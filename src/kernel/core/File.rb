@@ -3,11 +3,11 @@ class File
     primitive 'close', 'close'
     primitive '<<', 'addAll:'
     primitive 'write', 'addAll:'
-    primitive 'next_line', 'nextLine'
+    primitive 'next_line', 'nextLineTo:'
     primitive 'eof?', 'atEnd'
     primitive 'read', 'next:'
     primitive 'read', 'contents'
-    self.class.primitive '_open', 'open:mode:'
+    self.class.primitive '_open', 'openOnServer:mode:'
     self.class.primitive 'stdin'
     self.class.primitive 'stdout'
     self.class.primitive 'stderr'
@@ -60,7 +60,7 @@ class File
         
     def each_line(&block)
         until eof?
-            block.call(next_line)
+            block.call( next_line( $\ ) )
         end
     end
 end
@@ -87,7 +87,7 @@ class PersistentFile
     end
     
     def gets(sep=$/)
-        @block.call.next_line #whee
+        @block.call.next_line( sep ) #whee
     end
     
     def sync
