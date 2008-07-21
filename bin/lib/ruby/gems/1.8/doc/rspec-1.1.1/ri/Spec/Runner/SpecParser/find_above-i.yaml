@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: (source, line_number, pattern)
+is_singleton: false
+block_params: 
+name: find_above
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: Returns the context/describe or specify/it name and the line number
+full_name: Spec::Runner::SpecParser#find_above
+visibility: protected
+aliases: []

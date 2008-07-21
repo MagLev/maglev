@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: (*args)
+is_singleton: false
+block_params: 
+name: duck_type
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: Shortcut for creating an instance of Spec::Mocks::DuckTypeArgConstraint
+full_name: Spec::Mocks::ArgumentConstraintMatchers#duck_type
+visibility: public
+aliases: []

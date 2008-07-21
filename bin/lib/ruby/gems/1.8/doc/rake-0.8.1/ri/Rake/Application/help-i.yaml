@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: ()
+is_singleton: false
+block_params: 
+name: help
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: Display the rake command line help.
+full_name: Rake::Application#help
+visibility: public
+aliases: []

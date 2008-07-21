@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (message)
+is_singleton: false
+block_params: 
+name: fail_with_message
+comment: 
+full_name: Spec::Matchers::BaseOperatorMatcher#fail_with_message
+visibility: public
+aliases: []

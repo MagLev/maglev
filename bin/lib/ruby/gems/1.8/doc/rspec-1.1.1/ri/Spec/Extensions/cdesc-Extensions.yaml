@@ -1,0 +1,10 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: Extensions
+constants: []
+comment: 
+attributes: []
+instance_methods: []
+full_name: Spec::Extensions
+superclass: 
+class_methods: []

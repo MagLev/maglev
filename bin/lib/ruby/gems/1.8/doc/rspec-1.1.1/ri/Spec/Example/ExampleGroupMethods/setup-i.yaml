@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: (&block)
+is_singleton: false
+block_params: 
+name: setup
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: Deprecated. Use before(:each)
+full_name: Spec::Example::ExampleGroupMethods#setup
+visibility: public
+aliases: []

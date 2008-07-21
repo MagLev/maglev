@@ -1,0 +1,20 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: Translator
+constants: []
+comment: 
+attributes: []
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: standard_matcher?
+- !ruby/object:RI::MethodSummary
+  name: translate
+- !ruby/object:RI::MethodSummary
+  name: translate_dir
+- !ruby/object:RI::MethodSummary
+  name: translate_file
+- !ruby/object:RI::MethodSummary
+  name: translate_line
+full_name: Spec::Translator
+superclass: Object
+class_methods: []

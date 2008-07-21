@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (superclass_last=false) {|example_group| ...}
+is_singleton: false
+block_params: example_group
+name: execute_in_class_hierarchy
+comment: 
+full_name: Spec::Example::SharedExampleGroup#execute_in_class_hierarchy
+visibility: public
+aliases: []

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription
+params: (instance_rspec_options)
+is_singleton: true
+block_params: 
+name: run
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: Runs specs. <tt>argv</tt> is the commandline args as per the spec commandline
+    API, <tt>err</tt> and <tt>out</tt> are the streams output will be written to.
+full_name: Spec::Runner::CommandLine::run
+visibility: public
+aliases: []

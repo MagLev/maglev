@@ -1,0 +1,39 @@
+require 'rubygems'
+require "webrick"
+require 'parse_tree'
+require 'maglev_parser'
+
+include WEBrick
+
+port = (ENV["PARSETREE_PORT"] || "2001").to_i
+    
+s = HTTPServer.new( :Port => port )
+class ParseServlet < HTTPServlet::AbstractServlet
+	def do_GET(req, res)
+		if(code = req.query["string"])
+			filename = "eval"
+			puts "code: #{code.to_s}"
+		else
+			filename = req.query["file"].to_s
+			code = ""
+			File.open(filename, "r"){|f| code = f.read}
+		end
+		mp = MaglevParser.new
+		sexp = mp.parse(code, filename, 0).inspect
+		puts sexp
+		res.body = sexp
+	end
+end
+s.mount("/parse", ParseServlet)
+
+class CatServlet < HTTPServlet::AbstractServlet
+	def do_GET(req, res)
+		filename = req.query['file'].to_s
+		res.body = File.open(filename, "r").read
+	end
+end
+s.mount("/cat", CatServlet)
+
+s.start
+
+

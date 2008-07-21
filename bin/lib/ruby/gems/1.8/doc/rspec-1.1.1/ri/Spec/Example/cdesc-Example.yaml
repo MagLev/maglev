@@ -1,0 +1,10 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: Example
+constants: []
+comment: 
+attributes: []
+instance_methods: []
+full_name: Spec::Example
+superclass: 
+class_methods: []

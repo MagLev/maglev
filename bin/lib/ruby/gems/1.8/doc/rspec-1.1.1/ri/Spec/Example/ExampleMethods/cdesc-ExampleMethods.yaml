@@ -1,0 +1,34 @@
+--- !ruby/object:RI::ClassDescription
+includes: 
+- !ruby/object:RI::IncludedModule
+  name: Matchers
+- !ruby/object:RI::IncludedModule
+  name: Pending
+name: ExampleMethods
+constants: 
+- !ruby/object:RI::Constant
+  name: PENDING_EXAMPLE_BLOCK
+  value: lambda {         raise Spec::Example::ExamplePendingError.new("Not Yet Implemented")
+  comment: 
+comment: 
+attributes: []
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: after_example
+- !ruby/object:RI::MethodSummary
+  name: before_example
+- !ruby/object:RI::MethodSummary
+  name: description
+- !ruby/object:RI::MethodSummary
+  name: execute
+- !ruby/object:RI::MethodSummary
+  name: instance_variable_hash
+- !ruby/object:RI::MethodSummary
+  name: run_with_description_capturing
+- !ruby/object:RI::MethodSummary
+  name: set_instance_variables_from_hash
+- !ruby/object:RI::MethodSummary
+  name: violated
+full_name: Spec::Example::ExampleMethods
+superclass: 
+class_methods: []

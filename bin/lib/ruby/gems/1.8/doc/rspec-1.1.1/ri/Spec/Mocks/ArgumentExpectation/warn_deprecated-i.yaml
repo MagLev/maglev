@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (deprecated_method, instead)
+is_singleton: false
+block_params: 
+name: warn_deprecated
+comment: 
+full_name: Spec::Mocks::ArgumentExpectation#warn_deprecated
+visibility: public
+aliases: []

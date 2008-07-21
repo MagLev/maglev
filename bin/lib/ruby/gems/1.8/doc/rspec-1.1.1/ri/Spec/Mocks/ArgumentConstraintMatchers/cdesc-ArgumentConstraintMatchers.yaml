@@ -1,0 +1,20 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: ArgumentConstraintMatchers
+constants: []
+comment: 
+attributes: []
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: any_args
+- !ruby/object:RI::MethodSummary
+  name: anything
+- !ruby/object:RI::MethodSummary
+  name: boolean
+- !ruby/object:RI::MethodSummary
+  name: duck_type
+- !ruby/object:RI::MethodSummary
+  name: no_args
+full_name: Spec::Mocks::ArgumentConstraintMatchers
+superclass: 
+class_methods: []

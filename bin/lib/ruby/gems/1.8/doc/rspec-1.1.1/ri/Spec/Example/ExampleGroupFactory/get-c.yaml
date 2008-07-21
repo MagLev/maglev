@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (id=nil)
+is_singleton: true
+block_params: 
+name: get
+comment: 
+full_name: Spec::Example::ExampleGroupFactory::get
+visibility: public
+aliases: []

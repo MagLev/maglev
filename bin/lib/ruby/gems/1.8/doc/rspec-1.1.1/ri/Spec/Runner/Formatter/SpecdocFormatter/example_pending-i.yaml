@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (example_group_description, example, message)
+is_singleton: false
+block_params: 
+name: example_pending
+comment: 
+full_name: Spec::Runner::Formatter::SpecdocFormatter#example_pending
+visibility: public
+aliases: []

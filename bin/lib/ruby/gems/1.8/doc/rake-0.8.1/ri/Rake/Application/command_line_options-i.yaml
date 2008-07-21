@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: ()
+is_singleton: false
+block_params: 
+name: command_line_options
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: Return a list of the command line options supported by the program.
+full_name: Rake::Application#command_line_options
+visibility: public
+aliases: []

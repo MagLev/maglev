@@ -1,0 +1,12 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: MatcherHandlerHelper
+constants: []
+comment: 
+attributes: []
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: describe_matcher
+full_name: Spec::Expectations::MatcherHandlerHelper
+superclass: 
+class_methods: []

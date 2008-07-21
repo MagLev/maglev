@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: (value)
+is_singleton: false
+block_params: 
+name: matches?
+comment: 
+- !ruby/struct:SM::Flow::P
+  body: TODO - need this?
+full_name: Spec::Mocks::AnyArgConstraint#matches?
+visibility: public
+aliases: []

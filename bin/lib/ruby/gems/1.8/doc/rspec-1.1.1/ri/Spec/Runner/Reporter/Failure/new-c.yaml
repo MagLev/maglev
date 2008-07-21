@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (example_name, exception)
+is_singleton: true
+block_params: 
+name: new
+comment: 
+full_name: Spec::Runner::Reporter::Failure::new
+visibility: public
+aliases: []

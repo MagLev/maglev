@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription
+params: (filename)
+is_singleton: false
+block_params: 
+name: tests_for_file
+comment: 
+full_name: Autotest::Rspec#tests_for_file
+visibility: public
+aliases: 
+- !ruby/object:RI::AliasName
+  name: specs_for_file

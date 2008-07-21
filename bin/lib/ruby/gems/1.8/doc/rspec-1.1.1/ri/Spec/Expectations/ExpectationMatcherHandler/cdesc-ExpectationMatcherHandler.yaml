@@ -1,0 +1,14 @@
+--- !ruby/object:RI::ClassDescription
+includes: 
+- !ruby/object:RI::IncludedModule
+  name: MatcherHandlerHelper
+name: ExpectationMatcherHandler
+constants: []
+comment: 
+attributes: []
+instance_methods: []
+full_name: Spec::Expectations::ExpectationMatcherHandler
+superclass: Object
+class_methods: 
+- !ruby/object:RI::MethodSummary
+  name: handle_matcher

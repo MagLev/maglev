@@ -1,0 +1,28 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: Rspec
+constants: []
+comment: 
+attributes: []
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: add_options_if_present
+- !ruby/object:RI::MethodSummary
+  name: consolidate_failures
+- !ruby/object:RI::MethodSummary
+  name: failed_results
+- !ruby/object:RI::MethodSummary
+  name: handle_results
+- !ruby/object:RI::MethodSummary
+  name: make_test_cmd
+- !ruby/object:RI::MethodSummary
+  name: spec_command
+- !ruby/object:RI::MethodSummary
+  name: spec_commands
+- !ruby/object:RI::MethodSummary
+  name: specs_for_file
+- !ruby/object:RI::MethodSummary
+  name: tests_for_file
+full_name: Autotest::Rspec
+superclass: Autotest
+class_methods: []

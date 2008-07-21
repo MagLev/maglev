@@ -1,0 +1,14 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: LiteralArgConstraint
+constants: []
+comment: 
+attributes: []
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: matches?
+full_name: Spec::Mocks::LiteralArgConstraint
+superclass: Object
+class_methods: 
+- !ruby/object:RI::MethodSummary
+  name: new

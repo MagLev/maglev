@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (constraint)
+is_singleton: false
+block_params: 
+name: convert_constraint
+comment: 
+full_name: Spec::Mocks::ArgumentExpectation#convert_constraint
+visibility: public
+aliases: []

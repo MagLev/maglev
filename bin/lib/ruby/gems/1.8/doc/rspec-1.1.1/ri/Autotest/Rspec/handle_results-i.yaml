@@ -1,0 +1,9 @@
+--- !ruby/object:RI::MethodDescription
+params: (results)
+is_singleton: false
+block_params: 
+name: handle_results
+comment: 
+full_name: Autotest::Rspec#handle_results
+visibility: public
+aliases: []

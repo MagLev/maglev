@@ -1,0 +1,32 @@
+--- !ruby/object:RI::ClassDescription
+includes: []
+name: BaseOperatorMatcher
+constants: []
+comment: 
+attributes: 
+- !ruby/object:RI::Attribute
+  name: generated_description
+  comment: 
+  rw: R
+instance_methods: 
+- !ruby/object:RI::MethodSummary
+  name: <
+- !ruby/object:RI::MethodSummary
+  name: <=
+- !ruby/object:RI::MethodSummary
+  name: ==
+- !ruby/object:RI::MethodSummary
+  name: ===
+- !ruby/object:RI::MethodSummary
+  name: =~
+- !ruby/object:RI::MethodSummary
+  name: '>'
+- !ruby/object:RI::MethodSummary
+  name: '>='
+- !ruby/object:RI::MethodSummary
+  name: fail_with_message
+full_name: Spec::Matchers::BaseOperatorMatcher
+superclass: Object
+class_methods: 
+- !ruby/object:RI::MethodSummary
+  name: new
