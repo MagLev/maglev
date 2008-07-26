@@ -1,1 +1,1 @@
-../benchmark//cangiano/real-world/hilbert.rb
+../benchmark/cangiano/real-world/hilbert.rb
