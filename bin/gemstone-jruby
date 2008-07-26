@@ -14,9 +14,9 @@ if [ -z "$MAGLEV_HOME" ]; then
   fi
 fi
 #
-if [ -z "$PARSETREE_PORT" ]; then
-    # echo "using 2001 as PARSETREE_PORT"
-    export PARSETREE_PORT=2001
+if [ -z "$JRUBY_PORT" ]; then
+    # echo "using 2000 as JRUBY_PORT"
+    export JRUBY_PORT=2000
 fi
 #
 if [ -z "$JAVA_HOME" ]; then
@@ -41,6 +41,7 @@ export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
 export GEMSTONE=$MAGLEV_HOME/gemstone
 export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
 export TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+export JRUBY_HOME=$MAGLEV_HOME/bin
 
 # Commands
 startserver() {
@@ -58,31 +59,31 @@ startserver-debug() {
 }
 
 startparser() {
-  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
-      >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
+  if [ -z "`lsof -Fp -iTCP:${JRUBY_PORT}`" ]; then
+    nohup $MAGLEV_HOME/bin/jruby $MAGLEV_HOME/bin/parser.rb \
+      >$MAGLEV_HOME/log/parser.log 2>/dev/null &
     PARSER_PID="$!"
-    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
+    echo "MagLev Parse Server process $PARSER_PID started on port $JRUBY_PORT"
   else
-    echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
+    echo "MagLev Parse Server process already running on port $JRUBY_PORT"
   fi
 }
 
 forceparser() {
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
-      >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
+    nohup $MAGLEV_HOME/bin/jruby $MAGLEV_HOME/bin/parser.rb \
+      >$MAGLEV_HOME/log/parser.log 2>/dev/null &
     PARSER_PID="$!"
 }
 
 startparser-debug() {
-  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
-      >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
+  if [ -z "`lsof -Fp -iTCP:${JRUBY_PORT}`" ]; then
+    nohup $MAGLEV_HOME/bin/jruby $MAGLEV_HOME/bin/parser.rb \
+      >$MAGLEV_HOME/log/parser.log 2>$MAGLEV_HOME/log/parser.err &
     PARSER_PID="$!"
-    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
+    echo "MagLev Parse Server process $PARSER_PID started on port $JRUBY_PORT in verbose mode"
     echo "Parser logfiles are \$MAGLEV_HOME/log/parser.*"
   else
-    echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
+    echo "MagLev Parse Server process already running on port $JRUBY_PORT"
   fi
 }
 
@@ -92,20 +93,20 @@ stopserver() {
 }
 
 stopparser() {
-  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    kill `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
+  if [ ! -z "`lsof -Fp -iTCP:${JRUBY_PORT}`" ]; then
+    kill `lsof -Fp -iTCP:${JRUBY_PORT} | cut -c2-`
   fi
 }
 
 status() {
   echo "MAGLEV_HOME = $MAGLEV_HOME"
   $GEMSTONE/bin/gslist -clv
-  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    echo "MagLev Parse Server port = $PARSETREE_PORT"
-    lsof -P -iTCP:${PARSETREE_PORT}
-    netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
+  if [ ! -z "`lsof -Fp -iTCP:${JRUBY_PORT}`" ]; then
+    echo "MagLev Parse Server port = $JRUBY_PORT"
+    lsof -P -iTCP:${JRUBY_PORT}
+    netstat -an | grep "[:.]$JRUBY_PORT " | grep "LISTEN"
   else
-    echo "MagLev Parse Server is not running on port $PARSETREE_PORT"
+    echo "MagLev Parse Server is not running on port $JRUBY_PORT"
   fi
 }
 

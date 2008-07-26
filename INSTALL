@@ -3,4 +3,4 @@
 - Unzip a gemstone product distribution into the gemstone/ directory
 - Copy the ruby extent from gemstone/bin to data/extent0.ruby.dbf
 - Copy a key to etc/maglev.demo.key
-- Load MagLev-avi.170.mcz or later
+- Load MagLev-mrm.222.mcz or later

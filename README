@@ -26,7 +26,7 @@ gemstone help           - Display this text
 Note:
 - set MAGLEV_HOME to the full path of this directory, and add $MAGLEV_HOME/bin to your PATH. 
     Then you can use "gemstone ruby" etc from anywhere.
-- if you have multiple installations, set JRUBY_PORT to control 
+- if you have multiple installations, set PARSETREE_PORT to control 
     which port the parser server listens on
 - the first (and ony the first) time you run a gemstone command that runs Ruby code, 
     it will load and compile prims.rb, which takes up to a minute to run.
