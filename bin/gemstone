@@ -59,28 +59,34 @@ startserver-debug() {
 
 startparser() {
   if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
+    pushd $MAGLEV_HOME/bin > /dev/null
+    nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
+    popd > /dev/null
   else
     echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
   fi
 }
 
 forceparser() {
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
+    pushd $MAGLEV_HOME/bin > /dev/null
+    nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
     PARSER_PID="$!"
+    popd > /dev/null
 }
 
 startparser-debug() {
   if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
+    pushd $MAGLEV_HOME/bin > /dev/null
+    nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
     echo "Parser logfiles are \$MAGLEV_HOME/log/parser.*"
+    popd > /dev/null
   else
     echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
   fi
@@ -93,7 +99,7 @@ stopserver() {
 
 stopparser() {
   if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    kill `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
+    kill -9 `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
   fi
 }
 
