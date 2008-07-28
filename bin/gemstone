@@ -19,22 +19,6 @@ if [ -z "$PARSETREE_PORT" ]; then
     export PARSETREE_PORT=2001
 fi
 #
-if [ -z "$JAVA_HOME" ]; then
-  # for MacOSX use current installed Java
-  if [[ "`uname -sr | cut -f1 -d '.'`" = "Darwin 9" && -e /Library/Java/Home ]]; then
-    export JAVA_HOME=/Library/Java/Home
-  else
-  # for Linux use either java-1.5 or java-6
-    if [ -e /usr/lib/jvm/java-1.5.0-sun ]; then
-      export JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun
-    else
-      if [ -e /usr/lib/jvm/java-6-sun ]; then
-        export JAVA_HOME=/usr/lib/jvm/java-6-sun
-      fi
-    fi
-  fi
-fi
-#
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
@@ -73,8 +57,10 @@ startparser() {
 forceparser() {
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
-      >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
+      >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
     PARSER_PID="$!"
+    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
+    echo "Check \$MAGLEV_HOME/log/parsetree.err if the parser isn't working"
     popd > /dev/null
 }
 
@@ -85,7 +71,7 @@ startparser-debug() {
       >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
-    echo "Parser logfiles are \$MAGLEV_HOME/log/parser.*"
+    echo "Parser logfiles are \$MAGLEV_HOME/log/parsetree.*"
     popd > /dev/null
   else
     echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
