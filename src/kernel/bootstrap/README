@@ -1,0 +1,2 @@
+This RCL directory contains MagLev implementation specific kernel bootstrap files.
+Files in this directory are loaded first.

@@ -1,0 +1,2 @@
+This RCL directory contains commonly shared ruby files.
+Files in this directory are loaded after those in kernel/bootstrap.
