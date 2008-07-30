@@ -26,7 +26,6 @@ class String
     primitive 'inspect', 'printString'
     primitive 'empty?', 'isEmpty'
     primitive 'dup', 'copy'
-      # need to remove method  unpack:  from .mcz
     primitive 'unpack', 'rubyUnpack:'
     primitive '_findStringStartingAt', 'findString:startingAt:'
     primitive 'concat', '_rubyAddAll:'

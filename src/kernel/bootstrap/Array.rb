@@ -41,7 +41,6 @@ class Array
     primitive 'member?', 'includes:'
     primitive 'sort_by2&', 'sortBy:'
     primitive 'reject!&', 'removeAllSuchThat:'
-       # need to remove methods pack:, asUTF8String from .mcz 
     primitive 'pack', 'rubyPack:'
     primitive 'insert_all', 'insertAll:at:'
     primitive 'select&', 'select:'
