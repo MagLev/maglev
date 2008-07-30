@@ -58,9 +58,10 @@ class File
         contents
     end
         
+    # workaround for Ticket 67 where $/  not working yet, use 10
     def each_line(&block)
         until eof?
-            block.call( next_line( $\ ) )
+            block.call( next_line( 10 ) )
         end
     end
 end
@@ -86,7 +87,8 @@ class PersistentFile
       _file << data
     end
     
-    def gets(sep=$/)
+    # workaround for Ticket 67 where $/  not working yet, use 10
+    def gets(sep=10)
         @block.call.next_line( sep ) #whee
     end
     
