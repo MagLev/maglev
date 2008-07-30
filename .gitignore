@@ -1,0 +1,13 @@
+.DS_Store	# OS X junk
+._*			# TextMate junk 
+.svn
+*.err
+*.log
+*.out
+*.rbc
+data/
+gemstone/
+locks/
+log/
+
+
