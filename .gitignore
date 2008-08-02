@@ -5,6 +5,7 @@
 *.log
 *.out
 *.rbc
+*.swp
 data/
 gemstone/
 locks/
