@@ -1,7 +1,7 @@
 class Array
     primitive 'length', 'size'
     primitive 'size'
-    # note, can't use smalltalk add: , it returns arg, not receiver
+    # note, <<  can't use smalltalk add: , it returns arg, not receiver
     primitive '<<', '_rubyAddLast:'
     primitive 'concat', 'addAll:'
     primitive 'remove_if_absent', 'remove:ifAbsent:'
@@ -35,7 +35,11 @@ class Array
     primitive '_all', 'allSatisfy:'
     primitive '_detect', 'detect:ifNone:'
     primitive '+', ','
-    primitive '-', 'removeAll:'
+
+    #  &  uses Smalltalk implementation because Ruby Hash does not
+    #   support a removeKey:otherwise: in the Ruby API.
+    primitive '&',  'rubyIntersect:'
+
     primitive 'inspect', 'printString'
     primitive 'include?', 'includes:'
     primitive 'member?', 'includes:'
@@ -45,6 +49,9 @@ class Array
     primitive 'insert_all', 'insertAll:at:'
     primitive 'select&', 'select:'
     primitive 'inject&', 'inject:into:'
+
+    # replace written in Smalltalk so it can use copyFrom:to:into:startingAt prim
+    primitive 'replace', 'rubyReplace:'
     
     self.class.primitive 'alloc', 'new:'
     def self.new(size=0, value=nil)
@@ -85,12 +92,6 @@ class Array
     
     def find(&block)
         _detect(block, nil)
-    end
-    
-    def replace(a)
-        clear
-        a.each{|el| self << el}
-        self
     end
     
     def sort
@@ -216,11 +217,15 @@ class Array
     def uniq
       hash = {}
       ary = []
-      each do |el|
-          unless hash.include? el
-             ary << el
-             hash[el] = el
-          end
+      j = 0
+      lim = size
+      while (j < lim) 
+        el = self[j]
+	unless hash.include? el
+	   ary << el
+	   hash[el] = el
+	end
+        j = j + 1
       end
       ary
     end
@@ -234,8 +239,12 @@ class Array
     end
     
     def flatten_onto(output)
-      each do |el|
+      j = 0
+      lim = size
+      while (j < lim)
+        el = self[j]
         el.flatten_onto(output)
+        j = j + 1
       end
       output
     end
@@ -246,6 +255,28 @@ class Array
         result
     end
     
+    def -(arg)
+      argSize = arg.size
+      mySize = size
+      default = Array.new
+      h = Hash.new(default)
+      res = Array.new
+      j = 0
+      while (j < argSize) 
+        el = arg[j]
+        h[el] = el
+        j = j + 1
+      end 
+      j = 0
+      while (j < mySize)
+        el = self[j]
+        if (h[el].equal?(default)) 
+          res << el   
+        end
+        j = j + 1
+      end
+      res
+    end
     
     def slice!(x, y = nil)
         if y
