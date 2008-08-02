@@ -22,6 +22,7 @@ class MaglevParser
     end
     
     def parse(source, filename="(string)", line=0, method=nil)
+      begin
         sexp = @pt.parse_tree_for_str(source, filename, 0).first
         if method then
             # class, scope, block, *methods
@@ -31,5 +32,9 @@ class MaglevParser
         else
             sexp
         end
+      rescue Exception => ex
+        sexp = [ :parse_error , ex.message ]
+        return sexp 
+      end
     end
 end
