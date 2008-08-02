@@ -36,7 +36,7 @@ class File
     end
     
     def self.dirname(str)
-         if str =~ /(.+)\//
+        if str =~ /(.+)\//
             $1
         else
           if str[0] == ?/
