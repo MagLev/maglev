@@ -21,6 +21,7 @@ gemstone ruby  <file>   - Execute a Ruby file
 gemstone topaz          - Enter a Topaz shell
 gemstone topaz-debug    - Enter a Topaz shell useful for debugging 
 gemstone squeak         - Start optional Squeak development environment
+gemstone vsd            - Start Visual Statistics Display monitoring tool
 gemstone help           - Display this text
 
 Note:
