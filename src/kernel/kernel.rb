@@ -40,11 +40,15 @@ def load(name)
 end
 
 require 'kernel/bootstrap/Globals.rb'
+require 'kernel/bootstrap/GlobalErrors.rb'
+require 'kernel/bootstrap/Gemstone.rb'
 
 #
 # bootstrap
 #
 require 'kernel/bootstrap/Object.rb'
+# require 'kernel/bootstrap/Kernel.rb'
+
 require 'kernel/bootstrap/Class.rb'
 require 'kernel/bootstrap/Fixnum.rb'
 require 'kernel/bootstrap/Integer.rb'

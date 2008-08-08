@@ -35,15 +35,7 @@ RUBY.global( 'ENOTCONN' , 'SocketErrorENOTCONN')
 RUBY.global( 'EPIPE' , 'SocketErrorEPIPE')
 RUBY.global( 'ECONNRESET' , 'SocketErrorECONNRESET')
 
-class SystemCallError < Exception; end
-class RuntimeError < Exception; end
-class IOError < Exception; end
-
 RUBY.global("Gemstone", "System")
-
-Gemstone.class.primitive 'commitTransaction'
-Gemstone.class.primitive 'abortTransaction'
-Gemstone.class.primitive 'beginTransaction'
 
 def proc(&b); b; end
 Proc = proc{}.class

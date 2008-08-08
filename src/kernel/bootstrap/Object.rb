@@ -15,8 +15,6 @@ class Object
 
     primitive 'nil?' , '_rubyNilQ'
 
-    # inspect will print to topaz -l output or gem log if Omni client GUI
-    #   not initialized
     primitive '_send', 'rubySend:withArguments:'
     
     primitive 'freeze', 'immediateInvariant'
@@ -27,6 +25,8 @@ class Object
     # pause is not standard Ruby, for debugging only .
     #  trappable only by an Exception specifying exactly error 6001
     primitive 'pause', 'pause'
+
+    #   				rubyInspect comes from .mcz 
     primitive 'inspect', 'rubyInspect'
     primitive 'method', 'rubyMethod:'
     
@@ -37,9 +37,15 @@ class Object
             RandomInstance.next
         end
     end
+
     
     def to_str
         to_s
+    end
+
+    def to_a
+       # remove this method for MRI 1.9 compatibility
+       [ self ]
     end
     
     def loop
@@ -100,11 +106,6 @@ class Object
         $stdin.gets(sep)
     end
 
-    def format(str, *args)
-        args.each{|a| str.sub!(/%(d|s)/, a.to_s)}
-        str
-    end
-    
     def sprintf(str, *args)
         format(str, *args)
     end
@@ -146,4 +147,6 @@ class Object
   end
   
   def pretty_inspect; inspect; end
+
+  require 'kernel/bootstrap/Kernel.rb'
 end
