@@ -137,6 +137,9 @@ module MSpec
         STDERR.write "\nAn exception occurred in #{msg}:\n#{e.class}: #{e.message.inspect}\n"
         STDERR.write "#{e.backtrace.join "\n"}"
       end
+      if DEBUG_SPEC # bobw - See comments in Globals.rb
+        pause
+      end
     end
   end
 

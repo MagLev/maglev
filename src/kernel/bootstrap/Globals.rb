@@ -42,3 +42,11 @@ Proc = proc{}.class
 
 ARGV = []
 
+# A quick hack to get specs further w/o build having to poke the right string in this slot. See ticket #76
+RUBY_PLATFORM = 'Unspecified.platform' 
+RUBY_VERSION = '1.8.6'
+
+# If DEBUG_SPEC is true an executing rubyspec pauses on exception for degubbing in topaz
+# If false, the handling is unchanged: exception is reported along with the stringified stack.
+# Value is examined by mspec/runner/mspec.rb. 
+DEBUG_SPEC = false
