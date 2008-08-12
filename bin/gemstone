@@ -116,6 +116,7 @@ ENDRUBY
 spec() {
   WD=$PWD
   $TOPAZ_CMD <<ENDSPEC
+output push spec.out
 run
 RubyContext load.
 RubyContext requireFileNamed: 'mspec.rb'.
