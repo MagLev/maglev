@@ -42,7 +42,7 @@ fi
 
 # run the maglev command
   FILE=$PWD/$1
-  $TOPAZ_CMD <<ENDRUBY | sed -e '/^topaz 1> /s///' -e '/sz:0 *cls:/s/\[.*\] //'
+  $TOPAZ_CMD <<ENDRUBY | sed '/^topaz 1> /s///' 
 run
 RubyContext load.
 RubyContext loadFileNamed: '$FILE'.
