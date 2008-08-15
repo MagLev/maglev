@@ -47,7 +47,7 @@ require 'kernel/bootstrap/Gemstone.rb'
 # bootstrap
 #
 require 'kernel/bootstrap/Object.rb'
-# require 'kernel/bootstrap/Kernel.rb'
+#  Kernel.rb must be included from a require within Object.rb
 
 require 'kernel/bootstrap/Class.rb'
 require 'kernel/bootstrap/Fixnum.rb'

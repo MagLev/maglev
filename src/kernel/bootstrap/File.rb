@@ -58,10 +58,10 @@ class File
         contents
     end
         
-    # workaround for Ticket 67 where $/  not working yet, use 10
     def each_line(&block)
+        sep = $/[0] 
         until eof?
-            block.call( next_line( 10 ) )
+            block.call( next_line( sep ) )
         end
     end
 end
@@ -87,9 +87,8 @@ class PersistentFile
       _file << data
     end
     
-    # workaround for Ticket 67 where $/  not working yet, use 10
-    def gets(sep=10)
-        @block.call.next_line( sep ) #whee
+    def gets(sep=$/ )
+        @block.call.next_line( sep[0] ) #whee
     end
     
     def sync
@@ -105,3 +104,4 @@ end
 STDIN = $stdin = PersistentFile.new(proc{File.stdin})
 STDOUT = $stdout = PersistentFile.new(proc{File.stdout})
 STDERR = $stderr = PersistentFile.new(proc{File.stderr})
+$> = $stdout

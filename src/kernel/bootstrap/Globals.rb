@@ -15,6 +15,7 @@ Array = [].class
 Object = self.class
 Symbol = :primitive.class
 
+RUBY.global('Kernel', 'Kernel')    # for module Kernel
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('File', 'GsFile')
 RUBY.global('Socket', 'Socket')
@@ -41,12 +42,23 @@ def proc(&b); b; end
 Proc = proc{}.class
 
 ARGV = []
+#  $; is auto-initialized to nil if referenced, by RubySexpParser .
+#  $/ is auto-initialized to "\n" by parser at first ref .
+#  $-0 is translated to $/ by parser .
+#  $-F is translated to  $;  by parser .
+#  $!  is auto-auto-initialized by parser at first occurance of a RubyRescueBodyNode
 
-# A quick hack to get specs further w/o build having to poke the right string in this slot. See ticket #76
+# -------------------
+
+# A quick hack to get specs further w/o build having to poke the right string in 
+#  this slot. See ticket #76
 RUBY_PLATFORM = 'Unspecified.platform' 
 RUBY_VERSION = '1.8.6'
-
-# If DEBUG_SPEC is true an executing rubyspec pauses on exception for degubbing in topaz
-# If false, the handling is unchanged: exception is reported along with the stringified stack.
+ 
+# If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
+# If false, the handling is unchanged: exception is reported along with the 
+#  stringified stack.
 # Value is examined by mspec/runner/mspec.rb. 
 DEBUG_SPEC = false
+
+
