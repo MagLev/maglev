@@ -56,7 +56,7 @@ require '../benchmark/cangiano/core-library/bm_so_matrix.rb'
 require '../benchmark/cangiano/core-library/bm_vm2_array.rb'
 require '../benchmark/cangiano/core-library/bm_vm2_regexp.rb'
 # require '../benchmark/cangiano/core-library/bm_vm3_thread_create_join.rb'
-require '../benchmark/cangiano/micro-benchmarks/bm_app_pentomino.rb'
+# require '../benchmark/cangiano/micro-benchmarks/bm_app_pentomino.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_binary_trees.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_fannkuch.rb'
 # require '../benchmark/cangiano/micro-benchmarks/bm_fasta.rb' # Too much output
