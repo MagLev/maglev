@@ -11,7 +11,7 @@
 # * follow-parser: do a tail -f on the parser log
 # * git support for typical workflows (see git support in Rubinius Rakefile)
 # * allow command line control of the verbosity of the "sh" calls.
-#  
+#
 task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
 
 namespace :gs do # TODO: should this namespace be "gs" or "maglev" or ...?
@@ -19,7 +19,7 @@ namespace :gs do # TODO: should this namespace be "gs" or "maglev" or ...?
   task :start => [:initialize, :startserver, :startparser ]
 
   desc "Force parser process to start if it's dead."
-  task :'start-server' => [:initialize, :forceparser]
+  task :'start-parser' => [:initialize, :forceparser]
 
   desc "Start the GemStone processes with verbose output."
   task :'start-debug' => [:initialize, :'startserver-debug', :'startparser-debug']
@@ -144,7 +144,7 @@ namespace :gs do # TODO: should this namespace be "gs" or "maglev" or ...?
 
   task :destroy => :initenv do
     sh %{
-      rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/* 
+      rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/*
     }, :verbose => false
   end
 
