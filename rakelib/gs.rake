@@ -123,24 +123,27 @@ namespace :gs do
   end
 
   task :initialize => :initenv do
-    sh %{
-      cp -p #{GEMSTONE}/bin/extent0.ruby.dbf #{MAGLEV_HOME}/data/
-      chmod 660 #{MAGLEV_HOME}/data/extent0.ruby.dbf
-    }, :verbose => false unless File.exists?("#{MAGLEV_HOME}/data/extent0.ruby.dbf")
+    cd MAGLEV_HOME do
+      mkdir_p %w(data log locks)
+      install("#{GEMSTONE}/bin/extent0.ruby.dbf", "data", :mode => 0660) unless
+        File.exists?("#{MAGLEV_HOME}/data/extent0.ruby.dbf")
+    end
   end
 
-  task :destroy => :initenv do
-    sh %{
-      rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/*
-    }, :verbose => false
+  # RxINC: Should this be in a clobber target?
+  task :destroy => [:initenv, :stopserver] do
+    cd MAGLEV_HOME do
+      # RxINC: is -r necessary?
+      rm_rf FileList.new("data/*dbf", "log/*", "locks/*")
+    end
   end
 
-  desc "Run topaz (uses rlwrap, if available)"
+  desc "Run topaz (use rlwrap, if available)"
   task :topaz => :initenv do
     sh %{ `which rlwrap` #{TOPAZ_CMD} }
   end
 
-  desc "Run debug topaz (uses rlwrap, if available)"
+  desc "Run debug topaz (use rlwrap, if available)"
   task :'topaz-debug' => :initenv do
     sh %{ `which rlwrap` #{TOPAZDEBUG_CMD} }
   end
