@@ -659,6 +659,7 @@ class Array
       else
         f << el
       end
+      i += 1
     end
     [t,f]
   end
