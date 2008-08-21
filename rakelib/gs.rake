@@ -1,6 +1,9 @@
 # Define tasks to control basic GemStone processes (i.e., tasks useful for
 # any GemStone install, not just MagLev).
 
+# RxINC: Need a task to test if gs is already running., then make topaz
+# depend on it.
+
 namespace :gs do
   desc "Start GemStone server processes."
   task :start => [:initialize, :startserver, :startparser ]
@@ -131,7 +134,11 @@ namespace :gs do
   end
 
   # RxINC: Should this be in a clobber target?
-  task :destroy => [:gemstone, :stopserver] do
+  task :destroy => [:gemstone, :stopserver, :remove_extents]
+
+  task :remove_extents => :initenv do
+    puts "verbose: #{verbose}"
+    puts "===>  remove_extents"
     cd MAGLEV_HOME do
       # RxINC: is -r necessary?
       rm_rf FileList.new("data/*dbf", "log/*", "locks/*")
