@@ -25,11 +25,17 @@ task :initenv do
   TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
   TOPAZDEBUG_CMD = "#{GEMSTONE}/bin/topaz -I #{MAGLEV_HOME}/etc/.topazdebugini -l "
 
-  raise "Bad GEMSTONE dir: '#{GEMSTONE}'" unless File.directory?(GEMSTONE)
-
   ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
   ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
   ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone.log"
   ENV['GEMSTONE']            = GEMSTONE
+end
 
+# This initializes the environment, and then ensures that there is a
+# gemstone diretory there.  Needed to pull this out, since some of the
+# initialization tasks need to be performed before there is a gemstone dir
+# there, but need the ENV var (i.e., need to know where gemstone should
+# be).
+task :gemstone => :initenv do
+  raise "Bad GEMSTONE dir: '#{GEMSTONE}'" unless File.directory?(GEMSTONE)
 end

@@ -30,7 +30,7 @@ namespace :gs do
   # command line, but they are not "desc"cribed, since I'm trying to keep
   # "rake -T" clean.
 
-  task :startserver => :initenv do
+  task :startserver => :gemstone do
     sh %{
       ${GEMSTONE}/bin/startnetldi -g &>/dev/null
       ${GEMSTONE}/bin/startstone gs64stone &>/dev/null
@@ -40,7 +40,7 @@ namespace :gs do
     end
   end
 
-  task :'startserver-debug' => :initenv do
+  task :'startserver-debug' => :gemstone do
     sh %{
       ${GEMSTONE}/bin/startnetldi -g
       ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf gs64stone
@@ -50,7 +50,7 @@ namespace :gs do
     end
   end
 
-  task :startparser => :initenv do
+  task :startparser => :gemstone do
     case `lsof -Fp -iTCP:#{PARSETREE_PORT}`
     when ''
       sh %{
@@ -64,7 +64,7 @@ namespace :gs do
     end
   end
 
-  task :forceparser => :initenv do
+  task :forceparser => :gemstone do
     sh %{
       cd $MAGLEV_HOME/bin > /dev/null
       nohup ruby parsetree_parser.rb \
@@ -75,7 +75,7 @@ namespace :gs do
     }, :verbose => false
   end
 
-  task :'startparser-debug' => :initenv do
+  task :'startparser-debug' => :gemstone do
     case `lsof -Fp -iTCP:#{PARSETREE_PORT}`
     when ''
       sh %{
@@ -91,14 +91,14 @@ namespace :gs do
     end
   end
 
-  task :stopserver => :initenv do
+  task :stopserver => :gemstone do
     sh %{
       ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i
       ${GEMSTONE}/bin/stopnetldi
     }, :verbose => false
   end
 
-  task :stopparser => :initenv do
+  task :stopparser => :gemstone do
     sh %{
       if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
         kill -9 `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
@@ -107,7 +107,7 @@ namespace :gs do
     }, :verbose => false
   end
 
-  task :statusinternal => :initenv do
+  task :statusinternal => :gemstone do
     sh %{
       echo "MAGLEV_HOME = $MAGLEV_HOME"
       $GEMSTONE/bin/gslist -clv
@@ -122,7 +122,7 @@ namespace :gs do
     }, :verbose => false
   end
 
-  task :initialize => :initenv do
+  task :initialize => :gemstone do
     cd MAGLEV_HOME do
       mkdir_p %w(data log locks)
       install("#{GEMSTONE}/bin/extent0.ruby.dbf", "data", :mode => 0660) unless
@@ -131,7 +131,7 @@ namespace :gs do
   end
 
   # RxINC: Should this be in a clobber target?
-  task :destroy => [:initenv, :stopserver] do
+  task :destroy => [:gemstone, :stopserver] do
     cd MAGLEV_HOME do
       # RxINC: is -r necessary?
       rm_rf FileList.new("data/*dbf", "log/*", "locks/*")
@@ -139,12 +139,12 @@ namespace :gs do
   end
 
   desc "Run topaz (use rlwrap, if available)"
-  task :topaz => :initenv do
+  task :topaz => :gemstone do
     sh %{ `which rlwrap` #{TOPAZ_CMD} }
   end
 
   desc "Run debug topaz (use rlwrap, if available)"
-  task :'topaz-debug' => :initenv do
+  task :'topaz-debug' => :gemstone do
     sh %{ `which rlwrap` #{TOPAZDEBUG_CMD} }
   end
 
