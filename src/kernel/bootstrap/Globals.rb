@@ -31,6 +31,7 @@ RUBY.global('Time', 'DateTime')
 RUBY.global('Exception', 'Exception')
 RUBY.global('StandardError', 'Error')
 RUBY.global('LoadError', 'RubyLoadError')
+RUBY.global('ZeroDivisionError', 'ZeroDivide')
 RUBY.global( 'EBADF' , 'SocketErrorEBADF')
 RUBY.global( 'ENOTCONN' , 'SocketErrorENOTCONN')
 RUBY.global( 'EPIPE' , 'SocketErrorEPIPE')
@@ -50,16 +51,16 @@ ARGV = []
 
 # -------------------
 
-# A quick hack to get specs further w/o build having to poke the right string in 
+# A quick hack to get specs further w/o build having to poke the right string in
 #  this slot. See ticket #76
-RUBY_PLATFORM = 'Unspecified.platform' 
+RUBY_PLATFORM = 'Unspecified.platform'
 RUBY_VERSION = '1.8.6'
 RUBY_RELEASE_DATE = '09/15/2008' #TODO: Date should be inserted by build framework
- 
+
 # If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
-# If false, the handling is unchanged: exception is reported along with the 
+# If false, the handling is unchanged: exception is reported along with the
 #  stringified stack.
-# Value is examined by mspec/runner/mspec.rb. 
+# Value is examined by mspec/runner/mspec.rb.
 DEBUG_SPEC = false
 
 
