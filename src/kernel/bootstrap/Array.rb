@@ -1,5 +1,5 @@
 class Array
-  # These methods are private helper methods
+  # begin private helper methods
   # RxINC: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
   primitive '_detect', 'detect:ifNone:'
@@ -8,6 +8,10 @@ class Array
   primitive 'remove_first', 'removeFirst'
   primitive 'remove_if_absent', 'remove:ifAbsent:'
   primitive 'remove_last', 'removeLast'
+  primitive 'size=', 'size:'
+  self.class.primitive '_withAll', 'withAll:'
+  primitive '_removeFromTo', '_removeFrom:do:'
+
   def flatten_onto(output)
     j = 0
     lim = size
@@ -18,12 +22,13 @@ class Array
     end
     output
   end
+  # end private helper methods
 
   # Array Class Methods
 
   # Returns a new array with the given elements.
-  def self.[](elements)
-    raise "Method not implemented: Array.[]"
+  def self.[](*elements)
+    _withall(elements)
   end
   self.class.primitive 'alloc', 'new:'
 
@@ -31,6 +36,7 @@ class Array
   def self.new(size=0, value=nil)
     inst = alloc(size)
     if value
+      # TODO want a new Smalltalk primitive for atAllPut:
       for i in (0..(inst.length-1))
         inst[i] = value
       end
@@ -51,6 +57,8 @@ class Array
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
     result = []
+    # TODO:  not checking for  obj responds to to_str 
+    # TODO: do not use a block here.
     obj.times{result.concat(self)}
     result
   end
@@ -85,9 +93,16 @@ class Array
   primitive '<<', '_rubyAddLast:'
 
   # Comparison: return -1, 0, or 1.
-  def <=>(other)
+  def <=>(*other)
+    # should arg be *  ???
+# see example in Object.rb
+# knd = arg._kindBlkStrRanRegAry
+# if ( knd.equal?(1) )  # if arg.kind_of?(Array)
+    #iterarion with while loop
     raise "Method not implemented: Array#<=>"
   end
+
+  #  Method not implemented , need to code == as a while loop iteration in ruby
   primitive '==', '='
 
   primitive '[]' , '_rubyAt:'
@@ -98,12 +113,14 @@ class Array
 
   # Set Union
   def |(other)
+    # build a hash and iterate ... , see uniq for example
     raise "Method not implemented: Array#|"
   end
 
   # Associate: Search through self (an array of arrays).  Return first
   # array whose first element matches +key+ (using +key.==+).
   def assoc(key)
+    # iteration with while loop ...
     raise "Method not implemented: Array#assoc"
   end
 
@@ -121,30 +138,44 @@ class Array
 
   # Return copy of self with all nil elements removed
   def compact
+    # iteration with while loop bulding new array
+    # r = []
+    #  while 
     raise "Method not implemented: Array#compact"
   end
 
   # Remove all nil elements from self
   def compact!
+    # iteration from front with src and dest indexes
+    #  and when done  use size=  
     raise "Method not implemented: Array#compact!"
   end
 
   primitive 'concat', 'addAll:'
 
-  # TODO: need to add a block
+  # TODO: need to add a block arg variant to delete
   def delete(el)
     remove_if_absent(el, proc{return nil})
     return el
   end
 
+
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
+  #   TODO: use the smalltalk primitive 
   def delete_at(index)
-    raise "Method not implemented: Array#delete_at"
+    # convert negative index to positive and conver to on-based
+    # and do nothing if index out of range ..
+   # Method not implemented
+    self._removeFromTo(idx, idx)
+    # retvalue
   end
 
   # Delete every element of self for which +block+ evalutes to +true+.
   def delete_if(&block)
+    # iteration with src and dest indexes invoking the block ...
+    #   (similar to compact!)
+    #   size=  at end
     raise "Method not implemented: Array#delete_if"
   end
 
@@ -163,13 +194,16 @@ class Array
   primitive 'empty?', 'isEmpty'
 
   def eql?(other)
+    # iteration with while loop sending eql? ...
     raise "Method not implemented: Array#eql?"
   end
 
   def fetch(index,&b)
+    # Allen will do, maybe use _rubyAt: primitive variant
     raise "Method not implemented: Array#fetch"
   end
   def fill(obj)
+    # needs more analysis with Allen
     raise "Method not implemented: Array#fill"
   end
   primitive 'first'
@@ -179,6 +213,7 @@ class Array
   end
 
   def flatten!
+    # use existing flatten_onto followed by become: 
     raise "Method not implemented: Array#flatten!"
   end
 
@@ -199,9 +234,11 @@ class Array
   end
 
   def indexes(*args)
+    # use alias 
     raise "Method not implemented: deprecated (use Array#values_at): Array#indexes"
   end
   def indicies(*args)
+    # use alias 
     raise "Method not implemented: deprecated (use Array#values_at): Array#indicies"
   end
 
@@ -226,6 +263,7 @@ class Array
 
   # Number of non-<tt>nil</tt> elements in self.
   def nitems
+    # while loop # could be easy to write C primitive eventually
     raise "Method not implemented: Array#nitems"
   end
   primitive 'pack', 'rubyPack:'
@@ -240,13 +278,16 @@ class Array
   # Associate: Search through self (an array of arrays).  Return first
   # array whose second element matches +key+ (using +key.==+).
   def rassoc(key)
+    # iteration in ruby
     raise "Method not implemented: Array#rassoc"
   end
   primitive 'reject!&', 'removeAllSuchThat:'
 
   # replace written in Smalltalk so it can use copyFrom:to:into:startingAt prim
   primitive 'replace', 'rubyReplace:'
+
   primitive 'reverse'
+
   def reverse!
     replace(reverse)
   end
@@ -258,6 +299,7 @@ class Array
       i -= 1
     end
   end
+
   def rindex(el)
     i = size - 1
     while(i >= 0)
@@ -313,6 +355,8 @@ class Array
 
   # Transpose rows and columns (assumes self is an array of arrays)
   def transpose
+    # iteration in ruby , nested while loops
+    #  could be C primitive
     raise "Method not implemented: Array#transpose"
   end
 
@@ -344,6 +388,9 @@ class Array
   # Return an array containing the element in self at the positions given
   # by the selectors.
   def values_at(*selectors)
+    # iteration with while loop, using  [] primitive and appending to result
+    #   use either  self.[idx,1] or  self.[aRange] 
+    #   use << to append to result
     raise "Method not implemented: Array#values_at"
   end
 
@@ -380,6 +427,7 @@ class Array
   end
 
   def each_with_index(&block)
+    # iteration in ruby
     raise "Method not implemented: Enumerable#each_with_index (Array.rb)"
   end
 
@@ -390,6 +438,7 @@ class Array
   end
 
   def find_all(&block)
+    # iteration in ruby building result
     raise "Method not implemented: Enumerable#find_all (Array.rb)"
   end
 
@@ -405,12 +454,14 @@ class Array
   alias map collect
 
   def max
+    # iteration in ruby
     raise "Method not implemented: Enumerable#max (Array.rb)"
   end
 
   primitive 'member?', 'includes:'
 
   def min
+    # iteration in ruby
     raise "Method not implemented: Enumerable#min (Array.rb)"
   end
 
@@ -430,6 +481,7 @@ class Array
   end
 
   def reject(&block)
+    # iteration in ruby bulding result
     raise "Method not implemented: Enumerable#reject (Array.rb)"
   end
 
@@ -446,6 +498,7 @@ class Array
   # to_a: Implemented above in the Array section
 
   def zip(*args)
+    # write in ruby
     raise "Method not implemented: Enumerable#zip (Array.rb)"
   end
 
