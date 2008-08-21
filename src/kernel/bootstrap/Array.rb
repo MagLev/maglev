@@ -1,4 +1,7 @@
 class Array
+
+  PBM = 3
+
   # begin private helper methods
   # RxINC: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
@@ -11,6 +14,19 @@ class Array
   primitive 'size=', 'size:'
   self.class.primitive '_withAll', 'withAll:'
   primitive '_removeFromTo', '_removeFrom:do:'
+
+  # Used by both assoc and rassoc, since they differ only in the index of
+  # the array to compare to the key
+  def _assoc(key, idx)
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
+      return el if el[idx] == key
+      i += 1
+    end
+    nil
+  end
 
   # RxINC: This should be a private _ method, right?
   def flatten_onto(output)
@@ -145,14 +161,7 @@ class Array
   # Associate: Search through self (an array of arrays).  Return first
   # array whose first element matches +key+ (using +key.==+).
   def assoc(key)
-    i = 0
-    lim = size
-    while i < lim
-      el = self[i]
-      return el if el[0] == key
-      i += 1
-    end
-    nil
+    _assoc(key, 0)
   end
 
   primitive 'at' , '_rubyAt:'
@@ -260,15 +269,30 @@ class Array
 
   primitive 'empty?', 'isEmpty'
 
+  # Return true if both are the same object, or if both are arrays, and
+  # have the same number of elements and all corresponding elements are
+  # eql?.
+  #
+  # RxINC: "[1,2,3].eql? [1,2,3]" currently fails, since "1.eql? 1"
+  # currently fails...
   def eql?(other)
-    # iteration with while loop sending eql? ...
-    raise "Method not implemented: Array#eql?"
+    return true if equal? other
+    return false unless other.kind_of?(Array)
+    return false unless size == other.size
+
+    i = 0
+    lim = size
+    while i < size
+      return false unless self[i].eql? other[i]
+    end
+    true
   end
 
   def fetch(index,&b)
     # Allen will do, maybe use _rubyAt: primitive variant
     raise "Method not implemented: Array#fetch"
   end
+
   def fill(obj)
     # needs more analysis with Allen
     raise "Method not implemented: Array#fill"
@@ -330,9 +354,14 @@ class Array
 
   # Number of non-<tt>nil</tt> elements in self.
   def nitems
-    # while loop # could be easy to write C primitive eventually
-    raise "Method not implemented: Array#nitems"
+    count = 0
+    i = 0
+    while i < size
+      count += 1 unless self[i].nil?
+      i += 1
+    end
   end
+
   primitive 'pack', 'rubyPack:'
 
   def pop
@@ -345,12 +374,14 @@ class Array
   # Associate: Search through self (an array of arrays).  Return first
   # array whose second element matches +key+ (using +key.==+).
   def rassoc(key)
-    # iteration in ruby
-    raise "Method not implemented: Array#rassoc"
+    _assoc(key, 1)
   end
+
+
   primitive 'reject!&', 'removeAllSuchThat:'
 
-  # replace written in Smalltalk so it can use copyFrom:to:into:startingAt prim
+  # replace written in Smalltalk so it can use copyFrom:to:into:startingAt
+  # prim
   primitive 'replace', 'rubyReplace:'
 
   primitive 'reverse'
@@ -494,8 +525,11 @@ class Array
   end
 
   def each_with_index(&block)
-    # iteration in ruby
-    raise "Method not implemented: Enumerable#each_with_index (Array.rb)"
+    i = 0
+    while i < size
+      block.call(self[i],i)
+      i += 1
+    end
   end
 
   alias entries to_a
@@ -505,8 +539,14 @@ class Array
   end
 
   def find_all(&block)
-    # iteration in ruby building result
-    raise "Method not implemented: Enumerable#find_all (Array.rb)"
+    result = []
+    i = 0
+    while i < size
+      el = self[i]
+      result << el if block.call(el)
+      i += 1
+    end
+    result
   end
 
   def grep(pattern)
