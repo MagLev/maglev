@@ -1,7 +1,4 @@
 class Array
-
-  PBM = 3
-
   # begin private helper methods
   # RxINC: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
@@ -109,14 +106,36 @@ class Array
   # note, <<  can't use smalltalk add: , it returns arg, not receiver
   primitive '<<', '_rubyAddLast:'
 
-  # Comparison: return -1, 0, or 1.
-  def <=>(*other)
-    # should arg be *  ???
-# see example in Object.rb
-# knd = arg._kindBlkStrRanRegAry
-# if ( knd.equal?(1) )  # if arg.kind_of?(Array)
-    #iterarion with while loop
-    raise "Method not implemented: Array#<=>"
+  # Comparison: Returns an integer -1, 0, or 1 if this array is less than,
+  # equal to or greater than +other+.  Each object in each array is
+  # compared using <tt><=></tt>.  If any value isn't equal, then that
+  # inequality is the return value.  If all the values found are eqal, then
+  # the return is based on a comparison of the array lengths.  Thus, two
+  # arrays are "equal" iff they have the same length and the value of each
+  # element is equal to the value oof the corresponding element in the
+  # other array.
+  #
+  # If other is not an array, raise a type error "TypeError
+  def <=>(other)
+    # RxINC: need to get a coercion idiom going...
+    #
+    # [1] <=> "a" Should throw a TypeError: can't convert String into Array.
+    # but, "a".to_a => ["a"]...
+
+    # RxINC: need to throw a type error in many(?) situations, certainly
+    # with strings....
+
+    # RxINC: [1,2,3] <=> ["a"] should return nil, but throws a No method
+    # for #'_generality....
+
+    i = 0
+    lim = size > other.size ? other.size : size # lim is the min
+    while i < lim
+      result = self.at(i) <=> other.at(i)
+      return result if result != 0
+      i += 1
+    end
+    size <=> other.size
   end
 
   #  Method not implemented , need to code == as a while loop iteration in ruby
@@ -181,7 +200,8 @@ class Array
   def compact
     result = []
     i = 0
-    while i < size
+    lim = size
+    while i < lim
       el = self[i]
       result << el unless el.nil?
       i += 1
@@ -257,7 +277,8 @@ class Array
 
   def each(&b)
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       b.call(self[i])
       i += 1
     end
@@ -282,7 +303,7 @@ class Array
 
     i = 0
     lim = size
-    while i < size
+    while i < lim
       return false unless self[i].eql? other[i]
     end
     true
@@ -356,7 +377,8 @@ class Array
   def nitems
     count = 0
     i = 0
-    while i < size
+    lim = size
+    while i < lim
       count += 1 unless self[i].nil?
       i += 1
     end
@@ -451,11 +473,41 @@ class Array
     self.join
   end
 
-  # Transpose rows and columns (assumes self is an array of arrays)
+  # Transpose rows and columns (assumes self is an array of arrays, all of
+  # the same length).  If self is not an array of Arrays, then we should
+  # raise a TypeError trying to convert an element to an array.
   def transpose
-    # iteration in ruby , nested while loops
-    #  could be C primitive
-    raise "Method not implemented: Array#transpose"
+    return [] if empty?
+
+    ary_size = self[0].size # we aren't empty
+    i = 0
+    lim = size
+    # Check all contained arrays same length before we copy any data
+    # RxINC: Need to coerce to array...
+    while i < lim
+      if self[i].size != ary_size
+        # RxINC: can't raise a particular exception yet:
+        #    raise IndexError "All contained arrays must be same length."
+        raise "All contained arrays must be of same length."
+      end
+      i += 1
+    end
+
+    result = []
+    i = 0
+    while i < lim
+      sub_ary = self[i]
+      j = 0
+      while j < ary_size
+        # ||= doesn't yet work for array references...
+        #   result[i] ||= []
+        result[j] = [] if result[j].nil?
+        result[j][i] = sub_ary[j]
+        j += 1
+      end
+      i += 1
+    end
+    result
   end
 
   def uniq
@@ -513,7 +565,8 @@ class Array
   def collect(&b)
     result = Array.new(length)
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       result[i] = b.call(self[i])
       i += 1
     end
@@ -526,7 +579,8 @@ class Array
 
   def each_with_index(&block)
     i = 0
-    while i < size
+    lim = size
+    while i < lim
       block.call(self[i],i)
       i += 1
     end
@@ -541,7 +595,8 @@ class Array
   def find_all(&block)
     result = []
     i = 0
-    while i < size
+    lim = size
+    while i < lim
       el = self[i]
       result << el if block.call(el)
       i += 1
@@ -596,7 +651,8 @@ class Array
     t = []
     f = []
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       el = self[i]
       if(b.call(el))
         t << el
