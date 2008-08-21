@@ -12,13 +12,14 @@ class Array
   self.class.primitive '_withAll', 'withAll:'
   primitive '_removeFromTo', '_removeFrom:do:'
 
+  # RxINC: This should be a private _ method, right?
   def flatten_onto(output)
-    j = 0
+    i = 0
     lim = size
-    while (j < lim)
-      el = self[j]
+    while i < lim
+      el = self[i]
       el.flatten_onto(output)
-      j = j + 1
+      i = i + 1
     end
     output
   end
@@ -57,7 +58,7 @@ class Array
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
     result = []
-    # TODO:  not checking for  obj responds to to_str 
+    # TODO:  not checking for  obj responds to to_str
     # TODO: do not use a block here.
     obj.times{result.concat(self)}
     result
@@ -72,19 +73,19 @@ class Array
     default = Array.new
     h = Hash.new(default)
     res = Array.new
-    j = 0
-    while (j < argSize)
-      el = arg[j]
+    i = 0
+    while i < argSize
+      el = arg[i]
       h[el] = el
-      j = j + 1
+      i = i + 1
     end
-    j = 0
-    while (j < mySize)
-      el = self[j]
+    i = 0
+    while i < mySize
+      el = self[i]
       if (h[el].equal?(default))
         res << el
       end
-      j = j + 1
+      i = i + 1
     end
     res
   end
@@ -111,17 +112,47 @@ class Array
   primitive '[]=', '_rubyAt:put:'
   primitive '[]=', '_rubyAt:length:put:'
 
-  # Set Union
+  # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
+  # RxINC: This is currently broken since hash.include? isn't working....
+  # The code works under MRI.
   def |(other)
-    # build a hash and iterate ... , see uniq for example
-    raise "Method not implemented: Array#|"
+    hash = {}
+    ary = []
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
+      unless hash.include? el
+        ary << el
+        hash[el] = el
+      end
+      i = i + 1
+    end
+
+    i = 0
+    lim = other.size
+    while i < lim
+      el = other[i]
+      unless hash.include? el
+        ary << el
+        hash[el] = el
+      end
+      i = i + 1
+    end
+    ary
   end
 
   # Associate: Search through self (an array of arrays).  Return first
   # array whose first element matches +key+ (using +key.==+).
   def assoc(key)
-    # iteration with while loop ...
-    raise "Method not implemented: Array#assoc"
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
+      return el if el[0] == key
+      i += 1
+    end
+    nil
   end
 
   primitive 'at' , '_rubyAt:'
@@ -129,7 +160,8 @@ class Array
 
   def collect!(&b)
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       self[i] = b.call(self[i])
       i += 1
     end
@@ -138,17 +170,38 @@ class Array
 
   # Return copy of self with all nil elements removed
   def compact
-    # iteration with while loop bulding new array
-    # r = []
-    #  while 
-    raise "Method not implemented: Array#compact"
+    result = []
+    i = 0
+    while i < size
+      el = self[i]
+      result << el unless el.nil?
+      i += 1
+    end
+    result
   end
 
-  # Remove all nil elements from self
+  # Remove all nil elements from self.  Return nil if no changes,
+  # otherwise return self.
   def compact!
-    # iteration from front with src and dest indexes
-    #  and when done  use size=  
-    raise "Method not implemented: Array#compact!"
+    i = 0
+    lim = size
+    while i < lim
+      break if self[i].nil?
+      i += 1
+    end
+    return nil if i == lim
+
+    fill_idx = i
+    while i < lim
+      el = self[i]
+      unless el.nil?
+        self[fill_idx] = el
+        fill_idx += 1
+      end
+      i += 1
+    end
+    self.size= fill_idx
+    self
   end
 
   primitive 'concat', 'addAll:'
@@ -162,7 +215,7 @@ class Array
 
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
-  #   TODO: use the smalltalk primitive 
+  #   TODO: use the smalltalk primitive
   def delete_at(index)
     # convert negative index to positive and conver to on-based
     # and do nothing if index out of range ..
@@ -173,10 +226,24 @@ class Array
 
   # Delete every element of self for which +block+ evalutes to +true+.
   def delete_if(&block)
-    # iteration with src and dest indexes invoking the block ...
-    #   (similar to compact!)
-    #   size=  at end
-    raise "Method not implemented: Array#delete_if"
+    i = 0
+    lim = size
+    while i < lim
+      break if block.call(self[i])
+      i += 1
+    end
+
+    fill_idx = i
+    while i < lim
+      el = self[i]
+      unless block.call(el)
+        self[fill_idx] = el
+        fill_idx += 1
+      end
+      i += 1
+    end
+    self.size= fill_idx
+    self
   end
 
   def each(&b)
@@ -213,7 +280,7 @@ class Array
   end
 
   def flatten!
-    # use existing flatten_onto followed by become: 
+    # use existing flatten_onto followed by become:
     raise "Method not implemented: Array#flatten!"
   end
 
@@ -223,8 +290,8 @@ class Array
 
   def index(el)
     i = 0
-    sz = size
-    while(i < sz)
+    lim = size
+    while i < lim
       if(self[i] == el)
         return i
       end
@@ -234,11 +301,11 @@ class Array
   end
 
   def indexes(*args)
-    # use alias 
+    # use alias
     raise "Method not implemented: deprecated (use Array#values_at): Array#indexes"
   end
   def indicies(*args)
-    # use alias 
+    # use alias
     raise "Method not implemented: deprecated (use Array#values_at): Array#indicies"
   end
 
@@ -294,7 +361,7 @@ class Array
 
   def reverse_each(&b)
     i = length - 1
-    while(i >= 0)
+    while i >= 0
       b.call(self[i])
       i -= 1
     end
@@ -302,7 +369,7 @@ class Array
 
   def rindex(el)
     i = size - 1
-    while(i >= 0)
+    while i >= 0
       if(self[i] == el)
         return i
       end
@@ -363,15 +430,15 @@ class Array
   def uniq
     hash = {}
     ary = []
-    j = 0
+    i = 0
     lim = size
-    while (j < lim)
-      el = self[j]
+    while i < lim
+      el = self[i]
       unless hash.include? el
         ary << el
         hash[el] = el
       end
-      j = j + 1
+      i = i + 1
     end
     ary
   end
@@ -389,7 +456,7 @@ class Array
   # by the selectors.
   def values_at(*selectors)
     # iteration with while loop, using  [] primitive and appending to result
-    #   use either  self.[idx,1] or  self.[aRange] 
+    #   use either  self.[idx,1] or  self.[aRange]
     #   use << to append to result
     raise "Method not implemented: Array#values_at"
   end
@@ -454,15 +521,35 @@ class Array
   alias map collect
 
   def max
-    # iteration in ruby
-    raise "Method not implemented: Enumerable#max (Array.rb)"
+    if size == 0
+      nil
+    else
+      max_v = self[0]
+      i = 1
+      lim = size
+      while i < lim
+        max_v = self[i] if (self[i] <=> max_v) > 0
+        i += 1
+      end
+      max_v
+    end
   end
 
   primitive 'member?', 'includes:'
 
   def min
-    # iteration in ruby
-    raise "Method not implemented: Enumerable#min (Array.rb)"
+    if size == 0
+      nil
+    else
+      min_v = self[0]
+      i = 1
+      lim = size
+      while i < lim
+        min_v = self[i] if (self[i] <=> min_v) < 0
+        i += 1
+      end
+      min_v
+    end
   end
 
   def partition(&b)
@@ -480,9 +567,15 @@ class Array
     [t,f]
   end
 
-  def reject(&block)
-    # iteration in ruby bulding result
-    raise "Method not implemented: Enumerable#reject (Array.rb)"
+  def reject(&b)
+    result = []
+    i = 0
+    lim = size
+    while i < lim
+      result << self[i] unless b.call(self[i])
+      i += 1
+    end
+    result
   end
 
   primitive 'select&', 'select:'
@@ -498,10 +591,26 @@ class Array
   # to_a: Implemented above in the Array section
 
   def zip(*args)
-    # write in ruby
-    raise "Method not implemented: Enumerable#zip (Array.rb)"
-  end
+    result = []
+    args = args.map { |a| a.to_a }  # RxINC: loop-ize
+    i = 0
+    lim = size
+    while i < lim
+      ary = [self[i]]
 
+      j = 0
+      while j < args.length
+        ary << args[j][i]
+        j += 1
+      end
+      #  b.call(ary)...
+#       # yield(ary) if block_given? # RxINC: Uncomment when proper
+#                                    # block_given? is implemented
+      result << ary
+      i += 1
+    end
+    result
+  end
 
   # Overrides from Object that are not documented in Array (e.g., eql? is
   # documented in Array, so is not listed here).
