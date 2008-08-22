@@ -4,6 +4,14 @@
 # RxINC: Need a task to test if gs is already running., then make topaz
 # depend on it.
 
+# Ideas for Tasks:
+#
+# 1: Stash image: stop gs, copy the data/extent0.*, restart gs.  The idea
+#    here is that I can load up to a known state and then get back to it
+#    when ever.
+#
+# 2: Revert image: stop gs, copy the stashed image, restart gs.  This is
+#    the counterpart to Stash image.
 namespace :gs do
   desc "Start GemStone server processes."
   task :start => [:initialize, :startserver, :startparser ]
