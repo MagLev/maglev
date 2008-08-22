@@ -1,11 +1,12 @@
-.DS_Store	# OS X junk
-._*		# TextMate junk 
+.DS_Store  # OS X junk
+._*        # TextMate junk
 .svn
 *.err
 *.log
 *.out
 *.rbc
 *.swp
+*.tmproj   # TextMate
 data/
 gemstone/
 locks/
