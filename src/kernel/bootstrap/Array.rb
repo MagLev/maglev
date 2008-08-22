@@ -44,7 +44,7 @@ class Array
 
   # Returns a new array with the given elements.
   def self.[](*elements)
-    _withall(elements)
+    _withAll(elements)
   end
   self.class.primitive 'alloc', 'new:'
 
