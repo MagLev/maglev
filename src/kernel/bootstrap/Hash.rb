@@ -1,7 +1,7 @@
 class Hash
 
   primitive 'hash'
-  primitive '_keys', 'keys'
+  primitive 'keys', 'keys'
 
 
   # Class methods
@@ -26,6 +26,7 @@ class Hash
   primitive 'default_proc' , 'defaultBlock'
 
   primitive 'delete', 'removeKey:'
+  primitive 'delete&', 'removeKey:with:'
 
   # MNI: delete_if
 
@@ -51,12 +52,6 @@ class Hash
   # MNI invert
 
   def key?; has_key?; end  # RxINC: alias doesn't work for this one...
-
-  def keys
-    set = _keys
-    set.class.primitive 'to_a', 'asArray'
-    set.to_a
-  end
 
   primitive 'length', 'size'
 
@@ -111,4 +106,5 @@ class Hash
   end
 
   # RxINC: Need overrides from enumerable and comparable too?
+>>>>>>> 89f406096c8ca3945ad146934829a10a576f830e:src/kernel/bootstrap/Hash.rb
 end

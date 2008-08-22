@@ -3,11 +3,13 @@ class Array
   # RxINC: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
   primitive '_detect', 'detect:ifNone:'
+  primitive '_fillFromToWith', 'fillFrom:to:with:'
   primitive 'insert_all', 'insertAll:at:'
   primitive 'sort_by2&', 'sortBy:'
   primitive 'remove_first', 'removeFirst'
   primitive 'remove_if_absent', 'remove:ifAbsent:'
   primitive 'remove_last', 'removeLast'
+
   primitive 'size=', 'size:'
   self.class.primitive '_withAll', 'withAll:'
   primitive '_removeFromTo', '_removeFrom:do:'
@@ -50,10 +52,7 @@ class Array
   def self.new(size=0, value=nil)
     inst = alloc(size)
     if value
-      # TODO want a new Smalltalk primitive for atAllPut:
-      for i in (0..(inst.length-1))
-        inst[i] = value
-      end
+      inst._fillFromToWith(0, size - 1 , value)
     end
     inst
   end
@@ -282,6 +281,7 @@ class Array
       b.call(self[i])
       i += 1
     end
+    self
   end
 
   def each_index(&b)

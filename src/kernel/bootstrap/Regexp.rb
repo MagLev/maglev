@@ -5,7 +5,7 @@ class Regexp
     self.class.primitive 'alloc', '_basicNew'
 
     def initialize(str, options, lang)
-        if options.kind_of? Integer
+        if options._isInteger   # options.kind_of? Integer
             o = options
         else
            o = options ? 1 : 0
@@ -54,7 +54,8 @@ class Regexp
     end
 
     def ===(str)
-      if str.kind_of?(String)
+      knd = str._kindBlkStrRanRegAry
+      if ( knd.equal?(8) )  # if str.kind_of?(String)
         if  self.=~(str)
           return true
         end
