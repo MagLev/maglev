@@ -4,6 +4,16 @@ Random.primitive 'next'
 RandomInstance = Random.new
 
 class Object
+    # Begin private helper methods
+
+    primitive '_kindBlkStrRanRegAry', '_rubyKind_Block_String_Range_Regexp_Array'
+    #       results are                          0x10   0x8   0x4    0x2    0x1  else nil
+
+    # _isInteger allows integer?  special sends to non-Numeric objects
+    primitive '_isInteger', '_isInteger'
+
+    # End private helper methods
+
     primitive '==', '='
     primitive 'halt'
     primitive 'hash'
@@ -18,6 +28,7 @@ class Object
     primitive '_send', 'rubySend:withArguments:'
     
     primitive 'freeze', 'immediateInvariant'
+    # TODO:  fix inefficency in rubyRespondsTo: which is implemented in .mcz 
     primitive 'respond_to?', 'rubyRespondsTo:'
     primitive 'print_line', 'rubyPrint:'
     primitive 'to_s', 'asString'
@@ -78,7 +89,8 @@ class Object
             $stdout << "\n"
         else
             args.each do |arg|
-                if(arg.kind_of? Array)
+                knd = arg._kindBlkStrRanRegAry  
+                if ( knd.equal?(1) )  # if arg.kind_of?(Array)
                     puts *arg
                 else
                     $stdout << arg.to_s

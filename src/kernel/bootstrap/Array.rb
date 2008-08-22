@@ -1,5 +1,5 @@
 class Array
-  # These methods are private helper methods
+  # begin private helper methods
   # RxINC: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
   primitive '_detect', 'detect:ifNone:'
@@ -8,6 +8,8 @@ class Array
   primitive 'remove_first', 'removeFirst'
   primitive 'remove_if_absent', 'remove:ifAbsent:'
   primitive 'remove_last', 'removeLast'
+  primitive '_fillFromToWith', 'fillFrom:to:with:'
+
   def flatten_onto(output)
     j = 0
     lim = size
@@ -18,6 +20,7 @@ class Array
     end
     output
   end
+  # end private helper methods
 
   # Array Class Methods
 
@@ -31,9 +34,7 @@ class Array
   def self.new(size=0, value=nil)
     inst = alloc(size)
     if value
-      for i in (0..(inst.length-1))
-        inst[i] = value
-      end
+      inst._fillFromToWith(0, size - 1 , value)
     end
     inst
   end
@@ -51,6 +52,8 @@ class Array
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
     result = []
+    # TODO:  not checking for  obj responds to to_str 
+    # TODO: do not use a block here.
     obj.times{result.concat(self)}
     result
   end
@@ -131,7 +134,7 @@ class Array
 
   primitive 'concat', 'addAll:'
 
-  # TODO: need to add a block
+  # TODO: need to add a block arg variant to delete
   def delete(el)
     remove_if_absent(el, proc{return nil})
     return el
@@ -139,6 +142,7 @@ class Array
 
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
+  #   TODO: use the smalltalk primitive 
   def delete_at(index)
     raise "Method not implemented: Array#delete_at"
   end
@@ -154,6 +158,7 @@ class Array
       b.call(self[i])
       i += 1
     end
+    self
   end
 
   def each_index(&b)
@@ -246,7 +251,9 @@ class Array
 
   # replace written in Smalltalk so it can use copyFrom:to:into:startingAt prim
   primitive 'replace', 'rubyReplace:'
+
   primitive 'reverse'
+
   def reverse!
     replace(reverse)
   end
@@ -258,6 +265,7 @@ class Array
       i -= 1
     end
   end
+
   def rindex(el)
     i = size - 1
     while(i >= 0)

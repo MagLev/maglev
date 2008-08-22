@@ -11,6 +11,7 @@ class Hash
     primitive 'default_proc' , 'defaultBlock'
 
     primitive 'delete', 'removeKey:'
+    primitive 'delete&', 'removeKey:with:'
 
     primitive 'each&', 'keysAndValuesDo:'
 
@@ -21,7 +22,7 @@ class Hash
 
     primitive  'store', 'at:put:'
     
-    primitive '_keys', 'keys'
+    primitive 'keys', 'keys'
     
     primitive 'has_key?', 'includesKey:'
     primitive 'inspect', 'printString'
@@ -48,12 +49,6 @@ class Hash
         update(hash)
     end
 
-    def keys
-        set = _keys
-        set.class.primitive 'to_a', 'asArray'
-        set.to_a
-    end
-    
     def inspect
         return "{}" if length == 0
         str = "{"
