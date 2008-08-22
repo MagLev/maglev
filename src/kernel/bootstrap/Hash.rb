@@ -1,60 +1,112 @@
 class Hash
 
-    primitive '[]', 'at:'
-    primitive '[]=', 'at:put:'
+  primitive 'hash'
+  primitive 'keys', 'keys'
 
-    primitive 'dup', 'copy'
-    primitive 'default'
-    primitive 'default&' , 'default:'
-    primitive 'default=', 'setDefaultValue:'
 
-    primitive 'default_proc' , 'defaultBlock'
+  # Class methods
+  self.class.primitive 'new'
+  self.class.primitive 'new', 'new:'
+  self.class.primitive 'new&', 'new:'
+  # MNI: def self.[](*elements)
 
-    primitive 'delete', 'removeKey:'
-    primitive 'delete&', 'removeKey:with:'
+  # Instance Methods
 
-    primitive 'each&', 'keysAndValuesDo:'
+  primitive '==', '='
 
-    primitive 'hash'
-    primitive '==', '='
+  primitive '[]', 'at:'
+  primitive '[]=', 'at:put:'
 
-    primitive 'length', 'size'
+  # MNI: clear
 
-    primitive  'store', 'at:put:'
-    
-    primitive 'keys', 'keys'
-    
-    primitive 'has_key?', 'includesKey:'
-    primitive 'inspect', 'printString'
-    # primitive 'include?' 'includesKey:'
+  primitive 'default'
+  primitive 'default&' , 'default:'
+  primitive 'default=', 'setDefaultValue:'
 
-    def include?
-      has_key?
-    end
-    
-    def merge(hash)
-        dup.update(hash)
-    end
-        
-    def update(hash)
-        hash.each{|k,v| self[k] = v}
-        self
-    end
-    self.class.primitive 'new'
-    self.class.primitive 'new', 'new:'
-    self.class.primitive 'new&', 'new:'
+  primitive 'default_proc' , 'defaultBlock'
 
-    def replace(hash)
-        keys.each{|k| delete k}
-        update(hash)
-    end
+  primitive 'delete', 'removeKey:'
+  primitive 'delete&', 'removeKey:with:'
 
-    def inspect
-        return "{}" if length == 0
-        str = "{"
-        each{|k,v| str << k.inspect; str << "=>"; str << v.inspect; str << ", "}
-        str[0..(str.length - 3)] + "}"
-    end
+  # MNI: delete_if
+
+  primitive 'each&', 'keysAndValuesDo:'
+
+  # MNI: each_key
+  # MNI: each_pair
+  # MNI: each_value
+  # MNI: empty?
+  # MNI: fetch
+
+  primitive 'has_key?', 'includesKey:'
+
+  # MNI: has_value?
+
+  # RxINC: does the primitive work?  It was already commented out
+  # primitive 'include?' 'includesKey:'
+  def include?; has_key?; end  # RxINC: alias doesn't work for this one...
+
+  # MNI index
+  # MNI indexes
+  # MNI incicies
+  # MNI invert
+
+  def key?; has_key?; end  # RxINC: alias doesn't work for this one...
+
+  primitive 'length', 'size'
+
+  # MNI member?
+
+  def merge(hash)
+    dup.update(hash)
+  end
+  # MNI merge!
+  # MNI rehash
+  # MNI reject
+  # MNI reject!
+
+  def replace(hash)
+    keys.each{|k| delete k}
+    update(hash)
+  end
+
+  # MNI select
+  # MNI shift
+
+  primitive 'size', 'size'
+
+  # MNI sort
+
+  primitive  'store', 'at:put:'
+
+  # MNI to_a
+  # MNI to_hash
+  # MNI to_s
+
+  def update(hash)
+    hash.each{|k,v| self[k] = v}
+    self
+  end
+
+  # MNI value?
+  # MNI values
+
+  # MNI values_at
+
+  # Overrides from Object
+  #
+  # RxINC: does the primitive work?
+  primitive 'dup', 'copy'
+  primitive 'inspect', 'printString'
+  def inspect
+    return "{}" if length == 0
+    str = "{"
+    each{|k,v| str << k.inspect; str << "=>"; str << v.inspect; str << ", "}
+    str[0..(str.length - 3)] + "}"
+  end
+
+  # RxINC: Need overrides from enumerable and comparable too?
+>>>>>>> 89f406096c8ca3945ad146934829a10a576f830e:src/kernel/bootstrap/Hash.rb
 end
 
 class Struct

@@ -3,20 +3,39 @@ class Array
   # RxINC: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
   primitive '_detect', 'detect:ifNone:'
+  primitive '_fillFromToWith', 'fillFrom:to:with:'
   primitive 'insert_all', 'insertAll:at:'
   primitive 'sort_by2&', 'sortBy:'
   primitive 'remove_first', 'removeFirst'
   primitive 'remove_if_absent', 'remove:ifAbsent:'
   primitive 'remove_last', 'removeLast'
-  primitive '_fillFromToWith', 'fillFrom:to:with:'
 
-  def flatten_onto(output)
-    j = 0
+  primitive 'size=', 'size:'
+  self.class.primitive '_withAll', 'withAll:'
+  primitive '_removeFromTo', '_removeFrom:do:'
+
+  # Used by both assoc and rassoc, since they differ only in the index of
+  # the array to compare to the key
+  def _assoc(key, idx)
+    i = 0
     lim = size
-    while (j < lim)
-      el = self[j]
+    while i < lim
+      el = self[i]
+      return el if el[idx] == key
+      i += 1
+    end
+    nil
+  end
+
+  # RxINC: This should be a private _ method, right?
+>>>>>>> 89f406096c8ca3945ad146934829a10a576f830e:src/kernel/bootstrap/Array.rb
+  def flatten_onto(output)
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
       el.flatten_onto(output)
-      j = j + 1
+      i = i + 1
     end
     output
   end
@@ -25,8 +44,8 @@ class Array
   # Array Class Methods
 
   # Returns a new array with the given elements.
-  def self.[](elements)
-    raise "Method not implemented: Array.[]"
+  def self.[](*elements)
+    _withall(elements)
   end
   self.class.primitive 'alloc', 'new:'
 
@@ -52,7 +71,7 @@ class Array
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
     result = []
-    # TODO:  not checking for  obj responds to to_str 
+    # TODO:  not checking for  obj responds to to_str
     # TODO: do not use a block here.
     obj.times{result.concat(self)}
     result
@@ -67,19 +86,19 @@ class Array
     default = Array.new
     h = Hash.new(default)
     res = Array.new
-    j = 0
-    while (j < argSize)
-      el = arg[j]
+    i = 0
+    while i < argSize
+      el = arg[i]
       h[el] = el
-      j = j + 1
+      i = i + 1
     end
-    j = 0
-    while (j < mySize)
-      el = self[j]
+    i = 0
+    while i < mySize
+      el = self[i]
       if (h[el].equal?(default))
         res << el
       end
-      j = j + 1
+      i = i + 1
     end
     res
   end
@@ -87,10 +106,39 @@ class Array
   # note, <<  can't use smalltalk add: , it returns arg, not receiver
   primitive '<<', '_rubyAddLast:'
 
-  # Comparison: return -1, 0, or 1.
+  # Comparison: Returns an integer -1, 0, or 1 if this array is less than,
+  # equal to or greater than +other+.  Each object in each array is
+  # compared using <tt><=></tt>.  If any value isn't equal, then that
+  # inequality is the return value.  If all the values found are eqal, then
+  # the return is based on a comparison of the array lengths.  Thus, two
+  # arrays are "equal" iff they have the same length and the value of each
+  # element is equal to the value oof the corresponding element in the
+  # other array.
+  #
+  # If other is not an array, raise a type error "TypeError
   def <=>(other)
-    raise "Method not implemented: Array#<=>"
+    # RxINC: need to get a coercion idiom going...
+    #
+    # [1] <=> "a" Should throw a TypeError: can't convert String into Array.
+    # but, "a".to_a => ["a"]...
+
+    # RxINC: need to throw a type error in many(?) situations, certainly
+    # with strings....
+
+    # RxINC: [1,2,3] <=> ["a"] should return nil, but throws a No method
+    # for #'_generality....
+
+    i = 0
+    lim = size > other.size ? other.size : size # lim is the min
+    while i < lim
+      result = self.at(i) <=> other.at(i)
+      return result if result != 0
+      i += 1
+    end
+    size <=> other.size
   end
+
+  #  Method not implemented , need to code == as a while loop iteration in ruby
   primitive '==', '='
 
   primitive '[]' , '_rubyAt:'
@@ -99,15 +147,40 @@ class Array
   primitive '[]=', '_rubyAt:put:'
   primitive '[]=', '_rubyAt:length:put:'
 
-  # Set Union
+  # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
+  # RxINC: This is currently broken since hash.include? isn't working....
+  # The code works under MRI.
   def |(other)
-    raise "Method not implemented: Array#|"
+    hash = {}
+    ary = []
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
+      unless hash.include? el
+        ary << el
+        hash[el] = el
+      end
+      i = i + 1
+    end
+
+    i = 0
+    lim = other.size
+    while i < lim
+      el = other[i]
+      unless hash.include? el
+        ary << el
+        hash[el] = el
+      end
+      i = i + 1
+    end
+    ary
   end
 
   # Associate: Search through self (an array of arrays).  Return first
   # array whose first element matches +key+ (using +key.==+).
   def assoc(key)
-    raise "Method not implemented: Array#assoc"
+    _assoc(key, 0)
   end
 
   primitive 'at' , '_rubyAt:'
@@ -115,7 +188,8 @@ class Array
 
   def collect!(&b)
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       self[i] = b.call(self[i])
       i += 1
     end
@@ -124,12 +198,39 @@ class Array
 
   # Return copy of self with all nil elements removed
   def compact
-    raise "Method not implemented: Array#compact"
+    result = []
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
+      result << el unless el.nil?
+      i += 1
+    end
+    result
   end
 
-  # Remove all nil elements from self
+  # Remove all nil elements from self.  Return nil if no changes,
+  # otherwise return self.
   def compact!
-    raise "Method not implemented: Array#compact!"
+    i = 0
+    lim = size
+    while i < lim
+      break if self[i].nil?
+      i += 1
+    end
+    return nil if i == lim
+
+    fill_idx = i
+    while i < lim
+      el = self[i]
+      unless el.nil?
+        self[fill_idx] = el
+        fill_idx += 1
+      end
+      i += 1
+    end
+    self.size= fill_idx
+    self
   end
 
   primitive 'concat', 'addAll:'
@@ -140,21 +241,44 @@ class Array
     return el
   end
 
+
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
-  #   TODO: use the smalltalk primitive 
+  #   TODO: use the smalltalk primitive
   def delete_at(index)
-    raise "Method not implemented: Array#delete_at"
+    # convert negative index to positive and conver to on-based
+    # and do nothing if index out of range ..
+   # Method not implemented
+    self._removeFromTo(idx, idx)
+    # retvalue
   end
 
   # Delete every element of self for which +block+ evalutes to +true+.
   def delete_if(&block)
-    raise "Method not implemented: Array#delete_if"
+    i = 0
+    lim = size
+    while i < lim
+      break if block.call(self[i])
+      i += 1
+    end
+
+    fill_idx = i
+    while i < lim
+      el = self[i]
+      unless block.call(el)
+        self[fill_idx] = el
+        fill_idx += 1
+      end
+      i += 1
+    end
+    self.size= fill_idx
+    self
   end
 
   def each(&b)
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       b.call(self[i])
       i += 1
     end
@@ -167,14 +291,32 @@ class Array
 
   primitive 'empty?', 'isEmpty'
 
+  # Return true if both are the same object, or if both are arrays, and
+  # have the same number of elements and all corresponding elements are
+  # eql?.
+  #
+  # RxINC: "[1,2,3].eql? [1,2,3]" currently fails, since "1.eql? 1"
+  # currently fails...
   def eql?(other)
-    raise "Method not implemented: Array#eql?"
+    return true if equal? other
+    return false unless other.kind_of?(Array)
+    return false unless size == other.size
+
+    i = 0
+    lim = size
+    while i < lim
+      return false unless self[i].eql? other[i]
+    end
+    true
   end
 
   def fetch(index,&b)
+    # Allen will do, maybe use _rubyAt: primitive variant
     raise "Method not implemented: Array#fetch"
   end
+
   def fill(obj)
+    # needs more analysis with Allen
     raise "Method not implemented: Array#fill"
   end
   primitive 'first'
@@ -184,6 +326,7 @@ class Array
   end
 
   def flatten!
+    # use existing flatten_onto followed by become:
     raise "Method not implemented: Array#flatten!"
   end
 
@@ -193,8 +336,8 @@ class Array
 
   def index(el)
     i = 0
-    sz = size
-    while(i < sz)
+    lim = size
+    while i < lim
       if(self[i] == el)
         return i
       end
@@ -204,9 +347,11 @@ class Array
   end
 
   def indexes(*args)
+    # use alias
     raise "Method not implemented: deprecated (use Array#values_at): Array#indexes"
   end
   def indicies(*args)
+    # use alias
     raise "Method not implemented: deprecated (use Array#values_at): Array#indicies"
   end
 
@@ -231,8 +376,15 @@ class Array
 
   # Number of non-<tt>nil</tt> elements in self.
   def nitems
-    raise "Method not implemented: Array#nitems"
+    count = 0
+    i = 0
+    lim = size
+    while i < lim
+      count += 1 unless self[i].nil?
+      i += 1
+    end
   end
+
   primitive 'pack', 'rubyPack:'
 
   def pop
@@ -245,11 +397,14 @@ class Array
   # Associate: Search through self (an array of arrays).  Return first
   # array whose second element matches +key+ (using +key.==+).
   def rassoc(key)
-    raise "Method not implemented: Array#rassoc"
+    _assoc(key, 1)
   end
+
+
   primitive 'reject!&', 'removeAllSuchThat:'
 
-  # replace written in Smalltalk so it can use copyFrom:to:into:startingAt prim
+  # replace written in Smalltalk so it can use copyFrom:to:into:startingAt
+  # prim
   primitive 'replace', 'rubyReplace:'
 
   primitive 'reverse'
@@ -260,7 +415,7 @@ class Array
 
   def reverse_each(&b)
     i = length - 1
-    while(i >= 0)
+    while i >= 0
       b.call(self[i])
       i -= 1
     end
@@ -268,7 +423,7 @@ class Array
 
   def rindex(el)
     i = size - 1
-    while(i >= 0)
+    while i >= 0
       if(self[i] == el)
         return i
       end
@@ -319,23 +474,55 @@ class Array
     self.join
   end
 
-  # Transpose rows and columns (assumes self is an array of arrays)
+  # Transpose rows and columns (assumes self is an array of arrays, all of
+  # the same length).  If self is not an array of Arrays, then we should
+  # raise a TypeError trying to convert an element to an array.
   def transpose
-    raise "Method not implemented: Array#transpose"
+    return [] if empty?
+
+    ary_size = self[0].size # we aren't empty
+    i = 0
+    lim = size
+    # Check all contained arrays same length before we copy any data
+    # RxINC: Need to coerce to array...
+    while i < lim
+      if self[i].size != ary_size
+        # RxINC: can't raise a particular exception yet:
+        #    raise IndexError "All contained arrays must be same length."
+        raise "All contained arrays must be of same length."
+      end
+      i += 1
+    end
+
+    result = []
+    i = 0
+    while i < lim
+      sub_ary = self[i]
+      j = 0
+      while j < ary_size
+        # ||= doesn't yet work for array references...
+        #   result[i] ||= []
+        result[j] = [] if result[j].nil?
+        result[j][i] = sub_ary[j]
+        j += 1
+      end
+      i += 1
+    end
+    result
   end
 
   def uniq
     hash = {}
     ary = []
-    j = 0
+    i = 0
     lim = size
-    while (j < lim)
-      el = self[j]
+    while i < lim
+      el = self[i]
       unless hash.include? el
         ary << el
         hash[el] = el
       end
-      j = j + 1
+      i = i + 1
     end
     ary
   end
@@ -352,6 +539,9 @@ class Array
   # Return an array containing the element in self at the positions given
   # by the selectors.
   def values_at(*selectors)
+    # iteration with while loop, using  [] primitive and appending to result
+    #   use either  self.[idx,1] or  self.[aRange]
+    #   use << to append to result
     raise "Method not implemented: Array#values_at"
   end
 
@@ -376,7 +566,8 @@ class Array
   def collect(&b)
     result = Array.new(length)
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       result[i] = b.call(self[i])
       i += 1
     end
@@ -388,7 +579,12 @@ class Array
   end
 
   def each_with_index(&block)
-    raise "Method not implemented: Enumerable#each_with_index (Array.rb)"
+    i = 0
+    lim = size
+    while i < lim
+      block.call(self[i],i)
+      i += 1
+    end
   end
 
   alias entries to_a
@@ -398,7 +594,15 @@ class Array
   end
 
   def find_all(&block)
-    raise "Method not implemented: Enumerable#find_all (Array.rb)"
+    result = []
+    i = 0
+    lim = size
+    while i < lim
+      el = self[i]
+      result << el if block.call(el)
+      i += 1
+    end
+    result
   end
 
   def grep(pattern)
@@ -413,32 +617,63 @@ class Array
   alias map collect
 
   def max
-    raise "Method not implemented: Enumerable#max (Array.rb)"
+    if size == 0
+      nil
+    else
+      max_v = self[0]
+      i = 1
+      lim = size
+      while i < lim
+        max_v = self[i] if (self[i] <=> max_v) > 0
+        i += 1
+      end
+      max_v
+    end
   end
 
   primitive 'member?', 'includes:'
 
   def min
-    raise "Method not implemented: Enumerable#min (Array.rb)"
+    if size == 0
+      nil
+    else
+      min_v = self[0]
+      i = 1
+      lim = size
+      while i < lim
+        min_v = self[i] if (self[i] <=> min_v) < 0
+        i += 1
+      end
+      min_v
+    end
   end
 
   def partition(&b)
     t = []
     f = []
     i = 0
-    while i < length
+    lim = size
+    while i < lim
       el = self[i]
       if(b.call(el))
         t << el
       else
         f << el
       end
+      i += 1
     end
     [t,f]
   end
 
-  def reject(&block)
-    raise "Method not implemented: Enumerable#reject (Array.rb)"
+  def reject(&b)
+    result = []
+    i = 0
+    lim = size
+    while i < lim
+      result << self[i] unless b.call(self[i])
+      i += 1
+    end
+    result
   end
 
   primitive 'select&', 'select:'
@@ -454,9 +689,26 @@ class Array
   # to_a: Implemented above in the Array section
 
   def zip(*args)
-    raise "Method not implemented: Enumerable#zip (Array.rb)"
-  end
+    result = []
+    args = args.map { |a| a.to_a }  # RxINC: loop-ize
+    i = 0
+    lim = size
+    while i < lim
+      ary = [self[i]]
 
+      j = 0
+      while j < args.length
+        ary << args[j][i]
+        j += 1
+      end
+      #  b.call(ary)...
+#       # yield(ary) if block_given? # RxINC: Uncomment when proper
+#                                    # block_given? is implemented
+      result << ary
+      i += 1
+    end
+    result
+  end
 
   # Overrides from Object that are not documented in Array (e.g., eql? is
   # documented in Array, so is not listed here).
