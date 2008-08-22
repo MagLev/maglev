@@ -13,7 +13,7 @@ class String
     primitive 'length', 'size'
     primitive 'size', 'size'
     primitive 'size=', 'size:'
-    
+
     # note smalltalk addAll:  returns arg, not receiver
     primitive '<<', '_rubyAddAll:'
 
@@ -30,15 +30,15 @@ class String
     primitive '_findStringStartingAt', 'findString:startingAt:'
     primitive 'concat', '_rubyAddAll:'
     primitive 'reverse', 'reverse'
-    
+
     def signal
         raise RuntimeError, self
     end
-    
+
     def include?(item)
         !self.index(item).nil?
     end
-    
+
     def index(item, offset=nil)
         if offset.nil?
             item._index_string(self, 0)
@@ -48,15 +48,15 @@ class String
             return item._index_string(string, offset)
         end
     end
-    
+
     def _index_string(string)
         string._findStringStartingAt(self, 1) - 1
     end
-    
+
     def strip
         _strip
     end
-    
+
     def gsub(regex, str, &block)
        out = ""
         start = 1
@@ -74,7 +74,7 @@ class String
         end
         out
     end
-    
+
     def sub(regex, str, &block)
         if match = regex.to_rx.match(self)
            out = ""
@@ -88,9 +88,9 @@ class String
            out
         else
             dup
-        end    
+        end
     end
-    
+
     def sub!(regex, str, &block)
         new = sub(regex, str, &block)
         if new == self
@@ -100,7 +100,7 @@ class String
             self
         end
     end
-    
+
     def scan(regex)
         result = []
         regex.to_rx.each_match(self) do |m|
@@ -108,7 +108,7 @@ class String
         end
         result
     end
-    
+
     # asUppercase is a smalltalk primitive
     primitive 'upcase', 'asUppercase'
 
@@ -118,35 +118,35 @@ class String
     primitive '_to_i', 'asInteger'
     #  non-base-10 radix Ruby syntax not supported yet
     primitive '_to_i', '_asInteger:'
-    
+
     def to_i
         _to_i
     rescue Exception
         0
     end
-    
+
     def hex
         _to_i(16)
     end
-    
+
     def *(n)
         str = ""
         n.times{str << self}
         str
     end
-    
+
     def ljust(n)
         self
     end
-    
+
     def to_s
         self
     end
-    
+
     def to_rx
       Regexp.new(self)
     end
-    
+
     def each_char
         each_byte do |b|
             temp = ' '
@@ -158,41 +158,41 @@ class String
     def each_byte
         0.upto(size-1) do |idx|
             yield self[idx]
-        end        
+        end
     end
-    
+
     def each_line(&b)
        /(.*)/.all_matches(self).each do |match|
         str = match[1]
         b.call(str)
        end
     end
-    
+
     def downcase!
         replace(downcase)
     end
-    
+
     def gsub!(regex, str, &block)
         replace(gsub(regex, str, &block))
     end
-    
+
     def strip!
         replace(strip)
     end
-    
+
     def chop!
         replace(chop)
     end
-    
+
     def chop
         self[0..size-2]
     end
-    
+
     def chomp
       if self[-1] == ?\r
         return self[0..-2]
       end
-      
+
       if self[-1] == ?\n
         if self[-2] == ?\r
           return self[0..-3]
@@ -200,34 +200,34 @@ class String
           return self[0..-2]
         end
       end
-      
+
       return self
     end
-    
+
     def chomp!
       replace(chomp)
     end
-    
+
     def _split_string(string, limit)
         Regexp.new(self)._split_string(string, limit)
     end
-    
+
     def split(pattern=nil, limit=nil)
         return [] if empty?
         pattern ||= ($; || " ")
-        
+
         pattern._split_string(self, limit)
     end
-    
+
     def %(args)
         a = Array(args).dup
         gsub(/%(\d|\.)*./){a.shift.to_fmt}
     end
-    
+
     def reverse!
         replace(reverse)
     end
-    
+
     def tr!(from, to)
         map = []
         if from[0] == ?^
@@ -259,61 +259,18 @@ class String
                 end
             end
         end
-        
+
         for i in 0 ... size
             if c = map[self[i]]
                 self[i] = c
             end
-        end     
-        self             
-    end 
-    
+        end
+        self
+    end
+
     def tr(from, to)
         dup.tr!(from, to)
     end
+  end
 end
 
-class Integer
-    def _split_string(string, limit)
-        self.chr._split_string(string, limit)
-    end
-    
-    def _index_string(string, offset)
-        i = 0
-        string.each_byte do |ea|
-            if ea == self % 256
-                return i + offset 
-            end
-            i += 1
-        end
-        nil
-    end
-end
-
-
-class Regexp
-    def _index_string(string, offset)
-        md = self.match(string)
-        return nil if md.nil?
-        md.begin(0) + offset 
-    end
-
-    def _split_string(string, limit)
-        result = []
-        if self.source == ""
-          for i in 0...string.size
-            result[i] = string[i, 1]
-          end
-        else        
-          start = 0
-          self.all_matches(string).each do |match|
-              result << string[start...match.begin(0)]
-              start = match.end(0)
-          end
-          if(start < string.length)
-              result << string[start...string.length]
-          end
-        end
-        result
-    end
-end
