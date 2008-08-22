@@ -1,8 +1,15 @@
 class Hash
 
   primitive 'hash'
-  primitive 'keys', 'keys'
+#  primitive 'keys', 'keys'
 
+  # RxINC: Hack to get around broken primitive until Allen gets back from
+  # vacation
+  def keys
+    result = []
+    each { |k,v| result << k}
+    result
+  end
 
   # Class methods
   self.class.primitive 'new'
