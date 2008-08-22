@@ -1,5 +1,4 @@
 class String
-
     primitive '[]' , '_rubyAt:'
     primitive '[]' , '_rubyAt:length:'
     primitive 'slice', '_rubyAt:'
@@ -273,4 +272,3 @@ class String
     end
   end
 end
-

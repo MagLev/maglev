@@ -73,6 +73,32 @@ class Regexp
     IGNORECASE = 1
     EXTENDED = 2
     MULTILINE = 4
+
+# Were in String.rb
+    def _index_string(string, offset)
+        md = self.match(string)
+        return nil if md.nil?
+        md.begin(0) + offset
+    end
+
+    def _split_string(string, limit)
+        result = []
+        if self.source == ""
+          for i in 0...string.size
+            result[i] = string[i, 1]
+          end
+        else
+          start = 0
+          self.all_matches(string).each do |match|
+              result << string[start...match.begin(0)]
+              start = match.end(0)
+          end
+          if(start < string.length)
+              result << string[start...string.length]
+          end
+        end
+        result
+    end
 end
 
 class MatchData
@@ -102,33 +128,4 @@ class MatchData
     primitive '[]' , '_rubyAt:length:'
 
     # Ruby global variables $1..$9 implemented by MatchData(C)>>nthRegexRef:
-
-
-# Were in String.rb
-
-    def _index_string(string, offset)
-        md = self.match(string)
-        return nil if md.nil?
-        md.begin(0) + offset
-    end
-
-    def _split_string(string, limit)
-        result = []
-        if self.source == ""
-          for i in 0...string.size
-            result[i] = string[i, 1]
-          end
-        else
-          start = 0
-          self.all_matches(string).each do |match|
-              result << string[start...match.begin(0)]
-              start = match.end(0)
-          end
-          if(start < string.length)
-              result << string[start...string.length]
-          end
-        end
-        result
-    end
-
 end

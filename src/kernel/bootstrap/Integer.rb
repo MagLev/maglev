@@ -125,5 +125,4 @@ class Integer
         end
         nil
     end
-
 end
