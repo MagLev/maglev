@@ -270,5 +270,4 @@ class String
     def tr(from, to)
         dup.tr!(from, to)
     end
-  end
 end

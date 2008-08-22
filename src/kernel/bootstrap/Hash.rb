@@ -106,5 +106,4 @@ class Hash
   end
 
   # RxINC: Need overrides from enumerable and comparable too?
->>>>>>> 89f406096c8ca3945ad146934829a10a576f830e:src/kernel/bootstrap/Hash.rb
 end
