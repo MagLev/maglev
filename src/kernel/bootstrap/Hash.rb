@@ -112,6 +112,3 @@ class Hash
 
   # RxINC: Need overrides from enumerable and comparable too?
 end
-
-class Struct
-end

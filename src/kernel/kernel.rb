@@ -1,6 +1,6 @@
 #  This file adds entries in the Ruby session methods dictionary,
 #    i.e. the session methods dictionary for environment 1.
-#  The added entries will have keys being Ruby mangled selectors, 
+#  The added entries will have keys being Ruby mangled selectors,
 #  and values being Smalltalk methods already in the base server image.
 #
 #  The ruby method "primitive"  takes one or two String arguments
@@ -13,13 +13,13 @@
 #     The second arg is the Smalltalk selector.
 #     If second arg is not present is is assumed to be exactly the first arg.
 #
-#     The receiver is a Class in which the session method 
+#     The receiver is a Class in which the session method
 #     will be installed, and it is assumed that for that Class,
 #     Ruby and Smalltalk classes are identical.  The Smalltalk method
 #     installed will be obtained by sending lookupSelector: to
 #     the Smalltalk Class which is identical to the receiver.
 #
-#     The implementation of "primitive" uses 
+#     The implementation of "primitive" uses
 #       Behavior>>addRubySelector:method:category:
 
 #
@@ -74,3 +74,4 @@ require 'kernel/bootstrap/Method.rb'
 require 'kernel/bootstrap/Process.rb'
 require 'kernel/bootstrap/ThrowCatch.rb'
 require 'kernel/bootstrap/GC.rb'
+require 'kernel/bootstrap/Struct.rb'

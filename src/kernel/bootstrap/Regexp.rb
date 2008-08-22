@@ -1,7 +1,7 @@
 class Regexp
     primitive 'search', '_search:from:to:'
     primitive 'compile', '_compile:options:'
-    primitive 'source', 'source'    
+    primitive 'source', 'source'
     self.class.primitive 'alloc', '_basicNew'
 
     def initialize(str, options, lang)
@@ -12,7 +12,7 @@ class Regexp
         end
         compile(str, o)
     end
-    
+
     def match(str)
         return nil unless str && str.length > 0
         $~ = search(str, 0, nil)
@@ -32,7 +32,7 @@ class Regexp
             $~.begin(0)
         end
     end
-    
+
     def each_match(str, &block)
         pos = 0
         while(pos < str.length)
@@ -46,30 +46,30 @@ class Regexp
             end
         end
     end
-    
+
     def all_matches(str)
         matches = []
         each_match(str){|m| matches << m}
         matches
     end
-    
+
     def ===(str)
       if str.kind_of?(String)
-        if  self.=~(str) 
-          return true 
+        if  self.=~(str)
+          return true
         end
-      end   
+      end
       return false
     end
-    
+
     def self.escape(str)
         str
     end
-    
+
     def to_rx
       self
     end
-    
+
     IGNORECASE = 1
     EXTENDED = 2
     MULTILINE = 4
@@ -81,7 +81,7 @@ class MatchData
     def begin(group)
         at((group*2)+1)
     end
-    
+
     def end(group)
         at((group*2)+2)
     end
@@ -93,7 +93,7 @@ class MatchData
     def pre_match
         string[0..self.begin(0)-1]
     end
-    
+
     def post_match
         string[self.begin(0)+self[0].size..-1]
     end
@@ -102,4 +102,33 @@ class MatchData
     primitive '[]' , '_rubyAt:length:'
 
     # Ruby global variables $1..$9 implemented by MatchData(C)>>nthRegexRef:
+
+
+# Were in String.rb
+
+    def _index_string(string, offset)
+        md = self.match(string)
+        return nil if md.nil?
+        md.begin(0) + offset
+    end
+
+    def _split_string(string, limit)
+        result = []
+        if self.source == ""
+          for i in 0...string.size
+            result[i] = string[i, 1]
+          end
+        else
+          start = 0
+          self.all_matches(string).each do |match|
+              result << string[start...match.begin(0)]
+              start = match.end(0)
+          end
+          if(start < string.length)
+              result << string[start...string.length]
+          end
+        end
+        result
+    end
+
 end

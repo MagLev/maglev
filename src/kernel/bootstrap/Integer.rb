@@ -8,9 +8,9 @@
 #        SmallInteger
 #
 # Bignum and Integer will be identical
-# The environment 1 name of LargeNegativeInteger and LargePositiveInteger 
+# The environment 1 name of LargeNegativeInteger and LargePositiveInteger
 # will both be Bignum.
-# Environment 1 of Smalltalk Integer will hold the combined API of 
+# Environment 1 of Smalltalk Integer will hold the combined API of
 # Ruby Integer and Bignum .
 #
 #  At this time, there are no methods in LargeNegativeInteger nor LargePositiveInteger
@@ -24,7 +24,7 @@ class Integer
             yield i
         end
     end
-    
+
     def upto(n, &b)
         i = self
         while(i <= n)
@@ -32,7 +32,7 @@ class Integer
             i += 1
         end
     end
-    
+
     def downto(n, &b)
         i = self
         while(i >= n)
@@ -49,63 +49,81 @@ class Integer
         string[0] = self
         string
     end
-    
+
     def next
       self + 1
     end
-    
-	primitive '+', '+'
-	primitive '-', '-'
-	primitive '*', '*'
-	primitive '/', '_rubyDivide:'
+
+        primitive '+', '+'
+        primitive '-', '-'
+        primitive '*', '*'
+        primitive '/', '_rubyDivide:'
 
 #   Ruby  %   maps to  Smalltalk #'\\'
-	primitive '%', '\\\\'
+        primitive '%', '\\\\'
 
-	primitive '**' , 'raisedTo:'
+        primitive '**' , 'raisedTo:'
 
-	primitive '|', 'bitOr:'
-	primitive '&', 'bitAnd:'
-	primitive '^', 'bitXor:'
-	primitive '<<', 'bitShift:'
-	primitive '>>', '_bitShiftRight:'
+        primitive '|', 'bitOr:'
+        primitive '&', 'bitAnd:'
+        primitive '^', 'bitXor:'
+        primitive '<<', 'bitShift:'
+        primitive '>>', '_bitShiftRight:'
 
 #  <=> inherited from Numeric
 
-	primitive '[]', 'bitAt:'
+        primitive '[]', 'bitAt:'
 
 #  abs inherited from Numeric
 
-	primitive '==', '='
+        primitive '==', '='
 
-	primitive 'eql?', '_ruby_eqlQ:'
+        primitive 'eql?', '_ruby_eqlQ:'
 
-	primitive 'div', '_rubyDivide:'
+        primitive 'div', '_rubyDivide:'
 
 # divmod inherited from Numeric
 
         primitive 'hash'
 
-#    modulo   maps to Smalltalk  #'\\' 
-	primitive 'modulo', '\\\\'
+#    modulo   maps to Smalltalk  #'\\'
+        primitive 'modulo', '\\\\'
 
-	primitive 'quo', '_rubyQuo:'
+        primitive 'quo', '_rubyQuo:'
 
 #  remainder  inherited from numeric
 
-	primitive 'size', 'size'
-	primitive 'to_f', 'asFloat'
-	primitive 'to_i', 'truncated'
-	primitive 'to_int' , 'truncated'
-	primitive 'to_s', 'asString'
-	primitive 'truncate' , 'truncated'
+        primitive 'size', 'size'
+        primitive 'to_f', 'asFloat'
+        primitive 'to_i', 'truncated'
+        primitive 'to_int' , 'truncated'
+        primitive 'to_s', 'asString'
+        primitive 'truncate' , 'truncated'
 
 #  methods from Numeric
-	primitive 'coerce', '_rubyCoerce:'
-	primitive 'floor', 'floor'
-	primitive 'nonzero?', '_rubyNonzero'
-	primitive 'round', 'rounded'
-	primitive 'zero?', '_rubyEqualZero'
-	
-	primitive 'step&', 'to:by:do:'
+        primitive 'coerce', '_rubyCoerce:'
+        primitive 'floor', 'floor'
+        primitive 'nonzero?', '_rubyNonzero'
+        primitive 'round', 'rounded'
+        primitive 'zero?', '_rubyEqualZero'
+
+        primitive 'step&', 'to:by:do:'
+
+
+# Were in String.rb
+    def _split_string(string, limit)
+        self.chr._split_string(string, limit)
+    end
+
+    def _index_string(string, offset)
+        i = 0
+        string.each_byte do |ea|
+            if ea == self % 256
+                return i + offset
+            end
+            i += 1
+        end
+        nil
+    end
+
 end
