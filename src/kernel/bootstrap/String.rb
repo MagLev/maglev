@@ -270,4 +270,15 @@ class String
     def tr(from, to)
         dup.tr!(from, to)
     end
+
+    def match(pattern)
+      regexp = if pattern.kind_of?(Regexp)
+                 pattern
+               elsif pattern.respond_to?(:to_str)
+                 Regexp.new(pattern.to_str)
+               else
+                 raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+               end
+      regexp.match self
+    end
 end
