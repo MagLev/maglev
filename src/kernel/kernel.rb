@@ -74,4 +74,6 @@ require 'kernel/bootstrap/Method.rb'
 require 'kernel/bootstrap/Process.rb'
 require 'kernel/bootstrap/ThrowCatch.rb'
 require 'kernel/bootstrap/GC.rb'
+
 require 'kernel/bootstrap/Struct.rb'
+require 'kernel/bootstrap/Type.rb'
