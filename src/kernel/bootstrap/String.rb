@@ -1,4 +1,5 @@
 class String
+
     primitive '[]' , '_rubyAt:'
     primitive '[]' , '_rubyAt:length:'
     primitive 'slice', '_rubyAt:'
@@ -281,4 +282,50 @@ class String
                end
       regexp.match self
     end
+
+
+    # RxINC: Need to find implemention for <=>
+    def <=>(o)
+      other = Type.coerce_to(o, String, :to_s)
+      # RxINC:
+      raise TypeError, "String#\<=> passed non-string: #{other.class}" unless
+        other.kind_of?(String)
+
+      i = 0
+      lim = size > other.size ? other.size : size # lim is the min
+      while i < lim
+        result = self[i] <=> other[i]
+        return result if result != 0
+        i += 1
+      end
+      size <=> other.size
+    end
+
+    # ====== Comparable:
+    # RxINC: This is a cut-n-paste to get things working for mspec.
+    # Need to either overwrite or allow a mixin.
+  def ==(other)
+    (self <=> other) == 0
+  end
+
+  def >(other)
+    (self <=> other) > 0
+  end
+
+  def <(other)
+    (self <=> other) < 0
+  end
+
+  def >=(other)
+    (self <=> other) >= 0
+  end
+
+  def <=(other)
+    (self <=> other) <= 0
+  end
+
+  def between?(min, max)
+    (min <= self) && (self <= max)
+  end
+
 end

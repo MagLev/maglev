@@ -1,3 +1,4 @@
+# I've tweaked this a bit from the raw Rubinius.
 # BEGIN RUBINIUS: From rubinius rubinius/kernel/core/kernel.rb
 module Type
 
@@ -12,7 +13,8 @@ module Type
   # Equivalent to MRI's rb_convert_type().
 
   def self.coerce_to(obj, cls, meth)
-    return obj if self.obj_kind_of?(obj, cls)
+    #return obj if obj.kind_of?(cls)
+    return obj if obj.kind_of?(cls)   # GEMSTONE mod
 
     begin
       ret = obj.__send__(meth)
@@ -21,7 +23,8 @@ module Type
                        "(#{e.message})"
     end
 
-    return ret if self.obj_kind_of?(ret, cls)
+    #return ret if ret.kind_of?(cls)
+    return ret if ret.kind_of?(cls)   # GEMSTONE mod
 
     raise TypeError, "Coercion error: obj.#{meth} did NOT return a #{cls} (was #{ret.class})"
   end
