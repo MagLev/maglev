@@ -1,6 +1,6 @@
 class Array
   # begin private helper methods
-  # RxINC: Some of these don't begin with an '_'...
+  # TODO: Some of these don't begin with an '_'...
   primitive '_all', 'allSatisfy:'
   primitive '_detect', 'detect:ifNone:'
   primitive '_fillFromToWith', 'fillFrom:to:with:'
@@ -27,7 +27,7 @@ class Array
     nil
   end
 
-  # RxINC: This should be a private _ method, right?
+  # TODO: This should be a private _ method, right?
   def flatten_onto(output)
     i = 0
     lim = size
@@ -116,15 +116,15 @@ class Array
   #
   # If other is not an array, raise a type error "TypeError
   def <=>(other)
-    # RxINC: need to get a coercion idiom going...
+    # TODO: need to get a coercion idiom going...
     #
     # [1] <=> "a" Should throw a TypeError: can't convert String into Array.
     # but, "a".to_a => ["a"]...
 
-    # RxINC: need to throw a type error in many(?) situations, certainly
+    # TODO: need to throw a type error in many(?) situations, certainly
     # with strings....
 
-    # RxINC: [1,2,3] <=> ["a"] should return nil, but throws a No method
+    # TODO: [1,2,3] <=> ["a"] should return nil, but throws a No method
     # for #'_generality....
 
     i = 0
@@ -147,7 +147,7 @@ class Array
   primitive '[]=', '_rubyAt:length:put:'
 
   # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
-  # RxINC: This is currently broken since hash.include? isn't working....
+  # TODO: This is currently broken since hash.include? isn't working....
   # The code works under MRI.
   def |(other)
     hash = {}
@@ -232,7 +232,13 @@ class Array
     self
   end
 
-  primitive 'concat', 'addAll:'
+  # TODO: primitive version of concat is not returning self
+#  primitive 'concat', 'addAll:'
+  def concat(other)
+    other.to_ary.each { |el| self << el }
+    self
+  end
+
 
   # TODO: need to add a block arg variant to delete
   def delete(el)
@@ -294,7 +300,7 @@ class Array
   # have the same number of elements and all corresponding elements are
   # eql?.
   #
-  # RxINC: "[1,2,3].eql? [1,2,3]" currently fails, since "1.eql? 1"
+  # TODO: "[1,2,3].eql? [1,2,3]" currently fails, since "1.eql? 1"
   # currently fails...
   def eql?(other)
     return true if equal? other
@@ -318,6 +324,8 @@ class Array
     # needs more analysis with Allen
     raise "Method not implemented: Array#fill"
   end
+
+  # TODO: [].first should return nil, but currently throws exception
   primitive 'first'
 
   def flatten
@@ -460,7 +468,7 @@ class Array
   end
   primitive 'sort!', 'sort'
 
-  # RxINC: This implementation may be wrong.  See to_a vs to_ary in PickAxe.
+  # TODO: This implementation may be wrong.  See to_a vs to_ary in PickAxe.
   def to_a
     self
   end
@@ -483,10 +491,10 @@ class Array
     i = 0
     lim = size
     # Check all contained arrays same length before we copy any data
-    # RxINC: Need to coerce to array...
+    # TODO: Need to coerce to array...
     while i < lim
       if self[i].size != ary_size
-        # RxINC: can't raise a particular exception yet:
+        # TODO: can't raise a particular exception yet:
         #    raise IndexError "All contained arrays must be same length."
         raise "All contained arrays must be of same length."
       end
@@ -689,7 +697,7 @@ class Array
 
   def zip(*args)
     result = []
-    args = args.map { |a| a.to_a }  # RxINC: loop-ize
+    args = args.map { |a| a.to_a }  # TODO: loop-ize
     i = 0
     lim = size
     while i < lim
@@ -701,7 +709,7 @@ class Array
         j += 1
       end
       #  b.call(ary)...
-#       # yield(ary) if block_given? # RxINC: Uncomment when proper
+#       # yield(ary) if block_given? # TODO: Uncomment when proper
 #                                    # block_given? is implemented
       result << ary
       i += 1
