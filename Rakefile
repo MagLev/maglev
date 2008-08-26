@@ -12,30 +12,27 @@
 # * git support for typical workflows (see git support in Rubinius Rakefile)
 # * allow command line control of the verbosity of the "sh" calls.
 #
+
+require 'rakelib/gemstone'
+
 task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
-
-
-# So many things depend on the environment, we just make it global
-# Set up the proper GemStone environment for the shell and test for a
-# good gemstone install.
-task :initenv do
-  MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path(File.dirname(__FILE__))
-  PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
-  GEMSTONE = "#{MAGLEV_HOME}/gemstone"
-  TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
-  TOPAZDEBUG_CMD = "#{GEMSTONE}/bin/topaz -I #{MAGLEV_HOME}/etc/.topazdebugini -l "
-
-  ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
-  ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
-  ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone.log"
-  ENV['GEMSTONE']            = GEMSTONE
-end
 
 # This initializes the environment, and then ensures that there is a
 # gemstone diretory there.  Needed to pull this out, since some of the
 # initialization tasks need to be performed before there is a gemstone dir
 # there, but need the ENV var (i.e., need to know where gemstone should
 # be).
-task :gemstone => :initenv do
+task :gemstone do
   raise "Bad GEMSTONE dir: '#{GEMSTONE}'" unless File.directory?(GEMSTONE)
+end
+
+desc "Run squeak"
+task :squeak do
+  gem_tools = '/Applications/GemTools-3.0.app'
+  if File.exists?(gem_tools)
+    sh %{ open #{gem_tools} }
+  else
+    puts "The #{gem_tools} application used by the 'squeak' command was not found on your system."
+    puts "To fix this, correct the 'squeak' command in the gemstone script."
+  end
 end
