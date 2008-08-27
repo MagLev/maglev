@@ -14,18 +14,54 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  desc "Stop current server and install MagLev build from ENV['PREVIOUS']"
-  task :previous => :ensure_stopped do
-    previous = ENV['PREVIOUS'] || '/Users/pmclain/MagLev/PREVIOUS' # TODO rm pmclain
+  task :pbm do
+    previous = File.expand_path(ENV['PREVIOUS'] || "#{MAGLEV_HOME}/../PREVIOUS")
     raise ArgumentError, "No PREVIOUS directory found: '#{previous}'" unless
       File.directory? previous
 
+    files = FileList.new("#{previous}/*")
+    raise ArgumentError, "Can't find product.tgz file" if
+      files.grep(/product\.tgz/).empty?
+    warn "No .mcz file found in #{previous}." if files.grep(/mcz/).empty?
+
+
+    tgz_file = files.detect { |f| f =~ /\.tgzfff$/}
+    puts "tgz_file: #{tgz_file}  is nil? #{tgz_file.nil?}"
+  end
+
+  desc "Stop current server and install MagLev build from ENV['PREVIOUS']"
+  task :previous do
+    # Ensure the PREVIOUS directory exists, and it contains a 'product.tgz'
+    # file. Warn if we don't find any .mcz files.
+    previous = File.expand_path(ENV['PREVIOUS'] || "#{MAGLEV_HOME}/../PREVIOUS")
+    raise ArgumentError, "No PREVIOUS directory found: '#{previous}'" unless
+      File.directory? previous
+    files = FileList.new("#{previous}/*")
+
+    tgz_file = files.detect { |f| f =~ /\.tgz$/ }
+    mcz_file = files.detect { |f| f =~ /\.mcz$/ }
+    raise ArgumentError, "Can't find .tgz file" if tgz_file.nil?
+    warn "No .mcz file found in #{previous}." if mcz_file.nil?
+
+    puts "=" * 50
+    puts "= Installing product:  #{tgz_file}"
+    puts "= Installing mcz file: #{mcz_file}"
+    puts "=" * 50
+
+    Rake::Task[:'dev:ensure_stopped'].invoke
     ensure_std_directories
     rm_current_gemstone
-    untar_product_to_gemstone File.join(previous, 'product.tgz')
+
+    untar_product_to_gemstone tgz_file
+    copy_extent
+
     puts "=== Start GemStone Server"
     Rake::Task['gs:start'].invoke
+    load_mcz mcz_file
     Rake::Task['gs:status'].invoke
+    # TODO: really load mcz files, if necessary
+    # TODO: get topaz snippets working and ensure the image is loaded up
+    #       with all of the appropriate items (mcz, primitives, etc.)
   end
 
   desc "Make sure the gemstone server is stopped."
@@ -42,52 +78,4 @@ namespace :dev do
     end
   end
 
-
-
-
-
-
-
-#   desc "run mspecs known to work"
-#   task :mspecs => :initenv do
-#     prologue = <<'END_PROLOGUE'
-# run
-# RubyContext load.
-# RubyContext requireFileNamed: 'mspec.rb'.
-# RubyCompiler new evaluateString: '\$formatter = DottedFormatter.new; \$formatter.register'.
-# END_PROLOGUE
-#     finale = <<'END_FINALE'
-# RubyCompiler new evaluateString: '\$formatter.finish'
-# %
-# exit
-# END_FINALE
-
-#     load_files = ''
-#     %w(concat_spec.rb).each do |file_name|
-#       load_files << "RubyContext loadFileNamed: '#{Dir.pwd}/rubyspec/1.8/core/array/#{file_name}'.\n"
-#     end
-#     sh %{ #{TOPAZ_CMD} #{prologue}#{load_files}#{finale} }
-#   end
-
-#   task :mspecss => :initenv do
-#     load_files = ''
-#     %w(concat_spec.rb).each do |file_name|
-#       load_files << "RubyContext loadFileNamed: '#{Dir.pwd}/rubyspec/1.8/core/array/#{file_name}'."
-#     end
-#     puts "LOAD FILES:"
-#     puts load_files
-#     sh %{
-#       #{TOPAZ_CMD} <<'EOF'
-# run
-# RubyContext load.
-# RubyContext requireFileNamed: 'mspec.rb'.
-# RubyCompiler new evaluateString: '\$formatter = DottedFormatter.new; \$formatter.register'.
-# #{load_files}
-# RubyCompiler new evaluateString: '\$formatter.finish'
-# %
-# exit
-# EOF
-#     }
-#
-#  end
 end

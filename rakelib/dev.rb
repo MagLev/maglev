@@ -53,6 +53,26 @@ def ensure_std_directories
   end
 end
 
+
 def copy_extent
-  cd MAG
+  puts "=== Copy new ruby extent into data"
+  cd MAGLEV_HOME do
+
+    old_files = FileList.new("data/tranlog*", "data/extent0.ruby.dbf")
+    if ! old_files.empty?
+      puts "=== Removing old old_files #{old_files.join(' ')}"
+      rm_f old_files
+    end
+    raise "No data directory" unless File.directory? 'data'
+    puts "=== Copy new ruby extent."
+    cp 'gemstone/bin/extent0.ruby.dbf', 'data'
+  end
+end
+
+def load_mcz(file_name)
+  warn "=== Not loading mcz files...requires user name and password for monticello repository..."
+end
+
+def run_topaz(snippet)
+  sh %{ #{TOPAZ_CMD} #{snippet} }
 end
