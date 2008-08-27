@@ -14,19 +14,15 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  task :pbm do
-    previous = File.expand_path(ENV['PREVIOUS'] || "#{MAGLEV_HOME}/../PREVIOUS")
-    raise ArgumentError, "No PREVIOUS directory found: '#{previous}'" unless
-      File.directory? previous
-
-    files = FileList.new("#{previous}/*")
-    raise ArgumentError, "Can't find product.tgz file" if
-      files.grep(/product\.tgz/).empty?
-    warn "No .mcz file found in #{previous}." if files.grep(/mcz/).empty?
-
-
-    tgz_file = files.detect { |f| f =~ /\.tgzfff$/}
-    puts "tgz_file: #{tgz_file}  is nil? #{tgz_file.nil?}"
+  desc "Stop the server and copy the extent to the arg: rake dev:savestate'[foo]' copies to ../extent0.ruby.dbf_foo"
+  # Need to use full ruby syntax to pass args AND have a dependency.  So
+  # this one states that :savestate has a dependency on gs:stop, and that
+  # it takes a single arg named :name.  Then the args get passed as the
+  # second parameter and you use :name as the selector out of args.
+  task({ :savestate => :'gs:stop'}, :name)  do |t, args|
+    save_file = "../extent0.ruby.dbf_#{args.name}"
+    puts "Saving current extent to #{save_file}"
+    cp 'data/extent0.ruby.dbf', save_file
   end
 
   desc "Stop current server and install MagLev build from ENV['PREVIOUS']"

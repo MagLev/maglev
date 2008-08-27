@@ -1,3 +1,5 @@
+# Some other ideas: Cache images and reload them (e.g., after you've set
+# them up with something).
 
 def rm_current_gemstone
   cd MAGLEV_HOME do
@@ -58,6 +60,7 @@ def copy_extent
   puts "=== Copy new ruby extent into data"
   cd MAGLEV_HOME do
 
+    # TODO: Just add these to a clobber target and nuke them...
     old_files = FileList.new("data/tranlog*", "data/extent0.ruby.dbf")
     if ! old_files.empty?
       puts "=== Removing old old_files #{old_files.join(' ')}"
@@ -65,7 +68,7 @@ def copy_extent
     end
     raise "No data directory" unless File.directory? 'data'
     puts "=== Copy new ruby extent."
-    cp 'gemstone/bin/extent0.ruby.dbf', 'data'
+    install 'gemstone/bin/extent0.ruby.dbf', 'data', 0644
   end
 end
 
