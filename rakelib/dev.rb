@@ -77,5 +77,8 @@ def load_mcz(file_name)
 end
 
 def run_topaz(snippet)
-  sh %{ #{TOPAZ_CMD} #{snippet} }
+  sh %{ #{TOPAZ_CMD} <<EOF
+#{snippet}
+EOF
+  }
 end
