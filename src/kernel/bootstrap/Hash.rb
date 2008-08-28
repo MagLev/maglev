@@ -24,7 +24,11 @@ class Hash
   primitive '[]', 'at:'
   primitive '[]=', 'at:put:'
 
-  # MNI: clear
+  # MNI: clear: TODO: PERFORMANCE: Implemented in ruby, needs performance boost?
+  def clear
+    each { |k,v| delete k }
+    self
+  end
 
   primitive 'default'
   primitive 'default&' , 'default:'
@@ -35,23 +39,38 @@ class Hash
   primitive 'delete', 'removeKey:'
   primitive 'delete&', 'removeKey:with:'
 
-  # MNI: delete_if
+  def delete_if(&block)
+    # RUBINIUS: This code is from rubinius core/hash.rb
+    #raise LocalJumpError, "no block given" unless block_given? or empty? # TODO: uncomment
+
+    # Do this in 2 steps, so we're not altering the structure while we walk it.
+    # TODO: I'd like to write it like this:
+    # select(&block).each { |k, v| delete k }
+    to_del = []
+    each_pair { |k, v| to_del << k if yield(k, v) }
+    to_del.each { |k| delete k }
+    self
+  end
 
   primitive 'each&', 'keysAndValuesDo:'
+  primitive 'each_key&', 'keysDo:'
+  primitive 'each_pair&', 'keysAndValuesDo:'
+  primitive 'each_value&', 'valuesDo:'
 
-  # MNI: each_key
-  # MNI: each_pair
-  # MNI: each_value
-  # MNI: empty?
+  def empty?
+    size == 0
+  end
   # MNI: fetch
 
   primitive 'has_key?', 'includesKey:'
 
   # MNI: has_value?
 
-  # RxINC: does the primitive work?  It was already commented out
+  # TODO: include?  does includesKey: work?
   # primitive 'include?' 'includesKey:'
-  def include?; has_key?; end  # RxINC: alias doesn't work for this one...
+  def include?
+    has_key?
+  end
 
   # MNI index
   # MNI indexes

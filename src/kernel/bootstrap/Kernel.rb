@@ -7,15 +7,27 @@ module Kernel
   #   specs running .
 
   def format(str, *args)
-        args.each{|a| str.sub!(/%(d|s)/, a.to_s)}
-        str
+    args.each{|a| str.sub!(/%(d|s)/, a.to_s)}
+    str
   end
 
-  def open(fName) 
-     File.open(fName)
+  def open(fName)
+    File.open(fName)
   end
 
-  def open(fName, mode) 
-     File.open(fName, mode)
+  def open(fName, mode)
+    File.open(fName, mode)
+  end
+
+  def taint
+    # TODO: Kernel#taint is a noop!
+  end
+
+  def tainted?
+    false # TODO kernel#taint is a stub: return false
+  end
+
+  def untaint
+    # TODO: Kernel#untaint is a noop!
   end
 end
