@@ -24,7 +24,7 @@ class Hash
   primitive '[]', 'at:'
   primitive '[]=', 'at:put:'
 
-  # MNI: clear: TODO: PERFORMANCE: Implemented in ruby, needs performance boost?
+  # TODO: PERFORMANCE: Hash#clear: Implemented in ruby, needs performance boost?
   def clear
     each { |k,v| delete k }
     self
@@ -60,11 +60,17 @@ class Hash
   def empty?
     size == 0
   end
+
   # MNI: fetch
 
   primitive 'has_key?', 'includesKey:'
 
-  # MNI: has_value?
+  def has_value?(val)
+    each do |k,v|
+      return true if v == val
+    end
+    false
+  end
 
   # TODO: include?  does includesKey: work?
   # primitive 'include?' 'includesKey:'
@@ -72,58 +78,136 @@ class Hash
     has_key?
   end
 
-  # MNI index
+  primitive '_index', 'keyAtValue:ifAbsent:'
+  def index(value)
+    _index(value, proc { return nil })
+  end
+
   # MNI indexes
   # MNI incicies
-  # MNI invert
 
-  def key?; has_key?; end  # RxINC: alias doesn't work for this one...
+  def invert
+    result = {}
+    each { |k,v| result[v] = k }
+    result
+  end
+
+  # TODO: alias doesn't work for this one...
+  def key?
+    has_key?
+  end
 
   primitive 'length', 'size'
 
-  # MNI member?
+  # TODO: alias doesn't work, so remove def and impl via alias when alias works
+  #alias member? has_key?
+  def member?(key)
+    has_key? key
+  end
 
   def merge(hash)
     dup.update(hash)
   end
-  # MNI merge!
-  # MNI rehash
-  # MNI reject
-  # MNI reject!
+
+  def merge!(other)
+    # RUBINIUS: From core/hash.rb
+    other = Type.coerce_to(other, Hash, :to_hash)
+    other.each_pair do |k, v|
+      if block_given? and self.key? k
+        self[k] = yield(k, self[k], v)
+      else
+        self[k] = v
+      end
+    end
+    self
+  end
+
+  primitive 'rehash', 'rebuildTable:'
+
+  def reject(&block)
+    dup.delete_if(&block)
+  end
+
+  def reject!(&block)
+    # RUBINIUS
+    old_size = size
+    delete_if(&block)
+    return nil if old_size == size
+    self
+  end
 
   def replace(hash)
     keys.each{|k| delete k}
     update(hash)
   end
 
-  # MNI select
-  # MNI shift
+  def select()
+    result = []
+    each { |k,v| result <<[k,v] if yield(k, v) }
+    result
+  end
+
+  def shift
+    return default(nil) if empty?
+
+    # PERFORMANCE: Should be able to grab a key w/o creating the entire key set.
+    # need ST help on this...
+    key = keys.first
+    result = [key, self[key]]
+    delete key
+    result
+  end
 
   primitive 'size', 'size'
 
-  # MNI sort
+  def sort(&block)
+    to_a.sort(&block)
+  end
 
   primitive  'store', 'at:put:'
 
-  # MNI to_a
-  # MNI to_hash
-  # MNI to_s
+  def to_a
+    select { true }
+  end
+
+  def to_hash
+    self
+  end
+
+  def to_s
+    to_a.join
+  end
 
   def update(hash)
     hash.each{|k,v| self[k] = v}
     self
   end
 
-  # MNI value?
-  # MNI values
+  #alias value? has_value?
+  # TODO: alias doesn't currently work for methods with '?'
+  def value?(val)
+    has_value? val
+  end
 
-  # MNI values_at
+  def values
+    result = []
+    each { |k,v| result << v }
+    result
+  end
+
+  def values_at(*args)
+    # RUBINIUS
+    # TODO There is a maglev bug in Array#collect in dealing with nil
+    # values from the block, so this impl exhibits the underlying bug.
+    args.collect { |key| self[key] }
+  end
 
   # Overrides from Object
   #
   # RxINC: does the primitive work?
   primitive 'dup', 'copy'
-  primitive 'inspect', 'printString'
+
+#  primitive 'inspect', 'printString'
   def inspect
     return "{}" if length == 0
     str = "{"
