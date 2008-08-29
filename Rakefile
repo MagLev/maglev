@@ -14,6 +14,9 @@
 #
 
 require 'rakelib/gemstone'
+require 'rake/clean'
+
+CLEAN.include('load*.out', 'topazerrors.log')
 
 task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
 
