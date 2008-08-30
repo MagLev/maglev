@@ -13,10 +13,10 @@
 # * allow command line control of the verbosity of the "sh" calls.
 #
 
-require 'rakelib/gemstone'
 require 'rake/clean'
+require 'rakelib/gemstone'
 
-CLEAN.include('load*.out', 'topazerrors.log')
+CLEAN.include('*.out')
 
 task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
 
