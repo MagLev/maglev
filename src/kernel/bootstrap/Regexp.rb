@@ -82,6 +82,7 @@ class Regexp
         md.begin(0) + offset
     end
 
+    # TODO: limit is not used....
     def _split_string(string, limit)
         result = []
         if self.source == ""

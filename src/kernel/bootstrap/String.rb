@@ -50,7 +50,7 @@ class String
   end
 
   # PERFORMANCE: String#== could use help
-  primitive '==', '='
+  primitive '==', '='  # TODO: this is incorrect...
   #   def ==(other)
   #     if other.kind_of?(String)
   #       (self <=> other) == 0
@@ -75,7 +75,9 @@ class String
 
   # MNI: capitalize
   # MNI: capitalize!
-  # MNI: casecmp
+
+  primitive 'casecmp', 'equalsNoCase:'
+
   # MNI: center
 
   def chomp
@@ -109,6 +111,10 @@ class String
 
   primitive 'concat', '_rubyAddAll:'
 
+  # TODO: count, delete, and delete! could all benefit from a common
+  # routine to create the set of characters to work on.  This should be
+  # whatever the smalltalk has for a bitset data struct.
+
   # MNI: count
   # MNI: crypt
   # MNI: delete
@@ -123,7 +129,10 @@ class String
 
   # MNI: dump
 
-  # MNI: each
+  def each(sep=$/, &block)
+    tkns = sep._split_string(self, nil)
+    tkns.each { |t| block.call(t) }
+  end
 
   def each_byte
     0.upto(size-1) do |idx|
@@ -148,8 +157,7 @@ class String
   end
 
   primitive 'empty?', 'isEmpty'
-
-  # MNI: eql?
+  primitive 'eql?', '='
 
   def gsub(regex, str, &block)
     out = ""
@@ -196,18 +204,39 @@ class String
   end
 
   # MNI: insert
-  # MNI: intern
+# TODO: insert: Why doesn't this work?
+#   primitive '_insertAllAt', 'insertAll:At:'
+#   def insert(index, string)
+#     _insertAllAt(string, index)
+#   end
 
+  primitive 'intern', 'asSymbol'
   primitive 'length', 'size'
 
   def ljust(n)
     self
   end
 
-  # MNI: lstrip
-  # MNI: lstrip!
+  primitive '_trimLeadingSeparators', 'trimLeadingSeparators'
+  def lstrip
+    dup._trimLeadingSeparators
+  end
+
+  # TODO: PERFROMANCE: Avoid copying by testing first character for whitespace.
+  def lstrip!
+    stripped = lstrip
+    if stripped.size == size
+      nil
+    else
+      replace(stripped)
+      self
+    end
+  end
 
   def match(pattern)
+    # TODO: Figure out how to pass something more complex than a method name
+    # to coerce_to.  A proc? A proc or a symbol?
+    #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
     regexp = if pattern.kind_of?(Regexp)
                pattern
              elsif pattern.respond_to?(:to_str)
@@ -231,8 +260,22 @@ class String
 
   # MNI: rindex
   # MNI: rjust
-  # MNI: rstrip
-  # MNI: rstrip!
+
+  primitive '_trimTrailingSeparators', 'trimTrailingSeparators'
+  def rstrip
+    dup._trimTrailingSeparators
+  end
+
+  # TODO: PERFORMANCE: Avoid copying by testing last character for whitespace.
+  def rstrip!
+    stripped = rstrip
+    if stripped.size == size
+      nil
+    else
+      replace(stripped)
+      self
+    end
+  end
 
   def scan(regex)
     result = []
