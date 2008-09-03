@@ -61,7 +61,7 @@ class String
   #     end
   #   end
 
-  #   alias '===' '=='
+#  alias === ==
 
   # =~ is implemented somewhere....
 
@@ -73,8 +73,14 @@ class String
 
   # MNI: String#~
 
-  # MNI: capitalize
+  # MNI: capitalize:
+  # TODO: capitalize: Smalltalk method that capitalizes first char and
+  # lowercases the rest of the characters
+
   # MNI: capitalize!
+  # TODO: capitalize!: Smalltalk method that capitalizes first char and
+  # lowercases the rest of the characters.  Returns self, or nil if no
+  # changes to self.
 
   primitive 'casecmp', 'equalsNoCase:'
 
@@ -101,7 +107,6 @@ class String
   end
 
   def chop
-
     self[0..size-2]
   end
 
@@ -130,8 +135,8 @@ class String
   # MNI: dump
 
   def each(sep=$/, &block)
-    tkns = sep._split_string(self, nil)
-    tkns.each { |t| block.call(t) }
+    tokens = sep._split_string(self, nil)
+    tokens.each { |t| block.call(t) }
   end
 
   def each_byte
@@ -207,30 +212,26 @@ class String
 # TODO: insert: Why doesn't this work?
 #   primitive '_insertAllAt', 'insertAll:At:'
 #   def insert(index, string)
-#     _insertAllAt(string, index)
+#     _insertAllAt(string, index) # Flip order of parameters
 #   end
 
   primitive 'intern', 'asSymbol'
   primitive 'length', 'size'
 
+  # TODO: ljust: doesn't work
   def ljust(n)
     self
   end
 
-  primitive '_trimLeadingSeparators', 'trimLeadingSeparators'
-  def lstrip
-    dup._trimLeadingSeparators
-  end
+  primitive 'lstrip', 'trimLeadingSeparators'
 
-  # TODO: PERFROMANCE: Avoid copying by testing first character for whitespace.
+  # TODO: PERFROMANCE: In the case that there is leading whitespace, the
+  # underlying smalltalk returns a copy.  Is there a way to remove leading
+  # w/o a copy?
   def lstrip!
-    stripped = lstrip
-    if stripped.size == size
-      nil
-    else
-      replace(stripped)
-      self
-    end
+    original_length = length
+    replace(lstrip)
+    return original_length == length ? nil : self
   end
 
   def match(pattern)
@@ -258,23 +259,25 @@ class String
     replace(reverse)
   end
 
-  # MNI: rindex
+  # MNI: rindex  TODO: use findLast: ?, but does a block eval
+  def rindex(item, offset=nil)
+    if offset.nil?
+      item._lastIndexOf(item)
+    else
+
+    end
+  end
   # MNI: rjust
 
-  primitive '_trimTrailingSeparators', 'trimTrailingSeparators'
-  def rstrip
-    dup._trimTrailingSeparators
-  end
+  primitive 'rstrip', 'trimTrailingSeparators'
 
-  # TODO: PERFORMANCE: Avoid copying by testing last character for whitespace.
+  # TODO: PERFROMANCE: In the case that there is trailing whitespace, the
+  # underlying smalltalk returns a copy.  Is there a way to remove leading
+  # w/o a copy?
   def rstrip!
-    stripped = rstrip
-    if stripped.size == size
-      nil
-    else
-      replace(stripped)
-      self
-    end
+    original_length = length
+    replace(rstrip)
+    return original_length == length ? nil : self
   end
 
   def scan(regex)
@@ -289,7 +292,13 @@ class String
 
   primitive 'slice', '_rubyAt:'
   primitive 'slice', '_rubyAt:length:'
+
   # MNI: slice!
+  # TODO: Can't do the standard:
+  #   def slice!(*args)
+  #     replace(slice(*args))
+  #   end
+  # since slice returns characters (sometimes), not strings
 
   def split(pattern=nil, limit=nil)
     return [] if empty?
