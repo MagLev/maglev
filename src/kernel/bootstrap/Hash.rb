@@ -1,3 +1,14 @@
+
+
+# This is a global sentinal object representing an undefined object.  This
+# is used to distinguish the user passing nil vs not passing anything for
+# default parameters.
+#
+# TODO: This is in Hash.rb for right now, as I can't seem to call it in
+# ../kernel.rb, nor in Globals.rb, nor in Object.rb. When I figure out the
+# bootstrapping sequence, I can put it in the right spot.
+Undefined = Object.new
+
 class Hash
 
   primitive 'hash'
@@ -71,7 +82,7 @@ class Hash
   # TODO: Need to test this, as block_given? not working properly yet...
   def fetch(key, default=Undefined, &block)
     val = _index(key, proc { default })
-    puts "val: #{val}  undefined? #{val.equal?(Undefined)}"
+    puts "val: #{val}  undefined? #{val.equal?(Undefined)}  block_given? #{block_given?}"
     return val unless val.equal?(Undefined) # found it or used user default
     return block.call(key) if block_given?
     raise IndexError, "No value for #{key}"
@@ -87,10 +98,10 @@ class Hash
   end
 
   # TODO: include?  does includesKey: work?
-  # primitive 'include?' 'includesKey:'
-  def include?
-    has_key?
-  end
+#  primitive 'include?' 'includesKey:'
+#   def include?
+#     has_key?
+#   end
 
   primitive '_index', 'keyAtValue:ifAbsent:'
   def index(value)
