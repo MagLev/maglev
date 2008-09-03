@@ -61,7 +61,21 @@ class Hash
     size == 0
   end
 
-  # MNI: fetch
+  # Return a value from the hash for the given +key+.  If +key+ is not
+  # found, one of the following is returned:
+  # * If no other parameters passed, Raise +IndexError+.
+  # * If +default+ is given, return it.
+  # * If +block+ is given, return the value of calling +block+ with +key+
+  # Fetch does not use any default values supplied when the hash was created.
+  #
+  # TODO: Need to test this, as block_given? not working properly yet...
+  def fetch(key, default=Undefined, &block)
+    val = _index(key, proc { default })
+    puts "val: #{val}  undefined? #{val.equal?(Undefined)}"
+    return val unless val.equal?(Undefined) # found it or used user default
+    return block.call(key) if block_given?
+    raise IndexError, "No value for #{key}"
+  end
 
   primitive 'has_key?', 'includesKey:'
 
@@ -92,18 +106,9 @@ class Hash
     result
   end
 
-  # TODO: alias doesn't work for this one...
-  def key?
-    has_key?
-  end
-
+  primitive 'key?', 'includesKey:'
   primitive 'length', 'size'
-
-  # TODO: alias doesn't work, so remove def and impl via alias when alias works
-  #alias member? has_key?
-  def member?(key)
-    has_key? key
-  end
+  primitive 'member?', 'includesKey:'
 
   def merge(hash)
     dup.update(hash)
