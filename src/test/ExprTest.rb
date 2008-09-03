@@ -8,118 +8,118 @@
 class ExprTest
     # Expected value: 7
     def addIntSimple
-        puts 3+4
+         3+4
     end
 
     # Expected value: 12
     def addIntCompound
-        puts 3+4+5
+         3+4+5
     end
 
     # Expected value: -2
     def subtractIntSimple
-        puts 3-5
+         3-5
     end
 
     # Expected value: 5
     def subtractIntCompound
-        puts 100-90-5
+         100-90-5
     end
 
     # Expected value: 150
     def multiplyIntSimple
-        puts 50*3
+         50*3
     end
 
     # Expected value: 150
     def multiplyIntCompound
-        puts 25*3*2
+         25*3*2
     end
 
     # Expected value: 3
     def divideIntSimple
-        puts 300/100
+         300/100
     end
 
     # Expected value: 111
     def divideIntCompound
-        puts 999/3/3
+         999/3/3
     end
 
     # Expected value: 7.4
     def addFloatSimple
-        puts sprintf("%0.1f", 3.1+4.3)
+         sprintf("%0.1f", 3.1+4.3)
     end
 
     # Expected value: 12.8
     def addFloatCompound
-        puts sprintf("%0.1f", 3.1+4.3+5.4)
+         sprintf("%0.1f", 3.1+4.3+5.4)
     end
 
     # Expected value: 5.4
     def subtractFloatSimple
-        puts sprintf("%0.1f", 70.5-65.1)
+         sprintf("%0.1f", 70.5-65.1)
     end
 
     # Expected value: 5.14
     def subtractFloatCompound
-        puts sprintf("%0.2f", 100.54-90.1-5.3)
+         sprintf("%0.2f", 100.54-90.1-5.3)
     end
 
     # Expected value: 39.06
     def multiplyFloatSimple
-        puts sprintf("%2.2f", 12.6*3.1)
+         sprintf("%2.2f", 12.6*3.1)
     end
 
     # Expected value: 150
     def multiplyFloatCompound
-        puts sprintf("%3.2f", 25.25*3.7*2.4)
+         sprintf("%3.2f", 25.25*3.7*2.4)
     end
 
     # Expected value: 3
     def divideFloatSimple
-        puts sprintf("%2.13f", 255.64/3.6)
+         sprintf("%2.13f", 255.64/3.6)
     end
 
     # Expected value: 111
     def divideFloatCompound
-        puts sprintf("%2.14f", 3.2/2.3/0.5)
+         sprintf("%2.14f", 3.2/2.3/0.5)
     end
 
     # Expected value: 2
     def modulusInt
-        puts 8%3
+         8%3
     end
 
     # Expected value: 3.2
     def modulusFloat
-        puts sprintf("%2.1f", 25.4%3.7)
+         sprintf("%2.1f", 25.4%3.7)
     end
 
     # Expected value: 1000
     def powerInt
-        puts 10**3
+         10**3
     end
 
     # Expected value: 54798.1281
     def powerFloat
-        puts sprintf("%5.4f", 15.3**4)
+         sprintf("%5.4f", 15.3**4)
     end
 
     # Expected value: 12
     def rightShift
-        puts 100>>3
+         100>>3
     end
 
     # Expected value: 800
     def leftShift
-        puts 100<<3
+         100<<3
     end
 
     # Expected value: reverse of a and b
     def parallel(a, b)
         a, b = b, a
-        puts "#{a}#{b}"
+         "#{a}#{b}"
     end
 end
 
@@ -135,70 +135,93 @@ puts "****************************"
 puts ""
 
 # expectvalue 7
-ExprTest.new.addIntSimple()
+ret = ExprTest.new.addIntSimple()
+raise "ERROR" unless ret == 7
 
 # expectvalue 12
-ExprTest.new.addIntCompound()
+ret = ExprTest.new.addIntCompound()
+raise "ERROR" unless ret == 12
 
 # expectvalue -2
-ExprTest.new.subtractIntSimple()
+ret = ExprTest.new.subtractIntSimple()
+raise "ERROR" unless ret == -2
 
 # expectvalue 5
-ExprTest.new.subtractIntCompound()
+ret = ExprTest.new.subtractIntCompound()
+raise "ERROR" unless ret == 5
 
 # expectvalue 150
-ExprTest.new.multiplyIntSimple()
+ret = ExprTest.new.multiplyIntSimple()
+raise "ERROR" unless ret == 150
 
-# expectvalue 100
-ExprTest.new.multiplyIntCompound()
+# expectvalue 150
+ret = ExprTest.new.multiplyIntCompound()
+raise "ERROR" unless ret == 150
 
 # expectvalue 3
-ExprTest.new.divideIntSimple()
+ret = ExprTest.new.divideIntSimple()
+raise "ERROR" unless ret == 3
 
 # expectvalue 111
-ExprTest.new.divideIntCompound()
+ret = ExprTest.new.divideIntCompound()
+raise "ERROR" unless ret == 111
 
 # expectvalue 7.4
-ExprTest.new.addFloatSimple()
+ret = ExprTest.new.addFloatSimple()
+raise "ERROR" unless ret == "7.4"
 
 # expectvalue 12.8
-ExprTest.new.addFloatCompound()
+ret = ExprTest.new.addFloatCompound()
+raise "ERROR" unless ret == "12.8"
 
 # expectvalue 5.4
-ExprTest.new.subtractFloatSimple()
+ret = ExprTest.new.subtractFloatSimple()
+raise "ERROR" unless ret == "5.4"
 
 # expectvalue 5.14
-ExprTest.new.subtractFloatCompound()
+ret = ExprTest.new.subtractFloatCompound()
+raise "ERROR" unless ret == "5.14"
 
 # expectvalue 39.06
-ExprTest.new.multiplyFloatSimple()
+ret = ExprTest.new.multiplyFloatSimple()
+raise "ERROR" unless ret == "39.06"
 
 # expectvalue 224.22
-ExprTest.new.multiplyFloatCompound()
+ret = ExprTest.new.multiplyFloatCompound()
+raise "ERROR" unless ret == "224.22"
 
 # expectvalue 71.0111111111111
-ExprTest.new.divideFloatSimple()
+ret = ExprTest.new.divideFloatSimple()
+raise "ERROR" unless ret == "71.0111111111111"
 
 # expectvalue 2.78260869565217
-ExprTest.new.divideFloatCompound()
+ret = ExprTest.new.divideFloatCompound()
+raise "ERROR" unless ret == "2.78260869565217"
 
 # expectvalue 2
-ExprTest.new.modulusInt()
+ret = ExprTest.new.modulusInt()
+raise "ERROR" unless ret == 2
 
 # expectvalue 3.2
-ExprTest.new.modulusFloat()
+ret = ExprTest.new.modulusFloat()
+raise "ERROR" unless ret == "3.2"
 
 # expectvalue 1000
-ExprTest.new.powerInt()
+ret = ExprTest.new.powerInt()
+raise "ERROR" unless ret == 1000
 
 # expectvalue 54798.1281
-ExprTest.new.powerFloat()
+ret = ExprTest.new.powerFloat()
+raise "ERROR" unless ret == "54798.1281"
 
 # expectvalue 12
-ExprTest.new.rightShift()
+ret = ExprTest.new.rightShift()
+raise "ERROR" unless ret == 12
 
 # expectvalue 800
-ExprTest.new.leftShift()
+ret = ExprTest.new.leftShift()
+raise "ERROR" unless ret == 800
 
-# expectvalue
-ExprTest.new.parallel("aaa", "bbb")
+# expectvalue bbbaaa
+ret = ExprTest.new.parallel("aaa", "bbb")
+raise "ERROR" unless ret == "bbbaaa"

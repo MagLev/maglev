@@ -101,43 +101,57 @@ puts "****************************"
 puts ""
 
 # expectvalue 10
-puts WhileTest.new.simple(1, 10)
+ret = WhileTest.new.simple(1, 10)
+raise "ERROR" unless ret == 10
 
 # expectvalue 99
-puts WhileTest.new.simple(50, 99)
+ret = WhileTest.new.simple(50, 99)
+raise "ERROR" unless ret == 99
 
 # expectvalue 10
-puts WhileTest.new.simpleDo(1, 10)
+ret = WhileTest.new.simpleDo(1, 10)
+raise "ERROR" unless ret == 10
 
 # expectvalue 99
-puts WhileTest.new.simpleDo(50, 99)
+ret = WhileTest.new.simpleDo(50, 99)
+raise "ERROR" unless ret == 99
 
 # expectvalue 100
-puts WhileTest.new.compound(0,100)
+ret = WhileTest.new.compound(0,100)
+raise "ERROR" unless ret == 100
 
 # expectvalue 50
-puts WhileTest.new.compound(50,100)
+ret = WhileTest.new.compound(50,100)
+raise "ERROR" unless ret == 50
 
 # expectvalue 22
-puts WhileTest.new.next(0,23)
+ret = WhileTest.new.next(0,23)
+raise "ERROR" unless ret == 22
 
 # expectvalue 749
-puts WhileTest.new.next(250,1000)
+ret = WhileTest.new.next(250,1000)
+raise "ERROR" unless ret == 749
 
 # expectvalue 10
-puts WhileTest.new.redo(10, 20)
+ret = WhileTest.new.redo(10, 20)
+raise "ERROR" unless ret == 10
 
 # expectvalue 49
-puts WhileTest.new.redo(0, 49)
+ret = WhileTest.new.redo(0, 49)
+raise "ERROR" unless ret == 49
 
 # expectvalue 15
-puts WhileTest.new.retry(15, 30)
+ret = WhileTest.new.retry(15, 30)
+raise "ERROR" unless ret == 15
 
 # expectvalue 51
-puts WhileTest.new.retry(0, 51)
+ret = WhileTest.new.retry(0, 51)
+raise "ERROR" unless ret == 51
 
 # expectvalue 2
-puts WhileTest.new.break(15, 30)
+ret = WhileTest.new.break(15, 30)
+raise "ERROR" unless ret == 2
 
 # expectvalue 2
-puts WhileTest.new.break(0, 51)
+ret = WhileTest.new.break(0, 51)
+raise "ERROR" unless ret == 2

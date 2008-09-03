@@ -245,73 +245,97 @@ puts "****************************"
 puts ""
 
 # expectvalue true
-puts IfTest.new.greaterThanInt
+ret = IfTest.new.greaterThanInt
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.lessThanInt
+ret = IfTest.new.lessThanInt
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.equalsIntTrue
+ret = IfTest.new.equalsIntTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.equalsIntFalse
+ret = IfTest.new.equalsIntFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.notEqualsIntTrue
+ret = IfTest.new.notEqualsIntTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.notEqualsIntFalse
+ret = IfTest.new.notEqualsIntFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.greaterThanFloat
+ret = IfTest.new.greaterThanFloat
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.lessThanFloat
+ret = IfTest.new.lessThanFloat
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.equalsFloatTrue
+ret = IfTest.new.equalsFloatTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.equalsFloatFalse
+ret = IfTest.new.equalsFloatFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.notEqualsFloatTrue
+ret = IfTest.new.notEqualsFloatTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.notEqualsFloatFalse
+ret = IfTest.new.notEqualsFloatFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.greaterThanStringLc
+ret = IfTest.new.greaterThanStringLc
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.lessThanStringLc
+ret = IfTest.new.lessThanStringLc
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.equalsStringLcTrue
+ret = IfTest.new.equalsStringLcTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.equalsStringLcFalse
+ret = IfTest.new.equalsStringLcFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.notEqualsStringLcTrue
+ret = IfTest.new.notEqualsStringLcTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.notEqualsStringLcFalse
+ret = IfTest.new.notEqualsStringLcFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.greaterThanStringUc
+ret = IfTest.new.greaterThanStringUc
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.lessThanStringUc
+ret = IfTest.new.lessThanStringUc
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.equalsStringUcTrue
+ret = IfTest.new.equalsStringUcTrue
+raise "ERROR" unless ret == true
 
 # expectvalue false
-puts IfTest.new.equalsStringUcFalse
+ret = IfTest.new.equalsStringUcFalse
+raise "ERROR" unless ret == false
 
 # expectvalue true
-puts IfTest.new.greaterThanStringMixed
+ret = IfTest.new.greaterThanStringMixed
+raise "ERROR" unless ret == true
 
 # expectvalue true
-puts IfTest.new.lessThanStringMixed
+ret = IfTest.new.lessThanStringMixed
+raise "ERROR" unless ret == true

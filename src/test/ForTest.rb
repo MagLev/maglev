@@ -87,43 +87,57 @@ puts "****************************"
 puts ""
 
 # expectvalue 10
-puts ForTest.new.simple(1, 10)
+ret = ForTest.new.simple(1, 10)
+raise "ERROR" unless ret == 10
 
 # expectvalue 20
-puts ForTest.new.simple(5, 20)
+ret = ForTest.new.simple(5, 20)
+raise "ERROR" unless ret == 20
 
 # expectvalue 10
-puts ForTest.new.simpleDo(1, 10)
+ret = ForTest.new.simpleDo(1, 10)
+raise "ERROR" unless ret == 10
 
 # expectvalue 20
-puts ForTest.new.simpleDo(5, 20)
+ret = ForTest.new.simpleDo(5, 20)
+raise "ERROR" unless ret == 20
 
 # expectvalue 10
-puts ForTest.new.compound(1, 10)
+ret = ForTest.new.compound(1, 10)
+raise "ERROR" unless ret == 10
 
 # expectvalue 20
-puts ForTest.new.compound(5, 20)
+ret = ForTest.new.compound(5, 20)
+raise "ERROR" unless ret == 20
 
 # expectvalue 49
-puts ForTest.new.next(0, 50)
+ret = ForTest.new.next(0, 50)
+raise "ERROR" unless ret == 49
 
 # expectvalue 74
-puts ForTest.new.next(25, 100)
+ret = ForTest.new.next(25, 100)
+raise "ERROR" unless ret == 74
 
 # expectvalue 2
-puts ForTest.new.redo(49, 50)
+ret = ForTest.new.redo(49, 50)
+raise "ERROR" unless ret == 2
 
 # expectvalue 76
-puts ForTest.new.redo(25, 100)
+ret = ForTest.new.redo(25, 100)
+raise "ERROR" unless ret == 76
 
 # expectvalue 16
-puts ForTest.new.retry(35, 50)
+ret = ForTest.new.retry(35, 50)
+raise "ERROR" unless ret == 16
 
 # expectvalue 76
-puts ForTest.new.retry(25, 100)
+ret = ForTest.new.retry(25, 100)
+raise "ERROR" unless ret == 76
 
 # expectvalue 1
-puts ForTest.new.break(0,19)
+ret = ForTest.new.break(0,19)
+raise "ERROR" unless ret == 1
 
 # expectvalue 1
-puts ForTest.new.break(75,100)
+ret = ForTest.new.break(75,100)
+raise "ERROR" unless ret == 1
