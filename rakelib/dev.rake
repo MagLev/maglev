@@ -38,17 +38,24 @@ namespace :dev do
     cp 'data/extent0.ruby.dbf', save_file
   end
 
-  desc "Restore a previously stashed extent0.ruby.dbf."
-  # TODO: Hook into MAGLEV_IMAGE_CACHE (see comment in task savestate)
-  task({ :restorestate => :'gs:stop'}, :name)  do |t, args|
+  desc "Restore a previously stashed extent0.ruby.dbf (stops server first)."
+  # TODO: Hook into $MAGLEV_IMAGE_CACHE (see comment in task savestate)
+  #task({ :restorestate => :'gs:stop'}, :name)  do |t, args|
+  task :restorestate, :name do |t, args|
     restore_file = "../extent0.ruby.dbf_#{args.name}"
-    if File.exists? restore_file
-      # TODO: Do I blow away the tranlog in data?  Restore an old one?
-      puts "Restoring extent #{restore_file} to data/extent0.ruby.dbf"
-      cp restore_file, 'data/extent0.ruby.dbf'
-    else
+    unless File.exists? restore_file
       puts "Couldn't find restore file #{restore_file}"
+      return nil
     end
+
+    was_running = server_running?
+    Rake::Task['gs:stop'].invoke if was_running
+
+    # TODO: Do I blow away the tranlog in data?  Restore an old one?
+    puts "Restoring extent #{restore_file} to data/extent0.ruby.dbf"
+    cp restore_file, 'data/extent0.ruby.dbf'
+
+    Rake::Task['gs:start'].invoke if was_running
   end
 
   desc "Stop current server and install MagLev build from ENV['PREVIOUS']"
