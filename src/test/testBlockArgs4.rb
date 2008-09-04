@@ -2,8 +2,11 @@ def test
   yield( 7 )
 end
 test { | a, *b |
-  puts a.class
-  puts a
-  puts b.class
-  puts b.length
+  unless a == 7
+    raise 'ERR'
+  end
+  unless b == [ ]
+    raise 'ERR'
+  end
 }
+true

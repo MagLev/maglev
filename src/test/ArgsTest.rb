@@ -143,3 +143,4 @@ tests.test_01_no_block_with_splat
 tests.test_02_no_block_without_splat
 tests.test_03_no_block_with_splat_and_nils
 tests.test_04_no_block_without_splat_and_nils
+true

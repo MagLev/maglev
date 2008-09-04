@@ -26,14 +26,16 @@ class Object
     primitive 'nil?' , '_rubyNilQ'
 
     # rubySend: methods implemented in .mcz
-    #  TODO: reduce indirections in send implementation
+    #   note special handling of '_send:' in  installPrimitive:selector:
+    #  TODO: reduce indirections in send implementation, and make use of
+    #   rubySend:
     primitive '_send:*', 'rubySend:withArguments:'
-    primitive '_send:',    'rubySend:'
 
     def send(sym, *args)
       _send(sym, *args)
     end
 
+    # primitive '_send:',    'rubySend:'
     # def send(aSym)
     #  _send(aSym)
     #end
