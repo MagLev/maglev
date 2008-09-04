@@ -14,7 +14,7 @@ Benchmark.bm(7) do |bmr|
   i=0
   while i<6000000 # benchmark loop 2
     i+=1
-    o.__send__ :m
+    o.send :m
   end
 
 ### Begin footer added by script ###
