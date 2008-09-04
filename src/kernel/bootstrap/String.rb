@@ -191,11 +191,11 @@ class String
   end
 
   def include?(item)
-    !self.index(item).nil?
+    !self.index(item).equal?(nil)
   end
 
   def index(item, offset=nil)
-    if offset.nil?
+    if offset.equal?(nil)
       item._index_string(self, 0)
     else
       offset = size + offset if offset < 0
@@ -238,13 +238,15 @@ class String
     # TODO: Figure out how to pass something more complex than a method name
     # to coerce_to.  A proc? A proc or a symbol?
     #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
-    regexp = if pattern.kind_of?(Regexp)
-               pattern
-             elsif pattern.respond_to?(:to_str)
-               Regexp.new(pattern.to_str)
-             else
-               raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
-             end
+    knd = pattern._kindBlkStrRanRegAry
+    if (knd.equal?(2) )  # if pattern.kind_of?(Regexp)
+      regexp = pattern
+    elsif pattern.respond_to?(:to_str)
+      # TODO more optimization of coerce here 
+      regexp = Regexp.new(pattern.to_str)
+    else
+      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+    end
     regexp.match self
   end
 
@@ -387,7 +389,8 @@ class String
   def tr!(from, to)
     map = []
     if from[0] == ?^
-      for i in 0..255
+      i = 0
+      while i <= 255
         unless(from.include? i)
           map[i] = to[0]
         end
@@ -399,24 +402,30 @@ class String
         if to[1] == ?- && to.size == 3
           offset = to[0] - start
           last = to[2]
-          for i in start .. max
+          i = start 
+          while i <= max
             n = i + offset
             n = last if n > last
             map[i] = n
           end
         else
-          for i in start .. max
+          i = start 
+          while i <= max
             map[i] = to[i - start] || to[-1]
           end
         end
       else
-        for i in 0 ... from.size
+        lim = from.size
+        i = 0
+        while i < lim
           map[from[i]] = to[i] || to[-1]
         end
       end
     end
 
-    for i in 0 ... size
+    lim = size
+    i = 0 
+    while i < lim
       if c = map[self[i]]
         self[i] = c
       end

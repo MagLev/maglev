@@ -25,8 +25,19 @@ class Object
 
     primitive 'nil?' , '_rubyNilQ'
 
-    primitive '_send', 'rubySend:withArguments:'
+    # rubySend: methods implemented in .mcz
+    #  TODO: reduce indirections in send implementation
+    primitive '_send:*', 'rubySend:withArguments:'
+    primitive '_send:',    'rubySend:'
 
+    def send(sym, *args)
+      _send(sym, *args)
+    end
+
+    # def send(aSym)
+    #  _send(aSym)
+    #end
+    
     primitive 'freeze', 'immediateInvariant'
     # TODO:  fix inefficency in rubyRespondsTo: which is implemented in .mcz
     primitive 'respond_to?', 'rubyRespondsTo:'
@@ -108,12 +119,7 @@ class Object
     def ===(obj)
         self == obj
     end
-
-    def __send__(sym, *args)
-      _send(sym, args)
-    end
-    alias send __send__
-
+ 
     def gets(sep="\n")
         $stdin.gets(sep)
     end

@@ -19,4 +19,11 @@ class Range
     end
     
     alias include? ===
+
+    def initialize(fromArg, toArg)
+      @from = fromArg
+      @to = toArg
+      @by = 1
+      @excludeEnd = false
+    end
 end

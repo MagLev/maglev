@@ -12,15 +12,7 @@ Undefined = Object.new
 class Hash
 
   primitive 'hash'
-#  primitive 'keys', 'keys'
-
-  # RxINC: Hack to get around broken primitive until Allen gets back from
-  # vacation
-  def keys
-    result = []
-    each { |k,v| result << k}
-    result
-  end
+  primitive 'keys', 'keys'
 
   # Class methods
   self.class.primitive 'new'
@@ -35,11 +27,7 @@ class Hash
   primitive '[]', 'at:'
   primitive '[]=', 'at:put:'
 
-  # TODO: PERFORMANCE: Hash#clear: Implemented in ruby, needs performance boost?
-  def clear
-    each { |k,v| delete k }
-    self
-  end
+  primitive 'clear', 'removeAllKeys'
 
   primitive 'default'
   primitive 'default&' , 'default:'
@@ -92,16 +80,12 @@ class Hash
 
   def has_value?(val)
     each do |k,v|
-      return true if v == val
+      return true if val == v 
     end
     false
   end
 
-  # TODO: include?  does includesKey: work?
-#  primitive 'include?' 'includesKey:'
-#   def include?
-#     has_key?
-#   end
+  primitive 'include?', 'includesKey:'
 
   primitive '_index', 'keyAtValue:ifAbsent:'
   def index(value)
@@ -163,15 +147,14 @@ class Hash
     result
   end
 
-  def shift
-    return default(nil) if empty?
+  primitive '_firstPair'
 
-    # PERFORMANCE: Should be able to grab a key w/o creating the entire key set.
-    # need ST help on this...
-    key = keys.first
-    result = [key, self[key]]
+  def shift
+    pair = self._firstPair 
+    return nil if  pair.equal?(nil) 
+    key = pair[0] 
     delete key
-    result
+    return pair
   end
 
   primitive 'size', 'size'
