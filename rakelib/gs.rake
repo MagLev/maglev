@@ -109,4 +109,18 @@ namespace :gs do
     sh %{ `which rlwrap` #{TOPAZDEBUG_CMD} }
   end
 
+  desc "Run a .rb file under MagLev: (e.g.: rake gs:maglev file=../foo/bar.rb)"
+#  task :maglev => :start do  # The dependency check is kind of annoying...
+  task :maglev do
+    file = ENV['file']
+    raise "No file specified: Specify a file with file=...." if file.nil? || file.empty?
+    raise "Can't find file #{file}" unless File.exists?(file)
+    run_topaz <<END
+run
+RubyContext load.
+RubyContext loadFileNamed: '#{file}'.
+%
+exit
+END
+  end
 end
