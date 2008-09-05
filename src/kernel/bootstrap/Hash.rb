@@ -1,15 +1,18 @@
+
+
+# This is a global sentinal object representing an undefined object.  This
+# is used to distinguish the user passing nil vs not passing anything for
+# default parameters.
+#
+# TODO: This is in Hash.rb for right now, as I can't seem to call it in
+# ../kernel.rb, nor in Globals.rb, nor in Object.rb. When I figure out the
+# bootstrapping sequence, I can put it in the right spot.
+Undefined = Object.new
+
 class Hash
 
   primitive 'hash'
-#  primitive 'keys', 'keys'
-
-  # RxINC: Hack to get around broken primitive until Allen gets back from
-  # vacation
-  def keys
-    result = []
-    each { |k,v| result << k}
-    result
-  end
+  primitive 'keys', 'keys'
 
   # Class methods
   self.class.primitive 'new'
@@ -24,11 +27,7 @@ class Hash
   primitive '[]', 'at:'
   primitive '[]=', 'at:put:'
 
-  # TODO: PERFORMANCE: Hash#clear: Implemented in ruby, needs performance boost?
-  def clear
-    each { |k,v| delete k }
-    self
-  end
+  primitive 'clear', 'removeAllKeys'
 
   primitive 'default'
   primitive 'default&' , 'default:'
@@ -69,11 +68,13 @@ class Hash
   # Fetch does not use any default values supplied when the hash was created.
   #
   # TODO: Need to test this, as block_given? not working properly yet...
-  def fetch(key, default=Undefined, &block)
-    val = _index(key, proc { default })
-    puts "val: #{val}  undefined? #{val.equal?(Undefined)}"
-    return val unless val.equal?(Undefined) # found it or used user default
-    return block.call(key) if block_given?
+  primitive '_atIfAbsent', 'at:ifAbsent:'
+  def fetch(key, dflt=Undefined, &block)
+    val = _atIfAbsent(key, proc { dflt })
+    puts "========= 2 VAL: #{val}"
+    return val unless val.equal?(Undefined)
+# TODO: block_given? does not work, so this is commented out until it does work.
+#    return block.call(key) if block_given?
     raise IndexError, "No value for #{key}"
   end
 
@@ -81,16 +82,12 @@ class Hash
 
   def has_value?(val)
     each do |k,v|
-      return true if v == val
+      return true if val == v
     end
     false
   end
 
-  # TODO: include?  does includesKey: work?
-  # primitive 'include?' 'includesKey:'
-  def include?
-    has_key?
-  end
+  primitive 'include?', 'includesKey:'
 
   primitive '_index', 'keyAtValue:ifAbsent:'
   def index(value)
@@ -152,15 +149,14 @@ class Hash
     result
   end
 
-  def shift
-    return default(nil) if empty?
+  primitive '_firstPair'
 
-    # PERFORMANCE: Should be able to grab a key w/o creating the entire key set.
-    # need ST help on this...
-    key = keys.first
-    result = [key, self[key]]
+  def shift
+    pair = self._firstPair
+    return nil if  pair.equal?(nil)
+    key = pair[0]
     delete key
-    result
+    return pair
   end
 
   primitive 'size', 'size'

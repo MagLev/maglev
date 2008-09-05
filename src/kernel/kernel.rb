@@ -49,11 +49,6 @@ require 'kernel/bootstrap/Gemstone.rb'
 require 'kernel/bootstrap/Object.rb'
 #  Kernel.rb must be included from a require within Object.rb
 
-# This is a global sentinal object representing an undefined object.  This
-# is used to distinguish the user passing nil vs not passing anything for
-# default parameters.
-Undefined = Object.new
-
 require 'kernel/bootstrap/Type.rb'
 
 require 'kernel/bootstrap/Class.rb'

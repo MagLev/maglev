@@ -68,7 +68,8 @@ def copy_extent
     end
     raise "No data directory" unless File.directory? 'data'
     puts "=== Copy new ruby extent."
-    install 'gemstone/bin/extent0.ruby.dbf', 'data', 0644
+    cp 'gemstone/bin/extent0.ruby.dbf', 'data'
+    chmod 0644, 'data/extent0.ruby.dbf'
   end
 end
 

@@ -52,7 +52,8 @@ class Array
   def self.new(size=0, value=nil)
     inst = alloc(size)
     if value
-      inst._fillFromToWith(0, size - 1 , value)
+      # prim needs 1 based args 
+      inst._fillFromToWith(1, size, value)
     end
     inst
   end
@@ -202,7 +203,7 @@ class Array
     lim = size
     while i < lim
       el = self[i]
-      result << el unless el.nil?
+      result << el unless el.equal?(nil)
       i += 1
     end
     result
@@ -214,7 +215,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      break if self[i].nil?
+      break if self[i].equal?(nil)
       i += 1
     end
     return nil if i == lim
@@ -222,7 +223,7 @@ class Array
     fill_idx = i
     while i < lim
       el = self[i]
-      unless el.nil?
+      unless el.equal?(nil)
         self[fill_idx] = el
         fill_idx += 1
       end
@@ -232,13 +233,7 @@ class Array
     self
   end
 
-  # TODO: primitive version of concat is not returning self
-#  primitive 'concat', 'addAll:'
-  def concat(other)
-    other.to_ary.each { |el| self << el }
-    self
-  end
-
+  primitive 'concat', '_rubyAddAll:'
 
   # TODO: need to add a block arg variant to delete
   def delete(el)
@@ -300,8 +295,6 @@ class Array
   # have the same number of elements and all corresponding elements are
   # eql?.
   #
-  # TODO: "[1,2,3].eql? [1,2,3]" currently fails, since "1.eql? 1"
-  # currently fails...
   def eql?(other)
     return true if equal? other
     return false unless other.kind_of?(Array)
@@ -311,12 +304,13 @@ class Array
     lim = size
     while i < lim
       return false unless self[i].eql? other[i]
+      i += 1
     end
     true
   end
 
   def fetch(index,&b)
-    # Allen will do, maybe use _rubyAt: primitive variant
+    # TODO: Allen will do, maybe use _rubyAt: primitive variant
     raise "Method not implemented: Array#fetch"
   end
 
@@ -325,8 +319,9 @@ class Array
     raise "Method not implemented: Array#fill"
   end
 
-  # TODO: [].first should return nil, but currently throws exception
-  primitive 'first'
+  def first
+    self[0]
+  end
 
   def flatten
     flatten_onto([])
@@ -369,10 +364,13 @@ class Array
   def join(s="")
     out = ""
     max = length - 1
-    for i in (0..max)
+    i = 0 
+    while i < max 
       out << self[i].to_s
-      out << s unless i == max
+      out << s 
+      i = i + 1
     end
+    out << self[max].to_s
     out
   end
 
@@ -387,9 +385,10 @@ class Array
     i = 0
     lim = size
     while i < lim
-      count += 1 unless self[i].nil?
+      count += 1 unless self[i].equal?(nil)
       i += 1
     end
+    count
   end
 
   primitive 'pack', 'rubyPack:'
@@ -509,7 +508,7 @@ class Array
       while j < ary_size
         # ||= doesn't yet work for array references...
         #   result[i] ||= []
-        result[j] = [] if result[j].nil?
+        result[j] = [] if result[j].equal?(nil)
         result[j][i] = sub_ary[j]
         j += 1
       end

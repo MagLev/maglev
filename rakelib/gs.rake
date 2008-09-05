@@ -13,8 +13,19 @@
 # 2: Revert image: stop gs, copy the stashed image, restart gs.  This is
 #    the counterpart to Stash image.
 namespace :gs do
-  desc "Start GemStone server processes."
-  task :start => [:initialize, :startserver, :startparser ]
+  desc "Start GemStone server processes, if not already running."
+  task :start => :initialize do
+    if server_running?
+      puts "Server already running"
+    else
+      Rake::Task['gs:startserver'].invoke
+    end
+    if parser_running?
+      puts "Parser already running"
+    else
+      Rake::Task['gs:startparser'].invoke
+    end
+  end
 
   desc "Start the GemStone processes with verbose output."
   task :'start-debug' => [:initialize, :'startserver-debug', :'startparser-debug']
@@ -31,7 +42,7 @@ namespace :gs do
   end
 
   desc "Stop GemStone server, overwrite with empty repository!!!"
-  task :'force-reload' => [:stopserver, :stopparser, :destroy, :initialize]
+  task :'force-reload' => [:stopserver, :stopparser, :destroy, :initialize, :start]
 
   # ======================= core tasks =======================
 
@@ -67,6 +78,7 @@ namespace :gs do
     puts "No parser running on port #{PARSETREE_PORT}" unless stop_parser.nil?
   end
 
+  # TODO: should this target also load an mcz and the primitives?
   task :initialize => :gemstone do
     cd MAGLEV_HOME do
       mkdir_p %w(data log locks)
@@ -97,4 +109,18 @@ namespace :gs do
     sh %{ `which rlwrap` #{TOPAZDEBUG_CMD} }
   end
 
+  desc "Run a .rb file under MagLev: (e.g.: rake gs:maglev file=../foo/bar.rb)"
+#  task :maglev => :start do  # The dependency check is kind of annoying...
+  task :maglev do
+    file = ENV['file']
+    raise "No file specified: Specify a file with file=...." if file.nil? || file.empty?
+    raise "Can't find file #{file}" unless File.exists?(file)
+    run_topaz <<END
+run
+RubyContext load.
+RubyContext loadFileNamed: '#{file}'.
+%
+exit
+END
+  end
 end

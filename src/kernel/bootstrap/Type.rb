@@ -11,6 +11,7 @@ module Type
   # Uses Type.obj_kind_of to bypass type check overrides.
   #
   # Equivalent to MRI's rb_convert_type().
+  #  TODO more optimization here
 
   def self.coerce_to(obj, cls, meth)
     #return obj if obj.kind_of?(cls)

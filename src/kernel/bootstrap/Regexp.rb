@@ -78,7 +78,7 @@ class Regexp
 # Were in String.rb
     def _index_string(string, offset)
         md = self.match(string)
-        return nil if md.nil?
+        return nil if md.equal?(nil)
         md.begin(0) + offset
     end
 
@@ -86,8 +86,11 @@ class Regexp
     def _split_string(string, limit)
         result = []
         if self.source == ""
-          for i in 0...string.size
+          slim = string.size 
+          i = 0
+          while i < slim 
             result[i] = string[i, 1]
+            i = i + 1 
           end
         else
           start = 0
