@@ -68,11 +68,13 @@ class Hash
   # Fetch does not use any default values supplied when the hash was created.
   #
   # TODO: Need to test this, as block_given? not working properly yet...
-  def fetch(key, default=Undefined, &block)
-    val = _index(key, proc { default })
-    puts "val: #{val}  undefined? #{val.equal?(Undefined)}  block_given? #{block_given?}"
-    return val unless val.equal?(Undefined) # found it or used user default
-    return block.call(key) if block_given?
+  primitive '_atIfAbsent', 'at:ifAbsent:'
+  def fetch(key, dflt=Undefined, &block)
+    val = _atIfAbsent(key, proc { dflt })
+    puts "========= 2 VAL: #{val}"
+    return val unless val.equal?(Undefined)
+# TODO: block_given? does not work, so this is commented out until it does work.
+#    return block.call(key) if block_given?
     raise IndexError, "No value for #{key}"
   end
 
@@ -80,7 +82,7 @@ class Hash
 
   def has_value?(val)
     each do |k,v|
-      return true if val == v 
+      return true if val == v
     end
     false
   end
@@ -150,9 +152,9 @@ class Hash
   primitive '_firstPair'
 
   def shift
-    pair = self._firstPair 
-    return nil if  pair.equal?(nil) 
-    key = pair[0] 
+    pair = self._firstPair
+    return nil if  pair.equal?(nil)
+    key = pair[0]
     delete key
     return pair
   end
