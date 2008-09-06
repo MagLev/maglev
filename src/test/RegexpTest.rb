@@ -9,9 +9,9 @@ class RegexpTest
     def match(str, exp)
         regexp = Regexp.new(exp);
         if str =~ regexp
-            puts "#{$&}"
+            return "#{$&}"
         else
-            puts "NoMatch"
+            return "NoMatch"
         end
     end
 
@@ -19,9 +19,9 @@ class RegexpTest
     def before(str, exp)
         regexp = Regexp.new(exp);
         if str =~ regexp
-            puts "#{$`}"
+            return "#{$`}"
         else
-            puts "NoMatch"
+            return "NoMatch"
         end
     end
 
@@ -29,9 +29,9 @@ class RegexpTest
     def after(str, exp)
         regexp = Regexp.new(exp);
         if str =~ regexp
-            puts "#{$'}"
+            return "#{$'}"
         else
-            puts "NoMatch"
+            return "NoMatch"
         end
     end
 
@@ -49,109 +49,145 @@ puts "****************************"
 puts ""
 
 # expectvalue 'def'
-RegexpTest.new.match("abcdefghi", "def")
+ret = RegexpTest.new.match("abcdefghi", "def")
+raise "ERROR" unless ret == 'def'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("abcdefghi", "xyz")
+ret = RegexpTest.new.match("abcdefghi", "xyz")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'abc'
-RegexpTest.new.match("abcabcabc", "abc")
+ret = RegexpTest.new.match("abcabcabc", "abc")
+raise "ERROR" unless ret == 'abc'
 
 # expectvalue 'abc'
-RegexpTest.new.before("abcdefghi", "def")
+ret = RegexpTest.new.before("abcdefghi", "def")
+raise "ERROR" unless ret == 'abc'
 
 # expectvalue 'testin'
-RegexpTest.new.before("testingregexp", "gr")
+ret = RegexpTest.new.before("testingregexp", "gr")
+raise "ERROR" unless ret == 'testin'
 
 # expectvalue 'ghi'
-RegexpTest.new.after("abcdefghi", "def")
+ret = RegexpTest.new.after("abcdefghi", "def")
+raise "ERROR" unless ret == 'ghi'
 
 # expectvalue 'egexp'
-RegexpTest.new.after("testingregexp", "gr")
+ret = RegexpTest.new.after("testingregexp", "gr")
+raise "ERROR" unless ret == 'egexp'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("abcdefghi", "$def")
+ret = RegexpTest.new.match("abcdefghi", "$def")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("abcdefghi", "$abc")
+ret = RegexpTest.new.match("abcdefghi", "$abc")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("abcdefghi", "^abc")
+ret = RegexpTest.new.match("abcdefghi", "^abc")
+raise "ERROR" unless ret == 'abc'
 
 # expectvalue 'ghi'
-RegexpTest.new.match("abcdefghi", "ghi$")
+ret = RegexpTest.new.match("abcdefghi", "ghi$")
+raise "ERROR" unless ret == 'ghi'
 
 # expectvalue 'c'
-RegexpTest.new.match("abcdefghi", "[cd]")
+ret = RegexpTest.new.match("abcdefghi", "[cd]")
+raise "ERROR" unless ret == 'c'
 
-# expectvalue ?
-RegexpTest.new.match("abcdefghi", "[^cd]")
+# expectvalue a
+ret = RegexpTest.new.match("abcdefghi", "[^cd]")
+raise "ERROR" unless ret == 'a'
 
 # expectvalue 'def'
-RegexpTest.new.match("abcdefghi", ".ef")
+ret = RegexpTest.new.match("abcdefghi", ".ef")
+raise "ERROR" unless ret == 'def'
 
-# expectvalue 'def'
-RegexpTest.new.match("abcdefghi", "[.ef]")
+# expectvalue 'e'
+ret = RegexpTest.new.match("abcdefghi", "[.ef]")
+raise "ERROR" unless ret == 'e'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("ABCDEFGHI", "abc")
+ret = RegexpTest.new.match("ABCDEFGHI", "abc")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'DEF'
-RegexpTest.new.match("ABCDEFGHI", "DEF")
+ret = RegexpTest.new.match("ABCDEFGHI", "DEF")
+raise "ERROR" unless ret == 'DEF'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("AbCdEfGhI", "DEF");
+ret = RegexpTest.new.match("AbCdEfGhI", "DEF");
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'A'
-RegexpTest.new.match("AbCdEfGhI", "[^a..z]")
+ret = RegexpTest.new.match("AbCdEfGhI", "[^a..z]")
+raise "ERROR" unless ret == 'A'
 
 # expectvalue 'T'
-RegexpTest.new.match("Testingregularexpressions", "[[:alpha:]]")
+ret = RegexpTest.new.match("Testingregularexpressions", "[[:alpha:]]")
+raise "ERROR" unless ret == 'T'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("Testingregularexpressions", "[[:blank:]]")
+ret = RegexpTest.new.match("Testingregularexpressions", "[[:blank:]]")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue '1'
-RegexpTest.new.match("1Testing2regular3expressions", "[[:alnum:]]")
+ret = RegexpTest.new.match("1Testing2regular3expressions", "[[:alnum:]]")
+raise "ERROR" unless ret == '1'
 
 # expectvalue 'eee'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e+")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e+")
+raise "ERROR" unless ret == 'eee'
 
 # expectvalue 'abc'
-RegexpTest.new.after("abc", "b*")
+ret = RegexpTest.new.after("abc", "b*")
+raise "ERROR" unless ret == 'abc'
 
 # expectvalue 'abc'
-RegexpTest.new.after("abc", "b?")
+ret = RegexpTest.new.after("abc", "b?")
+raise "ERROR" unless ret == 'abc'
 
 # expectvalue 'eee'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{1,3}")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{1,3}")
+raise "ERROR" unless ret == 'eee'
 
 # expectvalue 'eee'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{1,4}")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{1,4}")
+raise "ERROR" unless ret == 'eee'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{4,5}")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{4,5}")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'ee'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{2}")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{2}")
+raise "ERROR" unless ret == 'ee'
 
 # expectvalue 'NoMatch'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{4}")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "e{4}")
+raise "ERROR" unless ret == 'NoMatch'
 
 # expectvalue 'efff'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "ef+")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "ef+")
+raise "ERROR" unless ret == 'efff'
 
 # expectvalue 'eee'
-RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "eee|fff")
+ret = RegexpTest.new.match("aaabbbcccdddeeefffggghhhiii", "eee|fff")
+raise "ERROR" unless ret == 'eee'
 
 # expectvalue '.'
-RegexpTest.new.match("abcde.fghi", "\\.")
+ret = RegexpTest.new.match("abcde.fghi", "\\.")
+raise "ERROR" unless ret == '.'
 
 # expectvalue 'bbb'
-RegexpTest.new.match("aabbbaacccaadddaaeee", "(\\w)\\1\\1")
+ret = RegexpTest.new.match("aabbbaacccaadddaaeee", "(\\w)\\1\\1")
+raise "ERROR" unless ret == 'bbb'
 
 # expectvalue 'def'
-RegexpTest.new.match("abcdefghijklmnoprqstuvwxyz", "dz*ef")
+ret = RegexpTest.new.match("abcdefghijklmnoprqstuvwxyz", "dz*ef")
+raise "ERROR" unless ret == 'def'
 
-# expectvalue 'def'
-RegexpTest.new.match("abcdzefghijklmnoprqstuvwxyz", "dz*ef")
+# expectvalue 'dzef'
+ret = RegexpTest.new.match("abcdzefghijklmnoprqstuvwxyz", "dz*ef")
+raise "ERROR" unless ret == 'dzef'

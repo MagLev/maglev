@@ -26,36 +26,52 @@
 # Class definition for hash tests
 
 class HashTest
-    # Expected value: '1=>100|2=>200|3=>300|'
+    # Expected value: true
     def new1
-        hash = Hash[1, 100, 2, 200, 3, 300]
-        hash.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash1 = Hash[1, 100, 2, 200, 3, 300]
+        hash2 = hash1.each_pair {|key, value|}
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
-    # Expected value: '1=>100|2=>200|3=>300|'
+    # Expected value: true
     def new2
-        hash = Hash[1=>100, 2=>200, 3=>300]
-        hash.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash1 = Hash[1=>100, 2=>200, 3=>300]
+        hash2 = hash1.each_pair {|key, value|}
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
-    # Expected value: '1=>100|2=>200|3=>300|'
+    # Expected value: true
     def new3
-        hash = Hash.new
-        hash[1] = 100
-        hash[2] = 200
-        hash[3] = 300
-        hash.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash1 = Hash.new
+        hash1[1] = 100
+        hash1[2] = 200
+        hash1[3] = 300
+        hash2 = hash1.each_pair {|key, value|}
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
-    # Expected value: '1=>100|2=>200|3=>300|'
+    # Expected value: true
     def new4
-        hash = Hash.new
-        hash = {1=>100, 2=>200, 3=>300}
-        hash.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash1 = Hash.new
+        hash1 = {1=>100, 2=>200, 3=>300}
+        hash2 = hash1.each_pair {|key, value|}
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
     # Expected value: true
@@ -66,9 +82,9 @@ class HashTest
         hash2[2] = 200
         hash2[3] = 300
         if hash1 == hash2
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -77,9 +93,9 @@ class HashTest
         hash1 = Hash[1, 100, 2, 200, 3, 300]
         hash2 = hash1
         if hash1 == hash2
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -88,54 +104,62 @@ class HashTest
         hash = Hash[1, 100, 2, 200, 3, 300]
         hash.clear()
         if hash.empty?()
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
     # Expected value: nil
     def default1
         hash = Hash[1, 100, 2, 200, 3, 300]
-        puts hash.default(key=nil)
+        return hash.default(key=nil)
     end
 
     # Expected value: 200
     def default2
         hash = Hash[1, 100, 2, 200, 3, 300]
         hash.default = 200
-        puts hash.default
+        return hash.default
     end
 
-    # Expected value: '1=>100|3=>300|'
+    # Expected value: true
     def delete
-        hash = Hash[1, 100, 2, 200, 3, 300]
-        hash.delete(2)
-        hash.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash1 = Hash[1, 100, 2, 200, 3, 300]
+        hash1.delete(2)
+        hash2 = hash1.each_pair {|key, value| print "#{key}=>#{value}|"}
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
-    # Expected value: '1=>100|3=>300|'
+    # Expected value: true
     def deleteIf
-        hash = Hash[1, 100, 2, 200, 3, 300]
-        hash.delete_if {|key, value| key == 2}
-        hash.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash1 = Hash[1, 100, 2, 200, 3, 300]
+        hash1.delete_if {|key, value| key == 2}
+        hash2 = hash1.each_pair {|key, value|}
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
     # Expected value: '300'
     def fetch
         hash = Hash[1, 100, 2, 200, 3, 300]
-        puts hash.fetch(3)
+        return hash.fetch(3)
     end
 
     # Expected value: true if key = a..c
     def hasKey(key)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         if hash.has_key?(key)
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -143,9 +167,9 @@ class HashTest
     def include(key)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         if hash.include?(key)
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -153,9 +177,9 @@ class HashTest
     def member(key)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         if hash.member?(key)
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -163,9 +187,9 @@ class HashTest
     def key(key)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         if hash.key?(key)
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -173,9 +197,9 @@ class HashTest
     def hasValue(value)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         if hash.has_value?(value)
-            puts "true"
+            return true
         else
-            puts "false"
+            return false
         end
     end
 
@@ -183,100 +207,120 @@ class HashTest
     #                 or "c" is value = "ghi", otherwise nil
     def index(value)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
-        puts hash.index(value)
+        return hash.index(value)
     end
 
-    # Expected value: x=>xyz|y=>uvw|z=>rts
+    # Expected value: true
     def replace
         hash1 = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         hash2 = Hash['x', 'xyz', 'y', 'uvw', 'z', 'rst']
         hash1.replace(hash2)
         hash1.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
-    # Expected value: x=>xyz|y=>uvw|z=>rts
-    def inspect
-        hash = Hash['x', 'xyz', 'y', 'uvw', 'z', 'rst']
-        puts hash.inspect()
-    end
-
-    # Expected value: z=>rts|y=>uvw|x=>xyz
+    # Expected value: false
     def invert
         hash1 = Hash['x', 'xyz', 'y', 'uvw', 'z', 'rst']
         hash2 = hash1.invert()
-        hash2.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash1 == hash2
+            return false
+        else
+            return true
+        end
     end
 
     # Expected value: 4
     def length
         hash = Hash['x', 'xyz', 'y', 'uvw', 'z', 'rst', 'd', 'deq']
-        puts hash.length()
+        return hash.length()
     end
 
     # Expected value: 5
     def size
         hash = Hash['x', 'xyz', 'y', 'uvw', 'z', 'rst', 'd', 'deq', 'e', 'fbi']
-        puts hash.length()
+        return hash.length()
     end
 
-    # Expected value: a=>abc|b=>def|y=>uvw|z=>xyz
+    # Expected value: true
     def merge1
         hash1 = Hash['a', 'abc', 'b', 'def']
         hash2 = Hash['y', 'uvw', 'z', 'xyz']
         hash3 = hash1.merge(hash2)
-        hash3.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash3 == hash1 or hash3 == hash2
+            return false
+        else
+            return true
+        end
     end
 
-    # Expected value: a=>abc|b=>def|c=>jkl|z=>xyz
+    # Expected value: true
     def merge2
         hash1 = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         hash2 = Hash['c', 'jkl', 'z', 'xyz']
         hash3 = hash1.merge(hash2)
-        hash3.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash3 == hash1 or hash3 == hash2
+            return false
+        else
+            return true
+        end
     end
 
-    # Expected value: a=>abc|b=>def|c=>jkl|z=>xyz
+    # Expected value: true
     def merge!
         hash1 = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         hash2 = Hash['c', 'jkl', 'z', 'xyz']
-        hash1.merge!(hash2)
-        hash1.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        hash3 = hash1.merge!(hash2)
+        if hash3 == hash2
+            return false
+        else
+            return true
+        end
     end
 
-    # Expected value: a=>abc|b=>def|c=>jkl|z=>xyz
+    # Expected value: true
     def update
         hash1 = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         hash2 = Hash['c', 'jkl', 'z', 'xyz']
         hash1.update(hash2)
-        hash1.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash1 == hash2
+            return false
+        else
+            return true
+        end
     end
 
-    # Expected value: a=>abc|b=>def|c=>ghi|
+    # Expected value: true
     def sort
         hash1 = Hash['a', 'abc', 'c', 'ghi', 'b', 'def']
         hash2 = hash1.sort()
-        hash1.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash1 == hash2
+            return false
+        else
+            return true
+        end
     end
 
-    # Expected value: a=>abc|b=>def|c=>ghi|
+    # Expected value: true
     def toHash
         hash1 = Hash['a', 'abc', 'c', 'ghi', 'b', 'def']
         hash2 = hash1.to_hash()
-        hash1.each_pair {|key, value| print "#{key}=>#{value}|"}
-        puts
+        if hash1 == hash2
+            return true
+        else
+            return false
+        end
     end
 
     # Expected value: aabcbdefcghi
     def toString
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
-        puts hash.to_s
+        ret = hash.to_s
+        return ret
     end
 end
 
@@ -291,110 +335,142 @@ puts "Beginning method invocations"
 puts "****************************"
 puts ""
 
-# expectvalue '1=>100|2=>200|3=>300|'
-HashTest.new.new1()
-
-# expectvalue '1=>100|2=>200|3=>300|'
-HashTest.new.new2()
-
-# expectvalue '1=>100|2=>200|3=>300|'
-HashTest.new.new3()
-
-# expectvalue '1=>100|2=>200|3=>300|'
-HashTest.new.new4()
+# expectvalue true
+ret = HashTest.new.new1()
+raise "ERROR" unless ret == true
 
 # expectvalue true
-HashTest.new.equals()
+ret = HashTest.new.new2()
+raise "ERROR" unless ret == true
 
 # expectvalue true
-HashTest.new.copy()
+ret = HashTest.new.new3()
+raise "ERROR" unless ret == true
 
 # expectvalue true
-HashTest.new.clear()
+ret = HashTest.new.new4()
+raise "ERROR" unless ret == true
+
+# expectvalue true
+ret = HashTest.new.equals()
+raise "ERROR" unless ret == true
+
+# expectvalue true
+ret = HashTest.new.copy()
+raise "ERROR" unless ret == true
+
+# expectvalue true
+ret = HashTest.new.clear()
+raise "ERROR" unless ret == true
 
 # expectvalue nil
-HashTest.new.default1()
+ret = HashTest.new.default1()
+raise "ERROR" unless ret == nil
 
-# expectvalue 2
-HashTest.new.default2()
+# expectvalue 200
+ret = HashTest.new.default2()
+raise "ERROR" unless ret == 200
 
-# expectvalue '1=>100|3=>300|'
-HashTest.new.delete()
+# expectvalue true
+ret = HashTest.new.delete()
+raise "ERROR" unless ret == true
 
-# expectvalue '1=>100|3=>300|'
-HashTest.new.deleteIf()
+# expectvalue true
+ret = HashTest.new.deleteIf()
+raise "ERROR" unless ret == true
 
 # expectvalue 300
-HashTest.new.fetch()
+ret = HashTest.new.fetch()
+raise "ERROR" unless ret == 300
 
 # expectvalue true
-HashTest.new.hasKey('a')
+ret = HashTest.new.hasKey('a')
+raise "ERROR" unless ret == true
 
 # expectvalue false
-HashTest.new.hasKey('d')
+ret = HashTest.new.hasKey('d')
+raise "ERROR" unless ret == false
 
 # expectvalue true
-HashTest.new.include('a')
+ret = HashTest.new.include('a')
+raise "ERROR" unless ret == true
 
 # expectvalue false
-HashTest.new.include('d')
+ret = HashTest.new.include('d')
+raise "ERROR" unless ret == false
 
 # expectvalue true
-HashTest.new.member('a')
+ret = HashTest.new.member('a')
+raise "ERROR" unless ret == true
 
 # expectvalue false
-HashTest.new.member('d')
+ret = HashTest.new.member('d')
+raise "ERROR" unless ret == false
 
 # expectvalue true
-HashTest.new.key('a')
+ret = HashTest.new.key('a')
+raise "ERROR" unless ret == true
 
 # expectvalue false
-HashTest.new.key('d')
+ret = HashTest.new.key('d')
+raise "ERROR" unless ret == false
 
 # expectvalue true
-HashTest.new.hasValue('abc')
+ret = HashTest.new.hasValue('abc')
+raise "ERROR" unless ret == true
 
 # expectvalue false
-HashTest.new.hasValue('xyz')
+ret = HashTest.new.hasValue('xyz')
+raise "ERROR" unless ret == false
 
-# expectvalue true
-HashTest.new.index('def')
+# expectvalue 'b'
+ret = HashTest.new.index('def')
+raise "ERROR" unless ret == 'b'
 
 # expectvalue nil
-HashTest.new.index('xyz')
+ret = HashTest.new.index('xyz')
+raise "ERROR" unless ret == nil
 
-# expectvalue 'x=>xyz|y=>uvw|z=>rst|'
-HashTest.new.replace()
+# expectvalue true
+ret = HashTest.new.replace()
+raise "ERROR" unless ret == true
 
-# expectvalue '{'x'=>'xyz', 'y'=>'uvw', 'z'=>'rst'}
-HashTest.new.inspect()
-
-# expectvalue 'uvw=>y|xyz=>x|rst=>z|'
-HashTest.new.invert()
+# expectvalue true
+ret = HashTest.new.invert()
+raise "ERROR" unless ret == true
 
 # expectvalue 4
-HashTest.new.length()
+ret = HashTest.new.length()
+raise "ERROR" unless ret == 4
 
 # expectvalue 5
-HashTest.new.size()
+ret = HashTest.new.size()
+raise "ERROR" unless ret == 5
 
-# expectvalue 'a=>abc|b=>def|y=>uvw|z=>xyz|'
-HashTest.new.merge1()
+# expectvalue true
+ret = HashTest.new.merge1()
+raise "ERROR" unless ret == true
 
-# expectvalue 'a=>abc|b=>def|c=>jkl|z=>xyz|'
-HashTest.new.merge2()
+# expectvalue true
+ret = HashTest.new.merge2()
+raise "ERROR" unless ret == true
 
-# expectvalue 'a=>abc|b=>def|c=>jkl|z=>xyz|'
-HashTest.new.merge!()
+# expectvalue true
+ret = HashTest.new.merge!()
+raise "ERROR" unless ret == true
 
-# expectvalue 'a=>abc|b=>def|c=>jkl|z=>xyz|'
-HashTest.new.update()
+# expectvalue true
+ret = HashTest.new.update()
+raise "ERROR" unless ret == true
 
-# expectvalue 'a=>abc|b=>def|c=>ghi|'
-HashTest.new.sort()
+# expectvalue true
+ret = HashTest.new.sort()
+raise "ERROR" unless ret == true
 
-# expectvalue 'a=>abc|b=>def|c=>ghi|'
-HashTest.new.toHash()
+# expectvalue true
+ret = HashTest.new.toHash()
+raise "ERROR" unless ret == true
 
 # expectvalue 'aabcbdefcghi'
-HashTest.new.toString()
+ret = HashTest.new.toString()
+raise "ERROR" unless ret == 'aabcbdefcghi'

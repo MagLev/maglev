@@ -58,24 +58,10 @@ namespace :dev do
     Rake::Task['gs:start'].invoke if was_running
   end
 
-  desc "Stop current server and install MagLev build from ENV['PREVIOUS']"
-  task :previous do
-    # Ensure the PREVIOUS directory exists, and it contains a 'product.tgz'
-    # file. Warn if we don't find any .mcz files.
-    previous = File.expand_path(ENV['PREVIOUS'] || "#{MAGLEV_HOME}/../PREVIOUS")
-    raise ArgumentError, "No PREVIOUS directory found: '#{previous}'" unless
-      File.directory? previous
-    files = FileList.new("#{previous}/*")
-
-    tgz_file = files.detect { |f| f =~ /\.tgz$/ }
-    mcz_file = files.detect { |f| f =~ /\.mcz$/ }
-    raise ArgumentError, "Can't find .tgz file" if tgz_file.nil?
-    warn "No .mcz file found in #{previous}." if mcz_file.nil?
-
-    puts "=" * 50
-    puts "= Installing product:  #{tgz_file}"
-    puts "= Installing mcz file: #{mcz_file}"
-    puts "=" * 50
+  desc "Stop current server and install ../latest-product.tgz"
+  task :'install-latest' do
+    tgz_file = '../latest-product.tgz'
+    raise "Can't find product #{tgz_file}" unless File.exists?(tgz_file)
 
     Rake::Task[:'dev:ensure_stopped'].invoke
     ensure_std_directories
@@ -86,7 +72,7 @@ namespace :dev do
 
     puts "=== Start GemStone Server"
     Rake::Task['gs:start'].invoke
-    load_mcz mcz_file
+#    load_mcz mcz_file
     Rake::Task['gs:status'].invoke
     # TODO: really load mcz files, if necessary
     # TODO: get topaz snippets working and ensure the image is loaded up

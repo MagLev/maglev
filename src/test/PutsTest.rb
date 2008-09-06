@@ -6,27 +6,27 @@
 
 # Class definition
 class PutsTest
-    # Expected value: Hello World!
+    # Expected value: nil
     def simplePuts
         puts "Hello World!"
     end
 
-    # Expected value: Hello World!
+    # Expected value: nil
     def compoundPuts
         puts "Hello" + " World" + "!"
     end
 
-    # Expected value: Hello <var>
+    # Expected value: nil
     def simpleStrVarPuts (var)
         puts "Hello " + var
     end
 
-    # Expected value: Hello <var>
+    # Expected value: nil
     def simpleIntVarPuts (var)
         puts "Hello " + var.to_s
     end
 
-    # Expected value: Hello <var> and <var>
+    # Expected value: nil
     def compoundVarPuts (var1, var2)
         puts "Hello " + var1 + " and " + var2
     end
@@ -43,38 +43,22 @@ puts "Beginning method invocations"
 puts "****************************"
 puts ""
 
-# expectvalue 'Hello World!'
-puts " "
-puts "Calling PutsTest.new.simplePuts"
-PutsTest.new.simplePuts
-puts "Completed PutsTest.new.simplePuts"
+# expectvalue nil
+ret = PutsTest.new.simplePuts
+raise "ERROR" unless ret == nil
 
-# expectvalue 'Hello World!'
-puts " "
-puts "Calling PutsTest.new.compoundPuts"
+# expectvalue nil
 PutsTest.new.compoundPuts
-puts "Completed PutsTest.new.compoundPuts"
+raise "ERROR" unless ret == nil
 
-# expectvalue 'Hello there' 
-puts ""
-puts "Calling PutsTest.new.simpleStrVarPuts('there')"
+# expectvalue nil
 PutsTest.new.simpleStrVarPuts('there')
-puts "Completed PutsTest.new.simpleStrVarPuts('there')"
+raise "ERROR" unless ret == nil
 
-# expectvalue 'Hello 345'
-puts ""
-puts "Skipping PutsTest.new.simpleIntVarPuts(345)"
-#PutsTest.new.simpleIntVarPuts(345)
-#puts "Completed PutsTest.new.simpleIntVarPuts(345)"
+# expectvalue nil
+PutsTest.new.simpleIntVarPuts(345)
+raise "ERROR" unless ret == nil
 
-# expectvalue 'Hello Fred and Wilma'
-puts ""
-puts "Calling PutsTest.new.compoundVarPuts('Fred', 'Wilma')"
+# expectvalue nil
 PutsTest.new.compoundVarPuts('Fred', 'Wilma')
-puts "Completed PutsTest.new.compoundVarPuts('Fred', 'Wilma')"
-
-puts ""
-puts "****************************"
-puts "Test complete"
-puts "****************************"
-puts ""
+raise "ERROR" unless ret == nil

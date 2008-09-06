@@ -3,10 +3,10 @@ def test
 end
 test { | a, *b |
   unless a == 7
-    raise 'ERR'
+    raise 'ERROR'
   end
   unless b == [ ]
-    raise 'ERR'
+    raise 'ERROR'
   end
 }
 true

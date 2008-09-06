@@ -3,13 +3,13 @@ def test
 end
 test { | a, b, c |
   unless a.equal?(nil) 
-    raise 'ERR'
+    raise 'ERROR'
   end
   unless b.equal?(nil) 
-    raise 'ERR'
+    raise 'ERROR'
   end
   unless c.equal?(nil) 
-    raise 'ERR'
+    raise 'ERROR'
   end
 }
 true

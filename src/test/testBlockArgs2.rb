@@ -3,13 +3,13 @@ def test
 end
 test { | a, b, c |
   unless a == 9
-    raise 'ERR'
+    raise 'ERROR'
   end
   unless b == 10
-    raise 'ERR'
+    raise 'ERROR'
   end
   unless c == 11
-    raise 'ERR'
+    raise 'ERROR'
   end
 }
 true
