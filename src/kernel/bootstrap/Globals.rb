@@ -5,7 +5,6 @@ Regexp = //.class
 Range = (1..2).class
 Fixnum = 1.class
 NilClass = nil.class
-TrueClass = true.class
 Float=1.0e100.class
 Integer = 1152921504606846976.class.superclass
 Numeric = 1.class.superclass.superclass
@@ -16,6 +15,9 @@ Object = self.class
 Symbol = :primitive.class
 
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
+RUBY.global('Boolean', 'Boolean')
+RUBY.global('TrueClass', 'TrueClass')
+RUBY.global('FalseClass', 'FalseClass')
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('File', 'GsFile')
 RUBY.global('Socket', 'Socket')
@@ -31,6 +33,7 @@ RUBY.global('Time', 'DateTime')
 RUBY.global('Exception', 'Exception')
 RUBY.global('StandardError', 'Error')
 RUBY.global('LoadError', 'RubyLoadError')
+RUBY.global('SystemExit', 'RubySystemExit')
 RUBY.global('ZeroDivisionError', 'ZeroDivide')
 RUBY.global( 'EBADF' , 'SocketErrorEBADF')
 RUBY.global( 'ENOTCONN' , 'SocketErrorENOTCONN')
@@ -39,8 +42,9 @@ RUBY.global( 'ECONNRESET' , 'SocketErrorECONNRESET')
 
 RUBY.global("Gemstone", "System")
 
+RUBY.global("Proc", "ExecBlock")
 def proc(&b); b; end
-Proc = proc{}.class
+# remainder of Proc support in Proc.rb
 
 ARGV = []
 #  $; is auto-initialized to nil if referenced, by RubySexpParser .

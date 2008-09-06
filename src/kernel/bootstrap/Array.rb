@@ -12,7 +12,6 @@ class Array
 
   primitive 'size=', 'size:'
   self.class.primitive '_withAll', 'withAll:'
-  primitive '_removeFromTo', '_removeFrom:do:'
 
   # Used by both assoc and rassoc, since they differ only in the index of
   # the array to compare to the key
@@ -46,17 +45,13 @@ class Array
   def self.[](*elements)
     _withAll(elements)
   end
-  self.class.primitive 'alloc', 'new:'
+  self.class.primitive '_alloc', '_rubyNew:initValue:'
 
-  #
   def self.new(size=0, value=nil)
-    inst = alloc(size)
-    if value
-      # prim needs 1 based args 
-      inst._fillFromToWith(1, size, value)
-    end
-    inst
+    _alloc(size, value) 
   end
+
+  #  Array.new(aSize) {|i| block| } # TODO form not supported yet
 
   # Array Instance methods
 
@@ -244,14 +239,10 @@ class Array
 
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
-  #   TODO: use the smalltalk primitive
-  def delete_at(index)
+  #   TODO: use write a smalltalk method
     # convert negative index to positive and conver to on-based
     # and do nothing if index out of range ..
-   # Method not implemented
-    self._removeFromTo(idx, idx)
-    # retvalue
-  end
+  # primitive 'delete_at' , '_rubyDeleteAt:'
 
   # Delete every element of self for which +block+ evalutes to +true+.
   def delete_if(&block)

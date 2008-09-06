@@ -28,7 +28,7 @@ class Float
 	primitive 'abs', 'abs'
 	primitive 'ceil', 'ceiling'
 
-#divmod inherited from Numeric
+	primitive 'divmod', '_divmod:'
 
 	primitive 'eql?', '_ruby_eqlQ:'
 

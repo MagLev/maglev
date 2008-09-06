@@ -13,7 +13,8 @@ class ArgsTest
     # Call method taking optional parameter w/o passing optional parameter
     raise "Fail 3A" unless required_optional_splat_no_block(1) == 1
     raise "Fail 3B" unless required_optional_splat_no_block(1, *[]) == 1
-    raise "Fail 3C" unless required_optional_splat_no_block(1, [1]) == 2
+    a = required_optional_splat_no_block(1, [1]) 
+    raise "Fail 3C" unless a == 2
 
     # Call method taking optional parameter passing optional parameter
     raise "Fail 3D" unless required_optional_splat_no_block(1, "f") == 2

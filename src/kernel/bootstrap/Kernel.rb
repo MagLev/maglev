@@ -6,6 +6,16 @@ module Kernel
   # following methods are just those needed to get some benchmarks and
   #   specs running .
 
+  def exit(arg=1)
+    status = '9'
+    if (arg.equal?(true))
+      status = '0'
+    elsif (arg.kind_of?(Integer))
+      status = arg.to_s
+    end
+    raise SystemExit , status
+  end
+
   def format(str, *args)
     args.each{|a| str.sub!(/%(d|s)/, a.to_s)}
     str

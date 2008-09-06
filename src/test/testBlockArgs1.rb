@@ -16,12 +16,12 @@ unless r.last == 3
   raise 'ERR'
 end
 a = r.to_a 
-unless a = [1,2,3]
+unless a == [1,2,3]
   raise 'ERR'
 end
 r = Range.new(1,5)
 a = r.to_a 
-unless a = [1,2,3,4,5]
+unless a == [1,2,3,4,5]
   raise 'ERR'
 end
 

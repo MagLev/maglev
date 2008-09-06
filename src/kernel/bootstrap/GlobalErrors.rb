@@ -37,7 +37,7 @@ class ThreadError         < StandardError; end
 class TypeError           < StandardError; end
 # class ZeroDivisionError < StandardError; end   # See Globals.rb
 
-class SystemExit          < Exception; end
+# SystemExit        # see Globals.rb
 class SystemStackError    < Exception; end
 
 

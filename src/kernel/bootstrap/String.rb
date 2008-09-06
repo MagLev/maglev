@@ -120,7 +120,10 @@ class String
   # routine to create the set of characters to work on.  This should be
   # whatever the smalltalk has for a bitset data struct.
 
-  # MNI: count
+  # primitive_nobridge '_count*', '_rubyCount:'
+  # def count( *strings)
+  #  _count(strings)
+  # end
   # MNI: crypt
   # MNI: delete
   # MNI: delete!

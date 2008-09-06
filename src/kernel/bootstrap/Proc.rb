@@ -10,6 +10,9 @@ class Proc
     primitive 'call', 'value:'
     primitive 'call', 'value:value:'
     primitive 'call', 'value:value:value:'
+
+    self.class.primitive 'new&' , '_newProc:'
+    self.class.primitive 'new' , '_newProc:'
     
     def inspect
       "#<Proc>"
