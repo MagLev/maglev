@@ -143,8 +143,6 @@ class Array
   primitive '[]=', '_rubyAt:length:put:'
 
   # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
-  # TODO: This is currently broken since hash.include? isn't working....
-  # The code works under MRI.
   def |(other)
     hash = {}
     ary = []
@@ -239,10 +237,7 @@ class Array
 
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
-  #   TODO: use write a smalltalk method
-    # convert negative index to positive and conver to on-based
-    # and do nothing if index out of range ..
-  # primitive 'delete_at' , '_rubyDeleteAt:'
+  primitive 'delete_at' , '_rubyDeleteAt:'
 
   # Delete every element of self for which +block+ evalutes to +true+.
   def delete_if(&block)

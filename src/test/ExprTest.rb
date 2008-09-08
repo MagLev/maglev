@@ -5,6 +5,21 @@
 
 # Class definition for expression tests
 
+def compareFloat( a , exp )
+  d = a - exp 
+  if (d < 0.0 )
+    d = 0.0 - d
+  end
+  maxD = exp * 1.0e-14 
+  ok = d < maxD
+  if (ok)
+    # ok
+  else
+    nil.pause
+  end
+  ok
+end
+
 class ExprTest
     # Expected value: 7
     def addIntSimple
@@ -48,42 +63,42 @@ class ExprTest
 
     # Expected value: 7.4
     def addFloatSimple
-         sprintf("%0.1f", 3.1+4.3)
+         3.1 + 4.3
     end
 
     # Expected value: 12.8
     def addFloatCompound
-         sprintf("%0.1f", 3.1+4.3+5.4)
+         3.1+4.3+5.4
     end
 
     # Expected value: 5.4
     def subtractFloatSimple
-         sprintf("%0.1f", 70.5-65.1)
+         70.5-65.1
     end
 
     # Expected value: 5.14
     def subtractFloatCompound
-         sprintf("%0.2f", 100.54-90.1-5.3)
+         100.54-90.1-5.3
     end
 
     # Expected value: 39.06
     def multiplyFloatSimple
-         sprintf("%2.2f", 12.6*3.1)
+         12.6*3.1
     end
 
     # Expected value: 150
     def multiplyFloatCompound
-         sprintf("%3.2f", 25.25*3.7*2.4)
+         25.25*3.7*2.4
     end
 
     # Expected value: 3
     def divideFloatSimple
-         sprintf("%2.13f", 255.64/3.6)
+         255.64/3.6
     end
 
     # Expected value: 111
     def divideFloatCompound
-         sprintf("%2.14f", 3.2/2.3/0.5)
+         3.2/2.3/0.5
     end
 
     # Expected value: 2
@@ -93,7 +108,7 @@ class ExprTest
 
     # Expected value: 3.2
     def modulusFloat
-         sprintf("%2.1f", 25.4%3.7)
+         25.4%3.7
     end
 
     # Expected value: 1000
@@ -103,7 +118,7 @@ class ExprTest
 
     # Expected value: 54798.1281
     def powerFloat
-         sprintf("%5.4f", 15.3**4)
+         15.3**4
     end
 
     # Expected value: 12
@@ -168,35 +183,35 @@ raise "ERROR" unless ret == 111
 
 # expectvalue 7.4
 ret = ExprTest.new.addFloatSimple()
-raise "ERROR" unless ret == "7.4"
+raise "ERROR" unless compareFloat( ret , 7.4 )
 
 # expectvalue 12.8
 ret = ExprTest.new.addFloatCompound()
-raise "ERROR" unless ret == "12.8"
+raise "ERROR" unless compareFloat(ret, 12.8)
 
 # expectvalue 5.4
 ret = ExprTest.new.subtractFloatSimple()
-raise "ERROR" unless ret == "5.4"
+raise "ERROR" unless compareFloat(ret , 5.4)
 
 # expectvalue 5.14
 ret = ExprTest.new.subtractFloatCompound()
-raise "ERROR" unless ret == "5.14"
+raise "ERROR" unless compareFloat(ret , 5.14)
 
 # expectvalue 39.06
 ret = ExprTest.new.multiplyFloatSimple()
-raise "ERROR" unless ret == "39.06"
+raise "ERROR" unless compareFloat(ret , 39.06)
 
 # expectvalue 224.22
 ret = ExprTest.new.multiplyFloatCompound()
-raise "ERROR" unless ret == "224.22"
+raise "ERROR" unless compareFloat(ret , 224.22)
 
 # expectvalue 71.0111111111111
 ret = ExprTest.new.divideFloatSimple()
-raise "ERROR" unless ret == "71.0111111111111"
+raise "ERROR" unless compareFloat(ret , 71.0111111111111)
 
 # expectvalue 2.78260869565217
 ret = ExprTest.new.divideFloatCompound()
-raise "ERROR" unless ret == "2.78260869565217"
+raise "ERROR" unless compareFloat(ret , 2.78260869565217)
 
 # expectvalue 2
 ret = ExprTest.new.modulusInt()
@@ -204,7 +219,7 @@ raise "ERROR" unless ret == 2
 
 # expectvalue 3.2
 ret = ExprTest.new.modulusFloat()
-raise "ERROR" unless ret == "3.2"
+raise "ERROR" unless compareFloat(ret, 3.2 )
 
 # expectvalue 1000
 ret = ExprTest.new.powerInt()
@@ -212,7 +227,7 @@ raise "ERROR" unless ret == 1000
 
 # expectvalue 54798.1281
 ret = ExprTest.new.powerFloat()
-raise "ERROR" unless ret == "54798.1281"
+raise "ERROR" unless compareFloat(ret , 54798.1281 )
 
 # expectvalue 12
 ret = ExprTest.new.rightShift()
