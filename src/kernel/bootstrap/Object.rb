@@ -80,9 +80,9 @@ class Object
         end
     end
 
-    def block_given?
-        true
-    end
+    # block_given?  is implemented by the ruby compiler .
+    #   do not code any definition of block_given? here .
+    # Attempts to reimplement  block_given?  will fail with a compiler error.
 
     def initialize(*args)
         self
