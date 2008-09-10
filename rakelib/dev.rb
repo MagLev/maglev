@@ -76,10 +76,3 @@ end
 def load_mcz(file_name)
   warn "=== Not loading mcz files...requires user name and password for monticello repository..."
 end
-
-def run_topaz(snippet)
-  sh %{ #{TOPAZ_CMD} <<EOF
-#{snippet}
-EOF
-  }
-end
