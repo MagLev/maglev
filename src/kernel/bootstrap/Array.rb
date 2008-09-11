@@ -48,7 +48,7 @@ class Array
   self.class.primitive '_alloc', '_rubyNew:initValue:'
 
   def self.new(size=0, value=nil)
-    _alloc(size, value) 
+    _alloc(size, value)
   end
 
   #  Array.new(aSize) {|i| block| } # TODO form not supported yet
@@ -300,9 +300,18 @@ class Array
     raise "Method not implemented: Array#fetch"
   end
 
-  def fill(obj)
-    # needs more analysis with Allen
-    raise "Method not implemented: Array#fill"
+  def fill(obj, start=nil, length=nil)
+    # TODO: needs more analysis with Allen
+    # TODO: Smalltalk throws exception if length extends beyond current
+    # array.  Ruby just extends the array with the new elements.
+    # TODO: Needs block suppor
+    start  ||= 0
+    length ||= size - 1
+
+    # smalltalk arrays start at 1
+    start += 1
+    length += 1
+    _fillFromToWith(start, length, obj)
   end
 
   def first
@@ -314,8 +323,7 @@ class Array
   end
 
   def flatten!
-    # use existing flatten_onto followed by become:
-    raise "Method not implemented: Array#flatten!"
+    replace(flatten)
   end
 
   # Note: The Pick Axe book has this method documented under both Array and
@@ -350,10 +358,10 @@ class Array
   def join(s="")
     out = ""
     max = length - 1
-    i = 0 
-    while i < max 
+    i = 0
+    while i < max
       out << self[i].to_s
-      out << s 
+      out << s
       i = i + 1
     end
     out << self[max].to_s
