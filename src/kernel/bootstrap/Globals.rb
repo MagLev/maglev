@@ -30,7 +30,7 @@ RUBY.global('Random')
 RUBY.global('Set', 'IdentitySet')
 RUBY.global('Time', 'DateTime')
 
-RUBY.global('Exception', 'Exception')
+RUBY.global('Exception', 'UserException')
 RUBY.global('StandardError', 'Error')
 RUBY.global('LoadError', 'RubyLoadError')
 RUBY.global('SystemExit', 'RubySystemExit')

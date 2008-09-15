@@ -11,6 +11,10 @@ class Object
 
     # _isInteger allows integer?  special sends to non-Numeric objects
     primitive '_isInteger', '_isInteger'
+  
+    #  private method _each: contains on:do: handler for RubyBreakException ,
+    #  all env1 sends of each& are compiled as sends of _each&
+    primitive '_each&', '_rubyEach:'
 
     # End private helper methods
 

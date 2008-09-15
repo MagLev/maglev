@@ -1,4 +1,5 @@
-# definitions in this file need to be in separate file from
+# This file is loaded after Globals.rb.
+# Definitions in this file need to be in separate file from
 #   Globals.rb, to force all global definitions in Globals.rb
 #  to be created/resolved before we attempt to use some of them here.
 

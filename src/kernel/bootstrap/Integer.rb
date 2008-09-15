@@ -19,11 +19,18 @@
 # Note,   1152921504606846976.class  will be LargePositiveInteger, not Integer .
 
 class Integer
-    def times
+    # _rubyTimes:  contains the handler for RubyBreakException
+    primitive '_times&', '_rubyTimes:'
+    def times(&b)
+       _times(&b)
+    end
+    # _rubyTimes: should be the only caller of __times& 
+    def __times(&b)
         for i in (0..self-1)
-            yield i
+            b.call(i)
         end
     end
+
 
     def upto(n, &b)
         i = self
