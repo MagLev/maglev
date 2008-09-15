@@ -31,7 +31,7 @@ namespace :dev do
   #
   # TODO: At some point, should probably have ENV['MAGLEV_IMAGE_CACHE']
   # point to the directory to cache these in.
-  task({ :savestate => :'gs:stop'}, :name)  do |t, args|
+  task({:savestate => :'gs:stop'}, :name)  do |t, args|
     # TODO: Do I need to save the tranlog too?
     save_file = "../extent0.ruby.dbf_#{args.name}"
     puts "Saving current extent to #{save_file}"
@@ -40,8 +40,7 @@ namespace :dev do
 
   desc "Restore a previously stashed extent0.ruby.dbf (stops server first)."
   # TODO: Hook into $MAGLEV_IMAGE_CACHE (see comment in task savestate)
-  #task({ :restorestate => :'gs:stop'}, :name)  do |t, args|
-  task :restorestate, :name do |t, args|
+  task({:restorestate => :'gs:stop'}, :name)  do |t, args|
     restore_file = "../extent0.ruby.dbf_#{args.name}"
     unless File.exists? restore_file
       puts "Couldn't find restore file #{restore_file}"
@@ -91,6 +90,20 @@ namespace :dev do
     else
       puts "=== No GemStone Server running"
     end
+  end
+
+  desc "Invoke topaz and run a .inp file: rake dev:inp file=/somedir/somefile.inp"
+  task :runinp => 'gs:start' do
+    the_file = ENV['file']
+    commit = 'commit'
+    raise "Need to pass a file: file=..." if the_file.nil?
+    raise "Can't find .inp file '#{ENV['file']}" unless File.exists?(the_file)
+    run_topaz <<END
+output push runinp.out
+omit resultcheck
+inp #{the_file}
+#{commit}
+END
   end
 
   desc "Reload kernel.rb (primitives) and commit it"

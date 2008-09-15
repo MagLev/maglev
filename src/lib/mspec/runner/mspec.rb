@@ -129,6 +129,10 @@ module MSpec
 #      @env.instance_eval(&block)
       block.call
     rescue Exception => e
+      if DEBUG_SPEC # bobw - See comments in Globals.rb
+        pause
+      end
+      
       register_exit 1
       if current and current.state
         #avi
@@ -136,9 +140,6 @@ module MSpec
       else
         STDERR.write "\nAn exception occurred in #{msg}:\n#{e.class}: #{e.message.inspect}\n"
         STDERR.write "#{e.backtrace.join "\n"}"
-      end
-      if DEBUG_SPEC # bobw - See comments in Globals.rb
-        pause
       end
     end
   end
