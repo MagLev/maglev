@@ -36,9 +36,9 @@ test s.count("a-a"), 1, "2A: a-a"
 test s.count("a-b"), 2, "2B: a-b"
 test s.count("b-a"), 0, "2C: b-a"
 
-test s.count("^a-a"), 4, "2D: a-a"
-test s.count("^a-b"), 3, "2E: a-b"
-test s.count("^b-a"), 5, "2F: b-a"
+test s.count("^a-a"), 4, "2D: ^a-a"
+test s.count("^a-b"), 3, "2E: ^a-b"
+test s.count("^b-a"), 5, "2F: ^b-a"
 
 # Test handling of '^' and '-'
 test s.count("-"),   1, "3A: -"
@@ -52,14 +52,14 @@ test s.count("^-a"),  3, "3G: ^-a"
 test s.count("^-a-"), 3, "3H: ^-a-"
 
 test s.count("^"),   1, "3I: ^"
-test s.count("^^"),  4, "3J: ^"
+test s.count("^^"),  4, "3J: ^^"
 test s.count("a^"),  2, "3K: a^"
 test s.count("^a^"), 3, "3M: ^a^"
 
-test s.count("a--"), 0, "3N: a--"  # '-' is ASCII 45
-test s.count("--a"), 3, "3O: --a"
-test s.count("--"),  1, "3P: --"
-test s.count("--"),  1, "3Q: ---"
-test s.count("--"),  1, "3R: ----"
+test s.count("a--"),  0, "3N: a--"  # '-' is ASCII 45
+test s.count("--a"),  3, "3O: --a"
+test s.count("--"),   1, "3P: --"
+test s.count("---"),  1, "3Q: ---"
+test s.count("----"), 1, "3R: ----"
 
 report
