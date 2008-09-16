@@ -11,6 +11,7 @@ class File
     self.class.primitive 'stdin'
     self.class.primitive 'stdout'
     self.class.primitive 'stderr'
+    self.class.primitive '_environmentAt', '_expandEnvVariable:isClient:'
 
     def self.new(file, mode="r")
         self._open(file, mode)

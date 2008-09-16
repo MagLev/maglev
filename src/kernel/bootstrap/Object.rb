@@ -39,6 +39,12 @@ class Object
       _send(sym, *args)
     end
 
+    #  __send__ defined per MRI, non-overrideable version of send
+    #  TODO: disallow redef in Object after prims loaded
+    def __send__(sym, *args)
+      _send(sym, *args)
+    end
+
     # primitive '_send:',    'rubySend:'
     # def send(aSym)
     #  _send(aSym)
