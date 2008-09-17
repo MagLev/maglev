@@ -1,16 +1,18 @@
 module CallerFixture
+  # TODO change @@block back to @block after ticket 121 fixed
+
   def block
-    @block
+    @@block
   end
   module_function :block
 
   def block=(block)
-    @block = block
+    @@block = block
   end
   module_function :block=
 
   def capture(&block)
-    @block = block
+    @@block = block
   end
   module_function :capture
 

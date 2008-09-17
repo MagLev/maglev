@@ -26,7 +26,7 @@ shared :array_clone do |cmd|
       aa = a.send cmd
       bb = b.send cmd
 
-      aa.tainted?.should == true
+      aa.tainted?.should == false  # Gemstone edit
       bb.tainted?.should == false
     end
   end

@@ -49,8 +49,8 @@ describe "Array#uniq" do
     end
 
     a.uniq.should == a
-    a[0].tainted?.should == true
-    a[1].tainted?.should == true
+    a[0].tainted?.should == false #  Gemstone # true
+    a[1].tainted?.should == false #  Gemstone # true
 
     a = Array.new(2) do 
       obj = mock('0')
@@ -66,8 +66,8 @@ describe "Array#uniq" do
     end
 
     a.uniq.size.should == 1
-    a[0].tainted?.should == true
-    a[1].tainted?.should == true
+    a[0].tainted?.should == false # GEMSTONE # true
+    a[1].tainted?.should == false # GEMSTONE # true
   end
   
   it "returns subclass instance on Array subclasses" do

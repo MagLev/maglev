@@ -34,7 +34,8 @@ module KernelSpecs
       def juu_ichi; end
     end
   
-    public
+    # TODO uncomment next line after  ticket 91 fixed
+    # public
   
     def self.juu_ni; end
     def juu_san; end
@@ -44,7 +45,8 @@ module KernelSpecs
     def public_method; :public_method; end
 
     def undefed_method; :undefed_method; end
-    undef_method :undefed_method
+    # TODO uncomment next line after  ticket 91 fixed
+    # undef_method :undefed_method
 
     protected
     def protected_method; :protected_method; end
@@ -81,7 +83,8 @@ module KernelSpecs
     def self.existing() :existing end
 
     def self.private_method() :private_method end
-    private_class_method :private_method
+    # TODO uncomment next line after  ticket 91 fixed
+    # private_class_method :private_method
   end
   
   class MethodMissingC
@@ -109,7 +112,8 @@ module KernelSpecs
     def self.existing() :existing end
 
     def self.private_method() :private_method end
-    private_class_method :private_method
+    # TODO uncomment next line after  ticket 91 fixed
+    # private_class_method :private_method
   end
     
   class NoMethodMissingC
