@@ -73,6 +73,3 @@ def copy_extent
   end
 end
 
-def load_mcz(file_name)
-  warn "=== Not loading mcz files...requires user name and password for monticello repository..."
-end

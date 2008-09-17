@@ -119,4 +119,26 @@ commit
 exit
 END
   end
+  
+  desc "Load the mcz file ../latest.mcz and commit it."
+  task :loadmcz do
+    run_topaz <<END
+output push loadall.out
+display resultcheck
+run
+| fileRepo aName ver |
+fileRepo := MCDirectoryRepository new directory: (FileDirectory on: '../').
+aName := 'latest.mcz'.
+
+ver := fileRepo loadVersionFromFileNamed: aName .
+ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
+GsFile gciLogServer: ver printString .
+ver load .
+GsFile gciLogServer: 'load done'.
+^ true
+%
+commit
+exit
+END
+  end
 end

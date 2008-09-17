@@ -118,8 +118,8 @@ def status
   end
 end
 
-def run_topaz(snippet)
-  sh %{ #{TOPAZ_CMD} <<EOF
+def run_topaz(snippet, debug=false)
+  sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
 #{snippet}
 EOF
   }, :verbose => false

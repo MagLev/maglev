@@ -40,16 +40,18 @@ task :squeak do
   end
 end
 
-desc "Run a .rb file under MagLev: (e.g.: rake gs:maglev file=../foo/bar.rb)"
+desc "Run a .rb file under MagLev: (e.g.: rake gs:maglev file=../foo/bar.rb). Turn on topaz debugging with: rake maglev debug=true file=foo.rb"
 task :maglev do
   file = ENV['file']
+  debug = ENV['debug'] || false
   raise "No file specified: Specify a file with file=...." if file.nil? || file.empty?
   raise "Can't find file #{file}" unless File.exists?(file)
-  run_topaz <<END
+  code =<<END
 run
 RubyContext load.
 RubyContext loadFileNamed: '#{File.expand_path(file)}'.
 %
 exit
 END
+  run_topaz code, debug
 end
