@@ -119,7 +119,7 @@ commit
 exit
 END
   end
-  
+
   desc "Load the mcz file ../latest.mcz and commit it."
   task :loadmcz do
     run_topaz <<END
@@ -140,5 +140,22 @@ GsFile gciLogServer: 'load done'.
 commit
 exit
 END
+  end
+
+  desc "Run an mspec file: spec=<dir_or_file_name>"
+  task :spec do
+    raise "No spec defined with: spec=localspec/1.8/..." unless ENV['spec']
+    topaz_stuff =<<END
+output push spec.out
+run
+RubyContext load.
+RubyContext requireFileNamed: 'mspec.rb'.
+RubyCompiler new evaluateString: '\\$formatter = DottedFormatter.new; \\$formatter.register'.
+RubyContext loadFileNamed: '#{ENV['PWD']}/', '#{ENV['spec']}'.
+RubyCompiler new evaluateString: '\\$formatter.finish'
+%
+exit
+END
+    run_topaz topaz_stuff
   end
 end
