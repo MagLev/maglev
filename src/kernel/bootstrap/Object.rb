@@ -22,6 +22,7 @@ class Object
     primitive 'halt'
     primitive 'hash'
     primitive 'object_id', 'asOop'
+    primitive '__id__' , 'asOop'
 
     #  not   is now a special selector,
     #   GsComSelectorLeaf>>selector:  translates #not to bytecode Bc_rubyNOT
@@ -31,25 +32,27 @@ class Object
 
     # rubySend: methods implemented in .mcz
     #   note special handling of '_send:' in  installPrimitive:selector:
-    #  TODO: reduce indirections in send implementation, and make use of
-    #   rubySend:
     primitive '_send:*', 'rubySend:withArguments:'
+    primitive '_send:', 'rubySend:'
 
     def send(sym, *args)
-      _send(sym, *args)
+      if (args.length <= 0) 
+        _send(sym) 
+      else
+        _send(sym, *args)
+      end
     end
 
     #  __send__ defined per MRI, non-overrideable version of send
     #  TODO: disallow redef in Object after prims loaded
     def __send__(sym, *args)
-      _send(sym, *args)
+      if (args.length <= 0) 
+        _send(sym, *args)
+      else
+        _send(sym) 
+      end
     end
 
-    # primitive '_send:',    'rubySend:'
-    # def send(aSym)
-    #  _send(aSym)
-    #end
-    
     primitive 'freeze', 'immediateInvariant'
     # TODO:  fix inefficency in rubyRespondsTo: which is implemented in .mcz
     primitive 'respond_to?', 'rubyRespondsTo:'

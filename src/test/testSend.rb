@@ -39,6 +39,10 @@ class TestSend
     puts "meth2arrok"
   end
 
+  def meth1
+     997
+  end
+
   def doSend2arr(*args)
      send :meth2arr , *args
      puts "send2ok"
@@ -46,6 +50,14 @@ class TestSend
   def doSend2b(aSym, *args)
      send aSym, *args
      puts "send2ok"
+  end
+
+  def doSend0Arr
+    cmd = [ :meth1 ]
+    a = self.send( cmd )
+    unless a == 997 
+      raise 'ERR' 
+    end
   end
 end
 
@@ -56,4 +68,5 @@ a = [88,99]
 o.send :meth2arr , a
 o.doSend2arr(a)
 o.doSend2b( :meth2arr , a )
+o.doSend0Arr
 true
