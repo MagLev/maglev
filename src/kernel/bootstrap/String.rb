@@ -116,17 +116,13 @@ class String
 
   primitive 'concat', '_rubyAddAll:'
 
-  # TODO: count, delete, and delete! could all benefit from a common
-  # routine to create the set of characters to work on.  This should be
-  # whatever the smalltalk has for a bitset data struct.
+  # arg to _rubyCount: is expected to be an Array , so declare as 'count*'
+  primitive 'count*', 'rubyCount:'
 
-  # primitive_nobridge '_count*', '_rubyCount:'
-  # def count( *strings)
-  #  _count(strings)
-  # end
   # MNI: crypt
-  # MNI: delete
-  # MNI: delete!
+  
+  primitive 'delete*',  'rubyDelete:'
+  primitive 'delete!*', 'rubyDeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
   primitive 'downcase', 'asLowercase'

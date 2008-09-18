@@ -172,7 +172,8 @@ class Module
   def method_undefined(symbol)
   end
 
-  # MNI: module_function
+  # MNI: module_function,  see old impl in Object.rb 
+
   # MNI: private
   # MNI: protected
   # MNI: public
