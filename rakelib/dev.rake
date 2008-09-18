@@ -57,8 +57,11 @@ namespace :dev do
     Rake::Task['gs:start'].invoke if was_running
   end
 
+  desc "Stop server, install ../latest-product.tgz, load ../latest.mcz and reload primitives"
+  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:reloadprims']
+
   desc "Stop current server and install ../latest-product.tgz"
-  task :'install-latest' do
+  task :'install-tgz' do
     tgz_file = '../latest-product.tgz'
     raise "Can't find product #{tgz_file}" unless File.exists?(tgz_file)
 
