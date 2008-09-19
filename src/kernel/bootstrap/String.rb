@@ -84,8 +84,6 @@ class String
 
   primitive 'casecmp', 'equalsNoCase:'
 
-  # MNI: center
-
   def chomp
     if self[-1] == ?\r
       return self[0..-2]
@@ -120,7 +118,7 @@ class String
   primitive 'count*', 'rubyCount:'
 
   # MNI: crypt
-  
+
   primitive 'delete*',  'rubyDelete:'
   primitive 'delete!*', 'rubyDeleteInPlace:'
 
@@ -207,20 +205,18 @@ class String
     string._findStringStartingAt(self, 1) - 1
   end
 
-  # MNI: insert
-# TODO: insert: Why doesn't this work?
-#   primitive '_insertAllAt', 'insertAll:At:'
-#   def insert(index, string)
-#     _insertAllAt(string, index) # Flip order of parameters
-#   end
+  primitive '_insertAllAt', 'insertAll:at:'
+  def insert(index, string)
+    # account for smalltalk index
+    idx = index < 0 ? index + size + 2 : index + 1
+    puts "==== index #{index}  idx #{idx}"
+    raise IndexError, "index #{index} out of string" if idx <= 0 || idx > size + 1
+    _insertAllAt(string, idx) # Flip order of parameters
+    self
+  end
 
   primitive 'intern', 'asSymbol'
   primitive 'length', 'size'
-
-  # TODO: ljust: doesn't work
-  def ljust(n)
-    self
-  end
 
   primitive 'lstrip', 'trimLeadingSeparators'
 
@@ -241,7 +237,7 @@ class String
     if (knd.equal?(2) )  # if pattern.kind_of?(Regexp)
       regexp = pattern
     elsif pattern.respond_to?(:to_str)
-      # TODO more optimization of coerce here 
+      # TODO more optimization of coerce here
       regexp = Regexp.new(pattern.to_str)
     else
       raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
@@ -268,7 +264,6 @@ class String
 
     end
   end
-  # MNI: rjust
 
   primitive 'rstrip', 'trimTrailingSeparators'
 
@@ -401,14 +396,14 @@ class String
         if to[1] == ?- && to.size == 3
           offset = to[0] - start
           last = to[2]
-          i = start 
+          i = start
           while i <= max
             n = i + offset
             n = last if n > last
             map[i] = n
           end
         else
-          i = start 
+          i = start
           while i <= max
             map[i] = to[i - start] || to[-1]
           end
@@ -423,7 +418,7 @@ class String
     end
 
     lim = size
-    i = 0 
+    i = 0
     while i < lim
       if c = map[self[i]]
         self[i] = c
@@ -481,4 +476,42 @@ class String
     (min <= self) && (self <= max)
   end
 
+
+  ###### Rubinius Code Here
+  def StringValue(obj)
+    Type.coerce_to(obj, String, :to_str)
+  end
+  private :StringValue
+
+  def rjust(width, padstr = " ")
+    justify(width, :right, padstr)
+  end
+
+  def ljust(width, padstr = " ")
+    justify(width, :left, padstr)
+  end
+
+  def center(width, padstr = " ")
+    justify(width, :center, padstr)
+  end
+
+  primitive "_paddedToWithString", "padded:to:withString:"
+
+  # This started off as Rubinius, but was heavily modified since most
+  # work is done in smalltalk.
+  def justify(width, direction, padstr=" ")
+    padstr = StringValue(padstr)
+    raise ArgumentError, "zero width padding" if padstr.size == 0
+
+    width = Type.coerce_to(width, Integer, :to_int) unless width.kind_of? Fixnum
+
+    if width > size
+      padsize = width - size
+    else
+      return dup
+    end
+    str = _paddedToWithString(direction, width, padstr)
+    str.taint if tainted? or padstr.tainted?
+    str
+  end
 end
