@@ -1,7 +1,6 @@
 class Yield
     def splat(*args)
-      44.pause		# AA
-      r = yield *args
+      yield *args
     end
 
     #def two_args
@@ -18,10 +17,7 @@ ret = nil
 iy = Yield.new
 iy.splat(1,2,3) {|*args| 
   ret = args 
-  y = ret
-  y.pause
 }
-55.pause
 unless ret == [1,2,3]
   raise 'ERR'
 end

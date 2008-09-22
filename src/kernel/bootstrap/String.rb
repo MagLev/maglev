@@ -504,9 +504,9 @@ class String
     raise ArgumentError, "zero width padding" if padstr.size == 0
 
     width = Type.coerce_to(width, Integer, :to_int) unless width.kind_of? Fixnum
-
-    if width > size
-      padsize = width - size
+    sz = size
+    if width > sz
+      padsize = width - sz
     else
       return dup
     end

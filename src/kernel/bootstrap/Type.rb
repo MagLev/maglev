@@ -11,10 +11,13 @@ module Type
   # Uses Type.obj_kind_of to bypass type check overrides.
   #
   # Equivalent to MRI's rb_convert_type().
-  #  TODO more optimization here
+  #  TODO more optimization here , coercion to one of 
+  #    Block , String, Range, Regexp, Array 
+  #  should use the ruby method _kindBlkStrRanRegAry in Object instead of
+  #   kind_of?  , to avoid the superclass walk for not-kind-of case . 
+  #  Also need a primitive or special send for isInteger .
 
   def self.coerce_to(obj, cls, meth)
-    #return obj if obj.kind_of?(cls)
     return obj if obj.kind_of?(cls)   # GEMSTONE mod
 
     begin
@@ -24,7 +27,6 @@ module Type
                        "(#{e.message})"
     end
 
-    #return ret if ret.kind_of?(cls)
     return ret if ret.kind_of?(cls)   # GEMSTONE mod
 
     raise TypeError, "Coercion error: obj.#{meth} did NOT return a #{cls} (was #{ret.class})"
