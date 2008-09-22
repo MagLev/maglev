@@ -73,14 +73,11 @@ class String
 
   # MNI: String#~
 
-  # MNI: capitalize:
-  # TODO: capitalize: Smalltalk method that capitalizes first char and
-  # lowercases the rest of the characters
+  primitive 'capitalize', 'rubyCapitalize'
 
-  # MNI: capitalize!
-  # TODO: capitalize!: Smalltalk method that capitalizes first char and
-  # lowercases the rest of the characters.  Returns self, or nil if no
-  # changes to self.
+  def capitalize!
+    replace(capitalize)
+  end
 
   primitive 'casecmp', 'equalsNoCase:'
 
@@ -291,9 +288,9 @@ class String
 
   # MNI: slice!
   # TODO: Can't do the standard:
-  #   def slice!(*args)
-  #     replace(slice(*args))
-  #   end
+  def slice!(*args)
+    replace(slice(*args).to_str)
+  end
   # since slice returns characters (sometimes), not strings
 
   def split(pattern=nil, limit=nil)
@@ -388,6 +385,7 @@ class String
         unless(from.include? i)
           map[i] = to[0]
         end
+        i = i + 1
       end
     else
       if from[1] == ?- && from.size == 3
@@ -401,11 +399,13 @@ class String
             n = i + offset
             n = last if n > last
             map[i] = n
+            i = i + 1
           end
         else
           i = start
           while i <= max
             map[i] = to[i - start] || to[-1]
+            i = i + 1
           end
         end
       else
@@ -413,6 +413,7 @@ class String
         i = 0
         while i < lim
           map[from[i]] = to[i] || to[-1]
+          i = i + 1
         end
       end
     end
@@ -423,6 +424,7 @@ class String
       if c = map[self[i]]
         self[i] = c
       end
+      i = i + 1
     end
     self
   end
@@ -435,18 +437,6 @@ class String
 
   # MNI: upcase!
   # MNI: upto
-
-
-
-
-
-
-
-
-
-
-
-
 
   # ====== Object
   primitive 'inspect', 'printString'
