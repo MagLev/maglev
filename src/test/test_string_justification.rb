@@ -1,6 +1,5 @@
 # Test the logic of String#tr, String#tr!, String#tr_s and String#tr_s!
 
-
 $failed = []
 $count = 0
 def test(actual, expected, msg)
@@ -11,6 +10,8 @@ end
 def report
   puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
   puts $failed
+
+  raise Err, $failed.join("\n") unless $failed.empty?
 end
 
 
