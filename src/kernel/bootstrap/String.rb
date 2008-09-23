@@ -255,7 +255,7 @@ class String
     if offset.nil?
       item._lastIndexOf(item)
     else
-
+      # TODO:!!!!
     end
   end
 
@@ -283,12 +283,9 @@ class String
   primitive 'slice', '_rubyAt:'
   primitive 'slice', '_rubyAt:length:'
 
-  # MNI: slice!
-  # TODO: Can't do the standard:
   def slice!(*args)
     replace(slice(*args).to_str)
   end
-  # since slice returns characters (sometimes), not strings
 
   def split(pattern=nil, limit=nil)
     return [] if empty?
@@ -370,64 +367,16 @@ class String
     self
   end
 
+  primitive 'tr!', 'rubyTrFrom:to:'
+
   def tr(from, to)
     dup.tr!(from, to)
   end
 
-  def tr!(from, to)
-    map = []
-    if from[0] == ?^
-      i = 0
-      while i <= 255
-        unless(from.include? i)
-          map[i] = to[0]
-        end
-        i = i + 1
-      end
-    else
-      if from[1] == ?- && from.size == 3
-        start = from[0]
-        max = from[2]
-        if to[1] == ?- && to.size == 3
-          offset = to[0] - start
-          last = to[2]
-          i = start
-          while i <= max
-            n = i + offset
-            n = last if n > last
-            map[i] = n
-            i = i + 1
-          end
-        else
-          i = start
-          while i <= max
-            map[i] = to[i - start] || to[-1]
-            i = i + 1
-          end
-        end
-      else
-        lim = from.size
-        i = 0
-        while i < lim
-          map[from[i]] = to[i] || to[-1]
-          i = i + 1
-        end
-      end
-    end
-
-    lim = size
-    i = 0
-    while i < lim
-      if c = map[self[i]]
-        self[i] = c
-      end
-      i = i + 1
-    end
-    self
+  primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
+  def tr_s(from, to)
+    (str = self.dup).tr_s!(from, to) || str
   end
-
-  # MNI: tr_s
-  # MNI: tr_s!
 
   primitive 'unpack', 'rubyUnpack:'
   primitive 'upcase', 'asUppercase'
