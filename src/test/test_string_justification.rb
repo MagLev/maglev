@@ -18,11 +18,11 @@ end
 
 #  String#center tests from Pickaxe
 s = "hello"
-test s.center(4),         'hello',                "Pickaxe center A"
-test s.center(20),        '       hello        ', "Pickaxe center B"
-test s.center(4, '_-^-'), 'hello',                "Pickaxe center C"
-test s.center(20, '_-^-'),'_-^-_-^hello_-^-_-^-', "Pickaxe center D"
-test s.center(20, '-'),   '-------hello--------', "Pickaxe center E"
+ test s.center(4),         'hello',                "Pickaxe center A"
+ test s.center(20),        '       hello        ', "Pickaxe center B"
+ test s.center(4, '_-^-'), 'hello',                "Pickaxe center C"
+ test s.center(20, '_-^-'),'_-^-_-^hello_-^-_-^-', "Pickaxe center D"
+ test s.center(20, '-'),   '-------hello--------', "Pickaxe center E"
 
 
 #  String#ljust tests from Pickaxe

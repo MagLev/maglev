@@ -121,10 +121,7 @@ class String
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
   primitive 'downcase', 'asLowercase'
-
-  def downcase!
-    replace(downcase)
-  end
+  primitive 'downcase!', 'rubyDowncaseInPlace'
 
   # MNI: dump
 
@@ -434,8 +431,8 @@ class String
 
   primitive 'unpack', 'rubyUnpack:'
   primitive 'upcase', 'asUppercase'
+  primitive 'upcase!', 'rubyUpcaseInPlace'
 
-  # MNI: upcase!
   # MNI: upto
 
   # ====== Object
@@ -474,15 +471,18 @@ class String
   private :StringValue
 
   def rjust(width, padstr = " ")
-    justify(width, :right, padstr)
+    justified = dup
+    justified.justify(width, :right, padstr)
   end
 
   def ljust(width, padstr = " ")
-    justify(width, :left, padstr)
+    justified = dup
+    justified.justify(width, :left, padstr)
   end
 
   def center(width, padstr = " ")
-    justify(width, :center, padstr)
+    centered = dup
+    centered.justify(width, :center, padstr)
   end
 
   primitive "_paddedToWithString", "padded:to:withString:"
@@ -500,8 +500,9 @@ class String
     else
       return dup
     end
-    str = _paddedToWithString(direction, width, padstr)
-    str.taint if tainted? or padstr.tainted?
-    str
+
+    _paddedToWithString(direction, width, padstr)
+    taint if padstr.tainted?
+    self
   end
 end
