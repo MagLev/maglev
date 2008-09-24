@@ -7,7 +7,8 @@
 
 # So many GemStone/S 64 processes depend on the environment variables, we
 # just make these global.
-MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path(File.dirname(__FILE__))
+MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("..", File.dirname(__FILE__))
+
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
 GEMSTONE = "#{MAGLEV_HOME}/gemstone"
 TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
