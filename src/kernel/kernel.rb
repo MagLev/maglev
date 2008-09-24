@@ -84,3 +84,4 @@ require 'kernel/bootstrap/ThrowCatch.rb'
 require 'kernel/bootstrap/GC.rb'
 
 require 'kernel/bootstrap/Struct.rb'
+require 'kernel/bootstrap/Enumerable.rb'
