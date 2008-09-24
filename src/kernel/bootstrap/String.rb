@@ -73,14 +73,11 @@ class String
 
   # MNI: String#~
 
-  # MNI: capitalize:
-  # TODO: capitalize: Smalltalk method that capitalizes first char and
-  # lowercases the rest of the characters
+  primitive 'capitalize', 'rubyCapitalize'
 
-  # MNI: capitalize!
-  # TODO: capitalize!: Smalltalk method that capitalizes first char and
-  # lowercases the rest of the characters.  Returns self, or nil if no
-  # changes to self.
+  def capitalize!
+    replace(capitalize)
+  end
 
   primitive 'casecmp', 'equalsNoCase:'
 
@@ -124,10 +121,7 @@ class String
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
   primitive 'downcase', 'asLowercase'
-
-  def downcase!
-    replace(downcase)
-  end
+  primitive 'downcase!', 'rubyDowncaseInPlace'
 
   # MNI: dump
 
@@ -261,7 +255,7 @@ class String
     if offset.nil?
       item._lastIndexOf(item)
     else
-
+      # TODO:!!!!
     end
   end
 
@@ -289,12 +283,9 @@ class String
   primitive 'slice', '_rubyAt:'
   primitive 'slice', '_rubyAt:length:'
 
-  # MNI: slice!
-  # TODO: Can't do the standard:
-  #   def slice!(*args)
-  #     replace(slice(*args))
-  #   end
-  # since slice returns characters (sometimes), not strings
+  def slice!(*args)
+    replace(slice(*args).to_str)
+  end
 
   def split(pattern=nil, limit=nil)
     return [] if empty?
@@ -376,77 +367,22 @@ class String
     self
   end
 
+  primitive 'tr!', 'rubyTrFrom:to:'
+
   def tr(from, to)
     dup.tr!(from, to)
   end
 
-  def tr!(from, to)
-    map = []
-    if from[0] == ?^
-      i = 0
-      while i <= 255
-        unless(from.include? i)
-          map[i] = to[0]
-        end
-      end
-    else
-      if from[1] == ?- && from.size == 3
-        start = from[0]
-        max = from[2]
-        if to[1] == ?- && to.size == 3
-          offset = to[0] - start
-          last = to[2]
-          i = start
-          while i <= max
-            n = i + offset
-            n = last if n > last
-            map[i] = n
-          end
-        else
-          i = start
-          while i <= max
-            map[i] = to[i - start] || to[-1]
-          end
-        end
-      else
-        lim = from.size
-        i = 0
-        while i < lim
-          map[from[i]] = to[i] || to[-1]
-        end
-      end
-    end
-
-    lim = size
-    i = 0
-    while i < lim
-      if c = map[self[i]]
-        self[i] = c
-      end
-    end
-    self
+  primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
+  def tr_s(from, to)
+    (str = self.dup).tr_s!(from, to) || str
   end
-
-  # MNI: tr_s
-  # MNI: tr_s!
 
   primitive 'unpack', 'rubyUnpack:'
   primitive 'upcase', 'asUppercase'
+  primitive 'upcase!', 'rubyUpcaseInPlace'
 
-  # MNI: upcase!
   # MNI: upto
-
-
-
-
-
-
-
-
-
-
-
-
 
   # ====== Object
   primitive 'inspect', 'printString'
@@ -484,15 +420,18 @@ class String
   private :StringValue
 
   def rjust(width, padstr = " ")
-    justify(width, :right, padstr)
+    justified = dup
+    justified.justify(width, :right, padstr)
   end
 
   def ljust(width, padstr = " ")
-    justify(width, :left, padstr)
+    justified = dup
+    justified.justify(width, :left, padstr)
   end
 
   def center(width, padstr = " ")
-    justify(width, :center, padstr)
+    centered = dup
+    centered.justify(width, :center, padstr)
   end
 
   primitive "_paddedToWithString", "padded:to:withString:"
@@ -510,8 +449,9 @@ class String
     else
       return dup
     end
-    str = _paddedToWithString(direction, width, padstr)
-    str.taint if tainted? or padstr.tainted?
-    str
+
+    _paddedToWithString(direction, width, padstr)
+    taint if padstr.tainted?
+    self
   end
 end
