@@ -91,7 +91,6 @@ namespace :gs do
   task :destroy => [:gemstone, :stopserver, :remove_extents]
 
   task :remove_extents do
-    puts "verbose: #{verbose}"
     puts "===>  remove_extents"
     cd MAGLEV_HOME do
       # RxINC: is -r necessary?

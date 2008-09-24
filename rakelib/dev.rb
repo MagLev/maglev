@@ -44,7 +44,7 @@ def untar_product_to_gemstone(tgz)
       mv product gemstone
       echo "=== Unpacked build: version.txt is:"
       cat gemstone/version.txt
-      }, :verbose => false
+      }
   end
 end
 

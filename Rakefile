@@ -16,6 +16,8 @@
 require 'rake/clean'
 require 'rakelib/gemstone'
 
+verbose false  # turn off rake's chatter about all the sh commands
+
 CLEAN.include('*.out')
 
 task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
