@@ -57,6 +57,8 @@ require 'kernel/bootstrap/Object.rb'
 
 require 'kernel/bootstrap/Type.rb'
 
+require 'kernel/bootstrap/GsHelper.rb'
+
 require 'kernel/bootstrap/Class.rb'
 require 'kernel/bootstrap/Fixnum.rb'
 require 'kernel/bootstrap/Integer.rb'

@@ -414,10 +414,6 @@ class String
 
 
   ###### Rubinius Code Here
-  def StringValue(obj)
-    Type.coerce_to(obj, String, :to_str)
-  end
-  private :StringValue
 
   def rjust(width, padstr = " ")
     justified = dup
