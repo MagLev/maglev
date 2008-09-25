@@ -31,27 +31,16 @@ class Object
     primitive 'nil?' , '_rubyNilQ'
 
     # rubySend: methods implemented in .mcz
-    #   note special handling of '_send:' in  installPrimitive:selector:
-    primitive '_send:*', 'rubySend:withArguments:'
-    primitive '_send:', 'rubySend:'
-
-    def send(sym, *args)
-      if (args.length <= 0) 
-        _send(sym) 
-      else
-        _send(sym, *args)
-      end
-    end
+    primitive_nobridge 'send', 'rubySend:'
+    primitive_nobridge 'send&', 'rubySend:withBlock:'
+    #  send* will get bridge methods for all but  'send' , 'send&'
+    primitive          'send*', 'rubySend:withArguments:'
 
     #  __send__ defined per MRI, non-overrideable version of send
     #  TODO: disallow redef in Object after prims loaded
-    def __send__(sym, *args)
-      if (args.length <= 0) 
-        _send(sym, *args)
-      else
-        _send(sym) 
-      end
-    end
+    primitive_nobridge '__send__', 'rubySend:'
+    primitive_nobridge '__send__&', 'rubySend:withBlock:'
+    primitive          '__send__*', 'rubySend:withArguments:'
 
     primitive 'freeze', 'immediateInvariant'
     # TODO:  fix inefficency in rubyRespondsTo: which is implemented in .mcz
@@ -152,13 +141,17 @@ class Object
         RUBY.module_eval(str, Object)
     end
 
+  #  uses Behavior>>rubyModuleFunction:, which for specified selector,
+  #    for each variant existing in receiver, installs an env1 meth dict
+  #    entry so that method also shows up as a class method for rcvr.
+  #  module_function is used by  lib/benchmark.rb
   self.class.primitive 'basic_module_function', 'rubyModuleFunction:'
   def self.module_function(*names)
-    if names.length > 0
-        names.each{|name| basic_module_function(name)}
-    else
-        @use_module_functions = true
-    end
+   if names.length > 0
+       names.each{|name| basic_module_function(name)}
+   else
+       @use_module_functions = true
+   end
   end
 
   def self.const_defined?(c) false; end

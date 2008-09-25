@@ -52,6 +52,41 @@ class Class
     obj.kind_of?(self)
   end
 
+  primitive '_subclassOf' , 'isSubclassOf:'
+  def <= ( obj)
+    self._subclassOf(obj)
+  end   
+
+  #  < <= > >=  defined for other object being a Class or Module
+  def < (obj)
+    if (self.equal?(obj))
+      res = false
+    else
+      res = self._subclassOf
+    end
+    res  
+  end
+
+  def >= (obj)
+    r = self < obj
+    ! r
+  end
+
+  def > (obj)
+    r = self <= obj
+    ! r
+  end
+
+  def <=> (obj)
+    if (self.equal?(obj))
+      r = 0
+    else
+      r = (self._subclassOf(obj)) ? -1 : 1 
+    end
+    r
+  end
+
+
   def inspect
     name
   end

@@ -19,6 +19,9 @@
 #     installed will be obtained by sending lookupSelector: to
 #     the Smalltalk Class which is identical to the receiver.
 #
+#     The ruby method "primitive" is installed into env 1 by
+#         RubyContext>>installPrimitiveBootstrap
+#
 #     The implementation of "primitive" uses
 #       Behavior>>addRubySelector:method:category:
 
@@ -49,6 +52,9 @@ require 'kernel/bootstrap/Gemstone.rb'
 require 'kernel/bootstrap/Object.rb'
 #  Kernel.rb must be included from a require within Object.rb
 
+# TODO:  include the new Module.rb in the right place
+#   and move some methods from Class.rb to Module.rb
+
 require 'kernel/bootstrap/Type.rb'
 
 require 'kernel/bootstrap/Class.rb'
@@ -78,3 +84,4 @@ require 'kernel/bootstrap/ThrowCatch.rb'
 require 'kernel/bootstrap/GC.rb'
 
 require 'kernel/bootstrap/Struct.rb'
+require 'kernel/bootstrap/Enumerable.rb'

@@ -57,8 +57,11 @@ namespace :dev do
     Rake::Task['gs:start'].invoke if was_running
   end
 
+  desc "Stop server, install ../latest-product.tgz, load ../latest.mcz and reload primitives"
+  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:reloadprims']
+
   desc "Stop current server and install ../latest-product.tgz"
-  task :'install-latest' do
+  task :'install-tgz' do
     tgz_file = '../latest-product.tgz'
     raise "Can't find product #{tgz_file}" unless File.exists?(tgz_file)
 
@@ -119,7 +122,7 @@ commit
 exit
 END
   end
-  
+
   desc "Load the mcz file ../latest.mcz and commit it."
   task :loadmcz do
     run_topaz <<END
@@ -140,5 +143,22 @@ GsFile gciLogServer: 'load done'.
 commit
 exit
 END
+  end
+
+  desc "Run an mspec file: spec=<dir_or_file_name>"
+  task :spec do
+    raise "No spec defined with: spec=localspec/1.8/..." unless ENV['spec']
+    topaz_stuff =<<END
+output push spec.out
+run
+RubyContext load.
+RubyContext requireFileNamed: 'mspec.rb'.
+RubyCompiler new evaluateString: '\\$formatter = DottedFormatter.new; \\$formatter.register'.
+RubyContext loadFileNamed: '#{ENV['PWD']}/', '#{ENV['spec']}'.
+RubyCompiler new evaluateString: '\\$formatter.finish'
+%
+exit
+END
+    run_topaz topaz_stuff
   end
 end

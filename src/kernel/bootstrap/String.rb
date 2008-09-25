@@ -73,18 +73,13 @@ class String
 
   # MNI: String#~
 
-  # MNI: capitalize:
-  # TODO: capitalize: Smalltalk method that capitalizes first char and
-  # lowercases the rest of the characters
+  primitive 'capitalize', 'rubyCapitalize'
 
-  # MNI: capitalize!
-  # TODO: capitalize!: Smalltalk method that capitalizes first char and
-  # lowercases the rest of the characters.  Returns self, or nil if no
-  # changes to self.
+  def capitalize!
+    replace(capitalize)
+  end
 
   primitive 'casecmp', 'equalsNoCase:'
-
-  # MNI: center
 
   def chomp
     if self[-1] == ?\r
@@ -116,24 +111,17 @@ class String
 
   primitive 'concat', '_rubyAddAll:'
 
-  # TODO: count, delete, and delete! could all benefit from a common
-  # routine to create the set of characters to work on.  This should be
-  # whatever the smalltalk has for a bitset data struct.
+  # arg to _rubyCount: is expected to be an Array , so declare as 'count*'
+  primitive 'count*', 'rubyCount:'
 
-  # primitive_nobridge '_count*', '_rubyCount:'
-  # def count( *strings)
-  #  _count(strings)
-  # end
   # MNI: crypt
-  # MNI: delete
-  # MNI: delete!
+
+  primitive 'delete*',  'rubyDelete:'
+  primitive 'delete!*', 'rubyDeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
   primitive 'downcase', 'asLowercase'
-
-  def downcase!
-    replace(downcase)
-  end
+  primitive 'downcase!', 'rubyDowncaseInPlace'
 
   # MNI: dump
 
@@ -211,20 +199,18 @@ class String
     string._findStringStartingAt(self, 1) - 1
   end
 
-  # MNI: insert
-# TODO: insert: Why doesn't this work?
-#   primitive '_insertAllAt', 'insertAll:At:'
-#   def insert(index, string)
-#     _insertAllAt(string, index) # Flip order of parameters
-#   end
+  primitive '_insertAllAt', 'insertAll:at:'
+  def insert(index, string)
+    # account for smalltalk index
+    idx = index < 0 ? index + size + 2 : index + 1
+    puts "==== index #{index}  idx #{idx}"
+    raise IndexError, "index #{index} out of string" if idx <= 0 || idx > size + 1
+    _insertAllAt(string, idx) # Flip order of parameters
+    self
+  end
 
   primitive 'intern', 'asSymbol'
   primitive 'length', 'size'
-
-  # TODO: ljust: doesn't work
-  def ljust(n)
-    self
-  end
 
   primitive 'lstrip', 'trimLeadingSeparators'
 
@@ -245,7 +231,7 @@ class String
     if (knd.equal?(2) )  # if pattern.kind_of?(Regexp)
       regexp = pattern
     elsif pattern.respond_to?(:to_str)
-      # TODO more optimization of coerce here 
+      # TODO more optimization of coerce here
       regexp = Regexp.new(pattern.to_str)
     else
       raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
@@ -269,10 +255,9 @@ class String
     if offset.nil?
       item._lastIndexOf(item)
     else
-
+      # TODO:!!!!
     end
   end
-  # MNI: rjust
 
   primitive 'rstrip', 'trimTrailingSeparators'
 
@@ -298,12 +283,9 @@ class String
   primitive 'slice', '_rubyAt:'
   primitive 'slice', '_rubyAt:length:'
 
-  # MNI: slice!
-  # TODO: Can't do the standard:
-  #   def slice!(*args)
-  #     replace(slice(*args))
-  #   end
-  # since slice returns characters (sometimes), not strings
+  def slice!(*args)
+    replace(slice(*args).to_str)
+  end
 
   def split(pattern=nil, limit=nil)
     return [] if empty?
@@ -385,77 +367,22 @@ class String
     self
   end
 
+  primitive 'tr!', 'rubyTrFrom:to:'
+
   def tr(from, to)
     dup.tr!(from, to)
   end
 
-  def tr!(from, to)
-    map = []
-    if from[0] == ?^
-      i = 0
-      while i <= 255
-        unless(from.include? i)
-          map[i] = to[0]
-        end
-      end
-    else
-      if from[1] == ?- && from.size == 3
-        start = from[0]
-        max = from[2]
-        if to[1] == ?- && to.size == 3
-          offset = to[0] - start
-          last = to[2]
-          i = start 
-          while i <= max
-            n = i + offset
-            n = last if n > last
-            map[i] = n
-          end
-        else
-          i = start 
-          while i <= max
-            map[i] = to[i - start] || to[-1]
-          end
-        end
-      else
-        lim = from.size
-        i = 0
-        while i < lim
-          map[from[i]] = to[i] || to[-1]
-        end
-      end
-    end
-
-    lim = size
-    i = 0 
-    while i < lim
-      if c = map[self[i]]
-        self[i] = c
-      end
-    end
-    self
+  primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
+  def tr_s(from, to)
+    (str = self.dup).tr_s!(from, to) || str
   end
-
-  # MNI: tr_s
-  # MNI: tr_s!
 
   primitive 'unpack', 'rubyUnpack:'
   primitive 'upcase', 'asUppercase'
+  primitive 'upcase!', 'rubyUpcaseInPlace'
 
-  # MNI: upcase!
   # MNI: upto
-
-
-
-
-
-
-
-
-
-
-
-
 
   # ====== Object
   primitive 'inspect', 'printString'
@@ -485,4 +412,46 @@ class String
     (min <= self) && (self <= max)
   end
 
+
+  ###### Rubinius Code Here
+  def StringValue(obj)
+    Type.coerce_to(obj, String, :to_str)
+  end
+  private :StringValue
+
+  def rjust(width, padstr = " ")
+    justified = dup
+    justified.justify(width, :right, padstr)
+  end
+
+  def ljust(width, padstr = " ")
+    justified = dup
+    justified.justify(width, :left, padstr)
+  end
+
+  def center(width, padstr = " ")
+    centered = dup
+    centered.justify(width, :center, padstr)
+  end
+
+  primitive "_paddedToWithString", "padded:to:withString:"
+
+  # This started off as Rubinius, but was heavily modified since most
+  # work is done in smalltalk.
+  def justify(width, direction, padstr=" ")
+    padstr = StringValue(padstr)
+    raise ArgumentError, "zero width padding" if padstr.size == 0
+
+    width = Type.coerce_to(width, Integer, :to_int) unless width.kind_of? Fixnum
+    sz = size
+    if width > sz
+      padsize = width - sz
+    else
+      return dup
+    end
+
+    _paddedToWithString(direction, width, padstr)
+    taint if padstr.tainted?
+    self
+  end
 end

@@ -5,7 +5,6 @@ class Array
   primitive '_detect', 'detect:ifNone:'
   primitive '_fillFromToWith', 'fillFrom:to:with:'
   primitive 'insert_all', 'insertAll:at:'
-  primitive 'sort_by2&', 'sortBy:'
   primitive 'remove_first', 'removeFirst'
   primitive 'remove_if_absent', 'remove:ifAbsent:'
   primitive 'remove_last', 'removeLast'
@@ -124,6 +123,10 @@ class Array
     # for #'_generality....
 
     i = 0
+    unless other.class.equal?(Array)
+      raise TypeError , "not an Array"
+    end
+      
     lim = size > other.size ? other.size : size # lim is the min
     while i < lim
       result = self.at(i) <=> other.at(i)
@@ -133,8 +136,38 @@ class Array
     size <=> other.size
   end
 
-  #  Method not implemented , need to code == as a while loop iteration in ruby
-  primitive '==', '='
+  # ====== Comparable:
+  # RxINC: This is a cut-n-paste to get things working for mspec.
+  # Need to either overwrite or allow a mixin.
+
+  def ==(other)
+    if (other.equal?(nil))
+      false
+    else
+      (self <=> other).equal?(0)
+    end
+  end
+
+  def >(other)
+    (self <=> other) > 0
+  end
+
+  def <(other)
+    (self <=> other) < 0
+  end
+
+  def >=(other)
+    (self <=> other) >= 0
+  end
+
+  def <=(other)
+    (self <=> other) <= 0
+  end
+
+  def between?(min, max)
+    (min <= self) && (self <= max)
+  end
+  # ==== end Comparable
 
   primitive '[]' , '_rubyAt:'
   primitive '[]' , '_rubyAt:length:'
@@ -302,16 +335,14 @@ class Array
 
   def fill(obj, start=nil, length=nil)
     # TODO: needs more analysis with Allen
-    # TODO: Smalltalk throws exception if length extends beyond current
-    # array.  Ruby just extends the array with the new elements.
-    # TODO: Needs block suppor
+    # TODO: Needs block support
     start  ||= 0
     length ||= size - 1
 
     # smalltalk arrays start at 1
-    start += 1
-    length += 1
-    _fillFromToWith(start, length, obj)
+    endIdx = start + length 
+    start += 1         # start, end both 1-based now
+    _fillFromToWith(start, endIdx, obj)
   end
 
   def first
@@ -454,12 +485,32 @@ class Array
   end
 
   # Note: sort is listed in the Pick Axe book under both Array and Enumerable
-  def sort
+  #  Smalltalk sort: expects a block returning boolean result of a <= b 
+  #
+  primitive '_sort!&', 'sort:'
+
+  def sort!(&blk)
+    if (block_given?)
+      _sort!{ | a, b| blk.call(a, b) <= 0 }
+    else
+      _sort!{ | a, b| a <= b }
+    end
+  end
+
+  def sort(&blk)
     d = dup
-    d.sort!
+    if (block_given?)
+      d._sort!{ | a, b| blk.call(a, b) <= 0 }
+    else
+      d._sort!{ | a, b| a <= b }
+    end
     d
   end
-  primitive 'sort!', 'sort'
+
+  primitive 'sort_by2&', 'sortBy:'
+  def sort_by(&block)
+    sort_by2{|a,b| block.call(a) <= block.call(b)}
+  end
 
   # TODO: This implementation may be wrong.  See to_a vs to_ary in PickAxe.
   def to_a
@@ -682,9 +733,7 @@ class Array
   # and implemented here in the Array section above.
 
   # PickAxe p 457 documents that sort_by uses Schwartzian Transform
-  def sort_by(&block)
-    sort_by2{|a,b| block.call(a) <= block.call(b)}
-  end
+  # sort_by  implemented in Array section above
 
   # to_a: Implemented above in the Array section
 
