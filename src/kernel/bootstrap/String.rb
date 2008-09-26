@@ -255,12 +255,16 @@ class String
   end
 
   # MNI: rindex  TODO: use findLast: ?, but does a block eval
-  def rindex(item, offset=nil)
-    if offset.nil?
-      item._lastIndexOf(item)
-    else
-      # TODO:!!!!
-    end
+  primitive '_lastSubstring', 'findLastOccuranceOfString:startingAt:'
+  def rindex(item, offset=0)
+    return size if item.empty? # This must be before we check for self.empty?
+    return nil if self.empty?
+    # TODO: Need to coerce to string....
+    # arg = StringValue(arg) unless [Fixnum, String, Regexp].include?(arg.class)
+    return (result = _lastSubstring(item, offset + 1)) == 0 ? nil : result - 1
+
+    # TODO: support for when item is a regexp
+    # TODO: support for when item is an int ("character")
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
@@ -419,10 +423,6 @@ class String
 
 
   ###### Rubinius Code Here
-  def StringValue(obj)
-    Type.coerce_to(obj, String, :to_str)
-  end
-  private :StringValue
 
   def rjust(width, padstr = " ")
     justified = dup

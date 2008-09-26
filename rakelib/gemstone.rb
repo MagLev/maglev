@@ -7,7 +7,8 @@
 
 # So many GemStone/S 64 processes depend on the environment variables, we
 # just make these global.
-MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path(File.dirname(__FILE__))
+MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("..", File.dirname(__FILE__))
+
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
 GEMSTONE = "#{MAGLEV_HOME}/gemstone"
 TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
@@ -37,7 +38,7 @@ def start_parser
     cd #{MAGLEV_HOME}/bin > /dev/null
     nohup ruby parsetree_parser.rb >#{MAGLEV_HOME}/log/parsetree.log 2>/dev/null & PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
-  }, :verbose => false
+  }
 end
 
 # Starts a ruby parsetree_parser on PARSETREE_PORT (no checks for prior
@@ -50,7 +51,7 @@ def start_parser_debug
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
     echo "Parser logfiles are \$MAGLEV_HOME/log/parsetree.*"
-  }, :verbose => false
+  }
 end
 
 # Tests for the parser on port PARSETREE_PORT, and kills it if found.
@@ -58,7 +59,7 @@ end
 # parser port.
 def stop_parser
   kill_pid = parser_pid
-  sh %{ kill -9 #{kill_pid} }, :verbose => false unless kill_pid.nil?
+  sh %{ kill -9 #{kill_pid} } unless kill_pid.nil?
   parser_pid
 end
 
@@ -74,7 +75,7 @@ def start_server
     ${GEMSTONE}/bin/startnetldi -g &>/dev/null
     ${GEMSTONE}/bin/startstone gs64stone &>/dev/null
     ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
-  }, :verbose => false do |ok, status|
+  } do |ok, status|
     puts "GemStone server gs64stone started" if ok
   end
 end
@@ -86,7 +87,7 @@ def start_server_debug
     ${GEMSTONE}/bin/startnetldi -g
     ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf gs64stone
     ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
-  }, :verbose => false do |ok, status|
+  } do |ok, status|
     puts "GemStone server gs64stone started in verbose mode" if ok
   end
 end
@@ -95,7 +96,7 @@ def stop_server
   sh %{
     ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i >/dev/null 2>&1
     ${GEMSTONE}/bin/stopnetldi > /dev/null 2>&1
-  }, :verbose => false do |ok, status|
+  } do |ok, status|
     puts "GemStone server stopped." if ok
   end
 end
@@ -103,14 +104,14 @@ end
 def status
   if server_running?
     puts "\nMAGLEV_HOME = #{MAGLEV_HOME}"
-    sh %{ #{GEMSTONE}/bin/gslist -clv }, :verbose => false
+    sh %{ #{GEMSTONE}/bin/gslist -clv }
   else
     puts "GemStone server not running."
   end
 
   if parser_running?
     puts "\nMagLev Parse Server port = #{PARSETREE_PORT}"
-    sh %{ lsof -P -iTCP:#{PARSETREE_PORT} }, :verbose => false
+    sh %{ lsof -P -iTCP:#{PARSETREE_PORT} }
     # if you don't have permission to run lsof, use the following instead
     # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
   else
@@ -122,5 +123,5 @@ def run_topaz(snippet, debug=false)
   sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
 #{snippet}
 EOF
-  }, :verbose => false
+  }
 end
