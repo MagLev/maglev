@@ -18,9 +18,16 @@
  unless a.equal?(nil) then raiseErr end
 
  a = 87
- p = Proc.new { | x , y | a = x  }
+ b = 87
+ p = Proc.new { | x , y | a = x ; b = y }
  p.call
  unless a.equal?(nil) then raiseErr end
+ unless b.equal?(nil) then raiseErr end
+
+ a = [99,98]
+ p[*a]
+ unless a.equal?(99) then raiseErr end
+ unless b.equal?(98) then raiseErr end
 
  def proc_from
    # this form not supported
