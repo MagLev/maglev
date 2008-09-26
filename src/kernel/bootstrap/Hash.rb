@@ -15,28 +15,29 @@ class Hash
   primitive 'keys', 'keys'
 
   # Class methods
+  self.class.primitive_nobridge 'new', 'new:'
+  self.class.primitive_nobridge 'new&', 'new:'
   self.class.primitive 'new'
-  self.class.primitive 'new', 'new:'
-  self.class.primitive 'new&', 'new:'
   # MNI: def self.[](*elements)
 
   # Instance Methods
 
-  primitive '==', '='
+  primitive_nobridge '==', '='
 
-  primitive '[]', 'at:'
-  primitive '[]=', 'at:put:'
+  primitive_nobridge '[]', 'at:'
+  primitive_nobridge '[]=', 'at:put:'
 
   primitive 'clear', 'removeAllKeys'
 
+  primitive_nobridge 'default&' , 'default:'
   primitive 'default'
-  primitive 'default&' , 'default:'
+
   primitive 'default=', 'setDefaultValue:'
 
   primitive 'default_proc' , 'defaultBlock'
 
+  primitive_nobridge 'delete&', 'removeKey:with:'
   primitive 'delete', 'removeKey:'
-  primitive 'delete&', 'removeKey:with:'
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb
@@ -68,7 +69,7 @@ class Hash
   # Fetch does not use any default values supplied when the hash was created.
   #
   # TODO: Need to test this, as block_given? not working properly yet...
-  primitive '_atIfAbsent', 'at:ifAbsent:'
+  primitive_nobridge '_atIfAbsent', 'at:ifAbsent:'
   def fetch(key, dflt=Undefined, &block)
     val = _atIfAbsent(key, proc { dflt })
     puts "========= 2 VAL: #{val}"
@@ -89,7 +90,7 @@ class Hash
 
   primitive 'include?', 'includesKey:'
 
-  primitive '_index', 'keyAtValue:ifAbsent:'
+  primitive_nobridge '_index', 'keyAtValue:ifAbsent:'
   def index(value)
     _index(value, proc { return nil })
   end
@@ -149,7 +150,7 @@ class Hash
     result
   end
 
-  primitive '_firstPair'
+  primitive_nobridge '_firstPair'
 
   def shift
     pair = self._firstPair

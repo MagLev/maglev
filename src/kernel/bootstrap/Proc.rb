@@ -6,26 +6,22 @@ def lambda(&b)
 end
 
 class Proc
-    primitive 'call', 'value'
-    primitive 'call', 'value:'
-    primitive 'call', 'value:value:'
-    primitive 'call', 'value:value:value:'
+    # primitives for call should not be needed,
+    #  any send of #call translates to special bytecode
 
-    self.class.primitive 'new&' , '_newProc:'
+    self.class.primitive_nobridge 'new&' , '_newProc:'
     self.class.primitive 'new' , '_newProc:'
     
     def inspect
       "#<Proc>"
     end
-    
+
+    primitive_nobridge '[]' , 'value:'
+    primitive_nobridge '[]' , 'value:value:'
+    primitive_nobridge '[]' , 'value:value:value:'
+   
     def [](*args)
-      case args.size
-        when 0
-          call
-        when 1
-          call(args[0])
-        when 2
-          call(args[0], args[1])
-      end
+      call(*args)
     end
+
 end

@@ -7,11 +7,11 @@ class File
     primitive 'eof?', 'atEnd'
     primitive 'read', 'next:'
     primitive 'read', 'contents'
-    self.class.primitive '_open', 'openOnServer:mode:'
+    self.class.primitive_nobridge '_open', 'openOnServer:mode:'
     self.class.primitive 'stdin'
     self.class.primitive 'stdout'
     self.class.primitive 'stderr'
-    self.class.primitive '_environmentAt', '_expandEnvVariable:isClient:'
+    self.class.primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
 
     def self.new(file, mode="r")
         self._open(file, mode)

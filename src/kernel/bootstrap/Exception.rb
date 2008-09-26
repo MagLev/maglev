@@ -2,7 +2,7 @@ class Exception
     primitive 'signal', 'signal:'
     self.class.primitive 'signal', 'signal:'
     primitive 'message', 'description'
-    primitive '_backtrace', 'backtrace'
+    primitive_nobridge '_backtrace', 'backtrace'
     def backtrace
       result = []
       _backtrace.each do |ary|

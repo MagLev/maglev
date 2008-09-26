@@ -437,13 +437,19 @@ module Enumerable
     if n && n < 0
       raise ArgumentError, "Invalid number of elements given."
     end
-    ary = []
-    each do |o|
-      return o unless n
-      return ary if ary.size == n
-      ary << o
+    if n 
+      each do |o|
+        return o 
+      end
+      nil
+    else
+      ary = []
+      each do |o|
+        return ary if ary.size == n
+        ary << o
+      end
+      ary
     end
-    n ? ary : nil
   end
 
   # :call-seq:

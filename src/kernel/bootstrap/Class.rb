@@ -52,7 +52,7 @@ class Class
     obj.kind_of?(self)
   end
 
-  primitive '_subclassOf' , 'isSubclassOf:'
+  primitive_nobridge '_subclassOf' , 'isSubclassOf:'
   def <= ( obj)
     self._subclassOf(obj)
   end   

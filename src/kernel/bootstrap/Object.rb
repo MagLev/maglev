@@ -6,19 +6,19 @@ RandomInstance = Random.new
 class Object
     # Begin private helper methods
 
-    primitive '_kindBlkStrRanRegAry', '_rubyKind_Block_String_Range_Regexp_Array'
+    primitive_nobridge '_kindBlkStrRanRegAry', '_rubyKind_Block_String_Range_Regexp_Array'
     #       results are                          0x10   0x8   0x4    0x2    0x1  else nil
 
     # _isInteger allows integer?  special sends to non-Numeric objects
-    primitive '_isInteger', '_isInteger'
+    primitive_nobridge '_isInteger', '_isInteger'
   
     #  private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
-    primitive '_each&', '_rubyEach:'
+    primitive_nobridge '_each&', '_rubyEach:'
 
     # End private helper methods
 
-    primitive '==', '='
+    primitive_nobridge '==', '='
     primitive 'halt'
     primitive 'hash'
     primitive 'object_id', 'asOop'

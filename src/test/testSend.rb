@@ -69,4 +69,12 @@ o.send :meth2arr , a
 o.doSend2arr(a)
 o.doSend2b( :meth2arr , a )
 o.doSend0Arr
+
+# call to a method with default value assign to arg
+s = 'abc'
+w = s.ljust(5)
+unless w = 'abc  '
+  raise 'ERR'
+end
+
 true
