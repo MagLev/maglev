@@ -129,7 +129,7 @@ class MatchData
         string[self.begin(0)+self[0].size..-1]
     end
 
-    primitive '[]' , '_rubyAt:'
+    primitive_nobridge '[]' , '_rubyAt:'
     primitive '[]' , '_rubyAt:length:'
 
     # Ruby global variables $1..$9 implemented by MatchData(C)>>nthRegexRef:

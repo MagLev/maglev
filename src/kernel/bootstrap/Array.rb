@@ -1,16 +1,48 @@
 class Array
   # begin private helper methods
   # TODO: Some of these don't begin with an '_'...
-  primitive '_all', 'allSatisfy:'
-  primitive '_detect', 'detect:ifNone:'
-  primitive '_fillFromToWith', 'fillFrom:to:with:'
-  primitive 'insert_all', 'insertAll:at:'
-  primitive 'remove_first', 'removeFirst'
-  primitive 'remove_if_absent', 'remove:ifAbsent:'
-  primitive 'remove_last', 'removeLast'
+  primitive_nobridge '_all', 'allSatisfy:'
+  primitive_nobridge '_detect', 'detect:ifNone:'
+  primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
+  primitive_nobridge 'insert_all', 'insertAll:at:'
+  primitive_nobridge 'remove_first', 'removeFirst'
+  primitive_nobridge 'remove_if_absent', 'remove:ifAbsent:'
+  primitive_nobridge 'remove_last', 'removeLast'
 
   primitive 'size=', 'size:'
-  self.class.primitive '_withAll', 'withAll:'
+  self.class.primitive_nobridge '_withAll', 'withAll:'
+
+  # TODO consider a method prefix __nobr__ which during load prims
+  #   would suppress generation of bridge methods for private
+  #   methods that should not need bridge methods
+
+  def _anySatisfyCaseLeaf( obj )
+    # used in implementation of  while *list   within a   case  
+    n = 0
+    lim = size 
+    while n < lim 
+      el = self[n]
+      if obj === el
+        return true
+      end
+      n = n + 1 
+    end
+    false
+  end
+
+  def _anySatisfyCaseTrue
+    # used in implementation of  while *list   within a   case  
+    n = 0
+    lim = size 
+    while n < lim 
+      el = self[n]
+      if el
+        return true
+      end
+      n = n + 1 
+    end
+    false
+  end
 
   # Used by both assoc and rassoc, since they differ only in the index of
   # the array to compare to the key
@@ -44,7 +76,7 @@ class Array
   def self.[](*elements)
     _withAll(elements)
   end
-  self.class.primitive '_alloc', '_rubyNew:initValue:'
+  self.class.primitive_nobridge '_alloc', '_rubyNew:initValue:'
 
   def self.new(size=0, value=nil)
     _alloc(size, value)
@@ -123,13 +155,14 @@ class Array
     # for #'_generality....
 
     i = 0
-    unless other.class.equal?(Array)
+    # TODO , optimize kind_of?
+    unless other.kind_of?(Array)
       raise TypeError , "not an Array"
     end
       
     lim = size > other.size ? other.size : size # lim is the min
     while i < lim
-      result = self.at(i) <=> other.at(i)
+      result = self[i] <=> other[i]
       return result if result != 0
       i += 1
     end
@@ -141,11 +174,22 @@ class Array
   # Need to either overwrite or allow a mixin.
 
   def ==(other)
-    if (other.equal?(nil))
-      false
-    else
-      (self <=> other).equal?(0)
+    # TODO , optimize kind_of?
+    unless other.kind_of?(Array)
+      return false
     end
+    lim = size
+    unless lim.equal?(other.size)
+      return false
+    end
+    i = 0
+    while i < lim
+      unless self[i] == other[i]
+        return false
+      end
+      i += 1
+    end
+    true
   end
 
   def >(other)
@@ -169,11 +213,11 @@ class Array
   end
   # ==== end Comparable
 
-  primitive '[]' , '_rubyAt:'
-  primitive '[]' , '_rubyAt:length:'
+  primitive_nobridge '[]' , '_rubyAt:'
+  primitive_nobridge '[]' , '_rubyAt:length:'
 
-  primitive '[]=', '_rubyAt:put:'
-  primitive '[]=', '_rubyAt:length:put:'
+  primitive_nobridge '[]=', '_rubyAt:put:'
+  primitive_nobridge '[]=', '_rubyAt:length:put:'
 
   # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
   def |(other)
@@ -244,7 +288,7 @@ class Array
       break if self[i].equal?(nil)
       i += 1
     end
-    return nil if i == lim
+    return nil if i.equal?(lim)
 
     fill_idx = i
     while i < lim
@@ -255,7 +299,7 @@ class Array
       end
       i += 1
     end
-    self.size= fill_idx
+    self.size = fill_idx
     self
   end
 
@@ -317,7 +361,7 @@ class Array
   def eql?(other)
     return true if equal? other
     return false unless other.kind_of?(Array)
-    return false unless size == other.size
+    return false unless size.equal?(other.size)
 
     i = 0
     lim = size
@@ -337,12 +381,18 @@ class Array
     # TODO: needs more analysis with Allen
     # TODO: Needs block support
     start  ||= 0
-    length ||= size - 1
+    sz = size 
+    length ||= sz - 1
 
     # smalltalk arrays start at 1
     endIdx = start + length 
     start += 1         # start, end both 1-based now
-    _fillFromToWith(start, endIdx, obj)
+    if start <= sz
+      if endIdx > sz
+        endIdx = sz
+      end
+      _fillFromToWith(start, endIdx, obj)
+    end
   end
 
   def first
@@ -487,7 +537,7 @@ class Array
   # Note: sort is listed in the Pick Axe book under both Array and Enumerable
   #  Smalltalk sort: expects a block returning boolean result of a <= b 
   #
-  primitive '_sort!&', 'sort:'
+  primitive_nobridge '_sort!&', 'sort:'
 
   def sort!(&blk)
     if (block_given?)
@@ -668,7 +718,7 @@ class Array
   alias map collect
 
   def max
-    if size == 0
+    if size.equal?(0)
       nil
     else
       max_v = self[0]
@@ -685,7 +735,7 @@ class Array
   primitive 'member?', 'includes:'
 
   def min
-    if size == 0
+    if size.equal?(0)
       nil
     else
       min_v = self[0]

@@ -50,7 +50,6 @@ begin
   n = n + 8 
   elist = [ ScriptError, SyntaxError ]
   begin
-    n.pause
     raise SyntaxError
     n = n + 10
     rescue *elist

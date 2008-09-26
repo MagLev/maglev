@@ -4,29 +4,29 @@ class Fixnum
 #  methods installed. They will fall back to Bignum (to implementations in
 #  Smalltalk Integer) if the special send fails.
 
-    primitive '<'
-    primitive '>'
-    primitive '<='
-    primitive '>='
+    primitive_nobridge '<'
+    primitive_nobridge '>'
+    primitive_nobridge '<='
+    primitive_nobridge '>='
 
 #  /    # note division does not produce Fractions in Ruby
-	primitive '/', '_rubyDivide:'
+	primitive_nobridge '/', '_rubyDivide:'
 
 #   Ruby  %   maps to  Smalltalk #'\\' 
-	primitive '%', '\\\\'
+	primitive_nobridge '%', '\\\\'
 
-	primitive '**' , 'raisedTo:'
+	primitive_nobridge '**' , 'raisedTo:'
 
 # unaries  +@  -@  eliminated during IR generation by compiler
 
-	primitive '|', 'bitOr:'
-	primitive '&', 'bitAnd:'
-	primitive '^', 'bitXor:'
-	primitive '<<', 'bitShift:'
-	primitive '>>', '_bitShiftRight:'
+	primitive_nobridge '|', 'bitOr:'
+	primitive_nobridge '&', 'bitAnd:'
+	primitive_nobridge '^', 'bitXor:'
+	primitive_nobridge '<<', 'bitShift:'
+	primitive_nobridge '>>', '_bitShiftRight:'
 
-	primitive '<=>', '_rubyCompare:'
-	primitive '[]', 'bitAt:'
+	primitive_nobridge '<=>', '_rubyCompare:'
+	primitive_nobridge '[]', 'bitAt:'
 	primitive 'abs', 'abs'
 
 	primitive 'div', '//'
@@ -37,7 +37,7 @@ class Fixnum
 #    modulo   maps to Smalltalk  #'\\' 
 	primitive 'modulo', '\\\\'
 
-	primitive 'quo', '_rubyQuo:'
+	primitive_nobridge 'quo', '_rubyQuo:'
 	primitive 'size', '_rubySize'
 	primitive 'to_f', 'asFloat'
 

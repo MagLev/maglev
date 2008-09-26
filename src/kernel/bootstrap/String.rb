@@ -26,16 +26,20 @@ class String
 
   def *(n)
     str = ""
-    n.times{str << self}
+    k = 0
+    while k < n
+      str << self
+      k = k + 1 
+    end
     str
   end
 
   primitive '+', ','
 
   # note smalltalk addAll:  returns arg, not receiver
-  primitive '<<', '_rubyAddAll:'
+  primitive_nobridge '<<', '_rubyAddAll:'
 
-  # TODO: Need to find ST implemention for <=>
+  # TODO: Need primitive ST implemention for <=>
   def <=>(o)
     other = Type.coerce_to(o, String, :to_s)
 
@@ -43,7 +47,7 @@ class String
     lim = size > other.size ? other.size : size # lim is the min
     while i < lim
       result = self[i] <=> other[i]
-      return result if result != 0
+      return result unless result.equal?(0)
       i += 1
     end
     size <=> other.size
@@ -65,11 +69,11 @@ class String
 
   # =~ is implemented somewhere....
 
-  primitive '[]' , '_rubyAt:'
-  primitive '[]' , '_rubyAt:length:'
+  primitive_nobridge '[]' , '_rubyAt:'
+  primitive_nobridge '[]' , '_rubyAt:length:'
 
-  primitive '[]=', '_rubyAt:put:'
-  primitive '[]=', '_rubyAt:length:put:'
+  primitive_nobridge '[]=', '_rubyAt:put:'
+  primitive_nobridge '[]=', '_rubyAt:length:put:'
 
   # MNI: String#~
 
@@ -82,12 +86,12 @@ class String
   primitive 'casecmp', 'equalsNoCase:'
 
   def chomp
-    if self[-1] == ?\r
+    if self[-1].equal(?\r)
       return self[0..-2]
     end
 
-    if self[-1] == ?\n
-      if self[-2] == ?\r
+    if self[-1].equal(?\n)
+      if self[-2].equal(?\r)
         return self[0..-3]
       else
         return self[0..-2]
@@ -280,8 +284,8 @@ class String
 
   primitive 'size', 'size'
 
-  primitive 'slice', '_rubyAt:'
-  primitive 'slice', '_rubyAt:length:'
+  primitive_nobridge 'slice', '_rubyAt:'
+  primitive          'slice', '_rubyAt:length:'
 
   def slice!(*args)
     replace(slice(*args).to_str)
@@ -355,7 +359,8 @@ class String
   rescue Exception
     0
   end
-  primitive '_to_i', 'asInteger'
+
+  primitive_nobridge '_to_i', 'asInteger'
   #  non-base-10 radix Ruby syntax not supported yet
   primitive '_to_i', '_asInteger:'
 
@@ -440,7 +445,7 @@ class String
   # work is done in smalltalk.
   def justify(width, direction, padstr=" ")
     padstr = StringValue(padstr)
-    raise ArgumentError, "zero width padding" if padstr.size == 0
+    raise ArgumentError, "zero width padding" if padstr.size.equal?(0)
 
     width = Type.coerce_to(width, Integer, :to_int) unless width.kind_of? Fixnum
     sz = size

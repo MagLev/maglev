@@ -20,7 +20,7 @@
 
 class Integer
     # _rubyTimes:  contains the handler for RubyBreakException
-    primitive '_times&', '_rubyTimes:'
+    primitive_nobridge '_times&', '_rubyTimes:'
     def times(&b)
        _times(&b)
     end
@@ -61,29 +61,29 @@ class Integer
       self + 1
     end
 
-        primitive '+', '+'
-        primitive '-', '-'
-        primitive '*', '*'
-        primitive '/', '_rubyDivide:'
+        primitive_nobridge '+', '+'
+        primitive_nobridge '-', '-'
+        primitive_nobridge '*', '*'
+        primitive_nobridge '/', '_rubyDivide:'
 
 #   Ruby  %   maps to  Smalltalk #'\\'
-        primitive '%', '\\\\'
+        primitive_nobridge '%', '\\\\'
 
-        primitive '**' , 'raisedTo:'
+        primitive_nobridge '**' , 'raisedTo:'
 
-        primitive '|', 'bitOr:'
-        primitive '&', 'bitAnd:'
-        primitive '^', 'bitXor:'
-        primitive '<<', 'bitShift:'
-        primitive '>>', '_bitShiftRight:'
+        primitive_nobridge '|', 'bitOr:'
+        primitive_nobridge '&', 'bitAnd:'
+        primitive_nobridge '^', 'bitXor:'
+        primitive_nobridge '<<', 'bitShift:'
+        primitive_nobridge '>>', '_bitShiftRight:'
 
 #  <=> inherited from Numeric
 
-        primitive '[]', 'bitAt:'
+        primitive_nobridge '[]', 'bitAt:'
 
 #  abs inherited from Numeric
 
-        primitive '==', '='
+        primitive_nobridge '==', '='
 
         primitive 'eql?', '_ruby_eqlQ:'
 
@@ -114,7 +114,8 @@ class Integer
         primitive 'round', 'rounded'
         primitive 'zero?', '_rubyEqualZero'
 
-        primitive 'step&', 'to:by:do:'
+        primitive_nobridge 'step&', 'to:do:'
+        primitive_nobridge 'step&', 'to:by:do:'
 
 
 # Were in String.rb

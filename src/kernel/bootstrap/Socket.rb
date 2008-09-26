@@ -20,19 +20,19 @@ class Socket
   #   use  TCPServer>>new:port:  to create a listening socket
 
   # send, write, recv  function per the non-blocking state of the receiver.
+  primitive_nobridge 'send', 'send:flags:addr:'
   primitive 'send', 'send:flags:'
-  primitive 'send', 'send:flags:addr:'
+  primitive_nobridge '<<', 'write:'
   primitive 'write', 'write:'
-  primitive '<<', 'write:'
   primitive 'recv', 'recv:' 
   primitive 'read', 'recv:' 
 
   # Note, assignment of result to Ruby global $_  not implemented yet.
-  primitive 'gets', 'gets'
+  primitive_nobridge 'gets', 'gets'
   primitive 'gets', 'gets:'
 
   primitive 'close', 'close'
-  primitive 'shutdown', 'shutdown'
+  primitive_nobridge 'shutdown', 'shutdown'
   primitive 'shutdown', 'shutdown:' 
   primitive 'connected?', 'isConnected'
 
@@ -45,7 +45,7 @@ class Socket
   #  and they only support access to SO_NONBLOCKING , examples:
   #    aSocket.getsockopt('SOL_TCP', 'SO_NONBLOCKING')
   #    aSocket.setsockopt('SOL_TCP', 'SO_NONBLOCKING', aBoolean)
-  primitive 'setsockopt', 'setsockopt:name:value:'
+  primitive_nobridge 'setsockopt', 'setsockopt:name:value:'
   primitive 'getsockopt', 'getsockopt:name:'
 
   self.class.primitive 'do_not_reverse_lookup', 'setNoReverseLookup:'

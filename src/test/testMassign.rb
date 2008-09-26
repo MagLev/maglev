@@ -11,22 +11,6 @@ class Holder
   attr_accessor :val
 end
 
-class ParAsgn
-    attr_accessor :x
-
-    def initialize
-      @x = 0
-    end
-
-    def inc
-      @x += 1
-    end
-
-    def to_ary
-      [1,2,3,4]
-    end
-end
-
 def raiseErr
   raise 'ERR'
 end
