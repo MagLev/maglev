@@ -11,7 +11,7 @@ end
 def report
   puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
   puts $failed
-  raise Err, $failed.join("\n") unless $failed.empty?
+  raise $failed.join("\n") unless $failed.empty?
 end
 
 
