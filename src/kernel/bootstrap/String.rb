@@ -286,6 +286,13 @@ class String
     result
   end
 
+  def scan(regex, &blk)
+    regex.to_rx.each_match(self) do |m|
+      yield m
+    end
+    self
+  end
+
   primitive 'size', 'size'
 
   primitive_nobridge 'slice', '_rubyAt:'
