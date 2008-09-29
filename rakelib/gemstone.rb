@@ -71,8 +71,10 @@ end
 # Start the GemStone servers (startnetldi; startstone).  Does no checking
 # if server is already started.
 def start_server
+  sh %{ ${GEMSTONE}/bin/startnetldi -g &>/dev/null } do |ok, status|
+    raise "Couldn't start netldi #{ok}: #{status}" unless ok
+  end
   sh %{
-    ${GEMSTONE}/bin/startnetldi -g &>/dev/null
     ${GEMSTONE}/bin/startstone gs64stone &>/dev/null
     ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
   } do |ok, status|
