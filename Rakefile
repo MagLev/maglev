@@ -28,7 +28,8 @@ task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
 # there, but need the ENV var (i.e., need to know where gemstone should
 # be).
 task :gemstone do
-  raise "Bad GEMSTONE dir: '#{GEMSTONE}'" unless File.directory?(GEMSTONE)
+  raise "\nBad GEMSTONE dir: '#{GEMSTONE}'" unless File.directory?(GEMSTONE)
+  raise "\nNo etc/maglev.demo.key" unless File.exists?("etc/maglev.demo.key")
 end
 
 desc "Run squeak"
