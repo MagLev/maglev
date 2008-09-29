@@ -29,7 +29,7 @@ class String
     k = 0
     while k < n
       str << self
-      k = k + 1 
+      k = k + 1
     end
     str
   end
@@ -288,7 +288,7 @@ class String
 
   def scan(regex, &blk)
     regex.to_rx.each_match(self) do |m|
-      yield m
+      yield m[0]  # m is a matchdata, m[0] is the matched string
     end
     self
   end

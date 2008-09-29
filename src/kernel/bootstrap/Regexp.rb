@@ -33,6 +33,7 @@ class Regexp
         end
     end
 
+    # TODO: make this private
     def each_match(str, &block)
         pos = 0
         while(pos < str.length)
@@ -86,11 +87,11 @@ class Regexp
     def _split_string(string, limit)
         result = []
         if self.source == ""
-          slim = string.size 
+          slim = string.size
           i = 0
-          while i < slim 
+          while i < slim
             result[i] = string[i, 1]
-            i = i + 1 
+            i = i + 1
           end
         else
           start = 0
