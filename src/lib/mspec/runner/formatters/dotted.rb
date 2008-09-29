@@ -37,6 +37,7 @@ class DottedFormatter
   def finish
     print "\n"
     count = 0
+    print "\n#{'COUNTS: ' + @tally.format}\n" #bobw
     @states.each do |state|
       state.exceptions.each do |msg, exc, bt|
         outcome = failure?(state) ? "FAILED" : "ERROR"
@@ -50,6 +51,7 @@ class DottedFormatter
     end
 #avi
 #    print "\n#{@timer.format}\n\n#{@tally.format}\n"
+
   end
 
   def print(*args)
