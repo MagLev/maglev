@@ -13,7 +13,7 @@ class ArgsTest
     # Call method taking optional parameter w/o passing optional parameter
     raise "Fail 3A" unless required_optional_splat_no_block(1) == 1
     raise "Fail 3B" unless required_optional_splat_no_block(1, *[]) == 1
-    a = required_optional_splat_no_block(1, [1]) 
+    a = required_optional_splat_no_block(1, [1])
     raise "Fail 3C" unless a == 2
 
     # Call method taking optional parameter passing optional parameter
@@ -145,3 +145,51 @@ tests.test_02_no_block_without_splat
 tests.test_03_no_block_with_splat_and_nils
 tests.test_04_no_block_without_splat_and_nils
 true
+
+
+$failed = []
+$count = 0
+def test(actual, expected, msg)
+  puts "==== Testing: #{msg}"
+  $count += 1
+  $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
+end
+
+def report
+  puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
+  puts $failed
+  raise $failed.join("\n") unless $failed.empty?
+end
+
+
+# Tests from "The Ruby Programming Language", section 6.4
+
+def suffix(s, index=s.size-1)
+  s[index,s.size-index]
+end
+
+test(suffix("Ruby"), "y", "Gemstone args A")
+test(suffix("Ruby", 2), "by", "Gemstone args B")
+
+# Ensure parameter defaults are evaluated when a method is invoked, rather
+# than when it is parsed.  I.e., a should be a fresh array each time
+# through...
+def append(x, a=[])
+  a << x
+end
+
+test(append(1), [1], "Gemstone args C")
+test(append(1), [1], "Gemstone args D") # again to ensure a is fresh
+test(append(1, [2]), [2,1], "Gemstone args E")
+
+def sequence(args)
+  n = args[:n] || 0
+  m = args[:m] || 1
+  [n,m]
+end
+
+test(sequence({ }), [0,1], "Gemstone args F")
+test(sequence(:m => 3), [0,3], "Gemstone args G")
+test(sequence(:m => 3, :n => 9), [9,3], "Gemstone args H")
+
+report
