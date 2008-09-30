@@ -3,8 +3,9 @@
 $failed = []
 $count = 0
 def test(actual, expected, msg)
-    $count += 1
-    $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
+  #puts "=== Testing #{msg}"
+  $count += 1
+  $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
 end
 
 def report
@@ -13,24 +14,17 @@ def report
   raise $failed.join("\n") unless $failed.empty?
 end
 
-
 #     BEGIN TEST CASES
 
 # Tests for basename
-puts "========== A"
 test(File.basename('/home/gumby/work/ruby.rb'),        'ruby.rb', "Pickaxe A")
-puts "========== B"
 test(File.basename('/home/gumby/work/ruby.rb', '.rb'), 'ruby',    "Pickaxe B")
-puts "========== C"
 test(File.basename('/home/gumby/work/ruby.rb', '.*'),  'ruby',    "Pickaxe C")
-puts "========== D"
-
 
 test(File.basename('ruby.rb',  '.*'),  'ruby',      "GemStone A")
 test(File.basename('/ruby.rb', '.*'),  'ruby',      "GemStone B")
 test(File.basename('ruby.rbx', '.*'),  'ruby',      "GemStone C")
 test(File.basename('ruby.rbx', '.rb'), 'ruby.rbx',  "GemStone D")
-
 
 test(File.basename('ruby.rb', ''),      'ruby.rb',  "GemStone E")
 test(File.basename('ruby.rbx', '.rb*'), 'ruby.rbx', "GemStone F")
