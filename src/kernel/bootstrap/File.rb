@@ -7,6 +7,10 @@ class File
     primitive 'eof?', 'atEnd'
     primitive 'read', 'next:'
     primitive 'read', 'contents'
+
+    self.class.primitive_nobridge '_fstat','fstat:isLstat:' 
+    self.class.primitive_nobridge '_stat','stat:isLstat:' 
+ 
     self.class.primitive_nobridge '_open', 'openOnServer:mode:'
     self.class.primitive 'stdin'
     self.class.primitive 'stdout'
@@ -97,6 +101,23 @@ class File
     def self.extname(filename)
       base = self.basename(filename)
       (result = base[/\..*$/]).nil? ? '' : result
+    end
+
+
+    def self.stat(filename)
+      _stat(filename, false);
+    end
+
+    def self.lstat(filename)
+      _stat(filename, true);
+    end
+
+    def stat
+      File._fstat(@fileDescriptor, false)
+    end
+
+    def lstat
+      File._stat(@pathName, true) 
     end
 end
 

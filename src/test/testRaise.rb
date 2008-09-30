@@ -54,7 +54,7 @@ begin
     n = n + 10
     rescue *elist
       n = n + 100
-    puts "rescueD"
+      puts "rescueD"
     else
       n = n + 1000
     ensure  
@@ -65,4 +65,21 @@ begin
   end
 end  
 
+true
+
+begin
+  a = 88
+  begin
+    raise ScriptError
+    rescue SyntaxError
+      a = 99
+      puts "rescue SyntaxError"
+    rescue ScriptError  # This rescue clause generates an unexpected token
+      a = 101
+      puts "rescue ScriptError"
+  end
+  unless a == 101
+    raise 'ERR'
+  end
+end
 true
