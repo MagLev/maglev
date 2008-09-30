@@ -2,16 +2,14 @@
 # clause generates an unexpected token error
 #
 
-begin
-  puts "begin"
-rescue
-  puts "rescue"
-ensure
   begin
-    puts "ensure begin"
+    puts "A"
+    raise ArgumentError
   rescue SyntaxError
-    puts "ensure rescue SyntaxError"
-  rescue Exception  # This rescue clause generates an unexpected token
-    puts "ensure rescue Exception"
+    puts "B"
+    raise ArgumentError
+  rescue ArgumentError  # This rescue clause generates an unexpected token
+    puts "C"
+    raise SyntaxError
   end
-end
+  puts "D"

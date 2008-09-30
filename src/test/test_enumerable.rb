@@ -1,16 +1,29 @@
 # Test the logic of the parameter handling for String#count, String#delete, etc.
 
+Err = StandardError
 $failed = []
 $count = 0
 def test(actual, expected, msg)
     $count += 1
-    $failed << "ERROR: #{msg} Expected: #{expected} actual: #{actual}" unless expected == actual
+    if expected == actual
+      # ok
+    else
+      $failed << "ERROR: #{msg} Expected: #{expected} actual: #{actual}" 
+      x = $failed
+      x.pause
+    end 
 end
 
 def report
   puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
   puts $failed
-  raise Err, $failed.join("\n") unless $failed.empty?
+  if $failed.empty?
+    puts ok
+  else
+    x = $failed
+    x.pause
+    raise Err, $failed.join("\n") 
+  end
 end
 
 
@@ -29,8 +42,9 @@ class VowelFinder
       yield vowel
     end
   end
+
 end
 
 vf = VowelFinder.new("the quick brown fox jumped")
-test(vf.inject { |v,n| v+n }, 'euiooue', "Pickaxe p 121")
+test(vf.inject("") { |v,n| v+n }, 'euiooue', "Pickaxe p 121")
 report
