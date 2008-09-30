@@ -161,4 +161,19 @@ exit
 END
     run_topaz topaz_stuff
   end
+
+
+  desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
+  task :'vm-tests' do
+    ENV['file'] = "rakelib/allvmunit.inp"
+    Rake::Task[:'dev:runinp'].invoke
+    puts "Log files in log/vmunit*"
+  end
+  desc "Run the bm smoke tests (depends on ../gss64bit_30/*)"
+  task :'bm-tests' do
+    ENV['file'] = "rakelib/allbench.inp"
+    Rake::Task[:'dev:runinp'].invoke
+    puts "Log files in log/bench*"
+  end
+
 end
