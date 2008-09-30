@@ -437,9 +437,9 @@ module Enumerable
     if n && n < 0
       raise ArgumentError, "Invalid number of elements given."
     end
-    if n 
+    if n
       each do |o|
-        return o 
+        return o
       end
       nil
     else
