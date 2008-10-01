@@ -29,6 +29,11 @@
  unless a.equal?(99) then raiseErr end
  unless b.equal?(98) then raiseErr end
 
+ a = [77,66]
+ p[*a] 		# coverage for ticket 132
+ unless a.equal?(77) then raiseErr end
+ unless b.equal?(66) then raiseErr end
+
  def proc_from
    # this form not supported
    Proc.new 
@@ -38,7 +43,15 @@
    Proc.new(&b) 
  end
  def proc_fromB(&b)
-   Proc.new(b) 
+   begin
+     p = Proc.new(b) 
+     rescue Exception
+       # expect Gemstone error 2111
+       p = 999
+     else
+       raise 'ERR'  
+   end
+   p
  end
 
  p = Proc.new { "hello" }
@@ -52,8 +65,7 @@
  unless r = "goodbye" then raiseErr end
 
  p = proc_fromB { "notime" }
- r = p.call
- unless r = "notime" then raiseErr end
+ unless p == 999 then raiseErr end
 
  a = 0
  p = Proc.new { | x | a = a + x }

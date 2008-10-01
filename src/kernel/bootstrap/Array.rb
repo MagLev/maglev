@@ -155,8 +155,7 @@ class Array
     # for #'_generality....
 
     i = 0
-    # TODO , optimize kind_of?
-    unless other.kind_of?(Array)
+    unless other._isArray
       raise TypeError , "not an Array"
     end
       
@@ -174,8 +173,7 @@ class Array
   # Need to either overwrite or allow a mixin.
 
   def ==(other)
-    # TODO , optimize kind_of?
-    unless other.kind_of?(Array)
+    unless other._isArray
       return false
     end
     lim = size
@@ -360,7 +358,7 @@ class Array
   #
   def eql?(other)
     return true if equal? other
-    return false unless other.kind_of?(Array)
+    return false unless other._isArray
     return false unless size.equal?(other.size)
 
     i = 0
@@ -378,21 +376,29 @@ class Array
   end
 
   def fill(obj, start=nil, length=nil)
-    # TODO: needs more analysis with Allen
     # TODO: Needs block support
     start  ||= 0
     sz = size 
-    length ||= sz - 1
-
+    length ||= sz 
+    if (start < 0)
+      start = sz + start 
+      if (start < 0)
+        start = 0
+      end
+    end
+    if (length < 0) 
+      length = 0
+    end
     # smalltalk arrays start at 1
     endIdx = start + length 
     start += 1         # start, end both 1-based now
-    if start <= sz
-      if endIdx > sz
-        endIdx = sz
-      end
+    if (endIdx > sz)
+      self.size=(endIdx)  # grow the receiver
+    end
+    if (length > 0) 
       _fillFromToWith(start, endIdx, obj)
     end
+    self
   end
 
   def first

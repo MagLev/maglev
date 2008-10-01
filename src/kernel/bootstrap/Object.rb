@@ -6,11 +6,24 @@ RandomInstance = Random.new
 class Object
     # Begin private helper methods
 
-    primitive_nobridge '_kindBlkStrRanRegAry', '_rubyKind_Block_String_Range_Regexp_Array'
-    #       results are                          0x10   0x8   0x4    0x2    0x1  else nil
+    #  begin special sends
+    #    these are optimized by the code generator to be special bytecodes
+    #    entries here are so that perform will work.
 
     # _isInteger allows integer?  special sends to non-Numeric objects
     primitive_nobridge '_isInteger', '_isInteger'
+
+    primitive_nobridge '_isFixnum', '_isSmallInteger'
+    primitive_nobridge '_isFloat', '_isFloat'
+    primitive_nobridge '_isNumber', '_isNumber'
+    primitive_nobridge '_isSymbol', '_isSymbol'
+    primitive_nobridge '_isBlock', '_isExecBlock'
+    primitive_nobridge '_isArray', '_isArray'
+    primitive_nobridge '_isHash', '_isRubyHash'
+    primitive_nobridge '_isString', '_isOneByteString'
+    primitive_nobridge '_isRegexp', '_isRegexp'
+    primitive_nobridge '_isRange', '_isRange'
+    # end special sends
   
     #  private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
@@ -104,8 +117,7 @@ class Object
             $stdout << "\n"
         else
             args.each do |arg|
-                knd = arg._kindBlkStrRanRegAry
-                if ( knd.equal?(1) )  # if arg.kind_of?(Array)
+                if ( arg._isArray )  # if arg.kind_of?(Array)
                     puts *arg
                 else
                     $stdout << arg.to_s

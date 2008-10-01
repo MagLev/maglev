@@ -231,14 +231,15 @@ class String
     # TODO: Figure out how to pass something more complex than a method name
     # to coerce_to.  A proc? A proc or a symbol?
     #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
-    knd = pattern._kindBlkStrRanRegAry
-    if (knd.equal?(2) )  # if pattern.kind_of?(Regexp)
+    if ( pattern._isRegexp  )  # if pattern.kind_of?(Regexp)
       regexp = pattern
-    elsif pattern.respond_to?(:to_str)
+    else 
       # TODO more optimization of coerce here
-      regexp = Regexp.new(pattern.to_str)
-    else
-      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      begin
+        regexp = Regexp.new(pattern.to_str)
+        rescue StandardError
+          raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      end
     end
     regexp.match self
   end
@@ -454,7 +455,7 @@ class String
     padstr = StringValue(padstr)
     raise ArgumentError, "zero width padding" if padstr.size.equal?(0)
 
-    width = Type.coerce_to(width, Integer, :to_int) unless width.kind_of? Fixnum
+    width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
     sz = size
     if width > sz
       padsize = width - sz

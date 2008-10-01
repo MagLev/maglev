@@ -13,10 +13,16 @@ class NilClass
    primitive 'to_f' , '_ruby_to_f'
    primitive 'to_i' , '_ruby_to_i'
    primitive 'to_s' , '_ruby_to_s'
+
+   def self.name
+      # override Smalltalk name
+      'NilClass'
+   end
 	
    def inspect
      "nil"
    end
+
 end
 
 #---------------------------------

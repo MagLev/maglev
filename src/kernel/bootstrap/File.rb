@@ -17,6 +17,11 @@ class File
     self.class.primitive 'stderr'
     self.class.primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
 
+    def self.name
+      # override Smalltalk name
+      'File'
+    end
+
     def self.new(file, mode="r")
         self._open(file, mode)
     end

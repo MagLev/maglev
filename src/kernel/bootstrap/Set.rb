@@ -6,6 +6,11 @@ class Set
     primitive 'each&', 'do:'
     primitive 'length', 'size'
     self.class.primitive 'new'
+
+    def self.name
+      # override Smalltalk name
+      :Set
+    end
     
     def inspect
         "[[#{length}]]"

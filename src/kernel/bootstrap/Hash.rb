@@ -20,6 +20,11 @@ class Hash
   self.class.primitive 'new'
   # MNI: def self.[](*elements)
 
+  def self.name
+    # override Smalltalk name
+    'Hash'
+  end
+
   # Instance Methods
 
   primitive_nobridge '==', '='

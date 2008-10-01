@@ -55,8 +55,7 @@ class Regexp
     end
 
     def ===(str)
-      knd = str._kindBlkStrRanRegAry
-      if ( knd.equal?(8) )  # if str.kind_of?(String)
+      if ( str._isString ) # if str.kind_of?(String)
         if  self.=~(str)
           return true
         end

@@ -19,6 +19,11 @@
 # Note,   1152921504606846976.class  will be LargePositiveInteger, not Integer .
 
 class Integer
+    def self.name
+      # override Smalltalk name
+      'Bignum'
+    end
+
     # _rubyTimes:  contains the handler for RubyBreakException
     primitive_nobridge '_times&', '_rubyTimes:'
     def times(&b)

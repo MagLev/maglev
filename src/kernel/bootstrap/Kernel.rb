@@ -10,7 +10,7 @@ module Kernel
     status = '9'
     if (arg.equal?(true))
       status = '0'
-    elsif (arg.kind_of?(Integer))
+    elsif (arg._isInteger)
       status = arg.to_s
     end
     raise SystemExit , status

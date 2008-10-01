@@ -12,6 +12,11 @@ class Time
   # _setTmArray fills in  @is_gmt , @tm 
   primitive_nobridge '_setTmArray', '_setTmArray:'
 
+  def self.name
+    # override Smalltalk name
+    :Time
+  end
+
   def _microsecs
     @microseconds
   end
