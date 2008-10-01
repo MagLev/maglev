@@ -25,5 +25,7 @@ test 'abcabc'.rindex('xyz'), nil, "GemStone rindex D"
 test ''.rindex('abc'),       nil, "GemStone rindex E"
 test ''.rindex(''),          0,   "GemStone rindex F"
 test 'abc'.rindex(''),       3,   "GemStone rindex G"
+test 'ruby.rbx'.rindex('x'), 7,   "GemStone rindex H"  # Regression
+test 'rubx.rbx'.rindex('x'), 7,   "GemStone rindex I"  # Regression
 
 report

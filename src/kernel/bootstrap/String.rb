@@ -262,7 +262,8 @@ class String
     return nil if self.empty?
     # TODO: Need to coerce to string....
     # arg = StringValue(arg) unless [Fixnum, String, Regexp].include?(arg.class)
-    return (result = _lastSubstring(item, offset + 1)) == 0 ? nil : result - 1
+    result = _lastSubstring(item, offset + 1)
+    return  result == 0 ? nil : result - 1
 
     # TODO: support for when item is a regexp
     # TODO: support for when item is an int ("character")

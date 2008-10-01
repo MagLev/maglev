@@ -8,9 +8,9 @@ class File
     primitive 'read', 'next:'
     primitive 'read', 'contents'
 
-    self.class.primitive_nobridge '_fstat','fstat:isLstat:' 
-    self.class.primitive_nobridge '_stat','stat:isLstat:' 
- 
+    self.class.primitive_nobridge '_fstat','fstat:isLstat:'
+    self.class.primitive_nobridge '_stat','stat:isLstat:'
+
     self.class.primitive_nobridge '_open', 'openOnServer:mode:'
     self.class.primitive 'stdin'
     self.class.primitive 'stdout'
@@ -98,16 +98,23 @@ class File
       fn = StringValue(filename)
       sf = StringValue(suffix)
       b = fn.split('/')[-1]
-      # This also works if suffix is ''
-      index = filename.rindex(suffix.eql?('.*') ? '.' : suffix)
-      return index.nil? ? filename : filename[0,index]
+      if suffix.eql?('.*')
+        index = b.rindex('.')
+      else
+        index = b.rindex(suffix)
+        if (not index.nil?) && ((index + suffix.size) != b.size)
+          index = nil
+        end
+      end
+      return index.nil? ? b : b[0,index]
     end
 
     def self.extname(filename)
       base = self.basename(filename)
-      (result = base[/\..*$/]).nil? ? '' : result
+      index = base.rindex('.')
+      return '' if index.nil? || index == (base.size - 1)
+      base[index..-1]
     end
-
 
     def self.stat(filename)
       _stat(filename, false);
@@ -122,7 +129,7 @@ class File
     end
 
     def lstat
-      File._stat(@pathName, true) 
+      File._stat(@pathName, true)
     end
 end
 
@@ -158,7 +165,6 @@ class PersistentFile
     def sync=
         @block.call.sync
     end
-
 end
 
 STDIN = $stdin = PersistentFile.new(proc{File.stdin})
