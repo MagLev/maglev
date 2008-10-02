@@ -49,10 +49,10 @@ class Time
     :isdst => 8,
   }
 
-  TIMEVAL_FIELDS = {
-    :sec => 0,
-    :usec => 1,
-  }
+  # TIMEVAL_FIELDS = {   # not used in Gemstone
+  #  :sec => 0,
+  #  :usec => 1,
+  #}
 
   #--
   # TODO: doesn't load nsec or ivars
@@ -105,13 +105,13 @@ class Time
 
     major = 1                     << 31 | # 1 bit
       (@is_gmt ? 1 : 0)     << 30 | # 1 bit
-      @tm[TM_FIELDS[:year]] << 14 | # 16 bits
+      @tm[TM_FIELDS[:year]] << 14 | # 16 bits  
       @tm[TM_FIELDS[:mon]]  << 10 | # 4 bits
       @tm[TM_FIELDS[:mday]] <<  5 | # 5 bits
       @tm[TM_FIELDS[:hour]]         # 5 bits
     minor = @tm[TM_FIELDS[:min]]  << 26 | # 6 bits
-      @tm[TM_FIELDS[:sec]]  << 20 | # 6 bits
-      @timeval[TIMEVAL_FIELDS[:usec]] # 20 bits
+      @tm[TM_FIELDS[:sec]] << 20 | # 6 bits
+      self.usec  # 20 bits  # GEMSTONE changes
 
     [major, minor].pack 'VV'
   ensure
@@ -120,10 +120,13 @@ class Time
   end
 
   def dup
-    t = Time.allocate
-    t.instance_variable_set(:@timeval, @timeval)
-    t.instance_variable_set(:@tm, @tm)
-    t.instance_variable_set(:@is_gmt, @is_gmt)
+    # t = Time.allocate
+    # t.instance_variable_set(:@timeval, @timeval)
+    # t.instance_variable_set(:@tm, @tm)
+    # t.instance_variable_set(:@is_gmt, @is_gmt)
+    # GEMSTONE implementation:
+    t = self.class.allocate
+    t._init(@microseconds, @is_gmt);
     t
   end
 
@@ -154,9 +157,9 @@ class Time
       isdst = -1
     end
 
-    t = Time.allocate
-    t.mktime(second, minute, hour, day, month, year, usec, isdst, false)
-    t.force_localtime
+    t = Time.allocate	# GEMSTONE changes
+    aTime_t = mktime(second, minute, hour, day, month, year, usec, isdst, false)
+    t._init(aTime_t, false)
   end
 
   def self.gm(first, *args)
@@ -184,19 +187,19 @@ class Time
       usec = args[5] || 0
     end
 
-    t = Time.allocate
-    t.mktime(second, minute, hour, day, month, year, usec, -1, true)
-    t.force_gmtime
+    t = Time.allocate 	# GEMSTONE chagns
+    aTime_t = mktime(second, minute, hour, day, month, year, usec, -1, true)
+    t._init(aTime_t, true)
+    t
   end
 
+  # Gemstone , new implementations at end of file
   #   def self.at(secs_or_time, msecs = nil)
   #     if secs_or_time.kind_of? Time
   #       return secs_or_time.dup
   #     end
-
   #     Time.allocate.at_gmt(secs_or_time, msecs, false)
   #   end
-
   #   def strftime(format)
   #     __strftime__(@tm, format.to_str)
   #   end
@@ -210,32 +213,34 @@ class Time
   end
 
   def seconds
-    @timeval.first
+    @microseconds / 1000000   # Gemstone
   end
 
   def +(other)
-    raise TypeError, 'time + time?' if other.kind_of?(Time)
-    other      = FloatValue(other) unless other.is_a?(Integer)
-    other_usec = 0
-    if other.kind_of?(Float)
-      other_usec = (other % 1) * 1000000
-      other      = other.to_i
+    raise TypeError, 'time + time?' if other.kind_of?(Time)  # GEMSTONE ...
+    if (other._isFloat)
+      deltamicro = (other * 100000.0).to_i
+    else
+      deltamicro = other * 1000000
     end
-    dup.at_gmt(seconds + other, usec + other_usec, @is_gmt)
+    t = self.class.allocate
+    t._init(@microseconds + deltamicro, @is_gmt)   
+    t							# ... GEMSTONE
   end
 
   def -(other)
-    if other.kind_of? Time
-      seconds - other.seconds + (usec - other.usec) * 0.000001
+    if other.kind_of? Time			# GEMSTONE ...
+      deltamicro = other._microsecs 
     else
-      other      = FloatValue(other) unless other.is_a?(Integer)
-      other_usec = 0
-      if other.kind_of?(Float)
-        other_usec = (1 - other % 1) * 1000000
-        other      = other.ceil.to_i
+      if (other._isFloat)
+        deltamicro = (other * 100000.0).to_i
+      else
+        deltamicro = other * 1000000
       end
-      dup.at_gmt(seconds - other, usec + other_usec, @is_gmt)
     end
+    t = self.class.allocate
+    t._init(@microseconds - deltamicro, @is_gmt)
+    t							# ... GEMSTONE
   end
 
   def succ
@@ -244,7 +249,7 @@ class Time
 
   def <=>(other)
     if other.kind_of? Time
-      [self.seconds, self.usec] <=> [other.seconds, other.usec]
+      @microseconds <=> other.microseconds  # GEMSTONE change
     else
       nil
     end
@@ -299,15 +304,15 @@ class Time
   end
 
   def usec
-    @timeval.last
+    @microseconds % 1000000	# GEMSTONE
   end
 
   def to_i
-    self.seconds
+    @microseconds / 1000000  # inline self.seconds	# GEMSTONE
   end
 
   def to_f
-    seconds + (usec / 1000000.0)
+    @microseconds / 1000000.0	# GEMSTONE
   end
 
   ##
@@ -384,7 +389,8 @@ class Time
     self
   end
 
-  def mktime(sec, min, hour, mday, mon, year, usec, isdst, from_gmt)
+  def self.mktime(sec, min, hour, mday, mon, year, usec, isdst, from_gmt) # GEMSTONE
+    # returns UTC microseconds since 1970	# GEMSTONE
     sec  = sec.to_i
     min  = min.to_i
     hour = hour.to_i
@@ -404,10 +410,10 @@ class Time
       end
     end
 
-    @timeval = time_mktime(sec, min, hour, mday, mon, year, usec, isdst, from_gmt)
-    raise ArgumentError, "time out of range" if @timeval.first == -1
-
-    self
+    args = [ sec, min, hour, mday, mon, year, usec, isdst, from_gmt ] # GEMSTONE...
+    aTime_t = _mktime(args)
+    raise ArgumentError, "time out of range" if aTime_t < 0
+    aTime_t						# ... GEMSTONE
   end
 
   ##
@@ -415,27 +421,28 @@ class Time
   #
   # +want_gmt+ says whether the caller wants a gmtime or local time object.
 
-  def at_gmt(sec, usec, want_gmt)
-    if sec.kind_of?(Integer) || usec
-      sec  = Type.coerce_to sec, Integer, :to_i
-      usec = usec ? usec.to_i : 0
-    else
-      sec  = Type.coerce_to sec, Float, :to_f
-      usec = ((sec % 1) * 1000000).to_i
-      sec  = sec.to_i
-    end
+#  def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
+#    if sec.kind_of?(Integer) || usec
+#      sec  = Type.coerce_to sec, Integer, :to_i
+#      usec = usec ? usec.to_i : 0
+#    else
+#      sec  = Type.coerce_to sec, Float, :to_f
+#      usec = ((sec % 1) * 1000000).to_i
+#      sec  = sec.to_i
+#    end
+#
+#    sec  = sec + (usec / 1000000)
+#    usec = usec % 1000000
+#
+#    @timeval = [sec, usec]
+#
+#    if want_gmt
+#      force_gmtime
+#    else
+#      force_localtime
+#    end
+#  end
 
-    sec  = sec + (usec / 1000000)
-    usec = usec % 1000000
-
-    @timeval = [sec, usec]
-
-    if want_gmt
-      force_gmtime
-    else
-      force_localtime
-    end
-  end
 
   def self.month_days(y, m)
     if ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
@@ -487,13 +494,18 @@ class Time
     return year, mon, day, hour, min, sec
   end
 
-  #  public
+# GEMSTONE, not used
+#  public
+#
+#   class << self
+#     alias_method :now,    :new
+#     alias_method :mktime, :local
+#     alias_method :utc,    :gm
+#   end
 
-  #   class << self
-  #     alias_method :now,    :new
-  #     alias_method :mktime, :local
-  #     alias_method :utc,    :gm
-  #   end
+  def self.utc(first, *args)	# GEMSTONE
+    gm(first, *args)
+  end
 
   alias_method :utc?,       :gmt?
   alias_method :month,      :mon
@@ -513,9 +525,15 @@ class Time
   # END RUBINIUS
   ######################################################################
 
+# begin Gemstone  specific code
+
   self.class.primitive 'new'
   self.class.primitive 'now'
   self.class.primitive_nobridge 'allocate' , '_basicNew'
+  self.class.primitive_nobridge '_mktime' , 'mktime:'
+
+  # _strftime takes a format String as the arg
+  primitive_nobridge '_strftime' , 'strftime:'
 
   # Smalltalk initialize takes care of all instvars,
   #   for use cases Time.new  Time.now
@@ -556,37 +574,11 @@ class Time
     res
   end
 
-  #   def ==(aTime)
-  #     @microseconds == aTime.usec
-  #   end
+  # TODO httpdate
 
-  #   def -(other)
-  #     to_f - other.to_f
-  #   end
-
-  #   primitive 'hash'
-
-  #   def to_f
-  #     (@microseconds / 1000000.0).to_f
-  #   end
-
-  #   # TODO httpdate
-
-  # TODO: UGH: this was here already, but hideous.  Need to just call into
-  # c strftime...
-  def strftime(str)
-    str.gsub(/%Y/, year.to_s).gsub(/%m/, month.to_s).gsub(/%d/, day.to_s).gsub(/%H/, hour.to_s).gsub(/%M/, min.to_s).gsub(/%S/, sec.to_s).gsub(/%b/,RFC2822_MONTH_NAME[@tm[4]]).gsub(/%Z/, "").gsub(/%a/,RFC2822_DAY_NAME[@tm[6]]).gsub(/%A/,FULL_DAY_NAME[@tm[6] - 1]).gsub(/%B/,FULL_MONTH_NAME[@tm[4]]).gsub(/%%/, "%").gsub(/%y/, year.to_s[2..3]).gsub(/%x/, "#{month}/#{day}/#{year.to_s[2..3]}").gsub(/%w/, wday.to_s).gsub(/%j/, yday.to_s).gsub(/%p/, hour > 11 ? "PM" : "AM")
-
-    # TODO: %W, %U, %Z
-    # TODO: sprintf "%02d" for %d %x etc.  Need sprintf support first...
+  def strftime(fmt='%a %b %d %H:%M:%S %Z %Y' )
+    fmt = fmt.to_str unless  fmt._isString
+    _strftime(fmt)
   end
-
-  #   def inspect
-  #     # TODO change to call httpdate
-  #     # httpdate
-
-  #     # TODO delete following after httpdate working again
-  #     @microseconds.to_s + ':' + (@is_gmt ? 'gmt' : 'pst' )
-  #   end
 
 end

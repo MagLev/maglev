@@ -56,7 +56,7 @@ class String
   # PERFORMANCE: String#== could use help
   primitive '==', '='  # TODO: this is incorrect...
   #   def ==(other)
-  #     if other.kind_of?(String)
+  #     if (other._isString )
   #       (self <=> other) == 0
   #     elsif other.respond_to? :to_str
   #       other == str

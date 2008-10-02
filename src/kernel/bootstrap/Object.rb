@@ -54,6 +54,8 @@ class Object
     primitive_nobridge '__send__', 'rubySend:'
     primitive_nobridge '__send__&', 'rubySend:withBlock:'
     primitive          '__send__*', 'rubySend:withArguments:'
+  
+    primitive 'dup', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
     # TODO:  fix inefficency in rubyRespondsTo: which is implemented in .mcz
