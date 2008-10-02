@@ -137,5 +137,4 @@ class FileStat
   def zero?
     size == 0
   end
->>>>>>> ef78027b2ded1800e82534bb2ac5c9ba49f8570b:src/kernel/bootstrap/FileStat.rb
 end
