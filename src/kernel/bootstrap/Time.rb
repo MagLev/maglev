@@ -1,4 +1,8 @@
 # Time in Ruby is identically Smalltalk RubyTime
+#
+# The Smalltalk RubyTime class holds a single value, @microseconds, which
+# is the number of microseconds since the epoch.  The usec() method just
+# gets the fractional part of @microseconds.
 
 class Time
 
@@ -105,7 +109,7 @@ class Time
 
     major = 1                     << 31 | # 1 bit
       (@is_gmt ? 1 : 0)     << 30 | # 1 bit
-      @tm[TM_FIELDS[:year]] << 14 | # 16 bits  
+      @tm[TM_FIELDS[:year]] << 14 | # 16 bits
       @tm[TM_FIELDS[:mon]]  << 10 | # 4 bits
       @tm[TM_FIELDS[:mday]] <<  5 | # 5 bits
       @tm[TM_FIELDS[:hour]]         # 5 bits
@@ -157,7 +161,7 @@ class Time
       isdst = -1
     end
 
-    t = Time.allocate	# GEMSTONE changes
+    t = Time.allocate   # GEMSTONE changes
     aTime_t = mktime(second, minute, hour, day, month, year, usec, isdst, false)
     t._init(aTime_t, false)
   end
@@ -187,7 +191,7 @@ class Time
       usec = args[5] || 0
     end
 
-    t = Time.allocate 	# GEMSTONE chagns
+    t = Time.allocate   # GEMSTONE chagns
     aTime_t = mktime(second, minute, hour, day, month, year, usec, -1, true)
     t._init(aTime_t, true)
     t
@@ -224,13 +228,13 @@ class Time
       deltamicro = other * 1000000
     end
     t = self.class.allocate
-    t._init(@microseconds + deltamicro, @is_gmt)   
-    t							# ... GEMSTONE
+    t._init(@microseconds + deltamicro, @is_gmt)
+    t                                                   # ... GEMSTONE
   end
 
   def -(other)
-    if other.kind_of? Time			# GEMSTONE ...
-      deltamicro = other._microsecs 
+    if other.kind_of? Time                      # GEMSTONE ...
+      deltamicro = other._microsecs
     else
       if (other._isFloat)
         deltamicro = (other * 100000.0).to_i
@@ -240,7 +244,7 @@ class Time
     end
     t = self.class.allocate
     t._init(@microseconds - deltamicro, @is_gmt)
-    t							# ... GEMSTONE
+    t                                                   # ... GEMSTONE
   end
 
   def succ
@@ -249,10 +253,16 @@ class Time
 
   def <=>(other)
     if other.kind_of? Time
-      @microseconds <=> other.microseconds  # GEMSTONE change
+      @microseconds <=> other._microsecs  # GEMSTONE change
     else
       nil
     end
+  end
+
+  # It seems that MRI return nil if other isn't a Time object
+  def ==(other)
+    result = self <=> other
+    result.nil? ? result : result == 0
   end
 
   def eql?(other)
@@ -304,15 +314,15 @@ class Time
   end
 
   def usec
-    @microseconds % 1000000	# GEMSTONE
+    @microseconds % 1000000     # GEMSTONE
   end
 
   def to_i
-    @microseconds / 1000000  # inline self.seconds	# GEMSTONE
+    @microseconds / 1000000  # inline self.seconds      # GEMSTONE
   end
 
   def to_f
-    @microseconds / 1000000.0	# GEMSTONE
+    @microseconds / 1000000.0   # GEMSTONE
   end
 
   ##
@@ -390,7 +400,7 @@ class Time
   end
 
   def self.mktime(sec, min, hour, mday, mon, year, usec, isdst, from_gmt) # GEMSTONE
-    # returns UTC microseconds since 1970	# GEMSTONE
+    # returns UTC microseconds since 1970       # GEMSTONE
     sec  = sec.to_i
     min  = min.to_i
     hour = hour.to_i
@@ -413,7 +423,7 @@ class Time
     args = [ sec, min, hour, mday, mon, year, usec, isdst, from_gmt ] # GEMSTONE...
     aTime_t = _mktime(args)
     raise ArgumentError, "time out of range" if aTime_t < 0
-    aTime_t						# ... GEMSTONE
+    aTime_t                                             # ... GEMSTONE
   end
 
   ##
@@ -421,27 +431,27 @@ class Time
   #
   # +want_gmt+ says whether the caller wants a gmtime or local time object.
 
-#  def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
-#    if sec.kind_of?(Integer) || usec
-#      sec  = Type.coerce_to sec, Integer, :to_i
-#      usec = usec ? usec.to_i : 0
-#    else
-#      sec  = Type.coerce_to sec, Float, :to_f
-#      usec = ((sec % 1) * 1000000).to_i
-#      sec  = sec.to_i
-#    end
-#
-#    sec  = sec + (usec / 1000000)
-#    usec = usec % 1000000
-#
-#    @timeval = [sec, usec]
-#
-#    if want_gmt
-#      force_gmtime
-#    else
-#      force_localtime
-#    end
-#  end
+  #  def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
+  #    if sec.kind_of?(Integer) || usec
+  #      sec  = Type.coerce_to sec, Integer, :to_i
+  #      usec = usec ? usec.to_i : 0
+  #    else
+  #      sec  = Type.coerce_to sec, Float, :to_f
+  #      usec = ((sec % 1) * 1000000).to_i
+  #      sec  = sec.to_i
+  #    end
+  #
+  #    sec  = sec + (usec / 1000000)
+  #    usec = usec % 1000000
+  #
+  #    @timeval = [sec, usec]
+  #
+  #    if want_gmt
+  #      force_gmtime
+  #    else
+  #      force_localtime
+  #    end
+  #  end
 
 
   def self.month_days(y, m)
@@ -494,16 +504,16 @@ class Time
     return year, mon, day, hour, min, sec
   end
 
-# GEMSTONE, not used
-#  public
-#
-#   class << self
-#     alias_method :now,    :new
-#     alias_method :mktime, :local
-#     alias_method :utc,    :gm
-#   end
+  # GEMSTONE, not used
+  #  public
+  #
+  #   class << self
+  #     alias_method :now,    :new
+  #     alias_method :mktime, :local
+  #     alias_method :utc,    :gm
+  #   end
 
-  def self.utc(first, *args)	# GEMSTONE
+  def self.utc(first, *args)    # GEMSTONE
     gm(first, *args)
   end
 
@@ -525,7 +535,7 @@ class Time
   # END RUBINIUS
   ######################################################################
 
-# begin Gemstone  specific code
+  # begin Gemstone  specific code
 
   self.class.primitive 'new'
   self.class.primitive 'now'
