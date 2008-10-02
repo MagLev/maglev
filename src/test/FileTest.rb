@@ -54,4 +54,18 @@ time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
 %x{ touch -t 199910201234 #{fname} }  # create at Wed Oct 20 12:34:00 1999
 
 test(File.atime(fname), time, 'File.atime')
+test(File.blockdev?(fname), false, 'File.blockdev?')
+test(File.chardev?(fname), false, 'File.chardev?')
+#test(File.ctime(fname), , 'File.')
+test(File.directory?(fname), false, 'File.directory?')
+test(File.file?(fname), true, 'File.file?')
+test(File.mtime(fname), time, 'File.mtime')
+test(File.pipe?(fname), false, 'File.pipe?')
+test(File.size(fname), 0, 'File.size')
+test(File.size?(fname), nil, 'File.size?')
+test(File.socket?(fname), false, 'File.socket?')
+test(File.sticky?(fname), false, 'File.sticky?')
+test(File.symlink?(fname), false, 'File.symlink?')
+test(File.zero?(fname), true, 'File.zero?')
+
 report

@@ -1,7 +1,7 @@
 #
 # FileStat in Ruby is identically Smalltalk GsFileStat
 
-class FileStat
+class File::Stat
 
   # TODO: Can't include Comparable right now, since it raises:
   #   'insert class disallowed, receiver is committed'
@@ -10,7 +10,7 @@ class FileStat
 
   def self.name
     # override Smalltalk name
-    'FileStat'
+    'File::Stat'
   end
 
   # POSIX constants for accessing the mode field
@@ -35,7 +35,7 @@ class FileStat
   # MNI: FileStat: <=>
 
   def <=>(other)
-    return nil unless other.is_a?(FileStat)
+    return nil unless other.is_a?(File::Stat)
     self.mtime <=> other.mtime
   end
 
