@@ -81,6 +81,11 @@ test(stat.symlink?, false, 'symlink?')
 #test(stat.writable_real?, true, 'writable_real?')
 test(stat.zero?, true, 'zero?')
 
+# Test the comparable methods
+same_stat = stat
+other_stat = File.open(__FILE__).stat
+test(stat <=> stat, 0, 'stat <=> stat')
+test(stat <=> same_stat, 0, 'stat <=> same_stat')
+test(stat <=> other_stat, -1, 'stat <=> other_stat')
+
 report
-
-

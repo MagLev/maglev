@@ -3,6 +3,11 @@
 
 class FileStat
 
+  # TODO: Can't include Comparable right now, since it raises:
+  #   'insert class disallowed, receiver is committed'
+  # Uncomment this when Allen fixes parser.
+  # include Comparable
+
   def self.name
     # override Smalltalk name
     'FileStat'
@@ -28,6 +33,11 @@ class FileStat
   primitive 'mode', 'mode'
 
   # MNI: FileStat: <=>
+
+  def <=>(other)
+    return nil unless other.is_a?(FileStat)
+    self.mtime <=> other.mtime
+  end
 
   def atime
     Time.at _atime
