@@ -13,7 +13,9 @@ def report
   raise $failed.join("\n") unless $failed.empty?
 end
 
-t = Time.at(1222895022)  # Wed Oct 01 14:03:42 -0700 2008
+t  = Time.at(1222895022)  # Wed Oct 01 14:03:42 -0700 2008
+t2 = Time.at(1222895022)
+later = Time.at(1222895023)
 
 test(t.year, 2008, "year()")
 test(t.day,    1,  "day()")
@@ -51,5 +53,9 @@ test(t.strftime("%y"), "08",        "%y test")
 test(t.strftime("%Y"), "2008",      "%Y test")
 #test(t.strftime("%Z"), "PDT",       "%Z test")
 test(t.strftime("%%"), "%",         "%% test")
+
+test(t == t, true, "t == t")
+test(t == t2, true, "t == t2")
+test(t == later, false, "t == later")
 
 report
