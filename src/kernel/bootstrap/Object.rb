@@ -60,6 +60,7 @@ class Object
     primitive 'freeze', 'immediateInvariant'
     # TODO:  fix inefficency in rubyRespondsTo: which is implemented in .mcz
     primitive 'respond_to?', 'rubyRespondsTo:'
+
     primitive 'print_line', 'rubyPrint:'
     primitive 'to_s', 'asString'
 
