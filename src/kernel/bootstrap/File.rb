@@ -37,6 +37,10 @@ class File
         end
     end
 
+    def self.atime(filename)
+      File.stat(filename).atime
+    end
+
     def print(*args)
         args.each {|arg| self << arg.to_s}
     end

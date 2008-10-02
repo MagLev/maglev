@@ -46,4 +46,12 @@ test(File.extname('test.'),         '',     'GemStone extname B')
 test(File.extname('test. '),        '. ',   'GemStone extname C')  # ?!!h
 
 
+# Test stat based methods
+
+# First create a file with known properties
+fname = "/tmp/FileStatTest-234"
+time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
+%x{ touch -t 199910201234 #{fname} }  # create at Wed Oct 20 12:34:00 1999
+
+test(File.atime(fname), time, 'File.atime')
 report
