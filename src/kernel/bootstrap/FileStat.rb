@@ -51,8 +51,13 @@ class FileStat
 
   primitive 'dev', 'dev'
 
-  # MNI: FileStat: dev_major
-  # MNI: FileStat: dev_minor
+  def dev_major
+    _major(dev)
+  end
+
+  def dev_minor
+    _minor(dev)
+  end
 
   def directory?
     (mode & S_IFMT) == S_IFDIR
@@ -98,8 +103,14 @@ class FileStat
 
   primitive 'rdev', 'rdev'
 
-  # MNI: FileStat: rdev_major
-  # MNI: FileStat: rdev_minor
+  def rdev_major
+    _major(rdev)
+  end
+
+  def rdev_minor
+    _minor(rdev)
+  end
+
   # MNI: FileStat: readable?
   # MNI: FileStat: readable_real?
 
@@ -126,7 +137,7 @@ class FileStat
   end
 
   def symlink?
-    (mode & S_IFLNK) != 0
+    (mode & S_IFMT) == S_IFLNK
   end
 
   primitive 'uid', 'uid'
@@ -137,4 +148,14 @@ class FileStat
   def zero?
     size == 0
   end
+
+  # pull the major device number out of a dev_t
+  def _major(dev_t)
+    (dev_t >> 24) & 0x0ff
+  end
+  # pull the minor device number out of a dev_t
+  def _minor(dev_t)
+    dev_t & 0xffffff
+  end
+
 end
