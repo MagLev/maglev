@@ -19,6 +19,7 @@ if [ -z "$PARSETREE_PORT" ]; then
     export PARSETREE_PORT=2001
 fi
 #
+export RUBY_VERSION=`ruby -e "puts \"#{RUBY_VERSION}\""`
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
@@ -42,6 +43,14 @@ startserver-debug() {
 }
 
 startparser() {
+  if [ "$RUBY_VERSION" != "1.8.6" ]; then
+    echo "### This command only works on Ruby 1.8.6,"
+    echo "but your RUBY_VERSION appears to be $RUBY_VERSION"
+    echo "You can skip _this_ check by using \"gemstone start-debug\","
+    echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
+    echo "Use \"gemstone status\" to check that the parser is running."
+    exit 1
+  fi
   if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
@@ -243,8 +252,8 @@ ENDHELP
 case "$1" in
   start)
         initialize
-        startserver
         startparser
+        startserver
         ;;
   start-parser)
         initialize
@@ -252,8 +261,8 @@ case "$1" in
         ;;
   start-debug)
         initialize
-        startserver-debug
         startparser-debug
+        startserver-debug
         ;;
   stop)
         stopserver
@@ -262,8 +271,8 @@ case "$1" in
   restart)
         stopserver
         stopparser
-        startserver
         startparser
+        startserver
         ;;
   status)
         status
