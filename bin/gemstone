@@ -19,6 +19,7 @@ if [ -z "$PARSETREE_PORT" ]; then
     export PARSETREE_PORT=2001
 fi
 #
+export RUBY_VERSION=`ruby -e "puts \"#{RUBY_VERSION}\""`
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
@@ -42,6 +43,14 @@ startserver-debug() {
 }
 
 startparser() {
+  if [ "$RUBY_VERSION" != "1.8.6" ]; then
+    echo "### This command only works on Ruby 1.8.6,"
+    echo "but your RUBY_VERSION appears to be $RUBY_VERSION"
+    echo "You can skip _this_ check by using \"gemstone start-debug\","
+    echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
+    echo "Use \"gemstone status\" to check that the parser is running."
+    exit 1
+  fi
   if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
@@ -100,6 +109,10 @@ status() {
   else
     echo "MagLev Parse Server is not running on port $PARSETREE_PORT"
   fi
+}
+
+version() {
+  grep GEMSTONE $MAGLEV_HOME/version.txt
 }
 
 ruby() {
@@ -196,6 +209,10 @@ startvsd() {
   $GEMSTONE/bin/vsd &
 }
 
+maglev-shell() {
+  $GEMSTONE/bin/maglev $@
+}
+
 mri() {
   export DYLD_LIBRARY_PATH=$GEMSTONE/lib32
   irb -I $MAGLEV_HOME/gci -rgci
@@ -221,10 +238,12 @@ gemstone start-parser   - Force parser process to start if it's dead
 gemstone stop           - Stop GemStone server processes
 gemstone restart        - Restart GemStone server processes
 gemstone status         - Display GemStone server status
+gemstone version        - Display GemStone version number
 gemstone preload <file> - Load and commit a file into an already running system
 gemstone force-reload   - Stop GemStone server, overwrite with empty repository!!!
 
 User Commands:
+gemstone irb            - Enter a MagLev interactive shell
 gemstone ruby  <file>   - Execute a Ruby file
 gemstone topaz          - Enter a Topaz shell
 gemstone topaz-debug    - Enter a Topaz shell useful for debugging
@@ -241,8 +260,8 @@ ENDHELP
 case "$1" in
   start)
         initialize
-        startserver
         startparser
+        startserver
         ;;
   start-parser)
         initialize
@@ -250,8 +269,8 @@ case "$1" in
         ;;
   start-debug)
         initialize
-        startserver-debug
         startparser-debug
+        startserver-debug
         ;;
   stop)
         stopserver
@@ -260,11 +279,14 @@ case "$1" in
   restart)
         stopserver
         stopparser
-        startserver
         startparser
+        startserver
         ;;
   status)
         status
+        ;;
+  version)
+        version
         ;;
   topaz)
         shift
@@ -289,6 +311,11 @@ case "$1" in
   vsd)
         startvsd
         ;;
+  irb)
+	shift
+	# in case we ever need to pass params
+        maglev-shell $@
+        ;;
   mri)
         mri
         ;;
@@ -308,7 +335,8 @@ case "$1" in
         help
         ;;
   *)
-  echo $"Usage: "
-  echo $"gemstone {start|start-debug|stop|restart|status|topaz|topaz-debug|ruby|squeak|preload|force-reload|help}"
-        exit 1
+  echo "Usage: "
+  echo "gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
+  echo "          squeak|preload|force-reload|version|help}"
+  exit 1
 esac

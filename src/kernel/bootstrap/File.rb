@@ -8,14 +8,19 @@ class File
     primitive 'read', 'next:'
     primitive 'read', 'contents'
 
-    self.class.primitive_nobridge '_fstat','fstat:isLstat:' 
-    self.class.primitive_nobridge '_stat','stat:isLstat:' 
- 
+    self.class.primitive_nobridge '_fstat','fstat:isLstat:'
+    self.class.primitive_nobridge '_stat','stat:isLstat:'
+
     self.class.primitive_nobridge '_open', 'openOnServer:mode:'
     self.class.primitive 'stdin'
     self.class.primitive 'stdout'
     self.class.primitive 'stderr'
     self.class.primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
+
+    def self.name
+      # override Smalltalk name
+      'File'
+    end
 
     def self.new(file, mode="r")
         self._open(file, mode)
@@ -31,6 +36,63 @@ class File
           f
         end
     end
+
+    def self.atime(filename)
+      File.stat(filename).atime
+    end
+
+    def self.blockdev?(filename)
+      File.stat(filename).blockdev?
+    end
+
+    def self.chardev?(filename)
+      File.stat(filename).chardev?
+    end
+
+    def self.ctime(filename)
+      File.stat(filename).ctime
+    end
+
+    def self.directory?(filename)
+      File.stat(filename).directory?
+    end
+
+    def self.file?(filename)
+      File.stat(filename).file?
+    end
+
+    def self.mtime(filename)
+      File.stat(filename).mtime
+    end
+
+    def self.pipe?(filename)
+      File.stat(filename).pipe?
+    end
+
+    def self.size(filename)
+      File.stat(filename).size
+    end
+
+    def self.size?(filename)
+      File.stat(filename).size?
+    end
+
+    def self.socket?(filename)
+      File.stat(filename).socket?
+    end
+
+    def self.sticky?(filename)
+      File.stat(filename).sticky?
+    end
+
+    def self.symlink?(filename)
+      File.stat(filename).symlink?
+    end
+
+    def self.zero?(filename)
+      File.stat(filename).zero?
+    end
+
 
     def print(*args)
         args.each {|arg| self << arg.to_s}
@@ -70,39 +132,27 @@ class File
         end
     end
 
-    self.class.primitive '_fileKind', '_fileKind:onClient:'
-    def self.blockdev?(filename)
-      _fileKind(filename, true) == 3
-    end
-    def self.chardev?(filename)
-      _fileKind(filename, true) == 2
-    end
-    def self.directory?(filename)
-      # TODO: this doesn't work if the directory is a symlink
-      _fileKind(filename, true) == 1
-    end
-    def self.file?(filename)
-      _fileKind(filename, true) == 0
-    end
-    def self.symlink?(filename)
-      # TODO: this doesn't work if the symlink points to a directory
-      _fileKind(filename, true) == 4
-    end
-
     def self.basename(filename, suffix='')
       fn = StringValue(filename)
       sf = StringValue(suffix)
       b = fn.split('/')[-1]
-      # This also works if suffix is ''
-      index = filename.rindex(suffix.eql?('.*') ? '.' : suffix)
-      return index.nil? ? filename : filename[0,index]
+      if suffix.eql?('.*')
+        index = b.rindex('.')
+      else
+        index = b.rindex(suffix)
+        if (not index.nil?) && ((index + suffix.size) != b.size)
+          index = nil
+        end
+      end
+      return index.nil? ? b : b[0,index]
     end
 
     def self.extname(filename)
       base = self.basename(filename)
-      (result = base[/\..*$/]).nil? ? '' : result
+      index = base.rindex('.')
+      return '' if index.nil? || index == (base.size - 1)
+      base[index..-1]
     end
-
 
     def self.stat(filename)
       _stat(filename, false);
@@ -117,7 +167,7 @@ class File
     end
 
     def lstat
-      File._stat(@pathName, true) 
+      File._stat(@pathName, true)
     end
 end
 
@@ -153,7 +203,6 @@ class PersistentFile
     def sync=
         @block.call.sync
     end
-
 end
 
 STDIN = $stdin = PersistentFile.new(proc{File.stdin})

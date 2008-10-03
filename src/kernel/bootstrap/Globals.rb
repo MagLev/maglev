@@ -9,7 +9,7 @@ Float=1.0e100.class
 Integer = 1152921504606846976.class.superclass
 Numeric = 1.class.superclass.superclass
 Class = self.class.class.superclass.superclass
-Hash = {}.class
+RUBY.global('Hash', 'RubyHash')
 Array = [].class
 Object = self.class
 Symbol = :primitive.class
@@ -20,7 +20,7 @@ RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('FalseClass', 'FalseClass')
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('File', 'GsFile')
-RUBY.global('FileStat', 'GsFileStat')
+RUBY.global('File__Stat', 'GsFileStat')
 RUBY.global('Socket', 'Socket')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('TCPSocket', 'TCPSocket')

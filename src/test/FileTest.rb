@@ -3,8 +3,9 @@
 $failed = []
 $count = 0
 def test(actual, expected, msg)
-    $count += 1
-    $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
+  #puts "=== Testing #{msg}"
+  $count += 1
+  $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
 end
 
 def report
@@ -13,24 +14,17 @@ def report
   raise $failed.join("\n") unless $failed.empty?
 end
 
-
 #     BEGIN TEST CASES
 
 # Tests for basename
-puts "========== A"
 test(File.basename('/home/gumby/work/ruby.rb'),        'ruby.rb', "Pickaxe A")
-puts "========== B"
 test(File.basename('/home/gumby/work/ruby.rb', '.rb'), 'ruby',    "Pickaxe B")
-puts "========== C"
 test(File.basename('/home/gumby/work/ruby.rb', '.*'),  'ruby',    "Pickaxe C")
-puts "========== D"
-
 
 test(File.basename('ruby.rb',  '.*'),  'ruby',      "GemStone A")
 test(File.basename('/ruby.rb', '.*'),  'ruby',      "GemStone B")
 test(File.basename('ruby.rbx', '.*'),  'ruby',      "GemStone C")
 test(File.basename('ruby.rbx', '.rb'), 'ruby.rbx',  "GemStone D")
-
 
 test(File.basename('ruby.rb', ''),      'ruby.rb',  "GemStone E")
 test(File.basename('ruby.rbx', '.rb*'), 'ruby.rbx', "GemStone F")
@@ -51,5 +45,27 @@ test(File.extname('test.123'),      '.123', 'GemStone extname A')
 test(File.extname('test.'),         '',     'GemStone extname B')
 test(File.extname('test. '),        '. ',   'GemStone extname C')  # ?!!h
 
+
+# Test stat based methods
+
+# First create a file with known properties
+fname = "/tmp/FileStatTest-234"
+time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
+%x{ touch -t 199910201234 #{fname} }  # create at Wed Oct 20 12:34:00 1999
+
+test(File.atime(fname), time, 'File.atime')
+test(File.blockdev?(fname), false, 'File.blockdev?')
+test(File.chardev?(fname), false, 'File.chardev?')
+#test(File.ctime(fname), , 'File.')
+test(File.directory?(fname), false, 'File.directory?')
+test(File.file?(fname), true, 'File.file?')
+test(File.mtime(fname), time, 'File.mtime')
+test(File.pipe?(fname), false, 'File.pipe?')
+test(File.size(fname), 0, 'File.size')
+test(File.size?(fname), nil, 'File.size?')
+test(File.socket?(fname), false, 'File.socket?')
+test(File.sticky?(fname), false, 'File.sticky?')
+test(File.symlink?(fname), false, 'File.symlink?')
+test(File.zero?(fname), true, 'File.zero?')
 
 report

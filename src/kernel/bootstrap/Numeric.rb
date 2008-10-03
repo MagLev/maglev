@@ -2,6 +2,12 @@
 #  Ruby Numeric is identically  Smalltalk Number
 
 class Numeric
+
+  def self.name
+    # override Smalltalk name
+    :Numeric
+  end
+
 	primitive '<=>', '_rubyCompare:'
 
 # unaries  +@  -@  eliminated during IR generation by compiler

@@ -56,7 +56,7 @@ class String
   # PERFORMANCE: String#== could use help
   primitive '==', '='  # TODO: this is incorrect...
   #   def ==(other)
-  #     if other.kind_of?(String)
+  #     if (other._isString )
   #       (self <=> other) == 0
   #     elsif other.respond_to? :to_str
   #       other == str
@@ -231,14 +231,15 @@ class String
     # TODO: Figure out how to pass something more complex than a method name
     # to coerce_to.  A proc? A proc or a symbol?
     #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
-    knd = pattern._kindBlkStrRanRegAry
-    if (knd.equal?(2) )  # if pattern.kind_of?(Regexp)
+    if ( pattern._isRegexp  )  # if pattern.kind_of?(Regexp)
       regexp = pattern
-    elsif pattern.respond_to?(:to_str)
+    else 
       # TODO more optimization of coerce here
-      regexp = Regexp.new(pattern.to_str)
-    else
-      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      begin
+        regexp = Regexp.new(pattern.to_str)
+        rescue StandardError
+          raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      end
     end
     regexp.match self
   end
@@ -261,7 +262,8 @@ class String
     return nil if self.empty?
     # TODO: Need to coerce to string....
     # arg = StringValue(arg) unless [Fixnum, String, Regexp].include?(arg.class)
-    return (result = _lastSubstring(item, offset + 1)) == 0 ? nil : result - 1
+    result = _lastSubstring(item, offset + 1)
+    return  result == 0 ? nil : result - 1
 
     # TODO: support for when item is a regexp
     # TODO: support for when item is an int ("character")
@@ -454,7 +456,7 @@ class String
     padstr = StringValue(padstr)
     raise ArgumentError, "zero width padding" if padstr.size.equal?(0)
 
-    width = Type.coerce_to(width, Integer, :to_int) unless width.kind_of? Fixnum
+    width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
     sz = size
     if width > sz
       padsize = width - sz
