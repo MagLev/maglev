@@ -1,22 +1,27 @@
 Quick Start:
 
-You can run everything in MagLev using the 'gemstone' bash script in the bin subdirectory.
+You can run everything in MagLev using the 'gemstone' bash script in the 
+bin subdirectory.
+
 For best results, set MAGLEV_HOME, and add $MAGLEV_HOME/bin to your PATH
 
 Usage:
-gemstone {start|start-debug|stop|restart|status|topaz|ruby|squeak|preload|force-reload|help}
+gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
+          squeak|preload|force-reload|version|help}
 
-First, control the GemStone server from one terminal session:
+To control the GemStone server:
 gemstone start          - Start GemStone server processes
 gemstone start-debug    - Start GemStone server processes with verbose output
 gemstone start-parser   - Force parser process to start if it's dead
 gemstone stop           - Stop GemStone server processes
 gemstone restart        - Restart GemStone server processes
 gemstone status         - Display GemStone server status
+gemstone version        - Display GemStone version number
 gemstone preload <file> - Load and commit a file into an already running system
-gemstone force-reload   - Stop GemStone server, overwrite with empty repository!!!
+gemstone force-reload   - Stop GemStone server, replace with empty repository!!!
 
-Next, in a second terminal session, run other gemstone commands:
+To execute other gemstone commands:
+gemstone irb            - Enter a MagLev interactive shell
 gemstone ruby  <file>   - Execute a Ruby file
 gemstone topaz          - Enter a Topaz shell
 gemstone topaz-debug    - Enter a Topaz shell useful for debugging 
@@ -25,15 +30,17 @@ gemstone vsd            - Start Visual Statistics Display monitoring tool
 gemstone help           - Display this text
 
 Note:
-- set MAGLEV_HOME to the full path of this directory, and add $MAGLEV_HOME/bin to your PATH. 
-    Then you can use "gemstone ruby" etc from anywhere.
+- set MAGLEV_HOME to the full path of this directory, 
+      and add $MAGLEV_HOME/bin to your PATH. 
+      Then you can use "gemstone ruby" etc from anywhere.
 - if you have multiple installations, set PARSETREE_PORT to control 
-    which port the parser server listens on
-- the first (and ony the first) time you run a gemstone command that runs Ruby code, 
-    it will load and compile prims.rb, which takes up to a minute to run.
-- gemstone ruby prints a topaz banner every time it is run. This will be fixed in a
-    future release. If you run "gemstone topaz" and then "maglev" you'll be in an irb-like
-    environment, and you won't get a banner on every command.
+      which port the parser server listens on
+- the first (and ony the first) time you run a gemstone command
+      that runs Ruby code, 
+      it will load and compile prims.rb, which takes up to a minute to run.
+- gemstone ruby prints a topaz banner every time it is run. 
+      You can use "gemstone irb" instead, but it will make errors
+      more difficult to debug, as they won't return to Topaz.
  
 Ruby code:
 - src/ and src/lib/ are both on the require path

@@ -226,7 +226,7 @@ gemstone preload <file> - Load and commit a file into an already running system
 gemstone force-reload   - Stop GemStone server, overwrite with empty repository!!!
 
 User Commands:
-gemstone irb            - Enter a MagLev shell
+gemstone irb            - Enter a MagLev interactive shell
 gemstone ruby  <file>   - Execute a Ruby file
 gemstone topaz          - Enter a Topaz shell
 gemstone topaz-debug    - Enter a Topaz shell useful for debugging
@@ -318,7 +318,8 @@ case "$1" in
         help
         ;;
   *)
-  echo $"Usage: "
-  echo $"gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|squeak|preload|force-reload|version|help}"
-        exit 1
+  echo "Usage: "
+  echo "gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
+  echo "          squeak|preload|force-reload|version|help}"
+  exit 1
 esac
