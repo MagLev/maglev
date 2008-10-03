@@ -118,13 +118,21 @@ spec() {
   $TOPAZ_CMD <<ENDSPEC
 output push spec.out
 run
+| stream |
+stream := WriteStream on: String new.
 RubyContext load.
 RubyContext requireFileNamed: 'mspec.rb'.
 RubyCompiler new evaluateString: '\$formatter = DottedFormatter.new; \$formatter.register'.
 ('$*' findTokens: Character space) allButFirst do:
     [:ea |
-    RubyContext loadFileNamed: '$WD/', ea].
-RubyCompiler new evaluateString: '\$formatter.finish'
+        [
+            RubyContext loadFileNamed: '$WD/', ea.
+        ] on: Exception do:[:ex |
+            stream nextPutAll: '<failed with error, ', ex asString, ' >'; cr.
+        ].
+    ].
+RubyCompiler new evaluateString: '\$formatter.finish'.
+stream contents.
 %
 exit
 ENDSPEC
