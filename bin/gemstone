@@ -102,6 +102,10 @@ status() {
   fi
 }
 
+version() {
+  grep GEMSTONE $MAGLEV_HOME/version.txt
+}
+
 ruby() {
   FILE=$PWD/$2
   $TOPAZ_CMD <<ENDRUBY
@@ -188,6 +192,10 @@ startvsd() {
   $GEMSTONE/bin/vsd &
 }
 
+maglev-shell() {
+  $GEMSTONE/bin/maglev $@
+}
+
 mri() {
   export DYLD_LIBRARY_PATH=$GEMSTONE/lib32
   irb -I $MAGLEV_HOME/gci -rgci
@@ -213,10 +221,12 @@ gemstone start-parser   - Force parser process to start if it's dead
 gemstone stop           - Stop GemStone server processes
 gemstone restart        - Restart GemStone server processes
 gemstone status         - Display GemStone server status
+gemstone version        - Display GemStone version number
 gemstone preload <file> - Load and commit a file into an already running system
 gemstone force-reload   - Stop GemStone server, overwrite with empty repository!!!
 
 User Commands:
+gemstone irb            - Enter a MagLev shell
 gemstone ruby  <file>   - Execute a Ruby file
 gemstone topaz          - Enter a Topaz shell
 gemstone topaz-debug    - Enter a Topaz shell useful for debugging
@@ -258,6 +268,9 @@ case "$1" in
   status)
         status
         ;;
+  version)
+        version
+        ;;
   topaz)
         shift
         # pass params so we can execute 'gemstone topaz -T200000'
@@ -281,6 +294,11 @@ case "$1" in
   vsd)
         startvsd
         ;;
+  irb)
+	shift
+	# in case we ever need to pass params
+        maglev-shell $@
+        ;;
   mri)
         mri
         ;;
@@ -301,6 +319,6 @@ case "$1" in
         ;;
   *)
   echo $"Usage: "
-  echo $"gemstone {start|start-debug|stop|restart|status|topaz|topaz-debug|ruby|squeak|preload|force-reload|help}"
+  echo $"gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|squeak|preload|force-reload|version|help}"
         exit 1
 esac
