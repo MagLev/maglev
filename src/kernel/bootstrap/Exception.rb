@@ -31,52 +31,103 @@ class Exception
     end
 end
 
-class LoadError
-  def self.name
-    # override Smalltalk name
-    'LoadError'
-  end
-end
 
 class SystemExit
   def self.name
-    # override Smalltalk name
-    'SystemExit'
+    'SystemExit'  # override Smalltalk name
+  end
+end
+
+class SystemStackExit
+  def self.name
+    'SystemStackExit' # override Smalltalk name
+  end
+end
+
+class NoMemoryError
+  def self.name
+    'NoMemoryError' # override Smalltalk name
+  end
+end
+class ScriptError
+  def self.name
+    'ScriptError' # override Smalltalk name
+  end
+end
+class LoadError
+  def self.name
+    'LoadError' # override Smalltalk name
+  end
+end
+class NotImplementedError
+  def self.name
+    'NotImplementedError' # override Smalltalk name
+  end
+end
+class SyntaxError
+  def self.name
+    'SyntaxError' # override Smalltalk name
   end
 end
 
 class StandardError
   def self.name
-    # override Smalltalk name
-    'StandardError'
+    'StandardError' # override Smalltalk name
   end
 end
 
 class EBADF
   def self.name
-    # override Smalltalk name
-    'EBADF'
+    'EBADF' # override Smalltalk name
   end
 end
 
 class ENOTCONN
   def self.name
-    # override Smalltalk name
-    'ENOTCONN'
+    'ENOTCONN' # override Smalltalk name
   end
 end
 
 class EPIPE
   def self.name
-    # override Smalltalk name
-    'EPIPE'
+    'EPIPE' # override Smalltalk name
   end
 end
 
 class ECONNRESET
   def self.name
-    # override Smalltalk name
-    'ECONNRESET'
+    'ECONNRESET' # override Smalltalk name
+  end
+end
+
+class IndexError
+  def self.name
+    'IndexError' # override Smalltalk name
+  end
+end
+class LocalJumpError
+  def self.name
+    'LocalJumpError' # override Smalltalk name
+  end
+end
+class FloatDomainError
+  def self.name
+    'FloatDomainError' # override Smalltalk name
+  end
+end
+class ZeroDivisionError
+  def self.name
+    'ZeroDivisionError' # override Smalltalk name
+  end
+end
+class NoMethodError
+  def self.name
+    'NoMethodError' # override Smalltalk name
+  end
+end
+class SignalException
+  def self.name
+    'SignalException' # override Smalltalk name
   end
 end
 

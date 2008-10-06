@@ -1,8 +1,7 @@
 class Regexp
-    primitive 'search', '_search:from:to:'
-    primitive 'compile', '_compile:options:'
-    primitive 'source', 'source'
-    self.class.primitive 'alloc', '_basicNew'
+    primitive_nobridge '_search', '_search:from:to:'
+    primitive_nobridge '_compile', '_compile:options:'
+    # self.class.primitive_nobridge 'alloc', '_basicNew'
 
     def initialize(str, options, lang)
         if options._isInteger   # options.kind_of? Integer
@@ -15,15 +14,14 @@ class Regexp
 
     def match(str)
         return nil unless str && str.length > 0
-        $~ = search(str, 0, nil)
-=begin
-#needed by racc
-        if $~
-            $& = $~[0]
-            $' = $~.post_match
-            $` = $~.pre_match
-        end
-=end
+        # search primitive automatically sets $~ 
+        return _search(str, 0, nil)
+# TODO more fixes
+#       if $~
+#           # $& = $~[0]
+#           # $' = $~.post_match
+#           # $` = $~.pre_match
+#       end
         return $~
     end
 
@@ -37,7 +35,7 @@ class Regexp
     def each_match(str, &block)
         pos = 0
         while(pos < str.length)
-            $~ = match = search(str, pos, nil)
+            $~ = match = _search(str, pos, nil)
             return unless match
             pos = match.end(0)
             if match.begin(0) == pos
@@ -85,7 +83,7 @@ class Regexp
     # TODO: limit is not used....
     def _split_string(string, limit)
         result = []
-        if self.source == ""
+        if @source == ""
           slim = string.size
           i = 0
           while i < slim
@@ -115,6 +113,10 @@ class MatchData
 
     def end(group)
         at((group*2)+2)
+    end
+
+    def length
+      size / 2
     end
 
     def string

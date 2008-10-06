@@ -45,6 +45,9 @@ end
  unless y == [1,2,5] then raiseErr end
  unless x == [1,2,5,3,4] then raiseErr end
  
-
+ x = [ 9, 8, 7]
+ a , b, * = x[0]
+ unless a == 9 then raiseErr end
+ unless b == nil then raiseErr end
 
  true

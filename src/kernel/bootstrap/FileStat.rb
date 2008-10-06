@@ -1,11 +1,13 @@
 #
-# FileStat in Ruby is identically Smalltalk GsFileStat
+# File::Stat in Ruby is identically Smalltalk GsFileStat
 
-class FileStat
+class File::Stat
+
+  include Comparable
 
   def self.name
-    # override Smalltalk name
-    'FileStat'
+   # override Smalltalk name
+    'File::Stat'
   end
 
   # POSIX constants for accessing the mode field

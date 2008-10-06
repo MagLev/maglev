@@ -62,7 +62,6 @@ class Object
     primitive 'respond_to?', 'rubyRespondsTo:'
 
     primitive 'print_line', 'rubyPrint:'
-    primitive 'to_s', 'asString'
 
     # pause is not standard Ruby, for debugging only .
     #  trappable only by an Exception specifying exactly error 6001
@@ -80,6 +79,9 @@ class Object
         end
     end
 
+    def to_s
+      self.class.name.to_s
+    end
 
     def to_str
         to_s

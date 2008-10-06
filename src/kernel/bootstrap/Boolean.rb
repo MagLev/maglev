@@ -30,12 +30,23 @@ end
 #     which returns either TrueClass or FalseClass 
 
 class Boolean
-  primitive 'not'
-
-  primitive 'inspect', 'asString'
   primitive '^', '_rubyXor:'
 
   primitive '&', '_rubyAnd:'
 
   primitive '|' , '_rubyOr:'
+
+  primitive 'not'
+
+  def inspect 
+    to_s
+  end
+
+  def to_s
+    if (self)
+      return 'true'
+    else
+      return 'false'
+    end
+  end
 end

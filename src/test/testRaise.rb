@@ -82,4 +82,17 @@ begin
     raise 'ERR'
   end
 end
+
+begin
+  a = 99
+  begin
+    a.frob
+    rescue NoMethodError => ex 
+      puts 'rescue ' , ex
+      a = 97
+  end    
+  unless a == 97
+     raise 'ERR'
+  end
+end
 true
