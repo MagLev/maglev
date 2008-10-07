@@ -18,7 +18,26 @@ class Hash
   self.class.primitive_nobridge 'new', 'new:'
   self.class.primitive_nobridge 'new&', 'new:'
   self.class.primitive 'new'
-  # MNI: def self.[](*elements)
+
+  def self.[](*elements)
+    numelem = elements.length
+    if ((numelem & 1) != 0)
+      if (numelem.equal?(1) )
+        first = elements[0]
+        if (first._isHash) 
+          return first.dup
+        end
+      end
+      raise ArgumentError , 'odd number of args'
+    end
+    n = 0
+    res = self.new
+    while (n < numelem) 
+      res[ elements[n] ] = elements[n + 1]
+      n += 2
+    end
+    res
+  end
 
   def self.name
     # override Smalltalk name
@@ -27,7 +46,23 @@ class Hash
 
   # Instance Methods
 
-  primitive_nobridge '==', '='
+  def ==(other)
+    unless other._isHash
+      other = other.to_hash
+    end
+    unless other.length == self.length
+      return false
+    end
+    unless other.default == self.default
+      return false
+    end 
+    each { |k,v| 
+       unless other[k] == v 
+         return false 
+       end
+    }
+    true
+  end
 
   primitive_nobridge '[]', 'at:'
   primitive_nobridge '[]=', 'at:put:'
@@ -151,7 +186,7 @@ class Hash
 
   def select()
     result = []
-    each { |k,v| result <<[k,v] if yield(k, v) }
+    each { |k,v| result << [k,v] if yield(k, v) }
     result
   end
 
@@ -174,7 +209,9 @@ class Hash
   primitive  'store', 'at:put:'
 
   def to_a
-    select { true }
+    result = []
+    each { |k,v| result << [k,v] }
+    result
   end
 
   def to_hash

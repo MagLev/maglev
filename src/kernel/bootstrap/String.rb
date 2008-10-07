@@ -67,7 +67,7 @@ class String
 
 #  alias === ==
 
-  # =~ is implemented somewhere....
+  # =~ is  translated to  :match  Sexpression by parser ...
 
   primitive_nobridge '[]' , '_rubyAt:'
   primitive_nobridge '[]' , '_rubyAt:length:'

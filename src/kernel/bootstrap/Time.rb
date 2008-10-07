@@ -146,7 +146,7 @@ class Time
       isdst = args[7] ? 1 : 0
     else
       # resolve month names to numbers
-      if args[0] && (args[0].kind_of?(String) || args[0].respond_to?(:to_str))
+      if args[0] && (args[0]._isString || args[0].respond_to?(:to_str))
         args[0] = args[0].to_str if args[0].respond_to?(:to_str)
         month = MonthValue[args[0].upcase] || args[0].to_i || raise(ArgumentError.new('argument out of range'))
       end
