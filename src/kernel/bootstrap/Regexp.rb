@@ -26,7 +26,7 @@ class Regexp
   end
 
   def match_from(str, count)
-    return nil if str.nil?
+    return nil if str.nil? || count >= str.size
     search_region(str, count, str.size, true)
   end
   # END RUBINIUS
@@ -159,4 +159,3 @@ class Regexp
     result
   end
 end
-

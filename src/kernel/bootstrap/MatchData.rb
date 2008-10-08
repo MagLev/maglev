@@ -3,6 +3,17 @@ class MatchData
   primitive_nobridge '[]' , '_rubyAt:'
   primitive '[]' , '_rubyAt:length:'
 
+#   def inspect
+#     matches = []
+#     i = 0
+#     lim = length
+#     while i < lim
+#       matches << "'#{@inputString[self.begin(i), self.end(i)]}'"
+#       i += 1
+#     end
+#     "MatchData: pre_match='#{pre_match}', [#{matches.join(',')}], post_match='#{post_match}'"
+#   end
+
   def begin(group)
     at((group*2)+1)
   end
@@ -11,13 +22,14 @@ class MatchData
     at((group*2)+2)
   end
 
+  primitive 'size', 'size'
   def length
     size / 2
   end
 
   def pre_match
     res = @strPreceedingMatch
-    if (res.equal?(nil)) 
+    if (res.equal?(nil))
       res = @inputString[0..self.begin(0)-1]
       @strPreceedingMatch = res
     end
@@ -46,41 +58,34 @@ class MatchData
 
   # BEGIN RUBINIUS
 
-  def full; self.at(1); end  # GEMSTONE
-
   def collapsing?
-    self.begin(0) == self.end(0)
+    r = self.begin(0) == self.end(0)
+    puts "'#{self.string}'.collapsing?: #{r} self.begin(0) #{self.begin(0)} self.end(0) #{self.end(0)}"
+    r
   end
 
   def pre_match_from(idx)
-#    return "" if full.at(0) == 0
-    return "" if full == 0  # GEMSTONE
-    nd = full.at(0) - 1
-#    @source[idx, nd-idx+1]
-    @inputString[idx, nd-idx+1]   # GEMSTONE
+    return "" if self.begin(0) == 0 # GEMSTONE
+    pre_end = self.begin(0) - 1
+    @inputString[idx, pre_end-idx+1]
   end
 
-  def captures
+  def captures  # GEMSTONE modified loop from each {...} to while
     out = []
-
-#  TODO: WIP: finish
-#     @region.each do |tup|
-
-
-#       x = tup.at(0)
-
-#       if x == -1
-#         out << nil
-#       else
-#         y = tup.at(1)
-# #        out << @source[x, y-x]
-#         out << source[x, y-x]  # GEMSTONE
-#       end
-#     end
+    i = 0
+    lim = length
+    while i < lim
+      x = self.begin(i)
+      if x == -1
+        out << nil
+      else
+        y = self.end(i)
+        out << @inputString[x, y-x]  # GEMSTONE
+      end
+      i += 1
+    end
     return out
   end
-
-
   # END RUBINIUS
 
 end

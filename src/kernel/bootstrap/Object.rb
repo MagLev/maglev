@@ -24,7 +24,7 @@ class Object
     primitive_nobridge '_isRegexp', '_isRegexp'
     primitive_nobridge '_isRange', '_isRange'
     # end special sends
-  
+
     #  private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
     primitive_nobridge '_each&', '_rubyEach:'
@@ -54,7 +54,7 @@ class Object
     primitive_nobridge '__send__', 'rubySend:'
     primitive_nobridge '__send__&', 'rubySend:withBlock:'
     primitive          '__send__*', 'rubySend:withArguments:'
-  
+
     primitive 'dup', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
@@ -139,7 +139,7 @@ class Object
     def ===(obj)
         self == obj
     end
- 
+
     def gets(sep="\n")
         $stdin.gets(sep)
     end
@@ -156,6 +156,24 @@ class Object
     def eval(str)
         RUBY.module_eval(str, Object)
     end
+
+    def eql?(other)
+      self == other
+    end
+
+    # BEGIN RUBINIUS
+    def instance_of?(cls)
+      # TODO: Object#instance_of?: Uncomment parameter checks when (A)
+      # Module is installed in the globals dict and class comparison is
+      # working properly.
+#       if cls.class != Class and cls.class != Module
+#         # We can obviously compare against Modules but result is always false
+#         raise TypeError, "instance_of? requires a Class argument"
+#       end
+
+      self.class.equal?(cls)
+    end
+    # END RUBINIUS
 
   #  uses Behavior>>rubyModuleFunction:, which for specified selector,
   #    for each variant existing in receiver, installs an env1 meth dict

@@ -233,7 +233,7 @@ class String
     #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
     if ( pattern._isRegexp  )  # if pattern.kind_of?(Regexp)
       regexp = pattern
-    else 
+    else
       # TODO more optimization of coerce here
       begin
         regexp = Regexp.new(pattern.to_str)
@@ -305,10 +305,91 @@ class String
   end
 
   def split(pattern=nil, limit=nil)
+    # BEGIN RUBINIUS
     return [] if empty?
+
+    if limit
+      if !limit.kind_of?(Integer) and limit.respond_to?(:to_int)
+        limit = limit.to_int
+      end
+
+      if limit > 0
+        return [self.dup] if limit == 1
+        limited = true
+      else
+        limited = false
+      end
+    else
+      limited = false
+    end
+
     pattern ||= ($; || " ")
 
-    pattern._split_string(self, limit)
+    if pattern == ' '
+      spaces = true
+      pattern = /\s+/
+    elsif pattern.nil?
+      pattern = /\s+/
+    elsif pattern.kind_of?(Regexp)
+      # Pass
+    else
+      pattern = StringValue(pattern) unless pattern.kind_of?(String)
+      pattern = Regexp.new(Regexp.quote(pattern))
+    end
+
+    start = 0
+    ret = []
+
+    last_match = nil
+
+    while match = pattern.match_from(self, start)
+      break if limited && limit - ret.size <= 1
+
+      collapsed = match.collapsing?
+#      puts "=== LOOP: collapsed=#{collapsed}  match=#{match.inspect}"
+      if !collapsed || (match.begin(0) != 0)
+        ret << match.pre_match_from(last_match ? last_match.end(0) : 0)
+        ret.push(*match.captures.compact)
+      end
+
+      if collapsed
+        start += 1
+      elsif last_match && last_match.collapsing?
+        start = match.end(0) + 1
+      else
+        start = match.end(0)
+      end
+
+      last_match = match
+    end
+
+    if last_match
+      ret << last_match.post_match
+    elsif ret.empty?
+      ret << self.dup
+    end
+
+    # Trim from end
+    if !ret.empty? and (limit == 0 || limit.nil?)
+      while s = ret.last and s.empty?
+        ret.pop
+      end
+    end
+
+    # Trim from front
+    if !ret.empty? and spaces
+      while s = ret.first and s.empty?
+        ret.shift
+      end
+    end
+
+    # Support subclasses
+    ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
+
+    # Taint all
+    ret = ret.map { |str| str.taint } if self.tainted?
+
+    ret
   end
 
   def _split_string(string, limit)
