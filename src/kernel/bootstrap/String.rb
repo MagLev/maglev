@@ -207,7 +207,6 @@ class String
   def insert(index, string)
     # account for smalltalk index
     idx = index < 0 ? index + size + 2 : index + 1
-    puts "==== index #{index}  idx #{idx}"
     raise IndexError, "index #{index} out of string" if idx <= 0 || idx > size + 1
     _insertAllAt(string, idx) # Flip order of parameters
     self
@@ -346,7 +345,7 @@ class String
       break if limited && limit - ret.size <= 1
 
       collapsed = match.collapsing?
-#      puts "=== LOOP: collapsed=#{collapsed}  match=#{match.inspect}"
+
       if !collapsed || (match.begin(0) != 0)
         ret << match.pre_match_from(last_match ? last_match.end(0) : 0)
         ret.push(*match.captures.compact)
