@@ -348,7 +348,8 @@ class String
 
       if !collapsed || (match.begin(0) != 0)
         ret << match.pre_match_from(last_match ? last_match.end(0) : 0)
-        ret.push(*match.captures.compact)
+        #ret.push(*match.captures.compact)
+        ret.concat(match.captures.compact) # GEMSTONE
       end
 
       if collapsed
@@ -362,7 +363,8 @@ class String
       last_match = match
     end
 
-    if last_match
+#    if last_match
+    if last_match && ! last_match.post_match.nil?  # GEMSTONE
       ret << last_match.post_match
     elsif ret.empty?
       ret << self.dup
