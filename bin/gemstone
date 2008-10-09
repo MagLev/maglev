@@ -103,7 +103,7 @@ status() {
   $GEMSTONE/bin/gslist -clv
   if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
     echo "MagLev Parse Server port = $PARSETREE_PORT"
-    lsof -P -iTCP:${PARSETREE_PORT}
+    lsof -P -w -iTCP:${PARSETREE_PORT}
     # if you don't have permission to run lsof, use the following instead
     # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
   else

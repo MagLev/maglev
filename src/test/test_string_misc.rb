@@ -28,8 +28,8 @@ test 'abc'.rindex(''),       3,   "GemStone rindex G"
 test 'ruby.rbx'.rindex('x'), 7,   "GemStone rindex H"  # Regression
 test 'rubx.rbx'.rindex('x'), 7,   "GemStone rindex I"  # Regression
 
-# s = "-rw-r--r--  1 650  0  0 Oct 20  1999 /tmp/FileStatTest-234\n"
-# test s.split, ["-rw-r--r--", "1", "650", "0", "0", "Oct", "20", "1999", "/tmp/FileStatTest-234"], "GemStone split A"
+s = "-rw-r--r--  1 650  0  0 Oct 20  1999 /tmp/FileStatTest-234\n"
+#test s.split, ["-rw-r--r--", "1", "650", "0", "0", "Oct", "20", "1999", "/tmp/FileStatTest-234"], "GemStone split A"
 
 # test(" now's   the time".split,      ["now's", "the", "time"],  "PA split A")
 # test(" now's   the time".split(' '), ["now's", "the", "time"],  "PA split B")
