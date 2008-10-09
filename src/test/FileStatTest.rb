@@ -42,7 +42,7 @@ test(stat.gid, `ls -ln #{fname}`.split[3].to_i, 'gid')
 test(stat.ino, `ls -i #{fname}`.split[0].to_i, 'ino')
 test(stat.mode, 33188, 'mode')  # TODO: depends on umask....
 test(stat.mtime, time, 'mtime')
-#test(stat.nlink, `ls -l #{fname}`.split[1].to_i, 'nlink') # TODO: broken due to String#split bug
+test(stat.nlink, `ls -l #{fname}`.split[1].to_i, 'nlink')
 #test(stat.owned?, '', 'owned?')
 #test(stat.pipe?, '', 'pipe?')
 test(stat.rdev, 0, 'rdev')
@@ -76,7 +76,7 @@ test(dir_stat.sticky?, true, 'sticky? on sticky dir')
 
 
 test(stat.symlink?, false, 'symlink?')
-#test(stat.uid, `ls -ln #{fname}`.split[2].to_i, 'uid') # TODO: broken due to String#split bug
+test(stat.uid, `ls -ln #{fname}`.split[2].to_i, 'uid')
 #test(stat.writable?, true, 'writable?')
 #test(stat.writable_real?, true, 'writable_real?')
 test(stat.zero?, true, 'zero?')
