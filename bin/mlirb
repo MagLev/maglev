@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+# Runs the equivalent of "gemstone irb"
+
+COMMAND="`basename $0`"
+
+usage()
+{
+cat << EOF
+Usage: `basename $0` [options]
+
+    Open a maglev shell
+
+OPTIONS:
+   -d      Run in debugging mode
+   -h      Show this message
+   -v      Print version number
+EOF
+}
+
+# Make sure MAGLEV_HOME is set
+if [ -z "${MAGLEV_HOME}" ]; then
+    echo "\$MAGLEV_HOME is not set."
+    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
+    exit 1
+fi
+# Make sure GEMSTONE is set
+if [ -z "${GEMSTONE}" ]; then
+    export GEMSTONE=$MAGLEV_HOME/gemstone
+    # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
+fi
+# Check for topaz command to validate the $GEMSTONE directory
+### -- after maglev binary is renamed irb we can use irb instead
+if [ ! -x $GEMSTONE/bin/topaz ]; then
+    echo "$GEMSTONE is not a valid GemStone product directory"
+    echo "To fix this, set a valid GEMSTONE in your .bashrc"
+    exit 1
+fi
+
+# Environment variable settings
+export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+# Use irb binary if available, otherwise use maglev
+### -- after maglev binary is renamed irb, change this
+if [ -x $GEMSTONE/bin/irb ]; then
+    IRB_CMD="$GEMSTONE/bin/irb"
+else
+    IRB_CMD="$GEMSTONE/bin/maglev"
+fi
+
+# Check options
+while getopts 'hdv' OPTION
+do
+    case $OPTION in
+        d)
+            ### We need to replace this with a real way to debug using irb
+            IRB_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+            ;;
+        h)
+            usage
+            exit
+            ;;
+        v)
+            grep GEMSTONE $MAGLEV_HOME/version.txt
+            exit
+            ;;
+        ?)
+            echo
+            usage
+            exit
+            ;;
+     esac
+done
+shift $(($OPTIND - 1))
+
+# Make sure we don't have any arguments
+if [ $# -ne 0 ]; then
+    echo "Error: $COMMAND does not allow any arguments."
+    usage
+    exit
+fi
+
+# Finally, execute the command
+$IRB_CMD
+
+exit

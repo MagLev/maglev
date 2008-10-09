@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+# Runs the equivalent of "gemstone ruby"
+
+COMMAND="`basename $0`"
+
+usage()
+{
+cat << EOF
+Usage: `basename $0` [options] <filename>
+
+    Execute a Ruby file
+
+OPTIONS:
+   -d      Run in debugging mode
+   -h      Show this message
+   -v      Print version number
+EOF
+}
+
+# Make sure MAGLEV_HOME is set
+if [ -z "${MAGLEV_HOME}" ]; then
+    echo "\$MAGLEV_HOME is not set."
+    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
+    exit 1
+fi
+# Make sure GEMSTONE is set
+if [ -z "${GEMSTONE}" ]; then
+    export GEMSTONE=$MAGLEV_HOME/gemstone
+    # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
+fi
+# Check for topaz command to validate the $GEMSTONE directory
+### -- after maglev binary is renamed irb we can use irb instead
+if [ ! -x $GEMSTONE/bin/topaz ]; then
+    echo "$GEMSTONE is not a valid GemStone product directory"
+    echo "To fix this, set a valid GEMSTONE in your .bashrc"
+    exit 1
+fi
+
+# Environment variable settings
+export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+
+# Check options
+while getopts 'hdv' OPTION
+do
+    case $OPTION in
+        d)
+            ### We need to replace this with a real way to debug using TOPAZ
+            export TOPAZ_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+            ;;
+        h)
+            usage
+            exit
+            ;;
+        v)
+            grep GEMSTONE $MAGLEV_HOME/version.txt
+            exit
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+     esac
+done
+shift $(($OPTIND - 1))
+
+# Make sure we have one argument
+if [ $# -ne 1 ]; then
+    echo "Error: $COMMAND requires exctly one filename as an argument."
+    usage
+    exit
+    exit 1
+fi
+# Make sure the argument is a valid file
+if [ ! -e $1 ]; then
+    echo "Error: The file \"$1\" does not exist"
+    exit 1
+fi
+
+# Finally, execute the command
+FILE=$PWD/$1
+$TOPAZ_CMD <<ENDRUBY 
+run
+RubyContext load.
+RubyContext loadFileNamed: '$FILE'.
+%
+exit
+ENDRUBY
+
+exit
