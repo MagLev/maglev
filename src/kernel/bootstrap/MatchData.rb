@@ -4,18 +4,31 @@ class MatchData
   primitive '[]' , '_rubyAt:length:'
 
   def inspect
-    matches = []
-    i = 0
-    lim = length
-    while i < lim
-      matches << "'<#{self.begin(i)}, #{self.end(i)}>: #{@inputString[self.begin(i), self.end(i)]}'"
-      i += 1
-    end
-    "MatchData: pre_match='#{pre_match}', [#{matches.inspect}], post_match='#{post_match}'"
+    matches = [self[0]].concat(self.captures)
+    "MatchData: #{matches.inspect}"
+  end
+
+  def to_a
+    _captures([self[0]])
+  end
+
+  def to_s
+    self[0].to_s
   end
 
   def begin(group)
     at((group*2)+1)
+  end
+
+  def values_at(*indicies)
+    result = []
+    i = 0
+    lim = indicies.length
+    while i < lim
+      result << self[indicies[i]]
+      i += 1
+    end
+    result
   end
 
   def end(group)
@@ -71,22 +84,26 @@ class MatchData
   end
 
   def captures  # GEMSTONE modified loop from each {...} to while
-    out = []
-    i = 1   # Captures do NOT include $0
+    _captures([])
+  end
+
+  # END RUBINIUS
+
+  # Append the captures (all but $&) to ary
+  def _captures(ary)
+    i = 1   # Captures do NOT include $& (the entire matched string)
     lim = length
     while i < lim
       x = self.begin(i)
       if x == -1
-        out << nil
+        ary << nil
       else
         y = self.end(i)
-        out << @inputString[x, y-x]  # GEMSTONE
+        ary << @inputString[x, y-x]  # GEMSTONE
       end
       i += 1
     end
-    return out
+    ary
   end
-  # END RUBINIUS
-
 end
 
