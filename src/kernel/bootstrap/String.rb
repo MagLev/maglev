@@ -348,8 +348,7 @@ class String
 
       if !collapsed || (match.begin(0) != 0)
         ret << match.pre_match_from(last_match ? last_match.end(0) : 0)
-        #ret.push(*match.captures.compact)
-        ret.concat(match.captures.compact) # GEMSTONE
+        ret.push(*match.captures.compact)
       end
 
       if collapsed
@@ -383,6 +382,14 @@ class String
         ret.shift
       end
     end
+
+    # BEGIN GEMSTONE
+    # If we are matching the empty string, and we have matches, then
+    # we need to tack on the trailing empty string match.
+    if ret && limit && limit < 0 && last_match && last_match.collapsing?
+      ret << ''
+    end
+    # END GEMSTONE
 
     # Support subclasses
     ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
