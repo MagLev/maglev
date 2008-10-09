@@ -39,10 +39,10 @@ test("a@1bb@2ccc".split(/@\d/),     ["a", "bb", "ccc"],           "PA split D")
 test("a@1bb@2ccc".split(/@(\d)/),   ["a", "1", "bb", "2", "ccc"], "PA split E")
 test("1, 2.34,56, 7".split(/,\s*/), ["1", "2.34", "56", "7"],     "PA split F")
 
-#test("hello".split(//),      ["h", "e", "l", "l", "o"], "PA split G")
-#test("hello".split(//, 3),   ["h", "e", "llo"],         "PA split H")
-# test("hi mom".split(/\s*/),  ["h", "i", "m", "o", "m"], "PA split I")
-# test("".split,               [],                        "PA split J")
+test("hello".split(//),      ["h", "e", "l", "l", "o"], "PA split G")
+test("hello".split(//, 3),   ["h", "e", "llo"],         "PA split H")
+test("hi mom".split(/\s*/),  ["h", "i", "m", "o", "m"], "PA split I")
+test("".split,               [],                        "PA split J")
 
 test "mellow yellow".split("ello"), ["m", "w y", "w"], "PA split J"
 
