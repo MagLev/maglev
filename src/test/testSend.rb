@@ -70,11 +70,28 @@ o.doSend2arr(a)
 o.doSend2b( :meth2arr , a )
 o.doSend0Arr
 
+b = o.respond_to?( :doSend2b )
+unless b.equal?(true)  
+  raise 'ERR'
+end
+c = o.respond_to?( :doSend2b, false )
+unless c.equal?(true) 
+  raise 'ERR'
+end
+c = o.respond_to?( :doSend2bfoo, false )
+unless c.equal?(false) 
+  raise 'ERR'
+end
+
+
+
 # call to a method with default value assign to arg
 s = 'abc'
 w = s.ljust(5)
 unless w = 'abc  '
   raise 'ERR'
 end
+
+
 
 true

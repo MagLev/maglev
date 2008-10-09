@@ -48,13 +48,13 @@ class Socket
   primitive_nobridge 'setsockopt', 'setsockopt:name:value:'
   primitive 'getsockopt', 'getsockopt:name:'
 
-  self.class.primitive 'do_not_reverse_lookup', 'setNoReverseLookup:'
+  class_primitive 'do_not_reverse_lookup', 'setNoReverseLookup:'
 # do we have a problem here ?
-#  self.class.primitive 'getaddrinfo', 'getaddrinfo:port:family:type:protocol:flag:' 
-  self.class.primitive '_getaddrinfo', 'getaddrinfo:port:' 
-  self.class.primitive 'gethostbyname', 'gethostbyname:'
-  self.class.primitive 'gethostname', 'getLocalHostName'
-  self.class.primitive 'new', 'new:type:proto:'
+#  class_primitive 'getaddrinfo', 'getaddrinfo:port:family:type:protocol:flag:' 
+  class_primitive '_getaddrinfo', 'getaddrinfo:port:' 
+  class_primitive 'gethostbyname', 'gethostbyname:'
+  class_primitive 'gethostname', 'getLocalHostName'
+  class_primitive 'new', 'new:type:proto:'
   
 # problem ?
   def self.getaddrinfo(name, port, *args)
@@ -63,15 +63,15 @@ class Socket
 end
 
 class IPSocket
-  self.class.primitive 'peeraddr', 'peeraddr'
-  self.class.primitive 'getaddress', 'getHostAddressByName:'
+  class_primitive 'peeraddr', 'peeraddr'
+  class_primitive 'getaddress', 'getHostAddressByName:'
 end
 
 class TCPSocket
 
   # open binds a socket to a port and does a blocking connect, 
   #  returning a blocking socket.
-  self.class.primitive 'open', 'new:port:'
+  class_primitive 'open', 'new:port:'
 end
 
 class TCPServer
@@ -79,8 +79,8 @@ class TCPServer
   primitive 'accept', 'accept'
 
   # new and open  both create a non-blocking listening socket
-  self.class.primitive 'new', 'new:port:'
-  self.class.primitive 'open', 'new:port:'
+  class_primitive 'new', 'new:port:'
+  class_primitive 'open', 'new:port:'
 end
 
 

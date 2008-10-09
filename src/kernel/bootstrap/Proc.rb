@@ -11,7 +11,7 @@ class Proc
     # primitives for call should not be needed,
     #  any send of #call translates to special bytecode
 
-    self.class.primitive_nobridge 'new&' , '_newProc:'
+    class_primitive_nobridge 'new&' , '_newProc:'
     # note special Parser code in .mcz , irForProcNewZeroArgs ,
     #  parser converts Proc.new  with no args to 
     #   b = nil ; Proc.new(&b) 

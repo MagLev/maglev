@@ -5,7 +5,7 @@ class Regexp
 
   primitive_nobridge '_search', '_search:from:to:'
   primitive_nobridge '_compile', '_compile:options:'
-  # self.class.primitive 'alloc', '_basicNew'
+  # class_primitive 'alloc', '_basicNew'
 
   def source
     # return the original string of the pattern

@@ -16,8 +16,7 @@ end
 r = CB::NoArg  
 rcls = r.class
 n = rcls.name
-# note Gemstone result not in agreement with MRI yet
-unless n == 'CB__NoArg class'
+unless n == 'Class'
   puts r
   raise 'ERROR'
 end

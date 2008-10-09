@@ -1,11 +1,17 @@
-# Ruby Class is identically Smalltalk's Behavior
 RUBY.class.primitive 'module_eval', 'evaluateString:inClass:'
  
 class Class
+  # Ruby Class is identically Smalltalk's Class
+
+  #  following are installed by RubyContext>>installPrimitiveBootstrap
+  #    primitive_nobridge 'superclass', 'superclass' # installed in Behavior 
+  #  end installPrimitiveBootstrap 
+
   primitive 'alloc', 'basicNew'
   primitive 'alias_method', 'rubyAlias:from:'
-  primitive 'name'
-  
+
+  # base image has persistent env 1 method Class>>class 
+
   def module_eval(str)
     RUBY.module_eval(str, self)
   end
@@ -35,19 +41,6 @@ class Class
     end  
   end
   
-  def protected(name)
-  end
-  
-  def private(name)
-  end
-
-  def alias(name)
-  end
-  
-  def const_get(name)
-    name
-  end
-
   def === (obj)
     obj.kind_of?(self)
   end
@@ -86,6 +79,9 @@ class Class
     r
   end
 
+  def name
+    @name.to_s
+  end
 
   def inspect
     name

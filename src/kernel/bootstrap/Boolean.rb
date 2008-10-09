@@ -2,10 +2,10 @@
 #  NilClass
 
 class NilClass
-   primitive '&', '_rubyAnd:'
+   primitive_nobridge '&', '_rubyAnd:'
    #  For receiver nil,  Or and Xor are the same
-   primitive '^', '_rubyOr:'
-   primitive '|', '_rubyOr:'
+   primitive_nobridge '^', '_rubyOr:'
+   primitive_nobridge '|', '_rubyOr:'
 
    primitive 'nil?' , '_rubyNilQ'
    primitive 'to_a' , '_ruby_to_a'
@@ -30,13 +30,13 @@ end
 #     which returns either TrueClass or FalseClass
 
 class Boolean
-  primitive '^', '_rubyXor:'
+  primitive_nobridge '^', '_rubyXor:'
 
-  primitive '&', '_rubyAnd:'
+  primitive_nobridge '&', '_rubyAnd:'
 
-  primitive '|' , '_rubyOr:'
+  primitive_nobridge '|' , '_rubyOr:'
 
-  primitive 'not'
+  primitive_nobridge 'not'
 
   def inspect 
     to_s

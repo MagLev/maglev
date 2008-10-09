@@ -59,6 +59,7 @@ require 'kernel/bootstrap/Type.rb'
 
 require 'kernel/bootstrap/GsHelper.rb'
 
+require 'kernel/bootstrap/Behavior.rb'
 require 'kernel/bootstrap/Class.rb'
 require 'kernel/bootstrap/Fixnum.rb'
 require 'kernel/bootstrap/Integer.rb'
@@ -74,6 +75,8 @@ require 'kernel/bootstrap/Symbol.rb'
 require 'kernel/bootstrap/Regexp.rb'
 require 'kernel/bootstrap/MatchData.rb'
 require 'kernel/bootstrap/Exception.rb'
+require 'kernel/bootstrap/Module.rb'
+
 require 'kernel/bootstrap/File.rb'
 require 'kernel/bootstrap/Env.rb'
 require 'kernel/bootstrap/Time.rb'

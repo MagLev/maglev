@@ -1,6 +1,6 @@
 class Exception
     primitive 'signal', 'signal:'
-    self.class.primitive 'signal', 'signal:'
+    class_primitive 'signal', 'signal:'
     primitive 'message', 'description'
     primitive_nobridge '_backtrace', 'backtrace'
    

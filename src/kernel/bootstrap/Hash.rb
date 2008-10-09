@@ -15,9 +15,9 @@ class Hash
   primitive 'keys', 'keys'
 
   # Class methods
-  self.class.primitive_nobridge 'new', 'new:'
-  self.class.primitive_nobridge 'new&', 'new:'
-  self.class.primitive 'new'
+  class_primitive_nobridge 'new', 'new:'
+  class_primitive_nobridge 'new&', 'new:'
+  class_primitive 'new'
 
   def self.[](*elements)
     numelem = elements.length

@@ -5,7 +5,7 @@ class Set
     primitive '-'
     primitive 'each&', 'do:'
     primitive 'length', 'size'
-    self.class.primitive 'new'
+    class_primitive 'new'
 
     def self.name
       # override Smalltalk name

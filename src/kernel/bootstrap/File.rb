@@ -8,14 +8,14 @@ class File
     primitive 'read', 'next:'
     primitive 'read', 'contents'
 
-    self.class.primitive_nobridge '_fstat','fstat:isLstat:'
-    self.class.primitive_nobridge '_stat','stat:isLstat:'
+    class_primitive_nobridge '_fstat','fstat:isLstat:'
+    class_primitive_nobridge '_stat','stat:isLstat:'
 
-    self.class.primitive_nobridge '_open', 'openOnServer:mode:'
-    self.class.primitive 'stdin'
-    self.class.primitive 'stdout'
-    self.class.primitive 'stderr'
-    self.class.primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
+    class_primitive_nobridge '_open', 'openOnServer:mode:'
+    class_primitive 'stdin'
+    class_primitive 'stdout'
+    class_primitive 'stderr'
+    class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
 
     def self.name
       # override Smalltalk name

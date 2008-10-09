@@ -10,7 +10,7 @@ class Array
   primitive_nobridge 'remove_last', 'removeLast'
 
   primitive 'size=', 'size:'
-  self.class.primitive_nobridge '_withAll', 'withAll:'
+  class_primitive_nobridge '_withAll', 'withAll:'
 
   # TODO consider a method prefix __nobr__ which during load prims
   #   would suppress generation of bridge methods for private
@@ -76,7 +76,7 @@ class Array
   def self.[](*elements)
     _withAll(elements)
   end
-  self.class.primitive_nobridge '_alloc', '_rubyNew:initValue:'
+  class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
 
   def self.new(size=0, value=nil)
     _alloc(size, value)

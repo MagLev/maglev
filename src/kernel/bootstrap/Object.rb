@@ -1,6 +1,7 @@
-Random.class.primitive 'new'
-Random.primitive 'next', 'nextInt:'
-Random.primitive 'next'
+# Random is the Smalltalk class Random
+Random.class_primitive_nobridge 'new'
+Random.primitive_nobridge 'next', 'nextInt:'
+Random.primitive_nobridge 'next'
 RandomInstance = Random.new
 
 class Object
@@ -24,6 +25,10 @@ class Object
     primitive_nobridge '_isRegexp', '_isRegexp'
     primitive_nobridge '_isRange', '_isRange'
     # end special sends
+
+    #  following are installed by RubyContext>>installPrimitiveBootstrap
+    #    primitive_nobridge 'class', 'class' # installed in Object 
+    #  end installPrimitiveBootstrap 
   
     #  private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
@@ -58,7 +63,12 @@ class Object
     primitive 'dup', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
-    primitive 'respond_to?', 'rubyRespondsTo:'
+    primitive_nobridge 'respond_to?', 'rubyRespondsTo:'
+
+    def respond_to?(aSymbol, includePrivateBoolean)
+      # Gemstone: the argument includePrivateBoolean is ignored
+      respond_to?(aSymbol)
+    end
 
     primitive 'print_line', 'rubyPrint:'
 
@@ -161,7 +171,7 @@ class Object
   #    for each variant existing in receiver, installs an env1 meth dict
   #    entry so that method also shows up as a class method for rcvr.
   #  module_function is used by  lib/benchmark.rb
-  self.class.primitive 'basic_module_function', 'rubyModuleFunction:'
+  class_primitive 'basic_module_function', 'rubyModuleFunction:'
   def self.module_function(*names)
    if names.length > 0
        names.each{|name| basic_module_function(name)}
@@ -171,7 +181,7 @@ class Object
   end
 
   def self.const_defined?(c) false; end
-  self.class.primitive 'include', 'addRubyVirtualSuperclass:'
+  class_primitive 'include', 'addRubyVirtualSuperclass:'
 
   def extend(mod)
   end

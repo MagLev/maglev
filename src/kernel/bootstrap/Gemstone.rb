@@ -1,5 +1,5 @@
 
-   Gemstone.class.primitive 'commitTransaction'
-   Gemstone.class.primitive 'abortTransaction'
-   Gemstone.class.primitive 'beginTransaction'
+   Gemstone.class_primitive 'commitTransaction'
+   Gemstone.class_primitive 'abortTransaction'
+   Gemstone.class_primitive 'beginTransaction'
 

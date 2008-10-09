@@ -537,10 +537,10 @@ class Time
 
   # begin Gemstone  specific code
 
-  self.class.primitive 'new'
-  self.class.primitive 'now'
-  self.class.primitive_nobridge 'allocate' , '_basicNew'
-  self.class.primitive_nobridge '_mktime' , 'mktime:'
+  class_primitive 'new'
+  class_primitive 'now'
+  class_primitive_nobridge 'allocate' , '_basicNew'
+  class_primitive_nobridge '_mktime' , 'mktime:'
 
   # _strftime takes a format String as the arg
   primitive_nobridge '_strftime' , 'strftime:'

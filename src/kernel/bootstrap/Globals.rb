@@ -1,38 +1,40 @@
 # We define all of these globals up front so that we can open these classes later without accidentally creating new ones
 
-String = ''.class
-Regexp = //.class
-Range = (1..2).class
-Fixnum = 1.class
-NilClass = nil.class
-Float=1.0e100.class
-Integer = 1152921504606846976.class.superclass
-Numeric = 1.class.superclass.superclass
-Class = self.class.class.superclass.superclass
-RUBY.global('Hash', 'RubyHash')
-Array = [].class
-Object = self.class
-Symbol = :primitive.class
-
-RUBY.global('Kernel', 'Kernel')    # for module Kernel
+#            Ruby class name , Gemstone class name 
+RUBY.global('Array', 'Array')
+RUBY.global('Behavior', 'Behavior')
 RUBY.global('Boolean', 'Boolean')
-RUBY.global('TrueClass', 'TrueClass')
+RUBY.global('Class', 'Class')
 RUBY.global('FalseClass', 'FalseClass')
-RUBY.global('MatchData', 'MatchData')
 RUBY.global('File', 'GsFile')
 RUBY.global('File__Stat', 'GsFileStat')  # File::Stat -->  GsFileStat
-RUBY.global('Socket', 'Socket')
-RUBY.global('IPSocket', 'IPSocket')
-RUBY.global('TCPSocket', 'TCPSocket')
-RUBY.global('TCPServer', 'TCPServer')
+RUBY.global('Fixnum', 'SmallInteger')
+RUBY.global('Float', 'Float')
+RUBY.global('Hash', 'RubyHash')
+RUBY.global('Integer', 'Integer')
 RUBY.global('IO', 'IO')
+RUBY.global('IPSocket', 'IPSocket')
+RUBY.global('Kernel', 'Kernel')    # for module Kernel
+RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMethod')  # RubyMethod , RubyUnboundMethod defined in .mcz
-RUBY.global('UnboundMethod', 'RubyUnboundMethod')
+RUBY.global('Module', 'Module')    # for class Module 
+RUBY.global('NilClass', 'UndefinedObject')
+RUBY.global('Numeric', 'Number')
+RUBY.global('Object', 'Object')
 RUBY.global('Random')
+RUBY.global('Range', 'Range')
+RUBY.global('Regexp', 'Regexp')
 RUBY.global('Set', 'IdentitySet')
+RUBY.global('Socket', 'Socket')
+RUBY.global('String', 'String')
+RUBY.global('Symbol', 'Symbol')
+RUBY.global('TCPServer', 'TCPServer')
+RUBY.global('TCPSocket', 'TCPSocket')
 RUBY.global('Time', 'RubyTime')
+RUBY.global('TrueClass', 'TrueClass')
+RUBY.global('UnboundMethod', 'RubyUnboundMethod')
 
-RUBY.global("Gemstone", "System")
+RUBY.global('Gemstone', 'System')
 
 # 
 #  Define some of the Ruby exception classes to be identical to certain

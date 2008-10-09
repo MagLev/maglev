@@ -1,6 +1,3 @@
-
-# Stub version of Module to get past compile errors
-
 class Module
 
   #  Class methods
