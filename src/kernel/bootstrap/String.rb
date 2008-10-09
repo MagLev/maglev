@@ -363,9 +363,9 @@ class String
       last_match = match
     end
 
-#    if last_match
-    if last_match && ! last_match.post_match.nil?  # GEMSTONE
-      ret << last_match.post_match
+    if !last_match.nil?           # GEMSTONE
+      pm = last_match.post_match  # GEMSTONE
+      ret << (pm.nil? ? "" : pm)  # GEMSTONE
     elsif ret.empty?
       ret << self.dup
     end
