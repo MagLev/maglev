@@ -23,8 +23,37 @@ end
 test(Regexp.escape('\\[]*?{}.'), '\\\\\\[\\]\\*\\?\\{\\}\\.', 'Pickaxe escape A')
 
 test(Regexp.escape("\n\t\f\r "), "\\n\\t\\f\\r\\ ", 'Gemstone escape A')
-report
 
+#  Test MatchData
+md = /(.)(.)(\d+)(\d)/.match("THX1138.")
+test(md[0],    "HX1138",                           "Pickaxe MatchData A")
+test(md[1,2],  ["H", "X"],                         "Pickaxe MatchData B")
+test(md[1..3], ["H", "X", "113"],                  "Pickaxe MatchData C")
+#test(md[-3,2], ["X", "113"],                       "Pickaxe MatchData D")
+
+test(md.begin(0), 1,                               "Pickaxe MatchData E")
+test(md.begin(2), 2,                               "Pickaxe MatchData F")
+
+test(md.captures, %w(H X 113 8),                   "Pickaxe MatchData G")
+
+test(md.end(0), 7,                                 "Pickaxe MatchData H")
+test(md.end(2), 3,                                 "Pickaxe MatchData I")
+
+test(md.length, 5,                                 "Pickaxe MatchData J")
+test(md.size,   5,                                 "Pickaxe MatchData K")
+
+#test(md.offset(0), [1,7],                          "Pickaxe MatchData L")
+#test(md.offset(4), [6,7],                          "Pickaxe MatchData M")
+
+#test(md.post_match, ".",                           "Pickaxe MatchData N")
+
+test(md.pre_match, "T",                            "Pickaxe MatchData O")
+test(md.string, "THX1138.",                        "Pickaxe MatchData P")
+#test(md.to_a, %w(HX1138 H X 113 8),                "Pickaxe MatchData Q")
+#test(md.to_s, "HX1138",                            "Pickaxe MatchData R")
+#test(md.values_at(0,2,-2), ["HX1138", "X", "113"], "Pickaxe MatchData S")
+
+report
 
 # TODO: The rest of this file won't run until $&, $` and $' are defined.
 

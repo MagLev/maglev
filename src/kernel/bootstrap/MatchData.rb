@@ -3,16 +3,16 @@ class MatchData
   primitive_nobridge '[]' , '_rubyAt:'
   primitive '[]' , '_rubyAt:length:'
 
-#   def inspect
-#     matches = []
-#     i = 0
-#     lim = length
-#     while i < lim
-#       matches << "'#{@inputString[self.begin(i), self.end(i)]}'"
-#       i += 1
-#     end
-#     "MatchData: pre_match='#{pre_match}', [#{matches.join(',')}], post_match='#{post_match}'"
-#   end
+  def inspect
+    matches = []
+    i = 0
+    lim = length
+    while i < lim
+      matches << "'<#{self.begin(i)}, #{self.end(i)}>: #{@inputString[self.begin(i), self.end(i)]}'"
+      i += 1
+    end
+    "MatchData: pre_match='#{pre_match}', [#{matches.inspect}], post_match='#{post_match}'"
+  end
 
   def begin(group)
     at((group*2)+1)
@@ -22,10 +22,12 @@ class MatchData
     at((group*2)+2)
   end
 
-  primitive 'size', 'size'
-  def length
-    size / 2
+  primitive '_size', 'size'
+  def size
+    _size / 2
   end
+
+  alias length size
 
   def pre_match
     res = @strPreceedingMatch
@@ -59,9 +61,7 @@ class MatchData
   # BEGIN RUBINIUS
 
   def collapsing?
-    r = self.begin(0) == self.end(0)
-    puts "'#{self.string}'.collapsing?: #{r} self.begin(0) #{self.begin(0)} self.end(0) #{self.end(0)}"
-    r
+    self.begin(0) == self.end(0)
   end
 
   def pre_match_from(idx)
@@ -72,7 +72,7 @@ class MatchData
 
   def captures  # GEMSTONE modified loop from each {...} to while
     out = []
-    i = 0
+    i = 1   # Captures do NOT include $0
     lim = length
     while i < lim
       x = self.begin(i)
