@@ -192,4 +192,20 @@ test(sequence({ }), [0,1], "Gemstone args F")
 test(sequence(:m => 3), [0,3], "Gemstone args G")
 test(sequence(:m => 3, :n => 9), [9,3], "Gemstone args H")
 
+# Next 3 tests inspired by a bug fix for String#split.  The Rubinius
+# code used the first version (splat), the bug fix usees Array#concat
+# instead.  Update: Array#push implementation was wrong and now fixed.
+
+ret = ["A", "B"]
+other_ary = ["FOO", nil, "BAR", nil]
+test(ret.push(*other_ary.compact), ["A", "B", "FOO", "BAR"], "Regression 1")
+
+ret = ["A", "B"]
+other_ary = ["FOO", nil, "BAR", nil]
+test(ret.push(*(other_ary.compact)), ["A", "B", "FOO", "BAR"], "Regression 2")
+
+ret = ["A", "B"]
+other_ary = ["FOO", nil, "BAR", nil]
+test(ret.concat(other_ary.compact),["A", "B", "FOO", "BAR"], "Regression 3")
+
 report

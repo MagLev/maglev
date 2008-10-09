@@ -17,29 +17,29 @@ class Array
   #   methods that should not need bridge methods
 
   def _anySatisfyCaseLeaf( obj )
-    # used in implementation of  while *list   within a   case  
+    # used in implementation of  while *list   within a   case
     n = 0
-    lim = size 
-    while n < lim 
+    lim = size
+    while n < lim
       el = self[n]
       if obj === el
         return true
       end
-      n = n + 1 
+      n = n + 1
     end
     false
   end
 
   def _anySatisfyCaseTrue
-    # used in implementation of  while *list   within a   case  
+    # used in implementation of  while *list   within a   case
     n = 0
-    lim = size 
-    while n < lim 
+    lim = size
+    while n < lim
       el = self[n]
       if el
         return true
       end
-      n = n + 1 
+      n = n + 1
     end
     false
   end
@@ -158,7 +158,7 @@ class Array
     unless other._isArray
       raise TypeError , "not an Array"
     end
-      
+
     lim = size > other.size ? other.size : size # lim is the min
     while i < lim
       result = self[i] <=> other[i]
@@ -378,24 +378,24 @@ class Array
   def fill(obj, start=nil, length=nil)
     # TODO: Needs block support
     start  ||= 0
-    sz = size 
-    length ||= sz 
+    sz = size
+    length ||= sz
     if (start < 0)
-      start = sz + start 
+      start = sz + start
       if (start < 0)
         start = 0
       end
     end
-    if (length < 0) 
+    if (length < 0)
       length = 0
     end
     # smalltalk arrays start at 1
-    endIdx = start + length 
+    endIdx = start + length
     start += 1         # start, end both 1-based now
     if (endIdx > sz)
       self.size=(endIdx)  # grow the receiver
     end
-    if (length > 0) 
+    if (length > 0)
       _fillFromToWith(start, endIdx, obj)
     end
     self
@@ -479,7 +479,8 @@ class Array
       remove_last
     end
   end
-  primitive 'push', '_rubyAddLast:'
+
+  primitive 'push*', '_rubyAddArguments:'
 
   # Associate: Search through self (an array of arrays).  Return first
   # array whose second element matches +key+ (using +key.==+).
@@ -541,7 +542,7 @@ class Array
   end
 
   # Note: sort is listed in the Pick Axe book under both Array and Enumerable
-  #  Smalltalk sort: expects a block returning boolean result of a <= b 
+  #  Smalltalk sort: expects a block returning boolean result of a <= b
   #
   primitive_nobridge '_sort!&', 'sort:'
 
