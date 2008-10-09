@@ -1,7 +1,7 @@
 If you are reading this file, you must have successfully unzipped MagLev,
 but there are some prerequisites for it to run correctly.
 
-You must have MRI 1.8.6 installed. 1.8.7 may work, but is untested.
+You must have MRI 1.8.6 installed. Other versions are not supported.
 You must have the ParseTree gem installed, if it is not:
 	gem install ParseTree
 if you are asked, pick 2.2.0

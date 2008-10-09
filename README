@@ -1,12 +1,26 @@
 Quick Start:
 
-You can run everything in MagLev using the 'gemstone' bash script in the 
-bin subdirectory.
+You run MagLev using the 'gemstone', 'mlirb', and 'mlruby' commands
+in the $MAGLEV_HOME/bin directory.  For best results, set MAGLEV_HOME,
+and add $MAGLEV_HOME/bin to your PATH. You must run 'gemstone start'
+before running 'mlirb' or 'mlruby'.
 
-For best results, set MAGLEV_HOME, and add $MAGLEV_HOME/bin to your PATH
+mlirb: Open a maglev shell
+Usage: mlirb [options]
+OPTIONS:
+   -d      Run in debugging mode
+   -h      Show this message
+   -v      Print version number
 
-Usage:
-gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
+mlruby: Execute a Ruby file
+Usage: mlruby [options] <filename>
+OPTIONS:
+   -d      Run in debugging mode
+   -h      Show this message
+   -v      Print version number
+
+gemstone:  Control the MagLev system
+Usage: gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
           squeak|preload|force-reload|version|help}
 
 To control the GemStone server:
@@ -21,8 +35,8 @@ gemstone preload <file> - Load and commit a file into an already running system
 gemstone force-reload   - Stop GemStone server, replace with empty repository!!!
 
 To execute other gemstone commands:
-gemstone irb            - Enter a MagLev interactive shell
-gemstone ruby  <file>   - Execute a Ruby file
+gemstone irb            - Enter a MagLev interactive shell (same as mlirb)
+gemstone ruby  <file>   - Execute a Ruby file (same as mlruby)
 gemstone topaz          - Enter a Topaz shell
 gemstone topaz-debug    - Enter a Topaz shell useful for debugging 
 gemstone squeak         - Start optional Squeak development environment
@@ -36,11 +50,11 @@ Note:
 - if you have multiple installations, set PARSETREE_PORT to control 
       which port the parser server listens on
 - the first (and ony the first) time you run a gemstone command
-      that runs Ruby code, 
-      it will load and compile prims.rb, which takes up to a minute to run.
-- gemstone ruby prints a topaz banner every time it is run. 
-      You can use "gemstone irb" instead, but it will make errors
-      more difficult to debug, as they won't return to Topaz.
+      that runs Ruby code, it will load and compile its primitives,
+      which takes up to a minute to run.
+- mlruby prints a topaz banner every time it is run. 
+      mlirb does not, but it will make errors more difficult to debug,
+      as they won't return to Topaz.
  
 Ruby code:
 - src/ and src/lib/ are both on the require path
