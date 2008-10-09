@@ -1,4 +1,6 @@
 class Array
+  Undefined = Object.new  # TODO: Make one Undefined object in the system
+
   # begin private helper methods
   # TODO: Some of these don't begin with an '_'...
   primitive_nobridge '_all', 'allSatisfy:'
@@ -455,7 +457,16 @@ class Array
     out
   end
 
-  primitive 'last'
+  primitive '_last', 'last'
+  def last(count = Undefined)
+    # Smalltalk SequenceableCollection>>last raises exception calling last
+    # on empty collection
+    if self.empty?
+      return count.equal?(Undefined) ? nil : []
+    end
+    _last
+  end
+
   primitive 'length', 'size'
 
   alias map! collect!
