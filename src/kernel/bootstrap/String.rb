@@ -362,8 +362,9 @@ class String
       last_match = match
     end
 
-    if last_match
-      ret << last_match.post_match
+    if !last_match.nil?           # GEMSTONE
+      pm = last_match.post_match  # GEMSTONE
+      ret << (pm.nil? ? "" : pm)  # GEMSTONE
     elsif ret.empty?
       ret << self.dup
     end
@@ -381,6 +382,14 @@ class String
         ret.shift
       end
     end
+
+    # BEGIN GEMSTONE
+    # If we are matching the empty string, and we have matches, then
+    # we need to tack on the trailing empty string match.
+    if ret && limit && limit < 0 && last_match && last_match.collapsing?
+      ret << ''
+    end
+    # END GEMSTONE
 
     # Support subclasses
     ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)

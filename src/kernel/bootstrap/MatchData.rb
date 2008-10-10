@@ -54,7 +54,7 @@ class MatchData
   def post_match
     res = @strFollowingMatch
     if (res.equal?(nil))
-      res = @inputString[self.begin(0)+self[0].size..-1]
+      res = @inputString[self.end(0)..-1]
       @strFollowingMatch = res
     end
     res
