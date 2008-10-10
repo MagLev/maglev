@@ -17,6 +17,9 @@ class File
     class_primitive 'stderr'
     class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
 
+    # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown
+    class_primitive_nobridge '_modifyFile', '_modifyFile:fd:path:with:with:'
+
     def self.name
       # override Smalltalk name
       'File'

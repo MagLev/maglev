@@ -29,6 +29,27 @@ module Kernel
     File.open(fName, mode)
   end
 
+  class_primitive_nobridge '_system', '_system:'
+
+  def system(command, *args)
+    cmd = command 
+    n = 0
+    sz = args.length
+    while n < sz
+      if (n < sz - 1)
+        cmd << ' ' 
+      end
+      cmd << args[n].to_s
+      n = n + 1
+    end 
+    resultStr = Kernel._system(cmd)
+    if (resultStr)
+      puts resultStr
+      return true
+    end
+    return false
+  end
+
   def taint
     # TODO: Kernel#taint is a noop!
   end

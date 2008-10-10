@@ -7,7 +7,7 @@ RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'Class')
 RUBY.global('FalseClass', 'FalseClass')
 RUBY.global('File', 'GsFile')
-RUBY.global('File__Stat', 'GsFileStat')  # File::Stat -->  GsFileStat
+RUBY.global('File::Stat', 'GsFileStat')  # File::Stat -->  GsFileStat
 RUBY.global('Fixnum', 'SmallInteger')
 RUBY.global('Float', 'Float')
 RUBY.global('Hash', 'RubyHash')
