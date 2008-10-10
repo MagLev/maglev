@@ -32,23 +32,23 @@ startserver() {
   $GEMSTONE/bin/startnetldi -g &>/dev/null
   $GEMSTONE/bin/startstone gs64stone &>/dev/null
   $GEMSTONE/bin/waitstone gs64stone &>/dev/null
-  echo "GemStone server gs64stone started"
+  echo "MagLev server gs64stone started"
 }
 
 startserver-debug() {
   $GEMSTONE/bin/startnetldi -g
   $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf gs64stone
   $GEMSTONE/bin/waitstone gs64stone
-  echo "GemStone server gs64stone started in verbose mode"
+  echo "MagLev server gs64stone started in verbose mode"
 }
 
 startparser() {
   if [ "$RUBY_VERSION" != "1.8.6" ]; then
     echo "### This command only works on Ruby 1.8.6,"
     echo "but your RUBY_VERSION appears to be $RUBY_VERSION"
-    echo "You can skip _this_ check by using \"gemstone start-debug\","
+    echo "You can skip _this_ check by using \"maglev start-debug\","
     echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
-    echo "Use \"gemstone status\" to check that the parser is running."
+    echo "Use \"maglev status\" to check that the parser is running."
     exit 1
   fi
   if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
@@ -200,7 +200,7 @@ squeak() {
       open /Applications/GemTools-3.0.app
   else
       echo "The GemTools application used by the 'squeak' command was not found on your system"
-      echo "To fix this, correct the 'squeak' command in the gemstone script"
+      echo "To fix this, correct the 'squeak' command in the maglev script"
   fi
 }
 
@@ -224,7 +224,7 @@ gemx() {
       open /Applications/GemX.app
   else
       echo "The application used by the 'gemx' command was not found on your system"
-      echo "To fix this, correct the 'gemx' command in the gemstone script"
+      echo "To fix this, correct the 'gemx' command in the maglev script"
   fi
 }
 
@@ -232,24 +232,24 @@ gemx() {
 help() {
 cat <<ENDHELP
 Server Commands:
-gemstone start          - Start GemStone server processes
-gemstone start-debug    - Start GemStone server processes with verbose output
-gemstone start-parser   - Force parser process to start if it's dead
-gemstone stop           - Stop GemStone server processes
-gemstone restart        - Restart GemStone server processes
-gemstone status         - Display GemStone server status
-gemstone version        - Display GemStone version number
-gemstone preload <file> - Load and commit a file into an already running system
-gemstone force-reload   - Stop GemStone server, overwrite with empty repository!!!
+maglev start          - Start MagLev server processes
+maglev start-debug    - Start MagLev server processes with verbose output
+maglev start-parser   - Force parser process to start if it's dead
+maglev stop           - Stop MagLev server processes
+maglev restart        - Restart MagLev server processes
+maglev status         - Display MagLev server status
+maglev version        - Display MagLev version number
+maglev preload <file> - Load and commit a file into an already running system
+maglev force-reload   - Stop MagLev server, overwrite with empty repository!!!
 
 User Commands:
-gemstone irb            - Enter a MagLev interactive shell
-gemstone ruby  <file>   - Execute a Ruby file
-gemstone topaz          - Enter a Topaz shell
-gemstone topaz-debug    - Enter a Topaz shell useful for debugging
-gemstone squeak         - Start optional Squeak development environment
-gemstone vsd            - Start Visual Statistics Display monitoring tool
-gemstone help           - Display this text
+maglev irb            - Enter a MagLev interactive shell
+maglev ruby  <file>   - Execute a Ruby file
+maglev topaz          - Enter a Topaz shell
+maglev topaz-debug    - Enter a Topaz shell useful for debugging
+maglev squeak         - Start optional Squeak development environment
+maglev vsd            - Start Visual Statistics Display monitoring tool
+maglev help           - Display this text
 
 Note: 
 For best results, set MAGLEV_HOME, and add \$MAGLEV_HOME/bin to your PATH
@@ -290,16 +290,16 @@ case "$1" in
         ;;
   topaz)
         shift
-        # pass params so we can execute 'gemstone topaz -T200000'
+        # pass params so we can execute 'maglev topaz -T200000'
         topaz $@
         ;;
   topaz-debug)
         shift
-        # pass params so we can execute 'gemstone topaz -T200000'
+        # pass params so we can execute 'maglev topaz -T200000'
         topaz-debug $@
         ;;
   ruby)
-        # pass params so we can execute 'gemstone ruby <FILE>'
+        # pass params so we can execute 'maglev ruby <FILE>'
         ruby $@
         ;;
   spec)
@@ -336,7 +336,7 @@ case "$1" in
         ;;
   *)
   echo "Usage: "
-  echo "gemstone {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
+  echo "maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
   echo "          squeak|preload|force-reload|version|help}"
   exit 1
 esac

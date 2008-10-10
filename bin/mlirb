@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Runs the equivalent of "gemstone irb"
+# Runs the equivalent of "maglev irb"
 
 COMMAND="`basename $0`"
 
