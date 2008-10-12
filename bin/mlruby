@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Runs the equivalent of "gemstone ruby"
+# Runs the equivalent of "maglev ruby"
 
 COMMAND="`basename $0`"
 

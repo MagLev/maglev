@@ -1,52 +1,342 @@
 #!/bin/bash
 #
-# Runs the equivalent of "gemstone ruby" as a "maglev" command
-
-# Make sure MAGLEV_HOME is set
-if [ -z "${MAGLEV_HOME}" ]; then
-    echo "\$MAGLEV_HOME is not set."
-    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
-    exit 1
-fi
-# Make sure GEMSTONE is set
-if [ -z "${GEMSTONE}" ]; then
-    export GEMSTONE=$MAGLEV_HOME/gemstone
-    # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
-fi
-# Make sure the topaz command exists
-if [ ! -x $GEMSTONE/bin/topaz ]; then
-    echo "$GEMSTONE is not a valid GemStone product directory"
-    echo "To fix this, set a valid GEMSTONE in your .bashrc"
-    exit 1
-fi
-# Make sure we have one argument
-if [ $# -ne 1 ]; then
-    echo "The maglev command must have one argument"
-    echo "i.e. maglev <filename>"
-    exit 1
-fi
-# Make sure the argument is a valid file
-if [ ! -e $1 ]; then
-    echo "You executed \"maglev $*\""
-    echo "The file \"$1\" does not exist"
-    exit 1
-fi
+# Runs GemStone scripts that used to be invoked as individual commands
 
 # Environment variable settings
+if [ -z "$MAGLEV_HOME" ]; then
+  if [ -x $PWD/gemstone/bin/startstone ]; then
+    # echo "using $PWD as MAGLEV_HOME"
+    export MAGLEV_HOME=$PWD
+  else
+    echo "$PWD is not a valid MAGLEV_HOME directory"
+    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
+    exit 1
+  fi
+fi
+#
+if [ -z "$PARSETREE_PORT" ]; then
+    # echo "using 2001 as PARSETREE_PORT"
+    export PARSETREE_PORT=2001
+fi
+#
+export RUBY_VERSION=`ruby -e "puts \"#{RUBY_VERSION}\""`
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
+export GEMSTONE=$MAGLEV_HOME/gemstone
 export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
-if [ -z "$JRUBY_PORT" ]; then
-    export JRUBY_PORT=2000
-fi
+export TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
 
-# run the maglev command
-  FILE=$PWD/$1
-  $TOPAZ_CMD <<ENDRUBY | sed '/^topaz 1> /s///' 
+# Commands
+startserver() {
+  $GEMSTONE/bin/startnetldi -g &>/dev/null
+  $GEMSTONE/bin/startstone gs64stone &>/dev/null
+  $GEMSTONE/bin/waitstone gs64stone &>/dev/null
+  echo "MagLev server gs64stone started"
+}
+
+startserver-debug() {
+  $GEMSTONE/bin/startnetldi -g
+  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf gs64stone
+  $GEMSTONE/bin/waitstone gs64stone
+  echo "MagLev server gs64stone started in verbose mode"
+}
+
+startparser() {
+  if [ "$RUBY_VERSION" != "1.8.6" ]; then
+    echo "### This command only works on Ruby 1.8.6,"
+    echo "but your RUBY_VERSION appears to be $RUBY_VERSION"
+    echo "You can skip _this_ check by using \"maglev start-debug\","
+    echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
+    echo "Use \"maglev status\" to check that the parser is running."
+    exit 1
+  fi
+  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+    pushd $MAGLEV_HOME/bin > /dev/null
+    nohup ruby parsetree_parser.rb \
+      >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
+    PARSER_PID="$!"
+    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
+    popd > /dev/null
+  else
+    echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
+  fi
+}
+
+forceparser() {
+    pushd $MAGLEV_HOME/bin > /dev/null
+    nohup ruby parsetree_parser.rb \
+      >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
+    PARSER_PID="$!"
+    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
+    echo "Check \$MAGLEV_HOME/log/parsetree.err if the parser isn't working"
+    popd > /dev/null
+}
+
+startparser-debug() {
+  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+    pushd $MAGLEV_HOME/bin > /dev/null
+    nohup ruby parsetree_parser.rb \
+      >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
+    PARSER_PID="$!"
+    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
+    echo "Parser logfiles are \$MAGLEV_HOME/log/parsetree.*"
+    popd > /dev/null
+  else
+    echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
+  fi
+}
+
+stopserver() {
+  $GEMSTONE/bin/stopstone gs64stone DataCurator swordfish -i
+  $GEMSTONE/bin/stopnetldi
+}
+
+stopparser() {
+  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+    kill -9 `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
+  fi
+}
+
+status() {
+  echo "MAGLEV_HOME = $MAGLEV_HOME"
+  $GEMSTONE/bin/gslist -clv
+  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+    echo "MagLev Parse Server port = $PARSETREE_PORT"
+    lsof -P -w -iTCP:${PARSETREE_PORT}
+    # if you don't have permission to run lsof, use the following instead
+    # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
+  else
+    echo "MagLev Parse Server is not running on port $PARSETREE_PORT"
+  fi
+}
+
+version() {
+  grep GEMSTONE $MAGLEV_HOME/version.txt
+}
+
+ruby() {
+  FILE=$PWD/$2
+  $TOPAZ_CMD <<ENDRUBY
 run
 RubyContext load.
 RubyContext loadFileNamed: '$FILE'.
 %
 exit
 ENDRUBY
+}
 
+spec() {
+  WD=$PWD
+  $TOPAZ_CMD <<ENDSPEC
+output push spec.out
+run
+| stream |
+stream := WriteStream on: String new.
+RubyContext load.
+RubyContext requireFileNamed: 'mspec.rb'.
+RubyCompiler new evaluateString: '\$formatter = DottedFormatter.new; \$formatter.register'.
+('$*' findTokens: Character space) allButFirst do:
+    [:ea |
+        [
+            RubyContext loadFileNamed: '$WD/', ea.
+        ] on: Exception do:[:ex |
+            stream nextPutAll: '<failed with error, ', ex asString, ' >'; cr.
+        ].
+    ].
+RubyCompiler new evaluateString: '\$formatter.finish'.
+stream contents.
+%
+exit
+ENDSPEC
+}
+
+topaz() {
+  if [ -z "`which rlwrap`" ]; then
+    $TOPAZ_CMD $@
+  else
+    rlwrap $TOPAZ_CMD $@
+  fi
+}
+
+topaz-debug() {
+  if [ -z "`which rlwrap`" ]; then
+    $TOPAZDEBUG_CMD $@
+  else
+    rlwrap $TOPAZDEBUG_CMD $@
+  fi
+}
+
+initialize() {
+  # grab a virgin repository if no repository exists
+  if [ ! -e $MAGLEV_HOME/data/extent0.ruby.dbf ]; then
+    cp -p $GEMSTONE/bin/extent0.ruby.dbf $MAGLEV_HOME/data/
+    chmod 660 $MAGLEV_HOME/data/extent0.ruby.dbf
+  fi
+}
+
+preload() {
+  $TOPAZ_CMD <<ENDPRELOAD
+run
+RubyContext load.
+RubyContext default loadFileNamed: '$1'.
+RubyContext save.
+%
+commit
+maglev
+puts 'MagLev preload $1 completed'
+quit
+exit
+ENDPRELOAD
+}
+
+destroy() {
+  rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/*
+}
+
+squeak() {
+  # If you use Squeak for development and debugging
+  if [ -e /Applications/GemTools-3.0.app ]; then
+      open /Applications/GemTools-3.0.app
+  else
+      echo "The GemTools application used by the 'squeak' command was not found on your system"
+      echo "To fix this, correct the 'squeak' command in the maglev script"
+  fi
+}
+
+startvsd() {
+  export PATH=$GEMSTONE/bin:$PATH
+  $GEMSTONE/bin/vsd &
+}
+
+maglev-shell() {
+  $GEMSTONE/bin/maglev $@
+}
+
+mri() {
+  export DYLD_LIBRARY_PATH=$GEMSTONE/lib32
+  irb -I $MAGLEV_HOME/gci -rgci
+}
+
+gemx() {
+  # If you use Squeak for development and debugging
+  if [ -e /Applications/GemX.app ]; then
+      open /Applications/GemX.app
+  else
+      echo "The application used by the 'gemx' command was not found on your system"
+      echo "To fix this, correct the 'gemx' command in the maglev script"
+  fi
+}
+
+
+help() {
+cat <<ENDHELP
+Server Commands:
+maglev start          - Start MagLev server processes
+maglev start-debug    - Start MagLev server processes with verbose output
+maglev start-parser   - Force parser process to start if it's dead
+maglev stop           - Stop MagLev server processes
+maglev restart        - Restart MagLev server processes
+maglev status         - Display MagLev server status
+maglev version        - Display MagLev version number
+maglev preload <file> - Load and commit a file into an already running system
+maglev force-reload   - Stop MagLev server, overwrite with empty repository!!!
+
+User Commands:
+maglev irb            - Enter a MagLev interactive shell
+maglev ruby  <file>   - Execute a Ruby file
+maglev topaz          - Enter a Topaz shell
+maglev topaz-debug    - Enter a Topaz shell useful for debugging
+maglev squeak         - Start optional Squeak development environment
+maglev vsd            - Start Visual Statistics Display monitoring tool
+maglev help           - Display this text
+
+Note: 
+For best results, set MAGLEV_HOME, and add \$MAGLEV_HOME/bin to your PATH
+ENDHELP
+}
+
+# See what we were asked to do
+case "$1" in
+  start)
+        initialize
+        startparser
+        startserver
+        ;;
+  start-parser)
+        initialize
+        forceparser
+        ;;
+  start-debug)
+        initialize
+        startparser-debug
+        startserver-debug
+        ;;
+  stop)
+        stopserver
+        stopparser
+        ;;
+  restart)
+        stopserver
+        stopparser
+        startparser
+        startserver
+        ;;
+  status)
+        status
+        ;;
+  version)
+        version
+        ;;
+  topaz)
+        shift
+        # pass params so we can execute 'maglev topaz -T200000'
+        topaz $@
+        ;;
+  topaz-debug)
+        shift
+        # pass params so we can execute 'maglev topaz -T200000'
+        topaz-debug $@
+        ;;
+  ruby)
+        # pass params so we can execute 'maglev ruby <FILE>'
+        ruby $@
+        ;;
+  spec)
+        spec $@
+        ;;
+  squeak)
+        squeak
+        ;;
+  vsd)
+        startvsd
+        ;;
+  irb)
+	shift
+	# in case we ever need to pass params
+        maglev-shell $@
+        ;;
+  mri)
+        mri
+        ;;
+  gemx)
+        gemx
+        ;;
+  preload)
+        preload $2
+        ;;
+  force-reload)
+        stopserver
+        stopparser
+	destroy
+	initialize
+        ;;
+  help)
+        help
+        ;;
+  *)
+  echo "Usage: "
+  echo "maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
+  echo "          squeak|preload|force-reload|version|help}"
+  exit 1
+esac

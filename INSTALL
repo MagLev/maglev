@@ -6,7 +6,7 @@ You must have the ParseTree gem installed, if it is not:
 	gem install ParseTree
 if you are asked, pick 2.2.0
 
-If 'gemstone status' tells you "MagLev Parse Server is not running on port 2001"
+If 'maglev status' tells you "MagLev Parse Server is not running on port 2001"
 it is most likely a problem running the ParseTree gem. To diagnose:
 	export PARSETREE_PORT=2001
 	cd $MAGLEV_HOME/bin
@@ -16,6 +16,6 @@ If that gives the following error on MacOSX:
 you can resolve the problem by upgrading to the latest Xcode
 	http://developer.apple.com/technology/xcode.html
 
-'gemstone status' uses the lsof command to see if the parse server
+'maglev status' uses the lsof command to see if the parse server
 is running. If you do not have lsof installed, or cannot run it,
-uncomment the equivalent netstat command in $MAGLEV_HOME/bin/gemstone.
+uncomment the equivalent netstat command in $MAGLEV_HOME/bin/maglev.
