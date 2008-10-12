@@ -29,7 +29,7 @@ module Kernel
     File.open(fName, mode)
   end
 
-  class_primitive_nobridge '_system', '_system:'
+  primitive_nobridge '_system', '_system:'
 
   def system(command, *args)
     cmd = command 

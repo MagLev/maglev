@@ -7,13 +7,19 @@ RandomInstance = Random.new
 class Object
     # Begin private helper methods
 
+    # primitive_nobridge has max of 3 normal args, 1 star arg, 1 block arg
+    #  example with a block argument  
+    #    primitive_nobridge '_foo*&' , '_foo:a:b:c:d:e:'
+    #  example without a block argument 
+    #    primitive_nobridge '_foo*' , '_foo:a:b:c:d:'
+
     #  begin special sends
     #    these are optimized by the code generator to be special bytecodes
+    #
     #    entries here are so that perform will work.
-
     # _isInteger allows integer?  special sends to non-Numeric objects
     primitive_nobridge '_isInteger', '_isInteger'
-
+    #
     primitive_nobridge '_isFixnum', '_isSmallInteger'
     primitive_nobridge '_isFloat', '_isFloat'
     primitive_nobridge '_isNumber', '_isNumber'

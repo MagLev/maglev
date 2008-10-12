@@ -18,7 +18,7 @@ class File
     class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
 
     # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown
-    class_primitive_nobridge '_modifyFile', '_modifyFile:fd:path:with:with:'
+    class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'
 
     def self.name
       # override Smalltalk name
@@ -172,6 +172,75 @@ class File
     def lstat
       File._stat(@pathName, true)
     end
+
+    def chmod(permission)
+      status = File._modifyFile( 1, @fileDescriptor, permission, nil)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx 
+      end
+      return 0 
+    end
+
+    def self.chmod(permission, *fileNames)
+      count = 0
+      fileNames.each { |aName| 
+        status = File._modifyFile( 0, aName, permission, nil)
+        if (status.equal?(0))
+          count = count + 1
+        end
+      }
+      return count 
+    end
+
+    def chown(owner, group)
+      status = File._modifyFile( 3, @fileDescriptor, owner, group)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx 
+      end
+      return 0 
+    end
+
+    def self.chown(owner, group, *fileNames)
+      count = 0
+      fileNames.each { |aName| 
+        status = File._modifyFile( 2, aName, owner, group)
+        if (status.equal?(0))
+          count = count + 1
+        end
+      }
+      return count
+    end
+  
+    def lchmod(permission)
+      # not supported , lchmod() not available on Linux or Solaris
+      raise NotImplementedError
+    end
+
+    def self.lchmod(permission, *fileNames)
+      # not supported , lchmod() not available on Linux or Solaris
+      raise NotImplementedError
+    end
+
+    def lchown(owner, group)
+      status = File._modifyFile( 4, @pathName, owner, group)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+      return 0
+    end 
+
+    def self.lchown(owner, group, *fileNames)
+      count = 0
+      fileNames.each { |aName|
+        status = File._modifyFile( 4, aName, owner, group)
+        if (status.equal?(0))
+          count = count + 1
+        end
+      }
+      return count
+    end
+
+      
 end
 
 class PersistentFile
