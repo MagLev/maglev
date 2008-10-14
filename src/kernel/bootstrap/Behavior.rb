@@ -1,5 +1,7 @@
 class Behavior
 
+  primitive_nobridge 'include', 'includeRubyModule:'
+
   def protected(name)
   end
   

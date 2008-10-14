@@ -205,7 +205,6 @@ class Object
   end
 
   def self.const_defined?(c) false; end
-  class_primitive 'include', 'addRubyVirtualSuperclass:'
 
   def extend(mod)
   end

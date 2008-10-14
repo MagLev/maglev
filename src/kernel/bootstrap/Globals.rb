@@ -95,7 +95,6 @@ ARGV = []
 #  $/ is auto-initialized to "\n" by parser at first ref .
 #  $-0 is translated to $/ by parser .
 #  $-F is translated to  $;  by parser .
-#  $!  is auto-initialized by parser at first occurance of a RubyRescueBodyNode
 
 # -------------------
 
