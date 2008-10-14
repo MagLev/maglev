@@ -85,10 +85,17 @@ end
 
 begin
   a = 99
+  y = 98
+  y = $! 
+  unless y.equal?(nil)
+    raise 'ERR'
+  end
   begin
     a.frob
     rescue NoMethodError => ex 
-      puts 'rescue ' , ex
+      unless ex.class.equal?(NoMethodError)
+        raise 'ERR'
+      end
       a = 97
   end    
   unless a == 97

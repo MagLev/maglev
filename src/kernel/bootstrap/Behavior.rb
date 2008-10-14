@@ -8,6 +8,9 @@ class Behavior
   def private(name)
   end
 
+  def public(name)
+  end
+
   def alias(name)
   end
   
