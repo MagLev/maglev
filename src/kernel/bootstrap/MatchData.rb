@@ -89,6 +89,21 @@ class MatchData
 
   # END RUBINIUS
 
+  def offset(n)
+    [self.begin(n), self.end(n)]
+  end
+
+  def select(&block)
+    result = []
+    i = 0
+    lim = self.size
+    while i < lim
+      result << self[i] if block.call(self[i])
+      i += 1
+    end
+    result
+  end
+
   # Append the captures (all but $&) to ary
   def _captures(ary)
     i = 1   # Captures do NOT include $& (the entire matched string)

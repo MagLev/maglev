@@ -1,15 +1,25 @@
 class Regexp
 
+  # Options for passing to new
+  IGNORECASE = 1
+  EXTENDED   = 2
+  MULTILINE  = 4
+
   # Regexp characters that need quoting
   META_CHARS =  %w![ ] { } ( ) | - * . \\ ? + ^ $ #!
 
   primitive_nobridge '_search', '_search:from:to:'
   primitive_nobridge '_compile', '_compile:options:'
+  primitive_nobridge 'options', 'options'
   # class_primitive 'alloc', '_basicNew'
 
   def source
     # return the original string of the pattern
     @source
+  end
+
+  def self.compile(pattern, options = 0, lang = nil)
+    Regexp.new(pattern, options, lang)
   end
 
   # BEGIN RUBINIUS
@@ -30,6 +40,11 @@ class Regexp
     search_region(str, count, str.size, true)
   end
   # END RUBINIUS
+
+  # Return true if +Regexp::IGNORECASE+ is set on this regexp
+  def casefold?
+    options & IGNORECASE != 0
+  end
 
   def initialize(str, options, lang)
     if options._isInteger   # options.kind_of? Integer
