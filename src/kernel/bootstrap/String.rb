@@ -86,12 +86,12 @@ class String
   primitive 'casecmp', 'equalsNoCase:'
 
   def chomp
-    if self[-1].equal(?\r)
+    if self[-1].equal?("\r")
       return self[0..-2]
     end
 
-    if self[-1].equal(?\n)
-      if self[-2].equal(?\r)
+    if self[-1].equal?("\n")
+      if self[-2].equal?("\r")
         return self[0..-3]
       else
         return self[0..-2]

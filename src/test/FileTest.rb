@@ -55,6 +55,8 @@ fname = "/tmp/FileStatTest-234"
 time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
 %x{ touch -t 199910201234 #{fname} }  # create at Wed Oct 20 12:34:00 1999
 
+# Test File class methods
+
 test(File.atime(fname), time, 'File.atime')
 test(File.blockdev?(fname), false, 'File.blockdev?')
 test(File.chardev?(fname), false, 'File.chardev?')
@@ -69,5 +71,12 @@ test(File.socket?(fname), false, 'File.socket?')
 test(File.sticky?(fname), false, 'File.sticky?')
 test(File.symlink?(fname), false, 'File.symlink?')
 test(File.zero?(fname), true, 'File.zero?')
+
+# Test File instance methods
+my_file = File.new(fname)
+
+test(my_file.atime, time, 'File#atime')
+test(my_file.mtime, time, 'File#mtime')
+test(my_file.path, fname, 'File#path')
 
 report

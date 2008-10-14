@@ -19,16 +19,29 @@ class File::Stat
   S_IFLNK  = 0120000  #  symbolic link
   S_IFSOCK = 0140000  #  socket
 
-  S_ISUID = 0004000   # set user id on execution
-  S_ISGID = 0002000   # set group id on execution
-  S_ISVTX = 0001000   # directory restrcted delete
+  S_ISUID  = 0004000  # set user id on execution
+  S_ISGID  = 0002000  # set group id on execution
+  S_ISVTX  = 0001000  # directory restrcted delete
+
+  S_IRWXU  = 0000700  # RWX mask for owner
+  S_IRUSR  = 0000400  # R for owner
+  S_IWUSR  = 0000200  # W for owner
+  S_IXUSR  = 0000100  # X for owner
+
+  S_IRWXG  = 0000070  # RWX mask for group
+  S_IRGRP  = 0000040  # R for group
+  S_IWGRP  = 0000020  # W for group
+  S_IXGRP  = 0000010  # X for group
+
+  S_IRWXO  = 0000007  # RWX mask for other
+  S_IROTH  = 0000004  # R for other
+  S_IWOTH  = 0000002  # W for other
+  S_IXOTH  = 0000001  # X for other
 
   primitive '_atime', 'atimeUtcSeconds'
   primitive '_ctime', 'ctimeUtcSeconds'
   primitive '_mtime', 'mtimeUtcSeconds'
   primitive 'mode', 'mode'
-
-  # MNI: FileStat: <=>
 
   def <=>(other)
     return nil unless other.is_a?(File::Stat)
@@ -69,8 +82,19 @@ class File::Stat
     (mode & S_IFMT) == S_IFDIR
   end
 
-  # MNI: FileStat: executable?
-  # MNI: FileStat: executable_real?
+  def executable?
+    return true if superuser?
+    return mode & S_IXUSR != 0 if owned?
+    return mode & S_IXGRP != 0 if grpowned?
+    return mode & S_IXOTH != 0
+  end
+
+  def executable_real?
+    return true if superuser?
+    return mode & S_IXUSR != 0 if rowned?
+    return mode & S_IXGRP != 0 if rgrpowned?
+    return mode & S_IXOTH != 0
+  end
 
   def file?
     (mode & S_IFMT) == S_IFREG
@@ -91,7 +115,9 @@ class File::Stat
 
   primitive 'gid', 'gid'
 
-  # MNI: FileStat: grpowned?
+  def grpowned?
+    gid == Gemstone.getegid
+  end
 
   primitive 'ino', 'ino'
 
@@ -101,7 +127,9 @@ class File::Stat
 
   primitive 'nlink', 'nlink'
 
-  # MNI: FileStat: owned?
+  def owned?
+    uid == Gemstone.geteuid
+  end
 
   def pipe?
     (mode & S_IFMT) == S_IFIFO
@@ -117,8 +145,19 @@ class File::Stat
     _minor(rdev)
   end
 
-  # MNI: FileStat: readable?
-  # MNI: FileStat: readable_real?
+  def readable?
+    return true if superuser?
+    return mode & S_IRUSR != 0 if owned?
+    return mode & S_IRGRP != 0 if grpowned?
+    return mode & S_IROTH != 0
+  end
+
+  def readable_real?
+    return true if superuser?
+    return mode & S_IRUSR != 0 if rowned?
+    return mode & S_IRGRP != 0 if rgrpowned?
+    return mode & S_IROTH != 0
+  end
 
   def setgid?
     (mode & S_IFMT) == S_ISGID
@@ -148,8 +187,19 @@ class File::Stat
 
   primitive 'uid', 'uid'
 
-  # MNI: FileStat: writable?
-  # MNI: FileStat: writable_real?
+  def writable?
+    return true if superuser?
+    return mode & S_IWUSR != 0 if owned?
+    return mode & S_IWGRP != 0 if grpowned?
+    return mode & S_IWOTH != 0
+  end
+
+  def writable_real?
+    return true if superuser?
+    return mode & S_IWUSR != 0 if rowned?
+    return mode & S_IWGRP != 0 if rgrpowned?
+    return mode & S_IWOTH != 0
+  end
 
   def zero?
     size == 0
@@ -162,6 +212,18 @@ class File::Stat
   # pull the minor device number out of a dev_t
   def _minor(dev_t)
     dev_t & 0xffffff
+  end
+
+  def superuser?
+    Gemstone.getuid == 0
+  end
+
+  def rgrpowned?
+    gid == Gemstone.getgid
+  end
+
+  def rowned?
+    uid == Gemstone.getuid
   end
 
 end
