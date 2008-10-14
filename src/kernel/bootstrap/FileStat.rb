@@ -43,8 +43,6 @@ class File::Stat
   primitive '_mtime', 'mtimeUtcSeconds'
   primitive 'mode', 'mode'
 
-  # MNI: FileStat: <=>
-
   def <=>(other)
     return nil unless other.is_a?(File::Stat)
     self.mtime <=> other.mtime
