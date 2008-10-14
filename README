@@ -1,27 +1,30 @@
 Quick Start:
 
-You run MagLev using the 'maglev', 'mlirb', and 'mlruby' commands
-in the $MAGLEV_HOME/bin directory.  For best results, set MAGLEV_HOME,
-and add $MAGLEV_HOME/bin to your PATH. You must run 'maglev start'
-before running 'mlirb' or 'mlruby'.
+You run MagLev using the 'maglev' script in the $MAGLEV_HOME/bin directory.
+For best results, set MAGLEV_HOME, and add $MAGLEV_HOME/bin to your PATH.
+You must run 'maglev start' before running commands that execute ruby code.
 
-mlirb: Open a maglev shell
-Usage: mlirb [options]
+The two scripts 'maglev-irb' and 'maglev-ruby' are provded for convenience,
+but at this time, they simply duplicate the function of 'maglev irb' and
+maglev ruby' and allow several options.
+
+maglev-irb: Open a maglev shell
+Usage: maglev-irb [options]
 OPTIONS:
    -d      Run in debugging mode
-   -h      Show this message
+   -h      Show help message
    -v      Print version number
 
-mlruby: Execute a Ruby file
-Usage: mlruby [options] <filename>
+maglev-ruby: Execute a Ruby file
+Usage: maglev-ruby [options] <filename>
 OPTIONS:
    -d      Run in debugging mode
-   -h      Show this message
+   -h      Show help message
    -v      Print version number
 
 maglev:  Control the MagLev system
 Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
-          squeak|preload|force-reload|version|help}
+               squeak|preload|force-reload|version|help}
 
 To control the MagLev server:
 maglev start          - Start MagLev server processes
@@ -35,8 +38,8 @@ maglev preload <file> - Load and commit a file into an already running system
 maglev force-reload   - Stop MagLev server, replace with empty repository!!!
 
 To execute other maglev commands:
-maglev irb            - Enter a MagLev interactive shell (same as mlirb)
-maglev ruby  <file>   - Execute a Ruby file (same as mlruby)
+maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
+maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
 maglev topaz          - Enter a Topaz shell
 maglev topaz-debug    - Enter a Topaz shell useful for debugging 
 maglev squeak         - Start optional Squeak development environment
@@ -52,8 +55,8 @@ Note:
 - the first (and ony the first) time you run a maglev command
       that runs Ruby code, it will load and compile its primitives,
       which takes up to a minute to run.
-- mlruby prints a topaz banner every time it is run. 
-      mlirb does not, but it will make errors more difficult to debug,
+- maglev-ruby prints a topaz banner every time it is run. 
+      maglev-irb does not, but it will make errors more difficult to debug,
       as they won't return to Topaz.
  
 Ruby code:

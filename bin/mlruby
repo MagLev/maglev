@@ -7,7 +7,7 @@ COMMAND="`basename $0`"
 usage()
 {
 cat << EOF
-Usage: `basename $0` [options] <filename>
+Usage: $COMMAND [options] <filename>
 
     Execute a Ruby file
 
@@ -32,7 +32,7 @@ fi
 # Check for topaz command to validate the $GEMSTONE directory
 ### -- after maglev binary is renamed irb we can use irb instead
 if [ ! -x $GEMSTONE/bin/topaz ]; then
-    echo "$GEMSTONE is not a valid GemStone product directory"
+    echo "$GEMSTONE does not appear to be a valid GemStone product directory"
     echo "To fix this, set a valid GEMSTONE in your .bashrc"
     exit 1
 fi
