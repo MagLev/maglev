@@ -42,8 +42,8 @@ test(md.end(2), 3,                                 "Pickaxe MatchData I")
 test(md.length, 5,                                 "Pickaxe MatchData J")
 test(md.size,   5,                                 "Pickaxe MatchData K")
 
-#test(md.offset(0), [1,7],                          "Pickaxe MatchData L")
-#test(md.offset(4), [6,7],                          "Pickaxe MatchData M")
+test(md.offset(0), [1,7],                          "Pickaxe MatchData L")
+test(md.offset(4), [6,7],                          "Pickaxe MatchData M")
 
 test(md.post_match, ".",                           "Pickaxe MatchData N")
 
@@ -53,6 +53,22 @@ test(md.string, "THX1138.",                        "Pickaxe MatchData P")
 test(md.to_a, %w(HX1138 H X 113 8),                "Pickaxe MatchData Q")
 test(md.to_s, "HX1138",                            "Pickaxe MatchData R")
 test(md.values_at(0,2,-2), ["HX1138", "X", "113"], "Pickaxe MatchData S")
+
+
+# Test that the Regexp constants are defined and operating correctly
+test(Regexp.new('dog') =~ 'DoG',                   nil, "Regexp::IGNORECASE A")
+test(Regexp.new('dog', Regexp::IGNORECASE) =~ 'DoG', 0, "Regexp::IGNORECASE B")
+
+test(Regexp.new('.') =~ "\n",                     nil, "Regexp::MULTILINE A")
+test(Regexp.new('.', Regexp::MULTILINE) =~ "\n",    0, "Regexp::MULTILINE B")
+
+test(Regexp.new('.D') =~ "\nD",    nil, "Multiple options A")
+test(Regexp.new('.D', Regexp::IGNORECASE) =~ "\nD",
+     nil,
+     "Multiple options A")
+test(Regexp.new('.D', Regexp::IGNORECASE|Regexp::MULTILINE) =~ "\nD",
+     0,
+     "Multiple options A")
 
 report
 
