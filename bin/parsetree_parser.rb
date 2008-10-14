@@ -26,8 +26,8 @@ class ParseServlet < HTTPServlet::AbstractServlet
 		end
 		mp = MaglevParser.new
 		sexp = mp.parse(code, filename, 0).inspect
-		puts sexp
-                STDOUT.flush
+		# puts sexp
+    #  STDOUT.flush
 		res.body = sexp
 	end
 end
