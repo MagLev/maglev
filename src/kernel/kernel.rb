@@ -94,3 +94,4 @@ require 'kernel/bootstrap/FileStat.rb'
 
 require 'kernel/bootstrap/Struct.rb'
 require 'kernel/bootstrap/Enumerable.rb'
+require 'kernel/bootstrap/Dir.rb'

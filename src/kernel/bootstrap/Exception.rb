@@ -1,13 +1,18 @@
+# Maps to Smalltalk class UserException.  See Globals.rb
 class Exception
-    primitive 'signal', 'signal:'
+    Undefined = Object.new
+
+    class_primitive 'exception', 'new'
     class_primitive 'signal', 'signal:'
-    primitive 'message', 'description'
-    primitive_nobridge '_backtrace', 'backtrace'
-   
+
     def self.name
       # override Smalltalk name
       'Exception'
     end
+
+    primitive 'signal', 'signal:'
+    primitive 'message', 'description'
+    primitive_nobridge '_backtrace', 'backtrace'
 
     def backtrace
       result = []
@@ -29,6 +34,24 @@ class Exception
       end
       result[1..-1]
     end
+
+    primitive_nobridge '_message', 'messageText:'
+    def exception(message = Undefined)
+      return self if message.equal?(Undefined)
+      e = dup
+      e._message(message)
+      e
+    end
+
+    # MNI: Exception#set_backtrace
+
+    def to_s
+      (m = message).nil? ? self.class.name : m
+    end
+
+    def to_str
+      (m = message).nil? ? self.class.name : m
+    end
 end
 
 
@@ -36,6 +59,8 @@ class SystemExit
   def self.name
     'SystemExit'  # override Smalltalk name
   end
+  # MNI: SystemExit#status
+  # MNI: SystemExit#success?
 end
 
 class SystemStackExit

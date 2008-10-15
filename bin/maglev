@@ -2,6 +2,36 @@
 #
 # Runs GemStone scripts that used to be invoked as individual commands
 
+COMMAND="`basename $0`"
+
+usage() {
+cat <<ENDHELP
+Usage: 
+$COMMAND {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
+        squeak|preload|force-reload|version|help}
+
+To control the MagLev server:
+maglev start          - Start MagLev server processes
+maglev start-debug    - Start MagLev server processes with verbose output
+maglev start-parser   - Force parser process to start if it's dead
+maglev stop           - Stop MagLev server processes
+maglev restart        - Restart MagLev server processes
+maglev status         - Display MagLev server status
+maglev version        - Display MagLev version number
+maglev preload <file> - Load and commit a file into an already running system
+maglev force-reload   - Stop MagLev server, replace with empty repository!!!
+
+To execute other maglev commands:
+maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
+maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
+maglev topaz          - Enter a Topaz shell
+maglev topaz-debug    - Enter a Topaz shell useful for debugging 
+maglev squeak         - Start optional Squeak development environment
+maglev vsd            - Start Visual Statistics Display monitoring tool
+maglev help           - Display this text
+ENDHELP
+}
+
 # Environment variable settings
 if [ -z "$MAGLEV_HOME" ]; then
   if [ -x $PWD/gemstone/bin/startstone ]; then
@@ -24,8 +54,28 @@ export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
 export GEMSTONE=$MAGLEV_HOME/gemstone
-export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
-export TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+
+# Check options
+while getopts 'hv' OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit
+            ;;
+        v)
+            grep GEMSTONE $MAGLEV_HOME/version.txt
+            exit
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+     esac
+done
+shift $(($OPTIND - 1))
 
 # Commands
 startserver() {
@@ -51,7 +101,7 @@ startparser() {
     echo "Use \"maglev status\" to check that the parser is running."
     exit 1
   fi
-  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+  if [ -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
@@ -74,7 +124,7 @@ forceparser() {
 }
 
 startparser-debug() {
-  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+  if [ -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
@@ -93,15 +143,15 @@ stopserver() {
 }
 
 stopparser() {
-  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    kill -9 `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
+  if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
+    kill -9 `lsof -Fp -w -iTCP:${PARSETREE_PORT} | cut -c2-`
   fi
 }
 
 status() {
   echo "MAGLEV_HOME = $MAGLEV_HOME"
   $GEMSTONE/bin/gslist -clv
-  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+  if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
     echo "MagLev Parse Server port = $PARSETREE_PORT"
     lsof -P -w -iTCP:${PARSETREE_PORT}
     # if you don't have permission to run lsof, use the following instead
@@ -210,7 +260,7 @@ startvsd() {
 }
 
 maglev-shell() {
-  $GEMSTONE/bin/maglev $@
+  $GEMSTONE/bin/irb $@
 }
 
 mri() {
@@ -228,33 +278,6 @@ gemx() {
   fi
 }
 
-
-help() {
-cat <<ENDHELP
-Server Commands:
-maglev start          - Start MagLev server processes
-maglev start-debug    - Start MagLev server processes with verbose output
-maglev start-parser   - Force parser process to start if it's dead
-maglev stop           - Stop MagLev server processes
-maglev restart        - Restart MagLev server processes
-maglev status         - Display MagLev server status
-maglev version        - Display MagLev version number
-maglev preload <file> - Load and commit a file into an already running system
-maglev force-reload   - Stop MagLev server, overwrite with empty repository!!!
-
-User Commands:
-maglev irb            - Enter a MagLev interactive shell
-maglev ruby  <file>   - Execute a Ruby file
-maglev topaz          - Enter a Topaz shell
-maglev topaz-debug    - Enter a Topaz shell useful for debugging
-maglev squeak         - Start optional Squeak development environment
-maglev vsd            - Start Visual Statistics Display monitoring tool
-maglev help           - Display this text
-
-Note: 
-For best results, set MAGLEV_HOME, and add \$MAGLEV_HOME/bin to your PATH
-ENDHELP
-}
 
 # See what we were asked to do
 case "$1" in
@@ -332,11 +355,11 @@ case "$1" in
 	initialize
         ;;
   help)
-        help
+        usage
         ;;
   *)
-  echo "Usage: "
-  echo "maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
-  echo "          squeak|preload|force-reload|version|help}"
-  exit 1
+        echo "Usage: $COMMAND {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
+        echo "               squeak|preload|force-reload|version|help}"
+        exit 1
+        ;;
 esac

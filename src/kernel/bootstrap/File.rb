@@ -1,5 +1,11 @@
 # File in Ruby is identically Smalltalk GsFile
 class File
+
+    FNM_NOESCAPE = 0x01
+    FNM_PATHNAME = 0x02
+    FNM_DOTMATCH = 0x04
+    FNM_CASEFOLD = 0x08
+
     primitive 'close', 'close'
     primitive '<<', 'addAll:'
     primitive 'write', 'addAll:'
@@ -16,6 +22,9 @@ class File
     class_primitive 'stdout'
     class_primitive 'stderr'
     class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
+
+    # For Dir.rb
+    class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
 
     # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown
     class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'

@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# Runs the equivalent of "maglev ruby"
+# Runs the equivalent of "maglev irb"
 
 COMMAND="`basename $0`"
 
 usage()
 {
 cat << EOF
-Usage: `basename $0` [options] <filename>
+Usage: $COMMAND [options]
 
-    Execute a Ruby file
+    Open a maglev shell
 
 OPTIONS:
    -d      Run in debugging mode
@@ -29,10 +29,9 @@ if [ -z "${GEMSTONE}" ]; then
     export GEMSTONE=$MAGLEV_HOME/gemstone
     # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
 fi
-# Check for topaz command to validate the $GEMSTONE directory
-### -- after maglev binary is renamed irb we can use irb instead
-if [ ! -x $GEMSTONE/bin/topaz ]; then
-    echo "$GEMSTONE is not a valid GemStone product directory"
+# Check for irb command to validate the $GEMSTONE directory
+if [ ! -x $GEMSTONE/bin/irb ]; then
+    echo "$GEMSTONE does not appear to be a valid GemStone product directory"
     echo "To fix this, set a valid GEMSTONE in your .bashrc"
     exit 1
 fi
@@ -40,15 +39,15 @@ fi
 # Environment variable settings
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+export IRB_CMD="$GEMSTONE/bin/irb"
 
 # Check options
 while getopts 'hdv' OPTION
 do
     case $OPTION in
         d)
-            ### We need to replace this with a real way to debug using TOPAZ
-            export TOPAZ_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+            ### We need to replace this with a real way to debug using irb
+            IRB_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
             ;;
         h)
             usage
@@ -59,6 +58,7 @@ do
             exit
             ;;
         ?)
+            echo
             usage
             exit
             ;;
@@ -66,27 +66,14 @@ do
 done
 shift $(($OPTIND - 1))
 
-# Make sure we have one argument
-if [ $# -ne 1 ]; then
-    echo "Error: $COMMAND requires exctly one filename as an argument."
+# Make sure we don't have any arguments
+if [ $# -ne 0 ]; then
+    echo "Error: $COMMAND does not allow any arguments."
     usage
     exit
-    exit 1
-fi
-# Make sure the argument is a valid file
-if [ ! -e $1 ]; then
-    echo "Error: The file \"$1\" does not exist"
-    exit 1
 fi
 
 # Finally, execute the command
-FILE=$PWD/$1
-$TOPAZ_CMD <<ENDRUBY 
-run
-RubyContext load.
-RubyContext loadFileNamed: '$FILE'.
-%
-exit
-ENDRUBY
+$IRB_CMD
 
 exit
