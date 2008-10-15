@@ -37,8 +37,8 @@ ruby$target:::function-entry
 dtrace:::END
 {
   printf("%25s %25s %8s\n", "Class", "Method", "Count");
-  printf("------------------------------------------------------------\n");
-  printa("%25s %25s %@8d\n", @count_table);
+  printf("-------------------------------------------------------------\n");
+  printa("|%25s %25s %@8d\n", @count_table);
 }
 
 
