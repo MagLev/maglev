@@ -216,15 +216,7 @@ class String
   primitive 'length', 'size'
 
   primitive 'lstrip', 'trimLeadingSeparators'
-
-  # TODO: PERFROMANCE: In the case that there is leading whitespace, the
-  # underlying smalltalk returns a copy.  Is there a way to remove leading
-  # w/o a copy?
-  def lstrip!
-    original_length = length
-    replace(lstrip)
-    return original_length == length ? nil : self
-  end
+  primitive 'lstrip!', '_removeLeadingSeparators' # in .mcz
 
   def match(pattern)
     # TODO: Figure out how to pass something more complex than a method name
@@ -269,15 +261,7 @@ class String
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
-
-  # TODO: PERFROMANCE: In the case that there is trailing whitespace, the
-  # underlying smalltalk returns a copy.  Is there a way to remove leading
-  # w/o a copy?
-  def rstrip!
-    original_length = length
-    replace(rstrip)
-    return original_length == length ? nil : self
-  end
+  primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
 
   def scan(regex)
     result = []

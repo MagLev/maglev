@@ -25,4 +25,19 @@ unless a == [1,2,3,4,5]
   raise 'ERR'
 end
 
+p = Proc.new { | a | 
+   unless a.equal?(99)
+     raise 'ERR'
+   end
+}
+p[99]
+
+q = Proc.new { | b |
+  unless b.equal?(88)
+     raise 'ERR'
+  end
+}
+arr = [ 88 ]
+q[*arr]
+
 true

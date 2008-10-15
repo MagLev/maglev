@@ -4,7 +4,7 @@ class File
     primitive '<<', 'addAll:'
     primitive 'write', 'addAll:'
     primitive 'next_line', 'nextLineTo:'
-    primitive 'eof?', 'atEnd'
+    primitive_nobridge '_atEnd', 'atEnd'
     primitive 'read', 'next:'
     primitive 'read', 'contents'
 
@@ -271,6 +271,14 @@ class File
 
     def ctime
       self.stat.ctime
+    end
+
+    def eof?
+      status = self._atEnd 
+      if (status.equal?(nil)) 
+        raise IOError
+      end
+      status
     end
 
     # MNI: File#flock

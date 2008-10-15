@@ -50,7 +50,7 @@ class Hash
     unless other._isHash
       other = other.to_hash
     end
-    unless other.length == self.length
+    unless other.length.equal?(self.length)
       return false
     end
     unless other.default == self.default
@@ -253,7 +253,7 @@ class Hash
 
 #  primitive 'inspect', 'printString'
   def inspect
-    return "{}" if length == 0
+    return "{}" if length.equal?(0)
     str = "{"
     each{|k,v| str << k.inspect; str << "=>"; str << v.inspect; str << ", "}
     str[0..(str.length - 3)] + "}"
