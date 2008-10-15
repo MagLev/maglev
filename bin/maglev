@@ -101,7 +101,7 @@ startparser() {
     echo "Use \"maglev status\" to check that the parser is running."
     exit 1
   fi
-  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+  if [ -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
@@ -124,7 +124,7 @@ forceparser() {
 }
 
 startparser-debug() {
-  if [ -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+  if [ -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
     pushd $MAGLEV_HOME/bin > /dev/null
     nohup ruby parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
@@ -143,15 +143,15 @@ stopserver() {
 }
 
 stopparser() {
-  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
-    kill -9 `lsof -Fp -iTCP:${PARSETREE_PORT} | cut -c2-`
+  if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
+    kill -9 `lsof -Fp -w -iTCP:${PARSETREE_PORT} | cut -c2-`
   fi
 }
 
 status() {
   echo "MAGLEV_HOME = $MAGLEV_HOME"
   $GEMSTONE/bin/gslist -clv
-  if [ ! -z "`lsof -Fp -iTCP:${PARSETREE_PORT}`" ]; then
+  if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
     echo "MagLev Parse Server port = $PARSETREE_PORT"
     lsof -P -w -iTCP:${PARSETREE_PORT}
     # if you don't have permission to run lsof, use the following instead
