@@ -14,7 +14,11 @@ class Dir
   # MNI: Dir.mkdir
   # MNI: Dir.new
   # MNI: Dir.open
-  # MNI: Dir.pwd
+
+  def self.pwd
+    `pwd`  # TODO: Dir.pwd: Hack to get things to compile. FIX
+  end
+
   # MNI: Dir.rmdir
   # MNI: Dir.unlink
 

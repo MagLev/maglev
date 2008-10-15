@@ -77,8 +77,11 @@ require 'kernel/bootstrap/MatchData.rb'
 require 'kernel/bootstrap/Exception.rb'
 require 'kernel/bootstrap/Module.rb'
 
-require 'kernel/bootstrap/File.rb'
 require 'kernel/bootstrap/Env.rb'
+require 'kernel/bootstrap/Enumerable.rb'
+require 'kernel/bootstrap/Dir.rb'
+require 'kernel/bootstrap/File.rb'
+
 require 'kernel/bootstrap/Time.rb'
 require 'kernel/bootstrap/IO.rb'
 require 'kernel/bootstrap/Socket.rb'
@@ -93,5 +96,3 @@ require 'kernel/bootstrap/GC.rb'
 require 'kernel/bootstrap/FileStat.rb'
 
 require 'kernel/bootstrap/Struct.rb'
-require 'kernel/bootstrap/Enumerable.rb'
-require 'kernel/bootstrap/Dir.rb'
