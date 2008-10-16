@@ -131,13 +131,15 @@ class File
     # appropriate path components.  Does not coalesce contiguous '/'s.
     def self.expand_path(a_path, a_dir = nil)
       path = StringValue(a_path) # nil a_path should raise TypeError
-      return Dir.pwd if path.empty?
+
+      dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
+      dir = Dir.pwd if dir.empty?
+
+      return dir if path.empty?
 
       path = _tilde_expand(path)
 
       if path[0] !=  SEPARATOR[0] # relative path
-        dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
-        dir = Dir.pwd if dir.empty?
         path = File.join(dir, path)
       end
 
