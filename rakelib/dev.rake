@@ -97,7 +97,7 @@ namespace :dev do
 output push runinp.out
 omit resultcheck
 inp #{the_file}
-#{commit}
+
 END
   end
 
