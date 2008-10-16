@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # File in Ruby is identically Smalltalk GsFile
 class File
 
@@ -5,6 +6,9 @@ class File
     FNM_PATHNAME = 0x02
     FNM_DOTMATCH = 0x04
     FNM_CASEFOLD = 0x08
+
+    SEPARATOR      = '/'
+    PATH_SEPARATOR = ':'
 
     primitive 'close', 'close'
     primitive '<<', 'addAll:'
@@ -30,8 +34,7 @@ class File
     class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'
 
     def self.name
-      # override Smalltalk name
-      'File'
+      'File' # override Smalltalk name
     end
 
     def self.atime(filename)
@@ -121,56 +124,55 @@ class File
       alias exists? exist?
     end
 
-    # BEGIN RUBINIUS (from kernel/platform/file.rb)
-    # FIXME: this is awful
-    def self.expand_path(path, dir_string = nil)
-      path = StringValue(path)
-      if(dir_string.nil?)
-        dir_string = Dir.pwd
-      else
-        dir_string = StringValue(dir_string)
+    # Convert path to an absolute pathname. If no directory is given,
+    # relative paths are rooted at the current working directory.
+    # Otherwise directory will be prefixed to the path. Tilde expansion is
+    # done on the path.  Replaces '.' and '..' in the path with the
+    # appropriate path components.  Does not coalesce contiguous '/'s.
+    def self.expand_path(a_path, a_dir = nil)
+      path = StringValue(a_path) # nil a_path should raise TypeError
+      return Dir.pwd if path.empty?
+
+      path = _tilde_expand(path)
+
+      if path[0] !=  SEPARATOR[0] # relative path
+        dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
+        dir = Dir.pwd if dir.empty?
+        path = File.join(dir, path)
       end
 
-      path.gsub!(/~(#{ENV['USER']})/, "~/")
+      _cannonicalize(path)
+    end
 
-      raise ArgumentError, "user #{path}" if path.match(/~([^\/])/)
-
-      if(dir_string.empty?)
-        dir_string = Dir.pwd
-      elsif(dir_string[0].chr == '~')
-        dir_string = ENV['HOME'] + dir_string[1..-1]
-      elsif(dir_string[0].chr != '/')
-        dir_string = Dir.pwd + "/" + dir_string
-      end
-
-      dirs = path.split('/')
-      if path == '' || (dirs.empty? && path[0].chr != '/')
-        return dir_string
-      else
-        first = case dirs.first
-                when '..'; dir_string.split('/')[0...-1].join('/')
-                when '~'; ENV['HOME']
-                when '.'; dir_string
-                when ''; '/'
-                when nil;
-                  match = /(\/+)/.match(path)
-                  prefix = match[0] if match
-                  ''
-                else
-                  dir_string + '/' + dirs.first
-                end
-
-        dirs.shift
-        paths = first.split('/')
-        dirs.each do |dir|
-          next if dir == '.' || dir == ''
-          dir == '..' ? paths.pop : paths.push(dir)
+    # Remove .. and . from path
+    def self._cannonicalize(path)
+      return path unless path['.']
+      new_parts = []
+      path.split(SEPARATOR).each do |component|
+        case component
+        when '..'
+          new_parts.pop
+        when '.'
+          # nothing: just skip it
+        when ''
+          # The split
+        else
+          new_parts << component
         end
-        string = paths.empty? ? '' : paths.join("/")
-        return !string.empty? && string[0].chr == '/' ? string : prefix || '/' +string
+      end
+      "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
+    end
+
+    def self._tilde_expand(path)
+      case path[0,2]
+      when '~':   ENV['HOME']
+      when '~/':  ENV['HOME'] + path[1..-1]
+      when /^~([^\/])+(.*)/
+        raise NotImplementedError, "Don't handle ~user expansion yet"
+      else
+        path
       end
     end
-    # END RUBINIUS
 
     def self.extname(filename)
       base = self.basename(filename)
@@ -195,7 +197,7 @@ class File
     end
 
     def self.join(*ary)
-        ary.join("/")
+        ary.join(SEPARATOR)
     end
 
     def self.lchmod(permission, *fileNames)

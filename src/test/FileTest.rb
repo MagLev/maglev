@@ -78,7 +78,13 @@ test(File.exist?("/tmp"),                   true,  'File.exist? B')
 test(File.exists?("/This/Better/Not/Exists"), false, 'File.exists? A')
 test(File.exists?("/tmp"),                    true,  'File.exists? B')
 
-# test(File.expand_path("~"), ENV['HOME'], 'expand_path A')
+
+test(File.expand_path("~"), ENV['HOME'],       'expand_path A')
+test(File.expand_path("/foo/bar/.."), '/foo',  'expand_path B')
+test(File.expand_path("./foo/bar/..", "/tmp"), '/tmp/foo', 'expand_path C')
+test(File.expand_path(".//foo///bar//..", "/tmp"), '/tmp/foo', 'expand_path D')
+
+#test(File.expand_path("///foo/bar/.."), '/foo',  'expand_path B')
 
 # Test File instance methods
 my_file = File.new(fname)
