@@ -233,7 +233,7 @@ RubyContext default loadFileNamed: '$1'.
 RubyContext save.
 %
 commit
-maglev
+irb
 puts 'MagLev preload $1 completed'
 quit
 exit
