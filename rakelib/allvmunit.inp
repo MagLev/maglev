@@ -3,7 +3,7 @@ run
 | bmCount lf confFile bmOutF |
 bmCount := 1 .
 lf := Character lf .
-confFile := GsFile openReadOnServer: '../gss64bit_3.0/tests/rubytst/vmunit.conf' .
+confFile := GsFile openReadOnServer: 'src/test/vmunit.conf' .
 [ true ] whileTrue:[
   | aLine fullPath bmResult |
   [
