@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # File in Ruby is identically Smalltalk GsFile
 class File
 
@@ -5,6 +6,9 @@ class File
     FNM_PATHNAME = 0x02
     FNM_DOTMATCH = 0x04
     FNM_CASEFOLD = 0x08
+
+    SEPARATOR      = '/'
+    PATH_SEPARATOR = ':'
 
     primitive 'close', 'close'
     primitive '<<', 'addAll:'
@@ -30,8 +34,7 @@ class File
     class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'
 
     def self.name
-      # override Smalltalk name
-      'File'
+      'File' # override Smalltalk name
     end
 
     def self.atime(filename)
@@ -113,9 +116,65 @@ class File
       File.stat(filename).executable_real?
     end
 
-    # MNI: File.exist?
-    # MNI: File.exists?
-    # MNI: File.expand_path
+    def self.exist?(path)
+      File.stat(path) ? true : false rescue false
+    end
+
+    class << self
+      alias exists? exist?
+    end
+
+    # Convert path to an absolute pathname. If no directory is given,
+    # relative paths are rooted at the current working directory.
+    # Otherwise directory will be prefixed to the path. Tilde expansion is
+    # done on the path.  Replaces '.' and '..' in the path with the
+    # appropriate path components.  Does not coalesce contiguous '/'s.
+    def self.expand_path(a_path, a_dir = nil)
+      path = StringValue(a_path) # nil a_path should raise TypeError
+
+      dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
+      dir = Dir.pwd if dir.empty?
+
+      return dir if path.empty?
+
+      path = _tilde_expand(path)
+
+      if path[0] !=  SEPARATOR[0] # relative path
+        path = File.join(dir, path)
+      end
+
+      _cannonicalize(path)
+    end
+
+    # Remove .. and . from path
+    def self._cannonicalize(path)
+      return path unless path['.']
+      new_parts = []
+      path.split(SEPARATOR).each do |component|
+        case component
+        when '..'
+          new_parts.pop
+        when '.'
+          # nothing: just skip it
+        when ''
+          # The split
+        else
+          new_parts << component
+        end
+      end
+      "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
+    end
+
+    def self._tilde_expand(path)
+      case path[0,2]
+      when '~':   ENV['HOME']
+      when '~/':  ENV['HOME'] + path[1..-1]
+      when /^~([^\/])+(.*)/
+        raise NotImplementedError, "Don't handle ~user expansion yet"
+      else
+        path
+      end
+    end
 
     def self.extname(filename)
       base = self.basename(filename)
@@ -140,7 +199,7 @@ class File
     end
 
     def self.join(*ary)
-        ary.join("/")
+        ary.join(SEPARATOR)
     end
 
     def self.lchmod(permission, *fileNames)
