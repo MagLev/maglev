@@ -1,18 +1,6 @@
 # Test the logic of String#tr, String#tr!, String#tr_s and String#tr_s!
 
-$failed = []
-$count = 0
-def test(actual, expected, msg)
-    $count += 1
-    $failed << "ERROR: #{msg} Expected: #{expected} actual: #{actual}" unless expected == actual
-end
-
-def report
-  puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
-  puts $failed
-  raise $failed.join("\n") unless $failed.empty?
-end
-
+require File.expand_path('simple', File.dirname(__FILE__))
 
 #     BEGIN TEST CASES
 

@@ -1,4 +1,4 @@
-output pushnew log/allbench.out
+output pushnew log/allvmunit.out
 run
 | bmCount lf confFile bmOutF |
 bmCount := 1 .

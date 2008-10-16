@@ -1,22 +1,4 @@
-
-$failed = []
-$count = 0
-def test(actual, expected, msg)
-  #puts "==== Testing: #{msg}"
-  $count += 1
-  if (expected == actual)
-    # ok
-  else
-    puts "==== Failure: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
-    raise 'ERROR'
-  end
-end
-
-def report
-  puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
-  $failed.each { |f| puts f }
-  raise "Failed #{$failed.size} tests" unless $failed.empty?
-end
+require File.expand_path('simple', File.dirname(__FILE__))
 
 t  = Time.at(1222895022)  # Wed Oct 01 14:03:42 -0700 2008
 t2 = Time.at(1222895022)
@@ -47,7 +29,7 @@ test(t.strftime("%H"), "14",        "%H test")
 test(t.strftime("%I"), "02",        "%I test")
 test(t.strftime("%j"), "275",       "%j test")
 test(t.strftime(
-  "                                                           %j"), 
+  "                                                           %j"),
   "                                                           275",  "%j test")
 test(t.strftime("%m"), "10",        "%m test")
 test(t.strftime("%M"), "03",        "%M test")
@@ -59,8 +41,8 @@ test(t.strftime("%w"), "3",         "%w test")
 test(t.strftime("%y"), "08",        "%y test")
 test(t.strftime("%Y"), "2008",      "%Y test")
 test(t.strftime("%Z"), "PDT",       "%Z test")
-test(t.strftime("%%"), "%",         "%% test") 
-# %x returns 2008 on Linux, 08 on Solaris 
+test(t.strftime("%%"), "%",         "%% test")
+# %x returns 2008 on Linux, 08 on Solaris
 # test(t.strftime("%x"), "10/01/08",  "%x test")
 
 # Test equality of Time objects
