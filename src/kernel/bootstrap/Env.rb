@@ -19,6 +19,12 @@ class Env
       @ht[vname] = v
     end
 
+    def has_key?(key)
+      ! File._environmentAt(key, false).nil?
+    end
+
+    alias include? has_key?
+
     # TODO the rest of the API for Hash needs implementation here
 end
 
