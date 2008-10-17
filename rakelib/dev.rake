@@ -71,14 +71,6 @@ namespace :dev do
 
     untar_product_to_gemstone tgz_file
     copy_extent
-
-    puts "=== Start GemStone Server"
-    Rake::Task['gs:start'].invoke
-#    load_mcz mcz_file
-    Rake::Task['gs:status'].invoke
-    # TODO: really load mcz files, if necessary
-    # TODO: get topaz snippets working and ensure the image is loaded up
-    #       with all of the appropriate items (mcz, primitives, etc.)
   end
 
   desc "Make sure the gemstone server is stopped."
@@ -105,12 +97,12 @@ namespace :dev do
 output push runinp.out
 omit resultcheck
 inp #{the_file}
-#{commit}
+
 END
   end
 
   desc "Reload kernel.rb (primitives) and commit it"
-  task :reloadprims do
+  task :reloadprims => ['gs:start'] do
     run_topaz <<END
 output push reloadprims.out
 omit resultcheck
@@ -124,7 +116,7 @@ END
   end
 
   desc "Load the mcz file ../latest.mcz and commit it."
-  task :loadmcz do
+  task :loadmcz => ['gs:start'] do
     run_topaz <<END
 output push loadall.out
 display resultcheck

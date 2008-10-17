@@ -1,3 +1,5 @@
+require File.expand_path('simple', File.dirname(__FILE__))
+
 class ArgsTest
 
   def test_000
@@ -144,23 +146,6 @@ tests.test_01_no_block_with_splat
 tests.test_02_no_block_without_splat
 tests.test_03_no_block_with_splat_and_nils
 tests.test_04_no_block_without_splat_and_nils
-true
-
-
-$failed = []
-$count = 0
-def test(actual, expected, msg)
-  # puts "==== Testing: #{msg}"
-  $count += 1
-  $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
-end
-
-def report
-  puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
-  puts $failed
-  raise $failed.join("\n") unless $failed.empty?
-end
-
 
 # Tests from "The Ruby Programming Language", section 6.4
 
@@ -209,3 +194,5 @@ other_ary = ["FOO", nil, "BAR", nil]
 test(ret.concat(other_ary.compact),["A", "B", "FOO", "BAR"], "Regression 3")
 
 report
+
+true

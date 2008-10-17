@@ -1,6 +1,6 @@
 # We define all of these globals up front so that we can open these classes later without accidentally creating new ones
 
-#            Ruby class name , Gemstone class name 
+#            Ruby class name , Gemstone class name
 RUBY.global('Array', 'Array')
 RUBY.global('Behavior', 'Behavior')
 RUBY.global('Boolean', 'Boolean')
@@ -18,7 +18,7 @@ RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMethod')  # RubyMethod , RubyUnboundMethod defined in .mcz
-RUBY.global('Module', 'Module')    # for class Module 
+RUBY.global('Module', 'Module')    # for class Module
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
@@ -38,47 +38,47 @@ RUBY.global('UnboundMethod', 'RubyUnboundMethod')
 
 RUBY.global('Gemstone', 'System')
 
-# 
+#
 #  Define some of the Ruby exception classes to be identical to certain
 #   Smalltalk exception classes   .
 #  see GlobalErrors.rb for additional creation of Ruby exception classes
 #
 #            Ruby name           Smalltalk Name
 #
-RUBY.global('Exception', 	'UserException')
-  RUBY.global('SystemExit', 	'RubySystemExit')
-  RUBY.global('SystemStackExit', 	'StackOverflow')
-  RUBY.global('NoMemoryError', 	'OutOfMemory')
+RUBY.global('Exception',    'UserException')
+  RUBY.global('SystemExit',     'RubySystemExit')
+  RUBY.global('SystemStackExit',    'StackOverflow')
+  RUBY.global('NoMemoryError',  'OutOfMemory')
   RUBY.global('ScriptError',      'RubyScriptError')
     RUBY.global('LoadError',        'RubyLoadError')
-    RUBY.global('NotImplementedError', 	'RubyNotImplementedError')
-    RUBY.global('SyntaxError', 	'RubyParseError')
+    RUBY.global('NotImplementedError',  'RubyNotImplementedError')
+    RUBY.global('SyntaxError',  'RubyParseError')
 
-  RUBY.global('SignalException', 	'ControlInterrupt')
+  RUBY.global('SignalException',    'ControlInterrupt')
 
   RUBY.global('StandardError',    'Error')
     #IntepreterError is here in Smalltalk hierarchy
-      RUBY.global('ArgumentError', 	'ArgumentError')
-      RUBY.global('IOError', 		'IOError')
-        RUBY.global('EOFError', 	'EOFError')
-        RUBY.global('SocketError', 	'SocketError')
-          RUBY.global('EBADF' , 		'SocketErrorEBADF')
-          RUBY.global('ENOTCONN' , 	'SocketErrorENOTCONN')
-          RUBY.global('EPIPE' , 		'SocketErrorEPIPE')
-          RUBY.global('ECONNRESET' , 	'SocketErrorECONNRESET')
-      RUBY.global('IndexError', 	'OffsetError')
-      RUBY.global('LocalJumpError', 	'CannotReturn')
-      RUBY.global('RangeError', 	'RangeError')
+      RUBY.global('ArgumentError',  'ArgumentError')
+      RUBY.global('IOError',        'IOError')
+        RUBY.global('EOFError',     'EOFError')
+        RUBY.global('SocketError',  'SocketError')
+          RUBY.global('EBADF' ,         'SocketErrorEBADF')
+          RUBY.global('ENOTCONN' ,  'SocketErrorENOTCONN')
+          RUBY.global('EPIPE' ,         'SocketErrorEPIPE')
+          RUBY.global('ECONNRESET' ,    'SocketErrorECONNRESET')
+      RUBY.global('IndexError',     'OffsetError')
+      RUBY.global('LocalJumpError',     'CannotReturn')
+      RUBY.global('RangeError',     'RangeError')
         RUBY.global('FloatDomainError', 'FloatingPointError')
-      RUBY.global('RegexpError', 	'RegexpError')
-      RUBY.global('RuntimeError', 	'RuntimeError')
-      RUBY.global('SecurityError', 	'SecurityError')
-      RUBY.global('SystemCallError', 	'SystemCallError')
-      RUBY.global('ThreadError', 	'ThreadError')
-      RUBY.global('TypeError', 	'TypeError')
+      RUBY.global('RegexpError',    'RegexpError')
+      RUBY.global('RuntimeError',   'RuntimeError')
+      RUBY.global('SecurityError',  'SecurityError')
+      RUBY.global('SystemCallError',    'SystemCallError')
+      RUBY.global('ThreadError',    'ThreadError')
+      RUBY.global('TypeError',  'TypeError')
 
-    RUBY.global('NameError', 	'NameError')
-      RUBY.global('NoMethodError', 	'MessageNotUnderstood')
+    RUBY.global('NameError',    'NameError')
+      RUBY.global('NoMethodError',  'MessageNotUnderstood')
     RUBY.global('ZeroDivisionError', 'ZeroDivide')
 
 
@@ -99,7 +99,7 @@ ARGV = []
 #  $-0 is translated to $/ by parser  .
 #  $-F is translated to  $;  by parser  .
 
-#  $!  translated to exception block block-arg-ref by RubyGlobalVarNode 
+#  $!  translated to exception block block-arg-ref by RubyGlobalVarNode
 #         and RubyRescueBodyNode
 #  $&  $_  $` $' $1..$9 $~  all translated to access to 
 #    appropriate thread-local data(see GsProcess) associated with $~ 
@@ -122,4 +122,5 @@ RUBY_PATCHLEVEL = '114'  # TODO: this is what MRI 1.8.6 shows...
 # Value is examined by mspec/runner/mspec.rb.
 DEBUG_SPEC = false
 
-
+TRUE  = true
+FALSE = false
