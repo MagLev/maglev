@@ -5,6 +5,7 @@ RUBY.global('Array', 'Array')
 RUBY.global('Behavior', 'Behavior')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'Class')
+RUBY.global('Dir', 'RubyDirectory')
 RUBY.global('FalseClass', 'FalseClass')
 RUBY.global('File', 'GsFile')
 RUBY.global('File::Stat', 'GsFileStat')  # File::Stat -->  GsFileStat
@@ -95,13 +96,16 @@ ARGV = []
 # Notes on various globals
 #  $; is auto-initialized to nil if referenced, by RubySexpParser .
 #  $/ is auto-initialized to "\n" by parser at first ref .
-#  $-0 is translated to $/ by parser .
-#  $-F is translated to  $;  by parser .
+#  $-0 is translated to $/ by parser  .
+#  $-F is translated to  $;  by parser  .
 
 #  $!  translated to exception block block-arg-ref by RubyGlobalVarNode 
 #         and RubyRescueBodyNode
-#  $&  $_  $` $' $1..$9 $~  all translated to access to thread-local
-#    data related to $~ 
+#  $&  $_  $` $' $1..$9 $~  all translated to access to 
+#    appropriate thread-local data(see GsProcess) associated with $~ 
+
+# $: , RUBY
+#  are currently initialized in RubyContext(C)>>initialize
 
 # -------------------
 

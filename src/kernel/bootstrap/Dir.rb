@@ -1,35 +1,87 @@
 class Dir
   include Enumerable
 
+  # private primitives
+  class_primitive_nobridge '_rmdir', '_rmdir:'
+  class_primitive_nobridge '_chdir', '_chdir:'
+  class_primitive_nobridge '_getwd', '_getwd'
+  class_primitive_nobridge '_new', '_new:'
+  class_primitive_nobridge '_mkdir', '_mkdir:permissions:'
+ 
   # Class Methods
 
   # MNI: Dir.[]
-  # MNI: Dir.chdir
-  # MNI: Dir.chroot
-  # MNI: Dir.delete
   # MNI: Dir.entries
   # MNI: Dir.foreach
-  # MNI: Dir.getwd
   # MNI: Dir.glob
-  # MNI: Dir.mkdir
-  # MNI: Dir.new
-  # MNI: Dir.open
 
-  def self.pwd
-    `pwd`  # TODO: Dir.pwd: Hack to get things to compile. FIX
+  def self.new(dirname)
+    inst = _new(dirname)
+    if (inst._isSmallInteger) 
+      raise SystemCallError  # TODO: use inst which is errno value
+    end
+    inst.initialize(dirname)
   end
 
-  # MNI: Dir.rmdir
-  # MNI: Dir.unlink
+  def self.delete(dirname)
+    status = _rmdir(dirname)
+    if (status.equal?(0))
+      return 0
+    end
+    raise SystemCallError  # TODO: use status which is errno value
+  end
+
+  def self.rmdir(dirname)
+    rmdir(dirname)
+  end
+
+  def self.unlink(dirname)
+    rmdir(dirname)
+  end
+
+  def self.chdir
+    raise NotImplementedError # TODO , use HOME env ....
+  end
+
+  def self.chdir(aString)
+    status = _chdir(aString)
+    if (status.equal?(0))
+      return 0
+    end
+    raise SystemCallError  # TODO: use status which is errno value
+  end
+
+  def self.chroot(dirname)
+    raise SecurityError  # MNU, and only root could do this anyway
+  end
+
+  def self.getwd
+    res = _getwd
+    if (res._isSmallInteger)
+      raise SystemCallError  # TODO: use res which is errno value
+    end
+    res
+  end
+
+  def self.pwd
+    getwd
+  end
+
+  def mkdir(dirname, permissions=nil)
+    # if not nil, permissions must be >= 0 and <= 0777
+    # if permissions==nil ,  the created directory will have
+    #   permissions as specified by current value of File.umask() 
+    status = _mkdir(dir, permissions)
+    if (status.equal?(0))
+      return 0
+    end
+    raise SystemCallError  # TODO: use status which is errno value
+  end
 
   # Instance Methods
   def initialize(path)
     @path    = path
-    # _dir_contents returns a listing with the full path, we want just the
-    # basename.  Also, _dir_contents will use the physical path, not the
-    # logical, e.g., File._dir_contents('/tmp'), on a Mac, will return
-    # ['/private/tmp/.',...].  So we use basename to clean up everything
-    @entries = File._dir_contents(@path, false).collect { |f| File.basename f }
+    # @entries has been filled in by _new primitive
     @index   = 0
     @closed  = false
     @range   = 0...@entries.length
@@ -44,9 +96,16 @@ class Dir
     check_closed
 
     i = 0
-    while i < @entries.size
+    lim = @entries.size
+    while i < lim
       block.call(@entries[i])
+      i = i + 1
     end
+  end
+
+  def entries
+    check_closed
+    @entries
   end
 
   def path

@@ -20,6 +20,7 @@ class File
 
     class_primitive_nobridge '_fstat','fstat:isLstat:'
     class_primitive_nobridge '_stat','stat:isLstat:'
+    class_primitive_nobridge '_umask', '_umask:'
 
     class_primitive_nobridge '_open', 'openOnServer:mode:'
     class_primitive 'stdin'
@@ -299,7 +300,26 @@ class File
     end
 
     # MNI: File.truncate
-    # MNI: File.umask
+
+    def self.umask
+      # return current file creation mask
+      _umask(-1)
+    end
+
+    def self.umask(newMask)
+      # set file creation mask to newMask and return previous value
+      # newMask must be >= 0 and <= 0777
+      if (newMask >= 0)
+        res = _umask(newMask)
+      else
+        res = -1
+      end
+      if (res < 0)
+        raise RangeError
+      end 
+      res
+    end
+
     # MNI: File.unlink
     # MNI: File.utime
 
