@@ -1,0 +1,5 @@
+set username 'DataCurator'
+set password swordfish
+login
+display oop
+irb
