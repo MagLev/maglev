@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (source, line_number)
-is_singleton: false
-block_params: 
-name: lines_above_reversed
-comment: 
-full_name: Spec::Runner::SpecParser#lines_above_reversed
-visibility: protected
-aliases: []

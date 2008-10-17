@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (names, values, parent=nil)
-is_singleton: true
-block_params: 
-name: new
-comment: 
-full_name: Rake::TaskArguments::new
-visibility: public
-aliases: []
