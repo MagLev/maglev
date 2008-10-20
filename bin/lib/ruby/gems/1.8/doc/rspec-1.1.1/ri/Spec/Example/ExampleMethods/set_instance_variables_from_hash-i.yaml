@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (instance_variables)
-is_singleton: false
-block_params: 
-name: set_instance_variables_from_hash
-comment: 
-full_name: Spec::Example::ExampleMethods#set_instance_variables_from_hash
-visibility: public
-aliases: []

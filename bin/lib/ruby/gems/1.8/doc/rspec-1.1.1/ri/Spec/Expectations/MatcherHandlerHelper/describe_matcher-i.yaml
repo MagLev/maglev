@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (matcher)
-is_singleton: false
-block_params: 
-name: describe_matcher
-comment: 
-full_name: Spec::Expectations::MatcherHandlerHelper#describe_matcher
-visibility: public
-aliases: []

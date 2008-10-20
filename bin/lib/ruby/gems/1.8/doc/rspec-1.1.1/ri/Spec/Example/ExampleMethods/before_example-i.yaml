@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: ()
-is_singleton: false
-block_params: 
-name: before_example
-comment: 
-full_name: Spec::Example::ExampleMethods#before_example
-visibility: protected
-aliases: []

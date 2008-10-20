@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (name, &block)
-is_singleton: false
-block_params: 
-name: init_module
-comment: 
-full_name: Spec::Story::Step#init_module
-visibility: public
-aliases: []

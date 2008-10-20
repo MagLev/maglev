@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (other_step_matchers)
-is_singleton: false
-block_params: 
-name: !str <<
-comment: 
-full_name: Spec::Story::StepGroup#<<
-visibility: public
-aliases: []

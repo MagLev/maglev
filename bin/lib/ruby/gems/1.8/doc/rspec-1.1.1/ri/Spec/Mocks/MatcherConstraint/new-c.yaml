@@ -1,9 +1,0 @@
---- !ruby/object:RI::MethodDescription
-params: (matcher)
-is_singleton: true
-block_params: 
-name: new
-comment: 
-full_name: Spec::Mocks::MatcherConstraint::new
-visibility: public
-aliases: []

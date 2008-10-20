@@ -4,21 +4,21 @@
 #    note in Ruby , superclass of Symbol is Object
 
 class Symbol
-	primitive 'all_symbols', '_rubyAllSymbols'
-	primitive 'id2name', 'asString'
-        primitive '==', '='
-        primitive 'hash'
-	primitive 'inspect', 'asSymbol'
-	primitive 'to_i', 'asOop'
-	primitive 'to_int', 'asOop'
-	primitive 'to_s', 'asString'
-	primitive 'to_sym', 'asSymbol'
-	
-	def inspect
-	   ":" + to_s
-    end 
-    
-    def call(value)
-        value.__send__(self)
-    end
+  class_primitive_nobridge 'all_symbols', '_rubyAllSymbols'
+  primitive_nobridge 'id2name', 'asString'
+  primitive_nobridge '==', '='
+  primitive_nobridge 'hash'
+  primitive_nobridge 'inspect', 'asSymbol'
+  primitive_nobridge 'to_i', 'asOop'
+  primitive_nobridge 'to_int', 'asOop'
+  primitive_nobridge 'to_s', 'asString'
+  primitive_nobridge 'to_sym', 'asSymbol'
+
+  def inspect
+    ":" + to_s
+  end
+
+  def call(value)
+    value.__send__(self)
+  end
 end
