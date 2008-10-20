@@ -40,4 +40,8 @@ File.open(spec_results) do |f|
 end
 
 puts "==================== Failing Specs ===================="
+puts "=== App File:  #{app_counts}"
+puts "=== Spec File: #{spec_results}"
+puts "=== Date run:  #{Time.now}"
+puts "======================================================="
 GsDtrace.pprint_hash failing_spec_methods
