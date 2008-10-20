@@ -47,7 +47,7 @@ do
     case $OPTION in
         d)
             ### We need to replace this with a real way to debug using irb
-            IRB_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+            IRB_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
             ;;
         h)
             usage
