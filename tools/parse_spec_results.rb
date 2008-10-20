@@ -12,8 +12,6 @@ $:.unshift File.dirname(__FILE__)
 require 'dtrace_summary'
 require 'mri_info'
 
-include MRIInfo
-
 app_counts   = ARGV[0]  # The summary of dtrace output
 spec_results = ARGV[1]
 
@@ -22,26 +20,25 @@ if ARGV.length != 2
   exit 1
 end
 
-failing_spec_methods = Hash.new { |h,k| h[k] = Hash.new }
+passing = Methods.new
 
 File.open(spec_results) do |f|
   f.each do |line|
     if line =~ /\s*(.+)\/(.+)\/(.+)_spec.rb/
       klass = $2.capitalize
       method = $3
-      if mri?(klass, method)
-        #puts "#{$2} #{$3}: OK"
-      else
-        failing_spec_methods[klass][method] = 1
-        #puts "#{$2} #{$3}: BAD"
-      end
+      passing.add(klass, method) if MRIInfo.mri?(klass, method)
     end
   end
 end
 
+app_methods = GsDtrace.methods_from_file(app_counts)
+not_passing = app_methods - passing
 puts "==================== Failing Specs ===================="
 puts "=== App File:  #{app_counts}"
 puts "=== Spec File: #{spec_results}"
 puts "=== Date run:  #{Time.now}"
 puts "======================================================="
-GsDtrace.pprint_hash failing_spec_methods
+#passing.pprint
+#app_methods.pprint
+(app_methods - passing).pprint
