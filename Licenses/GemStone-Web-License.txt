@@ -1,0 +1,373 @@
+GemStone Systems, Inc.  WEB EDITION SOFTWARE LICENSE AGREEMENT
+
+	This Agreement is between GemStone and Licensee, as each is
+	defined below.	Licensee's installation of the Software Products,
+	execution of this Agreement or otherwise indicating Licensee’s
+	assent, indicates Licensee's acceptance of the terms and
+	conditions of this Agreement.  The scope of the license granted,
+	as specified in this Agreement is defined in Section 2 below.
+
+DEFINITIONS.  As used in this Agreement:
+
+"Deploy" means any use of the Software Products that is available
+to persons and/or systems outside of an internal development and/or
+test environment.  Deployment includes internal use of the Software
+Products within an organization that is not solely for development or
+test purposes.
+
+"GemStone" means GemStone Systems, Inc., an Oregon corporation, or when
+applicable, its subsidiary from which Licensee licenses the Software
+Products.
+
+"Key File" means a form of computer code contained in the Software
+Products which enables the operation of the Software Products, yet
+limits the capacity and operation of the Software Products to values
+contained therein.
+
+"License" means the license described in Section 2 below which GemStone
+has granted to Licensee.
+
+"Licensee" means the entity or individual who installs the Software
+Products or otherwise agrees to be bound by the terms and conditions
+contained in this Agreement.  Each individual entering this Agreement on
+behalf of an entity represents and warrants that he/she has the authority
+to bind the entity to the terms and conditions of this Agreement.
+
+"License Term" means the time limit set forth in the definition of the
+License in Section 2, subject to the termination provisions of Section
+10 of this Agreement.
+
+"Software Products" means GemStone/S software downloaded or otherwise
+acquired by Licensee that may include software licensed from third
+parties.  Software Products include all updates and upgrades of Software
+Products provided to Licensee by GemStone and all modifications of the
+Software Products.
+
+"Technical Data" means the published user manuals included with the
+Software Products, and any similar materials provided to Licensee by
+GemStone to supplement the published user manuals.
+
+LICENSE TYPES
+
+"Web Edition License" means a no-cost license to use the Software Products
+to develop and Deploy software applications for internal or commercial
+use subject to the limitations specified in the Key File included with
+the Software Products.	Key Files which allow higher limitations require
+a different License.
+
+"Evaluation License" means a temporary license to use the Software
+Products for evaluation and testing purposes only and not for internal
+Deployment or commercial use.  Upon expiration of the time limit in the
+Key File Licensee will immediately cease use of the Software Products,
+delete the Software Products from all computer systems, and destroy all
+copies of the Software Products and all related evaluation materials.
+An Evaluation License does not include the right to Deploy the Software
+Products for any applications internally or externally.
+
+LICENSE GRANT, AUDIT RIGHTS.
+
+GemStone grants to Licensee a non-exclusive, non-transferable license,
+without right to sublicense, to install and use the Software Products
+and Technical Data for the License Term specified in their authorized Key
+File subject to the terms of this Agreement, including without limitation
+the general definitions set forth in Section 1 and the definition of
+the License as set forth in Section 2, and the capacity and operational
+limitations specified in their authorized Key File.
+
+Licensee will keep accurate records of all activity with respect to
+its use of the Software Products, including, without limitation, all
+editions of the Software Products used.  Licensee will provide GemStone
+with summaries of the records upon request.  At any time during the
+term of this Agreement and for three years following termination of this
+Agreement, GemStone will have the right to audit Licensee's records in
+order to verify that Licensee is limiting use of the Software Products in
+accordance with its License for the Software Products and this Agreement.
+If any audit reveals that Licensee is not limiting use of the Software
+Products in accordance with its License for the Software Products and this
+Agreement, Licensee will pay GemStone any unpaid or underpaid License
+Fees at GemStone's then current rates within five days of notification
+of the underpayment.  If any audit reveals that Licensee owes GemStone
+an amount equal to or greater than five percent of License Fees actually
+paid by Licensee, Licensee will also reimburse GemStone for the costs
+associated with the audit.
+
+OWNERSHIP.  GemStone or its licensors retain title to, ownership of, and
+intellectual property rights in, the Software Products and Technical
+Data and all modifications thereto, including all copies thereof.
+No title to or ownership of the Software Products or Technical Data is
+transferred to Licensee.
+
+PROPRIETARY NOTICES.  Licensee will not remove or alter GemStone's or
+any third party's ownership, trademark, copyright, or other proprietary
+notices on the Software Products or Technical Data.  Licensee must
+reproduce and include all copyright notices and other proprietary notices
+on each copy of the Software Products and Technical Data.
+
+USE RESTRICTIONS.
+
+Licensee will comply with all restrictions incorporated into the License
+as described in Section 2 and any Key File associated with the Software
+Product.
+
+Except as expressly allowed under the terms of the License granted to
+Licensee, Licensee will not (a) modify, develop derivative works of,
+adapt, alter, or translate the Software Products (all such actions
+are "modifications" of the Software Products); (b) reverse engineer,
+decompile, disassemble or otherwise attempt to derive the source code of
+the Software Products; (c) use the Software Products except on equipment
+owned or leased by Licensee; (d) copy the Software Products or Technical
+Data except as permitted in the definition of the License, except
+Licensee will be permitted to create one copy of the Software Products
+for archival storage to assure against loss; (e) disclose the results of
+any software performance benchmarks involving the Software Products which
+are generated by Licensee or anyone else to any third party without the
+prior written consent of GemStone; or (f) allow the unauthorized use of
+the Software Products and Technical Data.  Licensee will notify GemStone
+and pay any additional charges pursuant to GemStone's then current price
+list for any use of the Software Products that exceeds the use for which
+Licenses have been purchased.  In no event will Licensee allow any third
+party to copy or access the Software Products or Technical Data.
+
+No modifications of the Software Products are permitted, unless such
+rights are specifically set forth in the License type or otherwise
+granted in writing.  In the event modifications or derivative works are
+permitted, all modifications of the Software Products will be deemed to
+be part of the Software Products, which may be used by Licensee only in
+accordance with this Agreement.  GemStone will be the sole owner of any
+modifications to the Software Products.  Licensee's right to modify the
+Software Products is conditioned upon the Licensee not incorporating with
+the Software Products any software that is licensed pursuant to terms
+that directly or indirectly create obligations for GemStone with respect
+to a modification thereof, or grant to any third party any rights to or
+immunities under GemStone's intellectual property or proprietary rights
+in the Software Products or a modification thereof.  Software that is
+prohibited includes, without limitation, all software licensed pursuant
+to terms that require that software incorporated into, derived from,
+or distributed with such software be (a) disclosed or distributed in
+source code form, (b) licensed for the purpose of creating derivative
+works, or (c) redistributable at no charge.
+
+Licensee acknowledges that no computer software is error free and that
+the Software Products were not designed for use with, and Licensee will
+not use the Software Products for, applications for which errors, bugs
+or malfunctions in the Software Products could cause personal injury or
+death, property or environmental damage, or economic loss, including,
+without limitation, use in hazardous environments requiring fail-safe
+performance, the operation of nuclear facilities, aircraft navigation or
+communication systems, air traffic control, direct life support machines,
+or weapons systems.  Licensee will be solely responsible for taking all
+security precautions, such as data backup, testing and error detection
+procedures, which are necessary in order to ensure that errors in the
+Software Products and the applications using the Software Products do
+not cause adverse consequences.
+
+KEY FILES.  Licensee acknowledges that the Software Products contain
+Key Files that are a form of disabling code.  For the purpose of this
+paragraph, "disabling code" means computer code which interferes with
+the normal operation of the Software Products in order to (a) prevent
+unauthorized use of the Software Products or (b) provide limited use
+of the Software Products.  At the request of Licensee, GemStone will
+provide reasonable advice and assistance to Licensee with respect to
+any Key File in order to ensure that the existence of the code does
+not interfere with Licensee's authorized use of the Software Products.
+LICENSEE WILL TAKE ANY NECESSARY PRECAUTIONS TO AVOID ANY LOSS OF DATA
+THAT MAY RESULT FROM EXPIRATION OF A KEY FILE TIME LIMIT.
+
+CONFIDENTIALITY.
+
+The Software Products and Technical Data constitute highly valuable
+property of GemStone and contain trade secrets and confidential
+information owned by GemStone.	Licensee acknowledges that it may
+receive from GemStone other confidential information which is marked
+as "confidential".  Licensee will observe complete confidentiality
+with respect to the Software Products, Technical Data, all performance
+data and all information marked "confidential", and will not disclose
+this information to any third party, except its employees with a need
+for access to the information, or use the information for any purpose
+not contemplated or permitted under this Agreement.  The obligations
+of confidentiality in this Section 7 will survive the termination
+or cancellation of this Agreement.  Licensee will ensure that its
+employees and persons affiliated with Licensee who have access to the
+Software Products, Technical Data or GemStone's confidential information
+understand and acknowledge the obligations of confidentiality imposed
+in this Agreement, and are aware of and comply with the terms of this
+Agreement.  Licensee will indemnify and hold GemStone harmless for any
+breach of this Agreement by an employee, former employee, or person
+affiliated with or formerly affiliated with Licensee.
+
+Notwithstanding the foregoing, Licensee will have no obligation to hold
+any information in confidence to the extent that Licensee can show
+by documentary evidence that the information:  (a) was already known
+to Licensee at the time it was obtained by Licensee from GemStone,
+free from any obligations to hold the information in confidence; (b)
+was or becomes publicly known through no wrongful act of Licensee;
+(c) was rightfully received from a third party without restriction and
+without breach of any obligation to GemStone or its suppliers; or (d)
+was independently developed by Licensee without use of any confidential
+information of GemStone or its suppliers.
+
+TERM AND TERMINATION.
+
+The term of this Agreement will commence upon the earliest of:
+(a) installation of the Software Products; or (b) written execution of
+this Agreement.  This Agreement will terminate on the earliest of: (i)
+Licensee's breach of Sections 6 (Use Restrictions) or 8 (Confidentiality);
+(ii) the last day of the License Term or renewal term specified in a
+Key File; or (iii) a party's failure to remedy any default under this
+Agreement within 30 days of receipt of written notice from the other
+party specifying the default; provided, however, the cure period is not
+applicable to Licensee's failure to make timely payment.
+
+Upon termination of this Agreement for any reason, all Licenses granted
+will terminate and Licensee will pay all unpaid amounts that have accrued
+prior to termination and will immediately cease use of and will return to
+GemStone and delete from all computer systems all copies of the Software
+Products and Technical Data.  Upon GemStone's request, Licensee will
+submit a written certificate of compliance with this Section 9.2 signed
+by Licensee (if Licensee is an individual) or by an officer of Licensee
+(if Licensee is an entity).
+
+SUPPORT.  Maintenance and support for the Software Products must be
+purchased separately from GemStone.
+
+WARRANTY; LIMITATION OF LIABILITY.
+
+GemStone does not warrant that the Software Products are error free or
+that Licensee will be able to operate the Software Products without
+problems or interruptions.  Without limiting the preceding, Licensee
+accepts the Software Products AS IS with all faults.
+
+Nothing in this section will relieve Licensee of its obligation to pay
+any appropriate maintenance and support fees.
+
+GEMSTONE'S TOTAL CUMULATIVE LIABILITY TO THE LICENSEE, IN CONTRACT, TORT
+OR OTHERWISE, FOR ALL DAMAGES, COSTS, CLAIMS, OR DEMANDS INCURRED OR
+SUFFERED BY OR AWARDED AGAINST LICENSEE ARISING DIRECTLY OR INDIRECTLY
+OUT OF THE PERFORMANCE OR ANY BREACH OF THIS LICENSE WILL IN NO EVENT
+EXCEED THE TOTAL AMOUNT PAID TO GEMSTONE BY LICENSEE UNDER THIS AGREEMENT.
+
+THE WARRANTY CONTAINED IN SECTION 11.1 IS IN LIEU OF ALL OTHER
+WARRANTIES, EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO,
+ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+TITLE, AND NONINFRINGEMENT OF THIRD-PARTY RIGHTS.  GEMSTONE WILL NOT BE
+RESPONSIBLE TO LICENSEE OR TO ANY THIRD PARTY FOR ANY INDIRECT, SPECIAL,
+EXEMPLARY, INCIDENTAL OR CONSEQUENTIAL DAMAGES, WHETHER IN CONTRACT OR
+TORT, DUE TO ANY FORESEEN OR UNFORESEEN CAUSE FROM LICENSEE'S OR ANY
+THIRD PARTY'S USE OR THE PERFORMANCE OF THE SOFTWARE PRODUCTS UNDER
+THIS AGREEMENT.
+
+INDEMNITY BY LICENSEE.	Licensee acknowledges that GemStone has no
+knowledge of, or control over, the use of the Software Products by
+Licensee.  Licensee will defend, indemnify and hold GemStone harmless
+with respect to any suit, claim or proceeding brought against GemStone
+alleging that use of the Software Products by, or under authority
+of, Licensee or Licensee's current or former employees, consultants,
+or agents caused personal injury, property damage, or economic loss.
+In addition, Licensee will defend, indemnify and hold GemStone harmless
+with respect to any suit, claim or proceeding brought against GemStone
+due to Licensee's modification of any Software Product.
+
+GENERAL.
+
+This Agreement and other documents referred to in this Agreement
+constitute the entire agreement between the parties and supersede all
+prior or contemporaneous agreements or representations, written or oral,
+concerning the subject matter of this Agreement.  The parties may amend
+this Agreement only by a written instrument stating an intention to
+modify and signed by both parties.
+
+Failure by either party at any time to require performance or to claim a
+breach of any term or condition of this Agreement will not be construed
+as a waiver of that term or condition affecting the right to require
+performance or to claim a breach.
+
+Licensee may not assign this Agreement without the prior written
+permission of GemStone.
+
+If any provision in this Agreement may be held to be invalid or
+unenforceable, the meaning of that provision will be construed so
+as to render it enforceable to the extent feasible.  If no feasible
+interpretation would save that provision, it will be severed from
+this Agreement and the remainder will remain in full force and effect.
+However, in the event that provision is considered an essential element
+of this Agreement, the parties will promptly negotiate alternative,
+reasonably equivalent and enforceable terms.
+
+For all agreements between GemStone and Licensee, the rights and
+obligations of the parties and all interpretations and performance of the
+agreements will be governed in all respects by the laws of the State of
+Oregon without regard to their conflict of law provisions.  The United
+Nations Convention on Contracts for the International Sale of Goods
+does not apply to this Agreement.  Each party irrevocable consents to
+the jurisdiction and venue of any federal or state courts located in
+Multnomah County, Oregon in any proceeding or action arising from or
+relating to this Agreement.
+
+Section headings are inserted for convenience only and will not be used
+in any way to construe the terms of this Agreement.
+
+In the event that suit or other action is instituted to interpret or
+enforce this Agreement, the prevailing party will be entitled to recover
+its attorney fees, including those incurred on appeal, as determined by
+the court.
+
+This Agreement is expressly made subject to any laws, regulations, orders
+or other restrictions on the export of software products from the United
+States of America which may be imposed by the government of the United
+States of America from time to time.  Licensee may not export, reexport,
+directly or indirectly, the Software Products to any country for which the
+United States government, any agency of the United States government or
+any foreign government requires an export license or other governmental
+approval at the time of export or reexport without first obtaining the
+required license or approval.  Licensee will indemnify and hold GemStone
+harmless for any breach of this Section.  Licensee warrants that it is
+not domiciled in, a citizen, national or resident of, and is not under
+the control of the government of Cuba, Iran, Iraq, Libya, North Korea,
+Syria, Sudan, or any other country or any distributee to which the United
+States has prohibited export.
+
+All notices permitted or required by this Agreement will be delivered in
+a manner in which a receipt is obtained, including confirmed facsimile,
+to the headquarters office of GemStone and to Licensee at the location
+to which the Software Products were delivered.
+
+If Licensee is a branch or agency of the United States Government, whether
+that unit or agency be civilian or part of the Department of Defense,
+this provision applies.  The Software Products and Technical Data are
+comprised of "commercial computer software" and "commercial computer
+software documentation" as such terms are used in 48 C.F.R. 12.212
+and are provided to the Government consistent with 48 C.F.R. 12.212
+and 48 C.F.R. 227.7202-1 through 227.7202-4.  Except as otherwise
+specifically provided for in this Agreement, the Software Products
+and Technical Data may not be used, reproduced or disclosed to anyone,
+including support service contractors or their subcontractors, by the
+Government without the prior written consent of GemStone, such consent
+may be freely withheld at GemStone's own discretion.  The restrictions
+in this provision are in addition to, and not in lieu of, any other
+restrictions contained in or incorporated by this Agreement.
+
+
+GEMSTONE: GemStone Systems, Inc.
+
+By:
+
+Name:
+
+Title:
+
+Date: 
+
+
+LICENSEE:
+
+By:
+
+Name:
+
+Title:
+
+Date:
+
+
+
+
