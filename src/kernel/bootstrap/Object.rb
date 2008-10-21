@@ -160,10 +160,6 @@ class Object
         $stdin.gets(sep)
     end
 
-    def sprintf(str, *args)
-        format(str, *args)
-    end
-
     def raise(err, str)
         err ||= RuntimeError
         err.signal(str)

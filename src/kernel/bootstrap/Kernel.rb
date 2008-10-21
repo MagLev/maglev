@@ -16,10 +16,7 @@ module Kernel
     raise SystemExit , status
   end
 
-  def format(str, *args)
-    args.each{|a| str.sub!(/%(d|s)/, a.to_s)}
-    str
-  end
+  primitive 'format*', 'sprintf:with:'
 
   def open(fName)
     File.open(fName)
@@ -28,6 +25,8 @@ module Kernel
   def open(fName, mode)
     File.open(fName, mode)
   end
+
+  primitive 'sprintf*', 'sprintf:with:'
 
   primitive_nobridge '_system', '_system:'
 
