@@ -8,7 +8,6 @@ class Class
   #  end installPrimitiveBootstrap 
 
   primitive 'alloc', 'basicNew'
-  primitive 'alias_method', 'rubyAlias:from:'
 
   # base image has persistent env 1 method Class>>class 
 

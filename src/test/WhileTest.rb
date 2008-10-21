@@ -67,10 +67,15 @@ class WhileTest
 
     # Expected value: <stop-start>
     def retry (start, stop)
+        retried = false
+        retrylim = (stop - start) / 2 
         num = 0
         while start < stop
             num += 1
-            retry if num == start
+            if (num == retrylim && retried == false)
+              retried = true
+              retry
+            end
             start += 1
         end
         return num
@@ -82,7 +87,9 @@ class WhileTest
         orig = start
         while start < stop
             num += 1
-            break if start == orig+1
+            if start == orig+1 
+              break
+            end
             start += 1
         end
         return num
@@ -140,13 +147,14 @@ raise "ERROR" unless ret == 10
 ret = WhileTest.new.redo(0, 49)
 raise "ERROR" unless ret == 49
 
-# expectvalue 15
-ret = WhileTest.new.retry(15, 30)
-raise "ERROR" unless ret == 15
-
-# expectvalue 51
-ret = WhileTest.new.retry(0, 51)
-raise "ERROR" unless ret == 51
+# retry in a while loop raises RubyBreakException 
+#   per MRI un-rescuable   'retry outside of rescue clause'
+# begin
+#  ret = WhileTest.new.retry(10, 20)
+#  raise "ERROR" 
+#rescue 
+#  
+#end
 
 # expectvalue 2
 ret = WhileTest.new.break(15, 30)

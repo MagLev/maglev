@@ -5,7 +5,6 @@ class TestUntil
     loopVal = until n > 6
       n = n + 1
       if (n == 4 ) 
-        # self.pause
         break 123
       end
     end 

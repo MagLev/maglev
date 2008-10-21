@@ -16,13 +16,13 @@ test(stat.atime, time, 'atime') # TODO: Time needs ==
 test(stat.blockdev?, false, 'blockdev?')
 test(stat.blocks, `ls -s #{fname}`.split[0].to_i, 'blocks')
 test(stat.chardev?, false, 'chardev?')
-#test(stat.ctime, time, 'ctime')  # no good way to get creation time...
-test(stat.dev, 234881026, 'dev')
+test(stat.ctime.class, Time, 'ctime')  # value of stat.ctime is time dependent
+test(stat.dev.class, Fixnum, 'dev')    # stat.dev is machine dependent
 
 # TODO: need dynamic way of getting expected values for the current
 # platform dev_major dev_minor
-test(stat.dev_major, 14, 'dev_major')
-test(stat.dev_minor, 2, 'dev_minor')
+test(stat.dev_major.class, Fixnum, 'dev_major') # stat.dev_major is machine dependent
+test(stat.dev_minor.class, Fixnum, 'dev_minor') # stat.dev_minor is machine dependent
 
 test(stat.directory?, false, 'directory?')
 test(stat.executable?, true, 'executable?')

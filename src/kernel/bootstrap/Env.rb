@@ -1,31 +1,61 @@
 class Env
-    def initialize
-      #TODO delete @ht after  putenv prim access working
-      @ht = { }
+    # A ruby reference to ENV is translated to the message send Env._current
+    class_primitive_nobridge '_current', '_current'
+    class_primitive_nobridge '_getenv', '_getenv:'
+    class_primitive_nobridge '_putenv', '_putenv:with:'
+
+    def self.name
+      'Env'
     end
 
-    def [](vname)
-      # assume using topaz -l
-      v = @ht[vname]
-      if (v.equal?(nil))
-        v = File._environmentAt(vname, false)
-        @ht[vname] = v
-      end
-      v
+    def self.new
+      raise NotImplementedError
     end
 
-    def []=(vname,val)
-      # TODO, need smalltalk prim to access HostSetEnv
-      @ht[vname] = v
+    def self.[](*elements)
+      raise NotImplementedError
     end
 
-    def has_key?(key)
-      ! File._environmentAt(key, false).nil?
+    def dup
+      res = Hash.new
+      res.update(self)
+      res
     end
 
-    alias include? has_key?
+    def []=(key, val)
+      Env._putenv(key, val)
+      super(key, val)
+    end
 
-    # TODO the rest of the API for Hash needs implementation here
+    #  [] implemented in smalltalk because ruby doesn't allow super.[]=(k,v)
+    primitive '[]' , 'at:'
+
+    def store(key, val)
+     self.[]=(key, val)
+    end
+
+    def clear
+      raise NotImplementedError
+    end 
+
+    def delete(aKey, &aBlock)
+      # can't delete from C environment, can only []=(aKey,'')
+      raise NotImplementedError
+    end
+    def delete(aKey)
+      raise NotImplementedError
+    end
+    def delete_if(&block)     
+       raise NotImplementedError
+    end
+    def merge(aHash)
+      raise NotImplementedError
+    end
+    def merge!(other)
+      raise NotImplementedError
+    end
+
 end
 
-ENV = Env.new
+# access to Global ENV is translated by parser to   Env._current
+#  The one instance of Env is stored in   SessionTemps current  

@@ -4,7 +4,12 @@ $count = 0
 def test(actual, expected, msg)
   puts "==== Testing: #{msg}"
   $count += 1
-  $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" unless expected == actual
+  if (expected == actual)
+    # ok
+  else
+    $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" 
+    self.pause
+  end
 end
 
 def report

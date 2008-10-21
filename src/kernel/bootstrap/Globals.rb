@@ -6,6 +6,7 @@ RUBY.global('Behavior', 'Behavior')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'Class')
 RUBY.global('Dir', 'RubyDirectory')
+RUBY.global('Env', 'RubyEnv')
 RUBY.global('FalseClass', 'FalseClass')
 RUBY.global('File', 'GsFile')
 RUBY.global('File::Stat', 'GsFileStat')  # File::Stat -->  GsFileStat

@@ -168,8 +168,8 @@ class File
 
     def self._tilde_expand(path)
       case path[0,2]
-      when '~':   ENV['HOME']
-      when '~/':  ENV['HOME'] + path[1..-1]
+       when '~':   ENV['HOME']  
+       when '~/':  ENV['HOME'] + path[1..-1]
       when /^~([^\/])+(.*)/
         raise NotImplementedError, "Don't handle ~user expansion yet"
       else

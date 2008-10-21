@@ -1,6 +1,7 @@
 class Behavior
 
   primitive_nobridge 'include', 'includeRubyModule:'
+  primitive 'alias_method', 'rubyAlias:from:'
 
   def protected(name)
   end

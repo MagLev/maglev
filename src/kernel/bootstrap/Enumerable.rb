@@ -78,6 +78,7 @@ module Enumerable
         end
       end
 
+      # TODO is this recursion depth a function of self.size ???
       quicksort(lmr[-1], &prc) + lmr[0] + quicksort(lmr[1], &prc)
     end
 
