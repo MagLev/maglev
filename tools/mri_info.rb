@@ -123,16 +123,16 @@ module MRIInfo
 
   # Returns true if the +method+ on Class or Module +klass+ was defined
   # in MRI.
-  def mri?(klass, method)
+  def self.mri?(klass, method)
     mri_instance_method?(klass, method) || mri_class_method?(klass, method)
   end
 
-  def mri_class_method?(klass, method)
+  def self.mri_class_method?(klass, method)
     MRI_CLASS_METHODS.has_key?(klass) &&
       MRI_CLASS_METHODS[klass].has_key?(method)
   end
 
-  def mri_instance_method?(klass, method)
+  def self.mri_instance_method?(klass, method)
     MRI_INSTANCE_METHODS.has_key?(klass) &&
       MRI_INSTANCE_METHODS[klass].has_key?(method)
   end
@@ -140,6 +140,8 @@ module MRIInfo
   # ############################################################
   # Methods below this marker were only used to generate the data
   # ############################################################
+
+  private
 
   # Return an array of the class and modules names defined in this instance
   # of MRI.

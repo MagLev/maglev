@@ -476,7 +476,7 @@ class String
   # MNI: upto
 
   # ====== Object
-  primitive 'inspect', 'printString'
+  primitive 'inspect', '_rubyPrintString'
   primitive 'dup', 'copy'
 
   # ====== Comparable:

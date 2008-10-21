@@ -38,4 +38,27 @@ test "1,2,,3,4,,".split(','),     ["1", "2", "", "3", "4"], "PA split K"
 test "1,2,,3,4,,".split(',',4),   ["1", "2", "", "3,4,,"],  "PA split L"
 #test "1,2,,3,4,,".split(',', -4), ["1", "2", "", "3", "4", "", ""], "PA split M"
 
+# Test that string.inspect uses double quotes etc.
+test("".inspect,       "\"\"",          'inspect A')
+test("A".inspect,      "\"A\"",         'inspect B')
+test("\A".inspect,     "\"A\"",         'inspect C')
+test("\\A".inspect,    "\"\\\\A\"",     'inspect D')
+test("\\\"A".inspect,  "\"\\\\\\\"A\"", 'inspect E')
+
+foo = 1
+test("#{foo}".inspect, "\"1\"",         'inspect F')
+test("\t\n".inspect,   "\"\\t\\n\"",    'inspect G')
+
+
+# Test that string.inspect uses double quotes etc.
+test("".inspect,       "\"\"",          'inspect A')
+test("A".inspect,      "\"A\"",         'inspect B')
+test("\A".inspect,     "\"A\"",         'inspect C')
+test("\\A".inspect,    "\"\\\\A\"",     'inspect D')
+test("\\\"A".inspect,  "\"\\\\\\\"A\"", 'inspect E')
+
+foo = 1
+test("#{foo}".inspect, "\"1\"",         'inspect F')
+test("\t\n".inspect,   "\"\\t\\n\"",    'inspect G')
+
 report
