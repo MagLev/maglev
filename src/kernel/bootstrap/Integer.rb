@@ -29,7 +29,7 @@ class Integer
     def times(&b)
        _times(&b)
     end
-    # _rubyTimes: should be the only caller of __times& 
+    # _rubyTimes: should be the only caller of __times&
     def __times(&b)
         for i in (0..self-1)
             b.call(i)
@@ -66,6 +66,9 @@ class Integer
       self + 1
     end
 
+    def succ
+      self + 1
+    end
         primitive_nobridge '+', '+'
         primitive_nobridge '-', '-'
         primitive_nobridge '*', '*'
