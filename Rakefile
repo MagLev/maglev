@@ -52,7 +52,24 @@ task :maglev do
   code =<<END
 run
 RubyContext load.
-RubyContext loadFileNamed: '#{File.expand_path(file)}'.
+RubyContext loadFileNamed: '#{file}'.
+%
+exit
+END
+  run_topaz code, debug
+end
+
+desc "Run a ruby file in maglev with debug and parsetree debug: file=..."
+task :debug do
+  file = ENV['file']
+  debug = true
+  raise "No file specified: Specify a file with file=...." if file.nil? || file.empty?
+  raise "Can't find file #{file}" unless File.exists?(file)
+  code =<<END
+run
+RubyContext load .
+RubyParseTreeClient logSexp: true .
+RubyContext loadFileNamed: '#{file}' .
 %
 exit
 END
