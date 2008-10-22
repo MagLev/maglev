@@ -1,0 +1,92 @@
+
+def test(act, exp)
+  unless act == exp
+    raise 'ERROR'
+  end
+end
+
+test( sprintf("%d", 987) , "987" )
+test( sprintf("%dab", 987) , "987ab" )
+test( sprintf("%5d", 987) , "  987" )
+test( sprintf("%-5d", 987) , "987  " )
+test( sprintf("%05d", 987) , "00987" )
+test( sprintf("%#5d", 987) , "  987" )
+test( sprintf("% d", 987) , " 987" )
+test( sprintf("%+5d", 987) , " +987" )
+test( sprintf("%+d", 987) , "+987" )
+
+test( sprintf("%d", -987) , "-987" )
+test( sprintf("%dab", -987) , "-987ab" )
+test( sprintf("%5d", -987) , " -987" )
+test( sprintf("%-5d", -987) , "-987 " )
+test( sprintf("%05d", -987) , "-0987" )
+test( sprintf("%#5d", -987) , " -987" )
+test( sprintf("% d", -987) , "-987" )
+test( sprintf("%+5d", -987) , " -987" )
+test( sprintf("%+d", -987) , "-987" )
+
+test( sprintf("%.5d", 987) , "00987" )
+test( sprintf("%8.5d", 987) ,  "   00987" )
+test( sprintf("%+8.5d", 987) , "  +00987" )
+
+test( sprintf("%5d %7d yyy", 33, 456), "   33     456 yyy" )
+
+test( sprintf("%+i", -987) , "-987" )
+
+test( sprintf("%u", 456) , '456' )
+test( sprintf("%8u", 456) , '     456' )
+test( sprintf("%u", -456) , '..18446744073709551160' )
+test( sprintf("%8u", -456) , '..18446744073709551160' )
+
+h = Hash.new
+h[5]=7
+test( sprintf("%p", h ) , '{5=>7}' )
+
+test( sprintf("%s", h) , '57' )
+
+test( sprintf("%10.5s", 'abcdefgh') , '     abcde')
+test( sprintf("%c", 50) , '2' )
+
+test( sprintf("%b", 0x456), '10001010110' )
+test( sprintf("%#b", 0x456) , '0b10001010110' )
+test( sprintf("%b", -456) ,  '..1000111000' )
+test( sprintf("%#b", -456) ,  '0b..1000111000' )
+
+test( sprintf('%o', 465) , '721' )
+test( sprintf('%0o', 465) , '721' )
+test( sprintf('%#o', 465) , '0721' )
+test( sprintf('%o', -465) , '..7777777777057' )
+test( sprintf('%#o', -465) , '0..7777777777057' )
+
+test( sprintf("%x", 0x4b6), '4b6')
+test( sprintf("%#x", 0x4b6) , '0x4b6' )
+test( sprintf("%x", -459) ,  '..fe35')
+test( sprintf("%#x", -459) ,  '0x..fe35' )
+
+test( sprintf("%X", 0x4b6), '4B6' )
+test( sprintf("%#X", 0x4b6) , '0X4B6' )
+test( sprintf("%X", -459) ,  '..FE35' )
+test( sprintf("%#X", -458) ,  '0X..FE36' )
+
+test( sprintf("%e", 5.5), '5.500000e+00') 
+test( sprintf("%E", 5.5) ,'5.500000E+00') 
+test( sprintf("%f", 5.5) , "5.500000" ) 
+test( sprintf("%g", 5.5) , '5.5' )
+test( sprintf("%G", 5.5) , '5.5' )
+
+test( sprintf("%d", 5.5) , '5' )
+test( sprintf("%g", 5) , '5' )
+test( sprintf("%#g", 5) , '5.00000' )
+test( sprintf("%s", 99), '99' )
+
+test( sprintf("%8.4e", 3.7e45), '3.7000e+45' )
+test( sprintf("%8.4e", -3.7e45), '-3.7000e+45' )
+test( sprintf("%8.4E", -3.7e45), '-3.7000E+45' )
+test( sprintf("%8.4f", -3.7e45), '-3699999999999999771793234396487274551161389056.0000' )
+test( sprintf("%8.4g", -3.7e45), '-3.7e+45' )
+test( sprintf("%8.4G", -3.7e45), '-3.7E+45' )
+
+test( sprintf("%2$d w %1$d z", 33, 456), '456 w 33 z' )
+test( sprintf("%2$*3$d w %1$*4$d z", 33, 456, 4, 5), ' 456 w    33 z' )
+
+true
