@@ -7,8 +7,8 @@ def test(actual, expected, msg)
   if (expected == actual)
     # ok
   else
-    $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" 
-    self.pause
+    $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
+    #self.pause
   end
 end
 
