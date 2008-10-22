@@ -141,7 +141,7 @@ END
 
   desc "Run an mspec file: spec=<dir_or_file_name>"
   task :spec do
-    raise "No spec defined with: spec=localspec/1.8/..." unless ENV['spec']
+    raise "No spec defined with: spec=..." unless ENV['spec']
     topaz_stuff =<<END
 output push spec.out
 run
@@ -156,19 +156,27 @@ END
     run_topaz topaz_stuff
   end
 
+# For some reason, I can't get both to run under one target...
+#   desc "Run the smoke tests (vm-tests and passing specs)"
+#   task :smoke do
+#     Rake::Task[:'dev:vm-tests'].invoke
+#     Rake::Task[:'dev:specs'].invoke
+#   end
 
   desc "Run the passing ruby specs (depends on ../gss64bit_30/*)"
-  task :'specs' do
+  task :specs do
     ENV['file'] = "rakelib/passingspecs.inp"
     Rake::Task[:'dev:runinp'].invoke
     puts "Log files in log/spec*"
   end
+
   desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
   task :'vm-tests' do
     ENV['file'] = "rakelib/allvmunit.inp"
     Rake::Task[:'dev:runinp'].invoke
     puts "Log files in log/vmunit*"
   end
+
   desc "Run the bm smoke tests (depends on ../gss64bit_30/*)"
   task :'bm-tests' do
     ENV['file'] = "rakelib/allbench.inp"

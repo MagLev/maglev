@@ -1,4 +1,4 @@
-output pushnew log/allbench.out
+output pushnew log/allspec.out
 run
 | specCount lf confFile specOutF |
 GsNMethod traceIR: false .
