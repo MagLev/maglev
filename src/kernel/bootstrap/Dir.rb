@@ -11,74 +11,77 @@ class Dir
   # Class Methods
 
   # MNI: Dir.[]
-  # MNI: Dir.entries
-  # MNI: Dir.foreach
-  # MNI: Dir.glob
 
-  def self.new(dirname)
-    inst = _new(dirname)
-    if (inst._isSmallInteger)
-      raise SystemCallError  # TODO: use inst which is errno value
+  # RUBINIUS inspired, but our API is enough different..
+  def self.chdir(path = ENV['HOME'])
+    if block_given?
+      original_path = self.getwd
+      Errno.handle(_chdir(path), "chdir #{path}")
+
+      begin
+        value = yield path
+      ensure
+        Errno.handle(_chdir(original_path), "chdir back to #{original_path}")
+      end
+
+      return value
+    else
+      Errno.handle(_chdir(path), "chdir #{path}")
     end
-    inst.initialize(dirname)
-  end
-
-  def self.delete(dirname)
-    status = _rmdir(dirname)
-    if (status.equal?(0))
-      return 0
-    end
-    raise SystemCallError  # TODO: use status which is errno value
-  end
-
-  def self.rmdir(dirname)
-    rmdir(dirname)
-  end
-
-  def self.unlink(dirname)
-    rmdir(dirname)
-  end
-
-  def self.chdir
-    raise NotImplementedError # TODO , use HOME env ....
-  end
-
-  def self.chdir(aString)
-    status = _chdir(aString)
-    if (status.equal?(0))
-      return 0
-    end
-    raise SystemCallError  # TODO: use status which is errno value
   end
 
   def self.chroot(dirname)
     raise SecurityError  # MNU, and only root could do this anyway
   end
 
-  def self.getwd
-    res = _getwd
-    if (res._isSmallInteger)
-      raise SystemCallError  # TODO: use res which is errno value
-    end
-    res
+  def self.delete(dirname)
+    Errno.handle(_rmdir(dirname), "delete #{dirname}")
   end
+
+  def self.entries(dirname)
+    Dir.new(dirname).entries
+  end
+
+  def self.foreach(dirname, &block)
+    Dir.entries(filename).each(&block)
+  end
+
+  def self.getwd
+    Errno.handle(_getwd, "getwd")
+  end
+
+  # MNI: Dir.glob
+
+  # if not nil, permissions must be >= 0 and <= 0777 if permissions==nil ,
+  # the created directory will have permissions as specified by current
+  # value of File.umask()
+  def self.mkdir(dirname, permissions=nil)
+    Errno.handle(_mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
+  end
+
+  def self.new(dirname)
+    inst = _new(dirname)
+    Errno.handle(inst, dirname)
+    inst.initialize(dirname)
+  end
+
+  # MNI: Dir.open
 
   def self.pwd
-    getwd
+    Errno.handle(getwd, "pwd")
   end
 
-  def mkdir(dirname, permissions=nil)
-    # if not nil, permissions must be >= 0 and <= 0777
-    # if permissions==nil ,  the created directory will have
-    #   permissions as specified by current value of File.umask()
-    status = _mkdir(dir, permissions)
-    if (status.equal?(0))
-      return 0
-    end
-    raise SystemCallError  # TODO: use status which is errno value
+  def self.rmdir(dirname)
+    Errno.handle(_rmdir(dirname), "rmdir #{dirname}")
   end
+
+  def self.unlink(dirname)
+    Errno.handle(_rmdir(dirname), "unlink #{dirname}")
+  end
+
 
   # Instance Methods
+
   def initialize(path)
     @path    = path
     # @entries has been filled in by _new primitive
