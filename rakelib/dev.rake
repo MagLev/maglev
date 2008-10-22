@@ -157,6 +157,12 @@ END
   end
 
 
+  desc "Run the passing ruby specs (depends on ../gss64bit_30/*)"
+  task :'specs' do
+    ENV['file'] = "rakelib/passingspecs.inp"
+    Rake::Task[:'dev:runinp'].invoke
+    puts "Log files in log/spec*"
+  end
   desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
   task :'vm-tests' do
     ENV['file'] = "rakelib/allvmunit.inp"
