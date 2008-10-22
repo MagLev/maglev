@@ -13,6 +13,7 @@ PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
 GEMSTONE = "#{MAGLEV_HOME}/gemstone"
 TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
 TOPAZDEBUG_CMD = "#{GEMSTONE}/bin/topaz -I #{MAGLEV_HOME}/etc/.topazdebugini -l "
+IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
 
 ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
 ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"

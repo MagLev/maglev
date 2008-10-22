@@ -103,6 +103,7 @@ END
 
   desc "Reload kernel.rb (primitives) and commit it"
   task :reloadprims => ['gs:start'] do
+    puts "=== reload primitives"
     run_topaz <<END
 output push reloadprims.out
 omit resultcheck
@@ -117,6 +118,7 @@ END
 
   desc "Load the mcz file ../latest.mcz and commit it."
   task :loadmcz => ['gs:start'] do
+    puts "=== Load .mcz file: #{`ls -l ../latest.mcz`}"
     run_topaz <<END
 output push loadall.out
 display resultcheck

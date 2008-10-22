@@ -7,7 +7,7 @@ class Dir
   class_primitive_nobridge '_getwd', '_getwd'
   class_primitive_nobridge '_new', '_new:'
   class_primitive_nobridge '_mkdir', '_mkdir:permissions:'
- 
+
   # Class Methods
 
   # MNI: Dir.[]
@@ -17,7 +17,7 @@ class Dir
 
   def self.new(dirname)
     inst = _new(dirname)
-    if (inst._isSmallInteger) 
+    if (inst._isSmallInteger)
       raise SystemCallError  # TODO: use inst which is errno value
     end
     inst.initialize(dirname)
@@ -70,7 +70,7 @@ class Dir
   def mkdir(dirname, permissions=nil)
     # if not nil, permissions must be >= 0 and <= 0777
     # if permissions==nil ,  the created directory will have
-    #   permissions as specified by current value of File.umask() 
+    #   permissions as specified by current value of File.umask()
     status = _mkdir(dir, permissions)
     if (status.equal?(0))
       return 0
@@ -85,6 +85,7 @@ class Dir
     @index   = 0
     @closed  = false
     @range   = 0...@entries.length
+    self
   end
 
   def close
