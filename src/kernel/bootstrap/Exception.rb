@@ -5,6 +5,11 @@ class Exception
     class_primitive 'exception', 'new'
     class_primitive 'signal', 'signal:'
 
+    # support for errno to Name translation
+    class_primitive_nobridge  '_errnoTables', 'errnoTables'
+    class_primitive_nobridge  '_errnoToName', 'errnoToName:'
+    class_primitive_nobridge  '_cpuOsKind', 'cpuOsKind'
+
     def self.name
       # override Smalltalk name
       'Exception'
