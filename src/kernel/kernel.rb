@@ -78,6 +78,7 @@ require 'kernel/bootstrap/Module.rb'
 
 require 'kernel/bootstrap/Env.rb'
 require 'kernel/bootstrap/Enumerable.rb'
+require 'kernel/bootstrap/Errno.rb'
 require 'kernel/bootstrap/Dir.rb'
 require 'kernel/bootstrap/File.rb'
 
