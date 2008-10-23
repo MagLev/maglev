@@ -62,7 +62,7 @@ do
             usage
             exit
             ;;
-     esac
+    esac
 done
 shift $(($OPTIND - 1))
 
@@ -74,6 +74,10 @@ if [ $# -ne 0 ]; then
 fi
 
 # Finally, execute the command
-$IRB_CMD
+if [ -z "`which rlwrap`" ]; then
+    $IRB_CMD
+else
+    rlwrap $IRB_CMD
+fi
 
 exit
