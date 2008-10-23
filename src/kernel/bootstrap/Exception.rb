@@ -1,7 +1,5 @@
 # Maps to Smalltalk class UserException.  See Globals.rb
 class Exception
-    Undefined = Object.new
-
     class_primitive 'exception', 'new'
     class_primitive 'signal', 'signal:'
 

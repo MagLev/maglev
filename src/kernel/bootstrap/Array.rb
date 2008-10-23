@@ -1,5 +1,5 @@
 class Array
-  Undefined = Object.new  # TODO: Make one Undefined object in the system
+#  include Enumerable
 
   # begin private helper methods
   # TODO: Some of these don't begin with an '_'...

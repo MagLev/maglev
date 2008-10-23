@@ -1,3 +1,5 @@
+# NOTE: This file must be included AFTER Class.rb so that we can call new
+# on Object.
 
 # This file is here to define globaly useful stuff.  At the time this file
 # was created, the bootstrapping was not far enough along to allow us to
@@ -15,7 +17,7 @@
 #     fi
 #   end
 #
-#Undefined = Object.new
+Undefined = Object.new
 
 # Used to coerce a value to a string via to_str(), if available.
 def StringValue(obj)

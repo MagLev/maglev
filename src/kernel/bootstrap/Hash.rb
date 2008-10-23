@@ -1,14 +1,4 @@
 
-
-# This is a global sentinal object representing an undefined object.  This
-# is used to distinguish the user passing nil vs not passing anything for
-# default parameters.
-#
-# TODO: This is in Hash.rb for right now, as I can't seem to call it in
-# ../kernel.rb, nor in Globals.rb, nor in Object.rb. When I figure out the
-# bootstrapping sequence, I can put it in the right spot.
-Undefined = Object.new
-
 class Hash
 
   primitive 'hash'
@@ -24,7 +14,7 @@ class Hash
     if ((numelem & 1) != 0)
       if (numelem.equal?(1) )
         first = elements[0]
-        if (first._isHash) 
+        if (first._isHash)
           return first.dup
         end
       end
@@ -32,7 +22,7 @@ class Hash
     end
     n = 0
     res = self.new
-    while (n < numelem) 
+    while (n < numelem)
       res[ elements[n] ] = elements[n + 1]
       n += 2
     end
@@ -55,10 +45,10 @@ class Hash
     end
     unless other.default == self.default
       return false
-    end 
-    each { |k,v| 
-       unless other[k] == v 
-         return false 
+    end
+    each { |k,v|
+       unless other[k] == v
+         return false
        end
     }
     true
