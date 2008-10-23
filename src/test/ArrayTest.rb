@@ -775,3 +775,21 @@ ArrayTest.new.unshift()
 
 # expectvalue '147|258|3|'
 ArrayTest.new.zip()
+
+
+require File.expand_path('simple', File.dirname(__FILE__))
+
+ary = [1,2,3]
+a = "cat"
+class << a
+  def to_int ; 2; end
+end
+test(ary[a], 3, 'array coerces with :to_int')
+
+# begin
+#   ary["cat"]
+#   failed_test("Expecting TypeError", TypeError, nil)
+# rescue Exception => e
+#   failed_test("Expecting TypeError", TypeError, e) unless e.is_a? TypeError
+# end
+report
