@@ -1,2 +1,8 @@
-This RCL directory contains commonly shared ruby files.
+This RCL directory contains files common, or substantially common, with
+other implementations of Ruby (notably, Rubinius).
+
 Files in this directory are loaded after those in kernel/bootstrap.
+
+The delta directory contains files that override definitions in this
+directory (usually for performance reasons).
+

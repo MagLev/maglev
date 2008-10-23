@@ -1,7 +1,4 @@
 class Range
-  include Enumerable
-
-  primitive 'collect&', 'collect:'
   primitive 'to_a', 'asArray'
   primitive '==', '='
   primitive 'hash'
@@ -41,8 +38,6 @@ class Range
   primitive 'exclude_end?', 'excludeEnd'
   primitive 'first', '_from'
 
-  alias include? ===
-
   def initialize(fromArg, toArg)
     @from = fromArg
     @to = toArg
@@ -57,10 +52,6 @@ class Range
   end
 
   primitive 'last', '_to'
-
-  def member?(val)
-    self.detect { |i| i == val }
-  end
 
   def step(n=1, &block)
     is_numeric_range = @from.is_a?(Numeric)

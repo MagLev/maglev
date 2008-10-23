@@ -1,5 +1,4 @@
 class Dir
-  include Enumerable
 
   # private primitives
   class_primitive_nobridge '_rmdir', '_rmdir:'
@@ -105,11 +104,6 @@ class Dir
       block.call(@entries[i])
       i = i + 1
     end
-  end
-
-  def entries
-    check_closed
-    @entries
   end
 
   def path
