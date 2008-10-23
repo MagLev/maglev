@@ -260,7 +260,11 @@ startvsd() {
 }
 
 maglev-shell() {
-  $GEMSTONE/bin/irb $@
+  if [ -z "`which rlwrap`" ]; then
+    $GEMSTONE/bin/irb $@
+  else
+    rlwrap $GEMSTONE/bin/irb $@
+  fi
 }
 
 mri() {
