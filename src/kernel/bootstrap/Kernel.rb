@@ -26,6 +26,69 @@ module Kernel
     File.open(fName, mode)
   end
 
+  def p(obj)
+    f = STDOUT
+    f.write(obj.inspect)
+    f.write("\n")   # TODO observe record sep global
+    nil
+  end
+ 
+  def print(*args)
+    STDOUT.print(*args)
+    nil
+  end
+
+  def printf(a, b, c, *d)
+    if (a.kind_of?(IO))
+      if (d._isArray)
+        args = [ c ]
+        args.concat(*d)
+      else
+        args = [ c , d ]
+      end
+      a.printf(b, *args)
+    else
+      if (d._isArray)
+        args = [ b, c ]
+        args.concat(*d)
+      else
+        args = [ b, c , d ]
+      end
+      STDOUT.printf(a, *args)
+    end
+  end
+
+  def printf(a, b, c)
+    if (a.kind_of?(IO))
+      a.printf(b, c)
+    else
+      STDOUT.printf(a, b, c)
+    end
+  end
+
+  def printf(a, b)
+    if (a.kind_of?(IO))
+      a.printf(b)
+    else
+      STDOUT.printf(a, b)
+    end
+  end
+
+  def printf(a)
+    STDOUT.printf(a)
+  end
+
+  def puts(*args)
+    STDOUT.puts(*args)
+    nil
+  end
+
+  def putc(arg)
+    STDOUT.putc(arg)
+    arg
+  end
+
+
   primitive 'sprintf*', 'sprintf:with:'
 
   primitive_nobridge '_system', '_system:'

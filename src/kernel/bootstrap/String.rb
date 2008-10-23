@@ -19,9 +19,8 @@ class String
   # Class Methods
 
   # Instance Methods
-  def %(args)
-    a = Array(args).dup
-    gsub(/%(\d|\.)*./){a.shift.to_fmt}
+  def %(*args)
+    sprintf(self, *args)
   end
 
   def *(n)

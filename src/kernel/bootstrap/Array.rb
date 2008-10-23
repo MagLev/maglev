@@ -301,7 +301,8 @@ class Array
     self
   end
 
-  primitive 'concat', '_rubyAddAll:'
+  primitive_nobridge 'concat', '_rubyAddAll:'
+  primitive_nobridge 'concat*', '_rubyAddAll:'
 
   # TODO: need to add a block arg variant to delete
   def delete(el)

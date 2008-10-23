@@ -11,7 +11,7 @@ class File
     PATH_SEPARATOR = ':'
 
     primitive 'close', 'close'
-    primitive '<<', 'addAll:'
+    # << inherited from IO
     primitive 'write', 'addAll:'
     primitive 'next_line', 'nextLineTo:'
     primitive_nobridge '_atEnd', 'atEnd'
@@ -436,16 +436,32 @@ class PersistentFile
         @block.call
     end
 
-    def print(*args)
-        args.each {|arg| self << arg.to_s}
-    end
-
     def <<(data)
         _file << data
     end
 
+    def print(*args)
+       _file.print(*args)
+    end
+
+    def printf(format, *args)
+      _file.printf(format, *args)
+    end
+
+    def putc(arg)
+       _file.putc(args)
+    end
+
+    def puts(*args)
+       _file.puts(*args)
+    end
+
+    def puts(*args)
+       _file.puts(*args)
+    end
+
     def write(data)
-      _file << data
+      _file.write(data)
     end
 
     def gets(sep=$/ )

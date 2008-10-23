@@ -123,41 +123,8 @@ class Object
         self
     end
 
-    def print(*objs)
-      objs.each {|obj| $stdout << obj.to_s}
-      nil
-    end
-
-    def printf(pattern, *args)
-        puts pattern.gsub(/%s/){args.shift}
-    end
-
-    def puts(*args)
-        if args.empty?
-            $stdout << "\n"
-        else
-            args.each do |arg|
-                if ( arg._isArray )  # if arg.kind_of?(Array)
-                    puts *arg
-                else
-                    $stdout << arg.to_s
-                    $stdout << "\n"
-                end
-            end
-        end
-        nil
-    end
-
-    def p(obj)
-        puts obj.inspect
-    end
-
     def ===(obj)
         self == obj
-    end
-
-    def gets(sep="\n")
-        $stdin.gets(sep)
     end
 
     def raise(err, str)

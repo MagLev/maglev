@@ -23,7 +23,7 @@ Benchmark.bm(7) do |bmr|
     i+=1
     gen_random(100.0)
   end
-  # "%.9f" % gen_random(100.0)
+  puts "%.9f" % gen_random(100.0)
 
 ### Begin footer added by script ###
 }
