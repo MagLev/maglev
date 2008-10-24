@@ -41,9 +41,8 @@ def untar_product_to_gemstone(tgz)
     sh %{
       tar zxf ../latest-product.tgz
       chmod -R u+w product
-      mv product gemstone
       echo "=== Unpacked build: version.txt is:"
-      cat gemstone/version.txt
+      cat version.txt
       }
   end
 end
