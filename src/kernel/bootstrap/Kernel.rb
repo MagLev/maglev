@@ -88,7 +88,6 @@ module Kernel
     arg
   end
 
-
   primitive 'sprintf*', 'sprintf:with:'
 
   primitive_nobridge '_system', '_system:'

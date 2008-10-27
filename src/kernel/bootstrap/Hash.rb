@@ -217,11 +217,7 @@ class Hash
     self
   end
 
-  #alias value? has_value?
-  # TODO: alias doesn't currently work for methods with '?'
-  def value?(val)
-    has_value? val
-  end
+  alias value? has_value?
 
   def values
     result = []
@@ -241,7 +237,6 @@ class Hash
   # RxINC: does the primitive work?
   primitive 'dup', 'copy'
 
-#  primitive 'inspect', 'printString'
   def inspect
     return "{}" if length.equal?(0)
     str = "{"

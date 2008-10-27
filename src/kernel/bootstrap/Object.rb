@@ -58,18 +58,28 @@ class Object
     primitive_nobridge 'send', 'rubySend:'
     primitive_nobridge 'send&', 'rubySend:withBlock:'
     #  send* will get bridge methods for all but  'send' , 'send&'
-    primitive          'send*', 'rubySend:withArguments:'
+    primitive_nobridge 'send', 'rubySend:with:'
+    primitive_nobridge 'send',  'rubySend:with:with:'
+    primitive_nobridge 'send',  'rubySend:with:with:with:'
+    primitive          'send*',  'rubySend:withArguments:'
+    # primitive          'send*', 'rubySend:withArguments:'
 
     #  __send__ defined per MRI, non-overrideable version of send
     #  TODO: disallow redef in Object after prims loaded
     primitive_nobridge '__send__', 'rubySend:'
     primitive_nobridge '__send__&', 'rubySend:withBlock:'
-    primitive          '__send__*', 'rubySend:withArguments:'
+    primitive_nobridge '__send__', 'rubySend:with:'
+    primitive_nobridge '__send__',  'rubySend:with:with:'
+    primitive_nobridge '__send__',  'rubySend:with:with:with:'
+    primitive          '__send__*',  'rubySend:withArguments:'
 
     primitive 'dup', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
     primitive_nobridge 'respond_to?', 'rubyRespondsTo:'
+
+    # install this prim so  anObj.send(:kind_of?, aCls)   will work
+    primitive_nobridge 'kind_of?' , '_rubyKindOf:'
 
     def respond_to?(aSymbol, includePrivateBoolean)
       # Gemstone: the argument includePrivateBoolean is ignored

@@ -58,11 +58,19 @@ class File
     end
 
     def self.blockdev?(filename)
-      File.stat(filename).blockdev?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.blockdev?
     end
 
     def self.chardev?(filename)
-      File.stat(filename).chardev?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.chardev?
     end
 
     def self.chmod(permission, *fileNames)
@@ -94,7 +102,11 @@ class File
     # MNI: File.delete
 
     def self.directory?(filename)
-      File.stat(filename).directory?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.directory?
     end
 
     def self.dirname(str)
@@ -110,15 +122,27 @@ class File
     end
 
     def self.executable?(filename)
-      File.stat(filename).executable?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.executable?
     end
 
     def self.executable_real?(filename)
-      File.stat(filename).executable_real?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.executable_real?
     end
 
     def self.exist?(path)
-      File.stat(path) ? true : false rescue false
+      statObj = File._stat(path, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      true
     end
 
     class << self
@@ -185,7 +209,11 @@ class File
     end
 
     def self.file?(filename)
-      File.stat(filename).file?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.file?
     end
 
     # MNI: File.fnmatch
@@ -196,7 +224,11 @@ class File
     end
 
     def self.grpowned?(filename)
-      File.stat(filename).grpowned?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.grpowned?
     end
 
     def self.join(*ary)
@@ -245,30 +277,54 @@ class File
     end
 
     def self.owned?(filename)
-      File.stat(filename).owned?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.owned?
     end
 
     def self.pipe?(filename)
-      File.stat(filename).pipe?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.pipe?
     end
 
     def self.readable?(filename)
-      File.stat(filename).readable?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.readable?
     end
 
     def self.readable_real?(filename)
-      File.stat(filename).readable_real?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.readable_real?
     end
 
     # MNI: File.readlink
     # MNI: File.rename
 
     def self.setgid?(filename)
-      File.stat(filename).setgid?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.setgid?
     end
 
     def self.setuid?(filename)
-      File.stat(filename).setuid?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.setuid?
     end
 
     def self.size(filename)
@@ -276,11 +332,19 @@ class File
     end
 
     def self.size?(filename)
-      File.stat(filename).size?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return nil  # an error attempting to stat
+      end
+      statObj.size?
     end
 
     def self.socket?(filename)
-      File.stat(filename).socket?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.socket?
     end
 
     # MNI: File.split
@@ -290,13 +354,21 @@ class File
     end
 
     def self.sticky?(filename)
-      File.stat(filename).sticky?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.sticky?
     end
 
     # MNI: File.symlink
 
     def self.symlink?(filename)
-      File.stat(filename).symlink?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.symlink?
     end
 
     # MNI: File.truncate
@@ -324,15 +396,27 @@ class File
     # MNI: File.utime
 
     def self.writable?(filename)
-      File.stat(filename).writable?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.writable?
     end
 
     def self.writable_real?(filename)
-      File.stat(filename).writable_real?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.writable_real?
     end
 
     def self.zero?(filename)
-      File.stat(filename).zero?
+      statObj = File._stat(filename, false)
+      if (statObj._isFixnum)
+        return false  # an error attempting to stat
+      end
+      statObj.zero?
     end
 
     # BEGIN Instance methods
@@ -397,7 +481,11 @@ class File
     end
 
     def stat
-      File._fstat(@fileDescriptor, false)
+      res = File._fstat(@fileDescriptor, false)
+      if (res._isFixnum) 
+         raise SystemCallError # TODO: Errno::xxx      
+      end
+      return res
     end
 
     # TODO: The following methods are not documented as part of the API:

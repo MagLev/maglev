@@ -70,6 +70,15 @@ o.doSend2arr(a)
 o.doSend2b( :meth2arr , a )
 o.doSend0Arr
 
+b = o.send( :kind_of?,  Object )
+unless b.equal?(true)
+  raise 'ERR'
+end
+b = o.send( :kind_of?,  Fixnum )
+unless b.equal?(false)
+  raise 'ERR'
+end
+
 b = o.respond_to?( :doSend2b )
 unless b.equal?(true)  
   raise 'ERR'

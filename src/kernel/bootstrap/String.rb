@@ -19,8 +19,11 @@ class String
   # Class Methods
 
   # Instance Methods
-  def %(*args)
-    sprintf(self, *args)
+  def %(arg)
+    unless arg._isArray
+      arg = [ arg ]
+    end
+    sprintf(self, *arg)
   end
 
   def *(n)
