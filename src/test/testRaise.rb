@@ -102,4 +102,18 @@ begin
      raise 'ERR'
   end
 end
+
+begin
+  n=0
+  while n < 10
+    n+=1
+    begin
+    rescue
+    end
+  end
+  unless n == 10
+     raise 'ERR'
+  end
+end
+
 true
