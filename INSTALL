@@ -19,3 +19,16 @@ you can resolve the problem by upgrading to the latest Xcode
 'maglev status' uses the lsof command to see if the parse server
 is running. If you do not have lsof installed, or cannot run it,
 uncomment the equivalent netstat command in $MAGLEV_HOME/bin/maglev.
+
+
+For Linux users without ruby experience, you need to install 
+  ruby v1.8.6
+  rubygems
+with your Linux package manager or installer.
+Then with a live Internet connection, install ruby gems in this order:
+  /usr/bin/gem install RubyInline -v 3.6.0
+  /usr/bin/gem install rubyforge -v 1.0.0
+  /usr/bin/gem install rake -v 0.8.1
+  /usr/bin/gem install hoe -v 1.5.3
+  /usr/bin/gem install ParseTree -v 2.2.0
+
