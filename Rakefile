@@ -18,7 +18,7 @@ require 'rakelib/gemstone'
 
 verbose false  # turn off rake's chatter about all the sh commands
 
-CLEAN.include('*.out')
+CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out')
 
 task :default => :'gs:status'  # TODO: Do we want to leave this as the default?
 
