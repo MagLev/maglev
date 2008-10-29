@@ -1,5 +1,5 @@
-.DS_Store  # OS X junk
-._*        # TextMate junk
+.DS_Store
+._*
 .svn
 *~
 *.err
