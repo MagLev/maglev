@@ -45,8 +45,7 @@ while [[ $# > 0 ]]
 do
     case $1 in
         -d)
-            ### We need to replace this with a real way to debug using TOPAZ
-            export TOPAZ_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+            debug=1
             ;;
         -h)
             usage
@@ -93,13 +92,33 @@ do
 done
 
 # Finally, execute the command
-$TOPAZ_CMD <<ENDRUBY
-run
-RubyContext load.
-RubyContext default setARGV: #($args) .
-RubyContext loadFileNamed: '$RUBYSCRIPT'.
-%
-exit
-ENDRUBY
-
-exit
+if [[ -z $debug ]]
+then
+    # Normal execution
+    $TOPAZ_CMD <<-EOF
+	run
+	RubyContext load.
+	RubyContext default setARGV: #($args) .
+	RubyContext loadFileNamed: '$RUBYSCRIPT'.
+	%
+	exit
+	EOF
+else
+    # Debug.
+    # The key to debug is to keep topaz's stdin connected to the tty.
+    # So, we create a topaz script with all the goodies, and use it
+    # as the topaz ini file
+    dbscript=$MAGLEV_HOME/etc/dbscript
+    rm -f $dbscript
+    cp $MAGLEV_HOME/etc/.topazdebugini $dbscript
+    cat - >> $dbscript <<-EOF
+	run
+	RubyContext load.
+	RubyContext default setARGV: #($args) .
+	RubyContext loadFileNamed: '$RUBYSCRIPT'.
+	%
+	EOF
+    # Now run topaz with our debug script, including all params passed to us
+    $GEMSTONE/bin/topaz -I $dbscript -l
+    rm -f $dbscript   # Maybe keep this so we can run multiple times?
+fi
