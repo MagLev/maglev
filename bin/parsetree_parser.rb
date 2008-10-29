@@ -1,3 +1,4 @@
+$:.unshift File.dirname(__FILE__)  # Ensure we can find maglev_parser.rb
 require 'rubygems'
 require "webrick"
 require 'maglev_parser'
