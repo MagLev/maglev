@@ -19,46 +19,10 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  desc "Stop the server and copy the extent to the arg: rake dev:savestate'[foo]' copies to ../extent0.ruby.dbf_foo"
-  # Need to use full ruby syntax to pass args AND have a dependency.  So
-  # this one states that :savestate has a dependency on gs:stop, and that
-  # it takes a single arg named :name.  Then the args get passed as the
-  # second parameter and you use :name as the selector out of args.
-  #
-  # To invoke from the command line:
-  #    $ rake dev:savestate'[foo]'
-  # will copy data/extent0.ruby.dbf to ../extent0.ruby.dbf_foo.
-  #
-  # TODO: At some point, should probably have ENV['MAGLEV_IMAGE_CACHE']
-  # point to the directory to cache these in.
-  task({:savestate => :'gs:stop'}, :name)  do |t, args|
-    # TODO: Do I need to save the tranlog too?
-    save_file = "../extent0.ruby.dbf_#{args.name}"
-    puts "Saving current extent to #{save_file}"
-    cp 'data/extent0.ruby.dbf', save_file
-  end
 
-  desc "Restore a previously stashed extent0.ruby.dbf (stops server first)."
-  # TODO: Hook into $MAGLEV_IMAGE_CACHE (see comment in task savestate)
-  task({:restorestate => :'gs:stop'}, :name)  do |t, args|
-    restore_file = "../extent0.ruby.dbf_#{args.name}"
-    unless File.exists? restore_file
-      puts "Couldn't find restore file #{restore_file}"
-      return nil
-    end
-
-    was_running = server_running?
-    Rake::Task['gs:stop'].invoke if was_running
-
-    # TODO: Do I blow away the tranlog in data?  Restore an old one?
-    puts "Restoring extent #{restore_file} to data/extent0.ruby.dbf"
-    cp restore_file, 'data/extent0.ruby.dbf'
-
-    Rake::Task['gs:start'].invoke if was_running
-  end
-
-  desc "Stop server, install ../latest-product.tgz, load ../latest.mcz and reload primitives"
-  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:reloadprims']
+  desc "Stop server, install ../latest*, and reload primitives"
+  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz',
+                             :'dev:reloadprims']
 
   desc "Stop current server and install ../latest-product.tgz"
   task :'install-tgz' do
@@ -87,73 +51,16 @@ namespace :dev do
     end
   end
 
-  desc "Invoke topaz and run a .inp file: rake dev:inp file=/somedir/somefile.inp"
-  task :runinp => 'gs:start' do
-    the_file = ENV['file']
-    commit = 'commit'
-    raise "Need to pass a file: file=..." if the_file.nil?
-    raise "Can't find .inp file '#{ENV['file']}" unless File.exists?(the_file)
-    run_topaz <<END
-output push runinp.out
-omit resultcheck
-inp #{the_file}
-
-END
-  end
-
   desc "Reload kernel.rb (primitives) and commit it"
   task :reloadprims => ['gs:start'] do
     puts "=== reload primitives"
-    run_topaz <<END
-output push reloadprims.out
-omit resultcheck
-run
-RubyContext default requirePrimitives.
-RubyContext save.
-%
-commit
-exit
-END
+    run_topaz tc_reload_prims
   end
 
   desc "Load the mcz file ../latest.mcz and commit it."
   task :loadmcz => ['gs:start'] do
     puts "=== Load .mcz file: #{`ls -l ../latest.mcz`}"
-    run_topaz <<END
-output push loadall.out
-display resultcheck
-run
-| fileRepo aName ver |
-fileRepo := MCDirectoryRepository new directory: (FileDirectory on: '../').
-aName := 'latest.mcz'.
-
-ver := fileRepo loadVersionFromFileNamed: aName .
-ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
-GsFile gciLogServer: ver printString .
-ver load .
-GsFile gciLogServer: 'load done'.
-^ true
-%
-commit
-exit
-END
-  end
-
-  desc "Run an mspec file: spec=<dir_or_file_name>"
-  task :spec do
-    raise "No spec defined with: spec=..." unless ENV['spec']
-    topaz_stuff =<<END
-output push spec.out
-run
-RubyContext load.
-RubyContext requireFileNamed: 'mspec.rb'.
-RubyCompiler new evaluateString: '\\$formatter = DottedFormatter.new; \\$formatter.register'.
-RubyContext loadFileNamed: '#{ENV['PWD']}/', '#{ENV['spec']}'.
-RubyCompiler new evaluateString: '\\$formatter.finish'
-%
-exit
-END
-    run_topaz topaz_stuff
+    run_topaz tc_load_mcz
   end
 
 # For some reason, I can't get both to run under one target...
@@ -163,25 +70,15 @@ END
 #     Rake::Task[:'dev:specs'].invoke
 #   end
 
-  desc "Run the passing ruby specs (depends on ../gss64bit_30/*)"
-  task :specs do
-    ENV['file'] = "rakelib/passingspecs.inp"
-    Rake::Task[:'dev:runinp'].invoke
-    puts "Log files in log/spec*"
-  end
-
   desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
   task :'vm-tests' do
-    ENV['file'] = "rakelib/allvmunit.inp"
-    Rake::Task[:'dev:runinp'].invoke
+    run_topaz tc_run_vmunit
     puts "Log files in log/vmunit*"
   end
 
   desc "Run the bm smoke tests (depends on ../gss64bit_30/*)"
   task :'bm-tests' do
-    ENV['file'] = "rakelib/allbench.inp"
-    Rake::Task[:'dev:runinp'].invoke
+    run_topaz tc_run_benchmarks
     puts "Log files in log/bench*"
   end
-
 end
