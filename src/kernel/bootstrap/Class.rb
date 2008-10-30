@@ -11,6 +11,29 @@ class Class
 
   # base image has persistent env 1 method Class>>class
 
+  def attr_accessor(*names)
+    names.each do |n|
+        attr_reader(n)
+        attr_writer(n)
+    end
+  end
+
+  def attr_reader(*names)
+    names.each do |n|
+        module_eval "def #{n}; @#{n}; end"
+    end
+  end
+
+  def attr_writer(*names)
+    names.each do |n|
+        module_eval "def #{n}=(v); @#{n} = v; end"
+    end
+  end
+
+  def module_eval(str)
+    RUBY.module_eval(str, self)
+  end
+
   def new(*args)
     inst = self.alloc
     inst.initialize(*args)
