@@ -87,74 +87,16 @@ namespace :dev do
     end
   end
 
-  desc "Invoke topaz and run a .inp file: rake dev:inp file=/somedir/somefile.inp"
-  task :runinp => 'gs:start' do
-    the_file = ENV['file']
-    commit = 'commit'
-    raise "Need to pass a file: file=..." if the_file.nil?
-    raise "Can't find .inp file '#{ENV['file']}" unless File.exists?(the_file)
-    run_topaz <<END
-output push runinp.out
-omit resultcheck
-inp #{the_file}
-
-END
-  end
-
   desc "Reload kernel.rb (primitives) and commit it"
   task :reloadprims => ['gs:start'] do
     puts "=== reload primitives"
-    run_topaz <<END
-output push reloadprims.out
-omit resultcheck
-run
-RubyContext default requirePrimitives.
-RubyContext save.
-%
-commit
-exit
-END
+    run_topaz tc_reload_prims
   end
 
   desc "Load the mcz file ../latest.mcz and commit it."
   task :loadmcz => ['gs:start'] do
     puts "=== Load .mcz file: #{`ls -l ../latest.mcz`}"
-    run_topaz <<END
-output push loadall.out
-display resultcheck
-run
-| fileRepo aName ver |
-fileRepo := MCDirectoryRepository new directory: (FileDirectory on: '../').
-aName := 'latest.mcz'.
-
-ver := fileRepo loadVersionFromFileNamed: aName .
-ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
-GsFile gciLogServer: ver printString .
-ver load .
-GsFile gciLogServer: 'load done'.
-^ true
-%
-commit
-exit
-END
-  end
-
-  desc "Run an mspec file: spec=<dir_or_file_name>"
-  task :spec do
-    raise "No spec defined with: spec=..." unless ENV['spec']
-    topaz_stuff =<<END
-output push spec.out
-run
-RubyContext load.
-RubyContext default globals at: #DEBUG_SPEC put: false .
-RubyContext requireFileNamed: 'mspec.rb'.
-RubyCompiler new evaluateString: '\\$formatter = DottedFormatter.new; \\$formatter.register'.
-RubyContext loadFileNamed: '#{ENV['PWD']}/', '#{ENV['spec']}'.
-RubyCompiler new evaluateString: '\\$formatter.finish'
-%
-exit
-END
-    run_topaz topaz_stuff
+    run_topaz tc_load_mcz
   end
 
 # For some reason, I can't get both to run under one target...
@@ -164,25 +106,15 @@ END
 #     Rake::Task[:'dev:specs'].invoke
 #   end
 
-  desc "Run the passing ruby specs (depends on ../gss64bit_30/*)"
-  task :specs do
-    ENV['file'] = "rakelib/passingspecs.inp"
-    Rake::Task[:'dev:runinp'].invoke
-    puts "Log files in log/spec*"
-  end
-
   desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
   task :'vm-tests' do
-    ENV['file'] = "rakelib/allvmunit.inp"
-    Rake::Task[:'dev:runinp'].invoke
+    run_topaz tc_run_vmunit
     puts "Log files in log/vmunit*"
   end
 
   desc "Run the bm smoke tests (depends on ../gss64bit_30/*)"
   task :'bm-tests' do
-    ENV['file'] = "rakelib/allbench.inp"
-    Rake::Task[:'dev:runinp'].invoke
+    run_topaz tc_run_benchmarks
     puts "Log files in log/bench*"
   end
-
 end

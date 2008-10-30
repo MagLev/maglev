@@ -6,7 +6,7 @@ RubyContext load .
 RubyContext requireFileNamed: 'mspec.rb' .
 
 oldDebug := RubyContext default globals at: #DEBUG_SPEC .
-RubyContext default globals at: #DEBUG_SPEC put: false .
+RubyContext default globals at: #DEBUG_SPEC put: true .
 RubyCompiler new evaluateString:
   '$formatter = DottedFormatter.new; $formatter.register'.
 RubyContext save .
