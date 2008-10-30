@@ -47,6 +47,10 @@ describe "A block whose arguments are splatted" do
 #    BlockSpecs::Yield.new.two_arg_array { |*args| a << args }
 #    a.should == [[[1, 2]]]
 #  end
+   it "returns" do
+      DEFERRED
+   end
+# END DEFERRED
 end
 
 not_compliant_on :rubinius do
