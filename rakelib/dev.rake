@@ -19,46 +19,10 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  desc "Stop the server and copy the extent to the arg: rake dev:savestate'[foo]' copies to ../extent0.ruby.dbf_foo"
-  # Need to use full ruby syntax to pass args AND have a dependency.  So
-  # this one states that :savestate has a dependency on gs:stop, and that
-  # it takes a single arg named :name.  Then the args get passed as the
-  # second parameter and you use :name as the selector out of args.
-  #
-  # To invoke from the command line:
-  #    $ rake dev:savestate'[foo]'
-  # will copy data/extent0.ruby.dbf to ../extent0.ruby.dbf_foo.
-  #
-  # TODO: At some point, should probably have ENV['MAGLEV_IMAGE_CACHE']
-  # point to the directory to cache these in.
-  task({:savestate => :'gs:stop'}, :name)  do |t, args|
-    # TODO: Do I need to save the tranlog too?
-    save_file = "../extent0.ruby.dbf_#{args.name}"
-    puts "Saving current extent to #{save_file}"
-    cp 'data/extent0.ruby.dbf', save_file
-  end
 
-  desc "Restore a previously stashed extent0.ruby.dbf (stops server first)."
-  # TODO: Hook into $MAGLEV_IMAGE_CACHE (see comment in task savestate)
-  task({:restorestate => :'gs:stop'}, :name)  do |t, args|
-    restore_file = "../extent0.ruby.dbf_#{args.name}"
-    unless File.exists? restore_file
-      puts "Couldn't find restore file #{restore_file}"
-      return nil
-    end
-
-    was_running = server_running?
-    Rake::Task['gs:stop'].invoke if was_running
-
-    # TODO: Do I blow away the tranlog in data?  Restore an old one?
-    puts "Restoring extent #{restore_file} to data/extent0.ruby.dbf"
-    cp restore_file, 'data/extent0.ruby.dbf'
-
-    Rake::Task['gs:start'].invoke if was_running
-  end
-
-  desc "Stop server, install ../latest-product.tgz, load ../latest.mcz and reload primitives"
-  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:reloadprims']
+  desc "Stop server, install ../latest*, and reload primitives"
+  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz',
+                             :'dev:reloadprims']
 
   desc "Stop current server and install ../latest-product.tgz"
   task :'install-tgz' do
