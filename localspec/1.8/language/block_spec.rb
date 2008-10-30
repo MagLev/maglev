@@ -41,11 +41,12 @@ describe "A block whose arguments are splatted" do
     a.should == [[1, 2]]
   end
 
-  it "captures the array passed to the block in an array" do
-    a = []
-    BlockSpecs::Yield.new.two_arg_array { |*args| a << args }
-    a.should == [[[1, 2]]]
-  end
+# DEFERRED
+#  it "captures the array passed to the block in an array" do
+#    a = []
+#    BlockSpecs::Yield.new.two_arg_array { |*args| a << args }
+#    a.should == [[[1, 2]]]
+#  end
 end
 
 not_compliant_on :rubinius do
