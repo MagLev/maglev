@@ -146,6 +146,7 @@ END
 output push spec.out
 run
 RubyContext load.
+RubyContext default globals at: #DEBUG_SPEC put: false .
 RubyContext requireFileNamed: 'mspec.rb'.
 RubyCompiler new evaluateString: '\\$formatter = DottedFormatter.new; \\$formatter.register'.
 RubyContext loadFileNamed: '#{ENV['PWD']}/', '#{ENV['spec']}'.
