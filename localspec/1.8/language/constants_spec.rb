@@ -69,7 +69,7 @@ describe "Constant lookup rule" do
     end
   end
   
-# BEGIN DEFERRED
+# BEGIN DEFERRED (dwatson #178)
 #  it "only searches a Module or Class" do
 #    lambda { :File::TEST }.should raise_error(TypeError)
 #  end
