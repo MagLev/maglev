@@ -41,7 +41,7 @@ describe "A block whose arguments are splatted" do
     a.should == [[1, 2]]
   end
 
-# DEFERRED
+# BEGIN DEFERRED (dwatson #175)
 #  it "captures the array passed to the block in an array" do
 #    a = []
 #    BlockSpecs::Yield.new.two_arg_array { |*args| a << args }
