@@ -8,9 +8,9 @@ class Object
     # Begin private helper methods
 
     # primitive_nobridge has max of 3 normal args, 1 star arg, 1 block arg
-    #  example with a block argument  
+    #  example with a block argument
     #    primitive_nobridge '_foo*&' , '_foo:a:b:c:d:e:'
-    #  example without a block argument 
+    #  example without a block argument
     #    primitive_nobridge '_foo*' , '_foo:a:b:c:d:'
 
     #  begin special sends
@@ -33,9 +33,9 @@ class Object
     # end special sends
 
     #  following are installed by RubyContext>>installPrimitiveBootstrap
-    #    primitive_nobridge 'class', 'class' # installed in Object 
-    #  end installPrimitiveBootstrap 
-  
+    #    primitive_nobridge 'class', 'class' # installed in Object
+    #  end installPrimitiveBootstrap
+
     #  private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
     primitive_nobridge '_each&', '_rubyEach:'
@@ -76,6 +76,8 @@ class Object
     primitive 'dup', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
+    primitive 'frozen?', 'isInvariant'
+
     primitive_nobridge 'respond_to?', 'rubyRespondsTo:'
 
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
@@ -194,13 +196,15 @@ class Object
     end
 
     def raise(err, str)
-        err ||= RuntimeError
         err.signal(str)
     end
 
     def raise(err)
-        err ||= RuntimeError
         err.signal(nil)
+    end
+
+    def raise
+        RuntimeError.signal(nil)
     end
 
     def rand(n=nil)

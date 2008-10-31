@@ -1,6 +1,9 @@
-# Some other ideas: Cache images and reload them (e.g., after you've set
-# them up with something).
+# Ruby support for the rake tasks in dev.rake.  Support for managing the
+# development environment.
 
+# Remove the currently installed development image.
+# Saves $MAGLEV_HOME/gemstone as $MAGLEV_HOME.gemstone.old.  Deletes
+# $MAGLEV_HOME/product, if it exists.
 def rm_current_gemstone
   cd MAGLEV_HOME do
     # The raw products tend to have the directories write protected, so
@@ -30,6 +33,9 @@ def rm_current_gemstone
   end
 end
 
+# Unpack the given +tgz+ file into place as $MAGLEV_HOME/gemstone Assumes
+# the .tgz file unpacks a directory named +product+, renames it to
+# +gemstone+.
 def untar_product_to_gemstone(tgz)
   product_tgz = File.expand_path(tgz)
   raise ArgumentError, "'#{product_tgz}' is not a file" unless
@@ -55,7 +61,6 @@ def ensure_std_directories
   end
 end
 
-
 def copy_extent
   puts "=== Copy new ruby extent into data"
   cd MAGLEV_HOME do
@@ -71,5 +76,64 @@ def copy_extent
     cp 'gemstone/bin/extent0.ruby.dbf', 'data'
     chmod 0644, 'data/extent0.ruby.dbf'
   end
+end
+
+# ######################################################################
+#                           TOPAZ COMMAND STRINGS
+# ######################################################################
+# The following +tc_*+ methods generate topaz command strings based on the
+# parameters passed to them.
+
+# Returns a topaz command string that reloads the primitives
+# (src/kernel/kernel.rb) and commits the DB.
+def tc_reload_prims
+  <<-END.margin
+    |output push reloadprims.out
+    |omit resultcheck
+    |run
+    |RubyContext default requirePrimitives.
+    |RubyContext save.
+    |%
+    |commit
+    |exit
+  END
+end
+
+
+# Returns a topaz command string that runs the set of passing vm tests
+# in src/test/vmunit.conf
+def tc_run_vmunit
+  <<-END.margin
+    |inp #{"rakelib/allvmunit.inp"}
+  END
+end
+
+# Returns a topaz command string that runs the benchmarks
+def tc_run_benchmarks
+  <<-END.margin
+    |inp #{"rakelib/allbench.inp"}
+  END
+end
+
+# Returns a topaz command string that loads ../latest.mcz and commits the DB.
+def tc_load_mcz
+  <<-END.margin
+    |output push loadmcz.out
+    |display resultcheck
+    |run
+    || fileRepo aName ver |
+    |fileRepo := MCDirectoryRepository new directory: (FileDirectory on: '../').
+    |aName := 'latest.mcz'.
+    |
+    |ver := fileRepo loadVersionFromFileNamed: aName .
+    |ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
+    |GsFile gciLogServer: ver printString .
+    |ver load .
+    |GsFile gciLogServer: 'load done'.
+    |^ true
+    |%
+    |commit
+    |exit
+  END
 end
 

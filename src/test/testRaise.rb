@@ -5,11 +5,10 @@ begin
   n = n + 10 
   rescue
     n = n + 100    
-    puts "rescueA"
   else
     n = n + 1000
-  ensure
-    n = n + 10000
+   ensure
+     n = n + 10000
 end
 unless n == 10101
   raise 'ERR'
@@ -22,7 +21,6 @@ begin
   n = n + 10 
   rescue ScriptError
     n = n + 100    
-    puts "rescueB"
   else
     n = n + 1000
   ensure
@@ -39,7 +37,6 @@ begin
   n = n + 10
   rescue ScriptError, SyntaxError
     n = n + 100
-    puts "rescueC"
 end  
 unless n == 106
   raise 'ERR'
@@ -54,7 +51,6 @@ begin
     n = n + 10
     rescue *elist
       n = n + 100
-      puts "rescueD"
     else
       n = n + 1000
     ensure  
@@ -73,10 +69,8 @@ begin
     raise ScriptError
     rescue SyntaxError
       a = 99
-      puts "rescue SyntaxError"
     rescue ScriptError  # This rescue clause generates an unexpected token
       a = 101
-      puts "rescue ScriptError"
   end
   unless a == 101
     raise 'ERR'

@@ -1,45 +1,45 @@
 RUBY.class.primitive 'module_eval', 'evaluateString:inClass:'
- 
+
 class Class
   # Ruby Class is identically Smalltalk's Class
 
   #  following are installed by RubyContext>>installPrimitiveBootstrap
-  #    primitive_nobridge 'superclass', 'superclass' # installed in Behavior 
-  #  end installPrimitiveBootstrap 
+  #    primitive_nobridge 'superclass', 'superclass' # installed in Behavior
+  #  end installPrimitiveBootstrap
 
   primitive 'alloc', 'basicNew'
 
-  # base image has persistent env 1 method Class>>class 
+  # base image has persistent env 1 method Class>>class
 
-  def module_eval(str)
-    RUBY.module_eval(str, self)
-  end
-  
-  def new(*args)
-    inst = self.alloc
-    inst.initialize(*args)
-    inst
-  end
-    
   def attr_accessor(*names)
-    names.each do |n| 
+    names.each do |n|
         attr_reader(n)
         attr_writer(n)
     end
   end
-  
+
   def attr_reader(*names)
     names.each do |n|
         module_eval "def #{n}; @#{n}; end"
     end
   end
-  
+
   def attr_writer(*names)
     names.each do |n|
         module_eval "def #{n}=(v); @#{n} = v; end"
-    end  
+    end
   end
-  
+
+  def module_eval(str)
+    RUBY.module_eval(str, self)
+  end
+
+  def new(*args)
+    inst = self.alloc
+    inst.initialize(*args)
+    inst
+  end
+
   def === (obj)
     obj.kind_of?(self)
   end
@@ -47,7 +47,7 @@ class Class
   primitive_nobridge '_subclassOf' , 'isSubclassOf:'
   def <= ( obj)
     self._subclassOf(obj)
-  end   
+  end
 
   #  < <= > >=  defined for other object being a Class or Module
   def < (obj)
@@ -56,7 +56,7 @@ class Class
     else
       res = self._subclassOf
     end
-    res  
+    res
   end
 
   def >= (obj)
@@ -73,7 +73,7 @@ class Class
     if (self.equal?(obj))
       r = 0
     else
-      r = (self._subclassOf(obj)) ? -1 : 1 
+      r = (self._subclassOf(obj)) ? -1 : 1
     end
     r
   end
@@ -85,7 +85,7 @@ class Class
   def inspect
     name
   end
-  
+
   def to_s
     name
   end
