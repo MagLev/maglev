@@ -8,6 +8,10 @@ def test(actual, expected, msg)
 end
 
 def report
+  num = $failed.size
+  if ($failed.size > 0) 
+    num.pause
+  end
   puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
   $failed.each { |f| puts f }
   raise "Failed #{$failed.size} tests" unless $failed.empty?
@@ -20,4 +24,6 @@ end
 
 def register_failure(msg, expected, actual)
   $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
+  x = $failed
+  nil.pause
 end

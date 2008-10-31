@@ -81,6 +81,9 @@ class Object
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
     primitive_nobridge 'kind_of?' , '_rubyKindOf:'
 
+    # install this prim so  anObj.send(:is_a?, aCls)   will work
+    primitive_nobridge 'is_a?' , '_rubyKindOf:'
+
     def respond_to?(aSymbol, includePrivateBoolean)
       # Gemstone: the argument includePrivateBoolean is ignored
       respond_to?(aSymbol)
@@ -94,36 +97,65 @@ class Object
 
     #                                   rubyInspect comes from .mcz
     primitive 'inspect', 'rubyInspect'
+
+    primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
+    primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
+    primitive_nobridge '_instVarNames', 'rubyInstvarNames'
+
+    def instance_variable_get(aName)
+      aName = Type.coerce_to(aName, String, :to_str)
+      unless (aName[0].equal?( ?@ ))  
+        return nil
+      end
+      _instVarAt(aName[1, aName.length].to_sym) 
+    end
+
+    def instance_variable_set(aName, aVal)
+      aName = Type.coerce_to(aName, String, :to_str)
+      unless (aName[0].equal?( ?@ ))
+        return nil
+      end
+      _instVarAtPut(aName[1, aName.length].to_sym, aVal) 
+      aVal
+    end
+
+    def instance_variables
+      syms = self._instVarNames
+      len = syms.length
+      res = Array.new(len)
+      n = 0
+      while (n < len) 
+        res[n] = '@' << syms[n]
+        n = n + 1
+      end
+      res 
+    end
+
     primitive 'method', 'rubyMethod:'
 
-    def rand(n=nil)
-        if n
-            RandomInstance.next(n)
-        else
-            RandomInstance.next
-        end
+  #  uses Behavior>>rubyModuleFunction:, which for specified selector,
+  #    for each variant existing in receiver, installs an env1 meth dict
+  #    entry so that method also shows up as a class method for rcvr.
+  #  module_function is used by  lib/benchmark.rb
+  class_primitive 'basic_module_function', 'rubyModuleFunction:'
+
+  def self.module_function(*names)
+   if names.length > 0
+       names.each{|name| basic_module_function(name)}
+   else
+       @use_module_functions = true
+   end
+  end
+
+  def self.const_defined?(c) false; end
+
+
+    def ===(obj)
+        self == obj
     end
 
-    def to_s
-      self.class.name.to_s
-    end
-
-    def to_str
-        to_s
-    end
-
-    def to_a
-       # remove this method for MRI 1.9 compatibility
-       [ self ]
-    end
-
-    def loop
-        raise LocalJumpError, "no block given" unless block_given?
-
-        while true
-            yield
-        end
-    end
+  def at_exit
+  end
 
     # block_given?  is implemented by the ruby compiler .
     #   do not code any definition of block_given? here .
@@ -133,8 +165,32 @@ class Object
         self
     end
 
-    def ===(obj)
-        self == obj
+    def eql?(other)
+      self == other
+    end
+
+    def eval(str)
+        RUBY.module_eval(str, Object)
+    end
+
+  def extend(mod)
+  end
+
+  def flatten_onto(output)
+    output << self
+    output
+  end
+
+    def loop
+        raise LocalJumpError, "no block given" unless block_given?
+
+        while true
+            yield
+        end
+    end
+
+    def pretty_inspect 
+      inspect; 
     end
 
     def raise(err, str)
@@ -142,12 +198,34 @@ class Object
         err.signal(str)
     end
 
-    def eval(str)
-        RUBY.module_eval(str, Object)
+    def raise(err)
+        err ||= RuntimeError
+        err.signal(nil)
     end
 
-    def eql?(other)
-      self == other
+    def rand(n=nil)
+        if n
+            RandomInstance.next(n)
+        else
+            RandomInstance.next
+        end
+    end
+
+    def to_a
+       # remove this method for MRI 1.9 compatibility
+       [ self ]
+    end
+
+    def to_fmt
+      to_s
+    end
+
+    def to_s
+      self.class.name.to_s
+    end
+
+    def to_str
+        to_s
     end
 
     # BEGIN RUBINIUS
@@ -163,38 +241,6 @@ class Object
       self.class.equal?(cls)
     end
     # END RUBINIUS
-
-  #  uses Behavior>>rubyModuleFunction:, which for specified selector,
-  #    for each variant existing in receiver, installs an env1 meth dict
-  #    entry so that method also shows up as a class method for rcvr.
-  #  module_function is used by  lib/benchmark.rb
-  class_primitive 'basic_module_function', 'rubyModuleFunction:'
-  def self.module_function(*names)
-   if names.length > 0
-       names.each{|name| basic_module_function(name)}
-   else
-       @use_module_functions = true
-   end
-  end
-
-  def self.const_defined?(c) false; end
-
-  def extend(mod)
-  end
-
-  def at_exit
-  end
-
-  def to_fmt
-    to_s
-  end
-
-  def flatten_onto(output)
-    output << self
-    output
-  end
-
-  def pretty_inspect; inspect; end
 
   require 'kernel/bootstrap/Kernel.rb'
 end
