@@ -119,6 +119,6 @@ else
 	%
 	EOF
     # Now run topaz with our debug script, including all params passed to us
-    $GEMSTONE/bin/topaz -I $dbscript -l
+    $(which rlwrap) $GEMSTONE/bin/topaz -I $dbscript -l
     rm -f $dbscript   # Maybe keep this so we can run multiple times?
 fi
