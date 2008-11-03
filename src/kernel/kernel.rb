@@ -76,7 +76,6 @@ require 'kernel/bootstrap/Exception.rb'
 require 'kernel/bootstrap/Module.rb'
 
 require 'kernel/bootstrap/Env.rb'
-#require 'kernel/bootstrap/Enumerable.rb'
 require 'kernel/bootstrap/Errno.rb'
 require 'kernel/bootstrap/Dir.rb'
 require 'kernel/bootstrap/File.rb'
@@ -99,9 +98,13 @@ require 'kernel/bootstrap/FileStat.rb'
 require 'kernel/bootstrap/Struct.rb'
 
 
-
+# Include the common code after the basic primitives.  This is code that
+# should be identical to, or very close to, the Rubinius code.
+require 'kernel/common/misc.rb'
 require 'kernel/common/Enumerable.rb'
+require 'kernel/common/struct.rb'
 
+# Include the delta code
 require 'kernel/delta/Array.rb'
 require 'kernel/delta/Dir.rb'
 require 'kernel/delta/Range.rb'
