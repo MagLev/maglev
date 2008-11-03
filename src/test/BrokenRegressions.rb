@@ -3,12 +3,4 @@
 # in vmunit.conf, so that we can ensure we don't regress on these ad-hoc
 # cases.
 
-begin
-  ary = [1,2,3]
-  ary["cat"]
-rescue TypeError
-  # Nothing
-rescue Exception => e
-  puts "non TypeError unacceptable...#{e}"
-end
-
+# Currently, none...

@@ -9,4 +9,14 @@ class Foo
   end
 end
 
+##################################################
+
+begin
+  ary = [1,2,3]
+  ary["cat"]
+rescue TypeError
+  # Nothing
+rescue Exception => e
+  puts "non TypeError unacceptable...#{e}"
+end
 
