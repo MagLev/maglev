@@ -3,7 +3,7 @@
 # in vmunit.conf, so that we can ensure we don't regress on these ad-hoc
 # cases.
 
-# ############################################################
+# ##### Trac # 239 #######################################################
 # This one if from pp.rb (pretty print).  They try to mixin a bunch of
 # stuff into object, but in maglev, object is committed.
 #
