@@ -173,7 +173,11 @@ class Array
   # Need to either overwrite or allow a mixin.
 
   def ==(other)
-    unless other._isArray
+    if other._isArray
+      if (other.equal?(self))
+        return true
+      end
+    else
       return false
     end
     lim = size
@@ -654,13 +658,22 @@ class Array
     self
   end
 
-  # Return an array containing the element in self at the positions given
-  # by the selectors.
   def values_at(*selectors)
-    # iteration with while loop, using  [] primitive and appending to result
-    #   use either  self.[idx,1] or  self.[aRange]
-    #   use << to append to result
-    raise "Method not implemented: Array#values_at"
+    # selectors is an Array of 
+    lim = selectors.size
+    n = 0
+    res = []
+    while (n < lim)
+      idx = selectors[n]
+      elem = self[idx]  
+      if (idx._isRange && ! elem.equal?(nil) )
+	res.push(*elem)
+      else
+	res.push(elem)
+      end
+      n = n + 1
+    end
+    res
   end
 
   # Overrides from Object that are not documented in Array (e.g., eql? is

@@ -111,15 +111,4 @@ module Kernel
     return false
   end
 
-  def taint
-    # TODO: Kernel#taint is a noop!
-  end
-
-  def tainted?
-    false # TODO kernel#taint is a stub: return false
-  end
-
-  def untaint
-    # TODO: Kernel#untaint is a noop!
-  end
 end
