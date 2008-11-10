@@ -81,6 +81,9 @@ class Object
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
     primitive_nobridge 'kind_of?' , '_rubyKindOf:'
 
+    # install this prim so  anObj.send(:is_a?, aCls)   will work
+    primitive_nobridge 'is_a?' , '_rubyKindOf:'
+
     def respond_to?(aSymbol, includePrivateBoolean)
       # Gemstone: the argument includePrivateBoolean is ignored
       respond_to?(aSymbol)
