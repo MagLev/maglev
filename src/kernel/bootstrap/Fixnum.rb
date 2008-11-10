@@ -41,7 +41,8 @@ class Fixnum
 	primitive 'size', '_rubySize'
 	primitive 'to_f', 'asFloat'
 
-# TODO   to_s
+        # to_s inherited from Integer
+
 # TODO   to_sym
 
 	primitive 'zero?', '_rubyEqualZero'

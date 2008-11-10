@@ -12,7 +12,7 @@ it is most likely a problem running the ParseTree gem. To diagnose:
 	cd $MAGLEV_HOME/bin
 	ruby parsetree_parser.rb
 If that gives the following error on MacOSX:
-	ERROR: Can’t find header dir for ruby
+	ERROR: Cannot find header dir for ruby
 you can resolve the problem by upgrading to the latest Xcode
 	http://developer.apple.com/technology/xcode.html
 

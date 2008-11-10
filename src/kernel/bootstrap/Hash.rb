@@ -37,7 +37,11 @@ class Hash
   # Instance Methods
 
   def ==(other)
-    unless other._isHash
+    if (other._isHash)
+      if (other.equal?(self))
+        return true
+      end
+    else
       other = other.to_hash
     end
     unless other.length.equal?(self.length)

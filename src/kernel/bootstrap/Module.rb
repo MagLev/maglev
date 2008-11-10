@@ -57,9 +57,7 @@ class Module
 
   alias class_eval module_eval
 
-  def class_variables
-    []
-  end
+  # class_variables inherited from Behavior
 
   def clone
     nil

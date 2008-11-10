@@ -161,16 +161,12 @@ class String
   primitive 'empty?', 'isEmpty'
   primitive 'eql?', '='
 
-  def gsub(regex, str, &block)
+  def gsub(regex, str)
     out = ""
     start = 1
     regex.to_rx.each_match(self) do |match|
       out << substring1(start, match.begin(0))
-      if block
-        out << block.call.to_s
-      else
-        out << str
-      end
+      out << str
       start = match.end(0) + 1
     end
     if start <= length
@@ -179,8 +175,26 @@ class String
     out
   end
 
-  def gsub!(regex, str, &block)
-    replace(gsub(regex, str, &block))
+  def gsub(regex, &block)
+    out = ""
+    start = 1
+    regex.to_rx.each_match(self) do |match|
+      out << substring1(start, match.begin(0))
+      out << block.call.to_s
+      start = match.end(0) + 1
+    end
+    if start <= length
+      out << substring1(start, length)
+    end
+    out
+  end
+
+  def gsub!(regex, str)
+    replace(gsub(regex, str))
+  end
+
+  def gsub!(regex, &block)
+    replace(gsub(regex, &block))
   end
 
   def hex
@@ -459,6 +473,8 @@ class String
   def to_str
     self
   end
+
+  primitive_nobridge 'to_sym', 'asSymbol'
 
   primitive 'tr!', 'rubyTrFrom:to:'
 

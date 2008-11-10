@@ -8,9 +8,9 @@ class Object
     # Begin private helper methods
 
     # primitive_nobridge has max of 3 normal args, 1 star arg, 1 block arg
-    #  example with a block argument  
+    #  example with a block argument
     #    primitive_nobridge '_foo*&' , '_foo:a:b:c:d:e:'
-    #  example without a block argument 
+    #  example without a block argument
     #    primitive_nobridge '_foo*' , '_foo:a:b:c:d:'
 
     #  begin special sends
@@ -33,9 +33,9 @@ class Object
     # end special sends
 
     #  following are installed by RubyContext>>installPrimitiveBootstrap
-    #    primitive_nobridge 'class', 'class' # installed in Object 
-    #  end installPrimitiveBootstrap 
-  
+    #    primitive_nobridge 'class', 'class' # installed in Object
+    #  end installPrimitiveBootstrap
+
     #  private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
     primitive_nobridge '_each&', '_rubyEach:'
@@ -76,6 +76,8 @@ class Object
     primitive 'dup', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
+    primitive 'frozen?', 'isInvariant'
+
     primitive_nobridge 'respond_to?', 'rubyRespondsTo:'
 
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
@@ -97,36 +99,65 @@ class Object
 
     #                                   rubyInspect comes from .mcz
     primitive 'inspect', 'rubyInspect'
+
+    primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
+    primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
+    primitive_nobridge '_instVarNames', 'rubyInstvarNames'
+
+    def instance_variable_get(aName)
+      aName = Type.coerce_to(aName, String, :to_str)
+      unless (aName[0].equal?( ?@ ))  
+        return nil
+      end
+      _instVarAt(aName[1, aName.length].to_sym) 
+    end
+
+    def instance_variable_set(aName, aVal)
+      aName = Type.coerce_to(aName, String, :to_str)
+      unless (aName[0].equal?( ?@ ))
+        return nil
+      end
+      _instVarAtPut(aName[1, aName.length].to_sym, aVal) 
+      aVal
+    end
+
+    def instance_variables
+      syms = self._instVarNames
+      len = syms.length
+      res = Array.new(len)
+      n = 0
+      while (n < len) 
+        res[n] = '@' << syms[n]
+        n = n + 1
+      end
+      res 
+    end
+
     primitive 'method', 'rubyMethod:'
 
-    def rand(n=nil)
-        if n
-            RandomInstance.next(n)
-        else
-            RandomInstance.next
-        end
+  #  uses Behavior>>rubyModuleFunction:, which for specified selector,
+  #    for each variant existing in receiver, installs an env1 meth dict
+  #    entry so that method also shows up as a class method for rcvr.
+  #  module_function is used by  lib/benchmark.rb
+  class_primitive 'basic_module_function', 'rubyModuleFunction:'
+
+  def self.module_function(*names)
+   if names.length > 0
+       names.each{|name| basic_module_function(name)}
+   else
+       @use_module_functions = true
+   end
+  end
+
+  def self.const_defined?(c) false; end
+
+
+    def ===(obj)
+        self == obj
     end
 
-    def to_s
-      self.class.name.to_s
-    end
-
-    def to_str
-        to_s
-    end
-
-    def to_a
-       # remove this method for MRI 1.9 compatibility
-       [ self ]
-    end
-
-    def loop
-        raise LocalJumpError, "no block given" unless block_given?
-
-        while true
-            yield
-        end
-    end
+  def at_exit
+  end
 
     # block_given?  is implemented by the ruby compiler .
     #   do not code any definition of block_given? here .
@@ -136,21 +167,69 @@ class Object
         self
     end
 
-    def ===(obj)
-        self == obj
-    end
-
-    def raise(err, str)
-        err ||= RuntimeError
-        err.signal(str)
+    def eql?(other)
+      self == other
     end
 
     def eval(str)
         RUBY.module_eval(str, Object)
     end
 
-    def eql?(other)
-      self == other
+  def extend(mod)
+  end
+
+  def flatten_onto(output)
+    output << self
+    output
+  end
+
+    def loop
+        raise LocalJumpError, "no block given" unless block_given?
+
+        while true
+            yield
+        end
+    end
+
+    def pretty_inspect 
+      inspect; 
+    end
+
+    def raise(err, str)
+        err.signal(str)
+    end
+
+    def raise(err)
+        err.signal(nil)
+    end
+
+    def raise
+        RuntimeError.signal(nil)
+    end
+
+    def rand(n=nil)
+        if n
+            RandomInstance.next(n)
+        else
+            RandomInstance.next
+        end
+    end
+
+    def to_a
+       # remove this method for MRI 1.9 compatibility
+       [ self ]
+    end
+
+    def to_fmt
+      to_s
+    end
+
+    def to_s
+      self.class.name.to_s
+    end
+
+    def to_str
+        to_s
     end
 
     # BEGIN RUBINIUS
@@ -166,38 +245,6 @@ class Object
       self.class.equal?(cls)
     end
     # END RUBINIUS
-
-  #  uses Behavior>>rubyModuleFunction:, which for specified selector,
-  #    for each variant existing in receiver, installs an env1 meth dict
-  #    entry so that method also shows up as a class method for rcvr.
-  #  module_function is used by  lib/benchmark.rb
-  class_primitive 'basic_module_function', 'rubyModuleFunction:'
-  def self.module_function(*names)
-   if names.length > 0
-       names.each{|name| basic_module_function(name)}
-   else
-       @use_module_functions = true
-   end
-  end
-
-  def self.const_defined?(c) false; end
-
-  def extend(mod)
-  end
-
-  def at_exit
-  end
-
-  def to_fmt
-    to_s
-  end
-
-  def flatten_onto(output)
-    output << self
-    output
-  end
-
-  def pretty_inspect; inspect; end
 
   require 'kernel/bootstrap/Kernel.rb'
 end

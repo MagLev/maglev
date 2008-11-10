@@ -20,6 +20,28 @@ ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
 ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone.log"
 ENV['GEMSTONE']            = GEMSTONE
 
+
+
+class String
+  # This makes it nice to indent here documents and strip
+  # out the leading space from the here document.  A here
+  # document using this uses '|' to mark the beginning of line.
+  # E.g.,
+  #
+  #   str = <<END.margin
+  #       | This is the string.  All spaces before the '|
+  #       | and the '|' will be stripped from each line...
+  #   END
+  #
+  # From section 2.3 of The Ruby Way, 2nd Ed.
+  def margin
+    arr = self.split("\n")
+    arr.map! { |x| x.sub!(/\s*\|/,"") }
+    str = arr.join("\n")
+    self.replace(str)
+  end
+end
+
 # PARSE TREE SUPPORT
 
 # Returns the PID of the process listening on PARSETREE_PORT, or nil.
@@ -122,6 +144,18 @@ def status
   end
 end
 
+def create_debug_script(code)
+  script_name = "#{MAGLEV_HOME}/etc/rake_debug_script"
+  sh %{
+    cp #{MAGLEV_HOME}/etc/.topazdebugini #{script_name}
+    cat - >> #{script_name} <<EOF
+#{code}
+EOF
+  }
+  script_name
+end
+
+
 def run_topaz(snippet, debug=false)
   sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
 #{snippet}
@@ -133,3 +167,23 @@ EOF
   end
   true
 end
+
+# Run the topaz commands in +snippet+ in debug mode.  If an error or a
+# pause is encountered, this method leaves you at the topaz command prompt
+# with a live stack to work with.
+def debug_topaz(snippet)
+  # The key here, is to run topaz with stdin connected to the TTY.  In
+  # order to do that, we combine the topaz login commands with the code
+  # from +snippet+ into a temp file and pass that into topaz via +-I+.
+  script = create_debug_script(snippet)
+  sh %{
+    #{GEMSTONE}/bin/topaz -I #{script} -l
+    rm -f #{script}
+  } do |ok, status|
+    # TODO: Right now, topaz + maglev always exits with a non-zero error
+    # count, so hide that
+    # puts "topaz #{ok}  #{status}"
+  end
+  true
+end
+

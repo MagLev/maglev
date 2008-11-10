@@ -46,13 +46,9 @@ class Regexp
     options & IGNORECASE != 0
   end
 
-  def initialize(str, options, lang)
-    if options._isInteger   # options.kind_of? Integer
-      o = options
-    else
-      o = options ? 1 : 0
-    end
-    _compile(str, o)
+  def initialize(str, options=nil)   # 3rd arg language ignored
+    # if options == nil, prim defautls to case insensitive
+    _compile(str, options)
   end
 
   def match(str)

@@ -1,9 +1,14 @@
 output pushnew log/allspec.out
 run
-| specCount lf confFile specOutF |
+| specCount lf confFile specOutF oldDebug |
 GsNMethod traceIR: false .
 RubyContext load .
 RubyContext requireFileNamed: 'mspec.rb' .
+
+oldDebug := RubyContext default globals at: #DEBUG_SPEC .
+RubyContext default globals at: #DEBUG_SPEC put: true .
+RubyCompiler new evaluateString:
+  '$formatter = DottedFormatter.new; $formatter.register'.
 RubyContext save .
 System commitTransaction ifFalse:[ nil error:'commit fail'].
 
@@ -21,15 +26,16 @@ confFile := GsFile openReadOnServer: '../gss64bit_3.0/tests/rubytst/passingspecs
   ] whileTrue .
   aLine last == lf ifTrue:[ aLine size: (aLine size - 1) ].
   fullPath := '../rubyspec/1.8/' , aLine .
-  GsFile gciLogServer:'--- start ', specCount asString , ' :' , aLine .
+  GsFile gciLogServer:'--- start ', specCount asString , ': ' , aLine .
   System beginTransaction .
   RubyContext load .
-  specOutF := GsFile openWriteOnServer:'log/spec', specCount asString , '.out' .
-  GsFile redirectStdout: specOutF .
-  specResult := RubyContext loadFileNamed: fullPath .
-  specOutF close .
-  GsFile redirectStdout: nil .
-  GsFile gciLogServer:'--- end ' , aLine .
+  [
+    specResult := RubyContext loadFileNamed: fullPath .
+    GsFile gciLogServer: '--- end ' , aLine .
+  ] on: Exception do: [:ex |
+    GsFile gciLogServer: '<failed with error, ', ex asString, '>' .
+    RubyContext default globals at: #DEBUG_SPEC put: oldDebug .
+  ].
   specCount := specCount + 1 .
 ]
 %

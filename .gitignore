@@ -1,5 +1,5 @@
-.DS_Store  # OS X junk
-._*        # TextMate junk
+.DS_Store
+._*
 .svn
 *~
 *.err
@@ -18,3 +18,6 @@ cur.inp
 etc/maglev.demo.key
 .#*
 *#
+version.txt
+pbm.rb
+
