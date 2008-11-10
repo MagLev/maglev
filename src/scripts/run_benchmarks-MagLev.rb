@@ -20,7 +20,7 @@ require '../benchmark/cangiano/core-features/bm_app_answer.rb'
 require '../benchmark/cangiano/core-features/bm_app_factorial.rb'
 require '../benchmark/cangiano/core-features/bm_app_factorial2.rb'
 require '../benchmark/cangiano/core-features/bm_app_fib.rb'
-# require '../benchmark/cangiano/core-features/bm_app_raise.rb'
+require '../benchmark/cangiano/core-features/bm_app_raise.rb'
 require '../benchmark/cangiano/core-features/bm_app_tak.rb'
 require '../benchmark/cangiano/core-features/bm_app_tarai.rb'
 require '../benchmark/cangiano/core-features/bm_loop_times.rb'
@@ -55,13 +55,13 @@ require '../benchmark/cangiano/core-library/bm_so_lists.rb'
 require '../benchmark/cangiano/core-library/bm_so_matrix.rb'
 require '../benchmark/cangiano/core-library/bm_vm2_array.rb'
 require '../benchmark/cangiano/core-library/bm_vm2_regexp.rb'
-# require '../benchmark/cangiano/core-library/bm_vm3_thread_create_join.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_app_pentomino.rb' # Hangs
+# require '../benchmark/cangiano/core-library/bm_vm3_thread_create_join.rb' # Unimplemented
+# require '../benchmark/cangiano/micro-benchmarks/bm_app_pentomino.rb' # Broken?
 require '../benchmark/cangiano/micro-benchmarks/bm_binary_trees.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_fannkuch.rb'
 # require '../benchmark/cangiano/micro-benchmarks/bm_fasta.rb' # Too much output
 require '../benchmark/cangiano/micro-benchmarks/bm_fractal.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_knucleotide.rb'
+# require '../benchmark/cangiano/micro-benchmarks/bm_knucleotide.rb' # Broken?
 require '../benchmark/cangiano/micro-benchmarks/bm_lucas_lehmer.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_mandelbrot.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_mergesort.rb'
@@ -78,7 +78,7 @@ require '../benchmark/cangiano/micro-benchmarks/bm_regex_dna.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_so_sieve.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_spectral_norm.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_sum_file.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_thread_ring.rb'
+# require '../benchmark/cangiano/micro-benchmarks/bm_thread_ring.rb' # Unimplemented
 require '../benchmark/cangiano/micro-benchmarks/bm_word_anagrams.rb'
 # require '../benchmark/cangiano/real-world/bm_hilbert_matrix.rb' # requires mathn.rb
 # require '../benchmark/cangiano/standard-library/bm_app_mandelbrot.rb' # requires complex.rb
