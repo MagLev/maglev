@@ -50,14 +50,12 @@ require 'kernel/bootstrap/Gemstone.rb'
 # bootstrap
 #
 require 'kernel/bootstrap/Type.rb'
-require 'kernel/bootstrap/Object.rb'
-#  Kernel.rb must be included from a require within Object.rb
-
-# TODO:  include the new Module.rb in the right place
-#   and move some methods from Class.rb to Module.rb
-
+require 'kernel/bootstrap/Kernel.rb'
+require 'kernel/bootstrap/Module.rb'
 require 'kernel/bootstrap/Behavior.rb'
 require 'kernel/bootstrap/Class.rb'
+require 'kernel/bootstrap/Object.rb'
+
 require 'kernel/bootstrap/GsHelper.rb'
 
 require 'kernel/bootstrap/Fixnum.rb'
@@ -73,7 +71,6 @@ require 'kernel/bootstrap/Symbol.rb'
 require 'kernel/bootstrap/Regexp.rb'
 require 'kernel/bootstrap/MatchData.rb'
 require 'kernel/bootstrap/Exception.rb'
-require 'kernel/bootstrap/Module.rb'
 
 require 'kernel/bootstrap/Env.rb'
 require 'kernel/bootstrap/Errno.rb'

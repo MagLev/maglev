@@ -1,5 +1,9 @@
+# class RubyTimeoutError  is defined in the maglev*.mcz
 RUBY.global("TimeoutError", "RubyTimeoutError")
-TimeoutError.class.primitive 'timeout', 'timeout:do:'
+
+class TimeoutError
+  class_primitive_nobridge 'timeout', 'timeout:do:'
+end
 
 def timeout(n, &b)
     TimeoutError.timeout(n, b)

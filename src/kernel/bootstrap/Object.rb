@@ -5,6 +5,8 @@ Random.primitive_nobridge 'next'
 RandomInstance = Random.new
 
 class Object
+  include Kernel
+
     # Begin private helper methods
 
     # primitive_nobridge has max of 3 normal args, 1 star arg, 1 block arg
@@ -164,7 +166,7 @@ class Object
     # Attempts to reimplement  block_given?  will fail with a compiler error.
 
     def initialize(*args)
-        self
+       self
     end
 
     def eql?(other)
@@ -246,5 +248,4 @@ class Object
     end
     # END RUBINIUS
 
-  require 'kernel/bootstrap/Kernel.rb'
 end

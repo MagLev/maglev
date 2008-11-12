@@ -2,12 +2,26 @@
 
 class TestD
   
-  @@a_variable = nil
+  @@a_variable = 88
   
-  def someMethod
-    "Hello"
+  def setCv
+    @@a_variable = 99
+  end
+
+  def fetchCv
+    @@a_variable
   end
 
 end
 
-puts TestD.new.someMethod
+o = TestD.new 
+r = o.fetchCv
+unless r == 88
+  raise 'ERR'
+end
+o.setCv
+r = o.fetchCv
+unless r == 99
+  raise 'ERR'
+end
+true

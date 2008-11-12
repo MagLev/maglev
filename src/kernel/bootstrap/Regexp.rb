@@ -8,6 +8,10 @@ class Regexp
   # Regexp characters that need quoting
   META_CHARS =  %w![ ] { } ( ) | - * . \\ ? + ^ $ #!
 
+  class_primitive_nobridge 'new', 'new:options:lang:'
+  class_primitive_nobridge 'new', 'new:options:'
+  class_primitive_nobridge 'new', 'new:'
+
   primitive_nobridge '_search', '_search:from:to:'
   primitive_nobridge '_compile', '_compile:options:'
   primitive_nobridge 'options', 'options'

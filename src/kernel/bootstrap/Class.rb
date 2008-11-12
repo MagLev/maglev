@@ -3,9 +3,17 @@ RUBY.class.primitive 'module_eval', 'evaluateString:inClass:'
 class Class
   # Ruby Class is identically Smalltalk's Class
 
+  include Module
+
   #  following are installed by RubyContext>>installPrimitiveBootstrap
   #    primitive_nobridge 'superclass', 'superclass' # installed in Behavior
   #  end installPrimitiveBootstrap
+
+  class_primitive_nobridge '_rubyNew', '_rubyNew:do:'
+
+  def self.new(superCls=Object, &blk)
+    _rubyNew(superCls, blk)
+  end
 
   primitive 'alloc', 'basicNew'
 

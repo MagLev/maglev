@@ -44,7 +44,7 @@ test(md.values_at(0,2,-2), ["HX1138", "X", "113"], "Pickaxe MatchData S")
 
 
 # Test that the Regexp constants are defined and operating correctly
-test(Regexp.new('dog') =~ 'DoG',                   0, "Regexp::IGNORECASE A")
+test(Regexp.new('dog') =~ 'DoG',                   nil, "Regexp:: A")
 test(Regexp.new('dog', Regexp::IGNORECASE) =~ 'DoG', 0, "Regexp::IGNORECASE B")
 
 test(Regexp.new('.') =~ "\n",                     nil, "Regexp::MULTILINE A")

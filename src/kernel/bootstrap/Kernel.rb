@@ -6,6 +6,17 @@ module Kernel
   # following methods are just those needed to get some benchmarks and
   #   specs running .
 
+  def autoload(name, file_name)
+    nil
+  end
+
+  def autoload?(name)
+    false
+  end
+
+  # def catch(aSymbol, &aBlock); end
+  primitive_nobridge 'catch' , 'catch:do:'
+
   def exit(arg=1)
     status = '9'
     if (arg.equal?(true))
@@ -110,5 +121,11 @@ module Kernel
     end
     return false
   end
+
+  # def throw(aSymbol); end
+  primitive_nobridge 'throw' , 'throw:'
+
+  # def throw(aSymbol, aValue); end
+  primitive_nobridge 'throw' , 'throw:with:'
 
 end

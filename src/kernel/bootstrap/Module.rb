@@ -46,7 +46,7 @@ class Module
     nil
   end
 
-  def autoload(name)
+  def autoload?(name)
     false
   end
 
@@ -169,11 +169,31 @@ class Module
 
   # MNI: module_function,  see old impl in Object.rb 
 
-  # MNI: private
-  # MNI: protected
-  # MNI: public
-  # MNI: remove_class_variable
-  # MNI: remove_const
-  # MNI: remove_method
-  # MNI: undef_method
+  def private(*symbols)
+    # MNI
+  end
+
+  def protected(*symbols)
+    # MNI
+  end
+
+  def public(*symbols)
+    # MNI
+  end
+
+  def remove_class_variable(symbol)
+    # MNI
+  end
+
+  def remove_const(symbol)
+    # MNI
+  end
+
+  def remove_method(symbol)
+    # MNI
+  end
+
+  def undef_method(symbol)
+    # MNI
+  end
 end

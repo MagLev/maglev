@@ -14,7 +14,7 @@ module URI
   # RFC2368, The mailto URL scheme
   #
   class MailTo < Generic
-#    include REGEXP
+    include REGEXP
 
     DEFAULT_PORT = nil
 

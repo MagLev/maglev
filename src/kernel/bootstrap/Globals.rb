@@ -9,7 +9,7 @@ RUBY.global('Dir', 'RubyDirectory')
 RUBY.global('Env', 'RubyEnv')
 RUBY.global('FalseClass', 'FalseClass')
 RUBY.global('File', 'GsFile')
-RUBY.global('File::Stat', 'GsFileStat')
+RUBY.global( [ 'File' , 'Stat'] , 'GsFileStat')  # File::Stat --> GsFileStat
 RUBY.global('Fixnum', 'SmallInteger')
 RUBY.global('Float', 'Float')
 RUBY.global('Hash', 'RubyHash')

@@ -16,6 +16,16 @@ class TestB
 
 end
 
-puts TestA.new.doMath
+a = TestA.new.doMath
+unless a == 88
+ raise 'ERR'
+end
+b = TestB.new.someMethod
 
-puts TestB.new.someMethod
+c = Class.new
+
+CX = c
+unless c.name == 'CX' 
+  raise 'ERR'
+end
+true
