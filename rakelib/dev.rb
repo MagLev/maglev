@@ -91,10 +91,8 @@ def tc_reload_prims
     |output push reloadprims.out
     |omit resultcheck
     |run
-    |RubyContext default requirePrimitives.
-    |RubyContext save.
+    |RubyContext reset ; load "includes save, commit"
     |%
-    |commit
     |exit
   END
 end
