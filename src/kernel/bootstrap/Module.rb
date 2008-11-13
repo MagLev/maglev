@@ -142,7 +142,8 @@ class Module
   end
 
   # private instance methods
-  # TODO alias_method: is currently in Class.rb: move here
+  # MNI alias_method 
+  #    needs to call Behavior>>rubyAliias:from:
 
   # MNI: append_features
   # MNI: attr
