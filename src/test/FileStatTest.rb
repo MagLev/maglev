@@ -1,6 +1,6 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
-fname = "/tmp/FileStatTest-234"
+fname = "/tmp/FileStatTest-#{rand(100_000).to_s}"
 time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
 
 %x{
@@ -81,3 +81,6 @@ test(stat <=> same_stat, 0, 'stat <=> same_stat')
 test(stat <=> other_stat, -1, 'stat <=> other_stat')
 
 report
+
+File.delete fname
+
