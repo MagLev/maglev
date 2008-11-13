@@ -1,8 +1,3 @@
-# This file holds test cases that are currently broken.  When they get
-# fixed, they should be moved into FixedRegressions.rb, which is included
-# in vmunit.conf, so that we can ensure we don't regress on these ad-hoc
-# cases.
-
 # ##### Trac # 239 #######################################################
 # This one if from pp.rb (pretty print).  They try to mixin a bunch of
 # stuff into object, but in maglev, object is committed.
@@ -26,4 +21,3 @@ end
 class Object
   include Mixin
 end
-

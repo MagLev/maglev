@@ -93,7 +93,7 @@ require 'kernel/bootstrap/GC.rb'
 require 'kernel/bootstrap/FileStat.rb'
 
 require 'kernel/bootstrap/Struct.rb'
-
+require 'kernel/bootstrap/Signal.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
@@ -105,4 +105,3 @@ require 'kernel/common/struct.rb'
 require 'kernel/delta/Array.rb'
 require 'kernel/delta/Dir.rb'
 require 'kernel/delta/Range.rb'
-
