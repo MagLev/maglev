@@ -99,7 +99,16 @@ class File
       File.stat(filename).ctime
     end
 
-    # MNI: File.delete
+    def self.delete(*fileNames)
+      count = 0
+      fileNames.each { |aName|
+        status = File._modifyFile( 5, aName, nil, nil )
+        if (status.equal?(0))
+          count = count + 1
+        end
+      }
+      return count
+    end
 
     def self.directory?(filename)
       statObj = File._stat(filename, false)
@@ -392,7 +401,10 @@ class File
       res
     end
 
-    # MNI: File.unlink
+    def self.unlink(fileNames)
+      delete(fileNames)
+    end
+
     # MNI: File.utime
 
     def self.writable?(filename)
