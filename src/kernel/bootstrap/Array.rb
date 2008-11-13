@@ -681,9 +681,21 @@ class Array
   primitive 'clone', 'copy'
   primitive 'dup', 'copy'
   primitive 'hash'
-#  primitive 'inspect', 'printString'
-  def inspect
-    "[" + collect{|ea| ea.inspect}.join(", ") + "]"
+
+  def inspect(touchedSet=nil)
+    s = "["  
+    if (touchedSet.equal?(nil))
+      touchedSet = Set.new
+    else
+      if (touchedSet._includes(self))
+        s << '...]'
+        return s
+      end
+    end
+    touchedSet << self 
+    s << ( collect{|ea| ea.inspect(touchedSet) }.join(", ") ) 
+    s << "]"
+    s
   end
 
 end

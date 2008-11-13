@@ -409,9 +409,10 @@ class ArrayTest
         puts
     end
 
-    # Expected value: '[1, 2, 3]'
+    # Expected value: '[1, 2, 3, [...]]'
     def inspect
         arr = [1, 2, 3]
+        arr[3] = arr
         puts arr.inspect
     end
 
@@ -714,7 +715,7 @@ ArrayTest.new.replace()
 # expectvalue 4576
 ArrayTest.new.insert()
 
-# expectvalue '[1, 2, 3]'
+# expectvalue '[1, 2, 3, [...]]'
 ArrayTest.new.inspect()
 
 # expectvalue '123'

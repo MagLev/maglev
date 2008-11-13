@@ -1,10 +1,15 @@
 class Set
-    primitive '<<', 'add:'
-    primitive '*'
-    primitive '+'
-    primitive '-'
+   # Set is identically  Smalltalk IdentitySet 
+
+    primitive_nobridge '<<', 'add:'
+    primitive_nobridge '*'
+    primitive_nobridge '+'
+    primitive_nobridge '-'
     primitive 'each&', 'do:'
     primitive 'length', 'size'
+
+    primitive_nobridge '_includes', 'includes:'
+
     class_primitive 'new'
 
     def self.name
@@ -12,7 +17,7 @@ class Set
       :Set
     end
     
-    def inspect
+    def inspect(touchedSet=nil)
         "[[#{length}]]"
     end
     

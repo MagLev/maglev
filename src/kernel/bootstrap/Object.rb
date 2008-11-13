@@ -100,7 +100,11 @@ class Object
     primitive 'pause', 'pause'
 
     #                                   rubyInspect comes from .mcz
-    primitive 'inspect', 'rubyInspect'
+    primitive_nobridge '_inspect', '_rubyInspect:'
+
+    def inspect(touchedSet=nil)
+      self._inspect(touchedSet)
+    end
 
     primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
     primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'

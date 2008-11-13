@@ -25,4 +25,25 @@ unless e == 22
   raise 'ERR'
 end
 
+V = 3
+begin
+  V::W = 5
+rescue TypeError
+  e = 33
+end
+unless e == 33
+  raise 'ERR'
+end
+
+begin
+  class nil::Foo
+  end
+rescue TypeError
+  e = 44
+end
+unless e == 44
+  raise 'ERR'
+end
+ 
+
 true

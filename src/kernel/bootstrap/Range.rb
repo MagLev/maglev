@@ -47,8 +47,16 @@ class Range
 
   # Convert this range object to a printable form (using
   # <tt>inspect</tt> to convert the start and end objects).
-  def inspect
-    "#{@from.inspect}#{@excludeEnd ? "..." : ".."}#{@to.inspect}"
+  def inspect(touchedSet=nil)
+    if (touchedSet.equal?(nil))
+      touchedSet = Set.new
+    else
+      if (touchedSet._includes(self))
+        return #{@excludeEnd ? "..." : ".."}
+      end
+    end
+    touchedSet << self
+    "#{@from.inspect(touchedSet)}#{@excludeEnd ? "..." : ".."}#{@to.inspect(touchedSet)}"
   end
 
   primitive 'last', '_to'

@@ -241,10 +241,24 @@ class Hash
   # RxINC: does the primitive work?
   primitive 'dup', 'copy'
 
-  def inspect
+  def inspect(touchedSet=nil)
     return "{}" if length.equal?(0)
     str = "{"
-    each{|k,v| str << k.inspect; str << "=>"; str << v.inspect; str << ", "}
+    if (touchedSet.equal?(nil))
+      touchedSet = Set.new
+    else
+      if (touchedSet._includes(self))
+        str << '...}'
+        return str
+      end
+    end
+    touchedSet << self 
+    each {|k,v| 
+          str << k.inspect(touchedSet)
+          str << "=>"
+          str << v.inspect(touchedSet) 
+          str << ", " 
+         }
     str[0..(str.length - 3)] + "}"
   end
 

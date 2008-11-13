@@ -323,6 +323,14 @@ class HashTest
         ret = hash.to_s
         return ret
     end
+
+    def testInspect
+      h = Hash['a', 'abc', 'b', 'def' ]
+      h['c'] = h
+      s = h.inspect
+      exp = '{"b"=>"def", "c"=>{...}, "a"=>"abc"}'
+      return s == exp
+    end
 end
 
 
@@ -471,6 +479,10 @@ raise "ERROR" unless ret == true
 # expectvalue true
 ret = HashTest.new.toHash()
 raise "ERROR" unless ret == true
+
+ret = HashTest.new.testInspect()
+raise "ERROR" unless ret == true
+
 
 # expectvalue 'aabcbdefcghi'
 # TODO is result always sorted ??? irb seems to be
