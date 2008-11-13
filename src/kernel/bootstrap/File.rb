@@ -27,6 +27,7 @@ class File
     class_primitive 'stdout'
     class_primitive 'stderr'
     class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
+    class_primitive_nobridge '_delete', 'removeServerFile:'
 
     # For Dir.rb
     class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
@@ -99,7 +100,14 @@ class File
       File.stat(filename).ctime
     end
 
-    # MNI: File.delete
+    def self.delete(*filenames)
+      filenames.each do |filename|
+        path = StringValue(filename)
+        # TODO: GsFile(C)>>removeServerFile: returns nil on error: we need errno
+        Errno.handle(_delete(filename))
+      end
+      filenames.size
+    end
 
     def self.directory?(filename)
       statObj = File._stat(filename, false)
@@ -192,7 +200,7 @@ class File
 
     def self._tilde_expand(path)
       case path[0,2]
-       when '~':   ENV['HOME']  
+       when '~':   ENV['HOME']
        when '~/':  ENV['HOME'] + path[1..-1]
       when /^~([^\/])+(.*)/
         raise NotImplementedError, "Don't handle ~user expansion yet"
@@ -388,7 +396,7 @@ class File
       end
       if (res < 0)
         raise RangeError
-      end 
+      end
       res
     end
 
@@ -446,8 +454,8 @@ class File
     end
 
     def eof?
-      status = self._atEnd 
-      if (status.equal?(nil)) 
+      status = self._atEnd
+      if (status.equal?(nil))
         raise IOError
       end
       status
@@ -482,8 +490,8 @@ class File
 
     def stat
       res = File._fstat(@fileDescriptor, false)
-      if (res._isFixnum) 
-         raise SystemCallError # TODO: Errno::xxx      
+      if (res._isFixnum)
+         raise SystemCallError # TODO: Errno::xxx
       end
       return res
     end
