@@ -11,6 +11,17 @@ end
 puts Foo::BAR
 
 
+# A secondary case is due to inheritance:
+
+class Foo
+  FOO = 'foo'
+end
+
+class Bar < Foo
+end
+
+puts Bar::FOO  # Blows up
+
 # IO.rb and File.rb also depend on this behavior working, so here are some
 # tests so we don't miss them too.
 #
