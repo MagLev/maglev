@@ -402,8 +402,8 @@ class File
       res
     end
 
-    def self.unlink(fileNames)
-      delete(fileNames)
+    def self.unlink(*fileNames)
+      delete(*fileNames)
     end
 
     # MNI: File.utime
