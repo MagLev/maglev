@@ -2,13 +2,19 @@
 # File in Ruby is identically Smalltalk GsFile
 class File
 
-    FNM_NOESCAPE = 0x01
-    FNM_PATHNAME = 0x02
-    FNM_DOTMATCH = 0x04
-    FNM_CASEFOLD = 0x08
+  # TODO: Move these into the Constants module when trac 249 is fixed.
+  # Then also check to ensure the constants defined in IO are also
+  # available here.
+  SEPARATOR      = '/'
+  PATH_SEPARATOR = ':'
 
-    SEPARATOR      = '/'
-    PATH_SEPARATOR = ':'
+  module Constants
+    ALT_SEPARATOR  = nil
+#    PATH_SEPARATOR = ':'
+#    SEPARATOR      = '/'
+    Separator      = SEPARATOR
+  end
+  include Constants # Note: this is broken until trac ticket 249 is fixed
 
     primitive 'close', 'close'
     # << inherited from IO

@@ -9,7 +9,7 @@ end
 
 def report
   num = $failed.size
-  if ($failed.size > 0) 
+  if ($failed.size > 0 && defined? RUBY_ENGINE)
     num.pause
   end
   puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
@@ -25,5 +25,5 @@ end
 def register_failure(msg, expected, actual)
   $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
   x = $failed
-  nil.pause
+  nil.pause if defined? RUBY_ENGINE # Keep MRI from trying to pause
 end

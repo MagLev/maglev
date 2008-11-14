@@ -102,13 +102,19 @@ ARGV = []
 
 #  $!  translated to exception block block-arg-ref by RubyGlobalVarNode
 #         and RubyRescueBodyNode
-#  $&  $_  $` $' $1..$9 $~  all translated to access to 
-#    appropriate thread-local data(see GsProcess) associated with $~ 
+#  $&  $_  $` $' $1..$9 $~  all translated to access to
+#    appropriate thread-local data(see GsProcess) associated with $~
 
 # $: , RUBY
 #  are currently initialized in RubyContext(C)>>initialize
 
 # -------------------
+
+# RUBY_ENGINE is proposed as a way of distinguishing between JRuby, MRI,
+# YARV, IronRuby, MagLev etc.  While it is not official, it has support
+# from other implementers, wo we include it here.  It is also useful to
+# distinguish scripts running in MRI, since MRI 1.8.6 doesn't define it.
+RUBY_ENGINE = 'MagLev'
 
 # A quick hack to get specs further w/o build having to poke the right string in
 #  this slot. See ticket #76
@@ -125,4 +131,4 @@ DEBUG_SPEC = false
 
 TRUE  = true
 FALSE = false
-STDOUT = nil   # real value assigned later 
+STDOUT = nil   # real value assigned later
