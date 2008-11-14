@@ -94,6 +94,7 @@ require 'kernel/bootstrap/FileStat.rb'
 
 require 'kernel/bootstrap/Struct.rb'
 require 'kernel/bootstrap/Signal.rb'
+require 'kernel/bootstrap/Math.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
