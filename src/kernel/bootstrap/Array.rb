@@ -351,6 +351,16 @@ class Array
     self
   end
 
+  def each_with_index(&b)
+    i = 0
+    lim = size
+    while i < lim
+      b.call(self[i], i)
+      i += 1
+    end
+    self
+  end
+
   def each_index(&b)
     0.upto(size-1, &b)
   end
@@ -659,17 +669,17 @@ class Array
   end
 
   def values_at(*selectors)
-    # selectors is an Array of 
+    # selectors is an Array of
     lim = selectors.size
     n = 0
     res = []
     while (n < lim)
       idx = selectors[n]
-      elem = self[idx]  
+      elem = self[idx]
       if (idx._isRange && ! elem.equal?(nil) )
-	res.push(*elem)
+    res.push(*elem)
       else
-	res.push(elem)
+    res.push(elem)
       end
       n = n + 1
     end
