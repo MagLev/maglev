@@ -8,5 +8,5 @@ $:.unshift 'src/test/lib'
 puts "$: #{$:.inspect}"
 pb = $:
 require 'foobar'
-
+true
 
