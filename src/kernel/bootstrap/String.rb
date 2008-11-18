@@ -198,7 +198,11 @@ class String
   end
 
   def hex
-    self.sub(/0x/i, '').to_inum(16, false)
+    # Because 0b1 is a proper hex number, rather than the binary number 1,
+    # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
+    s = self.delete('_').strip
+    s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
+    "16r#{$1}#{$3}"._to_i
   end
 
   def include?(item)
@@ -255,7 +259,8 @@ class String
   # MNI: next!
 
   def oct
-    self.to_inum(8, false)
+    base, s = self.extract_base(8)
+    "#{base}r#{s}"._to_i
   end
 
   primitive 'replace', '_rubyReplace:'
@@ -464,25 +469,30 @@ class String
   primitive '_to_i', '_asInteger:'
 
   # Consider self as an integer and return value given base.
-  # This is the rubinius API, and some code taken from rubinius.
-  def to_inum(base, check)
-    detect_base = true if base == 0
-
-    # Ruby lets you add '_' to numbers to look nice, we strip them
-    s = if check then
-          self.strip
-        else
-          self.delete('_').strip
-        end
-
-    if detect_base then
-      # $1 is sign, $2 is base specifier $3 is the rest
-      s =~ /^([+-]?)(0[bdox]?)?(.*)/i
-      base = {"0b" => 2, "0d" => 10, "0o" => 8, '0' => 8, "0x" => 16}[$2.downcase]
-      s = "#{$1}#{$3}"  # The sign and number w/o base specifier
+  # This is the rubinius API, but we don't care about the check param
+  def to_inum(base, check=false)
+    if base == 0
+      base, s = self.extract_base
+    else
+      s = self
     end
-    raise ArgumentError, "illegal radix #{base}" unless (2..36).include? base
-    "#{base}r#{s}"._to_i  # convert to smalltalk form and convert
+    "#{base}r#{s}"._to_i
+  end
+
+  # Return an array of two elements: [an_int, a_string], where an_int is
+  # base, unless self contains a base specifier (e.g., "0x", "0b", etc.),
+  # in which case, an_int is the appropriate base.  a_string is self with
+  # any base specifier removed.
+  #
+  # "0x10" => [16, 10]
+  # "-0b1010".extract_base     => [2, "-1010"]
+  # "-0b1010".extract_base(16) => [2, "-1010"]
+  # "-1010".extract_base(16)   => [16, "-1010"]
+  def extract_base(base=10)
+    s = self.delete('_').strip
+    s =~ /^([+-]?)(0[bdox])?(.*)/i
+    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16}[$2.downcase] unless $2.nil?
+    [base, "#{$1}#{$3}"]
   end
 
   def to_s

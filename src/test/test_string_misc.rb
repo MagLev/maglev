@@ -97,4 +97,13 @@ test('123'.oct,      83, '"123".oct')
 test('-377'.oct,   -255, '"-377".oct')
 test('0377bad'.oct, 255, '"0377bad".oct')
 
+# Some weird ones...
+test('0b1010'.oct, 10, '"0b1010".oct')
+test('0755_333'.oct, 252635, '"0755_333".oct')
+
+# Some of these were raising exceptions at one point...
+test('0a'.to_i,     0, '"0a".to_i')     # radix is 10
+test('0a'.to_i(10), 0, '"0a".to_i(10)') # radix is 10
+test('0a'.to_i(0),  0, '"0a".to_i(0)')
+
 report
