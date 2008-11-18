@@ -198,7 +198,7 @@ class String
   end
 
   def hex
-    _to_i(16)
+    self.sub(/0x/i, '').to_inum(16, false)
   end
 
   def include?(item)
@@ -253,7 +253,10 @@ class String
 
   # MNI: next
   # MNI: next!
-  # MNI: oct   def oct; _to_i(8); end
+
+  def oct
+    self.to_inum(8, false)
+  end
 
   primitive 'replace', '_rubyReplace:'
   primitive 'reverse', 'reverse'
@@ -450,21 +453,37 @@ class String
   # MNI: swapcase!
 
   primitive 'to_f', 'asFloat'
-  def to_i
-    _to_i
-  rescue Exception
-    0
-  end
-
-  def to_i
-    _to_i
-  rescue Exception
-    0
+  def to_i(base=10)
+    base = Type.coerce_to(base, Integer, :to_int)
+    raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
+    self.to_inum(base, false)
   end
 
   primitive_nobridge '_to_i', 'asInteger'
   #  non-base-10 radix Ruby syntax not supported yet
   primitive '_to_i', '_asInteger:'
+
+  # Consider self as an integer and return value given base.
+  # This is the rubinius API, and some code taken from rubinius.
+  def to_inum(base, check)
+    detect_base = true if base == 0
+
+    # Ruby lets you add '_' to numbers to look nice, we strip them
+    s = if check then
+          self.strip
+        else
+          self.delete('_').strip
+        end
+
+    if detect_base then
+      # $1 is sign, $2 is base specifier $3 is the rest
+      s =~ /^([+-]?)(0[bdox]?)?(.*)/i
+      base = {"0b" => 2, "0d" => 10, "0o" => 8, '0' => 8, "0x" => 16}[$2.downcase]
+      s = "#{$1}#{$3}"  # The sign and number w/o base specifier
+    end
+    raise ArgumentError, "illegal radix #{base}" unless (2..36).include? base
+    "#{base}r#{s}"._to_i  # convert to smalltalk form and convert
+  end
 
   def to_s
     self
@@ -520,7 +539,6 @@ class String
   def between?(min, max)
     (min <= self) && (self <= max)
   end
-
 
   ###### Rubinius Code Here
 
