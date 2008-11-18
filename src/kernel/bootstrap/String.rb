@@ -465,8 +465,6 @@ class String
   end
 
   primitive_nobridge '_to_i', 'asInteger'
-  #  non-base-10 radix Ruby syntax not supported yet
-  primitive '_to_i', '_asInteger:'
 
   # Consider self as an integer and return value given base.
   # This is the rubinius API, but we don't care about the check param
