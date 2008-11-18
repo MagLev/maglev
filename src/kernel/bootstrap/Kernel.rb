@@ -1,10 +1,10 @@
 module Kernel
-  # Object has an empty module Kernel installed as its superclass
-  #   during the slowrubyimage step of server build.
-  #  this file will extend Kernel by adding methods to it.
+  # Object has an empty module Kernel installed as its superclass during
+  # the slowrubyimage step of server build.  this file will extend Kernel
+  # by adding methods to it.
 
   # following methods are just those needed to get some benchmarks and
-  #   specs running .
+  # specs running .
 
   def autoload(name, file_name)
     nil
@@ -12,6 +12,20 @@ module Kernel
 
   def autoload?(name)
     false
+  end
+
+  # TODO: Currently, smalltalk "@ruby:method_missing" doesn't allow you to
+  # pass multiple parameters, so we insert _method_missing to repackage the
+  # params. doesNotUnderstand calls _method_missing with a single array
+  # containing the method_id followed by any parameters. This is probably
+  # faster than doing a smalltalk perform from Object>>doesNotUnderstand.
+  def _method_missing(args)
+    # args is an array guaranteed to have args[0] be a symbol.
+    method_missing(*args)
+  end
+
+  def method_missing(method_id, *args)
+    raise NoMethodError, "Undefined method `#{method_id}' for #{self}"
   end
 
   # def catch(aSymbol, &aBlock); end
@@ -43,7 +57,7 @@ module Kernel
     f.write("\n")   # TODO observe record sep global
     nil
   end
- 
+
   def print(*args)
     STDOUT.print(*args)
     nil
@@ -104,16 +118,16 @@ module Kernel
   primitive_nobridge '_system', '_system:'
 
   def system(command, *args)
-    cmd = command 
+    cmd = command
     n = 0
     sz = args.length
     while n < sz
       if (n < sz - 1)
-        cmd << ' ' 
+        cmd << ' '
       end
       cmd << args[n].to_s
       n = n + 1
-    end 
+    end
     resultStr = Kernel._system(cmd)
     if (resultStr)
       puts resultStr
