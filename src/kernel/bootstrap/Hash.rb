@@ -216,10 +216,7 @@ class Hash
     to_a.join
   end
 
-  def update(hash)
-    hash.each{|k,v| self[k] = v}
-    self
-  end
+  alias update merge!
 
   alias value? has_value?
 
