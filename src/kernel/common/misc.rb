@@ -63,20 +63,23 @@
 # This is used to prevent recursively traversing an object graph.
 
 module RecursionGuard
+  # TODO move this module to a Gemstone file/directory since it
+  #  has been changed to use Gemstone identity Set .
+
   def self.inspecting?(obj)
-    stack.include?(obj.object_id)
+    stack._includes(obj)
   end
 
   def self.inspect(obj, &block)
-    stack.push(obj.object_id)
+    stack << obj
     begin
       yield
     ensure
-      stack.pop
+      stack._remove(obj)
     end
   end
 
   def self.stack
-    stack = Thread.current[:inspecting] ||= []
+    stack = Thread.current[:inspecting] ||= Set.new 
   end
 end
