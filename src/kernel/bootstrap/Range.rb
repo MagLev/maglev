@@ -19,7 +19,7 @@ class Range
     raise TypeError, "can't iterate from #{first.class}" unless first.respond_to? :succ
 
     current = @from
-    limit = exclude_end? ? @to : @to + 1
+    limit = exclude_end? ? @to : @to.succ
     begin
       block.call(current)
       current = current.succ

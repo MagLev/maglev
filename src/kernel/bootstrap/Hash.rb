@@ -104,9 +104,9 @@ class Hash
   #
   # TODO: Need to test this, as block_given? not working properly yet...
   primitive_nobridge '_atIfAbsent', 'at:ifAbsent:'
+
   def fetch(key, dflt=Undefined, &block)
     val = _atIfAbsent(key, proc { dflt })
-    puts "========= 2 VAL: #{val}"
     return val unless val.equal?(Undefined)
 # TODO: block_given? does not work, so this is commented out until it does work.
 #    return block.call(key) if block_given?
@@ -252,12 +252,12 @@ class Hash
         return str
       end
     end
-    touchedSet << self 
-    each {|k,v| 
+    touchedSet << self
+    each {|k,v|
           str << k.inspect(touchedSet)
           str << "=>"
-          str << v.inspect(touchedSet) 
-          str << ", " 
+          str << v.inspect(touchedSet)
+          str << ", "
          }
     str[0..(str.length - 3)] + "}"
   end
