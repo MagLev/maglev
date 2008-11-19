@@ -1,6 +1,4 @@
 class Range
-  primitive 'to_a', 'asArray'
-  primitive '==', '='
   primitive 'hash'
   primitive 'length', 'size'
 
@@ -35,14 +33,25 @@ class Range
       self.exclude_end?.eql?(other.exclude_end?)
   end
 
+  alias == eql?
+
   primitive 'exclude_end?', 'excludeEnd'
   primitive 'first', '_from'
 
-  def initialize(fromArg, toArg)
+  def initialize(fromArg, toArg, exclusive=false)
+    unless fromArg.is_a?(Fixnum) && toArg.is_a?(Fixnum)
+      begin
+        raise ArgumentError, "bad value for range" unless fromArg <=> toArg
+      rescue
+        # In case <=> isn't defined, we also need to raise an error
+        raise ArgumentError, "bad value for range"
+      end
+    end
+
     @from = fromArg
     @to = toArg
     @by = 1
-    @excludeEnd = false
+    @excludeEnd = exclusive
   end
 
   # Convert this range object to a printable form (using
@@ -77,5 +86,13 @@ class Range
 
   def to_s
     "#{@from}#{@excludeEnd ? "..." : ".."}#{@to}"
+  end
+
+  # We don't use the smalltalk asArray method, since it uses '+' rather
+  # than 'succ' to get the next element of the range.
+  def to_a
+    result = []
+    self.each { |e| result << e }  # each will use succ
+    result
   end
 end
