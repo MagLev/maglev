@@ -1,10 +1,12 @@
 # Tests for methods in Kernel.rb
 require File.expand_path('simple', File.dirname(__FILE__))
 
+
+# Tests to make sure method missing is working
 class Foo
   def method_missing(method_id, *args)
     if method_id == :foo
-      args.length
+      args.length  # Just return how many parameters we get
     else
       super
     end
@@ -13,10 +15,12 @@ end
 
 f = Foo.new
 
-test(f.foo,           0,  "f.foo")
-test(f.foo('a'),      1,  "f.foo")
-test(f.foo('a', 'b'), 2,  "f.foo")
+test(f.foo,           0,  "method_missing: f.foo")
+test(f.foo('a'),      1,  "method_missing: f.foo('a')")
+test(f.foo('a', 'b'), 2,  "method_missing: f.foo('a', 'b')")
 
+
+# Another method_missing test: try on a method w/o method_missing
 begin
   f.bar('a', 'b')
   # Fail! should have an exception
@@ -25,6 +29,7 @@ rescue
   # OK!
 end
 
+# Tests for the "global" conversion functions
 test(String("foo"), "foo", 'String("foo")')
 test(String(1),       "1", 'String(1)')
 
