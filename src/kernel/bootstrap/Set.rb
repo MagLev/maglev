@@ -9,6 +9,7 @@ class Set
     primitive 'length', 'size'
 
     primitive_nobridge '_includes', 'includes:'
+    primitive_nobridge '_remove', 'removeIfPresent:'
 
     class_primitive 'new'
 

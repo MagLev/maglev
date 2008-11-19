@@ -83,6 +83,8 @@ class Module
     []
   end
 
+  primitive_nobridge 'include', 'includeRubyModule:'
+
   def include?(mod)
     false
   end
@@ -104,10 +106,6 @@ class Module
   end
 
   # module_eval is above
-
-  def name
-    ""
-  end
 
   def private_class_method(*symbols)
     nil
@@ -168,7 +166,21 @@ class Module
   def method_undefined(symbol)
   end
 
-  # MNI: module_function,  see old impl in Object.rb 
+  primitive_nobridge '_addModuleMeth', 'addModuleMethod:'
+
+  def module_function(*names)
+    if names.length > 0
+      names.each{|name| 
+        unless name.equal?(nil)
+          _addModuleMeth(name)
+        end
+      }
+    else
+       _addModuleMeth(nil)  # enable the _module_methods_all semantics
+    end
+  else
+ 
+  end
 
   def private(*symbols)
     # MNI

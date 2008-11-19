@@ -141,29 +141,14 @@ class Object
 
     primitive 'method', 'rubyMethod:'
 
-  #  uses Behavior>>rubyModuleFunction:, which for specified selector,
-  #    for each variant existing in receiver, installs an env1 meth dict
-  #    entry so that method also shows up as a class method for rcvr.
-  #  module_function is used by  lib/benchmark.rb
-  class_primitive 'basic_module_function', 'rubyModuleFunction:'
-
-  def self.module_function(*names)
-   if names.length > 0
-       names.each{|name| basic_module_function(name)}
-   else
-       @use_module_functions = true
-   end
-  end
-
-  def self.const_defined?(c) false; end
-
+    def self.const_defined?(c) false; end
 
     def ===(obj)
         self == obj
     end
 
-  def at_exit
-  end
+    def at_exit
+    end
 
     # block_given?  is implemented by the ruby compiler .
     #   do not code any definition of block_given? here .
@@ -181,7 +166,13 @@ class Object
         RUBY.module_eval(str, Object)
     end
 
-  def extend(mod)
+  def extend(*modules)
+    if (modules.length > 0) 
+      cl = class << self
+        self
+      end
+      modules.each{ |aModule| cl.include(aModule) }
+    end
   end
 
   def flatten_onto(output)
