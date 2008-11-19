@@ -106,4 +106,6 @@ test('0a'.to_i,     0, '"0a".to_i')     # radix is 10
 test('0a'.to_i(10), 0, '"0a".to_i(10)') # radix is 10
 test('0a'.to_i(0),  0, '"0a".to_i(0)')
 
+# Ensure succ is present
+test('zzz'.succ, 'aaaa', '"zzz".succ')
 report

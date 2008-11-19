@@ -25,5 +25,14 @@ rescue
   # OK!
 end
 
+test(String("foo"), "foo", 'String("foo")')
+test(String(1),       "1", 'String(1)')
+
+test(Float(1),       1.0, 'Float("1")')
+
+test(Array(1),           [1], 'Array(1)')
+test(Array([1,2,3]), [1,2,3], 'Array([1,2,3])')
+test(Array(nil),          [], 'Array(nil)')
+
 report
 true
