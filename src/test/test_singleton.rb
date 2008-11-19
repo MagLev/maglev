@@ -37,9 +37,14 @@
  unless $y == 101
    raise 'ERR'
  end
- $y = 0
- 'newstr'.foob
- unless $y == 101
+ begin
+  'newstr'.foob
+   rescue NoMethodError
+     $y = 88 
+   else
+     $y = 0
+ end
+ unless $y == 88
    raise 'ERR'
  end
 

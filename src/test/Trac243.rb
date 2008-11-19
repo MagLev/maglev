@@ -1,14 +1,31 @@
 # ##### Trac # 243#######################################################
 #
-# The following should make the methods declared in the module to be module
-# methods, but it doesn't. This example comes from Sinatra.
+# This example comes from Sinatra.
+
+$yy = 0 
+module FooB
+  include self
+  def bar
+    $yy = 88
+  end
+end
+
+mb = FooB
+mb.bar
+unless $yy == 88
+  raise 'ERR'
+end
 
 module Foo
   extend self
   def bar
-    puts "bar called with #{self}"
+    $yy = 99
   end
 end
 
-Foo.bar
-
+m = Foo
+m.bar
+unless $yy == 99
+  raise 'ERR'
+end
+true

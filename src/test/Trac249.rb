@@ -1,26 +1,33 @@
 # The main test case for ticket 249:
 class Foo
   module Constants
-    BAR = "bar"
+    BAR = "bar249"
   end
   include Constants
 
   puts BAR
 end
 
-puts Foo::BAR
+x = Foo::BAR
+unless x == 'bar249'
+  raise 'ERR'
+end
 
 
 # A secondary case is due to inheritance:
 
 class Foo
-  FOO = 'foo'
+  FOO = 'foo249'
 end
 
 class Bar < Foo
 end
 
-puts Bar::FOO  # Blows up
+y = Bar::FOO  # Blows up
+unless y == 'foo249'
+   raise 'ERR'
+end
+
 
 # IO.rb and File.rb also depend on this behavior working, so here are some
 # tests so we don't miss them too.

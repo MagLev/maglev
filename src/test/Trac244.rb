@@ -7,11 +7,11 @@
 #  B: Defining the error in another module, but same compilation unit seems
 #     to go unnoticed by MagLev
 #
-module Gem
+module Gem244
   class LoadError < ::LoadError; end
 end
 
-module Kernel
+module M244
   def foo
     # Bug A: MRI accepts an unknown exception type as a parameter to raise,
     # but MagLev complains
@@ -19,6 +19,6 @@ module Kernel
 
     # Bug B: Even though Gem::LoadError is defined above, MagLev still has
     # problems here.
-    raise Gem::LoadError # if false
+    raise Gem244::LoadError # if false
   end
 end
