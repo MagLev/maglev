@@ -104,7 +104,11 @@ module Kernel
   end
 
   def puts(*args)
-    STDOUT.puts(*args)
+    if STDOUT.nil?
+      raise "STDOUT is nil in Kernel.puts!"
+    else
+      STDOUT.puts(*args)
+    end
     nil
   end
 
