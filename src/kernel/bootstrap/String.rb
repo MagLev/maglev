@@ -36,23 +36,34 @@ class String
     str
   end
 
-  primitive '+', ','
+  primitive_nobridge '_append', ','
+
+  def +(o)
+    other = Type.coerce_to(o, String, :to_str)
+    _append other
+  end
 
   # note smalltalk addAll:  returns arg, not receiver
   primitive_nobridge '<<', '_rubyAddAll:'
 
   # TODO: Need primitive ST implemention for <=>
-  def <=>(o)
-    other = Type.coerce_to(o, String, :to_s)
 
-    i = 0
-    lim = size > other.size ? other.size : size # lim is the min
-    while i < lim
-      result = self[i] <=> other[i]
-      return result unless result.equal?(0)
-      i += 1
+  def <=>(o)
+    if o.kind_of?(String)
+      i = 0
+      lim = size > o.size ? o.size : size # lim is the min
+      while i < lim
+        result = self[i] <=> o[i]
+        return result unless result.equal?(0)
+        i += 1
+      end
+      return size <=> o.size
     end
-    size <=> other.size
+    # From Rubinius...there are a lot of strange things in how
+    # string handles <=>...
+    return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
+    return nil unless tmp = (o <=> self)
+    return -tmp
   end
 
   # PERFORMANCE: String#== could use help
@@ -82,7 +93,9 @@ class String
   primitive 'capitalize', 'rubyCapitalize'
 
   def capitalize!
-    replace(capitalize)
+    x = capitalize
+    return nil if x == self
+    replace(x)
   end
 
   primitive 'casecmp', 'equalsNoCase:'

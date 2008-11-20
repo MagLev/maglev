@@ -112,10 +112,10 @@ class Object
 
     def instance_variable_get(aName)
       aName = Type.coerce_to(aName, String, :to_str)
-      unless (aName[0].equal?( ?@ ))  
+      unless (aName[0].equal?( ?@ ))
         return nil
       end
-      _instVarAt(aName[1, aName.length].to_sym) 
+      _instVarAt(aName[1, aName.length].to_sym)
     end
 
     def instance_variable_set(aName, aVal)
@@ -123,7 +123,7 @@ class Object
       unless (aName[0].equal?( ?@ ))
         return nil
       end
-      _instVarAtPut(aName[1, aName.length].to_sym, aVal) 
+      _instVarAtPut(aName[1, aName.length].to_sym, aVal)
       aVal
     end
 
@@ -132,11 +132,11 @@ class Object
       len = syms.length
       res = Array.new(len)
       n = 0
-      while (n < len) 
+      while (n < len)
         res[n] = '@' << syms[n]
         n = n + 1
       end
-      res 
+      res
     end
 
     primitive 'method', 'rubyMethod:'
@@ -188,8 +188,8 @@ class Object
         end
     end
 
-    def pretty_inspect 
-      inspect; 
+    def pretty_inspect
+      inspect;
     end
 
     def raise(err, str)
@@ -225,9 +225,14 @@ class Object
       self.class.name.to_s
     end
 
-    def to_str
-        to_s
-    end
+    # Object should NOT have a to_str.  If to_str is implementd by passing
+    # to to_s, then by default all objects can convert to a string!  But we
+    # want classes to make an effort in order to convert their objects to
+    # strings.
+    #
+    # def to_str
+    #   to_s
+    # end
 
     # BEGIN RUBINIUS
     def instance_of?(cls)
