@@ -103,6 +103,7 @@ require 'kernel/common/Enumerable.rb'
 require 'kernel/common/struct.rb'
 require 'kernel/common/kernel.rb'
 require 'kernel/common/string.rb'
+require 'kernel/common/symbol.rb'
 
 # Include the delta code
 require 'kernel/delta/Module.rb'

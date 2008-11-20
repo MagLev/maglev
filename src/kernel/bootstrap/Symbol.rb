@@ -14,9 +14,6 @@ class Symbol
   primitive_nobridge 'to_s', 'asString'
   primitive_nobridge 'to_sym', 'asSymbol'
 
-  def inspect
-    ":" + to_s
-  end
 
   def call(value)
     value.__send__(self)
