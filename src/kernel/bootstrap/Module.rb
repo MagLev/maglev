@@ -14,6 +14,8 @@ class Module
     nil  # TODO: MNI: stubbed
   end
 
+  primitive_nobridge 'include', 'includeRubyModule:'
+
   # Invoked as a callback when a method is added to the reciever
   def method_added(symbol)
   end
@@ -36,7 +38,7 @@ class Module
         end
       }
     else
-       _module_func(nil)  # enable the _module_methods_all semantics
+       _module_funct(nil)  # enable the _module_methods_all semantics
     end
   end
 

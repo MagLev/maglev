@@ -38,6 +38,8 @@ class Class
     end
   end
 
+  primitive_nobridge 'include', 'includeRubyModule:'
+
   def module_eval(str)
     RUBY.module_eval(str, self)
   end
