@@ -198,7 +198,11 @@ class String
   end
 
   def hex
-    _to_i(16)
+    # Because 0b1 is a proper hex number, rather than the binary number 1,
+    # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
+    s = self.delete('_').strip
+    s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
+    "16r#{$1}#{$3}"._to_i
   end
 
   def include?(item)
@@ -253,7 +257,11 @@ class String
 
   # MNI: next
   # MNI: next!
-  # MNI: oct   def oct; _to_i(8); end
+
+  def oct
+    base, s = self.extract_base(8)
+    "#{base}r#{s}"._to_i
+  end
 
   primitive 'replace', '_rubyReplace:'
   primitive 'reverse', 'reverse'
@@ -450,21 +458,40 @@ class String
   # MNI: swapcase!
 
   primitive 'to_f', 'asFloat'
-  def to_i
-    _to_i
-  rescue Exception
-    0
-  end
-
-  def to_i
-    _to_i
-  rescue Exception
-    0
+  def to_i(base=10)
+    base = Type.coerce_to(base, Integer, :to_int)
+    raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
+    self.to_inum(base, false)
   end
 
   primitive_nobridge '_to_i', 'asInteger'
-  #  non-base-10 radix Ruby syntax not supported yet
-  primitive '_to_i', '_asInteger:'
+
+  # Consider self as an integer and return value given base.
+  # This is the rubinius API, but we don't care about the check param
+  def to_inum(base, check=false)
+    if base == 0
+      base, s = self.extract_base
+    else
+      s = self
+    end
+    "#{base}r#{s}"._to_i
+  end
+
+  # Return an array of two elements: [an_int, a_string], where an_int is
+  # base, unless self contains a base specifier (e.g., "0x", "0b", etc.),
+  # in which case, an_int is the appropriate base.  a_string is self with
+  # any base specifier removed.
+  #
+  # "0x10" => [16, 10]
+  # "-0b1010".extract_base     => [2, "-1010"]
+  # "-0b1010".extract_base(16) => [2, "-1010"]
+  # "-1010".extract_base(16)   => [16, "-1010"]
+  def extract_base(base=10)
+    s = self.delete('_').strip
+    s =~ /^([+-]?)(0[bdox])?(.*)/i
+    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16}[$2.downcase] unless $2.nil?
+    [base, "#{$1}#{$3}"]
+  end
 
   def to_s
     self
@@ -520,7 +547,6 @@ class String
   def between?(min, max)
     (min <= self) && (self <= max)
   end
-
 
   ###### Rubinius Code Here
 

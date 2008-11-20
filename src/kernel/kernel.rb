@@ -101,8 +101,11 @@ require 'kernel/bootstrap/Math.rb'
 require 'kernel/common/misc.rb'
 require 'kernel/common/Enumerable.rb'
 require 'kernel/common/struct.rb'
+require 'kernel/common/kernel.rb'
+require 'kernel/common/string.rb'
 
 # Include the delta code
+require 'kernel/delta/Module.rb'
 require 'kernel/delta/Array.rb'
 require 'kernel/delta/Dir.rb'
 require 'kernel/delta/Range.rb'

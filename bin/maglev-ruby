@@ -108,9 +108,10 @@ else
     # The key to debug is to keep topaz's stdin connected to the tty.
     # So, we create a topaz script with all the goodies, and use it
     # as the topaz ini file
-    dbscript=$MAGLEV_HOME/etc/dbscript
+    base=`basename $0`
+    dbscript=`mktemp /tmp/${base}.XXXX` || exit 1
     rm -f $dbscript
-    cp $MAGLEV_HOME/etc/.topazdebugini $dbscript
+    cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
     cat - >> $dbscript <<-EOF
 	run
 	RubyContext load.
@@ -120,5 +121,5 @@ else
 	EOF
     # Now run topaz with our debug script, including all params passed to us
     $(which rlwrap) $GEMSTONE/bin/topaz -I $dbscript -l
-    rm -f $dbscript   # Maybe keep this so we can run multiple times?
+    rm -f $dbscript
 fi
