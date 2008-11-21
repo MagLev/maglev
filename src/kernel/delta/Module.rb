@@ -85,24 +85,9 @@ class Module
     false
   end
 
-  def const_get(symbol)
-    puts "== WARN: STUB: MNI: Module#const_get"
-    nil
-  end
-
   def const_missing(symbol)
     puts "== WARN: STUB: MNI: Module#const_missing"
     nil
-  end
-
-  def const_set(symbol, obj)
-    puts "== WARN: STUB: MNI: Module#const_set"
-    nil
-  end
-
-  def constants
-    puts "== WARN: STUB: MNI: Module#constants"
-    []
   end
 
   def include?(mod)
@@ -131,11 +116,6 @@ class Module
   end
 
   # module_eval is above
-
-  def name
-    puts "== WARN: STUB: MNI: Module#name"
-    ""
-  end
 
   def private_class_method(*symbols)
     puts "== WARN: STUB: MNI: Module#private_class_method"

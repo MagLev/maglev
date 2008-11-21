@@ -14,6 +14,7 @@ class Module
     nil  # TODO: MNI: stubbed
   end
 
+  primitive_nobridge 'constants', 'rubyConstants'
   primitive_nobridge 'include', 'includeRubyModule:'
 
   # Invoked as a callback when a method is added to the reciever
@@ -32,7 +33,7 @@ class Module
 
   def module_function(*names)
     if names.length > 0
-      names.each{|name| 
+      names.each{|name|
         unless name.equal?(nil)
           _module_funct(name)
         end
@@ -41,5 +42,17 @@ class Module
        _module_funct(nil)  # enable the _module_methods_all semantics
     end
   end
+
+  primitive '_name', 'name'
+  def name
+    _name.to_s
+  end
+  primitive_nobridge 'const_get', 'rubyGlobalAt:'
+  primitive_nobridge 'const_set', 'rubyConstAt:put:'
+
+#   def const_set(symbol, obj)
+#     puts "== WARN: STUB: MNI: Module#const_set"
+#     nil
+#   end
 
 end
