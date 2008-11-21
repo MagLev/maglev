@@ -6,7 +6,7 @@ class Behavior
 
   primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
   primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
-  primitive_nobridge '_instVarNames', 'rubyInstvarNames'
+  primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
   def attr_accessor(*names)
     names.each do |n|
@@ -59,20 +59,20 @@ class Behavior
     name
   end
 
-  def const_get(name)
-    name
-  end
+#   def const_get(name)
+#     name
+#   end
 
   primitive_nobridge '_allClassVars', 'allClassVarNames'
 
   def class_variable_defined?(aName)
-    sym = aName.to_sym 
+    sym = aName.to_sym
     a = _allClassVars
     lim = a.length
     n = 0
-    while (n < lim) 
+    while (n < lim)
       if (sym.equal?(a[n]))
-        return true 
+        return true
       end
       n = n + 1
     end
@@ -84,11 +84,11 @@ class Behavior
     lim = a.length
     r = Array.new(lim)
     n = 0
-    while (n < lim) 
+    while (n < lim)
       r[n] = a[n].to_s
       n = n + 1
     end
-    r 
+    r
   end
 
 end

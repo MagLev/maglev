@@ -66,11 +66,11 @@ module Errno
 
   def self.createAllErrnoClasses
     table = Errno.errno_names
-    table.each_with_index { |name, errno| Errno._createErrnoClass(errno, name)}
+    table.each_with_index do |name, errno|
+      # 'errno + 1': adjust from smalltalk indexing
+      Errno._createErrnoClass(errno + 1, name)
+    end
   end
-
-
-
 end
 
 Errno.createAllErrnoClasses
