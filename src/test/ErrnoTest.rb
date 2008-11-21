@@ -10,7 +10,7 @@ test(errnosWithBadSuperclass.size, 0, "Errnos with bad superclass: #{errnosWithB
 test(Errno::EBADF.superclass, SystemCallError, 'Errno::EBADF should be a SystemCallError')
 
 
-test(Errno::EBADF.errno, 9, 'Errno::EBADF::Errno != 9')
+test(Errno::EBADF::Errno, 9, 'Errno::EBADF::Errno != 9')
 
 report
 true
