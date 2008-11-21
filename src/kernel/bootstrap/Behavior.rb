@@ -1,8 +1,13 @@
 class Behavior
 
-  primitive_nobridge 'include', 'includeRubyModule:'
   primitive 'alias_method', 'rubyAlias:from:'
-  
+
+  primitive_nobridge 'include', 'includeRubyModule:'
+
+  primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
+  primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
+  primitive_nobridge '_instVarNames', 'rubyInstvarNames'
+
   def attr_accessor(*names)
     names.each do |n|
         attr_reader(n)
