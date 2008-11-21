@@ -235,10 +235,13 @@ class File
     # MNI: File.fnmatch
     # MNI: File.fnmatch?
 
-    def self.ftype(filename)
-      File.stat(filename).ftype
+    def self.ftype(*names)
+      unless names.length.equal?(1)
+        raise ArgumentError , 'expected 1 arg'
+      end
+      File.stat(names[0]).ftype
     end
-
+  
     def self.grpowned?(filename)
       statObj = File._stat(filename, false)
       if (statObj._isFixnum)
@@ -366,7 +369,11 @@ class File
     # MNI: File.split
 
     def self.stat(filename)
-      _stat(filename, false);
+      statObj = _stat(filename, false);
+      if (statObj._isFixnum)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+      statObj
     end
 
     def self.sticky?(filename)
