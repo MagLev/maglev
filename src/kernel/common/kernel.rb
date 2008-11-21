@@ -6,7 +6,7 @@
 #    to workaround module_function not working for Kernel
 #
 module Kernel
-  def self.Float(obj)
+  def Float(obj)
     if (obj._isFloat) 
       return obj
     end
@@ -19,18 +19,9 @@ module Kernel
     Type.coerce_to(obj, Float, :to_f)
   end
 
-  # TODO: module_function not working for Kernel,  
-  #  Kernel still an instance of Class, not instance of Module
-  # module_function :Float
-  def Float(obj)
-    if obj._isFloat
-      return obj
-    end
-    Kernel.Float(obj)
-  end
+  module_function :Float
 
-  # module_function :Integer
-  def self.Integer(obj)
+  def Integer(obj)
     if (obj._isInteger)
       return obj
     end
@@ -47,16 +38,9 @@ module Kernel
       Type.coerce_to(obj, Integer, :to_i)
     end
   end
+  module_function :Integer
 
-  def Integer(obj)
-    if (obj._isInteger)
-      return obj
-    end
-    Kernel.Integer(obj)
-  end
-
-  # module_function :Array
-  def self.Array(obj)
+  def Array(obj)
     if obj._isArray 
       return obj
     end 
@@ -68,23 +52,13 @@ module Kernel
       [obj]
     end
   end
-
-  def Array(obj)
-    if  obj._isArray 
-      return obj
-    end
-    Kernel.Array(obj)
-  end
-
+  module_function :Array
 
   def String(obj)
     Type.coerce_to(obj, String, :to_s)
   end
 
-  # module_function :String
-  def self.String(obj)
-    Type.coerce_to(obj, String, :to_s)
-  end
+  module_function :String
 
   ##
   # MRI uses a macro named NUM2DBL which has essentially the same semantics as

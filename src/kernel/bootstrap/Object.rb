@@ -57,23 +57,27 @@ class Object
     primitive 'nil?' , '_rubyNilQ'
 
     # rubySend: methods implemented in .mcz
-    primitive_nobridge 'send', 'rubySend:'
-    primitive_nobridge 'send&', 'rubySend:withBlock:'
-    #  send* will get bridge methods for all but  'send' , 'send&'
-    primitive_nobridge 'send', 'rubySend:with:'
+    primitive_nobridge 'send',  'rubySend:'
+    primitive_nobridge 'send',  'rubySend:with:'
     primitive_nobridge 'send',  'rubySend:with:with:'
     primitive_nobridge 'send',  'rubySend:with:with:with:'
-    primitive          'send*',  'rubySend:withArguments:'
-    # primitive          'send*', 'rubySend:withArguments:'
+    primitive_nobridge 'send&', 'rubySend:block:'
+    primitive_nobridge 'send&', 'rubySend:with:block:'
+    primitive_nobridge 'send&', 'rubySend:with:with:block:'
+    primitive_nobridge 'send&', 'rubySend:with:with:with:block:'
+    primitive          'send*&' , 'rubySend:withArgs:block:'
 
     #  __send__ defined per MRI, non-overrideable version of send
     #  TODO: disallow redef in Object after prims loaded
-    primitive_nobridge '__send__', 'rubySend:'
-    primitive_nobridge '__send__&', 'rubySend:withBlock:'
-    primitive_nobridge '__send__', 'rubySend:with:'
+    primitive_nobridge '__send__',  'rubySend:'
+    primitive_nobridge '__send__',  'rubySend:with:'
     primitive_nobridge '__send__',  'rubySend:with:with:'
     primitive_nobridge '__send__',  'rubySend:with:with:with:'
-    primitive          '__send__*',  'rubySend:withArguments:'
+    primitive_nobridge '__send__&', 'rubySend:block:'
+    primitive_nobridge '__send__&', 'rubySend:with:block:'
+    primitive_nobridge '__send__&', 'rubySend:with:with:block:'
+    primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
+    primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
     primitive 'dup', '_basicCopy'
 
