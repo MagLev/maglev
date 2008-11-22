@@ -54,10 +54,6 @@ class Behavior
     name
   end
 
-#   def const_get(name)
-#     name
-#   end
-
   primitive_nobridge '_allClassVars', 'allClassVarNames'
 
   def class_variable_defined?(aName)
