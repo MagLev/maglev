@@ -10,10 +10,11 @@ class Module
   # puts, they are temporarily there.  As they are implemented, we should
   # pull them into here.
 
-  primitive_nobridge 'constants', 'rubyConstants'
-  primitive_nobridge 'const_get', 'rubyGlobalAt:'
-  primitive_nobridge 'const_set', 'rubyConstAt:put:'
-  primitive_nobridge 'include', 'includeRubyModule:'
+  primitive_nobridge 'constants',      'rubyConstants'
+  primitive_nobridge 'const_defined?', 'rubyConstDefined:'
+  primitive_nobridge 'const_get',      'rubyGlobalAt:'
+  primitive_nobridge 'const_set',      'rubyConstAt:put:'
+  primitive_nobridge 'include',        'includeRubyModule:'
 
   # Invoked as a callback when a method is added to the reciever
   def method_added(symbol)
@@ -46,4 +47,5 @@ class Module
     _name.to_s
   end
 
+  primitive_nobridge 'remove_const', 'rubyRemoveConst:'
 end
