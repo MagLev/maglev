@@ -110,16 +110,17 @@ class Object
       self._inspect(touchedSet)
     end
 
+    #  following 3 prims must also be installed in Behavior
     primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
     primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
-    primitive_nobridge '_instVarNames', 'rubyInstvarNames'
+    primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
     def instance_variable_get(aName)
       aName = Type.coerce_to(aName, String, :to_str)
       unless (aName[0].equal?( ?@ ))
         return nil
       end
-      _instVarAt(aName[1, aName.length].to_sym)
+      _instVarAt(aName.to_sym)
     end
 
     def instance_variable_set(aName, aVal)
@@ -127,20 +128,8 @@ class Object
       unless (aName[0].equal?( ?@ ))
         return nil
       end
-      _instVarAtPut(aName[1, aName.length].to_sym, aVal)
+      _instVarAtPut(aName.to_sym, aVal)
       aVal
-    end
-
-    def instance_variables
-      syms = self._instVarNames
-      len = syms.length
-      res = Array.new(len)
-      n = 0
-      while (n < len)
-        res[n] = '@' << syms[n]
-        n = n + 1
-      end
-      res
     end
 
     primitive 'method', 'rubyMethod:'
