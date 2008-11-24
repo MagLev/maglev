@@ -68,7 +68,7 @@ module Errno
     table = Errno.errno_names
     table.each_with_index do |name, errno|
       # 'errno + 1': adjust from smalltalk indexing
-      Errno._createErrnoClass(errno + 1, name)
+      Errno._createErrnoClass(errno + 1, name)  unless name.nil?
     end
   end
 end
