@@ -134,8 +134,6 @@ class Object
 
     primitive 'method', 'rubyMethod:'
 
-    def self.const_defined?(c) false; end
-
     def ===(obj)
         self == obj
     end
@@ -160,7 +158,7 @@ class Object
     end
 
   def extend(*modules)
-    if (modules.length > 0) 
+    if (modules.length > 0)
       cl = class << self
         self
       end

@@ -10,12 +10,11 @@ class Module
   # puts, they are temporarily there.  As they are implemented, we should
   # pull them into here.
 
-  def const_set(symbol, obj)
-    nil  # TODO: MNI: stubbed
-  end
-
-  primitive_nobridge 'constants', 'rubyConstants'
-  primitive_nobridge 'include', 'includeRubyModule:'
+  primitive_nobridge 'constants',      'rubyConstants'
+  primitive_nobridge 'const_defined?', 'rubyConstDefined:'
+  primitive_nobridge 'const_get',      'rubyGlobalAt:'
+  primitive_nobridge 'const_set',      'rubyConstAt:put:'
+  primitive_nobridge 'include',        'includeRubyModule:'
 
   # Invoked as a callback when a method is added to the reciever
   def method_added(symbol)
@@ -47,12 +46,6 @@ class Module
   def name
     _name.to_s
   end
-  primitive_nobridge 'const_get', 'rubyGlobalAt:'
-  primitive_nobridge 'const_set', 'rubyConstAt:put:'
 
-#   def const_set(symbol, obj)
-#     puts "== WARN: STUB: MNI: Module#const_set"
-#     nil
-#   end
-
+  primitive_nobridge 'remove_const', 'rubyRemoveConst:'
 end

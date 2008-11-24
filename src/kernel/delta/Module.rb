@@ -80,11 +80,6 @@ class Module
     nil
   end
 
-  def const_defined?(symbol)
-    puts "== WARN: STUB: MNI: Module#const_defined?"
-    false
-  end
-
   def const_missing(symbol)
     puts "== WARN: STUB: MNI: Module#const_missing"
     nil
@@ -189,11 +184,6 @@ class Module
 
   def remove_class_variable(symbol)
     puts "== WARN: STUB: MNI: Module#remove_class_variable"
-    # MNI
-  end
-
-  def remove_const(symbol)
-    puts "== WARN: STUB: MNI: Module#remove_const"
     # MNI
   end
 
