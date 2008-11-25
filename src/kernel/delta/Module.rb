@@ -82,11 +82,6 @@ class Module
     nil
   end
 
-  def const_missing(symbol)
-    puts "== WARN: STUB: MNI: Module#const_missing"  unless GS_NOWARN
-    nil
-  end
-
   def include?(mod)
     puts "== WARN: STUB: MNI: Module#include?"  unless GS_NOWARN
     false

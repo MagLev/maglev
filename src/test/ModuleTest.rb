@@ -50,6 +50,30 @@ C.remove_my_const(:FOO)
 test(C.constants.length,         0, 'remove_const E')
 test(C.const_defined?(:FOO), false, 'remove_const F')
 
+# Ensure const_missing is called.
+class C
+  def self.const_missing(sym)
+    sym.to_s
+  end
+end
+
+test(C.const_get(:NOT_DEFINED), "NOT_DEFINED", 'const_missing A')
+test(C.const_get(:STILL_NOT_DEFINED), "STILL_NOT_DEFINED", 'const_missing B')
+test(C.const_get(:STILL_NOT_DEFINED), "STILL_NOT_DEFINED", 'const_missing C')
+
+# Ensure default const_missing raises a NameError
+begin
+  Object.const_get(:XYZ_ABC)
+  failed_test('Expected Name Error', NameError, nil)
+rescue NameError
+  # Ok!
+rescue Exception => e
+  # Failed...wrong exception
+  failed_test('Expected Name Error', NameError, e)
+end
+
+
+
 report
 Gemstone.abortTransaction if defined? RUBY_ENGINE
 true
