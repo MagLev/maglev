@@ -1,24 +1,26 @@
 
 # Test class creation via metaprogramming
 
-Klass = Class.new(Object)
-c1 = Klass.new   # Fails
+begin
+  Klass = Class.new(Object)
+  o1 = Klass.new   
 
+  klass = Class.new(Object)
+  o2 = klass.new    
 
-klass = Class.new(Object)
-c = klass.new    # Fails
+  $g263 = 0
+  klass = Class.new(Object) do
+     attr_accessor :foo
+     def bar(v)
+       $g263 = v
+     end
+   end
+  
+  o3 = klass.new
+  o3.bar(99)
+  unless $g263 == 99 ; raise 'ERR' ; end
 
-# Once the above code is working, make sure the following also works:
-#
-# klass = Class.new(Object) do
-#   attr_accessor :foo
-#   def bar
-#     puts "BAR"
-#   end
-# end
-
-# c = klass.new
-# p c.bar
-
-# c.foo = "foo"
-# p c.foo
+  o3.foo = "foo"
+  unless o3.foo == 'foo' ; raise 'ERR' ; end
+end
+true
