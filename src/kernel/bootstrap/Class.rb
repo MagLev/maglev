@@ -1,9 +1,8 @@
-RUBY.class.primitive 'module_eval', 'evaluateString:inClass:'
 
 class Class
   # Ruby Class is identically Smalltalk's Class
   # do not # include Module
-  # Module already present as superclass of Class in base smalltalk image 
+  # Module already present as superclass of Class in base smalltalk image
 
   #  following are installed by RubyContext>>installPrimitiveBootstrap
   #    primitive_nobridge 'superclass', 'superclass' # installed in Behavior
@@ -44,10 +43,6 @@ class Class
   end
 
   primitive_nobridge 'include', 'includeRubyModule:'
-
-  def module_eval(str)
-    RUBY.module_eval(str, self)
-  end
 
   def new(*args)
     inst = self.alloc

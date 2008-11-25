@@ -73,6 +73,17 @@ rescue Exception => e
 end
 
 
+##########################
+#  Tests for  module_eval
+##########################
+class Thing
+end
+
+# Test for the string version
+a = %q{def testEval() 123 end}
+Thing.module_eval(a)
+test(Thing.new.testEval, 123, 'module_eval of string')
+
 
 report
 Gemstone.abortTransaction if defined? RUBY_ENGINE

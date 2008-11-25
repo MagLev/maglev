@@ -1,4 +1,4 @@
-
+RUBY.class.primitive 'module_eval', 'evaluateString:inClass:'
 class Module
 
   # NOTE: Most of the implementation of Module is in delta/Module.rb due to
@@ -34,6 +34,14 @@ class Module
   end
 
   primitive_nobridge '_module_funct', 'addModuleMethod:'
+
+  # TODO: Module#module_eval: move the implementation of
+  # Class#module_eval from Class.rb here.
+  def module_eval(str)
+    RUBY.module_eval(str, self)
+  end
+
+  alias class_eval module_eval
 
   def module_function(*names)
     if names.length > 0

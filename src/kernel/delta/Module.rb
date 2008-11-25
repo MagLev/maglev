@@ -67,14 +67,6 @@ class Module
     false
   end
 
-  # TODO: Module#module_eval: move the implementation of
-  # Class#module_eval from Class.rb here.
-  def module_eval
-    puts "== WARN: STUB: MNI: Module#module_eval"  unless GS_NOWARN
-  end
-
-  alias class_eval module_eval
-
   # class_variables inherited from Behavior
 
   def clone
@@ -106,8 +98,6 @@ class Module
     puts "== WARN: STUB: MNI: Module#symbol"  unless GS_NOWARN
     false
   end
-
-  # module_eval is above
 
   def private_class_method(*symbols)
     puts "== WARN: STUB: MNI: Module#private_class_method"  unless GS_NOWARN
