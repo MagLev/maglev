@@ -85,6 +85,23 @@ Thing.module_eval(a)
 test(Thing.new.testEval, 123, 'module_eval of string')
 
 
+# Test the block version
+Thing.module_eval do
+  def testBlockEval
+    456
+  end
+end
+test(Thing.new.testBlockEval, 456, 'module_eval of block')
+
+Thing.class_eval do
+  def testClassEval
+    789
+  end
+end
+test(Thing.new.testClassEval, 789, 'class_eval of block')
+
+test(Thing.module_eval { 1 + 1 }, 2, 'module_eval of simple block')
+
 report
 Gemstone.abortTransaction if defined? RUBY_ENGINE
 true
