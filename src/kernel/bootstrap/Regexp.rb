@@ -14,7 +14,9 @@ class Regexp
 
   primitive_nobridge '_search', '_search:from:to:'
   primitive_nobridge '_compile', '_compile:options:'
+  primitive_nobridge 'kcode', 'kcode'
   primitive_nobridge 'options', 'options'
+
   # class_primitive 'alloc', '_basicNew'
 
   def source
@@ -23,7 +25,15 @@ class Regexp
   end
 
   def self.compile(pattern, options = 0, lang = nil)
-    Regexp.new(pattern, options, lang)
+    if (pattern._isRegexp) 
+      options = pattern.options
+      lang = nil
+      pattern = pattern.source
+    end
+    unless (options._isFixnum)
+      options = options ? IGNORECASE : 0
+    end
+    self.new(pattern, options, lang)
   end
 
   # BEGIN RUBINIUS
@@ -88,6 +98,17 @@ class Regexp
     matches = []
     each_match(str){|m| matches << m}
     matches
+  end
+
+  def ==(otherRegexp)
+    if (otherRegexp._isRegexp)
+      res = otherRegexp.source == source 
+      res &&=  otherRegexp.kcode == self.kcode
+      res &&=  otherRegexp.casefold? == self.casefold? 
+      res
+    else
+      false
+    end
   end
 
   def ===(str)
