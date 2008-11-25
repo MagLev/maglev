@@ -1,5 +1,7 @@
 # ##### Trac # 246 #######################################################
 # From mspec.rb
+require File.expand_path('simple', File.dirname(__FILE__))
+
 class Foo
   def self.store(symbol, value)
     # This line blows up:
@@ -11,5 +13,9 @@ class Foo
   end
 end
 
-Foo.store(:foo, "x")
-puts "value of :foo #{Foo.retrieve :foo}"
+val = "x"
+Foo.store(:foo, val)
+
+test(Foo.retrieve(:foo), val, 'the test')
+
+report

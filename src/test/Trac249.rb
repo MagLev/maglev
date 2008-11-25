@@ -5,7 +5,7 @@ class Foo
   end
   include Constants
 
-  puts BAR
+  #puts BAR
 end
 
 x = Foo::BAR
