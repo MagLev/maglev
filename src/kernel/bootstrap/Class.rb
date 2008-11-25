@@ -12,7 +12,12 @@ class Class
   class_primitive_nobridge '_rubyNew', '_rubyNew:do:'
 
   def self.new(superCls=Object, &blk)
-    _rubyNew(superCls, blk)
+    if (block_given?)
+      c = _rubyNew(superCls, blk)
+    else
+      c = _rubyNew(superCls, nil)
+    end
+    c
   end
 
   primitive 'alloc', 'basicNew'
