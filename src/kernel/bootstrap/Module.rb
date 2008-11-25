@@ -40,7 +40,7 @@ class Module
     RUBY.module_eval(string, self)
   end
 
-  primitive_nobridge '_module_eval&', '_module_eval:'
+  primitive_nobridge '_module_eval&', '_moduleEval:'
   def module_eval(&block)
     _module_eval(&block)
   end
