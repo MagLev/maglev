@@ -82,7 +82,42 @@ class Array
     _alloc(size, value)
   end
 
-  #  Array.new(aSize) {|i| block| } # TODO form not supported yet
+  def self.new(arg)
+    # this method will have no bridge methods, all the bridges
+    #  will map to the previous 2 arg form
+    if (arg._isFixnum)
+      new(arg, nil)
+    else
+      _coerceOneArg(arg)
+    end
+  end
+
+  def self._coerceOneArg(arg)
+    # separate method to avoid complex blocks in self.new(arg)
+    begin
+      ary = Type.coerce_to(arg, Array, :to_ary)
+      res = _withAll(ary)
+    rescue TypeError
+      siz = Type.coerce_to(arg, Fixnum, :to_int)
+      res = _alloc(siz, nil) 
+    end
+    res
+  end
+  
+
+  def self.new(size, &blk)
+    # will have no bridge methods
+    unless size._isFixnum
+      raise ArgumentError, 'size is not a Fixnum'
+    end
+    a = new(size, nil)
+    n = 0
+    while (n < size)
+      a[n] = blk.call(n)
+      n = n + 1
+    end
+    a
+  end
 
   # Array Instance methods
 
