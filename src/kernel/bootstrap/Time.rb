@@ -217,15 +217,15 @@ class Time
   end
 
   def seconds
-    @microseconds / 1000000   # Gemstone
+    @microseconds / 1_000_000   # Gemstone
   end
 
   def +(other)
     raise TypeError, 'time + time?' if other.kind_of?(Time)  # GEMSTONE ...
     if (other._isFloat)
-      deltamicro = (other * 100000.0).to_i
+      deltamicro = (other * 1_000_000.0).to_i
     else
-      deltamicro = other * 1000000
+      deltamicro = other * 1_000_000
     end
     t = self.class.allocate
     t._init(@microseconds + deltamicro, @is_gmt)
@@ -233,18 +233,17 @@ class Time
   end
 
   def -(other)
-    if other.kind_of? Time                      # GEMSTONE ...
-      deltamicro = other._microsecs
+    if other.kind_of? Time
+      (@microseconds - other._microsecs) / 1_000_000
     else
-      if (other._isFloat)
-        deltamicro = (other * 100000.0).to_i
+      if other._isFloat
+        deltamicro = (other * 1_000_000.0).to_i
       else
-        deltamicro = other * 1000000
+        deltamicro = other * 1_000_000.0
       end
+      t = self.class.allocate
+      t._init(@microseconds - deltamicro, @is_gmt)
     end
-    t = self.class.allocate
-    t._init(@microseconds - deltamicro, @is_gmt)
-    t                                                   # ... GEMSTONE
   end
 
   def succ
@@ -314,15 +313,15 @@ class Time
   end
 
   def usec
-    @microseconds % 1000000     # GEMSTONE
+    @microseconds % 1_000_000     # GEMSTONE
   end
 
   def to_i
-    @microseconds / 1000000  # inline self.seconds      # GEMSTONE
+    @microseconds / 1_000_000  # inline self.seconds      # GEMSTONE
   end
 
   def to_f
-    @microseconds / 1000000.0   # GEMSTONE
+    @microseconds / 1_000_000.0   # GEMSTONE
   end
 
   ##
@@ -431,27 +430,27 @@ class Time
   #
   # +want_gmt+ says whether the caller wants a gmtime or local time object.
 
-  #  def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
-  #    if sec.kind_of?(Integer) || usec
-  #      sec  = Type.coerce_to sec, Integer, :to_i
-  #      usec = usec ? usec.to_i : 0
-  #    else
-  #      sec  = Type.coerce_to sec, Float, :to_f
-  #      usec = ((sec % 1) * 1000000).to_i
-  #      sec  = sec.to_i
-  #    end
-  #
-  #    sec  = sec + (usec / 1000000)
-  #    usec = usec % 1000000
-  #
-  #    @timeval = [sec, usec]
-  #
-  #    if want_gmt
-  #      force_gmtime
-  #    else
-  #      force_localtime
-  #    end
-  #  end
+   def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
+     if sec.kind_of?(Integer) || usec
+       sec  = Type.coerce_to sec, Integer, :to_i
+       usec = usec ? usec.to_i : 0
+     else
+       sec  = Type.coerce_to sec, Float, :to_f
+       usec = ((sec % 1) * 1_000_000).to_i
+       sec  = sec.to_i
+     end
+
+     sec  = sec + (usec / 1_000_000)
+     usec = usec % 1000000
+
+     @timeval = [sec, usec]
+
+     if want_gmt
+       force_gmtime
+     else
+       force_localtime
+     end
+   end
 
 
   def self.month_days(y, m)
@@ -571,7 +570,7 @@ class Time
     if (aTime.kind_of?(self))
       usecs = aTime._microsecs
     else
-      usecs = (aTime.to_i) * 1000000
+      usecs = (aTime.to_i) * 1_000_000
     end
     res._init( usecs , false)
     res
@@ -579,7 +578,7 @@ class Time
 
   def self.at(secs, microsecs)
     res = self.allocate
-    usecs = (secs.to_i * 1000000) + microsecs.to_i
+    usecs = (secs.to_i * 1_000_000) + microsecs.to_i
     res._init( usecs , false)
     res
   end
