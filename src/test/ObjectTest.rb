@@ -51,4 +51,17 @@ begin
   test(p.to_a, [ nil, 8, 35 ], "ivs8")
 end
 
+# Test for instance_eval
+
+class Klass
+  def initialize
+    @secret = 99
+  end
+end
+
+k = Klass.new
+test(k.instance_eval { @secret }, 99, 'instance_eval { @secret }')
+test(k.instance_eval("@secret"), 99, 'instance_eval("@secret")')
+
+
 report

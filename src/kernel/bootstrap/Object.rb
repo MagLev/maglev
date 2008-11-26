@@ -216,6 +216,18 @@ class Object
       self.class.name.to_s
     end
 
+    primitive_nobridge '_instance_eval', 'rubyEvalString:'
+    def instance_eval(str, file=nil, line=nil)
+      # TODO: Object#instance_eval: handle file and line params
+      string = Type.coerce_to(str, String, :to_str)
+      _instance_eval(string)
+    end
+
+    primitive_nobridge '_instance_eval_block&', 'rubyEval:'
+    def instance_eval(&block)
+      _instance_eval_block(&block)
+    end
+
     # Object should NOT have a to_str.  If to_str is implementd by passing
     # to to_s, then by default all objects can convert to a string!  But we
     # want classes to make an effort in order to convert their objects to
