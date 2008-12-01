@@ -11,17 +11,18 @@ confFile := GsFile openReadOnServer: 'src/test/vmunit.conf' .
     aLine == nil ifTrue:[
       ^ bmCount "hit eof"
     ].
-    aLine first == $# 
+    aLine first == $#
   ] whileTrue .
   aLine last == lf ifTrue:[ aLine size: (aLine size - 1) ].
   fullPath := '../test/' , aLine .
   GsFile gciLogServer:'--- start ', bmCount asString , ' :' , aLine .
   System beginTransaction .
+  System signalAlmostOutOfMemoryThreshold:70 . "TODO: rm: Debug stack full in dev"
   RubyContext load .
   bmOutF := GsFile openWriteOnServer:'log/vmunit', bmCount asString , '.out' .
   GsFile redirectStdout: bmOutF .
   bmResult := RubyContext loadFileNamed: fullPath .
-  bmOutF close . 
+  bmOutF close .
   GsFile redirectStdout: nil .
   GsFile gciLogServer:'--- end ' , aLine .
   bmCount := bmCount + 1 .
