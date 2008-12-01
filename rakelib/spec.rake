@@ -8,7 +8,15 @@ namespace :spec do
   desc "Run an mspec file: spec=<dir_or_file_name>"
   task :run do
     check_spec_file
-    run_topaz tc_mspec(ENV['spec'])
+    s = ENV['spec']
+    if File.directory?(s)
+      Dir.entries(s).grep(/_spec\.rb/).each do |f|
+        full_path = File.join(s,f)
+        run_topaz tc_mspec(full_path)
+      end
+    else
+      run_topaz tc_mspec(s)
+    end
   end
 
   desc "Run the spec specified as spec=... in topaz debug mode."
