@@ -104,6 +104,8 @@ require 'kernel/common/struct.rb'
 require 'kernel/common/kernel.rb'
 require 'kernel/common/string.rb'
 require 'kernel/common/symbol.rb'
+require 'kernel/common/dir.rb'
+require 'kernel/common/file.rb'
 
 # Include the delta code
 require 'kernel/delta/Module.rb'
