@@ -108,4 +108,9 @@ test('0a'.to_i(0),  0, '"0a".to_i(0)')
 
 # Ensure succ is present
 test('zzz'.succ, 'aaaa', '"zzz".succ')
+
+# gsub was generating undefined method for each_match.  This tests that case:
+test('a.rb'.gsub('\\', ''), 'a.rb',  'gsub regression')
+
+
 report
