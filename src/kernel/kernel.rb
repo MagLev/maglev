@@ -99,6 +99,9 @@ require 'kernel/bootstrap/Math.rb'
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
 require 'kernel/common/misc.rb'
+require 'kernel/common/ctype.rb'
+
+require 'kernel/common/integer.rb'
 require 'kernel/common/Enumerable.rb'
 require 'kernel/common/struct.rb'
 require 'kernel/common/kernel.rb'
