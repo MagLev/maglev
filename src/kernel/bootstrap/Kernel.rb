@@ -3,12 +3,16 @@ module Kernel
   # following methods are just those needed to get some benchmarks and
   # specs running .
 
+  # Kernel#autoload: STUB: This stubbed version just calls +require
+  # file_name+ rather than defering the require.
   def autoload(name, file_name)
+    require file_name
     nil
   end
 
+  # Kernel#autoload?: STUB: Always returns nil.
   def autoload?(name)
-    false
+    nil
   end
 
   # TODO: Currently, smalltalk "@ruby:method_missing" doesn't allow you to

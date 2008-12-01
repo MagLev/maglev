@@ -1,0 +1,6 @@
+These are notes on the MagLev Alpha release.
+
+
+Kernel
+  * Kernel#autoload is a stub.  It does an immediate require of the file.
+  * Kernel#autoload? is a stub.  It always returns nil.
