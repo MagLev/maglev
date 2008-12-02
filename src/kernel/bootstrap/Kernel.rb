@@ -1,4 +1,11 @@
 module Kernel
+
+  # Print messages for stubbed methods
+  GS_WARNSTUB = false
+  def _stub_warn(msg)
+    puts "== WARN: STUB: MNI: #{msg}" if GS_WARNSTUB
+  end
+
 #  RUBY.class.primitive '_require', 'requireFileNamed:qualified:'
   def require(name)
     if $LOADED_FEATURES.include? name

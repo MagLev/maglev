@@ -2,12 +2,6 @@ class Module
 
   #  Class methods
 
-  GS_NOWARN = true
-
-  def _stub_warn(msg)
-    puts "== WARN: STUB: MNI: #{msg}" unless GS_NOWARN
-  end
-
   def self.constants
     _stub_warn("Module.constants")
     []
