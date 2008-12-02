@@ -39,5 +39,9 @@ test(Array(1),           [1], 'Array(1)')
 test(Array([1,2,3]), [1,2,3], 'Array([1,2,3])')
 test(Array(nil),          [], 'Array(nil)')
 
+
+# Tests for eval
+test(eval('1 + 1'), 2, 'eval "1 + 1"')
+
 report
 true

@@ -151,10 +151,6 @@ class Object
       self == other
     end
 
-    def eval(str)
-       module_eval(str, Object)
-    end
-
   def extend(*modules)
     if (modules.length > 0)
       cl = class << self

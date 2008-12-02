@@ -95,6 +95,8 @@ module Kernel
   # def catch(aSymbol, &aBlock); end
   primitive_nobridge 'catch' , 'catch:do:'
 
+  primitive_nobridge 'eval', 'eval:'
+
   def exit(arg=1)
     status = '9'
     if (arg.equal?(true))
