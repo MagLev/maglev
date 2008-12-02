@@ -80,6 +80,7 @@ class Object
     primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
     primitive 'dup', '_basicCopy'
+    primitive 'clone', '_basicCopy'
 
     primitive 'freeze', 'immediateInvariant'
     primitive 'frozen?', 'isInvariant'
