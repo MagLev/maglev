@@ -115,20 +115,19 @@ class Object
     primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
     primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
-    def instance_variable_get(aName)
-      aName = Type.coerce_to(aName, String, :to_str)
-      unless (aName[0].equal?( ?@ ))
-        return nil
-      end
-      _instVarAt(aName.to_sym)
+    def instance_variable_get(a_name)
+      a_name = Type.coerce_to(a_name, String, :to_str)
+      unless (a_name[0].equal?( ?@ ))
+        raise NameError, "`#{a_name}' is not allowed as an instance variable name"      end
+      _instVarAt(a_name.to_sym)
     end
 
-    def instance_variable_set(aName, aVal)
-      aName = Type.coerce_to(aName, String, :to_str)
-      unless (aName[0].equal?( ?@ ))
-        return nil
+    def instance_variable_set(a_name, aVal)
+      a_name = Type.coerce_to(a_name, String, :to_str)
+      unless (a_name[0].equal?( ?@ ))
+        raise NameError, "`#{a_name}' is not allowed as an instance variable name"
       end
-      _instVarAtPut(aName.to_sym, aVal)
+      _instVarAtPut(a_name.to_sym, aVal)
       aVal
     end
 
