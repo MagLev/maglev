@@ -43,6 +43,7 @@ module Kernel
   end
 
   def at_exit
+    _stub_warn("Kernel#at_exit")
   end
 
   # following methods are just those needed to get some benchmarks and
@@ -51,12 +52,14 @@ module Kernel
   # Kernel#autoload: STUB: This stubbed version just calls +require
   # file_name+ rather than defering the require.
   def autoload(name, file_name)
+    _stub_warn("Kernel#autoload:  does an immediate require (does not defer)")
     require file_name
     nil
   end
 
   # Kernel#autoload?: STUB: Always returns nil.
   def autoload?(name)
+    _stub_warn('Kernel#autoload?: always returns nil')
     nil
   end
 

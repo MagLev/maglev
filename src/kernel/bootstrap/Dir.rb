@@ -9,8 +9,6 @@ class Dir
 
   # Class Methods
 
-  # MNI: Dir.[]
-
   # RUBINIUS inspired, but our API is enough different..
   def self.chdir(path = ENV['HOME'])
     if block_given?
@@ -48,8 +46,6 @@ class Dir
   def self.getwd
     Errno.handle(_getwd, "getwd")
   end
-
-  # MNI: Dir.glob
 
   # if not nil, permissions must be >= 0 and <= 0777 if permissions==nil ,
   # the created directory will have permissions as specified by current
