@@ -11,6 +11,11 @@ class String
 
   primitive 'substring1', 'copyFrom:to:'
   primitive '_findStringStartingAt', 'findString:startingAt:'
+  class_primitive_nobridge '_withAll', 'withAll:'
+
+  def self.new(str="")
+    _withAll str
+  end
 
   def signal
     raise RuntimeError, self
@@ -30,10 +35,10 @@ class String
     n = Type.coerce_to(n, Integer, :to_int)
     unless n._isFixnum
       if n._isInteger
-        raise RangeError , 'arg exceeds max Fixnum' 
+        raise RangeError , 'arg exceeds max Fixnum'
       end
     end
-    if (n < 0) 
+    if (n < 0)
       raise ArgumentError , 'arg must be positive'
     end
     str = self.class.new
@@ -122,10 +127,10 @@ class String
             return self[0, self.length - 1 ]
           end
         end
-        return self.dup    
+        return self.dup
       end
     end
-    len = self.length 
+    len = self.length
     rsLen = rs.length
     if len >= rs.length
       idx = self.length - rs.length # one based
@@ -168,11 +173,11 @@ class String
   def chop
     mySize = self.length
     if mySize > 0
-      if self[-1].equal?(0xa) 
+      if self[-1].equal?(0xa)
         if mySize > 1 && self[-2].equal?(0xd)
-	  return self[0, mySize - 3]
-	else
-	  return self[0, mySize - 2]
+      return self[0, mySize - 3]
+    else
+      return self[0, mySize - 2]
         end
       else
         return self[0, mySize - 1]
@@ -185,17 +190,17 @@ class String
   def chop!
     mySize = self.length
     if mySize > 0
-      if self[-1].equal?(0xa) 
+      if self[-1].equal?(0xa)
         if mySize > 1 && self[-2].equal?(0xd)
-	  self.size=(mySize - 2)
-	else
-	  self.size=(mySize - 1)
+      self.size=(mySize - 2)
+    else
+      self.size=(mySize - 1)
         end
       else
         self.size=(mySize - 1)
       end
       return self
-    end 
+    end
     return nil # no modification made
   end
 
@@ -561,12 +566,12 @@ class String
     d = self.dup
     d.succ!
   end
-    
+
   def sum(power=16)
     tot = 0
     n = 0
     lim = self.size
-    unless power._isFixnum 
+    unless power._isFixnum
       power = power.to_int
     end
     mod = (1 << power) - 1
