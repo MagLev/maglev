@@ -22,7 +22,7 @@ module Kernel
   def self.unified_load(name)
     qualified = false
     if name =~ %r{\A(?:(\.\.?)|~)?/}
-      puts "===== #{name} is qualified"
+#      puts "===== #{name} is qualified"
       # A qualified name.
       qname = name.gsub(/^~/, ENV['HOME'])
       qualified = true
