@@ -118,26 +118,24 @@ class Object
     def instance_variable_get(a_name)
       a_name = Type.coerce_to(a_name, String, :to_str)
       unless (a_name[0].equal?( ?@ ))
-        raise NameError, "`#{a_name}' is not allowed as an instance variable name"      end
+        raise NameError, "`#{a_name}' is not allowed as an instance variable name"
+      end
       _instVarAt(a_name.to_sym)
     end
 
-    def instance_variable_set(a_name, aVal)
+    def instance_variable_set(a_name, a_val)
       a_name = Type.coerce_to(a_name, String, :to_str)
       unless (a_name[0].equal?( ?@ ))
         raise NameError, "`#{a_name}' is not allowed as an instance variable name"
       end
-      _instVarAtPut(a_name.to_sym, aVal)
-      aVal
+      _instVarAtPut(a_name.to_sym, a_val)
+      a_val
     end
 
     primitive 'method', 'rubyMethod:'
 
     def ===(obj)
         self == obj
-    end
-
-    def at_exit
     end
 
     # block_given?  is implemented by the ruby compiler .

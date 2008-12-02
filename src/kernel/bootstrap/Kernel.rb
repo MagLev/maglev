@@ -35,6 +35,9 @@ module Kernel
     true
   end
 
+  def at_exit
+  end
+
   # following methods are just those needed to get some benchmarks and
   # specs running .
 
