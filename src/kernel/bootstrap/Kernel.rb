@@ -51,6 +51,9 @@ module Kernel
 
   # Kernel#autoload: STUB: This stubbed version just calls +require
   # file_name+ rather than defering the require.
+  #
+  # See ruby-core:20222 for a discussion on whether to use Kernel#require or some
+  # other private implementation for autoload.
   def autoload(name, file_name)
     _stub_warn("Kernel#autoload:  does an immediate require (does not defer)")
     require file_name
@@ -83,7 +86,7 @@ module Kernel
       raise ArgumentError
     end
     res = Thread._backtrace(false, limit)
-    if (skip > 0) 
+    if (skip > 0)
       res = res[skip, res.length]
     end
     res
