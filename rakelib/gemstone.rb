@@ -165,6 +165,7 @@ EOF
     # count, so hide that
     # puts "topaz #{ok}  #{status}"
   end
+  puts ""  # clean up after topaz command prompt
   true
 end
 
