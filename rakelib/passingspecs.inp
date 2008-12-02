@@ -25,7 +25,7 @@ confFile := GsFile openReadOnServer: '../gss64bit_3.0/tests/rubytst/passingspecs
     aLine first == $#
   ] whileTrue .
   aLine last == lf ifTrue:[ aLine size: (aLine size - 1) ].
-  fullPath := '../rubyspec/1.8/' , aLine .
+  fullPath := '../localspec/1.8/' , aLine .
   GsFile gciLogServer:'--- start ', specCount asString , ': ' , aLine .
   System beginTransaction .
   RubyContext load .
