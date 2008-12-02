@@ -149,5 +149,8 @@ end
 
 test(self.testChomp() , true, "testing chomp, chop")
   
+# gsub was generating undefined method for each_match.  This tests that case:
+test('a.rb'.gsub('\\', ''), 'a.rb',  'gsub regression')
+
 report
 

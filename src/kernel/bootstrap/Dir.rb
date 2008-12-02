@@ -42,7 +42,7 @@ class Dir
   end
 
   def self.foreach(dirname, &block)
-    Dir.entries(filename).each(&block)
+    Dir.entries(dirname).each(&block)
   end
 
   def self.getwd

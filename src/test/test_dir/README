@@ -1,0 +1,3 @@
+This directory and its subdirs are used to test Dir.glob() in
+../DirTest.rb.  If you add/remove/rename files here, you'll have to update
+the tests.

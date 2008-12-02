@@ -244,7 +244,7 @@ class String
   def gsub(regex, str)
     out = ""
     start = 1
-    regex.to_rx.each_match(self) do |match|
+    get_pattern(regex, true).each_match(self) do |match|
       out << substring1(start, match.begin(0))
       out << str
       start = match.end(0) + 1
@@ -258,7 +258,7 @@ class String
   def gsub(regex, &block)
     out = ""
     start = 1
-    regex.to_rx.each_match(self) do |match|
+    get_pattern(regex, true).each_match(self) do |match|
       out << substring1(start, match.begin(0))
       out << block.call.to_s
       start = match.end(0) + 1
@@ -267,6 +267,20 @@ class String
       out << substring1(start, length)
     end
     out
+  end
+
+  # From Rubinius
+  def get_pattern(pattern, quote = false)
+    unless pattern.is_a?(String) || pattern.is_a?(Regexp)
+      if pattern.respond_to?(:to_str)
+        pattern = pattern.to_str
+      else
+        raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      end
+    end
+    pattern = Regexp.quote(pattern) if quote && pattern.is_a?(String)
+    pattern = Regexp.new(pattern) unless pattern.is_a?(Regexp)
+    pattern
   end
 
   def gsub!(regex, str)

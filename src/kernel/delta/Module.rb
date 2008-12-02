@@ -4,13 +4,17 @@ class Module
 
   GS_NOWARN = true
 
+  def _stub_warn(msg)
+    puts "== WARN: STUB: MNI: #{msg}" unless GS_NOWARN
+  end
+
   def self.constants
-    puts "== WARN: STUB: MNI: Module.constants" unless GS_NOWARN
+    _stub_warn("Module.constants")
     []
   end
 
   def self.nesting
-    puts "== WARN: STUB: MNI: Module.nesting"  unless GS_NOWARN
+    _stub_warn("Module.nesting")
     []
   end
 
@@ -19,123 +23,119 @@ class Module
   #  Instance methods
 
   def <(other)
-    puts "== WARN: STUB: MNI: Module#<"  unless GS_NOWARN
+    _stub_warn("Module#<")
     false
   end
 
   def <=(other)
-    puts "== WARN: STUB: MNI: Module#<="  unless GS_NOWARN
+    _stub_warn("Module#<=")
     false
   end
 
   def >(other)
-    puts "== WARN: STUB: MNI: Module#>"  unless GS_NOWARN
-    puts "== WARN: STUB: MNI: "  unless GS_NOWARN
+    _stub_warn("Module#>")
     false
   end
 
   def >=(other)
-    puts "== WARN: STUB: MNI: Module#>="  unless GS_NOWARN
-    puts "== WARN: STUB: MNI: "  unless GS_NOWARN
+    _stub_warn("Module#>=")
     false
   end
 
   def <=>(other)
-    puts "== WARN: STUB: MNI: Module#<=>"  unless GS_NOWARN
-    puts "== WARN: STUB: MNI: "  unless GS_NOWARN
+    _stub_warn("Module#<=>")
     false
   end
 
   def ===(other)
-    puts "== WARN: STUB: MNI: Module#==="  unless GS_NOWARN
-    puts "== WARN: STUB: MNI: "  unless GS_NOWARN
+    _stub_warn("Module#===")
     false
   end
 
   def ancestors
-    puts "== WARN: STUB: MNI: Module#ancestors"  unless GS_NOWARN
+    _stub_warn("Module#ancestors")
     []
   end
 
   def autoload(name, file_name)
-    puts "== WARN: STUB: MNI: Module#autoload"  unless GS_NOWARN
+    _stub_warn("Module#autoload")
     nil
   end
 
   def autoload?(name)
-    puts "== WARN: STUB: MNI: Module#autoload?"  unless GS_NOWARN
+    _stub_warn("Module#autoload?")
     false
   end
 
   # class_variables inherited from Behavior
 
   def clone
-    puts "== WARN: STUB: MNI: Module#clone"  unless GS_NOWARN
+    _stub_warn("Module#clone")
     nil
   end
 
   def include?(mod)
-    puts "== WARN: STUB: MNI: Module#include?"  unless GS_NOWARN
+    _stub_warn("Module#include?")
     false
   end
 
   def included_modules
-    puts "== WARN: STUB: MNI: Module#included_modules"  unless GS_NOWARN
+    _stub_warn("Module#included_modules")
     []
   end
 
   def instance_method(symbol)
-    puts "== WARN: STUB: MNI: Module#instance_method"  unless GS_NOWARN
+    _stub_warn("Module#instance_method")
     nil
   end
 
   def instance_methods(inc_super=true)
-    puts "== WARN: STUB: MNI: Module#instance_methods"  unless GS_NOWARN
+    _stub_warn("Module#instance_methods")
     []
   end
 
   def method_defined?(symbol)
-    puts "== WARN: STUB: MNI: Module#symbol"  unless GS_NOWARN
+    _stub_warn("Module#method_defined?")
     false
   end
 
   def private_class_method(*symbols)
-    puts "== WARN: STUB: MNI: Module#private_class_method"  unless GS_NOWARN
+    _stub_warn("Module#private_class_method")
     nil
   end
 
   def private_instance_mtehods(inc_super=true)
-    puts "== WARN: STUB: MNI: Module#private_instance_mtehods"  unless GS_NOWARN
+    _stub_warn("Module#private_instance_mtehods")
     []
   end
 
   def private_method_defined?(symbol)
-    puts "== WARN: STUB: MNI: Module#private_method_defined?"  unless GS_NOWARN
+    _stub_warn("Module#private_method_defined?")
     false
   end
 
   def protected_instance_methods(inc_super=true)
-    puts "== WARN: STUB: MNI: Module#protected_instance_methods"  unless GS_NOWARN
+    _stub_warn("Module#protected_instance_methods")
     []
   end
 
   def protected_method_defined?(symbol)
-    puts "== WARN: STUB: MNI: Module#protected_method_defined?"  unless GS_NOWARN
+    _stub_warn("Module#protected_method_defined?")
     false
   end
 
   def public_class_method(*symbols)
-    puts "== WARN: STUB: MNI: Module#public_class_method"  unless GS_NOWARN
+    _stub_warn("Module#public_class_method")
     nil
   end
 
   def public_instance_methods(inc_super=true)
-    puts "== WARN: STUB: MNI: Module#public_instance_methods"  unless GS_NOWARN
+    _stub_warn("Module#public_instance_methods")
     []
   end
 
   def public_method_defined?(symbol)
-    puts "== WARN: STUB: MNI: Module#public_method_defined?"  unless GS_NOWARN
+    _stub_warn("Module#public_method_defined?")
     false
   end
 
@@ -155,33 +155,27 @@ class Module
   # MNI: included
 
   def private(*symbols)
-    puts "== WARN: STUB: MNI: Module#private"  unless GS_NOWARN
-    # MNI
+    _stub_warn("Module#private")
   end
 
   def protected(*symbols)
-    puts "== WARN: STUB: MNI: Module#protected"  unless GS_NOWARN
-    # MNI
+    _stub_warn("Module#protected")
   end
 
   def public(*symbols)
-    puts "== WARN: STUB: MNI: Module#public"  unless GS_NOWARN
-    # MNI
+    _stub_warn("Module#public")
   end
 
   def remove_class_variable(symbol)
-    puts "== WARN: STUB: MNI: Module#remove_class_variable"  unless GS_NOWARN
-    # MNI
+    _stub_warn("Module#remove_class_variable")
   end
 
   def remove_method(symbol)
-    puts "== WARN: STUB: MNI: Module#remove_method"  unless GS_NOWARN
-    # MNI
+    _stub_warn("Module#remove_method")
   end
 
   def undef_method(symbol)
-    puts "== WARN: STUB: MNI: Module#undef_method"  unless GS_NOWARN
-    # MNI
+    _stub_warn("Module#undef_method")
   end
 
 end

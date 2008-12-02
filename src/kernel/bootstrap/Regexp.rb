@@ -25,7 +25,7 @@ class Regexp
   end
 
   def self.compile(pattern, options = 0, lang = nil)
-    if (pattern._isRegexp) 
+    if (pattern._isRegexp)
       options = pattern.options
       lang = nil
       pattern = pattern.source
@@ -102,9 +102,9 @@ class Regexp
 
   def ==(otherRegexp)
     if (otherRegexp._isRegexp)
-      res = otherRegexp.source == source 
+      res = otherRegexp.source == source
       res &&=  otherRegexp.kcode == self.kcode
-      res &&=  otherRegexp.casefold? == self.casefold? 
+      res &&=  otherRegexp.casefold? == self.casefold?
       res
     else
       false
