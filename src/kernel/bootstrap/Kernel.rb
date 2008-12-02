@@ -61,7 +61,19 @@ module Kernel
   end
 
   def method_missing(method_id, *args)
-    raise NoMethodError, "Undefined method `#{method_id}' for #{self}"
+    raise NoMethodError, "Undefined method `#{method_id}' for #{self}  "
+  end
+
+  def caller(skip=0, limit=1000)
+    # returns an Array of Strings, each element describes a stack frame
+    unless skip._isFixnum
+      raise ArgumentError
+    end
+    res = Thread._backtrace(false, limit)
+    if (skip > 0) 
+      res = res[skip, res.length]
+    end
+    res
   end
 
   # def catch(aSymbol, &aBlock); end
