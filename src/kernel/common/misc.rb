@@ -62,10 +62,13 @@
 ##
 # This is used to prevent recursively traversing an object graph.
 
+# TODO: RecursionGuard: Since we don't currently have a thread class,
+#       I made the thread local stack a single global...
 module RecursionGuard
   # TODO move this module to a Gemstone file/directory since it
   #  has been changed to use Gemstone identity Set .
 
+  STACK = Set.new # Gemstone single thread hack
   def self.inspecting?(obj)
     stack._includes(obj)
   end
@@ -80,6 +83,7 @@ module RecursionGuard
   end
 
   def self.stack
-    stack = Thread.current[:inspecting] ||= Set.new 
+#    stack = Thread.current[:inspecting] ||= Set.new
+    STACK  # Gemstone single thread hack
   end
 end

@@ -1,4 +1,11 @@
 module Kernel
+
+  # Print messages for stubbed methods
+  GS_WARNSTUB = false
+  def _stub_warn(msg)
+    puts "== WARN: STUB: MNI: #{msg}" if GS_WARNSTUB
+  end
+
 #  RUBY.class.primitive '_require', 'requireFileNamed:qualified:'
   def require(name)
     if $LOADED_FEATURES.include? name
@@ -33,6 +40,9 @@ module Kernel
     RUBY.require(qname)
     $LOADED_FEATURES << name unless $LOADED_FEATURES.include? name
     true
+  end
+
+  def at_exit
   end
 
   # following methods are just those needed to get some benchmarks and
