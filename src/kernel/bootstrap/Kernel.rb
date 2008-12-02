@@ -1,4 +1,39 @@
 module Kernel
+#  RUBY.class.primitive '_require', 'requireFileNamed:qualified:'
+  def require(name)
+    if $LOADED_FEATURES.include? name
+      false
+    else
+      Kernel.unified_load(name)
+    end
+  end
+
+  def load(name)
+    Kernel.unified_load(name)
+  end
+
+  # TODO: Kernel#unified_load: Currently, we only expand ~/..., not ~user/...
+  #
+  # If the path given starts with ./, ../, ~/ or /, it is treated
+  # as a "qualified" file and will be loaded directly (after path
+  # expansion) instead of matching against $LOAD_PATH. The relative
+  # paths use Dir.pwd.
+
+  def self.unified_load(name)
+    qualified = false
+    if name =~ %r{\A(?:(\.\.?)|~)?/}
+      puts "===== #{name} is qualified"
+      # A qualified name.
+      qname = name.gsub(/^~/, ENV['HOME'])
+      qualified = true
+    else
+      qname = name
+    end
+#    RUBY.require(name, qualified)
+    RUBY.require(qname)
+    $LOADED_FEATURES << name unless $LOADED_FEATURES.include? name
+    true
+  end
 
   # following methods are just those needed to get some benchmarks and
   # specs running .
