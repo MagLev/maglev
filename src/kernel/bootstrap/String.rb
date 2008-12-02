@@ -27,6 +27,11 @@ class String
   end
 
   def *(n)
+    unless n._isFixnum
+      if n._isInteger
+        raise RangeError  # arg is a Bignum
+      end
+    end
     str = ""
     k = 0
     while k < n
@@ -100,32 +105,94 @@ class String
 
   primitive 'casecmp', 'equalsNoCase:'
 
-  def chomp
-    if self[-1].equal?("\r")
-      return self[0..-2]
-    end
+  primitive '_atEquals', 'at:equals:'
 
-    if self[-1].equal?("\n")
-      if self[-2].equal?("\r")
-        return self[0..-3]
-      else
-        return self[0..-2]
+  def chomp(rs=$/)
+    if rs[0].equal?(0xa)
+      if rs.length.equal?(1)
+        # the default record separator
+        if self[-1].equal?(0xa)
+          if self[-2].equal?(0xd)
+            return self[0, self.length - 2 ]
+          else
+            return self[0, self.length - 1 ]
+          end
+        end
+        return self.dup    
       end
     end
-
-    return self
+    len = self.length 
+    rsLen = rs.length
+    if len >= rs.length
+      idx = self.length - rs.length # one based
+      if self._atEquals(idx, rs)
+        return self[0, idx]
+      end
+    end
+    return self.dup
   end
 
-  def chomp!
-    replace(chomp)
+  def chomp!(rs=$/)
+    if rs[0].equal?(0xa)
+      if rs.length.equal?(1)
+        # the default record separator
+        lastCh = self[-1]
+        if lastCh.equal?(0xa)
+          if self[-2].equal?(0xd)
+            self.size=(self.length - 2 )
+          else
+            self.size=(self.length - 1 )
+          end
+          return self
+        end
+      end
+    else
+      len = self.length
+      rsLen = rs.length
+      if len >= rs.length
+        idx = self.length - rs.length # one based
+        if self._atEquals(idx, rs)
+          self.size=(idx)
+          return self
+        end
+      end
+    end
+    return nil # no modification made
   end
+
 
   def chop
-    self[0..size-2]
+    mySize = self.length
+    if mySize > 0
+      if self[-1].equal?(0xa) 
+        if mySize > 1 && self[-2].equal?(0xd)
+	  return self[0, mySize - 3]
+	else
+	  return self[0, mySize - 2]
+        end
+      else
+        return self[0, mySize - 1]
+      end
+    else
+      return self.dup
+    end
   end
 
   def chop!
-    replace(chop)
+    mySize = self.length
+    if mySize > 0
+      if self[-1].equal?(0xa) 
+        if mySize > 1 && self[-2].equal?(0xd)
+	  self.size=(mySize - 2)
+	else
+	  self.size=(mySize - 1)
+        end
+      else
+        self.size=(mySize - 1)
+      end
+      return self
+    end 
+    return nil # no modification made
   end
 
   primitive 'concat', '_rubyAddAll:'
@@ -142,7 +209,7 @@ class String
   primitive 'downcase', 'asLowercase'
   primitive 'downcase!', 'rubyDowncaseInPlace'
 
-  # MNI: dump
+  primitive 'dump' , 'rubyDump'
 
   def each(sep=$/, &block)
     tokens = sep._split_string(self, nil)
@@ -227,7 +294,7 @@ class String
       item._index_string(self, 0)
     else
       offset = size + offset if offset < 0
-      string = self[offset..-1]
+      string = self[offset, self.length - 1 ]
       return item._index_string(string, offset)
     end
   end
@@ -255,7 +322,7 @@ class String
     # TODO: Figure out how to pass something more complex than a method name
     # to coerce_to.  A proc? A proc or a symbol?
     #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
-    if ( pattern._isRegexp  )  # if pattern.kind_of?(Regexp)
+    if pattern._isRegexp    # if pattern.kind_of?(Regexp)
       regexp = pattern
     else
       # TODO more optimization of coerce here
@@ -464,9 +531,29 @@ class String
   end
 
 
-  # MNI: succ
-  # MNI: succ!
-  # MNI: sum
+  primitive 'succ!', 'rubySucc'
+
+  def succ
+    d = self.dup
+    d.succ!
+  end
+    
+  def sum(power=16)
+    tot = 0
+    n = 0
+    lim = self.size
+    unless power._isFixnum 
+      power = power.to_int
+    end
+    mod = (1 << power) - 1
+    while n < lim
+      tot = tot + self[n]
+      tot = tot & mod
+      n = n + 1
+    end
+    tot
+  end
+
   # MNI: swapcase
   # MNI: swapcase!
 
