@@ -46,9 +46,9 @@ class Module
     end
   end
 
-  primitive '_name', 'name'
+  primitive_nobridge '_fullName', 'rubyFullName'
   def name
-    _name.to_s
+    _fullName
   end
 
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'

@@ -23,15 +23,15 @@ test(d.select { |e| e == "." || e == ".."}, [".", ".."], 'Enumerable: select')
 # The constants below are the exepcted names of files in them
 test_dir = File.join(File.dirname(__FILE__), 'test_dir')
 Dir.chdir(test_dir) do
-  all_files =     ['a.rb', 'b.rb', 'deeper', 'README']
+  all_files =     [ 'README', 'a.rb', 'b.rb', 'deeper']
   all_dot_files = ['.', '..', '.rbinit' ] + all_files
 
-  test(Dir.glob("*"), all_files, 'Dir.glob("*")')
-  test(Dir.glob("*", File::FNM_DOTMATCH), all_dot_files, 'Dir.glob FNM_DOTMATCH')
+  test(Dir.glob("*").sort , all_files, 'Dir.glob("*")')
+  test(Dir.glob("*", File::FNM_DOTMATCH).sort, all_dot_files, 'Dir.glob FNM_DOTMATCH')
 
   test(Dir.glob("[ax].rb"),        ['a.rb'],               'Dir.glob with []')
   # TODO: Fix bug and uncomment
-  #test(Dir.glob("{a,b}.rb"),       ['a.rb', 'b.rb'],       'Dir.glob with {}')
+  #test(Dir.glob("{a,b}.rb").sort,       ['a.rb', 'b.rb'],       'Dir.glob with {}')
   test(Dir.glob("**/even_deeper"), ['deeper/even_deeper'], 'Dir.glob with **')
 end
 

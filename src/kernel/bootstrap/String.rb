@@ -27,12 +27,16 @@ class String
   end
 
   def *(n)
+    n = Type.coerce_to(n, Integer, :to_int)
     unless n._isFixnum
       if n._isInteger
-        raise RangeError  # arg is a Bignum
+        raise RangeError , 'arg exceeds max Fixnum' 
       end
     end
-    str = ""
+    if (n < 0) 
+      raise ArgumentError , 'arg must be positive'
+    end
+    str = self.class.new
     k = 0
     while k < n
       str << self
@@ -209,7 +213,13 @@ class String
   primitive 'downcase', 'asLowercase'
   primitive 'downcase!', 'rubyDowncaseInPlace'
 
-  primitive 'dump' , 'rubyDump'
+  primitive '_dumpInto' , 'rubyDumpInto:'
+
+  def dump
+    res = self.class.new
+    self._dumpInto(res)
+    res
+  end
 
   def each(sep=$/, &block)
     tokens = sep._split_string(self, nil)

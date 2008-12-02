@@ -152,7 +152,7 @@ class Object
     end
 
     def eval(str)
-        RUBY.module_eval(str, Object)
+       module_eval(str, Object)
     end
 
   def extend(*modules)

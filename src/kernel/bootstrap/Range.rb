@@ -12,16 +12,20 @@ class Range
   end
 
   primitive 'begin', '_from'
-  #  primitive 'each&', 'do:'
+
   def each(&block)
     raise TypeError, "can't iterate from #{first.class}" unless first.respond_to? :succ
 
     current = @from
     limit = exclude_end? ? @to : @to.succ
-    begin
+    while (current < limit)
       block.call(current)
-      current = current.succ
-    end while current < limit
+      nxt = current.succ
+      if (nxt.size > current.size)
+        return  # special semantics for Ranges of Strings
+      end
+      current = nxt
+    end
   end
 
   primitive 'end', '_to'

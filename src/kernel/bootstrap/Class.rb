@@ -88,9 +88,7 @@ class Class
     r
   end
 
-  def name
-    @name.to_s
-  end
+  # name inherited from Module 
 
   def inspect
     name

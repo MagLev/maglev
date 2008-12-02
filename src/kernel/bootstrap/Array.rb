@@ -425,18 +425,34 @@ class Array
     raise "Method not implemented: Array#fetch"
   end
 
+  #  note multiple variants below
   def fill(obj, start=nil, length=nil)
-    # TODO: Needs block support
-    start  ||= 0
+    unless start._isFixnum
+      if start.equal?(nil) 
+        start = 0
+      else
+        start = start.to_int
+      end
+    end 
+    unless length._isFixnum
+      unless length.equal?(nil) 
+        length = length.to_int
+      end
+    end 
     sz = size
-    length ||= sz
     if (start < 0)
       start = sz + start
       if (start < 0)
         start = 0
       end
     end
-    if (length < 0)
+    if length.equal?(nil)
+      if start >= sz
+        # no modifications if index greater than end and no size
+        return self
+      end
+      length = sz - start
+    elsif length < 0
       length = 0
     end
     # smalltalk arrays start at 1
@@ -449,6 +465,74 @@ class Array
       _fillFromToWith(start, endIdx, obj)
     end
     self
+  end
+
+  def fill(obj, start)
+    # note no bridge methods for second and later variants
+    if (start._isRange)
+      start.each do | n |
+        self.fill(obj, n, 1)
+      end
+    else
+      fill(obj, start, nil)
+    end
+    self
+  end
+
+  def fill(start=nil, length=nil , &blk)
+    # note no bridge methods for second and later variants
+    unless start._isFixnum
+      if start.equal?(nil) 
+        start = 0
+      else
+        start = start.to_int
+      end
+    end 
+    sz = self.size
+    if length.equal?(nil)
+      length = sz - start
+    else
+      unless length._isFixnum
+        length = length.to_int
+      end
+    end
+    n = start 
+    limit = start + length
+    while (n < limit)
+      self[n] = blk.call(n)
+      n = n + 1
+    end
+    self
+  end
+
+  def fill(&blk)
+    # note no bridge methods for second and later variants
+    fill(nil, nil, blk)
+    self
+  end
+
+  def fill(start, &blk)
+    # note no bridge methods for second and later variants
+    if (start._isRange)
+      start.each do | n |
+        fill(start, 1, blk)
+      end
+    else
+      fill(start, nil, blk)
+    end
+    self
+  end
+  
+  def fill(a, b, c, *d)
+    if (d.length > 0)
+      raise ArgumentError , 'too many args'
+    else
+      return fill(a, b, c)
+    end
+  end
+
+  def fill(a, b, c, &blk)
+    raise ArgumentError , 'too many args'
   end
 
   def first
@@ -721,10 +805,11 @@ class Array
     res
   end
 
-  # Overrides from Object that are not documented in Array (e.g., eql? is
-  # documented in Array, so is not listed here).
-  primitive 'clone', 'copy'
-  primitive 'dup', 'copy'
+  # clone, dup inherited from Object
+
+  # Overrides from Object that are not documented in Array 
+  #   (e.g., eql? is documented in Array, so is not listed here).
+
   primitive 'hash'
 
   def inspect(touchedSet=nil)
