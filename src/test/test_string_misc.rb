@@ -108,4 +108,46 @@ test('0a'.to_i(0),  0, '"0a".to_i(0)')
 
 # Ensure succ is present
 test('zzz'.succ, 'aaaa', '"zzz".succ')
+
+def testChomp
+  s = 'abcd'
+  r = s.chomp
+  unless r == s ; raise 'Err'; end
+  if r.equal?(s) ; raise 'Err'; end
+  r = s.chomp!
+  unless r.equal?(nil) ; raise 'Err'; end
+
+  s = "abcd\n"
+  r = s.chomp
+  if r.equal?(s) ; raise 'Err'; end
+  unless r == 'abcd' ; raise 'Err'; end
+  r = s.chomp!
+  unless r.equal?(s) ; raise 'Err'; end
+  unless r == 'abcd' ; raise 'Err'; end
+  s = "abcd\r\n"
+  r = s.chomp
+  if r.equal?(s) ; raise 'Err'; end
+  unless r == 'abcd' ; raise 'Err'; end
+  r = s.chomp!
+  unless r.equal?(s) ; raise 'Err'; end
+  unless r == 'abcd' ; raise 'Err'; end
+
+  s = 'abcd'
+  r = s.chop
+  unless r == 'abc' ; raise 'Err'; end
+  if r.equal?(s) ; raise 'Err'; end
+  r = s.chop!
+  unless r == 'abc' ; raise 'Err'; end
+  unless r.equal?(s) ; raise 'Err'; end
+  s = '' 
+  r = s.chop! 
+  unless r.equal?(nil) ; raise 'Err'; end 
+  r = s.chop 
+  unless r.length == 0 ; raise 'Err'; end
+  return true
+end
+
+test(self.testChomp() , true, "testing chomp, chop")
+  
 report
+
