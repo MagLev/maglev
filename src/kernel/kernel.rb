@@ -84,7 +84,6 @@ RUBY.require 'kernel/bootstrap/GC.rb'
 RUBY.require 'kernel/bootstrap/FileStat.rb'
 RUBY.require 'kernel/bootstrap/Thread.rb'
 
-RUBY.require 'kernel/bootstrap/Struct.rb'
 RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/Math.rb'
 
@@ -107,3 +106,4 @@ RUBY.require 'kernel/delta/Module.rb'
 RUBY.require 'kernel/delta/Array.rb'
 RUBY.require 'kernel/delta/Dir.rb'
 RUBY.require 'kernel/delta/Range.rb'
+RUBY.require 'kernel/delta/struct.rb'

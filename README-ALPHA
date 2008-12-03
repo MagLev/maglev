@@ -9,7 +9,10 @@ Kernel
       * Tilde expansion is done only on '~/...', not on '~user/...'
       * $" is not updated
 
-
+Misc
+----
+  * ARGF is not supported
+  * ObjectSpace: Not supported
 
 
 Transaction support

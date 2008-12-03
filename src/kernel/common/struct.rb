@@ -122,7 +122,7 @@ class Struct
   def ==(other)
     return false if (self.class != other.class)
     return false if (self.values.size != other.values.size)
-    
+
     self.values.size.times { |i|
       next if (RecursionGuard.inspecting?(self.values.at(i)))
       next if (RecursionGuard.inspecting?(other.values.at(i)))
@@ -138,7 +138,7 @@ class Struct
   ##
   # call-seq:
   #   struct[symbol]    => anObject
-  #   struct[fixnum]    => anObject 
+  #   struct[fixnum]    => anObject
   #
   # Attribute Reference---Returns the value of the instance variable named
   # by <em>symbol</em>, or indexed (0..length-1) by <em>fixnum</em>. Will
@@ -372,7 +372,7 @@ class Struct
 
   def to_s
     return "[...]" if RecursionGuard.inspecting?(self)
-  
+
     RecursionGuard.inspect(self) do
       "#<struct #{self.class.name} #{_attrs.zip(self.to_a).map{|o| o[1] = o[1].inspect; o.join('=')}.join(', ') }>"
     end
