@@ -2,8 +2,22 @@ These are notes on the MagLev Alpha release.
 
 
 Kernel
+------
   * Kernel#autoload is a stub.  It does an immediate require of the file.
   * Kernel#autoload? is a stub.  It always returns nil.
   * Kernel#require:
       * Tilde expansion is done only on '~/...', not on '~user/...'
       * $" is not updated
+
+
+
+
+Transaction support
+-------------------
+  The Gemstone class has methods for commitTransaction, abortTransaction
+  and beginTransaction.
+
+maglev-irb
+----------
+  * There are commands STOP (recover from parse error) and some transaction
+    control commands: BEGIN, ABORT, COMMIT 
