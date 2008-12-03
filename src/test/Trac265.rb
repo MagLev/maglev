@@ -6,4 +6,4 @@ module Gem
     alias cache source_index
   end
 end
-
+true
