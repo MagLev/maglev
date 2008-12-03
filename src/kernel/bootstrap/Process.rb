@@ -1,10 +1,6 @@
-class Process
-  # TODO:  convert to  module Process
+module Process
 
-  def self.times
-    arr = Gemstone._host_times
-    ProcessTms.new(*arr)
-  end
+
 
   def self._procInfoResultCheck(status)
     if (status < 0)
@@ -23,7 +19,7 @@ class Process
   def self.egid=(arg)
     status = Gemstone._processInfo(5, arg, nil)
     _procInfoResultCheck(status)
-    arg 
+    arg
   end
 
   def self.euid
@@ -34,7 +30,7 @@ class Process
   def self.euid=(arg)
     status = Gemstone._processInfo(6, arg, nil)
     _procInfoResultCheck(status)
-    arg 
+    arg
   end
 
   def self.gid
@@ -45,7 +41,7 @@ class Process
   def self.gid=(arg)
     status = Gemstone._processInfo(7, arg, nil)
     _procInfoResultCheck(status)
-    arg 
+    arg
   end
 
   def self.getpgid(arg)
@@ -66,7 +62,7 @@ class Process
   def self.uid=(arg)
     status = Gemstone._processInfo(4, arg, nil)
     _procInfoResultCheck(status)
-    arg 
+    arg
   end
 
   def self.pid
@@ -78,22 +74,22 @@ class Process
     r = Gemstone._processInfo(10, nil, nil)
     _procInfoResultCheck(r)
   end
- 
+
   def self.kill(signal, aPid)
-    # aPid < 0 or  aPid == Process.pid() are not supported  
+    # aPid < 0 or  aPid == Process.pid() are not supported
     #    and will raise an error
     status = Gemstone._processInfo(12, signal, aPid)
     _procInfoResultCheck(status)
-    1 
+    1
   end
 
   def self.kill(signal, *pids)
     count = 0
-    pids.each { |aPid| 
+    pids.each { |aPid|
       self.kill(signal, aPid)
       count = count + 1
     }
-    return count 
+    return count
   end
-  
+
 end
