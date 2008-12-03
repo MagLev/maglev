@@ -45,5 +45,18 @@ unless e == 44
   raise 'ERR'
 end
  
+class TFile
+  ALT_X = 5
+  module Constants
+    ALT_SEPARATOR  = 6
+    Separator      = ALT_SEPARATOR  # Problem1: This blows up
+  end
+  include Constants
+end
+
+exp_constants = %w( ALT_SEPARATOR ALT_X Constants Separator )
+c = TFile.constants.sort 
+unless c == exp_constants ; raise 'Err' ; end
 
 true
+

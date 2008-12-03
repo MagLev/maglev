@@ -1,9 +1,9 @@
 module Kernel
 
   # Print messages for stubbed methods
-  GS_WARNSTUB = false
+  @@gs_WARNSTUB = false
   def _stub_warn(msg)
-    puts "== WARN: STUB: MNI: #{msg}" if GS_WARNSTUB
+    puts "== WARN: STUB: MNI: #{msg}" if @@gs_WARNSTUB
   end
 
 #  RUBY.class.primitive '_require', 'requireFileNamed:qualified:'
