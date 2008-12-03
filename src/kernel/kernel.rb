@@ -28,6 +28,8 @@
 #
 # Bootstrap
 #
+# We use RUBY.* in this file, since we are bootstrapping.  Normal code,
+# after this file is read, can use Kernel#require etc.
 RUBY.class.primitive 'require', 'requireFileNamed:'
 RUBY.class.primitive 'load', 'loadFileNamed:'
 RUBY.class.primitive 'global', 'installGlobal:'
@@ -100,8 +102,10 @@ RUBY.require 'kernel/common/string.rb'
 RUBY.require 'kernel/common/symbol.rb'
 RUBY.require 'kernel/common/dir.rb'
 RUBY.require 'kernel/common/file.rb'
+RUBY.require 'kernel/common/marshal.rb'
 
-# Include the delta code
+# Include the delta code.  The delta code overwrites the rubinius
+# common code with gemstone specific mods.
 RUBY.require 'kernel/delta/Module.rb'
 RUBY.require 'kernel/delta/Array.rb'
 RUBY.require 'kernel/delta/Dir.rb'
