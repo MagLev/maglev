@@ -139,18 +139,20 @@ def testChomp
   r = s.chop!
   unless r == 'abc' ; raise 'Err'; end
   unless r.equal?(s) ; raise 'Err'; end
-  s = '' 
-  r = s.chop! 
-  unless r.equal?(nil) ; raise 'Err'; end 
-  r = s.chop 
+  s = ''
+  r = s.chop!
+  unless r.equal?(nil) ; raise 'Err'; end
+  r = s.chop
   unless r.length == 0 ; raise 'Err'; end
   return true
 end
 
 test(self.testChomp() , true, "testing chomp, chop")
-  
+
 # gsub was generating undefined method for each_match.  This tests that case:
 test('a.rb'.gsub('\\', ''), 'a.rb',  'gsub regression')
+
+test(String.new("test"), 'test',  'String.new("test")')
 
 report
 
