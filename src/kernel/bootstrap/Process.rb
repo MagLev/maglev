@@ -1,7 +1,5 @@
 module Process
 
-
-
   def self._procInfoResultCheck(status)
     if (status < 0)
       errnoValue = - status
