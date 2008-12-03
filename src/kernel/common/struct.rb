@@ -151,6 +151,7 @@ class Struct
   #    joe[:name]    #=> "Joe Smith"
   #    joe[0]        #=> "Joe Smith"
 
+  # See Gemstone note in bootstrap/Struct.rb
   def [](var)
     case var
     when Numeric then

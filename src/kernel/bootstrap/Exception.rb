@@ -56,9 +56,9 @@ class SystemExit
   # MNI: SystemExit#success?
 end
 
-class SystemStackExit
+class SystemStackError
   def self.name
-    'SystemStackExit' # override Smalltalk name
+    'SystemStackError' # override Smalltalk name
   end
 end
 
