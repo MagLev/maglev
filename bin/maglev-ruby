@@ -123,3 +123,4 @@ else
     $(which rlwrap) $GEMSTONE/bin/topaz -I $dbscript -l
     rm -f $dbscript
 fi
+echo  # topaz tends to not output a newline, which can mess up the shell prompt

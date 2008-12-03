@@ -43,6 +43,7 @@ module Kernel
   end
 
   def at_exit
+    _stub_warn("Kernel#at_exit")
   end
 
   # following methods are just those needed to get some benchmarks and
@@ -50,13 +51,18 @@ module Kernel
 
   # Kernel#autoload: STUB: This stubbed version just calls +require
   # file_name+ rather than defering the require.
+  #
+  # See ruby-core:20222 for a discussion on whether to use Kernel#require or some
+  # other private implementation for autoload.
   def autoload(name, file_name)
+    _stub_warn("Kernel#autoload:  does an immediate require (does not defer)")
     require file_name
     nil
   end
 
   # Kernel#autoload?: STUB: Always returns nil.
   def autoload?(name)
+    _stub_warn('Kernel#autoload?: always returns nil')
     nil
   end
 
@@ -80,7 +86,7 @@ module Kernel
       raise ArgumentError
     end
     res = Thread._backtrace(false, limit)
-    if (skip > 0) 
+    if (skip > 0)
       res = res[skip, res.length]
     end
     res
@@ -88,6 +94,8 @@ module Kernel
 
   # def catch(aSymbol, &aBlock); end
   primitive_nobridge 'catch' , 'catch:do:'
+
+  primitive_nobridge 'eval', 'eval:'
 
   def exit(arg=1)
     status = '9'
