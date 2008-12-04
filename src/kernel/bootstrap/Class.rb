@@ -19,7 +19,9 @@ class Class
     c
   end
 
-  primitive 'alloc', 'basicNew'
+  # Allocate space for a new object of self's class.  The returned object
+  # is an instance of self.
+  primitive 'allocate', 'basicNew'
 
   # base image has persistent env 1 method Class>>class
 
@@ -45,7 +47,7 @@ class Class
   primitive_nobridge 'include', 'includeRubyModule:'
 
   def new(*args)
-    inst = self.alloc
+    inst = self.allocate
     inst.initialize(*args)
     inst
   end
@@ -88,7 +90,7 @@ class Class
     r
   end
 
-  # name inherited from Module 
+  # name inherited from Module
 
   def inspect
     name
