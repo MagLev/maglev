@@ -6,13 +6,22 @@
 
 class Time
 
+  # time_switch is a rubinius builtin that modifies self to be either gmt
+  # or localtime depending on +to_gmt+ flag.  (Possibly) changes the
+  # reciever.
+  # TODO: This is a stub...
+  def time_switch(to_gmt)
+    _stub_warn("Time#time_switch: does not convert between localtime and gmt")
+  end
+
   ######################################################################
   # BEGIN RUBINIUS
   ######################################################################
 
   #  include Comparable
 
-  ZoneOffset =      { 'UTC' => 0, 'Z' => 0,  'UT' => 0, 'GMT' => 0,
+  ZoneOffset = {
+    'UTC' => 0, 'Z' => 0,  'UT' => 0, 'GMT' => 0,
     'EST' => -5, 'EDT' => -4, 'CST' => -6, 'CDT' => -5,
     'CET' => 1, 'CEST' => 2,
     'MST' => -7, 'MDT' => -6, 'PST' => -8, 'PDT' => -7,
@@ -234,12 +243,13 @@ class Time
 
   def -(other)
     if other.kind_of? Time
-      (@microseconds - other._microsecs) / 1_000_000
+      (@microseconds - other._microsecs) / 1_000_000.0
     else
+      # other is number of seconds to subtract
       if other._isFloat
         deltamicro = (other * 1_000_000.0).to_i
       else
-        deltamicro = other * 1_000_000.0
+        deltamicro = other * 1_000_000
       end
       t = self.class.allocate
       t._init(@microseconds - deltamicro, @is_gmt)
@@ -430,27 +440,27 @@ class Time
   #
   # +want_gmt+ says whether the caller wants a gmtime or local time object.
 
-   def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
-     if sec.kind_of?(Integer) || usec
-       sec  = Type.coerce_to sec, Integer, :to_i
-       usec = usec ? usec.to_i : 0
-     else
-       sec  = Type.coerce_to sec, Float, :to_f
-       usec = ((sec % 1) * 1_000_000).to_i
-       sec  = sec.to_i
-     end
+  def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
+    if sec.kind_of?(Integer) || usec
+      sec  = Type.coerce_to sec, Integer, :to_i
+      usec = usec ? usec.to_i : 0
+    else
+      sec  = Type.coerce_to sec, Float, :to_f
+      usec = ((sec % 1) * 1_000_000).to_i
+      sec  = sec.to_i
+    end
 
-     sec  = sec + (usec / 1_000_000)
-     usec = usec % 1000000
+    sec  = sec + (usec / 1_000_000)
+    usec = usec % 1000000
 
-     @timeval = [sec, usec]
+    @timeval = [sec, usec]
 
-     if want_gmt
-       force_gmtime
-     else
-       force_localtime
-     end
-   end
+    if want_gmt
+      force_gmtime
+    else
+      force_localtime
+    end
+  end
 
 
   def self.month_days(y, m)
