@@ -99,11 +99,11 @@ class Array
       res = _withAll(ary)
     rescue TypeError
       siz = Type.coerce_to(arg, Fixnum, :to_int)
-      res = _alloc(siz, nil) 
+      res = _alloc(siz, nil)
     end
     res
   end
-  
+
 
   def self.new(size, &blk)
     # will have no bridge methods
@@ -428,17 +428,17 @@ class Array
   #  note multiple variants below
   def fill(obj, start=nil, length=nil)
     unless start._isFixnum
-      if start.equal?(nil) 
+      if start.equal?(nil)
         start = 0
       else
         start = start.to_int
       end
-    end 
+    end
     unless length._isFixnum
-      unless length.equal?(nil) 
+      unless length.equal?(nil)
         length = length.to_int
       end
-    end 
+    end
     sz = size
     if (start < 0)
       start = sz + start
@@ -482,12 +482,12 @@ class Array
   def fill(start=nil, length=nil , &blk)
     # note no bridge methods for second and later variants
     unless start._isFixnum
-      if start.equal?(nil) 
+      if start.equal?(nil)
         start = 0
       else
         start = start.to_int
       end
-    end 
+    end
     sz = self.size
     if length.equal?(nil)
       length = sz - start
@@ -496,7 +496,7 @@ class Array
         length = length.to_int
       end
     end
-    n = start 
+    n = start
     limit = start + length
     while (n < limit)
       self[n] = blk.call(n)
@@ -522,7 +522,7 @@ class Array
     end
     self
   end
-  
+
   def fill(a, b, c, *d)
     if (d.length > 0)
       raise ArgumentError , 'too many args'
@@ -782,8 +782,9 @@ class Array
     replace(uniq)
   end
 
-  def unshift(element)
-    insert_all([element], 1)
+  # Prepend elements to self.  If no elements, return unmodified self.
+  def unshift(*elements)
+    insert_all(elements, 1)
     self
   end
 
@@ -807,13 +808,13 @@ class Array
 
   # clone, dup inherited from Object
 
-  # Overrides from Object that are not documented in Array 
+  # Overrides from Object that are not documented in Array
   #   (e.g., eql? is documented in Array, so is not listed here).
 
   primitive 'hash'
 
   def inspect(touchedSet=nil)
-    s = "["  
+    s = "["
     if (touchedSet.equal?(nil))
       touchedSet = Set.new
     else
@@ -822,8 +823,8 @@ class Array
         return s
       end
     end
-    touchedSet << self 
-    s << ( collect{|ea| ea.inspect(touchedSet) }.join(", ") ) 
+    touchedSet << self
+    s << ( collect{|ea| ea.inspect(touchedSet) }.join(", ") )
     s << "]"
     s
   end

@@ -28,6 +28,8 @@
 #
 # Bootstrap
 #
+# We use RUBY.* in this file, since we are bootstrapping.  Normal code,
+# after this file is read, can use Kernel#require etc.
 RUBY.class.primitive 'require', 'requireFileNamed:'
 RUBY.class.primitive 'load', 'loadFileNamed:'
 RUBY.class.primitive 'global', 'installGlobal:'
@@ -77,16 +79,15 @@ RUBY.require 'kernel/bootstrap/Comparable.rb'
 RUBY.require 'kernel/bootstrap/Set.rb'
 RUBY.require 'kernel/bootstrap/UnboundMethod.rb'
 RUBY.require 'kernel/bootstrap/Method.rb'
-RUBY.require 'kernel/bootstrap/ProcessTms.rb'
 RUBY.require 'kernel/bootstrap/Process.rb'
 RUBY.require 'kernel/bootstrap/ThrowCatch.rb'
 RUBY.require 'kernel/bootstrap/GC.rb'
 RUBY.require 'kernel/bootstrap/FileStat.rb'
 RUBY.require 'kernel/bootstrap/Thread.rb'
 
-RUBY.require 'kernel/bootstrap/Struct.rb'
 RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/Math.rb'
+RUBY.require 'kernel/bootstrap/Struct.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
@@ -101,9 +102,15 @@ RUBY.require 'kernel/common/string.rb'
 RUBY.require 'kernel/common/symbol.rb'
 RUBY.require 'kernel/common/dir.rb'
 RUBY.require 'kernel/common/file.rb'
+RUBY.require 'kernel/common/marshal.rb'
+RUBY.require 'kernel/common/regexp.rb'
 
-# Include the delta code
+# Include the delta code.  The delta code overwrites the rubinius
+# common code with gemstone specific mods.
 RUBY.require 'kernel/delta/Module.rb'
 RUBY.require 'kernel/delta/Array.rb'
 RUBY.require 'kernel/delta/Dir.rb'
 RUBY.require 'kernel/delta/Range.rb'
+RUBY.require 'kernel/delta/struct.rb'
+RUBY.require 'kernel/delta/struct.rb'
+RUBY.require 'kernel/delta/Process.rb'
