@@ -1,0 +1,4 @@
+fails:Array#each_index passes the index of each element to the block
+fails:Array#each_index passes the index of each element to the block even if the array is changed during iteration
+fails:Array#each_index passes the index from 0..size even if size changes
+fails:Array#each_index raises a LocalJumpError if no block given

@@ -1,0 +1,4 @@
+fails:Array#<=> properly handles recursive arrays
+fails:Array#<=> tries to convert the passed argument to an Array using #to_ary
+fails:Array#<=> checks whether the passed argument responds to #to_ary
+fails:Array#<=> does not call #to_ary on Array subclasses

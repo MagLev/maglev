@@ -1,0 +1,9 @@
+fails:Array#insert returns self
+fails:Array#insert inserts objects before the element at index for non-negative index
+fails:Array#insert appends objects to the end of the array for index == -1
+fails:Array#insert inserts objects after the element at index with negative index
+fails:Array#insert pads with nils if the index to be inserted to is past the end
+fails:Array#insert can insert before the first element with a negative index
+fails:Array#insert does nothing of no object is passed
+fails:Array#insert tries to convert the passed position argument to an Integer using #to_int
+fails:Array#insert checks whether the passed position argument responds to #to_int

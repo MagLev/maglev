@@ -1,0 +1,4 @@
+fails:Array#- tries to convert the passed arguments to Arrays using #to_ary
+fails:Array#- checks whether the passed argument responds to #to_ary
+fails:Array#- raises a TypeError if the passed argument is not an array and does not respond to #to_ary
+fails:Array#- acts as if using an  intermediate hash to collect values

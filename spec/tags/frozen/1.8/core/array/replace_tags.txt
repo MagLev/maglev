@@ -1,0 +1,2 @@
+fails:Array#replace tries to convert the passed argument to an Array using #to_ary
+fails:Array#replace checks whether the passed argument responds to #to_ary

@@ -1,0 +1,2 @@
+fails:Array#compact returns subclass instance for Array subclasses
+fails:Array#compact keeps tainted status even if all elements are removed

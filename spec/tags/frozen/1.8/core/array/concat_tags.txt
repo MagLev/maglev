@@ -1,0 +1,3 @@
+fails:Array#concat tries to convert the passed argument to an Array using #to_ary
+fails:Array#concat checks whether the passed argument responds to #to_ary
+fails:Array#concat does not call #to_ary on Array subclasses
