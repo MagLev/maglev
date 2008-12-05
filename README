@@ -48,7 +48,7 @@ for convenience, but at this time, they simply duplicate the function of
   maglev help           - Display this text
 
 === Note:
-* set <tt>MAGLEV_HOME to the full path of this directory, and add
+* set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add
   <tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>. Then you can use
   <tt>maglev ruby</tt> etc from anywhere.
 * if you have multiple installations, set <tt>PARSETREE_PORT</tt> to
