@@ -1,11 +1,114 @@
 == Debugging scripts with MagLev
 
+=== Topaz Overview, Documentation and Help
+
+Topaz is the command line driven VM that MagLev runs in; it connects to
+the database.  Most of the scripts and rake tasks are based on topaz
+scripts and use the initialization files in <tt>$GEMSTONE_HOME/etc/*</tt>
+to log into topaz and setup the MagLev ruby environment.
+
+==== Run topaz directly
+You can get a topaz prompt via rake:
+
+  $ cd $GEMSTONE_HOME
+  $ rake gs:topaz
+  (in /Users/pmclain/maglev)
+  topaz 1>
+
+Type +exit+ to leave topaz
+
+
+==== Topaz Documentation
+
+{The Topaz Programming
+Environment}[http://seaside.gemstone.com/docs/GS64-Topaz-2.3.pdf] has all of
+the documentation on topaz.
+
+==== Topaz Help
+Topaz also has online help:
+
+  topaz 1> help
+
+    TOPAZ - a programmer's interface to the GemStone system
+
+    For an overview of Topaz, see the "Overview" help topic.
+
+
+
+  Help is available for:
+  HELP       ABORT      BEGIN      BREAK      C          CATEGORY:
+  CLASSMETHOD:          COMMIT     CONTINUE   DEFINE     DISPLAY
+  DISASSEM   DOIT       DOWN [<anInteger>]    EDIT       ERRORCOUNT
+  EXIT [<status>]       EXPECTBUG  EXPECTERROR
+  EXPECTVALUE           FILEOUT    FRAME [<anInteger>]   GCITRACE
+  HIERARCHY  IFERR      IFERR_LIST IFERR_CLEAR           IFERROR
+  INPUT      LEVEL      LIMIT      LIST       LISTW      LOADUA
+  LOOKUP     LOGIN      LOGOUT     METHOD:    OBJECT     OBJ1
+  OBJ2       Object_Specification_Formats     OMIT       OPAL
+  OUTPUT     PAUSEFORDEBUG         PRINTIT    PROTECTMETHODS
+  UNPROTECTMETHODS      RELEASEALL            REMARK
+  REMOVEALLMETHODS      REMOVEALLCLASSMETHODS RUBYHIERARCHY
+  RUBYLIST   RUBYLOOKUP RUBYMETHOD RUBYCLASSMETHOD       RUBYRUN
+  RUN        RUNENV     INTERP     INTERPENV  NBRUN      NBSTEP
+  NBRESULT   SEND       SENDENV    SET        SHELL      SPAWN
+  STACK      STACKWAITFORDEBUG     STK        STATUS     STEP
+  TEMPORARY  TIME       TOPAZPAUSEFORDEBUG    TOPAZWAITFORDEBUG
+
+  press RETURN to continue...
+
+==== Summary of Topaz commands
+
+===== Start, Stop, and misc commands
+<tt>rake gs:topaz</tt>:: Invoke topaz
++exit+::                 Exit topaz
++help+::                 Get help
+
+===== Stack info
++where+::
+  List current stack
+<tt>where nn</tt>:: Show only +nn+ frames starting at current frame.
++frame+::
+  Show information about the current frame
++list+::
+  List source code for the current frame
++listw+::
+  List a window of source code around the current IP location. Useful if
+  you have a long method, and just want to concentrate on the current
+  location.
++down+:: Move down one stack frame.
++up+::   Move up one stack frame.
+
+===== Break point control
+<tt>break method Foo bar @ 2</tt>::
+  Break at step point 2 in Foo#bar.
+
++continue+:: Continue after a break point.
+
+<tt>set class Foo</tt>:: Set the current class to +Foo+
+<tt>list step method: bar</tt>::
+  List source code with possible break points shown.  Use this to figure
+  out which numeric parameter to pass via <tt>@ nn</tt> for the break
+  method above.
+<tt>list breaks</tt>:: List current break points
+<tt>list breaks method: foo</tt>:: List 
+
+===== Level of detail and examining variables
+<tt>display oops</tt>::
+  Turn on display of object ids (necessary for examining variables)
+<tt>obj1 @ NNN </tt>::
+  Inspect the object with id +NNN+, one level deep
+<tt>obj2 @ NNN </tt>::
+  Inspect the object with id +NNN+, two levels deep
+<tt>level N</tt>::
+  Set the default display level to +N+.
+
+=== Use <tt>-d</tt> to run MagLev in debug mode
 
 Run maglev with the <tt>-d</tt> option to run in debug mode.  Uncaught
 exceptions will land you in the topaz prompt, where you can examine the
 stack etc.  Here is a sample file:
 
-    $ cat debug_example.rb 
+    $ cat debug_example.rb
     def raise_exception
       raise "Sample exception"
     end
@@ -54,7 +157,7 @@ And now we invoke MagLev with the <tt>-d</tt> option to debug it:
     Error, 'Sample exception'
     Error Category: 231169 [GemStone] Number: 2023 Arg Count: 1 Context : 91077889
     Arg 1: [91078913 sz:16 cls: 74753 String] Sample exception
-    topaz 1> 
+    topaz 1>
 
 We are now at the topaz prompt and can look at the stack with the +where+
 command (abbreviated +wh+):
@@ -82,7 +185,7 @@ command (abbreviated +wh+):
     20 [] in  RubyCompiler >> loadFileNamed: (envId 0) @2 line 2   [methId 51476481]
     21 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @3 line 10   [methId 52141569]
     ...
-    topaz 1> 
+    topaz 1>
 
 To see the location in the ruby source file, we'll look at stack frame 18,
 using the +frame+ command (abbreviated +fr+):
@@ -90,7 +193,7 @@ using the +frame+ command (abbreviated +fr+):
     topaz 1> fr 18
     18 Object >> _compileFile (envId 1) @6 line 9   [methId 91098113]
         receiver [91094785 sz:0 cls: 72193 Object] anObject
-    topaz 1> 
+    topaz 1>
 
 And then +list+ the current frame's source:
 
@@ -98,23 +201,23 @@ And then +list+ the current frame's source:
        def raise_exception
          raise "Sample exception"
        end
-       
+
        def another_method
          raise_exception
        end
-       
+
        another_method
      * ^6                                                                 *******
-       
-       # method starts at line 1 of file /Users/pmclain/tmp/debug_example.rb 
-    topaz 1> 
+
+       # method starts at line 1 of file /Users/pmclain/tmp/debug_example.rb
+    topaz 1>
 
 We can move down the stack with the +down+ command:
 
     topaz 1> down
     17 Object >> another_method (envId 1) @2 line 2   [methId 91097089]
         receiver [91094785 sz:0 cls: 72193 Object] anObject
-    topaz 1> 
+    topaz 1>
 
 And we can focus in on the current section of the stack frame by using
 +where+ with a parameter:
@@ -134,8 +237,8 @@ And we can focus in on the current section of the stack frame by using
        def another_method
          raise_exception
      * ^2                                                                 *******
-       
-       # method starts at line 5 of file /Users/pmclain/tmp/debug_example.rb 
+
+       # method starts at line 5 of file /Users/pmclain/tmp/debug_example.rb
     topaz 1> down
     16 Object >> raise_exception (envId 1) @2 line 2   [methId 91096065]
         receiver [91094785 sz:0 cls: 72193 Object] anObject
@@ -143,9 +246,9 @@ And we can focus in on the current section of the stack frame by using
        def raise_exception
          raise "Sample exception"
      * ^2                                                                 *******
-       
-       # method starts at line 1 of file /Users/pmclain/tmp/debug_example.rb 
-    topaz 1> 
+
+       # method starts at line 1 of file /Users/pmclain/tmp/debug_example.rb
+    topaz 1>
 
 Etc.  Read the Topaz manual for all the details.
 ==== Pausing with <tt>nil.pause</tt>
