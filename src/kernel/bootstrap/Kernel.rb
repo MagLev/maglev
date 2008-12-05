@@ -183,6 +183,10 @@ module Kernel
     arg
   end
 
+  def trap
+    _stub_warn("Kernel#trap")
+  end
+
   primitive 'sprintf*', 'sprintf:with:'
 
   primitive_nobridge '_system', '_system:'

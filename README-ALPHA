@@ -27,6 +27,9 @@ will be +irb+, but not yet.
 * <tt>Kernel#require</tt>: Tilde expansion is done only on <tt>~/...</tt>,
   not on <tt>~user/...</tt>, <tt>$"</tt> is not updated
 
+==== Threads
+* <tt>ThreadGroup</tt> is a stub.
+
 ==== Misc
 * +ARGF+ is not supported
 * +ObjectSpace+: Not supported
