@@ -1,26 +1,34 @@
-These are notes on the MagLev Alpha release.
+== These are notes on the MagLev Alpha release.
+
+=== Running MagLev
+
+Run maglev with <tt>bin/maglev-ruby</tt>. 
+
+=== Transaction support
+
+The Gemstone class has methods for +commitTransaction+, +abortTransaction+
+and +beginTransaction+.
+
+=== <tt>maglev-irb</tt>
+
+The first rule of <tt>maglev-irb</tt> is that you don't talk about +irb+,
+because <tt>maglev-irb</tt> is not +irb+.  Eventually, <tt>maglev-irb</tt>
+will be +irb+, but not yet.
+
+<tt>maglev-irb</tt> has a few commands to help using it:
+* +STOP+ (recover from parse error)
+* transaction control commands: +BEGIN+, +ABORT+, +COMMIT+
+
+=== Errata
+==== Kernel
+* <tt>Kernel#autoload</tt> is a stub.  It does an immediate require of the
+  file. 
+* <tt>Kernel#autoload?</tt> is a stub.  It always returns nil.
+* <tt>Kernel#require</tt>: Tilde expansion is done only on <tt>~/...</tt>,
+  not on <tt>~user/...</tt>, <tt>$"</tt> is not updated
+
+==== Misc
+* +ARGF+ is not supported
+* +ObjectSpace+: Not supported
 
 
-Kernel
-------
-  * Kernel#autoload is a stub.  It does an immediate require of the file.
-  * Kernel#autoload? is a stub.  It always returns nil.
-  * Kernel#require:
-      * Tilde expansion is done only on '~/...', not on '~user/...'
-      * $" is not updated
-
-Misc
-----
-  * ARGF is not supported
-  * ObjectSpace: Not supported
-
-
-Transaction support
--------------------
-  The Gemstone class has methods for commitTransaction, abortTransaction
-  and beginTransaction.
-
-maglev-irb
-----------
-  * There are commands STOP (recover from parse error) and some transaction
-    control commands: BEGIN, ABORT, COMMIT 

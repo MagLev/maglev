@@ -1,0 +1,158 @@
+== Debugging scripts with MagLev
+
+
+Run maglev with the <tt>-d</tt> option to run in debug mode.  Uncaught
+exceptions will land you in the topaz prompt, where you can examine the
+stack etc.  Here is a sample file:
+
+    $ cat debug_example.rb 
+    def raise_exception
+      raise "Sample exception"
+    end
+
+    def another_method
+      raise_exception
+    end
+
+    another_method
+
+And now we invoke MagLev with the <tt>-d</tt> option to debug it:
+
+    $ maglev-ruby -d debug_example.rb
+     _____________________________________________________________________________
+    |                             Configuration Files                             |
+    |                                                                             |
+    | System File: /Users/pmclain/projects/maglev/git/etc/system.conf             |
+    |                                                                             |
+    | Executable File: /Users/pmclain/tmp/gem.conf                                |
+    | Warning:  File not found (errno=2,ENOENT, The file or directory specified cannot
+    | be found)                                                                   |
+    |           using defaults.                                                   |
+    |_____________________________________________________________________________|
+    (vmGc spaceSizes: eden init 2000K max 28128K , survivor init 336K max 4688K,
+     vmGc    old max 112496K, code max 30000K, perm max 15000K, pom 10 * 12504K = 125040K,
+     vmGc    remSet 2880K, meSpace max 143384K oopMapSize 1048576 )
+     _____________________________________________________________________________
+    |             GemStone/S64 Object-Oriented Data Management System             |
+    |               Copyright (C) GemStone Systems, Inc. 1986-2008.               |
+    |                            All rights reserved.                             |
+    |     covered by Patent Number 6,567,905 Generational Garbage Collector.      |
+    +-----------------------------------------------------------------------------+
+    |    PROGRAM: topaz, Linear GemStone Interface (Linked Session)               |
+    |    VERSION: 3.0.0, Tue Dec  2 17:07:56 2008 pmclain private build           |
+    |      BUILD: 64bit-20633-PRIVATE                                             |
+    |  BUILT FOR: Darwin (Mac)                                                    |
+    |       MODE: 64 bit                                                          |
+    | RUNNING ON: 2-CPU cairo.gemstone.com i386 (Darwin 9.5.0 ) 2400MHz MacBook4,1|
+    | 2048MB                                                                      |
+    | PROCESS ID: 16567     DATE: 12/04/08 18:01:15 PST                           |
+    |   USER IDS: REAL=pmclain (650) EFFECTIVE=pmclain (650)                      |
+    |_____________________________________________________________________________|
+    [Info]: LNK client/gem GCI levels = 801/801
+    -----------------------------------------------------
+    GemStone: Error         Nonfatal
+    Error, 'Sample exception'
+    Error Category: 231169 [GemStone] Number: 2023 Arg Count: 1 Context : 91077889
+    Arg 1: [91078913 sz:16 cls: 74753 String] Sample exception
+    topaz 1> 
+
+We are now at the topaz prompt and can look at the stack with the +where+
+command (abbreviated +wh+):
+
+    topaz 1> wh
+    ==> 1 Exception >> _pass:with: (envId 0) @8 line 23   [methId 2266369]
+    2 Exception >> pass (envId 0) @2 line 14   [methId 4062465]
+    3 [] in  RubyFile >> load (envId 0) @4 line 18   [methId 53753089]
+    4 Exception >> _executeHandler: (envId 0) @2 line 7   [methId 2186753]
+    5 Exception >> _pass:with: (envId 0) @4 line 18   [methId 2266369]
+    6 Exception >> pass (envId 0) @2 line 14   [methId 4062465]
+    7 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @4 line 26   [methId 52167937]
+    8 Exception >> _executeHandler: (envId 0) @2 line 7   [methId 2186753]
+    9 Exception >> signal (envId 0) @1 line 1   [methId 2180865]
+    10 Exception >> signal: (envId 0) @3 line 7   [methId 2161921]
+    11 Exception class >> signal: (envId 0) @3 line 4   [methId 2045953]
+    12 Object >> raise:: (envId 1) @2 line 2   [methId 72786689]
+    13 String >> signal (envId 1) @2 line 2   [methId 72575745]
+    14 String >> signal: (envId 1) @2 line 1   [methId 72632321]
+    15 Object >> raise: (envId 1) @2 line 2   [methId 72742913]
+    16 Object >> raise_exception (envId 1) @2 line 2   [methId 91096065]
+    17 Object >> another_method (envId 1) @2 line 2   [methId 91097089]
+    18 Object >> _compileFile (envId 1) @6 line 9   [methId 91098113]
+    19 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @3 line 10   [methId 52139009]
+    20 [] in  RubyCompiler >> loadFileNamed: (envId 0) @2 line 2   [methId 51476481]
+    21 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @3 line 10   [methId 52141569]
+    ...
+    topaz 1> 
+
+To see the location in the ruby source file, we'll look at stack frame 18,
+using the +frame+ command (abbreviated +fr+):
+
+    topaz 1> fr 18
+    18 Object >> _compileFile (envId 1) @6 line 9   [methId 91098113]
+        receiver [91094785 sz:0 cls: 72193 Object] anObject
+    topaz 1> 
+
+And then +list+ the current frame's source:
+
+    topaz 1> list
+       def raise_exception
+         raise "Sample exception"
+       end
+       
+       def another_method
+         raise_exception
+       end
+       
+       another_method
+     * ^6                                                                 *******
+       
+       # method starts at line 1 of file /Users/pmclain/tmp/debug_example.rb 
+    topaz 1> 
+
+We can move down the stack with the +down+ command:
+
+    topaz 1> down
+    17 Object >> another_method (envId 1) @2 line 2   [methId 91097089]
+        receiver [91094785 sz:0 cls: 72193 Object] anObject
+    topaz 1> 
+
+And we can focus in on the current section of the stack frame by using
++where+ with a parameter:
+
+    topaz 1> wh 10
+    17 Object >> another_method (envId 1) @2 line 2   [methId 91097089]
+    18 Object >> _compileFile (envId 1) @6 line 9   [methId 91098113]
+    19 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @3 line 10   [methId 52139009]
+    20 [] in  RubyCompiler >> loadFileNamed: (envId 0) @2 line 2   [methId 51476481]
+    21 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @3 line 10   [methId 52141569]
+    22 ExecBlock >> on:do: (envId 0) @2 line 53   [methId 4329729]
+    23 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @6 line 11   [methId 52148225]
+    24 ExecBlock >> ensure: (envId 0) @2 line 10   [methId 4310273]
+    25 [] in  RubyCompiler >> compileFileNamed:do: (envId 0) @12 line 19   [methId 52168193]
+    26 ExecBlock >> on:do: (envId 0) @2 line 53   [methId 4329729]
+    topaz 1> list
+       def another_method
+         raise_exception
+     * ^2                                                                 *******
+       
+       # method starts at line 5 of file /Users/pmclain/tmp/debug_example.rb 
+    topaz 1> down
+    16 Object >> raise_exception (envId 1) @2 line 2   [methId 91096065]
+        receiver [91094785 sz:0 cls: 72193 Object] anObject
+    topaz 1> list
+       def raise_exception
+         raise "Sample exception"
+     * ^2                                                                 *******
+       
+       # method starts at line 1 of file /Users/pmclain/tmp/debug_example.rb 
+    topaz 1> 
+
+Etc.  Read the Topaz manual for all the details.
+==== Pausing with <tt>nil.pause</tt>
+
+If you run in debug mode, you can pause and get the topaz prompt using
+<tt>nil.pause</tt> (or <tt>anything_else.pause</tt>) in your ruby code:
+
+    nil.pause if rand(10) == 7 # if you're lucky, pause 10% of the time
+
+Then you can continue with +continue+:
