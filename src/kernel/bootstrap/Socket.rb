@@ -27,9 +27,15 @@ class Socket
   primitive 'recv', 'recv:' 
   primitive 'read', 'recv:' 
 
-  # Note, assignment of result to Ruby global $_  not implemented yet.
+  def gets(*args, &blk)
+    raise ArgumentError, 'expected 0 or 1 arg'
+    #  variants other than gets , gets(terminator) not supported
+    # because bridge methods would interfere with use of _storeRubyVcGlobal
+  end
+  # Smalltalk implementations of   gets  responsible for
+  #    _storeRubyVcGlobal  to  store into caller's $_ if any
   primitive_nobridge 'gets', 'gets'
-  primitive 'gets', 'gets:'
+  primitive_nobridge 'gets', 'gets:'
 
   primitive 'close', 'close'
   primitive_nobridge 'shutdown', 'shutdown'
