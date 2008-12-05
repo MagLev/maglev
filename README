@@ -1,65 +1,66 @@
-Quick Start:
+== Quick Start
 
-You run MagLev using the 'maglev' script in the $MAGLEV_HOME/bin directory.
-For best results, set MAGLEV_HOME, and add $MAGLEV_HOME/bin to your PATH.
-You must run 'maglev start' before running commands that execute ruby code.
+You run MagLev using the +maglev+ script in the <tt>$MAGLEV_HOME/bin</tt>
+directory.  For best results, set +MAGLEV_HOME+, and add
+<tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>.  You must run <tt>maglev
+start</tt> before running commands that execute ruby code.
 
-The two scripts 'maglev-irb' and 'maglev-ruby' are provded for convenience,
-but at this time, they simply duplicate the function of 'maglev irb' and
-maglev ruby' and allow several options.
+The two scripts <tt>maglev-irb</tt> and <tt>maglev-ruby</tt> are provded
+for convenience, but at this time, they simply duplicate the function of
+<tt>maglev irb</tt> and <tt>maglev ruby</tt> and allow several options.
 
-maglev-irb: Open a maglev shell
-Usage: maglev-irb [options]
-OPTIONS:
-   -d      Run in debugging mode
-   -h      Show help message
-   -v      Print version number
+=== <tt>maglev-irb</tt>: Open an interactive maglev shell
+  Usage: maglev-irb [options]
+  OPTIONS:
+     -d      Run in debugging mode
+     -h      Show help message
+     -v      Print version number
 
-maglev-ruby: Execute a Ruby file
-Usage: maglev-ruby [options] <filename>
-OPTIONS:
-   -d      Run in debugging mode
-   -h      Show help message
-   -v      Print version number
+=== <tt>maglev-ruby</tt>: Execute a Ruby file
+  Usage: maglev-ruby [options] <filename>
+  OPTIONS:
+     -d      Run in debugging mode
+     -h      Show help message
+     -v      Print version number
 
-maglev:  Control the MagLev system
-Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
-               squeak|preload|force-reload|version|help}
+=== <tt>maglev</tt>:  Control the MagLev system
+  Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|
+                 topaz-debug|squeak|preload|force-reload|version|help}
 
-To control the MagLev server:
-maglev start          - Start MagLev server processes
-maglev start-debug    - Start MagLev server processes with verbose output
-maglev start-parser   - Force parser process to start if it's dead
-maglev stop           - Stop MagLev server processes
-maglev restart        - Restart MagLev server processes
-maglev status         - Display MagLev server status
-maglev version        - Display MagLev version number
-maglev preload <file> - Load and commit a file into an already running system
-maglev force-reload   - Stop MagLev server, replace with empty repository!!!
+  To control the MagLev server:
+  maglev start          - Start MagLev server processes
+  maglev start-debug    - Start MagLev server processes with verbose output
+  maglev start-parser   - Force parser process to start if it's dead
+  maglev stop           - Stop MagLev server processes
+  maglev restart        - Restart MagLev server processes
+  maglev status         - Display MagLev server status
+  maglev version        - Display MagLev version number
+  maglev preload <file> - Load and commit a file into an already running system
+  maglev force-reload   - Stop MagLev server, replace with empty repository!!!
 
-To execute other maglev commands:
-maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
-maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
-maglev topaz          - Enter a Topaz shell
-maglev topaz-debug    - Enter a Topaz shell useful for debugging 
-maglev squeak         - Start optional Squeak development environment
-maglev vsd            - Start Visual Statistics Display monitoring tool
-maglev help           - Display this text
+  To execute other maglev commands:
+  maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
+  maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
+  maglev topaz          - Enter a Topaz shell
+  maglev topaz-debug    - Enter a Topaz shell useful for debugging
+  maglev squeak         - Start optional Squeak development environment
+  maglev vsd            - Start Visual Statistics Display monitoring tool
+  maglev help           - Display this text
 
-Note:
-- set MAGLEV_HOME to the full path of this directory, 
-      and add $MAGLEV_HOME/bin to your PATH. 
-      Then you can use "maglev ruby" etc from anywhere.
-- if you have multiple installations, set PARSETREE_PORT to control 
-      which port the parser server listens on
-- the first (and ony the first) time you run a maglev command
-      that runs Ruby code, it will load and compile its primitives,
-      which takes up to a minute to run.
-- maglev-ruby prints a topaz banner every time it is run. 
-      maglev-irb does not, but it will make errors more difficult to debug,
-      as they won't return to Topaz.
- 
-Ruby code:
-- src/ and src/lib/ are both on the require path
-- src/kernel/ has the core Array, String etc files
+=== Note:
+* set <tt>MAGLEV_HOME to the full path of this directory, and add
+  <tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>. Then you can use
+  <tt>maglev ruby</tt> etc from anywhere.
+* if you have multiple installations, set <tt>PARSETREE_PORT</tt> to
+  control which port the parser server listens on
+* the first (and ony the first) time you run a maglev command that runs
+  Ruby code, it will load and compile its primitives, which takes up to a
+  minute to run.
+* <tt>maglev-ruby</tt> prints a topaz banner every time it is
+  run. <tt>maglev-irb</tt> does not, but it will make errors more difficult
+  to debug, as they won't return to Topaz.
+
+=== Ruby code:
+* <tt>src/</tt> and <tt>src/lib/</tt> are both on the require path
+* <tt>src/kernel/</tt> has the core +Array+, +String+ etc. files
 
