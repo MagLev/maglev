@@ -1,0 +1,28 @@
+== RubySpecs and MagLev
+
+There are git submodules for the +mspec+ framework (<tt>spec/mspec</tt>,
+version 1.5.3) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
+2008-12-04).
+
+=== Run mspecs with +rake+
+
+There are three rake tasks that help with the specs:
+
+    $ rake -T spec
+    rake spec:ci          # Run the continuous integration specs (was passingpsecs) on MagLev
+    rake spec:debugci     # Run the continuous integration specs on MagLev with debug
+    rake spec:mri         # Run the continuous integration specs against MRI
+
+=== Run mspecs manually
+
+Assuming <tt>maglev-ruby</tt> is on your +PATH+, you can specs like this:
+
+    $ cd $MAGLEV_HOME
+    $ spec/bin/mspec -t maglev-ruby spec/rubyspec/1.8/core/nil
+
+To run with debug mode on (so that you end up in the topaz prompt on an
+error):
+
+    $ cd $MAGLEV_HOME
+    $ spec/bin/mspec -t maglev-ruby -T -d spec/rubyspec/1.8/core/nil
+

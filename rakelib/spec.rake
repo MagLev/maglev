@@ -5,6 +5,25 @@
 
 namespace :spec do
 
+  RSPEC_DIR = File.dirname(__FILE__) + '/../spec/rubyspec'
+
+  desc "Run the continuous integration specs against MRI"
+  task :mri do
+    sh "spec/mspec/bin/mspec -t ruby #{RSPEC_DIR}"
+  end
+
+  desc "Run the continuous integration specs (was passingpsecs) on MagLev"
+  task :ci do
+    sh "spec/mspec/bin/mspec #{RSPEC_DIR}"
+  end
+
+  desc "Run the continuous integration specs on MagLev with debug"
+  task :debugci do
+    sh "spec/mspec/bin/mspec -T -d #{RSPEC_DIR}"
+  end
+end
+
+namespace :oldspec do
   desc "Run an mspec file: spec=<dir_or_file_name>"
   task :run do
     check_spec_file

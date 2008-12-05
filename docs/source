@@ -1,0 +1,64 @@
+== MagLev source code layout
+
+=== File Layout
+
+The Git repository contains the ruby source files, rake files and some
+configuration.
+
+  $MAGLEV_HOME
+    |
+    + bin/        # MagLev shell scripts to run MagLev, the parser and
+    |             # start the Gemstone VM
+    + data/
+    |
+    + docs/       # Rdoc formatted documentation files
+    |
+    + etc/        # Misc config files used by topaz; demo key to unlock VM
+    |
+    + gci
+    |
+    + gemstone    # The MagLev/Smalltalk VM files
+    |
+    + html/       # created by "rake rdoc"; holds html versions of rdoc files
+    |
+    + locks/      # Lock files used by VM when running MagLev
+    |
+    + log/        # Log files created by VM
+    |
+    + rakelib/    # Rake scripts and supporting ruby files
+    |
+    + spec
+    |  |
+    |  + mspec    # Git submodule holding v1.5.3 of mspec
+    |  |
+    |  + rubyspec # Latest rubyspec files
+    |
+    + src/        # MagLev ruby source and libs
+
+=== Source File Layout
+
+  $MAGLEV_HOME/src
+    |
+    + benchmark     # A suite of ruby benchmark files
+    |
+    + kernel        # The core and language files pre-loaded into the image
+    |  |            # These files are reloaded with "rake dev:reloadprims"
+    |  |
+    |  + kernel.rb  # File that controls order kernel files are loaded
+    |  |
+    |  + bootstrap  # These files are loaded in the first wave and provide
+    |  |            # the basic/core functionality
+    |  |
+    |  + common     # Files that are common between MagLev and Rubinius
+    |  |            # (or at least mostly identical)
+    |  |
+    |  + delta      # Files that are loaded after the common files to
+    |               # overload Gemstone functions on top of the common ones.
+    |
+    + lib           # root of the ruby libraries.  This directory is on $:
+    |
+    + scripts       # Misc development/management scripts
+    |
+    + test          # smoke tests run before committing code
+
+

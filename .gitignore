@@ -9,6 +9,7 @@
 *.swp
 *tmproj
 data/
+html/
 gemstone/
 locks/
 log/
