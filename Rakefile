@@ -23,7 +23,7 @@ CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
 
 Rake::RDocTask.new do |rd|
   rd.main = "README"
-  rd.rdoc_files.include("README*", "docs/*")
+  rd.rdoc_files.include('README*', 'docs/*')
 end
 
 task :default => :'gs:status'
