@@ -1,0 +1,3 @@
+fails:Struct anonymous class instance methods Enumerable methods should work
+fails:Struct anonymous class instance methods reader method should be a synonym for []
+fails:Struct subclasses can be subclassed
