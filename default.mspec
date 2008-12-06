@@ -5,6 +5,66 @@ class MSpecScript
   # Define the continuous integration specs (the ones known to pass)
   DIR = File.dirname(__FILE__)
   set :ci_files, [
+#    DIR + '/spec/rubyspec/1.8/language/alias_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/and_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/array_spec.rb',
+#  DIR + '/spec/rubyspec/1.8/language/block_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/break_spec.rb',
+# #     DIR + '/spec/rubyspec/1.8/language/case_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/catch_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/class_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/constants_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/def_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/defined_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/else_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/ensure_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/execution_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/file_spec.rb',
+#    DIR + '/spec/rubyspec/1.8/language/for_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/hash_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/if_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/line_spec.rb',
+    DIR + '/spec/rubyspec/1.8/language/loop_spec.rb',
+    # TODO: metaclass_spec blows up in C
+#   DIR + '/spec/rubyspec/1.8/language/metaclass_spec.rb',
+
+#    DIR + '/spec/rubyspec/1.8/language/method_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/module_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/next_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/not_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/numbers_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/or_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/order_spec.rb',
+#     # TODO: precedence_spec blows up big time
+# #     DIR + '/spec/rubyspec/1.8/language/precedence_spec.rb',
+#     # TODO: predefined cant find stringio
+# #  DIR + '/spec/rubyspec/1.8/language/predefined_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/private_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/raise_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/redo_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/regexp_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/rescue_spec.rb',
+# #    DIR + '/spec/rubyspec/1.8/language/retry_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/return_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/string_spec.rb',
+# #     DIR + '/spec/rubyspec/1.8/language/super_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/symbol_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/throw_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/undef_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/unless_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/until_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/variables_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/while_spec.rb',
+#     DIR + '/spec/rubyspec/1.8/language/yield_spec.rb',
+
+
+
+
+
+
+
+
+
 #    DIR + '/spec/rubyspec/1.8/core/argf',
     DIR + '/spec/rubyspec/1.8/core/array',
     DIR + '/spec/rubyspec/1.8/core/bignum',
