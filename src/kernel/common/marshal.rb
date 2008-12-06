@@ -248,7 +248,7 @@ module Marshal
       when Fixnum, Float
         return
       else
-        puts "=== non-immediate: #{obj.class}"
+#        puts "=== non-immediate: #{obj.class}"
       end
       sz = @links.size
       @objects[sz] = obj
