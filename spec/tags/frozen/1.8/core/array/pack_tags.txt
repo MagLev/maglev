@@ -32,9 +32,25 @@ fails:Array#pack returns the whole argument string plus null char with star para
 fails:Array#pack reuses last array element as often as needed to complete the string
 fails:Array#pack with ('w') converts to BER-compressed integer
 fails:Array#pack with ('w') raises an ArgumentError if the count is greater than the number of remaining array elements
+
+
+
+
+
+
+
+
 fails:Array#pack raises a TypeError if value is string with ('C')
 fails:Array#pack raises a TypeError if value is string with ('c')
 fails:Array#pack coerces numerical values correctly with ('i')
 fails:Array#pack encodes a long in network-order with ('N4')
 fails:Array#pack calls to_int on non-integer values before packing
 fails:Array#pack raises TypeError on nil and non-numeric arguments
+fails:Array#pack raises a TypeError if array item is not String with ('A<count>')
+fails:Array#pack "raises a TypeError if array item is not String with ('a<count>')
+fails:Array#pack raises a TypeError if corresponding array item is not String with ('B')
+fails:Array#pack 
+fails:Array#pack 
+fails:Array#pack 
+
+

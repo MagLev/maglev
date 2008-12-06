@@ -1,0 +1,6 @@
+fails:File.join handles leading parts edge cases
+fails:File.join handles trailing parts edge cases
+fails:File.join handles middle parts edge cases
+fails:File.join handles recursive arrays
+fails:File.join raises a TypeError exception when args are nil
+fails:File.join calls #to_str

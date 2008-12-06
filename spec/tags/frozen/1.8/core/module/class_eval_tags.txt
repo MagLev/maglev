@@ -1,0 +1,4 @@
+fails:Module#class_eval defines constants in the receiver's scope
+fails:Module#class_eval uses the optional filename and lineno parameters for error messages
+fails:Module#class_eval raises an ArgumentError when more than 3 arguments are given
+fails:Module#class_eval raises an ArgumentError when a block and normal arguments are given

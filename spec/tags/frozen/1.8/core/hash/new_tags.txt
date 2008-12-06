@@ -1,0 +1,2 @@
+fails:Hash.new raises an ArgumentError if more than one argument is passed
+fails:Hash.new raises an ArgumentError if passed both default argument and default block

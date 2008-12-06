@@ -1,0 +1,2 @@
+fails:Hash#update checks whether the passed argument responds to #to_hash
+fails:Hash#update processes entries with same order as merge()

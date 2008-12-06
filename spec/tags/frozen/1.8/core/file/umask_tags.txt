@@ -1,0 +1,3 @@
+fails:File.umask invokes to_int on non-integer argument
+fails:File.umask always succeeds with any integer values
+fails:File.umask raises ArgumentError when more than one argument is provided

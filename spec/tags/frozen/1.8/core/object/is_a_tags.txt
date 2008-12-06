@@ -1,0 +1,4 @@
+fails:Object#is_a? returns true if given a Module that is included in object's class
+fails:Object#is_a? returns true if given a Module that is included one of object's ancestors only
+fails:Object#is_a? returns true if given a Module that object has been extended with
+fails:Object#is_a? returns false if given a Module not included in object's class nor ancestors
