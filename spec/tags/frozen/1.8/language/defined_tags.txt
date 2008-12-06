@@ -1,0 +1,19 @@
+fails:The defined? keyword returns 'method' when defined?(exit) is sent
+fails:The defined? keyword returns 'method' when defined?(Kernel.puts) is sent (attribute)
+fails:The defined? keyword returns nil when defined?(DoesNotExist.puts) is sent
+fails:The defined? keyword returns nil when defined?(Kernel.does_not_exist) is sent
+fails:The defined? keyword returns 'assignment' when defined?(x = 2) is sent
+fails:The defined? keyword returns 'local-variable' when x = 1; defined?(x) is sent
+fails:The defined? keyword returns 'constant' when defined?(Object) is sent
+fails:The defined? keyword returns 'class variable' when @@x = 1; defined?(@@x) is sent
+fails:The defined? keyword returns 'instance-variable' when @x = 1; defined?(@x) is sent
+fails:The defined? keyword returns 'self' when defined?(self) is sent
+fails:The defined? keyword returns 'nil' when defined?(nil) is sent
+fails:The defined? keyword returns 'true' when defined?(true) is sent
+fails:The defined? keyword returns 'false' when defined?(false) is sent
+fails:The defined? keyword returns nil when defined?(no_such_local) is sent
+fails:The defined? keyword returns 'constant' when defined?(LanguageDefinedSpecs::SomeConst) is sent
+fails:The defined? keyword returns 'constant' when evaluating self::FOO in module AAA
+fails:The defined? keyword returns 'constant' when defined?(File) is sent
+fails:The defined? keyword returns 'constant' when defined?(File::SEPARATOR) is sent
+fails:The defined? keyword returns 'method' when defined?(Object.nil?) is sent
