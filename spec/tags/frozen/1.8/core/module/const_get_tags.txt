@@ -1,0 +1,3 @@
+fails:Module#const_get returns the named constant in any included module in receiver's ancestry
+fails:Module#const_get tries to convert any non-String/Symbol 'name' with #to_str
+fails:Module#const_get raises a TypeError when the given object does not respond to or fails #to_str

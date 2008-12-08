@@ -1,0 +1,1 @@
+fails:Enumerable#partition throws LocalJumpError if called without a block

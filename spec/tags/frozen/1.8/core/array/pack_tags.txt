@@ -1,0 +1,56 @@
+fails:Array#pack raises an ArgumentError with ('%')
+fails:Array#pack raises an ArgumentError on empty array
+fails:Array#pack uses zeros if count is not multiple of 8 with ('B')
+fails:Array#pack returns zero-char for each 2 of count that greater than string length with ('B')
+fails:Array#pack returns extra zero char if count is odd and greater than string length with ('B')
+fails:Array#pack starts new char if string is ended before char's 8 bits with ('B')
+fails:Array#pack uses zeros if count is not multiple of 8 with ('b')
+fails:Array#pack returns zero-char for each 2 of count that greater than string length with ('b')
+fails:Array#pack returns extra zero char if count is odd and greater than string length with ('b')
+fails:Array#pack starts new char if argument string is ended before char's 8 bits with ('b')
+fails:Array#pack raises an ArgumentError if count is greater than array elements left with ('C')
+fails:Array#pack raises an ArgumentError if count is greater than array elements left with ('c')
+fails:Array#pack encodes a positive integer with ('i')
+fails:Array#pack correctly handles additional prefix and suffix codes with an asterix ('i*')
+fails:Array#pack raises a RangeError when the negative integer is too big with ('s')
+fails:Array#pack raises a RangeError when the positive integer is too big with ('i')
+fails:Array#pack raises a RangeError when the negative integer is too big with ('l')
+fails:Array#pack raises a RangeError when the positive integer is too big with ('l')
+fails:Array#pack raises a RangeError when the positive integer is too big with ('s')
+fails:Array#pack encodes a positive integer with ('l')
+fails:Array#pack appends soft line break after each 72 chars + 1 encoded char in encoded string with ('M')
+fails:Array#pack calls to_s on object to convert to string with ('M')
+fails:Array#pack properly handles recursive arrays with ('M')
+fails:Array#pack appends newline after each 60 chars in result string with ('m')
+fails:Array#pack encodes a positive integer with ('s')
+fails:Array#pack converts integers into UTF-8 encoded byte sequences with ('U')
+fails:Array#pack converts big integers into UTF-8 encoded byte sequences with ('U')
+fails:Array#pack encodes 6-bit char with another char starting from char 32 with ('u')
+fails:Array#pack replaces spaces in encoded string with grave accent (`) char with ('u')
+fails:Array#pack returns null padded string with ('Z')
+fails:Array#pack returns the whole argument string plus null char with star parameter with ('Z')
+fails:Array#pack reuses last array element as often as needed to complete the string
+fails:Array#pack with ('w') converts to BER-compressed integer
+fails:Array#pack with ('w') raises an ArgumentError if the count is greater than the number of remaining array elements
+
+
+
+
+
+
+
+
+fails:Array#pack raises a TypeError if value is string with ('C')
+fails:Array#pack raises a TypeError if value is string with ('c')
+fails:Array#pack coerces numerical values correctly with ('i')
+fails:Array#pack encodes a long in network-order with ('N4')
+fails:Array#pack calls to_int on non-integer values before packing
+fails:Array#pack raises TypeError on nil and non-numeric arguments
+fails:Array#pack raises a TypeError if array item is not String with ('A<count>')
+fails:Array#pack "raises a TypeError if array item is not String with ('a<count>')
+fails:Array#pack raises a TypeError if corresponding array item is not String with ('B')
+fails:Array#pack 
+fails:Array#pack 
+fails:Array#pack 
+
+

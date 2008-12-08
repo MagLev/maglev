@@ -1,0 +1,1 @@
+fails:Hash#delete_if raises a LocalJumpError when called on a non-empty hash without a block

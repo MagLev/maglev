@@ -1,0 +1,22 @@
+fails:Array#* tries to convert the passed argument to a String using #to_str
+fails:Array#* tires to convert the passed argument to an Integer using #to_int
+fails:Array#* checks whether the passed argument responds to #to_str
+fails:Array#* checks whether the passed argument responds to #to_int
+fails:Array#* raises a TypeError if the argument can neither be converted to a string nor an integer
+fails:Array#* converts the passed argument to a String rather than an Integer
+fails:Array#* raises a TypeError is the passed argument is nil
+fails:Array#* raises an ArgumentError when passed 2 or more arguments
+fails:Array#* raises an ArgumentError when passed no arguments
+fails:Array#* with an integer raises an ArgumentError when passed a negative integer
+fails:Array#* with an integer returns subclass instance with Array subclasses
+fails:Array#* with an integer copies the taint status of the original array even if the array is empty
+fails:Array#* with an integer copies the taint status of the original array if the passed count is not 0
+fails:Array#* with a string returns an empty string if the Array is empty
+fails:Array#* with a string returns a string formed by concatenating each element.to_s separated by separator without trailing separator
+fails:Array#* with a string raises a NoMethodError if an element does not respond to #to_s
+fails:Array#* with a string uses the same separator with nested arrays
+fails:Array#* with a string tries to convert the passed seperator to a String using #to_str
+fails:Array#* with a string checks whether the passed seperator responds to #to_str
+fails:Array#* with a string handles recursive arrays
+fails:Array#* with a string does not consider taint of either the array or the separator when the array is empty
+fails:Array#* with a string returns a string which would be infected with taint of the array, its elements or the separator when the array is not empty

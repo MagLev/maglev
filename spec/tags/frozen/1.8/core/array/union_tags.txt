@@ -1,0 +1,3 @@
+fails:Array#| tries to convert the passed argument to an Array using #to_ary
+fails:Array#| checks whether the passed argument responds to #to_ary
+fails:Array#| acts as if using an intermediate hash to collect values

@@ -1,0 +1,4 @@
+fails:Hash#== returns true if other Hash has the same number of keys and each key-value pair matches
+fails:Hash#== compares keys with eql? semantics
+fails:Hash#== does not compare keys with different hash codes via eql?
+fails:Hash#== compares keys with matching hash codes via eql?

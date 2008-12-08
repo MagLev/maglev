@@ -1,0 +1,3 @@
+fails:File.extname returns the extension (the portion of file name in path after the period).(edge cases)
+fails:File.extname returns the extension (the portion of file name in path after the period).
+fails:File.extname raises an ArgumentError if not passed one argument

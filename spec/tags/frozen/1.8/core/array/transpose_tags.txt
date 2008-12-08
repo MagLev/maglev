@@ -1,0 +1,4 @@
+fails:Array#transpose tries to convert the passed argument to an Array using #to_ary
+fails:Array#transpose checks whether the passed argument responds to #to_ary
+fails:Array#transpose raises a TypeError if the passed Argument does not respond to #to_ary
+fails:Array#transpose raises an IndexError if the arrays are not of the same length

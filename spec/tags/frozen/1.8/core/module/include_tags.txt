@@ -1,0 +1,10 @@
+fails:Module#include calls #append_features(self) in reversed order on each module
+fails:Module#include adds all ancestor modules when a previously included module is included again
+fails:Module#include does not raise a TypeError when the argument is an instance of a subclass of Module
+fails:Module#include imports constants to modules and classes
+fails:Module#include imports instance methods to modules and classes
+fails:Module#include imports constants to the toplevel
+fails:Module#include does not import methods to modules and classes
+fails:Module#include detects cyclic includes
+fails:Module#include? returns true if the given module is included by self or one of it's ancestors
+fails:Module#include? raises a TypeError when no module was given

@@ -1,0 +1,1 @@
+fails:Module#const_missing is invoked when an undefined constant is referenced in the scope of self

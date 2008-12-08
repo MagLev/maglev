@@ -1,0 +1,6 @@
+fails:Hash#merge sets any duplicate key to the value of block if passed a block
+fails:Hash#merge checks whether the passed argument responds to #to_hash
+fails:Hash#merge returns subclass instance for subclasses
+fails:Hash#merge processes entries with same order as each()
+fails:Hash#merge! checks whether the passed argument responds to #to_hash
+fails:Hash#merge! processes entries with same order as merge()

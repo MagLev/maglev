@@ -1,0 +1,1 @@
+fails:Range#step passes each nth element to the block

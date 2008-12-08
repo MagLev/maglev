@@ -1,0 +1,2 @@
+fails:Hash#replace checks whether the passed argument responds to #to_hash
+fails:Hash#replace does not transfer default values

@@ -1,0 +1,6 @@
+fails:return in a Thread raises a ThreadError if used to exit a thread
+fails:return when passed a splat returns nil when the ary is empty
+fails:return when passed a splat returns the first element when the array is size of 1
+fails:return when passed a splat returns a non-array when used as a splat
+fails:return when passed a splat calls 'to_a' on the splatted value first
+fails:return when passed a splat calls 'to_ary' on the splatted value first

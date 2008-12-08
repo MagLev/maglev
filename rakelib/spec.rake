@@ -5,45 +5,45 @@
 
 namespace :spec do
 
-  RSPEC_DIR = File.dirname(__FILE__) + '/../spec/rubyspec'
+  SPEC_DIR  = File.dirname(__FILE__) + '/../spec'
+  RSPEC_DIR = "#{SPEC_DIR}/rubyspec/1.8/"
+  MSPEC_CMD = "#{SPEC_DIR}/mspec/bin/mspec"
+  DEBUG     = "-T -d"   # flags to mspec to pass -d onto maglev
 
   desc "Run the continuous integration specs against MRI"
   task :mri do
-    sh "spec/mspec/bin/mspec -t ruby #{RSPEC_DIR}"
+    sh "#{MSPEC_CMD} -t ruby #{RSPEC_DIR}"
   end
 
   desc "Run the continuous integration specs (was passingpsecs) on MagLev"
   task :ci do
-    sh "spec/mspec/bin/mspec #{RSPEC_DIR}"
+    sh "#{MSPEC_CMD} ci"
   end
 
   desc "Run the continuous integration specs on MagLev with debug"
   task :debugci do
-    sh "spec/mspec/bin/mspec -T -d #{RSPEC_DIR}"
+    sh "#{MSPEC_CMD} ci #{DEBUG}"
+  end
+
+  desc "Run an mspec file: spec=<dir_or_file_name>"
+  task :run do
+    check_spec_file
+    sh "#{MSPEC_CMD} #{ENV['spec']}"
+  end
+
+  desc "Debug an mspec file: spec=<dir_or_file_name>"
+  task :debug do
+    check_spec_file
+    sh "#{MSPEC_CMD} #{DEBUG} #{ENV['spec']}"
+  end
+
+  desc "Run all passing specs (should be same as :ci, but isn't..."
+  task :passing do
+    sh "#{MSPEC_CMD} -G fails #{RSPEC_DIR}/core/array"
   end
 end
 
 namespace :oldspec do
-  desc "Run an mspec file: spec=<dir_or_file_name>"
-  task :run do
-    check_spec_file
-    s = ENV['spec']
-    if File.directory?(s)
-      Dir.entries(s).grep(/_spec\.rb/).each do |f|
-        full_path = File.join(s,f)
-        run_topaz tc_mspec(full_path)
-      end
-    else
-      run_topaz tc_mspec(s)
-    end
-  end
-
-  desc "Run the spec specified as spec=... in topaz debug mode."
-  task :debug do
-    check_spec_file
-    debug_topaz tc_mspec(ENV['spec'], true)
-  end
-
   desc "Run the passing specs as defined in ../gss64bit_30/tests/rubytst/passingspecs.conf)"
   task :passing do
     run_topaz tc_run_passing_specs

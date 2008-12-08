@@ -1,0 +1,1 @@
+fails:Integer#times raises a LocalJumpError when no block given
