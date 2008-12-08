@@ -1,0 +1,23 @@
+=== <tt>maglev</tt>:  Control the MagLev system
+  Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|
+                 topaz-debug|squeak|preload|force-reload|version|help}
+
+  To control the MagLev server:
+  maglev start          - Start MagLev server processes
+  maglev start-debug    - Start MagLev server processes with verbose output
+  maglev start-parser   - Force parser process to start if it's dead
+  maglev stop           - Stop MagLev server processes
+  maglev restart        - Restart MagLev server processes
+  maglev status         - Display MagLev server status
+  maglev version        - Display MagLev version number
+  maglev preload <file> - Load and commit a file into an already running system
+  maglev force-reload   - Stop MagLev server, replace with empty repository!!!
+
+  To execute other maglev commands:
+  maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
+  maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
+  maglev topaz          - Enter a Topaz shell
+  maglev topaz-debug    - Enter a Topaz shell useful for debugging
+  maglev squeak         - Start optional Squeak development environment
+  maglev vsd            - Start Visual Statistics Display monitoring tool
+  maglev help           - Display this text
