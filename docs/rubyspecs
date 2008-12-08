@@ -15,14 +15,73 @@ There are three rake tasks that help with the specs:
 
 === Run mspecs manually
 
-Assuming <tt>maglev-ruby</tt> is on your +PATH+, you can specs like this:
+Assuming <tt>maglev-ruby</tt> is on your +PATH+, you can run specs like
+this:
 
     $ cd $MAGLEV_HOME
-    $ spec/bin/mspec -t maglev-ruby spec/rubyspec/1.8/core/nil
+    $ spec/mspec/bin/mspec -t maglev-ruby spec/rubyspec/1.8/core/nil
 
 To run with debug mode on (so that you end up in the topaz prompt on an
 error):
 
     $ cd $MAGLEV_HOME
-    $ spec/bin/mspec -t maglev-ruby -T -d spec/rubyspec/1.8/core/nil
+    $ spec/mspec/bin/mspec -t maglev-ruby -T -d spec/rubyspec/1.8/core/nil
+
+=== Tag Failing Specs
+
+Mspec allows you to place arbitrary tags on expectations.  The tags are
+kept in a separate directory hierarchy outside of the rubyspec dir.  For
+the MagLev development environment, the hierarchy is kept in
+<tt>spec/tags/frozen</tt>, and is checked into Git.  The tag files are
+named according to the <tt>:tags_patterns</tt> configuration parameter in
+<tt>default.mspec</tt> at the top level git directory:
+
+    # The set of substitutions to transform a spec filename into a tag
+    # filename.  The transformations are applied, in the given sequence, to
+    # a filename, yielding a tag file name.
+    set :tags_patterns, [
+      [%r(spec/rubyspec/), 'spec/frozen/'],
+      [%r(spec/), 'spec/tags/'],
+      [/_spec.rb$/, '_tags.txt']
+    ]
+
+The MagLev scheme puts the tags for a given spec into a parallel directory
+hierarchy under <tt>spec/tags/frozen</tt>.  So, the tags for
+<tt>spec/rubyspec/1.8/core/array/at_spec.rb</tt> are in
+<tt>spec/tags/frozen/1.8/core/array/at_tags.txt</tt>.
+
+The mspec-tag command will run tests and then tag them based on the results
+of running the tests.
+
+* default action:  add a tag   What action to take when triggered
+* default tag:     "fails"     The default tag to work on
+* default outcome: :fail       The spec outcome that triggers the tag action
+
+Together, the above defaults say "when the test outcome is :fail, then add
+a tag named "fails" for that expectation.
+
+==== Tag Examples
+
+Note: we don't need to specify <tt>-n maglev-ruby</tt> or <tt>-t
+maglev-ruby</tt>, since the <tt>defaults.mspec</tt> file has that configured.
+
+===== Tag all failing specs in array:
+
+To tag failing specs, you can do something like:
+
+    $ spec/mspec/bin/mspec tag spec/rubyspec/1.8/core/array/
+
+But suppose there are already some failures recorded, especially for some
+nasty bugs that prevent mspec from continuing.  Then you can also add
+<tt>-G fails</tt> so that the tagging run won't run specs that are already
+known to fail, i.e., it will add to the known failures in a "safe" manner:
+
+    $ spec/mspec/bin/mspec tag -G fails spec/rubyspec/1.8/core/array/
+
+===== Run specs, ignoring any tagged as fails
+
+The <tt>-G tag</tt> option means: Exclude examples with descriptions tagged
+with <tt>tag</tt>:
+
+    $ spec/mspec/bin/mspec -G fails spec/rubyspec/1.8/core/array/
 
