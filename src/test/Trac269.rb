@@ -1,5 +1,5 @@
 require File.expand_path('simple', File.dirname(__FILE__))
-require 'URI'
+require 'uri'
 
 pattern = /\A(#{URI::REGEXP::PATTERN::HOST})(?::(\d+))?\z/n
 

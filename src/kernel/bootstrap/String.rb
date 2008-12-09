@@ -253,13 +253,13 @@ class String
 
   # each_char appears to be a Rubinius extension
   #  for each character of self, pass a one character String
-  #  containing that character to the block 
+  #  containing that character to the block
   def each_char(&blk)
     n = 0
-    lim = self.size 
+    lim = self.size
     while n < lim
       temp = ' '
-      temp[0] = self[n] 
+      temp[0] = self[n]
       blk.call(temp)
       n = n + 1
     end
@@ -301,7 +301,7 @@ class String
         out << block.call.to_s
       ensure
         block._setRubyVcGlobal(0, saveTilde);
-      end   
+      end
       start = match.end(0) + 1
     end
     if start <= length
@@ -431,20 +431,20 @@ class String
   primitive 'rstrip', 'trimTrailingSeparators'
   primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
 
-  def scan(regex)
-    result = []
-    regex.to_rx.each_match(self) do |m|
-      result << m[0]
-    end
-    result
-  end
+#   def scan(regex)
+#     result = []
+#     regex.to_rx.each_match(self) do |m|
+#       result << m[0]
+#     end
+#     result
+#   end
 
-  def scan(regex, &blk)
-    regex.to_rx.each_match(self) do |m|
-      yield m[0]  # m is a matchdata, m[0] is the matched string
-    end
-    self
-  end
+#   def scan(regex, &blk)
+#     regex.to_rx.each_match(self) do |m|
+#       yield m[0]  # m is a matchdata, m[0] is the matched string
+#     end
+#     self
+#   end
 
   primitive 'size', 'size'
 
