@@ -479,6 +479,69 @@ class File
       status
     end
 
+    # begin gets implementation --------------------------------------------
+
+    def gets(*args)
+      raise ArgumentError, 'expected 0 or 1 arg'
+    end
+
+    def gets(sep)
+      # variant after first gets no bridges
+       res = next_line( sep ) 
+       res._storeRubyVcGlobal(1) # store into caller's $_
+       res
+    end
+
+    def gets
+      # variant after first gets no bridges
+       sep=$/ 
+       res = next_line( sep ) 
+       res._storeRubyVcGlobal(1) # store into caller's $_
+       res
+    end
+
+    # during bootstrap,  send and __send__ get no bridge methods
+    def send(sym)
+      if (sym.equal?(:gets))
+        sep=$/ 
+        res = next_line( sep ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym)
+    end
+
+    def send(sym, arg)
+      if (sym.equal?(:gets))
+        res = next_line( arg ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym, arg)
+    end
+
+    def __send__(sym)
+      if (sym.equal?(:gets))
+        sep=$/ 
+        res = next_line( sep ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym)
+    end
+
+    def __send__(sym, arg)
+      if (sym.equal?(:gets))
+        res = next_line( arg ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym, arg)
+    end
+
+    # end gets --------------------------------------------------
+
+
     # MNI: File#flock
 
     def lchmod(permission)
@@ -578,9 +641,68 @@ class PersistentFile
       _file.write(data)
     end
 
-    def gets(sep=$/ )
-        @block.call.next_line( sep[0] ) #whee
+    # begin gets implementation -------------------------------
+    def gets(*args)
+      raise ArgumentError, 'expected 0 or 1 args'
     end
+
+    def gets
+      # variants after first get no bridge methods
+       sep = $/
+       res = @block.call.next_line( sep[0] ) 
+       res._storeRubyVcGlobal(1) # store into caller's $_
+       res
+    end
+
+    def gets(sep )
+      # variants after first get no bridge methods
+       res = @block.call.next_line( sep[0] ) 
+       res._storeRubyVcGlobal(1) # store into caller's $_
+       res
+    end
+
+    # during bootstrap,  send and __send__ get no bridge methods
+    def send(sym)
+      if (sym.equal?(:gets))
+        sep = $/
+        res = @block.call.next_line( sep[0] ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym)
+    end
+
+    def send(sym, arg)
+      if (sym.equal?(:gets))
+        res = @block.call.next_line( arg[0] ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym, arg)
+    end
+
+    def __send__(sym)
+      if (sym.equal?(:gets))
+        sep = $/
+        res = @block.call.next_line( sep[0] ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym)
+    end
+
+    def __send__(sym, arg)
+      if (sym.equal?(:gets))
+        res = @block.call.next_line( arg[0] ) 
+        res._storeRubyVcGlobal(1) # store into caller's $_
+        return res
+      end
+      super(sym, arg)
+    end
+
+    # end gets implementation -------------------------------
+
+    # TODO , reimplement send, __send__ for gets
 
     def sync
         @block.call.sync
