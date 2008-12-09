@@ -63,5 +63,16 @@ k = Klass.new
 test(k.instance_eval { @secret }, 99, 'instance_eval { @secret }')
 test(k.instance_eval("@secret"), 99, 'instance_eval("@secret")')
 
+def test_eval_with_tilde
+  a = $~
+  o = Klass.new
+  r = o.instance_eval( ' /cd/ =~ "abcded" ' )
+  unless r == 2 ; raise 'Err' end;
+  b = $~
+  unless a == nil ; raise 'Err' end;
+  unless b.class.equal?(MatchData); raise 'Err' end;
+end
+test_eval_with_tilde()
 
 report
+true

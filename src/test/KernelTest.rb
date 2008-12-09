@@ -43,5 +43,17 @@ test(Array(nil),          [], 'Array(nil)')
 # Tests for eval
 test(eval('1 + 1'), 2, 'eval "1 + 1"')
 
+def testEval
+  a = $~
+  r = eval( " /cd/ =~ 'aabcde' ")
+  b = $~ 
+  unless a == nil ; raise 'Err'; end
+  unless b.class.equal?(MatchData) ; raise 'Err'; end
+  unless r == 3 ; raise 'Err'; end
+  true
+end
+
+test( testEval() , true, "eval with tilde")
+
 report
 true
