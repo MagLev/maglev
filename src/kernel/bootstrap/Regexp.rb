@@ -6,10 +6,10 @@ class Regexp
   MULTILINE  = 4
 
   # Regexp characters that need quoting
-  META_CHARS = "\n\r\f\t " << '[]{}()|-*.\\?+^$#' 
+  META_CHARS = "\n\r\f\t " << '[]{}()|-*.\\?+^$#'
   META_CHARS.freeze
   META_REPL_CHARS = 'nrft '
-  META_REPL_CHARS.freeze 
+  META_REPL_CHARS.freeze
 
   class_primitive_nobridge 'new', 'new:options:lang:'
   class_primitive_nobridge 'new', 'new:options:'
@@ -104,14 +104,14 @@ class Regexp
 
     # during bootstrap,  send and __send__ get no bridge methods
   def send(sym, str)
-    if sym.equal?( :=~ ) 
+    if sym.equal?( :=~ )
       m = _search(str, 0, nil)
       m._storeRubyVcGlobal(0) # store into caller's $~
       if (m)
         return m.begin(0)
       end
       m
-    elif sym.equal?(:match)
+    elsif sym.equal?(:match)
       return nil unless str && str.length > 0
       m = _search(str, 0, nil)
       m._storeRubyVcGlobal(0) # store into caller's $~
@@ -122,14 +122,14 @@ class Regexp
   end
 
   def __send__(sym, str)
-    if sym.equal?( :=~ ) 
+    if sym.equal?( :=~ )
       m = _search(str, 0, nil)
       m._storeRubyVcGlobal(0) # store into caller's $~
       if (m)
         return m.begin(0)
       end
       m
-    elif sym.equal?(:match)
+    elsif sym.equal?(:match)
       return nil unless str && str.length > 0
       m = _search(str, 0, nil)
       m._storeRubyVcGlobal(0) # store into caller's $~
@@ -139,8 +139,8 @@ class Regexp
     end
   end
 
-  # DO NOT #  def ~(aRegexp) ; end 
-  # no definition for  ~  because  uses of   ~ aRegexp  
+  # DO NOT #  def ~(aRegexp) ; end
+  # no definition for  ~  because  uses of   ~ aRegexp
   # are  transformed to  aRegexp =~ $_   by the parser .
 
   def each_match(str, &block)
@@ -193,7 +193,7 @@ class Regexp
     while i < lim
       ch = str[i]
       m_idx = META_CHARS._indexOfByte(ch, 1)
-      if (m_idx > 0) 
+      if (m_idx > 0)
         if (ch <= 0x20)   # handle \n \r \f \t and " "
           escaped_ch = "\\."
           escaped_ch[1] = META_REPL_CHARS[m_idx - 1]
@@ -202,8 +202,8 @@ class Regexp
           escaped_ch[1] = ch
         end
         quoted << escaped_ch
-      else 
-        quoted << ch 
+      else
+        quoted << ch
       end
       i += 1
     end
@@ -215,7 +215,7 @@ class Regexp
   end
 
   def _index_string(string, offset)
-    # used by String index 
+    # used by String index
     md = self.match(string)
     return nil if md.equal?(nil)
     md.begin(0) + offset
@@ -244,7 +244,7 @@ class Regexp
     result
   end
 
-  # The AST productions for :nth_ref , :back_ref 
+  # The AST productions for :nth_ref , :back_ref
   #   produce a direct reference to $~  in the sending method.
   # Sends of last_match, =~ , ~  get an implicit ref to $~ in the AST
   #   that triggers a non-deletable method temp definition in the IR
