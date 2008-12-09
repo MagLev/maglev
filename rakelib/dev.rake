@@ -1,21 +1,8 @@
 # Rake tasks for MagLev core developers.
 #
 # These tasks depend on the conventions used by the GemStone MagLev
-# engineering team.  The following assumptions are made:
-#
-#  ENV['MAGLEV_HOME'] is the path to the top level development directory.
-#  Everything is done here.  Typical value is ~/MagLev/maglev-git.
-#
-#  ENV['PREVIOUS'], ENV['CURRENT'] are the directories holding the previous
-#  and current maglev product-nnn.tgz and *.mcz files.  These variables are
-#  only used for the "dev:previous" and "dev:current" targets to find the
-#  tgz and mcz files to create the maglev product from.
-#
-# TODO: Should we bother adding checks for a running instance of GemStone
-#       on all the tasks that need it, or only the ones that really need
-#       it?  E.g., reloadprims will fail in an obvious way if gs not
-#       running, so why bother slowing down the dev cycle with a check for
-#       a running instance?
+# engineering team.
+
 namespace :dev do
   require 'rakelib/dev.rb'
 
@@ -39,26 +26,26 @@ namespace :dev do
 
   desc "Make sure the gemstone server is stopped."
   task :ensure_stopped do
-    # We can't depend on the gs:stop task, as that depends on there being a
-    # gemstone/ directory, but it might not exist yet.  But if there *is* a
-    # gemstone dir, then we may as well ensure there is no instance
-    # running.
+    # We can't depend on the maglev:stop task, as that depends on there
+    # being a gemstone/ directory, but it might not exist yet.  But if
+    # there *is* a gemstone dir, then we may as well ensure there is no
+    # instance running.
     if File.directory?(GEMSTONE)
       puts "=== Stopping the GemStone Server"
-      Rake::Task['gs:stop'].invoke
+      Rake::Task['maglev:stop'].invoke
     else
       puts "=== No GemStone Server running"
     end
   end
 
   desc "Reload kernel.rb (primitives) and commit it"
-  task :reloadprims => ['gs:start'] do
+  task :reloadprims => ['maglev:start'] do
     puts "=== reload primitives"
     run_topaz tc_reload_prims
   end
 
   desc "Load the mcz file ../latest.mcz and commit it."
-  task :loadmcz => ['gs:start'] do
+  task :loadmcz => ['maglev:start'] do
     puts "=== Load .mcz file: #{`ls -l ../latest.mcz`}"
     run_topaz tc_load_mcz
   end

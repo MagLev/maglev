@@ -1,51 +1,111 @@
+
+To get the HTML version of this and other documentation:
+
+  $ rake rdoc
+  $ open html/index.html
+
+== Prerequisites
+
+=== MRI Ruby and required gems
+
+You will need the following MRI Ruby resources on your machine:
+
+1. MRI Ruby 1.8.6
+2. Ruby Gems
+3. ParseTree gem version 2.2.0 (version 3.x will not work).
+4. Rake
+
+=== Install MagLev
+
+This README assumes you've installed MagLev by running the appropriate
+<tt>installMaglev-<system>.sh</tt> or <tt>upgradeMaglev-<system>.sh</tt>,
+and have set your <tt>MAGLEV_HOME</tt> and <tt>PATH</tt> variables
+appropriately:
+
+  export MAGLEV_HOME=<path_to_the_directory_containing_this_README>
+  export PATH=$MAGLEV_HOME/bin:$PATH
+
 == Quick Start
+=== Check status of MagLev server
 
-You run MagLev using the +maglev+ script in the <tt>$MAGLEV_HOME/bin</tt>
-directory.  For best results, set +MAGLEV_HOME+, and add
-<tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>.  You must run <tt>maglev
-start</tt> before running commands that execute ruby code.
+Ensure the MagLev repository server is running.  To check if a server is
+running, run <tt>rake status</tt>, or simply, <tt>rake</tt>:
 
-The two scripts <tt>maglev-irb</tt> and <tt>maglev-ruby</tt> are provded
-for convenience, but at this time, they simply duplicate the function of
-<tt>maglev irb</tt> and <tt>maglev ruby</tt> and allow several options.
+  $ cd $MAGLEV_HOME
+  $ rake status
+  (in /Users/pmclain/projects/MagLev-20645.MacOSX)
+  GemStone server not running.
+  MagLev Parse Server is not running on port 2002
 
-=== <tt>maglev-irb</tt>: Open an interactive maglev shell
-  Usage: maglev-irb [options]
-  OPTIONS:
-     -d      Run in debugging mode
-     -h      Show help message
-     -v      Print version number
+If a server is running, you'll see output like:
+
+  $ rake
+  (in /Users/pmclain/projects/MagLev-20645.MacOSX)
+
+  MAGLEV_HOME = /Users/pmclain/projects/MagLev-20645.MacOSX
+  Status  Version    Owner    Pid   Port   Started     Type  Name
+  ------ --------- --------- ----- ----- ------------ ------ ----
+    OK   3.0.0     pmclain   38889 50377 Dec 08 13:21 Netldi gs64ldi
+    OK   3.0.0     pmclain   38892 60165 Dec 08 13:21 Stone  gs64stone
+    OK   3.0.0     pmclain   38893 60157 Dec 08 13:21 cache  gs64stone@cairo.gemstone.com
+
+  MagLev Parse Server port = 2002
+  COMMAND   PID    USER   FD   TYPE    DEVICE SIZE/OFF NODE NAME
+  ruby    38918 pmclain    3u  IPv6 0x3c524bc      0t0  TCP *:2002 (LISTEN)
+  ruby    38918 pmclain    4u  IPv4 0x6d63e64      0t0  TCP *:2002 (LISTEN)
+
+
+=== Start the MagLev server
+
+If a server is not running, then start one with rake:
+
+     $ cd $MAGLEV_HOME
+     $ rake maglev:start
 
 === <tt>maglev-ruby</tt>: Execute a Ruby file
-  Usage: maglev-ruby [options] <filename>
-  OPTIONS:
-     -d      Run in debugging mode
-     -h      Show help message
-     -v      Print version number
 
-=== <tt>maglev</tt>:  Control the MagLev system
-  Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|
-                 topaz-debug|squeak|preload|force-reload|version|help}
+You should now be able to run a simple ruby script:
 
-  To control the MagLev server:
-  maglev start          - Start MagLev server processes
-  maglev start-debug    - Start MagLev server processes with verbose output
-  maglev start-parser   - Force parser process to start if it's dead
-  maglev stop           - Stop MagLev server processes
-  maglev restart        - Restart MagLev server processes
-  maglev status         - Display MagLev server status
-  maglev version        - Display MagLev version number
-  maglev preload <file> - Load and commit a file into an already running system
-  maglev force-reload   - Stop MagLev server, replace with empty repository!!!
+  $ cat > hello.rb
+  puts "Hello from MagLev"^D
+  $ maglev-ruby hello.rb
+  topaz 1> Hello
+  nil
+  topaz 1>
+  $
 
-  To execute other maglev commands:
-  maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
-  maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
-  maglev topaz          - Enter a Topaz shell
-  maglev topaz-debug    - Enter a Topaz shell useful for debugging
-  maglev squeak         - Start optional Squeak development environment
-  maglev vsd            - Start Visual Statistics Display monitoring tool
-  maglev help           - Display this text
+Note: The first time (and only the first time) MagLev is run after an
+install, there is a short pause while the system loads the files in
+<tt>src/kernel/*</tt>.
+
+=== <tt>maglev-irb</tt>: Open an interactive maglev shell
+
+MagLev provides an IRB-like utility, <tt>$MAGLEV_HOME/bin/maglev-irb</tt>.
+It provides a minimal interactive environment with some limitations:
+
+  $ maglev-irb
+  >> 1 + 1
+  => 2
+  *> puts "Hi"
+  Hi
+  => nil
+  *> ^D
+  $
+
+
+See {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html] for details.
+
+
+=== Next Steps
+
+The following documentation explains more:
+
+Admin[link:files/docs/maglev-server.html]::  How to start and stop the MagLev server.
+Debug[link:files/docs/debugging.html]::      How to run MagLev in debug mode
+Source[link:files/docs/source.html]::        Guide to the source code layout
+Specs[link:files/docs/rubyspecs.html]::      Running +mspec+ and +rubyspecs+ with MagLev
+{<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility.
+
 
 === Note:
 * set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add
@@ -53,7 +113,7 @@ for convenience, but at this time, they simply duplicate the function of
   <tt>maglev ruby</tt> etc from anywhere.
 * if you have multiple installations, set <tt>PARSETREE_PORT</tt> to
   control which port the parser server listens on
-* the first (and ony the first) time you run a maglev command that runs
+* the first (and only the first) time you run a maglev command that runs
   Ruby code, it will load and compile its primitives, which takes up to a
   minute to run.
 * <tt>maglev-ruby</tt> prints a topaz banner every time it is

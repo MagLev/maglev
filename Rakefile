@@ -1,21 +1,8 @@
 # MagLev Rakefile
-#
-# Currently, this Rakefile does many, but not all, of the functions in
-# bin/gemstone.  Eventually, it will provide all of the functions in
-# bin/gemstone, and other MagLev tasks as the need arises.
-#
-# Ideas for other tasks:
-#
-# * The rest of the tasks in bin/gemstone (topaz, ruby,...)
-# * clean (remove logs etc.)
-# * follow-parser: do a tail -f on the parser log
-# * git support for typical workflows (see git support in Rubinius Rakefile)
-# * allow command line control of the verbosity of the "sh" calls.
-#
 
 require 'rake/clean'
 require 'rake/rdoctask'
-require 'rakelib/gemstone'
+require 'rakelib/maglev.rb'
 
 verbose false  # turn off rake's chatter about all the sh commands
 
@@ -26,7 +13,7 @@ Rake::RDocTask.new do |rd|
   rd.rdoc_files.include('README*', 'docs/*')
 end
 
-task :default => :'gs:status'
+task :default => :'maglev:status'
 
 # This initializes the environment, and then ensures that there is a
 # gemstone diretory there.  Needed to pull this out, since some of the
