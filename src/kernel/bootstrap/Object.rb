@@ -15,13 +15,14 @@ class Object
     #  example without a block argument
     #    primitive_nobridge '_foo*' , '_foo:a:b:c:d:'
 
-    #  begin special sends
-    #    these are optimized by the code generator to be special bytecodes
-    #
-    #    entries here are so that perform will work.
+
+    #  Begin special sends
+    #    Reimplementation of these selectors is disallowed by the parser
+    #    and they are optimized by code generator to special bytecodes.
+    #    Attempts to reimplement them will cause compile-time errors.
+    #    Entries here are so that perform will work.
     # _isInteger allows integer?  special sends to non-Numeric objects
     primitive_nobridge '_isInteger', '_isInteger'
-    #
     primitive_nobridge '_isFixnum', '_isSmallInteger'
     primitive_nobridge '_isFloat', '_isFloat'
     primitive_nobridge '_isNumber', '_isNumber'
@@ -32,15 +33,24 @@ class Object
     primitive_nobridge '_isString', '_isOneByteString'
     primitive_nobridge '_isRegexp', '_isRegexp'
     primitive_nobridge '_isRange', '_isRange'
-    # end special sends
+    # End special sends
 
     #  following are installed by RubyContext>>installPrimitiveBootstrap
     #    primitive_nobridge 'class', 'class' # installed in Object
     #  end installPrimitiveBootstrap
 
-    #  private method _each: contains on:do: handler for RubyBreakException ,
+    #  Private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
+    #  Attempts to reimplement _each& will fail with a compile error.
     primitive_nobridge '_each&', '_rubyEach:'
+
+    # _storeRubyVcGlobal is used by methods that need to store into
+    #   caller's caller's definition(if any) of $~ or $_  . 
+    #  Receiver is value to be stored.
+    #  An argument of 0 specifies $~ , 1 specifies $_  .
+    primitive_nobridge '_storeRubyVcGlobal' , '_storeRubyVcGlobal:'
+    #  _getRubyVcGlobal returns caller's caller's value of $~ or $_ , or nil 
+    primitive_nobridge '_getRubyVcGlobal' , '_getRubyVcGlobal:'
 
     # End private helper methods
 
@@ -50,7 +60,7 @@ class Object
     primitive 'object_id', 'asOop'
     primitive '__id__' , 'asOop'
 
-    #  not   is now a special selector,
+    #  not   is a special selector,
     #   GsComSelectorLeaf>>selector:  translates #not to bytecode Bc_rubyNOT
     # primitive 'not'
 
@@ -67,8 +77,12 @@ class Object
     primitive_nobridge 'send&', 'rubySend:with:with:with:block:'
     primitive          'send*&' , 'rubySend:withArgs:block:'
 
+    #  'send:*&' , '__send__:*&' special cased in  installBridgeMethodsFor ,
+    #    any other   def send;...  end   gets no bridges  during bootstrap
+    #    to allow reimplementation of  send  for methods updating $~ , $_
+
     #  __send__ defined per MRI, non-overrideable version of send
-    #  TODO: disallow redef in Object after prims loaded
+    #  redefinition of __send__  disallowed by parser after bootstrap finished.
     primitive_nobridge '__send__',  'rubySend:'
     primitive_nobridge '__send__',  'rubySend:with:'
     primitive_nobridge '__send__',  'rubySend:with:with:'
@@ -139,13 +153,17 @@ class Object
         self == obj
     end
 
-    # block_given?  is implemented by the ruby compiler .
+    # block_given?  is implemented by the ruby parser .
     #   do not code any definition of block_given? here .
-    # Attempts to reimplement  block_given?  will fail with a compiler error.
+    # Attempts to reimplement  block_given?  will fail with a compile error.
 
     def initialize(*args)
        self
     end
+
+    # equal?  is implemented by the ruby parser and optimized to
+    #  a special bytecode by the code generator.  
+    # Attempts to reimplement equal? will fail with a compile error.
 
     def eql?(other)
       self == other
@@ -210,17 +228,48 @@ class Object
       self.class.name.to_s
     end
 
-    primitive_nobridge '_instance_eval', 'rubyEvalString:'
+    primitive_nobridge '_instance_eval', 'rubyEvalString:with:'
+ 
+    def instance_eval(*args)
+      # bridge methods would interfere with VcGlobals logic
+      raise ArgumentError, 'wrong number of args'
+    end
+
+    def instance_eval(str)
+      string = Type.coerce_to(str, String, :to_str)
+      vcgl = Array.new(2)
+      vcgl[0] = self._getRubyVcGlobal(0);
+      vcgl[1] = self._getRubyVcGlobal(1);
+      res = _instance_eval(string, vcgl)
+      vcgl[0]._storeRubyVcGlobal(0)
+      vcgl[1]._storeRubyVcGlobal(1)
+      res
+    end
+
+    def instance_eval(str, file=nil)
+      string = Type.coerce_to(str, String, :to_str)
+      vcgl = Array.new(2)
+      vcgl[0] = self._getRubyVcGlobal(0);
+      vcgl[1] = self._getRubyVcGlobal(1);
+      res = _instance_eval(string, vcgl)
+      vcgl[0]._storeRubyVcGlobal(0)
+      vcgl[1]._storeRubyVcGlobal(1)
+      res
+    end
+
     def instance_eval(str, file=nil, line=nil)
       # TODO: Object#instance_eval: handle file and line params
       string = Type.coerce_to(str, String, :to_str)
-      _instance_eval(string)
+      vcgl = Array.new(2)
+      vcgl[0] = self._getRubyVcGlobal(0);
+      vcgl[1] = self._getRubyVcGlobal(1);
+      res = _instance_eval(string, vcgl)
+      vcgl[0]._storeRubyVcGlobal(0)
+      vcgl[1]._storeRubyVcGlobal(1)
+      res
     end
 
-    primitive_nobridge '_instance_eval_block&', 'rubyEval:'
-    def instance_eval(&block)
-      _instance_eval_block(&block)
-    end
+    primitive_nobridge 'instance_eval&', 'rubyEval:'
 
     # Object should NOT have a to_str.  If to_str is implementd by passing
     # to to_s, then by default all objects can convert to a string!  But we
