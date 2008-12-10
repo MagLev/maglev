@@ -50,13 +50,6 @@ namespace :dev do
     run_topaz tc_load_mcz
   end
 
-# For some reason, I can't get both to run under one target...
-#   desc "Run the smoke tests (vm-tests and passing specs)"
-#   task :smoke do
-#     Rake::Task[:'dev:vm-tests'].invoke
-#     Rake::Task[:'dev:specs'].invoke
-#   end
-
   desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
   task :'vm-tests' do
     run_topaz tc_run_vmunit
