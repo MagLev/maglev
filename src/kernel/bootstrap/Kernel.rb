@@ -93,7 +93,7 @@ module Kernel
   end
 
   # def catch(aSymbol, &aBlock); end
-  primitive_nobridge 'catch' , 'catch:do:'
+  primitive_nobridge 'catch&' , 'catch:do:'
 
   primitive_nobridge '_eval', '_eval:with:'
 
