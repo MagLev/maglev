@@ -1,6 +1,6 @@
 == RubySpecs and MagLev
 
-There are git submodules for the +mspec+ framework (<tt>spec/mspec</tt>,
+There are git sub modules for the +mspec+ framework (<tt>spec/mspec</tt>,
 version 1.5.3) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
 2008-12-04).
 
