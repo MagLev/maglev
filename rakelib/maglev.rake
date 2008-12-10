@@ -1,47 +1,35 @@
-# Define tasks to control basic GemStone processes (i.e., tasks useful for
-# any GemStone install, not just MagLev).
+# Rake tasks to control the MagLev server.
 
-# RxINC: Need a task to test if gs is already running., then make topaz
-# depend on it.
-
-# Ideas for Tasks:
-#
-# 1: Stash image: stop gs, copy the data/extent0.*, restart gs.  The idea
-#    here is that I can load up to a known state and then get back to it
-#    when ever.
-#
-# 2: Revert image: stop gs, copy the stashed image, restart gs.  This is
-#    the counterpart to Stash image.
-namespace :gs do
-  desc "Start GemStone server processes, if not already running."
+namespace :maglev do
+  desc "Start MagLev server processes, if not already running."
   task :start => :initialize do
     if server_running?
       puts "Server already running"
     else
-      Rake::Task['gs:startserver'].invoke
+      Rake::Task['maglev:startserver'].invoke
     end
     if parser_running?
       puts "Parser already running"
     else
-      Rake::Task['gs:startparser'].invoke
+      Rake::Task['maglev:startparser'].invoke
     end
   end
 
-  desc "Start the GemStone processes with verbose output."
+  desc "Start the MagLev processes with verbose output."
   task :'start-debug' => [:initialize, :'startserver-debug', :'startparser-debug']
 
-  desc "Stop the GemStone processes."
+  desc "Stop the MagLev processes."
   task :stop => [:stopserver, :stopparser]
 
-  desc "Restart GemStone server processes."
+  desc "Restart MagLev server processes."
   task :restart => [:stopserver, :stopparser, :startserver, :startparser]
 
-  desc "Display GemStone server status."
+  desc "Display MagLev server status."
   task :status do
     status
   end
 
-  desc "Stop GemStone server, overwrite with empty repository!!!"
+  desc "Stop MagLev server, overwrite with empty repository!!!"
   task :'force-reload' => [:stopserver, :stopparser, :destroy, :initialize, :start]
 
   # ======================= core tasks =======================
@@ -70,7 +58,7 @@ namespace :gs do
     if server_running?
       stop_server
     else
-      puts "GemStone Server is not running."
+      puts "MagLev Server is not running."
     end
   end
 

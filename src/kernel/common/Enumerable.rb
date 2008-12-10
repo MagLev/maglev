@@ -45,8 +45,12 @@ module Enumerable
         @value, @sort_id = val, sort_id
       end
 
-      attr_reader :value
-      attr_reader :sort_id
+      def value
+        @value
+      end
+      def sort_id
+        @sort_id
+      end
 
       def <=>(other)
         @sort_id <=> other.sort_id

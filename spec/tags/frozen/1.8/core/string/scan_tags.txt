@@ -1,0 +1,9 @@
+fails:String#scan returns an array containing all matches
+fails:String#scan stores groups as arrays in the returned arrays
+fails:String#scan sets $~ to MatchData of last match and nil when there's none
+fails:String#scan tries to convert pattern to a string via to_str
+fails:String#scan raises a TypeError if pattern isn't a Regexp and can't be converted to a String
+fails:String#scan with pattern and block returns self
+fails:String#scan with pattern and block sets $~ for access from the block
+fails:String#scan with pattern and block restores $~ after leaving the block
+fails:String#scan with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside

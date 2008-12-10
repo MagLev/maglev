@@ -12,9 +12,15 @@ class String
   primitive 'substring1', 'copyFrom:to:'
   primitive '_findStringStartingAt', 'findString:startingAt:'
   class_primitive_nobridge '_withAll', 'withAll:'
+  class_primitive_nobridge '_alloc', '_basicNew'
 
-  def self.new(str="")
+  def self.new(str)
     _withAll str
+  end
+
+  def self.new()
+    # no bridge methods for this variant
+    _alloc
   end
 
   def signal
@@ -117,7 +123,10 @@ class String
   primitive '_atEquals', 'at:equals:'
 
   def chomp(rs=$/)
-    if rs[0].equal?(0xa)
+    # check for nil and '' before doing rs[0] in elsif
+    if rs.equal?(nil) || rs.empty?
+      return self.dup
+    elsif rs[0].equal?(0xa)
       if rs.length.equal?(1)
         # the default record separator
         if self[-1].equal?(0xa)
@@ -142,7 +151,10 @@ class String
   end
 
   def chomp!(rs=$/)
-    if rs[0].equal?(0xa)
+    # check for nil and '' before doing rs[0] in elsif
+    if rs.equal?(nil) || rs.empty?
+      return self.dup
+    elsif rs[0].equal?(0xa)
       if rs.length.equal?(1)
         # the default record separator
         lastCh = self[-1]
@@ -228,25 +240,39 @@ class String
 
   def each(sep=$/, &block)
     tokens = sep._split_string(self, nil)
-    tokens.each { |t| block.call(t) }
-  end
-
-  def each_byte
-    0.upto(size-1) do |idx|
-      yield self[idx]
+    n = 0
+    lim = tokens.size
+    while n < lim
+      block.call( tokens[n] )
+      n = n + 1
     end
   end
 
-  # TODO: what is each_char?
-  def each_char
-    each_byte do |b|
+  def each_byte
+    n = 0
+    lim = self.size
+    while n < lim
+      yield self[n]
+      n = n + 1
+    end
+  end
+
+  # each_char appears to be a Rubinius extension
+  #  for each character of self, pass a one character String
+  #  containing that character to the block
+  def each_char(&blk)
+    n = 0
+    lim = self.size
+    while n < lim
       temp = ' '
-      temp[0] = b
-      yield temp
+      temp[0] = self[n]
+      blk.call(temp)
+      n = n + 1
     end
   end
 
   def each_line(&b)
+    # TODO why different than each  ???
     /(.*)/.all_matches(self).each do |match|
       str = match[1]
       b.call(str)
@@ -275,7 +301,13 @@ class String
     start = 1
     get_pattern(regex, true).each_match(self) do |match|
       out << substring1(start, match.begin(0))
-      out << block.call.to_s
+      saveTilde = block._fetchRubyVcGlobal(0);
+      begin
+        block._setRubyVcGlobal(0, match);
+        out << block.call.to_s
+      ensure
+        block._setRubyVcGlobal(0, saveTilde);
+      end
       start = match.end(0) + 1
     end
     if start <= length
@@ -318,18 +350,27 @@ class String
     !self.index(item).equal?(nil)
   end
 
+  primitive '_indexOfByte', 'indexOfByte:startingAt:'
+
   def index(item, offset=nil)
     if offset.equal?(nil)
-      item._index_string(self, 0)
+      offset = 0
+    elsif offset < 0
+      offset = self.size + offset
+    end
+    if item._isInteger
+      st_idx = self._indexOfByte(item % 256 , offset + 1)
+    elsif item._isString
+      st_idx = self._findStringStartingAt(item, offset + 1)
     else
-      offset = size + offset if offset < 0
-      string = self[offset, self.length - 1 ]
+      # item should be a Regex
       return item._index_string(string, offset)
     end
-  end
-
-  def _index_string(string)
-    string._findStringStartingAt(self, 1) - 1
+    if st_idx.equal?(0)
+      return nil
+    else
+      return st_idx - 1
+    end
   end
 
   primitive '_insertAllAt', 'insertAll:at:'
@@ -396,20 +437,20 @@ class String
   primitive 'rstrip', 'trimTrailingSeparators'
   primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
 
-  def scan(regex)
-    result = []
-    regex.to_rx.each_match(self) do |m|
-      result << m[0]
-    end
-    result
-  end
+#   def scan(regex)
+#     result = []
+#     regex.to_rx.each_match(self) do |m|
+#       result << m[0]
+#     end
+#     result
+#   end
 
-  def scan(regex, &blk)
-    regex.to_rx.each_match(self) do |m|
-      yield m[0]  # m is a matchdata, m[0] is the matched string
-    end
-    self
-  end
+#   def scan(regex, &blk)
+#     regex.to_rx.each_match(self) do |m|
+#       yield m[0]  # m is a matchdata, m[0] is the matched string
+#     end
+#     self
+#   end
 
   primitive 'size', 'size'
 

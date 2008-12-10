@@ -131,14 +131,5 @@ class Integer
         self.chr._split_string(string, limit)
     end
 
-    def _index_string(string, offset)
-        i = 0
-        string.each_byte do |ea|
-            if ea == self % 256
-                return i + offset
-            end
-            i += 1
-        end
-        nil
-    end
+    # deleted _index_string
 end

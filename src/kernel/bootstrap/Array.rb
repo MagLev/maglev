@@ -6,7 +6,6 @@ class Array
   primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
   primitive_nobridge 'insert_all', 'insertAll:at:'
   primitive_nobridge 'remove_first', 'removeFirst'
-  primitive_nobridge 'remove_if_absent', 'remove:ifAbsent:'
   primitive_nobridge 'remove_last', 'removeLast'
 
   primitive 'size=', 'size:'
@@ -343,10 +342,30 @@ class Array
   primitive_nobridge 'concat', '_rubyAddAll:'
   primitive_nobridge 'concat*', '_rubyAddAll:'
 
-  # TODO: need to add a block arg variant to delete
-  def delete(el)
-    remove_if_absent(el, proc{return nil})
-    return el
+  def delete(obj)
+    n = 0
+    lim = self.size
+    while (n < lim)
+      if obj == self[n] 
+        self.delete_at(n)
+        return obj
+      end
+      n = n + 1
+    end
+    return nil
+  end
+
+  def delete(obj, &blk)
+    n = 0
+    lim = self.size
+    while (n < lim)
+      if obj == self[n] 
+        self.delete_at(n)
+        return obj
+      end
+      n = n + 1
+    end
+    return blk.call
   end
 
 
@@ -420,9 +439,47 @@ class Array
     true
   end
 
-  def fetch(index,&b)
-    # TODO: Allen will do, maybe use _rubyAt: primitive variant
-    raise "Method not implemented: Array#fetch"
+  def fetch(index)
+    unless index._isFixnum
+      index = index.to_int
+    end
+    my_siz = self.length
+    if (index < 0)
+      index = my_siz + index
+    end
+    if (index >= my_siz)
+      raise IndexError
+    end
+    self[index]
+  end
+
+  def fetch(index, default)
+    unless index._isFixnum
+      index = index.to_int
+    end
+    my_siz = self.length
+    if (index < 0)
+      index = my_siz + index
+    end
+    if (index >= my_siz)
+      return default
+    end
+    self[index]
+  end
+
+  def fetch(idx, &blk)
+    index = idx
+    unless index._isFixnum
+      index = index.to_int 
+    end
+    my_siz = self.length
+    if (index < 0)
+      index = my_siz + index
+    end
+    if (index >= my_siz)
+      return blk.call(idx) 
+    end 
+    self[index]
   end
 
   #  note multiple variants below

@@ -6,7 +6,10 @@ class Regexp
   MULTILINE  = 4
 
   # Regexp characters that need quoting
-  META_CHARS =  %w![ ] { } ( ) | - * . \\ ? + ^ $ #!
+  META_CHARS = "\n\r\f\t " << '[]{}()|-*.\\?+^$#'
+  META_CHARS.freeze
+  META_REPL_CHARS = 'nrft '
+  META_REPL_CHARS.freeze
 
   class_primitive_nobridge 'new', 'new:options:lang:'
   class_primitive_nobridge 'new', 'new:options:'
@@ -18,11 +21,6 @@ class Regexp
   primitive_nobridge 'options', 'options'
 
   # class_primitive 'alloc', '_basicNew'
-
-  def source
-    # return the original string of the pattern
-    @source
-  end
 
   def self.compile(pattern, options = 0, lang = nil)
     if (pattern._isRegexp)
@@ -65,22 +63,95 @@ class Regexp
     _compile(str, options)
   end
 
+  def match(*args, &blk)
+    # only one-arg call supported. any other invocation
+    # will have a bridge method interposed which would
+    #   cause the _storeRubyVcGlobal to not work.
+    # if variant calls must be supported, need a variant of
+    #   _storeRubyVcGlobal that will go up the stack more than 1 frame
+    raise ArgumentError, 'expected 1 arg'
+  end
+
+  # This method is here to allow Rubinius common code to call into our handling of $~.
+  # the Rubinius code does the following to set $~:  Regexp.last_match  = ....
+  def self.last_match=(m)
+    raise ArgumentError, "Need MatchData, not #{m.class}" unless m.kind_of?(MatchData)
+    m._storeRubyVcGlobal(0) # store into caller's $~
+  end
+
   def match(str)
-    return nil unless str && str.length > 0
-    # search primitive automatically sets $~
-    ret = _search(str, 0, nil)
+    m = _search(str, 0, nil)
+    m._storeRubyVcGlobal(0) # store into caller's $~
+    m
+  end
+
+  def source
+    # return the original string of the pattern
+    @source
+  end
+
+  def =~(*args, &blk)
+    # only one-arg call supported. any other invocation
+    # will have a bridge method interposed which would
+    #   cause the _storeRubyVcGlobal to not work.
+    # if variant calls must be supported, need a variant of
+    #   _storeRubyVcGlobal that will go up the stack more than 1 frame
+    raise ArgumentError, 'expected 1 arg'
   end
 
   def =~(str)
-    m = match(str)
+    # no bridge method for this variant
+    m = _search(str, 0, nil)
+    m._storeRubyVcGlobal(0) # store into caller's $~
     if (m)
       return m.begin(0)
     end
     m
   end
 
-  # TODO: make this private
+    # during bootstrap,  send and __send__ get no bridge methods
+  def send(sym, str)
+    if sym.equal?( :=~ )
+      m = _search(str, 0, nil)
+      m._storeRubyVcGlobal(0) # store into caller's $~
+      if (m)
+        return m.begin(0)
+      end
+      m
+    elsif sym.equal?(:match)
+      return nil unless str && str.length > 0
+      m = _search(str, 0, nil)
+      m._storeRubyVcGlobal(0) # store into caller's $~
+      m
+    else
+      super(sym, str)
+    end
+  end
+
+  def __send__(sym, str)
+    if sym.equal?( :=~ )
+      m = _search(str, 0, nil)
+      m._storeRubyVcGlobal(0) # store into caller's $~
+      if (m)
+        return m.begin(0)
+      end
+      m
+    elsif sym.equal?(:match)
+      return nil unless str && str.length > 0
+      m = _search(str, 0, nil)
+      m._storeRubyVcGlobal(0) # store into caller's $~
+      m
+    else
+      super(sym, str)
+    end
+  end
+
+  # DO NOT #  def ~(aRegexp) ; end
+  # no definition for  ~  because  uses of   ~ aRegexp
+  # are  transformed to  aRegexp =~ $_   by the parser .
+
   def each_match(str, &block)
+    # private, does not update $~
     pos = 0
     while(pos < str.length)
       match = _search(str, pos, nil)
@@ -123,50 +194,35 @@ class Regexp
   def self.escape(str)
     # Modified RUBINIUS code
     quoted = ""
-
     lim = str.size
     i = 0
-    c = ' '          # setup to convert from ints to single char strings
+    ch_str = ' '
     while i < lim
-      c[0] = str[i]  # convert from int to single char string
-      quoted << if META_CHARS.include?(c)
-                  "\\#{c}"
-                elsif c == "\n"
-                  "\\n"
-                elsif c == "\r"
-                  "\\r"
-                elsif c == "\f"
-                  "\\f"
-                elsif c == "\t"
-                  "\\t"
-                elsif c == " "
-                  "\\ "
-                else
-                  c
-                end
+      ch = str[i]
+      m_idx = META_CHARS._indexOfByte(ch, 1)
+      if (m_idx > 0)
+        if (ch <= 0x20)   # handle \n \r \f \t and " "
+          escaped_ch = "\\."
+          escaped_ch[1] = META_REPL_CHARS[m_idx - 1]
+        else
+          escaped_ch = "\\."
+          escaped_ch[1] = ch
+        end
+        quoted << escaped_ch
+      else
+        quoted << ch
+      end
       i += 1
     end
     quoted
-  end
-
-  # TODO: Regexp.quote: alias it when class alias supported
-  #   class << self
-  #     alias_method :quote, :escape
-  #   end
-  def self.quote(str)
-    self.escape str
   end
 
   def to_rx
     self
   end
 
-  IGNORECASE = 1
-  EXTENDED = 2
-  MULTILINE = 4
-
-  # Were in String.rb
   def _index_string(string, offset)
+    # used by String index
     md = self.match(string)
     return nil if md.equal?(nil)
     md.begin(0) + offset
@@ -193,5 +249,34 @@ class Regexp
       end
     end
     result
+  end
+
+  # The AST productions for :nth_ref , :back_ref
+  #   produce a direct reference to $~  in the sending method.
+  # Sends of last_match, =~ , ~  get an implicit ref to $~ in the AST
+  #   that triggers a non-deletable method temp definition in the IR
+
+  def self.last_match(*args)
+    raise ArgumentError , 'expected 0 or 1 arg'
+  end
+
+  def self.last_match
+    # no bridge methods for variants after first
+    m = self._getRubyVcGlobal(0)
+    return m
+  end
+
+  def self.last_match(an_int)
+    # no bridge methods for variants after first
+    m = self._getRubyVcGlobal(0)
+    if m.equal?(nil)
+      return m
+    else
+      return m[an_int]
+    end
+  end
+
+  class << self
+    alias_method :quote, :escape
   end
 end

@@ -23,6 +23,10 @@ class Proc
 
     # Instance methods
 
+    # private primitives for $~ implementation only
+    primitive_nobridge '_fetchRubyVcGlobal', '_rubyVcGlobalAt:'
+    primitive_nobridge '_setRubyVcGlobal', '_rubyVcGlobalAt:put:'
+
     primitive_nobridge '[]' , '_rubyCall'
     primitive_nobridge '[]' , '_rubyCall:'
     primitive_nobridge '[]' , '_rubyCall:with:'

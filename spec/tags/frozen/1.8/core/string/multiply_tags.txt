@@ -1,0 +1,2 @@
+fails:String#* tries to convert the given argument to an integer using to_int
+fails:String#* always taints the result when self is tainted

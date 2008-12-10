@@ -60,7 +60,20 @@ class Dir
     inst.initialize(dirname)
   end
 
-  # MNI: Dir.open
+  def self.open(dirname, &block)
+
+    if block_given?
+      begin
+        d = Dir.new dirname
+        result = yield d
+      ensure
+        d.close unless d.nil?
+      end
+      result
+    else
+      Dir.new dirname
+    end
+  end
 
   def self.pwd
     Errno.handle(getwd, "pwd")

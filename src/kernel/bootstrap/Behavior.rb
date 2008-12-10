@@ -8,7 +8,7 @@ class Behavior
   primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
   primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'
-  primitive_nobridge '_module_eval_string', '_moduleEvalString:'
+  primitive_nobridge '_module_eval_string', '_moduleEvalString:with:'
   primitive_nobridge '_module_eval&', '_moduleEval:'
   # map name to _rubyName so name will work for metaclasses
   primitive 'name' , '_rubyName'
@@ -33,12 +33,24 @@ class Behavior
     end
   end
 
+  def module_eval(*args)
+    # bridge methods would interfere with VcGlobals logic
+    raise ArgumentError, 'expected 1 arg'
+  end
+
   def module_eval(str)
     string = Type.coerce_to(str, String, :to_str)
-    _module_eval_string(string)
+    vcgl = Array.new(2)
+    vcgl[0] = self._getRubyVcGlobal(0);
+    vcgl[1] = self._getRubyVcGlobal(1);
+    res = _module_eval_string(string, vcgl)
+    vcgl[0]._storeRubyVcGlobal(0)
+    vcgl[1]._storeRubyVcGlobal(1)
+    res
   end
 
   def module_eval(&block)
+    # no VcGlobal logic here, the block uses $~ of it's home context
     _module_eval(&block)
   end
 
@@ -64,6 +76,10 @@ class Behavior
 
   def inspect
     name
+  end
+
+  def _isBehavior
+    true
   end
 
   def to_s

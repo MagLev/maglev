@@ -95,7 +95,17 @@ module Kernel
   # def catch(aSymbol, &aBlock); end
   primitive_nobridge 'catch' , 'catch:do:'
 
-  primitive_nobridge 'eval', 'eval:'
+  primitive_nobridge '_eval', '_eval:with:'
+
+  def eval(str)
+    vcgl = Array.new(2)
+    vcgl[0] = self._getRubyVcGlobal(0);
+    vcgl[1] = self._getRubyVcGlobal(1);
+    res = _eval(str, vcgl)
+    vcgl[0]._storeRubyVcGlobal(0)
+    vcgl[1]._storeRubyVcGlobal(1)
+    res
+  end
 
   def exit(arg=1)
     status = '9'
@@ -216,4 +226,11 @@ module Kernel
   # def throw(aSymbol, aValue); end
   primitive_nobridge 'throw' , 'throw:with:'
 
+  # This is a hook into the mspec framework so that the --spec-debug action
+  # can call us.  E.g., to debug a failing spec, do:
+  #
+  #   spec/mspec/bin/mspec -T -d --spec-debug -K fails spec/rubyspec/1.8/core/string/append_spec.rb
+  def debugger
+    nil.pause
+  end
 end

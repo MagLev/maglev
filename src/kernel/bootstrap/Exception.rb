@@ -16,6 +16,15 @@ class Exception
     primitive 'signal', 'signal:'
     primitive 'message', 'description'
 
+    def self._validate(obj)
+      # used in implementation of $! on LHS of assignment
+      if (obj.kind_of?(Exception))
+        return obj
+      else
+        raise ArgumentError, 'not an Exception'
+      end
+    end
+
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop

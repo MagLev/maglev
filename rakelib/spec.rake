@@ -37,9 +37,10 @@ namespace :spec do
     sh "#{MSPEC_CMD} #{DEBUG} #{ENV['spec']}"
   end
 
-  desc "Run all passing specs (should be same as :ci, but isn't..."
-  task :passing do
-    sh "#{MSPEC_CMD} -G fails #{RSPEC_DIR}/core/array"
+  desc "Run the named specs and tag the failing ones"
+  task :tag do
+    check_spec_file
+    sh "#{MSPEC_CMD} tag -G fails #{ENV['spec']}"
   end
 end
 

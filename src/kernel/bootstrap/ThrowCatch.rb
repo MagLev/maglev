@@ -2,12 +2,19 @@ class ThrownValue < Exception
   primitive 'pass', 'pass'
   primitive 'signal', 'signal'
 
-  attr_reader :name, :returnValue
-
   def initialize(symbol, value)
     @name = symbol
     @returnValue = value
   end
+
+  def name
+    @name
+  end
+
+  def returnValue
+    @returnValue
+  end
+
 end
 
 class Object

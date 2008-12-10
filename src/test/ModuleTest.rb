@@ -102,6 +102,17 @@ test(Thing.new.testClassEval, 789, 'class_eval of block')
 
 test(Thing.module_eval { 1 + 1 }, 2, 'module_eval of simple block')
 
+def test_eval_with_tilde
+  a = $~
+  r = Thing.module_eval( ' /de/ =~ "abcded" ' )
+  unless r == 3 ; raise 'Err' end;
+  b = $~
+  unless a == nil ; raise 'Err' end;
+  unless b.class.equal?(MatchData); raise 'Err' end;
+  true
+end
+test( test_eval_with_tilde() , true, 'eval with tilde' )
+
 report
 Gemstone.abortTransaction if defined? RUBY_ENGINE
 true
