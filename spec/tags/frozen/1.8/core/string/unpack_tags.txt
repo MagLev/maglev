@@ -1,0 +1,11 @@
+fails:String#unpack returns an array by decoding self according to the format string
+fails:String#unpack with 'Z' directive returns an array by decoding self according to the format string
+fails:String#unpack with 'N' and 'n' directives returns an array by decoding self according to the format string
+fails:String#unpack with 'Q' and 'q' directives returns an array in little-endian (native format) order by decoding self according to the format string
+fails:String#unpack with 'a', 'X' and 'x' directives returns an array by decoding self according to the format string
+fails:String#unpack with 'B' and 'b' directives returns an array by decoding self according to the format string
+fails:String#unpack with 'U' directive returns an array by decoding self according to the format string
+fails:String#unpack with 'A' directive returns an array by decoding self according to the format string
+fails:String#unpack with '@' directive returns an array by decoding self according to the format string
+fails:String#unpack with 'M' directive returns an array by decoding self according to the format string
+fails:String#unpack with 'm' directive returns an array by decoding self according to the format string

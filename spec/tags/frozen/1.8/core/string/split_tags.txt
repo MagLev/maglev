@@ -1,0 +1,6 @@
+crash:String#split with Regexp taints the resulting strings if self is tainted
+fails:String#split with Regexp taints the resulting strings if self is tainted
+fails:String#split with String tries converting its pattern argument to a string via to_str
+fails:String#split with String tries converting limit to an integer via to_int
+fails:String#split with Regexp includes all captures in the result array
+fails:String#split with Regexp tries converting limit to an integer via to_int

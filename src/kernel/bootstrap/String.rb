@@ -123,7 +123,10 @@ class String
   primitive '_atEquals', 'at:equals:'
 
   def chomp(rs=$/)
-    if rs[0].equal?(0xa)
+    # check for nil and '' before doing rs[0] in elsif
+    if rs.equal?(nil) || rs.empty?
+      return self.dup
+    elsif rs[0].equal?(0xa)
       if rs.length.equal?(1)
         # the default record separator
         if self[-1].equal?(0xa)
@@ -148,7 +151,10 @@ class String
   end
 
   def chomp!(rs=$/)
-    if rs[0].equal?(0xa)
+    # check for nil and '' before doing rs[0] in elsif
+    if rs.equal?(nil) || rs.empty?
+      return self.dup
+    elsif rs[0].equal?(0xa)
       if rs.length.equal?(1)
         # the default record separator
         lastCh = self[-1]
