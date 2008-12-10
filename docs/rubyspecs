@@ -4,6 +4,10 @@ There are git submodules for the +mspec+ framework (<tt>spec/mspec</tt>,
 version 1.5.3) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
 2008-12-04).
 
+Links:
+* +Mspec+[http://rubyspec.org/projects/show/mspec]
+* +RubySpec+[http://rubyspec.org/]
+
 === Run mspecs with +rake+
 
 There are three rake tasks that help with the specs:
@@ -53,9 +57,9 @@ hierarchy under <tt>spec/tags/frozen</tt>.  So, the tags for
 The mspec-tag command will run tests and then tag them based on the results
 of running the tests.
 
-* default action:  add a tag   What action to take when triggered
-* default tag:     "fails"     The default tag to work on
-* default outcome: :fail       The spec outcome that triggers the tag action
+default action::  add a tag   What action to take when triggered
+default tag::     "fails"     The default tag to work on
+default outcome:: <tt>:fail</tt>       The spec outcome that triggers the tag action
 
 Together, the above defaults say "when the test outcome is :fail, then add
 a tag named "fails" for that expectation.
@@ -65,9 +69,10 @@ a tag named "fails" for that expectation.
 Note: we don't need to specify <tt>-n maglev-ruby</tt> or <tt>-t
 maglev-ruby</tt>, since the <tt>defaults.mspec</tt> file has that configured.
 
-===== Tag all failing specs in array:
+===== Tag all failing specs
 
-To tag failing specs, you can do something like:
+To tag failing specs, you can do something like the following, which tags
+all the failing Array specs:
 
     $ spec/mspec/bin/mspec tag spec/rubyspec/1.8/core/array/
 
@@ -85,3 +90,11 @@ with <tt>tag</tt>:
 
     $ spec/mspec/bin/mspec -G fails spec/rubyspec/1.8/core/array/
 
+===== Run specs, untagging fixed expectations
+
+If you've made some code changes to MagLev, and expect some previously
+failing specs to now pass, you can re-run the failing specs and have mspec
+un-tag the ones that now pass:
+
+    # delete the fails tag if the spec now runs
+    $ spec/mspec/bin/mspec tag --del fails spec/ruby/1.8/core/array/append_spec.rb
