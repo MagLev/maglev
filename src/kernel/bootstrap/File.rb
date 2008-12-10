@@ -241,7 +241,7 @@ class File
       end
       File.stat(names[0]).ftype
     end
-  
+
     def self.grpowned?(filename)
       statObj = File._stat(filename, false)
       if (statObj._isFixnum)
@@ -487,15 +487,15 @@ class File
 
     def gets(sep)
       # variant after first gets no bridges
-       res = next_line( sep ) 
+       res = next_line( sep )
        res._storeRubyVcGlobal(1) # store into caller's $_
        res
     end
 
     def gets
       # variant after first gets no bridges
-       sep=$/ 
-       res = next_line( sep ) 
+       sep=$/
+       res = next_line( sep )
        res._storeRubyVcGlobal(1) # store into caller's $_
        res
     end
@@ -503,8 +503,8 @@ class File
     # during bootstrap,  send and __send__ get no bridge methods
     def send(sym)
       if (sym.equal?(:gets))
-        sep=$/ 
-        res = next_line( sep ) 
+        sep=$/
+        res = next_line( sep )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -513,7 +513,7 @@ class File
 
     def send(sym, arg)
       if (sym.equal?(:gets))
-        res = next_line( arg ) 
+        res = next_line( arg )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -522,8 +522,8 @@ class File
 
     def __send__(sym)
       if (sym.equal?(:gets))
-        sep=$/ 
-        res = next_line( sep ) 
+        sep=$/
+        res = next_line( sep )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -532,7 +532,7 @@ class File
 
     def __send__(sym, arg)
       if (sym.equal?(:gets))
-        res = next_line( arg ) 
+        res = next_line( arg )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -596,7 +596,7 @@ class File
     end
 
     def each_line(&block)
-        sep = $/[0]
+        sep = ($/.equal?(nil) ? 10 : $/[0])
         until eof?
             block.call( next_line( sep ) )
         end
@@ -648,15 +648,23 @@ class PersistentFile
 
     def gets
       # variants after first get no bridge methods
-       sep = $/
-       res = @block.call.next_line( sep[0] ) 
-       res._storeRubyVcGlobal(1) # store into caller's $_
-       res
+      res = if $/.equal?(nil)
+              # Read entire file
+              raise NotImplementedError, 'Kernel#gets does not support full file mode'
+            elsif $/.length.equal?(0)
+              # Read by paragraphs
+              raise NotImplementedError, 'Kernel#gets does not support paragraph mode'
+            else
+              # read by lines
+              @block.call.next_line( sep )
+            end
+      res = res._storeRubyVcGlobal(1) # store into caller's $_
+      res
     end
 
     def gets(sep )
       # variants after first get no bridge methods
-       res = @block.call.next_line( sep[0] ) 
+       res = @block.call.next_line( sep[0] )
        res._storeRubyVcGlobal(1) # store into caller's $_
        res
     end
@@ -665,7 +673,7 @@ class PersistentFile
     def send(sym)
       if (sym.equal?(:gets))
         sep = $/
-        res = @block.call.next_line( sep[0] ) 
+        res = @block.call.next_line( sep[0] )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -674,7 +682,7 @@ class PersistentFile
 
     def send(sym, arg)
       if (sym.equal?(:gets))
-        res = @block.call.next_line( arg[0] ) 
+        res = @block.call.next_line( arg[0] )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -684,7 +692,7 @@ class PersistentFile
     def __send__(sym)
       if (sym.equal?(:gets))
         sep = $/
-        res = @block.call.next_line( sep[0] ) 
+        res = @block.call.next_line( sep[0] )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end
@@ -693,7 +701,7 @@ class PersistentFile
 
     def __send__(sym, arg)
       if (sym.equal?(:gets))
-        res = @block.call.next_line( arg[0] ) 
+        res = @block.call.next_line( arg[0] )
         res._storeRubyVcGlobal(1) # store into caller's $_
         return res
       end

@@ -110,10 +110,7 @@ class MSpecScript
 
     DIR + '/spec/rubyspec/1.8/core/regexp',
     DIR + '/spec/rubyspec/1.8/core/signal',
-
-    # TODO: string generates a SIGSEGV (haven't tracked down which one yet...)
-#    DIR + '/spec/rubyspec/1.8/core/string',
-
+    DIR + '/spec/rubyspec/1.8/core/string',
     DIR + '/spec/rubyspec/1.8/core/struct',
     DIR + '/spec/rubyspec/1.8/core/symbol',
     DIR + '/spec/rubyspec/1.8/core/systemexit',
