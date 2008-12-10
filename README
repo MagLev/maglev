@@ -104,6 +104,7 @@ Admin[link:files/docs/maglev-server.html]::  How to start and stop the MagLev se
 Debug[link:files/docs/debugging.html]::      How to run MagLev in debug mode
 Source[link:files/docs/source.html]::        Guide to the source code layout
 Specs[link:files/docs/rubyspecs.html]::      Running +mspec+ and +rubyspecs+ with MagLev
+Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility.
 
 
