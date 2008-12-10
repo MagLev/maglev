@@ -181,7 +181,7 @@ run
 stream := WriteStream on: String new.
 RubyContext load.
 RubyContext requireFileNamed: 'mspec.rb'.
-RubyCompiler new evaluateString: '\$formatter = DottedFormatter.new; \$formatter.register'.
+RubyCompiler new evaluateStringNoTilde: '\$formatter = DottedFormatter.new; \$formatter.register'.
 ('$*' findTokens: Character space) allButFirst do:
     [:ea |
         [
@@ -190,7 +190,7 @@ RubyCompiler new evaluateString: '\$formatter = DottedFormatter.new; \$formatter
             stream nextPutAll: '<failed with error, ', ex asString, ' >'; cr.
         ].
     ].
-RubyCompiler new evaluateString: '\$formatter.finish'.
+RubyCompiler new evaluateStringNoTilde: '\$formatter.finish'.
 stream contents.
 %
 exit
