@@ -78,6 +78,10 @@ class Behavior
     name
   end
 
+  def _isBehavior
+    true
+  end
+
   def to_s
     name
   end

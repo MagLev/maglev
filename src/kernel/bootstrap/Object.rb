@@ -280,18 +280,20 @@ class Object
     #   to_s
     # end
 
-    # BEGIN RUBINIUS
-    def instance_of?(cls)
-      # TODO: Object#instance_of?: Uncomment parameter checks when (A)
-      # Module is installed in the globals dict and class comparison is
-      # working properly.
-#       if cls.class != Class and cls.class != Module
-#         # We can obviously compare against Modules but result is always false
-#         raise TypeError, "instance_of? requires a Class argument"
-#       end
-
-      self.class.equal?(cls)
+    def _isBehavior
+      false
     end
-    # END RUBINIUS
+
+    def instance_of?(cls)
+      # Modified from RUBINIUS
+      if self.class.equal?(cls)
+        true
+      else
+        unless cls._isBehavior 
+          raise TypeError, 'expected a Class or Module'
+        end
+        false
+      end
+    end
 
 end
