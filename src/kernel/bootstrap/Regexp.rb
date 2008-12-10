@@ -72,6 +72,13 @@ class Regexp
     raise ArgumentError, 'expected 1 arg'
   end
 
+  # This method is here to allow Rubinius common code to call into our handling of $~.
+  # the Rubinius code does the following to set $~:  Regexp.last_match  = ....
+  def self.last_match=(m)
+    raise ArgumentError, "Need MatchData, not #{m.class}" unless m.kind_of?(MatchData)
+    m._storeRubyVcGlobal(0) # store into caller's $~
+  end
+
   def match(str)
     m = _search(str, 0, nil)
     m._storeRubyVcGlobal(0) # store into caller's $~

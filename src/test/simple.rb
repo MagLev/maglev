@@ -23,5 +23,5 @@ end
 def register_failure(msg, expected, actual)
   $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
   x = $failed
-  nil.pause # if defined? RUBY_ENGINE # Keep MRI from trying to pause
+  nil.pause if defined? RUBY_ENGINE # Keep MRI from trying to pause
 end

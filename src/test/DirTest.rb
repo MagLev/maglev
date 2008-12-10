@@ -35,4 +35,12 @@ Dir.chdir(test_dir) do
   test(Dir.glob("**/even_deeper"), ['deeper/even_deeper'], 'Dir.glob with **')
 end
 
+
+# Test Dir#each
+d = Dir.open('.')
+results = []
+d.each { |f| results << f }
+test(results.length > 0, true, 'Dir#each')
+
+
 report
