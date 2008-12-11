@@ -33,5 +33,6 @@ will be +irb+, but not yet.
 ==== Misc
 * +ARGF+ is not supported
 * +ObjectSpace+: Not supported
-
+* <tt>Object.equal?</tt> may not be overridden.  For performance reasons,
+  it is a special selector.
 
