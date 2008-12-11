@@ -100,6 +100,7 @@ See {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html] for details.
 
 The following documentation explains more:
 
+Errata[link:files/docs/Errata-alpha.html]::  Errata for the current release.
 Admin[link:files/docs/maglev-server.html]::  How to start and stop the MagLev server.
 Debug[link:files/docs/debugging.html]::      How to run MagLev in debug mode
 Source[link:files/docs/source.html]::        Guide to the source code layout

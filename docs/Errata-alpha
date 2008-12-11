@@ -1,8 +1,4 @@
-== These are notes on the MagLev Alpha release.
-
-=== Running MagLev
-
-Run maglev with <tt>bin/maglev-ruby</tt>. 
+== These are the Errata for the MagLev Alpha release.
 
 === Transaction support
 
@@ -11,26 +7,20 @@ and +beginTransaction+.
 
 === <tt>maglev-irb</tt>
 
-The first rule of <tt>maglev-irb</tt> is that you don't talk about +irb+,
-because <tt>maglev-irb</tt> is not +irb+.  Eventually, <tt>maglev-irb</tt>
-will be +irb+, but not yet.
+* <tt>maglev-irb</tt> is not +irb+.  Eventually, <tt>maglev-irb</tt> will
+  be +irb+, but not yet.
 
-<tt>maglev-irb</tt> has a few commands to help using it:
-* +STOP+ (recover from parse error)
-* transaction control commands: +BEGIN+, +ABORT+, +COMMIT+
-
-=== Errata
-==== Kernel
+=== Kernel
 * <tt>Kernel#autoload</tt> is a stub.  It does an immediate require of the
-  file. 
+  file.
 * <tt>Kernel#autoload?</tt> is a stub.  It always returns nil.
 * <tt>Kernel#require</tt>: Tilde expansion is done only on <tt>~/...</tt>,
   not on <tt>~user/...</tt>, <tt>$"</tt> is not updated
 
-==== Threads
+=== Threads
 * <tt>ThreadGroup</tt> is a stub.
 
-==== Misc
+=== Misc
 * +ARGF+ is not supported
 * +ObjectSpace+: Not supported
 * <tt>Object.equal?</tt> may not be overridden.  For performance reasons,
