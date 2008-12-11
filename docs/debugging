@@ -11,7 +11,7 @@ to log into topaz and setup the MagLev ruby environment.
 You can get a topaz prompt via rake:
 
   $ cd $GEMSTONE_HOME
-  $ rake gs:topaz
+  $ rake maglev:topaz
   (in /Users/pmclain/maglev)
   topaz 1>
 
@@ -59,7 +59,7 @@ Topaz also has on line help:
 ==== Summary of Topaz commands
 
 ===== Start, Stop, and misc commands
-<tt>rake gs:topaz</tt>:: Invoke topaz
+<tt>rake maglev:topaz</tt>:: Invoke topaz
 +exit+::                 Exit topaz
 +help+::                 Get help
 
