@@ -2,7 +2,7 @@
 To get the HTML version of this and other documentation:
 
   $ rake rdoc
-  $ open html/index.html
+  $ open html/index.html in your web browser of choice
 
 == Prerequisites
 
@@ -29,10 +29,10 @@ appropriately:
 === Check status of MagLev server
 
 Ensure the MagLev repository server is running.  To check if a server is
-running, run <tt>rake status</tt>, or simply, <tt>rake</tt>:
+running, run <tt>rake maglev:status</tt>, or simply, <tt>rake</tt>:
 
   $ cd $MAGLEV_HOME
-  $ rake status
+  $ rake maglev:status
   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
   GemStone server not running.
   MagLev Parse Server is not running on port 2002
@@ -67,9 +67,10 @@ If a server is not running, then start one with rake:
 You should now be able to run a simple ruby script:
 
   $ cat > hello.rb
-  puts "Hello from MagLev"^D
+  puts "Hello from MagLev"
+  ^D
   $ maglev-ruby hello.rb
-  topaz 1> Hello
+  topaz 1> Hello from MagLev
   nil
   topaz 1>
   $
@@ -112,7 +113,7 @@ Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 === Note:
 * set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add
   <tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>. Then you can use
-  <tt>maglev ruby</tt> etc from anywhere.
+  <tt>maglev-ruby</tt> etc from anywhere.
 * if you have multiple installations, set <tt>PARSETREE_PORT</tt> to
   control which port the parser server listens on
 * the first (and only the first) time you run a maglev command that runs
