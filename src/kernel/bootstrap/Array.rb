@@ -650,7 +650,7 @@ class Array
   def last(count = Undefined)
     # Smalltalk SequenceableCollection>>last raises exception calling last
     # on empty collection
-    if self.empty?
+    if self.size.equal?(0)
       return count.equal?(Undefined) ? nil : []
     end
     _last
@@ -675,7 +675,7 @@ class Array
   primitive 'pack', 'rubyPack:'
 
   def pop
-    unless empty?
+    unless size.equal?(0)
       remove_last
     end
   end
@@ -721,7 +721,7 @@ class Array
   end
 
   def shift
-    unless empty?
+    unless size.equal?(0)
       remove_first
     end
   end
@@ -786,7 +786,7 @@ class Array
   # the same length).  If self is not an array of Arrays, then we should
   # raise a TypeError trying to convert an element to an array.
   def transpose
-    return [] if empty?
+    return [] if size.equal?(0)
 
     ary_size = self[0].size # we aren't empty
     i = 0

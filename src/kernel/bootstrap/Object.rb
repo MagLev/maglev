@@ -45,11 +45,11 @@ class Object
     primitive_nobridge '_each&', '_rubyEach:'
 
     # _storeRubyVcGlobal is used by methods that need to store into
-    #   caller's caller's definition(if any) of $~ or $_  . 
+    #   caller(s) definition(if any) of $~ or $_  . 
     #  Receiver is value to be stored.
-    #  An argument of 0 specifies $~ , 1 specifies $_  .
+    #  See smalltalk code in Object for documentation.
     primitive_nobridge '_storeRubyVcGlobal' , '_storeRubyVcGlobal:'
-    #  _getRubyVcGlobal returns caller's caller's value of $~ or $_ , or nil 
+    #  _getRubyVcGlobal returns caller(s) value of $~ or $_ , or nil 
     primitive_nobridge '_getRubyVcGlobal' , '_getRubyVcGlobal:'
 
     # End private helper methods
@@ -237,35 +237,32 @@ class Object
 
     def instance_eval(str)
       string = Type.coerce_to(str, String, :to_str)
-      vcgl = Array.new(2)
-      vcgl[0] = self._getRubyVcGlobal(0);
-      vcgl[1] = self._getRubyVcGlobal(1);
+      vcgl = [ self._getRubyVcGlobal(0x20),
+               self._getRubyVcGlobal(0x21) ]
       res = _instance_eval(string, vcgl)
-      vcgl[0]._storeRubyVcGlobal(0)
-      vcgl[1]._storeRubyVcGlobal(1)
+      vcgl[0]._storeRubyVcGlobal(0x20)
+      vcgl[1]._storeRubyVcGlobal(0x21)
       res
     end
 
     def instance_eval(str, file=nil)
       string = Type.coerce_to(str, String, :to_str)
-      vcgl = Array.new(2)
-      vcgl[0] = self._getRubyVcGlobal(0);
-      vcgl[1] = self._getRubyVcGlobal(1);
+      vcgl = [ self._getRubyVcGlobal(0x20),
+               self._getRubyVcGlobal(0x21) ]
       res = _instance_eval(string, vcgl)
-      vcgl[0]._storeRubyVcGlobal(0)
-      vcgl[1]._storeRubyVcGlobal(1)
+      vcgl[0]._storeRubyVcGlobal(0x20)
+      vcgl[1]._storeRubyVcGlobal(0x21)
       res
     end
 
     def instance_eval(str, file=nil, line=nil)
       # TODO: Object#instance_eval: handle file and line params
       string = Type.coerce_to(str, String, :to_str)
-      vcgl = Array.new(2)
-      vcgl[0] = self._getRubyVcGlobal(0);
-      vcgl[1] = self._getRubyVcGlobal(1);
+      vcgl = [ self._getRubyVcGlobal(0x20),
+               self._getRubyVcGlobal(0x21) ]
       res = _instance_eval(string, vcgl)
-      vcgl[0]._storeRubyVcGlobal(0)
-      vcgl[1]._storeRubyVcGlobal(1)
+      vcgl[0]._storeRubyVcGlobal(0x20)
+      vcgl[1]._storeRubyVcGlobal(0x21)
       res
     end
 

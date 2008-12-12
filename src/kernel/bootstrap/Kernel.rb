@@ -98,12 +98,11 @@ module Kernel
   primitive_nobridge '_eval', '_eval:with:'
 
   def eval(str)
-    vcgl = Array.new(2)
-    vcgl[0] = self._getRubyVcGlobal(0);
-    vcgl[1] = self._getRubyVcGlobal(1);
+    vcgl = [ self._getRubyVcGlobal(0x20) ,
+             self._getRubyVcGlobal(0x21) ]
     res = _eval(str, vcgl)
-    vcgl[0]._storeRubyVcGlobal(0)
-    vcgl[1]._storeRubyVcGlobal(1)
+    vcgl[0]._storeRubyVcGlobal(0x20)
+    vcgl[1]._storeRubyVcGlobal(0x21)
     res
   end
 

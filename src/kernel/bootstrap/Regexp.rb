@@ -66,9 +66,7 @@ class Regexp
   def match(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   cause the _storeRubyVcGlobal to not work.
-    # if variant calls must be supported, need a variant of
-    #   _storeRubyVcGlobal that will go up the stack more than 1 frame
+    #   require different args to _storeRubyVcGlobal 
     raise ArgumentError, 'expected 1 arg'
   end
 
@@ -76,12 +74,12 @@ class Regexp
   # the Rubinius code does the following to set $~:  Regexp.last_match  = ....
   def self.last_match=(m)
     raise ArgumentError, "Need MatchData, not #{m.class}" unless m.kind_of?(MatchData)
-    m._storeRubyVcGlobal(0) # store into caller's $~
+    m._storeRubyVcGlobal(0x20) # store into caller's $~
   end
 
   def match(str)
     m = _search(str, 0, nil)
-    m._storeRubyVcGlobal(0) # store into caller's $~
+    m._storeRubyVcGlobal(0x20) # store into caller's $~
     m
   end
 
@@ -93,16 +91,14 @@ class Regexp
   def =~(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   cause the _storeRubyVcGlobal to not work.
-    # if variant calls must be supported, need a variant of
-    #   _storeRubyVcGlobal that will go up the stack more than 1 frame
+    #   require different args to _storeRubyVcGlobal 
     raise ArgumentError, 'expected 1 arg'
   end
 
   def =~(str)
     # no bridge method for this variant
     m = _search(str, 0, nil)
-    m._storeRubyVcGlobal(0) # store into caller's $~
+    m._storeRubyVcGlobal(0x20) # store into caller's $~
     if (m)
       return m.begin(0)
     end
@@ -113,7 +109,7 @@ class Regexp
   def send(sym, str)
     if sym.equal?( :=~ )
       m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0) # store into caller's $~
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
@@ -121,7 +117,7 @@ class Regexp
     elsif sym.equal?(:match)
       return nil unless str && str.length > 0
       m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0) # store into caller's $~
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
       m
     else
       super(sym, str)
@@ -131,7 +127,7 @@ class Regexp
   def __send__(sym, str)
     if sym.equal?( :=~ )
       m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0) # store into caller's $~
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
@@ -139,7 +135,7 @@ class Regexp
     elsif sym.equal?(:match)
       return nil unless str && str.length > 0
       m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0) # store into caller's $~
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
       m
     else
       super(sym, str)
@@ -262,13 +258,13 @@ class Regexp
 
   def self.last_match
     # no bridge methods for variants after first
-    m = self._getRubyVcGlobal(0)
+    m = self._getRubyVcGlobal(0x20)
     return m
   end
 
   def self.last_match(an_int)
     # no bridge methods for variants after first
-    m = self._getRubyVcGlobal(0)
+    m = self._getRubyVcGlobal(0x20)
     if m.equal?(nil)
       return m
     else

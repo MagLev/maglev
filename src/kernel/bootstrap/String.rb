@@ -424,7 +424,7 @@ class String
   primitive '_lastSubstring', 'findLastOccuranceOfString:startingAt:'
   def rindex(item, offset=0)
     return size if item.empty? # This must be before we check for self.empty?
-    return nil if self.empty?
+    return nil if self.size.equal?(0)
     # TODO: Need to coerce to string....
     # arg = StringValue(arg) unless [Fixnum, String, Regexp].include?(arg.class)
     result = _lastSubstring(item, offset + 1)
@@ -463,7 +463,7 @@ class String
 
   def split(pattern=nil, limit=nil)
     # BEGIN RUBINIUS
-    return [] if empty?
+    return [] if size.equal?(0)
 
     if limit
       if !limit.kind_of?(Integer) and limit.respond_to?(:to_int)

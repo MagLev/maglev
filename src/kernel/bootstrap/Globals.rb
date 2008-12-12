@@ -93,12 +93,15 @@ def proc(&b); b; end
 # ----------------------------------------------------------
 
 ARGV = []
+ARGF = nil # TODO a real implementation
 
 # Notes on various globals
 #  $; is auto-initialized to nil if referenced, by RubySexpParser .
 #  $/ is auto-initialized to "\n" by parser at first ref .
 #  $-0 is translated to $/ by parser  .
 #  $-F is translated to  $;  by parser  .
+#  $< is translated to ARGF by parser
+#  $* is translated to ARGV by parser
 
 #  $!  translated to exception block block-arg-ref by RubyGlobalVarNode
 #         and RubyRescueBodyNode

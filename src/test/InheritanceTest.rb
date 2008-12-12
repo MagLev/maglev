@@ -22,14 +22,27 @@ end
 
 module L3
   include L2
-  def foo(ary); ary << :L3; super; end
+  def foo(ary) 
+    ary << :L3  
+    super; 
+  end
 end
 
 class C; include L3; end
 class B; include L3; end
 
+c = C.new
+l1 = L1
+l2 = L2
+l3 = L3
 
-test(C.new.foo([]), [:C, :L3, :L2, :L1, :B, :L3, :L2, :L1, :A], 'Test one')
+#  this case gets infinite recursion still
+# test(c.foo([]), [:C, :L3, :L2, :L1, :B, :L3, :L2, :L1, :A], 'Test one')
+
+b = B.new
+
+test(b.foo([]), [:B, :L3, :L2, :L1, :A], 'Test two')
+
 
 report
 

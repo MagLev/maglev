@@ -488,7 +488,7 @@ class File
     def gets(sep)
       # variant after first gets no bridges
        res = next_line( sep )
-       res._storeRubyVcGlobal(1) # store into caller's $_
+       res._storeRubyVcGlobal(0x21) # store into caller's $_
        res
     end
 
@@ -496,7 +496,7 @@ class File
       # variant after first gets no bridges
        sep=$/
        res = next_line( sep )
-       res._storeRubyVcGlobal(1) # store into caller's $_
+       res._storeRubyVcGlobal(0x21) # store into caller's $_
        res
     end
 
@@ -505,7 +505,7 @@ class File
       if (sym.equal?(:gets))
         sep=$/
         res = next_line( sep )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym)
@@ -514,7 +514,7 @@ class File
     def send(sym, arg)
       if (sym.equal?(:gets))
         res = next_line( arg )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym, arg)
@@ -524,7 +524,7 @@ class File
       if (sym.equal?(:gets))
         sep=$/
         res = next_line( sep )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym)
@@ -533,7 +533,7 @@ class File
     def __send__(sym, arg)
       if (sym.equal?(:gets))
         res = next_line( arg )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym, arg)
@@ -658,14 +658,14 @@ class PersistentFile
               # read by lines
               @block.call.next_line( sep )
             end
-      res = res._storeRubyVcGlobal(1) # store into caller's $_
+      res = res._storeRubyVcGlobal(0x21) # store into caller's $_
       res
     end
 
     def gets(sep )
       # variants after first get no bridge methods
        res = @block.call.next_line( sep[0] )
-       res._storeRubyVcGlobal(1) # store into caller's $_
+       res._storeRubyVcGlobal(0x21) # store into caller's $_
        res
     end
 
@@ -674,7 +674,7 @@ class PersistentFile
       if (sym.equal?(:gets))
         sep = $/
         res = @block.call.next_line( sep[0] )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym)
@@ -683,7 +683,7 @@ class PersistentFile
     def send(sym, arg)
       if (sym.equal?(:gets))
         res = @block.call.next_line( arg[0] )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym, arg)
@@ -693,7 +693,7 @@ class PersistentFile
       if (sym.equal?(:gets))
         sep = $/
         res = @block.call.next_line( sep[0] )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym)
@@ -702,7 +702,7 @@ class PersistentFile
     def __send__(sym, arg)
       if (sym.equal?(:gets))
         res = @block.call.next_line( arg[0] )
-        res._storeRubyVcGlobal(1) # store into caller's $_
+        res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
       super(sym, arg)
