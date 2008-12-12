@@ -98,3 +98,13 @@ un-tag the ones that now pass:
 
     # delete the fails tag if the spec now runs
     $ spec/mspec/bin/mspec tag --del fails spec/ruby/1.8/core/array/append_spec.rb
+
+===== Tag arbitrary specs
+
+The following will tag all the specs in <tt>select_spec.rb</tt> with the
++fails+ tag:
+
+    $ spec/mspec/bin/mspec tag --add fails -L spec/rubyspec/1.8/core/array/select_spec.rb
+
+The <tt>-L</tt> says to "do the action" (in this case, tag) to all the
+specs that match (i.e. all expectations in <tt>select_spec.rb</tt>).
