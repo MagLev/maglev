@@ -138,11 +138,13 @@ class Array
     out << ms.serialize_user_class(self, Array)
     out << Marshal::TYPE_ARRAY
     out << ms.serialize_integer(self.length)
-    unless empty? then
-      each do |element|
-        out << ms.serialize(element)
-      end
-    end
+    # Gemstone, optimization to use while loop
+    n = 0
+    lim = self.length
+    while n < lim
+      out << ms.serialize(self[n])
+      n = n + 1
+    end # end Gemstone
     out << ms.serialize_instance_variables_suffix(self)
   end
 end
