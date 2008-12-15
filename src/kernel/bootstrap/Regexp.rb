@@ -66,7 +66,7 @@ class Regexp
   def match(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   require different args to _storeRubyVcGlobal 
+    #   require different args to _storeRubyVcGlobal
     raise ArgumentError, 'expected 1 arg'
   end
 
@@ -91,7 +91,7 @@ class Regexp
   def =~(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   require different args to _storeRubyVcGlobal 
+    #   require different args to _storeRubyVcGlobal
     raise ArgumentError, 'expected 1 arg'
   end
 
@@ -105,7 +105,7 @@ class Regexp
     m
   end
 
-    # during bootstrap,  send and __send__ get no bridge methods
+  # during bootstrap,  send and __send__ get no bridge methods
   def send(sym, str)
     if sym.equal?( :=~ )
       m = _search(str, 0, nil)
@@ -180,11 +180,16 @@ class Regexp
 
   def ===(str)
     if ( str._isString ) # if str.kind_of?(String)
-      if  self.=~(str)
-        return true
+      # inline =~  so as to update callers $~
+      m = _search(str, 0, nil)
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      if m
+        if m.begin(0)
+          return true
+        end
       end
     end
-    return false
+    false
   end
 
   def self.escape(str)

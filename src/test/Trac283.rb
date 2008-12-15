@@ -1,7 +1,7 @@
 
 case 'Accept: */*'
 when /^([A-Za-z0-9!\#$%&'*+\-.^_`|~]+):\s*(.*?)\s*\z/om
-  puts "======= $1: '#{$1}'  $2: '#{$2}'"
+  #puts "======= $1: '#{$1}'  $2: '#{$2}'"
   raise "FAILURE: $1 in when" unless $1 == 'Accept'
   raise "FAILURE: $2 in when" unless $2 == '*/*'
 else
