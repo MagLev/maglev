@@ -64,7 +64,7 @@ class RegexpTest
     # Expected value: whatever in str matches exp
     def match(str, exp)
         regexp = Regexp.new(exp);
-        if regexp  =~ str 
+        if regexp  =~ str
             return "#{$&}"
         else
             return "NoMatch"
@@ -244,3 +244,39 @@ raise "ERROR" unless ret == 'def'
 # expectvalue 'dzef'
 ret = RegexpTest.new.match("abcdzefghijklmnoprqstuvwxyz", "dz*ef")
 raise "ERROR" unless ret == 'dzef'
+
+
+
+# A complex example from webrick/common.rb.  This will test that match data
+# handles [] appropriately
+ABS_URI = /^
+  ([a-zA-Z][-+.a-zA-Z\d]*):
+  (?:
+    ((?:[-_.!~*'()a-zA-Z\d;?:@&=+$,]|%[a-fA-F\d]{2})(?:[-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]|%[a-fA-F\d]{2})*)
+  |
+  (?:(?:
+    \/\/(?:
+    (?:(?:((?:[-_.!~*'()a-zA-Z\d;:&=+$,]|%[a-fA-F\d]{2})*)@)?  (?# 3: userinfo)
+                   (?:((?:(?:(?:[a-zA-Z\d](?:[-a-zA-Z\d]*[a-zA-Z\d])?)\.)*(?:[a-zA-Z](?:[-a-zA-Z\d]*[a-zA-Z\d])?)\.?|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[(?:(?:[a-fA-F\d]{1,4}:)*(?:[a-fA-F\d]{1,4}|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|(?:(?:[a-fA-F\d]{1,4}:)*[a-fA-F\d]{1,4})?::(?:(?:[a-fA-F\d]{1,4}:)*(?:[a-fA-F\d]{1,4}|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))?)\]))(?::(\d*))?))?(?# 4: host, 5: port)
+               |
+                 ((?:[-_.!~*'()a-zA-Z\d$,;+@&=+]|%[a-fA-F\d]{2})+)
+               )
+             |
+             (?!\/\/))
+             (\/(?:[-_.!~*'()a-zA-Z\d:@&=+$,]|%[a-fA-F\d]{2})*(?:;(?:[-_.!~*'()a-zA-Z\d:@&=+$,]|%[a-fA-F\d]{2})*)*(?:\/(?:[-_.!~*'()a-zA-Z\d:@&=+$,]|%[a-fA-F\d]{2})*(?:;(?:[-_.!~*'()a-zA-Z\d:@&=+$,]|%[a-fA-F\d]{2})*)*)*)?
+           )(?:\?((?:[-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]|%[a-fA-F\d]{2})*))?
+        )
+        (?:\#((?:[-_.!~*'()a-zA-Z\d;\/?:@&=+$,\[\]]|%[a-fA-F\d]{2})*))?                  $/x
+
+uri = "http://localhost:9001/hello"
+
+if ABS_URI.match(uri)
+   scheme, opaque, userinfo, host, port, registry, path, query, fragment = $~[1..-1]
+
+  raise "Didn't find scheme" unless scheme == "http"
+  raise "Didn't find host"   unless host   == "localhost"
+  raise "Didn't find port"   unless port   == "9001"
+  raise "Didn't find path"   unless path   == "/hello"
+else
+  raise "Failed to match #{uri}"
+end
