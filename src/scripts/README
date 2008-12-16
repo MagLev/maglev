@@ -19,7 +19,7 @@ been modified to produce timing and status information as shown below:
 Suggested usage:
   nohup ruby ./run_benchmarks-MRI.rb 1>benchmark_results-MRI-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
 
-  nohup maglev ruby ./run_benchmarks-MagLev.rb 1>benchmark_results-Maglev-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
+  nohup maglev-ruby ./run_benchmarks-MagLev.rb 1>benchmark_results-Maglev-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
 
 You can run these without redirecting output if you want to watch a live run.
 
