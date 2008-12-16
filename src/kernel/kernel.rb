@@ -89,6 +89,8 @@ RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/Math.rb'
 RUBY.require 'kernel/bootstrap/Struct.rb'
 RUBY.require 'kernel/bootstrap/ThreadGroup.rb'
+RUBY.require 'kernel/bootstrap/ObjectSpace.rb'
+RUBY.require 'kernel/bootstrap/Kernel2.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
