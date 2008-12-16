@@ -13,6 +13,8 @@ class Exception
       'Exception'
     end
 
+    primitive_nobridge '_reraise', 'pass'
+    primitive_nobridge 'signal', 'signal'
     primitive 'signal', 'signal:'
     primitive 'message', 'description'
 

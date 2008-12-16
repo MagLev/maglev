@@ -183,36 +183,8 @@ class Object
     output
   end
 
-    def loop
-        raise LocalJumpError, "no block given" unless block_given?
-
-        while true
-            yield
-        end
-    end
-
     def pretty_inspect
       inspect;
-    end
-
-    def raise(err, str)
-        err.signal(str)
-    end
-
-    def raise(err)
-        err.signal(nil)
-    end
-
-    def raise
-        RuntimeError.signal(nil)
-    end
-
-    def rand(n=nil)
-        if n
-            RandomInstance.next(n)
-        else
-            RandomInstance.next
-        end
     end
 
     def to_a

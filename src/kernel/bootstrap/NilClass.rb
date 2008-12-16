@@ -35,5 +35,10 @@ class NilClass
      nil
    end
 
+   def call
+     # invoked when yield used with no block argument 
+     raise LocalJumpError , 'no block was passed'
+   end
+
 end
 
