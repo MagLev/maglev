@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Runs the equivalent of "maglev ruby"
+# Runs a ruby file using the MagLev VM 
 COMMAND="`basename $0`"
 
 usage()
