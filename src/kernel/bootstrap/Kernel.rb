@@ -118,6 +118,14 @@ module Kernel
 
   primitive 'format*', 'sprintf:with:'
 
+  def loop
+    raise LocalJumpError, "no block given" unless block_given?
+
+    while true
+      yield
+    end
+  end
+
   def open(fName)
     File.open(fName)
   end
@@ -192,8 +200,37 @@ module Kernel
     arg
   end
 
-  def trap
-    _stub_warn("Kernel#trap")
+  # def rand #  implemented in Kernel2.rb
+
+  def raise(ex_class, message)
+    ex = ex_class.exception 
+    ex.signal(message)
+  end
+
+  def raise(ex_class, message, *args)
+    # args is callback info not yet implemented
+    raise(ex_class, message)
+  end
+
+  def raise(msg)
+    if msg._isString  
+      raise(RuntimeError, msg)
+    else
+      # msg should be a subclass of Exception or
+      #  an object that returns a new exception 
+      ex = msg.exception 
+      ex.signal
+    end
+  end
+
+  def _reraise(ex)
+    ex._reraise
+  end
+
+  def raise
+    #  if $! is valid in the caller, the parser will
+    #   translate raise to  _resignal
+    RuntimeError.signal
   end
 
   primitive 'sprintf*', 'sprintf:with:'
@@ -217,6 +254,10 @@ module Kernel
       return true
     end
     return false
+  end
+
+  def trap
+    _stub_warn("Kernel#trap")
   end
 
   # def throw(aSymbol); end
