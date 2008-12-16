@@ -79,7 +79,7 @@ MagLev, but its use is deprecated.
 === Stop
 === <tt>maglev</tt>:  Control the MagLev system
   Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|
-                 topaz-debug|squeak|preload|force-reload|version|help}
+                 topaz-debug|squeak|force-reload|version|help}
 
   To control the MagLev server:
   maglev start          - Start MagLev server processes
@@ -89,7 +89,6 @@ MagLev, but its use is deprecated.
   maglev restart        - Restart MagLev server processes
   maglev status         - Display MagLev server status
   maglev version        - Display MagLev version number
-  maglev preload <file> - Load and commit a file into an already running system
   maglev force-reload   - Stop MagLev server, replace with empty repository!!!
 
   To execute other maglev commands:

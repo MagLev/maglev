@@ -7,8 +7,8 @@ COMMAND="`basename $0`"
 usage() {
 cat <<ENDHELP
 Usage: 
-$COMMAND {start|start-debug|stop|restart|status||topaz|topaz-debug|
-        squeak|preload|force-reload|version|help}
+$COMMAND {start|start-debug|stop|restart|status|topaz|topaz-debug|
+        squeak|force-reload|version|help}
 
 To control the MagLev server:
 maglev start          - Start MagLev server processes
@@ -18,7 +18,6 @@ maglev stop           - Stop MagLev server processes
 maglev restart        - Restart MagLev server processes
 maglev status         - Display MagLev server status
 maglev version        - Display MagLev version number
-maglev preload <file> - Load and commit a file into an already running system
 maglev force-reload   - Stop MagLev server, replace with empty repository!!!
 
 To execute other maglev commands:
@@ -183,21 +182,6 @@ initialize() {
   fi
 }
 
-preload() {
-  $TOPAZ_CMD <<ENDPRELOAD
-run
-RubyContext load.
-RubyContext default loadFileNamed: '$1'.
-RubyContext save.
-%
-commit
-irb
-puts 'MagLev preload $1 completed'
-quit
-exit
-ENDPRELOAD
-}
-
 destroy() {
   rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/*
 }
@@ -287,9 +271,6 @@ case "$1" in
   gemx)
         gemx
         ;;
-  preload)
-        preload $2
-        ;;
   force-reload)
         stopserver
         stopparser
@@ -300,8 +281,8 @@ case "$1" in
         usage
         ;;
   *)
-        echo "Usage: $COMMAND {start|start-debug|stop|restart|status||topaz|topaz-debug|"
-        echo "               squeak|preload|force-reload|version|help}"
+        echo "Usage: $COMMAND {start|start-debug|stop|restart|status|topaz|topaz-debug|"
+        echo "               squeak|force-reload|version|help}"
         exit 1
         ;;
 esac
