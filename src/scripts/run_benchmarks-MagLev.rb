@@ -1,7 +1,7 @@
 # Run modified bm_*.rb files from ruby-benchmark-suite using MagLev
 #
 # Usage:  
-# nohup maglev ruby ./run_benchmarks-MagLev.rb 1>benchmark_results-Maglev-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
+# nohup maglev-ruby ./run_benchmarks-MagLev.rb 1>benchmark_results-Maglev-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
 #
 # These benchmarks have been modified to produce timing and status information
 # e.g.

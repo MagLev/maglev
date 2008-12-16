@@ -7,8 +7,8 @@ COMMAND="`basename $0`"
 usage() {
 cat <<ENDHELP
 Usage: 
-$COMMAND {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|
-        squeak|preload|force-reload|version|help}
+$COMMAND {start|start-debug|stop|restart|status|topaz|topaz-debug|
+        squeak|force-reload|version|help}
 
 To control the MagLev server:
 maglev start          - Start MagLev server processes
@@ -18,12 +18,9 @@ maglev stop           - Stop MagLev server processes
 maglev restart        - Restart MagLev server processes
 maglev status         - Display MagLev server status
 maglev version        - Display MagLev version number
-maglev preload <file> - Load and commit a file into an already running system
 maglev force-reload   - Stop MagLev server, replace with empty repository!!!
 
 To execute other maglev commands:
-maglev irb            - Enter a MagLev interactive shell (same as maglev-irb)
-maglev ruby  <file>   - Execute a Ruby file (same as maglev-ruby)
 maglev topaz          - Enter a Topaz shell
 maglev topaz-debug    - Enter a Topaz shell useful for debugging 
 maglev squeak         - Start optional Squeak development environment
@@ -161,42 +158,6 @@ version() {
   grep GEMSTONE $MAGLEV_HOME/version.txt
 }
 
-ruby() {
-  FILE=$PWD/$2
-  $TOPAZ_CMD <<ENDRUBY
-run
-RubyContext load.
-RubyContext loadFileNamed: '$FILE'.
-%
-exit
-ENDRUBY
-}
-
-spec() {
-  WD=$PWD
-  $TOPAZ_CMD <<ENDSPEC
-output push spec.out
-run
-| stream |
-stream := WriteStream on: String new.
-RubyContext load.
-RubyContext requireFileNamed: 'mspec.rb'.
-RubyCompiler new evaluateStringNoTilde: '\$formatter = DottedFormatter.new; \$formatter.register'.
-('$*' findTokens: Character space) allButFirst do:
-    [:ea |
-        [
-            RubyContext loadFileNamed: '$WD/', ea.
-        ] on: Exception do:[:ex |
-            stream nextPutAll: '<failed with error, ', ex asString, ' >'; cr.
-        ].
-    ].
-RubyCompiler new evaluateStringNoTilde: '\$formatter.finish'.
-stream contents.
-%
-exit
-ENDSPEC
-}
-
 topaz() {
   if [ -z "`which rlwrap`" ]; then
     $TOPAZ_CMD $@
@@ -221,21 +182,6 @@ initialize() {
   fi
 }
 
-preload() {
-  $TOPAZ_CMD <<ENDPRELOAD
-run
-RubyContext load.
-RubyContext default loadFileNamed: '$1'.
-RubyContext save.
-%
-commit
-irb
-puts 'MagLev preload $1 completed'
-quit
-exit
-ENDPRELOAD
-}
-
 destroy() {
   rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/*
 }
@@ -253,14 +199,6 @@ squeak() {
 startvsd() {
   export PATH=$GEMSTONE/bin:$PATH
   $GEMSTONE/bin/vsd &
-}
-
-maglev-shell() {
-  if [ -z "`which rlwrap`" ]; then
-    $GEMSTONE/bin/irb $@
-  else
-    rlwrap $GEMSTONE/bin/irb $@
-  fi
 }
 
 mri() {
@@ -321,32 +259,17 @@ case "$1" in
         # pass params so we can execute 'maglev topaz -T200000'
         topaz-debug $@
         ;;
-  ruby)
-        # pass params so we can execute 'maglev ruby <FILE>'
-        ruby $@
-        ;;
-  spec)
-        spec $@
-        ;;
   squeak)
         squeak
         ;;
   vsd)
         startvsd
         ;;
-  irb)
-	shift
-	# in case we ever need to pass params
-        maglev-shell $@
-        ;;
   mri)
         mri
         ;;
   gemx)
         gemx
-        ;;
-  preload)
-        preload $2
         ;;
   force-reload)
         stopserver
@@ -358,8 +281,8 @@ case "$1" in
         usage
         ;;
   *)
-        echo "Usage: $COMMAND {start|start-debug|stop|restart|status|ruby|irb|topaz|topaz-debug|"
-        echo "               squeak|preload|force-reload|version|help}"
+        echo "Usage: $COMMAND {start|start-debug|stop|restart|status|topaz|topaz-debug|"
+        echo "               squeak|force-reload|version|help}"
         exit 1
         ;;
 esac
