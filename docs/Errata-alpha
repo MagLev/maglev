@@ -21,8 +21,9 @@ and +beginTransaction+.
 * <tt>ThreadGroup</tt> is a stub.
 
 === Misc
-* +ARGF+ is not supported
-* +ObjectSpace+: Not supported
+* +ARGF+ is not supported.
+* Continuations are not supported.
+* +ObjectSpace+ is not supported.
 * <tt>Object.equal?</tt> may not be overridden.  For performance reasons,
   it is a special selector.
 
