@@ -99,6 +99,17 @@ See {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html] for details.
 
 === Next Steps
 
+==== Examples
+
+You can try running the scripts in the +examples+ directory.  Currently,
+there is only one sample that starts a webrick server which you can connect
+to at [http://localhost:2000/].  To run the script, make sure
+<tt>maglev-ruby</tt> is on your path, and then:
+
+  $ $MAGLEV_HOME/examples/webrick/time_server.rb
+
+==== Further reading
+
 The following documentation explains more:
 
 Errata[link:files/docs/Errata-alpha.html]::  Errata for the current release.
