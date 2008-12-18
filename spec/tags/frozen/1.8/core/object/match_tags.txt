@@ -1,1 +1,2 @@
 fails:Object=~ returns false matching any object
+fails:Object =~ returns false matching any object
