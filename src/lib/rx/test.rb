@@ -54,7 +54,7 @@ end
 
 def test_rx(utf8)
 l = L.new
-f = "/opt/gemstone/maglev/src/rx/utf#{utf8 ? 8 : 16}.xml"
+f = "rx/utf#{utf8 ? 8 : 16}.xml"
 r = RX::Reader.new(File.open(f, "r"), RX::RXToStreamListener.new(l))
 $s = Time.now.to_f
 r.go

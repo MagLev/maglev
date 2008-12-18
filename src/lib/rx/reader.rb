@@ -3,7 +3,7 @@ require 'rx/null_api'
 module RX
  class Reader
     def initialize(doc, api = NullAPI.new)
-      here = "/opt/gemstone/maglev/src/rx"
+      here = "rx"
       @api = api
       @input = Input.new doc
       @encoding = @input.encoding
