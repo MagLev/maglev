@@ -15,6 +15,8 @@ configuration.
     |
     + etc/        # Misc config files used by topaz; demo key to unlock VM
     |
+    + examples/   # Examples ruby scripts to run under MagLev
+    |
     + gci
     |
     + gemstone    # The MagLev/Smalltalk VM files
@@ -60,5 +62,3 @@ configuration.
     + scripts       # Misc development/management scripts
     |
     + test          # smoke tests run before committing code
-
-
