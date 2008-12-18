@@ -1,0 +1,1 @@
+fails:Shell expansion in Kernel#require adds the path to $LOADED_FEATURES
