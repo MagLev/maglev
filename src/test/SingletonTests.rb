@@ -89,4 +89,14 @@ test(F.singleton_methods(true).sort,  ["bar", "foo"], "extend F true")
 test(F.singleton_methods(false).sort, ["foo"],        "extend F false")
 test(F.foo, 1, "extend F.foo")
 
+# Test on an object with out a singleton class
+
+o = Object.new
+test(o.singleton_methods(true),  [], "no singleton true")
+test(o.singleton_methods(false), [], "no singleton false")
+
+o.extend Foo
+test(o.singleton_methods(true),  ["foo", "bar"], "o extended true")
+test(o.singleton_methods(false), [],             "o extended false")
+
 report
