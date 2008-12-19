@@ -45,11 +45,11 @@ class Object
     primitive_nobridge '_each&', '_rubyEach:'
 
     # _storeRubyVcGlobal is used by methods that need to store into
-    #   caller(s) definition(if any) of $~ or $_  . 
+    #   caller(s) definition(if any) of $~ or $_  .
     #  Receiver is value to be stored.
     #  See smalltalk code in Object for documentation.
     primitive_nobridge '_storeRubyVcGlobal' , '_storeRubyVcGlobal:'
-    #  _getRubyVcGlobal returns caller(s) value of $~ or $_ , or nil 
+    #  _getRubyVcGlobal returns caller(s) value of $~ or $_ , or nil
     primitive_nobridge '_getRubyVcGlobal' , '_getRubyVcGlobal:'
 
     # End private helper methods
@@ -162,7 +162,7 @@ class Object
     end
 
     # equal?  is implemented by the ruby parser and optimized to
-    #  a special bytecode by the code generator.  
+    #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
 
     def eql?(other)
@@ -201,7 +201,7 @@ class Object
     end
 
     primitive_nobridge '_instance_eval', 'rubyEvalString:with:'
- 
+
     def instance_eval(*args)
       # bridge methods would interfere with VcGlobals logic
       raise ArgumentError, 'wrong number of args'
@@ -249,6 +249,12 @@ class Object
     #   to_s
     # end
 
+    primitive_nobridge '_ruby_singleton_methods', 'rubySingletonMethods:'
+
+    def singleton_methods(inc_modules = false)
+      _ruby_singleton_methods(inc_modules)
+    end
+
     def _isBehavior
       false
     end
@@ -258,7 +264,7 @@ class Object
       if self.class.equal?(cls)
         true
       else
-        unless cls._isBehavior 
+        unless cls._isBehavior
           raise TypeError, 'expected a Class or Module'
         end
         false
