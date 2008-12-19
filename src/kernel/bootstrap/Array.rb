@@ -674,6 +674,15 @@ class Array
 
   primitive 'pack', 'rubyPack:'
 
+  def self._pack_coerce(obj, sym)
+    begin
+      r = obj.__send__(sym)
+    rescue Exception 
+      return nil  # capiprim.c will raise TypeError
+    end
+    r
+  end
+
   def pop
     unless size.equal?(0)
       remove_last
