@@ -39,11 +39,19 @@ namespace :spec do
     check_spec_file
     sh "#{MSPEC_CMD} tag -G fails #{ENV['spec']}"
   end
+
+  desc "List the specs currently tagged as fails for the dir"
+  task :lsfails do
+    spec = ENV['spec'] || RSPEC_DIR
+    sh "#{MSPEC_CMD} tag --list fails #{spec}"
+  end
+
   def check_spec_file
     raise "No spec defined with: spec=..." unless ENV['spec']
     spec = ENV['spec']
     raise "Can't find file #{spec}" unless File.exists? spec
   end
+
 
 end
 
