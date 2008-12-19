@@ -251,7 +251,7 @@ class Object
 
     primitive_nobridge '_ruby_singleton_methods', 'rubySingletonMethods:'
 
-    def singleton_methods(inc_modules = false)
+    def singleton_methods(inc_modules = true)
       _ruby_singleton_methods(inc_modules)
     end
 
