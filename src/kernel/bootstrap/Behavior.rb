@@ -10,6 +10,7 @@ class Behavior
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'
   primitive_nobridge '_module_eval_string', '_moduleEvalString:with:'
   primitive_nobridge '_module_eval&', '_moduleEval:'
+
   # map name to _rubyName so name will work for metaclasses
   primitive 'name' , '_rubyName'
   primitive_nobridge '_allClassVars', 'allClassVarNames'
@@ -40,7 +41,7 @@ class Behavior
 
   def module_eval(str)
     string = Type.coerce_to(str, String, :to_str)
-    vcgl = [ self._getRubyVcGlobal(0x20) , 
+    vcgl = [ self._getRubyVcGlobal(0x20) ,
              self._getRubyVcGlobal(0x21) ]
     res = _module_eval_string(string, vcgl)
     vcgl[0]._storeRubyVcGlobal(0x20)
@@ -51,6 +52,11 @@ class Behavior
   def module_eval(&block)
     # no VcGlobal logic here, the block uses $~ of it's home context
     _module_eval(&block)
+  end
+
+  def module_eval(str, file=nil, line=nil)
+    _stub_warn("Behavior#module_eval: ignoring file and line numbers")
+    module_eval str
   end
 
   alias class_eval module_eval
