@@ -14,7 +14,7 @@ the MagLev Server.
 
 ==== Checking status of MagLev server
 
-To check if a server is running, run <tt>rake status</tt>, or simply,
+To check if a server is running, run <tt>rake maglev:status</tt>, or simply,
 <tt>rake</tt>:
 
    $ cd $MAGLEV_HOME
@@ -65,11 +65,10 @@ To stop the MagLev Server:
 The primary means to administer MagLev is through the Rake script. There
 is also a legacy shell script, <tt>$MAGLEV_HOME/bin/maglev</tt>, that is
 shipped with the system. The shell script can be used to administer
-MagLev, but its use is deprecated.
+MagLev, but its use may be deprecated in the future. It's only advantage
+is that you do not have to cd to $MAGLEV_HOME to run <tt>maglev start</tt>,
+<tt>maglev stop</tt>, <tt>maglev status</tt>, etc.
 
-=== Check Status of the MagLev Server
-
-=== Stop
 === <tt>maglev</tt>:  Control the MagLev system
   Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|
                  topaz-debug|squeak|force-reload|version|help}

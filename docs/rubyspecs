@@ -1,14 +1,15 @@
 == RubySpecs and MagLev
 
-There are git sub modules for the +mspec+ framework (<tt>spec/mspec</tt>,
+We've included a copy of the MSpec framework (<tt>spec/mspec</tt>,
 version 1.5.3) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
-2008-12-04).
+2008-12-04). You may be able to run with later MSpec or RubySpec versions, but this is the version we used when we built the system.
+
 
 Links:
-* +Mspec+[http://rubyspec.org/projects/show/mspec]
+* +MSpec+[http://rubyspec.org/projects/show/mspec]
 * +RubySpec+[http://rubyspec.org/]
 
-=== Run mspecs with +rake+
+=== Run MSpec with +rake+
 
 There are three rake tasks that help with the specs:
 
@@ -17,7 +18,7 @@ There are three rake tasks that help with the specs:
     rake spec:debugci     # Run the continuous integration specs on MagLev with debug
     rake spec:mri         # Run the continuous integration specs against MRI
 
-=== Run mspecs manually
+=== Run MSpec manually
 
 Assuming <tt>maglev-ruby</tt> is on your +PATH+, you can run specs like
 this:
@@ -33,7 +34,7 @@ error):
 
 === Tag Failing Specs
 
-Mspec allows you to place arbitrary tags on expectations.  The tags are
+MSpec allows you to place arbitrary tags on expectations.  The tags are
 kept in a separate directory hierarchy outside of the rubyspec dir.  For
 the MagLev development environment, the hierarchy is kept in
 <tt>spec/tags/frozen</tt>, and is checked into Git.  The tag files are
