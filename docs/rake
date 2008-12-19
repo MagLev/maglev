@@ -56,7 +56,7 @@ The Standard documentation, clean and clobber targets:
 
 === Developer tasks
 
-The developer tasks are specific to the GemStone MagLev development
+The developer tasks are specific to the GemStone's internal MagLev development
 environment and may depend on files not shipped with the Alpha release.
 Run at your own risk:
 

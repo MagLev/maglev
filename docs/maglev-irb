@@ -3,24 +3,15 @@
 === Synopsis
 
 MagLev provides an IRB-like utility, <tt>$MAGLEV_HOME/bin/maglev-irb</tt>.
-It provides a minimal interactive environment with some limitations (listed
-below).  GemStone plans to offer a full implementation of ruby IRB in a
-future release.
+It provides a minimal interactive environment, but is neither robust nor a
+full irb implementation. GemStone plans to offer a full implementation of 
+ruby IRB in a future release.
 
   Usage: maglev-irb [options]
   OPTIONS:
      -d      Run in debugging mode
      -h      Show help message
      -v      Print version number
-
-=== Limitations
-
-<tt>maglev-irb</tt> currently has the following limitations:
-
-1. It parses only one line at a time.  Each line of input must be a
-   complete lexical entity.  E.g., the following works:
-
-2. It is not robust.
 
 === Commands
 
@@ -30,7 +21,7 @@ future release.
 [+BEGIN+]           Begin a transaction.
 [+ABORT+]           Abort the current transaction.
 [+COMMIT+ or +END+] Commit/end the current transaction.
-[<tt>^D</tt>]       Exit <tt>maglev-irb</tt>.
+[<tt>^D</tt> or +quit+]       Exit <tt>maglev-irb</tt>.
 
 === Prompts
 

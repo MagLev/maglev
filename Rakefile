@@ -10,7 +10,7 @@ CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
 
 Rake::RDocTask.new do |rd|
   rd.main = "README"
-  rd.rdoc_files.include('README*', 'docs/*')
+  rd.rdoc_files.include('README*', 'docs/*', 'LICENSES*')
 end
 
 task :default => :'maglev:status'

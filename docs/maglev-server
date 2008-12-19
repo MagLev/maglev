@@ -1,10 +1,10 @@
 == MagLev Server
 
 The MagLev Server is a collection of system processes that manage the
-database of objects for MagLev.  The MagLev Server needs to be running
-before you can run Ruby code with MagLev.  Once the server is running, many
-individual MagLev Virtual Machines (VM) connect to the server and share the
-pool of objects.
+repository, MagLev's built-in database of objects. The MagLev Server
+needs to be running before you can run Ruby code with MagLev.  Once
+the server is running, many individual MagLev Virtual Machines (VM)
+connect to the server and share the pool of objects.
 
 
 === Start, Stop and Check Status of the MagLev Server
@@ -12,20 +12,22 @@ pool of objects.
 The MagLev distribution provides a +Rakefile+ that can be used to control
 the MagLev Server.
 
-==== Check status of MagLev server
+==== Checking status of MagLev server
 
 To check if a server is running, run <tt>rake status</tt>, or simply,
 <tt>rake</tt>:
 
-  $ cd $MAGLEV_HOME
-  $ rake status
+   $ cd $MAGLEV_HOME
+   $ rake status
+
+If the server is not running, you'll see output like:
+
   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
   GemStone server not running.
-  MagLev Parse Server is not running on port 2002
+  MagLev Parse Server is not running on port 2001
 
 If a server is running, you'll see output like:
 
-  $ rake
   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
 
   MAGLEV_HOME = /Users/pmclain/projects/MagLev-20645.MacOSX
@@ -35,43 +37,34 @@ If a server is running, you'll see output like:
     OK   3.0.0     pmclain   38892 60165 Dec 08 13:21 Stone  gs64stone
     OK   3.0.0     pmclain   38893 60157 Dec 08 13:21 cache  gs64stone@cairo.gemstone.com
 
-  MagLev Parse Server port = 2002
+  MagLev Parse Server port = 2001
   COMMAND   PID    USER   FD   TYPE    DEVICE SIZE/OFF NODE NAME
-  ruby    38918 pmclain    3u  IPv6 0x3c524bc      0t0  TCP *:2002 (LISTEN)
-  ruby    38918 pmclain    4u  IPv4 0x6d63e64      0t0  TCP *:2002 (LISTEN)
+  ruby    38918 pmclain    3u  IPv6 0x3c524bc      0t0  TCP *:2001 (LISTEN)
+  ruby    38918 pmclain    4u  IPv4 0x6d63e64      0t0  TCP *:2001 (LISTEN)
 
 
-==== Start the MagLev Server
+==== Starting the MagLev Server
 
-If a server is not running, then start one with rake:
+If the server is not running, you can start it with rake:
 
-     $ cd $MAGLEV_HOME
-     $ rake maglev:start
+   $ cd $MAGLEV_HOME
+   $ rake maglev:start
 
-==== Stop the MagLev Server
+==== Stopping the MagLev Server
 
 To stop the MagLev Server:
 
-    $ rake maglev:stop
-    (in /Users/pmclain/projects/MagLev-20645.MacOSX)
-    GemStone server stopped.
-
-
-
-
-
-
-
-
-
-
+   $ cd $MAGLEV_HOME
+   $ rake maglev:stop
+   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
+   GemStone server stopped.
 
 
 ==== Legacy <tt>$MAGLEV_HOME/bin/maglev</tt> script.
 
-The primary means to administer MagLev is through the Rake script.  There
+The primary means to administer MagLev is through the Rake script. There
 is also a legacy shell script, <tt>$MAGLEV_HOME/bin/maglev</tt>, that is
-shipped with the system.  The shell script can be used to administer
+shipped with the system. The shell script can be used to administer
 MagLev, but its use is deprecated.
 
 === Check Status of the MagLev Server

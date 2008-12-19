@@ -2,30 +2,20 @@
 
 === Topaz Overview, Documentation and Help
 
-Topaz is the command line driven VM that MagLev runs in; it connects to
-the database.  Most of the scripts and rake tasks are based on topaz
-scripts and use the initialization files in <tt>$GEMSTONE_HOME/etc/*</tt>
-to log into topaz and setup the MagLev ruby environment.
+Topaz is the command line driven VM that MagLev runs in; it connects
+to MagLev's built-in database.  Most of the scripts and rake tasks are
+based on topaz scripts and use the initialization files in
+<tt>$MAGLEV_HOME/etc/*</tt> to log into topaz and setup the MagLev
+ruby environment.
 
-==== Run topaz directly
-You can get a topaz prompt via rake:
-
-  $ cd $GEMSTONE_HOME
-  $ rake maglev:topaz
-  (in /Users/pmclain/maglev)
-  topaz 1>
-
-Type +exit+ to leave topaz
-
-
-==== Topaz Documentation
+==== Topaz Manual
 
 {The Topaz Programming
-Environment}[http://seaside.gemstone.com/docs/GS64-Topaz-2.3.pdf] has all of
-the documentation on topaz.
+Environment}[http://seaside.gemstone.com/docs/GS64-Topaz-2.3.pdf] 
+manual contains documentation for the Smalltalk version of Topaz.
 
 ==== Topaz Help
-Topaz also has on line help:
+Topaz also has on line help, which includes the Ruby-specific commands that are not covered in the manual:
 
   topaz 1> help
 
@@ -92,7 +82,7 @@ Topaz also has on line help:
 <tt>list breaks</tt>:: List current break points
 <tt>list breaks method: foo</tt>:: List 
 
-===== Level of detail and examining variables
+===== Examining variables at different levels of detail
 <tt>display oops</tt>::
   Turn on display of object ids (necessary for examining variables)
 <tt>obj1 @ NNN </tt>::
@@ -102,7 +92,7 @@ Topaz also has on line help:
 <tt>level N</tt>::
   Set the default display level to +N+.
 
-=== Use <tt>-d</tt> to run MagLev in debug mode
+=== Using <tt>-d</tt> to run MagLev in debug mode
 
 Run maglev with the <tt>-d</tt> option to run in debug mode.  Uncaught
 exceptions will land you in the topaz prompt, where you can examine the
@@ -259,3 +249,15 @@ If you run in debug mode, you can pause and get the topaz prompt using
     nil.pause if rand(10) == 7 # if you're lucky, pause 10% of the time
 
 Then you can continue with +continue+:
+
+=== Running topaz directly
+You can get a topaz prompt via rake:
+
+  $ cd $MAGLEV_HOME
+  $ rake maglev:topaz
+  (in /Users/pmclain/maglev)
+  topaz 1>
+
+Type +exit+ to leave topaz
+
+

@@ -1,9 +1,10 @@
-== These are the Errata for the MagLev Alpha release.
+== Release Notes for the MagLev Alpha release of December 19, 2008.
 
-=== Transaction support
+=== Persistence support
 
 The Gemstone class has methods for +commitTransaction+, +abortTransaction+
-and +beginTransaction+.
+and +beginTransaction+. In the future, this functionality is likely to be 
+provided by different classes and messages
 
 === <tt>maglev-irb</tt>
 
@@ -20,10 +21,13 @@ and +beginTransaction+.
 === Threads
 * <tt>ThreadGroup</tt> is a stub.
 
+=== Noise from rlwrap
+* In some cases, <tt>rlwrap</tt> (see Prerequisites[link:files/docs/prerequisites])
+will output noise while typing at a Topaz prompt.
+ 
 === Misc
 * +ARGF+ is not supported.
 * Continuations are not supported.
 * +ObjectSpace+ is not supported.
 * <tt>Object.equal?</tt> may not be overridden.  For performance reasons,
   it is a special selector.
-

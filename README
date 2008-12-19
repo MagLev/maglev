@@ -1,45 +1,53 @@
+== License
 
-To get the HTML version of this and other documentation:
-
-  $ rake rdoc
-  $ open html/index.html in your web browser of choice
+Please see LICENSES[link:files/LICENSES.txt] in this directory.
 
 == Prerequisites
 
-=== MRI Ruby and required gems
+Some prerequisites must be installed on your machine before MagLev can
+run correctly. For details, see the Prerequisites[link:files/docs/prerequisites.html] file in the docs directory.
 
-You will need the following MRI Ruby resources on your machine:
+== Documentation
 
-1. MRI Ruby 1.8.6
-2. Ruby Gems
-3. ParseTree gem version 2.2.0 (version 3.x will not work).
-4. Rake
+To get the HTML version of this and other documentation:
 
+cd to the directory holding this README
+  $ rake rdoc
+open html/index.html in your web browser of choice
+
+== Quick Start
 === Install MagLev
 
-This README assumes you've installed MagLev by running the appropriate
+Once you've downloaded MagLev by running
 <tt>installMaglev-<system>.sh</tt> or <tt>upgradeMaglev-<system>.sh</tt>,
-and have set your <tt>MAGLEV_HOME</tt> and <tt>PATH</tt> variables
-appropriately:
+set your <tt>MAGLEV_HOME</tt> and <tt>PATH</tt> variables:
 
   export MAGLEV_HOME=<path_to_the_directory_containing_this_README>
   export PATH=$MAGLEV_HOME/bin:$PATH
 
-== Quick Start
+=== Start the MagLev server
+
+The server is started with rake:
+
+     $ cd $MAGLEV_HOME
+     $ rake maglev:start
+
 === Check status of MagLev server
 
-Ensure the MagLev repository server is running.  To check if a server is
-running, run <tt>rake maglev:status</tt>, or simply, <tt>rake</tt>:
+To check that the MagLev repository server started correctly,
+run <tt>rake maglev:status</tt>, or simply, <tt>rake</tt>:
 
   $ cd $MAGLEV_HOME
   $ rake maglev:status
+
+If the server is not running, you'll see output like:
+
   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
   GemStone server not running.
-  MagLev Parse Server is not running on port 2002
+  MagLev Parse Server is not running on port 2001
 
 If a server is running, you'll see output like:
 
-  $ rake
   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
 
   MAGLEV_HOME = /Users/pmclain/projects/MagLev-20645.MacOSX
@@ -49,18 +57,12 @@ If a server is running, you'll see output like:
     OK   3.0.0     pmclain   38892 60165 Dec 08 13:21 Stone  gs64stone
     OK   3.0.0     pmclain   38893 60157 Dec 08 13:21 cache  gs64stone@cairo.gemstone.com
 
-  MagLev Parse Server port = 2002
+  MagLev Parse Server port = 2001
   COMMAND   PID    USER   FD   TYPE    DEVICE SIZE/OFF NODE NAME
-  ruby    38918 pmclain    3u  IPv6 0x3c524bc      0t0  TCP *:2002 (LISTEN)
-  ruby    38918 pmclain    4u  IPv4 0x6d63e64      0t0  TCP *:2002 (LISTEN)
+  ruby    38918 pmclain    3u  IPv6 0x3c524bc      0t0  TCP *:2001 (LISTEN)
+  ruby    38918 pmclain    4u  IPv4 0x6d63e64      0t0  TCP *:2001 (LISTEN)
 
-
-=== Start the MagLev server
-
-If a server is not running, then start one with rake:
-
-     $ cd $MAGLEV_HOME
-     $ rake maglev:start
+If the parse server is reported as NOT running, see the troubleshooting[link:files/docs/troubleshooting.html] file.
 
 === <tt>maglev-ruby</tt>: Execute a Ruby file
 
@@ -101,21 +103,50 @@ See {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html] for details.
 
 ==== Examples
 
-You can try running the scripts in the +examples+ directory.  Currently,
-there is only one sample that starts a webrick server which you can connect
+You can try running the scripts in the +examples+ directory. 
+
+===== Webrick
+A simple example that starts a webrick server which you can connect
 to at [http://localhost:2000/].  To run the script, make sure
 <tt>maglev-ruby</tt> is on your path, and then:
 
   $ $MAGLEV_HOME/examples/webrick/time_server.rb
 
+^C will terminate the webrick server VM.
+
+===== Avi's Hat Trick
+To recreate the hat trick that Avi demonstrated at RailsConf 2008:
+  cd $MAGLEV_HOME/examples/hat_trick
+  maglev-irb
+    require 'hat'
+    require 'rabbit'
+    COMMIT
+    $hat.contents
+The hat is empty
+
+In a second shell
+  maglev-irb
+    $hat.contents
+The hat is empty. Now put a rabbit in the hat.
+    $hat.put(Rabbit.new)
+    COMMIT
+    $hat.contents
+There is a rabbit in the hat.
+
+Now, back in the first shell:
+    ABORT
+    $hat.contents
+The rabbit put in the hat in one VM "magically" is there in the other VM.
+Nothing up my sleeve! (just a transactionally-shared object repository :-)
+  
 ==== Further reading
 
 The following documentation explains more:
 
-Errata[link:files/docs/Errata-alpha.html]::  Errata for the current release.
+{Release Notes}[link:files/docs/release_notes.html]::  Notes on and limitations of the current release.
 Admin[link:files/docs/maglev-server.html]::  How to start and stop the MagLev server.
 Debug[link:files/docs/debugging.html]::      How to run MagLev in debug mode
-Source[link:files/docs/source.html]::        Guide to the source code layout
+Layout[link:files/docs/file_layout.html]::   Guide to the MagLev distribution file layout
 Specs[link:files/docs/rubyspecs.html]::      Running +mspec+ and +rubyspecs+ with MagLev
 Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility.
