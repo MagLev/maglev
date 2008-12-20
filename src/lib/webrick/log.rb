@@ -46,7 +46,7 @@ module WEBrick
     end
 
     def fatal(msg) log(FATAL, "FATAL " << format(msg)); end
-    def error(msg) pause; log(ERROR, "ERROR " << format(msg)); end
+    def error(msg) log(ERROR, "ERROR " << format(msg)); end
     def warn(msg)  log(WARN,  "WARN  " << format(msg)); end
     def info(msg)  log(INFO,  "INFO  " << format(msg)); end
     def debug(msg) log(DEBUG, "DEBUG " << format(msg)); end
@@ -72,7 +72,7 @@ module WEBrick
   end
 
   class Log < BasicLog
-    attr_accessor :time_format 
+    attr_accessor :time_format
 
     def initialize(log_file=nil, level=nil)
       super(log_file, level)
