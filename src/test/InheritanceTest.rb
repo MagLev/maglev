@@ -22,9 +22,9 @@ end
 
 module L3
   include L2
-  def foo(ary) 
-    ary << :L3  
-    super; 
+  def foo(ary)
+    ary << :L3
+    super;
   end
 end
 
@@ -43,6 +43,61 @@ b = B.new
 
 test(b.foo([]), [:B, :L3, :L2, :L1, :A], 'Test two')
 
+
+
+# ========================================
+
+module M1
+  def foo
+    'M1#foo'
+  end
+end
+module M2
+  def foo
+    'M2#foo'
+  end
+end
+
+class C1
+  include M1
+  include M2
+  def foo
+    'C1#foo'
+  end
+end
+
+class C2
+  include M1
+end
+
+class C3
+  include M1
+  include M2
+end
+class C4
+  # opposite order from C3
+  include M2
+  include M1
+end
+class C5
+  extend M1
+end
+class C6
+  extend M1
+  extend M2
+end
+class C7
+  extend M2
+  extend M1
+end
+
+test(C1.new.foo, 'C1#foo', 'C1#foo')
+test(C2.new.foo, 'M1#foo', 'C2#foo')
+test(C3.new.foo, 'M2#foo', 'C3#foo')
+test(C4.new.foo, 'M1#foo', 'C4#foo')
+test(C5.foo,     'M1#foo', 'C5#foo')
+test(C6.foo,     'M2#foo', 'C6#foo')
+test(C7.foo,     'M1#foo', 'C7#foo')
 
 report
 

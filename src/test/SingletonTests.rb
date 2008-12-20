@@ -99,4 +99,23 @@ o.extend Foo
 test(o.singleton_methods(true),  ["foo", "bar"], "o extended true")
 test(o.singleton_methods(false), [],             "o extended false")
 
+
+class PP
+  module ObjectMixin
+    def method_from_object_mixin
+    end
+  end
+end
+
+class Object
+  include PP::ObjectMixin
+end
+
+
+test(Object.singleton_methods(true), [],  'ObjectMixin class true')
+test(Object.singleton_methods(false), [], 'ObjectMixin class false')
+
+test(Object.new.singleton_methods(true), [],  'ObjectMixin instance true')
+test(Object.new.singleton_methods(false), [], 'ObjectMixin instance false')
+
 report
