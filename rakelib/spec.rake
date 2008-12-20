@@ -28,6 +28,12 @@ namespace :spec do
     sh "#{MSPEC_CMD} #{ENV['spec']}"
   end
 
+  desc "Run an mspec file with -G fails: spec=<dir_or_file_name>"
+  task :runnofail do
+    check_spec_file
+    sh "#{MSPEC_CMD} -G fails #{ENV['spec']}"
+  end
+
   desc "Debug an mspec file: spec=<dir_or_file_name>"
   task :debug do
     check_spec_file
