@@ -9,7 +9,8 @@ class Dir
     glob(pattern, 0)
   end
 
-  def self.glob(pattern, flags = 0)
+  def self.glob(pat, flags = 0)
+    pattern = Type.coerce_to(pat, String, :to_str)  # GEMSTONE
     matches = []
 
     glob_brace_expand pattern, flags & ~GLOB_VERBOSE, matches
