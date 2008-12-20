@@ -119,3 +119,5 @@ test(Object.new.singleton_methods(true), [],  'ObjectMixin instance true')
 test(Object.new.singleton_methods(false), [], 'ObjectMixin instance false')
 
 report
+
+Gemstone.abortTransaction if defined? RUBY_ENGINE
