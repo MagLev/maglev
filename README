@@ -1,6 +1,6 @@
 == License
 
-Please see LICENSES[link:files/LICENSES.txt] in this directory.
+Please see LICENSES[link:files/LICENSES.html] in this directory.
 
 == Prerequisites
 
@@ -107,7 +107,7 @@ You can try running the scripts in the +examples+ directory.
 
 ===== Webrick
 A simple example that starts a webrick server which you can connect
-to at [http://localhost:2000/].  To run the script, make sure
+to at http://localhost:2000/.  To run the script, make sure
 <tt>maglev-ruby</tt> is on your path, and then:
 
   $ $MAGLEV_HOME/examples/webrick/time_server.rb
@@ -144,18 +144,20 @@ Nothing up my sleeve! (just a transactionally-shared object repository :-)
 The following documentation explains more:
 
 {Release Notes}[link:files/docs/release_notes.html]::  Notes on and limitations of the current release.
-Admin[link:files/docs/maglev-server.html]::  How to start and stop the MagLev server.
+Server[link:files/docs/maglev-server.html]::  How to start and stop the MagLev server.
 Debug[link:files/docs/debugging.html]::      How to run MagLev in debug mode
 Layout[link:files/docs/file_layout.html]::   Guide to the MagLev distribution file layout
 Specs[link:files/docs/rubyspecs.html]::      Running +mspec+ and +rubyspecs+ with MagLev
 Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
-{<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility.
+{<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility
+Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
+Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 
 
-=== Note:
+=== Hints:
 * set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add
   <tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>. Then you can use
-  <tt>maglev-ruby</tt> etc from anywhere.
+  <tt>maglev-ruby</tt> etc. from anywhere.
 * if you have multiple installations, set <tt>PARSETREE_PORT</tt> to
   control which port the parser server listens on
 * the first (and only the first) time you run a maglev command that runs
