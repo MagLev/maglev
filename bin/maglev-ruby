@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Runs a ruby file using the MagLev VM 
+# Runs a ruby file using the MagLev VM
 COMMAND="`basename $0`"
 
 usage()
@@ -41,6 +41,7 @@ export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
 
+args=""
 while [[ $# > 0 ]]
 do
     case $1 in
@@ -50,6 +51,13 @@ do
         -h)
             usage
             exit
+            ;;
+        -I)
+            args="$args '$1' '$2'"
+            shift
+            ;;
+        -I*)
+            args="$args '$1'"
             ;;
         -V)
             grep GEMSTONE $GEMSTONE/version.txt
@@ -84,7 +92,6 @@ fi
 # The rest of the command line gets passed to $RUBYSCRIPT via ARGV.
 # wrap each of the remaining command line params in single quotes so that
 # we can pass them as a literal array to Smalltalk.
-args=""
 while [[ $# > 0 ]]
 do
     args="$args '$1'"
