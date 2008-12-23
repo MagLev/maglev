@@ -1,0 +1,8 @@
+This directory contains source from outside the Ruby Libs that we don't
+intend to ship with the product, but we feel is important that everyone
+shares the same copy of.
+
+Rack http://rack.rubyforge.org/ 
+Downloaded from http://chneukirchen.org/releases/rack-0.4.0.tar.gz
+License: MIT
+
