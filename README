@@ -99,13 +99,13 @@ It provides a minimal interactive environment with some limitations:
 See {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html] for details.
 
 
-=== Next Steps
+== Next Steps
 
-==== Examples
+=== Examples
 
 You can try running the scripts in the +examples+ directory. 
 
-===== Webrick
+==== Webrick
 A simple example that starts a webrick server which you can connect
 to at http://localhost:2000/.  To run the script, make sure
 <tt>maglev-ruby</tt> is on your path, and then:
@@ -114,7 +114,7 @@ to at http://localhost:2000/.  To run the script, make sure
 
 ^C will terminate the webrick server VM.
 
-===== Avi's Hat Trick
+==== Avi's Hat Trick
 To recreate the hat trick that Avi demonstrated at RailsConf 2008:
   cd $MAGLEV_HOME/examples/hat_trick
   maglev-irb
@@ -139,7 +139,7 @@ Now, back in the first shell:
 The rabbit put in the hat in one VM "magically" is there in the other VM.
 Nothing up my sleeve! (just a transactionally-shared object repository :-)
   
-==== Further reading
+== Further reading
 
 The following documentation explains more:
 
@@ -154,7 +154,7 @@ Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common pro
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 
 
-=== Hints:
+== Hints:
 * set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add
   <tt>$MAGLEV_HOME/bin</tt> to your <tt>PATH</tt>. Then you can use
   <tt>maglev-ruby</tt> etc. from anywhere.
@@ -167,7 +167,7 @@ Prerequisites[link:files/docs/prerequisites.html]:: External software needed by 
   run. <tt>maglev-irb</tt> does not, but it will make errors more difficult
   to debug, as they won't return to Topaz.
 
-=== Ruby code:
+== Ruby code:
 * <tt>src/</tt> and <tt>src/lib/</tt> are both on the require path
 * <tt>src/kernel/</tt> has the core +Array+, +String+ etc. files
 
