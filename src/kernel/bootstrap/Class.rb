@@ -21,7 +21,7 @@ class Class
 
   # Allocate space for a new object of self's class.  The returned object
   # is an instance of self.
-  primitive 'allocate', 'basicNew'
+  primitive 'allocate', 'rubyBasicNew'    # init fixed instVars to remoteNil
 
   # base image has persistent env 1 method Class>>class
 
