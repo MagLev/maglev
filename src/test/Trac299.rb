@@ -12,3 +12,4 @@ class OpenStruct
   end
 end
 x = OpenStruct.new
+true

@@ -6,7 +6,9 @@ class MA
  X = 7
 end
 X = 5
-r = MA.new.initMe 
+cl = MA
+o = MA.new
+r = o.initMe 
 unless r == 7
   raise 'ERROR'
 end
