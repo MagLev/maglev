@@ -9,8 +9,8 @@ class String
 
   primitive 'size=', 'size:'
 
-  primitive 'substring1', 'copyFrom:to:'
-  primitive '_findStringStartingAt', 'findString:startingAt:'
+  primitive_nobridge 'substring1', 'copyFrom:to:'
+  primitive_nobridge '_findStringStartingAt', 'findString:startingAt:'
   class_primitive_nobridge '_withAll', 'withAll:'
   class_primitive_nobridge '_alloc', '_basicNew'
 
@@ -350,18 +350,17 @@ class String
     !self.index(item).equal?(nil)
   end
 
-  primitive '_indexOfByte', 'indexOfByte:startingAt:'
+  primitive_nobridge '_indexOfByte', 'indexOfByte:startingAt:'
 
-  def index(item, offset=nil)
-    if offset.equal?(nil)
-      offset = 0
-    elsif offset < 0
+  def index(item, offset=0)
+    offset = Type.coerce_to(offset, Integer, :to_int)
+    if offset < 0
       offset = self.size + offset
     end
-    if item._isInteger
-      st_idx = self._indexOfByte(item % 256 , offset + 1)
-    elsif item._isString
+    if item._isString
       st_idx = self._findStringStartingAt(item, offset + 1)
+    elsif item._isInteger
+      st_idx = self._indexOfByte(item % 256 , offset + 1)
     else
       # item should be a Regex
       return item._index_string(string, offset)
@@ -420,18 +419,41 @@ class String
     replace(reverse)
   end
 
-  # MNI: rindex  TODO: use findLast: ?, but does a block eval
-  primitive '_lastSubstring', 'findLastOccuranceOfString:startingAt:'
-  def rindex(item, offset=0)
-    return size if item.empty? # This must be before we check for self.empty?
-    return nil if self.size.equal?(0)
-    # TODO: Need to coerce to string....
-    # arg = StringValue(arg) unless [Fixnum, String, Regexp].include?(arg.class)
-    result = _lastSubstring(item, offset + 1)
-    return  result == 0 ? nil : result - 1
+  primitive_nobridge '_lastSubstring', 'findLastSubString:startingAt:'
+  primitive_nobridge '_indexOfLastByte', 'indexOfLastByte:startingAt:'
 
-    # TODO: support for when item is a regexp
-    # TODO: support for when item is an int ("character")
+  def rindex(item, offset=nil)
+    if offset.equal?(nil) 
+      offset = self.size 
+      if (offset.equal?(0))
+        offset = 1
+      end
+    else
+      offset = Type.coerce_to(offset, Integer, :to_int)
+      if offset < 0
+        offset = self.size + offset
+      end
+      offset = offset + 1  # to one-based
+    end
+    if item._isString
+      if item.size.equal?(0)
+        if self.size.equal?(0)
+          return 0  
+        else
+          return offset
+        end
+      end
+      st_idx = self._lastSubstring(item, offset )
+    elsif item._isInteger
+      st_idx = self._indexOfLastByte(item % 256 , offset )
+    else
+      raise NotImplementedError , 'String#rindex(aRegexp) not implemented' 
+    end 
+    if st_idx.equal?(0)
+      return nil
+    else
+      return st_idx - 1
+    end
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
