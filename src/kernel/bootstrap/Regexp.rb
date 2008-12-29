@@ -19,6 +19,7 @@ class Regexp
   primitive_nobridge '_compile', '_compile:options:'
   primitive_nobridge 'kcode', 'kcode'
   primitive_nobridge 'options', 'options'
+  primitive_nobridge 'to_s', 'to_s'
 
   # class_primitive 'alloc', '_basicNew'
 
@@ -55,7 +56,7 @@ class Regexp
 
   # Return true if +Regexp::IGNORECASE+ is set on this regexp
   def casefold?
-    options & IGNORECASE != 0
+    @options & IGNORECASE != 0
   end
 
   def initialize(str, options=nil)   # 3rd arg language ignored
