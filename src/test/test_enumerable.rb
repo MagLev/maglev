@@ -1,13 +1,14 @@
 # Test the logic of the parameter handling for String#count, String#delete, etc.
+require File.expand_path('simple', File.dirname(__FILE__))
 
 $count = 0
 def test(actual, expected, msg)
   $count += 1
   unless expected == actual
-    emsg = "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}" 
-    puts emsg 
+    emsg = "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
+    puts emsg
     self.pause
-    raise 'ERROR' 
+    raise 'ERROR'
   end
 end
 
