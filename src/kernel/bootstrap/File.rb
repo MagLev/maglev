@@ -648,17 +648,18 @@ class PersistentFile
 
     def gets
       # variants after first get no bridge methods
-      res = if $/.equal?(nil)
+      sep = $/ 
+      res = if sep.equal?(nil)
               # Read entire file
               raise NotImplementedError, 'Kernel#gets does not support full file mode'
-            elsif $/.length.equal?(0)
+            elsif sep.length.equal?(0)
               # Read by paragraphs
               raise NotImplementedError, 'Kernel#gets does not support paragraph mode'
             else
               # read by lines
               @block.call.next_line( sep )
             end
-      res = res._storeRubyVcGlobal(0x21) # store into caller's $_
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
       res
     end
 
@@ -709,8 +710,6 @@ class PersistentFile
     end
 
     # end gets implementation -------------------------------
-
-    # TODO , reimplement send, __send__ for gets
 
     def sync
         @block.call.sync
