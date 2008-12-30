@@ -57,24 +57,40 @@ end
 # Starts a ruby parsetree_parser on PARSETREE_PORT (no checks for prior
 # running instances).
 def start_parser
-  sh %{
-    cd #{MAGLEV_HOME}/bin > /dev/null
-    nohup ruby parsetree_parser.rb >#{MAGLEV_HOME}/log/parsetree.log 2>/dev/null & PARSER_PID="$!"
-    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
-  }
+  cd "#{MAGLEV_HOME}/bin" do
+    sh %{
+      nohup ruby parsetree_parser.rb \
+          >#{MAGLEV_HOME}/log/parsetree.log 2>/dev/null &
+      echo "MagLev Parse Server process $! starting on port $PARSETREE_PORT"
+    }
+  end
+  wait_for_parser
 end
 
 # Starts a ruby parsetree_parser on PARSETREE_PORT (no checks for prior
 # running instances).  Logs stderr to $MAGLEV_HOME/log/parsetree.err.
 def start_parser_debug
-  sh %{
-    cd #{MAGLEV_HOME}/bin > /dev/null
-    nohup ruby parsetree_parser.rb \
-      >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
-    PARSER_PID="$!"
-    echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
-    echo "Parser logfiles are \$MAGLEV_HOME/log/parsetree.*"
-  }
+  cd "#{MAGLEV_HOME}/bin" do
+    sh %{
+      nohup ruby parsetree_parser.rb \
+          >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
+      echo "MagLev DEBUG Parse Server process $! starting on port $PARSETREE_PORT"
+    }
+  end
+  wait_for_parser
+end
+
+def wait_for_parser
+  10.times do
+    if parser_running?
+      puts "MagLev Parser Server process started on port $PARSETREE_PORT"
+      return true
+    end
+    puts "Waiting for parser to start..."
+    sleep 2
+  end
+  puts "MagLev Parser Server process failed to start on port $PARSETREE_PORT"
+  return false
 end
 
 # Tests for the parser on port PARSETREE_PORT, and kills it if found.
