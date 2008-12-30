@@ -720,7 +720,4 @@ class PersistentFile
     end
 end
 
-STDIN = $stdin = PersistentFile.new(proc{File.stdin})
-STDOUT = $stdout = PersistentFile.new(proc{File.stdout})
-STDERR = $stderr = PersistentFile.new(proc{File.stderr})
-$> = $stdout
+# STDIN, STDOUT, STDERR , $>  initialized in File2.rb

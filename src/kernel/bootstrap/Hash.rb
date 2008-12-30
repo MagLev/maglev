@@ -124,10 +124,7 @@ class Hash
 
   primitive 'include?', 'includesKey:'
 
-  primitive_nobridge '_index', 'keyAtValue:ifAbsent:'
-  def index(value)
-    _index(value, proc { return nil })
-  end
+  primitive 'index', 'keyAtValue:'
 
   # MNI indexes
   # MNI incicies

@@ -23,6 +23,7 @@ RUBY.global('Module', 'Module')    # for class Module
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
+RUBY.global('Proc', 'RubyProc')
 RUBY.global('Random')
 RUBY.global('Range', 'Range')
 RUBY.global('Regexp', 'Regexp')
@@ -86,9 +87,7 @@ RUBY.global('Exception',    'UserException')
 
 # ----------------------------------------------------------
 
-RUBY.global("Proc", "ExecBlock")
-def proc(&b); b; end
-# remainder of Proc support in Proc.rb
+RUBY.global("ExecBlock", "ExecBlock")
 
 # ----------------------------------------------------------
 
