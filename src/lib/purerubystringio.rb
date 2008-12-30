@@ -251,6 +251,7 @@ class PureRubyStringIO
     pstart = @sio_pos
     @sio_pos += len
     buffer.replace(@sio_string[pstart..(@sio_pos - 1)])
+#    buffer.replace(@sio_string[pstart..@sio_pos])
     buffer.empty? && !length.nil? ? nil : buffer
   end
 
@@ -339,10 +340,9 @@ class PureRubyStringIO
 
   def syswrite(string)
     requireWritable
-    addition = "\000" * (@sio_string.length - @sio_pos) + string.to_s
-    @sio_string[@sio_pos..(addition.length - 1)] = addition
-    @sio_pos +=  addition.size
-    addition.size
+    @sio_string[@sio_pos, string.length] = string
+    @sio_pos +=  string.size
+    string.size
   end
 
   # In ruby 1.8.4 truncate differs from the docs in two ways.
