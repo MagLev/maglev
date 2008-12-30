@@ -34,14 +34,15 @@ class PureRubyStringIO
   SEEK_END = IO::SEEK_END
   SEEK_SET = IO::SEEK_SET
 
-  @@relayMethods = [:<<, :all?, :any?, :binmode, :close, :close_read, :close_write, :closed?, :closed_read?,
-                    :closed_write?, :collect, :detect, :each, :each_byte, :each_line, :each_with_index,
-                    :entries, :eof, :eof?, :fcntl, :fileno, :find, :find_all, :flush, :fsync, :getc, :gets,
-                    :grep, :include?, :inject, :isatty, :length, :lineno, :lineno=, :map, :max, :member?,
-                    :min, :partition, :path, :pid, :pos, :pos=, :print, :printf, :putc, :puts, :read,
-                    :readchar, :readline, :readlines, :reject, :rewind, :seek, :select, :size, :sort,
-                    :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
-                    :ungetc, :write, :zip]
+  @@relayMethods = [
+    :<<, :all?, :any?, :binmode, :close, :close_read, :close_write, :closed?, :closed_read?,
+    :closed_write?, :collect, :detect, :each, :each_byte, :each_line, :each_with_index,
+    :entries, :eof, :eof?, :fcntl, :fileno, :find, :find_all, :flush, :fsync, :getc, :gets,
+    :grep, :include?, :inject, :isatty, :length, :lineno, :lineno=, :map, :max, :member?,
+    :min, :partition, :path, :pid, :pos, :pos=, :print, :printf, :putc, :puts, :read,
+    :readchar, :readline, :readlines, :reject, :rewind, :seek, :select, :size, :sort,
+    :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
+    :ungetc, :write, :zip]
 
   def self.open(string="", mode="r+")
     if block_given? then
@@ -339,26 +340,26 @@ class PureRubyStringIO
   def syswrite(string)
     requireWritable
     addition = "\000" * (@sio_string.length - @sio_pos) + string.to_s
-STDERR.puts "addition: '#{addition}'"
-STDERR.puts "addition.length: #{addition.length}  "
-STDERR.puts "addition.size: #{addition.size}  "
-self.inspect
-
     @sio_string[@sio_pos..(addition.length - 1)] = addition
     @sio_pos +=  addition.size
     addition.size
   end
 
-  #In ruby 1.8.4 truncate differs from the docs in two ways.
-  #First, if an integer greater that the length is given then the string is expanded to the new integer
-  #length. As this expansion seems to contain junk characters instead of nulls I suspect this may be a
-  #flaw in the C code which could cause a core dump if abused/used.
-  #Second, the documentation states that  truncate returns 0. It returns the integer instead.
-  #This implementation follows the documentation in the first instance as I suspect this will be fixed
-  #in the C code. In the second instance, it follows the actions of the C code instead of the docs.
-  #This was decided as it causes no immedeate harm and this ruby implentation is to be as compatable
-  #as possible with the C version. Should the C version change to match the docs the ruby version
-  #will be simple to update as well.
+  # In ruby 1.8.4 truncate differs from the docs in two ways.
+
+  # First, if an integer greater that the length is given then the string
+  # is expanded to the new integer length. As this expansion seems to
+  # contain junk characters instead of nulls I suspect this may be a flaw
+  # in the C code which could cause a core dump if abused/used.
+  #
+  # Second, the documentation states that truncate returns 0. It returns
+  # the integer instead.  This implementation follows the documentation in
+  # the first instance as I suspect this will be fixed in the C code. In
+  # the second instance, it follows the actions of the C code instead of
+  # the docs.  This was decided as it causes no immedeate harm and this
+  # ruby implentation is to be as compatable as possible with the C
+  # version. Should the C version change to match the docs the ruby version
+  # will be simple to update as well.
   def truncate(integer)
     requireWritable
     raise Errno::EINVAL, "Invalid argument - negative length", caller if integer < 0
