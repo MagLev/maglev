@@ -1,57 +1,105 @@
 # ---------------------------------
 #   Proc 
 
-def lambda(&b)
-  b
+class ExecBlock
+  # creating subclasses of ExecBlock is not allowed
+  # extending ExecBlock with additional methods is not allowed outside of bootstrap
+  primitive_nobridge '_numArgs', 'numArgs'
+  primitive_nobridge '_lastStar', 'lastRubyArgIsStar'
+
+  primitive_nobridge '_fetchRubyVcGlobal', '_rubyVcGlobalAt:'
+  primitive_nobridge '_setRubyVcGlobal', '_rubyVcGlobalAt:put:'
+
+  primitive_nobridge '_rubyCall' , '_rubyCall:'
+
+  # call, call:, call::, call::: will be compiled to special bytecodes
+  #  and won't use the bridge methods generated for  call*
+  primitive          'call*' , '_rubyCall:'
 end
 
-class Proc
-    # Proc is identically  Smalltalk ExecBlock
-     
-    # Class methods
 
-    class_primitive_nobridge 'new&' , '_newProc:'
-    # note special Parser code in .mcz , irForProcNewZeroArgs ,
-    #  parser converts Proc.new  with no args to 
-    #   b = nil ; Proc.new(&b) 
-    # and ExecBlock>>_newProc: issues the error for missing block 
-
-    def self.name
-      # override Smalltalk name
-      'Proc'
+class Proc 
+   # Proc is identically  the smalltalk class RubyProc  
+    def self.new(&blk)
+      if blk._isBlock
+        inst = self.allocate
+        inst._initialize(&blk)
+        return inst
+      elsif blk.is_a?(Proc)
+        return blk
+      else
+        raise ArgumentError, 'tried to create Proc object without a block' 
+      end
     end
 
-    # Instance methods
+    def self.new
+      # no bridge methods
+      raise ArgumentError, 'tried to create Proc object without a block'
+    end
+
+    def _block
+      @block
+    end
+
+    def _initialize(&blk)
+      @block = blk
+    end
 
     # private primitives for $~ implementation only
-    primitive_nobridge '_fetchRubyVcGlobal', '_rubyVcGlobalAt:'
-    primitive_nobridge '_setRubyVcGlobal', '_rubyVcGlobalAt:put:'
+    def _fetchRubyVcGlobal(ofs)
+      @block._fetchRubyVcGlobal(ofs)
+    end
+    def _setRubyVcGlobal(ofs, val)
+      @block._setRubyVcGlobal(ofs, val)
+    end
 
-    primitive_nobridge '[]' , '_rubyCall'
-    primitive_nobridge '[]' , '_rubyCall:'
-    primitive_nobridge '[]' , '_rubyCall:with:'
-    primitive_nobridge '[]' , '_rubyCall:with:with:'
-    primitive          '[]*' , '_rubyCall:'
+    def []
+      @block.call
+    end
 
-    # call, call:, call::, call::: will be compiled to special bytecodes
-    #  and won't use the bridge methods generated for  call*
-    primitive          'call*' , '_rubyCall:'
+    def [](a)
+      @block._rubyCall(a)
+    end
 
-    primitive_nobridge '_numArgs', 'numArgs' 
-    primitive_nobridge '_lastStar', 'lastRubyArgIsStar'
+    def [](a, b)
+      @block.call(a, b)
+    end
+
+    def [](a, b, c)
+      @block.call(a, b, c)
+    end
+
+    def [](*args)
+      @block.call(*args)
+    end
 
     def arity
-      na = self._numArgs 
-      if (self._lastStar) 
+      blk = @block
+      na = blk._numArgs 
+      if (blk._lastStar) 
         na = -(na)  # negated (num required args + 1)
       end
       na
     end
 
-    # TODO: binding
+    def call(*args)
+      @block.call(*args)
+    end
+    def call
+      # this and following variants get no bridge methods
+      @block.call
+    end
+    def call(a)
+      @block.call(a)
+    end
+    def call(a, b)
+      @block.call(a, b)
+    end
+    def call(a, b, c)
+      @block.call(a, b, c)
+    end
 
-    # primitives or defs for call should not be needed,
-    #  any compiled send of :call translates to special bytecode
+    # TODO: binding
 
     def inspect
       "#<Proc>"
@@ -59,5 +107,10 @@ class Proc
 
     def to_proc
       self
+    end
+
+    def value
+      # used by smalltalk rubyEval:
+      @block.call
     end
 end

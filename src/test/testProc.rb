@@ -77,4 +77,3 @@
  unless a.equal?(nil) then raiseErr end
 
 
-
