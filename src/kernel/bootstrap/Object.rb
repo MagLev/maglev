@@ -255,6 +255,19 @@ class Object
       _ruby_singleton_methods(inc_modules)
     end
 
+    primitive_nobridge '_ruby_methods', 'rubyMethods'
+
+    # If regular is true, retuns an array of the names of methods publicly
+    # accessible in receiver and receiver's ancestors.  Otherwise, returns
+    # an array of the names of receiver's singleton methods.
+    def methods(regular = true)
+      if regular
+        _ruby_methods
+      else
+        _ruby_singleton_methods(false)
+      end
+    end
+
     def _isBehavior
       false
     end

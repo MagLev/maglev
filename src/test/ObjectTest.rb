@@ -74,5 +74,17 @@ def test_eval_with_tilde
 end
 test_eval_with_tilde()
 
+
+# Test methods: Just a smoke test to ensure the method is recognized
+# and does something approximately correct.
+class Methods
+  def a_method
+  end
+end
+
+m = Methods.new.methods
+some_methods = ["a_method", "methods"].sort
+test((m & some_methods).sort, some_methods, "Object#methods 1")
+
 report
 true
