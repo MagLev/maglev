@@ -487,7 +487,7 @@ class File
 
     def gets(sep)
       # variant after first gets no bridges
-       res = next_line( sep )
+       res = next_line( sep[0] )
        res._storeRubyVcGlobal(0x21) # store into caller's $_
        res
     end
@@ -495,7 +495,7 @@ class File
     def gets
       # variant after first gets no bridges
        sep=$/
-       res = next_line( sep )
+       res = next_line( sep[0] )
        res._storeRubyVcGlobal(0x21) # store into caller's $_
        res
     end
@@ -504,7 +504,7 @@ class File
     def send(sym)
       if (sym.equal?(:gets))
         sep=$/
-        res = next_line( sep )
+        res = next_line( sep[0] )
         res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
@@ -513,7 +513,7 @@ class File
 
     def send(sym, arg)
       if (sym.equal?(:gets))
-        res = next_line( arg )
+        res = next_line( arg[0] )
         res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
@@ -523,7 +523,7 @@ class File
     def __send__(sym)
       if (sym.equal?(:gets))
         sep=$/
-        res = next_line( sep )
+        res = next_line( sep[0] )
         res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
@@ -532,7 +532,7 @@ class File
 
     def __send__(sym, arg)
       if (sym.equal?(:gets))
-        res = next_line( arg )
+        res = next_line( arg[0] )
         res._storeRubyVcGlobal(0x21) # store into caller's $_
         return res
       end
@@ -657,7 +657,7 @@ class PersistentFile
               raise NotImplementedError, 'Kernel#gets does not support paragraph mode'
             else
               # read by lines
-              @block.call.next_line( sep )
+              @block.call.next_line( sep[0] )
             end
       res._storeRubyVcGlobal(0x21) # store into caller's $_
       res
