@@ -9,7 +9,8 @@ def test_from_lambda
   raise "lambda returned incorrect #{res}" unless res == 99
   return 88 # return something different from the lambda
 end
-raise "FAIL: lambda" unless test_from_lambda == 88
+ya = test_from_lambda
+raise "FAIL: lambda" unless ya == 88
 
 # proc goes like lambda
 def test_from_deprecated_proc
@@ -18,7 +19,8 @@ def test_from_deprecated_proc
   raise "proc returned incorrect #{res}" unless res == 99
   return 88 # return something different from the lambda
 end
-raise "FAIL: deprecated proc" unless test_from_deprecated_proc == 88
+yb = test_from_deprecated_proc
+raise "FAIL: deprecated proc" unless yb == 99
 
 # TODO: Currently, the next test case fails in MagLev with:
 #
@@ -36,5 +38,6 @@ def test_from_raw_proc
   p.call
   raise "FAIL: should not get here..."
 end
-raise "FAIL: raw proc" unless test_from_raw_proc == 99
-
+yc = test_from_raw_proc
+raise "FAIL: raw proc" unless yc == 99
+true
