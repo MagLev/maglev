@@ -3,7 +3,7 @@ module Kernel
   #  in the bootstrap
 
   def lambda(&blk)
-    Proc.new(&blk)
+    Proc.new_lambda(&blk)
   end
 
   def proc(&blk)
