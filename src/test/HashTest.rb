@@ -207,6 +207,7 @@ class HashTest
     #                 or "c" is value = "ghi", otherwise nil
     def index(value)
         hash = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
+        @hh = hash
         return hash.index(value)
     end
 
@@ -437,7 +438,8 @@ ret = HashTest.new.index('def')
 raise "ERROR" unless ret == 'b'
 
 # expectvalue nil
-ret = HashTest.new.index('xyz')
+h = HashTest.new 
+ret = h.index('xyz')
 raise "ERROR" unless ret == nil
 
 # expectvalue true
