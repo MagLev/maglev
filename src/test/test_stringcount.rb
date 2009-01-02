@@ -51,4 +51,16 @@ test s.count("--"),   1, "3P: --"
 test s.count("---"),  1, "3Q: ---"
 test s.count("----"), 1, "3R: ----"
 
+test( 'aabbcccdefffg'.squeeze , 'abcdefg' , 'squeeze A' )
+test( 'aabbcccdefffg'.squeeze! , 'abcdefg' , 'squeeze B' )
+test( 'aaa'.squeeze! , 'a' , 'squeeze C' )
+test( 'baaa'.squeeze! , 'ba' , 'squeeze C2' )
+test( 'aaab'.squeeze! , 'ab' , 'squeeze C3' )
+test( 'abc'.squeeze! , nil , 'squeeze D' )
+
+test( 'aabbcccdefffg'.squeeze('abcf') , 'abcdefg' , 'squeeze E' )
+test( 'aabbcccdefffg'.squeeze!('abcf') , 'abcdefg' , 'squeeze F' )
+test( 'aabbcccdefffg'.squeeze!('x') , nil , 'squeeze G' )
+test( 'aabbcccdefffg'.squeeze!('bf') , 'aabcccdefg' , 'squeeze H' )
+
 report
