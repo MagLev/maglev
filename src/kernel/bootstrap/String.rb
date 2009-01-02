@@ -218,7 +218,7 @@ class String
 
   primitive 'concat', '_rubyAddAll:'
 
-  # arg to _rubyCount: is expected to be an Array , so declare as 'count*'
+  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
   primitive 'count*', 'rubyCount:'
 
   # MNI: crypt
@@ -584,8 +584,11 @@ class String
     Regexp.new(self)._split_string(string, limit)
   end
 
-  # MNI: squeeze
-  # MNI: squeeze!
+  primitive_nobridge 'squeeze', 'rubySqueeze'
+  primitive 'squeeze*', 'rubySqueeze:'
+
+  primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
+  primitive 'squeeze!*', 'rubySqueezeSelf:'
 
   def strip
     _strip
