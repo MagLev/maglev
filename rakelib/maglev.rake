@@ -88,12 +88,12 @@ namespace :maglev do
 
   desc "Run topaz (use rlwrap, if available)"
   task :topaz => :gemstone do
-    sh %{ `which rlwrap` #{TOPAZ_CMD} }
+    sh %{ `which rlwrap > /dev/null 2>&1` #{TOPAZ_CMD} }
   end
 
   desc "Run debug topaz (use rlwrap, if available)"
   task :'topaz-debug' => :gemstone do
-    sh %{ `which rlwrap` #{TOPAZDEBUG_CMD} }
+    sh %{ `which rlwrap > /dev/null 2>&1` #{TOPAZDEBUG_CMD} }
   end
 
 end
