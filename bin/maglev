@@ -159,7 +159,7 @@ version() {
 }
 
 topaz() {
-  if [ -z "`which rlwrap`" ]; then
+  if [ -z "`which rlwrap > /dev/null 2>&1`" ]; then
     $TOPAZ_CMD $@
   else
     rlwrap $TOPAZ_CMD $@
@@ -167,7 +167,7 @@ topaz() {
 }
 
 topaz-debug() {
-  if [ -z "`which rlwrap`" ]; then
+  if [ -z "`which rlwrap > /dev/null 2>&1`" ]; then
     $TOPAZDEBUG_CMD $@
   else
     rlwrap $TOPAZDEBUG_CMD $@

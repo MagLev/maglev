@@ -74,7 +74,7 @@ if [ $# -ne 0 ]; then
 fi
 
 # Finally, execute the command
-if [ -z "`which rlwrap`" ]; then
+if [ -z "`which rlwrap > /dev/null 2>&1`" ]; then
     $IRB_CMD
 else
     rlwrap $IRB_CMD
