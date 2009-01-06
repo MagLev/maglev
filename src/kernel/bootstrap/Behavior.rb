@@ -79,7 +79,7 @@ class Behavior
     # TODO ?
   end
 
-  def inspect
+  def inspect(touchedSet=nil)
     name
   end
 
