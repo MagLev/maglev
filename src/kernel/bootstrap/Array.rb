@@ -125,7 +125,12 @@ class Array
   # --
   # & uses Smalltalk implementation because Ruby Hash does not
   # support a removeKey:otherwise: in the Ruby API.
-  primitive '&',  'rubyIntersect:'
+  primitive '_intersect',  'rubyIntersect:'
+
+  def &(other)
+    other = Type.coerce_to other, Array, :to_ary
+    _intersect(other)
+  end
 
   # Repetition: if +obj+ is a string, then <tt>arr.join(str)</tt>, otherwise
   # return a new array by concatenating +obj+ copies of self.
@@ -352,7 +357,7 @@ class Array
     n = 0
     lim = self.size
     while (n < lim)
-      if obj == self[n] 
+      if obj == self[n]
         self.delete_at(n)
         return obj
       end
@@ -365,7 +370,7 @@ class Array
     n = 0
     lim = self.size
     while (n < lim)
-      if obj == self[n] 
+      if obj == self[n]
         self.delete_at(n)
         return obj
       end
@@ -476,15 +481,15 @@ class Array
   def fetch(idx, &blk)
     index = idx
     unless index._isFixnum
-      index = index.to_int 
+      index = index.to_int
     end
     my_siz = self.length
     if (index < 0)
       index = my_siz + index
     end
     if (index >= my_siz)
-      return blk.call(idx) 
-    end 
+      return blk.call(idx)
+    end
     self[index]
   end
 
@@ -690,7 +695,7 @@ class Array
   def self._pack_coerce(obj, sym)
     begin
       r = obj.__send__(sym)
-    rescue Exception 
+    rescue Exception
       return nil  # capiprim.c will raise TypeError
     end
     r

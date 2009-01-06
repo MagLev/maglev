@@ -34,6 +34,9 @@ class Behavior
     end
   end
 
+  # This is a 1.9 thing, but some of the 1.8 specs expect it there anyway...
+  alias attr attr_reader
+
   def module_eval(*args)
     # bridge methods would interfere with VcGlobals logic
     raise ArgumentError, 'expected 1 arg'
