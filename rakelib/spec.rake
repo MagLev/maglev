@@ -46,6 +46,12 @@ namespace :spec do
     sh "#{MSPEC_CMD} tag -G fails #{ENV['spec']}"
   end
 
+  desc "Run specs currently tagged as fails, and untag ones now passing"
+  task :untag do
+    check_spec_file
+    sh "#{MSPEC_CMD} tag --del fails #{ENV['spec']}"
+  end
+
   desc "List the specs currently tagged as fails for the dir"
   task :lsfails do
     spec = ENV['spec'] || RSPEC_DIR
@@ -58,31 +64,4 @@ namespace :spec do
     raise "Can't find file #{spec}" unless File.exists? spec
   end
 
-
 end
-
-# namespace :oldspec do
-
-#   # ######################################################################
-#   #                           TOPAZ COMMAND STRINGS
-#   # ######################################################################
-#   # The following +tc_*+ methods generate topaz command strings based on the
-#   # parameters passed to them.
-
-#   # Returns a topaz command string that loads the mspec library, sets the
-#   # +DEBUG_SPEC+ flag per +debug+ parameter and runs the single +spec_file+.
-#   def tc_mspec(spec_file, debug=false)
-#     <<-END.margin
-#     |output push spec.out
-#     |run
-#     |RubyContext load.
-#     |RubyContext default globals at: #DEBUG_SPEC put: #{debug} .
-#     |RubyContext requireFileNamed: 'mspec.rb'.
-#     |RubyCompiler new evaluateString: '\\$formatter = DottedFormatter.new; \\$formatter.register'.
-#     |RubyContext loadFileNamed: '#{spec_file}'.
-#     |RubyCompiler new evaluateString: '\\$formatter.finish'
-#     |%
-#     |abort
-#   END
-#   end
-# end
