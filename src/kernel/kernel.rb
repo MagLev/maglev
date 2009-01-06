@@ -108,6 +108,7 @@ RUBY.require 'kernel/common/dir.rb'
 RUBY.require 'kernel/common/file.rb'
 RUBY.require 'kernel/common/marshal.rb'
 RUBY.require 'kernel/common/regexp.rb'
+RUBY.require 'kernel/common/io.rb'
 
 # Include the delta code.  The delta code overwrites the rubinius
 # common code with gemstone specific mods.
