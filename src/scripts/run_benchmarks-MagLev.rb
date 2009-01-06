@@ -65,7 +65,7 @@ require '../benchmark/cangiano/micro-benchmarks/bm_knucleotide.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_lucas_lehmer.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_mandelbrot.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_mergesort.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_meteor_contest.rb' # runs mostly
+require '../benchmark/cangiano/micro-benchmarks/bm_meteor_contest.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_monte_carlo_pi.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_nbody.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_nsieve.rb'
