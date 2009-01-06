@@ -50,6 +50,10 @@
 
 # Class definition for array tests
 
+def trace(linenum)
+  # puts 'line ' + linenum.to_s
+end
+
 class ArrayTest
     # Expected value: '100|200|300|'
     def new1
@@ -576,207 +580,273 @@ puts ""
 
 # expectvalue '100|200|300|'
 ArrayTest.new.new1()
+trace(__LINE__)
 
 # expectvalue '100|200|300|'
 ArrayTest.new.new2()
+trace(__LINE__)
 
 # expectvalue '100|200|300|'
 ArrayTest.new.new3()
+trace(__LINE__)
 
 # expectvalue '100|'
 ArrayTest.new.intersection()
+trace(__LINE__)
 
 # expectvalue '1|2|3|1|2|3|1|2|3|'
 ArrayTest.new.repeat()
+trace(__LINE__)
 
 # expectvalue '1|2|3|4|5|'
 ArrayTest.new.plus()
+trace(__LINE__)
 
 # expectvalue '1|4|5|'
 ArrayTest.new.minus()
+trace(__LINE__)
 
 # expectvalue '1|2|3|4|5|'
 ArrayTest.new.append()
+trace(__LINE__)
 
 # expectvalue 0
 ArrayTest.new.compare1()
+trace(__LINE__)
 
 # expectvalue 1
 ArrayTest.new.compare2()
+trace(__LINE__)
 
 # expectvalue -1
 ArrayTest.new.compare3()
+trace(__LINE__)
 
 # expectvalue true
 ArrayTest.new.equal1()
+trace(__LINE__)
 
 # expectvalue false
 ArrayTest.new.equal2()
+trace(__LINE__)
 
 # expectvalue 2
 ArrayTest.new.index1()
+trace(__LINE__)
 
 # expectvalue 0
 ArrayTest.new.index2()
+trace(__LINE__)
 
 # expectvalue 0
 ArrayTest.new.index3()
+trace(__LINE__)
 
 # expectvalue 2
 ArrayTest.new.slice1()
+trace(__LINE__)
 
 # expectvalue 0
 ArrayTest.new.slice2()
+trace(__LINE__)
 
 # expectvalue 0
 ArrayTest.new.slice3()
+trace(__LINE__)
 
 # expectvalue 300
 ArrayTest.new.assign1()
+trace(__LINE__)
 
 # expectvalue 'abc|def|ghi|'
 ArrayTest.new.assign2()
+trace(__LINE__)
 
 # expectvalue 'abc|def|ghi|'
 ArrayTest.new.assign3()
+trace(__LINE__)
 
 # expectvalue 'jkl|mno|pqr|'
 ArrayTest.new.assoc()
+trace(__LINE__)
 
 # expectvalue 401
 ArrayTest.new.at()
+trace(__LINE__)
 
 # expectvalue '102|202|302|
 ArrayTest.new.collect()
+trace(__LINE__)
 
 # expectvalue '102|202|302|
 ArrayTest.new.map()
+trace(__LINE__)
 
 # expectvalue '101|102|103|'
 ArrayTest.new.compact()
+trace(__LINE__)
 
 # expectvalue '101|102|103|'
 ArrayTest.new.compact!()
+trace(__LINE__)
 
 # expectvalue 'a|b|c|d|'
 ArrayTest.new.concat()
+trace(__LINE__)
 
 # expectvalue 'a|b|d'
 ArrayTest.new.delete()
+trace(__LINE__)
 
 # expectvalue 'a|b|d'
 ArrayTest.new.deleteAt()
+trace(__LINE__)
 
 # expectvalue true
 ArrayTest.new.empty1()
+trace(__LINE__)
 
 # expectvalue false
 ArrayTest.new.empty2()
+trace(__LINE__)
 
 # expectvalue true
 ArrayTest.new.eql1()
+trace(__LINE__)
 
 # expectvalue false
 ArrayTest.new.eql2()
+trace(__LINE__)
 
 # expectvalue 201
 #ArrayTest.new.fetch()  # TODO: Fix Array
+trace(__LINE__)
 
 # expectvalue 'x|x|x|x|x|'
 ArrayTest.new.fill1()
 
 # expectvalue 'a|x|x|x|e|'
 ArrayTest.new.fill2()
+trace(__LINE__)
 
 # expectvalue 'a|x|x|x|e|'
 #ArrayTest.new.fill3() # TODO: Fix Array#fill to take a range
+trace(__LINE__)
 
 # expectvalue '0|1|4|9|16|'
 ArrayTest.new.fill4()
+trace(__LINE__)
 
 # expectvalue 'a'
 ArrayTest.new.first1()
+trace(__LINE__)
 
 # expectvalue 'a|b|'
 ArrayTest.new.first2()
+trace(__LINE__)
 
 # expectvalue 'a|b|c|d|e|'
 ArrayTest.new.flatten()
+trace(__LINE__)
 
 # expectvalue true
 ArrayTest.new.include1()
+trace(__LINE__)
 
 # expectvalue false
 ArrayTest.new.include2()
+trace(__LINE__)
 
 # expectvalue 456
 ArrayTest.new.replace()
+trace(__LINE__)
 
 # expectvalue 4576
 ArrayTest.new.insert()
+trace(__LINE__)
 
 # expectvalue '[1, 2, 3, [...]]'
 ArrayTest.new.inspect()
+trace(__LINE__)
 
 # expectvalue '123'
 ArrayTest.new.join1()
+trace(__LINE__)
 
 # expectvalue '1-2-3'
 ArrayTest.new.join2()
+trace(__LINE__)
 
 # expectvalue 'ghi'
 ArrayTest.new.last()
+trace(__LINE__)
 
 # expectvalue 4
 ArrayTest.new.length()
+trace(__LINE__)
 
 # expectvalue 4
 ArrayTest.new.nitems()
+trace(__LINE__)
 
 # expectvalue 'ABC'
 ArrayTest.new.pack()
+trace(__LINE__)
 
 # expectvalue 67
 ArrayTest.new.pop()
+trace(__LINE__)
 
 # expectvalue '65|66|67|68|'
 ArrayTest.new.push()
+trace(__LINE__)
 
 # expectvalue 'd|e|f|'
 ArrayTest.new.rassoc()
+trace(__LINE__)
 
 # expectvalue '4|5|'
 ArrayTest.new.reject()
+trace(__LINE__)
 
 # expectvalue '3|2|1|'
 ArrayTest.new.reverse()
+trace(__LINE__)
 
 # expectvalue 'a|e|i|o|u|'
 # ArrayTest.new.select()  # TODO: Fix Array
+trace(__LINE__)
 
 # expectvalue 'b|c|d|e|'
 ArrayTest.new.shift()
+trace(__LINE__)
 
 # expectvalue 26
 ArrayTest.new.size()
 
 # expectvalue 'a|b|c|d|e|f|'
 ArrayTest.new.sort()
+trace(__LINE__)
 
 # expectvalue 'dfaceb'
 ArrayTest.new.toString()
+trace(__LINE__)
 
 # expectvalue '15|26'
 ArrayTest.new.transpose()
+trace(__LINE__)
 
 # expectvalue '1|2|3|4|5|'
 ArrayTest.new.uniq()
+trace(__LINE__)
 
 # expectvalue 'z|a|b|c|'
 ArrayTest.new.unshift()
+trace(__LINE__)
 
 # expectvalue '147|258|3|'
 ArrayTest.new.zip()
+trace(__LINE__)
 
 
 require File.expand_path('simple', File.dirname(__FILE__))
