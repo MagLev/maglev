@@ -131,9 +131,15 @@ class Array
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
     result = []
-    # TODO:  not checking for  obj responds to to_str
-    # TODO: do not use a block here.
-    obj.times{result.concat(self)}
+    if obj._isFixnum
+      for i in 0..obj-1
+        result.concat(self)
+      end
+    else
+      obj.times { |i| 
+        result.concat(self)
+      }
+    end
     result
   end
 
@@ -594,6 +600,13 @@ class Array
 
   def first
     self[0]
+  end
+
+  def first(count)
+    if count < 0
+      raise ArgumentError, 'negative count'
+    end
+    self[0,count] 
   end
 
   def flatten
