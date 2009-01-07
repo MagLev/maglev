@@ -1,8 +1,5 @@
-fails:File.new return a new File with mode string
 fails:File.new return a new File with mode num
 fails:File.new return a new File with modus num and permissions
-fails:File.new creates the file and returns writable descriptor when called with 'w' mode and r-o permissions
-fails:File.new opens the existing file, does not change permissions even when they are specified
 fails:File.new return a new File with modus fd 
 fails:File.new create a new file when use File::EXCL mode 
 fails:File.new raises an Errorno::EEXIST if the file exists when create a new file with File::CREAT|File::EXCL
