@@ -3,8 +3,16 @@
 === Persistence support
 
 The Gemstone class has methods for +commitTransaction+, +abortTransaction+
-and +beginTransaction+. In the future, this functionality is likely to be 
+and +beginTransaction+. In the future, this functionality is likely to be
 provided by different classes and messages
+
+=== Special methods
+* Underscore + camelCase = GemStone unmodifiable code.  There are several
+  methods that begin with an underscore and are camelCase,
+  e.g.,<tt>_isArray</tt>.  MagLev will not allow you to re-define these
+  methods.
+* <tt>equal?</tt> is also a special case, and you are unable to re-define
+  it.
 
 === <tt>maglev-irb</tt>
 
@@ -23,11 +31,11 @@ provided by different classes and messages
 
 === Noise from rlwrap
 * In some cases, <tt>rlwrap</tt> (see Prerequisites[link:files/docs/prerequisites]) will output noise while typing at a Topaz prompt (Linux only).
- 
+
 === Initial startup
-* The first time you run maglev-ruby or maglev-irb after installing MagLev there will be a delay of up to 30 seconds for system initialization. 
+* The first time you run maglev-ruby or maglev-irb after installing MagLev there will be a delay of up to 30 seconds for system initialization.
 * If you run maglev-irb immediately after installing MagLev, you may get an "Almost out of Memory" warning and a stack trace (Macintosh only). This can be safely ignored as it does not affect operation of the system.
- 
+
 === Misc
 * +ARGF+ is not supported.
 * Continuations are not supported.
