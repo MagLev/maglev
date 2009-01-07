@@ -1,3 +1,2 @@
-fails:Kernel.Integer when given a String does not call #to_i on the given String
 fails:Kernel.Integer when given a String raises an ArgumentError if the given String has no valid Integer representation
 fails:Kernel.Integer is a private method

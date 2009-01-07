@@ -1,4 +1,2 @@
-fails:Kernel#method returns a method object for a valid method
-fails:Kernel#method returns a method object for a valid singleton method
 fails:Kernel#method raises a NameError for an invalid method name
 fails:Kernel#method raises a NameError for an invalid singleton method name
