@@ -1,13 +1,10 @@
 fails:IO#readlines when passed no arguments returns an Array containing lines based on $/
 fails:IO#readlines when passed no arguments updates self's position
 fails:IO#readlines when passed no arguments updates self's lineno based on the number of lines read
-fails:IO#readlines when passed no arguments does not change $_
 fails:IO#readlines when passed no arguments returns an empty Array when self is at the end
-fails:IO#readlines when passed [seperator] returns an Array containing lines based on the passed seperator
 fails:IO#readlines when passed [seperator] returns an empty Array when self is at the end
 fails:IO#readlines when passed [seperator] updates self's lineno based on the number of lines read
 fails:IO#readlines when passed [seperator] updates self's position based on the number of characters read
-fails:IO#readlines when passed [seperator] does not change $_
 fails:IO#readlines when passed [seperator] returns an Array containing all paragraphs when the passed seperator is an empty String
 fails:IO#readlines when passed [seperator] returns the remaining content as one line starting at the current position when passed nil
 fails:IO#readlines when passed [seperator] tries to convert the passed seperator to a String using #to_str
@@ -15,11 +12,7 @@ fails:IO#readlines when passed [seperator] checks whether the passed seperator r
 fails:IO#readlines when in write-only mode raises an IOError
 fails:IO.readlines when passed [file_name] returns an Array containing lines of file_name based on $/
 fails:IO.readlines when passed [file_name] raises an Errno::ENOENT error when the passed file_name does not exist
-fails:IO.readlines when passed [file_name] does not change $_
-fails:IO.readlines when passed [file_name] tries to convert the passed file_name to a String using #to_str
 fails:IO.readlines when passed [file_name] checks whether the passed file_name responds to #to_str
-fails:IO#readlines when passed [file_name, seperator] returns an Array containing lines of file_name based on the passed seperator
-fails:IO#readlines when passed [file_name, seperator] does not change $_
 fails:IO#readlines when passed [file_name, seperator] returns an Array containing all paragraphs when the passed seperator is an empty String
 fails:IO#readlines when passed [file_name, seperator] tries to convert the passed seperator to a String using #to_str
 fails:IO#readlines when passed [file_name, seperator] checks whether the passed seperator responds to #to_str
