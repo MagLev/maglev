@@ -8,7 +8,11 @@ class Symbol
   primitive_nobridge 'id2name', 'asString'
   primitive_nobridge '==', '='
   primitive_nobridge 'hash'
-  primitive_nobridge 'inspect', 'asSymbol'
+
+  def inspect(touchedSet=nil)
+    ':' + self
+  end
+
   primitive_nobridge 'to_i', 'asOop'
   primitive_nobridge 'to_int', 'asOop'
   primitive_nobridge 'to_s', 'asString'
