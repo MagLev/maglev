@@ -184,8 +184,12 @@ class Object
   end
 
     def pretty_inspect
+      # TODO: remove
+      # hides Kernel#pretty_inspect from mspec's src/lib/pp.rb 
+      #   until we get Thread implemented.
       inspect;
     end
+
 
     def to_a
        # remove this method for MRI 1.9 compatibility
