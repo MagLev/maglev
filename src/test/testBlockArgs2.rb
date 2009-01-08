@@ -1,58 +1,111 @@
 def raise_err(a)
   puts a.inspect 
-  nil.pause  # do not checkin
+  nil.pause  
 end
 def trace(a)
-  # puts a
+  # puts a + 1
+end
+
+# need a repeat loop to cover the fast for second time
+#   through invoking a block
+def y_zeroArg
+  3.times {
+    yield
+  }
+end
+
+def y_zeroArgErr
+  2.times{
+    e = 0
+    begin
+      yield
+    rescue ArgumentError
+      e = 1 #expect wrong num args
+    end
+    unless e == 1 ; raise_err(e); end
+  }
 end
 
 def y_oneArg
-  #1.times do | n |
+  3.times {
     yield(8)
-  #end
+  }
+end
+def y_oneArgErr
+  2.times{
+    e = 0
+    begin
+      yield(8)
+    rescue ArgumentError
+      e = 1 #expect wrong num args
+    end
+    unless e == 1 ; raise_err(e); end
+  }
 end
 def y_twoArgs
-  #1.times do | n |
+  3.times {
     yield(9, 10)
-  #end
+  }
+end
+def y_twoArgsErr
+  2.times{
+    e = 0
+    begin
+      yield(8,9)
+    rescue ArgumentError
+      e = 1 #expect wrong num args
+    end
+    unless e == 1 ; raise_err(e); end
+  }
 end
 def y_threeArgs
-  #1.times do | n |
+  3.times {
     yield(8, 9, 10)
-  #end
+  }
+end
+def y_threeArgsErr
+  2.times{
+    e = 0
+    begin
+      yield(1,2,3)
+    rescue ArgumentError
+      e = 1 #expect wrong num args
+    end
+    unless e == 1 ; raise_err(e); end
+  }
 end
 def y_emptyArr
-  #1.times do | n |
+  3.times {
    yield( [] )
-  #end
+  }
 end
 def y_emptyArrArr
-  #1.times do | n |
+  3.times {
     yield( [[]] ) 
-  #end
+  }
 end
 def y_arrayFour
-  #1.times do | n |
+  3.times {
     yield( [ 9 , 10, 11 , 12 ] )
-  #end
+  }
 end
 
 def y_arrayTwo
-  #1.times do | n |
+  3.times {
    yield( [ 6, 7 ])
-  #end
+  }
 end
 
 def y_starTwo
-  #1.times do | n |
+  3.times {
     yield( *[6, 7])
-  #end
+  }
 end
 
 def y_starOne(*args)
-  #1.times do | n |
+  3.times {
     yield *args
-  #end
+  }
 end
 
 # --------
@@ -62,6 +115,12 @@ y_oneArg { | a |
     unless a == 8 ; raise_err(a) ; end
     trace(__LINE__)
   }
+
+y_zeroArg { | a |
+    unless a == nil ; raise_err(a) ; end;
+    trace(__LINE__)
+  }
+
 y_oneArg { | a, b |
     x = [a,b]
     unless x == [8,nil] ; raise_err(x) ; end
@@ -70,6 +129,12 @@ y_oneArg { | a, b |
 
 y_twoArgs { | a |
   unless a == [9, 10] ; raise_err(a); end
+    trace(__LINE__)
+}
+
+y_zeroArg { | a, b |
+  x = [a,b]
+  unless x == [nil,nil]; raise_err(x); end
     trace(__LINE__)
 }
 
@@ -85,6 +150,12 @@ y_twoArgs { | a, b ,c |
     trace(__LINE__)
 }
 
+y_zeroArg { | a, b, c|
+  x = [a,b,c]
+  unless x == [nil, nil, nil] ; raise_err(x); end
+    trace(__LINE__)
+}
+
 y_oneArg { | a, b, c|
   x = [a,b,c]
   unless x == [8, nil, nil] ; raise_err(x); end
@@ -96,4 +167,16 @@ y_threeArgs { | a, b, c|
   unless  x == [8, 9, 10] ; raise_err(x); end
     trace(__LINE__)
 } 
+
+y_threeArgs { | a, b|
+  x = [a,b]
+  unless  x == [8, 9] ; raise_err(x); end
+    trace(__LINE__)
+} 
+
+y_threeArgs { | a|
+  unless  a == [8, 9, 10] ; raise_err(a); end
+   trace(__LINE__)
+} 
+
 true

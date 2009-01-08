@@ -1,60 +1,43 @@
 
 T175 = true  # set to false with Ticket 175 completely fixed
 
+def raise_err(a)
+  puts a.inspect 
+  nil.pause  
+end
+def trace(linenum)
+  # puts linenum  + 1
+end
+
 def y_oneArg(x)
-  #1.times do | n |
     yield(x)
-  #end
 end
 def y_twoArgs
-  #1.times do | n |
     yield(9, 10)
-  #end
 end
 def y_threeArgs
-  #1.times do | n |
     yield(8, 9, 10)
-  #end
 end
 def y_emptyArr
-  #1.times do | n |
    yield( [] )
-  #end
 end
 def y_emptyArrArr
-  #1.times do | n |
     yield( [[]] ) 
-  #end
 end
 def y_arrayFour
-  #1.times do | n |
     yield( [ 9 , 10, 11 , 12 ] )
-  #end
 end
 
 def y_arrayTwo
-  #1.times do | n |
    yield( [ 6, 7 ])
-  #end
 end
 
 def y_starTwo
-  #1.times do | n |
     yield( *[6, 7])
-  #end
 end
 
 def y_starOne(*args)
-  #1.times do | n |
     yield *args
-  #end
-end
-def raise_err(a)
-  puts a.inspect 
-  nil.pause  # do not checkin
-end
-def trace(linenum)
-  # puts linenum 
 end
 
 # --------
