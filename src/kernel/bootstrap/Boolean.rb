@@ -12,7 +12,7 @@ class Boolean
 
   primitive_nobridge 'not'
 
-  def inspect 
+  def inspect(touchedSet=nil)
     to_s
   end
 
