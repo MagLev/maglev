@@ -205,7 +205,7 @@ module Kernel
   # def rand #  implemented in Kernel2.rb
 
   def raise(ex_class, message)
-    ex = ex_class.exception 
+    ex = ex_class.exception
     ex.signal(message)
   end
 
@@ -215,12 +215,12 @@ module Kernel
   end
 
   def raise(msg)
-    if msg._isString  
+    if msg._isString
       raise(RuntimeError, msg)
     else
       # msg should be a subclass of Exception or
-      #  an object that returns a new exception 
-      ex = msg.exception 
+      #  an object that returns a new exception
+      ex = msg.exception
       ex.signal
     end
   end
@@ -258,8 +258,12 @@ module Kernel
     return false
   end
 
-  def trap
-    _stub_warn("Kernel#trap")
+  def trap(signal, proc)
+    _stub_warn("Kernel#trap(signal, proc)")
+  end
+
+  def trap(signal, &block)
+    _stub_warn("Kernel#trap(signal, &block)")
   end
 
   # def throw(aSymbol); end
