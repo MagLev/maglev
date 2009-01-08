@@ -12,10 +12,11 @@ class ExecBlock
 
   primitive_nobridge '_copyForLambda', '_copyForLambda'
 
-  primitive_nobridge '_rubyCall' , '_rubyCall:'
-
   # call, call:, call::, call::: will be compiled to special bytecodes
   #  and won't use the bridge methods generated for  call*
+
+  # bridge methods generated for call*  will be used but the actual
+  #   send of call* will be a special bytecode.
   primitive          'call*' , '_rubyCall:'
 
     def []
@@ -23,7 +24,7 @@ class ExecBlock
     end
 
     def [](a)
-      self._rubyCall(a)
+      self.call(a)
     end
 
     def [](a, b)
@@ -37,6 +38,7 @@ class ExecBlock
     def [](*args)
       self.call(*args)
     end
+
 end
 
 
@@ -106,7 +108,7 @@ class Proc
     end
 
     def [](a)
-      @block._rubyCall(a)
+      @block.call(a)
     end
 
     def [](a, b)
@@ -156,7 +158,7 @@ class Proc
 
     # TODO: binding
 
-    def inspect
+    def inspect(touchedSet=nil)
       "#<Proc>"
     end
 
