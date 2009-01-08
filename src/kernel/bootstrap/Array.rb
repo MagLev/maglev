@@ -575,7 +575,7 @@ class Array
 
   def fill(&blk)
     # note no bridge methods for second and later variants
-    fill(nil, nil, blk)
+    fill(nil, nil, &blk)
     self
   end
 
@@ -583,7 +583,7 @@ class Array
     # note no bridge methods for second and later variants
     if (start._isRange)
       start.each do | n |
-        fill(start, 1, blk)
+        fill(start, 1, &lk)
       end
     else
       fill(start, nil, blk)
@@ -649,6 +649,7 @@ class Array
 
   def insert(idx, *args)
     insert_all(args, idx+1)
+    self
   end
 
   def join(s="")
