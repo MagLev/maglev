@@ -239,7 +239,7 @@ class Hash
     return "{}" if length.equal?(0)
     str = "{"
     if (touchedSet.equal?(nil))
-      touchedSet = Set.new
+      touchedSet = IdentitySet.new
     else
       if (touchedSet._includes(self))
         str << '...}'

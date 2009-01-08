@@ -68,7 +68,7 @@ module RecursionGuard
   # TODO move this module to a Gemstone file/directory since it
   #  has been changed to use Gemstone identity Set .
 
-  STACK = Set.new # Gemstone single thread hack
+  STACK = IdentitySet.new # Gemstone single thread hack
   def self.inspecting?(obj)
     stack._includes(obj)
   end
