@@ -42,7 +42,12 @@ class Numeric
 # round implemented in subclasses
 
     primitive 'step', '_rubyTo:by:do:'
-    primitive 'inspect', 'printString'
+
+    primitive_nobridge '_inspect', 'printString'
+
+    def inspect(touchedSet=nil)
+      _inspect
+    end
 
 # to_int  implemented in subclasses
 # truncated implemented in subclasses
