@@ -31,7 +31,7 @@ class Range
   primitive 'end', '_to'
 
   def eql?(other)
-    other.is_a?(Range) &&
+    other._isRange &&
       self.first.eql?(other.first) &&
       self.last.eql?(other.last) &&
       self.exclude_end?.eql?(other.exclude_end?)
@@ -43,7 +43,7 @@ class Range
   primitive 'first', '_from'
 
   def initialize(fromArg, toArg, exclusive=false)
-    unless fromArg.is_a?(Fixnum) && toArg.is_a?(Fixnum)
+    unless fromArg._isFixnum && toArg._isFixnum
       begin
         raise ArgumentError, "bad value for range" unless fromArg <=> toArg
       rescue
@@ -75,16 +75,18 @@ class Range
   primitive 'last', '_to'
 
   def step(n=1, &block)
-    is_numeric_range = @from.is_a?(Numeric)
     current = @from
-    begin
-      block.call(current)
-      if is_numeric_range
+    if @from._isNumber
+      begin
+        block.call(current)
         current += n
-      else
-        n.times { current = current.succ }
-      end
-    end while current < @to
+      end while current < @to
+    else
+      begin
+        block.call(current)
+        n.times { |i| current = current.succ }
+      end while current < @to
+    end
     self
   end
 
