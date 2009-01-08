@@ -62,12 +62,20 @@ class ArrayTest
     end
   end
 
-  # Expected value: [100, 200, 300]
   def new2
+    arr = [100, 200]
+    unless arr.length == 2 ; raise 'err'; end
+    unless arr[0] == 100 ; raise 'err'; end
+    unless arr[1] == 200 ; raise 'err'; end
+  end
+
+  # Expected value: [100, 200, 300]
+  def new3
     arr = [100, 200, 300]
-    if arr != [100, 200, 300]
-      raise 'ERROR'
-    end
+    unless arr.length == 3 ; raise 'err'; end
+    unless arr[0] == 100 ; raise 'err'; end
+    unless arr[1] == 200 ; raise 'err'; end
+    unless arr[2] == 300 ; raise 'err'; end
   end
 
   # Expected value: [100]
@@ -421,7 +429,7 @@ class ArrayTest
 
   # Expected value: [0, 1, 4, 9, 16]
   def fill4
-    arr = ['1', '2', '3', '4', '5']
+    arr = [0, 1, 2, 3, 4]
     arr.fill {|x| x*x}
     if arr != [0, 1, 4, 9, 16]
       raise 'ERROR'
@@ -690,7 +698,6 @@ puts ""
 ArrayTest.new.new1()
 trace(__LINE__)
 
-# expectvalue [100, 200, 300]
 ArrayTest.new.new2()
 trace(__LINE__)
 
