@@ -63,8 +63,11 @@ class Hash
 
   primitive 'clear', 'removeAllKeys'
 
-  primitive_nobridge 'default&' , 'default:'
-  primitive 'default'
+  primitive_nobridge '_default' , 'default:'
+
+  def default(key=nil)
+    _default(key)
+  end
 
   primitive 'default=', 'setDefaultValue:'
 
