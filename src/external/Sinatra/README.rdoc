@@ -1,0 +1,523 @@
+= Sinatra
+
+Sinatra is a DSL for quickly creating web-applications in Ruby with minimal
+effort.
+
+== Sample App
+
+  # myapp.rb
+  require 'rubygems'
+  require 'sinatra'
+  get '/' do
+    'Hello world!'
+  end
+
+Run with <tt>ruby myapp.rb</tt> and view at <tt>http://localhost:4567</tt>
+
+== HTTP Methods
+
+  get '/' do
+    .. show things ..
+  end
+
+  post '/' do
+    .. create something ..
+  end
+
+  put '/' do
+    .. update something ..
+  end
+
+  delete '/' do
+    .. annihilate something ..
+  end
+
+  head '/' do
+
+  end
+
+NOTE: <tt>put</tt> and <tt>delete</tt> are also triggered when a
+<tt>_method</tt> parameter is set to PUT or DELETE and the HTTP request method
+is POST
+
+== Routes
+
+Routes are matched based on the order of declaration. The first route that
+matches the request is invoked.
+
+Simple:
+
+  get '/hi' do
+    ...
+  end
+
+Named parameters:
+
+  get '/:name' do
+    # matches /sinatra and the like and sets params[:name]
+  end
+
+Splat parameters:
+
+  get '/say/*/to/*' do
+    # matches /say/hello/to/world
+    params["splat"] # => ["hello", "world"]
+  end
+
+  get '/download/*.*' do
+    # matches /download/path/to/file.xml
+    params["splat"] # => ["path/to/file", "xml"]
+  end
+
+User agent matching:
+
+  get '/foo', :agent => /Songbird (\d\.\d)[\d\/]*?/ do
+    "You're using Songbird version #{params[:agent][0]}"
+  end
+
+  get '/foo' do
+    # matches non-songbird browsers
+  end
+
+== Static files
+
+Put all of your static content in the ./public directory
+
+  root
+    \ public
+
+If a file exists that maps to the REQUEST_PATH then it is served and the
+request ends. Otherwise, Sinatra will look for an event that matches the
+path.
+
+== Views
+
+Views are searched for in a "views" directory in the same location as
+your main application.
+
+=== Haml Templates
+
+  get '/' do
+    haml :index
+  end
+
+Renders <tt>./views/index.haml</tt>.
+
+=== Erb
+
+  get '/' do
+    erb :index
+  end
+
+Renders <tt>./views/index.erb</tt>
+
+=== Builder
+
+See Sinatra::Builder
+
+=== Sass
+
+  get '/stylesheet.css' do
+    content_type 'text/css', :charset => 'utf-8'
+    sass :stylesheet
+  end
+
+Renders <tt>./views/stylesheet.sass</tt>.
+
+=== Inline Templates
+
+  get '/' do
+    haml '%div.title Hello World'
+  end
+
+Renders the inlined template string.
+
+=== Accessing Variables
+
+Templates are evaluated within the Sinatra::EventContext instance
+used to evaluate event blocks. Instance variables set in event
+blocks can be accessed direcly in views:
+
+  get '/:id' do
+    @foo = Foo.find(params[:id])
+    haml '%h1== @foo.name'
+  end
+
+Or, specify an explicit Hash of local variables:
+
+  get '/:id' do
+    foo = Foo.find(params[:id])
+    haml '%h1== foo.name', :locals => { :foo => foo }
+  end
+
+This is typically used when rendering templates as partials from within
+other templates.
+
+=== In-file Templates
+
+Templates may be defined at the end of the source file:
+
+  get '/' do
+    haml :index
+  end
+
+  use_in_file_templates!
+
+  __END__
+
+  @@ layout
+  X
+  = yield
+  X
+
+  @@ index
+  %div.title Hello world!!!!!
+
+It's also possible to define named templates using the top-level template
+method:
+
+  template :layout do
+    "X\n=yield\nX"
+  end
+
+  template :index do
+    '%div.title Hello World!'
+  end
+
+  get '/' do
+    haml :index
+  end
+
+== Helpers
+
+The top-level <tt>helpers</tt> method takes a block and extends all
+EventContext instances with the methods defined:
+
+  helpers do
+    def bar(name)
+      "#{name}bar"
+    end
+  end
+
+  get '/:name' do
+    bar(params[:name])
+  end
+
+== Filters
+
+These are run in Sinatra::EventContext before every event.
+
+  before do
+    .. this code will run before each event ..
+  end
+
+== Halt!
+
+To immediately stop a request during a before filter or event use:
+
+  throw :halt
+
+Set the body to the result of a helper method
+
+  throw :halt, :helper_method
+
+Set the body to the result of a helper method after sending it parameters from
+the local scope
+
+  throw :halt, [:helper_method, foo, bar]
+
+Set the body to a simple string
+
+  throw :halt, 'this will be the body'
+
+Set status then the body
+
+  throw :halt, [401, 'go away!']
+
+Set the status then call a helper method with params from local scope
+
+  throw :halt, [401, [:helper_method, foo, bar]]
+
+Run a proc inside the Sinatra::EventContext instance and set the body to the
+result
+
+  throw :halt, lambda { puts 'In a proc!'; 'I just wrote to $stdout!' }
+
+Create you own to_result
+
+  class MyResultObject
+    def to_result(event_context, *args)
+      event_context.body = 'This will be the body!
+    end
+  end
+
+  get '/' do
+    throw :halt, MyResultObject.new
+  end
+
+Get the gist?  If you want more fun with this then checkout <tt>to_result</tt>
+on Array, Symbol, Fixnum, NilClass.
+
+== Configuration and Reloading
+
+Sinatra supports multiple environments and reloading. Reloading happens
+before every request when running under the :development environment. Wrap
+your configurations in <tt>configure</tt> (i.e. Database connections, Constants,
+etc.) to protect them from reloading or to target specific environments.
+
+All environments:
+
+  configure do
+    ...
+  end
+
+Production:
+
+  configure :production do
+    ...
+  end
+
+Two at a time:
+
+  configure :production, :test do
+    ...
+  end
+
+This is also really nifty for error handling.
+
+== Error handling
+
+Error handlers run inside the current Sinatra::EventContext instance, which
+means you get all the goodies it has to offer (i.e. haml, erb, throw :halt,
+etc.)
+
+=== Not Found
+
+When Sinatra::NotFound is raised, the not_found handler is invoked:
+
+  not_found do
+    'This is nowhere to be found'
+  end
+
+=== Error
+
+By default, the +error+ handler is invoked on Sinatra::ServerError or when
+an unknown error occurs.
+
+The exception can be obtained from the 'sinatra.error' variable in
+request.env.
+
+  error do
+    'Sorry there was a nasty error - ' + request.env['sinatra.error'].name
+  end
+
+Custom errors:
+
+  error MyCustomError do
+    'So what happened was...' + request.env['sinatra.error'].message
+  end
+
+Then, if this happens:
+
+  get '/' do
+    raise MyCustomError, 'something bad'
+  end
+
+You get this:
+
+  So what happened was... something bad
+
+Sinatra installs special not_found and error handlers when running under
+the development.
+
+== Mime types
+
+When using send_file or static files you may have mime types Sinatra doesn't
+understand.  Use +mime+ in those cases.
+
+  mime :foo, 'text/foo'
+
+== Rack Middleware
+
+Sinatra rides on Rack[http://rack.rubyforge.org/], a minimal standard
+interface for Ruby web frameworks. One of Rack's most interesting capabilities
+for application developers is support for "middleware" -- components that sit
+between the server and your application monitoring and/or manipulating the
+HTTP request/response to provide various types of common functionality.
+
+Sinatra makes building Rack middleware pipelines a cinch via a top-level
++use+ method:
+
+  require 'sinatra'
+  require 'my_custom_middleware'
+
+  use Rack::Lint
+  use MyCustomMiddleware
+
+  get '/hello' do
+    'Hello World'
+  end
+
+The semantics of +use+ are identical to those defined for the
+Rack::Builder[http://rack.rubyforge.org/doc/classes/Rack/Builder.html] DSL
+(most frequently used from rackup files). For example, the +use+ method
+accepts multiple/variable args as well as blocks:
+
+  use Rack::Auth::Basic do |username, password|
+    username == 'admin' && password == 'secret'
+  end
+
+Rack is distributed with a variety of standard middleware for logging,
+debugging, URL routing, authentication, and session handling. Sinatra uses
+many of of these components automatically based on configuration so you
+typically don't have to +use+ them explicitly.
+
+== Testing
+
+=== Test/Unit
+
+  require 'rubygems'
+  require 'sinatra'
+  require 'sinatra/test/unit'
+  require 'my_sinatra_app'
+
+  class MyAppTest < Test::Unit::TestCase
+
+    def test_my_default
+      get_it '/'
+      assert_equal 'My Default Page!', @response.body
+    end
+
+    def test_with_agent
+      get_it '/', :agent => 'Songbird'
+      assert_equal 'You're in Songbird!', @response.body
+    end
+
+    ...
+
+  end
+
+=== Test/Spec
+
+  require 'rubygems'
+  require 'sinatra'
+  require 'sinatra/test/spec'
+  require 'my_sinatra_app'
+
+  describe 'My app' do
+
+    it "should show a default page" do
+      get_it '/'
+      should.be.ok
+      body.should.equal 'My Default Page!'
+    end
+
+    ...
+
+  end
+
+=== RSpec
+
+  require 'rubygems'
+  require 'spec'
+  require 'sinatra'
+  require 'sinatra/test/rspec'
+  require 'my_sinatra_app'
+
+  describe 'My app' do
+    it 'should show a default page' do
+      get_it '/'
+      @response.should be_ok
+      @response.body.should == 'My Default Page!'
+    end
+
+    ...
+
+  end
+
+See Sinatra::Test::Methods for more information on +get_it+, +post_it+,
++put_it+, and friends.
+
+== Command line
+
+Sinatra applications can be run directly:
+
+  ruby myapp.rb [-h] [-x] [-p PORT] [-e ENVIRONMENT]
+
+Options are:
+
+  -h # help
+  -p # set the port (default is 4567)
+  -e # set the environment (default is development)
+  -x # turn on the mutex lock (default is off)
+
+== Contributing
+
+=== Tools
+
+Besides Ruby itself, you only need a text editor, preferably one that supports
+Ruby syntax hilighting. VIM and Emacs are a fine choice on any platform, but
+feel free to use whatever you're familiar with.
+
+Sinatra uses the Git source code management system. If you're unfamiliar with
+Git, you can find more information and tutorials on http://git.or.cz/ as well
+as http://git-scm.com/.  Scott Chacon created a great series of introductory
+screencasts about Git, which you can find here: http://www.gitcasts.com/
+
+=== First Time: Cloning The Sinatra Repo
+
+  cd where/you/keep/your/projects
+  git clone git://github.com/bmizerany/sinatra.git
+  cd sinatra
+  cd path/to/your_project
+  ln -s ../sinatra/
+
+=== Updating Your Existing Sinatra Clone
+
+  cd where/you/keep/sinatra
+  git pull
+
+=== Using Edge Sinatra in Your App
+
+at the top of your sinatra_app.rb file:
+
+  $:.unshift File.dirname(__FILE__) + '/sinatra/lib'
+  require 'sinatra'
+
+  get '/about' do
+    "I'm running on Version " + Sinatra::VERSION
+  end
+
+=== Contributing a Patch
+
+There are several ways to do this. Probably the easiest (and preferred) way is
+to fork Sinatra on GitHub (http://github.com/bmizerany/sinatra), push your
+changes to your Sinatra repo, and then send Blake Mizerany (bmizerany on
+GitHub) a pull request.
+
+You can also create a patch file and attach it to a feature request or bug fix
+on the issue tracker (see below) or send it to the mailing list (see Community
+section).
+
+=== Issue Tracking and Feature Requests
+
+http://sinatra.lighthouseapp.com/
+
+== Community
+
+=== Mailing List
+
+http://groups.google.com/group/sinatrarb
+
+If you have a problem or question, please make sure to include all the
+relevant information in your mail, like the Sinatra version you're using, what
+version of Ruby you have, and so on.
+
+=== IRC Channel
+
+You can find us on the Freenode network in the channel #sinatra
+(irc://chat.freenode.net/#sinatra)
+
+There's usually someone online at any given time, but we cannot pay attention
+to the channel all the time, so please stick around for a while after asking a
+question.

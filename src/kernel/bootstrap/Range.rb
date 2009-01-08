@@ -62,7 +62,7 @@ class Range
   # <tt>inspect</tt> to convert the start and end objects).
   def inspect(touchedSet=nil)
     if (touchedSet.equal?(nil))
-      touchedSet = Set.new
+      touchedSet = IdentitySet.new
     else
       if (touchedSet._includes(self))
         return #{@excludeEnd ? "..." : ".."}

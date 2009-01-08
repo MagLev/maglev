@@ -901,7 +901,7 @@ class Array
   def inspect(touchedSet=nil)
     s = "["
     if (touchedSet.equal?(nil))
-      touchedSet = Set.new
+      touchedSet = IdentitySet.new
     else
       if (touchedSet._includes(self))
         s << '...]'

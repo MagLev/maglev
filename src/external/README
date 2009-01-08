@@ -2,7 +2,24 @@ This directory contains source from outside the Ruby Libs that we don't
 intend to ship with the product, but we feel is important that everyone
 shares the same copy of.
 
-Rack http://rack.rubyforge.org/ 
-Downloaded from http://chneukirchen.org/releases/rack-0.4.0.tar.gz
-License: MIT
+rack-0.9.0
+  Rack provides an minimal interface between webservers supporting Ruby and
+  Ruby frameworks. 0.9.0. released on 2009-01-06.
+  See: http://rack.rubyforge.org/
+  License: MIT
+
+Sinatra
+  Sinatra is a light-weight web framework for ruby.  This is a copy on
+  2009-01-07.
+  License: MIT
+
+racktest.rb
+  A simple webrick test of Rack.  Run it, then hit http://localhost:3333/ .
+
+      $ maglev-ruby racktest.rb
+
+sintatratest.rb
+  NOT WORKING YET...this will be a simple sinatra smoke test, but it isn't
+  working yet...
+
 
