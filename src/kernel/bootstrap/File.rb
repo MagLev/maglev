@@ -715,8 +715,8 @@ class PersistentFile
         @block.call.sync
     end
 
-    def sync=
-        @block.call.sync
+    def sync=(bool)
+        @block.call.sync(bool)
     end
 end
 
