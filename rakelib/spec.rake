@@ -12,9 +12,19 @@ namespace :spec do
     sh "#{MSPEC_CMD} -t ruby #{RSPEC_DIR}"
   end
 
-  desc "Run the continuous integration specs (was passingpsecs) on MagLev"
+  desc "Run the verbose continuous integration specs on MagLev"
+  task :civ do
+    sh "#{MSPEC_CMD} ci -V"
+  end
+
+  desc "Run the integration specs on MagLev"
   task :ci do
     sh "#{MSPEC_CMD} ci"
+  end
+
+  desc "Run mspec run --help"
+  task :help do
+    sh "#{MSPEC_CMD} run -t ruby --help"
   end
 
   desc "Run the continuous integration specs on MagLev with debug"
