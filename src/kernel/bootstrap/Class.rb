@@ -92,9 +92,47 @@ class Class
 
   # name inherited from Module
 
-  def inspect
+  def inspect(touchedSet=nil)
     name
   end
+
+    def instance_eval(*args)
+      # bridge methods would interfere with VcGlobals logic
+      raise ArgumentError, 'wrong number of args'
+    end
+
+    def instance_eval(str)
+      string = Type.coerce_to(str, String, :to_str)
+      vcgl = [ self._getRubyVcGlobal(0x20),
+               self._getRubyVcGlobal(0x21) ]
+      res = self.class._instance_eval(string, vcgl)
+      vcgl[0]._storeRubyVcGlobal(0x20)
+      vcgl[1]._storeRubyVcGlobal(0x21)
+      res
+    end
+
+    def instance_eval(str, file=nil)
+      string = Type.coerce_to(str, String, :to_str)
+      vcgl = [ self._getRubyVcGlobal(0x20),
+               self._getRubyVcGlobal(0x21) ]
+      res = self.class._instance_eval(string, vcgl)
+      vcgl[0]._storeRubyVcGlobal(0x20)
+      vcgl[1]._storeRubyVcGlobal(0x21)
+      res
+    end
+
+    def instance_eval(str, file=nil, line=nil)
+      # TODO: Object#instance_eval: handle file and line params
+      string = Type.coerce_to(str, String, :to_str)
+      vcgl = [ self._getRubyVcGlobal(0x20),
+               self._getRubyVcGlobal(0x21) ]
+      res = self.class._instance_eval(string, vcgl)
+      vcgl[0]._storeRubyVcGlobal(0x20)
+      vcgl[1]._storeRubyVcGlobal(0x21)
+      res
+    end
+
+    primitive_nobridge 'instance_eval&' , 'rubyMetaEval:'
 
   def to_s
     name
