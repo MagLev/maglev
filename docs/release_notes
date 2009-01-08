@@ -20,6 +20,8 @@ provided by different classes and messages
   be +irb+, but not yet.
 
 === Kernel
+* Note that we don't support instance variables as block arguments,
+  <tt>{ |@cc| }</tt> must be coded as <tt>{ | c | @cc = c }</tt>.
 * <tt>Kernel#autoload</tt> is a stub.  It does an immediate require of the
   file.
 * <tt>Kernel#autoload?</tt> is a stub.  It always returns nil.
