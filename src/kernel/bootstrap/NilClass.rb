@@ -16,7 +16,7 @@ class NilClass
       'NilClass'
    end
 
-   def inspect
+   def inspect(touchedSet=nil)
      "nil"
    end
 
@@ -35,7 +35,7 @@ class NilClass
      nil
    end
 
-   def call
+   def call(*args)
      # invoked when yield used with no block argument 
      raise LocalJumpError , 'no block was passed'
    end
