@@ -217,7 +217,7 @@ class Time
   #     __strftime__(@tm, format.to_str)
   #   end
 
-  def inspect
+  def inspect(touchedSet=nil)
     if @is_gmt
       strftime("%a %b %d %H:%M:%S UTC %Y")
     else
