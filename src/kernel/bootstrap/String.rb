@@ -318,15 +318,15 @@ class String
 
   # From Rubinius
   def get_pattern(pattern, quote = false)
-    unless pattern.is_a?(String) || pattern.is_a?(Regexp)
+    unless pattern._isString || pattern._isRegexp
       if pattern.respond_to?(:to_str)
         pattern = pattern.to_str
       else
         raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
       end
     end
-    pattern = Regexp.quote(pattern) if quote && pattern.is_a?(String)
-    pattern = Regexp.new(pattern) unless pattern.is_a?(Regexp)
+    pattern = Regexp.quote(pattern) if quote && pattern._isString
+    pattern = Regexp.new(pattern) unless pattern._isRegexp
     pattern
   end
 
@@ -716,7 +716,12 @@ class String
   # MNI: upto
 
   # ====== Object
-  primitive 'inspect', '_rubyPrintString'
+  primitive '_inspect', '_rubyPrintString'
+
+  def inspect(touchedSet=nil)
+    _inspect
+  end
+
   primitive 'dup', 'copy'
 
   # ====== Comparable:
