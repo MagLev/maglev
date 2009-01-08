@@ -31,9 +31,9 @@ class Integer
     end
     # _rubyTimes: should be the only caller of __times&
     def __times(&b)
-        for i in (0..self-1)
-            b.call(i)
-        end
+       for i in (0..self-1)
+           b.call(i)
+       end
     end
 
 
