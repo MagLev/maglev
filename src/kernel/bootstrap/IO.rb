@@ -45,6 +45,8 @@ class IO
     self.write(anObj)
   end
 
+  # NOTE: IO#read() is deprecated...perhaps we don't bother?
+
   def print(*args)
     # TODO handle non-nil state of $\
     lim = args.length
