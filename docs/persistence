@@ -1,0 +1,93 @@
+== MagLev Persistence
+
+To persist an object in MagLev, two conditions need to apply:
+1. The object must be reachable from a persistent root
+2. The state of the local VM must be committed to the central repository
+   (stone).
+
+=== Reachable from a persitent root
+
+To achieve #1, make sure your object is stored in a global variable, or
+reachable starting from a global variable.  E.g., from the hat trick,
+
+   class Hat
+     ...
+   end
+
+   $hat = Hat.new
+
+==== Commit the session state to the repository
+
+All changes to objects, classes, methods etc are local to your current
+session (VM).  In order to persist them to the central repository (stone),
+you need to commit them.  To do that, you need to wrap your changes in a
+transaction.  The <tt>Gemstone</tt> and <tt>RubyContext</tt> classes
+provide the necessary hooks.
+
+==== Wrap in a transaction
+
+To wrap changes in a transaction:
+
+    Gemstone.beginTransaction
+    $foo = Object.new
+    Gemstone.commitTransaction
+
+Then, from another session, you should be able to see $foo.
+
+==== Committing new and modified classes
+
+There is an additional step necessary if you modify a class method, or if
+you add a new class to the system.  When you add/modify a class, the
+methods for that class are stored in a session method dictionary (visible
+only to the local session/VM).  To make those methods globally available,
+you need to save the local ruby state to the global space, and then
+commit.
+
+Here is hat_trick.rb, which defines a class and then creates a global
+instance of a hat:
+
+    class Hat
+      def initialize
+        @contents = []
+      end
+
+      def put(item)
+        @contents << item
+        nil
+      end
+
+      def contents
+        @contents
+      end
+    end
+
+    $hat = Hat.new   # an empty hat
+
+Here is a maglev-irb session that commits the code and data ($hat) to the
+persistent store:
+
+    $ cd examples/hat_trick/
+    $ maglev-ruby
+    >> Gemstone.beginTransaction
+    => Gemstone
+    *> load 'hat'                  # Load our code into session
+    => true
+    *> RubyContext.save            # Copy methods from session to global
+    => #<RubyContext:0x05d20201
+    *> Gemstone.commitTransaction  # Commit the whole thing
+    => true
+    *>
+
+Now, we can start another maglev session and see the global variable and
+the methods:
+
+    $ maglev-irb
+    >> $hat
+    => #<Hat:0x07e46501
+    *> $hat.contents
+    => []
+    *>
+
+<tt>maglev-irb</tt> also has support via the <tt>COMMIT</tt> command (see
+the top level <tt>README</tt> for an example).
+

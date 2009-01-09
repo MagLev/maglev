@@ -39,6 +39,8 @@ RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMethod')
 
 RUBY.global('Gemstone', 'System')
+RUBY.global('Gemstone', 'System')
+RUBY.global('RubyContext', 'RubyContext')
 
 #
 #  Define some of the Ruby exception classes to be identical to certain

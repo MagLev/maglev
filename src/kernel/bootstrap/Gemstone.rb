@@ -1,15 +1,16 @@
 
-   Gemstone.class_primitive 'commitTransaction'
-   Gemstone.class_primitive 'abortTransaction'
-   Gemstone.class_primitive 'beginTransaction'
-
-   # _processInfo includes getuid getgid, getpid, kill  and related functions
-   Gemstone.class_primitive_nobridge '_processInfo', '_processInfo:with:with:'
-
-   Gemstone.class_primitive_nobridge '_host_times', '_hostTimes'
-
-
+# Class Gemstone is identically Smalltalk System
 class Gemstone
+
+  # Transaction support
+  class_primitive 'commitTransaction'
+  class_primitive 'abortTransaction'
+  class_primitive 'beginTransaction'
+
+  # _processInfo includes getuid getgid, getpid, kill  and related functions
+  class_primitive_nobridge '_processInfo', '_processInfo:with:with:'
+  class_primitive_nobridge '_host_times', '_hostTimes'
+
   # Return the real uid for the server process
   def self.getuid
     _processInfo(0, nil, nil)

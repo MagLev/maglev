@@ -92,6 +92,7 @@ RUBY.require 'kernel/bootstrap/ThreadGroup.rb'
 RUBY.require 'kernel/bootstrap/ObjectSpace.rb'
 RUBY.require 'kernel/bootstrap/Kernel2.rb'
 RUBY.require 'kernel/bootstrap/File2.rb'
+RUBY.require 'kernel/bootstrap/RubyContext.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
