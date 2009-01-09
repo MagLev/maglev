@@ -8,10 +8,46 @@ rack-0.9.0
   See: http://rack.rubyforge.org/
   License: MIT
 
+  NOTE: Rack is based on autoload, which is currently a stub.  As soon as
+  autoload is working, most of the dependency problems will go away (e.g.,
+  not *all* Rack apps will depend on digest/md5 or scgi etc.).
+
+  MagLev does not currently support the following Rack features:
+  * openid
+  * mongrel
+  * memcache
+  * thin
+  * showexceptions (depends on erb)
+  * showstatus (depends on erb)
+  * cookies (depends on openssl)
+  * fastcgi
+
+  Rack library dependencies (selected):
+    require 'digest/md5'
+    require 'lsapi'
+    require 'scgi'
+    require 'set'
+    require 'stringio'
+    require 'tempfile'
+    require 'thread'
+    require 'time'
+    require 'uri'
+    require 'webrick'
+    require 'zlib'
+
 Sinatra
   Sinatra is a light-weight web framework for ruby.  This is a copy on
   2009-01-07.
   License: MIT
+
+  Sinatra library dependencies (selected):
+    require 'erb'
+    require 'optparse'
+    require 'ostruct'
+    require 'rack'
+    require 'stringio'
+    require 'time'
+    require 'uri'
 
 racktest.rb
   A simple webrick test of Rack.  Run it, then hit http://localhost:3333/ .
