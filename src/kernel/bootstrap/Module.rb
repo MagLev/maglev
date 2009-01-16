@@ -52,4 +52,26 @@ class Module
   end
 
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'
+
+  primitive_nobridge '_method_protection', 'rubyMethodProtection'
+
+  primitive_nobridge '_define_method_meth' , 'defineMethod:method:'
+  primitive_nobridge '_define_method_block&' , 'defineMethod:block:'
+
+  def define_method(sym, meth)
+    m = meth
+    if m.is_a?(Proc) 
+      m = meth._block
+    end
+    if m._isBlock
+      _define_method_block(sym, &m)
+    else
+      _define_method_meth(sym, meth)
+    end 
+  end
+
+  def define_method(sym, &blk)
+    _define_method_block(sym, &blk)
+  end
+
 end
