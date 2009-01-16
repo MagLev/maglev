@@ -6,40 +6,12 @@ module Kernel
     puts "== WARN: STUB: MNI: #{msg}" if @@gs_WARNSTUB
   end
 
-#  RUBY.class.primitive '_require', 'requireFileNamed:qualified:'
   def require(name)
-    if $LOADED_FEATURES.include? name
-      false
-    else
-      Kernel.unified_load(name)
-    end
+    RUBY.require(name)
   end
 
   def load(name)
-    Kernel.unified_load(name)
-  end
-
-  # TODO: Kernel#unified_load: Currently, we only expand ~/..., not ~user/...
-  #
-  # If the path given starts with ./, ../, ~/ or /, it is treated
-  # as a "qualified" file and will be loaded directly (after path
-  # expansion) instead of matching against $LOAD_PATH. The relative
-  # paths use Dir.pwd.
-
-  def self.unified_load(name)
-    qualified = false
-    if name =~ %r{\A(?:(\.\.?)|~)?/}
-#      puts "===== #{name} is qualified"
-      # A qualified name.
-      qname = name.gsub(/^~/, ENV['HOME'])
-      qualified = true
-    else
-      qname = name
-    end
-#    RUBY.require(name, qualified)
-    RUBY.require(qname)
-    $LOADED_FEATURES << name unless $LOADED_FEATURES.include? name
-    true
+    RUBY.load(name)
   end
 
   def at_exit
@@ -52,8 +24,8 @@ module Kernel
   # Kernel#autoload: STUB: This stubbed version just calls +require
   # file_name+ rather than defering the require.
   #
-  # See ruby-core:20222 for a discussion on whether to use Kernel#require or some
-  # other private implementation for autoload.
+  # See ruby-core:20222 for a discussion on whether to use Kernel#require
+  # or some other private implementation for autoload.
   def autoload(name, file_name)
     _stub_warn("Kernel#autoload:  does an immediate require (does not defer)")
     require file_name
@@ -99,7 +71,7 @@ module Kernel
 
   def eval(str)
     vcgl = [ self._getRubyVcGlobal(0x20) ,
-             self._getRubyVcGlobal(0x21) ]
+      self._getRubyVcGlobal(0x21) ]
     res = _eval(str, vcgl)
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
@@ -275,7 +247,8 @@ module Kernel
   # This is a hook into the mspec framework so that the --spec-debug action
   # can call us.  E.g., to debug a failing spec, do:
   #
-  #   spec/mspec/bin/mspec -T -d --spec-debug -K fails spec/rubyspec/1.8/core/string/append_spec.rb
+  #   spec/mspec/bin/mspec -T -d --spec-debug -K fails \
+  #         spec/rubyspec/1.8/core/string/append_spec.rb
   def debugger
     nil.pause
   end
