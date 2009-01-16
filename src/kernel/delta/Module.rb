@@ -78,19 +78,9 @@ class Module
     []
   end
 
-  def instance_method(symbol)
-    _stub_warn("Module#instance_method")
-    nil
-  end
-
   def instance_methods(inc_super=true)
     _stub_warn("Module#instance_methods")
     []
-  end
-
-  def method_defined?(symbol)
-    _stub_warn("Module#method_defined?")
-    false
   end
 
   def private_class_method(*symbols)
@@ -98,24 +88,14 @@ class Module
     nil
   end
 
-  def private_instance_mtehods(inc_super=true)
+  def private_instance_methods(inc_super=true)
     _stub_warn("Module#private_instance_mtehods")
     []
-  end
-
-  def private_method_defined?(symbol)
-    _stub_warn("Module#private_method_defined?")
-    false
   end
 
   def protected_instance_methods(inc_super=true)
     _stub_warn("Module#protected_instance_methods")
     []
-  end
-
-  def protected_method_defined?(symbol)
-    _stub_warn("Module#protected_method_defined?")
-    false
   end
 
   def public_class_method(*symbols)
@@ -128,14 +108,7 @@ class Module
     []
   end
 
-  def public_method_defined?(symbol)
-    _stub_warn("Module#public_method_defined?")
-    false
-  end
-
   # private instance methods
-  # MNI alias_method
-  #    needs to call Behavior>>rubyAliias:from:
 
   # MNI: append_features
   # MNI: attr
@@ -147,18 +120,6 @@ class Module
   # MNI: extended
   # MNI: include
   # MNI: included
-
-  def private(*symbols)
-    _stub_warn("Module#private")
-  end
-
-  def protected(*symbols)
-    _stub_warn("Module#protected")
-  end
-
-  def public(*symbols)
-    _stub_warn("Module#public")
-  end
 
   def remove_class_variable(symbol)
     _stub_warn("Module#remove_class_variable")
