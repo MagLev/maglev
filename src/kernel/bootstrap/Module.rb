@@ -15,6 +15,9 @@ class Module
   primitive_nobridge 'const_set',      'rubyConstAt:put:'
   primitive_nobridge 'include',        'includeRubyModule:'
 
+  primitive_nobridge 'autoload', 'rubyAutoload:file:'
+  primitive_nobridge 'autoload?', 'rubyAutoloadFileFor:'
+
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)
     raise NameError, "uninitialized constant #{symbol}"

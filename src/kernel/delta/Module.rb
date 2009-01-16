@@ -51,16 +51,6 @@ class Module
     []
   end
 
-  def autoload(name, file_name)
-    _stub_warn("Module#autoload")
-    nil
-  end
-
-  def autoload?(name)
-    _stub_warn("Module#autoload?")
-    false
-  end
-
   # class_variables inherited from Behavior
 
   def clone
