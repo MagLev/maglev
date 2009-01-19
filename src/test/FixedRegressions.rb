@@ -10,6 +10,11 @@ class Foo
   end
 end
 
+oa = Foo.new
+unless oa.class.equal?(Foo) ; raise 'Error' ; end
+ob = Foo.my_new
+unless ob.class.equal?(Foo) ; raise 'Error' ; end
+
 ##################################################
 
 begin

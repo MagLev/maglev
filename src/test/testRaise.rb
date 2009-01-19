@@ -110,4 +110,27 @@ begin
   end
 end
 
+begin
+  b = 0
+  c = 0
+  d = nil
+  e = nil
+  begin
+    x = 5 / 0
+  rescue
+    b = $!
+    $! = ArgumentError.new
+    c = $! 
+  end 
+  d = $!
+  $! = TypeError.new
+  e = $!
+  puts [b,c,d,e].inspect
+  unless b.class.equal?( ZeroDivisionError) ; raise 'err' ; end
+  unless c.class.equal?( ArgumentError) ; raise 'err' ; end
+  unless d.equal?( nil) ; raise 'err' ; end
+  unless e.class.equal?( TypeError) ; raise 'err' ; end
+end
+true
+
 true
