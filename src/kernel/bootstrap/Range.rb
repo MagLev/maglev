@@ -2,29 +2,59 @@ class Range
   primitive 'hash'
   primitive 'length', 'size'
 
+  def begin
+    @from
+  end
+  def first
+    @from
+  end
+
+  def end
+    @to
+  end
+  def last
+    @to
+  end
+
   def ===(n)
-    return false if n < first
-    return false if n > last
+    return false if n < @from
+    return false if n > @to
     if exclude_end?
-      return false if n == last
+      return false if n == @to
     end
     return true
   end
 
-  primitive 'begin', '_from'
-
-  def each(&block)
-    raise TypeError, "can't iterate from #{first.class}" unless first.respond_to? :succ
-
-    current = @from
-    limit = exclude_end? ? @to : @to.succ
-    while (current < limit)
-      block.call(current)
-      nxt = current.succ
-      if (nxt.size > current.size)
-        return  # special semantics for Ranges of Strings
+  def each
+   				# adapted from fix contributed by Markus
+    x = @from
+    raise TypeError, "can't iterate from #{x.class}" unless x.respond_to?(:succ)
+    llast = @to
+    if llast._isString
+      sz = llast.size
+      if @excludeEnd
+        while (x < llast) and (x.size <= sz)
+          yield x 
+          x = x.succ 
+        end
+      else
+        while (x <= llast) and (x.size <= sz)
+          yield x 
+          x = x.succ 
+        end
       end
-      current = nxt
+    else
+      if @excludeEnd
+        while x < llast
+          yield x
+          x = x.succ
+        end
+      else
+        while x <= llast
+          yield x
+          x = x.succ
+        end
+      end
     end
   end
 
@@ -32,15 +62,16 @@ class Range
 
   def eql?(other)
     other._isRange &&
-      self.first.eql?(other.first) &&
-      self.last.eql?(other.last) &&
-      self.exclude_end?.eql?(other.exclude_end?)
+      @from.eql?(other.first) &&
+      @to.eql?(other.last) &&
+      @excludeEnd.eql?(other.exclude_end?)
   end
 
   alias == eql?
 
-  primitive 'exclude_end?', 'excludeEnd'
-  primitive 'first', '_from'
+  def exclude_end?
+    @excludeEnd
+  end
 
   def initialize(fromArg, toArg, exclusive=false)
     unless fromArg._isFixnum && toArg._isFixnum
@@ -71,8 +102,6 @@ class Range
     touchedSet << self
     "#{@from.inspect(touchedSet)}#{@excludeEnd ? "..." : ".."}#{@to.inspect(touchedSet)}"
   end
-
-  primitive 'last', '_to'
 
   def step(n=1, &block)
     current = @from
