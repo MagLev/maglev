@@ -7,11 +7,11 @@ module Kernel
   end
 
   def require(name)
-    RUBY.require(name)
+    RUBY.require(Type.coerce_to(name, String, :to_str))
   end
 
   def load(name)
-    RUBY.load(name)
+    RUBY.load(Type.coerce_to(name, String, :to_str))
   end
 
   def at_exit
