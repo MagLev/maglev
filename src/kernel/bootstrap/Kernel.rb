@@ -66,18 +66,17 @@ module Kernel
     nil
   end
 
-  # TODO: Currently, smalltalk "@ruby:method_missing" doesn't allow you to
-  # pass multiple parameters, so we insert _method_missing to repackage the
-  # params. doesNotUnderstand calls _method_missing with a single array
-  # containing the method_id followed by any parameters. This is probably
-  # faster than doing a smalltalk perform from Object>>doesNotUnderstand.
-  def _method_missing(args)
-    # args is an array guaranteed to have args[0] be a symbol.
-    method_missing(*args)
-  end
+  primitive_nobridge '_last_dnu_protection', '_lastDnuProtection'
 
   def method_missing(method_id, *args)
-    raise NoMethodError, "Undefined method `#{method_id}' for #{self}  "
+    prot = _last_dnu_protection()
+    if (prot.equal?(0)) 
+      raise NoMethodError, "Undefined method `#{method_id}' for #{self}  "
+    elsif (prot.equal?(1))
+      raise NoMethodError, "protected method `#{method_id}' called for  #{self}"
+    else
+      raise NoMethodError, "private method `#{method_id}' called for  #{self}"
+    end
   end
 
   def caller(skip=0, limit=1000)
