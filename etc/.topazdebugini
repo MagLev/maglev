@@ -1,4 +1,6 @@
 set username 'DataCurator'
 set password swordfish
 login
-display oop
+display oops
+omit classoops
+limit oops 20
