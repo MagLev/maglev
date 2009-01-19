@@ -34,15 +34,16 @@ class PureRubyStringIO
   SEEK_END = IO::SEEK_END
   SEEK_SET = IO::SEEK_SET
 
-  @@relayMethods = [
-    :<<, :all?, :any?, :binmode, :close, :close_read, :close_write, :closed?, :closed_read?,
-    :closed_write?, :collect, :detect, :each, :each_byte, :each_line, :each_with_index,
-    :entries, :eof, :eof?, :fcntl, :fileno, :find, :find_all, :flush, :fsync, :getc, :gets,
-    :grep, :include?, :inject, :isatty, :length, :lineno, :lineno=, :map, :max, :member?,
-    :min, :partition, :path, :pid, :pos, :pos=, :print, :printf, :putc, :puts, :read,
-    :readchar, :readline, :readlines, :reject, :rewind, :seek, :select, :size, :sort,
-    :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
-    :ungetc, :write, :zip]
+  # Gemstone, relayMethods not used
+  # @@relayMethods = [
+  #  :<<, :all?, :any?, :binmode, :close, :close_read, :close_write, :closed?, :closed_read?,
+  #  :closed_write?, :collect, :detect, :each, :each_byte, :each_line, :each_with_index,
+  #  :entries, :eof, :eof?, :fcntl, :fileno, :find, :find_all, :flush, :fsync, :getc, :gets,
+  #  :grep, :include?, :inject, :isatty, :length, :lineno, :lineno=, :map, :max, :member?,
+  #  :min, :partition, :path, :pid, :pos, :pos=, :print, :printf, :putc, :puts, :read,
+  #  :readchar, :readline, :readlines, :reject, :rewind, :seek, :select, :size, :sort,
+  #  :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
+  #  :ungetc, :write, :zip]
 
   def self.open(string="", mode="r+")
     if block_given? then
@@ -147,7 +148,7 @@ class PureRubyStringIO
     @sio_string = string.to_s
     @sio_lineno = 0
     @mode = mode
-    @relay = nil
+    # @relay = nil  # Gemstone, no longer used
     case mode.delete("b")
     when "r"
       @sio_closed_read = false
@@ -277,29 +278,22 @@ class PureRubyStringIO
     rc
   end
 
-  def reopen(string, mode=nil)
-    if string.is_a?(self.class) then
-      raise ArgumentError, "wrong number of arguments (2 for 1)", caller if !mode.nil?
-      @relay = string
-      instance_eval(%Q{
-        class << self
-          @@relayMethods.each { |name|
-            define_method(name, ObjectSpace._id2ref(#{@relay.object_id}).method(("original_" + name.to_s).to_sym).to_proc)
-          }
-        end
-      })
+  def _mode
+    @mode
+  end
+
+  def reopen(other_io, mode_arg=nil)
+    # Gemstone edits to delete use of ObjectSpace
+    if other_io._isString
+      raise ArgumentError, 'wrong number of arguments (1 for 2)', caller if mode_arg.nil?
+      self.initialize(other_io, mode_arg)
+    elsif other_io.is_a?(self.class) then
+      raise ArgumentError, 'wrong number of arguments (2 for 1)', caller if ! mode_arg.nil?
+      self.initialize(other_io.string, other_io._mode)
     else
-      raise ArgumentError, "wrong number of arguments (1 for 2)", caller if mode.nil?
-      class << self
-        @@relayMethods.each { |name|
-          alias_method(name, "original_#{name}".to_sym)
-          public name
-        }
-        @relay = nil
-      end unless @relay.nil?
-      @sio_string = string.to_s
-      @mode = mode
+      raise ArgumentError, 'unsupported kind of reopen'
     end
+    self
   end
 
   def rewind
@@ -383,11 +377,12 @@ class PureRubyStringIO
   alias :tell :pos
   alias :write :syswrite
 
-  protected
-  @@relayMethods.each { |name|
-    alias_method("original_#{name}".to_sym, name)
-    protected "original_#{name}".to_sym
-  }
+  # Gemstone,  relayMethods not used
+  # protected
+  # @@relayMethods.each { |name|
+  #  alias_method("original_#{name}".to_sym, name)
+  #  protected "original_#{name}".to_sym
+  #}
 
   private
 
