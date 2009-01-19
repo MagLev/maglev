@@ -2,11 +2,9 @@
 # File in Ruby is identically Smalltalk GsFile
 class File
 
-  # TODO: Move these into the Constants module when trac 249 is fixed.
-  # Then also check to ensure the constants defined in IO are also
-  # available here.
-  SEPARATOR      = '/'
+  ALT_SEPARATOR  = nil
   PATH_SEPARATOR = ':'
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
 
   # FILE::LOCK  constants initialized below
 
@@ -15,70 +13,99 @@ class File
 #    PATH_SEPARATOR = ':'
 #    SEPARATOR      = '/'
     Separator      = SEPARATOR
+=======
+  SEPARATOR      = '/'
+  Separator      = SEPARATOR
+
+  primitive 'close', 'close'
+  # << inherited from IO
+  primitive 'write', 'addAll:'
+  primitive 'next_line', 'nextLineTo:'
+  primitive_nobridge '_atEnd', 'atEnd'
+  primitive 'read', 'next:'
+  primitive 'read', 'contents'
+
+  class_primitive_nobridge '_fstat','fstat:isLstat:'
+  class_primitive_nobridge '_stat','stat:isLstat:'
+  class_primitive_nobridge '_umask', '_umask:'
+
+  class_primitive_nobridge '_open', 'openOnServer:mode:'
+  class_primitive 'stdin'
+  class_primitive 'stdout'
+  class_primitive 'stderr'
+  class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
+  class_primitive_nobridge '_delete', 'removeServerFile:'
+
+  # For Dir.rb
+  class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
+
+  # _modify_file provides access to chmod, fchmod, chown, lchown, fchown
+  class_primitive_nobridge '_modify_file*', '_modifyFile:fdPath:with:with:'
+
+  def self.name
+    'File' # override Smalltalk name
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
   end
-  include Constants # Note: this is broken until trac ticket 249 is fixed
 
-    primitive 'close', 'close'
-    # << inherited from IO
-    primitive 'write', 'addAll:'
-    primitive 'next_line', 'nextLineTo:'
-    primitive_nobridge '_atEnd', 'atEnd'
-    primitive 'read', 'next:'
-    primitive 'read', 'contents'
-
-    class_primitive_nobridge '_fstat','fstat:isLstat:'
-    class_primitive_nobridge '_stat','stat:isLstat:'
-    class_primitive_nobridge '_umask', '_umask:'
-
-    class_primitive_nobridge '_open', 'openOnServer:mode:'
-    class_primitive 'stdin'
-    class_primitive 'stdout'
-    class_primitive 'stderr'
-    class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
-    class_primitive_nobridge '_delete', 'removeServerFile:'
-
-    # For Dir.rb
-    class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
-
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
     # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown, etc
     class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'
+=======
+  def self.atime(filename)
+    File.stat(filename).atime
+  end
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-    def self.name
-      'File' # override Smalltalk name
-    end
-
-    def self.atime(filename)
-      File.stat(filename).atime
-    end
-
-    def self.basename(filename, suffix='')
-      fn = StringValue(filename)
-      sf = StringValue(suffix)
-      b = fn.split('/')[-1]
-      if suffix.eql?('.*')
-        index = b.rindex('.')
-      else
-        index = b.rindex(suffix)
-        if (not index.nil?) && ((index + suffix.size) != b.size)
-          index = nil
-        end
+  def self.basename(filename, suffix='')
+    fn = StringValue(filename)
+    sf = StringValue(suffix)
+    b = fn.split('/')[-1]
+    if suffix.eql?('.*')
+      index = b.rindex('.')
+    else
+      index = b.rindex(suffix)
+      if (not index.nil?) && ((index + suffix.size) != b.size)
+        index = nil
       end
-      return index.nil? ? b : b[0,index]
     end
+    return index.nil? ? b : b[0,index]
+  end
 
-    def self.blockdev?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.blockdev?
+  def self.blockdev?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.blockdev?
+  end
 
-    def self.chardev?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
+  def self.chardev?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
+    end
+    stat_obj.chardev?
+  end
+
+  def self.chmod(permission, *file_names)
+    count = 0
+    file_names.each { |a_name|
+      status = File._modify_file( 0, a_name, permission, nil)
+      if (status.equal?(0))
+        count = count + 1
       end
+    }
+    return count
+  end
+
+  def self.chown(owner, group, *file_names)
+    count = 0
+    file_names.each { |a_name|
+      status = File._modify_file( 2, a_name, owner, group)
+      if (status.equal?(0))
+        count = count + 1
+      end
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
       statObj.chardev?
     end
 
@@ -123,217 +150,247 @@ class File
       statObj = File._stat(filename, false)
       if (statObj._isFixnum)
         return false  # an error attempting to stat
+=======
+    }
+    return count
+  end
+
+  def self.ctime(filename)
+    File.stat(filename).ctime
+  end
+
+  def self.delete(*file_names)
+    count = 0
+    file_names.each { |a_name|
+      status = File._modify_file( 5, a_name, nil, nil )
+      if (status.equal?(0))
+        count = count + 1
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
       end
-      statObj.directory?
+    }
+    return count
+  end
+
+  def self.directory?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.directory?
+  end
 
-    def self.dirname(str)
-        if str =~ /(.+)\//
-            $1
-        else
-          if str[0] == ?/
-            "/"
-          else
-            "."
-          end
-        end
-    end
-
-    def self.executable?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.executable?
-    end
-
-    def self.executable_real?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.executable_real?
-    end
-
-    def self.exist?(path)
-      statObj = File._stat(path, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      true
-    end
-
-    class << self
-      alias exists? exist?
-    end
-
-    # Convert path to an absolute pathname. If no directory is given,
-    # relative paths are rooted at the current working directory.
-    # Otherwise directory will be prefixed to the path. Tilde expansion is
-    # done on the path.  Replaces '.' and '..' in the path with the
-    # appropriate path components.  Does not coalesce contiguous '/'s.
-    def self.expand_path(a_path, a_dir = nil)
-      path = StringValue(a_path) # nil a_path should raise TypeError
-
-      dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
-      dir = Dir.pwd if dir.empty?
-
-      return dir if path.empty?
-
-      path = _tilde_expand(path)
-
-      if path[0] !=  SEPARATOR[0] # relative path
-        path = File.join(dir, path)
-      end
-
-      _cannonicalize(path)
-    end
-
-    # Remove .. and . from path
-    def self._cannonicalize(path)
-      return path unless path['.']
-      new_parts = []
-      path.split(SEPARATOR).each do |component|
-        case component
-        when '..'
-          new_parts.pop
-        when '.'
-          # nothing: just skip it
-        when ''
-          # The split
-        else
-          new_parts << component
-        end
-      end
-      "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
-    end
-
-    def self._tilde_expand(path)
-      case path[0,2]
-       when '~':   ENV['HOME']
-       when '~/':  ENV['HOME'] + path[1..-1]
-      when /^~([^\/])+(.*)/
-        raise NotImplementedError, "Don't handle ~user expansion yet"
+  def self.dirname(str)
+    if str =~ /(.+)\//
+      $1
+    else
+      if str[0] == ?/
+        "/"
       else
-        path
+        "."
       end
     end
+  end
 
-    def self.extname(filename)
-      base = self.basename(filename)
-      index = base.rindex('.')
-      return '' if index.nil? || index == (base.size - 1)
-      base[index..-1]
+  def self.executable?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
+    end
+    stat_obj.executable?
+  end
+
+  def self.executable_real?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
+    end
+    stat_obj.executable_real?
+  end
+
+  def self.exist?(path)
+    stat_obj = File._stat(path, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
+    end
+    true
+  end
+
+  class << self
+    alias exists? exist?
+  end
+
+  # Convert path to an absolute pathname. If no directory is given,
+  # relative paths are rooted at the current working directory.
+  # Otherwise directory will be prefixed to the path. Tilde expansion is
+  # done on the path.  Replaces '.' and '..' in the path with the
+  # appropriate path components.  Does not coalesce contiguous '/'s.
+  def self.expand_path(a_path, a_dir = nil)
+    path = StringValue(a_path) # nil a_path should raise TypeError
+
+    dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
+    dir = Dir.pwd if dir.empty?
+
+    return dir if path.empty?
+
+    path = _tilde_expand(path)
+
+    if path[0] !=  SEPARATOR[0] # relative path
+      path = File.join(dir, path)
     end
 
-    def self.file?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
+    _cannonicalize(path)
+  end
+
+  # Remove .. and . from path
+  def self._cannonicalize(path)
+    return path unless path['.']
+    new_parts = []
+    path.split(SEPARATOR).each do |component|
+      case component
+      when '..'
+        new_parts.pop
+      when '.'
+        # nothing: just skip it
+      when ''
+        # The split
+      else
+        new_parts << component
       end
-      statObj.file?
     end
+    "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
+  end
 
-    # MNI: File.fnmatch
-    # MNI: File.fnmatch?
+  def self._tilde_expand(path)
+    case path[0,2]
+    when '~':   ENV['HOME']
+    when '~/':  ENV['HOME'] + path[1..-1]
+    when /^~([^\/])+(.*)/
+      raise NotImplementedError, "Don't handle ~user expansion yet"
+    else
+      path
+    end
+  end
 
-    def self.ftype(*names)
-      unless names.length.equal?(1)
-        raise ArgumentError , 'expected 1 arg'
+  def self.extname(filename)
+    base = self.basename(filename)
+    index = base.rindex('.')
+    return '' if index.nil? || index == (base.size - 1)
+    base[index..-1]
+  end
+
+  def self.file?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
+    end
+    stat_obj.file?
+  end
+
+  # MNI: File.fnmatch
+  # MNI: File.fnmatch?
+
+  def self.ftype(*names)
+    unless names.length.equal?(1)
+      raise ArgumentError , 'expected 1 arg'
+    end
+    File.stat(names[0]).ftype
+  end
+
+  def self.grpowned?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
+    end
+    stat_obj.grpowned?
+  end
+
+  def self.join(*ary)
+    ary.join(SEPARATOR)
+  end
+
+  def self.lchmod(permission, *file_names)
+    # not supported , lchmod() not available on Linux or Solaris
+    raise NotImplementedError
+  end
+
+  def self.lchown(owner, group, *file_names)
+    count = 0
+    file_names.each { |a_name|
+      status = File._modify_file( 4, a_name, owner, group)
+      if (status.equal?(0))
+        count = count + 1
       end
-      File.stat(names[0]).ftype
-    end
+    }
+    return count
+  end
 
-    def self.grpowned?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.grpowned?
-    end
-
-    def self.join(*ary)
-        ary.join(SEPARATOR)
-    end
-
-    def self.lchmod(permission, *fileNames)
-      # not supported , lchmod() not available on Linux or Solaris
-      raise NotImplementedError
-    end
-
-    def self.lchown(owner, group, *fileNames)
-      count = 0
-      fileNames.each { |aName|
-        status = File._modifyFile( 4, aName, owner, group)
-        if (status.equal?(0))
-          count = count + 1
-        end
-      }
-      return count
-    end
-
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
     def self.link(oldname, newname)
       status = File._modifyFile(8, oldname, newname)
       unless status.equal?(0)
         raise SystemCallError # TODO: Errno::xxx
       end
     end
+=======
+  # MNI: File.link
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-    def self.lstat(filename)
-      _stat(filename, true);
+  def self.lstat(filename)
+    _stat(filename, true);
+  end
+
+  def self.mtime(filename)
+    File.stat(filename).mtime
+  end
+
+  def self.new(file, mode="r")
+    self._open(file, mode)
+  end
+
+  def self.open(file, mode="r", &b)
+    f = self._open(file, mode)
+    if b
+      val = b.call(f)
+      f.close
+      val
+    else
+      f
     end
+  end
 
-    def self.mtime(filename)
-      File.stat(filename).mtime
+  def self.owned?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.owned?
+  end
 
-    def self.new(file, mode="r")
-        self._open(file, mode)
+  def self.pipe?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.pipe?
+  end
 
-    def self.open(file, mode="r", &b)
-        f = self._open(file, mode)
-        if b
-            val = b.call(f)
-            f.close
-            val
-        else
-          f
-        end
+  def self.readable?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.readable?
+  end
 
-    def self.owned?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.owned?
+  def self.readable_real?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.readable_real?
+  end
 
-    def self.pipe?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.pipe?
-    end
-
-    def self.readable?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.readable?
-    end
-
-    def self.readable_real?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.readable_real?
-    end
-
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
     def self.readlink(filename)
       res = String.new
       status = File._modifyFile(6, filename, res)
@@ -350,106 +407,115 @@ class File
       end
     end
     
+=======
+  # MNI: File.readlink
+  # MNI: File.rename
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-    def self.setgid?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.setgid?
+  def self.setgid?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.setgid?
+  end
 
-    def self.setuid?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.setuid?
+  def self.setuid?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.setuid?
+  end
 
-    def self.size(filename)
-      File.stat(filename).size
+  def self.size(filename)
+    File.stat(filename).size
+  end
+
+  def self.size?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return nil  # an error attempting to stat
     end
+    stat_obj.size?
+  end
 
-    def self.size?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return nil  # an error attempting to stat
-      end
-      statObj.size?
+  def self.socket?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.socket?
+  end
 
-    def self.socket?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.socket?
+  # MNI: File.split
+
+  def self.stat(filename)
+    stat_obj = _stat(filename, false);
+    if (stat_obj._isFixnum)
+      raise SystemCallError # TODO: Errno::xxx
     end
+    stat_obj
+  end
 
-    # MNI: File.split
-
-    def self.stat(filename)
-      statObj = _stat(filename, false);
-      if (statObj._isFixnum)
-        raise SystemCallError # TODO: Errno::xxx
-      end
-      statObj
+  def self.sticky?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.sticky?
+  end
 
-    def self.sticky?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.sticky?
-    end
-
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
     def self.symlink(oldname, newname)
       status = File._modifyFile(6, oldname, newname)
       unless status.equal?(0)
         raise SystemCallError # TODO: Errno::xxx
       end
     end
+=======
+  # MNI: File.symlink
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-    def self.symlink?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.symlink?
+  def self.symlink?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.symlink?
+  end
 
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
     def self.truncate(filename, newsize)
       status = File._modifyFile(2, filename, newsize)
       unless status.equal?(0)
         raise SystemCallError # TODO: Errno::xxx
       end
     end
+=======
+  # MNI: File.truncate
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-    def self.umask
-      # return current file creation mask
-      _umask(-1)
+  def self.umask
+    # return current file creation mask
+    _umask(-1)
+  end
+
+  def self.umask(newMask)
+    # set file creation mask to newMask and return previous value
+    # newMask must be >= 0 and <= 0777
+    if (newMask >= 0)
+      res = _umask(newMask)
+    else
+      res = -1
     end
-
-    def self.umask(newMask)
-      # set file creation mask to newMask and return previous value
-      # newMask must be >= 0 and <= 0777
-      if (newMask >= 0)
-        res = _umask(newMask)
-      else
-        res = -1
-      end
-      if (res < 0)
-        raise RangeError
-      end
-      res
+    if (res < 0)
+      raise RangeError
     end
+    res
+  end
 
-    def self.unlink(*fileNames)
-      delete(*fileNames)
-    end
-
+<<<<<<< HEAD:src/kernel/bootstrap/File.rb
     def self.utime(accesstime, modtime, *fileNames)
       count = 0
       fileNames.each { |aName|
@@ -460,126 +526,139 @@ class File
       }
       return count
     end
+=======
+  def self.unlink(*file_names)
+    delete(*file_names)
+  end
+>>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-    def self.writable?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.writable?
+  # MNI: File.utime
+  # TODO: Remove this stub impl....
+  def self.utime(atime, mtime, *files)
+    _stub_warn('File.utime is stubbed to just touch the file')
+    `touch #{files.join(' ')}`
+    files.size
+  end
+
+  def self.writable?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.writable?
+  end
 
-    def self.writable_real?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.writable_real?
+  def self.writable_real?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.writable_real?
+  end
 
-    def self.zero?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-      end
-      statObj.zero?
+  def self.zero?(filename)
+    stat_obj = File._stat(filename, false)
+    if (stat_obj._isFixnum)
+      return false  # an error attempting to stat
     end
+    stat_obj.zero?
+  end
 
-    # BEGIN Instance methods
+  # BEGIN Instance methods
 
-    def atime
-      self.stat.atime
+  def atime
+    self.stat.atime
+  end
+
+  def chmod(permission)
+    status = File._modify_file( 1, @fileDescriptor, permission, nil)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
+    return 0
+  end
 
-    def chmod(permission)
-      status = File._modifyFile( 1, @fileDescriptor, permission, nil)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
-      return 0
+  def chown(owner, group)
+    status = File._modify_file( 3, @fileDescriptor, owner, group)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
+    return 0
+  end
 
-    def chown(owner, group)
-      status = File._modifyFile( 3, @fileDescriptor, owner, group)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
-      return 0
+  def ctime
+    self.stat.ctime
+  end
+
+  def eof?
+    status = self._atEnd
+    if (status.equal?(nil))
+      raise IOError
     end
+    status
+  end
 
-    def ctime
-      self.stat.ctime
+  # begin gets implementation --------------------------------------------
+
+  def gets(*args)
+    raise ArgumentError, 'expected 0 or 1 arg'
+  end
+
+  def gets(sep)
+    # variant after first gets no bridges
+    res = next_line( sep[0] )
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def gets
+    # variant after first gets no bridges
+    sep=$/
+    res = next_line( sep[0] )
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  # during bootstrap,  send and __send__ get no bridge methods
+  def send(sym)
+    if (sym.equal?(:gets))
+      sep=$/
+      res = next_line( sep[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym)
+  end
 
-    def eof?
-      status = self._atEnd
-      if (status.equal?(nil))
-        raise IOError
-      end
-      status
+  def send(sym, arg)
+    if (sym.equal?(:gets))
+      res = next_line( arg[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym, arg)
+  end
 
-    # begin gets implementation --------------------------------------------
-
-    def gets(*args)
-      raise ArgumentError, 'expected 0 or 1 arg'
+  def __send__(sym)
+    if (sym.equal?(:gets))
+      sep=$/
+      res = next_line( sep[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym)
+  end
 
-    def gets(sep)
-      # variant after first gets no bridges
-       res = next_line( sep[0] )
-       res._storeRubyVcGlobal(0x21) # store into caller's $_
-       res
+  def __send__(sym, arg)
+    if (sym.equal?(:gets))
+      res = next_line( arg[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym, arg)
+  end
 
-    def gets
-      # variant after first gets no bridges
-       sep=$/
-       res = next_line( sep[0] )
-       res._storeRubyVcGlobal(0x21) # store into caller's $_
-       res
-    end
-
-    # during bootstrap,  send and __send__ get no bridge methods
-    def send(sym)
-      if (sym.equal?(:gets))
-        sep=$/
-        res = next_line( sep[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym)
-    end
-
-    def send(sym, arg)
-      if (sym.equal?(:gets))
-        res = next_line( arg[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym, arg)
-    end
-
-    def __send__(sym)
-      if (sym.equal?(:gets))
-        sep=$/
-        res = next_line( sep[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym)
-    end
-
-    def __send__(sym, arg)
-      if (sym.equal?(:gets))
-        res = next_line( arg[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym, arg)
-    end
-
-    # end gets --------------------------------------------------
+  # end gets --------------------------------------------------
 
     def self.fetch_flock_constants
       # returns [ LOCK_EX, LOCK_NB, LOCK_SH, LOCK_UN ] from VM
@@ -604,181 +683,181 @@ class File
       end
     end
 
-    def lchmod(permission)
-      # not supported , lchmod() not available on Linux or Solaris
-      raise NotImplementedError
-    end
+  def lchmod(permission)
+    # not supported , lchmod() not available on Linux or Solaris
+    raise NotImplementedError
+  end
 
-    def lchown(owner, group)
-      status = File._modifyFile( 4, @pathName, owner, group)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
+  def lchown(owner, group)
+    status = File._modify_file( 4, @pathName, owner, group)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
+    end
+    return 0
+  end
+
+  def lstat
+    File._stat(@pathName, true)
+  end
+
+  def mtime
+    self.stat.mtime
+  end
+
+  def path
+    @pathName
+  end
+
+  def stat
+    res = File._fstat(@fileDescriptor, false)
+    if (res._isFixnum)
+      raise SystemCallError # TODO: Errno::xxx
+    end
+    return res
+  end
+
+  def print(*args)
+      args.each {|arg| self << arg.to_s}
+  end
+
+  # read documented in IO, needs to be reimplemented here
+  def self.read(file)
+      open(file){|f| f.read}
+  end
+
+  def self.read(path)
+      file = self.new(path)
+      if file.equal?(nil)
+	raise SystemCallError # TODO: Errno::xxx
       end
-      return 0
-    end
+      contents = file.read
+      file.close
+      contents
+  end
 
-    def lstat
-      File._stat(@pathName, true)
+  def each_line(&block)
+    sep = ($/.equal?(nil) ? 10 : $/[0])
+    until eof?
+      block.call( next_line( sep ) )
     end
-
-    def mtime
-      self.stat.mtime
-    end
-
-    def path
-      @pathName
-    end
-
-    def stat
-      res = File._fstat(@fileDescriptor, false)
-      if (res._isFixnum)
-         raise SystemCallError # TODO: Errno::xxx
-      end
-      return res
-    end
-
-    def print(*args)
-        args.each {|arg| self << arg.to_s}
-    end
-
-    # read documented in IO, needs to be reimplemented here
-    def self.read(file)
-        open(file){|f| f.read}
-    end
-
-    def self.read(path)
-        file = self.new(path)
-        if file.equal?(nil)
-          raise SystemCallError # TODO: Errno::xxx
-        end
-        contents = file.read
-        file.close
-        contents
-    end
-
-    def each_line(&block)
-        sep = ($/.equal?(nil) ? 10 : $/[0])
-        until eof?
-            block.call( next_line( sep ) )
-        end
-    end
+  end
 
 end
 
 class PersistentFile
-    def initialize(block)
-        @block = block
-    end
+  def initialize(block)
+    @block = block
+  end
 
-    def _file
-        @block.call
-    end
+  def _file
+    @block.call
+  end
 
-    def <<(data)
-        _file << data
-    end
+  def <<(data)
+    _file << data
+  end
 
-    def print(*args)
-       _file.print(*args)
-    end
+  def print(*args)
+    _file.print(*args)
+  end
 
-    def printf(format, *args)
-      _file.printf(format, *args)
-    end
+  def printf(format, *args)
+    _file.printf(format, *args)
+  end
 
-    def putc(arg)
-       _file.putc(args)
-    end
+  def putc(arg)
+    _file.putc(args)
+  end
 
-    def puts(*args)
-       _file.puts(*args)
-    end
+  def puts(*args)
+    _file.puts(*args)
+  end
 
-    def puts(*args)
-       _file.puts(*args)
-    end
+  def puts(*args)
+    _file.puts(*args)
+  end
 
-    def write(data)
-      _file.write(data)
-    end
+  def write(data)
+    _file.write(data)
+  end
 
-    # begin gets implementation -------------------------------
-    def gets(*args)
-      raise ArgumentError, 'expected 0 or 1 args'
-    end
+  # begin gets implementation -------------------------------
+  def gets(*args)
+    raise ArgumentError, 'expected 0 or 1 args'
+  end
 
-    def gets
-      # variants after first get no bridge methods
-      sep = $/ 
-      res = if sep.equal?(nil)
-              # Read entire file
-              raise NotImplementedError, 'Kernel#gets does not support full file mode'
-            elsif sep.length.equal?(0)
-              # Read by paragraphs
-              raise NotImplementedError, 'Kernel#gets does not support paragraph mode'
-            else
-              # read by lines
-              @block.call.next_line( sep[0] )
-            end
+  def gets
+    # variants after first get no bridge methods
+    sep = $/
+    res = if sep.equal?(nil)
+            # Read entire file
+            raise NotImplementedError, 'Kernel#gets does not support full file mode'
+          elsif sep.length.equal?(0)
+            # Read by paragraphs
+            raise NotImplementedError, 'Kernel#gets does not support paragraph mode'
+          else
+            # read by lines
+            @block.call.next_line( sep[0] )
+          end
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def gets(sep )
+    # variants after first get no bridge methods
+    res = @block.call.next_line( sep[0] )
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  # during bootstrap,  send and __send__ get no bridge methods
+  def send(sym)
+    if (sym.equal?(:gets))
+      sep = $/
+      res = @block.call.next_line( sep[0] )
       res._storeRubyVcGlobal(0x21) # store into caller's $_
-      res
+      return res
     end
+    super(sym)
+  end
 
-    def gets(sep )
-      # variants after first get no bridge methods
-       res = @block.call.next_line( sep[0] )
-       res._storeRubyVcGlobal(0x21) # store into caller's $_
-       res
+  def send(sym, arg)
+    if (sym.equal?(:gets))
+      res = @block.call.next_line( arg[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym, arg)
+  end
 
-    # during bootstrap,  send and __send__ get no bridge methods
-    def send(sym)
-      if (sym.equal?(:gets))
-        sep = $/
-        res = @block.call.next_line( sep[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym)
+  def __send__(sym)
+    if (sym.equal?(:gets))
+      sep = $/
+      res = @block.call.next_line( sep[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym)
+  end
 
-    def send(sym, arg)
-      if (sym.equal?(:gets))
-        res = @block.call.next_line( arg[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym, arg)
+  def __send__(sym, arg)
+    if (sym.equal?(:gets))
+      res = @block.call.next_line( arg[0] )
+      res._storeRubyVcGlobal(0x21) # store into caller's $_
+      return res
     end
+    super(sym, arg)
+  end
 
-    def __send__(sym)
-      if (sym.equal?(:gets))
-        sep = $/
-        res = @block.call.next_line( sep[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym)
-    end
+  # end gets implementation -------------------------------
 
-    def __send__(sym, arg)
-      if (sym.equal?(:gets))
-        res = @block.call.next_line( arg[0] )
-        res._storeRubyVcGlobal(0x21) # store into caller's $_
-        return res
-      end
-      super(sym, arg)
-    end
+  def sync
+    @block.call.sync
+  end
 
-    # end gets implementation -------------------------------
-
-    def sync
-        @block.call.sync
-    end
-
-    def sync=(bool)
-        @block.call.sync=(bool)
-    end
+  def sync=(bool)
+    @block.call.sync=(bool)
+  end
 end
 
 # STDIN, STDOUT, STDERR , $>  initialized in File2.rb

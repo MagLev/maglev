@@ -63,9 +63,6 @@ class MSpecScript
     # error (i.e., tagging it as fails still generates an error).  So, for
     # the kernel specs, we turn all of them on except for case_compare_spec...
     '^' + DIR + '/spec/rubyspec/1.8/core/kernel/case_compare_spec.rb',
-
-    # TODO: Depends on FileUtils
-    '^' + DIR + '/spec/rubyspec/1.8/core/kernel/require_spec.rb',
     '^' + DIR + '/spec/rubyspec/1.8/core/objectspace',
 
     #  TODO: core/proc/arity_spec.rb has a parse error which blows up the whole
