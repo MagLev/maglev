@@ -27,10 +27,12 @@ class Exception
       end
     end
 
+    IncludeSmalltalkFrames = false;
+
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop
-      Thread._backtrace(false, limit)
+      Thread._backtrace(IncludeSmalltalkFrames, limit)
     end
 
     def backtrace_st(limit = 1000)
