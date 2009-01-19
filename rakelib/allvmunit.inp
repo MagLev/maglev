@@ -5,7 +5,7 @@ bmCount := 1 .
 lf := Character lf .
 confFile := GsFile openReadOnServer: 'src/test/vmunit.conf' .
 [ true ] whileTrue:[
-  | aLine fullPath bmResult |
+  | aLine bmResult |
   [
     aLine := confFile nextLine .
     aLine == nil ifTrue:[
@@ -14,14 +14,15 @@ confFile := GsFile openReadOnServer: 'src/test/vmunit.conf' .
     aLine first == $#
   ] whileTrue .
   aLine last == lf ifTrue:[ aLine size: (aLine size - 1) ].
-  fullPath := '../test/' , aLine .
+"  GsFile gciLogServer:'===== ', RubyDirectory _getwd . "
   GsFile gciLogServer:'--- start ', bmCount asString , ' :' , aLine .
   System beginTransaction .
   System signalAlmostOutOfMemoryThreshold:70 . "TODO: rm: Debug stack full in dev"
   RubyContext load .
+  RubyContext default _addLibs: (RubyDirectory _getwd, '/src/test/') .
   bmOutF := GsFile openWriteOnServer:'log/vmunit', bmCount asString , '.out' .
   GsFile redirectStdout: bmOutF .
-  bmResult := RubyContext loadFileNamed: fullPath .
+  bmResult := RubyContext loadFileNamed: aLine .
   bmOutF close .
   GsFile redirectStdout: nil .
   GsFile gciLogServer:'--- end ' , aLine .
@@ -29,3 +30,4 @@ confFile := GsFile openReadOnServer: 'src/test/vmunit.conf' .
 ].
 %
 output pop
+
