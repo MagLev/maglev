@@ -420,6 +420,12 @@ class File
     end
 
     # MNI: File.utime
+    # TODO: Remove this stub impl....
+    def self.utime(atime, mtime, *files)
+      _stub_warn('File.utime is stubbed to just touch the file')
+      `touch #{files.join(' ')}`
+      files.size
+    end
 
     def self.writable?(filename)
       statObj = File._stat(filename, false)
@@ -648,7 +654,7 @@ class PersistentFile
 
     def gets
       # variants after first get no bridge methods
-      sep = $/ 
+      sep = $/
       res = if sep.equal?(nil)
               # Read entire file
               raise NotImplementedError, 'Kernel#gets does not support full file mode'
