@@ -50,7 +50,10 @@ class Dir
   # if not nil, permissions must be >= 0 and <= 0777 if permissions==nil ,
   # the created directory will have permissions as specified by current
   # value of File.umask()
-  def self.mkdir(dirname, permissions=nil)
+  def self.mkdir(dirname, permissions=0777)
+    # MRI does not allow conversion of nil to 0 for this method...
+    raise TypeError, "no implicit conversion from nil to integer" if permissions.nil?
+    permissions = Type.coerce_to(permissions, Integer, :to_i)
     Errno.handle(_mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
   end
 
