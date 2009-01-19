@@ -64,22 +64,24 @@ class Behavior
 
   alias class_eval module_eval
 
+  primitive_nobridge '_method_protection', 'rubyMethodProtection'
+
+  primitive_nobridge '_set_protection_methods*', 'setProtection:methods:'
+ 
   def private(*names)
-    # TODO set visibility to private for specified methods
-    #  if names empty, set default visibility for subsequent methods to private
+    # if names empty, set default visibility for subsequent methods to private
+    _set_protection_methods(2, *names)
   end
 
   def public(*names)
-    # TODO set visibility to public for specified methods
     #  if names empty, set default visibility for subsequent methods to public
+    _set_protection_methods(0, *names)
   end
+
 
   def protected(*names)
-    # TODO set visibility to protected for specified methods
-  end
-
-  def alias(name)
-    # TODO ?
+    #  if names empty, set default visibility for subsequent methods to protected
+    _set_protection_methods(1, *names)
   end
 
   def inspect(touchedSet=nil)
@@ -119,5 +121,26 @@ class Behavior
     end
     r
   end
+
+  primitive_nobridge '_method_defined', 'rubyMethodDefined:protection:'
+
+  def method_defined?(symbol)
+    _method_defined(symbol, -1)
+  end
+
+  def public_method_defined?(symbol)
+    _method_defined(symbol, 0)
+  end
+
+  def protected_method_defined?(symbol)
+    _method_defined(symbol, 1)
+  end
+
+  def private_method_defined?(symbol)
+    _method_defined(symbol, 2)
+  end
+
+  primitive_nobridge 'instance_method', 'rubyUnboundMethodFor:'
+     # one arg, a Symbol
 
 end
