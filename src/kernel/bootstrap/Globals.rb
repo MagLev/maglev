@@ -18,7 +18,7 @@ RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
 RUBY.global('MatchData', 'MatchData')
-RUBY.global('Method', 'RubyMethod')  # RubyMethod , RubyUnboundMethod defined in .mcz
+RUBY.global('Method', 'RubyMeth')  # RubyMeth , RubyUnboundMeth defined in .mcz
 RUBY.global('Module', 'Module')    # for class Module
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
@@ -36,7 +36,7 @@ RUBY.global('TCPSocket', 'TCPSocket')
 RUBY.global('Thread', 'GsProcess')
 RUBY.global('Time', 'RubyTime')
 RUBY.global('TrueClass', 'TrueClass')
-RUBY.global('UnboundMethod', 'RubyUnboundMethod')
+RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 
 RUBY.global('Gemstone', 'System')
 RUBY.global('Gemstone', 'System')
@@ -90,6 +90,7 @@ RUBY.global('Exception',    'UserException')
 # ----------------------------------------------------------
 
 RUBY.global("ExecBlock", "ExecBlock")
+RUBY.global("GsNMethod", "GsNMethod")
 
 # ----------------------------------------------------------
 
