@@ -1,13 +1,3 @@
 fails:Kernel#load
 fails:Kernel#load is a private method
-fails:Kernel#load loads a .rb from a relative path and returns true
-fails:Kernel#load does not expand/resolve qualified files against $LOAD_PATH
-fails:Kernel#load allows unqualified files to contain path information (just not in the beginning)
-fails:Kernel#load does not add the loaded file to $LOADED_FEATURES
 fails:Kernel#load produces __FILE__ as the given filename and __LINE__ as the source line number
-fails:Kernel#load re-evaluates the file each time it is loaded
-fails:Kernel#load loads the file even if it has already been #required
-fails:Kernel#load does not cause #require on the same filename to fail
-fails:Kernel#load raises a LoadError if filename given without its extension
-fails:Kernel#load only accepts strings as the filename argument
-fails:Shell expansion in Kernel#load expands a preceding ~/ to the user's home directory to use as path
