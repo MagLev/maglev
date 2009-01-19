@@ -1,9 +1,3 @@
-# Random is the Smalltalk class Random
-Random.class_primitive_nobridge 'new'
-Random.primitive_nobridge 'next', 'nextInt:'
-Random.primitive_nobridge 'next'
-RandomInstance = Random.new
-
 class Object
   include Kernel
 
@@ -99,17 +93,23 @@ class Object
     primitive 'freeze', 'immediateInvariant'
     primitive 'frozen?', 'isInvariant'
 
-    primitive_nobridge 'respond_to?', 'rubyRespondsTo:'
-
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
     primitive_nobridge 'kind_of?' , '_rubyKindOf:'
 
     # install this prim so  anObj.send(:is_a?, aCls)   will work
     primitive_nobridge 'is_a?' , '_rubyKindOf:'
 
-    def respond_to?(aSymbol, includePrivateBoolean)
-      # Gemstone: the argument includePrivateBoolean is ignored
-      respond_to?(aSymbol)
+
+    # do not define # def respond_to?(symbol, include_private=false) ; end
+    #
+    # The one and two arg forms of respond_to? are translated directly to 
+    # a Smalltalk send of _respondsTo:private:flags: by the parser which constructs
+    # the flags argument, and so bridge methods don't determination of the
+    #  receiver's frame .
+    # After bootstrap, reimplementation of respond_to?  will fail with a compile error
+    #
+    def respond_to?
+      raise ArgumentError, 'wrong number of arguments, expected 1 or 2'
     end
 
     primitive 'print_line', 'rubyPrint:'
@@ -147,7 +147,7 @@ class Object
       a_val
     end
 
-    primitive 'method', 'rubyMethod:'
+    primitive_nobridge 'method', 'rubyMethod:'
 
     def ===(obj)
         self == obj
