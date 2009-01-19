@@ -69,7 +69,7 @@ class String
   # TODO: Need primitive ST implemention for <=>
 
   def <=>(o)
-    if o.kind_of?(String)
+    if o._isString
       i = 0
       lim = size > o.size ? o.size : size # lim is the min
       while i < lim
@@ -78,12 +78,16 @@ class String
         i += 1
       end
       return size <=> o.size
+    else
+      if o.equal?(nil)
+        return nil
+      end
+      # From Rubinius...there are a lot of strange things in how
+      # string handles <=>...
+      return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
+      return nil unless tmp = (o <=> self)
+      return -tmp
     end
-    # From Rubinius...there are a lot of strange things in how
-    # string handles <=>...
-    return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
-    return nil unless tmp = (o <=> self)
-    return -tmp
   end
 
   # PERFORMANCE: String#== could use help
