@@ -8,6 +8,8 @@ class File
   SEPARATOR      = '/'
   PATH_SEPARATOR = ':'
 
+  # FILE::LOCK  constants initialized below
+
   module Constants
     ALT_SEPARATOR  = nil
 #    PATH_SEPARATOR = ':'
@@ -38,7 +40,7 @@ class File
     # For Dir.rb
     class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
 
-    # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown
+    # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown, etc
     class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'
 
     def self.name
@@ -83,7 +85,7 @@ class File
     def self.chmod(permission, *fileNames)
       count = 0
       fileNames.each { |aName|
-        status = File._modifyFile( 0, aName, permission, nil)
+        status = File._modifyFile( 1, aName, permission, nil)
         if (status.equal?(0))
           count = count + 1
         end
@@ -94,7 +96,7 @@ class File
     def self.chown(owner, group, *fileNames)
       count = 0
       fileNames.each { |aName|
-        status = File._modifyFile( 2, aName, owner, group)
+        status = File._modifyFile( 3, aName, owner, group)
         if (status.equal?(0))
           count = count + 1
         end
@@ -109,7 +111,7 @@ class File
     def self.delete(*fileNames)
       count = 0
       fileNames.each { |aName|
-        status = File._modifyFile( 5, aName, nil, nil )
+        status = File._modifyFile( 0, aName, nil, nil )
         if (status.equal?(0))
           count = count + 1
         end
@@ -270,7 +272,12 @@ class File
       return count
     end
 
-    # MNI: File.link
+    def self.link(oldname, newname)
+      status = File._modifyFile(8, oldname, newname)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+    end
 
     def self.lstat(filename)
       _stat(filename, true);
@@ -327,8 +334,22 @@ class File
       statObj.readable_real?
     end
 
-    # MNI: File.readlink
-    # MNI: File.rename
+    def self.readlink(filename)
+      res = String.new
+      status = File._modifyFile(6, filename, res)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+      res
+    end
+
+    def self.rename(oldname, newname)
+      status = File._modifyFile(7, oldname, newname)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+    end
+    
 
     def self.setgid?(filename)
       statObj = File._stat(filename, false)
@@ -384,7 +405,12 @@ class File
       statObj.sticky?
     end
 
-    # MNI: File.symlink
+    def self.symlink(oldname, newname)
+      status = File._modifyFile(6, oldname, newname)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+    end
 
     def self.symlink?(filename)
       statObj = File._stat(filename, false)
@@ -394,7 +420,12 @@ class File
       statObj.symlink?
     end
 
-    # MNI: File.truncate
+    def self.truncate(filename, newsize)
+      status = File._modifyFile(2, filename, newsize)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+    end
 
     def self.umask
       # return current file creation mask
@@ -419,7 +450,16 @@ class File
       delete(*fileNames)
     end
 
-    # MNI: File.utime
+    def self.utime(accesstime, modtime, *fileNames)
+      count = 0
+      fileNames.each { |aName|
+        status = File._modifyFile( 5, aName, accesstime, modtime)
+        if (status.equal?(0))
+          count = count + 1
+        end
+      }
+      return count
+    end
 
     def self.writable?(filename)
       statObj = File._stat(filename, false)
@@ -541,8 +581,28 @@ class File
 
     # end gets --------------------------------------------------
 
+    def self.fetch_flock_constants
+      # returns [ LOCK_EX, LOCK_NB, LOCK_SH, LOCK_UN ] from VM
+      #  they will be -1 on Solaris , where flock not supported
+      arr = [ ]
+      status = File._modifyFile(13, 0, arr)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+      arr
+    end
 
-    # MNI: File#flock
+    LOCK_EX = fetch_flock_constants()[0]
+    LOCK_NB = fetch_flock_constants()[1]
+    LOCK_SH = fetch_flock_constants()[2]
+    LOCK_UN = fetch_flock_constants()[3]
+
+    def flock(lock_constant)
+      status = File._modifyFile(11, @fileDescriptor, lock_constant)
+      unless status.equal?(0)
+        raise SystemCallError # TODO: Errno::xxx
+      end
+    end
 
     def lchmod(permission)
       # not supported , lchmod() not available on Linux or Solaris
@@ -577,19 +637,20 @@ class File
       return res
     end
 
-    # TODO: The following methods are not documented as part of the API:
-    # print, read,
     def print(*args)
         args.each {|arg| self << arg.to_s}
     end
 
-    # TODO: Where is this used?  Not a method
+    # read documented in IO, needs to be reimplemented here
     def self.read(file)
         open(file){|f| f.read}
     end
 
     def self.read(path)
         file = self.new(path)
+        if file.equal?(nil)
+          raise SystemCallError # TODO: Errno::xxx
+        end
         contents = file.read
         file.close
         contents
