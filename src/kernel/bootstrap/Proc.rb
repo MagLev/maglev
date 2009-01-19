@@ -38,7 +38,6 @@ class ExecBlock
     def [](*args)
       self.call(*args)
     end
-
 end
 
 
