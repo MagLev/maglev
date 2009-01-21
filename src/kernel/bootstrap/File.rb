@@ -40,6 +40,13 @@ class File
     File.stat(filename).atime
   end
 
+  def each(separator=$/, &block)
+    sep = separator[0]
+    until eof?
+      block.call(next_line(sep))
+    end
+  end
+
   def self.basename(filename, suffix='')
     fn = StringValue(filename)
     sf = StringValue(suffix)
