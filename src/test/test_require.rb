@@ -11,12 +11,38 @@ pb = $:
 require 'foobar'
 # ================================================
 
+
 require File.expand_path('simple', File.dirname(__FILE__))
 
 # Check that $" does not have any of the bootstrap files
 #test($".grep(/bootstrap/), [], "Found bootstrap files on $\": #{$"}")
 #test($LOADED_FEATURES.grep(/bootstrap/), [], "Found bootstrap files on $LOADED_FEATURES: #{$LOADED_FEATURES}")
 #test($".eql? $LOADED_FEATURES, true, "$LOADED_FEATURES not equal $\""")
+
+
+# ensure that requiring a non-existent file raises an error
+begin
+  require 'this_does_not_exist'
+  # Failed to raise an exception!
+  failed_test("require 'this_does_not_exist' should raise load error: NO EXCEPTION", LoadError, nil)
+rescue LoadError => le
+  # OK!  We want a LoadError
+rescue Exception => e
+  # Wrong error...
+  failed_test("require 'this_does_not_exist' should raise load error: not #{e}", LoadError, e)
+end
+
+# ensure that loading a non-existent file raises an error
+begin
+  load 'this_does_not_exist'
+  # Failed to raise an exception!
+  failed_test("load 'this_does_not_exist' should raise load error: NO EXCEPTION", LoadError, nil)
+rescue LoadError => le
+  # OK!  We want a LoadError
+rescue Exception => e
+  # Wrong error...
+  failed_test("load 'this_does_not_exist' should raise load error: not #{e}", LoadError, e)
+end
 
 
 # Ensure that when we start the test, that our fixture is NOT already loaded
