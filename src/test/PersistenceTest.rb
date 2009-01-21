@@ -2,11 +2,20 @@
 
 working_dir = File.dirname(__FILE__)
 
-# A function to parse the output of a topaz run and remove all the
-# extra garbage.  It is hardcoded to handle only a couple of output types, so the tests below are limited to nil, integers and strings.
+# A function to parse the output of a topaz run and remove all the extra
+# garbage.  It is hardcoded to handle only a couple of output types, so the
+# tests below are limited to nil, integers and strings.
 def extract_return_value(topaz_garbage)
-  topaz_garbage =~ /topaz 1> (.*)\ntopaz 1> \n/
+  # Typical output from topaz is:
+  #
+  #    topaz 1> 42
+  #    true
+  #    topaz 1>
+  #
+  # We want to capture the "42", so match against the first line
+  topaz_garbage.split('\n')[0] =~ /topaz 1>\s*(.*)/
   str_value = $1
+  #puts "=== extracted '#{$1}' from '#{topaz_garbage}'"
   case str_value
   when /nil/
     nil
