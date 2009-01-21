@@ -56,20 +56,20 @@ class ParseServlet < HTTPServlet::AbstractServlet
     # (query["file"]) with the current working directory of the process
     # issuing the http request (query["dir"]).  This allows the parser to
     # expand __FILE__ correctly.
-    dir = req.query['dir'].to_s
     if(code = req.query['string'])
       dir = nil
       filename = 'eval'
       puts "code: #{code.to_s}"
     else
       filename = req.query['file'].to_s
-      full_path = dir.nil? ? filename : dir + '/' + filename
-      File.open(full_path, 'r') do |f|
+      given = req.query['given'].to_s
+      given ||= filename
+      File.open(filename, 'r') do |f|
         code = f.read
       end
     end
     mp = MaglevParser.new
-    sexp = mp.parse(code, filename, 0).inspect
+    sexp = mp.parse(code, given, 0).inspect
     # puts sexp
     #  STDOUT.flush
     res.body = sexp

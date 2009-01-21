@@ -21,7 +21,7 @@ test($:.include?('src/test/lib'), true,  "B: src/test/lib not on $:")
 # Test require only loads foo once
 require 'foo'
 test($foo,                     1, "C: foo not loaded first time")
-test($".include?('foo.rb'), true, 'D: foo.rb not put on $"')
+test($".include?('foo.rb'), true, "D: foo.rb not put on $\" #{$".inspect}")
 
 require 'foo'
 test($foo,                     1, "E: require foo: #{$foo}")
