@@ -89,6 +89,8 @@ module Kernel
 
   primitive 'format*', 'sprintf:with:'
 
+  primitive_nobridge 'include',  'includeRubyModule:'
+
   def loop
     raise LocalJumpError, "no block given" unless block_given?
 
@@ -181,7 +183,7 @@ module Kernel
   end
 
   def raise(ex_class, message, *args)
-    # args is callback info not yet implemented
+    # TODO args is callback info not yet implemented
     raise(ex_class, message)
   end
 
@@ -204,6 +206,33 @@ module Kernel
     #  if $! is valid in the caller, the parser will
     #   translate raise to  _resignal
     RuntimeError.signal
+  end
+
+  primitive_nobridge '_sleep_ms', '_highPriorityWaitForMilliseconds:'
+
+  def sleep(numeric=0)
+    # returns number of seconds slept
+    if numeric._isInteger 
+      ms = numeric * 1000
+    elsif 
+      ms = (1000.0 * numeric).to_i 
+    end
+    ms_slept = _sleep_ms(ms) 
+    ms_slept / 1000
+  end
+
+  def sleep_ms(milliseconds=0)
+    # Gemstone addition
+    # returns number of milliseconds slept
+    ms = milliseconds
+    unless milliseconds._isInteger 
+      ms = milliseconds.to_i 
+    end
+    _sleep_ms(ms) 
+  end
+
+  def split(pattern=nil, limit=nil)
+    $_ .split(pattern, limit)
   end
 
   primitive 'sprintf*', 'sprintf:with:'
