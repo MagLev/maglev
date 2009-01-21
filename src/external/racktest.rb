@@ -2,8 +2,6 @@ $:.unshift File.dirname(__FILE__) + '/rack-0.9.0/lib'
 
 require 'webrick'
 require 'rack'
-require 'rack/handler'
-require 'rack/handler/webrick'
 
 class RackTest
   include WEBrick
