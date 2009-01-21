@@ -1,3 +1,11 @@
+# A list of spec files and spec directories to skip.
+# Common reasons for being in this file:
+#
+#   * The maglev parser blows up on some syntax in the file
+#   * The file hangs
+#
+# Comments (lines beginning with '#') and blank lines are skipped.
+
 spec/rubyspec/1.8/language/else_spec.rb
 spec/rubyspec/1.8/language/loop_spec.rb
 spec/rubyspec/1.8/language/not_spec.rb
@@ -14,6 +22,7 @@ spec/rubyspec/1.8/language/method_spec.rb
 spec/rubyspec/1.8/language/numbers_spec.rb
 spec/rubyspec/1.8/language/precedence_spec.rb
 spec/rubyspec/1.8/language/retry_spec.rb
+
 spec/rubyspec/1.8/core/dir
 spec/rubyspec/1.8/core/continuation
 spec/rubyspec/1.8/core/filetest
