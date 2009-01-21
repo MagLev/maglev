@@ -1,7 +1,7 @@
 # Run modified bm_*.rb files from ruby-benchmark-suite using MagLev
 #
 # Usage:  
-# nohup maglev-ruby ./run_benchmarks-MagLev.rb 1>benchmark_results-Maglev-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
+# maglev-ruby ./run_benchmarks-MagLev.rb 1>benchmark_results-Maglev-${HOSTNAME}-`date +%y%m%d`.out 2>&1
 #
 # These benchmarks have been modified to produce timing and status information
 # e.g.
@@ -71,10 +71,10 @@ require '../benchmark/cangiano/micro-benchmarks/bm_nbody.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_nsieve.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_nsieve_bits.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_partial_sums.rb'
-require '../benchmark/cangiano/micro-benchmarks/bm_quicksort.rb'
+# require '../benchmark/cangiano/micro-benchmarks/bm_quicksort.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_recursive.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_regex_dna.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_reverse_compliment.rb' # Too much output
+require '../benchmark/cangiano/micro-benchmarks/bm_reverse_compliment.rb' # Too much output
 require '../benchmark/cangiano/micro-benchmarks/bm_so_sieve.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_spectral_norm.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_sum_file.rb'
