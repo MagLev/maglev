@@ -13,6 +13,12 @@ require 'foobar'
 
 require File.expand_path('simple', File.dirname(__FILE__))
 
+# Check that $" does not have any of the bootstrap files
+#test($".grep(/bootstrap/), [], "Found bootstrap files on $\": #{$"}")
+#test($LOADED_FEATURES.grep(/bootstrap/), [], "Found bootstrap files on $LOADED_FEATURES: #{$LOADED_FEATURES}")
+#test($".eql? $LOADED_FEATURES, true, "$LOADED_FEATURES not equal $\""")
+
+
 # Ensure that when we start the test, that our fixture is NOT already loaded
 $foo = 0
 test($".include?('foo'),          false, 'A: foo already on $"')

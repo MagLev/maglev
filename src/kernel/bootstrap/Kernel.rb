@@ -6,10 +6,6 @@ module Kernel
     puts "== WARN: STUB: MNI: #{msg}" if @@gs_WARNSTUB
   end
 
-  def require(name)
-    RUBY.require(Type.coerce_to(name, String, :to_str))
-  end
-
   def load(name)
     RUBY.load(Type.coerce_to(name, String, :to_str))
   end
@@ -18,19 +14,10 @@ module Kernel
     _stub_warn("Kernel#at_exit")
   end
 
-  # following methods are just those needed to get some benchmarks and
-  # specs running .
-
-  # Kernel#autoload: STUB: This stubbed version just calls +require
-  # file_name+ rather than defering the require.
-  #
   # See ruby-core:20222 for a discussion on whether to use Kernel#require
   # or some other private implementation for autoload.
-  def autoload(name, file_name)
-    _stub_warn("Kernel#autoload:  does an immediate require (does not defer)")
-    require file_name
-    nil
-  end
+  primitive_nobridge 'autoload', 'rubyKernelAutoload:file:'
+  primitive_nobridge 'autoload?', 'rubyKernelAutoloadFileFor:'
 
   # Kernel#autoload?: STUB: Always returns nil.
   def autoload?(name)
@@ -42,7 +29,7 @@ module Kernel
 
   def method_missing(method_id, *args)
     prot = _last_dnu_protection()
-    if (prot.equal?(0)) 
+    if (prot.equal?(0))
       raise NoMethodError, "Undefined method `#{method_id}' for #{self}  "
     elsif (prot.equal?(1))
       raise NoMethodError, "protected method `#{method_id}' called for  #{self}"
@@ -250,5 +237,9 @@ module Kernel
   #         spec/rubyspec/1.8/core/string/append_spec.rb
   def debugger
     nil.pause
+  end
+
+  def require(name)
+    RUBY.require(Type.coerce_to(name, String, :to_str))
   end
 end
