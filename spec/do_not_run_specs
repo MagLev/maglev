@@ -1,32 +1,72 @@
 # A list of spec files and spec directories to skip.
-# Common reasons for being in this file:
-#
-#   * The maglev parser blows up on some syntax in the file
-#   * The file hangs
 #
 # Comments (lines beginning with '#') and blank lines are skipped.
 
-spec/rubyspec/1.8/language/else_spec.rb
-spec/rubyspec/1.8/language/loop_spec.rb
-spec/rubyspec/1.8/language/not_spec.rb
-spec/rubyspec/1.8/language/private_spec.rb
-spec/rubyspec/1.8/language/return_spec.rb
-spec/rubyspec/1.8/language/undef_spec.rb
-spec/rubyspec/1.8/language/alias_spec.rb
-spec/rubyspec/1.8/language/block_spec.rb
-spec/rubyspec/1.8/language/case_spec.rb
-spec/rubyspec/1.8/language/def_spec.rb
-spec/rubyspec/1.8/language/for_spec.rb
-spec/rubyspec/1.8/language/metaclass_spec.rb
-spec/rubyspec/1.8/language/method_spec.rb
-spec/rubyspec/1.8/language/numbers_spec.rb
-spec/rubyspec/1.8/language/precedence_spec.rb
-spec/rubyspec/1.8/language/retry_spec.rb
+# ##################################################
+# ####  These ones blow up
+# ##################################################
 
-spec/rubyspec/1.8/core/dir
-spec/rubyspec/1.8/core/continuation
-spec/rubyspec/1.8/core/filetest
-spec/rubyspec/1.8/core/kernel/case_compare_spec.rb
-spec/rubyspec/1.8/core/objectspace
-spec/rubyspec/1.8/core/proc/arity_spec.rb
-spec/rubyspec/1.8/core/process
+spec/rubyspec/language/constants_spec.rb
+spec/rubyspec/language/block_spec.rb
+spec/rubyspec/language/for_spec.rb
+spec/rubyspec/language/next_spec.rb
+spec/rubyspec/language/precedence_spec.rb
+spec/rubyspec/language/retry_spec.rb
+
+
+# ##################################################
+# ####  1.9 Only files
+# ##################################################
+# These specs are guarded with only 1.9 examples/expectations.  No point in
+# running them.  We should occasionally recheck that they havnn't had 1.8
+# expectations added to them
+
+spec/rubyspec/language/encoding_spec.rb
+spec/rubyspec/language/magic_comment_spec.rb
+
+
+# ##################################################
+# ####  Partially Run
+# ##################################################
+# These files run partially, but have a syntax or other error part way
+# through
+#
+# spec/rubyspec/language/case_spec.rb
+
+# ##################################################
+# ####  Skeletons
+# ##################################################
+# These have no expectations, so we run them but get no credit.
+#
+# spec/rubyspec/language/else_spec.rb
+# spec/rubyspec/language/not_spec.rb
+
+# To investigate:
+# spec/rubyspec/language/loop_spec.rb
+#   The loop spec doesn't report any failure, but no expectations pass either...
+
+# ================================================
+# OLD SPECS
+# ================================================
+# spec/rubyspec/language/else_spec.rb
+# spec/rubyspec/language/loop_spec.rb
+# spec/rubyspec/language/not_spec.rb
+# spec/rubyspec/language/private_spec.rb
+# spec/rubyspec/language/return_spec.rb
+# spec/rubyspec/language/undef_spec.rb
+# spec/rubyspec/language/alias_spec.rb
+# spec/rubyspec/language/block_spec.rb
+# spec/rubyspec/language/case_spec.rb
+# spec/rubyspec/language/def_spec.rb
+# spec/rubyspec/language/metaclass_spec.rb
+# spec/rubyspec/language/method_spec.rb
+# spec/rubyspec/language/numbers_spec.rb
+# spec/rubyspec/language/retry_spec.rb
+
+# spec/rubyspec/core/dir
+# spec/rubyspec/core/continuation
+# spec/rubyspec/core/filetest
+# spec/rubyspec/core/kernel/case_compare_spec.rb
+# spec/rubyspec/core/objectspace
+# spec/rubyspec/core/proc/arity_spec.rb
+# spec/rubyspec/core/process
