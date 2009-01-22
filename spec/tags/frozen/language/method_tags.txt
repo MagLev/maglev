@@ -1,0 +1,4 @@
+fails:Calling a method with block argument converts the block to proc
+fails:Calling a method with an object that responds to 'to_proc' as a block argument coerces it to a proc
+fails:Calling a method with invalid argument count raises an ArgumentError
+fails:Calling a private getter method does not permit self as a receiver
