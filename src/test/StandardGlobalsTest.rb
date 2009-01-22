@@ -16,7 +16,18 @@ require File.expand_path('simple', File.dirname(__FILE__))
 #
 #  Ruby handles the non "x = " case fine.
 
+# Test initial values
+test($VERBOSE, false, "$VERBOSE initial value")
+test($DEBUG,   false, "$DEBUG   initial value")
 
+# Test $LOAD_PATH is an alias for $:
+test($:, $LOAD_PATH, "initial are equal")
+$: << 'foo'
+test($:.include?('foo'), true, '$: << foo')
+test($:, $LOAD_PATH, "after modify $: are equal")
+$LOAD_PATH << 'bar'
+test($:, $LOAD_PATH, "after modify $LOAD_PATH are equal")
+test($:.include?('bar'), true, '$LOAD_PATH << foo')
 
 # BEGIN GLOBAL PARSE CHECK
 x = $!
@@ -99,9 +110,8 @@ x = STDOUT
 #  END GLOBAL PARSE CHECK
 
 report
-
+Gemstone.abortTransaction # Don't mess up $: etc.
 
 # This occurrence of __END__ is necessary to define the global
 # variable DATA above.
 __END__
-

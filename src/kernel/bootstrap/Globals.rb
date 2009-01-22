@@ -137,6 +137,3 @@ DEBUG_SPEC = false
 TRUE  = true
 FALSE = false
 STDOUT = nil   # real value assigned later
-$LOAD_PATH = $:
-$" = []
-$LOADED_FEATURES = $"
