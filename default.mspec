@@ -1,30 +1,24 @@
 # -*-ruby-*-
 # Default RubySpec files for MagLev.
 
-
 DIR = File.dirname(__FILE__)
+
+
 $ci_files = [ 'spec/rubyspec/language' ]
 
+# The list of known bad specs are kept in a separate file so that both the
+# mspec framework and the build scripts have access to the list.  The
+# following code reads the file and adds the appropriate entries into the
+# ci_files array.
 File.open(DIR + '/spec/do_not_run_specs') do |f|
   f.each do |line|
     # Skip blank lines and lines beginning with '#'
     line =~ /^#|^\s*$/ && next
 
     entry = '^' +  line.chomp
-#    entry[entry.rindex('/'),1] = '//'
     $ci_files << entry
   end
 end
-# $ci_files = [
-#   'spec/rubyspec/language',
-#   'spec/rubyspec/language/constants_spec.rb',
-#   'spec/rubyspec/language/block_spec.rb',
-#   'spec/rubyspec/language/for_spec.rb',
-#   'spec/rubyspec/language/next_spec.rb',
-#   'spec/rubyspec/language/precedence_spec.rb',
-#   'spec/rubyspec/language/retry_spec.rb',
-# ]
-puts $ci_files.inspect
 
 class MSpecScript
 
