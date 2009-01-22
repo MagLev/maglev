@@ -11,11 +11,19 @@ File.open(DIR + '/spec/do_not_run_specs') do |f|
     line =~ /^#|^\s*$/ && next
 
     entry = '^' +  line.chomp
-    entry[entry.rindex('/'),1] = '//'
+#    entry[entry.rindex('/'),1] = '//'
     $ci_files << entry
   end
 end
-
+# $ci_files = [
+#   'spec/rubyspec/language',
+#   'spec/rubyspec/language/constants_spec.rb',
+#   'spec/rubyspec/language/block_spec.rb',
+#   'spec/rubyspec/language/for_spec.rb',
+#   'spec/rubyspec/language/next_spec.rb',
+#   'spec/rubyspec/language/precedence_spec.rb',
+#   'spec/rubyspec/language/retry_spec.rb',
+# ]
 puts $ci_files.inspect
 
 class MSpecScript
