@@ -248,10 +248,6 @@ class File
     stat_obj.grpowned?
   end
 
-  def self.join(*ary)
-    ary.join(SEPARATOR)
-  end
-
   def self.lchmod(permission, *file_names)
     # not supported , lchmod() not available on Linux or Solaris
     raise NotImplementedError
