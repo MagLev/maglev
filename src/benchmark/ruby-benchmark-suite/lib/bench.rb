@@ -4,6 +4,8 @@ else
   require File.dirname(__FILE__) + '/timeout.rb'
 end
 
+DEBUG_SPEC = true
+
 class BenchmarkRunner
   include Enumerable
   
@@ -35,8 +37,16 @@ class BenchmarkRunner
         end
       end
     rescue Timeout::Error
+      t = @timeout
+      i = @iterations 
       @error = "Timeout: %.2f seconds" % (@timeout / @iterations.to_f)
+      if DEBUG_SPEC
+        nil.pause   # timeout
+      end
     rescue Exception => e
+      if DEBUG_SPEC
+        nil.pause
+      end
       @error = "Error: #{e.message}"
     end          
   end
