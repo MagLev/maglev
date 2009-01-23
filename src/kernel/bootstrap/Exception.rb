@@ -15,8 +15,9 @@ class Exception
 
     primitive_nobridge '_reraise', 'pass'
     primitive_nobridge 'signal', 'signal'
-    primitive 'signal', 'signal:'
-    primitive 'message', 'description'
+    primitive          'signal', 'signal:'
+    primitive          'message', 'description'
+    primitive_nobridge '_message=', 'messageText:'
 
     def self._validate(obj)
       # used in implementation of $! on LHS of assignment
