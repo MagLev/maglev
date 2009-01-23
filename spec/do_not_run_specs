@@ -55,5 +55,7 @@ spec/rubyspec/language/case_spec.rb
 # These files are so bad, that even a custom version doesn't run...
 
 spec/localspec/language/for_spec.rb
-spec/localspec/language/next_spec.rb   # Core dump
+spec/localspec/language/next_spec.rb
+spec/localspec/language/constants_spec.rb
+
 

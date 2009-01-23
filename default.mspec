@@ -4,7 +4,10 @@
 DIR = File.dirname(__FILE__)
 
 
-$ci_files = [ 'spec/rubyspec/language' ]
+$ci_files = [
+  'spec/rubyspec/language',
+  'spec/localspec/language',
+]
 
 # The list of known bad specs are kept in a separate file so that both the
 # mspec framework and the build scripts have access to the list.  The
