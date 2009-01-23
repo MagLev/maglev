@@ -4,18 +4,10 @@ class File
 
   ALT_SEPARATOR  = nil
   PATH_SEPARATOR = ':'
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-
-  # FILE::LOCK  constants initialized below
-
-  module Constants
-    ALT_SEPARATOR  = nil
-#    PATH_SEPARATOR = ':'
-#    SEPARATOR      = '/'
-    Separator      = SEPARATOR
-=======
   SEPARATOR      = '/'
   Separator      = SEPARATOR
+
+  # FILE::LOCK  constants initialized below
 
   primitive 'close', 'close'
   # << inherited from IO
@@ -40,21 +32,15 @@ class File
   class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
 
   # _modify_file provides access to chmod, fchmod, chown, lchown, fchown
-  class_primitive_nobridge '_modify_file*', '_modifyFile:fdPath:with:with:'
+  class_primitive '_modify_file*', '_modifyFile:fdPath:with:with:'
 
   def self.name
     'File' # override Smalltalk name
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
   end
 
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-    # _modifyFile provides access to chmod, fchmod, chown, lchown, fchown, etc
-    class_primitive_nobridge '_modifyFile*', '_modifyFile:fdPath:with:with:'
-=======
   def self.atime(filename)
     File.stat(filename).atime
   end
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
   def self.basename(filename, suffix='')
     fn = StringValue(filename)
@@ -90,7 +76,7 @@ class File
   def self.chmod(permission, *file_names)
     count = 0
     file_names.each { |a_name|
-      status = File._modify_file( 0, a_name, permission, nil)
+      status = File._modify_file( 1, a_name, permission, nil)
       if (status.equal?(0))
         count = count + 1
       end
@@ -101,56 +87,10 @@ class File
   def self.chown(owner, group, *file_names)
     count = 0
     file_names.each { |a_name|
-      status = File._modify_file( 2, a_name, owner, group)
+      status = File._modify_file( 3, a_name, owner, group)
       if (status.equal?(0))
         count = count + 1
       end
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-      statObj.chardev?
-    end
-
-    def self.chmod(permission, *fileNames)
-      count = 0
-      fileNames.each { |aName|
-        status = File._modifyFile( 1, aName, permission, nil)
-        if (status.equal?(0))
-          count = count + 1
-        end
-      }
-      return count
-    end
-
-    def self.chown(owner, group, *fileNames)
-      count = 0
-      fileNames.each { |aName|
-        status = File._modifyFile( 3, aName, owner, group)
-        if (status.equal?(0))
-          count = count + 1
-        end
-      }
-      return count
-    end
-
-    def self.ctime(filename)
-      File.stat(filename).ctime
-    end
-
-    def self.delete(*fileNames)
-      count = 0
-      fileNames.each { |aName|
-        status = File._modifyFile( 0, aName, nil, nil )
-        if (status.equal?(0))
-          count = count + 1
-        end
-      }
-      return count
-    end
-
-    def self.directory?(filename)
-      statObj = File._stat(filename, false)
-      if (statObj._isFixnum)
-        return false  # an error attempting to stat
-=======
     }
     return count
   end
@@ -162,10 +102,9 @@ class File
   def self.delete(*file_names)
     count = 0
     file_names.each { |a_name|
-      status = File._modify_file( 5, a_name, nil, nil )
+      status = File._modify_file( 0, a_name, nil, nil )
       if (status.equal?(0))
         count = count + 1
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
       end
     }
     return count
@@ -324,16 +263,12 @@ class File
     return count
   end
 
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-    def self.link(oldname, newname)
-      status = File._modifyFile(8, oldname, newname)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
+  def self.link(oldname, newname)
+    status = File._modify_file(8, oldname, newname)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
-=======
-  # MNI: File.link
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
+  end
 
   def self.lstat(filename)
     _stat(filename, true);
@@ -343,12 +278,19 @@ class File
     File.stat(filename).mtime
   end
 
-  def self.new(file, mode="r")
-    self._open(file, mode)
+  def self.new(filename, mode="r")
+    f = self._open(filename, mode)
+    if f.equal?(nil)
+      raise SystemCallError # TODO: Errno::xxx
+    end
+    f
   end
 
-  def self.open(file, mode="r", &b)
-    f = self._open(file, mode)
+  def self.open(filename, mode="r", &b)
+    f = self._open(filename, mode)
+    if f.equal?(nil)
+      raise SystemCallError # TODO: Errno::xxx
+    end
     if b
       val = b.call(f)
       f.close
@@ -390,27 +332,21 @@ class File
     stat_obj.readable_real?
   end
 
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-    def self.readlink(filename)
-      res = String.new
-      status = File._modifyFile(6, filename, res)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
-      res
+  def self.readlink(filename)
+    res = String.new
+    status = File._modify_file(9, filename, res)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
+    res
+  end
 
-    def self.rename(oldname, newname)
-      status = File._modifyFile(7, oldname, newname)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
+  def self.rename(oldname, newname)
+    status = File._modify_file(7, oldname, newname)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
-    
-=======
-  # MNI: File.readlink
-  # MNI: File.rename
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
+  end
 
   def self.setgid?(filename)
     stat_obj = File._stat(filename, false)
@@ -466,16 +402,12 @@ class File
     stat_obj.sticky?
   end
 
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-    def self.symlink(oldname, newname)
-      status = File._modifyFile(6, oldname, newname)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
+  def self.symlink(oldname, newname)
+    status = File._modify_file(6, oldname, newname)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
-=======
-  # MNI: File.symlink
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
+  end
 
   def self.symlink?(filename)
     stat_obj = File._stat(filename, false)
@@ -485,16 +417,12 @@ class File
     stat_obj.symlink?
   end
 
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-    def self.truncate(filename, newsize)
-      status = File._modifyFile(2, filename, newsize)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
+  def self.truncate(filename, newsize)
+    status = File._modify_file(2, filename, newsize)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
-=======
-  # MNI: File.truncate
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
+  end
 
   def self.umask
     # return current file creation mask
@@ -515,29 +443,19 @@ class File
     res
   end
 
-<<<<<<< HEAD:src/kernel/bootstrap/File.rb
-    def self.utime(accesstime, modtime, *fileNames)
-      count = 0
-      fileNames.each { |aName|
-        status = File._modifyFile( 5, aName, accesstime, modtime)
-        if (status.equal?(0))
-          count = count + 1
-        end
-      }
-      return count
-    end
-=======
   def self.unlink(*file_names)
     delete(*file_names)
   end
->>>>>>> 3ffde66d5b2f950db4fed8c653d4cc3c7fa56659:src/kernel/bootstrap/File.rb
 
-  # MNI: File.utime
-  # TODO: Remove this stub impl....
-  def self.utime(atime, mtime, *files)
-    _stub_warn('File.utime is stubbed to just touch the file')
-    `touch #{files.join(' ')}`
-    files.size
+  def self.utime(accesstime, modtime, *filenames)
+    count = 0
+    filenames.each { |a_name|
+      status = File._modify_file( 5, a_name, accesstime, modtime)
+      if (status.equal?(0))
+        count = count + 1
+      end
+    }
+    return count
   end
 
   def self.writable?(filename)
@@ -571,7 +489,7 @@ class File
   end
 
   def chmod(permission)
-    status = File._modify_file( 1, @fileDescriptor, permission, nil)
+    status = File._modify_file( 10, @fileDescriptor, permission, nil)
     unless status.equal?(0)
       raise SystemCallError # TODO: Errno::xxx
     end
@@ -579,7 +497,7 @@ class File
   end
 
   def chown(owner, group)
-    status = File._modify_file( 3, @fileDescriptor, owner, group)
+    status = File._modify_file( 12, @fileDescriptor, owner, group)
     unless status.equal?(0)
       raise SystemCallError # TODO: Errno::xxx
     end
@@ -660,28 +578,30 @@ class File
 
   # end gets --------------------------------------------------
 
-    def self.fetch_flock_constants
-      # returns [ LOCK_EX, LOCK_NB, LOCK_SH, LOCK_UN ] from VM
-      #  they will be -1 on Solaris , where flock not supported
-      arr = [ ]
-      status = File._modifyFile(13, 0, arr)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
-      arr
-    end
 
-    LOCK_EX = fetch_flock_constants()[0]
-    LOCK_NB = fetch_flock_constants()[1]
-    LOCK_SH = fetch_flock_constants()[2]
-    LOCK_UN = fetch_flock_constants()[3]
-
-    def flock(lock_constant)
-      status = File._modifyFile(11, @fileDescriptor, lock_constant)
-      unless status.equal?(0)
-        raise SystemCallError # TODO: Errno::xxx
-      end
+  def self.fetch_flock_constants
+    # returns [ LOCK_EX, LOCK_NB, LOCK_SH, LOCK_UN ] from VM
+    #  they will be -1 on Solaris , where flock not supported
+    arr = [ ]
+    status = File._modify_file(13, 0, arr)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
     end
+    arr
+  end
+
+  LOCK_EX = fetch_flock_constants()[0]
+  LOCK_NB = fetch_flock_constants()[1]
+  LOCK_SH = fetch_flock_constants()[2]
+  LOCK_UN = fetch_flock_constants()[3]
+
+  def flock(lock_constant)
+    status = File._modify_file(11, @fileDescriptor, lock_constant)
+    unless status.equal?(0)
+      raise SystemCallError # TODO: Errno::xxx
+    end
+  end
+
 
   def lchmod(permission)
     # not supported , lchmod() not available on Linux or Solaris
@@ -716,23 +636,25 @@ class File
     return res
   end
 
+  # TODO: The following methods are not documented as part of the API:
+  # print, read,
   def print(*args)
-      args.each {|arg| self << arg.to_s}
+    args.each {|arg| self << arg.to_s}
   end
 
-  # read documented in IO, needs to be reimplemented here
+  # TODO: Where is this used?  Not a method
   def self.read(file)
-      open(file){|f| f.read}
+    open(file){|f| f.read}
   end
 
   def self.read(path)
-      file = self.new(path)
-      if file.equal?(nil)
-	raise SystemCallError # TODO: Errno::xxx
-      end
-      contents = file.read
-      file.close
-      contents
+    file = self.new(path)
+    if file.equal?(nil)
+      raise SystemCallError # TODO: Errno::xxx
+    end
+    contents = file.read
+    file.close
+    contents
   end
 
   def each_line(&block)
