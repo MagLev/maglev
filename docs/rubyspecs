@@ -1,17 +1,48 @@
 == RubySpecs and MagLev
 
-We've included a copy of the MSpec framework (<tt>spec/mspec</tt>,
-version 1.5.3) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
-2008-12-04). You may be able to run with later MSpec or RubySpec versions, but this is the version we used when we built the system.
-
+We've included a copy of the MSpec framework (<tt>spec/mspec</tt>, version
+1.5.6) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
+2009-01-22). You may be able to run with later MSpec or RubySpec versions,
+but this is the version we used when we built the system.
 
 Links:
 * +MSpec+[http://rubyspec.org/projects/show/mspec]
 * +RubySpec+[http://rubyspec.org/]
 
+=== Files
+
+All of the spec related files are under <tt>git/spec</tt>, except the
+<tt>default.mspec</tt> config file which lives in the +git+ directory.
+
+
+[<tt>do_not_run_specs</tt>]
+  A file read by <tt>default.mspec</tt> that list the specs under
+  <tt>rubyspec</tt> that have a syntax error or otherwise prevent any of
+  the expectations in that file from running.  Most of the files listed
+  here have a counterpart in <tt>localspec</tt> that has the offending bits
+  removed.
+
+[<tt>localspec/</tt>]
+  A directory that holds the Gemstone fixes for rubyspecs that cause MagLev
+  to choke.
+
+[<tt>mspec/</tt>]
+  A git submodule that tracks the mspec framework.
+  As of 2009-01-22, this is at version 1.5.6 of mspec.
+  http://github.com/rubyspec/mspec
+
+[<tt>rubyspec/</tt>]
+  A git submodule that tracks the rubyspecs.
+  As of 2009-01-22, this was the HEAD from the rubyspec git repository.
+  http://github.com/rubyspec/rubyspec
+
+[<tt>tags/</tt>]
+  The Gemstone rubyspec tags.  These are maintained in the git repository.
+
 === Run MSpec with +rake+
 
-There are three rake tasks that help with the specs:
+There are several rake tasks that help with the specs.  The most important
+are:
 
     $ rake -T spec
     rake spec:ci          # Run the continuous integration specs (was passingpsecs) on MagLev
