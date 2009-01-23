@@ -1,0 +1,1 @@
+fails:Module#public_method_defined? accepts any object that is a String type

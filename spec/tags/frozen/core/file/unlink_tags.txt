@@ -1,0 +1,3 @@
+fails:File.unlink raises an TypeError if not passed a String type
+fails:File.unlink raises an Errno::ENOENT when the given file doesn't exist
+fails:File.unlink coerces a given parameter into a string if possible

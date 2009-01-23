@@ -1,0 +1,2 @@
+fails:Thread#status reports threads as running and returns false on correct termination
+fails:Thread#status returns nil if thread terminates with exception

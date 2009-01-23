@@ -1,0 +1,2 @@
+fails:String#capitalize taints resulting string when self is tainted
+fails:String#capitalize is locale insensitive (only upcases a-z and only downcases A-Z)

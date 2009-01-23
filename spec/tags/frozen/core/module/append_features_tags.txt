@@ -1,0 +1,1 @@
+fails:Module#append_features gets called when self is included in another module/class

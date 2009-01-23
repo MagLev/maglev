@@ -1,0 +1,1 @@
+fails:Object#clone calls #initialize_copy on the NEW object if available, passing in original object

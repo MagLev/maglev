@@ -1,0 +1,4 @@
+fails:Kernel#open is a private method
+fails:Kernel#open opens a file when called with a block
+fails:Kernel#open opens an io when path starts with a pipe
+fails:Kernel#open raises a TypeError if not passed a String type

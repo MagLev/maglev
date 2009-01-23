@@ -1,0 +1,6 @@
+fails:File#chmod always succeeds with any numeric values
+fails:File#chmod invokes to_int on non-integer argument
+fails:File.chmod always succeeds with any numeric values
+fails:File.chmod throws a TypeError if the given path is not coercable into a string
+fails:File.chmod invokes to_int on non-integer argument
+fails:File.chmod invokes to_str on non-string file names

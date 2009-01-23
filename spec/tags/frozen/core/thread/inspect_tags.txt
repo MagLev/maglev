@@ -1,0 +1,2 @@
+fails:Thread#inspect can check it's own status
+fails:Thread#inspect describes a sleeping thread
