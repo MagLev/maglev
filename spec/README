@@ -1,0 +1,32 @@
+This directory contains all of the spec related files.
+
+do_not_run_specs
+  A file read by default.mspec and Don's test files that list the specs
+  under rubyspec that have a syntax error or otherwise blow up bad enough
+  that we do not even attempt to run them.  Most of these should have a
+  counterpart in localspec that has the offending bits removed.
+
+localspec
+  A directory that holds the Gemstone fixes for rubyspecs that cause MagLev
+  to choke.
+  NOTE: to get specs to run from this directory, you need to change the
+  require and load statements in the files
+
+  FROM:
+      require File.dirname(__FILE__) + '/../spec_helper'
+  TO:
+      require File.dirname(__FILE__) + '/../../rubyspec/language/' + '/../spec_helper'
+
+mspec
+  A git submodule that tracks the mspec framework.
+  As of 2009-01-22, this is at version 1.5.6 of mspec.
+  git://github.com/rubyspec/mspec
+
+rubyspec
+  A git submodule that tracks the rubyspecs.
+  As of 2009-01-22, this was the HEAD from the rubyspec git repository.
+  git://github.com/rubyspec/rubyspec
+
+tags
+  The Gemstone rubyspec tags.  These are maintained in the git repository.
+
