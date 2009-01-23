@@ -195,6 +195,11 @@ module Kernel
     RuntimeError.signal
   end
 
+  # sleep behavior
+  # PickAxe book   says argument of zero means infinite sleep
+  # MRI behavior,  sleep(0) returns immediately
+  # Maglev, sleep(0) will be equivalent to Thread.pass
+
   primitive_nobridge '_sleep_ms', '_highPriorityWaitForMilliseconds:'
 
   def sleep(numeric=0)
