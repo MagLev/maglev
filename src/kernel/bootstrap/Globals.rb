@@ -20,6 +20,7 @@ RUBY.global('Kernel', 'Kernel')    # for module Kernel
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMeth')  # RubyMeth , RubyUnboundMeth defined in .mcz
 RUBY.global('Module', 'Module')    # for class Module
+RUBY.global('Mutex', 'Semaphore')
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
@@ -34,6 +35,7 @@ RUBY.global('Symbol', 'Symbol')
 RUBY.global('TCPServer', 'TCPServer')
 RUBY.global('TCPSocket', 'TCPSocket')
 RUBY.global('Thread', 'GsProcess')
+RUBY.global('ThreadGroup', 'RubyThreadGroup')
 RUBY.global('Time', 'RubyTime')
 RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMeth')
