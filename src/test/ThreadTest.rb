@@ -122,7 +122,7 @@ class ThrTest
     while ($A < 1000)
       Thread.pass
     end
-    unless $A == 1168			Failed() ; end
+    unless $A == 1168;			Failed() ; end
     #---------------
   end
 end
