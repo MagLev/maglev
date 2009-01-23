@@ -79,4 +79,9 @@ test(my_file.atime, time, 'File#atime')
 test(my_file.mtime, time, 'File#mtime')
 test(my_file.path, fname, 'File#path')
 
+# This test case was causing mspec to fail.  Updated to
+# rubinius version of File.join and it is now fixed.
+result = File.join('spec/rubyspec/language', "/**/*_spec.rb")
+test(result, 'spec/rubyspec/language/**/*_spec.rb', "File.join:  MSPECs are probably broken now...")
+
 report

@@ -1,0 +1,18 @@
+fails:Defining an 'initialize' method should make it private
+fails:Defining an 'initialize_copy' method should make it private
+fails:Redefining a singleton method does not inherit a previously set visibility 
+fails:A method defined with extreme default arguments can redefine itself when the default is evaluated
+fails:A method defined with extreme default arguments evaluates the defaults in the method's scope
+fails:A singleton method defined with extreme default arguments may use a method definition as a default
+fails:A singleton method defined with extreme default arguments evaluates the defaults in the singleton scope
+fails:A nested method definition creates an instance method when evaluated in an instance method
+fails:A nested method definition creates a class method when evaluated in a class method
+fails:A method definition inside an instance_eval creates a singleton method
+fails:A method definition in an eval creates an instance method
+fails:A method definition in an eval creates a class method
+fails:A method definition in an eval creates a singleton method
+fails:a method definition that sets more than one default parameter all to the same value assigns them all the same object by default
+fails:a method definition that sets more than one default parameter all to the same value allows the first argument to be given, and sets the rest to null
+fails:a method definition that sets more than one default parameter all to the same value assigns the parameters different objects across different default calls
+fails:a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set
+fails:a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally

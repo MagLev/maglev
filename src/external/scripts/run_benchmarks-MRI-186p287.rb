@@ -1,7 +1,7 @@
 # Run modified bm_*.rb files from ruby-benchmark-suite using MRI
 #
 # Usage:  
-# nohup ruby ./run_benchmarks-MRI.rb 1>benchmark_results-MRI-${HOSTNAME}-`date +%y%m%d`.out 2>&1 &
+# /usr/local/ruby1.8.6/bin/ruby ./run_benchmarks-MRI.rb 1>benchmark_results-MRI-186p287-${HOSTNAME}-`date +%y%m%d`.out 2>&1
 #
 # These benchmarks have been modified to produce timing and status information
 # e.g.
@@ -59,11 +59,11 @@ require '../benchmark/cangiano/core-library/bm_vm3_thread_create_join.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_app_pentomino.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_binary_trees.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_fannkuch.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_fasta.rb' # Too much output
+require '../benchmark/cangiano/micro-benchmarks/bm_fasta.rb' # Too much output
 require '../benchmark/cangiano/micro-benchmarks/bm_fractal.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_knucleotide.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_lucas_lehmer.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_mandelbrot.rb'
+require '../benchmark/cangiano/micro-benchmarks/bm_mandelbrot.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_mergesort.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_meteor_contest.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_monte_carlo_pi.rb'
@@ -72,13 +72,13 @@ require '../benchmark/cangiano/micro-benchmarks/bm_nsieve.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_nsieve_bits.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_partial_sums.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_quicksort.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_recursive.rb'
+require '../benchmark/cangiano/micro-benchmarks/bm_recursive.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_regex_dna.rb'
-# require '../benchmark/cangiano/micro-benchmarks/bm_reverse_compliment.rb' # Too much output
+require '../benchmark/cangiano/micro-benchmarks/bm_reverse_compliment.rb' # Too much output
 require '../benchmark/cangiano/micro-benchmarks/bm_so_sieve.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_spectral_norm.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_sum_file.rb'
-require '../benchmark/cangiano/micro-benchmarks/bm_thread_ring.rb'
+# require '../benchmark/cangiano/micro-benchmarks/bm_thread_ring.rb'
 require '../benchmark/cangiano/micro-benchmarks/bm_word_anagrams.rb'
 require '../benchmark/cangiano/real-world/bm_hilbert_matrix.rb'
 require '../benchmark/cangiano/standard-library/bm_app_mandelbrot.rb'

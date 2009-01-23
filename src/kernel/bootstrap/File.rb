@@ -42,6 +42,13 @@ class File
     File.stat(filename).atime
   end
 
+  def each(separator=$/, &block)
+    sep = separator[0]
+    until eof?
+      block.call(next_line(sep))
+    end
+  end
+
   def self.basename(filename, suffix='')
     fn = StringValue(filename)
     sf = StringValue(suffix)
@@ -241,10 +248,6 @@ class File
       return false  # an error attempting to stat
     end
     stat_obj.grpowned?
-  end
-
-  def self.join(*ary)
-    ary.join(SEPARATOR)
   end
 
   def self.lchmod(permission, *file_names)

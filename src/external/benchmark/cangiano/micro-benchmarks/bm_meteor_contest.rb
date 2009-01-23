@@ -530,7 +530,7 @@ Benchmark.bm(7) do |bmr|
       # take noticable time (performance).
       if (@boards_found == @stop_count) then
         print_results
-        exit(0)
+        # exit(0)
       end
     end
   end

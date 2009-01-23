@@ -1,0 +1,2 @@
+require 'rbyaml'
+YAML = RbYAML
