@@ -83,6 +83,7 @@ RUBY.require 'kernel/bootstrap/Method.rb'
 RUBY.require 'kernel/bootstrap/Process.rb'
 RUBY.require 'kernel/bootstrap/GC.rb'
 RUBY.require 'kernel/bootstrap/FileStat.rb'
+RUBY.require 'kernel/bootstrap/Mutex.rb'
 RUBY.require 'kernel/bootstrap/Thread.rb'
 
 RUBY.require 'kernel/bootstrap/Signal.rb'
