@@ -65,7 +65,31 @@ class Array
   # TODO: include?: The Pick Axe book documents include? under both Array
   # and Enumerable. Our implementation is in the Array section above.
 
-  primitive 'inject&', 'inject:into:'
+  def inject(&blk)
+    my_size = size
+    accum = nil
+    n = 0
+    if my_size > 0 
+      accum = self[0]
+      n = 1
+      while (n < my_size)
+        accum = yield(accum, self[n])
+        n = n + 1
+      end 
+    end
+    accum
+  end
+
+  def inject(initial, &blk)
+    accum = initial
+    my_size = size
+    n = 0
+    while (n < my_size)
+      accum = yield(accum, self[n])
+      n = n + 1
+    end
+    accum
+  end
 
   alias map collect
 
