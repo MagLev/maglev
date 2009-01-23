@@ -1,0 +1,1 @@
+fails:Exception#set_backtrace allows the user to set the backtrace to any array

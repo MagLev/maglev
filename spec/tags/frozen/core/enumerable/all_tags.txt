@@ -1,0 +1,4 @@
+fails:Enumerable#all? always returns true on empty enumeration
+fails:Enumerable#all? with no block returns true if no elements are false or nil
+fails:Enumerable#all? with no block returns false if there are false or nil elements
+fails:Enumerable#all? with block returns true if the block never returns false or nil

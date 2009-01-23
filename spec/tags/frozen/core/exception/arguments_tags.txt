@@ -1,0 +1,1 @@
+fails:ArgumentError is a subclass of StandardError

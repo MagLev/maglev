@@ -6,6 +6,7 @@ DIR = File.dirname(__FILE__)
 
 $ci_files = [
   'spec/rubyspec/language',
+  'spec/rubyspec/core',
   'spec/localspec/language',
 ]
 

@@ -1,0 +1,1 @@
+fails:Enumerable#inject produces an array of the accumulator and the argument when given a block with a *arg

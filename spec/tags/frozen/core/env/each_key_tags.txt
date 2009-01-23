@@ -1,0 +1,2 @@
+fails:ENV.each_key returns each key
+fails:ENV.each_key raises LocalJumpError if no block given

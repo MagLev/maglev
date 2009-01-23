@@ -16,6 +16,12 @@ spec/rubyspec/language/numbers_spec.rb
 spec/rubyspec/language/precedence_spec.rb
 spec/rubyspec/language/retry_spec.rb
 
+# ##################################################
+# ####  MagLev does not implement
+# ##################################################
+                       
+spec/rubyspec/core/continuation
+spec/rubyspec/core/objectspace
 
 # ##################################################
 # ####  1.9 Only files

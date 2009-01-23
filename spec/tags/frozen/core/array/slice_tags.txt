@@ -1,0 +1,15 @@
+fails:Array#slice! removes and return the element at index
+fails:Array#slice! removes and returns length elements beginning at start
+fails:Array#slice! calls to_int on start and length arguments
+fails:Array#slice! removes and return elements in range
+fails:Array#slice! calls to_int on range arguments
+fails:Array#slice! expands self when indices are out of bounds
+fails:Array#slice return count elements starting from index with [index, count]
+fails:Array#slice returns count elements starting at index from the end of array with [-index, count]
+fails:Array#slice tries to convert the passed argument to an Integer using #to_int
+fails:Array#slice returns the elements specified by Range indexes with [m..n]
+fails:Array#slice returns elements specified by Range indexes except the element at index n with [m...n]
+fails:Array#slice tries to convert Range elements to Integers using #to_int with [m..n] and [m...n]
+fails:Array#slice returns nil if length is negative with [index, length]
+fails:Array#slice raises a RangeError when the start index is out of range of Fixnum
+fails:Array#slice raises a RangeError when the length is out of range of Fixnum
