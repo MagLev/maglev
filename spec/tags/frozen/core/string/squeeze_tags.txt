@@ -1,0 +1,2 @@
+fails:String#squeeze taints the result when self is tainted
+fails:String#squeeze raises a TypeError when one set arg can't be converted to a string

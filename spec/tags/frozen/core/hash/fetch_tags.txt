@@ -1,0 +1,2 @@
+fails:Hash#fetch returns value of block if key is not found when passed a block
+fails:Hash#fetch gives precedence to the default block over the default argument when passed both

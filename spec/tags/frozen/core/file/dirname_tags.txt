@@ -1,0 +1,4 @@
+fails:File.dirname returns all the components of filename except the last one
+fails:File.dirname returns all the components of filename except the last one (edge cases on all platforms)
+fails:File.dirname returns all the components of filename except the last one (edge cases on non-windows)
+fails:File.dirname raises a TypeError if not passed a String type

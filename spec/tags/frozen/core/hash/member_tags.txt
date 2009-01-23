@@ -1,0 +1,1 @@
+fails:Hash#member? returns true if argument is a key

@@ -1,0 +1,2 @@
+fails:Method#inspect the String reflects that this is a Method object
+fails:Method#inspect the String shows the method name, Module defined in and Module extracted from

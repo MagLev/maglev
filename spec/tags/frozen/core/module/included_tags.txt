@@ -1,0 +1,2 @@
+fails:Module#included is invoked when self is included in another module or class
+fails:Module#included allows extending self with the object into which it is being included

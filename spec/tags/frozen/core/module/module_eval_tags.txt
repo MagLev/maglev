@@ -1,0 +1,2 @@
+fails:Module#module_eval defines constants in the receiver's scope
+fails:Module#module_eval uses the optional filename and lineno parameters for error messages

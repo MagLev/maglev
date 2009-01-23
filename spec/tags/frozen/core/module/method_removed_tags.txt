@@ -1,0 +1,1 @@
+fails:Module#method_removed is called when a method is removed from self

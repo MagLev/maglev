@@ -1,0 +1,2 @@
+fails:Kernel#autoload is a private method
+fails:Kernel#autoload? is a private method

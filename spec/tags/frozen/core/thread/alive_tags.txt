@@ -1,0 +1,2 @@
+fails:Thread#alive? returns true as long as the thread is alive
+fails:Thread#alive? returns false when the thread is finished

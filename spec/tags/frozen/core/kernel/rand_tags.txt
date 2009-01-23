@@ -1,0 +1,3 @@
+fails:Kernel.rand is a private method
+fails:Kernel.rand returns a random float less than 1 for float arguments less than 1
+fails:Kernel.rand never returns a value greater or equal to any passed in max argument
