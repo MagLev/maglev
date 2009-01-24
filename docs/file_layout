@@ -2,58 +2,73 @@
 
   $MAGLEV_HOME
     |
-    + bin/        # MagLev shell scripts to run MagLev, the parser and
-    |             # start the Gemstone VM
-    + data/       # The MagLev repository files
+    + bin           # MagLev shell scripts to run MagLev, the parser and
+    |               # start the Gemstone VM
     |
-    + docs/       # Rdoc formatted documentation files
+    + data          # The MagLev repository files
     |
-    + etc/        # Misc config files used by topaz; demo key to unlock VM
+    + docs          # Rdoc formatted documentation files
     |
-    + examples/   # Example ruby scripts to run under MagLev
+    + etc           # Misc config files used by topaz; demo key to unlock VM
     |
-    + gci
+    + examples      # Example Ruby scripts to run under MagLev
     |
-    + gemstone    # The MagLev/Smalltalk executables, libraries, etc.
+    + gci           # Some GemStone C interface files
     |
-    + html/       # created by "rake rdoc"; holds html versions of rdoc files
+    + gemstone      # The MagLev/Smalltalk executables, libraries, etc.
     |
-    + locks/      # Lock files used by VM when running MagLev
+    + html          # created by "rake rdoc"; holds html versions of rdoc files
     |
-    + log/        # Log files created by MagLev components
+    + locks         # Lock files used by VM when running MagLev
     |
-    + rakelib/    # Rake scripts and supporting ruby files
+    + log           # Log files created by MagLev components
+    |
+    + rakelib       # Rake scripts and supporting Ruby files
     |
     + spec
     |  |
-    |  + mspec    # Git submodule holding v1.5.3 of mspec
+    |  + mspec      # Git submodule holding v1.5.3 of MSpec
     |  |
-    |  + rubyspec # Latest rubyspec files
+    |  + rubyspec   # Latest RubySpec files
     |
-    + src/        # MagLev ruby source and libs
+    + src           # MagLev Ruby source and libs
+    |
+    + tools         # Tools for developers
 
 === Source File Layout
 
   $MAGLEV_HOME/src
     |
-    + benchmark     # A suite of ruby benchmark files
-    |
-    + kernel        # The core and language files pre-loaded into the image
-    |  |            # These files are reloaded with "rake dev:reloadprims"
+    + external       # Frozen copies of files from other sources so
+    |  |             # developers are immune from sudden changes
+    |  |             # that might disrupt testing
     |  |
-    |  + kernel.rb  # File that controls the load order of order kernel files
+    |  + benchmark   # Suites of Ruby benchmark files
     |  |
-    |  + bootstrap  # These files are loaded in the first wave and provide
-    |  |            # the basic/core functionality
+    |  + rack-0.9.0
     |  |
-    |  + common     # Files that are common between MagLev and Rubinius
-    |  |            # (or at least mostly identical)
+    |  + rubygems-1.3.1
     |  |
-    |  + delta      # Files that are loaded after the common files to
-    |               # overload MagLev functions on top of the common ones.
+    |  + rxtest      # test rx
+    |  |
+    |  + scripts     # Scripts used in running benchmarks
+    |  |
+    |  + Sinatra
     |
-    + lib           # root of the ruby libraries.  This directory is on $:
+    + kernel         # The core and language files pre-loaded into the image
+    |  |             # These files are reloaded with "rake dev:reloadprims"
+    |  |
+    |  + kernel.rb   # File that controls the load order of order kernel files
+    |  |
+    |  + bootstrap   # These files are loaded in the first wave and provide
+    |  |             # the basic/core functionality
+    |  |
+    |  + common      # Files that are common between MagLev and Rubinius
+    |  |             # (or at least mostly identical)
+    |  |
+    |  + delta       # Files that are loaded after the common files to
+    |                # overload MagLev functions on top of the common ones.
     |
-    + scripts       # Misc development/management scripts
+    + lib            # root of the Ruby libraries.  This directory is on $:
     |
-    + test          # smoke tests run before committing code
+    + test           # smoke tests run before committing code
