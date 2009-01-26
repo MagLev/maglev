@@ -47,6 +47,13 @@ class IO
 
   # NOTE: IO#read() is deprecated...perhaps we don't bother?
 
+  # Returns true if io is associated with a terminal device (tty), and
+  # returns false otherwise.
+  def isatty
+    false
+  end
+  alias tty? isatty
+
   def print(*args)
     # TODO handle non-nil state of $\
     lim = args.length

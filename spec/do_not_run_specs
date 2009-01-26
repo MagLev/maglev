@@ -15,6 +15,9 @@ spec/rubyspec/language/next_spec.rb
 spec/rubyspec/language/numbers_spec.rb
 spec/rubyspec/language/precedence_spec.rb
 spec/rubyspec/language/retry_spec.rb
+spec/rubyspec/core/filetest/
+spec/rubyspec/core/kernel/case_compare_spec.rb
+spec/rubyspec/core/proc/arity_spec.rb
 
 # ##################################################
 # ####  MagLev does not implement

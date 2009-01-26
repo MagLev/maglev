@@ -783,6 +783,14 @@ class PersistentFile
   def sync=(bool)
     @block.call.sync=(bool)
   end
+
+  # Returns true if io is associated with a terminal device (tty), and
+  # returns false otherwise.
+  def isatty
+    false
+  end
+  alias tty? isatty
+
 end
 
 # STDIN, STDOUT, STDERR , $>  initialized in File2.rb
