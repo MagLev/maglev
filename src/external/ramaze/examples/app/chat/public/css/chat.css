@@ -1,0 +1,13 @@
+#login {
+  margin: auto;
+  width: 300px;
+}
+
+#main {
+  height: 250px;
+  overflow: auto;
+}
+
+#talk {
+  width: 100%;
+}

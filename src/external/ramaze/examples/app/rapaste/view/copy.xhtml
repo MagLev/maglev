@@ -1,0 +1,10 @@
+<form id="new_paste" action="/save" method="POST">
+  <textarea name="text">#{@paste.text}</textarea>
+  <select name="syntax">
+    <?r Paste::SYNTAX_LIST.each do |value, name|
+        selected = ' selected="selected"' if value == @paste.syntax ?>
+    <option value="#{value}"#{selected}>#{name || value}</option>
+    <?r end ?>
+  </select>
+  <input type="submit" />
+</form>

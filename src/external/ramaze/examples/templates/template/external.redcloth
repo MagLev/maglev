@@ -1,0 +1,19 @@
+h1. The <%= @place %> Template for RedCloth
+
+"Home":<%= Rs(:/) %>
+
+Here you can pass some stuff if you like, parameters are just passed like this:<br />
+"<%= @place %>/one":<%= Rs(@place, :one) %><br />
+"<%= @place %>/two/three":<%= Rs(@place, :two, :three) %><br />
+"<%= @place %>/one?foo=bar":<%= Rs(@place, :foo => :bar) %>
+
+The arguments you have passed to this action are:<br />
+<% if @args.empty? %>
+  none
+<% else %>
+  <% @args.each do |arg| %>
+    <span><%= arg %></span>
+  <% end %>
+<% end %>
+
+<%= request.params.inspect %>

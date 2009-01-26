@@ -1,0 +1,56 @@
+There are some basic principles that Ramaze tries to follow:
+
+* KISS (Keep It Super Simple)
+
+  Ramaze doesn't introduce any major change of paradigm for everyone familiar
+  with Ruby and the basics of Web-development.
+
+* POLS (Principle Of Least Surprise)
+
+  Ramaze tries to be intuitive and easy to learn. Most functionality is built in
+  a way to help, not to obfuscate or confuse.
+
+* Modular design
+
+  Use what you want and how you want it.
+
+  Through Ruby Ramaze provides one of the most powerful programming-languages
+  available, giving you full control over your system.
+
+  Even the most essential parts of Ramaze can easily be replaced and/or modified
+  without losing the advantage of the whole framework. 
+
+* Minimal dependencies
+
+  Nothing besides Ruby is required for the basic features.
+
+  Of course you can take advantage of several wonderful libraries, but Ramaze is
+  built in a way to be run on any basic setup.
+
+* Documentation
+
+  Document everything, classes, modules, methods, configuration...
+
+  Through 100% documentation Ramaze gives the developer easy and solid
+  understanding of the underlying concepts and functionality.
+
+* Open development
+
+  Everyone is welcome to contribute to Ramaze in the easiest way possible. The
+  repository is open for patches passing the Test-suite.
+
+* Examples
+
+  Everyone learns different, some only read the source, others browse
+  documentation, but everyone loves examples for a quick and painless start.
+
+  Ramaze addresses this need and offers a wide variety of examples of usage,
+  basic functionality, project-layout and more advanced applications.
+
+* Fully BDD (Behaviour Driven Design)
+
+  Ramaze has a very complete set of so-called specifications built by RSpec.
+  These specs define the way Ramaze has to behave.
+
+  The specs are checked every time a new patch is pushed into the repository,
+  deciding whether the changes the patch applies are valid and don't break the framework.

@@ -1,0 +1,99 @@
+This time we are proud to announce Version 2008.07 of Ramaze, the light and
+modular open source web framework.
+
+This release features a lot of work directly from our community and we are
+really greatful for everybody who helped in testing, patching and contributing
+exciting new features.
+
+Our extensive set of specs and docs now covers almost every detail of
+implementation and usage. Ramaze is under development by a growing community
+and in production use at companies.
+
+
+Home page:       http://ramaze.net
+Screencasts:     http://ramaze.net/screencasts
+
+Source browser:  http://source.ramaze.net
+Repository:      http://github.com/manveru/ramaze
+
+Nightly gems:    http://gems.ramaze.net
+Git clone:       git://github.com/manveru/ramaze
+Current tarball: http://github.com/manveru/ramaze/tarball/master
+
+IRC: #ramaze on irc.freenode.net
+
+
+Simple example:
+
+  require 'ramaze'
+
+  class MainController
+    def index
+      'Hello, World!'
+    end
+  end
+
+  Ramaze.start
+
+
+Some of 52 patches since 2008.06:
+
+  - Loggers are now in Ramaze::Logger namespace
+  - Global.prefix for nested deployment via webserver in front
+  - Binding#locals fixed for Ruby 1.9
+  - Redirects now use HTTP status 302 instead of 303
+  - Logger::Syslog works again
+
+Special (alphabetic) thanks go to:
+
+  Pistos                  - The usual Mathetes, patches and lots of friendly support
+  Aman 'tmm1' Gupta       - Time snippets for numeric
+  Clinton R. Nixon        - More REST and some fixes
+  Jean-Francois Chevrette - Restore --console feature
+  raggi                   - Various fixes
+  Rob Lievaart            - Fix Logger::Syslog
+  Sam Carr                - Cleanup of Cache
+  Wang Jinjing            - 1.9 compatibility
+  Yasushi Abe             - First patch!
+
+A complete Changelog is available at
+http://github.com/manveru/ramaze/tree/master/doc/CHANGELOG?raw=true
+
+
+Known issues:
+
+  - none yet, waiting for your reports :)
+
+
+Ramaze Features:
+  - Builds on top of the Rack library, which provides easy use of adapters like
+    Mongrel, WEBrick, LiteSpeed, Thin, CGI or FCGI.
+
+  - Supports a wide range of templating-engines like: Amrita2, Erubis, Haml,
+    Liquid, Markaby, Remarkably and its own engine called Ezamar and (still
+    unofficial) Nagoro.
+
+  - Highly modular structure: you can just use the parts you like. This also
+    means that it's very simple to add your own customizations.
+
+  - A variety of helpers is already available, giving you things like advanced
+    caching, OpenID-authentication or aspect-oriented programming for your
+    controllers.
+
+  - It is possible to use the ORM you like, be it Sequel, DataMapper,
+    ActiveRecord, Og, Kansas or something more simplistic like DBI, or a
+    wrapper around YAML::Store.
+
+  - Good documentation: although we don't have 100% documentation right now
+    (dcov says around 75%), just about every part of Ramaze is covered with
+    basic and advanced docs. There are a variety of examples, screencasts and a
+    tutorial available.
+
+  - Friendly community: there are people from all over the world using Ramaze,
+    so you can get almost instant help and info.
+
+
+For more information please come to http://ramaze.net or ask directly on IRC
+irc://irc.freenode.net/#ramaze
+
+Thank you, Michael 'manveru' Fellinger and the Ramaze community

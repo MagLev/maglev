@@ -1,0 +1,163 @@
+This chapter covers how to do configuration in Ramaze for your application.
+
+
+### Global
+
+The object holding most configuration is called Global. It resides in the Ramaze
+module/name space.
+
+Global is an instance of GlobalStruct, which itself is an instance of Struct.
+There have been some changes to it to suit its purpose.
+
+Before covering some of the available options let us see how to actually use it.
+
+For the examples shown here we will assume that you did include Ramaze
+into your main into your main name space. If you don't do that, just prefix
+Global with Ramaze so it is written Ramaze::Global.
+
+
+#### Basic assignment:
+
+  Global.port = 10
+
+if you do that before calling Ramaze::start Ramaze will choose the given number
+as port.
+
+
+#### Multiple assignment:
+
+  Global.setup :adapter => :mongrel,
+               :cache   => :memcached
+
+So you can pass a Hash of all the options you want to change.
+In this case you would use Mongrel as the adapter and use memcached for your
+sessions and general caching.
+
+
+#### Block assignment:
+
+  Global.setup do |g|
+    g.error_page = false
+    g.host = '127.0.0.1'
+    g.port = 7070
+  end
+
+This method is similar to the hash-assignment, but may be preferred for some
+applications.
+
+
+#### Pass on Ramaze.start
+
+  Ramaze.start :run_loose => true
+
+This way you can save a line or two in a small script.
+Please note that the values passed here have precedence over the ones directly
+set on Global and will overwrite them if you set them before, that is mostly
+useful to quickly test some configuration.
+
+
+### Global options
+
+This listing is here to provide you with descriptions of the most common
+configurations in alphabetical order per section showing the default value next
+to the key.
+
+This chapter has been shrunk a lot to cover only essentials, please look at
+lib/ramaze/global.rb to see all available options.
+
+Date of last update: 2007-05-20
+
+#### General Configuration:
+
+:sourcereload => 3
+
+SourceReload is a nifty mechanism that takes advantage of the dynamics of Ruby,
+it's basically a Thread that runs in the background and polls for files in the
+application and framework that have changed (using mtime). The value specifies
+roughly how fast your changes are going to be loaded and should be a number.
+If you set this to false, it will not start.
+
+
+:adapter => :webrick
+
+The adapter is the server Ramaze runs to serve your application. This can be any
+of mongrel/webrick/fcgi/cgi, please note that so far neither fcgi nor cgi have
+received the necessary testing, but, as they are only wrappers around the
+underlying Rack library, should work fine. Both fcgi and mongrel require
+additional libraries to be installed, webrick and cgi run out of the box.
+Generally the most supported and recommended for deployment is Mongrel.
+
+
+:cache => :memory
+
+Possible: :memory, :memcached, :yaml
+The cache is one of the more important things for deployment, the default for
+this is MemoryCache, a simple Hash.
+What you specify here will be used by Ramaze::Cache and is used throughout
+Ramaze to cache various things, like sessions, page- and value-caching.
+Included in Ramaze are the MemoryCache and YAMLStoreCache, after you install
+'memcached' you can also use the much more performant MemcachedCache that also
+makes it easy to use the same cache between different applications (sharing
+sessions is one of the most obvious uses).
+
+
+:cache_all => false
+
+Setting this value to true would enable caching for all pages served from the
+Controller (all actions).
+This is a very powerful setting and you might want to enable it if all pages
+you serve are only built once and have no further dynamics, the key for this
+cache consists of the controller and parameters, when repeated requests are
+made it will always serve the same (now static) page.
+
+
+:sessions => true
+
+Enables creation of sessions and automatic creation/setting of cookies.
+Please note that many functionalities of Ramaze depend on an intact session and
+you will have to be careful not to use these.
+This is most likely useful in combination with `cache_all`
+
+
+:error_page => true
+
+Enables the default Error page of Ramaze which is mostly useful for manual
+testing and faster debugging. In most deployment-scenarios you will however
+want to use your own Error page and so you can safely disable this setting.
+
+:host => '0.0.0.0'
+
+Tell the adapter where it accepts requests from, 0.0.0.0 says that every
+IP will be accepted, 127.0.0.1 would accept only requests from loopback.
+
+
+:mapping => {}
+
+This is a very central and special setting, it contains key/value pairs
+that define routes to your controllers, the keys are simple strings and
+start with '/', which means http://yourhost.com/ - '/foo/bar' would point
+to http://yourhost.com/foo/bar.
+The value is the class of your controller.
+
+
+:port => 7000
+
+The port Ramaze runs on, if you can think of more information about this feel
+free to tell us.
+
+
+:run_loose => false
+
+This option is mostly used to run the specs, it means that Ramaze will not
+join the adapter-threads and therefor you are free to run any code you want
+afterwards. You won't have to use this in most cases, example usage is in
+spec/spec_helper.
+
+
+:template_root => 'template'
+
+The template_root is the point your templates are located relative to the
+location of the entry-file (usually start.rb)
+It is also worth to mention that inside this directory the `mapping` is used
+to locate templates for each controller, only the controller mapped to '/' uses
+the templates directly from the `template_root`

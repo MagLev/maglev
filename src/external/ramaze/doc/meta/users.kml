@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+  <Document>
+    <Placemark>
+      <name>manveru</name>
+      <description><![CDATA[ <img src="http://manveru.mine.nu/public/me.png" /><br />
+            Tokyo, Japan ]]>
+        </description>
+      <Point>
+        <coordinates>139.667846,35.614759</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Pistos</name>
+      <description>
+      <![CDATA[
+          <img src="http://purepistos.net/favicon32.png" alt="Pistos" /><br />
+          Toronto, Canada<br />
+          <a href="http://blog.purepistos.net">blog.purepistos.net</a>
+      ]]>
+      </description>
+      <Point>
+        <coordinates>-79.386985,43.642515,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>MonoDelDiablo</name>
+      <description><![CDATA[ Seattle, Washington, United States ]]></description>
+      <Point>
+        <coordinates>-122.266881,47.682765,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Kashia</name>
+      <description><![CDATA[ Helsinki, Etela-Suomen Laani, Finland ]]></description>
+      <Point>
+        <coordinates>8.447204,49.028928,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>zenix</name>
+      <description><![CDATA[ Gaithersburg, Maryland, United States ]]></description>
+      <Point>
+        <coordinates>-77.183338,39.137049,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>tmm1</name>
+      <description><![CDATA[ <img src="http://tmm1.net/me.jpg" /><br />
+            Boston, Massachussetts ]]>
+        </description>
+      <Point>
+        <coordinates>-71.084371,42.365975,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>riffraff</name>
+      <description><![CDATA[ Rome, Italia ]]></description>
+      <Point>
+        <coordinates>41.993372,12.087193,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>

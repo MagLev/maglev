@@ -1,0 +1,10 @@
+* Performance
+  * Serving
+  
+    For best performance you should consider using Mongrel to host your
+    application.
+
+  * Caching
+  
+    You can easily cache your pages using the CacheHelper.
+    Also, using MemCache gives you high-end performance and security.

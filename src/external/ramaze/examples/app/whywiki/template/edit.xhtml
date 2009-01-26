@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>MicroWiki Edit #{@page}</title>
+  </head>
+  <body>
+    <h1>Edit #{@page}</h1>
+    #{ A("&lt; Home", :href => Rs()) }
+    <form method="POST" action="#{Rs(:save)}">
+      <input type="hidden" name="page" value="#{url_encode(@page)}" />
+      <textarea name="text" style="width: 90%; height: 20em;">#{@text}</textarea>
+      <input type="submit" />
+    </form>
+  </body>
+</html>

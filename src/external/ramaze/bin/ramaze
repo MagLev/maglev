@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+
+begin
+  $:.unshift File.join(File.dirname(__FILE__), '../lib')
+  require 'ramaze'
+rescue LoadError
+  $:.shift
+
+  begin
+    require 'rubygems'
+  rescue LoadError
+  end
+  require 'ramaze'
+end
+
+additions = lambda do |op|
+  op.separator ''
+  op.separator 'Specialized options:'
+
+  op.on('--create PROJECT', 'New application from proto') do |project_name|
+    require 'ramaze/tool/create'
+    Ramaze::Tool::Create.create(project_name)
+    exit
+  end
+
+  op.on('-i', '--instant', "Start up with bare-bones Controller") do |instant|
+    require 'ramaze/controller/main'
+  end
+
+  op.on('-e', '--execute STRING', String, "Execute string instead of a start.rb.") do |execute|
+    eval execute
+  end
+end
+
+runner = ARGV.reverse.find{|arg| File.file?(arg) }
+runner ||= 'start.rb' if File.file?('start.rb')
+
+if runner
+  overlay = {
+    :root => File.dirname(runner),
+    :runner => runner, :origin => :console,
+  }
+
+  [overlay, ENV, ARGV].each do |opt|
+    Ramaze::Global.merge!(opt, &additions)
+  end
+
+  runner = File.expand_path(runner)
+  
+  console = Ramaze::Global.console
+
+  if console
+    ARGV.clear #Avoid passing args to IRB
+
+    Ramaze.trait[:started] = true
+    require runner
+
+    require 'irb'
+    require 'irb/completion'
+
+    ENV['IRBRC'] = ".irbrc" if File.exists? ".irbrc"
+    Ramaze.start! :run_loose => true
+    IRB.start
+    Ramaze.shutdown
+  end
+  
+  daemonize = Ramaze::Global.daemonize
+
+  unless daemonize.empty?
+    require 'ramaze/tool/daemonize'
+    Ramaze::daemonize(runner, daemonize)
+  else
+    Ramaze.trait[:started] = true
+    require runner
+    Ramaze.start!
+  end
+else
+  Ramaze::Global.merge!(ARGV, &additions)
+  puts Ramaze::Global.option_parser(&additions)
+end

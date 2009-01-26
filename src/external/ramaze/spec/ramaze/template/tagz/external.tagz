@@ -1,0 +1,8 @@
+html_{
+  head_{
+    title_{ "Tagz Test" }
+  }
+  body_{
+    h1_{ "Tagz Template" }
+  }
+}

@@ -1,0 +1,131 @@
+====== simple ======
+<code ruby>
+require 'ramaze'
+
+class MainController < Ramaze::Controller
+  def index
+    "Hello, World!"
+  end
+end
+</code>
+
+=== webrick ===
+  Mem usage before:       20.32MB
+  Time taken for tests:   7.747022 seconds
+  Failed requests:        0
+  Requests per second:    129.08 [#/sec] (mean)
+  Time per request:       77.470 [ms] (mean)
+  Time per request:       7.747 [ms] (mean, across all concurrent requests)
+  Mem usage after:        25.43MB
+
+=== mongrel ===
+  Mem usage before:       20.25MB
+  Time taken for tests:   2.205161 seconds
+  Failed requests:        0
+  Requests per second:    453.48 [#/sec] (mean)
+  Time per request:       22.052 [ms] (mean)
+  Time per request:       2.205 [ms] (mean, across all concurrent requests)
+  Mem usage after:        21.91MB
+
+=== evented_mongrel ===
+  Mem usage before:       22.64MB
+  Time taken for tests:   1.311583 seconds
+  Failed requests:        0
+  Requests per second:    762.44 [#/sec] (mean)
+  Time per request:       13.116 [ms] (mean)
+  Time per request:       1.312 [ms] (mean, across all concurrent requests)
+  Mem usage after:        27.03MB
+
+====== no_template ======
+<code ruby>
+require 'ramaze'
+
+class MainController < Ramaze::Controller
+  engine :None
+
+  def index
+    "Hello, World!"
+  end
+end
+</code>
+
+=== evented_mongrel ===
+  Mem usage before:       22.63MB
+  Time taken for tests:   1.151947 seconds
+  Failed requests:        0
+  Requests per second:    868.10 [#/sec] (mean)
+  Time per request:       11.519 [ms] (mean)
+  Time per request:       1.152 [ms] (mean, across all concurrent requests)
+  Mem usage after:        27.11MB
+
+====== no_informer ======
+<code ruby>
+require 'ramaze'
+
+class MainController < Ramaze::Controller
+  def index
+    "Hello, World!"
+  end
+end
+
+Ramaze::Inform.loggers = []
+</code>
+
+=== evented_mongrel ===
+  Mem usage before:       22.63MB
+  Time taken for tests:   1.202878 seconds
+  Failed requests:        0
+  Requests per second:    831.34 [#/sec] (mean)
+  Time per request:       12.029 [ms] (mean)
+  Time per request:       1.203 [ms] (mean, across all concurrent requests)
+  Mem usage after:        27.07MB
+
+====== no_sessions ======
+<code ruby>
+require 'ramaze'
+
+class MainController < Ramaze::Controller
+  def index
+    "Hello, World!"
+  end
+end
+
+Ramaze::Inform.loggers = []
+Ramaze::Global.sessions = false
+</code>
+
+=== evented_mongrel ===
+  Mem usage before:       22.63MB
+  Time taken for tests:   0.835254 seconds
+  Failed requests:        0
+  Requests per second:    1197.24 [#/sec] (mean)
+  Time per request:       8.353 [ms] (mean)
+  Time per request:       0.835 [ms] (mean, across all concurrent requests)
+  Mem usage after:        26.38MB
+
+====== minimal ======
+<code ruby>
+require 'ramaze'
+
+class MainController < Ramaze::Controller
+  engine :None
+
+  def index
+    "Hello, World!"
+  end
+end
+
+Ramaze::Global.sourcereload = false
+Ramaze::Global.sessions = false
+Ramaze::Inform.loggers = []
+</code>
+
+=== evented_mongrel ===
+  Mem usage before:       22.62MB
+  Time taken for tests:   0.647273 seconds
+  Failed requests:        0
+  Requests per second:    1544.94 [#/sec] (mean)
+  Time per request:       6.473 [ms] (mean)
+  Time per request:       0.647 [ms] (mean, across all concurrent requests)
+  Mem usage after:        26.42MB
+

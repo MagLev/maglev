@@ -1,0 +1,64 @@
+<link rel="stylesheet" href="/css/ramaze_error.css" />
+<script type="text/javascript" src="/js/jquery.js"></script>
+
+<p>The backtrace gives filenames and line numbers for all parts of the call stack.<br />
+Click on any of them to view the surrounding source code.</p>
+
+<h3>#@title</h3>
+
+<table class="main">
+  <tr class="head">
+    <td>File</td><td>Line</td><td>Method</td>
+  </tr>
+  <?r @backtrace.each do |lines, hash, file, lineno, meth| ?>
+    <tr class="line" id="#{hash}">
+      <td>#{file}</td><td class="lineno">#{lineno}</td><td><pre>#{meth}</pre></td>
+    </tr>
+    <tr id="source_#{hash}" style="display:none;">
+      <td colspan="3">
+        <div class="source">
+          <table style="width:100%;">
+            <tr>
+              <td class="editor" colspan="2">
+                #{@editor} #{file} +#{lineno}
+                <div style="float: right">
+                  <a href="txmt://open?url=file://#{file}&line=#{lineno}">open in textmate</a>
+                </div>
+              </td>
+            </tr>
+            <?r lines.each do |llineno, lcode, lcurrent| ?>
+              <tr class="source" #{'style="background:#faa;"' if lcurrent}>
+                <td class="lineno">#{llineno}</td>
+                <td class="code"><pre>#{lcode.to_s.rstrip}</pre></td>
+              </tr>
+            <?r end ?>
+          </table>
+        </div>
+      </td>
+    </tr>
+  <?r end ?>
+</table>
+
+<?r
+  { 'Session'   => Ramaze::STATE[:session],
+    'Request'   => Ramaze::STATE[:request],
+    'Response'  => Ramaze::STATE[:response],
+    'Global'    => Global,
+  }.each do |title, content|
+    hash = [title, content].object_id.abs
+  ?>
+  <div class="additional">
+    <h3 id="#{hash}">#{title}</h3>
+    <pre style="display:none" id="is_#{hash}">#{Rack::Utils.escape_html(content.pretty_inspect)}</pre>
+  </div>
+<?r end ?>
+
+<script type="text/javascript">
+  $("tr.line").click(function(){
+    $("tr#source_"+this.id).toggle()
+  });
+
+  $("div.additional > h3").click(function(){
+    $("pre#is_"+this.id).toggle()
+  });
+</script>

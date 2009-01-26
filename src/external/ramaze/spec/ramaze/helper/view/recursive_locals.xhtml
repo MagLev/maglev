@@ -1,0 +1,7 @@
+{
+  #{n}
+  <?r if n < 4 ?>
+    #{render_template('recursive_locals.xhtml', :n => n+1)}
+  <?r end ?>
+  #{n}
+}

@@ -1,0 +1,6 @@
+<html>
+  <body>
+    <h1 am:src='title' />
+    <p am:src='body' />
+  </body>
+</html>

@@ -1,0 +1,787 @@
+Title: The official Ramaze todolist tutorial
+html_use_syntax: true
+uv_style: iplastic
+
+# To-do List Tutorial
+
+* Table of Contents
+{:toc}
+
+## Step Zero, Introduction
+
+Welcome to our official tutorial, the mandatory to-do list.
+I'm writing this while doing the steps to assure it will work for you.
+
+The tutorial assumes that you have Ramaze installed already. The easiest way to
+do that is `gem install ramaze`, for other ways of installation please see the
+documentation at http://ramaze.rubyforge.org
+
+Should you encounter any problems while doing this tutorial, this might either
+be because Ramaze changed (which happens very often while it is still young)
+or I actually made some mistake while writing it.
+
+In either case it would make me (and all other poor fellows who happen to try
+this tutorial) very happy if you could spare some time and report the issue
+either on the Bug tracker at http://rubyforge.org/projects/ramaze or just
+drop by on IRC ( irc.freenode.org channel: #ramaze ).
+
+There is also a Mailing list available where you can keep yourself updated on
+what is going on with little effort, it is also located on the project-page at
+RubyForge.
+
+Additionally, we now have added tests for the resulting application that you
+can find in spec/examples/todolist.rb
+
+Date of last update: Thu Jan 31 04:37:16 JST 2008
+
+Thanks in advance.
+The author of the tutorial, Michael 'manveru' Fellinger
+
+## First Step, Create
+
+We are using `ramaze --create todolist` to create a new application.
+Ramaze will then create the directory and fill it with a skeleton of a quite
+sophisticated hello-world example out of which we will create the actual
+to-do list.
+
+So run:
+
+    ramaze --create todolist
+{:lang=shell-unix-generic}
+
+done.
+
+
+## Second Step, M, like Model
+
+Ramaze comes at the moment only with a simple wrapper of the YAML::Store.
+So we are going to base this on the tools available, you can just do the same
+with your ORM or database-library of choice.
+
+So first, create a `model/todolist.rb` for our application:
+
+    require 'ramaze/store/default'
+    TodoList = Ramaze::Store::Default.new('todolist.yaml')
+{:lang=ruby}
+
+Let's add some items as well to have a base to start from.
+
+    { 'Laundry'     => {:done => false},
+      'Wash dishes' => {:done => false},
+    }.each do |title, value|
+      TodoList[title] = value
+    end
+{:lang=ruby}
+
+## Third Step, V, like View
+
+Now let's get our hands dirty and just edit the templates for our to-do list.
+
+Start with editing `view/index.xhtml`, it is using the default templating
+of Ramaze, called Ezamar.
+
+The index.xhtml currently contains a default welcome page, remove the contents.
+
+Let's put some things in there, I'll explain the syntax as we go, it's quite
+simple.
+
+    <html>
+      <head>
+        <title>TodoList</title>
+      </head>
+      <body>
+        <h1>TodoList</h1>
+        <ul>
+          <?r
+            TodoList.each do |title, value|
+              status = value[:done] ? 'done' : 'not done'
+            ?>
+            <li>#{h title}: #{status}</li>
+          <?r end ?>
+        </ul>
+      </body>
+    </html>
+{:lang=html}
+
+I will assume that you are familiar with basic Ruby already, so we will
+concentrate on the things new here.
+
+`<?r ?>` defines an area of ruby-code. Later, when the template is transformed
+into pure Ruby it will be evaluated. We iterate over the TodoList model and
+pass the title and value into a block. In that block we can just get the values
+of title and status (which we define based on the value) displayed on the
+page.
+
+The whole Template would expand to something like this (only showing the
+interesting part)
+
+    <ul>
+      <li>Laundry: not done</li>
+      <li>Wash dishes: not done</li>
+    </ul>
+{:lang=html}
+
+That wasn't too bad, huh?
+
+Now, so we can get our instant pleasure of seeing the result of our (hard) work,
+let's see how to start ramaze.
+
+In the `todolist` directory run `ramaze`.
+
+This will start an instance of Ramaze and run your application on it. You can
+now access it by browsing to http://localhost:7000/
+
+7000 is the default-port Ramaze will run on, to change it you can just run
+`ramaze -p 7070` or similar. Also be sure to look at the output of
+`ramaze --help` to see some other options.
+
+
+## Fourth Step, C, like Controller
+
+The last part of the MVC-paradigm is the Controller.
+
+Wouldn't it be nice to have a way to add and remove items on our to-do list?
+Editing the model every time would be quite tiresome and limited.
+
+Well, come along, I'll introduce you to Controller.
+
+In the way MVC is structured, the Controller provides the data in a nice way
+for the View, removing all of the data-preparation and most of the logic from
+the templates. This makes it firstly simple to change the front end of your
+application and secondly provides excellent ways of changing the complete
+Structure of the Model or View independent from each other.
+
+OK, enough of the theory, you will see the benefits in an instant. Go on and
+edit the file `controller/main.rb`.
+
+The contents of it are like following:
+
+    class MainController < Controller
+      def index
+        @welcome = "Welcome to Ramaze!"
+      end
+
+      def notemplate
+        "there is no template associated with this action"
+      end
+    end
+{:lang=ruby}
+
+The only methods right now are `#index` and `#notemplate`.
+The relationship between the methods on the controller and the templates is
+1:1, so the method `#index` is combined with the template `index.xhtml`. This
+combination is called an `action`.
+
+Let's get back to editing and change the method `#index` to this:
+
+    def index
+      @tasks = TodoList.original
+      @tasks.each do |title, value|
+        status = value[:done] ? 'done' : 'not done'
+        @tasks[title] = status
+      end
+    end
+{:lang=ruby}
+
+This will take care of the logic inside the template, which now should be
+changed to do following:
+
+    <html>
+      <head>
+        <title>TodoList</title>
+      </head>
+      <body>
+        <h1>TodoList</h1>
+        <?r if @tasks.empty? ?>
+          No Tasks
+        <?r else ?>
+          <ul>
+            <?r @tasks.each do |title, status| ?>
+              <li>#{h title}: #{status}</li>
+            <?r end ?>
+          </ul>
+        <?r end ?>
+      </body>
+    </html>
+{:lang=ezamar}
+
+The rest of the template can stay the same.
+
+Now, if you browse to http://localhost:7000/ again you will not notice any
+change, which is how it should be. The only change is that if there are no
+Tasks it will say so.
+
+Some things you should know:
+
+* Instance-variables defined in the Controller are available in the View.
+* The return-value of the Controller does not matter if a template is present.
+
+## Fifth Step, getting dynamic
+
+We set out to build the ultimate to-do list, but there are still some things
+missing. First off, we want to add new tasks, so let's get that done.
+
+Add a link on the `view/index.xhtml` like this:
+
+    <h1>TodoList</h1>
+    <a href="/new">New Task</a>
+{:lang=ezamar}
+
+Open a new file `view/new.xhtml` with a form to add a new task.
+
+    <html>
+      <head>
+        <title>TodoList</title>
+      </head>
+      <body>
+        <h1>New Task</h1>
+        <a href="/">Back to TodoList</a>
+        <form method="POST" action="create">
+          Task: <input type="text" name="title" /><br />
+          <input type="submit" />
+        </form>
+      </body>
+    </html>
+{:lang=ezamar}
+
+We will not need a method for this on our controller, in fact, actions can
+consist of either method and template or only one of them. The Controller
+can act as a View and the View can work like you may know it from PHP.
+
+If you try to use this form you will notice that we have not yet defined a way
+to actually create the task.
+
+You will get the default Ramaze error-page instead. Please take your time to
+explore it and see how Ramaze reacted on the error.
+
+It will show you the back trace and what state the application is in at the
+moment, the request and response and the contents of the session. This is very
+useful for debugging and development, you can provide your own set of
+error-pages before going into production (or deactivate them fully) though.
+
+OK, let's implement the action for `#create`, all we want to do is take the
+requests parameters and create a new task for it, this looks like following on
+your MainController.
+
+    def create
+      title = request['title']
+      TodoList[title] = {:done => false}
+      redirect Rs()
+    end
+{:lang=ruby}
+
+That's all folks!
+
+We get the title from the request-object, put it into our TodoList as undone
+and redirect back to the mapping of the current Controller ('/' in this case).
+
+Now you can create as many tasks as you want, please don't get overworked ;)
+
+
+## Sixth Step, open and close tasks
+
+Since the nature of tasks is to be done eventually
+we will need some way to mark it as done or open tasks again.
+
+Jump into `view/index.xhtml` and do the following:
+
+
+    <?r @tasks.each do |title, status, toggle| ?>
+      <li>
+        #{h title}: #{status} - [ #{toggle} ]
+      </li>
+    <?r end
+{:lang=ezamar}
+
+We added a new element here, `toggle`, the Controller should give us
+a link to change the status corresponding to the status of the task, so off
+we go and change the index method on the controller once again:
+
+    def index
+      @tasks = []
+      TodoList.original.each do |title, value|
+        if value[:done]
+          status = 'done'
+          toggle = A('Open Task', :href => Rs(:open, title))
+        else
+          status = 'not done'
+          toggle = A('Close Task', :href => Rs(:close, title))
+        end
+        @tasks << [title, status, toggle]
+      end
+      @tasks.sort!
+    end
+{:lang=ruby}
+
+Wow, quite some new stuff here. Let me explain that in detail.
+
+We first decide whether a task is done or not, then go on and provide a link to
+toggle the status, A and Rs are both methods that help you do that.
+The result will be something like:
+
+    <a href="/open/Wash+dishes">Close Task</a>
+{:lang=ezamar}
+
+Rs actually is responsible to build the links href, for more information please
+take a look at the RDoc for LinkHelper.
+
+Also, you might have noticed that the tasks were changing order on every reload,
+which is because we were using an Hash, which are per definition unsorted, so
+now we use an array to hold our tasks and sort it.
+
+As usual since the links for open and close don't lead anywhere, add the
+corresponding methods to the Controller:
+
+    def open title
+      task_status title, false
+      redirect Rs()
+    end
+
+    def close title
+      task_status title, true
+      redirect Rs()
+    end
+
+    private
+
+    def task_status title, status
+      task = TodoList[title]
+      task[:done] = status
+      TodoList[title] = task
+    end
+{:lang=ruby}
+
+Oh, now what have we got here?
+`private` declares that methods from here on are only to be used within the
+Controller itself, we define an `#task_status` method that takes the title and
+status to be set so we don't have to repeat that code in `#open` and `#close`
+and follow the DRY (Don't repeat yourself) paradigm.
+
+Another thing we have not encountered so far is that you can define your public
+methods to take parameters on their own, they will be calculated from requests.
+
+    '/open/Wash+dishes'
+{:lang=ruby}
+
+will translate into:
+
+    open('Wash dishes')
+{:lang=ruby}
+
+Which in turn will call 
+
+    task_status('Wash dishes', false)
+{:lang=ruby}
+
+That's it, go on and try it :)
+
+
+## Seventh Step, delete tasks
+
+Well, creating, opening and closing work now, one of the things you will
+consider is to delete a task permanently.
+
+This is just two little changes away, so let's add the link for deletion in our
+Controller:
+
+    delete = A('Delete', :href => Rs(:delete, title))
+    @tasks << [title, status, toggle, delete]
+{:lang=ruby}
+
+and an corresponding method while we're at it:
+
+    def delete title
+      TodoList.delete title
+      redirect Rs()
+    end
+{:lang=ruby}
+
+Now jumping to `view/index.xhtml` again, change it so it shows the link:
+
+    <?r @tasks.each do |title, status, toggle, delete| ?>
+      <li>
+        #{h title}: #{status} [ #{toggle} | #{delete} ]
+      </li>
+    <?r end ?>
+{:lang=ezamar}
+
+Voilà, you now have acquired the Certificate of Ramazeness.
+
+Just kidding, but that really are the basics, in the next few steps I will
+explain some more advanced concepts of Ramaze and Ezamar.
+
+
+## Eighth Step, Elements
+
+    <Page></Page>
+{:lang=ezamar}
+
+This is called an Element, Ramaze will go and search for a class that matches
+the name Page and responds to `#render`. Then it will go and hand the content in
+between to that Element.
+
+Sounds weird?
+
+Let us have a look at our templates, they got some repetitive stuff, like:
+
+    <html>
+      <head>
+        <title>TodoList</title>
+      </head>
+      <body>
+        <h1>some title</h1>
+      </body>
+    </html>
+{:lang=ezamar}
+
+How about replacing that with something short and reusable:
+
+    <Page title="TodoList">
+      your other content
+    </Page>
+{:lang=html}
+
+Would be nice of course, and when you start having more templates it makes an
+awful lot of sense being able to change the enclosing stuff in one place.
+
+So let's apply DRY here as well.
+
+Take a look at the `src/element/page.rb`
+
+    class Page < Ezamar::Element
+      def render
+        %{
+        <html>
+          <head>
+            <title>Welcome to Ramaze</title>
+          </head>
+          <body>
+            #{content}
+          </body>
+        </html>
+        }
+      end
+    end
+{:lang=ruby}
+
+Alright, most things we need are in place already, the most important thing
+is the `#content` method that we call with `#{content}` inside the string in
+`#render`.
+
+Just adopt it to your liking, I'll just use the things we had in our templates
+so far:
+
+    class Page < Ezamar::Element
+      def render
+        %{
+        <html>
+          <head>
+            <title>TodoList</title>
+          </head>
+          <body>
+            <h1>#{@title}</h1>
+            #{content}
+          </body>
+        </html>
+        }
+      end
+    end
+{:lang=ruby}
+
+Please note that instance variables reflecting the parameters are set.
+
+And let's change our templates as well.
+
+First the `view/index.xhtml`
+
+    <Page title="TodoList">
+      <a href="/new">New Task</a>
+      <?r if @tasks.empty? ?>
+        No Tasks
+      <?r else ?>
+        <ul>
+          <?r @tasks.each do |title, status, toggle, delete| ?>
+            <li>
+              #{h title}: #{status} [ #{toggle} | #{delete} ]
+            </li>
+          <?r end ?>
+        </ul>
+      <?r end ?>
+    </Page>
+{:lang=ezamar}
+
+and the `view/new.xhtml`
+
+    <Page title="New Task">
+      <a href="/">Back to TodoList</a>
+      <form method="POST" action="create">
+        Task: <input type="text" name="title" /><br />
+        <input type="submit" />
+      </form>
+    </Page>
+{:lang=ezamar}
+
+Alright, now just go and look at the result in the browser, try changing
+the things inside the Element and look at how it behaves.
+
+
+## Ninth Step, Prettify
+
+We structure the data inside the list a little bit, in this case into a table,
+to get it line up properly and look actually structured.
+
+So, from what we have right now:
+
+    <ul>
+      <?r @tasks.each do |title, status, toggle, delete| ?>
+        <li>
+          #{h title}: #{status} [ #{toggle} | #{delete} ]
+        </li>
+      <?r end ?>
+    </ul>
+{:lang=ezamar}
+
+To something like this:
+
+    <table>
+      <?r @tasks.each do |title, status, toggle, delete| ?>
+        <tr>
+          <td class="title">  #{h title}  </td>
+          <td class="status"> #{status} </td>
+          <td class="toggle"> #{toggle} </td>
+          <td class="delete"> #{delete} </td>
+        </tr>
+      <?r end ?>
+    </table>
+{:lang=ezamar}
+
+And, since we have proper classes to address some style sheets, jump into the
+Page element and add some style sheet:
+
+    <head>
+      <title>TodoList</title>
+      <style>
+        table     { width:       100%;              }
+        tr        { background:  #efe; width: 100%; }
+        tr:hover  { background:  #dfd;              }
+        td.title  { font-weight: bold; width: 60%;  }
+        td.status { margin:      1em;               }
+        a         { color:       #3a3;              }
+      </style>
+    </head>
+{:lang=ezamar}
+
+That looks quite a bit nicer, right?  And yes, if you don't like tables (though
+this is an entirely legit use in my opinion) you can just do it like you want,
+using nested lists or divs/spans, replacing the open/close and delete links with
+nice images and changing the style according to the status.
+
+I will leave this as an exercise to the reader.
+
+
+## Tenth Step, Configuration
+
+To round up this tutorial a bit, let's introduce you to configuration in Ramaze.
+This will not go into full depth of possibilities or a total coverage of the
+options, since they are bound to change over time.
+
+First of all, the default port Ramaze runs on is 7000, but to make it a usual
+webserver it has to run on port 80.  So, let's add following line in your
+start.rb right after the lines of require you added before:
+
+    Ramaze::Global.port = 80
+{:lang=ruby}
+
+Alright, that wasn't that hard.
+Let's say now you also want to run Mongrel instead of WEBrick, to get nice a bit
+of performance:
+
+    Ramaze::Global.adapter = :mongrel
+{:lang=ruby}
+
+To do this in a DRY way you could also do following:
+
+    Ramaze::Global.setup do |g|
+      g.port = 80
+      g.adapter = :mongrel
+    end
+{:lang=ruby}
+
+It seems to be quite common to put this configuration into separate files so you
+can just require it on demand.  There are other, slightly stronger way to set
+options, which is either using flags on the ramaze executable, or like this:
+
+    Ramaze.start :port => 80, :adapter => :mongrel
+{:lang=ruby}
+
+We haven't started Ramaze directly as of yet, but this allows you to ignore the
+ramaze executable and just run your application by `ruby start.rb`.
+
+
+## Eleventh Step, Refactor with AspectHelper
+
+Now, if you take a closer look at the Controller you will see:
+
+    def create
+      title = request['title']
+      TodoList[title] = {:done => false}
+      redirect R(self)
+    end
+
+    def open title
+      task_status title, false
+      redirect R(self)
+    end
+
+    def close title
+      task_status title, true
+      redirect R(self)
+    end
+
+    def delete title
+      TodoList.delete title
+      redirect R(self)
+    end
+{:lang=ruby}
+
+We did some refactoring before, by introducing `#task_status`, but here we have
+repetition again: `redirect Rs()` _after_ each method did its job.
+
+However, we can take advantage of one of the helpers Ramaze offers, the
+AspectHelper.
+It allows you to easily wrap actions in your controller with other methods
+
+In your Controller, replace the previous chunk with following:
+
+    def create
+      title = request['title']
+      TodoList[title] = {:done => false}
+    end
+
+    def open title
+      task_status title, false
+    end
+
+    def close title
+      task_status title, true
+    end
+
+    def delete title
+      TodoList.delete title
+    end
+
+    helper :aspect
+    after(:create, :open, :close, :delete){ redirect(Rs()) }
+{:lang=ruby}
+
+Alright, that looks a lot nicer already and is definitely easier to maintain.
+
+There is a symmetrical `before` aspect that you could take advantage of as
+well, and in case you want to add required authentication for all actions of a
+Controller you could use `before_all` and `after_all` instead of a list of
+action-names.
+
+
+## Twelfth Step, Validation and Errors
+
+Right now, all kinds of things could still go wrong when you do things like
+creating tasks with no title at all or try to open/close a task that does not
+exist. So in this step we will add some little checks for these cases.
+
+First we head over to the Controller again and take a look at `#create`:
+
+    def create
+      title = request['title']
+      TodoList[title] = {:done => false}
+    end
+{:lang=ruby}
+
+Here we just create a new task, no matter what we get. Every seasoned
+web-developer would advise you to be suspicious about all the input you receive
+from your users, so let's apply this advice.
+
+    def create
+      if title = request['title']
+        title.strip!
+        if title.empty?
+          failed("Please enter a title")
+          redirect '/new'
+        end
+        TodoList[title] = {:done => false}
+      end
+    end
+{:lang=ruby}
+
+First of all we check if we got a request with a value for 'title', if we get
+none we just let the aspect kick in that will redirect the browser to the index.
+Next we strip the title of all spaces around it so we can check if it is empty.
+We will talk about the specifics of our error-handling now.
+
+Ramaze has a helper called FlashHelper, that will keep a hash associated with
+the session for one request, afterwards the hash is thrown away. This is
+specifically useful for giving the user feedback while keeping a stateless
+approach.
+
+Let me show you our `#failed` method (it goes in the private section to
+`#task_status`):
+
+    def failed(message)
+      flash[:error] = message
+    end
+{:lang=ruby}
+
+Duh, you may say, wouldn't that fit in the one line instead of the call to
+`#failed`?
+Indeed, it would, but let me remind you, we have no checks for changing the
+status of a task yet. We will need error-handling there as well, so we just keep
+our code DRY and maintainable by collecting shared behaviour in small pieces.
+
+Now on to the `#task_status`:
+
+    def task_status title, status
+      unless task = TodoList[title]
+        failed "No such Task: `#{title}'"
+        redirect_referer
+      end
+
+      task[:done] = status
+      TodoList[title] = task
+    end
+{:lang=ruby}
+
+That used to look like this:
+
+    def task_status title, status
+      task = TodoList[title]
+      task[:done] = status
+      TodoList[title] = task
+    end
+{:lang=ruby}
+
+So in fact all we added is a check whether a task already exists, set an
+error-message in case it doesn't and redirect to wherever the browser came from.
+
+But what about actually showing the error-messages we so carefully set? Well,
+where do we change the view? Right, in the templates. But both templates we have
+so far (index and new) share this behaviour, so we head over to the Element
+and add in the right place:
+
+    <body>
+      <h1>#{@title}</h1>
+      <?r if flash[:error] ?>
+        <div class="error">
+          \\#{flash[:error]}
+        </div>
+      <?r end ?>
+      #{content}
+    </body>
+{:lang=ezamar}
+
+The only thing special about it is the `\\#{flash[:error]}`, we have to escape
+the `#` so it won't evaluate this immediately but wait until it is really
+rendered.
+As a note, If you read this as pure markaby, the double backslash is to output
+properly to HTML, just use one instead.
+Again, you can add some nifty style for that.
+
+To be continued...

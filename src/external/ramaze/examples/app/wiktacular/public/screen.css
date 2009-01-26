@@ -1,0 +1,72 @@
+body {
+  background: #dff;
+}
+
+a {
+  text-decoration: none;
+  color: #224;
+}
+a:hover {
+  text-decoration: underline overline;
+  color: #335;
+}
+
+a:before { content:"[ "; }
+a:after { content:" ]"; }
+
+h1 { font-size: 1.5em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.3em; }
+h4 { font-size: 1.2em; }
+h5 { font-size: 1.1em; }
+
+div#manipulate {
+  text-align: right;
+}
+
+div#navigation {
+  background: #fff;
+  padding: 0.5em;
+}
+
+div#text {
+  border: 1px black dashed;
+  padding: 1em;
+  margin: 1em;
+}
+
+div#menu {
+  height: 2em;
+  font-size: 1.1em;
+}
+
+form {
+  background: #cee;
+  padding: 2em;
+}
+
+input {
+  border: 1px solid #699;
+  background: #eee;
+}
+
+input:focus {
+  border: 1px solid green;
+}
+
+textarea {
+  width: 100%;
+  height: 35em;
+  border: 1px solid #699;
+  background: #eee;
+  padding: 5px;
+}
+
+textarea:focus {
+  border: 1px solid green;
+}
+
+#copyright {
+  text-align: center;
+  font-size: 0.9em;
+}

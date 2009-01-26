@@ -1,0 +1,40 @@
+#{@pager}
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript">
+  $(function() {
+    $('#paste_body').dblclick(function(){ $('.line-numbers').toggle() });
+  });
+  function change_style(name){
+    $('link')[1].href = '/css/' + name + '.css';
+    $('pre')[0].className = name;
+    $.get( '/save_theme/' + name );
+  }
+</script>
+<div id="paste">
+  <div id="paste_head">
+    <a id="toggle_meta" onclick="javascript:$('#paste_meta').toggle();" href="#">
+      <span class="toggle_button">-</span>
+    </a>
+    <ul id="paste_meta">
+      <li id="meta_syntax">Syntax: #{@syntax}</li>
+      <li id="meta_created">Created: #{time_diff(@paste.created)} ago</li>
+      <li id="meta_toggle_lines"><a onclick="javascript:$('span.line-numbers').toggle();" href="#">Toggle line numbers</a></li>
+      <li id="meta_change_style">
+        <form>
+          Theme:
+          <select onchange="change_style(this.value);" name="style" id="select_style">
+            <?r Uv.themes.each do |theme| ?>
+              <option value="#{theme}"#{theme == @style ? ' selected' : ''}>#{theme.capitalize.tr('_', ' ')}</option>
+            <?r end ?>
+          </select>
+        </form>
+      </li>
+      <ul id="meta_menu">
+        <li><a href="/copy/#{@paste.id}">Copy</a></li>
+        <li><a href="/#{@paste.id}">HTML</a></li>
+        <li><a href="/#{@paste.id}.txt">Plain</a></li>
+      </ul>
+    </ul>
+  </div>
+  <div id="paste_body">#@formatted</div>
+</div>

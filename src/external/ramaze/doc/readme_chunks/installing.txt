@@ -1,0 +1,92 @@
+* via RubyGems
+
+  The simplest way of installing Ramaze is via the gem.
+
+  [Rubygems](http://rubygems.org) is the package manager for ruby apps and
+  libraries and provides you with the last tagged version of Ramaze.
+
+      $ gem install ramaze
+
+  Versions are made as we see fit and get an announcment out (usually that's
+  the major obstacle as there is a lot to announce).
+
+  If you want to install the nightly gem of Ramaze you can do this with:
+
+      $ gem install ramaze --source=http://gem.ramaze.net/
+
+  We also use the gem building process on github, which locates gems at
+  http://gems.github.com - so you can get a version from there as well:
+
+      $ gem install manveru-ramaze --source=http://gems.github.com/
+
+* via git
+
+  To get the latest and sweetest, you can just pull from the repository and run
+  Ramaze that way.
+
+      $ git clone git://github.com/manveru/ramaze.git
+
+  Please read the `man git` or `git help` for more information about updating
+  and creating your own patches.
+  This is at the moment the premier way to use Ramaze, since it is the way I
+  use it.
+
+  Some hints for the usage of Git.
+
+  * use `require 'ramaze'` from everywhere
+
+    Simply add the path to your repository to the RUBYLIB environment variable.
+    If you are using bash you can simply put following line into your .bashrc:
+
+        $ export RUBYLIB="$HOME/path/to/repo/lib/"
+
+    Of course you should put the real path instead, you can also add multiple
+    paths, or create your personal `site_ruby`:
+
+        $ export RUBYLIB="$HOME/ruby/ramaze/lib:$HOME/.site_ruby:$HOME/ruby/bacon/lib"
+
+  * use `require 'ramaze'` systemwide from everywhere
+
+    add a file to your `site_ruby` directory named 'ramaze.rb'
+    the content should be: `require '/path/to/git/repo/ramaze/lib/ramaze'`
+
+  * Pull the latest version
+
+        $ git pull
+
+  * Reset the repo to original state (if you screw up something)
+
+        $ git reset --hard # resets the whole repo
+
+  * Revert changes to (for example) lib/ramaze.rb only
+
+        $ git checkout master lib/ramaze.rb
+
+  * Add and commit all changes.
+
+        $ git commit -a
+
+  * Adding only specific changes.
+
+        # Add hunks you want to commit to the staging area (index)
+        $ git add -p
+
+  * Commit the changes into the history of your repository
+
+        # Create a commit from the hunks added
+        $ git commit
+
+  * output your patches into a bundle ready to be mailed (compress it before
+    sending to make sure it arrives in the way you sent it)
+
+    At the end of this process you will have a tar.bz2 for all your changes
+    that you can mail to ramaze@googlegroups.com
+
+        # make sure you are on latest revision to avoid conflicts
+        $ git pull
+
+        # create 00xx-blah.patch files against the remote repo
+        $ git format-patch origin/HEAD
+
+        # From here on you can use either git-send-email or go the manual route
+        $ tar -cjf ramaze_bundle.tar.bz2 *.patch

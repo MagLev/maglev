@@ -1,0 +1,278 @@
+This document is a humble attempt to explain the internal workings of Ramaze and
+how the different parts fit into the big picture.
+
+It does not try to describe every little detail, as you will be better off
+reading the actual source instead. But you will at least get an idea of where to
+look.
+
+### Ramaze
+
+Ramaze is a web framework and therefor tries to make it simple to deploy your
+own applications on top of it.
+Let's outline the realms that Ramaze works in as to show what the current
+limitations and features are.
+
+
+#### Life of a request/response cycle
+
+This is a small summary of how a request creates a response in the
+examples/hello.rb and webrick (to keep it simple and short).
+All files referenced here are in lib/ramaze/ unless indicated otherwise.
+We don't explain the startup/shutdown process, only what happens from request to
+the eventual response.
+
+Browser sends request, webrick receives it and hands the ENV over to our rack
+handler (adapter/webrick.rb and adapter/base.rb).
+There it gets converted into a Ramaze::Request (trinity/request.rb) and
+a new blank Ramaze::Response (trinity/response.rb) is created.
+These two objects are then sent to Dispatcher::handle (dispatcher.rb).
+
+This all happens inside a new Thread, which is what Ramaze takes advantage of by
+assigning Thread-variables. You can see this now in
+Dispatcher::setup_environment which sets :request/:session/:response in
+Thread.current.
+
+After that, Dispatcher::dispatch is called with the path from request.path_info
+which in turn takes every class/module set in Dispatcher::FILTER and calls
+::process with the path.
+
+
+##### First, `/favicon.ico` (for most browsers)
+
+The first in FILTER is Dispatcher::File (dispatcher/file.rb) which searches
+Global.public_root and afterwards Global.public_proto for a matching file on
+this path. In our example the file found is a favicon.ico from
+Global.public_proto.
+
+The contents of FILTER have to return a Ramaze::Response, either the (possibly
+modified) original (Response#build helps with that) or a totally new
+one.
+
+In our case, Dispatcher::File uses response#build with an opened filehandler as
+body, '200 OK' as status and the Content-Type set to what Tool::MIME.type_for
+tells it is the correct mimetype for this file.
+
+
+##### Second, `/hello`
+
+We start in the processing of FILTER, since the previous steps are the same for
+every request.
+
+Here we now get only a nil value back from Dispatcher::File since no file in our
+two public directories exists for the given path.
+
+So, this time, Dispatcher::Action is called via ::process and the first thing
+this dispatcher does is trying to set the body of the request to the answer of
+Controller.handle (controller.rb) for the given path.
+
+Controller::handle doesn't do much either, but calls Controller::resolve
+(controller/resolve.rb) for the path.
+
+Here we get now into the guts of Ramaze, despite our efforts it's no easy
+reading since the underlying theory is a bit complex and many edge-cases have to
+be solved.
+
+Let me try to quickly sketch what happens here, maybe we can add a chapter about
+this aspect of Ramaze later.
+
+First we generate a pattern of how the requested path could fit into our
+controller and template structure. `/hello` only has 3 possible outcomes:
+
+Controller on '/', template or method `hello`
+Controller on '/', method `index` with parameter `hello`
+Controller on '/hello', method or template `index`
+
+After matching (in the order we wrote here) these possibilities against your
+application we get only one possibility, MainController on '/' with method
+`index`.
+
+The result is stored into an instance of Action and cached for repeated lookups,
+then passed back into Dispatcher::handle which subsequently calls Action#render
+(action/render.rb) on it.
+
+From here, Thread.current[:action] gets set and #uncached_render is called. This
+calls #before_process which only has effects if you have the AspectHelper
+activated and next on comes engine.transform with self as parameter.
+#engine is a method that figures out which engine this Action has to be rendered
+with, according to things like trait[:engine] in your controller and the
+extension of a template. In this case we have neither and the default engine
+Template::Ezamar (template/ezamar.rb) is used.
+
+So off we go, to Template::Ezamar::transform with the current instance of Action
+as parameter.
+
+::transform first calls ::wrap_compile which is inherited from Template
+(template.rb) and manages caching of compiled templates, calling ::compile with
+the action and template.
+
+The template again is retrieved through two attempts, firstly, we always call
+the method (if specified from Controller::resolve) on the controller, we
+temporarily store its result and replace it if a path for a template is set with
+the contents of the file on this path. The result of this is the final template
+that is ready for compilation.
+
+In the case of Ezamar, we first walk the TRANSFORM_PIPELINE (only
+Ezamar::Element (template/ezamar/element.rb) with ::transform and pass each the
+template for manipulation. In the example we don't have any elements, so we get
+back what we gave and generate a new instance of Ezamar::Template
+(template/ezamar/engine.rb) with the template and a path that indicates eval
+where we currently are supposed to be (templates path or the transformer).
+
+This instance is passed back to Ezamar::transform and we call #result with the
+actions binding (retrieved from earlier instantiation of the controller and
+subsequently eval `binding` inside of it).
+
+Now it's all done, we have got our body for the response which will be sent back
+to our handler as body.
+
+
+#### The Ramaze module
+
+Ramaze is also the main module or so-called namespace that the framework lives
+in. It has 
+
+Tasks on require
+
+* Inform
+  * LogHub.new(Informer)
+* Global
+  * GlobalStruct.new
+
+
+Tasks on startup as defined in Ramaze.trait[:internals] in lib/ramaze.rb
+
+* Global::startup
+  * passed options to Ramaze.start
+  * CLI options from bin/ramaze (treat as passed.merge)
+  * Global options set before startup (fake Global?)
+
+* Cache::startup
+  * adds the following caches via Cache.add:
+    * compiled
+      If Global.compile is set true this cache is used to store the compiled
+      templates.
+
+    * actions
+      Caching compiled actions.
+      
+    * patterns
+      This is used in Controller::resolve to cache the generated patterns for a
+      path.
+
+    * resolved
+      Caching the resolved but not yet compiled actions by their path.
+
+    * shield
+      Caching the generated errors for the path, so on repeated erronous
+      requests no new error-page has to be generated.
+
+* Controller::startup
+  * mapping of all subclassed Controller
+  * validation of mapping
+  * validation of template_root
+
+* Session::startup
+  * adds Cache.sessions if Global.sessions is true
+    This cache is used to store all sessions with their session-id as key.
+
+* SourceReload::startup
+  * start with Global.reload_interval
+  * assign Global.sourcereload
+
+* Adapter::startup
+  * interpret Global.adapter
+  * add every created adapter to Global.adapters
+
+
+Tasks on shutdown
+
+* Adapter::shutdown (iterates Global.adapters)
+* Inform::shutdown (iterates all in LogHub)
+
+
+
+#### Global configuration
+
+Any serious application or framework needs to be configured.
+Yes, I wished there was a silver bullet to serve all your needs as well, but at
+the current stage of programming development there is no such thing.
+So, since we need to configure, we should make it as simple and painless as
+possible, and, thanks to Ruby, it is actually quite enjoyable to do that.
+You can find a very detailed description about Global in the section about
+Configuration, for now just the basics.
+
+The basis of Ramaze::Global, the instance that is holding most part of your
+configuration or at least links to the actual places, is the
+Ramaze::GlobalStruct (ramaze/global.rb), which is a subclass of OpenStruct. If
+you are not yet familiar with OpenStruct, I very much recommend to read its
+documentation and play around a bit, it is basically just a wrapper around a
+normal Hash where you can access the keys instead of ostruct[:foo] with
+ostruct.foo.
+It simply defines a new accessors on assignment by catching things in
+method_missing. I won't go into more details here, I hope you got the principle.
+
+Now, based on this technique, GlobalStruct adds things like defaults and a
+couple of convenience methods like they are common in Ruby, giving you more
+power by tapping to the internal Hash of the GlobalStruct and adding
+update/setup methods so you can assign many key/value pairs at once.
+The RDocs will give you a very good overview of what is available and how one is
+supposed to work with it.
+
+Now back to the big picture.
+
+Ramaze accesses Global all over the place, there have been made several choices
+as to why using something like Global is considered beneficial against choosing
+for example global variables, which would be considered as a fatal choice by
+any respected Rubyist anyway.
+
+Now to something more subtle, which has to do with Global. I speak about traits,
+which is a very different concept in most of its implementations, but it is
+something that basically fits this name. It is configuration of single Objects
+and whole ancestries.
+You can give an object a trait, and most likely will use it along the lines of
+something like MyController.trait(:map => '/'), which would be picked up on
+startup and used to create Global.mapping - where we are at configuration again.
+Choosing this style of configuration complementary to a central place to put all
+your configuration was made very early in the development of Ramaze, and the
+basic code of how traits are implemented and used has proven very efficient both
+in understanding and using them.
+
+There is a basic distinction when to use Global and when to use traits and when
+to generate or assume one based on the other.
+
+If something affects your whole application and is either used directly in the
+Ramaze module or throughout the framework it is considered to be put into Global
+to gain benefits of better documentation and accessibility.
+
+On the other hand - if something is used in a configuring manner by a class that
+is instantiated often (like Controller is for example), or a module that cannot
+hold instance variables in a nice manner and is also not a constant - then it is
+configured using traits.
+
+
+Ramaze
+Global
+Adapter
+Dispatcher
+Controller
+Action
+
+Session
+Helper
+Tool
+
+
+#### The Web
+
+The so called web consists of a plethora of data, most of it is browsable
+through a web browser that just about every toaster has installed these days.
+The browser is the target of a web author, trying to utilize common standards
+like HTML and CSS which are means for data and layout to be combined, giving the
+browser a way to display the data.
+Ramaze works on the URI-scale web, meaning that addresses like
+http://someserver.com/blog/article/1 have a unique representation on your
+server.
+If we stay with this example, we see already everything Ramaze needs to see to
+serve a page based on your instructions.
+We assume that blog/article is a Controller named ArticleController in the blog
+application.

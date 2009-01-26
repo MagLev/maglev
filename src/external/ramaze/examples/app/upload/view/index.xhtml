@@ -1,0 +1,25 @@
+<html>
+
+  <body>
+    <form method="POST" enctype="multipart/form-data">
+      Upload file: <input type="file" name="file" /><br />
+      <input type="submit" name="submit" value="Submit" />
+    </form>
+
+    <?r if @inspection ?>
+      <h3>#{@basename}</h3>
+      File size: #{@file_size} bytes
+
+      <?r if @is_image ?>
+        <h4>Uploaded Image</h4>
+        <img src="#{@basename}" alt="Uploaded Image"/><br/>
+      <?r else ?>
+        <p>You uploaded a #{@type} file.  Upload an image file to see it here.</p>
+      <?r end ?>
+
+      <h4>request.params.inspect:</h4>
+      <pre>#{@inspection}</pre>
+    <?r end ?>
+  </body>
+
+</html>

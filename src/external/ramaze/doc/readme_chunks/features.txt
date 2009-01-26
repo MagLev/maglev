@@ -1,0 +1,148 @@
+Ramaze offers following features at the moment:
+
+* Adapters
+
+   Ramaze takes advantage of the rack library to provide a common way of
+   handling different ways to serve its content.
+
+   Rack supports at the moment:
+
+    * [Mongrel](http://mongrel.rubyforge.org/)
+
+      Mongrel is a fast HTTP library and server for Ruby that is intended for
+      hosting Ruby web applications of any kind using plain HTTP rather than
+      FastCGI or SCGI.
+
+    * [WEBrick](http://www.webrick.org/)
+
+      WEBrick is a Ruby library program to build HTTP servers.
+
+    * CGI
+
+      CGI is the Common Gateway Interface and is one of the most basic ways
+      to integrate into Webservers like Apache or Lighttpd.
+
+    * FCGI
+
+      Improvment of CGI as it doesn't start up a new connection to Ramaze on
+      every request.
+
+
+* Templates
+  * [Amrita2](http://amrita2.rubyforge.org/)
+
+    Amrita2 is a xml/xhtml template library for Ruby. It makes html documents
+    from a template and a model data.
+
+  * [Erubis](http://rubyforge.org/projects/erubis)
+
+    Erubis is a fast, secure, and very extensible implementation of eRuby.
+
+  * [Haml](http://haml.hamptoncatlin.com/)
+
+    Haml takes your gross, ugly templates and replaces them with veritable Haiku.
+
+  * [Liquid](http://home.leetsoft.com/liquid)
+
+    Liquid's syntax and parse model are inspired by Django templates, as well
+    as PHP's smarty.
+
+  * [Remarkably](http://rubyforge.org/projects/remarkably)
+
+    Remarkably is a very tiny Markaby-like XML builder
+
+  * [Markaby](http://code.whytheluckystiff.net/markaby/)
+
+    Markaby means Markup as Ruby.
+
+  * [Sass](http://haml.hamptoncatlin.com/docs/sass)
+
+    Sass is a meta-language on top of CSS that‘s used to describe the style of
+    a document cleanly and structurally, with more power than flat CSS allows. 
+
+  * Ezamar
+
+    A simple homage to [Nitro](http://nitroproject.org)s templating, is shipped
+    together with Ramaze.
+
+* Cache
+  * Hash
+  * YAML::Store
+  * MemCache
+
+* Helper
+  * Active by default 
+    * CGI
+
+      Shortcuts for escape/unescape of the CGI module.
+
+    * File
+
+      Helps you serving files from your Controller.
+
+    * Flash
+
+      Store a couple of values for one request associated with a session.
+
+    * Link
+
+      Easier linking to the various parts of your applications Controllers and
+      Actions.
+
+    * Redirect
+
+      Easy redirection.
+
+  * Optional
+    * Aspect
+
+      Allows you to wrap different Actions on your Controller with code.
+
+    * Auth
+
+      Simple way to add basic authentication.
+
+    * Cache
+
+      Easy caching Actions and values.
+
+    * Identity
+
+      For ease of use of the OpenID authentication mechanism.
+
+    * Inform
+
+      Wrapping the functionality of Ramazes logging facilities.
+
+    * Markaby
+
+      Allows you to use Markaby in your Controller without having it as the
+      default templating engine.
+
+    * Nitroform
+
+      Hooks up on nitros form builder to help you creating forms from Og
+      objects.
+
+    * OpenID
+
+      Authentication via OpenID made easy.
+
+    * Pager
+
+      Displays a collection of entitities in multiple pages.
+
+    * Partial
+
+      Renders so-called partials.
+
+    * Stack
+
+      Allows you to use a call/answer mechanism for things like redirection to the
+      site a user entered login-forms from.
+
+* Various
+  * Sessions
+  * Global configuration system
+  * Simple request/response handling
+  * Custom sophisticated Error-handling

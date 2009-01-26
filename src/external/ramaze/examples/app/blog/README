@@ -1,0 +1,3 @@
+A simple blog engine that uses Sequel as the persistence layer.
+Sequel uses sqlite as the default DBMS engine and will create the database
+automatically on startup.

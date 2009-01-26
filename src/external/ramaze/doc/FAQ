@@ -1,0 +1,92 @@
+== FAQ, Frequently asked Questions
+
+= How do you pronounce Ramaze?
+
+There are two ways Ramaze is usually pronounced, the one that is most common
+the moment is like the English `amaze` with a prefixed `r`.
+
+The other way is using Japanese pronunciation `ra ma ze`:
+
+`ra` in `rasta`
+
+`ma` in `mark`
+
+`ze`, just make it sound German ;)
+
+= What is MVC?
+
+MVC stands for Model, View and Controller and is a concept that comes from
+Smalltalk.
+
+It is a way to decouple the way Data is stored, accessed, processed and
+displayed.
+
+- Model
+
+   Here your Data is structured and accessible, for example an interface to
+   PostgreSQL or Oracle. It contains all the queries and data-layout of your
+   application.
+
+- View
+
+   This is called Template in Ramaze, it's the way your Data is displayed to
+   the consumer of your information.
+
+   That can be anything like pure HTML, XML, JSON, YAML, RSS or ATOM.
+
+- Controller
+
+   Controller are the way you process the Information between the Model and
+   View. It is where all (or almost all) your applications programming-logic
+   has its home.
+
+   Common tasks in a Controller are: fetching data from the Model,
+   authentication, processing of POST-requests or GET-parameters,
+   redirection, caching, feed-generation...
+
+
+= How does Ramaze enforce MVC?
+
+Now, that one is simple: it doesn't tell you in which way you have to layout
+your application at all.
+
+Of course there are many defaults and possible best practices, but you can
+always change the whole framework to fit your needs.
+
+
+= Still, What do those 'best practices' say about MVC
+
+- Model
+
+   First of all, Ramaze doesn't provide a best practice for the Model, it
+   simply assumes that you will have your ORM/database-interface of choice.
+
+   However, it features a simplistic interface to YAML::Store and work on a
+   small wrapper around KirbyBase is in progress.
+
+   For the time being you can use anything you like, currently tested ORMs are
+   ActiveRecord, Kansas and Og.
+
+- View
+
+   Ramaze offers a plethora of Templating-engines that you can use in your
+   View, including Amrita2, Erubis (ERB), HAML, Liquid, Remarkably, Markaby and
+   the default, called Ezamar.
+
+   The View in Ramaze is tightly coupled with the Controller, that means that
+   your Controller is a subclass of the Templating you will use for the
+   controller.
+
+- Controller
+
+   That's the smallest but most central part of every Ramaze-application.
+
+   The Controllers act as small dispatcher for your View, by looking up which
+   templating-engine to use and by providing methods that in compound with
+   the templates are called actions.
+
+   the naming and mapping of the controller and its methods will define the
+   layout of your URLs.
+
+   Many helpers provide you pragmatic ways of adding
+   things like aspects, feeds, redirects and the like.

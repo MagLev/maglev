@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN" "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd">
+<html xml:lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/1999/xhtml">
+<head><meta content="application/xhtml+xml;charset=utf-8" http-equiv="Content-type" /><title>The official Ramaze todolist tutorial</title><style type="text/css">
+              pre { margin: 1em; padding: 1em; }
+              pre.iplastic .Constant {
+   color: #6782D3;
+}
+pre.iplastic .Support {
+   font-weight: bold;
+   color: #3333FF;
+}
+pre.iplastic .EmbeddedSource {
+   background-color: #F9F9F9;
+   color: #000000;
+}
+pre.iplastic .Arguments {
+   font-style: italic;
+}
+pre.iplastic .TypeName {
+   font-weight: bold;
+}
+pre.iplastic .Identifier {
+   color: #9700CC;
+}
+pre.iplastic .Number {
+   color: #0066FF;
+}
+pre.iplastic .SectionName {
+   font-weight: bold;
+}
+pre.iplastic .Storage {
+   font-weight: bold;
+}
+pre.iplastic .line-numbers {
+   background-color: #BAD6FD;
+   color: #000000;
+}
+pre.iplastic {
+   background-color: #EEEEEE;
+   color: #000000;
+}
+pre.iplastic .FrameTitle {
+   font-weight: bold;
+   color: #000000;
+}
+pre.iplastic .TagName {
+   font-weight: bold;
+}
+pre.iplastic .Tag {
+   color: #0033CC;
+}
+pre.iplastic .Exception {
+   color: #990000;
+}
+pre.iplastic .XmlDeclaration {
+   color: #333333;
+}
+pre.iplastic .TrailingWhitespace {
+   background-color: #EEEEEE;
+}
+pre.iplastic .TagAttribute {
+   color: #3366CC;
+   font-style: italic;
+}
+pre.iplastic .Invalid {
+   background-color: #E7342D;
+   color: #FF0000;
+}
+pre.iplastic .Keyword {
+   color: #0000FF;
+}
+pre.iplastic .String {
+   color: #009933;
+}
+pre.iplastic .Comment {
+   color: #0066FF;
+   font-style: italic;
+}
+pre.iplastic .FunctionName {
+   color: #FF8000;
+}
+pre.iplastic .RegularExpression {
+   color: #FF0080;
+}
+
+            </style></head>
+<body>
+<h1 id="todo_list_tutorial">To-do List Tutorial</h1>
+<div class="maruku_toc"><ul style="list-style: none;"><li><a href="#step_zero_introduction">Step Zero, Introduction</a></li><li><a href="#first_step_create">First Step, Create</a></li><li><a href="#second_step_m_like_model">Second Step, M, like Model</a></li><li><a href="#third_step_v_like_view">Third Step, V, like View</a></li><li><a href="#fourth_step_c_like_controller">Fourth Step, C, like Controller</a></li><li><a href="#fifth_step_getting_dynamic">Fifth Step, getting dynamic</a></li><li><a href="#sixth_step_open_and_close_tasks">Sixth Step, open and close tasks</a></li><li><a href="#seventh_step_delete_tasks">Seventh Step, delete tasks</a></li><li><a href="#eighth_step_elements">Eighth Step, Elements</a></li><li><a href="#ninth_step_prettify">Ninth Step, Prettify</a></li><li><a href="#tenth_step_configuration">Tenth Step, Configuration</a></li><li><a href="#eleventh_step_refactor_with_aspecthelper">Eleventh Step, Refactor with AspectHelper</a></li><li><a href="#twelfth_step_validation_and_errors">Twelfth Step, Validation and Errors</a></li></ul></div>
+<h2 id="step_zero_introduction">Step Zero, Introduction</h2>
+
+<p>Welcome to our official tutorial, the mandatory to-do list. I&#8217;m writing this while doing the steps to assure it will work for you.</p>
+
+<p>The tutorial assumes that you have Ramaze installed already. The easiest way to do that is <code>gem install ramaze</code>, for other ways of installation please see the documentation at http://ramaze.rubyforge.org</p>
+
+<p>Should you encounter any problems while doing this tutorial, this might either be because Ramaze changed (which happens very often while it is still young) or I actually made some mistake while writing it.</p>
+
+<p>In either case it would make me (and all other poor fellows who happen to try this tutorial) very happy if you could spare some time and report the issue either on the Bug tracker at http://rubyforge.org/projects/ramaze or just drop by on IRC ( irc.freenode.org channel: #ramaze ).</p>
+
+<p>There is also a Mailing list available where you can keep yourself updated on what is going on with little effort, it is also located on the project-page at RubyForge.</p>
+
+<p>Additionally, we now have added tests for the resulting application that you can find in spec/examples/todolist.rb</p>
+
+<p>Date of last update: Thu Jan 31 04:37:16 JST 2008</p>
+
+<p>Thanks in advance. The author of the tutorial, Michael &#8216;manveru&#8217; Fellinger</p>
+
+<h2 id="first_step_create">First Step, Create</h2>
+
+<p>We are using <code>ramaze --create todolist</code> to create a new application. Ramaze will then create the directory and fill it with a skeleton of a quite sophisticated hello-world example out of which we will create the actual to-do list.</p>
+
+<p>So run:</p>
+
+<pre class="iplastic"><code class="shell-unix-generic" lang="shell-unix-generic">ramaze --create todolist
+</code></pre>
+
+<p>done.</p>
+
+<h2 id="second_step_m_like_model">Second Step, M, like Model</h2>
+
+<p>Ramaze comes at the moment only with a simple wrapper of the YAML::Store. So we are going to base this on the tools available, you can just do the same with your ORM or database-library of choice.</p>
+
+<p>So first, create a <code>model/todolist.rb</code> for our application:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">require</span> <span class="String"><span class="String">'</span>ramaze/store/default<span class="String">'</span></span>
+TodoList <span class="Keyword">=</span> <span class="Support">Ramaze</span>::<span class="FunctionName">Store</span>::<span class="FunctionName">Default</span>.<span class="FunctionName">new</span>(<span class="String"><span class="String">'</span>todolist.yaml<span class="String">'</span></span>)
+</code></pre>
+
+<p>Let&#8217;s add some items as well to have a base to start from.</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby">{ <span class="String"><span class="String">'</span>Laundry<span class="String">'</span></span>     =&gt; {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>},
+  <span class="String"><span class="String">'</span>Wash dishes<span class="String">'</span></span> =&gt; {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>},
+}.<span class="FunctionName">each</span> <span class="Keyword">do </span>|title, value|
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> value
+<span class="Keyword">end</span>
+</code></pre>
+
+<h2 id="third_step_v_like_view">Third Step, V, like View</h2>
+
+<p>Now let&#8217;s get our hands dirty and just edit the templates for our to-do list.</p>
+
+<p>Start with editing <code>view/index.xhtml</code>, it is using the default templating of Ramaze, called Ezamar.</p>
+
+<p>The index.xhtml currently contains a default welcome page, remove the contents.</p>
+
+<p>Let&#8217;s put some things in there, I&#8217;ll explain the syntax as we go, it&#8217;s quite simple.</p>
+
+<pre class="iplastic"><code class="html" lang="html"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+<span class="EmbeddedSource">      <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?</span><span class="Constant">r</span></span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">        <span class="Constant">TodoList</span><span class="Keyword">.</span><span class="Constant">each</span> <span class="Keyword">do</span> <span class="Keyword">|</span><span class="Constant">title</span>, <span class="Constant">value</span><span class="Keyword">|</span></span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">          <span class="Constant">status</span> <span class="Keyword">=</span> <span class="Constant">value</span>[:<span class="Constant">done</span>] ? <span class="String"><span class="String">'</span><span class="String">done</span><span class="String">'</span></span> : <span class="String"><span class="String">'</span><span class="String">not done</span><span class="String">'</span></span></span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">        <span class="EmbeddedSource"><span class="EmbeddedSource">?</span>&gt;</span></span></span>
+        <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>#<span class="EmbeddedSource">{h title}</span>: #<span class="EmbeddedSource">{status}</span><span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+      <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>I will assume that you are familiar with basic Ruby already, so we will concentrate on the things new here.</p>
+
+<p><code>&lt;?r ?&gt;</code> defines an area of ruby-code. Later, when the template is transformed into pure Ruby it will be evaluated. We iterate over the TodoList model and pass the title and value into a block. In that block we can just get the values of title and status (which we define based on the value) displayed on the page.</p>
+
+<p>The whole Template would expand to something like this (only showing the interesting part)</p>
+
+<pre class="iplastic"><code class="html" lang="html"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>Laundry: not done<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>Wash dishes: not done<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>That wasn&#8217;t too bad, huh?</p>
+
+<p>Now, so we can get our instant pleasure of seeing the result of our (hard) work, let&#8217;s see how to start ramaze.</p>
+
+<p>In the <code>todolist</code> directory run <code>ramaze</code>.</p>
+
+<p>This will start an instance of Ramaze and run your application on it. You can now access it by browsing to http://localhost:7000/</p>
+
+<p>7000 is the default-port Ramaze will run on, to change it you can just run <code>ramaze -p 7070</code> or similar. Also be sure to look at the output of <code>ramaze --help</code> to see some other options.</p>
+
+<h2 id="fourth_step_c_like_controller">Fourth Step, C, like Controller</h2>
+
+<p>The last part of the MVC-paradigm is the Controller.</p>
+
+<p>Wouldn&#8217;t it be nice to have a way to add and remove items on our to-do list? Editing the model every time would be quite tiresome and limited.</p>
+
+<p>Well, come along, I&#8217;ll introduce you to Controller.</p>
+
+<p>In the way MVC is structured, the Controller provides the data in a nice way for the View, removing all of the data-preparation and most of the logic from the templates. This makes it firstly simple to change the front end of your application and secondly provides excellent ways of changing the complete Structure of the Model or View independent from each other.</p>
+
+<p>OK, enough of the theory, you will see the benefits in an instant. Go on and edit the file <code>controller/main.rb</code>.</p>
+
+<p>The contents of it are like following:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">class</span> <span class="TypeName">MainController<span class="TypeName"> <span class="TypeName">&lt;</span> Controller</span></span>
+  <span class="Keyword">def</span> <span class="FunctionName">index</span>
+    @welcome <span class="Keyword">=</span> <span class="String"><span class="String">&quot;</span>Welcome to Ramaze!<span class="String">&quot;</span></span>
+  <span class="Keyword">end</span>
+
+  <span class="Keyword">def</span> <span class="FunctionName">notemplate</span>
+    <span class="String"><span class="String">&quot;</span>there is no template associated with this action<span class="String">&quot;</span></span>
+  <span class="Keyword">end</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>The only methods right now are <code>#index</code> and <code>#notemplate</code>. The relationship between the methods on the controller and the templates is 1:1, so the method <code>#index</code> is combined with the template <code>index.xhtml</code>. This combination is called an <code>action</code>.</p>
+
+<p>Let&#8217;s get back to editing and change the method <code>#index</code> to this:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">index</span>
+  @tasks <span class="Keyword">=</span> <span class="Support">TodoList</span>.<span class="FunctionName">original</span>
+  @tasks.<span class="FunctionName">each</span> <span class="Keyword">do </span>|title, value|
+    status <span class="Keyword">=</span> value[<span class="Constant"><span class="Constant">:</span>done</span>] <span class="Keyword">?</span> <span class="String"><span class="String">'</span>done<span class="String">'</span></span> : <span class="String"><span class="String">'</span>not done<span class="String">'</span></span>
+    @tasks[title] <span class="Keyword">=</span> status
+  <span class="Keyword">end</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>This will take care of the logic inside the template, which now should be changed to do following:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>
+    <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">if</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">empty?</span></span> <span class="EmbeddedSource">?&gt;</span></span>
+      No Tasks
+    <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">else</span> <span class="EmbeddedSource">?&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+        <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">each</span></span> <span class="Keyword">do </span><span class="EmbeddedSource">|</span><span class="EmbeddedSource">title</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">status</span><span class="EmbeddedSource">|</span> <span class="EmbeddedSource">?&gt;</span></span>
+          <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>#<span class="EmbeddedSource">{h title}</span>: #<span class="EmbeddedSource">{status}</span><span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+        <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+    <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>The rest of the template can stay the same.</p>
+
+<p>Now, if you browse to http://localhost:7000/ again you will not notice any change, which is how it should be. The only change is that if there are no Tasks it will say so.</p>
+
+<p>Some things you should know:</p>
+
+<ul>
+<li>Instance-variables defined in the Controller are available in the View.</li>
+
+<li>The return-value of the Controller does not matter if a template is present.</li>
+</ul>
+
+<h2 id="fifth_step_getting_dynamic">Fifth Step, getting dynamic</h2>
+
+<p>We set out to build the ultimate to-do list, but there are still some things missing. First off, we want to add new tasks, so let&#8217;s get that done.</p>
+
+<p>Add a link on the <code>view/index.xhtml</code> like this:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;</span><span class="TagName">a</span> <span class="TagAttribute">href</span>=<span class="String"><span class="String">&quot;</span>/new<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>New Task<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">a</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>Open a new file <code>view/new.xhtml</code> with a form to add a new task.</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>New Task<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">a</span> <span class="TagAttribute">href</span>=<span class="String"><span class="String">&quot;</span>/<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>Back to TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">a</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">form</span> <span class="TagAttribute">method</span>=<span class="String"><span class="String">&quot;</span>POST<span class="String">&quot;</span></span> <span class="TagAttribute">action</span>=<span class="String"><span class="String">&quot;</span>create<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>
+      Task: <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">input</span> <span class="TagAttribute">type</span>=<span class="String"><span class="String">&quot;</span>text<span class="String">&quot;</span></span> <span class="TagAttribute">name</span>=<span class="String"><span class="String">&quot;</span>title<span class="String">&quot;</span></span> /<span class="Tag">&gt;</span></span><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">br</span> /<span class="Tag">&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">input</span> <span class="TagAttribute">type</span>=<span class="String"><span class="String">&quot;</span>submit<span class="String">&quot;</span></span> /<span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">form</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>We will not need a method for this on our controller, in fact, actions can consist of either method and template or only one of them. The Controller can act as a View and the View can work like you may know it from PHP.</p>
+
+<p>If you try to use this form you will notice that we have not yet defined a way to actually create the task.</p>
+
+<p>You will get the default Ramaze error-page instead. Please take your time to explore it and see how Ramaze reacted on the error.</p>
+
+<p>It will show you the back trace and what state the application is in at the moment, the request and response and the contents of the session. This is very useful for debugging and development, you can provide your own set of error-pages before going into production (or deactivate them fully) though.</p>
+
+<p>OK, let&#8217;s implement the action for <code>#create</code>, all we want to do is take the requests parameters and create a new task for it, this looks like following on your MainController.</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">create</span>
+  title <span class="Keyword">=</span> request[<span class="String"><span class="String">'</span>title<span class="String">'</span></span>]
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>}
+  redirect Rs()
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>That&#8217;s all folks!</p>
+
+<p>We get the title from the request-object, put it into our TodoList as undone and redirect back to the mapping of the current Controller (&#8217;/&#8217; in this case).</p>
+
+<p>Now you can create as many tasks as you want, please don&#8217;t get overworked ;)</p>
+
+<h2 id="sixth_step_open_and_close_tasks">Sixth Step, open and close tasks</h2>
+
+<p>Since the nature of tasks is to be done eventually we will need some way to mark it as done or open tasks again.</p>
+
+<p>Jump into <code>view/index.xhtml</code> and do the following:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">each</span></span> <span class="Keyword">do </span><span class="EmbeddedSource">|</span><span class="EmbeddedSource">title</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">status</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">toggle</span><span class="EmbeddedSource">|</span> <span class="EmbeddedSource">?&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+    #<span class="EmbeddedSource">{h title}</span>: #<span class="EmbeddedSource">{status}</span> - [ #<span class="EmbeddedSource">{toggle}</span> ]
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span></span>
+</code></pre>
+
+<p>We added a new element here, <code>toggle</code>, the Controller should give us a link to change the status corresponding to the status of the task, so off we go and change the index method on the controller once again:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">index</span>
+  @tasks <span class="Keyword">=</span> []
+  <span class="Support">TodoList</span>.<span class="FunctionName">original</span>.<span class="FunctionName">each</span> <span class="Keyword">do </span>|title, value|
+    <span class="Keyword">if</span> value[<span class="Constant"><span class="Constant">:</span>done</span>]
+      status <span class="Keyword">=</span> <span class="String"><span class="String">'</span>done<span class="String">'</span></span>
+      toggle <span class="Keyword">=</span> A(<span class="String"><span class="String">'</span>Open Task<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>href</span> =&gt; Rs(<span class="Constant"><span class="Constant">:</span>open</span>, title))
+    <span class="Keyword">else</span>
+      status <span class="Keyword">=</span> <span class="String"><span class="String">'</span>not done<span class="String">'</span></span>
+      toggle <span class="Keyword">=</span> A(<span class="String"><span class="String">'</span>Close Task<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>href</span> =&gt; Rs(<span class="Constant"><span class="Constant">:</span>close</span>, title))
+    <span class="Keyword">end</span>
+    @tasks <span class="Keyword">&lt;&lt;</span> [title, status, toggle]
+  <span class="Keyword">end</span>
+  @tasks.<span class="FunctionName">sort!</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Wow, quite some new stuff here. Let me explain that in detail.</p>
+
+<p>We first decide whether a task is done or not, then go on and provide a link to toggle the status, A and Rs are both methods that help you do that. The result will be something like:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">a</span> <span class="TagAttribute">href</span>=<span class="String"><span class="String">&quot;</span>/open/Wash+dishes<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>Close Task<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">a</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>Rs actually is responsible to build the links href, for more information please take a look at the RDoc for LinkHelper.</p>
+
+<p>Also, you might have noticed that the tasks were changing order on every reload, which is because we were using an Hash, which are per definition unsorted, so now we use an array to hold our tasks and sort it.</p>
+
+<p>As usual since the links for open and close don&#8217;t lead anywhere, add the corresponding methods to the Controller:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">open</span> title
+  task_status title, <span class="Identifier">false</span>
+  redirect Rs()
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">close</span> title
+  task_status title, <span class="Identifier">true</span>
+  redirect Rs()
+<span class="Keyword">end</span>
+
+<span class="Keyword">private</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">task_status</span> title, status
+  task <span class="Keyword">=</span> <span class="Support">TodoList</span>[title]
+  task[<span class="Constant"><span class="Constant">:</span>done</span>] <span class="Keyword">=</span> status
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> task
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Oh, now what have we got here? <code>private</code> declares that methods from here on are only to be used within the Controller itself, we define an <code>#task_status</code> method that takes the title and status to be set so we don&#8217;t have to repeat that code in <code>#open</code> and <code>#close</code> and follow the DRY (Don&#8217;t repeat yourself) paradigm.</p>
+
+<p>Another thing we have not encountered so far is that you can define your public methods to take parameters on their own, they will be calculated from requests.</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="String"><span class="String">'</span>/open/Wash+dishes<span class="String">'</span></span>
+</code></pre>
+
+<p>will translate into:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="FunctionName">open</span>(<span class="String"><span class="String">'</span>Wash dishes<span class="String">'</span></span>)
+</code></pre>
+
+<p>Which in turn will call</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="FunctionName">task_status</span>(<span class="String"><span class="String">'</span>Wash dishes<span class="String">'</span></span>, <span class="Identifier">false</span>)
+</code></pre>
+
+<p>That&#8217;s it, go on and try it :)</p>
+
+<h2 id="seventh_step_delete_tasks">Seventh Step, delete tasks</h2>
+
+<p>Well, creating, opening and closing work now, one of the things you will consider is to delete a task permanently.</p>
+
+<p>This is just two little changes away, so let&#8217;s add the link for deletion in our Controller:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby">delete <span class="Keyword">=</span> A(<span class="String"><span class="String">'</span>Delete<span class="String">'</span></span>, <span class="Constant"><span class="Constant">:</span>href</span> =&gt; Rs(<span class="Constant"><span class="Constant">:</span>delete</span>, title))
+@tasks <span class="Keyword">&lt;&lt;</span> [title, status, toggle, delete]
+</code></pre>
+
+<p>and an corresponding method while we&#8217;re at it:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">delete</span> title
+  <span class="Support">TodoList</span>.<span class="FunctionName">delete</span> title
+  redirect Rs()
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Now jumping to <code>view/index.xhtml</code> again, change it so it shows the link:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">each</span></span> <span class="Keyword">do </span><span class="EmbeddedSource">|</span><span class="EmbeddedSource">title</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">status</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">toggle</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">delete</span><span class="EmbeddedSource">|</span> <span class="EmbeddedSource">?&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+    #<span class="EmbeddedSource">{h title}</span>: #<span class="EmbeddedSource">{status}</span> [ #<span class="EmbeddedSource">{toggle}</span> | #<span class="EmbeddedSource">{delete}</span> ]
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+</code></pre>
+
+<p>Voilà, you now have acquired the Certificate of Ramazeness.</p>
+
+<p>Just kidding, but that really are the basics, in the next few steps I will explain some more advanced concepts of Ramaze and Ezamar.</p>
+
+<h2 id="eighth_step_elements">Eighth Step, Elements</h2>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">Page</span><span class="Tag">&gt;<span class="Tag">&lt;</span>/</span><span class="TagName">Page</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>This is called an Element, Ramaze will go and search for a class that matches the name Page and responds to <code>#render</code>. Then it will go and hand the content in between to that Element.</p>
+
+<p>Sounds weird?</p>
+
+<p>Let us have a look at our templates, they got some repetitive stuff, like:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>some title<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">html</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>How about replacing that with something short and reusable:</p>
+
+<pre class="iplastic"><code class="html" lang="html"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">Page</span> <span class="TagAttribute">title</span>=<span class="String"><span class="String">&quot;</span>TodoList<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>
+  your other content
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">Page</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>Would be nice of course, and when you start having more templates it makes an awful lot of sense being able to change the enclosing stuff in one place.</p>
+
+<p>So let&#8217;s apply DRY here as well.</p>
+
+<p>Take a look at the <code>src/element/page.rb</code></p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">class</span> <span class="TypeName">Page<span class="TypeName"> <span class="TypeName">&lt;</span> Ezamar::Element</span></span>
+  <span class="Keyword">def</span> <span class="FunctionName">render</span>
+    <span class="String"><span class="String">%{</span></span>
+<span class="String">    &lt;html&gt;</span>
+<span class="String">      &lt;head&gt;</span>
+<span class="String">        &lt;title&gt;Welcome to Ramaze&lt;/title&gt;</span>
+<span class="String">      &lt;/head&gt;</span>
+<span class="String">      &lt;body&gt;</span>
+<span class="String">        <span class="String"><span class="String">#{</span>content<span class="String">}</span></span></span>
+<span class="String">      &lt;/body&gt;</span>
+<span class="String">    &lt;/html&gt;</span>
+<span class="String">    <span class="String">}</span></span>
+  <span class="Keyword">end</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Alright, most things we need are in place already, the most important thing is the <code>#content</code> method that we call with <code>#{content}</code> inside the string in <code>#render</code>.</p>
+
+<p>Just adopt it to your liking, I&#8217;ll just use the things we had in our templates so far:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">class</span> <span class="TypeName">Page<span class="TypeName"> <span class="TypeName">&lt;</span> Ezamar::Element</span></span>
+  <span class="Keyword">def</span> <span class="FunctionName">render</span>
+    <span class="String"><span class="String">%{</span></span>
+<span class="String">    &lt;html&gt;</span>
+<span class="String">      &lt;head&gt;</span>
+<span class="String">        &lt;title&gt;TodoList&lt;/title&gt;</span>
+<span class="String">      &lt;/head&gt;</span>
+<span class="String">      &lt;body&gt;</span>
+<span class="String">        &lt;h1&gt;<span class="String"><span class="String">#{</span><span class="String"><span class="String">@</span>title</span><span class="String">}</span></span>&lt;/h1&gt;</span>
+<span class="String">        <span class="String"><span class="String">#{</span>content<span class="String">}</span></span></span>
+<span class="String">      &lt;/body&gt;</span>
+<span class="String">    &lt;/html&gt;</span>
+<span class="String">    <span class="String">}</span></span>
+  <span class="Keyword">end</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Please note that instance variables reflecting the parameters are set.</p>
+
+<p>And let&#8217;s change our templates as well.</p>
+
+<p>First the <code>view/index.xhtml</code></p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">Page</span> <span class="TagAttribute">title</span>=<span class="String"><span class="String">&quot;</span>TodoList<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">a</span> <span class="TagAttribute">href</span>=<span class="String"><span class="String">&quot;</span>/new<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>New Task<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">a</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">if</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">empty?</span></span> <span class="EmbeddedSource">?&gt;</span></span>
+    No Tasks
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">else</span> <span class="EmbeddedSource">?&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+      <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">each</span></span> <span class="Keyword">do </span><span class="EmbeddedSource">|</span><span class="EmbeddedSource">title</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">status</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">toggle</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">delete</span><span class="EmbeddedSource">|</span> <span class="EmbeddedSource">?&gt;</span></span>
+        <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+          #<span class="EmbeddedSource">{h title}</span>: #<span class="EmbeddedSource">{status}</span> [ #<span class="EmbeddedSource">{toggle}</span> | #<span class="EmbeddedSource">{delete}</span> ]
+        <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+      <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">Page</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>and the <code>view/new.xhtml</code></p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">Page</span> <span class="TagAttribute">title</span>=<span class="String"><span class="String">&quot;</span>New Task<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">a</span> <span class="TagAttribute">href</span>=<span class="String"><span class="String">&quot;</span>/<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>Back to TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">a</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">form</span> <span class="TagAttribute">method</span>=<span class="String"><span class="String">&quot;</span>POST<span class="String">&quot;</span></span> <span class="TagAttribute">action</span>=<span class="String"><span class="String">&quot;</span>create<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>
+    Task: <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">input</span> <span class="TagAttribute">type</span>=<span class="String"><span class="String">&quot;</span>text<span class="String">&quot;</span></span> <span class="TagAttribute">name</span>=<span class="String"><span class="String">&quot;</span>title<span class="String">&quot;</span></span> /<span class="Tag">&gt;</span></span><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">br</span> /<span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">input</span> <span class="TagAttribute">type</span>=<span class="String"><span class="String">&quot;</span>submit<span class="String">&quot;</span></span> /<span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">form</span><span class="Tag">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">Page</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>Alright, now just go and look at the result in the browser, try changing the things inside the Element and look at how it behaves.</p>
+
+<h2 id="ninth_step_prettify">Ninth Step, Prettify</h2>
+
+<p>We structure the data inside the list a little bit, in this case into a table, to get it line up properly and look actually structured.</p>
+
+<p>So, from what we have right now:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">each</span></span> <span class="Keyword">do </span><span class="EmbeddedSource">|</span><span class="EmbeddedSource">title</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">status</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">toggle</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">delete</span><span class="EmbeddedSource">|</span> <span class="EmbeddedSource">?&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+      #<span class="EmbeddedSource">{h title}</span>: #<span class="EmbeddedSource">{status}</span> [ #<span class="EmbeddedSource">{toggle}</span> | #<span class="EmbeddedSource">{delete}</span> ]
+    <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">li</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">ul</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>To something like this:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">table</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="EmbeddedSource"><span class="EmbeddedSource">@</span>tasks</span><span class="EmbeddedSource"><span class="EmbeddedSource">.</span><span class="FunctionName">each</span></span> <span class="Keyword">do </span><span class="EmbeddedSource">|</span><span class="EmbeddedSource">title</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">status</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">toggle</span><span class="EmbeddedSource">,</span> <span class="EmbeddedSource">delete</span><span class="EmbeddedSource">|</span> <span class="EmbeddedSource">?&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">tr</span><span class="Tag">&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">td</span> <span class="TagAttribute">class</span>=<span class="String"><span class="String">&quot;</span>title<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>  #<span class="EmbeddedSource">{h title}</span>  <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">td</span><span class="Tag">&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">td</span> <span class="TagAttribute">class</span>=<span class="String"><span class="String">&quot;</span>status<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span> #<span class="EmbeddedSource">{status}</span> <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">td</span><span class="Tag">&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">td</span> <span class="TagAttribute">class</span>=<span class="String"><span class="String">&quot;</span>toggle<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span> #<span class="EmbeddedSource">{toggle}</span> <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">td</span><span class="Tag">&gt;</span></span>
+      <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">td</span> <span class="TagAttribute">class</span>=<span class="String"><span class="String">&quot;</span>delete<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span> #<span class="EmbeddedSource">{delete}</span> <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">td</span><span class="Tag">&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">tr</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">table</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>And, since we have proper classes to address some style sheets, jump into the Page element and add some style sheet:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>TodoList<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">title</span><span class="Tag">&gt;</span></span>
+<span class="EmbeddedSource">  <span class="EmbeddedSource">&lt;</span><span class="TagName">style</span><span class="EmbeddedSource">&gt;</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">    <span class="TagName">table</span>     </span><span class="EmbeddedSource">{ width:       100%;              }</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">    <span class="TagName">tr</span>        </span><span class="EmbeddedSource">{ background:  #efe; width: 100%; }</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">    <span class="TagName">tr</span><span class="TagAttribute"><span class="TagAttribute">:</span>hover</span>  </span><span class="EmbeddedSource">{ background:  #dfd;              }</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">    <span class="TagName">td</span><span class="TagAttribute"><span class="TagAttribute">.</span>title</span>  </span><span class="EmbeddedSource">{ font-weight: bold; width: 60%;  }</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">    <span class="TagName">td</span><span class="TagAttribute"><span class="TagAttribute">.</span>status</span> </span><span class="EmbeddedSource">{ margin:      1em;               }</span></span>
+<span class="EmbeddedSource"><span class="EmbeddedSource">    <span class="TagName">a</span>         </span><span class="EmbeddedSource">{ color:       #3a3;              }</span></span>
+<span class="EmbeddedSource">  <span class="EmbeddedSource">&lt;/</span><span class="TagName">style</span><span class="EmbeddedSource">&gt;</span></span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">head</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>That looks quite a bit nicer, right? And yes, if you don&#8217;t like tables (though this is an entirely legit use in my opinion) you can just do it like you want, using nested lists or divs/spans, replacing the open/close and delete links with nice images and changing the style according to the status.</p>
+
+<p>I will leave this as an exercise to the reader.</p>
+
+<h2 id="tenth_step_configuration">Tenth Step, Configuration</h2>
+
+<p>To round up this tutorial a bit, let&#8217;s introduce you to configuration in Ramaze. This will not go into full depth of possibilities or a total coverage of the options, since they are bound to change over time.</p>
+
+<p>First of all, the default port Ramaze runs on is 7000, but to make it a usual webserver it has to run on port 80. So, let&#8217;s add following line in your start.rb right after the lines of require you added before:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Support">Ramaze</span>::<span class="FunctionName">Global</span>.<span class="FunctionName">port</span> <span class="Keyword">=</span> <span class="Number">80</span>
+</code></pre>
+
+<p>Alright, that wasn&#8217;t that hard. Let&#8217;s say now you also want to run Mongrel instead of WEBrick, to get nice a bit of performance:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Support">Ramaze</span>::<span class="FunctionName">Global</span>.<span class="FunctionName">adapter</span> <span class="Keyword">=</span> <span class="Constant"><span class="Constant">:</span>mongrel</span>
+</code></pre>
+
+<p>To do this in a DRY way you could also do following:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Support">Ramaze</span>::<span class="FunctionName">Global</span>.<span class="FunctionName">setup</span> <span class="Keyword">do </span>|g|
+  g.<span class="FunctionName">port</span> <span class="Keyword">=</span> <span class="Number">80</span>
+  g.<span class="FunctionName">adapter</span> <span class="Keyword">=</span> <span class="Constant"><span class="Constant">:</span>mongrel</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>It seems to be quite common to put this configuration into separate files so you can just require it on demand. There are other, slightly stronger way to set options, which is either using flags on the ramaze executable, or like this:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Support">Ramaze</span>.<span class="FunctionName">start</span> <span class="Constant"><span class="Constant">:</span>port</span> =&gt; <span class="Number">80</span>, <span class="Constant"><span class="Constant">:</span>adapter</span> =&gt; <span class="Constant"><span class="Constant">:</span>mongrel</span>
+</code></pre>
+
+<p>We haven&#8217;t started Ramaze directly as of yet, but this allows you to ignore the ramaze executable and just run your application by <code>ruby start.rb</code>.</p>
+
+<h2 id="eleventh_step_refactor_with_aspecthelper">Eleventh Step, Refactor with AspectHelper</h2>
+
+<p>Now, if you take a closer look at the Controller you will see:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">create</span>
+  title <span class="Keyword">=</span> request[<span class="String"><span class="String">'</span>title<span class="String">'</span></span>]
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>}
+  redirect R(self)
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">open</span> title
+  task_status title, <span class="Identifier">false</span>
+  redirect R(self)
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">close</span> title
+  task_status title, <span class="Identifier">true</span>
+  redirect R(self)
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">delete</span> title
+  <span class="Support">TodoList</span>.<span class="FunctionName">delete</span> title
+  redirect R(self)
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>We did some refactoring before, by introducing <code>#task_status</code>, but here we have repetition again: <code>redirect Rs()</code> <em>after</em> each method did its job.</p>
+
+<p>However, we can take advantage of one of the helpers Ramaze offers, the AspectHelper. It allows you to easily wrap actions in your controller with other methods</p>
+
+<p>In your Controller, replace the previous chunk with following:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">create</span>
+  title <span class="Keyword">=</span> request[<span class="String"><span class="String">'</span>title<span class="String">'</span></span>]
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>}
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">open</span> title
+  task_status title, <span class="Identifier">false</span>
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">close</span> title
+  task_status title, <span class="Identifier">true</span>
+<span class="Keyword">end</span>
+
+<span class="Keyword">def</span> <span class="FunctionName">delete</span> title
+  <span class="Support">TodoList</span>.<span class="FunctionName">delete</span> title
+<span class="Keyword">end</span>
+
+helper <span class="Constant"><span class="Constant">:</span>aspect</span>
+<span class="FunctionName">after</span>(<span class="Constant"><span class="Constant">:</span>create</span>, <span class="Constant"><span class="Constant">:</span>open</span>, <span class="Constant"><span class="Constant">:</span>close</span>, <span class="Constant"><span class="Constant">:</span>delete</span>){ <span class="FunctionName">redirect</span>(Rs()) }
+</code></pre>
+
+<p>Alright, that looks a lot nicer already and is definitely easier to maintain.</p>
+
+<p>There is a symmetrical <code>before</code> aspect that you could take advantage of as well, and in case you want to add required authentication for all actions of a Controller you could use <code>before_all</code> and <code>after_all</code> instead of a list of action-names.</p>
+
+<h2 id="twelfth_step_validation_and_errors">Twelfth Step, Validation and Errors</h2>
+
+<p>Right now, all kinds of things could still go wrong when you do things like creating tasks with no title at all or try to open/close a task that does not exist. So in this step we will add some little checks for these cases.</p>
+
+<p>First we head over to the Controller again and take a look at <code>#create</code>:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">create</span>
+  title <span class="Keyword">=</span> request[<span class="String"><span class="String">'</span>title<span class="String">'</span></span>]
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>}
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Here we just create a new task, no matter what we get. Every seasoned web-developer would advise you to be suspicious about all the input you receive from your users, so let&#8217;s apply this advice.</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">create</span>
+  <span class="Keyword">if</span> title <span class="Keyword">=</span> request[<span class="String"><span class="String">'</span>title<span class="String">'</span></span>]
+    title.<span class="FunctionName">strip!</span>
+    <span class="Keyword">if</span> title.<span class="FunctionName">empty?</span>
+      <span class="FunctionName">failed</span>(<span class="String"><span class="String">&quot;</span>Please enter a title<span class="String">&quot;</span></span>)
+      redirect <span class="String"><span class="String">'</span>/new<span class="String">'</span></span>
+    <span class="Keyword">end</span>
+    <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> {<span class="Constant"><span class="Constant">:</span>done</span> =&gt; <span class="Identifier">false</span>}
+  <span class="Keyword">end</span>
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>First of all we check if we got a request with a value for &#8216;title&#8217;, if we get none we just let the aspect kick in that will redirect the browser to the index. Next we strip the title of all spaces around it so we can check if it is empty. We will talk about the specifics of our error-handling now.</p>
+
+<p>Ramaze has a helper called FlashHelper, that will keep a hash associated with the session for one request, afterwards the hash is thrown away. This is specifically useful for giving the user feedback while keeping a stateless approach.</p>
+
+<p>Let me show you our <code>#failed</code> method (it goes in the private section to <code>#task_status</code>):</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">failed</span>(<span class="Arguments">message</span>)
+  flash[<span class="Constant"><span class="Constant">:</span>error</span>] <span class="Keyword">=</span> message
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>Duh, you may say, wouldn&#8217;t that fit in the one line instead of the call to <code>#failed</code>? Indeed, it would, but let me remind you, we have no checks for changing the status of a task yet. We will need error-handling there as well, so we just keep our code DRY and maintainable by collecting shared behaviour in small pieces.</p>
+
+<p>Now on to the <code>#task_status</code>:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">task_status</span> title, status
+  <span class="Keyword">unless</span> task <span class="Keyword">=</span> <span class="Support">TodoList</span>[title]
+    failed <span class="String"><span class="String">&quot;</span>No such Task: `<span class="String"><span class="String">#{</span>title<span class="String">}</span></span>'<span class="String">&quot;</span></span>
+    redirect_referer
+  <span class="Keyword">end</span>
+
+  task[<span class="Constant"><span class="Constant">:</span>done</span>] <span class="Keyword">=</span> status
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> task
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>That used to look like this:</p>
+
+<pre class="iplastic"><code class="ruby" lang="ruby"><span class="Keyword">def</span> <span class="FunctionName">task_status</span> title, status
+  task <span class="Keyword">=</span> <span class="Support">TodoList</span>[title]
+  task[<span class="Constant"><span class="Constant">:</span>done</span>] <span class="Keyword">=</span> status
+  <span class="Support">TodoList</span>[title] <span class="Keyword">=</span> task
+<span class="Keyword">end</span>
+</code></pre>
+
+<p>So in fact all we added is a check whether a task already exists, set an error-message in case it doesn&#8217;t and redirect to wherever the browser came from.</p>
+
+<p>But what about actually showing the error-messages we so carefully set? Well, where do we change the view? Right, in the templates. But both templates we have so far (index and new) share this behaviour, so we head over to the Element and add in the right place:</p>
+
+<pre class="iplastic"><code class="ezamar" lang="ezamar"><span class="Tag"><span class="Tag">&lt;</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+  <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>#<span class="EmbeddedSource">{@title}</span><span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">h1</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">if</span> flash<span class="EmbeddedSource">[</span><span class="Constant"><span class="Constant">:</span>error</span><span class="EmbeddedSource">]</span> <span class="EmbeddedSource">?&gt;</span></span>
+    <span class="Tag"><span class="Tag">&lt;</span><span class="TagName">div</span> <span class="TagAttribute">class</span>=<span class="String"><span class="String">&quot;</span>error<span class="String">&quot;</span></span><span class="Tag">&gt;</span></span>
+      \\#<span class="EmbeddedSource">{flash[:error]}</span>
+    <span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">div</span><span class="Tag">&gt;</span></span>
+  <span class="EmbeddedSource"><span class="EmbeddedSource">&lt;?r</span> <span class="Keyword">end</span> <span class="EmbeddedSource">?&gt;</span></span>
+  #<span class="EmbeddedSource">{content}</span>
+<span class="Tag"><span class="Tag">&lt;/</span><span class="TagName">body</span><span class="Tag">&gt;</span></span>
+</code></pre>
+
+<p>The only thing special about it is the <code>\\#{flash[:error]}</code>, we have to escape the <code>#</code> so it won&#8217;t evaluate this immediately but wait until it is really rendered. As a note, If you read this as pure markaby, the double backslash is to output properly to HTML, just use one instead. Again, you can add some nifty style for that.</p>
+
+<p>To be continued&#8230;</p>
+</body></html>

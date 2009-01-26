@@ -1,0 +1,26 @@
+This is a list of files included into ramaze but under different licenses.
+Also included are files that are not under the copyright from Michael Fellinger.
+
+lib/ramaze/helper/pager.rb
+  License: BSD License
+  Author: George K. Moschovitis
+
+lib/ramaze/snippets/dictionary.rb
+  License: Ruby License
+  Authors: Jan Molic and Thomas Sawyer
+
+lib/proto/js/jquery.js
+  License: Dual licensed under MIT and GPL
+  Author: John Resig
+
+lib/ramaze/spec/helper/simple_http.rb
+  License: Ruby
+  Author: Tim Becker
+
+lib/ramaze/template/xslt.rb
+  License: Ruby
+  Author: Stephan Maka
+
+lib/vendor/bacon.rb
+  License: MIT
+  Author: Christian Neukirchen

@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Template::Liquid external</title>
+  </head>
+  <body>
+  <h1>{{header}}</h1>
+    {{homelink}}
+    <p>
+      Here you can pass some stuff if you like, parameters are just passed like this:<br />
+      {{link_one}}<br />
+      {{link_two}}<br />
+      {{link_three}}
+    </p>
+    <div>
+      The arguments you have passed to this action are:
+      {% if args_empty %}
+        none
+      {% else %}
+        {% for arg in args %}
+          <span>{{arg}}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div>
+      {{params}}
+    </div>
+  </body>
+</html>

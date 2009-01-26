@@ -1,0 +1,8 @@
+html do
+  head do
+    title "Markaby Test"
+  end
+  body do
+    h1 "Markaby Template"
+  end
+end

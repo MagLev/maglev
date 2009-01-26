@@ -1,0 +1,24 @@
+# General Apache options
+Options +FollowSymLinks +ExecCGI
+AddHandler cgi-script cgi rb
+<IfModule mod_fastcgi.c>
+ AddHandler fastcgi-script fcgi
+</IfModule>
+<IfModule mod_fcgid.c>
+ AddHandler fcgid-script fcgi
+</IfModule>
+
+# Redirect all requests not available on the filesystem to Ramaze.
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ dispatch.fcgi [QSA,L]
+
+# In case Ramaze experiences terminal errors.
+# Instead of displaying this message you can supply a
+# file here which will be rendered instead.
+#
+# Example:
+#   ErrorDocument 500 /500.html
+
+ErrorDocument 500 "<h2>Application error</h2>Ramaze failed to start properly"

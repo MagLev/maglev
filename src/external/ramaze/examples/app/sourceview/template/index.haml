@@ -1,0 +1,59 @@
+%html
+  %head
+    %title Ramaze Source Browser
+
+    %script{ :type => 'text/javascript', :src => '/jquery.js' }=''
+    %script{ :type => 'text/javascript', :src => '/jquery.treeview.js' }=''
+    %script{ :type => 'text/javascript', :src => '/sourceview.js?1.2' }=''
+    %script{ :type => 'text/javascript', :src => 'http://www.google-analytics.com/urchin.js' }=''
+    %script{ :type => 'text/javascript' }
+      _uacct = "UA-1005424-6";
+
+    %link{ :rel => 'stylesheet', :type => 'text/css', :href => '/coderay.css' }/
+    %link{ :rel => 'stylesheet', :type => 'text/css', :href => '/jquery.treeview.css' }/
+    %style{ :type => 'text/css' }
+      :sass
+        body
+          :font-family sans-serif
+          :margin 1.5em
+
+        a
+          :text-decoration none
+          :color #000
+          &.selected
+            :color #f00
+
+        #dir_listing
+          :position absolute
+          :top 1.5em
+          :width 280px
+
+          .filetree
+            span.folder, span.file
+              :padding-left 19px
+              :margin-left 2px
+
+        #file_contents
+          :margin-left 290px
+          :font-size 11pt
+
+          #welcome
+            :text-align center
+            :background-color #f8f8f8
+            :padding 1em
+
+        #repourl
+          :padding-top 4px
+          :text-align right
+          :font-size 10pt
+          a
+            :text-decoration underline
+
+  %body
+    #file_contents
+      #welcome
+        %h1 Welcome to the Ramaze source code browser
+        %h3 pick a file on the left to view its contents
+    #dir_listing
+      = render_partial('/filetree')
+    #repourl
