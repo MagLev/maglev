@@ -186,6 +186,7 @@ module Kernel
   end
 
   def _reraise(ex)
+    # _reraise invoked from IR generated for RubyVCallRaiseNode 
     ex._reraise
   end
 
