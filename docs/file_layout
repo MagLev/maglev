@@ -40,20 +40,8 @@
   $MAGLEV_HOME/src
     |
     + external       # Frozen copies of files from other sources so
-    |  |             # developers are immune from sudden changes
-    |  |             # that might disrupt testing
-    |  |
-    |  + benchmark   # Suites of Ruby benchmark files
-    |  |
-    |  + rack-0.9.0
-    |  |
-    |  + rubygems-1.3.1
-    |  |
-    |  + rxtest      # test rx
-    |  |
-    |  + scripts     # Scripts used in running benchmarks
-    |  |
-    |  + Sinatra
+    |                # developers are immune from sudden changes
+    |                # that might disrupt testing
     |
     + kernel         # The core and language files pre-loaded into the image
     |  |             # These files are reloaded with "rake dev:reloadprims"
