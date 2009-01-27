@@ -1,3 +1,2 @@
-fails:Array#each yields each element to the block even if the array is changed during iteration
 fails:Array#each yields only elements that are still in the array
 fails:Array#each yields elements based on an internal index
