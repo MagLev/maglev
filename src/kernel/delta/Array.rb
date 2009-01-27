@@ -14,6 +14,21 @@ class Array
     _all(b)
   end
 
+  # Equivalent to Array#delete_if, but returns nil if no changes were made.
+  #
+  # Note: we do not use Smalltalk removeAllSuchThat:, as Smalltalk expects
+  # only boolean values to be returned by the block, but Ruby allows nil
+  # for false and anything but nil or false is considered true.
+  def reject!(&b)
+    a = reject(&b)
+    if a.size == size
+      nil # no changes, return nil
+    else
+      replace(a)
+      self
+    end
+  end
+
   primitive 'any?&', 'anySatisfy:'
 
   def collect(&b)
@@ -69,13 +84,13 @@ class Array
     my_size = size
     accum = nil
     n = 0
-    if my_size > 0 
+    if my_size > 0
       accum = self[0]
       n = 1
       while (n < my_size)
         accum = yield(accum, self[n])
         n = n + 1
-      end 
+      end
     end
     accum
   end

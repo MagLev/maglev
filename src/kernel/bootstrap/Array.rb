@@ -141,7 +141,7 @@ class Array
         result.concat(self)
       end
     else
-      obj.times { |i| 
+      obj.times { |i|
         result.concat(self)
       }
     end
@@ -611,7 +611,7 @@ class Array
     if count < 0
       raise ArgumentError, 'negative count'
     end
-    self[0,count] 
+    self[0,count]
   end
 
   def flatten
@@ -717,7 +717,7 @@ class Array
   end
 
 
-  primitive 'reject!&', 'removeAllSuchThat:'
+#  primitive 'reject!&', 'removeAllSuchThat:'
 
   # replace written in Smalltalk so it can use copyFrom:to:into:startingAt
   # prim
