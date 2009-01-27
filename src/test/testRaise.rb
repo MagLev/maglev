@@ -133,4 +133,14 @@ begin
 end
 true
 
+begin
+  o = []
+  begin
+    o.raise
+  rescue  
+    e = $!
+    unless e.class.equal?(RuntimeError)  ; raise 'err' ; end
+  end
+end
+        
 true
