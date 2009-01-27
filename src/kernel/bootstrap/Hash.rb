@@ -125,8 +125,6 @@ class Hash
     false
   end
 
-  primitive 'include?', 'includesKey:'
-
   primitive 'index', 'keyAtValue:'
 
   # MNI indexes
@@ -140,7 +138,6 @@ class Hash
 
   primitive 'key?', 'includesKey:'
   primitive 'length', 'size'
-  primitive 'member?', 'includesKey:'
 
   def merge(hash)
     dup.update(hash)
@@ -161,10 +158,6 @@ class Hash
 
   primitive 'rehash', 'rebuildTable:'
 
-  def reject(&block)
-    dup.delete_if(&block)
-  end
-
   def reject!(&block)
     # RUBINIUS
     old_size = size
@@ -178,12 +171,6 @@ class Hash
     update(hash)
   end
 
-  def select()
-    result = []
-    each { |k,v| result << [k,v] if yield(k, v) }
-    result
-  end
-
   primitive_nobridge '_firstPair'
 
   def shift
@@ -195,18 +182,7 @@ class Hash
   end
 
   primitive 'size', 'size'
-
-  def sort(&block)
-    to_a.sort(&block)
-  end
-
   primitive  'store', 'at:put:'
-
-  def to_a
-    result = []
-    each { |k,v| result << [k,v] }
-    result
-  end
 
   def to_hash
     self
@@ -259,5 +235,4 @@ class Hash
     str[0..(str.length - 3)] + "}"
   end
 
-  # RxINC: Need overrides from enumerable and comparable too?
 end

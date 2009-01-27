@@ -66,6 +66,8 @@ RUBY.require 'kernel/bootstrap/Regexp.rb'
 RUBY.require 'kernel/bootstrap/MatchData.rb'
 RUBY.require 'kernel/bootstrap/Exception.rb'
 
+RUBY.require 'kernel/bootstrap/Globals2.rb'
+
 RUBY.require 'kernel/bootstrap/Env.rb'
 RUBY.require 'kernel/bootstrap/Errno.rb'
 RUBY.require 'kernel/bootstrap/Dir.rb'
@@ -115,6 +117,7 @@ RUBY.require 'kernel/common/io.rb'
 
 # Include the delta code.  The delta code overwrites the rubinius
 # common code with gemstone specific mods.
+RUBY.require 'kernel/delta/hash.rb'
 RUBY.require 'kernel/delta/Module.rb'
 RUBY.require 'kernel/delta/Array.rb'
 RUBY.require 'kernel/delta/Dir.rb'

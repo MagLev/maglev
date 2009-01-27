@@ -24,6 +24,7 @@
 #    ToString
 
 # Class definition for hash tests
+Hash.new.any? { |x| true }  # ensure Enumerable was included
 
 class HashTest
     # Expected value: true
@@ -299,7 +300,7 @@ class HashTest
     def sort
         hash1 = Hash['a', 'abc', 'c', 'ghi', 'b', 'def']
         a1 = hash1.to_a
-        a2 = hash1.sort() 
+        a2 = hash1.sort()
         if a1 == a2
             return false
         else
@@ -438,7 +439,7 @@ ret = HashTest.new.index('def')
 raise "ERROR" unless ret == 'b'
 
 # expectvalue nil
-h = HashTest.new 
+h = HashTest.new
 ret = h.index('xyz')
 raise "ERROR" unless ret == nil
 
@@ -490,3 +491,5 @@ raise "ERROR" unless ret == true
 # TODO is result always sorted ??? irb seems to be
 # ret = HashTest.new.toString()
 # raise "ERROR" unless ret == 'aabcbdefcghi'
+
+Hash.new.any? { |x| true }

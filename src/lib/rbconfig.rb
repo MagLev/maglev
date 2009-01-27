@@ -68,6 +68,10 @@ module Config
   # TODO: this is usually something like /usr/share need to decide where to
   # put this
   CONFIG['datadir']           = File.join(MAGLEV_HOME, 'data')
+
+  CONFIG['host_os'] = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
+                          darwin9.0 x86_64_Solaris Itanium_HP-UX
+                        )[Exception._cpuOsKind - 1]
 end
 
 RbConfig = Config
