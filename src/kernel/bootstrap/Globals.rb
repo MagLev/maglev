@@ -14,6 +14,7 @@ RUBY.global('Fixnum', 'SmallInteger')
 RUBY.global('Float', 'Float')
 RUBY.global('Hash', 'RubyHash')
 RUBY.global('Integer', 'Integer')
+RUBY.global('Bignum', 'Integer')   # temporary, TODO separate class for Bignum
 RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
@@ -100,20 +101,33 @@ ARGV = []
 ARGF = nil # TODO a real implementation
 
 # Notes on various globals
-#  $; is auto-initialized to nil if referenced, by RubySexpParser .
-#  $/ is auto-initialized to "\n" by parser at first ref .
-#  $-0 is translated to $/ by parser  .
-#  $-F is translated to  $;  by parser  .
-#  $< is translated to ARGF by parser
-#  $* is translated to ARGV by parser
+begin 
+  #  $/ is auto-initialized to "\n" by parser at first ref .
+  x = $/ 
+  #  $; is auto-initialized to nil if referenced, by RubySexpParser .
+  y = $; 
+end
 
-#  $!  translated to exception block block-arg-ref by RubyGlobalVarNode
-#         and RubyRescueBodyNode
+#  $!  translated to rescue block block-arg-ref  or to the global $! 
+#    by RubyGlobalVarNode and RubyRescueBodyNode
+
 #  $&  $_  $` $' $1..$9 $~  all translated to access to
-#    appropriate thread-local data(see GsProcess) associated with $~
+#    appropriate frame-local data associated with $~
 
 # $: , RUBY
 #  are currently initialized in RubyContext(C)>>initialize
+
+alias $-0  $/ 
+alias $-F  $;  
+alias $-d $DEBUG
+alias $-I $:
+alias $-v $VERBOSE
+alias $-w $VERBOSE
+
+alias $LOADED_FEATURES $"
+alias $LOAD_PATH  $: 
+alias $<  $ARGF
+alias $*  $ARGF
 
 # -------------------
 
