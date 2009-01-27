@@ -2,6 +2,7 @@
 class Exception
     class_primitive 'exception', 'new'
     class_primitive 'signal', 'signal:'
+    class_primitive_nobridge 'signal', 'signal'
 
     # support for errno to Name translation
     class_primitive_nobridge  '_errnoTables', 'errnoTables'
@@ -14,8 +15,8 @@ class Exception
     end
 
     primitive_nobridge '_reraise', 'pass'
-    primitive_nobridge 'signal', 'signal'
     primitive          'signal', 'signal:'
+    primitive_nobridge 'signal', 'signal'
     primitive          'message', 'description'
     primitive_nobridge '_message=', 'messageText:'
 
