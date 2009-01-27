@@ -99,6 +99,25 @@ test(C5.foo,     'M1#foo', 'C5#foo')
 test(C6.foo,     'M2#foo', 'C6#foo')
 test(C7.foo,     'M1#foo', 'C7#foo')
 
+class Cl319A
+  def initialize(enum = nil, &block)
+    @iva = enum
+  end
+  def iva
+    @iva
+  end
+end
+class Cl319B < Cl319A
+  def initialize(*args, &block)
+    super
+  end
+end
+
+o = Cl319B.new([95])
+test(o.iva, [95], "ticket 319 a");
+o = Cl319B.new([101,33])
+test(o.iva, [101,33], "ticket 319 b");
+
 report
 
 true
