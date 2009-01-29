@@ -12,6 +12,11 @@ class TB
     end
     b
   end
+
+  def test_noargs
+    wwv = 'radio'
+    binding
+  end
 end
 
 tobj = TB.new
@@ -31,6 +36,10 @@ end
 
 unless TBINDSTR == '_abc_wvt' ; raise 'error'; end
 
+# Binding created by a zero-arg method
+bz = tobj.test_noargs
+bv = eval( ' wwv ' , bz )
+unless bv == 'radio' ; raise 'error'; end
 
 puts "==== BindingTest ok"
 
