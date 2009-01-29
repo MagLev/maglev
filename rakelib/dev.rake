@@ -50,13 +50,13 @@ namespace :dev do
     run_topaz tc_load_mcz
   end
 
-  desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
+  desc "Run the vm smoke tests"
   task :'vm-tests' do
     run_topaz tc_run_vmunit
     puts "Log files in log/vmunit*"
   end
 
-  desc "Run the bm smoke tests (depends on ../gss64bit_30/*)"
+  desc "Run the bm smoke tests"
   task :'bm-tests' do
     run_topaz tc_run_benchmarks
     puts "Log files in log/bench*"
