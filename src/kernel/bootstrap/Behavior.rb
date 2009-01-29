@@ -1,6 +1,6 @@
 class Behavior
   # Behavior has methods that are shared by meta classes (singletons) and
-  # Module and Class.  E.g., attr_* are needed for singeltons as well as
+  # Module and Class.  E.g., attr_* are needed for singletons as well as
   # normal class/modules so they are defined up here.
 
   primitive 'alias_method', 'rubyAlias:from:'
