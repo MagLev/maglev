@@ -88,7 +88,6 @@ end
 # (src/kernel/kernel.rb) and commits the DB.
 def tc_reload_prims
   <<-END.margin
-    |output push reloadprims.out
     |omit resultcheck
     |run
     |RubyContext reset ; load "includes save, commit"
@@ -102,7 +101,11 @@ end
 # in src/test/vmunit.conf
 def tc_run_vmunit
   <<-END.margin
-    |inp #{"rakelib/allvmunit.inp"}
+    |omit resultcheck
+    |run
+    |RubyContext _runVmUnit
+    |%
+    |exit
   END
 end
 

@@ -6,7 +6,6 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-
   desc "Stop server, install ../latest*, and reload primitives"
   task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz',
                              :'dev:reloadprims']
@@ -50,13 +49,22 @@ namespace :dev do
     run_topaz tc_load_mcz
   end
 
-  desc "Run the vm smoke tests (depends on ../gss64bit_30/*)"
+  desc "Run the passing specs and the vm tests"
+  task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
+
+  desc "Run the vm smoke tests"
   task :'vm-tests' do
     run_topaz tc_run_vmunit
     puts "Log files in log/vmunit*"
   end
 
-  desc "Run the bm smoke tests (depends on ../gss64bit_30/*)"
+  desc "Run the passing specs"
+  task :'passing' do
+    sh "spec/mspec/bin/mspec run -B passing.mspec"
+    puts "Log files in log/vmunit*"
+  end
+
+  desc "Run the bm smoke tests"
   task :'bm-tests' do
     run_topaz tc_run_benchmarks
     puts "Log files in log/bench*"
