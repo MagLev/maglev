@@ -16,7 +16,7 @@ TIMEOUT =  (ENV['TIMEOUT'] || 300).to_i
 
 ITERATIONS = (ENV['ITERATIONS'] || 5).to_i
 
-report = "#{Time.now.strftime("%Y%m%d%H%M%S")}_#{RUBY_VM.gsub('/','').split.first}.csv"
+report = "#{Time.now.strftime("%Y%m%d%H%M%S")}_#{RUBY_VM.gsub('/','').gsub('\\', '').gsub(':', '').split.first}.csv"
 REPORT = ENV['REPORT'] || report
 
 MAIN_DIR = pwd
@@ -40,11 +40,18 @@ task :report do
   end
 end
 
-desc "Runs a single benchmark."
+desc "Runs a single benchmark; specify as FILE=micro-benchmarks/bm_mergesort.rb. Other options for all tasks: ITERATIONS=3 RUBY_VM=\"/path/to/ruby opts\" TIMEOUT=secs REPORT=outputfile"
 task :run_one => :report do
   benchmark = ENV['FILE']
-  puts "Benchmarking #{benchmark}"
-  `#{RUBY_VM} #{benchmark} #{ITERATIONS} #{TIMEOUT} #{MAIN_DIR}/#{REPORT}`
+  puts 'ERROR: need to specify file, a la FILE="micro-benchmarks/bm_mergesort.rb"' unless benchmark
+  basename = File.basename(benchmark)    
+  puts "ERROR: non bm_ file specified" if basename !~ /^bm_.+\.rb$/
+  dirname = File.dirname(benchmark)
+  cd(dirname) do
+    puts "Benchmarking #{benchmark}"
+    puts "Report will be written to #{REPORT}"
+    `#{RUBY_VM} #{basename} #{ITERATIONS} #{TIMEOUT} #{MAIN_DIR}/#{REPORT}`
+  end
   puts "Report written in #{REPORT}"
 end
 
@@ -52,9 +59,15 @@ desc "Runs all the benchmarks in the suite."
 task :run_all => :report do
   puts "Ruby Benchmark Suite started"
   puts "-------------------------------"
+  puts "Report will be written to #{REPORT}"
   puts "Benchmarking startup time"
   benchmark_startup
+  all_files = []
   Find.find(MAIN_DIR) do |filename|
+    all_files << filename
+  end
+
+  all_files.sort.each do |filename|
     basename = File.basename(filename)    
     next if basename !~ /^bm_.+\.rb$/
     dirname = File.dirname(filename)
