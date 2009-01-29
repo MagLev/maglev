@@ -2,9 +2,9 @@ This directory contains source from outside the Ruby Libs that we don't
 intend to ship with the product, but we feel is important that everyone
 shares the same copy of.
 
-rack-0.9.0
+Rack
   Rack provides an minimal interface between webservers supporting Ruby and
-  Ruby frameworks. 0.9.0. released on 2009-01-06.
+  Ruby frameworks. 0.9.1. released on 2009-01-10.
   See: http://rack.rubyforge.org/
   License: MIT
 
@@ -36,8 +36,8 @@ rack-0.9.0
     require 'zlib'
 
 Sinatra
-  Sinatra is a light-weight web framework for ruby.  This is a copy on
-  2009-01-07.
+  Sinatra is a light-weight web framework for ruby.
+  Version 0.9.0.4 (compatible with rack 0.9.1)
   License: MIT
 
   Sinatra library dependencies (selected):

@@ -1,13 +1,11 @@
+require 'sinatra/test'
 require 'test/unit'
-require File.dirname(__FILE__) + '/methods'
 
-Test::Unit::TestCase.send(:include, Sinatra::Test::Methods)
+Test::Unit::TestCase.send :include, Sinatra::Test
 
-Sinatra::Application.default_options.merge!(
-  :env => :test,
+Sinatra::Default.set(
+  :environment => :test,
   :run => false,
   :raise_errors => true,
   :logging => false
 )
-
-Sinatra.application = nil

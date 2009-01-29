@@ -1,101 +1,64 @@
 require File.dirname(__FILE__) + '/helper'
 
-context "Builder" do
-
-  setup do
-    Sinatra.application = nil
+describe "Builder Templates" do
+  def builder_app(&block)
+    mock_app {
+      set :views, File.dirname(__FILE__) + '/views'
+      get '/', &block
+    }
+    get '/'
   end
 
-  context "without layouts" do
-
-    setup do
-      Sinatra.application = nil
-    end
-
-    specify "should render" do
-
-      get '/no_layout' do
-        builder 'xml.instruct!'
-      end
-
-      get_it '/no_layout'
-      should.be.ok
-      body.should == %(<?xml version="1.0" encoding="UTF-8"?>\n)
-
-    end
-
-    specify "should render inline block" do
-
-      get '/no_layout_and_inlined' do
-        @name = "Frank & Mary"
-        builder do |xml|
-          xml.couple @name
-        end
-      end
-
-      get_it '/no_layout_and_inlined'
-      should.be.ok
-      body.should == %(<couple>Frank &amp; Mary</couple>\n)
-
-    end
-
+  it 'renders inline Builder strings' do
+    builder_app { builder 'xml.instruct!' }
+    assert ok?
+    assert_equal %{<?xml version="1.0" encoding="UTF-8"?>\n}, body
   end
 
-
-
-  context "Templates (in general)" do
-
-    setup do
-      Sinatra.application = nil
-    end
-
-    specify "are read from files if Symbols" do
-
-      get '/from_file' do
-        @name = 'Blue'
-        builder :foo, :views_directory => File.dirname(__FILE__) + "/views"
+  it 'renders inline blocks' do
+    builder_app {
+      @name = "Frank & Mary"
+      builder do |xml|
+        xml.couple @name
       end
-
-      get_it '/from_file'
-      should.be.ok
-      body.should.equal %(<exclaim>You rock Blue!</exclaim>\n)
-
-    end
-
-    specify "use layout.ext by default if available" do
-
-      get '/' do
-        builder :foo, :views_directory => File.dirname(__FILE__) + "/views/layout_test"
-      end
-
-      get_it '/'
-      should.be.ok
-      body.should.equal "<layout>\n<this>is foo!</this>\n</layout>\n"
-
-    end
-
-    specify "renders without layout" do
-
-      get '/' do
-        builder :no_layout, :views_directory => File.dirname(__FILE__) + "/views/no_layout"
-      end
-
-      get_it '/'
-      should.be.ok
-      body.should.equal "<foo>No Layout!</foo>\n"
-
-    end
-
-    specify "raises error if template not found" do
-
-      get '/' do
-        builder :not_found
-      end
-
-      lambda { get_it '/' }.should.raise(Errno::ENOENT)
-
-    end
-
+    }
+    assert ok?
+    assert_equal "<couple>Frank &amp; Mary</couple>\n", body
   end
 
+  it 'renders .builder files in views path' do
+    builder_app {
+      @name = "Blue"
+      builder :hello
+    }
+    assert ok?
+    assert_equal %(<exclaim>You're my boy, Blue!</exclaim>\n), body
+  end
+
+  it "renders with inline layouts" do
+    mock_app {
+      layout do
+        %(xml.layout { xml << yield })
+      end
+      get('/') { builder %(xml.em 'Hello World') }
+    }
+    get '/'
+    assert ok?
+    assert_equal "<layout>\n<em>Hello World</em>\n</layout>\n", body
+  end
+
+  it "renders with file layouts" do
+    builder_app {
+      builder %(xml.em 'Hello World'), :layout => :layout2
+    }
+    assert ok?
+    assert_equal "<layout>\n<em>Hello World</em>\n</layout>\n", body
+  end
+
+  it "raises error if template not found" do
+    mock_app {
+      get('/') { builder :no_such_template }
+    }
+    assert_raise(Errno::ENOENT) { get('/') }
+  end
 end

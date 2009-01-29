@@ -1,9 +1,7 @@
 = Sinatra
 
 Sinatra is a DSL for quickly creating web-applications in Ruby with minimal
-effort.
-
-== Sample App
+effort:
 
   # myapp.rb
   require 'rubygems'
@@ -32,70 +30,72 @@ Run with <tt>ruby myapp.rb</tt> and view at <tt>http://localhost:4567</tt>
     .. annihilate something ..
   end
 
-  head '/' do
-
-  end
-
-NOTE: <tt>put</tt> and <tt>delete</tt> are also triggered when a
-<tt>_method</tt> parameter is set to PUT or DELETE and the HTTP request method
-is POST
-
 == Routes
 
 Routes are matched based on the order of declaration. The first route that
 matches the request is invoked.
 
-Simple:
+Basic routes:
 
   get '/hi' do
     ...
   end
 
-Named parameters:
+Route patterns may include named parameters, accessible via the
+<tt>params</tt> hash:
 
   get '/:name' do
-    # matches /sinatra and the like and sets params[:name]
+    # matches "GET /foo" and "GET /bar"
+    # params[:name] is 'foo' or 'bar'
+    "Hello #{params[:name]}!"
   end
 
-Splat parameters:
+Route patterns may also include splat (or wildcard) parameters, accessible
+via the <tt>params[:splat]</tt> array.
 
   get '/say/*/to/*' do
     # matches /say/hello/to/world
-    params["splat"] # => ["hello", "world"]
+    params[:splat] # => ["hello", "world"]
   end
 
   get '/download/*.*' do
     # matches /download/path/to/file.xml
-    params["splat"] # => ["path/to/file", "xml"]
+    params[:splat] # => ["path/to/file", "xml"]
   end
 
-User agent matching:
+Route matching with Regular Expressions:
+
+  get %r{/hello/([\w]+)} do
+    "Hello, #{params[:captures].first}!"
+  end
+
+Routes may include a variety of matching conditions, such as the user agent:
 
   get '/foo', :agent => /Songbird (\d\.\d)[\d\/]*?/ do
     "You're using Songbird version #{params[:agent][0]}"
   end
 
   get '/foo' do
-    # matches non-songbird browsers
+    # Matches non-songbird browsers
   end
 
-== Static files
+== Static Files
 
-Put all of your static content in the ./public directory
+Static files are served from the <tt>./public</tt> directory. You can specify
+a different location by setting the <tt>:public</tt> option:
 
-  root
-    \ public
+  set :public, File.dirname(__FILE__) + '/static'
 
-If a file exists that maps to the REQUEST_PATH then it is served and the
-request ends. Otherwise, Sinatra will look for an event that matches the
-path.
+== Views / Templates
 
-== Views
+Templates are assumed to be located directly under a <tt>./views</tt>
+directory. To use a different views directory:
 
-Views are searched for in a "views" directory in the same location as
-your main application.
+  set :views, File.dirname(__FILE__) + '/templates'
 
 === Haml Templates
+
+The haml gem/library is required to render HAML templates:
 
   get '/' do
     haml :index
@@ -103,7 +103,7 @@ your main application.
 
 Renders <tt>./views/index.haml</tt>.
 
-=== Erb
+=== Erb Templates
 
   get '/' do
     erb :index
@@ -111,11 +111,20 @@ Renders <tt>./views/index.haml</tt>.
 
 Renders <tt>./views/index.erb</tt>
 
-=== Builder
+=== Builder Templates
 
-See Sinatra::Builder
+The builder gem/library is required to render builder templates:
 
-=== Sass
+  get '/' do
+    content_type 'application/xml', :charset => 'utf-8'
+    builder :index
+  end
+
+Renders <tt>./views/index.builder</tt>.
+
+=== Sass Templates
+
+The sass gem/library is required to render Sass templates:
 
   get '/stylesheet.css' do
     content_type 'text/css', :charset => 'utf-8'
@@ -134,20 +143,19 @@ Renders the inlined template string.
 
 === Accessing Variables
 
-Templates are evaluated within the Sinatra::EventContext instance
-used to evaluate event blocks. Instance variables set in event
-blocks can be accessed direcly in views:
+Templates are evaluated within the same context as the route blocks. Instance
+variables set in route blocks are available in templates:
 
   get '/:id' do
     @foo = Foo.find(params[:id])
-    haml '%h1== @foo.name'
+    haml '%h1= @foo.name'
   end
 
 Or, specify an explicit Hash of local variables:
 
   get '/:id' do
     foo = Foo.find(params[:id])
-    haml '%h1== foo.name', :locals => { :foo => foo }
+    haml '%h1= foo.name', :locals => { :foo => foo }
   end
 
 This is typically used when rendering templates as partials from within
@@ -157,27 +165,32 @@ other templates.
 
 Templates may be defined at the end of the source file:
 
+  require 'rubygems'
+  require 'sinatra'
+
   get '/' do
     haml :index
   end
 
-  use_in_file_templates!
-
   __END__
 
   @@ layout
-  X
-  = yield
-  X
+  %html
+    = yield
 
   @@ index
   %div.title Hello world!!!!!
+
+NOTE:  Sinatra will automaticly load any in-file-templates in the
+source file that first required sinatra.  If you have in-file-templates
+in another source file you will need to explicitly call
++use_in_file_templates! on main in that file.
 
 It's also possible to define named templates using the top-level template
 method:
 
   template :layout do
-    "X\n=yield\nX"
+    "%html\n  =yield\n"
   end
 
   template :index do
@@ -188,10 +201,17 @@ method:
     haml :index
   end
 
+If a template named "layout" exists, it will be used each time a template
+is rendered. You can disable layouts by passing <tt>:layout => false</tt>.
+
+  get '/' do
+    haml :index, :layout => !request.xhr?
+  end
+
 == Helpers
 
-The top-level <tt>helpers</tt> method takes a block and extends all
-EventContext instances with the methods defined:
+Use the top-level <tt>helpers</tt> method to define helper methods for use in
+route blocks and templates:
 
   helpers do
     def bar(name)
@@ -205,95 +225,89 @@ EventContext instances with the methods defined:
 
 == Filters
 
-These are run in Sinatra::EventContext before every event.
+Before filters are evaluated before each request within the context of the
+request and can modify the request and response. Instance variables set in
+filters are accessible by routes and templates.
 
   before do
-    .. this code will run before each event ..
+    @note = 'Hi!'
+    request.path_info = '/foo/bar/baz'
   end
 
-== Halt!
-
-To immediately stop a request during a before filter or event use:
-
-  throw :halt
-
-Set the body to the result of a helper method
-
-  throw :halt, :helper_method
-
-Set the body to the result of a helper method after sending it parameters from
-the local scope
-
-  throw :halt, [:helper_method, foo, bar]
-
-Set the body to a simple string
-
-  throw :halt, 'this will be the body'
-
-Set status then the body
-
-  throw :halt, [401, 'go away!']
-
-Set the status then call a helper method with params from local scope
-
-  throw :halt, [401, [:helper_method, foo, bar]]
-
-Run a proc inside the Sinatra::EventContext instance and set the body to the
-result
-
-  throw :halt, lambda { puts 'In a proc!'; 'I just wrote to $stdout!' }
-
-Create you own to_result
-
-  class MyResultObject
-    def to_result(event_context, *args)
-      event_context.body = 'This will be the body!
-    end
+  get '/foo/*' do
+    @note #=> 'Hi!'
+    params[:splat] #=> 'bar/baz'
   end
 
-  get '/' do
-    throw :halt, MyResultObject.new
+== Halting
+
+To immediately stop a request during a before filter or route use:
+
+  halt
+
+You can also specify a body when halting ...
+
+  halt 'this will be the body'
+
+Set the status and body ...
+
+  halt 401, 'go away!'
+
+== Passing
+
+A route can punt processing to the next matching route using the <tt>pass</tt>
+statement:
+
+  get '/guess/:who' do
+    pass unless params[:who] == 'Frank'
+    "You got me!"
   end
 
-Get the gist?  If you want more fun with this then checkout <tt>to_result</tt>
-on Array, Symbol, Fixnum, NilClass.
+  get '/guess/*' do
+    "You missed!"
+  end
+
+The route block is immediately exited and control continues with the next
+matching route. If no matching route is found, a 404 is returned.
 
 == Configuration and Reloading
 
 Sinatra supports multiple environments and reloading. Reloading happens
-before every request when running under the :development environment. Wrap
-your configurations in <tt>configure</tt> (i.e. Database connections, Constants,
-etc.) to protect them from reloading or to target specific environments.
+before each request when running under the <tt>:development</tt>
+environment. Wrap your configurations (e.g., database connections, constants,
+etc.) in <tt>configure</tt> blocks to protect them from reloading or to
+target specific environments.
 
-All environments:
+Run once, at startup, in any environment:
 
   configure do
     ...
   end
 
-Production:
+Run only when the environment (RACK_ENV environment variable) is set to
+<tt>:production</tt>.
 
   configure :production do
     ...
   end
 
-Two at a time:
+Run when the environment (RACK_ENV environment variable) is set to
+either <tt>:production</tt> or <tt>:test</tt>.
 
   configure :production, :test do
     ...
   end
 
-This is also really nifty for error handling.
-
 == Error handling
 
-Error handlers run inside the current Sinatra::EventContext instance, which
-means you get all the goodies it has to offer (i.e. haml, erb, throw :halt,
-etc.)
+Error handlers run within the same context as routes and before filters, which
+means you get all the goodies it has to offer, like <tt>haml</tt>, <tt>erb</tt>,
+<tt>halt</tt>, etc.
 
 === Not Found
 
-When Sinatra::NotFound is raised, the not_found handler is invoked:
+When a <tt>Sinatra::NotFound</tt> exception is raised, or the response's status
+code is 404, the <tt>not_found</tt> handler is invoked:
 
   not_found do
     'This is nowhere to be found'
@@ -301,14 +315,12 @@ When Sinatra::NotFound is raised, the not_found handler is invoked:
 
 === Error
 
-By default, the +error+ handler is invoked on Sinatra::ServerError or when
-an unknown error occurs.
-
-The exception can be obtained from the 'sinatra.error' variable in
-request.env.
+The +error+ handler is invoked any time an exception is raised from a route
+block or before filter. The exception object can be obtained from the
+'sinatra.error' Rack variable:
 
   error do
-    'Sorry there was a nasty error - ' + request.env['sinatra.error'].name
+    'Sorry there was a nasty error - ' + env['sinatra.error'].name
   end
 
 Custom errors:
@@ -328,12 +340,12 @@ You get this:
   So what happened was... something bad
 
 Sinatra installs special not_found and error handlers when running under
-the development.
+the development environment.
 
 == Mime types
 
-When using send_file or static files you may have mime types Sinatra doesn't
-understand.  Use +mime+ in those cases.
+When using <tt>send_file</tt> or static files you may have mime types Sinatra
+doesn't understand. Use +mime+ to register them by file extension:
 
   mime :foo, 'text/foo'
 
@@ -374,59 +386,61 @@ typically don't have to +use+ them explicitly.
 
 == Testing
 
-=== Test/Unit
+The Sinatra::Test module includes a variety of helper methods for testing
+your Sinatra app. Sinatra includes support for Test::Unit, test-spec, RSpec,
+and Bacon through separate source files.
 
-  require 'rubygems'
+=== Test::Unit
+
   require 'sinatra'
   require 'sinatra/test/unit'
   require 'my_sinatra_app'
 
   class MyAppTest < Test::Unit::TestCase
-
     def test_my_default
-      get_it '/'
+      get '/'
       assert_equal 'My Default Page!', @response.body
     end
 
     def test_with_agent
-      get_it '/', :agent => 'Songbird'
+      get '/', :agent => 'Songbird'
       assert_equal 'You're in Songbird!', @response.body
     end
 
     ...
-
   end
 
-=== Test/Spec
+=== Test::Spec
 
-  require 'rubygems'
+Install the test-spec gem and require <tt>'sinatra/test/spec'</tt> before
+your app:
+
   require 'sinatra'
   require 'sinatra/test/spec'
   require 'my_sinatra_app'
 
   describe 'My app' do
-
     it "should show a default page" do
-      get_it '/'
+      get '/'
       should.be.ok
       body.should.equal 'My Default Page!'
     end
 
     ...
-
   end
 
 === RSpec
 
-  require 'rubygems'
-  require 'spec'
+Install the rspec gem and require <tt>'sinatra/test/rspec'</tt> before
+your app:
+
   require 'sinatra'
   require 'sinatra/test/rspec'
   require 'my_sinatra_app'
 
   describe 'My app' do
     it 'should show a default page' do
-      get_it '/'
+      get '/'
       @response.should be_ok
       @response.body.should == 'My Default Page!'
     end
@@ -435,20 +449,35 @@ typically don't have to +use+ them explicitly.
 
   end
 
-See Sinatra::Test::Methods for more information on +get_it+, +post_it+,
-+put_it+, and friends.
+=== Bacon
+
+  require 'sinatra'
+  require 'sinatra/test/bacon'
+  require 'my_sinatra_app'
+
+  describe 'My app' do
+    it 'should be ok' do
+      get '/'
+      should.be.ok
+      body.should == 'Im OK'
+    end
+  end
+
+See Sinatra::Test for more information on +get+, +post+, +put+, and
+friends.
 
 == Command line
 
 Sinatra applications can be run directly:
 
-  ruby myapp.rb [-h] [-x] [-p PORT] [-e ENVIRONMENT]
+  ruby myapp.rb [-h] [-x] [-e ENVIRONMENT] [-p PORT] [-s HANDLER]
 
 Options are:
 
   -h # help
   -p # set the port (default is 4567)
   -e # set the environment (default is development)
+  -s # specify rack server/handler (default is thin)
   -x # turn on the mutex lock (default is off)
 
 == Contributing
@@ -481,7 +510,7 @@ screencasts about Git, which you can find here: http://www.gitcasts.com/
 
 at the top of your sinatra_app.rb file:
 
-  $:.unshift File.dirname(__FILE__) + '/sinatra/lib'
+  $LOAD_PATH.unshift File.dirname(__FILE__) + '/sinatra/lib'
   require 'sinatra'
 
   get '/about' do

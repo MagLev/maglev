@@ -1,4 +1,4 @@
-$:.unshift File.dirname(__FILE__) + '/rack-0.9.0/lib'
+$:.unshift File.dirname(__FILE__) + '/Rack/lib'
 
 require 'webrick'
 require 'rack'
