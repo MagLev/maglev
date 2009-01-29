@@ -717,10 +717,8 @@ class Array
   end
 
 
-#  primitive 'reject!&', 'removeAllSuchThat:'
-
-  # replace written in Smalltalk so it can use copyFrom:to:into:startingAt
-  # prim
+  # replace written in Smalltalk 
+  # so it can use the copyFrom:to:into:startingAt  primitive
   primitive 'replace', 'rubyReplace:'
 
   primitive 'reverse'
