@@ -3,6 +3,7 @@
 #            Ruby class name , Gemstone class name
 RUBY.global('Array', 'Array')
 RUBY.global('Behavior', 'Behavior')
+RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'Class')
 RUBY.global('Dir', 'RubyDirectory')
@@ -91,8 +92,10 @@ RUBY.global('Exception',    'UserException')
 
 
 # ----------------------------------------------------------
+#  classes related to implementation of Proc, not extendable by Ruby
 
 RUBY.global("ExecBlock", "ExecBlock")
+RUBY.global("VariableContext", "VariableContext")
 RUBY.global("GsNMethod", "GsNMethod")
 
 # ----------------------------------------------------------

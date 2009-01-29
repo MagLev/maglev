@@ -1,6 +1,13 @@
 # ---------------------------------
 #   Proc 
 
+class VariableContext
+  # creating subclasses of VariableContext is not allowed
+  # extending VariableContext is not allowed outside of bootstrap
+  primitive_nobridge 'at', 'at:'
+  primitive_nobridge 'put', 'at:put:'
+end
+
 class ExecBlock
   # creating subclasses of ExecBlock is not allowed
   # extending ExecBlock is not allowed outside of bootstrap

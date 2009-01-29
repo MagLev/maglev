@@ -25,6 +25,8 @@ module Kernel
     nil
   end
 
+  # binding defined in Kernel2.rb
+
   primitive_nobridge '_last_dnu_protection', '_lastDnuProtection'
 
   def method_missing(method_id, *args)
@@ -53,12 +55,42 @@ module Kernel
   # def catch(aSymbol, &aBlock); end
   primitive_nobridge 'catch&' , 'catch:do:'
 
-  primitive_nobridge '_eval', '_eval:with:'
+  primitive_nobridge '_eval', '_eval:binding:with:'
+
+  def eval(str, binding, file_not_used, line_not_used)
+    # use 0x3? because one extra stack frame due to bridging methods .
+    # max send site is :::* , call is via a :::* to :::: bridge meth .
+    vcgl = [ self._getRubyVcGlobal(0x30) ,
+      self._getRubyVcGlobal(0x31) ]
+    res = _eval(str, binding, vcgl)
+    vcgl[0]._storeRubyVcGlobal(0x30)
+    vcgl[1]._storeRubyVcGlobal(0x31)
+    res
+  end
 
   def eval(str)
+    # no bridge methods for this an subsequent variants
     vcgl = [ self._getRubyVcGlobal(0x20) ,
       self._getRubyVcGlobal(0x21) ]
-    res = _eval(str, vcgl)
+    res = _eval(str, nil, vcgl)
+    vcgl[0]._storeRubyVcGlobal(0x20)
+    vcgl[1]._storeRubyVcGlobal(0x21)
+    res
+  end
+
+  def eval(str, binding)
+    vcgl = [ self._getRubyVcGlobal(0x20) ,
+      self._getRubyVcGlobal(0x21) ]
+    res = _eval(str, binding, vcgl)
+    vcgl[0]._storeRubyVcGlobal(0x20)
+    vcgl[1]._storeRubyVcGlobal(0x21)
+    res
+  end
+
+  def eval(str, binding, file_not_used)
+    vcgl = [ self._getRubyVcGlobal(0x20) ,
+      self._getRubyVcGlobal(0x21) ]
+    res = _eval(str, binding, vcgl)
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
