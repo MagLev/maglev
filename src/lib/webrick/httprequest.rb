@@ -82,7 +82,7 @@ module WEBrick
       rescue Errno::ENOTCONN
         raise HTTPStatus::EOFError
       end
-      
+
       read_request_line(socket)
 
       if @http_version.major > 0
@@ -108,8 +108,8 @@ module WEBrick
         @query_string = @request_uri.query
         @script_name = ""
         @path_info = @path.dup
-      rescue
-        raise HTTPStatus::BadRequest, "bad URI `#{@unparsed_uri}'."
+      rescue Exception => e
+        raise HTTPStatus::BadRequest, "bad URI `#{@unparsed_uri}'. \nORIGINAL: #{e.message}"
       end
 
       if /close/io =~ self["connection"]
@@ -246,8 +246,8 @@ module WEBrick
     def read_request_line(socket)
       @request_line = read_line(socket, 1024) if socket
 
-       if @request_line.nil? 
-         raise HTTPStatus::EOFError       
+       if @request_line.nil?
+         raise HTTPStatus::EOFError
        end
 
       if @request_line.size >= 1024 and @request_line[-1, 1] != LF
@@ -310,7 +310,7 @@ module WEBrick
         end
       elsif self['content-length'] || @remaining_size
         @remaining_size ||= self['content-length'].to_i
-        while @remaining_size > 0 
+        while @remaining_size > 0
           sz = [@buffer_size, @remaining_size].min
           break unless buf = read_data(socket, sz)
           @remaining_size -= buf.size
