@@ -15,6 +15,10 @@ class Behavior
   primitive 'name' , '_rubyName'
   primitive_nobridge '_allClassVars', 'allClassVarNames'
 
+  def _isBehavior
+    true
+  end
+
   def attr_accessor(*names)
     names.each do |n|
       attr_reader(n)
@@ -36,6 +40,64 @@ class Behavior
 
   # This is a 1.9 thing, but some of the 1.8 specs expect it there anyway...
   alias attr attr_reader
+
+  def class_variable_defined?(aName)
+    sym = aName.to_sym
+    a = _allClassVars
+    lim = a.length
+    n = 0
+    while (n < lim)
+      if (sym.equal?(a[n]))
+        return true
+      end
+      n = n + 1
+    end
+    false
+  end
+
+  def class_variables
+    a = _allClassVars
+    lim = a.length
+    r = Array.new(lim)
+    n = 0
+    while (n < lim)
+      r[n] = a[n].to_s
+      n = n + 1
+    end
+    r
+  end
+
+  primitive_nobridge '_define_method_meth' , 'defineMethod:method:'
+  primitive_nobridge '_define_method_block&' , 'defineMethod:block:'
+
+  def define_method(sym, meth)
+    m = meth
+    if m.is_a?(Proc) 
+      m = meth._block
+    end
+    if m._isBlock
+      _define_method_block(sym, &m)
+    else
+      _define_method_meth(sym, meth)
+    end 
+  end
+
+  def define_method(sym, &blk)
+    _define_method_block(sym, &blk)
+  end
+
+  def inspect(touchedSet=nil)
+    name
+  end
+
+  primitive_nobridge 'instance_method', 'rubyUnboundMethodFor:'
+     # one arg, a Symbol
+
+  primitive_nobridge '_method_defined', 'rubyMethodDefined:protection:'
+
+  def method_defined?(symbol)
+    _method_defined(symbol, -1)
+  end
 
   def module_eval(*args)
     # bridge methods would interfere with VcGlobals logic
@@ -84,48 +146,8 @@ class Behavior
     _set_protection_methods(1, *names)
   end
 
-  def inspect(touchedSet=nil)
-    name
-  end
-
-  def _isBehavior
-    true
-  end
-
   def to_s
     name
-  end
-
-  def class_variable_defined?(aName)
-    sym = aName.to_sym
-    a = _allClassVars
-    lim = a.length
-    n = 0
-    while (n < lim)
-      if (sym.equal?(a[n]))
-        return true
-      end
-      n = n + 1
-    end
-    false
-  end
-
-  def class_variables
-    a = _allClassVars
-    lim = a.length
-    r = Array.new(lim)
-    n = 0
-    while (n < lim)
-      r[n] = a[n].to_s
-      n = n + 1
-    end
-    r
-  end
-
-  primitive_nobridge '_method_defined', 'rubyMethodDefined:protection:'
-
-  def method_defined?(symbol)
-    _method_defined(symbol, -1)
   end
 
   def public_method_defined?(symbol)
@@ -140,7 +162,5 @@ class Behavior
     _method_defined(symbol, 2)
   end
 
-  primitive_nobridge 'instance_method', 'rubyUnboundMethodFor:'
-     # one arg, a Symbol
 
 end
