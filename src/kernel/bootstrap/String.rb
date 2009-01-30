@@ -104,7 +104,15 @@ class String
 
 #  alias === ==
 
-  # =~ is  translated to  :match  Sexpression by parser ...
+  # =~ is mostly translated to  :match  Sexpression by parser ...
+  #
+  def =~(regex)
+    if regex._isRegexp
+      regex.=~(self) 
+    else
+      raise ArgumentError , 'expected a Regex'
+    end
+  end
 
   primitive_nobridge '[]' , '_rubyAt:'
   primitive_nobridge '[]' , '_rubyAt:length:'
