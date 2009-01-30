@@ -7,12 +7,13 @@ COMMAND="`basename $0`"
 usage() {
 cat <<ENDHELP
 Usage: 
-$COMMAND {start|start-debug|stop|restart|status|topaz|topaz-debug|
+$COMMAND {start|start-debug|start-bench|stop|restart|status|topaz|topaz-debug|
         squeak|force-reload|version|help}
 
 To control the MagLev server:
 maglev start          - Start MagLev server processes
 maglev start-debug    - Start MagLev server processes with verbose output
+maglev start-bench    - Start MagLev server with performance optimizations
 maglev start-parser   - Force parser process to start if it's dead
 maglev stop           - Stop MagLev server processes
 maglev restart        - Restart MagLev server processes
@@ -87,6 +88,13 @@ startserver-debug() {
   $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf gs64stone
   $GEMSTONE/bin/waitstone gs64stone
   echo "MagLev server gs64stone started in verbose mode"
+}
+
+startserver-bench() {
+  $GEMSTONE/bin/startnetldi -g
+  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-benchmark.conf gs64stone
+  $GEMSTONE/bin/waitstone gs64stone
+  echo "MagLev server gs64stone started with performance optimizations"
 }
 
 startparser() {
@@ -233,6 +241,11 @@ case "$1" in
         startparser-debug
         startserver-debug
         ;;
+  start-bench)
+        initialize
+        startparser
+        startserver-bench
+        ;;
   stop)
         stopserver
         stopparser
@@ -281,7 +294,7 @@ case "$1" in
         usage
         ;;
   *)
-        echo "Usage: $COMMAND {start|start-debug|stop|restart|status|topaz|topaz-debug|"
+        echo "Usage: $COMMAND {start|start-debug|start-bench|stop|restart|status|topaz|topaz-debug|"
         echo "               squeak|force-reload|version|help}"
         exit 1
         ;;
