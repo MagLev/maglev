@@ -1,8 +1,6 @@
 class Array
   # begin private helper methods
   # TODO: Some of these don't begin with an '_'...
-  primitive_nobridge '_all', 'allSatisfy:'
-  primitive_nobridge '_detect', 'detect:ifNone:'
   primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
   primitive_nobridge 'insert_all', 'insertAll:at:'
   primitive_nobridge 'remove_first', 'removeFirst'
