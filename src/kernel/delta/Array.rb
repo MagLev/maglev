@@ -10,8 +10,21 @@ class Array
   # ensure only the methods critical for performane or Array specific
   # implementations are implemented here.
 
-  def all?(&b)
-    _all(b)
+  def all?(&block)
+    n = 0
+    lim = size
+    if block_given?
+      while n < lim
+        unless yield(self[n]) ; return false ; end
+        n = n + 1
+      end
+    else
+      while n < lim
+        unless self[n] ; return false ; end
+        n = n + 1
+      end
+    end
+    true
   end
 
   # Equivalent to Array#delete_if, but returns nil if no changes were made.
@@ -29,7 +42,22 @@ class Array
     end
   end
 
-  primitive 'any?&', 'anySatisfy:'
+  def any?(&block)
+    n = 0
+    lim = size
+    if block_given?
+      while n < lim
+        if yield(self[n]) ; return true ; end
+        n = n + 1
+      end
+    else
+      while n < lim
+        if self[n] ; return true ; end
+        n = n + 1
+      end
+    end
+    false
+  end
 
   def collect(&b)
     result = Array.new(length)
@@ -42,8 +70,21 @@ class Array
     result
   end
 
-  def detect(&block)
-    _detect(block, nil)
+  def detect(ifnone_proc=nil, &block)
+    n = 0
+    lim = size
+    while n < lim
+      elem = self[n]
+      if yield(elem)
+        return elem
+      end
+      n = n + 1
+    end
+    if ifnone_proc.equal?(nil)
+      nil
+    else
+      ifnone_proc.call 
+    end
   end
 
   def each_with_index(&block)
@@ -57,9 +98,7 @@ class Array
 
   alias entries to_a
 
-  def find(&block)
-    _detect(block, nil)
-  end
+  alias find  detect
 
   def find_all(&block)
     result = []
