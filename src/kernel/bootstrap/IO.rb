@@ -94,5 +94,11 @@ class IO
     end
   end
 
+  def self.read(name)
+    File.read(name)
+  end
+
+  # TODO #  def self.read(name, length, offset); ... ; end
+
 end
 

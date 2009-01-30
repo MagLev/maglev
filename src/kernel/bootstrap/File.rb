@@ -645,11 +645,6 @@ class File
     args.each {|arg| self << arg.to_s}
   end
 
-  # TODO: Where is this used?  Not a method
-  def self.read(file)
-    open(file){|f| f.read}
-  end
-
   def self.read(path)
     file = self.new(path)
     if file.equal?(nil)
