@@ -18,6 +18,9 @@ namespace :maglev do
   desc "Start the MagLev processes with verbose output."
   task :'start-debug' => [:initialize, :'startserver-debug', :'startparser-debug']
 
+  desc "Start the MagLev processes with performance optimizations."
+  task :'start-bench' => [:initialize, :'startserver-bench', :'startparser']
+
   desc "Stop the MagLev processes."
   task :stop => [:stopserver, :stopparser]
 
@@ -40,6 +43,9 @@ namespace :maglev do
 
   task :'startserver-debug' => :gemstone do
     start_server_debug
+  end
+  task :'startserver-bench' => :gemstone do
+    start_server_bench
   end
 
   task :startparser => :gemstone do

@@ -133,6 +133,18 @@ def start_server_debug
   end
 end
 
+# Start the GemStone servers with larger page cache and /dev/null tranlogs
+# startstone).  Does no checking if server is already started.
+def start_server_bench
+  sh %{
+    ${GEMSTONE}/bin/startnetldi -g
+    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf gs64stone
+    ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
+  } do |ok, status|
+    puts "GemStone server gs64stone started with performance optimizations" if ok
+  end
+end
+
 def stop_server
   sh %{
     ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i >/dev/null 2>&1
