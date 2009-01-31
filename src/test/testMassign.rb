@@ -8,6 +8,12 @@ class Holder
   def initialize
     @val = 987
   end
+  def set2(a, b)
+    foo, @ivb = a, b 
+  end
+  def getb
+    @ivb
+  end
   attr_accessor :val
 end
 
@@ -49,5 +55,9 @@ end
  a , b, * = x[0]
  unless a == 9 then raiseErr end
  unless b == nil then raiseErr end
+
+ h.set2(20,30)  # cover a pattern seen in Sinatra , instVar on LHS of masgn
+ x = h.getb
+ unless x == 30 then raiseErr end
 
  true
