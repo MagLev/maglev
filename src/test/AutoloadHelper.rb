@@ -1,5 +1,5 @@
 # This file is called by the AutoloadTest.rb
 $marker = true
-class A::B
+class AutoA::AutoB
 
 end
