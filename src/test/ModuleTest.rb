@@ -16,6 +16,7 @@ end
 test(M.constants.length,         0, 'M.constants 1')
 test(M.const_defined?(:FOO), false, 'const_defined? A')
 
+m = M
 M.const_set(:FOO, 12)
 
 test(M.constants.length,        1, 'const_set A')
