@@ -160,6 +160,10 @@ class Thread
       end
     end
   end
+
+  def raise
+    self.raise(RuntimeError, '')
+  end
  
   primitive_nobridge 'run' , 'rubyRun'
 
