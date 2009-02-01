@@ -23,18 +23,18 @@ popd
 touch benchmarks-completed
 
 # Second, extract the base info
-grep bm_ MagLev-raw.csv  | cut -d, -f1,9 | tr "," "=" > MagLev-tmp.csv
-grep bm_ JRuby1.1.6-raw.csv  | cut -d, -f1,9 | tr "," "=" > JRuby1.1.6-tmp.csv
-grep bm_ MRI-186p287-raw.csv  | cut -d, -f1,9  | tr "," "=" > MRI-186p287-tmp.csv
-grep bm_ MRI-187p72-raw.csv  | cut -d, -f1,9  | tr "," "=" > MRI-187p72-tmp.csv
-grep bm_ MRI-19-raw.csv  | cut -d, -f1,9 | tr "," "=" > MRI-19-tmp.csv
+grep bm_ MagLev-raw.csv  | cut -d, -f1,9 | tr "," ";" > MagLev-tmp.csv
+grep bm_ JRuby1.1.6-raw.csv  | cut -d, -f1,9 | tr "," ";" > JRuby1.1.6-tmp.csv
+grep bm_ MRI-186p287-raw.csv  | cut -d, -f1,9  | tr "," ";" > MRI-186p287-tmp.csv
+grep bm_ MRI-187p72-raw.csv  | cut -d, -f1,9  | tr "," ";" > MRI-187p72-tmp.csv
+grep bm_ MRI-19-raw.csv  | cut -d, -f1,9 | tr "," ";" > MRI-19-tmp.csv
 
 # Next, extract the times
-grep bm_ MagLev-raw.csv  | cut -d, -f7 | paste -d, MagLev-tmp.csv - | sort > MagLev.csv
-grep bm_ JRuby1.1.6-raw.csv  | cut -d, -f7 | paste -d, JRuby1.1.6-tmp.csv - | sort > JRuby1.1.6.csv
-grep bm_ MRI-186p287-raw.csv  | cut -d, -f7  | paste -d, MRI-186p287-tmp.csv - | sort > MRI-186p287.csv
-grep bm_ MRI-187p72-raw.csv  | cut -d, -f7  | paste -d, MRI-187p72-tmp.csv - | sort > MRI-187p72.csv
-grep bm_ MRI-19-raw.csv  | cut -d, -f7 | paste -d, MRI-19-tmp.csv - | sort > MRI-19.csv
+grep bm_ MagLev-raw.csv  | cut -d, -f7 | paste -d, MagLev-tmp.csv - > MagLev.csv
+grep bm_ JRuby1.1.6-raw.csv  | cut -d, -f7 | paste -d, JRuby1.1.6-tmp.csv - > JRuby1.1.6.csv
+grep bm_ MRI-186p287-raw.csv  | cut -d, -f7  | paste -d, MRI-186p287-tmp.csv - > MRI-186p287.csv
+grep bm_ MRI-187p72-raw.csv  | cut -d, -f7  | paste -d, MRI-187p72-tmp.csv - > MRI-187p72.csv
+grep bm_ MRI-19-raw.csv  | cut -d, -f7 | paste -d, MRI-19-tmp.csv - > MRI-19.csv
 
 # Finally, make into spreadsheet form
 echo $hdr > $outfile
