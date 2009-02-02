@@ -3,26 +3,11 @@
 #
 # The Smalltalk hierarchy is
 #      Integer
-#        LargeNegativeInteger
-#        LargePositiveInteger
+#        LargeInteger
 #        SmallInteger
 #
-# Bignum and Integer will be identical
-# The environment 1 name of LargeNegativeInteger and LargePositiveInteger
-# will both be Bignum.
-# Environment 1 of Smalltalk Integer will hold the combined API of
-# Ruby Integer and Bignum .
-#
-#  At this time, there are no methods in LargeNegativeInteger nor LargePositiveInteger
-#   that need to be referenced from environment 1
-
-# Note,   1152921504606846976.class  will be LargePositiveInteger, not Integer .
 
 class Integer
-    def self.name
-      # override Smalltalk name
-      'Bignum'
-    end
 
     # _rubyTimes:  contains the handler for RubyBreakException
     primitive_nobridge '_times&', '_rubyTimes:'

@@ -15,7 +15,7 @@ RUBY.global('Fixnum', 'SmallInteger')
 RUBY.global('Float', 'Float')
 RUBY.global('Hash', 'RubyHash')
 RUBY.global('Integer', 'Integer')
-RUBY.global('Bignum', 'Integer')   # temporary, TODO separate class for Bignum
+RUBY.global('Bignum', 'LargeInteger')
 RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel

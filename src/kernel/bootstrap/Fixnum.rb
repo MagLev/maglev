@@ -1,8 +1,12 @@
 class Fixnum
+  # Fixnum is identically  Smalltalk SmallInteger
 
   #  The 3 selectors  + - *   should be emitted as special sends and don't need
   #  methods installed. They will fall back to Bignum (to implementations in
   #  Smalltalk Integer) if the special send fails.
+
+  # The selectors + - * >= <= < bitAnd: are special sends and may not
+  #  be reimplemented in Fixnum.
 
   primitive_nobridge '<'
   primitive_nobridge '>'
