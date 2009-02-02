@@ -87,3 +87,11 @@ module RecursionGuard
     STACK  # Gemstone single thread hack
   end
 end
+
+class Object
+  # Rubinius uses metaclass() in several files
+  def metaclass
+    class << self;self;end
+  end
+  alias_method :__metaclass__, :metaclass
+end
