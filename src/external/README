@@ -8,11 +8,7 @@ Rack
   See: http://rack.rubyforge.org/
   License: MIT
 
-  NOTE: Rack is based on autoload, which is currently a stub.  As soon as
-  autoload is working, most of the dependency problems will go away (e.g.,
-  not *all* Rack apps will depend on digest/md5 or scgi etc.).
-
-  MagLev does not currently support the following Rack features:
+  MagLev does not currently support (at least) the following Rack features:
   * openid
   * mongrel
   * memcache
@@ -22,37 +18,32 @@ Rack
   * cookies (depends on openssl)
   * fastcgi
 
-  Rack library dependencies (selected):
-    require 'digest/md5'
-    require 'lsapi'
-    require 'scgi'
-    require 'set'
-    require 'stringio'
-    require 'tempfile'
-    require 'thread'
-    require 'time'
-    require 'uri'
-    require 'webrick'
-    require 'zlib'
-
 Sinatra
   Sinatra is a light-weight web framework for ruby.
   Version 0.9.0.4 (compatible with rack 0.9.1)
   License: MIT
 
-  Sinatra library dependencies (selected):
-    require 'erb'
-    require 'optparse'
-    require 'ostruct'
-    require 'rack'
-    require 'stringio'
-    require 'time'
-    require 'uri'
+benchmark
+  Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.
 
 racktest.rb
   A simple webrick test of Rack.  Run it, then hit http://localhost:3333/ .
 
       $ maglev-ruby racktest.rb
+
+ramaze
+  A Ruby modular web framework. http://ramaze.net/
+
+ramaze_hello.rb
+  An in-progress test script to run a simple ramaze app.
+
+rubygems-1.3.1
+  Ruby gems 1.3.1.  We're working on getting it to run.
+
+rxtest
+  Tim Bray's rx code.  Rx is an automaton based XML tokenizer.  It was
+  proposed as one of the real-world-ish applications to add to Antonio's
+  benchmark suite.
 
 sintatratest.rb
   NOT WORKING YET...this will be a simple sinatra smoke test, but it isn't
