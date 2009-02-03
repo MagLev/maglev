@@ -23,7 +23,7 @@
 $:.unshift File.dirname(__FILE__)  # Ensure we can find maglev_parser.rb
 
 require 'rubygems'
-gem 'ParseTree', '2.2.0'
+gem 'ParseTree', '3.0.2'
 
 require "webrick"
 require 'parse_tree'
