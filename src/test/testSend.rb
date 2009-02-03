@@ -84,13 +84,15 @@ unless b.equal?(true)
   raise 'ERR'
 end
 c = o.respond_to?( :doSend2b, false )
-unless c.equal?(true) 
-  raise 'ERR'
-end
+unless c.equal?(true) ; 			raise 'ERR'; end
 c = o.respond_to?( :doSend2bfoo, false )
-unless c.equal?(false) 
-  raise 'ERR'
-end
+unless c.equal?(false) ; 			raise 'ERR'; end
+c = o.respond_to?( :initialize, false )
+unless c.equal?(false) ; 			raise 'ERR'; end
+c = o.respond_to?( :initialize, true )
+unless c.equal?(true) ; 			raise 'ERR'; end
+
+
 
 
 
