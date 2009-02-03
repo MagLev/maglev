@@ -99,17 +99,19 @@ class Object
     # install this prim so  anObj.send(:is_a?, aCls)   will work
     primitive_nobridge 'is_a?' , '_rubyKindOf:'
 
+    primitive_nobridge '_responds_to', '_respondsTo:private:flags:'
+       # _responds_to flags bit masks are
+       #     environmentId                   0xFF
+       #     ruby lookup semantics          0x100
+       #     ruby receiver is self         0x1000 (for future use)
+       #     cache successes in code_gen  0x10000
+    
+    def respond_to?(symbol, include_private)
+      _responds_to(symbol, include_private, 0x10101)
+    end
 
-    # do not define # def respond_to?(symbol, include_private=false) ; end
-    #
-    # The one and two arg forms of respond_to? are translated directly to 
-    # a Smalltalk send of _respondsTo:private:flags: by the parser which constructs
-    # the flags argument, and so bridge methods don't determination of the
-    #  receiver's frame .
-    # After bootstrap, reimplementation of respond_to?  will fail with a compile error
-    #
-    def respond_to?
-      raise ArgumentError, 'wrong number of arguments, expected 1 or 2'
+    def respond_to?(symbol )
+      _responds_to(symbol, false, 0x10101)
     end
 
     primitive 'print_line', 'rubyPrint:'

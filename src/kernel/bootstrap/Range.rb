@@ -19,7 +19,7 @@ class Range
   def ===(n)
     return false if n < @from
     return false if n > @to
-    if exclude_end?
+    if @excludeEnd
       return false if n == @to
     end
     return true
@@ -105,16 +105,23 @@ class Range
 
   def step(n=1, &block)
     current = @from
+    lim = @to
     if @from._isNumber
+      unless @excludeEnd
+        lim = lim + 1
+      end
       begin
         block.call(current)
         current += n
-      end while current < @to
+      end while current < lim
     else
+      unless @excludeEnd
+        lim = lim.succ
+      end
       begin
         block.call(current)
         n.times { |i| current = current.succ }
-      end while current < @to
+      end while current < lim
     end
     self
   end

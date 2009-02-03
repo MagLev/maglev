@@ -13,6 +13,7 @@ class ExecBlock
   # extending ExecBlock is not allowed outside of bootstrap
   primitive_nobridge '_numArgs', 'numArgs'
   primitive_nobridge '_lastStar', 'lastRubyArgIsStar'
+  primitive_nobridge '_noDeclaredArgs', 'noRubyDeclaredArgs'
 
   primitive_nobridge '_fetchRubyVcGlobal', '_rubyVcGlobalAt:'
   primitive_nobridge '_setRubyVcGlobal', '_rubyVcGlobalAt:put:'
@@ -139,8 +140,14 @@ class Proc
     def arity
       blk = @block
       na = blk._numArgs 
-      if (blk._lastStar) 
-        na = -(na)  # negated (num required args + 1)
+      if na.equal?(0)
+        if (blk._noDeclaredArgs)
+          na = -1  # for Proc.new { }.arity == -1
+        end 
+      else
+        if (blk._lastStar) 
+          na = -(na)  # negated (num required args + 1)
+        end
       end
       na
     end
