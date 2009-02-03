@@ -3,7 +3,7 @@
 # the parsetree_parser.rb script to launch the MagLev parse service.
 #
 require 'rubygems'
-gem 'ParseTree', '3.0.2'
+gem 'ParseTree', '3.0.3'
 require 'parse_tree'
 
 class ParseTree
