@@ -1,5 +1,5 @@
 
-T175 = true  # set to false with Ticket 175 completely fixed
+T175notfixed = false  # set to false with Ticket 175 completely fixed
 
 def raise_err(a)
   puts a.inspect 
@@ -69,7 +69,7 @@ y_starOne([5]) { | a |
 
 
 y_emptyArrArr { | a |
-  if (T175)
+  if (T175notfixed)
     exp = []
   else
     exp = [[]]
@@ -111,7 +111,7 @@ y_starOne( [ 5 ] ) { | *a |
 
 
 y_arrayTwo { | *a |
-  if (T175)
+  if (T175notfixed)
     exp = [6,7]
   else
     exp = [[6,7]]
@@ -131,14 +131,13 @@ y_starTwo { | *a |
 
 
 y_threeArgs { | *a |
-   # BUG, we get [[ 8 , 9, 10 ]] ;
-   # cannot fix until ParseTree gem fixed to distinguish
-   #   def ma; yield(8,9);end
-   #  from
-   #   def ma; yield([8,9]);end
-   #unless a == [ 8 , 9, 10 ] ; raise_err(a); end
+  if (T175notfixed)
+     # BUG, we get [[ 8 , 9, 10 ]] ;
+  else
+   unless a == [ 8 , 9, 10 ] ; raise_err(a); end
    trace(__LINE__)
- } 
+  end
+} 
 
 y_emptyArr { | *a |
    unless a == [[]] ; raise_err(a) ; end
@@ -146,7 +145,7 @@ y_emptyArr { | *a |
  }
 
 y_emptyArrArr{ | *a |
-  if (T175)
+  if (T175notfixed)
     exp = [[]]
   else
     exp = [[[]]]
@@ -191,7 +190,7 @@ y_emptyArr { | a, *b |
 
 y_emptyArrArr{ | a, *b |
    act = [ a, b ]
-   if (T175)
+   if (T175notfixed)
      exp = [nil, []]  
    else
      exp = [[], []]  
@@ -241,7 +240,7 @@ y_emptyArr {  | a, b, c |
 
 y_emptyArrArr { |a,b,c|
    act = [ a , b , c]
-   if (T175) 
+   if (T175notfixed) 
      exp = [ nil, nil, nil ]
    else
      exp = [ [], nil, nil ]
@@ -290,7 +289,7 @@ y_emptyArr { | a, b, *c |
 
 y_emptyArrArr { |a, b, *c|
    act = [ a, b, c ]
-   if (T175)
+   if (T175notfixed)
      exp = [ nil, nil, [] ]
    else
      exp = [ [], nil, [] ]
