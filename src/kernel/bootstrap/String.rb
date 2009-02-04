@@ -436,39 +436,39 @@ class String
   primitive_nobridge '_lastSubstring', 'findLastSubString:startingAt:'
   primitive_nobridge '_indexOfLastByte', 'indexOfLastByte:startingAt:'
 
-  def rindex(item, offset=nil)
-    if offset.equal?(nil)
-      offset = self.size
-      if (offset.equal?(0))
-        offset = 1
-      end
+  def rindex(item, original_offset=Undefined)
+    my_size = self.size
+    if original_offset.equal?(Undefined)
+      offset = my_size
+      offset = 1 if (offset.equal?(0))
     else
-      offset = Type.coerce_to(offset, Integer, :to_int)
-      if offset < 0
-        offset = self.size + offset
-      end
+      offset = Type.coerce_to(original_offset, Integer, :to_int)
+      offset += my_size if offset < 0
+      offset = my_size - 1 if offset >= my_size
       offset = offset + 1  # to one-based
     end
+
+    return nil if offset <= 0
+
     if item._isString
-      if item.size.equal?(0)
-        if self.size.equal?(0)
-          return 0
-        else
-          return offset
-        end
+#      puts "=== offset: #{offset} my_size: #{my_size} "
+      if item.size == 0
+        return (offset <= my_size) ? (offset - 1) : my_size
       end
-      st_idx = self._lastSubstring(item, offset )
+      st_idx = self._lastSubstring(item, offset)
     elsif item._isInteger
-      st_idx = self._indexOfLastByte(item % 256 , offset )
-    else
+      return nil if item > 255 || item < 0
+#      puts "=== #{self}.rindex(#{item.inspect}, #{offset}): item % 256: #{item % 256} original_offset: #{original_offset}"
+      st_idx = self._indexOfLastByte(item % 256 , offset)
+    elsif item._isRegexp
       st_idx = item._rindex_string(self, offset)
-#      raise NotImplementedError , 'String#rindex(aRegexp) not implemented'
-    end
-    if st_idx.equal?(0)
-      return nil
     else
-      return st_idx - 1
+      coerced = Type.coerce_to(item, String, :to_str)
+      return self.rindex(coerced, original_offset)
     end
+
+#    puts "=== #{self}.rindex(#{item.inspect}, #{offset}): st_idx #{st_idx.inspect}"
+    return st_idx.equal?(0) ? nil : st_idx - 1
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
