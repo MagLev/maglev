@@ -44,7 +44,7 @@ Thread.abort_on_exception = true
 
 # Bootstrap
 require 'ramaze/version'
-require 'ramaze/reloader'
+#require 'ramaze/reloader'
 require 'ramaze/snippets'
 require 'ramaze/log'
 require 'ramaze/trinity'

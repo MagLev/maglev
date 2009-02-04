@@ -2,7 +2,7 @@
 class Thread
 
   def self.name
-    'Thread'    
+    'Thread'
   end
 
   class_primitive_nobridge '_stbacktrace', 'backtraceToLevel:'
@@ -18,23 +18,23 @@ class Thread
     _stbacktrace(limit).each do |ary|
       where, line, source = ary
       if /(.*) \(envId 1\)/ =~ where
-	meth = $1
-	if source
-	  lines = source.split("\n").grep(/# method/)
-	  unless lines.empty?
-	    if /line (\d+) .* file (.*)/=~ lines[-1]
-	      baseline = $1.to_i
-	      file = $2
-	      result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
-	    end
-	  end
-	end
+  meth = $1
+  if source
+    lines = source.split("\n").grep(/# method/)
+    unless lines.empty?
+      if /line (\d+) .* file (.*)/=~ lines[-1]
+        baseline = $1.to_i
+        file = $2
+        result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
+      end
+    end
+  end
       elsif includeSt
         if  /(.*) \(envId 0\)/ =~ where
-	  meth = $1
-	  result << "smalltalk:#{line}: in '#{meth}'"
+    meth = $1
+    result << "smalltalk:#{line}: in '#{meth}'"
         else
-	  result << "smalltalk:#{line}: in #{where} " # usually in Executed Code
+    result << "smalltalk:#{line}: in #{where} " # usually in Executed Code
         end
       end
     end
@@ -51,12 +51,16 @@ class Thread
 
   # MNI self.abort_on_exception=
 
+  def self.abort_on_exception=(bool)
+    _stub_warn("Thread.abort_on_exception=: Does nothing")
+  end
+
   def self.critical
-    false  # 
+    false  #
   end
 
   # MNI def self.critical= ; end
-  # use of critical= not yet supported, however the 
+  # use of critical= not yet supported, however the
   #    Smalltalk class ProcessorScheduler does define rubyCritical instVar.
 
   class_primitive_nobridge 'current', '_current'
@@ -91,13 +95,13 @@ class Thread
   class_primitive_nobridge 'list', 'allProcesses'
 
   class_primitive_nobridge 'main', 'main'
- 
+
   class_primitive_nobridge 'pass', 'pass'
 
   class_primitive_nobridge 'stop', 'stop'
-  
+
   primitive_nobridge '[]', 'threadDataAt:'
- 
+
   primitive_nobridge '[]=', 'threadDataAt:put:'
 
   def abort_on_exception
@@ -105,7 +109,7 @@ class Thread
   end
 
   # MNI abort_on_exception=
-  
+
   primitive_nobridge 'alive?' , 'alive'
 
   primitive_nobridge 'exit', 'exit'
@@ -113,14 +117,14 @@ class Thread
 
   primitive_nobridge 'group' , 'rubyGroup'
 
-  # def join(limit); end # 
+  # def join(limit); end #
   #  if limit is zero, join will return immediately
   primitive_nobridge 'join', 'join:'
 
   # def join; end #
   #   wait forever for the receiver to finish
   primitive_nobridge 'join', 'joinValue'
-  
+
   primitive_nobridge 'keys', 'keys'
 
   primitive_nobridge 'key?', 'includesKey:'
@@ -133,7 +137,7 @@ class Thread
 
   def raise(ex_class, message)
     ex = ex_class.exception
-    if self.equal?(Thread.current) 
+    if self.equal?(Thread.current)
       ex.signal(message)
     else
       ex._message=(message)
@@ -143,12 +147,12 @@ class Thread
 
   def raise(ex_class, message, *args)
     # TODO  args is callback info not yet implemented
-    self.raise(ex_class, message) 
+    self.raise(ex_class, message)
   end
 
   def raise(msg)
     if (msg._isString)
-      self.raise(RuntimeError, msg) 
+      self.raise(RuntimeError, msg)
     else
       # msg should be a subclass of Exception or
       #  an object that returns a new exception
@@ -164,7 +168,7 @@ class Thread
   def raise
     self.raise(RuntimeError, '')
   end
- 
+
   primitive_nobridge 'run' , 'rubyRun'
 
   def safe_level
