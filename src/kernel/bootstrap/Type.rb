@@ -12,7 +12,7 @@ module Type
 
   def self.coerce_to(obj, cls, meth)
     # this default implementation should only be used by non-bootstrap code
-    return obj if obj.kind_of?(cls) 
+    return obj if obj.kind_of?(cls)
 
     begin
       ret = obj.__send__(meth)
@@ -41,7 +41,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_ary => Array failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isArray 
+     return ret if ret._isArray
      raise TypeError, "Coercion error: obj.to_ary did NOT return an Array"
   end
 
@@ -52,7 +52,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_a => Array failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isArray 
+     return ret if ret._isArray
      raise TypeError, "Coercion error: obj.to_a did NOT return an Array"
   end
 
@@ -63,7 +63,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_int => Fixnum failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isFixnum 
+     return ret if ret._isFixnum
      raise TypeError, "Coercion error: obj.to_int did NOT return an Fixnum"
   end
 
@@ -74,10 +74,10 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_f => Float failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isFloat 
+     return ret if ret._isFloat
      raise TypeError, "Coercion error: obj.to_f did NOT return an Float"
   end
-  
+
   def self.coerce_to_Hash_to_hash(obj)
      begin
        ret = obj.to_hash
@@ -85,7 +85,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_hash => Hash failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isHash 
+     return ret if ret._isHash
      raise TypeError, "Coercion error: obj.to_hash did NOT return a Hash"
   end
 
@@ -96,7 +96,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_i => Integer failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isInteger 
+     return ret if ret._isInteger
      raise TypeError, "Coercion error: obj.to_i did NOT return an Integer"
   end
 
@@ -107,7 +107,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_int => Integer failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isInteger 
+     return ret if ret._isInteger
      raise TypeError, "Coercion error: obj.to_int did NOT return an Integer"
   end
 
@@ -118,7 +118,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_s => String failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isString 
+     return ret if ret._isString
      raise TypeError, "Coercion error: obj.to_s did NOT return a String"
   end
 
@@ -129,7 +129,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_str => String failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isString 
+     return ret if ret._isString
      raise TypeError, "Coercion error: obj.to_str did NOT return a String"
   end
 
@@ -140,9 +140,18 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_sym => Symbol failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isSymbol 
+     return ret if ret._isSymbol
      raise TypeError, "Coercion error: obj.to_sym did NOT return a Symbol"
   end
 
+  def self.coerce_to_string_or_integer(item)
+    begin
+      coereced = Type.coerce_to(item, Integer, :to_int)
+    rescue TypeError
+      coereced = Type.coerce_to(item, String, :to_str)
+      # May raise, if not a string, but let that flow to caller
+    end
+    return coereced
+  end
 end
 # END RUBINIUS

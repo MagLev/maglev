@@ -84,6 +84,13 @@ class Regexp
     m
   end
 
+#   def _rmatch(str, offset=nil)
+#     offset = str.length if offset.nil?
+#     m = _search(offset, 0)
+#     m._storeRubyVcGlobal(0x20)
+#     m
+#   end
+
   def source
     # return the original string of the pattern
     @source
@@ -225,7 +232,16 @@ class Regexp
 
   def _index_string(string, offset)
     # used by String index
-    md = self.match(string)
+    start = offset.nil? ? 0 : offset
+    md = self._search(string, start, nil)
+    md._storeRubyVcGlobal(0x20)
+    md.begin(0) + offset
+  end
+
+  def _rindex_string(string, offset)
+    # used by String rindex
+    md = self._search(string, offset, 0)
+    md._storeRubyVcGlobal(0x20)
     return nil if md.equal?(nil)
     md.begin(0) + offset
   end

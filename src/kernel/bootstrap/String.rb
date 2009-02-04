@@ -108,7 +108,7 @@ class String
   #
   def =~(regex)
     if regex._isRegexp
-      regex.=~(self) 
+      regex.=~(self)
     else
       raise ArgumentError , 'expected a Regex'
     end
@@ -366,22 +366,24 @@ class String
 
   def index(item, offset=0)
     offset = Type.coerce_to(offset, Integer, :to_int)
-    if offset < 0
-      offset = self.size + offset
-    end
+    offset += size if offset < 0
+    return nil if offset < 0 || offset > size
+
     if item._isString
+      return offset if item.size == 0
       st_idx = self._findStringStartingAt(item, offset + 1)
     elsif item._isInteger
-      st_idx = self._indexOfByte(item % 256 , offset + 1)
+      return nil if item > 255 || item < 0
+      st_idx = self._indexOfByte(item % 256, offset + 1)
+    elsif item._isRegexp
+      st_idx = item._index_string(self, offset) + 1
     else
-      # item should be a Regex
-      return item._index_string(string, offset)
+      # try to coerce to a number or string and try again
+      coerced = Type.coerce_to_string_or_integer(item)
+      return self.index(coerced, offset)
     end
-    if st_idx.equal?(0)
-      return nil
-    else
-      return st_idx - 1
-    end
+
+    return st_idx.equal?(0) ? nil : st_idx - 1
   end
 
   primitive '_insertAllAt', 'insertAll:at:'
@@ -435,8 +437,8 @@ class String
   primitive_nobridge '_indexOfLastByte', 'indexOfLastByte:startingAt:'
 
   def rindex(item, offset=nil)
-    if offset.equal?(nil) 
-      offset = self.size 
+    if offset.equal?(nil)
+      offset = self.size
       if (offset.equal?(0))
         offset = 1
       end
@@ -450,7 +452,7 @@ class String
     if item._isString
       if item.size.equal?(0)
         if self.size.equal?(0)
-          return 0  
+          return 0
         else
           return offset
         end
@@ -459,8 +461,9 @@ class String
     elsif item._isInteger
       st_idx = self._indexOfLastByte(item % 256 , offset )
     else
-      raise NotImplementedError , 'String#rindex(aRegexp) not implemented' 
-    end 
+      st_idx = item._rindex_string(self, offset)
+#      raise NotImplementedError , 'String#rindex(aRegexp) not implemented'
+    end
     if st_idx.equal?(0)
       return nil
     else
