@@ -41,4 +41,13 @@ obj.start
 
 test(obj.width, 12, 'dynamic instvar created from singleton')
 
+### From Ramaze
+# There was a bug in which alias_method would only accept symbols.  Now
+# it should also accept strings.
+class String
+  def escape which = :html
+  end
+  alias_method 'esc', 'escape'
+end
+
 report
