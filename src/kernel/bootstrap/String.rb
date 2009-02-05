@@ -454,7 +454,9 @@ class String
 
     return nil if offset <= 0
 
-    if item._isString
+    if item._isSymbol
+      raise TypeError
+    elsif item._isString
       if item.size == 0
         return my_size if (offset >= my_size)
         return (offset <= my_size) ? (offset - 1) : my_size

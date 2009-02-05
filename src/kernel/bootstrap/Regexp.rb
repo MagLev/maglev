@@ -84,13 +84,6 @@ class Regexp
     m
   end
 
-#   def _rmatch(str, offset=nil)
-#     offset = str.length if offset.nil?
-#     m = _search(offset, 0)
-#     m._storeRubyVcGlobal(0x20)
-#     m
-#   end
-
   def source
     # return the original string of the pattern
     @source

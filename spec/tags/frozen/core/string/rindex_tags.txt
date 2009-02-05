@@ -1,4 +1,3 @@
-fails:String#rindex with object raises a TypeError if obj isn't a String, Fixnum or Regexp
 fails:String#rindex with String starts the search at the given offset
 fails:String#rindex with Regexp behaves the same as String#rindex(string) for escaped string regexps
 fails:String#rindex with Regexp returns the index of the first match from the end of string of regexp
