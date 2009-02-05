@@ -436,6 +436,10 @@ class String
   primitive_nobridge '_lastSubstring', 'findLastSubString:startingAt:'
   primitive_nobridge '_indexOfLastByte', 'indexOfLastByte:startingAt:'
 
+  # Return the index of the last occurrence of the given substring,
+  # character or pattern in self.  Returns nil if not found.  If the second
+  # parameter is present, it specifies the position in the string to end
+  # the search -- characters beyond this point will not be considered.
   def rindex(item, original_offset=Undefined)
     my_size = self.size
     if original_offset.equal?(Undefined)
