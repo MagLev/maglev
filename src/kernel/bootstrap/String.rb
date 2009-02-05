@@ -451,23 +451,23 @@ class String
     return nil if offset <= 0
 
     if item._isString
-#      puts "=== offset: #{offset} my_size: #{my_size} "
       if item.size == 0
+        return my_size if (offset >= my_size)
         return (offset <= my_size) ? (offset - 1) : my_size
       end
       st_idx = self._lastSubstring(item, offset)
     elsif item._isInteger
       return nil if item > 255 || item < 0
-#      puts "=== #{self}.rindex(#{item.inspect}, #{offset}): item % 256: #{item % 256} original_offset: #{original_offset}"
       st_idx = self._indexOfLastByte(item % 256 , offset)
     elsif item._isRegexp
-      st_idx = item._rindex_string(self, offset)
+      st_idx = item._rindex_string(self, offset - 1)
+      return nil if st_idx.nil?
+      st_idx += 1
     else
       coerced = Type.coerce_to(item, String, :to_str)
       return self.rindex(coerced, original_offset)
     end
 
-#    puts "=== #{self}.rindex(#{item.inspect}, #{offset}): st_idx #{st_idx.inspect}"
     return st_idx.equal?(0) ? nil : st_idx - 1
   end
 

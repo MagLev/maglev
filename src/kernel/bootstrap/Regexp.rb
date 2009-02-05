@@ -239,11 +239,13 @@ class Regexp
   end
 
   def _rindex_string(string, offset)
-    # used by String rindex
     md = self._search(string, offset, 0)
     md._storeRubyVcGlobal(0x20)
     return nil if md.equal?(nil)
-    md.begin(0) + offset
+    return md.begin(0) if md[0].nil?
+    match_len = md.end(0) - md.begin(0)
+    return md.begin(0) + 1 if match_len == 0
+    md.begin(0)
   end
 
   # TODO: limit is not used....
