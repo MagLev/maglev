@@ -715,7 +715,7 @@ class Array
   end
 
 
-  # replace written in Smalltalk 
+  # replace written in Smalltalk
   # so it can use the copyFrom:to:into:startingAt  primitive
   primitive 'replace', 'rubyReplace:'
 
@@ -756,11 +756,14 @@ class Array
 
   def slice!(x, y = nil)
     if y
+      return [] if size == 0
       result = self[x,y]
-      self[x,y] = nil
+      self[x,y] = []
     else
       result = self[x]
-      self[x] = nil
+      unless result.nil?
+        self.delete_at(x)
+      end
     end
     result
   end
