@@ -1,10 +1,8 @@
 # 
 # Benchmark blocks of code selected to stress VM garbage collection.
 #
-# Run this set of benchmarks using bin/rubypazl benchmark_gc
-# 
 # When both of these benchmarks run are run sequentially (as in this file) the 
-# gem needs at least 350MB gemstone GEM_TEMPOBJ_CACHE_SIZE
+# MagLev gem needs at least 350MB gemstone GEM_TEMPOBJ_CACHE_SIZE to run this
 #
 
 require 'benchmark'
