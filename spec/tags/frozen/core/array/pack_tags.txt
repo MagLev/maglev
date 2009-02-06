@@ -120,7 +120,6 @@ fails:Array#pack with format 'G' accepts a NaN
 fails:Array#pack with format 'G' keeps order of nonnegative real numbers
 fails:Array#pack with format 'G' reverses order of nonpositive real numbers
 fails:Array#pack with format 'M' appends soft line break after each specified number of chars + 1 encoded char in encoded string for the specified number > 1
-fails:Array#pack with format 'M' does not check whether the pack argument responds to #to_s before call #to_s
 fails:Array#pack with format 'M' comsumres only one array item per a format
 fails:Array#pack with format 'M' properly handles recursive arrays
 fails:Array#pack with format 'm' appends newline whenever after consumes [number/3]*3 of bytes for the specified number > 2, where [x] is the floor function
