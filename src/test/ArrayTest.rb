@@ -117,7 +117,7 @@ class ArrayTest
     arr = [1, 2, 3] << 4 << 5
     if arr != [1, 2, 3, 4, 5]
       raise 'ERROR'
-    end   
+    end
   end
 
   # Expected value: 0
@@ -127,7 +127,7 @@ class ArrayTest
     res = arr1 <=> arr2
     if res != 0
       raise 'ERROR'
-    end    
+    end
   end
 
   # Expected value: 1
@@ -147,7 +147,7 @@ class ArrayTest
     res = arr2 <=> arr1
     if res == 0
       raise 'ERROR'
-    end   
+    end
   end
 
   # Expected value: true
@@ -967,6 +967,47 @@ class << a
   def to_int ; 2; end
 end
 test(ary[a], 3, 'array coerces with :to_int')
+
+
+a = [1, 2, 3, 4, 5, 6]
+test(a.slice!(2, 3), [3,4,5],       "slice!  1")
+test(a,              [1,2,6],       "slice!  2")
+
+test(a.slice!(1, 1), [2],           "slice!  3")
+test(a,              [1,6],         "slice!  4")
+
+test(a.slice!(1, 0), [],            "slice!  5")
+test(a,              [1,6],         "slice!  6")
+
+test(a.slice!(2, 0), [],            "slice!  7")
+test(a,              [1,6],         "slice!  8")
+
+test(a.slice!(0, 4), [1,6],         "slice!  9")
+test(a,              [],            "slice! 10")
+
+test(a.slice!(0, 4), [],            "slice! 11")
+test(a,              [],            "slice! 12")
+
+test(a.slice!(0, 4), [],            "slice! 13")
+test(a,              [],            "slice! 14")
+
+a = [1,2]
+test(a.slice!(4),    nil,           "slice! 15")
+test(a,              [1,2],         "slice! 16")
+
+test(a.slice!(4,0),  nil,           "slice! 17")
+test(a,              [1,2,nil,nil], "slice! 18")
+
+a = [1,2]
+test(a[4,10] = nil,  nil,             "assign  1")
+test(a,              [1,2,nil,nil],   "assign  2")
+
+test(a[4,10] = 4,    4,               "assign  3")
+test(a,              [1,2,nil,nil,4], "assign  4")
+
+a = [1,2]
+test(a[4,10] = 4,    4,               "assign  5")
+test(a,              [1,2,nil,nil,4], "assign  6")
 
 # begin
 #   ary["cat"]
