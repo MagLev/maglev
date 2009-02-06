@@ -650,19 +650,6 @@ class Array
     self
   end
 
-  def join(s="")
-    out = ""
-    max = length - 1
-    i = 0
-    while i < max
-      out << self[i].to_s
-      out << s
-      i = i + 1
-    end
-    out << self[max].to_s
-    out
-  end
-
   primitive '_last', 'last'
   def last(count = Undefined)
     # Smalltalk SequenceableCollection>>last raises exception calling last

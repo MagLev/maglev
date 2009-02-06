@@ -258,4 +258,49 @@ class Array
     end
     return block_given? ? nil : out
   end
+
+
+  # Generates a string from converting all elements of
+  # the Array to strings, inserting a separator between
+  # each. The separator defaults to $,. Detects recursive
+  # Arrays.
+  def join(s = Undefined)
+    # this is mostly Rubinius code, but modified for our API
+    # Put in delta since we need the recursion guard found in common.
+    my_size = size
+    return "" if my_size.equal?(0)
+    if s.equal?(Undefined)
+      sep = $,
+    else
+      begin
+        sep = s.nil? ? nil : s.to_str
+      rescue NoMethodError
+        raise TypeError, "Cannot convert #{s.inspect} to str"
+      end
+    end
+
+    out = ""
+#    out.taint if sep.tainted? or self.tainted?
+    i = 0
+    while(i < my_size)
+      elem = at(i)
+      out << sep unless (sep.equal?(nil) || i == 0)
+
+      if elem.kind_of?(Array)
+        if RecursionGuard.inspecting?(elem)
+          out << "[...]"
+        else
+          RecursionGuard.inspect(self) do
+            out << elem.join(sep)
+          end
+        end
+      else
+        out << elem.to_s
+#        out.taint if elem.tainted? and not out.tainted?
+      end
+      i += 1
+    end
+    out
+  end
+
 end
