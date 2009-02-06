@@ -76,7 +76,8 @@ class Array
   class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
 
   def self.new(size=0, value=nil)
-    _alloc(size, value)
+    s = Type.coerce_to(size, Integer, :to_int)
+    _alloc(s, value)
   end
 
   def self.new(arg)
