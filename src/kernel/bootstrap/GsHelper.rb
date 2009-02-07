@@ -1,3 +1,5 @@
+++++ OBSOLETE FILE , no longer used
+
 # NOTE: This file must be included AFTER Class.rb so that we can call new
 # on Object.
 
