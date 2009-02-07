@@ -44,3 +44,4 @@ provided by different classes and messages
 * +ObjectSpace+ is not supported.
 * <tt>Object.equal?</tt> may not be overridden.  For performance reasons,
   it is a special selector.
+* String#unpack and Array#pack do not support pointers ('p' and 'P').

@@ -24,7 +24,7 @@ class NilClass
      nil
    end
 
-   # support for RubyBackRefNode productions when $~ is nil 
+   # support for RubyBackRefNode productions when $~ is nil
    def pre_match
     nil
    end
@@ -36,9 +36,15 @@ class NilClass
    end
 
    def call(*args)
-     # invoked when yield used with no block argument 
+     # invoked when yield used with no block argument
      raise LocalJumpError , 'no block was passed'
    end
 
+   private
+
+   # This prevents infinite recursion if $_ is nil and you call
+   # split(...).  Now it will raise an exception
+   def split(pat, limit)
+   end
 end
 
