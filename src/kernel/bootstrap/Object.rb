@@ -16,17 +16,18 @@ class Object
     #    Attempts to reimplement them will cause compile-time errors.
     #    Entries here are so that perform will work.
     # _isInteger allows integer?  special sends to non-Numeric objects
-    primitive_nobridge '_isInteger', '_isInteger'
+    primitive_nobridge '_isArray', '_isArray'
+    primitive_nobridge '_isBlock', '_isExecBlock'
     primitive_nobridge '_isFixnum', '_isSmallInteger'
     primitive_nobridge '_isFloat', '_isFloat'
-    primitive_nobridge '_isNumber', '_isNumber'
-    primitive_nobridge '_isSymbol', '_isSymbol'
-    primitive_nobridge '_isBlock', '_isExecBlock'
-    primitive_nobridge '_isArray', '_isArray'
     primitive_nobridge '_isHash', '_isRubyHash'
-    primitive_nobridge '_isString', '_isOneByteString'
+    primitive_nobridge '_isInteger', '_isInteger'
+    primitive_nobridge '_isNumber', '_isNumber'
     primitive_nobridge '_isRegexp', '_isRegexp'
     primitive_nobridge '_isRange', '_isRange'
+    primitive_nobridge '_isString', '_isRubyString'  # returns false for Symbols
+    primitive_nobridge '_isSymbol', '_isSymbol'      # returns false for Strings
+    primitive_nobridge '_isStringOrSymbol', '_isOneByteString'
     # End special sends
 
     #  following are installed by RubyContext>>installPrimitiveBootstrap
@@ -133,7 +134,9 @@ class Object
     primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
     def instance_variable_get(a_name)
-      a_name = Type.coerce_to(a_name, String, :to_str)
+      unless a_name._isStringOrSymbol
+        a_name = Type.coerce_to(a_name, String, :to_str)
+      end
       unless (a_name[0].equal?( ?@ ))
         raise NameError, "`#{a_name}' is not allowed as an instance variable name"
       end
@@ -141,7 +144,9 @@ class Object
     end
 
     def instance_variable_set(a_name, a_val)
-      a_name = Type.coerce_to(a_name, String, :to_str)
+      unless a_name._isStringOrSymbol
+        a_name = Type.coerce_to(a_name, String, :to_str)
+      end
       unless (a_name[0].equal?( ?@ ))
         raise NameError, "`#{a_name}' is not allowed as an instance variable name"
       end
@@ -289,5 +294,19 @@ class Object
         false
       end
     end
-
 end
+
+
+# Sentinal value used to distinguish between nil as a value passed by the
+# user and the user not passing anything for a defaulted value.  E.g.,:
+#
+#   def foo(required_param, optional_param=Undefined)
+#     if optional_param.equal?( Undefined )
+#       puts "User did not pass a value"
+#     else
+#       puts "Users passed #{optional_param} (which may be nil)"
+#     fi
+#   end
+#
+Undefined = Object.new
+
