@@ -153,9 +153,9 @@ class Array
   def -(arg)
     argSize = arg.size
     mySize = size
-    default = Array.new
+    default = []
     h = Hash.new(default)
-    res = Array.new
+    res = []
     i = 0
     while i < argSize
       el = arg[i]
