@@ -1,5 +1,7 @@
 module Kernel
 
+  primitive_nobridge '_resolve_smalltalk_class', 'resolveSmalltalkClass:'
+
   # Print messages for stubbed methods
   @@gs_WARNSTUB = false
   def _stub_warn(msg)
