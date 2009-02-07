@@ -7,6 +7,8 @@ class File
   SEPARATOR      = '/'
   Separator      = SEPARATOR
 
+  Stat = _resolve_smalltalk_class(:GsFileStat)
+
   # FILE::LOCK  constants initialized below
 
   primitive 'close', 'close'
@@ -50,8 +52,8 @@ class File
   end
 
   def self.basename(filename, suffix='')
-    fn = StringValue(filename)
-    sf = StringValue(suffix)
+    fn = Type.coerce_to(filename, String, :to_str)
+    sf = Type.coerce_to(suffix, String, :to_str)
     b = fn.split('/')[-1]
     if suffix.eql?('.*')
       index = b.rindex('.')
@@ -171,9 +173,9 @@ class File
   # done on the path.  Replaces '.' and '..' in the path with the
   # appropriate path components.  Does not coalesce contiguous '/'s.
   def self.expand_path(a_path, a_dir = nil)
-    path = StringValue(a_path) # nil a_path should raise TypeError
+    path = Type.coerce_to(a_path, String, :to_str) # nil a_path should raise TypeError
 
-    dir = a_dir.nil? ? Dir.pwd : StringValue(a_dir)
+    dir = a_dir.nil? ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
     dir = Dir.pwd if dir.empty?
 
     return dir if path.empty?
