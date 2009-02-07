@@ -49,7 +49,7 @@ RUBY.require 'kernel/bootstrap/Behavior.rb'
 RUBY.require 'kernel/bootstrap/Class.rb'
 RUBY.require 'kernel/bootstrap/Object.rb'
 
-RUBY.require 'kernel/bootstrap/GsHelper.rb'
+# deleted use of GsHelper.rb
 
 RUBY.require 'kernel/bootstrap/Fixnum.rb'
 RUBY.require 'kernel/bootstrap/Integer.rb'
