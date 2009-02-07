@@ -5,13 +5,21 @@ class IdentitySet
     primitive_nobridge '*'
     primitive_nobridge '+'
     primitive_nobridge '-'
+    primitive_nobridge '==' , '='
+    primitive '_addall', 'addAll:'
     primitive 'each&', 'do:'
     primitive 'length', 'size'
 
     primitive_nobridge '_includes', 'includes:'
     primitive_nobridge '_remove', 'removeIfPresent:'
 
-    class_primitive 'new'
+    class_primitive 'new' , 'new'
+
+    def self.with_all(*array)
+      o = new
+      o._addall(*array)   
+      o
+    end
 
     def self.name
       # override Smalltalk name
