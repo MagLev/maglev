@@ -39,12 +39,24 @@ module Errno
   #
   #     <tt>Errno::EBADF         # => A class representing Errno number 9.</tt>
   #     <tt>Errno::EBADF::Errno  # => 9</tt>
-  def self._createErrnoClass(errno, name)
-    klass = Class.new(SystemCallError)
-    const_set(name, klass)
 
-    # TODO: Currently, const_set is just stubbed out, so this doesn't work...
-    klass.const_set(:Errno, errno)  # TODO: Hack for now.
+  # following 4 exceptions may be signaled from smalltalk code.
+  #   but they are subclasses of SocketError not SystemCallError... 
+  #   so don't use them here.  
+  # EBADF = _resolve_smalltalk_class(:SocketErrorEBADF)
+  # ECONNRESET = _resolve_smalltalk_class(:SocketErrorECONNRESET)
+  # ENOTCONN = _resolve_smalltalk_class(:SocketErrorENOTCONN)
+  # EPIPE = _resolve_smalltalk_class(:SocketErrorEPIPE)
+
+  def self._createErrnoClass(errno, name)
+    if const_defined?(name)
+      klass = const_get(name)  # class already mapped to a Smalltalk class
+    else
+      klass = Class.new(SystemCallError)
+      const_set(name, klass)
+    end
+    klass.const_set(:Errno, errno)  
+
     # If we want to add a const_missing hook, then comment out the above
     # line and do something like this instead:
 #     klass.instance_eval do
