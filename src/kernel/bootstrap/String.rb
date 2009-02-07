@@ -56,11 +56,11 @@ class String
     str
   end
 
-  primitive_nobridge '_append', ','
+  primitive_nobridge '_concatenate', ','
 
   def +(o)
     other = Type.coerce_to(o, String, :to_str)
-    _append other
+    self._concatenate(other)
   end
 
   # note smalltalk addAll:  returns arg, not receiver
@@ -84,6 +84,7 @@ class String
       end
       # From Rubinius...there are a lot of strange things in how
       # string handles <=>...
+      return nil if o._isSymbol
       return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
       return nil unless tmp = (o <=> self)
       return -tmp
@@ -377,8 +378,9 @@ class String
       st_idx = self._indexOfByte(item % 256, offset + 1)
     elsif item._isRegexp
       st_idx = item._index_string(self, offset) + 1
-    else
-      # try to coerce to a number or string and try again
+    else 
+      # try to coerce to a number or string and try again,
+      #   will raise TypeError if item is a Symbol .
       coerced = Type.coerce_to_string_or_integer(item)
       return self.index(coerced, offset)
     end
@@ -454,9 +456,7 @@ class String
 
     return nil if offset <= 0
 
-    if item._isSymbol
-      raise TypeError
-    elsif item._isString
+    if item._isString
       if item.size == 0
         return my_size if (offset >= my_size)
         return (offset <= my_size) ? (offset - 1) : my_size
@@ -533,7 +533,7 @@ class String
     elsif pattern.kind_of?(Regexp)
       # Pass
     else
-      pattern = StringValue(pattern) unless pattern.kind_of?(String)
+      pattern = Type.coerce_to(pattern, String, :to_str)
       pattern = Regexp.new(Regexp.quote(pattern))
     end
 
@@ -791,7 +791,7 @@ class String
   # This started off as Rubinius, but was heavily modified since most
   # work is done in smalltalk.
   def justify(width, direction, padstr=" ")
-    padstr = StringValue(padstr)
+    padstr = Type.coerce_to(padstr, String, :to_str)
     raise ArgumentError, "zero width padding" if padstr.size.equal?(0)
 
     width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum

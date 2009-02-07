@@ -145,13 +145,17 @@ module Type
   end
 
   def self.coerce_to_string_or_integer(item)
-    begin
-      coereced = Type.coerce_to(item, Integer, :to_int)
-    rescue TypeError
-      coereced = Type.coerce_to(item, String, :to_str)
-      # May raise, if not a string, but let that flow to caller
+    if item._isSymbol
+      raise TypeError, 'cannot convert Symbol to String'
+    else
+      begin
+        coereced = Type.coerce_to(item, Integer, :to_int)
+      rescue TypeError
+        coereced = Type.coerce_to(item, String, :to_str)
+        # May raise, if not a string, but let that flow to caller
+      end
+      return coereced
     end
-    return coereced
   end
 end
 # END RUBINIUS

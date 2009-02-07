@@ -5,13 +5,20 @@
 
 class Symbol
   class_primitive_nobridge 'all_symbols', '_rubyAllSymbols'
+
+  def self.superclass
+    Object  # override because Smalltalk would return String
+  end 
+
   primitive_nobridge 'id2name', 'asString'
   primitive_nobridge '==', '='
   primitive_nobridge 'hash'
 
+  # _concatenate inherited from String for now
   def inspect(touchedSet=nil)
-    ':' + self
+    ':'._concatenate(self)
   end
+
 
   primitive_nobridge 'to_i', 'asOop'
   primitive_nobridge 'to_int', 'asOop'
