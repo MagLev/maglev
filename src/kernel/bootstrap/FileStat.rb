@@ -38,70 +38,75 @@ class File::Stat
   S_IWOTH  = 0000002  # W for other
   S_IXOTH  = 0000001  # X for other
 
-  primitive '_atime', 'atimeUtcSeconds'
-  primitive '_ctime', 'ctimeUtcSeconds'
-  primitive '_mtime', 'mtimeUtcSeconds'
-  primitive 'mode', 'mode'
+  def mode
+    @mode
+  end
 
   def <=>(other)
     return nil unless other.is_a?(File::Stat)
-    self.mtime <=> other.mtime
+    mtime <=> other.mtime
   end
 
   def atime
-    Time.at _atime
+    Time.at @atime
   end
 
-  primitive 'blksize', 'blksize'
-
+  def blksize
+    @blksize
+  end
+ 
   def blockdev?
-    (mode & S_IFMT) == S_IFBLK
+    (@mode & S_IFMT) == S_IFBLK
   end
 
-  primitive 'blocks', 'blocks'
+  def blocks
+    @blocks
+  end
 
   def chardev?
-    (mode & S_IFMT) == S_IFCHR
+    (@mode & S_IFMT) == S_IFCHR
   end
 
   def ctime
-    Time.at _ctime
+    Time.at @ctime
   end
 
-  primitive 'dev', 'dev'
+  def dev
+    @dev
+  end
 
   def dev_major
-    _major(dev)
+    _major(@dev)
   end
 
   def dev_minor
-    _minor(dev)
+    _minor(@dev)
   end
 
   def directory?
-    (mode & S_IFMT) == S_IFDIR
+    (@mode & S_IFMT) == S_IFDIR
   end
 
   def executable?
     return true if superuser?
-    return mode & S_IXUSR != 0 if owned?
-    return mode & S_IXGRP != 0 if grpowned?
-    return mode & S_IXOTH != 0
+    return @mode & S_IXUSR != 0 if owned?
+    return @mode & S_IXGRP != 0 if grpowned?
+    return @mode & S_IXOTH != 0
   end
 
   def executable_real?
     return true if superuser?
-    return mode & S_IXUSR != 0 if rowned?
-    return mode & S_IXGRP != 0 if rgrpowned?
-    return mode & S_IXOTH != 0
+    return @mode & S_IXUSR != 0 if rowned?
+    return @mode & S_IXGRP != 0 if rgrpowned?
+    return @mode & S_IXOTH != 0
   end
 
   def file?
-    (mode & S_IFMT) == S_IFREG
+    (@mode & S_IFMT) == S_IFREG
   end
 
   def ftype
-    case mode & S_IFMT
+    case @mode & S_IFMT
     when S_IFBLK : 'blockSpecial'
     when S_IFCHR : 'characterSpecial'
     when S_IFDIR : 'directory'
@@ -113,96 +118,109 @@ class File::Stat
     end
   end
 
-  primitive 'gid', 'gid'
+  def gid
+    @gid
+  end
 
   def grpowned?
-    gid == Gemstone.getegid
+    @gid == Gemstone.getegid
   end
 
-  primitive 'ino', 'ino'
+  def ino
+    @ino
+  end
 
   def mtime
-    Time.at _mtime
+    Time.at @mtime
   end
 
-  primitive 'nlink', 'nlink'
+  def nlink
+    @nlink
+  end
 
   def owned?
-    uid == Gemstone.geteuid
+    @uid == Gemstone.geteuid
   end
 
   def pipe?
-    (mode & S_IFMT) == S_IFIFO
+    (@mode & S_IFMT) == S_IFIFO
   end
 
-  primitive 'rdev', 'rdev'
+  def rdev
+    @rdev
+  end
 
   def rdev_major
-    _major(rdev)
+    _major(@rdev)
   end
 
   def rdev_minor
-    _minor(rdev)
+    _minor(@rdev)
   end
 
   def readable?
     return true if superuser?
-    return mode & S_IRUSR != 0 if owned?
-    return mode & S_IRGRP != 0 if grpowned?
-    return mode & S_IROTH != 0
+    return @mode & S_IRUSR != 0 if owned?
+    return @mode & S_IRGRP != 0 if grpowned?
+    return @mode & S_IROTH != 0
   end
 
   def readable_real?
     return true if superuser?
-    return mode & S_IRUSR != 0 if rowned?
-    return mode & S_IRGRP != 0 if rgrpowned?
-    return mode & S_IROTH != 0
+    return @mode & S_IRUSR != 0 if rowned?
+    return @mode & S_IRGRP != 0 if rgrpowned?
+    return @mode & S_IROTH != 0
   end
 
   def setgid?
-    (mode & S_IFMT) == S_ISGID
+    (@mode & S_IFMT) == S_ISGID
   end
 
   def setuid?
-    (mode & S_ISUID) != 0
+    (@mode & S_ISUID) != 0
   end
 
-  primitive 'size', 'size'
+  def size
+    @size
+  end
 
   def size?
-    size == 0 ? nil : size
+    sz = @size 
+    sz.equal?(0) ? nil : sz
   end
 
   def socket?
-    (mode & S_IFMT) == S_IFSOCK
+    (@mode & S_IFMT) == S_IFSOCK
   end
 
   def sticky?
-    (mode & S_ISVTX) != 0
+    (@mode & S_ISVTX) != 0
   end
 
   def symlink?
-    (mode & S_IFMT) == S_IFLNK
+    (@mode & S_IFMT) == S_IFLNK
   end
 
-  primitive 'uid', 'uid'
+  def uid
+    @uid
+  end
 
   def writable?
     return true if superuser?
-    return mode & S_IWUSR != 0 if owned?
-    return mode & S_IWGRP != 0 if grpowned?
-    return mode & S_IWOTH != 0
+    return @mode & S_IWUSR != 0 if owned?
+    return @mode & S_IWGRP != 0 if grpowned?
+    return @mode & S_IWOTH != 0
   end
 
   def writable_real?
     return true if superuser?
-    return mode & S_IWUSR != 0 if rowned?
-    return mode & S_IWGRP != 0 if rgrpowned?
-    return mode & S_IWOTH != 0
+    return @mode & S_IWUSR != 0 if rowned?
+    return @mode & S_IWGRP != 0 if rgrpowned?
+    return @mode & S_IWOTH != 0
   end
 
   def zero?
-    size == 0
+    @size.equal?(0)
   end
 
   # pull the major device number out of a dev_t
@@ -219,11 +237,11 @@ class File::Stat
   end
 
   def rgrpowned?
-    gid == Gemstone.getgid
+    @gid == Gemstone.getgid
   end
 
   def rowned?
-    uid == Gemstone.getuid
+    @uid == Gemstone.getuid
   end
 
 end
