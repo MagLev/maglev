@@ -58,6 +58,25 @@ test(Regexp.new('.D', Regexp::IGNORECASE|Regexp::MULTILINE) =~ "\nD",
      0,
      "Multiple options A")
 
+
+
+# Test a couple of regressions with MatchData and distinguishing
+# between no match and zero length string matches.
+md = /^([+-]?)(0[bdox])?(.*)/i.match '123'
+
+test(md[0], "123", 'A md[0]')
+test(md[1], "",    'A md[1]')
+test(md[2], nil,   'A md[2]')
+test(md[3], "123", 'A md[3]')
+
+
+md = /^(.*)::(.*)$/.match 'fc00::'
+
+test(md[0], "fc00::", 'md[0]')
+test(md[1], "fc00",   'md[1]')
+test(md[2], "",       'md[2]')
+test(md[3], nil,      'md[3]')
+
 report
 
 class RegexpTest
