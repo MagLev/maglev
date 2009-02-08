@@ -81,7 +81,9 @@ class ThrTest
     t['B'] = 7
     t['C'] = 6
     s = t.join(1)
-    unless (x = $A.sort ) == [:B, :C];		      Failed() ; end
+    act = IdentitySet.with_all($A) 
+    exp = IdentitySet.with_all( [:B, :C] )
+    unless act == exp  ;   		      Failed() ; end
     unless t.key?(:C).equal?(true) ;		      Failed() ; end
     unless t.key?(:D).equal?(false) ;		      Failed() ; end
 
