@@ -42,24 +42,14 @@ class Struct
 
   def self.new(klass_name, *attrs, &block)
 
-    # GEMSTONE: TODO: when ticket 338 is fixed, replace next eight lines
-    # with the commented out coded below.
-    unless klass_name.nil?
-      if klass_name._isSymbol
+    unless klass_name.nil? then
+      begin
+        klass_name = Type.coerce_to(klass_name, String, :to_str)
+      rescue TypeError
         attrs.unshift klass_name
         klass_name = nil
-      else
-        klass_name = StringValue klass_name
       end
     end
-#     unless klass_name.nil? then
-#       begin
-#         klass_name = StringValue klass_name
-#       rescue TypeError
-#         attrs.unshift klass_name
-#         klass_name = nil
-#       end
-#     end
 
     begin
       attrs = attrs.map { |attr| attr.to_sym }

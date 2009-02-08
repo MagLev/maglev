@@ -7,7 +7,7 @@ class IO
   #  a = IO.readlines("testfile")
   #  a[0]   #=> "This is line one\n"
   def self.readlines(name, sep_string = $/)
-    io = File.open(StringValue(name), 'r')
+    io = File.open( Type.coerce_to(name, String, :to_str), 'r')
     return if io.nil?
 
     begin
@@ -26,7 +26,7 @@ class IO
   #  f = File.new("testfile")
   #  f.readlines[0]   #=> "This is line one\n"
   def readlines(sep=$/)
-    ary = Array.new
+    ary = []
     while line = gets(sep)
       ary << line
     end

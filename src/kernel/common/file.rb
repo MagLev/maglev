@@ -218,8 +218,8 @@ class File
   #  File.fnmatch(pattern, 'a/.b/c/foo', File::FNM_PATHNAME)    #=> false
   #  File.fnmatch(pattern, 'a/.b/c/foo', File::FNM_PATHNAME | File::FNM_DOTMATCH) #=> true
   def self.fnmatch(pattern, path, flags=0)
-    pattern = StringValue(pattern).dup
-    path    = StringValue(path).dup
+    pattern = Type.coerce_to(pattern, String, :to_str).dup
+    path    = Type.coerce_to(path, String, :to_str).dup
     flags   = Type.coerce_to(flags, Fixnum, :to_int) unless Fixnum === flags
 
     name_match(pattern, path, flags, 0, pattern.size, 0, path.size)
