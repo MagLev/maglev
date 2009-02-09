@@ -43,7 +43,8 @@ end
 
 benchmark = BenchmarkRunner.new(label, iterations, timeout)
 benchmark.run do
-  array = File.read("random.input").split(/\n/).map!{|n| n.to_i }
+  fname = File.dirname(__FILE__) + "/random.input"
+  array = File.read(fname).split(/\n/).map!{|n| n.to_i }
   puts "Mergesort verified." if array.merge_sort == array.sort
 end
   
