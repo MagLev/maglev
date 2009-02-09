@@ -63,8 +63,8 @@ module Kernel
     # use 0x3? because one extra stack frame due to bridging methods .
     # max send site is :::* , call is via a :::* to :::: bridge meth .
     vcgl = [ self._getRubyVcGlobal(0x30) ,
-      self._getRubyVcGlobal(0x31) ]
-    res = _eval(str, binding, vcgl)
+      self._getRubyVcGlobal(0x31) , nil ]
+    res = _eval(str, binding, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x30)
     vcgl[1]._storeRubyVcGlobal(0x31)
     res
@@ -73,8 +73,8 @@ module Kernel
   def eval(str)
     # no bridge methods for this an subsequent variants
     vcgl = [ self._getRubyVcGlobal(0x20) ,
-      self._getRubyVcGlobal(0x21) ]
-    res = _eval(str, nil, vcgl)
+             self._getRubyVcGlobal(0x21) , self ]
+    res = _eval(str, nil, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
@@ -82,8 +82,8 @@ module Kernel
 
   def eval(str, binding)
     vcgl = [ self._getRubyVcGlobal(0x20) ,
-      self._getRubyVcGlobal(0x21) ]
-    res = _eval(str, binding, vcgl)
+      self._getRubyVcGlobal(0x21), nil ]
+    res = _eval(str, binding, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
@@ -91,8 +91,8 @@ module Kernel
 
   def eval(str, binding, file_not_used)
     vcgl = [ self._getRubyVcGlobal(0x20) ,
-      self._getRubyVcGlobal(0x21) ]
-    res = _eval(str, binding, vcgl)
+      self._getRubyVcGlobal(0x21) , nil ]
+    res = _eval(str, binding, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
