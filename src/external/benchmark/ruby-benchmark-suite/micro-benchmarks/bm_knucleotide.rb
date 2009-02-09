@@ -39,7 +39,8 @@ end
 benchmark = BenchmarkRunner.new(label, iterations, timeout)
 benchmark.run do
   seq = String.new
-  File.open("fasta.input", "r").each_line do |line|
+  fname = File.dirname(__FILE__) + "/fasta.input" 
+  File.open(fname, "r").each_line do |line|
     seq << line.chomp
   end
   [1,2].each {|i| sort_by_freq(seq, i) }

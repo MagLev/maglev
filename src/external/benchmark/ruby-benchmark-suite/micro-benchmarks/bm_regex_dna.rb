@@ -13,7 +13,8 @@ report = ARGV.last
 benchmark = BenchmarkRunner.new(label, iterations, timeout)
 benchmark.run do
   20.times do
-    seq = File.read("fasta.input")
+    fname = File.dirname(__FILE__) + "/fasta.input" 
+    seq = File.read(fname)
     ilen = seq.size
 
     seq.gsub!(/>.*\n|\n/,"")

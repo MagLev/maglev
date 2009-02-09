@@ -21,7 +21,8 @@ benchmark = BenchmarkRunner.new(label, iterations, timeout)
 benchmark.run do
   seq = Array.new
    
-  File.open("fasta.input", "r").each_line do |line|
+  fname = File.dirname(__FILE__) + "/fasta.input" 
+  File.open(fname, "r").each_line do |line|
     seq << line.chomp
   end
 
