@@ -109,7 +109,7 @@ micro-benchmarks/bm_count_shared_thread.rb;1,=MIN(B109:E109),=F109/G109,=B109/G1
 micro-benchmarks/bm_count_shared_thread.rb;2,=MIN(B110:E110),=F110/G110,=B110/G110
 micro-benchmarks/bm_count_shared_thread.rb;4,=MIN(B111:E111),=F111/G111,=B111/G111
 micro-benchmarks/bm_count_shared_thread.rb;8,=MIN(B112:E112),=F112/G112,=B112/G112
-micro-benchmarks/bm_count_shared_thread.rb,16,=MIN(B113:E113),=F113/G113,=B113/G113
+micro-benchmarks/bm_count_shared_thread.rb;16,=MIN(B113:E113),=F113/G113,=B113/G113
 micro-benchmarks/bm_fannkuch.rb;6,=MIN(B114:E114),=F114/G114,=B114/G114
 micro-benchmarks/bm_fannkuch.rb;8,=MIN(B115:E115),=F115/G115,=B115/G115
 micro-benchmarks/bm_fannkuch.rb;10,=MIN(B116:E116),=F116/G116,=B116/G116
