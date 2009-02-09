@@ -38,7 +38,8 @@ Benchmark.bm(7) do |bmr|
         20.times{|j| str << "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYy"}
         a[x] = str
         10.times do |y|
-          20.times{|k| str << "GaRbAgEGaRbAgEGaRbAgEGaRbAgEGaRbAgEGaRbAgEGaRbAgE_"}
+          junk = ""
+          20.times{|k| junk << "GaRbAgEGaRbAgEGaRbAgEGaRbAgEGaRbAgEGaRbAgEGaRbAgE_"}
         end
       end
     end
