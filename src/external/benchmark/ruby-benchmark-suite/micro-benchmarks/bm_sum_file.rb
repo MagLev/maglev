@@ -9,7 +9,8 @@ benchmark = BenchmarkRunner.new(label, iterations, timeout)
   benchmark.run do
   100.times do
     count = 0
-    File.open("random.input", "r").each_line do |line|
+    fname = File.dirname(__FILE__) + "/random.input"
+    File.open(fname, "r").each_line do |line| 
       count += line.to_i
     end
     puts count

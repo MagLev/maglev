@@ -16,7 +16,8 @@ end
 
 benchmark = BenchmarkRunner.new(label, iterations, timeout)
 benchmark.run do
-  array = File.read("random.input").split(/\n/).map!{|n| n.to_i }
+  fname = File.dirname(__FILE__) + "/random.input"
+  array = File.read(fname).split(/\n/).map!{|n| n.to_i }
   puts "Quicksort verified." if array.qsort == array.sort
 end
   
