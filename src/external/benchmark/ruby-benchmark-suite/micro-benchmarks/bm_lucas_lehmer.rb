@@ -20,7 +20,7 @@ input_sizes = [9689, 9941, 11213, 19937] # 4 Mersenne's exponents
 input_sizes.each do |n|
   benchmark = BenchmarkRunner.new(label, iterations, timeout)
   benchmark.run do
-    puts "2**#{p} - 1 is prime" if is_prime?(n)
+    puts "2**#{n} - 1 is prime" if is_prime?(n)
   end
   
   File.open(report, "a") {|f| f.puts "#{benchmark.to_s},#{n}" }
