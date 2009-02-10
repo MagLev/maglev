@@ -1,1 +1,0 @@
-fails:Hash#key? returns true if argument is a key
