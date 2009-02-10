@@ -22,6 +22,7 @@
 #    Sort
 #    ToHash
 #    ToString
+require File.dirname(__FILE__) + '/simple.rb'
 
 # Class definition for hash tests
 Hash.new.any? { |x| true }  # ensure Enumerable was included
@@ -335,157 +336,44 @@ class HashTest
     end
 end
 
-
-###
 # Call test methods
-###
+test(HashTest.new.new1(),true,           "new1")
+test(HashTest.new.new2(),true,           "new2")
+test(HashTest.new.new3(),true,           "new3")
+test(HashTest.new.new4(),true,           "new4")
+test(HashTest.new.equals(),true,         "equals")
+test(HashTest.new.copy(),true,           "copy")
+test(HashTest.new.clear(),true,          "clear")
+test(HashTest.new.default1(),nil,        "default1")
+test(HashTest.new.default2(),200,        "default2")
+test(HashTest.new.delete(),true,         "delete")
+test(HashTest.new.deleteIf(),true,       "deleteIf")
+test(HashTest.new.fetch(),300,           "fetch")
+test(HashTest.new.hasKey('a'),true,      "hasKey1")
+test(HashTest.new.hasKey('d'),false,     "hasKey2")
+test(HashTest.new.include('a'),true,     "include1")
+test(HashTest.new.include('d'),false,    "include2")
+test(HashTest.new.member('a'),true,      "member1")
+test(HashTest.new.member('d'),false,     "member2")
+test(HashTest.new.key('a'),true,         "key1")
+test(HashTest.new.key('d'),false,        "key2")
+test(HashTest.new.hasValue('abc'),true,  "hasValue1")
+test(HashTest.new.hasValue('xyz'),false, "hasValue2")
+test(HashTest.new.index('def'),'b',      "index")
 
-puts ""
-puts "****************************"
-puts "Beginning method invocations"
-puts "****************************"
-puts ""
-
-# expectvalue true
-ret = HashTest.new.new1()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.new2()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.new3()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.new4()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.equals()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.copy()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.clear()
-raise "ERROR" unless ret == true
-
-# expectvalue nil
-ret = HashTest.new.default1()
-raise "ERROR" unless ret == nil
-
-# expectvalue 200
-ret = HashTest.new.default2()
-raise "ERROR" unless ret == 200
-
-# expectvalue true
-ret = HashTest.new.delete()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.deleteIf()
-raise "ERROR" unless ret == true
-
-# expectvalue 300
-ret = HashTest.new.fetch()
-raise "ERROR" unless ret == 300
-
-# expectvalue true
-ret = HashTest.new.hasKey('a')
-raise "ERROR" unless ret == true
-
-# expectvalue false
-ret = HashTest.new.hasKey('d')
-raise "ERROR" unless ret == false
-
-# expectvalue true
-ret = HashTest.new.include('a')
-raise "ERROR" unless ret == true
-
-# expectvalue false
-ret = HashTest.new.include('d')
-raise "ERROR" unless ret == false
-
-# expectvalue true
-ret = HashTest.new.member('a')
-raise "ERROR" unless ret == true
-
-# expectvalue false
-ret = HashTest.new.member('d')
-raise "ERROR" unless ret == false
-
-# expectvalue true
-ret = HashTest.new.key('a')
-raise "ERROR" unless ret == true
-
-# expectvalue false
-ret = HashTest.new.key('d')
-raise "ERROR" unless ret == false
-
-# expectvalue true
-ret = HashTest.new.hasValue('abc')
-raise "ERROR" unless ret == true
-
-# expectvalue false
-ret = HashTest.new.hasValue('xyz')
-raise "ERROR" unless ret == false
-
-# expectvalue 'b'
-ret = HashTest.new.index('def')
-raise "ERROR" unless ret == 'b'
-
-# expectvalue nil
 h = HashTest.new
-ret = h.index('xyz')
-raise "ERROR" unless ret == nil
-
-# expectvalue true
-ret = HashTest.new.replace()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.invert()
-raise "ERROR" unless ret == true
-
-# expectvalue 4
-ret = HashTest.new.length()
-raise "ERROR" unless ret == 4
-
-# expectvalue 5
-ret = HashTest.new.size()
-raise "ERROR" unless ret == 5
-
-# expectvalue true
-ret = HashTest.new.merge1()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.merge2()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.merge!()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.update()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.sort()
-raise "ERROR" unless ret == true
-
-# expectvalue true
-ret = HashTest.new.toHash()
-raise "ERROR" unless ret == true
-
-ret = HashTest.new.testInspect()
-raise "ERROR" unless ret == true
-
+test(h.index('xyz'),nil,                 "A")
+test(HashTest.new.replace(),true,        "replace")
+test(HashTest.new.invert(),true,         "invert")
+test(HashTest.new.length(),4,            "length")
+test(HashTest.new.size(),5,              "size")
+test(HashTest.new.merge1(),true,         "merge1")
+test(HashTest.new.merge2(),true,         "merge2")
+test(HashTest.new.merge!(),true,         "merge!")
+test(HashTest.new.update(),true,         "update")
+test(HashTest.new.sort(),true,           "sort1")
+test(HashTest.new.toHash(),true,         "toHash")
+test(HashTest.new.testInspect(),true,    "inspect")
 
 # expectvalue 'aabcbdefcghi'
 # TODO is result always sorted ??? irb seems to be
@@ -493,3 +381,10 @@ raise "ERROR" unless ret == true
 # raise "ERROR" unless ret == 'aabcbdefcghi'
 
 Hash.new.any? { |x| true }
+
+test({1 => "x"}.key?(1.0), false, "eql? test A")
+test({1 => "x"}.key?(1),   true,  "eql? test B")
+test({:a => 1, :b => 2, :c => 3, 4 => 0 }.key?(4.0), false, "eql? test C")
+test({:a => 1, :b => 2, :c => 3, 4 => 0 }.key?(4 ),  true,  "eql? test D")
+
+report

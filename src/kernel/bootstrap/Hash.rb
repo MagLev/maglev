@@ -12,11 +12,12 @@ class Hash
   def self.[](*elements)
     numelem = elements.length
     if ((numelem & 1) != 0)
-      if (numelem.equal?(1) )
+      if (numelem.equal?(1))
         first = elements[0]
         if (first._isHash)
           return first.dup
         end
+        return Type.coerce_to(first, Hash, :to_hash)
       end
       raise ArgumentError , 'odd number of args'
     end

@@ -869,7 +869,9 @@ class Array
   end
 
   def uniq!
+    old_size = size
     replace(uniq)
+    return old_size.equal?(size) ? nil : self
   end
 
   # Prepend elements to self.  If no elements, return unmodified self.

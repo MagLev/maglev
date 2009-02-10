@@ -1,1 +1,0 @@
-fails:Hash#include? returns true if argument is a key
