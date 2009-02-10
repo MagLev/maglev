@@ -3,8 +3,6 @@ class Array
   # TODO: Some of these don't begin with an '_'...
   primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
   primitive_nobridge 'insert_all', 'insertAll:at:'
-  primitive_nobridge 'remove_first', 'removeFirst'
-  primitive_nobridge 'remove_last', 'removeLast'
 
   primitive 'size=', 'size:'
   class_primitive_nobridge '_withAll', 'withAll:'
@@ -75,8 +73,8 @@ class Array
   end
   class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
 
-  def self.new(size=0, value=nil)
-    s = Type.coerce_to(size, Integer, :to_int)
+  def self.new(a_size=0, value=nil)
+    s = Type.coerce_to(a_size, Integer, :to_int)
     _alloc(s, value)
   end
 
@@ -401,7 +399,7 @@ class Array
       end
       i += 1
     end
-    self.size= fill_idx
+    self.size=(fill_idx)
     self
   end
 
@@ -689,11 +687,16 @@ class Array
   end
 
   def pop
-    unless size.equal?(0)
-      remove_last
+    sz = self.size 
+    unless sz.equal?(0)
+      idx = sz - 1
+      elem = self[idx] 
+      self.size=(idx)
+      elem
     end
   end
 
+  primitive_nobridge 'push', '_rubyAddArguments:'
   primitive 'push*', '_rubyAddArguments:'
 
   # Associate: Search through self (an array of arrays).  Return first
@@ -707,10 +710,20 @@ class Array
   # so it can use the copyFrom:to:into:startingAt  primitive
   primitive 'replace', 'rubyReplace:'
 
-  primitive 'reverse'
+  primitive 'reverse', 'reverse'
 
   def reverse!
-    replace(reverse)
+    low = 0
+    high = self.size - 1  
+    while low < high
+      a = self[low]
+      b = self[high]
+      self[high] = a
+      self[low]   = b
+      low = low + 1
+      high = high - 1
+    end
+    self
   end
 
   def reverse_each(&b)
@@ -732,9 +745,14 @@ class Array
     nil
   end
 
+  primitive_nobridge '_remove_from_to_', 'removeFrom:to:'
+
   def shift
-    unless size.equal?(0)
-      remove_first
+    sz = self.size
+    unless sz.equal?(0)
+      elem = self[0]
+      _remove_from_to_(1, 1)
+      elem
     end
   end
 
