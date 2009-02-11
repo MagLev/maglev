@@ -56,11 +56,14 @@ class C
   def self.const_missing(sym)
     sym.to_s
   end
+  TOLERANCE = 33 unless self.const_defined?(:TOLERANCE)
+  TOLERANCE = 44 unless self.const_defined?(:TOLERANCE)
 end
 
 test(C.const_get(:NOT_DEFINED), "NOT_DEFINED", 'const_missing A')
 test(C.const_get(:STILL_NOT_DEFINED), "STILL_NOT_DEFINED", 'const_missing B')
 test(C.const_get(:STILL_NOT_DEFINED), "STILL_NOT_DEFINED", 'const_missing C')
+test(C.const_get(:TOLERANCE), 33,      'const_defined?  C')
 
 # Ensure default const_missing raises a NameError
 begin

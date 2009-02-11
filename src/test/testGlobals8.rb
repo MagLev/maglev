@@ -55,8 +55,9 @@ class TFile
 end
 
 exp_constants = %w( ALT_SEPARATOR ALT_X Constants Separator )
-c = TFile.constants.sort 
-unless c == exp_constants ; raise 'Err' ; end
+cls = TFile
+clist = TFile.constants.sort 
+unless clist == exp_constants ; raise 'Err' ; end
 
 true
 
