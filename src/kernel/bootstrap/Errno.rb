@@ -86,5 +86,5 @@ module Errno
   end
 end
 
-#  createAllErrnoClasses done in Errno2.rb
+Errno.createAllErrnoClasses
 
