@@ -1,0 +1,2 @@
+Errno.createAllErrnoClasses
+
