@@ -179,4 +179,10 @@ y_threeArgs { | a|
    trace(__LINE__)
 } 
 
+$agl = 0
+y_threeArgs { |*|   # coverage for lastStar logic for block with zero args
+  $agl = 3
+}
+unless $agl == 3 ; raise_err($agl); end
+
 true
