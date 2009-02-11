@@ -71,6 +71,7 @@ RUBY.require 'kernel/bootstrap/Globals2.rb'
 
 RUBY.require 'kernel/bootstrap/Env.rb'
 RUBY.require 'kernel/bootstrap/Errno.rb'
+RUBY.require 'kernel/bootstrap/Errno2.rb'
 RUBY.require 'kernel/bootstrap/Dir.rb'
 RUBY.require 'kernel/bootstrap/File.rb'
 
