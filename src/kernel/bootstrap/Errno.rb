@@ -51,6 +51,7 @@ module Errno
   def self._createErrnoClass(errno, name)
     if const_defined?(name)
       klass = const_get(name)  # class already mapped to a Smalltalk class
+      nil.pause
     else
       klass = Class.new(SystemCallError)
       const_set(name, klass)
@@ -77,13 +78,13 @@ module Errno
   end
 
   def self.createAllErrnoClasses
-    table = Errno.errno_names
+    table = self.errno_names
     table.each_with_index do |name, errno|
       # 'errno + 1': adjust from smalltalk indexing
-      Errno._createErrnoClass(errno + 1, name)  unless name.nil?
+      self._createErrnoClass(errno + 1, name)  unless name.nil?
     end
   end
 end
 
-Errno.createAllErrnoClasses
+#  createAllErrnoClasses done in Errno2.rb
 
