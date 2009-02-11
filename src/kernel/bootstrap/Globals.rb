@@ -138,7 +138,7 @@ alias $*  $ARGF
 # YARV, IronRuby, MagLev etc.  While it is not official, it has support
 # from other implementers, wo we include it here.  It is also useful to
 # distinguish scripts running in MRI, since MRI 1.8.6 doesn't define it.
-RUBY_ENGINE = 'MagLev'
+RUBY_ENGINE = 'maglev'
 
 # A quick hack to get specs further w/o build having to poke the right string in
 #  this slot. See ticket #76
