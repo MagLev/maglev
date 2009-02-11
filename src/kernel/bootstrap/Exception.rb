@@ -109,29 +109,29 @@ class StandardError
   end
 end
 
-class EBADF
-  def self.name
-    'EBADF' # override Smalltalk name
-  end
-end
+#class EBADF
+#  def self.name
+#    'EBADF' # override Smalltalk name
+#  end
+#end
 
-class ENOTCONN
-  def self.name
-    'ENOTCONN' # override Smalltalk name
-  end
-end
+#class ENOTCONN
+#  def self.name
+#    'ENOTCONN' # override Smalltalk name
+#  end
+#end
 
-class EPIPE
-  def self.name
-    'EPIPE' # override Smalltalk name
-  end
-end
+#class EPIPE
+#  def self.name
+#    'EPIPE' # override Smalltalk name
+#  end
+#end
 
-class ECONNRESET
-  def self.name
-    'ECONNRESET' # override Smalltalk name
-  end
-end
+#class ECONNRESET
+#  def self.name
+#    'ECONNRESET' # override Smalltalk name
+#  end
+#end
 
 class IndexError
   def self.name
