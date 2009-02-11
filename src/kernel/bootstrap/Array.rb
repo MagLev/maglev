@@ -698,6 +698,10 @@ class Array
 
   primitive_nobridge 'push', '_rubyAddArguments:'
   primitive 'push*', '_rubyAddArguments:'
+  def push
+    # zero args variant does nothing
+    self
+  end
 
   # Associate: Search through self (an array of arrays).  Return first
   # array whose second element matches +key+ (using +key.==+).
