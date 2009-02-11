@@ -77,6 +77,8 @@ test(md[1], "fc00",   'md[1]')
 test(md[2], "",       'md[2]')
 test(md[3], nil,      'md[3]')
 
+# Test a regression with inspect() vs inspect(touchedSet)
+test([/xyz/].inspect, "[/xyz/]", "[/xyz/].inspect" )
 report
 
 class RegexpTest

@@ -86,5 +86,57 @@ m = Methods.new.methods
 some_methods = ["a_method", "methods"].sort
 test((m & some_methods).sort, some_methods, "Object#methods 1")
 
+
+# Ruby inspect takes no parameters, but the implementation in array, and
+# other containers adds a touchedSet parameter to dectect infinite loop.
+# Object defines inspect(touchedSet=nil), but the bridge logic doesn't find
+# it and if there is, e.g., a Regexp in an array, then inspect fails with
+# wrong number of parameters.
+#
+#    [ /xyz/ ].inspect => Error, 'too many arguments'
+#
+# Since regexp is not a container, we just ignore the touched set and
+# call the normal inspect.
+#
+# This test creates an array with an instance of all the concrete classes
+# and then inspects it to make sure inspect is well defined on all Classes.
+#
+require 'socket'
+x = [ [1,2,3],                    # Array
+  999898989898989898989898989898, # Bignum
+  binding,
+  true,
+  false,
+  Class.new,
+  Dir.new("/tmp"),
+  Errno::EBADF,
+  Exception.new,
+  STDERR,                          # IO
+  File.open("/tmp/foo", "w+"),     # File
+  File.stat("/tmp"),               # FileStat
+  10,                              # Fixnum
+  10.4,                            # Float
+  { "a" => 1},                     # Hash
+  IdentitySet.new,
+  # Integer is abstract
+  /xyz/.match("foo"),              # MatchData
+  Mutex.new,
+  nil,
+  Object.new,
+  Proc.new { "a proc"},
+  Random.new,
+  (0..4),
+  /xyz/,
+#  TCPSocket.open('localhost', 7777),
+  "a string",
+  Struct.new(:foo, :bar),
+  :a_symbol,
+  Thread.new { sleep 1 },
+  ThreadGroup.new,
+  Time.now
+]
+
+p x.inspect # The test passes if there is no exception
+
 report
 true

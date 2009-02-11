@@ -48,6 +48,19 @@ class Regexp
     end
   end
 
+  # This is here to circumvent a problem in the bridge logic.  Ruby inspect
+  # takes no parameters, but the implementation in array, and other
+  # containers adds a touchedSet parameter to dectect infinite loop.
+  # Object defines inspect(touchedSet=nil), but the bridge logic doesn't
+  # find it and if there is a Regexp in an array, then inspect fails with
+  # wrong number of parameters.
+  #    [ /xyz/ ].inspect => Error, 'too many arguments'
+  # Since regexp is not a container, we just ignore the touched set and
+  # call the normal inspect.
+  def inspect(touchedSet=nil)
+    self.inspect
+  end
+
   def match_from(str, count)
     return nil if str.nil? || count >= str.size
     search_region(str, count, str.size, true)
