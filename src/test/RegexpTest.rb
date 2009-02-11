@@ -12,6 +12,9 @@ test(Regexp.escape('\\[]*?{}.'), '\\\\\\[\\]\\*\\?\\{\\}\\.', 'Pickaxe escape A'
 
 test(Regexp.escape("\n\t\f\r "), "\\n\\t\\f\\r\\ ", 'Gemstone escape A')
 
+test( /abc/.source , 'abc' , 'simple regexp source' )
+test( /\\/.source , "\\\\" , 'Trac343')
+
 #  Test MatchData
 md = /(.)(.)(\d+)(\d)/.match("THX1138.")
 test(md[0],    "HX1138",                           "Pickaxe MatchData A")
