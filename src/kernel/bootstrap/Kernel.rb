@@ -277,7 +277,7 @@ module Kernel
       cmd << args[n].to_s
       n = n + 1
     end
-    resultStr = Kernel._system(cmd)
+    resultStr = _system(cmd)
     if (resultStr)
       puts resultStr
       return true
