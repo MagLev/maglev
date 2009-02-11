@@ -4,4 +4,4 @@
 # variables referenced for the first time by the files required here will
 # be dynamic instance variables.
 
-RUBY.require 'kernel/post_prims/Object.rb'
+require 'kernel/post_prims/Object.rb'
