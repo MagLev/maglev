@@ -149,9 +149,9 @@ module Type
       raise TypeError, 'cannot convert Symbol to String'
     else
       begin
-        coereced = Type.coerce_to(item, Integer, :to_int)
+        coereced = self.coerce_to(item, Integer, :to_int)
       rescue TypeError
-        coereced = Type.coerce_to(item, String, :to_str)
+        coereced = self.coerce_to(item, String, :to_str)
         # May raise, if not a string, but let that flow to caller
       end
       return coereced
