@@ -13,6 +13,7 @@ Usage: $COMMAND [options]
 
 OPTIONS:
    -d      Run in debugging mode
+   -G      Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h      Show this message
    -v      Print version number
 EOF
@@ -42,12 +43,15 @@ export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export IRB_CMD="$GEMSTONE/bin/irb"
 
 # Check options
-while getopts 'hdv' OPTION
+while getopts 'dGhv' OPTION
 do
     case $OPTION in
         d)
             ### We need to replace this with a real way to debug using irb
             IRB_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
+            ;;
+        G)
+            unset GEMSTONE_GLOBAL_DIR
             ;;
         h)
             usage

@@ -12,6 +12,7 @@ Usage: $COMMAND [options] <filename>
 
 OPTIONS:
    -d           Set debugging flags
+   -G           Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h           Show this message and exit
    -v           Print version number, then turn on verbose mode
    --copyright  Print copyright and exit
@@ -56,6 +57,9 @@ do
         -e)
             echo "-e not yet implemented"
             exit
+            ;;
+        -G)
+            unset GEMSTONE_GLOBAL_DIR
             ;;
         -h)
             usage
