@@ -45,16 +45,18 @@ module Ramaze
       :control => nil, # lambda{ cycle },
     }
 
-    begin
-      gem 'RInotify', '>=0.9' # is older version ok?
-      require 'rinotify'
-      require 'ramaze/reloader/watch_inotify'
-      Watcher = WatchInotify
-    rescue LoadError
+# GEMSTONE: We don't currently have Gem working, so just force
+# use of the File.stat version
+#     begin
+#       gem 'RInotify', '>=0.9' # is older version ok?
+#       require 'rinotify'
+#       require 'ramaze/reloader/watch_inotify'
+#       Watcher = WatchInotify
+#     rescue LoadError
       # stat always available
       require 'ramaze/reloader/watch_stat'
       Watcher = WatchStat
-    end
+#    end
 
     def initialize(app)
       @app = app
