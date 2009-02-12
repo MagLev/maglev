@@ -11,10 +11,11 @@ Usage: $COMMAND [options] <filename>
     Execute a Ruby file
 
 OPTIONS:
-   -d      Run in debugging mode
-   -h      Show this message
-   -V      Print version number and exit
-   -v      Verbose.  Print version number, then handle rest of params.
+   -d           Set debugging flags
+   -h           Show this message and exit
+   -v           Print version number, then turn on verbose mode
+   --copyright  Print copyright and exit
+   --version    Print version number and exit
 EOF
 }
 
@@ -45,8 +46,16 @@ args=""
 while [[ $# > 0 ]]
 do
     case $1 in
+        --copyright)
+            echo "maglev - Copyright (C) 2008-2009 GemStone Systems, Inc."
+            exit
+            ;;
         -d)
             debug=1
+            ;;
+        -e)
+            echo "-e not yet implemented"
+            exit
             ;;
         -h)
             usage
@@ -59,12 +68,13 @@ do
         -I*)
             args="$args '$1'"
             ;;
-        -V)
-            grep ^maglev $MAGLEV_HOME/version.txt
-            exit
-            ;;
         -v|--verbose)
             grep ^maglev $MAGLEV_HOME/version.txt
+            if [ $# -eq 1 ]; then exit; fi
+            ;;
+        --version)
+            grep ^maglev $MAGLEV_HOME/version.txt
+            exit
             ;;
         *)
             break
@@ -73,11 +83,11 @@ do
     shift
 done
 
-# Make sure we have one argument
+# Make sure we have at least one argument
 if [ $# -lt 1 ]; then
-    echo "Error: $COMMAND requires a filename."
+    echo "$COMMAND: Error -- requires a filename to run."
+    echo
     usage
-    exit
     exit 1
 fi
 
@@ -85,7 +95,7 @@ RUBYSCRIPT=$1
 shift
 # Make sure the argument is a valid file
 if [ ! -e $RUBYSCRIPT ]; then
-    echo "$COMMAND: Error: The file \"$RUBYSCRIPT\" does not exist"
+    echo "$COMMAND: Error -- The file \"$RUBYSCRIPT\" does not exist"
     exit 1
 fi
 
