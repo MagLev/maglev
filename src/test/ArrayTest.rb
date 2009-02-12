@@ -1009,6 +1009,13 @@ a = [1,2]
 test(a[4,10] = 4,    4,               "assign  5")
 test(a,              [1,2,nil,nil,4], "assign  6")
 
+# A regression:
+tmp = []
+val = "text/html"
+q = 1.0
+tmp.push([val,q])
+test(tmp, [["text/html", 1.0]], "Push an array")
+
 # begin
 #   ary["cat"]
 #   failed_test("Expecting TypeError", TypeError, nil)
