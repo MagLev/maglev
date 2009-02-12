@@ -115,6 +115,32 @@ class Object
       _responds_to(symbol, false, 0x10101)
     end
 
+    def _splat_return_value
+      # runtime support for  return *v  , invoked from generated IR
+      v = self
+      unless v._isArray
+        begin
+          v = Type.coerce_to(self, Array, :to_ary)
+        rescue TypeError
+          begin 
+            v = Type.coerce_to(self, Array, :to_a)
+          rescue TypeError
+            # ignore
+          end 
+        end
+      end
+      sz = v.length
+      if sz < 2
+	if sz.equal?(0)
+	  return nil
+	else
+	  return v[0]
+	end
+      else
+	return v
+      end
+    end
+
     primitive 'print_line', 'rubyPrint:'
 
     # pause is not standard Ruby, for debugging only .
@@ -183,6 +209,7 @@ class Object
       end
       modules.each{ |aModule| cl.include(aModule) }
     end
+    self
   end
 
   def flatten_onto(output)
