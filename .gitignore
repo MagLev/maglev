@@ -12,7 +12,7 @@ data/
 html/
 gemstone/
 locks/
-log/
+./log/
 gemstone.old/
 debugspec.inp
 cur.inp
