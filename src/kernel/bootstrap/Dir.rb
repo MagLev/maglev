@@ -7,6 +7,14 @@ class Dir
   class_primitive_nobridge '_new', '_new:'
   class_primitive_nobridge '_mkdir', '_mkdir:permissions:'
 
+  class_primitive_nobridge '_getgrgent', '_getgrgent:'
+  class_primitive_nobridge '_getgrgid', '_getgrgid:'
+  class_primitive_nobridge '_getgrnam', '_getgrnam:'
+  class_primitive_nobridge '_getlogin', '_getlogin'
+  class_primitive_nobridge '_getpwent', '_getpwent:'
+  class_primitive_nobridge '_getpwnam', '_getpwnam:'
+  class_primitive_nobridge '_getpwuid', '_getpwuid:'
+
   # Class Methods
 
   # RUBINIUS inspired, but our API is enough different..
