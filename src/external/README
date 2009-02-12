@@ -37,6 +37,12 @@ ramaze
 ramaze_hello.rb
   An in-progress test script to run a simple ramaze app.
 
+  Gemstone has made the following changes to the ramaze code:
+  * lib/ramaze/reloader.rb: Commented out the test for RInotify gem, and
+    force use of File.stat
+  * Commented out fiber.rb guts (uncomment when Trac #352 is fixed).
+  * Thread.abort_on_exception= is a stub, so...watch out.
+
 rubygems-1.3.1
   Ruby gems 1.3.1.  We're working on getting it to run.
 
