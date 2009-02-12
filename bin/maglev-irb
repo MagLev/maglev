@@ -54,7 +54,7 @@ do
             exit
             ;;
         v)
-            grep GEMSTONE $MAGLEV_HOME/version.txt
+            grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
         ?)

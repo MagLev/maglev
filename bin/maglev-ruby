@@ -60,11 +60,11 @@ do
             args="$args '$1'"
             ;;
         -V)
-            grep GEMSTONE $GEMSTONE/version.txt
+            grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
         -v|--verbose)
-            grep GEMSTONE $GEMSTONE/version.txt
+            grep ^maglev $MAGLEV_HOME/version.txt
             ;;
         *)
             break

@@ -6,7 +6,7 @@ end
 
 DEBUG_SPEC = false
 ### For now, set to always true for MagLev
-DEBUG_SPEC = (RUBY_ENGINE.downcase == "maglev") if defined? RUBY_ENGINE
+DEBUG_SPEC = (RUBY_ENGINE == "maglev") if defined? RUBY_ENGINE
 
 class BenchmarkRunner
   include Enumerable
