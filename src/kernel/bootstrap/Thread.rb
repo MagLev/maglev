@@ -119,11 +119,13 @@ class Thread
 
   # def join(limit); end #
   #  if limit is zero, join will return immediately
-  primitive_nobridge 'join', 'join:'
+  primitive_nobridge 'join', '_join:'
 
-  # def join; end #
-  #   wait forever for the receiver to finish
-  primitive_nobridge 'join', 'joinValue'
+  def join
+    #   wait forever for the receiver to finish
+    self.value 
+    self
+  end
 
   primitive_nobridge 'keys', 'keys'
 
