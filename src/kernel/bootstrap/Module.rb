@@ -56,6 +56,8 @@ class Module
     _fullName
   end
 
+  class_primitive_nobridge 'new', 'newModule'
+
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'
 
   primitive_nobridge '_method_protection', 'rubyMethodProtection'
