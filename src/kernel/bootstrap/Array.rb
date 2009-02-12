@@ -687,17 +687,17 @@ class Array
   end
 
   def pop
-    sz = self.size 
+    sz = self.size
     unless sz.equal?(0)
       idx = sz - 1
-      elem = self[idx] 
+      elem = self[idx]
       self.size=(idx)
       elem
     end
   end
 
-  primitive_nobridge 'push', '_rubyAddArguments:'
-  primitive 'push*', '_rubyAddArguments:'
+  primitive 'push*', '_rubyAddAll:'
+  primitive_nobridge 'push', '_rubyAddLast:'
   def push
     # zero args variant does nothing
     self
@@ -718,7 +718,7 @@ class Array
 
   def reverse!
     low = 0
-    high = self.size - 1  
+    high = self.size - 1
     while low < high
       a = self[low]
       b = self[high]
