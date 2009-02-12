@@ -14,10 +14,11 @@ end
 
 current_time = WEBrick::HTTPServlet::ProcHandler.new(time_proc)
 
-s = WEBrick::HTTPServer.new(:Port => 2000)
+port_num = 10700
+s = WEBrick::HTTPServer.new(:Port => port_num )
 s.mount("/", current_time)
 puts "=================================================="
-puts "Starting web server:  URL: http://localhost:2000/"
+puts "Starting web server:  URL: http://localhost:#{port_num}/"
 puts "=================================================="
 puts
 s.start
