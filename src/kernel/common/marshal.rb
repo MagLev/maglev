@@ -599,30 +599,45 @@ module Marshal
 
   end
 
-  def self.dump(obj, an_io=nil, limit=nil)
-    if limit.nil?
-      if an_io.kind_of? Fixnum
-        limit = an_io
-        an_io = nil
-      else
-        limit = -1
-      end
-    end
+  def self.dump(a, b, c, *d)
+    raise ArgumentError , 'too many args'
+  end
 
+  def self.dump(obj, an_io, limit)
     depth = Type.coerce_to limit, Fixnum, :to_int
-    ms = State.new nil, depth, nil
-
     if an_io and !an_io.respond_to? :write
-      raise TypeError, "output must respond to write"
+      raise TypeError, 'output must respond to write'
     end
+    _dump(obj, the_io, depth)
+  end
 
+  def self.dump(obj, an_io)
+    depth = -1
+    if (an_io._isFixnum)
+      depth = an_io
+      an_io = nil
+    else
+      if an_io.kind_of?(IO)
+        # ok
+      elsif !an_io.respond_to?(:write)
+        raise TypeError, "output must respond to write"
+      end 
+    end
+    _dump(obj, an_io, depth)
+  end
+
+  def self.dump(obj)
+    _dump(obj, nil, -1)
+  end
+
+
+  def self._dump(obj, an_io, depth)
+    ms = State.new(nil, depth, nil)
     str = VERSION_STRING + ms.serialize(obj)
-
     if an_io
       an_io.write(str)
       return an_io
     end
-
     return str
   end
 
