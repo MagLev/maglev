@@ -14,6 +14,7 @@ class Dir
   class_primitive_nobridge '_getpwent', '_getpwent:'
   class_primitive_nobridge '_getpwnam', '_getpwnam:'
   class_primitive_nobridge '_getpwuid', '_getpwuid:'
+  class_primitive_nobridge '_getuid',   '_getuid'
 
   # Class Methods
 
