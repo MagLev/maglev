@@ -131,11 +131,17 @@ module Etc
   end
 
   # Returns the /etc/passwd information for the user with specified uid.
+  # If uid is nil, the uid of the current user is used.
   # The information is returned as a Struct::Passwd; see getpwent
   # above for details. E.g.,
   # Etc.getpwnam(0) -> #<struct Struct::Passwd name="root", passwd="x", uid=0, gid=0, gecos="root",dir="/root", shell="/bin/bash">
-  def self.getpwuid(uid)
-    raise TypeError, "can't convert #{uid.class} into Integer" unless uid.is_a?(Integer)
+  def self.getpwuid(uid=nil)
+    if uid.nil?
+      uid = Dir._getuid
+    elsif not uid.is_a?(Integer)
+      raise TypeError, "can't convert #{uid.class} into Integer"
+    end
+
     result = Dir._getpwuid(uid)
     raise ArgumentError, "can't find user for #{uid}" if result.nil?
     Passwd.new(*result)
