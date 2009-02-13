@@ -9,7 +9,7 @@ verbose false  # turn off rake's chatter about all the sh commands
 CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
 
 Rake::RDocTask.new do |rd|
-  rd.main = "README"
+  rd.main = "README.rdoc"
   rd.rdoc_files.include('README*', 'docs/*', 'LICENSES.txt')
 end
 
