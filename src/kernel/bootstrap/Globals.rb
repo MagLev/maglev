@@ -155,4 +155,5 @@ DEBUG_SPEC = false
 
 TRUE  = true
 FALSE = false
+NIL = nil
 STDOUT = nil   # real value assigned later
