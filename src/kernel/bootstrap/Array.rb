@@ -73,19 +73,58 @@ class Array
   end
   class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
 
-  def self.new(a_size=0, value=nil)
+  def self.new(*args)
+    # this variant gets bridge methods
+    raise ArgumentError, 'too many args'
+  end
+
+  def self.new(first, &blk)
+    if first._isArray
+      _withAll(first) # ignore the block
+    else
+      siz = Type.coerce_to(first, Integer, :to_int)
+      a = _alloc(siz, nil)
+      if block_given?   # block takes precedence over extra 
+	n = 0
+	while (n < siz)
+	  a[n] = blk.call(n)
+	  n = n + 1
+	end
+      end
+      a
+    end
+  end
+
+  def self.new(a_size, value)
     s = Type.coerce_to(a_size, Integer, :to_int)
     _alloc(s, value)
+  end
+
+  def self.new(first, second, &blk)
+    if block_given?
+      self.new(first, &blk)  # ignore second arg
+    else
+      self.new(first, second)
+    end
   end
 
   def self.new(arg)
     # this method will have no bridge methods, all the bridges
     #  will map to the previous 2 arg form
     if (arg._isFixnum)
-      new(arg, nil)
+      _alloc(arg, nil)
     else
       _coerceOneArg(arg)
     end
+  end
+
+  def self.new
+    _alloc(0, nil)
+  end
+
+  def self.new(&blk)
+    # ignores the block
+    _alloc(0, nil)
   end
 
   def self._coerceOneArg(arg)
@@ -98,21 +137,6 @@ class Array
       res = _alloc(siz, nil)
     end
     res
-  end
-
-
-  def self.new(size, &blk)
-    # will have no bridge methods
-    unless size._isFixnum
-      raise ArgumentError, 'size is not a Fixnum'
-    end
-    a = new(size, nil)
-    n = 0
-    while (n < size)
-      a[n] = blk.call(n)
-      n = n + 1
-    end
-    a
   end
 
   # Array Instance methods
