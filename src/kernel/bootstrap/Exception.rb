@@ -14,6 +14,8 @@ class Exception
       'Exception'
     end
 
+    primitive_nobridge '_handler_active' , '_handlerActive'
+
     primitive_nobridge '_reraise', 'pass'
     primitive          'signal', 'signal:'
     primitive_nobridge 'signal', 'signal'
