@@ -136,12 +136,25 @@ class PureRubyStringIO
     char
   end
 
-  def gets(sep_string=$/)
-    requireReadable
-    @sio_lineno += 1
-    pstart = @sio_pos
-    @sio_pos = @sio_string.index(sep_string, @sio_pos) || [@sio_string.length, @sio_pos].max
-    @sio_string[pstart..@sio_pos]
+  # Gemstone, install variants of gets to store into caller's $_
+  #   see private  def _gets; ...  at end of file
+  def gets(*args)
+    raise ArgumentError, 'expected 0 or 1 arg'
+  end
+  
+  def gets(sep_string)
+    # variant after first gets no bridges   # gemstone 
+    res = self._gets(sep_string)
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def gets
+    # variant after first gets no bridges   # gemstone 
+    sep_string=$/
+    res = self._gets(sep_string)
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
   end
 
   def initialize(string="", mode="r+")
@@ -385,6 +398,19 @@ class PureRubyStringIO
   #}
 
   private
+
+  def _gets(sep_string)
+    requireReadable
+    @sio_lineno += 1
+    pstart = @sio_pos
+    found = @sio_string.index(sep_string, @sio_pos)
+    @sio_pos = found || [@sio_string.length, @sio_pos].max
+    res = @sio_string[pstart..@sio_pos]
+    if (found)
+      @sio_pos += sep_string.length
+    end
+    res
+  end
 
   def requireReadable
     raise IOError, "not opened for reading", caller[1..-1] if @sio_closed_read
