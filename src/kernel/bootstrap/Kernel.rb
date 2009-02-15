@@ -215,12 +215,16 @@ module Kernel
       # msg should be a subclass of Exception or
       #  an object that returns a new exception
       ex = msg.exception
-      ex.signal
+      if (ex._handler_active)
+        ex._reraise
+      else
+        ex.signal
+      end
     end
   end
 
   def _reraise(ex)
-    # _reraise invoked from IR generated for RubyVCallRaiseNode 
+    # _reraise also invoked from IR generated for RubyVCallRaiseNode 
     ex._reraise
   end
 
