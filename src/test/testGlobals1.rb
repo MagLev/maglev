@@ -1,54 +1,42 @@
-$a = [ 0 ]
-$b = 0
-X = 4
-Y = -1 
-module MA
-  X = 5
-  Y = X 
-  module MA
-   X = Y + 1
-   module MA
-     X = 7
-     $b = MA::X + 1000
-     $a[3] = X # gets 7
-     $a[0] = ::X # gets 4
-     # puts MA::MA::X # gets error
-   end
-   module MA
-     X = 8 # already initialized warning
-   end
-  end
+V = 3
+a = V
+unless a == 3 ; raise 'err' ; end
+
+module M
+  X = 9
 end
-class MyError < Exception
-  EA = 105
+b = M::X
+unless b == 9 ; raise 'err' ; end
+M::Y = 10
+c = M::Y
+unless c == 10 ; raise 'err' ; end
+
+begin
+  V::W = 5
+  nil.pause
+rescue TypeError
+  e = 33
 end
-# puts "expect 4 5 6 7 8 105 "
-r = $a[0]
-unless r == 4
-  raise 'ERROR'
+unless e == 33; raise 'ERR'; end
+begin
+  b = V::W
+  nil.pause
+rescue TypeError
+  e = 44
 end
-r = MA::X  # gets 5
-unless r == 5 
-  raise 'ERROR'
+unless e == 44; raise 'ERR'; end
+
+o = Object.new
+class << o
+   AB = 99
 end
-r = MA::MA::X # gets 6
-unless r == 6
-  raise 'ERROR'
+ 
+class << o
+  unless AB == 99 ; raise 'err' ; end
 end
-r = $a[3]
-unless r == 7
-  raise 'ERROR'
+ 
+class << o
+  unless self::AB == 99 ; raise 'err' ; end
 end
-r = MA::MA::MA::X # gets 8
-unless r == 8
-  raise 'ERROR'
-end
-r = MyError::EA
-unless r == 105
-  raise 'ERROR'
-end
-r = $b
-unless r == 1007
-  raise 'ERROR'
-end
+puts "ok"
 true
