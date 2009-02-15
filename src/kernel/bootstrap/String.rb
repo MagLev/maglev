@@ -429,10 +429,13 @@ class String
   end
 
   primitive 'replace', '_rubyReplace:'
-  primitive 'reverse', 'reverse'
+
+  primitive          'reverse', 'reverse'
+
+  primitive_nobridge '_reverse_from', '_reverseFrom:'
 
   def reverse!
-    replace(reverse)
+    self._reverse_from(self) # returns self
   end
 
   primitive_nobridge '_lastSubstring', 'findLastSubString:startingAt:'
