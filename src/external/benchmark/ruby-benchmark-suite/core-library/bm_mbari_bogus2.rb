@@ -1,6 +1,7 @@
 # test context switching between two threads with very different stack sizes
 # from the bogus2.rb file
 # of the Brent Roman MBARI patches 
+# http://sites.google.com/site/brentsrubypatches/
 require File.dirname(__FILE__) + '/../lib/benchutils'
 
 label = File.expand_path(__FILE__).sub(File.expand_path("..") + "/", "")

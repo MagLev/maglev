@@ -1,6 +1,6 @@
-# Note that it uses 400MB of RAM, but doesn't run as many iterations since that makes for a very slow test
-# on MRI, at least
+# This is required for every benchmark
 require File.dirname(__FILE__) + '/../lib/benchutils'
+
 label = File.expand_path(__FILE__).sub(File.expand_path("..") + "/", "")
 
 iterations = ARGV[-3].to_i
@@ -13,8 +13,8 @@ report = ARGV.last
   benchmark = BenchmarkRunner.new(label, iterations, timeout)
   benchmark.run do
     a = []
-    3000000.times { a << []} # use up some RAM
-    100000.times {[]}
+    500000.times { a << []} # use up some RAM
+    3000000.times {[]}
   end
   
   File.open(report, "a") {|f| f.puts "#{benchmark.to_s},n/a" }
