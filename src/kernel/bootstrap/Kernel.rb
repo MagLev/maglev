@@ -4,8 +4,15 @@ module Kernel
 
   # Print messages for stubbed methods
   @@gs_WARNSTUB = false
+  @@gs_SEEN = { }
+
   def _stub_warn(msg)
-    puts "== WARN: STUB: MNI: #{msg}" if @@gs_WARNSTUB
+    if @@gs_WARNSTUB
+      unless @@gs_SEEN[msg]
+        puts "== WARN: STUB: MNI: #{msg}" if @@gs_WARNSTUB
+        @@gs_SEEN[msg] = 1
+      end
+    end
   end
 
   def load(name)
@@ -230,7 +237,7 @@ module Kernel
   end
 
   def _reraise(ex)
-    # _reraise also invoked from IR generated for RubyVCallRaiseNode 
+    # _reraise also invoked from IR generated for RubyVCallRaiseNode
     ex._reraise
   end
 
@@ -249,12 +256,12 @@ module Kernel
 
   def sleep(numeric=0)
     # returns number of seconds slept
-    if numeric._isInteger 
+    if numeric._isInteger
       ms = numeric * 1000
-    elsif 
-      ms = (1000.0 * numeric).to_i 
+    elsif
+      ms = (1000.0 * numeric).to_i
     end
-    ms_slept = _sleep_ms(ms) 
+    ms_slept = _sleep_ms(ms)
     ms_slept / 1000
   end
 
@@ -262,10 +269,10 @@ module Kernel
     # Gemstone addition
     # returns number of milliseconds slept
     ms = milliseconds
-    unless milliseconds._isInteger 
-      ms = milliseconds.to_i 
+    unless milliseconds._isInteger
+      ms = milliseconds.to_i
     end
-    _sleep_ms(ms) 
+    _sleep_ms(ms)
   end
 
   def split(pattern=nil, limit=nil)
