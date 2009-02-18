@@ -1,4 +1,31 @@
+class SystemCallError
+  attr_reader :errno
+
+#   class_primitive_nobridge '_new', 'basicNew'
+
+#   def self.new(msg, errno)
+#     instance = _new
+#     instance.initialize(msg, errno)
+#     instance
+#   end
+
+  def initialize(msg)
+    super
+    @errno = -1
+  end
+
+# TODO: ??
+#   def ===(other)
+#     puts "SystemCallError#==="
+#     return false unless other.class == SystemCallError
+#     return other.errno == errno
+#   end
+end
+
 module Errno
+  # Map an errno (small int) to the exception class for that errno
+  ERRNO_TO_EXCEPTION = [ ]
+
   # Given a return value from a "system or library" call, raise the
   # appropriate exception if any.  If +err+ is not a small integer, or if
   # it is 0, then return +err+ (i.e., there was no problem, so just return
@@ -14,11 +41,10 @@ module Errno
     return err unless err._isSmallInteger  # Not an errno
     return err if err.equal?(0)                 # errno signifying no error
 
-    # TODO: Errno: need to map errno to correct Exception
-    raise SystemCallError, "System error (errno: #{err}): #{additional}"
+    errno_exc = ERRNO_TO_EXCEPTION[err]
+    errno_exc ||= SystemCallError.new("System error (errno: #{err}): #{additional}", err)
+    raise errno_exc
   end
-
-  # TODO: Errno.rb: Map system dependent errno ints to common Errno class
 
   #    We may want to make Errno::EBADF::Errno map to a method call so that
   #    we can map platform specific errnos to the correct, shared,
@@ -31,6 +57,15 @@ module Errno
   #    Errno::EBADF classes and have that call Errno.errno_for(sym).  See
   #    commented code below.
   #
+
+  # following 4 exceptions may be signaled from smalltalk code.
+  #   but they are subclasses of SocketError not SystemCallError...
+  #   so don't use them here.
+  # EBADF = _resolve_smalltalk_class(:SocketErrorEBADF)
+  # ECONNRESET = _resolve_smalltalk_class(:SocketErrorECONNRESET)
+  # ENOTCONN = _resolve_smalltalk_class(:SocketErrorENOTCONN)
+  # EPIPE = _resolve_smalltalk_class(:SocketErrorEPIPE)
+
   # Create a class to represent +errno+.  A constant, +name+, will be added to
   # +Errno+ to store the class and the class will have the value of its
   # constant +Errno+ be +errno+.  E.g.,
@@ -39,37 +74,31 @@ module Errno
   #
   #     <tt>Errno::EBADF         # => A class representing Errno number 9.</tt>
   #     <tt>Errno::EBADF::Errno  # => 9</tt>
-
-  # following 4 exceptions may be signaled from smalltalk code.
-  #   but they are subclasses of SocketError not SystemCallError... 
-  #   so don't use them here.  
-  # EBADF = _resolve_smalltalk_class(:SocketErrorEBADF)
-  # ECONNRESET = _resolve_smalltalk_class(:SocketErrorECONNRESET)
-  # ENOTCONN = _resolve_smalltalk_class(:SocketErrorENOTCONN)
-  # EPIPE = _resolve_smalltalk_class(:SocketErrorEPIPE)
-
-  def self._createErrnoClass(errno, name)
+  def self._createErrnoClassXX(errno, name)
     if const_defined?(name)
       klass = const_get(name)  # class already mapped to a Smalltalk class
-      nil.pause
     else
       klass = Class.new(SystemCallError)
       const_set(name, klass)
     end
-    klass.const_set(:Errno, errno)  
+    klass.const_set(:Errno, errno)
+    klass
+  end
 
-    # If we want to add a const_missing hook, then comment out the above
-    # line and do something like this instead:
-#     klass.instance_eval do
-#       def const_missing(sym)
-#         if sym.to_str == 'Errno'
-#           my_name = self.name.split('::')[-1]
-#           Errno.errno_names.index[my_name] + 1
-#         else
-#           raise NameError, "uninitialized constant #{self}::#{sym}"
-#         end
-#       end
-#     end
+
+  # TODO: There is the case where two error names, e.g., EBADF and
+  # EBADFALSO, both map to the same errno (9).  To accommodate that, and
+  # the semantics of rescue clauses, we make the second and subsequent
+  # instances of an errno class subclasses of the first instance.
+
+  def self._createErrnoClass(errno, name)
+    klass = class_eval %Q{
+      class #{name} < SystemCallError
+        Errno = #{errno}
+      end
+      Errno::ERRNO_TO_EXCEPTION[#{errno}] = #{name}
+    }
+   klass
   end
 
   # Return an array of errno names, indexed by errno for this platform.
@@ -79,12 +108,11 @@ module Errno
 
   def self.createAllErrnoClasses
     table = self.errno_names
-    table.each_with_index do |name, errno|
-      # 'errno + 1': adjust from smalltalk indexing
-      self._createErrnoClass(errno + 1, name)  unless name.nil?
+    table.each_with_index do |name, st_errno|
+      ruby_errno = st_errno + 1 # adjust from smalltalk indexing
+      ERRNO_TO_EXCEPTION[ruby_errno] = self._createErrnoClass(ruby_errno, name) unless name.nil?
     end
   end
+
+  createAllErrnoClasses
 end
-
-Errno.createAllErrnoClasses
-

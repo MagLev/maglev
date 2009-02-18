@@ -388,10 +388,12 @@ class File
   # MNI: File.split
 
   def self.stat(filename)
-    stat_obj = _stat(filename, false);
-    if (stat_obj._isFixnum)
-      raise SystemCallError # TODO: Errno::xxx
-    end
+    stat_obj = Errno.handle(_stat(filename, false), filename)
+#     stat_obj = _stat(filename, false);
+#     if (stat_obj._isFixnum)
+#       raise Errno::ENOENT
+# #      raise SystemCallError # TODO: Errno::xxx
+#     end
     stat_obj
   end
 
