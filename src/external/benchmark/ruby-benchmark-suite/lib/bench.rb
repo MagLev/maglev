@@ -4,9 +4,12 @@ else
   require File.dirname(__FILE__) + '/timeout.rb'
 end
 
-DEBUG_SPEC = false
 ### For now, set to always true for MagLev
-DEBUG_SPEC = (RUBY_ENGINE == "maglev") if defined? RUBY_ENGINE
+if defined? RUBY_ENGINE 
+  DEBUG_SPEC = (RUBY_ENGINE == "maglev")
+else
+  DEBUG_SPEC = false
+end
 
 class BenchmarkRunner
   include Enumerable
