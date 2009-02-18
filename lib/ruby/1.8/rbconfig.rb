@@ -39,7 +39,14 @@ module Config
     raise "ruby lib version (1.8.6) doesn't match executable version (#{RUBY_VERSION})"
   VERSION = '1.8'   # Used in paths below
   ARCH = `uname -m`
+
+  # Note: MAGLEV_HOME and TOPDIR should end up being the same
+  # in a default installation
   MAGLEV_HOME = ENV['MAGLEV_HOME']
+
+  # TODO: MRI puts rbconfig in the architecture specific subdir of
+  # .../lib/ruby/1.8/<archdir>/rbconfig.rb
+  TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/1.8")
 
   CONFIG = {}
   CONFIG['EXEEXT']            = ''
