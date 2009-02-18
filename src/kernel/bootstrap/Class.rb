@@ -16,6 +16,7 @@ class Class
     else
       c = _rubyNew(superCls, nil)
     end
+    superCls.inherited(c)  # See also RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:
     c
   end
 

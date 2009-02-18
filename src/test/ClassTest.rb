@@ -28,5 +28,30 @@ test(mc.b, 5, 'alloc b')
 test(mc.c, 6, 'alloc c')
 
 
+# Test that the inherited() callback works.
+#
+# There are two paths that we have to test:
+# 1: RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:, for the
+#       class Foo < Bar; ... ;end case
+# 2: Class.new in Class.rb
+$child_class = nil
+
+# Using Class.new syntax
+top = Class.new do
+  def self.inherited(cls)
+    $child_class = cls
+  end
+end
+
+test($child_class, nil, "inherited A")
+child = Class.new(top)
+test($child_class, child, "inherited B")
+
+# Using class F < B syntax
+class AnotherTop < top
+end
+test($child_class, AnotherTop, "inherited C")
+
+
 report
 true
