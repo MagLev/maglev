@@ -12,8 +12,12 @@ module Kernel
     RUBY.load(Type.coerce_to(name, String, :to_str))
   end
 
-  def at_exit
-    _stub_warn("Kernel#at_exit")
+  primitive_nobridge '_at_exit', 'atExit:'
+
+  def at_exit(&block)
+    proc = Proc.new(&block)
+    _at_exit(proc._block )
+    proc
   end
 
   # See ruby-core:20222 for a discussion on whether to use Kernel#require
@@ -26,6 +30,8 @@ module Kernel
     _stub_warn('Kernel#autoload?: always returns nil')
     nil
   end
+
+  primitive_nobridge 'at_exit&', 'atExit:'
 
   # binding defined in Kernel2.rb
 
