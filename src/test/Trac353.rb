@@ -5,3 +5,4 @@ class Generic
   end
 end
 Generic.default_port
+true

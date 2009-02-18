@@ -12,7 +12,8 @@ class ThrTest
     s = tmain.inspect
     puts s
     unless s[-6,6] = ', run>' ; 	Failed() ; end
-    unless tmain.equal?(Thread.main);       Failed() ; end
+    mainb = Thread.main
+    unless tmain.equal?(mainb);       Failed() ; end
     t = Thread.fork { $A = 99 }
     x = $A
     unless x == 99 ; 			Failed() ; end
