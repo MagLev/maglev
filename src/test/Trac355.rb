@@ -7,3 +7,4 @@ module ErrnoFoo
 end
 klass = ErrnoFoo.const_get($const_name)
 raise "Expecting 'ErrnoFoo::Baz' but got #{klass.name}" unless klass.name == 'ErrnoFoo::Baz'
+true
