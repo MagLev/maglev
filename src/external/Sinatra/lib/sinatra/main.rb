@@ -16,7 +16,16 @@ module Sinatra
       path || $0
     }.call
 
-    set :run, Proc.new { $0 == app_file }
+    # GEMSTONE: To work around a bug in caller (only full pathnames are
+    # provided), we compare basenames (which may be wrong in some
+    # circumstances).
+    #
+    # set :run, Proc.new { $0 == app_file }   # Original Version
+    #
+    # set :run, Proc.new { File.basename($0) == File.basename(app_file) }
+    set :run, Proc.new { true }
+    # END GEMSTONE
+
     set :reload, Proc.new{ app_file? && development? }
 
     if run? && ARGV.any?

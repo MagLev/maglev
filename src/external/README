@@ -1,6 +1,6 @@
 This directory contains source from outside the Ruby Libs that we don't
-intend to ship with the product, but we feel is important that everyone
-shares the same copy of.
+intend to ship with the product, but we feel is important that anyone
+working with these apps on MagLev should share the same code/fixes.
 
 Rack
   Rack provides an minimal interface between webservers supporting Ruby and
@@ -23,6 +23,12 @@ Sinatra
   Version 0.9.0.4 (compatible with rack 0.9.1)
   License: MIT
 
+  !!! NOTE !!!: Gemstone has made the following changes to the Sinatra code:
+  * lib/sinatra/main.rb: Stubbed out the definition of run.  The
+    implementation depended on examining the stack frames returnd by
+    Kernel#caller, but the details of filenames caused problems (MagLev
+    prints only full pathnames, while MRI prints a variety of formats).
+
 benchmark
   Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.
 
@@ -31,16 +37,17 @@ racktest.rb
 
       $ maglev-ruby racktest.rb
 
-ramaze
+Ramaze
   A Ruby modular web framework. http://ramaze.net/
 
-ramaze_hello.rb
-  An in-progress test script to run a simple ramaze app.
-
-  Gemstone has made the following changes to the ramaze code:
+  !!! NOTE !!!: Gemstone has made the following changes to the Ramaze code:
   * lib/ramaze/reloader.rb: Commented out the test for RInotify gem, and
     force use of File.stat.  MagLev does not currently support rubygem.
   * Thread.abort_on_exception= is a stub, so...watch out.
+
+
+ramaze_hello.rb
+  An in-progress test script to run a simple ramaze app.
 
 rubygems-1.3.1
   Ruby gems 1.3.1.  We're working on getting it to run.
