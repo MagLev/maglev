@@ -119,7 +119,7 @@ then
     $TOPAZ_CMD <<-EOF
 	run
 	RubyContext load.
-	RubyContext default setARGV: #($args) .
+	RubyContext default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
 	RubyContext loadFileNamed: '$RUBYSCRIPT'.
 	%
 	exit
@@ -136,8 +136,8 @@ else
     cat - >> $dbscript <<-EOF
 	run
 	RubyContext load.
-	RubyContext default setARGV: #($args) .
-	RubyContext loadFileNamed: '$RUBYSCRIPT'.
+	RubyContext default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
+	RubyContext loadFileNamed: '$RUBYSCRIPT' .
 	%
 	EOF
     # Now run topaz with our debug script, including all params passed to us
