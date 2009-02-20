@@ -11,7 +11,7 @@ class Hash
 
   def self.[](*elements)
     numelem = elements.length
-    if ((numelem & 1) != 0)
+    if !((numelem & 1).equal?(0))
       if (numelem.equal?(1))
         first = elements[0]
         if (first._isHash)
@@ -96,7 +96,7 @@ class Hash
   primitive 'each_value&', 'valuesDo:'
 
   def empty?
-    size == 0
+    size.equal?(0)
   end
 
   # Return a value from the hash for the given +key+.  If +key+ is not
