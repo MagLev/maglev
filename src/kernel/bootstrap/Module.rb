@@ -51,6 +51,10 @@ class Module
     end
   end
 
+  # The @name fixed instVar in Module may hold a Smalltalk class name
+  # which may be different from the Ruby name for the Module .
+  # The  rubyFullName method obtains the name from the Module's
+  # rubyNameSpace if possible, before using @name .
   primitive_nobridge '_fullName', 'rubyFullName'
   def name
     _fullName

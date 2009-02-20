@@ -4,10 +4,6 @@ class Env
     class_primitive_nobridge '_getenv', '_getenv:'
     class_primitive_nobridge '_putenv', '_putenv:with:'
 
-    def self.name
-      'Env'
-    end
-
     def self.new
       raise NotImplementedError
     end

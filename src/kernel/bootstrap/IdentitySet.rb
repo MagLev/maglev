@@ -21,11 +21,6 @@ class IdentitySet
       o
     end
 
-    def self.name
-      # override Smalltalk name
-      :IdentitySet
-    end
-
     def inspect(touchedSet=nil)
         "[[#{length}]]"
     end

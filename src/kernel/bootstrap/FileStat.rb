@@ -5,10 +5,6 @@ class File::Stat
 
   include Comparable
 
-  def self.name
-    'File::Stat'   # override Smalltalk name
-  end
-
   # POSIX constants for accessing the mode field
   S_IFMT   = 0170000  #  type of file mask
   S_IFIFO  = 0010000  #  named pipe (fifo)

@@ -53,9 +53,4 @@ class Fixnum
   primitive 'zero?', '_rubyEqualZero'
   primitive 'nonzero?', '_rubyNonzero'
 
-  def self.name
-    # override Smalltalk name
-    'Fixnum'
-  end
-
 end

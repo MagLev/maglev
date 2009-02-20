@@ -1,10 +1,6 @@
 # Maps to Smalltalk class GsProcess .  See Globals.rb
 class Thread
 
-  def self.name
-    'Thread'
-  end
-
   class_primitive_nobridge '_stbacktrace', 'backtraceToLevel:'
 
   def self._backtrace(includeSt, limit)

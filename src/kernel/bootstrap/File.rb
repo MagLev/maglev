@@ -36,10 +36,6 @@ class File
   # _modify_file provides access to chmod, fchmod, chown, lchown, fchown
   class_primitive '_modify_file*', '_modifyFile:fdPath:with:with:'
 
-  def self.name
-    'File' # override Smalltalk name
-  end
-
   def self.atime(filename)
     File.stat(filename).atime
   end

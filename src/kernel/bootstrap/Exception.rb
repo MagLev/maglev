@@ -9,11 +9,6 @@ class Exception
     class_primitive_nobridge  '_errnoToName', 'errnoToName:'
     class_primitive_nobridge  '_cpuOsKind', 'cpuOsKind'
 
-    def self.name
-      # override Smalltalk name
-      'Exception'
-    end
-
     primitive_nobridge '_handler_active' , '_handlerActive'
 
     primitive_nobridge '_reraise', 'pass'
@@ -66,49 +61,49 @@ end
 
 
 class SystemExit
-  def self.name
-    'SystemExit'  # override Smalltalk name
-  end
+  #def self.name
+  #  'SystemExit'  # override Smalltalk name
+  #end
   # MNI: SystemExit#status
   # MNI: SystemExit#success?
 end
 
 class SystemStackError
-  def self.name
-    'SystemStackError' # override Smalltalk name
-  end
+  #def self.name
+  #  'SystemStackError' # override Smalltalk name
+  #end
 end
 
 class NoMemoryError
-  def self.name
-    'NoMemoryError' # override Smalltalk name
-  end
+  #def self.name
+  #  'NoMemoryError' # override Smalltalk name
+  #end
 end
 class ScriptError
-  def self.name
-    'ScriptError' # override Smalltalk name
-  end
+  #def self.name
+  #  'ScriptError' # override Smalltalk name
+  #end
 end
 class LoadError
-  def self.name
-    'LoadError' # override Smalltalk name
-  end
+  #def self.name
+  #  'LoadError' # override Smalltalk name
+  #end
 end
 class NotImplementedError
-  def self.name
-    'NotImplementedError' # override Smalltalk name
-  end
+  #def self.name
+  #  'NotImplementedError' # override Smalltalk name
+  #end
 end
 class SyntaxError
-  def self.name
-    'SyntaxError' # override Smalltalk name
-  end
+  #def self.name
+  #  'SyntaxError' # override Smalltalk name
+  #end
 end
 
 class StandardError
-  def self.name
-    'StandardError' # override Smalltalk name
-  end
+  #def self.name
+  #  'StandardError' # override Smalltalk name
+  #end
 end
 
 #class EBADF
@@ -136,33 +131,33 @@ end
 #end
 
 class IndexError
-  def self.name
-    'IndexError' # override Smalltalk name
-  end
+  #def self.name
+  #  'IndexError' # override Smalltalk name
+  #end
 end
 class LocalJumpError
-  def self.name
-    'LocalJumpError' # override Smalltalk name
-  end
+  #def self.name
+  #  'LocalJumpError' # override Smalltalk name
+  #end
 end
 class FloatDomainError
-  def self.name
-    'FloatDomainError' # override Smalltalk name
-  end
+  #def self.name
+  #  'FloatDomainError' # override Smalltalk name
+  #end
 end
 class ZeroDivisionError
-  def self.name
-    'ZeroDivisionError' # override Smalltalk name
-  end
+  #def self.name
+  #  'ZeroDivisionError' # override Smalltalk name
+  #end
 end
 class NoMethodError
-  def self.name
-    'NoMethodError' # override Smalltalk name
-  end
+  #def self.name
+  #  'NoMethodError' # override Smalltalk name
+  #end
 end
 class SignalException
-  def self.name
-    'SignalException' # override Smalltalk name
-  end
+  #def self.name
+  #  'SignalException' # override Smalltalk name
+  #end
 end
 

@@ -1,11 +1,6 @@
 class Bignum
   # Bignum is identically  Smalltalk LargeInteger
 
-  def self.name
-    # override Smalltalk name
-    'Bignum'
-  end
-
   # methods from Number or Integer reimplemented in LargeInteger,
   #   and thus needing a primitive mapping here
   primitive 'abs', 'abs'

@@ -4,11 +4,6 @@ class ThreadGroup
   #   cannot be persistent in the name space
   #   use  self.default instead
 
-  def self.name
-    nil.pause
-    'ThreadGroup'    
-  end
-
   # def self.default; end #  returns the equivalent of  ThreadGroup::Default
   class_primitive_nobridge 'default', 'default'
 

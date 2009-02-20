@@ -30,11 +30,6 @@ class Hash
     res
   end
 
-  def self.name
-    # override Smalltalk name
-    'Hash'
-  end
-
   # Instance Methods
 
   def ==(other)

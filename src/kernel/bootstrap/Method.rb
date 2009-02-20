@@ -10,10 +10,6 @@ class Method
     # Method is identically Smalltalk RubyMeth  
     #   RubyMethod is defined in the .mcz 
 
-    def self.name
-      'Method'
-    end
-
     def _obj
       @obj
     end

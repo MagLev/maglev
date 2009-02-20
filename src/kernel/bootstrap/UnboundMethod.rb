@@ -4,10 +4,6 @@ class UnboundMethod
   # Maglev implementation differs from MRI in that Method is a
   #  subclass of UnboundMethod, not of Object,
 
-  def self.name
-    'UnboundMethod'
-  end
-
   primitive_nobridge 'arity', 'arity'
   primitive_nobridge 'bind', 'bind:'
   primitive_nobridge '_home_class', 'homeClass'
