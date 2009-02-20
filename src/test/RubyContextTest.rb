@@ -2,6 +2,8 @@
 # RubyContext.save are available to ruby.  It passes by not raising an
 # exception.
 
-RubyContext.load
-RubyContext.save
+# Don't actually call the methods, as that may mess things up...
 
+[:load_context, :save_context].each do |m|
+  raise "RubyContext.#{m} not present" unless RubyContext.respond_to? m
+end
