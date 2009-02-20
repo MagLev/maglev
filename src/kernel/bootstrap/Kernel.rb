@@ -123,6 +123,8 @@ module Kernel
 
   primitive 'format*', 'sprintf:with:'
 
+  primitive 'global_variables', 'rubyGlobalVariables' 
+
   primitive_nobridge 'include',  'includeRubyModule:'
 
   def loop
