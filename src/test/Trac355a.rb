@@ -1,21 +1,30 @@
 module Pbm
   def self.define_class(name)
-    klass = Class.new(SystemCallError)
-    const_set(name, klass)
-    klass
+    cl = Class.new(SystemCallError)
+    const_set(name, cl)
+    cl
+    $a = cl
   end
 end
 
-klass = Pbm.define_class(:EBADF)
+kb = Pbm.define_class(:EBADF)
 
 unless Pbm.constants.grep(/EBADF/)
   puts "Constant not defined Pbm::EBADF"
+  raise 'error'
 end
 
-unless klass.superclass == SystemCallError
-  puts "Bad superclass #{klass.superclass}"
+unless kb.superclass == SystemCallError
+  puts "Bad superclass #{kb.superclass}"
+  raise 'error'
 end
 
-unless klass.name == 'Pbm::EBADF'
-  puts "Bad class name #{klass.name}"
+ka = $a
+kstderr = StandardError
+nstd = kstderr.name
+cn = kb.name
+unless cn == 'Pbm::EBADF'
+  puts "Bad class name #{kb.name}"
+  raise 'error'
 end
+true
