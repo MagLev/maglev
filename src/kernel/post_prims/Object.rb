@@ -4,7 +4,7 @@
 #
 class Object
   def taint
-    raise TypeError, "Can't modify frozen object" if self.frozen?
+    # if frozen, primitive signals TypeError for gemstone error 2031
     @tainted = true
   end
 
@@ -13,7 +13,7 @@ class Object
   end
 
   def untaint
-    raise TypeError, "Can't modify frozen object" if self.frozen?
+    # if frozen, primitive signals TypeError for gemstone error 2031
     @tainted = false
   end
 end
