@@ -12,7 +12,7 @@ module Errno
   #     end
   def self.handle(err, additional = nil)
     return err unless err._isSmallInteger  # Not an errno
-    return err if err == 0                 # errno signifying no error
+    return err if err.equal?(0)                 # errno signifying no error
 
     # TODO: Errno: need to map errno to correct Exception
     raise SystemCallError, "System error (errno: #{err}): #{additional}"
