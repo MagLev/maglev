@@ -53,6 +53,10 @@ class Class
     inst
   end
 
+  # In MagLev, rescue clauses use kind_of? implemented in C within the VM , to
+  # determine if a the raised exception is to be handled by a specific rescue.
+  # Reimplementations of === in ruby code will not be used by rescue clauses.
+  #
   def === (obj)
     obj.kind_of?(self)
   end
