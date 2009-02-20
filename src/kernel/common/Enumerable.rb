@@ -539,7 +539,7 @@ module Enumerable
     prc = Proc.new { |obj| obj } unless block_given?
     times = 0
     each { |o| times += 1 if prc.call(o) }
-    times == 0
+    times.equal?(0)
   end
 
   ##

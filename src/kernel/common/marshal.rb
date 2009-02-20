@@ -454,7 +454,7 @@ module Marshal
     end
 
     def serialize(obj)
-      raise ArgumentError, "exceed depth limit" if @depth == 0
+      raise ArgumentError, "exceed depth limit" if @depth <= 0
 
       # How much depth we have left.
       @depth -= 1;
@@ -498,7 +498,7 @@ module Marshal
         str << to_byte(n >> 8)
         str << to_byte(n)
       end
-      str.chomp!("\0") while str[-1] == 0
+      str.chomp!("\0") while str[-1].equal?(0)
       str
     end
 
