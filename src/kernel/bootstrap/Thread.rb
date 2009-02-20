@@ -15,6 +15,7 @@ class Thread
       raise ArgumentError, 'limit must be > 0'
     end
     result = []
+    maglev_home = ENV['MAGLEV_HOME']
     _stbacktrace(limit).each do |ary|
       where, line, source = ary
       if /(.*) \(envId 1\)/ =~ where
@@ -25,7 +26,9 @@ class Thread
             if /line (\d+) .* file (.*)/=~ lines[-1]
               baseline = $1.to_i
               file = $2
-              result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
+              unless file =~ %r{<file name not available>|#{maglev_home}/src}
+                result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
+              end
             end
           end
         end
@@ -123,7 +126,7 @@ class Thread
 
   def join
     #   wait forever for the receiver to finish
-    self.value 
+    self.value
     self
   end
 
