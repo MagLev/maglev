@@ -186,7 +186,7 @@ class Time
       usec = 0
     else
       # resolve month names to numbers
-      if args[0] && args[0].respond_to?(:to_str) && (args[0] = args[0].to_str).to_i == 0
+      if args[0] && args[0].respond_to?(:to_str) && (args[0] = args[0].to_str).to_i.equal?(0)
         month = MonthValue[args[0].upcase] || raise(ArgumentError.new('argument out of range'))
       end
 
@@ -271,11 +271,11 @@ class Time
   # It seems that MRI return nil if other isn't a Time object
   def ==(other)
     result = self <=> other
-    result.nil? ? result : result == 0
+    result.nil? ? result : result.equal?(0)
   end
 
   def eql?(other)
-    (self <=> other) == 0
+    (self <=> other).equal?(0)
   end
 
   def asctime
