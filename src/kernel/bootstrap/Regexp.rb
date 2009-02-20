@@ -69,7 +69,7 @@ class Regexp
 
   # Return true if +Regexp::IGNORECASE+ is set on this regexp
   def casefold?
-    @options & IGNORECASE != 0
+    !((@options & IGNORECASE).equal?(0))
   end
 
   def initialize(str, options=nil)   # 3rd arg language ignored
@@ -82,13 +82,6 @@ class Regexp
     # will have a bridge method interposed which would
     #   require different args to _storeRubyVcGlobal
     raise ArgumentError, 'expected 1 arg'
-  end
-
-  # This method is here to allow Rubinius common code to call into our handling of $~.
-  # the Rubinius code does the following to set $~:  Regexp.last_match  = ....
-  def self.last_match=(m)
-    raise ArgumentError, "Need MatchData, not #{m.class}" unless m.kind_of?(MatchData)
-    m._storeRubyVcGlobal(0x20) # store into caller's $~
   end
 
   def match(str)
@@ -250,7 +243,7 @@ class Regexp
     return nil if md.equal?(nil)
     return md.begin(0) if md[0].nil?
     match_len = md.end(0) - md.begin(0)
-    return md.begin(0) + 1 if match_len == 0
+    return md.begin(0) + 1 if match_len.equal?(0)
     md.begin(0)
   end
 

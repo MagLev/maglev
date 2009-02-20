@@ -371,7 +371,7 @@ class String
     return nil if offset < 0 || offset > size
 
     if item._isString
-      return offset if item.size == 0
+      return offset if item.size.equal?(0)
       st_idx = self._findStringStartingAt(item, offset + 1)
     elsif item._isInteger
       return nil if item > 255 || item < 0
@@ -460,7 +460,7 @@ class String
     return nil if offset <= 0
 
     if item._isString
-      if item.size == 0
+      if item.size.equal?(0)
         return my_size if (offset >= my_size)
         return (offset <= my_size) ? (offset - 1) : my_size
       end
@@ -483,20 +483,7 @@ class String
   primitive 'rstrip', 'trimTrailingSeparators'
   primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
 
-#   def scan(regex)
-#     result = []
-#     regex.to_rx.each_match(self) do |m|
-#       result << m[0]
-#     end
-#     result
-#   end
-
-#   def scan(regex, &blk)
-#     regex.to_rx.each_match(self) do |m|
-#       yield m[0]  # m is a matchdata, m[0] is the matched string
-#     end
-#     self
-#   end
+  # def scan #  implemented in common/string.rb
 
   primitive 'size', 'size'
 
@@ -550,7 +537,7 @@ class String
 
       collapsed = match.collapsing?
 
-      if !collapsed || (match.begin(0) != 0)
+      if !collapsed || !(match.begin(0).equal?(0))
         ret << match.pre_match_from(last_match ? last_match.end(0) : 0)
         ret.push(*match.captures.compact)
       end
@@ -574,7 +561,7 @@ class String
     end
 
     # Trim from end
-    if !ret.empty? and (limit == 0 || limit.nil?)
+    if !ret.empty? and (limit.equal?(0) || limit.equal?(nil) )
       while s = ret.last and s.empty?
         ret.pop
       end

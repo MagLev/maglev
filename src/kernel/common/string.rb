@@ -28,9 +28,6 @@ class String
     self.dup.succ!
   end
 
-  def pbm
-    puts self[0].class
-  end
   def self.isalnum(int)
     (48..57).include?(int) ||
       (65..90).include?(int) ||
@@ -40,7 +37,7 @@ class String
   # place.
   def succ!
 #    return self if @num_bytes == 0
-    return self if size == 0
+    return self if size.equal?(0)
 
     carry = nil
     last_alnum = 0
@@ -72,14 +69,14 @@ class String
           self[start] = carry = ?A
         end
 
-        break if carry == 0
+        break if carry.equal?(0)
         last_alnum = start
       end
 
       start -= 1
     end
 
-    if carry.nil?
+    if carry.equal?(nil)
       start = length - 1
       carry = ?\001
 
@@ -141,30 +138,53 @@ class String
     taint = self.tainted? || pattern.tainted?
     pattern = get_pattern(pattern, true)
     index = 0
-
     last_match = nil
-
-    if block_given?
-      ret = self
-    else
-      ret = []
-    end
+    ret = []
 
     while match = pattern.match_from(self, index)
       index = match.collapsing? ? match.end(0) + 1 : match.end(0)
       last_match = match
-      val = (match.length == 1 ? match[0] : match.captures)
+      val = (match.length.equal?(1) ? match[0] : match.captures)
       val.taint if taint
+      ret << val
+    end
 
-      if block_given?
-        Regexp.last_match = match
+    last_match._storeRubyVcGlobal(0x20) # store into caller's $~
+    return ret
+  end
+
+  def scan(pattern, &block)
+    # second variant gets no bridge methods. can't rely on single
+    # implementation with bridge methods when using _storeRubyVcGlobal
+    # because number of frames up to caller's frame would vary .
+    taint = self.tainted? || pattern.tainted?
+    pattern = get_pattern(pattern, true)
+    index = 0
+    last_match = nil
+    if block_given?
+      ret = self
+      while match = pattern.match_from(self, index)
+        index = match.collapsing? ? match.end(0) + 1 : match.end(0)
+        last_match = match
+        val = (match.length.equal?(1) ? match[0] : match.captures)
+        val.taint if taint
+      
+        last_match._storeRubyVcGlobal(0x20) # store into caller's $~
         yield(val)
-      else
+      end
+    else
+      ret = []
+      while match = pattern.match_from(self, index)
+        index = match.collapsing? ? match.end(0) + 1 : match.end(0)
+        last_match = match
+        val = (match.length.equal?(1) ? match[0] : match.captures)
+        val.taint if taint
+
         ret << val
       end
     end
 
-    Regexp.last_match = last_match
+    last_match._storeRubyVcGlobal(0x20) # store into caller's $~
     return ret
   end
 
