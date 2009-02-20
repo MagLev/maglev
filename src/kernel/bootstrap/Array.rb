@@ -228,7 +228,7 @@ class Array
     lim = size > other.size ? other.size : size # lim is the min
     while i < lim
       result = self[i] <=> other[i]
-      return result if result != 0
+      return result if !(result.equal?(0))
       i += 1
     end
     size <=> other.size
@@ -790,7 +790,7 @@ class Array
 
   def slice!(x, y = nil)
     if y
-      return [] if size == 0
+      return [] if size.equal?(0)
       result = self[x,y]
       self[x,y] = []
     else
