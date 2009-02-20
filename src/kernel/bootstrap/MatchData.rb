@@ -78,7 +78,7 @@ class MatchData
   end
 
   def pre_match_from(idx)
-    return "" if self.begin(0) == 0 # GEMSTONE
+    return "" if self.begin(0).equal?(0) # GEMSTONE
     pre_end = self.begin(0) - 1
     @inputString[idx, pre_end-idx+1]
   end
