@@ -43,8 +43,25 @@ only to the local session/VM).  To make those methods globally available,
 you need to save the local ruby state to the global space, and then
 commit.
 
-Here is hat_trick.rb, which defines a class and then creates a global
-instance of a hat:
+=== Hat Trick Example
+
+Here is the hat trick example.  The Magician (VM one), creates an empty
+hat.  The Magician shows that it is empty, then waves his magic wand and
+pulls a rabbit out of the hat.
+
+The magic happens due to the Assistant (second VM), which loads a Rabbit
+class, creates a rabbit and stuffs it into the hat, so the Magician can
+amaze the crowd.
+
+We'll explain the trick at two levels.  In the first explanation, we show
+all the steps necessary using the base APIs MagLev provides.  There are
+several details to keep track of at this level. The second walk through
+will use a higher level API that manages some of the details for us.
+
+==== The Code
+But first, the code.   The code used in both versions is in
+<tt>examples/hat_trick</tt>.  The Hat is just a container that you can put
+an item into and pull an item out of:
 
     class Hat
       def initialize
@@ -61,33 +78,97 @@ instance of a hat:
       end
     end
 
-    $hat = Hat.new   # an empty hat
+The rabbit class defines a cute, furry object to pull out of a hat:
 
-Here is a maglev-irb session that commits the code and data ($hat) to the
-persistent store:
+    class Rabbit
+      def inspect
+        "\n () ()\n( '.' )\n(\")_(\")\n"
+      end
+    end
+
+==== Low Level API version
+
+Here is the detailed, low level API explanation of the hat trick.
+
+The magician creates a hat, and shows the audience that it is empty:
+
+    MAGICIAN:
 
     $ cd examples/hat_trick/
-    $ maglev-ruby
-    >> Gemstone.beginTransaction
-    => Gemstone
-    *> load 'hat'                  # Load our code into session
-    => true
-    *> RubyContext.save            # Copy methods from session to global
-    => #<RubyContext:0x05d20201
-    *> Gemstone.commitTransaction  # Commit the whole thing
-    => true
-    *>
-
-Now, we can start another maglev session and see the global variable and
-the methods:
-
     $ maglev-irb
-    >> $hat
-    => #<Hat:0x07e46501
-    *> $hat.contents
-    => []
+    >> Gemstone.beginTransaction    # Not strictly necessary
+    => Gemstone
+    *> load 'hat.rb'                # hat.rb loaded into Magician VM only
+    => true
+    *> $hat = Hat.new               # Create our hat in a persistent root
+    => #<Hat:0x1fcf9101>
+    *> puts $hat.contents           # Show everyone the hat is empty
+
+    => nil
+    *> RubyContext.save_context     # Stage hat code for commit
+    => #<RubyContext:0x2437c501>
+
+At this point, <tt>$hat</tt> and the code in <tt>hat.rb</tt> exist only in
+the Magician's VM.  When we commit the transaction, both will be available
+to all VMs attached to the repository.
+
+    *> Gemstone.commitTransaction   # Commit code and hat to repository
+    => true
     *>
 
-<tt>maglev-irb</tt> also has support via the <tt>COMMIT</tt> command (see
-the top level <tt>README</tt> for an example).
+Now we switch to the Assistant's VM, and secretly put the rabbit in the
+hat.
+
+    ASSISTANT:
+
+    $ cd examples/hat_trick/
+    $ maglev-irb
+    *> Gemstone.abortTransaction   # Ensure we have a fresh view of repository
+    => Gemstone
+    *> RubyContext.load_context    # Load changed code into working copy
+    => #<RubyContext:0x2437c501>   # NOTE: same obj id as in Magician VM!
+    *> $hat.contents[0]            # Check we have the hat, and it is empty
+    => nil
+    *> load 'rabbit.rb'            # Load rabbit code into Assistant VM
+    => true
+    *> $hat.put(Rabbit.new)        # Stuff a rabbit in the hat
+    => nil
+    *> RubyContext.save_context    # Stage rabbit code for commit
+    => #<RubyContext:0x2437c501>
+    *> Gemstone.commitTransaction  # Commit rabbit code and rabbit in hat
+    => true
+
+The assistant starts by aborting the current transaction and then loading
+the ruby context.  This is only necessary if the assistant VM was started
+before the magician did the commit.  The <tt>Gemstone.abortTransaction</tt>
+flushes any changes in the current vm (in our case, none), and then
+refreshes state from the repository (i.e., gets <tt>$hat</tt> and updates
+the RubyContext with the hat code).  Since the VM runs off of the working
+copy of the ruby code, we then have to move the hat.rb code into the
+working copy, which is done with the <tt>RubyContext.load_context</tt>.  If
+the assistant VM is started after the magician commits, then neither the
+abort nor the load is necessary, since the VM initialized everything from
+the committed view of the repository.
+
+After getting the signal from the assistant that the rabbit is loaded, the
+Magician waves his magic wand and pulls the rabbit out of the hat:
+
+Wave magic wand:
+
+    MAGICIAN:
+
+    *> Gemstone.abortTransaction     # Refresh our view from the repository
+    => Gemstone                      # (reads $hat, that now has a rabbit)
+    *> RubyContext.load_context      # Copy persistent view of code to working view
+    => #<RubyContext:0x2437c501>
+
+Amaze the crowd:
+
+    MAGICIAN:
+
+    *> $hat.contents[0]
+    =>
+     () ()
+    ( '.' )
+    (")_(")
 
