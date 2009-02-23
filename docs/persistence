@@ -102,16 +102,15 @@ The magician creates a hat, and shows the audience that it is empty:
     => true
     *> $hat = Hat.new               # Create our hat in a persistent root
     => #<Hat:0x1fcf9101>
-    *> puts $hat.contents           # Show everyone the hat is empty
-
+    *> $hat.contents[0]             # Show everyone the hat is empty
     => nil
-    *> RubyContext.save_context     # Stage hat code for commit
-    => #<RubyContext:0x2437c501>
 
 At this point, <tt>$hat</tt> and the code in <tt>hat.rb</tt> exist only in
 the Magician's VM.  When we commit the transaction, both will be available
 to all VMs attached to the repository.
 
+    *> RubyContext.save_context     # Stage hat code for commit
+    => #<RubyContext:0x2437c501>
     *> Gemstone.commitTransaction   # Commit code and hat to repository
     => true
     *>
@@ -172,3 +171,55 @@ Amaze the crowd:
     ( '.' )
     (")_(")
 
+
+==== A Higher Level API version
+
+Here is a different run of the hat trick.  This time, we use an
+experimental higher level API that assumes we want to manage both code and
+data at each of the life-cycle stages.  The file with the experimental code
+is <tt>lib/ruby/1.8/maglev.rb</tt>.
+
+The magician creates a hat, and shows the audience that it is empty:
+
+    MAGICIAN:
+
+    $ cd examples/hat_trick/
+    $ maglev-irb
+    >> require 'maglev'                  # Load the helper library
+    => true
+    *> load 'hat.rb'                     # Load the hat code
+    => true
+    *> $hat = Hat.new                    # Create hat
+    => #<Hat:0x05a8ea01>
+    *> $hat.contents[0]                  # The hat is empty
+    => nil
+    *> MagLev::CodeAndData.commit_txn    # Stage the new code (both hat and 
+    => true                              # maglev are staged) and commit code
+    *>                                   # and data.
+
+Now the assistent does some work:
+
+    ASSISTANT:
+    
+    $ cd examples/hat_trick/
+    $ maglev-irb
+    >> MagLev::CodeAndData.freshen       # No need to load maglev, if assitant
+    => true                              # started after magician commits.
+    *> $hat.contents[0]                  # Hat is there, but empty
+    => nil
+    *> load 'rabbit.rb'                  # Load rabbit code
+    => true
+    *> $hat.put(Rabbit.new)              # Stuff rabbit in hat
+    => nil
+    *> MagLev::CodeAndData.commit_txn    # Commit both rabbit code and rabbit
+    => true
+
+Back in the Magician:
+ 
+    *> MagLev::CodeAndData.freshen       # Wave magic wand (loads both the
+    => true                              # rabbit and its code)
+    *> $hat.contents[0]                  # Pull rabbit out of hat
+    => 
+     () ()
+    ( '.' )
+    (")_(")
