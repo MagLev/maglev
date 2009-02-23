@@ -7,8 +7,25 @@ class Hash
   # Class methods
   class_primitive_nobridge '_new', '_new:defaultValue:'
 
-  def self.new(&block)
+  def self.new(*args)
     # first variant gets bridge methods
+    if args.length <= 1
+      if (args.length == 0)
+        h = self.new
+      else
+        h = self.new(args[0])
+      end
+    else
+      # raises ArgumentError, too-many args, unless  a subclass of Hash 
+      #   has implemented forms of initialize to take > 1 arg
+      h = self._new(5, nil)
+      h.initialize(*args) 
+    end
+    h
+  end
+
+  def self.new(&block)
+    # subsequent variants replace just the corresponding bridge method
     if block_given? 
       h = self._new(5, block)
       h.initialize(&block)
@@ -20,7 +37,6 @@ class Hash
   end
  
   def self.new
-    # subsequent variants replace just the corresponding bridge method
     h = self._new(5, nil)
     h.initialize
     h
@@ -32,6 +48,15 @@ class Hash
     h
   end
 
+  def self.new(default_value, &block)
+    # raises ArgumentError, too-many args, unless  a subclass of Hash
+    #   has implemented forms of initialize to take > 1 arg
+    h = self._new(5, default_value)
+    h.initialize(default_value, &block) # raises too-many args 
+    h
+  end
+
+ 
   def self.[](*elements)
     numelem = elements.length
     if !((numelem & 1).equal?(0))
@@ -58,6 +83,24 @@ class Hash
   end
 
   # Instance Methods
+
+  # initialize is only used to issue too-many args errors for new
+  def initialize(*args)
+    if (args.length > 1)
+      raise ArgumentError, 'too many args'
+    end
+    self
+  end
+  def initialize(one_arg)
+    self
+  end
+  def initialize(&block)
+    self
+  end
+  def initialize(one_arg, &block)
+    raise ArgumentError, 'too many args'
+    self
+  end
 
   def ==(other)
     if (other._isHash)
