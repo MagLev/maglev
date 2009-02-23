@@ -1,11 +1,22 @@
 class Mutex
   # Mutex is identically the Smalltalk class Semaphore
 
-  def self.new
-    'Mutex'  # override Smalltalk name
+  class_primitive_nobridge '_new', 'forRubyMutualExclusion'
+
+  def self.new(*args, &blk)
+    # first variant gets bridge methods
+    m = self._new
+    m.initialize(*args, &blk)
+    m
   end
 
-  class_primitive_nobridge 'new', 'forMutualExclusion'
+  def self.new
+    # subsequent variants replace just the corresponding bridge method
+    #  this variant is optimization for most common usage
+    m = self._new
+    m.initialize
+    m
+  end
 
   primitive_nobridge 'locked?', 'isLocked'
 

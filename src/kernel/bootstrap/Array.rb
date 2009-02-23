@@ -5,7 +5,6 @@ class Array
   primitive_nobridge 'insert_all', 'insertAll:at:'
 
   primitive 'size=', 'size:'
-  class_primitive_nobridge '_withAll', 'withAll:'
 
   # TODO consider a method prefix __nobr__ which during load prims
   #   would suppress generation of bridge methods for private
@@ -66,12 +65,13 @@ class Array
   # end private helper methods
 
   # Array Class Methods
+  class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
+  class_primitive_nobridge '_withall', '_rubyWithAll:'
 
   # Returns a new array with the given elements.
   def self.[](*elements)
-    _withAll(elements)
+    _withall(elements)
   end
-  class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
 
   def self.new(*args)
     # this variant gets bridge methods
@@ -80,9 +80,9 @@ class Array
 
   def self.new(first, &blk)
     if first._isArray
-      _withAll(first) # ignore the block
+      _withall(first) # ignore the block
     else
-      siz = Type.coerce_to(first, Integer, :to_int)
+      siz = Type.coerce_to(first, Fixnum, :to_int)
       a = _alloc(siz, nil)
       if block_given?   # block takes precedence over extra 
 	n = 0
@@ -96,7 +96,7 @@ class Array
   end
 
   def self.new(a_size, value)
-    s = Type.coerce_to(a_size, Integer, :to_int)
+    s = Type.coerce_to(a_size, Fixnum, :to_int)
     _alloc(s, value)
   end
 
@@ -131,7 +131,7 @@ class Array
     # separate method to avoid complex blocks in self.new(arg)
     begin
       ary = Type.coerce_to(arg, Array, :to_ary)
-      res = _withAll(ary)
+      res = _withall(ary)
     rescue TypeError
       siz = Type.coerce_to(arg, Fixnum, :to_int)
       res = _alloc(siz, nil)

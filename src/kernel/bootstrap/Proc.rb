@@ -55,6 +55,7 @@ class Proc
       if blk._isBlock
         inst = self.allocate
         inst._initialize(&blk)
+        inst.initialize
         return inst
       elsif blk.is_a?(Proc)
         return blk

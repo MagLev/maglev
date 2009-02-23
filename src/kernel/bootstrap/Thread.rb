@@ -67,7 +67,7 @@ class Thread
   class_primitive_nobridge 'exit', 'exit'
 
   primitive_nobridge '_start*&', 'rubyStart:block:'
-  class_primitive_nobridge '_basic_new', '_basicNew'
+  class_primitive_nobridge '_basic_new', 'rubyBasicNew'
 
   def self.new(*args, &blk)
     thr = self._basic_new

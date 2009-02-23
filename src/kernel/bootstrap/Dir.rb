@@ -66,10 +66,23 @@ class Dir
     Errno.handle(_mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
   end
 
+  def self.new(*args, &blk)
+    # first variant gets bridge methods
+    if (args.length > 0)
+      d = _new(args[0])
+      Errno.handle(d, dirname)
+      d.initialize(*args, &blk)
+    else
+      raise ArgumentError, 'too few args'
+    end
+  end
+
   def self.new(dirname)
-    inst = _new(dirname)
-    Errno.handle(inst, dirname)
-    inst.initialize(dirname)
+    # replaces the corresponding bridge method only
+    d = _new(dirname)
+    Errno.handle(d, dirname)
+    d.initialize(dirname)
+    d
   end
 
   def self.open(dirname, &block)

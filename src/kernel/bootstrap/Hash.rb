@@ -5,9 +5,32 @@ class Hash
   primitive 'keys', 'keys'
 
   # Class methods
-  class_primitive_nobridge 'new', 'new:'
-  class_primitive_nobridge 'new&', 'new:'
-  class_primitive 'new'
+  class_primitive_nobridge '_new', '_new:defaultValue:'
+
+  def self.new(&block)
+    # first variant gets bridge methods
+    if block_given? 
+      h = self._new(5, block)
+      h.initialize(&block)
+    else
+      h = self._new(5, nil)
+      h.initialize
+    end
+    h
+  end
+ 
+  def self.new
+    # subsequent variants replace just the corresponding bridge method
+    h = self._new(5, nil)
+    h.initialize
+    h
+  end
+
+  def self.new(default_value)
+    h = self._new(5, default_value)
+    h.initialize(default_value)
+    h
+  end
 
   def self.[](*elements)
     numelem = elements.length
@@ -22,7 +45,11 @@ class Hash
       raise ArgumentError , 'odd number of args'
     end
     n = 0
-    res = self.new
+    tsize = numelem / 4 
+    if tsize < 5
+      tsize = 5 
+    end
+    res = self._new(tsize , nil)
     while (n < numelem)
       res[ elements[n] ] = elements[n + 1]
       n += 2

@@ -1,5 +1,8 @@
 class Env
-    # A ruby reference to ENV is translated to the message send Env._current
+    # A ruby reference to ENV is translated by parser to a message send Env._current
+    # There is only one transient instance of Env , created during RubyContext load .
+    #  The one instance of Env is stored in Smalltalk in     SessionTemps current   .
+
     class_primitive_nobridge '_current', '_current'
     class_primitive_nobridge '_getenv', '_getenv:'
     class_primitive_nobridge '_putenv', '_putenv:with:'
@@ -53,5 +56,3 @@ class Env
 
 end
 
-# access to Global ENV is translated by parser to   Env._current
-#  The one instance of Env is stored in   SessionTemps current  

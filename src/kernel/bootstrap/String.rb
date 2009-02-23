@@ -595,11 +595,11 @@ class String
     Regexp.new(self)._split_string(string, limit)
   end
 
-  primitive_nobridge 'squeeze', 'rubySqueeze'
   primitive 'squeeze*', 'rubySqueeze:'
+  primitive_nobridge 'squeeze', 'rubySqueeze'
 
-  primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
   primitive 'squeeze!*', 'rubySqueezeSelf:'
+  primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
 
   def strip
     _strip

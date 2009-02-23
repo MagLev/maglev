@@ -23,7 +23,7 @@ class File
   class_primitive_nobridge '_stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
-  class_primitive_nobridge '_open', 'openOnServer:mode:'
+  class_primitive_nobridge '_open', 'rubyOpen:mode:'
   class_primitive 'stdin'
   class_primitive 'stdout'
   class_primitive 'stderr'
@@ -279,13 +279,41 @@ class File
     File.stat(filename).mtime
   end
 
-  def self.new(filename, mode="r")
+  def self.new(*args, &blk)
+    # first variant gets bridge methods
+    len = args.length
+    if len > 0
+      if len.equal?(1)
+        f = self.new(args[0], 'r')
+      else
+        f = self.new(args[0], args[1])
+      end
+      f.initialize(*args, &blk)
+      f
+    else
+      raise ArgumentError, 'too few args'
+    end
+  end 
+
+  def self.new(filename)
+    # subsequent variants replace just the corresponding bridge method
+    f = self._open(filename, 'r')
+    if f.equal?(nil)
+      raise SystemCallError # TODO: Errno::xxx
+    end
+    f.initialize
+    f
+  end
+
+  def self.new(filename, mode)
     f = self._open(filename, mode)
     if f.equal?(nil)
       raise SystemCallError # TODO: Errno::xxx
     end
+    f.initialize
     f
   end
+
 
   def self.open(filename, mode="r", &b)
     f = self._open(filename, mode)
