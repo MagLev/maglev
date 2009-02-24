@@ -108,8 +108,6 @@ class Module
   # MNI: define_method
   # MNI: extend_object
   # MNI: extended
-  # MNI: include
-  # MNI: included
 
   def remove_class_variable(symbol)
     _stub_warn("Module#remove_class_variable")

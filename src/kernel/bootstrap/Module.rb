@@ -25,15 +25,19 @@ class Module
 
   #  define_method   is implemented in Behavior
 
-  # Invoked as a callback when a method is added to the reciever
+  # Invoked as a callback when a_module includes receiver
+  def included(a_module)
+  end
+
+  # Invoked as a callback when a method is added to the receiver
   def method_added(symbol)
   end
 
-  # Invoked as a callback when a method is removed from the reciever
+  # Invoked as a callback when a method is removed from the receiver
   def method_removed(symbol)
   end
 
-  # Invoked as a callback when a method is undefined in the reciever
+  # Invoked as a callback when a method is undefined in the receiver
   def method_undefined(symbol)
   end
 
