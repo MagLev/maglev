@@ -1,77 +1,117 @@
-# This is (going to be) an example of maglev persistence on unordered
-# collections with indexing.
+# A simple blog with comments for experimentation.  The names of the
+# classes, "Post" and "Comment", as well as the list of attributes and
+# their names, comes from the blog example from the Rails 2.2.2
+# getting_started_with_rails.txt file.  See the TODO.txt for hints of rails
+# features to add to this example.
 #
-# Status: As of 2009-02-23, we can do the indexing of the unordered
-# collections from ruby, but we don't have a way of doing the selects...
-#
-# This example is on hold.
-#
-class Array
-  # Pick an element at random from the array (from the facets library)
-  def at_random
-    at(rand(size) - 1)
+
+class Post
+  # These are the attributes and names from the ra
+  attr_reader :name, :title, :content
+
+  def initialize(name, title, content, timestamp=Time.now)
+    @name, @title, @content, @timestamp = name, title, content, timestamp
+    @comments = []
   end
-end
 
-# TODO: Could make a name class that has first and last fields
-
-class Address
-  STREETS = ['Main', 'Spruce', 'Robinson Ln', 'Taylor Ave.', '43rd Ave']
-  CITIES = ['Portland', 'AnyTown', 'Roseville', 'Santa Cruz', 'Bellingham',
-    'Fort Collins', 'Berkeley', 'Yuma', 'Tuscon', 'Vermillion', 'St. Louis']
-  STATES = ['AZ', 'CA', 'CO', 'MO', 'WA', 'OR', 'SD']
-  ZIPS = [01234, 12345, 23456, 34567, 45678]
-
-  attr_reader :street, :city, :state, :zip
-
-  def initialize(number, street, city, state, zip)
-    @number, @street, @city, @state, @zip = number, street, city, state, zip
+  def add_comment(comment)
+    @comments << comment
+    # Could also make a bi-directional link:
+    #   comment.set_entry(self)
+    # This is fodder for the associationn management gizmo yet to be
+    # developed.
   end
 
   def to_s
-    "#{@number} #{@street}, #{@city}, #{@state}  #{@zip}"
-  end
-
-  def self.random
-    Address.new(rand(9500), STREETS.at_random, CITIES.at_random,
-      STATES.at_random, ZIPS.at_random)
+    "Post #{@name} #{@title} (#{@timestamp}) #{@content}: \n#{@comments.join("\n")}"
   end
 end
 
-class Person
-  MALE_NAMES = [ 'Peter', 'Jon', 'Allen', 'Martin', 'Monty',
-    'Bob', 'Paul', 'Sir' ]
-  FEMALE_NAMES = ['Cleopatra', 'Helen', 'Joan', 'Lady', 'Mary', 'Dame']
-  LAST_NAMES   = ['de Rothschild', 'Public', 'Doe', 'Smith', 'McLain',
-    'Williams', 'McClure', 'Otis', 'Walker', 'Not appearing in this film']
-  MARITAL_STATUS = [:single, :married, :hermit]
-  attr_reader :name, :age, :gender, :address
 
-  def initialize(name, age, gender, address, marital_status=:single)
-    @name, @age, @gender, @address, @marital_status = name, age, gender, address, marital_status
+class UseCases
+  def post_index
+    # @posts = Post.find(:all)
+#     respond_to do |format|
+#       format.html # index.html.erb
+#       format.xml  { render :xml => @posts }
+#     end
   end
 
-  def to_s
-    "#{@name} is a #{@age} year old, #{@marital_status} #{@gender}, and lives at: #{@address}"
+  def post_new
+#    @post = Post.new
   end
 
-  def self.random
-    gender = [:male, :female].at_random
-    first_name = (gender == :male ? MALE_NAMES : FEMALE_NAMES).at_random
-    Person.new( "#{first_name} #{LAST_NAMES.at_random}",
-      rand(75) + 18,  # only legal adults, please...but no ageism...
-      gender,
-      Address.random,
-      MARITAL_STATUS.at_random)
+  def post_create
+#     @post = Post.new(params[:post])
+
+#     respond_to do |format|
+#       if @post.save
+#         flash[:notice] = 'Post was successfully created.'
+#         format.html { redirect_to(@post) }
+#         format.xml  { render :xml => @post, :status => :created, :location => @post }
+#       else
+#         format.html { render :action => "new" }
+#         format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
+#       end
+#     end
+  end
+
+  def post_show
+#     @post = Post.find(params[:id])
+
+#     respond_to do |format|
+#       format.html # show.html.erb
+#       format.xml  { render :xml => @post }
+#     end
+  end
+
+  def post_update
+#     @post = Post.find(params[:id])
+
+#     respond_to do |format|
+#       if @post.update_attributes(params[:post])
+#         flash[:notice] = 'Post was successfully updated.'
+#         format.html { redirect_to(@post) }
+#         format.xml  { head :ok }
+#       else
+#         format.html { render :action => "edit" }
+#         format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
+#       end
+#     end
+  end
+
+  def post_destroy
+#     @post = Post.find(params[:id])
+#     @post.destroy
+
+#     respond_to do |format|
+#       format.html { redirect_to(posts_url) }
+#       format.xml  { head :ok }
+#     end
   end
 end
 
-all_people = IdentitySet.new
-all_people._create_index 'age'
 
-10.times do |i|
-  all_people << Person.random
-end
+$all_blogs = { }
+Gemstone.commitTransaction
 
-all_people.each { |p| puts p }
+
+my_name 'Ogdred Weary'
+$all_blogs[my_name] = Blog.new("My Spiffy Blog", my_name)
+
+
+
+#  No real purpose....?
+# class Blog
+#   attr_reader :author, :title, :entries
+#   def initialize(author, title)
+#     @author = author
+#     @title = title
+#     @entries = []
+#   end
+
+#   def to_s
+#     "BLOG: #{@title} by #{@author}: #{@entries.join("\n\n")}"
+#   end
+# end
 
