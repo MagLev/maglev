@@ -13,10 +13,14 @@ hdr="Benchmark-${HOSTNAME}-`date +%y%m%d`,MRI-186,MRI-187,Jruby-116,MRI-1.9,Fast
 
 pushd ruby-benchmark-suite
 rake run_all RUBY_VM="maglev-ruby" TIMEOUT=600 REPORT="../MagLev-raw.csv"
-rake run_all RUBY_VM="$JRUBY_HOME/jruby -J-Xss1024m -J-Xmn512m -J-Xms2048m -J-Xmx2048m -J-server" TIMEOUT=600 REPORT="../JRuby1.1.6-raw.csv"
-rake run_all RUBY_VM="/usr/local/ruby1.8.6/bin/ruby" TIMEOUT=600 REPORT="../MRI-186p287-raw.csv"
-rake run_all RUBY_VM="/usr/local/ruby1.8.7/bin/ruby" TIMEOUT=600 REPORT="../MRI-187p72-raw.csv"
+
+# Stop MagLev to free up any memory
+maglev stop
+
 rake run_all RUBY_VM="/usr/local/ruby1.9/bin/ruby" TIMEOUT=600 REPORT="../MRI-19-raw.csv"
+rake run_all RUBY_VM="$JRUBY_HOME/jruby -J-Xss1024m -J-Xmn512m -J-Xms2048m -J-Xmx2048m -J-server" TIMEOUT=600 REPORT="../JRuby1.1.6-raw.csv"
+rake run_all RUBY_VM="/usr/local/ruby1.8.7/bin/ruby" TIMEOUT=600 REPORT="../MRI-187p72-raw.csv"
+rake run_all RUBY_VM="/usr/local/ruby1.8.6/bin/ruby" TIMEOUT=600 REPORT="../MRI-186p287-raw.csv"
 popd
 
 # Let us know we're done with the actual tests so we can start using the machine again
