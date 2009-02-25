@@ -161,3 +161,11 @@ class SignalException
   #end
 end
 
+# This was in lib/ruby/1.8/timeout.rb, but class_primitive_nobridge is not
+# allowed after boot, so the exception definition was moved here.
+#
+# class RubyTimeoutError  is defined in the maglev*.mcz
+RUBY.global("TimeoutError", "RubyTimeoutError")
+class TimeoutError
+  class_primitive_nobridge 'timeout', 'timeout:do:'
+end

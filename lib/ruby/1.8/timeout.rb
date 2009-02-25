@@ -1,9 +1,4 @@
-# class RubyTimeoutError  is defined in the maglev*.mcz
-RUBY.global("TimeoutError", "RubyTimeoutError")
-
-class TimeoutError
-  class_primitive_nobridge 'timeout', 'timeout:do:'
-end
+# TimeoutError defined in kernel/bootstrap/Exception.rb.
 
 def timeout(n, &b)
     TimeoutError.timeout(n, b)
@@ -13,7 +8,7 @@ module Timeout
     def timeout(n, &b)
         TimeoutError.timeout(n, b)
     end
-    
+
     def self.timeout(n, &b)
         TimeoutError.timeout(n, b)
     end
