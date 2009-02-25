@@ -194,6 +194,12 @@ class Object
        self
     end
 
+    def initialize_copy(other)
+      # dup and clone are complete, and C extensions not supported yet,
+      #   so do nothing
+      self
+    end
+
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
@@ -287,23 +293,31 @@ class Object
     #   to_s
     # end
 
-    primitive_nobridge '_ruby_singleton_methods', 'rubySingletonMethods:'
+    primitive_nobridge '_ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
     def singleton_methods(inc_modules = true)
-      _ruby_singleton_methods(inc_modules)
+      _ruby_singleton_methods(inc_modules, 0)
     end
 
-    primitive_nobridge '_ruby_methods', 'rubyMethods'
+    primitive_nobridge '_ruby_methods', 'rubyMethods:'
 
     # If regular is true, retuns an array of the names of methods publicly
     # accessible in receiver and receiver's ancestors.  Otherwise, returns
     # an array of the names of receiver's singleton methods.
     def methods(regular = true)
       if regular
-        _ruby_methods
+        _ruby_methods(0) # get public methods
       else
-        _ruby_singleton_methods(false)
+        _ruby_singleton_methods(false, 0)
       end
+    end
+
+    def private_methods(unused_boolean=true)
+      _ruby_methods(2) 
+    end
+
+    def protected_methods(unused_boolean=true)
+      _ruby_methods(1) 
     end
 
     def _isBehavior
