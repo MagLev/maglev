@@ -64,7 +64,15 @@ class Module
     _fullName
   end
 
-  class_primitive_nobridge 'new', 'newModule'
+  class_primitive_nobridge '_new_module', 'newModule'
+
+  def self.new(&block)
+    m = _new_module
+    if block_given?
+      m.module_eval(&block)
+    end
+    m
+  end
 
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'
 
