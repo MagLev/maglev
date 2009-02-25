@@ -9,8 +9,9 @@ class Hash
 
   def self.new(*args)
     # first variant gets bridge methods
-    if args.length <= 1
-      if (args.length == 0)
+    len = args.length
+    if len <= 1
+      if len.equal?(0)
         h = self.new
       else
         h = self.new(args[0])

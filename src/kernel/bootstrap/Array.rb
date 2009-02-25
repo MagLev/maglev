@@ -73,14 +73,29 @@ class Array
     _withall(elements)
   end
 
+  # implementations of new need to call initialize in case application has
+  #   subclassed Array and reimplemented initialize .
   def self.new(*args)
     # this variant gets bridge methods
-    raise ArgumentError, 'too many args'
+    len = args.length
+    if len <= 2
+      if  len.equal?(2)
+        a = self.new(args[0], args[1])
+      elsif len.equal?(1)
+        a = self.new(args[0])
+      elsif len.equal?(0)
+        a = self.new
+      end
+    else
+      a = _alloc(0, nil)
+    end
+    a.initialize(*args)  # raises too many args
+    a
   end
 
   def self.new(first, &blk)
     if first._isArray
-      _withall(first) # ignore the block
+      a = _withall(first) # ignore the block
     else
       siz = Type.coerce_to(first, Fixnum, :to_int)
       a = _alloc(siz, nil)
@@ -93,11 +108,15 @@ class Array
       end
       a
     end
+    a.initialize(first, &blk)
+    a
   end
 
   def self.new(a_size, value)
     s = Type.coerce_to(a_size, Fixnum, :to_int)
-    _alloc(s, value)
+    a = _alloc(s, value)
+    a.initialize(a_size, value)
+    a
   end
 
   def self.new(first, second, &blk)
@@ -112,34 +131,60 @@ class Array
     # this method will have no bridge methods, all the bridges
     #  will map to the previous 2 arg form
     if (arg._isFixnum)
-      _alloc(arg, nil)
+      a = _alloc(arg, nil)
     else
-      _coerceOneArg(arg)
+      a = _coerceOneArg(arg)
     end
+    a.initialize(arg)
+    a
   end
 
   def self.new
-    _alloc(0, nil)
+    a = _alloc(0, nil)
+    a.initialize
+    a
   end
 
   def self.new(&blk)
     # ignores the block
-    _alloc(0, nil)
+    a = _alloc(0, nil)
+    a.initialize(&blk)
   end
 
   def self._coerceOneArg(arg)
     # separate method to avoid complex blocks in self.new(arg)
     begin
       ary = Type.coerce_to(arg, Array, :to_ary)
-      res = _withall(ary)
+      a = _withall(ary)
     rescue TypeError
       siz = Type.coerce_to(arg, Fixnum, :to_int)
-      res = _alloc(siz, nil)
+      a = _alloc(siz, nil)
     end
-    res
+    a
   end
 
   # Array Instance methods
+ 
+  def initialize(*args)
+    # this variant gets bridge methods
+    raise ArgumentError, 'too many args'
+  end
+  def initialize(first, &blk)
+    self
+  end
+  def initialize(a_size, value)
+    self
+  end
+  def initialize(arg)
+    self
+  end
+  def initialize
+    self
+  end
+  def initialize(&blk)
+    self
+  end
+
 
   # Set intersection. Return new array containing elements common to two
   # arrays.
