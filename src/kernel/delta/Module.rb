@@ -68,9 +68,14 @@ class Module
     []
   end
 
+  primitive '_ruby_methods', 'rubyMethods:protection:'
+
   def instance_methods(inc_super=true)
-    _stub_warn("Module#instance_methods")
-    []
+    _ruby_methods(inc_super, 0);
+  end
+
+  def public_instance_methods(inc_super=true)
+    _ruby_methods(inc_super, 0);
   end
 
   def private_class_method(*symbols)
@@ -79,13 +84,11 @@ class Module
   end
 
   def private_instance_methods(inc_super=true)
-    _stub_warn("Module#private_instance_mtehods")
-    []
+    _ruby_methods(inc_super, 2);
   end
 
   def protected_instance_methods(inc_super=true)
-    _stub_warn("Module#protected_instance_methods")
-    []
+    _ruby_methods(inc_super, 1);
   end
 
   def public_class_method(*symbols)
@@ -93,12 +96,6 @@ class Module
     nil
   end
 
-  def public_instance_methods(inc_super=true)
-    _stub_warn("Module#public_instance_methods")
-    []
-  end
-
-  # private instance methods
 
   # MNI: append_features
   # MNI: attr
