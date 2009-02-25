@@ -5,9 +5,6 @@
 timeout = File.dirname(__FILE__) + "/timeout"
 limit, vm, runner, name, iterations, report = ARGV
 
-puts "==> Timeout = #{timeout} -t #{limit}"
-puts "==> Command =  #{vm} #{runner} #{name} #{iterations} #{report}"
-
 start = Time.now
 cmd = "#{timeout} -t #{limit} #{vm} #{runner} #{name} #{iterations} #{report} > /dev/null"
 system cmd
