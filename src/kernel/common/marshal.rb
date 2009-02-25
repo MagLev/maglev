@@ -1,5 +1,6 @@
 # depends on: module.rb class.rb
 
+
 module Marshal
 
   MAJOR_VERSION = 4
@@ -61,13 +62,11 @@ module Marshal
     end
 
     def add_object(obj)
-      # Gemstone
-      #return if obj.kind_of?(ImmediateValue)
+      # GEMSTONE
+      # return if obj.kind_of?(ImmediateValue)
       case obj
       when Fixnum, Float
         return
-      else
-#        puts "=== non-immediate: #{obj.class}"
       end
       sz = @links.size
       @objects[sz] = obj
@@ -377,15 +376,6 @@ module Marshal
       @symlinks[obj.object_id]
     end
 
-    def frexp(flt)
-      # Gemstone
-      throw NotImplementedError, 'Marshal#frexp'
-#      ptr = MemoryPointer.new :int
-#      return Platform::Float.frexp(flt, ptr)
-#    ensure
-#      ptr.free if ptr
-    end
-
     def get_byte_sequence
       size = construct_integer
       consume size
@@ -395,7 +385,7 @@ module Marshal
       names = []
       sup = obj.metaclass.superclass
 
-      # Gemstone
+# GEMSTONE
 #      while sup and [Module, IncludedModule].include? sup.class do
       while sup and [Module].include? sup.class do
         names << sup.name
@@ -428,33 +418,12 @@ module Marshal
       end
     end
 
-    def ldexp(flt, exp)
-      # Gemstone
-      raise NotImplementedError, 'Marshal#ldexp'
-#      Platform::Float.ldexp flt, exp
-    end
-
-    def modf(flt)
-      # Gemstone
-      raise NotImplementedError, 'Marshal#modf'
-
-#       raise NotImplementedError, 'Marshal#ldexp'
-#       ptr = MemoryPointer.new :double
-
-#       flt = Platform::Float.modf flt, ptr
-#       num = ptr.read_float
-
-#       return flt, num
-#     ensure
-#       ptr.free if ptr
-    end
-
     def prepare_ivar(ivar)
       ivar.to_s =~ /\A@/ ? ivar : "@#{ivar}".to_sym
     end
 
     def serialize(obj)
-      raise ArgumentError, "exceed depth limit" if @depth <= 0
+      raise ArgumentError, "exceed depth limit" if @depth == 0
 
       # How much depth we have left.
       @depth -= 1;
@@ -488,30 +457,40 @@ module Marshal
 
     def serialize_float_thing(flt)
       str = ''
-      (flt, ) = modf(ldexp(frexp(flt.abs), 37));
+      flt = Math.modf(Math.ldexp(Math.frexp(flt.abs)[0], 37))[0]
       str << "\0" if flt > 0
       while flt > 0
-        (flt, n) = modf(ldexp(flt, 32))
+        flt, n = Math.modf(Math.ldexp(flt, 32))
         n = n.to_i
         str << to_byte(n >> 24)
         str << to_byte(n >> 16)
         str << to_byte(n >> 8)
         str << to_byte(n)
       end
-      str.chomp!("\0") while str[-1].equal?(0)
+      str.chomp!("\0") while str[-1] == 0
       str
     end
 
-    def serialize_instance_variables_prefix(obj)
-      if obj.instance_variables.length > 0
+    def serialize_instance_variables_prefix(obj, exclude_ivars = false)
+      ivars = obj.instance_variables
+
+      ivars -= exclude_ivars if exclude_ivars
+
+      if ivars.length > 0 then
         TYPE_IVAR + ''
       else
-      ''
+        ''
       end
     end
 
-    def serialize_instance_variables_suffix(obj, force = false, strip_ivars = false)
-      if force or obj.instance_variables.length > 0
+    def serialize_instance_variables_suffix(obj, force = false,
+                                            strip_ivars = false,
+                                            exclude_ivars = false)
+      ivars = obj.instance_variables
+
+      ivars -= exclude_ivars if exclude_ivars
+
+      if force or ivars.length > 0 then
         str = serialize_integer(obj.instance_variables.length)
         obj.instance_variables.each do |ivar|
           sym = ivar.to_sym
@@ -599,45 +578,30 @@ module Marshal
 
   end
 
-  def self.dump(a, b, c, *d)
-    raise ArgumentError , 'too many args'
-  end
+  def self.dump(obj, an_io=nil, limit=nil)
+    if limit.nil?
+      if an_io.kind_of? Fixnum
+        limit = an_io
+        an_io = nil
+      else
+        limit = -1
+      end
+    end
 
-  def self.dump(obj, an_io, limit)
     depth = Type.coerce_to limit, Fixnum, :to_int
+    ms = State.new nil, depth, nil
+
     if an_io and !an_io.respond_to? :write
-      raise TypeError, 'output must respond to write'
+      raise TypeError, "output must respond to write"
     end
-    _dump(obj, the_io, depth)
-  end
 
-  def self.dump(obj, an_io)
-    depth = -1
-    if (an_io._isFixnum)
-      depth = an_io
-      an_io = nil
-    else
-      if an_io.kind_of?(IO)
-        # ok
-      elsif !an_io.respond_to?(:write)
-        raise TypeError, "output must respond to write"
-      end 
-    end
-    _dump(obj, an_io, depth)
-  end
-
-  def self.dump(obj)
-    _dump(obj, nil, -1)
-  end
-
-
-  def self._dump(obj, an_io, depth)
-    ms = State.new(nil, depth, nil)
     str = VERSION_STRING + ms.serialize(obj)
+
     if an_io
       an_io.write(str)
       return an_io
     end
+
     return str
   end
 
@@ -669,6 +633,187 @@ module Marshal
 
 end
 
-#  implementations of to_marshal moved to marshal2.rb 
-#    to allow references to Marshal to be resolved at compile time
+class Object
+  def to_marshal(ms, strip_ivars = false)
+    out = ms.serialize_extended_object self
+    out << Marshal::TYPE_OBJECT
+    out << ms.serialize(self.class.name.to_sym)
+    out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
+  end
+end
 
+class Range
+  def to_marshal(ms)
+    super(ms, true)
+  end
+end
+
+class NilClass
+  def to_marshal(ms)
+    Marshal::TYPE_NIL
+  end
+end
+
+class TrueClass
+  def to_marshal(ms)
+    Marshal::TYPE_TRUE
+  end
+end
+
+class FalseClass
+  def to_marshal(ms)
+    Marshal::TYPE_FALSE
+  end
+end
+
+class Class
+  def to_marshal(ms)
+    raise TypeError, "can't dump anonymous class #{self}" if self.name == ''
+    Marshal::TYPE_CLASS + ms.serialize_integer(name.length) + name
+  end
+end
+
+class Module
+  def to_marshal(ms)
+    raise TypeError, "can't dump anonymous module #{self}" if self.name == ''
+    Marshal::TYPE_MODULE + ms.serialize_integer(name.length) + name
+  end
+end
+
+class Symbol
+  def to_marshal(ms)
+    if idx = ms.find_symlink(self) then
+      Marshal::TYPE_SYMLINK + ms.serialize_integer(idx)
+    else
+      ms.add_symlink self
+
+      str = to_s
+      Marshal::TYPE_SYMBOL + ms.serialize_integer(str.length) + str
+    end
+  end
+end
+
+class String
+  def to_marshal(ms)
+    out = ms.serialize_instance_variables_prefix(self)
+    out << ms.serialize_extended_object(self)
+    out << ms.serialize_user_class(self, String)
+    out << Marshal::TYPE_STRING
+    out << ms.serialize_integer(self.length) << self
+    out << ms.serialize_instance_variables_suffix(self)
+  end
+end
+
+class Fixnum
+  def to_marshal(ms)
+    Marshal::TYPE_FIXNUM + ms.serialize_integer(self)
+  end
+end
+
+class Bignum
+  def to_marshal(ms)
+    str = Marshal::TYPE_BIGNUM + (self < 0 ? '-' : '+')
+    cnt = 0
+    num = self.abs
+
+    while num != 0
+      str << ms.to_byte(num)
+      num >>= 8
+      cnt += 1
+    end
+
+    if cnt % 2 == 1
+      str << "\0"
+      cnt += 1
+    end
+
+    str[0..1] + ms.serialize_integer(cnt / 2) + str[2..-1]
+  end
+end
+
+class Regexp
+  def to_marshal(ms)
+    str = self.source
+    out = ms.serialize_instance_variables_prefix(self)
+    out << ms.serialize_extended_object(self)
+    out << ms.serialize_user_class(self, Regexp)
+    out << Marshal::TYPE_REGEXP
+    out << ms.serialize_integer(str.length) + str
+    out << ms.to_byte(options & 0x7)
+    out << ms.serialize_instance_variables_suffix(self)
+  end
+end
+
+class Struct
+  def to_marshal(ms)
+    out =  ms.serialize_instance_variables_prefix(self)
+    out << ms.serialize_extended_object(self)
+
+    out << Marshal::TYPE_STRUCT
+
+    out << ms.serialize(self.class.name.to_sym)
+    out << ms.serialize_integer(self.length)
+
+    self.each_pair do |name, value|
+      out << ms.serialize(name)
+      out << ms.serialize(value)
+    end
+
+    out << ms.serialize_instance_variables_suffix(self)
+    out
+  end
+end
+
+class Array
+  def to_marshal(ms)
+    out = ms.serialize_instance_variables_prefix(self)
+    out << ms.serialize_extended_object(self)
+    out << ms.serialize_user_class(self, Array)
+    out << Marshal::TYPE_ARRAY
+    out << ms.serialize_integer(self.length)
+    unless empty? then
+      each do |element|
+        out << ms.serialize(element)
+      end
+    end
+    out << ms.serialize_instance_variables_suffix(self)
+  end
+end
+
+class Hash
+  def to_marshal(ms)
+    raise TypeError, "can't dump hash with default proc" if default_proc
+
+    excluded_ivars = %w[@bins @count @records]
+
+    out = ms.serialize_instance_variables_prefix self, excluded_ivars
+    out << ms.serialize_extended_object(self)
+    out << ms.serialize_user_class(self, Hash)
+    out << (self.default ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
+    out << ms.serialize_integer(length)
+    unless empty? then
+      each_pair do |(key, val)|
+        out << ms.serialize(key)
+        out << ms.serialize(val)
+      end
+    end
+    out << (default ? ms.serialize(default) : '')
+    out << ms.serialize_instance_variables_suffix(self, false, false,
+                                                  excluded_ivars)
+  end
+end
+
+class Float
+  def to_marshal(ms)
+    str = if nan? then
+            "nan"
+          elsif zero? then
+            (1.0 / self) < 0 ? '-0' : '0'
+          elsif infinite? then
+            self < 0 ? "-inf" : "inf"
+          else
+            "%.*g" % [17, self] + ms.serialize_float_thing(self)
+          end
+    Marshal::TYPE_FLOAT + ms.serialize_integer(str.length) + str
+  end
+end
