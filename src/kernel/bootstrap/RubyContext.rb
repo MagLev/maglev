@@ -1,5 +1,34 @@
-# RubyContext is identically Smalltalk RubyContext
+# = RubyContext
+#
+# Root of the Ruby environment in the MagLev VM.
+#
+# The VM maintains a singleton RubyContext object, referred to in ruby code
+# as +RUBY+ (see <tt>RubyContext>>initialize</tt>).  The singleton,
+# hereafter referred to as +RUBY+, provides the following services:
+#
+# * Entry points to load or require ruby files (available only from Smalltalk code)
+#   (<tt>RubyContext(c)>>loadFileNamed:</tt>, <tt>RubyContext(c)>>requireFileNamed:</tt>)
+# * Manage the ruby method dictionaries by copying between session state and persistent state.
+# * Hold the root namespace object (which holds +$+ globals and top level constants).
+#
+# +RUBY+ is a persistent object, and hence changes to its namespace will be
+# commited to the repository during a <tt>Gemstone.commitTransaction</tt>.
+
+# RubyContext is identically Smalltalk RubyContext.
 class RubyContext
+
+  # Set this instance as the saved version of the ruby context and make
+  # session methods visible to the persistent store (does NOT commit).
   class_primitive 'save_context', 'save'
+
+  # Return the current default context after initializing or loading it.
+  #
+  # If no saved context exists, then create a new one, load the primitives
+  # code (<tt>src/kernel/kernel.rb</tt>), save the instance and commit the
+  # transaction.  The global namespace will start empty, and be initialized
+  # with effects of loading the primitives.
+  #
+  # If a saved contet exists, retrieve it and install its methods into
+  # session temps (copy from persistent to session temps).
   class_primitive 'load_context', 'load'
 end
