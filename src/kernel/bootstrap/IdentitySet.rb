@@ -17,7 +17,7 @@ class IdentitySet
 
     def self.with_all(*array)
       o = new
-      o._addall(*array)   
+      o._addall(*array)
       o
     end
 
@@ -44,4 +44,57 @@ class IdentitySet
     def avg(&block)
         sum(&block) / length
     end
+
+    # ##################################################
+    #                  EXPERIMENTAL:
+    # ##################################################
+    #
+    # experimental support for the indicies and "selection blocks" Still to
+    # be done: Need to expose Rc* (reduced conflict) versions for high
+    # concurrency scenarios.  The current API is probably good enough to
+    # get feedback on the direction we should take...
+
+    # Creates an index on the path specified by the string.  The equality
+    # index is ordered according to the sort-provided comparison operators
+    # provided by the last element class.
+    #
+    # Example:
+    #   Create an index for a set of people.  The index is on the age field
+    #   (a Fixnum) of the Person class:
+    #
+    #     class Person
+    #       attr_reader :name, :age
+    #       ...
+    #     end
+    #
+    #     my_peeps = IdentitySet.new   # Will contain only Person objects
+    #     my_peeps._create_index('age', Fixnum)
+    #
+    # A collection may have multiple indexes.
+    primitive_nobridge '_create_index', 'createEqualityIndexOn:withLastElementClass:'
+
+    # Search the identity set for elements matching some criteria.  Makes
+    # use of the index.  Assume my_peeps is setup per comments for
+    # _create_index.  The following code will return an IdentitySet (since
+    # my_peeps is an IdentitySet) with all of the Person objects whose age
+    # field is less than 25.
+    #
+    #     youngsters = my_peeps._select([:age], :<, 25)
+    #
+    # The following comparsison operators are allowed: TBD...
+    primitive_nobridge '_select', 'select:comparing:with:'
+
+    # Remove an the specified index from receiver.
+    #
+    # Indexes will stay around, even if the collection they index is
+    # destroyed (think running your test cases, over and over and not
+    # cleaning up the indexes...). .
+    #
+    #    my_peeps._remove_index('age')
+    primitive_nobridge '_remove_index', 'removeIdentityIndexOn:'
+
+    # Remove all indexes from the receiver
+    primitive_nobridge '_remove_all_indexes', 'removeAllIndexes'
+
+    # TODO: Expose the IndexManager so you can list un-referenced indexes...
 end

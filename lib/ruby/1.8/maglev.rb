@@ -13,7 +13,12 @@
 #     checkpoint, abort the transaction.
 #
 #   * Some way to unset a global (remove it from the namespace, not just
-#   * set to nil).
+#     set to nil).
+#
+#   * Allow multiple users rather than just a single user for all of ruby?
+#
+#   * Expose env1 vs env0 vs envNN?
+#
 module MagLev  # TODO: "MagLev" or "Maglev"?
 
   # This module exposes three methods to commit, abort and begin a
