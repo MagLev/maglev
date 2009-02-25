@@ -1,16 +1,15 @@
 # This is (going to be) an example of maglev persistence on unordered
 # collections with indexing.
 #
-# Status: As of 2009-02-23, we can do the indexing of the unordered
-# collections from ruby, but we don't have a way of doing the selects...
-#
-# This example is on hold.
-#
+$:.unshift File.dirname(__FILE__)
+
 require 'benchmark'
+require 'names'
+
 class Array
   # Pick an element at random from the array (from the facets library)
   def at_random
-    at(rand(size) - 1)
+    at(rand(size))
   end
 end
 
@@ -40,12 +39,8 @@ class Address
 end
 
 class Person
-  MALE_NAMES = [ 'Peter', 'Jon', 'Allen', 'Martin', 'Monty',
-    'Bob', 'Paul', 'Sir' ]
-  FEMALE_NAMES = ['Cleopatra', 'Helen', 'Joan', 'Lady', 'Mary', 'Dame']
-  LAST_NAMES   = ['de Rothschild', 'Public', 'Doe', 'Smith', 'McLain',
-    'Williams', 'McClure', 'Otis', 'Walker', 'Not appearing in this film']
   MARITAL_STATUS = [:single, :married, :hermit]
+
   attr_reader :name, :age, :gender, :address
 
   def initialize(name, age, gender, address, marital_status=:single)
@@ -58,8 +53,8 @@ class Person
 
   def self.random
     gender = [:male, :female].at_random
-    first_name = (gender == :male ? MALE_NAMES : FEMALE_NAMES).at_random
-    Person.new( "#{first_name} #{LAST_NAMES.at_random}",
+    first_name, last_name = RandomNameGenerator.name_for(gender)
+    Person.new( "#{first_name} #{last_name}",
       rand(75) + 18,  # only legal adults, please...but no ageism...
       gender,
       Address.random,
@@ -67,24 +62,37 @@ class Person
   end
 end
 
-all_people = IdentitySet.new
-all_people._create_index('age', Fixnum)
+people = IdentitySet.new
+people._create_index('age', Fixnum)
 
 Benchmark.bm do |x|
   population = 100_000
   youngsters = nil
   x.report("Create #{population} People in indexed set") {
-    100_000.times do |i|
-      all_people << Person.random
-    end
+    100_000.times { people << Person.random }
   }
 
   x.report("Find the youngsters") {
-    youngsters = all_people._select([:age], :<, 25)
+    youngsters = people._select([:age], :<, 25)
+  }
+  puts "Found #{youngsters.length} youngsters"
+
+  # This shows doing a query on an indexed field (age) and a non-indexed
+  # field (marital_status).  We then intersect the sets to get the result
+  old_hermits = nil
+  x.report("Find old hermits") {
+    old_ones = people._select([:age], :>=, 75)
+    hermits  = people._select([:marital_status], :==, :hermit)
+    old_hermits = hermits * old_ones
   }
 
-  puts "Found #{youngsters.length} youngsters"
+  count = 0
+  old_hermits.each do |h|
+      break if count > 10
+      count += 1
+      puts h
+  end
 end
 
 # TODO: Clean up the indexes....
-all_people._remove_index('age')
+people._remove_index('age')
