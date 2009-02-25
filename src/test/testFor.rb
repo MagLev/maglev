@@ -62,7 +62,7 @@ class TestFor
       k = k + 1
     end 
     raise "ERROR" unless loopVal == (1..6)
-    raise "ERROR" unless k==8
+    raise "ERROR" unless k==6
     raise "ERROR" unless m==7
   end
 
@@ -79,7 +79,7 @@ class TestFor
     end
     raise "ERRORA" unless loopVal == (1..6)
     raise "ERRORB" unless k==1
-    raise "ERRORC" unless m==10
+    raise "ERRORC" unless m==9
   end
 
   def tstAll

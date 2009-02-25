@@ -88,6 +88,38 @@ class TestWhile
     raise "ERROR" unless c==4000
     raise "ERROR" unless d==30000
   end
+
+  def testEndCondition  # from Trac 309
+    x = 5
+    begin
+      x = x + 10
+    end while false
+    unless x == 15 ; raise 'err'; end
+
+    x = 5
+    j = 0
+    while j < 2
+      x = x + 100
+      j += 1
+    end
+    unless x == 205 ; raise 'err' end
+    true
+
+    x = 5
+    begin
+      x = x + 10
+    end until true
+    unless x == 15 ; raise 'err'; end
+
+    x = 5
+    j = 0
+    until j > 2
+      x = x + 100
+      j += 1
+    end
+    unless x == 305 ; raise 'err' end
+    true
+  end
 end
 
 t = TestWhile.new
@@ -96,6 +128,7 @@ t.tstBreakNoValue
 t.tstNext
 t.tstRedo
 t.tstAll
+t.testEndCondition
 puts "done"
 
 true
