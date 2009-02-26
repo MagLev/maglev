@@ -293,7 +293,7 @@ class File
     else
       raise ArgumentError, 'too few args'
     end
-  end 
+  end
 
   def self.new(filename)
     # subsequent variants replace just the corresponding bridge method
@@ -315,17 +315,22 @@ class File
   end
 
 
-  def self.open(filename, mode="r", &b)
+  def self.open(filename, mode="r", perm = 0644, &b)
+    # Not easy to pass the perm flag to open(2) through smalltalk,
+    # so manage it here.  First, see if the file exists
+    stat_obj = File._stat(filename, false)
     f = self._open(filename, mode)
     if f.equal?(nil)
       raise SystemCallError # TODO: Errno::xxx
     end
-    if b
-      val = b.call(f)
-      f.close
-      val
-    else
-      f
+    f.chmod(perm) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
+
+    return f unless block_given?
+
+    begin
+      b.call(f)
+    ensure
+      f.close rescue nil
     end
   end
 
