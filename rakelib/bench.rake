@@ -24,8 +24,10 @@ end
 # Cache the name so it is only generated once during an invocation.
 # Eliminates having to save the name and pass it around.
 def report
+  os = `uname`
+  host = `uname -n`
   vm = File.basename VM.split.first
-  @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{Time.now.strftime "%d-%m-%Y-%H%M"}.yaml"
+  @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{os.chomp}-#{host.chomp}-#{Time.now.strftime "%y%m%d.%H%M%S"}.yaml"
 end
 
 def report_name
@@ -51,11 +53,16 @@ namespace :bench do
 
     dir = ENV['RESULTS'] || RBS_RESULTS_DIR
 
-    header = ["Benchmark file", "input"]
+    header = ["Benchmark File", "Input Size"]
     data   = Hash.new { |h,k| h[k] = {} }
     status = Hash.new { |h,k| h[k] = {} }
 
+    puts "Creating Ruby Benchmark spreadsheet"
+    csv_report = "#{dir}/RBS-#{Time.now.strftime "%y%m%d.%H%M"}.csv"
+    puts "  Writing spreadsheet to #{csv_report}"
+
     Dir[dir + "/**/*.yaml"].sort.each do |name|
+      puts "  Processing #{File.basename name}"
       system = File.basename name, ".yaml"
       header << system
 
@@ -73,7 +80,6 @@ namespace :bench do
       end
     end
 
-    csv_report = "#{dir}/RBS-#{Time.now.strftime "%d-%m-%Y-%H%M"}.csv"
     File.open csv_report, "w" do |file|
       file.puts(header.map { |h| h.inspect }.join(","))
       header.shift
@@ -86,6 +92,7 @@ namespace :bench do
         file.puts line.join(",")
       end
     end
+    puts "Done"
   end
 
   # Not public. Creates directories for results, etc.
@@ -128,9 +135,13 @@ namespace :bench do
   desc "Run only the benchmark specified by FILE"
   task :file => :setup do
     name = ENV['FILE'] || raise("bench:file needs FILE to be a filename")
+
+    puts "Running benchmark #{name}"
+    puts "  Writing report to #{report_name}"
+
     Dir.chdir File.dirname(name) do
+      puts "  Running #{File.basename name}"
       system "#{command name}"
     end
-    puts "Writing report to #{report_name}"
   end
 end
