@@ -24,10 +24,10 @@ end
 # Cache the name so it is only generated once during an invocation.
 # Eliminates having to save the name and pass it around.
 def report
-  os = `uname`
-  host = `uname -n`
+  os = `uname`.chop
+  host = `uname -n`.chop
   vm = File.basename VM.split.first
-  @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{os.chomp}-#{host.chomp}-#{Time.now.strftime "%y%m%d.%H%M%S"}.yaml"
+  @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{os}-#{host}-#{Time.now.strftime "%y%m%d.%H%M%S"}.yaml"
 end
 
 def report_name
