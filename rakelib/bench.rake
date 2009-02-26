@@ -34,15 +34,15 @@ def report_name
   report[(BASEDIR.size+1)..-1]
 end
 
-desc "Run the RBS benchmarks"
+desc "Run all the RBS benchmarks"
 task :bench => 'bench:run'
 
 namespace :bench do
-  desc "Plot the RBS benchmark results"
+  desc "Plot the RBS benchmark results (not implemented)"
   task :results => :setup do
   end
 
-  desc "Generate a CSV file of results"
+  desc "Generate a CSV file of RBS results"
   task :to_csv => :setup do
     require 'yaml'
 
@@ -115,7 +115,7 @@ namespace :bench do
     puts "Done"
   end
 
-  desc "Run all the benchmarks in DIR"
+  desc "Run all the RBS benchmarks in DIR"
   task :dir => :setup do
     dir = ENV['DIR'] || raise("bench:dir needs DIR to be a directory")
 
@@ -132,7 +132,7 @@ namespace :bench do
     puts "Done"
   end
 
-  desc "Run only the benchmark specified by FILE"
+  desc "Run only the RBS benchmark specified by FILE"
   task :file => :setup do
     name = ENV['FILE'] || raise("bench:file needs FILE to be a filename")
 
