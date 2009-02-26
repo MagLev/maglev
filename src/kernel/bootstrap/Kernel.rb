@@ -123,7 +123,7 @@ module Kernel
 
   primitive 'format*', 'sprintf:with:'
 
-  primitive 'global_variables', 'rubyGlobalVariables' 
+  primitive 'global_variables', 'rubyGlobalVariables'
 
   primitive_nobridge 'include',  'includeRubyModule:'
 
@@ -248,6 +248,7 @@ module Kernel
     #   translate raise to  _resignal
     RuntimeError.signal
   end
+  alias fail raise
 
   # sleep behavior
   # PickAxe book   says argument of zero means infinite sleep

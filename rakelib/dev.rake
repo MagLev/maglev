@@ -69,4 +69,10 @@ namespace :dev do
     run_topaz tc_run_benchmarks
     puts "Log files in log/bench*"
   end
+
+  desc "Clean up after a test install of rubygems"
+  task :'clean-gems' do
+    files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby', 'lib/maglev']
+    files.each { |fn| rm_r fn rescue nil }
+  end
 end

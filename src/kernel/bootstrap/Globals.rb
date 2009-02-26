@@ -104,14 +104,14 @@ ARGV = []
 ARGF = nil # TODO a real implementation
 
 # Notes on various globals
-begin 
+begin
   #  $/ is auto-initialized to "\n" by parser at first ref .
-  x = $/ 
+  x = $/
   #  $; is auto-initialized to nil if referenced, by RubySexpParser .
-  y = $; 
+  y = $;
 end
 
-#  $!  translated to rescue block block-arg-ref  or to the global $! 
+#  $!  translated to rescue block block-arg-ref  or to the global $!
 #    by RubyGlobalVarNode and RubyRescueBodyNode
 
 #  $&  $_  $` $' $1..$9 $~  all translated to access to
@@ -120,15 +120,15 @@ end
 # $: , RUBY
 #  are currently initialized in RubyContext(C)>>initialize
 
-alias $-0  $/ 
-alias $-F  $;  
+alias $-0  $/
+alias $-F  $;
 alias $-d $DEBUG
 alias $-I $:
 alias $-v $VERBOSE
 alias $-w $VERBOSE
 
 alias $LOADED_FEATURES $"
-alias $LOAD_PATH  $: 
+alias $LOAD_PATH  $:
 alias $<  $ARGF
 alias $*  $ARGF
 
@@ -147,6 +147,7 @@ RUBY_VERSION = '1.8.6'
 RUBY_RELEASE_DATE = '09/15/2008' #TODO: Date should be inserted by build framework
 RUBY_PATCHLEVEL = '114'  # TODO: this is what MRI 1.8.6 shows...
 
+VERSION = RUBY_VERSION
 # If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
 # If false, the handling is unchanged: exception is reported along with the
 #  stringified stack.
