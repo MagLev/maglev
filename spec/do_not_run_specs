@@ -6,18 +6,18 @@
 # ####  These ones blow up
 # ##################################################
 
-spec/rubyspec/language/block_spec.rb
+# spec/rubyspec/language/block_spec.rb
 spec/rubyspec/language/constants_spec.rb
-spec/rubyspec/language/def_spec.rb
+# spec/rubyspec/language/def_spec.rb
 spec/rubyspec/language/for_spec.rb
-spec/rubyspec/language/method_spec.rb
+# spec/rubyspec/language/method_spec.rb
 spec/rubyspec/language/next_spec.rb
-spec/rubyspec/language/numbers_spec.rb
+# spec/rubyspec/language/numbers_spec.rb
 spec/rubyspec/language/precedence_spec.rb
 spec/rubyspec/language/retry_spec.rb
 spec/rubyspec/core/filetest/
-spec/rubyspec/core/kernel/case_compare_spec.rb
-spec/rubyspec/core/proc/arity_spec.rb
+# spec/rubyspec/core/kernel/case_compare_spec.rb
+# spec/rubyspec/core/proc/arity_spec.rb
 
 # ##################################################
 # ####  MagLev does not implement
@@ -30,7 +30,7 @@ spec/rubyspec/core/objectspace
 # ####  1.9 Only files
 # ##################################################
 # These specs are guarded with only 1.9 examples/expectations.  No point in
-# running them.  We should occasionally recheck that they havnn't had 1.8
+# running them.  We should occasionally recheck that they haven't had 1.8
 # expectations added to them
 
 spec/rubyspec/language/encoding_spec.rb
