@@ -109,7 +109,7 @@ test('0a'.to_i(0),  0, '"0a".to_i(0)')
 # Ensure succ is present
 test('zzz'.succ, 'aaaa', '"zzz".succ')
 
-def testChomp
+def test_chomp
   s = 'abcd'
   r = s.chomp
   unless r == s ; raise 'Err'; end
@@ -147,12 +147,24 @@ def testChomp
   return true
 end
 
-test(self.testChomp() , true, "testing chomp, chop")
+test(test_chomp() , true, "testing chomp, chop")
 
 # gsub was generating undefined method for each_match.  This tests that case:
 test('a.rb'.gsub('\\', ''), 'a.rb',  'gsub regression')
 
 test(String.new("test"), 'test',  'String.new("test")')
+
+# Test all the forms of sub/sub!
+test("hello".sub(/[aeiou]/, '*'),              'h*llo',   "sub A")
+test("hello".sub(/[aeiou]/) { |match| 'FOO' }, 'hFOOllo', "sub B")
+
+x = "hello"
+x.sub!(/[aeiou]/, '*')
+test(x, 'h*llo',   "sub! C")
+
+x = "hello"
+x.sub!(/[aeiou]/) { |match| 'FOO' }
+test(x, 'hFOOllo', "sub! D")
 
 report
 

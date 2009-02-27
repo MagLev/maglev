@@ -378,7 +378,7 @@ class String
       st_idx = self._indexOfByte(item % 256, offset + 1)
     elsif item._isRegexp
       st_idx = item._index_string(self, offset) + 1
-    else 
+    else
       # try to coerce to a number or string and try again,
       #   will raise TypeError if item is a Symbol .
       coerced = Type.coerce_to_string_or_integer(item)
@@ -610,7 +610,7 @@ class String
     replace(strip)
   end
 
-  def sub(regex, str, &block)
+  def sub_orig(regex, str, &block)
     if match = regex.to_rx.match(self)
       out = ""
       out << self[0...(match.begin(0))]
@@ -626,16 +626,48 @@ class String
     end
   end
 
-  def sub!(regex, str, &block)
-    new = sub(regex, str, &block)
-    if new == self
-      nil
+  def sub(regex, replacement)
+    if match = regex.to_rx.match(self)
+      _replace_match_with(match, replacement)
     else
-      replace(new)
-      self
+      dup
     end
   end
 
+  def sub(regex, &block)
+    if match = regex.to_rx.match(self)
+      _replace_match_with(match, block.call(match))
+    else
+      dup
+    end
+  end
+
+  def sub!(regex, replacement)
+    if match = regex.to_rx.match(self)
+      replace(_replace_match_with(match, replacement))
+      self
+    else
+      nil
+    end
+  end
+
+  def sub!(regex, &block)
+    if match = regex.to_rx.match(self)
+      replacement = block.call(match)
+      replace(_replace_match_with(match, replacement))
+      self
+    else
+      nil
+    end
+  end
+
+  def _replace_match_with(match, replacement)
+    out = ""
+    out << self[0...(match.begin(0))]
+    out << replacement
+    out << ((self[(match.end(0))...length]) || "")
+    out
+  end
 
   primitive 'succ!', 'rubySucc'
 
