@@ -10,6 +10,12 @@ class ParseTree
   attr_accessor :include_newlines
 end
 
+class Float
+  def to_s
+    sprintf('%.16e', self)   # fix Trac 358, default to_s is only %.14e
+  end
+end
+
 class MaglevParser
   def initialize
     @pt = ParseTree.new(true)
