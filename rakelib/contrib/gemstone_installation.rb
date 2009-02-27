@@ -1,11 +1,16 @@
 class GemStoneInstallation
   attr_reader :installation_directory, :config_directory, :installation_extent_directory, :base_log_directory, :backup_directory
 
+  @current = nil
   def self.current
-    self.new("/opt/gemstone/product")
+    @current ||= self.new("/opt/gemstone/product")
   end
 
-  def initialize(installation_directory, 
+  def self.current=(instance)
+    @current = instance
+  end
+
+  def initialize(installation_directory,
                  config_directory="/etc/gemstone",
                  installation_extent_directory="/var/local/gemstone",
                  base_log_directory="/var/log/gemstone",
@@ -23,7 +28,7 @@ class GemStoneInstallation
 
   def stones
     Dir.glob("#{config_directory}/*").collect do | full_filename |
-      File.basename(full_filename).split(".").first 
+      File.basename(full_filename).split(".").first
     end
   end
 

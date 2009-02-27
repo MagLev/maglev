@@ -41,6 +41,7 @@ class Stone
 
   # Bare bones stone with nothing loaded, specialise for your situation
   def initialize_new_stone
+    mkdir_p @gemstone_installation.config_directory
     create_config_file
     mkdir_p extent_directory
     mkdir_p log_directory
