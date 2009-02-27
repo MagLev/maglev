@@ -186,6 +186,10 @@ class Object
         self == obj
     end
 
+    def =~(other)
+      false
+    end
+
     # block_given?  is implemented by the ruby parser .
     #   do not code any definition of block_given? here .
     # Attempts to reimplement  block_given?  will fail with a compile error.
@@ -244,7 +248,7 @@ class Object
       self.class.name.to_s
     end
 
-    primitive_nobridge '_instance_eval', 'rubyEvalString:with:'
+    primitive_nobridge '_instance_eval', 'rubyEvalString:with:binding:'
 
     def instance_eval(*args)
       # bridge methods would interfere with VcGlobals logic
@@ -253,9 +257,11 @@ class Object
 
     def instance_eval(str)
       string = Type.coerce_to(str, String, :to_str)
+      ctx = self._binding_ctx(0)
+      bnd = Binding.new(ctx, self, nil)
       vcgl = [ self._getRubyVcGlobal(0x20),
                self._getRubyVcGlobal(0x21) ]
-      res = _instance_eval(string, vcgl)
+      res = _instance_eval(string, vcgl, bnd)
       vcgl[0]._storeRubyVcGlobal(0x20)
       vcgl[1]._storeRubyVcGlobal(0x21)
       res
@@ -263,9 +269,11 @@ class Object
 
     def instance_eval(str, file=nil)
       string = Type.coerce_to(str, String, :to_str)
+      ctx = self._binding_ctx(0)
+      bnd = Binding.new(ctx, self, nil)
       vcgl = [ self._getRubyVcGlobal(0x20),
                self._getRubyVcGlobal(0x21) ]
-      res = _instance_eval(string, vcgl)
+      res = _instance_eval(string, vcgl, bnd)
       vcgl[0]._storeRubyVcGlobal(0x20)
       vcgl[1]._storeRubyVcGlobal(0x21)
       res
@@ -274,9 +282,11 @@ class Object
     def instance_eval(str, file=nil, line=nil)
       # TODO: Object#instance_eval: handle file and line params
       string = Type.coerce_to(str, String, :to_str)
+      ctx = self._binding_ctx(0)
+      bnd = Binding.new(ctx, self, nil)
       vcgl = [ self._getRubyVcGlobal(0x20),
                self._getRubyVcGlobal(0x21) ]
-      res = _instance_eval(string, vcgl)
+      res = _instance_eval(string, vcgl, bnd)
       vcgl[0]._storeRubyVcGlobal(0x20)
       vcgl[1]._storeRubyVcGlobal(0x21)
       res

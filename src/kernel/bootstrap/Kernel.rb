@@ -73,6 +73,7 @@ module Kernel
   primitive_nobridge '_eval', '_eval:binding:with:'
 
   def eval(str, binding, file_not_used, line_not_used)
+    unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     # use 0x3? because one extra stack frame due to bridging methods .
     # max send site is :::* , call is via a :::* to :::: bridge meth .
     vcgl = [ self._getRubyVcGlobal(0x30) ,
@@ -84,16 +85,19 @@ module Kernel
   end
 
   def eval(str)
-    # no bridge methods for this an subsequent variants
+    # no bridge methods for this and subsequent variants
+    ctx = self._binding_ctx(0)
+    bnd = Binding.new(ctx, self, nil)
     vcgl = [ self._getRubyVcGlobal(0x20) ,
              self._getRubyVcGlobal(0x21) , self ]
-    res = _eval(str, nil, vcgl )
+    res = _eval(str, bnd, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
   end
 
   def eval(str, binding)
+    unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     vcgl = [ self._getRubyVcGlobal(0x20) ,
       self._getRubyVcGlobal(0x21), nil ]
     res = _eval(str, binding, vcgl )
@@ -103,6 +107,7 @@ module Kernel
   end
 
   def eval(str, binding, file_not_used)
+    unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     vcgl = [ self._getRubyVcGlobal(0x20) ,
       self._getRubyVcGlobal(0x21) , nil ]
     res = _eval(str, binding, vcgl )
