@@ -4,6 +4,16 @@
 #
 # The :run task does not depend on the :update tasks so the
 # updates are done manually to ensure stability.
+#
+# This file is a slight modification of Brian Ford's refactoring
+# of the Ruby Benchmark Suite project for use in Rubinius. We've
+# primarily changed it to fit MagLev's directory structure and to
+# default to the MagLev VM instead of Rubinius.
+#
+# The primary Ruby Benchmark Suite project is at:
+#   http://github.com/acangiano/ruby-benchmark-suite/
+#
+# see $MAGLEV_HOME/src/external/benchmark/utils/README for more
 
 BASEDIR         = File.expand_path(File.dirname(__FILE__) + "/..")
 MONITOR         = BASEDIR + "/src/external/benchmark/utils/monitor.rb"
