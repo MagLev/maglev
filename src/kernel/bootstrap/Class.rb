@@ -48,10 +48,34 @@ class Class
   primitive_nobridge 'include', 'includeRubyModule:'
 
   def new(*args)
+    # this variant gets bridge methods
     inst = self.allocate
     inst.initialize(*args)
     inst
   end
+
+  # override some bridge methods as an optimization
+  def new
+    inst = self.allocate
+    inst.initialize
+    inst
+  end
+  def new(a)
+    inst = self.allocate
+    inst.initialize(a)
+    inst
+  end
+  def new(a,b)
+    inst = self.allocate
+    inst.initialize(a,b)
+    inst
+  end
+  def new(a,b,c)
+    inst = self.allocate
+    inst.initialize(a,b,c)
+    inst
+  end
+
 
   # In MagLev, rescue clauses use kind_of? implemented in C within the VM , to
   # determine if a the raised exception is to be handled by a specific rescue.
