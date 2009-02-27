@@ -4,6 +4,9 @@ require 'rake/clean'
 require 'rake/rdoctask'
 require 'rakelib/maglev.rb'
 
+# require 'rakelib/contrib/stone.rb'
+# require 'rakelib/contrib/maglev.rb'
+
 verbose false  # turn off rake's chatter about all the sh commands
 
 CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
@@ -35,3 +38,32 @@ task :squeak do
     puts "To fix this, correct the 'squeak' command in the gemstone script."
   end
 end
+
+
+# task :list_stones do
+#   puts GemStoneInstallation.current.stones.join("\n")
+# end
+
+# desc "Create a new stone"
+# task :new_stone, :stone_name do |t, args|
+#   puts "Creating #{args.stone_name}"
+#   Stone.create(args.stone_name)
+# end
+
+
+# def task_gemstone(stone, action)
+#   desc "#{action.to_s} - #{stone.name}"
+#   task action do
+#     stone.send(action)
+#   end
+# end
+
+# GemStoneInstallation.current.stones.each do |stone_name|
+#   namespace stone_name do
+#     stone = Stone.new(stone_name, GemStoneInstallation.current)
+
+#     [:stop, :start, :restart, :status, :backup, :restore_latest_backup].each do |action|
+#       task_gemstone(stone, action)
+#     end
+#   end
+# end
