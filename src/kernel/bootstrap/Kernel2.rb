@@ -2,16 +2,21 @@ module Kernel
   # file Kernel2.rb  , parts of kernel that must be deferred to later
   #  in the bootstrap
 
-  primitive_nobridge '_binding_ctx' , '_bindingContext'
+  # argument to _bindingContext: is number of frames up from sender
+  #   of Kernel.binding from which to create the binding .
+  #  Parser has to know about methods which may send _binding_ctx,
+  #  to ensure such methods are created with a VariableContext.
+  #  see setSendsBinding and the *BindingNode , *EvalNode classes in .mcz
+  primitive_nobridge '_binding_ctx' , '_bindingContext:'
 
   def binding
-    Binding.new( _binding_ctx, self, nil )
+    # the block argument is synthesized by the parser and should not
+    #  be explicitly passed, so this variant probably not used
+    Binding.new( self._binding_ctx(0), self, nil )
   end
 
   def binding(&blk)
-    # the argument is synthesized by the parser and should not
-    #  be explicitly passed
-    Binding.new( _binding_ctx, self , blk)
+    Binding.new( self._binding_ctx(0), self , blk)
   end
 
   def lambda(&blk)

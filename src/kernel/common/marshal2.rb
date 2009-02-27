@@ -1,5 +1,3 @@
-# file marshal2.rb 
-
 class Object
   def to_marshal(ms, strip_ivars = false)
     out = ms.serialize_extended_object self
@@ -138,13 +136,11 @@ class Array
     out << ms.serialize_user_class(self, Array)
     out << Marshal::TYPE_ARRAY
     out << ms.serialize_integer(self.length)
-    # Gemstone, optimization to use while loop
-    n = 0
-    lim = self.length
-    while n < lim
-      out << ms.serialize(self[n])
-      n = n + 1
-    end # end Gemstone
+    unless empty? then
+      each do |element|
+        out << ms.serialize(element)
+      end
+    end
     out << ms.serialize_instance_variables_suffix(self)
   end
 end
@@ -152,7 +148,10 @@ end
 class Hash
   def to_marshal(ms)
     raise TypeError, "can't dump hash with default proc" if default_proc
-    out = ms.serialize_instance_variables_prefix(self)
+
+    excluded_ivars = %w[@bins @count @records]
+
+    out = ms.serialize_instance_variables_prefix self, excluded_ivars
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Hash)
     out << (self.default ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
@@ -164,7 +163,8 @@ class Hash
       end
     end
     out << (default ? ms.serialize(default) : '')
-    out << ms.serialize_instance_variables_suffix(self)
+    out << ms.serialize_instance_variables_suffix(self, false, false,
+                                                  excluded_ivars)
   end
 end
 
@@ -182,4 +182,3 @@ class Float
     Marshal::TYPE_FLOAT + ms.serialize_integer(str.length) + str
   end
 end
-

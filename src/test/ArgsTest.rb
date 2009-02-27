@@ -114,6 +114,35 @@ class ArgsTest
     end
   end
 
+  def test_03_noextra
+    x = required_three(10, 100, 1000)
+    unless x = 1110 ; raise 'error' ; end 
+    y = 0
+    begin
+      x = required_three(1,2,3,4)
+      y = 1
+    rescue ArgumentError 
+      y = 5
+    end
+    unless y == 5; raise 'error' ; end;
+    puts "test_03_noextra done"
+  end
+
+  def test_01_noextra
+    x = required_one(5)
+    unless x == 105 ; raise 'error' ; end
+    a = [6];
+    x = required_one(*a)
+    unless x == 106 ; raise 'error' ; end
+    a = [6,7];
+    begin
+      x = required_one(*a)
+    rescue  ArgumentError
+      x = 88
+    end
+    unless x == 88 ; raise 'error' ; end
+    puts "test_01_noextra done"
+  end
 
   ############## Tests with blocks
 
@@ -135,6 +164,14 @@ class ArgsTest
   def required_optional_splat_with_block(required, optional=nil, *params, &block)
     return 1 + params.size
   end
+
+  def required_three(a, b, c)
+    return a + b + c
+  end
+
+  def required_one(a)
+    return a + 100
+  end
 end
 
 
@@ -146,6 +183,8 @@ tests.test_01_no_block_with_splat
 tests.test_02_no_block_without_splat
 tests.test_03_no_block_with_splat_and_nils
 tests.test_04_no_block_without_splat_and_nils
+tests.test_03_noextra
+tests.test_01_noextra
 
 # Tests from "The Ruby Programming Language", section 6.4
 
