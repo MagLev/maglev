@@ -149,7 +149,7 @@ begin
   bench = Bench.new(*ARGV)
   load bench.file
   bench.write_success
-  rescue Object => exc
+  rescue Exception => exc
   bench.write_error exc if bench
   exit 1
 end
