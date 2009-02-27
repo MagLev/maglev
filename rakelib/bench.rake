@@ -84,7 +84,7 @@ namespace :bench do
           next unless doc.key? field
 
           bench = [bench_name, doc["parameter"]]
-          data[bench]["input"] = doc["parameter"]
+          data[bench]["Input Size"] = doc["parameter"]
           data[bench][system] = doc[field]
         end
       end
