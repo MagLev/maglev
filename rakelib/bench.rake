@@ -24,7 +24,7 @@ RBS_RESULTS_DIR = RESULTS_DIR + "/rbs"
 WEB_DIR         = RESULTS_DIR + "/web"
 
 ITERATIONS      = (ENV['ITERATIONS'] || 5).to_i
-TIMEOUT         = (ENV['TIMEOUT'] || 300).to_i
+TIMEOUT         = (ENV['TIMEOUT'] || 600).to_i
 VM              = ENV['VM'] || "#{BASEDIR}/bin/maglev-ruby"
 
 def command(name)
