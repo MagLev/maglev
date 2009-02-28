@@ -9,6 +9,7 @@ class Binding
     @names = info[1]
     @selfObj = obj 
     @block = blk
+    # if this code changed see also RubyBinding>>ctx:mainSelf: 
   end
 
 end

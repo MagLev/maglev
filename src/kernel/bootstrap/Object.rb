@@ -47,6 +47,13 @@ class Object
     #  _getRubyVcGlobal returns caller(s) value of $~ or $_ , or nil
     primitive_nobridge '_getRubyVcGlobal' , '_getRubyVcGlobal:'
 
+    # argument to _bindingContext: is number of frames up from sender
+    #   of Object.binding from which to create the binding .
+    #  Parser has to know about methods which may send _binding_ctx,
+    #  to ensure such methods are created with a VariableContext.
+    #  see setSendsBinding and the *BindingNode , *EvalNode classes in .mcz
+    primitive_nobridge '_binding_ctx' , '_bindingContext:'
+
     # End private helper methods
 
     primitive_nobridge '==', '='
