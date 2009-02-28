@@ -47,9 +47,15 @@ end
 # desc "Create a new stone"
 # task :new_stone, :stone_name do |t, args|
 #   puts "Creating #{args.stone_name}"
-#   Stone.create(args.stone_name)
+#   MagLevStone.create(args.stone_name)
 # end
 
+# desc "Destroy a stone"
+# task :destroy_stone, :stone_name do |t, args|
+#   puts "Destroying #{args.stone_name}"
+#   s = Stone.existing(args.stone_name)
+#   s.destroy!
+# end
 
 # def task_gemstone(stone, action)
 #   desc "#{action.to_s} - #{stone.name}"
@@ -60,9 +66,10 @@ end
 
 # GemStoneInstallation.current.stones.each do |stone_name|
 #   namespace stone_name do
-#     stone = Stone.new(stone_name, GemStoneInstallation.current)
+#     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
 
-#     [:stop, :start, :restart, :status, :backup, :restore_latest_backup].each do |action|
+#     [:stop, :start, :restart, :status, :backup,
+#       :restore_latest_backup, :reset_ruby_context].each do |action|
 #       task_gemstone(stone, action)
 #     end
 #   end
