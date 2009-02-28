@@ -30,7 +30,7 @@ end
 class Topaz
   attr_accessor :output
 
-  def initialize(stone, topaz_command="topazl")
+  def initialize(stone, topaz_command="topaz")
     @stone = stone
     @output = []
     @topaz_command = "#{topaz_command} 2>&1"
@@ -50,7 +50,7 @@ class Topaz
     end
     return @output
   end
-  
+
   def dump_as_script(*topaz_commands)
     topaz_commands.each do | command |
       command.execute_on_topaz_stream(STDOUT)
