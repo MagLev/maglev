@@ -5,11 +5,11 @@ class UnboundMethod
   #  subclass of UnboundMethod, not of Object,
 
   primitive_nobridge 'arity', 'arity'
-  primitive_nobridge 'bind', 'bind:'
+  primitive_nobridge '_bind', 'bind:'
   primitive_nobridge '_home_class', 'homeClass'
 
   def bind(obj)
-    if (obj.kind_of?(@gsmeth._home_class))
+    if (obj.kind_of?(self._home_class))
       return _bind(obj)   # returns a Method
     else
       raise TypeError , ('obj must be kind_of ' << @rcvrClass.name )
