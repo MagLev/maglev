@@ -172,5 +172,11 @@ class Behavior
     _method_defined(symbol, 2)
   end
 
+  primitive_nobridge 'remove_method', 'rubyRemoveMethod:' 
+
+  #   for now, undef_method is same as remove_method , there is no
+  #   other way to prevent a class responding to a selector.
+  #
+  primitive_nobridge 'undef_method', 'rubyRemoveMethod:' 
 
 end

@@ -110,12 +110,7 @@ class Module
     _stub_warn("Module#remove_class_variable")
   end
 
-  def remove_method(symbol)
-    _stub_warn("Module#remove_method")
-  end
-
-  def undef_method(symbol)
-    _stub_warn("Module#undef_method")
-  end
+  # remove_method  implemented in Behavior
+  # undef_method implemented in Behavior
 
 end
