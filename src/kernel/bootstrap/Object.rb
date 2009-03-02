@@ -122,8 +122,23 @@ class Object
       _responds_to(symbol, false, 0x10101)
     end
 
+    def _splat_lasgn_value
+      # runtime support for   x = *y   , invoked from generated code
+      if self._isArray
+        sz = self.length
+        if (sz < 2)
+          if sz.equal?(0)
+            return nil
+          else
+            return self[0]
+          end
+        end
+      end
+      self
+    end
+
     def _splat_return_value
-      # runtime support for  return *v  , invoked from generated IR
+      # runtime support for  return *v  , invoked from generated code
       v = self
       unless v._isArray
         begin
