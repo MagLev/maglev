@@ -319,7 +319,10 @@ class Gem::SourceIndex
       begin
         fetcher = Gem::SpecFetcher.fetcher
         remotes = fetcher.find_matching dependency
-        remotes = remotes.map { |(name, version,_),_| version }
+# GEMSTONE: Workaround Trac 370
+#        remotes = remotes.map { |(name, version,_),_| version }
+        remotes = remotes.map { |(name, version,_1),_2| version }
+# END GEMSTONE
       rescue Gem::RemoteFetcher::FetchError => e
         raise unless fetcher.warn_legacy e do
           require 'rubygems/source_info_cache'
@@ -376,7 +379,7 @@ class Gem::SourceIndex
   end
 
   def ==(other) # :nodoc:
-    self.class === other and @gems == other.gems 
+    self.class === other and @gems == other.gems
   end
 
   def dump
