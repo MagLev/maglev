@@ -318,10 +318,10 @@ module Kernel
     _stub_warn("Kernel#trap(signal, &block)")
   end
 
-  # def throw(aSymbol); end
+  # def throw(aSymbol); end  # implemented in smalltalk
   primitive_nobridge 'throw' , 'throw:'
 
-  # def throw(aSymbol, aValue); end
+  # def throw(aSymbol, aValue); end  # implemented in smalltalk
   primitive_nobridge 'throw' , 'throw:with:'
 
   # This is a hook into the mspec framework so that the --spec-debug action
