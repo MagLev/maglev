@@ -18,6 +18,7 @@ class File
   primitive_nobridge '_atEnd', 'atEnd'
   primitive 'read', 'next:'
   primitive 'read', 'contents'
+  primitive 'flush', 'flush'
 
   class_primitive_nobridge '_fstat','fstat:isLstat:'
   class_primitive_nobridge '_stat','stat:isLstat:'
@@ -732,6 +733,10 @@ class PersistentFile
 
   def write(data)
     _file.write(data)
+  end
+
+  def flush
+    _file.flush
   end
 
   # begin gets implementation -------------------------------
