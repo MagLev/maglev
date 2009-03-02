@@ -487,11 +487,27 @@ class String
 
   primitive 'size', 'size'
 
-  primitive_nobridge 'slice', '_rubyAt:'
   primitive          'slice', '_rubyAt:length:'
+    # start and length are both  int
+  primitive_nobridge 'slice', '_rubyAt:'
+    # arg may be an  int, range, regexp, or match_string
 
-  def slice!(*args)
-    replace(slice(*args).to_str)
+  def slice!(start, length)
+    # start and length are both  int
+    s = slice(start, length)
+    if s.equal?(nil)
+      s = ''
+    end
+    replace(s)
+  end
+
+  def slice!(arg)
+    # arg may be an  int, range, regexp, or match_string
+    s = slice(arg)
+    if s.equal?(nil)
+      s = ''
+    end
+    replace(s)
   end
 
   def split(pattern=nil, limit=nil)
