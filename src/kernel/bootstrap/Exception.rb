@@ -11,7 +11,7 @@ class Exception
 
     primitive_nobridge '_handler_active' , '_handlerActive'
 
-    primitive_nobridge '_reraise', 'pass'
+    primitive_nobridge '_reraise', '_rubyReraise'
     primitive          'signal', 'signal:'
     primitive_nobridge 'signal', 'signal'
     primitive          'message', 'description'

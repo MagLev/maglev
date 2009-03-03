@@ -18,7 +18,8 @@ class ExecBlock
   primitive_nobridge '_fetchRubyVcGlobal', '_rubyVcGlobalAt:'
   primitive_nobridge '_setRubyVcGlobal', '_rubyVcGlobalAt:put:'
 
-  primitive_nobridge '_copyForLambda', '_copyForLambda'
+  primitive_nobridge '_copyForRuby', '_copyForRuby:'
+    #  one Fixnum arg,  0 == for lambda, 1 == for define_method
 
   # call, call:, call::, call::: will be compiled to special bytecodes
   #  and won't use the bridge methods generated for  call*
@@ -72,12 +73,12 @@ class Proc
     def self.new_lambda(&blk)
       if blk._isBlock
         inst = self.allocate
-        b = blk._copyForLambda 
+        b = blk._copyForRuby(0)
         inst._initialize(&b)
         return inst
       elsif blk.is_a?(Proc)
         pb = blk._block
-        b = pb._copyForLambda
+        b = pb._copyForRuby(0)
         if (b.equal?(pb)) 
           return blk  # the argument blk  is already a lambda
         else
