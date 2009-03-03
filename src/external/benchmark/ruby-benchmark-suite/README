@@ -38,11 +38,17 @@ Please note however that FILE will only work with the run_one task.
 
 The suite is cross-platform, but avoid paths with spaces if you are running it under Windows.
 
+Run rake --tasks to see more options.
 
 MANAGING ERRORS
 ===============
 The Ruby Benchmark Suite relies on the fact that any exception raised at runtime by a given VM will be rescued and the error message reported within the .csv report. If a less mature RUBY VM encounters a segmentation fault during the execution of a benchmark, the execution of that file terminates before the error can be rescued, and will therefore not appear within the report. Similarly, if due to a bug in a VM, rescuing a given exception is not succesfull, the benchmark at hand will not appear in the report.
 
 What this means in pratice is that certain Ruby VMs may generate a few less entries in the report, when compared to the report produced by Ruby MRI. Comparing the two lists is an easy way to see which tests aborted before they were able to make it into the report. In the case of exceptions which weren't rescued due to a bug in the VM, you'll see the exceptions in the shell where you run rake from, so that you can then add them manually to the report. When running the suite through rake, segmentation faults in individual benchmarks may be silent. To investigate missing entries from the report that didn't show an error message in the shell, you can bypass rake altogether. For example, if the Ruby VM 'myrubyvm' fails to include bm_mergesort.rb in the report, then you can verify what the issue is by running something along the lines of: myrubyvm -myoptions micro-benchmarks/bm_mergesort.rb 300 5 myreport.txt, where the last three parameters must be the timeout, iterations and report filename respectively.
+
+ADDITIONAL OPTIONS
+==================
+Currently the suite is setup to use the hitimes gem, if it is installed, for more accurate timing on windows/linux.
+Also if you want the RSS sizes to show up on windows you'll need to first install the sys-proctable gem.
 
 The mailing list for the project is located at: http://groups.google.com/group/ruby-benchmark-suite
