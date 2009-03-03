@@ -97,12 +97,11 @@ startserver-bench() {
   echo "MagLev server gs64stone started with performance optimizations"
 }
 
-loadPrimsIfNeeded() {
+ensurePrimsLoaded() {
   echo "Loading prims if needed -- it may take a few seconds"
   $TOPAZ_CMD << EOF > /dev/null
     run
-      RubyContext _saved == nil ifTrue: [
-      RubyContext reset; load. ]
+      RubyContext ensurePrimsLoaded.
 %
 exit
 EOF
@@ -243,7 +242,7 @@ case "$1" in
         initialize
         startparser
         startserver
-	loadPrimsIfNeeded
+	ensurePrimsLoaded
         ;;
   start-parser)
         initialize
@@ -253,13 +252,13 @@ case "$1" in
         initialize
         startparser-debug
         startserver-debug
-	loadPrimsIfNeeded
+	ensurePrimsLoaded
         ;;
   start-bench)
         initialize
         startparser
         startserver-bench
-	loadPrimsIfNeeded
+	ensurePrimsLoaded
         ;;
   stop)
         stopserver
@@ -270,7 +269,7 @@ case "$1" in
         stopparser
         startparser
         startserver
-	loadPrimsIfNeeded
+	ensurePrimsLoaded
         ;;
   status)
         status
