@@ -55,13 +55,17 @@ class Thread
   end
 
   def self.critical
+    _stub_warn("Thread.critical: Does nothing; returns false")
     false  #
   end
 
   # MNI def self.critical= ; end
   # use of critical= not yet supported, however the
   #    Smalltalk class ProcessorScheduler does define rubyCritical instVar.
-
+  def self.critical=(flag)
+    _stub_warn("Thread.critical=: Does nothing; returns flag")
+    flag
+  end
   class_primitive_nobridge 'current', '_current'
 
   class_primitive_nobridge 'exit', 'exit'
