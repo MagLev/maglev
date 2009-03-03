@@ -7,8 +7,7 @@ namespace :dev do
   require 'rakelib/dev.rb'
 
   desc "Stop server, install ../latest*, and reload primitives"
-  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz',
-                             :'dev:reloadprims']
+  task :'install-latest' => [:'dev:install-tgz', :'dev:ensureprims']
 
   desc "Stop current server and install ../latest-product.tgz"
   task :'install-tgz' do
@@ -41,6 +40,12 @@ namespace :dev do
   task :reloadprims => ['maglev:start'] do
     puts "=== reload primitives"
     run_topaz tc_reload_prims
+  end
+
+  desc "Ensure kernel.rb (primitives) is loaded and committed"
+  task :ensureprims => ['maglev:start'] do
+    puts "=== ensure primitives loaded"
+    run_topaz tc_ensure_prims
   end
 
   desc "Load the mcz file ../latest.mcz and commit it."

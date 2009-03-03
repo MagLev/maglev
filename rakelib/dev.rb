@@ -96,6 +96,16 @@ def tc_reload_prims
   END
 end
 
+def tc_ensure_prims
+  <<-END.margin
+    |omit resultcheck
+    |run
+    |RubyContext ensurePrimsLoaded .
+    |%
+    |exit
+  END
+end
+
 
 # Returns a topaz command string that runs the set of passing vm tests
 # in src/test/vmunit.conf
