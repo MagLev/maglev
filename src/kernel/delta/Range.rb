@@ -27,7 +27,12 @@ class Range
   end
 
   def member?(val)
-    self.detect { |i| i == val }
+    self.step(1) { |i| 
+      if i == val 
+        return true
+      end
+    }
+    false
   end
 
   alias include? ===

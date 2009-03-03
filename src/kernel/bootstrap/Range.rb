@@ -121,13 +121,23 @@ class Range
     current = @from
     lim = @to
     if @from._isNumber
-      unless @excludeEnd
-        lim = lim + 1
+      unless n._isNumber
+        n = Type.coerce_to(n, Integer, :to_int)
       end
-      begin
-        block.call(current)
-        current += n
-      end while current < lim
+      if (n <= 0) 
+        raise ArgumentError, 'increment for step must be > 0'
+      end
+      if @excludeEnd
+        begin
+          block.call(current)
+          current += n
+        end while current < lim
+      else 
+        begin
+          block.call(current)
+          current += n
+        end while current <= lim
+      end
     else
       unless @excludeEnd
         lim = lim.succ
