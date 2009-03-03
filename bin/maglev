@@ -97,6 +97,18 @@ startserver-bench() {
   echo "MagLev server gs64stone started with performance optimizations"
 }
 
+loadPrimsIfNeeded() {
+  echo "Loading prims if needed -- it may take a few seconds"
+  $TOPAZ_CMD << EOF > /dev/null
+    run
+      RubyContext _saved == nil ifTrue: [
+      RubyContext reset; load. ]
+%
+exit
+EOF
+  echo "Prims are loaded"
+}
+
 startparser() {
   if [ "$RUBY_VERSION" != "1.8.6" ]; then
     echo "### This command only works on Ruby 1.8.6,"
@@ -231,6 +243,7 @@ case "$1" in
         initialize
         startparser
         startserver
+	loadPrimsIfNeeded
         ;;
   start-parser)
         initialize
@@ -240,11 +253,13 @@ case "$1" in
         initialize
         startparser-debug
         startserver-debug
+	loadPrimsIfNeeded
         ;;
   start-bench)
         initialize
         startparser
         startserver-bench
+	loadPrimsIfNeeded
         ;;
   stop)
         stopserver
@@ -255,6 +270,7 @@ case "$1" in
         stopparser
         startparser
         startserver
+	loadPrimsIfNeeded
         ;;
   status)
         status
