@@ -4,7 +4,6 @@
 #    Simple for loop with do
 #    Compound for loop
 #    For with next
-#    For with retry
 #    For with redo
 #    For with break
 
@@ -55,15 +54,19 @@ class ForTest
         return num2
     end
 
-    # Expected value: <stop-start+1>
-    def retry (start, stop)
-        num2 = 0
-        for num1 in start..stop
+    def tstRetry 
+      num2 = 0
+      begin
+        for num1 in 1..10
             num2 = num2 + 1
-            retry if stop == start
+            retry if num2 == 3
         end
-        return num2
+      rescue LocalJumpError
+        return 1
+      end
+      return 0
     end
+
 
     # Expected value: <1>
     def break (start, stop)
@@ -122,16 +125,12 @@ raise "ERROR" unless ret == 74
 ret = ForTest.new.redo(49, 50)
 raise "ERROR" unless ret == 2
 
+ret = ForTest.new.tstRetry()
+raise "ERROR" unless ret == 1
+
+
 # expectvalue 76
 ret = ForTest.new.redo(25, 100)
-raise "ERROR" unless ret == 76
-
-# expectvalue 16
-ret = ForTest.new.retry(35, 50)
-raise "ERROR" unless ret == 16
-
-# expectvalue 76
-ret = ForTest.new.retry(25, 100)
 raise "ERROR" unless ret == 76
 
 # expectvalue 1
