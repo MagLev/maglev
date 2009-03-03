@@ -20,7 +20,7 @@ port = 2000
 s = WEBrick::HTTPServer.new( :Port => port )
 s.mount("/", current_time)
 puts "=================================================="
-puts "Starting web server:  URL: http://abaco:#{port}/"
+puts "Starting web server:  URL: http://localhost:#{port}/"
 puts "=================================================="
 puts
 s.start
