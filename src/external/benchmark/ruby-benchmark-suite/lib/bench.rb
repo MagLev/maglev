@@ -1,17 +1,37 @@
-if RUBY_VERSION[0,3] == "1.9"
-  require 'timeout'
-else
-  require File.dirname(__FILE__) + '/timeout.rb'
-end
-
-### For now, set to always true for MagLev
-if defined? RUBY_ENGINE 
-  DEBUG_SPEC = (RUBY_ENGINE == "maglev")
-else
-  DEBUG_SPEC = false
-end
 
 class BenchmarkRunner
+
+  if ARGV[-4] != "0"
+    BARE_BONES=true
+  else
+    BARE_BONES=false
+  end
+  unless BARE_BONES
+    if RUBY_VERSION[0,3] == "1.9"
+      require 'timeout'
+    else
+      require File.dirname(__FILE__) + '/timeout.rb'
+    end
+  end
+
+  # define our own so we don't have to require benchmark
+  def self.realtime
+    start = Time.now
+    yield
+    Time.now - start
+  end
+
+  # now attempt to use hitimes, if installed, for its higher accuracy timing
+  unless BARE_BONES
+    begin
+     require 'rubygems'
+     require 'hitimes'
+     def self.realtime; Hitimes::Interval.measure { yield }; end 
+    rescue LoadError
+
+    end
+  end
+
   include Enumerable
   
   attr_reader :label, :times, :error
@@ -21,6 +41,7 @@ class BenchmarkRunner
     @timeout = timeout
     @label = label
     @times = []
+    # @rss = []
   end
   
   def each
@@ -30,30 +51,51 @@ class BenchmarkRunner
   def <=>(other)
     self.label <=> other.label
   end
-  
+
+  def current_rss
+   begin
+     if RUBY_PLATFORM =~ /mswin|mingw/
+        raise if BARE_BONES 'currently BARE_BONES not accomodated on windoze'
+	require 'rubygems'     
+	require 'sys/proctable'
+	require 'time' # accomodate for sys-proctable 0.7.6 bug
+        return Sys::ProcTable.ps(Process.pid).working_set_size
+     else
+       # linux etc
+       # stats = File.read "/proc/#{Process.pid}/status"
+       # stats =~ /RSS:\s+(\d+)/i # attempt to parse it
+       # return $1.to_i*1024 # comes in kB, assume 1024
+     end
+   rescue Exception
+     return nil
+   end
+  end
+ 
+
   def run
     begin
-      Timeout.timeout(@timeout) do
-        @iterations.times do
-          t0 = Time.now.to_f
-          yield
-          t1 = Time.now.to_f
-          @times << t1 - t0
+      if @timeout != -1
+        raise 'cant have BARE_BONES and a timeout' if BARE_BONES
+        begin
+          Timeout.timeout(@timeout) do
+	    do_iterations { yield }
+          end
+        rescue Timeout::Error
+          @error = "Timeout: %.2f seconds" % (@timeout / @iterations.to_f)
         end
-      end
-    rescue Timeout::Error
-      t = @timeout
-      i = @iterations 
-      @error = "Timeout: %.2f seconds" % (@timeout / @iterations.to_f)
-      if DEBUG_SPEC
-        nil.pause   # timeout
+      else
+        do_iterations { yield }
       end
     rescue Exception => e
-      if DEBUG_SPEC
-        nil.pause
-      end
-      @error = "Error: #{e.message}"
+      @error = "Error: #{e.message} #{e.class} #{e.backtrace[0]}"
     end          
+  end
+
+  def do_iterations
+    @iterations.times do
+      @times << BenchmarkRunner.realtime { yield }
+      # @rss << current_rss
+    end
   end
   
   def best
@@ -72,6 +114,7 @@ class BenchmarkRunner
     if @error
       "#{@label},#{@error}#{"," * (@iterations + 1)}"
     else
+      # "#{@label},#{@times.join(',')},%.15f,%.15f,#{@rss.join(',')}" % [mean, standard_deviation]
       "#{@label},#{@times.join(',')},%.15f,%.15f" % [mean, standard_deviation]
     end
   end

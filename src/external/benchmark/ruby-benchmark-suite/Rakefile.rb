@@ -1,5 +1,3 @@
-require 'lib/benchutils'
-
 #--------------------------------
 # Benchmark Configuration
 #--------------------------------
@@ -12,12 +10,13 @@ RUBY_VM = ENV['RUBY_VM'] || "ruby"
 # can take up to a maxium of 60 seconds to complete.
 # If multiple input sizes are being tested in a benchmark,
 # they'll each be allocated this amount of time in seconds (before timing out).
-TIMEOUT =  (ENV['TIMEOUT'] || 300).to_i
+TIMEOUT =  (ENV['TIMEOUT'] || -1).to_i
 
 ITERATIONS = (ENV['ITERATIONS'] || 5).to_i
 VERBOSE = ENV['VERBOSE']
 report = "#{Time.now.strftime("%Y%m%d%H%M%S")}_#{RUBY_VM.gsub('/','').gsub('\\', '').gsub(':', '').split.first}.csv"
 REPORT = ENV['REPORT'] || report
+BARE_BONES = ENV['BARE_BONES'] || '0' # we'll interpret a 0 as turned off, anything else as turned on
 
 MAIN_DIR = pwd
          
@@ -27,11 +26,10 @@ MAIN_DIR = pwd
 
 # a friendly output on -T or --tasks
 if(ARGV.include?("-T") || ARGV.include?("--tasks"))
- puts "Optional options: [ITERATIONS=3] [RUBY_VM=\"/path/to/ruby opts\"] [TIMEOUT=secs] [REPORT=outputfile] [VERBOSE=true]"
+ puts "Optional options: \n  [ITERATIONS=3] \n  [RUBY_VM=\"/path/to/ruby opts\"] \n  [TIMEOUT=secs -- causes ruby to run a surrounding thread timing out the operation] \n  [REPORT=outputfile] \n  [VERBOSE=1 outputs the output of tests] \n  [BARE_BONES=1 try not to require any external libraries for statistics gathering--useful for non fully fledged interpreters]"
 end
 
 task :default => [:run_all]
-
 
 desc "Initializes report; Used by the others."
 task :report do
@@ -72,6 +70,8 @@ task :run_dir => :report do
   dir = ENV['DIR']
   puts 'ERROR: need to specify directory, a la DIR="micro-benchmarks/bm_mergesort.rb"' unless dir
   puts "Report will be written to #{REPORT}"
+  puts "Benchmarking startup time"
+  benchmark_startup
   all_files = []
   Find.find('./' + dir) do |filename|
     all_files << filename
@@ -112,9 +112,9 @@ def process_file filename
   cd(dirname) do
     puts "Benchmarking #{filename}"
     if(VERBOSE)
-      system("#{RUBY_VM} #{basename} #{ITERATIONS} #{TIMEOUT} #{MAIN_DIR}/#{REPORT}")
+      system("#{RUBY_VM} #{basename} #{BARE_BONES} #{ITERATIONS} #{TIMEOUT} #{MAIN_DIR}/#{REPORT}")
     else
-      `#{RUBY_VM} #{basename} #{ITERATIONS} #{TIMEOUT} #{MAIN_DIR}/#{REPORT}`
+      `#{RUBY_VM} #{basename} #{BARE_BONES} #{ITERATIONS} #{TIMEOUT} #{MAIN_DIR}/#{REPORT}`
     end
   end
 
@@ -122,6 +122,14 @@ end
 
 
 def benchmark_startup
+
+  # fake some ARGV so that lib/bench.rb receives the right one
+  ARGV  << BARE_BONES.to_s
+  ARGV << ITERATIONS.to_s
+  ARGV << TIMEOUT.to_s
+  ARGV << REPORT
+  require 'lib/benchutils' 
+  4.times { ARGV.pop }
   benchmark = BenchmarkRunner.new("Startup", ITERATIONS, TIMEOUT)
   benchmark.run do
     `#{RUBY_VM} core-features/startup.rb`
