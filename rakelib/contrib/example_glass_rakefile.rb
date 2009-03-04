@@ -27,7 +27,7 @@ task :status do
   GemStoneInstallation.current.status
 end
 
-desc "Start netldi"
+desc "Stop netldi"
 task :stopnetldi do
   GemStoneInstallation.current.stopnetldi
 end
