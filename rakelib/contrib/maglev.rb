@@ -20,10 +20,19 @@ class MagLevStone < Stone
     ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
   end
 
-  # Does a ruby context reset, which reloads the primitives
+  # Expensive: throws away the current ruby context, and creates a new one
+  # from scratch.  Side-effect is that all primitives are re-read.
   def reset_ruby_context
     if running?
       run_topaz_commands("RubyContext reset", "RubyContext load")
+    end
+  end
+
+  # Loads the primitives if they haven't been loaded, then commits the
+  # transaction.  Does nothing if prims are already loaded.
+  def ensure_prims_loaded
+    if running?
+      run_topaz_commands("RubyContext ensurePrimsLoaded")
     end
   end
 end

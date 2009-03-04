@@ -26,4 +26,6 @@ class Options
   include Singleton
 end
 
-Options.instance
+xx = Options.instance
+unless xx.class.equal?(Options) ; raise 'error' ; end
+true

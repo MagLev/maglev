@@ -26,25 +26,6 @@ class Class
 
   # base image has persistent env 1 method Class>>class
 
-  def attr_accessor(*names)
-    names.each do |n|
-        attr_reader(n)
-        attr_writer(n)
-    end
-  end
-
-  def attr_reader(*names)
-    names.each do |n|
-        module_eval "def #{n}; @#{n}; end"
-    end
-  end
-
-  def attr_writer(*names)
-    names.each do |n|
-        module_eval "def #{n}=(v); @#{n} = v; end"
-    end
-  end
-
   primitive_nobridge 'include', 'includeRubyModule:'
 
   def new(*args)

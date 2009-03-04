@@ -102,7 +102,6 @@ class Module
   # MNI: attr_accessor
   # MNI: attr_reader
   # MNI: attr_writer
-  # MNI: define_method
   # MNI: extend_object
   # MNI: extended
 

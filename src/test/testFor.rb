@@ -66,22 +66,6 @@ class TestFor
     raise "ERROR" unless m==7
   end
 
-  def tstRetry
-    k = 0
-    m = 0
-    loopVal = 97090
-    loopVal = for n in 1..6
-      m += 1
-      if m == 3 && k == 0
-        k = 1
-        retry
-      end
-    end
-    raise "ERRORA" unless loopVal == (1..6)
-    raise "ERRORB" unless k==1
-    raise "ERRORC" unless m==9
-  end
-
   def tstAll
     a = 0
     b = 0
@@ -119,7 +103,6 @@ t.tstBreakValue
 t.tstBreakNoValue
 t.tstNext
 t.tstRedo
-t.tstRetry
 t.tstAll
 puts "done"
 

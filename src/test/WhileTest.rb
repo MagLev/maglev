@@ -4,7 +4,6 @@
 #    simple while loop with do
 #    Compound while loop
 #    While with next
-#    While with retry
 #    While with redo
 #    While with break
 
@@ -65,21 +64,22 @@ class WhileTest
         return num
     end
 
-    # Expected value: <stop-start>
-    def retry (start, stop)
-        retried = false
-        retrylim = (stop - start) / 2 
+    def tstRetry
+        xx = false
         num = 0
-        while start < stop
+        begin
+          while num < 10 
             num += 1
-            if (num == retrylim && retried == false)
-              retried = true
+            if (num == 5)
               retry
             end
-            start += 1
+          end
+        rescue LocalJumpError
+          return 1
         end
-        return num
+        return 0
     end
+
 
     # Expected value: <2>
     def break (start, stop)
@@ -143,18 +143,12 @@ raise "ERROR" unless ret == 749
 ret = WhileTest.new.redo(10, 20)
 raise "ERROR" unless ret == 10
 
+ret = WhileTest.new.tstRetry
+raise "ERROR" unless ret == 1
+
 # expectvalue 49
 ret = WhileTest.new.redo(0, 49)
 raise "ERROR" unless ret == 49
-
-# retry in a while loop raises RubyBreakException 
-#   per MRI un-rescuable   'retry outside of rescue clause'
-# begin
-#  ret = WhileTest.new.retry(10, 20)
-#  raise "ERROR" 
-#rescue 
-#  
-#end
 
 # expectvalue 2
 ret = WhileTest.new.break(15, 30)
