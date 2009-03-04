@@ -19,27 +19,40 @@ class Behavior
     true
   end
 
+  def attr(name, writeable=false)
+    attr_reader(name)
+    attr_writer(name) if writeable
+  end
+
   def attr_accessor(*names)
     names.each do |n|
-      attr_reader(n)
-      attr_writer(n)
+      attr(n, true)
+    end
+  end
+
+  def _attr_type_check(name)
+    if name._isFixnum
+      name.id2name
+    elsif (name._isString || name._isSymbol)
+      name
+    else
+      Type.coerce_to(name, String, :to_str)
     end
   end
 
   def attr_reader(*names)
     names.each do |n|
-      module_eval "def #{n}; @#{n}; end"
+      the_name = self._attr_type_check(n)
+      module_eval "def #{the_name}; @#{the_name}; end"
     end
   end
 
   def attr_writer(*names)
     names.each do |n|
-      module_eval "def #{n}=(v); @#{n} = v; end"
+      the_name = self._attr_type_check(n)
+      module_eval "def #{the_name}=(v); @#{the_name} = v; end"
     end
   end
-
-  # This is a 1.9 thing, but some of the 1.8 specs expect it there anyway...
-  alias attr attr_reader
 
   def class_variable_defined?(aName)
     sym = aName.to_sym
@@ -72,14 +85,14 @@ class Behavior
 
   def define_method(sym, meth)
     m = meth
-    if m.is_a?(Proc) 
+    if m.is_a?(Proc)
       m = meth._block
     end
     if m._isBlock
       _define_method_block(sym, &m)
     else
       _define_method_meth(sym, meth)
-    end 
+    end
   end
 
   def define_method(sym, &blk)
@@ -139,7 +152,7 @@ class Behavior
   primitive_nobridge '_method_protection', 'rubyMethodProtection'
 
   primitive_nobridge '_set_protection_methods*', 'setProtection:methods:'
- 
+
   def private(*names)
     # if names empty, set default visibility for subsequent methods to private
     _set_protection_methods(2, *names)
@@ -172,11 +185,11 @@ class Behavior
     _method_defined(symbol, 2)
   end
 
-  primitive_nobridge 'remove_method', 'rubyRemoveMethod:' 
+  primitive_nobridge 'remove_method', 'rubyRemoveMethod:'
 
   #   for now, undef_method is same as remove_method , there is no
   #   other way to prevent a class responding to a selector.
   #
-  primitive_nobridge 'undef_method', 'rubyRemoveMethod:' 
+  primitive_nobridge 'undef_method', 'rubyRemoveMethod:'
 
 end
