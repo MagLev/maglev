@@ -14,13 +14,15 @@ class GemStoneInstallation
                  config_directory="/etc/gemstone",
                  installation_extent_directory="/var/local/gemstone",
                  base_log_directory="/var/log/gemstone",
-                 backup_directory="/var/backups/gemstone")
+                 backup_directory="/var/backups/gemstone",
+                 initial_extent_name='extent0.dbf')
 
     @installation_directory = installation_directory
     @config_directory = config_directory
     @base_log_directory = base_log_directory
     @installation_extent_directory = installation_extent_directory
     @backup_directory = backup_directory
+    @initial_extent_name = initial_extent_name
 
     ENV['GEMSTONE'] = @installation_directory
     ENV['PATH'] += ":#{ENV['GEMSTONE']}/bin"
@@ -45,6 +47,6 @@ class GemStoneInstallation
   end
 
   def initial_extent
-    File.join(@installation_directory, "bin", "extent0.dbf")
+    File.join(@installation_directory, "bin", @initial_extent_name)
   end
 end

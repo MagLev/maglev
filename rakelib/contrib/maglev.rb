@@ -2,8 +2,9 @@ require File.join(File.dirname(__FILE__), 'stone')
 # Set the GemStoneInstallation paths for a default install of MagLev, based
 # on $MAGLEV_HOME.
 ML = ENV['MAGLEV_HOME']
-GemStoneInstallation.current= GemStoneInstallation.new(
-  "#{ML}/gemstone", "#{ML}/etc/stones", "#{ML}/stones", "#{ML}/log", "#{ML}/backups")
+GemStoneInstallation.current = GemStoneInstallation.new(
+  "#{ML}/gemstone", "#{ML}/etc/stones", "#{ML}/stones",
+  "#{ML}/log", "#{ML}/backups", 'extent0.ruby.dbf')
 
 class MagLevStone < Stone
   def config_file_template
@@ -12,6 +13,11 @@ class MagLevStone < Stone
 
   def key_file
     "#{ML}/etc/maglev.demo.key"
+  end
+
+  def start
+    super
+    ensure_prims_loaded
   end
 
   def initialize_gemstone_environment
