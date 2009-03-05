@@ -13,7 +13,6 @@ class Behavior
 
   # map name to _rubyName so name will work for metaclasses
   primitive 'name' , '_rubyName'
-  primitive_nobridge '_allClassVars', 'allClassVarNames'
 
   def _isBehavior
     true
@@ -54,31 +53,13 @@ class Behavior
     end
   end
 
-  def class_variable_defined?(aName)
-    sym = aName.to_sym
-    a = _allClassVars
-    lim = a.length
-    n = 0
-    while (n < lim)
-      if (sym.equal?(a[n]))
-        return true
-      end
-      n = n + 1
-    end
-    false
-  end
+  primitive_nobridge 'class_variables', 'rubyClassVarNames' 
 
-  def class_variables
-    a = _allClassVars
-    lim = a.length
-    r = Array.new(lim)
-    n = 0
-    while (n < lim)
-      r[n] = a[n].to_s
-      n = n + 1
-    end
-    r
-  end
+  # def class_variable_defined?(string) ; end 
+  primitive_nobridge 'class_variable_defined?', 'rubyClassVarDefined:'
+
+  # def class_variable_get(string) ; end 
+  primitive_nobridge 'class_variable_get', 'rubyClassVarGet:'
 
   primitive_nobridge '_define_method_meth' , 'defineMethod:method:'
   primitive_nobridge '_define_method_block&' , 'defineMethod:block:'
