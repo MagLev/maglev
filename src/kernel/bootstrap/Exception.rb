@@ -31,7 +31,7 @@ class Exception
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop
-      Thread._backtrace(IncludeSmalltalkFrames, limit)
+      @backtrace || Thread._backtrace(IncludeSmalltalkFrames, limit)
     end
 
     def backtrace_st(limit = 1000)
@@ -48,7 +48,9 @@ class Exception
       e
     end
 
-    # MNI: Exception#set_backtrace
+    def set_backtrace(array)
+      @backtrace = array
+    end
 
     def to_s
       (m = message).nil? ? self.class.name : m
