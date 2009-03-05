@@ -55,7 +55,7 @@ task :list_stones do
 end
 
 desc "Create a new stone"
-task :new_stone, :stone_name do |t, args|
+task :create_stone, :stone_name do |t, args|
   puts "Creating #{args.stone_name}"
   MagLevStone.create(args.stone_name)
 end
