@@ -10,20 +10,15 @@ run correctly.
 You will need the following MRI Ruby resources on your machine:
 
 1. MRI Ruby 1.8.6 (other versions are not supported)
+   patchlevel 287 is required, patchlevel 111 and 114 currently don't work
 2. Ruby Gems
-3. ParseTree gem version 2.2.0 (version 3.x will not work).
+3. ParseTree gem (version 3.0.3 or later)
 4. Rake
 
-For Linux users without ruby experience, you need to install 
-  ruby v1.8.6
-  rubygems
-with your Linux package manager or installer.
-Then with a live Internet connection, install ruby gems in this order:
-  /usr/bin/gem install RubyInline -v 3.6.0
-  /usr/bin/gem install rubyforge -v 1.0.0
-  /usr/bin/gem install rake -v 0.8.1
-  /usr/bin/gem install hoe -v 1.5.3
-  /usr/bin/gem install ParseTree -v 2.2.0
+You can check which ParseTree version you have installed with:
+   gem list --local 
+If you don't have ParseTree or have an earlier version:
+   sudo gem install ParseTree
 
 === Optional prerequisites
 
