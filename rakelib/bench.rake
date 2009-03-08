@@ -13,13 +13,13 @@
 # The primary Ruby Benchmark Suite project is at:
 #   http://github.com/acangiano/ruby-benchmark-suite/
 #
-# see $MAGLEV_HOME/src/external/benchmark/utils/README for more
+# see $MAGLEV_HOME/benchmark/utils/README for more
 
 BASEDIR         = File.expand_path(File.dirname(__FILE__) + "/..")
-MONITOR         = BASEDIR + "/src/external/benchmark/utils/monitor.rb"
-RUNNER          = BASEDIR + "/src/external/benchmark/utils/bench.rb"
-RBS_DIR         = BASEDIR + "/src/external/benchmark/rbs"
-RESULTS_DIR     = BASEDIR + "/src/external/benchmark/results"
+MONITOR         = BASEDIR + "/benchmark/utils/monitor.rb"
+RUNNER          = BASEDIR + "/benchmark/utils/bench.rb"
+RBS_DIR         = BASEDIR + "/benchmark/rbs"
+RESULTS_DIR     = BASEDIR + "/benchmark/results"
 RBS_RESULTS_DIR = RESULTS_DIR + "/rbs"
 WEB_DIR         = RESULTS_DIR + "/web"
 
