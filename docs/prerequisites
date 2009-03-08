@@ -10,7 +10,7 @@ run correctly.
 You will need the following MRI Ruby resources on your machine:
 
 1. MRI Ruby 1.8.6 (other versions are not supported)
-   patchlevel 287 is required, patchlevel 111 and 114 currently don't work
+   Patchlevel 287 is required, patchlevel 111 and 114 currently don't work
 2. Ruby Gems
 3. ParseTree gem (version 3.0.3 or later)
 4. Rake
