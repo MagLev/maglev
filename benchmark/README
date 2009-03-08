@@ -1,0 +1,10 @@
+This directory contains a slight modification of Brian Ford's refactoring
+of the Ruby Benchmark Suite project for use in Rubinius. We've primarily
+changed it default to the MagLev VM instead of Rubinius.
+
+Benchmaks are run using rake. Type "rake -T bench" so see options.
+
+The primary Ruby Benchmark Suite project is at:
+  http://github.com/acangiano/ruby-benchmark-suite/
+
+see $MAGLEV_HOME/benchmark/utils/README for more detail.

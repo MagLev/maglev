@@ -7,8 +7,7 @@
 #
 # This file is a slight modification of Brian Ford's refactoring
 # of the Ruby Benchmark Suite project for use in Rubinius. We've
-# primarily changed it to fit MagLev's directory structure and to
-# default to the MagLev VM instead of Rubinius.
+# primarily changed it to default to the MagLev VM instead of Rubinius.
 #
 # The primary Ruby Benchmark Suite project is at:
 #   http://github.com/acangiano/ruby-benchmark-suite/
