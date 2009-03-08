@@ -118,10 +118,6 @@ see the Persistence[link:files/docs/persistence.html] file in the docs directory
 
 The following documentation explains more:
 
-debugging
-file_layout
-persistence
-
 {Release Notes}[link:files/docs/release_notes.html]::  Notes on and limitations of the current release.
 Server[link:files/docs/maglev-server.html]::  How to start and stop the MagLev server.
 Debug[link:files/docs/debugging.html]::      How to run MagLev in debug mode
@@ -132,7 +128,7 @@ Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 Persistence[link:files/docs/persistence.html]:: Persistence and transactions
-
+Benchmarks[link:files/docs/Benchmarks.html]:: Ruby Benchmark Suite benchmarks
 
 == Hints:
 * set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add

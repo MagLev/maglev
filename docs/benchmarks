@@ -1,4 +1,6 @@
-This directory contains a copy of Brian Ford's refactoring of the
+== MagLev Benchmarks
+
+The benchmark directory contains a copy of Brian Ford's refactoring of the
 Ruby Benchmark Suite project as used by the Rubinius project. We made
 a one line change to bench.rb to ensure it runs in MagLev as well as
 other Ruby implementations.
@@ -10,7 +12,7 @@ Subdirectories:
   rbs   - contains the benchmarks themselves
   utils - contains the infrastructure necessary to run the benchmarks
 
-see $MAGLEV_HOME/benchmark/utils/README for more detail.
+see <tt>$MAGLEV_HOME/benchmark/utils/README</tt> for more detail.
 
 Benchmarks are run using rake. Type "rake -T bench" to see options.
 
