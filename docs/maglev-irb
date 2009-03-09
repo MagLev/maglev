@@ -10,6 +10,7 @@ ruby IRB in a future release.
   Usage: maglev-irb [options]
   OPTIONS:
      -d      Run in debugging mode
+     -G      Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
      -h      Show help message
      -v      Print version number
 

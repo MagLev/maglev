@@ -38,6 +38,7 @@ namespace :maglev do
   # ======================= core tasks =======================
 
   task :startserver => :gemstone do
+    start_netldi
     start_server
   end
 
@@ -63,6 +64,7 @@ namespace :maglev do
   task :stopserver => :gemstone do
     if server_running?
       stop_server
+      stop_netldi
     else
       puts "MagLev Server is not running."
     end

@@ -7,19 +7,19 @@
 #
 # This file is a slight modification of Brian Ford's refactoring
 # of the Ruby Benchmark Suite project for use in Rubinius. We've
-# primarily changed it to fit MagLev's directory structure and to
-# default to the MagLev VM instead of Rubinius.
+# changed it to default to the MagLev VM instead of Rubinius, and 
+# made minor changes to filenames and formats.
 #
 # The primary Ruby Benchmark Suite project is at:
 #   http://github.com/acangiano/ruby-benchmark-suite/
 #
-# see $MAGLEV_HOME/src/external/benchmark/utils/README for more
+# see $MAGLEV_HOME/benchmark/utils/README for more
 
 BASEDIR         = File.expand_path(File.dirname(__FILE__) + "/..")
-MONITOR         = BASEDIR + "/src/external/benchmark/utils/monitor.rb"
-RUNNER          = BASEDIR + "/src/external/benchmark/utils/bench.rb"
-RBS_DIR         = BASEDIR + "/src/external/benchmark/rbs"
-RESULTS_DIR     = BASEDIR + "/src/external/benchmark/results"
+MONITOR         = BASEDIR + "/benchmark/utils/monitor.rb"
+RUNNER          = BASEDIR + "/benchmark/utils/bench.rb"
+RBS_DIR         = BASEDIR + "/benchmark/rbs"
+RESULTS_DIR     = BASEDIR + "/benchmark/results"
 RBS_RESULTS_DIR = RESULTS_DIR + "/rbs"
 WEB_DIR         = RESULTS_DIR + "/web"
 
@@ -34,8 +34,8 @@ end
 # Cache the name so it is only generated once during an invocation.
 # Eliminates having to save the name and pass it around.
 def report
-  os = `uname`.chop
-  host = `uname -n`.chop
+  os = `uname`.chomp
+  host = `uname -n`.chomp
   vm = File.basename VM.split.first
   @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{os}-#{host}-#{Time.now.strftime "%y%m%d.%H%M%S"}.yaml"
 end
@@ -78,7 +78,8 @@ namespace :bench do
 
       File.open name, "r" do |file|
         YAML.load_documents file do |doc|
-          bench_name = doc["name"][(RBS_DIR.size-BASEDIR.size)..-1]
+          canonical_name  = doc["name"].gsub '//', '/'
+          bench_name = File.basename(File.dirname(canonical_name)) + '/' + File.basename(canonical_name)
           status[bench_name][system] ||= doc["status"]
 
           next unless doc.key? field

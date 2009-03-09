@@ -1,5 +1,9 @@
 == Release Notes for the MagLev Alpha release of December 19, 2008.
 
+=== ParseTree
+This version requires Ruby 1.8.6 patchlevel 287 due to an incompatibility
+with patchlevel 111 and 114. It also requires the ParseTree 3.0.3 gem.
+
 === Persistence support
 
 The Gemstone class has methods for +commitTransaction+, +abortTransaction+
@@ -35,7 +39,6 @@ provided by different classes and messages
 * In some cases, <tt>rlwrap</tt> (see Prerequisites[link:files/docs/prerequisites]) will output noise while typing at a Topaz prompt (Linux only).
 
 === Initial startup
-* The first time you run maglev-ruby or maglev-irb after installing MagLev there will be a delay of up to 30 seconds for system initialization.
 * If you run maglev-irb immediately after installing MagLev, you may get an "Almost out of Memory" warning and a stack trace (Macintosh only). This can be safely ignored as it does not affect operation of the system.
 
 === Misc

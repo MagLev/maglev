@@ -84,4 +84,8 @@ test(my_file.path, fname, 'File#path')
 result = File.join('spec/rubyspec/language', "/**/*_spec.rb")
 test(result, 'spec/rubyspec/language/**/*_spec.rb', "File.join:  MSPECs are probably broken now...")
 
+
+# Test FileTest module methods
+s = FileTest.size(__FILE__)
+test(s > 100, true, 'FileTest.size(__FILE__)')
 report

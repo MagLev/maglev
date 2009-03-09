@@ -49,14 +49,16 @@ Topaz also has on line help, which includes the Ruby-specific commands that are 
 ==== Summary of Topaz commands
 
 ===== Start, Stop, and misc commands
-<tt>rake maglev:topaz</tt>:: Invoke topaz
-+exit+::                 Exit topaz
-+help+::                 Get help
+<tt>rake maglev:topaz</tt>::  Invoke topaz
++exit+::  Exit topaz
++help+::  Get help
 
 ===== Stack info
 +where+::
   List current stack
 <tt>where nn</tt>:: Show only +nn+ frames starting at current frame.
+<tt>where string</tt>:: Show only frames containing +string+. +string+ cannot start with +, -, a decimal digit, or contain whitespace. Search is case-sensitive. Current frame is set to first frame matched by the search. 
+<tt>where 'string'</tt>:: Same as above, but <tt>'string'</tt> may contain digits and whitespace.
 +frame+::
   Show information about the current frame
 +list+::
@@ -67,6 +69,11 @@ Topaz also has on line help, which includes the Ruby-specific commands that are 
   location.
 +down+:: Move down one stack frame.
 +up+::   Move up one stack frame.
+
+==== Example usage of WHERE for debuggging a RubySpec failure
+<tt>fr 5</tt>::   See reason for failure where the "pause" for DEBUG_SPEC is
+<tt>wh _co</tt>:: Search for _compileFile frames
+<tt>l</tt>::      Window listing for first _compileFile frame 
 
 ===== Break point control
 <tt>break method Foo bar @ 2</tt>::
@@ -85,9 +92,9 @@ Topaz also has on line help, which includes the Ruby-specific commands that are 
 ===== Examining variables at different levels of detail
 <tt>display oops</tt>::
   Turn on display of object ids (necessary for examining variables)
-<tt>obj1 @ NNN </tt>::
+<tt>obj1 @ NNN</tt>::
   Inspect the object with id +NNN+, one level deep
-<tt>obj2 @ NNN </tt>::
+<tt>obj2 @ NNN</tt>::
   Inspect the object with id +NNN+, two levels deep
 <tt>level N</tt>::
   Set the default display level to +N+.

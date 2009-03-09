@@ -17,7 +17,7 @@ your ruby 1.8.6 was compiled without ipv6 support. You need to compile ruby with
   dev-lang/ruby   ipv6
 to /etc/portage/package.use, then re-emerge dev-lang/ruby.
 
-Also note that you must be using ParseTree 2.2.0; version 3.x will not work with MagLev.
+Also note that you must be using ParseTree 3.0.3 or later
 You can check which version you have installed with:
   gem list --local
 

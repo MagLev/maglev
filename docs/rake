@@ -8,14 +8,15 @@ Run <tt>rake -D</tt> for full documentation of all the MagLev rake tasks.
 The <tt>maglev:</tt> namespace holds the rake tasks for administration of the
 MagLev Server.
 
-  rake maglev:force-reload  # Stop MagLev server, overwrite with empty repository!!!
-  rake maglev:restart       # Restart MagLev server processes.
-  rake maglev:start         # Start MagLev server processes, if not already running.
-  rake maglev:start-debug   # Start the MagLev processes with verbose output.
-  rake maglev:status        # Display MagLev server status.
-  rake maglev:stop          # Stop the MagLev processes.
-  rake maglev:topaz         # Run topaz (use rlwrap, if available)
-  rake maglev:topaz-debug   # Run debug topaz (use rlwrap, if available)
+  rake maglev:force-reload        # Stop MagLev server, overwrite with empty repository!!!
+  rake maglev:restart             # Restart MagLev server processes.
+  rake maglev:start               # Start MagLev server processes, if not already running.
+  rake maglev:start-bench         # Start the MagLev processes with performance optimizations.
+  rake maglev:start-debug         # Start the MagLev processes with verbose output.
+  rake maglev:status              # Display MagLev server status.
+  rake maglev:stop                # Stop the MagLev processes.
+  rake maglev:topaz               # Run topaz (use rlwrap, if available)
+  rake maglev:topaz-debug         # Run debug topaz (use rlwrap, if available)
 
 * There are <tt>-debug</tt> versions of several of the commands, which run
   the associated item with a higher level of debug information.
@@ -26,12 +27,17 @@ MagLev Server.
 
 === RubySpec and MSpec Tasks in <tt>spec:</tt> Namespace
 
-  rake spec:ci              # Run the continuous integration specs (was passingpsecs) on MagLev
-  rake spec:debug           # Debug an mspec file: spec=<dir_or_file_name>
-  rake spec:debugci         # Run the continuous integration specs on MagLev with debug
-  rake spec:mri             # Run the continuous integration specs against MRI
-  rake spec:run             # Run an mspec file: spec=<dir_or_file_name>
-  rake spec:tag             # Run the named specs and tag the failing ones
+  rake spec:ci                    # Run the integration specs on MagLev
+  rake spec:civ                   # Run the verbose continuous integration specs on MagLev
+  rake spec:debug                 # Debug an mspec file: spec=<dir_or_file_name>
+  rake spec:debugci               # Run the continuous integration specs on MagLev with debug
+  rake spec:help                  # Run mspec run --help
+  rake spec:lsfails               # List the specs currently tagged as fails for the dir
+  rake spec:mri                   # Run the continuous integration specs against MRI
+  rake spec:run                   # Run an mspec file: spec=<dir_or_file_name>
+  rake spec:runnofail             # Run an mspec file with -G fails: spec=<dir_or_file_name>
+  rake spec:tag                   # Run the named specs and tag the failing ones
+  rake spec:untag                 # Run specs currently tagged as fails, and untag ones now passing
 
 * The debug versions of the spec tasks setup MagLev to leave the developer
   at the Topaz prompt if there is a spec failure or an uncaught exception.
@@ -40,6 +46,13 @@ MagLev Server.
     rake spec:run spec=spec/rubyspec/1.8/core/string/append_spec.rb
   The spec may be a file or directory.
 
+=== Benchmark Tasks
+The benchmark tasks run the ruby benchmark suite as adapted by the Rubinius project
+  rake bench                      # Run all the RBS benchmarks
+  rake bench:dir                  # Run all the RBS benchmarks in DIR
+  rake bench:file                 # Run only the RBS benchmark specified by FILE
+  rake bench:results              # Plot the RBS benchmark results (not implemented)
+  rake bench:to_csv               # Generate a CSV file of RBS results
 
 === Miscellaneous
 
@@ -60,17 +73,16 @@ The developer tasks are specific to the GemStone's internal MagLev development
 environment and may depend on files not shipped with the Alpha release.
 Run at your own risk:
 
-  rake dev:bm-tests         # Run the bm smoke tests (depends on ../gss64bit_30/*)
-  rake dev:ensure_stopped   # Make sure the gemstone server is stopped.
-  rake dev:install-latest   # Stop server, install ../latest*, and reload primitives
-  rake dev:install-tgz      # Stop current server and install ../latest-product.tgz
-  rake dev:loadmcz          # Load the mcz file ../latest.mcz and commit it.
-  rake dev:reloadprims      # Reload kernel.rb (primitives) and commit it
-  rake dev:vm-tests         # Run the vm smoke tests (depends on ../gss64bit_30/*)
+  rake dev:bm-tests               # Run the bm smoke tests
+  rake dev:clean-gems             # Clean up after a test install of rubygems
+  rake dev:ensure_stopped         # Make sure the gemstone server is stopped.
+  rake dev:ensureprims            # Ensure kernel.rb (primitives) is loaded and committed
+  rake dev:install-latest         # Stop server, install ../latest*, and reload primitives
+  rake dev:install-tgz            # Stop current server and install ../latest-product.tgz
+  rake dev:loadmcz                # Load the mcz file ../latest.mcz and commit it.
+  rake dev:passing                # Run the passing specs
+  rake dev:reloadprims            # Reload kernel.rb (primitives) and commit it
+  rake dev:smoke                  # Run the passing specs and the vm tests
+  rake dev:vm-tests               # Run the vm smoke tests
 
   rake squeak               # Run a squeak image
-
-
-
-
-

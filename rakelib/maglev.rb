@@ -107,12 +107,15 @@ def server_running?
   `#{GEMSTONE}/bin/gslist -clp`.tr("\n", ' ').strip != "0"
 end
 
-# Start the GemStone servers (startnetldi; startstone).  Does no checking
-# if server is already started.
-def start_server
+def start_netldi
   sh %{ ${GEMSTONE}/bin/startnetldi -g &>/dev/null } do |ok, status|
     raise "Couldn't start netldi #{ok}: #{status}" unless ok
   end
+end
+
+# Start the GemStone servers (startnetldi; startstone).  Does no checking
+# if server is already started.
+def start_server
   sh %{
     ${GEMSTONE}/bin/startstone gs64stone &>/dev/null
     ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
@@ -148,9 +151,16 @@ end
 def stop_server
   sh %{
     ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i >/dev/null 2>&1
-    ${GEMSTONE}/bin/stopnetldi > /dev/null 2>&1
   } do |ok, status|
     puts "GemStone server stopped." if ok
+  end
+end
+
+def stop_netldi
+  sh %{
+    ${GEMSTONE}/bin/stopnetldi > /dev/null 2>&1
+  } do |ok, status|
+    puts "NetLDI stopped" if ok
   end
 end
 
@@ -177,6 +187,7 @@ def create_debug_script(code)
   sh %{
     cp #{MAGLEV_HOME}/etc/.topazdebugini #{script_name}
     cat - >> #{script_name} <<EOF
+login
 #{code}
 EOF
   }
@@ -186,6 +197,7 @@ end
 
 def run_topaz(snippet, debug=false)
   sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
+login
 #{snippet}
 EOF
   } do |ok, status|

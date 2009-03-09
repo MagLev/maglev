@@ -11,8 +11,9 @@ Links:
 
 === Files
 
-All of the spec related files are under <tt>git/spec</tt>, except the
-<tt>default.mspec</tt> config file which lives in the +git+ directory.
+All of the spec related files are under <tt>$MAGLEV_HOME/spec</tt>, except the
+<tt>default.mspec</tt> and <tt>passing.mspec</tt> config files which liver
+in the +$MAGLEV_HOME+ directory.
 
 
 [<tt>do_not_run_specs</tt>]

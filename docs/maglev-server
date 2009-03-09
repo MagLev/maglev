@@ -70,22 +70,23 @@ is that you do not have to cd to $MAGLEV_HOME to run <tt>maglev start</tt>,
 <tt>maglev stop</tt>, <tt>maglev status</tt>, etc.
 
 === <tt>maglev</tt>:  Control the MagLev system
-  Usage: maglev {start|start-debug|stop|restart|status|ruby|irb|topaz|
-                 topaz-debug|squeak|force-reload|version|help}
+  Usage: maglev {start|start-debug|start-bench|stop|restart|status|topaz|topaz-debug|
+                 squeak|force-reload|version|help}
 
   To control the MagLev server:
   maglev start          - Start MagLev server processes
   maglev start-debug    - Start MagLev server processes with verbose output
+  maglev start-bench    - Start MagLev server with performance optimizations
   maglev start-parser   - Force parser process to start if it's dead
   maglev stop           - Stop MagLev server processes
   maglev restart        - Restart MagLev server processes
   maglev status         - Display MagLev server status
   maglev version        - Display MagLev version number
   maglev force-reload   - Stop MagLev server, replace with empty repository!!!
-
+  
   To execute other maglev commands:
   maglev topaz          - Enter a Topaz shell
-  maglev topaz-debug    - Enter a Topaz shell useful for debugging
+  maglev topaz-debug    - Enter a Topaz shell useful for debugging 
   maglev squeak         - Start optional Squeak development environment
   maglev vsd            - Start Visual Statistics Display monitoring tool
   maglev help           - Display this text
