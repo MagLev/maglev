@@ -160,7 +160,7 @@ def stop_netldi
   sh %{
     ${GEMSTONE}/bin/stopnetldi > /dev/null 2>&1
   } do |ok, status|
-    puts "Net LDI stopped" if ok
+    puts "NetLDI stopped" if ok
   end
 end
 
