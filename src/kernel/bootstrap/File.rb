@@ -249,6 +249,16 @@ class File
     stat_obj.grpowned?
   end
 
+  def self.identical?(file_1, file_2)
+    stat_1 = File._stat(Type.coerce_to(file_1, String, :to_str))
+    stat_2 = File._stat(Type.coerce_to(file_2, String, :to_str))
+    return false unless stat_1.ino == stat_2.ino
+    return false unless stat_1.ftype == stat_2.ftype
+#     return false unless POSIX.access(orig, Constants::R_OK)
+#     return false unless POSIX.access(copy, Constants::R_OK)
+    return true
+  end
+
   def self.lchmod(permission, *file_names)
     # not supported , lchmod() not available on Linux or Solaris
     raise NotImplementedError
