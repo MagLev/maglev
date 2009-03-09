@@ -187,6 +187,7 @@ def create_debug_script(code)
   sh %{
     cp #{MAGLEV_HOME}/etc/.topazdebugini #{script_name}
     cat - >> #{script_name} <<EOF
+login
 #{code}
 EOF
   }
@@ -196,6 +197,7 @@ end
 
 def run_topaz(snippet, debug=false)
   sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
+login
 #{snippet}
 EOF
   } do |ok, status|
