@@ -47,7 +47,6 @@ if [ -z "$PARSETREE_PORT" ]; then
     export PARSETREE_PORT=2001
 fi
 #
-export RUBY_VERSION=`ruby -e "puts \"#{RUBY_VERSION}\""`
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
@@ -97,6 +96,30 @@ startserver-bench() {
   echo "MagLev server gs64stone started with performance optimizations"
 }
 
+rubyversioncheck() {
+# Pick up environment variable if needed for ruby 186 patchlevel 287
+if [ -z "$RUBY186P287" ]; then
+    # echo "using '`which ruby`' as ruby 186 patchlevel 287"
+    export RUBY186P287=ruby
+fi
+# Check for Ruby 1.8.6 patchlevel 287
+if [ `$RUBY186P287 --version | grep -c 'ruby 1\.8\.6'` -ne 1 ] || \
+   [ `$RUBY186P287 --version | grep -c 'patchlevel 287'` -ne 1 ]; then
+     echo "### The MagLev parser requires MRI ruby 1.8.6 patchlevel 287"
+     echo "    with the ParseTree version 3.0.3 gem installed."
+     echo "### Your MRI ruby version appears to be:"
+     echo "    `$RUBY186P287 --version`"
+     echo "To fix this set the environment variable RUBY186P287"
+     echo "to point to a Ruby 1.8.6 patchlevel 287 executable."
+     echo
+     echo "You can skip _this_ check by using \"maglev start-debug\","
+     echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
+     echo
+     echo "Use \"maglev status\" to check that the parser is running."
+     exit 1
+fi
+}
+
 ensurePrimsLoaded() {
   echo "Loading prims if needed -- it may take a few seconds"
   $TOPAZ_CMD << EOF > /dev/null
@@ -109,16 +132,8 @@ EOF
 }
 
 startparser() {
-  if [ "$RUBY_VERSION" != "1.8.6" ]; then
-    echo "### This command only works on Ruby 1.8.6,"
-    echo "but your RUBY_VERSION appears to be $RUBY_VERSION"
-    echo "You can skip _this_ check by using \"maglev start-debug\","
-    echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
-    echo "Use \"maglev status\" to check that the parser is running."
-    exit 1
-  fi
   if [ -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
+    nohup $RUBY186P287 $MAGLEV_HOME/bin/parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>/dev/null &
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
@@ -129,7 +144,7 @@ startparser() {
 
 forceparser() {
     echo "FORCEPARSER: PATH: $PATH"
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
+    nohup $RUBY186P287 $MAGLEV_HOME/bin/parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT"
@@ -139,7 +154,7 @@ forceparser() {
 startparser-debug() {
     echo "STARTPARSER-DEBUG: PATH: $PATH"
   if [ -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
-    nohup ruby $MAGLEV_HOME/bin/parsetree_parser.rb \
+    nohup $RUBY186P287 $MAGLEV_HOME/bin/parsetree_parser.rb \
       >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
     PARSER_PID="$!"
     echo "MagLev Parse Server process $PARSER_PID started on port $PARSETREE_PORT in verbose mode"
@@ -240,22 +255,27 @@ gemx() {
 case "$1" in
   start)
         initialize
+        rubyversioncheck
         startparser
         startserver
 	ensurePrimsLoaded
         ;;
   start-parser)
         initialize
+        rubyversioncheck
         forceparser
         ;;
   start-debug)
         initialize
+        # Leave a loophole about checking for ruby 186 patchlevel 287
+        # rubyversioncheck
         startparser-debug
         startserver-debug
 	ensurePrimsLoaded
         ;;
   start-bench)
         initialize
+        rubyversioncheck
         startparser
         startserver-bench
 	ensurePrimsLoaded
@@ -267,6 +287,7 @@ case "$1" in
   restart)
         stopserver
         stopparser
+        rubyversioncheck
         startparser
         startserver
 	ensurePrimsLoaded
