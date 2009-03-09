@@ -4,9 +4,6 @@ require 'rake/clean'
 require 'rake/rdoctask'
 require 'rakelib/maglev.rb'
 
-require 'rakelib/contrib/stone.rb'
-require 'rakelib/contrib/maglev.rb'
-
 verbose false  # turn off rake's chatter about all the sh commands
 
 CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
@@ -36,52 +33,5 @@ task :squeak do
   else
     puts "The #{gem_tools} application used by the 'squeak' command was not found on your system."
     puts "To fix this, correct the 'squeak' command in the gemstone script."
-  end
-end
-
-
-desc "Stop netldi"
-task :stopnetldi do
-  GemStoneInstallation.current.stopnetldi
-end
-
-desc "Start netldi"
-task :startnetldi do
-  GemStoneInstallation.current.startnetldi
-end
-
-task :list_stones do
-  puts GemStoneInstallation.current.stones.join("\n")
-end
-
-desc "Create a new stone"
-task :create_stone, :stone_name do |t, args|
-  puts "Creating #{args.stone_name}"
-  MagLevStone.create(args.stone_name)
-end
-
-desc "Destroy a stone"
-task :destroy_stone, :stone_name do |t, args|
-  puts "Destroying #{args.stone_name}"
-  s = Stone.existing(args.stone_name)
-  s.stop
-  s.destroy!
-end
-
-def task_gemstone(stone, action)
-  desc "#{action.to_s} - #{stone.name}"
-  task action do
-    stone.send(action)
-  end
-end
-
-GemStoneInstallation.current.stones.each do |stone_name|
-  namespace stone_name do
-    stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
-
-    [:stop, :start, :restart, :status, :backup,
-      :restore_latest_backup, :reset_ruby_context].each do |action|
-      task_gemstone(stone, action)
-    end
   end
 end

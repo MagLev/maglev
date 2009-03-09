@@ -38,24 +38,15 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
     exit 1
 fi
 
-conf_file=$MAGLEV_HOME/etc/system.conf
-stone=gs64stone
+# Environment variable settings
+export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+
 args=""
 while [[ $# > 0 ]]
 do
     case $1 in
-        --stone)
-            stone=$2
-            stone_conf=$MAGLEV_HOME/etc/stones/${stone}.conf
-            if [[ -f $stone_conf ]]
-            then
-              conf_file=$stone_conf
-            else
-              echo "Couldn't find $stone_conf"
-              exit 2
-            fi
-            shift
-            ;;
         --copyright)
             echo "maglev - Copyright (C) 2008-2009 GemStone Systems, Inc."
             exit
@@ -96,12 +87,6 @@ do
     shift
 done
 
-# Environment variable settings
-export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
-export GEMSTONE_SYS_CONF=$conf_file
-export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
-
-
 # Make sure we have at least one argument
 if [ $# -lt 1 ]; then
     echo "$COMMAND: Error -- requires a filename to run."
@@ -132,8 +117,6 @@ if [[ -z $debug ]]
 then
     # Normal execution
     $TOPAZ_CMD <<-EOF
-        set gemstone $stone
-        login
 	run
 	RubyContext load.
 	RubyContext default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
@@ -151,8 +134,6 @@ else
     rm -f $dbscript
     cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
     cat - >> $dbscript <<-EOF
-        set gemstone $stone
-        login
 	run
 	RubyContext load.
 	RubyContext default setARGV: #($args) scriptName: '$RUBYSCRIPT' .

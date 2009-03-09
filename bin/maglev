@@ -105,18 +105,24 @@ fi
 # Check for Ruby 1.8.6 patchlevel 287
 if [ `$RUBY186P287 --version | grep -c 'ruby 1\.8\.6'` -ne 1 ] || \
    [ `$RUBY186P287 --version | grep -c 'patchlevel 287'` -ne 1 ]; then
-     echo "### The MagLev parser requires MRI ruby 1.8.6 patchlevel 287"
-     echo "    with the ParseTree version 3.0.3 gem installed."
-     echo "### Your MRI ruby version appears to be:"
-     echo "    `$RUBY186P287 --version`"
-     echo "To fix this set the environment variable RUBY186P287"
-     echo "to point to a Ruby 1.8.6 patchlevel 287 executable."
-     echo
-     echo "You can skip _this_ check by using \"maglev start-debug\","
-     echo "but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail."
-     echo
-     echo "Use \"maglev status\" to check that the parser is running."
-     exit 1
+   cat << EOF
+#######################  WARNING  ###############################
+# The MagLev parser requires MRI ruby 1.8.6 patchlevel 287
+# with the ParseTree version 3.0.3 gem installed.
+# Your MRI ruby version appears to be:
+#    `$RUBY186P287 --version`
+#
+# To fix this upgrade your default ruby to 1.8.6 patchlevel 287
+# or set the environment variable RUBY186P287 to point to a 
+# ruby 1.8.6 patchlevel 287 executable.
+# 
+# You can skip _this_ check by using "maglev start-debug",
+# but \$MAGLEV_HOME/bin/parsetree_parser.rb may silently fail.
+# 
+# Use "maglev status" to check that the parser is running.
+#################################################################
+EOF
+   exit 1
 fi
 }
 
