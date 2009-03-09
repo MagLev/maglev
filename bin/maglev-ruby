@@ -46,7 +46,6 @@ do
     case $1 in
         --stone)
             stone=$2
-            echo "Using stone $stone"
             stone_conf=$MAGLEV_HOME/etc/stones/${stone}.conf
             if [[ -f $stone_conf ]]
             then
@@ -132,7 +131,6 @@ done
 if [[ -z $debug ]]
 then
     # Normal execution
-    echo "RUNNING: stone: $stone  conf: $conf_file"
     $TOPAZ_CMD <<-EOF
         set gemstone $stone
         login
