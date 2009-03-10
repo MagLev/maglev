@@ -9,34 +9,16 @@
 
 class Integer
 
-    # _rubyTimes:  contains the handler for RubyBreakException
-    primitive_nobridge '_times&', '_rubyTimes:'
-    def times(&b)
-       _times(&b)
-    end
-    # _rubyTimes: should be the only caller of __times&
-    def __times(&b)
-       for i in (0..self-1)
-           b.call(i)
-       end
-    end
+    # following 3 prims contain handler for RubyBreakException
+    primitive 'times&', '_rubyTimes:'
+    # def times(&block) ; end 
 
+    # def upto(n, &block) ; end 
+    primitive 'upto&', '_rubyUpto:block:'
 
-    def upto(n, &b)
-        i = self
-        while(i <= n)
-            b.call(i)
-            i += 1
-        end
-    end
+    # def downdo(n, &block) ; end 
+    primitive 'downto&', '_rubyDownto:block:'
 
-    def downto(n, &b)
-        i = self
-        while(i >= n)
-            b.call(i)
-            i -= 1
-        end
-    end
 
     def chr
         if self > 255

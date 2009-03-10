@@ -28,13 +28,19 @@ module Enumerable
 
     def sort(xs, &prc)
       # The ary should be inmutable while sorting
-      prc = Proc.new { |a,b| a <=> b } unless block_given?
+      # prc = Proc.new { |a,b| a <=> b } unless block_given?
 
       if @sorter
         @sorter = method(@sorter) unless @sorter.respond_to?(:call)
         @sorter.call(xs, &prc)
       else
-        quicksort(xs, &prc)
+        # quicksort(xs, &prc)
+        #    use Smalltalk mergesort from Array 
+        if block_given?
+          mergesort(xs) { | a, b| prc.call(a, b) <= 0 }
+        else
+          mergesort(xs) { |a,b| (a <=> b) <= 0 }
+        end
       end
     end
 
@@ -67,6 +73,13 @@ module Enumerable
     ##
     # Sort an Enumerable using simple quicksort (not optimized)
 
+    def mergesort(xs, &block)
+      arr = []
+      xs.each { | o | arr << o }
+      arr._sort!(&block)  # sorts array in place
+      arr
+    end
+
     def quicksort(xs, &prc)
       return [] unless xs
 
@@ -81,8 +94,6 @@ module Enumerable
           yield(o, pivot)
         end
       end
-
-      # TODO is this recursion depth a function of self.size ???
       quicksort(lmr[-1], &prc) + lmr[0] + quicksort(lmr[1], &prc)
     end
 

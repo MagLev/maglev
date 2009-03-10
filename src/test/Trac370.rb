@@ -10,8 +10,10 @@ remotes = [
   [["Name1", 1, "Whatever"],  "Ignore"],
   [["Name2", 2, "Whatever2"], "Ignore2"],
 ]
-remotes = remotes.map { |(name, version,_),_| version }
-raise "Fail: #{remotes.inspect}" unless remotes == [1,2]
+yy = remotes
+xx = remotes.map { |(name, version,_),_| version }
+puts xx.inspect
+raise "Fail: #{remotes.inspect}" unless xx == [1,2]
 
 # Issue two:
 #   The same code, but in a method defn, won't even compile
@@ -22,7 +24,7 @@ class SourceIndex
       [["Name1", 1, "Whatever"],  "Ignore"],
       [["Name2", 2, "Whatever2"], "Ignore2"],
     ]
-    remotes = remotes.map { |(name, version,_),_| version }
+    remotes = remotes.map { |(name, version,w),w| version }
     raise Fail unless remotes == [1,2]
     puts remotes.inspect
   end

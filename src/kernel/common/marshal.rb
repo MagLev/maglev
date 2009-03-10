@@ -381,17 +381,20 @@ module Marshal
       consume size
     end
 
-    def get_module_names(obj)
-      names = []
-      sup = obj.metaclass.superclass
-
-# GEMSTONE
-#      while sup and [Module, IncludedModule].include? sup.class do
-      while sup and [Module].include? sup.class do
-        names << sup.name
-        sup = sup.superclass
+    def self._get_module_names(a_class)
+      # returns an Array of Symbols
+      h = MAGLEV_MARSHAL_CLASS_CACHE 
+      arr = h[a_class]
+      if arr.equal?(nil)
+        arr = a_class.ancestor_module_names 
+        h[a_class] = arr
       end
+      arr
+    end
 
+    def get_module_names(obj)
+      # returns an Array of Symbols
+      _get_module_names(obj.class)		# Gemstone changes
       names
     end
 
@@ -448,9 +451,13 @@ module Marshal
     end
 
     def serialize_extended_object(obj)
+      arr = get_module_names(obj)
+      n = 0
+      lim = arr.size
       str = ''
-      get_module_names(obj).each do |mod_name|
-        str << TYPE_EXTENDED + serialize(mod_name.to_sym)
+      while n < lim 
+        str << TYPE_EXTENDED + serialize(arr[n])
+        n += 1
       end
       str
     end

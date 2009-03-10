@@ -46,11 +46,6 @@ class Module
     false
   end
 
-  def ancestors
-    _stub_warn("Module#ancestors")
-    []
-  end
-
   # class_variables inherited from Behavior
 
   def clone
@@ -58,14 +53,22 @@ class Module
     nil
   end
 
-  def include?(mod)
-    _stub_warn("Module#include?")
+  def include?(other)
+    ancests = self.ancestors
+    n = 0
+    nlim = ancest.size
+    while n < nlim
+      return true if ancests[n].equal?(other)
+      imods = an_ancest.included_modules
+      k = 0
+      klim = imods.size
+      while k < klim
+        return true if imods[k].equal?(other)
+        k += 1
+      end 
+      n += 1
+    end
     false
-  end
-
-  def included_modules
-    _stub_warn("Module#included_modules")
-    []
   end
 
   primitive '_ruby_methods', 'rubyMethods:protection:'

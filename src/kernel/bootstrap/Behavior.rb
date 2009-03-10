@@ -64,6 +64,9 @@ class Behavior
   primitive_nobridge '_define_method_meth' , 'defineMethod:method:'
   primitive_nobridge '_define_method_block&' , 'defineMethod:block:'
 
+  primitive_nobridge 'ancestor_modules_names', 'rubyAncestorModulesNames' 
+      # result is an Array of Symbols
+
   def define_method(sym, meth)
     m = meth
     if m.is_a?(Proc)
