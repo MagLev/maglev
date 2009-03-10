@@ -856,7 +856,7 @@ class Array
     if (block_given?)
       _sort!{ | a, b| blk.call(a, b) <= 0 }
     else
-      _sort!{ | a, b| a <= b }
+      _sort!{ | a, b| (a <=> b) <= 0 }
     end
   end
 
@@ -865,7 +865,7 @@ class Array
     if (block_given?)
       d._sort!{ | a, b| blk.call(a, b) <= 0 }
     else
-      d._sort!{ | a, b| a <= b }
+      d._sort!{ | a, b| (a <=> b) <= 0 }
     end
     d
   end
@@ -875,12 +875,13 @@ class Array
     sort_by2{|a,b| block.call(a) <= block.call(b)}
   end
 
-  # TODO: This implementation may be wrong.  See to_a vs to_ary in PickAxe.
   def to_a
     self
   end
 
   def to_ary
+    # TODO, if self.class is a subclass of Array , return
+    #  an Array with elements of self ???
     self
   end
 
