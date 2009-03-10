@@ -132,13 +132,8 @@ module Kernel
 
   primitive_nobridge 'include',  'includeRubyModule:'
 
-  def loop
-    raise LocalJumpError, "no block given" unless block_given?
-
-    while true
-      yield
-    end
-  end
+  # def loop(&block) ; end
+  primitive 'loop&', '_rubyLoop:'
 
   def open(fName)
     File.open(fName)
