@@ -65,6 +65,7 @@ task :run_one => :report do
   puts "Report written in #{REPORT}"
 end
 
+require 'find'
 desc "Runs a directory worth of benchmarks; specify as DIR=micro-benchmarks"
 task :run_dir => :report do
   dir = ENV['DIR']

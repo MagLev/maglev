@@ -33,7 +33,7 @@ core-features/bm_so_random.rb;1000000,=MIN(B33:E33),=F33/G33,=B33/G33
 core-features/bm_vm1_block.rb;100000,=MIN(B34:E34),=F34/G34,=B34/G34
 core-features/bm_vm1_block.rb;1000000,=MIN(B35:E35),=F35/G35,=B35/G35
 core-features/bm_vm1_block.rb;10000000,=MIN(B36:E36),=F36/G36,=B36/G36
-core-features/bm_vm1_const.rb;n/a,=MIN(B37:E37),=F37/G37,=B37/G37
+core-features/bm_vm1_const2.rb;n/a,=MIN(B37:E37),=F37/G37,=B37/G37
 core-features/bm_vm1_ensure.rb;100000,=MIN(B38:E38),=F38/G38,=B38/G38
 core-features/bm_vm1_ensure.rb;1000000,=MIN(B39:E39),=F39/G39,=B39/G39
 core-features/bm_vm1_ensure.rb;10000000,=MIN(B40:E40),=F40/G40,=B40/G40

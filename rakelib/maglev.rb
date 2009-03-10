@@ -20,7 +20,9 @@ ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
 ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone.log"
 ENV['GEMSTONE']            = GEMSTONE
 
-
+# RUBY186P287 must be set to a ruby 1.8.6 patchlevel 287 executable
+# in order to run Parse Server. Earlier versions will fail.
+PARSER_RUBY                = ENV['RUBY186P287'] || "ruby"
 
 class String
   # This makes it nice to indent here documents and strip
@@ -59,7 +61,7 @@ end
 def start_parser
   cd "#{MAGLEV_HOME}/bin" do
     sh %{
-      nohup ruby parsetree_parser.rb \
+      nohup #{PARSER_RUBY} parsetree_parser.rb \
           >#{MAGLEV_HOME}/log/parsetree.log 2>/dev/null &
       echo "MagLev Parse Server process $! starting on port $PARSETREE_PORT"
     }
@@ -72,7 +74,7 @@ end
 def start_parser_debug
   cd "#{MAGLEV_HOME}/bin" do
     sh %{
-      nohup ruby parsetree_parser.rb \
+      nohup #{PARSER_RUBY} parsetree_parser.rb \
           >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
       echo "MagLev DEBUG Parse Server process $! starting on port $PARSETREE_PORT"
     }

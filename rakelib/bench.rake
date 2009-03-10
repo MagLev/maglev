@@ -1,19 +1,11 @@
-# Some tasks to automate running the Ruby Benchmark Suite (RBS)
-# on MagLev. The results are output to YAML and processed by
-# the :results task into graphs on a webpage.
+# Some tasks to automate running the Ruby Benchmark Suite (RBS).
+# The results are output to YAML and processed by the :to_csv
+# task into a .csv spreadsheet
 #
 # The :run task does not depend on the :update tasks so the
 # updates are done manually to ensure stability.
 #
-# This file is a slight modification of Brian Ford's refactoring
-# of the Ruby Benchmark Suite project for use in Rubinius. We've
-# changed it to default to the MagLev VM instead of Rubinius, and 
-# made minor changes to filenames and formats.
-#
-# The primary Ruby Benchmark Suite project is at:
-#   http://github.com/acangiano/ruby-benchmark-suite/
-#
-# see $MAGLEV_HOME/benchmark/utils/README for more
+# see utils/README for more information
 
 BASEDIR         = File.expand_path(File.dirname(__FILE__) + "/..")
 MONITOR         = BASEDIR + "/benchmark/utils/monitor.rb"
@@ -24,7 +16,7 @@ RBS_RESULTS_DIR = RESULTS_DIR + "/rbs"
 WEB_DIR         = RESULTS_DIR + "/web"
 
 ITERATIONS      = (ENV['ITERATIONS'] || 5).to_i
-TIMEOUT         = (ENV['TIMEOUT'] || 600).to_i
+TIMEOUT         = (ENV['TIMEOUT'] || 300).to_i
 VM              = ENV['VM'] || "#{BASEDIR}/bin/maglev-ruby"
 
 def command(name)
