@@ -15,6 +15,9 @@ class Module
   primitive_nobridge 'const_set',      'rubyConstAt:put:'
   primitive_nobridge 'include',        'includeRubyModule:'
 
+  primitive_nobridge 'ancestors' , 'rubyAncestors'
+  primitive_nobridge 'included_modules' , 'rubyIncludedModules'
+
   primitive_nobridge 'autoload', 'rubyAutoload:file:'
   primitive_nobridge 'autoload?', 'rubyAutoloadFileFor:'
 
