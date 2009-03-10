@@ -137,19 +137,27 @@ class Object
       self
     end
 
+    def _splat_return_value_coerce
+      # in a separate method from _splat_return_value,
+      #  so  _splat_return_value does not have complex ExecBlocks
+      v = self
+      begin
+	v = Type.coerce_to(self, Array, :to_ary)
+      rescue TypeError
+	begin 
+	  v = Type.coerce_to(self, Array, :to_a)
+	rescue TypeError
+	  # ignore
+	end 
+      end
+      v
+    end
+
     def _splat_return_value
       # runtime support for  return *v  , invoked from generated code
       v = self
       unless v._isArray
-        begin
-          v = Type.coerce_to(self, Array, :to_ary)
-        rescue TypeError
-          begin 
-            v = Type.coerce_to(self, Array, :to_a)
-          rescue TypeError
-            # ignore
-          end 
-        end
+        v = self._splat_return_value_coerce
       end
       sz = v.length
       if sz < 2
@@ -160,6 +168,17 @@ class Object
 	end
       else
 	return v
+      end
+    end
+
+    def _par_asgn_to_ary
+      # runtime support for parallel assignment, invoked from generated code
+      if self._isArray
+        return self
+      elsif self.respond_to?(:to_ary)
+        return self.to_ary
+      else
+        return [ self ]
       end
     end
 
