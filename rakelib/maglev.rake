@@ -3,29 +3,29 @@
 namespace :maglev do
   desc "Start MagLev server processes, if not already running."
   task :start => :initialize do
-    if server_running?
-      puts "Server already running"
-    else
-      Rake::Task['maglev:startserver'].invoke
-    end
     if parser_running?
       puts "Parser already running"
     else
       Rake::Task['maglev:startparser'].invoke
     end
+    if server_running?
+      puts "Server already running"
+    else
+      Rake::Task['maglev:startserver'].invoke
+    end
   end
 
   desc "Start the MagLev processes with verbose output."
-  task :'start-debug' => [:initialize, :'startserver-debug', :'startparser-debug']
+  task :'start-debug' => [:initialize, :'startparser-debug', :'startserver-debug']
 
   desc "Start the MagLev processes with performance optimizations."
-  task :'start-bench' => [:initialize, :'startserver-bench', :'startparser']
+  task :'start-bench' => [:initialize, :'startparser', :'startserver-bench']
 
   desc "Stop the MagLev processes."
   task :stop => [:stopserver, :stopparser]
 
   desc "Restart MagLev server processes."
-  task :restart => [:stopserver, :stopparser, :startserver, :startparser]
+  task :restart => [:stopserver, :stopparser, :startparser, :startserver]
 
   desc "Display MagLev server status."
   task :status do
@@ -45,6 +45,7 @@ namespace :maglev do
   task :'startserver-debug' => :gemstone do
     start_server_debug
   end
+
   task :'startserver-bench' => :gemstone do
     start_server_bench
   end
@@ -53,7 +54,13 @@ namespace :maglev do
     if parser_running?
       puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
     else
-      start_parser
+      if valid_ruby_for_parser?
+        start_parser
+      else
+        puts "ERROR: #{PARSER_RUBY} won't run the Parse server,"
+        puts "       ruby 1.8.6 patchlevel 287 with ParseTree 3.0.3 is required."
+        exit 1
+      end
     end
   end
 

@@ -51,6 +51,12 @@ def parser_pid
   `lsof -Fp -iTCP:#{PARSETREE_PORT}`.chomp[1..-1]
 end
 
+# Returns true iff there is a valid ruby 186 patchlevel 287 to run the parser
+def valid_ruby_for_parser?
+  rubyversion = `#{PARSER_RUBY} --version`
+  (rubyversion.include? "ruby 1.8.6") && (rubyversion.include? "patchlevel 287")
+end
+
 # Returns true iff there is a process listening on the PARSETREE_PORT
 def parser_running?
   ! parser_pid.nil?
