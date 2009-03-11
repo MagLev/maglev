@@ -6,6 +6,14 @@ class IdentityHash
   # Class methods
   class_primitive_nobridge '_new', 'new'
 
+  def self.from_hash(a_hash)
+    ih = self._new 
+    a_hash.each { | k,v |
+      ih[k] = v
+    }
+    ih
+  end
+
   def ==(other)
     if (other.class.equal?(self.class))
       if (other.equal?(self))
