@@ -23,3 +23,6 @@ app = MyApp.new
 app.configure do
   puts "In a block"
 end
+
+puts "Passed 375"
+true
