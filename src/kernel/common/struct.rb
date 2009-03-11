@@ -82,10 +82,6 @@ class Struct
     return klass
   end
 
-  def self.allocate # :nodoc:
-    super
-  end
-
   def _attrs # :nodoc:
     return self.class.const_get(:STRUCT_ATTRS)
   end
