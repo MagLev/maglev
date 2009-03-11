@@ -71,14 +71,15 @@ module Kernel
   primitive_nobridge 'catch&' , 'catch:do:'
 
   primitive_nobridge '_eval', '_eval:binding:with:'
+  primitive_nobridge '_eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
-  def eval(str, binding, file_not_used, line_not_used)
+  def eval(str, binding, file_name, line_number)
     unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     # use 0x3? because one extra stack frame due to bridging methods .
     # max send site is :::* , call is via a :::* to :::: bridge meth .
     vcgl = [ self._getRubyVcGlobal(0x30) ,
       self._getRubyVcGlobal(0x31) , nil ]
-    res = _eval(str, binding, vcgl )
+    res = _eval_with_position(str, binding, vcgl, file_name, line_number )
     vcgl[0]._storeRubyVcGlobal(0x30)
     vcgl[1]._storeRubyVcGlobal(0x31)
     res
