@@ -43,10 +43,12 @@ namespace :maglev do
   end
 
   task :'startserver-debug' => :gemstone do
+    start_netldi_debug
     start_server_debug
   end
 
   task :'startserver-bench' => :gemstone do
+    start_netldi
     start_server_bench
   end
 
@@ -59,6 +61,8 @@ namespace :maglev do
       else
         puts "ERROR: #{PARSER_RUBY} won't run the Parse server,"
         puts "       ruby 1.8.6 patchlevel 287 with ParseTree 3.0.3 is required."
+        puts "       Upgrade #{PARSER_RUBY} or set the environment variable"
+        puts "       RUBY186P287 to point to a ruby 1.8.6 patchlevel 287 executable."
         exit 1
       end
     end
@@ -94,7 +98,7 @@ namespace :maglev do
   task :destroy => [:gemstone, :stopserver, :remove_extents]
 
   task :remove_extents do
-    puts "===>  remove_extents"
+    puts "==>  remove_extents"
     cd MAGLEV_HOME do
       # RxINC: is -r necessary?
       rm_rf FileList.new("data/*dbf", "log/*", "locks/*")

@@ -69,7 +69,7 @@ def start_parser
     sh %{
       nohup #{PARSER_RUBY} parsetree_parser.rb \
           >#{MAGLEV_HOME}/log/parsetree.log 2>/dev/null &
-      echo "MagLev Parse Server process $! starting on port $PARSETREE_PORT"
+      echo "MagLev Parse Server process $! starting on port #{PARSETREE_PORT}"
     }
   end
   wait_for_parser
@@ -82,7 +82,7 @@ def start_parser_debug
     sh %{
       nohup #{PARSER_RUBY} parsetree_parser.rb \
           >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
-      echo "MagLev DEBUG Parse Server process $! starting on port $PARSETREE_PORT"
+      echo "MagLev DEBUG Parse Server process $! starting on port #{PARSETREE_PORT}"
     }
   end
   wait_for_parser
@@ -91,13 +91,13 @@ end
 def wait_for_parser
   10.times do
     if parser_running?
-      puts "MagLev Parser Server process started on port $PARSETREE_PORT"
+      puts "MagLev Parse Server process started on port #{PARSETREE_PORT}"
       return true
     end
     puts "Waiting for parser to start..."
     sleep 2
   end
-  puts "MagLev Parser Server process failed to start on port $PARSETREE_PORT"
+  puts "MagLev Parse Server process failed to start on port #{PARSETREE_PORT}"
   return false
 end
 
@@ -110,33 +110,40 @@ def stop_parser
   parser_pid
 end
 
-# Returns true iff the GemStone server is running (gslit -clp)
+# Returns true iff the GemStone server is running (gslist -clp)
 def server_running?
   `#{GEMSTONE}/bin/gslist -clp`.tr("\n", ' ').strip != "0"
 end
 
+# Start the NetLDI but hide output
 def start_netldi
-  sh %{ ${GEMSTONE}/bin/startnetldi -g &>/dev/null } do |ok, status|
+  sh %{ ${GEMSTONE}/bin/startnetldi -g >/dev/null 2>&1 } do |ok, status|
     raise "Couldn't start netldi #{ok}: #{status}" unless ok
   end
 end
 
-# Start the GemStone servers (startnetldi; startstone).  Does no checking
+# Start the NetLDI with visible output
+def start_netldi_debug
+  sh %{ ${GEMSTONE}/bin/startnetldi -g } do |ok, status|
+    raise "Couldn't start netldi #{ok}: #{status}" unless ok
+  end
+end
+
+# Start the GemStone server (startstone).  Does no checking
 # if server is already started.
 def start_server
   sh %{
-    ${GEMSTONE}/bin/startstone gs64stone &>/dev/null
-    ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
+    ${GEMSTONE}/bin/startstone gs64stone >/dev/null 2>&1
+    ${GEMSTONE}/bin/waitstone gs64stone >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server gs64stone started" if ok
   end
 end
 
-# Start the GemStone servers with debug flags set (startnetldi;
-# startstone).  Does no checking if server is already started.
+# Start the GemStone server with debug flags set (startstone).
+# Does no checking if server is already started.
 def start_server_debug
   sh %{
-    ${GEMSTONE}/bin/startnetldi -g
     ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf gs64stone
     ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
   } do |ok, status|
@@ -148,9 +155,8 @@ end
 # startstone).  Does no checking if server is already started.
 def start_server_bench
   sh %{
-    ${GEMSTONE}/bin/startnetldi -g
-    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf gs64stone
-    ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
+    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf gs64stone >/dev/null 2>&1
+    ${GEMSTONE}/bin/waitstone gs64stone >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server gs64stone started with performance optimizations" if ok
   end
@@ -184,7 +190,7 @@ def status
     puts "\nMagLev Parse Server port = #{PARSETREE_PORT}"
     sh %{ lsof -P -iTCP:#{PARSETREE_PORT} }
     # if you don't have permission to run lsof, use the following instead
-    # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
+    # netstat -an | grep "[:.]#{PARSETREE_PORT} " | grep "LISTEN"
   else
     puts "MagLev Parse Server is not running on port #{PARSETREE_PORT}"
   end
