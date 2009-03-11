@@ -28,6 +28,11 @@ Sinatra
     implementation depended on examining the stack frames returnd by
     Kernel#caller, but the details of filenames caused problems (MagLev
     prints only full pathnames, while MRI prints a variety of formats).
+  * lib/sinatra/base.rb: https://magtrac.gemstone.com/ticket/375
+    MagLev wasn't passing the implicit block in a super call, so added
+    an explicit &block parameter.
+  * lib/sinatra/base.rb: https://magtrac.gemstone.com/ticket/376
+    Work around problem between blocks vs. procs.
 
 benchmark
   Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.
