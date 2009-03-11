@@ -162,6 +162,19 @@ def start_server_bench
   end
 end
 
+# Make sure prims are loaded, but suppress output
+def ensure_prims_loaded
+    puts "Loading kernel if needed -- it may take a few seconds..."
+  sh %{ #{TOPAZ_CMD} <<EOF >/dev/null
+run
+      RubyContext ensurePrimsLoaded.
+%
+exit
+EOF
+} 
+    puts "Kernel is loaded"
+end
+
 def stop_server
   sh %{
     ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i >/dev/null 2>&1

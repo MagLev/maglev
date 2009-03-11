@@ -40,16 +40,19 @@ namespace :maglev do
   task :startserver => :gemstone do
     start_netldi
     start_server
+    ensure_prims_loaded
   end
 
   task :'startserver-debug' => :gemstone do
     start_netldi_debug
     start_server_debug
+    ensure_prims_loaded
   end
 
   task :'startserver-bench' => :gemstone do
     start_netldi
     start_server_bench
+    ensure_prims_loaded
   end
 
   task :startparser => :gemstone do
