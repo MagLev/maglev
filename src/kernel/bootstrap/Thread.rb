@@ -12,8 +12,10 @@ class Thread
     end
     result = []
     maglev_home = ENV['MAGLEV_HOME']
-    _stbacktrace(limit).each do |ary|
-      where, line, source = ary
+    res_start_ofs = 1
+    ststack = _stbacktrace(limit)
+    for idx in 0..(ststack.length - 1) do
+      where, line, source = ststack[idx]
       if /(.*) \(envId 1\)/ =~ where
         meth = $1
         if source
@@ -22,7 +24,10 @@ class Thread
             if /line (\d+) .* file (.*)/=~ lines[-1]
               baseline = $1.to_i
               file = $2
-              unless file =~ %r{<file name not available>|#{maglev_home}/src}
+              if file =~ %r{<file name not available>|#{maglev_home}/src}
+                # not in Ruby application code, reject the line
+                if idx == 0 ; res_start_ofs = 0 ; end
+              else
                 result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
               end
             end
@@ -37,7 +42,7 @@ class Thread
         end
       end
     end
-    result[1..-1]
+    result[res_start_ofs..-1]
   end
 
   primitive_nobridge '_inspect', '_rubyInspect:'
