@@ -10,6 +10,10 @@ class Class
 
   class_primitive_nobridge '_rubyNew', '_rubyNew:do:'
 
+  def inherited(a_subclass)
+    # do nothing
+  end
+
   def self.new(superCls=Object, &blk)
     if (block_given?)
       c = _rubyNew(superCls, blk)
