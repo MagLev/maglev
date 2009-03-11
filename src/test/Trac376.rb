@@ -1,4 +1,7 @@
-def bug(&block)
+#  file Trac376.rb
+def bug(&block_arg)
+  block = block_arg
+  # block = Proc.new(&block_arg)   # workaround is to uncomment
   def block.each
     yield call   # To iterate over the block is to call it
   end
