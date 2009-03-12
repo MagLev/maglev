@@ -102,11 +102,7 @@ class Module
 
   # MNI: append_features
   # MNI: attr
-  # MNI: attr_accessor
-  # MNI: attr_reader
-  # MNI: attr_writer
   # MNI: extend_object
-  # MNI: extended
 
   def remove_class_variable(symbol)
     _stub_warn("Module#remove_class_variable")
