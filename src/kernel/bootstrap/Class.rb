@@ -11,6 +11,7 @@ class Class
   class_primitive_nobridge '_rubyNew', '_rubyNew:do:'
 
   def inherited(a_subclass)
+    # .mcz code will not invoke this during bootstrap.
     # do nothing
   end
 
