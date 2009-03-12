@@ -52,6 +52,28 @@ class AnotherTop < top
 end
 test($child_class, AnotherTop, "inherited C")
 
+# Test that the proper version of Class.new is called
+class C
+  attr_reader :x
+  def initialize(&b)
+    raise "NO BLOCK PASSED" unless block_given?
+    @x = 10
+  end
+end
+
+c = C.new { true }
+test(c.x, 10, "c.x")
+
+class D
+  attr_reader :x
+  def initialize(x)
+    raise "BLOCK PASSED" if block_given?
+    @x = x
+  end
+end
+
+d = D.new(1)
+test(d.x, 1, "d.x")
 
 report
 true
