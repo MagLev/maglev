@@ -152,7 +152,7 @@ test(test_chomp() , true, "testing chomp, chop")
 # gsub was generating undefined method for each_match.  This tests that case:
 test('a.rb'.gsub('\\', ''), 'a.rb',  'gsub regression')
 
-test( 'xay'.sub(/xa/) {$1} , 'y' , "Markus 10Mar09" ) 
+test( 'xay'.sub(/xa/) {$1} , 'y' , "Markus 10Mar09" )
 
 test(String.new("test"), 'test',  'String.new("test")')
 
@@ -167,6 +167,18 @@ test(x, 'h*llo',   "sub! C")
 x = "hello"
 x.sub!(/[aeiou]/) { |match| 'FOO' }
 test(x, 'hFOOllo', "sub! D")
+
+# This exercises a path through gsub that wasn't being tested before.
+ALPHA = "a-zA-Z"
+ALNUM = "#{ALPHA}\\d"
+RESERVED = ";/?:@&=+$,\\[\\]"
+UNRESERVED = "-_.!~*'()#{ALNUM}"
+UNSAFE = Regexp.new("[^#{UNRESERVED}#{RESERVED}]", false, 'N').freeze
+
+str = '/__sinatra__/:image.png'
+str.gsub(UNSAFE) do |us|
+  puts "us: #{us}"
+end
 
 report
 

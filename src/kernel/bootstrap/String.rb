@@ -313,6 +313,7 @@ class String
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
     start = 1
+    out = ''
     get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       out << substring1(start, match.begin(0))
       saveTilde = block._fetchRubyVcGlobal(0);
