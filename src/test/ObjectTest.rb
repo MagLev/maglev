@@ -138,5 +138,14 @@ x = [ [1,2,3],                    # Array
 
 p x.inspect # The test passes if there is no exception
 
+
+# Regression for Trac378
+result = Object.methods
+test(result.kind_of?(Array), true, 'Object.methods A')
+test(result.length > 20,     true, 'Object.methods B')
+%w(== === =~ __id__ __send__).each do |m_name|
+  test(result.include?(m_name), true, "Object.methods.include?(#{m_name})")
+end
+
 report
 true

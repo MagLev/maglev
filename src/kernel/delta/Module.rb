@@ -65,20 +65,20 @@ class Module
       while k < klim
         return true if imods[k].equal?(other)
         k += 1
-      end 
+      end
       n += 1
     end
     false
   end
 
-  primitive '_ruby_methods', 'rubyMethods:protection:'
+  primitive '_ruby_methods_protection', 'rubyMethods:protection:'
 
   def instance_methods(inc_super=true)
-    _ruby_methods(inc_super, 0);
+    _ruby_methods_protection(inc_super, 0);
   end
 
   def public_instance_methods(inc_super=true)
-    _ruby_methods(inc_super, 0);
+    _ruby_methods_protection(inc_super, 0);
   end
 
   def private_class_method(*symbols)
@@ -87,11 +87,11 @@ class Module
   end
 
   def private_instance_methods(inc_super=true)
-    _ruby_methods(inc_super, 2);
+    _ruby_methods_protection(inc_super, 2);
   end
 
   def protected_instance_methods(inc_super=true)
-    _ruby_methods(inc_super, 1);
+    _ruby_methods_protection(inc_super, 1);
   end
 
   def public_class_method(*symbols)
