@@ -152,6 +152,8 @@ test(test_chomp() , true, "testing chomp, chop")
 # gsub was generating undefined method for each_match.  This tests that case:
 test('a.rb'.gsub('\\', ''), 'a.rb',  'gsub regression')
 
+test( 'xay'.sub(/xa/) {$1} , 'y' , "Markus 10Mar09" ) 
+
 test(String.new("test"), 'test',  'String.new("test")')
 
 # Test all the forms of sub/sub!
