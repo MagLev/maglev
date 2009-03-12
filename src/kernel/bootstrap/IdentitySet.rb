@@ -63,7 +63,7 @@ class IdentitySet
     #   (a Fixnum) of the Person class:
     #
     #     class Person
-    #       attr_reader :name, :age
+    #       attr_reader :name, :age  # probably need fixed instVars here
     #       ...
     #     end
     #
