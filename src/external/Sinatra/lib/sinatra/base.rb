@@ -839,13 +839,7 @@ module Sinatra
       @reloading ||= false
     end
 
-    # GEMSTONE
-    # Work around a MagLev problem passing blocks
-    # https://magtrac.gemstone.com/ticket/375
-    #
-    # def self.configure(*envs)
-    def self.configure(*envs, &block)
-    # END GEMSTONE
+    def self.configure(*envs)
       super unless reloading?
     end
 
