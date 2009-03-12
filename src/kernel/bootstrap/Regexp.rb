@@ -90,6 +90,13 @@ class Regexp
     m
   end
 
+  def _match_vcglobals(str, vcglobals_arg)
+    # Private , for example, see usage in String.sub
+    m = _search(str, 0, nil)
+    m._storeRubyVcGlobal(vcglobals_arg) # store into specified $~
+    m
+  end
+
   def source
     # return the original string of the pattern
     @source
@@ -153,24 +160,47 @@ class Regexp
   # no definition for  ~  because  uses of   ~ aRegexp
   # are  transformed to  aRegexp =~ $_   by the parser .
 
-  def each_match(str, &block)
-    # private, does not update $~
+ def __each_match(str, &block)
+    # Private, does not store into callers $~
     pos = 0
     while(pos < str.length)
       match = _search(str, pos, nil)
-      return unless match
-      pos = match.end(0)
-      if match.begin(0) == pos
-        pos += 1
+      if match
+        pos = match.end(0)
+        if match.begin(0) == pos
+          pos += 1
+        else
+          block.call(match)
+        end
       else
-        block.call(match)
+        return 
+      end
+    end
+  end
+
+ def __each_match_vcgl(str, vcglobals_arg, &block)
+    # Private, stores into $~ specified by vcglobals_arg
+    pos = 0
+    while(pos < str.length)
+      match = _search(str, pos, nil)
+      if match
+        # store into specified $~, in case block references it
+        match._storeRubyVcGlobal(vcglobals_arg) 
+        pos = match.end(0)
+        if match.begin(0) == pos
+          pos += 1
+        else
+          block.call(match)
+        end
+      else
+        return 
       end
     end
   end
 
   def all_matches(str)
     matches = []
-    each_match(str){|m| matches << m}
+    __each_match(str){|m| matches << m}
     matches
   end
 

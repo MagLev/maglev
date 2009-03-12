@@ -298,7 +298,7 @@ class String
   def gsub(regex, str)
     out = ""
     start = 1
-    get_pattern(regex, true).each_match(self) do |match|
+    get_pattern(regex, true).__each_match(self) do |match|
       out << substring1(start, match.begin(0))
       out << str
       start = match.end(0) + 1
@@ -310,9 +310,10 @@ class String
   end
 
   def gsub(regex, &block)
-    out = ""
+    # $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
     start = 1
-    get_pattern(regex, true).each_match(self) do |match|
+    get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       out << substring1(start, match.begin(0))
       saveTilde = block._fetchRubyVcGlobal(0);
       begin
@@ -413,11 +414,11 @@ class String
       # TODO more optimization of coerce here
       begin
         regexp = Regexp.new(pattern.to_str)
-        rescue StandardError
+      rescue StandardError
           raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
       end
     end
-    regexp.match self
+    regexp._match_vcglobals(self, 0x30)
   end
 
   # MNI: next
@@ -626,24 +627,9 @@ class String
     replace(strip)
   end
 
-  def sub_orig(regex, str, &block)
-    if match = regex.to_rx.match(self)
-      out = ""
-      out << self[0...(match.begin(0))]
-      if block
-        out << block.call.to_s
-      else
-        out << str
-      end
-      out << ((self[(match.end(0))...length]) || "")
-      out
-    else
-      dup
-    end
-  end
-
   def sub(regex, replacement)
-    if match = regex.to_rx.match(self)
+    # stores into caller's $~
+    if match = regex.to_rx._match_vcglobals(self, 0x30)
       _replace_match_with(match, replacement)
     else
       dup
@@ -651,7 +637,9 @@ class String
   end
 
   def sub(regex, &block)
-    if match = regex.to_rx.match(self)
+    # $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
+    if match = regex.to_rx._match_vcglobals(self, 0x30)
       _replace_match_with(match, block.call(match))
     else
       dup
@@ -659,7 +647,8 @@ class String
   end
 
   def sub!(regex, replacement)
-    if match = regex.to_rx.match(self)
+    # stores into caller's $~
+    if match = regex.to_rx._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
       self
     else
@@ -668,7 +657,9 @@ class String
   end
 
   def sub!(regex, &block)
-    if match = regex.to_rx.match(self)
+    # $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
+    if match = regex.to_rx._match_vcglobals(self, 0x30)
       replacement = block.call(match)
       replace(_replace_match_with(match, replacement))
       self
@@ -680,7 +671,9 @@ class String
   def _replace_match_with(match, replacement)
     out = ""
     out << self[0...(match.begin(0))]
-    out << replacement
+    unless replacement.equal?(nil)
+      out << replacement
+    end
     out << ((self[(match.end(0))...length]) || "")
     out
   end
