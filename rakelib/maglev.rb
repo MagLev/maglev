@@ -52,9 +52,13 @@ def parser_pid
 end
 
 # Returns true iff there is a valid ruby 186 patchlevel 287 to run the parser
+# Depends on parsetree_verscheck.rb printing 'installed'.
 def valid_ruby_for_parser?
   rubyversion = `#{PARSER_RUBY} --version`
-  (rubyversion.include? "ruby 1.8.6") && (rubyversion.include? "patchlevel 287")
+  parsetree_check = `#{PARSER_RUBY} #{MAGLEV_HOME}/bin/parsetree_verscheck.rb`
+  (rubyversion.include? "ruby 1.8.6") \
+  && (rubyversion.include? "patchlevel 287") \
+  && (parsetree_check.include? "installed")
 end
 
 # Returns true iff there is a process listening on the PARSETREE_PORT

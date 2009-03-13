@@ -6,10 +6,12 @@ begin
     exit 1
 end
 
+### NOTE: Other programs look for 'installed' so
+### don't change it. You can change the 3.0.3 though.
 if Gem.available?('ParseTree', '3.0.3')
-  puts "PasrseTree 3.0.3 is installed."
+  puts "ParseTree 3.0.3 is installed."
   exit 0
 else
-  puts "PasrseTree 3.0.3 is not installed."
+  puts "ParseTree 3.0.3 is missing."
   exit 1
 end
