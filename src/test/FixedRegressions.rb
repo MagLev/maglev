@@ -126,6 +126,10 @@ test(p.call(1,2), [1,2], 'Fail at J')
 #        => #<Object:0x05985001>
 
 
+# This one passes if it doesn't blow up
+class C
+  p ancestors
+end
 
 
 report
