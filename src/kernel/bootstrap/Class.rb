@@ -33,10 +33,10 @@ class Class
 
   primitive_nobridge 'include', 'includeRubyModule:'
 
-  def new(*args)
+  def new(*args, &block)
     # this variant gets bridge methods
     inst = self.allocate
-    inst.initialize(*args)
+    inst.initialize(*args, &block)
     inst
   end
 
@@ -59,6 +59,11 @@ class Class
   def new(a,b,c)
     inst = self.allocate
     inst.initialize(a,b,c)
+    inst
+  end
+  def new(*args)
+    inst = self.allocate
+    inst.initialize(*args)
     inst
   end
 
