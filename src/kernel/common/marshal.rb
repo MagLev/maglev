@@ -8,43 +8,63 @@ module Marshal
 
   VERSION_STRING = "\x04\x08"
 
-  TYPE_NIL = '0'
-  TYPE_TRUE = 'T'
-  TYPE_FALSE = 'F'
-  TYPE_FIXNUM = 'i'
-
-  TYPE_EXTENDED = 'e'
-  TYPE_UCLASS = 'C'
-  TYPE_OBJECT = 'o'
-  TYPE_DATA = 'd'  # no specs
-  TYPE_USERDEF = 'u'
-  TYPE_USRMARSHAL = 'U'
-  TYPE_FLOAT = 'f'
-  TYPE_BIGNUM = 'l'
-  TYPE_STRING = '"'
-  TYPE_REGEXP = '/'
   TYPE_ARRAY = '['
+  TYPE_ARRAY_ch = ?[ 
+  TYPE_BIGNUM = 'l'
+  TYPE_BIGNUM_ch = ?l 
+  TYPE_CLASS = 'c'
+  TYPE_CLASS_ch = ?c 
+  TYPE_DATA = 'd'  # no specs
+  TYPE_DATA_ch = ?d  # no specs
+  TYPE_EXTENDED = 'e'
+  TYPE_EXTENDED_ch = ?e
+  TYPE_FALSE = 'F'
+  TYPE_FALSE_ch = ?F
+  TYPE_FIXNUM = 'i'
+  TYPE_FIXNUM_ch = ?i
+  TYPE_FLOAT = 'f'
+  TYPE_FLOAT_ch = ?f 
   TYPE_HASH = '{'
   TYPE_HASH_DEF = '}'
-  TYPE_STRUCT = 'S'
-  TYPE_MODULE_OLD = 'M'  # no specs
-  TYPE_CLASS = 'c'
-  TYPE_MODULE = 'm'
-
-  TYPE_SYMBOL = ':'
-  TYPE_SYMLINK = ';'
-
+  TYPE_HASH_DEF_ch = ?} 
+  TYPE_HASH_ch = ?{ 
   TYPE_IVAR = 'I'
+  TYPE_IVAR_ch = ?I 
   TYPE_LINK = '@'
+  TYPE_LINK_ch = ?@ 
+  TYPE_MODULE = 'm'
+  TYPE_MODULE_OLD = 'M'  # no specs
+  TYPE_MODULE_OLD_ch = ?M   # no specs
+  TYPE_MODULE_ch = ?m 
+  TYPE_NIL = '0'
+  TYPE_NIL_ch = ?0
+  TYPE_OBJECT = 'o'
+  TYPE_OBJECT_ch = ?o
+  TYPE_REGEXP = '/'
+  TYPE_REGEXP_ch = ?/ 
+  TYPE_STRING = '"'
+  TYPE_STRING_ch = ?" 
+  TYPE_STRUCT = 'S'
+  TYPE_STRUCT_ch = ?S 
+  TYPE_SYMBOL = ':'
+  TYPE_SYMBOL_ch = ?: 
+  # TYPE_SYMLINK = ';'  not used
+  TYPE_TRUE = 'T'
+  TYPE_TRUE_ch = ?T
+  TYPE_UCLASS = 'C'
+  TYPE_UCLASS_ch = ?C
+  TYPE_USERDEF = 'u'
+  TYPE_USERDEF_ch = ?u 
+  TYPE_USRMARSHAL = 'U'
+  TYPE_USRMARSHAL_ch = ?U 
 
   class State
 
     def initialize(stream, depth, proc)
       # shared
-      @links = {}
-      @symlinks = {}
-      @symbols = []
-      @objects = []
+      @objs_dict = IdentityHash.new
+      @objs_output_count = 0
+      @objs_input_arr = []
 
       # dumping
       @depth = depth
@@ -53,7 +73,7 @@ module Marshal
       @stream = stream
       @consumed = 0
 
-      consume 2 if @stream
+      consume(2) if @stream
 
       @modules = nil
       @has_ivar = []
@@ -61,22 +81,17 @@ module Marshal
       @call = true
     end
 
-    def add_object(obj)
-      # GEMSTONE
-      # return if obj.kind_of?(ImmediateValue)
-      case obj
-      when Fixnum, Float
-        return
-      end
-      sz = @links.size
-      @objects[sz] = obj
-      @links[obj.object_id] = sz
+    def add_output_obj(obj)
+      count = @objs_output_count
+      @objs_dict[obj] = count
+      @objs_output_count = count + 1
     end
 
-    def add_symlink(obj)
-      sz = @symlinks.size
-      @symbols[sz] = obj
-      @symlinks[obj.object_id] = sz
+    def store_unique_object(obj)
+      # used on input
+      arr = @objs_input_arr
+      arr[arr.length] = obj
+      obj
     end
 
     def call(obj)
@@ -84,91 +99,81 @@ module Marshal
     end
 
     def construct(ivar_index = nil, call_proc = true)
-      type = consume
-      obj = case type
-            when TYPE_NIL
-              nil
-            when TYPE_TRUE
-              true
-            when TYPE_FALSE
-              false
-            when TYPE_CLASS, TYPE_MODULE
-              name = construct_symbol
-              obj = Object.const_lookup name
+      type = consume_byte
 
-              store_unique_object obj
+      if type.equal?(TYPE_NIL_ch)
+	obj = nil
+      elsif type.equal?( TYPE_TRUE_ch )
+	obj = true
+      elsif type.equal?( TYPE_FALSE_ch )
+	obj = false
+      elsif type.equal?( TYPE_FIXNUM_ch )
+	obj = construct_integer
+      elsif type.equal?( TYPE_LINK_ch )
+	num = construct_integer
+	obj = @objs_input_arr[num]
 
-              obj
-            when TYPE_FIXNUM
-              construct_integer
-            when TYPE_BIGNUM
-              construct_bignum
-            when TYPE_FLOAT
-              construct_float
-            when TYPE_SYMBOL
-              construct_symbol
-            when TYPE_STRING
-              construct_string
-            when TYPE_REGEXP
-              construct_regexp
-            when TYPE_ARRAY
-              construct_array
-            when TYPE_HASH, TYPE_HASH_DEF
-              construct_hash type
-            when TYPE_STRUCT
-              construct_struct
-            when TYPE_OBJECT
-              construct_object
-            when TYPE_USERDEF
-              construct_user_defined ivar_index
-            when TYPE_USRMARSHAL
-              construct_user_marshal
-            when TYPE_LINK
-              num = construct_integer
-              obj = @objects[num]
+	raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
 
-              raise ArgumentError, "dump format error (unlinked)" if obj.nil?
+	return obj
+      elsif type.equal?( TYPE_STRING_ch)
+	obj = construct_string
+        call obj if call_proc
+      elsif type.equal?( TYPE_ARRAY_ch )
+	obj = construct_array
+        call obj if call_proc
+      elsif type.equal?( TYPE_SYMBOL_ch )
+	obj = construct_symbol
+      elsif type.equal?( TYPE_FLOAT_ch )
+	obj = construct_float
+      elsif type.equal?( TYPE_BIGNUM_ch )
+	obj = construct_bignum
+      elsif type.equal?( TYPE_CLASS_ch) || type.equal?( TYPE_MODULE_ch)
+	name = construct_symbol
+	obj = Object.const_get(name)
+	store_unique_object(obj)
+        call obj if call_proc
+      elsif type.equal?( TYPE_REGEXP_ch )
+	obj = construct_regexp
+        call obj if call_proc
+      elsif type.equal?( TYPE_HASH_ch) || type.equal?( TYPE_HASH_DEF_ch)
+	obj = construct_hash(type)
+        call obj if call_proc
+      elsif type.equal?( TYPE_STRUCT_ch )
+	obj = construct_struct
+        call obj if call_proc
+      elsif type.equal?( TYPE_OBJECT_ch )
+	obj = construct_object
+        call obj if call_proc
+      elsif type.equal?( TYPE_USERDEF_ch )
+	obj = construct_user_defined ivar_index
+        call obj if call_proc
+      elsif type.equal?( TYPE_USRMARSHAL_ch )
+	obj = construct_user_marshal
+        call obj if call_proc
+      elsif type.equal?( TYPE_EXTENDED_ch )
+	@modules ||= []
+	name = get_symbol
+	@modules << Object.const_get(name)
+	obj = construct nil, false
+	extend_object obj
+        call obj if call_proc
 
-              return obj
-            when TYPE_SYMLINK
-              num = construct_integer
-              sym = @symbols[num]
+      elsif type.equal?( TYPE_UCLASS_ch )
+	name = get_symbol
+	@user_class = name
+	obj = construct nil, false
+        call obj if call_proc
 
-              raise ArgumentError, "bad symbol" if sym.nil?
-
-              return sym
-            when TYPE_EXTENDED
-              @modules ||= []
-
-              name = get_symbol
-              @modules << Object.const_lookup(name)
-
-              obj = construct nil, false
-
-              extend_object obj
-
-              obj
-            when TYPE_UCLASS
-              name = get_symbol
-              @user_class = name
-
-              construct nil, false
-
-            when TYPE_IVAR
-              ivar_index = @has_ivar.length
-              @has_ivar.push true
-
-              obj = construct ivar_index, false
-
-              set_instance_variables obj if @has_ivar.pop
-
-              obj
-            else
-              raise ArgumentError, "load error, unknown type #{type}"
-            end
-
-      call obj if call_proc
-
+      elsif type.equal?( TYPE_IVAR_ch )
+	ivar_index = @has_ivar.length
+	@has_ivar.push true
+	obj = construct ivar_index, false
+	set_instance_variables obj if @has_ivar.pop
+        call obj if call_proc
+      else
+	raise ArgumentError, "load error, unknown type #{type}"
+      end
       obj
     end
 
@@ -176,7 +181,7 @@ module Marshal
       obj = @user_class ? get_user_class.new : []
       store_unique_object obj
 
-      construct_integer.times do
+      for k in (1..construct_integer) do
         obj << construct
       end
 
@@ -184,19 +189,17 @@ module Marshal
     end
 
     def construct_bignum
-      sign = consume == '-' ? -1 : 1
+      sign = consume_byte == ?-  ? -1 : 1
       size = construct_integer * 2
 
       result = 0
 
-      data = consume size
+      data = consume(size)
       (0...size).each do |exp|
-        result += (data[exp] * 2**(exp*8))
+        result += (data[exp] * (1 << (exp*8)) )
       end
 
       obj = result * sign
-
-      store_unique_object obj
     end
 
     def construct_float
@@ -211,9 +214,6 @@ module Marshal
       else
         obj = s.to_f
       end
-
-      store_unique_object obj
-
       obj
     end
 
@@ -221,7 +221,7 @@ module Marshal
       obj = @user_class ? get_user_class.allocate : {}
       store_unique_object obj
 
-      construct_integer.times do
+      for k in (1..construct_integer) do
         key = construct
         val = construct
         obj[key] = val
@@ -233,18 +233,16 @@ module Marshal
     end
 
     def construct_integer
-      n = consume[0]
-
+      n = consume_byte
       if (n > 0 and n < 5) or n > 251
-        size, signed = n > 251 ? [256 - n, 2**((256 - n)*8)] : [n, 0]
+        size, signed = n > 251 ? [256 - n, 1 << ((256 - n)*8) ] : [n, 0]
 
         result = 0
-        data = consume size
+        data = consume(size)
 
-        (0...size).each do |exp|
-          result += (data[exp] * 2**(exp*8))
+        for exp in (0...size) do 
+          result += (data[exp] * (1 << (exp*8)) )
         end
-
         result - signed
       elsif n > 127
         (n - 256) + 5
@@ -257,7 +255,7 @@ module Marshal
 
     def construct_object
       name = get_symbol
-      klass = Object.const_lookup name
+      klass = Object.const_get(name)
       obj = klass.allocate
 
       raise TypeError, 'dump format error' unless Object === obj
@@ -271,9 +269,9 @@ module Marshal
     def construct_regexp
       s = get_byte_sequence
       if @user_class
-        obj = get_user_class.new s, consume[0]
+        obj = get_user_class.new(s, consume_byte)
       else
-        obj = Regexp.new s, consume[0]
+        obj = Regexp.new(s, consume_byte)
       end
 
       store_unique_object obj
@@ -293,13 +291,13 @@ module Marshal
       name = get_symbol
       store_unique_object name
 
-      klass = Object.const_lookup name
+      klass = Object.const_get(name)
       members = klass.members
 
       obj = klass.allocate
       store_unique_object obj
 
-      construct_integer.times do |i|
+      for i in (0..(construct_integer - 1)) do
         slot = get_symbol
         unless members[i].intern == slot then
           raise TypeError, "struct %s is not compatible (%p for %p)" %
@@ -321,7 +319,7 @@ module Marshal
 
     def construct_user_defined(ivar_index)
       name = get_symbol
-      klass = Module.const_lookup name
+      klass = Module.const_get(name)
 
       data = get_byte_sequence
 
@@ -341,7 +339,7 @@ module Marshal
       name = get_symbol
       store_unique_object name
 
-      klass = Module.const_lookup name
+      klass = Module.const_get(name)
       obj = klass.allocate
 
       extend_object obj if @modules
@@ -358,35 +356,37 @@ module Marshal
       obj
     end
 
-    def consume(bytes = 1)
-      data = @stream[@consumed, bytes]
-      @consumed += bytes
+    def consume(byte_count)
+      idx = @consumed
+      data = @stream[idx, byte_count]
+      idx += byte_count
+      @consumed = idx
       data
+    end
+
+    def consume_byte
+      idx = @consumed
+      ch = @stream[idx]
+      idx += 1
+      @consumed = idx
+      ch
     end
 
     def extend_object(obj)
       obj.extend(@modules.pop) until @modules.empty?
     end
 
-    def find_link(obj)
-      @links[obj.object_id]
-    end
-
-    def find_symlink(obj)
-      @symlinks[obj.object_id]
-    end
-
     def get_byte_sequence
       size = construct_integer
-      consume size
+      consume(size)
     end
 
-    def self._get_module_names(a_class)
+    def _get_module_names(a_class)
       # returns an Array of Symbols
       h = MAGLEV_MARSHAL_CLASS_CACHE 
       arr = h[a_class]
       if arr.equal?(nil)
-        arr = a_class.ancestor_module_names 
+        arr = a_class.ancestor_modules_names 
         h[a_class] = arr
       end
       arr
@@ -394,31 +394,28 @@ module Marshal
 
     def get_module_names(obj)
       # returns an Array of Symbols
-      _get_module_names(obj.class)		# Gemstone changes
-      names
+      _get_module_names(obj.class)  # Gemstone changes
     end
 
     def get_user_class
-      cls = Module.const_lookup @user_class
+      cls = Module.const_get(@user_class)
       @user_class = nil
       cls
     end
 
     def get_symbol
-      type = consume
-
-      case type
-      when TYPE_SYMBOL then
+      type = consume_byte
+      if type.equal?(TYPE_SYMBOL_ch)
         @call = false
         obj = construct_symbol
         @call = true
-        obj
-      when TYPE_SYMLINK then
+      elsif type.equal?(TYPE_LINK_ch) 
         num = construct_integer
-        @symbols[num]
+        obj = @objs_input_arr[num]
       else
         raise ArgumentError, "expected TYPE_SYMBOL or TYPE_SYMLINK, got #{type.inspect}"
       end
+      obj
     end
 
     def prepare_ivar(ivar)
@@ -426,22 +423,29 @@ module Marshal
     end
 
     def serialize(obj)
-      raise ArgumentError, "exceed depth limit" if @depth == 0
+      raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
 
       # How much depth we have left.
       @depth -= 1;
 
-      if link = find_link(obj)
-        str = TYPE_LINK + serialize_integer(link)
+      if obj._isSpecial
+        str = obj.to_marshal(self)
       else
-        add_object obj
-
-        if obj.respond_to? :_dump then
-          str = serialize_user_defined obj
-        elsif obj.respond_to? :marshal_dump then
-          str = serialize_user_marshal obj
+        idx = @objs_dict[obj]  # 
+        if idx.equal?(nil) 
+          if obj.respond_to? :_dump then
+            add_output_obj(obj)
+            str = serialize_user_defined obj
+          elsif obj.respond_to? :marshal_dump then
+            add_output_obj(obj)
+            str = serialize_user_marshal obj
+          else
+            #  to_marshal responsible for add_output_obj if desired
+            str = obj.to_marshal(self)
+          end
         else
-          str = obj.to_marshal self
+          # object seen , by a call to add_output_obj
+          str = TYPE_LINK + serialize_integer(idx)
         end
       end
 
@@ -474,40 +478,47 @@ module Marshal
         str << to_byte(n >> 8)
         str << to_byte(n)
       end
-      str.chomp!("\0") while str[-1] == 0
+      str.chomp!("\0") while str[-1].equal?(0)
       str
     end
 
-    def serialize_instance_variables_prefix(obj, exclude_ivars = false)
+    def serialize_instance_variables_prefix(obj, ivars_result) 
+		# (... exclude_ivars = false)
+      # ivars_result is Array of size 1, an output .
+      #   ivars_result[0] will be second arg to serialize_instance_variables_suffix
       ivars = obj.instance_variables
 
-      ivars -= exclude_ivars if exclude_ivars
+      # ivars -= exclude_ivars if exclude_ivars
 
+      ivars_result[0] = ivars
       if ivars.length > 0 then
-        TYPE_IVAR + ''
+        TYPE_IVAR
       else
         ''
       end
     end
 
-    def serialize_instance_variables_suffix(obj, force = false,
-                                            strip_ivars = false,
-                                            exclude_ivars = false)
-      ivars = obj.instance_variables
-
-      ivars -= exclude_ivars if exclude_ivars
-
-      if force or ivars.length > 0 then
-        str = serialize_integer(obj.instance_variables.length)
-        obj.instance_variables.each do |ivar|
+    def serialize_instance_variables_suffix(obj, ivars) 
+                            # (... , force = false, strip_ivars = false)
+      len = ivars.length
+      # if force or len > 0 then
+      if len > 0 then
+        str = serialize_integer( len )
+        n = 0
+        while n < len
+          ivar = ivars[n]
           sym = ivar.to_sym
           val = obj.instance_variable_get(sym)
-          unless strip_ivars then
-            str << serialize(sym)
-          else
-            str << serialize(ivar[1..-1].to_sym)
-          end
+
+          #unless strip_ivars then
+          #  str << serialize(sym)
+          #else
+          #  str << serialize(ivar[1..-1].to_sym)
+          #end
+          str << serialize(sym)
+
           str << serialize(val)
+          n += 1
         end
         str
       else
@@ -516,7 +527,7 @@ module Marshal
     end
 
     def serialize_integer(n)
-      if n == 0
+      if n.equal?(0)
         s = to_byte(n)
       elsif n > 0 and n < 123
         s = to_byte(n + 5)
@@ -525,11 +536,11 @@ module Marshal
       else
         s = "\0"
         cnt = 0
-        4.times do
+        for k in (1..4) do
           s << to_byte(n)
           n >>= 8
           cnt += 1
-          break if n == 0 or n == -1
+          break if n.equal?(0) or n.equal?(-1)
         end
         s[0] = to_byte(n < 0 ? 256 - cnt : cnt)
       end
@@ -537,20 +548,21 @@ module Marshal
     end
 
     def serialize_user_class(obj, cls)
-      if obj.class != cls
-        TYPE_UCLASS + serialize(obj.class.name.to_sym)
+      if obj.class.equal?(cls)
+        ''
       else
-      ''
+        TYPE_UCLASS + serialize(obj.class.name.to_sym)
       end
     end
 
     def serialize_user_defined(obj)
       str = obj._dump @depth
       raise TypeError, "_dump() must return string" if str.class != String
-      out = serialize_instance_variables_prefix(str)
+      ivars = [ nil ]
+      out = serialize_instance_variables_prefix(str, ivars)
       out << TYPE_USERDEF + serialize(obj.class.name.to_sym)
       out << serialize_integer(str.length) + str
-      out << serialize_instance_variables_suffix(str)
+      out << serialize_instance_variables_suffix(str, ivars[0])
     end
 
     def serialize_user_marshal(obj)
@@ -563,20 +575,11 @@ module Marshal
     end
 
     def set_instance_variables(obj)
-      construct_integer.times do
+      for k in (1..construct_integer) do
         ivar = get_symbol
         value = construct
         obj.instance_variable_set prepare_ivar(ivar), value
       end
-    end
-
-    def store_unique_object(obj)
-      if obj.kind_of? Symbol
-        add_symlink obj
-      else
-        add_object obj
-      end
-      obj
     end
 
     def to_byte(n)
@@ -586,7 +589,7 @@ module Marshal
   end
 
   def self.dump(obj, an_io=nil, limit=nil)
-    if limit.nil?
+    if limit.equal?(nil)
       if an_io.kind_of? Fixnum
         limit = an_io
         an_io = nil

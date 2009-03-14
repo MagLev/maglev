@@ -1,9 +1,12 @@
+
 class Object
   def to_marshal(ms, strip_ivars = false)
     out = ms.serialize_extended_object self
+    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
     out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
+    out
   end
 end
 
@@ -34,6 +37,7 @@ end
 class Class
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous class #{self}" if self.name == ''
+    ms.add_output_obj(self)
     Marshal::TYPE_CLASS + ms.serialize_integer(name.length) + name
   end
 end
@@ -41,31 +45,29 @@ end
 class Module
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous module #{self}" if self.name == ''
+    ms.add_output_obj(self)
     Marshal::TYPE_MODULE + ms.serialize_integer(name.length) + name
   end
 end
 
 class Symbol
   def to_marshal(ms)
-    if idx = ms.find_symlink(self) then
-      Marshal::TYPE_SYMLINK + ms.serialize_integer(idx)
-    else
-      ms.add_symlink self
-
-      str = to_s
-      Marshal::TYPE_SYMBOL + ms.serialize_integer(str.length) + str
-    end
+    idx = ms.add_output_obj(self)
+    str = to_s
+    Marshal::TYPE_SYMBOL + ms.serialize_integer(str.length) + str
   end
 end
 
 class String
   def to_marshal(ms)
-    out = ms.serialize_instance_variables_prefix(self)
+    ivars = [ nil]
+    out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, String)
+    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_STRING
     out << ms.serialize_integer(self.length) << self
-    out << ms.serialize_instance_variables_suffix(self)
+    out << ms.serialize_instance_variables_suffix(self, ivars[0])
   end
 end
 
@@ -77,6 +79,7 @@ end
 
 class Bignum
   def to_marshal(ms)
+    # no add_output_obj
     str = Marshal::TYPE_BIGNUM + (self < 0 ? '-' : '+')
     cnt = 0
     num = self.abs
@@ -99,21 +102,25 @@ end
 class Regexp
   def to_marshal(ms)
     str = self.source
-    out = ms.serialize_instance_variables_prefix(self)
+    ivars = [ nil]
+    out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Regexp)
+    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_REGEXP
     out << ms.serialize_integer(str.length) + str
     out << ms.to_byte(options & 0x7)
-    out << ms.serialize_instance_variables_suffix(self)
+    out << ms.serialize_instance_variables_suffix(self, ivars[0])
   end
 end
 
 class Struct
   def to_marshal(ms)
-    out =  ms.serialize_instance_variables_prefix(self)
+    ivars = [ nil]
+    out =  ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
 
+    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_STRUCT
 
     out << ms.serialize(self.class.name.to_sym)
@@ -124,16 +131,18 @@ class Struct
       out << ms.serialize(value)
     end
 
-    out << ms.serialize_instance_variables_suffix(self)
+    out << ms.serialize_instance_variables_suffix(self, ivars[0])
     out
   end
 end
 
 class Array
   def to_marshal(ms)
-    out = ms.serialize_instance_variables_prefix(self)
+    ivars = [ nil]
+    out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Array)
+    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_ARRAY
     out << ms.serialize_integer(self.length)
     # Gemstone, optimization to use while loop
@@ -143,7 +152,7 @@ class Array
       out << ms.serialize(self[n])
       n = n + 1
     end		# end Gemstone
-    out << ms.serialize_instance_variables_suffix(self)
+    out << ms.serialize_instance_variables_suffix(self, ivars[0])
   end
 end
 
@@ -151,27 +160,31 @@ class Hash
   def to_marshal(ms)
     raise TypeError, "can't dump hash with default proc" if default_proc
 
-    excluded_ivars = %w[@bins @count @records]
-
-    out = ms.serialize_instance_variables_prefix self, excluded_ivars
+    #  excluded_ivars = %w[@bins @count @records]  # Rubinius only
+    ivars = [ nil]
+    out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Hash)
-    out << (self.default ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
-    out << ms.serialize_integer(length)
-    unless empty? then
+    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
+    default_val = self.default
+    out << (default_val ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
+    len = self.length
+    out << ms.serialize_integer(len) 
+    unless len.equal?(0) then
       each_pair do |(key, val)|
         out << ms.serialize(key)
         out << ms.serialize(val)
       end
     end
-    out << (default ? ms.serialize(default) : '')
-    out << ms.serialize_instance_variables_suffix(self, false, false,
-                                                  excluded_ivars)
+    out << (default_val ? ms.serialize(default_val) : '')
+    out << ms.serialize_instance_variables_suffix(self, ivars[0])
+    out
   end
 end
 
 class Float
   def to_marshal(ms)
+    # no add_output_obj
     str = if nan? then
             "nan"
           elsif zero? then
