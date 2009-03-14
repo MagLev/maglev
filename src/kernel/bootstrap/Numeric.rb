@@ -24,6 +24,8 @@ class Numeric
 # eql?  implemented in subclasses
 #  floor implemented in subclasses
 
+    primitive '_frexp', '_frexp'
+
         primitive 'hash'
 
     primitive 'integer?', '_isInteger'
@@ -43,6 +45,7 @@ class Numeric
     def inspect(touchedSet=nil)
       _inspect
     end
+
 
 # to_int  implemented in subclasses
 # truncated implemented in subclasses

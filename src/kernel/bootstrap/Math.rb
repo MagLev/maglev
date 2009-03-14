@@ -2,6 +2,10 @@ module Math
   PI = 3.14159265358979
   E  = 2.71828182845905
 
+  def self.frexp(x)
+    x._frexp
+  end
+
   def self.sin(x)
     x.sin
   end
