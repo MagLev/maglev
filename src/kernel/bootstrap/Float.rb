@@ -1,8 +1,10 @@
 # ---------------------------------
 #  Float ,  The Ruby and Smalltalk  Float classes are identical
 #
-#  Smalltalk SmallDouble is a subclass of Float, so  we only have
-#   to Bootstrap the env 1 method dictionary for Float .
+
+class SmallDouble
+  primitive_nobridge '_isSpecial', 'isSpecial'
+end
 
 class Float
 
