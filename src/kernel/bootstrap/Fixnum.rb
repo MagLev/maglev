@@ -8,6 +8,8 @@ class Fixnum
   # The selectors + - * >= <= < bitAnd: are special sends and may not
   #  be reimplemented in Fixnum.
 
+  primitive_nobridge '_isSpecial', 'isSpecial'
+
   primitive_nobridge '<'
   primitive_nobridge '>'
   primitive_nobridge '<='
