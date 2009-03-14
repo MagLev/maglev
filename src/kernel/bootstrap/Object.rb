@@ -3,36 +3,35 @@ class Object
 
     # Begin private helper methods
 
-    # primitive_nobridge has max of 3 normal args, 1 star arg, 1 block arg
+    #  primitive_nobridge has max of 3 normal args, 1 star arg, 1 block arg
     #  example with a block argument
     #    primitive_nobridge '_foo*&' , '_foo:a:b:c:d:e:'
     #  example without a block argument
     #    primitive_nobridge '_foo*' , '_foo:a:b:c:d:'
 
-
-    #  Begin special sends
-    #    Reimplementation of these selectors is disallowed by the parser
-    #    and they are optimized by code generator to special bytecodes.
-    #    Attempts to reimplement them will cause compile-time errors.
-    #    Entries here are so that perform will work.
-    # _isInteger allows integer?  special sends to non-Numeric objects
-    primitive_nobridge '_isArray', '_isArray'
-    primitive_nobridge '_isBlock', '_isExecBlock'
-    primitive_nobridge '_isFixnum', '_isSmallInteger'
-    primitive_nobridge '_isFloat', '_isFloat'
-    primitive_nobridge '_isHash', '_isRubyHash'
-    primitive_nobridge '_isInteger', '_isInteger'
-    primitive_nobridge '_isNumber', '_isNumber'
-    primitive_nobridge '_isRegexp', '_isRegexp'
-    primitive_nobridge '_isRange', '_isRange'
-    primitive_nobridge '_isString', '_isRubyString'  # returns false for Symbols
-    primitive_nobridge '_isSymbol', '_isSymbol'      # returns false for Strings
-    primitive_nobridge '_isStringOrSymbol', '_isOneByteString'
-    # End special sends
-
-    #  following are installed by RubyContext>>installPrimitiveBootstrap
+    #  installed by RubyContext>>installPrimitiveBootstrap :
     #    primitive_nobridge 'class', 'class' # installed in Object
-    #  end installPrimitiveBootstrap
+
+    #  Reimplementation of the following special selectors is disallowed 
+    #  by the parser and they are optimized by code generator to special bytecodes.
+    #  Attempts to reimplement them will cause compile-time errors.
+    # _isArray  	# smalltalk   _isArray
+    # _isBlock  	# smalltalk   _isExecBlock
+    # _isFixnum 	# smalltalk   _isSmallInteger
+    # _isFloat  	# smalltalk   _isFloat
+    # _isHash   	# smalltalk   _isRubyHash
+    # _isInteger	# smalltalk  _isInteger
+    # _isNumber 	# smalltalk   _isNumber
+    # _isRegexp 	# smalltalk   _isRegexp
+    # _isRange  	# smalltalk   _isRange
+    # _isString 	# smalltalk   _isRubyString  # returns false for Symbols
+    # _isSymbol 	# smalltalk   _isSymbol      # returns false for Strings
+    # _isStringOrSymbol # smalltalk _isOneByteString
+
+
+    #   _isSpecial is used by marshal.rb . It is not a special selector
+    primitive_nobridge '_isSpecial', 'isSpecial'
+
 
     #  Private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
@@ -105,6 +104,7 @@ class Object
     primitive_nobridge 'kind_of?' , '_rubyKindOf:'
 
     # install this prim so  anObj.send(:is_a?, aCls)   will work
+    # Reimplementation of is_a?  is disallowed, it is compiled direct to a bytecode
     primitive_nobridge 'is_a?' , '_rubyKindOf:'
 
     primitive_nobridge '_responds_to', '_respondsTo:private:flags:'
