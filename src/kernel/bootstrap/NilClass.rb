@@ -1,4 +1,7 @@
 class NilClass
+
+   primitive_nobridge '_isSpecial', 'isSpecial'
+
    primitive_nobridge '&', '_rubyAnd:'
    #  For receiver nil,  Or and Xor are the same
    primitive_nobridge '^', '_rubyOr:'
