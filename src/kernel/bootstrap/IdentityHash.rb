@@ -6,6 +6,11 @@ class IdentityHash
   # Class methods
   class_primitive_nobridge '_new', 'new'
 
+  def self.new
+    # args are ignored
+    _new
+  end
+
   def self.from_hash(a_hash)
     ih = self._new 
     a_hash.each { | k,v |
@@ -35,6 +40,7 @@ class IdentityHash
 
   primitive_nobridge '_at_otherwise', 'at:otherwise:'
   def [](key)
+    # returns the value for key, or nil if key not found
     _at_otherwise(key, nil)
   end
 
