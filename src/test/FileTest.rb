@@ -23,6 +23,12 @@ test(File.basename('ruby.rbx', 'rbx'), 'ruby.',     "GemStone H")
 test(File.basename('ruby.rbx', 'x'),   'ruby.rb',   "GemStone I")
 test(File.basename('ruby.rbx', '*'),   'ruby.rbx',  "GemStone J")
 
+# A couple of regressions:
+test(File.basename('', ''),           '',     'File.basename regression 1')
+test(File.basename('/'),              '/',    'File.basename regression 2')
+test(File.basename('//'),             '/',    'File.basename regression 3')
+test(File.basename('//dir///base//'), 'base', 'File.basename regression 4')
+
 # Tests for extname
 
 test(File.extname('test.rb'),       '.rb', 'Pickaxe extname A')
@@ -37,7 +43,7 @@ test(File.extname('test. '),        '. ',   'GemStone extname C')  # ?!!h
 # Test stat based methods
 
 # First create a file with known properties
-fname = "/tmp/FileStatTest-234"
+fname = '/tmp/FileStatTest-234'
 time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
 %x{ touch -t 199910201234 #{fname} }  # create at Wed Oct 20 12:34:00 1999
 
@@ -58,11 +64,11 @@ test(File.sticky?(fname), false, 'File.sticky?')
 test(File.symlink?(fname), false, 'File.symlink?')
 test(File.zero?(fname), true, 'File.zero?')
 
-test(File.exist?("/This/Better/Not/Exist"), false, 'File.exist? A')
-test(File.exist?("/tmp"),                   true,  'File.exist? B')
+test(File.exist?('/This/Better/Not/Exist'), false, 'File.exist? A')
+test(File.exist?('/tmp'),                   true,  'File.exist? B')
 
-test(File.exists?("/This/Better/Not/Exists"), false, 'File.exists? A')
-test(File.exists?("/tmp"),                    true,  'File.exists? B')
+test(File.exists?('/This/Better/Not/Exists'), false, 'File.exists? A')
+test(File.exists?('/tmp'),                    true,  'File.exists? B')
 
 
 test(File.expand_path("~"), ENV['HOME'],       'expand_path A')

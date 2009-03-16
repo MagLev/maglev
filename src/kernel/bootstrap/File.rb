@@ -48,10 +48,16 @@ class File
     end
   end
 
+  # TODO: consider using FFI to call libc basename
   def self.basename(filename, suffix='')
-    fn = Type.coerce_to(filename, String, :to_str)
+    fn = Type.coerce_to(filename, String, :to_str).squeeze('/')
     sf = Type.coerce_to(suffix, String, :to_str)
+
+    return '/' if fn.eql?('/')
+
     b = fn.split('/')[-1]
+    return '' if b.nil?
+
     if suffix.eql?('.*')
       index = b.rindex('.')
     else
