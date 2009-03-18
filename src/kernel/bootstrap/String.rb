@@ -319,7 +319,7 @@ class String
       saveTilde = block._fetchRubyVcGlobal(0);
       begin
         block._setRubyVcGlobal(0, match);
-        out << block.call.to_s
+        out << block.call(match[0]).to_s
       ensure
         block._setRubyVcGlobal(0, saveTilde);
       end

@@ -180,5 +180,8 @@ str.gsub(UNSAFE) do |us|
   puts "us: #{us}"
 end
 
+actual = "hello".gsub(/./) { |s| s[0].to_s + '|' }
+test(actual, "104|101|108|108|111|", "gsub with block")
+
 report
 
