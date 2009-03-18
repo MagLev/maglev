@@ -14,7 +14,7 @@ RUBY.global('File', 'GsFile')
 RUBY.global('Fixnum', 'SmallInteger')
 RUBY.global('Float', 'Float')
 RUBY.global('Hash', 'RubyHash')
-RUBY.global('IdentityHash', 'IdentityKeyValueDictionary')
+RUBY.global('IdentityHash', 'RubyIdentityHash')
 RUBY.global('Integer', 'Integer')
 RUBY.global('Bignum', 'LargeInteger')
 RUBY.global('IO', 'IO')
@@ -47,6 +47,7 @@ RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 RUBY.global('Gemstone', 'System')
 RUBY.global('Gemstone', 'System')
 RUBY.global('RubyContext', 'RubyContext')
+RUBY.global('CZstream', 'CZstream')
 
 #
 #  Define some of the Ruby exception classes to be identical to certain
