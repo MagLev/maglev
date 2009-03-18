@@ -142,5 +142,83 @@ begin
     unless e.class.equal?(RuntimeError)  ; raise 'err' ; end
   end
 end
-        
+
+begin
+  a = 5
+  begin
+    a = 6
+    raise Exception
+    a = 7
+  rescue Object
+    a = a + 20
+  end
+  unless a == 26 ; raise 'Error'; end
+end
+
+begin
+  a = 5
+  begin
+    a = 6
+    raise Exception
+    a = 7
+  rescue TypeError, Object
+    a = a + 20
+  end
+  unless a == 26 ; raise 'Error'; end
+end
+
+begin
+  a = 5
+  begin
+    a = 6
+    raise Exception
+    a = 7
+  rescue Object, TypeError
+    a = a + 20
+  end
+  unless a == 26 ; raise 'Error'; end
+end
+
+begin
+  a = 5
+  begin
+    a = 6
+    raise Exception
+    a = 7
+  rescue TypeError
+    a = a + 10
+  rescue Object
+    a = a + 20
+  end
+  unless a == 26 ; raise 'Error'; end
+end
+
+begin
+  a = 5
+  begin
+    a = 6
+    raise Exception
+    a = 7
+  rescue Object
+    a = a + 20
+  rescue TypeError
+    a = a + 10
+  end
+  unless a == 26 ; raise 'Error'; end
+end
+
+begin
+  a = 5
+  begin
+    a = 6
+    raise TypeError
+    a = 7
+  rescue TypeError
+    a = a + 10
+  rescue Object
+    a = a + 20
+  end
+  unless a == 16 ; raise 'Error'; end
+end
+
 true
