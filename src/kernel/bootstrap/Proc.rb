@@ -47,6 +47,24 @@ class ExecBlock
     def [](*args)
       self.call(*args)
     end
+
+    def arity
+      na = self._numArgs 
+      if na.equal?(0)
+        if (self._noDeclaredArgs)
+          na = -1  # for Proc.new { }.arity == -1
+        end 
+      else
+        if (self._lastStar) 
+          na = -(na)  # negated (num required args + 1)
+        end
+      end
+      na
+    end
+
+    def to_proc
+      Proc._from_block(self)
+    end
 end
 
 
@@ -64,6 +82,18 @@ class Proc
         raise ArgumentError, 'tried to create Proc object without a block' 
       end
     end
+
+    def self._from_block(blk)
+      if blk._isBlock
+        inst = self.allocate
+        inst._init_from_block(blk)
+        inst.initialize
+        return inst
+      else
+        raise ArgumentError, 'tried to create Proc object without a block'
+      end
+    end
+
 
     def self.new
       # no bridge methods
@@ -101,6 +131,10 @@ class Proc
     end
 
     def _initialize(&blk)
+      @block = blk
+    end
+
+    def _init_from_block(blk)
       @block = blk
     end
 
