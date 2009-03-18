@@ -216,12 +216,13 @@ module Kernel
 
   def raise(ex_class, message)
     ex = ex_class.exception
-    ex.signal(message)
+    ex._signal(message)
   end
 
-  def raise(ex_class, message, *args)
-    # TODO args is callback info not yet implemented
-    raise(ex_class, message)
+  def raise(ex_class, message, stack)
+    ex = ex_class.exception 
+    ex.set_backtrace(stack)
+    ex._signal(message)
   end
 
   def raise(msg)
@@ -234,7 +235,7 @@ module Kernel
       if (ex._handler_active)
         ex._reraise
       else
-        ex.signal
+        ex._signal
       end
     end
   end
@@ -247,7 +248,7 @@ module Kernel
   def raise
     #  if $! is valid in the caller, the parser will
     #   translate raise to  _resignal
-    RuntimeError.signal
+    RuntimeError._signal
   end
   alias fail raise
 
