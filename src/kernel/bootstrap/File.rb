@@ -689,12 +689,6 @@ class File
     return res
   end
 
-  # TODO: The following methods are not documented as part of the API:
-  # print, read,
-  def print(*args)
-    args.each {|arg| self << arg.to_s}
-  end
-
   def self.read(path)
     file = self.new(path)
     if file.equal?(nil)

@@ -54,18 +54,45 @@ class IO
   end
   alias tty? isatty
 
+
+  #  Writes the given object(s) to <em>ios</em>. The stream must be
+  #  opened for writing. If the output record separator (<code>$\\</code>)
+  #  is not <code>nil</code>, it will be appended to the output. If no
+  #  arguments are given, prints <code>$_</code>. Objects that aren't
+  #  strings will be converted by calling their <code>to_s</code> method.
+  #  With no argument, prints the contents of the variable <code>$_</code>.
+  #  Returns <code>nil</code>.
+  #
+  #     $stdout.print("This is ", 100, " percent.\n")
+  #
+  #  <em>produces:</em>
+  #
+  #     This is 100 percent.
   def print(*args)
     # TODO handle non-nil state of $\
     lim = args.length
+
+    # If no argument, print $_
+    if lim == 0
+      args = [$_]
+      lim = 1
+    end
+
     n = 0
     while (n < lim)
       elem = args[n]
-      unless (elem._isString)
-        elem = elem.to_s
+      if elem.nil?
+        write("nil")
+      else
+        unless (elem._isString)
+          elem = elem.to_s
+        end
+        write(elem)
       end
-      write(elem)
       n = n + 1
     end
+
+    write($\) unless $\.nil?
   end
 
   def printf(format, *args)
@@ -78,20 +105,53 @@ class IO
     raise NotImplementedError
   end
 
+  #  Writes the given objects to <em>ios</em> as with
+  #  <code>IO#print</code>. Writes a record separator (typically a
+  #  newline) after any that do not already end with a newline sequence.
+  #  If called with an array argument, writes each element on a new line.
+  #  If called without arguments, outputs a single record separator.
+  #
+  #     $stdout.puts("this", "is", "a", "test")
+  #
+  #  <em>produces:</em>
+  #
+  #     this
+  #     is
+  #     a
+  #     test
+  #
   def puts(*args)
     lim = args.length
+
+    # If no parameters, print newline
+    if lim == 0
+      write("\n")
+      return nil
+    end
+
     n = 0
     while (n < lim)
       elem = args[n]
-      unless (elem._isString)
-        elem = elem.to_s
+      line = ''
+
+      if (elem._isArray)
+        # Mark for recursion and print each
+        # element of array separated by a newline
+        line = elem.join("\n")
+      elsif elem.equal?(nil)
+        line = "nil"
+      elsif elem._isString
+        line = elem
+      else
+        line = elem.to_s
       end
-      write(elem)
-      unless (elem[elem.length - 1].equal?(10))
-        write("\n")
-      end
+
+      write(line)
+      write("\n") unless line[-1].equal?(10)
       n = n + 1
     end
+
+    nil
   end
 
   def self.read(name)
