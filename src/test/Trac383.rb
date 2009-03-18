@@ -1,3 +1,4 @@
+<<<<<<< HEAD:src/test/Trac383.rb
 # trac 383
 class Base
   @@cva = 9
@@ -28,3 +29,15 @@ Base.getc
 Base.new.getd
 Base.checkb
 true
+=======
+class Base
+  class << self
+    @@mutex = "a mutex"
+    def synchronize
+      fail "Expecting non nil @@mutex" if @@mutex.nil?
+    end
+  end
+end
+
+Base.synchronize
+>>>>>>> Added src/test/Trac383.rb:src/test/Trac383.rb
