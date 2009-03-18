@@ -513,6 +513,166 @@ class Time
     return year, mon, day, hour, min, sec
   end
 
+    def rfc2822(date)
+      if /\A\s*
+          (?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s*,\s*)?
+          (\d{1,2})\s+
+          (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+
+          (\d{2,})\s+
+          (\d{2})\s*
+          :\s*(\d{2})\s*
+          (?::\s*(\d{2}))?\s+
+          ([+-]\d{4}|
+           UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-IK-Z])/ix =~ date
+        # Since RFC 2822 permit comments, the regexp has no right anchor.
+        day = $1.to_i
+        mon = MonthValue[$2.upcase]
+        year = $3.to_i
+        hour = $4.to_i
+        min = $5.to_i
+        sec = $6 ? $6.to_i : 0
+        zone = $7
+
+        # following year completion is compliant with RFC 2822.
+        year = if year < 50
+                 2000 + year
+               elsif year < 1000
+                 1900 + year
+               else
+                 year
+               end
+
+        year, mon, day, hour, min, sec =
+          apply_offset(year, mon, day, hour, min, sec, zone_offset(zone))
+        t = self.utc(year, mon, day, hour, min, sec)
+        t.localtime if !zone_utc?(zone)
+        t
+      else
+        raise ArgumentError.new("not RFC 2822 compliant date: #{date.inspect}")
+      end
+    end
+    alias rfc822 rfc2822
+
+
+  # Returns a string which represents the time as date-time defined by RFC 2822:
+  #
+  #   day-of-week, DD month-name CCYY hh:mm:ss zone
+  #
+  # where zone is [+-]hhmm.
+  #
+  # If +self+ is a UTC time, -0000 is used as zone.
+  #
+  def rfc2822
+    sprintf('%s, %02d %s %d %02d:%02d:%02d ',
+      RFC2822_DAY_NAME[wday],
+      day, RFC2822_MONTH_NAME[mon-1], year,
+      hour, min, sec) +
+    if utc?
+      '-0000'
+    else
+      off = utc_offset
+      sign = off < 0 ? '-' : '+'
+      sprintf('%s%02d%02d', sign, *(off.abs / 60).divmod(60))
+    end
+  end
+  alias rfc822 rfc2822
+
+  # Returns a string which represents the time as rfc1123-date of HTTP-date
+  # defined by RFC 2616:
+  #
+  #   day-of-week, DD month-name CCYY hh:mm:ss GMT
+  #
+  # Note that the result is always UTC (GMT).
+  #
+  def httpdate
+    t = dup.utc
+    sprintf('%s, %02d %s %d %02d:%02d:%02d GMT',
+      RFC2822_DAY_NAME[t.wday],
+      t.day, RFC2822_MONTH_NAME[t.mon-1], t.year,
+      t.hour, t.min, t.sec)
+  end
+
+    # Parses +date+ as HTTP-date defined by RFC 2616 and converts it to a Time
+    # object.
+    #
+    # ArgumentError is raised if +date+ is not compliant with RFC 2616 or Time
+    # class cannot represent specified date.
+    #
+    # See #httpdate for more information on this format.
+    #
+    def httpdate(date)
+      if /\A\s*
+          (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\x20
+          (\d{2})\x20
+          (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\x20
+          (\d{4})\x20
+          (\d{2}):(\d{2}):(\d{2})\x20
+          GMT
+          \s*\z/ix =~ date
+        self.rfc2822(date)
+      elsif /\A\s*
+             (?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\x20
+             (\d\d)-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d\d)\x20
+             (\d\d):(\d\d):(\d\d)\x20
+             GMT
+             \s*\z/ix =~ date
+        year = $3.to_i
+        if year < 50
+          year += 2000
+        else
+          year += 1900
+        end
+        self.utc(year, $2, $1.to_i, $4.to_i, $5.to_i, $6.to_i)
+      elsif /\A\s*
+             (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\x20
+             (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\x20
+             (\d\d|\x20\d)\x20
+             (\d\d):(\d\d):(\d\d)\x20
+             (\d{4})
+             \s*\z/ix =~ date
+        self.utc($6.to_i, MonthValue[$1.upcase], $2.to_i,
+                 $3.to_i, $4.to_i, $5.to_i)
+      else
+        raise ArgumentError.new("not RFC 2616 compliant date: #{date.inspect}")
+      end
+    end
+
+
+  # Returns a string which represents the time as dateTime defined by XML
+  # Schema:
+  #
+  #   CCYY-MM-DDThh:mm:ssTZD
+  #   CCYY-MM-DDThh:mm:ss.sssTZD
+  #
+  # where TZD is Z or [+-]hh:mm.
+  #
+  # If self is a UTC time, Z is used as TZD.  [+-]hh:mm is used otherwise.
+  #
+  # +fractional_seconds+ specifies a number of digits of fractional seconds.
+  # Its default value is 0.
+  #
+  def xmlschema(fraction_digits=0)
+    sprintf('%d-%02d-%02dT%02d:%02d:%02d',
+      year, mon, day, hour, min, sec) +
+    if fraction_digits == 0
+      ''
+    elsif fraction_digits <= 9
+      '.' + sprintf('%09d', nsec)[0, fraction_digits]
+    else
+      '.' + sprintf('%09d', nsec) + '0' * (fraction_digits - 9)
+    end +
+    if utc?
+      'Z'
+    else
+      off = utc_offset
+      sign = off < 0 ? '-' : '+'
+      sprintf('%s%02d:%02d', sign, *(off.abs / 60).divmod(60))
+    end
+  end
+  alias iso8601 xmlschema
+
+
+
   # GEMSTONE, not used
   #  public
   #
@@ -587,8 +747,6 @@ class Time
     res._init( usecs , false)
     res
   end
-
-  # TODO httpdate
 
   def strftime(fmt='%a %b %d %H:%M:%S %Z %Y' )
     fmt = fmt.to_str unless  fmt._isString
