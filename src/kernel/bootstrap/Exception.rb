@@ -1,8 +1,9 @@
 # Maps to Smalltalk class UserException.  See Globals.rb
 class Exception
+    class_primitive 'allocate', 'rubyBasicNew'
     class_primitive 'exception', 'new'
-    class_primitive 'signal', 'signal:'
-    class_primitive_nobridge 'signal', 'signal'
+    class_primitive '_signal', 'signal:'
+    class_primitive_nobridge '_signal', 'signal'
 
     # support for errno to Name translation
     class_primitive_nobridge  '_errnoTables', 'errnoTables'
@@ -12,8 +13,8 @@ class Exception
     primitive_nobridge '_handler_active' , '_handlerActive'
 
     primitive_nobridge '_reraise', '_rubyReraise'
-    primitive          'signal', 'signal:'
-    primitive_nobridge 'signal', 'signal'
+    primitive          '_signal', 'signal:'
+    primitive_nobridge '_signal', 'signal'
     primitive          'message', 'description'
     primitive_nobridge '_message=', 'messageText:'
 
@@ -31,7 +32,7 @@ class Exception
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop
-      @backtrace || Thread._backtrace(IncludeSmalltalkFrames, limit)
+      @stack || Thread._backtrace(IncludeSmalltalkFrames, limit)
     end
 
     def backtrace_st(limit = 1000)
@@ -49,7 +50,7 @@ class Exception
     end
 
     def set_backtrace(array)
-      @backtrace = array
+      @stack = array
     end
 
     def to_s
