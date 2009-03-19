@@ -14,6 +14,7 @@ OPTIONS:
    -d           Set debugging flags
    -G           Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h           Show this message and exit
+   --help       Show this message and exit
    -v           Print version number, then turn on verbose mode
    --copyright  Print copyright and exit
    --version    Print version number and exit
@@ -65,6 +66,10 @@ do
             usage
             exit
             ;;
+        --help)
+            usage
+            exit
+            ;;
         -I)
             args="$args '$1' '$2'"
             shift
@@ -113,7 +118,7 @@ do
 done
 
 # Finally, execute the command
-if [[ -z $debug ]]
+if [ -z $debug ]
 then
     # Normal execution
     $TOPAZ_CMD <<-EOF
@@ -141,7 +146,13 @@ else
 	%
 	EOF
     # Now run topaz with our debug script, including all params passed to us
-    $(which rlwrap) $GEMSTONE/bin/topaz -I $dbscript -l
+    rlwrapExe=$(which rlwrap)
+    if [ $? == 0 ]
+    then
+      $rlwrapExe $GEMSTONE/bin/topaz -I $dbscript -l
+    else
+      $GEMSTONE/bin/topaz -I $dbscript -l
+    fi
     rm -f $dbscript
 fi
 echo  # topaz tends to not output a newline, which can mess up the shell prompt
