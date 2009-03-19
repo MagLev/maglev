@@ -121,6 +121,10 @@ class IO
   #     test
   #
   def puts(*args)
+    _puts(args, IdentitySet.new)
+  end
+
+  def _puts(args, touched_set=IdentitySet.new)
     lim = args.length
 
     # If no parameters, print newline
@@ -131,13 +135,17 @@ class IO
 
     n = 0
     while (n < lim)
+      suppress = false
       elem = args[n]
       line = ''
 
       if (elem._isArray)
         # Mark for recursion and print each
         # element of array separated by a newline
-        line = elem.join("\n")
+        touched_set << elem
+        _puts_ary(elem, touched_set)
+        n = n + 1
+        next
       elsif elem.equal?(nil)
         line = "nil"
       elsif elem._isString
@@ -146,13 +154,33 @@ class IO
         line = elem.to_s
       end
 
-      write(line)
-      write("\n") unless line[-1].equal?(10)
+      unless suppress
+        write(line)
+        write("\n") unless line[-1].equal?(10)
+      end
       n = n + 1
     end
 
     nil
   end
+
+  def _puts_ary(ary, touched_set)
+    lim = ary.length
+    i = 0
+    while i < lim
+      el = []
+      if touched_set._includes(ary[i])
+        el << "[...]"
+      else
+        el << ary[i]
+      end
+      _puts(el, touched_set)
+      i += 1
+    end
+
+    nil
+  end
+  private :_puts, :_puts_ary
 
   def self.read(name)
     File.read(name)
