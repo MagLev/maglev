@@ -30,39 +30,39 @@
  unless b.equal?(98) then raiseErr end
 
  a = [77,66]
- p[*a] 		# coverage for ticket 132
+ p[*a]    # coverage for ticket 132
  unless a.equal?(77) then raiseErr end
  unless b.equal?(66) then raiseErr end
 
  def proc_from
    # this form not supported
-   Proc.new 
+   Proc.new
  end
 
  def proc_fromA(&b)
-   Proc.new(&b) 
+   Proc.new(&b)
  end
  def proc_fromB(&b)
    begin
-     p = Proc.new(b) 
+     p = Proc.new(b)
      rescue Exception
        # expect Gemstone error 2111
        p = 999
      else
-       raise 'ERR'  
+       raise 'ERR'
    end
    p
  end
 
  p = Proc.new { "hello" }
  r = p.call
- unless r = "hello" then raiseErr end
- 
+ unless r == "hello" then raiseErr end
+
  # p = proc_from  # not supported yet
 
  p = proc_fromA { "goodbye" }
  r = p.call
- unless r = "goodbye" then raiseErr end
+ unless r == "goodbye" then raiseErr end
 
  p = proc_fromB { "notime" }
  unless p == 999 then raiseErr end
@@ -77,3 +77,12 @@
  unless a.equal?(nil) then raiseErr end
 
 
+# Ensure passed blocks have arity defined
+def test_arity(expected, msg, &block)
+  actual = block.arity
+  raise "test_arity: #{msg}: expected #{expected} actual: #{actual}" unless actual == expected
+end
+
+test_arity(-1, "A") { true }
+test_arity(1, "A") { |x| true }
+test_arity(2, "A") { |x,y| true }
