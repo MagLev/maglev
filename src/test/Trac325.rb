@@ -1,13 +1,14 @@
 module Mha
   @@mywarn = 90
-  def warning
-    @@mywarn
+  def self.warning
+    x = @@mywarn
+    @@mywarn = x + 10
+    x
   end
 end
 
 class Haml
   include Mha
-  @@mywarn = 99
   def self.version
     y = defined?(@@version)
     if y
@@ -18,7 +19,9 @@ class Haml
     end
   end
   def self.warning
-    @@mywarn
+    x = @@mywarn
+    @@mywarn = x + 1
+    x
   end
 end
 
@@ -27,11 +30,14 @@ b = Haml.version
 unless a == 55 ; raise 'error' ; end
 unless b == 88 ; raise 'error' ; end
 
-c = Haml.warning
-unless c == 99 ; raise 'error' ; end
+c = Mha.warning 
+unless c == 90 ; raise 'error' ; end
 
-d = Haml.new.warning
-unless d == 90 ; raise 'error' ; end
+d = Haml.warning
+unless d == 100 ; raise 'error' ; end
+
+e = Mha.warning
+unless e == 101 ; raise 'error' ; end
 
 true
 
