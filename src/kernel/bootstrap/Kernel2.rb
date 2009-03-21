@@ -3,8 +3,8 @@ module Kernel
   #  in the bootstrap
 
   def binding
-    # the block argument is synthesized by the parser and should not
-    #  be explicitly passed, so this variant probably not used
+    # usually the block argument is synthesized by the parser.
+    # this case is used to create the top-level binding. 
     Binding.new( self._binding_ctx(0), self, nil )
   end
 
