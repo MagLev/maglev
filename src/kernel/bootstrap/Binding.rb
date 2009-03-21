@@ -5,7 +5,7 @@ class Binding
 
   def initialize( binding_context , obj, blk )
     info = Binding._build_names( binding_context )
-    @staticLink = info[0] 
+    @staticLink = info[0]   # staticLink may be nil
     @names = info[1]
     @selfObj = obj 
     @block = blk
