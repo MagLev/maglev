@@ -4,3 +4,7 @@ login
 display oops
 omit classoops
 limit oops 20
+limit bytes 0
+set stackpad 40
+omit bytes
+level 0
