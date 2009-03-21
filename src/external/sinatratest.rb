@@ -3,10 +3,14 @@ $:.unshift(ENV['MAGLEV_HOME'] + '/src/external/Rack/lib')
 
 require 'sinatra'
 
-@default_options = {
-  :dump_errors => true,
-  :raise_errors => true
-}
+configure(:development) do
+  set :logging, false
+  set :reload,  false
+  set :run,     true
+  set :server,  'webrick'
+  set :lock,    false     # but I'm only sending one request at a time....
+end
+
 get '/' do
   "Hello world"
 end
