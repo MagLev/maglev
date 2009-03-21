@@ -42,9 +42,9 @@ fi
 # Environment variable settings
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-export TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
 
 args=""
+debug=0
 while [[ $# > 0 ]]
 do
     case $1 in
@@ -117,42 +117,50 @@ do
     shift
 done
 
-# Finally, execute the command
-if [ -z $debug ]
-then
-    # Normal execution
-    $TOPAZ_CMD <<-EOF
-	run
-	RubyContext load.
-	RubyContext default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
-	RubyContext loadFileNamed: '$RUBYSCRIPT'.
-	%
-	exit
-	EOF
+# need to keep topaz's stdin connected to the tty always
+#  so stdin is usable from Ruby , so do not redirect topaz stdin
+base=`basename $0`
+dbscript=`mktemp /tmp/${base}.XXXX` || exit 1
+rm -f $dbscript
+if [ $debug == 1 ]; then
+  cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
 else
-    # Debug.
-    # The key to debug is to keep topaz's stdin connected to the tty.
-    # So, we create a topaz script with all the goodies, and use it
-    # as the topaz ini file
-    base=`basename $0`
-    dbscript=`mktemp /tmp/${base}.XXXX` || exit 1
-    rm -f $dbscript
-    cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
-    cat - >> $dbscript <<-EOF
-	run
-	RubyContext load.
-	RubyContext default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
-	RubyContext loadFileNamed: '$RUBYSCRIPT' .
-	%
-	EOF
-    # Now run topaz with our debug script, including all params passed to us
-    rlwrapExe=$(which rlwrap)
-    if [ $? == 0 ]
-    then
-      $rlwrapExe $GEMSTONE/bin/topaz -I $dbscript -l
-    else
-      $GEMSTONE/bin/topaz -I $dbscript -l
-    fi
-    rm -f $dbscript
+  cat $MAGLEV_HOME/etc/.topazini > $dbscript
 fi
-echo  # topaz tends to not output a newline, which can mess up the shell prompt
+cat - >> $dbscript <<-EOFA
+run
+| res ctx |
+(ctx := RubyContext) load .
+ctx default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
+res := ctx loadFileNamed: '$RUBYSCRIPT'.
+GsFile stdout close . "ensure final LF on stdout"
+^ res
+%
+EOFA
+
+# generate a topaz exit command as last line of init file
+if [ $debug == 0 ]; then
+  cat - >> $dbscript <<-EOFB  
+exit
+EOFB
+else
+  cat - >> $dbscript <<-EOFC
+exitifnoerror
+EOFC
+fi
+
+TOPAZ_CMD="$GEMSTONE/bin/topaz -l -q -I $dbscript "
+
+# note that   /usr/bin/which   on Solaris always produces  $?==0 , so be careful
+#  about how you test result of which .
+#
+rlwrapExe=$(which rlwrap 2> /dev/null )
+if [ -f "$rlwrapExe" ]; then
+  $rlwrapExe $TOPAZ_CMD
+  exitStatus=$?
+else
+  $TOPAZ_CMD
+  exitStatus=$?
+fi
+rm -f $dbscript
+exit $exitStatus
