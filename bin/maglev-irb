@@ -78,10 +78,12 @@ if [ $# -ne 0 ]; then
 fi
 
 # Finally, execute the command
-if [ -z "`which rlwrap > /dev/null 2>&1`" ]; then
-    $IRB_CMD
+rlwrapExe=$(which rlwrap)
+if [ $? == 0 ]
+then
+  $rlwrapExe $IRB_CMD
 else
-    rlwrap $IRB_CMD
+    $IRB_CMD
 fi
 
 exit
