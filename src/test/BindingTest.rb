@@ -17,6 +17,16 @@ class TB
     wwv = 'radio'
     binding
   end
+
+  XCOPY = 0
+  def test_lamba
+     xx = 98
+     lambda {
+         eval <<-CODE
+           XCOPY = xx
+         CODE
+     }.call
+  end
 end
 
 tobj = TB.new
@@ -40,6 +50,10 @@ unless TBINDSTR == '_abc_wvt' ; raise 'error'; end
 bz = tobj.test_noargs
 bv = eval( ' wwv ' , bz )
 unless bv == 'radio' ; raise 'error'; end
+
+tobj.test_lamba
+y = TB::XCOPY
+unless y == 98 ; raise 'error'; end
 
 puts "==== BindingTest ok"
 
