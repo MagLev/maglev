@@ -1,3 +1,4 @@
-
-x = true
-raise "Expecting x to be true" unless eval("x", TOPLEVEL_BINDING)
+x = 385
+y = eval("x", TOPLEVEL_BINDING)
+unless y == 385 ; raise 'error'; end
+true
