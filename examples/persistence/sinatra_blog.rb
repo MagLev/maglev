@@ -16,29 +16,33 @@ $:.unshift(File.dirname(__FILE__))
 
 require 'sinatra'
 require 'post'
+require 'blog'
+require 'maglev_transaction_wrapper'
+
+# Rack middleware to wrap http requests in a gemstone transaction.  Only
+# data will be saved, not methods...
+use MagLevTransactionWrapper
 
 configure(:development) do
-  puts "Hello from configure"
   set :dump_errors, true
   set :raise_errors, true
   set :logging, false
+  #set :port, 4567
 end
 
 helpers do
   # Return an array of all the posts
   def posts
-    puts "+++ posts"
-    Post
+    $my_blog ||= Blog.new("My Blog")
+    $my_blog.all
   end
 
   def new_post_link
-    puts "+++ new_post_link"
     "<a href='/new'>Add</a> a new post"
   end
 end
 
 get '/' do
-  puts "@@@ '/' "
   body do
     if posts.empty?
       "There are no posts<br />" + new_post_link
@@ -51,7 +55,6 @@ get '/' do
 end
 
 get '/new' do
-  puts "@@@ '/new' "
   body do
     <<-eos
       <h3>Add a new post</h3>
@@ -67,9 +70,10 @@ get '/new' do
 end
 
 post '/create' do
-  puts "@@@ '/create' "
+  puts "==== /create"
+
   title, body = params[:title], params[:body]
 #  posts.insert(:title => title, :body => body)
-  posts.insert(params)
+#  posts.insert(params)
   redirect '/'
 end
