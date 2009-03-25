@@ -36,12 +36,12 @@ module WEBrick
           [ $stderr, AccessLog::REFERER_LOG_FORMAT ]
         ]
       end
- 
+
       @virtual_hosts = Array.new
     end
-    
+
     def run(sock)
-      while true 
+      while true
         res = req = server = nil
         res = HTTPResponse.new(@config)
         req = HTTPRequest.new(@config)
@@ -56,7 +56,7 @@ module WEBrick
           # end
           # raise HTTPStatus::EOFError if timeout <= 0
           # end gemstone
-        
+
           raise HTTPStatus::EOFError if sock.eof?
 
           req.parse(sock)
@@ -83,6 +83,10 @@ module WEBrick
         rescue HTTPStatus::Status => ex
           res.status = ex.code
         rescue StandardError => ex
+          # GEMSTONE
+          # A debug hook until webapps are running well
+          nil.pause if (!!defined? RUBY_ENGINE) && !!ENV['DEBUG_WEBRICK']
+          # END GEMSTONE
           @logger.error(ex)
           res.set_error(ex, true)
         ensure
