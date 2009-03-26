@@ -6,17 +6,21 @@
 # as +RUBY+ (see <tt>RubyContext>>initialize</tt>).  The singleton,
 # hereafter referred to as +RUBY+, provides the following services:
 #
-# * Entry points to load or require ruby files (available only from Smalltalk code)
-#   (<tt>RubyContext(c)>>loadFileNamed:</tt>, <tt>RubyContext(c)>>requireFileNamed:</tt>)
-# * Manage the ruby method dictionaries by copying between session state and persistent state.
-# * Hold the root namespace object (which holds +$+ globals and top level constants).
+# * Entry points to load or require ruby files (available only from
+#   Smalltalk code) (<tt>RubyContext(c)>>loadFileNamed:</tt>,
+#   <tt>RubyContext(c)>>requireFileNamed:</tt>)
+#
+# * Manage the ruby method dictionaries by copying between session state
+#   and persistent state.
+#
+# * Hold the root namespace object (which holds +$+ globals and top level
+#   constants).
 #
 # +RUBY+ is a persistent object, and hence changes to its namespace will be
 # commited to the repository during a <tt>Gemstone.commitTransaction</tt>.
 
 # RubyContext is identically Smalltalk RubyContext.
 class RubyContext
-
   # Set this instance as the saved version of the ruby context and make
   # session methods visible to the persistent store (does NOT commit).
   class_primitive 'save_context', 'save'
@@ -31,4 +35,11 @@ class RubyContext
   # If a saved contet exists, retrieve it and install its methods into
   # session temps (copy from persistent to session temps).
   class_primitive 'load_context', 'load'
+
+  # These primitives are defined in kernel.rb for bootstrapping.  The
+  # comment here is for documentation.
+  #
+  # RUBY.class.primitive 'require', 'requireFileNamed:'
+  # RUBY.class.primitive 'load', 'loadFileNamed:'
+  # RUBY.class.primitive 'global', 'installGlobal:name:'
 end
