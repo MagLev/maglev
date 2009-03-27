@@ -13,15 +13,17 @@ module Errno
   #     def Dir.getwd
   #       Errno.handle(_getwd, "Dir.getwd")
   #     end
-  def self.handle(err, additional = nil)
+  def self.handle(err, additional='')
     return err unless err._isSmallInteger  # Not an errno
     return err if err.equal?(0)                 # errno signifying no error
-
-    errno_exc = ERRNO_TO_EXCEPTION[err]
-    errno_exc ||= SystemCallError.new("System error (errno: #{err}): #{additional}", err)
-    raise errno_exc
+    self.raise_errno(err, additional)
   end
 
+  def self.raise_errno(errno, additional='')
+    errno_exc = ERRNO_TO_EXCEPTION[errno]
+    errno_exc ||= SystemCallError.new("System error (errno: #{err}):", err)
+    raise errno_exc, additional
+  end
   private
 
   #    We may want to make Errno::EBADF::Errno map to a method call so that

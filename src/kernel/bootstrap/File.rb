@@ -21,6 +21,8 @@ class File
   primitive 'flush', 'flush'
 
   class_primitive_nobridge '_fstat','fstat:isLstat:'
+
+  # _stat will return either a stat object or ERRNO
   class_primitive_nobridge '_stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
@@ -316,7 +318,7 @@ class File
     # subsequent variants replace just the corresponding bridge method
     f = self._open(filename, 'r')
     if f.equal?(nil)
-      raise SystemCallError # TODO: Errno::xxx
+      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
     end
     f.initialize
     f
@@ -325,7 +327,7 @@ class File
   def self.new(filename, mode)
     f = self._open(filename, mode)
     if f.equal?(nil)
-      raise SystemCallError # TODO: Errno::xxx
+      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
     end
     f.initialize
     f
@@ -337,9 +339,8 @@ class File
     # so manage it here.  First, see if the file exists
     stat_obj = File._stat(filename, false)
     f = self._open(filename, mode)
-    if f.equal?(nil)
-      raise SystemCallError # TODO: Errno::xxx
-    end
+    Errno.raise_errno(stat_obj, filename) if f.equal?(nil)
+
     f.chmod(perm) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
 
     return f unless block_given?
