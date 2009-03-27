@@ -2,37 +2,18 @@ This directory contains source from outside the Ruby Libs that we don't
 intend to ship with the product, but we feel is important that anyone
 working with these apps on MagLev should share the same code/fixes.
 
+See the top level docs/applications directory for more details.
+
 Rack
   Rack provides an minimal interface between webservers supporting Ruby and
   Ruby frameworks. 0.9.1. released on 2009-01-10.
   See: http://rack.rubyforge.org/
   License: MIT
 
-  MagLev does not currently support (at least) the following Rack features:
-  * openid
-  * mongrel
-  * memcache
-  * thin
-  * showexceptions (depends on erb)
-  * showstatus (depends on erb)
-  * cookies (depends on openssl)
-  * fastcgi
-
 Sinatra
   Sinatra is a light-weight web framework for ruby.
   Version 0.9.0.4 (compatible with rack 0.9.1)
   License: MIT
-
-  !!! NOTE !!!: Gemstone has made the following changes to the Sinatra code:
-  * lib/sinatra/main.rb: Stubbed out the definition of run.  The
-    implementation depended on examining the stack frames returnd by
-    Kernel#caller, but the details of filenames caused problems (MagLev
-    prints only full pathnames, while MRI prints a variety of formats).
-  * lib/sinatra/base.rb: https://magtrac.gemstone.com/ticket/375
-    MagLev wasn't passing the implicit block in a super call, so added
-    an explicit &block parameter.
-  * lib/sinatra/base.rb: https://magtrac.gemstone.com/ticket/376
-    Work around problem between blocks vs. procs.
 
 benchmark
   Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.

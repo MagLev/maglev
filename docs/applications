@@ -1,0 +1,62 @@
+== Current state of various applications
+
+This document summarizes the state of various applications under MagLev.
+MagLev does not currently support the Ruby C-extension mechanism.  Features
+of applications that depend on a C-extension do not work.
+
+=== Rack
+
+Version 0.9.1 of Rack is in <tt>src/external/Rack</tt>
+
+MagLev does not currently support (at least) the following Rack features:
+* openid
+* mongrel
+* memcache
+* thin
+* showexceptions (depends on erb)
+* showstatus (depends on erb)
+* cookies (depends on openssl)
+* fastcgi
+
+=== Sinatra
+
+Version 0.9.0.4 of Sinatra is in <tt>src/external/Sinatra</tt>.   Much of
+Sinatra runs, but some things don't.
+
+The following items are known not to work:
+
+* Cookies and Cookie based sessions
+  WEBrick requires openssl for cookie support. openssl is a C-based
+  library, and MagLev does not yet support ruby c-extensions.
+
+==== GemStone Patches
+
+GemStone has made the following modifications to the stock version of
+Sinatra:
+
+* lib/sinatra/main.rb: Stubbed out the definition of run.  The
+  implementation depended on examining the stack frames returnd by
+  Kernel#caller, but the details of filenames caused problems (MagLev
+  prints only full pathnames, while MRI prints a variety of formats).
+
+* lib/sinatra/base.rb: https://magtrac.gemstone.com/ticket/376
+  Work around problem between blocks vs. procs.
+
+=== RubyGems
+
+Version 1.3.1 of RubyGems is in <tt>src/external/rubygems-1.3.1</tt>.  The
+RubyGems setup script runs, but currently rdoc and ri are broken.  To run
+the setup script:
+
+    $ src/external/rubygems-1.3.1
+    $ maglev-ruby setup.rb --no-rdoc --no-ri
+
+This will install the RubyGems libraries under
+<tt>$MAGLEV_HOME/lib/ruby/site_ruby</tt> and will create
+<tt>bin/maglev-gem</tt>.
+
+To uninstall the files, run:
+
+    $ cd $MAGLEV_HOME
+    $ rake dev:clean-gems
+
