@@ -1,5 +1,5 @@
 class Mutex
-  # Mutex is identically the Smalltalk class Semaphore
+  # Mutex is identically the Smalltalk class TransientMutex
 
   class_primitive_nobridge '_new', 'forRubyMutualExclusion'
 
