@@ -23,7 +23,7 @@ RUBY.global('Kernel', 'Kernel')    # for module Kernel
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMeth')  # RubyMeth , RubyUnboundMeth defined in .mcz
 RUBY.global('Module', 'Module')    # for class Module
-RUBY.global('Mutex', 'Semaphore')
+RUBY.global('Mutex', 'TransientMutex')
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
@@ -103,7 +103,7 @@ RUBY.global("GsNMethod", "GsNMethod")
 
 # ----------------------------------------------------------
 
-ARGV = []
+# ARGV initialized in .mcz, in RubyTransientConstantAssociation>>initGlobals:
 ARGF = nil # TODO a real implementation
 
 # Notes on various globals
