@@ -79,3 +79,9 @@ post '/create' do
 #  posts.insert(params)
   redirect '/'
 end
+
+get '/index' do
+  title = "Erb Test"
+  body = "It works..."
+  erb :index
+end
