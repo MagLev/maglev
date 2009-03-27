@@ -27,8 +27,8 @@ configure(:development) do
   set :server, 'webrick'
   set :dump_errors, true
   set :raise_errors, true
-  #set :reload, false
-  #set :logging, false
+  set :reload, false
+  set :logging, false
   #set :port, 4567
 end
 
@@ -81,7 +81,7 @@ post '/create' do
 end
 
 get '/index' do
-  title = "Erb Test"
-  body = "It works..."
+  @title = "Erb Test"
+  @body = "It works..."
   erb :index
 end
