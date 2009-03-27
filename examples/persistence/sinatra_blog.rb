@@ -24,9 +24,11 @@ require 'maglev_transaction_wrapper'
 use MagLevTransactionWrapper
 
 configure(:development) do
+  set :server, 'webrick'
   set :dump_errors, true
   set :raise_errors, true
-  set :logging, false
+  #set :reload, false
+  #set :logging, false
   #set :port, 4567
 end
 
@@ -76,4 +78,10 @@ post '/create' do
 #  posts.insert(:title => title, :body => body)
 #  posts.insert(params)
   redirect '/'
+end
+
+get '/index' do
+  title = "Erb Test"
+  body = "It works..."
+  erb :index
 end
