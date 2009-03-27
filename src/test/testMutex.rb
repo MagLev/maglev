@@ -8,4 +8,3 @@ Gemstone.commitTransaction
 TestMutex::M.synchronize { puts "hello" }
 
 x = TestMutex::M
-nil.pause
