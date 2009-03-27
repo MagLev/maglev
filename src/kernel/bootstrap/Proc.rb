@@ -63,7 +63,10 @@ class ExecBlock
     end
 
     def to_proc
-      Proc._from_block(self)
+      Proc.new(self)
+    end
+    def _to_proc
+      Proc.new(self)
     end
 end
 
@@ -83,7 +86,7 @@ class Proc
       end
     end
 
-    def self._from_block(blk)
+    def self.new(blk)
       if blk._isBlock
         inst = self.allocate
         inst._init_from_block(blk)
@@ -212,6 +215,9 @@ class Proc
     end
 
     def to_proc
+      self
+    end
+    def _to_proc
       self
     end
 

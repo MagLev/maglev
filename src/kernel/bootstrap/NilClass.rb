@@ -33,6 +33,10 @@ class NilClass
      nil
    end
 
+   def _to_proc
+     self
+   end
+
    def call(*args)
      # invoked when yield used with no block argument
      raise LocalJumpError , 'no block was passed'
