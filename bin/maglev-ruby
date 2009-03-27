@@ -132,7 +132,7 @@ run
 | res ctx |
 (ctx := RubyContext) load .
 ctx default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
-res := ctx loadFileNamed: '$RUBYSCRIPT'.
+res := ctx default runFileNamed: '$RUBYSCRIPT'.
 GsFile stdout close . "ensure final LF on stdout"
 ^ res
 %
