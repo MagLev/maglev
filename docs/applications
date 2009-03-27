@@ -23,6 +23,11 @@ MagLev does not currently support (at least) the following Rack features:
 Version 0.9.0.4 of Sinatra is in <tt>src/external/Sinatra</tt>.   Much of
 Sinatra runs, but some things don't.
 
+The following items seem to work (at least in the simple case)
+* Routes
+* Source code reloading
+* Views (erb)
+
 The following items are known not to work:
 
 * Cookies and Cookie based sessions
