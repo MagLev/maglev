@@ -16,6 +16,7 @@ Sinatra
   License: MIT
 
 benchmark
+  (moved to $MAGLEV_HOME/benchmark)
   Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.
 
 racktest.rb
