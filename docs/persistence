@@ -5,7 +5,7 @@ To persist an object in MagLev, two conditions need to apply:
 2. The state of the local VM must be committed to the central repository
    (stone).
 
-=== Reachable from a persitent root
+=== Reachable from a persistent root
 
 To achieve #1, make sure your object is stored in a global variable, or
 reachable starting from a global variable.  E.g., from the hat trick,

@@ -72,9 +72,7 @@ You should now be able to run a simple ruby script:
   puts "Hello from MagLev"
   ^D
   $ maglev-ruby hello.rb
-  topaz 1> Hello from MagLev
-  nil
-  topaz 1>
+  Hello from MagLev
   $
 
 === <tt>maglev-irb</tt>: Open an interactive maglev shell
@@ -128,7 +126,8 @@ Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 Persistence[link:files/docs/persistence.html]:: Persistence and transactions
-Benchmarks[link:files/docs/Benchmarks.html]:: Ruby Benchmark Suite benchmarks
+Benchmarks[link:files/docs/benchmarks.html]:: Ruby Benchmark Suite benchmarks
+Applications[link:files/docs/applications.html]:: Sample Ruby apps we're testing in MagLev
 
 == Hints:
 * set <tt>MAGLEV_HOME</tt> to the full path of this directory, and add
@@ -136,9 +135,6 @@ Benchmarks[link:files/docs/Benchmarks.html]:: Ruby Benchmark Suite benchmarks
   <tt>maglev-ruby</tt> etc. from anywhere.
 * if you have multiple installations, set <tt>PARSETREE_PORT</tt> to
   control which port the parser server listens on
-* <tt>maglev-ruby</tt> prints a topaz banner every time it is
-  run. <tt>maglev-irb</tt> does not, but it will make errors more difficult
-  to debug, as they won't return to Topaz.
 
 == Ruby code:
 * <tt>src/</tt> and <tt>src/lib/</tt> are both on the require path

@@ -21,6 +21,12 @@ Also note that you must be using ParseTree 3.0.3 or later
 You can check which version you have installed with:
   gem list --local
 
+=== Using a different default MRI version
+If the current MRI version on your machine is not 1.8.6 patchlevel 287, you have two options for running MagLev 
+
+1. Upgrade the default MRI installation to 1.8.6 patchlevel 287
+2. Install a separate MRI 1.8.6 patchlevel 287, including the ParseTree 3.0.3 gem. Set the environment variable RUBY186P287 to the bin/ruby for that MRI installation.
+
 === lsof
 
 'maglev status' uses the lsof command to see if the parse server

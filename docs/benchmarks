@@ -1,9 +1,7 @@
 == MagLev Benchmarks
 
 The benchmark directory contains a copy of Brian Ford's refactoring of the
-Ruby Benchmark Suite project as used by the Rubinius project. We made
-a one line change to bench.rb to ensure it runs in MagLev as well as
-other Ruby implementations.
+Ruby Benchmark Suite project as used by the Rubinius project. 
 
 The primary Ruby Benchmark Suite project is at:
   http://github.com/acangiano/ruby-benchmark-suite/
