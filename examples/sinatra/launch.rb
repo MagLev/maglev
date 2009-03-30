@@ -11,7 +11,7 @@ options = { :Port => 4567, :Host => "0.0.0.0" }
 require 'rack'
 config = 'config.ru'
 cfgfile = File.read(config)
-inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", TOPLEVEL_BINDING, config
+inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", nil, config
 server = Rack::Handler::WEBrick
 app = Rack::Builder.new {
   use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
