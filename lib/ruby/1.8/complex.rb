@@ -398,7 +398,7 @@ class Complex < Numeric
   #
   # +I+ is the imaginary number.  It exists at point (0,1) on the complex plane.
   #
-  I = Complex(0,1)
+  # I = Complex(0,1) # Gemstone, moved
   
   # The real part of a complex number.
   attr :real
@@ -409,8 +409,11 @@ class Complex < Numeric
   
 end
 
-
-
+class Complex
+  # +I+ is the imaginary number.  It exists at point (0,1) on the complex plane.
+  
+  I = Complex(0,1)  # Gemstone , create first instance after defining class
+end
 
 module Math
   alias sqrt! sqrt
