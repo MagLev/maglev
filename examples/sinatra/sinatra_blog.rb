@@ -24,16 +24,16 @@ $:.unshift(SINATRA_DIR)
 $:.unshift(RACK_DIR)
 $:.unshift(File.dirname(__FILE__))
 
-RubyContext.load_context
+#RubyContext.load_context
 
 require 'sinatra'
 require 'post'
 require 'blog'
-require 'maglev_transaction_wrapper'
+#require 'txn_wrapper'
 
 # Rack middleware to wrap http requests in a gemstone transaction.  Only
 # data will be saved, not methods...
-use MagLevTransactionWrapper
+#use MagLevTransactionWrapper
 
 configure(:development) do
   set :server, 'webrick'
@@ -49,74 +49,46 @@ helpers do
     $blogs ||= { }
   end
 
+  # Ensures that there is not already a blog named +name+, and then creates
+  # the blog Raises an exception if the name is already used.  Returns the
+  # new blog.
+  #
+  # TODO: What is the Sinatra way of redirecting etc.?
+  def create_blog(name)
+    blog = $blogs[name]
+    raise "A blog named '#{name}' already exists" unless blog.nil?
+    blog = Blog.new(name)
+    $blogs[name] = blog
+    blog
+  end
+
   def get_blog(name)
-    $blogs.detect { |blog| blog.name == b_name }
+    $blogs[name]
     # TODO: Raise or redirect from here if can't find the blog?
   end
 end
 
 get '/' do
-  blogs = all_blogs
-  if blogs.empty?
-    "There are no blogs<br />" + new_post_link
-  else
-    "<ul>" + posts.all.collect do |post|
-      "<li>#{post[:title]} - #{post.body}</li>"
-    end + "</ul><br />" + new_post_link
-  end
+  puts "============= get '/'"
+  @blogs = all_blogs
+  erb :blogs
 end
 
-post '/blogs/:name' do
-  b_name = params[:name]
-  # TODO: Move this to ActiveObject...
-  cur_blog = all_blogs.detect { |blog| blog.name == b_name }
-  raise "A blog named '#{b_name}' already exists" unless cur_blog.nil?
-  cur_blog = Blog.new(:name)
-  all_blogs << cur_blog
-  redirect "/blogs/#{name}/"  # TODO: Make sure this is a get
-end
-
-get '/blogs/:name/' do
+get '/blogs/:name' do
+  puts "============= get '/blogs/:name'"
   name = params[:name]
-  blog = get_blog(name)
-  if blog.nil?
-    "ERROR: Couldn't find #{blog}"  # TODO redirect
-  else
-    "<ul>" + posts.all.collect do |post|
-      "<li>#{post[:title]} - #{post.body}</li>"
-    end + "</ul><br />" + new_post_link
-  end
+  @blog = get_blog(name)
+  raise "Can't find blog '#{name}'" if @blog.nil?
+  erb :index
 end
 
-# get '/:blog' do
-#   blog = blogs.
-# end
-# get '/new' do
-#   body do
-#     <<-eos
-#       <h3>Add a new post</h3>
-#         <form action="/create" method="post">
-#         <label for="title">Title</label><br />
-#         <input type="text" name="title" /><br />
-#         <label for="body">Body</label><br />
-#         <textarea name="body"></textarea><br />
-#         <input type="submit" name="submit" value="Add" />
-#       </form>
-#     eos
-#   end
-# end
+# Create a new blog
+post '/blogs' do
+  puts "============= post '/blogs'"
+  # TODO: check params for nil etc.
+  # TODO: properly quote and otherwise validate name
+  name = params[:name]
+  create_blog(name)
+  redirect "/blogs/#{name}"
+end
 
-# post '/create' do
-#   title, body = params[:title], params[:body]
-#   puts "==== /create   title: #{title}"
-
-# #  posts.insert(:title => title, :body => body)
-# #  posts.insert(params)
-#   redirect '/'
-# end
-
-# get '/index' do
-#   @title = "Erb Test"
-#   @body = "It works..."
-#   erb :index
-# end

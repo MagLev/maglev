@@ -12,13 +12,11 @@ require 'rack'
 config = 'config.ru'
 cfgfile = File.read(config)
 inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", TOPLEVEL_BINDING, config
-#inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", binding, config
-#inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", binding, config
 server = Rack::Handler::WEBrick
 app = Rack::Builder.new {
   use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
   use Rack::ShowExceptions
-  use Rack::Lint
+#  use Rack::Lint
   run inner_app
 }.to_app
 

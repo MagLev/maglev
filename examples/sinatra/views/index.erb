@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <title><%= @title %></title>
-  </head>
-  <body>
-    <%= @body %>
-  </body>
-</html>
+<!-- The index page for a blog -->
+<% if @blog.empty? %>
+   <p>There are no posts for this blog</p>
+<% else %>
+  <ul>
+    <% @blog.each do |post| %>
+      <li><%= post[:title] %> - <%= post.body %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+

@@ -17,5 +17,5 @@ set :app_file, __FILE__
 # STDOUT.reopen(log)
 # STDERR.reopen(log)
 
-require 'simple_sinatra.rb'
+require 'sinatra_blog.rb'
 run Sinatra::Application

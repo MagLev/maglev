@@ -1,22 +1,13 @@
 puts "=== READING blog.rb"
-class Blog
-  attr_reader :name, :posts
+class Blog < Array
+  attr_reader :name
 
   def initialize(name)
     @name = name
-    @posts = []
   end
 
   def add_post(a_post)
-    @posts << a_post
-  end
-
-  def empty?
-    @posts.empty?
-  end
-
-  def [](index)
-    @posts[index]
+    self << a_post
   end
 end
 
