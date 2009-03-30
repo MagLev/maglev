@@ -6,6 +6,7 @@ class Object
   def taint
     # if frozen, primitive signals TypeError for gemstone error 2031
     @tainted = true
+    self
   end
 
   def tainted?
@@ -15,5 +16,6 @@ class Object
   def untaint
     # if frozen, primitive signals TypeError for gemstone error 2031
     @tainted = false
+    self
   end
 end
