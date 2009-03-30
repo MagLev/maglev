@@ -81,7 +81,7 @@ class IO
     n = 0
     while (n < lim)
       elem = args[n]
-      if elem.nil?
+      if elem.equal?(nil)
         write("nil")
       else
         unless (elem._isString)
@@ -92,7 +92,8 @@ class IO
       n = n + 1
     end
 
-    write($\) unless $\.nil?
+    sep = $\
+    write(sep) unless sep.equal?(nil)
   end
 
   def printf(format, *args)

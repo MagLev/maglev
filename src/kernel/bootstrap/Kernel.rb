@@ -199,10 +199,11 @@ module Kernel
   # def proc ...  in Kernel2.rb
 
   def puts(*args)
-    if STDOUT.nil?
+    f = STDOUT
+    if f.equal?(nil)
       raise "STDOUT is nil in Kernel.puts!"
     else
-      STDOUT.puts(*args)
+      f.puts(*args)
     end
     nil
   end

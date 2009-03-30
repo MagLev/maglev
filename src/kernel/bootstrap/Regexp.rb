@@ -62,7 +62,7 @@ class Regexp
   end
 
   def match_from(str, count)
-    return nil if str.nil? || count >= str.size
+    return nil if str.equal?(nil) || count >= str.size
     search_region(str, count, str.size, true)
   end
   # END RUBINIUS
@@ -271,7 +271,7 @@ class Regexp
     md = self._search(string, offset, 0)
     md._storeRubyVcGlobal(0x20)
     return nil if md.equal?(nil)
-    return md.begin(0) if md[0].nil?
+    return md.begin(0) if md[0].equal?(nil)
     match_len = md.end(0) - md.begin(0)
     return md.begin(0) + 1 if match_len.equal?(0)
     md.begin(0)

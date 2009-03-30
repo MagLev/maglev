@@ -472,7 +472,7 @@ class String
       st_idx = self._indexOfLastByte(item % 256 , offset)
     elsif item._isRegexp
       st_idx = item._rindex_string(self, offset - 1)
-      return nil if st_idx.nil?
+      return nil if st_idx.equal?(nil)
       st_idx += 1
     else
       coerced = Type.coerce_to(item, String, :to_str)
@@ -536,7 +536,7 @@ class String
     if pattern == ' '
       spaces = true
       pattern = /\s+/
-    elsif pattern.nil?
+    elsif pattern.equal?(nil)
       pattern = /\s+/
     elsif pattern.kind_of?(Regexp)
       # Pass
@@ -571,9 +571,9 @@ class String
       last_match = match
     end
 
-    if !last_match.nil?           # GEMSTONE
+    if ! last_match.equal?(nil)           # GEMSTONE
       pm = last_match.post_match  # GEMSTONE
-      ret << (pm.nil? ? "" : pm)  # GEMSTONE
+      ret << (pm.equal?(nil) ? "" : pm)  # GEMSTONE
     elsif ret.empty?
       ret << self.dup
     end
