@@ -61,7 +61,7 @@ class Dir
   # value of File.umask()
   def self.mkdir(dirname, permissions=0777)
     # MRI does not allow conversion of nil to 0 for this method...
-    raise TypeError, "no implicit conversion from nil to integer" if permissions.nil?
+    raise TypeError, "no implicit conversion from nil to integer" if permissions.equal?(nil)
     permissions = Type.coerce_to(permissions, Integer, :to_i)
     Errno.handle(_mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
   end
@@ -92,7 +92,7 @@ class Dir
         d = Dir.new dirname
         result = yield d
       ensure
-        d.close unless d.nil?
+        d.close unless d.equal?(nil)
       end
       result
     else

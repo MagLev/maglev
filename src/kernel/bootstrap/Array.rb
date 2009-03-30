@@ -840,7 +840,7 @@ class Array
       self[x,y] = []
     else
       result = self[x]
-      unless result.nil?
+      unless result.equal?(nil)
         self.delete_at(x)
       end
     end

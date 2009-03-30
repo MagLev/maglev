@@ -58,13 +58,13 @@ class File
     return '/' if fn.eql?('/')
 
     b = fn.split('/')[-1]
-    return '' if b.nil?
+    return '' if b.equal?(nil)
 
     if suffix.eql?('.*')
       index = b.rindex('.')
     else
       index = b.rindex(suffix)
-      if (not index.nil?) && ((index + suffix.size) != b.size)
+      if (not index.equal?(nil)) && ((index + suffix.size) != b.size)
         index = nil
       end
     end
@@ -227,7 +227,7 @@ class File
   def self.extname(filename)
     base = self.basename(filename)
     index = base.rindex('.')
-    return '' if index.nil? || index == (base.size - 1)
+    return '' if index.equal?(nil) || index == (base.size - 1)
     base[index..-1]
   end
 
