@@ -3,38 +3,51 @@
 
 class Numeric
 
+  def coerce(param)
+    raise TypeError, 'numeric coercion failed'
+    [ nil, nil]
+  end
+
     primitive '<=>', '_rubyCompare:'
 
 # unaries  +@  -@  eliminated during IR generation by compiler
 
     primitive 'abs', 'abs'
-    primitive 'ceil', '_rubyCeiling'
+   
+    def ceil
+      f = Type.coerce_to(self, Float, :to_f)
+      f.ceil
+    end
 
-# coerce is a subclass responsiblity
-#   the implementation in Number just generates subclassResponsibility error
-    primitive 'coerce', '_rubyCoerce:'
+    def div(arg)
+      q = self / arg
+      q.to_int
+    end
 
+    def quo(arg)
+      self / quo
+    end
 
-#           Note some of the "implemented in subclasses" might need
-#           implementation in Numeric to support user-defined subclasses
-# div implemented in subclasses
-
-    primitive 'divmod', '_divmod:'
+    def divmod(arg)
+      a = Type.coerce_to(arg, Float, :to_f)
+      q = (self / a).floor
+      r = self - (q * a)
+      [ q, r ]
+    end  
 
 # eql?  implemented in subclasses
 #  floor implemented in subclasses
-
-    primitive '_frexp', '_frexp'
 
         primitive 'hash'
 
     primitive 'integer?', '_isInteger'
 
-#  modulo implemented in subclasses
 #  nonzero?  implemented in subclasses
 #  quo   implemented in subclasses
 
-    primitive 'remainder', '_rubyRem:'
+    def modulo(arg)
+      (self.divmod(arg))[1]
+    end
 
 # round implemented in subclasses
 
@@ -54,10 +67,5 @@ class Numeric
     def -@
         self * -1
     end
-
-    primitive 'sin'
-    primitive 'cos'
-    primitive 'tan'
-    primitive 'sqrt'
 end
 

@@ -10,41 +10,40 @@ class Fixnum
 
   primitive_nobridge '_isSpecial', 'isSpecial'
 
-  primitive_nobridge '<'
-  primitive_nobridge '>'
-  primitive_nobridge '<='
-  primitive_nobridge '>='
+  primitive '<',  '_rubyLt:'
+  primitive '<=', '_rubyLteq:'
+  primitive '>' , '_rubyGt:'
+  primitive '>=', '_rubyGteq:'
+  primitive '==', '_rubyEqual:'
 
   #  /    # note division does not produce Fractions in Ruby
   primitive_nobridge '/', '_rubyDivide:'
 
   #   Ruby  %   maps to  Smalltalk #'\\'
-  primitive_nobridge '%', '\\\\'
+  primitive_nobridge '%', '_rubyModulus:'
 
-  primitive_nobridge '**' , 'raisedTo:'
+  primitive_nobridge '**' , '_rubyRaisedTo:'
 
   # unaries  +@  -@  eliminated during IR generation by compiler
 
   primitive_nobridge '~', 'bitInvert'
-  primitive_nobridge '|', 'bitOr:'
-  primitive_nobridge '&', 'bitAnd:'
-  primitive_nobridge '^', 'bitXor:'
-  primitive_nobridge '<<', 'bitShift:'
-  primitive_nobridge '>>', '_bitShiftRight:'
+  primitive_nobridge '&', '_rubyBitAnd:'
+  primitive_nobridge '|', '_rubyBitOr:'
+  primitive_nobridge '^', '_rubyBitXor:'
+  primitive_nobridge '<<', '_rubyShiftLeft:'
+  # >> inherited from Integer
 
   primitive_nobridge '<=>', '_rubyCompare:'
   primitive_nobridge '[]', 'bitAt:'
   primitive 'abs', 'abs'
 
-  primitive 'div', '//'
-  # divmod inherited from Numeric
+  alias div /
 
   primitive 'id2name', '_ruby_id2name'
 
-  #    modulo   maps to Smalltalk  #'\\'
-  primitive 'modulo', '\\\\'
+  alias modulo %
 
-  primitive_nobridge 'quo', '_rubyQuo:'
+  # quo inherited from Integer
   primitive 'size', '_rubySize'
   primitive 'to_f', 'asFloat'
 

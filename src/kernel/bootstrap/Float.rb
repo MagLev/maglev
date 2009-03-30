@@ -3,10 +3,23 @@
 #
 
 class SmallDouble
+
   primitive_nobridge '_isSpecial', 'isSpecial'
 end
 
 class Float
+
+  def coerce(param)
+    begin
+      v = param.to_f
+      if v._isFloat
+        return [ v, self ]
+      end
+    rescue
+      # continue execution
+    end
+    super
+  end
 
   # Float constants 
       # changing any of the constants at runtime will only change the constant
@@ -25,56 +38,96 @@ class Float
                 # ROUNDS is made invariant by code in RubyContext 
 	        #  because there is no support for changing rounding mode in the VM.
 
-	primitive '+', '+'
-	primitive '-', '-'
-	primitive '*', '*'
-	primitive '/', '/'
+	primitive_nobridge '+', '_rubyAdd:'
+	primitive_nobridge '-', '_rubySubtract:'
+	primitive_nobridge '*', '_rubyMultiply:'
+	primitive_nobridge '/', '_rubyDivide:'
 
-#    %  maps to  Smalltalk  #'\\' , will use the implementation in Number
-	primitive '%', '\\\\'
+        def div(arg)
+          q = self / arg 
+          q.floor
+        end
 
-#   ** uses   raiseTo:  which  coerces argument to a Float first .
-	primitive '**', 'raisedTo:'
+        # quo inherited from Numeric
+        # divmod inherited from Numeric
+
+        def %(arg)
+          (self.divmod(arg))[1]
+        end
+
+	primitive_nobridge '_raised_to', '_rubyRaisedTo:'
+        def **(arg)
+          a = Type.coerce_to(arg, Float, :to_f)
+          self._raised_to(a)
+        end
 
 # unaries  +@  -@  eliminated during IR generation by compiler
 
-	primitive '<=>', '_rubyCompare:'
-	primitive '<'
-	primitive '<='
-	primitive '>'
-	primitive '>='
-	primitive '==', '='
+	primitive_nobridge '<=>', '_rubyCompare:'
+	primitive_nobridge '<',  '_rubyLt:'
+	primitive_nobridge '<=', '_rubyLteq:'
+        def >(arg)
+          arg < self
+        end
+	def >=(arg)
+          arg <= self
+        end
+	primitive_nobridge '==', '_rubyEqual:'
+	#  primitive '!=', '_rubyNotEqual:'
 
-	primitive 'abs', 'abs'
-	primitive 'ceil', 'ceiling'
+	primitive_nobridge 'abs', 'abs'
+	primitive_nobridge 'ceil', 'ceiling'
 
-	primitive 'divmod', '_divmod:'
+	primitive_nobridge 'eql?', '_ruby_eqlQ:'
 
-	primitive 'eql?', '_ruby_eqlQ:'
+	primitive_nobridge 'finite?', '_ruby_finiteQ'
+	primitive_nobridge 'floor', 'floor'
+	primitive_nobridge 'hash'
+	primitive_nobridge 'infinite?', '_ruby_infiniteQ'
 
-	primitive 'finite?', '_ruby_finiteQ'
-	primitive 'floor', 'floor'
-	primitive 'hash'
-	primitive 'infinite?', '_ruby_infiniteQ'
-
-#    modulo   maps to Smalltalk  #'\\' 
-	primitive 'modulo' , '\\\\'
-
-	primitive 'nan?', '_isNaN'
-	primitive 'round', 'rounded'
-	primitive 'to_f' , 'asFloat'
-	primitive 'to_i' , 'truncated'
-	primitive 'to_int' , 'truncated'
-	primitive 'to_s' , '_rubyAsString'  
-	primitive 'truncate' , 'truncated'
-	primitive 'zero?' , '_rubyEqualZero'
+	primitive_nobridge 'nan?', '_isNaN'
+	primitive_nobridge 'round', 'rounded'
+	primitive_nobridge 'to_f' , 'asFloat'
+	primitive_nobridge 'to_i' , 'truncated'
+	primitive_nobridge 'to_int' , 'truncated'
+	primitive_nobridge 'to_s' , '_rubyAsString'  
+	primitive_nobridge 'truncate' , 'truncated'
+	primitive_nobridge 'zero?' , '_rubyEqualZero'
   
 # Note: nonstandard meth to format Float - for use by Benchmark 
   primitive 'to_fmt' , '_rubyAsFormattedString' 
 	
 #  methods from Numeric
-	primitive 'coerce', '_rubyCoerce:'
-	primitive 'floor', 'floor'
-	primitive 'nonzero?', '_rubyNonzero'
+	primitive_nobridge 'floor', 'floor'
+	primitive_nobridge 'nonzero?', '_rubyNonzero'
 
+# trig methods used by Math
+       primitive_nobridge 'acos', 'arcCos'
+       primitive_nobridge 'acosh', 'arcCosh'
+       primitive_nobridge 'asin', 'arcSin'
+       primitive_nobridge 'asinh', 'arcSinh'
+       primitive_nobridge 'atan', 'arcTan'
+       primitive_nobridge 'atanh', 'arcTanh'
+
+       primitive_nobridge 'cos', 'cos'
+       primitive_nobridge 'cosh', 'cosh'
+       primitive_nobridge 'erf', 'erf'
+       primitive_nobridge 'erfc', 'erfc'
+       primitive_nobridge 'exp', 'exp'
+       primitive_nobridge 'frexp', 'frexp'
+       primitive_nobridge 'log', 'ln'
+       primitive_nobridge 'log2', 'log2'
+       primitive_nobridge 'log10', 'log10'
+       primitive_nobridge  'modf', 'modf'
+       primitive_nobridge 'sin', 'sin'
+       primitive_nobridge 'sinh', 'sinh'
+       primitive_nobridge 'sqrt', 'sqrt'
+       primitive_nobridge 'tan', 'tan'
+       primitive_nobridge 'tanh', 'tanh'
+
+       # following 3 not intented for public use, 
+       #  coercion of arguments is done in Math.rb
+       primitive_nobridge '_atan2', 'arcTan2:'
+       primitive_nobridge '_hypot', 'hypot:'
+       primitive_nobridge  '_ldexp', 'ldexp:'
 end

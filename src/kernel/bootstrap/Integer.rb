@@ -9,6 +9,18 @@
 
 class Integer
 
+  def coerce(param)
+    begin
+      v = param.to_int
+      if v._isInteger
+        return [ v, self ]
+      end
+    rescue
+      # continue execution
+    end
+    super
+  end
+
     # following 3 prims contain handler for RubyBreakException
     primitive 'times&', '_rubyTimes:'
     # def times(&block) ; end 
@@ -36,42 +48,92 @@ class Integer
     def succ
       self + 1
     end
-        primitive_nobridge '+', '+'
-        primitive_nobridge '-', '-'
-        primitive_nobridge '*', '*'
+        primitive_nobridge '+', '_rubyAdd:'
+        primitive_nobridge '-', '_rubySubtract:'
+        primitive_nobridge '*', '_rubyMultiply:'
         primitive_nobridge '/', '_rubyDivide:'
 
-#   Ruby  %   maps to  Smalltalk #'\\'
-        primitive_nobridge '%', '\\\\'
+        primitive_nobridge '%', '_rubyModulus:'
 
-        primitive_nobridge '**' , 'raisedTo:'
+        primitive_nobridge '**', '_rubyRaisedTo:'
 
-        primitive_nobridge '|', 'bitOr:'
-        primitive_nobridge '&', 'bitAnd:'
-        primitive_nobridge '^', 'bitXor:'
-        primitive_nobridge '<<', 'bitShift:'
-        primitive_nobridge '>>', '_bitShiftRight:'
+        def _fraised_to(arg)
+          # handles coercion for _rubyRaisedTo:
+          if arg._isInteger 
+            raise TypeError , 'coercion error in ** '
+          else
+            s = Type.coerce_to(self, Float, :to_f)
+            s ** arg 
+          end
+        end 
 
-#  <=> inherited from Numeric
+        primitive_nobridge '&', '_rubyBitAnd:'
+        primitive_nobridge '|', '_rubyBitOr:'
+        primitive_nobridge '^', '_rubyBitXor:'
+        primitive_nobridge '<<', '_rubyShiftLeft:'
+
+        def >>(arg)
+          self << ( 0 - arg )
+        end
+
+       # following handle primitive failures of  _rubyBitOr:, etc
+       def _bit_and(arg)
+         a = Type.coerce_to(arg, Integer, :to_int) 
+         self & a 
+       end
+
+       def _bit_or(arg)
+         a = Type.coerce_to(arg, Integer, :to_int) 
+         self | a 
+       end
+
+       def _bit_xor(arg)
+         a = Type.coerce_to(arg, Integer, :to_int) 
+         self ^ a 
+       end
+
+       def _shift_left(arg)
+         a = Type.coerce_to(arg, Integer, :to_int) 
+         self << a 
+       end
+
+     primitive '<',  '_rubyLt:'
+     primitive '<=', '_rubyLteq:'
+     primitive '>' , '_rubyGt:'
+     primitive '>=', '_rubyGteq:'
+     primitive '==', '_rubyEqual:'
+
+    #  <=> inherited from Numeric
 
         primitive_nobridge '[]', 'bitAt:'
 
 #  abs inherited from Numeric
 
-        primitive_nobridge '==', '='
+     def ceil
+       self
+     end
 
         primitive 'eql?', '_ruby_eqlQ:'
 
-        primitive 'div', '_rubyDivide:'
+        alias div /
 
-# divmod inherited from Numeric
+        def divmod(arg)
+          if arg._isInteger
+            q = self / arg
+            r = self - (q * arg)
+            [ q, r ]
+          else
+            super
+          end
+        end
 
         primitive 'hash'
 
-#    modulo   maps to Smalltalk  #'\\'
-        primitive 'modulo', '\\\\'
+        alias modulo %
 
-        primitive 'quo', '_rubyQuo:'
+        def quo(param)
+           (self.to_f ) / param
+        end
 
 #  remainder  inherited from numeric
 
@@ -83,7 +145,6 @@ class Integer
         primitive 'truncate' , 'truncated'
 
 #  methods from Numeric
-        primitive 'coerce', '_rubyCoerce:'
         primitive 'floor', 'floor'
         primitive 'nonzero?', '_rubyNonzero'
         primitive 'round', 'rounded'
