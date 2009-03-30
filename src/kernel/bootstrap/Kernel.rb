@@ -73,13 +73,19 @@ module Kernel
   primitive_nobridge '_eval', '_eval:binding:with:'
   primitive_nobridge '_eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
-  def eval(str, binding, file_name, line_number)
-    unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
-    # use 0x3? because one extra stack frame due to bridging methods .
+  def eval(str, binding, file_name, line_number=1 )
+    # use _binding_ctx(1) and 0x3? because one extra stack frame due to bridging methods .
     # max send site is :::* , call is via a :::* to :::: bridge meth .
+    if binding.equal?(nil)
+      ctx = self._binding_ctx(1)
+      bnd = Binding.new(ctx, self, nil)
+    else
+      bnd = binding
+      unless bnd.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+    end
     vcgl = [ self._getRubyVcGlobal(0x30) ,
       self._getRubyVcGlobal(0x31) , nil ]
-    res = _eval_with_position(str, binding, vcgl, file_name, line_number )
+    res = _eval_with_position(str, bnd, vcgl, file_name, line_number )
     vcgl[0]._storeRubyVcGlobal(0x30)
     vcgl[1]._storeRubyVcGlobal(0x31)
     res
@@ -98,20 +104,16 @@ module Kernel
   end
 
   def eval(str, binding)
-    unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+    if binding.equal?(nil)
+      ctx = self._binding_ctx(0)
+      bnd = Binding.new(ctx, self, nil)
+    else
+      bnd = binding
+      unless bnd.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+    end
     vcgl = [ self._getRubyVcGlobal(0x20) ,
       self._getRubyVcGlobal(0x21), nil ]
-    res = _eval(str, binding, vcgl )
-    vcgl[0]._storeRubyVcGlobal(0x20)
-    vcgl[1]._storeRubyVcGlobal(0x21)
-    res
-  end
-
-  def eval(str, binding, file_not_used)
-    unless binding.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
-    vcgl = [ self._getRubyVcGlobal(0x20) ,
-      self._getRubyVcGlobal(0x21) , nil ]
-    res = _eval(str, binding, vcgl )
+    res = _eval(str, bnd, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
