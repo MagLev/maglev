@@ -1,5 +1,5 @@
-# This is (going to be) an example of maglev persistence on unordered
-# collections with indexing.
+# This is an example of maglev persistence on unordered collections with
+# indexing.
 #
 $:.unshift File.dirname(__FILE__)
 
@@ -62,6 +62,11 @@ class Person
   end
 end
 
+# Indexes are used to find elements in an otherwise unordered collection.
+# E.g., Hashes already have a way of efficiently finding an element, but
+# sets do not.  We will create an unordered collection, then add an index
+# on the age field of elements of the set.  We can then efficiently search
+# and sort by age on the set.
 people = IdentitySet.new
 people._create_index('age', Fixnum)
 
@@ -94,5 +99,6 @@ Benchmark.bm do |x|
   end
 end
 
-# TODO: Clean up the indexes....
+# TODO: Clean up the indexes.  The indexes are permanently stored, and
+# must be cleaned up explicitly.
 people._remove_index('age')
