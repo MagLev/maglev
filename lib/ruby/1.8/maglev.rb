@@ -19,7 +19,8 @@
 #
 #   * Expose env1 vs env0 vs envNN?
 #
-module MagLev  # TODO: "MagLev" or "Maglev"?
+puts "== reading lib/ruby/1.8/maglev.rb"
+module Maglev  # TODO: "MagLev" or "Maglev"?
 
   # This module exposes three methods to commit, abort and begin a
   # transaction, but also manages the ruby context to ensure that both code

@@ -6,7 +6,11 @@
 #
 # TODO: Should HTTP redirects commit or not?
 #
+
+require 'maglev.rb'
 class MagLevTransactionWrapper
+  include Maglev::CodeAndData
+
   def initialize(app)
     @app = app
   end
@@ -18,11 +22,14 @@ class MagLevTransactionWrapper
       status, headers, body = @app.call env
       [status, headers, body]
     ensure
-      puts "=== End Transaction"
       if good_status?(status)
-        Gemstone.commitTransaction if running_maglev?
+        puts "=== Commit Transaction"
+        #Gemstone.commitTransaction if running_maglev?
+        commit_txn if running_maglev?
       else
-        Gemstone.abortTransaction  if running_maglev?
+        puts "=== Abort Transaction"
+        #Gemstone.abortTransaction  if running_maglev?
+        Gemstone.abort_txn  if running_maglev?
       end
     end
   end

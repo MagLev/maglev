@@ -1,6 +1,6 @@
 puts "=== READING blog.rb"
 class Blog
-  attr_reader :name
+  attr_reader :name, :posts
 
   def initialize(name)
     @name = name
@@ -9,10 +9,6 @@ class Blog
 
   def add_post(a_post)
     @posts << a_post
-  end
-
-  def all
-    @posts # Dangerous... caller could erase all of our posts!
   end
 
   def empty?
