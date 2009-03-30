@@ -20,4 +20,11 @@ test(template.result(binding), "The value of x is 42", "ERB 1")
 # test(ERB.new(s).result,          "  \n      UGLY\n  \n", 'ERB defaulting to TOPLEVEL_BINDING')
 # test(ERB.new(s).result(binding), "  \n      UGLY\n  \n", 'ERB using new binding')
 
+# A test for trac 390
+# template = ERB.new "<%= yield %>"
+# def get_binding
+#   binding
+# end
+# test(template.result(get_binding { 25 }), 25, 'Trac 390')
+
 report
