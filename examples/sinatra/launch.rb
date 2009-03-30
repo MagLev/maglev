@@ -15,7 +15,7 @@ inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", nil, config
 server = Rack::Handler::WEBrick
 app = Rack::Builder.new {
   use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
-  use Rack::ShowExceptions
+#  use Rack::ShowExceptions
 #  use Rack::Lint
   run inner_app
 }.to_app
