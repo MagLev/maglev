@@ -209,6 +209,10 @@ class Proc
     end
 
     # TODO: binding
+    #  creating a Binding from a Proc is not yet supported.
+    #  The block from which the Proc was created does not
+    #  necessarily have a VariableContext so it may not even
+    #  be possible to create a complete Binding.
 
     def inspect(touchedSet=nil)
       "#<Proc>"

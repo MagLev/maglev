@@ -3,6 +3,7 @@ class ThreadGroup
   # Constant ThreadGroup::Default not implementable, 
   #   cannot be persistent in the name space
   #   use  self.default instead
+  # TODO, need Ruby API to create a transient constant
 
   # def self.default; end #  returns the equivalent of  ThreadGroup::Default
   class_primitive_nobridge 'default', 'default'
