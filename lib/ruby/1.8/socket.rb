@@ -1,5 +1,2 @@
-class Socket
-    def self.gethostname
-        "localhost"
-    end
-end
+# Socket is fully loaded by the bootstrap
+#
