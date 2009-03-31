@@ -91,4 +91,3 @@ post '/blogs' do
   create_blog(name)
   redirect "/blogs/#{name}"
 end
-

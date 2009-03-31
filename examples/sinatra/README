@@ -45,6 +45,10 @@ the initial VM, but no new VMs, started via 'maglev-ruby sinatra_blog.rb',
 will actually invoke the app.
 
 
+Limitations
+-----------
 
+* Right now, doing "<%= yield %>" doesn't work in an ERB template, so we're
+  not using layouts with yield yet.
 
 

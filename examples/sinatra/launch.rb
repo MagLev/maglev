@@ -1,15 +1,18 @@
 # Since RubyGems isn't working, and we need some rackup help, this
 # emulates loading the rack gem and kicking off rackup
 
-sinatra_dir = File.dirname(__FILE__) + '/../../src/external/Sinatra/lib'
-rack_dir    = File.dirname(__FILE__) + '/../../src/external/Rack/lib'
-rackup      = File.dirname(__FILE__) + '/../../src/external/Rack/bin/rackup'
+here = File.dirname(__FILE__)
+sinatra_dir = here + '/../../src/external/Sinatra/lib'
+rack_dir    = here + '/../../src/external/Rack/lib'
+rackup      = here + '/../../src/external/Rack/bin/rackup'
+
 $:.unshift(sinatra_dir)
 $:.unshift(rack_dir)
+$:.unshift(here)
 
 options = { :Port => 4567, :Host => "0.0.0.0" }
 require 'rack'
-config = 'config.ru'
+config = here + '/config.ru'
 cfgfile = File.read(config)
 inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", nil, config
 server = Rack::Handler::WEBrick
