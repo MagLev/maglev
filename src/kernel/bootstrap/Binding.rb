@@ -12,4 +12,8 @@ class Binding
     # if this code changed see also RubyBinding>>ctx:mainSelf: 
   end
 
+  def block
+    @block
+  end
+
 end
