@@ -13,7 +13,7 @@ class Numeric
 # unaries  +@  -@  eliminated during IR generation by compiler
 
     primitive 'abs', 'abs'
-   
+
     def ceil
       f = Type.coerce_to(self, Float, :to_f)
       f.ceil
@@ -33,7 +33,7 @@ class Numeric
       q = (self / a).floor
       r = self - (q * a)
       [ q, r ]
-    end  
+    end
 
 # eql?  implemented in subclasses
 #  floor implemented in subclasses
@@ -60,7 +60,12 @@ class Numeric
     end
 
 
-# to_int  implemented in subclasses
+    # to_int implemented in subclasses, but this default implementation is
+    # here for library classes like Rational.
+    def to_int
+      self.to_i
+    end
+
 # truncated implemented in subclasses
 # zero?  implemented in subclasses
 
