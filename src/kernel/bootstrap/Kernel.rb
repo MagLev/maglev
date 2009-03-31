@@ -85,6 +85,10 @@ module Kernel
     end
     vcgl = [ self._getRubyVcGlobal(0x30) ,
       self._getRubyVcGlobal(0x31) , nil ]
+    blk = bnd.block
+    unless blk.equal?(nil)
+      vcgl << blk
+    end
     res = _eval_with_position(str, bnd, vcgl, file_name, line_number )
     vcgl[0]._storeRubyVcGlobal(0x30)
     vcgl[1]._storeRubyVcGlobal(0x31)
@@ -97,6 +101,24 @@ module Kernel
     bnd = Binding.new(ctx, self, nil)
     vcgl = [ self._getRubyVcGlobal(0x20) ,
              self._getRubyVcGlobal(0x21) , self ]
+    blk = bnd.block
+    unless blk.equal?(nil)
+      vcgl << blk
+    end
+    res = _eval(str, bnd, vcgl )
+    vcgl[0]._storeRubyVcGlobal(0x20)
+    vcgl[1]._storeRubyVcGlobal(0x21)
+    res
+  end
+
+  def eval(str, &blk)
+    ctx = self._binding_ctx(0)
+    bnd = Binding.new(ctx, self, nil)
+    vcgl = [ self._getRubyVcGlobal(0x20) ,
+             self._getRubyVcGlobal(0x21) , self ]
+    unless blk.equal?(nil)
+      vcgl << blk
+    end
     res = _eval(str, bnd, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
@@ -113,6 +135,10 @@ module Kernel
     end
     vcgl = [ self._getRubyVcGlobal(0x20) ,
       self._getRubyVcGlobal(0x21), nil ]
+    blk = bnd.block
+    unless blk.equal?(nil)
+      vcgl << blk
+    end
     res = _eval(str, bnd, vcgl )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
@@ -324,12 +350,9 @@ module Kernel
   # def throw(aSymbol, aValue); end  # implemented in smalltalk
   primitive_nobridge 'throw' , 'throw:with:'
 
-  # This is a hook into the mspec framework so that the --spec-debug action
-  # can call us.  E.g., to debug a failing spec, do:
-  #
-  #   spec/mspec/bin/mspec -T -d --spec-debug -K fails \
-  #         spec/rubyspec/1.8/core/string/append_spec.rb
   def debugger
+    # signals an Exception which is not trappable by Ruby or Smalltalk
+    # and thus returns control to topaz debugger or other GCI main program.
     nil.pause
   end
 
