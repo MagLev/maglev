@@ -5,6 +5,8 @@ class Exception
     class_primitive '_signal', 'signal:'
     class_primitive_nobridge '_signal', 'signal'
 
+    class_primitive 'install_debug_block&', 'installDebugBlock:'
+
     # support for errno to Name translation
     class_primitive_nobridge  '_errnoTables', 'errnoTables'
     class_primitive_nobridge  '_errnoToName', 'errnoToName:'
