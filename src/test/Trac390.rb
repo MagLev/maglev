@@ -1,3 +1,5 @@
+str = "( yield ).to_s"
+raise "Fail A" unless (eval(str) { 12 }) == "12"
 
 def get_binding
   binding
@@ -13,5 +15,5 @@ c = get_binding
 
 rc = eval(' block_given? ', c)
 unless rc == false ; raise 'error'; end
-true
 
+true
