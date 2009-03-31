@@ -88,6 +88,7 @@ RUBY.require 'kernel/bootstrap/GC.rb'
 RUBY.require 'kernel/bootstrap/FileStat.rb'
 RUBY.require 'kernel/bootstrap/Mutex.rb'
 RUBY.require 'kernel/bootstrap/Thread.rb'
+RUBY.require 'kernel/bootstrap/Queue.rb'
 
 RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/Math.rb'
