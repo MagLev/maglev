@@ -21,7 +21,13 @@ begin
   end
   o = ClsOne.new
   x = o.instance_variables
-  test(x , [ '@bb', '@cc' ] , "instance_variables fixed")
+  test(x , [ ] , "ivs not defined" )
+  o.setCc(6)
+  x = o.instance_variables
+  test(x , [ '@cc' ] , "cc defined" )
+  o.setBb(5)
+  x = o.instance_variables
+  test(x , [ '@bb', '@cc' ] , "plus bb defined" )
   class ClsOne
     def setDd(a)
       @dd = a
