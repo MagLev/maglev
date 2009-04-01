@@ -43,6 +43,13 @@ namespace :maglev do
     ensure_prims_loaded
   end
 
+  # This just boots the server, but does NOT call ensure prims.  This is
+  # useful for starting from a raw image before the mcz is loaded...
+  task :bootserver => :gemstone do
+    start_netldi
+    start_server
+  end
+
   task :'startserver-debug' => :gemstone do
     start_netldi_debug
     start_server_debug

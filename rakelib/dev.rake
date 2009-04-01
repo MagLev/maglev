@@ -1,3 +1,4 @@
+
 # Rake tasks for MagLev core developers.
 #
 # These tasks depend on the conventions used by the GemStone MagLev
@@ -7,7 +8,7 @@ namespace :dev do
   require 'rakelib/dev.rb'
 
   desc "Stop server, install ../latest*, and reload primitives"
-  task :'install-latest' => [:'dev:install-tgz', :'dev:ensureprims']
+  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:ensureprims']
 
   desc "Stop current server and install ../latest-product.tgz"
   task :'install-tgz' do
@@ -49,7 +50,7 @@ namespace :dev do
   end
 
   desc "Load the mcz file ../latest.mcz and commit it."
-  task :loadmcz => ['maglev:start'] do
+  task :loadmcz => ['maglev:startparser', 'maglev:bootserver'] do
     puts "=== Load .mcz file: #{`ls -l ../latest.mcz`}"
     run_topaz tc_load_mcz
   end
