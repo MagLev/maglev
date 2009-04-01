@@ -2,19 +2,11 @@
 # emulates loading the rack gem and kicking off rackup
 
 puts "== launch.rb"
-
-here = File.dirname(__FILE__)
-sinatra_dir = here + '/../../src/external/Sinatra/lib'
-rack_dir    = here + '/../../src/external/Rack/lib'
-rackup      = here + '/../../src/external/Rack/bin/rackup'
-
-$:.unshift(sinatra_dir)
-$:.unshift(rack_dir)
-$:.unshift(here)
+require 'setup.rb'
 
 options = { :Port => 4567, :Host => "0.0.0.0" }
 require 'rack'
-config = here + '/config.ru'
+config = File.dirname(__FILE__) + '/config.ru'
 cfgfile = File.read(config)
 puts "============================="
 inner_app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app", nil, config
