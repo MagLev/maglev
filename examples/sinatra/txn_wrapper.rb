@@ -6,7 +6,7 @@
 #
 # TODO: Should HTTP redirects commit or not?
 #
-
+puts "== txn_wrapper.rb"
 require 'maglev.rb'
 class MagLevTransactionWrapper
   include Maglev::CodeAndData

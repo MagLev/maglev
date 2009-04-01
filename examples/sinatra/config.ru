@@ -1,3 +1,4 @@
+puts "== config.ru"
 HERE = File.dirname(__FILE__)
 SINATRA_DIR = HERE + '/../../src/external/Sinatra/lib'
 RACK_DIR    = HERE + '/../../src/external/Rack/lib'
@@ -18,4 +19,5 @@ set :app_file, __FILE__
 # STDERR.reopen(log)
 
 require 'sinatra_blog.rb'
+puts "== config.ru: calling run Sinatra::Application"
 run Sinatra::Application

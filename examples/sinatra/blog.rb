@@ -1,4 +1,4 @@
-puts "=== READING blog.rb"
+puts "=== blog.rb"
 class Blog
   attr_reader :name
 

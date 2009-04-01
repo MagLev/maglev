@@ -17,6 +17,7 @@
 #    In development mode, Sinatra reloads the application with every request.
 #    This means you can't
 #
+puts "== sinatra_blog.rb"
 SINATRA_DIR = File.dirname(__FILE__) + '/../../src/external/Sinatra/lib'
 RACK_DIR    = File.dirname(__FILE__) + '/../../src/external/Rack/lib'
 
@@ -29,11 +30,11 @@ $:.unshift(File.dirname(__FILE__))
 require 'sinatra'
 require 'post'
 require 'blog'
-require 'txn_wrapper'
+#require 'txn_wrapper'
 
 # Rack middleware to wrap http requests in a gemstone transaction.  Only
 # data will be saved, not methods...
-use MagLevTransactionWrapper
+#use MagLevTransactionWrapper
 
 configure(:development) do
   set :server, 'webrick'
