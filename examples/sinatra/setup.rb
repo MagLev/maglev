@@ -8,6 +8,12 @@ unless defined? SETUP_RUN
   $:.unshift(here + '/../../src/external/Sinatra/lib')
   $:.unshift(here + '/../../src/external/Rack/lib')
   $:.unshift(here)
+
+  class Object
+    def running_maglev?
+      !!defined? RUBY_ENGINE && RUBY_ENGINE == 'maglev'
+    end
+  end
 end
 
 

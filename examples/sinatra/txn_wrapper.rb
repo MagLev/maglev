@@ -38,7 +38,7 @@ class MagLevTransactionWrapper
     not (status.nil? || status >= 300)
   end
 
-  def running_maglev?
-    !!defined? RUBY_ENGINE
-  end
+#   def running_maglev?
+#     !!defined? RUBY_ENGINE
+#   end
 end

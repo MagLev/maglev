@@ -18,23 +18,18 @@
 #    This means you can't
 #
 puts "== sinatra_blog.rb"
-SINATRA_DIR = File.dirname(__FILE__) + '/../../src/external/Sinatra/lib'
-RACK_DIR    = File.dirname(__FILE__) + '/../../src/external/Rack/lib'
-
-$:.unshift(SINATRA_DIR)
-$:.unshift(RACK_DIR)
-$:.unshift(File.dirname(__FILE__))
-
-#RubyContext.load_context
+require 'setup.rb'
 
 require 'sinatra'
 require 'post'
 require 'blog'
-#require 'txn_wrapper'
 
-# Rack middleware to wrap http requests in a gemstone transaction.  Only
-# data will be saved, not methods...
-#use MagLevTransactionWrapper
+if running_maglev?
+  # If we're running MagLev, then load some Rack middleware to wrap http
+  # requests in a gemstone transaction.
+  require 'txn_wrapper'
+  use MagLevTransactionWrapper
+end
 
 configure(:development) do
   set :server, 'webrick'
