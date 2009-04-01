@@ -63,6 +63,7 @@ helpers do
   end
 
   def get_blog(name)
+    $blogs ||= { }
     $blogs[name]
     # TODO: Raise or redirect from here if can't find the blog?
   end
