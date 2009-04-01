@@ -1,19 +1,9 @@
 # Rake tasks to control the MagLev server.
 
 namespace :maglev do
+
   desc "Start MagLev server processes, if not already running."
-  task :start => :initialize do
-    if parser_running?
-      puts "Parser already running"
-    else
-      Rake::Task['maglev:startparser'].invoke
-    end
-    if server_running?
-      puts "Server already running"
-    else
-      Rake::Task['maglev:startserver'].invoke
-    end
-  end
+  task :start => [:initialize, :startparser, :startserver]
 
   desc "Start the MagLev processes with verbose output."
   task :'start-debug' => [:initialize, :'startparser-debug', :'startserver-debug']
@@ -38,9 +28,13 @@ namespace :maglev do
   # ======================= core tasks =======================
 
   task :startserver => :gemstone do
-    start_netldi
-    start_server
-    ensure_prims_loaded
+    if server_running?
+      puts "Server already running"
+    else
+      start_netldi
+      start_server
+      ensure_prims_loaded
+    end
   end
 
   # This just boots the server, but does NOT call ensure prims.  This is
@@ -51,15 +45,23 @@ namespace :maglev do
   end
 
   task :'startserver-debug' => :gemstone do
-    start_netldi_debug
-    start_server_debug
-    ensure_prims_loaded
+    if server_running?
+      puts "Server already running: try stopping server before starting debug"
+    else
+      start_netldi_debug
+      start_server_debug
+      ensure_prims_loaded
+    end
   end
 
   task :'startserver-bench' => :gemstone do
-    start_netldi
-    start_server_bench
-    ensure_prims_loaded
+    if server_running?
+      puts "Server already running: try stopping server before starting bench"
+    else
+      start_netldi
+      start_server_bench
+      ensure_prims_loaded
+    end
   end
 
   task :startparser => :gemstone do
