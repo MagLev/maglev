@@ -29,11 +29,11 @@ $:.unshift(File.dirname(__FILE__))
 require 'sinatra'
 require 'post'
 require 'blog'
-#require 'txn_wrapper'
+require 'txn_wrapper'
 
 # Rack middleware to wrap http requests in a gemstone transaction.  Only
 # data will be saved, not methods...
-#use MagLevTransactionWrapper
+use MagLevTransactionWrapper
 
 configure(:development) do
   set :server, 'webrick'

@@ -29,7 +29,7 @@ class MagLevTransactionWrapper
       else
         puts "=== Abort Transaction"
         #Gemstone.abortTransaction  if running_maglev?
-        Gemstone.abort_txn  if running_maglev?
+        abort_txn  if running_maglev?
       end
     end
   end
