@@ -1,6 +1,6 @@
 module FFI
-  CLibrary = _resolve_smalltalk_class(:CLibrary)
-  CFunction = _resolve_smalltalk_class(:CFunction)
-  CByteArray = _resolve_smalltalk_class(:CByteArray)
+  CLibrary = _resolve_smalltalk_global(:CLibrary)
+  CFunction = _resolve_smalltalk_global(:CFunction)
+  CByteArray = _resolve_smalltalk_global(:CByteArray)
 end
 
