@@ -105,13 +105,25 @@ class String
 
 #  alias === ==
 
-  # =~ is mostly translated to  :match  Sexpression by parser ...
+  # call-seq:
+  #    str =~ obj   => fixnum or nil
   #
-  def =~(regex)
-    if regex._isRegexp
-      regex.=~(self)
+  # Match---If <i>obj</i> is a <code>Regexp</code>, use it as a pattern to match
+  # against <i>str</i>,and returns the position the match starts, or
+  # <code>nil</code> if there is no match. Otherwise, invokes
+  # <i>obj.=~</i>, passing <i>str</i> as an argument. The default
+  # <code>=~</code> in <code>Object</code> returns <code>false</code>.
+  #
+  #    "cat o' 9 tails" =~ /\d/   #=> 7
+  #    "cat o' 9 tails" =~ 9      #=> false
+  def =~(other)
+    # =~ is mostly translated to  :match  Sexpression by parser ...
+    if other._isRegexp
+      other.=~(self)
+    elsif other._isString
+      raise TypeError, 'String given'
     else
-      raise ArgumentError , 'expected a Regex'
+      other =~ self
     end
   end
 
