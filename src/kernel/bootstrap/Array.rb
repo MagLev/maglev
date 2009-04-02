@@ -86,11 +86,15 @@ class Array
       elsif len.equal?(0)
         a = self.new
       end
+      a
     else
-      a = _alloc(0, nil)
+      raise ArgumentError, 'too many args'
     end
-    a.initialize(*args)  # raises too many args
-    a
+  end
+
+  def initialize(*args)
+    # this variant gets bridge methods
+    raise ArgumentError, 'too many args'
   end
 
   def self.new(first, &blk)
@@ -99,24 +103,58 @@ class Array
     else
       siz = Type.coerce_to(first, Fixnum, :to_int)
       a = _alloc(siz, nil)
-      if block_given?   # block takes precedence over extra 
-	n = 0
-	while (n < siz)
-	  a[n] = blk.call(n)
-	  n = n + 1
-	end
-      end
-      a
+      # blk processed by initialize
     end
     a.initialize(first, &blk)
     a
   end
 
+  def initialize(first, &blk)
+    if self.class.equal?(Array)
+      if first._isArray
+        lim = 0 # ignore any block
+      else
+        lim = self.size
+      end
+    else
+      if first._isArray
+        self.replace(first) 
+        lim = 0 # ignore any block
+      else
+        lim = Type.coerce_to(first, Fixnum, :to_int)
+        self.size=(lim)
+      end   
+    end
+    if block_given? 
+      n = 0
+      while (n < lim)
+	self[n] = blk.call(n)
+	n = n + 1
+      end
+    end
+    self
+  end
+
   def self.new(a_size, value)
-    s = Type.coerce_to(a_size, Fixnum, :to_int)
-    a = _alloc(s, value)
+    if self.equal?(Array)
+      s = Type.coerce_to(a_size, Fixnum, :to_int)
+      a = _alloc(s, value)
+    else
+      a = _alloc(0, nil)
+    end
     a.initialize(a_size, value)
     a
+  end
+
+  def initialize(a_size, value)
+    if self.class.equal?(Array)
+      # do nothing
+    else
+      s = Type.coerce_to(a_size, Fixnum, :to_int)
+      self.size=(s)
+      self.fill(value, 0, s) 
+    end
+    self
   end
 
   def self.new(first, second, &blk)
@@ -130,29 +168,22 @@ class Array
   def self.new(arg)
     # this method will have no bridge methods, all the bridges
     #  will map to the previous 2 arg form
-    if (arg._isFixnum)
-      a = _alloc(arg, nil)
+    if self.equal?(Array) 
+      if arg._isFixnum
+        a = _alloc(arg, nil)
+      elsif arg._isArray
+        a = _withall(arg)
+      else
+        a = _alloc_one_arg(arg)
+      end
     else
-      a = _coerceOneArg(arg)
+      a = _alloc(0, nil)
     end
     a.initialize(arg)
     a
   end
 
-  def self.new
-    a = _alloc(0, nil)
-    a.initialize
-    a
-  end
-
-  def self.new(&blk)
-    # ignores the block
-    a = _alloc(0, nil)
-    a.initialize(&blk)
-  end
-
-  def self._coerceOneArg(arg)
-    # separate method to avoid complex blocks in self.new(arg)
+  def self._alloc_one_arg(arg)
     begin
       ary = Type.coerce_to(arg, Array, :to_ary)
       a = _withall(ary)
@@ -163,24 +194,48 @@ class Array
     a
   end
 
-  # Array Instance methods
- 
-  def initialize(*args)
-    # this variant gets bridge methods
-    raise ArgumentError, 'too many args'
-  end
-  def initialize(first, &blk)
+  def _init_one_arg(arg)
+    begin
+      ary = Type.coerce_to(arg, Array, :to_ary)
+      self.replace(arg)
+    rescue TypeError
+      siz = Type.coerce_to(arg, Fixnum, :to_int)
+      self.size=(siz)
+    end
     self
   end
-  def initialize(a_size, value)
-    self
-  end
+
   def initialize(arg)
+    if self.class.equal?(Array)
+      # do nothing
+    else 
+      if arg._isFixnum
+        self.size=(arg)
+      elsif arg._isArray
+        self.replace(arg)
+      else
+        _init_one_arg(arg)
+      end 
+    end
     self
   end
+ 
+  def self.new
+    a = _alloc(0, nil)
+    a.initialize
+    a
+  end
+
   def initialize
     self
   end
+
+  def self.new(&blk)
+    # ignores the block
+    a = _alloc(0, nil)
+    a.initialize(&blk)
+  end
+
   def initialize(&blk)
     self
   end
