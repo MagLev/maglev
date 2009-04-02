@@ -41,10 +41,10 @@ module Errno
   # following 4 exceptions may be signaled from smalltalk code.
   #   but they are subclasses of SocketError not SystemCallError...
   #   so don't use them here.
-  # EBADF = _resolve_smalltalk_class(:SocketErrorEBADF)
-  # ECONNRESET = _resolve_smalltalk_class(:SocketErrorECONNRESET)
-  # ENOTCONN = _resolve_smalltalk_class(:SocketErrorENOTCONN)
-  # EPIPE = _resolve_smalltalk_class(:SocketErrorEPIPE)
+  # EBADF = _resolve_smalltalk_global(:SocketErrorEBADF)
+  # ECONNRESET = _resolve_smalltalk_global(:SocketErrorECONNRESET)
+  # ENOTCONN = _resolve_smalltalk_global(:SocketErrorENOTCONN)
+  # EPIPE = _resolve_smalltalk_global(:SocketErrorEPIPE)
 
   # Create a class to represent +errno+.  A constant, +name+, will be added to
   # +Errno+ to store the class and the class will have the value of its
