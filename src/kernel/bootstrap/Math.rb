@@ -4,17 +4,35 @@ module Math
 
   def acos(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.acos
+    r = f.acos
+    if r.nan?
+      raise Errno::EDOM
+      nil
+    else
+      r
+    end
   end
 
   def acosh(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.acosh
+    r = f.acosh
+    if r.nan?
+      raise Errno::EDOM
+      nil
+    else
+      r
+    end
   end
 
   def asin(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.asin
+    r = f.asin
+    if r.nan?
+      raise Errno::EDOM
+      nil
+    else
+      r
+    end
   end
 
   def asinh(x)
@@ -30,12 +48,24 @@ module Math
   def atan2(x, y)
     fx = Type.coerce_to(x, Float, :to_f )
     fy= Type.coerce_to(y, Float, :to_f )
-    fx._atan2(fy)
+    r = fx._atan2(fy)
+    if r.nan?
+      raise Errno::EDOM
+      nil
+    else
+      r
+    end
   end
 
   def atanh(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.atanh
+    r = f.atanh
+    if r.nan? || r.infinite?
+      raise Errno::EDOM
+      nil
+    else
+      r
+    end
   end 
 
   def cos(x)
@@ -82,17 +112,47 @@ module Math
 
   def log(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.log
+    r = f.log
+    if r.nan?
+      if f == 0.0 
+        raise Errno::ERANGE
+      else
+        raise Errno::EDOM
+      end
+      nil
+    else
+      r
+    end
   end
 
   def log2(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.log2
+    r = f.log2
+    if r.nan?
+      if f == 0.0 
+        raise Errno::ERANGE
+      else
+        raise Errno::EDOM
+      end
+      nil
+    else
+      r
+    end
   end
 
   def log10(x)
     f = Type.coerce_to(x, Float, :to_f )
-    f.log10
+    r = f.log10
+    if r.nan?
+      if f == 0.0 
+        raise Errno::ERANGE
+      else
+        raise Errno::EDOM
+      end
+      nil
+    else
+      r
+    end
   end
 
   def modf

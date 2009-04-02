@@ -8,9 +8,19 @@ class Numeric
     [ nil, nil]
   end
 
-    primitive '<=>', '_rubyCompare:'
-
-# unaries  +@  -@  eliminated during IR generation by compiler
+    def <=>(arg)
+      if arg._isNumber
+        if self > arg
+          1
+        elsif self == arg
+          0
+        else
+          -1 
+        end
+      else
+        nil
+      end
+    end
 
     primitive 'abs', 'abs'
 
@@ -19,20 +29,43 @@ class Numeric
       f.ceil
     end
 
+    # "Internal" uses of /  must use _divide() to avoid
+    #   infinite recursion after  math.n redefines quo and / for Rational
+
     def div(arg)
-      q = self / arg
+      q = self._divide(arg)
       q.to_int
     end
 
     def quo(arg)
-      self / quo
+      self._divide(arg)
     end
 
     def divmod(arg)
+      unless arg._isNumber
+        raise TypeError, 'arg to divmod is not a Numeric'
+      end
       a = Type.coerce_to(arg, Float, :to_f)
-      q = (self / a).floor
+      if a == 0.0
+        raise FloatDomainError ,'arg to divmod was zero'
+      end
+      q = (self._divide(a)).floor
       r = self - (q * a)
       [ q, r ]
+    end
+
+    def remainder(arg)
+      unless arg._isNumber
+        raise TypeError, 'arg to remainder is not a Numeric'
+      end
+      mod = self.modulo(arg)
+      rec_neg = self < 0 
+      arg_neg = arg < 0
+      if (rec_neg == arg_neg)
+        mod
+      else
+        mod - arg
+      end
     end
 
 # eql?  implemented in subclasses
@@ -46,6 +79,7 @@ class Numeric
 #  quo   implemented in subclasses
 
     def modulo(arg)
+      # reimplemented in subclasses
       (self.divmod(arg))[1]
     end
 
@@ -69,8 +103,12 @@ class Numeric
 # truncated implemented in subclasses
 # zero?  implemented in subclasses
 
+    def +@
+      self
+    end
+
     def -@
-        self * -1
+      0 - self
     end
 end
 

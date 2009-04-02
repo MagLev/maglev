@@ -1,3 +1,4 @@
+# ~
 # ---------------------------------
 #  Bignum and Integer
 #
@@ -10,15 +11,28 @@
 class Integer
 
   def coerce(param)
-    begin
-      v = param.to_int
-      if v._isInteger
-        return [ v, self ]
+    unless param._isSymbol
+      begin
+        v = param.to_int
+        if v._isInteger
+          return [ v, self ]
+        end
+      rescue
+        # continue execution
       end
-    rescue
-      # continue execution
     end
     super
+  end
+
+  def self.induced_from(obj)
+    if obj._isInteger
+      obj
+    elsif obj._isFloat
+      obj.to_i
+    else
+      raise TypeError, "argument to induced_from neither Float nor Integer"
+      nil
+    end
   end
 
     # following 3 prims contain handler for RubyBreakException
@@ -33,7 +47,7 @@ class Integer
 
 
     def chr
-        if self > 255
+        if self > 255 || self < 0
             raise RangeError, "#{self} out of char range"
         end
         string = ' '
@@ -52,8 +66,10 @@ class Integer
         primitive_nobridge '-', '_rubySubtract:'
         primitive_nobridge '*', '_rubyMultiply:'
         primitive_nobridge '/', '_rubyDivide:'
+        primitive_nobridge '_divide', '_rubyDivide:'
 
-        primitive_nobridge '%', '_rubyModulus:'
+        primitive_nobridge '%', '_rubyModulo:'
+        primitive_nobridge 'modulo', '_rubyModulo:'
 
         primitive_nobridge '**', '_rubyRaisedTo:'
 
@@ -67,12 +83,22 @@ class Integer
           end
         end 
 
+        primitive_nobridge '~', 'bitInvert'
         primitive_nobridge '&', '_rubyBitAnd:'
         primitive_nobridge '|', '_rubyBitOr:'
         primitive_nobridge '^', '_rubyBitXor:'
         primitive_nobridge '<<', '_rubyShiftLeft:'
 
         def >>(arg)
+          unless arg._isFixnum
+            if arg._isInteger 
+              if (self >= 0)
+                return 0
+              else
+                return -1
+              end
+            end
+          end
           self << ( 0 - arg )
         end
 
@@ -94,6 +120,9 @@ class Integer
 
        def _shift_left(arg)
          a = Type.coerce_to(arg, Integer, :to_int) 
+         unless a._isFixnum
+           raise RangeError, 'argument must be a Fixnum'
+         end
          self << a 
        end
 
@@ -105,7 +134,16 @@ class Integer
 
     #  <=> inherited from Numeric
 
-        primitive_nobridge '[]', 'bitAt:'
+     primitive_nobridge '_bit_at', 'bitAt:'
+     
+     def [](arg)
+       a = Type.coerce_to(arg, Integer, :to_int)
+       if (a < 0)
+         0
+       else
+         self._bit_at(a)
+       end 
+     end
 
 #  abs inherited from Numeric
 
@@ -115,24 +153,35 @@ class Integer
 
         primitive 'eql?', '_ruby_eqlQ:'
 
-        alias div /
-
         def divmod(arg)
           if arg._isInteger
-            q = self / arg
+            q = self._divide(arg)
             r = self - (q * arg)
             [ q, r ]
+          elsif arg._isNumber
+            c = arg.coerce(self)
+            c[0].divmod(c[1])
           else
-            super
+            raise TypeError, 'numeric coercion failed'
+            nil
           end
+        end
+
+        def div(arg)
+          if arg._isFloat 
+            if arg == 0.0
+              raise FloatDomainError, 'argument to div is zero'
+            end
+          end
+          q = self._divide(arg)
+          q.to_int
         end
 
         primitive 'hash'
 
-        alias modulo %
-
+        
         def quo(param)
-           (self.to_f ) / param
+           (self.to_f )._divide(param)
         end
 
 #  remainder  inherited from numeric
@@ -141,7 +190,18 @@ class Integer
         primitive 'to_f', 'asFloat'
         primitive 'to_i', 'truncated'
         primitive 'to_int' , 'truncated'
+
+        primitive '_to_s_base_show', 'printStringRadix:showRadix:'
+
         primitive 'to_s', 'asString'
+
+        def to_s(base)
+          unless base._isFixnum 
+            raise TypeError, 'arg must be a Fixnum'
+          end
+          _to_s_base_show(base, false)
+        end
+
         primitive 'truncate' , 'truncated'
 
 #  methods from Numeric
