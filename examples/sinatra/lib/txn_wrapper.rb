@@ -6,10 +6,11 @@
 #
 # TODO: Should HTTP redirects commit or not?
 #
-
+puts "== txn_wrapper.rb"
 require 'maglev.rb'
 class MagLevTransactionWrapper
-  include Maglev::CodeAndData
+#  include Maglev::CodeAndData
+  include Maglev::DataOnly
 
   def initialize(app)
     @app = app
@@ -17,28 +18,22 @@ class MagLevTransactionWrapper
 
   def call(env)
     begin
-      #Gemstone.beginTransaction if running_maglev?
-      puts "=== Begin Transaction"
+      puts "=== (Begin Transaction)"
       status, headers, body = @app.call env
       [status, headers, body]
     ensure
       if good_status?(status)
         puts "=== Commit Transaction"
-        #Gemstone.commitTransaction if running_maglev?
         commit_txn if running_maglev?
       else
         puts "=== Abort Transaction"
-        #Gemstone.abortTransaction  if running_maglev?
         abort_txn  if running_maglev?
       end
     end
   end
 
+  # A Commit-worthy status is success (2xx).
   def good_status?(status)
-    not (status.nil? || status >= 300)
-  end
-
-  def running_maglev?
-    !!defined? RUBY_ENGINE
+    ! status.nil? &&  (200..299).include?(status)
   end
 end

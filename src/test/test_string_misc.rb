@@ -183,5 +183,35 @@ end
 actual = "hello".gsub(/./) { |s| s[0].to_s + '|' }
 test(actual, "104|101|108|108|111|", "gsub with block")
 
+begin
+  r = "xxx" =~ "yyy"
+  failed_test("Expected TypeError", TypeError, nil)
+rescue TypeError
+  # OK
+rescue Exception => x
+  failed_test("Expected TypeError", TypeError, x)
+end
+
+class C
+  def to_str
+    '/xxx/'
+  end
+  def to_s
+    '/yyy/'
+  end
+end
+
+test('xxx'   =~ C.new, false, "'xxx'   =~ C.new")
+test('yyy'   =~ C.new, false, "'yyy'   =~ C.new")
+
+test('/xxx/' =~ C.new, false, "'/xxx/' =~ C.new")
+test('/yyy/' =~ C.new, false, "'/yyy/' =~ C.new")
+
+test(C.new =~ 'xxx',   false, "C.new =~ 'xxx'")
+test(C.new =~ 'yyy',   false, "C.new =~ 'yyy'")
+
+test(C.new =~ '/xxx/', false, "C.new =~ '/xxx/'")
+test(C.new =~ '/yyy/', false, "C.new =~ '/yyy/'")
+
 report
 

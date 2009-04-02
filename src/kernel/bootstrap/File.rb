@@ -19,6 +19,7 @@ class File
   primitive 'read', 'next:'
   primitive 'read', 'contents'
   primitive 'flush', 'flush'
+  primitive 'rewind', 'rewind'
 
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 

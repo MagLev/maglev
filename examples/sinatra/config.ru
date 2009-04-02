@@ -1,17 +1,12 @@
-HERE = File.dirname(__FILE__)
-SINATRA_DIR = HERE + '/../../src/external/Sinatra/lib'
-RACK_DIR    = HERE + '/../../src/external/Rack/lib'
-
-$:.unshift(SINATRA_DIR)
-$:.unshift(RACK_DIR)
-$:.unshift(File.dirname(__FILE__))
-
+puts "== config.ru"
+require 'setup.rb'
 require 'sinatra'
 
+here = File.dirname(__FILE__)
 disable :run              # Prevent Sinatra from running out of at_exit handler
-set :views,  HERE + '/views'
-set :public, HERE + '/public'
-set :app_file, __FILE__
+set :views,  here + '/views'
+set :public, here + '/public'
+set :app_file, 'sinatra_blog.rb'
 
 # log = File.new('./sinatra_log', 'a')
 # STDOUT.reopen(log)

@@ -81,4 +81,33 @@ namespace :dev do
     files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby', 'lib/maglev']
     files.each { |fn| rm_r fn rescue nil }
   end
+
+  desc "Save a snapshot: Stop the server, copy data/* to snapshot, restart the server"
+  task :snapshot => [:'maglev:stopserver', :'dev:takesnapshot', :'maglev:startserver']
+
+  desc "Restore to snapshot: Stop the server, copy snapshot/* to data, restart the server"
+  task :tosnapshot => [:'maglev:stopserver', :'dev:tosnapshot', :'maglev:startserver']
+
+  task :takesnapshot do
+    if server_running?
+      puts "Must stop server before calling :takesnapshot"
+    else
+      puts "Copying data from data -> snapshot"
+      Dir.mkdir('snapshot') unless File.directory?('snapshot')
+      cd MAGLEV_HOME do
+        sh "cp data/* snapshot"
+      end
+    end
+  end
+
+  task :tosnapshot do
+    if server_running?
+      puts "Must stop server before calling :tosnapshot"
+    else
+      puts "Copying data from snapshot -> data"
+      cd MAGLEV_HOME do
+        sh "cp snapshot/* data"
+      end
+    end
+  end
 end

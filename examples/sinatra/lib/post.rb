@@ -1,4 +1,4 @@
-puts "=== READING post.rb"
+puts "=== post.rb"
 class Post
   attr_reader :title, :content, :date
 
