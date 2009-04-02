@@ -82,16 +82,31 @@ namespace :dev do
     files.each { |fn| rm_r fn rescue nil }
   end
 
-  desc "Stop the server, copy hotswap/* to data, restart the server"
-  task :swap => [:'maglev:stopserver', :'dev:swapdb', :'maglev:startserver']
+  desc "Save a snapshot: Stop the server, copy data/* to snapshot, restart the server"
+  task :snapshot => [:'maglev:stopserver', :'dev:takesnapshot', :'maglev:startserver']
 
-  task :swapdb do
+  desc "Restore to snapshot: Stop the server, copy snapshot/* to data, restart the server"
+  task :tosnapshot => [:'maglev:stopserver', :'dev:tosnapshot', :'maglev:startserver']
+
+  task :takesnapshot do
     if server_running?
-      puts "Must stop server before calling :swapdb"
+      puts "Must stop server before calling :takesnapshot"
     else
-      puts "Copying data from hotswap -> data"
+      puts "Copying data from data -> snapshot"
+      Dir.mkdir('snapshot') unless File.directory?('snapshot')
       cd MAGLEV_HOME do
-        sh "cp hotswap/* data"
+        sh "cp data/* snapshot"
+      end
+    end
+  end
+
+  task :tosnapshot do
+    if server_running?
+      puts "Must stop server before calling :tosnapshot"
+    else
+      puts "Copying data from snapshot -> data"
+      cd MAGLEV_HOME do
+        sh "cp snapshot/* data"
       end
     end
   end
