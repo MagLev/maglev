@@ -7,7 +7,7 @@ class File
   SEPARATOR      = '/'
   Separator      = SEPARATOR
 
-  Stat = _resolve_smalltalk_class(:GsFileStat)
+  Stat = _resolve_smalltalk_global(:GsFileStat)
 
   # FILE::LOCK  constants initialized below
 
