@@ -2,7 +2,7 @@
       <p>There are no blogs</p>
     <% else %>
       <ul>
-        <% @blogs.each do |blog| %>
+        <% @blogs.each do |name,blog| %>
           <li><%= blog.name %></li>
         <% end %>
     <% end %>
