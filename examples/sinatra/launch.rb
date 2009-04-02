@@ -2,7 +2,7 @@
 # emulates loading the rack gem and kicking off rackup
 
 puts "== launch.rb"
-require 'setup.rb'
+require 'lib/setup.rb'
 
 options = { :Port => 4567, :Host => "0.0.0.0" }
 require 'rack'
