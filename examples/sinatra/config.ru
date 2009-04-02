@@ -6,7 +6,7 @@ here = File.dirname(__FILE__)
 disable :run              # Prevent Sinatra from running out of at_exit handler
 set :views,  here + '/views'
 set :public, here + '/public'
-set :app_file, __FILE__
+set :app_file, 'sinatra_blog.rb'
 
 # log = File.new('./sinatra_log', 'a')
 # STDOUT.reopen(log)

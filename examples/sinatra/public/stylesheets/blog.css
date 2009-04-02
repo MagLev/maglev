@@ -1,7 +1,6 @@
-/* 
- * Eric Meyer reset 
+/*
+ * Eric Meyer reset
  * http://meyerweb.com/eric/thoughts/2007/05/01/reset-reloaded/
- */
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -21,9 +20,12 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   font-family: inherit;
   vertical-align: baseline;
 }
+ */
+
 body {
-    color: black;
-    background: beige;
+  color: black;
+  background: beige;
 }
+
 #flash { background: Khaki; }
-#debug { background: MediumAquaMarine; }
+#debug { background: Thistle; }

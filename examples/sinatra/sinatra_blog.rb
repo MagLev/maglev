@@ -35,7 +35,7 @@ configure(:development) do
   set :server, 'webrick'
   set :dump_errors, true
   set :raise_errors, true
-  set :reload, false
+  set :reload, true
   set :logging, false
   #set :port, 4567
 end
@@ -81,13 +81,17 @@ end
 
 get '/' do
   @blogs = all_blogs
+  puts "== get /:  self #{self}  @blogs: #{@blogs}"
   erb :blogs
 end
 
 get '/blogs/:name' do
   name = params[:name]
-  @blog = get_blog(name)
+  xyz = get_blog(name)
+  @blog = xyz
+  puts "== get /blogs/:name: name: #{name} self #{self} xyz: #{xyz.inspect} @blog: #{@blog.inspect}"
   if @blog.nil?
+    raise NotImplementedError, "Can't find blog '#{name}'"
     # Or do we do a 404?
     flash "Can't find blog '#{name}'"
     redirect '/'
