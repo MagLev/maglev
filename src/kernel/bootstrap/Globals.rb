@@ -46,7 +46,6 @@ RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 
 RUBY.global('Gemstone', 'System')
-RUBY.global('Gemstone', 'System')
 RUBY.global('RubyContext', 'RubyContext')
 RUBY.global('CZstream', 'CZstream')
 
