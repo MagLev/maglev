@@ -1,6 +1,6 @@
 module Kernel
 
-  primitive_nobridge '_resolve_smalltalk_class', 'resolveSmalltalkClass:'
+  primitive_nobridge '_resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
   # Print messages for stubbed methods
   @@gs_WARNSTUB = false
