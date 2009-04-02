@@ -81,4 +81,18 @@ namespace :dev do
     files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby', 'lib/maglev']
     files.each { |fn| rm_r fn rescue nil }
   end
+
+  desc "Stop the server, copy hotswap/* to data, restart the server"
+  task :swap => [:'maglev:stopserver', :'dev:swapdb', :'maglev:startserver']
+
+  task :swapdb do
+    if server_running?
+      puts "Must stop server before calling :swapdb"
+    else
+      puts "Copying data from hotswap -> data"
+      cd MAGLEV_HOME do
+        sh "cp hotswap/* data"
+      end
+    end
+  end
 end
