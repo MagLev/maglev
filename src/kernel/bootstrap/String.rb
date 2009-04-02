@@ -15,12 +15,33 @@ class String
   class_primitive_nobridge '_alloc', '_basicNew'
 
   def self.new(str)
-    _withAll str
+    if self.equal?(String)
+      s = _withAll(str)
+    else
+      s = _alloc
+    end
+    s.initialize(str)
+    s
+  end
+
+  def initialize(str)
+    if self.class.equal?(String)
+      # do nothing
+    else
+      self.replace(str) 
+    end
+    self
   end
 
   def self.new()
     # no bridge methods for this variant
-    _alloc
+    s = _alloc
+    s.initialize 
+    s
+  end
+
+  def initialize
+    self
   end
 
   def signal
@@ -406,13 +427,11 @@ class String
   primitive 'lstrip!', '_removeLeadingSeparators' # in .mcz
 
   def match(pattern)
-    # TODO: Figure out how to pass something more complex than a method name
-    # to coerce_to.  A proc? A proc or a symbol?
-    #p = Type.coerce_to(pattern, Regexp, "Regexp.new(:to_str)" )
-    if pattern._isRegexp    # if pattern.kind_of?(Regexp)
+    if pattern._isRegexp
       regexp = pattern
+    elsif pattern._isString
+      regexp = Regexp.new(pattern)
     else
-      # TODO more optimization of coerce here
       begin
         regexp = Regexp.new(pattern.to_str)
       rescue StandardError
