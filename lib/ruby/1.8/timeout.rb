@@ -37,8 +37,9 @@ module Timeout
   class ExitException < ::Exception # :nodoc:
   end
 
-  THIS_FILE = /\A#{Regexp.quote(__FILE__)}:/o
-  CALLER_OFFSET = ((c = caller[0]) && THIS_FILE =~ c) ? 1 : 0
+  # Gemstone,  these two constants not needed
+  # THIS_FILE = /\A#{Regexp.quote(__FILE__)}:/o
+  # CALLER_OFFSET = ((c = caller[0]) && THIS_FILE =~ c) ? 1 : 0
 
   ##
   # Executes the method's block. If the block execution terminates before +sec+
@@ -62,16 +63,17 @@ module Timeout
       yield sec
       #    return true
     rescue exception => e
-      rej = /\A#{Regexp.quote(__FILE__)}:#{__LINE__-4}\z/o
-      (bt = e.backtrace).reject! {|m| rej =~ m}
-      level = -caller(CALLER_OFFSET).size
-      while THIS_FILE =~ bt[level]
-        bt.delete_at(level)
-        level += 1
-      end
+      # Gemstone,  comment this code which apparently has no effect
+      # rej = /\A#{Regexp.quote(__FILE__)}:#{__LINE__-4}\z/o
+      # (bt = e.backtrace).reject! {|m| rej =~ m}
+      # level = -caller(CALLER_OFFSET).size
+      # while THIS_FILE =~ bt[level]
+      #   bt.delete_at(level)
+      #   level += 1
+      # end
       raise if klass            # if exception class is specified, it
                                 # would be expected outside.
-      raise Error, e.message, e.backtrace
+      raise Error, e.message    #  e.backtrace  # Gemstone, skip backtrace
     ensure
       y.kill if y and y.alive?
     end
