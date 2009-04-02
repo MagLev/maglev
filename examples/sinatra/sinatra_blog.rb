@@ -73,8 +73,9 @@ helpers do
   end
 
   def get_flash
-    flash = @flash
+    flash = @flash.to_s
     @flash = nil
+    flash
   end
 end
 
@@ -113,4 +114,9 @@ get '/save/code' do
   RubyContext.save_context
   Gemstone.commitTransaction
   redirect '/'
+end
+
+get '/reload/app' do
+  puts "== reloading app code"
+  load 'sinatra_blog.rb'
 end
