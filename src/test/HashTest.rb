@@ -76,6 +76,18 @@ class HashTest
         end
     end
 
+    def new5
+      # Apr 1,09  from Michael Latta
+      exp = { 8=>9, 20=>21 }
+
+      h = Hash[ *[8,9,20,21] ]
+      unless h == exp ; raise 'error'; end
+
+      h = Hash[8,9,20,21]
+      unless h == exp ; raise 'error'; end
+      true 
+    end
+
     # Expected value: true
     def equals
         hash1 = Hash[1, 100, 2, 200, 3, 300]
@@ -341,6 +353,7 @@ test(HashTest.new.new1(),true,           "new1")
 test(HashTest.new.new2(),true,           "new2")
 test(HashTest.new.new3(),true,           "new3")
 test(HashTest.new.new4(),true,           "new4")
+test(HashTest.new.new5(),true,           "new5")
 test(HashTest.new.equals(),true,         "equals")
 test(HashTest.new.copy(),true,           "copy")
 test(HashTest.new.clear(),true,          "clear")
