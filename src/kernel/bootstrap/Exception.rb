@@ -170,7 +170,8 @@ end
 # allowed after boot, so the exception definition was moved here.
 #
 # class RubyTimeoutError  is defined in the maglev*.mcz
-RUBY.global("TimeoutError", "RubyTimeoutError")
-class TimeoutError
-  class_primitive_nobridge 'timeout', 'timeout:do:'
-end
+#   RubyTimeoutError deprecated , just use  lib/ruby/1.8/timeout.rb
+# RUBY.global("TimeoutError", "RubyTimeoutError")
+# class TimeoutError 
+#  class_primitive_nobridge 'timeout', 'timeout:do:'
+# end
