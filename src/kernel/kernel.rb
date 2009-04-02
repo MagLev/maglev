@@ -50,9 +50,9 @@ RUBY.require 'kernel/bootstrap/Object.rb'
 
 # deleted use of GsHelper.rb
 
+RUBY.require 'kernel/bootstrap/Float.rb'
 RUBY.require 'kernel/bootstrap/Fixnum.rb'
 RUBY.require 'kernel/bootstrap/Integer.rb'
-RUBY.require 'kernel/bootstrap/Float.rb'
 RUBY.require 'kernel/bootstrap/Numeric.rb'
 RUBY.require 'kernel/bootstrap/Bignum.rb'
 RUBY.require 'kernel/bootstrap/Boolean.rb'
