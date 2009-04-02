@@ -57,8 +57,7 @@ class Hash
     h
   end
 
- 
-  def self.[](*elements)
+  def self._from_elements(elements)
     numelem = elements.length
     if !((numelem & 1).equal?(0))
       if (numelem.equal?(1))
@@ -83,6 +82,20 @@ class Hash
     res
   end
 
+  def self.[](*args)
+    self._from_elements(args)
+  end
+
+  def self.[](arg)
+    if arg._isArray 
+      self._from_elements(arg)
+    elsif arg._isHash
+      arg.dup
+    else
+      Type.coerce_to(arg, Hash, :to_hash)
+    end
+  end
+ 
   # Instance Methods
 
   # initialize is only used to issue too-many args errors for new
