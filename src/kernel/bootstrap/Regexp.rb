@@ -42,8 +42,14 @@ class Regexp
   # engine.
   def search_region(str, start, finish, forward) # equiv to MRI's re_search
     if forward
+      unless finish._isFixnum
+        raise TypeError, 'finish must be a Fixnum'
+      end
       _search(str, start, finish)
     else
+      unless start._isFixnum
+        raise TypeError, 'finish must be a Fixnum'
+      end
       _search(str, finish, start)
     end
   end
@@ -61,10 +67,31 @@ class Regexp
     self.inspect
   end
 
-  def match_from(str, count)
-    return nil if str.equal?(nil) || count >= str.size
-    search_region(str, count, str.size, true)
+  def match_from(str, offset)
+    # search  str[offset .. str.size-1]
+    # does not update caller's $~
+    if str.equal?(nil) 
+      return nil
+    end
+    sz = str.size
+    if (offset >= str.size)
+      return nil
+    end
+    _search(str, offset, sz)
   end
+
+  def match_from_nocheck(str, offset)
+    # search  str[offset .. str.size-1]
+    # caller has already checked that offset < str.size
+    # does not update caller's $~
+    _search(str, offset, nil)
+  end
+
+  def match_start(str, offset) # equiv to MRI's re_match
+    _search(str, offset, true )  # use onig_match()
+    # does not update caller's $~
+  end
+
   # END RUBINIUS
 
   # Return true if +Regexp::IGNORECASE+ is set on this regexp
