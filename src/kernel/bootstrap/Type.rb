@@ -74,8 +74,14 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_f => Float failed:\n" \
                        "(#{e.message})"
      end
-     return ret if ret._isFloat
-     raise TypeError, "Coercion error: obj.to_f did NOT return an Float"
+     unless obj.equal?(nil)
+       if ret._isFloat
+         unless ret.nan?
+           return ret
+         end
+       end 
+     end
+     raise TypeError, "Coercion error: obj.to_f did not return a Float"
   end
 
   def self.coerce_to_Hash_to_hash(obj)
