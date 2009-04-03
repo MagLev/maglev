@@ -17,17 +17,17 @@ class Hash
         h = self.new(args[0])
       end
     else
-      # raises ArgumentError, too-many args, unless  a subclass of Hash 
+      # raises ArgumentError, too-many args, unless  a subclass of Hash
       #   has implemented forms of initialize to take > 1 arg
       h = self._new(5, nil)
-      h.initialize(*args) 
+      h.initialize(*args)
     end
     h
   end
 
   def self.new(&block)
     # subsequent variants replace just the corresponding bridge method
-    if block_given? 
+    if block_given?
       h = self._new(5, block)
       h.initialize(&block)
     else
@@ -36,7 +36,7 @@ class Hash
     end
     h
   end
- 
+
   def self.new
     h = self._new(5, nil)
     h.initialize
@@ -53,7 +53,7 @@ class Hash
     # raises ArgumentError, too-many args, unless  a subclass of Hash
     #   has implemented forms of initialize to take > 1 arg
     h = self._new(5, default_value)
-    h.initialize(default_value, &block) # raises too-many args 
+    h.initialize(default_value, &block) # raises too-many args
     h
   end
 
@@ -70,9 +70,9 @@ class Hash
       raise ArgumentError , 'odd number of args'
     end
     n = 0
-    tsize = numelem / 4 
+    tsize = numelem / 4
     if tsize < 5
-      tsize = 5 
+      tsize = 5
     end
     res = self._new(tsize , nil)
     while (n < numelem)
@@ -87,7 +87,7 @@ class Hash
   end
 
   def self.[](arg)
-    if arg._isArray 
+    if arg._isArray
       self._from_elements(arg)
     elsif arg._isHash
       arg.dup
@@ -95,7 +95,7 @@ class Hash
       Type.coerce_to(arg, Hash, :to_hash)
     end
   end
- 
+
   # Instance Methods
 
   # initialize is only used to issue too-many args errors for new
@@ -158,11 +158,9 @@ class Hash
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb
-    #raise LocalJumpError, "no block given" unless block_given? or empty? # TODO: uncomment
+    raise LocalJumpError, "no block given" unless block_given? or empty?
 
     # Do this in 2 steps, so we're not altering the structure while we walk it.
-    # TODO: I'd like to write it like this:
-    # select(&block).each { |k, v| delete k }
     to_del = []
     each_pair { |k, v| to_del << k if yield(k, v) }
     to_del.each { |k| delete k }
@@ -185,14 +183,12 @@ class Hash
   # * If +block+ is given, return the value of calling +block+ with +key+
   # Fetch does not use any default values supplied when the hash was created.
   #
-  # TODO: Need to test this, as block_given? not working properly yet...
   primitive_nobridge '_atIfAbsent', 'at:ifAbsent:'
 
   def fetch(key, dflt=Undefined, &block)
     val = _atIfAbsent(key, proc { dflt })
     return val unless val.equal?(Undefined)
-# TODO: block_given? does not work, so this is commented out until it does work.
-#    return block.call(key) if block_given?
+    return block.call(key) if block_given?
     raise IndexError, "No value for #{key}"
   end
 

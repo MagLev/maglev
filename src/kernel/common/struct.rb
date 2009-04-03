@@ -43,12 +43,21 @@ class Struct
   def self.new(klass_name, *attrs, &block)
 
     unless klass_name.nil? then
-      begin
-        klass_name = Type.coerce_to(klass_name, String, :to_str)
-      rescue TypeError
+      # GEMSTONE
+      #
+      # We don't want to throw an exception just to distinguish
+      # between a string and a symbol...
+      # begin
+      #   klass_name = Type.coerce_to(klass_name, String, :to_str)
+      # rescue TypeError
+      #   attrs.unshift klass_name
+      #   klass_name = nil
+      # end
+      if klass_name.instance_of?(Symbol)
         attrs.unshift klass_name
         klass_name = nil
       end
+      # END GEMSTONE
     end
 
     begin

@@ -85,7 +85,7 @@ class HashTest
 
       h = Hash[8,9,20,21]
       unless h == exp ; raise 'error'; end
-      true 
+      true
     end
 
     # Expected value: true
@@ -399,5 +399,8 @@ test({1 => "x"}.key?(1.0), false, "eql? test A")
 test({1 => "x"}.key?(1),   true,  "eql? test B")
 test({:a => 1, :b => 2, :c => 3, 4 => 0 }.key?(4.0), false, "eql? test C")
 test({:a => 1, :b => 2, :c => 3, 4 => 0 }.key?(4 ),  true,  "eql? test D")
+
+#  Test passing block to fetch
+test(Hash.new.fetch('xxx') { |el| "go fish #{el}" }, 'go fish xxx', 'Fetch with block')
 
 report
