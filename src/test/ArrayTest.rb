@@ -1016,6 +1016,36 @@ q = 1.0
 tmp.push([val,q])
 test(tmp, [["text/html", 1.0]], "Push an array")
 
+
+# Smoke test each method in enumerable
+ary = ["-i", "--no", "foo"]
+
+test(ary.all? { |arg| arg =~ /^-/ }, false, "all?")
+test(ary.any? { |arg| arg =~ /^-/ }, true, "any?")
+test(ary.collect { |arg| arg =~ /^-/ },[0, 0, nil], "collect")
+test(ary.detect { |arg| arg =~ /^-/ }, '-i', 'detect')
+
+sum = 0
+ary.each_with_index { |arg,i| sum += i }
+test(sum, 3, 'each_with_index')
+
+test(ary.entries, ary, 'entries')
+test(ary.find { |arg| arg =~ /^-/ }, '-i', 'find')
+test(ary.find_all { |arg| arg =~ /^-/ }, ["-i", "--no"], 'find_all')
+test(ary.grep(/^-/), ["-i", "--no"], 'grep')
+test(ary.include?("-i"), true, 'include true')
+test(ary.include?("-ix"), false, 'include false')
+
+test(ary.inject('') { |acc,i| acc << i },"-i--nofoo", 'inject')
+test(ary.map { |arg| arg =~ /^-/ },[0, 0, nil], 'map')
+test(ary.max { |a,b| a.length <=> b.length }, '--no', 'max')
+test(ary.min { |a,b| a.length <=> b.length }, '-i', 'min')
+test(ary.partition { |arg| arg =~ /^-/ }, [['-i', '--no'],['foo']], 'partition')
+test(ary.reject { |arg| arg =~ /^-/ }, ['foo'], 'reject')
+test(ary.select { |arg| arg =~ /^-/ }, ["-i", "--no"], 'select')
+test(ary.zip([1,2,3]), [['-i', 1], ['--no', 2], ['foo', 3]], 'zip')
+
+
 # begin
 #   ary["cat"]
 #   failed_test("Expecting TypeError", TypeError, nil)

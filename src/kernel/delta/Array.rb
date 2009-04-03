@@ -113,11 +113,15 @@ class Array
   end
 
   def grep(pattern)
-    select{|ea| pattern === ea}
+    result = []
+    i = 0
+    lim = size
+    while i < lim
+      result << self[i] if pattern === self[i]
+      i += 1
+    end
+    result
   end
-
-  # TODO: include?: The Pick Axe book documents include? under both Array
-  # and Enumerable. Our implementation is in the Array section above.
 
   def inject(&blk)
     my_size = size
@@ -147,36 +151,54 @@ class Array
 
   alias map collect
 
-  def max
-    if size.equal?(0)
-      nil
-    else
-      max_v = self[0]
-      i = 1
-      lim = size
+  def max(&blk)
+    return nil if size.equal?(0)
+
+    max_v = self[0]
+    i = 1
+    lim = size
+    if block_given?
       while i < lim
-        max_v = self[i] if (self[i] <=> max_v) > 0
+        o = self[i]
+        comp = blk.call(o, max_v)
+        raise ArgumentError, "comparison of #{o.class} with #{max_v} failed" if comp.nil?
+        max_v = o if comp > 0
         i += 1
       end
-      max_v
+    else
+      while i < lim
+        o = self[i]
+        max_v = o if (o <=> max_v) > 0
+        i += 1
+      end
     end
+    max_v
   end
 
   primitive 'member?', 'includes:'
 
-  def min
-    if size.equal?(0)
-      nil
-    else
-      min_v = self[0]
-      i = 1
-      lim = size
+  def min(&blk)
+    return nil if size.equal?(0)
+
+    min_v = self[0]
+    i = 1
+    lim = size
+    if block_given?
       while i < lim
-        min_v = self[i] if (self[i] <=> min_v) < 0
+        o = self[i]
+        comp = blk.call(o, min_v)
+        raise ArgumentError, "comparison of #{o.class} with #{min_v} failed" if comp.nil?
+        min_v = o if comp < 0
         i += 1
       end
-      min_v
+    else
+      while i < lim
+        o = self[i]
+        min_v = o if (o <=> min_v) < 0
+        i += 1
+      end
     end
+    min_v
   end
 
   def partition(&b)
@@ -207,7 +229,16 @@ class Array
     result
   end
 
-  primitive 'select&', 'select:'
+  def select(&b)
+    result = []
+    i = 0
+    lim = size
+    while i < lim
+      result << self[i] if b.call(self[i])
+      i += 1
+    end
+    result
+  end
 
   # sort: is listed in the Pick Axe book under both Array and Enumerable,
   # and implemented here in the Array section above.
