@@ -137,14 +137,28 @@ class String
   #
   #    "cat o' 9 tails" =~ /\d/   #=> 7
   #    "cat o' 9 tails" =~ 9      #=> false
+
+  def =~(*args, &blk)
+    # only one-arg call supported. any other invocation
+    # will have a bridge method interposed which would
+    #   require different args to _storeRubyVcGlobal
+    raise ArgumentError, 'expected 1 arg'
+  end
+
   def =~(other)
+    # no bridge method for this variant
     # =~ is mostly translated to  :match  Sexpression by parser ...
     if other._isRegexp
-      other.=~(self)
+      m = other._search(self, 0, nil)
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      if (m)
+        return m.begin(0)
+      end
+      m
     elsif other._isString
       raise TypeError, 'String given'
     else
-      other =~ self
+      super(other) # code args explicitly to avoid implicit block of ZSuperNode
     end
   end
 
