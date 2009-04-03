@@ -1,5 +1,5 @@
 class GsNMethod
-   # Gemstone compiled methods  are instances of GsNMethod 
+   # Gemstone compiled methods  are instances of GsNMethod
    #  subclasses of GsNMethod is not allowed
    #  extending GsNMethod is not allowed outside of bootstrap
 
@@ -7,8 +7,8 @@ class GsNMethod
 end
 
 class Method
-    # Method is identically Smalltalk RubyMeth  
-    #   RubyMethod is defined in the .mcz 
+    # Method is identically Smalltalk RubyMeth
+    #   RubyMethod is defined in the .mcz
 
     def _obj
       @obj
@@ -21,8 +21,8 @@ class Method
     def ==(other)
       # Returns true if other is the same method as self
       if (other.kind_of?(Method))
-        return @obj.equal?(other._obj) && 
-	       @gsmeth.equal?(other._gsmeth)
+        return @obj.equal?(other._obj) &&
+         @gsmeth.equal?(other._gsmeth)
       else
         return false
       end
@@ -31,16 +31,19 @@ class Method
     # arity inherited from UnboundMethod
 
     def call(*args, &blk)
-      @gsmeth._call_star(@obj, *args, &blk) 
+      @gsmeth._call_star(@obj, *args, &blk)
     end
 
     def [](*args, &blk)
-      @gsmeth._call_star(@obj, *args, &blk) 
+      @gsmeth._call_star(@obj, *args, &blk)
     end
 
     alias_method :eql? , :==
 
     # TODO to_proc
+    def to_proc
+      Proc.new { |*args| self.call(*args) }
+    end
 
     primitive_nobridge 'unbind', 'unbind'
 end

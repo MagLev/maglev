@@ -86,7 +86,7 @@ class Class
     if (self.equal?(obj))
       res = false
     else
-      res = self._subclassOf
+      res = self._subclassOf(obj)
     end
     res
   end
