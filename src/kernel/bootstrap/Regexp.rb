@@ -11,9 +11,7 @@ class Regexp
   META_REPL_CHARS = 'nrft '
   META_REPL_CHARS.freeze
 
-  class_primitive_nobridge 'new', 'new:options:lang:'
-  class_primitive_nobridge 'new', 'new:options:'
-  class_primitive_nobridge 'new', 'new:'
+  class_primitive_nobridge '_new', 'new:options:lang:'
 
   primitive_nobridge '_search', '_search:from:to:'
   primitive_nobridge '_compile', '_compile:options:'
@@ -23,7 +21,30 @@ class Regexp
 
   # class_primitive 'alloc', '_basicNew'
 
-  def self.compile(pattern, options = 0, lang = nil)
+
+  #     Regexp.new(string [, options [, lang]])       => regexp
+  #     Regexp.new(regexp)                            => regexp
+  #     Regexp.compile(string [, options [, lang]])   => regexp
+  #     Regexp.compile(regexp)                        => regexp
+  #
+  #  Constructs a new regular expression from <i>pattern</i>, which can be either
+  #  a <code>String</code> or a <code>Regexp</code> (in which case that regexp's
+  #  options are propagated, and new options may not be specified (a change as of
+  #  Ruby 1.8). If <i>options</i> is a <code>Fixnum</code>, it should be one or
+  #  more of the constants <code>Regexp::EXTENDED</code>,
+  #  <code>Regexp::IGNORECASE</code>, and <code>Regexp::MULTILINE</code>,
+  #  <em>or</em>-ed together. Otherwise, if <i>options</i> is not
+  #  <code>nil</code>, the regexp will be case insensitive. The <i>lang</i>
+  #  parameter enables multibyte support for the regexp: `n', `N' = none, `e',
+  #  `E' = EUC, `s', `S' = SJIS, `u', `U' = UTF-8.
+  #
+  #     r1 = Regexp.new('^a-z+:\\s+\w+')           #=> /^a-z+:\s+\w+/
+  #     r2 = Regexp.new('cat', true)               #=> /cat/i
+  #     r3 = Regexp.new('dog', Regexp::EXTENDED)   #=> /dog/x
+  #     r4 = Regexp.new(r2)                        #=> /cat/i
+  #
+  # GEMSTONE: Only languages 'n' and 'N' are currently supported
+  def self.new(pattern, options = 0, lang = nil)
     if (pattern._isRegexp)
       options = pattern.options
       lang = nil
@@ -32,6 +53,11 @@ class Regexp
     unless (options._isFixnum)
       options = options ? IGNORECASE : 0
     end
+    self._new(pattern, options, lang)
+  end
+
+  # Synonym for <code>Regexp.new</code>.
+  def self.compile(pattern, options = 0, lang = nil)
     self.new(pattern, options, lang)
   end
 
@@ -70,7 +96,7 @@ class Regexp
   def match_from(str, offset)
     # search  str[offset .. str.size-1]
     # does not update caller's $~
-    if str.equal?(nil) 
+    if str.equal?(nil)
       return nil
     end
     sz = str.size
@@ -200,7 +226,7 @@ class Regexp
           block.call(match)
         end
       else
-        return 
+        return
       end
     end
   end
@@ -212,7 +238,7 @@ class Regexp
       match = _search(str, pos, nil)
       if match
         # store into specified $~, in case block references it
-        match._storeRubyVcGlobal(vcglobals_arg) 
+        match._storeRubyVcGlobal(vcglobals_arg)
         pos = match.end(0)
         if match.begin(0) == pos
           pos += 1
@@ -220,7 +246,7 @@ class Regexp
           block.call(match)
         end
       else
-        return 
+        return
       end
     end
   end

@@ -82,6 +82,14 @@ test(md[3], nil,      'md[3]')
 
 # Test a regression with inspect() vs inspect(touchedSet)
 test([/xyz/].inspect, "[/xyz/]", "[/xyz/].inspect" )
+
+# Test a regression: Regexp.new() wouldn't accept a Regexp
+#
+# Test one is that new does not throw an exception:
+munge_re = Regexp.new(/[^a-z0-9_.-]+/)
+test(munge_re.match('XXX').class, MatchData, 'Munge A')
+test(munge_re.match('xxx'), nil, 'Munge B')
+
 report
 
 class RegexpTest
