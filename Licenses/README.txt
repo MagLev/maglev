@@ -19,3 +19,7 @@ included in this distribution, and covered by their respective licenses:
    Rubinius-LICENSE.txt - Rubinius (Ruby Sources only)
    Seaside-MIT-License.txt - Seaside web application framework
    SqueakLicense.txt - Squeak Smalltalk
+
+In all cases where open source components are dual licensed, and one of 
+the choices is the GPL, we have chosen to use that software under the
+non-GPL license.
