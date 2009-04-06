@@ -11,6 +11,7 @@ class String
 
   primitive_nobridge 'substring1', 'copyFrom:to:'
   primitive_nobridge '_findStringStartingAt', 'findString:startingAt:'
+  primitive_nobridge '_md5sum', 'md5sum'
   class_primitive_nobridge '_withAll', 'withAll:'
   class_primitive_nobridge '_alloc', '_basicNew'
 
@@ -28,7 +29,7 @@ class String
     if self.class.equal?(String)
       # do nothing
     else
-      self.replace(str) 
+      self.replace(str)
     end
     self
   end
@@ -36,7 +37,7 @@ class String
   def self.new()
     # no bridge methods for this variant
     s = _alloc
-    s.initialize 
+    s.initialize
     s
   end
 
