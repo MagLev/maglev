@@ -313,16 +313,22 @@ class Array
     out = ""
 #    out.taint if sep.tainted? or self.tainted?
     i = 0
-    while(i < my_size)
+    ts = Thread._recursion_guard_set
+    while (i < my_size)
       elem = at(i)
       out << sep unless (sep.equal?(nil) || i == 0)
 
-      if elem.kind_of?(Array)
-        if RecursionGuard.inspecting?(elem)
+      if elem._isArray
+        if ts.include?(elem)
           out << "[...]"
         else
-          RecursionGuard.inspect(self) do
+          added = ts._add_if_absent(self)
+          begin
             out << elem.join(sep)
+          ensure
+            if added
+             ts.remove(self)
+            end
           end
         end
       else
