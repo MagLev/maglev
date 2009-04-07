@@ -66,20 +66,8 @@ module Sinatra
     # evaluation is deferred until the body is read with #each.
     def body(value=nil, &block)
       if block_given?
-        # GEMSTONE
-        # Workaround for https://magtrac.gemstone.com/ticket/376.  MagLev
-        # doesn't convert all blocks to Procs (it is expensive). MagLev
-        # does not allow you to extend a block, so defining the iterator on
-        # the block won't work.  As a workaround, we convert to a Proc and
-        # then work on that.
-        #
-        #   def block.each ; yield call ; end
-        #   response.body = block
-        #
-        p = Proc.new(&block)
-        def p.each; yield self.call;  end
-        response.body = p
-        # END GEMSTONE
+        def block.each ; yield call ; end
+        response.body = block
       else
         response.body = value
       end

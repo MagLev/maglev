@@ -5,10 +5,11 @@ puts "== setup.rb"
 unless defined? SETUP_RUN
   SETUP_RUN = 1
   here = File.dirname(__FILE__)
-  $:.unshift(here + '/../../src/external/Sinatra/lib')
-  $:.unshift(here + '/../../src/external/Rack/lib')
+  $:.unshift(here + '/../../../src/external/Sinatra/lib')
+  $:.unshift(here + '/../../../src/external/Rack/lib')
   $:.unshift(here)
 
+puts "$: #{$:.inspect}"
   class Object
     def running_maglev?
       !!defined? RUBY_ENGINE && RUBY_ENGINE == 'maglev'

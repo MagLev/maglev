@@ -2,7 +2,7 @@ This directory contains source from outside the Ruby Libs that we don't
 intend to ship with the product, but we feel is important that anyone
 working with these apps on MagLev should share the same code/fixes.
 
-See the top level docs/applications directory for more details.
+NOTE:  See the top level docs/applications directory for more details.
 
 Rack
   Rack provides an minimal interface between webservers supporting Ruby and
@@ -29,9 +29,8 @@ Ramaze
 
   !!! NOTE !!!: Gemstone has made the following changes to the Ramaze code:
   * lib/ramaze/reloader.rb: Commented out the test for RInotify gem, and
-    force use of File.stat.  MagLev does not currently support rubygem.
+    force use of File.stat.  MagLev does not currently support Ruby Gems.
   * Thread.abort_on_exception= is a stub, so...watch out.
-
 
 ramaze_hello.rb
   An in-progress test script to run a simple ramaze app.
@@ -39,16 +38,10 @@ ramaze_hello.rb
 rubygems-1.3.1
   Ruby gems 1.3.1.  We're working on getting it to run.
 
-  !!! NOTE !!!: Gemstone has made the following changes to the code:
-  * rubygems-1.3.1/lib/rubygems/source_index.rb: Work around Trac 370
-
 rxtest
   Tim Bray's rx code.  Rx is an automaton based XML tokenizer.  It was
   proposed as one of the real-world-ish applications to add to Antonio's
   benchmark suite.
 
 sintatratest.rb
-  NOT WORKING YET...this will be a simple sinatra smoke test, but it isn't
-  working yet...
-
-
+  A simple sinatra smoke test.

@@ -44,9 +44,6 @@ Sinatra:
   Kernel#caller, but the details of filenames caused problems (MagLev
   prints only full pathnames, while MRI prints a variety of formats).
 
-* lib/sinatra/base.rb: https://magtrac.gemstone.com/ticket/376
-  Work around problem between blocks vs. procs.
-
 === RubyGems
 
 A (currently) unpatched version of RubyGems is in the source tree under
