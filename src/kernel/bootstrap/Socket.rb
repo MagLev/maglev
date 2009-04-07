@@ -8,7 +8,7 @@
 #   state is the same as the receiver's
 #
 #   All other newly created sockets default to non-blocking. Use
-#      aSocket.setsockopt('SOL_TCP', 'SO_NONBLOCKING', false)
+#      aSocket.set_blocking(false)
 #   to change a socket to blocking.
 #
 #   The above is based on the current plan to use blocking sockets
@@ -16,53 +16,8 @@
 
 class Socket
 
-  SOCK_STREAM    = 1
-  SOCK_DGRAM     = 2
-  SOCK_RAW       = 3
-  SOCK_SEQPACKET = 5
-
-  AF_UNSPEC    = 0
-  AF_UNIX      = 1
-  AF_LOCAL     = AF_UNIX
-  AF_INET      = 2
-  AF_IMPLINK   = 3
-  AF_PUP       = 4
-  AF_CHAOS     = 5
-  AF_NS        = 6
-  AF_ISO       = 7
-  AF_OSI       = AF_ISO
-  AF_ECMA      = 8
-  AF_DATAKIT   = 9
-  AF_CCITT     = 10
-  AF_SNA       = 11
-  AF_DECnet    = 12
-  AF_DLI       = 13
-  AF_LAT       = 14
-  AF_HYLINK    = 15
-  AF_APPLETALK = 16
-  AF_ROUTE     = 17
-  AF_LINK      = 18
-  AF_COIP      = 20
-  AF_CNT       = 21
-  AF_IPX       = 23
-  AF_SIP       = 24
-  AF_NDRV      = 27
-  AF_ISDN      = 28
-  AF_E164      = AF_ISDN
-  AF_INET6     = 30
-  AF_NATM      = 31
-  AF_SYSTEM    = 32
-  AF_NETBIOS   = 33
-  AF_PPP       = 34
-
-  AI_PASSIVE     = 0x00000001
-  AI_CANONNAME   = 0x00000002
-  AI_NUMERICHOST = 0x00000004
-  AI_MASK        = (AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST)
-  AI_ALL         = 0x00000100
-  AI_ADDRCONFIG  = 0x00000400
-  AI_V4MAPPED    = 0x00000800
-  AI_DEFAULT     = (AI_V4MAPPED | AI_ADDRCONFIG)
+  # OS dependent constants initialized by _init_socket_constants
+  # in second opening of Socket, below
 
   # accept implemented only in TCPServer .
   # bind, listen not implemented,
@@ -75,6 +30,11 @@ class Socket
   primitive 'write', 'write:'
   primitive 'recv', 'recv:'
   primitive 'read', 'recv:'
+
+  def flush
+    # nothing to do, no buffering in the VM for socket write operations
+    self
+  end
 
   def gets(*args, &blk)
     raise ArgumentError, 'expected 0 or 1 arg'
@@ -97,24 +57,95 @@ class Socket
   end
 
   # following 2 are in BasicSocket in Ruby 1.8 , but put in Socket for now,
-  #  and they only support access to SO_NONBLOCKING , examples:
-  #    aSocket.getsockopt('SOL_TCP', 'SO_NONBLOCKING')
-  #    aSocket.setsockopt('SOL_TCP', 'SO_NONBLOCKING', aBoolean)
-  primitive_nobridge 'setsockopt', 'setsockopt:name:value:'
-  primitive 'getsockopt', 'getsockopt:name:'
+
+  primitive_nobridge '_setsockopt', 'setsockopt:name:value:'
+
+  primitive '_getsockopt', 'getsockopt:name:'
+
+  def getsockopt(level, optname)
+    #  result is a Fixnum except for
+    #  optname's SO_RCVTIMEO, SO_SNDTIMEO, SO_LINGER which return a 2 element Array
+    arr = _getsockopt(level, optname)
+    if arr._isFixnum
+      Errno.raise(arr)
+      res = nil
+    elsif arr.size.equal?(1) 
+      res = arr[0]  # a Fixnum
+    else
+      # 2 element Array from SO_RCVTIMEO, SO_SNDTIMEO, or SO_LINGER
+      res = arr
+    end
+    res
+  end
+
+  def setsockopt(level, optname, optval)
+    # optval should be a Fixnum or true or false except for
+    # optname's SO_RCVTIMEO, SO_SNDTIMEO, SO_LINGER which require a 2 element Array
+    #   of Fixnums .
+    if optval.equal?(true)
+      optval = 1
+    elsif optval.equal?(false)
+      optval = 0
+    end 
+    status = _setsockopt(level, optname, optval)
+    if status.equal?(0)
+      return self
+    else
+      Errno.raise(status)
+    end
+  end
+
+  
+  # def set_blocking(a_boolean)  ; end
+  #  this is a  workaround until fcntl() is implemented in IO.rb
+  primitive 'set_blocking', 'setBlocking:'
 
   class_primitive 'do_not_reverse_lookup', 'setNoReverseLookup:'
-# do we have a problem here ?
-#  class_primitive 'getaddrinfo', 'getaddrinfo:port:family:type:protocol:flag:'
-  class_primitive '_getaddrinfo', 'getaddrinfo:port:'
+  class_primitive_nobridge '_getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
   class_primitive 'gethostbyname', 'gethostbyname:'
+  class_primitive '_getservbyname', 'getservbyname:protocol:'
   class_primitive 'gethostname', 'getLocalHostName'
   class_primitive 'new', 'new:type:proto:'
 
-# problem ?
-  def self.getaddrinfo(name, port, *args)
-    [[2, port, "localhost", "127.0.0.1", nil, nil]]
+  def self.getservbyname(service, proto='tcp')
+    # returns a port number as a Fixnum , or raises an error
+    #   if the service is not found.
+    s = Type.coerce_to(service, String, :to_str)
+    p = Type.coerce_to(proto, String, :to_str)
+    _getservbyname(s, p)
   end
+
+  def self.getaddrinfo(host, service, family = 0, socktype = 0,  
+			protocol = 0, flags = 0)
+    # implementation in Smalltalk layer is incomplete ,
+    #   result will only include a single entry for the specified host
+    #   and service, assuming TCP protocol.
+    if host.equal?(nil)
+      host = 'localhost'
+    else
+      host = Type.coerce_to(host, String, :to_s)
+    end
+    if service._isFixnum || service._isString || service.equal?(nil)
+      # ok
+    else
+      service = Type.coerce_to(service, String, :to_s)
+    end
+    family = Type.coerce_to(family, Fixnum, :to_int) 
+    socktype = Type.coerce_to(socktype, Fixnum, :to_int)
+    protocol = Type.coerce_to(protocol, Fixnum, :to_int)
+    flags = Type.coerce_to(flags, Fixnum, :to_int)
+    args = [ host, service, family, socktype, protocol, flags ]
+    _getaddrinfo( args )
+  end
+end
+
+class Socket
+  class_primitive '_init_socket_constants', '_initSocketConstants'
+
+  self._init_socket_constants  # initialize OS dependent constants,
+               #  they are implemented as Transient constants ,
+               #  must be in second opening of Socket so Socket's name space
+               #  is fully initialized
 end
 
 class IPSocket
@@ -127,6 +158,20 @@ class TCPSocket
   # open binds a socket to a port and does a blocking connect,
   #  returning a blocking socket.
   class_primitive 'open', 'new:port:'
+  class_primitive '_open', 'open:'
+
+  def self.new(host, port)
+    self.open(host, port)
+  end
+
+  def self.new(host)
+    self._open(host)
+  end
+
+  def self.open(host)
+    self._open(host)
+  end 
+
 end
 
 class TCPServer
