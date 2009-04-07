@@ -814,11 +814,7 @@ class String
   # MNI: upto
 
   # ====== Object
-  primitive '_inspect', '_rubyPrintString'
-
-  def inspect(touchedSet=nil)
-    _inspect
-  end
+  primitive 'inspect', '_rubyPrintString'
 
   primitive 'dup', 'copy'
 
