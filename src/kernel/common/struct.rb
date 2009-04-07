@@ -129,11 +129,13 @@ class Struct
     return false if (self.class != other.class)
     return false if (self.values.size != other.values.size)
 
-    self.values.size.times { |i|
-      next if (RecursionGuard.inspecting?(self.values.at(i)))
-      next if (RecursionGuard.inspecting?(other.values.at(i)))
-      RecursionGuard.inspect(self.values.at(i)) do
-        RecursionGuard.inspect(other.values.at(i)) do
+    self.values.size.times { |i |
+      rg = RecursionGuard
+      rgstack = rg.stack
+      next if (rgstack.include?(self.values.at(i)))
+      next if (rgstack.include?(other.values.at(i)))
+      rg.inspect(self.values.at(i)) do
+        rg.inspect(other.values.at(i)) do
           return false if (self.values.at(i) != other.values.at(i))
         end
       end
@@ -378,9 +380,10 @@ class Struct
   # Describe the contents of this struct in a string.
 
   def to_s
-    return "[...]" if RecursionGuard.inspecting?(self)
+    rg = RecursionGuard
+    return "[...]" if rg.inspecting?(self)
 
-    RecursionGuard.inspect(self) do
+    rg.inspect(self) do
       "#<struct #{self.class.name} #{_attrs.zip(self.to_a).map{|o| o[1] = o[1].inspect; o.join('=')}.join(', ') }>"
     end
   end
