@@ -71,7 +71,7 @@ module WEBrick
         begin
           logger.debug("TCPServer.new(#{ai[3]}, #{port})") if logger
           sock = TCPServer.new(ai[3], port)
-          sock.setsockopt('SOL_TCP', 'SO_NONBLOCKING', false) # gemstone use blocking sockets
+          sock.set_blocking(true) # gemstone use blocking sockets
           port = sock.addr[1] if port == 0
           Utils::set_close_on_exec(sock)
           sockets << sock

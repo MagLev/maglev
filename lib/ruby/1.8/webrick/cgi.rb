@@ -47,7 +47,7 @@ module WEBrick
 
     def start(env=ENV, stdin=$stdin, stdout=$stdout)
       sock = WEBrick::CGI::Socket.new(@config, env, stdin, stdout)
-      sock.setsockopt('SOL_TCP', 'SO_NONBLOCKING', false) # gemstone use blocking sockets
+      sock.set_blocking(true) # gemstone use blocking sockets
       req = HTTPRequest.new(@config)
       res = HTTPResponse.new(@config)
       unless @config[:NPH] or defined?(MOD_RUBY)

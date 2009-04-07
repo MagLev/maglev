@@ -103,7 +103,7 @@ module WEBrick
       begin
         @logger.debug("CONNECT: upstream proxy is `#{host}:#{port}'.")
         os = TCPSocket.new(host, port)     # origin server
-        os.setsockopt('SOL_TCP', 'SO_NONBLOCKING', false) # gemstone use blocking sockets
+        os.set_blocking(true) # gemstone use blocking sockets
 
         if proxy
           @logger.debug("CONNECT: sending a Request-Line")
