@@ -19,23 +19,17 @@ module Digest
   #
   # Generates a hex-encoded version of a given _string_.
   def hexencode(value)
-    case value
-    when Bignum
-      value.to_s(16).downcase
-    when String
-      value
-    else
-      #nil.pause
-      raise ArgumentError, "Class #{value.class} not handled yet"
-    end
+    out = ''
+    value.each_byte { |b| out << sprintf("%02x", b) }
+    out
   end
   module_function :hexencode
 
-  def const_missing(c)
-    # Recognize :SHA256, :SHA384, :SHA512 and load up the right libs
-    # then return Digest.const_get(c)
-    raise NotImplementedError
-  end
+#   def const_missing(c)
+#     # Recognize :SHA256, :SHA384, :SHA512 and load up the right libs
+#     # then return Digest.const_get(c)
+#     raise NotImplementedError
+#   end
 
   # This module provides instance methods for a digest implementation
   # object to calculate message digest values.

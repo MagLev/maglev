@@ -46,6 +46,6 @@ class ::Digest::MD5 < ::Digest::Base
       bytes[l - i - 1] =  b & 0xFF
       b = b >> 8
     end
-     bytes.pack("C*")
+    bytes.pack("C*")
  end
 end
