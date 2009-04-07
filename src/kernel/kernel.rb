@@ -75,6 +75,7 @@ RUBY.require 'kernel/bootstrap/Dir.rb'
 RUBY.require 'kernel/bootstrap/File.rb'
 
 RUBY.require 'kernel/bootstrap/Range.rb'
+RUBY.require 'kernel/bootstrap/RecursionGuard.rb'
 
 RUBY.require 'kernel/bootstrap/Time.rb'
 RUBY.require 'kernel/bootstrap/IO.rb'
@@ -104,7 +105,7 @@ RUBY.require 'kernel/bootstrap/zlib_czstream.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
-RUBY.require 'kernel/common/misc.rb'
+# RUBY.require 'kernel/common/misc.rb'  # not used
 RUBY.require 'kernel/common/ctype.rb'
 
 RUBY.require 'kernel/common/integer.rb'
