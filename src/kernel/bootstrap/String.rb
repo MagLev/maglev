@@ -540,6 +540,17 @@ class String
   primitive_nobridge 'slice', '_rubyAt:'
     # arg may be an  int, range, regexp, or match_string
 
+  def slice(*args)
+    len = args.size
+    if len.equal?(1)
+      slice(args[0])
+    elsif len.equal?(2)
+      slice(args[0], args[1])
+    else
+      raise ArgumentError, 'expected 1 or 2 args'
+    end 
+  end
+
   def slice!(start, length)
     # start and length are both  int
     s = slice(start, length)

@@ -923,8 +923,20 @@ class Array
   end
 
   primitive 'size'
+
   primitive 'slice', '_rubyAt:'
   primitive 'slice', '_rubyAt:length:'
+
+  def slice(*args)
+    len = args.size
+    if len.equal?(1)
+      slice(args[0])
+    elsif len.equal?(2)
+      slice(args[0], args[1])
+    else
+      raise ArgumentError, 'expected 1 or 2 args'
+    end
+  end
 
   def slice!(x, y = nil)
     if y
