@@ -344,7 +344,8 @@ class HashTest
       h['c'] = h
       s = h.inspect
       exp = '{"b"=>"def", "c"=>{...}, "a"=>"abc"}'
-      return s == exp
+      unless s == exp ; raise 'error'; end
+      true
     end
 end
 
