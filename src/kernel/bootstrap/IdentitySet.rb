@@ -1,7 +1,10 @@
 class IdentitySet
    # Set is identically  Smalltalk IdentitySet
+   #  an IdentitySet will never contain nil  ,  add(nil) will have no effect .
 
     primitive_nobridge '<<', 'add:'
+    primitive_nobridge 'add', 'add:'
+    primitive_nobridge '_add_if_absent', '_addIfAbsent:'
     primitive_nobridge '*'
     primitive_nobridge '+'
     primitive_nobridge '-'
@@ -10,8 +13,18 @@ class IdentitySet
     primitive 'each&', 'do:'
     primitive 'length', 'size'
 
-    primitive_nobridge '_includes', 'includes:'
-    primitive_nobridge '_remove', 'removeIfPresent:'
+    primitive_nobridge 'include?', 'includes:'
+ 
+    primitive_nobridge 'remove', 'removeIfPresent:'
+    primitive_nobridge 'pop', 'removeIfPresent:'
+    # returns argument, or nil if object was not present
+
+    primitive_nobridge 'delete?', 'removeIfPresent:'
+
+    def delete(obj)
+      delete?(obj)
+      self
+    end
 
     class_primitive 'new' , 'new'
 
@@ -21,7 +34,7 @@ class IdentitySet
       o
     end
 
-    def inspect(touchedSet=nil)
+    def inspect
         "[[#{length}]]"
     end
 

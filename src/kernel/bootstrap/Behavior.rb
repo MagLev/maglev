@@ -82,7 +82,7 @@ class Behavior
     _define_method_block(sym, &blk)
   end
 
-  def inspect(touchedSet=nil)
+  def inspect
     name
   end
 

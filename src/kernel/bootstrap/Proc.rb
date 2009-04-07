@@ -214,7 +214,7 @@ class Proc
     #  necessarily have a VariableContext so it may not even
     #  be possible to create a complete Binding.
 
-    def inspect(touchedSet=nil)
+    def inspect
       "#<Proc>"
     end
 

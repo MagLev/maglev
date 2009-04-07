@@ -105,16 +105,18 @@ class Range
 
   # Convert this range object to a printable form (using
   # <tt>inspect</tt> to convert the start and end objects).
-  def inspect(touchedSet=nil)
-    if (touchedSet.equal?(nil))
-      touchedSet = IdentitySet.new
-    else
-      if (touchedSet._includes(self))
-        return #{@excludeEnd ? "..." : ".."}
-      end
+  def inspect
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    unless added
+      return #{@excludeEnd ? "..." : ".."}
     end
-    touchedSet << self
-    "#{@from.inspect(touchedSet)}#{@excludeEnd ? "..." : ".."}#{@to.inspect(touchedSet)}"
+    begin 
+      s = "#{@from.inspect}#{@excludeEnd ? "..." : ".."}#{@to.inspect}"
+    ensure
+      ts.remove(self)
+    end
+    s 
   end
 
   def step(n=1, &block)

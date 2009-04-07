@@ -15,7 +15,7 @@ class Symbol
   primitive_nobridge 'hash'
 
   # _concatenate inherited from String for now
-  def inspect(touchedSet=nil)
+  def inspect
     ':'._concatenate(self)
   end
 

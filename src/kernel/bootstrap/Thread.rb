@@ -108,6 +108,8 @@ class Thread
 
   class_primitive_nobridge 'stop', 'stop'
 
+  class_primitive_nobridge '_recursion_guard_set', '_recursionGuardSet'
+
   primitive_nobridge '[]', 'threadDataAt:'
 
   primitive_nobridge '[]=', 'threadDataAt:put:'

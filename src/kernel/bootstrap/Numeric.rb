@@ -87,11 +87,7 @@ class Numeric
 
     primitive 'step', '_rubyTo:by:do:'
 
-    primitive_nobridge '_inspect', 'printString'
-
-    def inspect(touchedSet=nil)
-      _inspect
-    end
+    primitive_nobridge 'inspect', 'printString'
 
 
     # to_int implemented in subclasses, but this default implementation is

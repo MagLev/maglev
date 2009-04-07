@@ -112,7 +112,7 @@ class Class
 
   # name inherited from Module
 
-  def inspect(touchedSet=nil)
+  def inspect
     name
   end
 

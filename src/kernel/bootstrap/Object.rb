@@ -188,12 +188,8 @@ class Object
     #  trappable only by an Exception specifying exactly error 6001
     primitive 'pause', 'pause'
 
-    #                                   rubyInspect comes from .mcz
-    primitive_nobridge '_inspect', '_rubyInspect:'
-
-    def inspect(touchedSet=nil)
-      self._inspect(touchedSet)
-    end
+    primitive   'inspect', '_rubyInspect'
+    #    rubyInspect implemented in.mcz
 
     #  following 3 prims must also be installed in Behavior
     primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
@@ -267,13 +263,6 @@ class Object
     output << self
     output
   end
-
-    def pretty_inspect
-      # TODO: remove
-      # hides Kernel#pretty_inspect from mspec's src/lib/pp.rb 
-      #   until we get Thread implemented.
-      inspect;
-    end
 
 
     def to_a

@@ -3,9 +3,9 @@ class MatchData
   primitive_nobridge '[]' , '_rubyAt:'
   primitive '[]' , '_rubyAt:length:'
 
-  def inspect(touchedSet=nil)
+  def inspect
     matches = [self[0]].concat(self.captures)
-    "MatchData: #{matches.inspect(touchedSet)}"
+    "MatchData: #{matches.inspect}"
   end
 
   def to_a

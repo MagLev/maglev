@@ -193,6 +193,7 @@ class Integer
 
         primitive '_to_s_base_show', 'printStringRadix:showRadix:'
 
+        # primitive to_s  is the zero arg form 
         primitive 'to_s', 'asString'
 
         def to_s(base)

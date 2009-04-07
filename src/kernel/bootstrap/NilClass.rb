@@ -14,7 +14,7 @@ class NilClass
    primitive 'to_i' , '_ruby_to_i'
    primitive 'to_s' , '_ruby_to_s'
 
-   def inspect(touchedSet=nil)
+   def inspect
      "nil"
    end
 

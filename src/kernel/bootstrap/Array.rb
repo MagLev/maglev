@@ -320,18 +320,32 @@ class Array
     # TODO: [1,2,3] <=> ["a"] should return nil, but throws a No method
     # for #'_generality....
 
-    i = 0
-    unless other._isArray
-      raise TypeError , "not an Array"
-    end
-
-    lim = size > other.size ? other.size : size # lim is the min
-    while i < lim
-      result = self[i] <=> other[i]
-      return result if !(result.equal?(0))
-      i += 1
-    end
-    size <=> other.size
+    other = Type.coerce_to(other, Array, :to_ary)
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    begin
+      other_size = other.size
+      lim = size > other_size ? other_size : size # lim is the min
+      i = 0
+      while i < lim
+        curr = self[i] 
+        if ts.include?(curr)
+          unless cur.equal?(other[i])
+            return 1 if size > other_size
+            return -1 if size < other_size
+          end
+        else
+          result = self[i] <=> other[i]
+          return result if !(result.equal?(0))
+        end
+        i += 1
+      end
+      return size <=> other_size
+    ensure
+      if added
+        ts.remove(self)
+      end
+    end  
   end
 
   # ====== Comparable:
@@ -339,23 +353,34 @@ class Array
   # Need to either overwrite or allow a mixin.
 
   def ==(other)
-    if other._isArray
-      if (other.equal?(self))
-        return true
-      end
-    else
-      return false
+    return true if equal?(other)
+    unless other._isArray
+      return false unless other.respond_to?(:to_ary)
+      other = other.to_ary
     end
-    lim = size
+
+    lim = self.size
     unless lim.equal?(other.size)
       return false
     end
-    i = 0
-    while i < lim
-      unless self[i] == other[i]
-        return false
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    begin
+      i = 0
+      limi = lim
+      while i < limi
+        curr = self[i]
+        if ts.include?(curr)
+          return false unless curr.equal?(other[i])
+        else
+          return false unless curr == other[i]
+        end
+        i += 1
       end
-      i += 1
+    ensure
+      if added
+        ts.remove(self)
+      end
     end
     true
   end
@@ -558,15 +583,28 @@ class Array
   # eql?.
   #
   def eql?(other)
-    return true if equal? other
+    return true if self.equal?(other)
     return false unless other._isArray
     return false unless size.equal?(other.size)
 
-    i = 0
-    lim = size
-    while i < lim
-      return false unless self[i].eql? other[i]
-      i += 1
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    begin
+      i = 0
+      lim = size
+      while i < lim
+        curr = self[i]
+        if ts.include?(curr)
+          return false unless curr.equal?(other[i])
+        else
+          return false unless curr.eql?(other[i])
+        end
+        i += 1
+      end
+    ensure
+      if added
+        ts.remove(self)
+      end
     end
     true
   end
@@ -1034,19 +1072,20 @@ class Array
 
   primitive 'hash'
 
-  def inspect(touchedSet=nil)
+  def inspect
     s = "["
-    if (touchedSet.equal?(nil))
-      touchedSet = IdentitySet.new
-    else
-      if (touchedSet._includes(self))
-        s << '...]'
-        return s
-      end
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    unless added
+      s << '...]'
+      return s
     end
-    touchedSet << self
-    s << ( collect{|ea| ea.inspect(touchedSet) }.join(", ") )
-    s << "]"
+    begin
+      s << ( collect {|ea| ea.inspect }.join(", ") )
+      s << "]"
+    ensure
+      ts.remove(self)
+    end
     s
   end
 
