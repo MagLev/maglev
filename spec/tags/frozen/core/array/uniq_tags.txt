@@ -1,4 +1,2 @@
-fails:Array#uniq uses eql? semantics
 fails:Array#uniq compares elements with matching hash codes with #eql?
 fails:Array#uniq returns subclass instance on Array subclasses
-fails:Array#uniq! returns nil if no changes are made to the array

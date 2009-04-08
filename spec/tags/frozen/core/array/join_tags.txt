@@ -1,9 +1,3 @@
 fails:Array#join returns a string formed by concatenating each element.to_s separated by separator without trailing separator
 fails:Array#join raises a NoMethodError if an element does not respond to #to_s
-fails:Array#join uses the same separator with nested arrays
-fails:Array#join tries to convert the passed seperator to a String using #to_str
-fails:Array#join handles recursive arrays
 fails:Array#join returns a string which would be infected with taint of the array, its elements or the separator when the array is not empty
-fails:Array#join does not separates elements when the passed separator is nil
-fails:Array#join uses $, as the default separator (which defaults to nil)
-fails:Array#join calls #to_str to convert the separator to a String

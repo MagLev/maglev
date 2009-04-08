@@ -1,4 +1,1 @@
-fails:Array#sort sorts Arrays that consist entirely of equal elements
-fails:Array#sort uses #<=> of elements in order to sort
-fails:Array#sort! uses #<=> of elements in order to sort
 fails:Array#sort! temporarily freezes self and recovers after sorted

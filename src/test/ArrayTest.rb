@@ -1002,10 +1002,18 @@ a = [1,2]
 test(a[4,10] = nil,  nil,             "assign  1")
 test(a,              [1,2,nil,nil],   "assign  2")
 
+
+report
+
+puts "=== a #{a.inspect} 1"
+
 test(a[4,10] = 4,    4,               "assign  3")
+puts "=== a #{a.inspect} 2"
 test(a,              [1,2,nil,nil,4], "assign  4")
+puts "=== a #{a.inspect} 3"
 
 a = [1,2]
+puts "=== a #{a.inspect} 4"
 test(a[4,10] = 4,    4,               "assign  5")
 test(a,              [1,2,nil,nil,4], "assign  6")
 
@@ -1052,4 +1060,31 @@ test(ary.zip([1,2,3]), [['-i', 1], ['--no', 2], ['foo', 3]], 'zip')
 # rescue Exception => e
 #   failed_test("Expecting TypeError", TypeError, e) unless e.is_a? TypeError
 # end
+
+# Element assignment from pick-axe
+a = Array.new
+a[4] = "4"
+test(a, [nil, nil, nil, nil, "4"], 'el assignment 1')
+
+a[0] = [1,2,3]
+test(a, [[1,2,3], nil, nil, nil, "4"], 'el assignment 2')
+
+a[0, 3] = ['a', 'b', 'c']
+test(a, ['a', 'b', 'c', nil, "4"], 'el assignment 3')
+
+a[1..2] = [1, 2]
+test(a, ['a', 1, 2, nil, "4"], 'el assignment 4')
+
+a[0, 2] = "?"
+test(a, ['?', 2, nil, "4"], 'el assignment 5')
+
+a[0..2] = 'A'
+test(a, ['A', "4"], 'el assignment 6')
+
+a[-1] = 'Z'
+test(a, ['A', 'Z'], 'el assignment 7')
+
+# a[1..-1] = nil
+# test(a, ['A'], 'el assignment 8')
+
 report

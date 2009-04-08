@@ -1,7 +1,1 @@
-fails:Array.new raise an ArgumentError if passed 3 or more arguments
-fails:Array.new with (array) does not use the given block
-fails:Array.new with (array) raises a TypeError if an Array type argument and a default object
 fails:Array.new with (size, object=nil) raises an ArgumentError if size is too large
-fails:Array.new with (size, object=nil) calls #to_int to convert the size argument to an Integer when object is given
-fails:Array.new with (size, object=nil) raises a TypeError if the size argument is not an Integer type
-fails:Array.new with (size, object=nil) uses the block value instead of using the default value
