@@ -30,7 +30,12 @@ class Socket
   primitive 'write', 'write:'
   primitive 'recv', 'recv:'
   primitive 'read', 'recv:'
-  primitive 'sysread', 'rubySysRead:'
+
+  def sysread(num_bytes)
+    s = self.read(num_bytes)
+    raise EOFError if s.nil?
+    return s
+  end
 
   def flush
     # nothing to do, no buffering in the VM for socket write operations
