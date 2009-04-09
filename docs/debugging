@@ -347,7 +347,7 @@ Before invoking the ruby program, we want to setup some debug help.  Create
     " ------------------------------------------------------------------
       Setup the ARGV array for the script, and then run it.
       ------------------------------------------------------------------ "
-    RubyContext default setARGV: #( 'install', 'rake' ) scriptName: 'maglev-gem' .
+    RubyContext default setARGV: #( 'install' 'rake' ) scriptName: 'maglev-gem' .
     RubyContext loadFileNamed: './bin/maglev-gem' .
   %
 
@@ -391,145 +391,13 @@ tracing loads, we see output like:
 There are also a couple of boring exceptions printed.  After a bit, we get
 to the real exception:
 
-  ...
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/1.8/time.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/local_remote_options.rb
   -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/validator.rb
   -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/version_option.rb
-  ==== "Undefined method `name' for ,  " (MessageNotUnderstood) ====
+  ==== "Undefined method `do_not_reverse_lookup=' for Socket  " (MessageNotUnderstood) ====
   Execution has been suspended by a "pause" or "halt" message.
   topaz 1>
 
-So we can now print the stack trace and begin debugging:
-
-  topaz 1> where
-  ==> 1 Exception >> signal                      (envId 0) @2 line 47
-  2 Exception >> signalNotTrappable          (envId 0) @3 line 7
-  3 Exception class >> signalNotTrappable    (envId 0) @3 line 3
-  4 Object >> pause                          (envId 0) @2 line 7
-  5 [] in  Executed Code                     (envId 0) @14 line 39
-  6 Exception >> _debugException:            (envId 0) @2 line 12
-  7 Exception >> _executeHandler:            (envId 0) @2 line 7
-  8 Exception >> signal                      (envId 0) @1 line 1
-  9 Exception >> signal:                     (envId 0) @3 line 7
-  10 Kernel >> raise::                        (envId 1) @4 line 3
-  11 Kernel >> method_missing:*               (envId 1) @7 line 4
-  12 Object >> _doesNotUnderstand:args:envId: (envId 0) @16 line 22
-  13 DependencyInstaller >> find_gems_with_sources: (envId 1) @11 line 5
-  14 DependencyInstaller >> install::         (envId 1) @11 line 5
-  15 [] in  InstallCommand >> execute         (envId 1) @7 line 29
-  16 ExecBlock >> rescue:do:                  (envId 0) @2 line 59
-  17 [] in  InstallCommand >> execute         (envId 1) @7 line 41
-  18 Array >> each&                           (envId 1) @8 line 5
-  19 [] in  Object >> _rubyEach:              (envId 0) @2 line 7
-  20 ExecBlock >> on:do:                      (envId 0) @2 line 53
-  21 Object >> _rubyEach:                     (envId 0) @4 line 8
-  22 InstallCommand >> execute                (envId 1) @42 line 26
-  23 Command >> invoke*                       (envId 1) @11 line 8
-  24 [] in  CommandManager >> process_args:   (envId 1) @28 line 20
-  25 ExecBlock >> value:                      (envId 0) @2 line 11
-  26 CommandManager >> process_args:          (envId 1) @15 line 7
-  27 [] in  CommandManager >> run:            (envId 1) @2 line 2
-  28 ExecBlock >> rescue:do:                  (envId 0) @2 line 59
-  29 CommandManager >> run:                   (envId 1) @9 line 10
-  30 GemRunner >> run:                        (envId 1) @14 line 15
-  31 [] in  Object >> _compileFile            (envId 1) @4 line 24
-  32 ExecBlock >> rescue:do:                  (envId 0) @2 line 59
-  33 Object >> _compileFile                   (envId 1) @33 line 26
-  34 [] in  RubyCompiler >> compileFileNamed:loadName: (envId 0) @5 line 17
-  ...
-
-Frames that have <tt>_compileFile</tt> in the listing are often interesting
-to look at, as they show you where in the ruby script you are.  To find the
-frames with <tt>_compileFile</tt> in them do:
-
-  topaz 1> wh _compileFile
-  ==> 31 [] in  Object >> _compileFile            (envId 1) @4 line 24
-  33 Object >> _compileFile                   (envId 1) @33 line 26
-    [GsProcess 106820353]
-
-Our stack frame is also now set to the first occurrence of
-<tt>_compileFile</tt>, so we can get an idea of what's going on:
-
-  topaz 1> l
-     #!/Users/pmclain/DevelopmentMagLev/git/bin/maglev-ruby
-     #--
-  ...
-     unless required_version.satisfied_by? Gem.ruby_version then
-       abort "Expected Ruby Version #{required_version}, was #{Gem.ruby_version}"
-     end
-
-     # We need to preserve the original ARGV to use for passing gem options
-     # to source gems.  If there is a -- in the line, strip all options after
-     # it...its for the source building process.
-     args = !ARGV.include?("--") ? ARGV.clone : ARGV[0...ARGV.index("--")]
-
-     begin
-       Gem::GemRunner.new.run args
-   *    ^4                                                              *******
-     rescue Gem::SystemExitException => e
-       exit e.exit_code
-
-     # method starts at line 1 of file /Users/pmclain/projects/maglev/git/bin/maglev-gem
-
-But the exception comes from doing something in frame 13, so we'll look at
-it and frame 12:
-
-  topaz 1> fr 13
-  13 DependencyInstaller >> find_gems_with_sources: (envId 1) @11 line 5
-      receiver [115041281  DependencyInstaller] aDependencyInstaller
-      dep [3822593 sz:1  Symbol]   ,
-      dep [3822593 sz:1  Symbol]   ,
-      self [115041281  DependencyInstaller] aDependencyInstaller
-      gems_and_sources [114672129 sz:0  Array]  anArray
-  topaz 1> l
-       def find_gems_with_sources(dep)
-         gems_and_sources = []
-
-         if @domain == :both or @domain == :local then
-           Dir[File.join(Dir.pwd, "#{dep.name}-[0-9]*.gem")].each do |gem_file|
-   *     ^11
-             spec = Gem::Format.from_file_by_path(gem_file).spec
-             gems_and_sources << [spec, gem_file] if spec.name == dep.name
-           end
-         end
-
-         if @domain == :both or @domain == :remote then
-           begin
-             requirements = dep.version_requirements.requirements.map do |req, ver|
-               req
-  ...
-     # method starts at line 77 of file /Users/pmclain/DevelopmentMagLev/git/lib/ruby/site_ruby/1.8/rubygems/dependency_installer.rb
-
-  topaz 1> down
-  12 Object >> _doesNotUnderstand:args:envId: (envId 0) @16 line 22
-      receiver [3822593 sz:1  Symbol]   ,
-      aSymbol [1043201 sz:4  Symbol]   name
-      anArray [114669569 sz:0  Array]  anArray
-      envId 1
-      aProc nil
-      prefix [1043201 sz:4  Symbol]   name
-  topaz 1> l
-     _doesNotUnderstand: aSymbol args: anArray envId: envId
-
-  ...
-     "
-     envId == 1  ifTrue: [ |  prefix  |
-             prefix := aSymbol rubySelectorPrefix asSymbol .
-             prefix ~~ #method_missing ifTrue:[
-               prefix == #call ifTrue:[ | aProc |
-                 (aProc := self _coerceToProc)  ifNotNil:[
-                   ^ aProc perform:  #call:  env: 1  withArguments: anArray .
-                 ].
-               ].
-                "env 1 send of #'method_missing:*'  "
-               ^ self  @ruby:method_missing: prefix __STAR: anArray
-   *                         ^16                                        *******
-             ].
-     ] .
-     ^ self doesNotUnderstand: aSymbol args: anArray envId: envId
-
-  topaz 1>
-
-So, it looks like the symbol <tt>:','</tt> is getting sent the selector
-<tt>name</tt>, which corresponds well with the <tt>"#{dep.name}..."</tt> in
-frame 13.  Now we just have to figure out why dep is set to
-<tt>:','</tt>...
+In this case, the problem is obvious: we haven't implemented
+<tt>Socket#do_not_reverse_lookup=</tt>....
