@@ -30,6 +30,7 @@ class Socket
   primitive 'write', 'write:'
   primitive 'recv', 'recv:'
   primitive 'read', 'recv:'
+  primitive 'sysread', 'rubySysRead:'
 
   def flush
     # nothing to do, no buffering in the VM for socket write operations
@@ -47,6 +48,7 @@ class Socket
   primitive_nobridge 'gets', 'gets:'
 
   primitive 'close', 'close'
+  primitive 'closed?', 'isActive'
   primitive_nobridge 'shutdown', 'shutdown'
   primitive 'shutdown', 'shutdown:'
   primitive 'connected?', 'isConnected'
@@ -69,7 +71,7 @@ class Socket
     if arr._isFixnum
       Errno.raise(arr)
       res = nil
-    elsif arr.size.equal?(1) 
+    elsif arr.size.equal?(1)
       res = arr[0]  # a Fixnum
     else
       # 2 element Array from SO_RCVTIMEO, SO_SNDTIMEO, or SO_LINGER
@@ -86,7 +88,7 @@ class Socket
       optval = 1
     elsif optval.equal?(false)
       optval = 0
-    end 
+    end
     status = _setsockopt(level, optname, optval)
     if status.equal?(0)
       return self
@@ -95,12 +97,11 @@ class Socket
     end
   end
 
-  
   # def set_blocking(a_boolean)  ; end
   #  this is a  workaround until fcntl() is implemented in IO.rb
   primitive 'set_blocking', 'setBlocking:'
 
-  class_primitive 'do_not_reverse_lookup', 'setNoReverseLookup:'
+  class_primitive 'do_not_reverse_lookup=', 'setNoReverseLookup:'
   class_primitive_nobridge '_getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
   class_primitive 'gethostbyname', 'gethostbyname:'
   class_primitive '_getservbyname', 'getservbyname:protocol:'
@@ -115,8 +116,8 @@ class Socket
     _getservbyname(s, p)
   end
 
-  def self.getaddrinfo(host, service, family = 0, socktype = 0,  
-			protocol = 0, flags = 0)
+  def self.getaddrinfo(host, service, family = 0, socktype = 0,
+      protocol = 0, flags = 0)
     # implementation in Smalltalk layer is incomplete ,
     #   result will only include a single entry for the specified host
     #   and service, assuming TCP protocol.
@@ -130,7 +131,7 @@ class Socket
     else
       service = Type.coerce_to(service, String, :to_s)
     end
-    family = Type.coerce_to(family, Fixnum, :to_int) 
+    family = Type.coerce_to(family, Fixnum, :to_int)
     socktype = Type.coerce_to(socktype, Fixnum, :to_int)
     protocol = Type.coerce_to(protocol, Fixnum, :to_int)
     flags = Type.coerce_to(flags, Fixnum, :to_int)
@@ -170,7 +171,7 @@ class TCPSocket
 
   def self.open(host)
     self._open(host)
-  end 
+  end
 
 end
 
