@@ -48,10 +48,14 @@ class Socket
   primitive_nobridge 'gets', 'gets:'
 
   primitive 'close', 'close'
-  primitive 'closed?', 'isActive'
+  primitive '_active?', 'isActive'
   primitive_nobridge 'shutdown', 'shutdown'
   primitive 'shutdown', 'shutdown:'
   primitive 'connected?', 'isConnected'
+
+  def closed?
+    ! _active?
+  end
 
   def eof?
     conn = connected?
