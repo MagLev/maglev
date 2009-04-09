@@ -102,13 +102,6 @@ r = ''
 255.times { |i| r << i }
 ins = r.inspect
 expected = "\"\\000\\001\\002\\003\\004\\005\\006\\a\\b\\t\\n\\v\\f\\r\\016\\017\\020\\021\\022\\023\\024\\025\\026\\027\\030\\031\\032\\e\\034\\035\\036\\037 !\\\"\\\#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\177\\200\\201\\202\\203\\204\\205\\206\\207\\210\\211\\212\\213\\214\\215\\216\\217\\220\\221\\222\\223\\224\\225\\226\\227\\230\\231\\232\\233\\234\\235\\236\\237\\240\\241\\242\\243\\244\\245\\246\\247\\250\\251\\252\\253\\254\\255\\256\\257\\260\\261\\262\\263\\264\\265\\266\\267\\270\\271\\272\\273\\274\\275\\276\\277\\300\\301\\302\\303\\304\\305\\306\\307\\310\\311\\312\\313\\314\\315\\316\\317\\320\\321\\322\\323\\324\\325\\326\\327\\330\\331\\332\\333\\334\\335\\336\\337\\340\\341\\342\\343\\344\\345\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\\360\\361\\362\\363\\364\\365\\366\\367\\370\\371\\372\\373\\374\\375\\376\""
-
-puts "========= ins ============="
-puts ins
-puts "========= expected ============="
-puts expected
-
-
 test(ins, expected, 'All byte values inspected')
 
 def test_chomp
@@ -214,6 +207,79 @@ test(C.new =~ 'yyy',   false, "C.new =~ 'yyy'")
 
 test(C.new =~ '/xxx/', false, "C.new =~ '/xxx/'")
 test(C.new =~ '/yyy/', false, "C.new =~ '/yyy/'")
+
+# Slice! tests from pickaxe
+string = "this is a string"
+test(string.slice!(2), 105, 'slice! 1')
+test(string, "ths is a string", 'slice! 1a')
+
+test(string.slice!(3..6), " is ", 'slice! 2')
+test(string, "thsa string", 'slice! 2a')
+
+test(string.slice!(/s.*t/), "sa st", 'slice! 3')
+test(string, "thring", 'slice! 3a')
+
+test(string.slice!("r"), "r", 'slice! 4')
+test(string, "thing", 'slice! 4a')
+
+string = "0123456"
+test(string.slice!(2,2), "23", 'slice! 5')
+test(string, "01456", 'slice! 5a')
+
+string = "0123456"
+test(string.slice!(-5,2), "23", 'slice! 6')
+test(string, "01456", 'slice! 6a')
+
+# Test some error cases
+string = "0123456"
+test(string.slice!(-5,-2), nil, 'slice! 7')
+test(string, "0123456", 'slice! 7a')
+
+string = "0123456"
+test(string.slice!(string.length, 10), "", 'slice! 8')
+test(string, "0123456", 'slice! 8a')
+
+string = "0123456"
+test(string.slice!(string.length + 1, 10), nil, 'slice! 9')
+test(string, "0123456", 'slice! 9a')
+
+string = "0123456"
+test(string.slice!(0, 100), "0123456", 'slice! 10')
+test(string, "", 'slice! 10a')
+
+string = "0123456"
+test(string.slice!(0, -10), nil, 'slice! 11')
+test(string, "0123456", 'slice! 11a')
+
+string = "0123456"
+test(string.slice!(-10, 10), nil, 'slice! 11')
+test(string, "0123456", 'slice! 11a')
+
+# slice! with a range
+string = "0123456"
+test(string.slice!(0..6), "0123456", 'slice! 12')
+test(string, "", 'slice! 12a')
+
+string = "0123456"
+test(string.slice!(2..4), "234", 'slice! 13')
+test(string, "0156", 'slice! 13a')
+
+string = "0123456"
+test(string.slice!(3..10), "3456", 'slice! 14')
+test(string, "012", 'slice! 14a')
+
+string = "0123456"
+test(string.slice!(-10..2), nil, 'slice! 15')
+test(string, "0123456", 'slice! 15a')
+
+# Slice! with regexp
+string = "0123456"
+test(string.slice!(/012/), "012", 'slice! 16')
+test(string, "3456", 'slice! 16a')
+
+string = "0123456"
+test(string.slice!(/abc/), nil, 'slice! 17')
+test(string, "0123456", 'slice! 17a')
 
 report
 

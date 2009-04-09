@@ -12,6 +12,7 @@ class String
   primitive_nobridge 'substring1', 'copyFrom:to:'
   primitive_nobridge '_findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '_md5sum', 'md5sum'
+  primitive_nobridge '_remove_from_to', 'removeFrom:to:'
   class_primitive_nobridge '_withAll', 'withAll:'
   class_primitive_nobridge '_alloc', '_basicNew'
 
@@ -536,9 +537,10 @@ class String
   primitive 'size', 'size'
 
   primitive          'slice', '_rubyAt:length:'
-    # start and length are both  int
+  # start and length are both  int
+
   primitive_nobridge 'slice', '_rubyAt:'
-    # arg may be an  int, range, regexp, or match_string
+  # arg may be an  int, range, regexp, or match_string
 
   def slice(*args)
     len = args.size
@@ -548,25 +550,47 @@ class String
       slice(args[0], args[1])
     else
       raise ArgumentError, 'expected 1 or 2 args'
-    end 
+    end
   end
 
-  def slice!(start, length)
-    # start and length are both  int
-    s = slice(start, length)
-    if s.equal?(nil)
-      s = ''
-    end
-    replace(s)
+  def slice!(start, len)
+    return nil if len < 0
+
+    sz = self.size
+    start += sz if start < 0
+    return nil if start < 0 || start > sz
+    return "" if start == sz
+
+    s = slice(start, len)
+
+    stop = start + len
+    stop = sz if stop > sz
+    _remove_from_to(start + 1, stop) # convert to smalltalk indexing
+    s || ''
   end
 
   def slice!(arg)
-    # arg may be an  int, range, regexp, or match_string
-    s = slice(arg)
-    if s.equal?(nil)
-      s = ''
+    case arg
+    when Range
+      start = arg.begin
+      len = arg.end - start
+      len += 1 if ! arg.exclude_end?
+      slice!(start, len)
+    when Fixnum
+      s = slice!(arg, 1)
+      s[0]
+    when Regexp
+      md = arg.match(self)
+      return nil if md.nil?
+      start = md.begin(0)
+      len = md.end(0) - start
+      slice!(start, len)
+    when String
+      start = self._findStringStartingAt(arg, 1)
+      start.nil? ? nil : slice!(start - 1, arg.length) # adjust coming from smalltalk
+    else
+      raise TypeError, "String#slice! does not support #{arg.class}"
     end
-    replace(s)
   end
 
   def split(pattern=nil, limit=nil)
