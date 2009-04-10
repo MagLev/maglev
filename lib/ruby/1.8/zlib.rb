@@ -10,7 +10,7 @@ module Zlib
   Z_FULL_FLUSH    = 3  # inflate() will terminate a block of compressed data
   Z_FINISH        = 4
   Z_BLOCK         = 5  # deflate() will return at end of next block boundary,
-		       #  or after the gzip header .
+           #  or after the gzip header .
   Z_OK            = 0
   Z_STREAM_END    = 1
   Z_NEED_DICT     = 2
@@ -46,7 +46,7 @@ module Zlib
 
   class GzipFile  # {
 
-    class Error <  StandardError 
+    class Error <  StandardError
     end
 
     #SYNC            = Zlib::CZStream::UNUSED
@@ -99,10 +99,10 @@ module Zlib
     def finished?
       self.closed?()
     end
- 
+
     # def footer_finished? # not implemented
     # def header_finished? # not implemented
- 
+
     def mtime
       Time.at(@mtime)
     end
@@ -119,7 +119,7 @@ module Zlib
 
     def initialize(io)
       @io = io
-      @zstream = Zlib::CZStream.open_read(io, GzipFile::Error)
+      @zstream = Zlib::ZStream.open_read(io, GzipFile::Error)
       super()
       arr = @zstream.read_header()
       @orig_name = arr[0]
@@ -136,7 +136,7 @@ module Zlib
     end
 
     def read(length = 2048)
-      @zstream.read(length)  
+      @zstream.read(length)
     end
 
     def finish
@@ -164,7 +164,7 @@ module Zlib
       @strategy = strategy
       @io = io
       @mtime = 0
-      @buffer = '' 
+      @buffer = ''
       @bufsize = 0
       super()
     end
@@ -212,7 +212,7 @@ module Zlib
       unless tim._isFixnum
         raise ArgumentError, 'mtime must be a Fixnum'
       end
-      arr = [ @orig_name, @comment, tim] 
+      arr = [ @orig_name, @comment, tim]
       @zstream.write_header(arr)
     end
 
@@ -223,7 +223,7 @@ module Zlib
         strm = @zstream
       end
       unless data._isString
-        data = String(data) 
+        data = String(data)
       end
       ds = data.length
       bs = @bufsize
@@ -232,15 +232,15 @@ module Zlib
           strm.write(@buffer, bs)
           @bufsize = 0
         end
-        strm.write(data, ds) 
-      else 
-        if (bs >= 1024) 
+        strm.write(data, ds)
+      else
+        if (bs >= 1024)
           strm.write(@buffer, bs)
           @bufsize = 0
           bs = 0
-        end          
+        end
         @buffer[bs, ds] = data
-        @bufsize = bs + ds 
+        @bufsize = bs + ds
       end
     end
 
@@ -256,10 +256,18 @@ module Zlib
       strm.flush  # writes footer
       @zstream = nil
       io = @io
-      @io = nil 
+      @io = nil
       io
     end
 
   end # }
 
-end 
+#   class Deflate
+#     def initialize(level = Zlib::DEFAULT_COMPRESSION)
+#       @level = level
+#     end
+#     def deflate(string, flush = Zlib::FINISH)
+
+#     end
+#   end
+end
