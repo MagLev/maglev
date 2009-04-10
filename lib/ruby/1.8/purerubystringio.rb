@@ -26,7 +26,7 @@
 # coders, by now, will have begin to consider the delegator mixin. I'll
 # leave that exercise for you to finish. ;)
 
-class PureRubyStringIO
+class PureRubyStringIO < IO
 
   include Enumerable
 
@@ -141,16 +141,16 @@ class PureRubyStringIO
   def gets(*args)
     raise ArgumentError, 'expected 0 or 1 arg'
   end
-  
+
   def gets(sep_string)
-    # variant after first gets no bridges   # gemstone 
+    # variant after first gets no bridges   # gemstone
     res = self._gets(sep_string)
     res._storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end
 
   def gets
-    # variant after first gets no bridges   # gemstone 
+    # variant after first gets no bridges   # gemstone
     sep_string=$/
     res = self._gets(sep_string)
     res._storeRubyVcGlobal(0x21) # store into caller's $_

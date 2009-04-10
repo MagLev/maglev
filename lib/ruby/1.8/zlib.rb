@@ -158,8 +158,8 @@ module Zlib
     # respond to the +write+ method that behaves same as write method in IO
     # class.
 
-    def initialize(io, level = Zlib::DEFAULT_COMPRESSION,
-                   strategy = Zlib::DEFAULT_STRATEGY)
+    def initialize(io, level = Zlib::Z_DEFAULT_COMPRESSION,
+                   strategy = Zlib::Z_DEFAULT_STRATEGY)
       @level = level
       @strategy = strategy
       @io = io
@@ -207,7 +207,7 @@ module Zlib
       if (lev < Z_DEFAULT_COMPRESSION || lev > Z_BEST_COMPRESSION)
         raise ArgumentError, 'compression level out of range'
       end
-      @zstream = Zlib::CZStream.open_write(io, GzipFile::Error, lev)
+      @zstream = Zlib::ZStream.open_write(@io, GzipFile::Error, lev)
       tim = @mtime.to_i
       unless tim._isFixnum
         raise ArgumentError, 'mtime must be a Fixnum'
