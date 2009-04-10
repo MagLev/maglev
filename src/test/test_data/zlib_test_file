@@ -1,0 +1,214 @@
+_rubyAt: anOffset length: aCount put: aValue
+  " Ruby Array  [anOffset, aCount]=aValue
+
+   Replace the slice of self, starting at anOffset and of aCount length,
+   with the contents of aValue.  If aValue is nil or the empty array, delete
+   aCount elements from receiver starting at anOffset.
+
+   else if aValue is an Array , replace elements anOffset..(anOffset+aCount-1)
+   of the receiver with the elements of aValue , growing or shrinking
+   receiver as needed ;
+
+   anOffset is zero based.
+   Returns aValue ."
+
+ | sliceStart sliceEnd sliceSize rcvrSize replacement replaceSize newRcvrSize space |
+
+  sliceStart := self _rubyToInt: anOffset .
+  sliceSize := self _rubyToInt: aCount .
+  sliceEnd := sliceStart + sliceSize .
+  rcvrSize := self size .
+
+  (sliceSize < 0) ifTrue: [ ^ aCount _error: #rtErrArgOutOfRange ] .
+  (sliceStart < 0) ifTrue: [
+    sliceStart := sliceStart + rcvrSize .
+    (sliceStart < 0) ifTrue: [ ^ anOffset _error: #rtErrArgOutOfRange ]
+  ] .
+
+  replacement := self _rubyToArray: aValue .
+
+ 
+  newRcvrSize := (sliceStart > rcvrSize) ifTrue: [ sliceStart ] ifFalse: [ rcvrSize  ] .
+  replaceSize := replacement size .
+
+  (sliceStart >= rcvrSize) ifTrue: [
+	self size: (sliceStart + replaceSize) .
+	(replaceSize == 0) ifFalse: [
+	 	replacement copyFrom: 1 to: replaceSize into: self startingAt: (sliceStart + 1)
+     ] .
+     ^ replacement
+  ] .
+
+  (replaceSize > sliceSize) ifTrue: [
+    newRcvrSize := newRcvrSize + replaceSize - sliceSize .
+  ] ifFalse: [
+    (replaceSize < sliceSize) ifTrue: [
+      newRcvrSize := newRcvrSize - (sliceSize - replaceSize)
+    ]
+  ] .
+
+  (newRcvrSize < 0) ifTrue: [ newRcvrSize := 0 ] .
+  (newRcvrSize > rcvrSize) ifTrue: [ self size: newRcvrSize ].
+  (sliceEnd < rcvrSize) ifTrue: [
+    "Only copy the surviving tail of the original array, if there is one"
+      self copyFrom: (sliceEnd + 1) to: (rcvrSize) into: self startingAt: (sliceStart + replaceSize + 1) .
+  ] .
+  (newRcvrSize < rcvrSize) ifTrue: [ self size: newRcvrSize ].
+
+  (replaceSize > 0) ifTrue: [
+    replacement copyFrom: 1 to: replaceSize into: self startingAt: (sliceStart + 1)
+  ] .
+  ^ replacement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_rubyAt: anOffset length: aCount put: aValue
+  " Ruby Array  [anOffset, aCount]=aValue
+
+   Replace the slice of self, starting at anOffset and of aCount length,
+   with the contents of aValue.  If aValue is nil or the empty array, delete
+   aCount elements from receiver starting at anOffset.
+
+   else if aValue is an Array , replace elements anOffset..(anOffset+aCount-1)
+   of the receiver with the elements of aValue , growing or shrinking
+   receiver as needed ;
+
+   anOffset is zero based.
+   Returns aValue ."
+
+ | sliceStart sliceEnd sliceSize rcvrSize replacement replaceSize newRcvrSize space |
+
+  sliceStart := self _rubyToInt: anOffset .
+  sliceSize := self _rubyToInt: aCount .
+  sliceEnd := sliceStart + sliceSize .
+  rcvrSize := self size .
+
+  (sliceSize < 0) ifTrue: [ ^ aCount _error: #rtErrArgOutOfRange ] .
+  (sliceStart < 0) ifTrue: [
+    sliceStart := sliceStart + rcvrSize .
+    (sliceStart < 0) ifTrue: [ ^ anOffset _error: #rtErrArgOutOfRange ]
+  ] .
+
+  replacement := self _rubyToArray: aValue .
+
+ 
+  newRcvrSize := (sliceStart > rcvrSize) ifTrue: [ sliceStart ] ifFalse: [ rcvrSize  ] .
+  replaceSize := replacement size .
+
+  (sliceStart >= rcvrSize) ifTrue: [
+	self size: (sliceStart + replaceSize) .
+	(replaceSize == 0) ifFalse: [
+	 	replacement copyFrom: 1 to: replaceSize into: self startingAt: (sliceStart + 1)
+     ] .
+     ^ replacement
+  ] .
+
+  (replaceSize > sliceSize) ifTrue: [
+    newRcvrSize := newRcvrSize + replaceSize - sliceSize .
+  ] ifFalse: [
+    (replaceSize < sliceSize) ifTrue: [
+      newRcvrSize := newRcvrSize - (sliceSize - replaceSize)
+    ]
+  ] .
+
+  (newRcvrSize < 0) ifTrue: [ newRcvrSize := 0 ] .
+  (newRcvrSize > rcvrSize) ifTrue: [ self size: newRcvrSize ].
+  (sliceEnd < rcvrSize) ifTrue: [
+    "Only copy the surviving tail of the original array, if there is one"
+      self copyFrom: (sliceEnd + 1) to: (rcvrSize) into: self startingAt: (sliceStart + replaceSize + 1) .
+  ] .
+  (newRcvrSize < rcvrSize) ifTrue: [ self size: newRcvrSize ].
+
+  (replaceSize > 0) ifTrue: [
+    replacement copyFrom: 1 to: replaceSize into: self startingAt: (sliceStart + 1)
+  ] .
+  ^ replacement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_rubyAt: anOffset length: aCount put: aValue
+  " Ruby Array  [anOffset, aCount]=aValue
+
+   Replace the slice of self, starting at anOffset and of aCount length,
+   with the contents of aValue.  If aValue is nil or the empty array, delete
+   aCount elements from receiver starting at anOffset.
+
+   else if aValue is an Array , replace elements anOffset..(anOffset+aCount-1)
+   of the receiver with the elements of aValue , growing or shrinking
+   receiver as needed ;
+
+   anOffset is zero based.
+   Returns aValue ."
+
+ | sliceStart sliceEnd sliceSize rcvrSize replacement replaceSize newRcvrSize  |
+
+  sliceStart := self _rubyToInt: anOffset .
+  sliceSize := self _rubyToInt: aCount .
+  sliceEnd := sliceStart + sliceSize .
+  rcvrSize := self size .
+
+  (sliceSize < 0) ifTrue: [ ^ aCount _error: #rtErrArgOutOfRange ] .
+  (sliceStart < 0) ifTrue: [
+    sliceStart := sliceStart + rcvrSize .
+    (sliceStart < 0) ifTrue: [ ^ anOffset _error: #rtErrArgOutOfRange ]
+  ] .
+
+  replacement := self _rubyToArray: aValue .
+
+  newRcvrSize := (sliceStart > rcvrSize) ifTrue: [ sliceStart ] ifFalse: [ rcvrSize  ] .
+  replaceSize := replacement size .
+
+  (replaceSize > sliceSize) ifTrue: [
+    newRcvrSize := newRcvrSize + replaceSize - sliceSize .
+  ] ifFalse: [
+    (replaceSize < sliceSize) ifTrue: [
+      newRcvrSize := newRcvrSize - (sliceSize - replaceSize)
+    ]
+  ] .
+  (newRcvrSize < 0) ifTrue: [ newRcvrSize := 0 ] .
+  (newRcvrSize > rcvrSize) ifTrue: [ self size: newRcvrSize ].
+  (sliceEnd < rcvrSize) ifTrue: [
+    "Only copy the surviving tail of the original array, if there is one"
+      self copyFrom: (sliceEnd + 1) to: (rcvrSize) into: self startingAt: (sliceStart + replaceSize + 1) .
+  ] .
+  (newRcvrSize < rcvrSize) ifTrue: [ self size: newRcvrSize ].
+
+  (replaceSize > 0) ifTrue: [
+    replacement copyFrom: 1 to: replaceSize into: self startingAt: (sliceStart + 1)
+  ] .
+  ^ replacement
