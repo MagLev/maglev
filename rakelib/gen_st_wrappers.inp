@@ -10,8 +10,7 @@ classes do: [:eachClass |
         GsFile gciLogServer: '-- writing: ', file name .
         [
                 file nextPutAll:
-'# -*- coding: utf-8 -*-
-#--
+'#--
 # ' , eachClass name , '.rb
 #
 # Copyright (c) ' , year , ' GemStone Systems, Inc.  All rights reserved.

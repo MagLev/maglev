@@ -7,6 +7,7 @@ require 'rakelib/maglev.rb'
 verbose false  # turn off rake's chatter about all the sh commands
 
 CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
+CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk')
 
 Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"
