@@ -126,6 +126,14 @@ def tc_run_benchmarks
   END
 end
 
+# Returns a topaz command string that will generate Ruby files that expose
+# every smalltalk class.
+def tc_gen_st_wrappers
+  <<-END.margin
+    |inp #{"rakelib/gen_st_wrappers.inp"}
+  END
+end
+
 # Returns a topaz command string that loads ../latest.mcz and commits the DB.
 def tc_load_mcz
   <<-END.margin
@@ -147,4 +155,3 @@ def tc_load_mcz
     |exit
   END
 end
-

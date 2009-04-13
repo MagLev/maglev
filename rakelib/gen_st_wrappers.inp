@@ -1,0 +1,60 @@
+run
+| year directory classes |
+year := DateAndTime now year printString.
+directory := 'lib/ruby/site_ruby/1.8/smalltalk/'.
+classes := Globals select: [:each | each isBehavior].
+classes := classes asSortedCollection: [:a :b | a name <= b name].
+classes do: [:eachClass |
+        | file |
+        file := GsFile openWriteOnServer: directory , eachClass name , '.rb'.
+        GsFile gciLogServer: '-- writing: ', file name .
+        [
+                file nextPutAll:
+'# -*- coding: utf-8 -*-
+#--
+# ' , eachClass name , '.rb
+#
+# Copyright (c) ' , year , ' GemStone Systems, Inc.  All rights reserved.
+#
+#++
+
+# = Overview
+#
+# This file defines the methods available in the Smalltalk class ' , eachClass name , '.
+# It is not intended for general use in applications, but for use in developing tools
+# and persistence libraries to be used by applications.
+
+module Smalltalk
+
+  class ' , eachClass name , '
+'.
+                eachClass class selectors asSortedCollection do: [:eachSelector |
+                        | string |
+                        string := eachSelector collect: [:each | each = $: ifTrue: [$_] ifFalse: [each]].
+                        string last = $_ ifTrue: [string size: string size - 1].
+                        file
+                                nextPutAll: '    class_primitive_nobridge ''_st_';
+                                nextPutAll: string;
+                                nextPutAll: ''', ''';
+                                nextPutAll: eachSelector;
+                                nextPutAll: '''';
+                                cr.
+                ].
+                eachClass selectors asSortedCollection do: [:eachSelector |
+                        | string |
+                        string := eachSelector collect: [:each | each = $: ifTrue: [$_] ifFalse: [each]].
+                        string last = $_ ifTrue: [string size: string size - 1].
+                        file
+                                nextPutAll: '    primitive_nobridge ''_st_';
+                                nextPutAll: string;
+                                nextPutAll: ''', ''';
+                                nextPutAll: eachSelector;
+                                nextPutAll: '''';
+                                cr.
+                ].
+                file nextPutAll: '  end'; cr; nextPutAll: 'end'; cr .
+        ] ensure: [
+                file close.
+        ].
+].
+%

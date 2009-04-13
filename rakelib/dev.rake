@@ -110,4 +110,10 @@ namespace :dev do
       end
     end
   end
+
+  desc "Create .rb files for each smalltalk class (lib/ruby/site_ruby/1.8/smalltalk/*)"
+  task :stwrappers => ['maglev:start'] do
+    mkdir_p "#{MAGLEV_HOME}/lib/ruby/site_ruby/1.8/smalltalk/"
+    run_topaz tc_gen_st_wrappers
+  end
 end
