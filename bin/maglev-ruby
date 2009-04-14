@@ -131,8 +131,7 @@ cat - >> $dbscript <<-EOFA
 run
 | res ctx |
 (ctx := RubyContext) load .
-ctx default setARGV: #($args) scriptName: '$RUBYSCRIPT' .
-res := ctx default runFileNamed: '$RUBYSCRIPT'.
+ctx default runFileNamed: '$RUBYSCRIPT' withARGV: #($args) .
 GsFile stdout close . "ensure final LF on stdout"
 ^ res
 %
