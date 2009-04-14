@@ -70,19 +70,19 @@ class PureRubyStringIO < IO
     requireOpen
     @sio_closed_read = true
     @sio_closed_write = true
-    self
+    nil
   end
 
   def close_read
     raise IOError, "closing non-duplex IO for reading", caller if closed_read?
     @sio_closed_read = true
-    self
+    nil
   end
 
   def close_write
     raise IOError, "closing non-duplex IO for writing", caller if closed_write?
-    @sio_closed_read = true
-    self
+    @sio_closed_write = true
+    nil
   end
 
   def closed?
@@ -259,7 +259,9 @@ class PureRubyStringIO < IO
 
   def read(length=nil, buffer=nil)
     requireReadable
-    len = length || [@sio_string.length - @sio_pos, 0].max
+    bytes_left = (@sio_string.length - @sio_pos)
+    length ||= bytes_left
+    len = [length, bytes_left].min
     raise ArgumentError, "negative length #{len} given", caller if len < 0
     buffer ||= ""
     pstart = @sio_pos
