@@ -570,24 +570,23 @@ class String
   end
 
   def slice!(arg)
-    case arg
-    when Range
+    if arg._isFixnum
+      s = slice!(arg, 1)
+      s[0]
+    elsif arg._isRange
       start = arg.begin
       len = arg.end - start
       len += 1 if ! arg.exclude_end?
       slice!(start, len)
-    when Fixnum
-      s = slice!(arg, 1)
-      s[0]
-    when Regexp
+    elsif arg._isString
+      start = self._findStringStartingAt(arg, 1)
+      start.equal?(nil) ? nil : slice!(start - 1, arg.length) # adjust coming from smalltalk
+    elsif arg._isRegexp
       md = arg.match(self)
-      return nil if md.nil?
+      return nil if md.equal?(nil)
       start = md.begin(0)
       len = md.end(0) - start
       slice!(start, len)
-    when String
-      start = self._findStringStartingAt(arg, 1)
-      start.nil? ? nil : slice!(start - 1, arg.length) # adjust coming from smalltalk
     else
       raise TypeError, "String#slice! does not support #{arg.class}"
     end
@@ -818,7 +817,7 @@ class String
   def extract_base(base=10)
     s = self.delete('_').strip
     s =~ /^([+-]?)(0[bdox])?(.*)/i
-    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16}[$2.downcase] unless $2.nil?
+    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16}[$2.downcase] unless $2.equal?(nil)
     [base, "#{$1}#{$3}"]
   end
 
