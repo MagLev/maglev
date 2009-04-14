@@ -26,7 +26,7 @@ class Thread
               file = $2
               if file =~ %r{<file name not available>|#{maglev_home}/src}
                 # not in Ruby application code, reject the line
-                if idx == 0 ; res_start_ofs = 0 ; end
+                if idx.equal?(0) ; res_start_ofs = 0 ; end
               else
                 result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
               end
