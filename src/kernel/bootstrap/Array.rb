@@ -409,6 +409,17 @@ class Array
   primitive_nobridge '[]' , '_rubyAt:'
   primitive_nobridge '[]' , '_rubyAt:length:'
 
+  def [](*args)
+    len = args.size
+    if len.equal?(1)
+      slice(args[0])
+    elsif len.equal?(2)
+      slice(args[0], args[1])
+    else
+      raise ArgumentError, 'expected 1 or 2 args'
+    end
+  end
+
   primitive_nobridge '[]=', '_rubyAt:put:'
   primitive_nobridge '[]=', '_rubyAt:length:put:'
 
