@@ -8,6 +8,7 @@ require 'stringio'
 def zip(data, file)
   File.open(file, 'w+') do |f|
     gz_writer = Zlib::GzipWriter.new(f)
+    gz_writer.orig_name=('test.i')
     gz_writer.write(data)
     gz_writer.close
   end
@@ -26,11 +27,15 @@ end
 original = "Some test data."
 filename = 'test.gz'
 zip(original, filename)
-copy = unzip(filename)
+f = File.open(filename, 'r')
+gz_reader = Zlib::GzipReader.new(f)
+copy = gz_reader.read
+orig_name = gz_reader.orig_name()
+gz_reader.close
 
 raise "Failed: #{copy}" unless copy == original
-fsize = File.size(filename)
-raise "Failed to write header: expecting: 35  actual size: #{fsize}" unless fsize == 35
+
+raise "Failed to write header: " unless orig_name == 'test.i'
 
 # data_dir = File.dirname(__FILE__) + '/test_data'
 # orig_file = data_dir  + '/zlib_test_file'
