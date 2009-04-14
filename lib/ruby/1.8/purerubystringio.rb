@@ -86,6 +86,7 @@ class PureRubyStringIO < IO
   end
 
   def closed?
+
     closed_read? && closed_write?
   end
 
@@ -273,7 +274,8 @@ class PureRubyStringIO < IO
     @sio_pos += len
     buf.replace(@sio_string[pstart..(@sio_pos - 1)])
 #    buf.replace(@sio_string[pstart..@sio_pos])
-    buf.empty? && !length.nil? ? nil : buf
+    r = buf.empty? && !length.nil? ? nil : buf
+    r
   end
 
   def readchar

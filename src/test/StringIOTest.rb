@@ -20,7 +20,11 @@ test(sio.write("a banana"), 8, "Test 6")
 test(sio.rewind, 0, "Test 7")
 test(sio.read, "fruitflies like a banana", "Test 8")
 
-
+# A regression that broke rubygems:
+sio = StringIO.new('A short string')
+test(sio.pos,                       0, 'Regression 1 A')
+test(sio.read(2048), 'A short string', 'Regression 1 B')
+test(sio.pos,                      14, 'Regression 1 C') # MagLev used to return 2048
 
 report
 
