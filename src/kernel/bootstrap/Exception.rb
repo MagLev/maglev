@@ -56,114 +56,74 @@ class Exception
     end
 
     def to_s
-      (m = message).nil? ? self.class.name : m
+      (m = message).equal?(nil) ? self.class.name : m
     end
 
     def to_str
-      (m = message).nil? ? self.class.name : m
+      (m = message).equal?(nil) ? self.class.name : m
     end
 end
 
+# open each of the subclasses of Exception that map to
+#   a Smalltalk class to initialize the ruby name space
+#  order here matches order in  Exception(C)>>commentRubyMapping
 
 class SystemExit
-  #def self.name
-  #  'SystemExit'  # override Smalltalk name
-  #end
   # MNI: SystemExit#status
   # MNI: SystemExit#success?
 end
 
-class SystemStackError
-  #def self.name
-  #  'SystemStackError' # override Smalltalk name
-  #end
+class SystemStackExit
 end
-
 class NoMemoryError
-  #def self.name
-  #  'NoMemoryError' # override Smalltalk name
-  #end
 end
 class ScriptError
-  #def self.name
-  #  'ScriptError' # override Smalltalk name
-  #end
 end
-class LoadError
-  #def self.name
-  #  'LoadError' # override Smalltalk name
-  #end
+class LoadError  # a subclass of ScriptError
 end
-class NotImplementedError
-  #def self.name
-  #  'NotImplementedError' # override Smalltalk name
-  #end
+class NotImplementedError  # a subclass of ScriptError
 end
-class SyntaxError
-  #def self.name
-  #  'SyntaxError' # override Smalltalk name
-  #end
+class SyntaxError  # a subclass of ScriptError
 end
-
 class StandardError
-  #def self.name
-  #  'StandardError' # override Smalltalk name
-  #end
 end
-
-#class EBADF
-#  def self.name
-#    'EBADF' # override Smalltalk name
-#  end
-#end
-
-#class ENOTCONN
-#  def self.name
-#    'ENOTCONN' # override Smalltalk name
-#  end
-#end
-
-#class EPIPE
-#  def self.name
-#    'EPIPE' # override Smalltalk name
-#  end
-#end
-
-#class ECONNRESET
-#  def self.name
-#    'ECONNRESET' # override Smalltalk name
-#  end
-#end
-
+class ArgumentError
+end
+class IOError
+end
+class EOFError  # a subclass of IOError
+end
+class SocketError  # a subclass of IOError
+end
 class IndexError
-  #def self.name
-  #  'IndexError' # override Smalltalk name
-  #end
 end
 class LocalJumpError
-  #def self.name
-  #  'LocalJumpError' # override Smalltalk name
-  #end
 end
-class FloatDomainError
-  #def self.name
-  #  'FloatDomainError' # override Smalltalk name
-  #end
+class RuntimeError
+end
+class RangeError
+end
+class FloatDomainError # a subclass of RangeError
+end
+class RegexpError
+end
+class SecurityError
+end
+class SystemCallError
+end
+class ThreadError
+end
+class TypeError
 end
 class ZeroDivisionError
-  #def self.name
-  #  'ZeroDivisionError' # override Smalltalk name
-  #end
 end
-class NoMethodError
-  #def self.name
-  #  'NoMethodError' # override Smalltalk name
-  #end
+class NameError
+end
+class NoMethodError  # a subclass of NameError
 end
 class SignalException
-  #def self.name
-  #  'SignalException' # override Smalltalk name
-  #end
+end
+class Interrupt  # a subclass of SignalException
 end
 
 # This was in lib/ruby/1.8/timeout.rb, but class_primitive_nobridge is not
