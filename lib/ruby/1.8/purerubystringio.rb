@@ -115,7 +115,8 @@ class PureRubyStringIO < IO
   end
 
   def eof
-    requireReadable { @sio_pos >= @sio_string.length }
+    requireReadable
+    @sio_pos >= @sio_string.length
   end
 
   def fcntl(integer_cmd, arg)
@@ -147,16 +148,8 @@ class PureRubyStringIO < IO
     raise ArgumentError, 'expected 0 or 1 arg'
   end
 
-  def gets(sep_string)
+  def gets(sep_string=$/)
     # variant after first gets no bridges   # gemstone
-    res = self._gets(sep_string)
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
-    res
-  end
-
-  def gets
-    # variant after first gets no bridges   # gemstone
-    sep_string=$/
     res = self._gets(sep_string)
     res._storeRubyVcGlobal(0x21) # store into caller's $_
     res
@@ -289,18 +282,27 @@ class PureRubyStringIO < IO
     getc
   end
 
-  def readline
+  def readline(sep=$/)
     requireReadable
     raise EOFError, "End of file reached", caller if eof?
-    gets
+    gets(sep)
   end
 
-  def readlines(sep_string=$/)
+  def readlines(sep_string=Undefined)
     requireReadable
+    if sep_string.equal?(Undefined)
+      sep = $/
+      return [] if eof?
+    elsif sep_string.nil?
+      return [read]
+    else
+      sep = Type.coerce_to(sep_string, String, :to_str)
+    end
     raise EOFError, "End of file reached", caller if eof?
+    sep = "\n\n" if sep.empty?
     rc = []
-    until eof
-      rc << gets(sep_string)
+    while ! eof
+      rc << gets(sep)
     end
     rc
   end
