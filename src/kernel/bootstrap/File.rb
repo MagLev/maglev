@@ -69,7 +69,7 @@ class File
         index = nil
       end
     end
-    return index.nil? ? b : b[0,index]
+    return index.equal?(nil) ? b : b[0,index]
   end
 
   def self.blockdev?(filename)
@@ -181,7 +181,7 @@ class File
   def self.expand_path(a_path, a_dir = nil)
     path = Type.coerce_to(a_path, String, :to_str) # nil a_path should raise TypeError
 
-    dir = a_dir.nil? ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
+    dir = a_dir.equal?(nil) ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
     dir = Dir.pwd if dir.empty?
 
     return dir if path.empty?
