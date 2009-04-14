@@ -33,7 +33,7 @@ class Socket
 
   def sysread(num_bytes)
     s = self.read(num_bytes)
-    raise EOFError if s.nil?
+    raise EOFError if s.equal?(nil)
     return s
   end
 
