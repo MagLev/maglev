@@ -105,8 +105,13 @@ class PureRubyStringIO < IO
 
   def each_byte(&block)
     requireReadable
-    @sio_string.each_byte(&block)
-    @sio_pos = @sio_string.length
+    len = @sio_string.length
+    while @sio_pos < len
+      # pos must be updated before call to yield
+      byte = @sio_string[@sio_pos]
+      @sio_pos += 1
+      block.call(byte)
+    end
   end
 
   def eof
@@ -259,16 +264,23 @@ class PureRubyStringIO < IO
 
   def read(length=nil, buffer=nil)
     requireReadable
+    buf = buffer.nil? ? "" : Type.coerce_to(buffer, String, :to_str)
+
     bytes_left = (@sio_string.length - @sio_pos)
-    length ||= bytes_left
-    len = [length, bytes_left].min
+    if length.nil?
+      len = bytes_left
+    else
+      len = Type.coerce_to(length, Fixnum, :to_int)
+      return "" if len.equal?(0)  # only in case length = 0 is passed in
+    end
+    len = [len, bytes_left].min
     raise ArgumentError, "negative length #{len} given", caller if len < 0
-    buffer ||= ""
+
     pstart = @sio_pos
     @sio_pos += len
-    buffer.replace(@sio_string[pstart..(@sio_pos - 1)])
-#    buffer.replace(@sio_string[pstart..@sio_pos])
-    buffer.empty? && !length.nil? ? nil : buffer
+    buf.replace(@sio_string[pstart..(@sio_pos - 1)])
+#    buf.replace(@sio_string[pstart..@sio_pos])
+    buf.empty? && !length.nil? ? nil : buf
   end
 
   def readchar
@@ -349,9 +361,15 @@ class PureRubyStringIO < IO
 
   def syswrite(string)
     requireWritable
-    @sio_string[@sio_pos, string.length] = string
-    @sio_pos +=  string.size
-    string.size
+    str = Type.coerce_to(string, String, :to_s)
+    my_len = @sio_string.length
+    if @sio_pos > my_len
+      # Pad with nulls
+      @sio_string << ("\000" * (@sio_pos - my_len))
+    end
+    @sio_string[@sio_pos, str.length] = str
+    @sio_pos +=  str.size
+    str.size
   end
 
   # In ruby 1.8.4 truncate differs from the docs in two ways.
