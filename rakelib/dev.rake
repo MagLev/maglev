@@ -66,7 +66,7 @@ namespace :dev do
 
   desc "Run the passing specs"
   task :'passing' do
-    sh "spec/mspec/bin/mspec run -B passing.mspec"
+    sh "spec/mspec/bin/mspec run -V -B passing.mspec"
     puts "Log files in log/vmunit*"
   end
 

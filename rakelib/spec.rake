@@ -35,7 +35,7 @@ namespace :spec do
   desc "Run an mspec file: spec=<dir_or_file_name>"
   task :run do
     check_spec_file
-    sh "#{MSPEC_CMD} #{ENV['spec']}"
+    sh "#{MSPEC_CMD} -V #{ENV['spec']}"
   end
 
   desc "Run an mspec file with -G fails: spec=<dir_or_file_name>"
