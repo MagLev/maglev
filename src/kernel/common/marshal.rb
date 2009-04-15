@@ -48,7 +48,8 @@ module Marshal
   TYPE_STRUCT_ch = ?S 
   TYPE_SYMBOL = ':'
   TYPE_SYMBOL_ch = ?: 
-  # TYPE_SYMLINK = ';'  not used
+  TYPE_SYMLINK = ';'  
+  TYPE_SYMLINK_ch = ?;
   TYPE_TRUE = 'T'
   TYPE_TRUE_ch = ?T
   TYPE_UCLASS = 'C'
@@ -65,6 +66,9 @@ module Marshal
       @objs_dict = IdentityHash.new
       @objs_output_count = 0
       @objs_input_arr = []
+      @syms_dict = IdentityHash.new
+      @syms_output_count = 0
+      @syms_input_arr = []
 
       # dumping
       @depth = depth
@@ -85,6 +89,12 @@ module Marshal
       count = @objs_output_count
       @objs_dict[obj] = count
       @objs_output_count = count + 1
+    end
+
+    def add_output_sym(obj)
+      count = @syms_output_count
+      @syms_dict[obj] = count
+      @syms_output_count = count + 1
     end
 
     def store_unique_object(obj)
@@ -112,10 +122,13 @@ module Marshal
       elsif type.equal?( TYPE_LINK_ch )
 	num = construct_integer
 	obj = @objs_input_arr[num]
-
 	raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
-
 	return obj
+      elsif type.equal?( TYPE_SYMLINK_ch )
+        num = construct_integer
+        obj = @syms_input_arr[num]
+	raise ArgumentError, "dump format error (symbol unlinked)" if obj.equal?(nil)
+        return obj
       elsif type.equal?( TYPE_STRING_ch)
 	obj = construct_string
         call obj if call_proc
@@ -289,7 +302,7 @@ module Marshal
       values = []
 
       name = get_symbol
-      store_unique_object name
+      #
 
       klass = Object.const_get(name)
       members = klass.members
@@ -312,8 +325,8 @@ module Marshal
 
     def construct_symbol
       obj = get_byte_sequence.to_sym
-      store_unique_object obj
-
+      arr = @syms_input_arr   # inline store_unique_sym
+      arr[arr.length] = obj
       obj
     end
 
@@ -337,7 +350,7 @@ module Marshal
 
     def construct_user_marshal
       name = get_symbol
-      store_unique_object name
+      # 
 
       klass = Module.const_get(name)
       obj = klass.allocate
@@ -409,9 +422,9 @@ module Marshal
         @call = false
         obj = construct_symbol
         @call = true
-      elsif type.equal?(TYPE_LINK_ch) 
+      elsif type.equal?(TYPE_SYMLINK_ch) 
         num = construct_integer
-        obj = @objs_input_arr[num]
+        obj = @syms_input_arr[num]
       else
         raise ArgumentError, "expected TYPE_SYMBOL or TYPE_SYMLINK, got #{type.inspect}"
       end
@@ -425,14 +438,21 @@ module Marshal
     def serialize(obj)
       raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
 
-      # How much depth we have left.
-      @depth -= 1;
-
       if obj._isSpecial
         str = obj.to_marshal(self)
+      elsif obj._isSymbol
+        idx = @syms_dict[obj]
+        if idx.equal?(nil)
+          add_output_sym(obj)
+          str = obj.to_marshal(self)
+        else
+          # object already seen , by a call to add_output_sym
+          str = TYPE_SYMLINK + serialize_integer(idx)
+        end
       else
-        idx = @objs_dict[obj]  # 
+        idx = @objs_dict[obj]
         if idx.equal?(nil) 
+          @depth -= 1;
           if obj.respond_to? :_dump then
             add_output_obj(obj)
             str = serialize_user_defined obj
@@ -440,17 +460,15 @@ module Marshal
             add_output_obj(obj)
             str = serialize_user_marshal obj
           else
-            #  to_marshal responsible for add_output_obj if desired
+            add_output_obj(obj)
             str = obj.to_marshal(self)
           end
+          @depth += 1
         else
           # object seen , by a call to add_output_obj
           str = TYPE_LINK + serialize_integer(idx)
         end
       end
-
-      @depth += 1
-
       return str
     end
 
@@ -556,7 +574,7 @@ module Marshal
     end
 
     def serialize_user_defined(obj)
-      str = obj._dump @depth
+      str = obj._dump(@depth)
       raise TypeError, "_dump() must return string" if str.class != String
       ivars = [ nil ]
       out = serialize_instance_variables_prefix(str, ivars)
@@ -590,18 +608,21 @@ module Marshal
 
   def self.dump(obj, an_io=nil, limit=nil)
     if limit.equal?(nil)
-      if an_io.kind_of? Fixnum
+      if an_io._isFixnum
         limit = an_io
         an_io = nil
       else
         limit = -1
       end
     end
+    if limit.equal?(nil)
+      depth = -1
+    else
+      depth = Type.coerce_to(limit, Fixnum, :to_int )
+    end
+    ms = State.new(nil, depth, nil)
 
-    depth = Type.coerce_to limit, Fixnum, :to_int
-    ms = State.new nil, depth, nil
-
-    if an_io and !an_io.respond_to? :write
+    if an_io and !an_io.respond_to?(:write )
       raise TypeError, "output must respond to write"
     end
 

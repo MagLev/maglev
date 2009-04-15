@@ -2,7 +2,6 @@
 class Object
   def to_marshal(ms, strip_ivars = false)
     out = ms.serialize_extended_object self
-    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
     out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
@@ -37,7 +36,6 @@ end
 class Class
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous class #{self}" if self.name == ''
-    ms.add_output_obj(self)
     Marshal::TYPE_CLASS + ms.serialize_integer(name.length) + name
   end
 end
@@ -45,14 +43,13 @@ end
 class Module
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous module #{self}" if self.name == ''
-    ms.add_output_obj(self)
     Marshal::TYPE_MODULE + ms.serialize_integer(name.length) + name
   end
 end
 
 class Symbol
   def to_marshal(ms)
-    idx = ms.add_output_obj(self)
+    # caller responsible for find_symlink (i.e. lookup in syms_dict )
     str = to_s
     Marshal::TYPE_SYMBOL + ms.serialize_integer(str.length) + str
   end
@@ -64,7 +61,6 @@ class String
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, String)
-    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_STRING
     out << ms.serialize_integer(self.length) << self
     out << ms.serialize_instance_variables_suffix(self, ivars[0])
@@ -79,7 +75,6 @@ end
 
 class Bignum
   def to_marshal(ms)
-    # no add_output_obj
     str = Marshal::TYPE_BIGNUM + (self < 0 ? '-' : '+')
     cnt = 0
     num = self.abs
@@ -106,7 +101,6 @@ class Regexp
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Regexp)
-    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_REGEXP
     out << ms.serialize_integer(str.length) + str
     out << ms.to_byte(options & 0x7)
@@ -120,7 +114,6 @@ class Struct
     out =  ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
 
-    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_STRUCT
 
     out << ms.serialize(self.class.name.to_sym)
@@ -142,7 +135,6 @@ class Array
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Array)
-    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     out << Marshal::TYPE_ARRAY
     out << ms.serialize_integer(self.length)
     # Gemstone, optimization to use while loop
@@ -165,7 +157,6 @@ class Hash
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Hash)
-    ms.add_output_obj(self)  # after extended_object if Symbols and objs in same dict
     default_val = self.default
     out << (default_val ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
     len = self.length
@@ -184,7 +175,6 @@ end
 
 class Float
   def to_marshal(ms)
-    # no add_output_obj
     str = if nan? then
             "nan"
           elsif zero? then
