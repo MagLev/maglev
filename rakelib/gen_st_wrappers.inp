@@ -2,7 +2,7 @@ run
 | year directory classes clSet |
 RubyContext load .
 year := DateAndTime now year printString.
-directory := 'lib/ruby/site_ruby/1.8/smalltalk/'.
+directory := '$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/'.
 classes := Globals select: [:each | each isBehavior].
 classes := classes asSortedCollection: [:a :b | a name <= b name].
 classes do: [:eachClass |
