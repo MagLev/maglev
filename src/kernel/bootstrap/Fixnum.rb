@@ -13,8 +13,9 @@ class Fixnum
   #  methods installed. They will fall back to Bignum (to implementations in
   #  Smalltalk Integer) if the special send fails.
 
-  # The selectors + - * >= <= < bitAnd: are special sends and may not
-  #  be reimplemented in Fixnum.
+  # The selectors 
+  #    + - * >= <= < &  
+  #  are special sends and may not be reimplemented in Fixnum.
 
   primitive_nobridge '_isSpecial', 'isSpecial'
 
