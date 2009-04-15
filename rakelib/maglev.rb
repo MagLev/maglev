@@ -10,7 +10,7 @@
 MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("..", File.dirname(__FILE__))
 
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
-GEMSTONE ||= "#{MAGLEV_HOME}/gemstone"
+GEMSTONE = ENV['GEMSTONE'] || "#{MAGLEV_HOME}/gemstone"
 TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
 TOPAZDEBUG_CMD = "#{GEMSTONE}/bin/topaz -I #{MAGLEV_HOME}/etc/.topazdebugini -l "
 IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
@@ -175,7 +175,7 @@ run
 %
 exit
 EOF
-} 
+}
     puts "Kernel is loaded"
 end
 
