@@ -1,0 +1,51 @@
+=== Smalltalk FFI
+
+The MagLev VM is a Smalltalk VM that has been enhanced to run Ruby as well.
+GemStone provides a set of <tt>.rb</tt> files that allow Ruby code to call
+into the Smalltalk evnironment.
+
+==== Create Ruby Wrappers for Smalltalk Classes
+
+To generate the ruby wrappers:
+
+  $ cd $MAGLEV_HOME
+  $ rake dev:stwrappers
+
+The wrapper files are placed in
+<tt>$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk</tt>
+
+==== Using the Wrappers
+
+To use a wrapper, simply require the appropriate file and call the methods:
+
+  require 'smalltalk/System'
+  puts Smalltalk::System._st_inTransaction
+
+  require 'smalltalk/SymbolSet'
+  s = Smalltalk::SymbolSet._st_new(10)
+
+  require 'smalltalk/IdentityBag'
+  b = Smalltalk::IdentityBag._st_new(10)
+  puts b._st_hash
+  puts b._st_getIndexInfo
+
+==== Conventions
+
+The naming conventions of the files, methods and classes have a Smalltalk
+flavor to remind you that they are Smalltalk objects and follow Smalltalk
+semantics rather than Ruby semantics.
+
+
+* Do not use ruby <tt>new</tt> to initialize objects via the Smalltalk
+  FFI.  Smalltalk objects need to be initialized with a send of
+  <tt>_st_new</tt>.
+
+* In order to call a method defined in a super class, the wrapper file for
+  the super class must also be loaded into the system.  The wrapper files
+  are generated with the proper includes.  E.g., <tt>Bag.rb</tt> contains;
+
+    require 'smalltalk/UnorderedCollection'
+    require 'smalltalk/Collection'
+    require 'smalltalk/Object'
+
+
