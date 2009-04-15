@@ -6,5 +6,5 @@ s = Smalltalk::SymbolSet._st_new(10)
 
 require 'smalltalk/IdentityBag'
 b = Smalltalk::IdentityBag._st_new(10)
-puts b._st_hash            OK
+puts b._st_hash
 puts b._st_getIndexInfo
