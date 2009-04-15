@@ -279,14 +279,6 @@ module Marshal
       obj
     end
 
-    def get_scoped_constant(name)
-      ns = Module
-      name.to_s.split('::').each do |n|
-        ns = ns.const_get(n) unless n.empty?
-      end
-      ns
-    end
-
     def construct_regexp
       s = get_byte_sequence
       if @user_class
@@ -340,8 +332,7 @@ module Marshal
 
     def construct_user_defined(ivar_index)
       name = get_symbol
-      #klass = Module.const_get(name)
-      klass = get_scoped_constant(name)
+      klass = Module.const_get(name)
 
       data = get_byte_sequence
 
@@ -360,8 +351,7 @@ module Marshal
     def construct_user_marshal
       name = get_symbol
       # 
-
-      klass = Module.const_get(name)
+      klass = get_scoped_constant(name)
       obj = klass.allocate
 
       extend_object obj if @modules
@@ -417,6 +407,14 @@ module Marshal
     def get_module_names(obj)
       # returns an Array of Symbols
       _get_module_names(obj.class)  # Gemstone changes
+    end
+
+    def get_scoped_constant(name)
+      ns = Module
+      name.to_s.split('::').each do |n|
+        ns = ns.const_get(n) unless n.empty?
+      end
+      ns
     end
 
     def get_user_class
