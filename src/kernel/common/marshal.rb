@@ -9,11 +9,11 @@ module Marshal
   VERSION_STRING = "\x04\x08"
 
   TYPE_ARRAY = '['
-  TYPE_ARRAY_ch = ?[ 
+  TYPE_ARRAY_ch = ?[
   TYPE_BIGNUM = 'l'
-  TYPE_BIGNUM_ch = ?l 
+  TYPE_BIGNUM_ch = ?l
   TYPE_CLASS = 'c'
-  TYPE_CLASS_ch = ?c 
+  TYPE_CLASS_ch = ?c
   TYPE_DATA = 'd'  # no specs
   TYPE_DATA_ch = ?d  # no specs
   TYPE_EXTENDED = 'e'
@@ -23,40 +23,40 @@ module Marshal
   TYPE_FIXNUM = 'i'
   TYPE_FIXNUM_ch = ?i
   TYPE_FLOAT = 'f'
-  TYPE_FLOAT_ch = ?f 
+  TYPE_FLOAT_ch = ?f
   TYPE_HASH = '{'
   TYPE_HASH_DEF = '}'
-  TYPE_HASH_DEF_ch = ?} 
-  TYPE_HASH_ch = ?{ 
+  TYPE_HASH_DEF_ch = ?}
+  TYPE_HASH_ch = ?{
   TYPE_IVAR = 'I'
-  TYPE_IVAR_ch = ?I 
+  TYPE_IVAR_ch = ?I
   TYPE_LINK = '@'
-  TYPE_LINK_ch = ?@ 
+  TYPE_LINK_ch = ?@
   TYPE_MODULE = 'm'
   TYPE_MODULE_OLD = 'M'  # no specs
   TYPE_MODULE_OLD_ch = ?M   # no specs
-  TYPE_MODULE_ch = ?m 
+  TYPE_MODULE_ch = ?m
   TYPE_NIL = '0'
   TYPE_NIL_ch = ?0
   TYPE_OBJECT = 'o'
   TYPE_OBJECT_ch = ?o
   TYPE_REGEXP = '/'
-  TYPE_REGEXP_ch = ?/ 
+  TYPE_REGEXP_ch = ?/
   TYPE_STRING = '"'
-  TYPE_STRING_ch = ?" 
+  TYPE_STRING_ch = ?"
   TYPE_STRUCT = 'S'
-  TYPE_STRUCT_ch = ?S 
+  TYPE_STRUCT_ch = ?S
   TYPE_SYMBOL = ':'
-  TYPE_SYMBOL_ch = ?: 
+  TYPE_SYMBOL_ch = ?:
   # TYPE_SYMLINK = ';'  not used
   TYPE_TRUE = 'T'
   TYPE_TRUE_ch = ?T
   TYPE_UCLASS = 'C'
   TYPE_UCLASS_ch = ?C
   TYPE_USERDEF = 'u'
-  TYPE_USERDEF_ch = ?u 
+  TYPE_USERDEF_ch = ?u
   TYPE_USRMARSHAL = 'U'
-  TYPE_USRMARSHAL_ch = ?U 
+  TYPE_USRMARSHAL_ch = ?U
 
   class State
 
@@ -102,77 +102,77 @@ module Marshal
       type = consume_byte
 
       if type.equal?(TYPE_NIL_ch)
-	obj = nil
+  obj = nil
       elsif type.equal?( TYPE_TRUE_ch )
-	obj = true
+  obj = true
       elsif type.equal?( TYPE_FALSE_ch )
-	obj = false
+  obj = false
       elsif type.equal?( TYPE_FIXNUM_ch )
-	obj = construct_integer
+  obj = construct_integer
       elsif type.equal?( TYPE_LINK_ch )
-	num = construct_integer
-	obj = @objs_input_arr[num]
+  num = construct_integer
+  obj = @objs_input_arr[num]
 
-	raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
+  raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
 
-	return obj
+  return obj
       elsif type.equal?( TYPE_STRING_ch)
-	obj = construct_string
+  obj = construct_string
         call obj if call_proc
       elsif type.equal?( TYPE_ARRAY_ch )
-	obj = construct_array
+  obj = construct_array
         call obj if call_proc
       elsif type.equal?( TYPE_SYMBOL_ch )
-	obj = construct_symbol
+  obj = construct_symbol
       elsif type.equal?( TYPE_FLOAT_ch )
-	obj = construct_float
+  obj = construct_float
       elsif type.equal?( TYPE_BIGNUM_ch )
-	obj = construct_bignum
+  obj = construct_bignum
       elsif type.equal?( TYPE_CLASS_ch) || type.equal?( TYPE_MODULE_ch)
-	name = construct_symbol
-	obj = Object.const_get(name)
-	store_unique_object(obj)
+  name = construct_symbol
+  obj = Object.const_get(name)
+  store_unique_object(obj)
         call obj if call_proc
       elsif type.equal?( TYPE_REGEXP_ch )
-	obj = construct_regexp
+  obj = construct_regexp
         call obj if call_proc
       elsif type.equal?( TYPE_HASH_ch) || type.equal?( TYPE_HASH_DEF_ch)
-	obj = construct_hash(type)
+  obj = construct_hash(type)
         call obj if call_proc
       elsif type.equal?( TYPE_STRUCT_ch )
-	obj = construct_struct
+  obj = construct_struct
         call obj if call_proc
       elsif type.equal?( TYPE_OBJECT_ch )
-	obj = construct_object
+  obj = construct_object
         call obj if call_proc
       elsif type.equal?( TYPE_USERDEF_ch )
-	obj = construct_user_defined ivar_index
+  obj = construct_user_defined ivar_index
         call obj if call_proc
       elsif type.equal?( TYPE_USRMARSHAL_ch )
-	obj = construct_user_marshal
+  obj = construct_user_marshal
         call obj if call_proc
       elsif type.equal?( TYPE_EXTENDED_ch )
-	@modules ||= []
-	name = get_symbol
-	@modules << Object.const_get(name)
-	obj = construct nil, false
-	extend_object obj
+  @modules ||= []
+  name = get_symbol
+  @modules << Object.const_get(name)
+  obj = construct nil, false
+  extend_object obj
         call obj if call_proc
 
       elsif type.equal?( TYPE_UCLASS_ch )
-	name = get_symbol
-	@user_class = name
-	obj = construct nil, false
+  name = get_symbol
+  @user_class = name
+  obj = construct nil, false
         call obj if call_proc
 
       elsif type.equal?( TYPE_IVAR_ch )
-	ivar_index = @has_ivar.length
-	@has_ivar.push true
-	obj = construct ivar_index, false
-	set_instance_variables obj if @has_ivar.pop
+  ivar_index = @has_ivar.length
+  @has_ivar.push true
+  obj = construct ivar_index, false
+  set_instance_variables obj if @has_ivar.pop
         call obj if call_proc
       else
-	raise ArgumentError, "load error, unknown type #{type}"
+  raise ArgumentError, "load error, unknown type #{type}"
       end
       obj
     end
@@ -240,7 +240,7 @@ module Marshal
         result = 0
         data = consume(size)
 
-        for exp in (0...size) do 
+        for exp in (0...size) do
           result += (data[exp] * (1 << (exp*8)) )
         end
         result - signed
@@ -264,6 +264,14 @@ module Marshal
       set_instance_variables obj
 
       obj
+    end
+
+    def get_scoped_constant(name)
+      ns = Module
+      name.to_s.split('::').each do |n|
+        ns = ns.const_get(n) unless n.empty?
+      end
+      ns
     end
 
     def construct_regexp
@@ -319,7 +327,8 @@ module Marshal
 
     def construct_user_defined(ivar_index)
       name = get_symbol
-      klass = Module.const_get(name)
+      #klass = Module.const_get(name)
+      klass = get_scoped_constant(name)
 
       data = get_byte_sequence
 
@@ -383,10 +392,10 @@ module Marshal
 
     def _get_module_names(a_class)
       # returns an Array of Symbols
-      h = MAGLEV_MARSHAL_CLASS_CACHE 
+      h = MAGLEV_MARSHAL_CLASS_CACHE
       arr = h[a_class]
       if arr.equal?(nil)
-        arr = a_class.ancestor_modules_names 
+        arr = a_class.ancestor_modules_names
         h[a_class] = arr
       end
       arr
@@ -409,7 +418,7 @@ module Marshal
         @call = false
         obj = construct_symbol
         @call = true
-      elsif type.equal?(TYPE_LINK_ch) 
+      elsif type.equal?(TYPE_LINK_ch)
         num = construct_integer
         obj = @objs_input_arr[num]
       else
@@ -431,8 +440,8 @@ module Marshal
       if obj._isSpecial
         str = obj.to_marshal(self)
       else
-        idx = @objs_dict[obj]  # 
-        if idx.equal?(nil) 
+        idx = @objs_dict[obj]  #
+        if idx.equal?(nil)
           if obj.respond_to? :_dump then
             add_output_obj(obj)
             str = serialize_user_defined obj
@@ -459,7 +468,7 @@ module Marshal
       n = 0
       lim = arr.size
       str = ''
-      while n < lim 
+      while n < lim
         str << TYPE_EXTENDED + serialize(arr[n])
         n += 1
       end
@@ -482,8 +491,8 @@ module Marshal
       str
     end
 
-    def serialize_instance_variables_prefix(obj, ivars_result) 
-		# (... exclude_ivars = false)
+    def serialize_instance_variables_prefix(obj, ivars_result)
+    # (... exclude_ivars = false)
       # ivars_result is Array of size 1, an output .
       #   ivars_result[0] will be second arg to serialize_instance_variables_suffix
       ivars = obj.instance_variables
@@ -498,7 +507,7 @@ module Marshal
       end
     end
 
-    def serialize_instance_variables_suffix(obj, ivars) 
+    def serialize_instance_variables_suffix(obj, ivars)
                             # (... , force = false, strip_ivars = false)
       len = ivars.length
       # if force or len > 0 then
@@ -643,5 +652,5 @@ module Marshal
 
 end
 
-# optimization, code moved to common/marshal2.rb 
-#  so constants can be resolved during bootstrap compile 
+# optimization, code moved to common/marshal2.rb
+#  so constants can be resolved during bootstrap compile
