@@ -1,5 +1,6 @@
 run
 | year directory classes clSet |
+RubyContext load .
 year := DateAndTime now year printString.
   "directory := 'tmp/' . "
 directory := 'lib/ruby/site_ruby/1.8/smalltalk/'. 
