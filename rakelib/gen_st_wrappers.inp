@@ -26,10 +26,14 @@ classes do: [:eachClass |
 # and persistence libraries to be used by applications.
 '       ; cr .
 
+        eachClass allSuperClassesDo: [:eachSuperClass|
+            file nextPutAll: 'require ''smalltalk/', eachSuperClass name, '''' ; cr
+        ] .
+        file cr .
+
         file nextPutAll:'module Smalltalk' ; cr ;
              nextPutAll:'  ', stName , ' = _resolve_smalltalk_global(:' , stName , ')' ; cr .
 
-         
          isRubyCls  ifTrue:[
             file nextPutAll:'end' ; cr ;
                  nextPutAll:'class ' , eachClass @ruby:name  ; cr .
@@ -62,8 +66,8 @@ classes do: [:eachClass |
         ].
         isRubyCls ifFalse:[ file nextPutAll:'  end' ; cr ].
         file nextPutAll: 'end'; cr .
-      ] ensure: [
-       file close.
+    ] ensure: [
+        file close.
     ].
 ].
 %
