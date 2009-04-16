@@ -1,6 +1,9 @@
 
 module Zlib
 
+  # The superclass for all exceptions raised by Ruby/zlib.
+  class Error < StandardError; end
+
   # constants from zlib.h as linked into Gemstone libgcilnk.so
   ZLIB_VERSION = "1.2.3"
 
@@ -46,8 +49,7 @@ module Zlib
 
   class GzipFile  # {
 
-    class Error <  StandardError
-    end
+    class Error < Zlib::Error; end
 
     #SYNC            = Zlib::CZStream::UNUSED
     #HEADER_FINISHED = Zlib::CZStream::UNUSED << 1
@@ -135,8 +137,16 @@ module Zlib
       @zstream.total_out()
     end
 
-    def read(length = 2048)
-      @zstream.read(length)
+    def read(length = nil)
+      if length.nil?
+        buf = ''
+        while ! eof?
+          buf << @zstream.read(2048)
+        end
+        buf
+      else
+        @zstream.read(length)
+      end
     end
 
     def finish
@@ -262,10 +272,47 @@ module Zlib
 
   end # }
 
-#   class Deflate
-#     def initialize(level = Zlib::DEFAULT_COMPRESSION)
-#       @level = level
-#     end
+
+  # Zlib:Inflate is the class for decompressing compressed data.  Unlike
+  # Zlib::Deflate, an instance of this class is not able to duplicate
+  # (clone, dup) itself.
+  class Inflate < ZStream
+    # Decompress +string+.
+    def self.inflate(string)
+      inflate_stream = Zlib::Inflate.new
+      buf = inflate_stream.inflate(string)
+      inflate_stream.finish
+      inflate_stream.close
+      buf
+    end
+
+    def inflate(string)
+      _open(false, StringIO.new(string), Zlib::Error, Zlib::Z_DEFAULT_COMPRESSION)
+      buf = ''
+      while ! at_eof
+        buf << read(2048)
+      end
+      buf
+    end
+  end
+
+#   class Deflate < ZStream
+
+#     # Compresses the given +string+. Valid values of level are
+#     # <tt>Zlib::NO_COMPRESSION</tt>, <tt>Zlib::BEST_SPEED</tt>,
+#     # <tt>Zlib::BEST_COMPRESSION</tt>, <tt>Zlib::DEFAULT_COMPRESSION</tt>, and an
+#     # integer from 0 to 9.
+#     #
+#     # This method is almost equivalent to the following code:
+#     #
+#     #   def deflate(string, level)
+#     #     z = Zlib::Deflate.new(level)
+#     #     dst = z.deflate(string, Zlib::FINISH)
+#     #     z.close
+#     #     dst
+#     #   end
+#     #
+#     # TODO: what's default value of +level+?
 #     def deflate(string, flush = Zlib::FINISH)
 
 #     end

@@ -164,12 +164,91 @@ module Kernel
   # def loop(&block) ; end
   primitive 'loop&', '_rubyLoop:'
 
-  def open(fName)
-    File.open(fName)
-  end
+  #     open(path [, mode [, perm]] )                => io or nil
+  #     open(path [, mode [, perm]] ) {|io| block }  => obj
+  #
+  #  Creates an <code>IO</code> object connected to the given stream,
+  #  file, or subprocess.
+  #
+  #  If <i>path</i> does not start with a pipe character
+  #  (``<code>|</code>''), treat it as the name of a file to open using
+  #  the specified mode (defaulting to ``<code>r</code>''). (See the table
+  #  of valid modes on page 331.) If a file is being created, its initial
+  #  permissions may be set using the integer third parameter.
+  #
+  #  If a block is specified, it will be invoked with the
+  #  <code>File</code> object as a parameter, and the file will be
+  #  automatically closed when the block terminates. The call
+  #  returns the value of the block.
+  #
+  #  If <i>path</i> starts with a pipe character, a subprocess is
+  #  created, connected to the caller by a pair of pipes. The returned
+  #  <code>IO</code> object may be used to write to the standard input
+  #  and read from the standard output of this subprocess. If the command
+  #  following the ``<code>|</code>'' is a single minus sign, Ruby forks,
+  #  and this subprocess is connected to the parent. In the subprocess,
+  #  the <code>open</code> call returns <code>nil</code>. If the command
+  #  is not ``<code>-</code>'', the subprocess runs the command. If a
+  #  block is associated with an <code>open("|-")</code> call, that block
+  #  will be run twice---once in the parent and once in the child. The
+  #  block parameter will be an <code>IO</code> object in the parent and
+  #  <code>nil</code> in the child. The parent's <code>IO</code> object
+  #  will be connected to the child's <code>$stdin</code> and
+  #  <code>$stdout</code>. The subprocess will be terminated at the end
+  #  of the block.
+  #
+  #     open("testfile") do |f|
+  #       print f.gets
+  #     end
+  #
+  #  <em>produces:</em>
+  #
+  #     This is line one
+  #
+  #  Open a subprocess and read its output:
+  #
+  #     cmd = open("|date")
+  #     print cmd.gets
+  #     cmd.close
+  #
+  #  <em>produces:</em>
+  #
+  #     Wed Apr  9 08:56:31 CDT 2003
+  #
+  #  Open a subprocess running the same Ruby program:
+  #
+  #     f = open("|-", "w+")
+  #     if f == nil
+  #       puts "in Child"
+  #       exit
+  #     else
+  #       puts "Got: #{f.gets}"
+  #     end
+  #
+  #  <em>produces:</em>
+  #
+  #     Got: in Child
+  #
+  #  Open a subprocess using a block to receive the I/O object:
+  #
+  #     open("|-") do |f|
+  #       if f == nil
+  #         puts "in Child"
+  #       else
+  #         puts "Got: #{f.gets}"
+  #       end
+  #     end
+  #
+  #  <em>produces:</em>
+  #
+  #     Got: in Child
+  def open(name, *rest, &block)
+    path = Type.coerce_to(name, String, :to_str)
 
-  def open(fName, mode)
-    File.open(fName, mode)
+    if path._isString and path[0].equal?(?|)
+      return IO.popen(path[1..-1], *rest, &block)
+    end
+    File.open(path, *rest, &block)
   end
 
   def p(obj)
@@ -249,7 +328,7 @@ module Kernel
   end
 
   def raise(ex_class, message, stack)
-    ex = ex_class.exception 
+    ex = ex_class.exception
     ex.set_backtrace(stack)
     ex._signal(message)
   end

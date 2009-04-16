@@ -54,6 +54,9 @@ class IO
   end
   alias tty? isatty
 
+  def self.popen(cmd, mode="r", &block)
+    raise NotImplementedError
+  end
 
   #  Writes the given object(s) to <em>ios</em>. The stream must be
   #  opened for writing. If the output record separator (<code>$\\</code>)
