@@ -47,8 +47,8 @@ module Marshal
   TYPE_STRUCT = 'S'
   TYPE_STRUCT_ch = ?S
   TYPE_SYMBOL = ':'
-  TYPE_SYMBOL_ch = ?: 
-  TYPE_SYMLINK = ';'  
+  TYPE_SYMBOL_ch = ?:
+  TYPE_SYMLINK = ';'
   TYPE_SYMLINK_ch = ?;
   TYPE_TRUE = 'T'
   TYPE_TRUE_ch = ?T
@@ -120,14 +120,14 @@ module Marshal
       elsif type.equal?( TYPE_FIXNUM_ch )
         obj = construct_integer
       elsif type.equal?( TYPE_LINK_ch )
-	num = construct_integer
-	obj = @objs_input_arr[num]
-	raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
-	return obj
+        num = construct_integer
+        obj = @objs_input_arr[num]
+        raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
+        return obj
       elsif type.equal?( TYPE_SYMLINK_ch )
         num = construct_integer
         obj = @syms_input_arr[num]
-	raise ArgumentError, "dump format error (symbol unlinked)" if obj.equal?(nil)
+        raise ArgumentError, "dump format error (symbol unlinked)" if obj.equal?(nil)
         return obj
       elsif type.equal?( TYPE_STRING_ch)
         obj = construct_string
@@ -185,7 +185,7 @@ module Marshal
         set_instance_variables obj if @has_ivar.pop
         call obj if call_proc
       else
-  raise ArgumentError, "load error, unknown type #{type}"
+        raise ArgumentError, "load error, unknown type #{type}"
       end
       obj
     end
@@ -350,7 +350,7 @@ module Marshal
 
     def construct_user_marshal
       name = get_symbol
-      # 
+      #
       klass = get_scoped_constant(name)
       obj = klass.allocate
 
@@ -429,7 +429,7 @@ module Marshal
         @call = false
         obj = construct_symbol
         @call = true
-      elsif type.equal?(TYPE_SYMLINK_ch) 
+      elsif type.equal?(TYPE_SYMLINK_ch)
         num = construct_integer
         obj = @syms_input_arr[num]
       else
@@ -458,7 +458,7 @@ module Marshal
         end
       else
         idx = @objs_dict[obj]
-        if idx.equal?(nil) 
+        if idx.equal?(nil)
           @depth -= 1;
           if obj.respond_to? :_dump then
             add_output_obj(obj)
@@ -508,7 +508,7 @@ module Marshal
     end
 
     def serialize_instance_variables_prefix(obj, ivars_result)
-    # (... exclude_ivars = false)
+      # (... exclude_ivars = false)
       # ivars_result is Array of size 1, an output .
       #   ivars_result[0] will be second arg to serialize_instance_variables_suffix
       ivars = obj.instance_variables
@@ -524,7 +524,7 @@ module Marshal
     end
 
     def serialize_instance_variables_suffix(obj, ivars)
-                            # (... , force = false, strip_ivars = false)
+      # (... , force = false, strip_ivars = false)
       len = ivars.length
       # if force or len > 0 then
       if len > 0 then
@@ -547,7 +547,7 @@ module Marshal
         end
         str
       else
-      ''
+        ''
       end
     end
 
@@ -593,7 +593,7 @@ module Marshal
     def serialize_user_marshal(obj)
       val = obj.marshal_dump
 
-      add_object val
+      add_output_obj val
 
       out = TYPE_USRMARSHAL + serialize(obj.class.name.to_sym)
       out << val.to_marshal(self)
