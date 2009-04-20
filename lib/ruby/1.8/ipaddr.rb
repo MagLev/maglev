@@ -354,7 +354,7 @@ class IPAddr
   end
 
   def mask!(mask)
-    if mask.kind_of?(String)
+    if mask._isString
       if mask =~ /^\d+$/
 	prefixlen = mask.to_i
       else
@@ -400,7 +400,7 @@ class IPAddr
   # specified address, you can specify an address family explicitly by
   # the optional second argument.
   def initialize(addr = '::', family = Socket::AF_UNSPEC)
-    if !addr.kind_of?(String)
+    if !addr._isString
       if family != Socket::AF_INET6 && family != Socket::AF_INET
 	raise ArgumentError, "unsupported address family"
       end
