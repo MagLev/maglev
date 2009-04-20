@@ -199,7 +199,7 @@ EOT
           full_message = build_message(nil, "<?>\ngiven as the method name argument to #assert_respond_to must be a Symbol or #respond_to\\?(:to_str).", method)
 
           assert_block(full_message) do
-            method.kind_of?(Symbol) || method.respond_to?(:to_str)
+            method._isSymbol || method.respond_to?(:to_str)
           end
           full_message = build_message(message, <<EOT, object, object.class, method)
 <?>
@@ -261,7 +261,7 @@ EOT
       def assert_operator(object1, operator, object2, message="")
         _wrap_assertion do
           full_message = build_message(nil, "<?>\ngiven as the operator for #assert_operator must be a Symbol or #respond_to\\?(:to_str).", operator)
-          assert_block(full_message){operator.kind_of?(Symbol) || operator.respond_to?(:to_str)}
+          assert_block(full_message){operator._isSymbol || operator.respond_to?(:to_str)}
           full_message = build_message(message, <<EOT, object1, AssertionMessage.literal(operator), object2)
 <?> expected to be
 ?
