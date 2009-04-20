@@ -170,6 +170,12 @@ class Behavior
 
   primitive_nobridge 'remove_method', 'rubyRemoveMethod:'
 
+  def _ruby_inherited(a_class)
+    # do the actual send  of inherited to self, so Rails can install
+    #   a private inherited method.   Trac 428.
+    self.inherited(a_class)
+  end
+
   #   for now, undef_method is same as remove_method , there is no
   #   other way to prevent a class responding to a selector.
   #
