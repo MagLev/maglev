@@ -75,4 +75,11 @@ module Kernel
     end
   end
 #  private :FloatValue   # TODO: uncomment
+
+  def warn(warning)
+    $stderr.write "#{warning}\n" unless $VERBOSE.equal?(nil)
+    nil
+  end
+  module_function :warn
+
 end
