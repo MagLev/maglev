@@ -87,7 +87,7 @@ module RubyToken
   class TkOPASGN < TkOp
     def initialize(line_no, char_no, op)
       super(line_no, char_no)
-      op = TkReading2Token[op] unless op.kind_of?(Symbol)
+      op = TkReading2Token[op] unless op._isSymbol
       @op = op
     end
     attr :op
@@ -113,7 +113,7 @@ module RubyToken
     tk = nil
     case token
     when String, Symbol
-      source = token.kind_of?(String) ? TkReading2Token : TkSymbol2Token
+      source = token._isString ? TkReading2Token : TkSymbol2Token
       if (tk = source[token]).nil?
 	IRB.fail TkReading2TokenNoKey, token
       end
@@ -268,7 +268,7 @@ module RubyToken
   TkSymbol2Token = {}
 
   def RubyToken.def_token(token_n, super_token = Token, reading = nil, *opts)
-    token_n = token_n.id2name unless token_n.kind_of?(String)
+    token_n = token_n.id2name unless token_n._isString
     if RubyToken.const_defined?(token_n)
       IRB.fail AlreadyDefinedToken, token_n
     end
