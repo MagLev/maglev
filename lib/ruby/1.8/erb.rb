@@ -814,7 +814,7 @@ class ERB
   module DefMethod  # :nodoc:
     public
     def def_erb_method(methodname, erb)
-      if erb.kind_of? String
+      if erb._isString
 	fname = erb
 	File.open(fname) {|f| erb = ERB.new(f.read) }
 	erb.def_method(self, methodname, fname)
