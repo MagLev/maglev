@@ -139,7 +139,7 @@ class PureRubyStringIO < IO
   def getc
     requireReadable
     char = @sio_string[@sio_pos]
-    @sio_pos +=  1 unless char.nil?
+    @sio_pos +=  1 unless char.equal?(nil)
     char
   end
 
@@ -152,6 +152,13 @@ class PureRubyStringIO < IO
   def gets(sep_string=$/)
     # variant after first gets no bridges   # gemstone
     res = self._gets(sep_string)
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def gets
+    # variant after first gets no bridges   # gemstone
+    res = self._gets( $/ )
     res._storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end
@@ -230,7 +237,7 @@ class PureRubyStringIO < IO
     requireWritable
     args.unshift($_) if args.empty
     args.each { |obj| write(obj) }
-    write($\) unless $\.nil?
+    write($\) unless $\.equal?(nil)
     nil
   end
 
@@ -258,10 +265,10 @@ class PureRubyStringIO < IO
 
   def read(length=nil, buffer=nil)
     requireReadable
-    buf = buffer.nil? ? "" : Type.coerce_to(buffer, String, :to_str)
+    buf = buffer.equal?(nil) ? "" : Type.coerce_to(buffer, String, :to_str)
 
     bytes_left = (@sio_string.length - @sio_pos)
-    if length.nil?
+    if length.equal?(nil)
       len = bytes_left
     else
       len = Type.coerce_to(length, Fixnum, :to_int)
@@ -274,7 +281,7 @@ class PureRubyStringIO < IO
     @sio_pos += len
     buf.replace(@sio_string[pstart..(@sio_pos - 1)])
 #    buf.replace(@sio_string[pstart..@sio_pos])
-    r = buf.empty? && !length.nil? ? nil : buf
+    r = buf.empty? && !length.equal?(nil) ? nil : buf
     r
   end
 
@@ -295,7 +302,7 @@ class PureRubyStringIO < IO
     if sep_string.equal?(Undefined)
       sep = $/
       return [] if eof?
-    elsif sep_string.nil?
+    elsif sep_string.equal?(nil)
       return [read]
     else
       sep = Type.coerce_to(sep_string, String, :to_str)
@@ -316,10 +323,10 @@ class PureRubyStringIO < IO
   def reopen(other_io, mode_arg=nil)
     # Gemstone edits to delete use of ObjectSpace
     if other_io._isString
-      raise ArgumentError, 'wrong number of arguments (1 for 2)', caller if mode_arg.nil?
+      raise ArgumentError, 'wrong number of arguments (1 for 2)', caller if mode_arg.equal?(nil)
       self.initialize(other_io, mode_arg)
     elsif other_io.is_a?(self.class) then
-      raise ArgumentError, 'wrong number of arguments (2 for 1)', caller if ! mode_arg.nil?
+      raise ArgumentError, 'wrong number of arguments (2 for 1)', caller if ! mode_arg.equal?(nil)
       self.initialize(other_io.string, other_io._mode)
     else
       raise ArgumentError, 'unsupported kind of reopen'
