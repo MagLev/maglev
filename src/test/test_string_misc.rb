@@ -281,5 +281,22 @@ string = "0123456"
 test(string.slice!(/abc/), nil, 'slice! 17')
 test(string, "0123456", 'slice! 17a')
 
+# ticket 400
+str = "this is a string"
+r = str.slice!(2) 
+unless r == 105 ; raise 'error' ; end
+unless str == 'ths is a string' ; raise 'error' ; end
+r = str.slice!(3..6) 
+unless r == " is " ; raise 'error' ; end
+unless str == 'thsa string' ; raise 'error'; end
+r = str.slice!(/s.*t/) 
+unless r == "sa st" ; raise 'error' ; end
+unless str == 'thring' ; raise 'error' ; end
+r = str.slice!("r") 
+unless r == "r" ; raise 'error' ; end
+unless str == "thing" ; raise 'error' ; end
+puts "Trac400 ok"
+true
+
 report
 
