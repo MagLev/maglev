@@ -104,8 +104,8 @@ class Complex < Numeric
   undef step
 
   def Complex.generic?(other) # :nodoc:
-    other.kind_of?(Integer) or
-    other.kind_of?(Float) or
+    other._isInteger or
+    other._isFloat or
     (defined?(Rational) and other.kind_of?(Rational))
   end
 
@@ -124,9 +124,9 @@ class Complex < Numeric
   end
 
   def initialize(a, b)
-    raise TypeError, "non numeric 1st arg `#{a.inspect}'" if !a.kind_of? Numeric
+    raise TypeError, "non numeric 1st arg `#{a.inspect}'" if !a._isNumeric
     raise TypeError, "`#{a.inspect}' for 1st arg" if a.kind_of? Complex
-    raise TypeError, "non numeric 2nd arg `#{b.inspect}'" if !b.kind_of? Numeric
+    raise TypeError, "non numeric 2nd arg `#{b.inspect}'" if !b._isNumeric
     raise TypeError, "`#{b.inspect}' for 2nd arg" if b.kind_of? Complex
     @real = a
     @image = b
@@ -208,7 +208,7 @@ class Complex < Numeric
       nr = Math.exp!(ore*Math.log!(r) - oim * theta)
       ntheta = theta*ore + oim*Math.log!(r)
       Complex.polar(nr, ntheta)
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       if other > 0
 	x = self
 	z = x
