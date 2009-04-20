@@ -525,7 +525,7 @@ module Net
       time_out = @options["Timeout"]
       waittime = @options["Waittime"]
 
-      if options.kind_of?(Hash)
+      if options._isHash
         prompt   = if options.has_key?("Match")
                      options["Match"]
                    elsif options.has_key?("Prompt")
@@ -672,7 +672,7 @@ module Net
       match    = @options["Prompt"]
       time_out = @options["Timeout"]
 
-      if options.kind_of?(Hash)
+      if options._isHash
         string   = options["String"]
         match    = options["Match"]   if options.has_key?("Match")
         time_out = options["Timeout"] if options.has_key?("Timeout")
@@ -713,7 +713,7 @@ module Net
     def login(options, password = nil) # :yield: recvdata
       login_prompt = /[Ll]ogin[: ]*\z/n
       password_prompt = /[Pp]ass(?:word|phrase)[: ]*\z/n
-      if options.kind_of?(Hash)
+      if options._isHash
         username = options["Name"]
         password = options["Password"]
 	login_prompt = options["LoginPrompt"] if options["LoginPrompt"]
