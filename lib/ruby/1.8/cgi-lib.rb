@@ -246,7 +246,7 @@ class CGI < SimpleDelegator
 
   # print message to $>
   def CGI::message(message, title = "", header = ["Content-Type: text/html"])
-    if message.kind_of?(Hash)
+    if message._isHash
       title   = message['title']
       header  = message['header']
       message = message['body']
