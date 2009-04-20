@@ -217,7 +217,7 @@ module URI
   module Util # :nodoc:
     def make_components_hash(klass, array_hash)
       tmp = {}
-      if array_hash.kind_of?(Array) &&
+      if array_hash._isArray &&
           array_hash.size == klass.component.size - 1
         klass.component[1..-1].each_index do |i|
           begin
@@ -227,7 +227,7 @@ module URI
           end
         end
 
-      elsif array_hash.kind_of?(Hash)
+      elsif array_hash._isHash
         array_hash.each do |key, value|
           begin
             tmp[key] = value.clone
@@ -282,7 +282,7 @@ module URI
     #   # => "@%3F@%21"
     #
     def escape(str, unsafe = UNSAFE)
-      unless unsafe.kind_of?(Regexp)
+      unless unsafe._isRegexp
         # perhaps unsafe is String object
         unsafe = Regexp.new("[#{Regexp.quote(unsafe)}]", false, 'N')
       end
