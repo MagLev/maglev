@@ -83,10 +83,14 @@ class Prime
 	@seed += 1
 	i += 1
       else
-	while @seed > @counts[i]
-	  @counts[i] += @primes[i]
+        lseed = @seed
+        lcnti = @counts[i]
+        lprimi = @primes[i]
+	while lseed > lcnti
+	  lcnti += lprimi
 	end
-	if @seed != @counts[i]
+        @counts[i] = lcnti
+	if lseed != lcnti
 	  i += 1
 	else
 	  i = -1
@@ -145,7 +149,7 @@ class Rational
       
       for elm in npd
 	elm[1] = elm[1] * other
-	if !elm[1].kind_of?(Integer) and elm[1].denominator != 1
+	if ! elm[1]._isInteger and elm[1].denominator != 1
          return Float(self) ** other2
 	end
 	elm[1] = elm[1].to_i
@@ -153,7 +157,7 @@ class Rational
       
       for elm in dpd
 	elm[1] = elm[1] * other
-	if !elm[1].kind_of?(Integer) and elm[1].denominator != 1
+	if !elm[1]._isInteger and elm[1].denominator != 1
          return Float(self) ** other2
 	end
 	elm[1] = elm[1].to_i
@@ -164,7 +168,7 @@ class Rational
       
       Rational(num,den)
       
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       if other > 0
 	num = numerator ** other
 	den = denominator ** other
@@ -176,7 +180,7 @@ class Rational
 	den = 1
       end
       Rational.new!(num, den)
-    elsif other.kind_of?(Float)
+    elsif other._isFloat
       Float(self) ** other
     else
       x , y = other.coerce(self)
@@ -208,7 +212,7 @@ class Rational
       nearn = self.numerator.to_f ** (1.0/other.denominator.to_f)
       Rational(num,den)
       
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       if other > 0
 	num = numerator ** other
 	den = denominator ** other
@@ -220,7 +224,7 @@ class Rational
 	den = 1
       end
       Rational.new!(num, den)
-    elsif other.kind_of?(Float)
+    elsif other._isFloat
       Float(self) ** other
     else
       x , y = other.coerce(self)
@@ -254,7 +258,7 @@ module Math
   end
   
   def rsqrt(a)
-    if a.kind_of?(Float)
+    if a._isFloat
       sqrt!(a)
     elsif a.kind_of?(Rational)
       rsqrt(a.numerator)/rsqrt(a.denominator)
