@@ -104,7 +104,7 @@ class Rational < Numeric
       num = -num
       den = -den
     end
-    if num.kind_of?(Integer) and den.kind_of?(Integer)
+    if num._isInteger and den._isInteger
       @numerator = num
       @denominator = den
     else
@@ -126,9 +126,9 @@ class Rational < Numeric
       num = @numerator * a.denominator
       num_a = a.numerator * @denominator
       Rational(num + num_a, @denominator * a.denominator)
-    elsif a.kind_of?(Integer)
+    elsif a._isInteger
       self + Rational.new!(a, 1)
-    elsif a.kind_of?(Float)
+    elsif a._isFloat
       Float(self) + a
     else
       x, y = a.coerce(self)
@@ -150,9 +150,9 @@ class Rational < Numeric
       num = @numerator * a.denominator
       num_a = a.numerator * @denominator
       Rational(num - num_a, @denominator*a.denominator)
-    elsif a.kind_of?(Integer)
+    elsif a._isInteger
       self - Rational.new!(a, 1)
-    elsif a.kind_of?(Float)
+    elsif a._isFloat
       Float(self) - a
     else
       x, y = a.coerce(self)
@@ -175,9 +175,9 @@ class Rational < Numeric
       num = @numerator * a.numerator
       den = @denominator * a.denominator
       Rational(num, den)
-    elsif a.kind_of?(Integer)
+    elsif a._isInteger
       self * Rational.new!(a, 1)
-    elsif a.kind_of?(Float)
+    elsif a._isFloat
       Float(self) * a
     else
       x, y = a.coerce(self)
@@ -197,10 +197,10 @@ class Rational < Numeric
       num = @numerator * a.denominator
       den = @denominator * a.numerator
       Rational(num, den)
-    elsif a.kind_of?(Integer)
+    elsif a._isInteger
       raise ZeroDivisionError, "division by zero" if a == 0
       self / Rational.new!(a, 1)
-    elsif a.kind_of?(Float)
+    elsif a._isFloat
       Float(self) / a
     else
       x, y = a.coerce(self)
@@ -220,7 +220,7 @@ class Rational < Numeric
   def ** (other)
     if other.kind_of?(Rational)
       Float(self) ** other
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       if other > 0
 	num = @numerator ** other
 	den = @denominator ** other
@@ -232,7 +232,7 @@ class Rational < Numeric
 	den = 1
       end
       Rational.new!(num, den)
-    elsif other.kind_of?(Float)
+    elsif other._isFloat
       Float(self) ** other
     else
       x, y = other.coerce(self)
@@ -290,9 +290,9 @@ class Rational < Numeric
   def == (other)
     if other.kind_of?(Rational)
       @numerator == other.numerator and @denominator == other.denominator
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       self == Rational.new!(other, 1)
-    elsif other.kind_of?(Float)
+    elsif other._isFloat
       Float(self) == other
     else
       other == self
@@ -314,9 +314,9 @@ class Rational < Numeric
       else
 	return 0
       end
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       return self <=> Rational.new!(other, 1)
-    elsif other.kind_of?(Float)
+    elsif other._isFloat
       return Float(self) <=> other
     elsif defined? other.coerce
       x, y = other.coerce(self)
@@ -327,9 +327,9 @@ class Rational < Numeric
   end
 
   def coerce(other)
-    if other.kind_of?(Float)
+    if other._isFloat
       return other, self.to_f
-    elsif other.kind_of?(Integer)
+    elsif other._isInteger
       return Rational.new!(other, 1), self
     else
       super
