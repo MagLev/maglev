@@ -633,7 +633,7 @@ class Matrix
   #        48 99
   #
   def ** (other)
-    if other.kind_of?(Integer)
+    if other._isInteger
       x = self
       if other <= 0
         x = self.inverse
@@ -652,7 +652,7 @@ class Matrix
         n -= 1
       end
       z
-    elsif other.kind_of?(Float) || defined?(Rational) && other.kind_of?(Rational)
+    elsif other._isFloat || defined?(Rational) && other.kind_of?(Rational)
       Matrix.Raise ErrOperationNotDefined, "**"
     else
       Matrix.Raise ErrOperationNotDefined, "**"
