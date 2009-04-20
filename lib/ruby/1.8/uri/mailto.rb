@@ -97,16 +97,16 @@ module URI
       if tmp[:headers]
         tmp[:opaque] << '?'
 
-        if tmp[:headers].kind_of?(Array)
+        if tmp[:headers]._isArray
           tmp[:opaque] << tmp[:headers].collect { |x|
-            if x.kind_of?(Array)
+            if x._isArray
               x[0] + '=' + x[1..-1].to_s
             else
               x.to_s
             end
           }.join('&')
 
-        elsif tmp[:headers].kind_of?(Hash)
+        elsif tmp[:headers]._isHash
           tmp[:opaque] << tmp[:headers].collect { |h,v|
             h + '=' + v
           }.join('&')
