@@ -71,7 +71,7 @@ module URI
       begin
         return self.build(args)
       rescue InvalidComponentError
-        if args.kind_of?(Array)
+        if args._isArray
           return self.build(args.collect{|x| 
             if x
               URI.escape(x)
@@ -79,7 +79,7 @@ module URI
               x
             end
           })
-        elsif args.kind_of?(Hash)
+        elsif args._isHash
           tmp = {}
           args.each do |key, value|
             tmp[key] = if value
@@ -106,10 +106,10 @@ module URI
     # See #new for hash keys to use or for order of array items.
     #
     def self.build(args)
-      if args.kind_of?(Array) &&
+      if args._isArray &&
           args.size == ::URI::Generic::COMPONENT.size
         tmp = args
-      elsif args.kind_of?(Hash)
+      elsif args._isHash
         tmp = ::URI::Generic::COMPONENT.collect do |c|
           if args.include?(c)
             args[c]
@@ -405,7 +405,7 @@ module URI
       if @registry || @opaque
         raise InvalidURIError, 
           "can not set port with registry or opaque"
-      elsif !v.kind_of?(Fixnum) && PORT !~ v
+      elsif !v._isFixnum && PORT !~ v
         raise InvalidComponentError,
           "bad component(expected port component): #{v}"
       end
@@ -415,7 +415,7 @@ module URI
     private :check_port
 
     def set_port(v)
-      unless !v || v.kind_of?(Fixnum)
+      unless !v || v._isFixnum
         if v.empty?
           v = nil
         else
