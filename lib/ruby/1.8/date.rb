@@ -250,7 +250,7 @@ class Date
   ABBR_DAYNAMES = %w(Sun Mon Tue Wed Thu Fri Sat)
 
   [MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYNAMES].each do |xs|
-    xs.each{|x| x.freeze unless x.nil?}.freeze
+    xs.each{|x| x.freeze unless x.equal?(nil)}.freeze
   end
 
   class Infinity < Numeric # :nodoc:
@@ -881,7 +881,7 @@ class Date
       end
 
       a = elem.values_at(:cwyear, :cweek, :cwday)
-      if a[2].nil? && elem[:wday]
+      if a[2].equal?(nil) && elem[:wday]
 	a[2] = elem[:wday].nonzero? || 7
       end
       if a.all?
@@ -891,7 +891,7 @@ class Date
       end
 
       a = elem.values_at(:year, :wnum0, :wday)
-      if a[2].nil? && elem[:cwday]
+      if a[2].equal?(nil) && elem[:cwday]
 	a[2] = elem[:cwday] % 7
       end
       if a.all?
@@ -904,7 +904,7 @@ class Date
       if a[2]
 	a[2] = (a[2] - 1) % 7
       end
-      if a[2].nil? && elem[:cwday]
+      if a[2].equal?(nil) && elem[:cwday]
 	a[2] = (elem[:cwday] - 1) % 7
       end
       if a.all?
