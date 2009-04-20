@@ -6,7 +6,7 @@ class Range
     res = []
     current = @from
     lim = @to
-    if @from._isNumber
+    if @from._isNumeric
       unless @excludeEnd
         lim = lim + 1
       end
