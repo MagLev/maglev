@@ -1,3 +1,9 @@
+unless File.directory?("#{ENV['MAGLEV_HOME']}/lib/ruby/site_ruby/1.8/smalltalk")
+  Dir.chdir "#{ENV['MAGLEV_HOME']}" do
+    system 'rake dev:stwrappers'
+  end
+end
+
 require 'smalltalk/System'
 puts Smalltalk::System._st_inTransaction # Crashes system
 
