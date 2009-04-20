@@ -64,7 +64,7 @@ class Set
   def initialize(enum = nil, &block) # :yields: o
     @hash ||= Hash.new
 
-    enum.nil? and return
+    enum.equal?(nil) and return
 
     if block
       enum.each { |o| add(block[o]) }
