@@ -122,8 +122,8 @@ class Range
   def step(n=1, &block)
     current = @from
     lim = @to
-    if @from._isNumber
-      unless n._isNumber
+    if @from._isNumeric
+      unless n._isNumeric
         n = Type.coerce_to(n, Integer, :to_int)
       end
       if (n <= 0) 

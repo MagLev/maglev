@@ -35,7 +35,7 @@ class Fixnum
 
   primitive_nobridge '_raised_to' , '_rubyRaisedTo:'
   def **(arg)
-    if arg._isNumber
+    if arg._isNumeric
       if arg < 0
         r = self.to_f
         return r ** arg
@@ -55,7 +55,7 @@ class Fixnum
 
   def <=>(arg)
     # reimplemented to reduce use of polymorphic send caches
-    if arg._isNumber
+    if arg._isNumeric
       if self > arg
         1 
       elsif self == arg

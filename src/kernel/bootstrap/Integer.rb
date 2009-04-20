@@ -158,7 +158,7 @@ class Integer
             q = self._divide(arg)
             r = self - (q * arg)
             [ q, r ]
-          elsif arg._isNumber
+          elsif arg._isNumeric
             c = arg.coerce(self)
             c[0].divmod(c[1])
           else

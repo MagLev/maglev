@@ -21,7 +21,7 @@ class Object
     # _isFloat  	# smalltalk   _isFloat
     # _isHash   	# smalltalk   _isRubyHash
     # _isInteger	# smalltalk  _isInteger
-    # _isNumber 	# smalltalk   _isNumber
+    # _isNumeric 	# smalltalk   _isNumber
     # _isRegexp 	# smalltalk   _isRegexp
     # _isRange  	# smalltalk   _isRange
     # _isString 	# smalltalk   _isRubyString  # returns false for Symbols

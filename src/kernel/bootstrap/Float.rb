@@ -71,7 +71,7 @@ class Float
   end
 
   def divmod(arg)
-    unless arg._isNumber
+    unless arg._isNumeric
       raise TypeError, 'arg to divmod is not a Numeric'
     end
     a = Type.coerce_to(arg, Float, :to_f)
@@ -113,7 +113,7 @@ class Float
 
   def <=>(arg)
     # reimplemented for efficiency since Float > not a prim
-    if arg._isNumber
+    if arg._isNumeric
       if self < arg
 	-1 
       elsif self == arg

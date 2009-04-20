@@ -9,7 +9,7 @@ class Numeric
   end
 
     def <=>(arg)
-      if arg._isNumber
+      if arg._isNumeric
         if self > arg
           1
         elsif self == arg
@@ -42,7 +42,7 @@ class Numeric
     end
 
     def divmod(arg)
-      unless arg._isNumber
+      unless arg._isNumeric
         raise TypeError, 'arg to divmod is not a Numeric'
       end
       a = Type.coerce_to(arg, Float, :to_f)
@@ -55,7 +55,7 @@ class Numeric
     end
 
     def remainder(arg)
-      unless arg._isNumber
+      unless arg._isNumeric
         raise TypeError, 'arg to remainder is not a Numeric'
       end
       mod = self.modulo(arg)
