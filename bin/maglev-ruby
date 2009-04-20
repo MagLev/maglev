@@ -16,6 +16,7 @@ OPTIONS:
    -h           Show this message and exit
    --help       Show this message and exit
    -v           Print version number, then turn on verbose mode
+   -w           Turn warnings on
    --copyright  Print copyright and exit
    --version    Print version number and exit
 EOF
@@ -85,6 +86,9 @@ do
             grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
+        -w)
+            warning=1
+            ;;
         *)
             break
             ;;
@@ -94,14 +98,14 @@ done
 
 # Make sure we have at least one argument
 if [ $# -lt 1 ]; then
-    echo "$COMMAND: Error -- requires a filename to run."
-    echo
-    usage
-    exit 1
+  stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
+  cat /dev/stdin > $stdinscript
+  RUBYSCRIPT=$stdinscript
+else
+  RUBYSCRIPT=$1
+  shift
 fi
 
-RUBYSCRIPT=$1
-shift
 # Make sure the argument is a valid file
 if [ ! -e $RUBYSCRIPT ]; then
     echo "$COMMAND: Error -- The file \"$RUBYSCRIPT\" does not exist"
@@ -119,8 +123,7 @@ done
 
 # need to keep topaz's stdin connected to the tty always
 #  so stdin is usable from Ruby , so do not redirect topaz stdin
-base=`basename $0`
-dbscript=`mktemp /tmp/${base}.XXXX` || exit 1
+dbscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
 rm -f $dbscript
 if [ $debug == 1 ]; then
   cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
@@ -161,5 +164,7 @@ else
   $TOPAZ_CMD
   exitStatus=$?
 fi
+
+rm -f $stdinscript
 rm -f $dbscript
 exit $exitStatus
