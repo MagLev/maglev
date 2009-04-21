@@ -77,30 +77,37 @@ class Prime
   
   def succ
     i = -1
-    size = @primes.size
+    lprimes = @primes
+    size = lprimes.size
+    lcounts = @counts
+    lseed = @seed
     while i < size
-      if i == -1
-	@seed += 1
-	i += 1
+      if i == -1 
+        lseed = lseed + 1
+        i += 1
       else
-        lseed = @seed
-        lcnti = @counts[i]
-        lprimi = @primes[i]
-	while lseed > lcnti
-	  lcnti += lprimi
-	end
-        @counts[i] = lcnti
-	if lseed != lcnti
+        lcounts_i = lcounts[i]
+        if (lseed > lcounts_i) 
+          lprimes_i = lprimes[i]
+	  lcounts_i += lprimes_i
+          while lseed > lcounts_i
+            lcounts_i += lprimes_i
+          end
+          lcounts[i] = lcounts_i
+        end
+        if lseed != lcounts_i
 	  i += 1
-	else
+        else
 	  i = -1
-	end
+        end
       end
     end
-    @primes.push @seed
-    @counts.push @seed + @seed
-    return @seed
+    lprimes.push( lseed)
+    lcounts.push( lseed + lseed )
+    @seed = lseed
+    return lseed
   end
+
   alias next succ
 
   def each

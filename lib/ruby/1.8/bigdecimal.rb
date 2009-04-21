@@ -1,5 +1,10 @@
 # depends on: class.rb numeric.rb regexp.rb string.rb
 
+#  copied from Rubinius ,
+#  changes:
+#    use Maglev _is  methods instead of kind_of? where possible
+#    use equal?(nil) instead of nil ? 
+
 def BigDecimal(string, _precs=0)
   BigDecimal.new(string, _precs)
 end
@@ -37,10 +42,9 @@ class BigDecimal < Numeric
   # Class methods #
   #################
   def self.induced_from(obj)
-    case obj
-    when BigDecimal
+    if obj.kind_of?(BigDecimal)
      obj
-    when Bignum, Fixnum
+    elsif obj._isInteger
       BigDecimal(obj.to_s)
     else
       raise TypeError, "failed to convert #{obj.class} into BigDecimal"
