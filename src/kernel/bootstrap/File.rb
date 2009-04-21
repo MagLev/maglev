@@ -20,6 +20,7 @@ class File
   primitive 'read', 'contents'
   primitive 'flush', 'flush'
   primitive 'rewind', 'rewind'
+  primitive_nobridge '_seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 
@@ -691,16 +692,6 @@ class File
     return res
   end
 
-  def self.read(path)
-    file = self.new(path)
-    if file.equal?(nil)
-      raise SystemCallError # TODO: Errno::xxx
-    end
-    contents = file.read
-    file.close
-    contents
-  end
-
   def each_line(&block)
     sep = ($/.equal?(nil) ? 10 : $/[0])
     until eof?
@@ -708,6 +699,9 @@ class File
     end
   end
 
+  def seek(offset, whence = IO::SEEK_SET)
+    _seek(offset, whence)
+  end
 end
 
 class PersistentFile

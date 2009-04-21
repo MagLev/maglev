@@ -167,11 +167,37 @@ class IO
     nil
   end
 
-  def self.read(name)
-    File.read(name)
-  end
+  ##
+  # Opens the file, optionally seeks to the given offset,
+  # then returns length bytes (defaulting to the rest of
+  # the file). read ensures the file is closed before returning.
+  #
+  #  IO.read("testfile")           #=> "This is line one\nThis is line two\nThis is line three\nAnd so on...\n"
+  #  IO.read("testfile", 20)       #=> "This is line one\nThi"
+  #  IO.read("testfile", 20, 10)   #=> "ne one\nThis is line "
+  def self.read(name, length=Undefined, offset=0)
+    offset = Type.coerce_to(offset, Fixnum, :to_int)
+    if offset < 0
+      raise Errno::EINVAL, "offset must not be negative"
+    end
+    unless length.equal?(Undefined)
+      length = Type.coerce_to(length, Fixnum, :to_int)
 
-  # TODO #  def self.read(name, length, offset); ... ; end
+      if length < 0
+        raise ArgumentError, "length must not be negative"
+      end
+    end
+
+    File.open(name) do |f|
+      f.seek(offset) unless offset.zero?
+
+      if length.equal?(Undefined)
+        f.read
+      else
+        f.read(length)
+      end
+    end
+  end
 
 end
 

@@ -332,7 +332,8 @@ module Marshal
 
     def construct_user_defined(ivar_index)
       name = get_symbol
-      klass = Module.const_get(name)
+      klass = get_scoped_constant(name)
+      #klass = Module.const_get(name)
 
       data = get_byte_sequence
 

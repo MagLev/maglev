@@ -555,11 +555,12 @@ class String
 
   def slice!(start, len)
     return nil if len < 0
+    return '' if len.equal?(0)
 
     sz = self.size
     start += sz if start < 0
     return nil if start < 0 || start > sz
-    return "" if start == sz
+    return '' if start.equal?(sz)
 
     s = slice(start, len)
 

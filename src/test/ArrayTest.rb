@@ -1010,6 +1010,11 @@ test(a[4,10] = 4,    4,               "assign  5")
 test(a,              [1,2,nil,nil,4], "assign  6")
 
 # A regression:
+ary = [1]
+ary.slice!(0..-1)
+test(ary, [], 'slice! regression A')
+
+# A regression:
 tmp = []
 val = "text/html"
 q = 1.0
@@ -1058,25 +1063,73 @@ a = Array.new
 a[4] = "4"
 test(a, [nil, nil, nil, nil, "4"], 'el assignment 1')
 
+a = [nil, nil, nil, nil, "4"]
 a[0] = [1,2,3]
 test(a, [[1,2,3], nil, nil, nil, "4"], 'el assignment 2')
 
+a = [[1,2,3], nil, nil, nil, "4"]
 a[0, 3] = ['a', 'b', 'c']
 test(a, ['a', 'b', 'c', nil, "4"], 'el assignment 3')
 
+a = ['a', 'b', 'c', nil, "4"]
 a[1..2] = [1, 2]
 test(a, ['a', 1, 2, nil, "4"], 'el assignment 4')
 
+a = ['a', 1, 2, nil, "4"]
 a[0, 2] = "?"
 test(a, ['?', 2, nil, "4"], 'el assignment 5')
 
+a = ['?', 2, nil, "4"]
 a[0..2] = 'A'
 test(a, ['A', "4"], 'el assignment 6')
 
+a = ['A', "4"]
 a[-1] = 'Z'
 test(a, ['A', 'Z'], 'el assignment 7')
 
-#a[1..-1] = nil
-#test(a, ['A'], 'el assignment 8')
+a = ['A', 'Z']
+a[1..-1] = nil
+test(a, ['A'], 'el assignment 8')
+
+
+# More element assigment
+a = ['a', 'b', 'c', nil, "4"]
+a[0..4] = nil
+test(a,  [], 'el assigment 10')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[0..4] = :x
+test(a, [:x], 'el assigment 11')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[0..3] = :x
+test(a, [:x, "4"], 'el assigment 12')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[1..-2] = :x
+test(a, ["a", :x, "4"], 'el assigment 13')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[1..4] = nil
+test(a, ["a"], 'el assigment 14')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[1..4] = :x
+test(a, ["a", :x], 'el assigment 15')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[1..3] = :x
+test(a, ["a", :x, "4"], 'el assigment 16')
+
+a = ['a', 'b', 'c', nil, "4"]
+a[1..-2] = :x
+test(a, ["a", :x, "4"], 'el assigment 17')
+
+a = [1,2,3,4,5]
+a[0..-1] = nil
+test(a, [], 'el assigment 18')
+
+a[4..10] = 2
+test(a, [nil, nil, nil,nil, 2], 'el assigment 19')
 
 report

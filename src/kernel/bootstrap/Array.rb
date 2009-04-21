@@ -118,18 +118,18 @@ class Array
       end
     else
       if first._isArray
-        self.replace(first) 
+        self.replace(first)
         lim = 0 # ignore any block
       else
         lim = Type.coerce_to(first, Fixnum, :to_int)
         self.size=(lim)
-      end   
+      end
     end
-    if block_given? 
+    if block_given?
       n = 0
       while (n < lim)
-	self[n] = blk.call(n)
-	n = n + 1
+  self[n] = blk.call(n)
+  n = n + 1
       end
     end
     self
@@ -152,7 +152,7 @@ class Array
     else
       s = Type.coerce_to(a_size, Fixnum, :to_int)
       self.size=(s)
-      self.fill(value, 0, s) 
+      self.fill(value, 0, s)
     end
     self
   end
@@ -168,7 +168,7 @@ class Array
   def self.new(arg)
     # this method will have no bridge methods, all the bridges
     #  will map to the previous 2 arg form
-    if self.equal?(Array) 
+    if self.equal?(Array)
       if arg._isFixnum
         a = _alloc(arg, nil)
       elsif arg._isArray
@@ -208,18 +208,18 @@ class Array
   def initialize(arg)
     if self.class.equal?(Array)
       # do nothing
-    else 
+    else
       if arg._isFixnum
         self.size=(arg)
       elsif arg._isArray
         self.replace(arg)
       else
         _init_one_arg(arg)
-      end 
+      end
     end
     self
   end
- 
+
   def self.new
     a = _alloc(0, nil)
     a.initialize
@@ -328,7 +328,7 @@ class Array
       lim = size > other_size ? other_size : size # lim is the min
       i = 0
       while i < lim
-        curr = self[i] 
+        curr = self[i]
         if ts.include?(curr)
           unless cur.equal?(other[i])
             return 1 if size > other_size
@@ -345,7 +345,7 @@ class Array
       if added
         ts.remove(self)
       end
-    end  
+    end
   end
 
   # ====== Comparable:
@@ -957,7 +957,7 @@ class Array
     else
       result = self[x]
       unless result.equal?(nil)
-        self.delete_at(x)
+        self[x] = nil
       end
     end
     result
