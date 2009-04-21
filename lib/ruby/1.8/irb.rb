@@ -50,29 +50,28 @@ module IRB
   # initialize IRB and start TOP_LEVEL irb
   def IRB.start(ap_path = nil)
     $0 = File::basename(ap_path, ".rb") if ap_path
-
     IRB.setup(ap_path)
-
     if @CONF[:SCRIPT]
       irb = Irb.new(nil, @CONF[:SCRIPT])
     else
       irb = Irb.new
     end
-
     @CONF[:IRB_RC].call(irb.context) if @CONF[:IRB_RC]
     @CONF[:MAIN_CONTEXT] = irb.context
-
     trap("SIGINT") do
+      print "SIGINT\n"
       irb.signal_handle
     end
-    
     catch(:IRB_EXIT) do
-      irb.eval_input
+      ret_v = irb.eval_input
+      print "Caught/returned #{ret_v}\n"
+      ret_v
     end
 #    print "\n"
   end
 
   def IRB.irb_exit(irb, ret)
+    print "About to throw #{[:IRB_EXIT,ret].inspect}\n"
     throw :IRB_EXIT, ret
   end
 
@@ -96,14 +95,17 @@ module IRB
       @scanner = RubyLex.new
       @scanner.exception_on_syntax_error = false
     end
+    def to_s
+       '[irb]'
+    end   
     attr_reader :context
     attr_accessor :scanner
 
     def eval_input
       @scanner.set_prompt do
 	|ltype, indent, continue, line_no|
-	if ltype
-	  f = @context.prompt_s
+        if ltype
+          f = @context.prompt_s
 	elsif continue
 	  f = @context.prompt_c
 	elsif indent > 0
@@ -126,7 +128,6 @@ module IRB
 	  end
 	end
       end
-       
       @scanner.set_input(@context.io) do
 	signal_status(:IN_INPUT) do
 	  if l = @context.io.gets
@@ -139,12 +140,17 @@ module IRB
 	      end
 	    end
 	  end
+	  
+	  #print "l = #{l.inspect}\n"
+	  
 	  l
 	end
       end
-
       @scanner.each_top_level_statement do |line, line_no|
 	signal_status(:IN_EVAL) do
+	
+#	  p :a
+	  
 	  begin
             line.untaint
 	    @context.evaluate(line, line_no)
@@ -155,10 +161,14 @@ module IRB
 	    raise
 	  rescue Exception => exc
 	  end
-	  if exc
+	  
+#	  p :b
+	  #p "exc is a #{exc.class.name}"
+	  
+          if exc
 	    print exc.class, ": ", exc, "\n"
-	    if exc.backtrace[0] =~ /irb(2)?(\/.*|-.*|\.rb)?:/ && exc.class.to_s !~ /^IRB/
-	      irb_bug = true 
+	    if exc.backtrace[0] =~ /irb(\/.*|-.*|\.rb)?:/ && exc.class.to_s !~ /^IRB/ && exc.backtrace[0] !~ /Irb >> eval_input/
+              irb_bug = true 
 	    else
 	      irb_bug = false
 	    end
@@ -187,6 +197,9 @@ module IRB
 	    end
 	    print "Maybe IRB bug!!\n" if irb_bug
 	  end
+	  
+#	  p :c
+	  
           if $SAFE > 2
             abort "Error: irb does not work for $SAFE level higher than 2"
           end
@@ -344,3 +357,4 @@ module IRB
     array.join("\n")
   end
 end
+

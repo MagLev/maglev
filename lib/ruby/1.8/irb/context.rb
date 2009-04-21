@@ -215,10 +215,13 @@ module IRB
     end
 
     def evaluate(line, line_no)
+      #p :enter_context_evaluate
       @line_no = line_no
-      set_last_value(@workspace.evaluate(self, line, irb_path, line_no))
+      result = set_last_value(@workspace.evaluate(self, line, irb_path, line_no))
 #      @workspace.evaluate("_ = IRB.conf[:MAIN_CONTEXT]._")
 #      @_ = @workspace.evaluate(line, irb_path, line_no)
+      #p :leave_context_evaluate
+      result
     end
 
     alias __exit__ exit
@@ -234,8 +237,8 @@ module IRB
     def inspect
       array = []
       for ivar in instance_variables.sort{|e1, e2| e1 <=> e2}
-	name = ivar.sub(/^@(.*)$/){$1}
-	val = instance_eval(ivar)
+	name = ivar.sub(/^@(.*)$/){ |m| (Regexp.last_match || m).captures[0]}
+        val = instance_eval(ivar)
 	case ivar
 	when *NOPRINTING_IVARS
 	  array.push format("conf.%s=%s", name, "...")
