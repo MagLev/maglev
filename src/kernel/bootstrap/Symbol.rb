@@ -19,6 +19,13 @@ class Symbol
     ':'._concatenate(self)
   end
 
+  # You may not copy Symbols
+  def dup
+    self
+  end
+  def clone
+    self
+  end
 
   primitive_nobridge 'to_i', 'asOop'
   primitive_nobridge 'to_int', 'asOop'

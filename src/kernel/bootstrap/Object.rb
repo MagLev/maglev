@@ -53,6 +53,13 @@ class Object
     #  see setSendsBinding and the *BindingNode , *EvalNode classes in .mcz
     primitive_nobridge '_binding_ctx' , '_bindingContext:'
 
+    # Special semantics for send of  super  while in bootstrap:
+    #   During bootstrap, a send of super passes a block arg only
+    #   if no args specified, otherwise only the exact args to super
+    #   are passed.
+    #   Outside of bootstrap,  super alway passes an explicit or implicit
+    #   block argument.    See RubySuperNode in .mcz and Trac 454.
+
     # End private helper methods
 
     primitive_nobridge '==', '='
@@ -94,8 +101,16 @@ class Object
     primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
     primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
-    primitive 'dup', '_basicCopy'
-    primitive 'clone', '_basicCopy'
+    primitive   'dup', '_rubyBasicCopy'      # use non-singleton class
+    primitive   '_basic_clone', '_basicCopy' # use singleton class
+
+    def clone
+      res = self._basic_clone
+      if self.frozen?
+        res.freeze
+      end
+      res
+    end
 
     primitive 'freeze', 'immediateInvariant'
     primitive 'frozen?', 'isInvariant'

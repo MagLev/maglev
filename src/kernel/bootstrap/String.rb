@@ -851,7 +851,7 @@ class String
   # ====== Object
   primitive 'inspect', '_rubyPrintString'
 
-  primitive 'dup', 'copy'
+  # dup, clone  inherited from Object
 
   # ====== Comparable:
   # RxINC: This is a cut-n-paste to get things working for mspec.
