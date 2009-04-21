@@ -90,8 +90,18 @@ test(my_file.path, fname, 'File#path')
 result = File.join('spec/rubyspec/language', "/**/*_spec.rb")
 test(result, 'spec/rubyspec/language/**/*_spec.rb', "File.join:  MSPECs are probably broken now...")
 
+File.open(File.dirname(__FILE__)+'/lib/testfile') do |f|
+  test(f.pos, 0, 'MISC pos at start')
+  test(f.readline, "This is line one\n", 'MISC readline')
+  test(f.pos, 17, 'MISC pos after readline')
+  test(f.pos = 20, 20, 'MISC set pos to 20')
+  test(f.pos, 20, 'MISC pos after pos = 20')
+  test(f.readline, "s is line two\n", 'MISC readline after pos=')
+end
 
 # Test FileTest module methods
 s = FileTest.size(__FILE__)
 test(s > 100, true, 'FileTest.size(__FILE__)')
+
+
 report

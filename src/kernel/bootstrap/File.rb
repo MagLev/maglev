@@ -702,6 +702,15 @@ class File
   def seek(offset, whence = IO::SEEK_SET)
     _seek(offset, whence)
   end
+
+  # Return the current offset (in bytes) of +io+
+  primitive_nobridge 'pos', 'position'
+
+  # Seeks to the given position (in bytes) in +io+
+  def pos=(offset)
+      seek(offset, IO::SEEK_SET)
+  end
+
 end
 
 class PersistentFile
@@ -829,7 +838,6 @@ class PersistentFile
     false
   end
   alias tty? isatty
-
 end
 
 # STDIN, STDOUT, STDERR , $>  initialized in File2.rb
