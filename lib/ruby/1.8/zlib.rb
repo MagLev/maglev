@@ -81,6 +81,7 @@ module Zlib
     #  end
     # end
 
+    # TODO: protect against multiple calls to close, or a close after a finish
     def close
       io = finish()
       io.close if io.respond_to? :close
