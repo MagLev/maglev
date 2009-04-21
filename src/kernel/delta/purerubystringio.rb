@@ -117,7 +117,7 @@ class PureRubyStringIO < IO
     pos = @sio_pos
     char = @sio_string[pos]
     unless char.equal?(nil)
-      @sio_pos = pos +  1 
+      @sio_pos = pos +  1
     end
     char
   end
@@ -259,7 +259,7 @@ class PureRubyStringIO < IO
       len = bytes_left
     end
     if len < 0
-      raise ArgumentError, "negative length #{len} given", caller 
+      raise ArgumentError, "negative length #{len} given", caller
     end
     pstart = s_pos
     s_pos += len
@@ -323,7 +323,7 @@ class PureRubyStringIO < IO
     @sio_lineno = 0
   end
 
-  def seek(amount, whence=SEEK_SET)
+  def seek(offset, whence=SEEK_SET)
     if whence == SEEK_CUR then
       offset += @sio_pos
     elsif whence == SEEK_END then
