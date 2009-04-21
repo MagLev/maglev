@@ -77,6 +77,26 @@ class Numeric
 
 #  nonzero?  implemented in subclasses
 #  quo   implemented in subclasses
+ 
+    # _max and _min allow
+    #    a._max(b) 
+    #  which is much cheaper than the typical Ruby style
+    #    [a,b].max
+    #
+    def _max(arg)
+      unless arg._isNumeric
+        raise TypeError, 'arg to _max is not a Numeric'
+      end
+      return self < arg ? arg : self
+    end
+
+    def _min(arg)
+      unless arg._isNumeric
+        raise TypeError, 'arg to _min is not a Numeric'
+      end
+      return self < arg ? self : arg
+    end
+      
 
     def modulo(arg)
       # reimplemented in subclasses
