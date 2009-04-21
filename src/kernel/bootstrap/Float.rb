@@ -16,6 +16,10 @@ end
 
 class Float
 
+  def self.superclass
+    Numeric  # override to hide Smalltalk BinaryFloat 
+  end 
+
   # Float constants 
       # changing any of the constants at runtime will only change the constant
       # value and will have no effect on on results of floating point computations.
