@@ -3,12 +3,12 @@ run
 RubyContext load .
 year := DateAndTime now year printString.
 directory := '$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/'.
-classes := Globals select: [:each | each isBehavior].
-classes := classes asSortedCollection: [:a :b | a name <= b name].
-classes do: [:eachClass |
-    | stName file isRubyCls |
+classes := Module _wrappedSmalltalkClasses .
+1 to: classes size by: 2 do:[:n | | eachClass stName file isRubyCls inDcSeg |
+    eachClass := classes at: n .
     stName := eachClass name .
     isRubyCls := eachClass rubyGlobalsDict ~~ nil .
+    inDcSeg := eachClass segment == DataCuratorSegment .
     file := GsFile openWriteOnServer: directory , eachClass name , '.rb'.
     [  GsFile gciLogServer: '-- writing: ', file name .
         file nextPutAll:
@@ -26,6 +26,10 @@ classes do: [:eachClass |
 # and persistence libraries to be used by applications.
 '       ; cr .
 
+        inDcSeg ifFalse:[
+          file nextPutAll: 
+'# ' , stName , ' should not be extended in Ruby (it is in SystemSegment) ' ; cr; cr.
+        ].
         eachClass allSuperClassesDo: [:eachSuperClass|
             file nextPutAll: 'require ''smalltalk/', eachSuperClass name, '''' ; cr
         ] .
@@ -34,9 +38,10 @@ classes do: [:eachClass |
         file nextPutAll:'module Smalltalk' ; cr ;
              nextPutAll:'  ', stName , ' = _resolve_smalltalk_global(:' , stName , ')' ; cr .
 
-         isRubyCls  ifTrue:[
+         isRubyCls  ifTrue:[ | rName |
             file nextPutAll:'end' ; cr ;
-                 nextPutAll:'class ' , eachClass @ruby:name  ; cr .
+                 nextPutAll:'class ' , (rName := eachClass @ruby:name)  ; cr ;
+                 nextPutAll:'    # ', rName , ' is identically Smalltalk::', stName ; cr .
         ] ifFalse:[
             file nextPutAll:'  class ' , stName ; cr .
         ].
