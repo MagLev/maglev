@@ -124,6 +124,8 @@ done
 # need to keep topaz's stdin connected to the tty always
 #  so stdin is usable from Ruby , so do not redirect topaz stdin
 dbscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
+trap "rm -f $dbscript $stdinscript" EXIT
+
 rm -f $dbscript
 if [ $debug == 1 ]; then
   cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
@@ -165,6 +167,4 @@ else
   exitStatus=$?
 fi
 
-rm -f $stdinscript
-rm -f $dbscript
 exit $exitStatus
