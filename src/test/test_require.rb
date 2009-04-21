@@ -63,6 +63,7 @@ test($foo,                     1, "F: require foo.rb: #{$foo}")
 
 # Test that load will re-load the file
 load 'foo.rb'
+puts "==== FOO #{$foo}"
 test($foo,                     2, "G: load foo.rb: #{$foo}")
 
 # Test that load needs the .rb extension
@@ -74,6 +75,11 @@ rescue Exception => e
 end
 test($foo,                     2, "H: load foo: #{$foo}")
 
+
+# Test that require 'bar' with files named 'bar' and 'bar.rb' on the path,
+# only finds bar.rb and not bar.
+require 'bar'
+test($bar, true, "require 'bar' finds only 'bar.rb', not 'bar'")
 
 # puts "load_path: #{load_path.inspect}"
 # puts "foo:       #{$foo}"

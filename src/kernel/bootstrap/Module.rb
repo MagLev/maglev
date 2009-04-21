@@ -13,7 +13,7 @@ class Module
   primitive_nobridge 'const_defined?', 'rubyConstDefined:'
   primitive_nobridge 'const_get',      'rubyGlobalAt:'
   primitive_nobridge 'const_set',      'rubyConstAt:put:'
-  primitive_nobridge 'include',        'includeRubyModule:'
+  primitive_nobridge '_include',       'includeRubyModule:'
 
   primitive_nobridge 'ancestors' , 'rubyAncestors'
   primitive_nobridge 'included_modules' , 'rubyIncludedModules'
@@ -24,6 +24,13 @@ class Module
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)
     raise NameError, "uninitialized constant #{symbol}"
+  end
+
+  # Invokes Module.append_features on each parameter (in reverse order).
+  def include(*names)
+    names.reverse.each do |name|
+      _include(name)
+    end
   end
 
   #  define_method   is implemented in Behavior
