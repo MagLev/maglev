@@ -199,5 +199,28 @@ class IO
     end
   end
 
+  ##
+  # Reads a line as with IO#gets, but raises an EOFError on end of file.
+  def readline(separator=$/)
+    r = gets(separator)
+    raise EOFError if r.nil?
+    r
+  end
+
+  ##
+  # Reads all of the lines in +io+ and returns them in an +array+.  Lines
+  # are separated by the optional +separator+.  The stream must be opened
+  # for reading, or an +IOError+ will be raised.
+  #
+  # f = File.new("testfile")
+  # f.readlines               #=> [ "This is line one\n",   "This is line two\n",
+  #                           #     "This is line three\n", "And so on...\n" ]
+  def readlines(separator=$/)
+    r = Array.new
+    while ! eof?
+      r << gets(separator)
+    end
+    r
+  end
 end
 
