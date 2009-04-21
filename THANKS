@@ -2,8 +2,8 @@ Many thanks to the MagLev Alpha testers who have contributed code and design ide
 reported and sometimes fixed bugs, and helped in many other ways, including:.
 
 - Avi Bryant, for a lot of inspiration and hard work from day one.
-- Markus Roberts, for lots of feedback, bugfixes, and porting zaml to MagLev.
+- Markus Roberts, for lots of feedback, bugfixes, and porting irb and zaml to MagLev.
 - Michael Latta, for getting the MySQL driver and ruby_parser working under MagLev, 
-  and his valuable feedback while suffering through earliest Alphas
+  and his valuable feedback and bugfixes while suffering through earliest Alphas
 - Danie Roux and Otto Behrens, for providing rake scripts to manage multiple
   MagLev systems on a single computer.
