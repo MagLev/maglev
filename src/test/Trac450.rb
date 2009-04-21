@@ -1,6 +1,6 @@
 
 module Mod
-  autoload("Class", "Trac450_test1")
+  autoload("Class", File.expand_path('Trac450_test1.rb', File.dirname(__FILE__)))
 end
 
 Mod::Class.superclass

@@ -5,4 +5,4 @@ module Mod
   end
 end
 
-require 'Trac450_test2'
+require  File.expand_path('Trac450_test2.rb', File.dirname(__FILE__))
