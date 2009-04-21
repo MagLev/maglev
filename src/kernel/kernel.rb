@@ -66,19 +66,15 @@ RUBY.require 'kernel/bootstrap/Symbol.rb'
 RUBY.require 'kernel/bootstrap/Regexp.rb'
 RUBY.require 'kernel/bootstrap/MatchData.rb'
 RUBY.require 'kernel/bootstrap/Exception.rb'
-
 RUBY.require 'kernel/bootstrap/Globals2.rb'
-
 RUBY.require 'kernel/bootstrap/Env.rb'
 RUBY.require 'kernel/bootstrap/Errno.rb'
 RUBY.require 'kernel/bootstrap/Dir.rb'
+RUBY.require 'kernel/bootstrap/IO.rb'
 RUBY.require 'kernel/bootstrap/File.rb'
-
 RUBY.require 'kernel/bootstrap/Range.rb'
 RUBY.require 'kernel/bootstrap/RecursionGuard.rb'
-
 RUBY.require 'kernel/bootstrap/Time.rb'
-RUBY.require 'kernel/bootstrap/IO.rb'
 RUBY.require 'kernel/bootstrap/Socket.rb'
 RUBY.require 'kernel/bootstrap/Comparable.rb'
 RUBY.require 'kernel/bootstrap/IdentitySet.rb'
@@ -90,7 +86,6 @@ RUBY.require 'kernel/bootstrap/FileStat.rb'
 RUBY.require 'kernel/bootstrap/Mutex.rb'
 RUBY.require 'kernel/bootstrap/Thread.rb'
 RUBY.require 'kernel/bootstrap/Queue.rb'
-
 RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/Math.rb'
 RUBY.require 'kernel/bootstrap/Struct.rb'
