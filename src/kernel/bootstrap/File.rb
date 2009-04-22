@@ -25,7 +25,7 @@ class File
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 
   # _stat will return either a stat object or ERRNO
-  class_primitive_nobridge '_stat','stat:isLstat:'
+  class_primitive_nobridge '__stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
   class_primitive_nobridge '_open', 'rubyOpen:mode:'
@@ -50,6 +50,11 @@ class File
     until eof?
       block.call(next_line(sep))
     end
+  end
+
+  def self._stat(name, is_lstat)
+    path = Type.coerce_to(name, String, :to_s)
+    __stat(path, is_lstat)
   end
 
   # TODO: consider using FFI to call libc basename
