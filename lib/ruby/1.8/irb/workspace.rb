@@ -72,30 +72,39 @@ EOF
 	end
       end
       eval("_=nil", @binding)
+      eval("def method_missing(*args); if args.length == 1 then eval('@__'+args.first.to_s) else super(*args); end; end", @binding) # pretend to bind locals
     end
 
     attr_reader :binding
     attr_reader :main
 
     def evaluate(context, statements, file = __FILE__, line = __LINE__)
-      eval(statements, @binding, file, line)
+      # pretend to bind locals (really hide them in @__... vars)
+      s2 = statements 
+         #.gsub(/^ *([a-z_][a-z_0-9]*)*([-+*\/&|]*=|<<)([^=]|$)/i) {"@__#{$1}#{$2}#{$3}"} 
+	 # Now done more robustly in ruby-lex.rb
+      #p [:enter_workspace_evaluate,statements,s2,@binding]
+      eval(s2, @binding, file, line)
+      #p :leave_workspace_evaluate
+      #result
     end
   
     # error message manipulator
     def filter_backtrace(bt)
-      case IRB.conf[:CONTEXT_MODE]
+      #p [IRB.conf[:CONTEXT_MODE],bt]
+      case 1 #IRB.conf[:CONTEXT_MODE]
       when 0
 	return nil if bt =~ /\(irb_local_binding\)/
       when 1
 	if(bt =~ %r!/tmp/irb-binding! or
-	   bt =~ %r!irb/.*\.rb! or
-	   bt =~ /irb\.rb/)
+	   bt =~ %r!irb?/.*\.rb! or
+	   bt =~ /irbx?\.rb/)
 	  return nil
 	end
       when 2
-	return nil if bt =~ /irb\/.*\.rb/
+	return nil if bt =~ /irb?\/.*\.rb/
       when 3
-	return nil if bt =~ /irb\/.*\.rb/
+	return nil if bt =~ /irb?\/.*\.rb/
 	bt.sub!(/:\s*in `irb_binding'/){""} 
       end
       bt

@@ -35,6 +35,9 @@ module IRB
     def readable_atfer_eof?
       false
     end
+    def to_s
+      "#{self.class.name}:#{@file_name}"
+    end  
   end
   
   class StdioInputMethod < InputMethod

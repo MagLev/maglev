@@ -113,7 +113,7 @@ module IRB
     end
 
     # aliases = [commans_alias, flag], ...
-    def self.def_extend_command(cmd_name, cmd_class, load_file = nil, *aliases)
+    def self.def_extend_command(cmd_name, cmd_class, load_file = nil, *xaliases)
       case cmd_class
       when Symbol
 	cmd_class = cmd_class.id2name
@@ -142,13 +142,14 @@ module IRB
 	]
       end
 
-      for ali, flag in aliases
+      for ali, flag in xaliases
 	@ALIASES.push [ali, cmd_name, flag]
       end
     end
 
     # override = {NO_OVERRIDE, OVERRIDE_PRIVATE_ONLY, OVERRIDE_ALL}
     def install_alias_method(to, from, override = NO_OVERRIDE)
+      print "Aliasing #{to} from #{from} with #{override}\n"
       to = to.id2name unless to.kind_of?(String)
       from = from.id2name unless from.kind_of?(String)
 
@@ -173,6 +174,8 @@ module IRB
     end
 
     def self.extend_object(obj)
+    #def self.extended(obj)
+      print "#{self} extending #{obj}\n"
       unless (class<<obj;ancestors;end).include?(EXCB)
 	super
 	for ali, com, flg in @ALIASES
@@ -202,17 +205,17 @@ module IRB
       end
     end
 
-    def self.def_extend_command(cmd_name, load_file, *aliases)
+    def self.def_extend_command(cmd_name, load_file, *yaliases)
       Context.module_eval %[
         def #{cmd_name}(*opts, &b)
 	  Context.module_eval {remove_method(:#{cmd_name})}
 	  require "#{load_file}"
 	  send :#{cmd_name}, *opts, &b
 	end
-	for ali in aliases
-	  alias_method ali, cmd_name
-	end
       ]
+      for ali in yaliases
+          Context.module_eval { alias_method ali, cmd_name }
+	end
     end
 
     CE.install_extend_commands

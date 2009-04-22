@@ -68,6 +68,9 @@ module IRB
     end
     
     def match(token)
+      #p :match
+      #p token.class.name
+      #p @head
       case token
       when Array
       when String
@@ -75,8 +78,11 @@ module IRB
       else
 	return @head.match_io(token)
       end
+      #p :match1
       ret = @head.match(token)
+      #p :match2
       D_DETAIL.exec_if{D_DEATIL.printf "match end: %s:%s\n", ret, token.inspect}
+      #p :match_done
       ret
     end
     
@@ -165,6 +171,9 @@ module IRB
       #       able to be called arbitrary number of times. 
       #
       def match(chrs, op = "")
+        p :match_chrs
+	p chrs
+	p op
 	D_DETAIL.print "match>: ", chrs, "op:", op, "\n"
 	if chrs.empty?
 	  if @preproc.nil? || @preproc.call(op, chrs)
@@ -202,40 +211,64 @@ module IRB
       end
 
       def match_io(io, op = "")
-	if op == ""
+        #p :mio
+	#p io
+	#p op
+        if op == ""
 	  ch = io.getc
 	  if ch == nil
 	    return nil
 	  end
 	else
 	  ch = io.getc_of_rests
+	  #print "ch = #{ch.inspect}\n"
 	end
 	if ch.nil?
-	  if @preproc.nil? || @preproc.call(op, io)
+          #p :mio2
+          if @preproc.nil? || @preproc.call(op, io)
+	    #p :mio2a
 	    D_DETAIL.printf("op1: %s\n", op)
+	    #p :mio2a1
+	    #p @postproc
+	    #p op
+	    #p io
 	    @postproc.call(op, io)
 	  else
+	    #p :mio2b
 	    nil
 	  end
 	else
+	  #p :mio3
 	  if node = @Tree[ch]
+	    #p :mio3a
 	    if ret = node.match_io(io, op+ch)
+	      #p :mio3a1
 	      ret
 	    else
+	      #p :mio3a2
 	      io.ungetc ch
+	      #p :mio3a3
 	      if @postproc and @preproc.nil? || @preproc.call(op, io)
+	        #p :mio3a4
 		DOUT.exec_if{D_DETAIL.printf "op2: %s\n", op.inspect}
+		#p :mio3a5
 		@postproc.call(op, io)
 	      else
+	        #p :mio3a6
 		nil
 	      end
 	    end
 	  else
+	    #p :mio3b
 	    io.ungetc ch
+	    #p :mio3b1
 	    if @postproc and @preproc.nil? || @preproc.call(op, io)
+	      #p :mio3b2
 	      D_DETAIL.printf("op3: %s\n", op)
+	      #p :mio3b3
 	      @postproc.call(op, io)
 	    else
+	      #p :mio3b4
 	      nil
 	    end
 	  end

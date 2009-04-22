@@ -51,6 +51,7 @@ class RubyLex
 
     @indent = 0
     @indent_stack = []
+    @scope_stack = []
     @lex_state = EXPR_BEG
     @space_seen = false
     @here_header = false
@@ -77,7 +78,7 @@ class RubyLex
   # io functions
   def set_input(io, p = nil, &block)
     @io = io
-    if p.respond_to?(:call)
+    if !p.nil? and p.respond_to?(:call)
       @input = p
     elsif block_given?
       @input = block
@@ -121,9 +122,10 @@ class RubyLex
 
   def gets
     l = ""
-    while c = getc
+    done = false
+    while !done and c = getc
       l.concat(c)
-      break if c == "\n"
+      done = true if c == "\n"
     end
     return nil if l == "" and c.nil?
     l
@@ -167,6 +169,7 @@ class RubyLex
     until @rests.size >= chrs.size
       return false unless buf_input
     end
+    #p "peek_equal?(#{chrs.inspect}) on #{@rests[0, chrs.size].inspect} => #{@rests[0, chrs.size] == chrs}\n"
     @rests[0, chrs.size] == chrs
   end
 
@@ -174,6 +177,7 @@ class RubyLex
     while @rests.empty?
       return false unless buf_input
     end
+    #p "peek_match?(#{regexp.inspect}) on #{@rests.join('').inspect} => #{regexp =~ @rests.join("")}\n"
     regexp =~ @rests.join("")
   end
 
@@ -181,12 +185,15 @@ class RubyLex
     while @rests.size <= i
       return nil unless buf_input
     end
+    #p "peek(#{i}) on #{@rests.inspect} => #{@rests[i].inspect}\n"    
     @rests[i]
   end
 
   def buf_input
     prompt
+    #p @input
     line = @input.call
+    #p line
     return nil unless line
     @rests.concat line.split(//)
     true
@@ -225,31 +232,51 @@ class RubyLex
   end
   
   def each_top_level_statement
+    #p :rl1
     initialize_input
+    #p :rl2
     catch(:TERM_INPUT) do
-      loop do
+      #p :rl3
+      done = false
+      while not done
+        #p :rl4
+	skip_to_next = false
 	begin
+	  #p :rl5
 	  @continue = false
 	  prompt
+	  #p :rl6
 	  unless l = lex
+	    #p :rl61  
 	    throw :TERM_INPUT if @line == ''
 	  else
+	    #p :rl62 
 	    #p l
 	    @line.concat l
 	    if @ltype or @continue or @indent > 0
-	      next
+	      #p :rl622
+	      skip_to_next = true
 	    end
+	    #p :rl629
 	  end
-	  if @line != "\n"
-	    yield @line, @exp_line_no
-	  end
-	  break unless l
-	  @line = ''
-	  @exp_line_no = @line_no
+	  #p :rl7
+	  unless skip_to_next
+  	    if @line != "\n"
+	      #p :rl71
+	      yield @line, @exp_line_no
+	    end
+	    done = true unless l
+	    if not done
+	      @line = ''
+	      @exp_line_no = @line_no 
 
-	  @indent = 0
-	  @indent_stack = []
-	  prompt
+  	      @indent = 0
+	      @indent_stack = []
+	      #p :rl8
+	      prompt
+	      #p :rl9
+	    end  
+	 end
 	rescue TerminateLineInput
 	  initialize_input
 	  prompt
@@ -260,15 +287,22 @@ class RubyLex
   end
 
   def lex
+    #p :lex0
     until (((tk = token).kind_of?(TkNL) || tk.kind_of?(TkEND_OF_SCRIPT)) &&
 	     !@continue or
 	     tk.nil?)
+      #p :lex1
       #p tk
       #p @lex_state
       #p self
     end
+    #p :lex2
+    #p tk
     line = get_readed
-    #      print self.inspect
+      #p :lex_got_readed
+      #p line
+      #p self
+      #    print self.inspect
     if line == "" and tk.kind_of?(TkEND_OF_SCRIPT) || tk.nil?
       nil
     else
@@ -279,19 +313,43 @@ class RubyLex
   def token
     #      require "tracer"
     #      Tracer.on
+    #p :tk0
     @prev_seek = @seek
     @prev_line_no = @line_no
     @prev_char_no = @char_no
     begin
       begin
+        #p :tk1a
 	tk = @OP.match(self)
+	#p :tk2a
 	@space_seen = tk.kind_of?(TkSPACE)
+	#p :tk3a
       rescue SyntaxError
+        #p :tkerr1a
 	raise if @exception_on_syntax_error
+	#p :tkerr2a
 	tk = TkError.new(@seek, @line_no, @char_no)
       end
-    end while @skip_space and tk.kind_of?(TkSPACE)
+    end
+    while @skip_space and tk.kind_of?(TkSPACE)
+    begin
+      begin
+        #p :tk1
+	tk = @OP.match(self)
+	#p :tk2
+	@space_seen = tk.kind_of?(TkSPACE)
+	#p :tk3
+      rescue SyntaxError
+        #p :tkerr1
+	raise if @exception_on_syntax_error
+	#p :tkerr2
+	tk = TkError.new(@seek, @line_no, @char_no)
+      end
+    end
+    end
+    #p :tk7
     if @readed_auto_clean_up
+      #p :tk8
       get_readed
     end
     #      Tracer.off
@@ -536,6 +594,7 @@ class RubyLex
       @lex_state = EXPR_END
       @indent -= 1
       @indent_stack.pop
+      @scope_stack.pop
       Token(op)
     end
 
@@ -629,6 +688,7 @@ class RubyLex
 	tk_c = TkLPAREN
       end
       @indent_stack.push tk_c
+      @scope_stack.push tk_c
       tk = Token(tk_c)
     end
 
@@ -660,6 +720,7 @@ class RubyLex
 	@lex_state = EXPR_BEG
       end
       @indent_stack.push tk_c
+      @scope_stack.push tk_c
       Token(tk_c)
     end
 
@@ -673,6 +734,7 @@ class RubyLex
       end
       @lex_state = EXPR_BEG
       @indent_stack.push tk_c
+      @scope_stack.push tk_c
       Token(tk_c)
     end
 
@@ -786,6 +848,13 @@ class RubyLex
       token.concat getc
     end
 
+    unless @scope_stack.include? TkDEF
+        if token =~ /[a-z_][A-Za-z0-9_]*/ and peek_match?(/^\s*(([+-\/*&\|^]|<<|>>|\|\||\&\&)?=)([^=]|$)/)
+	    @readed = @readed.insert(@readed.length-token.length,*%w{ @ _ _ })
+	    token = "@__#{token}"
+	    end
+        end
+      
     # almost fix token
 
     case token
@@ -835,10 +904,12 @@ class RubyLex
 		  if ![TkFOR, TkWHILE, TkUNTIL].include?(@indent_stack.last)
 		    @indent += 1
 		    @indent_stack.push token_c
+		    @scope_stack.push token_c
 		  end
 		else
 		  @indent += 1
 		  @indent_stack.push token_c
+		  @scope_stack.push token_c
 		end
 #		p @indent_stack
 	      end
@@ -846,6 +917,7 @@ class RubyLex
 	    elsif DEINDENT_CLAUSE.include?(token)
 	      @indent -= 1
 	      @indent_stack.pop
+	      @scope_stack.pop
 	    end
 	    @lex_state = trans[0]
 	  else
@@ -900,20 +972,22 @@ class RubyLex
 
     ltback, @ltype = @ltype, lt
     reserve = []
-    while ch = getc
+    done = false
+    while not done and ch = getc
       reserve.push ch
       if ch == "\\"
 	reserve.push ch = getc
       elsif ch == "\n"
-	break
+	done = true #break
       end
     end
 
     @here_header = false
-    while l = gets
+    done = false
+    while not done and l = gets
       l = l.sub(/(:?\r)?\n\z/, '')
       if (indent ? l.strip : l) == quoted
- 	break
+ 	done = true #break
       end
     end
 
@@ -974,7 +1048,8 @@ class RubyLex
       
       len0 = true
       non_digit = false
-      while ch = getc
+      done = false
+      while not done and ch = getc
 	if match =~ ch
 	  if ch == "_"
 	    if non_digit
@@ -994,9 +1069,11 @@ class RubyLex
 	  if non_digit
 	    RubyLex.fail SyntaxError, "trailing `#{non_digit}' in number"
 	  end
-	  break
+	  #p :about_to_break
+	  done = true #break
 	end
       end
+      #p :about_to_return
       return Token(TkINTEGER)
     end
     
@@ -1004,7 +1081,8 @@ class RubyLex
     allow_point = true
     allow_e = true
     non_digit = false
-    while ch = getc
+    done = false
+    while not done and ch = getc
       case ch
       when /[0-9]/
 	non_digit = false
@@ -1018,9 +1096,9 @@ class RubyLex
 	if peek(0) !~ /[0-9]/
 	  type = TkINTEGER
 	  ungetc
-	  break
+	  done = true #break
 	end
-	allow_point = false
+	allow_point = false unless done
       when allow_e && "e", allow_e && "E"
 	if non_digit
 	  RubyLex.fail SyntaxError, "trailing `#{non_digit}' in number"
@@ -1037,7 +1115,9 @@ class RubyLex
 	  RubyLex.fail SyntaxError, "trailing `#{non_digit}' in number"
 	end
 	ungetc
-	break
+	done = true
+	#return Token(type)
+	#break
       end
     end
     Token(type)
@@ -1049,15 +1129,16 @@ class RubyLex
     subtype = nil
     begin
       nest = 0
-      while ch = getc
+      done = false
+      while not done and ch = getc
 	if @quoted == ch and nest == 0
-	  break
+	  done = true #break
 	elsif @ltype != "'" && @ltype != "]" && @ltype != ":" and ch == "#"
 	  subtype = true
 	elsif ch == '\\' #'
 	  read_escape
 	end
-	if PERCENT_PAREN.values.include?(@quoted) 
+	if not done and PERCENT_PAREN.values.include?(@quoted) 
 	  if PERCENT_PAREN[ch] == @quoted
 	    nest += 1
 	  elsif ch == @quoted
@@ -1084,15 +1165,15 @@ class RubyLex
   
   def identify_comment
     @ltype = "#"
-
-    while ch = getc
+    done = false
+    while not done and ch = getc
 #      if ch == "\\" #"
 #	read_escape
 #      end
       if ch == "\n"
 	@ltype = nil
 	ungetc
-	break
+	done = true # break
       end
     end
     return Token(TkCOMMENT)
@@ -1104,27 +1185,29 @@ class RubyLex
     when "\\", "n", "t", "r", "f", "v", "a", "e", "b", "s" #"
     when /[0-7]/
       ungetc ch
+      done = false
       3.times do
 	case ch = getc
 	when /[0-7]/
 	when nil
-	  break
+	  done = true #break
 	else
 	  ungetc
-	  break
-	end
+	  done = true # break
+	end if not done
       end
       
     when "x"
+      done = false
       2.times do
 	case ch = getc
 	when /[0-9a-fA-F]/
 	when nil
-	  break
+	  done = true #break
 	else
 	  ungetc
-	  break
-	end
+	  done = true #break
+	end if not done
       end
 
     when "M"

@@ -16,6 +16,10 @@ module IRB
   class Locale
     @RCS_ID='-$Id: locale.rb 11708 2007-02-12 23:01:19Z shyouhei $-'
 
+    def inspect
+        "#<#{self.class.name}:#{object_id}>"
+	end
+				            
     JPDefaultLocale = "ja"
     LOCALE_DIR = "/lc/"
 
