@@ -54,6 +54,7 @@ class TFile
   include Constants
 end
 
+#  maybe MAGLEV_SEEN MAGLEV_WARNSTUB  also
 exp_constants = %w( ALT_SEPARATOR ALT_X Constants Separator )
 cls = TFile
 clist = TFile.constants.sort 
