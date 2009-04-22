@@ -94,7 +94,9 @@ class IdentityHash
   end
 
   # Overrides from Object
-  primitive 'dup', 'copy'
+
+  primitive   '_basic_dup', 'rubyDup'       # use non-singleton class
+  primitive   '_basic_clone', 'rubyClone'   # use singleton class
 
   def inspect
     return "{}" if length.equal?(0)
