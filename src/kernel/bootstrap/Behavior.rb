@@ -95,6 +95,17 @@ class Behavior
     _method_defined(symbol, -1)
   end
 
+  def method_added(a_symbol)
+    # invoked from code in .mcz when a method is compiled into receiver
+    # overrides the bootstrap implementation in Behavior_ruby.gs 
+    nil
+  end
+
+  def method_removed(a_symbol)
+    # invoked from code in .mcz when a method is removed from receiver
+    nil
+  end
+
   def module_eval(*args)
     # bridge methods would interfere with VcGlobals logic
     raise ArgumentError, 'expected 1 arg'
