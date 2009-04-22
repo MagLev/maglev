@@ -90,7 +90,7 @@ namespace :bench do
       data.keys.sort.each do |key|
         file.print key.first.inspect, ","
         line = header.map do |h|
-          (data[key][h] || status[key.first][h].split.first).inspect
+          (data[key][h] || (status[key.first][h].split.first if status[key.first][h])).inspect
         end
         file.puts line.join(",")
       end
