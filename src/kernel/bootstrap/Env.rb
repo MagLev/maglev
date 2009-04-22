@@ -20,6 +20,10 @@ class Env
       res
     end
 
+    def clone
+      self.dup
+    end
+
     def []=(key, val)
       Env._putenv(key, val)
       super(key, val)
