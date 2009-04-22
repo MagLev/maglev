@@ -2,17 +2,18 @@ module Kernel
 
   primitive_nobridge '_resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
-  # Print messages for stubbed methods
-  @@gs_WARNSTUB = false
-  @@gs_SEEN = { }
+  # Print messages for stubbed methods 
+  # presence of classvars disturbs specs, constants disturbs vmunit tests
+  # MAGLEV_WARNSTUB = false
+  # MAGLEV_SEEN = { }  # TODO, should be a transient hash
 
   def _stub_warn(msg)
-    if @@gs_WARNSTUB
-      unless @@gs_SEEN[msg]
-        puts "== WARN: STUB: MNI: #{msg}" if @@gs_WARNSTUB
-        @@gs_SEEN[msg] = 1
-      end
-    end
+    #if MAGLEV_WARNSTUB
+    #  unless MAGLEV_SEEN[msg]
+    #    puts "== WARN: STUB: MNI: #{msg}" 
+    #    MAGLEV_SEEN[msg] = 1
+    #  end
+    #end
   end
 
   def load(name)
