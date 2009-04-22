@@ -21,6 +21,10 @@ class IdentitySet
 
     primitive_nobridge 'delete?', 'removeIfPresent:'
 
+    primitive_nobridge '_basic_dup', '_basicCopy'  # uses singleton class for now
+    primitive_nobridge '_basic_clone', '_basicCopy' # use singleton class
+    # dup, clone inherited from Object
+
     def delete(obj)
       delete?(obj)
       self
