@@ -80,6 +80,14 @@ module Errno
       ruby_errno = st_errno + 1 # adjust from smalltalk indexing
       self.create_errno_class(ruby_errno, name) unless name.nil?
     end
+    # Special cases: Some systems spel "EACCESS" as "EACCES", but user code
+    # uses the longer name.  Note: Kernel#defined? is not defined during bootstrap,
+    # so munge through the errno tables
+    if ! table.include?('EACCESS') && table.include?('EACCES')
+      const_set('EACCESS', Errno::EACCES)
+# TODO: this is broken during bootstrap
+#      create_errno_class(Errno::EACCES::Errno, 'EACCESS')
+    end
   end
 
   create_all_errno_classes
