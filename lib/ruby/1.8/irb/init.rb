@@ -223,7 +223,8 @@ module IRB
 	@CONF[:RC_NAME_GENERATOR] ||= rcgen
 	if File.exist?(rcgen.call(IRBRC_EXT))
 	  @CONF[:RC_NAME_GENERATOR] = rcgen
-	  break
+	  # TODO - uncomment the break when Ticket #470 is fixed
+	  # break
 	end
       end
     end
