@@ -32,6 +32,9 @@ class Object
     #   _isSpecial is used by marshal.rb . It is not a special selector
     primitive_nobridge '_isSpecial', 'isSpecial'
 
+    def _isBehavior
+      false
+    end
 
     #  Private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
@@ -101,11 +104,18 @@ class Object
     primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
     primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
-    primitive   'dup', '_rubyBasicCopy'      # use non-singleton class
+    primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
     primitive   '_basic_clone', '_basicCopy' # use singleton class
+
+    def dup
+      res = self._basic_dup
+      res.initialize_copy(self)
+      res
+    end 
 
     def clone
       res = self._basic_clone
+      res.initialize_copy(self)
       if self.frozen?
         res.freeze
       end
@@ -246,16 +256,6 @@ class Object
     #   do not code any definition of block_given? here .
     # Attempts to reimplement  block_given?  will fail with a compile error.
 
-    def initialize(*args)
-       self
-    end
-
-    def initialize_copy(other)
-      # dup and clone are complete, and C extensions not supported yet,
-      #   so do nothing
-      self
-    end
-
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
@@ -264,33 +264,54 @@ class Object
       self == other
     end
 
-  def extend(*modules)
-    if (modules.length > 0)
-      cl = class << self
-        self
+    def extend(*modules)
+      if (modules.length > 0)
+	cl = class << self
+	  self
+	end
+	modules.each{ |aModule| cl.include(aModule) }
       end
-      modules.each{ |aModule| cl.include(aModule) }
-    end
-    self
-  end
-
-  def flatten_onto(output)
-    output << self
-    output
-  end
-
-
-    def to_a
-       # remove this method for MRI 1.9 compatibility
-       [ self ]
+      self
     end
 
-    def to_fmt
-      to_s
+    def flatten_onto(output)
+      output << self
+      output
     end
 
-    def to_s
-      self.class.name.to_s
+    def initialize(*args)
+       self
+    end
+    # implement common variants to avoid runtime cost of bridge methods
+    def initialize
+      self
+    end
+    def initialize(a)
+      self
+    end
+    def initialize(a,b)
+      self
+    end
+    def initialize(a,b,c)
+      self
+    end
+
+    def initialize_copy(other)
+      # dup and clone are complete, and C extensions not supported yet,
+      #   so do nothing
+      self
+    end
+
+    def instance_of?(cls)
+      # Modified from RUBINIUS
+      if self.class.equal?(cls)
+        true
+      else
+        unless cls._isBehavior
+          raise TypeError, 'expected a Class or Module'
+        end
+        false
+      end
     end
 
     primitive_nobridge '_instance_eval', 'rubyEvalString:with:binding:'
@@ -375,21 +396,26 @@ class Object
       _ruby_methods(1) 
     end
 
-    def _isBehavior
-      false
+    def singleton_method_added(a_symbol)
+     # invoked from code in .mcz when a singleton method is compiled
+     # overrides the bootstrap implementation in Object_ruby.gs 
+     self
+    end
+    #  cannot make singleton_method_added private yet
+
+    def to_a
+       # remove this method for MRI 1.9 compatibility
+       [ self ]
     end
 
-    def instance_of?(cls)
-      # Modified from RUBINIUS
-      if self.class.equal?(cls)
-        true
-      else
-        unless cls._isBehavior
-          raise TypeError, 'expected a Class or Module'
-        end
-        false
-      end
+    def to_fmt
+      to_s
     end
+
+    def to_s
+      self.class.name.to_s
+    end
+
 end
 
 
