@@ -63,7 +63,7 @@ class Hash
       if (numelem.equal?(1))
         first = elements[0]
         if (first._isHash)
-          return first.dup
+          return self[first]
         end
         return Type.coerce_to(first, Hash, :to_hash)
       end
@@ -90,7 +90,13 @@ class Hash
     if arg._isArray
       self._from_elements(arg)
     elsif arg._isHash
-      arg.dup
+      if self.equal?(arg.class) 
+        arg.dup
+      else
+        res = self._new(arg.size, nil)
+        arg.each_pair { |k, v| res[k] = v }
+        res
+      end
     else
       Type.coerce_to(arg, Hash, :to_hash)
     end
@@ -157,13 +163,20 @@ class Hash
   primitive 'delete', 'removeKey:'
 
   def delete_if(&block)
-    # RUBINIUS: This code is from rubinius core/hash.rb
-    raise LocalJumpError, "no block given" unless block_given? or empty?
+    # RUBINIUS: This code is from rubinius core/hash.rb ;  modified. 
+    unless size.equal?(0) 
+      raise LocalJumpError, "no block given" unless block_given? 
 
-    # Do this in 2 steps, so we're not altering the structure while we walk it.
-    to_del = []
-    each_pair { |k, v| to_del << k if yield(k, v) }
-    to_del.each { |k| delete k }
+      # Do this in 2 steps, so we're not altering the structure while we walk it.
+      to_del = []
+      each_pair { |k, v| to_del << k if yield(k, v) }
+      len = to_del.length
+      n = 0
+      while n < len
+        self.delete(to_del[n])
+        n += 1
+      end
+    end
     self
   end
 
@@ -234,6 +247,10 @@ class Hash
 
   primitive 'rehash', 'rebuildTable:'
 
+  def reject(&block)
+    self.dup.delete_if(&block)
+  end
+
   def reject!(&block)
     # RUBINIUS
     old_size = size
@@ -243,9 +260,19 @@ class Hash
   end
 
   def replace(hash)
-    keys.each{|k| delete k}
+    keys.each{ |k| delete k}
     update(hash)
   end
+
+  def select(&block)
+    res = []
+    each_pair { |k, v| 
+       if yield(k,v)
+         res << [k,v] 
+       end
+    }
+    res
+  end 
 
   primitive_nobridge '_firstPair'
 
@@ -288,7 +315,9 @@ class Hash
   # Overrides from Object
   #
   # RxINC: does the primitive work?
-  primitive 'dup', 'copy'
+
+  primitive   '_basic_dup', 'rubyDup'       # use non-singleton class
+  primitive   '_basic_clone', 'rubyClone'   # use singleton class
 
   def inspect
     return "{}" if length.equal?(0)
