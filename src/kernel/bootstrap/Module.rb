@@ -40,12 +40,10 @@ class Module
   end
 
   # Invoked as a callback when a method is added to the receiver
-  def method_added(symbol)
-  end
+  # def method_added(symbol) ; end # inherited from Behavior
 
   # Invoked as a callback when a method is removed from the receiver
-  def method_removed(symbol)
-  end
+  # def method_removed(symbol) ; end #  inherited from Behavior
 
   # Invoked as a callback when a method is undefined in the receiver
   def method_undefined(symbol)
