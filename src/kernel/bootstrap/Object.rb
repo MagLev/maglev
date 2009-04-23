@@ -403,6 +403,13 @@ class Object
     end
     #  cannot make singleton_method_added private yet
 
+    def singleton_method_removed(a_symbol)
+     self
+    end
+    #  cannot make singleton_method_removed private yet
+
+    # TODO   singleton_method_removed
+
     def to_a
        # remove this method for MRI 1.9 compatibility
        [ self ]
