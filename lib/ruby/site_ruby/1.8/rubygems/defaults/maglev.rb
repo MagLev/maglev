@@ -12,8 +12,9 @@
 #
 # For more information on this file, see
 # http://www.mail-archive.com/rubygems-developers@rubyforge.org/msg02161.html
-puts "================= rubygems/defaults/maglev.rb ====================="
-
+#
+#
+# NOTE: Currently, this isn't working due to a bug in maglev's handling of optparse.
 require 'rubygems/config_file'
 
 module Gem

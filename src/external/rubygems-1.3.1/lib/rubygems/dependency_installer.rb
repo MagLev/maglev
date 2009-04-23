@@ -15,7 +15,8 @@ class Gem::DependencyInstaller
   attr_reader :installed_gems
 
   DEFAULT_OPTIONS = {
-    :env_shebang => false,
+#    :env_shebang => false,        # GEMSTONE
+    :env_shebang => true,          # GEMSTONE
     :domain => :both, # HACK dup
     :force => false,
     :format_executable => false, # HACK dup
