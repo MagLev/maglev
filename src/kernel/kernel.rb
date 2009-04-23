@@ -97,6 +97,7 @@ RUBY.require 'kernel/bootstrap/Kernel2.rb'
 RUBY.require 'kernel/bootstrap/File2.rb'
 RUBY.require 'kernel/bootstrap/RubyContext.rb'
 RUBY.require 'kernel/bootstrap/zlib_czstream.rb'
+RUBY.require 'kernel/bootstrap/Maglev.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
