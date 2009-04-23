@@ -80,6 +80,7 @@ namespace :dev do
   desc "Clean up after a test install of rubygems"
   task :'clean-gems' do
     files = FileList.new('bin/maglev-gem', 'lib/maglev') do |fl|
+      fl.include('lib/ruby/site_ruby/1.8/*ubygems.rb')
       fl.include('lib/ruby/site_ruby/1.8/ubygems')
       fl.include('lib/ruby/site_ruby/1.8/rubygems/**/*.rb')
       fl.include('lib/ruby/site_ruby/1.8/rbconfig')
