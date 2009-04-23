@@ -21,7 +21,7 @@ def compress(source)
   output.string
 end
 
-original = File.read(File.dirname(__FILE__) + "/ArrayTest.rb")
+original = File.read(File.dirname(__FILE__) + "/test_data/gziptest.txt")
 zipped = compress(original)
 unzipped = decompress(zipped)
 
