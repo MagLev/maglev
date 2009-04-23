@@ -66,7 +66,7 @@ namespace :dev do
 
   desc "Run the passing specs"
   task :'passing' do
-    sh "spec/mspec/bin/mspec run -V -B passing.mspec"
+    sh "spec/mspec/bin/mspec run -B passing.mspec"
     puts "Log files in log/vmunit*"
   end
 
@@ -78,7 +78,8 @@ namespace :dev do
 
   desc "Clean up after a test install of rubygems"
   task :'clean-gems' do
-    files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby', 'lib/maglev']
+    files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby/1.8/*ubygems*',
+      'lib/ruby/site_ruby/1.8/rbconfig', 'lib/maglev']
     files.each { |fn| rm_r fn rescue nil }
   end
 

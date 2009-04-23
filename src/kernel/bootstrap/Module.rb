@@ -39,11 +39,16 @@ class Module
   def included(a_module)
   end
 
-  # Invoked as a callback when a method is added to the receiver
-  # def method_added(symbol) ; end # inherited from Behavior
+  def method_added(a_symbol)
+    # invoked from code in .mcz when a method is compiled into receiver
+    # overrides the bootstrap implementation in Behavior_ruby.gs
+    nil
+  end 
 
-  # Invoked as a callback when a method is removed from the receiver
-  # def method_removed(symbol) ; end #  inherited from Behavior
+  def method_removed(a_symbol)
+    # invoked from code in .mcz when a method is removed from receiver
+    nil
+  end
 
   # Invoked as a callback when a method is undefined in the receiver
   def method_undefined(symbol)

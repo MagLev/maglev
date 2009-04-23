@@ -120,6 +120,12 @@ class Gem::Version
   def <=>(other)
     return nil unless self.class === other
     return 1 unless other
+    # GEMSTONE
+    # For some reason, a few of the versions are sneaking through with nil
+    # @ints.  I haven't caught where this is happening, so we fix it here.
+    other.normalize
+    self.normalize
+    # END GEMSTONE
     @ints <=> other.ints
   end
 

@@ -53,8 +53,10 @@ class File
   end
 
   def self._stat(name, is_lstat)
-    path = Type.coerce_to(name, String, :to_s)
-    __stat(path, is_lstat)
+    unless name.equal?(nil)
+      name = Type.coerce_to(name, String, :to_s)
+    end
+    __stat(name, is_lstat)
   end
 
   # TODO: consider using FFI to call libc basename
