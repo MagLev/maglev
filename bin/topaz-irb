@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Runs the equivalent of "maglev irb"
+### this file is deprecated, and will be removed once it's replacment has been fully tested
 
 COMMAND="`basename $0`"
 
