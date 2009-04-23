@@ -102,6 +102,7 @@ class Object
     primitive_nobridge '__send__&', 'rubySend:with:block:'
     primitive_nobridge '__send__&', 'rubySend:with:with:block:'
     primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
+    primitive_nobridge '__send__*' , 'rubySend:withArgs:'
     primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
     primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
