@@ -76,10 +76,16 @@ namespace :dev do
     puts "Log files in log/bench*"
   end
 
+
   desc "Clean up after a test install of rubygems"
   task :'clean-gems' do
-    files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby/1.8/*ubygems*',
-      'lib/ruby/site_ruby/1.8/rbconfig', 'lib/maglev']
+    files = FileList.new('bin/maglev-gem', 'lib/maglev') do |fl|
+      fl.include('lib/ruby/site_ruby/1.8/ubygems')
+      fl.include('lib/ruby/site_ruby/1.8/rubygems/**/*.rb')
+      fl.include('lib/ruby/site_ruby/1.8/rbconfig')
+
+      fl.exclude('lib/ruby/site_ruby/1.8/rubygems/defaults/*')
+    end
     files.each { |fn| rm_r fn rescue nil }
   end
 
