@@ -78,7 +78,8 @@ namespace :dev do
 
   desc "Clean up after a test install of rubygems"
   task :'clean-gems' do
-    files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby', 'lib/maglev']
+    files = FileList['bin/maglev-gem', 'lib/ruby/site_ruby/1.8/*ubygems*',
+      'lib/ruby/site_ruby/1.8/rbconfig', 'lib/maglev']
     files.each { |fn| rm_r fn rescue nil }
   end
 
