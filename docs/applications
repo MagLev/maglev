@@ -34,7 +34,7 @@ The following items are known not to work:
   WEBrick requires openssl for cookie support. openssl is a C-based
   library, and MagLev does not yet support ruby c-extensions.
 
-==== GemStone Patches
+==== GemStone Patches for Sinatra
 
 GemStone has made the following modifications to the stock version of
 Sinatra:
@@ -46,7 +46,7 @@ Sinatra:
 
 === RubyGems
 
-A (currently) unpatched version of RubyGems is in the source tree under
+A slightly modified version of RubyGems is in the source tree under
 src/external/rubygems-1.3.1.  MagLev will run the setup.rb file, as long as
 you don't try to make the rdoc:
 
@@ -76,5 +76,21 @@ some of the ruby gems commands:
     $ maglev-ruby bin/maglev-gem --version
     1.3.1
 
-But most of the interesting commands do not yet work (list, install,...).
-We're working on it, but it is not currently our highest priority.
+We have successfully installed the rake gem:
+
+    $ maglev-ruby bin/maglev-gem install rake --no-rdoc --no-ri
+
+But rake itself isn't working yet.
+
+==== Gemstone Patches for RubyGems
+
+GemStone has made the following modifications to the stock version of
+RubyGems:
+
+* lib/rubygems/package/tar_input.rb: The tar support throws away the gzip
+  header before passing the archive to zlib.  MagLev's zlib support expects
+  the gzip header (and, apparently, so does Rubinius).  So, we do not throw
+  away the header before processing the archive:
+* lib/rubygems/version.rb: A few of the Version objects are not initialized
+  properly (@ints is nil).  This causes problems in <=>, so we normalize
+  both sides before comparing @ints.
