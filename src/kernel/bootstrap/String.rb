@@ -685,7 +685,7 @@ class String
     ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
 
     # Taint all
-    ret = ret.map { |str| str.taint } if self.tainted?
+    # ret = ret.map { |str| str.taint } if self.tainted?
 
     ret
   end
@@ -912,7 +912,7 @@ class String
     end
 
     _paddedToWithString(direction, width, padstr)
-    taint if padstr.tainted?
+    # taint if padstr.tainted?
     self
   end
 end
