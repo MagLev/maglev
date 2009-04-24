@@ -1132,4 +1132,9 @@ test(a, [], 'el assigment 18')
 a[4..10] = 2
 test(a, [nil, nil, nil,nil, 2], 'el assigment 19')
 
+# Test *()
+test([1,2,3] * 3, [1,2,3,1,2,3,1,2,3], '* 1')
+test([1,2,3] * '--', '1--2--3', '* 2')
+test(['test','more'] * ',', 'test,more', '* 3')
+
 report
