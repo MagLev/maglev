@@ -15,8 +15,10 @@ class Gem::Commands::UpdateCommand < Gem::Command
   def initialize
     super 'update',
           'Update the named gems (or all installed gems) in the local repository',
-      :generate_rdoc => true,
-      :generate_ri => true,
+      #:generate_rdoc => true, # GEMSTONE
+      #:generate_ri => true,   # GEMSTONE
+      :generate_rdoc => false, # GEMSTONE
+      :generate_ri => false, # GEMSTONE
       :force => false,
       :test => false
 
@@ -37,7 +39,8 @@ class Gem::Commands::UpdateCommand < Gem::Command
   end
 
   def defaults_str # :nodoc:
-    "--rdoc --ri --no-force --no-test --install-dir #{Gem.dir}"
+    #"--rdoc --ri --no-force --no-test --install-dir #{Gem.dir}"      # GEMSTONE
+    "--no-rdoc --no-ri --no-force --no-test --install-dir #{Gem.dir}" # GEMSTONE
   end
 
   def usage # :nodoc:

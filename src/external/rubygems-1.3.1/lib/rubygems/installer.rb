@@ -91,7 +91,8 @@ class Gem::Installer
 
     options = {
       :bin_dir      => nil,
-      :env_shebang  => false,
+#      :env_shebang  => false,  # GEMSTONE
+      :env_shebang  => true,    # GEMSTONE
       :exec_format  => false,
       :force        => false,
       :install_dir  => Gem.dir,

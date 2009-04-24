@@ -68,19 +68,23 @@ way:
     ...
 
 This is because the shell ends up trying to read the commands in
-bin/maglev-gem as shell commands...
+bin/maglev-gem as shell commands.  To fix this, edit bin/maglev-gem and
+make the first line:
 
-If you run maglev, and pass maglev-gem as the script, then you can invoke
-some of the ruby gems commands:
+    #!/usr/bin/env maglev-ruby
 
-    $ maglev-ruby bin/maglev-gem --version
-    1.3.1
+There is support for <tt>--env-shebang</tt> in ruby gems, but it doesn't
+work yet with maglev from the setup script.  The default has been set for
+installed gems, however (i.e., if you <tt>maglev-gem install rake</tt>,
+then the <tt>bin/rake</tt> shell script will have the shebang line set
+using <tt>#!/usr/bin/env maglev-ruby</tt>).
 
 We have successfully installed the rake gem:
 
-    $ maglev-ruby bin/maglev-gem install rake --no-rdoc --no-ri
+    $ maglev-ruby bin/maglev-gem install rake
 
-But rake itself isn't working yet.
+But rake itself isn't working yet.  We tried installing the rack gem, but
+the zlib compression blew up...
 
 ==== Gemstone Patches for RubyGems
 
@@ -94,3 +98,7 @@ RubyGems:
 * lib/rubygems/version.rb: A few of the Version objects are not initialized
   properly (@ints is nil).  This causes problems in <=>, so we normalize
   both sides before comparing @ints.
+* Patched several places to change the default options:
+    * default to --no-rdoc
+    * default to --no-ri
+    * default to --env-shebang
