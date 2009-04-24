@@ -344,18 +344,84 @@ class String
   primitive 'empty?', 'isEmpty'
   primitive 'eql?', '='
 
+
+  # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
+  # replaced with either <i>replacement</i> or the value of the block. The
+  # <i>pattern</i> will typically be a <code>Regexp</code>; if it is a
+  # <code>String</code> then no regular expression metacharacters will be
+  # interpreted (that is <code>/\d/</code> will match a digit, but
+  # <code>'\d'</code> will match a backslash followed by a 'd').
+  #
+  # If a string is used as the replacement, special variables from the match
+  # (such as <code>$&</code> and <code>$1</code>) cannot be substituted into it,
+  # as substitution into the string occurs before the pattern match
+  # starts. However, the sequences <code>\1</code>, <code>\2</code>, and so on
+  # may be used to interpolate successive groups in the match.
+  #
+  # In the block form, the current match string is passed in as a parameter, and
+  # variables such as <code>$1</code>, <code>$2</code>, <code>$`</code>,
+  # <code>$&</code>, and <code>$'</code> will be set appropriately. The value
+  # returned by the block will be substituted for the match on each call.
+  #
+  # The result inherits any tainting in the original string or any supplied
+  # replacement string.
+  #
+  #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
+  #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
+  #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
   def gsub(regex, str)
     out = ""
     start = 1
     get_pattern(regex, true).__each_match(self) do |match|
       out << substring1(start, match.begin(0))
-      out << str
+      out << str._to_sub_replacement(match)
       start = match.end(0) + 1
     end
     if start <= length
       out << substring1(start, length)
     end
     out
+  end
+
+  # From Rubinius
+  def _to_sub_replacement(match)
+    index = 0
+    result = ""
+    lim = size
+    while index < lim
+      current = index
+      while current < lim && self[current] != ?\\
+        current += 1
+      end
+      result << self[index, current - index]
+      break if current == lim
+
+      # found backslash escape, looking next
+      if current == lim - 1
+        result << ?\\ # backslash at end of string
+        break
+      end
+      index = current + 1
+
+      result << case (cap = self[index])
+        when ?&
+          match[0]
+        when ?`
+          match.pre_match
+        when ?'
+          match.post_match
+        when ?+
+          match.captures.compact[-1].to_s
+        when ?0..?9
+          match[cap - ?0].to_s
+        when ?\\ # escaped backslash
+          '\\'
+        else     # unknown escape
+          '\\' << cap
+      end
+      index += 1
+    end
+    return result
   end
 
   def gsub(regex, &block)

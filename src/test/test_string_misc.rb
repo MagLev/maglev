@@ -303,5 +303,18 @@ string = 'test'
 test(string.slice!(0,0), '', 'Trac458')
 test(string, 'test', 'Trac458a')
 
+# gsub pickaxe examples
+test('hello'.gsub(/[aeiou]/, '*'),    'h*ll*',     'gsub pickaxe 1')
+test('hello'.gsub(/([aeiou])/, '<\1>'), 'h<e>ll<o>', 'gsub pickaxe 2')
+r = 'hello'.gsub(/./) {|s| s[0].to_s + ' ' }
+test(r,    '104 101 108 108 111 ', 'gsub pickaxe 3')
+
+# Gsub with all backslash substitutions
+test('Foo Bar'.gsub(/(.)o(.)(.)(.*)/, '\4 \3 \2 \1'), 'Bar   o F', 'gsub backslash numeric')
+test('Foo Bar'.gsub(/(o)(o)/, '<\&>'), 'F<oo> Bar', 'gsub \&')
+test('Foo Bar'.gsub(/Bar/, '<\'>'), "Foo <'>", 'gsub X')
+test('Foo Bar'.gsub(/Bar/, '<\`>'), 'Foo <Foo >', 'gsub \`')
+test('Foo Bar'.gsub(/(o)(o)/, '<\+>'), 'F<o> Bar', 'gsub \+')
+
 report
 
