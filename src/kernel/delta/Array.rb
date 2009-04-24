@@ -15,12 +15,12 @@ class Array
     lim = size
     if block_given?
       while n < lim
-        unless yield(self[n]) ; return false ; end
+        unless yield(self._at(n)) ; return false ; end
         n = n + 1
       end
     else
       while n < lim
-        unless self[n] ; return false ; end
+        unless self._at(n) ; return false ; end
         n = n + 1
       end
     end
@@ -47,12 +47,12 @@ class Array
     lim = size
     if block_given?
       while n < lim
-        if yield(self[n]) ; return true ; end
+        if yield(self._at(n)) ; return true ; end
         n = n + 1
       end
     else
       while n < lim
-        if self[n] ; return true ; end
+        if self._at(n) ; return true ; end
         n = n + 1
       end
     end
@@ -64,7 +64,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      result[i] = b.call(self[i])
+      result[i] = b.call(self._at(i))
       i += 1
     end
     result
@@ -74,7 +74,7 @@ class Array
     n = 0
     lim = size
     while n < lim
-      elem = self[n]
+      elem = self._at(n)
       if yield(elem)
         return elem
       end
@@ -91,7 +91,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      block.call(self[i],i)
+      block.call(self._at(i), i)
       i += 1
     end
   end
@@ -105,7 +105,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       result << el if block.call(el)
       i += 1
     end
@@ -117,7 +117,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      result << self[i] if pattern === self[i]
+      result << self._at(i) if pattern === self._at(i)
       i += 1
     end
     result
@@ -128,10 +128,10 @@ class Array
     accum = nil
     n = 0
     if my_size > 0
-      accum = self[0]
+      accum = self._at(0)
       n = 1
       while (n < my_size)
-        accum = yield(accum, self[n])
+        accum = yield(accum, self._at(n))
         n = n + 1
       end
     end
@@ -143,7 +143,7 @@ class Array
     my_size = size
     n = 0
     while (n < my_size)
-      accum = yield(accum, self[n])
+      accum = yield(accum, self._at(n))
       n = n + 1
     end
     accum
@@ -154,12 +154,12 @@ class Array
   def max(&blk)
     return nil if size.equal?(0)
 
-    max_v = self[0]
+    max_v = self._at(0)
     i = 1
     lim = size
     if block_given?
       while i < lim
-        o = self[i]
+        o = self._at(i)
         comp = blk.call(o, max_v)
         raise ArgumentError, "comparison of #{o.class} with #{max_v} failed" if comp.nil?
         max_v = o if comp > 0
@@ -167,7 +167,7 @@ class Array
       end
     else
       while i < lim
-        o = self[i]
+        o = self._at(i)
         max_v = o if (o <=> max_v) > 0
         i += 1
       end
@@ -180,12 +180,12 @@ class Array
   def min(&blk)
     return nil if size.equal?(0)
 
-    min_v = self[0]
+    min_v = self._at(0)
     i = 1
     lim = size
     if block_given?
       while i < lim
-        o = self[i]
+        o = self._at(i)
         comp = blk.call(o, min_v)
         raise ArgumentError, "comparison of #{o.class} with #{min_v} failed" if comp.nil?
         min_v = o if comp < 0
@@ -193,7 +193,7 @@ class Array
       end
     else
       while i < lim
-        o = self[i]
+        o = self._at(i)
         min_v = o if (o <=> min_v) < 0
         i += 1
       end
@@ -207,7 +207,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       if(b.call(el))
         t << el
       else
@@ -223,7 +223,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      result << self[i] unless b.call(self[i])
+      result << self._at(i) unless b.call(self._at(i))
       i += 1
     end
     result
@@ -234,7 +234,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      result << self[i] if b.call(self[i])
+      result << self._at(i) if b.call(self._at(i))
       i += 1
     end
     result
@@ -275,7 +275,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      ary = [self[i]]
+      ary = [ self._at(i) ]
 
       j = 0
       while j < others.length

@@ -1,6 +1,13 @@
 class Array
   # begin private helper methods
   # TODO: Some of these don't begin with an '_'...
+
+  primitive_nobridge '_at' , '_rubyAt:'
+  primitive_nobridge '_at' , '_rubyAt:length:'
+
+  primitive_nobridge '_at_put', '_rubyAt:put:'
+  primitive_nobridge '_at_put', '_rubyAt:length:put:'
+
   primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
   primitive_nobridge 'insert_all', 'insertAll:at:'
 
@@ -15,7 +22,7 @@ class Array
     n = 0
     lim = size
     while n < lim
-      el = self[n]
+      el = self._at(n)
       if obj === el
         return true
       end
@@ -29,7 +36,7 @@ class Array
     n = 0
     lim = size
     while n < lim
-      el = self[n]
+      el = self._at(n)
       if el
         return true
       end
@@ -44,7 +51,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       return el if el[idx] == key
       i += 1
     end
@@ -56,7 +63,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       el.flatten_onto(output)
       i = i + 1
     end
@@ -128,7 +135,7 @@ class Array
     if block_given?
       n = 0
       while (n < lim)
-  self[n] = blk.call(n)
+  self._at_put(n,  blk.call(n))
   n = n + 1
       end
     end
@@ -286,7 +293,7 @@ class Array
     end
     i = 0
     while i < mySize
-      el = self[i]
+      el = self._at(i)
       if (h[el].equal?(default))
         res << el
       end
@@ -328,14 +335,14 @@ class Array
       lim = size > other_size ? other_size : size # lim is the min
       i = 0
       while i < lim
-        curr = self[i]
+        curr = self._at(i)
         if ts.include?(curr)
           unless cur.equal?(other[i])
             return 1 if size > other_size
             return -1 if size < other_size
           end
         else
-          result = self[i] <=> other[i]
+          result = self._at(i) <=> other[i]
           return result if !(result.equal?(0))
         end
         i += 1
@@ -369,7 +376,7 @@ class Array
       i = 0
       limi = lim
       while i < limi
-        curr = self[i]
+        curr = self._at(i)
         if ts.include?(curr)
           return false unless curr.equal?(other[i])
         else
@@ -430,7 +437,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       unless hash.include? el
         ary << el
         hash[el] = el
@@ -464,7 +471,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      self[i] = b.call(self[i])
+      self._at_put(i,  b.call(self._at(i) ) )
       i += 1
     end
     self
@@ -476,7 +483,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       result << el unless el.equal?(nil)
       i += 1
     end
@@ -489,16 +496,16 @@ class Array
     i = 0
     lim = size
     while i < lim
-      break if self[i].equal?(nil)
+      break if self._at(i).equal?(nil)
       i += 1
     end
     return nil if i.equal?(lim)
 
     fill_idx = i
     while i < lim
-      el = self[i]
+      el = self._at(i)
       unless el.equal?(nil)
-        self[fill_idx] = el
+        self._at_put(fill_idx,  el )
         fill_idx += 1
       end
       i += 1
@@ -514,7 +521,7 @@ class Array
     n = 0
     lim = self.size
     while (n < lim)
-      if obj == self[n]
+      if obj == self._at(n)
         self.delete_at(n)
         return obj
       end
@@ -527,7 +534,7 @@ class Array
     n = 0
     lim = self.size
     while (n < lim)
-      if obj == self[n]
+      if obj == self._at(n)
         self.delete_at(n)
         return obj
       end
@@ -546,15 +553,15 @@ class Array
     i = 0
     lim = size
     while i < lim
-      break if block.call(self[i])
+      break if block.call(self._at(i) )
       i += 1
     end
 
     fill_idx = i
     while i < lim
-      el = self[i]
+      el = self._at(i)
       unless block.call(el)
-        self[fill_idx] = el
+        self._at_put(fill_idx,  el)
         fill_idx += 1
       end
       i += 1
@@ -567,7 +574,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      b.call(self[i])
+      b.call(self._at(i))
       i += 1
     end
     self
@@ -577,7 +584,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      b.call(self[i], i)
+      b.call(self._at(i), i)
       i += 1
     end
     self
@@ -604,7 +611,7 @@ class Array
       i = 0
       lim = size
       while i < lim
-        curr = self[i]
+        curr = self._at(i)
         if ts.include?(curr)
           return false unless curr.equal?(other[i])
         else
@@ -631,7 +638,7 @@ class Array
     if (index >= my_siz)
       raise IndexError
     end
-    self[index]
+    self._at(index)
   end
 
   def fetch(index, default)
@@ -645,7 +652,7 @@ class Array
     if (index >= my_siz)
       return default
     end
-    self[index]
+    self._at(index)
   end
 
   def fetch(idx, &blk)
@@ -660,7 +667,7 @@ class Array
     if (index >= my_siz)
       return blk.call(idx)
     end
-    self[index]
+    self._at(index)
   end
 
   #  note multiple variants below
@@ -737,7 +744,7 @@ class Array
     n = start
     limit = start + length
     while (n < limit)
-      self[n] = blk.call(n)
+      self._at_put(n, blk.call(n) )
       n = n + 1
     end
     self
@@ -774,14 +781,14 @@ class Array
   end
 
   def first
-    self[0]
+    self._at(0)
   end
 
   def first(count)
     if count < 0
       raise ArgumentError, 'negative count'
     end
-    self[0,count]
+    self._at(0 , count)
   end
 
   def flatten
@@ -800,7 +807,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      if(self[i] == el)
+      if self._at(i) == el
         return i
       end
       i += 1
@@ -842,7 +849,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      count += 1 unless self[i].equal?(nil)
+      count += 1 unless self._at(i).equal?(nil)
       i += 1
     end
     count
@@ -863,7 +870,7 @@ class Array
     sz = self.size
     unless sz.equal?(0)
       idx = sz - 1
-      elem = self[idx]
+      elem = self._at(idx)
       self.size=(idx)
       elem
     end
@@ -893,10 +900,10 @@ class Array
     low = 0
     high = self.size - 1
     while low < high
-      a = self[low]
-      b = self[high]
-      self[high] = a
-      self[low]   = b
+      a = self._at(low)
+      b = self._at(high)
+      self._at_put(high, a)
+      self._at_put(low, b)
       low = low + 1
       high = high - 1
     end
@@ -906,7 +913,7 @@ class Array
   def reverse_each(&b)
     i = length - 1
     while i >= 0
-      b.call(self[i])
+      b.call(self._at(i))
       i -= 1
     end
   end
@@ -914,7 +921,7 @@ class Array
   def rindex(el)
     i = size - 1
     while i >= 0
-      if(self[i] == el)
+      if(self._at(i) == el)
         return i
       end
       i -= 1
@@ -927,7 +934,7 @@ class Array
   def shift
     sz = self.size
     unless sz.equal?(0)
-      elem = self[0]
+      elem = self._at(0)
       _remove_from_to_(1, 1)
       elem
     end
@@ -941,7 +948,7 @@ class Array
   def slice(*args)
     len = args.size
     if len.equal?(1)
-      slice(args[0])
+      slice(args._at(0))
     elsif len.equal?(2)
       slice(args[0], args[1])
     else
@@ -952,12 +959,12 @@ class Array
   def slice!(x, y = nil)
     if y
       return [] if size.equal?(0)
-      result = self[x,y]
-      self[x,y] = []
+      result = self._at(x, y)
+      self._at_put(x, y , [] )
     else
-      result = self[x]
+      result = self._at(x)
       unless result.equal?(nil)
-        self[x] = nil
+        self._at_put(x,  nil )
       end
     end
     result
@@ -1011,13 +1018,13 @@ class Array
   def transpose
     return [] if size.equal?(0)
 
-    ary_size = self[0].size # we aren't empty
+    ary_size = self._at(0).size # we aren't empty
     i = 0
     lim = size
     # Check all contained arrays same length before we copy any data
     # TODO: Need to coerce to array...
     while i < lim
-      if self[i].size != ary_size
+      if self._at(i).size != ary_size
         # TODO: can't raise a particular exception yet:
         #    raise IndexError "All contained arrays must be same length."
         raise "All contained arrays must be of same length."
@@ -1028,12 +1035,12 @@ class Array
     result = []
     i = 0
     while i < lim
-      sub_ary = self[i]
+      sub_ary = self._at(i)
       j = 0
       while j < ary_size
         # ||= doesn't yet work for array references...
         #   result[i] ||= []
-        result[j] = [] if result[j].equal?(nil)
+        result[j] =  []  if result[j].equal?(nil)
         result[j][i] = sub_ary[j]
         j += 1
       end
@@ -1048,7 +1055,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self[i]
+      el = self._at(i)
       unless hash.include? el
         ary << el
         hash[el] = el
@@ -1077,7 +1084,7 @@ class Array
     res = []
     while (n < lim)
       idx = selectors[n]
-      elem = self[idx]
+      elem = self._at(idx)
       if (idx._isRange && ! elem.equal?(nil) )
     res.push(*elem)
       else
