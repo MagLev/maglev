@@ -263,15 +263,16 @@ class Array
   # Repetition: if +obj+ is a string, then <tt>arr.join(str)</tt>, otherwise
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
-    result = []
-    if obj._isFixnum
-      for i in 0..obj-1
-        result.concat(self)
-      end
-    else
-      obj.times { |i|
-        result.concat(self)
-      }
+    if obj.respond_to? :to_str
+      return join(obj)
+    end
+
+    val = Type.coerce_to(obj, Fixnum, :to_int)
+    result = self.class.new # preserve subclass
+    i = 0
+    while i < val
+      result.concat(self)
+      i += 1
     end
     result
   end

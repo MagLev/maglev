@@ -28,6 +28,25 @@ class String
     self.dup.succ!
   end
 
+  def upto(stop)
+    #stop = StringValue(stop)
+    stop = Type.coerce_to(stop, String, :to_str)
+
+    return self if self > stop
+
+    after_stop = stop.succ
+    current = self
+
+    until current == after_stop
+      yield current
+      #current = StringValue(current.succ)
+      current = Type.coerce_to(current.succ, String, :to_str)
+      break if current.size > stop.size || current.size == 0
+    end
+
+    self
+  end
+
   def self.isalnum(int)
     (48..57).include?(int) ||
       (65..90).include?(int) ||
@@ -168,7 +187,7 @@ class String
         last_match = match
         val = (match.length.equal?(1) ? match[0] : match.captures)
         val.taint if taint
-      
+
         last_match._storeRubyVcGlobal(0x20) # store into caller's $~
         yield(val)
       end
