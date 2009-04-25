@@ -59,8 +59,7 @@ module M2
 end
 
 class C1
-  include M1
-  include M2
+  include( M2, M1)
   def foo
     'C1#foo'
   end
@@ -71,13 +70,11 @@ class C2
 end
 
 class C3
-  include M1
-  include M2
+  include(M2, M1)
 end
 class C4
   # opposite order from C3
-  include M2
-  include M1
+  include(M1, M2)
 end
 class C5
   extend M1
