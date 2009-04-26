@@ -13,7 +13,7 @@ class Module
   primitive_nobridge 'const_defined?', 'rubyConstDefined:'
   primitive_nobridge 'const_get',      'rubyGlobalAt:'
   primitive_nobridge 'const_set',      'rubyConstAt:put:'
-  primitive_nobridge '_include',       'includeRubyModule:'
+  primitive_nobridge '_include_module', 'includeRubyModule:'
 
   primitive_nobridge 'ancestors' , 'rubyAncestors'
   primitive_nobridge 'included_modules' , 'rubyIncludedModules'
@@ -27,11 +27,7 @@ class Module
   end
 
   # Invokes Module.append_features on each parameter (in reverse order).
-  def include(*names)
-    names.reverse.each do |name|
-      _include(name)
-    end
-  end
+  # def include(*names) ; end  #  inherited from Behavior
 
   #  define_method   is implemented in Behavior
 
