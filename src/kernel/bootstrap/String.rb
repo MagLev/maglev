@@ -184,6 +184,10 @@ class String
 
   primitive '_atEquals', 'at:equals:'
 
+  # Returns a new +String+ with the given record separator removed from the
+  # end of receiver (if present).  If <tt>$/</tt> has not been changed from
+  # the default Ruby record separator, then +chomp+ also removes carriage
+  # return characters (that is, it will remove \n, \r, and \r\n).
   def chomp(rs=$/)
     # check for nil and '' before doing rs[0] in elsif
     if rs.equal?(nil) || rs.empty?
@@ -198,14 +202,15 @@ class String
             return self[0, self.length - 1 ]
           end
         end
+        return self[0, self.length - 1 ] if self[-1].equal?(0xd) # "...\r"
         return self.dup
       end
     end
     len = self.length
     rsLen = rs.length
     if len >= rs.length
-      idx = self.length - rs.length # one based
-      if self._atEquals(idx, rs)
+      idx = self.length - rs.length # zero based
+      if self._atEquals(idx+1, rs)
         return self[0, idx]
       end
     end

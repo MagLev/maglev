@@ -316,5 +316,16 @@ test('Foo Bar'.gsub(/Bar/, '<\'>'), "Foo <'>", 'gsub X')
 test('Foo Bar'.gsub(/Bar/, '<\`>'), 'Foo <Foo >', 'gsub \`')
 test('Foo Bar'.gsub(/(o)(o)/, '<\+>'), 'F<o> Bar', 'gsub \+')
 
+# Test chomp
+test("hello".chomp,     'hello', 'chomp 1')
+test("hello\n".chomp,   'hello', 'chomp 2')
+test("hello\r\n".chomp, 'hello', 'chomp 3')
+test("hello\n\r".chomp, "hello\n", 'chomp 4')
+test("hello\r".chomp, 'hello', 'chomp 5')
+test("hello\n there".chomp, "hello\n there", 'chomp 6')
+test("hello".chomp("llo"), 'he', 'chomp 7')
+
+test("/".chomp('/'), '', 'chomp 8 Trac 495')
+
 report
 
