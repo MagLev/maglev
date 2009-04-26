@@ -673,25 +673,26 @@ class Array
 
   #  note multiple variants below
   def fill(obj, start=nil, length=nil)
-    unless start._isFixnum
-      if start.equal?(nil)
-        start = 0
-      else
-        start = start.to_int
-      end
+    if start.equal?(nil)
+      start = 0
+    else
+      start = Type.coerce_to(start, Fixnum, :to_int)
     end
+
     unless length._isFixnum
       unless length.equal?(nil)
-        length = length.to_int
+        length = Type.coerce_to(length, Fixnum, :to_int)
       end
     end
-    sz = size
+
+    sz = self.size
     if (start < 0)
       start = sz + start
       if (start < 0)
         start = 0
       end
     end
+
     if length.equal?(nil)
       if start >= sz
         # no modifications if index greater than end and no size
@@ -703,6 +704,7 @@ class Array
     end
     # smalltalk arrays start at 1
     endIdx = start + length
+
     start += 1         # start, end both 1-based now
     if (endIdx > sz)
       self.size=(endIdx)  # grow the receiver
@@ -716,8 +718,19 @@ class Array
   def fill(obj, start)
     # note no bridge methods for second and later variants
     if (start._isRange)
-      start.each do | n |
-        self.fill(obj, n, 1)
+      s = Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s += self.size if s < 0
+      e += self.size if e < 0
+      if start.exclude_end?
+        return self if s == e
+        e -= 1
+      end
+      raise RangeError, "#{start.inspect} out of range" if s < 0
+      return self if e < 0
+      s.upto(e) do | n |
+        self[n] = obj
+        #self.fill(obj, n, 1) if n > 0
       end
     else
       fill(obj, start, nil)
@@ -734,7 +747,15 @@ class Array
         start = start.to_int
       end
     end
+
     sz = self.size
+    if (start < 0)
+      start = sz + start
+      if (start < 0)
+        start = 0
+      end
+    end
+
     if length.equal?(nil)
       length = sz - start
     else
@@ -761,10 +782,10 @@ class Array
     # note no bridge methods for second and later variants
     if (start._isRange)
       start.each do | n |
-        fill(start, 1, &lk)
+        fill(start, 1, &blk)
       end
     else
-      fill(start, nil, blk)
+      fill(start, nil, &blk)
     end
     self
   end
