@@ -679,13 +679,19 @@ class Array
       start = Type.coerce_to(start, Fixnum, :to_int)
     end
 
+    sz = self.size
+
     unless length._isFixnum
       unless length.equal?(nil)
-        length = Type.coerce_to(length, Fixnum, :to_int)
+        if (length.kind_of?(Bignum))
+          raise RangeError, "#{length} too big" if length >= 2**63
+        else
+          length = Type.coerce_to(length, Fixnum, :to_int)
+        end
+        raise ArgumentError if length > sz
       end
     end
 
-    sz = self.size
     if (start < 0)
       start = sz + start
       if (start < 0)
@@ -730,7 +736,6 @@ class Array
       return self if e < 0
       s.upto(e) do | n |
         self[n] = obj
-        #self.fill(obj, n, 1) if n > 0
       end
     else
       fill(obj, start, nil)
@@ -781,8 +786,18 @@ class Array
   def fill(start, &blk)
     # note no bridge methods for second and later variants
     if (start._isRange)
-      start.each do | n |
-        fill(start, 1, &blk)
+      s = Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s += self.size if s < 0
+      e += self.size if e < 0
+      if start.exclude_end?
+        return self if s == e
+        e -= 1
+      end
+      raise RangeError, "#{start.inspect} out of range" if s < 0
+      return self if e < 0
+      s.upto(e) do | n |
+        self[n] = yield n
       end
     else
       fill(start, nil, &blk)
