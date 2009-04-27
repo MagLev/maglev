@@ -327,7 +327,7 @@ class File
     # subsequent variants replace just the corresponding bridge method
     f = self._open(filename, 'r')
     if f.equal?(nil)
-      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
+      raise Errno::ENOENT, "No such file or directory - #{filename}"
     end
     f.initialize
     f
@@ -336,7 +336,7 @@ class File
   def self.new(filename, mode)
     f = self._open(filename, mode)
     if f.equal?(nil)
-      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
+      raise Errno::ENOENT, "No such file or directory - #{filename}"
     end
     f.initialize
     f
