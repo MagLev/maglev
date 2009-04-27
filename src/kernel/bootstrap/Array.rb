@@ -861,8 +861,15 @@ class Array
     raise "Method not implemented: deprecated (use Array#values_at): Array#indicies"
   end
 
+  # If +index+ is not negative, inserts the given values before the element
+  # with the given index.  If +index+ is negative, add the values after the
+  # element with the given index (counting from the end).
   def insert(idx, *args)
-    insert_all(args, idx+1)
+    return self if args.length == 0
+    idx = Type.coerce_to(idx, Fixnum, :to_int)
+    idx += (size + 1) if idx < 0
+    raise IndexError, "#{idx} out of bounds" if idx < 0
+    self[idx, 0] = args
     self
   end
 
