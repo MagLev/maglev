@@ -325,6 +325,7 @@ class File
 
   def self.new(filename)
     # subsequent variants replace just the corresponding bridge method
+    filename = Type.coerce_to(filename, String, :to_str)
     f = self._open(filename, 'r')
     if f.equal?(nil)
       raise Errno::ENOENT, "No such file or directory - #{filename}"
@@ -334,6 +335,7 @@ class File
   end
 
   def self.new(filename, mode)
+    filename = Type.coerce_to(filename, String, :to_str)
     f = self._open(filename, mode)
     if f.equal?(nil)
       raise Errno::ENOENT, "No such file or directory - #{filename}"
