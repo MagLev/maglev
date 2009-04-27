@@ -429,6 +429,17 @@ class String
     return result
   end
 
+  def _replace_match_with(match, replacement)
+    out = ""
+    out << self[0...(match.begin(0))]
+    unless replacement.equal?(nil)
+      out << replacement._to_sub_replacement(match)
+    end
+    out << ((self[(match.end(0))...length]) || "")
+    out
+  end
+
+
   def gsub(regex, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
@@ -780,28 +791,44 @@ class String
     replace(strip)
   end
 
-  def sub(regex, replacement)
+  # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
+  # with either +replacement+ or the value of the block.  See the
+  # description of <tt>String#gsub</tt> for a description of the
+  # parameters.
+  def sub(pattern, replacement)
+    replacement = Type.coerce_to(replacement, String, :to_str)
+    regex = _get_pattern(pattern, true)
+
+    # If pattern is a string, then do NOT interpret regex special characters.
     # stores into caller's $~
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
-      _replace_match_with(match, replacement)
-    else
-      dup
-    end
+    r = if match = regex._match_vcglobals(self, 0x30)
+          _replace_match_with(match, replacement)
+        else
+          dup
+        end
+    r = self.class.new(r) unless self._isString
+    r.taint if replacement.tainted? || self.tainted?
+    r
   end
 
-  def sub(regex, &block)
+  def sub(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
-      _replace_match_with(match, block.call(match))
-    else
-      dup
-    end
+    regex = _get_pattern(pattern, true)
+    r = if match = regex._match_vcglobals(self, 0x30)
+          _replace_match_with(match, block.call(match).to_s)
+        else
+          dup
+        end
+    r = self.class.new(r) unless self._isString
+    r.taint if self.tainted? || pattern.tainted?
+    r
   end
 
-  def sub!(regex, replacement)
+  def sub!(pattern, replacement)
+    regex = _get_pattern(pattern, true)
     # stores into caller's $~
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
+    if match = regex._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
       self
     else
@@ -809,10 +836,11 @@ class String
     end
   end
 
-  def sub!(regex, &block)
+  def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
+    regex = _get_pattern(pattern, true)
+    if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match)
       replace(_replace_match_with(match, replacement))
       self
@@ -820,16 +848,22 @@ class String
       nil
     end
   end
-
-  def _replace_match_with(match, replacement)
-    out = ""
-    out << self[0...(match.begin(0))]
-    unless replacement.equal?(nil)
-      out << replacement
+  # Do ruby conversions of a string or regexp to regexp.
+  # If pattern is a string, then quote regexp special characters.
+  # If pattern is neither a Regexp nor a String, try to coerce to string.
+  def _get_pattern(pattern, quote = false)
+    unless pattern._isString || pattern._isRegexp
+      if pattern.respond_to?(:to_str)
+        pattern = pattern.to_str
+      else
+        raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      end
     end
-    out << ((self[(match.end(0))...length]) || "")
-    out
+    pattern = Regexp.quote(pattern) if quote && pattern._isString
+    pattern = Regexp.new(pattern) unless pattern._isRegexp
+    pattern
   end
+
 
   primitive 'succ!', 'rubySucc'
 

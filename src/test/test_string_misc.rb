@@ -327,5 +327,10 @@ test("hello".chomp("llo"), 'he', 'chomp 7')
 
 test("/".chomp('/'), '', 'chomp 8 Trac 495')
 
+# Test sub with backslash references
+test('hello'.sub(/[aeiou]/, '*'), 'h*llo', 'sub 1')
+test('hello'.sub(/([aeiou])/, '<\1>'), 'h<e>llo', 'sub 2')
+test('hello'.sub(/./) { |s| s[0].to_s + ' '}, 'h ello', 'sub 3')
+#test('hello'.sub(/(?<double>l)/, '-\k<double>-'), 'he-l-lo', 'sub 4') # 1.9?
 report
 
