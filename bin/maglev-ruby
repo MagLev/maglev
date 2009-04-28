@@ -18,11 +18,15 @@ OPTIONS:
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h             Show this message and exit
    --help         Show this message and exit
+   -M<opt>        Pass a maglev option to the VM.  This flag may be passed multiple
+                  times.  The currently recognized options are:
+                    traceLoad     Trace loading of ruby files
+                    logSexp       Print sexpressions as they are parsed
    -v, --verbose  Print version number, then turn on verbose mode
    --version      Print version number and exit
 
 MagLev will also read the MAGLEV_OPTS environment variable for options.
-Currently, only -d or --debug is supported in MAGLEV_OPTS.
+Currently, only -d, --debug and -M are supported in MAGLEV_OPTS.
 EOF
 }
 
@@ -50,6 +54,7 @@ export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 
 args=""
 debug=0
+maglev_options=""
 while [[ $# > 0 ]]
 do
     case "$1" in
@@ -77,6 +82,9 @@ do
             ;;
         -I*)
             args="$args '$1'"
+            ;;
+        -M*)
+            maglev_options="$maglev_options ${1:2}"
             ;;
         -v|--verbose)
             grep ^maglev $MAGLEV_HOME/version.txt
@@ -110,6 +118,10 @@ done
 case "$MAGLEV_OPTS" in
     -d|--debug)
         debug=1
+        ;;
+    -M*)
+        maglev_options="$maglev_options ${1:2}"
+        ;;
 esac
 
 # Make sure we have at least one argument
@@ -148,10 +160,12 @@ if [ $debug == 1 ]; then
 else
   cat $MAGLEV_HOME/etc/.topazini > $dbscript
 fi
+
 cat - >> $dbscript <<-EOFA
 run
 | res ctx |
 (ctx := RubyContext) load .
+ctx default setMagLevOptions: #($maglev_options) .
 ctx default runFileNamed: '$RUBYSCRIPT' withARGV: #($args) .
 GsFile stdout close . "ensure final LF on stdout"
 ^ res
