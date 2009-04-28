@@ -10,26 +10,22 @@ class File
   Stat = _resolve_smalltalk_global(:GsFileStat)
 
   class_primitive_nobridge '_section2OpenConstants', '_section2OpenConstants'
-  def self.init_open2_constants
-    h = self._section2OpenConstants 
 
-    # Note, these constants are OS independent values different than
-    #  any found on common variants of Unix. They are translated to 
-    #  OS dependent values by the primitives.  Use of other hardcoded values
-    #  will cause Exceptions during file openinng.
-    APPEND = h[:RUBY_APPEND]
-    CREAT = h[:RUBY_CREAT]
-    EXCL = h[:RUBY_EXCL]
-    NOCTTY = h[:RUBY_NOCTTY]
-    NONBLOCK = h[:RUBY_NONBLOCK]
-    RDONLY = h[:RUBY_RDONLY]
-    RDWR = h[:RUBY_RDWR]
-    TRUNC = h[:RUBY_TRUNC]
-    WRONLY = h[:RUBY_WRONLY]
-  end
+  # Note, these constants are OS independent values different than
+  #  any found on common variants of Unix. They are translated to 
+  #  OS dependent values by the primitives.  Use of other hardcoded values
+  #  will cause Exceptions during file openinng.
+  APPEND = self._section2OpenConstants[:RUBY_APPEND]
+  CREAT = self._section2OpenConstants[:RUBY_CREAT]
+  EXCL = self._section2OpenConstants[:RUBY_EXCL]
+  NOCTTY = self._section2OpenConstants[:RUBY_NOCTTY]
+  NONBLOCK = self._section2OpenConstants[:RUBY_NONBLOCK]
+  RDONLY = self._section2OpenConstants[:RUBY_RDONLY]
+  RDWR = self._section2OpenConstants[:RUBY_RDWR]
+  TRUNC = self._section2OpenConstants[:RUBY_TRUNC]
+  WRONLY = self._section2OpenConstants[:RUBY_WRONLY]
+  # 
 
-  self.init_open2_constants
-  
   # FILE::LOCK  constants initialized below
 
   primitive 'close', 'close'
@@ -46,7 +42,7 @@ class File
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 
   # _stat will return either a stat object or ERRNO
-  class_primitive_nobridge '__stat','stat:isLstat:'
+  class_primitive_nobridge '_stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
   class_primitive_nobridge '_open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
@@ -76,12 +72,12 @@ class File
     end
   end
 
-  def self._stat(name, is_lstat)
-    unless name.equal?(nil)
-      name = Type.coerce_to(name, String, :to_s)
-    end
-    __stat(name, is_lstat)
-  end
+#   def self._stat(name, is_lstat)
+#     unless name.equal?(nil)
+#       name = Type.coerce_to(name, String, :to_s)
+#     end
+#     __stat(name, is_lstat)
+#   end
 
   # TODO: consider using FFI to call libc basename
   def self.basename(filename, suffix='')
@@ -346,11 +342,6 @@ class File
     f
   end
 
-  def self.new(filename)
-    # subsequent variants replace just the corresponding bridge method
-    self.new(filename, 'r')
-  end
-
   def self.new(filename, mode)
     if mode._isString
       f = self._fopen(filename, mode)
@@ -366,6 +357,11 @@ class File
     f
   end
 
+  def self.new(filename)
+    filename = Type.coerce_to(filename, String, :to_str)
+    self.new(filename, 'r')
+  end
+
   def self.open(filename, mode, permission, &blk)
     unless mode._isFixnum
       raise TypeError, 'second arg not a Fixnum '
@@ -377,25 +373,20 @@ class File
     if f._isFixnum
       Errno.raise_errno(f, filename )
     end
-    return f unless block_given?
-    begin
-      blk.call(f)
-    ensure
-      f.close rescue nil
+    if block_given?
+      begin
+        blk.call(f)
+      ensure
+        f.close rescue nil
+      end
+    else
+      f 
     end
-  end
-
-  def self.open(filename, &blk)
-    self.open(filename, 'r', &blk)
-  end
-
-  def self.open(filename)
-    self.open(filename, 'r')
   end
 
   def self.open(filename, mode, &blk)
     if mode._isString
-      f = self._fopen(filename, 'r')
+      f = self._fopen(filename, mode)
     elsif mode._isFixnum
       f = self._open(filename, mode, -1)
     else
@@ -404,17 +395,20 @@ class File
     if f._isFixnum
       Errno.raise_errno(f, filename )
     end
-    return f unless block_given?
-    begin
-      blk.call(f)
-    ensure
-      f.close rescue nil
+    if block_given?
+      begin
+        blk.call(f)
+      ensure
+        f.close rescue nil
+      end
+    else
+      f
     end
   end 
 
   def self.open(filename, mode)
     if mode._isString
-      f = self._fopen(filename, 'r')
+      f = self._fopen(filename, mode)
     elsif mode._isFixnum
       f = self._open(filename, mode, -1)
     else
@@ -423,7 +417,18 @@ class File
     if f._isFixnum
       Errno.raise_errno(f, filename )
     end
+    f
   end 
+
+  def self.open(filename, &blk)
+    filename = Type.coerce_to(filename, String, :to_str)
+    self.open(filename, 'r', &blk)
+  end
+
+  def self.open(filename)
+    filename = Type.coerce_to(filename, String, :to_str)
+    self.open(filename, 'r')
+  end
 
   def self.owned?(filename)
     stat_obj = File._stat(filename, false)

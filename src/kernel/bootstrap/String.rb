@@ -936,15 +936,26 @@ class String
   end
 
   primitive_nobridge 'to_sym', 'asSymbol'
+  primitive '_tr!', 'rubyTrFrom:to:'
 
-  primitive 'tr!', 'rubyTrFrom:to:'
+  def tr!(from, to)
+    raise TypeError, "can't modify frozen string" if frozen?
+    from = Type.coerce_to(from, String, :to_str)
+    to   = Type.coerce_to(to,   String, :to_str)
+    _tr!(from, to)
+  end
 
   def tr(from, to)
-    dup.tr!(from, to)
+    s = self.dup
+    s.tr!(from, to)
+    s.taint if tainted?
+    s
   end
 
   primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
   def tr_s(from, to)
+    from = Type.coerce_to(from, String, :to_str)
+    to   = Type.coerce_to(to,   String, :to_str)
     (str = self.dup).tr_s!(from, to) || str
   end
 
