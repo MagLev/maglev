@@ -9,6 +9,27 @@ class File
 
   Stat = _resolve_smalltalk_global(:GsFileStat)
 
+  class_primitive_nobridge '_section2OpenConstants', '_section2OpenConstants'
+  def self.init_open2_constants
+    h = self._section2OpenConstants 
+
+    # Note, these constants are OS independent values different than
+    #  any found on common variants of Unix. They are translated to 
+    #  OS dependent values by the primitives.  Use of other hardcoded values
+    #  will cause Exceptions during file openinng.
+    APPEND = h[:RUBY_APPEND]
+    CREAT = h[:RUBY_CREAT]
+    EXCL = h[:RUBY_EXCL]
+    NOCTTY = h[:RUBY_NOCTTY]
+    NONBLOCK = h[:RUBY_NONBLOCK]
+    RDONLY = h[:RUBY_RDONLY]
+    RDWR = h[:RUBY_RDWR]
+    TRUNC = h[:RUBY_TRUNC]
+    WRONLY = h[:RUBY_WRONLY]
+  end
+
+  self.init_open2_constants
+  
   # FILE::LOCK  constants initialized below
 
   primitive 'close', 'close'
@@ -28,12 +49,15 @@ class File
   class_primitive_nobridge '__stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
-  class_primitive_nobridge '_open', 'rubyOpen:mode:'
+  class_primitive_nobridge '_open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
+  class_primitive_nobridge '_fopen', '_rubyFopen:mode:' # path is String or Fixnum, mode is a String
+				      # first arg determines use of fdopen or open
   class_primitive 'stdin'
   class_primitive 'stdout'
   class_primitive 'stderr'
   class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
   class_primitive_nobridge '_delete', 'removeServerFile:'
+
 
   # For Dir.rb
   class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
@@ -307,59 +331,99 @@ class File
     File.stat(filename).mtime
   end
 
-  def self.new(*args, &blk)
-    # first variant gets bridge methods
-    len = args.length
-    if len > 0
-      if len.equal?(1)
-        f = self.new(args[0], 'r')
-      else
-        f = self.new(args[0], args[1])
-      end
-      f.initialize(*args, &blk)
-      f
-    else
-      raise ArgumentError, 'too few args'
+  def self.new(filename, mode, permission)
+    unless mode._isFixnum
+      raise TypeError, 'second arg not a Fixnum '
     end
+    unless permission._isFixnum
+      raise TypeError, 'third arg not a Fixnum '
+    end
+    f = self._open(filename, mode, permission)
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
+    f.initialize
+    f
   end
 
   def self.new(filename)
     # subsequent variants replace just the corresponding bridge method
-    f = self._open(filename, 'r')
-    if f.equal?(nil)
-      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
-    end
-    f.initialize
-    f
+    self.new(filename, 'r')
   end
 
   def self.new(filename, mode)
-    f = self._open(filename, mode)
-    if f.equal?(nil)
-      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
+    if mode._isString
+      f = self._fopen(filename, mode)
+    elsif mode._isFixnum
+      f = self._open(filename, mode, -1)  # fdopen() or open()
+    else
+      raise TypeError, 'second arg neither Fixnum nor String'
+    end
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
     end
     f.initialize
     f
   end
 
-
-  def self.open(filename, mode="r", perm = 0644, &b)
-    # Not easy to pass the perm flag to open(2) through smalltalk,
-    # so manage it here.  First, see if the file exists
-    stat_obj = File._stat(filename, false)
-    f = self._open(filename, mode)
-    Errno.raise_errno(stat_obj, filename) if f.equal?(nil)
-
-    f.chmod(perm) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
-
+  def self.open(filename, mode, permission, &blk)
+    unless mode._isFixnum
+      raise TypeError, 'second arg not a Fixnum '
+    end
+    unless permission._isFixnum
+      raise TypeError, 'third arg not a Fixnum '
+    end
+    f = self._open(filename, mode, permission)
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
     return f unless block_given?
-
     begin
-      b.call(f)
+      blk.call(f)
     ensure
       f.close rescue nil
     end
   end
+
+  def self.open(filename, &blk)
+    self.open(filename, 'r', &blk)
+  end
+
+  def self.open(filename)
+    self.open(filename, 'r')
+  end
+
+  def self.open(filename, mode, &blk)
+    if mode._isString
+      f = self._fopen(filename, 'r')
+    elsif mode._isFixnum
+      f = self._open(filename, mode, -1)
+    else
+      raise TypeError, 'second arg neither Fixnum nor String'
+    end
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
+    return f unless block_given?
+    begin
+      blk.call(f)
+    ensure
+      f.close rescue nil
+    end
+  end 
+
+  def self.open(filename, mode)
+    if mode._isString
+      f = self._fopen(filename, 'r')
+    elsif mode._isFixnum
+      f = self._open(filename, mode, -1)
+    else
+      raise TypeError, 'second arg neither Fixnum nor String'
+    end
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
+  end 
 
   def self.owned?(filename)
     stat_obj = File._stat(filename, false)
