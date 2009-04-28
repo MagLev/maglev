@@ -25,7 +25,7 @@ class File
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 
   # _stat will return either a stat object or ERRNO
-  class_primitive_nobridge '__stat','stat:isLstat:'
+  class_primitive_nobridge '_stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
   class_primitive_nobridge '_open', 'rubyOpen:mode:'
@@ -52,12 +52,12 @@ class File
     end
   end
 
-  def self._stat(name, is_lstat)
-    unless name.equal?(nil)
-      name = Type.coerce_to(name, String, :to_s)
-    end
-    __stat(name, is_lstat)
-  end
+#   def self._stat(name, is_lstat)
+#     unless name.equal?(nil)
+#       name = Type.coerce_to(name, String, :to_s)
+#     end
+#     __stat(name, is_lstat)
+#   end
 
   # TODO: consider using FFI to call libc basename
   def self.basename(filename, suffix='')
@@ -325,18 +325,20 @@ class File
 
   def self.new(filename)
     # subsequent variants replace just the corresponding bridge method
+    filename = Type.coerce_to(filename, String, :to_str)
     f = self._open(filename, 'r')
     if f.equal?(nil)
-      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
+      raise Errno::ENOENT, "No such file or directory - #{filename}"
     end
     f.initialize
     f
   end
 
   def self.new(filename, mode)
+    filename = Type.coerce_to(filename, String, :to_str)
     f = self._open(filename, mode)
     if f.equal?(nil)
-      raise Errno::ENOENT # TODO: Is ENOENT always applicable?
+      raise Errno::ENOENT, "No such file or directory - #{filename}"
     end
     f.initialize
     f
@@ -346,6 +348,7 @@ class File
   def self.open(filename, mode="r", perm = 0644, &b)
     # Not easy to pass the perm flag to open(2) through smalltalk,
     # so manage it here.  First, see if the file exists
+    filename = Type.coerce_to(filename, String, :to_str)
     stat_obj = File._stat(filename, false)
     f = self._open(filename, mode)
     Errno.raise_errno(stat_obj, filename) if f.equal?(nil)

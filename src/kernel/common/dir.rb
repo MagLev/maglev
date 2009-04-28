@@ -227,7 +227,10 @@ class Dir
 
           length = new_pattern.length
 
-          new_pattern.concat pattern[copied, pattern.size-copied]
+          _tmp = pattern[copied, pattern.size-copied]
+          new_pattern.concat _tmp unless _tmp == nil
+
+#          new_pattern.concat pattern[copied, pattern.size-copied]
 
           glob_helper(buf, true, :yes, new_isdir, new_pattern, 0, length,
                       flags, matches)

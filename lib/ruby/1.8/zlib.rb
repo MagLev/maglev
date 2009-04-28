@@ -45,15 +45,15 @@ module Zlib
   OS_UNIX     = 0x03
   OS_CODE = OS_UNIX
 
-  # class CZStream was defined during bootstrap in zlib_czstream.rb
+  # class Zlib::ZStream was defined during bootstrap in zlib_czstream.rb
 
   class GzipFile  # {
 
     class Error < Zlib::Error; end
 
-    #SYNC            = Zlib::CZStream::UNUSED
-    #HEADER_FINISHED = Zlib::CZStream::UNUSED << 1
-    #FOOTER_FINISHED = Zlib::CZStream::UNUSED << 2
+    #SYNC            = Zlib::ZStream::UNUSED
+    #HEADER_FINISHED = Zlib::ZStream::UNUSED << 1
+    #FOOTER_FINISHED = Zlib::ZStream::UNUSED << 2
 
     FLAG_MULTIPART    = 0x2
     FLAG_EXTRA        = 0x4
@@ -142,7 +142,7 @@ module Zlib
       if length.nil?
         buf = ''
         while ! eof?
-          buf << @zstream.read(2048)
+          buf << @zstream.read(16384)
         end
         buf
       else

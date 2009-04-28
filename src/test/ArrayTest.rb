@@ -1132,4 +1132,30 @@ test(a, [], 'el assigment 18')
 a[4..10] = 2
 test(a, [nil, nil, nil,nil, 2], 'el assigment 19')
 
+# Test *()
+test([1,2,3] * 3, [1,2,3,1,2,3,1,2,3], '* 1')
+test([1,2,3] * '--', '1--2--3', '* 2')
+test(['test','more'] * ',', 'test,more', '* 3')
+
+# Pickaxe tests for Array#fill
+a = ['a', 'b', 'c', 'd']
+a.fill('x')
+test(a, ['x', 'x', 'x', 'x'], 'fill 1')
+
+a = ['x', 'x', 'x', 'x']
+a.fill('z', 2, 2)
+test(a, ['x', 'x', 'z', 'z'], 'fill 2')
+
+a = ['x', 'x', 'z', 'z']
+a.fill('y', 0..1)
+test(a, ['y', 'y', 'z', 'z'], 'fill 3')
+
+a = ['y', 'y', 'z', 'z']
+a.fill { |i| i*i }
+test(a, [0, 1, 4, 9], 'fill 4')
+
+a = [0, 1, 4, 9]
+a.fill(-2) { |i| i*i*i }
+test(a, [0, 1, 8, 27], 'fill 5')
+
 report

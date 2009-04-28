@@ -184,6 +184,10 @@ class String
 
   primitive '_atEquals', 'at:equals:'
 
+  # Returns a new +String+ with the given record separator removed from the
+  # end of receiver (if present).  If <tt>$/</tt> has not been changed from
+  # the default Ruby record separator, then +chomp+ also removes carriage
+  # return characters (that is, it will remove \n, \r, and \r\n).
   def chomp(rs=$/)
     # check for nil and '' before doing rs[0] in elsif
     if rs.equal?(nil) || rs.empty?
@@ -198,14 +202,15 @@ class String
             return self[0, self.length - 1 ]
           end
         end
+        return self[0, self.length - 1 ] if self[-1].equal?(0xd) # "...\r"
         return self.dup
       end
     end
     len = self.length
     rsLen = rs.length
     if len >= rs.length
-      idx = self.length - rs.length # one based
-      if self._atEquals(idx, rs)
+      idx = self.length - rs.length # zero based
+      if self._atEquals(idx+1, rs)
         return self[0, idx]
       end
     end
@@ -344,12 +349,37 @@ class String
   primitive 'empty?', 'isEmpty'
   primitive 'eql?', '='
 
+
+  # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
+  # replaced with either <i>replacement</i> or the value of the block. The
+  # <i>pattern</i> will typically be a <code>Regexp</code>; if it is a
+  # <code>String</code> then no regular expression metacharacters will be
+  # interpreted (that is <code>/\d/</code> will match a digit, but
+  # <code>'\d'</code> will match a backslash followed by a 'd').
+  #
+  # If a string is used as the replacement, special variables from the match
+  # (such as <code>$&</code> and <code>$1</code>) cannot be substituted into it,
+  # as substitution into the string occurs before the pattern match
+  # starts. However, the sequences <code>\1</code>, <code>\2</code>, and so on
+  # may be used to interpolate successive groups in the match.
+  #
+  # In the block form, the current match string is passed in as a parameter, and
+  # variables such as <code>$1</code>, <code>$2</code>, <code>$`</code>,
+  # <code>$&</code>, and <code>$'</code> will be set appropriately. The value
+  # returned by the block will be substituted for the match on each call.
+  #
+  # The result inherits any tainting in the original string or any supplied
+  # replacement string.
+  #
+  #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
+  #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
+  #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
   def gsub(regex, str)
     out = ""
     start = 1
     get_pattern(regex, true).__each_match(self) do |match|
       out << substring1(start, match.begin(0))
-      out << str
+      out << str._to_sub_replacement(match)
       start = match.end(0) + 1
     end
     if start <= length
@@ -357,6 +387,58 @@ class String
     end
     out
   end
+
+  # From Rubinius
+  def _to_sub_replacement(match)
+    index = 0
+    result = ""
+    lim = size
+    while index < lim
+      current = index
+      while current < lim && self[current] != ?\\
+        current += 1
+      end
+      result << self[index, current - index]
+      break if current == lim
+
+      # found backslash escape, looking next
+      if current == lim - 1
+        result << ?\\ # backslash at end of string
+        break
+      end
+      index = current + 1
+
+      result << case (cap = self[index])
+        when ?&
+          match[0]
+        when ?`
+          match.pre_match
+        when ?'
+          match.post_match
+        when ?+
+          match.captures.compact[-1].to_s
+        when ?0..?9
+          match[cap - ?0].to_s
+        when ?\\ # escaped backslash
+          '\\'
+        else     # unknown escape
+          '\\' << cap
+      end
+      index += 1
+    end
+    return result
+  end
+
+  def _replace_match_with(match, replacement)
+    out = ""
+    out << self[0...(match.begin(0))]
+    unless replacement.equal?(nil)
+      out << replacement._to_sub_replacement(match)
+    end
+    out << ((self[(match.end(0))...length]) || "")
+    out
+  end
+
 
   def gsub(regex, &block)
     # $~ and related variables will be valid in block if
@@ -709,28 +791,44 @@ class String
     replace(strip)
   end
 
-  def sub(regex, replacement)
+  # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
+  # with either +replacement+ or the value of the block.  See the
+  # description of <tt>String#gsub</tt> for a description of the
+  # parameters.
+  def sub(pattern, replacement)
+    replacement = Type.coerce_to(replacement, String, :to_str)
+    regex = _get_pattern(pattern, true)
+
+    # If pattern is a string, then do NOT interpret regex special characters.
     # stores into caller's $~
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
-      _replace_match_with(match, replacement)
-    else
-      dup
-    end
+    r = if match = regex._match_vcglobals(self, 0x30)
+          _replace_match_with(match, replacement)
+        else
+          dup
+        end
+    r = self.class.new(r) unless self._isString
+    r.taint if replacement.tainted? || self.tainted?
+    r
   end
 
-  def sub(regex, &block)
+  def sub(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
-      _replace_match_with(match, block.call(match))
-    else
-      dup
-    end
+    regex = _get_pattern(pattern, true)
+    r = if match = regex._match_vcglobals(self, 0x30)
+          _replace_match_with(match, block.call(match).to_s)
+        else
+          dup
+        end
+    r = self.class.new(r) unless self._isString
+    r.taint if self.tainted? || pattern.tainted?
+    r
   end
 
-  def sub!(regex, replacement)
+  def sub!(pattern, replacement)
+    regex = _get_pattern(pattern, true)
     # stores into caller's $~
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
+    if match = regex._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
       self
     else
@@ -738,10 +836,11 @@ class String
     end
   end
 
-  def sub!(regex, &block)
+  def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    if match = regex.to_rx._match_vcglobals(self, 0x30)
+    regex = _get_pattern(pattern, true)
+    if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match)
       replace(_replace_match_with(match, replacement))
       self
@@ -749,16 +848,22 @@ class String
       nil
     end
   end
-
-  def _replace_match_with(match, replacement)
-    out = ""
-    out << self[0...(match.begin(0))]
-    unless replacement.equal?(nil)
-      out << replacement
+  # Do ruby conversions of a string or regexp to regexp.
+  # If pattern is a string, then quote regexp special characters.
+  # If pattern is neither a Regexp nor a String, try to coerce to string.
+  def _get_pattern(pattern, quote = false)
+    unless pattern._isString || pattern._isRegexp
+      if pattern.respond_to?(:to_str)
+        pattern = pattern.to_str
+      else
+        raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+      end
     end
-    out << ((self[(match.end(0))...length]) || "")
-    out
+    pattern = Regexp.quote(pattern) if quote && pattern._isString
+    pattern = Regexp.new(pattern) unless pattern._isRegexp
+    pattern
   end
+
 
   primitive 'succ!', 'rubySucc'
 
@@ -831,15 +936,26 @@ class String
   end
 
   primitive_nobridge 'to_sym', 'asSymbol'
+  primitive '_tr!', 'rubyTrFrom:to:'
 
-  primitive 'tr!', 'rubyTrFrom:to:'
+  def tr!(from, to)
+    raise TypeError, "can't modify frozen string" if frozen?
+    from = Type.coerce_to(from, String, :to_str)
+    to   = Type.coerce_to(to,   String, :to_str)
+    _tr!(from, to)
+  end
 
   def tr(from, to)
-    dup.tr!(from, to)
+    s = self.dup
+    s.tr!(from, to)
+    s.taint if tainted?
+    s
   end
 
   primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
   def tr_s(from, to)
+    from = Type.coerce_to(from, String, :to_str)
+    to   = Type.coerce_to(to,   String, :to_str)
     (str = self.dup).tr_s!(from, to) || str
   end
 

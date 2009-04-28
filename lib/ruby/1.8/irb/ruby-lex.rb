@@ -849,7 +849,7 @@ class RubyLex
     end
 
     unless @scope_stack.include? TkDEF
-        if token =~ /[a-z_][A-Za-z0-9_]*/ and peek_match?(/^\s*(([+-\/*&\|^]|<<|>>|\|\||\&\&)?=)([^=]|$)/)
+        if token =~ /^[a-z_][A-Za-z0-9_]*/ and peek_match?(/^\s*(([+-\/*&\|^]|<<|>>|\|\||\&\&)?=)([^=]|$)/)
 	    @readed = @readed.insert(@readed.length-token.length,*%w{ @ _ _ })
 	    token = "@__#{token}"
 	    end

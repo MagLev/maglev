@@ -263,15 +263,16 @@ class Array
   # Repetition: if +obj+ is a string, then <tt>arr.join(str)</tt>, otherwise
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
-    result = []
-    if obj._isFixnum
-      for i in 0..obj-1
-        result.concat(self)
-      end
-    else
-      obj.times { |i|
-        result.concat(self)
-      }
+    if obj.respond_to? :to_str
+      return join(obj)
+    end
+
+    val = Type.coerce_to(obj, Fixnum, :to_int)
+    result = self.class.new # preserve subclass
+    i = 0
+    while i < val
+      result.concat(self)
+      i += 1
     end
     result
   end
@@ -672,25 +673,32 @@ class Array
 
   #  note multiple variants below
   def fill(obj, start=nil, length=nil)
-    unless start._isFixnum
-      if start.equal?(nil)
-        start = 0
-      else
-        start = start.to_int
-      end
+    if start.equal?(nil)
+      start = 0
+    else
+      start = Type.coerce_to(start, Fixnum, :to_int)
     end
+
+    sz = self.size
+
     unless length._isFixnum
       unless length.equal?(nil)
-        length = length.to_int
+        if (length.kind_of?(Bignum))
+          raise RangeError, "#{length} too big" if length >= 2**63
+        else
+          length = Type.coerce_to(length, Fixnum, :to_int)
+        end
+        raise ArgumentError if length > sz
       end
     end
-    sz = size
+
     if (start < 0)
       start = sz + start
       if (start < 0)
         start = 0
       end
     end
+
     if length.equal?(nil)
       if start >= sz
         # no modifications if index greater than end and no size
@@ -702,6 +710,7 @@ class Array
     end
     # smalltalk arrays start at 1
     endIdx = start + length
+
     start += 1         # start, end both 1-based now
     if (endIdx > sz)
       self.size=(endIdx)  # grow the receiver
@@ -715,8 +724,18 @@ class Array
   def fill(obj, start)
     # note no bridge methods for second and later variants
     if (start._isRange)
-      start.each do | n |
-        self.fill(obj, n, 1)
+      s = Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s += self.size if s < 0
+      e += self.size if e < 0
+      if start.exclude_end?
+        return self if s == e
+        e -= 1
+      end
+      raise RangeError, "#{start.inspect} out of range" if s < 0
+      return self if e < 0
+      s.upto(e) do | n |
+        self[n] = obj
       end
     else
       fill(obj, start, nil)
@@ -733,7 +752,15 @@ class Array
         start = start.to_int
       end
     end
+
     sz = self.size
+    if (start < 0)
+      start = sz + start
+      if (start < 0)
+        start = 0
+      end
+    end
+
     if length.equal?(nil)
       length = sz - start
     else
@@ -759,11 +786,21 @@ class Array
   def fill(start, &blk)
     # note no bridge methods for second and later variants
     if (start._isRange)
-      start.each do | n |
-        fill(start, 1, &lk)
+      s = Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s += self.size if s < 0
+      e += self.size if e < 0
+      if start.exclude_end?
+        return self if s == e
+        e -= 1
+      end
+      raise RangeError, "#{start.inspect} out of range" if s < 0
+      return self if e < 0
+      s.upto(e) do | n |
+        self[n] = yield n
       end
     else
-      fill(start, nil, blk)
+      fill(start, nil, &blk)
     end
     self
   end
@@ -824,8 +861,15 @@ class Array
     raise "Method not implemented: deprecated (use Array#values_at): Array#indicies"
   end
 
+  # If +index+ is not negative, inserts the given values before the element
+  # with the given index.  If +index+ is negative, add the values after the
+  # element with the given index (counting from the end).
   def insert(idx, *args)
-    insert_all(args, idx+1)
+    return self if args.length == 0
+    idx = Type.coerce_to(idx, Fixnum, :to_int)
+    idx += (size + 1) if idx < 0
+    raise IndexError, "#{idx} out of bounds" if idx < 0
+    self[idx, 0] = args
     self
   end
 

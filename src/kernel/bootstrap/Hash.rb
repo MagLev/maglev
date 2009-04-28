@@ -90,7 +90,7 @@ class Hash
     if arg._isArray
       self._from_elements(arg)
     elsif arg._isHash
-      if self.equal?(arg.class) 
+      if self.equal?(arg.class)
         arg.dup
       else
         res = self._new(arg.size, nil)
@@ -122,12 +122,15 @@ class Hash
     self
   end
 
+# 48 190 382 31 3
+
   def ==(other)
     if (other._isHash)
       if (other.equal?(self))
         return true
       end
     else
+      return false unless other.respond_to? :to_hash
       other = other.to_hash
     end
     unless other.length.equal?(self.length)
@@ -163,9 +166,9 @@ class Hash
   primitive 'delete', 'removeKey:'
 
   def delete_if(&block)
-    # RUBINIUS: This code is from rubinius core/hash.rb ;  modified. 
-    unless size.equal?(0) 
-      raise LocalJumpError, "no block given" unless block_given? 
+    # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
+    unless size.equal?(0)
+      raise LocalJumpError, "no block given" unless block_given?
 
       # Do this in 2 steps, so we're not altering the structure while we walk it.
       to_del = []
@@ -266,13 +269,13 @@ class Hash
 
   def select(&block)
     res = []
-    each_pair { |k, v| 
+    each_pair { |k, v|
        if yield(k,v)
-         res << [k,v] 
+         res << [k,v]
        end
     }
     res
-  end 
+  end
 
   primitive_nobridge '_firstPair'
 
@@ -338,7 +341,7 @@ class Hash
          }
       str[0..(str.length - 3)] + "}"
     ensure
-      ts.remove(self) 
+      ts.remove(self)
     end
   end
 

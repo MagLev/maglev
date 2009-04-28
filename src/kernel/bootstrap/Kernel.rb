@@ -160,7 +160,18 @@ module Kernel
 
   primitive 'global_variables', 'rubyGlobalVariables'
 
-  primitive_nobridge 'include',  'includeRubyModule:'
+  # This implementation of include handles include from a main program
+  primitive_nobridge '_include_module',  'includeRubyModule:'
+  def include(*names)
+    # this variant gets bridge methods
+    names.reverse.each do |name|
+      _include_module(name)
+    end
+  end
+  def include(name)
+    # variant needed for bootstrap 
+    _include_module(name) 
+  end
 
   # def loop(&block) ; end
   primitive 'loop&', '_rubyLoop:'

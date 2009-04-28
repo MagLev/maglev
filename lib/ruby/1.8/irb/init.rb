@@ -204,31 +204,30 @@ module IRB
   def IRB.run_config
     if @CONF[:RC]
       begin
-	load rc_file
+	load rc_file if rc_file
       rescue LoadError, Errno::ENOENT
-      rescue
-	print "load error: #{rc_file}\n"
+      rescue Exception => e
+	print "load error: #{e} on #{rc_file}\n"
 	print $!.class, ": ", $!, "\n"
-	for err in $@[0, $@.size - 2]
-	  print "\t", err, "\n"
-	end
+	#for err in $@[0, $@.size - 2]
+	#  print "\t", err, "\n"
+	#end
       end
     end
   end
 
   IRBRC_EXT = "rc"
   def IRB.rc_file(ext = IRBRC_EXT)
+    wtf = nil
     if !@CONF[:RC_NAME_GENERATOR]
+      @CONF[:RC_NAME_GENERATOR] = proc { |rc| wtf }
       rc_file_generators do |rcgen|
-	@CONF[:RC_NAME_GENERATOR] ||= rcgen
-	if File.exist?(rcgen.call(IRBRC_EXT))
-	  @CONF[:RC_NAME_GENERATOR] = rcgen
-	  # TODO - uncomment the break when Ticket #470 is fixed
-	  # break
+	if File.exist?(fn = rcgen.call(ext))
+	  wtf ||= fn
 	end
       end
     end
-    @CONF[:RC_NAME_GENERATOR].call ext
+  @CONF[:RC_NAME_GENERATOR].call ext
   end
 
   # enumerate possible rc-file base name generators

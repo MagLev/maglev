@@ -4,7 +4,6 @@ class Behavior
   # normal class/modules so they are defined up here.
 
   primitive 'alias_method', 'rubyAlias:from:'
-  primitive_nobridge 'include', 'includeRubyModule:'
   primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
   primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'
@@ -80,6 +79,18 @@ class Behavior
 
   def define_method(sym, &blk)
     _define_method_block(sym, &blk)
+  end
+
+  primitive_nobridge '_include_module', 'includeRubyModule:' 
+  def include(*names)
+    # this variant gets bridge methods
+    names.reverse.each do |name|
+      _include_module(name)
+    end
+  end
+  def include(name)
+    # variant needed for bootstrap
+    _include_module(name)
   end
 
   def inspect
