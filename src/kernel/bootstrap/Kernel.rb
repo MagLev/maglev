@@ -2,7 +2,7 @@ module Kernel
 
   primitive_nobridge '_resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
-  # Print messages for stubbed methods 
+  # Print messages for stubbed methods
   # presence of classvars disturbs specs, constants disturbs vmunit tests
   # MAGLEV_WARNSTUB = false
   # MAGLEV_SEEN = { }  # TODO, should be a transient hash
@@ -10,7 +10,7 @@ module Kernel
   def _stub_warn(msg)
     #if MAGLEV_WARNSTUB
     #  unless MAGLEV_SEEN[msg]
-    #    puts "== WARN: STUB: MNI: #{msg}" 
+    #    puts "== WARN: STUB: MNI: #{msg}"
     #    MAGLEV_SEEN[msg] = 1
     #  end
     #end
@@ -18,6 +18,11 @@ module Kernel
 
   def load(name)
     RUBY.load(Type.coerce_to(name, String, :to_str))
+  end
+
+  def abort(string)
+    puts string
+    exit(1)
   end
 
   primitive_nobridge '_at_exit', 'atExit:'
@@ -169,8 +174,8 @@ module Kernel
     end
   end
   def include(name)
-    # variant needed for bootstrap 
-    _include_module(name) 
+    # variant needed for bootstrap
+    _include_module(name)
   end
 
   # def loop(&block) ; end
