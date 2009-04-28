@@ -6,19 +6,23 @@ COMMAND="`basename $0`"
 usage()
 {
 cat << EOF
-Usage: $COMMAND [options] <filename>
+Usage: $COMMAND [options] [--] filename [script-args]
 
     Execute a Ruby file
 
+    Currently, the filename argument is required.
+
 OPTIONS:
-   -d           Set debugging flags
-   -G           Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
-   -h           Show this message and exit
-   --help       Show this message and exit
-   -v           Print version number, then turn on verbose mode
-   -w           Turn warnings on
-   --copyright  Print copyright and exit
-   --version    Print version number and exit
+   --copyright    Print copyright and exit
+   -d, --debug    Set debugging flags
+   -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
+   -h             Show this message and exit
+   --help         Show this message and exit
+   -v, --verbose  Print version number, then turn on verbose mode
+   --version      Print version number and exit
+
+MagLev will also read the MAGLEV_OPTS environment variable for options.
+Currently, only -d or --debug is supported in MAGLEV_OPTS.
 EOF
 }
 
@@ -48,12 +52,12 @@ args=""
 debug=0
 while [[ $# > 0 ]]
 do
-    case $1 in
+    case "$1" in
         --copyright)
             echo "maglev - Copyright (C) 2008-2009 GemStone Systems, Inc."
             exit
             ;;
-        -d)
+        -d|--debug)
             debug=1
             ;;
         -e)
@@ -63,11 +67,7 @@ do
         -G)
             unset GEMSTONE_GLOBAL_DIR
             ;;
-        -h)
-            usage
-            exit
-            ;;
-        --help)
+        -h|--help)
             usage
             exit
             ;;
@@ -86,8 +86,19 @@ do
             grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
-        -w)
-            warning=1
+#         -w)
+#             warning=1
+#             ;;
+
+        --)
+            break
+            ;;
+        -*)
+            echo
+            echo "Unrecognized option: $1"
+            echo
+            usage
+            exit
             ;;
         *)
             break
@@ -95,6 +106,11 @@ do
     esac
     shift
 done
+
+case "$MAGLEV_OPTS" in
+    -d|--debug)
+        debug=1
+esac
 
 # Make sure we have at least one argument
 if [ $# -lt 1 ]; then
@@ -144,7 +160,7 @@ EOFA
 
 # generate a topaz exit command as last line of init file
 if [ $debug == 0 ]; then
-  cat - >> $dbscript <<-EOFB  
+  cat - >> $dbscript <<-EOFB
 exit
 EOFB
 else
