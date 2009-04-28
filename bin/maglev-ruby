@@ -26,9 +26,12 @@ OPTIONS:
    --version      Print version number and exit
 
 MagLev will also read the MAGLEV_OPTS environment variable for options.
-Currently, only -d, --debug and -M are supported in MAGLEV_OPTS.
 EOF
 }
+
+# Prepend the maglev options onto the passed parameters so we can parse
+# them all the same in one pass
+set -- $MAGLEV_OPTS $@
 
 # Make sure MAGLEV_HOME is set
 if [ -z "${MAGLEV_HOME}" ]; then
@@ -114,15 +117,6 @@ do
     esac
     shift
 done
-
-case "$MAGLEV_OPTS" in
-    -d|--debug)
-        debug=1
-        ;;
-    -M*)
-        maglev_options="$maglev_options ${1:2}"
-        ;;
-esac
 
 # Make sure we have at least one argument
 if [ $# -lt 1 ]; then
