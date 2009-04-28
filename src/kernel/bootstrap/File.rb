@@ -42,7 +42,7 @@ class File
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 
   # _stat will return either a stat object or ERRNO
-  class_primitive_nobridge '_stat','stat:isLstat:'
+  class_primitive_nobridge '__stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
   class_primitive_nobridge '_open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
@@ -72,12 +72,12 @@ class File
     end
   end
 
-#   def self._stat(name, is_lstat)
-#     unless name.equal?(nil)
-#       name = Type.coerce_to(name, String, :to_s)
-#     end
-#     __stat(name, is_lstat)
-#   end
+  def self._stat(name, is_lstat)
+    unless name.equal?(nil)
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    __stat(name, is_lstat)
+  end
 
   # TODO: consider using FFI to call libc basename
   def self.basename(filename, suffix='')
