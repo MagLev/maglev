@@ -327,49 +327,41 @@ class File
     File.stat(filename).mtime
   end
 
-  def self.new(filename, mode, permission)
-    unless mode._isFixnum
-      raise TypeError, 'second arg not a Fixnum '
-    end
-    unless permission._isFixnum
-      raise TypeError, 'third arg not a Fixnum '
-    end
-    f = self._open(filename, mode, permission)
-    if f._isFixnum
-      Errno.raise_errno(f, filename )
-    end
-    f.initialize
-    f
+
+  def self.new(filename, mode=Undefined, permission=Undefined)
+    self.open(filename, mode, permission) 
   end
 
-  def self.new(filename, mode)
-    if mode._isString
-      f = self._fopen(filename, mode)
-    elsif mode._isFixnum
-      f = self._open(filename, mode, -1)  # fdopen() or open()
-    else
-      raise TypeError, 'second arg neither Fixnum nor String'
-    end
-    if f._isFixnum
-      Errno.raise_errno(f, filename )
-    end
-    f.initialize
-    f
-  end
-
-  def self.new(filename)
+  def self.open(filename, mode=Undefined, permission=Undefined, &blk)
     filename = Type.coerce_to(filename, String, :to_str)
-    self.new(filename, 'r')
-  end
-
-  def self.open(filename, mode, permission, &blk)
-    unless mode._isFixnum
-      raise TypeError, 'second arg not a Fixnum '
+    nargs = 1
+    if mode.equal?(Undefined)
+      mode = 'r'
+      nargs = 2
+    else
+      if permission.equal?(Undefined)
+        nargs = 2
+      else
+        unless permission._isFixnum
+          raise TypeError, 'third arg not a Fixnum '
+        end
+        nargs = 3
+      end
     end
-    unless permission._isFixnum
-      raise TypeError, 'third arg not a Fixnum '
+    if nargs.equal?(2)
+      if mode._isString
+        f = self._fopen(filename, mode)
+      elsif mode._isFixnum
+        f = self._open(filename, mode, -1)
+      else
+        raise TypeError, 'second arg neither Fixnum nor String'
+      end
+    else
+      unless mode._isFixnum
+        raise TypeError, 'second arg not a Fixnum '
+      end
+      f = self._open(filename, mode, permission)
     end
-    f = self._open(filename, mode, permission)
     if f._isFixnum
       Errno.raise_errno(f, filename )
     end
@@ -382,52 +374,6 @@ class File
     else
       f 
     end
-  end
-
-  def self.open(filename, mode, &blk)
-    if mode._isString
-      f = self._fopen(filename, mode)
-    elsif mode._isFixnum
-      f = self._open(filename, mode, -1)
-    else
-      raise TypeError, 'second arg neither Fixnum nor String'
-    end
-    if f._isFixnum
-      Errno.raise_errno(f, filename )
-    end
-    if block_given?
-      begin
-        blk.call(f)
-      ensure
-        f.close rescue nil
-      end
-    else
-      f
-    end
-  end 
-
-  def self.open(filename, mode)
-    if mode._isString
-      f = self._fopen(filename, mode)
-    elsif mode._isFixnum
-      f = self._open(filename, mode, -1)
-    else
-      raise TypeError, 'second arg neither Fixnum nor String'
-    end
-    if f._isFixnum
-      Errno.raise_errno(f, filename )
-    end
-    f
-  end 
-
-  def self.open(filename, &blk)
-    filename = Type.coerce_to(filename, String, :to_str)
-    self.open(filename, 'r', &blk)
-  end
-
-  def self.open(filename)
-    filename = Type.coerce_to(filename, String, :to_str)
-    self.open(filename, 'r')
   end
 
   def self.owned?(filename)
