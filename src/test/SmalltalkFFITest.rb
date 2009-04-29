@@ -1,5 +1,7 @@
-unless File.directory?("#{ENV['MAGLEV_HOME']}/lib/ruby/site_ruby/1.8/smalltalk")
+dirname = "#{ENV['MAGLEV_HOME']}/lib/ruby/site_ruby/1.8/smalltalk"
+unless File.directory?(dirname)
   Dir.chdir "#{ENV['MAGLEV_HOME']}" do
+    puts "generating stwrappers"
     system 'rake dev:stwrappers'
   end
 end

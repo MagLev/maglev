@@ -3,6 +3,10 @@ run
 RubyContext load .
 year := DateAndTime now year printString.
 directory := '$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/'.
+(GsFile isServerDirectory: directory) == true ifFalse:[ | dirOk |
+  dirOk := GsFile createServerDirectory: directory .
+  dirOk ifNil:[ Error signal:'failed to create directory' ].
+].
 classes := Module _wrappedSmalltalkClasses .
 1 to: classes size by: 2 do:[:n | | eachClass stName file isRubyCls inDcSeg |
     eachClass := classes at: n .

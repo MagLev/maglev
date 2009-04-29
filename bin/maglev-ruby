@@ -6,21 +6,32 @@ COMMAND="`basename $0`"
 usage()
 {
 cat << EOF
-Usage: $COMMAND [options] <filename>
+Usage: $COMMAND [options] [--] filename [script-args]
 
     Execute a Ruby file
 
+    Currently, the filename argument is required.
+
 OPTIONS:
-   -d           Set debugging flags
-   -G           Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
-   -h           Show this message and exit
-   --help       Show this message and exit
-   -v           Print version number, then turn on verbose mode
-   -w           Turn warnings on
-   --copyright  Print copyright and exit
-   --version    Print version number and exit
+   --copyright    Print copyright and exit
+   -d, --debug    Set debugging flags
+   -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
+   -h             Show this message and exit
+   --help         Show this message and exit
+   -M<opt>        Pass a maglev option to the VM.  This flag may be passed multiple
+                  times.  The currently recognized options are:
+                    traceLoad     Trace loading of ruby files
+                    logSexp       Print sexpressions as they are parsed
+   -v, --verbose  Print version number, then turn on verbose mode
+   --version      Print version number and exit
+
+MagLev will also read the MAGLEV_OPTS environment variable for options.
 EOF
 }
+
+# Prepend the maglev options onto the passed parameters so we can parse
+# them all the same in one pass
+set -- $MAGLEV_OPTS $@
 
 # Make sure MAGLEV_HOME is set
 if [ -z "${MAGLEV_HOME}" ]; then
@@ -46,14 +57,15 @@ export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 
 args=""
 debug=0
+maglev_options=""
 while [[ $# > 0 ]]
 do
-    case $1 in
+    case "$1" in
         --copyright)
             echo "maglev - Copyright (C) 2008-2009 GemStone Systems, Inc."
             exit
             ;;
-        -d)
+        -d|--debug)
             debug=1
             ;;
         -e)
@@ -63,11 +75,7 @@ do
         -G)
             unset GEMSTONE_GLOBAL_DIR
             ;;
-        -h)
-            usage
-            exit
-            ;;
-        --help)
+        -h|--help)
             usage
             exit
             ;;
@@ -78,6 +86,9 @@ do
         -I*)
             args="$args '$1'"
             ;;
+        -M*)
+            maglev_options="$maglev_options ${1:2}"
+            ;;
         -v|--verbose)
             grep ^maglev $MAGLEV_HOME/version.txt
             if [ $# -eq 1 ]; then exit; fi
@@ -86,8 +97,19 @@ do
             grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
-        -w)
-            warning=1
+#         -w)
+#             warning=1
+#             ;;
+
+        --)
+            break
+            ;;
+        -*)
+            echo
+            echo "Unrecognized option: $1"
+            echo
+            usage
+            exit
             ;;
         *)
             break
@@ -132,11 +154,12 @@ if [ $debug == 1 ]; then
 else
   cat $MAGLEV_HOME/etc/.topazini > $dbscript
 fi
+
 cat - >> $dbscript <<-EOFA
 run
 | res ctx |
-(ctx := RubyContext) load .
-ctx default runFileNamed: '$RUBYSCRIPT' withARGV: #($args) .
+(ctx := RubyContext load: #($maglev_options) ) .
+ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) .
 GsFile stdout close . "ensure final LF on stdout"
 ^ res
 %
@@ -144,7 +167,7 @@ EOFA
 
 # generate a topaz exit command as last line of init file
 if [ $debug == 0 ]; then
-  cat - >> $dbscript <<-EOFB  
+  cat - >> $dbscript <<-EOFB
 exit
 EOFB
 else

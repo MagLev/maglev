@@ -9,6 +9,23 @@ class File
 
   Stat = _resolve_smalltalk_global(:GsFileStat)
 
+  class_primitive_nobridge '_section2OpenConstants', '_section2OpenConstants'
+
+  # Note, these constants are OS independent values different than
+  #  any found on common variants of Unix. They are translated to 
+  #  OS dependent values by the primitives.  Use of other hardcoded values
+  #  will cause Exceptions during file openinng.
+  APPEND = self._section2OpenConstants[:RUBY_APPEND]
+  CREAT = self._section2OpenConstants[:RUBY_CREAT]
+  EXCL = self._section2OpenConstants[:RUBY_EXCL]
+  NOCTTY = self._section2OpenConstants[:RUBY_NOCTTY]
+  NONBLOCK = self._section2OpenConstants[:RUBY_NONBLOCK]
+  RDONLY = self._section2OpenConstants[:RUBY_RDONLY]
+  RDWR = self._section2OpenConstants[:RUBY_RDWR]
+  TRUNC = self._section2OpenConstants[:RUBY_TRUNC]
+  WRONLY = self._section2OpenConstants[:RUBY_WRONLY]
+  # 
+
   # FILE::LOCK  constants initialized below
 
   primitive 'close', 'close'
@@ -25,15 +42,18 @@ class File
   class_primitive_nobridge '_fstat','fstat:isLstat:'
 
   # _stat will return either a stat object or ERRNO
-  class_primitive_nobridge '_stat','stat:isLstat:'
+  class_primitive_nobridge '__stat','stat:isLstat:'
   class_primitive_nobridge '_umask', '_umask:'
 
-  class_primitive_nobridge '_open', 'rubyOpen:mode:'
+  class_primitive_nobridge '_open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
+  class_primitive_nobridge '_fopen', '_rubyFopen:mode:' # path is String or Fixnum, mode is a String
+				      # first arg determines use of fdopen or open
   class_primitive 'stdin'
   class_primitive 'stdout'
   class_primitive 'stderr'
   class_primitive_nobridge '_environmentAt', '_expandEnvVariable:isClient:'
   class_primitive_nobridge '_delete', 'removeServerFile:'
+
 
   # For Dir.rb
   class_primitive_nobridge '_dir_contents', 'contentsOfDirectory:onClient:'
@@ -52,12 +72,12 @@ class File
     end
   end
 
-#   def self._stat(name, is_lstat)
-#     unless name.equal?(nil)
-#       name = Type.coerce_to(name, String, :to_s)
-#     end
-#     __stat(name, is_lstat)
-#   end
+  def self._stat(name, is_lstat)
+    unless name.equal?(nil)
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    __stat(name, is_lstat)
+  end
 
   # TODO: consider using FFI to call libc basename
   def self.basename(filename, suffix='')
@@ -307,61 +327,107 @@ class File
     File.stat(filename).mtime
   end
 
-  def self.new(*args, &blk)
-    # first variant gets bridge methods
-    len = args.length
-    if len > 0
-      if len.equal?(1)
-        f = self.new(args[0], 'r')
-      else
-        f = self.new(args[0], args[1])
-      end
-      f.initialize(*args, &blk)
-      f
-    else
-      raise ArgumentError, 'too few args'
+  def self.new(filename, mode, permission)
+    unless mode._isFixnum
+      raise TypeError, 'second arg not a Fixnum '
     end
-  end
-
-  def self.new(filename)
-    # subsequent variants replace just the corresponding bridge method
-    filename = Type.coerce_to(filename, String, :to_str)
-    f = self._open(filename, 'r')
-    if f.equal?(nil)
-      raise Errno::ENOENT, "No such file or directory - #{filename}"
+    unless permission._isFixnum
+      raise TypeError, 'third arg not a Fixnum '
+    end
+    f = self._open(filename, mode, permission)
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
     end
     f.initialize
     f
   end
 
   def self.new(filename, mode)
-    filename = Type.coerce_to(filename, String, :to_str)
-    f = self._open(filename, mode)
-    if f.equal?(nil)
-      raise Errno::ENOENT, "No such file or directory - #{filename}"
+    if mode._isString
+      f = self._fopen(filename, mode)
+    elsif mode._isFixnum
+      f = self._open(filename, mode, -1)  # fdopen() or open()
+    else
+      raise TypeError, 'second arg neither Fixnum nor String'
+    end
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
     end
     f.initialize
     f
   end
 
-
-  def self.open(filename, mode="r", perm = 0644, &b)
-    # Not easy to pass the perm flag to open(2) through smalltalk,
-    # so manage it here.  First, see if the file exists
+  def self.new(filename)
     filename = Type.coerce_to(filename, String, :to_str)
-    stat_obj = File._stat(filename, false)
-    f = self._open(filename, mode)
-    Errno.raise_errno(stat_obj, filename) if f.equal?(nil)
+    self.new(filename, 'r')
+  end
 
-    f.chmod(perm) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
-
-    return f unless block_given?
-
-    begin
-      b.call(f)
-    ensure
-      f.close rescue nil
+  def self.open(filename, mode, permission, &blk)
+    unless mode._isFixnum
+      raise TypeError, 'second arg not a Fixnum '
     end
+    unless permission._isFixnum
+      raise TypeError, 'third arg not a Fixnum '
+    end
+    f = self._open(filename, mode, permission)
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
+    if block_given?
+      begin
+        blk.call(f)
+      ensure
+        f.close rescue nil
+      end
+    else
+      f 
+    end
+  end
+
+  def self.open(filename, mode, &blk)
+    if mode._isString
+      f = self._fopen(filename, mode)
+    elsif mode._isFixnum
+      f = self._open(filename, mode, -1)
+    else
+      raise TypeError, 'second arg neither Fixnum nor String'
+    end
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
+    if block_given?
+      begin
+        blk.call(f)
+      ensure
+        f.close rescue nil
+      end
+    else
+      f
+    end
+  end 
+
+  def self.open(filename, mode)
+    if mode._isString
+      f = self._fopen(filename, mode)
+    elsif mode._isFixnum
+      f = self._open(filename, mode, -1)
+    else
+      raise TypeError, 'second arg neither Fixnum nor String'
+    end
+    if f._isFixnum
+      Errno.raise_errno(f, filename )
+    end
+    f
+  end 
+
+  def self.open(filename, &blk)
+    filename = Type.coerce_to(filename, String, :to_str)
+    self.open(filename, 'r', &blk)
+  end
+
+  def self.open(filename)
+    filename = Type.coerce_to(filename, String, :to_str)
+    self.open(filename, 'r')
   end
 
   def self.owned?(filename)
