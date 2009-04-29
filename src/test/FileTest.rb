@@ -104,4 +104,9 @@ s = FileTest.size(__FILE__)
 test(s > 100, true, 'FileTest.size(__FILE__)')
 
 
+# The mac had a problem opening a file with these perms (the
+# underlying primitive fdopen was using "a+" rather than "a".
+log = open(__FILE__, (File::WRONLY | File::APPEND))
+log.close
+
 report
