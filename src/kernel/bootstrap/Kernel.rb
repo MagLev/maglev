@@ -413,6 +413,8 @@ module Kernel
 
   primitive_nobridge '_system', '_system:'
 
+  primitive '`',   '_system:'  
+
   def system(command, *args)
     cmd = command
     n = 0
