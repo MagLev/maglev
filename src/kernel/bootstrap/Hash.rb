@@ -5,7 +5,7 @@ class Hash
   primitive 'keys', 'keys'
 
   # Class methods
-  class_primitive_nobridge '_new', '_new:defaultValue:'
+  class_primitive_nobridge '_new', '_new:'
 
   def self.new(*args)
     # first variant gets bridge methods
@@ -19,7 +19,7 @@ class Hash
     else
       # raises ArgumentError, too-many args, unless  a subclass of Hash
       #   has implemented forms of initialize to take > 1 arg
-      h = self._new(5, nil)
+      h = self._new(5)
       h.initialize(*args)
     end
     h
@@ -28,23 +28,23 @@ class Hash
   def self.new(&block)
     # subsequent variants replace just the corresponding bridge method
     if block_given?
-      h = self._new(5, block)
+      h = self._new(5)
       h.initialize(&block)
     else
-      h = self._new(5, nil)
+      h = self._new(5)
       h.initialize
     end
     h
   end
 
   def self.new
-    h = self._new(5, nil)
+    h = self._new(5)
     h.initialize
     h
   end
 
   def self.new(default_value)
-    h = self._new(5, default_value)
+    h = self._new(5)
     h.initialize(default_value)
     h
   end
@@ -52,7 +52,7 @@ class Hash
   def self.new(default_value, &block)
     # raises ArgumentError, too-many args, unless  a subclass of Hash
     #   has implemented forms of initialize to take > 1 arg
-    h = self._new(5, default_value)
+    h = self._new(5)
     h.initialize(default_value, &block) # raises too-many args
     h
   end
@@ -74,7 +74,8 @@ class Hash
     if tsize < 5
       tsize = 5
     end
-    res = self._new(tsize , nil)
+    res = self._new(tsize)
+    res.default=(nil)
     while (n < numelem)
       res[ elements[n] ] = elements[n + 1]
       n += 2
@@ -93,7 +94,8 @@ class Hash
       if self.equal?(arg.class)
         arg.dup
       else
-        res = self._new(arg.size, nil)
+        res = self._new(arg.size)
+        res.default=(nil)
         arg.each_pair { |k, v| res[k] = v }
         res
       end
@@ -111,10 +113,16 @@ class Hash
     end
     self
   end
+  def initialize  # zero args
+    self.default=(nil)
+    self
+  end
   def initialize(one_arg)
+    self.default=(one_arg)
     self
   end
   def initialize(&block)
+    self.default=(block)
     self
   end
   def initialize(one_arg, &block)
