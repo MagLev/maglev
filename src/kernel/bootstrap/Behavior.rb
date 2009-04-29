@@ -78,7 +78,7 @@ class Behavior
   end
 
   def define_method(sym, &blk)
-    _define_method_block(sym, &blk)
+    define_method(sym, blk)
   end
 
   primitive_nobridge '_include_module', 'includeRubyModule:' 
