@@ -164,8 +164,7 @@ fi
 cat - >> $dbscript <<-EOFA
 run
 | res ctx |
-(ctx := RubyContext) load .
-ctx default setMagLevOptions: #($maglev_options) .
+(ctx := RubyContext load: #($maglev_options) .
 ctx default runFileNamed: '$RUBYSCRIPT' withARGV: #($args) .
 GsFile stdout close . "ensure final LF on stdout"
 ^ res
