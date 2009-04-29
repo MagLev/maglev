@@ -75,12 +75,17 @@ class Module
 
   class_primitive_nobridge '_new_module', 'newModule'
 
-  def self.new(&block)
+  def self.new(*args, &block)
     m = _new_module
+    m.initialize(*args)
     if block_given?
       m.module_eval(&block)
     end
     m
+  end
+
+  def initialize(*args)
+    self
   end
 
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'
