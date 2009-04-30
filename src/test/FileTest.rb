@@ -115,4 +115,10 @@ log.close
 log = open(__FILE__, (File::WRONLY | File::APPEND | File::CREAT))
 log.close
 
+# Another way to open files we need to support (from fileutils.rb)
+fname = __FILE__ + 'x'
+log = open(fname, 'wb', 0644)
+log.close
+File.delete(fname) if File.exist?(fname)
+
 report
