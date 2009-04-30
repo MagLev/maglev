@@ -12,7 +12,7 @@ class File
   class_primitive_nobridge '_section2OpenConstants', '_section2OpenConstants'
 
   # Note, these constants are OS independent values different than
-  #  any found on common variants of Unix. They are translated to 
+  #  any found on common variants of Unix. They are translated to
   #  OS dependent values by the primitives.  Use of other hardcoded values
   #  will cause Exceptions during file openinng.
   APPEND = self._section2OpenConstants[:RUBY_APPEND]
@@ -24,7 +24,7 @@ class File
   RDWR = self._section2OpenConstants[:RUBY_RDWR]
   TRUNC = self._section2OpenConstants[:RUBY_TRUNC]
   WRONLY = self._section2OpenConstants[:RUBY_WRONLY]
-  # 
+  #
 
   # FILE::LOCK  constants initialized below
 
@@ -47,7 +47,7 @@ class File
 
   class_primitive_nobridge '_open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
   class_primitive_nobridge '_fopen', '_rubyFopen:mode:' # path is String or Fixnum, mode is a String
-				      # first arg determines use of fdopen or open
+              # first arg determines use of fdopen or open
   class_primitive 'stdin'
   class_primitive 'stdout'
   class_primitive 'stderr'
@@ -329,7 +329,7 @@ class File
 
 
   def self.new(filename, mode=Undefined, permission=Undefined)
-    self.open(filename, mode, permission) 
+    self.open(filename, mode, permission)
   end
 
   def self.open(filename, mode=Undefined, permission=Undefined, &blk)
@@ -357,14 +357,18 @@ class File
         raise TypeError, 'second arg neither Fixnum nor String'
       end
     else
-      unless mode._isFixnum
-        raise TypeError, 'second arg not a Fixnum '
+      if mode._isFixnum
+        f = self._open(filename, mode, permission)
+      else
+        stat_obj = File._stat(filename, false) # does file exist before we create?
+        f = self._fopen(filename, mode)
+        Errno.raise_errno(stat_obj, filename) if f.equal?(nil)
+        f.chmod(perm) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
       end
-      f = self._open(filename, mode, permission)
     end
-    if f._isFixnum
-      Errno.raise_errno(f, filename )
-    end
+
+    Errno.raise_errno(f, filename ) if f._isFixnum
+
     if block_given?
       begin
         blk.call(f)
@@ -372,7 +376,7 @@ class File
         f.close rescue nil
       end
     else
-      f 
+      f
     end
   end
 
