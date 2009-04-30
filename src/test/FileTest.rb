@@ -108,5 +108,11 @@ test(s > 100, true, 'FileTest.size(__FILE__)')
 # underlying primitive fdopen was using "a+" rather than "a".
 log = open(__FILE__, (File::WRONLY | File::APPEND))
 log.close
+# This one raised a bogus error:
+# error , TypeError,  'both APPEND and CREAT specified',
+#           during /Users/pmclain/projects/maglev/git/src/test/FileTest.rb
+# ERROR 2508, TypeError,  'both APPEND and CREAT specified'TypeError,  'both APPEND and CREAT specified'
+log = open(__FILE__, (File::WRONLY | File::APPEND | File::CREAT))
+log.close
 
 report
