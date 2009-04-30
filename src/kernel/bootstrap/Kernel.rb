@@ -152,13 +152,13 @@ module Kernel
   end
 
   def exit(arg=1)
-    status = '9'
+    status = 9
     if (arg.equal?(true))
-      status = '0'
+      status = 0
     elsif (arg._isInteger)
-      status = arg.to_s
+      status = arg
     end
-    raise SystemExit , status
+    raise SystemExit.new(status)
   end
 
   primitive 'format*', 'sprintf:with:'
@@ -340,14 +340,14 @@ module Kernel
   # def rand #  implemented in Kernel2.rb
 
   def raise(ex_class, message)
-    ex = ex_class.exception
-    ex._signal(message)
+    ex = ex_class.exception(message)
+    ex._signal
   end
 
   def raise(ex_class, message, stack)
-    ex = ex_class.exception
+    ex = ex_class.exception(message)
     ex.set_backtrace(stack)
-    ex._signal(message)
+    ex._signal
   end
 
   def raise(msg)
@@ -413,7 +413,7 @@ module Kernel
 
   primitive_nobridge '_system', '_system:'
 
-  primitive '`',   '_system:'  
+  primitive '`',   '_system:'
 
   def system(command, *args)
     cmd = command
