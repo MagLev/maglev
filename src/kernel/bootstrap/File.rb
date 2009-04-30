@@ -363,7 +363,7 @@ class File
         stat_obj = File._stat(filename, false) # does file exist before we create?
         f = self._fopen(filename, mode)
         Errno.raise_errno(stat_obj, filename) if f.equal?(nil)
-        f.chmod(perm) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
+        f.chmod(permission) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
       end
     end
 
