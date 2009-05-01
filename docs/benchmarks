@@ -1,7 +1,8 @@
 == MagLev Benchmarks
 
-The benchmark directory contains a copy of Brian Ford's refactoring of the
-Ruby Benchmark Suite project as used by the Rubinius project. 
+The benchmark directory contains a copy of the Ruby Benchmark Suite.
+For historical comparisons, we added back some "trivial" VM benchmarks
+that have been removed from the project, 
 
 The primary Ruby Benchmark Suite project is at:
   http://github.com/acangiano/ruby-benchmark-suite/
@@ -16,7 +17,7 @@ Benchmarks are run using rake. Type "rake -T bench" to see options.
 
 Examples:
   rake bench
-  rake bench:file FILE=benchmark/rbs/core-features/bm_app_tak.rb
-  rake bench:dir DIR=benchmark/rbs/core-features
+  rake bench:file FILE=benchmark/rbs/micro-benchmarks/bm_app_tak.rb
+  rake bench:dir DIR=benchmark/rbs/micro-benchmarks
   rake bench:to_csv
 

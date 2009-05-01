@@ -1,7 +1,6 @@
 # Maps to Smalltalk class UserException.  See Globals.rb
 class Exception
     class_primitive 'allocate', 'rubyBasicNew'
-    class_primitive 'exception', 'new'
     class_primitive '_signal', 'signal:'
     class_primitive_nobridge '_signal', 'signal'
 
@@ -20,6 +19,11 @@ class Exception
     primitive          'message', 'description'
     primitive_nobridge '_message=', 'messageText:'
 
+    # Define this in ruby code so we get the full env1 creation hooks
+    def self.exception(message=nil)
+      self.new(message)
+    end
+
     def self._validate(obj)
       # used in implementation of $! on LHS of assignment
       if (obj.kind_of?(Exception))
@@ -30,6 +34,11 @@ class Exception
     end
 
     IncludeSmalltalkFrames = false;
+
+    def initialize(message=nil)
+      message = self.class.name if message.nil?
+      self._message=(message)
+    end
 
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
@@ -69,8 +78,6 @@ end
 #  order here matches order in  Exception(C)>>commentRubyMapping
 
 class SystemExit
-  # MNI: SystemExit#status
-  # MNI: SystemExit#success?
 end
 
 class SystemStackExit
@@ -132,6 +139,6 @@ end
 # class RubyTimeoutError  is defined in the maglev*.mcz
 #   RubyTimeoutError deprecated , just use  lib/ruby/1.8/timeout.rb
 # RUBY.global("TimeoutError", "RubyTimeoutError")
-# class TimeoutError 
+# class TimeoutError
 #  class_primitive_nobridge 'timeout', 'timeout:do:'
 # end

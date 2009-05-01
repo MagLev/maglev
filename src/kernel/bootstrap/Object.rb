@@ -12,20 +12,20 @@ class Object
     #  installed by RubyContext>>installPrimitiveBootstrap :
     #    primitive_nobridge 'class', 'class' # installed in Object
 
-    #  Reimplementation of the following special selectors is disallowed 
+    #  Reimplementation of the following special selectors is disallowed
     #  by the parser and they are optimized by code generator to special bytecodes.
     #  Attempts to reimplement them will cause compile-time errors.
-    # _isArray  	# smalltalk   _isArray
-    # _isBlock  	# smalltalk   _isExecBlock
-    # _isFixnum 	# smalltalk   _isSmallInteger
-    # _isFloat  	# smalltalk   _isFloat
-    # _isHash   	# smalltalk   _isRubyHash
-    # _isInteger	# smalltalk  _isInteger
-    # _isNumeric 	# smalltalk   _isNumber
-    # _isRegexp 	# smalltalk   _isRegexp
-    # _isRange  	# smalltalk   _isRange
-    # _isString 	# smalltalk   _isRubyString  # returns false for Symbols
-    # _isSymbol 	# smalltalk   _isSymbol      # returns false for Strings
+    # _isArray    # smalltalk   _isArray
+    # _isBlock    # smalltalk   _isExecBlock
+    # _isFixnum   # smalltalk   _isSmallInteger
+    # _isFloat    # smalltalk   _isFloat
+    # _isHash     # smalltalk   _isRubyHash
+    # _isInteger  # smalltalk  _isInteger
+    # _isNumeric  # smalltalk   _isNumber
+    # _isRegexp   # smalltalk   _isRegexp
+    # _isRange    # smalltalk   _isRange
+    # _isString   # smalltalk   _isRubyString  # returns false for Symbols
+    # _isSymbol   # smalltalk   _isSymbol      # returns false for Strings
     # _isStringOrSymbol # smalltalk _isOneByteString
 
 
@@ -112,7 +112,7 @@ class Object
       res = self._basic_dup
       res.initialize_copy(self)
       res
-    end 
+    end
 
     def clone
       res = self._basic_clone
@@ -139,7 +139,7 @@ class Object
        #     ruby lookup semantics          0x100
        #     ruby receiver is self         0x1000 (for future use)
        #     cache successes in code_gen  0x10000
-    
+
     def respond_to?(symbol, include_private)
       _responds_to(symbol, include_private, 0x10101)
     end
@@ -168,13 +168,13 @@ class Object
       #  so  _splat_return_value does not have complex ExecBlocks
       v = self
       begin
-	v = Type.coerce_to(self, Array, :to_ary)
+  v = Type.coerce_to(self, Array, :to_ary)
       rescue TypeError
-	begin 
-	  v = Type.coerce_to(self, Array, :to_a)
-	rescue TypeError
-	  # ignore
-	end 
+  begin
+    v = Type.coerce_to(self, Array, :to_a)
+  rescue TypeError
+    # ignore
+  end
       end
       v
     end
@@ -187,13 +187,13 @@ class Object
       end
       sz = v.length
       if sz < 2
-	if sz.equal?(0)
-	  return nil
-	else
-	  return v[0]
-	end
+  if sz.equal?(0)
+    return nil
+  else
+    return v[0]
+  end
       else
-	return v
+  return v
       end
     end
 
@@ -267,10 +267,13 @@ class Object
 
     def extend(*modules)
       if (modules.length > 0)
-	cl = class << self
-	  self
-	end
-	modules.each{ |aModule| cl.include(aModule) }
+        cl = class << self
+               self
+             end
+        modules.each do |aModule|
+          cl.include(aModule)
+          aModule.extended(self)
+        end
       end
       self
     end
@@ -390,16 +393,16 @@ class Object
     end
 
     def private_methods(unused_boolean=true)
-      _ruby_methods(2) 
+      _ruby_methods(2)
     end
 
     def protected_methods(unused_boolean=true)
-      _ruby_methods(1) 
+      _ruby_methods(1)
     end
 
     def singleton_method_added(a_symbol)
      # invoked from code in .mcz when a singleton method is compiled
-     # overrides the bootstrap implementation in Object_ruby.gs 
+     # overrides the bootstrap implementation in Object_ruby.gs
      self
     end
     #  cannot make singleton_method_added private yet

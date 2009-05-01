@@ -74,4 +74,43 @@ end
 actual = e3.message
 raise "Expecting #{msg_b.inspect} but got #{actual.inspect} from e3" unless actual == msg_b
 
+
+
+
+# From RubyGems
+class FooException < SystemExit
+  attr_accessor :exit_code
+  def initialize(exit_code)
+    @exit_code = exit_code
+    super "Exiting RubyGems with exit_code #{exit_code}"
+  end
+end
+
+begin
+  raise FooException, 1
+rescue FooException => ex
+  raise "Fail FooException exit code: #{ex.exit_code}" unless ex.exit_code == 1
+  raise "Fail FooException message" unless ex.message == "Exiting RubyGems with exit_code 1"
+end
+
+begin
+  raise SystemExit, 12
+rescue SystemExit => ex
+  raise "Fail SystemExit 12 status: #{ex.status.inspect}" unless ex.status == 12
+  raise "Fail SystemExit 12 message" unless ex.message == 'SystemExit'
+end
+
+begin
+  raise SystemExit.new
+rescue SystemExit => ex
+  raise "Fail SystemExit default status: #{ex.status.inspect}" unless ex.status == 0
+  raise "Fail SystemExit default message" unless ex.message == 'SystemExit'
+end
+
+begin
+  exit(99)
+rescue SystemExit => ex
+  raise "Fail exit(99)" unless ex.status == 99
+end
+
 0

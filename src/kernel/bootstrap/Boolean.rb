@@ -21,4 +21,8 @@ class Boolean
   def to_s
     self.equal?(true) ? "true" : "false"
   end
+
+  def self.===(other)
+    return other.class.equal?(self)
+  end
 end
