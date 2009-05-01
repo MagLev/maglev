@@ -3,7 +3,6 @@
   $MAGLEV_HOME
     |
     + benchmarks    # Benchmarks from the Ruby Benchmark Suite project
-    |               # as modified by Brian Ford of the Rubinius project
     |
     + bin           # MagLev shell scripts to run MagLev, the parser and
     |               # start the Gemstone VM

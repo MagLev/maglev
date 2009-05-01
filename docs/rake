@@ -73,16 +73,19 @@ The developer tasks are specific to the GemStone's internal MagLev development
 environment and may depend on files not shipped with the Alpha release.
 Run at your own risk:
 
-  rake dev:bm-tests               # Run the bm smoke tests
-  rake dev:clean-gems             # Clean up after a test install of rubygems
-  rake dev:ensure_stopped         # Make sure the gemstone server is stopped.
-  rake dev:ensureprims            # Ensure kernel.rb (primitives) is loaded and committed
-  rake dev:install-latest         # Stop server, install ../latest*, and reload primitives
-  rake dev:install-tgz            # Stop current server and install ../latest-product.tgz
-  rake dev:loadmcz                # Load the mcz file ../latest.mcz and commit it.
-  rake dev:passing                # Run the passing specs
-  rake dev:reloadprims            # Reload kernel.rb (primitives) and commit it
-  rake dev:smoke                  # Run the passing specs and the vm tests
-  rake dev:vm-tests               # Run the vm smoke tests
+  rake dev:bm-tests          # Run the bm smoke tests
+  rake dev:clean-gems        # Clean up after a test install of rubygems
+  rake dev:ensure_stopped    # Make sure the gemstone server is stopped.
+  rake dev:ensureprims       # Ensure kernel.rb (primitives) is loaded and committed
+  rake dev:install-latest    # Stop server, install ../latest*, and reload primitives
+  rake dev:install-tgz       # Stop current server and install ../latest-product.tgz
+  rake dev:loadmcz           # Load the mcz file ../latest.mcz and commit it.
+  rake dev:passing           # Run the passing specs
+  rake dev:reloadprims       # Reload kernel.rb (primitives) and commit it
+  rake dev:smoke             # Run the passing specs and the vm tests
+  rake dev:snapshot          # Save a snapshot: Stop the server, copy data/* to snapshot, restart the server
+  rake dev:stwrappers        # Create .rb files for each smalltalk class (lib/ruby/site_ruby/1.8/smalltalk/*)
+  rake dev:tosnapshot        # Restore from snapshot: Stop the server, copy snapshot/* to data, restart the server
+  rake dev:vm-tests          # Run the vm smoke tests
 
-  rake squeak               # Run a squeak image
+  rake squeak                # Run a squeak image
