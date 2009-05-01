@@ -29,12 +29,12 @@ in the +$MAGLEV_HOME+ directory.
 
 [<tt>mspec/</tt>]
   A git submodule that tracks the mspec framework.
-  As of 2009-01-22, this is at version 1.5.6 of mspec.
+  As of 2009-05-01, this is at version 1.5.11 of mspec.
   http://github.com/rubyspec/mspec
 
 [<tt>rubyspec/</tt>]
   A git submodule that tracks the rubyspecs.
-  As of 2009-01-22, this was the HEAD from the rubyspec git repository.
+  As of 2009-05-01, this was the HEAD from the rubyspec git repository.
   http://github.com/rubyspec/rubyspec
 
 [<tt>tags/</tt>]
