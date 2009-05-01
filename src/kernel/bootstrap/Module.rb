@@ -35,11 +35,16 @@ class Module
   def included(a_module)
   end
 
+  # Callback invoked whenever the receiver is used to extend an object.
+  # The object is passed as a paramter.
+  def extended(a_module)
+  end
+
   def method_added(a_symbol)
     # invoked from code in .mcz when a method is compiled into receiver
     # overrides the bootstrap implementation in Behavior_ruby.gs
     nil
-  end 
+  end
 
   def method_removed(a_symbol)
     # invoked from code in .mcz when a method is removed from receiver

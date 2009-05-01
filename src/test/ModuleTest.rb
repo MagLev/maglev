@@ -118,22 +118,22 @@ end
 test( test_eval_with_tilde() , true, 'eval with tilde' )
 
 
-# # Do some tests of callbacks
-# $extended = Hash.new
-# module M
-#   def self.extended(obj)
-#     puts "#{self} extended #{obj}"
-#     $extended[self] = obj
-#     super
-#   end
-#   def self.extend_object(obj)
-#     puts "#{self} extend_object #{obj}\n"
-#   end
-# end
+# Do some tests of callbacks
+$extended = Hash.new
+module M
+  def self.extended(obj)
+    puts "#{self} extended #{obj}"
+    $extended[self] = obj
+    super
+  end
+  def self.extend_object(obj)
+    puts "#{self} extend_object #{obj}\n"
+  end
+end
 
-# x = Object.new
-# x.extend(M)
-# raise "Module M: extended not called" unless $extended[M] == x
+x = Object.new
+x.extend(M)
+raise "Module M: extended not called" unless $extended[M] == x
 
 ################### Report and clean up #####################
 report
