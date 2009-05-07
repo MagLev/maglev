@@ -121,8 +121,24 @@ end
 
 # Start the NetLDI but hide output
 def start_netldi
-  sh %{ ${GEMSTONE}/bin/startnetldi -g >/dev/null 2>&1 } do |ok, status|
-    raise "Couldn't start netldi #{ok}: #{status}" unless ok
+  logout = "#{MAGLEV_HOME}/log/rake.out"
+  logerr = "#{MAGLEV_HOME}/log/rake.err"
+  rm_f logout
+  rm_f logerr
+  begin
+    sh %{ ${GEMSTONE}/bin/startnetldi -g >#{logout} 2> #{logerr} } do |ok, status|
+      unless ok
+        puts "== STDOUT ====="
+        puts IO.readlines(logout)
+        puts "== STDERR ====="
+        puts IO.readlines(logerr)
+        puts "==============="
+        raise "Couldn't start netldi #{ok}: #{status}"
+      end
+    end
+  ensure
+    rm_f logout
+    rm_f logerr
   end
 end
 
