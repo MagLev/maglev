@@ -162,8 +162,46 @@ class String
     end
   end
 
-  primitive_nobridge '[]' , '_rubyAt:'
-  primitive_nobridge '[]' , '_rubyAt:length:'
+  primitive_nobridge '_at' , '_rubyAt:'
+  primitive_nobridge '_at_length' , '_rubyAt:length:'
+
+  def [](*args)
+    # This variant gets bridge methods
+    raise ArgumentError, 'wrong number of arguments'
+  end
+  def [](index)
+    if index._isRegexp
+      s = _at(index)
+      s.taint if index.tainted?
+    elsif index._isRange
+      first = Type.coerce_to(index.first, Integer, :to_int)
+      last =  Type.coerce_to(index.last,  Integer, :to_int)
+      #           _slice(start, last-start)
+      #start = index.begin
+      return nil if first > self.size
+      s = self._at(index)
+    elsif index._isString
+      s = self._at(index)
+      s.taint if ! s.nil? && index.tainted?
+    else
+      index = Type.coerce_to(index, Integer, :to_int)
+      s = self._at(index)
+    end
+    s.taint if self.tainted? and not s.nil?
+    s
+  end
+
+  def [](start, length)
+    length = Type.coerce_to(length, Integer, :to_int)
+    unless start._isRegexp
+      start = Type.coerce_to(start, Integer, :to_int)
+    end
+    return nil if length < 0
+
+    s = _at_length(start, length)
+    s.taint if self.tainted?
+    s
+  end
 
   primitive_nobridge '[]=', '_rubyAt:put:'
   primitive_nobridge '[]=', '_rubyAt:length:put:'
@@ -707,47 +745,36 @@ class String
 
   primitive 'size', 'size'
 
-  primitive          'slice', '_rubyAt:length:'
-  # start and length are both  int
+  alias slice []
 
-  primitive_nobridge 'slice', '_rubyAt:'
-  # arg may be an  int, range, regexp, or match_string
-
-  def slice(*args)
-    len = args.size
-    if len.equal?(1)
-      slice(args[0])
-    elsif len.equal?(2)
-      slice(args[0], args[1])
-    else
-      raise ArgumentError, 'expected 1 or 2 args'
-    end
-  end
-
-  def slice!(start, len)
-    raise TypeError, "can't modify frozen string" if frozen?
-
-    return nil if len < 0
-    return '' if len.equal?(0)
+  def slice!(start, a_len)
+    return nil if a_len < 0
+    return '' if a_len.equal?(0)
 
     sz = self.size
     start += sz if start < 0
     return nil if start < 0 || start > sz
     return '' if start.equal?(sz)
 
-    s = slice(start, len)
+    raise TypeError, "can't modify frozen string" if frozen?
 
-    stop = start + len
+    s = _at_length(start, a_len)
+
+    stop = start + a_len
     stop = sz if stop > sz
     _remove_from_to(start + 1, stop) # convert to smalltalk indexing
     s || ''
   end
 
   def slice!(arg)
-    raise TypeError, "can't modify frozen string" if frozen?
-    if arg._isFixnum
-      s = slice!(arg, 1)
-      s[0]
+    # Do NOT check for frozen here...fails specs
+    if arg._isRegexp
+      md = arg.match(self)
+      return nil if md.equal?(nil)
+      raise TypeError, "can't modify frozen string" if self.frozen?
+      start = md.begin(0)
+      len = md.end(0) - start
+      slice!(start, len)
     elsif arg._isRange
       start = arg.begin
       len = arg.end - start
@@ -755,15 +782,12 @@ class String
       slice!(start, len)
     elsif arg._isString
       start = self._findStringStartingAt(arg, 1)
-      start.equal?(nil) ? nil : slice!(start - 1, arg.length) # adjust coming from smalltalk
-    elsif arg._isRegexp
-      md = arg.match(self)
-      return nil if md.equal?(nil)
-      start = md.begin(0)
-      len = md.end(0) - start
-      slice!(start, len)
+      return nil if start.equal?(0)
+      slice!(start - 1, arg.length) # adjust coming from smalltalk
     else
-      raise TypeError, "String#slice! does not support #{arg.class}"
+      arg = Type.coerce_to(arg, Integer, :to_int)
+      s = slice!(arg, 1)
+      s[0]
     end
   end
 
