@@ -1018,8 +1018,19 @@ class String
     tot
   end
 
-  # MNI: swapcase
-  # MNI: swapcase!
+  primitive '_swapcase!', 'rubySwapcaseInPlace'
+
+  def swapcase!
+    raise TypeError, "can't modify frozen string" if frozen?
+    self._swapcase!
+  end
+
+  def swapcase
+    s = self.dup
+    s.swapcase!
+    s.taint if self.tainted?
+    s
+  end
 
   primitive 'to_f', 'asFloat'
   def to_i(base=10)
