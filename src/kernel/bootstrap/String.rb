@@ -972,7 +972,7 @@ class String
     else
       s = self
     end
-    "#{base}r#{s}"._to_i
+    "#{base}r#{s.delete('_').strip}"._to_i
   end
 
   # Return an array of two elements: [an_int, a_string], where an_int is
@@ -986,9 +986,13 @@ class String
   # "-1010".extract_base(16)   => [16, "-1010"]
   def extract_base(base=10)
     s = self.delete('_').strip
-    s =~ /^([+-]?)(0[bdox])?(.*)/i
-    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16}[$2.downcase] unless $2.equal?(nil)
+    s =~ /^([+-]?)(0[bdox]?)?(.*)/i
+    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8}[$2.downcase] unless $2.equal?(nil)
     [base, "#{$1}#{$3}"]
+  end
+
+  def to_a
+    self.empty? ? [] : [self]
   end
 
   def to_s
