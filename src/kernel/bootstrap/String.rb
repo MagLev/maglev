@@ -170,10 +170,17 @@ class String
 
   # MNI: String#~
 
-  primitive 'capitalize', 'rubyCapitalize'
+  primitive '_capitalize', 'rubyCapitalize'
+
+  def capitalize
+    x = _capitalize
+    x.taint if self.tainted?
+    x
+  end
 
   def capitalize!
-    x = capitalize
+    raise TypeError, "can't modify frozen string" if frozen?
+    x = _capitalize
     return nil if x == self
     replace(x)
   end
@@ -216,6 +223,7 @@ class String
   end
 
   def chomp!(rs=$/)
+    raise TypeError, "can't modify frozen string" if frozen?
     # check for nil and '' before doing rs[0] in elsif
     if rs.equal?(nil) || rs.empty?
       return self.dup
@@ -265,6 +273,7 @@ class String
   end
 
   def chop!
+    raise TypeError, "can't modify frozen string" if frozen?
     mySize = self.length
     if mySize > 0
       if self[-1].equal?(0xa)
@@ -293,7 +302,12 @@ class String
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
   primitive 'downcase', 'asLowercase'
-  primitive 'downcase!', 'rubyDowncaseInPlace'
+  primitive '_downcase!', 'rubyDowncaseInPlace'
+
+  def downcase
+    raise TypeError, "can't modify frozen string" if frozen?
+    _downcase!
+  end
 
   primitive '_dumpInto' , 'rubyDumpInto:'
 
@@ -541,10 +555,12 @@ class String
   end
 
   def gsub!(regex, str)
+    raise TypeError, "can't modify frozen string" if frozen?
     replace(gsub(regex, str))
   end
 
   def gsub!(regex, &block)
+    raise TypeError, "can't modify frozen string" if frozen?
     replace(gsub(regex, &block))
   end
 
@@ -598,7 +614,11 @@ class String
   primitive 'length', 'size'
 
   primitive 'lstrip', 'trimLeadingSeparators'
-  primitive 'lstrip!', '_removeLeadingSeparators' # in .mcz
+  primitive '_lstrip!', '_removeLeadingSeparators' # in .mcz
+  def lstrip!
+    raise TypeError, "can't modify frozen string" if frozen?
+    _lstrip!
+  end
 
   def match(pattern)
     if pattern._isRegexp
@@ -630,6 +650,7 @@ class String
   primitive_nobridge '_reverse_from', '_reverseFrom:'
 
   def reverse!
+    raise TypeError, "can't modify frozen string" if frozen?
     self._reverse_from(self) # returns self
   end
 
@@ -676,7 +697,11 @@ class String
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
-  primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
+  primitive '_rstrip!', '_removeTrailingSeparators'  # in .mcz
+  def rstrip!
+    raise TypeError, "can't modify frozen string" if frozen?
+    _rstrip!
+  end
 
   # def scan #  implemented in common/string.rb
 
@@ -700,6 +725,8 @@ class String
   end
 
   def slice!(start, len)
+    raise TypeError, "can't modify frozen string" if frozen?
+
     return nil if len < 0
     return '' if len.equal?(0)
 
@@ -717,6 +744,7 @@ class String
   end
 
   def slice!(arg)
+    raise TypeError, "can't modify frozen string" if frozen?
     if arg._isFixnum
       s = slice!(arg, 1)
       s[0]
@@ -852,6 +880,7 @@ class String
   primitive '_strip', 'withBlanksTrimmed'
 
   def strip!
+    raise TypeError, "can't modify frozen string" if frozen?
     replace(strip)
   end
 
@@ -890,6 +919,8 @@ class String
   end
 
   def sub!(pattern, replacement)
+    raise TypeError, "can't modify frozen string" if frozen?
+
     regex = _get_pattern(pattern, true)
     # stores into caller's $~
     if match = regex._match_vcglobals(self, 0x30)
@@ -903,6 +934,8 @@ class String
   def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
+    raise TypeError, "can't modify frozen string" if frozen?
+
     regex = _get_pattern(pattern, true)
     if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match)
