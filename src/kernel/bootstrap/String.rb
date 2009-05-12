@@ -339,10 +339,16 @@ class String
   primitive 'delete!*', 'rubyDeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
-  primitive 'downcase', 'asLowercase'
+  primitive '_downcase', 'asLowercase'
   primitive '_downcase!', 'rubyDowncaseInPlace'
 
   def downcase
+    s = _downcase
+    s.taint if self.tainted?
+    s
+  end
+
+  def downcase!
     raise TypeError, "can't modify frozen string" if frozen?
     _downcase!
   end
