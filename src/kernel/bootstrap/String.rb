@@ -305,14 +305,84 @@ class String
     res
   end
 
-  def each(sep=$/, &block)
-    tokens = sep._split_string(self, nil)
-    n = 0
-    lim = tokens.size
-    while n < lim
-      block.call( tokens[n] )
-      n = n + 1
+  # Splits <i>self</i> using the supplied parameter as the record separator
+  # (<code>$/</code> by default), passing each substring in turn to the supplied
+  # block. If a zero-length record separator is supplied, the string is split on
+  # <code>\n</code> characters, except that multiple successive newlines are
+  # appended together.
+  #
+  #   print "Example one\n"
+  #   "hello\nworld".each {|s| p s}
+  #   print "Example two\n"
+  #   "hello\nworld".each('l') {|s| p s}
+  #   print "Example three\n"
+  #   "hello\n\n\nworld".each('') {|s| p s}
+  #
+  # <em>produces:</em>
+  #
+  #   Example one
+  #   "hello\n"
+  #   "world"
+  #   Example two
+  #   "hel"
+  #   "l"
+  #   "o\nworl"
+  #   "d"
+  #   Example three
+  #   "hello\n\n\n"
+  #   "world"
+  def each(a_sep=$/, &block)
+    # Modified Rubinius
+    if a_sep.equal?(nil)
+      block.call(self)
+      return self
     end
+
+    sep = Type.coerce_to(a_sep, String, :to_str)
+    raise LocalJumpError, 'no block given' unless block_given?
+
+    id = self.__id__
+    my_size = self.size
+    ssize = sep.size
+    newline = ssize == 0 ? ?\n : sep[ssize-1]
+
+    last, i = 0, ssize
+    while i < my_size
+      if ssize == 0 && self[i] == ?\n
+        if self[i+=1] != ?\n
+          i += 1
+          next
+        end
+        i += 1 while i < my_size && self[i] == ?\n
+      end
+
+      if i > 0 && self[i-1] == newline &&
+          (ssize < 2 || sep._compare_substring(self, i-ssize, ssize) == 0)
+        line = self[last, i-last]
+        line.taint if tainted?
+        yield line
+        # We don't have a way yet to check if the data was modified...
+        #modified? id, my_size
+        last = i
+      end
+
+      i += 1
+    end
+
+    unless last == my_size
+      line = self[last, my_size-last+1]
+      line.taint if tainted?
+      yield line
+    end
+
+    self
+  end
+
+  def _compare_substring(other, start, size)
+    if start > self.size || start + self.size < 0
+      raise IndexError, "index #{start} out of string"
+    end
+    self <=> other[start,size]
   end
 
   def each_byte
