@@ -919,12 +919,13 @@ class String
   end
 
   def sub!(pattern, replacement)
-    raise TypeError, "can't modify frozen string" if frozen?
+    raise TypeError, "sub!: can't modify frozen string" if frozen?
 
     regex = _get_pattern(pattern, true)
     # stores into caller's $~
     if match = regex._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
+      self.taint if replacement.tainted?
       self
     else
       nil
@@ -934,12 +935,13 @@ class String
   def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    raise TypeError, "can't modify frozen string" if frozen?
+    raise TypeError, "sub!: can't modify frozen string" if frozen?
 
     regex = _get_pattern(pattern, true)
     if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match)
       replace(_replace_match_with(match, replacement))
+      self.taint if replacement.tainted?
       self
     else
       nil
@@ -952,6 +954,7 @@ class String
     unless pattern._isString || pattern._isRegexp
       if pattern.respond_to?(:to_str)
         pattern = pattern.to_str
+        raise TypeError, "can't convert pattern to string" unless pattern._isString
       else
         raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
       end
