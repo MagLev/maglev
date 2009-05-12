@@ -128,7 +128,6 @@ class String
 
 #  alias === ==
 
-  # call-seq:
   #    str =~ obj   => fixnum or nil
   #
   # Match---If <i>obj</i> is a <code>Regexp</code>, use it as a pattern to match
@@ -139,7 +138,6 @@ class String
   #
   #    "cat o' 9 tails" =~ /\d/   #=> 7
   #    "cat o' 9 tails" =~ 9      #=> false
-
   def =~(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
@@ -377,6 +375,7 @@ class String
 
     self
   end
+  alias each_line each
 
   def _compare_substring(other, start, size)
     if start > self.size || start + self.size < 0
@@ -387,11 +386,14 @@ class String
 
   def each_byte
     n = 0
-    lim = self.size
-    while n < lim
+    # Do not cache size before looping.  Specs require
+    # us to go to new end when string grows or shrinks
+    # in the yield.
+    while n < self.size
       yield self[n]
       n = n + 1
     end
+    self
   end
 
   # each_char appears to be a Rubinius extension
@@ -405,14 +407,6 @@ class String
       temp[0] = self[n]
       blk.call(temp)
       n = n + 1
-    end
-  end
-
-  def each_line(&b)
-    # TODO why different than each  ???
-    /(.*)/.all_matches(self).each do |match|
-      str = match[1]
-      b.call(str)
     end
   end
 
