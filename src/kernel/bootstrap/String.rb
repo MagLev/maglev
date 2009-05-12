@@ -1030,8 +1030,19 @@ class String
   end
 
   primitive 'unpack', 'rubyUnpack:'
-  primitive 'upcase', 'asUppercase'
-  primitive 'upcase!', 'rubyUpcaseInPlace'
+  primitive '_upcase', 'asUppercase'
+
+  def upcase
+    r = _upcase
+    r.taint if tainted?
+    r
+  end
+
+  primitive '_upcase!', 'rubyUpcaseInPlace'
+  def upcase!
+    raise TypeError, "upcase!: can't modify frozen string" if frozen?
+    _upcase!
+  end
 
   # MNI: upto
 
