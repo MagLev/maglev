@@ -45,6 +45,10 @@ commit.
 
 === Hat Trick Example
 
+You can follow along below, or run the canned ruby scripts 
+create_hat.rb, add_rabbit_to_hat.rb, and show_hat_contents.rb
+as shown in <tt>examples/hat_trick/README</tt>
+
 Here is the hat trick example.  The Magician (VM one), creates an empty
 hat.  The Magician shows that it is empty, then waves his magic wand and
 pulls a rabbit out of the hat.

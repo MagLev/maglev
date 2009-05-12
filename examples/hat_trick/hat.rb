@@ -11,6 +11,10 @@ class Hat
 	def contents
 		@contents
 	end
+	
+	def size
+		@contents.size
+	end
 end
 
 $hat = Hat.new
