@@ -1006,32 +1006,71 @@ class String
   end
 
   primitive_nobridge 'to_sym', 'asSymbol'
-  primitive '_tr!', 'rubyTrFrom:to:'
 
-  def tr!(from, to)
+  primitive '_tr!', 'rubyTrFrom:to:'
+  #     str.tr!(from_str, to_str)   => str or nil
+  #
+  #  Translates <i>str</i> in place, using the same rules as
+  #  <code>String#tr</code>. Returns <i>str</i>, or <code>nil</code> if no
+  #  changes were made.
+  def tr!(from_str, to_str)
     raise TypeError, "can't modify frozen string" if frozen?
-    from = Type.coerce_to(from, String, :to_str)
-    to   = Type.coerce_to(to,   String, :to_str)
+    from = Type.coerce_to(from_str, String, :to_str)
+    to   = Type.coerce_to(to_str,   String, :to_str)
     _tr!(from, to)
   end
 
-  def tr(from, to)
+  #     str.tr(from_str, to_str)   => new_str
+  #
+  #  Returns a copy of <i>str</i> with the characters in <i>from_str</i> replaced
+  #  by the corresponding characters in <i>to_str</i>. If <i>to_str</i> is
+  #  shorter than <i>from_str</i>, it is padded with its last character. Both
+  #  strings may use the c1--c2 notation to denote ranges of characters, and
+  #  <i>from_str</i> may start with a <code>^</code>, which denotes all
+  #  characters except those listed.
+  #
+  #     "hello".tr('aeiou', '*')    #=> "h*ll*"
+  #     "hello".tr('^aeiou', '*')   #=> "*e**o"
+  #     "hello".tr('el', 'ip')      #=> "hippo"
+  #     "hello".tr('a-y', 'b-z')    #=> "ifmmp"
+  def tr(from_str, to_str)
     s = self.dup
-    s.tr!(from, to)
+    s.tr!(from_str, to_str)
     s.taint if tainted?
     s
   end
 
-  primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
-  def tr_s(from, to)
-    from = Type.coerce_to(from, String, :to_str)
-    to   = Type.coerce_to(to,   String, :to_str)
-    (str = self.dup).tr_s!(from, to) || str
+  primitive '_tr_s!', 'rubyTrSqueezeFrom:to:'
+  #     str.tr_s!(from_str, to_str)   => str or nil
+  #
+  #  Performs <code>String#tr_s</code> processing on <i>str</i> in place,
+  #  returning <i>str</i>, or <code>nil</code> if no changes were made.
+  def tr_s!(from_str, to_str)
+    raise TypeError, "tr_s!: can't modify frozen string" if frozen?
+    return nil if from_str.empty?
+    _tr_s!(from_str, to_str)
+  end
+
+  #     str.tr_s(from_str, to_str)   => new_str
+  #
+  #  Processes a copy of <i>str</i> as described under <code>String#tr</code>,
+  #  then removes duplicate characters in regions that were affected by the
+  #  translation.
+  #
+  #     "hello".tr_s('l', 'r')     #=> "hero"
+  #     "hello".tr_s('el', '*')    #=> "h*o"
+  #     "hello".tr_s('el', 'hx')   #=> "hhxo"
+  def tr_s(from_str, to_str)
+    from = Type.coerce_to(from_str, String, :to_str)
+    to   = Type.coerce_to(to_str,   String, :to_str)
+    str = self.dup
+    str.taint if self.tainted?
+    str._tr_s!(from, to) || str
   end
 
   primitive 'unpack', 'rubyUnpack:'
-  primitive '_upcase', 'asUppercase'
 
+  primitive '_upcase', 'asUppercase'
   def upcase
     r = _upcase
     r.taint if tainted?
