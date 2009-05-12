@@ -130,15 +130,13 @@ class PureRubyStringIO < IO
 
   def gets(sep_string=$/)
     # variant after first gets no bridges   # gemstone
-    res = self._gets(sep_string)
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res = self._gets(sep_string, 0x31)
     res
   end
 
   def gets
     # variant after first gets no bridges   # gemstone
-    res = self._gets( $/ )
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res = self._gets( $/, 0x31 )
     res
   end
 
@@ -419,28 +417,43 @@ class PureRubyStringIO < IO
 
   private
 
-  def _gets(sep_string)
+  def _gets(a_sep_string, vc_frame_arg)
+    sep_is_nil = a_sep_string.equal?(nil)
+    unless sep_is_nil
+      sep_string = Type.coerce_to(a_sep_string, String, :to_str)
+    end
+    if !sep_is_nil && sep_string.size == 0
+      sep_string = "\n\n"
+    end
+
     if @sio_closed_read ; requireReadable ; end
     @sio_lineno += 1
     s_pos = @sio_pos
     pstart = s_pos
     s_string = @sio_string
-    found = s_string.index(sep_string, s_pos)
-    if found
-      s_pos = found
+    if sep_is_nil
+      res = s_string[@sio_pos..-1]
+      @sio_pos = s_string.length
     else
-      s_len = s_string.length
-      if s_pos >= s_len
-        @sio_pos = s_pos
-        return nil  # EOF
+      found = s_string.index(sep_string, s_pos)
+      if found
+        s_pos = found
+      else
+        s_len = s_string.length
+        if s_pos >= s_len
+          @sio_pos = s_pos
+          nil._storeRubyVcGlobal(vc_frame_arg) # store into caller's $_
+          return nil  # EOF
+        end
+        s_pos = s_len._max(s_pos)
       end
-      s_pos = s_len._max(s_pos)
+      res = s_string[pstart..s_pos]
+      if (found)
+        s_pos += sep_string.length
+      end
+      @sio_pos = s_pos
     end
-    res = s_string[pstart..s_pos]
-    if (found)
-      s_pos += sep_string.length
-    end
-    @sio_pos = s_pos
+    res._storeRubyVcGlobal(vc_frame_arg) # store into caller's $_
     res
   end
 
