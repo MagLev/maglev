@@ -2,6 +2,9 @@ module Kernel
 
   primitive_nobridge '_resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
+  # _smalltalk_global_put for use by bootstrap code only
+  primitive_nobridge '_smalltalk_global_put', 'smalltalkUserGlobalsAt:put:'
+
   # Print messages for stubbed methods
   # presence of classvars disturbs specs, constants disturbs vmunit tests
   # MAGLEV_WARNSTUB = false
