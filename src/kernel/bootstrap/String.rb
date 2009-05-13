@@ -169,17 +169,15 @@ class String
     # This variant gets bridge methods
     raise ArgumentError, 'wrong number of arguments'
   end
+
   def [](index)
     if index._isRegexp
       s = _at(index)
       s.taint if index.tainted?
     elsif index._isRange
-      first = Type.coerce_to(index.first, Integer, :to_int)
-      last =  Type.coerce_to(index.last,  Integer, :to_int)
-      #           _slice(start, last-start)
-      #start = index.begin
-      return nil if first > self.size
-      s = self._at(index)
+      first, len = index._beg_len(self.length)
+      return nil if first.equal?(nil)
+      s = self._at_length(first, len)
     elsif index._isString
       s = self._at(index)
       s.taint if ! s.nil? && index.tainted?
@@ -192,13 +190,20 @@ class String
   end
 
   def [](start, length)
-    length = Type.coerce_to(length, Integer, :to_int)
-    unless start._isRegexp
-      start = Type.coerce_to(start, Integer, :to_int)
+    if start._isRegexp
+      m_begin, m_len = self._match_regexp(start, length)
+      return nil if m_begin.equal?(nil)
+      s = self._at_length(m_begin, m_len)
+      s.taint if start.tainted?
+      s
+    else
+      length = Type.coerce_to(length, Integer, :to_int)
+      unless start._isRegexp
+        start = Type.coerce_to(start, Integer, :to_int)
+      end
+      s = _at_length(start, length)
+      return nil if length < 0
     end
-    return nil if length < 0
-
-    s = _at_length(start, length)
     s.taint if self.tainted?
     s
   end
@@ -753,20 +758,49 @@ class String
 
   alias slice []
 
-  def slice!(start, a_len)
-    return nil if a_len < 0
-    return '' if a_len.equal?(0)
+#   def slice!(*args)
+#     raise ArgumentError, 'wrong number of arguments'
+#   end
 
+
+  #     str.slice!(fixnum)           => fixnum or nil
+  #     str.slice!(fixnum, fixnum)   => new_str or nil
+  #     str.slice!(range)            => new_str or nil
+  #     str.slice!(regexp)           => new_str or nil
+  #     str.slice!(other_str)        => new_str or nil
+  #
+  #  Deletes the specified portion from <i>str</i>, and returns the portion
+  #  deleted. The forms that take a <code>Fixnum</code> will raise an
+  #  <code>IndexError</code> if the value is out of range; the <code>Range</code>
+  #  form will raise a <code>RangeError</code>, and the <code>Regexp</code> and
+  #  <code>String</code> forms will silently ignore the assignment.
+  #
+  #     string = "this is a string"
+  #     string.slice!(2)        #=> 105
+  #     string.slice!(3..6)     #=> " is "
+  #     string.slice!(/s.*t/)   #=> "sa st"
+  #     string.slice!("r")      #=> "r"
+  #     string                  #=> "thing"
+  def slice!(start, a_len)
     sz = self.size
+    if start._isRegexp
+      m_begin, m_len = self._match_regexp(start, a_len)
+      return nil if m_begin.equal?(nil)
+      raise TypeError, "can't modify frozen string" if self.frozen?
+      r = slice!(m_begin, m_len)
+      r.taint if self.tainted? or start.tainted?
+      return r
+    end
+
+    len = Type.coerce_to(a_len, Integer, :to_int)
+    return nil if len < 0
+    return '' if len.equal?(0)
     start += sz if start < 0
     return nil if start < 0 || start > sz
     return '' if start.equal?(sz)
-
-    raise TypeError, "can't modify frozen string" if frozen?
-
-    s = _at_length(start, a_len)
-
-    stop = start + a_len
+    raise TypeError, "can't modify frozen string" if self.frozen?
+    s = _at_length(start, len)
+    stop = start + len
     stop = sz if stop > sz
     _remove_from_to(start + 1, stop) # convert to smalltalk indexing
     s || ''
@@ -782,10 +816,9 @@ class String
       len = md.end(0) - start
       slice!(start, len)
     elsif arg._isRange
-      start = arg.begin
-      len = arg.end - start
-      len += 1 if ! arg.exclude_end?
-      slice!(start, len)
+      first, len = arg._beg_len(self.length)
+      raise RangeError, "#{arg} out of range" if first.equal?(nil)
+      slice!(first, len)
     elsif arg._isString
       start = self._findStringStartingAt(arg, 1)
       return nil if start.equal?(0)
@@ -795,6 +828,16 @@ class String
       s = slice!(arg, 1)
       s[0]
     end
+  end
+
+  def _match_regexp(regexp, length)
+    md = regexp.match(self)
+    return nil if md.equal?(nil)
+    idx = Type.coerce_to(length, Integer, :to_int)
+    return nil if idx >= md.size or idx < 0
+    m_begin = md.begin(idx)
+    m_len = md.end(idx) - m_begin
+    [m_begin, m_len]
   end
 
   def split(pattern=nil, limit=nil)
