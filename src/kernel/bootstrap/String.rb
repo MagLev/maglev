@@ -995,12 +995,39 @@ class String
   end
 
 
-  primitive 'succ!', 'rubySucc'
+  primitive '_succ!', 'rubySucc'
+  def succ!
+    raise TypeError, "succ!: can't modify frozen string" if self.frozen?
+    _succ!
+  end
 
+  # Returns the successor to <i>self</i>. The successor is calculated by
+  # incrementing characters starting from the rightmost alphanumeric (or
+  # the rightmost character if there are no alphanumerics) in the
+  # string. Incrementing a digit always results in another digit, and
+  # incrementing a letter results in another letter of the same case.
+  # Incrementing nonalphanumerics uses the underlying character set's
+  # collating sequence.
+  #
+  # If the increment generates a ``carry,'' the character to the left of
+  # it is incremented. This process repeats until there is no carry,
+  # adding an additional character if necessary.
+  #
+  #   "abcd".succ        #=> "abce"
+  #   "THX1138".succ     #=> "THX1139"
+  #   "<<koala>>".succ   #=> "<<koalb>>"
+  #   "1999zzz".succ     #=> "2000aaa"
+  #   "ZZZ9999".succ     #=> "AAAA0000"
+  #   "***".succ         #=> "**+"
   def succ
     d = self.dup
     d.succ!
+    d.taint if self.tainted?
+    d
   end
+
+  alias_method :next, :succ
+  alias_method :next!, :succ!
 
   def sum(power=16)
     tot = 0
