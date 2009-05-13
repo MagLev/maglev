@@ -18,6 +18,7 @@ class Exception
     primitive_nobridge '_signal', 'signal'
     primitive          'message', 'description'
     primitive_nobridge '_message=', 'messageText:'
+    primitive_nobridge '_st_initialize', 'initialize'
 
     # Define this in ruby code so we get the full env1 creation hooks
     def self.exception(message=nil)
@@ -36,8 +37,11 @@ class Exception
     IncludeSmalltalkFrames = false;
 
     def initialize(message=nil)
-      message = self.class.name if message.nil?
-      self._message=(message)
+      self._st_initialize  # initialize smalltak instvars
+      if message.equal?(nil)
+        message = self.class.name 
+      end
+      @messageText = message
     end
 
     def backtrace(limit = 1000)
