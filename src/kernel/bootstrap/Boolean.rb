@@ -25,4 +25,28 @@ class Boolean
   def self.===(other)
     return other.class.equal?(self)
   end
+
+  def frozen?
+    false
+  end
+
+  def freeze
+    # no-op
+    self
+  end
+
+  def tainted?
+    false
+  end
+
+  def taint
+    # no-op
+    self
+  end
+
+  def untaint
+    # no-op
+    self
+  end
+
 end

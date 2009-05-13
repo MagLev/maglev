@@ -17,8 +17,23 @@ class NilClass
     false
   end
 
+  def freeze
+    # no-op
+    nil
+  end
+
   def tainted?
     false
+  end
+
+  def taint
+    # no-op
+    nil
+  end
+
+  def untaint
+    # no-op
+    nil
   end
 
   def inspect
