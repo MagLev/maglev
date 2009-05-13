@@ -346,7 +346,7 @@ class String
     return nil # no modification made
   end
 
-  primitive 'concat', '_rubyAddAll:'
+  alias concat <<
 
   # arg to rubyCount: is expected to be an Array , so declare as 'count*'
   primitive 'count*', 'rubyCount:'
