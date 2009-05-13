@@ -218,3 +218,4 @@ module Math
     :tanh
 
 end
+Math._freeze_constants
