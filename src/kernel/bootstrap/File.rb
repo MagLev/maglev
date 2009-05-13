@@ -31,12 +31,15 @@ class File
   primitive 'close', 'close'
   # << inherited from IO
   primitive 'write', 'addAll:'
+  primitive '_getc', 'nextByte'
   primitive 'next_line', 'nextLineTo:'
   primitive_nobridge '_atEnd', 'atEnd'
-  primitive 'read', 'next:'
-  primitive 'read', 'contents'
+  primitive '_read', 'next:'
+  primitive '_read', 'contents'
+  primitive '_read_into', 'read:into:'
   primitive 'flush', 'flush'
   primitive 'rewind', 'rewind'
+  primitive '_is_open', 'isOpen'
   primitive_nobridge '_seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '_fstat','fstat:isLstat:'
@@ -586,6 +589,10 @@ class File
     return 0
   end
 
+  def closed?
+    not _is_open
+  end
+
   def ctime
     self.stat.ctime
   end
@@ -598,7 +605,11 @@ class File
     status
   end
 
-  # begin gets implementation --------------------------------------------
+  def getc
+    raise IOError, 'getc: closed stream' unless _is_open
+    return nil if self.eof?
+    _getc
+  end
 
   def gets(*args)
     raise ArgumentError, 'expected 0 or 1 arg'
@@ -617,6 +628,34 @@ class File
     res = next_line( sep[0] )
     res._storeRubyVcGlobal(0x21) # store into caller's $_
     res
+  end
+
+  def read(a_length=Undefined, a_buffer=Undefined)
+    raise IOError, 'read: closed stream' unless _is_open
+
+    read_all_bytes = a_length.equal?(Undefined) || a_length.nil?
+    unless read_all_bytes
+      length = Type.coerce_to(a_length, Fixnum, :to_int)
+      raise ArgumentError, "length must not be negative" if length < 0
+      return nil if self.pos > self.stat.size
+    end
+
+    if self.eof?
+      return read_all_bytes ? '' : nil
+    end
+
+    data = if a_buffer.equal?(Undefined)
+             data = read_all_bytes ? _read : _read(length)
+           else
+             buffer = Type.coerce_to(a_buffer, String, :to_str)
+             length = self.stat.size if length.equal?(nil)
+             num_read = _read_into(length, buffer)
+             raise IOError, 'error' if num_read.equal?(nil)
+             buffer.size = num_read # truncate buffer
+             buffer
+           end
+    data = '' if data.equal?(nil)
+    data
   end
 
   # during bootstrap,  send and __send__ get no bridge methods

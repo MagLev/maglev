@@ -1,0 +1,10 @@
+This directory holds a recreation of the "Hat Trick" performed by Avi Bryant
+at RailsConf 2008, which you can see at http://vimeo.com/1147409
+
+First, run this to create a new hat.
+  create_hat.rb
+Next, run these in any order as many times as you wish.
+  add_rabbit_to_hat.rb
+  show_hat_contents.rb
+To empty the hat and start over, run
+  create_hat.rb
