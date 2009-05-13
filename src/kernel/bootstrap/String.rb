@@ -817,7 +817,7 @@ class String
       slice!(start, len)
     elsif arg._isRange
       first, len = arg._beg_len(self.length)
-      raise RangeError, "#{arg} out of range" if first.equal?(nil)
+      return nil if first.equal?(nil)
       slice!(first, len)
     elsif arg._isString
       start = self._findStringStartingAt(arg, 1)
