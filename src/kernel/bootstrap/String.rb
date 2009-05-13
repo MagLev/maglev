@@ -87,10 +87,23 @@ class String
   end
 
   # note smalltalk addAll:  returns arg, not receiver
-  primitive_nobridge '<<', '_rubyAddAll:'
+  #primitive '_append', '_rubyAddAll:'
+  primitive '_append', '_rubyAddAll:'
+
+  def <<(arg)
+    raise TypeError, "<<: can't modify frozen string" if self.frozen?
+    if arg._isFixnum
+      raise TypeError, "<<: #{arg} out of range" if arg < 0 or arg > 255
+      other = arg
+    else
+      other = Type.coerce_to(arg, String, :to_str)
+    end
+    self._append(other)
+    self.taint if other.tainted?
+    self
+  end
 
   # TODO: Need primitive ST implemention for <=>
-
   def <=>(o)
     if o._isString
       i = 0

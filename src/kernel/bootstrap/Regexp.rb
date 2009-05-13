@@ -6,7 +6,7 @@ class Regexp
   MULTILINE  = 4
 
   # Regexp characters that need quoting
-  META_CHARS = "\n\r\f\t " << '[]{}()|-*.\\?+^$#'
+  META_CHARS = "\n\r\f\t " + '[]{}()|-*.\\?+^$#'
   META_CHARS.freeze
   META_REPL_CHARS = 'nrft '
   META_REPL_CHARS.freeze
