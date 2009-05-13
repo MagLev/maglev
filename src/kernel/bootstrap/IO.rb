@@ -30,6 +30,7 @@ class IO
     SEEK_CUR     = 1            # set file position to current + offset
     SEEK_END     = 2            # set file position to end of file + offset
   end
+  Constants._freeze_constants
   include Constants
 
   primitive 'binmode', 'binmode'
