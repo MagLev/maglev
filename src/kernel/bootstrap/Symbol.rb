@@ -19,6 +19,14 @@ class Symbol
     ':'._concatenate(self)
   end
 
+  # You may not create symbols directly
+  def self.new
+    raise 'Illegal creation of a Symbol'
+  end
+  def initialize
+    raise 'Illegal construction of a Symbol'
+  end
+
   # You may not copy Symbols
   def dup
     self
