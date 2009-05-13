@@ -371,3 +371,5 @@ class Regexp
     alias_method :quote, :escape
   end
 end
+Regexp._freeze_constants
+
