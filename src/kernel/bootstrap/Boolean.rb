@@ -22,7 +22,6 @@ class Boolean
     self.equal?(true) ? "true" : "false"
   end
 
-  def self.===(other)
-    return other.class.equal?(self)
-  end
+  # deleted patch to === for Trac 514, kind_of? bytecode has been fixed
+
 end
