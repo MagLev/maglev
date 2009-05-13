@@ -865,5 +865,8 @@ class PersistentFile
   end
   alias tty? isatty
 end
+File._freeze_constants
+
+
 
 # STDIN, STDOUT, STDERR , $>  initialized in File2.rb
