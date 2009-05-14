@@ -234,7 +234,7 @@ class String
       idx = Type.coerce_to(index, Integer, :to_int)
       sz = self.size
       idx += sz if idx < 0
-      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz or sz == 0
+      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
       _at_put(idx, val)
     end
     taint if value.tainted?
@@ -249,7 +249,7 @@ class String
       sz = self.size
       idx += sz if idx < 0
 
-      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz or sz == 0
+      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
 
       str_value = Type.coerce_to(value, String, :to_str)
       raise IndexError, "index #{count} out of string" if count < 0
