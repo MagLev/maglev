@@ -211,9 +211,7 @@ class String
       s
     else
       length = Type.coerce_to(length, Integer, :to_int)
-      unless start._isRegexp
-        start = Type.coerce_to(start, Integer, :to_int)
-      end
+      start = Type.coerce_to(start, Integer, :to_int)
       s = _at_length(start, length)
       return nil if length < 0
     end
@@ -221,8 +219,46 @@ class String
     s
   end
 
-  primitive_nobridge '[]=', '_rubyAt:put:'
-  primitive_nobridge '[]=', '_rubyAt:length:put:'
+  primitive_nobridge '_at_put', '_rubyAt:put:'
+  primitive_nobridge '_at_length_put', '_rubyAt:length:put:'
+  def []=(*args)
+    # This variant gets bridge methods
+    raise ArgumentError, 'wrong number of arguments'
+  end
+
+  def []=(index, value)
+    val = value._isFixnum ? value : Type.coerce_to(value, String, :to_str)
+    if index._isString or index._isRegexp
+      _at_put(index, val)
+    else
+      idx = Type.coerce_to(index, Integer, :to_int)
+      sz = self.size
+      idx += sz if idx < 0
+      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz or sz == 0
+      _at_put(idx, val)
+    end
+    taint if value.tainted?
+    self
+  end
+
+  def []=(index, count, value)
+    if index._isRegexp
+      _at_length_put(index, count, value)
+    else
+      idx = Type.coerce_to(index, Integer, :to_int)
+      sz = self.size
+      idx += sz if idx < 0
+
+      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz or sz == 0
+
+      str_value = Type.coerce_to(value, String, :to_str)
+      raise IndexError, "index #{count} out of string" if count < 0
+
+      _at_length_put(idx, count, str_value)
+    end
+    taint if value.tainted?
+    self
+  end
 
   # MNI: String#~
 
