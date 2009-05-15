@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'stone')
 # on $MAGLEV_HOME.
 ML = ENV['MAGLEV_HOME']
 GemStoneInstallation.current = GemStoneInstallation.new(
-  "#{ML}/gemstone", "#{ML}/etc/stones", "#{ML}/stones",
+  "#{ML}/gemstone", "#{ML}/etc/configs", "#{ML}/stones",
   "#{ML}/log", "#{ML}/backups", 'extent0.ruby.dbf')
 
 class MagLevStone < Stone

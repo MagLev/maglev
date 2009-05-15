@@ -70,7 +70,7 @@ STN_HALT_ON_FATAL_ERR = FALSE;
 #  will persist in the repository and subsequent changes to this parameter
 #  in the config file will be ignored.  To change the repository back to
 #  partial logging you must do a full backup and then restore the backup into
-#  a copy of $GEMSTONE/bin/extent0.dbf .
+#  a copy of $GEMSTONE/bin/extent0.ruby.dbf .
 #
 # Default: NONE, a value must be provided.
 # A value for this option is provided at the end of this file.
@@ -134,5 +134,5 @@ STN_TRAN_LOG_SIZES = 100, 100;
 
 GEM_MAX_SMALLTALK_STACK_DEPTH = 15000;
 GEM_TEMPOBJ_SCOPES_SIZE = 20000;
-GEM_TEMPOBJ_CACHE_SIZE = 150000;
+GEM_TEMPOBJ_CACHE_SIZE = 500000;
 KEYFILE = <%= key_file %>;

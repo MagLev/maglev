@@ -15,7 +15,7 @@ class GemStoneInstallation
                  installation_extent_directory="/var/local/gemstone",
                  base_log_directory="/var/log/gemstone",
                  backup_directory="/var/backups/gemstone",
-                 initial_extent_name='extent0.dbf')
+                 initial_extent_name='extent0.ruby.dbf')
 
     @installation_directory = installation_directory
     @config_directory = config_directory
@@ -43,7 +43,7 @@ class GemStoneInstallation
   end
 
   def startnetldi
-    sh "startnetldi -g"
+    sh "startnetldi -g -a #{ENV['USER']}"
   end
 
   def initial_extent

@@ -54,6 +54,7 @@ class Stone
     fail "Can not destroy a running stone" if running?
     rm_rf system_config_filename
     rm_rf extent_directory
+    rm_rf data_directory
     rm_rf log_directory
     rm_rf tranlog_directories
   end
@@ -73,6 +74,7 @@ class Stone
   end
 
   def start
+    start_parser
     log_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
     running?(10)
     self
@@ -127,7 +129,7 @@ class Stone
   end
 
   def extent_filename
-    File.join(extent_directory, "extent0.dbf")
+    File.join(extent_directory, "extent0.ruby.dbf")
   end
 
   def scratch_directory
