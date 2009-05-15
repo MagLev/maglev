@@ -126,7 +126,7 @@ def start_netldi
   rm_f logout
   rm_f logerr
   begin
-    sh %{ ${GEMSTONE}/bin/startnetldi -g >#{logout} 2> #{logerr} } do |ok, status|
+    sh %{ ${GEMSTONE}/bin/startnetldi -g -a #{ENV['USER']} >#{logout} 2> #{logerr} } do |ok, status|
       unless ok
         puts "== STDOUT ====="
         puts IO.readlines(logout)
@@ -144,7 +144,7 @@ end
 
 # Start the NetLDI with visible output
 def start_netldi_debug
-  sh %{ ${GEMSTONE}/bin/startnetldi -g } do |ok, status|
+  sh %{ ${GEMSTONE}/bin/startnetldi -g -a #{ENV['USER']} } do |ok, status|
     raise "Couldn't start netldi #{ok}: #{status}" unless ok
   end
 end
