@@ -14,6 +14,7 @@ class Regexp
   class_primitive_nobridge '_new', 'new:options:lang:'
 
   primitive_nobridge '_search', '_search:from:to:'
+  primitive_nobridge '_matchstart_cbytearr_from', '_matchstart:cBytes:from:'
   primitive_nobridge '_compile', '_compile:options:'
   primitive_nobridge 'kcode', 'kcode'
   primitive_nobridge 'options', 'options'
