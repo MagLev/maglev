@@ -108,9 +108,11 @@ do
             grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
-#         -w)
-#             warning=1
-#             ;;
+        -w)
+            # -w doesn't do anything at present
+            # but maglev-ruby is invoked with -w by some test apps
+            warning=1
+            ;;
 
         --)
             break
