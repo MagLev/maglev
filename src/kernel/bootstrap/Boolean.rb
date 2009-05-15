@@ -22,6 +22,27 @@ class Boolean
     self.equal?(true) ? "true" : "false"
   end
 
-  # deleted patch to === for Trac 514, kind_of? bytecode has been fixed
+  def frozen?
+    false
+  end
+
+  def freeze
+    # no-op
+    self
+  end
+
+  def tainted?
+    false
+  end
+
+  def taint
+    # no-op
+    self
+  end
+
+  def untaint
+    # no-op
+    self
+  end
 
 end

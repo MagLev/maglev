@@ -22,6 +22,7 @@ OPTIONS:
                   times.  The currently recognized options are:
                     traceLoad     Trace loading of ruby files
                     logSexp       Print sexpressions as they are parsed
+   --stone <name> Run script connecting to the named stone
    -v, --verbose  Print version number, then turn on verbose mode
    --version      Print version number and exit
 
@@ -51,16 +52,26 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
     exit 1
 fi
 
-# Environment variable settings
-export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
-export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-
+conf_file=$MAGLEV_HOME/etc/system.conf
+stone=gs64stone
 args=""
 debug=0
 maglev_options=""
 while [[ $# > 0 ]]
 do
     case "$1" in
+        --stone)
+            stone=$2
+            stone_conf=$MAGLEV_HOME/etc/stones/${stone}.conf
+            if [[ -f $stone_conf ]]
+            then
+              conf_file=$stone_conf
+            else
+              echo "Couldn't find $stone_conf"
+              exit 2
+            fi
+            shift
+            ;;
         --copyright)
             echo "maglev - Copyright (C) 2008-2009 GemStone Systems, Inc."
             exit
@@ -97,9 +108,11 @@ do
             grep ^maglev $MAGLEV_HOME/version.txt
             exit
             ;;
-#         -w)
-#             warning=1
-#             ;;
+        -w)
+            # -w doesn't do anything at present
+            # but maglev-ruby is invoked with -w by some test apps
+            warning=1
+            ;;
 
         --)
             break
@@ -117,6 +130,11 @@ do
     esac
     shift
 done
+
+# Environment variable settings
+export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+export GEMSTONE_SYS_CONF=$conf_file
+
 
 # Make sure we have at least one argument
 if [ $# -lt 1 ]; then
@@ -156,6 +174,8 @@ else
 fi
 
 cat - >> $dbscript <<-EOFA
+set gemstone $stone
+login
 run
 | res ctx |
 (ctx := RubyContext load: #($maglev_options) ) .
