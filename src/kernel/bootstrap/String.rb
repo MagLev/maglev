@@ -128,16 +128,17 @@ class String
   end
 
   # PERFORMANCE: String#== could use help
-  primitive '==', '='  # TODO: this is incorrect...
-  #   def ==(other)
-  #     if (other._isString )
-  #       (self <=> other) == 0
-  #     elsif other.respond_to? :to_str
-  #       other == str
-  #     else
-  #       false
-  #     end
-  #   end
+  primitive '_same_value', '='  # TODO: this is incorrect...
+  def ==(other)
+    if other._isString
+      s = other
+    elsif other.respond_to? :to_str
+      s = Type.coerce_to(other, String, :to_str)
+    else
+      return false
+    end
+    self._same_value(s)
+  end
 
 #  alias === ==
 
