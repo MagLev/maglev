@@ -157,6 +157,7 @@ def start_server
     ${GEMSTONE}/bin/waitstone gs64stone >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server gs64stone started" if ok
+    ok
   end
 end
 
@@ -168,6 +169,7 @@ def start_server_debug
     ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
   } do |ok, status|
     puts "GemStone server gs64stone started in verbose mode" if ok
+    ok
   end
 end
 
@@ -179,20 +181,14 @@ def start_server_bench
     ${GEMSTONE}/bin/waitstone gs64stone >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server gs64stone started with performance optimizations" if ok
+    ok
   end
 end
 
 # Make sure prims are loaded, but suppress output
 def ensure_prims_loaded
-    puts "Loading kernel if needed -- it may take a few seconds..."
-  sh %{ #{TOPAZ_CMD} <<EOF >/dev/null
-run
-      RubyContext ensurePrimsLoaded.
-%
-exit
-EOF
-}
-    puts "Kernel is loaded"
+  puts "Loading kernel if needed -- it may take a few seconds..."
+  run_topaz tc_ensure_prims
 end
 
 def stop_server
@@ -200,6 +196,7 @@ def stop_server
     ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server stopped." if ok
+    ok
   end
 end
 
@@ -208,6 +205,7 @@ def stop_netldi
     ${GEMSTONE}/bin/stopnetldi > /dev/null 2>&1
   } do |ok, status|
     puts "NetLDI stopped" if ok
+    ok
   end
 end
 
@@ -234,6 +232,7 @@ def create_debug_script(code)
   sh %{
     cp #{MAGLEV_HOME}/etc/.topazdebugini #{script_name}
     cat - >> #{script_name} <<EOF
+login
 #{code}
 EOF
   }
@@ -243,15 +242,12 @@ end
 
 def run_topaz(snippet, debug=false)
   sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
+login
 #{snippet}
 EOF
   } do |ok, status|
-    # TODO: Right now, topaz + maglev always exits with a non-zero error
-    # count, so hide that
-    # puts "topaz #{ok}  #{status}"
+    ok
   end
-  puts ""  # clean up after topaz command prompt
-  true
 end
 
 # Run the topaz commands in +snippet+ in debug mode.  If an error or a
@@ -266,10 +262,7 @@ def debug_topaz(snippet)
     #{GEMSTONE}/bin/topaz -I #{script} -l
     rm -f #{script}
   } do |ok, status|
-    # TODO: Right now, topaz + maglev always exits with a non-zero error
-    # count, so hide that
-    # puts "topaz #{ok}  #{status}"
+    ok
   end
-  true
 end
 
