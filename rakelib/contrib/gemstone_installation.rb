@@ -43,6 +43,7 @@ class GemStoneInstallation
   end
 
   def startnetldi
+    # sh "startnetldi -g -a #{ENV['USER']} >/dev/null 2>&1"
     sh "startnetldi -g -a #{ENV['USER']}"
   end
 
