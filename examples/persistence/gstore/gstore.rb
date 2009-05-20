@@ -12,6 +12,8 @@
 # NOTE: You must have created the smalltalk FFI wrappers in order to run
 # this (rake dev:stwrappers).
 
+# TODO: Add a way to remove a "file" from GStore.
+
 load "smalltalk/System.rb"
 load "smalltalk/UserProfile.rb"
 load "smalltalk/SymbolDictionary.rb"
@@ -22,15 +24,15 @@ class GStore
   def initialize(file="")
     GStore::Error.raise "Commit failed!" if (!Smalltalk::System._st_commitTransaction)
 
-    userGlobals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
-    allData = nil
-    doInTransaction {
-      allData = userGlobals._st_at_ifAbsent(:GStore_data, nil)
-      if (!allData)
-        allData = userGlobals._st_at_put(:GStore_data, Hash.new)
+    user_globals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
+    all_data = nil
+    do_in_transaction {
+      all_data = user_globals._st_at_ifAbsent(:GStore_data, nil)
+      if (!all_data)
+        all_data = user_globals._st_at_put(:GStore_data, Hash.new)
       end
-      if (!allData.key? file)
-        allData[file] = Hash.new
+      if (!all_data.key? file)
+        all_data[file] = Hash.new
       end
     }
     @transaction = false
@@ -97,9 +99,9 @@ class GStore
       @rdonly = read_only
       @abort = false
       Smalltalk::System._st_beginTransaction
-      userGlobals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
-      allData = userGlobals._st_at :GStore_data
-      @table = allData[@filename]
+      user_globals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
+      all_data = user_globals._st_at :GStore_data
+      @table = all_data[@filename]
       begin
         catch(:gstore_abort_transaction) do
           yield(self)
@@ -131,12 +133,10 @@ class GStore
     Error.raise "Must be in write transaction" if @rdonly
   end
 
-  def doInTransaction
+  def do_in_transaction
     for i in (1..10)
       yield
-      if (Smalltalk::System._st_commitTransaction)
-        return
-      end
+      return if (Smalltalk::System._st_commitTransaction)
       Smalltalk::System._st_abortTransaction
     end
     Error.raise "Unable to commit transaction"
