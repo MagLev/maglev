@@ -25,17 +25,29 @@ load "smalltalk/System.rb"
 load "smalltalk/UserProfile.rb"
 load "smalltalk/SymbolDictionary.rb"
 
+# GStore is a MagLev native re-implementation of the Ruby standard library
+# +PStore+.  GStore implements a Gemstone/MagLev based persistence
+# mechanism based on a Hash.  User code can store arbitrary graphs of Ruby
+# objects into the GStore file by name (keys).  User code may later read
+# values back from the data store or update as needed.
+#
+# GStore is transactional, which ensures that updates to the store either
+# succeed or fail together.
+#
+# GStore supports multiple, independent GStore databases.
+
 class GStore
   # The Error thrown by all GStore methods.
   class Error < StandardError; end
 
-  # Initialize a new GStore object.  The name of the GStore object will be +file+
-  #
+  # Initialize a new GStore object.  The name of the GStore object will be
+  # +file+ If the named GStore "file" already exists, its contents are used
+  # as the inital state of the store.  Otherwise, a new, empty Hash is
+  # created.
   def initialize(file="")
     raise GStore::Error, "Commit failed!" if (!Smalltalk::System._st_commitTransaction)
 
     user_globals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
-    all_data = nil
     do_in_transaction {
       all_data = user_globals._st_at_ifAbsent(:GStore_data, nil)
       if (!all_data)
@@ -49,33 +61,42 @@ class GStore
     @filename = file
   end
 
+  # Return the value stored under the key +name+
   def [](name)
     in_transaction
     @table[name]
   end
 
+  # Set the value stored at +name+ to +value+.  Must be in a write
+  # transaction.
   def []=(name,value)
     in_transaction_wr()
     @table[name] = value
   end
 
+  # Abort the current transaction
   def abort()
     in_transaction
     abort = true
     throw :gstore_abort_transaction
   end
 
+  # Commit the current transaction
   def commit()
     in_transaction
     abort = false
     throw :gstore_abort_transaction
   end
 
+  # Remove the named element from the store.
   def delete(name)
     in_transaction_wr()
     @table.delete name
   end
 
+  # Return the value stored at +name+.  If there is no key for +name+, then
+  # return +default+.  If +default+ is not given, then raise and error if
+  # no entry for +name+ has been stored.
   def fetch(name, default=GStore::Error)
     in_transaction
     unless @table.key? name
@@ -88,6 +109,7 @@ class GStore
     @table[name]
   end
 
+  # Return the name of this GStore
   def path()
     @filename
   end
