@@ -14,15 +14,25 @@
 
 # TODO: Add a way to remove a "file" from GStore.
 
+# Other contenders to think about:
+#   * *dbm
+#   * madeline
+#   * YAML
+#   * Tokyo Cabinet
+#   * CouchDB
+
 load "smalltalk/System.rb"
 load "smalltalk/UserProfile.rb"
 load "smalltalk/SymbolDictionary.rb"
 
 class GStore
+  # The Error thrown by all GStore methods.
   class Error < StandardError; end
 
+  # Initialize a new GStore object.  The name of the GStore object will be +file+
+  #
   def initialize(file="")
-    GStore::Error.raise "Commit failed!" if (!Smalltalk::System._st_commitTransaction)
+    raise GStore::Error, "Commit failed!" if (!Smalltalk::System._st_commitTransaction)
 
     user_globals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
     all_data = nil
@@ -125,12 +135,12 @@ class GStore
   private
 
   def in_transaction
-    Error.raise "Must be in transaction" if !@transaction
+    raise GStore::Error, "Must be in transaction" unless @transaction
   end
 
   def in_transaction_wr
     in_transaction
-    Error.raise "Must be in write transaction" if @rdonly
+    raise GStore::Error, "Must be in write transaction" if @rdonly
   end
 
   def do_in_transaction
@@ -139,6 +149,6 @@ class GStore
       return if (Smalltalk::System._st_commitTransaction)
       Smalltalk::System._st_abortTransaction
     end
-    Error.raise "Unable to commit transaction"
+    raise GStore::Error, "Unable to commit transaction"
   end
 end
