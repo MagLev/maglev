@@ -7,14 +7,14 @@
 # ##################################################
 
 # spec/rubyspec/language/block_spec.rb
-spec/rubyspec/language/constants_spec.rb
+# spec/rubyspec/language/constants_spec.rb
 # spec/rubyspec/language/def_spec.rb
-spec/rubyspec/language/for_spec.rb
+# spec/rubyspec/language/for_spec.rb
 # spec/rubyspec/language/method_spec.rb
-spec/rubyspec/language/next_spec.rb
+# spec/rubyspec/language/next_spec.rb
 # spec/rubyspec/language/numbers_spec.rb
 spec/rubyspec/language/precedence_spec.rb
-spec/rubyspec/language/retry_spec.rb
+# spec/rubyspec/language/retry_spec.rb
 # spec/rubyspec/core/filetest/
 # spec/rubyspec/core/kernel/case_compare_spec.rb
 # spec/rubyspec/core/proc/arity_spec.rb
@@ -63,8 +63,8 @@ spec/rubyspec/language/case_spec.rb
 # ##################################################
 # These files are so bad, that even a custom version doesn't run...
 
-spec/localspec/language/for_spec.rb
-spec/localspec/language/next_spec.rb
-spec/localspec/language/constants_spec.rb
+# spec/localspec/language/for_spec.rb
+# spec/localspec/language/next_spec.rb
+# spec/localspec/language/constants_spec.rb
 
 
