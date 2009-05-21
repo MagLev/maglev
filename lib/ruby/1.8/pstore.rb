@@ -143,9 +143,9 @@ class PStore
     in_transaction
     unless @table.key? name
       if default==PStore::Error
-  raise PStore::Error, format("undefined root name `%s'", name)
+        raise PStore::Error, format("undefined root name `%s'", name)
       else
-  return default
+        return default
       end
     end
     @table[name]
@@ -307,34 +307,34 @@ class PStore
       end
 
       if content != ""
-  @table = load(content)
+        @table = load(content)
         if !read_only
           size = content.size
           md5 = Digest::MD5.digest(content)
         end
       else
-  @table = {}
+        @table = {}
       end
       content = nil   # unreference huge data
 
       begin
-  catch(:pstore_abort_transaction) do
-    value = yield(self)
-  end
+        catch(:pstore_abort_transaction) do
+          value = yield(self)
+        end
       rescue Exception
-  @abort = true
-  raise
+        @abort = true
+        raise
       ensure
-  if !read_only and !@abort
+        if !read_only and !@abort
           tmp_file = @filename + ".tmp"
-    content = dump(@table)
-    if !md5 || size != content.size || md5 != Digest::MD5.digest(content)
+          content = dump(@table)
+          if !md5 || size != content.size || md5 != Digest::MD5.digest(content)
             File.open(tmp_file, WR_ACCESS) {|t| t.write(content)}
             File.rename(tmp_file, new_file)
             commit_new(file)
           end
           content = nil   # unreference huge data
-  end
+        end
       end
     ensure
       @table = nil
