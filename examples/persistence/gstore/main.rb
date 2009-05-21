@@ -7,7 +7,7 @@
 #   * Different workloads (many readers, a few writers, etc.)
 
 if defined? Maglev
-  # Whereas persistence is messed up in MagLev right now,
+  # Whereas the MagLev persistence API is not quite ready yet,
   # and whereas GStore does a commit, which doesn't save the methods,
   # and whereas we want to run this multiple times,
   # be it resolved to use load rather than require for maglev...
@@ -21,7 +21,7 @@ else
   db = PStore.new("pstore.db")
 end
 
-def do_work(db, inner_count=100, outer_count=100)
+def do_work(db, inner_count, outer_count)
   outer_count.times do |i|
     a = Array.new
     inner_count.times do |j|
@@ -32,6 +32,5 @@ def do_work(db, inner_count=100, outer_count=100)
 end
 
 Benchmark.bm do |x|
-  count = 100
-  x.report { do_work(db, count) }
+  x.report { do_work(db, 2_000, 100) }
 end
