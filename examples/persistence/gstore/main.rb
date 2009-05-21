@@ -13,24 +13,64 @@ if defined? Maglev
   # be it resolved to use load rather than require for maglev...
   load 'benchmark.rb'
   load 'gstore.rb'
-  db = GStore.new("gstore.db")
+
+  file = 'gstore.db'
+  GStore.rm(file)
+  db = GStore.new(file)
 else
   require 'benchmark'
   require 'pstore'
-  File.delete("pstore.db") if File.exists?("pstore.db")
-  db = PStore.new("pstore.db")
+
+  file = 'pstore.db'
+  File.delete(file) if File.exists?(file)
+  db = PStore.new(file)
 end
 
-def do_work(db, inner_count, outer_count)
+def create_data(db, inner_count=500, outer_count=10)
+  samples = Hash.new
   outer_count.times do |i|
     a = Array.new
     inner_count.times do |j|
       a << "#{i} #{j} #{Time.now}"
     end
-    db.transaction { |ps| ps[i.to_s()] = a }
+    db.transaction { |ps| ps[i.to_s] = a }
+    samples[i] = a if i % 10 == 0
+  end
+  samples
+end
+
+def verify_samples(db, samples)
+  #puts "Verifying #{samples.length} samples"
+  samples.each do |k,v|
+    db.transaction { |ps| raise "Bad read data" unless ps[k.to_s] == v }
   end
 end
 
+def random_reads_and_writes(db, count)
+  write_count = 0
+  read_count = 0
+  bytes_read = 0
+
+  count.times do |i|
+    reading = rand(100) < 80
+    db.transaction(reading) do |ps|
+      key = rand(100).to_s
+      if reading
+        read_count += 1
+        v = ps[key]
+        bytes_read += v.length unless v.nil?
+      else
+        write_count += 1
+        ps[key] = "Standard data for item #{key} at #{Time.now}"
+      end
+    end
+  end
+  #puts "Did #{write_count} writes and #{read_count} reads (#{bytes_read})"
+end
+
 Benchmark.bm do |x|
-  x.report { do_work(db, 2_000, 100) }
+  samples = nil
+  x.report("write") { samples = create_data(db, 2_000, 100) }
+  x.report("read ") { verify_samples(db, samples) }
+  x.report("r/w  ") { random_reads_and_writes(db, 1000) }
 end
