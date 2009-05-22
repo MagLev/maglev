@@ -62,7 +62,7 @@ do
     case "$1" in
         --stone)
             stone=$2
-            stone_conf=$MAGLEV_HOME/etc/stones/${stone}.conf
+            stone_conf=$MAGLEV_HOME/etc/conf.d/${stone}.conf
             if [[ -f $stone_conf ]]
             then
               conf_file=$stone_conf

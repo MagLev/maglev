@@ -1,0 +1,91 @@
+body {
+	color: black;
+	background: #dfd;
+}
+
+h1 {
+	color: white;
+	background: blue;
+	width: 100%;
+}
+
+h1 a {
+	color: white;
+}
+
+h1 a:link {
+}
+
+h1 a:visited {
+	color: white;
+}
+
+h1 a:hover {
+}
+
+h2 {
+	width: 100%;
+	border: thin red;
+	border-style: solid none;
+	background: #fee;
+}
+
+h3 {
+	width: 100%;
+	border: thin red;
+	border-style: none none solid;
+	background: #fee;
+}
+
+h4 {
+	border: thin red;
+	border-style: none none solid;
+}
+
+dt {
+	font-weight: bold;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+th {
+	background-color: #00ffff;
+}
+
+td {
+	background-color: #eeeeee;
+}
+
+pre.code {
+	margin: 20px;
+	padding: 4px;
+	border: #363 inset;
+	color: #fff;
+	background: #232;
+	width: 80%;
+}
+
+
+/*
+a {
+	background: #eee;
+}
+*/
+
+a:link {
+	color: #008;
+}
+
+a:visited {
+	color: black;
+}
+
+a:hover {
+	background: #fcc;
+}
+
+.red {
+  color: red;
+}

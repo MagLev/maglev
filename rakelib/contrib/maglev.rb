@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'stone')
 # on $MAGLEV_HOME.
 ML = ENV['MAGLEV_HOME']
 GemStoneInstallation.current = GemStoneInstallation.new(
-  "#{ML}/gemstone", "#{ML}/etc/configs", "#{ML}/stones",
+  "#{ML}/gemstone", "#{ML}/etc/conf.d", "#{ML}/stones",
   "#{ML}/log", "#{ML}/backups", 'extent0.ruby.dbf')
 
 class MagLevStone < Stone
@@ -38,7 +38,9 @@ class MagLevStone < Stone
   # transaction.  Does nothing if prims are already loaded.
   def ensure_prims_loaded
     if running?
-      run_topaz_commands("RubyContext ensurePrimsLoaded")
+      puts "Loading kernel if needed. It may take a few seconds..."
+      run_topaz_command("RubyContext ensurePrimsLoaded")
+      puts "Kernel is loaded."
     end
   end
 end

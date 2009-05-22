@@ -75,6 +75,7 @@ class Stone
 
   def start
     start_parser
+    puts "MagLev server \"#{name}\" starting"
     log_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
     running?(10)
     self

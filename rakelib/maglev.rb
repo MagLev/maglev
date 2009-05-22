@@ -95,10 +95,10 @@ end
 def wait_for_parser
   10.times do
     if parser_running?
-      puts "MagLev Parse Server process started on port #{PARSETREE_PORT}"
+      puts "MagLev Parse Server process running on port #{PARSETREE_PORT}"
       return true
     end
-    puts "Waiting for parser to start..."
+    puts "Waiting for MagLev Parse Server process to start..."
     sleep 2
   end
   puts "MagLev Parse Server process failed to start on port #{PARSETREE_PORT}"
