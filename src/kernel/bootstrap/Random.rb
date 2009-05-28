@@ -6,6 +6,8 @@ class Random
   class_primitive_nobridge 'new'
   primitive_nobridge 'next', 'nextInt:'
   primitive_nobridge 'next'
+  primitive_nobridge 'seed', 'seed:'
+  primitive_nobridge 'seed', 'seed'
 end
 RandomInstance = Random.new
 
