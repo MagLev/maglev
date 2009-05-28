@@ -1,5 +1,10 @@
 == Debugging scripts with MagLev
 
+Topaz is currently, the primary debugging tool for use with MagLev.  Most
+of this document describes debugging with Topaz.  An alternate approach, is
+to use the Squeak debugger.  See the section at the end on "Using Squeak to
+debug" 
+
 === Topaz Overview, Documentation and Help
 
 MagLev runs in the Topaz VM.  Topaz is command line driven, and connects to
@@ -401,3 +406,19 @@ to the real exception:
 
 In this case, the problem is obvious: we haven't implemented
 <tt>Socket#do_not_reverse_lookup=</tt>....
+
+=== Using Squeak to Debug
+
+Download and install the GemTools squeak image from the website.
+Fire up Squeak, and login to the GemStone VM.
+From the GemStone transcript window, issue the following commands:
+
+
+  RubyDirectory _chdir: (RubyEnv _getenv:'MAGLEV_HOME') .
+  RubyContext load: #() .
+  RubyContext default runFileNamed: 'my_file.rb' withARGV: #() .
+
+The debugging environment is not quite the same as a standard script (e.g.,
+__FILE__ and $0 are not set correctly), but if you don't depend on those,
+then this is a possible way to debug/explore your ruby program.
+
