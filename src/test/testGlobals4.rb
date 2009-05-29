@@ -34,3 +34,4 @@ C324.new.do_alias
 
 unless $AB == 88 ; raise 'Error' ; end
 # ------- end ticket 324
+true
