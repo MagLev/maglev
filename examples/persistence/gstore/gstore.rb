@@ -32,10 +32,8 @@ load "pstore.rb"
 # NOTE: You must have created the smalltalk FFI wrappers in order to run
 # this (rake dev:stwrappers).
 
-# TODO: Add a way to remove a "file" from GStore.
-
 # Other contenders to think about:
-#   * *dbm
+#   * gdbm, ndbm,...
 #   * madeline
 #   * YAML
 #   * Tokyo Cabinet
@@ -49,21 +47,16 @@ class GStore < PStore
   def initialize(file="")
     raise PStore::Error, "Commit failed!" if (!Smalltalk::System._st_commitTransaction)
 
-    # Get the user program root for storing persistent data within the VM.
-    # This is known to the GemStone VM as :UserGlobals.  It is a Smalltalk
-    # Dictionary (hash).
-    user_globals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
-
-    do_in_transaction {
-      # @all_data is the Ruby Hash that will store each of the "files"
-      # managed by GStore.  Each GStore "file" will be a Hash stored in
-      # @all_data, keyed by the "file name".  @all_data is kept in
-      # UserGlobals, so it, and all it contains, will be transactionally
-      # persisted automatically by MagLev.
-      @all_data = user_globals._st_at_ifAbsent(:GStore_data, nil)
-      @all_data = user_globals._st_at_put(:GStore_data, Hash.new) unless @all_data
+    # @all_data is the Ruby Hash that will store each of the "files"
+    # managed by GStore.  Each GStore "file" will be a Hash stored in
+    # @all_data, keyed by the "file name".  @all_data is kept in
+    # UserGlobals, so it, and all it contains, will be transactionally
+    # persisted automatically by MagLev.
+    @all_data = GStore.get_all_data
+    GStore.do_in_transaction do
       @all_data[file] = Hash.new unless @all_data.key?(file)
-    }
+    end
+
     @transaction = false
     @filename = file
   end
@@ -96,12 +89,31 @@ class GStore < PStore
     end
   end
 
+  # Remove the GStore "file" from the persistent store.  This is analagous
+  # to deleting the PStore db file (rm pstore.db).
+  def self.rm(file)
+    all_data = self.get_all_data
+    GStore.do_in_transaction { all_data.delete(file) }
+  end
+
   private
 
-  def do_in_transaction
+  def self.get_all_data
+    GStore.do_in_transaction {
+      # UserGlobals is the well known GemStone VM persistent root available
+      # for use by user programs.
+      user_globals = Smalltalk::System._st_myUserProfile._st_objectNamed :UserGlobals
+
+      all_data = user_globals._st_at_ifAbsent(:GStore_data, nil)
+      all_data = user_globals._st_at_put(:GStore_data, Hash.new) unless all_data
+      all_data
+    }
+  end
+
+  def self.do_in_transaction
     for i in (1..10)
-      yield
-      return if (Smalltalk::System._st_commitTransaction)
+      v = yield
+      return v if (Smalltalk::System._st_commitTransaction)
       Smalltalk::System._st_abortTransaction
     end
     raise PStore::Error, "Unable to commit transaction"
