@@ -1,0 +1,20 @@
+limit bytes 128
+login
+run
+| ctx hm |
+hm := (RubyEnv _getenv:'MAGLEV_HOME') .
+
+ctx := RubyContext load:#( ) . "traceLoad logSexp allIvsDynamic" 
+"RubyCompiler altParser: (RubyParseTreeClient host: 'energy' port: 10020) . "
+RubyContext bootWarnings: true .  "enable/disable:  warning dynamic constant"
+RubyGlobalScopN traceGlobals: 0 .
+RubyStaticScope traceLocals: 0 .
+GsNMethod traceIR: 0 .   "0 none, 1, line num of each meth, 2 full"
+
+"Exception installDebugBlock: [:ex|  nil pause ].  "
+ctx loadBootFileNamed: hm , '/src/kernel/parser/load_parser.rb'  .
+
+RubyContext save .
+System commitTransaction ifFalse:[ nil error:'commit failed'].
+true
+%
