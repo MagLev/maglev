@@ -53,7 +53,7 @@ class Struct
       #   attrs.unshift klass_name
       #   klass_name = nil
       # end
-      if klass_name.instance_of?(Symbol)
+      if klass_name._isSymbol
         attrs.unshift klass_name
         klass_name = nil
       end
@@ -161,8 +161,7 @@ class Struct
 
   # See Gemstone note in bootstrap/Struct.rb
   def [](var)
-    case var
-    when Numeric then
+    if var._isNumeric
       var = var.to_i
       a_len = _attrs.length
       if var > a_len - 1 then
@@ -172,7 +171,7 @@ class Struct
         raise IndexError, "offset #{var + a_len} too small for struct(size:#{a_len})"
       end
       var = _attrs[var]
-    when Symbol, String then
+    elsif var._isStringOrSymbol
       42 # HACK
       # ok
     else
@@ -204,8 +203,7 @@ class Struct
   #    joe.zip    #=> "90210"
 
   def []=(var, obj)
-    case var
-    when Numeric then
+    if var._isNumeric 
       var = var.to_i
       a_len = _attrs.length
       if var > a_len - 1 then
@@ -215,7 +213,7 @@ class Struct
         raise IndexError, "offset #{var + a_len} too small for struct(size:#{a_len})"
       end
       var = _attrs[var]
-    when Symbol, String then
+    elsif var._isStringOrSymbol
       42 # HACK
       # ok
     else

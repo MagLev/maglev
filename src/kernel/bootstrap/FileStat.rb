@@ -241,3 +241,4 @@ class File::Stat
   end
 
 end
+File::Stat._freeze_constants

@@ -1158,4 +1158,7 @@ a = [0, 1, 4, 9]
 a.fill(-2) { |i| i*i*i }
 test(a, [0, 1, 8, 27], 'fill 5')
 
+b = [1, 2, *[3, 4, 5]]
+test(b,  [1, 2, 3, 4, 5] , "splat in array construction");
+
 report

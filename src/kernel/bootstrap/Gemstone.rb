@@ -7,6 +7,9 @@ class Gemstone
   class_primitive 'abortTransaction'
   class_primitive 'beginTransaction'
 
+  class_primitive 'session_temp' , '_sessionTempsAt:'  # returns nil if not found
+  class_primitive 'session_temp_put', '_sessionTempsAt:put:' # returns value stored
+
   # _processInfo includes getuid getgid, getpid, kill  and related functions
   class_primitive_nobridge '_processInfo', '_processInfo:with:with:'
   class_primitive_nobridge '_host_times', '_hostTimes'

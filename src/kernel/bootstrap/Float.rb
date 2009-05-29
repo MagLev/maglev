@@ -186,3 +186,4 @@ primitive 'to_fmt' , '_rubyAsFormattedString'
   primitive_nobridge '_hypot', 'hypot:'
   primitive_nobridge  '_ldexp', 'ldexp:'
 end
+Float._freeze_constants

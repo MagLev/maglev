@@ -13,6 +13,11 @@ class Module
   primitive_nobridge 'const_defined?', 'rubyConstDefined:'
   primitive_nobridge '_const_get',      'rubyGlobalAt:'
   primitive_nobridge 'const_set',      'rubyConstAt:put:'
+
+  # make associations holding constants of receiver invariant
+  #   does not affect inherited constants
+  primitive_nobridge '_freeze_constants', '_rubyConstantsFreeze'
+
   primitive_nobridge '_include_module', 'includeRubyModule:'
 
   primitive_nobridge 'ancestors' , 'rubyAncestors'

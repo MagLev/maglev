@@ -25,6 +25,8 @@ class IdentitySet
     primitive_nobridge '_basic_clone', '_basicCopy' # use singleton class
     # dup, clone inherited from Object
 
+   primitive_nobridge 'to_a' , 'asArray'
+
     def delete(obj)
       delete?(obj)
       self

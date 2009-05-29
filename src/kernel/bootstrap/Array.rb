@@ -478,6 +478,30 @@ class Array
     self
   end
 
+  primitive_nobridge '_copy_from_to', 'copyFrom:to:'
+
+  def _copy_delete_last(count)
+    # Returns an Array containing the last  count  elements of receiver
+    # and deletes those elements  from the receiver.
+    if count.equal?(0)
+      res = []
+    else
+      sz = self.size
+      res = self._copy_from_to( sz - count + 1 , sz )
+      self.size=( sz - count  )
+    end
+    res
+  end
+
+  def _remove_last(count)
+    # deletes the last count elements of receiver.
+    unless count.equal?(0)
+      sz = self.size
+      self.size=( sz - count  )
+    end
+    self
+  end
+
   # Return copy of self with all nil elements removed
   def compact
     result = []
@@ -974,6 +998,11 @@ class Array
   end
 
   primitive_nobridge '_remove_from_to_', 'removeFrom:to:'
+
+  def _remove_last(count)
+    sz = self.size
+    self.size=(sz - count)
+  end
 
   def shift
     sz = self.size

@@ -42,6 +42,7 @@ RUBY.global('TCPSocket', 'TCPSocket')
 RUBY.global('Thread', 'GsProcess')
 RUBY.global('ThreadGroup', 'RubyThreadGroup')
 RUBY.global('Time', 'RubyTime')
+RUBY.global('TransientShortArray', 'TransientShortArray')
 RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 
@@ -161,4 +162,6 @@ DEBUG_SPEC = false
 TRUE  = true
 FALSE = false
 NIL = nil
+#  associationsfor TRUE, FALSE, NIL frozen by RubyContext>>_requirePrimitives...
+#
 STDOUT = nil   # real value assigned later

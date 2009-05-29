@@ -14,7 +14,8 @@ module URI
   class MailTo < Generic
     MBP = PATTERN::ESCAPED
   end
-  URI_A , URI_B = 99, 101
+  URI_A = 99
+  URI_B = 101
 end
 
 m = URI::MailTo.new  

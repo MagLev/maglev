@@ -104,6 +104,11 @@ class Object
     primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
     primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
+    # redefinition of __perform___ disallowed by parser after bootstrap finished.
+    # __perform___  requires first arg to be a Symbol with proper suffix 
+    #   for the number of with: keywords; it is used by RubyParser
+    primitive_nobridge '__perform___', '_rubyPerform:env:with:with:with:'
+
     primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
     primitive   '_basic_clone', '_basicCopy' # use singleton class
 
@@ -124,6 +129,11 @@ class Object
 
     primitive 'freeze', 'immediateInvariant'
     primitive 'frozen?', 'isInvariant'
+
+    # _set_nostubbing prevents stubbing ram oops to objectIds in in-memory 
+    #  instance variables that reference committed objects .  should only
+    # be used in limited cases when initializing transient state .
+    primitive '_set_nostubbing', '_setNoStubbing'
 
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
     primitive_nobridge 'kind_of?' , '_rubyKindOf:'
@@ -259,6 +269,10 @@ class Object
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
+
+    # _not_equal? is implemented by the ruby parser and optimized to
+    #  a special bytecode by the code generator.
+    # Attempts to reimplement _not_equal? will fail with a compile error.
 
     def eql?(other)
       self == other

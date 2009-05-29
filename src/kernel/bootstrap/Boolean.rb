@@ -22,10 +22,6 @@ class Boolean
     self.equal?(true) ? "true" : "false"
   end
 
-  def self.===(other)
-    return other.class.equal?(self)
-  end
-
   def frozen?
     false
   end

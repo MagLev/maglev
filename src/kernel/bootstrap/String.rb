@@ -99,7 +99,7 @@ class String
       other = Type.coerce_to(arg, String, :to_str)
     end
     self._append(other)
-    self.taint if other.tainted?
+    # self.taint if other.tainted?
     self
   end
 
@@ -187,19 +187,19 @@ class String
   def [](index)
     if index._isRegexp
       s = _at(index)
-      s.taint if index.tainted?
+      # s.taint if index.tainted?
     elsif index._isRange
       first, len = index._beg_len(self.length)
       return nil if first.equal?(nil)
       s = self._at_length(first, len)
     elsif index._isString
       s = self._at(index)
-      s.taint if ! s.nil? && index.tainted?
+      # s.taint if ! s.nil? && index.tainted?
     else
       index = Type.coerce_to(index, Integer, :to_int)
       s = self._at(index)
     end
-    s.taint if self.tainted? and not s.nil?
+    # s.taint if self.tainted? and not s.nil?
     s
   end
 
@@ -208,7 +208,7 @@ class String
       m_begin, m_len = self._match_regexp(start, length)
       return nil if m_begin.equal?(nil)
       s = self._at_length(m_begin, m_len)
-      s.taint if start.tainted?
+      # s.taint if start.tainted?
       s
     else
       length = Type.coerce_to(length, Integer, :to_int)
@@ -216,7 +216,7 @@ class String
       s = _at_length(start, length)
       return nil if length < 0
     end
-    s.taint if self.tainted?
+    # s.taint if self.tainted?
     s
   end
 
@@ -238,7 +238,7 @@ class String
       raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
       _at_put(idx, val)
     end
-    taint if value.tainted?
+    # taint if value.tainted?
     self
   end
 
@@ -257,7 +257,7 @@ class String
 
       _at_length_put(idx, count, str_value)
     end
-    taint if value.tainted?
+    # taint if value.tainted?
     self
   end
 
@@ -267,7 +267,7 @@ class String
 
   def capitalize
     x = _capitalize
-    x.taint if self.tainted?
+    # x.taint if self.tainted?
     x
   end
 
@@ -399,7 +399,7 @@ class String
 
   def downcase
     s = _downcase
-    s.taint if self.tainted?
+    # s.taint if self.tainted?
     s
   end
 
@@ -470,7 +470,7 @@ class String
       if i > 0 && self[i-1] == newline &&
           (ssize < 2 || sep._compare_substring(self, i-ssize, ssize) == 0)
         line = self[last, i-last]
-        line.taint if tainted?
+        # line.taint if tainted?
         yield line
         # We don't have a way yet to check if the data was modified...
         #modified? id, my_size
@@ -482,7 +482,7 @@ class String
 
     unless last == my_size
       line = self[last, my_size-last+1]
-      line.taint if tainted?
+      # line.taint if tainted?
       yield line
     end
 
@@ -838,7 +838,7 @@ class String
       return nil if m_begin.equal?(nil)
       raise TypeError, "can't modify frozen string" if self.frozen?
       r = slice!(m_begin, m_len)
-      r.taint if self.tainted? or start.tainted?
+      # r.taint if self.tainted? or start.tainted?
       return r
     end
 
@@ -982,7 +982,7 @@ class String
     ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
 
     # Taint all
-    ret = ret.map { |str| str.taint } if self.tainted?
+    # ret = ret.map { |str| str.taint } if self.tainted?
 
     ret
   end
@@ -1023,7 +1023,7 @@ class String
           dup
         end
     r = self.class.new(r) unless self._isString
-    r.taint if replacement.tainted? || self.tainted?
+    # r.taint if replacement.tainted? || self.tainted?
     r
   end
 
@@ -1037,7 +1037,7 @@ class String
           dup
         end
     r = self.class.new(r) unless self._isString
-    r.taint if self.tainted? || pattern.tainted?
+    # r.taint if self.tainted? || pattern.tainted?
     r
   end
 
@@ -1048,7 +1048,7 @@ class String
     # stores into caller's $~
     if match = regex._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
-      self.taint if replacement.tainted?
+      # self.taint if replacement.tainted?
       self
     else
       nil
@@ -1064,7 +1064,7 @@ class String
     if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match)
       replace(_replace_match_with(match, replacement))
-      self.taint if replacement.tainted?
+      # self.taint if replacement.tainted?
       self
     else
       nil
@@ -1115,7 +1115,7 @@ class String
   def succ
     d = self.dup
     d.succ!
-    d.taint if self.tainted?
+    # d.taint if self.tainted?
     d
   end
 
@@ -1148,7 +1148,7 @@ class String
   def swapcase
     s = self.dup
     s.swapcase!
-    s.taint if self.tainted?
+    # s.taint if self.tainted?
     s
   end
 
@@ -1231,7 +1231,7 @@ class String
   def tr(from_str, to_str)
     s = self.dup
     s.tr!(from_str, to_str)
-    s.taint if tainted?
+    # s.taint if tainted?
     s
   end
 
@@ -1259,7 +1259,7 @@ class String
     from = Type.coerce_to(from_str, String, :to_str)
     to   = Type.coerce_to(to_str,   String, :to_str)
     str = self.dup
-    str.taint if self.tainted?
+    # str.taint if self.tainted?
     str._tr_s!(from, to) || str
   end
 
@@ -1268,7 +1268,7 @@ class String
   primitive '_upcase', 'asUppercase'
   def upcase
     r = _upcase
-    r.taint if tainted?
+    # r.taint if tainted?
     r
   end
 
@@ -1343,7 +1343,7 @@ class String
     end
 
     _paddedToWithString(direction, width, padstr)
-    taint if padstr.tainted?
+    # taint if padstr.tainted?
     self
   end
 end
