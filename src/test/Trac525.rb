@@ -3,6 +3,8 @@ def foo
     super() { yield }
   end
 end
+true
+
 # class CGI
 #   module HtmlExtension
 #     # Generate an Anchor element as a string.
