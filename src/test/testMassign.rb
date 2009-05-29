@@ -1,5 +1,8 @@
 def expect(act, exp)
-  unless act == exp ; raise 'error'; end
+  unless act == exp 
+    puts 'error'
+    nil.pause
+  end
 end
 
  a , b  = 1, 2, 3
@@ -34,13 +37,8 @@ end
    expect( a , 9 )
    expect( b , nil )
 
- x = [11,[22,[33,44]]]
- a,(b,(c,d)) = x
-   expect( a , 11 )
-   expect( b , 22 )
-   expect( c , 33 )
-   expect( d , 44 )
-
+ b = 22
+ c = 33
  b,c = c,b
    expect( c , 22 )
    expect( b , 33 )
@@ -49,7 +47,70 @@ end
  y = x[0,2] += [5]
    expect( y , [1,2,5] )
    expect( x , [1,2,5,3,4] )
+
+ x = [22,[33,44]]
+ b,(c,d) = x
+   expect( b , 22 )
+   expect( c , 33 )
+   expect( d , 44 )
  
+ x = [11,[22,[33,44]]]
+ a,(b,(c,d)) = x
+   expect( a , 11 )
+   expect( b , 22 )
+   expect( c , 33 )
+   expect( d , 44 )
+
+ *b = [1] 
+ expect( b , [[1]] )
+
+ *w = 5
+ expect( w , [5] )
+
+ * = (k=5),(j=6)   # useless but allowed , and don't skip rhs side effects
+ expect( k , 5)
+ expect( j , 6)
+
+ *w = [*[7]]
+ expect( w , [[7]] )
+
+ *j = [1,2,3]
+ expect( j , [[1,2,3]] )
+
+ *x = (1..7).to_a
+ expect(x , [[1, 2, 3, 4, 5, 6, 7]] )
+
+ a,b,*c = [*[8,9]] 
+ expect(a, 8)
+ expect(b, 9)
+ expect(c , [])
+
+ a,b,*c = []
+ expect(a, nil)
+ expect(b, nil)
+ expect(c, [])
+
+ *a = *[1]
+ expect(a , [1])
+
+ a,b,*c = [1,2]
+ expect( [a,b,c] , [1,2,[]])
+
+ a,b,*c = *1
+ expect( [a,b,c] , [1, nil, []] )
+
+ *a = 1, 2, 3
+ expect( a , [1, 2, 3] )
+
+ a,(b,(c,d)) = 1,[2,[3,4]]
+ expect( [a, b, c, d ], [1,2,3,4] )
+
+ a , = *[1]
+ expect (a , 1)
+
+ a,(b,(c,d)) = [1,[2,[3,4]]]
+ expect( [a, b, c, d],  [1,2,3,4] )
+
 
 class Holder
   def get
