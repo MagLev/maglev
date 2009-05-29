@@ -9,13 +9,19 @@ class EvalLine
     unless line 
        raise "Didn't find #{$file} in caller" 
     end
-    file, line, method = line.split(':')
-    unless file == $file
+    splits = line.split(':')
+    file = splits[0]
+    line_num = splits[1]
+    method = splits[2]
+    gfile = $file
+    gline = $line_number
+    unless file == gfile
       raise "Wrong file name: #{file} expecting"   
     end
-    unless line.to_i == $line_number
-      raise "Wrong line number: #{line} expecting: #{$line_number}"
+    unless line_num.to_i == gline
+      raise "Wrong line number: #{line_num} expecting: #{gline}"
     end
+    nil.pause 
   end
 
   def baz
