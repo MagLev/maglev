@@ -1,0 +1,1424 @@
+# require 'stringio'
+# require 'racc/parser'
+# require 'sexp'
+# require 'strscan'
+
+# WHY do I have to do this?!?
+class Regexp
+  ONCE     = 0 # 16 # ?
+  ENC_NONE = /x/n.options
+  ENC_EUC  = /x/e.options
+  ENC_SJIS = /x/s.options
+  ENC_UTF8 = /x/u.options
+end
+Regexp._freeze_constants
+
+# Fixnum#ord deleted
+
+# class InternalParseError < StandardError
+# end
+
+module MagRp # {
+
+    # RPStringScanner deleted, code moved to strscan2.rb
+
+    class Keyword # {
+      class KWtable
+	attr_accessor :name, :state, :id0, :id1 
+	def initialize(name, id=[], state=nil)
+	  @name  = name
+	  @id0, @id1 = id
+	  @state = state
+	end
+      end
+
+      ##
+      # :stopdoc:
+      #
+      # lexer states changed to Fixnums, see rp_classes.rb 
+      #  Expr_beg    = ignore newline, +/- is a sign.
+      #  Expr_end    = newline significant, +/- is a operator.
+      #  Expr_arg    = newline significant, +/- is a operator.
+      #  Expr_cmdarg = newline significant, +/- is a operator.
+      #  Expr_endarg = newline significant, +/- is a operator.
+      #  Expr_mid    = newline significant, +/- is a operator.
+      #  Expr_fname  = ignore newline, no reserved words.
+      #  Expr_dot    = right after . or ::, no reserved words.
+      #  Expr_class  = immediate after class, no here document.
+
+      wordlist = [
+		    # negated new state means yacc_value gets encapsulated in an RpNameToken
+		    # and/or gets other special handling
+		  ["end",      [:kEND,      :kEND        ], RubyLexer::Expr_end   ],
+		  ["else",     [:kELSE,     :kELSE       ], RubyLexer::Expr_beg   ],
+		  ["case",     [:kCASE,     :kCASE       ], - RubyLexer::Expr_beg   ],
+		  ["ensure",   [:kENSURE,   :kENSURE     ], RubyLexer::Expr_beg   ],
+		  ["module",   [:kMODULE,   :kMODULE     ], RubyLexer::Expr_beg   ],
+		  ["elsif",    [:kELSIF,    :kELSIF      ], RubyLexer::Expr_beg   ],
+		  ["def",      [:kDEF,      :kDEF        ], - RubyLexer::Expr_fname ],  
+		  ["rescue",   [:kRESCUE,   :kRESCUE_MOD ], - RubyLexer::Expr_mid   ],  
+		  ["not",      [:kNOT,      :kNOT        ], RubyLexer::Expr_beg   ],
+		  ["then",     [:kTHEN,     :kTHEN       ], RubyLexer::Expr_beg   ],
+		  ["yield",    [:kYIELD,    :kYIELD      ], - RubyLexer::Expr_arg   ],
+		  ["for",      [:kFOR,      :kFOR        ], RubyLexer::Expr_beg   ],
+		  ["self",     [:kSELF,     :kSELF       ], RubyLexer::Expr_end   ],
+		  ["false",    [:kFALSE,    :kFALSE      ], RubyLexer::Expr_end   ],
+		  ["retry",    [:kRETRY,    :kRETRY      ], - RubyLexer::Expr_end   ],
+		  ["return",   [:kRETURN,   :kRETURN     ], RubyLexer::Expr_mid   ],
+		  ["true",     [:kTRUE,     :kTRUE       ], RubyLexer::Expr_end   ],
+		  ["if",       [:kIF,       :kIF_MOD     ], - RubyLexer::Expr_beg   ], 
+		  ["defined?", [:kDEFINED,  :kDEFINED    ], RubyLexer::Expr_arg   ],
+		  ["super",    [:kSUPER,    :kSUPER      ], - RubyLexer::Expr_arg   ], 
+		  ["undef",    [:kUNDEF,    :kUNDEF      ], RubyLexer::Expr_fname ],
+		  ["break",    [:kBREAK,    :kBREAK      ], - RubyLexer::Expr_mid   ],
+		  ["in",       [:kIN,       :kIN         ], RubyLexer::Expr_beg   ],
+		  ["do",       [:kDO,       :kDO         ], - RubyLexer::Expr_beg   ], 
+		  ["nil",      [:kNIL,      :kNIL        ], RubyLexer::Expr_end   ],
+		  ["until",    [:kUNTIL,    :kUNTIL_MOD  ], - RubyLexer::Expr_beg   ], 
+		  ["unless",   [:kUNLESS,   :kUNLESS_MOD ], - RubyLexer::Expr_beg   ], 
+		  ["or",       [:kOR,       :kOR         ], RubyLexer::Expr_beg   ],
+		  ["next",     [:kNEXT,     :kNEXT       ], - RubyLexer::Expr_mid   ],
+		  ["when",     [:kWHEN,     :kWHEN       ], - RubyLexer::Expr_beg   ],
+		  ["redo",     [:kREDO,     :kREDO       ], - RubyLexer::Expr_end   ],
+		  ["and",      [:kAND,      :kAND        ], RubyLexer::Expr_beg   ],
+		  ["begin",    [:kBEGIN,    :kBEGIN      ], RubyLexer::Expr_beg   ],
+		  ["__LINE__", [:k__LINE__, :k__LINE__   ], RubyLexer::Expr_end   ],
+		  ["class",    [:kCLASS,    :kCLASS      ], RubyLexer::Expr_class ],
+		  ["__FILE__", [:k__FILE__, :k__FILE__   ], RubyLexer::Expr_end   ],
+		  ["END",      [:klEND,     :klEND       ], RubyLexer::Expr_end   ],
+		  ["BEGIN",    [:klBEGIN,   :klBEGIN     ], RubyLexer::Expr_end   ],
+		  ["while",    [:kWHILE,    :kWHILE_MOD  ], - RubyLexer::Expr_beg   ], 
+		  ["alias",    [:kALIAS,    :kALIAS      ], - RubyLexer::Expr_fname ],
+		 ].map { |args| KWtable.new(*args) }
+
+      # :startdoc:
+
+      WORDLIST = (Hash[*wordlist.map { |o| [o.name, o] }.flatten]).freeze
+
+      # def self.keyword( str)  ; end # implemented in lexer.rb
+
+    end # }
+
+    class Environment # {    
+      # first openning of Environment is in rp_classes.rp,
+      #    so OFF_ constant refs can be static
+
+      def reset
+	@curridx = -ENTRY_SIZE 
+	self.extend(false)
+      end
+
+      def extend(dyn)  # arg is false or true
+	idx = @curridx + ENTRY_SIZE
+	@curridx = idx 
+        ary = @arr
+	ary[idx ] = nil   # the env dict , created on demand
+	ary[idx + OFF_dyn] = dyn
+	ary[idx + OFF_use] = nil # # the use dict , created on demand
+        ary[idx + OFF_byte_offset] = @src_scanner.pos
+       end
+
+      def unextend
+        idx = @curridx
+        @extend_ofs_last_unextend = @arr[idx + OFF_byte_offset]
+	idx = idx - ENTRY_SIZE
+	if idx < 0
+	  raise "You went too far unextending env"
+	end
+	@curridx = idx
+      end
+
+      def is_extended
+        @curridx > 0
+      end
+
+      def []( k)
+	# look for k starting in current and including first non-dynamic scope
+	idx = @curridx
+	ary = @arr
+	while idx >= 0
+	  h = ary[idx ]
+          if h._not_equal?(nil)
+	    v = h[k] 
+	    if v._not_equal?(nil)
+	      return v
+	    end
+          end
+          if ary[idx + OFF_dyn].equal?( false)
+            break # exit loop , we just probed first non-dynamic scope
+          end
+	  idx -= ENTRY_SIZE
+	end
+	nil
+      end
+
+      def []=( k, v)
+	# raise "no" if v == true
+	if v.equal?(true)
+	  raise "Environment:[]= , invalid true arg"
+	end
+	# self.current[k] = v
+        idx = @curridx
+        ary = @arr
+	h = ary[idx ]
+        if h.equal?(nil)
+          h = Hash.new 
+          ary[idx ] = h 
+        end
+	h[k] = v
+      end
+
+
+      # def env ; end # same as  current
+
+      def current_at(akey)
+	# @env.first
+        h = @arr[@curridx ]
+        if h._not_equal?( nil)
+          h[akey]
+        else
+          nil
+	end
+      end
+
+      def dynamic_keys
+	# return all keys in current up to and excluding first non-dynamic
+	idx = @curridx
+	ary = @arr
+	set = IdentitySet.new
+	while idx >= 0
+	  if ary[idx + OFF_dyn].equal?( false) 
+	    break # exit while loop
+	  end
+	  h = ary[idx ]
+          if h._not_equal?(nil)
+	    h._add_keys_to(set)
+          end
+	  idx -= ENTRY_SIZE
+	end
+	set.to_a 
+      end
+
+      def dynamic?
+	# @dyn[0] != false
+	@arr[@curridx + OFF_dyn].equal?( true )
+      end
+
+      def use( id)
+	#@env.each_with_index do |env, i|
+	#  if env[id] then
+	#    @use[i][id] = true
+	#  end
+	#end
+	idx = @curridx
+	ary = @arr
+	while idx >= 0
+	  h_env = ary[idx ]
+          if h_env._not_equal?(nil)
+	    if h_env[id]
+	      h_use = ary[idx + OFF_use]
+              if h_use.equal?(nil)
+                h_use = Hash.new
+                ary[idx + OFF_use] = h_use
+              end
+	      h_use[id] = true
+            end
+	  end
+	  idx -= ENTRY_SIZE
+	end
+      end
+
+      def used?( id)
+	idx = @curridx
+	ary = @arr
+	while idx >= 0
+	  h_use = ary[idx + OFF_use]
+          if h_use._not_equal?(nil)
+	    if h_use[idx]
+	      return true
+            end
+	  end
+	end 
+	false
+      end
+
+    end # }
+
+    class StackState < Array  # {
+      # deleted instvar @stack and made StackState a subclass of Array
+      def initialize
+	self[0] = false 
+      end
+
+      def inspect
+	"StackState:" << super 
+      end
+
+      def is_in_state
+	# @stack.last
+	self[ self.size - 1]
+      end
+
+      def lexpop
+        # raise if @stack.size == 0
+        # a = @stack.pop
+        # b = @stack.pop
+        # @stack.push(a || b)
+	sz = self.size
+        if (sz >= 2)
+          new_sz = sz - 1
+          a = self[new_sz]
+          if a
+            self[new_sz - 1] = a
+          end
+          self.size=( new_sz )
+        elsif sz.equal?(0)
+          raise('lexpop underflow')
+        else
+          # no change if stack size == 1
+        end
+	self
+      end
+
+      def pop
+	sz = self.size
+	sz_minus_1 = sz - 1 
+	# r = @stack.pop
+	r = self[ sz_minus_1 ]
+	# @stack.push false if @stack.size == 0
+	if sz_minus_1.equal?(0)
+	  self[ sz_minus_1 ] = false
+	else
+	  self.size=( sz_minus_1 )
+	end
+	r
+      end
+
+      def push( val)
+	# @stack.push val
+	sz = self.size
+	self[sz] = val
+	self 
+      end
+    end # }
+
+# Gemstone, deleted class Sexp
+
+
+ class RubyParser < MagRp::Parser # {
+  VERSION = '2.0.2'
+
+  attr_accessor :lexer, :in_def, :in_single, :file , :syntax_err_count
+  attr_reader :env
+
+  def line_for(name_tok)
+    # for syntax error messages
+    # returns a String
+    num = -1
+    if name_tok.is_a?(RpNameToken)
+      byte_ofs = name_tok.src_offset
+      num = @lexer.line_for_offset(byte_ofs)
+    end
+    num == -1 ? '???' : num.to_s
+  end
+
+  def line_for_offset(byte_ofs)
+    # error messages and debugging
+    @lexer.line_for_offset(byte_ofs)
+  end
+
+  def last_closed_def_message
+    # for error messages
+    ofs = @env.last_closed_def_offset
+    if ofs >= 0
+      num = @lexer.line_for_offset(ofs)
+      if (num > 1)
+        num -= 1   # usually extend happens after EOL has been lexed
+      end
+      msg = " last 'end' matched def/class/module near line "
+      msg << (num >= 0 ? num.to_s : '???' )
+    else
+      msg = ''
+    end
+    msg
+  end
+
+
+  InvalidAssignableLhs = IdentitySet.with_all(
+       [ :self , :nil , :true , :false , :"__LINE__" , :"__FILE__" ] )
+
+  def assignable(lhs, value) # value maybe nil    # [
+    lhs_cls = lhs.class
+    if lhs_cls.equal?(RpNameToken)
+      id = lhs.symval 
+      src_ofs = lhs.src_offset 
+    elsif lhs.kind_of?( RubyAbstractLiteralNode )
+      raise SyntaxError, "Can't change the value of #{lhs.nameForError}"
+    else
+      raise_error("assignable - invalid lhs")
+    end
+    if InvalidAssignableLhs.include?(id)
+      raise SyntaxError, "Can't change the value of #{id}"
+    end
+
+    first_ch = id[0]
+    result = nil
+    if first_ch <= ?Z
+      if first_ch.equal?(  ?@ )
+        if id[1].equal?( ?@ )
+          # asgn = self.in_def || self.in_single > 0
+          # s((asgn ? :cvasgn : :cvdecl), id)
+          #   maglev, :cvasgn , :cvdecl  both have same production
+          result = RubyClassVarDeclNode.s(id, value)  # s(:cvasgn ) , s(:cvdecl) 
+        else
+          result = RubyInstAsgnNode.s(id, value) # s(:iasgn )
+        end
+      elsif first_ch.equal?( ?$ )
+        result = RubyGlobalAsgnNode.s(id, value) # s(:gasgn )
+      elsif RpStringScanner.ch_is_uc_alpha(first_ch)   # A-Z
+        c2node = RubyColon2Node.simple(id)
+        result = RubyConstDeclNode.s(c2node, value) # s(:cdecl )
+      end
+    end
+    if result.equal?(nil) 
+      cenv = @env
+      type = cenv[id]
+      if type.equal?( :lvar) 
+	result = RubyLocalAsgnNode.s(id, value) # s(:lasgn )
+        result.src_offset=( src_ofs )
+        return result;
+      elsif type.equal?( nil ) || type.equal?(:dvar)
+	 if cenv.current_at(id).equal?(  :dvar)  then
+	   # ok
+	 elsif type.equal?( :dvar) then
+	   @env.use(id)
+	 end
+	 result = RubyLocalAsgnNode.s(id, value) # s(:lasgn )
+      else
+	 raise "in assignable:  unknown type: #{@env[id]}"
+      end
+      if type.equal?( nil)
+        cenv[id] = :lvar
+      end
+    else
+      @env[id] = :lvar
+    end
+    result.src_offset=( src_ofs )
+    return result
+  end      # ]
+
+  def check_assignable(lhs) 
+    # has side effect of updating env 
+    if lhs._isSymbol
+      id = lhs
+      if InvalidAssignableLhs.include?(id)
+        raise SyntaxError, "Can't change the value of #{id}"
+      end
+    else
+      raise_error("check_assignable arg not a symbol")
+    end
+
+    first_ch = id[0]
+    ok = nil
+    if first_ch <= ?Z
+      if first_ch.equal?(  ?@ )
+        if id[1].equal?( ?@ )
+          ok = true # for s(:cvasgn ) , s(:cvdecl)
+        else
+          ok = true # for s(:iasgn )
+        end
+      elsif first_ch.equal?( ?$ )
+        ok = true # for  s(:gasgn )
+      elsif RpStringScanner.ch_is_uc_alpha(first_ch)
+        ok = true # s(:cdecl )
+      end
+    end
+    if ok.equal?(nil) 
+      type = @env[id]
+      if type.equal?( :lvar) 
+	#ok
+      elsif type.equal?( nil ) || type.equal?(:dvar)
+	 if @env.current_at(id).equal?(  :dvar)  then
+	   # ok
+	 elsif type.equal?( :dvar) then
+	   @env.use(id)
+	 end
+	 #
+      else
+	 raise "in assignable:  unknown type: #{@env[id]}"
+      end
+    end
+    if type.equal?( nil)
+      @env[id] = :lvar
+    end
+    nil
+  end
+
+  def min_line(a_line, b_line)
+    if a_line.equal?(nil)
+      return b_line
+    end
+    if b_line.equal?(nil)
+      return a_line
+    end
+    return a_line < b_line ? a_line : b_line
+  end
+
+  def block_append(head, tail)  #  , strip_tail_block=false
+	# can't find any callers passing strip_tail_block==true
+    h_arg = head
+    return head unless tail
+    return tail unless head
+
+    # case head[0]
+    # when :lit, :str then  # :str produces a subclass of what :lit produces
+    #  return tail
+    # end
+    if head.kind_of?(RubyAbstractLiteralNode)
+      return tail
+    end
+
+    # head = remove_begin(head)
+    head = head.kbegin_value
+
+    #  head = s(:block, head) unless head[0] == :block
+    unless head.class.equal?(RubyBlockNode)
+      head = RubyBlockNode.s( [ head ] )
+    end
+
+    # if strip_tail_block and Sexp === tail and tail[0] == :block then 
+    #  head.push(*tail.values)
+    # else
+    #  head << tail
+    # end               # note strip_tail_block always false
+    head.append_to_block( tail )
+    head
+  end
+
+  def cond_or_nil(node)
+    if node.equal?(nil)
+      nil
+    else
+      cond(node)
+    end
+  end 
+
+  def cond(arg)
+    node = value_expr(arg)
+    node = node.as_cond(self)
+ # # as_cond(aMagRp) implements:
+ #  case node.first
+ #  when :dregx then     # RubyDRegexpNode   # Ryan says not used
+ #    return s(:match2, node, s(:gvar, "$_".to_sym))
+ #  when :regex then     # RubyRegexpNode  # :regex is Rubinius only
+ #    return s(:match, node)
+ #  when :lit then     # RubyRegexpNode
+ #    if Regexp === node.last then
+ #      return s(:match, node)
+ #    else
+ #      return node
+ #    end
+ #  when :and then	# RubyAndNode
+ #    return s(:and, cond_or_nil(node[1]), cond_or_nil(node[2]))
+ #  when :or then	# RubyOrNode
+ #    return s(:or,  cond_or_nil(node[1]), cond_or_nil(node[2]))
+ #  when :dot2 then     # RubyDotNode
+ #    label = "flip#{node.hash}"
+ #    env[label] = :lvar
+ #    return s(:flip2, node[1], node[2])
+ #  when :dot3 then     # RubyDotNode
+ #    label = "flip#{node.hash}"
+ #    env[label] = :lvar
+ #    return s(:flip3, node[1], node[2])
+ #  else		# RubyNode
+ #    return node
+ #  end
+    node
+  end
+
+  def get_match_node( lhs, sel_tok, rhs) # TODOryan: rename to new_match
+    if lhs then
+      #case lhs[0]
+      #when :dregx, :dregx_once then
+      #  return s(:match2, lhs, rhs)
+      #when :lit then
+      #  return s(:match2, lhs, rhs) if Regexp === lhs.last
+      #end
+      l_cls = lhs.class
+      if l_cls.equal?(RubyDRegexpNode)  # :dregx and :dregx_once
+        res = RubyMatch2Node.s(lhs, rhs)
+        res.src_offset=( sel_tok.src_offset )
+        return res
+      elsif l_cls.equal?(RubyRegexpNode)
+        res = RubyMatch2Node.s(lhs, rhs)
+        res.src_offset=( sel_tok.src_offset )
+        return res
+      end
+    end
+
+    if rhs then
+      #case rhs[0]
+      #when :dregx, :dregx_once then
+      #  return s(:match3, rhs, lhs)
+      #when :lit then
+      #  return s(:match3, rhs, lhs) if Regexp === rhs.last
+      #end
+      r_cls = rhs.class
+      if r_cls.equal?(RubyDRegexpNode)  # :dregx and :dregx_once
+        res = RubyMatch2Node.s(rhs, lhs)  # we use Match2Node for :match3
+        res.src_offset=( sel_tok.src_offset )
+        return res
+      elsif r_cls.equal?(RubyRegexpNode)
+        res = RubyMatch2Node.s(rhs, lhs)
+        res.src_offset=( sel_tok.src_offset )
+        return res
+      end
+    end
+
+    # return s(:call, lhs, :"=~", s(:arglist, rhs))
+    final_sel = RpNameToken.new( :"=~" , sel_tok.src_offset ) 
+    res = new_call_1( lhs,  final_sel , rhs )
+    res
+  end
+
+  def gettable(arg)
+    # raise "no: #{id.inspect}" if Sexp === id
+    #  id = id.to_sym if Sexp   === id # HACK
+    if arg.class.equal?(RpNameToken)
+      id = arg.symval
+      src_ofs = arg.src_offset
+    elsif arg._isSymbol
+      id = arg 
+      return RubySelfNode._new if id.equal?(:self) # s(:self)
+      return RubyNilNode._new  if id.equal?(:nil)  # s(:nil)  
+      return RubyTrueNode._new if id.equal?(:true) # s(:true)
+      return RubyFalseNode._new if id.equal?(:false) # s(:false) 
+      src_ofs = nil
+    else
+      raise_error("gettable unrecognized argument kind")
+    end 
+    
+    first_ch = id[0]
+    if first_ch <= ?Z
+      if first_ch.equal?(  ?@ )
+        if id[1].equal?( ?@ )
+          return RubyClassVarNode.s(id) # s(:cvar, id)
+        else
+          return RubyInstVarNode.s(id)  # s(:ivar, id)   
+        end
+      elsif first_ch.equal?( ?$ )
+        res = RubyGlobalVarNode.s( id)  # s(:gvar )
+        res.src_offset=( src_ofs )
+        return res
+      elsif RpStringScanner.ch_is_uc_alpha(first_ch)
+        return RubyConstNode.s( id)  # s(:const )
+      end 
+    end
+    if first_ch.equal?( ?_ )
+      if id.equal?(:__FILE__)   
+        return RubyStrNode.s( self.file)        
+      elsif id.equal?(:__LINE__) # s(:lit...)  # id was a RpNameToken
+        return RubyFixnumNode.s( src_ofs )
+      end
+    end
+    cenv = @env
+    type = cenv[id]
+    if type.equal?(:lvar) then
+      return RubyLocalVarNode.s(id)  # ryan's code always took this path ???
+    elsif type.equal?(:dvar) && cenv.dynamic? then
+      return RubyLocalVarNode.s(id)  # s(:lvar, id)  
+    else
+      # return  s(:call, nil, id, s(:arglist))  
+      return new_vcall(RubySelfNode._new, arg )
+    end
+    raise_error("identifier #{id.inspect} is not valid")
+  end
+
+  def initialize
+    super
+    lx = RubyLexer.new
+    lx.parser = self
+    @lexer = lx
+    @env = Environment.new
+    #  @comments  no longer used , this parser not for use with RDoc implementation
+
+    # inline required subset of reset # moved to new_instance method
+  end
+
+  def reset
+    lexer.reset
+    @env.reset
+  end
+
+  def list_append(list, item )  # TODOryan: nuke me *sigh*
+    # return s(:array, item) unless list
+    # list = s(:array, list) unless Sexp === list && list.first == :array
+    # list << item
+    arrayCls = RubyRpCallArgs
+    if list.equal?(nil)
+      return arrayCls.s( item) 
+    end
+    unless list.class.equal?(arrayCls) 
+      list = arrayCls.s(list)
+    end
+    list.append(item)
+    list
+  end
+
+  def list_prepend( list, item )  # TODOryan: nuke me *sigh*
+    # list = s(:array, list) unless Sexp === list && list[0] == :array
+    # list.insert 1, item
+    # list
+    arrayCls = RubyRpCallArgs
+    if list.class.equal?(arrayCls)
+      list.prepend(item)  
+    else
+      list = arrayCls.s(item, list)  
+    end
+    list
+  end
+
+  def literal_concat( head, tail)
+    unless head
+      return tail 
+    end
+    unless tail
+      return head 
+    end
+    # htype, ttype = head[0], tail[0]
+    htype = head.str_dstr_evstr_kind()  # 0,1,2  or nil
+    ttype = tail.str_dstr_evstr_kind()
+
+    if htype.equal?(2)  # htype == :evstr
+      head = RubyDStrNode.s([ RubyStrNode.s('') , head] )   
+    end
+
+    # case ttype
+    if ttype.equal?(0) #  when :str then
+      if htype.equal?(0) #  htype == :str
+        # append tail's String to head's String
+        head.appendString( tail.strNodeValue )  # head[-1] << tail[-1]
+      elsif  htype.equal?(1) and head.size.equal?(1) # htype == :dstr and head.size == 2 
+        # head is a dstr with a StrNode and no  further list elements
+        head.appendToHeadString( tail.strNodeValue ) #  head[-1] << tail[-1]
+      else  # htype == :dstr , or was :evstr changed to :dstr above
+        head.appendToList( tail ) 
+      end
+    elsif ttype.equal?(1)  # when :dstr then
+      if htype.equal?(0) #   htype == :str then
+        # tail[1] = head[-1] + tail[1]
+        tail.appendToHeadString( head.strNodeValue )
+        head = tail
+      else  # tail and head both  :dstr  
+        #tail[0] = :array
+        #tail[1] = s(:str, tail[1])
+        #tail.delete_at 1 if tail[1] == s(:str, '')
+        # head.push(*tail[1..-1])
+        t_list = tail.dstrList
+        t_list_head = t_list[0]
+        if t_list_head.strNodeValue == ''
+          t_list.delete_at(0)
+        end
+        head.dstrList.push( *t_list)
+      end
+    elsif ttype.equal?(2)  #   when :evstr then  # tail is EvStrNode
+      # head[0] = :dstr if htype == :str
+      if htype.equal?(0)  # head is StrNode
+        t_body = tail.evStrBody
+        if t_body.class.equal?(RubyStrNode)
+          head.appendString( t_body.strNodeValue )
+        else
+          dstr = RubyDStrNode.s( [ head, tail ] )
+          head = dstr   # become not needed by design of .y file
+        end
+      else
+        # head is a DStrNode
+        head.dstrList.push( tail)
+      end
+    else
+      raise_error( "literal_concat unknown type")
+    end
+    return head
+  end
+
+# def logop(type, left, right) # TODOryan: rename logical_op
+#   left = value_expr(left)
+#   if left and left[0] == type and not left.paren then
+#     node, second = left, nil
+#     while (second = node[2]) && second[0] == type and not second.paren do
+#       node = second
+#     end
+#     node[2] = s(type, second, right)
+#     return left
+#   end
+#   return s(type, left, right)
+# end
+
+  def logop(cls, left, right )
+    left = value_expr(left)
+    if left and left.class.equal?(cls) and not left.paren then
+      node = left
+      second = nil
+      while (second = node.secondNode) && second.class.equal?(cls) and not second.paren 
+        node = second
+      end
+      node.secondNode=( cls.s( second, right ) )
+      return left
+    end
+    return cls.s( left, right)
+  end
+
+  def new_aref( val)
+    # used from    | primary_value "[" aref_args tRBRACK
+    v_two = val[2]  # the aref_args , an arguments list
+    if v_two.equal?(nil)
+      v_two = RubyRpCallArgs._new
+    end
+    res = RubyCallNode.s( val[0], :"[]" , v_two )
+    res.src_offset=( val[3].src_offset )  # val[3] is the tRBRACK, a RpNameToken
+    res
+  end
+
+  def new_body( val)
+    v_zero = val[0]
+    result = v_zero
+    v_one = val[1]
+    if v_one             # we have a rescue clause
+      r_body = nil
+      if v_zero 
+        r_body = v_zero
+      end
+      rescuebody = v_one
+      #while rescuebody do
+      #  result << resbody
+      #  resbody = resbody.resbody(true)  # does not make sense
+      #end
+
+      r_else = val[2]
+      result = RubyRescueNode.s( r_body, rescuebody, r_else) # s(:rescue )
+    elsif not (v_two = val[2]).equal?(nil) then
+      warning("else without rescue is useless")
+      result = block_append(result, v_two)  # may create a new :block
+    end
+    v_three = val[3]
+    if v_three
+      result = RubyEnsureNode.s( result, v_three)  # s(:ensure )
+    end
+    return result
+  end
+
+  def new_fcall( sel_tok , arg)
+    # receiver is self
+    if arg.equal?(nil)
+      #  args ||= s(:arglist) , i.e. zero args
+      return new_vcall(RubySelfNode._new, sel_tok)
+    end
+    arg_cls = arg.class
+    if arg_cls.equal?(RubyRpCallArgs)
+      lst = arg.list
+      if lst.size.equal?(0)
+        return new_vcall(RubySelfNode._new, sel_tok)
+      end
+      result = RubyFCallNode.s( sel_tok.symval, arg ) # s(:vcall )
+    elsif arg_cls.equal?( RubyBlockPassNode )
+      result = RubyFCallNode.s( sel_tok.symval , nil) # s(:vcall )
+      result.iter=( arg )
+    else
+      cArgs = RubyRpCallArgs._new
+      cArgs.list=( [ arg ] )
+      result = RubyFCallNode.s( sel_tok.symval, cArgs ) # s(:vcall )
+    end
+    result.src_offset=( sel_tok.src_offset )
+#nil.pause
+    result
+  end
+
+  def new_vcall(recv, sel_tok)
+    # call with void , i.e. zero , args
+    result = RubyVCallNode.s(recv, sel_tok.symval)
+    result.src_offset=( sel_tok.src_offset )
+#nil.pause
+    result
+  end
+
+  def new_call(recv, sel_tok , arg)
+    # used where ryan had   new_call(r,sel,v[n]) without explicit s(:arglist, v)
+    # convert arg list to a RubyRpCallArgs for hasRestArg AST->IR phase
+    # generate VCallNode if possible, else FCallNode, else CallNode
+    if arg.equal?(nil)
+      #  args ||= s(:arglist) , i.e. zero args
+      return new_vcall(recv, sel_tok)       # DONE
+    end
+    arg_cls = arg.class
+    if arg_cls.equal?(RubyRpCallArgs)
+      if arg.is_empty
+        return new_vcall(recv, sel_tok)     # DONE
+      end
+      cArgs = arg
+    elsif arg_cls.equal?( RubyBlockPassNode )
+      if recv.class.equal?( RubySelfNode )
+        result = RubyFCallNode.s( recv , sel_tok.symval , nil ) # s(:fcall)
+      else
+        result = RubyCallNode.s( recv, sel_tok.symval , nil )  # s(:call )
+      end
+      result.iter=( arg )
+      result.src_offset=( sel_tok.src_offset )
+      return result     # DONE
+    else
+      cArgs = RubyRpCallArgs._new
+      cArgs.list=( [ arg ] ) 
+    end
+    if recv.class.equal?( RubySelfNode )
+      result = RubyFCallNode.s( recv , sel_tok.symval , cArgs ) # s(:fcall)
+    else
+      result = RubyCallNode.s( recv, sel_tok.symval , cArgs )  # s(:call )
+    end
+    result.src_offset=( sel_tok.src_offset )
+#nil.pause
+    result
+  end
+
+  def new_call_1(recv, sel_tok , argone)
+    # used where  ryan had  new_call(r,sel, s(:arglist, argone))
+    #   argone should never be a RubyBlockPassNode 
+    if argone.equal?(nil)
+      raise_error("new_call_1 unexpected nil arg")
+      cArgs = nil
+    else
+      cArgs = RubyRpCallArgs._new  # s(:array )
+      cArgs.list=( [ argone ] ) 
+    end
+    if recv.class.equal?( RubySelfNode )
+      result = RubyFCallNode.s( recv , sel_tok.symval , cArgs ) # s(:fcall)
+    else
+      result = RubyCallNode.s( recv, sel_tok.symval , cArgs )  # s(:call )
+    end
+    result.src_offset=( sel_tok.src_offset )
+#nil.pause
+    result
+  end
+
+  def new_case(expr, body)
+    if body.class._not_equal?(RubyWhenNode)
+      raise_error "new_case - bad body arg "
+    end
+    # chaining of body nodes done in smalltalk
+    RubyCaseNode.s(expr, body)
+  end
+
+  def new_class( val)
+    #line, path, superclass, body = val[1], val[2], val[3], val[5]
+    # line = val[1] # DELETED from .y
+    path = val[1]
+    superclass = val[2]
+    body = val[4]             
+    k_end = val[5]
+    if k_end.equal?( :tEOF )
+      msg = 'syntax error, unexpected $end, expecting kEND'
+      line = self.line_for(path)
+      msg << ", for   class    near line #{line} \n"
+      msg << self.last_closed_def_message
+      raise SyntaxError , msg
+    end
+
+    # scope = s(:scope, body).compact  
+    # AST does not use  scope 
+
+    # result = s(:class, path, superclass, scope)
+    #   expect path to be either a Colon2Node or a Colon3Node
+    result = RubyClassNode.s(path , superclass, body, @lexer.source_string) 
+    result
+  end
+
+  def new_compstmt( val )
+    result = void_stmts(val[0])
+    if result
+      result = result.kbegin_value 
+    end
+    result
+  end
+
+  def new_defn(val)
+    # (line, bol), name, args, body = val[2], val[1], val[3], val[4]
+    # line, bol = val[2]   # unused
+    def_tok = val[0] # a DefnNameToken
+    name_tok = val[1]
+    args = val[3]
+    body = val[4]
+    k_end = val[5]   # yacc_value for kEND synthesized EOF
+    if k_end.equal?( :tEOF )
+      msg = 'syntax error, unexpected $end, expecting kEND'
+      msg << ", for   def   near line #{def_tok.line} "
+      msg << self.last_closed_def_message
+      raise SyntaxError , msg
+    end
+
+    # body ||= s(:nil)
+    # body ||= s(:block)
+    # body = s(:block, body) unless body.first == :block 
+    if body.equal?(nil)
+      body = RubyBlockNode._new
+    elsif body.class.equal?(RubyBlockNode)
+      # ok
+    else
+      body = RubyBlockNode.s( [ body ] )  # s(:block, body) 
+    end
+    if name_tok._isString
+      name_sym = name_tok.to_sym  # from a reserved word
+    else
+      name_sym = name_tok.symval # expect a RpNameToken
+    end
+    result = RubyDefnNode.s(name_sym, args, body) # s(:defn )
+    result.src_offset=( def_tok.src_offset )
+    result.start_line=( def_tok.line )
+    result
+  end
+
+  def new_defs(val)
+    #recv, name, args, body = val[1], val[4], val[6], val[7]
+    def_tok = val[0] # a DefnNameToken
+    recv = val[1]
+    name_tok = val[4]
+    args = val[6]
+    body = val[7]
+    k_end = val[8]   # yacc_value for kEND synthesized EOF
+    if k_end.equal?( :tEOF )
+      msg = 'syntax error, unexpected $end, expecting kEND'
+      line = self.line_for(name_tok)
+      msg << ", for   def    near line #{line} "
+      msg << self.last_closed_def_message
+      raise SyntaxError , msg
+    end
+
+    #body ||= s(:block)
+    #body = s(:block, body) unless body.first == :block  
+    if body.equal?(nil)
+      body = RubyBlockNode.s( [] )
+    elsif body.class.equal?(RubyBlockNode)
+      # ok
+    else
+      body = RubyBlockNode.s( [ body ] )  # s(:block, body)
+    end
+
+    result = RubyDefsNode.s(name_tok.symval, args, body) # s(:defs )
+    result.receiver=(recv) 
+    result.src_offset=( def_tok.src_offset )
+    result.start_line=( def_tok.line )
+    result
+  end
+
+  def new_for( expr, var, body )
+    #result = s(:for, expr, var)
+    #result << body if body
+    #result
+    res = RubyForNode.s(expr, var, body)
+    res.srcOffset=(  var.srcOffset )
+    res
+  end
+
+  def new_if( carg, t, f )
+    # c = cond c
+    # c, t, f = c.last, f, t if c[0] == :not
+    # s(:if, c, t, f)
+    c = carg.as_cond(self)
+    if c.class.equal?(RubyNotNode)
+      res = RubyIfNode.s( c.conditionNode, f, t)  # s(:if )
+    else
+      res = RubyIfNode.s( c, t, f)  # s(:if )
+    end
+    res
+  end
+
+  def new_iter(args, body, k_end) 
+    if k_end.equal?( :tEOF )
+      msg = 'syntax error, unexpected $end, expecting kEND'
+      msg << ", for   block   near line #{def_tok.line} "
+      msg << self.last_closed_def_message
+      raise SyntaxError , msg
+    end
+    RubyIterRpNode.s( args, body ) 
+  end
+
+  def new_parasgn(lhs, src_ofs)
+    if @mydebug 
+      # src_ofs is zero based
+      src_line = @lexer.src_line_for_offset(src_ofs + 1)
+    else
+      src_line = nil
+    end
+    if lhs.equal?(nil)
+      nil.pause
+    end
+    n = RubyParAsgnRpNode.s(lhs, src_line)
+    n.src_offset=( src_ofs)
+    n
+  end
+
+  def masgn_append_arg(lhs, rhs)
+    rhs = value_expr(rhs)
+    lhs.masgn_append_arg( rhs )
+  end
+
+  def masgn_append_mrhs(lhs, rhs)
+    rhs = value_expr(rhs)
+    # lhs.delete_at 1 if lhs[1].nil?  # MRI compat, no delete
+    # lhs << rhs
+    lhs.append_mrhs( rhs )
+  end
+
+  def new_module( val) 
+    # line, path, body = val[1], val[2], val[4]  # line deleted from .y
+    path = val[1]
+    body = val[3]
+    k_end = val[4]   # yacc_value for kEND synthesized EOF
+    if k_end.equal?( :tEOF )
+      msg = 'syntax error, unexpected $end, expecting kEND'
+      line = self.line_for(path)
+      msg << ", for   module    near line #{line} "
+      msg << self.last_closed_def_message
+      raise SyntaxError , msg
+    end
+    # body = s(:scope, body).compact  
+    # AST does not use scope nodes
+
+    # result = s(:module, path, body)
+    result = RubyModuleNode.s(path, body, @lexer.source_string)
+    result
+  end
+
+  def new_op_asgn(val)
+    # lhs, asgn_op, arg = val[0], val[1].to_sym, val[2]
+    lhs = val[0]
+    # val[1] should be a RpNameToken
+    asgn_sel_tok = val[1] 
+    asgn_op = asgn_sel_tok.symval
+    arg = val[2]
+    			# lhs should be a RubyAssignableNode
+    new_lhs = lhs.as_accessor 
+    arg = arg.kbegin_value
+
+    if asgn_op.equal?(:"||")
+      lhs.node_assign_set_rhs(arg)
+      # s(:op_asgn_or, self.gettable(name), lhs)
+      res = RubyOpAsgnOrNode.s(  new_lhs, lhs )
+      res.src_offset=( asgn_sel_tok.src_offset )
+    elsif asgn_op.equal?(:"&&")
+      lhs.node_assign_set_rhs(arg)
+      # s(:op_asgn_and, self.gettable(name), lhs)
+      res = RubyOpAsgnAndNode.s( new_lhs, lhs )
+      res.src_offset=( asgn_sel_tok.src_offset )
+    else
+      # see original code   # 
+      call = new_call_1(new_lhs, asgn_sel_tok,  arg) 
+      lhs.node_assign_set_rhs( call )
+      res = lhs
+    end
+    res
+  end
+
+  def new_regexp( val)  
+    # node = val[1] || s(:str, '')
+    options = val[2]
+
+    # o, k = 0, nil
+    o = 0
+    kch = nil
+
+    have_once = false
+    opt_idx = 0
+    opt_len = options.length
+    while opt_idx < opt_len
+      ch = options[opt_idx]
+      if ch <= ?n 
+        if ch.equal?( ?i) ; o += Regexp::IGNORECASE
+        elsif ch.equal?( ?m) ; o += Regexp::MULTILINE
+        elsif ch.equal?( ?n) ; o += Regexp::ENC_NONE
+        elsif ch.equal?( ?e) ; o += Regexp::ENC_EUC ; kch = ch; 
+        else
+          err_str = ' ' ; err_str[0] = ch ;
+          raise "unknown regexp option: #{err_str}" 
+        end 
+      else 
+        if ch.equal?( ?x ) ; o += Regexp::EXTENDED  
+        elsif ch.equal?( ?o) ; o += Regexp::ONCE ; have_once = true;
+        elsif ch.equal?( ?s) ; o += Regexp::ENC_SJIS; kch = ch;
+        elsif ch.equal?( ?u) ; o += Regexp::ENC_UTF8; kch = ch;
+        else
+          err_str = ' ' ; err_str[0] = ch ;
+          raise "unknown regexp option: #{err_str}" 
+        end 
+      end
+      opt_idx += 1
+    end
+
+    argnode = val[1]
+    if argnode.equal?(nil)
+      kstr = nil
+      if kch 
+        kstr = ' ' ; kstr[0] = kch
+      end
+      rxlit = Regexp.new('', o, kstr)
+      node = RubyRegexpNode.s(rxlit)
+    else
+      arg_cls = argnode.class
+      if have_once
+        node = RubyDRegexpOnceNode._new
+      else
+        node = RubyDRegexpNode._new
+      end
+      if arg_cls.equal?(RubyDStrNode) # when :dstr 
+        node.list=( argnode.list )
+      else
+        d_list = [ RubyStrNode.s(''), argnode ]
+        node.list=(d_list)
+      end
+      node.options=(o)
+    end
+    node
+  end
+
+  def new_sclass( val)  
+    # recv, in_def, in_single, body = val[3], val[4], val[6], val[7]
+    # line deleted from .y
+    recv = val[2]
+    in_def = val[3]
+    in_single = val[5]
+    body = val[6]
+    k_end = val[7]   # yacc_value for kEND synthesized EOF
+    if k_end.equal?( :tEOF )
+      msg = 'syntax error, unexpected $end, expecting kEND'
+      msg << ", for   class   near line #{def_tok.line} "
+      msg << self.last_closed_def_message
+      raise SyntaxError , msg
+    end
+
+    # scope = s(:scope, body).compact  # scope not used in AST
+    # result = s(:sclass, recv, scope)
+    result = RubySClassNode.s(recv, body)
+
+    self.in_def = in_def
+    self.in_single = in_single
+    result
+  end
+
+  def new_super( val ) 
+    sel_tok = val[0]
+    args = val[1]
+    aryCls = RubyRpCallArgs 
+    arg_cls = args.class
+    if args.equal?(nil)
+      # maybe this should be zsuper ??, but that's not what Ryan does
+      res = RubySuperNode.s( aryCls._new  )
+    elsif arg_cls.equal?(RubyBlockPassNode) # args[0] == :block_pass then
+      res = RubySuperNode.s( aryCls._new  )
+      res.iter=(args)
+    elsif arg_cls.equal?(aryCls)
+      res = RubySuperNode.s( args )
+    else
+      raise_error("new_super, invalid args")
+    end
+    res.src_offset=( sel_tok.src_offset )
+    res
+  end
+
+  #def new_undef(n, m = nil)
+  #  if m then
+  #    block_append(n, s(:undef, m))
+  #  else
+  #    s(:undef, n)
+  #  end
+  #end
+
+  def new_undef(sym_node)
+    RubyUndefNode.s(sym_node.symNodeValue )
+  end
+
+  def append_undef( blk , nam )
+    ud = new_undef(nam)
+    block_append( blk , ud )
+  end
+
+  def new_until(block, expr)
+    # expr = (expr.first == :not ? expr.last : s(:not, expr))
+    if expr.class.equal?(RubyNotNode)
+      expr = expr.conditionNode
+    else
+      expr = RubyNotNode.s(expr)
+    end
+    new_while( block, expr)
+  end
+
+  def premature_eof( name_tok )
+    line = self.line_for(name_tok)
+    msg = 'syntax error, unexpected $end, expecting kEND'
+    msg << ", for   #{name_tok.symval}   near line line"
+    msg << self.last_closed_def_message
+    raise SyntaxError , msg
+  end
+
+  def new_while( block, expr)
+    preBool= true  # argument value from .y was always true
+    # block, pre = block.last, false if block && block[0] == :begin
+    if block.class.equal?(RubyKBeginNode)
+      block = block.kbegin_value
+      preBool = false
+    end
+    expr = cond( expr)
+
+    # result = if expr.first == :not then
+    #           s(:until, expr.last, block, pre)
+    #         else
+    #           s(:while, expr, block, pre)
+    #         end
+    if expr.class.equal?(RubyNotNode) 
+      result = RubyUntilNode.s( expr.conditionNode, block, preBool)
+    else
+      result = RubyWhileNode.s(expr, block, preBool)
+    end
+    result
+  end
+
+  def new_xstring( str)
+    if str.equal?(nil)
+      res = RubyXStrNode.s( '' )
+    else
+      # might need become on this path ???
+      knd = str.str_dstr_evstr_kind
+      if knd.equal?(0) # when :str
+        res = RubyXStrNode.s( str.strNodeValue ) # str[0] = :xstr
+      elsif knd.equal?(1) #  when :dstr
+        res = RubyDXStrNode._new 
+        res.list=( str.list )
+      else
+        res = RubyDXStrNode._new
+        res.list=( [ RubyStrNode.s('') , str ] )
+      end
+    end
+    res
+  end
+
+  def new_yield(args )
+    args_cls = args.class
+  
+    if args.equal?(nil)
+      #  args ||= s(:arglist) , i.e. zero args
+      cArgs = RubyRpCallArgs._new #  list left as nil 
+    else
+      args_cls = args.class
+      if args_cls.equal?(RubyRpCallArgs)
+        cArgs = args.as_yield_args
+      elsif args_cls.equal?(RubyBlockPassNode)
+        raise SyntaxError, "Block argument should not be given." 
+      else
+        raise_error("new_yield, unregognized args")
+      end
+    end
+    # not sure how  setArrayWrapper  logic to be handled, nextNodeForParser:
+  
+    # s(:yield, *args[1..-1])
+    return RubyYieldNode.s( cArgs )
+  end
+
+  def new_yield_0
+    return RubyYieldNode.s( RubyRpCallArgs._new ) 
+  end
+
+  def node_assign(lhs, rhs) # TODOryan: rename new_assign
+    return nil unless lhs
+
+    rhs = self.value_expr(rhs)
+
+    # case lhs[0]
+    #  # cannot find any generation of  :dasgn_curr , # Ryan says delete it
+    #      but it is same as :dasgn for Maglev
+    # when :gasgn, :iasgn, :lasgn, :dasgn,
+    #  :masgn, :cdecl, :cvdecl, :cvasgn then
+    #  lhs << rhs
+    # when :attrasgn, :call then
+    #  args = lhs.pop unless Symbol === lhs.last
+    #  lhs << arg_add(args, rhs)
+    # when :const then
+    #  lhs[0] = :cdecl
+    #  lhs << rhs
+
+    new_lhs = lhs.node_assign_set_rhs(rhs)  # may raise error
+    unless new_lhs.equal?(lhs)
+      # :const to :cdecl conversion, or similar
+      new_lhs._become(lhs) 
+    end
+    lhs
+  end
+
+  def parse(str, load_name)
+    unless str._isString
+      raise ArgumentError, 'expected a string'
+    end
+    @file = load_name
+    @lexer.install_source( str )
+    ast = self._racc_do_parse_rb()
+    err_count = @syntax_err_count
+    if err_count._not_equal?(0)
+      raise SyntaxError , "#{err_count.to_s} syntax errors"
+    end
+    ast 
+  end
+
+  # deleted  remove_begin,  
+  #  replaced by kbegin_value implemented in RubyNode and RubyKBeginNode
+  #def remove_begin node
+  #  oldnode = node
+  #  if node and :begin == node[0] and node.size == 2 then
+  #    node = node[-1]
+  #  end
+  #  node
+  #end
+
+  def ret_args( node )
+    # node should be a  RubyRpCallArgs
+    if node.iter._not_equal?(nil)
+      raise SyntaxError, "block argument should not be given"
+    end
+    lst = node.list
+    if lst.size.equal?(1)
+      node = lst[0]
+    end
+    node
+  end
+
+  def value_expr(oldnode)   # HACK
+    # node = remove_begin oldnode
+    # node[2] = value_expr(node[2]) if node and node[0] == :if
+    # node  # e_nd of  original code
+    #
+    node = oldnode.kbegin_value
+    node.ifNode_kbegin_remove2
+    node
+  end
+
+  def void_stmts(node)
+    return nil unless node
+
+    # return node unless node[0] == :block
+    # node[1..-1] = node[1..-1].map { |n| remove_begin(n) }
+    node.blockNode_listdo_kbegin_value
+
+    node
+  end
+
+  def warning( s)
+    puts "RpWarning: #{s}"
+  end
+
+  #alias :old_yyerror :yyerror # added printout to yyerror
+
+  def raise_error(msg)
+    puts "InternalParseError: #{msg}"
+    if MagRp::debug > 0
+      nil.pause  
+    end
+    raise InternalParseError, msg
+  end
+
+
+ end  # }
+end  # 
