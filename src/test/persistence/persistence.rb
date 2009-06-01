@@ -50,7 +50,10 @@ class Module
   # +maglev_reopen!+).
   #
   # Returns receiver
-  def maglev_persist!(include_all=true)
+  #
+  # See also Array#maglev_persist!
+  #
+  def maglev_persist!
     raise AlreadyPersistentException if maglev_persist?
     # ...
     self
@@ -74,9 +77,56 @@ class Module
   # Raises +NonPersistentException+ if the class has not yet been persisted
   # (i.e., if <tt>maglev_persist?</tt> returns false).
   #
+  # If an unhandled exception causes the block to terminiate, the state of
+  # receiver is unspecified and the current transaction is poisoned (MagLev
+  # will only allow a subsequent abort_transaction, not a
+  # commit_transaction).  I.e., for recovery, you should abort the current
+  # transaction, fix the problem and then replay the block.
+  #
+  # See also Array#maglev_reopen!
+  #
   def maglev_reopen!(&block)
     raise NonPersistentClassException unless maglev_persist?
     # TODO: Should it raise if already re-opened?
+    # ...
+  end
+end
+
+class Array
+  # Consider each element of receiver as a class or module, and call
+  # maglev_persist! on it, but only if it hasn't already been called.
+  # Sorts the array to ensure all ancestors are processed before
+  # dependents.  Almost equivalent to the following:
+  #
+  #   self.each do |x|
+  #     unless x.maglev_persist?
+  #       x.ancestors.reverse.each do |a|
+  #         a.maglev_persist! if self.include?(a) and not a.maglev_persist?
+  #       end
+  #     end
+  #   end
+  def maglev_persist!
+    # ...
+  end
+
+  # Consider each element of receiver as a class or module, and execute the
+  # block with the classes and modules marked for reopen.  E.g.,
+  #
+  #   [A, B, C].reopen! do
+  #     # stuff
+  #   end
+  #
+  # is equivalent to the following:
+  #
+  #   A.reopen! do
+  #     B.reopen! do
+  #       C.reopn! do
+  #         # stuff
+  #       end
+  #     end
+  #   end
+  #
+  def maglev_reopen!(&block)
     # ...
   end
 end

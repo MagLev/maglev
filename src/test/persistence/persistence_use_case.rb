@@ -22,7 +22,7 @@ MyClass.maglev_persist!
 # have not yet been saved in the repository:
 #
 #  |--------------------------+------------------+-----------------|
-#  | Feature                  | Local VM         | Repository view |
+#  | Feature                  | Local VM view    | Repository view |
 #  |--------------------------+------------------+-----------------|
 #  | @class_instance_variable | 1                | N/A             |
 #  | PERSISTENT_CONSTANT      | 10               | N/A             |
@@ -35,7 +35,7 @@ Maglev.commit_transaction
 # Now, the current VM and the repository have the same view of the class:
 #
 #  |--------------------------+------------------+------------------|
-#  | Feature                  | Local VM         | Repository view  |
+#  | Feature                  | Local VM view    | Repository view  |
 #  |--------------------------+------------------+------------------|
 #  | @class_instance_variable | 1                | 1                |
 #  | PERSISTENT_CONSTANT      | 10               | 10               |
@@ -58,30 +58,30 @@ class MyClass
   TRANSIENT_CONSTANT = :foo
 end
 
-# The current VM session will now always see a different view of MyClass than the
-# repository view.  None of the changes made during step 2 are visible
-# outside of the current VM session.  Note especially the value of meth1.
+# The current VM session will now always see a different view of MyClass
+# than the repository view.  None of the changes made during step 2 are
+# visible outside of the current VM session.  Note especially the '**"
+# rows:
 #
 #  |--------------------------+-------------------+------------------|
-#  | Feature                  | Local VM          | Repository view  |
+#  | Feature                  | Local VM view     | Repository view  |
 #  |--------------------------+-------------------+------------------|
-#  | @class_instance_variable | 2                 | 1                |
+#  | @class_instance_variable | 2                 | 1                | **
 #  | PERSISTENT_CONSTANT      | 10                | 10               |
-#  | meth1                    | "transient meth1" | "original meth1" |
+#  | meth1                    | "transient meth1" | "original meth1" | **
 #  | meth2                    | "original meth2"  | "original meth2" |
-#  | meth3                    | "transient meth3" | N/A              |
-#  | TRANSIENT_CONSTANT       | :foo              | N/A              |
+#  | meth3                    | "transient meth3" | N/A              | **
+#  | TRANSIENT_CONSTANT       | :foo              | N/A              | **
 #  |--------------------------+-------------------+------------------|
 
 
-# Even committing the repository will not change anything.
 Maglev.commit_transaction
 
-# At this point, the repository still sees the same state for MyClass
-# that it did at the end of Step 1.
+# Since the chages were not made in a reopen block, the Local VM view and
+# Repository view remain the same:
 #
 #  |--------------------------+-------------------+------------------|
-#  | Feature                  | Local VM          | Repository view  |
+#  | Feature                  | Local VM view     | Repository view  |
 #  |--------------------------+-------------------+------------------|
 #  | @class_instance_variable | 2                 | 1                |
 #  | PERSISTENT_CONSTANT      | 10                | 10               |
@@ -125,15 +125,15 @@ end
 # The view before committing shows the staged changes:
 #
 #  |--------------------------+-------------------+------------------|
-#  | Feature                  | Local VM          | Repository view  |
+#  | Feature                  | Local VM view     | Repository view  |
 #  |--------------------------+-------------------+------------------|
 #  | @class_instance_variable | 2                 | 1                |
 #  | PERSISTENT_CONSTANT      | 10                | 10               |
-#  | meth1                    | "Step 3 meth1"    | "original meth1" |
+#  | meth1                    | "Step 3 meth1"    | "original meth1" | **
 #  | meth2                    | "original meth2"  | "original meth2" |
 #  | meth3                    | "transient meth3" | N/A              |
 #  | TRANSIENT_CONSTANT       | :foo              | N/A              |
-#  | meth4                    | "Step 3 meth4"    | N/A              |
+#  | meth4                    | "Step 3 meth4"    | N/A              | **
 #  |--------------------------+-------------------+------------------|
 
 Maglev.commit_transaction
@@ -143,7 +143,7 @@ Maglev.commit_transaction
 # features not in the repository (`TRANSIENT_CONSTANT` and `meth3`).
 #
 #  |--------------------------+-------------------+------------------|
-#  | Feature                  | Local VM          | Repository view  |
+#  | Feature                  | Local VM view     | Repository view  |
 #  |--------------------------+-------------------+------------------|
 #  | @class_instance_variable | 2                 | 1                |
 #  | PERSISTENT_CONSTANT      | 10                | 10               |
