@@ -6,7 +6,7 @@ class Regexp
   MULTILINE  = 4
 
   # Regexp characters that need quoting
-  META_CHARS = "\n\r\f\t " << '[]{}()|-*.\\?+^$#'
+  META_CHARS = "\n\r\f\t " + '[]{}()|-*.\\?+^$#'
   META_CHARS.freeze
   META_REPL_CHARS = 'nrft '
   META_REPL_CHARS.freeze
@@ -14,6 +14,7 @@ class Regexp
   class_primitive_nobridge '_new', 'new:options:lang:'
 
   primitive_nobridge '_search', '_search:from:to:'
+  primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
   primitive_nobridge '_compile', '_compile:options:'
   primitive_nobridge 'kcode', 'kcode'
   primitive_nobridge 'options', 'options'
@@ -371,3 +372,5 @@ class Regexp
     alias_method :quote, :escape
   end
 end
+Regexp._freeze_constants
+

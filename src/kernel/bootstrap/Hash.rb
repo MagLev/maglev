@@ -4,6 +4,8 @@ class Hash
   primitive 'hash'
   primitive 'keys', 'keys'
 
+  primitive '_add_keys_to', 'addKeysTo:'
+
   # Class methods
   class_primitive_nobridge '_new', '_new:'
 

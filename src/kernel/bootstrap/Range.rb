@@ -26,48 +26,48 @@ class Range
   end
 
   def each
-   				# adapted from fix contributed by Markus
+          # adapted from fix contributed by Markus
     x = @from
     llast = @to
     if x._isFixnum
       if @excludeEnd
-	while x < llast
-	  yield x
-	  x = x + 1
-	end
+  while x < llast
+    yield x
+    x = x + 1
+  end
       else
-	while x <= llast
-	  yield x
-	  x = x + 1
-	end
+  while x <= llast
+    yield x
+    x = x + 1
+  end
       end
     else
       raise TypeError, "can't iterate from #{x.class}" unless x.respond_to?(:succ)
       if llast._isString
-	sz = llast.size
-	if @excludeEnd
-	  while (x < llast) and (x.size <= sz)
-	    yield x 
-	    x = x.succ 
-	  end
-	else
-	  while (x <= llast) and (x.size <= sz)
-	    yield x 
-	    x = x.succ 
-	  end
-	end
+  sz = llast.size
+  if @excludeEnd
+    while (x < llast) and (x.size <= sz)
+      yield x
+      x = x.succ
+    end
+  else
+    while (x <= llast) and (x.size <= sz)
+      yield x
+      x = x.succ
+    end
+  end
       else
-	if @excludeEnd
-	  while x < llast
-	    yield x
-	    x = x.succ
-	  end
-	else
-	  while x <= llast
-	    yield x
-	    x = x.succ
-	  end
-	end
+  if @excludeEnd
+    while x < llast
+      yield x
+      x = x.succ
+    end
+  else
+    while x <= llast
+      yield x
+      x = x.succ
+    end
+  end
       end
    end
   end
@@ -111,12 +111,12 @@ class Range
     unless added
       return #{@excludeEnd ? "..." : ".."}
     end
-    begin 
+    begin
       s = "#{@from.inspect}#{@excludeEnd ? "..." : ".."}#{@to.inspect}"
     ensure
       ts.remove(self)
     end
-    s 
+    s
   end
 
   def step(n=1, &block)
@@ -126,7 +126,7 @@ class Range
       unless n._isNumeric
         n = Type.coerce_to(n, Integer, :to_int)
       end
-      if (n <= 0) 
+      if (n <= 0)
         raise ArgumentError, 'increment for step must be > 0'
       end
       if @excludeEnd
@@ -134,7 +134,7 @@ class Range
           block.call(current)
           current += n
         end while current < lim
-      else 
+      else
         begin
           block.call(current)
           current += n
@@ -162,5 +162,31 @@ class Range
     result = []
     self.each { |e| result << e }  # each will use succ
     result
+  end
+
+  # Given a target length, +len+, Calculate whether this range covers the given length.
+  # If it does, return the beginning and length of the "string" of length +len+.
+  # Returns nil if the range does not cover.  See rb_range_beg_len.
+  # This does the appropriate Type.coerce_to that the specs expect.
+  # +err+ is ignored for now.
+  def _beg_len(len, err=0)
+    beg = Type.coerce_to(@from, Integer, :to_int)
+    the_end = Type.coerce_to(@to, Integer, :to_int)
+
+    if (beg < 0)
+      beg += len
+      return nil if (beg < 0)
+    end
+
+    if (err == 0 || err == 2)
+      return nil if (beg > len)
+      the_end = len if (the_end > len)
+    end
+
+    the_end += len if (the_end < 0)
+    the_end += 1 unless @excludeEnd
+    len = the_end - beg
+    len = 0 if (len < 0)
+    return [beg, len]
   end
 end

@@ -1,0 +1,41 @@
+This is a demo of how you might implement the standard ruby PStore library
+using MagLev persistence, rather than the filesystem and marshal.  See the
+comments in gstore.rb for more details.
+
+To run this example:
+
+1: Ensure MagLev is running
+
+2: Ensure the smalltalk ffi wrappers have been generated:
+
+     $ cd $MAGLEV_HOME
+     $ rake dev:stwrappers
+
+   This will populate $MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk with
+   the necessary files
+
+3: Run the main.rb script:
+
+     $ maglev-ruby main.rb
+           user     system      total        real
+       1.390000   0.050000   1.440000 (  7.979673)
+
+     $ maglev-ruby --version
+     maglev 0.6 (ruby 1.8.6) (2009-05-14 rev 21661-859) [i386-darwin9.6.0]
+
+
+4: You can also run main.rb using MRI, or another ruby impleentation:
+
+     $ ruby main.rb
+           user     system      total        real
+      19.480000   6.260000  25.740000 ( 37.151687)
+
+     $ ruby --version
+     ruby 1.8.6 (2008-08-11 patchlevel 287) [i686-darwin9.6.0]
+
+
+
+
+
+
+

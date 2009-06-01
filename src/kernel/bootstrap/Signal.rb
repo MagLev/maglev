@@ -10,3 +10,4 @@ module Signal
     SIGNALS
   end
 end
+Signal._freeze_constants

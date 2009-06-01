@@ -754,3 +754,5 @@ class Time
   end
 
 end
+Time._freeze_constants
+

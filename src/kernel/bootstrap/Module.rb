@@ -11,8 +11,13 @@ class Module
 
   primitive_nobridge 'constants',      'rubyConstants'
   primitive_nobridge 'const_defined?', 'rubyConstDefined:'
-  primitive_nobridge 'const_get',      'rubyGlobalAt:'
+  primitive_nobridge '_const_get',      'rubyGlobalAt:'
   primitive_nobridge 'const_set',      'rubyConstAt:put:'
+
+  # make associations holding constants of receiver invariant
+  #   does not affect inherited constants
+  primitive_nobridge '_freeze_constants', '_rubyConstantsFreeze'
+
   primitive_nobridge '_include_module', 'includeRubyModule:'
 
   primitive_nobridge 'ancestors' , 'rubyAncestors'
@@ -20,6 +25,13 @@ class Module
 
   primitive_nobridge 'autoload', 'rubyAutoload:file:'
   primitive_nobridge 'autoload?', 'rubyAutoloadFileFor:'
+
+  def const_get(name)
+    unless name._isString or name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    _const_get(name)
+  end
 
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)

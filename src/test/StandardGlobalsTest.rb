@@ -94,9 +94,9 @@ x = nil
 x = self
 x = true
 
-# x = DATA
-# x = FALSE
-# x = NIL
+# x = DATA   # not supported yet  
+x = FALSE
+x = NIL
 x = RUBY_PLATFORM
 x = RUBY_RELEASE_DATE
 x = RUBY_VERSION

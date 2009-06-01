@@ -39,9 +39,10 @@ unless dx = [ 66 , [[77]], ExecBlock, 99, 66, [77], [77], 77, 77] ; raise 'error
 # test a creating binding at main program level
 TBINDSTR = String.new
 [ 'abc', 'wvt' ].each do |str |
-  eval(<<-EOS, binding )
+  hstr = <<-EOS
     TBINDSTR.concat("_#{str}")
   EOS
+  eval(hstr, binding )
 end
 
 unless TBINDSTR == '_abc_wvt' ; raise 'error'; end

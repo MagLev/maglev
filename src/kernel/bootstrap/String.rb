@@ -87,10 +87,23 @@ class String
   end
 
   # note smalltalk addAll:  returns arg, not receiver
-  primitive_nobridge '<<', '_rubyAddAll:'
+  #primitive '_append', '_rubyAddAll:'
+  primitive '_append', '_rubyAddAll:'
+
+  def <<(arg)
+    raise TypeError, "<<: can't modify frozen string" if self.frozen?
+    if arg._isFixnum
+      raise TypeError, "<<: #{arg} out of range" if arg < 0 or arg > 255
+      other = arg
+    else
+      other = Type.coerce_to(arg, String, :to_str)
+    end
+    self._append(other)
+    # self.taint if other.tainted?
+    self
+  end
 
   # TODO: Need primitive ST implemention for <=>
-
   def <=>(o)
     if o._isString
       i = 0
@@ -115,20 +128,20 @@ class String
   end
 
   # PERFORMANCE: String#== could use help
-  primitive '==', '='  # TODO: this is incorrect...
-  #   def ==(other)
-  #     if (other._isString )
-  #       (self <=> other) == 0
-  #     elsif other.respond_to? :to_str
-  #       other == str
-  #     else
-  #       false
-  #     end
-  #   end
+  primitive '_same_value', '='  # TODO: this is incorrect...
+  def ==(other)
+    if other._isString
+      s = other
+    elsif other.respond_to? :to_str
+      s = Type.coerce_to(other, String, :to_str)
+    else
+      return false
+    end
+    self._same_value(s)
+  end
 
 #  alias === ==
 
-  # call-seq:
   #    str =~ obj   => fixnum or nil
   #
   # Match---If <i>obj</i> is a <code>Regexp</code>, use it as a pattern to match
@@ -139,7 +152,6 @@ class String
   #
   #    "cat o' 9 tails" =~ /\d/   #=> 7
   #    "cat o' 9 tails" =~ 9      #=> false
-
   def =~(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
@@ -164,18 +176,104 @@ class String
     end
   end
 
-  primitive_nobridge '[]' , '_rubyAt:'
-  primitive_nobridge '[]' , '_rubyAt:length:'
+  primitive_nobridge '_at' , '_rubyAt:'
+  primitive_nobridge '_at_length' , '_rubyAt:length:'
 
-  primitive_nobridge '[]=', '_rubyAt:put:'
-  primitive_nobridge '[]=', '_rubyAt:length:put:'
+  def [](*args)
+    # This variant gets bridge methods
+    raise ArgumentError, 'wrong number of arguments'
+  end
+
+  def [](index)
+    if index._isRegexp
+      s = _at(index)
+      # s.taint if index.tainted?
+    elsif index._isRange
+      first, len = index._beg_len(self.length)
+      return nil if first.equal?(nil)
+      s = self._at_length(first, len)
+    elsif index._isString
+      s = self._at(index)
+      # s.taint if ! s.nil? && index.tainted?
+    else
+      index = Type.coerce_to(index, Integer, :to_int)
+      s = self._at(index)
+    end
+    # s.taint if self.tainted? and not s.nil?
+    s
+  end
+
+  def [](start, length)
+    if start._isRegexp
+      m_begin, m_len = self._match_regexp(start, length)
+      return nil if m_begin.equal?(nil)
+      s = self._at_length(m_begin, m_len)
+      # s.taint if start.tainted?
+      s
+    else
+      length = Type.coerce_to(length, Integer, :to_int)
+      start = Type.coerce_to(start, Integer, :to_int)
+      s = _at_length(start, length)
+      return nil if length < 0
+    end
+    # s.taint if self.tainted?
+    s
+  end
+
+  primitive_nobridge '_at_put', '_rubyAt:put:'
+  primitive_nobridge '_at_length_put', '_rubyAt:length:put:'
+  def []=(*args)
+    # This variant gets bridge methods
+    raise ArgumentError, 'wrong number of arguments'
+  end
+
+  def []=(index, value)
+    val = value._isFixnum ? value : Type.coerce_to(value, String, :to_str)
+    if index._isString or index._isRegexp
+      _at_put(index, val)
+    else
+      idx = Type.coerce_to(index, Integer, :to_int)
+      sz = self.size
+      idx += sz if idx < 0
+      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
+      _at_put(idx, val)
+    end
+    # taint if value.tainted?
+    self
+  end
+
+  def []=(index, count, value)
+    if index._isRegexp
+      _at_length_put(index, count, value)
+    else
+      idx = Type.coerce_to(index, Integer, :to_int)
+      sz = self.size
+      idx += sz if idx < 0
+
+      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
+
+      str_value = Type.coerce_to(value, String, :to_str)
+      raise IndexError, "index #{count} out of string" if count < 0
+
+      _at_length_put(idx, count, str_value)
+    end
+    # taint if value.tainted?
+    self
+  end
 
   # MNI: String#~
 
-  primitive 'capitalize', 'rubyCapitalize'
+  primitive '_capitalize', 'rubyCapitalize'
+
+  def capitalize
+    x = _capitalize
+    # x.taint if self.tainted?
+    x
+  end
 
   def capitalize!
-    x = capitalize
+    raise TypeError, "can't modify frozen string" if frozen?
+    x = _capitalize
     return nil if x == self
     replace(x)
   end
@@ -218,6 +316,7 @@ class String
   end
 
   def chomp!(rs=$/)
+    raise TypeError, "can't modify frozen string" if frozen?
     # check for nil and '' before doing rs[0] in elsif
     if rs.equal?(nil) || rs.empty?
       return self.dup
@@ -267,6 +366,7 @@ class String
   end
 
   def chop!
+    raise TypeError, "can't modify frozen string" if frozen?
     mySize = self.length
     if mySize > 0
       if self[-1].equal?(0xa)
@@ -283,7 +383,7 @@ class String
     return nil # no modification made
   end
 
-  primitive 'concat', '_rubyAddAll:'
+  alias concat <<
 
   # arg to rubyCount: is expected to be an Array , so declare as 'count*'
   primitive 'count*', 'rubyCount:'
@@ -294,8 +394,19 @@ class String
   primitive 'delete!*', 'rubyDeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
-  primitive 'downcase', 'asLowercase'
-  primitive 'downcase!', 'rubyDowncaseInPlace'
+  primitive '_downcase', 'asLowercase'
+  primitive '_downcase!', 'rubyDowncaseInPlace'
+
+  def downcase
+    s = _downcase
+    # s.taint if self.tainted?
+    s
+  end
+
+  def downcase!
+    raise TypeError, "can't modify frozen string" if frozen?
+    _downcase!
+  end
 
   primitive '_dumpInto' , 'rubyDumpInto:'
 
@@ -305,23 +416,97 @@ class String
     res
   end
 
-  def each(sep=$/, &block)
-    tokens = sep._split_string(self, nil)
-    n = 0
-    lim = tokens.size
-    while n < lim
-      block.call( tokens[n] )
-      n = n + 1
+  # Splits <i>self</i> using the supplied parameter as the record separator
+  # (<code>$/</code> by default), passing each substring in turn to the supplied
+  # block. If a zero-length record separator is supplied, the string is split on
+  # <code>\n</code> characters, except that multiple successive newlines are
+  # appended together.
+  #
+  #   print "Example one\n"
+  #   "hello\nworld".each {|s| p s}
+  #   print "Example two\n"
+  #   "hello\nworld".each('l') {|s| p s}
+  #   print "Example three\n"
+  #   "hello\n\n\nworld".each('') {|s| p s}
+  #
+  # <em>produces:</em>
+  #
+  #   Example one
+  #   "hello\n"
+  #   "world"
+  #   Example two
+  #   "hel"
+  #   "l"
+  #   "o\nworl"
+  #   "d"
+  #   Example three
+  #   "hello\n\n\n"
+  #   "world"
+  def each(a_sep=$/, &block)
+    # Modified Rubinius
+    if a_sep.equal?(nil)
+      block.call(self)
+      return self
     end
+
+    sep = Type.coerce_to(a_sep, String, :to_str)
+    raise LocalJumpError, 'no block given' unless block_given?
+
+    id = self.__id__
+    my_size = self.size
+    ssize = sep.size
+    newline = ssize == 0 ? ?\n : sep[ssize-1]
+
+    last, i = 0, ssize
+    while i < my_size
+      if ssize == 0 && self[i] == ?\n
+        if self[i+=1] != ?\n
+          i += 1
+          next
+        end
+        i += 1 while i < my_size && self[i] == ?\n
+      end
+
+      if i > 0 && self[i-1] == newline &&
+          (ssize < 2 || sep._compare_substring(self, i-ssize, ssize) == 0)
+        line = self[last, i-last]
+        # line.taint if tainted?
+        yield line
+        # We don't have a way yet to check if the data was modified...
+        #modified? id, my_size
+        last = i
+      end
+
+      i += 1
+    end
+
+    unless last == my_size
+      line = self[last, my_size-last+1]
+      # line.taint if tainted?
+      yield line
+    end
+
+    self
+  end
+  alias each_line each
+
+  def _compare_substring(other, start, size)
+    if start > self.size || start + self.size < 0
+      raise IndexError, "index #{start} out of string"
+    end
+    self <=> other[start,size]
   end
 
   def each_byte
     n = 0
-    lim = self.size
-    while n < lim
+    # Do not cache size before looping.  Specs require
+    # us to go to new end when string grows or shrinks
+    # in the yield.
+    while n < self.size
       yield self[n]
       n = n + 1
     end
+    self
   end
 
   # each_char appears to be a Rubinius extension
@@ -335,14 +520,6 @@ class String
       temp[0] = self[n]
       blk.call(temp)
       n = n + 1
-    end
-  end
-
-  def each_line(&b)
-    # TODO why different than each  ???
-    /(.*)/.all_matches(self).each do |match|
-      str = match[1]
-      b.call(str)
     end
   end
 
@@ -477,10 +654,12 @@ class String
   end
 
   def gsub!(regex, str)
+    raise TypeError, "can't modify frozen string" if frozen?
     replace(gsub(regex, str))
   end
 
   def gsub!(regex, &block)
+    raise TypeError, "can't modify frozen string" if frozen?
     replace(gsub(regex, &block))
   end
 
@@ -534,7 +713,11 @@ class String
   primitive 'length', 'size'
 
   primitive 'lstrip', 'trimLeadingSeparators'
-  primitive 'lstrip!', '_removeLeadingSeparators' # in .mcz
+  primitive '_lstrip!', '_removeLeadingSeparators' # in .mcz
+  def lstrip!
+    raise TypeError, "can't modify frozen string" if frozen?
+    _lstrip!
+  end
 
   def match(pattern)
     if pattern._isRegexp
@@ -566,6 +749,7 @@ class String
   primitive_nobridge '_reverse_from', '_reverseFrom:'
 
   def reverse!
+    raise TypeError, "can't modify frozen string" if frozen?
     self._reverse_from(self) # returns self
   end
 
@@ -612,40 +796,60 @@ class String
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
-  primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
+  primitive '_rstrip!', '_removeTrailingSeparators'  # in .mcz
+  def rstrip!
+    raise TypeError, "can't modify frozen string" if frozen?
+    _rstrip!
+  end
 
   # def scan #  implemented in common/string.rb
 
   primitive 'size', 'size'
 
-  primitive          'slice', '_rubyAt:length:'
-  # start and length are both  int
+  alias slice []
 
-  primitive_nobridge 'slice', '_rubyAt:'
-  # arg may be an  int, range, regexp, or match_string
+#   def slice!(*args)
+#     raise ArgumentError, 'wrong number of arguments'
+#   end
 
-  def slice(*args)
-    len = args.size
-    if len.equal?(1)
-      slice(args[0])
-    elsif len.equal?(2)
-      slice(args[0], args[1])
-    else
-      raise ArgumentError, 'expected 1 or 2 args'
+
+  #     str.slice!(fixnum)           => fixnum or nil
+  #     str.slice!(fixnum, fixnum)   => new_str or nil
+  #     str.slice!(range)            => new_str or nil
+  #     str.slice!(regexp)           => new_str or nil
+  #     str.slice!(other_str)        => new_str or nil
+  #
+  #  Deletes the specified portion from <i>str</i>, and returns the portion
+  #  deleted. The forms that take a <code>Fixnum</code> will raise an
+  #  <code>IndexError</code> if the value is out of range; the <code>Range</code>
+  #  form will raise a <code>RangeError</code>, and the <code>Regexp</code> and
+  #  <code>String</code> forms will silently ignore the assignment.
+  #
+  #     string = "this is a string"
+  #     string.slice!(2)        #=> 105
+  #     string.slice!(3..6)     #=> " is "
+  #     string.slice!(/s.*t/)   #=> "sa st"
+  #     string.slice!("r")      #=> "r"
+  #     string                  #=> "thing"
+  def slice!(start, a_len)
+    sz = self.size
+    if start._isRegexp
+      m_begin, m_len = self._match_regexp(start, a_len)
+      return nil if m_begin.equal?(nil)
+      raise TypeError, "can't modify frozen string" if self.frozen?
+      r = slice!(m_begin, m_len)
+      # r.taint if self.tainted? or start.tainted?
+      return r
     end
-  end
 
-  def slice!(start, len)
+    len = Type.coerce_to(a_len, Integer, :to_int)
     return nil if len < 0
     return '' if len.equal?(0)
-
-    sz = self.size
     start += sz if start < 0
     return nil if start < 0 || start > sz
     return '' if start.equal?(sz)
-
-    s = slice(start, len)
-
+    raise TypeError, "can't modify frozen string" if self.frozen?
+    s = _at_length(start, len)
     stop = start + len
     stop = sz if stop > sz
     _remove_from_to(start + 1, stop) # convert to smalltalk indexing
@@ -653,26 +857,37 @@ class String
   end
 
   def slice!(arg)
-    if arg._isFixnum
-      s = slice!(arg, 1)
-      s[0]
-    elsif arg._isRange
-      start = arg.begin
-      len = arg.end - start
-      len += 1 if ! arg.exclude_end?
-      slice!(start, len)
-    elsif arg._isString
-      start = self._findStringStartingAt(arg, 1)
-      start.equal?(nil) ? nil : slice!(start - 1, arg.length) # adjust coming from smalltalk
-    elsif arg._isRegexp
+    # Do NOT check for frozen here...fails specs
+    if arg._isRegexp
       md = arg.match(self)
       return nil if md.equal?(nil)
+      raise TypeError, "can't modify frozen string" if self.frozen?
       start = md.begin(0)
       len = md.end(0) - start
       slice!(start, len)
+    elsif arg._isRange
+      first, len = arg._beg_len(self.length)
+      return nil if first.equal?(nil)
+      slice!(first, len)
+    elsif arg._isString
+      start = self._findStringStartingAt(arg, 1)
+      return nil if start.equal?(0)
+      slice!(start - 1, arg.length) # adjust coming from smalltalk
     else
-      raise TypeError, "String#slice! does not support #{arg.class}"
+      arg = Type.coerce_to(arg, Integer, :to_int)
+      s = slice!(arg, 1)
+      s[0]
     end
+  end
+
+  def _match_regexp(regexp, length)
+    md = regexp.match(self)
+    return nil if md.equal?(nil)
+    idx = Type.coerce_to(length, Integer, :to_int)
+    return nil if idx >= md.size or idx < 0
+    m_begin = md.begin(idx)
+    m_len = md.end(idx) - m_begin
+    [m_begin, m_len]
   end
 
   def split(pattern=nil, limit=nil)
@@ -788,6 +1003,7 @@ class String
   primitive '_strip', 'withBlanksTrimmed'
 
   def strip!
+    raise TypeError, "can't modify frozen string" if frozen?
     replace(strip)
   end
 
@@ -807,7 +1023,7 @@ class String
           dup
         end
     r = self.class.new(r) unless self._isString
-    r.taint if replacement.tainted? || self.tainted?
+    # r.taint if replacement.tainted? || self.tainted?
     r
   end
 
@@ -821,15 +1037,18 @@ class String
           dup
         end
     r = self.class.new(r) unless self._isString
-    r.taint if self.tainted? || pattern.tainted?
+    # r.taint if self.tainted? || pattern.tainted?
     r
   end
 
   def sub!(pattern, replacement)
+    raise TypeError, "sub!: can't modify frozen string" if frozen?
+
     regex = _get_pattern(pattern, true)
     # stores into caller's $~
     if match = regex._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
+      # self.taint if replacement.tainted?
       self
     else
       nil
@@ -839,10 +1058,13 @@ class String
   def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
+    raise TypeError, "sub!: can't modify frozen string" if frozen?
+
     regex = _get_pattern(pattern, true)
     if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match)
       replace(_replace_match_with(match, replacement))
+      # self.taint if replacement.tainted?
       self
     else
       nil
@@ -855,6 +1077,7 @@ class String
     unless pattern._isString || pattern._isRegexp
       if pattern.respond_to?(:to_str)
         pattern = pattern.to_str
+        raise TypeError, "can't convert pattern to string" unless pattern._isString
       else
         raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
       end
@@ -865,12 +1088,39 @@ class String
   end
 
 
-  primitive 'succ!', 'rubySucc'
+  primitive '_succ!', 'rubySucc'
+  def succ!
+    raise TypeError, "succ!: can't modify frozen string" if self.frozen?
+    _succ!
+  end
 
+  # Returns the successor to <i>self</i>. The successor is calculated by
+  # incrementing characters starting from the rightmost alphanumeric (or
+  # the rightmost character if there are no alphanumerics) in the
+  # string. Incrementing a digit always results in another digit, and
+  # incrementing a letter results in another letter of the same case.
+  # Incrementing nonalphanumerics uses the underlying character set's
+  # collating sequence.
+  #
+  # If the increment generates a ``carry,'' the character to the left of
+  # it is incremented. This process repeats until there is no carry,
+  # adding an additional character if necessary.
+  #
+  #   "abcd".succ        #=> "abce"
+  #   "THX1138".succ     #=> "THX1139"
+  #   "<<koala>>".succ   #=> "<<koalb>>"
+  #   "1999zzz".succ     #=> "2000aaa"
+  #   "ZZZ9999".succ     #=> "AAAA0000"
+  #   "***".succ         #=> "**+"
   def succ
     d = self.dup
     d.succ!
+    # d.taint if self.tainted?
+    d
   end
+
+  alias_method :next, :succ
+  alias_method :next!, :succ!
 
   def sum(power=16)
     tot = 0
@@ -888,8 +1138,19 @@ class String
     tot
   end
 
-  # MNI: swapcase
-  # MNI: swapcase!
+  primitive '_swapcase!', 'rubySwapcaseInPlace'
+
+  def swapcase!
+    raise TypeError, "can't modify frozen string" if frozen?
+    self._swapcase!
+  end
+
+  def swapcase
+    s = self.dup
+    s.swapcase!
+    # s.taint if self.tainted?
+    s
+  end
 
   primitive 'to_f', 'asFloat'
   def to_i(base=10)
@@ -908,7 +1169,7 @@ class String
     else
       s = self
     end
-    "#{base}r#{s}"._to_i
+    "#{base}r#{s.delete('_').strip}"._to_i
   end
 
   # Return an array of two elements: [an_int, a_string], where an_int is
@@ -922,9 +1183,13 @@ class String
   # "-1010".extract_base(16)   => [16, "-1010"]
   def extract_base(base=10)
     s = self.delete('_').strip
-    s =~ /^([+-]?)(0[bdox])?(.*)/i
-    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16}[$2.downcase] unless $2.equal?(nil)
+    s =~ /^([+-]?)(0[bdox]?)?(.*)/i
+    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8}[$2.downcase] unless $2.equal?(nil)
     [base, "#{$1}#{$3}"]
+  end
+
+  def to_a
+    self.empty? ? [] : [self]
   end
 
   def to_s
@@ -936,32 +1201,82 @@ class String
   end
 
   primitive_nobridge 'to_sym', 'asSymbol'
-  primitive '_tr!', 'rubyTrFrom:to:'
 
-  def tr!(from, to)
+  primitive '_tr!', 'rubyTrFrom:to:'
+  #     str.tr!(from_str, to_str)   => str or nil
+  #
+  #  Translates <i>str</i> in place, using the same rules as
+  #  <code>String#tr</code>. Returns <i>str</i>, or <code>nil</code> if no
+  #  changes were made.
+  def tr!(from_str, to_str)
     raise TypeError, "can't modify frozen string" if frozen?
-    from = Type.coerce_to(from, String, :to_str)
-    to   = Type.coerce_to(to,   String, :to_str)
+    from = Type.coerce_to(from_str, String, :to_str)
+    to   = Type.coerce_to(to_str,   String, :to_str)
     _tr!(from, to)
   end
 
-  def tr(from, to)
+  #     str.tr(from_str, to_str)   => new_str
+  #
+  #  Returns a copy of <i>str</i> with the characters in <i>from_str</i> replaced
+  #  by the corresponding characters in <i>to_str</i>. If <i>to_str</i> is
+  #  shorter than <i>from_str</i>, it is padded with its last character. Both
+  #  strings may use the c1--c2 notation to denote ranges of characters, and
+  #  <i>from_str</i> may start with a <code>^</code>, which denotes all
+  #  characters except those listed.
+  #
+  #     "hello".tr('aeiou', '*')    #=> "h*ll*"
+  #     "hello".tr('^aeiou', '*')   #=> "*e**o"
+  #     "hello".tr('el', 'ip')      #=> "hippo"
+  #     "hello".tr('a-y', 'b-z')    #=> "ifmmp"
+  def tr(from_str, to_str)
     s = self.dup
-    s.tr!(from, to)
-    s.taint if tainted?
+    s.tr!(from_str, to_str)
+    # s.taint if tainted?
     s
   end
 
-  primitive 'tr_s!', 'rubyTrSqueezeFrom:to:'
-  def tr_s(from, to)
-    from = Type.coerce_to(from, String, :to_str)
-    to   = Type.coerce_to(to,   String, :to_str)
-    (str = self.dup).tr_s!(from, to) || str
+  primitive '_tr_s!', 'rubyTrSqueezeFrom:to:'
+  #     str.tr_s!(from_str, to_str)   => str or nil
+  #
+  #  Performs <code>String#tr_s</code> processing on <i>str</i> in place,
+  #  returning <i>str</i>, or <code>nil</code> if no changes were made.
+  def tr_s!(from_str, to_str)
+    raise TypeError, "tr_s!: can't modify frozen string" if frozen?
+    return nil if from_str.empty?
+    _tr_s!(from_str, to_str)
+  end
+
+  #     str.tr_s(from_str, to_str)   => new_str
+  #
+  #  Processes a copy of <i>str</i> as described under <code>String#tr</code>,
+  #  then removes duplicate characters in regions that were affected by the
+  #  translation.
+  #
+  #     "hello".tr_s('l', 'r')     #=> "hero"
+  #     "hello".tr_s('el', '*')    #=> "h*o"
+  #     "hello".tr_s('el', 'hx')   #=> "hhxo"
+  def tr_s(from_str, to_str)
+    from = Type.coerce_to(from_str, String, :to_str)
+    to   = Type.coerce_to(to_str,   String, :to_str)
+    str = self.dup
+    # str.taint if self.tainted?
+    str._tr_s!(from, to) || str
   end
 
   primitive 'unpack', 'rubyUnpack:'
-  primitive 'upcase', 'asUppercase'
-  primitive 'upcase!', 'rubyUpcaseInPlace'
+
+  primitive '_upcase', 'asUppercase'
+  def upcase
+    r = _upcase
+    # r.taint if tainted?
+    r
+  end
+
+  primitive '_upcase!', 'rubyUpcaseInPlace'
+  def upcase!
+    raise TypeError, "upcase!: can't modify frozen string" if frozen?
+    _upcase!
+  end
 
   # MNI: upto
 

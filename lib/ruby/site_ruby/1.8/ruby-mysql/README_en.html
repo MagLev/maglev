@@ -1,0 +1,695 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- $Id: README_en.html,v 1.14 2005/02/12 12:34:05 tommy Exp $ -->
+<html>
+  <head>
+    <meta http-equiv="content-style-type" content="text/css">
+    <title>Ruby/MySQL</title>
+    <link rel=stylesheet type="text/css" href="tommy.css">
+    <link rev=made href="mailto:tommy@tmtm.org">
+  </head>
+
+  <body>
+    <h1>Ruby/MySQL</h1>
+    <p><a href="README.html">[Japanese page]</a></p>
+    <hr>
+    <p>
+      This is the <a href="http://www.mysql.com">MySQL</a> <a
+      href="http://www.ruby-lang.org">Ruby</a> API written by Ruby.
+      It provides the same functions for Ruby programs that the MySQL
+      C API provides for C programs.
+    </p>
+
+    <h2>Requirement</h2>
+    <ul>
+      <li>Ruby 1.8.2
+    </ul>
+
+    <h2>License</h2>
+    <p>
+      This program is under Ruby's license.
+    </p>
+<!--
+    <h2>Download</h2>
+    <ul>
+      <li><a href="ruby-mysql-0.2.6.tar.gz">ruby-mysql-0.2.6.tar.gz</a>
+      <li><a href="ruby-mysql-0.2.5.tar.gz">ruby-mysql-0.2.5.tar.gz</a>
+      <li><a href="ruby-mysql-0.2.4.tar.gz">ruby-mysql-0.2.4.tar.gz</a>
+      <li><a href="ruby-mysql-0.2.3a.tar.gz">ruby-mysql-0.2.3a.tar.gz</a>
+      <li><a href="ruby-mysql-0.2.2.tar.gz">ruby-mysql-0.2.2.tar.gz</a>
+      <li><a href="ruby-mysql-0.2.1.tar.gz">ruby-mysql-0.2.1.tar.gz</a>
+      <li><a href="ruby-mysql-0.2.0.tar.gz">ruby-mysql-0.2.0.tar.gz</a>
+      <li><a href="ruby-mysql-0.1.5.tar.gz">ruby-mysql-0.1.5.tar.gz</a>
+      <li><a href="ruby-mysql-0.1.4.tar.gz">ruby-mysql-0.1.4.tar.gz</a>
+      <li><a href="ruby-mysql-0.1.3.tar.gz">ruby-mysql-0.1.3.tar.gz</a>
+      <li><a href="ruby-mysql-0.1.2.tar.gz">ruby-mysql-0.1.2.tar.gz</a>
+      <li><a href="ruby-mysql-0.1.1.tar.gz">ruby-mysql-0.1.1.tar.gz</a>
+      <li><a href="ruby-mysql-0.1.tar.gz">ruby-mysql-0.1.tar.gz</a>
+    </ul>
+-->
+    <h2>Install</h2>
+    <pre class="code">
+% ruby ./setup.rb
+% ruby ./test.rb <i>hostname</i> <i>user</i> <i>passwd</i>
+# ruby ./install.rb
+</pre>
+    <h3>Setup</h3>
+    <pre class="code">
+% ruby ./setup.rb
+</pre>
+    <p>
+      This command find MySQL's UNIX domain socket. This is not needed
+      for system that does not have UNIX domain socket such as
+      Microsoft Windows.
+    </p>
+
+    <h3>Test</h3>
+    <pre class="code">
+% ruby ./test.rb <i>hostname</i> <i>user</i> <i>passwd</i>
+</pre>
+    <p>
+      test.rb should be invoked with three arguments that indicate the
+      MySQL server hostname, and the username and password for a MySQL
+      account that can create a database named "rubytest".  An
+      optional fourth argument is allowed, to specify a database name
+      to use rather than "rubytest".  The database should not already
+      exist.
+    </p>
+
+    <h3>Install</h3>
+    <pre class="code">
+# ruby ./install.rb
+</pre>
+    <p>
+      This command install mysql.rb to standard library
+      directory(Config::CONFIG["rubylibdir"]). If you want to copy to
+      other directory, copy mysql.rb to appropriate directory.
+    </p>
+
+    <h2>Missing Features</h2>
+    <ul>
+      <li>
+	Old protocol (version 9) is not supported.
+      <li>
+	mysql_character_set_name(), mysql_debug() are not supported.
+      <li>
+	Mysql#options() support only OPT_LOCAL_INFILE.
+      <li>
+	Mysql::Field#max_length is always 0.
+    </ul>
+
+    <h2>Usage</h2>
+    <p>example)
+      <pre class="code">
+require "mysql"
+my = Mysql::new("host", "user", "passwd", "db")
+res = my.query("select * from tbl")
+res.each do |row|
+  col1 = row[0]
+  col2 = row[1]
+end
+</pre>
+
+    <h2>Reference</h2>
+    <p>
+      The names of methods provided by this module basically are the
+      same as the names of the functions in the C API, except that the
+      Ruby method names do not begin with a 'mysql_' prefix. For
+      example, the Ruby query() method corresponds to the C API
+      mysql_query() function. For details on the use of each Ruby
+      method, see the descriptions of the corresponding C functions in
+      the MySQL Reference Manual.
+    </p>
+    <p>
+      Some Ruby methods may be invoked under other names that serve as
+      equivalent aliases, as noted below.
+    </p>
+    <p>
+      If an error occurs when a method executes, it raises a
+      Mysql::Error exception.
+    </p>
+
+    <h3>Mysql class</h3>
+    <p>
+      MySQL class
+    </p>
+
+    <h4>Class Methods</h4>
+    <dl>
+      <dt>init()
+      <dd>
+	<p>
+	  return Mysql class object.
+	</p>
+      <dt>real_connect(host=nil, user=nil, passwd=nil, db=nil, port=nil, sock=nil, flag=nil)
+      <dt>connect(host=nil, user=nil, passwd=nil, db=nil, port=nil, sock=nil, flag=nil)
+      <dt>new(host=nil, user=nil, passwd=nil, db=nil, port=nil, sock=nil, flag=nil)
+      <dd>
+	<p>
+	  connect to mysqld and return Mysql class object.
+	</p>
+
+      <dt>escape_string(str)
+      <dt>quote(str)
+      <dd>
+	<p>
+	  quote string for insert, update.
+	</p>
+
+      <dt>get_client_info()
+      <dt>client_info()
+      <dd>
+	<p>
+	  return client version information.
+	</p>
+
+      <dt>debug(str)
+      <dd>
+	<p>
+	  unsupported.
+	</p>
+    </dl>
+
+    <h4>Object Methods</h4>
+    <dl>
+      <dt>options(opt, val=nil)
+      <dd>
+	<p>
+	  set options. opt is available only Mysql::OPT_LOCAL_INFILE.
+	  if val is omitted or val is true value, LOAD DATA LOCAL INFILE query can be used.
+	</p>
+
+      <dt>real_connect(host=nil, user=nil, passwd=nil, db=nil, port=nil, sock=nil, flag=nil)
+      <dt>connect(host=nil, user=nil, passwd=nil, db=nil, port=nil, sock=nil, flag=nil)
+      <dd>
+	<p>
+	  same as Mysql::real_connect().
+	</p>
+
+      <dt>affected_rows()
+      <dd>
+	<p>
+	  return number of affected rows.
+	</p>
+
+      <dt>change_user(user=nil, passwd=nil, db=nil)
+      <dd>
+	<p>
+	  change user.
+	</p>
+
+      <dt>character_set_name()
+      <dd>
+	<p>
+	  unsupported.
+	</p>
+
+      <dt>close()
+      <dd>
+	<p>
+	  close connection.
+	</p>
+
+      <dt>create_db(db)
+      <dd>
+	<p>
+	  create database.
+	</p>
+
+      <dt>drop_db(db)
+      <dd>
+	<p>
+	  drop database.
+	</p>
+
+      <dt>dump_debug_info()
+      <dd>
+	<p>
+	  same as C API mysql_dump_debug_info().
+	</p>
+
+      <dt>errno()
+      <dd>
+	<p>
+	  return error number.
+	</p>
+
+      <dt>error()
+      <dd>
+	<p>
+	  return error message.
+	</p>
+
+      <dt>escape_string(str)
+      <dt>quote(str)
+      <dd>
+	<p>
+	  quote string for insert, update.
+	</p>
+
+      <dt>field_count()
+      <dd>
+	<p>
+	  return number of field for last query.
+	</p>
+
+      <dt>get_host_info()
+      <dt>host_info()
+      <dd>
+	<p>
+	  return connection information.
+	</p>
+
+      <dt>get_proto_info()
+      <dt>proto_info()
+      <dd>
+	<p>
+	  return protocol version.
+	</p>
+
+      <dt>get_server_info()
+      <dt>server_info()
+      <dd>
+	<p>
+	  return server version information.
+	</p>
+
+      <dt>info()
+      <dd>
+	<p>
+	  return query information. if no information, return nil.
+	</p>
+
+      <dt>insert_id()
+      <dd>
+	<p>
+	  last generated AUTO_INCREMENT-ed field's value.
+	</p>
+
+      <dt>kill(id)
+      <dd>
+	<p>
+	  kill thread for id.
+	</p>
+
+      <dt>list_dbs(db=nil)
+      <dd>
+	<p>
+	  return array of database name.
+	</p>
+
+      <dt>list_fields(table, field=nil)
+      <dd>
+	<p>
+	  return Mysql::Result class object that indicate field
+	  information.
+	</p>
+
+      <dt>list_processes()
+      <dd>
+	<p>
+	  return Mysql::Result class object that indicate thread list
+	  on server.
+	</p>
+
+      <dt>list_tables(table=nil)
+      <dd>
+	<p>
+	  return array of table name.
+	</p>
+
+      <dt>ping()
+      <dd>
+	<p>
+	  check that server is alive.
+	</p>
+
+      <dt>query(q)
+      <dd>
+	<p>
+	  do query. If query return result, automatically invoke
+	  store_result() and return Mysql::Result object when
+	  query_with_result is true. If query do not return result,
+	  return nil.
+	</p>
+
+      <dt>query_with_result
+      <dt>query_with_result=bool
+      <dd>
+	<p>
+	  If true, query() also invokes store_result() and returns a
+	  MysqlRes object.  Default is true.
+	</p>
+
+      <dt>real_query(q)
+      <dd>
+	<p>
+	  do query only. store_result() is not invoked.
+	</p>
+
+      <dt>refresh(r)
+      <dd>
+	<p>
+	  flush server log or cache.
+	</p>
+
+      <dt>reload()
+      <dd>
+	<p>
+	  reload grant table.
+	</p>
+
+      <dt>select_db(db)
+      <dd>
+	<p>
+	  select database.
+	</p>
+
+      <dt>shutdown()
+      <dd>
+	<p>
+	  shutdown server.
+	</p>
+
+      <dt>stat()
+      <dd>
+	<p>
+	  return server status.
+	</p>
+
+      <dt>store_result()
+      <dd>
+	<p>
+	  return Mysql::Result class object.
+	</p>
+
+      <dt>thread_id()
+      <dd>
+	<p>
+	  return thread id of this connection.
+	</p>
+
+      <dt>use_result()
+      <dd>
+	<p>
+	  return Mysql::Result class object.
+	</p>
+
+    </dl>
+
+    <h3>Mysql::Result class</h3>
+    <p>
+      query result class. MysqlRes is alias name for compatibility.
+    </p>
+
+    <h4>Object Methods</h4>
+    <dl>
+      <dt>data_seek(offset)
+      <dd>
+	<p>
+	  set current row position to offset line.
+	</p>
+
+      <dt>each() {|x| ...}
+      <dd>
+	<p>
+	  repeat fetch_row().
+	</p>
+
+      <dt>each_hash(with_table=false) {|x| ...}
+      <dd>
+	<p>
+	  repeat fetch_hash().
+	</p>
+
+      <dt>fetch_field()
+      <dd>
+	<p>
+	  return Mysql::Field class object.
+	</p>
+
+      <dt>fetch_fields()
+      <dd>
+	<p>
+	  return array of Mysql::Field class object.
+	</p>
+
+      <dt>fetch_field_direct(n)
+      <dd>
+	<p>
+	  return nth Mysql::Field class object.
+	</p>
+
+      <dt>fetch_lengths()
+      <dd>
+	<p>
+	  return array of length of field value of current row.
+	</p>
+
+      <dt>fetch_row()
+      <dd>
+	<p>
+	  return array of field value.
+	</p>
+
+      <dt>fetch_hash(with_table=false)
+      <dd>
+	<p>
+	  return hash of pair of field name and field value.  if
+	  with_table is true, hash key is table+"."+fieldname.
+	</p>
+
+      <dt>field_seek(offset)
+      <dd>
+	<p>
+	  set current row position to offset line.
+	</p>
+
+      <dt>field_tell()
+      <dd>
+	<p>
+	  return current row position.
+	</p>
+
+      <dt>free()
+      <dd>
+	<p>
+	  call GC::start.
+	</p>
+
+      <dt>num_fields()
+      <dd>
+	<p>
+	  return number of fields.
+	</p>
+
+      <dt>num_rows()
+      <dd>
+	<p>
+	  return number of rows.
+	</p>
+
+      <dt>row_seek(offset)
+      <dd>
+	<p>
+	  same as data_seek().
+	</p>
+
+      <dt>row_tell()
+      <dd>
+	<p>
+	  return current row position.
+	</p>
+    </dl>
+
+    <h3>Mysql::Field class</h3>
+    <p>
+      field information class. MysqlField is alias for compatibility.
+    </p>
+
+    <h4>Object Methods</h4>
+    <dl>
+      <dt>name()
+      <dd>
+	<p>
+	  field name.
+	</p>
+
+      <dt>table()
+      <dd>
+	<p>
+	  table name.
+	</p>
+
+      <dt>def()
+      <dd>
+	<p>
+	  default value.
+	</p>
+
+      <dt>type()
+      <dd>
+	<p>
+	  type of field.
+	</p>
+
+      <dt>length()
+      <dd>
+	<p>
+	  field length.
+	</p>
+
+      <dt>max_length()
+      <dd>
+	<p>
+	  maximum length of field of result set.
+	</p>
+
+      <dt>flags()
+      <dd>
+	<p>
+	  flag.
+	</p>
+
+      <dt>decimals()
+      <dd>
+	<p>
+	  number of decimal.
+	</p>
+
+      <dt>hash()
+      <dd>
+	<p>
+	  return hash.
+	  obj.hash['name'] == obj.name, 
+	  obj.hash['type'] == obj.type, 
+	  ...
+	</p>
+    </dl>
+
+    <h3>Mysql::Error class</h3>
+    <p>
+      MySQL error class. MysqlError is alias for compatibility.
+    </p>
+
+    <h4>Object Methods</h4>
+    <dl>
+      <dt>errno()
+      <dd>
+	<p>
+	  error number.
+	</p>
+
+      <dt>error()
+      <dd>
+	<p>
+	  error message.
+	</p>
+    </dl>
+
+    <h2>History</h2>
+
+    <dl>
+      <dt>2005-02-12  ver. 0.2.6
+      <dd>
+	<ul>
+	  <li>escape_string() BUG: escape_string(): change "\032" to "\Z" instead of "\\Z".
+	</ul>
+
+      <dt>2004-10-07  ver. 0.2.5
+      <dd>
+	<ul>
+	  <li>When program exited without Mysql#close, mysqld write error log 'Aborted connection'.
+	</ul>
+
+      <dt>2004-01-21  ver. 0.2.4
+      <dd>
+	<ul>
+	  <li>query() return nil when query do not return result, for compatibility with MySQL/Ruby.
+	</ul>
+
+      <dt>2004-01-11  ver. 0.2.3a
+      <dd>
+	<ul>
+	  <li>bug fix: list_dbs(), list_tables() return invalid value.
+	</ul>
+
+      <dt>2004-01-11  ver. 0.2.3
+      <dd>
+	<ul>
+	  <li>bug fix: error on next query of list_dbs(), list_tables().
+	</ul>
+
+      <dt>2003-10-21  ver. 0.2.2
+      <dd>
+	<ul>
+	  <li>avoid ruby warning
+	  <li>add setup.rb and install.rb
+	</ul>
+
+      <dt>2003-08-27  ver. 0.2.1
+      <dd>
+	<ul>
+	  <li>bug fix: error when result records >= 256.
+	</ul>
+
+      <dt>2003-08-19  ver. 0.2.0
+      <dd>
+	<ul>
+	  <li>support LOAD DATA LOCAL INFILE
+	  <li>support Mysql#options() (only Mysql::OPT_LOCAL_INFILE)
+	  <li>support for environment that not have UNIXSocket
+	  <li>bug fix: error when connecting to server that not support transaction
+	</ul>
+
+      <dt>2003-08-16  ver. 0.1.5
+      <dd>
+	<ul>
+	  <li> add server side error symbol (ER_*)
+	</ul>
+
+      <dt>2003-08-11  ver. 0.1.4
+      <dd>
+	<ul>
+	  <li>bug fix: real_connect() if flag=nil
+	</ul>
+
+      <dt>2003-07-27  ver. 0.1.3
+      <dd>
+	<ul>
+	  <li>for Ruby 1.8.0
+	</ul>
+
+      <dt>2003-07-25  ver. 0.1.2
+      <dd>
+	<ul>
+	  <li>bug fix: fetch_lengths(), fetch_row()
+	</ul>
+
+      <dt>2003-07-24  ver. 0.1.1
+      <dd>
+	<ul>
+	  <li>bug fix: list_dbs(), list_tables()
+	  <li>English document.
+	</ul>
+
+      <dt>2003-07-23  ver. 0.1
+      <dd>
+	<ul>
+	  <li>initial version
+	</ul>
+    </dl>
+
+    <h2>Author</h2>
+    <p>
+      TOMITA Masahiro <a href="mailto:tommy@tmtm.org">tommy@tmtm.org</a>
+      <a href="http://www.tmtm.org">http://www.tmtm.org</a>
+    </p>
+
+    <hr>
+    <address><a href="mailto:tommy@tmtm.org">TOMITA Masahiro</a></address>
+<!-- Created: Wed Jul 23 10:34:18 JST 2003 -->
+<!-- hhmts start -->
+Last modified: Sat Feb 12 21:33:52 JST 2005
+<!-- hhmts end -->
+  </body>
+</html>

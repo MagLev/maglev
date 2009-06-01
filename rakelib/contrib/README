@@ -1,0 +1,87 @@
+
+Rake scripts ruby files to support installation and management of several
+gemstone instances.
+
+The scripts provide the following services:
+
+* create, manage and destroy stone instances
+* start, stop and show status of stone instances
+* Manage environment variables needed for each stone instance.
+* backup stone files
+
+By default, these scripts assume / setup / manage the following
+directories:
+
+|--------------------------------------------------+-----------------------|
+| The installation directory.                      | /opt/gemstone/product |
+|                                                  |                       |
+| There need be only one of these per computer.    |                       |
+| It contains the install of MagLev, GLASS         |                       |
+| or the Smalltalk/64 product.  This is the        |                       |
+| source of the new extents.  Many instances of    |                       |
+| stones share the common code here.  The VM code, |                       |
+| ruby libraries and documentation live here.      |                       |
+|--------------------------------------------------+-----------------------|
+| The config directory.                            | /etc/gemstone         |
+|                                                  |                       |
+| Contains a .conf file for each stone.            |                       |
+| The list of currently managed stones is          |                       |
+| derived from the .conf file names in this        |                       |
+| directory.                                       |                       |
+|--------------------------------------------------+-----------------------|
+| Per-stone runtime root                           | /var/local/gemstone   |
+|                                                  |                       |
+| Each stone gets a named directory under          |                       |
+| here that holds the extent, locks,               |                       |
+| tranlogs, etc. for just that stone.              |                       |
+|--------------------------------------------------+-----------------------|
+| The base log directory                           | /var/log/gemstone     |
+|                                                  |                       |
+| Each named stone gets its own named subdir       |                       |
+| for log files.                                   |                       |
+|--------------------------------------------------+-----------------------|
+| Directory to hold backups.                       | /var/backups/gemstone |
+|--------------------------------------------------+-----------------------|
+
+Many of the directories will have sub-directories or files based on the
+"name" of the stone.
+
+So, for an installation named "test_stone_one", we'd have:
+
+|-------------+------------------------------------|
+| Install Dir | /opt/gemstone/product              |
+|-------------+------------------------------------|
+| Config file | /etc/gemstone/test_stone_one.conf  |
+|-------------+------------------------------------|
+| Log Dir     | /var/log/gemstone/test_stone_one   |
+|-------------+------------------------------------|
+| Data Dir    | /var/local/gemstone/test_stone_one |
+|-------------+------------------------------------|
+| Backup Dir  | /var/backups/gemstone              |
+|-------------+------------------------------------|
+
+The following directories and files are derived from the previous
+parameters
+
+|------------+--------------------------------------------|
+| Extent Dir | /var/local/gemstone/test_stone_one/extent  |
+|------------+--------------------------------------------|
+| Tranlogs   | /var/local/gemstone/test_stone_one/tranlog |
+|------------+--------------------------------------------|
+
+The following environment variables are setup:
+
+|------------------+------------------------------------|
+| GEMSTONE         | /opt/gemstone/product              |
+|------------------+------------------------------------|
+| GEMSTONE_NAME    | test_stone_one                     |
+|------------------+------------------------------------|
+| GEMSTONE_LOGDIR  | /var/log/gemstone/test_stone_one   |
+|------------------+------------------------------------|
+| GEMSTONE_DATADIR | /var/local/gemstone/test_stone_one |
+|------------------+------------------------------------|
+
+
+Each Stone represents a separate stone.  Each stone is tied to a
+GemStoneInstallation (a version of the gemstone product installed on the
+machine, e.g., Glass 3.3.0).

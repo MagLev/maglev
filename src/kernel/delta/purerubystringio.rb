@@ -273,10 +273,22 @@ class PureRubyStringIO < IO
     getc
   end
 
+  def readline(*args)
+    raise ArgumentError, 'expected 0 or 1 arg'
+  end
+
   def readline(sep=$/)
+    # variant after first gets no bridges   # gemstone
     if @sio_closed_read ; requireReadable ; end
     raise EOFError, "End of file reached", caller if eof?
-    gets(sep)
+    self._gets(sep, 0x31)
+  end
+
+  def readline
+    # variant after first gets no bridges   # gemstone
+    if @sio_closed_read ; requireReadable ; end
+    raise EOFError, "End of file reached", caller if eof?
+    self._gets($/, 0x31)
   end
 
   def readlines(sep_string=Undefined)

@@ -76,21 +76,21 @@ shift $(($OPTIND - 1))
 
 # Commands
 startserver() {
-  $GEMSTONE/bin/startnetldi -g &>/dev/null
+  $GEMSTONE/bin/startnetldi -g -a $USER &>/dev/null
   $GEMSTONE/bin/startstone gs64stone &>/dev/null
   $GEMSTONE/bin/waitstone gs64stone &>/dev/null
   echo "MagLev server gs64stone started"
 }
 
 startserver-debug() {
-  $GEMSTONE/bin/startnetldi -g
+  $GEMSTONE/bin/startnetldi -g -a $USER
   $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf gs64stone
   $GEMSTONE/bin/waitstone gs64stone
   echo "MagLev server gs64stone started in verbose mode"
 }
 
 startserver-bench() {
-  $GEMSTONE/bin/startnetldi -g &>/dev/null
+  $GEMSTONE/bin/startnetldi -g -a $USER &>/dev/null
   $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-benchmark.conf gs64stone &>/dev/null
   $GEMSTONE/bin/waitstone gs64stone &>/dev/null
   echo "MagLev server gs64stone started with performance optimizations"
@@ -146,14 +146,17 @@ fi
 }
 
 ensurePrimsLoaded() {
-  echo "Loading prims if needed -- it may take a few seconds"
-  $TOPAZ_CMD << EOF > /dev/null
-    run
-      RubyContext ensurePrimsLoaded.
-%
-exit
-EOF
-  echo "Prims are loaded"
+  echo "Loading kernel if needed. It may take a few seconds..."
+#  $TOPAZ_CMD << EOF > /dev/null
+#    run
+#      RubyContext ensurePrimsLoaded.
+#%
+#exit
+#EOF
+  pushd $MAGLEV_HOME >>/dev/null
+  rake dev:ensureprims >>/dev/null
+  echo "Kernel is loaded."
+  popd >>/dev/null
 }
 
 startparser() {
