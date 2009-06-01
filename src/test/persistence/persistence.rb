@@ -5,30 +5,31 @@
 class MaglevError < StandardError; end
 
 # The base class for all MagLev Persistence Errors.
-class MaglevPersistenceError < MaglevError; end
-class AlreadyPersistentException < MaglevPersistenceError; end
-class NonPersistentClassException < MaglevPersistenceError; end
+class MaglevPersistenceError          < MaglevError;            end
+
+class AlreadyPersistentException      < MaglevPersistenceError; end
+class NonPersistentException          < MaglevPersistenceError; end
+class NonPersistentAncestorException  < MaglevPersistenceError; end
+class NonPersistentNamespaceException < MaglevPersistenceError; end
+
 
 class Module
   # Mark the receiver as a persistable class and persist the current state
-  # of the class.  If the <tt>include_all</tt> flag is true, then also
-  # ensure that all classes in the super class chain, and their included
-  # modules, are marked as persistable.  Once marked persistable, the state
-  # of the class (methods, constants, class variables and class instance
-  # variables) will be saved at the next <tt>Maglev.commit_transaction</tt>.
+  # of the class.  Once marked persistable, the state of the class
+  # (methods, constants, class variables and class instance variables) will
+  # be saved at the next <tt>Maglev.commit_transaction</tt>.
   #
   #  class C
   #    # stuff
   #  end
   #  C.maglev_persist!   # Persists all defined aspects of class at this point.
   #
-  # Raises +MaglevPersistenceError+ if the <tt>include_all</tt> flag is
-  # +false+, and one of receiver's superclasses or mixed in modules is
-  # not marked as persistable.
+  # Raises +NonPersistentAncestorException+ if one of receiver's
+  # superclasses or mixed in modules is not marked as persistable.
   #
-  # Raises +MaglevPersistenceError+ if the class or module that will hold
-  # the constant reference to this class is not persistable.  E.g., an
-  # exception is raised in the following code if module M is not
+  # Raises +NonPersistentNamespaceException+ if the class or module that
+  # will hold the constant reference to this class is not persistable.
+  # E.g., an exception is raised in the following code if module M is not
   # persistable:
   #
   #   module M
@@ -45,16 +46,17 @@ class Module
   # the metaclass.  Ruby classes will, by default, have the np bit set in
   # their metaclass, preventing accidental saving of a class.
   #
-  # Raises AlreadyPersistentException if called a second time (see also
-  # maglev_reopen!).
+  # Raises +AlreadyPersistentException+ if called a second time (see also
+  # +maglev_reopen!+).
   #
-  # TODO: should this return an array of the classes that were modified
-  # (had persistable set to false before the call, and now have it set to
-  # true)?
+  # Returns receiver
   #
-  def maglev_persist!(include_all=true)
+  # See also Array#maglev_persist!
+  #
+  def maglev_persist!
     raise AlreadyPersistentException if maglev_persist?
     # ...
+    self
   end
 
   # Returns true if <tt>maglev_persist!</tt> has been called on
@@ -64,63 +66,76 @@ class Module
     # ...
   end
 
-  # Reopen a class for persistence.  Marks the class so that the next time
-  # it is opened, all changes will be persisted.   All changes to theE.g.,
+  # Define a scope for making persistent changes to a persistable module or
+  # class.  Receiver must already have had +maglev_persist!+ called on it.
+  # The changes within the block are only staged for commit, and must be
+  # followed by a `Magelv.commit_transaction` to be persisted.  Only
+  # changes to the class or module made within a reopen block are
+  # persisted.  Modifications made outside of a reopen block are not
+  # persisted and available only during the current VM sesssion.
   #
-  #   class MyClass
-  #     # First Open
-  #     # ...
-  #   end
-  #   MyClass.maglev_persist!
+  # Raises +NonPersistentException+ if the class has not yet been persisted
+  # (i.e., if <tt>maglev_persist?</tt> returns false).
   #
-  #   class MyClass
-  #     # Second Open is non persistent
-  #   end
+  # If an unhandled exception causes the block to terminiate, the state of
+  # receiver is unspecified and the current transaction is poisoned (MagLev
+  # will only allow a subsequent abort_transaction, not a
+  # commit_transaction).  I.e., for recovery, you should abort the current
+  # transaction, fix the problem and then replay the block.
   #
-  #   MyClass.maglev_reopen!
-  #   class MyClass
-  #     # Third Open is persistent
-  #   end
-  #   Maglev.commit_transaction
+  # See also Array#maglev_reopen!
   #
-  # Raises UnpersistentClassException if the class has not yet been
-  # persisted (i.e., if maglev_persist? returns false).
-  #
-  # TODO: Should this take an optional block?  That way, you could have a
-  # natural way to mixin other modules, class_eval etc. and make that
-  # persistent too.
-  #
-  # TODO: Should this get turned off at the end of a file?  E.g., if you do
-  # this:
-  #    # foo.rb
-  #    MyClass.maglev_reopen!
-  #
-  #  should MyClass be in a re-opened state?  Seems like now you have the
-  #  possibility of unintended consequences?  Perhaps this is only good for
-  #  the current file? (but that means you can't
-  #
-  def maglev_reopen!
+  def maglev_reopen!(&block)
     raise NonPersistentClassException unless maglev_persist?
     # TODO: Should it raise if already re-opened?
     # ...
   end
+end
 
-  # TODO: Do we need/want this?
-  def maglev_reopen?
+class Array
+  # Consider each element of receiver as a class or module, and call
+  # maglev_persist! on it, but only if it hasn't already been called.
+  # Sorts the array to ensure all ancestors are processed before
+  # dependents.  Almost equivalent to the following:
+  #
+  #   self.each do |x|
+  #     unless x.maglev_persist?
+  #       x.ancestors.reverse.each do |a|
+  #         a.maglev_persist! if self.include?(a) and not a.maglev_persist?
+  #       end
+  #     end
+  #   end
+  def maglev_persist!
+    # ...
   end
 
-  # TODO: Do we need/want this?
-  def maglev_close!
-    raise NotReopenedException unless maglev_reopen?
-    # TODO: should it raise if not reopened?
+  # Consider each element of receiver as a class or module, and execute the
+  # block with the classes and modules marked for reopen.  E.g.,
+  #
+  #   [A, B, C].reopen! do
+  #     # stuff
+  #   end
+  #
+  # is equivalent to the following:
+  #
+  #   A.reopen! do
+  #     B.reopen! do
+  #       C.reopn! do
+  #         # stuff
+  #       end
+  #     end
+  #   end
+  #
+  def maglev_reopen!(&block)
+    # ...
   end
 end
 
 module Maglev
-
-  # USER_GLOBALS is a persistent Hash table.  It is the root for
-  # holding objects the application needs to persist.
-  USER_GLOBALS = :TBD
+  # +USER_GLOBALS+ is a persistent Hash table that is the root for holding
+  # objects the application needs to persist.  The keys for +USER_GLOBALS+
+  # must be symbols.
+  RUBY.global('USER_GLOBALS', 'UserGlobals') # USER_GLOBALS = ...
 
   # Application level transaction API
   module Transaction
