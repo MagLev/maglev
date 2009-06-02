@@ -1,9 +1,8 @@
 == RubySpecs and MagLev
 
-We've included a copy of the MSpec framework (<tt>spec/mspec</tt>, version
-1.5.6) and the RubySpecs (<tt>spec/rubyspec</tt>, latest as of
-2009-01-22). You may be able to run with later MSpec or RubySpec versions,
-but this is the version we used when we built the system.
+We've included a recent copy of the MSpec framework (<tt>spec/mspec</tt>)
+and the RubySpecs (<tt>spec/rubyspec</tt>). It is the version we used when
+we built the system.
 
 Links:
 * +MSpec+[http://rubyspec.org/projects/show/mspec]
@@ -12,14 +11,14 @@ Links:
 === Files
 
 All of the spec related files are under <tt>$MAGLEV_HOME/spec</tt>, except the
-<tt>default.mspec</tt> and <tt>passing.mspec</tt> config files which liver
-in the +$MAGLEV_HOME+ directory.
+<tt>default.mspec</tt> and <tt>passing.mspec</tt> config files which live
+in the <tt>$MAGLEV_HOME</tt> directory.
 
 
 [<tt>do_not_run_specs</tt>]
   A file read by <tt>default.mspec</tt> that list the specs under
   <tt>rubyspec</tt> that have a syntax error or otherwise prevent any of
-  the expectations in that file from running.  Most of the files listed
+  the expectations in that file from running.  Many of the files listed
   here have a counterpart in <tt>localspec</tt> that has the offending bits
   removed.
 
@@ -28,17 +27,15 @@ in the +$MAGLEV_HOME+ directory.
   to choke.
 
 [<tt>mspec/</tt>]
-  A git submodule that tracks the mspec framework.
-  As of 2009-05-01, this is at version 1.5.11 of mspec.
+  A git submodule that tracks the MSpec framework.
   http://github.com/rubyspec/mspec
 
 [<tt>rubyspec/</tt>]
-  A git submodule that tracks the rubyspecs.
-  As of 2009-05-01, this was the HEAD from the rubyspec git repository.
+  A git submodule that tracks the RubySpecs.
   http://github.com/rubyspec/rubyspec
 
 [<tt>tags/</tt>]
-  The Gemstone rubyspec tags.  These are maintained in the git repository.
+  The Gemstone RubySpec tags.  These are maintained in the MagLev git repository.
 
 === Run MSpec with +rake+
 
@@ -56,20 +53,20 @@ Assuming <tt>maglev-ruby</tt> is on your +PATH+, you can run specs like
 this:
 
     $ cd $MAGLEV_HOME
-    $ spec/mspec/bin/mspec -t maglev-ruby spec/rubyspec/1.8/core/nil
+    $ spec/mspec/bin/mspec -t maglev-ruby spec/rubyspec/core/array/at_spec.rb
 
-To run with debug mode on (so that you end up in the topaz prompt on an
+To run with debug mode on (so that you end up in the Topaz prompt on an
 error):
 
     $ cd $MAGLEV_HOME
-    $ spec/mspec/bin/mspec -t maglev-ruby -T -d spec/rubyspec/1.8/core/nil
+    $ spec/mspec/bin/mspec -t maglev-ruby -T -d spec/rubyspec/core/array/at_spec.rb
 
 === Tag Failing Specs
 
 MSpec allows you to place arbitrary tags on expectations.  The tags are
 kept in a separate directory hierarchy outside of the rubyspec dir.  For
 the MagLev development environment, the hierarchy is kept in
-<tt>spec/tags/frozen</tt>, and is checked into Git.  The tag files are
+<tt>spec/tags/frozen</tt>, and is checked into git.  The tag files are
 named according to the <tt>:tags_patterns</tt> configuration parameter in
 <tt>default.mspec</tt> at the top level git directory:
 
@@ -84,8 +81,8 @@ named according to the <tt>:tags_patterns</tt> configuration parameter in
 
 The MagLev scheme puts the tags for a given spec into a parallel directory
 hierarchy under <tt>spec/tags/frozen</tt>.  So, the tags for
-<tt>spec/rubyspec/1.8/core/array/at_spec.rb</tt> are in
-<tt>spec/tags/frozen/1.8/core/array/at_tags.txt</tt>.
+<tt>spec/rubyspec/core/array/at_spec.rb</tt> are in
+<tt>spec/tags/frozen/core/array/at_tags.txt</tt>.
 
 The mspec-tag command will run tests and then tag them based on the results
 of running the tests.
@@ -107,21 +104,21 @@ maglev-ruby</tt>, since the <tt>defaults.mspec</tt> file has that configured.
 To tag failing specs, you can do something like the following, which tags
 all the failing Array specs:
 
-    $ spec/mspec/bin/mspec tag spec/rubyspec/1.8/core/array/
+    $ spec/mspec/bin/mspec tag spec/rubyspec/core/array/
 
 But suppose there are already some failures recorded, especially for some
 nasty bugs that prevent mspec from continuing.  Then you can also add
 <tt>-G fails</tt> so that the tagging run won't run specs that are already
 known to fail, i.e., it will add to the known failures in a "safe" manner:
 
-    $ spec/mspec/bin/mspec tag -G fails spec/rubyspec/1.8/core/array/
+    $ spec/mspec/bin/mspec tag -G fails spec/rubyspec/core/array/
 
 ===== Run specs, ignoring any tagged as fails
 
 The <tt>-G tag</tt> option means: Exclude examples with descriptions tagged
 with <tt>tag</tt>:
 
-    $ spec/mspec/bin/mspec -G fails spec/rubyspec/1.8/core/array/
+    $ spec/mspec/bin/mspec -G fails spec/rubyspec/core/array/
 
 ===== Run specs, untagging fixed expectations
 
@@ -130,14 +127,14 @@ failing specs to now pass, you can re-run the failing specs and have mspec
 un-tag the ones that now pass:
 
     # delete the fails tag if the spec now runs
-    $ spec/mspec/bin/mspec tag --del fails spec/ruby/1.8/core/array/append_spec.rb
+    $ spec/mspec/bin/mspec tag --del fails spec/ruby/core/array/append_spec.rb
 
 ===== Tag arbitrary specs
 
 The following will tag all the specs in <tt>select_spec.rb</tt> with the
 +fails+ tag:
 
-    $ spec/mspec/bin/mspec tag --add fails -L spec/rubyspec/1.8/core/array/select_spec.rb
+    $ spec/mspec/bin/mspec tag --add fails -L spec/rubyspec/core/array/select_spec.rb
 
 The <tt>-L</tt> says to "do the action" (in this case, tag) to all the
 specs that match (i.e. all expectations in <tt>select_spec.rb</tt>).

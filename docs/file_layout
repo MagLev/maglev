@@ -4,7 +4,7 @@
     |
     + benchmarks    # Benchmarks from the Ruby Benchmark Suite project
     |
-    + bin           # MagLev shell scripts to run MagLev, the parser and
+    + bin           # MagLev shell scripts to run MagLev, the parse server and
     |               # start the Gemstone VM
     |
     + data          # The MagLev repository files
@@ -17,7 +17,7 @@
     |
     + gci           # Some GemStone C interface files
     |
-    + gemstone      # The MagLev/Smalltalk executables, libraries, etc.
+    + gemstone      # The GemStone/Smalltalk executables, libraries, etc.
     |
     + html          # created by "rake rdoc"; holds html versions of rdoc files
     |
@@ -27,11 +27,11 @@
     |     |
     |     + 1.8     # Standard ruby library files go here
     |     |
-    |     + gems    # Managed by ruby gems
+    |     + gems    # Managed by RubyGems
     |     |
     |     + site_ruby
     |
-    + locks         # Lock files used by VM when running MagLev
+    + locks         # Lock files used by the GemStone VM
     |
     + log           # Log files created by MagLev components
     |
@@ -39,9 +39,9 @@
     |
     + spec
     |  |
-    |  + mspec      # Git submodule holding v1.5.3 of MSpec
+    |  + mspec      # Git submodule holding a recent version of MSpec
     |  |
-    |  + rubyspec   # Latest RubySpec files
+    |  + rubyspec   # Git submodule holding a recent version of RubySpec files
     |
     + src           # MagLev Ruby source and libs
     |
@@ -58,7 +58,7 @@
     + kernel         # The core and language files pre-loaded into the image
     |  |             # These files are reloaded with "rake dev:reloadprims"
     |  |
-    |  + kernel.rb   # File that controls the load order of order kernel files
+    |  + kernel.rb   # File that controls the load order of kernel files
     |  |
     |  + bootstrap   # These files are loaded in the first wave and provide
     |  |             # the basic/core functionality

@@ -1,6 +1,6 @@
 === Required prerequisites
 
-You must be running on a suitable machine and OS. The install or
+You must be running on a suitable machine and 64-bit OS. The install or
 upgrade script you used to download MagLev should have complained if
 your machine was not suitable.
  
@@ -11,7 +11,7 @@ You will need the following MRI Ruby resources on your machine:
 
 1. MRI Ruby 1.8.6 (other versions are not supported)
    Patchlevel 287 is required, patchlevel 111 and 114 currently don't work
-2. Ruby Gems
+2. RubyGems
 3. ParseTree gem (version 3.0.3 or later)
 4. Rake
 

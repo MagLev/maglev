@@ -53,7 +53,7 @@ you don't try to make the rdoc:
     $ cd src/external/rubygems-1.3.1
     $ maglev-ruby setup.rb --no-rdoc --no-ri
 
-This will create the ruby gems hierarchy under lib/maglev/gems/... and will
+This will create the RubyGems hierarchy under lib/maglev/gems/... and will
 create a bin/maglev-gem. However, you'll need to change the first line in
 bin/maglev-gem to:
     #!/usr/bin/env maglev-ruby
@@ -63,7 +63,7 @@ causing this type of error:
     /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 8: require: command not found
     /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 9: require: command not found
 
-There is support for <tt>--env-shebang</tt> in ruby gems, but it doesn't
+There is support for <tt>--env-shebang</tt> in RubyGems, but it doesn't
 correctly setup bin/maglev-gem.  The default has been set for
 installed gems, however (i.e., if you <tt>maglev-gem install rake</tt>,
 then the <tt>bin/rake</tt> shell script will have the shebang line set

@@ -43,7 +43,7 @@ MagLev Server.
   at the Topaz prompt if there is a spec failure or an uncaught exception.
 * For the spec tasks that require a spec parameter, pass the parameter in
   with <tt>spec=...</tt>, e.g.,:
-    rake spec:run spec=spec/rubyspec/1.8/core/string/append_spec.rb
+    rake spec:run spec=spec/rubyspec/core/string/append_spec.rb
   The spec may be a file or directory.
 
 === Benchmark Tasks
@@ -74,7 +74,7 @@ environment and may depend on files not shipped with the Alpha release.
 Run at your own risk:
 
   rake dev:bm-tests          # Run the bm smoke tests
-  rake dev:clean-gems        # Clean up after a test install of rubygems
+  rake dev:clean-gems        # Clean up after a test install of RubyGems
   rake dev:ensure_stopped    # Make sure the gemstone server is stopped.
   rake dev:ensureprims       # Ensure kernel.rb (primitives) is loaded and committed
   rake dev:install-latest    # Stop server, install ../latest*, and reload primitives
