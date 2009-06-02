@@ -1,10 +1,10 @@
 === Smalltalk FFI
 
-The MagLev VM is a Smalltalk VM that has been enhanced to run Ruby as well.
-GemStone provides a set of <tt>.rb</tt> files that allow Ruby code to call
-into the Smalltalk evnironment.
+The MagLev VM is a GemStone VM that has been enhanced to run Ruby as well
+as Smalltalk. GemStone provides a set of <tt>.rb</tt> files that allow Ruby
+code to call into the GemStone/Smalltalk evnironment.
 
-==== Create Ruby Wrappers for Smalltalk Classes
+==== Create Ruby Wrappers for GemStone/Smalltalk Classes
 
 To generate the ruby wrappers:
 

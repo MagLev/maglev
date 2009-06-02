@@ -9,7 +9,7 @@ run correctly. For details, see the Prerequisites[link:files/docs/prerequisites.
 
 == Documentation
 
-To get the HTML version of this and other documentation:
+To generate the HTML version of this and other documentation:
 
 cd to the directory holding this README
   $ rake rdoc
@@ -128,6 +128,7 @@ Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 Persistence[link:files/docs/persistence.html]:: Persistence and transactions
+{MySQL Driver}[link:files/docs/mysql_driver.html]:: MySQL driver
 Benchmarks[link:files/docs/benchmarks.html]:: Ruby Benchmark Suite benchmarks
 Applications[link:files/docs/applications.html]:: Sample Ruby apps we're testing in MagLev
 

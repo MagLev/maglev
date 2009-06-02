@@ -1,26 +1,28 @@
 == Debugging scripts with MagLev
 
-Topaz is currently, the primary debugging tool for use with MagLev.  Most
-of this document describes debugging with Topaz.  An alternate approach, is
-to use the Squeak debugger.  See the section at the end on "Using Squeak to
-debug" 
+Topaz is currently the primary debugging tool for use with MagLev.  Most
+of this document describes debugging with Topaz.  An alternate approach is
+to use GemTools, written in Squeak, for debugging.  See the section at the
+end on "Using Squeak to debug" 
+
+Topaz provides a way to run underlying GemStone/S code from the command line.
+GemTools provides a Squeak based GUI interface for running GemStone/S code.
 
 === Topaz Overview, Documentation and Help
 
-MagLev runs in the Topaz VM.  Topaz is command line driven, and connects to
-MagLev's built-in database (the stone).  Most of the scripts and rake tasks
-are based on topaz scripts and use the initialization files in
-<tt>$MAGLEV_HOME/etc/*</tt> to log into topaz and setup the MagLev ruby
-environment.
+Most of the scripts and rake tasks are based on Topaz scripts and use the
+initialization files in <tt>$MAGLEV_HOME/etc/*</tt> to log into Topaz and
+setup the MagLev Ruby environment.
 
 ==== Topaz Manual
 
-{The Topaz Programming
-Environment}[http://seaside.gemstone.com/docs/GS64-Topaz-2.3.pdf]
-manual contains documentation for the Smalltalk version of Topaz.
+{The Topaz Programming Environment}[http://seaside.gemstone.com/docs/GS64-Topaz-2.3.pdf]
+manual contains documentation on using Topaz with GemStone/S. However,
+it is version 2.3, not version 3.0 which is included with MagLev.
 
 ==== Topaz Help
-Topaz also has on line help, which includes the Ruby-specific commands that are not covered in the manual:
+Topaz version 3.0 has online help, which includes the Ruby-specific commands
+that are not covered in the manual:
 
   topaz 1> help
 
@@ -28,34 +30,40 @@ Topaz also has on line help, which includes the Ruby-specific commands that are 
 
     For an overview of Topaz, see the "Overview" help topic.
 
-
-
   Help is available for:
-  HELP       ABORT      BEGIN      BREAK      C          CATEGORY:
-  CLASSMETHOD:          COMMIT     CONTINUE   DEFINE     DISPLAY
-  DISASSEM   DOIT       DOWN [<anInteger>]    EDIT       ERRORCOUNT
-  EXIT [<status>]       EXPECTBUG  EXPECTERROR
-  EXPECTVALUE           FILEOUT    FRAME [<anInteger>]   GCITRACE
-  HIERARCHY  IFERR      IFERR_LIST IFERR_CLEAR           IFERROR
-  INPUT      LEVEL      LIMIT      LIST       LISTW      LOADUA
-  LOOKUP     LOGIN      LOGOUT     METHOD:    OBJECT     OBJ1
-  OBJ2       Object_Specification_Formats     OMIT       OPAL
-  OUTPUT     PAUSEFORDEBUG         PRINTIT    PROTECTMETHODS
-  UNPROTECTMETHODS      RELEASEALL            REMARK
-  REMOVEALLMETHODS      REMOVEALLCLASSMETHODS RUBYHIERARCHY
-  RUBYLIST   RUBYLOOKUP RUBYMETHOD RUBYCLASSMETHOD       RUBYRUN
-  RUN        RUNENV     INTERP     INTERPENV  NBRUN      NBSTEP
-  NBRESULT   SEND       SENDENV    SET        SHELL      SPAWN
-  STACK      STACKWAITFORDEBUG     STK        STATUS     STEP
-  TEMPORARY  TIME       TOPAZPAUSEFORDEBUG    TOPAZWAITFORDEBUG
+  HELP       ABORT      BEGIN      BREAK      C          CATEGORY:  
+  CLASSMETHOD:          COMMIT     CONTINUE   DEFINE     DISPLAY    
+  DISASSEM   DOIT       DOWN [<anInteger>]    EDIT       ERRORCOUNT 
+  EXIT [<status>]       EXITIFNOERROR         EXPECTBUG  
+  EXPECTERROR           EXPECTVALUE           FILEOUT    
+  FRAME [<anInteger>]   GCITRACE   HIERARCHY  IFERR      IFERR_LIST 
+  IFERR_CLEAR           IFERROR    INPUT      LEVEL      LIMIT      
+  LIST       LISTW      LOADUA     LOGIN      LOGOUT     LOOKUP     
+  METHOD:    OBJECT     OBJ1       OBJ2       OBJ1Z      OBJ2Z      
+  Object_Specification_Formats     OMIT       OPAL       OUTPUT     
+  PAUSEFORDEBUG         PRINTIT    PROTECTMETHODS        
+  UNPROTECTMETHODS      RELEASEALL            REMARK     
+  REMOVEALLMETHODS      REMOVEALLCLASSMETHODS RUBYHIERARCHY         
+  RUBYLIST   RUBYLOOKUP RUBYMETHOD RUBYCLASSMETHOD       RUBYRUN    
+  RUN        RUNENV     INTERP     INTERPENV  NBRUN      NBSTEP     
+  NBRESULT   SEND       SENDENV    SET        SHELL      SPAWN      
+  STACK      STACKWAITFORDEBUG     STK        STATUS     STEP       
+  TEMPORARY  THREAD     THREADS    TIME       TOPAZPAUSEFORDEBUG    
+  TOPAZWAITFORDEBUG     QUIT [<status>]       UP [<anInteger>]      
+  WHERE <various options>          Overview   Blanks     
+  Break_Handling_in_Topaz          Debugging_Smalltalk_DB_Code      
+  Initialization        Local_Variables       Multiple_Sessions     
+  Specifying_Objects    Strings    Linked_vs_RPC         
+  Network_Resource_String          
+  Topic?
 
-  press RETURN to continue...
+press RETURN to continue...
 
 ==== Summary of Topaz commands
 
 ===== Start, Stop, and misc commands
-<tt>rake maglev:topaz</tt>::  Invoke topaz
-+exit+::  Exit topaz
+<tt>rake maglev:topaz</tt>::  Invoke Topaz
++exit+::  Exit Topaz
 +help+::  Get help
 
 ===== Stack info
@@ -107,7 +115,7 @@ Topaz also has on line help, which includes the Ruby-specific commands that are 
 === Using <tt>-d</tt> to run MagLev in debug mode
 
 Run maglev with the <tt>-d</tt> option to run in debug mode.  Uncaught
-exceptions will land you in the topaz prompt, where you can examine the
+exceptions will land you in the Topaz prompt, where you can examine the
 stack etc.  Here is a sample file:
 
     $ cat debug_example.rb
@@ -161,7 +169,7 @@ And now we invoke MagLev with the <tt>-d</tt> option to debug it:
     Arg 1: [91078913 sz:16 cls: 74753 String] Sample exception
     topaz 1>
 
-We are now at the topaz prompt and can look at the stack with the +where+
+We are now at the Topaz prompt and can look at the stack with the +where+
 command (abbreviated +wh+):
 
     topaz 1> wh
@@ -255,53 +263,52 @@ And we can focus in on the current section of the stack frame by using
 Etc.  Read the Topaz manual for all the details.
 ==== Pausing with <tt>nil.pause</tt>
 
-If you run in debug mode, you can pause and get the topaz prompt using
+If you run in debug mode, you can pause and get the Topaz prompt using
 <tt>nil.pause</tt> (or <tt>anything_else.pause</tt>) in your ruby code:
 
     nil.pause if rand(10) == 7 # if you're lucky, pause 10% of the time
 
 Then you can continue with +continue+:
 
-=== Running topaz directly
-You can get a topaz prompt via rake:
+=== Running Topaz directly
+You can get a Topaz prompt via rake:
 
   $ cd $MAGLEV_HOME
   $ rake maglev:topaz
   (in /Users/pmclain/maglev)
   topaz 1>
 
-Type +exit+ to leave topaz
+Type +exit+ to leave Topaz
 
 
 == Catching exceptions in Topaz
 
 This example demonstrates a couple of things:
-1. Invoking MagLev from the topaz prompt
+1. Invoking MagLev from the Topaz prompt
 2. Using the new exception hook to catch an exception
 
-=== Run MagLev from the topaz prompt
+=== Run MagLev from the Topaz prompt
 
-This scenario shows how to debug a ruby program (Ruby Gems) from the topaz
+This scenario shows how to debug a ruby program (RubyGems) from the Topaz
 prompt.
 
-==== Install ruby gems
+==== Install RubyGems
 To get <tt>bin/maglev-gem</tt> installed, do the following:
 
   $ cd $MAGLEV_HOME/src/external/rubygems-1.3.1
   $ maglev-ruby setup.rb --no-rdoc --no-ri
 
-This installs ruby gems into <tt>$MAGLEV_HOME/lib/...</tt> and puts
-<tt>maglev-gem</tt> into <tt>$MAGLEV_HOME/bin</tt>.  Ruby Gems (as of the
-time this example was written) installs, but does not yet run.
+This installs RubyGems into <tt>$MAGLEV_HOME/lib/...</tt> and puts
+<tt>maglev-gem</tt> into <tt>$MAGLEV_HOME/bin</tt>. 
 
-====  Start topaz:
+====  Start Topaz:
 
   $ cd $MAGLEV_HOME
   $ rake maglev:topaz
   (in /Users/pmclain/projects/maglev/git)
   topaz 1>
 
-==== Set debug env in topaz
+==== Set debug env in Topaz
 
 Before invoking the ruby program, we want to setup some debug help.  Create
 <tt>$MAGLEV_HOME/gem.inp</tt> and put the following in it:
@@ -322,7 +329,7 @@ Before invoking the ruby program, we want to setup some debug help.  Create
     GsNMethod traceIR: 0 .
 
     " ------------------------------------------------------------------
-      Ruby Gems throws a couple of exceptions during normal processing,
+      RubyGems throws a couple of exceptions during normal processing,
       mostly to discover that various libraries do not exist, or to force
       the loading of a library.  The following Smalltalk array holds the
       error messages from these boring exceptionns, so we can filter them
@@ -339,7 +346,7 @@ Before invoking the ruby program, we want to setup some debug help.  Create
       This installs an exception handler that will be invoked for every
       exception thrown.  It prints the message from all exceptions, and
       then checks to see if the exception is interesting.  If it is, then
-      it pauses the VM and drops down into the topaz prompt.
+      it pauses the VM and drops down into the Topaz prompt.
       ------------------------------------------------------------------ "
 
     Exception installDebugBlock: [:ex|
@@ -359,7 +366,7 @@ Before invoking the ruby program, we want to setup some debug help.  Create
 This Smalltalk code sets up a number of debugging variables, and installs
 an exception handling hook that will intercept all exceptions.  It then
 invokes <tt>./bin/maglev-gem install rake</tt>, and will break back to the
-topaz prompt when it hits an "interesting" exception.
+Topaz prompt when it hits an "interesting" exception.
 
 ==== Run it
 
@@ -410,9 +417,8 @@ In this case, the problem is obvious: we haven't implemented
 === Using Squeak to Debug
 
 Download and install the GemTools squeak image from the website.
-Fire up Squeak, and login to the GemStone VM.
+Fire up GemTools, and login to the GemStone VM.
 From the GemStone transcript window, issue the following commands:
-
 
   RubyDirectory _chdir: (RubyEnv _getenv:'MAGLEV_HOME') .
   RubyContext load: #() .

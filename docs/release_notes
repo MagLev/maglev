@@ -1,4 +1,4 @@
-== Release Notes for the MagLev Alpha release of March 29, 2009
+== Release Notes for the MagLev Alpha release of June 2, 2009
 
 === ParseTree
 This version requires Ruby 1.8.6 patchlevel 287 due to an incompatibility
@@ -13,7 +13,7 @@ provided by different classes and messages
 === Special methods
 * Underscore + camelCase = GemStone unmodifiable code.  There are several
   methods that begin with an underscore and are camelCase,
-  e.g.,<tt>_isArray</tt>.  MagLev will not allow you to re-define these
+  e.g. <tt>_isArray</tt>.  MagLev will not allow you to re-define these
   methods.
 * <tt>equal?</tt> is also a special case, and you are unable to re-define
   it.
@@ -36,10 +36,7 @@ provided by different classes and messages
 * <tt>ThreadGroup</tt> is a stub.
 
 === Noise from rlwrap
-* In some cases, <tt>rlwrap</tt> (see Prerequisites[link:files/docs/prerequisites]) will output noise while typing at a Topaz prompt (Linux only).
-
-=== Initial startup
-* If you run maglev-irb immediately after installing MagLev, you may get an "Almost out of Memory" warning and a stack trace (Macintosh only). This can be safely ignored as it does not affect operation of the system.
+* In some cases, <tt>rlwrap</tt> (see Prerequisites[link:files/docs/prerequisites.html]) will output noise while typing at a Topaz prompt (Linux only).
 
 === Misc
 * +ARGF+ is not supported.

@@ -2,7 +2,7 @@
 
 === Synopsis
 
-MagLev now includes a slightly modified copy of irb called maglev-irb. This documentation applies to the deprecated maglev-irb version, temporarily renamed topaz-irb. We'll update the docs soon.
+MagLev now includes a slightly modified copy of irb called maglev-irb. <b>This documentation applies to the deprecated maglev-irb version, temporarily renamed topaz-irb.</b> We'll update the docs soon.
 
 MagLev provides an IRB-like utility, <tt>$MAGLEV_HOME/bin/maglev-irb</tt>.
 It provides a minimal interactive environment, but is neither robust nor a

@@ -51,33 +51,23 @@ src/external/rubygems-1.3.1.  MagLev will run the setup.rb file, as long as
 you don't try to make the rdoc:
 
     $ cd src/external/rubygems-1.3.1
-    $ mruby setup.rb --no-rdoc --no-ri
+    $ maglev-ruby setup.rb --no-rdoc --no-ri
 
-This will create the ruby gems hierarchy under lib/maglev/gems/... and will
-create a bin/maglev-gem.  To clean up, there is a rake task:
-
-    $ rake dev:clean-gems
-
-Since bin/maglev-ruby is a shell script, and bin/maglev-gem is also a shell
-script, there is a bit of confusion trying to invoke ruby gems the normal
-way:
-
+This will create the RubyGems hierarchy under lib/maglev/gems/... and will
+create a bin/maglev-gem. However, you'll need to change the first line in
+bin/maglev-gem to:
+    #!/usr/bin/env maglev-ruby
+otherwise maglev-gem will act like a shell script rather than a ruby script --
+causing this type of error:
     $ maglev-gem --version
     /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 8: require: command not found
     /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 9: require: command not found
-    ...
 
-This is because the shell ends up trying to read the commands in
-bin/maglev-gem as shell commands.  To fix this, edit bin/maglev-gem and
-make the first line:
-
-    #!/usr/bin/env maglev-ruby
-
-There is support for <tt>--env-shebang</tt> in ruby gems, but it doesn't
-work yet with maglev from the setup script.  The default has been set for
+There is support for <tt>--env-shebang</tt> in RubyGems, but it doesn't
+correctly setup bin/maglev-gem.  The default has been set for
 installed gems, however (i.e., if you <tt>maglev-gem install rake</tt>,
 then the <tt>bin/rake</tt> shell script will have the shebang line set
-using <tt>#!/usr/bin/env maglev-ruby</tt>).
+to <tt>#!/usr/bin/env maglev-ruby</tt>).
 
 We have successfully installed the rake gem:
 
@@ -85,6 +75,12 @@ We have successfully installed the rake gem:
 
 But rake itself isn't working yet.  We tried installing the rack gem, but
 the zlib compression blew up...
+
+To clean up after experimenting with gems, there is a rake task:
+
+    $ rake dev:clean-gems
+
+which removes all traces of any gems you've installed.
 
 ==== Gemstone Patches for RubyGems
 
