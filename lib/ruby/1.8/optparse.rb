@@ -203,7 +203,7 @@
 #
 class OptionParser
   # :stopdoc:
-  RCSID = %w$Id: optparse.rb 11798 2007-02-20 06:53:16Z knu $[1..-1].each {|s| s.freeze}.freeze
+  RCSID = %w$Id: optparse.rb 18108 2008-07-17 12:30:12Z shyouhei $[1..-1].each {|s| s.freeze}.freeze
   Version = (RCSID[1].split('.').collect {|s| s.to_i}.extend(Comparable).freeze if RCSID[1])
   LastModified = (Time.gm(*RCSID[2, 2].join('-').scan(/\d+/).collect {|s| s.to_i}) if RCSID[2])
   Release = RCSID[2]
@@ -236,7 +236,7 @@ class OptionParser
       end
       candidates = candidates.sort_by {|k, v, kn| kn.size}
       if candidates.size == 1
-        canon, sw, * = candidates[0] #bobw: Parse error - unexpected token
+        canon, sw, * = candidates[0]
       elsif candidates.size > 1
         canon, sw, cn = candidates.shift
         candidates.each do |k, v, kn|
@@ -310,8 +310,7 @@ class OptionParser
 
     def initialize(pattern = nil, conv = nil,
                    short = nil, long = nil, arg = nil,
-                   desc = ([] if short or long), &block)   # gemstone
-	  # Gemstone edit, last arg was     block = Proc.new
+                   desc = ([] if short or long), block = Proc.new)
       raise if Array === pattern
       @pattern, @conv, @short, @long, @arg, @desc, @block =
         pattern, conv, short, long, arg, desc, block
@@ -380,7 +379,7 @@ class OptionParser
       while s = lopts.shift
         l = left[-1].length + s.length
         l += arg.length if left.size == 1 && arg
-        l < max or left << ''
+        l < max or sopts.empty? or left << ''
         left[-1] << if left[-1].empty? then ' ' * 4 else ', ' end << s
       end
 
@@ -431,8 +430,7 @@ class OptionParser
         conv_arg(arg)
       end
 
-      def self.incompatible_argument_styles(arg, t) # HACK was (*)
-        nil # HACK was empty
+      def self.incompatible_argument_styles(*)
       end
 
       def self.pattern
@@ -1476,6 +1474,7 @@ class OptionParser
   #
   def environment(env = File.basename($0, '.*'))
     env = ENV[env] || ENV[env.upcase] or return
+    require 'shellwords'
     parse(*Shellwords.shellwords(env))
   end
 
