@@ -1,2 +1,0 @@
-fails:Thread.new creates a thread executing the given block
-fails:Thread.new can pass arguments to the thread block

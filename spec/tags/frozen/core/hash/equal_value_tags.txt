@@ -1,1 +1,0 @@
-fails:Hash#== returns true if other Hash has the same number of keys and each key-value pair matches

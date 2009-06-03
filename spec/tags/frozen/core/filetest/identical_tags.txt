@@ -1,2 +1,0 @@
-fails:FileTest.identical? return true if they are identical
-fails:FileTest.identical? returns true if both named files are identical

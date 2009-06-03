@@ -1,3 +1,0 @@
-fails:Kernel#raise is a private method
-fails:Kernel#raise raises RuntimeError if no exception class is given
-fails:Kernel#raise allows Exception, message, and backtrace parameters

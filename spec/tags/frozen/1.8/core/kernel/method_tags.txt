@@ -1,2 +1,0 @@
-fails:Kernel#method raises a NameError for an invalid method name
-fails:Kernel#method raises a NameError for an invalid singleton method name

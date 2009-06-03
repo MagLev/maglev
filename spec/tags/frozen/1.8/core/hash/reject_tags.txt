@@ -1,4 +1,0 @@
-fails:Hash#reject is equivalent to hsh.dup.delete_if
-fails:Hash#reject returns subclass instance for subclasses
-fails:Hash#reject raises a LocalJumpError when called on a non-empty hash without a block
-fails:Hash#reject! raises a LocalJumpError when called on a non-empty hash without a block

@@ -1,1 +1,0 @@
-fails:File.zero? zero? should return true if the named file exists and has a zero size.

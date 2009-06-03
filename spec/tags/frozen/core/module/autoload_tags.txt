@@ -1,9 +1,0 @@
-fails:Module#autoload registers the given filename to be loaded the first time that the Module with the given name is accessed
-fails:Module#autoload does not autoload when the specified constant was already set
-fails:Module#autoload raises a NameError when an invalid constant name is given
-fails:Module#autoload raises an ArgumentError when an empty filename is given
-fails:Module#autoload doesn't call 'require' nor 'load' dynamically
-fails:Module#autoload with constant enumeration or removal doesn't trigger file load
-fails:Module#autoload uses dup copies for autoloaded constants
-fails:Module#autoload autoloaded constants are removed on the first access
-fails:Module#autoload? returns the name of the file that will be autoloaded

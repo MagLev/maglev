@@ -1,2 +1,0 @@
-fails:Kernel#send raises a NoMethodError if the corresponding method can't be found
-fails:Kernel#send raises a NoMethodError if the corresponding singleton method can't be found

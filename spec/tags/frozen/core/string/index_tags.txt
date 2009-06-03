@@ -1,7 +1,0 @@
-fails:String#index with object raises a TypeError if obj isn't a String, Fixnum or Regexp
-fails:String#index with Regexp behaves the same as String#index(string) for escaped string regexps
-fails:String#index with Regexp sets $~ to MatchData of match and nil when there's none
-fails:String#index with Regexp starts the search at the given offset
-fails:String#index with Regexp returns nil if the substring isn't found
-fails:String#index with Regexp supports \G which matches at the given start offset
-fails:String#index with Regexp converts start_offset to an integer via to_int

@@ -1,3 +1,0 @@
-fails:Hash#initialize is private
-fails:Hash#initialize can be used to reset default_proc
-fails:Hash#initialize should get passed whatever args were passed to Hash#new

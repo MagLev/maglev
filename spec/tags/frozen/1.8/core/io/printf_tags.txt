@@ -1,2 +1,0 @@
-fails:IO#printf writes the #sprintf formatted string to the file descriptor
-fails:IO#printf raises IOError on closed stream

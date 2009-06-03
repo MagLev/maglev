@@ -1,1 +1,0 @@
-fails:File.mtime raises an Errno::ENOENT exception if the file is not found

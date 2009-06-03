@@ -1,2 +1,0 @@
-fails:Array#select does not return subclass instance on Array subclasses
-fails:Array#select properly handles recursive arrays

@@ -1,2 +1,0 @@
-fails:Kernel#raise inside a rescue block re-raises the exception that was rescued
-fails:Kernel#raise inside a rescue block ignores inner exceptions

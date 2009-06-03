@@ -1,2 +1,0 @@
-fails:Module#initialize accepts a block
-fails:Module#initialize is called on subclasses

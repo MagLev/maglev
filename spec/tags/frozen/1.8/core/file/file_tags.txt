@@ -1,2 +1,0 @@
-fails:File includes File::Constants
-fails:File.file? raises an ArgumentError if not passed one argument

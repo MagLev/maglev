@@ -1,1 +1,0 @@
-fails:Module#protected_method_defined? accepts any object that is a String type

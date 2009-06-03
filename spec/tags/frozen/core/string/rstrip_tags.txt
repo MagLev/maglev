@@ -1,2 +1,0 @@
-fails:String#rstrip taints the result when self is tainted
-fails:String#rstrip! returns nil if no modifications were made

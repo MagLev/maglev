@@ -1,2 +1,0 @@
-fails:Module#<= returns true if self is a subclass of, the same as or includes the given module
-fails:Module#<= returns nil if self is not related to the given module

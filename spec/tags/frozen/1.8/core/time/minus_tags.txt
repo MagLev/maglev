@@ -1,4 +1,0 @@
-fails:Time#- decrements the time by the specified amount
-fails:Time#- accepts arguments that can be coerced into Float
-fails:Time#- raises TypeError on argument that can't be coerced into Float
-fails:Time#- raises TypeError on nil argument

@@ -1,2 +1,0 @@
-fails:Hash.[] returns an instance of the class it's called on
-fails:Hash#[] calls subclass implementations of default

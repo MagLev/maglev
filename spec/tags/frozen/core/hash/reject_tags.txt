@@ -1,2 +1,0 @@
-fails:Hash#reject is equivalent to hsh.dup.delete_if
-fails:Hash#reject returns subclass instance for subclasses

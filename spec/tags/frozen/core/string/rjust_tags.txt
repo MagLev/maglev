@@ -1,2 +1,0 @@
-fails:String#rjust with length, padding taints result when self or padstr is tainted
-fails:String#rjust with length, padding raises a TypeError when padstr can't be converted

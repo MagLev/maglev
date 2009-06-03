@@ -1,6 +1,0 @@
-fails:Array#slice! calls to_int on start and length arguments
-fails:Array#slice! removes and return elements in range
-fails:Array#slice! calls to_int on range arguments
-fails:Array#slice! expands self when indices are out of bounds
-fails:Array#slice raises a RangeError when the start index is out of range of Fixnum
-fails:Array#slice raises a RangeError when the length is out of range of Fixnum

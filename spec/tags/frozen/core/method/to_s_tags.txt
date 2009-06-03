@@ -1,2 +1,0 @@
-fails:Method#to_s the String reflects that this is a Method object
-fails:Method#to_s the String shows the method name, Module defined in and Module extracted from

@@ -1,9 +1,0 @@
-fails:IO#each_line yields each line starting from the current position
-fails:IO#each_line uses $/ as the default line seperator
-fails:IO#each_line returns self
-fails:IO#each_line when passed a seperator uses the passed argument as the line seperator
-fails:IO#each_line when passed a seperator does not change $_
-fails:IO#each_line when passed a seperator returns self
-fails:IO#each_line when passed a seperator tries to convert the passed seperator to a String using #to_str
-fails:IO#each_line when passed a seperator yields self's content starting from the current position when the passed seperator is nil
-fails:IO#each_line when passed a seperator yields each paragraph when passed an empty String as seperator

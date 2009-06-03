@@ -1,4 +1,0 @@
-fails:Object.object_id returns an integer
-fails:Object.object_id returns the same value on all calls to id for a given object
-fails:Object.object_id returns different values for different objects
-fails:Kernel#object_id needs to be reviewed for spec completeness

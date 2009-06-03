@@ -1,5 +1,0 @@
-fails:String#tr translates chars not in from_string when it starts with a ^
-fails:String#tr tries to convert from_str and to_str to strings using to_str
-fails:String#tr taints the result when self is tainted
-fails:String#tr! returns nil if no modification was made
-fails:String#tr! does not modify self if from_str is empty

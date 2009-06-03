@@ -1,2 +1,0 @@
-fails:Array#at checks whether the passed argument responds to #to_int
-fails:Array#at raises an ArgumentError when 2 or more arguments is passed

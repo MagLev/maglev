@@ -1,4 +1,0 @@
-fails:String#concat converts the given argument to a String using to_str
-fails:String#concat raises a TypeError if the given argument can't be converted to a String
-fails:String#concat taints self if other is tainted
-fails:String#concat with Fixnum raises a TypeError when the given Fixnum is not between 0 and 255

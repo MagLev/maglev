@@ -1,2 +1,0 @@
-fails:String#next taints the result if self is tainted
-fails:String#next! is equivalent to succ, but modifies self in place (still returns self)

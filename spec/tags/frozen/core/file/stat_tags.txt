@@ -1,2 +1,0 @@
-fails:File.stat raises an Errno::ENOENT if the file does not exist
-fails:File.stat returns a File::Stat object with file properties for a symlink

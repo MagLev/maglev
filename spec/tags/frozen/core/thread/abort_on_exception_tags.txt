@@ -1,1 +1,0 @@
-fails:Thread#abort_on_exception is changeable to true or false

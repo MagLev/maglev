@@ -1,3 +1,0 @@
-fails:Exception.new creates a new instance of Exception
-fails:Exception.new sets the message of the Exception when passes a message
-fails:Exception.new returns 'Exception' for message when no message given

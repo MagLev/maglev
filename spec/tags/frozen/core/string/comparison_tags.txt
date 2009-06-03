@@ -1,1 +1,0 @@
-fails:String#<=> returns nil if its argument does not provide #to_str

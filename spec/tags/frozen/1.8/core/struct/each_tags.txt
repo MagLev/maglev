@@ -1,1 +1,0 @@
-fails:Struct#each fails if not passed a block

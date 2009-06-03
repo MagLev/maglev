@@ -1,7 +1,0 @@
-fails:String#to_i ignores leading whitespaces
-fails:String#to_i ignores leading underscores
-fails:String#to_i ignores underscores in between the digits
-fails:String#to_i ignores a leading mix of whitespaces and underscores
-fails:String#to_i interprets leading characters as a number in the given base
-fails:String#to_i auto-detects base 8 via leading 0 when base = 0
-fails:String#to_i doesn't handle foreign base specifiers when base is > 0

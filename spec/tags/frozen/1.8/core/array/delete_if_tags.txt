@@ -1,1 +1,0 @@
-fails:Array#delete_if raises a LocalJumpError if no block given
