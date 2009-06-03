@@ -42,7 +42,7 @@ class Module
   # Eigenclasses (singleton classes) are automatically marked as
   # persistent when the corresponding object is persisted.
   #
-  # Implementation note: this will set the np flag on both the class and
+  # Implementation note: this will clear the np flag on both the class and
   # the metaclass.  Ruby classes will, by default, have the np bit set in
   # their metaclass, preventing accidental saving of a class.
   #

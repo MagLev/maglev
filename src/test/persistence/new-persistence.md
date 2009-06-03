@@ -405,3 +405,14 @@ transactions per second and manage terabytes of data.
 
        Maglev.commit_transaction   # will this fail or succeed? or is it
                                    # non deterministic?
+* How will re-reading files work?  E.g., suppose you have:
+    class MyClass
+      Foo = 0
+    end
+    MyClass.maglev_persist!
+
+  And you're in development, so you want to edit it and reload.  The API
+  says you can call maglev_persist! only once.  Should we allow multiple
+  calls in development mode?  Should we add a switch? Or should developers
+  start w/o persisting, and then add it later?...
+
