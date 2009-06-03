@@ -1,0 +1,1 @@
+fails:Hash#[] calls subclass implementations of default

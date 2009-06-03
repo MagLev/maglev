@@ -1,0 +1,2 @@
+fails:Kernel#putc is a private method
+fails:Kernel.putc needs to be reviewed for spec completeness

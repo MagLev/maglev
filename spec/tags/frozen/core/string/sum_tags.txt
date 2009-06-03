@@ -1,0 +1,2 @@
+fails:String#sum returns a basic n-bit checksum of the characters in self
+fails:String#sum tries to convert n to an integer using to_int

@@ -1,0 +1,2 @@
+fails:Hash#shift returns (computed) default for empty hashes
+fails:Hash#shift raises a TypeError if called on a frozen instance

@@ -1,0 +1,1 @@
+fails:Dir#rewind returns the Dir instance

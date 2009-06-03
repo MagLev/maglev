@@ -1,0 +1,2 @@
+fails:Array#- tries to convert the passed arguments to Arrays using #to_ary
+fails:Array#- raises a TypeError if the argument cannot be coerced to an Array by calling #to_ary

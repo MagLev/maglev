@@ -1,0 +1,5 @@
+fails:String#+ returns a new string containing the given string concatenated to self
+fails:String#+ converts any non-String argument with #to_str
+fails:String#+ raises a TypeError when given any object that fails #to_str
+fails:String#+ doesn't return subclass instances
+fails:String#+ taints the result when self or other is tainted

@@ -1,0 +1,2 @@
+fails:Kernel#split is a private method
+fails:Kernel.split needs to be reviewed for spec completeness

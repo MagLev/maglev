@@ -1,0 +1,2 @@
+fails:Array#uniq returns subclass instance on Array subclasses
+fails:Array#uniq! does not raise an exception on a frozen array if no modification takes place

@@ -1,0 +1,1 @@
+fails:Time#strftime supports week of year format with %U and %W

@@ -1,0 +1,1 @@
+fails:The __FILE__ constant equals (eval) inside an eval

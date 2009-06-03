@@ -1,0 +1,3 @@
+fails:Thread#exit runs ensure clause
+fails:Thread#exit runs nested ensure clauses
+fails:Thread#exit killing dying sleeping thread wakes up thread

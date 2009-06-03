@@ -1,0 +1,6 @@
+fails:Literal (A::X) constant resolution with statically assigned constants does not search the singleton class of the class or module
+fails:Literal (A::X) constant resolution with dynamically assigned constants does not search the singleton class of the class or module
+fails:Constant resolution within methods sends #const_missing to the original class or module scope
+fails:Constant resolution within methods with statically assigned constants searches the lexical scope of the method not the receiver's immediate class
+fails:Constant resolution within methods with statically assigned constants searches Object as a lexical scope only if Object is explicitly opened
+fails:Constant resolution within methods with dynamically assigned constants searches Object as a lexical scope only if Object is explicitly opened

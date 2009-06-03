@@ -1,0 +1,6 @@
+fails:String#hex treats leading characters of self as a string of hex digits
+fails:String#hex accepts a sequence of underscores as part of a number
+fails:String#hex takes an optional sign
+fails:String#hex takes an optional 0x
+fails:String#hex requires that the sign is in front of the 0x if present
+fails:String#hex returns 0 on error

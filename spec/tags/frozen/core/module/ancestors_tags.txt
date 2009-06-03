@@ -1,0 +1,1 @@
+fails:Module#ancestors returns only modules and classes

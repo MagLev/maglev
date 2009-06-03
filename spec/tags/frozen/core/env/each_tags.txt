@@ -1,0 +1,2 @@
+fails:ENV.each returns each pair
+fails:ENV.each raises LocalJumpError if no block given

@@ -1,0 +1,2 @@
+fails:Array#delete removes elements that are #== to object
+fails:Array#delete calculates equality correctly for reference values

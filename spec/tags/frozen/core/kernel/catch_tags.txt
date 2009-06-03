@@ -1,0 +1,1 @@
+fails:Kernel#catch is a private method

@@ -1,0 +1,5 @@
+fails:Array#fetch raises an IndexError if there is no element at index
+fails:Array#fetch returns default if there is no element at index if passed a default value
+fails:Array#fetch returns the value of block if there is no element at index if passed a block
+fails:Array#fetch gives precedence to the default block over the default argument
+fails:Array#fetch raises a TypeError when the passed argument can't be coerced to Integer

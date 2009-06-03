@@ -1,0 +1,6 @@
+fails:String#[]= with index raises an IndexError without changing self if idx is outside of self
+fails:String#[]= with String taints self if other_str is tainted
+fails:String#[]= with String raises an IndexError without changing self if idx is outside of self
+fails:String#[]= with String raises IndexError if the string index doesn't match a position in the string
+fails:String#[]= with String raises IndexError if the regexp index doesn't match a position in the string
+fails:String#[]= with index, count taints self if other_str is tainted

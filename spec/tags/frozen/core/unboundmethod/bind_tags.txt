@@ -1,0 +1,2 @@
+fails:UnboundMethod#bind raises TypeError if object is not kind_of? the Module the method defined in
+fails:UnboundMethod#bind Method returned for obj is equal to one directly returned by obj.method

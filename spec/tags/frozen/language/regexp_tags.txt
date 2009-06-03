@@ -1,0 +1,6 @@
+fails:Literal Regexps disallows spaces after %r and delimiter
+fails:Literal Regexps throws NoMethodError on missing to_s
+fails:Literal Regexps throws RegexpError for malformed substitution
+fails:Literal Regexps allows substituion in extended mode
+fails:Literal Regexps does not do thread synchronization for /o
+fails:Literal Regexps will not clobber capture variables across threads
