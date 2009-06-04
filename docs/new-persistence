@@ -9,7 +9,7 @@ document are available in the following places:
 * The Persistence MSpecs (in <tt>src/test/persistence/</tt>) specify the detailed
   semantics of the methods.  Some of the comments outline use cases and
   provide additional insight.  Note: these mspecs are not yet runnable.
-* The persistence API file (currently <tt>src/test/persistence/persistence.rb</tt>).
+* The persistence API file (currently <tt>docs/persistence.rb</tt>).
 * The GemStone/S 64 Bit Programming Guide: provides a full discussion of
   the GemStone persistence model (including transactions, locking, etc.),
   http://seaside.gemstone.com/docs/GS64-ProgGuide-2.2.pdf.
@@ -22,7 +22,7 @@ Out of the box, MagLev will accommodate two persistence models:
    persistence (MRI compatibility).
 2. To take advantage of the MagLev VM's distributed, shared,
    cached, native object persistence, requires explicit action, by adding
-   directives to your code.
+   directives to your code, or starting the VM in a different mode.
 
 In the no persistence model, nothing is saved to the repository, so MagLev
 acts much like the standard MRI version of Ruby.

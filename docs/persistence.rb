@@ -1,142 +1,240 @@
-## Proposed MagLev Persistence API ##
+##############################################################################
 #
-# The following code shows proposed API additions for MagLev persistence.
+#   P E R S I S T E N C E  A P I
+#
+##############################################################################
 
-class MaglevError < StandardError; end
+# A quick guide to the Transient / Persistent semantics:
+#
+#  |-------------+----------------------------+----------------------------|
+#  |             | Maglev.persistent          | Maglev.transient           |
+#  |-------------+----------------------------+----------------------------|
+#  | Persistent  | * Constant -> both         | * Constant -> transient    |
+#  | receiver    | * method -> both           | * method -> session        |
+#  |-------------+----------------------------+----------------------------|
+#  | Transient   | * Constant -> transient    | * Constant -> transient    |
+#  | receiver    | * method -> session        | * method -> session        |
+#  |-------------+----------------------------+----------------------------|
+#  | New Class   | * Class marked persistent  | * Class marked transient   |
+#  |             | * Name: according to rules | * Name: according to rules |
+#  |             | of parent namespace        | of parent namespace        |
+#  |-------------+----------------------------+----------------------------|
+#
+module Maglev
+  # A Hash that is the root for persistent objects.  In a fresh repository,
+  # this is initialized with an empty Ruby Hash.  After the first commit,
+  # the contents of this Hash will be refreshed from the repository at each
+  # Maglev.abort_transaction, Maglev.commit_transaction and at VM startup.
 
-# The base class for all MagLev Persistence Errors.
-class MaglevPersistenceError          < MaglevError;            end
+  PERSISTENT_ROOT = Hash.new   # Not really: the VM will fix this up...
 
-class AlreadyPersistentException      < MaglevPersistenceError; end
-class NonPersistentException          < MaglevPersistenceError; end
-class NonPersistentAncestorException  < MaglevPersistenceError; end
-class NonPersistentNamespaceException < MaglevPersistenceError; end
+  # Maglev.transient(&block)
+  #
+  # Executes the block with the VM in transient mode, which affects the
+  # following operations:
+  #
+  # 1: All newly defined modules and classes will be marked as transient,
+  #    and their names will be registered under the transient slot of the
+  #    appropriate namespace (i.e., the constants that refer to the new
+  #    classes will not be written to the repository during a
+  #    Maglev.commit_transaction).
+  #
+  # 2: All assignments to constants will happen in the transient namespace,
+  #    even for persistent modules and classes.
+  #
+  # 3: All method definitions in re-opened classes and modules will be
+  #    placed into the session dictionaries and not be available for
+  #    persistence (but see Module#maglev_persist!).
+  #
+  # If the VM is already in transient mode, the block is executed and the
+  # VM remains in transient mode (i.e., a no-op).
+  #
+  # == Example
+  #
+  # Suppose we have a running VM, and there already exist a persistent
+  # module named +Persistent+, and a transient module named +Transient+.
+  # We then run the following code:
+  #
+  #   Maglev.transient do
+  #
+  #     module Persistent   # a previously defined, persistent module
+  #       class C           # A brand new class
+  #         A_CONST = 42
+  #         def foo
+  #         end
+  #       end
+  #     end
+  #
+  #     Maglev::PERSISTENT_ROOT['foo'] = Persistent::C
+  #
+  #     Persistent::X = 42
+  #     Transient::X  = 42
+  #
+  #   end
+  #
+  #   Maglev.commit_transaction
+  #
+  # After the code runs, the following statements hold:
+  #
+  # 1: Module +Persistent+ is still persisted in the repository, and module
+  #    +Transient+ is still local to this VM.
+  #
+  # 2: <tt>Persistent::C</tt> is a constant in <tt>Persistent</tt>'s transient
+  #    namespace, so will not have been written to the repository.  The
+  #    current VM will still see <tt>Persistent::C</tt>.
+  #
+  # 3: <tt>Persistent::C</tt> is a class that is itself not persistable,
+  #    nor are its instances persistable.
+  #
+  # 4: All methods and constants in <tt>Persistent::C</tt>,
+  #    (<tt>Persistent::C::A_CONST</tt> and <tt>Persistent::C#foo</tt> will
+  #    be lost (as will +C+) when the VM shuts down.
+  #
+  # 5: <tt>Maglev::PERSISTENT_ROOT['foo'] = Persistent::C</tt> will raise an
+  #    exception at commit time (since +C+ is not persistable).
+  #
+  # 6: For <tt>Transient::X = 42</tt>, both the constant and its value are
+  #    visible to the current VM, but not saved in the repository.
+  #
+  # 7: For <tt>Persistent::X = 42</tt>, both the constant +X+ and its
+  #    current value (42) are visible to the current VM.  The repository
+  #    will see the constant <tt>Persistent::X</tt> only if it was in the
+  #    repository prior to the commit, and if it was, the repository will
+  #    see the previous value.
+  #
+  # Calls to +transient+ may be nested inside other calls to +transient+
+  # and calls to +persistent+.
+  #
+  def transient(&block)
+  end
 
+  # Maglev.persistent(&block)
+  #
+  # Executes the block with the VM in persistent mode, which affects the
+  # following operations:
+  #
+  # 1: All newly defined modules and classes will be marked as persistent,
+  #    and their names will be registered under the rules for the
+  #    appropriate namespace (i.e., if the parent namespace is persistent,
+  #    then the constant will be staged for persistence; if the parent
+  #    namespace is transient, the constant reference will not be visible
+  #    to the persistent store).
+  #
+  # 2: All assignments to constants in persistent classes and modules will
+  #    be seen by the repository at the next
+  #    <tt>Maglev.commit_transaction</tt>.  Any assignment to constants in
+  #    transient classes and modules will be visible in the current VM, but
+  #    will not be saved to the repository.
+  #
+  # 3: All method definitions in re-opened persistent classes and modules
+  #    will be placed into both the transient and persistent method
+  #    dictionaries and will be available for persistence.
+  #
+  #    All method definitions in re-opened transient classes and modules
+  #    will be available only to the current VM and will not be persisted
+  #    (i.e., defining a method on a transient class during persistent mode
+  #    does not change the class to be persistent).
+  #
+  # If the VM is already in persistent mode, the block is executed and the
+  # VM remains in persistent mode (i.e., a no-op).
+  #
+  # == Example
+  #
+  # Suppose we have a running VM, and there already exist a persistent
+  # module named +Persistent+, and a transient module named +Transient+.
+  # We then run the following code:
+  #
+  #   Maglev.persistent do
+  #
+  #     module Persistent   # a previously defined, persistent module
+  #       class C           # A brand new class
+  #         A_CONST = 42
+  #         def foo
+  #         end
+  #       end
+  #     end
+  #
+  #     Maglev::PERSISTENT_ROOT['foo'] = Persistent::C
+  #
+  #     Persistent::X = 42
+  #     Transient::X  = 42
+  #
+  #   end
+  #
+  #   Maglev.commit_transaction
+  #
+  # After the code runs, the following statements hold:
+  #
+  # 1: Module +Persistent+ is still persisted in the repository, and module
+  #    +Transient+ is still local to this VM.
+  #
+  # 2: <tt>Persistent::C</tt> is a constant in <tt>Persistent</tt>'s persistent
+  #    namespace, so will have been written to the repository.
+  #
+  # 3: <tt>Persistent::C</tt> is a class that is itself persistable, and
+  #    its instances are also persistable.
+  #
+  # 4: All methods and constants in <tt>Persistent::C</tt>,
+  #    (<tt>Persistent::C::A_CONST</tt> and <tt>Persistent::C#foo</tt> will
+  #    be saved to the repository.
+  #
+  # 5: <tt>Maglev::PERSISTENT_ROOT['foo'] = Persistent::C</tt> will be
+  #    committed to the repository and be available to all VMs.
+  #
+  # 6: For <tt>Transient::X = 42</tt>, both the constant and its value are
+  #    visible to the current VM, but not saved in the repository.
+  #
+  # 7: For <tt>Persistent::X = 42</tt>, both the constant +X+ and its
+  #    current value (42) are visible to the current VM and saved in the
+  #    repository.
+  #
+  # Calls to +persistent+ may be nested inside calls to +transient+ and
+  # other calls to +persistent+.
+  #
+  def persistent(&block)
+  end
+
+  module_function :transient, :persistent
+end
 
 class Module
-  # Mark the receiver as a persistable class and persist the current state
-  # of the class.  Once marked persistable, the state of the class
-  # (methods, constants, class variables and class instance variables) will
-  # be saved at the next <tt>Maglev.commit_transaction</tt>.
+  # Sets the persistent flag on receiver.
   #
-  #  class C
-  #    # stuff
-  #  end
-  #  C.maglev_persist!   # Persists all defined aspects of class at this point.
+  # If the +flag+ is true, then receiver is marked to allow itself and, if
+  # receiver is a class, its instances to be persisted.  Since Modules and
+  # Classes are namespaces, all of receivers constants should hold
+  # persistable values or an exceptionn will be raised at commit time.
   #
-  # Raises +NonPersistentAncestorException+ if one of receiver's
-  # superclasses or mixed in modules is not marked as persistable.
-  #
-  # Raises +NonPersistentNamespaceException+ if the class or module that
-  # will hold the constant reference to this class is not persistable.
-  # E.g., an exception is raised in the following code if module M is not
-  # persistable:
-  #
-  #   module M
-  #      class C
-  #      end
-  #
-  #      C.maglev_persist!  # will raise exception if M is not persistable.
-  #   end
-  #
-  # Eigenclasses (singleton classes) are automatically marked as
-  # persistent when the corresponding object is persisted.
-  #
-  # Implementation note: this will clear the np flag on both the class and
-  # the metaclass.  Ruby classes will, by default, have the np bit set in
-  # their metaclass, preventing accidental saving of a class.
-  #
-  # Raises +AlreadyPersistentException+ if called a second time (see also
-  # +maglev_reopen!+).
-  #
-  # Returns receiver
-  #
-  # See also Array#maglev_persist!
-  #
-  def maglev_persist!
-    raise AlreadyPersistentException if maglev_persist?
-    # ...
-    self
+  # If the +flag+ is false, then receiver is marked to disallow itself and,
+  # if receiver is a class, its instances to be persisted.  Receiver and
+  # its instances should be removed from persistent roots before the next
+  # <tt>Maglev.commit_transaction</tt>.
+  def maglev_persist=(flag=true)
   end
 
-  # Returns true if <tt>maglev_persist!</tt> has been called on
-  # receiver.  Returns false otherwise.  For Eigenclasses, this bit is
-  # inferred from the associated class.
+  # Returns the persistent flag of receiver
   def maglev_persist?
-    # ...
-  end
-
-  # Define a scope for making persistent changes to a persistable module or
-  # class.  Receiver must already have had +maglev_persist!+ called on it.
-  # The changes within the block are only staged for commit, and must be
-  # followed by a `Magelv.commit_transaction` to be persisted.  Only
-  # changes to the class or module made within a reopen block are
-  # persisted.  Modifications made outside of a reopen block are not
-  # persisted and available only during the current VM sesssion.
-  #
-  # Raises +NonPersistentException+ if the class has not yet been persisted
-  # (i.e., if <tt>maglev_persist?</tt> returns false).
-  #
-  # If an unhandled exception causes the block to terminiate, the state of
-  # receiver is unspecified and the current transaction is poisoned (MagLev
-  # will only allow a subsequent abort_transaction, not a
-  # commit_transaction).  I.e., for recovery, you should abort the current
-  # transaction, fix the problem and then replay the block.
-  #
-  # See also Array#maglev_reopen!
-  #
-  def maglev_reopen!(&block)
-    raise NonPersistentClassException unless maglev_persist?
-    # TODO: Should it raise if already re-opened?
-    # ...
   end
 end
 
-class Array
-  # Consider each element of receiver as a class or module, and call
-  # maglev_persist! on it, but only if it hasn't already been called.
-  # Sorts the array to ensure all ancestors are processed before
-  # dependents.  Almost equivalent to the following:
-  #
-  #   self.each do |x|
-  #     unless x.maglev_persist?
-  #       x.ancestors.reverse.each do |a|
-  #         a.maglev_persist! if self.include?(a) and not a.maglev_persist?
-  #       end
-  #     end
-  #   end
-  def maglev_persist!
-    # ...
+# TODO: Should we allow this?
+class Class
+  # Allows the class to be persistable, but not instances of the class.
+  def maglev_persistable!
   end
 
-  # Consider each element of receiver as a class or module, and execute the
-  # block with the classes and modules marked for reopen.  E.g.,
-  #
-  #   [A, B, C].reopen! do
-  #     # stuff
-  #   end
-  #
-  # is equivalent to the following:
-  #
-  #   A.reopen! do
-  #     B.reopen! do
-  #       C.reopn! do
-  #         # stuff
-  #       end
-  #     end
-  #   end
-  #
-  def maglev_reopen!(&block)
-    # ...
+  def maglev_persistable?
   end
 end
+
+
+##############################################################################
+#
+#   T R A N S A C T I O N   A P I
+#
+##############################################################################
 
 module Maglev
-  # +USER_GLOBALS+ is a persistent Hash table that is the root for holding
-  # objects the application needs to persist.  The keys for +USER_GLOBALS+
-  # must be symbols.
-  RUBY.global('USER_GLOBALS', 'UserGlobals') # USER_GLOBALS = ...
-
   # Application level transaction API
   module Transaction
 
@@ -250,12 +348,8 @@ module Maglev
       return Gemstone.abort_transaction
     end
 
-    # Returns true to indicate that the session is in a transaction, false
-    # otherwise.
-    def in_transaction?
-      return Gemstone._in_transaction?
-    end
-
-    module_function :commit_transaction, :abort_transaction, :in_transaction?
+    module_function :commit_transaction, :abort_transaction
   end
 end
+
+
