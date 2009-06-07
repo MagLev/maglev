@@ -493,15 +493,6 @@ class Array
     res
   end
 
-  def _remove_last(count)
-    # deletes the last count elements of receiver.
-    unless count.equal?(0)
-      sz = self.size
-      self.size=( sz - count  )
-    end
-    self
-  end
-
   # Return copy of self with all nil elements removed
   def compact
     result = []
@@ -979,10 +970,17 @@ class Array
   end
 
   def reverse_each(&b)
-    i = length - 1
+    sz = self.size
+    i = sz - 1
     while i >= 0
       b.call(self._at(i))
-      i -= 1
+      new_siz = self.size
+      if new_siz < sz && i > 0
+        sz = new_siz
+        i = sz - 1
+      else 
+        i -= 1
+      end
     end
   end
 
@@ -1000,8 +998,12 @@ class Array
   primitive_nobridge '_remove_from_to_', 'removeFrom:to:'
 
   def _remove_last(count)
-    sz = self.size
-    self.size=(sz - count)
+    # deletes the last count elements of receiver.
+    unless count.equal?(0)
+      sz = self.size
+      self.size=( sz - count  )
+    end
+    self
   end
 
   def shift
@@ -1173,7 +1175,7 @@ class Array
   # Overrides from Object that are not documented in Array
   #   (e.g., eql? is documented in Array, so is not listed here).
 
-  primitive 'hash'
+  primitive 'hash', '_rubyHash'
 
   def inspect
     s = "["
