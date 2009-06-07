@@ -17,7 +17,8 @@ endif
    sed -e '1,$s+racc_reduce_n+Racc_reduce_n+' | \
    sed -e '1,$s+racc_shift_n+Racc_shift_n+' | \
    sed -e '1,$s+racc_nt_base+Racc_nt_base+' | \
-   sed -e '1,$s+racc_use_result_var+Racc_use_result_var+' > ruby_parser.rb
+   sed -e '1,$s+racc_use_result_var+Racc_use_result_var+' | \
+   sed -e '1,$s+, _values, result)+, vofs)+' > ruby_parser.rb
 if ( $status != 0) then
   echo "Error: NON-ZERO status from sed "
   exit 1
