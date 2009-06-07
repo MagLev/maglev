@@ -3,7 +3,21 @@
 
 class Numeric
 
-  def coerce(param)
+  def coerce(param, &block)
+    if param._isNumeric && param.class.equal?(self.class)
+      return [ param, self ]
+    end
+    if ! param.equal?(nil) && ! param._isSymbol
+      begin
+        p = param.to_f
+        s = self.to_f
+        if p._isFloat && s._isFloat && ! p.nan? && ! s.nan?
+          return [p, s]
+        end
+      rescue
+        # continue execution
+      end
+    end
     raise TypeError, 'numeric coercion failed'
     [ nil, nil]
   end
@@ -70,8 +84,19 @@ class Numeric
 
   # eql?  implemented in subclasses
   #  floor implemented in subclasses
+ 
+  primitive '_to_float', 'asFloat'
 
-  primitive 'hash'
+  def hash
+    h = 0
+    begin
+      # don't use to_f here; causes infinite recursion with mspec
+      h = self._to_float.hash
+    rescue
+      # continue execution
+    end
+    h
+  end
 
   primitive 'integer?', '_isInteger'
 
