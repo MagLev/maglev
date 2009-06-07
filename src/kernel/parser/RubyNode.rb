@@ -147,6 +147,9 @@ module MagRp
              @receiverNode = rcvrNode
              self
            end
+           def inspect 
+             "[:match2, #{@receiverNode.inspect} , #{@valueNode.inspect}]"
+           end
          end
 
          class RubyMatchZeroNode
@@ -384,6 +387,7 @@ module MagRp
        class RubyMethodDefNode
          class_primitive_nobridge 's', 's_forRp:args:body:'
          primitive_nobridge 'start_line=', 'startLine:' 
+         primitive_nobridge 'set_filename_source', 'fileName:source:' 
        end
          class RubyDefnNode
            # def self.s # inherited
@@ -1241,7 +1245,6 @@ module MagRp
 
      class RubyIterRpNode
        def self.s(args, body)  # call installed later
-#nil.pause
          res = self._new
          res.init(args, body)
        end
@@ -1252,7 +1255,6 @@ module MagRp
          self
        end
        def call=(aCallNode)
-#nil.pause
          if @callNode.equal?(nil)
            @callNode = aCallNode
          else
@@ -1261,7 +1263,6 @@ module MagRp
          @position = aCallNode.srcOffset()  # one-based already
        end
        def inspect
-#nil.pause
          "[:iterRp, #{@callNode.inspect}, #{@varNode.inspect}, #{@bodyNode.inspect} ]" 
        end
      end
@@ -1454,14 +1455,14 @@ module MagRp
          end
          primitive_nobridge       'options=', 'options:'
          def inspect
-           "[:dregex, #{@self.inspect_list} ]"
+           "[:dregex, #{self.inspect_list} ]"
          end
        end
 
          class RubyDRegexpOnceNode
            # instance creation via inherited _new
            def inspect
-             "[:dregex_once, #{@self.inspect_list} ]"
+             "[:dregex_once, #{self.inspect_list} ]"
            end
          end
 
