@@ -107,7 +107,7 @@ class Object
     # redefinition of __perform___ disallowed by parser after bootstrap finished.
     # __perform___  requires first arg to be a Symbol with proper suffix 
     #   for the number of with: keywords; it is used by RubyParser
-    primitive_nobridge '__perform___', '_rubyPerform:env:with:with:with:'
+    primitive_nobridge '__perform___', '_rubyPerform:env:with:with:'
 
     primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
     primitive   '_basic_clone', '_basicCopy' # use singleton class
