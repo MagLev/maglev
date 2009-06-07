@@ -44,7 +44,6 @@ class Regexp
   #     r3 = Regexp.new('dog', Regexp::EXTENDED)   #=> /dog/x
   #     r4 = Regexp.new(r2)                        #=> /cat/i
   #
-  # GEMSTONE: Only languages 'n' and 'N' are currently supported
   def self.new(pattern, options = 0, lang = nil)
     if (pattern._isRegexp)
       options = pattern.options
