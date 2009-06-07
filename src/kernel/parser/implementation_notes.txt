@@ -1,0 +1,91 @@
+The ruby parser in the Maglev kernel/parser directory was derived
+from Ryan Davis' ruby_parser2.0.2. .  
+
+The code in kernel/parser is a tight integration of all of the following:
+  ruby_parser's lexer
+  ruby_parser's .y  file
+  ruby_parser's supporting .rb files (extras.rb, etc)
+    all of above have modifications to emit instances of our AST tree classes,
+    and no longer know how to emit instances of your Sexp class.
+    The new class encapsulating tokens and byte offsets is RpNameToken .
+
+  modified strscan.rb integrated with new Regexp primitives in Maglev
+  to operate against a C memory copy of the frozen  source string, thus
+  reducing  copying between object memory and C memory for Regexp operations
+  by the lexer .
+
+  Post-processing of the racc parser generator output with  sed 
+  (see file kernel/parser/racc.sh  )  to make constant whan can
+  be constant, and delete code paths in the parser engine never used
+  by ruby parser.  
+
+  Modified racc parser engine  ( kernel/parser/racc_parser.rb  ).
+  Includes rework to avoid expensive  parallel assignments
+  and access parser state tables from instVars , and is tied to
+  the post processing in racc.sh .
+
+  The .y file and the racc_parser.rb now avoid copying the last "len"
+  elements of the value stack for each reduce method. Rather 
+  the offset to val[0] is passed to each reduce method, and 
+  the value stack is truncated as needed after the reduce method returns.
+  This reduces garbage creation during parser execution.
+  
+  Rework of initialization of a parser instance so that we can
+  execute the complicated racc initialization once at bootstrap time,
+  and then just  dup and  reset  a committed instance to start
+  a new parse .
+
+  Rework of class Environment to make extend and unextend cheaper.
+  See comments in rp_classes.rb .
+
+  Code style changes to access instVars directly instead of using accessor
+  methods within class that defines an instVar .
+  Lexer rework to change very simple regular expressions to 
+  use   equal?( ?X )   style of checks for a single character where possible.
+  Lexer rework to have lexer state values be Fixnums, with bit values
+  arranged to make compare of one of many states faster.
+  The coding style is what we are using within Maglev's bootstrap code,
+  and takes advantage of things like  equal?  being compiled direct to
+  a bytecode, etc.   
+
+  Comments with TODO in ruby_parser2.0.2 were changed to say TODO202 .
+  Other TODO in comments represent additional Maglev issues.
+
+Our current goal is 1.8 compatiblity and the above code will
+need more work before it will run or be efficient in 1.9 .
+
+As of 5 June 09, algorithmic changes since ruby_parser2.0.2 include
+
+  Emitting instances of RpNameToken as the yacc_value for many tokens
+  from the lexer, so accurate byte offsets in the source string are available
+  for the AST nodes.
+
+  Emitting instances of DefnNameToken for :kDEF token , containing
+  both a line number and a byte offset for start of a method definition.
+
+  Changes to parsing of heredoc's to allow the input string to be frozen,
+  and to have heredocs' not upset byte offset computations.
+  This is accomplished by a stack of source regions representing additional
+  regions of the source to be lexed  after an EOF on the current source
+  region is reached.  See instVar  @src_regions  in lexer.rb, 
+  and class SrcRegion .
+
+  Heuristics to give message with approximate position of a missing "end"
+  when a missing "end" is detected at end of file.
+  See uses of the instVar  @extend_ofs_last_unextend  ,
+  and implementation and uses of the method   last_closed_def_offset  
+  in files rp_classes.rb , extras.rb .  The reported position of the
+  missing end will not be 100% accurate, but for the common case of
+  a def/class/module/if  missing an "end" ,  an approximate line number
+  is given which should speed up finding the missing end .
+
+  Fixes to lexer to parse these symbol literals
+     :-@
+     :+@
+  See code for second occurrance of :tSYMBOL  in lexer.rb.
+
+  Added one more case of enforcement of Symbols not allowed to 
+  contain the null character.
+  See first occurrance of "symbol cannot contain" in lexer.rb 
+   
+
