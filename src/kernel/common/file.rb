@@ -231,13 +231,16 @@ class File
   #  File.join("usr", "mail", "gumby")   #=> "usr/mail/gumby"
   def self.join(*args)
     args.map! { |o|
-      o = o.to_str unless Array === o || String === o
+      unless o._isString || o._isArray 
+        o = o.to_str 
+      end
       o
     } rescue raise TypeError
 
     # let join/split deal with all the recursive array complexities
     # one small hack is to replace URI header with \0 and swap back later
-    result = args.join(SEPARATOR).gsub(/\:\//, "\0").split(/#{SEPARATOR}+/o)
+    result = args.join(SEPARATOR).gsub(/\:\//, "\0").split(/#{SEPARATOR}+/o)   
+ 						     # ^ broken here for args of ['','']
     result << '' if args.empty? || args.last.empty? || args.last[-1] == SEPARATOR[0]
     result.join(SEPARATOR).gsub(/\0/, ':/')
   end
