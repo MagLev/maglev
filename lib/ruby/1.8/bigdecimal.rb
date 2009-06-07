@@ -97,7 +97,7 @@ class BigDecimal < Numeric
         end
         @digits = (int + frac).gsub(/0*$/, '').to_i
       end
-      @precs = [v.length, _precs].max
+      @precs = v.length._max( _precs)
     end
   end
 
@@ -302,7 +302,7 @@ class BigDecimal < Numeric
       sumsign = sum < 0 ? MINUS : PLUS
       s = sum.abs.to_s
       sumdiff = s.length - zd.length
-      BigDecimal(sumsign + RADIX + s + EXP + (sumdiff + [nzx, 0].max).to_s, precs)
+      BigDecimal(sumsign + RADIX + s + EXP + (sumdiff + 0._max(nzx) ).to_s, precs)
     else
       a, b, extra = reduce(self, other)
       sum = a + b
@@ -644,7 +644,7 @@ class BigDecimal < Numeric
     elsif prec.equal?(nil)
       self.fix
     else
-      e = [0, @exp + prec].max
+      e = 0._max( @exp + prec)
       s = @digits.to_s[0, e]
       BigDecimal(@sign + '0' + RADIX + s + EXP + @exp.to_s)
     end
@@ -697,7 +697,7 @@ class BigDecimal < Numeric
   # call-seq:
   # reduce(BigDecimal("8E5"), BigDecimal("6E2")) => [BigDecimal("8E3"), BigDecimal("6"), 2]
   def reduce(x, y)
-    extra = [x.exponent, y.exponent].min
+    extra = x.exponent._min(  y.exponent )
     a = BigDecimal(SIGNS[x.sign <=> 0].to_s + RADIX + x.digits.to_s + EXP + (x.exponent - extra).to_s)
     b = BigDecimal(SIGNS[y.sign <=> 0].to_s + RADIX + y.digits.to_s + EXP + (y.exponent - extra).to_s)
     [a, b, extra]
