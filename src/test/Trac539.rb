@@ -13,61 +13,54 @@ class Parser
   end
 
   def parse!
-    @blocks.each do |v|
-      v.call(:foo)
+    res = []
+    ary = @blocks
+    n = 0
+    lim = ary.size
+    while n < lim
+      res << ary[n].call( 9 )
+      n += 1
     end
+    res
   end
 end
 
-option_list = [
-  Proc.new { |a| puts "--help #{a}"},
-  Proc.new { |a| puts "--verbose #{a}"},
-  Proc.new { |a| puts "--rdoc #{a}"},
-  Proc.new { |a| puts "--ri #{a}"},
-]
+class C
+  def test
+    option_list = [
+      Proc.new { |a| 10 + a } ,
+      Proc.new { |a| 20 + a } ,
+      Proc.new { |a| 30 + a } ,
+      Proc.new { |a| 40 + a }
+    ]
+    parser = Parser.new
 
-# each handler works correctly:
-# option_list.each { |handler| handler.call("xxx") }
-
-parser = Parser.new
-
-option_list.each do |handler|
-  parser.on { |value| handler.call(value) }
+    option_list.each do |handler|
+      parser.on { |value| handler.call(value) }
+    end
+    
+    parser.parse!
+  end
 end
 
-parser.parse!
 
+# test case for a method not creating a binding
+xx = C.new.test
+unless xx == [19, 29, 39, 49] ; raise 'ERROR'; end
 
-######################################################################
-#
-# The following commented out code reproduces the same problem in
-# the original context of optparse
-#
-######################################################################
+# now execute again at top level (which has an implicit binding)
+    option_list = [
+      Proc.new { |a| 10 + a } ,
+      Proc.new { |a| 20 + a } ,
+      Proc.new { |a| 30 + a } ,
+      Proc.new { |a| 40 + a }
+    ]
+    parser = Parser.new
+    option_list.each do |handler|
+      parser.on { |value| handler.call(value) }
+    end
 
-# require 'optparse'
-
-# options = { }
-# parser = OptionParser.new
-# parser.separator("")
-
-# option_list = [
-#   [["-h", "--help", "Get help on this command"],                Proc.new { |a| puts "--help #{a}"}],
-#   [["-V", "--[no-]verbose", "Set the verbose level of output"], Proc.new { |a| puts "--verbose #{a}"}],
-#   [["--[no-]rdoc", "Set the rdoc flag"],                        Proc.new { |a| puts "--rdoc #{a}"}],
-#   [["--[no-]ri", "Set the ri flag"],                            Proc.new { |a| puts "--ri #{a}"}],
-# ]
-
-# option_list.each do |args, handler|
-#   puts "Iteration for #{args.inspect}  handler: #{handler}"
-#   parser.on(*args) do |value|
-#     puts "In Block  handler: #{handler.__id__}"
-#     handler.call(value)
-#   end
-# end
-
-# parser.parse!(["--no-rdoc", "--no-ri"])
-
-
-
+yy =  parser.parse!
+unless yy == [19, 29, 39, 49] ; raise 'ERROR'; end
+true
 
