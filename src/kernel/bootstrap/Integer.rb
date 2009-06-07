@@ -10,18 +10,53 @@
 
 class Integer
 
-  def coerce(param)
+  def coerce(param, &block)
+    s = nil
+    p = nil
+    v = nil
     unless param._isSymbol
+      float_attempted = false
       begin
-        v = param.to_int
-        if v._isInteger
-          return [ v, self ]
+        if param._isFloat
+          float_attempted = true
+          s = self.to_f 
+          if s._isFloat && ! s.nan?
+            return [ param, s ] 
+          end
         end
+	v = param.to_int
+	if v._isInteger
+	  return [ v, self ]
+	end
       rescue
         # continue execution
       end
+      unless float_attempted
+	begin
+	  unless param.equal?(nil)
+	    p = param.to_f
+	    if p._isFloat && ! p.nan?
+	      return [ p, self.to_f ]
+	    end
+	  end
+	rescue
+	  # continue execution
+	end 
+      end
     end
     super
+  end
+
+  def coerce(param)
+    # non-bridge variant to optimize common case of float arg and no block
+    if param._isFloat
+      s = self.to_f
+      if s._isFloat && ! s.nan?
+        return [ param, s ]
+      end 
+    end
+    blk = nil
+    self.coerce(param, &blk)
   end
 
   def self.induced_from(obj)
@@ -91,11 +126,12 @@ class Integer
 
         def >>(arg)
           unless arg._isFixnum
-            if arg._isInteger 
-              if (self >= 0)
-                return 0
-              else
-                return -1
+            arg = Type.coerce_to(arg, Integer, :to_int)
+            unless arg._isFixnum 
+	      if (self >= 0)
+	        return 0
+	      else
+	        return -1
               end
             end
           end
@@ -141,7 +177,11 @@ class Integer
        if (a < 0)
          0
        else
-         self._bit_at(a)
+         if a._isFixnum
+           self._bit_at(a)
+         else
+           self < 0 ? 1 : 0 
+         end
        end 
      end
 
@@ -172,9 +212,11 @@ class Integer
             if arg == 0.0
               raise FloatDomainError, 'argument to div is zero'
             end
+            self.to_f.div(arg)
+          else
+            q = self._divide(arg)
+            q.to_int
           end
-          q = self._divide(arg)
-          q.to_int
         end
 
         primitive 'hash'
@@ -188,6 +230,7 @@ class Integer
 
         primitive 'size', 'size'
         primitive 'to_f', 'asFloat'
+        primitive '_to_float', 'asFloat'
         primitive 'to_i', 'truncated'
         primitive 'to_int' , 'truncated'
 
