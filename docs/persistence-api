@@ -131,13 +131,16 @@ Since every object has a reference to its class object, and each class
 object has a reference to its super class (and mixed in modules), one
 consequence of persistence by reachability, is that in order to persist an
 object, you must also persist its class (and the whole ancestor chain as
-well).  The VM maintains a flag in each class and module that marks whether
-it and its instances are allowed to be persisted (see
-<tt>Module#persistable=</tt> and <tt>Module#persistable?</tt>).  If you
-attempt to commit an object whose class is not marked persistable, then the
-VM will raise an exception and the current transaction will remain
-uncommitted.   All of the core classes (+Object+, +Array+, +String+, etc.)
-are already marked persistable.
+well).  The VM maintains flags in each class and module that marks whether
+it (<tt>Module#maglev_persistable=</tt> and
+<tt>Module#maglev_persistable?</tt>) and its instances
+(<tt>Class#maglev_instances_persistable=</tt> and
+<tt>Class#maglev_instances_persistable?</tt>) are allowed to be persisted.
+If you attempt to commit an object whose class is not marked persistable or
+not marked as having persistable instances, then the VM will raise an
+exception and the current transaction will remain uncommitted.  All of the
+core classes (+Object+, +Array+, +String+, etc.)  are already marked
+persistable.
 
 The MagLev persistence API, is therefore centered around how to mark
 classes and modules as persistable.  Once that aspect of the program has
@@ -204,11 +207,10 @@ persistence:
 ===== <tt>Maglev.persistent</tt> and <tt>Maglev.transient</tt> Basics
 
 <tt>Maglev.persistent</tt> and <tt>Maglev.transient</tt> provide a
-mechanism (ruby blocks) to mark for the VM sections of your code as
-containing persistable or non-persistable modifications to classes and
-modules.   This, combined with starting the VM in either persistent or
-transient mode, provide complete control over class and module
-persistence.
+mechanism (ruby blocks) to mark sections of your code as containing
+persistable or non-persistable modifications to classes and modules.  This,
+combined with starting the VM in either persistent or transient mode,
+provide complete control over class and module persistence.
 
 Assume the VM is started normally (transient mode), then unless action is
 taken, all class definitions are transient (the classes will have their
