@@ -5,3 +5,4 @@ fails:Array#flatten! returns nil if no modifications took place
 fails:Array#flatten! does not call flatten! on elements
 fails:Array#flatten! raises an ArgumentError on recursive arrays
 fails:Array#flatten! flattens any elements which responds to #to_ary, using the return value of said method
+fails:Array#flatten! does not raise on frozen arrays when no modification would take place

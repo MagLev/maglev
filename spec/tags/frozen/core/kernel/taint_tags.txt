@@ -1,1 +1,2 @@
+fails:Kernel#taint sets self to be tainted
 fails:Kernel#taint has no effect on immediate values

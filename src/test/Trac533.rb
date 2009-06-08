@@ -6,6 +6,9 @@
 require 'thread'
 THREAD_NUM = 403
 number = ARGV.first.to_i
+if number == 0
+  number = 400
+end
 
 threads = []
 for i in 1..THREAD_NUM

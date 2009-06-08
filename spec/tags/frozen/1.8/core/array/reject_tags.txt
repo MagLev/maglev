@@ -1,3 +1,0 @@
-fails:Array#reject! removes elements for which block is true
-fails:Array#reject! properly handles recursive arrays
-fails:Array#reject! returns nil if no changes are made

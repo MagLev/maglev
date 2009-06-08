@@ -1,2 +1,3 @@
 fails:Float#to_s returns a string representation of self, possibly Nan, -Infinity, +Infinity
+fails:Float#to_s returns a string representation of self
 fails:Float#to_s returns the correct values for -0.0

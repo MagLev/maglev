@@ -319,17 +319,17 @@ class Array
       out << sep unless (sep.equal?(nil) || i == 0)
 
       if elem._isArray
-        if ts.include?(elem)
-          out << "[...]"
-        else
-          added = ts._add_if_absent(self)
-          begin
+	added = ts._add_if_absent(self)
+	begin
+          if ts.include?(elem)
+            out << "[...]"
+          else
             out << elem.join(sep)
-          ensure
-            if added
-             ts.remove(self)
-            end
           end
+	ensure
+          if added
+	   ts.remove(self)
+	  end
         end
       else
         out << elem.to_s

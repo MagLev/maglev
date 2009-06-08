@@ -1,4 +1,0 @@
-fails:Numeric#coerce returns [other, self] if self and other are instances of the same class
-fails:Numeric#coerce returns an Array containing other and self converted to Fixnums using #to_f if they are not instances of the same class
-fails:Numeric#coerce raises a TypeError when other can't be coerced
-fails:Numeric#coerce raises an ArgumentError when other can't be converted to Float

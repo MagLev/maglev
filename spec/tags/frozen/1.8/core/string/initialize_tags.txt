@@ -1,6 +1,0 @@
-fails:String#initialize is a private method
-fails:String#initialize replaces contents of self with the passed string
-fails:String#initialize replaces the taint status of self with that of the passed string
-fails:String#initialize is called on subclasses
-fails:String#initialize converts its argument to a string representation
-fails:String#initialize raises TypeError on inconvertible object

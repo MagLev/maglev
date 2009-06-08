@@ -1,6 +1,9 @@
 
 class SystemExit
-  attr_reader :status
+  def status
+    @status  # a dynamic instVar
+  end
+
   def initialize(*args)
     status = if args.first._isFixnum
                args.shift

@@ -2929,30 +2929,31 @@ Racc_debug_parser = true
 
 # reduce 0 omitted
 
-def _reduce_1(val, _values, result)
+def _reduce_1(val, vofs)
 		      # program:
                       @lexer.lex_state=( RubyLexer::Expr_beg )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_2(val, _values, result)
+def _reduce_2(val, vofs)
 		      # compstmt
-                      result = val[1]
+                      result = val[vofs+ 1]
                     
     result
 end
 
-def _reduce_3(val, _values, result)
+def _reduce_3(val, vofs)
 		      # bodystmt: compstmt opt_rescue opt_else opt_ensure
-                      result = new_body( val)
+                      result = new_body( val, vofs)
                     
     result
 end
 
-def _reduce_4(val, _values, result)
+def _reduce_4(val, vofs)
 		      # compstmt: stmts opt_terms
-                      result = new_compstmt(val)
+                      result = new_compstmt(val[vofs])
                     
     result
 end
@@ -2961,21 +2962,21 @@ end
 
 # reduce 6 omitted
 
-def _reduce_7(val, _values, result)
+def _reduce_7(val, vofs)
 		      # | stmts terms stmt
-                      result = self.block_append( val[0], val[2])
+                      result = self.block_append( val[vofs], val[vofs + 2])
                     
     result
 end
 
-def _reduce_8(val, _values, result)
+def _reduce_8(val, vofs)
 		      # | error stmt
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_9(val, _values, result)
+def _reduce_9(val, vofs)
 		      # stmt: kALIAS fitem
                       lx = @lexer
                       lx.lex_state=( RubyLexer::Expr_fname )
@@ -2984,196 +2985,199 @@ def _reduce_9(val, _values, result)
     result
 end
 
-def _reduce_10(val, _values, result)
+def _reduce_10(val, vofs)
 		      # kALIAS fitem   fitem
-                      result = RubyAliasNode.s(val[1], val[3])
-                      result.src_offset=( val[0].src_offset ) # of kALIAS RpNameToken
+                      result = RubyAliasNode.s(val[vofs + 1], val[vofs + 3])
+                      result.src_offset=( val[vofs].src_offset ) # of kALIAS RpNameToken
                     
     result
 end
 
-def _reduce_11(val, _values, result)
+def _reduce_11(val, vofs)
 		      # | kALIAS tGVAR tGVA
-                      result = RubyGlobalVarAliasNode.s( val[1].symval, val[2].symval) # s(:valias)
+                      result = RubyGlobalVarAliasNode.s( val[vofs + 1].symval, val[vofs + 2].symval) # s(:valias)
                     
     result
 end
 
-def _reduce_12(val, _values, result)
+def _reduce_12(val, vofs)
 		      # | kALIAS tGVAR tBACK_REF
-                      result = RubyGlobalVarAliasNode.s( val[1].symval, :"$#{val[2]}" )  # s(:valias)
+                      result = RubyGlobalVarAliasNode.s( val[vofs + 1].symval, :"$#{val[vofs + 2]}" )  # s(:valias)
                     
     result
 end
 
-def _reduce_13(val, _values, result)
+def _reduce_13(val, vofs)
 		      # | kALIAS tGVAR tNTH_REF
                       yyerror "can't make alias for the number variables"
                     
     result
 end
 
-def _reduce_14(val, _values, result)
+def _reduce_14(val, vofs)
 		      # | kUNDEF undef_list
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_15(val, _values, result)
+def _reduce_15(val, vofs)
 		      # | stmt kIF_MOD expr_value
-                      result = new_if(val[2], val[0], nil ) 
-                      result.src_offset=( val[1].src_offset )
+                      result = new_if(val[vofs + 2], val[vofs ], nil ) 
+                      result.src_offset=( val[vofs + 1].src_offset )
                     
     result
 end
 
-def _reduce_16(val, _values, result)
+def _reduce_16(val, vofs)
 		      # | stmt kUNLESS_MOD expr_value
-                      result = new_if( val[2], nil, val[0])
-                      result.src_offset=( val[1].src_offset )
+                      result = new_if( val[vofs + 2], nil, val[vofs])
+                      result.src_offset=( val[vofs + 1].src_offset )
                     
     result
 end
 
-def _reduce_17(val, _values, result)
+def _reduce_17(val, vofs)
 		      # | stmt kWHILE_MOD expr_value  
-                      # val[1] is kWHILE_MOD RpNameToken
-                      result = new_while( val[0], val[2] )
-                      result.src_offset=( val[1].src_offset) # kWHILE_MOD  RpNameToken
+                      # val_[1] is kWHILE_MOD RpNameToken
+                      result = new_while( val[vofs ], val[vofs + 2] )
+                      result.src_offset=( val[vofs + 1].src_offset) # kWHILE_MOD  RpNameToken
                     
     result
 end
 
-def _reduce_18(val, _values, result)
+def _reduce_18(val, vofs)
 		      # | stmt kUNTIL_MOD expr_value   
-                      # val[1] is kUNTIL_MOD RpNameToken
-                      result = new_until( val[0], val[2] )
-                      result.src_offset=( val[1].src_offset )
+                      # val_[1] is kUNTIL_MOD RpNameToken
+                      result = new_until( val[vofs ], val[vofs + 2] )
+                      result.src_offset=( val[vofs + 1].src_offset )
                     
     result
 end
 
-def _reduce_19(val, _values, result)
+def _reduce_19(val, vofs)
 		      # | stmt kRESCUE_MOD stmt
-                      # result = s(:rescue, val[0], s(:resbody, s(:array), val[2]))
-                      resbody = RubyRescueBodyNode.s(nil, val[2])
-                      result = RubyRescueNode.s( val[0], resbody, nil)
-                      ofs = val[1].src_offset  # # kRESCUE position
+                      # result = s(:rescue, val_[0], s(:resbody, s(:array), val_[2]))
+                      resbody = RubyRescueBodyNode.s(nil, val[vofs + 2])
+                      result = RubyRescueNode.s( val[vofs ], resbody, nil)
+                      ofs = val[vofs + 1].src_offset  # # kRESCUE position
                       result.src_offset=( ofs )
                       resbody.src_offset=( ofs )
                     
     result
 end
 
-def _reduce_20(val, _values, result)
+def _reduce_20(val, vofs)
 		      # | klBEGIN
                       if (@in_def || @in_single > 0) then
                         yyerror "BEGIN in method"
                       end
                       @env.extend( false)
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_21(val, _values, result)
+def _reduce_21(val, vofs)
 		      # tLCURLY compstmt tRCURLY
-                      # result = new_iter s(:preexe), nil, val[3] # TODO: add test?
+                      # result = new_iter s(:preexe), nil, val[vofs + 3] # TODO: add test?
                       result = nil # TODO: since it isn't supposed to go in the AST
                     
     result
 end
 
-def _reduce_22(val, _values, result)
+def _reduce_22(val, vofs)
 		      # | klEND tLCURLY compstmt tRCURLY
                       if (@in_def || @in_single > 0) then
                         yyerror "END in method; use at_exit"
                       end
-                      # result = new_iter s(:postexe), nil, val[2]
-                      result = new_iter( nil, val[2], nil )
+                      # result = new_iter s(:postexe), nil, val_[2]
+                      result = new_iter(nil, val[vofs + 2])
                     
     result
 end
 
-def _reduce_23(val, _values, result)
+def _reduce_23(val, vofs)
 		      # | lhs tEQL command_call
-                      result = self.node_assign(val[0], val[2])
+                      result = self.node_assign(val[vofs ], val[vofs + 2])
                     
     result
 end
 
-def _reduce_24(val, _values, result)
+def _reduce_24(val, vofs)
 		      # | mlhs tEQL command_call
-                      result = masgn_append_arg( val[0], val[2] ) 
+                      result = masgn_append_arg( val[vofs ], val[vofs + 2] ) 
                     
     result
 end
 
-def _reduce_25(val, _values, result)
+def _reduce_25(val, vofs)
 		      # | var_lhs tOP_ASGN command_call
-                      result = new_op_asgn(val)
+                      result = new_op_asgn(val, vofs)
                     
     result
 end
 
-def _reduce_26(val, _values, result)
+def _reduce_26(val, vofs)
 		      # | primary_value tLBRACK_STR aref_args tRBRACK tOP_ASGN command_call
-                      result = RubyOpElementAsgnNode.s(val[0], val[2], val[4], val[5]) # s(:op_asgn1 )
+                      result = RubyOpElementAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 4], val[vofs + 5]) # s(:op_asgn1 )
                     
     result
 end
 
-def _reduce_27(val, _values, result)
+def _reduce_27(val, vofs)
 		      # | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                       raise_error(":op_asgn never seen from MRI parser ")
-                      # result = s(:op_asgn, val[0], val[4], val[2], val[3])
+                      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
                       result = nil
                     
     result
 end
 
-def _reduce_28(val, _values, result)
+def _reduce_28(val, vofs)
 		      # | primary_value tDOT tCONSTANT tOP_ASGN command_call
                       raise_error(":op_asgn never seen from MRI parser ")
-		      # result = s(:op_asgn, val[0], val[4], val[2], val[3])
+		      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
 		      result = nil
 		    
     result
 end
 
-def _reduce_29(val, _values, result)
+def _reduce_29(val, vofs)
 		        # | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
                         raise_error(":op_asgn never seen from MRI parser ")
-			# result = s(:op_asgn, val[0], val[4], val[2], val[3])
+			# result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
                         result = nil
 		      
     result
 end
 
-def _reduce_30(val, _values, result)
+def _reduce_30(val, vofs)
 			# | backref tOP_ASGN command_call
-			self.backref_assign_error val[0]
+                        v_zero = val[vofs ] 
+			self.backref_assign_error( v_zero )
+                        result = v_zero 
 		      
     result
 end
 
-def _reduce_31(val, _values, result)
+def _reduce_31(val, vofs)
 			# | lhs tEQL mrhs
-			result = self.node_assign(val[0], RubySValueNode.s( val[2]))
+			result = self.node_assign(val[vofs ], RubySValueNode.s( val[vofs + 2]))
 		      
     result
 end
 
-def _reduce_32(val, _values, result)
+def _reduce_32(val, vofs)
 			# | mlhs tEQL arg_value
-			result =  masgn_append_arg(val[0], val[2] )
+			result =  masgn_append_arg(val[vofs ], val[vofs + 2] )
 		      
     result
 end
 
-def _reduce_33(val, _values, result)
+def _reduce_33(val, vofs)
 			# | mlhs tEQL mrhs
-			result = masgn_append_mrhs( val[0], val[2] )
+			result = masgn_append_mrhs( val[vofs ], val[vofs + 2] )
 		      
     result
 end
@@ -3182,39 +3186,39 @@ end
 
 # reduce 35 omitted
 
-def _reduce_36(val, _values, result)
+def _reduce_36(val, vofs)
 			# | expr kAND expr
-			result = logop( RubyAndNode,  val[0], val[2])  # s(:and )
+			result = logop( RubyAndNode,  val[vofs ], val[vofs + 2])  # s(:and )
 		      
     result
 end
 
-def _reduce_37(val, _values, result)
+def _reduce_37(val, vofs)
 			# | expr kOR expr
-			result = logop( RubyOrNode, val[0], val[2]) # s(:or )
+			result = logop( RubyOrNode, val[vofs ], val[vofs + 2]) # s(:or )
 		      
     result
 end
 
-def _reduce_38(val, _values, result)
+def _reduce_38(val, vofs)
 			# | kNOT expr
-			result = RubyNotNode.s( val[1]) # s(:not )
+			result = RubyNotNode.s( val[vofs + 1]) # s(:not )
 		      
     result
 end
 
-def _reduce_39(val, _values, result)
+def _reduce_39(val, vofs)
 			# | tBANG command_call
-			result = RubyNotNode.s( val[1]) # s(:not )
+			result = RubyNotNode.s( val[vofs + 1]) # s(:not )
 		      
     result
 end
 
 # reduce 40 omitted
 
-def _reduce_41(val, _values, result)
+def _reduce_41(val, vofs)
 			# expr_value: expr
-			result = value_expr(val[0])
+			result = value_expr(val[vofs ])
 		      
     result
 end
@@ -3223,49 +3227,49 @@ end
 
 # reduce 43 omitted
 
-def _reduce_44(val, _values, result)
+def _reduce_44(val, vofs)
 			# | kRETURN call_args
-			# result = s(:return, ret_args(val[1]))
-                        result = RubyReturnNode.s( ret_args(val[1]))
+			# result = s(:return, ret_args(val_[1]))
+                        result = RubyReturnNode.s( ret_args(val[vofs + 1]))
 		      
     result
 end
 
-def _reduce_45(val, _values, result)
+def _reduce_45(val, vofs)
 			# | kBREAK call_args
-			# result = s(:break, ret_args(val[1]))
-                        result = RubyBreakNode.s( ret_args(val[1]))
-                        result.src_offset=( val[0].src_offset ) #  of the kBREAK
+			# result = s(:break, ret_args(val_[1]))
+                        result = RubyBreakNode.s( ret_args(val[vofs + 1]))
+                        result.src_offset=( val[vofs ].src_offset ) #  of the kBREAK
 		      
     result
 end
 
-def _reduce_46(val, _values, result)
+def _reduce_46(val, vofs)
 			# | kNEXT call_args
-			# result = s(:next, ret_args(val[1]))
-                        result = RubyNextNode.s( ret_args(val[1]))
-                        result.src_offset=( val[0].src_offset ) #  of the kNEXT
+			# result = s(:next, ret_args(val_[1]))
+                        result = RubyNextNode.s( ret_args(val[vofs + 1]))
+                        result.src_offset=( val[vofs ].src_offset ) #  of the kNEXT
 		      
     result
 end
 
 # reduce 47 omitted
 
-def _reduce_48(val, _values, result)
+def _reduce_48(val, vofs)
 			# | block_call tDOT operation2 command_args
-			result = new_call(val[0], val[2], val[3])
+			result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
 		      
     result
 end
 
-def _reduce_49(val, _values, result)
+def _reduce_49(val, vofs)
 			# | block_call tCOLON2 operation2 command_args
-			result = new_call(val[0], val[2], val[3])
+			result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
 		      
     result
 end
 
-def _reduce_50(val, _values, result)
+def _reduce_50(val, vofs)
 			# cmd_brace_block: tLBRACE_ARG
 			@env.extend( true ) # (:dynamic)
 			result = -902 #  @lexer.lineno_
@@ -3273,37 +3277,37 @@ def _reduce_50(val, _values, result)
     result
 end
 
-def _reduce_51(val, _values, result)
+def _reduce_51(val, vofs)
 			# opt_block_var
 			result = @env.dynamic_keys
 		      
     result
 end
 
-def _reduce_52(val, _values, result)
+def _reduce_52(val, vofs)
 			#  compstmt tRCURLY
-			result = new_iter(  val[2], val[4], nil)  
+			result = new_iter(val[vofs + 2], val[vofs + 4])
                       @env.unextend
                     
     result
 end
 
-def _reduce_53(val, _values, result)
+def _reduce_53(val, vofs)
 		      # command: operation command_args =tLOWEST
-                      result = new_fcall( val[0], val[1])
+                      result = new_fcall( val[vofs ], val[vofs + 1])
                     
     result
 end
 
-def _reduce_54(val, _values, result)
+def _reduce_54(val, vofs)
 		      # | operation command_args cmd_brace_block
-                      result = new_fcall( val[0], val[1])
-                      v_two = val[2]
+                      result = new_fcall( val[vofs ], val[vofs + 1])
+                      v_two = val[vofs + 2]
                       if v_two then
                         if v_two.class.equal?(RubyBlockPassNode) # v_two[0] == :block_pass 
                           raise "both block arg and actual block given"
                         end
-                        # result, operation = val[2], result
+                        # result, operation = val_[2], result
                         # result.insert 1, operation
                         iter = v_two
                         call = result
@@ -3314,91 +3318,91 @@ def _reduce_54(val, _values, result)
     result
 end
 
-def _reduce_55(val, _values, result)
+def _reduce_55(val, vofs)
 		      # | primary_value tDOT operation2 command_args =tLOWEST
-                      result = new_call(val[0], val[2], val[3])
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
                     
     result
 end
 
-def _reduce_56(val, _values, result)
+def _reduce_56(val, vofs)
 		      # | primary_value tDOT operation2 command_args cmd_brace_block
-                      result = new_call(val[0], val[2], val[3])
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
                     
     result
 end
 
-def _reduce_57(val, _values, result)
+def _reduce_57(val, vofs)
 		      # | primary_value tCOLON2 operation2 command_args =tLOWEST
-                      result = new_call(val[0], val[2], val[3])
+                      result = new_call(val[vofs], val[vofs + 2], val[vofs + 3])
                     
     result
 end
 
-def _reduce_58(val, _values, result)
+def _reduce_58(val, vofs)
 		      # | primary_value tCOLON2 operation2 command_args cmd_brace_block
-                      result = new_call(val[0], val[2], val[3])
-                      if val[4] then
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
+                      if val[vofs + 4] then
                         #if result[0] == :block_pass then # REFACTOR
                         if result.rcvr.class.equal?(RubyBlockPassNode) 
                           raise "both block arg and actual block given"
                         end
-                        raise_error("dont know how to append to selector") # waiting for mail from Ryan 
-                        val[2] << result
-                        result = val[2]
+                        raise_error("dont know how to append to selector") 
+                        val[vofs + 2] << result
+                        result = val[vofs + 2]
                       end
                     
     result
 end
 
-def _reduce_59(val, _values, result)
+def _reduce_59(val, vofs)
 		      # | kSUPER command_args
-                      result = new_super( val )
+                      result = new_super( val, vofs )
                     
     result
 end
 
-def _reduce_60(val, _values, result)
+def _reduce_60(val, vofs)
 		      # | kYIELD command_args
-                      result = new_yield( val[1] )
-                      result.src_offset=( val[0].src_offset ) # of the kYIELD
+                      result = new_yield( val[vofs + 1] )
+                      result.src_offset=( val[vofs ].src_offset ) # of the kYIELD
                     
     result
 end
 
 # reduce 61 omitted
 
-def _reduce_62(val, _values, result)
+def _reduce_62(val, vofs)
 		      # | tLPAREN mlhs_entry tRPAREN
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
 # reduce 63 omitted
 
-def _reduce_64(val, _values, result)
+def _reduce_64(val, vofs)
 		      # mlhs_entry: mlhs_basic #  | tLPAREN mlhs_entry tRPAREN
-                      # result = s(:masgn, s(:array, val[1]))
-                      ofs = val[0].src_offset  #  of the tLPAREN
-                      result = new_parasgn( RubyArrayNode.s(val[1]) , ofs )
+                      # result = s(:masgn, s(:array, val_[1]))
+                      ofs = val[vofs ].src_offset  #  of the tLPAREN
+                      result = new_parasgn( RubyArrayNode.s(val[vofs + 1]) , ofs )
                     
     result
 end
 
-def _reduce_65(val, _values, result)
-		      # mlhs_basic: mlhs_head # result = s(:masgn, val[0])
-                      v_zero = val[0]
+def _reduce_65(val, vofs)
+		      # mlhs_basic: mlhs_head # result = s(:masgn, val_[0])
+                      v_zero = val[vofs ]
                       result = new_parasgn( v_zero , v_zero.src_offset )
                     
     result
 end
 
-def _reduce_66(val, _values, result)
+def _reduce_66(val, vofs)
 		      # mlhs_basic: mlhs_head #  | mlhs_head mlhs_item
-                      # result = s(:masgn, val[0] << val[1].compact)
-                      v_zero = val[0]
-                      v_one = val[1]
+                      # result = s(:masgn, val_[0] << val_[1].compact)
+                      v_zero = val[vofs ]
+                      v_one = val[vofs + 1]
                       v_zero.append( v_one )
                       ofs = v_one.src_offset 
                       result = new_parasgn( v_zero, ofs )
@@ -3406,41 +3410,41 @@ def _reduce_66(val, _values, result)
     result
 end
 
-def _reduce_67(val, _values, result)
+def _reduce_67(val, vofs)
 		      # mlhs_basic: mlhs_head #   mlhs_head tSTAR mlhs_node
-                      # result = s(:masgn, val[0] << s(:splat, val[2])) 
-                      v_zero = val[0]
-                      ofs = val[1].src_offset # of the tSTAR
-                      v_zero.append(  RubySplatNode.s(val[2] ))
+                      # result = s(:masgn, val_[0] << s(:splat, val_[2])) 
+                      v_zero = val[vofs ]
+                      ofs = val[vofs + 1].src_offset # of the tSTAR
+                      v_zero.append(  RubySplatNode.s(val[vofs + 2] ))
                       result = new_parasgn( v_zero , ofs )
                     
     result
 end
 
-def _reduce_68(val, _values, result)
+def _reduce_68(val, vofs)
 		      # mlhs_basic: mlhs_head #   mlhs_head tSTAR
-                      # result = s(:masgn, val[0] << s(:splat))
-                      v_zero = val[0]
+                      # result = s(:masgn, val_[0] << s(:splat))
+                      v_zero = val[vofs ]
                       v_zero.append(  RubySplatNode.s( nil ))
-                      ofs = val[1].src_offset  #  of the tSTAR
+                      ofs = val[vofs + 1].src_offset  #  of the tSTAR
                       result = new_parasgn( v_zero, ofs )
                     
     result
 end
 
-def _reduce_69(val, _values, result)
+def _reduce_69(val, vofs)
 		      # mlhs_basic: mlhs_head #   tSTAR mlhs_node
-                      # result = s(:masgn, s(:array, s(:splat, val[1])))
-                      ofs = val[0].src_offset  #  of the tSTAR
-             result = new_parasgn( RubyArrayNode.s( RubySplatNode.s( val[1])), ofs )
+                      # result = s(:masgn, s(:array, s(:splat, val_[1])))
+                      ofs = val[vofs ].src_offset  #  of the tSTAR
+             result = new_parasgn( RubyArrayNode.s( RubySplatNode.s( val[vofs + 1])), ofs )
                     
     result
 end
 
-def _reduce_70(val, _values, result)
+def _reduce_70(val, vofs)
 		      # mlhs_basic: mlhs_head #  | tSTAR
                       # result = s(:masgn, s(:array, s(:splat)))
-                      ofs = val[0].src_offset  #  of the tSTAR
+                      ofs = val[vofs ].src_offset  #  of the tSTAR
                 result = new_parasgn( RubyArrayNode.s( RubySplatNode.s(nil)), ofs )
                     
     result
@@ -3448,203 +3452,206 @@ end
 
 # reduce 71 omitted
 
-def _reduce_72(val, _values, result)
+def _reduce_72(val, vofs)
 		      # mlhs_item: mlhs_node #  | tLPAREN mlhs_entry tRPAREN
-                      result = val[1]  # mlhs_item: mlhs_node ; tLPAREN mlhs_entry tRPAREN
+                      result = val[vofs + 1]  # mlhs_item: mlhs_node ; tLPAREN mlhs_entry tRPAREN
                     
     result
 end
 
-def _reduce_73(val, _values, result)
+def _reduce_73(val, vofs)
 		      # mlhs_head: mlhs_item tCOMMA
-                      # result = s(:array, val[0]) # mlhs_head: mlhs_item tCOMMA
-                      result = RubyArrayNode.s( val[0])
+                      # result = s(:array, val_[0]) # mlhs_head: mlhs_item tCOMMA
+                      result = RubyArrayNode.s( val[vofs ])
                     
     result
 end
 
-def _reduce_74(val, _values, result)
+def _reduce_74(val, vofs)
 		      # mlhs_head: mlhs_item tCOMMA #  | mlhs_head mlhs_item tCOMMA
-                      # result = val[0] << val[1].compact
-                      v_zero = val[0]
-                      v_zero.append( val[1] )
+                      # result = val_[0] << val_[1].compact
+                      v_zero = val[vofs ]
+                      v_zero.append( val[vofs + 1] )
                       result = v_zero
                     
     result
 end
 
-def _reduce_75(val, _values, result)
+def _reduce_75(val, vofs)
 		      # mlhs_node: variable
-                      result = self.assignable(val[0], nil)
+                      result = self.assignable(val[vofs ], nil)
                     
     result
 end
 
-def _reduce_76(val, _values, result)
+def _reduce_76(val, vofs)
 		      # mlhs_node: variable #  | primary_value tLBRACK_STR aref_args tRBRACK
-                      result = RubyAttrAssignNode.s(val[0], :"[]=", val[2] )
-                      result.src_offset=( val[3].src_offset )  # position of tRBRACK
+                      result = RubyAttrAssignNode.s(val[vofs ], :"[]=", val[vofs + 2] )
+                      result.src_offset=( val[vofs + 3].src_offset )  # position of tRBRACK
                     
     result
 end
 
-def _reduce_77(val, _values, result)
+def _reduce_77(val, vofs)
 		      # mlhs_node: variable #  | primary_value tDOT tIDENTIFIER
-                      # result = s(:attrasgn, val[0], :"#{val[2]}=", s(:arglist))
+                      # result = s(:attrasgn, val_[0], :"#{val_[2]}=", s(:arglist))
                       # the  tIDENTIFIER value will be a RpNameToken
                       #  all places where we send   symval   we expect a  RpNameToken
-            result = RubyAttrAssignNode.s_tk(val[0], val[2], nil )
+            result = RubyAttrAssignNode.s_tk(val[vofs ], val[vofs + 2], nil )
                     
     result
 end
 
-def _reduce_78(val, _values, result)
+def _reduce_78(val, vofs)
 		      # mlhs_node: variable #  | primary_value tCOLON2 tIDENTIFIER
-                      # result = s(:attrasgn, val[0], :"#{val[2]}=", s(:arglist))
+                      # result = s(:attrasgn, val_[0], :"#{val_[2]}=", s(:arglist))
                       # the  tIDENTIFIER value will be a RpNameToken
-           result = RubyAttrAssignNode.s_tk( val[0], val[2], nil )
+           result = RubyAttrAssignNode.s_tk( val[vofs ], val[vofs + 2], nil )
                     
     result
 end
 
-def _reduce_79(val, _values, result)
+def _reduce_79(val, vofs)
 		      # mlhs_node: variable #  | primary_value tDOT tCONSTANT
-                      # result = s(:attrasgn, val[0], :"#{val[2]}=", s(:arglist))
-           result = RubyAttrAssignNode.s_tk( val[0], val[2], nil)
+                      # result = s(:attrasgn, val_[0], :"#{val_[2]}=", s(:arglist))
+           result = RubyAttrAssignNode.s_tk( val[vofs ], val[vofs + 2], nil)
                     
     result
 end
 
-def _reduce_80(val, _values, result)
+def _reduce_80(val, vofs)
 		      # mlhs_node: variable #  | primary_value tCOLON2 tCONSTANT
                       if (@in_def || @in_single > 0) then
                         yyerror "dynamic constant assignment"
                       end
                     # all RubyColon2Node.s  expect second arg to be a RpNameToken
-                    #  result = s(:const, s(:colon2, val[0], val[2].to_sym), nil)
-     result = RubyConstDeclNode.s( RubyColon2Node.s( val[0], val[2]), nil)
+                    #  result = s(:const, s(:colon2, val_[0], val_[2].to_sym), nil)
+     result = RubyConstDeclNode.s( RubyColon2Node.s( val[vofs ], val[vofs + 2]), nil)
                     
     result
 end
 
-def _reduce_81(val, _values, result)
+def _reduce_81(val, vofs)
 		      # mlhs_node: variable #  | tCOLON3 tCONSTANT
                       if (@in_def || @in_single > 0) then
                         yyerror "dynamic constant assignment"
                       end
                       # all RubyColon3Node.s  expect second arg to be a RpNameToken
-                      # result = s(:const, nil, s(:colon3, val[1].to_sym))
-     result = RubyConstDeclNode.s( RubyColon3Node.s( val[1] ), nil )
+                      # result = s(:const, nil, s(:colon3, val_[1].to_sym))
+                   result = RubyConstDeclNode.s( RubyColon3Node.s( val[vofs + 1] ), nil )
                     
     result
 end
 
-def _reduce_82(val, _values, result)
+def _reduce_82(val, vofs)
 		      # mlhs_node: variable #  | backref
-                      self.backref_assign_error( val[0] ) # backref_assign_error MNU
+                      self.backref_assign_error( val[vofs ] ) 
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_83(val, _values, result)
+def _reduce_83(val, vofs)
 		      # lhs: variable
-                      result = self.assignable(val[0], nil)
+                      result = self.assignable(val[vofs ], nil)
                     
     result
 end
 
-def _reduce_84(val, _values, result)
+def _reduce_84(val, vofs)
 		      # lhs: variable #   | primary_value tLBRACK_STR aref_args tRBRACK
-                      result = RubyAttrAssignNode.s(val[0], :"[]=", val[2] )
-                      result.src_offset=( val[3].src_offset )  # position of tRBRACK
+                      result = RubyAttrAssignNode.s(val[vofs ], :"[]=", val[vofs + 2] )
+                      result.src_offset=( val[vofs + 3].src_offset )  # position of tRBRACK
                     
     result
 end
 
-def _reduce_85(val, _values, result)
+def _reduce_85(val, vofs)
 		      # lhs: variable #  | primary_value tDOT tIDENTIFIER
-                      # result = s(:attrasgn, val[0], :"#{val[2]}=")
+                      # result = s(:attrasgn, val_[0], :"#{val_[2]}=")
                       # the  tIDENTIFIER value will be a RpNameToken
-                      result = RubyAttrAssignNode.s_tk(val[0], val[2], nil)
+                      result = RubyAttrAssignNode.s_tk(val[vofs ], val[vofs + 2], nil)
                     
     result
 end
 
-def _reduce_86(val, _values, result)
+def _reduce_86(val, vofs)
 		      # lhs: variable #  | primary_value tCOLON2 tIDENTIFIER
-                      # result = s(:attrasgn, val[0], :"#{val[2]}=")
+                      # result = s(:attrasgn, val_[0], :"#{val_[2]}=")
                       # the  tIDENTIFIER value will be a RpNameToken
-		      result = RubyAttrAssignNode.s_tk(val[0], val[2], nil)
+		      result = RubyAttrAssignNode.s_tk(val[vofs ], val[vofs + 2], nil)
                     
     result
 end
 
-def _reduce_87(val, _values, result)
+def _reduce_87(val, vofs)
 		      # lhs: variable #  | primary_value tDOT tCONSTANT
-                      # result = s(:attrasgn, val[0], :"#{val[2]}=")
-                      result = RubyAttrAssignNode.s_tk( val[0], val[2], nil)
+                      # result = s(:attrasgn, val_[0], :"#{val_[2]}=")
+                      result = RubyAttrAssignNode.s_tk( val[vofs ], val[vofs + 2], nil)
                     
     result
 end
 
-def _reduce_88(val, _values, result)
+def _reduce_88(val, vofs)
 		      # lhs: variable #  | primary_value tCOLON2 tCONSTANT
                       if (@in_def || @in_single > 0) then
                         yyerror "dynamic constant assignment"
                       end
-                      # result = s(:const, s(:colon2, val[0], val[2].to_sym))
-       result = RubyConstDeclNode.s( RubyColon2Node.s( val[0], val[2]), nil)
+                      # result = s(:const, s(:colon2, val_[0], val_[2].to_sym))
+       result = RubyConstDeclNode.s( RubyColon2Node.s( val[vofs ], val[vofs + 2]), nil)
                     
     result
 end
 
-def _reduce_89(val, _values, result)
+def _reduce_89(val, vofs)
 		      # lhs: variable #  | tCOLON3 tCONSTANT
                       if (@in_def || @in_single > 0) then
                         yyerror "dynamic constant assignment"
                       end
 
-                      # result = s(:const, s(:colon3, val[1].to_sym))
-        result = RubyConstDeclNode.s( RubyColon3Node.s( val[1]), nil )
+                      # result = s(:const, s(:colon3, val_[1].to_sym))
+        result = RubyConstDeclNode.s( RubyColon3Node.s( val[vofs + 1]), nil )
                     
     result
 end
 
-def _reduce_90(val, _values, result)
+def _reduce_90(val, vofs)
 		      # lhs: variable #  | backref
-                      self.backref_assign_error( val[0] ) # MNU
+                      self.backref_assign_error( val[vofs ] ) 
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_91(val, _values, result)
+def _reduce_91(val, vofs)
 		      # cname: tIDENTIFIER
                       yyerror "class/module name must be CONSTANT"
+                      result = val[vofs]
                     
     result
 end
 
 # reduce 92 omitted
 
-def _reduce_93(val, _values, result)
+def _reduce_93(val, vofs)
 		      # cpath: tCOLON3 cname
-                      # result = s(:colon3, val[1].to_sym)
-                      result = RubyColon3Node.s( val[1] )
+                      # result = s(:colon3, val_[1].to_sym)
+                      result = RubyColon3Node.s( val[vofs + 1] )
                     
     result
 end
 
-def _reduce_94(val, _values, result)
+def _reduce_94(val, vofs)
 		      # cpath: tCOLON3 cname #   | cname  
-                      result = val[0]  # a RpNameToken
+                      result = val[vofs ]  # a RpNameToken
                     
     result
 end
 
-def _reduce_95(val, _values, result)
+def _reduce_95(val, vofs)
 		      #  cpath: tCOLON3 cname #   | primary_value tCOLON2 cname
-                      # result = s(:colon2, val[0], val[2].to_sym)
-                      result =  RubyColon2Node.s( val[0], val[2] )
+                      # result = s(:colon2, val_[0], val_[2].to_sym)
+                      result =  RubyColon2Node.s( val[vofs ], val[vofs + 2] )
                     
     result
 end
@@ -3655,26 +3662,26 @@ end
 
 # reduce 98 omitted
 
-def _reduce_99(val, _values, result)
+def _reduce_99(val, vofs)
 		      # fname: tIDENTIFIER | tCONSTANT | tFID #  | op
                       @lexer.lex_state=( RubyLexer::Expr_end )
-                      result = val[0]   # val[0] is a RpNameToken
+                      result = val[vofs ]   # val_[0] is a RpNameToken
                     
     result
 end
 
-def _reduce_100(val, _values, result)
+def _reduce_100(val, vofs)
 		      # fname: tIDENTIFIER | tCONSTANT | tFID #  | reswords
                       @lexer.lex_state=( RubyLexer::Expr_end )
-                      result = val[0]  # val[0] is a RpNameToken or a String
+                      result = val[vofs ]  # val_[0] is a RpNameToken or a String
                     
     result
 end
 
-def _reduce_101(val, _values, result)
+def _reduce_101(val, vofs)
                            # TODO: cruby has fsym and dsym
 		      # fitem: fname
-                      v_zero = val[0]  # a RpNameToken
+                      v_zero = val[vofs ]  # a RpNameToken
 		      result = RubySymbolNode.s( v_zero.symval)  # s(:lit)
                       result.src_offset=( v_zero.src_offset )
                       # fitem - fname path
@@ -3682,33 +3689,33 @@ def _reduce_101(val, _values, result)
     result
 end
 
-def _reduce_102(val, _values, result)
+def _reduce_102(val, vofs)
 		       #  fitem: fname #    | symbol 
-		       result = RubySymbolNode.s( val[0])  # s(:lit)
+		       result = RubySymbolNode.s( val[vofs ])  # s(:lit)
 			# fitem - symbol path 
                     
     result
 end
 
-def _reduce_103(val, _values, result)
+def _reduce_103(val, vofs)
 		      # undef_list: fitem
-                      v_zero = val[0]   # a RubySymbolNode
-                      result = new_undef( v_zero )
-                      result.src_offset=( v_zero.srcOffset )
+                      vsym = val[vofs ]   # a RubySymbolNode
+                      result = new_undef( vsym )
+                      result.src_offset=( val[ vofs - 1 ].src_offset ) # of the kUNDEF
                     
     result
 end
 
-def _reduce_104(val, _values, result)
+def _reduce_104(val, vofs)
 		      # undef_list: fitem #  | undef_list tCOMMA
                       @lexer.lex_state=( RubyLexer::Expr_fname )
                     
     result
 end
 
-def _reduce_105(val, _values, result)
+def _reduce_105(val, vofs)
 		      # undef_list: fitem #   fitem
-                      result = append_undef( val[0], val[3] )
+                      result = append_undef( val[vofs ], val[vofs + 3] )
                     
     result
 end
@@ -3847,436 +3854,430 @@ end
 
 # reduce 172 omitted
 
-def _reduce_173(val, _values, result)
+def _reduce_173(val, vofs)
 		      #  arg: lhs tEQL arg
-                      result = self.node_assign(val[0], val[2])
+                      result = self.node_assign(val[vofs ], val[vofs + 2])
                     
     result
 end
 
-def _reduce_174(val, _values, result)
+def _reduce_174(val, vofs)
 		      # | lhs tEQL arg kRESCUE_MOD arg
-         # result = self.node_assign(val[0], s(:rescue, val[2], s(:resbody, s(:array), val[4])) )
-                      resbody = RubyRescueBodyNode.s(nil, val[4])
-                      resbody.src_offset=( val[3].src_offset )   # kRESCUE_MOD position
-                      rescue_nod = RubyRescueNode.s( val[2], resbody, nil)
-                      rescue_nod.src_offset=( val[1].src_offset )   # tEQL position
-                      result = self.node_assign(val[0], rescue_node )
+         # result = self.node_assign(val_[0], s(:rescue, val_[2], s(:resbody, s(:array), val_[4])) )
+                      resbody = RubyRescueBodyNode.s(nil, val[vofs + 4])
+                      resbody.src_offset=( val[vofs + 3].src_offset )   # kRESCUE_MOD position
+                      rescue_nod = RubyRescueNode.s( val[vofs + 2], resbody, nil)
+                      rescue_nod.src_offset=( val[vofs + 1].src_offset )   # tEQL position
+                      result = self.node_assign(val[vofs ], rescue_node )
                     
     result
 end
 
-def _reduce_175(val, _values, result)
+def _reduce_175(val, vofs)
 		      # | var_lhs tOP_ASGN arg
-                      result = new_op_asgn( val)
+                      result = new_op_asgn( val, vofs )
                     
     result
 end
 
-def _reduce_176(val, _values, result)
+def _reduce_176(val, vofs)
 		      # | primary_value tLBRACK_STR aref_args tRBRACK tOP_ASGN arg
-                      v_two = val[2]
+                      v_two = val[vofs + 2]
                       unless v_two.class.equal?(RubyRpCallArgs) ; 
                         raise_error('aref_args is not a RubyRpCallArgs')
                       end
-                      result = RubyOpElementAsgnNode.s(val[0], v_two, val[4], val[5])
+                      result = RubyOpElementAsgnNode.s(val[vofs ], v_two, val[vofs + 4], val[vofs + 5])
                     
     result
 end
 
-def _reduce_177(val, _values, result)
+def _reduce_177(val, vofs)
 		      # | primary_value tDOT tIDENTIFIER tOP_ASGN arg
-                      # result = s(:op_asgn2, val[0], :"#{val[2]}=", val[3].to_sym, val[4])
-                      # val[2], val[3] are RpNameToken
-                     result = RubyOpAsgnNode.s(val[0], val[2], val[3], val[4])
+                      # result = s(:op_asgn2, val_[0], :"#{val_[2]}=", val_[3].to_sym, val_[4])
+                      # val_[2], val_[3] are RpNameToken
+                     result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
                     
     result
 end
 
-def _reduce_178(val, _values, result)
+def _reduce_178(val, vofs)
 		     # | primary_value tDOT tCONSTANT tOP_ASGN arg
-                     # result = s(:op_asgn2, val[0], :"#{val[2]}=", val[3].to_sym, val[4])
-                     # val[2], val[3] are RpNameToken
-	             result = RubyOpAsgnNode.s(val[0], val[2], val[3], val[4])
+                     # result = s(:op_asgn2, val_[0], :"#{val_[2]}=", val_[3].to_sym, val_[4])
+                     # val_[2], val_[3] are RpNameToken
+	             result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
                     
     result
 end
 
-def _reduce_179(val, _values, result)
+def _reduce_179(val, vofs)
 		      # | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
                       raise_error(":op_asgn never seen from MRI parser ")
-                      # result = s(:op_asgn, val[0], val[4], val[2], val[3])
+                      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
                       result = nil
                     
     result
 end
 
-def _reduce_180(val, _values, result)
+def _reduce_180(val, vofs)
 		      # | primary_value tCOLON2 tCONSTANT tOP_ASGN ar
                       yyerror "constant re-assignment"
                     
     result
 end
 
-def _reduce_181(val, _values, result)
+def _reduce_181(val, vofs)
 		      # | tCOLON3 tCONSTANT tOP_ASGN arg
                       yyerror "constant re-assignment"
                     
     result
 end
 
-def _reduce_182(val, _values, result)
+def _reduce_182(val, vofs)
 		      # | backref tOP_ASGN arg
-                      self.backref_assign_error( val[0])  # MNU
+                      self.backref_assign_error( val[vofs ])  
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_183(val, _values, result)
+def _reduce_183(val, vofs)
 		      # ! arg tDOT2 arg
-                      v1 = val[0]
-                      v2 = val[2]
+                      v1 = val[vofs ]
+                      v2 = val[vofs + 2]
                       result = RubyDotNode.s(:dot2, v1, v2)
                     
     result
 end
 
-def _reduce_184(val, _values, result)
+def _reduce_184(val, vofs)
 		      # | arg tDOT3 arg
-                      v1 = val[0]
-                      v2 = val[2]
+                      v1 = val[vofs ]
+                      v2 = val[vofs + 2]
                       result = RubyDotNode.s(:dot3, v1, v2)
                     
     result
 end
 
-def _reduce_185(val, _values, result)
+def _reduce_185(val, vofs)
 		      # | arg tPLUS arg
-                      result = new_call_1(val[0], val[1],  val[2]  ) 
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2]  ) 
                     
     result
 end
 
-def _reduce_186(val, _values, result)
+def _reduce_186(val, vofs)
 		      # | arg tMINUS arg
-                      result = new_call_1(val[0], val[1],  val[2]  )
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2]  )
                     
     result
 end
 
-def _reduce_187(val, _values, result)
+def _reduce_187(val, vofs)
 		      # | arg tSTAR2 arg
-                      result = new_call_1(val[0], val[1], val[2]  )
+                      result = new_call_1(val[vofs ], val[vofs + 1], val[vofs + 2]  )
                     
     result
 end
 
-def _reduce_188(val, _values, result)
+def _reduce_188(val, vofs)
 		      # | arg tDIVIDE arg
-                      result = new_call_1( val[0], val[1], val[2] )  # tDIVIDE_a
+                      result = new_call_1( val[vofs ], val[vofs + 1], val[vofs + 2] )  # tDIVIDE_a
                     
     result
 end
 
-def _reduce_189(val, _values, result)
+def _reduce_189(val, vofs)
 		      # | arg tPERCENT arg
-                      result = new_call_1(val[0], val[1] , val[2] )  # tPERCENT_a
+                      result = new_call_1(val[vofs ], val[vofs + 1] , val[vofs + 2] )  # tPERCENT_a
                     
     result
 end
 
-def _reduce_190(val, _values, result)
+def _reduce_190(val, vofs)
 		      # | arg tPOW arg
-                      result = new_call_1(val[0], val[1], val[2] ) # tPOW_a
+                      result = new_call_1(val[vofs ], val[vofs + 1], val[vofs + 2] ) # tPOW_a
                     
     result
 end
 
-def _reduce_191(val, _values, result)
+def _reduce_191(val, vofs)
 		      # | tUMINUS_NUM tINTEGER tPOW arg
-                      lit_one =  RubyAbstractNumberNode.s( val[1])  # s(:lit )
-                      pow_sel = val[2]
+                      lit_one =  RubyAbstractNumberNode.s( val[vofs + 1])  # s(:lit )
+                      pow_sel = val[vofs + 2]
                       minus_sel = RpNameToken.new( :"-@" , pow_sel.src_offset )
-                      result = new_vcall( new_call_1( lit_one, pow_sel, val[3] ), minus_sel )
+                      result = new_vcall( new_call_1( lit_one, pow_sel, val[vofs + 3] ), minus_sel )
                     
     result
 end
 
-def _reduce_192(val, _values, result)
+def _reduce_192(val, vofs)
 		      # | tUMINUS_NUM tFLOAT tPOW arg
-                      lit_one = RubyAbstractNumberNode.s( val[1])  # s(:lit )
-                      pow_sel = val[2]
+                      lit_one = RubyAbstractNumberNode.s( val[vofs + 1])  # s(:lit )
+                      pow_sel = val[vofs + 2]
                       minus_sel = RpNameToken.new( :"-@" , pow_sel.src_offset )
-                      result = new_vcall(new_call_1( lit_one, pow_sel, val[3] ), minus_sel )
+                      result = new_vcall(new_call_1( lit_one, pow_sel, val[vofs + 3] ), minus_sel )
                     
     result
 end
 
-def _reduce_193(val, _values, result)
+def _reduce_193(val, vofs)
 		      # | tUPLUS arg
-                      v_one = val[1]
-                      if v_one.kind_of(RubyAbstractLiteralNode) # val[1][0] == :lit 
+                      v_one = val[vofs + 1]
+                      if v_one.kind_of(RubyAbstractLiteralNode) # val_[1][0] == :lit 
                         result = v_one
                       else
-                        sel_tok = RpNameToken.new( :"+@" , val[0].src_offset )
+                        sel_tok = RpNameToken.new( :"+@" , val[vofs ].src_offset )
                         result = new_vcall( v_one, sel_tok )
                       end
                     
     result
 end
 
-def _reduce_194(val, _values, result)
+def _reduce_194(val, vofs)
 		      #  | tUMINUS arg
-                      sel_tok = RpNameToken.new( :"-@" , val[0].src_offset )
-                      result = new_vcall( val[1], sel_tok )
+                      sel_tok = RpNameToken.new( :"-@" , val[vofs ].src_offset )
+                      result = new_vcall( val[vofs + 1], sel_tok )
                     
     result
 end
 
-def _reduce_195(val, _values, result)
+def _reduce_195(val, vofs)
 		      # | arg tPIPE arg
-                      result = new_call_1( val[0], val[1],  val[2] )
+                      result = new_call_1( val[vofs ], val[vofs + 1],  val[vofs + 2] )
                     
     result
 end
 
-def _reduce_196(val, _values, result)
+def _reduce_196(val, vofs)
 		      # | arg tCARET arg
-                      result = new_call_1(val[0], val[1],  val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2] )
                     
     result
 end
 
-def _reduce_197(val, _values, result)
+def _reduce_197(val, vofs)
 		      # | arg tAMPER2 arg
-                      result = new_call_1(val[0], val[1],  val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2] )
                     
     result
 end
 
-def _reduce_198(val, _values, result)
+def _reduce_198(val, vofs)
 		      # | arg tCMP arg
-                      result = new_call_1(val[0], val[1], val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1], val[vofs + 2] )
                     
     result
 end
 
-def _reduce_199(val, _values, result)
+def _reduce_199(val, vofs)
 		      # | arg tGT arg
-                      result = new_call_1(val[0], val[1], val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1], val[vofs + 2] )
                     
     result
 end
 
-def _reduce_200(val, _values, result)
+def _reduce_200(val, vofs)
 		      # | arg tGEQ arg
-                      result = new_call_1(val[0], val[1], val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1], val[vofs + 2] )
                     
     result
 end
 
-def _reduce_201(val, _values, result)
+def _reduce_201(val, vofs)
 		      # | arg tLT arg
-                      result = new_call_1(val[0], val[1],  val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2] )
                     
     result
 end
 
-def _reduce_202(val, _values, result)
+def _reduce_202(val, vofs)
 		      # | arg tLEQ arg
-                      result = new_call_1(val[0], val[1],  val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2] )
                     
     result
 end
 
-def _reduce_203(val, _values, result)
+def _reduce_203(val, vofs)
 		      # | arg tEQ arg
-                      result = new_call_1(val[0], val[1], val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1], val[vofs + 2] )
                     
     result
 end
 
-def _reduce_204(val, _values, result)
+def _reduce_204(val, vofs)
 		      # | arg tEQQ arg
-                      result = new_call_1(val[0], val[1],  val[2] )
+                      result = new_call_1(val[vofs ], val[vofs + 1],  val[vofs + 2] )
                     
     result
 end
 
-def _reduce_205(val, _values, result)
+def _reduce_205(val, vofs)
 		      # | arg tNEQ arg
 					# TODOryan: port call_op and clean these
-                      v_zero = value_expr(val[0] )   # val[1] is RpNameToken for tNEQ
-                      val[0] = v_zero
-                      v_two = value_expr( val[2])
-                      val[2] = v_two
-                      sel_tok = RpNameToken.new( :"==" , val[1].src_offset ) 
+                      v_zero = value_expr(val[vofs ] ) 
+                      v_two = value_expr( val[vofs + 2])
+                      sel_tok = RpNameToken.new( :"==" , val[vofs + 1].src_offset ) 
                       result = RubyNotNode.s( new_call_1(v_zero, sel_tok,  v_two ) ) # s(:not )
                     
     result
 end
 
-def _reduce_206(val, _values, result)
+def _reduce_206(val, vofs)
 		      # | arg tMATCH arg
-                      result = self.get_match_node( val[0], val[1], val[2] )
+                      result = self.get_match_node( val[vofs ], val[vofs + 1], val[vofs + 2] )
                     
     result
 end
 
-def _reduce_207(val, _values, result)
+def _reduce_207(val, vofs)
 		      # | arg tNMATCH arg
-                      result = RubyNotNode.s( self.get_match_node(val[0], val[1], val[2])) # s(:not )
+                      result = RubyNotNode.s( self.get_match_node(val[vofs ], val[vofs + 1], val[vofs + 2])) # s(:not )
                     
     result
 end
 
-def _reduce_208(val, _values, result)
+def _reduce_208(val, vofs)
 		      # | tBANG arg
-                      result = RubyNotNode.s( val[1]) # s(:not )
+                      result = RubyNotNode.s( val[vofs + 1]) # s(:not )
                     
     result
 end
 
-def _reduce_209(val, _values, result)
-		      # | tTILDE arg           # val[0] already a NameToken
-                      # val[2] = value_expr( val[2]) # TODO ask ryan , why ??
-                      # result = new_call val[1], :"~", s(:arglist)
-                      v_one = value_expr( val[1] )
-                      val[1] = v_one
-                      result = new_vcall( v_one, val[0] )
+def _reduce_209(val, vofs)
+		      # | tTILDE arg           # val_[0] already a NameToken
+                      # val_[2] = value_expr( val[2]) # TODO ask ryan , why ??
+                      # result = new_call val_[1], :"~", s(:arglist)
+                      v_one = value_expr( val[vofs + 1] )
+                      result = new_vcall( v_one, val[vofs ] )
                     
     result
 end
 
-def _reduce_210(val, _values, result)
+def _reduce_210(val, vofs)
 		      # | arg tLSHFT arg
-                      v_zero = value_expr( val[0])
-                      val[0] = v_zero
-	              v_two = value_expr( val[2])
-                      val[2] = v_two
-                      result = new_call_1(v_zero, val[1],  v_two  )
+                      v_zero = value_expr( val[vofs ])
+	              v_two = value_expr( val[vofs + 2])
+                      result = new_call_1(v_zero, val[vofs + 1],  v_two  )
                     
     result
 end
 
-def _reduce_211(val, _values, result)
+def _reduce_211(val, vofs)
 		      # | arg tRSHFT arg
-                      v_zero = value_expr( val[0])
-                      val[0] = v_zero
-                      v_two = value_expr( val[2])
-                      val[2] = v_two
-                      result = new_call_1(v_zero , val[1],  v_two )
+                      v_zero = value_expr( val[vofs ])
+                      v_two = value_expr( val[vofs + 2])
+                      result = new_call_1(v_zero , val[vofs + 1],  v_two )
                     
     result
 end
 
-def _reduce_212(val, _values, result)
+def _reduce_212(val, vofs)
 		      # | arg tANDOP arg
-                      result = logop( RubyAndNode, val[0], val[2]) # s(:and )
+                      result = logop( RubyAndNode, val[vofs ], val[vofs + 2]) # s(:and )
                     
     result
 end
 
-def _reduce_213(val, _values, result)
+def _reduce_213(val, vofs)
 		      # | arg tOROP arg
-                      result = logop( RubyOrNode, val[0], val[2]) # s(:or )
+                      result = logop( RubyOrNode, val[vofs ], val[vofs + 2]) # s(:or )
                     
     result
 end
 
-def _reduce_214(val, _values, result)
+def _reduce_214(val, vofs)
 		      # | kDEFINED opt_nl arg
-                      result = RubyDefinedNode.s( val[2])  # s(:defined )
+                      result = RubyDefinedNode.s( val[vofs + 2])  # s(:defined )
                     
     result
 end
 
-def _reduce_215(val, _values, result)
+def _reduce_215(val, vofs)
 		      # | arg tEH arg tCOLON arg
-                      result = RubyIfNode.s(val[0], val[2], val[4]) # s(:if )
+                      result = RubyIfNode.s(val[vofs ], val[vofs + 2], val[vofs + 4]) # s(:if )
                     
     result
 end
 
 # reduce 216 omitted
 
-def _reduce_217(val, _values, result)
+def _reduce_217(val, vofs)
 		      # arg_value: arg
-                      result = value_expr(val[0])
+                      result = value_expr(val[vofs ])
                     
     result
 end
 
 # reduce 218 omitted
 
-def _reduce_219(val, _values, result)
+def _reduce_219(val, vofs)
 		      #  | command opt_nl
                       warning 'parenthesize argument(s) for future version'
-                      # result = s(:array, val[0])
-                      result = RubyRpCallArgs.s( val[0])
+                      # result = s(:array, val_[0])
+                      result = RubyRpCallArgs.s( val[vofs ])
                     
     result
 end
 
-def _reduce_220(val, _values, result)
+def _reduce_220(val, vofs)
 		      # | args trailer
-                      result = val[0]
+                      result = val[vofs ]
                     
     result
 end
 
-def _reduce_221(val, _values, result)
+def _reduce_221(val, vofs)
 		      #  | args tCOMMA tSTAR arg opt_nl
-                      result = val[0]
-                      result.append( RubySplatNode.s( val[3] ))
+                      result = val[vofs ]
+                      result.append( RubySplatNode.s( val[vofs + 3] ))
                     
     result
 end
 
-def _reduce_222(val, _values, result)
+def _reduce_222(val, vofs)
 		      #  | assocs trailer
-                      # result = s(:array, s(:hash, *val[0].values))
-                      result = RubyRpCallArgs.s( RubyHashNode.s( val[0] ))
+                      # result = s(:array, s(:hash, *val_[0].values))
+                      result = RubyRpCallArgs.s( RubyHashNode.s( val[vofs ] ))
                     
     result
 end
 
-def _reduce_223(val, _values, result)
+def _reduce_223(val, vofs)
 		      #  | tSTAR arg opt_nl
-                      # result = s(:array, s(:splat, val[1]))
-                     result = RubyRpCallArgs.s( RubySplatNode.s( val[1])) 
+                      # result = s(:array, s(:splat, val_[1]))
+                     result = RubyRpCallArgs.s( RubySplatNode.s( val[vofs + 1])) 
                     
     result
 end
 
-def _reduce_224(val, _values, result)
+def _reduce_224(val, vofs)
 		      #  paren_args: tLPAREN2 none tRPAREN
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_225(val, _values, result)
+def _reduce_225(val, vofs)
 		      #  | tLPAREN2 call_args opt_nl tRPAREN
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_226(val, _values, result)
+def _reduce_226(val, vofs)
 		      #  | tLPAREN2 block_call opt_nl tRPAREN
                       warning "parenthesize argument(s) for future version"
-                      # result = s(:array, val[1])
-                      result = RubyRpCallArgs.s( val[1])
+                      # result = s(:array, val_[1])
+                      result = RubyRpCallArgs.s( val[vofs + 1])
                     
     result
 end
 
-def _reduce_227(val, _values, result)
+def _reduce_227(val, vofs)
 		      # | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN
                       warning "parenthesize argument(s) for future version"
-                      # result = val[1].add val[3]
-                      result = val[1].append(  val[3] )
+                      # result = val_[1].add val_[3]
+                      result = val[vofs + 1].append(  val[vofs + 3] )
                     
     result
 end
@@ -4285,185 +4286,185 @@ end
 
 # reduce 229 omitted
 
-def _reduce_230(val, _values, result)
+def _reduce_230(val, vofs)
 		      # call_args: command
                       warning "parenthesize argument(s) for future version"
-                      # result = s(:array, val[0])
-                      result = RubyRpCallArgs.s( val[0])
+                      # result = s(:array, val_[0])
+                      result = RubyRpCallArgs.s( val[vofs ])
                     
     result
 end
 
-def _reduce_231(val, _values, result)
+def _reduce_231(val, vofs)
 		      #  | args opt_block_arg
-                      result = val[0]  # should be a RubyRpCallArgs
-                      result.append_blk_arg( val[1])
+                      result = val[vofs ]  # should be a RubyRpCallArgs
+                      result.append_blk_arg( val[vofs + 1])
                     
     result
 end
 
-def _reduce_232(val, _values, result)
+def _reduce_232(val, vofs)
 		      #  | args tCOMMA tSTAR arg_value opt_block_arg
-                      result = val[0]  # should be a RubyRpCallArgs
-                      result.append_arg( RubySplatNode.s( val[3]) )
-                      result.append_blk_arg( val[4])
+                      result = val[vofs ]  # should be a RubyRpCallArgs
+                      result.append_arg( RubySplatNode.s( val[vofs + 3]) )
+                      result.append_blk_arg( val[vofs + 4])
                     
     result
 end
 
-def _reduce_233(val, _values, result)
+def _reduce_233(val, vofs)
 		      #  | assocs opt_block_arg
-                      # result = s(:array, s(:hash, *val[0].values))
-                      result = RubyRpCallArgs.s( RubyHashNode.s( val[0] ))
-                      result.append_blk_arg( val[1] )
+                      # result = s(:array, s(:hash, *val_[0].values))
+                      result = RubyRpCallArgs.s( RubyHashNode.s( val[vofs ] ))
+                      result.append_blk_arg( val[vofs + 1] )
                     
     result
 end
 
-def _reduce_234(val, _values, result)
+def _reduce_234(val, vofs)
 		      #  ! assocs tCOMMA tSTAR arg_value opt_block_arg
-                      # result = self.arg_concat s(:array, s(:hash, *val[0].values)), val[3]
-                      result = RubyRpCallArgs.s( RubyHashNode.s( val[0]) )
-                      result.append_arg( RubySplatNode.s( val[3] ) )
-                      result.append_blk_arg( val[4] )
+                      # result = self.arg_concat s(:array, s(:hash, *val_[0].values)), val_[3]
+                      result = RubyRpCallArgs.s( RubyHashNode.s( val[vofs ]) )
+                      result.append_arg( RubySplatNode.s( val[vofs + 3] ) )
+                      result.append_blk_arg( val[vofs + 4] )
                     
     result
 end
 
-def _reduce_235(val, _values, result)
+def _reduce_235(val, vofs)
 		      #  | args tCOMMA assocs opt_block_arg
-                      # result = val[0] << s(:hash, *val[2].values)
-                      result = val[0]
-                      result.append_arg( RubyHashNode.s( val[2] ))
-                      result.append_blk_arg( val[3])
+                      # result = val_[0] << s(:hash, *val_[2].values)
+                      result = val[vofs ]
+                      result.append_arg( RubyHashNode.s( val[vofs + 2] ))
+                      result.append_blk_arg( val[vofs + 3])
                     
     result
 end
 
-def _reduce_236(val, _values, result)
+def _reduce_236(val, vofs)
 		      #  | args tCOMMA assocs tCOMMA tSTAR arg opt_block_arg
-                      # val[0] << s(:hash, *val[2].values)
-                      result = val[0]
-                      result.append_arg( RubyHashNode.s( val[2] ))
-                      result.append_arg( RubySplatNode.s( val[5] ))
-                      result.append_blk_arg( val[6])
+                      # val_[0] << s(:hash, *val_[2].values)
+                      result = val[vofs ]
+                      result.append_arg( RubyHashNode.s( val[vofs + 2] ))
+                      result.append_arg( RubySplatNode.s( val[vofs + 5] ))
+                      result.append_blk_arg( val[vofs + 6])
                     
     result
 end
 
-def _reduce_237(val, _values, result)
+def _reduce_237(val, vofs)
 		      #  | tSTAR arg_value opt_block_arg
-                      # result = self.arg_blk_pass s(:splat, val[1]), val[2]
-                      result = RubyRpCallArgs.s( RubySplatNode.s( val[1]))
-                      result.append_blk_arg( val[2] )
+                      # result = self.arg_blk_pass s(:splat, val_[1]), val_[2]
+                      result = RubyRpCallArgs.s( RubySplatNode.s( val[vofs + 1]))
+                      result.append_blk_arg( val[vofs + 2] )
                     
     result
 end
 
 # reduce 238 omitted
 
-def _reduce_239(val, _values, result)
+def _reduce_239(val, vofs)
 		      #  call_args2: arg_value tCOMMA args opt_block_arg
-                      args = self.list_prepend( val[2], val[0] )
-                      result = args.append_blk_arg( val[3] )
+                      args = self.list_prepend( val[vofs + 2], val[vofs ] )
+                      result = args.append_blk_arg( val[vofs + 3] )
                     
     result
 end
 
-def _reduce_240(val, _values, result)
+def _reduce_240(val, vofs)
 		      #  | arg_value tCOMMA block_arg
-                      result = RubyRpCallArgs.s( val[0])
-                      result.append_blk_arg( val[2])
+                      result = RubyRpCallArgs.s( val[vofs ])
+                      result.append_blk_arg( val[vofs + 2])
                     
     result
 end
 
-def _reduce_241(val, _values, result)
+def _reduce_241(val, vofs)
 		      #  | arg_value tCOMMA tSTAR arg_value opt_block_arg
-                      result = RubyRpCallArgs.s( val[0])
-                      result.append_arg( RubySplatNode.s( val[3] ))
-                      result.append_blk_arg( val[4] )
+                      result = RubyRpCallArgs.s( val[vofs ])
+                      result.append_arg( RubySplatNode.s( val[vofs + 3] ))
+                      result.append_blk_arg( val[vofs + 4] )
                     
     result
 end
 
-def _reduce_242(val, _values, result)
+def _reduce_242(val, vofs)
 		      #  ! arg_value tCOMMA args tCOMMA tSTAR arg_value opt_block_arg
-                      #result = self.arg_concat s(:array, val[0], s(:hash, *val[2].values)), val[5]
-                      result = RubyRpCallArgs.s(val[0], RubyHashNode.s( val[2]) )
-                      result.append_arg( val[5])
-                      result.append_blk_arg( val[6] )
+                      #result = self.arg_concat s(:array, val_[0], s(:hash, *val_[2].values)), val_[5]
+                      result = RubyRpCallArgs.s(val[vofs ], RubyHashNode.s( val[vofs + 2]) )
+                      result.append_arg( val[vofs + 5])
+                      result.append_blk_arg( val[vofs + 6] )
                     
     result
 end
 
-def _reduce_243(val, _values, result)
+def _reduce_243(val, vofs)
 		      #  | assocs opt_block_arg
-                      # result = s(:array, s(:hash, *val[0].values))
-                      result = RubyRpCallArgs.s( RubyHashNode.s( val[0] ))
-                      result.append_blk_arg( val[1])
+                      # result = s(:array, s(:hash, *val_[0].values))
+                      result = RubyRpCallArgs.s( RubyHashNode.s( val[vofs ] ))
+                      result.append_blk_arg( val[vofs + 1])
                     
     result
 end
 
-def _reduce_244(val, _values, result)
+def _reduce_244(val, vofs)
 		      #  ! assocs tCOMMA tSTAR arg_value opt_block_arg
-                      result = RubyRpCallArgs.s( RubyHashNode.s( val[0]), RubySplatNode.s(val[3]) )
-                      result.append_blk_arg( val[4] )
+                      result = RubyRpCallArgs.s( RubyHashNode.s( val[vofs ]), RubySplatNode.s(val[vofs + 3]) )
+                      result.append_blk_arg( val[vofs + 4] )
                     
     result
 end
 
-def _reduce_245(val, _values, result)
+def _reduce_245(val, vofs)
 		      #  | arg_value tCOMMA assocs opt_block_arg
-                      # result = s(:array, val[0], s(:hash, *val[2].values))
-                      result = RubyRpCallArgs.s( val[0], RubyHashNode.s( val[2]))
-                      result.append_blk_arg( val[3] )
+                      # result = s(:array, val_[0], s(:hash, *val_[2].values))
+                      result = RubyRpCallArgs.s( val[vofs ], RubyHashNode.s( val[vofs + 2]))
+                      result.append_blk_arg( val[vofs + 3] )
                     
     result
 end
 
-def _reduce_246(val, _values, result)
+def _reduce_246(val, vofs)
 		      #  | arg_value tCOMMA args tCOMMA assocs opt_block_arg
-                      result = RubyRpCallArgs.s( val[0] )
-                      result.appendAll( val[2] ) 
-                      result.append_arg( RubyHashNode.s( val[4] ))
-                      result.append_blk_arg( val[5] )
+                      result = RubyRpCallArgs.s( val[vofs ] )
+                      result.appendAll( val[vofs + 2] ) 
+                      result.append_arg( RubyHashNode.s( val[vofs + 4] ))
+                      result.append_blk_arg( val[vofs + 5] )
                     
     result
 end
 
-def _reduce_247(val, _values, result)
+def _reduce_247(val, vofs)
 		      #  | arg_value tCOMMA assocs tCOMMA tSTAR arg_value opt_block_arg
-                      result = RubyRpCallArgs.s( val[0] , RubyHashNode.s( val[2] ))
-                      result.append_arg( RubySplatNode.s( val[5] ))
-                      result.append_blk_arg( val[6] )
+                      result = RubyRpCallArgs.s( val[vofs ] , RubyHashNode.s( val[vofs + 2] ))
+                      result.append_arg( RubySplatNode.s( val[vofs + 5] ))
+                      result.append_blk_arg( val[vofs + 6] )
                     
     result
 end
 
-def _reduce_248(val, _values, result)
+def _reduce_248(val, vofs)
 		      #  | arg_value tCOMMA args tCOMMA assocs tCOMMA tSTAR arg_value opt_block_arg
-                      result = RubyRpCallArgs.s( val[0] )
-                      result.appendAll( val[2] )  
-                      result.append_arg( RubyHashNode.s( val[4] ))
-                      result.append_arg( RubySplatNode.s( val[7]))
-                      result.append_blk_arg( val[8])
+                      result = RubyRpCallArgs.s( val[vofs ] )
+                      result.appendAll( val[vofs + 2] )  
+                      result.append_arg( RubyHashNode.s( val[vofs + 4] ))
+                      result.append_arg( RubySplatNode.s( val[vofs + 7]))
+                      result.append_blk_arg( val[vofs + 8])
                     
     result
 end
 
-def _reduce_249(val, _values, result)
+def _reduce_249(val, vofs)
 		      #  | tSTAR arg_value opt_block_arg
-                      result = RubyRpCallArgs.s( RubySplatNode.s( val[1]))
-                      result.result.append_blk_arg( val[2] )
+                      result = RubyRpCallArgs.s( RubySplatNode.s( val[vofs + 1]))
+                      result.result.append_blk_arg( val[vofs + 2] )
                     
     result
 end
 
 # reduce 250 omitted
 
-def _reduce_251(val, _values, result)
+def _reduce_251(val, vofs)
 		      #  command_args:
 		      lex_cmdarg = @lexer.cmdarg_ 
                       result = lex_cmdarg.dup
@@ -4472,25 +4473,26 @@ def _reduce_251(val, _values, result)
     result
 end
 
-def _reduce_252(val, _values, result)
+def _reduce_252(val, vofs)
 		      #  open_args
-                      # @lexer.cmdarg_.stack.replace( val[0] )
-                      @lexer.cmdarg=( val[0].dup  )
-                      result = val[1]
+                      # @lexer.cmdarg_.stack.replace( val_[0] )
+                      @lexer.cmdarg=( val[vofs ].dup  )
+                      result = val[vofs + 1]
                     
     result
 end
 
 # reduce 253 omitted
 
-def _reduce_254(val, _values, result)
+def _reduce_254(val, vofs)
 		      # open_args: call_args #   | tLPAREN_ARG
                       @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_255(val, _values, result)
+def _reduce_255(val, vofs)
 		      # open_args: call_args #   tRPAREN 
                       msg = "don't put space before argument parentheses"
                       if @mydebug ; msg << " (B)" ; end 
@@ -4500,75 +4502,76 @@ def _reduce_255(val, _values, result)
     result
 end
 
-def _reduce_256(val, _values, result)
+def _reduce_256(val, vofs)
 		      #  | tLPAREN_ARG call_args2
                       @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_257(val, _values, result)
+def _reduce_257(val, vofs)
 		      #  | tLPAREN_ARG call_args2
 		      #    tRPAREN
-                      warning "don't put space before argument parentheses"
+                      msg = "don't put space before argument parentheses"
                       if @mydebug ; msg << " (C)" ; end 
                       warning(msg)
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_258(val, _values, result)
+def _reduce_258(val, vofs)
 		      # block_arg: tAMPER arg_value
-                      # result = s(:block_pass, val[1])
-                      result = RubyBlockPassNode.s(val[1])
+                      # result = s(:block_pass, val_[1])
+                      result = RubyBlockPassNode.s(val[vofs + 1])
                     
     result
 end
 
-def _reduce_259(val, _values, result)
+def _reduce_259(val, vofs)
 		      #  opt_block_arg: tCOMMA block_arg
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
 # reduce 260 omitted
 
-def _reduce_261(val, _values, result)
+def _reduce_261(val, vofs)
 		      #  args: arg_value
-                      result = RubyRpCallArgs.s( val[0]) # s(:array )
+                      result = RubyRpCallArgs.s( val[vofs ]) # s(:array )
                     
     result
 end
 
-def _reduce_262(val, _values, result)
+def _reduce_262(val, vofs)
 		      #  | args tCOMMA arg_value
-                      result = val[0]
-                      result.append_arg( val[2])
+                      result = val[vofs ]
+                      result.append_arg( val[vofs + 2])
                     
     result
 end
 
-def _reduce_263(val, _values, result)
-		      # mrhs: args tCOMMA arg_value # result = val[0] << val[2] 
-                      result = val[0]
-                      result.append_arg( val[2] )
+def _reduce_263(val, vofs)
+		      # mrhs: args tCOMMA arg_value # result = val_[0] << val_[2] 
+                      result = val[vofs ]
+                      result.append_arg( val[vofs + 2] )
                     
     result
 end
 
-def _reduce_264(val, _values, result)
+def _reduce_264(val, vofs)
 		      # mrhs: args tCOMMA arg_value #  | args tCOMMA tSTAR arg_value
-                      result = val[0]
-                      result.append_arg( RubySplatNode.s( val[3]))
+                      result = val[vofs ]
+                      result.append_arg( RubySplatNode.s( val[vofs + 3]))
                     
     result
 end
 
-def _reduce_265(val, _values, result)
+def _reduce_265(val, vofs)
 		      # mrhs: args tCOMMA arg_value #  | tSTAR arg_value
-                      result = RubySplatNode.s( val[1])  # s(:splat ) 
+                      result = RubySplatNode.s( val[vofs + 1])  # s(:splat ) 
                     
     result
 end
@@ -4589,19 +4592,19 @@ end
 
 # reduce 273 omitted
 
-def _reduce_274(val, _values, result)
+def _reduce_274(val, vofs)
 		      # primary: literal
-                      result = new_fcall( val[0], nil) 
+                      result = new_fcall( val[vofs ], nil) 
                     
     result
 end
 
-def _reduce_275(val, _values, result)
+def _reduce_275(val, vofs)
 		      # primary: kBEGIN bodystmt kEND
-                      if val[2].equal?( :tEOF )
+                      if val[vofs + 2].equal?( :tEOF )
                         raise SyntaxError, 'unexpected $end, expecting kEND for kBEGIN'
                       end
-                      v_two = val[1]  # the  bodystmt
+                      v_two = val[vofs + 1]  # the  bodystmt
                       unless v_two then
                         result = RubyNilNode._new # s(:nil)
                       else
@@ -4611,70 +4614,71 @@ def _reduce_275(val, _values, result)
     result
 end
 
-def _reduce_276(val, _values, result)
+def _reduce_276(val, vofs)
 		      # primary: #  | tLPAREN_ARG expr
                       @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_277(val, _values, result)
+def _reduce_277(val, vofs)
 		      # primary: #  opt_nl tRPAREN
                       warning "(...) interpreted as grouped expression"
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_278(val, _values, result)
+def _reduce_278(val, vofs)
 		      # primary: #  | tLPAREN compstmt tRPAREN
-                      # result = val[1] || s(:nil)
-                      result = val[1] || RubyNilNode._new 
+                      # result = val_[1] || s(:nil)
+                      result = val[vofs + 1] || RubyNilNode._new 
                       result.paren=( true )
                     
     result
 end
 
-def _reduce_279(val, _values, result)
+def _reduce_279(val, vofs)
 		      # primary: #  | primary_value tCOLON2 tCONSTANT
-                      # result = s(:colon2, val[0], val[2].to_sym) 
-                      result = RubyColon2Node.s( val[0], val[2])
+                      # result = s(:colon2, val_[0], val_[2].to_sym) 
+                      result = RubyColon2Node.s( val[vofs ], val[vofs + 2])
                     
     result
 end
 
-def _reduce_280(val, _values, result)
+def _reduce_280(val, vofs)
 		      # primary: # | tCOLON3 tCONSTANT
-                      # result = s(:colon3, val[1].to_sym)  
-                      result = RubyColon3Node.s( val[1])
+                      # result = s(:colon3, val_[1].to_sym)  
+                      result = RubyColon3Node.s( val[vofs + 1])
                     
     result
 end
 
-def _reduce_281(val, _values, result)
+def _reduce_281(val, vofs)
 		      # primary: #  | primary_value tLBRACK_STR aref_args tRBRACK
-                      result = new_aref( val)
+                      result = new_aref( val, vofs )
                     
     result
 end
 
-def _reduce_282(val, _values, result)
+def _reduce_282(val, vofs)
 		      # primary: #  | tLBRACK aref_args tRBRACK
-                      # result = val[1] || s(:array)
-                      result = val[1] || RubyRpCallArgs._new 
+                      # result = val_[1] || s(:array)
+                      result = val[vofs + 1] || RubyRpCallArgs._new 
                     
     result
 end
 
-def _reduce_283(val, _values, result)
+def _reduce_283(val, vofs)
 		      # primary:  # | tLBRACE assoc_list tRCURLY
-                      # result = s(:hash, *val[1].values)
-                      result = RubyHashNode.s( val[1] )
+                      # result = s(:hash, *val_[1].values)
+                      result = RubyHashNode.s( val[vofs + 1] )
                     
     result
 end
 
-def _reduce_284(val, _values, result)
+def _reduce_284(val, vofs)
 		      # primary:  # | kRETURN
                       # result = s(:return)
                       result = RubyReturnNode.s(nil)
@@ -4682,41 +4686,41 @@ def _reduce_284(val, _values, result)
     result
 end
 
-def _reduce_285(val, _values, result)
+def _reduce_285(val, vofs)
 		      # primary:  # | kYIELD tLPAREN2 call_args tRPAREN
-                      result = new_yield( val[2])  
-                      result.src_offset=( val[0].src_offset ) # of the kYIELD
+                      result = new_yield( val[vofs + 2])  
+                      result.src_offset=( val[vofs ].src_offset ) # of the kYIELD
                     
     result
 end
 
-def _reduce_286(val, _values, result)
+def _reduce_286(val, vofs)
 		      # primary:  # | kYIELD tLPAREN2 tRPAREN
                       result = new_yield_0
-                      result.src_offset=( val[0].src_offset ) # of the kYIELD
+                      result.src_offset=( val[vofs ].src_offset ) # of the kYIELD
                     
     result
 end
 
-def _reduce_287(val, _values, result)
+def _reduce_287(val, vofs)
 		      # primary:  # | kYIELD
                       result = new_yield_0
-                      result.src_offset=( val[0].src_offset ) # of the kYIELD
+                      result.src_offset=( val[vofs ].src_offset ) # of the kYIELD
                     
     result
 end
 
-def _reduce_288(val, _values, result)
+def _reduce_288(val, vofs)
 		      # primary:  # | kDEFINED opt_nl tLPAREN2 expr tRPAREN
-                      result = RubyDefinedNode.s( val[3])   # s(:defined )
+                      result = RubyDefinedNode.s( val[vofs + 3])   # s(:defined )
                     
     result
 end
 
-def _reduce_289(val, _values, result)
+def _reduce_289(val, vofs)
 		      # primary:  # | operation brace_block
-                      oper = val[0]
-                      iter = val[1]
+                      oper = val[vofs ]
+                      iter = val[vofs + 1]
                       call = new_fcall( oper, nil  )  # zero args
                       # iter.insert(1, call)
                       iter.call=(call)
@@ -4728,10 +4732,10 @@ end
 
 # reduce 290 omitted
 
-def _reduce_291(val, _values, result)
+def _reduce_291(val, vofs)
 		      # primary:  # | method_call
-                      call = val[0]
-                      iter = val[1]
+                      call = val[vofs ]
+                      iter = val[vofs + 1]
                       # iter.insert(1, call)
                       iter.call=(call)
                       result = iter
@@ -4739,155 +4743,162 @@ def _reduce_291(val, _values, result)
     result
 end
 
-def _reduce_292(val, _values, result)
+def _reduce_292(val, vofs)
 		      # primary:  # | kIF expr_value then compstmt if_tail kEND
-                      if val[5].equal?( :tEOF )
-                        premature_eof( val[0] )
+                      if val[vofs + 5].equal?( :tEOF )
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_if( val[1], val[3], val[4] )
-                      result.src_offset=( val[0].src_offset )
+                      result = new_if( val[vofs + 1], val[vofs + 3], val[vofs + 4] )
+                      result.src_offset=( val[vofs ].src_offset )
                     
     result
 end
 
-def _reduce_293(val, _values, result)
+def _reduce_293(val, vofs)
 		      # primary:  # | kUNLESS expr_value then compstmt opt_else kEND
-                      if val[5].equal?( :tEOF )
-                        premature_eof( val[0] )
+                      if val[vofs + 5].equal?( :tEOF )
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_if( val[1], val[4], val[3])
-                      result.src_offset=( val[0].src_offset )
+                      result = new_if( val[vofs + 1], val[vofs + 4], val[vofs + 3])
+                      result.src_offset=( val[vofs ].src_offset )
                     
     result
 end
 
-def _reduce_294(val, _values, result)
+def _reduce_294(val, vofs)
 		      # primary:  # | kWHILE
                       @lexer.cond_.push( true )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_295(val, _values, result)
+def _reduce_295(val, vofs)
 		      # kWHILE  # expr_value do
                       @lexer.cond_.pop
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_296(val, _values, result)
+def _reduce_296(val, vofs)
 		      # kWHILE  # compstmt kEND
-                      if val[6].equal?(:tEOF)
-                        premature_eof( val[0] )
+                      if val[vofs + 6].equal?(:tEOF)
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_while( val[5], val[2])
-                      result.src_offset=( val[0].src_offset) # kWhile is a RpNameToken
+                      result = new_while( val[vofs + 5], val[vofs + 2])
+                      result.src_offset=( val[vofs ].src_offset) # kWhile is a RpNameToken
                     
     result
 end
 
-def _reduce_297(val, _values, result)
+def _reduce_297(val, vofs)
 		      # primary: | kUNTIL
                       @lexer.cond_.push( true )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_298(val, _values, result)
+def _reduce_298(val, vofs)
 		      # kUNTIL # expr_value do
                       @lexer.cond_.pop
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_299(val, _values, result)
+def _reduce_299(val, vofs)
 		      # kUNTIL compstmt kEND
-                      if val[6].equal?(:tEOF)
-                        premature_eof( val[0] )
+                      if val[vofs + 6].equal?(:tEOF)
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_until( val[5], val[2] )
-                      result.src_offset=( val[0].src_offset ) # kUNTIL RpNameToken
+                      result = new_until( val[vofs + 5], val[vofs + 2] )
+                      result.src_offset=( val[vofs ].src_offset ) # kUNTIL RpNameToken
                     
     result
 end
 
-def _reduce_300(val, _values, result)
+def _reduce_300(val, vofs)
 		      #  | kCASE expr_value opt_terms case_body kEND
-                      if val[4].equal?( :tEOF )
-                        premature_eof( val[0] )
+                      if val[vofs + 4].equal?( :tEOF )
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_case( val[1], val[3])
-                      result.src_offset=(   val[0].src_offset ) # kCASE position
+                      result = new_case( val[vofs + 1], val[vofs + 3])
+                      result.src_offset=(   val[vofs ].src_offset ) # kCASE position
                     
     result
 end
 
-def _reduce_301(val, _values, result)
+def _reduce_301(val, vofs)
 		      # | kCASE    opt_terms case_body kEND
-                      if val[3].equal?( :tEOF )
-                        premature_eof( val[0] )
+                      if val[vofs + 3].equal?( :tEOF )
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_case( nil, val[2] )
-                      result.src_offset=(   val[0].src_offset ) # kCASE position
+                      result = new_case( nil, val[vofs + 2] )
+                      result.src_offset=(   val[vofs ].src_offset ) # kCASE position
                     
     result
 end
 
-def _reduce_302(val, _values, result)
+def _reduce_302(val, vofs)
 		      # | kCASE opt_terms kELSE compstmt kEND
-                      if val[4].equal?( :tEOF )
-                        premature_eof( val[0] )
+                      if val[vofs + 4].equal?( :tEOF )
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_case( nil, val[3] )
-                      result.src_offset=(   val[0].src_offset ) # kCASE position
+                      result = new_case( nil, val[vofs + 3] )
+                      result.src_offset=(   val[vofs ].src_offset ) # kCASE position
                     
     result
 end
 
-def _reduce_303(val, _values, result)
+def _reduce_303(val, vofs)
 		      # | kFOR block_var kIN
                       @lexer.cond_.push( true )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_304(val, _values, result)
+def _reduce_304(val, vofs)
 		      # kFOR # expr_value do
                       @lexer.cond_.pop
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_305(val, _values, result)
+def _reduce_305(val, vofs)
 		      #  kFOR # compstmt kEND
-                      if val[8].equal?( :tEOF )
-                        premature_eof( val[0] )
+                      if val[vofs + 8].equal?( :tEOF )
+                        premature_eof( val[vofs ] )
                       end
-                      result = new_for( val[4], val[1], val[7])
+                      result = new_for( val[vofs + 4], val[vofs + 1], val[vofs + 7])
                     
     result
 end
 
-def _reduce_306(val, _values, result)
+def _reduce_306(val, vofs)
 		      # kCLASS cpath superclass
                       # @comments.push( @lexer.comments_ )
                       if (@in_def || @in_single > 0) then
                         yyerror "class definition in method body"
                       end
                       @env.extend( false)
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_307(val, _values, result)
+def _reduce_307(val, vofs)
 		      # kCLASS # bodystmt kEND
-                      result = new_class( val)
+                      result = new_class( val, vofs )
                       @env.unextend
                     
     result
 end
 
-def _reduce_308(val, _values, result)
+def _reduce_308(val, vofs)
 		      # | kCLASS tLSHFT expr
                       result = @in_def
                       @in_def = false
@@ -4895,7 +4906,7 @@ def _reduce_308(val, _values, result)
     result
 end
 
-def _reduce_309(val, _values, result)
+def _reduce_309(val, vofs)
 		      # | kCLASS tLSHFT # term
                       result = @in_single
                       @in_single = 0
@@ -4904,34 +4915,35 @@ def _reduce_309(val, _values, result)
     result
 end
 
-def _reduce_310(val, _values, result)
+def _reduce_310(val, vofs)
 		      # | kCLASS tLSHFT # bodystmt kEND
-                      result = new_sclass(val)
+                      result = new_sclass(val, vofs )
                       @env.unextend
                     
     result
 end
 
-def _reduce_311(val, _values, result)
+def _reduce_311(val, vofs)
 		      # | kMODULE cpath
                       # @comments.push( @lexer.comments_ )
                       if   @in_def or @in_single > 0
                         yyerror "module definition in method body" 
                       end
                       @env.extend( false)
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_312(val, _values, result)
+def _reduce_312(val, vofs)
 		      # | kMODULE # bodystmt kEND
-                      result = new_module( val)
+                      result = new_module( val, vofs )
                       @env.unextend
                     
     result
 end
 
-def _reduce_313(val, _values, result)
+def _reduce_313(val, vofs)
 		      #  | kDEF fname
                       lx = @lexer
                       # @comments.push( lx.comments_ )
@@ -4942,36 +4954,38 @@ def _reduce_313(val, _values, result)
     result
 end
 
-def _reduce_314(val, _values, result)
+def _reduce_314(val, vofs)
 		      #  | kDEF fname # f_arglist bodystmt kEND
-                      result = new_defn( val )
+                      result = new_defn( val , vofs )
                       @env.unextend
                       @in_def = false
                     
     result
 end
 
-def _reduce_315(val, _values, result)
+def _reduce_315(val, vofs)
 		      # | kDEF singleton dot_or_colon
                       lx = @lexer
                       # @comments.push( lx.comments_ )
                       lx.lex_state=( RubyLexer::Expr_fname )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_316(val, _values, result)
+def _reduce_316(val, vofs)
 		      # | kDEF singleton dot_or_colon # fname
                       @in_single += 1
                       @env.extend( false)
                       @lexer.lex_state=( RubyLexer::Expr_end )# force for args
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_317(val, _values, result)
+def _reduce_317(val, vofs)
 		      # | kDEF singleton dot_or_colon # f_arglist bodystmt kEND
-                      result = new_defs( val )
+                      result = new_defs( val , vofs )
 
                       @env.unextend
                       @in_single -= 1
@@ -4979,41 +4993,41 @@ def _reduce_317(val, _values, result)
     result
 end
 
-def _reduce_318(val, _values, result)
+def _reduce_318(val, vofs)
 		      # | kBREAK
                       result = RubyBreakNode.s(nil) # s(:break)
-                      result.src_offset=( val[0].src_offset ) #  of the kBREAK
+                      result.src_offset=( val[vofs ].src_offset ) #  of the kBREAK
                     
     result
 end
 
-def _reduce_319(val, _values, result)
+def _reduce_319(val, vofs)
 		      # | kNEXT
                       result = RubyNextNode.s(nil) #  s(:next)
-                      result.src_offset=( val[0].src_offset ) #  of the kNEXT
+                      result.src_offset=( val[vofs ].src_offset ) #  of the kNEXT
                     
     result
 end
 
-def _reduce_320(val, _values, result)
+def _reduce_320(val, vofs)
 		      # | kREDO
                       result = RubyRedoNode._new # s(:redo)
-                      result.src_offset=( val[0].src_offset ) #  of the kREDO
+                      result.src_offset=( val[vofs ].src_offset ) #  of the kREDO
                     
     result
 end
 
-def _reduce_321(val, _values, result)
+def _reduce_321(val, vofs)
 		      # | kRETRY
                       result = RubyRetryNode._new # s(:retry)
-                      result.src_offset=( val[0].src_offset ) #  of the kRETRY
+                      result.src_offset=( val[vofs ].src_offset ) #  of the kRETRY
                     
     result
 end
 
-def _reduce_322(val, _values, result)
+def _reduce_322(val, vofs)
 		      # primary_value: primary
-                      result = value_expr(val[0])
+                      result = value_expr(val[vofs ])
                     
     result
 end
@@ -5034,156 +5048,157 @@ end
 
 # reduce 330 omitted
 
-def _reduce_331(val, _values, result)
+def _reduce_331(val, vofs)
 		      # if_tail: opt_else ....
-                      result = RubyIfNode.s(val[1], val[3], val[4]) # s(:if )
+                      result = RubyIfNode.s(val[vofs + 1], val[vofs + 3], val[vofs + 4]) # s(:if )
                     
     result
 end
 
 # reduce 332 omitted
 
-def _reduce_333(val, _values, result)
+def _reduce_333(val, vofs)
 		      # opt_else: none ...
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
 # reduce 334 omitted
 
-def _reduce_335(val, _values, result)
+def _reduce_335(val, vofs)
 		      # block_var: lhs
-                      # val[0].delete_at 1 if val[0][1].nil? # HACK 
+                      # val_[0].delete_at 1 if val[0][1].nil? # HACK 
                       # Maglev, do nothing for now
+                      result = val[vofs]
                     
     result
 end
 
 # reduce 336 omitted
 
-def _reduce_337(val, _values, result)
+def _reduce_337(val, vofs)
 		      # opt_block_var: none # | tPIPE tPIPE
                       result = 0
                     
     result
 end
 
-def _reduce_338(val, _values, result)
+def _reduce_338(val, vofs)
 		      # opt_block_var: none # | tOROP
                       result = 0
                     
     result
 end
 
-def _reduce_339(val, _values, result)
+def _reduce_339(val, vofs)
 		      # opt_block_var: none # | tPIPE block_var tPIPE
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_340(val, _values, result)
+def _reduce_340(val, vofs)
 		      # do_block: kDO_BLOCK
 		      @env.extend( true ) # (:dynamic)
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_341(val, _values, result)
+def _reduce_341(val, vofs)
 		      # do_block: kDO_BLOCK # opt_block_var
                       result = @env.dynamic_keys
                     
     result
 end
 
-def _reduce_342(val, _values, result)
+def _reduce_342(val, vofs)
 		      # do_block: kDO_BLOCK # compstmt kEND
-                      if val[6].equal?( :tEOF )
-                        premature_eof( val[3] )
+                      if val[vofs + 5].equal?( :tEOF )
+                        premature_eof( val[vofs] )  # of kDO
                       end
-                      vars   = val[2]
-                      body   = val[4]
-                      result = new_iter(vars, body, val[5]) 
+                      vars   = val[vofs + 2]
+                      body   = val[vofs + 4]
+                      result = new_iter(vars, body)
                       @env.unextend
                     
     result
 end
 
-def _reduce_343(val, _values, result)
+def _reduce_343(val, vofs)
 		      # block_call: command do_block
-                      v_zero = val[0]
+                      v_zero = val[vofs ]
                       if v_zero.equal?(nil)
                         # ok
                       elsif v_zero.class.equal?(RubyBlockPassNode) 
                         raise SyntaxError, "Both block arg and actual block given." 
                       end
-                      #result = val[1]
-                      #result.insert 1, val[0]
-                      iter = val[1]
+                      iter = val[vofs + 1]
                       iter.call=(v_zero)
                       result = iter
                     
     result
 end
 
-def _reduce_344(val, _values, result)
+def _reduce_344(val, vofs)
 		      # | block_call tDOT operation2 opt_paren_args
-                      result = new_call(val[0], val[2], val[3])
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
                     
     result
 end
 
-def _reduce_345(val, _values, result)
+def _reduce_345(val, vofs)
 		      # | block_call tCOLON2 operation2 opt_paren_args
-                      result = new_call(val[0], val[2], val[3])
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
                     
     result
 end
 
-def _reduce_346(val, _values, result)
+def _reduce_346(val, vofs)
 		      # method_call: operation  paren_args
-                      result = new_fcall( val[0], val[1] )
+                      result = new_fcall( val[vofs ], val[vofs + 1] )
                     
     result
 end
 
-def _reduce_347(val, _values, result)
+def _reduce_347(val, vofs)
 		      # # method_call: | primary_value tDOT operation2 opt_paren_args
-                      result = new_call(val[0], val[2], val[3] )
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3] )
                     
     result
 end
 
-def _reduce_348(val, _values, result)
+def _reduce_348(val, vofs)
 		      # # method_call: | primary_value tCOLON2 operation2 paren_args
-                      result = new_call(val[0], val[2], val[3] )
+                      result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3] )
                     
     result
 end
 
-def _reduce_349(val, _values, result)
+def _reduce_349(val, vofs)
 		      # # method_call: | primary_value tCOLON2 operation3
-                      result = new_vcall( val[0], val[2] )
+                      result = new_vcall( val[vofs ], val[vofs + 2] )
                     
     result
 end
 
-def _reduce_350(val, _values, result)
+def _reduce_350(val, vofs)
 		      # # method_call: | kSUPER paren_args
-                      result = new_super( val )
+                      result = new_super( val , vofs )
                     
     result
 end
 
-def _reduce_351(val, _values, result)
+def _reduce_351(val, vofs)
 		      # method_call:  | kSUPER
                       result = RubyZSuperNode._new # s(:zsuper)
+                      result.src_offset=( val[vofs].src_offset ) # of the kSUPER
                     
     result
 end
 
-def _reduce_352(val, _values, result)
+def _reduce_352(val, vofs)
 		      # brace_block: tLCURLY
 		      @env.extend( true ) # (:dynamic)
                       result = -909 # @lexer.lineno_
@@ -5191,26 +5206,25 @@ def _reduce_352(val, _values, result)
     result
 end
 
-def _reduce_353(val, _values, result)
+def _reduce_353(val, vofs)
 		      # brace_block: tLCURLY # opt_block_var
                       result = @env.dynamic_keys
                     
     result
 end
 
-def _reduce_354(val, _values, result)
+def _reduce_354(val, vofs)
 		      # brace_block: tLCURLY #  compstmt tRCURLY
                       # REFACTOR
-                      args   = val[2]
-                      body   = val[4]
-                      result = new_iter( args, body, nil )
+                      args   = val[vofs + 2]
+                      body   = val[vofs + 4]
+                      result = new_iter(args, body)
                       @env.unextend
-                      # result.line=( val[1])
                     
     result
 end
 
-def _reduce_355(val, _values, result)
+def _reduce_355(val, vofs)
 		      # brace_block: tLCURLY # | kDO
 		      @env.extend( true ) # (:dynamic)
                       result = -910 # @lexer.lineno_      
@@ -5218,50 +5232,49 @@ def _reduce_355(val, _values, result)
     result
 end
 
-def _reduce_356(val, _values, result)
+def _reduce_356(val, vofs)
 		      # brace_block: tLCURLY # opt_block_var
                       result = @env.dynamic_keys
                     
     result
 end
 
-def _reduce_357(val, _values, result)
+def _reduce_357(val, vofs)
 		      # brace_block: tLCURLY # compstmt kEND
-                      if val[6].equal?( :tEOF )
-                        premature_eof( val[1] )
+                      if val[vofs + 5].equal?( :tEOF )
+                        premature_eof( val[vofs + 1] )
                       end
-                      args = val[2]
-                      body = val[4]
-                      result = new_iter( args, body, val[5])  
+                      args = val[vofs + 2]
+                      body = val[vofs + 4]
+                      result = new_iter(args, body)
                       @env.unextend
-                      # result.line=( val[1])
                     
     result
 end
 
-def _reduce_358(val, _values, result)
-                      result = RubyWhenNode.s( val[1], val[3], val[4])  # s(:when )
-                      result.src_offset=(   val[0].src_offset ) # kWHEN position
+def _reduce_358(val, vofs)
+                      result = RubyWhenNode.s( val[vofs + 1], val[vofs + 3], val[vofs + 4])  # s(:when )
+                      result.src_offset=(   val[vofs ].src_offset ) # kWHEN position
                     
     result
 end
 
 # reduce 359 omitted
 
-def _reduce_360(val, _values, result)
+def _reduce_360(val, vofs)
 		      # when_args: args  # | args tCOMMA tSTAR arg_value
-                      wh = RubyWhenNode.s(val[3], nil, nil)
-                      wh.src_offset=(   val[2].src_offset ) # tSTAR position
-                      result = self.list_append( val[0], wh )
+                      wh = RubyWhenNode.s(val[vofs + 3], nil, nil)
+                      wh.src_offset=(   val[vofs + 2].src_offset ) # tSTAR position
+                      result = self.list_append( val[vofs ], wh )
                     
     result
 end
 
-def _reduce_361(val, _values, result)
+def _reduce_361(val, vofs)
 		      # # when_args: args # | tSTAR arg_value
-                      # result = s(:array, s(:when, val[1], nil))
-                      wh = RubyWhenNode.s( val[1], nil, nil)
-                      wh.src_offset=(   val[0].src_offset ) # tSTAR position
+                      # result = s(:array, s(:when, val_[1], nil))
+                      wh = RubyWhenNode.s( val[vofs + 1], nil, nil)
+                      wh.src_offset=(   val[vofs ].src_offset ) # tSTAR position
                       result = RubyRpCallArgs.s( wh )
                     
     result
@@ -5271,14 +5284,14 @@ end
 
 # reduce 363 omitted
 
-def _reduce_364(val, _values, result)
+def _reduce_364(val, vofs)
 	              # opt_rescue: kRESCUE exc_list exc_var then compstmt opt_rescue
-                      # klasses, var, body, rest = val[1], val[2], val[4], val[5]
+                      # klasses, var, body, rest = val_[1], val_[2], val_[4], val_[5]
                       # klasses ||= s(:array )  # Maglev not used
-                      klasses = val[1]   # ok if nil
-                      var = val[2]
-                      body = val[4]
-                      rest = val[5] 
+                      klasses = val[vofs + 1]   # ok if nil
+                      var = val[vofs + 2]
+                      body = val[vofs + 4]
+                      rest = val[vofs + 5] 
                       if var 
                         rhs = RubyGlobalVarNode.s( :"$!" )  # s(:gvar )
                         asgn = node_assign(var, rhs )
@@ -5289,21 +5302,21 @@ def _reduce_364(val, _values, result)
                         end
                       end   
                       result = RubyRescueBodyNode.s(klasses, body, rest)   # s(:resbody )
-                      result.src_offset=( val[0].src_offset )   # kRESCUE position
+                      result.src_offset=( val[vofs ].src_offset )   # kRESCUE position
                     
     result
 end
 
-def _reduce_365(val, _values, result)
+def _reduce_365(val, vofs)
 		      # opt_rescue: # |
                       result = nil
                     
     result
 end
 
-def _reduce_366(val, _values, result)
+def _reduce_366(val, vofs)
 		      # exc_list: arg_value
-                      result = RubyArrayNode.s( val[0])  # s(:array )
+                      result = RubyArrayNode.s( val[vofs ])  # s(:array )
                     
     result
 end
@@ -5312,19 +5325,20 @@ end
 
 # reduce 368 omitted
 
-def _reduce_369(val, _values, result)
+def _reduce_369(val, vofs)
 		      # exc_var: tASSOC lhs
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
 # reduce 370 omitted
 
-def _reduce_371(val, _values, result)
+def _reduce_371(val, vofs)
 		      # opt_ensure: kENSURE compstmt
-                      if (val[1] != nil) then
-                        result = val[1]
+                      v_one = val[vofs + 1]
+                      if (v_one != nil) then
+                        result = v_one
                       else
                         result = RubyNilNode._new # s(:nil)
                       end
@@ -5334,17 +5348,17 @@ end
 
 # reduce 372 omitted
 
-def _reduce_373(val, _values, result)
+def _reduce_373(val, vofs)
 			    # literal: numeric
-                            result = RubyAbstractNumberNode.s( val[0])  # s(:lit )
+                            result = RubyAbstractNumberNode.s( val[vofs ])  # s(:lit )
                             # literal - numeric path 
                           
     result
 end
 
-def _reduce_374(val, _values, result)
+def _reduce_374(val, vofs)
 			    # literal: numeric # | symbol
-		            result = RubySymbolNode.s( val[0]) # s(:lit )
+		            result = RubySymbolNode.s( val[vofs ]) # s(:lit )
 			    # literal - symbol path 
                           
     result
@@ -5352,14 +5366,13 @@ end
 
 # reduce 375 omitted
 
-def _reduce_376(val, _values, result)
+def _reduce_376(val, vofs)
 		      # strings: string
-                      # val[0] = s(:dstr, val[0].value) if val[0][0] == :evstr 
-                      # result = val[0]
-                      v_zero = val[0] 
+                      # val_[0] = s(:dstr, val[0].value) if val[0][0] == :evstr 
+                      # result = val_[0]
+                      v_zero = val[vofs ] 
                       if v_zero.class.equal?(RubyEvStrNode)
                         result = RubyDStrNode.s( [ v_zero.evStrBody ] )
-                        val[0] = result
                       else
                         result = v_zero
                       end 
@@ -5369,116 +5382,116 @@ end
 
 # reduce 377 omitted
 
-def _reduce_378(val, _values, result)
+def _reduce_378(val, vofs)
 		      # string: string1
-                      result = self.literal_concat( val[0], val[1])  
+                      result = self.literal_concat( val[vofs ], val[vofs + 1])  
                     
     result
 end
 
-def _reduce_379(val, _values, result)
+def _reduce_379(val, vofs)
 		      # string1: tSTRING_BEG string_contents tSTRING_END
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_380(val, _values, result)
+def _reduce_380(val, vofs)
 		      # string1: tSTRING_BEG string_contents tSTRING_END # | t_STRING
-                      result = RubyStrNode.s( val[0])  # s(:str )
+                      result = RubyStrNode.s( val[vofs ])  # s(:str )
                     
     result
 end
 
-def _reduce_381(val, _values, result)
+def _reduce_381(val, vofs)
 		      # xstring: tXSTRING_BEG xstring_contents tSTRING_END
-                      result = new_xstring( val[1])
+                      result = new_xstring( val[vofs + 1])
                     
     result
 end
 
-def _reduce_382(val, _values, result)
+def _reduce_382(val, vofs)
 		      # regexp: tREGEXP_BEG xstring_contents tREGEXP_END
-                      result = new_regexp(val)
+                      result = new_regexp(val, vofs)
                     
     result
 end
 
-def _reduce_383(val, _values, result)
+def _reduce_383(val, vofs)
 		      # words: tWORDS_BEG tSPACE tSTRING_END
                       result = RubyArrayNode._new # s(:array)
                     
     result
 end
 
-def _reduce_384(val, _values, result)
+def _reduce_384(val, vofs)
 		      # words: | tWORDS_BEG word_list tSTRING_END
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_385(val, _values, result)
+def _reduce_385(val, vofs)
 		      # word_list: none
                       result = RubyArrayNode._new # s(:array)
                     
     result
 end
 
-def _reduce_386(val, _values, result)
+def _reduce_386(val, vofs)
 		      # word_list: # | word_list word tSPACE
-                      # word = val[1][0] == :evstr ? s(:dstr, "", val[1]) : val[1] #
-                      # result = val[0] << word
-                      v_one = val[1]
+                      # word = val_[1][0] == :evstr ? s(:dstr, "", val[1]) : val[1] #
+                      # result = val_[0] << word
+                      v_one = val[vofs + 1]
                       if v_one.class.equal?(RubyEvStrNode)
                         word = RubyDStrNode.s([ RubyStrNode.s('') , v_one ])
                       else
                         word = v_one
                       end
-                      result = val[0].append( word)  # v[0] should be a RubyArrayNode
+                      result = val[vofs ].append( word)  # v[0] should be a RubyArrayNode
                     
     result
 end
 
 # reduce 387 omitted
 
-def _reduce_388(val, _values, result)
+def _reduce_388(val, vofs)
 		      # word: string_content
-                      result = self.literal_concat( val[0], val[1])
+                      result = self.literal_concat( val[vofs ], val[vofs + 1])
                     
     result
 end
 
-def _reduce_389(val, _values, result)
+def _reduce_389(val, vofs)
 		      # awords: tAWORDS_BEG tSPACE tSTRING_END
                       result = RubyArrayNode._new # s(:array)
                     
     result
 end
 
-def _reduce_390(val, _values, result)
+def _reduce_390(val, vofs)
 		      # awords: # | tAWORDS_BEG qword_list tSTRING_END
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_391(val, _values, result)
+def _reduce_391(val, vofs)
 		      # qword_list: none
                       result = RubyArrayNode._new # s(:array)
                     
     result
 end
 
-def _reduce_392(val, _values, result)
+def _reduce_392(val, vofs)
 		      # qword_list: # | qword_list tSTRING_CONTENT tSPACE
-                      # result = val[0] << s(:str, val[1]) # assume val[0] is ArrayNode 
-                      result = val[0].append( RubyStrNode.s(val[1]))
+                      # result = val_[0] << s(:str, val_[1]) # assume val[0] is ArrayNode 
+                      result = val[vofs ].append( RubyStrNode.s(val[vofs + 1]))
                     
     result
 end
 
-def _reduce_393(val, _values, result)
+def _reduce_393(val, vofs)
 			# string_contents: none
                       	# result = s(:str, "")
 			result = RubyStrNode.s( "")
@@ -5486,36 +5499,36 @@ def _reduce_393(val, _values, result)
     result
 end
 
-def _reduce_394(val, _values, result)
+def _reduce_394(val, vofs)
 		      # string_contents: # | string_contents string_content
-                      result = self.literal_concat(val[0], val[1])
+                      result = self.literal_concat(val[vofs ], val[vofs + 1])
                     
     result
 end
 
-def _reduce_395(val, _values, result)
+def _reduce_395(val, vofs)
 		      # xstring_contents: none
                       result = nil
                     
     result
 end
 
-def _reduce_396(val, _values, result)
+def _reduce_396(val, vofs)
 		      # xstring_contents: # | xstring_contents string_content
-                      result = self.literal_concat(val[0], val[1])
+                      result = self.literal_concat(val[vofs ], val[vofs + 1])
                     
     result
 end
 
-def _reduce_397(val, _values, result)
+def _reduce_397(val, vofs)
 		      # string_content: tSTRING_CONTENT
-                      # result = s(:str, val[0])
-		      result = RubyStrNode.s( val[0])
+                      # result = s(:str, val_[0])
+		      result = RubyStrNode.s( val[vofs ])
                     
     result
 end
 
-def _reduce_398(val, _values, result)
+def _reduce_398(val, vofs)
 		      # string_content: # | tSTRING_DVAR
                       lx = @lexer
                       result = lx.lex_strterm_
@@ -5525,16 +5538,16 @@ def _reduce_398(val, _values, result)
     result
 end
 
-def _reduce_399(val, _values, result)
+def _reduce_399(val, vofs)
 		      # string_content: # string_dvar
-                      @lexer.lex_strterm=( val[1])
-                      # result = s(:evstr, val[2]) 
-                      result = RubyEvStrNode.s( val[2] )
+                      # result = s(:evstr, val_[2]) 
+                      @lexer.lex_strterm=( val[vofs + 1])
+                      result = RubyEvStrNode.s( val[vofs + 2] )
                     
     result
 end
 
-def _reduce_400(val, _values, result)
+def _reduce_400(val, vofs)
 		      # string_content: # | tSTRING_DBEG
                       lx = @lexer
                       result = lx.lex_strterm_
@@ -5546,14 +5559,14 @@ def _reduce_400(val, _values, result)
     result
 end
 
-def _reduce_401(val, _values, result)
+def _reduce_401(val, vofs)
 		      # string_content: # compstmt tRCURLY
                       lx = @lexer
-                      lx.lex_strterm=( val[1] )
+                      lx.lex_strterm=( val[vofs + 1] )
                       lx.cond_.lexpop
                       lx.cmdarg_.lexpop
 
-                      v_two = val[2] 
+                      v_two = val[vofs + 2] 
                       if v_two.equal?(nil) 
                         result = RubyEvStrNode.s(nil) #  s(:evstr ) 
                       else 
@@ -5568,43 +5581,43 @@ def _reduce_401(val, _values, result)
     result
 end
 
-def _reduce_402(val, _values, result)
+def _reduce_402(val, vofs)
 			  # string_dvar: tGVAR 
-                          # result = s(:gvar, val[0].to_sym)   
-			  result = RubyGlobalVarNode.s( val[0].symval )
+                          # result = s(:gvar, val_[0].to_sym)   
+			  result = RubyGlobalVarNode.s( val[vofs ].symval )
 			
     result
 end
 
-def _reduce_403(val, _values, result)
+def _reduce_403(val, vofs)
 			  # string_dvar: # | tIVAR
-		          # result = s(:ivar, val[0].to_sym) 
-			  result = RubyInstVarNode.s( val[0].symval )
+		          # result = s(:ivar, val_[0].to_sym) 
+			  result = RubyInstVarNode.s( val[vofs ].symval )
 			
     result
 end
 
-def _reduce_404(val, _values, result)
+def _reduce_404(val, vofs)
 			  # string_dvar: # | tCVAR
-	                  # result = s(:cvar, val[0].to_sym) 
-			  result = RubyClassVarNode.s( val[0].symval)
+	                  # result = s(:cvar, val_[0].to_sym) 
+			  result = RubyClassVarNode.s( val[vofs ].symval)
 			
     result
 end
 
 # reduce 405 omitted
 
-def _reduce_406(val, _values, result)
+def _reduce_406(val, vofs)
 		      # symbol: tSYMBEG sym
                       @lexer.lex_state=( RubyLexer::Expr_end )
-                      result = val[1].symval  # expect an RpNameToken
+                      result = val[vofs + 1].symval  # expect an RpNameToken
                     
     result
 end
 
-def _reduce_407(val, _values, result)
+def _reduce_407(val, vofs)
 		      # symbol: # | tSYMBOL
-                      result = val[0].to_sym
+                      result = val[vofs ].to_sym
                     
     result
 end
@@ -5617,10 +5630,10 @@ end
 
 # reduce 411 omitted
 
-def _reduce_412(val, _values, result)
+def _reduce_412(val, vofs)
 		      # dsym: tSYMBEG xstring_contents tSTRING_END
                       @lexer.lex_state=( RubyLexer::Expr_end )
-                      v_one = val[1]
+                      v_one = val[vofs + 1]
 
 		      v_cls = v_one.class
 		      if v_cls.equal?(RubyDStrNode)  # convert :dstr to :dsym
@@ -5649,16 +5662,16 @@ end
 
 # reduce 414 omitted
 
-def _reduce_415(val, _values, result)
+def _reduce_415(val, vofs)
 		      # numeric: tINTEGER ...
-                      result = val[1] * -1 # TODO: pt_testcase
+                      result = val[vofs + 1] * -1 # TODO: pt_testcase
                     
     result
 end
 
-def _reduce_416(val, _values, result)
+def _reduce_416(val, vofs)
 		      # numeric: # | tUMINUS_NUM tFLOAT   =tLOWEST
-                      result = val[1] * -1 # TODO: pt_testcase
+                      result = val[vofs + 1] * -1 # TODO: pt_testcase
                     
     result
 end
@@ -5673,101 +5686,101 @@ end
 
 # reduce 421 omitted
 
-def _reduce_422(val, _values, result)
+def _reduce_422(val, vofs)
   # variable: | kNIL
                               result = :nil      
                             
     result
 end
 
-def _reduce_423(val, _values, result)
+def _reduce_423(val, vofs)
   # variable: | kSELF
 			      result = :self     
                             
     result
 end
 
-def _reduce_424(val, _values, result)
+def _reduce_424(val, vofs)
   # variable: | kTRUE
 			      result = :true     
                             
     result
 end
 
-def _reduce_425(val, _values, result)
+def _reduce_425(val, vofs)
   # variable: | kFALSE
 			      result = :false    
                             
     result
 end
 
-def _reduce_426(val, _values, result)
+def _reduce_426(val, vofs)
  # variable: | k__FILE__
 			      result = :__FILE__ 
                             
     result
 end
 
-def _reduce_427(val, _values, result)
+def _reduce_427(val, vofs)
  # variable: | k__LINE__
 			      result =  RpNameToken.new( :__LINE__ ,  @lexer.line_num_)  
                             
     result
 end
 
-def _reduce_428(val, _values, result)
+def _reduce_428(val, vofs)
 		      # var_ref: variable
-                      result = self.gettable( val[0])
+                      result = self.gettable( val[vofs ])
                     
     result
 end
 
-def _reduce_429(val, _values, result)
+def _reduce_429(val, vofs)
 		      # var_lhs: variable
-                      result = self.assignable(val[0], nil)
+                      result = self.assignable(val[vofs ], nil)
                     
     result
 end
 
-def _reduce_430(val, _values, result)
+def _reduce_430(val, vofs)
 			      # backref: tNTH_REF
-	                      # result = s(:nth_ref,  val[0]) 
-			      result = RubyNthRefNode.s(val[0])
+	                      # result = s(:nth_ref,  val_[0]) 
+			      result = RubyNthRefNode.s(val[vofs ])
 			    
     result
 end
 
-def _reduce_431(val, _values, result)
+def _reduce_431(val, vofs)
 			      # backref: #  tBACK_REF
-			      # result = s(:back_ref, val[0])
-			      result = RubyBackRefNode.s( val[0] )
-			      # TODO, install line number in result
+			      # result = s(:back_ref, val_[0])
+			      result = RubyBackRefNode.s( val[vofs ] )
 			    
     result
 end
 
-def _reduce_432(val, _values, result)
+def _reduce_432(val, vofs)
 		      # superclass: term
                       result = nil
                     
     result
 end
 
-def _reduce_433(val, _values, result)
+def _reduce_433(val, vofs)
 		      # superclass: # | tLT
                       @lexer.lex_state=( RubyLexer::Expr_beg )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_434(val, _values, result)
+def _reduce_434(val, vofs)
 		      # superclass: # expr_value term
-                      result = val[2]
+                      result = val[vofs + 2]
                     
     result
 end
 
-def _reduce_435(val, _values, result)
+def _reduce_435(val, vofs)
 		      # superclass: # | error term
                       yyerrok
                       result = nil
@@ -5775,103 +5788,103 @@ def _reduce_435(val, _values, result)
     result
 end
 
-def _reduce_436(val, _values, result)
+def _reduce_436(val, vofs)
 		      # f_arglist: tLPAREN2 f_args opt_nl tRPAREN
-                      result = val[1]
+                      result = val[vofs + 1]
                       @lexer.lex_state=( RubyLexer::Expr_beg )
                     
     result
 end
 
-def _reduce_437(val, _values, result)
+def _reduce_437(val, vofs)
 		      # f_arglist: # | f_args term
-                      result = val[0]
+                      result = val[vofs ]
                     
     result
 end
 
-def _reduce_438(val, _values, result)
+def _reduce_438(val, vofs)
 		      # f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_f_block_arg
-                      # result = args( val[0], val[2], val[4], val[5])
-                      result = val[0]
-                      result.add_optional_arg( val[2] )
-                      result.add_star_arg( val[4] )
-                      result.add_block_arg( val[5] )
+                      # result = args( val_[0], val_[2], val_[4], val_[5])
+                      result = val[vofs ]
+                      result.add_optional_arg( val[vofs + 2] )
+                      result.add_star_arg( val[vofs + 4] )
+                      result.add_block_arg( val[vofs + 5] )
                     
     result
 end
 
-def _reduce_439(val, _values, result)
+def _reduce_439(val, vofs)
 		      # f_args: # | f_arg tCOMMA f_optarg  opt_f_block_arg
-                      # result = args( val[0], val[2],    nil, val[3])
-                      result = val[0] 
-                      result.add_optional_arg( val[2] )
-                      result.add_block_arg( val[3] )
+                      # result = args( val_[0], val_[2],    nil, val_[3])
+                      result = val[vofs ] 
+                      result.add_optional_arg( val[vofs + 2] )
+                      result.add_block_arg( val[vofs + 3] )
                     
     result
 end
 
-def _reduce_440(val, _values, result)
+def _reduce_440(val, vofs)
 		      # f_args: # | f_arg tCOMMA   f_rest_arg opt_f_block_arg
-                      # result = args( val[0],    nil, val[2], val[3])
-                      result = val[0] 
-                      result.add_star_arg( val[2] )
-                      result.add_block_arg( val[3] )
+                      # result = args( val_[0],    nil, val_[2], val_[3])
+                      result = val[vofs ] 
+                      result.add_star_arg( val[vofs + 2] )
+                      result.add_block_arg( val[vofs + 3] )
                     
     result
 end
 
-def _reduce_441(val, _values, result)
+def _reduce_441(val, vofs)
 		      # f_args: # | f_arg  opt_f_block_arg
-                      # result = args( val[0],    nil,    nil, val[1])
-                      result = val[0] 
-                      result.add_block_arg( val[1] )
+                      # result = args( val_[0],    nil,    nil, val_[1])
+                      result = val[vofs ] 
+                      result.add_block_arg( val[vofs + 1] )
                     
     result
 end
 
-def _reduce_442(val, _values, result)
+def _reduce_442(val, vofs)
 		      # f_args: # |    f_optarg tCOMMA f_rest_arg opt_f_block_arg
-                      # result = args(    nil, val[0], val[2], val[3])
+                      # result = args(    nil, val_[0], val_[2], val_[3])
                       result = RubyArgsNode._new
-                      result.add_optional_arg(val[0] )
-                      result.add_star_arg( val[2] )
-                      result.add_block_arg( val[3] )
+                      result.add_optional_arg(val[vofs ] )
+                      result.add_star_arg( val[vofs + 2] )
+                      result.add_block_arg( val[vofs + 3] )
                     
     result
 end
 
-def _reduce_443(val, _values, result)
+def _reduce_443(val, vofs)
 		      # f_args: # |  f_optarg  opt_f_block_arg
-                      # result = args(    nil, val[0],    nil, val[1])
+                      # result = args(    nil, val_[0],    nil, val_[1])
                       result = RubyArgsNode._new
-                      result.add_optional_arg(val[0])
-                      result.add_block_arg( val[1] )
+                      result.add_optional_arg(val[vofs ])
+                      result.add_block_arg( val[vofs + 1] )
 
                     
     result
 end
 
-def _reduce_444(val, _values, result)
+def _reduce_444(val, vofs)
 		      # f_args: # |   f_rest_arg opt_f_block_arg
-                      # result = args(    nil,    nil, val[0], val[1])
+                      # result = args(    nil,    nil, val_[0], val_[1])
                       result = RubyArgsNode._new
-                      result.add_star_arg( val[0] )
-                      result.add_block_arg( val[1] )
+                      result.add_star_arg( val[vofs ] )
+                      result.add_block_arg( val[vofs + 1] )
                     
     result
 end
 
-def _reduce_445(val, _values, result)
+def _reduce_445(val, vofs)
 		      # f_args: # |   f_block_arg
-                      # result = args(    nil,    nil,    nil, val[0])
+                      # result = args(    nil,    nil,    nil, val_[0])
                       result = RubyArgsNode._new
-                      result.add_block_arg( val[0] )
+                      result.add_block_arg( val[vofs ] )
                     
     result
 end
 
-def _reduce_446(val, _values, result)
+def _reduce_446(val, vofs)
 		      # f_args: # | #
                       #result = args(    nil,    nil,    nil,    nil)
                       result = RubyArgsNode._new
@@ -5879,73 +5892,76 @@ def _reduce_446(val, _values, result)
     result
 end
 
-def _reduce_447(val, _values, result)
+def _reduce_447(val, vofs)
 		      # f_norm_arg: tCONSTANT
-                      yyerror "formal argument cannot be a constant: #{val[0]}"
+                      yyerror "formal argument cannot be a constant: #{val[vofs ]}"
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_448(val, _values, result)
+def _reduce_448(val, vofs)
 		      # f_norm_arg: # | tIVAR
                       yyerror "formal argument cannot be an instance variable"
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_449(val, _values, result)
+def _reduce_449(val, vofs)
 		      # f_norm_arg: # | tCVAR
                       yyerror "formal argument cannot be a class variable"
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_450(val, _values, result)
+def _reduce_450(val, vofs)
 		      # f_norm_arg: # | tIDENTIFIER
-                      v_zero = val[0]  # val[0] will be a RpNameToken
+                      v_zero = val[vofs ]  # val_[0] will be a RpNameToken
                       @env[ v_zero.symval ] = :lvar
                       result = v_zero
                     
     result
 end
 
-def _reduce_451(val, _values, result)
+def _reduce_451(val, vofs)
 		      # f_arg: f_norm_arg
                       # result = s(:args)
-                      # result << val[0].to_sym
+                      # result << val_[0].to_sym
                       result = RubyArgsNode._new
-                      result.add_arg( val[0].symval )
+                      result.add_arg( val[vofs ].symval )
                     
     result
 end
 
-def _reduce_452(val, _values, result)
+def _reduce_452(val, vofs)
 		      # f_arg: # | f_arg tCOMMA f_norm_arg
-                      result = val[0]
-                      result.add_arg( val[2].symval )
+                      result = val[vofs ]
+                      result.add_arg( val[vofs + 2].symval )
                     
     result
 end
 
-def _reduce_453(val, _values, result)
+def _reduce_453(val, vofs)
 		      # f_opt: tIDENTIFIER tEQL arg_value
-                      result = self.assignable(val[0], val[2])
-                      # TODO: detect duplicate names
+                      result = self.assignable(val[vofs ], val[vofs + 2])
+                      # TODO: detect duplicate names  ??
                     
     result
 end
 
-def _reduce_454(val, _values, result)
+def _reduce_454(val, vofs)
 		      # f_optarg: f_opt
-                      result = RubyBlockNode.s( [ val[0] ] ) # s(:block )
+                      result = RubyBlockNode.s( [ val[vofs ] ] ) # s(:block )
                     
     result
 end
 
-def _reduce_455(val, _values, result)
+def _reduce_455(val, vofs)
 		      # f_optarg: # | f_optarg tCOMMA f_opt
-                      result = val[0] # a RubyBlockNode
-                      result.append_to_block( val[2] )
+                      result = val[vofs ] # a RubyBlockNode
+                      result.append_to_block( val[vofs + 2] )
                     
     result
 end
@@ -5954,17 +5970,17 @@ end
 
 # reduce 457 omitted
 
-def _reduce_458(val, _values, result)
+def _reduce_458(val, vofs)
 		      # f_rest_arg: restarg_mark tIDENTIFIER
                       # TODO: differs from parse.y - needs tests
-                      name = val[1].symval    # expect a RpNameToken
+                      name = val[vofs + 1].symval    # expect a RpNameToken
                       self.check_assignable( name ) # updates env
                       result = name   # MagLev, no prefixing of f_rest_arg with '*' 
                     
     result
 end
 
-def _reduce_459(val, _values, result)
+def _reduce_459(val, vofs)
 		      # f_rest_arg: # | restarg_mark
                       name = :"*"
                       @env[name] = :lvar
@@ -5977,9 +5993,9 @@ end
 
 # reduce 461 omitted
 
-def _reduce_462(val, _values, result)
+def _reduce_462(val, vofs)
 		      # f_block_arg: blkarg_mark tIDENTIFIER
-                      identifier = val[1].symval
+                      identifier = val[vofs + 1].symval
 
                       @env[identifier] = :lvar
                       # result = s(:block_arg, identifier.to_sym)
@@ -5988,14 +6004,14 @@ def _reduce_462(val, _values, result)
     result
 end
 
-def _reduce_463(val, _values, result)
+def _reduce_463(val, vofs)
 		      # opt_f_block_arg: tCOMMA f_block_arg
-                      result = val[1]
+                      result = val[vofs + 1]
                     
     result
 end
 
-def _reduce_464(val, _values, result)
+def _reduce_464(val, vofs)
 		      # opt_f_block_arg: # | #
                       result = nil
                     
@@ -6004,16 +6020,17 @@ end
 
 # reduce 465 omitted
 
-def _reduce_466(val, _values, result)
+def _reduce_466(val, vofs)
 		      # singleton: var_ref
                       @lexer.lex_state=( RubyLexer::Expr_beg )
+                      result = val[vofs]
                     
     result
 end
 
-def _reduce_467(val, _values, result)
+def _reduce_467(val, vofs)
 		      # singleton: # expr opt_nl tRPAREN
-                      result = val[2]
+                      result = val[vofs + 2]
 		      if result.kind_of?(RubyAbstractiLiteralNode)
                         yyerror "Can't define singleton method for literals." 
 		      end
@@ -6021,52 +6038,52 @@ def _reduce_467(val, _values, result)
     result
 end
 
-def _reduce_468(val, _values, result)
+def _reduce_468(val, vofs)
 		      # assoc_list: none
                       result = RubyArrayNode._new # s(:array)
                     
     result
 end
 
-def _reduce_469(val, _values, result)
+def _reduce_469(val, vofs)
 		      # assoc_list: # | assocs trailer
-                      result = val[0]
+                      result = val[vofs ]
                     
     result
 end
 
-def _reduce_470(val, _values, result)
+def _reduce_470(val, vofs)
 		      # assoc_list: # | args trailer
-                      # size = val[0].size
+                      # size = val_[0].size
                       # if (size % 2 != 1) then # != 1 because of leading :array
-                      v_one = val[0]
-                      size = v_one.arrayLength
+                      v_zero = val[vofs ]
+                      size = v_zero.arrayLength
                       unless (size & 1).equal?(0)
-                        yyerror "Odd number (#{size}) list for Hash. #{val[0].inspect}"
+                        yyerror "Odd number (#{size}) list for Hash. #{v_zero.inspect}"
                       end
-                      result = v_one
+                      result = v_zero
                     
     result
 end
 
 # reduce 471 omitted
 
-def _reduce_472(val, _values, result)
+def _reduce_472(val, vofs)
 		      # assocs: assoc
-                      # list = val[0].dup
-                      # more = val[2][1..-1]            
+                      # list = val_[0].dup
+                      # more = val_[2][1..-1]            
                       # list.push(*more) unless more.empty?
-                      list = val[0].arrayDup  # dup a RubyArrayNode
-                      v_two = val[2]
+                      list = val[vofs ].arrayDup  # dup a RubyArrayNode
+                      v_two = val[vofs + 2]
                       list.appendAll(v_two) # expect v_two to be a RubyArrayNode
                       result = list
                     
     result
 end
 
-def _reduce_473(val, _values, result)
+def _reduce_473(val, vofs)
 		      # assoc: arg_value tASSOC arg_value
-                      result = RubyArrayNode.s( val[0], val[2]) # s(:array )
+                      result = RubyArrayNode.s( val[vofs ], val[vofs + 2]) # s(:array )
                     
     result
 end
@@ -6109,8 +6126,10 @@ end
 
 # reduce 492 omitted
 
-def _reduce_493(val, _values, result)
- yyerrok 
+def _reduce_493(val, vofs)
+  # term: tSEMI
+                          yyerrok ; result = val[vofs] 
+                         
     result
 end
 
@@ -6118,22 +6137,28 @@ end
 
 # reduce 495 omitted
 
-def _reduce_496(val, _values, result)
- yyerrok 
+def _reduce_496(val, vofs)
+  # term: # | terms tSEMI 
+				yyerrok  ; result = val[vofs] 
+				
     result
 end
 
-def _reduce_497(val, _values, result)
- result = nil 
+def _reduce_497(val, vofs)
+  # none:
+		      result = nil  
+		  
     result
 end
 
-def _reduce_498(val, _values, result)
- result = nil 
+def _reduce_498(val, vofs)
+  # none_block_pass:
+			result = nil 
+		  
     result
 end
 
-def _reduce_none(val, _values, result)
+def _reduce_none(val, vofs)
   val[0]
 end
 

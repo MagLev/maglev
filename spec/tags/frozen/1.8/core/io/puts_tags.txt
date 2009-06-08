@@ -1,6 +1,0 @@
-fails:IO#puts writes just a newline when given no args
-fails:IO#puts writes just a newline when given just a newline
-fails:IO#puts writes nil with a newline when given nil as an arg
-fails:IO#puts flattens a nested array before writing it
-fails:IO#puts writes [...] for a recursive array arg
-fails:IO#puts raises IOError on closed stream

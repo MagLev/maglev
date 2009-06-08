@@ -1,2 +1,0 @@
-fails:Bignum#** returns self raised to other power
-fails:Bignum#** raises a TypeError when given a non-Integer

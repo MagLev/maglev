@@ -1,5 +1,0 @@
-fails:Hash.[] call to_hash
-fails:Hash.[] returns an instance of the class it's called on
-fails:Hash#[] calls subclass implementations of default
-fails:Hash#[] compares keys with eql? semantics
-fails:Hash#[] compares key with found hash code via eql?

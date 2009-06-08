@@ -1,4 +1,0 @@
-fails:The if expression returns nil if then-body is empty and expression is true
-fails:The if expression returns nil if then-body is empty, expression is true and else part is empty
-fails:The if expression returns nil when then-body separated by ':' is empty and expression is true
-fails:The if expression returns nil when then-body separated by 'then' is empty and expression is true

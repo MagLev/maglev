@@ -1,1 +1,0 @@
-fails:Enumerable#reject raises a LocalJumpError if no block is given

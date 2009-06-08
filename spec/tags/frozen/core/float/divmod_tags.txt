@@ -1,2 +1,0 @@
-fails:Float#divmod returns an [quotient, modulus] from dividing self by other
-fails:Float#divmod raises FloatDomainError if other is zero

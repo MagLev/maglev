@@ -132,13 +132,11 @@ module MagRp # {
     nerr = 0   # tmp
 
     cracc_state = @racc_state   # cracc_state hopefully on stack
-    cc_racc_state = cracc_state  #  cc_racc_state is in a VC
     if act >= 0 
       if act.equal?(0)   # TODO delete check
 	 raise_error("_racc_evalact, unexpected act==0") 
       end 
       if act._not_equal?(Racc_shift_n)
-      #
 	# shift
 	#
 	cracc_error_status = @racc_error_status
@@ -152,26 +150,99 @@ module MagRp # {
 	cracc_state.push act
 	@racc_read_next = true
       else
-	#
 	# accept
 	#
 	throw :racc_end_parse, @racc_vstack[0]
       end
     else
       if act._not_equal?(- Racc_reduce_n)
-	#
 	# reduce
 	#       replaced  catch(:racc_jump) which had only one use case 
 	#       with rescue of RaccJumpError 
+        last_len = 0
 	begin
-	    cc_racc_state.push _racc_do_reduce( act)
-	rescue RaccJumpError
-	    # when 1 # yyerror
-	    @racc_user_yyerror = true   # user_yyerror
-	    return - Racc_reduce_n
+#	    cracc_state.push _racc_do_reduce( act)
+# inline _racc_do_reduce [
+      state = cracc_state
+      vstack = @racc_vstack
+
+      i = act * -3
+      creduce_table = @reduce_table
+      len       = creduce_table[i]
+      last_len = len
+      # method_id = creduce_table[i+2]
+      sel = creduce_table[i+2]
+
+      if sel.equal?( :_reduce_noneOne ) 
+	# optimization - no net change to vstack 
+        # state[-len, len]  = void_array
+        state.size=( state.size - len )  
+
+	# puts "      #{sel}"                         if @mydebug
+      else
+
+        # Maglev: optimization , don't make copy of part of stack, 
+        #   pass reference to whole stack and offset to val[0]
+        # tmp_v = vstack[-len, len]
+        # vstack[-len, len] = void_array
+        # tmp_v = vstack._copy_delete_last(len)
+
+        # state[-len, len]  = void_array
+        state.size=( state.size - len )
+
+        # puts "VvoidA:			#{vstack.inspect} "    if @mydebug
+
+        # vstack must be updated AFTER method call
+        #  Maglev:  use_result  is generated as constant true by .y-->.rb processing,
+        #  Maglev: optimization, use __perform___ 
+        #    and omit the tmp_v[0] arg since it is usually never used 
+        # if use_result 
+        #  vstack.push __send__(method_id, tmp_v, vstack, tmp_v[0])
+        # else
+        #  vstack.push __send__(method_id, tmp_v, vstack)
+        # end
+        #
+        puts "      #{sel}"                         if @mydebug
+    
+        vstack_siz = vstack.size
+        vofs = vstack_siz - len   # in a reduce method, val[0] is vstack[0 + vofs]
+
+        # Maglev optimization use two args  , and pass stack and offset 
+        vres =  __perform___( creduce_table[i+2], 1, vstack, vofs )
+
+        # delete last len elements of vstack and push vres
+        vstack[vofs] = vres 
+        vstack.size=( vofs + 1)  
+
+        # puts "after #{sel}  	#{vstack.inspect} "    if @mydebug
+      end
+      reduce_to = creduce_table[i+1]
+
+      k1 = reduce_to - Racc_nt_base
+      if i = @goto_pointer[k1]
+        i += state[-1]
+        if i >= 0 and (curstate = @goto_table[i]) and @goto_check[i] == k1
+          cracc_state.push( curstate )
+        else
+          cracc_state.push( @goto_default[k1] )
+        end
+      else
+        cracc_state.push( @goto_default[k1] )
+      end
+# inline _racc_do_reduce ]
+	rescue Exception
+            ex = $! 
+            vstk = @racc_vstack
+            vstk.size=( vstk.size - last_len )
+            if ex.class.equal?(RaccJumpError)
+	      # when 1 # yyerror
+	      @racc_user_yyerror = true   # user_yyerror
+	      return  - Racc_reduce_n 
+            else
+              _reraise(ex)
+            end
 	end
       elsif act.equal?( - Racc_reduce_n)
-	#
 	# error
 	#
         cracc_error_status = @racc_error_status
@@ -196,7 +267,7 @@ module MagRp # {
         caction_check = @action_check
         caction_pointer = @action_pointer
         while true
-          if i = @action_pointer[cracc_state[-1]]
+          if i = caction_pointer[cracc_state[-1]]
             i += 1   # error token
             if  i >= 0 and
                 (act = caction_table[i]) and
@@ -216,56 +287,6 @@ module MagRp # {
     end
     nil
   end  # ]
-
-    def _racc_do_reduce( act)
-      
-      state = @racc_state
-      vstack = @racc_vstack
-
-      i = act * -3
-      creduce_table = @reduce_table
-      len       = creduce_table[i]
-      # method_id = creduce_table[i+2]
-      sel = creduce_table[i+2]
-
-      if sel.equal?( :_reduce_noneOne ) 
-	# optimization - no net change to vstack 
-	state._remove_last(len)
-	# puts "      #{sel}"                         if @mydebug
-      else
-
-        # tmp_v = vstack[-len, len]
-        # vstack[-len, len] = void_array
-        tmp_v = vstack._copy_delete_last(len)
-        # state[-len, len]  = void_array
-        state._remove_last(len)
-        # puts "VvoidA:			#{vstack.inspect} "    if @mydebug
-
-        # tstack must be updated AFTER method call
-        #  Maglev:  use_result  is generated as constant true by .y-->.rb processing,
-        #  Maglev: optimization, use __perform___ 
-        # if use_result 
-        #  vstack.push __send__(method_id, tmp_v, vstack, tmp_v[0])
-        # else
-        #  vstack.push __send__(method_id, tmp_v, vstack)
-        # end
-        #
-        puts "      #{sel}"                         if @mydebug
-        vstack.push __perform___(creduce_table[i+2], 1, tmp_v, vstack, tmp_v[0])
-        # puts "after #{sel}  	#{vstack.inspect} "    if @mydebug
-      end
-      reduce_to = creduce_table[i+1]
-
-      k1 = reduce_to - Racc_nt_base
-      if i = @goto_pointer[k1]
-        i += state[-1]
-        if i >= 0 and (curstate = @goto_table[i]) and @goto_check[i] == k1
-          return curstate
-        end
-      end
-      res = @goto_default[k1]
-      res
-    end
 
     def on_error(t, val, vstack)
       # reworked for better messages, not sure how to continue parsing.

@@ -1,1 +1,2 @@
+fails:Array#& properly handles recursive arrays
 fails:Array#& does return subclass instances for Array subclasses

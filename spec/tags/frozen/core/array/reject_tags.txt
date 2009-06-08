@@ -1,0 +1,2 @@
+fails:Array#reject returns subclass instance on Array subclasses
+fails:Array#reject! raises a TypeError on a frozen array

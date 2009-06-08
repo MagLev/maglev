@@ -1,1 +1,0 @@
-fails:Fixnum#/ coerces fixnum and return self divided by other

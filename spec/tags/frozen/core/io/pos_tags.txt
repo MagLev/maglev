@@ -1,6 +1,3 @@
-fails:IO#pos gets the offset
 fails:IO#pos raises IOError on closed stream
-fails:IO#pos resets #eof?
-fails:IO#pos= sets the offset
 fails:IO#pos= can handle any numerical argument without breaking
 fails:IO#pos= raises IOError on closed stream

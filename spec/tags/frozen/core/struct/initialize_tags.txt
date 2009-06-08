@@ -1,1 +1,3 @@
 fails:Struct#initialize is private
+fails:Struct#initialize does nothing when passed a set of fields equal to self
+fails:Struct#initialize explicitly sets instance variables to nil when args not provided to initialize

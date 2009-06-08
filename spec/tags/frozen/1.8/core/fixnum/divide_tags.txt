@@ -1,2 +1,0 @@
-fails:Fixnum#/ coerces fixnum and return self divided by other
-fails:Fixnum#/ raises a TypeError when given a non-Integer

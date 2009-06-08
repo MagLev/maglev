@@ -663,10 +663,19 @@ class String
     replace(gsub(regex, &block))
   end
 
+  def _delete_underscore_strip
+    str = self
+    idx = str._indexOfByte( ?_ , 1 )
+    unless idx.equal?(0)
+      str = str.delete('_')   
+    end
+    str.strip
+  end
+
   def hex
     # Because 0b1 is a proper hex number, rather than the binary number 1,
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
-    s = self.delete('_').strip
+    s = self._delete_underscore_strip
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
     "16r#{$1}#{$3}"._to_i
   end
@@ -1152,11 +1161,22 @@ class String
     s
   end
 
-  primitive 'to_f', 'asFloat'
+  primitive '_to_f', 'asFloat'
+  def to_f
+    s = self._delete_underscore_strip
+    s._to_f
+  end
+
   def to_i(base=10)
     base = Type.coerce_to(base, Integer, :to_int)
-    raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
-    self.to_inum(base, false)
+    if base.equal?(10)
+      str = '10r'
+      str << self._delete_underscore_strip
+      str._to_i
+    else
+      raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
+      self.to_inum(base, false)
+    end
   end
 
   primitive_nobridge '_to_i', 'asInteger'
@@ -1167,9 +1187,9 @@ class String
     if base == 0
       base, s = self.extract_base
     else
-      s = self
+      s = self._delete_underscore_strip
     end
-    "#{base}r#{s.delete('_').strip}"._to_i
+    "#{base}r#{s}"._to_i
   end
 
   # Return an array of two elements: [an_int, a_string], where an_int is
@@ -1181,11 +1201,14 @@ class String
   # "-0b1010".extract_base     => [2, "-1010"]
   # "-0b1010".extract_base(16) => [2, "-1010"]
   # "-1010".extract_base(16)   => [16, "-1010"]
+  MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 } 
+  MAGLEV_EXTRACT_BASE_TABLE.freeze
   def extract_base(base=10)
-    s = self.delete('_').strip
+    s = self._delete_underscore_strip
     s =~ /^([+-]?)(0[bdox]?)?(.*)/i
-    base = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8}[$2.downcase] unless $2.equal?(nil)
-    [base, "#{$1}#{$3}"]
+    dtwo = $2
+    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo.equal?(nil)
+    [ base, "#{$1}#{$3}" ]
   end
 
   def to_a
@@ -1290,19 +1313,35 @@ class String
   # Need to either overwrite or allow a mixin.
 
   def >(other)
-    (self <=> other) > 0
+    o = (self <=> other) 
+    if o.equal?(nil)
+      raise ArgumentError, 'comparision failed'
+    end
+    o > 0
   end
 
   def <(other)
-    (self <=> other) < 0
+    o = (self <=> other) 
+    if o.equal?(nil)
+      raise ArgumentError, 'comparision failed'
+    end
+    o < 0
   end
 
   def >=(other)
-    (self <=> other) >= 0
+    o = (self <=> other) 
+    if o.equal?(nil)
+      raise ArgumentError, 'comparision failed'
+    end
+    o >= 0
   end
 
   def <=(other)
-    (self <=> other) <= 0
+    o = (self <=> other) 
+    if o.equal?(nil)
+      raise ArgumentError, 'comparision failed'
+    end
+    o <= 0
   end
 
   def between?(min, max)

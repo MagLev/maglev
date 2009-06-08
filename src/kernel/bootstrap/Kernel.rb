@@ -375,7 +375,7 @@ module Kernel
 
   def raise
     #  if $! is valid in the caller, the parser will
-    #   translate raise to  _resignal
+    #   translate raise to  _reraise
     RuntimeError._signal
   end
   alias fail raise

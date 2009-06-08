@@ -1,4 +1,3 @@
-fails:IO#close closes the stream
 fails:IO#close returns nil
 fails:IO#close makes the stream unavailable for any further data operations
 fails:IO#close raises an IOError on subsequent invocations

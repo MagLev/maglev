@@ -1,1 +1,1 @@
-fails:Signal.list should contain the EXIT key with a value of zero
+fails:Signal.list includes the EXIT key with a value of zero

@@ -1,2 +1,0 @@
-fails:Regexp.union returns /(?!)/ when passed no arguments
-fails:Regexp.union returns a regular expression that will match passed arguments

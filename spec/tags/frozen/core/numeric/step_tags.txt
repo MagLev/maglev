@@ -7,3 +7,4 @@ fails:Numeric#step with [stop, +step] when self, stop or step is a Float yields 
 fails:Numeric#step with [stop, +step] when self, stop or step is a Float yields once when self equals stop
 fails:Numeric#step with [stop, +step] when self, stop or step is a Float does not yield when self is greater than stop
 fails:Numeric#step with [stop, -step] when self, stop or step is a Float yields once when self equals stop
+fails:Numeric#step doesn't catch errors

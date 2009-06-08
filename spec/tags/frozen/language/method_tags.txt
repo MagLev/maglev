@@ -1,4 +1,3 @@
-fails:Calling a method with block argument converts the block to proc
-fails:Calling a method with an object that responds to 'to_proc' as a block argument coerces it to a proc
-fails:Calling a method with invalid argument count raises an ArgumentError
 fails:Calling a private getter method does not permit self as a receiver
+fails:Calling a method with splat operator * and non-Array value attempts to coerce it to Array if the object respond_to?(:to_ary)
+fails:Calling a method with splat operator * and non-Array value uses value unchanged if it does not respond_to?(:to_ary)

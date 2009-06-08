@@ -1,2 +1,0 @@
-fails:Exception#inspect returns '#<Exception: Exception>' when no message given
-fails:Exception#inspect includes message when given

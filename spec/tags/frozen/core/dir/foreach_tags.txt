@@ -1,1 +1,2 @@
+fails:Dir.foreach yields all names in an existing directory to the provided block
 fails:Dir.foreach returns nil when successful

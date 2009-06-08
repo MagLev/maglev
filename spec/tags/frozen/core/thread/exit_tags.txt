@@ -1,1 +1,3 @@
-fails:Thread#exit does not deadlock when called from within the thread while being joined from without
+fails:Thread#exit runs ensure clause
+fails:Thread#exit runs nested ensure clauses
+fails:Thread#exit killing dying sleeping thread wakes up thread

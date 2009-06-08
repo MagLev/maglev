@@ -1,1 +1,1 @@
-fails:Hash#delete calls eql? on colliding keys it finds
+fails:Hash#delete raises a TypeError if called on a frozen instance

@@ -178,7 +178,7 @@ module MagRp
     
     # ruby constants for strings (should this be moved somewhere else?)
     STR_FUNC_BORING = 0x00 
-    STR_FUNC_ESCAPE = 0x01 # TODOryan: remove and replace with REGEXP
+    STR_FUNC_ESCAPE = 0x01 # TODO202: remove and replace with REGEXP
     STR_FUNC_EXPAND = 0x02
     STR_FUNC_REGEXP = 0x04
     STR_FUNC_AWORDS = 0x08

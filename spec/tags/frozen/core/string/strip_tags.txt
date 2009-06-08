@@ -1,2 +1,5 @@
+fails:String#strip returns a new string with leading and trailing whitespace removed
 fails:String#strip taints the result when self is tainted
+fails:String#strip! modifies self in place and returns self
 fails:String#strip! returns nil if no modifications where made
+fails:String#strip! raises a TypeError if self is frozen

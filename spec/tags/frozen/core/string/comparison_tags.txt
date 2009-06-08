@@ -1,1 +1,1 @@
-fails:String#<=> returns nil if its argument does not provide #to_str
+fails:String#<=> calls #to_str to convert the argument to a String and calls #<=> to compare with self

@@ -1,3 +1,0 @@
-fails:A Class Variable retrieves the value from the place it is defined
-fails:A Class Variable defined in a Module can be accessed from Classes that are extended by the Module
-fails:A Class Variable defined in a Module does updates the Class Variable in the Module but in the Class when using a Method defined in the Class

@@ -1,4 +1,0 @@
-fails:Array#values_at checks whether the start and length respond to #to_int
-fails:Array#values_at returns an array of elements in the ranges when passes ranges
-fails:Array#values_at calls to_int on arguments of ranges when passes ranges
-fails:Array#values_at checks whether the range arguments respond to #to_int

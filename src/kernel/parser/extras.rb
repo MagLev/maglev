@@ -69,7 +69,7 @@ module MagRp # {
 		  ["if",       [:kIF,       :kIF_MOD     ], - RubyLexer::Expr_beg   ], 
 		  ["defined?", [:kDEFINED,  :kDEFINED    ], RubyLexer::Expr_arg   ],
 		  ["super",    [:kSUPER,    :kSUPER      ], - RubyLexer::Expr_arg   ], 
-		  ["undef",    [:kUNDEF,    :kUNDEF      ], RubyLexer::Expr_fname ],
+		  ["undef",    [:kUNDEF,    :kUNDEF      ], - RubyLexer::Expr_fname ],
 		  ["break",    [:kBREAK,    :kBREAK      ], - RubyLexer::Expr_mid   ],
 		  ["in",       [:kIN,       :kIN         ], RubyLexer::Expr_beg   ],
 		  ["do",       [:kDO,       :kDO         ], - RubyLexer::Expr_beg   ], 
@@ -308,7 +308,7 @@ module MagRp # {
  class RubyParser < MagRp::Parser # {
   VERSION = '2.0.2'
 
-  attr_accessor :lexer, :in_def, :in_single, :file , :syntax_err_count
+  attr_accessor :lexer, :in_def, :in_single, :file_name , :syntax_err_count
   attr_reader :env
 
   def line_for(name_tok)
@@ -536,7 +536,7 @@ module MagRp # {
     node
   end
 
-  def get_match_node( lhs, sel_tok, rhs) # TODOryan: rename to new_match
+  def get_match_node( lhs, sel_tok, rhs) # TODO202: rename to new_match
     if lhs then
       #case lhs[0]
       #when :dregx, :dregx_once then
@@ -616,7 +616,7 @@ module MagRp # {
     end
     if first_ch.equal?( ?_ )
       if id.equal?(:__FILE__)   
-        return RubyStrNode.s( self.file)        
+        return RubyStrNode.s( self.file_name )        
       elsif id.equal?(:__LINE__) # s(:lit...)  # id was a RpNameToken
         return RubyFixnumNode.s( src_ofs )
       end
@@ -624,7 +624,7 @@ module MagRp # {
     cenv = @env
     type = cenv[id]
     if type.equal?(:lvar) then
-      return RubyLocalVarNode.s(id)  # ryan's code always took this path ???
+      return RubyLocalVarNode.s(id)  # rp202 code always took this path ???
     elsif type.equal?(:dvar) && cenv.dynamic? then
       return RubyLocalVarNode.s(id)  # s(:lvar, id)  
     else
@@ -650,7 +650,7 @@ module MagRp # {
     @env.reset
   end
 
-  def list_append(list, item )  # TODOryan: nuke me *sigh*
+  def list_append(list, item )  # TODO202: nuke me *sigh*
     # return s(:array, item) unless list
     # list = s(:array, list) unless Sexp === list && list.first == :array
     # list << item
@@ -665,7 +665,7 @@ module MagRp # {
     list
   end
 
-  def list_prepend( list, item )  # TODOryan: nuke me *sigh*
+  def list_prepend( list, item )  # TODO202: nuke me *sigh*
     # list = s(:array, list) unless Sexp === list && list[0] == :array
     # list.insert 1, item
     # list
@@ -741,7 +741,7 @@ module MagRp # {
     return head
   end
 
-# def logop(type, left, right) # TODOryan: rename logical_op
+# def logop(type, left, right) # TODO202: rename logical_op
 #   left = value_expr(left)
 #   if left and left[0] == type and not left.paren then
 #     node, second = left, nil
@@ -768,21 +768,21 @@ module MagRp # {
     return cls.s( left, right)
   end
 
-  def new_aref( val)
+  def new_aref( val, vofs )
     # used from    | primary_value "[" aref_args tRBRACK
-    v_two = val[2]  # the aref_args , an arguments list
+    v_two = val[vofs + 2]  # the aref_args , an arguments list
     if v_two.equal?(nil)
       v_two = RubyRpCallArgs._new
     end
-    res = RubyCallNode.s( val[0], :"[]" , v_two )
-    res.src_offset=( val[3].src_offset )  # val[3] is the tRBRACK, a RpNameToken
+    res = RubyCallNode.s( val[vofs ], :"[]" , v_two )
+    res.src_offset=( val[vofs + 3].src_offset )  # val[3] is the tRBRACK, a RpNameToken
     res
   end
 
-  def new_body( val)
-    v_zero = val[0]
+  def new_body( val, vofs)
+    v_zero = val[vofs]
     result = v_zero
-    v_one = val[1]
+    v_one = val[vofs + 1]
     if v_one             # we have a rescue clause
       r_body = nil
       if v_zero 
@@ -794,13 +794,13 @@ module MagRp # {
       #  resbody = resbody.resbody(true)  # does not make sense
       #end
 
-      r_else = val[2]
+      r_else = val[vofs + 2]
       result = RubyRescueNode.s( r_body, rescuebody, r_else) # s(:rescue )
-    elsif not (v_two = val[2]).equal?(nil) then
+    elsif not (v_two = val[vofs + 2]).equal?(nil) then
       warning("else without rescue is useless")
       result = block_append(result, v_two)  # may create a new :block
     end
-    v_three = val[3]
+    v_three = val[vofs + 3]
     if v_three
       result = RubyEnsureNode.s( result, v_three)  # s(:ensure )
     end
@@ -829,7 +829,6 @@ module MagRp # {
       result = RubyFCallNode.s( sel_tok.symval, cArgs ) # s(:vcall )
     end
     result.src_offset=( sel_tok.src_offset )
-#nil.pause
     result
   end
 
@@ -837,12 +836,11 @@ module MagRp # {
     # call with void , i.e. zero , args
     result = RubyVCallNode.s(recv, sel_tok.symval)
     result.src_offset=( sel_tok.src_offset )
-#nil.pause
     result
   end
 
   def new_call(recv, sel_tok , arg)
-    # used where ryan had   new_call(r,sel,v[n]) without explicit s(:arglist, v)
+    # used where rp202 had   new_call(r,sel,v[n]) without explicit s(:arglist, v)
     # convert arg list to a RubyRpCallArgs for hasRestArg AST->IR phase
     # generate VCallNode if possible, else FCallNode, else CallNode
     if arg.equal?(nil)
@@ -874,12 +872,11 @@ module MagRp # {
       result = RubyCallNode.s( recv, sel_tok.symval , cArgs )  # s(:call )
     end
     result.src_offset=( sel_tok.src_offset )
-#nil.pause
     result
   end
 
   def new_call_1(recv, sel_tok , argone)
-    # used where  ryan had  new_call(r,sel, s(:arglist, argone))
+    # used where  rp202 had  new_call(r,sel, s(:arglist, argone))
     #   argone should never be a RubyBlockPassNode 
     if argone.equal?(nil)
       raise_error("new_call_1 unexpected nil arg")
@@ -894,7 +891,6 @@ module MagRp # {
       result = RubyCallNode.s( recv, sel_tok.symval , cArgs )  # s(:call )
     end
     result.src_offset=( sel_tok.src_offset )
-#nil.pause
     result
   end
 
@@ -906,13 +902,13 @@ module MagRp # {
     RubyCaseNode.s(expr, body)
   end
 
-  def new_class( val)
+  def new_class(val, vofs)
     #line, path, superclass, body = val[1], val[2], val[3], val[5]
     # line = val[1] # DELETED from .y
-    path = val[1]
-    superclass = val[2]
-    body = val[4]             
-    k_end = val[5]
+    path = val[vofs + 1]
+    superclass = val[vofs + 2]
+    body = val[vofs + 4]             
+    k_end = val[vofs + 5]
     if k_end.equal?( :tEOF )
       msg = 'syntax error, unexpected $end, expecting kEND'
       line = self.line_for(path)
@@ -930,22 +926,22 @@ module MagRp # {
     result
   end
 
-  def new_compstmt( val )
-    result = void_stmts(val[0])
+  def new_compstmt( v_zero )
+    result = void_stmts(v_zero )
     if result
       result = result.kbegin_value 
     end
     result
   end
 
-  def new_defn(val)
+  def new_defn(val, vofs )
     # (line, bol), name, args, body = val[2], val[1], val[3], val[4]
     # line, bol = val[2]   # unused
-    def_tok = val[0] # a DefnNameToken
-    name_tok = val[1]
-    args = val[3]
-    body = val[4]
-    k_end = val[5]   # yacc_value for kEND synthesized EOF
+    def_tok = val[vofs ] # a DefnNameToken
+    name_tok = val[vofs + 1]
+    args = val[vofs + 3]
+    body = val[vofs + 4]
+    k_end = val[vofs + 5]   # yacc_value for kEND synthesized EOF
     if k_end.equal?( :tEOF )
       msg = 'syntax error, unexpected $end, expecting kEND'
       msg << ", for   def   near line #{def_tok.line} "
@@ -971,17 +967,18 @@ module MagRp # {
     result = RubyDefnNode.s(name_sym, args, body) # s(:defn )
     result.src_offset=( def_tok.src_offset )
     result.start_line=( def_tok.line )
+    result.set_filename_source( @file_name , @source_string )
     result
   end
 
-  def new_defs(val)
+  def new_defs(val, vofs)
     #recv, name, args, body = val[1], val[4], val[6], val[7]
-    def_tok = val[0] # a DefnNameToken
-    recv = val[1]
-    name_tok = val[4]
-    args = val[6]
-    body = val[7]
-    k_end = val[8]   # yacc_value for kEND synthesized EOF
+    def_tok = val[vofs ] # a DefnNameToken
+    recv = val[vofs + 1]
+    name_tok = val[vofs + 4]
+    args = val[vofs + 6]
+    body = val[vofs + 7]
+    k_end = val[vofs + 8]   # yacc_value for kEND synthesized EOF
     if k_end.equal?( :tEOF )
       msg = 'syntax error, unexpected $end, expecting kEND'
       line = self.line_for(name_tok)
@@ -1004,6 +1001,7 @@ module MagRp # {
     result.receiver=(recv) 
     result.src_offset=( def_tok.src_offset )
     result.start_line=( def_tok.line )
+    result.set_filename_source( @file_name , @source_string )
     result
   end
 
@@ -1029,11 +1027,11 @@ module MagRp # {
     res
   end
 
-  def new_iter(args, body, k_end) 
-    if k_end.equal?( :tEOF )
-      msg = 'syntax error, unexpected $end, expecting kEND'
-      msg << ", for   block   near line #{def_tok.line} "
-      msg << self.last_closed_def_message
+  def new_iter(args, body)
+    if args.class.equal?( RubyGlobalAsgnNode) 
+      lnum = self.line_for_offset( args.src_offset )
+      msg = 'assignment to global variable not supported as block arg, '
+      msg << "near line #{line} "
       raise SyntaxError , msg
     end
     RubyIterRpNode.s( args, body ) 
@@ -1047,7 +1045,7 @@ module MagRp # {
       src_line = nil
     end
     if lhs.equal?(nil)
-      nil.pause
+      raise_error("lhs is nil in new_parasgn")
     end
     n = RubyParAsgnRpNode.s(lhs, src_line)
     n.src_offset=( src_ofs)
@@ -1066,11 +1064,11 @@ module MagRp # {
     lhs.append_mrhs( rhs )
   end
 
-  def new_module( val) 
+  def new_module( val, vofs ) 
     # line, path, body = val[1], val[2], val[4]  # line deleted from .y
-    path = val[1]
-    body = val[3]
-    k_end = val[4]   # yacc_value for kEND synthesized EOF
+    path = val[vofs + 1]
+    body = val[vofs + 3]
+    k_end = val[vofs + 4]   # yacc_value for kEND synthesized EOF
     if k_end.equal?( :tEOF )
       msg = 'syntax error, unexpected $end, expecting kEND'
       line = self.line_for(path)
@@ -1086,13 +1084,13 @@ module MagRp # {
     result
   end
 
-  def new_op_asgn(val)
+  def new_op_asgn(val, vofs)
     # lhs, asgn_op, arg = val[0], val[1].to_sym, val[2]
-    lhs = val[0]
+    lhs = val[vofs]
     # val[1] should be a RpNameToken
-    asgn_sel_tok = val[1] 
+    asgn_sel_tok = val[vofs + 1] 
     asgn_op = asgn_sel_tok.symval
-    arg = val[2]
+    arg = val[vofs + 2]
     			# lhs should be a RubyAssignableNode
     new_lhs = lhs.as_accessor 
     arg = arg.kbegin_value
@@ -1116,13 +1114,12 @@ module MagRp # {
     res
   end
 
-  def new_regexp( val)  
+  def new_regexp(val, vofs)  
     # node = val[1] || s(:str, '')
-    options = val[2]
+    options = val[vofs + 2] # an Array, lexer yacc_value for tREGEXP_END
 
-    # o, k = 0, nil
+    # o, k = 0, nil  # k not used
     o = 0
-    kch = nil
 
     have_once = false
     opt_idx = 0
@@ -1133,7 +1130,7 @@ module MagRp # {
         if ch.equal?( ?i) ; o += Regexp::IGNORECASE
         elsif ch.equal?( ?m) ; o += Regexp::MULTILINE
         elsif ch.equal?( ?n) ; o += Regexp::ENC_NONE
-        elsif ch.equal?( ?e) ; o += Regexp::ENC_EUC ; kch = ch; 
+        elsif ch.equal?( ?e) ; o += Regexp::ENC_EUC 
         else
           err_str = ' ' ; err_str[0] = ch ;
           raise "unknown regexp option: #{err_str}" 
@@ -1141,8 +1138,8 @@ module MagRp # {
       else 
         if ch.equal?( ?x ) ; o += Regexp::EXTENDED  
         elsif ch.equal?( ?o) ; o += Regexp::ONCE ; have_once = true;
-        elsif ch.equal?( ?s) ; o += Regexp::ENC_SJIS; kch = ch;
-        elsif ch.equal?( ?u) ; o += Regexp::ENC_UTF8; kch = ch;
+        elsif ch.equal?( ?s) ; o += Regexp::ENC_SJIS
+        elsif ch.equal?( ?u) ; o += Regexp::ENC_UTF8
         else
           err_str = ' ' ; err_str[0] = ch ;
           raise "unknown regexp option: #{err_str}" 
@@ -1150,41 +1147,47 @@ module MagRp # {
       end
       opt_idx += 1
     end
-
-    argnode = val[1]
-    if argnode.equal?(nil)
-      kstr = nil
-      if kch 
-        kstr = ' ' ; kstr[0] = kch
+    argnode = val[vofs + 1]
+    arg_cls = argnode.class
+    if  arg_cls.equal?(RubyStrNode) 
+      # simple regexp, don't care about have_once because no substitutions
+      node = nil
+      begin
+        str = argnode.strNodeValue
+        rxlit = Regexp._new( str, o, nil)
+        node = RubyRegexpNode.s(rxlit)
+      rescue RegexpError => ex
+        regex_beg_tok = val[vofs]  # for tREGEXP_BEG
+        line = self.line_for(regex_beg_tok)
+        msg = "near line #{line}, #{ex.message} " 
+        raise SyntaxError , msg
       end
-      rxlit = Regexp.new('', o, kstr)
-      node = RubyRegexpNode.s(rxlit)
-    else
-      arg_cls = argnode.class
-      if have_once
-        node = RubyDRegexpOnceNode._new
-      else
-        node = RubyDRegexpNode._new
-      end
-      if arg_cls.equal?(RubyDStrNode) # when :dstr 
-        node.list=( argnode.list )
-      else
-        d_list = [ RubyStrNode.s(''), argnode ]
-        node.list=(d_list)
-      end
-      node.options=(o)
+      return node
     end
+    if argnode.equal?(nil)
+      rxlit = Regexp._new('', o, nil)
+      node = RubyRegexpNode.s(rxlit)
+      return node
+    end
+    node = have_once ? RubyDRegexpOnceNode._new : RubyDRegexpNode._new
+    if arg_cls.equal?(RubyDStrNode) # when :dstr 
+      node.list=( argnode.list )
+    else
+      d_list = [ RubyStrNode.s(''), argnode ]
+      node.list=(d_list)
+    end
+    node.options=(o)
     node
   end
 
-  def new_sclass( val)  
+  def new_sclass( val, vofs)  
     # recv, in_def, in_single, body = val[3], val[4], val[6], val[7]
     # line deleted from .y
-    recv = val[2]
-    in_def = val[3]
-    in_single = val[5]
-    body = val[6]
-    k_end = val[7]   # yacc_value for kEND synthesized EOF
+    recv = val[vofs + 2]
+    in_def = val[vofs + 3]
+    in_single = val[vofs + 5]
+    body = val[vofs + 6]
+    k_end = val[vofs + 7]   # yacc_value for kEND synthesized EOF
     if k_end.equal?( :tEOF )
       msg = 'syntax error, unexpected $end, expecting kEND'
       msg << ", for   class   near line #{def_tok.line} "
@@ -1201,13 +1204,13 @@ module MagRp # {
     result
   end
 
-  def new_super( val ) 
-    sel_tok = val[0]
-    args = val[1]
+  def new_super( val , vofs ) 
+    sel_tok = val[vofs]
+    args = val[vofs + 1]
     aryCls = RubyRpCallArgs 
     arg_cls = args.class
     if args.equal?(nil)
-      # maybe this should be zsuper ??, but that's not what Ryan does
+      # maybe this should be zsuper ??, but that's not what rp202 does
       res = RubySuperNode.s( aryCls._new  )
     elsif arg_cls.equal?(RubyBlockPassNode) # args[0] == :block_pass then
       res = RubySuperNode.s( aryCls._new  )
@@ -1251,7 +1254,7 @@ module MagRp # {
   def premature_eof( name_tok )
     line = self.line_for(name_tok)
     msg = 'syntax error, unexpected $end, expecting kEND'
-    msg << ", for   #{name_tok.symval}   near line line"
+    msg << ", for   #{name_tok.symval} near line #{line}, "
     msg << self.last_closed_def_message
     raise SyntaxError , msg
   end
@@ -1323,7 +1326,7 @@ module MagRp # {
     return RubyYieldNode.s( RubyRpCallArgs._new ) 
   end
 
-  def node_assign(lhs, rhs) # TODOryan: rename new_assign
+  def node_assign(lhs, rhs) # TODO202: rename new_assign
     return nil unless lhs
 
     rhs = self.value_expr(rhs)
@@ -1353,7 +1356,8 @@ module MagRp # {
     unless str._isString
       raise ArgumentError, 'expected a string'
     end
-    @file = load_name
+    @file_name = load_name
+    @source_string = str 
     @lexer.install_source( str )
     ast = self._racc_do_parse_rb()
     err_count = @syntax_err_count
@@ -1419,6 +1423,9 @@ module MagRp # {
     raise InternalParseError, msg
   end
 
+  def backref_assign_error( a_val)  # method missing from rp202 code
+    raise_error( "backref_assign_error" )
+  end
 
  end  # }
 end  # 

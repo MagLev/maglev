@@ -850,8 +850,7 @@ class Date
     elem[:hour] ||= 0
     elem[:min]  ||= 0
     elem[:sec]  ||= 0
-    elem[:sec] = [elem[:sec], 59].min
-
+    elem[:sec] = 59._min( elem[:sec] )
     elem
   end
 

@@ -1,4 +1,0 @@
-fails:Kernel#require is a private method
-fails:Kernel#require appends a file with no extension with .rb/.<ext> in that order to locate file
-fails:Kernel#require appends any non-ruby extensioned file with .rb/.<ext> in that order to locate file
-fails:Kernel#require produces __FILE__ as the given filename and __LINE__ as the source line number

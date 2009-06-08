@@ -1,3 +1,6 @@
 fails:Kernel#raise is a private method
+fails:Kernel#raise aborts execution
 fails:Kernel#raise raises RuntimeError if no exception class is given
+fails:Kernel#raise re-raises the rescued exception
 fails:Kernel#raise allows Exception, message, and backtrace parameters
+fails:Kernel.raise needs to be reviewed for spec completeness

@@ -1,1 +1,0 @@
-fails:Kernel#singleton_methods returns a list of the names of singleton methods in the object

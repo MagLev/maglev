@@ -240,7 +240,7 @@ module Marshal
         obj[key] = val
       end
 
-      obj.default = construct if type == TYPE_HASH_DEF
+      obj.default = construct if type.equal?( TYPE_HASH_DEF_ch)
 
       obj
     end
@@ -248,7 +248,13 @@ module Marshal
     def construct_integer
       n = consume_byte
       if (n > 0 and n < 5) or n > 251
-        size, signed = n > 251 ? [256 - n, 1 << ((256 - n)*8) ] : [n, 0]
+        if n > 251
+          size= 256 - n
+          signed = 1 << ((256 - n)*8) 
+        else
+          size = n
+          signed = 0
+        end
 
         result = 0
         data = consume(size)

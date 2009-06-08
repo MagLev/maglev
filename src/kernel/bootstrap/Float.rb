@@ -38,7 +38,22 @@ class Float
      # ROUNDS is made invariant by code in RubyContext 
      #  because there is no support for changing rounding mode in the VM.
 
+  def coerce(param, &block)
+    begin
+      unless param.equal?(nil)
+        v = param.to_f
+        if v._isFloat
+          return [ v, self ]
+        end
+      end
+    rescue
+      # continue execution
+    end
+    super
+  end
+
   def coerce(param)
+    # non-bridge variant without block arg
     begin
       v = param.to_f
       if v._isFloat
@@ -143,6 +158,7 @@ class Float
   primitive_nobridge 'nan?', '_isNaN'
   primitive_nobridge 'round', 'rounded'
   primitive_nobridge 'to_f' , 'asFloat'
+  primitive_nobridge '_to_float' , 'asFloat'
   primitive_nobridge 'to_i' , 'truncated'
   primitive_nobridge 'to_int' , 'truncated'
   primitive_nobridge 'to_s' , '_rubyAsString'  

@@ -1,29 +1,9 @@
-fails:File.open with block does not raise error when file is closed inside the block
-fails:File.open with a block invokes close on opened file when exiting the block
-fails:File.open with a block propagates non-StandardErrors produced by close
 fails:File.open with a block swallows StandardErrors produced by close
-fails:File.open opens the file (basic case)
 fails:File.open opens file when call with a block (basic case)
-fails:File.open opens with mode string
 fails:File.open opens a file with mode string and block
-fails:File.open opens a file with mode num
 fails:File.open opens a file with mode num and block
-fails:File.open creates the file and returns writable descriptor when called with 'w' mode and r-o permissions
-fails:File.open opens the existing file, does not change permissions even when they are specified
-fails:File.open creates a new write-only file when invoked with 'w' and '0222'
+fails:File.open opens the file when passed mode, num, permissions and block
 fails:File.open opens the file when call with fd
 fails:File.open opens a file with a file descriptor d and a block
-fails:File.open opens a file that no exists when use File::WRONLY mode
-fails:File.open opens a file that no exists when use File::RDONLY mode
-fails:File.open opens a file that no exists when use 'r' mode
-fails:File.open opens a file that no exists when use File::EXCL mode
-fails:File.open opens a file that no exists when use File::NONBLOCK mode
-fails:File.open opens a file that no exists when use File::TRUNC mode
-fails:File.open opens a file that no exists when use File::NOCTTY mode
 fails:File.open opens a file that no exists when use File::CREAT mode
-fails:File.open opens a file that no exists when use 'a' mode
-fails:File.open opens a file that no exists when use 'w' mode
 fails:File.open raises an ArgumentError exception when call with an unknown mode
-fails:File.open can read in a block when call open with RDONLY mode
-fails:File.open can read in a block when call open with 'r' mode
-fails:File.open raises an IO exception when write in a block opened with RDONLY mode

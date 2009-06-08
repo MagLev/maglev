@@ -1,2 +1,1 @@
 fails:File.extname returns the extension (the portion of file name in path after the period).
-fails:File.extname returns the extension (the portion of file name in path after the period).(edge cases)

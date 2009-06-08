@@ -1,3 +1,0 @@
-fails:Thread.stop causes the current thread to sleep indefinitely
-fails:Thread.stop resets Thread.critical to false
-fails:Thread#stop? reports if a thread has stopped due to sleeping

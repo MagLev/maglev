@@ -4,3 +4,4 @@ fails:String#swapcase is locale insensitive (only upcases a-z and only downcases
 fails:String#swapcase returns subclass instances when called on a subclass
 fails:String#swapcase! modifies self in place
 fails:String#swapcase! returns nil if no modifications were made
+fails:String#swapcase! raises a TypeError when self is frozen

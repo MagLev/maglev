@@ -1,4 +1,5 @@
 fails:Dir.glob converts patterns with to_str
+fails:Dir.glob matches non-dotfiles with '*'
 fails:Dir.glob matches regexp special +
 fails:Dir.glob matches regexp special *
 fails:Dir.glob matches regexp special ?
@@ -7,11 +8,23 @@ fails:Dir.glob matches regexp special ^
 fails:Dir.glob matches regexp special $
 fails:Dir.glob matches regexp special (
 fails:Dir.glob matches regexp special )
+fails:Dir.glob matches regexp special [
 fails:Dir.glob matches regexp special ]
 fails:Dir.glob matches regexp special {
 fails:Dir.glob matches regexp special }
-fails:Dir.glob recursively matches any subdirectories including ./ and ../ with '.**/'
-fails:Dir.glob matches any one of the strings in a set with '{<string>,<other>,...}'
+fails:Dir.glob matches dotfiles with '.*'
+fails:Dir.glob matches non-dotfiles with '*<non-special characters>'
+fails:Dir.glob matches dotfiles with '.*<non-special characters>'
+fails:Dir.glob matches files with any ending with '<non-special characters>*'
+fails:Dir.glob matches files with multiple '*' special characters
+fails:Dir.glob matches non-dotfiles in the current directory with '**'
+fails:Dir.glob matches dotfiles in the current directory with '.**'
 fails:Dir.glob accepts string sets with empty strings with {<string>,,<other>}
+fails:Dir.glob matches dot or non-dotfiles with '{,.}*'
 fails:Dir.glob matches special characters by escaping with a backslash with '\<character>'
+fails:Dir.glob recursively matches directories with '**/<characters>'
 fails:Dir.glob matches multiple recursives
+fails:Dir.glob matches both dot and non-dotfiles with '*' and option File::FNM_DOTMATCH
+fails:Dir.glob matches files with any beginning with '*<non-special characters>' and option File::FNM_DOTMATCH
+fails:Dir.glob matches any files in the current directory with '**' and option File::FNM_DOTMATCH
+fails:Dir.glob returns nil for directories current user has no permission to read
