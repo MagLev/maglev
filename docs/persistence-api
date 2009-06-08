@@ -38,9 +38,9 @@ In the MagLev persistence model:
 An Object is persisted by:
 
 * Ensuring that its class and all classes and mixed in modules along its
-  super class chain are persistable. 
+  super class chain are persistable.
 * Attaching the object to a persistent root (e.g.,
-  <tt>Maglev::PERSISTENT_ROOT</tt>) 
+  <tt>Maglev::PERSISTENT_ROOT</tt>)
 * Calling <tt>Maglev.commit_transaction</tt>
 
 A Class is made persistable by either marking it explicitly,
@@ -58,7 +58,7 @@ data in an RDBMS (e.g., through +ActiveRecord+ or another ORM).  All of
 these mechanisms will work in MagLev, just as they work in MRI.
 
 The MagLev examples directory contains several examples of using MagLev
-persistence, including the +GStore+ example, which provides an small
+persistence, including the +GStore+ example, which provides a small
 persistence library based on the Ruby +PStore+ API.  Read the comments in
 <tt>examples/persistence/gstore/</tt> for complete details.
 
@@ -169,7 +169,7 @@ other VM that attaches to the same GemStone repository will see
 modifications made by a VM running in default mode.  File loading,
 etc. should be just like MRI.
 
-=== Explicit MagLev Persistence
+=== MagLev Persistence
 
 To take advantage of the transactional, shared, distributed, cached, native
 MagLev persistence, the MagLev programmer has to take explicit action.  To
@@ -199,7 +199,7 @@ There are two ways to use the MagLev persistence API to mark classes for
 persistence:
 
 * Use of <tt>Maglev.persistent</tt> and <tt>Maglev.transient</tt>
-* Use of <tt>Module#maglev_persist=</tt>
+* Use of <tt>Module#maglev_persistable=</tt>
 
 ===== <tt>Maglev.persistent</tt> and <tt>Maglev.transient</tt> Basics
 
@@ -268,7 +268,7 @@ Note: it is safe to call either <tt>Maglev.persistent</tt> or
 more detailed uses cases that explore finer grained control over class
 persistence later in this document.
 
-===== <tt>Module#maglev_persist=</tt> Basics
+===== <tt>Module#maglev_persistable=</tt> Basics
 
 The other mechanism to control persistence is to explicitly set/clear the
 persistable flag on individual classes and modules.
@@ -293,6 +293,12 @@ will see the state of the class at the time <tt>persistable=</tt> was
 invoked and committed.  Any VM already connected to the repository will see
 the new class (or modifications) the next time it does a
 <tt>Maglev.commit_transaction</tt> or an <tt>Maglev.abort_transaction</tt>.
+
+=== Eigenclasses (Singleton classes)
+
+The MagLev VM marks all Eigenclasses as persistable, and marks them to
+allow persistable instances.  Eigenclasses are automatically persisted by
+reachability if their object is persisted.
 
 === Re-Opening Classes to Achieve Finer Control
 
@@ -489,6 +495,14 @@ object, contained in <tt>PERSISTENT_ROOT[:my_favorite_foos]</tt> array.
 All new MagLev VMs that connect to the repository will also see these
 objects.
 
+=== Global variables
+
+In a previous version of the MagLev persistence model, gloal variables,
+e.g, <tt>$hat</tt>, were automatically persisted.  That is no longer the
+case.  Global variables are global to the VM, but not shared between VMs.
+Global variables are allowed to have persistent objects as their value,
+however.
+
 === Roll Your Own Persistence Model
 
 If none of the preceding options meets your requirements, MagLev provides
@@ -497,71 +511,5 @@ etc.).  See <tt>docs/smalltalk_ffi</tt> for more information. These APIs
 have proven to be robust and sufficient enough for real world applications
 to run hundreds of VMs, thousands of transactions per second and manage
 terabytes of data.
-
-
-
-= Issues
-* Eigenclass of a class (automatic when the class is marked?)
-* Eigenclass of a non-class is automatically persisted when the object is
-  persisted.
-* GemStone decided not to include the ability to un-persist a class.  The
-  underlying VM allows for classes to be made non-persistent, but until
-  there is a good use case, we have not exposed this to the Ruby world due
-  to the complexity of disentangling the class and its instances from the
-  persisted object graph.
-* Need a design document as well.  Some fodder for the design document:
-  * Dale's idea: Calling <tt>MyClass.persistable=</tt> should also write a
-    copy of the new "file" to a well known directory so that the programmer
-    can have a reference copy of what is in the image.  The VM will
-    maintain the integrity of this shadow copy, since Ruby developers won't
-    be developing in a squeak IDE.
-  * To mark a class as persistable, move the ST method
-    <tt>_makeInstancesPersistent</tt> up to behavior, that way we can mark a class'
-    metaclass as persistent or not.  Then when in ruby you do
-    <tt>MyClass.persistable=</tt>, you can mark both the metaclass and the
-    class as <tt>_makeInstancesPersistent</tt>.
-  * We'll need to do some sort of shadow ruby name space, since that is
-    where the names of the classes live.  If a class is persisted, then
-    we'll need to ensure that it (and its inheritance chain) is also put in
-    the persistent version of the ruby namespace.
-  * Persisting a ruby class that has a (constant) reference to a
-    non-persistable class or object will result in an exception.
-* Other extensions:
-  * There may be an opportunity to provide a .rbc form that does some of
-    the compilation up front.
-  * $LOADED_FEATURES is per VM and initialized to blank.
-  * STDOUT $stdout
-  * .rb files as migrations
-  * print warnings on re-open of a persistent class if you did not do a
-    maglev_reopen!?
-  * Part of going to persistence world is you'll probably have to re-factor
-    your code into init/run-once stuff and the "main loop".
-  * Gemstone may have to partition popular ruby apps like IRB, gems etc.
-* Does the effect of persistable= have to be committed before you can
-  commit an instance of the class, or can you do it in one shot. I.e., is
-  this legal:
-
-       # first mention of Foo
-       class Foo
-       end
-
-       Foo.persistable=
-
-       # create an instance before Foo's persistence is committed
-       # and attach to persistent root
-       PERSISTENT_ROOT[:foo] = Foo.new
-
-       Maglev.commit_transaction   # will this fail or succeed? or is it
-                                   # non deterministic?
-* How will re-reading files work?  E.g., suppose you have:
-    class MyClass
-      Foo = 0
-    end
-    MyClass.persistable=
-
-  And you're in development, so you want to edit it and reload.  The API
-  says you can call persistable= only once.  Should we allow multiple
-  calls in development mode?  Should we add a switch? Or should developers
-  start w/o persisting, and then add it later?...
 
 

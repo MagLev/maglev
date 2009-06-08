@@ -236,15 +236,15 @@ class Module
   #
   # If the +flag+ is true, then receiver is marked to allow itself to be
   # persisted.  Since Modules and Classes are namespaces, all of receivers
-  # constants should hold persistable values or an exception will be
-  # raised at commit time.
+  # constants should hold persistable values or an exception will be raised
+  # at commit time.
   #
   # If the +flag+ is false, then receiver is marked to disallow itself to
   # be persisted.  Receiver and its instances should be removed from
   # persistent roots before the next <tt>Maglev.commit_transaction</tt>.
   #
-  # If receiver is a class, this does not affect whether instances of
-  # receiver are persistable.  See
+  # If receiver is a class, this method does not affect the persistable
+  # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
   #
