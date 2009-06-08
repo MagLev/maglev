@@ -143,7 +143,8 @@ module Marshal
         obj = construct_bignum
       elsif type.equal?( TYPE_CLASS_ch) || type.equal?( TYPE_MODULE_ch)
         name = construct_symbol
-        obj = Object.const_get(name)
+        #obj = Object.const_get(name)
+        obj = get_scoped_constant(name)
         store_unique_object(obj)
         call obj if call_proc
       elsif type.equal?( TYPE_REGEXP_ch )
@@ -167,7 +168,8 @@ module Marshal
       elsif type.equal?( TYPE_EXTENDED_ch )
         @modules ||= []
         name = get_symbol
-        @modules << Object.const_get(name)
+        # @modules << Object.const_get(name)
+        @modules << get_scoped_constant(name)
         obj = construct nil, false
         extend_object obj
         call obj if call_proc
@@ -250,7 +252,7 @@ module Marshal
       if (n > 0 and n < 5) or n > 251
         if n > 251
           size= 256 - n
-          signed = 1 << ((256 - n)*8) 
+          signed = 1 << ((256 - n)*8)
         else
           size = n
           signed = 0
@@ -274,7 +276,8 @@ module Marshal
 
     def construct_object
       name = get_symbol
-      klass = Object.const_get(name)
+      #klass = Object.const_get(name)
+      klass = get_scoped_constant(name)
       obj = klass.allocate
 
       raise TypeError, 'dump format error' unless Object === obj
@@ -310,7 +313,8 @@ module Marshal
       name = get_symbol
       #
 
-      klass = Object.const_get(name)
+      #klass = Object.const_get(name)
+      klass = get_scoped_constant(name)
       members = klass.members
 
       obj = klass.allocate
