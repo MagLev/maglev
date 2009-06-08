@@ -9,8 +9,8 @@ document are available in the following places:
 * The Persistence MSpecs (in <tt>src/test/persistence/</tt>) specify the detailed
   semantics of the methods.  Some of the comments outline use cases and
   provide additional insight.  Note: these MSpecs are not yet runnable.
-* The persistence API[link:classes/Maglev.html] (<tt>docs/persistence.rb</tt>) and rdoc,
-  provides Ruby pseudo code for the API.
+* The persistence API[link:classes/Maglev.html]
+* <tt>docs/persistence.rb</tt> provides Ruby pseudo code for the API.
 * The GemStone/S 64 Bit Programming Guide: provides a full discussion of
   the GemStone persistence model (including transactions, locking, etc.),
   http://seaside.gemstone.com/docs/GS64-ProgGuide-2.2.pdf.
@@ -26,33 +26,40 @@ Out of the box, MagLev will accommodate two persistence models:
    shared, cached, native object persistence, requires explicit action, by
    adding directives to your code, or starting the VM in a different mode.
 
-In the no persistence model, nothing is saved to the repository, and MagLev
-acts like the standard MRI version of Ruby.  We believe this mode will be
-very valuable, especially during the development stage and for folks that
-want to take advantage of the stable and performant VM.  We believe a
-production ready application will be most performant and scalable when it
-makes full use of the MagLev persistence, both for data and classes.
+In the MRI compatibility model, nothing is saved to the repository, and
+MagLev acts like the standard MRI version of Ruby.  We believe this mode
+will be very valuable, especially during the development stage and for
+folks that just want to take advantage of the stable and performant VM.  We
+believe a production ready application will be most performant and scalable
+when it makes full use of MagLev persistence, both for data and classes.
 
 In the MagLev persistence model:
 
-* An Object is persisted by:
-    * Ensuring that its class and all classes and mixed in modules along
-      its super class chain are persistable.
-    * Attaching the object to a persistent root (e.g., <tt>USER\_GLOBALS</tt>)
-    * Calling <tt>Maglev.commit_transaction</tt>
-* A Class is made persistable by either marking it explicitly:
-  <tt>MyClass.maglev_persistable = true</tt>, or by having its initial
-  class declaration run within a persistent block:
-  <tt>Maglev.persistent do ... end</tt>.
+An Object is persisted by:
+
+* Ensuring that its class and all classes and mixed in modules along its
+  super class chain are persistable. 
+* Attaching the object to a persistent root (e.g.,
+  <tt>Maglev::PERSISTENT_ROOT</tt>) 
+* Calling <tt>Maglev.commit_transaction</tt>
+
+A Class is made persistable by either marking it explicitly,
+<tt>MyClass.maglev_persistable = true</tt>, or by having its initial
+class declaration run within a persistent block:
+  Maglev.persistent do
+    class MyClass
+      # ...
+    end
+  end
 
 The MagLev persistence model does not affect the use of other, traditional
 Ruby persistence mechanisms such as Yaml, JSON, Ruby Marshaling or storing
-data in an RDBMS (e.g., through ActiveRecord or another ORM).  All of these
-mechanisms will work in MagLev, just as they work in MRI.
+data in an RDBMS (e.g., through +ActiveRecord+ or another ORM).  All of
+these mechanisms will work in MagLev, just as they work in MRI.
 
 The MagLev examples directory contains several examples of using MagLev
-persistence, including the GStore example, which provides an small
-persistence library based on the Ruby PStore API.  Read the comments in
+persistence, including the +GStore+ example, which provides an small
+persistence library based on the Ruby +PStore+ API.  Read the comments in
 <tt>examples/persistence/gstore/</tt> for complete details.
 
 If neither the MRI Compatibility model nor the MagLev persistence model is
