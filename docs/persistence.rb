@@ -198,7 +198,7 @@ module Maglev
 end
 
 class Module
-  # Sets the persistent flag on receiver.
+  # Sets the persistable flag on receiver.
   #
   # If the +flag+ is true, then receiver is marked to allow itself and, if
   # receiver is a class, its instances to be persisted.  Since Modules and
@@ -209,11 +209,11 @@ class Module
   # if receiver is a class, its instances to be persisted.  Receiver and
   # its instances should be removed from persistent roots before the next
   # <tt>Maglev.commit_transaction</tt>.
-  def maglev_persist=(flag=true)
+  def maglev_persistable=(flag=true)
   end
 
   # Returns the persistent flag of receiver
-  def maglev_persist?
+  def maglev_persistable?
   end
 end
 
