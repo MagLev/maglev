@@ -4,4 +4,4 @@
 require 'rabbit.rb'
 $hat.put(Rabbit.new)
 RubyContext.save_context
-Gemstone.commitTransaction
+Maglev.commit_transaction
