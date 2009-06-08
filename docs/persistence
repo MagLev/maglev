@@ -28,9 +28,8 @@ provide the necessary hooks.
 
 To wrap changes in a transaction:
 
-    Gemstone.beginTransaction
     $foo = Object.new
-    Gemstone.commitTransaction
+    Maglev.commit_transaction
 
 Then, from another session, you should be able to see $foo.
 
@@ -45,7 +44,7 @@ commit.
 
 === Hat Trick Example
 
-You can follow along below, or run the canned ruby scripts 
+You can follow along below, or run the canned ruby scripts
 create_hat.rb, add_rabbit_to_hat.rb, and show_hat_contents.rb
 as shown in <tt>examples/hat_trick/README</tt>
 
@@ -100,8 +99,6 @@ The magician creates a hat, and shows the audience that it is empty:
 
     $ cd examples/hat_trick/
     $ maglev-irb
-    >> Gemstone.beginTransaction    # Not strictly necessary
-    => Gemstone
     *> load 'hat.rb'                # hat.rb loaded into Magician VM only
     => true
     *> $hat = Hat.new               # Create our hat in a persistent root
@@ -115,7 +112,7 @@ to all VMs attached to the repository.
 
     *> RubyContext.save_context     # Stage hat code for commit
     => #<RubyContext:0x2437c501>
-    *> Gemstone.commitTransaction   # Commit code and hat to repository
+    *> Maglev.commit_transaction   # Commit code and hat to repository
     => true
     *>
 
@@ -126,7 +123,7 @@ hat.
 
     $ cd examples/hat_trick/
     $ maglev-irb
-    *> Gemstone.abortTransaction   # Ensure we have a fresh view of repository
+    *> Maglev.abort_transaction   # Ensure we have a fresh view of repository
     => Gemstone
     *> RubyContext.load_context    # Load changed code into working copy
     => #<RubyContext:0x2437c501>   # NOTE: same obj id as in Magician VM!
@@ -138,12 +135,12 @@ hat.
     => nil
     *> RubyContext.save_context    # Stage rabbit code for commit
     => #<RubyContext:0x2437c501>
-    *> Gemstone.commitTransaction  # Commit rabbit code and rabbit in hat
+    *> Maglev.commit_transaction  # Commit rabbit code and rabbit in hat
     => true
 
 The assistant starts by aborting the current transaction and then loading
 the ruby context.  This is only necessary if the assistant VM was started
-before the magician did the commit.  The <tt>Gemstone.abortTransaction</tt>
+before the magician did the commit.  The <tt>Maglev.abort_transaction</tt>
 flushes any changes in the current vm (in our case, none), and then
 refreshes state from the repository (i.e., gets <tt>$hat</tt> and updates
 the RubyContext with the hat code).  Since the VM runs off of the working
@@ -160,7 +157,7 @@ Wave magic wand:
 
     MAGICIAN:
 
-    *> Gemstone.abortTransaction     # Refresh our view from the repository
+    *> Maglev.abort_transaction     # Refresh our view from the repository
     => Gemstone                      # (reads $hat, that now has a rabbit)
     *> RubyContext.load_context      # Copy persistent view of code to working view
     => #<RubyContext:0x2437c501>
@@ -197,14 +194,14 @@ The magician creates a hat, and shows the audience that it is empty:
     => #<Hat:0x05a8ea01>
     *> $hat.contents[0]                  # The hat is empty
     => nil
-    *> MagLev::CodeAndData.commit_txn    # Stage the new code (both hat and 
+    *> MagLev::CodeAndData.commit_txn    # Stage the new code (both hat and
     => true                              # maglev are staged) and commit code
     *>                                   # and data.
 
 Now the assistent does some work:
 
     ASSISTANT:
-    
+
     $ cd examples/hat_trick/
     $ maglev-irb
     >> MagLev::CodeAndData.freshen       # No need to load maglev, if assitant
@@ -219,11 +216,11 @@ Now the assistent does some work:
     => true
 
 Back in the Magician:
- 
+
     *> MagLev::CodeAndData.freshen       # Wave magic wand (loads both the
     => true                              # rabbit and its code)
     *> $hat.contents[0]                  # Pull rabbit out of hat
-    => 
+    =>
      () ()
     ( '.' )
     (")_(")
