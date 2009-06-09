@@ -37,7 +37,7 @@ ramaze_hello.rb
 
 rubygems-1.3.1
   Ruby gems 1.3.1.  Basically works.
-  Ruby gems 1.3.2 does not yet work.
+  Ruby gems 1.3.4   Runs setup.rb --no-rdoc --no-ri
 
 rxtest
   Tim Bray's rx code.  Rx is an automaton based XML tokenizer.  It was

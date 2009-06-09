@@ -4,4 +4,4 @@
 load 'hat.rb'
 $hat = Hat.new
 RubyContext.save_context
-Gemstone.commitTransaction
+Maglev.commit_transaction
