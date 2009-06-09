@@ -1,4 +1,2 @@
 fails:Array#== handles well recursive arrays
 fails:Array#== does not call #to_ary on its argument
-fails:Array#== returns false if any corresponding elements are not #==
-fails:Array#== returns true if corresponding elements are #==

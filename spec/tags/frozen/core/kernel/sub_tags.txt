@@ -1,4 +1,0 @@
-fails:Kernel#sub is a private method
-fails:Kernel#sub! is a private method
-fails:Kernel.sub needs to be reviewed for spec completeness
-fails:Kernel.sub! needs to be reviewed for spec completeness

@@ -1,2 +1,2 @@
-fails:Hash#each yields one argument: [key, value]
+fails:Hash#each yields a [[key, value]] Array for each pair to a block expecting |*args|
 fails:Hash#each raises a LocalJumpError when called on a non-empty hash without a block

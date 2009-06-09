@@ -1,2 +1,0 @@
-fails:Kernel.String is a private method
-fails:Kernel.String converts the given argument to a String by calling #to_s

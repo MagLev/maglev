@@ -1,7 +1,0 @@
-fails:Kernel.proc is a private method
-fails:Kernel.proc returns a Proc object
-fails:Kernel.proc raises an ArgumentError when no block is given
-fails:Kernel.proc raises an ArgumentError when given too many arguments
-fails:Kernel.proc raises an ArgumentError when given too few arguments
-fails:Kernel.proc returns from block into caller block
-fails:Kernel#proc needs to be reviewed for spec completeness

@@ -1,2 +1,0 @@
-fails:Kernel#exec is a private method
-fails:Kernel#exec raises a SystemCallError if cmd cannot execute

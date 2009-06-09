@@ -1,2 +1,0 @@
-fails:Struct#each passes each value to the given block
-fails:Struct#each fails if not passed a block

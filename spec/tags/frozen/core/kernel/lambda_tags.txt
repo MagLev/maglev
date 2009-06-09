@@ -1,1 +1,0 @@
-fails:Kernel.lambda is a private method

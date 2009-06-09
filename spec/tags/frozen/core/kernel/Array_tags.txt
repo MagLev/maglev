@@ -1,3 +1,0 @@
-fails:Kernel#Array is a private method
-fails:Kernel#Array first tries to call #to_ary on the given argument
-fails:Kernel#Array raises a TypeError if #to_ary / #to_a do not return an array

@@ -1,1 +1,0 @@
-fails:Fixnum#div coerces self and the given argument to Floats and returns self divided by other as Fixnum

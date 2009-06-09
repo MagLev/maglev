@@ -1,2 +1,0 @@
-fails:Kernel#trace_var is a private method
-fails:Kernel.trace_var needs to be reviewed for spec completeness
