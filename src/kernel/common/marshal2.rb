@@ -4,7 +4,8 @@ class Object
     out = ms.serialize_extended_object self
     out << Marshal::TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
-    out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
+    #out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
+    out << ms.serialize_instance_variables_suffix(self, self.instance_variables)
     out
   end
 end
@@ -143,7 +144,7 @@ class Array
     while n < lim
       out << ms.serialize(self[n])
       n = n + 1
-    end		# end Gemstone
+    end   # end Gemstone
     out << ms.serialize_instance_variables_suffix(self, ivars[0])
   end
 end
@@ -160,7 +161,7 @@ class Hash
     default_val = self.default
     out << (default_val ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
     len = self.length
-    out << ms.serialize_integer(len) 
+    out << ms.serialize_integer(len)
     unless len.equal?(0) then
       each_pair do |(key, val)|
         out << ms.serialize(key)
