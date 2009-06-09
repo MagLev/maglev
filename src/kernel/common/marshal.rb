@@ -514,7 +514,8 @@ module Marshal
         str << to_byte(n >> 8)
         str << to_byte(n)
       end
-      str.chomp!("\0") while str[-1].equal?(0)
+      # This was doing an infinite loop...
+      #str.chomp!("\0") while str[-1].equal?(0)
       str
     end
 
