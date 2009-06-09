@@ -110,10 +110,6 @@ to at http://localhost:2000/.  To run the script, make sure
 
 ^C will terminate the webrick server VM.
 
-==== Avi's Hat Trick
-To recreate the hat trick that Avi demonstrated at RailsConf 2008,
-see the Persistence[link:files/docs/persistence.html] file in the docs directory.
-
 == Further reading
 
 The following documentation explains more:
@@ -127,7 +123,7 @@ Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility
 Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
-Persistence[link:files/docs/persistence.html]:: Persistence and transactions
+{Persistence API}[link:files/docs/persistence-api.html]:: Persistence and transactions
 {MySQL Driver}[link:files/docs/mysql_driver.html]:: MySQL driver
 Benchmarks[link:files/docs/benchmarks.html]:: Ruby Benchmark Suite benchmarks
 Applications[link:files/docs/applications.html]:: Sample Ruby apps we're testing in MagLev
