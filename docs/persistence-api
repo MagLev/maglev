@@ -1,16 +1,18 @@
-== Proposed New MagLev Persistence API
+== Proposed MagLev Persistence API
+
+This document is a work in progress and GemStone is looking for feedback on
+how to improve the persistence model.
 
 === Overview
 
-This document is a brief overview of the MagLev persistence model and API
-intended for MagLev Alpha Developers.  Many details left out of this
-document are available in the following places:
+This document provides a brief overview of the MagLev persistence model and API
+for MagLev Alpha Developers.  For more detail see:
 
-* The Persistence MSpecs (in <tt>src/test/persistence/</tt>) specify the detailed
-  semantics of the methods.  Some of the comments outline use cases and
+* The Persistence MSpecs (in <tt>src/test/persistence/</tt>) specify detailed
+  semantics of the persistence methods.  Comments outline use cases and
   provide additional insight.  Note: these MSpecs are not yet runnable.
 * The persistence API[link:classes/Maglev.html]
-* <tt>docs/persistence.rb</tt> provides Ruby pseudo code for the API.
+* <tt>docs/persistence.rb</tt> provides Ruby pseudocode for the API.
 * The GemStone/S 64 Bit Programming Guide: provides a full discussion of
   the GemStone persistence model (including transactions, locking, etc.),
   http://seaside.gemstone.com/docs/GS64-ProgGuide-2.2.pdf.
@@ -20,22 +22,22 @@ document are available in the following places:
 Out of the box, MagLev will accommodate two persistence models:
 
 1. MRI Compatibility (default): If you take no explicit action in your
-   code, then you get no persistence.  Your ruby programs run just as they
-   do under MRI.
-2. MagLev Persistence: To take advantage of the MagLev VM's distributed,
-   shared, cached, native object persistence, requires explicit action, by
-   adding directives to your code, or starting the VM in a different mode.
+   code, then you get no MagLev native object persistence.  Your ruby
+   programs behave just as they do under MRI.
+2. MagLev Persistence: To take advantage of MagLev's native object persistence
+   requires explicit action, either adding directives to your code, or starting
+   the VM in a persistence mode.
 
-In the MRI compatibility model, nothing is saved to the repository, and
-MagLev acts like the standard MRI version of Ruby.  We believe this mode
-will be very valuable, especially during the development stage and for
-folks that just want to take advantage of the stable and performant VM.  We
-believe a production ready application will be most performant and scalable
-when it makes full use of MagLev persistence, both for data and classes.
+In the MRI compatibility model, nothing is saved to the MagLev object
+repository, and MagLev behaves like standard MRI Ruby.  The only
+difference is your code will execute in MagLev's stable, high performance
+VM.  This mode provides the simplest mechanism for porting existing
+apps to the MagLev VM.  Persistence is available through MySQL or other
+traditional mechanism.  However, for optimum benefit and performance
+from MagLev, you should use MagLev's native object persistence for both
+code and data.
 
-In the MagLev persistence model:
-
-An Object is persisted by:
+In the MagLev persistence model, an object is persisted by:
 
 * Ensuring that its class and all classes and mixed in modules along its
   super class chain are persistable.
@@ -62,12 +64,11 @@ persistence, including the +GStore+ example, which provides a small
 persistence library based on the Ruby +PStore+ API.  Read the comments in
 <tt>examples/persistence/gstore/</tt> for complete details.
 
-If neither the MRI Compatibility model nor the MagLev persistence model is
-appropriate for your application, you may roll your own using the full
-GemStone/S API via the Smalltalk FFI wrapper classes.
-
-This document is a work in progress and GemStone is looking for feedback on
-how to improve the model.
+If neither the MRI Compatibility model nor the MagLev persistence
+model is appropriate for your application, you may roll your own using
+the full GemStone/S API via the Smalltalk FFI wrapper classes. See
+<tt>docs/smalltalk_ffi</tt> or after running <tt>rake rdoc</tt> see the
+.rb files in <tt>lib/ruby/site_ruby/1.8/smalltalk.</tt>
 
 ==== Guiding Principles
 
@@ -93,31 +94,31 @@ Some of the other goals we had are:
 === Persistence Background: How Persistence works in the VM
 
 This section provides some background on how the MagLev VM works in
-conjunction with the persistent Object Repository.  It may be skipped if
+conjunction with the persistent object repository.  It may be skipped if
 you are already familiar with the underlying persistence support.
 
 ==== MagLev VMs and the Object Repository
 
-In MagLev, ruby code is run in a process called the MagLev VM (a virtual
+In MagLev, ruby code is run in a process called the MagLev VM (virtual
 machine).  Code (classes, methods, modules, etc.) and other objects may be
-transactionally and persistently stored in a MagLev Object Repository.  A
+transactionally and persistently stored in a MagLev object repository.  A
 MagLev VM must connect to a repository, and Many MagLev VMs can share the
 same repository.  All MagLev VMs that connect to a particular repository
 share a collection of classes and objects managed by that repository.  All
 of the standard ruby classes are already defined and loaded into a MagLev
 repository, and are thus available immediately when a VM connects to the
 repository.  VMs and repositories may reside on the same machine, or may be
-distributed on the network.
+distributed on a network.
 
-The MagLev VM and repository are based on the GemStone/S 64 bit Virtual
-Machine, which has been used to connect hundreds of VMs, running thousands
-of transactions per second connected to a repository managing terabytes of
-data.  MagLev allows Ruby programs to take advantage of the The GemStone/S
+The MagLev VM and repository are based on the GemStone/S 64-bit product,
+which has been used to connect thousands of VMs, running thousands of
+transactions per second, connected to a repository managing terabytes
+of data.  MagLev allows Ruby programs to take advantage of the GemStone/S
 built-in, shared, scalable and distributed cache and object repository.
 
 ==== Persistence by Reachability
 
-The Persistence model the GemStone VM provides is persistence by
+The Persistence model the MagLev VM provides is persistence by
 reachability.  That means that if +an_object+ is persisted, then all
 objects reachable from +an_object+ (by following references held in
 instance variables) will also be persisted.  MagLev provides a well known
@@ -143,7 +144,7 @@ core classes (+Object+, +Array+, +String+, etc.)  are already marked
 persistable.
 
 The MagLev persistence API, is therefore centered around how to mark
-classes and modules as persistable.  Once that aspect of the program has
+classes and modules as persistable.  Once that aspect of your program has
 been worked out, the management of persistence is straightforward.  When a
 class marked persistable is actually committed to the repository, then the
 standard rules for persistence are applied (all objects reachable from that
@@ -162,15 +163,15 @@ then committed to the repository.
 === MRI Compatibility: Just like MRI
 
 When a new MagLev VM starts up, it initializes its set of classes, methods
-and objects from the GemStone Object repository.  The default image shipped
+and objects from the MagLev object repository.  The default image shipped
 with MagLev has all the standard classes, modules, objects and variables
 that one finds in a fresh MRI instance.
 
-All new methods, instances and constants defined by the code loaded into a
-fresh VM are local to that VM, and will be lost when that VM exits.  No
-other VM that attaches to the same GemStone repository will see
-modifications made by a VM running in default mode.  File loading,
-etc. should be just like MRI.
+All new methods, instances and constants defined by the code loaded into
+a fresh VM are local to that VM, and are available only while that VM is
+running -- i.e. they will be lost when that VM exits. No other VM that
+attaches to the same MagLev repository will see modifications made by
+a VM running in default mode.  File loading, etc. should be just like MRI.
 
 === MagLev Persistence
 
@@ -184,7 +185,7 @@ visible consequences of this.  If you are in the MagLev world, then you
 must explicitly commit the current transaction to save data.  The VM will
 automatically start a new transaction after a commit or abort.
 
-When you step into the Explicit MagLev Persistence Model, you've entered an
+When you step into the explicit MagLev persistence model, you've entered an
 image based view of your program (the primary view of the code lives in the
 image, not your files). Since, in the default MRI world, nothing is
 committed to the database, the state of the VM is reflected closely by the
@@ -193,8 +194,8 @@ the repository (and other VMs may also commit to the repository), the state
 of the code may drift away from the state of the <tt>.rb</tt> files.  This
 is not a big problem, just something to keep in mind.
 
-* MRI is file world
-* MagLev is image world
+* MRI is file based
+* MagLev is image based
 
 ==== Persisting Classes
 
@@ -259,11 +260,10 @@ them like this:
       require 'some_other_lib'
     end
 
-All classes defined in <tt>foo.rb</tt> and <tt>bar.rb</tt>, including any
-files they require or load, will be done with the VM in persistent mode.
-The class definitions executed in <tt>some_lib.rb</tt> and
-<tt>some_other_lib.rb</tt>, and any files they load or require, will be
-done in a transient context.
+The class definitions in <tt>foo.rb</tt> and <tt>bar.rb</tt>, including
+any files they require or load, will be executed in persistent mode.  The
+class definitions in <tt>some_lib.rb</tt> and <tt>some_other_lib.rb</tt>,
+and any files they load or require, will be executed in transient mode.
 
 Note: it is safe to call either <tt>Maglev.persistent</tt> or
 <tt>Maglev.transient</tt> regardless of the mode the VM is in.  There are
@@ -272,15 +272,14 @@ persistence later in this document.
 
 ===== <tt>Module#maglev_persistable=</tt> Basics
 
-The other mechanism to control persistence is to explicitly set/clear the
-persistable flag on individual classes and modules.
-<tt>MyClass.persistable = true</tt> makes a class persistable.  It marks the
-class as persistable, so that instances of the class may be persisted.
-Additionally, it stages for commit, the class, and all of its constants,
-(class) instance variables, class variables, methods and class
-methods. Finally, the constant naming the class, if appropriate, is
-persisted within the appropriate namespace, if that namespace is
-persistent.
+The other mechanism to control persistence is to explicitly
+set/clear the persistable flag on individual classes and modules.
+<tt>MyClass.persistable = true</tt> marks the class as persistable, so
+that instances of the class may be persisted.  Additionally, it stages for
+commit, the class and all of its constants, (class) instance variables,
+class variables, methods and class methods. Finally, the constant naming
+the class, if appropriate, is persisted within the appropriate namespace,
+if that namespace is persistent.
 
 A class may be persisted by issuing the following command:
 
@@ -290,11 +289,12 @@ A class may be persisted by issuing the following command:
 In order to successfully persist a class, all of the classes in its super
 class chain (including mixed in modules) must also be persisted.
 
-The next time a MagLev VM starts up and connects to the repository, the VM
-will see the state of the class at the time <tt>persistable=</tt> was
-invoked and committed.  Any VM already connected to the repository will see
-the new class (or modifications) the next time it does a
-<tt>Maglev.commit_transaction</tt> or an <tt>Maglev.abort_transaction</tt>.
+The next time a MagLev VM starts up and connects to the repository,
+the VM will see the state of the persistable classes at the
+time they were last committed.  Any VM already connected to
+the repository will see the new class (or modifications) the
+next time it does a <tt>Maglev.commit_transaction</tt> or an
+<tt>Maglev.abort_transaction</tt>.
 
 === Eigenclasses (Singleton classes)
 
@@ -349,7 +349,7 @@ A short example:
     # persistence.  This will stage A_SECOND_PERSISTENT_CONST,
     # a_persistent_method, and an_ambiguous_method persistent for
     # persistence, but will NOT stage the other items from Step 2 for
-    # persistence (i.e., A_NON_PERSISTENT_CONST and a_non_persistent_method
+    # persistence (i.e. A_NON_PERSISTENT_CONST and a_non_persistent_method
     # are still local to the VM and non-persistent; an_ambiguous_method
     # becomes persistent, with the definition from step 3).
 
@@ -446,7 +446,7 @@ Real world programs may be more selective in what they save...
 
 A <tt>Maglev.abort_transaction</tt> will set the value of all persistent
 objects, including the state of <tt>Maglev::PERSISTENT_ROOT</tt> to the
-current, committed state of the repository.  I.e., it will erase local
+current, committed state of the repository -- i.e. it will erase local
 changes to persistent values, but leave local changes to local values
 alone.  Changes made to shared data / classes from other VMs before this
 abort will be made visible to this VM.
@@ -490,8 +490,8 @@ class, and then commit the object:
 
     Maglev.commit_transaction  # commit class Foo and the instance f.
 
-At this point, all MagLev VMs connected to the repository will see the new
-class <tt>Foo</tt>, the new array in
+At this point, all MagLev VMs connected to the repository
+will see the new class <tt>Foo</tt>, the new array in
 <tt>PERSISTENT_ROOT[:my_favorite_foos]</tt> and the single <tt>Foo</tt>
 object, contained in <tt>PERSISTENT_ROOT[:my_favorite_foos]</tt> array.
 All new MagLev VMs that connect to the repository will also see these
@@ -499,7 +499,7 @@ objects.
 
 === Global variables
 
-In a previous version of the MagLev persistence model, gloal variables,
+In a previous version of the MagLev persistence model, global variables,
 e.g, <tt>$hat</tt>, were automatically persisted.  That is no longer the
 case.  Global variables are global to the VM, but not shared between VMs.
 Global variables are allowed to have persistent objects as their value,
@@ -511,7 +511,7 @@ If none of the preceding options meets your requirements, MagLev provides
 access to additional APIs (transactions, locking, instance migrations,
 etc.).  See <tt>docs/smalltalk_ffi</tt> for more information. These APIs
 have proven to be robust and sufficient enough for real world applications
-to run hundreds of VMs, thousands of transactions per second and manage
+to run thousands of VMs, thousands of transactions per second and manage
 terabytes of data.
 
 

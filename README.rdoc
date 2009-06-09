@@ -124,6 +124,7 @@ Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 {Persistence API}[link:files/docs/persistence-api.html]:: Persistence and transactions
+{Smalltalk FFI}[link:files/docs/smalltalk_ffi.html]:: GemStone Smalltalk FFI
 {MySQL Driver}[link:files/docs/mysql_driver.html]:: MySQL driver
 Benchmarks[link:files/docs/benchmarks.html]:: Ruby Benchmark Suite benchmarks
 Applications[link:files/docs/applications.html]:: Sample Ruby apps we're testing in MagLev
