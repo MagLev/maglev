@@ -38,7 +38,7 @@ module Math
   def asinh(x)
     f = Type.coerce_to(x, Float, :to_f )
     f.asinh
-  end 
+  end
 
   def atan(x)
     f = Type.coerce_to(x, Float, :to_f )
@@ -66,7 +66,7 @@ module Math
     else
       r
     end
-  end 
+  end
 
   def cos(x)
     f = Type.coerce_to(x, Float, :to_f )
@@ -114,7 +114,7 @@ module Math
     f = Type.coerce_to(x, Float, :to_f )
     r = f.log
     if r.nan?
-      if f == 0.0 
+      if f == 0.0
         raise Errno::ERANGE
       else
         raise Errno::EDOM
@@ -129,7 +129,7 @@ module Math
     f = Type.coerce_to(x, Float, :to_f )
     r = f.log2
     if r.nan?
-      if f == 0.0 
+      if f == 0.0
         raise Errno::ERANGE
       else
         raise Errno::EDOM
@@ -144,7 +144,7 @@ module Math
     f = Type.coerce_to(x, Float, :to_f )
     r = f.log10
     if r.nan?
-      if f == 0.0 
+      if f == 0.0
         raise Errno::ERANGE
       else
         raise Errno::EDOM
@@ -155,7 +155,7 @@ module Math
     end
   end
 
-  def modf
+  def modf(x)
     # result is an Array,   [ fractional_part, integral_part ]
     f = Type.coerce_to(x, Float, :to_f )
     f.modf
