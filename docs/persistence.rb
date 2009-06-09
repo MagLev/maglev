@@ -357,12 +357,12 @@ module Maglev
     end
   end
 
-  # Attempts to update the persistent state of the Repository to include
+  # Attempts to update the persistent state of the repository to include
   # changes made by this transaction.
   #
   # If the commit operation succeeds, then this method returns true, and
   # the current transaction's changes, if any, become a part of the
-  # persistent Repository.  After the repository update, the session exits
+  # persistent repository.  After the repository update, the session exits
   # the current transaction.  If the transaction mode is :auto_begin (the
   # MagLev default), then the session enters a new transaction.  If the
   # transaction mode is :manual_begin, then the session remains outside of
