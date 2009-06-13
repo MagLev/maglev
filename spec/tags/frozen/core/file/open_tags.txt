@@ -7,3 +7,20 @@ fails:File.open opens the file when call with fd
 fails:File.open opens a file with a file descriptor d and a block
 fails:File.open opens a file that no exists when use File::CREAT mode
 fails:File.open raises an ArgumentError exception when call with an unknown mode
+crashes:File.open can read in a block when call open with RDONLY mode
+crashes:File.open can read in a block when call open with 'r' mode
+crashes:File.open raises an IO exception when write in a block opened with RDONLY mode
+crashes:File.open raises an IO exception when write in a block opened with 'r' mode
+crashes:File.open can't read in a block when call open with File::EXCL
+crashes:File.open can read in a block when call open with File::EXCL mode
+crashes:File.open truncates the file when passed File::TRUNC mode
+crashes:File.open can't read in a block when call open with File::TRUNC mode
+crashes:File.open can't write in a block when call open with File::TRUNC mode
+crashes:File.open raises an Errorno::EEXIST if the file exists when open with File::RDONLY|File::TRUNC
+fails:File.open can't read in a block when call open with File::WRONLY||File::RDONLY mode
+fails:File.open raises an IOError when read in a block opened with WRONLY mode
+fails:File.open raises an IOError when read in a block opened with 'w' mode
+fails:File.open raises an IOError when read in a block opened with 'a' mode
+fails:File.open raises an IOError when read in a block opened with File::WRONLY|File::APPEND mode
+fails:File.open raises a SystemCallError if passed an invalid Integer type
+fails:File.open raises an ArgumentError if passed an invalid string for mode
