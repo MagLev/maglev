@@ -1,1 +1,2 @@
 fails:Array.new with (size, object=nil) raises an ArgumentError if size is too large
+breaks:Array.new with (size, object=nil) returns the value passed to break
