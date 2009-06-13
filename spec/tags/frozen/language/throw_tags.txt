@@ -1,0 +1,1 @@
+fails:The throw keyword only allows symbols and strings as it's argument

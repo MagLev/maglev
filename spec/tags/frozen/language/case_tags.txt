@@ -1,0 +1,2 @@
+breaks:The 'case'-construct raises a SyntaxError when 'else' is used when no 'when' is given
+breaks:The 'case'-construct raises a SyntaxError when 'else' is used before a 'when' was given

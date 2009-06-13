@@ -4,3 +4,12 @@ fails:Literal Regexps throws RegexpError for malformed substitution
 fails:Literal Regexps allows substituion in extended mode
 fails:Literal Regexps does not do thread synchronization for /o
 fails:Literal Regexps will not clobber capture variables across threads
+breaks:Literal Regexps disallows first part of paired delimiters to be used as non-paired delimiters
+breaks:Literal Regexps disallows alphabets as non-paired delimiter with %r
+breaks:Literal Regexps supports \x (hex characters)
+breaks:Literal Regexps supports \c (control characters)
+breaks:Literal Regexps throws SyntaxError for malformed literals
+breaks:Literal Regexps supports [[:alpha:][:digit:][:etc:]] (predefined character classes)
+breaks:Literal Regexps supports (?imx-imx) (inline modifiers)
+breaks:Literal Regexps supports (?imx-imx:expr) (scoped inline modifiers)
+breaks:Literal Regexps supports modifier combinations

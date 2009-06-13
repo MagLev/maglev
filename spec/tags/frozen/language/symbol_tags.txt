@@ -1,0 +1,2 @@
+breaks:A Symbol literal does not contain null in the string
+breaks:A Symbol literal must not be an empty string
