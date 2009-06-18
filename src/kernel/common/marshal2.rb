@@ -22,15 +22,9 @@ class NilClass
   end
 end
 
-class TrueClass
+class Boolean
   def to_marshal(ms)
-    Marshal::TYPE_TRUE
-  end
-end
-
-class FalseClass
-  def to_marshal(ms)
-    Marshal::TYPE_FALSE
+    self.equal?(true) ? Marshal::TYPE_TRUE : Marshal::TYPE_FALSE
   end
 end
 

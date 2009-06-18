@@ -39,9 +39,9 @@ raise "infinity"  unless Marshal.load(Marshal.dump(1.0/0.0)).infinite? == 1
 test_items = [ Foo.new,                # An ObjectThis used to fail...
 #                (1..4),
                nil,
-#               true,
-#               false,
-                :a_symbol,
+               true,
+               false,
+               :a_symbol,
                "xyz",
                1,
 #               3.4,                   # Generic float
