@@ -409,13 +409,28 @@ module Marshal
       h = MAGLEV_MARSHAL_CLASS_CACHE
       arr = h[a_class]
       if arr.equal?(nil)
-        arr = a_class.ancestor_modules_names
+        #        arr = a_class.ancestor_modules_names - ['Enumerable']
+        arr = []
+        sup = obj.class.superclass
         h[a_class] = arr
       end
       arr
     end
 
     def get_module_names(obj)
+      names = []
+#      sup = obj.metaclass.superclass
+      sup = obj.class.superclass
+
+      while sup and [Module].include? sup.class do
+        names << sup.name
+        sup = sup.superclass
+      end
+
+      names
+    end
+
+    def get_module_namesX(obj)
       # returns an Array of Symbols
       _get_module_names(obj.class)  # Gemstone changes
     end
@@ -457,8 +472,10 @@ module Marshal
       raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
 
       if obj._isSpecial
+        puts "serialize(#{obj.inspect}) isSpecial"
         str = obj.to_marshal(self)
       elsif obj._isSymbol
+        puts "serialize(#{obj.inspect}) isSymbol"
         idx = @syms_dict[obj]
         if idx.equal?(nil)
           add_output_sym(obj)
@@ -468,6 +485,7 @@ module Marshal
           str = TYPE_SYMLINK + serialize_integer(idx)
         end
       else
+        puts "serialize(#{obj.inspect}) else..."
         idx = @objs_dict[obj]
         if idx.equal?(nil)
           @depth -= 1;
@@ -617,6 +635,17 @@ module Marshal
         value = construct
         obj.instance_variable_set prepare_ivar(ivar), value
       end
+    end
+
+    def serialize_ivars(hash)
+      str = serialize_integer(hash.length)
+      hash.each do |k,v|
+        puts "Calling to_marshal on k #{k.inspect}"
+        puts "Calling to_marshal on v #{v.inspect}"
+        str << k.to_marshal(self)
+        str << v.to_marshal(self)
+      end
+      str
     end
 
     def to_byte(n)

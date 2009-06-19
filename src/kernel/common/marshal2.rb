@@ -12,7 +12,13 @@ end
 
 class Range
   def to_marshal(ms)
-    super(ms, true)
+    out = ms.serialize_extended_object self
+    out << Marshal::TYPE_OBJECT
+    out << ms.serialize(self.class.name.to_sym)
+    out << ms.serialize_ivars( { :begin => self.begin,
+                                 :end => self.end,
+                                 :excl => self.exclude_end? })
+    out
   end
 end
 
