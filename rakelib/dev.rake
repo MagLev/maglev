@@ -123,4 +123,10 @@ namespace :dev do
   task :stwrappers => ['maglev:start'] do
     run_topaz tc_gen_st_wrappers
   end
+
+  desc "Load the MagLev native parser"
+  task :load_native_parser => ['maglev:start'] do
+    run_topaz tc_load_native_parser
+  end
+
 end

@@ -134,6 +134,13 @@ def tc_gen_st_wrappers
   END
 end
 
+# Returns a topaz command string that will load the native parser
+def tc_load_native_parser
+  <<-END.margin
+    |inp #{"src/kernel/parser/loadrp.inp"}
+  END
+end
+
 # Returns a topaz command string that loads ../latest.mcz and commits the DB.
 def tc_load_mcz
   <<-END.margin
