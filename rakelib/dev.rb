@@ -130,7 +130,11 @@ end
 # every smalltalk class.
 def tc_gen_st_wrappers
   <<-END.margin
-    |inp #{"rakelib/gen_st_wrappers.inp"}
+    |omit resultcheck
+    |run
+    |RubyContext createSmalltalkFFIWrappers
+    |%
+    |exit
   END
 end
 
