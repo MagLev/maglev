@@ -65,6 +65,7 @@ test_items = [
               [:a_symbol, "\004\b:\ra_symbol"],
               ["xyz", "\004\b\"\bxyz"],
               [1, "\004\bi\006"],
+              [2.71828, "\004\bf\0172.71828\000\367\220"],
               [/xyz/, "\004\b/\bxyz\000"],
               [["hello", 12], "\004\b[\a\"\nhelloi\021"],
               [{"one"=>"two"}, "\004\b{\006\"\bone\"\btwo"],
@@ -81,18 +82,3 @@ end
 
 report
 true
-
-
-
-
-
-=begin
-  MRI:
-"\004\b[\020o:\bFoo\a:\t@bazi\006:\t@bar\"\nhelloo:\nRange\b:\nbegini\006:\texclF:\bendi\t0TF:\ra_symbol\"\bxyzi\006/\bxyz\000[\a\"\nhelloi\021{\006\"\bone\"\btwo"
-
-  ML
-"\004\b[\020o:\bFoo\a:\t@bar\"\nhello:\t@bazi\006o:\nRange\b:\bendi\t:\texclF:\nbegini\0060TF:\ra_symbol\"\bxyzi\006I/\bxyz\000\t:\f@source\"\bxyz:\r@optionsi\000:\021@stringCache0:\020@stringCopy0[\a\"\nhelloi\021{\006\"\bone\"\btwo"
-
-
-
-=end

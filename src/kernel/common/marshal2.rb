@@ -193,7 +193,7 @@ class Float
           elsif infinite? then
             self < 0 ? "-inf" : "inf"
           else
-            "%.*g" % [17, self] + ms.serialize_float_thing(self)
+            "%.17g" % [self] + ms.serialize_float_thing(self)
           end
     Marshal::TYPE_FLOAT + ms.serialize_integer(str.length) + str
   end

@@ -472,10 +472,8 @@ module Marshal
       raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
 
       if obj._isSpecial
-        puts "serialize(#{obj.inspect}) isSpecial"
         str = obj.to_marshal(self)
       elsif obj._isSymbol
-        puts "serialize(#{obj.inspect}) isSymbol"
         idx = @syms_dict[obj]
         if idx.equal?(nil)
           add_output_sym(obj)
@@ -485,7 +483,6 @@ module Marshal
           str = TYPE_SYMLINK + serialize_integer(idx)
         end
       else
-        puts "serialize(#{obj.inspect}) else..."
         idx = @objs_dict[obj]
         if idx.equal?(nil)
           @depth -= 1;
@@ -530,10 +527,9 @@ module Marshal
         str << to_byte(n >> 24)
         str << to_byte(n >> 16)
         str << to_byte(n >> 8)
-        str << to_byte(n)
+        str << to_byte(n & 0x7fffffff)
       end
-      # This was doing an infinite loop...
-      #str.chomp!("\0") while str[-1].equal?(0)
+      str.chop! while str[-1].equal?(0)
       str
     end
 
@@ -645,8 +641,6 @@ module Marshal
     def serialize_ivars(hash)
       str = serialize_integer(hash.length)
       hash.each do |k,v|
-        puts "Calling to_marshal on k #{k.inspect}"
-        puts "Calling to_marshal on v #{v.inspect}"
         str << k.to_marshal(self)
         str << v.to_marshal(self)
       end
