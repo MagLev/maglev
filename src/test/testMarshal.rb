@@ -38,22 +38,6 @@ raise "nan"       unless Marshal.load(Marshal.dump(0.0/0.0)).nan?
 raise "-infinity" unless Marshal.load(Marshal.dump(-1.0/0.0)).infinite? == -1
 raise "infinity"  unless Marshal.load(Marshal.dump(1.0/0.0)).infinite? == 1
 
-test_items = [ Foo.new,                # An ObjectThis used to fail...
-               (1..4),
-               nil,
-               true,
-               false,
-               :a_symbol,
-               "xyz",
-               1,
-#               3.4,                   # Generic float
-#                18888888888888888888888888888888888,
-                %r{xyz},
-# #               Struct
-               ["hello", 12, ],
-               { "one" => 'two'}
-             ]
-
 # This array was generated from MRI.  The strings are the MRI 1.8.6
 # marshaled strings for the given object.
 test_items = [
@@ -69,11 +53,14 @@ test_items = [
               [/xyz/, "\004\b/\bxyz\000"],
               [["hello", 12], "\004\b[\a\"\nhelloi\021"],
               [{"one"=>"two"}, "\004\b{\006\"\bone\"\btwo"],
+#              [18888888888888888888888888888888888, "\004\bl+\r8\216\3438\022\324'\367\243\216\271KK\243\003\000"],
+#               Struct
              ]
 
 test_items.each do |(item, marshal)|
   b = Marshal.dump(item)
   item2 = Marshal.load(b)
+  #puts "=== #{item.inspect} => #{b.inspect}"
   test(item2, item, "Unmarshal: item: #{item.inspect} item2: #{item2.inspect}")
 
   item2 = Marshal.load(marshal)
