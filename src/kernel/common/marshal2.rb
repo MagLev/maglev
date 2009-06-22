@@ -20,6 +20,16 @@ class Range
                                  :excl => self.exclude_end? })
     out
   end
+  def from_marshal(ivar, value)
+    case ivar
+    when :begin
+      @from = value
+    when :end
+      @to = value
+    when :excl
+      @excludeEnd = value
+    end
+  end
 end
 
 class NilClass

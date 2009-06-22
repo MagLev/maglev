@@ -630,10 +630,15 @@ module Marshal
     end
 
     def set_instance_variables(obj)
+      special = obj.respond_to? :from_marshal
       for k in (1..construct_integer) do
         ivar = get_symbol
         value = construct
-        obj.instance_variable_set prepare_ivar(ivar), value
+        if special
+          obj.from_marshal(ivar, value)
+        else
+          obj.instance_variable_set prepare_ivar(ivar), value
+        end
       end
     end
 
