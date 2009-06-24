@@ -1153,7 +1153,7 @@ class Array
 
   def uniq
     hash = {}
-    ary = []
+    ary = self.class.new # Ensure we return proper subclass
     i = 0
     lim = size
     while i < lim
