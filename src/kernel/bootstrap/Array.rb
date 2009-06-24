@@ -135,8 +135,8 @@ class Array
     if block_given?
       n = 0
       while (n < lim)
-  self._at_put(n,  blk.call(n))
-  n = n + 1
+        self._at_put(n,  blk.call(n))
+        n = n + 1
       end
     end
     self
@@ -978,7 +978,7 @@ class Array
       if new_siz < sz && i > 0
         sz = new_siz
         i = sz - 1
-      else 
+      else
         i -= 1
       end
     end
@@ -1161,9 +1161,9 @@ class Array
       idx = selectors[n]
       elem = self._at(idx)
       if (idx._isRange && ! elem.equal?(nil) )
-    res.push(*elem)
+        res.push(*elem)
       else
-    res.push(elem)
+        res.push(elem)
       end
       n = n + 1
     end
