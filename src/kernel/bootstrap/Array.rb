@@ -460,6 +460,7 @@ class Array
 
   # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
   def |(other)
+    other = Type.coerce_to(other, Array, :to_ary)
     hash = {}
     ary = []
     i = 0
