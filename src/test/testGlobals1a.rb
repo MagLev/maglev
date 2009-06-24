@@ -1,10 +1,12 @@
+require File.expand_path('simple', File.dirname(__FILE__))
+
 $a = [ 0 ]
 $b = 0
 X = 4
-Y = -1 
+Y = -1
 module MA
   X = 5
-  Y = X 
+  Y = X
   module MA
    X = Y + 1
    module MA
@@ -19,36 +21,17 @@ module MA
    end
   end
 end
+
 class MyError < Exception
   EA = 105
 end
-# puts "expect 4 5 6 7 8 105 "
-r = $a[0]
-unless r == 4
-  raise 'ERROR'
-end
-r = MA::X  # gets 5
-unless r == 5 
-  raise 'ERROR'
-end
-r = MA::MA::X # gets 6
-unless r == 6
-  raise 'ERROR'
-end
-r = $a[3]
-unless r == 7
-  raise 'ERROR'
-end
-r = MA::MA::MA::X # gets 8
-unless r == 8
-  raise 'ERROR'
-end
-r = MyError::EA
-unless r == 105
-  raise 'ERROR'
-end
-r = $b
-unless r == 1007
-  raise 'ERROR'
-end
-true
+
+test($a[0],           4, 'A')
+test(MA::X,           5, 'B')
+test($a[3],           7, 'C')
+test(MA::MA::MA::X,   8, 'D')
+test(MyError::EA,   105, 'E')
+test($b,           1007, 'F')
+test(MA::MA::X,       6, 'G')
+
+report
