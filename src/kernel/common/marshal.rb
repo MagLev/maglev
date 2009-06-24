@@ -409,13 +409,28 @@ module Marshal
       h = MAGLEV_MARSHAL_CLASS_CACHE
       arr = h[a_class]
       if arr.equal?(nil)
-        arr = a_class.ancestor_modules_names
+        #        arr = a_class.ancestor_modules_names - ['Enumerable']
+        arr = []
+        sup = obj.class.superclass
         h[a_class] = arr
       end
       arr
     end
 
     def get_module_names(obj)
+      names = []
+#      sup = obj.metaclass.superclass
+      sup = obj.class.superclass
+
+      while sup and [Module].include? sup.class do
+        names << sup.name
+        sup = sup.superclass
+      end
+
+      names
+    end
+
+    def get_module_namesX(obj)
       # returns an Array of Symbols
       _get_module_names(obj.class)  # Gemstone changes
     end
@@ -512,10 +527,9 @@ module Marshal
         str << to_byte(n >> 24)
         str << to_byte(n >> 16)
         str << to_byte(n >> 8)
-        str << to_byte(n)
+        str << to_byte(n & 0x7fffffff)
       end
-      # This was doing an infinite loop...
-      #str.chomp!("\0") while str[-1].equal?(0)
+      str.chop! while str[-1].equal?(0)
       str
     end
 
@@ -612,11 +626,25 @@ module Marshal
     end
 
     def set_instance_variables(obj)
+      special = obj.respond_to? :from_marshal
       for k in (1..construct_integer) do
         ivar = get_symbol
         value = construct
-        obj.instance_variable_set prepare_ivar(ivar), value
+        if special
+          obj.from_marshal(ivar, value)
+        else
+          obj.instance_variable_set prepare_ivar(ivar), value
+        end
       end
+    end
+
+    def serialize_ivars(hash)
+      str = serialize_integer(hash.length)
+      hash.each do |k,v|
+        str << k.to_marshal(self)
+        str << v.to_marshal(self)
+      end
+      str
     end
 
     def to_byte(n)
