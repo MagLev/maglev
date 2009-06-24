@@ -99,9 +99,25 @@ class Array
     end
   end
 
-  def initialize(*args)
+  def initialize(*args, &blk)
     # this variant gets bridge methods
-    raise ArgumentError, 'too many args'
+    #
+    # If a Subclass#initialize calls super(*args), then we go through this
+    # variant.  That means we also have to unpack the parameters for all
+    # the possible variants here.  The initialize variants below will be
+    # called directly, in the case of Array, or of a subclass calling super
+    # with explicit args, e.g. super(x,y).
+
+    len = args.length
+    if len.equal?(0)
+      self
+    elsif len.equal?(1)
+      _initialize(args[0], &blk)
+    elsif len.equal?(2)
+      _initialize(args[0], args[1])
+    else
+      raise ArgumentError, 'too many args'
+    end
   end
 
   def self.new(first, &blk)
@@ -117,6 +133,10 @@ class Array
   end
 
   def initialize(first, &blk)
+    _initialize(first, &blk)
+  end
+
+  def _initialize(first, &blk)
     if self.class.equal?(Array)
       if first._isArray
         lim = 0 # ignore any block
@@ -142,6 +162,7 @@ class Array
     self
   end
 
+
   def self.new(a_size, value)
     if self.equal?(Array)
       s = Type.coerce_to(a_size, Fixnum, :to_int)
@@ -154,6 +175,9 @@ class Array
   end
 
   def initialize(a_size, value)
+    _initialize(a_size, value)
+  end
+  def _initialize(a_size, value)
     if self.class.equal?(Array)
       # do nothing
     else
@@ -213,6 +237,9 @@ class Array
   end
 
   def initialize(arg)
+    _init_one_arg(arg)
+  end
+  def _initialize(arg)
     if self.class.equal?(Array)
       # do nothing
     else
@@ -1142,8 +1169,14 @@ class Array
 
   def uniq!
     old_size = size
-    replace(uniq)
-    return old_size.equal?(size) ? nil : self
+    r = uniq
+    if old_size.equal?(r.size)
+      nil
+    else
+      # Only try to replace if size changed.  This prevents
+      # unwanted frozen exception if there was no real change.
+      replace(uniq)
+    end
   end
 
   # Prepend elements to self.  If no elements, return unmodified self.
