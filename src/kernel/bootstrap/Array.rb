@@ -1159,11 +1159,17 @@ class Array
     res = []
     while (n < lim)
       idx = selectors[n]
-      elem = self._at(idx)
-      if (idx._isRange && ! elem.equal?(nil) )
-        res.push(*elem)
+      if (idx._isRange)
+        beg, len = idx._beg_len(self.length)
+        if beg
+          j = 0
+          while j < len
+            res << self[j+beg]
+            j += 1
+          end
+        end
       else
-        res.push(elem)
+        res.push(self._at(idx))
       end
       n = n + 1
     end
