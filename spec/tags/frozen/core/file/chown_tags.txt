@@ -1,0 +1,4 @@
+breaks:File#chown changes the owner id of the file
+breaks:File#chown changes the group id of the file
+breaks:File#chown does not modify the owner id of the file if passed nil or -1
+breaks:File#chown does not modify the group id of the file if passed nil or -1

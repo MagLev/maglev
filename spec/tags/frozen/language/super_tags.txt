@@ -1,0 +1,2 @@
+fails:The super keyword raises an error error when super method does not exist
+breaks:The super keyword supers up appropriate name even if used for multiple method names

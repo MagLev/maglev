@@ -1,8 +1,2 @@
 fails:Kernel.rand is a private method
-fails:Kernel.rand returns a random float less than 1 if no max argument is passed
-fails:Kernel.rand returns a random int or bigint less than the argument for an integer argument
-fails:Kernel.rand returns a random integer less than the argument casted to an int for a float argument greater than 1
 fails:Kernel.rand returns a random float less than 1 for float arguments less than 1
-fails:Kernel.rand never returns a value greater or equal to 1.0 with no arguments
-fails:Kernel.rand never returns a value greater or equal to any passed in max argument
-fails:Kernel#rand needs to be reviewed for spec completeness

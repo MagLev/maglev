@@ -1,3 +1,7 @@
 fails:Thread#kill runs ensure clause
 fails:Thread#kill runs nested ensure clauses
 fails:Thread#kill killing dying sleeping thread wakes up thread
+hangs:Thread#kill killing dying running does nothing
+breaks:Thread#kill sets $! in outer ensure clause if inner ensure clause raises exception
+breaks:Thread#kill can be rescued by outer rescue clause when inner ensure clause raises exception
+breaks:Thread#kill is deferred if ensure clause does Thread.stop

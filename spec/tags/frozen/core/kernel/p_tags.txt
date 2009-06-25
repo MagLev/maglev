@@ -4,4 +4,3 @@ fails:Kernel#p prints obj.inspect followed by system record separator for each a
 fails:Kernel#p is not affected by setting $\, $/ or $,
 fails:Kernel#p prints nothing if no argument is given
 fails:Kernel#p prints nothing if called splatting an empty Array
-fails:Kernel.p needs to be reviewed for spec completeness

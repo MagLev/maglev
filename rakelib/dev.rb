@@ -130,7 +130,18 @@ end
 # every smalltalk class.
 def tc_gen_st_wrappers
   <<-END.margin
-    |inp #{"rakelib/gen_st_wrappers.inp"}
+    |omit resultcheck
+    |run
+    |RubyContext createSmalltalkFFIWrappers
+    |%
+    |exit
+  END
+end
+
+# Returns a topaz command string that will load the native parser
+def tc_load_native_parser
+  <<-END.margin
+    |inp #{"src/kernel/parser/loadrp.inp"}
   END
 end
 

@@ -1,0 +1,5 @@
+fails:StringIO#each_line when passed a separator returns self
+fails:StringIO#each_line when passed a separator yields self's content starting from the current position when the passed separator is nil
+fails:StringIO#each_line when passed a separator yields each paragraph when passed an empty String as separator
+fails:StringIO#each_line when passed no arguments yields each line starting from the current position
+fails:StringIO#each_line when passed no arguments returns self

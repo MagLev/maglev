@@ -1,1 +1,5 @@
 fails:Time#strftime supports week of year format with %U and %W
+fails:Time#strftime supports 12-hr formatting with %l
+fails:Time#strftime supports AM/PM formatting with %p
+breaks:Time#strftime formats time according to the directives in the given format string
+breaks:Time#strftime supports timezone formatting with %z

@@ -1,1 +1,4 @@
 fails:Array#sort! temporarily freezes self and recovers after sorted
+breaks:Array#sort returns the specified value when it would break in the given block
+breaks:Array#sort! returns the specified value when it would break in the given block
+breaks:Array#sort! makes some modification even if finished sorting when it would break in the given block

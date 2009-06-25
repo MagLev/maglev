@@ -1,0 +1,3 @@
+hangs:Thread#stop? describes a running thread
+fails:Thread#stop? describes a dying running thread
+fails:Thread#stop? reports aborting on a killed thread

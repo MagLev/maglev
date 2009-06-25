@@ -1161,4 +1161,20 @@ test(a, [0, 1, 8, 27], 'fill 5')
 b = [1, 2, *[3, 4, 5]]
 test(b,  [1, 2, 3, 4, 5] , "splat in array construction");
 
+# Test that subclasses can initialize correctly
+
+class MyArray1 < Array
+  def initialize(*args)
+    super(*args)
+  end
+  def my_size
+    size
+  end
+end
+test(MyArray1.new,                             [], 'MyArray1.new')
+test(MyArray1.new(3),             [nil, nil, nil], 'MyArray1.new(3)')
+test(MyArray1.new([:a, :b, :c]),     [:a, :b, :c], 'MyArray1.new([:a, :b, :c])')
+test(MyArray1.new(2, "hello"), ["hello", "hello"], 'MyArray1.new(2, "hello")')
+test(MyArray1.new(2) { |i| i + 2 },         [2,3], 'MyArray1.new(2) { |i| i + 2 }')
+
 report

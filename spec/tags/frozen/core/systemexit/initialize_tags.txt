@@ -1,3 +1,0 @@
-fails:SystemExit#initialize accepts a status
-fails:SystemExit#initialize accepts a message
-fails:SystemExit#initialize accepts a status and message

@@ -1,1 +1,2 @@
-fails:Time.times is an obsolete method
+fails:Time.times returns a Struct::Tms
+fails:Time.times returns current cpu times

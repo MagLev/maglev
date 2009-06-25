@@ -38,7 +38,6 @@ describe "The retry statement" do
   end
 
   # block retry has been officially deprecated by matz and is unsupported in 1.9
-  compliant_on :ruby do
     it "re-executes the entire enumeration" do
       list = []
       [1,2,3].each do |x|
@@ -48,7 +47,6 @@ describe "The retry statement" do
       end
       list.should == [1,2,3,1,2,3]
     end
-  end
 end
 
 describe "The retry keyword inside a begin block's rescue block" do

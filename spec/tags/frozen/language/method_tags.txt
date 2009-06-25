@@ -1,3 +1,5 @@
 fails:Calling a private getter method does not permit self as a receiver
 fails:Calling a method with splat operator * and non-Array value attempts to coerce it to Array if the object respond_to?(:to_ary)
 fails:Calling a method with splat operator * and non-Array value uses value unchanged if it does not respond_to?(:to_ary)
+breaks:Calling a method fails with both lambda and block argument
+breaks:Calling a method with ambiguous missing parens, arguments go with innermost call

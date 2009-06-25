@@ -1,0 +1,7 @@
+fails:StringIO#puts when passed [Array, ...] writes each element of the passed Array to self, separated by a newline
+fails:StringIO#puts when passed [Array, ...] flattens nested Arrays
+fails:StringIO#puts when passed [Array, ...] handles self-recursive arrays correctly
+fails:StringIO#puts when passed [Array, ...] does not honor the global output record separator $\
+fails:StringIO#puts when passed [Array, ...] first tries to convert each Array element to an Array using #to_ary
+fails:StringIO#puts when passed [Object, ...] does not put a \n after each Objects that end in a newline
+fails:StringIO#puts when passed [Object, ...] first tries to convert each Object to an Array using #to_ary
