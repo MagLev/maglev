@@ -122,8 +122,6 @@ fails:Array#pack with format 'U' regards a integer as a Unicode codepoint and en
 fails:Array#pack with format 'U' raises RangeError when a pack argument is negative
 fails:Array#pack with format 'u' appends newline whenever after consumes [number/3]*3 of bytes for the specified number > 2, where [x] is the floor function
 fails:Array#pack with format 'u' tries to convert the pack argument to a String using #to_str
-fails:Array#pack with format 'H' considers count = 1 if count omited
-fails:Array#pack with format 'h' considers count = 1 if count omited
 breaks:Array#pack sequentially processes each pack format, which consumes element in the array, and finally concatenates their result
 breaks:Array#pack with format 'B' returns packed bit-string descending order
 breaks:Array#pack with format 'B' conversion edge case: all zeros
