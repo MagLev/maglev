@@ -16,3 +16,4 @@ fails:Module#autoload raises a NameError when the constant name starts with a nu
 fails:Module#autoload raises a NameError when the constant name has a space in it
 fails:Module#autoload raises a TypeError if opening a class with a different superclass than the class defined in the autoload file
 fails:Module#autoload raises a TypeError if not passed a String for the filename
+fails:Module#autoload does not call Kernel#require or Kernel#load dynamically
