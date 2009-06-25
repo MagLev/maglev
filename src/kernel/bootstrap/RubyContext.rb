@@ -42,4 +42,10 @@ class RubyContext
   # RUBY.class.primitive 'require', 'requireFileNamed:'
   # RUBY.class.primitive 'load', 'loadFileNamed:'
   # RUBY.class.primitive 'global', 'installGlobal:name:'
+
+  # access to persistentMode in transient instance of RubyCompilerState
+  class_primitive_nobridge 'persistence_mode', 'persistenceMode'
+  class_primitive_nobridge 'persistence_mode=', 'persistenceMode:'
+  class_primitive_nobridge 'persistable_instances', 'persistableInstances'
+  class_primitive_nobridge 'persistable_instances=', 'persistableInstances:'
 end
