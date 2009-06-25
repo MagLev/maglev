@@ -3,3 +3,5 @@ fails:Kernel#require does not expand/resolve qualified files against $LOAD_PATH
 fails:Kernel#require prefers to use .rb over .<ext> if given non-extensioned file and both exist
 fails:Kernel#require will not load file.<ext> when given 'file' if file.rb already loaded
 fails:Kernel#require produces __FILE__ as the given filename and __LINE__ as the source line number
+fails:Kernel#require collapses consecutive path separators
+fails:Kernel#require raises a LoadError if the file exists but can't be read
