@@ -1,0 +1,2 @@
+fails:Kernel#block_given? is a private method
+fails:self.send(:block_given?) always returns false
