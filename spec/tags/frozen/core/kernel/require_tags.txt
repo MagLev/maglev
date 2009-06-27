@@ -5,3 +5,4 @@ fails:Kernel#require will not load file.<ext> when given 'file' if file.rb alrea
 fails:Kernel#require produces __FILE__ as the given filename and __LINE__ as the source line number
 fails:Kernel#require collapses consecutive path separators
 fails:Kernel#require raises a LoadError if the file exists but can't be read
+breaks:Kernel#require will not add a bad load to LOADED_FEATURES
