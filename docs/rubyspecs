@@ -53,13 +53,13 @@ Assuming <tt>maglev-ruby</tt> is on your +PATH+, you can run specs like
 this:
 
     $ cd $MAGLEV_HOME
-    $ spec/mspec/bin/mspec -t maglev-ruby spec/rubyspec/core/array/at_spec.rb
+    $ spec/mspec/bin/mspec -t m spec/rubyspec/core/array/at_spec.rb
 
 To run with debug mode on (so that you end up in the Topaz prompt on an
 error):
 
     $ cd $MAGLEV_HOME
-    $ spec/mspec/bin/mspec -t maglev-ruby -T -d spec/rubyspec/core/array/at_spec.rb
+    $ spec/mspec/bin/mspec -t m -T -d spec/rubyspec/core/array/at_spec.rb
 
 === Tag Failing Specs
 
@@ -97,7 +97,7 @@ a tag named "fails" for that expectation.
 ==== Tag Examples
 
 Note: we don't need to specify <tt>-n maglev-ruby</tt> or <tt>-t
-maglev-ruby</tt>, since the <tt>defaults.mspec</tt> file has that configured.
+maglev</tt>, since the <tt>defaults.mspec</tt> file has that configured.
 
 ===== Tag all failing specs
 
@@ -119,6 +119,11 @@ The <tt>-G tag</tt> option means: Exclude examples with descriptions tagged
 with <tt>tag</tt>:
 
     $ spec/mspec/bin/mspec -G fails spec/rubyspec/core/array/
+
+We have now tagged failing rubyspecs in four categories. The following switches
+can be used o bypass all specs that don't run:
+
+    -G fails -G breaks -G crashes -G hangs.
 
 ===== Run specs, untagging fixed expectations
 

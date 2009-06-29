@@ -7,6 +7,8 @@ Please see LICENSES.txt[link:files/LICENSES_txt.html] in this directory.
 Some prerequisites must be installed on your machine before MagLev can
 run correctly. For details, see the Prerequisites[link:files/docs/prerequisites.html] file in the docs directory.
 
+A MagLev build requires a compatible version of the GemStone 3.x binaries. Use the installer mentioned below to ensure your MagLev and GemStone versions are in sync. Simply cloning this repository could result in an intermediate version that won't run with any GemStone build.
+
 == Documentation
 
 To generate the HTML version of this and other documentation:
