@@ -8,11 +8,11 @@
 *.rbc
 *.swp
 *tmproj
-./data/
-./html/
-./gemstone/
-./locks/
-./log/
+/data/
+/html/
+/gemstone/
+/locks/
+/log/
 gemstone.old/
 debugspec.inp
 cur.inp
