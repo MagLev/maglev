@@ -282,69 +282,66 @@ class String
 
   primitive '_atEquals', 'at:equals:'
 
-  # Returns a new +String+ with the given record separator removed from the
-  # end of receiver (if present).  If <tt>$/</tt> has not been changed from
-  # the default Ruby record separator, then +chomp+ also removes carriage
-  # return characters (that is, it will remove \n, \r, and \r\n).
-  def chomp(rs=$/)
-    # check for nil and '' before doing rs[0] in elsif
-    if rs.equal?(nil) || rs.empty?
-      return self.dup
-    elsif rs[0].equal?(0xa)
-      if rs.length.equal?(1)
-        # the default record separator
-        if self[-1].equal?(0xa)
-          if self[-2].equal?(0xd)
-            return self[0, self.length - 2 ]
-          else
-            return self[0, self.length - 1 ]
-          end
-        end
-        return self[0, self.length - 1 ] if self[-1].equal?(0xd) # "...\r"
-        return self.dup
-      end
-    end
-    len = self.length
-    rsLen = rs.length
-    if len >= rs.length
-      idx = self.length - rs.length # zero based
-      if self._atEquals(idx+1, rs)
-        return self[0, idx]
-      end
-    end
-    return self.dup
+  #     str.chomp(separator=$/)   => new_str
+  #
+  #  Returns a new <code>String</code> with the given record separator removed
+  #  from the end of <i>str</i> (if present). If <code>$/</code> has not been
+  #  changed from the default Ruby record separator, then <code>chomp</code> also
+  #  removes carriage return characters (that is it will remove <code>\n</code>,
+  #  <code>\r</code>, and <code>\r\n</code>).
+  #
+  #     "hello".chomp            #=> "hello"
+  #     "hello\n".chomp          #=> "hello"
+  #     "hello\r\n".chomp        #=> "hello"
+  #     "hello\n\r".chomp        #=> "hello\n"
+  #     "hello\r".chomp          #=> "hello"
+  #     "hello \n there".chomp   #=> "hello \n there"
+  #     "hello".chomp("llo")     #=> "he"
+  def chomp(separator=$/)
+    (str = self.dup).chomp!(separator) || str
   end
 
-  def chomp!(rs=$/)
-    raise TypeError, "can't modify frozen string" if frozen?
-    # check for nil and '' before doing rs[0] in elsif
-    if rs.equal?(nil) || rs.empty?
-      return self.dup
-    elsif rs[0].equal?(0xa)
-      if rs.length.equal?(1)
-        # the default record separator
-        lastCh = self[-1]
-        if lastCh.equal?(0xa)
-          if self[-2].equal?(0xd)
-            self.size=(self.length - 2 )
-          else
-            self.size=(self.length - 1 )
-          end
-          return self
+  #     str.chomp!(separator=$/)   => str or nil
+  #
+  #  Modifies <i>str</i> in place as described for <code>String#chomp</code>,
+  #  returning <i>str</i>, or <code>nil</code> if no modifications were made.
+  def chomp!(sep=$/)
+    return if sep.nil? || self.empty?
+    sep = Type.coerce_to(sep, String, :to_str)
+
+    if (sep == $/ && sep == "\n") || sep == "\n"
+      last_ch = self[-1]
+      diminish_by = 0
+      if last_ch == ?\n
+        diminish_by += 1 if self[-2] == ?\r && self.size > 1
+      elsif last_ch != ?\r
+        return
+      end
+      diminish_by += 1
+      self.size=(self.length - diminish_by)
+    elsif sep.size == 0
+      size = self.size
+      while size > 0 && self[size-1] == ?\n
+        if size > 1 && self[size-2] == ?\r
+          size -= 2
+        else
+          size -= 1
         end
       end
+      return if size == self.size
+      self.size=(size)
     else
-      len = self.length
-      rsLen = rs.length
-      if len >= rs.length
-        idx = self.length - rs.length # one based
-        if self._atEquals(idx, rs)
-          self.size=(idx)
-          return self
-        end
+      sep_size = sep.size
+      size = self.size
+      return if sep_size > size
+      sep_size = -sep_size
+      while sep_size < 0
+        return if sep[sep_size] != self[sep_size]
+        sep_size += 1
       end
+      self.size=(size - sep.size)
     end
-    return nil # no modification made
+    self
   end
 
 
