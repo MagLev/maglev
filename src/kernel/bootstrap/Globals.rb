@@ -148,9 +148,9 @@ RUBY_ENGINE = 'maglev'
 #  this slot. See ticket #76
 RUBY_PLATFORM = 'Unspecified.platform'
 RUBY_VERSION = '1.8.6'
-# Warning - buildruby.pl modifies the date on any line starting with RUBY_RELEASE_DATE
+# Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
 RUBY_RELEASE_DATE = '09/15/2008'
-RUBY_PATCHLEVEL = '114'  # TODO: this is what MRI 1.8.6 shows...
+RUBY_PATCHLEVEL = 114  # TODO: this is what MRI 1.8.6 shows...
 
 VERSION = RUBY_VERSION
 # If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
