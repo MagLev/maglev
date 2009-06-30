@@ -1164,7 +1164,9 @@ class String
   primitive '_to_f', 'asFloat'
   def to_f
     s = self._delete_underscore_strip
-    s._to_f
+    s =~ /^([+-]?\d*(\.\d+)?\d*([eE][+-]?\d+)?)/
+    f = $1._to_f
+    f.nan? ? 0.0 : f
   end
 
   def to_i(base=10)
