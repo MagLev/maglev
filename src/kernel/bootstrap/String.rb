@@ -1224,7 +1224,11 @@ class String
   end
 
   def to_str
-    self
+    if self.class.equal?(String)
+      self
+    else
+      String.new(self)
+    end
   end
 
   primitive_nobridge 'to_sym', 'asSymbol'
