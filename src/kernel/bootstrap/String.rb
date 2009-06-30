@@ -667,7 +667,7 @@ class String
     str = self
     idx = str._indexOfByte( ?_ , 1 )
     unless idx.equal?(0)
-      str = str.delete('_')   
+      str = str.delete('_')
     end
     str.strip
   end
@@ -1201,7 +1201,7 @@ class String
   # "-0b1010".extract_base     => [2, "-1010"]
   # "-0b1010".extract_base(16) => [2, "-1010"]
   # "-1010".extract_base(16)   => [16, "-1010"]
-  MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 } 
+  MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 }
   MAGLEV_EXTRACT_BASE_TABLE.freeze
   def extract_base(base=10)
     s = self._delete_underscore_strip
@@ -1216,7 +1216,11 @@ class String
   end
 
   def to_s
-    self
+    if self.class.equal?(String)
+      self
+    else
+      String.new(self)
+    end
   end
 
   def to_str
@@ -1313,7 +1317,7 @@ class String
   # Need to either overwrite or allow a mixin.
 
   def >(other)
-    o = (self <=> other) 
+    o = (self <=> other)
     if o.equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
@@ -1321,7 +1325,7 @@ class String
   end
 
   def <(other)
-    o = (self <=> other) 
+    o = (self <=> other)
     if o.equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
@@ -1329,7 +1333,7 @@ class String
   end
 
   def >=(other)
-    o = (self <=> other) 
+    o = (self <=> other)
     if o.equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
@@ -1337,7 +1341,7 @@ class String
   end
 
   def <=(other)
-    o = (self <=> other) 
+    o = (self <=> other)
     if o.equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
