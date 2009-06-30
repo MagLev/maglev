@@ -8,11 +8,11 @@
 *.rbc
 *.swp
 *tmproj
-data/
-html/
-gemstone/
-locks/
-./log/
+/data/
+/html/
+/gemstone/
+/locks/
+/log/
 gemstone.old/
 debugspec.inp
 cur.inp
@@ -26,5 +26,5 @@ lib/ruby/site_ruby/1.8/rubygems.rb
 lib/ruby/site_ruby/1.8/ubygems.rb
 lib/ruby/site_ruby/1.8/rbconfig
 lib/ruby/site_ruby/1.8/smalltalk
-stones
+./stones
 examples/persistence/gstore/pstore.db

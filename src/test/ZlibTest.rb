@@ -61,6 +61,8 @@ test(copy, original, 'Round trip')
 r = unzip(data_dir + '/test-mri.gz')
 test(r, original, "Unzip of MRI file")
 
+File.delete(filename)
+
 # ####################################################################
 #    Other Tests
 # ####################################################################

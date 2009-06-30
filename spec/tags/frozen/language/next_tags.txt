@@ -1,2 +1,2 @@
-fails:Assignment via next assigns splatted objects to a splatted reference via a splatted yield
 breaks:The next statement raises a LocalJumpError if used not within block or while/for loop
+fails:Assignment via next assigns splatted objects to a splatted reference via a splatted yield

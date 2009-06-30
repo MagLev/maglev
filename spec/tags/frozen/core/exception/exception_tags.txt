@@ -1,1 +1,2 @@
 fails:Exception is a superclass of SystemStackError
+fails:Exception#exception returns self when passed self as an argument

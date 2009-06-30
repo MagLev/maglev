@@ -19,14 +19,35 @@ localspec
 
 mspec
   A git submodule that tracks the mspec framework.
-  As of 2009-01-22, this is at version 1.5.6 of mspec.
+  As of 2009-06-28, this is at version 1.5.12 of mspec.
   git://github.com/rubyspec/mspec
 
 rubyspec
   A git submodule that tracks the rubyspecs.
-  As of 2009-01-22, this was the HEAD from the rubyspec git repository.
+  As of 2009-06-28, this was the HEAD from the rubyspec git repository.
   git://github.com/rubyspec/rubyspec
+
+  In order to work around parser problems that cannot be resolved by tagging, 
+  we've temporarily removed or altered the following files:
+
+    rm -f spec/rubyspec/core/fiber/resume_spec.rb
+    rm -f spec/rubyspec/core/fiber/transfer_spec.rb
+    rm -f spec/rubyspec/core/kernel/__callee__spec.rb
+    rm -f spec/rubyspec/core/kernel/__method__spec.rb
+    rm -f spec/rubyspec/core/kernel/case_compare_spec.rb
+    rm -f spec/rubyspec/core/kernel/eval_spec.rb
+    cp spec/localspec/core/kernel/fixtures/classes.rb \
+       spec/rubyspec/core/kernel/fixtures/classes.rb
+    cp spec/localspec/core/module/autoload_spec.rb \
+       spec/rubyspec/core/module/autoload_spec.rb
+    cp spec/localspec/language/block_spec.rb \
+       spec/rubyspec/language/block_spec.rb
+    cp spec/localspec/language/super_spec.rb \
+       spec/rubyspec/language/super_spec.rb
 
 tags
   The Gemstone rubyspec tags.  These are maintained in the git repository.
-
+  To get a complete run of passing specs using tags:
+  cd $MAGLEV_HOME
+  spec/mspec/bin/mspec -G fails -G breaks -G crashes -G hangs \
+    spec/rubyspec/language/ spec/rubyspec/core spec/rubyspec/library/stringio/

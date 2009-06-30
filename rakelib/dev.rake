@@ -8,7 +8,8 @@ namespace :dev do
   require 'rakelib/dev.rb'
 
   desc "Stop server, install ../latest*, and reload primitives"
-  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:ensureprims']
+  task :'install-latest' => [:'dev:cpbuild', :'dev:loadmcz', :'dev:ensureprims']
+#  task :'install-latest' => [:'dev:install-tgz', :'dev:loadmcz', :'dev:ensureprims']
 
   desc "Stop current server and install ../latest-product.tgz"
   task :'install-tgz' do
@@ -21,6 +22,32 @@ namespace :dev do
 
     untar_product_to_gemstone tgz_file
     copy_extent
+  end
+
+  desc "Remove the ./gemstone and ./data directories"
+  task :clean_runtime_gemstone => :'maglev:stop' do
+    #Rake::Task[:'dev:ensure_stopped'].invoke
+    if File.directory?('gemstone')
+      sh "chmod -R 777 gemstone"
+      sh "rm -rf gemstone"
+      sh "rm -rf data"
+    end
+  end
+
+  desc "Copy build results from ../gss64bit_3.0 into ./gemstone and ./data"
+#  task :runtime => :clean_runtime_gemstone do
+  task :cpbuild do
+    # The runtime environment is made up of two aspects: (1) symlinks to the
+    # git checkout that I use all the time and (2) a copy of the
+    # build-products, so I can run and do another build at the same time.
+    sh 'mkdir locks log data'
+
+    puts "== copying product"
+    # 2: Copy the build products
+    cp_r '../gss64bit_3.0/fast42/gs/product', 'gemstone'
+    cp '../gss64bit_3.0/MagLev.MacOSX.fast/version.txt', 'version.txt'
+    cp 'gemstone/bin/extent0.ruby.dbf', 'data'
+    chmod 0644, 'data/extent0.ruby.dbf'
   end
 
   desc "Make sure the gemstone server is stopped."

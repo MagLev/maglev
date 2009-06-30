@@ -13,10 +13,11 @@
 # spec/rubyspec/language/method_spec.rb
 # spec/rubyspec/language/next_spec.rb
 # spec/rubyspec/language/numbers_spec.rb
-spec/rubyspec/language/precedence_spec.rb
+# spec/rubyspec/language/precedence_spec.rb
 # spec/rubyspec/language/retry_spec.rb
 # spec/rubyspec/core/filetest/
-# spec/rubyspec/core/kernel/case_compare_spec.rb
+spec/rubyspec/core/kernel/case_compare_spec.rb
+spec/rubyspec/core/kernel/eval_spec.rb
 # spec/rubyspec/core/proc/arity_spec.rb
 
 # ##################################################
@@ -27,24 +28,34 @@ spec/rubyspec/core/continuation
 spec/rubyspec/core/objectspace
 
 # ##################################################
+# ####  1..8.7 Only files
+# ##################################################
+# These specs are guarded with only 1.8.7 examples/expectations.  No point in
+# running them.  We should occasionally recheck that they haven't had 1.8.6
+# expectations added to them
+
+spec/rubyspec/core/kernel/__method__spec.rb
+
+# ##################################################
 # ####  1.9 Only files
 # ##################################################
 # These specs are guarded with only 1.9 examples/expectations.  No point in
 # running them.  We should occasionally recheck that they haven't had 1.8
 # expectations added to them
 
+spec/rubyspec/core/fiber/resume_spec.rb
+spec/rubyspec/core/fiber/transfer_spec.rb
+spec/rubyspec/core/kernel/__callee__spec.rb
 spec/rubyspec/language/encoding_spec.rb
 spec/rubyspec/language/magic_comment_spec.rb
-
 
 # ##################################################
 # ####  Partially Run
 # ##################################################
 # These files run partially, but have a syntax or other error part way
 # through
-#
-spec/rubyspec/language/case_spec.rb
 
+# spec/rubyspec/language/case_spec.rb
 
 # ##################################################
 # ####  Skeletons
@@ -66,5 +77,4 @@ spec/rubyspec/language/case_spec.rb
 # spec/localspec/language/for_spec.rb
 # spec/localspec/language/next_spec.rb
 # spec/localspec/language/constants_spec.rb
-
 
