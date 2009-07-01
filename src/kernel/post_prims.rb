@@ -5,3 +5,4 @@
 # be dynamic instance variables.
 
 require 'kernel/post_prims/Object.rb'
+require 'kernel/post_prims/StructTms.rb'
