@@ -25,7 +25,8 @@ b = TestB.new.someMethod
 c = Class.new
 
 CX = c
-unless c.name == 'CX' 
+cn = c.name 
+unless cn == 'CX' 
   raise 'ERR'
 end
 true

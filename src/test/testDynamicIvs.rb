@@ -21,11 +21,13 @@ module MC
     @block
   end
   module_function :block
+  mc = self
 
   def block=(block)
     @block = block
   end
   module_function :block=
+
 end
 class CA
   include MB
