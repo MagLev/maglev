@@ -4,12 +4,12 @@
 # from Racc grammer file "".
 #
 
-require 'kernel/parser/racc_parser.rb'
+# require 'racc/parser.rb'
 module MagRp
   class RubyParser < MagRp::Parser
 
 
-require "kernel/parser/lexer.rb"
+# require "kernel/parser/lexer.rb"
 
 # Local Variables: **
 # racc-token-length-max:14 **
@@ -2490,9 +2490,9 @@ racc_reduce_table = [
   0, 142, :_reduce_497,
   0, 199, :_reduce_498 ]
 
-Racc_reduce_n = 499
+Parser::Racc_reduce_n = 499
 
-Racc_shift_n = 896
+Parser::Racc_shift_n = 896
 
 racc_token_table = {
   false => 0,
@@ -2628,7 +2628,7 @@ racc_token_table = {
   :tEQL => 130,
   :tLOWEST => 131 }
 
-Racc_nt_base = 132
+Parser::Racc_nt_base = 132
 
 Racc_use_result_var = true
 
@@ -2641,11 +2641,11 @@ Racc_arg = [
   racc_goto_check,
   racc_goto_default,
   racc_goto_pointer,
-  Racc_nt_base,
+  Parser::Racc_nt_base,
   racc_reduce_table,
   racc_token_table,
-  Racc_shift_n,
-  Racc_reduce_n,
+  Parser::Racc_shift_n,
+  Parser::Racc_reduce_n,
   Racc_use_result_var ]
 
 Racc_token_to_s_table = [
@@ -3868,7 +3868,7 @@ def _reduce_174(val, vofs)
                       resbody.src_offset=( val[vofs + 3].src_offset )   # kRESCUE_MOD position
                       rescue_nod = RubyRescueNode.s( val[vofs + 2], resbody, nil)
                       rescue_nod.src_offset=( val[vofs + 1].src_offset )   # tEQL position
-                      result = self.node_assign(val[vofs ], rescue_node )
+                      result = self.node_assign(val[vofs ], rescue_nod )        # Fix trac 545
                     
     result
 end
@@ -6031,7 +6031,7 @@ end
 def _reduce_467(val, vofs)
 		      # singleton: # expr opt_nl tRPAREN
                       result = val[vofs + 2]
-		      if result.kind_of?(RubyAbstractiLiteralNode)
+		      if result.kind_of?(RubyAbstractLiteralNode)
                         yyerror "Can't define singleton method for literals." 
 		      end
                     

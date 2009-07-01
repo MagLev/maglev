@@ -88,17 +88,6 @@ module MagRp
     def as_cond(aMagRp)
       self
     end
-    def paren
-      # @paren ||= false
-      v = @paren      # @paren is a dynamic IV
-      if v.equal?(nil)
-        v = false
-      end
-      v 
-    end
-    def paren=(v)
-      @paren = v      # @paren is a dynamic IV
-    end
     def list
       []
     end
@@ -1023,7 +1012,7 @@ module MagRp
            c2node.dup
          end
          def inspect
-           "[:cdecl, :#{@name}, #{@valueNode}]"
+           "[:cdecl, :#{@constNode}, #{@valueNode}]"
          end
        end
 
@@ -1534,15 +1523,8 @@ module MagRp
          res = self._new
          res.init(first , src_line)
        end
-       def init(first, src_line )
-         @firstNode = first
-         # @secondNode = nil  # not used
-         @thirdNode = nil
-         if src_line._not_equal?(nil)
-           @srcLine = src_line  # for debugging , a dynamic iv
-         end
-         self
-       end
+
+       # def init ; end #  is in  RubyNode_dynamic.rb
 
        def masgn_append_arg(val)
          if @thirdNode.equal?( nil)

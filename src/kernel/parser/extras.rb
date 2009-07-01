@@ -305,11 +305,7 @@ module MagRp # {
 # Gemstone, deleted class Sexp
 
 
- class RubyParser < MagRp::Parser # {
-  VERSION = '2.0.2'
-
-  attr_accessor :lexer, :in_def, :in_single, :file_name , :syntax_err_count
-  attr_reader :env
+ class RubyParser # {
 
   def line_for(name_tok)
     # for syntax error messages
@@ -332,9 +328,9 @@ module MagRp # {
     ofs = @env.last_closed_def_offset
     if ofs >= 0
       num = @lexer.line_for_offset(ofs)
-      if (num > 1)
-        num -= 1   # usually extend happens after EOL has been lexed
-      end
+      #if (num > 1)
+      #  num -= 1   # usually extend happens after EOL has been lexed
+      #end
       msg = " last 'end' matched def/class/module near line "
       msg << (num >= 0 ? num.to_s : '???' )
     else
@@ -342,10 +338,6 @@ module MagRp # {
     end
     msg
   end
-
-
-  InvalidAssignableLhs = IdentitySet.with_all(
-       [ :self , :nil , :true , :false , :"__LINE__" , :"__FILE__" ] )
 
   def assignable(lhs, value) # value maybe nil    # [
     lhs_cls = lhs.class

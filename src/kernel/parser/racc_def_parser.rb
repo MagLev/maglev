@@ -14,10 +14,6 @@
 # 
 # copied from lib and code moved to module MagRp for the internal parser
 
-unless defined?(NotImplementedError)
-  NotImplementedError = NotImplementError
-end
-
 module MagRp
   class ParseError < StandardError; end
 end
@@ -28,7 +24,7 @@ module MagRp # {
     Racc_No_Extentions = false
   end
 
-  class Parser
+  class Parser # [
 
     PrintRaccArrayInfo = false
 
@@ -60,6 +56,9 @@ module MagRp # {
       @goto_check = TransientShortArray._with_shorts(@goto_check).freeze
       @goto_default = @goto_default
       @goto_pointer = @goto_pointer
+      @lexer = nil
+      @env = nil 
+      @syntax_err_count = 0
       rt = @reduce_table.dup
       len = rt.size
       idx = 0
@@ -93,7 +92,19 @@ module MagRp # {
 
     # remaining code is in files racc_init_parser.rb and racc_parser.rb 
 
-  end
+  end # ]
+
+  class RubyParser < Parser  # [
+
+    VERSION = '2.0.2'
+
+    attr_accessor :lexer, :in_def, :in_single, :file_name , :syntax_err_count
+    attr_reader :env , :source_string
+
+    InvalidAssignableLhs = IdentitySet.with_all(
+       [ :self , :nil , :true , :false , :"__LINE__" , :"__FILE__" ] )
+
+  end # ]
 
 end # }
 
