@@ -88,11 +88,8 @@ end
 # (src/kernel/kernel.rb) and commits the DB.
 def tc_reload_prims
   <<-END.margin
-    |omit resultcheck
-    |run
-    |RubyContext reset ; load "includes save, commit"
-    |%
-    |exit
+    | omit resultcheck
+    | input $GEMSTONE/upgrade/ruby/reloadprims.topaz
   END
 end
 
