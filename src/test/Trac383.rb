@@ -4,8 +4,9 @@ class Base
   class << self
     @@cvb = 10
     def checkb
+      ss = self
       x = @@cvb
-      fail "Expecting non nil " if x.nil?
+      unless x == 10 ; raise 'err' ; end
     end
   end
   def geta
