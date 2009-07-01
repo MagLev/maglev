@@ -5,7 +5,8 @@ RUBY.global('Array', 'Array')
 RUBY.global('Behavior', 'Behavior')
 RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
-RUBY.global('Class', 'Class')
+RUBY.global('Class', 'RClass')
+RUBY.global('StClass', 'Class')
 RUBY.global('ConditionVariable', 'TransientSemaphore')
 RUBY.global('Dir', 'RubyDirectory')
 RUBY.global('Env', 'RubyEnv')
@@ -164,4 +165,5 @@ FALSE = false
 NIL = nil
 #  associationsfor TRUE, FALSE, NIL frozen by RubyContext>>_requirePrimitives...
 #
-STDOUT = nil   # real value assigned later
+# do not initialize STDOUT , STDIN, STDERR , they are handled by the
+#   transient context state initialization
