@@ -1169,6 +1169,15 @@ class String
     f.nan? ? 0.0 : f
   end
 
+  def _to_f_or_error
+    s = self._delete_underscore_strip
+    f = s._to_f
+    unless f.finite?
+      raise TypeError, 'coercion to float failed'
+    end
+    f
+  end
+
   def to_i(base=10)
     base = Type.coerce_to(base, Integer, :to_int)
     if base.equal?(10)
