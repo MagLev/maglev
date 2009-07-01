@@ -13,10 +13,10 @@ if ( $status != 0) then
 endif
  cat parser.racc_out | \
    sed -e '1,$s+Racc::+MagRp::+' | \
-   sed -e '1,$s+racc/parser.rb+kernel/parser/racc_parser.rb+' | \
-   sed -e '1,$s+racc_reduce_n+Racc_reduce_n+' | \
-   sed -e '1,$s+racc_shift_n+Racc_shift_n+' | \
-   sed -e '1,$s+racc_nt_base+Racc_nt_base+' | \
+   sed -e '1,$s+require+# require+' | \
+   sed -e '1,$s+racc_reduce_n+Parser::Racc_reduce_n+' | \
+   sed -e '1,$s+racc_shift_n+Parser::Racc_shift_n+' | \
+   sed -e '1,$s+racc_nt_base+Parser::Racc_nt_base+' | \
    sed -e '1,$s+racc_use_result_var+Racc_use_result_var+' | \
    sed -e '1,$s+, _values, result)+, vofs)+' > ruby_parser.rb
 if ( $status != 0) then
