@@ -53,7 +53,11 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
 fi
 
 conf_file=$MAGLEV_HOME/etc/system.conf
-stone=gs64stone
+if [ -z "$STONENAME" ]; then
+	stone=gs64stone
+else 
+	stone=$STONENAME
+fi
 args=""
 debug=0
 maglev_options=""

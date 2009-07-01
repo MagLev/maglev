@@ -47,10 +47,13 @@ if [ -z "$PARSETREE_PORT" ]; then
     export PARSETREE_PORT=2001
 fi
 #
-export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+if [ -z "$STONENAME" ]; then
+	STONENAME=gs64stone
+fi
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-export GEMSTONE_LOG=$MAGLEV_HOME/log/gs64stone.log
+export GEMSTONE_LOG=$MAGLEV_HOME/log/$STONENAME.log
 export GEMSTONE=$MAGLEV_HOME/gemstone
+export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
 TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
 
@@ -77,23 +80,23 @@ shift $(($OPTIND - 1))
 # Commands
 startserver() {
   $GEMSTONE/bin/startnetldi -g -a $USER &>/dev/null
-  $GEMSTONE/bin/startstone gs64stone &>/dev/null
-  $GEMSTONE/bin/waitstone gs64stone &>/dev/null
-  echo "MagLev server gs64stone started"
+  $GEMSTONE/bin/startstone $STONENAME &>/dev/null
+  $GEMSTONE/bin/waitstone $STONENAME &>/dev/null
+  echo "MagLev server $STONENAME started"
 }
 
 startserver-debug() {
   $GEMSTONE/bin/startnetldi -g -a $USER
-  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf gs64stone
-  $GEMSTONE/bin/waitstone gs64stone
-  echo "MagLev server gs64stone started in verbose mode"
+  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf $STONENAME
+  $GEMSTONE/bin/waitstone $STONENAME
+  echo "MagLev server $STONENAME started in verbose mode"
 }
 
 startserver-bench() {
   $GEMSTONE/bin/startnetldi -g -a $USER &>/dev/null
-  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-benchmark.conf gs64stone &>/dev/null
-  $GEMSTONE/bin/waitstone gs64stone &>/dev/null
-  echo "MagLev server gs64stone started with performance optimizations"
+  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-benchmark.conf $STONENAME &>/dev/null
+  $GEMSTONE/bin/waitstone $STONENAME &>/dev/null
+  echo "MagLev server $STONENAME started with performance optimizations"
 }
 
 rubyversioncheck() {
@@ -191,9 +194,9 @@ startparser-debug() {
     echo "MagLev Parse Server process already running on port $PARSETREE_PORT"
   fi
 }
-
+ 
 stopserver() {
-  $GEMSTONE/bin/stopstone gs64stone DataCurator swordfish -i
+  $GEMSTONE/bin/stopstone $STONENAME DataCurator swordfish -i
   $GEMSTONE/bin/stopnetldi
 }
 
