@@ -345,26 +345,34 @@ class String
   end
 
 
+  #  call-seq:
+  #     str.chop   => new_str
+  #
+  #  Returns a new <code>String</code> with the last character removed.  If the
+  #  string ends with <code>\r\n</code>, both characters are removed. Applying
+  #  <code>chop</code> to an empty string returns an empty
+  #  string. <code>String#chomp</code> is often a safer alternative, as it leaves
+  #  the string unchanged if it doesn't end in a record separator.
+  #
+  #     "string\r\n".chop   #=> "string"
+  #     "string\n\r".chop   #=> "string\n"
+  #     "string\n".chop     #=> "string"
+  #     "string".chop       #=> "strin"
+  #     "x".chop.chop       #=> ""
   def chop
-    mySize = self.length
-    if mySize > 0
-      if self[-1].equal?(0xa)
-        if mySize > 1 && self[-2].equal?(0xd)
-      return self[0, mySize - 3]
-    else
-      return self[0, mySize - 2]
-        end
-      else
-        return self[0, mySize - 1]
-      end
-    else
-      return self.dup
-    end
+    str = self.class.new(self) # preserve species
+    str.chop!
+    str
   end
 
+  #     str.chop!   => str or nil
+  #
+  #  Processes <i>str</i> as for <code>String#chop</code>, returning <i>str</i>,
+  #  or <code>nil</code> if <i>str</i> is the empty string.  See also
+  #  <code>String#chomp!</code>.
   def chop!
-    raise TypeError, "can't modify frozen string" if frozen?
     mySize = self.length
+    raise TypeError, "can't modify frozen string" if frozen?
     if mySize > 0
       if self[-1].equal?(0xa)
         if mySize > 1 && self[-2].equal?(0xd)

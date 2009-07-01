@@ -38,4 +38,6 @@ module Kernel
     RandomInstance.seed(number)
     old_seed
   end
+
+  module_function :debugger
 end
