@@ -1,7 +1,8 @@
+# file marshal2.rb
 
 class Object
   def to_marshal(ms, strip_ivars = false)
-    out = ms.serialize_extended_object self
+    out = ms.serialize_extended_object(self)
     out << Marshal::TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
     #out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
@@ -12,22 +13,23 @@ end
 
 class Range
   def to_marshal(ms)
-    out = ms.serialize_extended_object self
+    out = ms.serialize_extended_object(self)
     out << Marshal::TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
-    out << ms.serialize_ivars( { :begin => self.begin,
-                                 :end => self.end,
-                                 :excl => self.exclude_end? })
+    out << ms.serialize_ivars( [ :begin , self.begin,
+                                 :end , self.end,
+                                 :excl , self.exclude_end? ])
     out
   end
   def from_marshal(ivar, value)
-    case ivar
-    when :begin
+    if ivar.equal?(:begin)
       @from = value
-    when :end
+    elsif ivar.equal?( :end)
       @to = value
-    when :excl
+    elsif ivar.equal?( :excl)
       @excludeEnd = value
+    else
+      raise TypeError, 'unrecognized instvar in Range#from_marshal'
     end
   end
 end
