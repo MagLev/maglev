@@ -35,8 +35,9 @@ class Float
   NaN      = _resolve_smalltalk_global(:PlusQuietNaN)
   RADIX    = 2
   ROUNDS   = 1  # towards nearest representable value,
-     # ROUNDS is made invariant by code in RubyContext 
-     #  because there is no support for changing rounding mode in the VM.
+     #  there is no support for changing rounding mode in the VM.
+
+  PlusInfinity = _resolve_smalltalk_global(:PlusInfinity)
 
   def coerce(param, &block)
     begin
@@ -109,7 +110,7 @@ class Float
 
   primitive_nobridge '_raised_to', '_rubyRaisedTo:'
   def **(arg)
-    a = Type.coerce_to(arg, Float, :to_f)
+    a = Type.coerce_to(arg, Float, :_to_f_or_error)
     self._raised_to(a)
   end
 
@@ -132,14 +133,32 @@ class Float
 
   def <=>(arg)
     # reimplemented for efficiency since Float > not a prim
-    if arg._isNumeric
+    if arg._isFloat
       if self < arg
 	-1 
       elsif self == arg
 	0 
+      elsif self.finite? and arg.finite?
+	1
       else
-	1 
+        nil
       end
+    elsif arg._isInteger
+      if self.finite? 
+        a = Type.coerce_to(arg, Float, :to_f)
+        self <=> a
+      elsif self.infinite?
+        if self > 0.0
+          1
+        else
+          -1
+        end 
+      else
+        nil
+      end
+    elsif arg._isNumeric
+      a = Type.coerce_to(arg, Float, :to_f)
+      self <=> a
     else
       nil
     end

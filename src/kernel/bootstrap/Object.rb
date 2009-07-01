@@ -102,6 +102,7 @@ class Object
     primitive_nobridge '__send__&', 'rubySend:with:block:'
     primitive_nobridge '__send__&', 'rubySend:with:with:block:'
     primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
+    primitive_nobridge '__send__*' , 'rubySend:withArgs:'
     primitive          '__send__*&' , 'rubySend:withArgs:block:'
 
     # redefinition of __perform___ disallowed by parser after bootstrap finished.
@@ -269,6 +270,8 @@ class Object
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
+ 
+    primitive_nobridge 'equal?', '_rubyEqualQ:'    # so send will work
 
     # _not_equal? is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.

@@ -1,5 +1,6 @@
 # I've tweaked this a bit from the raw Rubinius.
 # BEGIN RUBINIUS: From rubinius rubinius/kernel/core/kernel.rb
+
 module Type
 
   ##
@@ -70,6 +71,23 @@ module Type
   def self.coerce_to_Float_to_f(obj)
      begin
        ret = obj.to_f
+     rescue Exception => e
+       raise TypeError, "Coercion error: #{obj.inspect}.to_f => Float failed:\n" \
+                       "(#{e.message})"
+     end
+     unless obj.equal?(nil)
+       if ret._isFloat
+         unless ret.nan?
+           return ret
+         end
+       end 
+     end
+     raise TypeError, "Coercion error: obj.to_f did not return a Float"
+  end
+
+  def self.coerce_to_Float__to_f_or_error(obj)
+     begin
+       ret = obj._to_f_or_error
      rescue Exception => e
        raise TypeError, "Coercion error: #{obj.inspect}.to_f => Float failed:\n" \
                        "(#{e.message})"

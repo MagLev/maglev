@@ -604,6 +604,7 @@ rule
                 | cname
                     {
 		      # cpath: tCOLON3 cname #   | cname  
+# TODO, fix trac_1001.rb 
                       result = val[vofs ]  # a RpNameToken
                     }
                 | primary_value tCOLON2 cname
@@ -690,7 +691,7 @@ rule
                       resbody.src_offset=( val[vofs + 3].src_offset )   # kRESCUE_MOD position
                       rescue_nod = RubyRescueNode.s( val[vofs + 2], resbody, nil)
                       rescue_nod.src_offset=( val[vofs + 1].src_offset )   # tEQL position
-                      result = self.node_assign(val[vofs ], rescue_node )
+                      result = self.node_assign(val[vofs ], rescue_nod )        # Fix trac 545
                     }
                 | var_lhs tOP_ASGN arg
                     {
@@ -2365,7 +2366,7 @@ xstring_contents: none
                     {
 		      # singleton: # expr opt_nl tRPAREN
                       result = val[vofs + 2]
-		      if result.kind_of?(RubyAbstractiLiteralNode)
+		      if result.kind_of?(RubyAbstractLiteralNode)
                         yyerror "Can't define singleton method for literals." 
 		      end
                     }

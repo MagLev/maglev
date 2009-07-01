@@ -6,7 +6,6 @@ class Behavior
   primitive 'alias_method', 'rubyAlias:from:'
   primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
   primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
-  primitive_nobridge 'instance_variables', 'rubyInstvarNames'
   primitive_nobridge '_module_eval_string', '_moduleEvalString:with:binding:'
   primitive_nobridge '_module_eval&', '_moduleEval:'
 
@@ -54,7 +53,7 @@ class Behavior
     end
   end
 
-  primitive_nobridge 'class_variables', 'rubyClassVarNames' 
+  primitive_nobridge 'class_variables', 'rubyClassVarNames'   # ??? to RClass?
 
   # def class_variable_defined?(string) ; end 
   primitive_nobridge 'class_variable_defined?', 'rubyClassVarDefined:'
@@ -81,7 +80,6 @@ class Behavior
     define_method(sym, blk)
   end
 
-  primitive_nobridge '_include_module', 'includeRubyModule:' 
   def include(*names)
     # this variant gets bridge methods
     names.reverse.each do |name|

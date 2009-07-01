@@ -113,7 +113,7 @@ class Integer
           if arg._isInteger 
             raise TypeError , 'coercion error in ** '
           else
-            s = Type.coerce_to(self, Float, :to_f)
+            s = Type.coerce_to(self, Float, :_to_f_or_error)
             s ** arg 
           end
         end 
@@ -168,7 +168,22 @@ class Integer
      primitive '>=', '_rubyGteq:'
      primitive '==', '_rubyEqual:'
 
-    #  <=> inherited from Numeric
+     def <=>(arg)
+       if arg._isInteger
+         if self < arg
+           -1
+         elsif self == arg
+           0
+         else
+           1  
+         end
+       elsif arg._isFloat
+         sf = Type.coerce_to(self, Float, :to_f)
+         sf <=> arg
+       else
+         super
+       end
+     end
 
      primitive_nobridge '_bit_at', 'bitAt:'
      

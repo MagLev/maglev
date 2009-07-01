@@ -41,7 +41,8 @@ class ThrTest
     unless (x = $A) == 78 ; 			Failed() ; end
     Thread.pass
     unless (x = $A) == 78 ;                     Failed() ; end
-    unless t.status == 'sleep' ; 		Failed() ; end
+    x = t.status
+    unless x == 'run' ;                 Failed() ; end
     unless (x = t.stop?).equal?(true)  ; 		Failed() ; end
     unless t.alive?.equal?(true) ; 		Failed() ; end
    
@@ -64,7 +65,7 @@ class ThrTest
     s = t.join(1)
     unless (s == nil);				Failed() ; end
     unless (x = $A) == 98 ; 			Failed() ; end
-    unless (s = t.status) == 'sleep';		Failed() ; end
+    unless (s = t.status) == 'run';		Failed() ; end
     t.terminate
     Thread.pass 
     t.run
@@ -114,15 +115,24 @@ class ThrTest
     unless (x = t.value) == 456 ;			        Failed() ; end
 
     #---------------
-    t = Thread.fork { $A = 68 
+    t = Thread.fork { 
+      puts "entered $A + 1000 "
+      $A = 68 
       while $A == 68
+        puts "sleep in $A + 1000 "
         sleep			# coverage for sleep(0) equivalent to pass 
+        puts "woke in $A + 1000 "
       end
       $A = $A + 1000
+      puts "Finished $A + 1000 "
     }
     unless $A == 68 ; 			Failed() ; end
     $A = $A + 100 
+    puts "Main1  $A + 1000 "
+    cnt = 0
     while ($A < 1000)
+      if cnt == 0 ; puts "Main2  $A + 1000 " ; end
+      cnt += 1
       Thread.pass
     end
     unless $A == 1168;			Failed() ; end

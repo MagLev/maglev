@@ -79,7 +79,6 @@ module Kernel
   # def catch(aSymbol, &aBlock); end
   primitive_nobridge 'catch&' , 'catch:do:'
 
-  primitive_nobridge '_eval', '_eval:binding:with:'
   primitive_nobridge '_eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
   def eval(str, binding, file_name, line_number=1 )
@@ -114,7 +113,7 @@ module Kernel
     unless blk.equal?(nil)
       vcgl << blk
     end
-    res = _eval(str, bnd, vcgl )
+    res = _eval_with_position(str, bnd, vcgl, nil, 0 )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
@@ -128,7 +127,7 @@ module Kernel
     unless blk.equal?(nil)
       vcgl << blk
     end
-    res = _eval(str, bnd, vcgl )
+    res = _eval_with_position(str, bnd, vcgl, nil, 0 )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res
@@ -148,7 +147,7 @@ module Kernel
     unless blk.equal?(nil)
       vcgl << blk
     end
-    res = _eval(str, bnd, vcgl )
+    res = _eval_with_position(str, bnd, vcgl, nil, 0 )
     vcgl[0]._storeRubyVcGlobal(0x20)
     vcgl[1]._storeRubyVcGlobal(0x21)
     res

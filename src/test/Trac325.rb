@@ -25,6 +25,9 @@ class Haml
   end
 end
 
+hh = Haml
+mm = Mha
+
 a = Haml.version
 b = Haml.version
 unless a == 55 ; raise 'error' ; end

@@ -1,65 +1,10 @@
+# file marshal.rb 
 # depends on: module.rb class.rb
 
 
 module Marshal
 
-  MAJOR_VERSION = 4
-  MINOR_VERSION = 8
-
-  VERSION_STRING = "\x04\x08"
-
-  TYPE_ARRAY = '['
-  TYPE_ARRAY_ch = ?[
-  TYPE_BIGNUM = 'l'
-  TYPE_BIGNUM_ch = ?l
-  TYPE_CLASS = 'c'
-  TYPE_CLASS_ch = ?c
-  TYPE_DATA = 'd'  # no specs
-  TYPE_DATA_ch = ?d  # no specs
-  TYPE_EXTENDED = 'e'
-  TYPE_EXTENDED_ch = ?e
-  TYPE_FALSE = 'F'
-  TYPE_FALSE_ch = ?F
-  TYPE_FIXNUM = 'i'
-  TYPE_FIXNUM_ch = ?i
-  TYPE_FLOAT = 'f'
-  TYPE_FLOAT_ch = ?f
-  TYPE_HASH = '{'
-  TYPE_HASH_DEF = '}'
-  TYPE_HASH_DEF_ch = ?}
-  TYPE_HASH_ch = ?{
-  TYPE_IVAR = 'I'
-  TYPE_IVAR_ch = ?I
-  TYPE_LINK = '@'
-  TYPE_LINK_ch = ?@
-  TYPE_MODULE = 'm'
-  TYPE_MODULE_OLD = 'M'  # no specs
-  TYPE_MODULE_OLD_ch = ?M   # no specs
-  TYPE_MODULE_ch = ?m
-  TYPE_NIL = '0'
-  TYPE_NIL_ch = ?0
-  TYPE_OBJECT = 'o'
-  TYPE_OBJECT_ch = ?o
-  TYPE_REGEXP = '/'
-  TYPE_REGEXP_ch = ?/
-  TYPE_STRING = '"'
-  TYPE_STRING_ch = ?"
-  TYPE_STRUCT = 'S'
-  TYPE_STRUCT_ch = ?S
-  TYPE_SYMBOL = ':'
-  TYPE_SYMBOL_ch = ?:
-  TYPE_SYMLINK = ';'
-  TYPE_SYMLINK_ch = ?;
-  TYPE_TRUE = 'T'
-  TYPE_TRUE_ch = ?T
-  TYPE_UCLASS = 'C'
-  TYPE_UCLASS_ch = ?C
-  TYPE_USERDEF = 'u'
-  TYPE_USERDEF_ch = ?u
-  TYPE_USRMARSHAL = 'U'
-  TYPE_USRMARSHAL_ch = ?U
-
-  class State
+  class State # [
 
     def initialize(stream, depth, proc)
       # shared
@@ -108,7 +53,7 @@ module Marshal
       @proc.call obj if @proc and @call
     end
 
-    def construct(ivar_index = nil, call_proc = true)
+    def construct(ivar_index = nil, call_proc = true) # [
       type = consume_byte
 
       if type.equal?(TYPE_NIL_ch)
@@ -170,27 +115,27 @@ module Marshal
         name = get_symbol
         # @modules << Object.const_get(name)
         @modules << get_scoped_constant(name)
-        obj = construct nil, false
-        extend_object obj
+        obj = construct( nil, false)
+        extend_object( obj)
         call obj if call_proc
 
       elsif type.equal?( TYPE_UCLASS_ch )
         name = get_symbol
         @user_class = name
-        obj = construct nil, false
+        obj = construct( nil, false)
         call obj if call_proc
 
       elsif type.equal?( TYPE_IVAR_ch )
         ivar_index = @has_ivar.length
-        @has_ivar.push true
-        obj = construct ivar_index, false
+        @has_ivar.push(true)
+        obj = construct(ivar_index, false)
         set_instance_variables obj if @has_ivar.pop
         call obj if call_proc
       else
         raise ArgumentError, "load error, unknown type #{type}"
       end
       obj
-    end
+    end # ]
 
     def construct_array
       obj = @user_class ? get_user_class.new : []
@@ -421,8 +366,8 @@ module Marshal
       names = []
 #      sup = obj.metaclass.superclass
       sup = obj.class.superclass
-
-      while sup and [Module].include? sup.class do
+#     while sup and [Module].include? sup.class do
+      while sup and sup.class.equal?( Module ) do
         names << sup.name
         sup = sup.superclass
       end
@@ -522,7 +467,9 @@ module Marshal
       flt = Math.modf(Math.ldexp(Math.frexp(flt.abs)[0], 37))[0]
       str << "\0" if flt > 0
       while flt > 0
-        flt, n = Math.modf(Math.ldexp(flt, 32))
+        mod_arr = Math.modf(Math.ldexp(flt, 32))
+        flt = mod_arr[0]
+        n = mod_arr[1]
         n = n.to_i
         str << to_byte(n >> 24)
         str << to_byte(n >> 16)
@@ -638,11 +585,14 @@ module Marshal
       end
     end
 
-    def serialize_ivars(hash)
-      str = serialize_integer(hash.length)
-      hash.each do |k,v|
-        str << k.to_marshal(self)
-        str << v.to_marshal(self)
+    def serialize_ivars(arr)
+      siz = arr.size 
+      str = serialize_integer( siz >> 1 )
+      n = 0
+      while n < siz 
+        str << arr[n].to_marshal(self)
+        str << arr[n + 1].to_marshal(self)
+        n += 2 
       end
       str
     end
@@ -651,7 +601,7 @@ module Marshal
       [n].pack('C')
     end
 
-  end
+  end  # ]
 
   def self.dump(obj, an_io=nil, limit=nil)
     if limit.equal?(nil)

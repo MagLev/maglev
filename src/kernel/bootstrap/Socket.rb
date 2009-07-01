@@ -16,8 +16,8 @@
 
 class Socket
 
-  # OS dependent constants initialized by _init_socket_constants
-  # in second opening of Socket, below
+  # OS dependent constants initialized by smalltalk code 
+  #  in Socket>>_initTransientSocketConstants , called from RubyContext>>initTransient .
 
   # accept implemented only in TCPServer .
   # bind, listen not implemented,
@@ -147,15 +147,6 @@ class Socket
     args = [ host, service, family, socktype, protocol, flags ]
     _getaddrinfo( args )
   end
-end
-
-class Socket
-  class_primitive '_init_socket_constants', '_initSocketConstants'
-
-  self._init_socket_constants  # initialize OS dependent constants,
-               #  they are implemented as Transient constants ,
-               #  must be in second opening of Socket so Socket's name space
-               #  is fully initialized
 end
 
 class IPSocket

@@ -1083,7 +1083,7 @@ class RubyLexer
         elsif (s_ch.equal?( ?@ )) and (s_matched = src.scan(/\@\@?\w*/)) then  #  ] [
           first_dig_ch = s_matched[1] 
           if first_dig_ch._not_equal?(nil) and src.ch_is_digit( first_dig_ch) # @token  =~ /\@\d/
-            rb_compile_error "`#{@token}` is not allowed as a variable name" 
+            rb_compile_error "'#{s_matched}' is not allowed as a variable name" 
           end
           return process_token(s_matched, command_state, tok_start_offset)
         elsif (s_ch.equal?( ?: ))  # ] [

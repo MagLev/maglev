@@ -3,15 +3,21 @@
 # rubygems => rdoc which uses singleton.
 
 module Singleton
+  sb = self
+  class << self
+    sc = self
+  end
 end
 
 class << Singleton
+  sa = self  # should have sa == sc
   FirstInstanceCall = proc do
     @__instance__ = new   # => Undefined method `new' for Singleton
   end
 
   def __init__(klass)
     class << klass
+      ss = self
       define_method(:instance, FirstInstanceCall)
     end
     klass

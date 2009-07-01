@@ -9,10 +9,11 @@ class UnboundMethod
   primitive_nobridge '_home_class', 'homeClass'
 
   def bind(obj)
-    if (obj.kind_of?(self._home_class))
+    hm_cls = self._home_class 
+    if (obj.kind_of?( hm_cls))
       return _bind(obj)   # returns a Method
     else
-      raise TypeError , ('obj must be kind_of ' << @rcvrClass.name )
+      raise TypeError , ('obj must be kind_of ' << (hm_class.name ))
     end
   end
 

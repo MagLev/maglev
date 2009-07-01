@@ -67,7 +67,13 @@
  unless $y == 203
    raise 'ERR'
  end
- F.new.class.mmaa
+
+ #     F.new.class.mmaa
+ ff = F
+ oo = F.new 
+ ocls = oo.class
+ ocls.mmaa
+
  unless $y == 205
    raise 'ERR'
  end

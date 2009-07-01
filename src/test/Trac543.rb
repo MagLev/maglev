@@ -9,4 +9,6 @@ b = binding
 #
 #
 b2 = binding()
-
+unless b.class.equal?(Binding) ; raise 'ERROR'; end
+unless b2.class.equal?(Binding) ; raise 'ERROR'; end
+true

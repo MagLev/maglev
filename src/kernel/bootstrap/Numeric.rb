@@ -23,13 +23,12 @@ class Numeric
   end
 
   def <=>(arg)
+    # Must be reimplemented in Float and Integer
     if arg._isNumeric
-      if self > arg
-        1
-      elsif self == arg
+      if self == arg
         0
       else
-        -1
+        nil
       end
     else
       nil
@@ -170,6 +169,10 @@ class Numeric
 
   def freeze
     self # no-op
+  end
+
+  def _to_f_or_error
+    self.to_f
   end
 end
 

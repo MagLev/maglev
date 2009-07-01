@@ -20,18 +20,14 @@ end
 
 class Test445_2
   extend Mod445
-#  def self.cvar
-#    @@var 
-#  end
-#  def cvar
-#    @@var 
-#  end
 end
 
 a = Test445.cvar
-b = Test445_2.cvar
 c = Mod445.cvar
+bcl = Test445_2
+b = Test445_2.cvar
 unless [a,b,c] == [ "Test445_clsvar", "Mod445_clsvar", "Mod445_clsvar"]
   raise 'error'
 end
+puts 'ok'
 true

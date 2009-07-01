@@ -44,7 +44,8 @@ module Enclosing
     raise "Bad C #{C}" unless C == "defined in included module"
     raise "Bad D #{D}" unless D == "defined in superclass"
     raise "Bad E #{E}" unless E == "defined at toplevel"
-    raise "Bad F #{F}" unless F == "defined in kernel"
+    ss = self
+    raise "Bad F #{F}" unless (ff = F) == "defined in kernel"
 
     # The list of modules searched, in the order searched
     #

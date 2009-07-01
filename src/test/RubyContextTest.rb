@@ -4,6 +4,6 @@
 
 # Don't actually call the methods, as that may mess things up...
 
-[:load_context, :save_context].each do |m|
+[:load_context ].each do |m|
   raise "RubyContext.#{m} not present" unless RubyContext.respond_to? m
 end

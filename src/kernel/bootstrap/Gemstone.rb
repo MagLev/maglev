@@ -3,9 +3,22 @@
 class Gemstone
 
   # Transaction support
-  class_primitive 'commitTransaction'
-  class_primitive 'abortTransaction'
-  class_primitive 'beginTransaction'
+  class_primitive '_commitTransaction', 'commitTransaction'
+  class_primitive '_abortTransaction', 'abortTransaction'
+  class_primitive '_beginTransaction', 'beginTransaction'
+
+  def self.commitTransaction
+    # STDERR.write( "- Ruby  commitTransaction\n") 
+    _commitTransaction
+  end
+  def self.abortTransaction
+    # STDERR.write( "- Ruby  abortTransaction\n") 
+    _abortTransaction
+  end
+  def self.beginTransaction
+    # STDERR.write( "- Ruby  beginTransaction\n") 
+    _beginTransaction
+  end
 
   class_primitive 'session_temp' , '_sessionTempsAt:'  # returns nil if not found
   class_primitive 'session_temp_put', '_sessionTempsAt:put:' # returns value stored

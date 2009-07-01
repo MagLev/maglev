@@ -36,14 +36,38 @@ l1 = L1
 l2 = L2
 l3 = L3
 
-#  this case gets infinite recursion still
-# test(c.foo([]), [:C, :L3, :L2, :L1, :B, :L3, :L2, :L1, :A], 'Test one')
-
 b = B.new
 
 test(b.foo([]), [:B, :L3, :L2, :L1, :A], 'Test two')
 
-
+#  this case gets infinite recursion still because implementation of super
+#    bytecode only knows meth.inClass.primaryCopy and the class of receiver.
+# test(c.foo([]), [:C, :L3, :L2, :L1, :B, :L3, :L2, :L1, :A], 'Test one')
+#
+# 2532 B >> foo:&                                         (envId 1) @3 line 1   [methId 103256065]
+# 2533 L1 >> foo:&                                        (envId 1) @3 line 1   [methId 102716929]
+# 2534 L2 >> foo:&                                        (envId 1) @3 line 1   [methId 102715649]
+# 2535 L3 >> foo:&                                        (envId 1) @3 line 3   [methId 102714369]
+# 2536 B >> foo:&                                         (envId 1) @3 line 1   [methId 103256065]
+# 2537 L1 >> foo:&                                        (envId 1) @3 line 1   [methId 102716929]
+# 2538 L2 >> foo:&                                        (envId 1) @3 line 1   [methId 102715649]
+# 2539 L3 >> foo:&                                        (envId 1) @3 line 3   [methId 102714369]
+# 2540 C >> foo:&                                         (envId 1) @3 line 1   [methId 102655745]
+# 2541 C >> foo:                                          (envId 1) @2 line 1   [methId 102654465]
+#    receiver [103259393 sz:0 cls: 102727681 C] aC
+#
+#virtualKernel                  81848833   primaryCopy 13725185
+#  Object                       72193
+#    A                          102726401
+#      virtualL1                102728961   primaryCopy 102725633
+#        virtualL2              102743041   primaryCopy 102724865
+#          virtualL3            103257345   primaryCopy 102723585
+#            B                  102728449
+#              virtualL1        102722049   primaryCopy 102725633
+#                virtualL2      102721537   primaryCopy 102724865
+#                  virtualL3    102721025   primaryCopy 102723585
+#                    C          102727681
+#
 
 # ========================================
 

@@ -37,38 +37,26 @@ module Enumerable
         # quicksort(xs, &prc)
         #    use Smalltalk mergesort from Array 
         if block_given?
-          mergesort(xs) { | a, b| prc.call(a, b) <= 0 }
+          mergesort(xs) { | a, b| 
+            c = prc.call(a, b) 
+            if c.equal?(nil)
+              raise ArgumentError, 'not comparable'
+            end
+            c <= 0
+          }
         else
-          mergesort(xs) { |a,b| (a <=> b) <= 0 }
+          mergesort(xs) { |a, b| 
+            c = (a <=> b)
+            if c.equal?(nil)
+              raise ArgumentError, 'not comparable'
+            end
+            c <= 0
+          }
         end
       end
     end
 
     alias_method :call, :sort
-
-    class SortedElement
-      def initialize(val, sort_id)
-        @value, @sort_id = val, sort_id
-      end
-
-      def value
-        @value
-      end
-      def sort_id
-        @sort_id
-      end
-
-      def <=>(other)
-        @sort_id <=> other.sort_id
-      end
-    end
-
-    def sort_by(xs)
-      # The ary and its elements sould be inmutable while sorting
-
-      elements = xs.map { |x| SortedElement.new(x, yield(x)) }
-      sort(elements).map { |e| e.value }
-    end
 
     ##
     # Sort an Enumerable using simple quicksort (not optimized)
@@ -96,7 +84,34 @@ module Enumerable
       end
       quicksort(lmr[-1], &prc) + lmr[0] + quicksort(lmr[1], &prc)
     end
+  end
 
+  class Sort
+    class SortedElement
+      def initialize(val, sort_id)
+        @value, @sort_id = val, sort_id
+      end
+
+      def value
+        @value
+      end
+      def sort_id
+        @sort_id
+      end
+
+      def <=>(other)
+        @sort_id <=> other.sort_id
+      end
+    end
+  end
+
+  class Sort
+    def sort_by(xs)
+      # The ary and its elements sould be inmutable while sorting
+
+      elements = xs.map { |x| SortedElement.new(x, yield(x)) }
+      sort(elements).map { |e| e.value }
+    end
   end
 
   ##

@@ -2,7 +2,7 @@
 
 class Struct
 
-  include Enumerable
+#  include Enumerable
 
   class << self
     alias_method :subclass_new, :new
