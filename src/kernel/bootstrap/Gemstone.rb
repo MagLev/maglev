@@ -8,15 +8,15 @@ class Gemstone
   class_primitive '_beginTransaction', 'beginTransaction'
 
   def self.commitTransaction
-    STDERR.write( "- Ruby  commitTransaction\n")  # do not checkin
+    # STDERR.write( "- Ruby  commitTransaction\n") 
     _commitTransaction
   end
   def self.abortTransaction
-    STDERR.write( "- Ruby  abortTransaction\n")  # do not checkin
+    # STDERR.write( "- Ruby  abortTransaction\n") 
     _abortTransaction
   end
   def self.beginTransaction
-    STDERR.write( "- Ruby  beginTransaction\n")  # do not checkin
+    # STDERR.write( "- Ruby  beginTransaction\n") 
     _beginTransaction
   end
 
