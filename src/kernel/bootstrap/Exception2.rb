@@ -1,7 +1,7 @@
 
 class SystemExit
   def status
-    @status  # a dynamic instVar
+    @status  
   end
 
   def initialize(*args)

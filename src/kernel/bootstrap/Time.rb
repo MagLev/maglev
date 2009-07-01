@@ -440,7 +440,7 @@ class Time
   #
   # +want_gmt+ says whether the caller wants a gmtime or local time object.
 
-  def at_gmt(sec, usec, want_gmt)  # GEMSTONE, not used
+  def at_gmt(sec, usec, want_gmt)  # GEMSTONE
     if sec.kind_of?(Integer) || usec
       sec  = Type.coerce_to sec, Integer, :to_i
       usec = usec ? usec.to_i : 0
@@ -450,10 +450,9 @@ class Time
       sec  = sec.to_i
     end
 
-    sec  = sec + (usec / 1_000_000)
-    usec = usec % 1000000
+    usec = usec + (sec * 1000000)
 
-    @timeval = [sec, usec]
+    @microseconds =  usec
 
     if want_gmt
       force_gmtime
@@ -751,6 +750,10 @@ class Time
   def strftime(fmt='%a %b %d %H:%M:%S %Z %Y' )
     fmt = fmt.to_str unless  fmt._isString
     _strftime(fmt)
+  end
+
+  def self.times
+    Process.times
   end
 
 end

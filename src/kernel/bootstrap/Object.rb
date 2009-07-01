@@ -270,6 +270,8 @@ class Object
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
+ 
+    primitive_nobridge 'equal?', '_rubyEqualQ:'    # so send will work
 
     # _not_equal? is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.

@@ -4,7 +4,7 @@ class File
   def self._validate_stdin_value(file)
     # used in generated code value for     $stdin = file
     cls = file.class
-    if cls == File || cls == PersistentFile
+    if cls == File 
       return file
     end
     raise TypeError, 'expected a File'
@@ -20,9 +20,4 @@ class File
     raise TypeError, 'expected a File'
   end
 end
-
-STDIN = $stdin = PersistentFile.new(proc{File.stdin})
-STDOUT = $stdout = PersistentFile.new(proc{File.stdout})
-STDERR = $stderr = PersistentFile.new(proc{File.stderr})
-$> = $stdout
 

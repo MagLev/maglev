@@ -21,9 +21,8 @@
 
 # RubyContext is identically Smalltalk RubyContext.
 class RubyContext
-  # Set this instance as the saved version of the ruby context and make
-  # session methods visible to the persistent store (does NOT commit).
-  class_primitive 'save_context', 'save'
+  # save_context no longer exists.  the operation is only performed
+  # by smalltalk bootstrapping code in RubyContext.
 
   # Return the current default context after initializing or loading it.
   #
@@ -32,7 +31,7 @@ class RubyContext
   # transaction.  The global namespace will start empty, and be initialized
   # with effects of loading the primitives.
   #
-  # If a saved contet exists, retrieve it and install its methods into
+  # If a saved context exists, retrieve it and install its methods into
   # session temps (copy from persistent to session temps).
   class_primitive 'load_context', 'load'
 

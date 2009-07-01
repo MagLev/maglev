@@ -9,10 +9,12 @@ class Module
   # puts, they are temporarily there.  As they are implemented, we should
   # pull them into here.
 
+  primitive_nobridge 'superclass' , 'rubySuperclass'  # resolves to impl in .mcz
+
   primitive_nobridge 'constants',      'rubyConstants'
   primitive_nobridge 'const_defined?', 'rubyConstDefined:'
-  primitive_nobridge '_const_get',      'rubyGlobalAt:'
-  primitive_nobridge 'const_set',      'rubyConstAt:put:'
+  primitive_nobridge '_const_get',      'rubyConstAt:'
+  primitive_nobridge 'const_set',      'rubyConstDecl:put:'
 
   # make associations holding constants of receiver invariant
   #   does not affect inherited constants
@@ -25,6 +27,11 @@ class Module
 
   primitive_nobridge 'autoload', 'rubyAutoload:file:'
   primitive_nobridge 'autoload?', 'rubyAutoloadFileFor:'
+
+  primitive_nobridge 'instance_variables', 'rubyInstvarNames'
+
+  primitive_nobridge 'freeze' , 'freezeModule'
+  primitive_nobridge 'frozen?' , 'moduleFrozen'
 
   def const_get(name)
     unless name._isString or name._isSymbol
@@ -46,7 +53,7 @@ class Module
   # Invoked as a callback when a_module includes receiver
   def included(a_module)
   end
-
+ 
   # Callback invoked whenever the receiver is used to extend an object.
   # The object is passed as a paramter.
   def extended(a_module)
@@ -108,5 +115,11 @@ class Module
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'
 
   primitive_nobridge '_method_protection', 'rubyMethodProtection'
+
+  def maglev_persistable=(flag=true)
+    self._set_persistable(flag)
+  end 
+  primitive_nobridge '_set_persistable', '_setPersistable:'
+  primitive_nobridge 'maglev_persistable?', '_persistable'   
 
 end

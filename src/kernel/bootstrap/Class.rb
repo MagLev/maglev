@@ -1,12 +1,11 @@
 
 class Class
-  # Ruby Class is identically Smalltalk's Class
-  # do not # include Module
-  # Module already present as superclass of Class in base smalltalk image
+  # Ruby Class is identically Smalltalk's RClass
 
-  #  following are installed by RubyContext>>installPrimitiveBootstrap
-  #    primitive_nobridge 'superclass', 'superclass' # installed in Behavior
-  #  end installPrimitiveBootstrap
+  # do not # include Module
+  # Module already present as superclass of RClass in base smalltalk image
+
+  primitive_nobridge 'superclass', 'superClass'
 
   class_primitive_nobridge '_rubyNew', '_rubyNew:do:'
 
@@ -116,8 +115,17 @@ class Class
     name
   end
 
-
   def to_s
     name
   end
+
+  def maglev_instances_persistable=(flag=true)
+    unless self.maglev_persistable?
+      raise Maglev::NotPersistableException 
+    end
+    self._set_instances_persistent(flag)
+  end
+  primitive_nobridge '_set_instances_persistent', '_setInstancesPersistent:' 
+  primitive_nobridge 'maglev_instances_persistable?', '_instancesPersistent'
+
 end

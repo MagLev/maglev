@@ -1,64 +1,79 @@
-# This module defines a convenient constant in the global namespace so
-# scripts can quickly tell if they are running MagLev:
+# A quick guide to the Transient / Persistent semantics:
 #
-#    if defined? Maglev
-#      ...
-#    end
-#
+#  |-------------+----------------------------+----------------------------|
+#  |             | Maglev.persistent          | Maglev.transient           |
+#  |-------------+----------------------------+----------------------------|
+#  | Persistent  | * Constant -> both         | * Constant -> transient    |
+#  | receiver    | * method -> both           | * method -> session        |
+#  |-------------+----------------------------+----------------------------|
+#  | Transient   | * Constant -> transient    | * Constant -> transient    |
+#  | receiver    | * method -> session        | * method -> session        |
+#  |-------------+----------------------------+----------------------------|
+#  | New Class   | * Class marked persistent  | * Class marked transient   |
+#  |             | * Name: according to rules | * Name: according to rules |
+#  |             | of parent namespace        | of parent namespace        |
+#  |-------------+----------------------------+----------------------------|
+
 module Maglev
-  # The root for all Maglev exceptions
-  class MaglevException < StandardError;  end
+  # MaglevException            # defined in GlobalErrors.rb
+  # NotPersistableException    # defined in GlobalErrors.rb
+  # OutsideOfTransactionException    # defined in GlobalErrors.rb
+  # CommitFailedException      # defined in GlobalErrors.rb
 
-  class OutsideOfTransactionException < MaglevException; end
+  PERSISTENT_ROOT = Hash.new
 
-  # This exception is raised if MagLev is unable to commit the state of the
-  # repository.  The details of why the commit failed are contained in the
-  # exception.
-  class CommitFailedException < MaglevException
-    # TODO: De-smalltalk-ify description and API
-    #
-    # Returns a SymbolDictionary that contains an Association whose key is
-    # #commitResult and whose value is one of the following Symbols:
-    # #success, #failure, #retryFailure, #commitDisallowed, or #rcFailure .
-    #
-    # The remaining Associations in the dictionary are used to report the
-    # conflicts found.  Each Association's key indicates the kind of
-    # conflict detected; its associated value is an Array of OOPs for the
-    # objects that are conflicting.  If there are no conflicts for the
-    # transaction, the returned SymbolDictionary has no additional
-    # Associations.
-    #
-    # The conflict sets are cleared at the beginning of a commit or abort
-    # and therefore may be examined until the next commit, continue or
-    # abort.
-    #
-    # The keys for the conflicts are as follows:
-    #
-    #     Key                Conflicts
-    # Read-Write          StrongReadSet and WriteSetUnion conflicts.
-    # Write-Write         WriteSet and WriteSetUnion conflicts.
-    # Write-Dependency    WriteSet and DependencyChangeSetUnion conflicts.
-    # Write-WriteLock     WriteSet and WriteLockSet conflicts.
-    # Write-ReadLock      WriteSet and ReadLockSet conflicts.
-    # Rc-Write-Write      Logical write-write conflict on reduced conflict object.
-    # WriteWrite_minusRcReadSet  (WriteSet and WriteSetUnion conflicts) - RcReadSet)
-    #
-    # The Read-Write conflict set has already had RcReadSet subtracted from
-    # it.  The Write-Write conflict set does not have RcReadSet subtracted.
-    #
-    # Beginning with Gemstone64 v1.1 , the WriteSet no longer includes
-    # objects newly committed by this transaction.  Thus a conflict between
-    # a lock and a newly committed object in prior releases will no longer
-    # show up as a conflict.
-    #
-    # The Write-Dependency conflict set contains objects modified
-    # (including DependencyMap operations) in the current transaction that
-    # were either added to, removed from, or changed in the DependencyMap
-    # by another transaction. Objects in the Write-Dependency conflict set
-    # may be in the Write-Write conflict set.
-    #
-    # Note: You should be sure to disconnect conflict sets before
-    # committing to avoid making them persistent.
+  def transient(&block)
+    # Newly defined modules/classes will be marked as transient  
+    #  and their names will be stored as transient constants in parent module.  
+    # All assignments to constants in existing modules are transient.  
+    # All method definitions added to transient method dictionaries.
+    # All methods defined via  Object#extend or Module#include
+    #   will be transient even if target class is persistable.
+    # Constant removal that finds constant in a persistent module will raise exception.
+    # Method removal that finds method in a persistent module will raise exception.
+    rctx = RubyContext
+    save_pm = rctx.persistence_mode
+    begin
+      rctx.persistence_mode=(false)  
+      yield
+    ensure
+      rctx.persistence_mode=(save_pm)
+    end
+  end
+
+  def persistent(persistable_instances=true, &block)
+    # Newly defined modules/classes will be marked as persistable,
+    #   and their names stored in persistable parent's persistent name space,
+    #   or stored in transient parent's transient name space .
+    # All assignments/removals of constants in existing persistent modules   
+    #   are stored to both transient and peristent name space of module.
+    # All assignments to constants in existing transient modules are transient.
+    # All method definitions/removals in re-opened persistent modules
+    #   stored to both transient and peristent method dictionaries.
+    # All method definitions in re-opened transient modules are transient.
+    # All methods defined via  Object#extend or Module#include
+    #   will be persistent if target class is persistable.
+    # The persistable_instances arg controls setting of corresponding
+    #   flag in newly created classes.
+    
+    rctx = RubyContext
+    save_pm = rctx.persistence_mode
+    save_pinst = rctx.persistable_instances
+    begin
+      rctx.persistence_mode=(false)
+      rctx.persistable_instances=(persistable_instances)
+      yield
+    ensure
+      rctx.persistence_mode=(save_pm)
+      rctx.persistable_instances=(save_pinst)
+    end
+  end
+
+  module_function :transient, :persistent
+end
+
+module Maglev
+  class CommitFailedException 
     def transaction_conflicts
       raise NotImplementedError
     end
@@ -72,33 +87,6 @@ module Maglev
     end
   end
 
-  # Attempts to update the persistent state of the Repository to include
-  # changes made by this transaction.
-  #
-  # If the commit operation succeeds, then this method returns true, and
-  # the current transaction's changes, if any, become a part of the
-  # persistent Repository.  After the repository update, the session exits
-  # the current transaction.  If the transaction mode is :auto_begin (the
-  # MagLev default), then the session enters a new transaction.  If the
-  # transaction mode is :manual_begin, then the session remains outside of
-  # a transaction.
-  #
-  # If conflicts prevent the repository update, then this method raises a
-  # CommitFailedException which contains details of why the commit failed.
-  # Call the transaction_conflicts method to determine the nature of the
-  # conflicts.  If the session is outside of a transaction, then this
-  # method raises the error OutsideOfTransactionException
-  #
-  # This method also updates the session's view of GemStone.  If the commit
-  # operation succeeds, then all objects in the session's view are
-  # consistent with the current state of GemStone.  If the commit fails,
-  # then this method retains all the changes that were made to objects
-  # within the current transaction.  However, commits made by other
-  # sessions are visible to the extent that changes in this transaction do
-  # not conflict with them.
-  #
-  # Returns true if commit was read-only or succeeded.  Raises
-  # OutsideOfTransactionException if there was a failure.
   def commit_transaction
     # TODO: wrap #rtErrPrimOutsideTrans in OutsideOfTransactionException
     unless Gemstone.commitTransaction
@@ -107,14 +95,6 @@ module Maglev
     return true
   end
 
-  # Rolls back all modifications made to committed GemStone objects and
-  # provides the session with a new view of the most recently committed
-  # GemStone state.
-  #
-  # These operations are performed whether or not the session was
-  # previously in a transaction.  If the transaction mode is set to
-  # :auto_begin, then a new transaction is started.  If the transaction
-  # mode is set to :manual_begin, then a new transaction is not started.
   def abort_transaction
     return Gemstone.abort_transaction
   end
