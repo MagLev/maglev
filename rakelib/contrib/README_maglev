@@ -1,4 +1,4 @@
-Rake scripts ruby files to support installation and management of several
+Rake scripts and ruby files to support installation and management of several
 MagLev server instances.
 
 The scripts provide the following services:

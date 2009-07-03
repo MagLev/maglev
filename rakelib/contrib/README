@@ -1,5 +1,5 @@
 
-Rake scripts ruby files to support installation and management of several
+Rake scripts and ruby files to support installation and management of several
 gemstone instances.
 
 The scripts provide the following services:
