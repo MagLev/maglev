@@ -1,0 +1,85 @@
+Rake scripts ruby files to support installation and management of several
+MagLev server instances.
+
+The scripts provide the following services:
+
+* create, manage and destroy MagLev server instances
+* start, stop and show status of MagLev server instances
+* Manage environment variables needed for each MagLev server instance
+* backup MagLev server files
+
+By default, these scripts assume / setup / manage the following
+directories:
+
+|--------------------------------------------------+-----------------------|
+| The installation directory.                      | $MAGLEV_HOME          |
+|                                                  |                       |
+| There need be only one of these per computer.    |                       |
+| It contains the install of MagLev and GemStone.  |                       |
+| It is the source of the new extents.  Many       |                       |
+| MagLev server instances share the common code    |                       |
+| here.  The VM code, ruby libraries and           |                       |
+| documentation live here.                         |                       |
+|--------------------------------------------------+-----------------------|
+| The config directory.                            | etc/conf.d            |
+|                                                  |                       |
+| Contains a .conf file for each MagLev server.    |                       |
+| The list of currently managed servers is         |                       |
+| derived from the .conf file names in this        |                       |
+| directory.                                       |                       |
+|--------------------------------------------------+-----------------------|
+| Per-server runtime root                          | data                  |
+|                                                  |                       |
+| Each stone gets a named directory under          |                       |
+| here that holds the extent, locks,               |                       |
+| tranlogs, etc. for just that stone.              |                       |
+|--------------------------------------------------+-----------------------|
+| The base log directory                           | log                   |
+|                                                  |                       |
+| Each named server gets its own named subdir      |                       |
+| for log files.                                   |                       |
+|--------------------------------------------------+-----------------------|
+| Directory to hold backups.                       | backups               |
+|--------------------------------------------------+-----------------------|
+
+Many of the directories will have sub-directories or files based on the
+"name" of the MagLev server.
+
+So, for an installation named "test_one", we'd have:
+
+|-------------+------------------------------------|
+| Install Dir | $MAGLEV_HOME                       |
+|-------------+------------------------------------|
+| Config file | etc/conf.d/test_one.conf           |
+|-------------+------------------------------------|
+| Log Dir     | log/test_one                       |
+|-------------+------------------------------------|
+| Data Dir    | data/test_one                      |
+|-------------+------------------------------------|
+| Backup Dir  | backups                            |
+|-------------+------------------------------------|
+
+The following directories and files are derived from the previous
+parameters
+
+|------------+-------------------------------------|
+| Extent Dir | data/test_one/extent                |
+|------------+-------------------------------------|
+| Tranlogs   | data/test_one/tranlog               |
+|------------+-------------------------------------|
+
+The following environment variables are setup:
+
+|------------------+-------------------------------|
+| GEMSTONE         | $MAGLEV_HOME/gemstone         |
+|------------------+-------------------------------|
+| GEMSTONE_NAME    | test_one                      |
+|------------------+-------------------------------|
+| GEMSTONE_LOGDIR  | log/gemstone/test_one         |
+|------------------+-------------------------------|
+| GEMSTONE_DATADIR | data/test_one                 |
+|------------------+-------------------------------|
+
+Each MagLev server name represents a separate MagLev server instance. 
+All of these share a GemStoneInstallation (a version of the GemStone
+product installed on the machine, e.g., GemStone 3.0.0 Build: 64bit-21842
