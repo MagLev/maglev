@@ -45,16 +45,16 @@ directories:
 Many of the directories will have sub-directories or files based on the
 "name" of the MagLev server.
 
-So, for an installation named "test_one", we'd have:
+So, for an installation named "test1", we'd have:
 
 |-------------+------------------------------------|
 | Install Dir | $MAGLEV_HOME                       |
 |-------------+------------------------------------|
-| Config file | etc/conf.d/test_one.conf           |
+| Config file | etc/conf.d/test1.conf              |
 |-------------+------------------------------------|
-| Log Dir     | log/test_one                       |
+| Log Dir     | log/test1                          |
 |-------------+------------------------------------|
-| Data Dir    | data/test_one                      |
+| Data Dir    | data/test1                         |
 |-------------+------------------------------------|
 | Backup Dir  | backups                            |
 |-------------+------------------------------------|
@@ -63,9 +63,9 @@ The following directories and files are derived from the previous
 parameters
 
 |------------+-------------------------------------|
-| Extent Dir | data/test_one/extent                |
+| Extent Dir | data/test1/extent                   |
 |------------+-------------------------------------|
-| Tranlogs   | data/test_one/tranlog               |
+| Tranlogs   | data/test1/tranlog                  |
 |------------+-------------------------------------|
 
 The following environment variables are setup:
@@ -73,11 +73,11 @@ The following environment variables are setup:
 |------------------+-------------------------------|
 | GEMSTONE         | $MAGLEV_HOME/gemstone         |
 |------------------+-------------------------------|
-| GEMSTONE_NAME    | test_one                      |
+| GEMSTONE_NAME    | test1                         |
 |------------------+-------------------------------|
-| GEMSTONE_LOGDIR  | log/gemstone/test_one         |
+| GEMSTONE_LOGDIR  | log/gemstone/test1            |
 |------------------+-------------------------------|
-| GEMSTONE_DATADIR | data/test_one                 |
+| GEMSTONE_DATADIR | data/test1                    |
 |------------------+-------------------------------|
 
 Each MagLev server name represents a separate MagLev server instance. 

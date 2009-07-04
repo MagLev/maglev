@@ -8,6 +8,7 @@ class Stone
   attr_reader :log_directory
   attr_reader :data_directory
   attr_reader :backup_directory
+  attr_reader :extent_name
 
   def Stone.existing(name)
     fail "Stone does not exist" if not GemStoneInstallation.current.stones.include? name
@@ -28,6 +29,7 @@ class Stone
     @log_directory = "#{gemstone_installation.base_log_directory}/#@name"
     @data_directory = "#{gemstone_installation.installation_extent_directory}/#@name"
     @backup_directory = gemstone_installation.backup_directory
+    @extent_name = gemstone_installation.initial_extent_name
     @gemstone_installation = gemstone_installation ||= GemStoneInstallation.current
     initialize_gemstone_environment
   end
@@ -90,6 +92,28 @@ class Stone
     start
   end
 
+  def make_offline_backup
+    if running?
+      puts "Must stop server before making offline backup."
+    else
+      puts "Making offline backup to: #{backup_directory}/#{snapshot_filename}"
+      log_sh "cd #{extent_directory}; tar zcf #{backup_directory}/#{snapshot_filename} *dbf"
+    end
+  end
+
+  def restore_offline_backup
+    if running?
+      puts "Must stop server before restoring full backup."
+    else
+      rm_rf extent_directory
+      rm_rf tranlog_directories
+      mkdir_p extent_directory
+      mkdir_p tranlog_directories
+      puts "Restoring offline backup from: #{backup_directory}/#{snapshot_to_restore}"
+      log_sh "cd #{extent_directory}; tar zxfv #{backup_directory}/#{snapshot_to_restore}"
+    end
+  end
+
   def full_backup
     result = run_topaz_command("SystemRepository startNewLog")
     tranlog_number = ((/(\d*)$/.match(result.last))[1]).to_i
@@ -129,7 +153,7 @@ class Stone
   end
 
   def extent_filename
-    File.join(extent_directory, "extent0.ruby.dbf")
+    File.join(extent_directory, extent_name)
   end
 
   def scratch_directory
@@ -152,6 +176,17 @@ class Stone
 
   def gemstone_installation_directory
     @gemstone_installation.installation_directory
+  end
+
+  def snapshot_filename
+    "#{name}_extent.tgz"
+    # TODO allow multiple snapshot files by time of day
+    # "#{name}_#{Time.now.strftime("%Y%d%H-%H%M")}.bak.tgz"
+  end
+
+  def snapshot_to_restore
+    "#{name}_extent.tgz"
+    # TODO allow selection of snapshot file to restore
   end
 
   def backup_filename_for_today

@@ -1,5 +1,5 @@
 class GemStoneInstallation
-  attr_reader :installation_directory, :config_directory, :installation_extent_directory, :base_log_directory, :backup_directory
+  attr_reader :installation_directory, :config_directory, :installation_extent_directory, :base_log_directory, :backup_directory, :initial_extent_name
 
   @current = nil
   def self.current
@@ -15,7 +15,7 @@ class GemStoneInstallation
                  installation_extent_directory="/var/local/gemstone",
                  base_log_directory="/var/log/gemstone",
                  backup_directory="/var/backups/gemstone",
-                 initial_extent_name='extent0.ruby.dbf')
+                 initial_extent_name='extent0.dbf')
 
     @installation_directory = installation_directory
     @config_directory = config_directory

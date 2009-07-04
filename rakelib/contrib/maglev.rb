@@ -16,9 +16,29 @@ class MagLevStone < Stone
   end
 
   def start
-    start_parser
+    start_parser unless parser_running?
     super
     ensure_prims_loaded
+  end
+
+  def make_offline_backup
+    if running?
+      stop
+      super
+      start
+    else
+      super
+    end
+  end
+
+  def restore_offline_backup
+    if running?
+      stop
+      super
+      start
+    else
+      super
+    end
   end
 
   def initialize_gemstone_environment
