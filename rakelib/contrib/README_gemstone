@@ -1,40 +1,40 @@
 Rake scripts and ruby files to support installation and management of several
-MagLev server instances.
+GemStone server instances.
 
 The scripts provide the following services:
 
-* create, manage and destroy MagLev server instances
-* start, stop and show status of MagLev server instances
-* Manage environment variables needed for each MagLev server instance
-* backup and restore MagLev repositories
+* create, manage and destroy GemStone server instances
+* start, stop and show status of GemStone server instances
+* Manage environment variables needed for each GemStone server instance
+* backup and restore GemStone repositories
 
 By default, these scripts assume / setup / manage the following
 directories:
 
 |--------------------------------------------------+-----------------------|
-| The installation directory.                      | $MAGLEV_HOME          |
+| The installation directory.                      | /opt/gemstone/product          |
 |                                                  |                       |
 | There need be only one of these per computer.    |                       |
-| It contains the install of MagLev and GemStone.  |                       |
+| It contains the of GemStone installation.        |                       |
 | It is the source of the new extents.  Many       |                       |
-| MagLev server instances share the common code    |                       |
-| here.  The VM code, ruby libraries and           |                       |
-| documentation live here.                         |                       |
+| GemStone server instances share the common code  |                       |
+| here.  The VM code, libraries and documentation  |                       |
+| live here.                                       |                       |
 |--------------------------------------------------+-----------------------|
-| The config directory.                            | etc/conf.d            |
+| The config directory.                            | etc/gemstone          |
 |                                                  |                       |
-| Contains a .conf file for each MagLev server.    |                       |
+| Contains a .conf file for each GemStone server.  |                       |
 | The list of currently managed servers is         |                       |
 | derived from the .conf file names in this        |                       |
 | directory.                                       |                       |
 |--------------------------------------------------+-----------------------|
-| Per-server repository                            | data                  |
+| Per-server repository                            | /var/local/gemstone   |
 |                                                  |                       |
 | Each server gets a named directory under         |                       |
 | here that holds the extent and tranlogs          |                       |
 | for just that server.                            |                       |
 |--------------------------------------------------+-----------------------|
-| The base log directory                           | log                   |
+| The base log directory                           | /var/log/gemstone     |
 |                                                  |                       |
 | Each named server gets its own named directory   |                       |
 | under here for log files.                        |                       |
@@ -43,18 +43,18 @@ directories:
 |--------------------------------------------------+-----------------------|
 
 Many of the directories will have sub-directories or files based on the
-"name" of the MagLev server.
+"name" of the GemStone server.
 
 So, for a server named "devel", we'd have:
 
 |-------------+------------------------------------|
-| Install Dir | $MAGLEV_HOME                       |
+| Install Dir | /opt/gemstone/product              |
 |-------------+------------------------------------|
-| Config file | etc/conf.d/devel.conf              |
+| Config file | etc/gemstone/devel.conf            |
 |-------------+------------------------------------|
-| Log Dir     | log/devel                          |
+| Log Dir     | /var/log/gemstone/devel            |
 |-------------+------------------------------------|
-| Data Dir    | data/devel                         |
+| Data Dir    | /var/local/gemstone/devel          |
 |-------------+------------------------------------|
 | Backup Dir  | backups                            |
 |-------------+------------------------------------|
@@ -63,23 +63,23 @@ The following directories and files are derived from the previous
 parameters
 
 |------------+-------------------------------------|
-| Extent Dir | data/devel/extent                   |
+| Extent Dir | /var/local/gemstone/devel/extent    |
 |------------+-------------------------------------|
-| Tranlogs   | data/devel/tranlog                  |
+| Tranlogs   | /var/local/gemstone/devel/tranlog   |
 |------------+-------------------------------------|
 
 The following environment variables are setup:
 
 |------------------+-------------------------------|
-| GEMSTONE         | $MAGLEV_HOME/gemstone         |
+| GEMSTONE         | /opt/gemstone/product         |
 |------------------+-------------------------------|
 | GEMSTONE_NAME    | devel                         |
 |------------------+-------------------------------|
-| GEMSTONE_LOGDIR  | log/gemstone/devel            |
+| GEMSTONE_LOGDIR  | /var/log/gemstone/devel       |
 |------------------+-------------------------------|
-| GEMSTONE_DATADIR | data/devel                    |
+| GEMSTONE_DATADIR | /var/local/gemstone/devel     |
 |------------------+-------------------------------|
 
-Each MagLev server name represents a separate MagLev server instance. 
+Each GemStone server name represents a separate GemStone server instance. 
 All of these share a GemStoneInstallation (a version of the GemStone
 product installed on the machine, e.g., GemStone 3.0.0 Build: 64bit-21842
