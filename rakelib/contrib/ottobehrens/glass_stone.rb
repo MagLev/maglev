@@ -8,4 +8,8 @@ class GlassStone < Stone
     topaz_commands(["input #{gemstone_installation_directory}/seaside/topaz/installMonticello.topaz", "commit"])
     run_topaz_command("UserGlobals removeKey: #BootStrapSymbolDictionaryName. System commitTransaction")
   end
+
+  def seaside_bin_directory
+    "#{gemstone_installation_directory}/seaside/bin"
+  end
 end

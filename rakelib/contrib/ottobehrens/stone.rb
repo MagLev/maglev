@@ -4,7 +4,9 @@ require File.join(File.dirname(__FILE__), 'topaz')
 require 'date'
 
 class Stone
-  attr_reader :name, :username, :password
+  attr_accessor :username, :password
+
+  attr_reader :name
   attr_reader :log_directory
   attr_reader :data_directory
   attr_reader :backup_directory
@@ -36,19 +38,21 @@ class Stone
 
   def initialize_gemstone_environment
     ENV['GEMSTONE'] = @gemstone_installation.installation_directory
-    ENV['GEMSTONE_NAME'] = name
     ENV['GEMSTONE_LOGDIR'] = log_directory
     ENV['GEMSTONE_DATADIR'] = data_directory
   end
 
   # Bare bones stone with nothing loaded, specialise for your situation
   def initialize_new_stone
-    mkdir_p @gemstone_installation.config_directory
+    create_skeleton
+    initialize_extents
+  end
+
+  def create_skeleton
     create_config_file
     mkdir_p extent_directory
     mkdir_p log_directory
     mkdir_p tranlog_directories
-    initialize_extents
   end
 
   # Will remove everything in the stone's data directory!
@@ -56,7 +60,6 @@ class Stone
     fail "Can not destroy a running stone" if running?
     rm_rf system_config_filename
     rm_rf extent_directory
-    rm_rf data_directory
     rm_rf log_directory
     rm_rf tranlog_directories
   end
@@ -76,7 +79,6 @@ class Stone
   end
 
   def start
-    puts "MagLev server \"#{name}\" starting"
     log_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
     running?(10)
     self
@@ -92,28 +94,6 @@ class Stone
     start
   end
 
-  def make_offline_backup
-    if running?
-      puts "Must stop server before making offline backup."
-    else
-      puts "Making offline backup to: #{backup_directory}/#{snapshot_filename}"
-      log_sh "cd #{extent_directory}; tar zcf #{backup_directory}/#{snapshot_filename} *dbf"
-    end
-  end
-
-  def restore_offline_backup
-    if running?
-      puts "Must stop server before restoring full backup."
-    else
-      rm_rf extent_directory
-      rm_rf tranlog_directories
-      mkdir_p extent_directory
-      mkdir_p tranlog_directories
-      puts "Restoring offline backup from: #{backup_directory}/#{snapshot_to_restore}"
-      log_sh "cd #{extent_directory}; tar zxfv #{backup_directory}/#{snapshot_to_restore}"
-    end
-  end
-
   def full_backup
     result = run_topaz_command("SystemRepository startNewLog")
     tranlog_number = ((/(\d*)$/.match(result.last))[1]).to_i
@@ -122,14 +102,33 @@ class Stone
     run_topaz_command("System startCheckpointSync")
     run_topaz_commands("System abortTransaction", "SystemRepository fullBackupCompressedTo: '#{extent_backup_filename_for_today}'")
 
-    log_sh "tar zcf #{backup_filename_for_today} #{extent_backup_filename_for_today} #{data_directory}/tranlog/tranlog#{tranlog_number}.dbf"
+    # Transform is to remove the leading directory name
+    log_sh "tar --transform='s,.*/,,' -zcf #{backup_filename_for_today} #{extent_backup_filename_for_today} #{data_directory}/tranlog/tranlog#{tranlog_number}.dbf"
   end
 
   def restore_latest_full_backup
-    log_sh "tar -C '#{backup_directory}' -zxf '#{backup_filename_for_today}'"
-    run_topaz_command("SystemRepository restoreFromBackup: '#{extent_backup_filename_for_today}'")
+    restore_full_backup(name, Date.today)
+  end
+
+  def recreate!
+    stop
+    destroy!
+    initialize_new_stone
+    start
+  end
+
+  def restore_full_backup(stone_name, for_date=Date.today)
+    recreate!
+
+    log_sh "tar -C '#{backup_directory}' -zxf '#{backup_filename(stone_name, for_date)}'"
+    log_sh "cp #{backup_directory}/tranlog*.dbf #{data_directory}/tranlog/"
+    run_topaz_command("System commitTransaction. SystemRepository restoreFromBackup: '#{extent_backup_filename(stone_name, for_date)}'")
     run_topaz_command("SystemRepository restoreFromCurrentLogs")
     run_topaz_command("SystemRepository commitRestore")
+  end
+
+  def input_file(topaz_script_filename)
+    topaz_commands(["input #{topaz_script_filename}", "commit"])
   end
 
   def system_config_filename
@@ -178,23 +177,24 @@ class Stone
     @gemstone_installation.installation_directory
   end
 
-  def snapshot_filename
-    "#{name}_extent.tgz"
-    # TODO allow multiple snapshot files by time of day
-    # "#{name}_#{Time.now.strftime("%Y%d%H-%H%M")}.bak.tgz"
-  end
-
-  def snapshot_to_restore
-    "#{name}_extent.tgz"
-    # TODO allow selection of snapshot file to restore
-  end
-
   def backup_filename_for_today
-    "#{backup_directory}/#{name}_#{Date.today.strftime('%F')}.bak.tgz"
+    backup_filename(name, Date.today)
   end
 
   def extent_backup_filename_for_today
-    "#{backup_directory}/#{name}_#{Date.today.strftime('%F')}.full.gz"
+    extent_backup_filename(name, Date.today)
+  end
+
+  def extent_backup_filename(for_stone_name, for_date)
+    "#{backup_filename_prefix(for_stone_name, for_date)}.full.gz"
+  end
+
+  def backup_filename(for_stone_name, for_date)
+    "#{backup_filename_prefix(for_stone_name, for_date)}.bak.tgz"
+  end
+
+  def backup_filename_prefix(for_stone_name, for_date)
+    "#{backup_directory}/#{for_stone_name}_#{for_date.strftime('%F')}"
   end
 
   def run_topaz_command(command)

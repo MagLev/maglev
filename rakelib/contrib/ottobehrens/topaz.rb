@@ -30,7 +30,7 @@ end
 class Topaz
   attr_accessor :output
 
-  def initialize(stone, topaz_command="topaz")
+  def initialize(stone, topaz_command="#{ENV['GEMSTONE']}/bin/topaz -l -T 200000")
     @stone = stone
     @output = []
     @topaz_command = "#{topaz_command} 2>&1"
@@ -42,7 +42,9 @@ class Topaz
       consume_until_prompt(io)
       topaz_commands.each do | command |
         command.execute_on_topaz_stream(io)
-        consume_until_prompt(io)
+        if command != "exit" then
+          consume_until_prompt(io)
+        end
       end
     end
     if $?.exitstatus > 0

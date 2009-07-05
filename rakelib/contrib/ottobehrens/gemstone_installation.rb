@@ -30,7 +30,7 @@ class GemStoneInstallation
 
   def stones
     Dir.glob("#{config_directory}/*").collect do | full_filename |
-      File.basename(full_filename).split(".").first
+      File.basename(full_filename).split(".conf").first 
     end
   end
 
@@ -43,7 +43,6 @@ class GemStoneInstallation
   end
 
   def startnetldi
-    # sh "startnetldi -g -a #{ENV['USER']} >/dev/null 2>&1"
     sh "startnetldi -g -a #{ENV['USER']}"
   end
 

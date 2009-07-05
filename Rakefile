@@ -4,8 +4,8 @@ require 'rake/clean'
 require 'rake/rdoctask'
 require 'rakelib/maglev.rb'
 
-require 'rakelib/contrib/stone.rb'
-require 'rakelib/contrib/maglev.rb'
+require 'rakelib/contrib/ottobehrens/stone.rb'
+require 'rakelib/contrib/ottobehrens/maglev_stone.rb'
 
 verbose false  # turn off rake's chatter about all the sh commands
 
@@ -85,7 +85,7 @@ GemStoneInstallation.current.stones.each do |stone_name|
   namespace stone_name do
     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
 
-    [:stop, :start, :restart, :status, 
+    [:start, :stop, :restart, :status, :take_snapshot, :restore_snapshot,
       :reset_ruby_context].each do |action|
       task_gemstone(stone, action)
     end
