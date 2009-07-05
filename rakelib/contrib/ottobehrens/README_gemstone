@@ -41,7 +41,7 @@ directories:
 | Each named server gets its own named directory   |                       |
 | under here for log files.                        |                       |
 |--------------------------------------------------+-----------------------|
-| Directory to hold backups.                       | backups               |
+| Directory to hold backups.                       | /var/backups/gemstone |
 |--------------------------------------------------+-----------------------|
 
 Many of the directories will have sub-directories or files based on the
@@ -58,7 +58,7 @@ So, for a server named "devel", we'd have:
 |-------------+------------------------------------|
 | Data Dir    | /var/local/gemstone/devel          |
 |-------------+------------------------------------|
-| Backup Dir  | backups                            |
+| Backup Dir  | /var/backups/gemstone              |
 |-------------+------------------------------------|
 
 The following directories and files are derived from the previous
