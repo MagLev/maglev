@@ -11,10 +11,10 @@ class GemStoneInstallation
   end
 
   def initialize(installation_directory,
-                 config_directory="/etc/gemstone",
-                 installation_extent_directory="/var/local/gemstone",
-                 base_log_directory="/var/log/gemstone",
-                 backup_directory="/var/backups/gemstone",
+                 config_directory="/opt/gemstone/etc/conf.d",
+                 installation_extent_directory="/opt/gemstone/product/data",
+                 base_log_directory="/opt/gemstone/log",
+                 backup_directory="/opt/gemstone/backups",
                  initial_extent_name='extent0.dbf')
 
     @installation_directory = installation_directory

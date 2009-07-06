@@ -30,7 +30,7 @@ class StoneUnitTestCase < StoneTestCase
 
   def test_restore_backup_of_another_stone_on_date
     stone = Stone.create(TEST_STONE_NAME)
-    mock_out_restore_commands(stone, '/var/backups/gemstone/anotherstone_2005-05-13.bak.tgz', '/var/backups/gemstone/anotherstone_2005-05-13.full.gz')
+    mock_out_restore_commands(stone, "#{stone.backup_directory}/anotherstone_2005-05-13.bak.tgz", "#{stone.backup_directory}/anotherstone_2005-05-13.full.gz")
     stone.restore_full_backup('anotherstone', Date.civil(2005, 5, 13))
   end
 

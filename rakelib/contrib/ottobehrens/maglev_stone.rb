@@ -37,6 +37,12 @@ class MagLevStone < Stone
     mkdir_p tranlog_directories
   end
 
+  def replace
+    stop if running?
+    destroy!
+    initialize_new_stone
+  end
+
   def start
     start_parser unless parser_running?
     puts "MagLev server \"#{name}\" starting..."

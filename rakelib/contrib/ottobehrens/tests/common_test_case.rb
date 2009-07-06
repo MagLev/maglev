@@ -8,7 +8,7 @@ verbose(false)
 
 require 'date'
 
-TEST_STONE_NAME = 'testcase.finworks.biz'
+TEST_STONE_NAME = 'unit.test'
 
 class BaseTestCase < Test::Unit::TestCase
   def setup
