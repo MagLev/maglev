@@ -4,8 +4,8 @@ require 'rake/clean'
 require 'rake/rdoctask'
 require 'rakelib/maglev.rb'
 
+require 'rakelib/maglev_stone.rb'
 require 'rakelib/contrib/ottobehrens/stone.rb'
-require 'rakelib/contrib/ottobehrens/maglev_stone.rb'
 
 verbose false  # turn off rake's chatter about all the sh commands
 

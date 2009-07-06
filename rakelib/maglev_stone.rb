@@ -1,8 +1,11 @@
-require File.join(File.dirname(__FILE__), 'stone')
+# Require management scripts written by Otto Behrens and Danie Roux
+require File.join(File.dirname(__FILE__), 'contrib/ottobehrens/stone')
 
 # Set the GemStoneInstallation paths for a default install of MagLev, based
 # on $MAGLEV_HOME.
 ML = ENV['MAGLEV_HOME']
+# installation_directory, config_directory, installation_extent_directory,
+# base_log_directory, backup_directory, initial_extent_name
 GemStoneInstallation.current = GemStoneInstallation.new(
   "#{ML}/gemstone", "#{ML}/etc/conf.d", "#{ML}/data",
   "#{ML}/log", "#{ML}/backups", 'extent0.ruby.dbf')
