@@ -84,12 +84,6 @@ module MagRp #
       
     MagTemplate = init_template()
 
-    def self.parse_string(a_string, load_name)
-      # invoked from Smalltalk
-      p = self.new_instance  
-      p.parse(a_string, load_name)
-    end
-
 #    def _racc_yyparse_rb(recv, mid, arg, c_debug)
 #      # probably not used by Maglev  # TODO determine for sure
 #      raise_error('unexpected call to _racc_yyparse_rb')
