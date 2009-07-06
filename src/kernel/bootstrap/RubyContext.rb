@@ -54,22 +54,22 @@ class RubyContext
   def self.customize_top_self(top_self)
     # Commented out since adding the eigneclass causes testGlobals1a.rb to
     # fail, but only if run via RubyContext _runVmUnit.
-#     class << top_self
-#       def to_s
-#         "main"
-#       end
-#       def inspect
-#         "main"
-#       end
-#       def include(*args)
-#         Object.include(*args)
-#       end
-#       def private(*args)
-#         Object.private(*args)
-#       end
-#       def public(*args)
-#         Object.public(*args)
-#       end
-#     end
+       class << top_self
+         def to_s
+           "main"
+         end
+         def inspect
+           "main"
+         end
+         def include(*args)
+           Object.include(*args)
+         end
+         def private(*args)
+           Object.private(*args)
+         end
+         def public(*args)
+           Object.public(*args)
+         end
+       end
   end
 end
