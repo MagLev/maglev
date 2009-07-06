@@ -25,4 +25,5 @@ spec_code=<<EOS
   end
 EOS
 
-eval(spec_code, binding, "foo")
+xx = eval(spec_code, binding, "foo")
+true
