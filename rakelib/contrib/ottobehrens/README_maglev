@@ -13,74 +13,73 @@ The scripts provide the following services:
 By default, these scripts assume / setup / manage the following
 directories:
 
-|--------------------------------------------------+-----------------------|
-| The installation directory.                      | $MAGLEV_HOME          |
-|                                                  |                       |
-| There need be only one of these per computer.    |                       |
-| It contains the install of MagLev and GemStone.  |                       |
-| It is the source of the new extents.  Many       |                       |
-| MagLev server instances share the common code    |                       |
-| here.  The VM code, ruby libraries and           |                       |
-| documentation live here.                         |                       |
-|--------------------------------------------------+-----------------------|
-| The config directory.                            | etc/conf.d            |
-|                                                  |                       |
-| Contains a .conf file for each MagLev server.    |                       |
-| The list of currently managed servers is         |                       |
-| derived from the .conf file names in this        |                       |
-| directory.                                       |                       |
-|--------------------------------------------------+-----------------------|
-| Per-server repository                            | data                  |
-|                                                  |                       |
-| Each server gets a named directory under         |                       |
-| here that holds the extent and tranlogs          |                       |
-| for just that server.                            |                       |
-|--------------------------------------------------+-----------------------|
-| The base log directory                           | log                   |
-|                                                  |                       |
-| Each named server gets its own named directory   |                       |
-| under here for log files.                        |                       |
-|--------------------------------------------------+-----------------------|
-| Directory to hold backups.                       | backups               |
-|--------------------------------------------------+-----------------------|
+|--------------------------------------------------+-------------------------|
+| The installation directory.                      | $MAGLEV_HOME            |
+|                                                  |                         |
+| There need be only one of these per computer.    |                         |
+| It contains the install of MagLev and GemStone.  |                         |
+| It is the source of the new extents.  Many       |                         |
+| MagLev server instances share the common code    |                         |
+| here.  The VM code, ruby libraries and           |                         |
+| documentation live here.                         |                         |
+|--------------------------------------------------+-------------------------|
+| The config directory.                            | $MAGLEV_HOME/etc/conf.d |
+|                                                  |                         |
+| Contains a .conf file for each MagLev server.    |                         |
+| The list of currently managed servers is         |                         |
+| derived from the .conf file names in this        |                         |
+| directory.                                       |                         |
+|--------------------------------------------------+-------------------------|
+| Per-server repository                            | $MAGLEV_HOME/data       |
+|                                                  |                         |
+| Each server gets a named directory under         |                         |
+| here that holds the extent and tranlogs          |                         |
+| for just that server.                            |                         |
+|--------------------------------------------------+-------------------------|
+| The base log directory                           | $MAGLEV_HOME/log        |
+|                                                  |                         |
+| Each named server gets its own named directory   |                         |
+| under here for log files.                        |                         |
+|--------------------------------------------------+-------------------------|
+| Directory to hold lock files for all servers     | $MAGLEV_HOME/locks      |
+|--------------------------------------------------+-------------------------|
+| Directory to hold backup files for all servers   | $MAGLEV_HOME/backups    |
+|--------------------------------------------------+-------------------------|
 
 Many of the directories will have sub-directories or files based on the
 "name" of the MagLev server.
 
 So, for a server named "devel", we'd have:
 
-|-------------+------------------------------------|
-| Install Dir | $MAGLEV_HOME                       |
-|-------------+------------------------------------|
-| Config file | etc/conf.d/devel.conf              |
-|-------------+------------------------------------|
-| Log Dir     | log/devel                          |
-|-------------+------------------------------------|
-| Data Dir    | data/devel                         |
-|-------------+------------------------------------|
-| Backup Dir  | backups                            |
-|-------------+------------------------------------|
-
-The following directories and files are derived from the previous
-parameters
-
-|------------+-------------------------------------|
-| Extent Dir | data/devel/extent                   |
-|------------+-------------------------------------|
-| Tranlogs   | data/devel/tranlog                  |
-|------------+-------------------------------------|
+|--------------+-------------------------------------|
+| Install Dir  | $MAGLEV_HOME                        |
+|--------------+-------------------------------------|
+| Config File  | $MAGLEV_HOME/etc/conf.d/devel.conf  |
+|--------------+-------------------------------------|
+| Log Dir      | $MAGLEV_HOME/log/devel              |
+|--------------+-------------------------------------|
+| Data Dir     | $MAGLEV_HOME/data/devel             |
+|--------------+-------------------------------------|
+| Extent Dir   | $MAGLEV_HOME/data/devel/extent      |
+|--------------+-------------------------------------|
+| Tranlog Dir  | $MAGLEV_HOME/data/devel/tranlog     |
+|--------------+-------------------------------------|
+| Locks Dir    | $MAGLEV_HOME/locks                  |
+|--------------+-------------------------------------|
+| Backup Dir   | $MAGLEV_HOME/backups                |
+|--------------+-------------------------------------|
 
 The following environment variables are setup:
 
-|------------------+-------------------------------|
-| GEMSTONE         | $MAGLEV_HOME/gemstone         |
-|------------------+-------------------------------|
-| GEMSTONE_NAME    | devel                         |
-|------------------+-------------------------------|
-| GEMSTONE_LOGDIR  | log/gemstone/devel            |
-|------------------+-------------------------------|
-| GEMSTONE_DATADIR | data/devel                    |
-|------------------+-------------------------------|
+|------------------+---------------------------------|
+| GEMSTONE         | $MAGLEV_HOME/gemstone           |
+|------------------+---------------------------------|
+| GEMSTONE_NAME    | devel                           |
+|------------------+---------------------------------|
+| GEMSTONE_LOGDIR  | $MAGLEV_HOME/log/gemstone/devel |
+|------------------+---------------------------------|
+| GEMSTONE_DATADIR | $MAGLEV_HOME/data/devel         |
+|------------------+---------------------------------|
 
 Each MagLev server name represents a separate MagLev server instance. 
 All of these share a GemStoneInstallation (a version of the GemStone
