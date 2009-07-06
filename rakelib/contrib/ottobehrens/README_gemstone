@@ -14,7 +14,7 @@ By default, these scripts assume / setup / manage the following
 directories:
 
 |--------------------------------------------------+-----------------------|
-| The installation directory.                      | /opt/gemstone/product          |
+| The installation directory.                      | /opt/gemstone/product |
 |                                                  |                       |
 | There need be only one of these per computer.    |                       |
 | It contains the of GemStone installation.        |                       |
@@ -41,7 +41,7 @@ directories:
 | Each named server gets its own named directory   |                       |
 | under here for log files.                        |                       |
 |--------------------------------------------------+-----------------------|
-| Directory to hold backups.                       | /var/backups/gemstone |
+| Directory to hold backups.                       | backups               |
 |--------------------------------------------------+-----------------------|
 
 Many of the directories will have sub-directories or files based on the
@@ -58,7 +58,7 @@ So, for a server named "devel", we'd have:
 |-------------+------------------------------------|
 | Data Dir    | /var/local/gemstone/devel          |
 |-------------+------------------------------------|
-| Backup Dir  | /var/backups/gemstone              |
+| Backup Dir  | backups                            |
 |-------------+------------------------------------|
 
 The following directories and files are derived from the previous
