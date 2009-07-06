@@ -12,6 +12,11 @@ module Kernel
     Binding.new( self._binding_ctx(0), self , blk)
   end
 
+  def block_given?(&blk)
+    # this implementation present so   send   will work.
+    block_given?   # implemented by parser, not a recursive send
+  end
+
   def lambda(&blk)
     Proc.new_lambda(&blk)
   end

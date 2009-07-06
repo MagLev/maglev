@@ -9,8 +9,8 @@ require 'rakelib/contrib/ottobehrens/maglev_stone.rb'
 
 verbose false  # turn off rake's chatter about all the sh commands
 
-CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html')
-CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk')
+CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html', 'vmunit.log', 'topazerrors.log')
+CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk', 'version.txt')
 
 Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"
@@ -71,6 +71,13 @@ namespace :stone do
     s = Stone.existing(args.stone_name)
     s.stop
     s.destroy!
+  end
+
+  desc "Invoke a task on all stones"
+  task :all, :task_name do |t,args|
+    GemStoneInstallation.current.stones.each do |stone_name|
+      Rake::Task["#{stone_name}:#{args.task_name}"].invoke
+    end
   end
 end
 

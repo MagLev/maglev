@@ -264,8 +264,9 @@ class Object
     end
 
     # block_given?  is implemented by the ruby parser .
-    #   do not code any definition of block_given? here .
-    # Attempts to reimplement  block_given?  will fail with a compile error.
+    # implementation in Kernel2.rb handles  sends 
+    # Attempts to reimplement  block_given? outside of bootstrap code
+    #    will fail with a compile error.
 
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
