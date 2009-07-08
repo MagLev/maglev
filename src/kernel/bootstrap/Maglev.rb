@@ -60,7 +60,7 @@ module Maglev
     save_pm = rctx.persistence_mode
     save_pinst = rctx.persistable_instances
     begin
-      rctx.persistence_mode=(false)
+      rctx.persistence_mode=(true)
       rctx.persistable_instances=(persistable_instances)
       yield
     ensure
