@@ -15,6 +15,7 @@ Usage: $COMMAND [options] [--] filename [script-args]
 OPTIONS:
    --copyright    Print copyright and exit
    -d, --debug    Set debugging flags
+   -e 'command'   Execute command.  May pass multiple -e
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h             Show this message and exit
    --help         Show this message and exit
@@ -32,7 +33,7 @@ EOF
 
 # Prepend the maglev options onto the passed parameters so we can parse
 # them all the same in one pass
-set -- $MAGLEV_OPTS $@
+set -- $MAGLEV_OPTS "$@"
 
 # Make sure MAGLEV_HOME is set
 if [ -z "${MAGLEV_HOME}" ]; then
@@ -55,13 +56,14 @@ fi
 conf_file=$MAGLEV_HOME/etc/system.conf
 if [ -z "$STONENAME" ]; then
 	stone=gs64stone
-else 
+else
 	stone=$STONENAME
 fi
+dash_e=""
 args=""
 debug=0
 maglev_options=""
-while [[ $# > 0 ]]
+while [ $# -gt 0 ]
 do
     case "$1" in
         --stone)
@@ -84,8 +86,12 @@ do
             debug=1
             ;;
         -e)
-            echo "-e not yet implemented"
-            exit
+            dash_e="${dash_e} '${2//\'/''}'"  # smalltalk escape: ' => ''
+            shift
+            ;;
+        -e*)
+            x="${1:2}"
+            dash_e="${dash_e} '${x//\'/''}'" # smalltalk escape: ' => ''
             ;;
         -G)
             unset GEMSTONE_GLOBAL_DIR
@@ -139,19 +145,20 @@ done
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$conf_file
 
-
 # Make sure we have at least one argument
 if [ $# -lt 1 ]; then
-  stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
-  cat /dev/stdin > $stdinscript
-  RUBYSCRIPT=$stdinscript
+  if [ -z $dash_e ]; then
+    stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
+    cat /dev/stdin > $stdinscript
+    RUBYSCRIPT=$stdinscript
+  fi
 else
   RUBYSCRIPT=$1
   shift
 fi
 
-# Make sure the argument is a valid file
-if [ ! -e $RUBYSCRIPT ]; then
+# Make sure the argument is a valid file, or there was a -e "command" parameter
+if [[ ! -z $RUBYSCRIPT && ! -e $RUBYSCRIPT && -z $dash_e ]]; then
     echo "$COMMAND: Error -- The file \"$RUBYSCRIPT\" does not exist"
     exit 1
 fi
@@ -183,7 +190,7 @@ login
 run
 | res ctx |
 (ctx := RubyContext load: #($maglev_options) ) .
-ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) .
+ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) withDashE: #($dash_e) .
 GsFile stdout close . "ensure final LF on stdout"
 ^ res
 %
