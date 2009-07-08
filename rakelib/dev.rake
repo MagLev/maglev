@@ -103,14 +103,48 @@ namespace :dev do
     puts "Log files in log/bench*"
   end
 
-  desc "Run the persistence tests"
-  task :'p-tests' do
-    # RxTODO:  Create a fresh stone to run the tests in
-    pdir = "#{MAGLEV_HOME}/src/test/persistence/"
-    ['persistence_tests.rb', 'run_tests.rb', 'run_checks.rb'].each do |fname|
-      puts
-      puts "=================== #{fname} ======================="
-      sh "maglev-ruby #{pdir}/#{fname}"
+  # Run block after ensuring a fresh stone has been created and started
+  # The block is passed the stone (e.g., to get the stone name).  The stone
+  # will be shutdown and destroyed
+  def with_fresh_stone(stone_prefix='TempStone', destroy_on_finish=true)
+    stone = nil
+    begin
+      stones = GemStoneInstallation.current.stones
+      stone_name = stone_prefix
+      serial = 0
+      while stones.include? stone_name
+        serial += 1
+        stone_name = "#{stone_prefix}#{serial}"
+      end
+      puts "=== Creating:  #{stone_name}"
+      stone = MagLevStone.create(stone_name)
+      puts "=== Starting:  #{stone_name}"
+      stone.start
+      puts "=== Yielding block"
+      yield(stone)
+      puts "=== block return"
+    ensure
+      unless stone.nil?
+        puts "=== Stopping:  #{stone_name}"
+        stone.stop
+        if destroy_on_finish
+          puts "=== Destroying:  #{stone_name}"
+          stone.destroy!
+        end
+      end
+    end
+  end
+
+  desc "Run the persistence tests on stone_name (default ptest). Create stone if it does not exist."
+  task :'p-tests', :stone_name do
+    with_fresh_stone('ptest') do |stone|
+      pdir = "#{MAGLEV_HOME}/src/test/persistence/"
+      stone_name = stone.name
+      ['persistence_tests.rb', 'run_tests.rb', 'run_checks.rb'].each do |fname|
+        puts
+        puts "=================== #{fname} ======================="
+        sh "maglev-ruby --stone #{stone_name} #{pdir}/#{fname}"
+      end
     end
   end
 
