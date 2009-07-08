@@ -103,6 +103,16 @@ namespace :dev do
     puts "Log files in log/bench*"
   end
 
+  desc "Run the persistence tests"
+  task :'p-tests' do
+    # RxTODO:  Create a fresh stone to run the tests in
+    pdir = "#{MAGLEV_HOME}/src/test/persistence/"
+    ['persistence_tests.rb', 'run_tests.rb', 'run_checks.rb'].each do |fname|
+      puts
+      puts "=================== #{fname} ======================="
+      sh "maglev-ruby #{pdir}/#{fname}"
+    end
+  end
 
   desc "Clean up after a test install of rubygems"
   task :'clean-gems' do
