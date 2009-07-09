@@ -9,7 +9,12 @@ namespace :dev do
   desc "Reload kernel.rb (primitives) and commit it"
   task :reloadprims => ['maglev:start'] do
     puts "=== reload primitives"
-    run_topaz tc_reload_prims
+    #run_topaz tc_reload_prims
+    sh %{
+      #{TOPAZ_CMD} <<EOF
+input #{GEMSTONE}/upgrade/ruby/reloadprims.topaz
+EOF
+    }
   end
 
   desc "Ensure kernel.rb (primitives) is loaded and committed"
