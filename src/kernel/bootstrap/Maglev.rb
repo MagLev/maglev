@@ -23,9 +23,9 @@ module Maglev
   PERSISTENT_ROOT = Hash.new
 
   def transient(&block)
-    # Newly defined modules/classes will be marked as transient  
-    #  and their names will be stored as transient constants in parent module.  
-    # All assignments to constants in existing modules are transient.  
+    # Newly defined modules/classes will be marked as transient
+    #  and their names will be stored as transient constants in parent module.
+    # All assignments to constants in existing modules are transient.
     # All method definitions added to transient method dictionaries.
     # All methods defined via  Object#extend or Module#include
     #   will be transient even if target class is persistable.
@@ -34,7 +34,7 @@ module Maglev
     rctx = RubyContext
     save_pm = rctx.persistence_mode
     begin
-      rctx.persistence_mode=(false)  
+      rctx.persistence_mode=(false)
       yield
     ensure
       rctx.persistence_mode=(save_pm)
@@ -45,7 +45,7 @@ module Maglev
     # Newly defined modules/classes will be marked as persistable,
     #   and their names stored in persistable parent's persistent name space,
     #   or stored in transient parent's transient name space .
-    # All assignments/removals of constants in existing persistent modules   
+    # All assignments/removals of constants in existing persistent modules
     #   are stored to both transient and peristent name space of module.
     # All assignments to constants in existing transient modules are transient.
     # All method definitions/removals in re-opened persistent modules
@@ -55,7 +55,7 @@ module Maglev
     #   will be persistent if target class is persistable.
     # The persistable_instances arg controls setting of corresponding
     #   flag in newly created classes.
-    
+
     rctx = RubyContext
     save_pm = rctx.persistence_mode
     save_pinst = rctx.persistable_instances
@@ -73,7 +73,7 @@ module Maglev
 end
 
 module Maglev
-  class CommitFailedException 
+  class CommitFailedException
     def transaction_conflicts
       raise NotImplementedError
     end
@@ -96,7 +96,7 @@ module Maglev
   end
 
   def abort_transaction
-    return Gemstone.abort_transaction
+    return Gemstone.abortTransaction
   end
 
   module_function :commit_transaction, :abort_transaction
