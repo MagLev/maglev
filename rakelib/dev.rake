@@ -1,4 +1,3 @@
-
 # Rake tasks for MagLev core developers.
 #
 # These tasks depend on the conventions used by the GemStone MagLev
@@ -138,14 +137,23 @@ namespace :dev do
   desc "Run the persistence tests on stone_name (default ptest). Create stone if it does not exist."
   task :'p-tests', :stone_name do
     with_fresh_stone('ptest') do |stone|
-      pdir = "#{MAGLEV_HOME}/src/test/persistence/"
-      stone_name = stone.name
-      ['persistence_tests.rb', 'run_tests.rb', 'run_checks.rb'].each do |fname|
-        puts
-        puts "=================== #{fname} ======================="
-        sh "maglev-ruby --stone #{stone_name} #{pdir}/#{fname}"
-      end
+      run_ptests(stone.name)
     end
+  end
+
+  def run_ptests(stone_name=nil)
+    pdir = "#{MAGLEV_HOME}/src/test/persistence/"
+    stone_spec = stone_name.nil? ? "" : "--stone #{stone_name}"
+    ['persistence_tests.rb', 'run_tests.rb', 'run_checks.rb'].each do |fname|
+      puts
+      puts "=================== #{fname} ======================="
+      sh "maglev-ruby #{stone_spec} #{pdir}/#{fname}"
+    end
+  end
+
+  desc 'Run p-tests on gs64stone'
+  task :'quick-p-tests' do
+    run_ptests
   end
 
   desc "Clean up after a test install of rubygems"
