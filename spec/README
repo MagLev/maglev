@@ -34,14 +34,9 @@ rubyspec
     rm -f spec/rubyspec/core/fiber/transfer_spec.rb
     rm -f spec/rubyspec/core/kernel/__callee__spec.rb
     rm -f spec/rubyspec/core/kernel/__method__spec.rb
-    rm -f spec/rubyspec/core/kernel/case_compare_spec.rb
-    rm -f spec/rubyspec/core/kernel/eval_spec.rb
-    cp spec/localspec/core/kernel/fixtures/classes.rb \
-       spec/rubyspec/core/kernel/fixtures/classes.rb
+
     cp spec/localspec/core/module/autoload_spec.rb \
        spec/rubyspec/core/module/autoload_spec.rb
-    cp spec/localspec/language/block_spec.rb \
-       spec/rubyspec/language/block_spec.rb
     cp spec/localspec/language/super_spec.rb \
        spec/rubyspec/language/super_spec.rb
 
