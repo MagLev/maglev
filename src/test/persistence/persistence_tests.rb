@@ -182,6 +182,15 @@ Maglev.persistent do
       test(c.respond_to?(:a_non_persistent_method), false, "007: C007#a_non_persistent_method")
     end
 
+    def test_008
+      require 't008'
+    end
+    def check_008
+      foos = Maglev::PERSISTENT_ROOT[:my_favorite_foos]
+      test(foos.size, 1, '008: Maglev::PERSISTENT_ROOT[:my_favorite_foos].size')
+      test(Foo.maglev_persistable?, true, '008: Foo.maglev_persistable?')
+    end
+
     ########################################
     # Test Framework Methods
     ########################################
