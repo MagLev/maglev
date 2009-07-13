@@ -1,3 +1,4 @@
+$:.unshift File.expand_path(File.dirname(__FILE__))
 # This script assumes persistence_tests.rb has been run.
 #
 if defined? PTEST

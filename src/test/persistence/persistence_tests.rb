@@ -1,3 +1,12 @@
+$:.unshift File.expand_path(File.dirname(__FILE__))
+puts "$: at top of file: #{$:.inspect}"
+# Until Trac # 552 is fixed, just code all of the tests in this file.
+# Later, after 552 is fixed, we can break them apart a bit.
+#
+#require 'globals_tests'
+#Maglev.abort_transaction  # Pick up any commits during the requires
+
+
 Maglev.persistent do
 
   # This class defines a small unit test framework, and it defines many
@@ -13,6 +22,7 @@ Maglev.persistent do
   # details.
 
   class MagLevPersistenceTests
+    #include GlobalsTests
 
     ########################################
     # Persistence Tests methods
@@ -23,6 +33,46 @@ Maglev.persistent do
 
     def check_001
       test(Maglev::PERSISTENT_ROOT[:hat], "A New Hat", :check_001)
+    end
+
+#  test_002 waiting on track 553
+#
+#     def test_002
+#       # PTestPersistentConstant and PTestTransientConstant are set
+#       # below, this method makes sure const_set works correctly in
+#       # both transient and persistent modes
+#       Maglev.transient do
+#         Object.const_set('PTestTransientConstant2', 33)
+#       end
+#       Maglev.persistent do
+#         Object.const_set('PTestPersistentConstant2', 44)
+#       end
+
+#       test(PTestPersistentConstant, true, "PTestPersistentConstant")
+#       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
+
+#       test(PTestTransientConstant,  true, "PTestTransientConstant")
+#       test(PTestTransientConstant2,   33, "PTestTransientConstant2")
+#     end
+
+#     def check_002
+#       test(PTestPersistentConstant, true, "PTestPersistentConstant")
+#       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
+
+#       test(defined? PTestTransientConstant,  nil, "PTestTransientConstant")
+#       test(defined? PTestTransientConstant2,  nil, "PTestTransientConstant2")
+#     end
+
+    def test_003
+      # Test that a persisted class has its constants, instance variables
+      # and class variables saved.
+      puts "$: in test_003: #{$:.inspect}"
+      require 't003'
+    end
+
+    def check_003
+      test(C003.foo, "foo", "Class variable")
+      test(C003.bar, "bar", "Class instance variable")
     end
 
     ########################################
@@ -43,9 +93,13 @@ Maglev.persistent do
         Maglev.commit_transaction
         puts "== Maglev.commit_transaction"
       end
+      report
     end
 
     def run_checks
+      puts "======================="
+      p self.methods
+      puts "======================="
       self.methods.grep(/^check_/).sort.each do |m|
         puts "== Checking: #{m}"
         send m
@@ -81,5 +135,11 @@ Maglev.persistent do
 
   end
 
+  PTestPersistentConstant = true  # A top level persistent constant
 end
+
+Maglev.transient do
+  PTestTransientConstant = true  # A top level transient constant
+end
+
 Maglev.commit_transaction

@@ -1,6 +1,6 @@
 # Specification for Class#maglev_persist!
 
-describe "from features define by class Foo...end, the first time" do
+describe "from features defined by class Foo...end, the first time" do
   # When we say "stages" we mean that everything is set to
   # persist the item, but that it is not yet persisted.
   it "Stages receiver's constants"
