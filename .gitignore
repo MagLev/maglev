@@ -29,3 +29,6 @@ lib/ruby/site_ruby/1.8/ubygems.rb
 lib/ruby/site_ruby/1.8/rbconfig
 lib/ruby/site_ruby/1.8/smalltalk
 examples/persistence/gstore/pstore.db
+bin/maglev-gem
+bin/rake
+lib/maglev/gems
