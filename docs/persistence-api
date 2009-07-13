@@ -11,7 +11,7 @@ for MagLev Alpha Developers.  For more detail see:
 * The Persistence MSpecs (in <tt>src/test/persistence/</tt>) specify detailed
   semantics of the persistence methods.  Comments outline use cases and
   provide additional insight.  Note: these MSpecs are not yet runnable.
-* The persistence API[link:classes/Maglev.html] 
+* The persistence API[link:classes/Maglev.html]
 * <tt>docs/persistence.rb</tt> provides Ruby pseudocode for the API.
 * The GemStone/S 64 Bit Programming Guide: provides a full discussion of
   the GemStone persistence model (including transactions, locking, etc.),
@@ -39,8 +39,8 @@ code and data.
 
 In the MagLev Persistence model, an object is persisted by:
 
-* Ensuring that its class and all classes and mixed in modules along its
-  superclass chain are persistable.
+* Ensuring that its class and all ancestors (super classes and mixed in
+  modules) are persistable.
 * Attaching the object to a persistent root (e.g.,
   <tt>Maglev::PERSISTENT_ROOT</tt>)
 * Calling <tt>Maglev.commit_transaction</tt>
@@ -78,14 +78,14 @@ The two principles that guided the MagLev persistence API are:
 2. Explicit action is necessary to take advantage of MagLev persistence
    (MagLev will not surprise you by persisting objects you didn't request).
 
-Some of the other goals we had are:
+Some of the other goals were:
 
 * For the first round of the API, provide the minimal set of persistence
   primitives necessary to persist objects and classes.  GemStone is open to
   adding convenience methods in subsequent versions of the API.
 * By explicitly requesting MagLev persistence, the programmer acknowledges
   they understand and will deal with the effects of that decision.
-* Provide full access to the entire underlying GemStone persistence API for 
+* Provide full access to the entire underlying GemStone persistence API for
   those who need it.
 * MagLev's ruby code will provide enhancements over the analogous smalltalk API
   (e.g., <tt>commit_transaction</tt> throws an exception instead of returning
@@ -110,10 +110,10 @@ repository.  VMs and repositories may reside on the same machine, or may be
 distributed on a network.
 
 The MagLev VM and repository are based on the GemStone/S 64-bit product,
-which is used in a number of mission critical applications to connect 
-thousands of VMs, running thousands of transactions per second, connected 
-to a repository managing terabytes of data.  MagLev allows Ruby programs 
-to take advantage of the the full GemStone/S built-in, shared, scalable, 
+which is used in a number of mission critical applications to connect
+thousands of VMs, running thousands of transactions per second, connected
+to a repository managing terabytes of data.  MagLev allows Ruby programs
+to take advantage of the the full GemStone/S built-in, shared, scalable,
 distributed cache and native object repository.
 
 ==== Persistence by Reachability
@@ -129,10 +129,10 @@ all of the objects they can reach) will be persisted at the next
 <tt>Maglev.commit_transaction</tt>.
 
 Since every object has a reference to its class object and each class
-object has a reference to its superclass (and mixed in modules), in order 
-to persist an object, you must also persist its class (and the whole ancestor 
-chain as well).  The VM maintains flags in each class and module that marks whether 
-it (<tt>Module#maglev_persistable=</tt> and <tt>Module#maglev_persistable?</tt>) 
+object has a reference to its superclass (and mixed in modules), in order
+to persist an object, you must also persist its class (and the whole ancestor
+chain as well).  The VM maintains flags in each class and module that marks whether
+it (<tt>Module#maglev_persistable=</tt> and <tt>Module#maglev_persistable?</tt>)
 and its instances (<tt>Class#maglev_instances_persistable=</tt> and
 <tt>Class#maglev_instances_persistable?</tt>) are allowed to be persisted.
 If you attempt to commit an object whose class is not marked persistable or
@@ -169,8 +169,12 @@ All new methods, instances and constants defined by the code loaded into
 a fresh VM are local to that VM, and are available only while that VM is
 running -- i.e. they will be lost when that VM exits. No other VM that
 attaches to the same MagLev repository will see modifications made by
-a VM using the default MRI Compatibility model.  File loading, etc. is 
+a VM using the default MRI Compatibility model.  File loading, etc. is
 just like MRI.
+
+Note: Even though a VM run in MRI compatibility mode will not see the
+effects of other VMs during its runtime, it *will* see changes by other VMs
+that were committed to the repository before the current VM started.
 
 === MagLev Persistence
 
@@ -179,17 +183,17 @@ MagLev persistence, the MagLev programmer has to take explicit action.  To
 persist an object, its class must be persistent.
 
 By default, MagLev runs in "auto-transaction" mode, which means that each
-VM is always in a transaction.  If you are using the MRI Compatibility model, 
+VM is always in a transaction.  If you are using the MRI Compatibility model,
 there are no visible consequences of this.  If you using the MagLev Persistence
-model, then you must explicitly commit the current transaction to save your data.  
+model, then you must explicitly commit the current transaction to save your data.
 The VM will automatically start a new transaction after a commit or abort.
 
 When you use the explicit MagLev Persistence model, you've entered a
 repository based view of your program (the primary view of the code lives in the
 repository, not your files). Since, in the default MRI model, nothing is
 committed to the repository, the state of the VM is reflected closely by the
-state of your <tt>.rb</tt> files.  But in MagLev Persistence model, 
-as you begin to commit items into the repository (and other VMs also commit 
+state of your <tt>.rb</tt> files.  But in MagLev Persistence model,
+as you begin to commit items into the repository (and other VMs also commit
 to the repository), the state of the code may drift away from the state of the <tt>.rb</tt> files.  This is not a big problem, just something to keep in mind.
 
 * MRI is file based
@@ -284,13 +288,13 @@ A class may be persisted by issuing the following command:
     MyClass.persistable = true   # stage the class for persistence
     Maglev.commit_transaction    # commit the repository
 
-In order to successfully persist a class, all of the classes in its superclass 
+In order to successfully persist a class, all of the classes in its superclass
 chain (including mixed in modules) must also be persisted.
 
 The next time a MagLev VM starts up and connects to the repository,
-the VM will see the last committed state of the persistable classes.  
-Any VM already connected to the repository will see the new class 
-(or modifications) the next time it does a <tt>Maglev.commit_transaction</tt> 
+the VM will see the last committed state of the persistable classes.
+Any VM already connected to the repository will see the new class
+(or modifications) the next time it does a <tt>Maglev.commit_transaction</tt>
 or a <tt>Maglev.abort_transaction</tt>.
 
 === Eigenclasses (Singleton classes)
@@ -350,7 +354,7 @@ A short example:
     # are still local to the VM and non-persistent; an_ambiguous_method
     # becomes persistent, with the definition from step 3).
 
-    maglev.persistent do
+    Maglev.persistent do
       class C
         A_SECOND_PERSISTENT_CONST = 53
 
@@ -367,7 +371,7 @@ A short example:
 The ability to make transient changes to persistent classes enables
 multiple VMs to run highly dynamic code without unnecessary commit
 conflicts.  As an example Rails dynamically defines many methods through the
-<tt>method_missing</tt> hook (e.g., dynamically created <tt>find_by_*</tt> methods).  These methods will be created as needed by individual VMs.  If the class was marked 
+<tt>method_missing</tt> hook (e.g., dynamically created <tt>find_by_*</tt> methods).  These methods will be created as needed by individual VMs.  If the class was marked
 as dirty due to these dynamic method definitions, then at commit time, there
 would be conflicts because several VMs would be trying to define the same
 methods on the fly.  Rails is designed to run with these methods defined in
@@ -424,8 +428,9 @@ is possible:
         # ...
 
         # Override new to save instances
-        def self.new
+        def self.new(*args)
           instance = super
+          instance.initialize(*args)
           Maglev::PERSISTENT_ROOT[:employees] << instance
           instance
         end
@@ -478,10 +483,10 @@ class, and then commit the object:
     Foo.persistable = true
 
     # Create a space in PERSISTENT_ROOT to hold persistent Foo objects:
-    Maglev.PERSISTENT_ROOT[:my_favorite_foos] = Array.new
+    Maglev::PERSISTENT_ROOT[:my_favorite_foos] = Array.new
 
     # Connect a Foo instance to a persistent root
-    Maglev.PERSISTENT_ROOT[:my_favorite_foos] << Foo.new
+    Maglev::PERSISTENT_ROOT[:my_favorite_foos] << Foo.new
 
     Maglev.commit_transaction  # commit class Foo and the instance f.
 
@@ -503,9 +508,9 @@ however.
 === Create Your Own Persistence Model
 
 If none of the preceding options meets your requirements, MagLev provides
-access to the full underlying GemStone/S API (transactions, locking, instance migrations, reduced conflict collections, etc.).  See <tt>docs/smalltalk_ffi</tt> 
-for more information. This API has proven to be robust and scalable enough for 
-real world applications to run thousands of VMs, thousands of transactions 
+access to the full underlying GemStone/S API (transactions, locking, instance migrations, reduced conflict collections, etc.).  See <tt>docs/smalltalk_ffi</tt>
+for more information. This API has proven to be robust and scalable enough for
+real world applications to run thousands of VMs, thousands of transactions
 per second and manage terabytes of data.
 
 
