@@ -35,33 +35,33 @@ Maglev.persistent do
       test(Maglev::PERSISTENT_ROOT[:hat], "A New Hat", :check_001)
     end
 
-#  test_002 waiting on track 553
-#
-#     def test_002
-#       # PTestPersistentConstant and PTestTransientConstant are set
-#       # below, this method makes sure const_set works correctly in
-#       # both transient and persistent modes
-#       Maglev.transient do
-#         Object.const_set('PTestTransientConstant2', 33)
-#       end
-#       Maglev.persistent do
-#         Object.const_set('PTestPersistentConstant2', 44)
-#       end
+    #  test_002 waiting on track 553
+    #
+    #     def test_002
+    #       # PTestPersistentConstant and PTestTransientConstant are set
+    #       # below, this method makes sure const_set works correctly in
+    #       # both transient and persistent modes
+    #       Maglev.transient do
+    #         Object.const_set('PTestTransientConstant2', 33)
+    #       end
+    #       Maglev.persistent do
+    #         Object.const_set('PTestPersistentConstant2', 44)
+    #       end
 
-#       test(PTestPersistentConstant, true, "PTestPersistentConstant")
-#       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
+    #       test(PTestPersistentConstant, true, "PTestPersistentConstant")
+    #       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
 
-#       test(PTestTransientConstant,  true, "PTestTransientConstant")
-#       test(PTestTransientConstant2,   33, "PTestTransientConstant2")
-#     end
+    #       test(PTestTransientConstant,  true, "PTestTransientConstant")
+    #       test(PTestTransientConstant2,   33, "PTestTransientConstant2")
+    #     end
 
-#     def check_002
-#       test(PTestPersistentConstant, true, "PTestPersistentConstant")
-#       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
+    #     def check_002
+    #       test(PTestPersistentConstant, true, "PTestPersistentConstant")
+    #       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
 
-#       test(defined? PTestTransientConstant,  nil, "PTestTransientConstant")
-#       test(defined? PTestTransientConstant2,  nil, "PTestTransientConstant2")
-#     end
+    #       test(defined? PTestTransientConstant,  nil, "PTestTransientConstant")
+    #       test(defined? PTestTransientConstant2,  nil, "PTestTransientConstant2")
+    #     end
 
     def test_003
       # Test that a persisted class has its constants, instance variables
@@ -93,20 +93,20 @@ Maglev.persistent do
       test(c.im_two, :im_two, 'test_004 a: im_two still here')
       test(c.im_three, :im_three, 'test_004 a: im_three still here')
 
-#      Maglev.transient do
-#        C004.remove_method(:im_three) # raises exception
+      #      Maglev.transient do
+      #        C004.remove_method(:im_three) # raises exception
 
-#         class << C004; remove_method(:cm_three); end
-#       end
-#       Maglev.commit_transaction # should be no-op, but just testing...
+      #         class << C004; remove_method(:cm_three); end
+      #       end
+      #       Maglev.commit_transaction # should be no-op, but just testing...
 
-#       test(C004.respond_to?( :cm_one), false, 'test_004 b: cm_one not there')
-#       test(C004.cm_two, :self_cm_two, 'test_004 b: cm_two still here')
-#       test(C004.respond_to?(:cm_three), 'test_004 b: cm_three still here')
+      #       test(C004.respond_to?( :cm_one), false, 'test_004 b: cm_one not there')
+      #       test(C004.cm_two, :self_cm_two, 'test_004 b: cm_two still here')
+      #       test(C004.respond_to?(:cm_three), 'test_004 b: cm_three still here')
 
-#       test(c.respond_to?(:im_one), false, 'test_004 b: im_one not there')
-#       test(c.im_two, :im_two, 'test_004 b: im_two still here')
-#       test(c.respond_to?(:im_three), false, 'test_004 b: im_three not there')
+      #       test(c.respond_to?(:im_one), false, 'test_004 b: im_one not there')
+      #       test(c.im_two, :im_two, 'test_004 b: im_two still here')
+      #       test(c.respond_to?(:im_three), false, 'test_004 b: im_three not there')
     end
 
     def check_004
@@ -133,6 +133,39 @@ Maglev.persistent do
         test(employee.name.nil?, false,  "Bad name for #{employee}")
         test(employee.salary > 0, true,  "Bad salary for #{employee}")
       end
+    end
+
+    def test_006
+      # Use Case from the persistence-api doc
+
+      # Assume Maglev::PERSISTENT_ROOT[:maybe] is nil:
+      test(Maglev::PERSISTENT_ROOT[:maybe], nil, "006: :maybe initially nil")
+
+      # Stage an object for persistence
+      s = "I want to be persistent...but..."
+      Maglev::PERSISTENT_ROOT[:maybe] = s
+
+      # create a local variable that will be unaffected by the
+      # abort_transaction:
+      $clueless = "Yup"
+
+      test(Maglev::PERSISTENT_ROOT[:maybe], s, "006: :maybe value before abort")
+      test($clueless, "Yup", "006: $clueless value before abort")
+
+      Maglev.abort_transaction
+
+      # At this point, the state of Maglev::PERSISTENT_ROOT is reset to the
+      # default value but local variables are unaffected
+
+      test(Maglev::PERSISTENT_ROOT[:maybe], nil, "006: :maybe value after abort")
+      test($clueless, "Yup", "006: $clueless value after abort")
+
+      #Maglev::PERSISTENT_ROOT[:maybe] # => nil
+      #$clueless # => "Yup"
+    end
+
+    def check_006
+      # Null  all checks are in test_006
     end
 
     ########################################
