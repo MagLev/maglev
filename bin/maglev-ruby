@@ -21,6 +21,7 @@ OPTIONS:
    --help         Show this message and exit
    -M<opt>        Pass a maglev option to the VM.  This flag may be passed multiple
                   times.  The currently recognized options are:
+                    traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
                     logSexp       Print sexpressions as they are parsed
    --stone <name> Run script connecting to the named stone
