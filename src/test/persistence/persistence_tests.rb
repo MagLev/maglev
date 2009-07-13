@@ -1,5 +1,5 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
-puts "$: at top of file: #{$:.inspect}"
+
 # Until Trac # 552 is fixed, just code all of the tests in this file.
 # Later, after 552 is fixed, we can break them apart a bit.
 #
@@ -66,13 +66,73 @@ Maglev.persistent do
     def test_003
       # Test that a persisted class has its constants, instance variables
       # and class variables saved.
-      puts "$: in test_003: #{$:.inspect}"
       require 't003'
     end
 
     def check_003
       test(C003.foo, "foo", "Class variable")
       test(C003.bar, "bar", "Class instance variable")
+    end
+
+    def test_004
+      require 't004'  # Commits class C004 with methods
+      # Now remove the methods
+      Maglev.persistent do
+        C004.remove_method(:im_one)
+        class << C004; remove_method(:cm_one); end
+      end
+      Maglev.commit_transaction
+
+      c = C004.new
+
+      test(C004.respond_to?(:cm_one), false, 'test_004 a: cm_one not there')
+      test(C004.cm_two, :self_cm_two, 'test_004 a: cm_two still here')
+      test(C004.cm_three, :self_cm_three, 'test_004 a: cm_three still here')
+
+      test(c.respond_to?(:im_one), false, 'test_004 a: im_one not there')
+      test(c.im_two, :im_two, 'test_004 a: im_two still here')
+      test(c.im_three, :im_three, 'test_004 a: im_three still here')
+
+#      Maglev.transient do
+#        C004.remove_method(:im_three) # raises exception
+
+#         class << C004; remove_method(:cm_three); end
+#       end
+#       Maglev.commit_transaction # should be no-op, but just testing...
+
+#       test(C004.respond_to?( :cm_one), false, 'test_004 b: cm_one not there')
+#       test(C004.cm_two, :self_cm_two, 'test_004 b: cm_two still here')
+#       test(C004.respond_to?(:cm_three), 'test_004 b: cm_three still here')
+
+#       test(c.respond_to?(:im_one), false, 'test_004 b: im_one not there')
+#       test(c.im_two, :im_two, 'test_004 b: im_two still here')
+#       test(c.respond_to?(:im_three), false, 'test_004 b: im_three not there')
+    end
+
+    def check_004
+      c = C004.new
+
+      test(C004.respond_to?(:cm_one), false, 'test_004 a: cm_one not there')
+      test(C004.cm_two, :self_cm_two, 'test_004 a: cm_two still here')
+      test(C004.cm_three, :self_cm_three, 'test_004 a: cm_three still here')
+
+      test(c.respond_to?(:im_one), false, 'test_004 a: im_one not there')
+      test(c.im_two, :im_two, 'test_004 a: im_two still here')
+      test(c.im_three, :im_three, 'test_004 a: im_three still here')
+    end
+
+    def test_005
+      require 't005'
+      check_005  # the checks are valid both in this VM and the next
+    end
+
+    def check_005
+      employees = Maglev::PERSISTENT_ROOT[:employees]
+      test(employees.size, 3, "005: check right number of employees")
+      employees.each do |employee|
+        test(employee.name.nil?, false,  "Bad name for #{employee}")
+        test(employee.salary > 0, true,  "Bad salary for #{employee}")
+      end
     end
 
     ########################################
@@ -97,9 +157,6 @@ Maglev.persistent do
     end
 
     def run_checks
-      puts "======================="
-      p self.methods
-      puts "======================="
       self.methods.grep(/^check_/).sort.each do |m|
         puts "== Checking: #{m}"
         send m
