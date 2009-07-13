@@ -168,6 +168,20 @@ Maglev.persistent do
       # Null  all checks are in test_006
     end
 
+    def test_007
+      require 't007'
+    end
+
+    def check_007
+      test(C::A_CONST, 1, "007: A_CONST")
+      test(defined?(C::A_NON_PERSISTENT_CONST), false, "007: A_NON_PERSISTENT_CONST")
+      test(C::A_SECOND_PERSISTENT_CONST, 53, "007: A_SECOND_PERSISTENT_CONST")
+      c = C007.new
+      test(c.respond_to?(:a_persistent_method), true, "007: C007#a_persistent_method")
+      test(c.respond_to?(:an_ambiguous_method), true, "007: C007#an_ambiguous_method")
+      test(c.respond_to?(:a_non_persistent_method), false, "007: C007#a_non_persistent_method")
+    end
+
     ########################################
     # Test Framework Methods
     ########################################
