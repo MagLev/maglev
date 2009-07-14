@@ -9,8 +9,12 @@ class String
 
   def upto(stop)
     #stop = StringValue(stop)
-    stop = Type.coerce_to(stop, String, :to_str)
-
+    unless stop._isString
+      if stop._isSymbol 
+        raise TypeError , 'upto does not support Symbol arg'
+      end
+      stop = Type.coerce_to(stop, String, :to_str)
+    end
     return self if self > stop
 
     after_stop = stop.succ
