@@ -32,7 +32,7 @@
 # after this file is read, can use Kernel#require etc.
 RUBY.class.primitive 'require', 'requireFileNamed:'
 RUBY.class.primitive 'load', 'loadFileNamed:'
-RUBY.class.primitive 'global', 'installGlobal:name:'
+RUBY.class.primitive 'global', 'installConstant:name:'
 
 RUBY.require 'kernel/bootstrap/Globals.rb'
 RUBY.require 'kernel/bootstrap/GlobalErrors.rb'
