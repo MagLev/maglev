@@ -1195,6 +1195,10 @@ module MagRp # {
     # scope = s(:scope, body).compact  # scope not used in AST
     # result = s(:sclass, recv, scope)
     result = RubySClassNode.s(recv, body)
+    body_pos = body.src_offset 
+    if body_pos._not_equal?(nil)
+      result.src_offset=( body_pos )
+    end
 
     self.in_def = in_def
     self.in_single = in_single

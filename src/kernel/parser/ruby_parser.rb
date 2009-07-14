@@ -3643,6 +3643,7 @@ end
 
 def _reduce_94(val, vofs)
 		      # cpath: tCOLON3 cname #   | cname  
+# TODO, fix trac_1001.rb 
                       result = val[vofs ]  # a RpNameToken
                     
     result
@@ -4023,7 +4024,7 @@ end
 def _reduce_193(val, vofs)
 		      # | tUPLUS arg
                       v_one = val[vofs + 1]
-                      if v_one.kind_of(RubyAbstractLiteralNode) # val_[1][0] == :lit 
+                      if v_one.kind_of?(RubyAbstractLiteralNode) # val_[1][0] == :lit 
                         result = v_one
                       else
                         sel_tok = RpNameToken.new( :"+@" , val[vofs ].src_offset )

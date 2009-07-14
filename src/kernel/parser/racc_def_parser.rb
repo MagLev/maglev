@@ -20,9 +20,7 @@ end
 
 module MagRp # {
 
-  unless defined?(Racc_No_Extentions)
-    Racc_No_Extentions = false
-  end
+  # deleted Racc_No_Extentions, not used
 
   class Parser # [
 

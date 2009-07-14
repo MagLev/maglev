@@ -2,6 +2,10 @@
 module MagRp
 
   def self.debug
+    # MagRpDEBUG values are
+    #   0 no tracing
+    #   1  trace files parsed by RubyParser
+    #   2  also include lexer and racc state machine tracing
     d = Gemstone.session_temp(:MagRpDEBUG)
     if d.equal?(nil)
       d = 0

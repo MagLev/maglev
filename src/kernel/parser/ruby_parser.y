@@ -809,7 +809,7 @@ rule
                     {
 		      # | tUPLUS arg
                       v_one = val[vofs + 1]
-                      if v_one.kind_of(RubyAbstractLiteralNode) # val_[1][0] == :lit 
+                      if v_one.kind_of?(RubyAbstractLiteralNode) # val_[1][0] == :lit 
                         result = v_one
                       else
                         sel_tok = RpNameToken.new( :"+@" , val[vofs ].src_offset )
