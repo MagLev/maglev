@@ -35,33 +35,28 @@ Maglev.persistent do
       test(Maglev::PERSISTENT_ROOT[:hat], "A New Hat", :check_001)
     end
 
-    #  test_002 waiting on track 553
-    #
-    #     def test_002
-    #       # PTestPersistentConstant and PTestTransientConstant are set
-    #       # below, this method makes sure const_set works correctly in
-    #       # both transient and persistent modes
-    #       Maglev.transient do
-    #         Object.const_set('PTestTransientConstant2', 33)
-    #       end
-    #       Maglev.persistent do
-    #         Object.const_set('PTestPersistentConstant2', 44)
-    #       end
+    # test_002 waiting on track 553
 
-    #       test(PTestPersistentConstant, true, "PTestPersistentConstant")
-    #       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
+    def test_002
+      # PTestPersistentConstant and PTestTransientConstant are set
+      # below, this method makes sure const_set works correctly in
+      # both transient and persistent modes
+      Maglev.transient do
+        Object.const_set('PTestTransientConstant', 33)
+      end
+      Maglev.persistent do
+        Object.const_set('PTestPersistentConstant', 44)
+      end
 
-    #       test(PTestTransientConstant,  true, "PTestTransientConstant")
-    #       test(PTestTransientConstant2,   33, "PTestTransientConstant2")
-    #     end
+      test(PTestTransientConstant,  33, "PTestTransientConstant")
+      test(PTestPersistentConstant, 44, "PTestPersistentConstant")
+    end
 
-    #     def check_002
-    #       test(PTestPersistentConstant, true, "PTestPersistentConstant")
-    #       test(PTestPersistentConstant2,  44, "PTestPersistentConstant2")
+    def check_002
+      test(defined? PTestTransientConstant,  nil, "PTestTransientConstant")
+      test(PTestPersistentConstant,  44, "PTestPersistentConstant2")
+    end
 
-    #       test(defined? PTestTransientConstant,  nil, "PTestTransientConstant")
-    #       test(defined? PTestTransientConstant2,  nil, "PTestTransientConstant2")
-    #     end
 
     def test_003
       # Test that a persisted class has its constants, instance variables
@@ -182,6 +177,8 @@ Maglev.persistent do
       test(c.respond_to?(:a_non_persistent_method), false, "007: C007#a_non_persistent_method")
     end
 
+    # Basic test that Module#maglev_persistable= and
+    # Module#maglev_persitable? work
     def test_008
       require 't008'
     end
