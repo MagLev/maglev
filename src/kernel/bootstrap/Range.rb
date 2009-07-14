@@ -44,30 +44,30 @@ class Range
     else
       raise TypeError, "can't iterate from #{x.class}" unless x.respond_to?(:succ)
       if llast._isString
-				sz = llast.size
-				if @excludeEnd
-					while (x < llast) and (x.size <= sz)
-						yield x
-						x = x.succ
-					end
-				else
-					while (x <= llast) and (x.size <= sz)
-						yield x
-						x = x.succ
-					end
-				end
-			else
-				if @excludeEnd
-					while x < llast
-						yield x
-						x = x.succ
-					end
-				else
-					while x <= llast
-						yield x
-						x = x.succ
-					end
-				end
+        sz = llast.size
+        if @excludeEnd
+          while (x < llast) and (x.size <= sz)
+            yield x
+            x = x.succ
+          end
+        else
+          while (x <= llast) and (x.size <= sz)
+            yield x
+            x = x.succ
+          end
+        end
+      else
+        if @excludeEnd
+          while x < llast
+            yield x
+            x = x.succ
+          end
+        else
+          while x <= llast
+            yield x
+            x = x.succ
+          end
+        end
       end
    end
   end
