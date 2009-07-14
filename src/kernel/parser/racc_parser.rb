@@ -194,8 +194,8 @@ module MagRp # {
 
         # vstack must be updated AFTER method call
         #  Maglev:  use_result  is generated as constant true by .y-->.rb processing,
-        #  Maglev: optimization, use __perform___ 
-        #    and omit the tmp_v[0] arg since it is usually never used 
+        #  Maglev: optimization use __perform
+        #    and omit the tmp_v[0] arg since it is never used 
         # if use_result 
         #  vstack.push __send__(method_id, tmp_v, vstack, tmp_v[0])
         # else
@@ -208,7 +208,7 @@ module MagRp # {
         vofs = vstack_siz - len   # in a reduce method, val[0] is vstack[0 + vofs]
 
         # Maglev optimization use two args  , and pass stack and offset 
-        vres =  __perform___( creduce_table[i+2], 1, vstack, vofs )
+        vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 );
 
         # delete last len elements of vstack and push vres
         vstack[vofs] = vres 
