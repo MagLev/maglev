@@ -5,11 +5,13 @@
 
 # WHY do I have to do this?!?
 class Regexp
-  ONCE     = 0 # 16 # ?
-  ENC_NONE = /x/n.options
-  ENC_EUC  = /x/e.options
-  ENC_SJIS = /x/s.options
-  ENC_UTF8 = /x/u.options
+  unless defined? ONCE then
+    ONCE     = 0 # 16 # ?
+    ENC_NONE = /x/n.options
+    ENC_EUC  = /x/e.options
+    ENC_SJIS = /x/s.options
+    ENC_UTF8 = /x/u.options
+  end
 end
 Regexp._freeze_constants
 
@@ -168,6 +170,7 @@ module MagRp # {
 	h[k] = v
       end
 
+      # def all ; end #  not used
 
       # def env ; end # same as  current
 
@@ -500,10 +503,12 @@ module MagRp # {
     node = node.as_cond(self)
  # # as_cond(aMagRp) implements:
  #  case node.first
+# following two 'when's  deleted as of ruby_parser2.0.3
  #  when :dregx then     # RubyDRegexpNode   # Ryan says not used
  #    return s(:match2, node, s(:gvar, "$_".to_sym))
  #  when :regex then     # RubyRegexpNode  # :regex is Rubinius only
  #    return s(:match, node)
+#
  #  when :lit then     # RubyRegexpNode
  #    if Regexp === node.last then
  #      return s(:match, node)
