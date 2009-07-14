@@ -12,7 +12,7 @@ class CZstream
     primitive_nobridge 'total_out', 'position'
     primitive_nobridge 'close', 'close'
     primitive_nobridge 'flush', 'flush'
-    primitive_nobridge 'write', 'write:count:'
+    primitive_nobridge 'write', 'rubyWrite:count:'
 
     primitive_nobridge '_open', 'open:io:errorClass:comprLevel:'
 

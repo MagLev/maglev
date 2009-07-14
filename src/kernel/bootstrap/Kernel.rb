@@ -77,7 +77,7 @@ module Kernel
   end
 
   # def catch(aSymbol, &aBlock); end
-  primitive_nobridge 'catch&' , 'catch:do:'
+  primitive_nobridge_env 'catch&' , 'catch', ':do:'
 
   primitive_nobridge '_eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
@@ -181,7 +181,7 @@ module Kernel
   end
 
   # def loop(&block) ; end
-  primitive 'loop&', '_rubyLoop:'
+  primitive_env 'loop&', '_rubyLoop', ':'
 
   #     open(path [, mode [, perm]] )                => io or nil
   #     open(path [, mode [, perm]] ) {|io| block }  => obj

@@ -71,14 +71,14 @@ class Integer
   end
 
     # following 3 prims contain handler for RubyBreakException
-    primitive 'times&', '_rubyTimes:'
+    primitive_env 'times&', '_rubyTimes', ':'
     # def times(&block) ; end 
 
     # def upto(n, &block) ; end 
-    primitive 'upto&', '_rubyUpto:block:'
+    primitive_env 'upto&', '_rubyUpto', ':block:'
 
     # def downdo(n, &block) ; end 
-    primitive 'downto&', '_rubyDownto:block:'
+    primitive_env 'downto&', '_rubyDownto', ':block:'
 
 
     def chr
@@ -269,9 +269,32 @@ class Integer
         primitive 'round', 'rounded'
         primitive 'zero?', '_rubyEqualZero'
 
-        primitive_nobridge 'step&', 'to:do:'
-        primitive_nobridge 'step&', 'to:by:do:'
+        def step(nend, &blk)
+          nend = Type.coerce_to(nend, Integer, :to_int)
+          if block_given?
+            n = self
+            while n <= nend
+              blk.call(n)
+              n += 1
+            end
+          end
+        end
 
+        def step(nend, inc, &blk) 
+          if nend._isFloat || inc._isFloat
+            super
+          else
+            nend = Type.coerce_to(nend, Integer, :to_int)
+            inc = Type.coerce_to(inc, Integer, :to_int)
+            if block_given?
+              n = self
+              while n <= nend
+                blk.call(n)
+                n += inc
+              end
+            end
+          end
+        end
 
 # Were in String.rb
     def _split_string(string, limit)

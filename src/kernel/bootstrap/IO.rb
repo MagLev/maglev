@@ -231,5 +231,14 @@ class IO
     end
     r
   end
+
+  def _read_into(len, buf)
+    res = self.read(len, buf)
+    if res.equal?(nil)
+      0
+    else
+      res.size 
+    end
+  end
 end
 

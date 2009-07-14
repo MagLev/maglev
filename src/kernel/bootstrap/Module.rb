@@ -9,7 +9,7 @@ class Module
   # puts, they are temporarily there.  As they are implemented, we should
   # pull them into here.
 
-  primitive_nobridge 'superclass' , 'rubySuperclass'  # resolves to impl in .mcz
+  primitive_nobridge 'superclass' , '_rubySuperclass'  # resolves to impl in .mcz
 
   primitive_nobridge 'constants',      'rubyConstants'
   primitive_nobridge 'const_defined?', 'rubyConstDefined:'

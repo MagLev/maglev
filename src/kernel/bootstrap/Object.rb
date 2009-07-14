@@ -39,7 +39,7 @@ class Object
     #  Private method _each: contains on:do: handler for RubyBreakException ,
     #  all env1 sends of each& are compiled as sends of _each&
     #  Attempts to reimplement _each& will fail with a compile error.
-    primitive_nobridge '_each&', '_rubyEach:'
+    primitive_nobridge_env '_each&',   '_rubyEach' , ':'
 
     # _storeRubyVcGlobal is used by methods that need to store into
     #   caller(s) definition(if any) of $~ or $_  .
@@ -78,37 +78,42 @@ class Object
     primitive 'nil?' , '_rubyNilQ'
 
     # rubySend: methods implemented in .mcz
-    primitive_nobridge 'send',  'rubySend:'
-    primitive_nobridge 'send',  'rubySend:with:'
-    primitive_nobridge 'send',  'rubySend:with:with:'
-    primitive_nobridge 'send',  'rubySend:with:with:with:'
-    primitive_nobridge 'send&', 'rubySend:block:'
-    primitive_nobridge 'send&', 'rubySend:with:block:'
-    primitive_nobridge 'send&', 'rubySend:with:with:block:'
-    primitive_nobridge 'send&', 'rubySend:with:with:with:block:'
-    primitive          'send*&' , 'rubySend:withArgs:block:'
+    primitive_nobridge_env 'send',  'rubySend', ':'
+    primitive_nobridge_env 'send',  'rubySend', ':with:'
+    primitive_nobridge_env 'send',  'rubySend', ':with:with:'
+    primitive_nobridge_env 'send',  'rubySend', ':with:with:with:'
+    primitive_nobridge_env 'send&', 'rubySend', ':block:'
+    primitive_nobridge_env 'send&', 'rubySend', ':with:block:'
+    primitive_nobridge_env 'send&', 'rubySend', ':with:with:block:'
+    primitive_nobridge_env 'send&', 'rubySend', ':with:with:with:block:'
+    primitive_nobridge_env 'send*', 'rubySend', ':withArgs:'
+    primitive_env          'send*&' , 'rubySend', ':withArgs:block:'
 
     #  'send:*&' , '__send__:*&' special cased in  installBridgeMethodsFor ,
-    #    any other   def send;...  end   gets no bridges  during bootstrap
-    #    to allow reimplementation of  send  for methods updating $~ , $_
+    #   to have no bridges.
+    #  any other   def send;...  end   gets no bridges  during bootstrap
+    #  to allow reimplementation of  send  for methods updating $~ , $_
 
     #  __send__ defined per MRI, non-overrideable version of send
     #  redefinition of __send__  disallowed by parser after bootstrap finished.
-    primitive_nobridge '__send__',  'rubySend:'
-    primitive_nobridge '__send__',  'rubySend:with:'
-    primitive_nobridge '__send__',  'rubySend:with:with:'
-    primitive_nobridge '__send__',  'rubySend:with:with:with:'
-    primitive_nobridge '__send__&', 'rubySend:block:'
-    primitive_nobridge '__send__&', 'rubySend:with:block:'
-    primitive_nobridge '__send__&', 'rubySend:with:with:block:'
-    primitive_nobridge '__send__&', 'rubySend:with:with:with:block:'
-    primitive_nobridge '__send__*' , 'rubySend:withArgs:'
-    primitive          '__send__*&' , 'rubySend:withArgs:block:'
+    primitive_nobridge_env '__send__',  'rubySend', ':'
+    primitive_nobridge_env '__send__',  'rubySend', ':with:'  
+    primitive_nobridge_env '__send__',  'rubySend', ':with:with:'
+    primitive_nobridge_env '__send__',  'rubySend', ':with:with:with:'
+    primitive_nobridge_env '__send__&', 'rubySend', ':block:' 
+    primitive_nobridge_env '__send__&', 'rubySend', ':with:block:'
+    primitive_nobridge_env '__send__&', 'rubySend', ':with:with:block:'
+    primitive_nobridge_env '__send__&', 'rubySend', ':with:with:with:block:'
+    primitive_nobridge_env '__send__*', 'rubySend', ':withArgs:'
+    primitive_env          '__send__*&', 'rubySend', ':withArgs:block:'
+
 
     # redefinition of __perform___ disallowed by parser after bootstrap finished.
-    # __perform___  requires first arg to be a Symbol with proper suffix 
-    #   for the number of with: keywords; it is used by RubyParser
-    primitive_nobridge '__perform___', '_rubyPerform:env:with:with:'
+    # __perform___  requires next to last arg to be a Symbol with proper suffix 
+    #   for the number of with: keywords;  
+    #   and last arg is envId 
+    # it is used by RubyParser
+    primitive_nobridge '__perform__se', 'with:with:perform:env:'
 
     primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
     primitive   '_basic_clone', '_basicCopy' # use singleton class
@@ -379,7 +384,7 @@ class Object
       res
     end
 
-    primitive_nobridge 'instance_eval&', 'rubyEval:'
+    primitive_nobridge_env 'instance_eval&', 'rubyEval', ':'
 
     # Object should NOT have a to_str.  If to_str is implementd by passing
     # to to_s, then by default all objects can convert to a string!  But we

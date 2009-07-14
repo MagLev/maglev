@@ -1,7 +1,7 @@
 
 class Hash
 
-  primitive 'hash'
+  primitive 'hash' , '_hash'
   primitive 'keys', 'keys'
 
   primitive '_add_keys_to', 'addKeysTo:'
@@ -157,22 +157,38 @@ class Hash
     true
   end
 
-  primitive_nobridge '[]', 'at:'
-  primitive_nobridge '[]=', 'at:put:'
+  primitive_nobridge '[]', 'rubyAt:'
+  primitive_nobridge '[]=', 'rubyAt:put:'
 
   primitive 'clear', 'removeAllKeys'
 
-  primitive_nobridge '_default' , 'default:'
+  def _call_default_block(arg)
+    # intended to be called from Smalltalk code only
+    @defaultValue.call(arg)
+  end
 
   def default(key=nil)
-    _default(key)
+    if @defaultIsBlock.equal?(true)
+      @defaultValue.call(key)
+    else
+      @defaultValue
+    end
   end
 
   primitive 'default=', 'setDefaultValue:'
 
   primitive 'default_proc' , 'defaultBlock'
 
-  primitive_nobridge 'delete&', 'removeKey:with:'
+  def delete(key, &blk)
+    v = self.delete(key) 
+    if block_given? 
+      if v.equal?(@sentinel)
+        return  blk.call(key)
+      end
+    end
+    v
+  end
+
   primitive 'delete', 'removeKey:'
 
   def delete_if(&block)
@@ -193,10 +209,25 @@ class Hash
     self
   end
 
-  primitive 'each&', 'keysAndValuesDo:'
-  primitive 'each_key&', 'keysDo:'
-  primitive 'each_pair&', 'keysAndValuesDo:'
-  primitive 'each_value&', 'valuesDo:'
+  def _call_block(arga, &blk) 
+    "to be called from smalltalk"  
+     blk.call(arga)
+  end
+
+  def _call_block(arga, argb, &blk) 
+    "to be called from smalltalk"  
+     blk.call(arga, argb)
+  end
+
+  primitive '_each&', 'eachPairDo:'
+  def each(&blk)
+    # this method needed so sender of eachPairDo: is in env 1
+    self._each(&blk)
+  end
+
+  primitive 'each_key&', 'eachKeyDo:'
+  primitive 'each_pair&', 'eachPairDo:'
+  primitive 'each_value&', 'eachValueDo:'
 
   def empty?
     size.equal?(0)
@@ -209,10 +240,10 @@ class Hash
   # * If +block+ is given, return the value of calling +block+ with +key+
   # Fetch does not use any default values supplied when the hash was created.
   #
-  primitive_nobridge '_atIfAbsent', 'at:ifAbsent:'
+  primitive_nobridge '_at_otherwise', 'rubyAt:otherwise:'
 
   def fetch(key, dflt=Undefined, &block)
-    val = _atIfAbsent(key, proc { dflt })
+    val = _at_otherwise(key, dflt)
     return val unless val.equal?(Undefined)
     return block.call(key) if block_given?
     raise IndexError, "No value for #{key}"
@@ -258,7 +289,7 @@ class Hash
     self
   end
 
-  primitive 'rehash', 'rebuildTable:'
+  primitive 'rehash', 'rehash'
 
   def reject(&block)
     self.dup.delete_if(&block)
@@ -298,7 +329,7 @@ class Hash
   end
 
   primitive 'size', 'size'
-  primitive  'store', 'at:put:'
+  primitive  'store', 'rubyAt:put:'
 
   def to_hash
     self

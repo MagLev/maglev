@@ -7,7 +7,7 @@ class Class
 
   primitive_nobridge 'superclass', 'superClass'
 
-  class_primitive_nobridge '_rubyNew', '_rubyNew:do:'
+  class_primitive_nobridge_env '_rubyNew', '_rubyNew', ':do:'
 
   def inherited(a_subclass)
     # .mcz code will not invoke this during bootstrap.

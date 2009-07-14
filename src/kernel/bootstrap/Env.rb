@@ -24,13 +24,23 @@ class Env
       self.dup
     end
 
+    primitive '_at_put' , 'rubyAt:put:' # resolves to RubyHash>>rubyAt:put:
+
+    def [](key)
+      v = super(key)
+      if v.equal?(nil)
+        v = Env._getenv(key)
+        unless v.equal?(nil)
+          self._at_put(key, v)
+        end
+      end
+      v
+    end
+
     def []=(key, val)
       Env._putenv(key, val)
       super(key, val)
     end
-
-    #  [] implemented in smalltalk because ruby doesn't allow super.[]=(k,v)
-    primitive '[]' , 'at:'
 
     def store(key, val)
      self.[]=(key, val)

@@ -40,7 +40,7 @@ class RubyContext
   #
   # RUBY.class.primitive 'require', 'requireFileNamed:'
   # RUBY.class.primitive 'load', 'loadFileNamed:'
-  # RUBY.class.primitive 'global', 'installGlobal:name:'
+  # RUBY.class.primitive 'global', 'installConstant:name:'
 
   # access to persistentMode in transient instance of RubyCompilerState
   class_primitive_nobridge 'persistence_mode', 'persistenceMode'

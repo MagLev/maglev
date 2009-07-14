@@ -129,7 +129,28 @@ class Numeric
 
   # round implemented in subclasses
 
-  primitive 'step', '_rubyTo:by:do:'
+  def step(nend, &blk)
+    n = Type.coerce_to(self, Float, :to_f)
+    nend = Type.coerce_to(nend, Float, :to_f)
+    if block_given?
+      while n <= nend
+	blk.call(n)
+	n += 1.0
+      end
+    end
+  end
+
+  def step(nend, inc, &blk) 
+    n = Type.coerce_to(self, Float, :to_f)
+    nend = Type.coerce_to(nend, Float, :to_f)
+    inc = Type.coerce_to(inc, Float, :to_f)
+    if block_given?
+      while n <= nend
+	blk.call(n)
+	n += inc
+      end
+    end
+  end
 
   primitive_nobridge 'inspect', 'printString'
 

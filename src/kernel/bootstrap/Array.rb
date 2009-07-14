@@ -58,6 +58,11 @@ class Array
     nil
   end
 
+  def _as_hash
+    # called fro generated code
+    Hash[self]
+  end
+
   # TODO: This should be a private _ method, right?
   def flatten_onto(output)
     i = 0
