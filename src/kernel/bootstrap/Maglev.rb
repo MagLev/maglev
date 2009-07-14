@@ -69,7 +69,17 @@ module Maglev
     end
   end
 
-  module_function :transient, :persistent
+  # Returns true iff the VM is currently in persistent mode.
+  def persistent?
+    RubyContext.persistence_mode
+  end
+
+  # Returns true iff the VM is currently in transient mode.
+  def transient?
+    not RubyContext.persistence_mode
+  end
+
+  module_function :transient, :persistent, :transient?, :persistent?
 end
 
 module Maglev
