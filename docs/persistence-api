@@ -272,6 +272,9 @@ Note: it is safe to call either <tt>Maglev.persistent</tt> or
 more detailed uses cases that explore finer grained control over class
 persistence later in this document.
 
+To query the current state of the VM, use <tt>Maglev.persistent?</tt> or
+<tt>Maglev.transient?</tt>. 
+
 ===== <tt>Module#maglev_persistable=</tt> Basics
 
 The other mechanism to control persistence is to explicitly
