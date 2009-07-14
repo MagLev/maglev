@@ -60,7 +60,7 @@ module MagRp #
         if sym.equal?( :_reduce_none ) && reduc_tab[idx].equal?( 1 )
           new_sym = :_reduce_noneOne  # for "no net change to vstack" optimization
         else
-          new_sym = (sym.to_s << '::' ).to_sym  # so we can use __perform___
+          new_sym = (sym.to_s << '::' ).to_sym  # so we can use __perform__se
         end
         reduc_tab[idx + 2] = new_sym
         idx += 3
