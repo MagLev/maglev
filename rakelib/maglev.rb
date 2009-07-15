@@ -185,10 +185,37 @@ def start_server_bench
   end
 end
 
-# Make sure prims are loaded, but suppress output
+def prims_loaded?
+  sh %{ #{TOPAZ_CMD} << EOF
+set user DataCurator pass swordfish
+login
+obj RubyPrimsLoaded
+quit
+EOF
+  } do |ok, status|
+    #puts "prims_loaded: #{ok}  status: #{status.inspect}"
+    ok
+  end
+end
+
+def load_prims
+  sh %{ #{TOPAZ_CMD} << EOF
+input #{MAGLEV_HOME}/gemstone/upgrade/ruby/allprims.topaz
+EOF
+  } do |ok, status|
+    #puts "load_prims_new ok: #{ok}  status: #{status.inspect}"
+    ok
+  end
+end
+
 def ensure_prims_loaded
   puts "Loading kernel if needed -- it may take a few seconds..."
-  run_topaz tc_ensure_prims
+  if prims_loaded?
+    puts "Primitives already loaded"
+  else
+    puts "loading prims"
+    load_prims
+  end
 end
 
 def stop_server

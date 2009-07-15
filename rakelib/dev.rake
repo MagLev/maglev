@@ -9,25 +9,12 @@ namespace :dev do
   desc "Reload kernel.rb (primitives) and commit it"
   task :reloadprims => ['maglev:start'] do
     puts "=== reload primitives"
-    #run_topaz tc_reload_prims
     sh %{
       #{TOPAZ_CMD} <<EOF
-input #{GEMSTONE}/upgrade/ruby/reloadprims.topaz
+input #{GEMSTONE}/upgrade/ruby/allprims.topaz
 EOF
     }
   end
-
-  desc "Ensure kernel.rb (primitives) is loaded and committed"
-  task :ensureprims => ['maglev:start'] do
-    puts "=== ensure primitives loaded"
-    run_topaz tc_ensure_prims
-  end
-
-#   desc "Load the mcz file ../latest.mcz and commit it."
-#   task :loadmcz => ['maglev:startparser', 'maglev:bootserver'] do
-#     puts "=== Load .mcz file: #{`ls -l ../latest.mcz`}"
-#     run_topaz tc_load_mcz
-#   end
 
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]

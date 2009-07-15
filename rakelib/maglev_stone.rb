@@ -118,9 +118,32 @@ class MagLevStone < Stone
   # transaction.  Does nothing if prims are already loaded.
   def ensure_prims_loaded
     if running?
-      puts "Loading kernel if needed. It may take a few seconds..."
-      run_topaz_command("RubyContext ensurePrimsLoaded")
-      puts "Kernel is loaded."
+      if prims_loaded?(@name)
+        puts "Kernel already loaded."
+      else
+        puts "Loading Kernel.  This may take a few seconds..."
+        input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
+      end
     end
+  end
+
+  def prims_loaded?(name='gs64stone')
+    begin
+      Topaz.new(self).commands("output append #{topaz_logfile}",
+                               "set u DataCurator p swordfish gemstone #{name}",
+                               "login",
+                               "obj RubyPrimsLoaded",
+                               "output pop",
+                               "exit")
+    rescue Exception => e
+      # Ignore the exception.  If test for obj RubyPrimsLoaded will cause
+      # topaz to exit with a non-zero exit status, which is what we want,
+      # so that we can return true or false.
+    end
+    $?.success?
+  end
+
+  def topaz_session
+    Topaz.new(self).interactive_session
   end
 end

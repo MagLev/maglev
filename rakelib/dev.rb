@@ -7,26 +7,6 @@
 # The following +tc_*+ methods generate topaz command strings based on the
 # parameters passed to them.
 
-# Returns a topaz command string that reloads the primitives
-# (src/kernel/kernel.rb) and commits the DB.
-def tc_reload_prims
-  <<-END.margin
-    | omit resultcheck
-    | input $GEMSTONE/upgrade/ruby/reloadprims.topaz
-  END
-end
-
-def tc_ensure_prims
-  <<-END.margin
-    |omit resultcheck
-    |run
-    |RubyContext ensurePrimsLoaded .
-    |%
-    |exit
-  END
-end
-
-
 # Returns a topaz command string that runs the set of passing vm tests
 # in src/test/vmunit.conf
 def tc_run_vmunit
