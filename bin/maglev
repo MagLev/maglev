@@ -150,16 +150,9 @@ fi
 
 ensurePrimsLoaded() {
   echo "Loading kernel if needed. It may take a few seconds..."
-#  $TOPAZ_CMD << EOF > /dev/null
-#    run
-#      RubyContext ensurePrimsLoaded.
-#%
-#exit
-#EOF
-  pushd $MAGLEV_HOME >>/dev/null
-  rake dev:ensureprims >>/dev/null
-  echo "Kernel is loaded."
-  popd >>/dev/null
+  $TOPAZ_CMD << EOF > /dev/null
+    input $GEMSTONE/upgrade/ruby/allprims.topaz
+EOF
 }
 
 startparser() {
