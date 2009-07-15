@@ -189,11 +189,11 @@ cat - >> $dbscript <<-EOFA
 set gemstone $stone
 login
 run
-| res ctx |
+|ctx|
 (ctx := RubyContext load: #($maglev_options) ) .
 ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) withDashE: #($dash_e) .
 GsFile stdout close . "ensure final LF on stdout"
-^ res
+^ nil
 %
 EOFA
 
