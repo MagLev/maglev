@@ -146,9 +146,9 @@ done
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$conf_file
 
-# Make sure we have at least one argument
 if [ $# -lt 1 ]; then
-  if [ -z $dash_e ]; then
+  if [ -z "${dash_e}" ]; then
+    # If no -e params and no script, then read commands from STDIN
     stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
     cat /dev/stdin > $stdinscript
     RUBYSCRIPT=$stdinscript
