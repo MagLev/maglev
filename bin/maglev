@@ -149,10 +149,17 @@ fi
 }
 
 ensurePrimsLoaded() {
-  echo "Loading kernel if needed. It may take a few seconds..."
   $TOPAZ_CMD << EOF > /dev/null
-    input $GEMSTONE/upgrade/ruby/allprims.topaz
+    login
+    obj RubyPrimsLoaded
+    quit
 EOF
+  if [ $? -ne 0 ] ; then
+    echo "Loading kernel. It may take a few seconds..."
+    $TOPAZ_CMD << EOF > /dev/null
+      input $GEMSTONE/upgrade/ruby/allprims.topaz
+EOF
+  fi
 }
 
 startparser() {
