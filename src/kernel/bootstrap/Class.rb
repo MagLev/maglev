@@ -1,4 +1,3 @@
-
 class Class
   # Ruby Class is identically Smalltalk's RClass
 
@@ -66,7 +65,6 @@ class Class
     inst
   end
 
-
   # In MagLev, rescue clauses use kind_of? implemented in C within the VM , to
   # determine if a the raised exception is to be handled by a specific rescue.
   # Reimplementations of === in ruby code will not be used by rescue clauses.
@@ -119,13 +117,28 @@ class Class
     name
   end
 
+  # Controls whether instances of receiver are persistable.  If the flag is
+  # +true+, then receiver is marked to allow instances to be persisted.
+  #
+  # If the flag is +false+, then receiver is marked to disallow instances
+  # to be persisted.  If reciever was previously marked to allow
+  # persistable instances, and instances have been committed to the
+  # repository, the call will succeed, and all further instances will not
+  # be committable.  The previously persisted instances remain in the
+  # repository (and will hold a reference to receiver) until they are
+  # cleared by the program.
+  #
+  # Raises +NotPersistableException+ if reciever is not persistable.
+  #
   def maglev_instances_persistable=(flag=true)
     unless self.maglev_persistable?
-      raise Maglev::NotPersistableException 
+      raise Maglev::NotPersistableException
     end
     self._set_instances_persistent(flag)
   end
-  primitive_nobridge '_set_instances_persistent', '_setInstancesPersistent:' 
-  primitive_nobridge 'maglev_instances_persistable?', '_instancesPersistent'
+  primitive_nobridge '_set_instances_persistent', '_setInstancesPersistent:'
 
+  # Returns +true+ if instances of receiver are allowed to be
+  # persisted. Returns +false+ otherwise.
+  primitive_nobridge 'maglev_instances_persistable?', '_instancesPersistent'
 end

@@ -53,7 +53,7 @@ class Module
   # Invoked as a callback when a_module includes receiver
   def included(a_module)
   end
- 
+
   # Callback invoked whenever the receiver is used to extend an object.
   # The object is passed as a paramter.
   def extended(a_module)
@@ -116,10 +116,26 @@ class Module
 
   primitive_nobridge '_method_protection', 'rubyMethodProtection'
 
+  # Controls whether receiver is persistable.
+  #
+  # If the +flag+ is true, then receiver is marked to allow itself to be
+  # persisted.  Since Modules and Classes are namespaces, all of receivers
+  # constants should hold persistable values or an exception will be raised
+  # at commit time.
+  #
+  # If the +flag+ is false, then receiver is marked to disallow itself to
+  # be persisted.  Receiver and its instances should be removed from
+  # persistent roots before the next <tt>Maglev.commit_transaction</tt>.
+  #
+  # If receiver is a class, this method does not affect the persistable
+  # instances flag (which is set to true by default). See
+  # <tt>Class#maglev_persistable_instances</tt> for controlling whether
+  # instances of the class are persistable.
   def maglev_persistable=(flag=true)
     self._set_persistable(flag)
-  end 
+  end
   primitive_nobridge '_set_persistable', '_setPersistable:'
-  primitive_nobridge 'maglev_persistable?', '_persistable'   
 
+  # Returns true if receiver is marked as persistable; false otherwise.
+  primitive_nobridge 'maglev_persistable?', '_persistable'
 end
