@@ -1,26 +1,20 @@
-# Define a Hat class that is persistent
-Maglev.persistent do
-  class Hat
-    def initialize
-      @contents = []
-    end
-
-    def put(item)
-      @contents << item
-      nil
-    end
-
-    def contents
-      @contents
-    end
-
-    def size
-      @contents.size
-    end
+# This class defines the Magician's Hat.  It is just a container for
+# Rabbits, doves and other things Magicians don't keep up their sleeve.
+class Hat
+  def initialize
+    @contents = []
   end
 
-  ::HAT = Hat.new
-end
-Maglev.commit_transaction # Save HAT and the class definition
+  def put(item)
+    @contents << item
+    nil
+  end
 
-puts "::HAT: #{::HAT.inspect}"
+  def contents
+    @contents
+  end
+
+  def size
+    @contents.size
+  end
+end
