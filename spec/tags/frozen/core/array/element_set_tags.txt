@@ -8,3 +8,4 @@ fails:Array#[]= with [index, count] replaces the section to other if idx < 0 and
 fails:Array#[]= with [index, count] replaces the section to other even if cnt spanning beyond the array boundary
 fails:Array#[]= with [index, count] raises an IndexError when passed start and negative length
 fails:Array#[]= with [m..n] inserts the other section at m if m > n
+fails:Array#[]= calls to_int on its start and length arguments

@@ -5,3 +5,5 @@ hangs:Thread#kill killing dying running does nothing
 breaks:Thread#kill sets $! in outer ensure clause if inner ensure clause raises exception
 breaks:Thread#kill can be rescued by outer rescue clause when inner ensure clause raises exception
 breaks:Thread#kill is deferred if ensure clause does Thread.stop
+fails:Thread#kill kills sleeping thread
+hangs:Thread#kill does not deadlock when called from within the thread while being joined from without

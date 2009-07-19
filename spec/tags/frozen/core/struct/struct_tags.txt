@@ -1,1 +1,2 @@
 fails:Struct subclasses can be subclassed
+fails:Struct anonymous class instance methods Enumerable methods should work

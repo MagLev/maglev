@@ -1,1 +1,2 @@
 fails:Module#ancestors returns only modules and classes
+fails:Module#ancestors returns a list of modules included in self (including self)

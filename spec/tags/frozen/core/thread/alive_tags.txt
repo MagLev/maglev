@@ -2,3 +2,4 @@ hangs:Thread#alive? describes a running thread
 breaks:Thread#alive? describes a dying running thread
 breaks:Thread#alive? describes a dying sleeping thread
 breaks:Thread#alive? reports aborting on a killed thread
+fails:Thread#alive? describes a sleeping thread
