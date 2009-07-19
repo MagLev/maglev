@@ -12,7 +12,6 @@ for MagLev Alpha Developers.  For more detail see:
   semantics of the persistence methods.  Comments outline use cases and
   provide additional insight.  Note: these MSpecs are not yet runnable.
 * The persistence API[link:classes/Maglev.html]
-* <tt>docs/persistence.rb</tt> provides Ruby pseudocode for the API.
 * The GemStone/S 64 Bit Programming Guide: provides a full discussion of
   the GemStone persistence model (including transactions, locking, etc.),
   http://seaside.gemstone.com/docs/GS64-ProgGuide-2.2.pdf.
