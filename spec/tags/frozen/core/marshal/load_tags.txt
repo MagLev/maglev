@@ -8,3 +8,4 @@ fails:Marshal::load loads a array containing the same objects
 fails:Marshal::load loads a 1..2
 fails:Marshal::load loads a 'a'..'b'
 fails:Marshal::load loads a 1...2
+fails:Marshal::load loads a Hash subclass
