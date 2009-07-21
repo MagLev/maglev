@@ -72,10 +72,11 @@ Maglev.persistent do
 
     def test_001
       Maglev::PERSISTENT_ROOT[:hat] = "A New Hat"
+      test(Maglev::PERSISTENT_ROOT[:hat], "A New Hat", '001 test: hat')
     end
 
     def check_001
-      test(Maglev::PERSISTENT_ROOT[:hat], "001: A New Hat", :check_001)
+      test(Maglev::PERSISTENT_ROOT[:hat], "A New Hat", '001 check: hat')
     end
 
     # test_002 waiting on track 553
@@ -112,7 +113,7 @@ Maglev.persistent do
 
     def check_003
       test(C003::XYZ,                   45, "003: C003::XYZ")
-      test(C003.class_variable,         22, "003: Class variable")
+#      test(C003.class_variable,         22, "003: Class variable")
       test(C003.class_instance_variable, 2, "003: Class instance variable")
       test(C003.new.instance_variable,   3, "003: Class instance variable")
       test(C003.maglev_persistable?,  true, "003: C003.maglev_persistable?")
@@ -219,9 +220,9 @@ Maglev.persistent do
     end
 
     def check_007
-      test(C::A_CONST, 1, "007: A_CONST")
-      test(defined?(C::A_NON_PERSISTENT_CONST), false, "007: A_NON_PERSISTENT_CONST")
-      test(C::A_SECOND_PERSISTENT_CONST, 53, "007: A_SECOND_PERSISTENT_CONST")
+      test(C007::A_CONST, 1, "007: A_CONST")
+      test(defined?(C007::A_NON_PERSISTENT_CONST), nil, "007: A_NON_PERSISTENT_CONST")
+      test(C007::A_SECOND_PERSISTENT_CONST, 53, "007: A_SECOND_PERSISTENT_CONST")
       c = C007.new
       test(c.respond_to?(:a_persistent_method), true, "007: C007#a_persistent_method")
       test(c.respond_to?(:an_ambiguous_method), true, "007: C007#an_ambiguous_method")
@@ -230,21 +231,35 @@ Maglev.persistent do
 
     # Basic test that Module#maglev_persistable= and
     # Module#maglev_persitable? work
-    def test_008
-      require 't008'
-    end
-    def check_008
-      foos = Maglev::PERSISTENT_ROOT[:my_favorite_foos]
-      test(foos.size, 1, '008: Maglev::PERSISTENT_ROOT[:my_favorite_foos].size')
-      test(Foo.maglev_persistable?, true, '008: Foo.maglev_persistable?')
+#     def test_008
+#       require 't008'
+#     end
+#     def check_008
+#       foos = Maglev::PERSISTENT_ROOT[:my_favorite_foos]
+#       test(foos.size, 1, '008: Maglev::PERSISTENT_ROOT[:my_favorite_foos].size')
+#       test(Foo.maglev_persistable?, true, '008: Foo.maglev_persistable?')
+#     end
+
+#     # Test that wrapping Maglev.persistent and Maglev.transient around a require works
+#     def test_009
+#     end
+
+#     def check_009
+#     end
+
+    # https://magtrac.gemstone.com/ticket/553  Trac 553
+    def test_010
+      require 't010'
+      test(X10, 123, '010 test: X10')
+      test(X20, 678, '010 test: X20')
     end
 
-    # Test that wrapping Maglev.persistent and Maglev.transient around a require works
-    def test_009
+    def check_010
+      # New VM should not see the transient value
+      test(X10, 123, '010 check: X10')
+      test(X20, 345, '010 check: X20')
     end
 
-    def check_009
-    end
     ########################################
     # Test Framework Methods
     ########################################
