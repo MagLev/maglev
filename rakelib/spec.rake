@@ -5,7 +5,7 @@ namespace :spec do
   SPEC_DIR  = File.dirname(__FILE__) + '/../spec'
   RSPEC_DIR = "#{SPEC_DIR}/rubyspec/1.8/"
   MSPEC_CMD = "#{SPEC_DIR}/mspec/bin/mspec"
-  DEBUG     = "-T -d"   # flags to mspec to pass -d onto maglev
+  DEBUG     = "-B #{MAGLEV_HOME}/debug.mspec"   # flags to include the debug stuff
 
   desc "Run the continuous integration specs against MRI"
   task :mri do
