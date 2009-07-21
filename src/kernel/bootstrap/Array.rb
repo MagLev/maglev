@@ -207,6 +207,7 @@ class Array
     if self.equal?(Array)
       if arg._isFixnum
         a = _alloc(arg, nil)
+        return a
       elsif arg._isArray
         a = _withall(arg)
       else
