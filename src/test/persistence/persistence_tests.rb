@@ -260,6 +260,23 @@ Maglev.persistent do
       test(X20, 345, '010 check: X20')
     end
 
+    # https://magtrac.gemstone.com/ticket/552  Trac 552
+    def test_011
+      Maglev.persistent do
+        require 't011_trac552'
+      end
+      Maglev.commit_transaction
+      test(C.new.m_meth, 'M', '011 test: m_meth')
+      test(C.new.methods.grep(/m_meth$/), ['m_meth'], '011 test: C methods')
+      test(M.methods.grep(/m_meth$/), [], '011 test: M methods')
+    end
+
+    def check_011
+      test(C.new.m_meth, 'M', '011 check: m_meth')
+      test(C.new.methods.grep(/m_meth$/), ['m_meth'], '011 check: C methods')
+      test(M.methods.grep(/m_meth$/), [], '011 check: M methods')
+    end
+
     ########################################
     # Test Framework Methods
     ########################################
