@@ -1,0 +1,4 @@
+This directory contains a few simple apps to test that rack works in
+MagLev.  rackup is not yet working.  All apps run on http://localhost:9292.
+
+Just run them like: "$ maglev-ruby app1.rb"
