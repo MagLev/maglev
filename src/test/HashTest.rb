@@ -417,4 +417,14 @@ end
 hh = HHash.new
 hh.delete(nil)
 
+# Another bug where subclasses don't call super in their initialize method
+# caused problems.  This test case passes if there is no exception.
+class BHash < Hash
+  def initialize
+    # don't call super
+  end
+end
+bh = BHash.new
+bh['foo']
+
 report

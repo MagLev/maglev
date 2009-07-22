@@ -21,7 +21,7 @@ class Hash
     else
       # raises ArgumentError, too-many args, unless  a subclass of Hash
       #   has implemented forms of initialize to take > 1 arg
-      h = self._new(5)
+      h = self._st_initialized_instance
       h.initialize(*args)
     end
     h
@@ -29,24 +29,23 @@ class Hash
 
   def self.new(&block)
     # subsequent variants replace just the corresponding bridge method
+    h = self._st_initialized_instance
     if block_given?
-      h = self._new(5)
       h.initialize(&block)
     else
-      h = self._new(5)
       h.initialize
     end
     h
   end
 
   def self.new
-    h = self._new(5)
+    h = self._st_initialized_instance
     h.initialize
     h
   end
 
   def self.new(default_value)
-    h = self._new(5)
+    h = self._st_initialized_instance
     h.initialize(default_value)
     h
   end
@@ -54,8 +53,17 @@ class Hash
   def self.new(default_value, &block)
     # raises ArgumentError, too-many args, unless  a subclass of Hash
     #   has implemented forms of initialize to take > 1 arg
-    h = self._new(5)
+    h = self._st_initialized_instance
     h.initialize(default_value, &block) # raises too-many args
+    h
+  end
+
+  def self._st_initialized_instance
+    h = self._new(5)
+    # protects us from subclasses that don't call super in their initialize
+    # method (i.e., Rack 1.0.0).  At least all of the smalltalk inst vars
+    # will be initialized.
+    h.default=(nil)
     h
   end
 
