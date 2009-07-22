@@ -180,16 +180,15 @@ class Hash
   primitive 'default_proc' , 'defaultBlock'
 
   def delete(key, &blk)
-    v = self.delete(key) 
-    if block_given? 
+    v = self._delete(key)
+    if block_given?
       if v.equal?(@sentinel)
         return  blk.call(key)
       end
     end
     v
   end
-
-  primitive 'delete', 'removeKey:'
+  primitive '_delete', 'removeKey:'
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
@@ -209,13 +208,13 @@ class Hash
     self
   end
 
-  def _call_block(arga, &blk) 
-    "to be called from smalltalk"  
+  def _call_block(arga, &blk)
+    "to be called from smalltalk"
      blk.call(arga)
   end
 
-  def _call_block(arga, argb, &blk) 
-    "to be called from smalltalk"  
+  def _call_block(arga, argb, &blk)
+    "to be called from smalltalk"
      blk.call(arga, argb)
   end
 
