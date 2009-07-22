@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+	<title>Class: Rack::RewindableInput</title>
+
+	<link rel="stylesheet" href="../rdoc.css" type="text/css" media="screen" />
+
+	<script src="../js/jquery.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../js/thickbox-compressed.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../js/quicksearch.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../js/darkfish.js" type="text/javascript"
+		charset="utf-8"></script>
+
+</head>
+<body class="class">
+
+	<div id="metadata">
+		<div id="file-metadata">
+			<div id="file-list-section" class="section">
+				<h3 class="section-header">In Files</h3>
+				<div class="section-body">
+					<ul>
+					
+						<li><a href="../lib/rack/rewindable_input_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+							class="thickbox" title="lib/rack/rewindable_input.rb">lib/rack/rewindable_input.rb</a></li>
+					
+					</ul>
+				</div>
+			</div>
+
+			
+		</div>
+
+		<div id="class-metadata">
+
+			<!-- Parent Class -->
+			
+			<div id="parent-class-section" class="section">
+				<h3 class="section-header">Parent</h3>
+				
+				<p class="link">Object</p>
+				
+			</div>
+			
+
+			<!-- Namespace Contents -->
+			
+			<div id="namespace-list-section" class="section">
+				<h3 class="section-header">Namespace</h3>
+				<ul class="link-list">
+					
+					<li><span class="type">CLASS</span> <a href="RewindableInput/Tempfile.html">Rack::RewindableInput::Tempfile</a></li>
+					
+				</ul>
+			</div>
+			
+
+			<!-- Method Quickref -->
+			
+			<div id="method-list-section" class="section">
+				<h3 class="section-header">Methods</h3>
+				<ul class="link-list">
+					
+					<li><a href="#M000263">::new</a></li>
+					
+					<li><a href="#M000268">#close</a></li>
+					
+					<li><a href="#M000266">#each</a></li>
+					
+					<li><a href="#M000271">#filesystem_has_posix_semantics?</a></li>
+					
+					<li><a href="#M000264">#gets</a></li>
+					
+					<li><a href="#M000270">#make_rewindable</a></li>
+					
+					<li><a href="#M000265">#read</a></li>
+					
+					<li><a href="#M000267">#rewind</a></li>
+					
+				</ul>
+			</div>
+			
+
+			<!-- Included Modules -->
+			
+		</div>
+
+		<div id="project-metadata">
+			
+			
+			<div id="fileindex-section" class="section project-section">
+				<h3 class="section-header">Files</h3>
+				<ul>
+				
+					<li class="file"><a href="../KNOWN-ISSUES.html">KNOWN-ISSUES</a></li>
+				
+					<li class="file"><a href="../RDOX.html">RDOX</a></li>
+				
+					<li class="file"><a href="../README.html">README</a></li>
+				
+					<li class="file"><a href="../SPEC.html">SPEC</a></li>
+				
+				</ul>
+			</div>
+			
+
+			<div id="classindex-section" class="section project-section">
+				<h3 class="section-header">Class Index
+					<span class="search-toggle"><img src="../images/find.png"
+						height="16" width="16" alt="[+]"
+						title="show/hide quicksearch" /></span></h3>
+				<form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+				<fieldset>
+					<legend>Quicksearch</legend>
+					<input type="text" name="quicksearch" value=""
+						class="quicksearch-field" />
+				</fieldset>
+				</form>
+
+				<ul class="link-list">
+				
+					<li><a href="../Rack.html">Rack</a></li>
+				
+					<li><a href="../Rack/Adapter.html">Rack::Adapter</a></li>
+				
+					<li><a href="../Rack/Adapter/Camping.html">Rack::Adapter::Camping</a></li>
+				
+					<li><a href="../Rack/Auth.html">Rack::Auth</a></li>
+				
+					<li><a href="../Rack/Auth/AbstractHandler.html">Rack::Auth::AbstractHandler</a></li>
+				
+					<li><a href="../Rack/Auth/AbstractRequest.html">Rack::Auth::AbstractRequest</a></li>
+				
+					<li><a href="../Rack/Auth/Basic.html">Rack::Auth::Basic</a></li>
+				
+					<li><a href="../Rack/Auth/Basic/Request.html">Rack::Auth::Basic::Request</a></li>
+				
+					<li><a href="../Rack/Auth/Digest.html">Rack::Auth::Digest</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/MD5.html">Rack::Auth::Digest::MD5</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/Nonce.html">Rack::Auth::Digest::Nonce</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/Params.html">Rack::Auth::Digest::Params</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/Request.html">Rack::Auth::Digest::Request</a></li>
+				
+					<li><a href="../Rack/Auth/OpenID.html">Rack::Auth::OpenID</a></li>
+				
+					<li><a href="../Rack/Auth/OpenID/BadExtension.html">Rack::Auth::OpenID::BadExtension</a></li>
+				
+					<li><a href="../Rack/Auth/OpenID/NoSession.html">Rack::Auth::OpenID::NoSession</a></li>
+				
+					<li><a href="../Rack/Auth/OpenIDAuth.html">Rack::Auth::OpenIDAuth</a></li>
+				
+					<li><a href="../Rack/Builder.html">Rack::Builder</a></li>
+				
+					<li><a href="../Rack/Cascade.html">Rack::Cascade</a></li>
+				
+					<li><a href="../Rack/Chunked.html">Rack::Chunked</a></li>
+				
+					<li><a href="../Rack/CommonLogger.html">Rack::CommonLogger</a></li>
+				
+					<li><a href="../Rack/ConditionalGet.html">Rack::ConditionalGet</a></li>
+				
+					<li><a href="../Rack/ContentLength.html">Rack::ContentLength</a></li>
+				
+					<li><a href="../Rack/ContentType.html">Rack::ContentType</a></li>
+				
+					<li><a href="../Rack/Deflater.html">Rack::Deflater</a></li>
+				
+					<li><a href="../Rack/Deflater/DeflateStream.html">Rack::Deflater::DeflateStream</a></li>
+				
+					<li><a href="../Rack/Deflater/GzipStream.html">Rack::Deflater::GzipStream</a></li>
+				
+					<li><a href="../Rack/Directory.html">Rack::Directory</a></li>
+				
+					<li><a href="../Rack/File.html">Rack::File</a></li>
+				
+					<li><a href="../Rack/ForwardRequest.html">Rack::ForwardRequest</a></li>
+				
+					<li><a href="../Rack/Handler.html">Rack::Handler</a></li>
+				
+					<li><a href="../Rack/Handler/CGI.html">Rack::Handler::CGI</a></li>
+				
+					<li><a href="../Rack/Handler/EventedMongrel.html">Rack::Handler::EventedMongrel</a></li>
+				
+					<li><a href="../Rack/Handler/FastCGI.html">Rack::Handler::FastCGI</a></li>
+				
+					<li><a href="../Rack/Handler/LSWS.html">Rack::Handler::LSWS</a></li>
+				
+					<li><a href="../Rack/Handler/Mongrel.html">Rack::Handler::Mongrel</a></li>
+				
+					<li><a href="../Rack/Handler/SCGI.html">Rack::Handler::SCGI</a></li>
+				
+					<li><a href="../Rack/Handler/SwiftipliedMongrel.html">Rack::Handler::SwiftipliedMongrel</a></li>
+				
+					<li><a href="../Rack/Handler/Thin.html">Rack::Handler::Thin</a></li>
+				
+					<li><a href="../Rack/Handler/WEBrick.html">Rack::Handler::WEBrick</a></li>
+				
+					<li><a href="../Rack/Head.html">Rack::Head</a></li>
+				
+					<li><a href="../Rack/Lint.html">Rack::Lint</a></li>
+				
+					<li><a href="../Rack/Lobster.html">Rack::Lobster</a></li>
+				
+					<li><a href="../Rack/Lock.html">Rack::Lock</a></li>
+				
+					<li><a href="../Rack/MethodOverride.html">Rack::MethodOverride</a></li>
+				
+					<li><a href="../Rack/Mime.html">Rack::Mime</a></li>
+				
+					<li><a href="../Rack/MockRequest.html">Rack::MockRequest</a></li>
+				
+					<li><a href="../Rack/MockRequest/FatalWarner.html">Rack::MockRequest::FatalWarner</a></li>
+				
+					<li><a href="../Rack/MockRequest/FatalWarning.html">Rack::MockRequest::FatalWarning</a></li>
+				
+					<li><a href="../Rack/MockResponse.html">Rack::MockResponse</a></li>
+				
+					<li><a href="../Rack/Recursive.html">Rack::Recursive</a></li>
+				
+					<li><a href="../Rack/Reloader.html">Rack::Reloader</a></li>
+				
+					<li><a href="../Rack/Reloader/Stat.html">Rack::Reloader::Stat</a></li>
+				
+					<li><a href="../Rack/Request.html">Rack::Request</a></li>
+				
+					<li><a href="../Rack/Response.html">Rack::Response</a></li>
+				
+					<li><a href="../Rack/Response/Helpers.html">Rack::Response::Helpers</a></li>
+				
+					<li><a href="../Rack/RewindableInput.html">Rack::RewindableInput</a></li>
+				
+					<li><a href="../Rack/RewindableInput/Tempfile.html">Rack::RewindableInput::Tempfile</a></li>
+				
+					<li><a href="../Rack/Session.html">Rack::Session</a></li>
+				
+					<li><a href="../Rack/Session/Abstract.html">Rack::Session::Abstract</a></li>
+				
+					<li><a href="../Rack/Session/Abstract/ID.html">Rack::Session::Abstract::ID</a></li>
+				
+					<li><a href="../Rack/Session/Cookie.html">Rack::Session::Cookie</a></li>
+				
+					<li><a href="../Rack/Session/Memcache.html">Rack::Session::Memcache</a></li>
+				
+					<li><a href="../Rack/Session/Pool.html">Rack::Session::Pool</a></li>
+				
+					<li><a href="../Rack/ShowExceptions.html">Rack::ShowExceptions</a></li>
+				
+					<li><a href="../Rack/ShowStatus.html">Rack::ShowStatus</a></li>
+				
+					<li><a href="../Rack/Static.html">Rack::Static</a></li>
+				
+					<li><a href="../Rack/URLMap.html">Rack::URLMap</a></li>
+				
+					<li><a href="../Rack/Utils.html">Rack::Utils</a></li>
+				
+					<li><a href="../Rack/Utils/Context.html">Rack::Utils::Context</a></li>
+				
+					<li><a href="../Rack/Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></li>
+				
+					<li><a href="../Rack/Utils/Multipart.html">Rack::Utils::Multipart</a></li>
+				
+					<li><a href="../FCGI.html">FCGI</a></li>
+				
+					<li><a href="../FCGI/Stream.html">FCGI::Stream</a></li>
+				
+				</ul>
+				<div id="no-class-search-results" style="display: none;">No matching classes.</div>
+			</div>
+
+			
+		</div>
+	</div>
+
+	<div id="documentation">
+		<h1 class="class">Rack::RewindableInput</h1>
+
+		<div id="description">
+			<p>
+Class which can make any IO object rewindable, including non-rewindable
+ones. It does this by buffering the data into a tempfile, which is
+rewindable.
+</p>
+<p>
+rack.input is required to be rewindable, so if your input stream IO is
+non-rewindable by nature (e.g. a pipe or a socket) then you can wrap it in
+an object of this class to easily make it rewindable.
+</p>
+<p>
+Don&#8217;t forget to call <a href="RewindableInput.html#M000268">close</a>
+when you&#8217;re done. This frees up temporary resources that <a
+href="RewindableInput.html">RewindableInput</a> uses, though it does
+<b>not</b> close the original IO object.
+</p>
+
+		</div>
+
+		<!-- Constants -->
+		
+
+		<!-- Attributes -->
+		
+
+		<!-- Methods -->
+		
+		<div id="public-class-method-details" class="method-section section">
+			<h3 class="section-header">Public Class Methods</h3>
+
+		
+			<div id="new-method" class="method-detail ">
+				<a name="M000263"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">new</span><span
+						class="method-args">(io)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="new-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 14</span>
+14:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">io</span>)
+15:       <span class="ruby-ivar">@io</span> = <span class="ruby-identifier">io</span>
+16:       <span class="ruby-ivar">@rewindable_io</span> = <span class="ruby-keyword kw">nil</span>
+17:       <span class="ruby-ivar">@unlinked</span> = <span class="ruby-keyword kw">false</span>
+18:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+		<div id="public-instance-method-details" class="method-section section">
+			<h3 class="section-header">Public Instance Methods</h3>
+
+		
+			<div id="close-method" class="method-detail ">
+				<a name="M000268"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">close</span><span
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Closes this <a href="RewindableInput.html">RewindableInput</a> object
+without closing the originally wrapped IO oject. Cleans up any temporary
+resources that this <a href="RewindableInput.html">RewindableInput</a> has
+created.
+</p>
+<p>
+This method may be called multiple times. It does nothing on subsequent
+calls.
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="close-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 45</span>
+45:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">close</span>
+46:       <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@rewindable_io</span>
+47:         <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@unlinked</span>
+48:           <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">close</span>
+49:         <span class="ruby-keyword kw">else</span>
+50:           <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">close!</span>
+51:         <span class="ruby-keyword kw">end</span>
+52:         <span class="ruby-ivar">@rewindable_io</span> = <span class="ruby-keyword kw">nil</span>
+53:       <span class="ruby-keyword kw">end</span>
+54:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="each-method" class="method-detail ">
+				<a name="M000266"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">each</span><span
+						class="method-args">(&block)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="each-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 30</span>
+30:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+31:       <span class="ruby-identifier">make_rewindable</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@rewindable_io</span>
+32:       <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+33:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="gets-method" class="method-detail ">
+				<a name="M000264"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">gets</span><span
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="gets-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 20</span>
+20:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">gets</span>
+21:       <span class="ruby-identifier">make_rewindable</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@rewindable_io</span>
+22:       <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">gets</span>
+23:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="read-method" class="method-detail ">
+				<a name="M000265"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">read</span><span
+						class="method-args">(*args)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="read-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 25</span>
+25:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+26:       <span class="ruby-identifier">make_rewindable</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@rewindable_io</span>
+27:       <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">read</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+28:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="rewind-method" class="method-detail ">
+				<a name="M000267"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">rewind</span><span
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="rewind-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 35</span>
+35:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rewind</span>
+36:       <span class="ruby-identifier">make_rewindable</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@rewindable_io</span>
+37:       <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">rewind</span>
+38:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+		<div id="private-instance-method-details" class="method-section section">
+			<h3 class="section-header">Private Instance Methods</h3>
+
+		
+			<div id="filesystem-has-posix-semantics--method" class="method-detail ">
+				<a name="M000271"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">filesystem_has_posix_semantics?</span><span
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="filesystem-has-posix-semantics--source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 94</span>
+94:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">filesystem_has_posix_semantics?</span>
+95:       <span class="ruby-constant">RUBY_PLATFORM</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/(mswin|mingw|cygwin|java)/</span>
+96:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="make-rewindable-method" class="method-detail ">
+				<a name="M000270"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">make_rewindable</span><span
+						class="method-args">()</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="make-rewindable-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/rewindable_input.rb, line 67</span>
+67:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">make_rewindable</span>
+68:       <span class="ruby-comment cmt"># Buffer all data into a tempfile. Since this tempfile is private to this</span>
+69:       <span class="ruby-comment cmt"># RewindableInput object, we chmod it so that nobody else can read or write</span>
+70:       <span class="ruby-comment cmt"># it. On POSIX filesystems we also unlink the file so that it doesn't</span>
+71:       <span class="ruby-comment cmt"># even have a file entry on the filesystem anymore, though we can still</span>
+72:       <span class="ruby-comment cmt"># access it because we have the file handle open.</span>
+73:       <span class="ruby-ivar">@rewindable_io</span> = <span class="ruby-constant">Tempfile</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'RackRewindableInput'</span>)
+74:       <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">chmod</span>(<span class="ruby-value">0000</span>)
+75:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">filesystem_has_posix_semantics?</span>
+76:         <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">unlink</span>
+77:         <span class="ruby-ivar">@unlinked</span> = <span class="ruby-keyword kw">true</span>
+78:       <span class="ruby-keyword kw">end</span>
+79:       
+80:       <span class="ruby-identifier">buffer</span> = <span class="ruby-value str">&quot;&quot;</span>
+81:       <span class="ruby-keyword kw">while</span> <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">read</span>(<span class="ruby-value">1024</span> <span class="ruby-operator">*</span> <span class="ruby-value">4</span>, <span class="ruby-identifier">buffer</span>)
+82:         <span class="ruby-identifier">entire_buffer_written_out</span> = <span class="ruby-keyword kw">false</span>
+83:         <span class="ruby-keyword kw">while</span> <span class="ruby-operator">!</span><span class="ruby-identifier">entire_buffer_written_out</span>
+84:           <span class="ruby-identifier">written</span> = <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">buffer</span>)
+85:           <span class="ruby-identifier">entire_buffer_written_out</span> = <span class="ruby-identifier">written</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">buffer</span>.<span class="ruby-identifier">size</span>
+86:           <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">entire_buffer_written_out</span>
+87:             <span class="ruby-identifier">buffer</span>.<span class="ruby-identifier">slice!</span>(<span class="ruby-value">0</span> <span class="ruby-operator">..</span> <span class="ruby-identifier">written</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)
+88:           <span class="ruby-keyword kw">end</span>
+89:         <span class="ruby-keyword kw">end</span>
+90:       <span class="ruby-keyword kw">end</span>
+91:       <span class="ruby-ivar">@rewindable_io</span>.<span class="ruby-identifier">rewind</span>
+92:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+
+	</div>
+
+
+	<div id="rdoc-debugging-section-dump" class="debugging-section">
+	
+		<p>Disabled; run with --debug to generate this.</p>
+	
+	</div>
+
+	<div id="validator-badges">
+		<p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+		<p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+			Rdoc Generator</a> 1.1.6</small>.</p>
+	</div>
+
+</body>
+</html>
+

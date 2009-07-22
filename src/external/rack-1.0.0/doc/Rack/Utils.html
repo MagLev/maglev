@@ -1,0 +1,1223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+	<title>Module: Rack::Utils</title>
+
+	<link rel="stylesheet" href="../rdoc.css" type="text/css" media="screen" />
+
+	<script src="../js/jquery.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../js/thickbox-compressed.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../js/quicksearch.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../js/darkfish.js" type="text/javascript"
+		charset="utf-8"></script>
+
+</head>
+<body class="module">
+
+	<div id="metadata">
+		<div id="file-metadata">
+			<div id="file-list-section" class="section">
+				<h3 class="section-header">In Files</h3>
+				<div class="section-body">
+					<ul>
+					
+						<li><a href="../lib/rack/utils_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+							class="thickbox" title="lib/rack/utils.rb">lib/rack/utils.rb</a></li>
+					
+					</ul>
+				</div>
+			</div>
+
+			
+		</div>
+
+		<div id="class-metadata">
+
+			<!-- Parent Class -->
+			
+
+			<!-- Namespace Contents -->
+			
+			<div id="namespace-list-section" class="section">
+				<h3 class="section-header">Namespace</h3>
+				<ul class="link-list">
+					
+					<li><span class="type">MODULE</span> <a href="Utils/Multipart.html">Rack::Utils::Multipart</a></li>
+					
+					<li><span class="type">CLASS</span> <a href="Utils/Context.html">Rack::Utils::Context</a></li>
+					
+					<li><span class="type">CLASS</span> <a href="Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></li>
+					
+				</ul>
+			</div>
+			
+
+			<!-- Method Quickref -->
+			
+			<div id="method-list-section" class="section">
+				<h3 class="section-header">Methods</h3>
+				<ul class="link-list">
+					
+					<li><a href="#M000314">::build_query</a></li>
+					
+					<li><a href="#M000318">::bytesize</a></li>
+					
+					<li><a href="#M000317">::bytesize</a></li>
+					
+					<li><a href="#M000307">::escape</a></li>
+					
+					<li><a href="#M000315">::escape_html</a></li>
+					
+					<li><a href="#M000313">::normalize_params</a></li>
+					
+					<li><a href="#M000310">::parse_nested_query</a></li>
+					
+					<li><a href="#M000309">::parse_query</a></li>
+					
+					<li><a href="#M000316">::select_best_encoding</a></li>
+					
+					<li><a href="#M000308">::unescape</a></li>
+					
+					<li><a href="#M000314">#build_query</a></li>
+					
+					<li><a href="#M000317">#bytesize</a></li>
+					
+					<li><a href="#M000318">#bytesize</a></li>
+					
+					<li><a href="#M000307">#escape</a></li>
+					
+					<li><a href="#M000315">#escape_html</a></li>
+					
+					<li><a href="#M000313">#normalize_params</a></li>
+					
+					<li><a href="#M000310">#parse_nested_query</a></li>
+					
+					<li><a href="#M000309">#parse_query</a></li>
+					
+					<li><a href="#M000316">#select_best_encoding</a></li>
+					
+					<li><a href="#M000308">#unescape</a></li>
+					
+				</ul>
+			</div>
+			
+
+			<!-- Included Modules -->
+			
+		</div>
+
+		<div id="project-metadata">
+			
+			
+			<div id="fileindex-section" class="section project-section">
+				<h3 class="section-header">Files</h3>
+				<ul>
+				
+					<li class="file"><a href="../KNOWN-ISSUES.html">KNOWN-ISSUES</a></li>
+				
+					<li class="file"><a href="../RDOX.html">RDOX</a></li>
+				
+					<li class="file"><a href="../README.html">README</a></li>
+				
+					<li class="file"><a href="../SPEC.html">SPEC</a></li>
+				
+				</ul>
+			</div>
+			
+
+			<div id="classindex-section" class="section project-section">
+				<h3 class="section-header">Class Index
+					<span class="search-toggle"><img src="../images/find.png"
+						height="16" width="16" alt="[+]"
+						title="show/hide quicksearch" /></span></h3>
+				<form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+				<fieldset>
+					<legend>Quicksearch</legend>
+					<input type="text" name="quicksearch" value=""
+						class="quicksearch-field" />
+				</fieldset>
+				</form>
+
+				<ul class="link-list">
+				
+					<li><a href="../Rack.html">Rack</a></li>
+				
+					<li><a href="../Rack/Adapter.html">Rack::Adapter</a></li>
+				
+					<li><a href="../Rack/Adapter/Camping.html">Rack::Adapter::Camping</a></li>
+				
+					<li><a href="../Rack/Auth.html">Rack::Auth</a></li>
+				
+					<li><a href="../Rack/Auth/AbstractHandler.html">Rack::Auth::AbstractHandler</a></li>
+				
+					<li><a href="../Rack/Auth/AbstractRequest.html">Rack::Auth::AbstractRequest</a></li>
+				
+					<li><a href="../Rack/Auth/Basic.html">Rack::Auth::Basic</a></li>
+				
+					<li><a href="../Rack/Auth/Basic/Request.html">Rack::Auth::Basic::Request</a></li>
+				
+					<li><a href="../Rack/Auth/Digest.html">Rack::Auth::Digest</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/MD5.html">Rack::Auth::Digest::MD5</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/Nonce.html">Rack::Auth::Digest::Nonce</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/Params.html">Rack::Auth::Digest::Params</a></li>
+				
+					<li><a href="../Rack/Auth/Digest/Request.html">Rack::Auth::Digest::Request</a></li>
+				
+					<li><a href="../Rack/Auth/OpenID.html">Rack::Auth::OpenID</a></li>
+				
+					<li><a href="../Rack/Auth/OpenID/BadExtension.html">Rack::Auth::OpenID::BadExtension</a></li>
+				
+					<li><a href="../Rack/Auth/OpenID/NoSession.html">Rack::Auth::OpenID::NoSession</a></li>
+				
+					<li><a href="../Rack/Auth/OpenIDAuth.html">Rack::Auth::OpenIDAuth</a></li>
+				
+					<li><a href="../Rack/Builder.html">Rack::Builder</a></li>
+				
+					<li><a href="../Rack/Cascade.html">Rack::Cascade</a></li>
+				
+					<li><a href="../Rack/Chunked.html">Rack::Chunked</a></li>
+				
+					<li><a href="../Rack/CommonLogger.html">Rack::CommonLogger</a></li>
+				
+					<li><a href="../Rack/ConditionalGet.html">Rack::ConditionalGet</a></li>
+				
+					<li><a href="../Rack/ContentLength.html">Rack::ContentLength</a></li>
+				
+					<li><a href="../Rack/ContentType.html">Rack::ContentType</a></li>
+				
+					<li><a href="../Rack/Deflater.html">Rack::Deflater</a></li>
+				
+					<li><a href="../Rack/Deflater/DeflateStream.html">Rack::Deflater::DeflateStream</a></li>
+				
+					<li><a href="../Rack/Deflater/GzipStream.html">Rack::Deflater::GzipStream</a></li>
+				
+					<li><a href="../Rack/Directory.html">Rack::Directory</a></li>
+				
+					<li><a href="../Rack/File.html">Rack::File</a></li>
+				
+					<li><a href="../Rack/ForwardRequest.html">Rack::ForwardRequest</a></li>
+				
+					<li><a href="../Rack/Handler.html">Rack::Handler</a></li>
+				
+					<li><a href="../Rack/Handler/CGI.html">Rack::Handler::CGI</a></li>
+				
+					<li><a href="../Rack/Handler/EventedMongrel.html">Rack::Handler::EventedMongrel</a></li>
+				
+					<li><a href="../Rack/Handler/FastCGI.html">Rack::Handler::FastCGI</a></li>
+				
+					<li><a href="../Rack/Handler/LSWS.html">Rack::Handler::LSWS</a></li>
+				
+					<li><a href="../Rack/Handler/Mongrel.html">Rack::Handler::Mongrel</a></li>
+				
+					<li><a href="../Rack/Handler/SCGI.html">Rack::Handler::SCGI</a></li>
+				
+					<li><a href="../Rack/Handler/SwiftipliedMongrel.html">Rack::Handler::SwiftipliedMongrel</a></li>
+				
+					<li><a href="../Rack/Handler/Thin.html">Rack::Handler::Thin</a></li>
+				
+					<li><a href="../Rack/Handler/WEBrick.html">Rack::Handler::WEBrick</a></li>
+				
+					<li><a href="../Rack/Head.html">Rack::Head</a></li>
+				
+					<li><a href="../Rack/Lint.html">Rack::Lint</a></li>
+				
+					<li><a href="../Rack/Lobster.html">Rack::Lobster</a></li>
+				
+					<li><a href="../Rack/Lock.html">Rack::Lock</a></li>
+				
+					<li><a href="../Rack/MethodOverride.html">Rack::MethodOverride</a></li>
+				
+					<li><a href="../Rack/Mime.html">Rack::Mime</a></li>
+				
+					<li><a href="../Rack/MockRequest.html">Rack::MockRequest</a></li>
+				
+					<li><a href="../Rack/MockRequest/FatalWarner.html">Rack::MockRequest::FatalWarner</a></li>
+				
+					<li><a href="../Rack/MockRequest/FatalWarning.html">Rack::MockRequest::FatalWarning</a></li>
+				
+					<li><a href="../Rack/MockResponse.html">Rack::MockResponse</a></li>
+				
+					<li><a href="../Rack/Recursive.html">Rack::Recursive</a></li>
+				
+					<li><a href="../Rack/Reloader.html">Rack::Reloader</a></li>
+				
+					<li><a href="../Rack/Reloader/Stat.html">Rack::Reloader::Stat</a></li>
+				
+					<li><a href="../Rack/Request.html">Rack::Request</a></li>
+				
+					<li><a href="../Rack/Response.html">Rack::Response</a></li>
+				
+					<li><a href="../Rack/Response/Helpers.html">Rack::Response::Helpers</a></li>
+				
+					<li><a href="../Rack/RewindableInput.html">Rack::RewindableInput</a></li>
+				
+					<li><a href="../Rack/RewindableInput/Tempfile.html">Rack::RewindableInput::Tempfile</a></li>
+				
+					<li><a href="../Rack/Session.html">Rack::Session</a></li>
+				
+					<li><a href="../Rack/Session/Abstract.html">Rack::Session::Abstract</a></li>
+				
+					<li><a href="../Rack/Session/Abstract/ID.html">Rack::Session::Abstract::ID</a></li>
+				
+					<li><a href="../Rack/Session/Cookie.html">Rack::Session::Cookie</a></li>
+				
+					<li><a href="../Rack/Session/Memcache.html">Rack::Session::Memcache</a></li>
+				
+					<li><a href="../Rack/Session/Pool.html">Rack::Session::Pool</a></li>
+				
+					<li><a href="../Rack/ShowExceptions.html">Rack::ShowExceptions</a></li>
+				
+					<li><a href="../Rack/ShowStatus.html">Rack::ShowStatus</a></li>
+				
+					<li><a href="../Rack/Static.html">Rack::Static</a></li>
+				
+					<li><a href="../Rack/URLMap.html">Rack::URLMap</a></li>
+				
+					<li><a href="../Rack/Utils.html">Rack::Utils</a></li>
+				
+					<li><a href="../Rack/Utils/Context.html">Rack::Utils::Context</a></li>
+				
+					<li><a href="../Rack/Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></li>
+				
+					<li><a href="../Rack/Utils/Multipart.html">Rack::Utils::Multipart</a></li>
+				
+					<li><a href="../FCGI.html">FCGI</a></li>
+				
+					<li><a href="../FCGI/Stream.html">FCGI::Stream</a></li>
+				
+				</ul>
+				<div id="no-class-search-results" style="display: none;">No matching classes.</div>
+			</div>
+
+			
+		</div>
+	</div>
+
+	<div id="documentation">
+		<h1 class="module">Rack::Utils</h1>
+
+		<div id="description">
+			<p>
+<a href="Utils.html">Rack::Utils</a> contains a grab-bag of useful methods
+for writing web applications adopted from all kinds of Ruby libraries.
+</p>
+
+		</div>
+
+		<!-- Constants -->
+		
+		<div id="constants-list" class="section">
+			<h3 class="section-header">Constants</h3>
+			<dl>
+			
+				<dt><a name="HTTP_STATUS_CODES">HTTP_STATUS_CODES</a></dt>
+				
+				<dd class="description"><p>
+Every standard HTTP code mapped to the appropriate message. Stolen from
+Mongrel.
+</p></dd>
+				
+			
+				<dt><a name="STATUS_WITH_NO_ENTITY_BODY">STATUS_WITH_NO_ENTITY_BODY</a></dt>
+				
+				<dd class="description"><p>
+Responses with HTTP status codes that should not have an entity body
+</p></dd>
+				
+			
+			</dl>
+		</div>
+		
+
+		<!-- Attributes -->
+		
+
+		<!-- Methods -->
+		
+		<div id="public-class-method-details" class="method-section section">
+			<h3 class="section-header">Public Class Methods</h3>
+
+		
+			<div id="build-query-method" class="method-detail ">
+				<a name="M000314"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">build_query</span><span
+						class="method-args">(params)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="build-query-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 97</span>
+ 97:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">build_query</span>(<span class="ruby-identifier">params</span>)
+ 98:       <span class="ruby-identifier">params</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+ 99:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Array</span>
+100:           <span class="ruby-identifier">build_query</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">k</span>, <span class="ruby-identifier">x</span>] })
+101:         <span class="ruby-keyword kw">else</span>
+102:           <span class="ruby-identifier">escape</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">escape</span>(<span class="ruby-identifier">v</span>)
+103:         <span class="ruby-keyword kw">end</span>
+104:       }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;&amp;&quot;</span>)
+105:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="bytesize-method" class="method-detail ">
+				<a name="M000318"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">bytesize</span><span
+						class="method-args">(string)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="bytesize-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 155</span>
+155:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bytesize</span>(<span class="ruby-identifier">string</span>)
+156:         <span class="ruby-identifier">string</span>.<span class="ruby-identifier">size</span>
+157:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="bytesize-method" class="method-detail ">
+				<a name="M000317"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">bytesize</span><span
+						class="method-args">(string)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="bytesize-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 151</span>
+151:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bytesize</span>(<span class="ruby-identifier">string</span>)
+152:         <span class="ruby-identifier">string</span>.<span class="ruby-identifier">bytesize</span>
+153:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="escape-method" class="method-detail ">
+				<a name="M000307"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">escape</span><span
+						class="method-args">(s)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Performs URI escaping so that you can construct proper query strings
+faster. Use this rather than the cgi.rb version since it&#8217;s faster.
+(Stolen from Camping).
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="escape-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 12</span>
+12:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">escape</span>(<span class="ruby-identifier">s</span>)
+13:       <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/([^ a-zA-Z0-9_.-]+)/n</span>) {
+14:         <span class="ruby-value str">'%'</span><span class="ruby-operator">+</span><span class="ruby-identifier">$1</span>.<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">'H2'</span><span class="ruby-operator">*</span><span class="ruby-identifier">$1</span>.<span class="ruby-identifier">size</span>).<span class="ruby-identifier">join</span>(<span class="ruby-value str">'%'</span>).<span class="ruby-identifier">upcase</span>
+15:       }.<span class="ruby-identifier">tr</span>(<span class="ruby-value str">' '</span>, <span class="ruby-value str">'+'</span>)
+16:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="escape-html-method" class="method-detail ">
+				<a name="M000315"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">escape_html</span><span
+						class="method-args">(string)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Escape ampersands, brackets and quotes to their HTML/XML entities.
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="escape-html-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 109</span>
+109:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">escape_html</span>(<span class="ruby-identifier">string</span>)
+110:       <span class="ruby-identifier">string</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;&amp;&quot;</span>, <span class="ruby-value str">&quot;&amp;amp;&quot;</span>).
+111:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;&lt;&quot;</span>, <span class="ruby-value str">&quot;&amp;lt;&quot;</span>).
+112:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;&gt;&quot;</span>, <span class="ruby-value str">&quot;&amp;gt;&quot;</span>).
+113:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;'&quot;</span>, <span class="ruby-value str">&quot;&amp;#39;&quot;</span>).
+114:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">'&quot;'</span>, <span class="ruby-value str">&quot;&amp;quot;&quot;</span>)
+115:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="normalize-params-method" class="method-detail ">
+				<a name="M000313"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">normalize_params</span><span
+						class="method-args">(params, name, v = nil)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="normalize-params-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 65</span>
+65:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">v</span> = <span class="ruby-keyword kw">nil</span>)
+66:       <span class="ruby-identifier">name</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r([\[\]]*([^\[\]]+)\]*)</span>
+67:       <span class="ruby-identifier">k</span> = <span class="ruby-identifier">$1</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>
+68:       <span class="ruby-identifier">after</span> = <span class="ruby-identifier">$'</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>
+69: 
+70:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">empty?</span>
+71: 
+72:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;&quot;</span>
+73:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>
+74:       <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;[]&quot;</span>
+75:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">||=</span> []
+76:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;expected Array (got #{params[k].class.name}) for param `#{k}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+77:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">v</span>
+78:       <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r(^\[\]\[([^\[\]]+)\]$)</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r(^\[\](.+)$)</span>
+79:         <span class="ruby-identifier">child_key</span> = <span class="ruby-identifier">$1</span>
+80:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">||=</span> []
+81:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;expected Array (got #{params[k].class.name}) for param `#{k}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+82:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">last</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">child_key</span>)
+83:           <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">last</span>, <span class="ruby-identifier">child_key</span>, <span class="ruby-identifier">v</span>)
+84:         <span class="ruby-keyword kw">else</span>
+85:           <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">normalize_params</span>({}, <span class="ruby-identifier">child_key</span>, <span class="ruby-identifier">v</span>)
+86:         <span class="ruby-keyword kw">end</span>
+87:       <span class="ruby-keyword kw">else</span>
+88:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">||=</span> {}
+89:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;expected Hash (got #{params[k].class.name}) for param `#{k}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+90:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>], <span class="ruby-identifier">after</span>, <span class="ruby-identifier">v</span>)
+91:       <span class="ruby-keyword kw">end</span>
+92: 
+93:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">params</span>
+94:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="parse-nested-query-method" class="method-detail ">
+				<a name="M000310"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">parse_nested_query</span><span
+						class="method-args">(qs, d = '&;')</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="parse-nested-query-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 53</span>
+53:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse_nested_query</span>(<span class="ruby-identifier">qs</span>, <span class="ruby-identifier">d</span> = <span class="ruby-value str">'&amp;;'</span>)
+54:       <span class="ruby-identifier">params</span> = {}
+55: 
+56:       (<span class="ruby-identifier">qs</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">split</span>(<span class="ruby-node">/[#{d}] */n</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+57:         <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span> = <span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">p</span>).<span class="ruby-identifier">split</span>(<span class="ruby-value str">'='</span>, <span class="ruby-value">2</span>)
+58:         <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span>)
+59:       <span class="ruby-keyword kw">end</span>
+60: 
+61:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">params</span>
+62:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="parse-query-method" class="method-detail ">
+				<a name="M000309"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">parse_query</span><span
+						class="method-args">(qs, d = '&;')</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Stolen from Mongrel, with some small modifications: Parses a query string
+by breaking it up at the &#8217;&amp;&#8217; and &#8217;;&#8217;
+characters. You can also use this to parse cookies by changing the
+characters used in the second parameter (which defaults to
+&#8217;&amp;;&#8217;).
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="parse-query-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 32</span>
+32:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse_query</span>(<span class="ruby-identifier">qs</span>, <span class="ruby-identifier">d</span> = <span class="ruby-value str">'&amp;;'</span>)
+33:       <span class="ruby-identifier">params</span> = {}
+34: 
+35:       (<span class="ruby-identifier">qs</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">split</span>(<span class="ruby-node">/[#{d}] */n</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+36:         <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span> = <span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">p</span>).<span class="ruby-identifier">split</span>(<span class="ruby-value str">'='</span>, <span class="ruby-value">2</span>)
+37: 
+38:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">cur</span> = <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>]
+39:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">cur</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Array</span>
+40:             <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">v</span>
+41:           <span class="ruby-keyword kw">else</span>
+42:             <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = [<span class="ruby-identifier">cur</span>, <span class="ruby-identifier">v</span>]
+43:           <span class="ruby-keyword kw">end</span>
+44:         <span class="ruby-keyword kw">else</span>
+45:           <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>
+46:         <span class="ruby-keyword kw">end</span>
+47:       <span class="ruby-keyword kw">end</span>
+48: 
+49:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">params</span>
+50:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="select-best-encoding-method" class="method-detail ">
+				<a name="M000316"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">select_best_encoding</span><span
+						class="method-args">(available_encodings, accept_encoding)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="select-best-encoding-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 118</span>
+118:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">select_best_encoding</span>(<span class="ruby-identifier">available_encodings</span>, <span class="ruby-identifier">accept_encoding</span>)
+119:       <span class="ruby-comment cmt"># http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</span>
+120: 
+121:       <span class="ruby-identifier">expanded_accept_encoding</span> =
+122:         <span class="ruby-identifier">accept_encoding</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
+123:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;*&quot;</span>
+124:             (<span class="ruby-identifier">available_encodings</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">accept_encoding</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m2</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m2</span> }).<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m2</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">m2</span>, <span class="ruby-identifier">q</span>] }
+125:           <span class="ruby-keyword kw">else</span>
+126:             [[<span class="ruby-identifier">m</span>, <span class="ruby-identifier">q</span>]]
+127:           <span class="ruby-keyword kw">end</span>
+128:         }.<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">mem</span>, <span class="ruby-identifier">list</span><span class="ruby-operator">|</span>
+129:           <span class="ruby-identifier">mem</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">list</span>
+130:         }
+131: 
+132:       <span class="ruby-identifier">encoding_candidates</span> = <span class="ruby-identifier">expanded_accept_encoding</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">q</span><span class="ruby-operator">|</span> <span class="ruby-operator">-</span><span class="ruby-identifier">q</span> }.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> }
+133: 
+134:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">encoding_candidates</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value str">&quot;identity&quot;</span>)
+135:         <span class="ruby-identifier">encoding_candidates</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value str">&quot;identity&quot;</span>)
+136:       <span class="ruby-keyword kw">end</span>
+137: 
+138:       <span class="ruby-identifier">expanded_accept_encoding</span>.<span class="ruby-identifier">find_all</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
+139:         <span class="ruby-identifier">q</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span><span class="ruby-value">.0</span>
+140:       }.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span>
+141:         <span class="ruby-identifier">encoding_candidates</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">m</span>)
+142:       }
+143: 
+144:       <span class="ruby-keyword kw">return</span> (<span class="ruby-identifier">encoding_candidates</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">available_encodings</span>)[<span class="ruby-value">0</span>]
+145:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="unescape-method" class="method-detail ">
+				<a name="M000308"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">unescape</span><span
+						class="method-args">(s)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Unescapes a URI escaped string. (Stolen from Camping).
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="unescape-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 20</span>
+20:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">s</span>)
+21:       <span class="ruby-identifier">s</span>.<span class="ruby-identifier">tr</span>(<span class="ruby-value str">'+'</span>, <span class="ruby-value str">' '</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/((?:%[0-9a-fA-F]{2})+)/n</span>){
+22:         [<span class="ruby-identifier">$1</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value str">'%'</span>)].<span class="ruby-identifier">pack</span>(<span class="ruby-value str">'H*'</span>)
+23:       }
+24:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+		<div id="private-instance-method-details" class="method-section section">
+			<h3 class="section-header">Private Instance Methods</h3>
+
+		
+			<div id="build-query-method" class="method-detail ">
+				<a name="M000314"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">build_query</span><span
+						class="method-args">(params)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="build-query-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 97</span>
+ 97:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">build_query</span>(<span class="ruby-identifier">params</span>)
+ 98:       <span class="ruby-identifier">params</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+ 99:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Array</span>
+100:           <span class="ruby-identifier">build_query</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">k</span>, <span class="ruby-identifier">x</span>] })
+101:         <span class="ruby-keyword kw">else</span>
+102:           <span class="ruby-identifier">escape</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">escape</span>(<span class="ruby-identifier">v</span>)
+103:         <span class="ruby-keyword kw">end</span>
+104:       }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;&amp;&quot;</span>)
+105:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="bytesize-method" class="method-detail ">
+				<a name="M000317"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">bytesize</span><span
+						class="method-args">(string)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="bytesize-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 151</span>
+151:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bytesize</span>(<span class="ruby-identifier">string</span>)
+152:         <span class="ruby-identifier">string</span>.<span class="ruby-identifier">bytesize</span>
+153:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="bytesize-method" class="method-detail ">
+				<a name="M000318"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">bytesize</span><span
+						class="method-args">(string)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="bytesize-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 155</span>
+155:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bytesize</span>(<span class="ruby-identifier">string</span>)
+156:         <span class="ruby-identifier">string</span>.<span class="ruby-identifier">size</span>
+157:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="escape-method" class="method-detail ">
+				<a name="M000307"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">escape</span><span
+						class="method-args">(s)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Performs URI escaping so that you can construct proper query strings
+faster. Use this rather than the cgi.rb version since it&#8217;s faster.
+(Stolen from Camping).
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="escape-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 12</span>
+12:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">escape</span>(<span class="ruby-identifier">s</span>)
+13:       <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/([^ a-zA-Z0-9_.-]+)/n</span>) {
+14:         <span class="ruby-value str">'%'</span><span class="ruby-operator">+</span><span class="ruby-identifier">$1</span>.<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">'H2'</span><span class="ruby-operator">*</span><span class="ruby-identifier">$1</span>.<span class="ruby-identifier">size</span>).<span class="ruby-identifier">join</span>(<span class="ruby-value str">'%'</span>).<span class="ruby-identifier">upcase</span>
+15:       }.<span class="ruby-identifier">tr</span>(<span class="ruby-value str">' '</span>, <span class="ruby-value str">'+'</span>)
+16:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="escape-html-method" class="method-detail ">
+				<a name="M000315"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">escape_html</span><span
+						class="method-args">(string)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Escape ampersands, brackets and quotes to their HTML/XML entities.
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="escape-html-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 109</span>
+109:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">escape_html</span>(<span class="ruby-identifier">string</span>)
+110:       <span class="ruby-identifier">string</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;&amp;&quot;</span>, <span class="ruby-value str">&quot;&amp;amp;&quot;</span>).
+111:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;&lt;&quot;</span>, <span class="ruby-value str">&quot;&amp;lt;&quot;</span>).
+112:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;&gt;&quot;</span>, <span class="ruby-value str">&quot;&amp;gt;&quot;</span>).
+113:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;'&quot;</span>, <span class="ruby-value str">&quot;&amp;#39;&quot;</span>).
+114:         <span class="ruby-identifier">gsub</span>(<span class="ruby-value str">'&quot;'</span>, <span class="ruby-value str">&quot;&amp;quot;&quot;</span>)
+115:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="normalize-params-method" class="method-detail ">
+				<a name="M000313"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">normalize_params</span><span
+						class="method-args">(params, name, v = nil)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="normalize-params-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 65</span>
+65:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">v</span> = <span class="ruby-keyword kw">nil</span>)
+66:       <span class="ruby-identifier">name</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r([\[\]]*([^\[\]]+)\]*)</span>
+67:       <span class="ruby-identifier">k</span> = <span class="ruby-identifier">$1</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>
+68:       <span class="ruby-identifier">after</span> = <span class="ruby-identifier">$'</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>
+69: 
+70:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">empty?</span>
+71: 
+72:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;&quot;</span>
+73:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>
+74:       <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;[]&quot;</span>
+75:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">||=</span> []
+76:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;expected Array (got #{params[k].class.name}) for param `#{k}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+77:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">v</span>
+78:       <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r(^\[\]\[([^\[\]]+)\]$)</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">after</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r(^\[\](.+)$)</span>
+79:         <span class="ruby-identifier">child_key</span> = <span class="ruby-identifier">$1</span>
+80:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">||=</span> []
+81:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;expected Array (got #{params[k].class.name}) for param `#{k}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+82:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">last</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">child_key</span>)
+83:           <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">last</span>, <span class="ruby-identifier">child_key</span>, <span class="ruby-identifier">v</span>)
+84:         <span class="ruby-keyword kw">else</span>
+85:           <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">normalize_params</span>({}, <span class="ruby-identifier">child_key</span>, <span class="ruby-identifier">v</span>)
+86:         <span class="ruby-keyword kw">end</span>
+87:       <span class="ruby-keyword kw">else</span>
+88:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">||=</span> {}
+89:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;expected Hash (got #{params[k].class.name}) for param `#{k}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+90:         <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>], <span class="ruby-identifier">after</span>, <span class="ruby-identifier">v</span>)
+91:       <span class="ruby-keyword kw">end</span>
+92: 
+93:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">params</span>
+94:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="parse-nested-query-method" class="method-detail ">
+				<a name="M000310"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">parse_nested_query</span><span
+						class="method-args">(qs, d = '&;')</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="parse-nested-query-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 53</span>
+53:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse_nested_query</span>(<span class="ruby-identifier">qs</span>, <span class="ruby-identifier">d</span> = <span class="ruby-value str">'&amp;;'</span>)
+54:       <span class="ruby-identifier">params</span> = {}
+55: 
+56:       (<span class="ruby-identifier">qs</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">split</span>(<span class="ruby-node">/[#{d}] */n</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+57:         <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span> = <span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">p</span>).<span class="ruby-identifier">split</span>(<span class="ruby-value str">'='</span>, <span class="ruby-value">2</span>)
+58:         <span class="ruby-identifier">normalize_params</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span>)
+59:       <span class="ruby-keyword kw">end</span>
+60: 
+61:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">params</span>
+62:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="parse-query-method" class="method-detail ">
+				<a name="M000309"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">parse_query</span><span
+						class="method-args">(qs, d = '&;')</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Stolen from Mongrel, with some small modifications: Parses a query string
+by breaking it up at the &#8217;&amp;&#8217; and &#8217;;&#8217;
+characters. You can also use this to parse cookies by changing the
+characters used in the second parameter (which defaults to
+&#8217;&amp;;&#8217;).
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="parse-query-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 32</span>
+32:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse_query</span>(<span class="ruby-identifier">qs</span>, <span class="ruby-identifier">d</span> = <span class="ruby-value str">'&amp;;'</span>)
+33:       <span class="ruby-identifier">params</span> = {}
+34: 
+35:       (<span class="ruby-identifier">qs</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">split</span>(<span class="ruby-node">/[#{d}] */n</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+36:         <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span> = <span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">p</span>).<span class="ruby-identifier">split</span>(<span class="ruby-value str">'='</span>, <span class="ruby-value">2</span>)
+37: 
+38:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">cur</span> = <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>]
+39:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">cur</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Array</span>
+40:             <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">v</span>
+41:           <span class="ruby-keyword kw">else</span>
+42:             <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = [<span class="ruby-identifier">cur</span>, <span class="ruby-identifier">v</span>]
+43:           <span class="ruby-keyword kw">end</span>
+44:         <span class="ruby-keyword kw">else</span>
+45:           <span class="ruby-identifier">params</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>
+46:         <span class="ruby-keyword kw">end</span>
+47:       <span class="ruby-keyword kw">end</span>
+48: 
+49:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">params</span>
+50:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="select-best-encoding-method" class="method-detail ">
+				<a name="M000316"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">select_best_encoding</span><span
+						class="method-args">(available_encodings, accept_encoding)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="select-best-encoding-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 118</span>
+118:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">select_best_encoding</span>(<span class="ruby-identifier">available_encodings</span>, <span class="ruby-identifier">accept_encoding</span>)
+119:       <span class="ruby-comment cmt"># http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</span>
+120: 
+121:       <span class="ruby-identifier">expanded_accept_encoding</span> =
+122:         <span class="ruby-identifier">accept_encoding</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
+123:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;*&quot;</span>
+124:             (<span class="ruby-identifier">available_encodings</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">accept_encoding</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m2</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m2</span> }).<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m2</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">m2</span>, <span class="ruby-identifier">q</span>] }
+125:           <span class="ruby-keyword kw">else</span>
+126:             [[<span class="ruby-identifier">m</span>, <span class="ruby-identifier">q</span>]]
+127:           <span class="ruby-keyword kw">end</span>
+128:         }.<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">mem</span>, <span class="ruby-identifier">list</span><span class="ruby-operator">|</span>
+129:           <span class="ruby-identifier">mem</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">list</span>
+130:         }
+131: 
+132:       <span class="ruby-identifier">encoding_candidates</span> = <span class="ruby-identifier">expanded_accept_encoding</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">q</span><span class="ruby-operator">|</span> <span class="ruby-operator">-</span><span class="ruby-identifier">q</span> }.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> }
+133: 
+134:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">encoding_candidates</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value str">&quot;identity&quot;</span>)
+135:         <span class="ruby-identifier">encoding_candidates</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value str">&quot;identity&quot;</span>)
+136:       <span class="ruby-keyword kw">end</span>
+137: 
+138:       <span class="ruby-identifier">expanded_accept_encoding</span>.<span class="ruby-identifier">find_all</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
+139:         <span class="ruby-identifier">q</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span><span class="ruby-value">.0</span>
+140:       }.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span>
+141:         <span class="ruby-identifier">encoding_candidates</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">m</span>)
+142:       }
+143: 
+144:       <span class="ruby-keyword kw">return</span> (<span class="ruby-identifier">encoding_candidates</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">available_encodings</span>)[<span class="ruby-value">0</span>]
+145:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="unescape-method" class="method-detail ">
+				<a name="M000308"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">unescape</span><span
+						class="method-args">(s)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p>
+Unescapes a URI escaped string. (Stolen from Camping).
+</p>
+					
+
+					
+					<div class="method-source-code"
+						id="unescape-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/utils.rb, line 20</span>
+20:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">s</span>)
+21:       <span class="ruby-identifier">s</span>.<span class="ruby-identifier">tr</span>(<span class="ruby-value str">'+'</span>, <span class="ruby-value str">' '</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/((?:%[0-9a-fA-F]{2})+)/n</span>){
+22:         [<span class="ruby-identifier">$1</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value str">'%'</span>)].<span class="ruby-identifier">pack</span>(<span class="ruby-value str">'H*'</span>)
+23:       }
+24:     <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+
+	</div>
+
+
+	<div id="rdoc-debugging-section-dump" class="debugging-section">
+	
+		<p>Disabled; run with --debug to generate this.</p>
+	
+	</div>
+
+	<div id="validator-badges">
+		<p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+		<p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+			Rdoc Generator</a> 1.1.6</small>.</p>
+	</div>
+
+</body>
+</html>
+

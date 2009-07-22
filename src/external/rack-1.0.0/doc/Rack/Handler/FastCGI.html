@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+	<title>Class: Rack::Handler::FastCGI</title>
+
+	<link rel="stylesheet" href="../../rdoc.css" type="text/css" media="screen" />
+
+	<script src="../../js/jquery.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../../js/thickbox-compressed.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../../js/quicksearch.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="../../js/darkfish.js" type="text/javascript"
+		charset="utf-8"></script>
+
+</head>
+<body class="class">
+
+	<div id="metadata">
+		<div id="file-metadata">
+			<div id="file-list-section" class="section">
+				<h3 class="section-header">In Files</h3>
+				<div class="section-body">
+					<ul>
+					
+						<li><a href="../../lib/rack/handler/fastcgi_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+							class="thickbox" title="lib/rack/handler/fastcgi.rb">lib/rack/handler/fastcgi.rb</a></li>
+					
+					</ul>
+				</div>
+			</div>
+
+			
+		</div>
+
+		<div id="class-metadata">
+
+			<!-- Parent Class -->
+			
+			<div id="parent-class-section" class="section">
+				<h3 class="section-header">Parent</h3>
+				
+				<p class="link">Object</p>
+				
+			</div>
+			
+
+			<!-- Namespace Contents -->
+			
+
+			<!-- Method Quickref -->
+			
+			<div id="method-list-section" class="section">
+				<h3 class="section-header">Methods</h3>
+				<ul class="link-list">
+					
+					<li><a href="#M000137">::run</a></li>
+					
+					<li><a href="#M000140">::send_body</a></li>
+					
+					<li><a href="#M000139">::send_headers</a></li>
+					
+					<li><a href="#M000138">::serve</a></li>
+					
+				</ul>
+			</div>
+			
+
+			<!-- Included Modules -->
+			
+		</div>
+
+		<div id="project-metadata">
+			
+			
+			<div id="fileindex-section" class="section project-section">
+				<h3 class="section-header">Files</h3>
+				<ul>
+				
+					<li class="file"><a href="../../KNOWN-ISSUES.html">KNOWN-ISSUES</a></li>
+				
+					<li class="file"><a href="../../RDOX.html">RDOX</a></li>
+				
+					<li class="file"><a href="../../README.html">README</a></li>
+				
+					<li class="file"><a href="../../SPEC.html">SPEC</a></li>
+				
+				</ul>
+			</div>
+			
+
+			<div id="classindex-section" class="section project-section">
+				<h3 class="section-header">Class Index
+					<span class="search-toggle"><img src="../../images/find.png"
+						height="16" width="16" alt="[+]"
+						title="show/hide quicksearch" /></span></h3>
+				<form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+				<fieldset>
+					<legend>Quicksearch</legend>
+					<input type="text" name="quicksearch" value=""
+						class="quicksearch-field" />
+				</fieldset>
+				</form>
+
+				<ul class="link-list">
+				
+					<li><a href="../../Rack.html">Rack</a></li>
+				
+					<li><a href="../../Rack/Adapter.html">Rack::Adapter</a></li>
+				
+					<li><a href="../../Rack/Adapter/Camping.html">Rack::Adapter::Camping</a></li>
+				
+					<li><a href="../../Rack/Auth.html">Rack::Auth</a></li>
+				
+					<li><a href="../../Rack/Auth/AbstractHandler.html">Rack::Auth::AbstractHandler</a></li>
+				
+					<li><a href="../../Rack/Auth/AbstractRequest.html">Rack::Auth::AbstractRequest</a></li>
+				
+					<li><a href="../../Rack/Auth/Basic.html">Rack::Auth::Basic</a></li>
+				
+					<li><a href="../../Rack/Auth/Basic/Request.html">Rack::Auth::Basic::Request</a></li>
+				
+					<li><a href="../../Rack/Auth/Digest.html">Rack::Auth::Digest</a></li>
+				
+					<li><a href="../../Rack/Auth/Digest/MD5.html">Rack::Auth::Digest::MD5</a></li>
+				
+					<li><a href="../../Rack/Auth/Digest/Nonce.html">Rack::Auth::Digest::Nonce</a></li>
+				
+					<li><a href="../../Rack/Auth/Digest/Params.html">Rack::Auth::Digest::Params</a></li>
+				
+					<li><a href="../../Rack/Auth/Digest/Request.html">Rack::Auth::Digest::Request</a></li>
+				
+					<li><a href="../../Rack/Auth/OpenID.html">Rack::Auth::OpenID</a></li>
+				
+					<li><a href="../../Rack/Auth/OpenID/BadExtension.html">Rack::Auth::OpenID::BadExtension</a></li>
+				
+					<li><a href="../../Rack/Auth/OpenID/NoSession.html">Rack::Auth::OpenID::NoSession</a></li>
+				
+					<li><a href="../../Rack/Auth/OpenIDAuth.html">Rack::Auth::OpenIDAuth</a></li>
+				
+					<li><a href="../../Rack/Builder.html">Rack::Builder</a></li>
+				
+					<li><a href="../../Rack/Cascade.html">Rack::Cascade</a></li>
+				
+					<li><a href="../../Rack/Chunked.html">Rack::Chunked</a></li>
+				
+					<li><a href="../../Rack/CommonLogger.html">Rack::CommonLogger</a></li>
+				
+					<li><a href="../../Rack/ConditionalGet.html">Rack::ConditionalGet</a></li>
+				
+					<li><a href="../../Rack/ContentLength.html">Rack::ContentLength</a></li>
+				
+					<li><a href="../../Rack/ContentType.html">Rack::ContentType</a></li>
+				
+					<li><a href="../../Rack/Deflater.html">Rack::Deflater</a></li>
+				
+					<li><a href="../../Rack/Deflater/DeflateStream.html">Rack::Deflater::DeflateStream</a></li>
+				
+					<li><a href="../../Rack/Deflater/GzipStream.html">Rack::Deflater::GzipStream</a></li>
+				
+					<li><a href="../../Rack/Directory.html">Rack::Directory</a></li>
+				
+					<li><a href="../../Rack/File.html">Rack::File</a></li>
+				
+					<li><a href="../../Rack/ForwardRequest.html">Rack::ForwardRequest</a></li>
+				
+					<li><a href="../../Rack/Handler.html">Rack::Handler</a></li>
+				
+					<li><a href="../../Rack/Handler/CGI.html">Rack::Handler::CGI</a></li>
+				
+					<li><a href="../../Rack/Handler/EventedMongrel.html">Rack::Handler::EventedMongrel</a></li>
+				
+					<li><a href="../../Rack/Handler/FastCGI.html">Rack::Handler::FastCGI</a></li>
+				
+					<li><a href="../../Rack/Handler/LSWS.html">Rack::Handler::LSWS</a></li>
+				
+					<li><a href="../../Rack/Handler/Mongrel.html">Rack::Handler::Mongrel</a></li>
+				
+					<li><a href="../../Rack/Handler/SCGI.html">Rack::Handler::SCGI</a></li>
+				
+					<li><a href="../../Rack/Handler/SwiftipliedMongrel.html">Rack::Handler::SwiftipliedMongrel</a></li>
+				
+					<li><a href="../../Rack/Handler/Thin.html">Rack::Handler::Thin</a></li>
+				
+					<li><a href="../../Rack/Handler/WEBrick.html">Rack::Handler::WEBrick</a></li>
+				
+					<li><a href="../../Rack/Head.html">Rack::Head</a></li>
+				
+					<li><a href="../../Rack/Lint.html">Rack::Lint</a></li>
+				
+					<li><a href="../../Rack/Lobster.html">Rack::Lobster</a></li>
+				
+					<li><a href="../../Rack/Lock.html">Rack::Lock</a></li>
+				
+					<li><a href="../../Rack/MethodOverride.html">Rack::MethodOverride</a></li>
+				
+					<li><a href="../../Rack/Mime.html">Rack::Mime</a></li>
+				
+					<li><a href="../../Rack/MockRequest.html">Rack::MockRequest</a></li>
+				
+					<li><a href="../../Rack/MockRequest/FatalWarner.html">Rack::MockRequest::FatalWarner</a></li>
+				
+					<li><a href="../../Rack/MockRequest/FatalWarning.html">Rack::MockRequest::FatalWarning</a></li>
+				
+					<li><a href="../../Rack/MockResponse.html">Rack::MockResponse</a></li>
+				
+					<li><a href="../../Rack/Recursive.html">Rack::Recursive</a></li>
+				
+					<li><a href="../../Rack/Reloader.html">Rack::Reloader</a></li>
+				
+					<li><a href="../../Rack/Reloader/Stat.html">Rack::Reloader::Stat</a></li>
+				
+					<li><a href="../../Rack/Request.html">Rack::Request</a></li>
+				
+					<li><a href="../../Rack/Response.html">Rack::Response</a></li>
+				
+					<li><a href="../../Rack/Response/Helpers.html">Rack::Response::Helpers</a></li>
+				
+					<li><a href="../../Rack/RewindableInput.html">Rack::RewindableInput</a></li>
+				
+					<li><a href="../../Rack/RewindableInput/Tempfile.html">Rack::RewindableInput::Tempfile</a></li>
+				
+					<li><a href="../../Rack/Session.html">Rack::Session</a></li>
+				
+					<li><a href="../../Rack/Session/Abstract.html">Rack::Session::Abstract</a></li>
+				
+					<li><a href="../../Rack/Session/Abstract/ID.html">Rack::Session::Abstract::ID</a></li>
+				
+					<li><a href="../../Rack/Session/Cookie.html">Rack::Session::Cookie</a></li>
+				
+					<li><a href="../../Rack/Session/Memcache.html">Rack::Session::Memcache</a></li>
+				
+					<li><a href="../../Rack/Session/Pool.html">Rack::Session::Pool</a></li>
+				
+					<li><a href="../../Rack/ShowExceptions.html">Rack::ShowExceptions</a></li>
+				
+					<li><a href="../../Rack/ShowStatus.html">Rack::ShowStatus</a></li>
+				
+					<li><a href="../../Rack/Static.html">Rack::Static</a></li>
+				
+					<li><a href="../../Rack/URLMap.html">Rack::URLMap</a></li>
+				
+					<li><a href="../../Rack/Utils.html">Rack::Utils</a></li>
+				
+					<li><a href="../../Rack/Utils/Context.html">Rack::Utils::Context</a></li>
+				
+					<li><a href="../../Rack/Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></li>
+				
+					<li><a href="../../Rack/Utils/Multipart.html">Rack::Utils::Multipart</a></li>
+				
+					<li><a href="../../FCGI.html">FCGI</a></li>
+				
+					<li><a href="../../FCGI/Stream.html">FCGI::Stream</a></li>
+				
+				</ul>
+				<div id="no-class-search-results" style="display: none;">No matching classes.</div>
+			</div>
+
+			
+		</div>
+	</div>
+
+	<div id="documentation">
+		<h1 class="class">Rack::Handler::FastCGI</h1>
+
+		<div id="description">
+			
+		</div>
+
+		<!-- Constants -->
+		
+
+		<!-- Attributes -->
+		
+
+		<!-- Methods -->
+		
+		<div id="public-class-method-details" class="method-section section">
+			<h3 class="section-header">Public Class Methods</h3>
+
+		
+			<div id="run-method" class="method-detail ">
+				<a name="M000137"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">run</span><span
+						class="method-args">(app, options={})</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="run-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/handler/fastcgi.rb, line 19</span>
+19:       <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">run</span>(<span class="ruby-identifier">app</span>, <span class="ruby-identifier">options</span>={})
+20:         <span class="ruby-identifier">file</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:File</span>] <span class="ruby-keyword kw">and</span> <span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">reopen</span>(<span class="ruby-constant">UNIXServer</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">file</span>))
+21:         <span class="ruby-identifier">port</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:Port</span>] <span class="ruby-keyword kw">and</span> <span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">reopen</span>(<span class="ruby-constant">TCPServer</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">port</span>))
+22:         <span class="ruby-constant">FCGI</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">request</span><span class="ruby-operator">|</span>
+23:           <span class="ruby-identifier">serve</span> <span class="ruby-identifier">request</span>, <span class="ruby-identifier">app</span>
+24:         }
+25:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="send-body-method" class="method-detail ">
+				<a name="M000140"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">send_body</span><span
+						class="method-args">(out, body)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="send-body-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/handler/fastcgi.rb, line 80</span>
+80:       <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">send_body</span>(<span class="ruby-identifier">out</span>, <span class="ruby-identifier">body</span>)
+81:         <span class="ruby-identifier">body</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">part</span><span class="ruby-operator">|</span>
+82:           <span class="ruby-identifier">out</span>.<span class="ruby-identifier">print</span> <span class="ruby-identifier">part</span>
+83:           <span class="ruby-identifier">out</span>.<span class="ruby-identifier">flush</span>
+84:         }
+85:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="send-headers-method" class="method-detail ">
+				<a name="M000139"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">send_headers</span><span
+						class="method-args">(out, status, headers)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="send-headers-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/handler/fastcgi.rb, line 69</span>
+69:       <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">send_headers</span>(<span class="ruby-identifier">out</span>, <span class="ruby-identifier">status</span>, <span class="ruby-identifier">headers</span>)
+70:         <span class="ruby-identifier">out</span>.<span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Status: #{status}\r\n&quot;</span>
+71:         <span class="ruby-identifier">headers</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">vs</span><span class="ruby-operator">|</span>
+72:           <span class="ruby-identifier">vs</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;\n&quot;</span>).<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+73:             <span class="ruby-identifier">out</span>.<span class="ruby-identifier">print</span> <span class="ruby-node">&quot;#{k}: #{v}\r\n&quot;</span>
+74:           }
+75:         }
+76:         <span class="ruby-identifier">out</span>.<span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;\r\n&quot;</span>
+77:         <span class="ruby-identifier">out</span>.<span class="ruby-identifier">flush</span>
+78:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+			<div id="serve-method" class="method-detail ">
+				<a name="M000138"></a>
+
+				<div class="method-heading">
+				
+					<span class="method-name">serve</span><span
+						class="method-args">(request, app)</span>
+					<span class="method-click-advice">click to toggle source</span>
+				
+				</div>
+
+				<div class="method-description">
+					
+					<p class="missing-docs">(Not documented)</p>
+					
+
+					
+					<div class="method-source-code"
+						id="serve-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rack/handler/fastcgi.rb, line 27</span>
+27:       <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">serve</span>(<span class="ruby-identifier">request</span>, <span class="ruby-identifier">app</span>)
+28:         <span class="ruby-identifier">app</span> = <span class="ruby-constant">Rack</span><span class="ruby-operator">::</span><span class="ruby-constant">ContentLength</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">app</span>)
+29: 
+30:         <span class="ruby-identifier">env</span> = <span class="ruby-identifier">request</span>.<span class="ruby-identifier">env</span>
+31:         <span class="ruby-identifier">env</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">&quot;HTTP_CONTENT_LENGTH&quot;</span>
+32: 
+33:         <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;SCRIPT_NAME&quot;</span>] = <span class="ruby-value str">&quot;&quot;</span>  <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;SCRIPT_NAME&quot;</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;/&quot;</span>
+34:         
+35:         <span class="ruby-identifier">rack_input</span> = <span class="ruby-constant">RewindableInput</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">request</span>.<span class="ruby-identifier">in</span>)
+36: 
+37:         <span class="ruby-identifier">env</span>.<span class="ruby-identifier">update</span>({<span class="ruby-value str">&quot;rack.version&quot;</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">0</span>,<span class="ruby-value">1</span>],
+38:                      <span class="ruby-value str">&quot;rack.input&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">rack_input</span>,
+39:                      <span class="ruby-value str">&quot;rack.errors&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">request</span>.<span class="ruby-identifier">err</span>,
+40: 
+41:                      <span class="ruby-value str">&quot;rack.multithread&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>,
+42:                      <span class="ruby-value str">&quot;rack.multiprocess&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>,
+43:                      <span class="ruby-value str">&quot;rack.run_once&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>,
+44: 
+45:                      <span class="ruby-value str">&quot;rack.url_scheme&quot;</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value str">&quot;yes&quot;</span>, <span class="ruby-value str">&quot;on&quot;</span>, <span class="ruby-value str">&quot;1&quot;</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;HTTPS&quot;</span>]) <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;https&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;http&quot;</span>
+46:                    })
+47: 
+48:         <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;QUERY_STRING&quot;</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;&quot;</span>
+49:         <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;HTTP_VERSION&quot;</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;SERVER_PROTOCOL&quot;</span>]
+50:         <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;REQUEST_PATH&quot;</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;/&quot;</span>
+51:         <span class="ruby-identifier">env</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">&quot;PATH_INFO&quot;</span>  <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;PATH_INFO&quot;</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;&quot;</span>
+52:         <span class="ruby-identifier">env</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">&quot;CONTENT_TYPE&quot;</span>  <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;CONTENT_TYPE&quot;</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;&quot;</span>
+53:         <span class="ruby-identifier">env</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">&quot;CONTENT_LENGTH&quot;</span>  <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">env</span>[<span class="ruby-value str">&quot;CONTENT_LENGTH&quot;</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;&quot;</span>
+54: 
+55:         <span class="ruby-keyword kw">begin</span>
+56:           <span class="ruby-identifier">status</span>, <span class="ruby-identifier">headers</span>, <span class="ruby-identifier">body</span> = <span class="ruby-identifier">app</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">env</span>)
+57:           <span class="ruby-keyword kw">begin</span>
+58:             <span class="ruby-identifier">send_headers</span> <span class="ruby-identifier">request</span>.<span class="ruby-identifier">out</span>, <span class="ruby-identifier">status</span>, <span class="ruby-identifier">headers</span>
+59:             <span class="ruby-identifier">send_body</span> <span class="ruby-identifier">request</span>.<span class="ruby-identifier">out</span>, <span class="ruby-identifier">body</span>
+60:           <span class="ruby-keyword kw">ensure</span>
+61:             <span class="ruby-identifier">body</span>.<span class="ruby-identifier">close</span>  <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">body</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:close</span>
+62:           <span class="ruby-keyword kw">end</span>
+63:         <span class="ruby-keyword kw">ensure</span>
+64:           <span class="ruby-identifier">rack_input</span>.<span class="ruby-identifier">close</span>
+65:           <span class="ruby-identifier">request</span>.<span class="ruby-identifier">finish</span>
+66:         <span class="ruby-keyword kw">end</span>
+67:       <span class="ruby-keyword kw">end</span></pre>
+					</div>
+					
+				</div>
+
+				
+			</div>
+
+		
+		</div>
+	
+
+	</div>
+
+
+	<div id="rdoc-debugging-section-dump" class="debugging-section">
+	
+		<p>Disabled; run with --debug to generate this.</p>
+	
+	</div>
+
+	<div id="validator-badges">
+		<p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+		<p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+			Rdoc Generator</a> 1.1.6</small>.</p>
+	</div>
+
+</body>
+</html>
+

@@ -1,0 +1,1367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+	<title>File: RDOX ['Rack Documentation']</title>
+
+	<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet" />
+
+	<script src="./js/jquery.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="./js/thickbox-compressed.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="./js/quicksearch.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="./js/darkfish.js" type="text/javascript"
+		charset="utf-8"></script>
+</head>
+
+<body class="file">
+	<div id="metadata">
+		<div id="project-metadata">
+			
+			
+			<div id="fileindex-section" class="section project-section">
+				<h3 class="section-header">Files</h3>
+				<ul>
+				
+					<li class="file"><a href="./KNOWN-ISSUES.html">KNOWN-ISSUES</a></li>
+				
+					<li class="file"><a href="./RDOX.html">RDOX</a></li>
+				
+					<li class="file"><a href="./README.html">README</a></li>
+				
+					<li class="file"><a href="./SPEC.html">SPEC</a></li>
+				
+				</ul>
+			</div>
+			
+
+			<div id="classindex-section" class="section project-section">
+				<h3 class="section-header">Class Index
+					<span class="search-toggle"><img src="./images/find.png"
+						height="16" width="16" alt="[+]"
+						title="show/hide quicksearch" /></span></h3>
+				<form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+				<fieldset>
+					<legend>Quicksearch</legend>
+					<input type="text" name="quicksearch" value=""
+						class="quicksearch-field" />
+				</fieldset>
+				</form>
+
+				<ul class="link-list">
+				
+					<li><a href="./Rack.html">Rack</a></li>
+				
+					<li><a href="./Rack/Adapter.html">Rack::Adapter</a></li>
+				
+					<li><a href="./Rack/Adapter/Camping.html">Rack::Adapter::Camping</a></li>
+				
+					<li><a href="./Rack/Auth.html">Rack::Auth</a></li>
+				
+					<li><a href="./Rack/Auth/AbstractHandler.html">Rack::Auth::AbstractHandler</a></li>
+				
+					<li><a href="./Rack/Auth/AbstractRequest.html">Rack::Auth::AbstractRequest</a></li>
+				
+					<li><a href="./Rack/Auth/Basic.html">Rack::Auth::Basic</a></li>
+				
+					<li><a href="./Rack/Auth/Basic/Request.html">Rack::Auth::Basic::Request</a></li>
+				
+					<li><a href="./Rack/Auth/Digest.html">Rack::Auth::Digest</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/MD5.html">Rack::Auth::Digest::MD5</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/Nonce.html">Rack::Auth::Digest::Nonce</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/Params.html">Rack::Auth::Digest::Params</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/Request.html">Rack::Auth::Digest::Request</a></li>
+				
+					<li><a href="./Rack/Auth/OpenID.html">Rack::Auth::OpenID</a></li>
+				
+					<li><a href="./Rack/Auth/OpenID/BadExtension.html">Rack::Auth::OpenID::BadExtension</a></li>
+				
+					<li><a href="./Rack/Auth/OpenID/NoSession.html">Rack::Auth::OpenID::NoSession</a></li>
+				
+					<li><a href="./Rack/Auth/OpenIDAuth.html">Rack::Auth::OpenIDAuth</a></li>
+				
+					<li><a href="./Rack/Builder.html">Rack::Builder</a></li>
+				
+					<li><a href="./Rack/Cascade.html">Rack::Cascade</a></li>
+				
+					<li><a href="./Rack/Chunked.html">Rack::Chunked</a></li>
+				
+					<li><a href="./Rack/CommonLogger.html">Rack::CommonLogger</a></li>
+				
+					<li><a href="./Rack/ConditionalGet.html">Rack::ConditionalGet</a></li>
+				
+					<li><a href="./Rack/ContentLength.html">Rack::ContentLength</a></li>
+				
+					<li><a href="./Rack/ContentType.html">Rack::ContentType</a></li>
+				
+					<li><a href="./Rack/Deflater.html">Rack::Deflater</a></li>
+				
+					<li><a href="./Rack/Deflater/DeflateStream.html">Rack::Deflater::DeflateStream</a></li>
+				
+					<li><a href="./Rack/Deflater/GzipStream.html">Rack::Deflater::GzipStream</a></li>
+				
+					<li><a href="./Rack/Directory.html">Rack::Directory</a></li>
+				
+					<li><a href="./Rack/File.html">Rack::File</a></li>
+				
+					<li><a href="./Rack/ForwardRequest.html">Rack::ForwardRequest</a></li>
+				
+					<li><a href="./Rack/Handler.html">Rack::Handler</a></li>
+				
+					<li><a href="./Rack/Handler/CGI.html">Rack::Handler::CGI</a></li>
+				
+					<li><a href="./Rack/Handler/EventedMongrel.html">Rack::Handler::EventedMongrel</a></li>
+				
+					<li><a href="./Rack/Handler/FastCGI.html">Rack::Handler::FastCGI</a></li>
+				
+					<li><a href="./Rack/Handler/LSWS.html">Rack::Handler::LSWS</a></li>
+				
+					<li><a href="./Rack/Handler/Mongrel.html">Rack::Handler::Mongrel</a></li>
+				
+					<li><a href="./Rack/Handler/SCGI.html">Rack::Handler::SCGI</a></li>
+				
+					<li><a href="./Rack/Handler/SwiftipliedMongrel.html">Rack::Handler::SwiftipliedMongrel</a></li>
+				
+					<li><a href="./Rack/Handler/Thin.html">Rack::Handler::Thin</a></li>
+				
+					<li><a href="./Rack/Handler/WEBrick.html">Rack::Handler::WEBrick</a></li>
+				
+					<li><a href="./Rack/Head.html">Rack::Head</a></li>
+				
+					<li><a href="./Rack/Lint.html">Rack::Lint</a></li>
+				
+					<li><a href="./Rack/Lobster.html">Rack::Lobster</a></li>
+				
+					<li><a href="./Rack/Lock.html">Rack::Lock</a></li>
+				
+					<li><a href="./Rack/MethodOverride.html">Rack::MethodOverride</a></li>
+				
+					<li><a href="./Rack/Mime.html">Rack::Mime</a></li>
+				
+					<li><a href="./Rack/MockRequest.html">Rack::MockRequest</a></li>
+				
+					<li><a href="./Rack/MockRequest/FatalWarner.html">Rack::MockRequest::FatalWarner</a></li>
+				
+					<li><a href="./Rack/MockRequest/FatalWarning.html">Rack::MockRequest::FatalWarning</a></li>
+				
+					<li><a href="./Rack/MockResponse.html">Rack::MockResponse</a></li>
+				
+					<li><a href="./Rack/Recursive.html">Rack::Recursive</a></li>
+				
+					<li><a href="./Rack/Reloader.html">Rack::Reloader</a></li>
+				
+					<li><a href="./Rack/Reloader/Stat.html">Rack::Reloader::Stat</a></li>
+				
+					<li><a href="./Rack/Request.html">Rack::Request</a></li>
+				
+					<li><a href="./Rack/Response.html">Rack::Response</a></li>
+				
+					<li><a href="./Rack/Response/Helpers.html">Rack::Response::Helpers</a></li>
+				
+					<li><a href="./Rack/RewindableInput.html">Rack::RewindableInput</a></li>
+				
+					<li><a href="./Rack/RewindableInput/Tempfile.html">Rack::RewindableInput::Tempfile</a></li>
+				
+					<li><a href="./Rack/Session.html">Rack::Session</a></li>
+				
+					<li><a href="./Rack/Session/Abstract.html">Rack::Session::Abstract</a></li>
+				
+					<li><a href="./Rack/Session/Abstract/ID.html">Rack::Session::Abstract::ID</a></li>
+				
+					<li><a href="./Rack/Session/Cookie.html">Rack::Session::Cookie</a></li>
+				
+					<li><a href="./Rack/Session/Memcache.html">Rack::Session::Memcache</a></li>
+				
+					<li><a href="./Rack/Session/Pool.html">Rack::Session::Pool</a></li>
+				
+					<li><a href="./Rack/ShowExceptions.html">Rack::ShowExceptions</a></li>
+				
+					<li><a href="./Rack/ShowStatus.html">Rack::ShowStatus</a></li>
+				
+					<li><a href="./Rack/Static.html">Rack::Static</a></li>
+				
+					<li><a href="./Rack/URLMap.html">Rack::URLMap</a></li>
+				
+					<li><a href="./Rack/Utils.html">Rack::Utils</a></li>
+				
+					<li><a href="./Rack/Utils/Context.html">Rack::Utils::Context</a></li>
+				
+					<li><a href="./Rack/Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></li>
+				
+					<li><a href="./Rack/Utils/Multipart.html">Rack::Utils::Multipart</a></li>
+				
+					<li><a href="./FCGI.html">FCGI</a></li>
+				
+					<li><a href="./FCGI/Stream.html">FCGI::Stream</a></li>
+				
+				</ul>
+				<div id="no-class-search-results" style="display: none;">No matching classes.</div>
+			</div>
+
+			
+		</div>
+	</div>
+
+	<div id="documentation">
+		<h2><a href="Rack/Auth/Basic.html">Rack::Auth::Basic</a></h2>
+<ul>
+<li>should challenge correctly when no credentials are specified
+
+</li>
+<li>should rechallenge if incorrect credentials are specified
+
+</li>
+<li>should return application output if correct credentials are specified
+
+</li>
+<li>should return 400 Bad Request if different auth scheme used
+
+</li>
+<li>realm as optional constructor arg
+
+</li>
+</ul>
+<h2><a href="Rack/Auth/Digest/MD5.html">Rack::Auth::Digest::MD5</a></h2>
+<ul>
+<li>should challenge when no credentials are specified
+
+</li>
+<li>should return application output if correct credentials given
+
+</li>
+<li>should return application output if correct credentials given (hashed
+passwords)
+
+</li>
+<li>should rechallenge if incorrect username given
+
+</li>
+<li>should rechallenge if incorrect password given
+
+</li>
+<li>should rechallenge with stale parameter if nonce is stale
+
+</li>
+<li>should return 400 Bad Request if incorrect qop given
+
+</li>
+<li>should return 400 Bad Request if incorrect uri given
+
+</li>
+<li>should return 400 Bad Request if different auth scheme used
+
+</li>
+<li>should not require credentials for unprotected path
+
+</li>
+<li>should challenge when no credentials are specified for protected path
+
+</li>
+<li>should return application output if correct credentials given for protected
+path
+
+</li>
+<li>should return application output if correct credentials given for POST
+
+</li>
+<li>should return application output if correct credentials given for PUT
+(using method override of POST)
+
+</li>
+<li>realm as optional constructor arg
+
+</li>
+</ul>
+<h2><a href="Rack/Auth/OpenID.html">Rack::Auth::OpenID</a></h2>
+<ul>
+<li>realm uri should be valid
+
+</li>
+<li>should be able to check if a uri is within the realm (empty)
+
+</li>
+<li>return_to should be valid
+
+</li>
+<li>extensions should have required constants defined
+
+</li>
+<li>extensions should have Request and Response defined and inherit from
+OpenID::Extension
+
+</li>
+</ul>
+<h2><a href="Rack/Builder.html">Rack::Builder</a></h2>
+<ul>
+<li>chains apps by default
+
+</li>
+<li>has implicit to_app
+
+</li>
+<li>supports blocks on use
+
+</li>
+<li>has explicit to_app
+
+</li>
+<li>apps are initialized once
+
+</li>
+</ul>
+<h2><a href="Rack/Adapter/Camping.html">Rack::Adapter::Camping</a></h2>
+<ul>
+<li>works with GET
+
+</li>
+<li>works with POST
+
+</li>
+</ul>
+<h2><a href="Rack/Cascade.html">Rack::Cascade</a></h2>
+<ul>
+<li>should dispatch onward on 404 by default
+
+</li>
+<li>should dispatch onward on whatever is passed
+
+</li>
+<li>should fail if empty
+
+</li>
+<li>should append new app
+
+</li>
+</ul>
+<h2><a href="Rack/Handler/CGI.html">Rack::Handler::CGI</a></h2>
+<ul>
+<li>startup (empty)
+
+</li>
+<li>should respond
+
+</li>
+<li>should be a lighttpd
+
+</li>
+<li>should have rack headers
+
+</li>
+<li>should have CGI headers on GET
+
+</li>
+<li>should have CGI headers on POST
+
+</li>
+<li>should support HTTP auth
+
+</li>
+<li>should set status
+
+</li>
+<li>shutdown
+
+</li>
+</ul>
+<h2><a href="Rack/Chunked.html">Rack::Chunked</a></h2>
+<ul>
+<li>chunks responses with no Content-Length
+
+</li>
+<li>chunks empty bodies properly
+
+</li>
+<li>does not modify response when Content-Length header present
+
+</li>
+<li>does not modify response when client is HTTP/1.0
+
+</li>
+<li>does not modify response when Transfer-Encoding header already present
+
+</li>
+<li>does not modify response when status code is 100
+
+</li>
+<li>does not modify response when status code is 204
+
+</li>
+<li>does not modify response when status code is 304
+
+</li>
+</ul>
+<h2><a href="Rack/CommonLogger.html">Rack::CommonLogger</a></h2>
+<ul>
+<li>should log to rack.errors by default
+
+</li>
+<li>should log to anything with <<
+
+</li>
+</ul>
+<h2><a href="Rack/ConditionalGet.html">Rack::ConditionalGet</a></h2>
+<ul>
+<li>should set a 304 status and truncate body when If-Modified-Since hits
+
+</li>
+<li>should set a 304 status and truncate body when If-None-Match hits
+
+</li>
+<li>should not affect non-GET/HEAD requests
+
+</li>
+</ul>
+<h2><a href="Rack/ContentLength.html">Rack::ContentLength</a></h2>
+<ul>
+<li>sets Content-Length on String bodies if none is set
+
+</li>
+<li>sets Content-Length on Array bodies if none is set
+
+</li>
+<li>does not set Content-Length on variable length bodies
+
+</li>
+<li>does not change Content-Length if it is already set
+
+</li>
+<li>does not set Content-Length on 304 responses
+
+</li>
+<li>does not set Content-Length when Transfer-Encoding is chunked
+
+</li>
+</ul>
+<h2><a href="Rack/ContentType.html">Rack::ContentType</a></h2>
+<ul>
+<li>sets Content-Type to default text/html if none is set
+
+</li>
+<li>sets Content-Type to chosen default if none is set
+
+</li>
+<li>does not change Content-Type if it is already set
+
+</li>
+<li>case insensitive detection of Content-Type
+
+</li>
+</ul>
+<h2><a href="Rack/Deflater.html">Rack::Deflater</a></h2>
+<ul>
+<li>should be able to deflate bodies that respond to each
+
+</li>
+<li>should be able to deflate String bodies
+
+</li>
+<li>should be able to gzip bodies that respond to each
+
+</li>
+<li>should be able to fallback to no deflation
+
+</li>
+<li>should be able to skip when there is no response entity body
+
+</li>
+<li>should handle the lack of an acceptable encoding
+
+</li>
+<li>should handle gzip response with Last-Modified header
+
+</li>
+<li>should do nothing when no-transform Cache-Control directive present
+
+</li>
+</ul>
+<h2><a href="Rack/Directory.html">Rack::Directory</a></h2>
+<ul>
+<li>serves directory indices
+
+</li>
+<li>passes to app if file found
+
+</li>
+<li>serves uri with URL encoded filenames
+
+</li>
+<li>does not allow directory traversal
+
+</li>
+<li>404s if it can&#8217;t find the file
+
+</li>
+</ul>
+<h2><a href="Rack/Handler/FastCGI.html">Rack::Handler::FastCGI</a></h2>
+<ul>
+<li>startup (empty)
+
+</li>
+<li>should respond
+
+</li>
+<li>should be a lighttpd
+
+</li>
+<li>should have rack headers
+
+</li>
+<li>should have CGI headers on GET
+
+</li>
+<li>should have CGI headers on POST
+
+</li>
+<li>should support HTTP auth
+
+</li>
+<li>should set status
+
+</li>
+<li>shutdown
+
+</li>
+</ul>
+<h2><a href="Rack/File.html">Rack::File</a></h2>
+<ul>
+<li>serves files
+
+</li>
+<li>sets Last-Modified header
+
+</li>
+<li>serves files with URL encoded filenames
+
+</li>
+<li>does not allow directory traversal
+
+</li>
+<li>does not allow directory traversal with encoded periods
+
+</li>
+<li>404s if it can&#8217;t find the file
+
+</li>
+<li>detects SystemCallErrors
+
+</li>
+<li>returns bodies that respond to to_path
+
+</li>
+</ul>
+<h2><a href="Rack/Handler.html">Rack::Handler</a></h2>
+<ul>
+<li>has registered default handlers
+
+</li>
+<li>handler that doesn&#8217;t exist should raise a NameError
+
+</li>
+<li>should get unregistered, but already required, handler by name
+
+</li>
+<li>should register custom handler
+
+</li>
+<li>should not need registration for properly coded handlers even if not
+already required
+
+</li>
+</ul>
+<h2><a href="Rack/Head.html">Rack::Head</a></h2>
+<ul>
+<li>response (empty)
+
+</li>
+<li>passes GET, POST, PUT, DELETE, OPTIONS, TRACE requests
+
+</li>
+<li>removes body from HEAD requests
+
+</li>
+</ul>
+<h2><a href="Rack/Lint.html">Rack::Lint</a></h2>
+<ul>
+<li>passes valid request
+
+</li>
+<li>notices fatal errors
+
+</li>
+<li>notices environment errors
+
+</li>
+<li>notices input errors
+
+</li>
+<li>notices error errors
+
+</li>
+<li>notices status errors
+
+</li>
+<li>notices header errors
+
+</li>
+<li>notices content-type errors
+
+</li>
+<li>notices content-length errors
+
+</li>
+<li>notices body errors
+
+</li>
+<li>notices input handling errors
+
+</li>
+<li>notices error handling errors
+
+</li>
+<li>notices HEAD errors
+
+</li>
+<li>passes valid read calls
+
+</li>
+</ul>
+<h2>Rack::Lint::InputWrapper</h2>
+<ul>
+<li>delegates :size to underlying IO object
+
+</li>
+<li>delegates :rewind to underlying IO object
+
+</li>
+</ul>
+<h2>Rack::Lobster::LambdaLobster</h2>
+<ul>
+<li>should be a single lambda
+
+</li>
+<li>should look like a lobster
+
+</li>
+<li>should be flippable
+
+</li>
+</ul>
+<h2><a href="Rack/Lobster.html">Rack::Lobster</a></h2>
+<ul>
+<li>should look like a lobster
+
+</li>
+<li>should be flippable
+
+</li>
+<li>should provide crashing for testing purposes
+
+</li>
+</ul>
+<h2><a href="Rack/Lock.html">Rack::Lock</a></h2>
+<ul>
+<li>should call synchronize on lock
+
+</li>
+<li>should set multithread flag to false
+
+</li>
+<li>should reset original multithread flag when exiting lock
+
+</li>
+</ul>
+<h2><a href="Rack/MethodOverride.html">Rack::MethodOverride</a></h2>
+<ul>
+<li>should not affect GET requests
+
+</li>
+<li>_method parameter should modify REQUEST_METHOD for POST requests
+
+</li>
+<li>X-HTTP-Method-Override header should modify REQUEST_METHOD for POST
+requests
+
+</li>
+<li>should not modify REQUEST_METHOD if the method is unknown
+
+</li>
+<li>should not modify REQUEST_METHOD when _method is nil
+
+</li>
+<li>should store the original REQUEST_METHOD prior to overriding
+
+</li>
+</ul>
+<h2><a href="Rack/MockRequest.html">Rack::MockRequest</a></h2>
+<ul>
+<li>should return a MockResponse
+
+</li>
+<li>should be able to only return the environment
+
+</li>
+<li>should provide sensible defaults
+
+</li>
+<li>should allow GET/POST/PUT/DELETE
+
+</li>
+<li>should set content length
+
+</li>
+<li>should allow posting
+
+</li>
+<li>should use all parts of an URL
+
+</li>
+<li>should behave valid according to the <a href="Rack.html">Rack</a> spec
+
+</li>
+</ul>
+<h2><a href="Rack/MockResponse.html">Rack::MockResponse</a></h2>
+<ul>
+<li>should provide access to the HTTP status
+
+</li>
+<li>should provide access to the HTTP headers
+
+</li>
+<li>should provide access to the HTTP body
+
+</li>
+<li>should provide access to the <a href="Rack.html">Rack</a> errors
+
+</li>
+<li>should optionally make <a href="Rack.html">Rack</a> errors fatal
+
+</li>
+</ul>
+<h2><a href="Rack/Handler/Mongrel.html">Rack::Handler::Mongrel</a></h2>
+<ul>
+<li>should respond
+
+</li>
+<li>should be a Mongrel
+
+</li>
+<li>should have rack headers
+
+</li>
+<li>should have CGI headers on GET
+
+</li>
+<li>should have CGI headers on POST
+
+</li>
+<li>should support HTTP auth
+
+</li>
+<li>should set status
+
+</li>
+<li>should provide a .run
+
+</li>
+<li>should provide a .run that maps a hash
+
+</li>
+<li>should provide a .run that maps a urlmap
+
+</li>
+<li>should provide a .run that maps a urlmap restricting by host
+
+</li>
+<li>should stream each part of the response
+
+</li>
+</ul>
+<h2><a href="Rack/Recursive.html">Rack::Recursive</a></h2>
+<ul>
+<li>should allow for subrequests
+
+</li>
+<li>should raise error on requests not below the app
+
+</li>
+<li>should support forwarding
+
+</li>
+</ul>
+<h2><a href="Rack/Request.html">Rack::Request</a></h2>
+<ul>
+<li>wraps the rack variables
+
+</li>
+<li>can figure out the correct host
+
+</li>
+<li>can parse the query string
+
+</li>
+<li>can parse POST data
+
+</li>
+<li>can parse POST data with explicit content type
+
+</li>
+<li>does not parse POST data when media type is not form-data
+
+</li>
+<li>rewinds input after parsing POST data
+
+</li>
+<li>cleans up Safari&#8217;s ajax POST body
+
+</li>
+<li>can get value by key from params with #[]
+
+</li>
+<li>can set value to key on params with #[]=
+
+</li>
+<li>values_at answers values by keys in order given
+
+</li>
+<li>referrer should be extracted correct
+
+</li>
+<li>can cache, but invalidates the cache
+
+</li>
+<li>can figure out if called via XHR
+
+</li>
+<li>can parse cookies
+
+</li>
+<li>parses cookies according to RFC 2109
+
+</li>
+<li>provides setters
+
+</li>
+<li>provides the original env
+
+</li>
+<li>can restore the URL
+
+</li>
+<li>can restore the full path
+
+</li>
+<li>can handle multiple media type parameters
+
+</li>
+<li>can parse multipart form data
+
+</li>
+<li>can parse big multipart form data
+
+</li>
+<li>can detect invalid multipart form data
+
+</li>
+<li>shouldn&#8217;t try to interpret binary as utf8
+
+</li>
+<li>should work around buggy 1.8.* Tempfile equality
+
+</li>
+<li>does conform to the <a href="Rack.html">Rack</a> spec
+
+</li>
+<li>should parse Accept-Encoding correctly
+
+</li>
+<li>should provide ip information
+
+</li>
+<li>memoizes itself to reduce the cost of repetitive initialization
+
+</li>
+<li>should allow subclass request to be instantiated after parent request
+
+</li>
+<li>should allow parent request to be instantiated after subclass request
+
+</li>
+</ul>
+<h2><a href="Rack/Response.html">Rack::Response</a></h2>
+<ul>
+<li>has sensible default values
+
+</li>
+<li>can be written to
+
+</li>
+<li>can set and read headers
+
+</li>
+<li>can set cookies
+
+</li>
+<li>formats the Cookie expiration date accordingly to RFC 2109
+
+</li>
+<li>can set secure cookies
+
+</li>
+<li>can set http only cookies
+
+</li>
+<li>can delete cookies
+
+</li>
+<li>can do redirects
+
+</li>
+<li>has a useful constructor
+
+</li>
+<li>has a constructor that can take a block
+
+</li>
+<li>doesn&#8217;t return invalid responses
+
+</li>
+<li>knows if it&#8217;s empty
+
+</li>
+<li>should provide access to the HTTP status
+
+</li>
+<li>should provide access to the HTTP headers
+
+</li>
+<li>does not add or change Content-Length when finish()ing
+
+</li>
+<li>updates Content-Length when body appended to using write
+
+</li>
+</ul>
+<h2><a href="Rack/RewindableInput.html">Rack::RewindableInput</a></h2>
+<h3>given an IO object that is already rewindable</h3>
+<ul>
+<li>should be able to handle to read()
+
+</li>
+<li>should be able to handle to read(nil)
+
+</li>
+<li>should be able to handle to read(length)
+
+</li>
+<li>should be able to handle to read(length, buffer)
+
+</li>
+<li>should be able to handle to read(nil, buffer)
+
+</li>
+<li>should rewind to the beginning when rewind is called
+
+</li>
+<li>should be able to handle gets
+
+</li>
+<li>should be able to handle each
+
+</li>
+<li>should not buffer into a Tempfile if no data has been read yet
+
+</li>
+<li>should buffer into a Tempfile when data has been consumed for the first
+time
+
+</li>
+<li>should close the underlying tempfile upon calling close
+
+</li>
+<li>should be possibel to call close when no data has been buffered yet (empty)
+
+</li>
+<li>should be possible to call close multiple times (empty)
+
+</li>
+</ul>
+<h3>given an IO object that is not rewindable</h3>
+<ul>
+<li>should be able to handle to read()
+
+</li>
+<li>should be able to handle to read(nil)
+
+</li>
+<li>should be able to handle to read(length)
+
+</li>
+<li>should be able to handle to read(length, buffer)
+
+</li>
+<li>should be able to handle to read(nil, buffer)
+
+</li>
+<li>should rewind to the beginning when rewind is called
+
+</li>
+<li>should be able to handle gets
+
+</li>
+<li>should be able to handle each
+
+</li>
+<li>should not buffer into a Tempfile if no data has been read yet
+
+</li>
+<li>should buffer into a Tempfile when data has been consumed for the first
+time
+
+</li>
+<li>should close the underlying tempfile upon calling close
+
+</li>
+<li>should be possibel to call close when no data has been buffered yet (empty)
+
+</li>
+<li>should be possible to call close multiple times (empty)
+
+</li>
+</ul>
+<h3>given an IO object whose rewind method raises Errno::ESPIPE</h3>
+<ul>
+<li>should be able to handle to read()
+
+</li>
+<li>should be able to handle to read(nil)
+
+</li>
+<li>should be able to handle to read(length)
+
+</li>
+<li>should be able to handle to read(length, buffer)
+
+</li>
+<li>should be able to handle to read(nil, buffer)
+
+</li>
+<li>should rewind to the beginning when rewind is called
+
+</li>
+<li>should be able to handle gets
+
+</li>
+<li>should be able to handle each
+
+</li>
+<li>should not buffer into a Tempfile if no data has been read yet
+
+</li>
+<li>should buffer into a Tempfile when data has been consumed for the first
+time
+
+</li>
+<li>should close the underlying tempfile upon calling close
+
+</li>
+<li>should be possibel to call close when no data has been buffered yet (empty)
+
+</li>
+<li>should be possible to call close multiple times (empty)
+
+</li>
+</ul>
+<h2><a href="Rack/Session/Cookie.html">Rack::Session::Cookie</a></h2>
+<ul>
+<li>creates a new cookie
+
+</li>
+<li>loads from a cookie
+
+</li>
+<li>survives broken cookies
+
+</li>
+<li>barks on too big cookies
+
+</li>
+<li>creates a new cookie with integrity hash
+
+</li>
+<li>loads from a cookie wih integrity hash
+
+</li>
+<li>ignores tampered with session cookies
+
+</li>
+</ul>
+<h2><a href="Rack/Session/Memcache.html">Rack::Session::Memcache</a></h2>
+<ul>
+<li>MemCache can connect to existing server (empty)
+
+</li>
+<li>faults on no connection
+
+</li>
+<li>creates a new cookie
+
+</li>
+<li>determines session from a cookie
+
+</li>
+<li>survives nonexistant cookies
+
+</li>
+<li>maintains freshness
+
+</li>
+<li>deletes cookies with :drop option
+
+</li>
+<li>provides new session id with :renew option
+
+</li>
+<li>omits cookie with :defer option
+
+</li>
+<li>multithread: should cleanly merge sessions (empty)
+
+</li>
+</ul>
+<h2><a href="Rack/Session/Pool.html">Rack::Session::Pool</a></h2>
+<ul>
+<li>creates a new cookie
+
+</li>
+<li>determines session from a cookie
+
+</li>
+<li>survives nonexistant cookies
+
+</li>
+<li>deletes cookies with :drop option
+
+</li>
+<li>provides new session id with :renew option
+
+</li>
+<li>omits cookie with :defer option
+
+</li>
+<li>multithread: should merge sessions (empty)
+
+</li>
+</ul>
+<h2><a href="Rack/ShowExceptions.html">Rack::ShowExceptions</a></h2>
+<ul>
+<li>catches exceptions
+
+</li>
+</ul>
+<h2><a href="Rack/ShowStatus.html">Rack::ShowStatus</a></h2>
+<ul>
+<li>should provide a default status message
+
+</li>
+<li>should let the app provide additional information
+
+</li>
+<li>should not replace existing messages
+
+</li>
+<li>should pass on original headers
+
+</li>
+<li>should replace existing messages if there is detail
+
+</li>
+</ul>
+<h2><a href="Rack/Static.html">Rack::Static</a></h2>
+<ul>
+<li>serves files
+
+</li>
+<li>404s if url root is known but it can&#8217;t find the file
+
+</li>
+<li>calls down the chain if url root is not known
+
+</li>
+</ul>
+<h2><a href="Rack/Handler/Thin.html">Rack::Handler::Thin</a></h2>
+<ul>
+<li>should respond
+
+</li>
+<li>should be a Thin
+
+</li>
+<li>should have rack headers
+
+</li>
+<li>should have CGI headers on GET
+
+</li>
+<li>should have CGI headers on POST
+
+</li>
+<li>should support HTTP auth
+
+</li>
+<li>should set status
+
+</li>
+</ul>
+<h2><a href="Rack/URLMap.html">Rack::URLMap</a></h2>
+<ul>
+<li>dispatches paths correctly
+
+</li>
+<li>dispatches hosts correctly
+
+</li>
+<li>should be nestable
+
+</li>
+<li>should route root apps correctly
+
+</li>
+</ul>
+<h2><a href="Rack/Utils.html">Rack::Utils</a></h2>
+<ul>
+<li>should escape correctly
+
+</li>
+<li>should unescape correctly
+
+</li>
+<li>should parse query strings correctly
+
+</li>
+<li>should parse nested query strings correctly
+
+</li>
+<li>should build query strings correctly
+
+</li>
+<li>should figure out which encodings are acceptable
+
+</li>
+<li>should return the bytesize of String
+
+</li>
+</ul>
+<h2><a href="Rack/Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></h2>
+<ul>
+<li>should retain header case
+
+</li>
+<li>should check existence of keys case insensitively
+
+</li>
+<li>should merge case-insensitively
+
+</li>
+<li>should overwrite case insensitively and assume the new key&#8217;s case
+
+</li>
+<li>should be converted to real Hash
+
+</li>
+<li>should convert Array values to Strings when converting to Hash
+
+</li>
+</ul>
+<h2><a href="Rack/Utils/Context.html">Rack::Utils::Context</a></h2>
+<ul>
+<li>should set context correctly
+
+</li>
+<li>should alter app on recontexting
+
+</li>
+<li>should run different apps
+
+</li>
+</ul>
+<h2><a href="Rack/Utils/Multipart.html">Rack::Utils::Multipart</a></h2>
+<ul>
+<li>should return nil if content type is not multipart
+
+</li>
+<li>should parse multipart upload with text file
+
+</li>
+<li>should parse multipart upload with nested parameters
+
+</li>
+<li>should parse multipart upload with binary file
+
+</li>
+<li>should parse multipart upload with empty file
+
+</li>
+<li>should not include file params if no file was selected
+
+</li>
+<li>should parse IE multipart upload and clean up filename
+
+</li>
+<li>rewinds input after parsing upload
+
+</li>
+</ul>
+<h2><a href="Rack/Handler/WEBrick.html">Rack::Handler::WEBrick</a></h2>
+<ul>
+<li>should respond
+
+</li>
+<li>should be a WEBrick
+
+</li>
+<li>should have rack headers
+
+</li>
+<li>should have CGI headers on GET
+
+</li>
+<li>should have CGI headers on POST
+
+</li>
+<li>should support HTTP auth
+
+</li>
+<li>should set status
+
+</li>
+<li>should correctly set cookies
+
+</li>
+<li>should provide a .run
+
+</li>
+</ul>
+<p>
+330 specifications, 13 empty (1183 requirements), 0 failures
+</p>
+
+	</div>
+
+	<div id="validator-badges">
+		<p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+		<p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+			Rdoc Generator</a> 1.1.6</small>.</p>
+	</div>
+</body>
+</html>
+
