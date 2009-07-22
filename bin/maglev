@@ -60,7 +60,7 @@ if [[ -e .topazini || -e $HOME/.topazini ]]; then
   TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz "
 else
   TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
-  TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+  TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazini -l "
 fi
 
 # Check options

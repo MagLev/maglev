@@ -12,7 +12,7 @@ MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("..", File.dirname(__FILE_
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
 GEMSTONE = ENV['GEMSTONE'] || "#{MAGLEV_HOME}/gemstone"
 TOPAZ_CMD ="#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
-TOPAZDEBUG_CMD = "#{GEMSTONE}/bin/topaz -I #{MAGLEV_HOME}/etc/.topazdebugini -l "
+TOPAZDEBUG_CMD = "#{GEMSTONE}/bin/topaz -I #{MAGLEV_HOME}/etc/.topazini -l "
 IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
 
 ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
@@ -257,7 +257,7 @@ end
 def create_debug_script(code)
   script_name = "#{MAGLEV_HOME}/etc/rake_debug_script"
   sh %{
-    cp #{MAGLEV_HOME}/etc/.topazdebugini #{script_name}
+    cp #{MAGLEV_HOME}/etc/.topazini #{script_name}
     cat - >> #{script_name} <<EOF
 login
 #{code}
