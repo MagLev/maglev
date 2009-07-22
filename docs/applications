@@ -6,7 +6,7 @@ of applications that depend on a C-extension do not work.
 
 === Rack
 
-Version 0.9.1 of Rack is in <tt>src/external/Rack</tt>
+An unmodified version 1.0.0 of Rack is in <tt>src/external/rack-1.0.0</tt>
 
 MagLev does not currently support (at least) the following Rack features:
 * openid
@@ -20,8 +20,9 @@ MagLev does not currently support (at least) the following Rack features:
 
 === Sinatra
 
-Version 0.9.0.4 of Sinatra is in <tt>src/external/Sinatra</tt>.   Much of
-Sinatra runs, but some things don't.
+An unmodified version 0.9.3 of Sinatra is in
+<tt>src/external/sinatra-0.9.3</tt>.
+Much of Sinatra runs, but some things don't.
 
 The following items seem to work (at least in the simple case)
 * Routes
