@@ -1,5 +1,5 @@
-$:.unshift(ENV['MAGLEV_HOME'] + '/src/external/sinatra-0.9.3/lib')
-$:.unshift(ENV['MAGLEV_HOME'] + '/src/external/rack-1.0.0/lib')
+$:.unshift("#{ENV['MAGLEV_HOME']}/src/external/rack/lib")
+$:.unshift("#{ENV['MAGLEV_HOME']}/src/external/sinatra/lib")
 
 require 'sinatra'
 
@@ -16,7 +16,16 @@ end
 # http://www.sinatrarb.com/book.html
 
 get '/' do
-  "Hello World (rack: #{Rack.release}) (sinatra: #{Sinatra::VERSION})"
+  <<-EOS
+  <html>
+    <head><title>Sinatra Hello</title></head>
+    <body>
+      <h2>Hello from Sinatra</h2>
+      <p>Rack: #{Rack.release}</p>
+      <p>Sinatra: #{Sinatra::VERSION}</p>
+    </body>
+  </html>
+  EOS
 end
 
 get '/names/:name' do
