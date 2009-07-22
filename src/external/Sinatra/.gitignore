@@ -1,9 +1,0 @@
-*.log
-.DS_Store
-/dist
-/book
-/doc/api
-/doc/*.html
-.#*
-\#*
-.emacs*

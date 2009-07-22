@@ -1,14 +1,14 @@
-$:.unshift File.dirname(__FILE__) + '/Rack/lib'
-# $:.unshift File.dirname(__FILE__) + '/rack-1.0.0/lib'
+# $:.unshift File.dirname(__FILE__) + '/Rack/lib'
+$:.unshift File.dirname(__FILE__) + '/rack-1.0.0/lib'
 
 require 'webrick'
 require 'rack'
 
 # For debugging, stop on all exceptions
-# Exception.install_debug_block do |e|
-#   puts "=== caught #{e.inspect} ================="
-#   nil.pause
-# end
+Exception.install_debug_block do |e|
+  puts "=== caught #{e.inspect} ================="
+  nil.pause
+end
 
 class RackTest
   include WEBrick
