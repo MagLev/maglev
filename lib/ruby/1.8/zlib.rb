@@ -1,3 +1,4 @@
+require 'stringio'
 
 module Zlib
 
