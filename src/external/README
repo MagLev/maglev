@@ -4,24 +4,22 @@ working with these apps on MagLev should share the same code/fixes.
 
 NOTE:  See the top level docs/applications directory for more details.
 
-rack-1.0.0
+rack
   Rack provides an minimal interface between webservers supporting Ruby and
-  Ruby frameworks. 1.0.0. released on 2009-04-25.
+  Ruby frameworks.  See $MAGLEV_HOME/examples/rack for more info.
+  Version: 1.0.0. released on 2009-04-25.
   See: http://rack.rubyforge.org/
   License: MIT
 
-sinatra-0.9.3
-  Sinatra is a light-weight web framework for ruby.
-  Version 0.9.3
+sinatra
+  Sinatra is a light-weight web framework for ruby.  See
+  $MAGLEV_HOME/examples/sinatra for more info.
+  Version: 0.9.3
   License: MIT
 
 benchmark
   (moved to $MAGLEV_HOME/benchmark)
   Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.
-
-racktest.rb
-  A simple webrick test of Rack.  Run it, then hit http://localhost:3333/ .
-      $ maglev-ruby racktest.rb
 
 Ramaze
   A Ruby modular web framework. http://ramaze.net/
@@ -42,6 +40,3 @@ rxtest
   Tim Bray's rx code.  Rx is an automaton based XML tokenizer.  It was
   proposed as one of the real-world-ish applications to add to Antonio's
   benchmark suite.
-
-sintatratest.rb
-  A simple sinatra smoke test.
