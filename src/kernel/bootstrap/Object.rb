@@ -241,18 +241,12 @@ class Object
       unless a_name._isStringOrSymbol
         a_name = Type.coerce_to(a_name, String, :to_str)
       end
-      unless (a_name[0].equal?( ?@ ))
-        raise NameError, "`#{a_name}' is not allowed as an instance variable name"
-      end
       _instVarAt(a_name.to_sym)
     end
 
     def instance_variable_set(a_name, a_val)
       unless a_name._isStringOrSymbol
         a_name = Type.coerce_to(a_name, String, :to_str)
-      end
-      unless (a_name[0].equal?( ?@ ))
-        raise NameError, "`#{a_name}' is not allowed as an instance variable name"
       end
       _instVarAtPut(a_name.to_sym, a_val)
       a_val
