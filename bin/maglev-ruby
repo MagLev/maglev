@@ -55,6 +55,9 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
 fi
 
 conf_file=$MAGLEV_HOME/etc/system.conf
+# to login to an already running stone not started by
+# maglev commands, use STONENAME env variable , not the --stone option.  
+#  because --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
 if [ -z "$STONENAME" ]; then
 	stone=gs64stone
 else
