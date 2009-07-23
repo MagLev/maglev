@@ -29,8 +29,6 @@ class Class
 
   # base image has persistent env 1 method Class>>class
 
-  primitive_nobridge '_include_module', 'includeRubyModule:'
-
   def new(*args, &block)
     # this variant gets bridge methods
     inst = self.allocate
