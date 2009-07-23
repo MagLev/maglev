@@ -64,7 +64,7 @@ persistence library based on the Ruby +PStore+ API.  Read the comments in
 <tt>examples/persistence/gstore/</tt> for complete details.
 
 If neither the MRI Compatibility model nor the MagLev Persistence model is
-appropriate for your application, you may create your own custome
+appropriate for your application, you may create your own custom
 persistence model using the full GemStone/S API via the Smalltalk FFI
 wrapper classes. See <tt>docs/smalltalk_ffi</tt> or after running <tt>rake
 rdoc</tt> see the .rb files in <tt>lib/ruby/site_ruby/1.8/smalltalk.</tt>
