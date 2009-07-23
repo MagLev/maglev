@@ -17,6 +17,25 @@ Regexp._freeze_constants
 
 # Fixnum#ord deleted
 
+class Array
+  def _join
+    # optimized version of join
+    sep = nil  # default value of $,
+    n = 0
+    out = ""
+    sz = self.size
+    while (n < sz)
+      elem = at(n)
+      if elem._isArray
+        raise ArgumentError, 'nested Array not supported'
+      end
+      out << elem.to_s
+      n += 1
+    end
+    out
+  end
+end
+
 # class InternalParseError < StandardError
 # end
 
@@ -608,7 +627,7 @@ module MagRp # {
         res.src_offset=( src_ofs )
         return res
       elsif RpStringScanner.ch_is_uc_alpha(first_ch)
-        return RubyConstNode.s( id)  # s(:const )
+        return RubyConstNode.s( id, src_ofs )  # s(:const )
       end 
     end
     if first_ch.equal?( ?_ )

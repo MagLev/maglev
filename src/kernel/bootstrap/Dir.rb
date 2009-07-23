@@ -20,6 +20,7 @@ class Dir
 
   # RUBINIUS inspired, but our API is enough different..
   def self.chdir(path = ENV['HOME'])
+    path = Type.coerce_to(path, String, :to_str)
     if block_given?
       original_path = self.getwd
       Errno.handle(_chdir(path), "chdir #{path}")

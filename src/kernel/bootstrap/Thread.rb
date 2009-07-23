@@ -195,7 +195,7 @@ class Thread
 
   primitive_nobridge 'terminate', 'exit'
 
-  primitive_nobridge 'wakeup', 'resume'
+  primitive_nobridge 'wakeup', 'rubyResume'
 
 end
 

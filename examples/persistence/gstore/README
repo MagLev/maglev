@@ -6,35 +6,27 @@ To run this example:
 
 1: Ensure MagLev is running
 
-2: Ensure the smalltalk ffi wrappers have been generated:
+2: Run the main.rb script:
 
-     $ cd $MAGLEV_HOME
-     $ rake dev:stwrappers
-
-   This will populate $MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk with
-   the necessary files
-
-3: Run the main.rb script:
-
-     $ maglev-ruby main.rb
+     $ mruby main.rb
            user     system      total        real
-       1.390000   0.050000   1.440000 (  7.979673)
+     write  1.940000   0.070000   2.010000 (  9.077902)
+     read   0.000000   0.000000   0.000000 (  0.001899)
+     r/w    0.150000   0.080000   0.230000 ( 13.876143)
 
      $ maglev-ruby --version
-     maglev 0.6 (ruby 1.8.6) (2009-05-14 rev 21661-859) [i386-darwin9.6.0]
+     maglev 0.6 (ruby 1.8.6) (2009-07-15 rev 21935-929) [i386-darwin9.7.0]
 
-
-4: You can also run main.rb using MRI, or another ruby impleentation:
+3: You can also run main.rb using MRI, or another ruby impleentation:
 
      $ ruby main.rb
            user     system      total        real
-      19.480000   6.260000  25.740000 ( 37.151687)
+     write 21.830000   6.860000  28.690000 ( 39.075893)
+     read   3.970000   1.340000   5.310000 (  7.510127)
+     r/w   96.270000  19.500000 115.770000 (136.750766)
 
      $ ruby --version
      ruby 1.8.6 (2008-08-11 patchlevel 287) [i686-darwin9.6.0]
-
-
-
 
 
 

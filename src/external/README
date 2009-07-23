@@ -4,15 +4,15 @@ working with these apps on MagLev should share the same code/fixes.
 
 NOTE:  See the top level docs/applications directory for more details.
 
-Rack
+rack-1.0.0
   Rack provides an minimal interface between webservers supporting Ruby and
-  Ruby frameworks. 0.9.1. released on 2009-01-10.
+  Ruby frameworks. 1.0.0. released on 2009-04-25.
   See: http://rack.rubyforge.org/
   License: MIT
 
-Sinatra
+sinatra-0.9.3
   Sinatra is a light-weight web framework for ruby.
-  Version 0.9.0.4 (compatible with rack 0.9.1)
+  Version 0.9.3
   License: MIT
 
 benchmark
@@ -21,7 +21,6 @@ benchmark
 
 racktest.rb
   A simple webrick test of Rack.  Run it, then hit http://localhost:3333/ .
-
       $ maglev-ruby racktest.rb
 
 Ramaze

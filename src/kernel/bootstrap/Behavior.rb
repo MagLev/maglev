@@ -4,8 +4,6 @@ class Behavior
   # normal class/modules so they are defined up here.
 
   primitive 'alias_method', 'rubyAlias:from:'
-  primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
-  primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
   primitive_nobridge '_module_eval_string', '_moduleEvalString:with:binding:'
   primitive_nobridge '_module_eval&', '_moduleEval:'
 

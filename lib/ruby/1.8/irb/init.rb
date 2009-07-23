@@ -20,8 +20,9 @@ module IRB
     IRB.run_config
     IRB.load_modules
 
-    unless @CONF[:PROMPT][@CONF[:PROMPT_MODE]]
-      IRB.fail(UndefinedPromptMode, @CONF[:PROMPT_MODE])
+    cnf = IRB.conf
+    unless cnf[:PROMPT][cnf[:PROMPT_MODE]]
+      IRB.fail(UndefinedPromptMode, cnf[:PROMPT_MODE])
     end
   end
 
@@ -31,34 +32,35 @@ module IRB
     @TRACER_INITIALIZED = false
 
     # default configurations
-    unless ap_path and @CONF[:AP_NAME]
+    cnf = IRB.conf
+    unless ap_path and cnf[:AP_NAME]
       ap_path = File.join(File.dirname(File.dirname(__FILE__)), "irb.rb")
     end
-    @CONF[:AP_NAME] = File::basename(ap_path, ".rb")
+    cnf[:AP_NAME] = File::basename(ap_path, ".rb")
 
-    @CONF[:IRB_NAME] = "irb"
-    @CONF[:IRB_LIB_PATH] = File.dirname(__FILE__)
+    cnf[:IRB_NAME] = "irb"
+    cnf[:IRB_LIB_PATH] = File.dirname(__FILE__)
 
-    @CONF[:RC] = true
-    @CONF[:LOAD_MODULES] = []
-    @CONF[:IRB_RC] = nil
+    cnf[:RC] = true
+    cnf[:LOAD_MODULES] = []
+    cnf[:IRB_RC] = nil
 
-    @CONF[:MATH_MODE] = false
-    @CONF[:USE_READLINE] = false unless defined?(ReadlineInputMethod)
-    @CONF[:INSPECT_MODE] = nil
-    @CONF[:USE_TRACER] = false
-    @CONF[:USE_LOADER] = false
-    @CONF[:IGNORE_SIGINT] = true
-    @CONF[:IGNORE_EOF] = false
-    @CONF[:ECHO] = nil
-    @CONF[:VERBOSE] = nil
+    cnf[:MATH_MODE] = false
+    cnf[:USE_READLINE] = false unless defined?(ReadlineInputMethod)
+    cnf[:INSPECT_MODE] = nil
+    cnf[:USE_TRACER] = false
+    cnf[:USE_LOADER] = false
+    cnf[:IGNORE_SIGINT] = true
+    cnf[:IGNORE_EOF] = false
+    cnf[:ECHO] = nil
+    cnf[:VERBOSE] = nil
 
-    @CONF[:EVAL_HISTORY] = nil
-    @CONF[:SAVE_HISTORY] = nil
+    cnf[:EVAL_HISTORY] = nil
+    cnf[:SAVE_HISTORY] = nil
 
-    @CONF[:BACK_TRACE_LIMIT] = 16
+    cnf[:BACK_TRACE_LIMIT] = 16
 
-    @CONF[:PROMPT] = {
+    cnf[:PROMPT] = {
       :NULL => {
   :PROMPT_I => nil,
   :PROMPT_N => nil,
@@ -105,20 +107,21 @@ module IRB
       }
     }
 
-    @CONF[:PROMPT_MODE] = (STDIN.tty? ? :DEFAULT : :NULL)
-    @CONF[:AUTO_INDENT] = false
+    cnf[:PROMPT_MODE] = (STDIN.tty? ? :DEFAULT : :NULL)
+    cnf[:AUTO_INDENT] = false
 
-    @CONF[:CONTEXT_MODE] = 3 # use binding in function on TOPLEVEL_BINDING
-    @CONF[:SINGLE_IRB] = false
+    cnf[:CONTEXT_MODE] = 3 # use binding in function on TOPLEVEL_BINDING
+    cnf[:SINGLE_IRB] = false
 
 #    @CONF[:LC_MESSAGES] = "en"
-    @CONF[:LC_MESSAGES] = Locale.new
+    cnf[:LC_MESSAGES] = Locale.new
 
-    @CONF[:DEBUG_LEVEL] = 1
+    cnf[:DEBUG_LEVEL] = 1
   end
 
   def IRB.init_error
-    @CONF[:LC_MESSAGES].load("irb/error.rb")
+    cnf = IRB.conf
+    cnf[:LC_MESSAGES].load("irb/error.rb")
   end
 
   FEATURE_IOPT_CHANGE_VERSION = "1.9.0"
@@ -126,75 +129,76 @@ module IRB
   # option analyzing
   def IRB.parse_opts
     load_path = []
+    cnf = IRB.conf
     while opt = ARGV.shift
       case opt
       when "-f"
-  @CONF[:RC] = false
+        cnf[:RC] = false
       when "-m"
-  @CONF[:MATH_MODE] = true
+        cnf[:MATH_MODE] = true
       when "-d"
-  $DEBUG = true
+         $DEBUG = true
       when /^-r(.+)?/
-  opt = $1 || ARGV.shift
-  @CONF[:LOAD_MODULES].push opt if opt
+        opt = $1 || ARGV.shift
+  	cnf[:LOAD_MODULES].push opt if opt
       when /^-I(.+)?/
         opt = $1 || ARGV.shift
-  load_path.concat(opt.split(File::PATH_SEPARATOR)) if opt
+        load_path.concat(opt.split(File::PATH_SEPARATOR)) if opt
       when /^-K(.)/
-  $KCODE = $1
+        $KCODE = $1
       when "--inspect"
-  @CONF[:INSPECT_MODE] = true
+        cnf[:INSPECT_MODE] = true
       when "--noinspect"
-  @CONF[:INSPECT_MODE] = false
+        cnf[:INSPECT_MODE] = false
       when "--readline"
-  @CONF[:USE_READLINE] = true
+        cnf[:USE_READLINE] = true
       when "--noreadline"
-  @CONF[:USE_READLINE] = false
+        cnf[:USE_READLINE] = false
       when "--echo"
-  @CONF[:ECHO] = true
+        cnf[:ECHO] = true
       when "--noecho"
-  @CONF[:ECHO] = false
+        cnf[:ECHO] = false
       when "--verbose"
-  @CONF[:VERBOSE] = true
+        cnf[:VERBOSE] = true
       when "--noverbose"
-  @CONF[:VERBOSE] = false
+        cnf[:VERBOSE] = false
       when "--prompt-mode", "--prompt"
-  prompt_mode = ARGV.shift.upcase.tr("-", "_").intern
-  @CONF[:PROMPT_MODE] = prompt_mode
+        prompt_mode = ARGV.shift.upcase.tr("-", "_").intern
+        cnf[:PROMPT_MODE] = prompt_mode
       when "--noprompt"
-  @CONF[:PROMPT_MODE] = :NULL
+        cnf[:PROMPT_MODE] = :NULL
       when "--inf-ruby-mode"
-  @CONF[:PROMPT_MODE] = :INF_RUBY
+        cnf[:PROMPT_MODE] = :INF_RUBY
       when "--sample-book-mode", "--simple-prompt"
-  @CONF[:PROMPT_MODE] = :SIMPLE
+        cnf[:PROMPT_MODE] = :SIMPLE
       when "--tracer"
-  @CONF[:USE_TRACER] = true
+        cnf[:USE_TRACER] = true
       when "--back-trace-limit"
-  @CONF[:BACK_TRACE_LIMIT] = ARGV.shift.to_i
+        cnf[:BACK_TRACE_LIMIT] = ARGV.shift.to_i
       when "--context-mode"
-  @CONF[:CONTEXT_MODE] = ARGV.shift.to_i
+        cnf[:CONTEXT_MODE] = ARGV.shift.to_i
       when "--single-irb"
-  @CONF[:SINGLE_IRB] = true
+        cnf[:SINGLE_IRB] = true
       when "--irb_debug"
-  @CONF[:DEBUG_LEVEL] = ARGV.shift.to_i
+        cnf[:DEBUG_LEVEL] = ARGV.shift.to_i
       when "-v", "--version"
-  print IRB.version, "\n"
-  exit 0
+        print IRB.version, "\n"
+        exit 0
       when "-h", "--help"
-  require "irb/help"
-  IRB.print_usage
-  exit 0
+        require "irb/help"
+        IRB.print_usage
+        exit 0
       when /^-/
-  IRB.fail UnrecognizedSwitch, opt
+        IRB.fail UnrecognizedSwitch, opt
       else
-  @CONF[:SCRIPT] = opt
-  $0 = opt
-  break
+        cnf[:SCRIPT] = opt
+        $0 = opt
+        break
       end
     end
     if RUBY_VERSION >= FEATURE_IOPT_CHANGE_VERSION
       load_path.collect! do |path|
-  /\A\.\// =~ path ? path : File.expand_path(path)
+        /\A\.\// =~ path ? path : File.expand_path(path)
       end
     end
     $LOAD_PATH.unshift(*load_path)
@@ -202,32 +206,34 @@ module IRB
 
   # running config
   def IRB.run_config
-    if @CONF[:RC]
+    cnf = IRB.conf
+    if cnf[:RC]
       begin
-  load rc_file if rc_file
+         load rc_file if rc_file
       rescue LoadError, Errno::ENOENT
       rescue Exception => e
-  print "load error: #{e} on #{rc_file}\n"
-  print $!.class, ": ", $!, "\n"
-  #for err in $@[0, $@.size - 2]
-  #  print "\t", err, "\n"
-  #end
+        print "load error: #{e} on #{rc_file}\n"
+        print $!.class, ": ", $!, "\n"
+        #for err in $@[0, $@.size - 2]
+        #  print "\t", err, "\n"
+        #end
       end
     end
   end
 
   IRBRC_EXT = "rc"
   def IRB.rc_file(ext = IRBRC_EXT)
+    cnf = IRB.conf
     wtf = nil
-    if !@CONF[:RC_NAME_GENERATOR]
-      @CONF[:RC_NAME_GENERATOR] = proc { |rc| wtf }
+    if !cnf[:RC_NAME_GENERATOR]
+      cnf[:RC_NAME_GENERATOR] = proc { |rc| wtf }
       rc_file_generators do |rcgen|
-  if File.exist?(fn = rcgen.call(ext))
-    wtf ||= fn
-  end
+      if File.exist?(fn = rcgen.call(ext))
+        wtf ||= fn
+      end
       end
     end
-  @CONF[:RC_NAME_GENERATOR].call ext
+    cnf[:RC_NAME_GENERATOR].call ext
   end
 
   # enumerate possible rc-file base name generators
@@ -254,11 +260,12 @@ module IRB
 
   # loading modules
   def IRB.load_modules
-    for m in @CONF[:LOAD_MODULES]
+    cnf = IRB.conf
+    for m in cnf[:LOAD_MODULES]
       begin
-  require m
+        require m
       rescue
-  print $@[0], ":", $!.class, ": ", $!, "\n"
+        print $@[0], ":", $!.class, ": ", $!, "\n"
       end
     end
   end

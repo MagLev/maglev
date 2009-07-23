@@ -55,6 +55,9 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
 fi
 
 conf_file=$MAGLEV_HOME/etc/system.conf
+# to login to an already running stone not started by
+# maglev commands, use STONENAME env variable , not the --stone option.  
+#  because --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
 if [ -z "$STONENAME" ]; then
 	stone=gs64stone
 else
@@ -180,7 +183,7 @@ trap "rm -f $dbscript $stdinscript" EXIT
 
 rm -f $dbscript
 if [ $debug == 1 ]; then
-  cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
+  cat $MAGLEV_HOME/etc/.topazini > $dbscript
 else
   cat $MAGLEV_HOME/etc/.topazini > $dbscript
 fi
@@ -190,6 +193,22 @@ set gemstone $stone
 login
 run
 |ctx|
+EOFA
+
+# Use MagRpDEBUG_level environment variable to set
+# MagRpDEBUG logging level to 0, 1, or 2
+# If it is not set, cwdefault to using the ParseTree parser
+# The need for this will go away as soon as we default to the new parser
+if [ ! -z "${MagRpDEBUG_level}" ]; then
+  cat - >> $dbscript <<-EOFA
+  SessionTemps current at: #MAGLEV_evalUseRp put: true ;
+   at: #MAGLEV_loadUseRp put: true ;
+   at: #MAGLEV_logSexp put: false ;
+   at: #MagRpDEBUG put: ${MagRpDEBUG_level} .
+EOFA
+fi
+
+cat - >> $dbscript <<-EOFA
 (ctx := RubyContext load: #($maglev_options) ) .
 ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) withDashE: #($dash_e) .
 GsFile stdout close . "ensure final LF on stdout"

@@ -1,3 +1,4 @@
 fails:The defined? keyword returns 'local-variable' when x = 1; defined?(x) is sent
 fails:The defined? keyword returns 'local-variable(in-block)' when defined? is called on a block var
 fails:The defined? keyword follows normal lexical and hierarchical scoping for constants
+fails:The defined? keyword returns 'yield' when there is a block to yield to and defined?(yield) is sent

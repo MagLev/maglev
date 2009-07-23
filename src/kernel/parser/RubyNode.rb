@@ -175,6 +175,9 @@ module MagRp
            @oldName = oldnam # a RubySymbolNode
            self
          end
+         def inspect
+           "[:alias, @{oldName.inspect}, @{newNam.inspect} ]"
+         end
        end
 
        class RubyGlobalVarAliasNode
@@ -814,11 +817,21 @@ module MagRp
            end
          end
 
-
+           class RubyClassNameNode
+             def inspect
+               if @isColon3
+                 "[:classname, '::', #{@name}]"
+               else
+                 "[:classname, #{@leftNode}, #{@name}]"
+               end
+             end
+           end
 
        class RubyConstNode
-         def self.s(sym)
-           RubyColon2Node.simple(sym)
+         def self.s(sym, src_ofs)
+           res = RubyColon2Node.simple(sym)
+           res.src_offset=( src_ofs ) 
+           res
          end
          def node_assign_set_rhs(rhs)
            # caller responsible for become
@@ -1050,6 +1063,12 @@ module MagRp
          end
          def inspect
            "[:gasgn, :#{@name}, #{@valueNode}]"
+         end
+       end
+
+       class RubyGlobalLastExcBackTrace
+         def inspect
+           '[:gvar_last_ex_bt, :$@ ]'
          end
        end
 
@@ -1367,9 +1386,6 @@ module MagRp
            end
 
            def append_blk_arg(node)
-#if node._not_equal?(nil)
-#  nil.pause
-#end
              if @iterNode.equal?(nil)
                @iterNode = node
              else

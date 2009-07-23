@@ -54,8 +54,14 @@ export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_LOG=$MAGLEV_HOME/log/$STONENAME.log
 export GEMSTONE=$MAGLEV_HOME/gemstone
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
-TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
-TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazdebugini -l "
+# Only use $MAGLEV_HOME/etc/.topazini if normal .topazini doesn't exist
+if [[ -e .topazini || -e $HOME/.topazini ]]; then
+  TOPAZ_CMD="$GEMSTONE/bin/topaz -q "
+  TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz "
+else
+  TOPAZ_CMD="$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.topazini -l "
+  TOPAZDEBUG_CMD="$GEMSTONE/bin/topaz -I $MAGLEV_HOME/etc/.topazini -l "
+fi
 
 # Check options
 while getopts 'hv' OPTION

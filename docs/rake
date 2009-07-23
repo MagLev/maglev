@@ -8,15 +8,15 @@ Run <tt>rake -D</tt> for full documentation of all the MagLev rake tasks.
 The <tt>maglev:</tt> namespace holds the rake tasks for administration of the
 MagLev Server.
 
-  rake maglev:force-reload        # Stop MagLev server, overwrite with empty repository!!!
-  rake maglev:restart             # Restart MagLev server processes.
-  rake maglev:start               # Start MagLev server processes, if not already running.
-  rake maglev:start-bench         # Start the MagLev processes with performance optimizations.
-  rake maglev:start-debug         # Start the MagLev processes with verbose output.
-  rake maglev:status              # Display MagLev server status.
-  rake maglev:stop                # Stop the MagLev processes.
-  rake maglev:topaz               # Run topaz (use rlwrap, if available)
-  rake maglev:topaz-debug         # Run debug topaz (use rlwrap, if available)
+  rake maglev:force-reload   # Stop MagLev server, overwrite with empty repository!!!
+  rake maglev:restart        # Restart MagLev server processes.
+  rake maglev:start          # Start MagLev server processes, if not already running.
+  rake maglev:start-bench    # Start the MagLev processes with performance optimizations.
+  rake maglev:start-debug    # Start the MagLev processes with verbose output.
+  rake maglev:status         # Display MagLev server status.
+  rake maglev:stop           # Stop the MagLev processes.
+  rake maglev:topaz          # Run topaz (use rlwrap, if available)
+  rake maglev:topaz-debug    # Run debug topaz (use rlwrap, if available)
 
 * There are <tt>-debug</tt> versions of several of the commands, which run
   the associated item with a higher level of debug information.
@@ -27,17 +27,17 @@ MagLev Server.
 
 === RubySpec and MSpec Tasks in <tt>spec:</tt> Namespace
 
-  rake spec:ci                    # Run the integration specs on MagLev
-  rake spec:civ                   # Run the verbose continuous integration specs on MagLev
-  rake spec:debug                 # Debug an mspec file: spec=<dir_or_file_name>
-  rake spec:debugci               # Run the continuous integration specs on MagLev with debug
-  rake spec:help                  # Run mspec run --help
-  rake spec:lsfails               # List the specs currently tagged as fails for the dir
-  rake spec:mri                   # Run the continuous integration specs against MRI
-  rake spec:run                   # Run an mspec file: spec=<dir_or_file_name>
-  rake spec:runnofail             # Run an mspec file with -G fails: spec=<dir_or_file_name>
-  rake spec:tag                   # Run the named specs and tag the failing ones
-  rake spec:untag                 # Run specs currently tagged as fails, and untag ones now passing
+  rake spec:ci               # Run the integration specs on MagLev
+  rake spec:civ              # Run the verbose continuous integration specs on MagLev
+  rake spec:debug            # Debug an mspec file: spec=<dir_or_file_name>
+  rake spec:debugci          # Run the continuous integration specs on MagLev with debug
+  rake spec:help             # Run mspec run --help
+  rake spec:lsfails          # List the specs currently tagged as fails for the dir
+  rake spec:mri              # Run the continuous integration specs against MRI
+  rake spec:run              # Run an mspec file: spec=<dir_or_file_name>
+  rake spec:runnofail        # Run an mspec file with -G fails: spec=<dir_or_file_name>
+  rake spec:tag              # Run the named specs and tag the failing ones
+  rake spec:untag            # Run specs currently tagged as fails, and untag ones now passing
 
 * The debug versions of the spec tasks setup MagLev to leave the developer
   at the Topaz prompt if there is a spec failure or an uncaught exception.
@@ -48,22 +48,23 @@ MagLev Server.
 
 === Benchmark Tasks
 The benchmark tasks run the ruby benchmark suite as adapted by the Rubinius project
-  rake bench                      # Run all the RBS benchmarks
-  rake bench:dir                  # Run all the RBS benchmarks in DIR
-  rake bench:file                 # Run only the RBS benchmark specified by FILE
-  rake bench:results              # Plot the RBS benchmark results (not implemented)
-  rake bench:to_csv               # Generate a CSV file of RBS results
+  rake bench                 # Run all the RBS benchmarks
+  rake bench:dir             # Run all the RBS benchmarks in DIR
+  rake bench:file            # Run only the RBS benchmark specified by FILE
+  rake bench:pattern         # Run all the RBS benchmarks that match PATTERN ex: PATTERN=rbs/micro-benchmarks/bm_gc*
+  rake bench:results         # Plot the RBS benchmark results (not implemented)
+  rake bench:to_csv          # Generate a CSV file of RBS results
 
 === Miscellaneous
 
 The Standard documentation, clean and clobber targets:
 
-  rake rdoc                 # Build the rdoc HTML Files
-  rake rerdoc               # Force a rebuild of the RDOC files
+  rake rdoc                  # Build the rdoc HTML Files
+  rake rerdoc                # Force a rebuild of the RDOC files
 
-  rake clean                # Remove any temporary products.
-  rake clobber              # Remove any generated file.
-  rake clobber_rdoc         # Remove rdoc products
+  rake clean                 # Remove any temporary products.
+  rake clobber               # Remove any generated file.
+  rake clobber_rdoc          # Remove rdoc products
 
 * The rdoc gets dumped into <tt>$MAGLEV_HOME/html</tt>
 

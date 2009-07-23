@@ -1,0 +1,1 @@
+fails:Module#attr applies current visibility to methods created

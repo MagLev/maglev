@@ -18,7 +18,8 @@ module IRB
     Tracer.verbose = false
     Tracer.add_filter {
       |event, file, line, id, binding, *rests|
-      /^#{Regexp.quote(@CONF[:IRB_LIB_PATH])}/ !~ file and
+      cnf = IRB.conf 
+      /^#{Regexp.quote(cnf[:IRB_LIB_PATH])}/ !~ file and
 	File::basename(file) != "irb.rb"
     }
   end

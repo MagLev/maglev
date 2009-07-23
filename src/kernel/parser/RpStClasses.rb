@@ -30,7 +30,7 @@ module MagRp
 #        RubyBlockGivenNode
 #        RubyFCallBindingNode
 #        RubyFCallEvalNode
-#      RubyGlobalLastExcBackTrace
+       RubyGlobalLastExcBackTrace = _resolve_smalltalk_global(:RubyGlobalLastExcBackTrace)
        RubyGlobalNotAssignable = _resolve_smalltalk_global(:RubyGlobalNotAssignable)
        RubyHashNode = _resolve_smalltalk_global(:RubyHashNode)
        RubyIfNode = _resolve_smalltalk_global(:RubyIfNode)
@@ -78,7 +78,7 @@ module MagRp
        RubyClassVarNode = _resolve_smalltalk_global(:RubyClassVarNode)
        RubyColon3Node = _resolve_smalltalk_global(:RubyColon3Node)
          RubyColon2Node = _resolve_smalltalk_global(:RubyColon2Node)
-#          RubyClassNameNode
+           RubyClassNameNode = _resolve_smalltalk_global(:RubyClassNameNode)
        RubyConstNode = _resolve_smalltalk_global(:RubyConstNode)
 #      RubyDVarNode
        RubyGlobalVarNode = _resolve_smalltalk_global(:RubyGlobalVarNode)

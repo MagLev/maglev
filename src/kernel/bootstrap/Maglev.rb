@@ -43,8 +43,8 @@ module Maglev
   # and at VM startup.
   PERSISTENT_ROOT = Hash.new
 
-  # Executes the block with the VM in transient mode, which affects the
-  # following operations:
+  # Executes the block with the current thread in transient mode, which
+  # affects the following operations:
   #
   # 1. All newly defined modules and classes will be marked as transient,
   #    and their names will be registered under the transient slot of the
@@ -63,14 +63,13 @@ module Maglev
   #    <tt>Module#include</tt> will be done transiently, even if the target
   #    class or module is marked persistable.
   #
-  # If the VM is already in transient mode, the block is executed and the
-  # VM remains in transient mode (i.e., a no-op).
+  # If the thread is already in transient mode, the block is executed and
+  # the thread remains in transient mode (i.e., a no-op).
   #
   # == Example
   #
-  # Suppose we have a running VM, and there already exist a persistent
-  # module named +Persistent+, and a transient module named +Transient+.
-  # We then run the following code:
+  # Suppose there already exist a persistent module named +Persistent+, and
+  # a transient module named +Transient+.  We then run the following code:
   #
   #   Maglev.transient do
   #
@@ -143,8 +142,8 @@ module Maglev
     end
   end
 
-  # Executes the block with the VM in persistent mode, which affects the
-  # following operations:
+  # Executes the block with the current thread in persistent mode, which
+  # affects the following operations:
   #
   # 1. All newly defined modules and classes will be marked as persistable,
   #    and their names will be registered under the rules for the
@@ -179,14 +178,13 @@ module Maglev
   # 5. All methods defined via <tt>Object#extend</tt> or
   #    <tt>Module#include</tt> will be done persistently.
   #
-  # If the VM is already in persistent mode, the block is executed and the
-  # VM remains in persistent mode (i.e., a no-op).
+  # If the current thread is already in persistent mode, the block is
+  # executed and the thread remains in persistent mode (i.e., a no-op).
   #
   # == Example
   #
-  # Suppose we have a running VM, and there already exist a persistent
-  # module named +Persistent+, and a transient module named +Transient+.
-  # We then run the following code:
+  # Suppose there already exist a persistent module named +Persistent+, and
+  # a transient module named +Transient+.  We then run the following code:
   #
   #   Maglev.persistent do
   #
@@ -263,12 +261,12 @@ module Maglev
     end
   end
 
-  # Returns true if the VM is currently in persistent mode.
+  # Returns true if the current thread is in persistent mode.
   def persistent?
     RubyContext.persistence_mode
   end
 
-  # Returns true if the VM is currently in transient mode.
+  # Returns true if the current thread is in transient mode.
   def transient?
     not RubyContext.persistence_mode
   end

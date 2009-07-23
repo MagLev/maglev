@@ -6,9 +6,7 @@ with patchlevel 111 and 114. It also requires the ParseTree 3.0.3 gem.
 
 === Persistence support
 
-The Gemstone class has methods for +commitTransaction+, +abortTransaction+
-and +beginTransaction+. In the future, this functionality is likely to be
-provided by different classes and messages
+See the {Persistence API}[link:files/docs/persistence-api.html]
 
 === Special methods
 * Underscore + camelCase = GemStone unmodifiable code.  There are several

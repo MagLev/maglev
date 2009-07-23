@@ -68,7 +68,6 @@ class ThrTest
     unless (s = t.status) == 'run';		Failed() ; end
     t.terminate
     Thread.pass 
-    t.run
     unless (x = $A) == 98 ; 			Failed() ; end
     unless t.alive?.equal?(false) ;             Failed() ; end
 

@@ -404,4 +404,27 @@ test({:a => 1, :b => 2, :c => 3, 4 => 0 }.key?(4 ),  true,  "eql? test D")
 #  Test passing block to fetch
 test(Hash.new.fetch('xxx') { |el| "go fish #{el}" }, 'go fish xxx', 'Fetch with block')
 
+
+# There was a bug where you could get a stack overflow because
+# Hash#delete(x,&b) called self.delete(x), but if delete was implemented by
+# a subclass to call super(x), then you'd be in trouble.  This tests passes
+# if we don't have a stack overflow.
+class HHash < Hash
+  def delete(k)
+    super k
+  end
+end
+hh = HHash.new
+hh.delete(nil)
+
+# Another bug where subclasses don't call super in their initialize method
+# caused problems.  This test case passes if there is no exception.
+class BHash < Hash
+  def initialize
+    # don't call super
+  end
+end
+bh = BHash.new
+bh['foo']
+
 report

@@ -156,7 +156,7 @@ class Stone
   end
 
   def scratch_directory
-    File.join(data_directory, "scratch")
+    File.join(data_directory, "scratch.")
   end
 
   def tranlog_directories
@@ -221,7 +221,8 @@ class Stone
     commands << ["limit oops 100",
                  "limit bytes 1000",
                  "display oops",
-                 "iferror stack" ]
+                 "iferr 1 stack",
+                 "iferr 2 exit" ]
     commands << user_commands
     commands << ["output pop",
                  "exit" ]

@@ -1,0 +1,953 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+	<title>File: README ['Rack Documentation']</title>
+
+	<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet" />
+
+	<script src="./js/jquery.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="./js/thickbox-compressed.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="./js/quicksearch.js" type="text/javascript"
+		charset="utf-8"></script>
+	<script src="./js/darkfish.js" type="text/javascript"
+		charset="utf-8"></script>
+</head>
+
+<body class="file">
+	<div id="metadata">
+		<div id="project-metadata">
+			
+			
+			<div id="fileindex-section" class="section project-section">
+				<h3 class="section-header">Files</h3>
+				<ul>
+				
+					<li class="file"><a href="./KNOWN-ISSUES.html">KNOWN-ISSUES</a></li>
+				
+					<li class="file"><a href="./RDOX.html">RDOX</a></li>
+				
+					<li class="file"><a href="./README.html">README</a></li>
+				
+					<li class="file"><a href="./SPEC.html">SPEC</a></li>
+				
+				</ul>
+			</div>
+			
+
+			<div id="classindex-section" class="section project-section">
+				<h3 class="section-header">Class Index
+					<span class="search-toggle"><img src="./images/find.png"
+						height="16" width="16" alt="[+]"
+						title="show/hide quicksearch" /></span></h3>
+				<form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+				<fieldset>
+					<legend>Quicksearch</legend>
+					<input type="text" name="quicksearch" value=""
+						class="quicksearch-field" />
+				</fieldset>
+				</form>
+
+				<ul class="link-list">
+				
+					<li><a href="./Rack.html">Rack</a></li>
+				
+					<li><a href="./Rack/Adapter.html">Rack::Adapter</a></li>
+				
+					<li><a href="./Rack/Adapter/Camping.html">Rack::Adapter::Camping</a></li>
+				
+					<li><a href="./Rack/Auth.html">Rack::Auth</a></li>
+				
+					<li><a href="./Rack/Auth/AbstractHandler.html">Rack::Auth::AbstractHandler</a></li>
+				
+					<li><a href="./Rack/Auth/AbstractRequest.html">Rack::Auth::AbstractRequest</a></li>
+				
+					<li><a href="./Rack/Auth/Basic.html">Rack::Auth::Basic</a></li>
+				
+					<li><a href="./Rack/Auth/Basic/Request.html">Rack::Auth::Basic::Request</a></li>
+				
+					<li><a href="./Rack/Auth/Digest.html">Rack::Auth::Digest</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/MD5.html">Rack::Auth::Digest::MD5</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/Nonce.html">Rack::Auth::Digest::Nonce</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/Params.html">Rack::Auth::Digest::Params</a></li>
+				
+					<li><a href="./Rack/Auth/Digest/Request.html">Rack::Auth::Digest::Request</a></li>
+				
+					<li><a href="./Rack/Auth/OpenID.html">Rack::Auth::OpenID</a></li>
+				
+					<li><a href="./Rack/Auth/OpenID/BadExtension.html">Rack::Auth::OpenID::BadExtension</a></li>
+				
+					<li><a href="./Rack/Auth/OpenID/NoSession.html">Rack::Auth::OpenID::NoSession</a></li>
+				
+					<li><a href="./Rack/Auth/OpenIDAuth.html">Rack::Auth::OpenIDAuth</a></li>
+				
+					<li><a href="./Rack/Builder.html">Rack::Builder</a></li>
+				
+					<li><a href="./Rack/Cascade.html">Rack::Cascade</a></li>
+				
+					<li><a href="./Rack/Chunked.html">Rack::Chunked</a></li>
+				
+					<li><a href="./Rack/CommonLogger.html">Rack::CommonLogger</a></li>
+				
+					<li><a href="./Rack/ConditionalGet.html">Rack::ConditionalGet</a></li>
+				
+					<li><a href="./Rack/ContentLength.html">Rack::ContentLength</a></li>
+				
+					<li><a href="./Rack/ContentType.html">Rack::ContentType</a></li>
+				
+					<li><a href="./Rack/Deflater.html">Rack::Deflater</a></li>
+				
+					<li><a href="./Rack/Deflater/DeflateStream.html">Rack::Deflater::DeflateStream</a></li>
+				
+					<li><a href="./Rack/Deflater/GzipStream.html">Rack::Deflater::GzipStream</a></li>
+				
+					<li><a href="./Rack/Directory.html">Rack::Directory</a></li>
+				
+					<li><a href="./Rack/File.html">Rack::File</a></li>
+				
+					<li><a href="./Rack/ForwardRequest.html">Rack::ForwardRequest</a></li>
+				
+					<li><a href="./Rack/Handler.html">Rack::Handler</a></li>
+				
+					<li><a href="./Rack/Handler/CGI.html">Rack::Handler::CGI</a></li>
+				
+					<li><a href="./Rack/Handler/EventedMongrel.html">Rack::Handler::EventedMongrel</a></li>
+				
+					<li><a href="./Rack/Handler/FastCGI.html">Rack::Handler::FastCGI</a></li>
+				
+					<li><a href="./Rack/Handler/LSWS.html">Rack::Handler::LSWS</a></li>
+				
+					<li><a href="./Rack/Handler/Mongrel.html">Rack::Handler::Mongrel</a></li>
+				
+					<li><a href="./Rack/Handler/SCGI.html">Rack::Handler::SCGI</a></li>
+				
+					<li><a href="./Rack/Handler/SwiftipliedMongrel.html">Rack::Handler::SwiftipliedMongrel</a></li>
+				
+					<li><a href="./Rack/Handler/Thin.html">Rack::Handler::Thin</a></li>
+				
+					<li><a href="./Rack/Handler/WEBrick.html">Rack::Handler::WEBrick</a></li>
+				
+					<li><a href="./Rack/Head.html">Rack::Head</a></li>
+				
+					<li><a href="./Rack/Lint.html">Rack::Lint</a></li>
+				
+					<li><a href="./Rack/Lobster.html">Rack::Lobster</a></li>
+				
+					<li><a href="./Rack/Lock.html">Rack::Lock</a></li>
+				
+					<li><a href="./Rack/MethodOverride.html">Rack::MethodOverride</a></li>
+				
+					<li><a href="./Rack/Mime.html">Rack::Mime</a></li>
+				
+					<li><a href="./Rack/MockRequest.html">Rack::MockRequest</a></li>
+				
+					<li><a href="./Rack/MockRequest/FatalWarner.html">Rack::MockRequest::FatalWarner</a></li>
+				
+					<li><a href="./Rack/MockRequest/FatalWarning.html">Rack::MockRequest::FatalWarning</a></li>
+				
+					<li><a href="./Rack/MockResponse.html">Rack::MockResponse</a></li>
+				
+					<li><a href="./Rack/Recursive.html">Rack::Recursive</a></li>
+				
+					<li><a href="./Rack/Reloader.html">Rack::Reloader</a></li>
+				
+					<li><a href="./Rack/Reloader/Stat.html">Rack::Reloader::Stat</a></li>
+				
+					<li><a href="./Rack/Request.html">Rack::Request</a></li>
+				
+					<li><a href="./Rack/Response.html">Rack::Response</a></li>
+				
+					<li><a href="./Rack/Response/Helpers.html">Rack::Response::Helpers</a></li>
+				
+					<li><a href="./Rack/RewindableInput.html">Rack::RewindableInput</a></li>
+				
+					<li><a href="./Rack/RewindableInput/Tempfile.html">Rack::RewindableInput::Tempfile</a></li>
+				
+					<li><a href="./Rack/Session.html">Rack::Session</a></li>
+				
+					<li><a href="./Rack/Session/Abstract.html">Rack::Session::Abstract</a></li>
+				
+					<li><a href="./Rack/Session/Abstract/ID.html">Rack::Session::Abstract::ID</a></li>
+				
+					<li><a href="./Rack/Session/Cookie.html">Rack::Session::Cookie</a></li>
+				
+					<li><a href="./Rack/Session/Memcache.html">Rack::Session::Memcache</a></li>
+				
+					<li><a href="./Rack/Session/Pool.html">Rack::Session::Pool</a></li>
+				
+					<li><a href="./Rack/ShowExceptions.html">Rack::ShowExceptions</a></li>
+				
+					<li><a href="./Rack/ShowStatus.html">Rack::ShowStatus</a></li>
+				
+					<li><a href="./Rack/Static.html">Rack::Static</a></li>
+				
+					<li><a href="./Rack/URLMap.html">Rack::URLMap</a></li>
+				
+					<li><a href="./Rack/Utils.html">Rack::Utils</a></li>
+				
+					<li><a href="./Rack/Utils/Context.html">Rack::Utils::Context</a></li>
+				
+					<li><a href="./Rack/Utils/HeaderHash.html">Rack::Utils::HeaderHash</a></li>
+				
+					<li><a href="./Rack/Utils/Multipart.html">Rack::Utils::Multipart</a></li>
+				
+					<li><a href="./FCGI.html">FCGI</a></li>
+				
+					<li><a href="./FCGI/Stream.html">FCGI::Stream</a></li>
+				
+				</ul>
+				<div id="no-class-search-results" style="display: none;">No matching classes.</div>
+			</div>
+
+			
+		</div>
+	</div>
+
+	<div id="documentation">
+		<h1><a href="Rack.html">Rack</a>, a modular Ruby webserver interface</h1>
+<p>
+<a href="Rack.html">Rack</a> provides a minimal, modular and adaptable
+interface for developing web applications in Ruby. By wrapping HTTP
+requests and responses in the simplest way possible, it unifies and
+distills the API for web servers, web frameworks, and software in between
+(the so-called middleware) into a single method call.
+</p>
+<p>
+The exact details of this are described in the <a href="Rack.html">Rack</a>
+specification, which all <a href="Rack.html">Rack</a> applications should
+conform to.
+</p>
+<h2>Specification changes in this release</h2>
+<p>
+With <a href="Rack.html">Rack</a> 1.0, the <a href="Rack.html">Rack</a>
+specification (found in <a href="SPEC.html">SPEC</a>) changed in the
+following backward-incompatible ways. This was done to properly support
+Ruby 1.9 and to deprecate some problematic techniques:
+</p>
+<ul>
+<li>Rack::VERSION has been pushed to [1,0].
+
+</li>
+<li>Header values must be Strings now, split on &#8220;n&#8220;.
+
+</li>
+<li>rack.input must be rewindable and support reading into a buffer, wrap with
+<a href="Rack/RewindableInput.html">Rack::RewindableInput</a> if it
+isn&#8217;t.
+
+</li>
+<li>Content-Length can be missing, in this case chunked transfer encoding is
+used.
+
+</li>
+<li>Bodies can now additionally respond to to_path with a filename to be
+served.
+
+</li>
+<li>String bodies are deprecated and will not work with Ruby 1.9, use an Array
+with a single String instead.
+
+</li>
+<li>rack.session is now specified.
+
+</li>
+</ul>
+<h2>Supported web servers</h2>
+<p>
+The included <b>handlers</b> connect all kinds of web servers to Rack:
+</p>
+<ul>
+<li>Mongrel
+
+</li>
+<li>EventedMongrel
+
+</li>
+<li>SwiftipliedMongrel
+
+</li>
+<li>WEBrick
+
+</li>
+<li><a href="FCGI.html">FCGI</a>
+
+</li>
+<li>CGI
+
+</li>
+<li>SCGI
+
+</li>
+<li>LiteSpeed
+
+</li>
+<li>Thin
+
+</li>
+</ul>
+<p>
+These web servers include <a href="Rack.html">Rack</a> handlers in their
+distributions:
+</p>
+<ul>
+<li>Ebb
+
+</li>
+<li>Fuzed
+
+</li>
+<li>Phusion Passenger (which is mod_rack for Apache and for nginx)
+
+</li>
+<li>Unicorn
+
+</li>
+</ul>
+<p>
+Any valid <a href="Rack.html">Rack</a> app will run the same on all these
+handlers, without changing anything.
+</p>
+<h2>Supported web frameworks</h2>
+<p>
+The included <b>adapters</b> connect <a href="Rack.html">Rack</a> with
+existing Ruby web frameworks:
+</p>
+<ul>
+<li>Camping
+
+</li>
+</ul>
+<p>
+These frameworks include <a href="Rack.html">Rack</a> adapters in their
+distributions:
+</p>
+<ul>
+<li>Camping
+
+</li>
+<li>Coset
+
+</li>
+<li>Halcyon
+
+</li>
+<li>Mack
+
+</li>
+<li>Maveric
+
+</li>
+<li>Merb
+
+</li>
+<li>Racktools::SimpleApplication
+
+</li>
+<li>Ramaze
+
+</li>
+<li>Ruby on Rails
+
+</li>
+<li>Rum
+
+</li>
+<li>Sinatra
+
+</li>
+<li>Sin
+
+</li>
+<li>Vintage
+
+</li>
+<li>Waves
+
+</li>
+<li>Wee
+
+</li>
+</ul>
+<p>
+Current links to these projects can be found at <a
+href="http://wiki.ramaze.net/Home#other-frameworks">wiki.ramaze.net/Home#other-frameworks</a>
+</p>
+<h2>Available middleware</h2>
+<p>
+Between the server and the framework, <a href="Rack.html">Rack</a> can be
+customized to your applications needs using middleware, for example:
+</p>
+<ul>
+<li><a href="Rack/URLMap.html">Rack::URLMap</a>, to route to multiple
+applications inside the same process.
+
+</li>
+<li><a href="Rack/CommonLogger.html">Rack::CommonLogger</a>, for creating
+Apache-style logfiles.
+
+</li>
+<li>Rack::ShowException, for catching unhandled exceptions and presenting them
+in a nice and helpful way with clickable backtrace.
+
+</li>
+<li><a href="Rack/File.html">Rack::File</a>, for serving static files.
+
+</li>
+<li>&#8230;many others!
+
+</li>
+</ul>
+<p>
+All these components use the same interface, which is described in detail
+in the <a href="Rack.html">Rack</a> specification. These optional
+components can be used in any way you wish.
+</p>
+<h2>Convenience</h2>
+<p>
+If you want to develop outside of existing frameworks, implement your own
+ones, or develop middleware, <a href="Rack.html">Rack</a> provides many
+helpers to create <a href="Rack.html">Rack</a> applications quickly and
+without doing the same web stuff all over:
+</p>
+<ul>
+<li><a href="Rack/Request.html">Rack::Request</a>, which also provides query
+string parsing and multipart handling.
+
+</li>
+<li><a href="Rack/Response.html">Rack::Response</a>, for convenient generation
+of HTTP replies and cookie handling.
+
+</li>
+<li><a href="Rack/MockRequest.html">Rack::MockRequest</a> and <a
+href="Rack/MockResponse.html">Rack::MockResponse</a> for efficient and
+quick testing of <a href="Rack.html">Rack</a> application without real HTTP
+round-trips.
+
+</li>
+</ul>
+<h2>rack-contrib</h2>
+<p>
+The plethora of useful middleware created the need for a project that
+collects fresh <a href="Rack.html">Rack</a> middleware. rack-contrib
+includes a variety of add-on components for <a href="Rack.html">Rack</a>
+and it is easy to contribute new modules.
+</p>
+<ul>
+<li><a
+href="http://github.com/rack/rack-contrib">github.com/rack/rack-contrib</a>
+
+</li>
+</ul>
+<h2>rackup</h2>
+<p>
+rackup is a useful tool for running <a href="Rack.html">Rack</a>
+applications, which uses the <a href="Rack/Builder.html">Rack::Builder</a>
+DSL to configure middleware and build up applications easily.
+</p>
+<p>
+rackup automatically figures out the environment it is run in, and runs
+your application as FastCGI, CGI, or standalone with Mongrel or
+WEBrick&#8212;all from the same configuration.
+</p>
+<h2>Quick start</h2>
+<p>
+Try the lobster!
+</p>
+<p>
+Either with the embedded WEBrick starter:
+</p>
+<pre>
+    ruby -Ilib lib/rack/lobster.rb
+</pre>
+<p>
+Or with rackup:
+</p>
+<pre>
+    bin/rackup -Ilib example/lobster.ru
+</pre>
+<p>
+By default, the lobster is found at <a
+href="http://localhost:9292">localhost:9292</a>.
+</p>
+<h2>Installing with RubyGems</h2>
+<p>
+A Gem of <a href="Rack.html">Rack</a> is available. You can install it
+with:
+</p>
+<pre>
+    gem install rack
+</pre>
+<p>
+I also provide a local mirror of the gems (and development snapshots) at my
+site:
+</p>
+<pre>
+    gem install rack --source http://chneukirchen.org/releases/gems/
+</pre>
+<h2>Running the tests</h2>
+<p>
+Testing <a href="Rack.html">Rack</a> requires the test/spec testing
+framework:
+</p>
+<pre>
+    gem install test-spec
+</pre>
+<p>
+There are two rake-based test tasks:
+</p>
+<pre>
+    rake test       tests all the fast tests (no Handlers or Adapters)
+    rake fulltest   runs all the tests
+</pre>
+<p>
+The fast testsuite has no dependencies outside of the core Ruby
+installation and test-spec.
+</p>
+<p>
+To run the test suite completely, you need:
+</p>
+<pre>
+  * camping
+  * fcgi
+  * memcache-client
+  * mongrel
+  * ruby-openid
+  * thin
+</pre>
+<p>
+The full set of tests test <a href="FCGI.html">FCGI</a> access with
+lighttpd (on port 9203) so you will need lighttpd installed as well as the
+<a href="FCGI.html">FCGI</a> libraries and the fcgi gem:
+</p>
+<p>
+Download and install lighttpd:
+</p>
+<pre>
+    http://www.lighttpd.net/download
+</pre>
+<p>
+Installing the <a href="FCGI.html">FCGI</a> libraries:
+</p>
+<pre>
+    curl -O http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz
+    tar xzvf fcgi-2.4.0.tar.gz
+    cd fcgi-2.4.0
+    ./configure --prefix=/usr/local
+    make
+    sudo make install
+    cd ..
+</pre>
+<p>
+Installing the Ruby fcgi gem:
+</p>
+<pre>
+    gem install fcgi
+</pre>
+<p>
+Furthermore, to test Memcache sessions, you need memcached (will be run on
+port 11211) and memcache-client installed.
+</p>
+<h2>History</h2>
+<ul>
+<li>March 3rd, 2007: First public release 0.1.
+
+</li>
+<li>May 16th, 2007: Second public release 0.2.
+
+<ul>
+<li>HTTP Basic authentication.
+
+</li>
+<li>Cookie Sessions.
+
+</li>
+<li>Static file handler.
+
+</li>
+<li>Improved <a href="Rack/Request.html">Rack::Request</a>.
+
+</li>
+<li>Improved <a href="Rack/Response.html">Rack::Response</a>.
+
+</li>
+<li>Added <a href="Rack/ShowStatus.html">Rack::ShowStatus</a>, for better
+default error messages.
+
+</li>
+<li>Bug fixes in the Camping adapter.
+
+</li>
+<li>Removed Rails adapter, was too alpha.
+
+</li>
+</ul>
+</li>
+<li>February 26th, 2008: Third public release 0.3.
+
+<ul>
+<li>LiteSpeed handler, by Adrian Madrid.
+
+</li>
+<li>SCGI handler, by Jeremy Evans.
+
+</li>
+<li>Pool sessions, by blink.
+
+</li>
+<li>OpenID authentication, by blink.
+
+</li>
+<li>:Port and :File options for opening FastCGI sockets, by blink.
+
+</li>
+<li>Last-Modified HTTP header for <a href="Rack/File.html">Rack::File</a>, by
+blink.
+
+</li>
+<li><a href="Rack/Builder.html#M000056">Rack::Builder#use</a> now accepts
+blocks, by Corey Jewett. (See example/protectedlobster.ru)
+
+</li>
+<li>HTTP status 201 can contain a Content-Type and a body now.
+
+</li>
+<li>Many bugfixes, especially related to Cookie handling.
+
+</li>
+</ul>
+</li>
+<li>August 21st, 2008: Fourth public release 0.4.
+
+<ul>
+<li>New middleware, <a href="Rack/Deflater.html">Rack::Deflater</a>, by
+Christoffer Sawicki.
+
+</li>
+<li>OpenID authentication now needs ruby-openid 2.
+
+</li>
+<li>New Memcache sessions, by blink.
+
+</li>
+<li>Explicit EventedMongrel handler, by Joshua Peek <josh@joshpeek.com>
+
+</li>
+<li><a href="Rack/Reloader.html">Rack::Reloader</a> is not loaded in rackup
+development mode.
+
+</li>
+<li>rackup can daemonize with -D.
+
+</li>
+<li>Many bugfixes, especially for pool sessions, URLMap, thread safety and
+tempfile handling.
+
+</li>
+<li>Improved tests.
+
+</li>
+<li><a href="Rack.html">Rack</a> moved to Git.
+
+</li>
+</ul>
+</li>
+<li>January 6th, 2009: Fifth public release 0.9.
+
+<ul>
+<li><a href="Rack.html">Rack</a> is now managed by the <a
+href="Rack.html">Rack</a> Core Team.
+
+</li>
+<li><a href="Rack/Lint.html">Rack::Lint</a> is stricter and follows the HTTP
+RFCs more closely.
+
+</li>
+<li>Added ConditionalGet middleware.
+
+</li>
+<li>Added ContentLength middleware.
+
+</li>
+<li>Added Deflater middleware.
+
+</li>
+<li>Added Head middleware.
+
+</li>
+<li>Added MethodOverride middleware.
+
+</li>
+<li><a href="Rack/Mime.html">Rack::Mime</a> now provides popular MIME-types and
+their extension.
+
+</li>
+<li>Mongrel Header now streams.
+
+</li>
+<li>Added Thin handler.
+
+</li>
+<li>Official support for swiftiplied Mongrel.
+
+</li>
+<li>Secure cookies.
+
+</li>
+<li>Made HeaderHash case-preserving.
+
+</li>
+<li>Many bugfixes and small improvements.
+
+</li>
+</ul>
+</li>
+<li>January 9th, 2009: Sixth public release 0.9.1.
+
+<ul>
+<li>Fix directory traversal exploits in <a href="Rack/File.html">Rack::File</a>
+and <a href="Rack/Directory.html">Rack::Directory</a>.
+
+</li>
+</ul>
+</li>
+<li>April 25th, 2009: Seventh public release 1.0.0.
+
+<ul>
+<li><a href="SPEC.html">SPEC</a> change: Rack::VERSION has been pushed to
+[1,0].
+
+</li>
+<li><a href="SPEC.html">SPEC</a> change: header values must be Strings now,
+split on &#8220;n&#8220;.
+
+</li>
+<li><a href="SPEC.html">SPEC</a> change: Content-Length can be missing, in this
+case chunked transfer encoding is used.
+
+</li>
+<li><a href="SPEC.html">SPEC</a> change: rack.input must be rewindable and
+support reading into a buffer, wrap with <a
+href="Rack/RewindableInput.html">Rack::RewindableInput</a> if it
+isn&#8217;t.
+
+</li>
+<li><a href="SPEC.html">SPEC</a> change: rack.session is now specified.
+
+</li>
+<li><a href="SPEC.html">SPEC</a> change: Bodies can now additionally respond to
+to_path with a filename to be served.
+
+</li>
+<li>NOTE: String bodies break in 1.9, use an Array consisting of a single
+String instead.
+
+</li>
+<li>New middleware <a href="Rack/Lock.html">Rack::Lock</a>.
+
+</li>
+<li>New middleware <a href="Rack/ContentType.html">Rack::ContentType</a>.
+
+</li>
+<li><a href="Rack/Reloader.html">Rack::Reloader</a> has been rewritten.
+
+</li>
+<li>Major update to <a href="Rack/Auth/OpenID.html">Rack::Auth::OpenID</a>.
+
+</li>
+<li>Support for nested parameter parsing in <a
+href="Rack/Response.html">Rack::Response</a>.
+
+</li>
+<li>Support for redirects in <a href="Rack/Response.html">Rack::Response</a>.
+
+</li>
+<li>HttpOnly cookie support in <a href="Rack/Response.html">Rack::Response</a>.
+
+</li>
+<li>The Rakefile has been rewritten.
+
+</li>
+<li>Many bugfixes and small improvements.
+
+</li>
+</ul>
+</li>
+</ul>
+<h2>Contact</h2>
+<p>
+Please mail bugs, suggestions and patches to <<a
+href="mailto:rack-devel@googlegroups.com">rack-devel@googlegroups.com</a>>.
+</p>
+<p>
+Mailing list archives are available at <<a
+href="http://groups.google.com/group/rack-devel">groups.google.com/group/rack-devel</a>>.
+</p>
+<p>
+There is a bug tracker at <<a
+href="http://rack.lighthouseapp.com/">rack.lighthouseapp.com/</a>>.
+</p>
+<p>
+Git repository (send Git patches to the mailing list):
+</p>
+<ul>
+<li><a href="http://github.com/rack/rack">github.com/rack/rack</a>
+
+</li>
+<li><a
+href="http://git.vuxu.org/cgi-bin/gitweb.cgi?p=rack.git">git.vuxu.org/cgi-bin/gitweb.cgi?p=rack.git</a>
+
+</li>
+</ul>
+<p>
+You are also welcome to join the rack channel on irc.freenode.net.
+</p>
+<h2>Thanks</h2>
+<p>
+The <a href="Rack.html">Rack</a> Core Team, consisting of
+</p>
+<ul>
+<li>Christian Neukirchen (chneukirchen)
+
+</li>
+<li>James Tucker (raggi)
+
+</li>
+<li>Josh Peek (josh)
+
+</li>
+<li>Michael Fellinger (manveru)
+
+</li>
+<li>Ryan Tomayko (rtomayko)
+
+</li>
+<li>Scytrin dai Kinthra (scytrin)
+
+</li>
+</ul>
+<p>
+would like to thank:
+</p>
+<ul>
+<li>Adrian Madrid, for the LiteSpeed handler.
+
+</li>
+<li>Christoffer Sawicki, for the first Rails adapter and <a
+href="Rack/Deflater.html">Rack::Deflater</a>.
+
+</li>
+<li>Tim Fletcher, for the HTTP authentication code.
+
+</li>
+<li>Luc Heinrich for the Cookie sessions, the static file handler and bugfixes.
+
+</li>
+<li>Armin Ronacher, for the logo and racktools.
+
+</li>
+<li>Aredridel, Ben Alpert, Dan Kubb, Daniel Roethlisberger, Matt Todd, Tom
+Robinson, Phil Hagelberg, and S. Brent Faulkner for bug fixing and other
+improvements.
+
+</li>
+<li>Brian Candler, for <a href="Rack/ContentType.html">Rack::ContentType</a>.
+
+</li>
+<li>Graham Batty, for improved handler loading.
+
+</li>
+<li>Stephen Bannasch, for bug reports and documentation.
+
+</li>
+<li>Gary Wright, for proposing a better <a
+href="Rack/Response.html">Rack::Response</a> interface.
+
+</li>
+<li>Jonathan Buch, for improvements regarding <a
+href="Rack/Response.html">Rack::Response</a>.
+
+</li>
+<li>Armin Röhrl, for tracking down bugs in the Cookie generator.
+
+</li>
+<li>Alexander Kellett for testing the Gem and reviewing the announcement.
+
+</li>
+<li>Marcus Rückert, for help with configuring and debugging lighttpd.
+
+</li>
+<li>The WSGI team for the well-done and documented work they&#8217;ve done and
+<a href="Rack.html">Rack</a> builds up on.
+
+</li>
+<li>All bug reporters and patch contributers not mentioned above.
+
+</li>
+</ul>
+<h2>Copyright</h2>
+<p>
+Copyright (C) 2007, 2008, 2009 Christian Neukirchen <<a
+href="http://purl.org/net/chneukirchen">purl.org/net/chneukirchen</a>>
+</p>
+<p>
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+&#8220;Software&#8221;), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the
+following conditions:
+</p>
+<p>
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+</p>
+<p>
+THE SOFTWARE IS PROVIDED &#8220;AS IS&#8221;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+</p>
+<h2>Links</h2>
+<table>
+<tr><td valign="top">Rack:</td><td><<a href="http://rack.rubyforge.org/">rack.rubyforge.org/</a>>
+
+</td></tr>
+<tr><td valign="top">Rack&#8217;s Rubyforge project:</td><td><<a
+href="http://rubyforge.org/projects/rack">rubyforge.org/projects/rack</a>>
+
+</td></tr>
+<tr><td valign="top">Official <a href="Rack.html">Rack</a> repositories:</td><td><<a href="http://github.com/rack">github.com/rack</a>>
+
+</td></tr>
+<tr><td valign="top">rack-devel mailing list:</td><td><<a
+href="http://groups.google.com/group/rack-devel">groups.google.com/group/rack-devel</a>>
+
+</td></tr>
+<tr><td valign="top">Christian Neukirchen:</td><td><<a href="http://chneukirchen.org/">chneukirchen.org/</a>>
+
+</td></tr>
+</table>
+
+	</div>
+
+	<div id="validator-badges">
+		<p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+		<p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+			Rdoc Generator</a> 1.1.6</small>.</p>
+	</div>
+</body>
+</html>
+

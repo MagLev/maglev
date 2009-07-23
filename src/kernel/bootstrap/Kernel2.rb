@@ -25,11 +25,12 @@ module Kernel
     Proc.new(&blk)
   end
 
-  def rand(n=nil)
-    if n
-      RandomInstance.next(n) - 1
-    else
+  def rand(n=0)
+    limit = n.to_i.abs
+    if limit.equal?(0)
       RandomInstance.next
+    else
+      RandomInstance.next(limit) - 1
     end
   end
 

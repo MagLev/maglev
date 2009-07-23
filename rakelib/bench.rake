@@ -118,6 +118,23 @@ namespace :bench do
     puts "Done"
   end
 
+  desc "Run all the RBS benchmarks that match PATTERN ex: PATTERN=rbs/micro-benchmarks/bm_gc*"
+  task :pattern => :setup do
+    dir = ENV['PATTERN'] || raise("bench:pattern needs PATTERN set")
+
+    puts "Running all benchmarks matching #{dir}"
+    puts "  Writing report to #{report_name}"
+
+    Dir[dir].sort.each do |name|
+      Dir.chdir File.dirname(name) do
+        puts "  Running #{File.basename name}"
+        system "#{command name}"
+      end
+    end
+
+    puts "Done"
+  end
+
   desc "Run all the RBS benchmarks in DIR"
   task :dir => :setup do
     dir = ENV['DIR'] || raise("bench:dir needs DIR to be a directory")

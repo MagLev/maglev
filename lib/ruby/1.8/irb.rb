@@ -22,42 +22,53 @@ require "irb/locale"
 
 STDOUT.sync = true
 
+class ConfHash < Hash
+  # inspect implemented below
+end
+
 module IRB
   @RCS_ID='-$Id: irb.rb 17127 2008-06-13 03:02:17Z shyouhei $-'
 
   class Abort < Exception;end
 
   #
-  @CONF = {}
+  # @CONF = {}
 
   def IRB.conf
-    @CONF
+    cnf = Gemstone.session_temp( :IRB_conf )
+    if cnf.equal?(nil)
+      cnf = ConfHash.new
+      Gemstone.session_temp_put( :IRB_conf, cnf)
+      cnf[:SINGLE_IRB_MODE] = false
+    end
+    cnf 
   end
 
   # IRB version method
   def IRB.version
-    if v = @CONF[:VERSION] then return v end
+    if v = self.conf[:VERSION] then return v end
 
     require "irb/version"
     rv = @RELEASE_VERSION.sub(/\.0/, "")
-    @CONF[:VERSION] = format("irb %s(%s)", rv, @LAST_UPDATE_DATE)
+    self.conf[:VERSION] = format("irb %s(%s)", rv, @LAST_UPDATE_DATE)
   end
 
   def IRB.CurrentContext
-    IRB.conf[:MAIN_CONTEXT]
+    self.conf[:MAIN_CONTEXT]
   end
 
   # initialize IRB and start TOP_LEVEL irb
   def IRB.start(ap_path = nil)
     $0 = File::basename(ap_path, ".rb") if ap_path
     IRB.setup(ap_path)
-    if @CONF[:SCRIPT]
-      irb = Irb.new(nil, @CONF[:SCRIPT])
+    cnf = self.conf
+    if cnf[:SCRIPT]
+      irb = Irb.new(nil, cnf[:SCRIPT])
     else
       irb = Irb.new
     end
-    @CONF[:IRB_RC].call(irb.context) if @CONF[:IRB_RC]
-    @CONF[:MAIN_CONTEXT] = irb.context
+    cnf[:IRB_RC].call(irb.context) if cnf[:IRB_RC]
+    cnf[:MAIN_CONTEXT] = irb.context
     trap("SIGINT") do
       print "SIGINT\n"
       irb.signal_handle
@@ -333,9 +344,11 @@ module IRB
       format("#<%s: %s>", self.class, ary.join(", "))
     end
   end
+end
 
-  # Singleton method
-  def @CONF.inspect
+class ConfHash
+  def inspect
+    # was a Singleton method
     IRB.version unless self[:VERSION]
 
     array = []

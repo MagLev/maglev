@@ -180,7 +180,14 @@ class Array
   end
 
   def initialize(a_size, value)
-    _initialize(a_size, value)
+    if self.class.equal?(Array)
+      # do nothing
+    else
+      s = Type.coerce_to(a_size, Fixnum, :to_int)
+      self.size=(s)
+      self.fill(value, 0, s)
+    end
+    self
   end
   def _initialize(a_size, value)
     if self.class.equal?(Array)
@@ -207,53 +214,44 @@ class Array
     if self.equal?(Array)
       if arg._isFixnum
         a = _alloc(arg, nil)
+        return a
       elsif arg._isArray
-        a = _withall(arg)
+        a = _alloc(arg.size, nil)
       else
-        a = _alloc_one_arg(arg)
+        arg = _coerce_one_arg(arg)
+        if arg._isFixnum
+          a = _alloc(arg, nil)
+          return a
+        else
+          a = _alloc(arg.size, nil)
+        end
       end
     else
       a = _alloc(0, nil)
     end
     a.initialize(arg)
-    a
   end
 
-  def self._alloc_one_arg(arg)
+  def self._coerce_one_arg(arg)
     begin
-      ary = Type.coerce_to(arg, Array, :to_ary)
-      a = _withall(ary)
+      carg = Type.coerce_to(arg, Array, :to_ary)
     rescue TypeError
-      siz = Type.coerce_to(arg, Fixnum, :to_int)
-      a = _alloc(siz, nil)
+      carg = Type.coerce_to(arg, Fixnum, :to_int)
     end
-    a
-  end
-
-  def _init_one_arg(arg)
-    begin
-      ary = Type.coerce_to(arg, Array, :to_ary)
-      self.replace(arg)
-    rescue TypeError
-      siz = Type.coerce_to(arg, Fixnum, :to_int)
-      self.size=(siz)
-    end
-    self
+    carg
   end
 
   def initialize(arg)
-    _init_one_arg(arg)
-  end
-  def _initialize(arg)
-    if self.class.equal?(Array)
-      # do nothing
+    if arg._isFixnum
+      self.size=(siz)
+    elsif arg._isArray
+      self.replace(arg)
     else
+      arg = Array._coerce_one_arg(arg)
       if arg._isFixnum
-        self.size=(arg)
-      elsif arg._isArray
-        self.replace(arg)
+        self.size=(siz)
       else
-        _init_one_arg(arg)
+        self.replace(arg)
       end
     end
     self
@@ -1015,6 +1013,7 @@ class Array
         i -= 1
       end
     end
+    self
   end
 
   def rindex(el)
