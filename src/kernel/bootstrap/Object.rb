@@ -114,6 +114,10 @@ class Object
     #   and last arg is envId 
     # it is used by RubyParser
     primitive_nobridge '__perform__se', 'with:with:perform:env:'
+    #
+    # redefinition of __perform_method disallowed after bootstrap,
+    #  it is used by implementation of eval 
+    primitive_nobridge '__perform_meth', 'performMethod:'
 
     primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
     primitive   '_basic_clone', '_basicCopy' # use singleton class
