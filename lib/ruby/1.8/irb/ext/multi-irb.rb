@@ -134,10 +134,18 @@ module IRB
     end
   end
 
-  @JobManager = JobManager.new
+  # @JobManager = JobManager.new # Maglev changes
 
   def IRB.JobManager
-    @JobManager
+    cnf = IRB.conf  # was  @JobManager
+    jbm = cnf[:IRB_JOBMANAGER]
+    if jbm.equal?(nil)
+      jbm = JobManager.new
+      cnf[:IRB_JOBMANAGER] = jbm
+      jbm.insert( cnf[:MAIN_CONTEXT].irb)
+      jbm.current_job = cnf[:MAIN_CONTEXT].irb
+    end
+    jbm
   end
 
   def IRB.CurrentContext
@@ -158,9 +166,11 @@ module IRB
 	Thread.main.wakeup
 	Thread.exit
       end
-      @CONF[:IRB_RC].call(irb.context) if @CONF[:IRB_RC]
-      @JobManager.insert(irb)
-      @JobManager.current_job = irb
+      cnf = IRB.conf
+      cnf[:IRB_RC].call(irb.context) if cnf[:IRB_RC]
+      jbm = IRB.JobManager
+      jbm.insert(irb)
+      jbm.current_job = irb
       begin
 	system_exit = false
 	catch(:IRB_EXIT) do
@@ -172,19 +182,19 @@ module IRB
 	#fail
       ensure
 	unless system_exit
-	  @JobManager.delete(irb)
+	  jbm.delete(irb)
 	  if parent_thread.alive?
-	    @JobManager.current_job = @JobManager.irb(parent_thread)
+	    jbm.current_job = jbm.irb(parent_thread)
 	    parent_thread.run
 	  else
-	    @JobManager.current_job = @JobManager.main_irb
-	    @JobManager.main_thread.run
+	    jbm.current_job = jbm.main_irb
+	    jbm.main_thread.run
 	  end
 	end
       end
     end
     Thread.stop
-    @JobManager.current_job = @JobManager.irb(Thread.current)
+    jbm.current_job = jbm.irb(Thread.current)
   end
 
 #   class Context
@@ -206,9 +216,10 @@ module IRB
 # #    alias conf irb_context
 #   end
 
-  @CONF[:SINGLE_IRB_MODE] = false
-  @JobManager.insert(@CONF[:MAIN_CONTEXT].irb)
-  @JobManager.current_job = @CONF[:MAIN_CONTEXT].irb
+  # @CONF[:SINGLE_IRB_MODE] = false  # Moved to IRB.conf method
+
+  # @JobManager.insert(@CONF[:MAIN_CONTEXT].irb)  # moved to JobManager init
+  # @JobManager.current_job = @CONF[:MAIN_CONTEXT].irb
 
   class Irb
     def signal_handle
@@ -234,7 +245,8 @@ module IRB
   end
 
   trap("SIGINT") do
-    @JobManager.current_job.signal_handle
+    jbm = IRB.JobManager
+    jbm.current_job.signal_handle
     Thread.stop
   end
 
