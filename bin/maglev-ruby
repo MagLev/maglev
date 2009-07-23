@@ -180,7 +180,7 @@ trap "rm -f $dbscript $stdinscript" EXIT
 
 rm -f $dbscript
 if [ $debug == 1 ]; then
-  cat $MAGLEV_HOME/etc/.topazdebugini > $dbscript
+  cat $MAGLEV_HOME/etc/.topazini > $dbscript
 else
   cat $MAGLEV_HOME/etc/.topazini > $dbscript
 fi
