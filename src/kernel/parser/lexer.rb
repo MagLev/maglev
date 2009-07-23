@@ -177,7 +177,7 @@ class RubyLexer
           src.advance(1) # past \n
           @line_num = @line_num + 1
         else
-          @yacc_value = cstring_buffer.join.delete("\r")
+          @yacc_value = cstring_buffer._join.delete("\r")
           return :tSTRING_CONTENT
         end
 	if src.eos? 
@@ -201,7 +201,7 @@ class RubyLexer
     #  identifier
 
     # no change to  @lex_strterm 
-    @yacc_value = cstring_buffer.join.delete("\r")
+    @yacc_value = cstring_buffer._join.delete("\r")
     return :tSTRING_CONTENT
   end # ]
 
@@ -268,7 +268,7 @@ class RubyLexer
       rb_compile_error( "unterminated here document identifier")
     end
 
-    eos = cstring_buffer.join   # the doc_identifier
+    eos = cstring_buffer._join   # the doc_identifier
     eos_re  = indent ? /[ \t]*#{eos}(\r?\n|\z)/ : /#{eos}(\r?\n|\z)/
     @lex_strterm = [:heredoc, func, eos, eos_re ]
 
@@ -535,7 +535,7 @@ class RubyLexer
       rb_compile_error "unterminated string meets end of file"
     end
 
-    @yacc_value = cstring_buffer.join
+    @yacc_value = cstring_buffer._join
     return :tSTRING_CONTENT
   end # ]
 
@@ -619,9 +619,9 @@ class RubyLexer
       bad = part_arr[1]
       if bad.size._not_equal?( 0)  then
         rb_compile_error("unknown regexp option%s - %s" %
-                         [(bad.size > 1 ? "s" : ""), bad.join.inspect])
+                         [(bad.size > 1 ? "s" : ""), bad._join.inspect])
       end
-      return good.join
+      return good._join
     else
       return []
     end
