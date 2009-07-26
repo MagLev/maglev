@@ -156,6 +156,7 @@ fi
 
 ensurePrimsLoaded() {
   $TOPAZ_CMD << EOF > /dev/null
+    set gemstone $STONENAME
     login
     obj RubyPrimsLoaded
     quit
@@ -163,6 +164,7 @@ EOF
   if [ $? -ne 0 ] ; then
     echo "Loading kernel. It may take a few seconds..."
     $TOPAZ_CMD << EOF > /dev/null
+      set gemstone $STONENAME
       input $GEMSTONE/upgrade/ruby/allprims.topaz
 EOF
   fi

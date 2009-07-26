@@ -182,11 +182,7 @@ dbscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
 trap "rm -f $dbscript $stdinscript" EXIT
 
 rm -f $dbscript
-if [ $debug == 1 ]; then
-  cat $MAGLEV_HOME/etc/.topazini > $dbscript
-else
-  cat $MAGLEV_HOME/etc/.topazini > $dbscript
-fi
+cat $MAGLEV_HOME/etc/.topazini > $dbscript
 
 cat - >> $dbscript <<-EOFA
 set gemstone $stone
