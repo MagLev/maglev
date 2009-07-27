@@ -87,5 +87,25 @@ As of 5 June 09, algorithmic changes since ruby_parser2.0.2 include
   Added one more case of enforcement of Symbols not allowed to 
   contain the null character.
   See first occurrance of "symbol cannot contain" in lexer.rb 
-   
+
+Merged changes from ruby_parser2.0.3 
+  no subtantive differences that affect Maglev code
+
+Fixes for Maglev Trac 567
+  Ryan's code does not correctly lex a string of the form
+    "%w(abc\tdef)"
+  Added a  \t  to the Regexp near comment 'to pick up whatever'
+  in 'def tokadd_string' in lexer.rb .
+
+  In 'def advance' near the comment "# Fix Trac 567" , 
+  change the return token based on "is_arg" and shutoff the
+  arg_ambiguous warning , 
+  to handle parsing of a Ruby 1.8 multi-line statement 
+  with first line ending in a '+' like this:
+    a = 10.0
+    b = 20.0
+    jd = a.floor +
+        b
+    # end of example
+
 
