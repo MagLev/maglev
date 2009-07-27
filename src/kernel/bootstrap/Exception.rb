@@ -82,13 +82,19 @@ end
 #  order here matches order in  Exception(C)>>commentRubyMapping
 
 class SystemExit
+   # Smalltalk reimplements initialize
+   primitive_nobridge '_st_initialize', 'initialize'  
 end
 
 class SystemStackExit
 end
 class NoMemoryError
+   # Smalltalk reimplements initialize
+   primitive_nobridge '_st_initialize', 'initialize'  
 end
 class ScriptError
+   # Smalltalk reimplements initialize
+   primitive_nobridge '_st_initialize', 'initialize'  
 end
 class LoadError  # a subclass of ScriptError
 end
@@ -129,8 +135,12 @@ end
 class ZeroDivisionError
 end
 class NameError
+   # Smalltalk reimplements initialize
+   primitive_nobridge '_st_initialize', 'initialize'  
 end
 class NoMethodError  # a subclass of NameError
+   # Smalltalk reimplements initialize
+   primitive_nobridge '_st_initialize', 'initialize'  
 end
 class SignalException
 end
