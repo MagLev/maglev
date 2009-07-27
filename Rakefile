@@ -31,7 +31,7 @@ end
 
 desc "Run a squeak image"
 task :squeak do
-  gem_tools = '/Applications/GemTools-3.0.app'
+  gem_tools = '/Applications/Maglev.app'
   if File.exists?(gem_tools)
     sh %{ open #{gem_tools} }
   else
