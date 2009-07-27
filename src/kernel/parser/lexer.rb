@@ -84,7 +84,7 @@ class RubyLexer
   # def is_argument ; end ;  # deleted
 
   def arg_ambiguous
-    self.warning("Ambiguous first argument. make sure.")
+    self.warning("Ambiguous first argument to method call")
   end
 
   def expr_beg_push( val )
@@ -482,7 +482,7 @@ class RubyLexer
     awords = (func & STR_FUNC_AWORDS)._not_equal?( 0 )
     if @mydebug
       puts strterm_descr.inspect
-      puts "   lexer: parse_string at byte #{src.pos} line #{@line_num} nest=#{@nest}"
+      puts "   lexer: parse_string at byte #{src.pos} line #{@line_num} nest=#{@nest} awords=#{awords}"
     end
 
     if awords and src.check_advance(/\s+/)
@@ -665,7 +665,7 @@ class RubyLexer
 
     if @mydebug 
       puts "   lexer: tokadd_string at byte #{src.pos} line #{@line_num}"
-      puts "                     args  #{args.inspect}"
+      puts "                     args  #{args.inspect} awords=#{awords}"
     end
     until src.eos? do # [
       cres = nil
@@ -699,6 +699,7 @@ class RubyLexer
           cres = ' '
         elsif expand && next_ch.equal?( ?\n ) # src.scan(/\\\n/) 
           s_matched = "\\n" 
+          src.advance(2)
           next
         elsif regexp  #  regex && src.check(/\\/) 
           self.tokadd_escape( src, term )
@@ -742,7 +743,8 @@ class RubyLexer
         t = Regexp.escape( term )
         x = Regexp.escape(paren) if paren && paren != "\000"
         re = if awords then
-               /[^#{t}#{x}\#\0\\\n\ ]+|./ # |. to pick up whatever
+               /[^#{t}#{x}\#\0\\\n\ \t]+|./ # |. to pick up whatever  
+				# Bug in Ryan's code , added the \t
              else
                /[^#{t}#{x}\#\0\\]+|./
              end
@@ -756,7 +758,7 @@ class RubyLexer
       end
       cres ||= s_matched
       @string_buffer << cres
-    end # until eos #  ] 
+    end # until eos #  ]
 
     cres ||= s_matched
     if src.eos?
@@ -910,26 +912,29 @@ class RubyLexer
             return :tOP_ASGN
           end
 
-          is_arg = false
+          is_arg = (clex_state & Expr_IS_argument)._not_equal?(0)
           if ( (clex_state & Expr_IS_beg_mid)._not_equal?( 0) ||
-               ( (is_arg = (clex_state & Expr_IS_argument)._not_equal?(0)) && space_seen &&
-                 ! src.ch_is_white(s_ch)) )   #  !src.check(/\s/))) 
-            if is_arg
-              arg_ambiguous
-            end
-
+               ( is_arg && space_seen && 
+                    ! src.ch_is_white(s_ch)) )   #  !src.check(/\s/))) 
+            #if is_arg	# shutoff warning, Trac 567
+            #  arg_ambiguous
+            #end
             @lex_state = Expr_beg
-
+            
             if src.ch_is_digit(s_ch)  #  src.check(/\d/) then
-              @yacc_value = sign.to_s
               if utype.equal?( :tUPLUS) then
                 return self.parse_number
               else
+                @yacc_value = RpNameToken.new( sign , tok_start_offset)
                 return :tUMINUS_NUM
               end
             end
             @yacc_value = RpNameToken.new( sign , tok_start_offset)
-            return utype
+            if is_arg
+              return type	# Fix Trac 567
+            else
+              return utype  
+            end
           end
 
           @lex_state = Expr_beg

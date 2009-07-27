@@ -275,6 +275,7 @@ rule
 			# | kRETURN call_args
 			# result = s(:return, ret_args(val_[1]))
                         result = RubyReturnNode.s( ret_args(val[vofs + 1]))
+			result.src_offset=( val[vofs ].src_offset ) # of the kRETURN
 		      }
 		  | kBREAK call_args
 		      {
@@ -1314,6 +1315,7 @@ rule
 		      # primary:  # | kRETURN
                       # result = s(:return)
                       result = RubyReturnNode.s(nil)
+		      result.src_offset=( val[vofs ].src_offset ) # of the kRETURN
                     }
                 | kYIELD tLPAREN2 call_args tRPAREN
                     {

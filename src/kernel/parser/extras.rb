@@ -85,7 +85,7 @@ module MagRp # {
 		  ["self",     [:kSELF,     :kSELF       ], RubyLexer::Expr_end   ],
 		  ["false",    [:kFALSE,    :kFALSE      ], RubyLexer::Expr_end   ],
 		  ["retry",    [:kRETRY,    :kRETRY      ], - RubyLexer::Expr_end   ],
-		  ["return",   [:kRETURN,   :kRETURN     ], RubyLexer::Expr_mid   ],
+		  ["return",   [:kRETURN,   :kRETURN     ], - RubyLexer::Expr_mid   ],
 		  ["true",     [:kTRUE,     :kTRUE       ], RubyLexer::Expr_end   ],
 		  ["if",       [:kIF,       :kIF_MOD     ], - RubyLexer::Expr_beg   ], 
 		  ["defined?", [:kDEFINED,  :kDEFINED    ], RubyLexer::Expr_arg   ],

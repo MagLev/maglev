@@ -3231,6 +3231,7 @@ def _reduce_44(val, vofs)
 			# | kRETURN call_args
 			# result = s(:return, ret_args(val_[1]))
                         result = RubyReturnNode.s( ret_args(val[vofs + 1]))
+			result.src_offset=( val[vofs ].src_offset ) # of the kRETURN
 		      
     result
 end
@@ -4683,6 +4684,7 @@ def _reduce_284(val, vofs)
 		      # primary:  # | kRETURN
                       # result = s(:return)
                       result = RubyReturnNode.s(nil)
+		      result.src_offset=( val[vofs ].src_offset ) # of the kRETURN
                     
     result
 end
