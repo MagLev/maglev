@@ -32,9 +32,11 @@ Ramaze
 ramaze_hello.rb
   An in-progress test script to run a simple ramaze app.
 
-rubygems-1.3.1
-  Ruby gems 1.3.1.  Basically works.
-  Ruby gems 1.3.4   Runs setup.rb --no-rdoc --no-ri
+rubygems-1.3.5
+  A slightly patched version of rubygems 1.3.5.  The patches are in
+  * rubygems-1.3.5/lib/rubygems/dependency_installer.rb
+  * rubygems-1.3.5/lib/rubygems/package/tar_input.rb
+  See docs/applications for details
 
 rxtest
   Tim Bray's rx code.  Rx is an automaton based XML tokenizer.  It was
