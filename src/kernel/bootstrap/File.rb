@@ -30,9 +30,9 @@ class File
 
   primitive 'close', 'close'
   # << inherited from IO
-  primitive 'write', 'addAll:'
+  primitive '_write', 'addAll:'
   primitive '_getc', 'nextByte'
-  primitive 'next_line', 'nextLineTo:'
+  primitive '_next_line_to', 'nextLineTo:'
   primitive_nobridge '_atEnd', 'atEnd'
   primitive '_read', 'next:'
   primitive '_read', 'contents'
@@ -40,6 +40,8 @@ class File
   primitive 'flush', 'flush'
   primitive 'rewind', 'rewind'
   primitive '_is_open', 'isOpen'
+  primitive '_last_err_string', 'lastErrorString'
+  primitive '_last_err_code', 'lastErrorCode'
   primitive_nobridge '_seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '_fstat','fstat:isLstat:'
@@ -71,7 +73,7 @@ class File
   def each(separator=$/, &block)
     sep = separator[0]
     until eof?
-      block.call(next_line(sep))
+      block.call(_next_line(sep))
     end
   end
 
@@ -336,6 +338,9 @@ class File
   end
 
   def self.open(filename, mode=Undefined, permission=Undefined, &blk)
+    if filename._isInteger
+      raise TypeError , 'File.new(fd_integer)  not supported yet'
+    end
     filename = Type.coerce_to(filename, String, :to_str)
     nargs = 1
     if mode.equal?(Undefined)
@@ -617,7 +622,7 @@ class File
 
   def gets(sep)
     # variant after first gets no bridges
-    res = next_line( sep[0] )
+    res = _next_line( sep[0] )
     res._storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end
@@ -625,8 +630,18 @@ class File
   def gets
     # variant after first gets no bridges
     sep=$/
-    res = next_line( sep[0] )
+    res = _next_line( sep[0] )
     res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def _next_line(sep)
+    res = _next_line_to(sep)
+    if res.equal?(nil)
+      unless _last_err_code.equal?(0)
+        raise IOError , self._last_err_string  # TODO: Errno::xxx
+      end
+    end
     res
   end
 
@@ -662,7 +677,7 @@ class File
   def send(sym)
     if (sym.equal?(:gets))
       sep=$/
-      res = next_line( sep[0] )
+      res = _next_line( sep[0] )
       res._storeRubyVcGlobal(0x21) # store into caller's $_
       return res
     end
@@ -671,7 +686,7 @@ class File
 
   def send(sym, arg)
     if (sym.equal?(:gets))
-      res = next_line( arg[0] )
+      res = _next_line( arg[0] )
       res._storeRubyVcGlobal(0x21) # store into caller's $_
       return res
     end
@@ -681,7 +696,7 @@ class File
   def __send__(sym)
     if (sym.equal?(:gets))
       sep=$/
-      res = next_line( sep[0] )
+      res = _next_line( sep[0] )
       res._storeRubyVcGlobal(0x21) # store into caller's $_
       return res
     end
@@ -690,7 +705,7 @@ class File
 
   def __send__(sym, arg)
     if (sym.equal?(:gets))
-      res = next_line( arg[0] )
+      res = _next_line( arg[0] )
       res._storeRubyVcGlobal(0x21) # store into caller's $_
       return res
     end
@@ -760,7 +775,7 @@ class File
   def each_line(&block)
     sep = ($/.equal?(nil) ? 10 : $/[0])
     until eof?
-      block.call( next_line( sep ) )
+      block.call( _next_line( sep ) )
     end
   end
 
@@ -774,6 +789,14 @@ class File
   # Seeks to the given position (in bytes) in +io+
   def pos=(offset)
       seek(offset, IO::SEEK_SET)
+  end
+
+  def write(arg)
+    count = self._write(arg)
+    if count.equal?(nil)
+      raise IOError , self._last_err_string  # TODO: Errno::xxx
+    end
+    count
   end
 
 end
