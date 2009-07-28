@@ -14,38 +14,38 @@ module RbYAML
     def __is_sequence; false; end
     def __is_mapping; false; end
   end
-  
+
   class ScalarNode < Node
     def tid
       "scalar"
     end
-    
+
     attr_accessor :style
-    
+
     def initialize(tag,value,style=nil)
       super(tag,value)
       @style = style
     end
     def __is_scalar; true; end
   end
-  
+
   class CollectionNode < Node
     attr_accessor :flow_style
-    
+
     def initialize(tag, value,flow_style=nil)
       super(tag,value)
       @flow_style = flow_style
     end
     def __is_collection; true; end
   end
-  
+
   class SequenceNode < CollectionNode
     def tid
       "sequence"
     end
     def __is_sequence; true; end
   end
-  
+
   class MappingNode < CollectionNode
     def tid
       "mapping"

@@ -22,7 +22,7 @@ class Object
       mep = {}
       to_yaml_properties.each do |m|
         mep[m[1..-1]] = instance_variable_get(m)
-      end      
+      end
       out.map(taguri,mep,to_yaml_style)
     end
   end
@@ -34,7 +34,7 @@ class Hash
   def is_complex_yaml?; true; end
   def yaml_initialize( tag, val )
     if Array === val
-      update Hash.[]( *val )		# Convert the map to a sequence
+      update Hash.[]( *val )    # Convert the map to a sequence
     elsif Hash === val
       update val
     else
@@ -55,7 +55,7 @@ class Struct
   def self.yaml_new( klass, tag, val )
     if Hash === val
       struct_type = nil
-      
+
       #
       # Use existing Struct if it exists
       #
@@ -67,9 +67,9 @@ class Struct
       end
       if !struct_type
         struct_def = [ tag.split( /:/, 4 ).last ]
-        struct_type = Struct.new( *struct_def.concat( val.keys.collect { |k| k.intern } ) ) 
+        struct_type = Struct.new( *struct_def.concat( val.keys.collect { |k| k.intern } ) )
       end
-    
+
       #
       # Set the Struct properties
       #
@@ -94,7 +94,7 @@ class Struct
       self.to_yaml_properties.each do |m|
         mep[m]=instance_variable_get( m )
       end
-      
+
       #
       # Basic struct is passed as a YAML map
       #
@@ -306,7 +306,7 @@ class Time
         utc_same_instant = dup.utc
         utc_same_writing = Time.utc(year,month,day,hour,min,sec,usec)
         difference_to_utc = utc_same_writing - utc_same_instant
-        if (difference_to_utc < 0) 
+        if (difference_to_utc < 0)
           difference_sign = '-'
           absolute_difference = -difference_to_utc
         else
@@ -379,7 +379,7 @@ class FalseClass
   end
 end
 
-class NilClass 
+class NilClass
   yaml_as "tag:yaml.org,2002:null"
   def is_complex_yaml?; false; end
   def to_yaml_node( repre )

@@ -65,7 +65,7 @@ module RbYAML
     SEQUENCE_END = SequenceEndEvent.new
     STREAM_END = StreamEndEvent.new
     STREAM_START = StreamStartEvent.new
-    
+
 
     def initialize(scanner)
       @scanner = scanner
@@ -148,7 +148,7 @@ module RbYAML
       @scanner.get_token
       STREAM_END
     end
-    
+
     def document_start_implicit
       token = @scanner.peek_token
       version, tags = process_directives
@@ -260,7 +260,7 @@ module RbYAML
     def empty_scalar
       process_empty_scalar
     end
-    
+
 
 # PRODUCTIONS
     def stream
@@ -324,7 +324,7 @@ module RbYAML
           anchor = @scanner.get_token.value
         end
       end
-      
+
       if !tag.nil? and tag != "!"
         handle, suffix = tag
         if !handle.nil?
@@ -385,7 +385,7 @@ module RbYAML
           @parse_steck += [:block_sequence_entry]
           return empty_scalar
         end
-      end      
+      end
       nil
     end
 
@@ -558,7 +558,7 @@ module RbYAML
         empty_scalar
       end
     end
-   
+
 
     def process_directives
       # DIRECTIVE*
