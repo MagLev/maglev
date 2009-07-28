@@ -1140,22 +1140,23 @@ module MagRp # {
     have_once = false
     opt_idx = 0
     opt_len = options.length
+    encod = 0  # select last of multiple encoding specifiers , Trac 565
     while opt_idx < opt_len
       ch = options[opt_idx]
       if ch <= ?n 
-        if ch.equal?( ?i) ; o += Regexp::IGNORECASE
-        elsif ch.equal?( ?m) ; o += Regexp::MULTILINE
-        elsif ch.equal?( ?n) ; o += Regexp::ENC_NONE
-        elsif ch.equal?( ?e) ; o += Regexp::ENC_EUC 
+        if ch.equal?( ?i) ; o = o | Regexp::IGNORECASE
+        elsif ch.equal?( ?m) ; o = o | Regexp::MULTILINE
+        elsif ch.equal?( ?n) ; encod = Regexp::ENC_NONE
+        elsif ch.equal?( ?e) ; encod = Regexp::ENC_EUC 
         else
           err_str = ' ' ; err_str[0] = ch ;
           raise "unknown regexp option: #{err_str}" 
         end 
       else 
-        if ch.equal?( ?x ) ; o += Regexp::EXTENDED  
-        elsif ch.equal?( ?o) ; o += Regexp::ONCE ; have_once = true;
-        elsif ch.equal?( ?s) ; o += Regexp::ENC_SJIS
-        elsif ch.equal?( ?u) ; o += Regexp::ENC_UTF8
+        if ch.equal?( ?x ) ; o = o | Regexp::EXTENDED  
+        elsif ch.equal?( ?o) ; o = o | Regexp::ONCE ; have_once = true;
+        elsif ch.equal?( ?s) ; encod = Regexp::ENC_SJIS
+        elsif ch.equal?( ?u) ; encod = Regexp::ENC_UTF8
         else
           err_str = ' ' ; err_str[0] = ch ;
           raise "unknown regexp option: #{err_str}" 
@@ -1163,6 +1164,7 @@ module MagRp # {
       end
       opt_idx += 1
     end
+    o = o | encod
     argnode = val[vofs + 1]
     arg_cls = argnode.class
     if  arg_cls.equal?(RubyStrNode) 
