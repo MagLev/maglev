@@ -93,6 +93,7 @@ EOF
 
   desc "Clean up after a test install of rubygems"
   task :'clean-gems' do
+    puts "CLEANING GEMS"
     files = FileList.new('bin/maglev-gem', 'lib/maglev') do |fl|
       fl.include('lib/ruby/site_ruby/1.8/*ubygems.rb')
       fl.include('lib/ruby/site_ruby/1.8/ubygems')
@@ -112,5 +113,13 @@ EOF
   desc "Load the MagLev native parser"
   task :load_native_parser => ['maglev:start'] do
     run_topaz tc_load_native_parser
+  end
+
+  desc "Clear out the old ruby gems and install a new version"
+  task :'new-gems' => 'dev:clean-gems' do
+    cd('src/external/rubygems-1.3.5') do
+      sh "maglev-ruby ./setup.rb --no-rdoc --no-ri"
+    end
+    cp "/Users/pmclain/GemStone/dev/maglev-gem", "bin"
   end
 end
