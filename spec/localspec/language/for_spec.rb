@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../rubyspec/language/' + '/../spec_helper'
+require File.dirname(__FILE__) + '/../spec_helper'
 
 # for name[, name]... in expr [do]
 #   body
@@ -15,23 +15,23 @@ describe "The for expression" do
   it "iterates over an Hash passing each key-value pair to the block" do
     k = 0
     l = 0
-
+    
     for i, j in { 1 => 10, 2 => 20 }
       k += i
       l += j
     end
-
+    
     k.should == 3
     l.should == 30
   end
-
+  
   it "iterates over any object responding to 'each'" do
     class XYZ
       def each
         (0..10).each { |i| yield i }
       end
     end
-
+    
     j = 0
     for i in XYZ.new
       j += i
@@ -48,17 +48,17 @@ describe "The for expression" do
     @var.should == 3
     n.should == 3
   end
-
-  # TODO: commented out due to a compiler error
-  #it "allows a class variable as an iterator name" do
-  #  m = [1,2,3]
-  #  n = 0
-  #  for @@var in m
-  #    n += 1
-  #  end
-  #  @@var.should == 3
-  #  n.should == 3
-  #end
+  
+  # Maglev parse error, class variable not supported as an iterator name 
+#  it "allows a class variable as an iterator name" do
+#    m = [1,2,3]
+#    n = 0
+#    for @@var in m
+#      n += 1
+#    end
+#    @@var.should == 3
+#    n.should == 3
+#  end
 
   it "splats multiple arguments together if there are fewer arguments than values" do
     class OFor
@@ -76,7 +76,7 @@ describe "The for expression" do
     qs.should == [[1,2,3], [4,5,6]]
     q.should == [4,5,6]
   end
-
+  
   it "optionally takes a 'do' after the expression" do
     j = 0
     for i in 1..3 do
@@ -84,27 +84,27 @@ describe "The for expression" do
     end
     j.should == 6
   end
-
+  
   it "allows body begin on the same line if do is used" do
     j = 0
     for i in 1..3 do j += i
     end
     j.should == 6
   end
-
+  
   it "executes code in containing variable scope" do
     for i in 1..2
       a = 123
     end
-
+    
     a.should == 123
   end
-
+  
   it "executes code in containing variable scope with 'do'" do
     for i in 1..2 do
       a = 123
     end
-
+    
     a.should == 123
   end
 
@@ -120,10 +120,10 @@ describe "The for expression" do
 
       break if i == 2
     end.should == nil
-
+    
     j.should == 3
   end
-
+  
   it "allows 'break' to have an argument which becomes the value of the for expression" do
     for i in 1..3
       break 10 if i == 2
@@ -137,7 +137,7 @@ describe "The for expression" do
 
       j += i
     end
-
+    
     j.should == 13
   end
 
@@ -145,21 +145,12 @@ describe "The for expression" do
     j = 0
     for i in 1..3
       j += i
-
+      
       redo if i == 2 && j < 4
     end
-
+    
     j.should == 8
   end
-
-  it "repeats the loop from the beginning with 'retry'" do
-    j = 0
-    for i in 1..5
-      j += i
-
-      retry if i == 3 && j < 7
-    end
-
-    j.should == 21
-  end
 end
+
+language_version __FILE__, "for"
