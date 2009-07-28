@@ -10,24 +10,34 @@ regexes =  {
 }
 
 
-# Each of the following loop forms is broken in MagLev:
-
-regexes.each_value do |x|
-  break
+a = [ 9 ]
+x = a.each do |x|  
+  break 20
 end
+unless x == 20 ; raise 'error'; end
 
-regexes.each_pair do |x,y|
-  break
+x = regexes.each do |x|
+  break 21
 end
+unless x == 21 ; raise 'error'; end
 
-regexes.each_key do |x|
-  break
+x = regexes.each_value do |x|
+  break 22
 end
+unless x == 22 ; raise 'error'; end
 
-regexes.each do |x|
-  break
+x = regexes.each_pair do |x,y|
+  break 23
 end
+unless x == 23 ; raise 'error'; end
 
-for key,value in regexes do
-  break
+x = regexes.each_key do |x|
+  break 24
 end
+unless x == 24 ; raise 'error'; end
+
+x = for key,value in regexes do
+  break 25
+end
+unless x == 25 ; raise 'error'; end
+true
