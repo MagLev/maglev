@@ -1,6 +1,5 @@
-specs = [['String 10',   10], ['String 11',   11]]
-specs.reject! do |x,|
-  p x
-  raise "Expecting Stirng but got #{x.inspect}" unless x.kind_of? String
+specs = [['Abc 10',   10] ]
+specs.each do |y,|
+  raise "y got #{y.inspect}" unless y == 'Abc 10'
 end
-
+true
