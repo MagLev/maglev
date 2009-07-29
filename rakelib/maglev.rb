@@ -199,6 +199,7 @@ EOF
 end
 
 def load_prims
+  start_parser unless parser_running?
   sh %{ #{TOPAZ_CMD} << EOF
 input #{MAGLEV_HOME}/gemstone/upgrade/ruby/allprims.topaz
 EOF

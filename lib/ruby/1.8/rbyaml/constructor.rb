@@ -29,28 +29,28 @@ end
 module RbYAML
   class ConstructorError < YAMLError
   end
-  
+
   class BaseConstructor
     @@yaml_constructors = {}
     @@yaml_multi_constructors = {}
     @@yaml_multi_regexps = {}
-    
+
     def get_yaml_constructor(key)
       @@yaml_constructors[key]
     end
-      
+
     def get_yaml_multi_constructor(key)
       @@yaml_multi_constructors[key]
     end
-    
+
     def get_yaml_multi_regexp(key)
       @@yaml_multi_regexps[key]
     end
-      
+
     def get_yaml_multi_regexps
       @@yaml_multi_regexps
     end
-    
+
     def self.add_constructor(tag, constructor)
       @@yaml_constructors[tag] = constructor
     end
@@ -75,13 +75,13 @@ module RbYAML
       # Construct and return the next document.
       construct_document(@composer.get_node) if @composer.check_node
     end
-    
+
     def each_document
       # Iterator protocol.
       while @composer.check_node
         yield construct_document(@composer.get_node)
       end
-    end 
+    end
 
     def construct_document(node)
       data = construct_object(node)
@@ -102,7 +102,7 @@ module RbYAML
         @value.to_s
       end
     end
-    
+
     def construct_object(node)
       return @constructed_objects[node] if @constructed_objects.include?(node)
       @constructed_objects[node] = RecursiveProxy.new
@@ -153,7 +153,7 @@ module RbYAML
         puts node.tag
       end
     end
-    
+
     def str(node)
       if !node.__is_scalar
         if node.__is_mapping
@@ -227,23 +227,23 @@ module RbYAML
     @@yaml_safe_constructors = {}
     @@yaml_safe_multi_constructors = {}
     @@yaml_safe_multi_regexps = {}
-    
+
     def get_yaml_constructor(key)
       @@yaml_safe_constructors[key] || super(key)
     end
-      
+
     def get_yaml_multi_constructor(key)
       @@yaml_safe_multi_constructors[key] || super(key)
     end
-    
+
     def get_yaml_multi_regexp(key)
       @@yaml_safe_multi_regexps[key] || super(key)
     end
-      
+
     def get_yaml_multi_regexps
       super.update(@@yaml_safe_multi_regexps)
     end
-    
+
     def self.add_constructor(tag, constructor)
       @@yaml_safe_constructors[tag] = constructor
     end
@@ -257,7 +257,7 @@ module RbYAML
       str(node)
       nil
     end
-    
+
     BOOL_VALUES = {
 #      "y" =>       true,
 #      "n" =>       false,
@@ -269,11 +269,15 @@ module RbYAML
       "off" =>     false
     }
 
+    def construct_yaml_sym(node)
+      value = str(node)[1..-1].intern
+    end
+
     def construct_yaml_bool(node)
       value = str(node)
       BOOL_VALUES[value.downcase]
     end
-    
+
     def construct_yaml_int(node)
       value = str(node).to_s
       value = value.gsub(/_/, '')
@@ -314,7 +318,7 @@ module RbYAML
 
     INF_VALUE = +1.0/0.0
     NAN_VALUE = 0.0/0.0
-    
+
     def construct_yaml_float(node)
       value = str(node).to_s
       value = value.gsub(/_/, '')
@@ -352,7 +356,7 @@ module RbYAML
     TIMESTAMP_REGEXP = /^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)(?:(?:[Tt]|[ \t]+)([0-9][0-9]?):([0-9][0-9]):([0-9][0-9])(?:\.([0-9]*))?(?:[ \t]*(?:Z|([-+][0-9][0-9]?)(?::([0-9][0-9])?)?))?)?$/
 
     YMD_REGEXP = /^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)$/
-    
+
     def construct_yaml_timestamp(node)
       if (match = YMD_REGEXP.match(node.value))
         values = match.captures.map {|val| val.to_i}
@@ -368,18 +372,18 @@ module RbYAML
         values[6] = fraction
       end
       stamp = Time.gm(values[0],values[1],values[2],values[3],values[4],values[5],values[6])
-      
+
       diff = values[7] * 3600 + values[8] * 60
       return stamp-diff
     end
-    
+
     def construct_yaml_omap(node)
       # Note: we do not check for duplicate keys, because its too
       # CPU-expensive.
       raise ConstructorError.new("while constructing an ordered map","expected a sequence, but found #{node.tid}") if !node.__is_sequence
       omap = []
       for subnode in node.value
-        raise ConstructorError.new("while constructing an ordered map", 
+        raise ConstructorError.new("while constructing an ordered map",
                                    "expected a mapping of length 1, but found #{subnode.tid}") if !subnode.__is_mapping
         raise ConstructorError.new("while constructing an ordered map",
                                    "expected a single mapping item, but found #{subnode.value.length} items") if subnode.value.length != 1
@@ -398,7 +402,7 @@ module RbYAML
     def construct_yaml_set(node)
       Set.new(map(node).keys)
     end
-    
+
     def construct_yaml_str(node)
       val = str(node).to_s
       val.empty? ? nil : val
@@ -407,7 +411,7 @@ module RbYAML
     def construct_yaml_seq(node)
       seq(node)
     end
-    
+
     def construct_yaml_map(node)
       map(node)
     end
@@ -423,7 +427,7 @@ module RbYAML
       raise ConstructorError.new(nil,"could not determine a constructor for the tag #{node.tag}")
     end
   end
-  
+
   SafeConstructor.add_constructor('tag:yaml.org,2002:null',:construct_yaml_null)
   SafeConstructor.add_constructor('tag:yaml.org,2002:bool',:construct_yaml_bool)
   SafeConstructor.add_constructor('tag:yaml.org,2002:int',:construct_yaml_int)
@@ -436,29 +440,30 @@ module RbYAML
   SafeConstructor.add_constructor('tag:yaml.org,2002:str',:construct_yaml_str)
   SafeConstructor.add_constructor('tag:yaml.org,2002:seq',:construct_yaml_seq)
   SafeConstructor.add_constructor('tag:yaml.org,2002:map',:construct_yaml_map)
+  SafeConstructor.add_constructor('tag:yaml.org,2002:sym',:construct_yaml_sym)
   SafeConstructor.add_constructor(nil,:construct_private_type)
 
   class Constructor < SafeConstructor
     @@yaml_main_constructors = {}
     @@yaml_main_multi_constructors = {}
     @@yaml_main_multi_regexps = {}
-    
+
     def get_yaml_constructor(key)
       @@yaml_main_constructors[key] || super(key)
     end
-      
+
     def get_yaml_multi_constructor(key)
       @@yaml_main_multi_constructors[key] || super(key)
     end
-    
+
     def get_yaml_multi_regexp(key)
       @@yaml_main_multi_regexps[key] || super(key)
     end
-      
+
     def get_yaml_multi_regexps
       super.update(@@yaml_main_multi_regexps)
     end
-    
+
     def self.add_constructor(tag, constructor)
       @@yaml_main_constructors[tag] = constructor
     end

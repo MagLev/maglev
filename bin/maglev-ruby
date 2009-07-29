@@ -184,33 +184,41 @@ trap "rm -f $dbscript $stdinscript" EXIT
 rm -f $dbscript
 cat $MAGLEV_HOME/etc/.topazini > $dbscript
 
-cat - >> $dbscript <<-EOFA
+cat - >> $dbscript <<-EOF
 set gemstone $stone
 login
 run
 |ctx|
-EOFA
+EOF
 
-# Use MagRpDEBUG_level environment variable to set
-# MagRpDEBUG logging level to 0, 1, or 2
-# If it is not set, cwdefault to using the ParseTree parser
-# The need for this will go away as soon as we default to the new parser
+# Use MagRpDEBUG_level environment variable to select old/new parser and set MagRpDEBUG_level
+# If MagRpDEBUG_level is not set, default is new parser with no logging
+# If MagRpDEBUG_level is 0..2, use native parser with logging level 0, 1, or 2
+# if MagRpDEBUG_level is -1, use the old parser
 if [ ! -z "${MagRpDEBUG_level}" ]; then
-  cat - >> $dbscript <<-EOFA
-  SessionTemps current at: #MAGLEV_evalUseRp put: true ;
-   at: #MAGLEV_loadUseRp put: true ;
-   at: #MAGLEV_logSexp put: false ;
-   at: #MagRpDEBUG put: ${MagRpDEBUG_level} .
-EOFA
+  if [ ${MagRpDEBUG_level} -lt 0 ] ; then 
+    # echo "Using old parser"
+    cat - >> $dbscript <<-EOF
+    SessionTemps current at: #MAGLEV_evalUseRp put: false ;
+      at: #MAGLEV_loadUseRp put: false .
+EOF
+  else
+    # echo "Using new parser with MagRpDEBUG_level $MagRpDEBUG_level"
+    cat - >> $dbscript <<-EOF
+    SessionTemps current at: #MAGLEV_evalUseRp put: true ;
+      at: #MAGLEV_loadUseRp put: true ;
+      at: #MagRpDEBUG put: ${MagRpDEBUG_level} .
+EOF
+  fi
 fi
 
-cat - >> $dbscript <<-EOFA
+cat - >> $dbscript <<-EOF
 (ctx := RubyContext load: #($maglev_options) ) .
 ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) withDashE: #($dash_e) .
 GsFile stdout close . "ensure final LF on stdout"
 ^ nil
 %
-EOFA
+EOF
 
 # generate a topaz exit command as last line of init file
 if [ $debug == 0 ]; then

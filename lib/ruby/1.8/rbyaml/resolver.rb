@@ -1,7 +1,7 @@
 require 'rbyaml/util'
 require 'rbyaml/nodes'
 require 'rbyaml/error'
-  
+
 module RbYAML
   class ResolverError < YAMLError
   end
@@ -9,7 +9,7 @@ module RbYAML
   DEFAULT_SCALAR_TAG = 'tag:yaml.org,2002:str'
   DEFAULT_SEQUENCE_TAG = 'tag:yaml.org,2002:seq'
   DEFAULT_MAPPING_TAG = 'tag:yaml.org,2002:map'
-  
+
   class BaseResolver
     @@yaml_implicit_resolvers = {""=>[['tag:yaml.org,2002:null',/^$/]]}
     @@yaml_path_resolvers = {}
@@ -18,7 +18,7 @@ module RbYAML
       @resolver_exact_paths = []
       @resolver_prefix_paths = []
     end
-    
+
     def self.add_implicit_resolver(tag, regexp, first)
       if first.nil?
         first = ""
@@ -134,7 +134,7 @@ module RbYAML
         implicit = implicit[1]
       end
       exact_paths = @resolver_exact_paths[-1]
-      return exact_paths[kind] if exact_paths.include?(kind) 
+      return exact_paths[kind] if exact_paths.include?(kind)
       return exact_paths[nil] if exact_paths.include?(nil)
       if ScalarNode == kind
         return RbYAML::DEFAULT_SCALAR_TAG
@@ -148,7 +148,8 @@ module RbYAML
 
   class Resolver < BaseResolver
   end
-  
+
+  BaseResolver.add_implicit_resolver('tag:yaml.org,2002:sym',/^:/,':')
   BaseResolver.add_implicit_resolver('tag:yaml.org,2002:bool',/^(?:yes|Yes|YES|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)$/,'yYnNtTfFoO')
   BaseResolver.add_implicit_resolver('tag:yaml.org,2002:float',/^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+][0-9]+)?|[-+]?(?:[0-9][0-9_]*)?\.[0-9_]+(?:[eE][-+][0-9]+)?|[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*|[-+]?\.(?:inf|Inf|INF)|\.(?:nan|NaN|NAN))$/,'-+0123456789.')
   BaseResolver.add_implicit_resolver('tag:yaml.org,2002:int',/^(?:[-+]?0b[0-1_]+|[-+]?0[0-7_]+|[-+]?(?:0|[1-9][0-9_]*)|[-+]?0x[0-9a-fA-F_]+|[-+]?[1-9][0-9_]*(?::[0-5]?[0-9])+)$/,'-+0123456789')

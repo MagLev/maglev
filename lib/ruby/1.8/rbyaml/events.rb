@@ -22,7 +22,7 @@ module RbYAML
     def __is_mapping_start; false; end
     def __is_mapping_end; false; end
   end
-  
+
   class NodeEvent < Event
     attr_reader :anchor
     def initialize(anchor)
@@ -37,7 +37,7 @@ module RbYAML
       super(anchor)
       @tag = tag
       @implicit = implicit
-      @flow_style = flow_style        
+      @flow_style = flow_style
     end
     def __is_collection_start; true; end
   end

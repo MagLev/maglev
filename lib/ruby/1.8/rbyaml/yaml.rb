@@ -34,7 +34,7 @@ module RbYAML
     l = loader.new(stream)
     yield l.constructor.get_data while l.constructor.check_data
   end
-  
+
   def self._load(stream, loader=Loader)
     l = loader.new(stream)
     l.constructor.get_data if l.constructor.check_data
@@ -56,7 +56,7 @@ module RbYAML
     dumper = dump.new(stream,opts)
     for event in events
       dumper.emit(event)
-    end        
+    end
     stream.string if StringIO === stream
   end
 
@@ -73,11 +73,11 @@ module RbYAML
     dumper.serializer.close
     stream.string if StringIO === stream
   end
-  
+
   def self._serialize(node, stream=nil, dump=Dumper, opts={})
     _serialize_all([node], stream, dump, opts)
   end
-  
+
   def self._dump_all(documents,stream=nil, dump=Dumper, opts={})
     if stream.nil?
       require 'stringio'
@@ -95,7 +95,7 @@ module RbYAML
   def self._dump(data, stream=nil,dump=Dumper, opts={})
     _dump_all([data], stream, dump, opts)
   end
-  
+
   def self._add_implicit_resolver(tag, regexp, first=nil, resolver=BaseResolver)
     resolver.add_implicit_resolver(tag, regexp, first)
   end
@@ -103,7 +103,7 @@ module RbYAML
   def self._add_path_resolver(tag, path, kind=nil, resolver=BaseResolver)
     resolver.add_path_resolver(tag, path, kind)
   end
-  
+
   def self._add_constructor(tag, constructor, ctor=Constructor)
     ctor.add_constructor(tag, constructor)
   end

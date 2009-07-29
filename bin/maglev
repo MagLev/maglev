@@ -14,12 +14,13 @@ To control the MagLev server:
 maglev start          - Start MagLev server processes
 maglev start-debug    - Start MagLev server processes with verbose output
 maglev start-bench    - Start MagLev server with performance optimizations
-maglev start-parser   - Force parser process to start if it's dead
 maglev stop           - Stop MagLev server processes
 maglev restart        - Restart MagLev server processes
 maglev status         - Display MagLev server status
 maglev version        - Display MagLev version number
 maglev force-reload   - Stop MagLev server, replace with empty repository!!!
+maglev start-parser   - Start ParseTree based parser (deprecated)
+maglev stop-parser    - Stop ParseTree based parser (deprecated)
 
 To execute other maglev commands:
 maglev topaz          - Enter a Topaz shell
@@ -162,6 +163,9 @@ ensurePrimsLoaded() {
     quit
 EOF
   if [ $? -ne 0 ] ; then
+    # Have to have old parser to load prims
+    rubyversioncheck
+    startparser
     echo "Loading kernel. It may take a few seconds..."
     $TOPAZ_CMD << EOF > /dev/null
       set gemstone $STONENAME
@@ -217,13 +221,15 @@ stopparser() {
 status() {
   echo "MAGLEV_HOME = $MAGLEV_HOME"
   $GEMSTONE/bin/gslist -clv
-  if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
-    echo "MagLev Parse Server port = $PARSETREE_PORT"
-    lsof -P -w -iTCP:${PARSETREE_PORT}
-    # if you don't have permission to run lsof, use the following instead
-    # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
-  else
-    echo "MagLev Parse Server is not running on port $PARSETREE_PORT"
+  if (( MagRpDEBUG_level < 0 )) ; then
+    if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
+      echo "MagLev Parse Server port = $PARSETREE_PORT"
+      lsof -P -w -iTCP:${PARSETREE_PORT}
+      # if you don't have permission to run lsof, use the following instead
+      # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
+    else
+      echo "MagLev Parse Server is not running on port $PARSETREE_PORT"
+    fi
   fi
 }
 
@@ -294,40 +300,53 @@ gemx() {
 case "$1" in
   start)
         initialize
-        rubyversioncheck
-        startparser
+	if (( MagRpDEBUG_level < 0 )) ; then
+          rubyversioncheck
+          startparser
+	fi
         startserver
 	ensurePrimsLoaded
         ;;
   start-parser)
         initialize
         rubyversioncheck
-        forceparser
+        startparser
+        ;;
+  stop-parser)
+        stopparser
         ;;
   start-debug)
         initialize
-        # Leave a loophole about checking for ruby 186 patchlevel 287
-        # rubyversioncheck
-        startparser-debug
+	if (( MagRpDEBUG_level < 0 )) ; then
+          # Leave a loophole about checking for ruby 186 patchlevel 287
+          # rubyversioncheck
+          startparser-debug
+	fi
         startserver-debug
 	ensurePrimsLoaded
         ;;
   start-bench)
         initialize
-        rubyversioncheck
-        startparser
+	if (( MagRpDEBUG_level < 0 )) ; then
+          rubyversioncheck
+          startparser
+	fi
         startserver-bench
 	ensurePrimsLoaded
         ;;
   stop)
         stopserver
-        stopparser
+	if (( MagRpDEBUG_level < 0 )) ; then
+          stopparser
+	fi
         ;;
   restart)
         stopserver
-        stopparser
-        rubyversioncheck
-        startparser
+	if (( MagRpDEBUG_level < 0 )) ; then
+          stopparser
+          rubyversioncheck
+          startparser
+	fi
         startserver
 	ensurePrimsLoaded
         ;;
@@ -361,7 +380,9 @@ case "$1" in
         ;;
   force-reload)
         stopserver
-        stopparser
+	if (( MagRpDEBUG_level < 0 )) ; then
+          stopparser
+	fi
 	destroy
 	initialize
         ;;
