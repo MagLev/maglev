@@ -792,6 +792,7 @@ class File
   end
 
   def write(arg)
+    arg = Type.coerce_to(arg, String, :to_s)
     count = self._write(arg)
     if count.equal?(nil)
       raise IOError , self._last_err_string  # TODO: Errno::xxx
