@@ -2,7 +2,9 @@ login
 run
 | ctx hm |
 hm := (RubyEnv _getenv:'MAGLEV_HOME') .
-
+SessionTemps current
+   at: #MAGLEV_loadUseMri put: true ;
+   at: #MAGLEV_evalUseMri put: true .
 ctx := RubyContext load:#( ) env: 2 . "traceLoad logSexp allIvsDynamic"
 RubyContext bootWarnings: false .  "enable/disable:  warning dynamic constant"
 RubyNameSpace traceGlobals: 0 .
