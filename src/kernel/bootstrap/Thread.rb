@@ -45,7 +45,7 @@ class Thread
     result[res_start_ofs..-1]
   end
 
-  primitive_nobridge '_inspect', '_rubyInspect:'
+  primitive_nobridge 'inspect', '_rubyInspect'
 
   primitive_nobridge '_join_group', '_joinGroup:'
 
