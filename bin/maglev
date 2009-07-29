@@ -163,6 +163,9 @@ ensurePrimsLoaded() {
     quit
 EOF
   if [ $? -ne 0 ] ; then
+    # Have to have old parser to load prims
+    rubyversioncheck
+    startparser
     echo "Loading kernel. It may take a few seconds..."
     $TOPAZ_CMD << EOF > /dev/null
       set gemstone $STONENAME

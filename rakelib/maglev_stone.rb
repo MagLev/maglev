@@ -20,7 +20,6 @@ class MagLevStone < Stone
   end
 
   def create_skeleton
-    mkdir_p backup_directory
     mkdir_p @gemstone_installation.config_directory
     super
   end
@@ -47,7 +46,8 @@ class MagLevStone < Stone
   end
 
   def start
-    start_parser unless parser_running?
+    # Don't start parser by defult anymore
+    # start_parser unless parser_running?
     puts "MagLev server \"#{name}\" starting..."
     super
     ensure_prims_loaded
@@ -121,6 +121,8 @@ class MagLevStone < Stone
       if prims_loaded?(@name)
         puts "Kernel already loaded."
       else
+        # Prims can't be loaded without parser running
+        start_parser unless parser_running?
         puts "Loading Kernel.  This may take a few seconds..."
         input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
       end

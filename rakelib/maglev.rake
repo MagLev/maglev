@@ -3,19 +3,19 @@
 namespace :maglev do
 
   desc "Start MagLev server processes, if not already running."
-  task :start => [:initialize, :startparser, :startserver]
+  task :start => [:initialize, :startserver]
 
   desc "Start the MagLev processes with verbose output."
-  task :'start-debug' => [:initialize, :'startparser-debug', :'startserver-debug']
+  task :'start-debug' => [:initialize, :'startserver-debug']
 
   desc "Start the MagLev processes with performance optimizations."
-  task :'start-bench' => [:initialize, :'startparser', :'startserver-bench']
+  task :'start-bench' => [:initialize, :'startserver-bench']
 
   desc "Stop the MagLev processes."
-  task :stop => [:stopserver, :stopparser]
+  task :stop => [:stopserver]
 
   desc "Restart MagLev server processes."
-  task :restart => [:stopserver, :stopparser, :startparser, :startserver]
+  task :restart => [:stopserver, :startserver]
 
   desc "Display MagLev server status."
   task :status do
@@ -23,7 +23,13 @@ namespace :maglev do
   end
 
   desc "Stop MagLev server, overwrite with empty repository!!!"
-  task :'force-reload' => [:stopserver, :stopparser, :destroy, :initialize, :start]
+  task :'force-reload' => [:stopserver, :destroy, :initialize, :start]
+
+  desc "Start the ParseTree based parser (deprecated)"
+  task :'start-parser' => [:startparser]
+
+  desc "Stop the ParseTree based parser (deprecated)"
+  task :'stop-parser' => [:stopparser]
 
   # ======================= core tasks =======================
 
