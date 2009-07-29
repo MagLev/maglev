@@ -233,8 +233,12 @@ class Object
     #  trappable only by an Exception specifying exactly error 6001
     primitive 'pause', 'pause'
 
-    primitive   'inspect', '_rubyInspect'
-    #    rubyInspect implemented in.mcz
+    primitive   '_inspect', '_rubyInspect'
+
+    def inspect
+      # sender of _inspect must be in env 1
+      self._inspect
+    end
 
     #  following 3 prims must also be installed in Behavior
     primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
@@ -296,11 +300,6 @@ class Object
         end
       end
       self
-    end
-
-    def flatten_onto(output)
-      output << self
-      output
     end
 
     def initialize(*args)
