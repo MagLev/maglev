@@ -129,25 +129,54 @@ class Numeric
 
   # round implemented in subclasses
 
-  def step(nend, &blk)
-    n = Type.coerce_to(self, Float, :to_f)
-    nend = Type.coerce_to(nend, Float, :to_f)
-    if block_given?
-      while n <= nend
-	blk.call(n)
-	n += 1.0
+  def step(nend, inc, &blk) 
+    if nend._isFloat or inc._isFloat
+      s = Type.coerce_to(self, Float, :to_f)
+      s.step(nend, inc, &blk)
+    else
+      n = self
+      if inc == 0 
+        raise ArgumentError, "increment is zero"
+      end
+      if block_given?
+        if (inc > 0)
+          until n > nend
+            blk.call(n)
+            n += inc
+          end
+        else
+          until n < nend
+            blk.call(n)
+            n += inc
+          end
+        end
+      else
+        if (inc > 0)
+          if n < nend
+            raise LocalJumpError, 'no block given'
+          end
+        else
+          if n > nend
+            raise LocalJumpError, 'no block given'
+          end
+        end
       end
     end
   end
 
-  def step(nend, inc, &blk) 
-    n = Type.coerce_to(self, Float, :to_f)
-    nend = Type.coerce_to(nend, Float, :to_f)
-    inc = Type.coerce_to(inc, Float, :to_f)
-    if block_given?
-      while n <= nend
-	blk.call(n)
-	n += inc
+  def step(nend, &blk)
+    if nend._isFloat
+      s = Type.coerce_to(self, Float, :to_f)
+      s.step(nend, &blk)
+    else
+      n = self
+      if block_given?
+        until n > nend 
+	  blk.call(n)
+	  n += 1
+        end
+      elsif n < nend
+        raise LocalJumpError, 'no block given'
       end
     end
   end

@@ -269,33 +269,6 @@ class Integer
         primitive 'round', 'rounded'
         primitive 'zero?', '_rubyEqualZero'
 
-        def step(nend, &blk)
-          nend = Type.coerce_to(nend, Integer, :to_int)
-          if block_given?
-            n = self
-            while n <= nend
-              blk.call(n)
-              n += 1
-            end
-          end
-        end
-
-        def step(nend, inc, &blk) 
-          if nend._isFloat || inc._isFloat
-            super
-          else
-            nend = Type.coerce_to(nend, Integer, :to_int)
-            inc = Type.coerce_to(inc, Integer, :to_int)
-            if block_given?
-              n = self
-              while n <= nend
-                blk.call(n)
-                n += inc
-              end
-            end
-          end
-        end
-
 # Were in String.rb
     def _split_string(string, limit)
         self.chr._split_string(string, limit)

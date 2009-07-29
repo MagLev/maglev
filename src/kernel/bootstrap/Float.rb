@@ -191,6 +191,51 @@ primitive 'to_fmt' , '_rubyAsFormattedString'
   primitive_nobridge 'floor', 'floor'
   primitive_nobridge 'nonzero?', '_rubyNonzero'
 
+  def step(nend, inc, &blk)
+    inc = Type.coerce_to(inc, Float, :to_f)
+    n = self
+    if inc == 0.0
+      raise ArgumentError, "increment is zero"
+    end
+    if block_given?
+      nend = Type.coerce_to(nend, Float, :to_f)
+      if (inc > 0.0)
+        while n <= nend
+          blk.call(n)
+          n += inc
+        end
+      else  
+        while n >= nend
+          blk.call(n)
+          n += inc
+        end
+      end
+    else 
+      if inc > 0.0 
+        if n < nend
+          raise LocalJumpError, 'no block given'
+        end
+      else
+        if n > nend
+          raise LocalJumpError, 'no block given'
+        end
+      end
+    end
+  end
+
+  def step(nend, &blk)
+    n = self
+    if block_given?
+      nend = Type.coerce_to(nend, Float, :to_f)
+      while n <= nend
+        blk.call(n)
+        n += 1.0
+      end
+    elsif n < nend
+      raise LocalJumpError, 'no block given'
+    end
+  end
+
 # trig methods used by Math
   primitive_nobridge 'acos', 'arcCos'
   primitive_nobridge 'acosh', 'arcCosh'
