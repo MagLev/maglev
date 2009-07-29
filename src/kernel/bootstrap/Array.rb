@@ -63,16 +63,44 @@ class Array
     Hash[self]
   end
 
-  # TODO: This should be a private _ method, right?
-  def flatten_onto(output)
-    i = 0
-    lim = size
-    while i < lim
-      el = self._at(i)
-      el.flatten_onto(output)
-      i = i + 1
+  def _flatten_onto(output)
+    # returns true if any recursion done into child arrays
+    recursed = false
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    unless added
+      # self was already in the set
+      raise ArgumentError, 'recursive element in flatten'
     end
-    output
+    begin
+      i = 0
+      lim = size
+      while i < lim
+        el = self._at(i)
+        if el._isArray
+          el._flatten_onto(output)
+          recursed = true
+        else
+          begin
+            el = el.to_ary
+          rescue
+            # ignore exception   
+          end 
+          if el._isArray
+            el._flatten_onto(output)
+            recursed = true
+          else
+            output << el
+          end
+        end
+        i = i + 1
+      end
+    ensure
+      if added
+        ts.remove(self)
+      end
+    end
+    recursed
   end
   # end private helper methods
 
@@ -243,13 +271,13 @@ class Array
 
   def initialize(arg)
     if arg._isFixnum
-      self.size=(siz)
+      self.size=(arg)
     elsif arg._isArray
       self.replace(arg)
     else
       arg = Array._coerce_one_arg(arg)
       if arg._isFixnum
-        self.size=(siz)
+        self.size=(arg)
       else
         self.replace(arg)
       end
@@ -264,6 +292,7 @@ class Array
   end
 
   def initialize
+    self.size=(0)
     self
   end
 
@@ -274,6 +303,7 @@ class Array
   end
 
   def initialize(&blk)
+    self.size=(0)
     self
   end
 
@@ -875,11 +905,20 @@ class Array
   end
 
   def flatten
-    flatten_onto([])
+    ary = self.class.new 
+    _flatten_onto( ary ) 
+    ary
   end
 
   def flatten!
-    replace(flatten)
+    ary = []
+    recursed = _flatten_onto(ary)
+    if recursed
+      self.replace(ary)
+      self
+    else
+      nil
+    end 
   end
 
   # Note: The Pick Axe book has this method documented under both Array and
