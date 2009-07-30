@@ -3527,7 +3527,9 @@ def _reduce_80(val, vofs)
                       end
                     # all RubyColon2Node.s  expect second arg to be a RpNameToken
                     #  result = s(:const, s(:colon2, val_[0], val_[2].to_sym), nil)
-     result = RubyConstDeclNode.s( RubyColon2Node.s( val[vofs ], val[vofs + 2]), nil)
+             nam = val[vofs + 2]
+             result = RubyConstDeclNode.s( RubyColon2Node.s( val[vofs ], nam ), nil)
+             result.src_offset=( nam.src_offset )
                     
     result
 end
@@ -3537,9 +3539,11 @@ def _reduce_81(val, vofs)
                       if (@in_def || @in_single > 0) then
                         yyerror "dynamic constant assignment"
                       end
-                      # all RubyColon3Node.s  expect second arg to be a RpNameToken
+                      # all RubyColon3Node.s  expects arg to be a RpNameToken
                       # result = s(:const, nil, s(:colon3, val_[1].to_sym))
-                   result = RubyConstDeclNode.s( RubyColon3Node.s( val[vofs + 1] ), nil )
+                   nam = val[vofs + 1]
+                   result = RubyConstDeclNode.s( RubyColon3Node.s( nam ), nil )
+                   result.src_offset=( nam.src_offset )
                     
     result
 end
@@ -3599,7 +3603,9 @@ def _reduce_88(val, vofs)
                         yyerror "dynamic constant assignment"
                       end
                       # result = s(:const, s(:colon2, val_[0], val_[2].to_sym))
-       result = RubyConstDeclNode.s( RubyColon2Node.s( val[vofs ], val[vofs + 2]), nil)
+             nam = val[vofs + 2] 
+             result = RubyConstDeclNode.s( RubyColon2Node.s( val[vofs ], nam ), nil)
+             result.src_offset=( nam.src_offset )
                     
     result
 end
@@ -3611,7 +3617,9 @@ def _reduce_89(val, vofs)
                       end
 
                       # result = s(:const, s(:colon3, val_[1].to_sym))
-        result = RubyConstDeclNode.s( RubyColon3Node.s( val[vofs + 1]), nil )
+             nam = val[vofs + 1]
+             result = RubyConstDeclNode.s( RubyColon3Node.s( nam ), nil )
+             result.src_offset=( nam.src_offset )
                     
     result
 end

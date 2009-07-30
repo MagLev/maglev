@@ -52,6 +52,7 @@ module MagRp
       # result is zero based 
       p = self.srcOffset
       if p.equal?(nil)
+        raise_error('missing source offset') 
         return nil
       end
       p - 1
@@ -807,9 +808,10 @@ module MagRp
              res.src_offset=( name_tok.src_offset )
              res
            end
-           def self.simple(a_sym)
+           def self.simple(a_sym, src_ofs )
              res = self._new
              res.name=(a_sym)
+             res.src_offset=( src_ofs )
              res
            end
            def inspect
@@ -829,13 +831,16 @@ module MagRp
 
        class RubyConstNode
          def self.s(sym, src_ofs)
-           res = RubyColon2Node.simple(sym)
-           res.src_offset=( src_ofs ) 
+           res = RubyColon2Node.simple(sym, src_ofs)
            res
          end
          def node_assign_set_rhs(rhs)
            # caller responsible for become
-           return RubyConstDeclNode.s( RubyColon2Node.simple( @name), rhs)
+           ofs = self.src_offset .
+           c2n = RubyColon2Node.simple( @name, ofs )
+           res = RubyConstDeclNode.s( c2n, rhs)
+           res.src_offset=( ofs )
+           res
          end
          def inspect
            "[:const, #{@name.inspect}]"
@@ -1025,7 +1030,7 @@ module MagRp
            c2node.dup
          end
          def inspect
-           "[:cdecl, :#{@constNode}, #{@valueNode}]"
+           "[:cdecl, #{@constNode.inspect}, #{@valueNode.inspect}]"
          end
        end
 

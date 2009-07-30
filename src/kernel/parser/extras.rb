@@ -104,7 +104,7 @@ module MagRp # {
 		  ["and",      [:kAND,      :kAND        ], RubyLexer::Expr_beg   ],
 		  ["begin",    [:kBEGIN,    :kBEGIN      ], RubyLexer::Expr_beg   ],
 		  ["__LINE__", [:k__LINE__, :k__LINE__   ], RubyLexer::Expr_end   ],
-		  ["class",    [:kCLASS,    :kCLASS      ], RubyLexer::Expr_class ],
+		  ["class",    [:kCLASS,    :kCLASS      ], - RubyLexer::Expr_class ],
 		  ["__FILE__", [:k__FILE__, :k__FILE__   ], RubyLexer::Expr_end   ],
 		  ["END",      [:klEND,     :klEND       ], RubyLexer::Expr_end   ],
 		  ["BEGIN",    [:klBEGIN,   :klBEGIN     ], RubyLexer::Expr_end   ],
@@ -390,8 +390,9 @@ module MagRp # {
       elsif first_ch.equal?( ?$ )
         result = RubyGlobalAsgnNode.s(id, value) # s(:gasgn )
       elsif RpStringScanner.ch_is_uc_alpha(first_ch)   # A-Z
-        c2node = RubyColon2Node.simple(id)
+        c2node = RubyColon2Node.simple(id, src_ofs )
         result = RubyConstDeclNode.s(c2node, value) # s(:cdecl )
+        result.src_offset=( src_ofs )
       end
     end
     if result.equal?(nil) 
@@ -1200,7 +1201,7 @@ module MagRp # {
 
   def new_sclass( val, vofs)  
     # recv, in_def, in_single, body = val[3], val[4], val[6], val[7]
-    # line deleted from .y
+    cls_token = val[vofs] 
     recv = val[vofs + 2]
     in_def = val[vofs + 3]
     in_single = val[vofs + 5]
@@ -1216,12 +1217,7 @@ module MagRp # {
     # scope = s(:scope, body).compact  # scope not used in AST
     # result = s(:sclass, recv, scope)
     result = RubySClassNode.s(recv, body)
-    if body._not_equal?(nil)
-      body_pos = body.src_offset 
-      if body_pos._not_equal?(nil)
-        result.src_offset=( body_pos )
-      end
-    end
+    result.src_offset=( cls_token.src_offset )
 
     self.in_def = in_def
     self.in_single = in_single
