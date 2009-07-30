@@ -4,6 +4,8 @@ class GsNMethod
    #  extending GsNMethod is not allowed outside of bootstrap
 
    primitive_nobridge '_call_star*&' , '_executeInContext:star:block:'
+
+   primitive_nobridge 'inspect', '_rubyInspect' 
 end
 
 class Method
