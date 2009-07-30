@@ -131,4 +131,5 @@ RUBY.require 'kernel/delta/Dir.rb'
 RUBY.require 'kernel/delta/Range.rb'
 RUBY.require 'kernel/delta/Process.rb'
 RUBY.require 'kernel/delta/purerubystringio.rb'
+RUBY.require 'kernel/delta/String.rb'
 
