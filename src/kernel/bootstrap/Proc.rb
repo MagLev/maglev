@@ -62,6 +62,8 @@ class ExecBlock
       na
     end
 
+    primitive_nobridge 'inspect', '_rubyInspect' 
+
     def to_proc
       Proc.new(self)
     end
