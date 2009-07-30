@@ -4,6 +4,8 @@ class Class
   # do not # include Module
   # Module already present as superclass of RClass in base smalltalk image
 
+  primitive_nobridge 'ancestors' , 'rubyAncestors'
+
   primitive_nobridge 'superclass', 'superClass'
 
   class_primitive_nobridge_env '_rubyNew', '_rubyNew', ':do:'
