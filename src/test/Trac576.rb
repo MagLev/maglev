@@ -1,11 +1,11 @@
 class Spec
   def self.current
-    @@current
+    cc = @@current
+    cc
   end
   def initialize
     super
     @@current = self
-    puts "@@current is now: #{@@current}"
   end
 end
 
@@ -13,4 +13,8 @@ class ASpec < Spec
 end
 
 a = ASpec.new  # Should set  @@current to a
-p Spec.current
+b = ASpec.current
+c = Spec.current
+unless b.equal?(a) ; raise 'error' ; end
+unless c.equal?(a) ; raise 'error' ; end
+true
