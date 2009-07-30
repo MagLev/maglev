@@ -1,6 +1,19 @@
-module M
+
+a = String.ancestors
+unless a == [ String, Enumerable, Comparable, Object, Kernel ] 
+  raise 'error'
 end
-expect = [M]
-actual = M.ancestors
-raise "Fail: expected #{expect.inspect} actual: #{actual.inspect}" unless expect == actual
+
+a = String.class.ancestors
+unless a == [Class, Module, Behavior, Object, Kernel]
+  raise 'error'
+end
+
+
+module M
+  include Math
+end
+a = M.ancestors
+unless a == [ M, Math ] ; raise 'error' ; end
+
 true
