@@ -95,6 +95,8 @@ EOF
   task :'clean-gems' do
     puts "CLEANING GEMS"
     files = FileList.new('bin/maglev-gem', 'lib/maglev') do |fl|
+      fl.include('bin/rackup')
+      fl.include('bin/rake')
       fl.include('lib/ruby/site_ruby/1.8/*ubygems.rb')
       fl.include('lib/ruby/site_ruby/1.8/ubygems')
       fl.include('lib/ruby/site_ruby/1.8/rubygems/**/*.rb')

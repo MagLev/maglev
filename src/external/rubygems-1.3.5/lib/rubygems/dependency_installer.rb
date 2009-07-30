@@ -138,12 +138,7 @@ class Gem::DependencyInstaller
         deps.each do |dep|
           results = find_gems_with_sources(dep).reverse
 
-          # GEMSTONE PATCH
-          #
-          # Workaround Trac570
-          #results.reject! do |dep_spec,|
-          results.reject! do |dep_spec,_|
-          # END GEMSTONE
+          results.reject! do |dep_spec,|
             to_do.push dep_spec
 
             @source_index.any? do |_, installed_spec|
