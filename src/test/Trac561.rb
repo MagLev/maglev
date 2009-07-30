@@ -16,13 +16,17 @@ unless Bar::CB == 5 ; raise 'error'; end
       module FooO
         Bar = 561
       end
-      class Baz; include FooO ; end
-      class Baz;
-        def self.bar;  Bar ; end
+      class Baz
+        include FooO
+      end
+      class Baz
+        def self.bar  
+          Bar 
+        end
       end
       def baz; Baz; end
     end
     xx = o.baz.bar
     unless xx == 561 ; raise 'error'; end
-
+puts "done"
 true
