@@ -19,16 +19,28 @@ class Integer
   def gcd2(int)
     a = self.abs
     b = int.abs
-    a, b = b, a if a < b
+    # a, b = b, a if a < b
+    if a < b
+      tmp = a
+      a = b
+      b = tmp
+    end
     
     pd_a = a.prime_division
     pd_b = b.prime_division
     
     gcd = 1
-    for pair in pd_a
+
+    # for pair in pd_a
+    pd_a_len = pd_a.size
+    pd_a_idx = 0
+    while pd_a_idx < pd_a_len
+      pair = pd_a[pd_a_idx]
+      pd_a_idx += 1
+
       as = pd_b.assoc(pair[0])
       if as
-	gcd *= as[0] ** [as[1], pair[1]].min
+	gcd *= as[0] ** ( as[1]._min( pair[1]) )
       end
     end
     return gcd
@@ -36,7 +48,16 @@ class Integer
   
   def Integer.from_prime_division(pd)
     value = 1
-    for prime, index in pd
+
+    # for prime, index in pd
+    pd_len = pd.size
+    pd_idx = 0
+    while pd_idx < pd_len
+      pair = pd[pd_idx]
+      pd_idx += 1
+      prime = pair[0]
+      index = pair[1]
+
       value *= prime**index
     end
     value
@@ -154,7 +175,13 @@ class Rational
 	npd, dpd = dpd, npd
       end
       
-      for elm in npd
+      # for elm in npd
+      npd_len = npd.size
+      npd_idx = 0
+      while npd_idx < npd_len 
+        elm = npd[npd_idx]
+        npd_idx += 1
+
 	elm[1] = elm[1] * other
 	if ! elm[1]._isInteger and elm[1].denominator != 1
          return Float(self) ** other2
@@ -162,7 +189,13 @@ class Rational
 	elm[1] = elm[1].to_i
       end
       
-      for elm in dpd
+      # for elm in dpd
+      dpd_len = dpd.size
+      dpd_idx = 0
+      while dpd_idx < dpd_len 
+        elm = dpd[dpd_idx]
+        dpd_idx += 1
+
 	elm[1] = elm[1] * other
 	if !elm[1]._isInteger and elm[1].denominator != 1
          return Float(self) ** other2
