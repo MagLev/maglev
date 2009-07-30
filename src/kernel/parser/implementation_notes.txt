@@ -108,4 +108,10 @@ Fixes for Maglev Trac 567
         b
     # end of example
 
+Fix Maglev Trac 565
+  Ryan's code in "def new_regexp" in extras.rb is incorrect.
+  In the original code, the loop  "options.split(//).each do"
+  probably needs to use   "o |= v" instead of "o += v"
+  to handle the case of redundant/duplicate specification letters 
+  in the options string.
 
