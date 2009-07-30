@@ -64,15 +64,11 @@ causing this type of error:
     /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 8: require: command not found
     /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 9: require: command not found
 
-There is support for <tt>--env-shebang</tt> in RubyGems, but it doesn't
-correctly setup bin/maglev-gem.  The default has been set for
-installed gems, however (i.e., if you <tt>maglev-gem install rake</tt>,
-then the <tt>bin/rake</tt> shell script will have the shebang line set
-to <tt>#!/usr/bin/env maglev-ruby</tt>).
+Once you've tweaked <tt>bin/magelv-gem</tt> however, any shell scripts
+installed using rubygems will have the appropriate shebang line.
 
-We have successfully installed the rake gem:
-
-    $ maglev-ruby bin/maglev-gem install rake
+We have succuessfully installed rack-1.0.0 and run a basic rack app using
+rubygems (see <tt>examples/rack/gemrack.rb</tt>):
 
 To clean up after experimenting with gems, there is a rake task:
 
@@ -83,13 +79,13 @@ which removes all traces of any gems you've installed.
 ==== Gemstone Patches for RubyGems
 
 GemStone has made the following modifications to the stock version of
-RubyGems:
+RubyGems 1.3.5:
 
 * lib/rubygems/package/tar_input.rb:
-  The tar support throws away the gzip
-  header before passing the archive to zlib.  MagLev's zlib support expects
-  the gzip header (and, apparently, so does Rubinius).  So, we do not throw
-  away the header before processing the archive:
-* rubygems-1.3.5/lib/rubygems/dependency_installer.rb
-  Work around a bug in handling multiple assignment with a trailing ','.
-  See the GEMSTONE comment.
+
+  The tar support throws away the gzip header before passing the archive to
+  zlib.  MagLev's zlib support expects the gzip header (and, apparently, so
+  does Rubinius).  This patch has been submitted and accepted by the
+  RubyGems project, so we expect rubygems-1.3.6 to install w/o patches to
+  the code.
+
