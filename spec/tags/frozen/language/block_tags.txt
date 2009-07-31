@@ -1,0 +1,4 @@
+breaks:Block parameters (to be removed from MRI) assigns to a global variable
+breaks:Block parameters (to be removed from MRI) calls method=
+fails:Block parameters assign to local variable
+fails:Block parameters captures variables from the outer scope
