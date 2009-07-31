@@ -71,7 +71,7 @@ module Config
   end
 
   CONFIG['EXEEXT']            = ''
-  CONFIG['ruby_install_name'] = 'maglev-ruby'
+  CONFIG['ruby_install_name'] = 'maglev-ruby'  # The name of the interpreter executable
   CONFIG['RUBY_INSTALL_NAME'] = CONFIG['ruby_install_name']
   CONFIG['RUBY_SO_NAME']      = CONFIG['ruby_install_name']
   CONFIG['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?

@@ -279,11 +279,11 @@ class Hash
   primitive 'key?', 'includesKey:'
   primitive 'length', 'size'
 
-  def merge(hash)
-    dup.update(hash)
+  def merge(hash, &block)
+    dup.update(hash, &block)
   end
 
-  def merge!(other)
+  def merge!(other, &block)
     # RUBINIUS: From core/hash.rb
     other = Type.coerce_to(other, Hash, :to_hash)
     other.each_pair do |k, v|

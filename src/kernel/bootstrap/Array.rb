@@ -80,18 +80,14 @@ class Array
         if el._isArray
           el._flatten_onto(output)
           recursed = true
-        else
-          begin
-            el = el.to_ary
-          rescue
-            # ignore exception   
-          end 
+        elsif el.respond_to?(:to_ary)
+          el = el.to_ary
           if el._isArray
             el._flatten_onto(output)
             recursed = true
-          else
-            output << el
           end
+        else
+          output << el
         end
         i = i + 1
       end
@@ -905,8 +901,8 @@ class Array
   end
 
   def flatten
-    ary = self.class.new 
-    _flatten_onto( ary ) 
+    ary = self.class.new
+    _flatten_onto( ary )
     ary
   end
 
@@ -918,7 +914,7 @@ class Array
       self
     else
       nil
-    end 
+    end
   end
 
   # Note: The Pick Axe book has this method documented under both Array and
