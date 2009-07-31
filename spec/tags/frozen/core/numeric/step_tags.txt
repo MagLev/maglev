@@ -2,18 +2,3 @@ fails:Numeric#step with [stop, step] raises no LocalJumpError when passed no blo
 fails:Numeric#step with [stop, step] raises a LocalJumpError when passed no block and self < stop
 fails:Numeric#step with [stop, step] increments self (using #+) until self > stop when step > 0
 fails:Numeric#step with [stop, step] decrements self (using #-) until self < stop when step < 0
-fails:Numeric#step with [stop, step] when self, stop or step is a Float yields only Floats
-fails:Numeric#step with [stop, +step] when self, stop or step is a Float yields while increasing self by step until stop is reached
-fails:Numeric#step with [stop, +step] when self, stop or step is a Float yields once when self equals stop
-fails:Numeric#step with [stop, +step] when self, stop or step is a Float does not yield when self is greater than stop
-fails:Numeric#step with [stop, -step] when self, stop or step is a Float yields once when self equals stop
-fails:Numeric#step doesn't catch errors
-fails:Numeric#step with [stop, step] raises an ArgumentError when step is 0
-hangs:Numeric#step with [stop, step] when self, stop and step are Fixnums raises an ArgumentError when step is 0
-fails:Numeric#step with [stop, -step] when self, stop and step are Fixnums yields while decreasing self by step until stop is reached
-fails:Numeric#step with [stop, -step] when self, stop and step are Fixnums yields once when self equals stop
-hangs:Numeric#step with [stop, -step] when self, stop and step are Fixnums does not yield when self is greater than stop
-hangs:Numeric#step with [stop, step] when self, stop or step is a Float raises an ArgumentError when step is 0
-fails:Numeric#step with [stop, -step] when self, stop and step are Fixnums does not yield when self is less than stop
-fails:Numeric#step with [stop, -step] when self, stop or step is a Float yields while decreasing self by step until stop is reached
-hangs:Numeric#step with [stop, -step] when self, stop or step is a Float does not yield when self is less than stop
