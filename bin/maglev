@@ -336,14 +336,12 @@ case "$1" in
         ;;
   stop)
         stopserver
-	if (( MagRpDEBUG_level < 0 )) ; then
-          stopparser
-	fi
+        stopparser
         ;;
   restart)
         stopserver
+        stopparser
 	if (( MagRpDEBUG_level < 0 )) ; then
-          stopparser
           rubyversioncheck
           startparser
 	fi
@@ -380,9 +378,7 @@ case "$1" in
         ;;
   force-reload)
         stopserver
-	if (( MagRpDEBUG_level < 0 )) ; then
-          stopparser
-	fi
+        stopparser
 	destroy
 	initialize
         ;;
