@@ -1,5 +1,3 @@
-fails:Module#const_set sets the constant specified by a String or Symbol to the given value
-fails:Module#const_set returns the value set
 fails:Module#const_set raises a NameError if the name does not start with a capital letter
 fails:Module#const_set raises a NameError if the name starts with a non-alphabetic character
 fails:Module#const_set raises a NameError if the name contains non-alphabetic characters except '_'

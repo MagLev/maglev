@@ -1,5 +1,5 @@
+fails:Module#alias_method retains method visibility
 fails:Module#alias_method converts a non string/symbol/fixnum name to string using to_str
 fails:Module#alias_method raises a TypeError when the given name can't be converted using to_str
 fails:Module#alias_method is a private method
 fails:Module#alias_method works on private module methods in a module that has been reopened
-fails:Module#alias_method retains method visibility

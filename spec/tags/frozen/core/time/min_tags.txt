@@ -1,1 +1,1 @@
-breaks:Time#min returns the minute of the hour (0..59) for time
+fails:Time#min returns the minute of the hour (0..59) for time
