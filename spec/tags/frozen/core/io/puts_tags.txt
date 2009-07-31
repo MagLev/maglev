@@ -8,4 +8,3 @@ fails:IO#puts writes [...] for a recursive array arg
 fails:IO#puts writes a newline after objects that do not end in newlines
 fails:IO#puts does not write a newline after objects that end in newlines
 fails:IO#puts ignores the $/ separator global
-fails:IO#puts raises IOError on closed stream
