@@ -1,1 +1,0 @@
-fails:A class variable defined in a module can be accessed from modules that extend the module
