@@ -1,5 +1,1 @@
 fails:IO#write on a file writes all of the string's bytes but buffers them
-fails:IO#write coerces the argument to a string using to_s
-hangs:IO#write checks if the file is writable if writing more than zero bytes
-fails:IO#write invokes to_s on non-String argument
-fails:IO#write raises IOError on closed stream

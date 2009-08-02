@@ -1,7 +1,3 @@
-fails:Array#initialize preserves the object's identity even when changing its value
-fails:Array#initialize raises a TypeError on frozen arrays even if the array would not be modified
-fails:Array#initialize with no arguments makes the array empty
-fails:Array#initialize with (array) calls #to_ary to convert the value to an array
 fails:Array#initialize with (array) raises a TypeError if an Array type argument and a default object
 fails:Array#initialize with (size, object=nil) sets the array to size and fills with the object
 fails:Array#initialize with (size, object=nil) raises an ArgumentError if size is negative
@@ -11,4 +7,3 @@ fails:Array#initialize with (size, object=nil) raises a TypeError if the size ar
 fails:Array#initialize with (size, object=nil) yields the index of the element and sets the element to the value of the block
 fails:Array#initialize with (size, object=nil) uses the block value instead of using the default value
 fails:Array#initialize with (size, object=nil) returns the value passed to break
-breaks:Array#initialize with (size, object=nil) sets the array to the values returned by the block before break is executed

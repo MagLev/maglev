@@ -186,7 +186,7 @@ def start_server_bench
 end
 
 def prims_loaded?
-  sh %{ #{TOPAZ_CMD} << EOF
+  sh %{ #{TOPAZ_CMD} << EOF >/dev/null
 set user DataCurator pass swordfish
 login
 obj RubyPrimsLoaded
@@ -200,7 +200,7 @@ end
 
 def load_prims
   start_parser unless parser_running?
-  sh %{ #{TOPAZ_CMD} << EOF
+  sh %{ #{TOPAZ_CMD} << EOF >/dev/null
 input #{MAGLEV_HOME}/gemstone/upgrade/ruby/allprims.topaz
 EOF
   } do |ok, status|
