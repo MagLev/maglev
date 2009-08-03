@@ -472,7 +472,32 @@ class File
     stat_obj.socket?
   end
 
-  # MNI: File.split
+  def self.split(arg)
+    arg = Type.coerce_to(arg, String, :to_str)
+    if arg.size.equal?(0)
+      return [ '.' , '' ]
+    end
+    str = arg.dup
+    changed = true
+    until changed.equal?(nil)
+      changed = str.gsub!('//', '/') 
+    end
+    idx = str.rindex('/')
+    if idx.equal?(str.size - 1)
+      str.size=(str.size - 1)
+    end
+    idx = str.rindex('/')
+    if idx.equal?(nil) 
+      return [ '.', str ]
+    end 
+    if idx.equal?(0)
+      left = '/' 
+    else
+      left = str[0, idx] 
+    end
+    [ left , str[idx+1, str.size - idx - 1] ]
+  end
+  
 
   def self.stat(filename)
     stat_obj = Errno.handle(_stat(filename, false), filename)
