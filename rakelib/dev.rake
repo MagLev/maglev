@@ -6,8 +6,9 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  desc "Reload kernel.rb (primitives) and commit it"
-  task :reloadprims => ['maglev:start'] do
+  desc "Reload kernel.rb (primitives) and commit it.  Starts MRI parser for prims if needed."
+  # Still requires old MRI parser for bootstrapping the prims...
+  task :reloadprims => ['maglev:start', 'maglev:startparser'] do
     puts "=== reload primitives"
     sh %{
       #{TOPAZ_CMD} <<EOF
