@@ -140,8 +140,6 @@ class Hash
     self
   end
 
-# 48 190 382 31 3
-
   def ==(other)
     if (other._isHash)
       if (other.equal?(self))
@@ -158,7 +156,29 @@ class Hash
       return false
     end
     each { |k,v|
-       unless other[k] == v
+       unless other[k] == v	# TODO handle recursive refs
+         return false
+       end
+    }
+    true
+  end
+
+  def eql?(other)
+    # per specs,  does not coerce the argument
+    if other.equal?(self)
+      return true
+    end
+    unless other._isHash
+      return false
+    end
+    unless other.length.equal?(self.length)
+      return false
+    end
+    unless other.default == self.default
+      return false
+    end
+    each { |k,v|
+       unless other[k] == v	# TODO handle recursive refs
          return false
        end
     }
