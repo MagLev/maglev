@@ -984,7 +984,7 @@ module MagRp # {
     result = RubyDefnNode.s(name_sym, args, body) # s(:defn )
     result.src_offset=( def_tok.src_offset )
     result.start_line=( def_tok.line )
-    result.set_filename_source( @file_name , @source_string )
+    # source installed by walk-with scope phase now
     result
   end
 
@@ -1018,7 +1018,7 @@ module MagRp # {
     result.receiver=(recv) 
     result.src_offset=( def_tok.src_offset )
     result.start_line=( def_tok.line )
-    result.set_filename_source( @file_name , @source_string )
+    # source installed by walk-with scope phase now
     result
   end
 

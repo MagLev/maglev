@@ -380,7 +380,6 @@ module MagRp
        class RubyMethodDefNode
          class_primitive_nobridge 's', 's_forRp:args:body:'
          primitive_nobridge 'start_line=', 'startLine:' 
-         primitive_nobridge 'set_filename_source', 'fileName:source:' 
        end
          class RubyDefnNode
            # def self.s # inherited
