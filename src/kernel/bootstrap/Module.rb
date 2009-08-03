@@ -97,10 +97,10 @@ class Module
     _fullName
   end
 
-  class_primitive_nobridge '_new_module', 'newModule'
+  class_primitive_nobridge 'allocate', 'newModule'
 
   def self.new(*args, &block)
-    m = _new_module
+    m = allocate
     m.initialize(*args)
     if block_given?
       m.module_eval(&block)
