@@ -1017,23 +1017,35 @@ module FileUtils
   def touch(list, options = {})
     fu_check_options options, OPT_TABLE['touch']
     list = fu_list(list)
-    created = nocreate = options[:nocreate]
+    nocreate = options[:nocreate]
     t = options[:mtime]
     if options[:verbose]
       fu_output_message "touch #{nocreate ? ' -c' : ''}#{t ? t.strftime(' -t %Y%m%d%H%M.%S') : ''}#{list.join ' '}"
     end
     return if options[:noop]
     list.each do |path|
-      created = nocreate
-      begin
-        File.utime(t, t, path)
-      rescue Errno::ENOENT
-        raise if created
+#     created = nocreate
+#     begin
+#       File.utime(t, t, path)
+#     rescue Errno::ENOENT
+#       raise if created
+#       File.open(path, 'a') {
+#         ;
+#       }
+#       created = true
+#       retry if t
+#     end
+# Gemstone, alternate implementation not dependent on exact Errno::ENOENT
+      if File.exist?(path)
+        if t
+          File.utime(t, t, path)
+        end  
+      elsif nocreate
+        # nothing more
+      else
         File.open(path, 'a') {
           ;
         }
-        created = true
-        retry if t
       end
     end
   end
