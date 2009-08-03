@@ -659,13 +659,38 @@ class String
   end
 
   def gsub!(regex, str)
-    raise TypeError, "can't modify frozen string" if frozen?
-    replace(gsub(regex, str))
+    nval = gsub(regex, str)
+    if self == nval 
+      nil
+    else
+      replace(nval)  # replace detects frozen
+    end
   end
 
   def gsub!(regex, &block)
-    raise TypeError, "can't modify frozen string" if frozen?
-    replace(gsub(regex, &block))
+    # $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
+    start = 1
+    out = ''
+    get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+      out << substring1(start, match.begin(0))
+      saveTilde = block._fetchRubyVcGlobal(0);
+      begin
+        block._setRubyVcGlobal(0, match);
+        out << block.call(match[0]).to_s
+      ensure
+        block._setRubyVcGlobal(0, saveTilde);
+      end
+      start = match.end(0) + 1
+    end
+    if start <= length
+      out << substring1(start, length)
+    end
+    if self == out
+      nil
+    else
+      replace(out)  # replace detects frozen
+    end
   end
 
   def _delete_underscore_strip
@@ -850,7 +875,6 @@ class String
     if start._isRegexp
       m_begin, m_len = self._match_regexp(start, a_len)
       return nil if m_begin.equal?(nil)
-      raise TypeError, "can't modify frozen string" if self.frozen?
       r = slice!(m_begin, m_len)
       # r.taint if self.tainted? or start.tainted?
       return r
@@ -862,7 +886,7 @@ class String
     start += sz if start < 0
     return nil if start < 0 || start > sz
     return '' if start.equal?(sz)
-    raise TypeError, "can't modify frozen string" if self.frozen?
+    #  _remove_from_to will detect frozen if changes would occur
     s = _at_length(start, len)
     stop = start + len
     stop = sz if stop > sz
@@ -1011,14 +1035,10 @@ class String
   primitive 'squeeze!*', 'rubySqueezeSelf:'
   primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
 
-  def strip
-    _strip
-  end
-  primitive '_strip', 'withBlanksTrimmed'
+  primitive 'strip', 'withBlanksTrimmed' 
 
   def strip!
-    raise TypeError, "can't modify frozen string" if frozen?
-    replace(strip)
+    replace(strip)  # replace detects frozen
   end
 
   # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
@@ -1102,11 +1122,7 @@ class String
   end
 
 
-  primitive '_succ!', 'rubySucc'
-  def succ!
-    raise TypeError, "succ!: can't modify frozen string" if self.frozen?
-    _succ!
-  end
+  primitive 'succ!', 'rubySucc' # prim detects frozen if would change
 
   # Returns the successor to <i>self</i>. The successor is calculated by
   # incrementing characters starting from the rightmost alphanumeric (or
@@ -1152,12 +1168,7 @@ class String
     tot
   end
 
-  primitive '_swapcase!', 'rubySwapcaseInPlace'
-
-  def swapcase!
-    raise TypeError, "can't modify frozen string" if frozen?
-    self._swapcase!
-  end
+  primitive 'swapcase!', 'rubySwapcaseInPlace' # prim detects frozen if would change
 
   def swapcase
     s = self.dup
@@ -1249,14 +1260,13 @@ class String
 
   primitive_nobridge 'to_sym', 'asSymbol'
 
-  primitive '_tr!', 'rubyTrFrom:to:'
+  primitive '_tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
   #     str.tr!(from_str, to_str)   => str or nil
   #
   #  Translates <i>str</i> in place, using the same rules as
   #  <code>String#tr</code>. Returns <i>str</i>, or <code>nil</code> if no
   #  changes were made.
   def tr!(from_str, to_str)
-    raise TypeError, "can't modify frozen string" if frozen?
     from = Type.coerce_to(from_str, String, :to_str)
     to   = Type.coerce_to(to_str,   String, :to_str)
     _tr!(from, to)
@@ -1282,13 +1292,12 @@ class String
     s
   end
 
-  primitive '_tr_s!', 'rubyTrSqueezeFrom:to:'
+  primitive '_tr_s!', 'rubyTrSqueezeFrom:to:'  # prim detects frozen if would change
   #     str.tr_s!(from_str, to_str)   => str or nil
   #
   #  Performs <code>String#tr_s</code> processing on <i>str</i> in place,
   #  returning <i>str</i>, or <code>nil</code> if no changes were made.
   def tr_s!(from_str, to_str)
-    raise TypeError, "tr_s!: can't modify frozen string" if frozen?
     return nil if from_str.empty?
     _tr_s!(from_str, to_str)
   end
@@ -1319,11 +1328,7 @@ class String
     r
   end
 
-  primitive '_upcase!', 'rubyUpcaseInPlace'
-  def upcase!
-    raise TypeError, "upcase!: can't modify frozen string" if frozen?
-    _upcase!
-  end
+  primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
 
   # MNI: upto
 
