@@ -8,22 +8,24 @@ usage()
 cat << EOF
 Usage: $COMMAND [options] [--] filename [script-args]
 
-    Execute a Ruby file
+    Execute a Ruby file with MagLev
 
     Currently, the filename argument is required.
 
 OPTIONS:
    --copyright    Print copyright and exit
-   -d, --debug    Set debugging flags
-   -e 'command'   Execute command.  May pass multiple -e
+   -d, --debug    Set debugging flags. Allows topaz debugging.
+   -e <command>   Execute command.  May pass multiple -e
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
-   -h             Show this message and exit
-   --help         Show this message and exit
+   -h, --help     Show this message and exit
+   -I <path>      Add <path> to $LOAD_PATH
    -M<opt>        Pass a maglev option to the VM.  This flag may be passed multiple
                   times.  The currently recognized options are:
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
                     logSexp       Print sexpressions as they are parsed
+   --             End of MagLev parameters.  The next parameter is the script
+                  name, then script parameters follow.
    --stone <name> Run script connecting to the named stone
    -v, --verbose  Print version number, then turn on verbose mode
    --version      Print version number and exit
