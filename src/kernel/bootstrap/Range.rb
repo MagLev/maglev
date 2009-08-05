@@ -56,7 +56,7 @@ class Range
             x = x.succ
           end
         end
-      else
+      elsif x._isNumeric && llast._isNumeric
         if @excludeEnd
           while x < llast
             yield x
@@ -64,6 +64,18 @@ class Range
           end
         else
           while x <= llast
+            yield x
+            x = x.succ
+          end
+        end
+      else
+        if @excludeEnd
+          while (x <=> llast) < 0
+            yield x
+            x = x.succ
+          end
+        else
+          while (x <=> llast) <= 0
             yield x
             x = x.succ
           end
