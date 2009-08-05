@@ -341,14 +341,14 @@ class RubyLexer
         int_with_base(2, s_matched, sign)
       elsif (s_matched = src.scan(/0d[0-9_]+/)) then
         int_with_base(10, s_matched, sign)
-      elsif src.check_advance(/0o?[0-7_]*[89]/) then
+      elsif src.check_advance(/0(o|O)?[0-7_]*[89]/) then
         rb_compile_error "Illegal octal digit."
-      elsif (s_matched = src.scan(/0o[0-7_]+/))
+      elsif (s_matched = src.scan(/0(o|O)[0-7_]+/))
         int_with_base(8, s_matched, sign)
-      elsif src.check_advance(/0o/) then
+      elsif src.check_advance(/0(o|O)/) then
         int_with_base(8, "0o0", sign)
       elsif (s_matched = src.scan(/0[0-7_]+/)) then
-        int_with_base(8, "0" << s_matched, sign)
+        int_with_base(8, "0o" << s_matched, sign)
       elsif src.check_advance(/[\d_]+_(e|\.)/) then
         rb_compile_error "Trailing '_' in number."
       elsif (s_matched = src.scan(/[\d_]+\.[\d_]+(e[+-]?[\d_]+)?\b|[+-]?[\d_]+e[+-]?[\d_]+\b/i)) then
