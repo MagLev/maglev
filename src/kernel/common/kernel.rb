@@ -26,17 +26,32 @@ module Kernel
       return obj
     end
     if obj._isString
-      if obj == ''
+      if obj.size.equal?(0)
 	raise ArgumentError, "invalid value for Integer: (empty string)"
-      else
-	return obj.to_inum(0, true)
       end
+      if obj[0].equal?(0) || obj[-1].equal?(0)  # begin/end with null byte
+	raise ArgumentError, "invalid value for Integer: (null byte)"
+      end
+      return obj.to_inum(0, true)
     end
-    if (obj.respond_to?(:to_int))
-      Type.coerce_to(obj, Integer, :to_int)
-    else
-      Type.coerce_to(obj, Integer, :to_i)
+    if obj.equal?(nil)
+      return 0
     end
+    val = nil
+    begin
+      val = obj.to_int
+    rescue Exception
+    end
+    if val.equal?(nil)
+      begin
+        val = obj.to_i
+      rescue Exception
+      end
+    end  
+    unless val._isInteger
+      raise TypeError, 'Coercion error: to_int or to_i did not return an Integer'
+    end
+    val
   end
   module_function :Integer
 
