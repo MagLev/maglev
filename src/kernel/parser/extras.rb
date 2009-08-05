@@ -813,6 +813,7 @@ module MagRp # {
 
       r_else = val[vofs + 2]
       result = RubyRescueNode.s( r_body, rescuebody, r_else) # s(:rescue )
+      result.src_offset=( rescuebody.src_offset )
     elsif not (v_two = val[vofs + 2]).equal?(nil) then
       warning("else without rescue is useless")
       result = block_append(result, v_two)  # may create a new :block
