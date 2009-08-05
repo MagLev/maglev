@@ -433,11 +433,22 @@ class Array
       i = 0
       limi = lim
       while i < limi
-        curr = self._at(i)
-        if ts.include?(curr)
-          return false unless curr.equal?(other[i])
+        v = self._at(i)
+        ov = other[i]
+        if v.equal?(ov)
+	  # ok
+        elsif ts.include?(v) || ts.include?(ov)
+          if v.equal?(self) && ov.equal?(other)
+            # ok 
+          elsif v.equal?(other) && ov.equal?(self)
+            # ok
+          else
+            raise ArgumentError, 'recursion too complex for Array#=='
+          end
+        elsif v == ov
+          # ok
         else
-          return false unless curr == other[i]
+          return false 
         end
         i += 1
       end
