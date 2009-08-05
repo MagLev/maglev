@@ -42,7 +42,7 @@ class ThrTest
     Thread.pass
     unless (x = $A) == 78 ;                     Failed() ; end
     x = t.status
-    unless x == 'run' ;                 Failed() ; end
+    unless x == 'sleep' ;                 Failed() ; end
     unless (x = t.stop?).equal?(true)  ; 		Failed() ; end
     unless t.alive?.equal?(true) ; 		Failed() ; end
    
@@ -65,7 +65,7 @@ class ThrTest
     s = t.join(1)
     unless (s == nil);				Failed() ; end
     unless (x = $A) == 98 ; 			Failed() ; end
-    unless (s = t.status) == 'run';		Failed() ; end
+    unless (s = t.status) == 'sleep';		Failed() ; end
     t.terminate
     Thread.pass 
     unless (x = $A) == 98 ; 			Failed() ; end
