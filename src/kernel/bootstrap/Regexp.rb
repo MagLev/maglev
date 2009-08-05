@@ -306,6 +306,7 @@ class Regexp
     start = offset.equal?(nil) ? 0 : offset
     md = self._search(string, start, nil)
     md._storeRubyVcGlobal(0x20)
+    return nil if md.equal?(nil)
     md.begin(0) + offset
   end
 
