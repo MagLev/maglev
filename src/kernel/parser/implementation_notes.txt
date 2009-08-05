@@ -89,7 +89,7 @@ As of 5 June 09, algorithmic changes since ruby_parser2.0.2 include
   See first occurrance of "symbol cannot contain" in lexer.rb 
 
 Merged changes from ruby_parser2.0.3 
-  no subtantive differences that affect Maglev code
+  no substantive differences that affect Maglev code
 
 Fixes for Maglev Trac 567
   Ryan's code does not correctly lex a string of the form
@@ -114,4 +114,18 @@ Fix Maglev Trac 565
   probably needs to use   "o |= v" instead of "o += v"
   to handle the case of redundant/duplicate specification letters 
   in the options string.
+
+Lexing of Octal numbers
+  The original code in lexer.rb,  
+     when src.scan(/[+-]?0o?[0-7_]*[89]/) then
+       rb_compile_error "Illegal octal digit."
+     when src.scan(/[+-]?0o?[0-7_]+|0o/) then
+       int_with_base(8)
+  should be
+     when src.scan(/[+-]?0(o|O)?[0-7_]*[89]/) then
+       rb_compile_error "Illegal octal digit."
+     when src.scan(/[+-]?0(o|O)?[0-7_]+|0o/) then
+       int_with_base(8)
+  to allow either upper or lower case 'o' after the leading zero
+
 
