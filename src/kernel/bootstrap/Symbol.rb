@@ -53,4 +53,9 @@ class Symbol
       super(sym)
     end
   end
+
+  def to_str
+    # MRI raises a NoMethodError
+    raise TypeError , 'to_str not allowed for Symbol'
+  end
 end
