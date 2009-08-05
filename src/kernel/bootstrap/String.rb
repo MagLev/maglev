@@ -17,8 +17,14 @@ class String
   class_primitive_nobridge '_alloc', '_basicNew'
 
   def self.new(str)
-    if self.equal?(String)
-      s = _withAll(str)
+    if self.equal?(String) 
+      if str._isString
+        s = _withAll(str)
+      else
+        s = _alloc
+        str = Type.coerce_to(str, String, :to_str)
+        s.replace(str) 
+      end      
     else
       s = _alloc
     end
@@ -30,6 +36,7 @@ class String
     if self.class.equal?(String)
       # do nothing
     else
+      str = Type.coerce_to(str, String, :to_str)
       self.replace(str)
     end
     self
@@ -107,13 +114,14 @@ class String
   def <=>(o)
     if o._isString
       i = 0
-      lim = size > o.size ? o.size : size # lim is the min
+      o_size = o.size
+      lim = size > o_size ? o_size : size # lim is the min
       while i < lim
         result = self[i] <=> o[i]
         return result unless result.equal?(0)
         i += 1
       end
-      return size <=> o.size
+      return size <=> o_size
     else
       if o.equal?(nil)
         return nil
@@ -127,13 +135,42 @@ class String
     end
   end
 
+  primitive_nobridge '_uppercase_at', 'rubyUpperCaseAt:' # arg is one-based
+
+  def casecmp(o)
+    # case-insensitive version of String#<=>
+    if o._isString
+      i = 1
+      o_size = o.size
+      lim = size > o_size ? o_size : size # lim is the min
+      while i <= lim
+        sc = self._uppercase_at(i)
+        oc = o._uppercase_at(i)
+        result = sc <=> oc
+        return result unless result.equal?(0)
+        i += 1
+      end
+      return size <=> o_size
+    else
+      if o.equal?(nil)
+        return nil
+      end
+      # From Rubinius...there are a lot of strange things in how
+      # string handles <=>...
+      return nil if o._isSymbol
+      return nil unless o.respond_to?(:to_str) && o.respond_to?(:casecmp)
+      return nil unless tmp = (o casecmp self)
+      return -tmp
+    end
+  end
+
   # PERFORMANCE: String#== could use help
   primitive '_same_value', '='  # TODO: this is incorrect...
   def ==(other)
     if other._isString
       s = other
     elsif other.respond_to? :to_str
-      s = Type.coerce_to(other, String, :to_str)
+      return other == self  # per specs
     else
       return false
     end
@@ -172,7 +209,7 @@ class String
     elsif other._isString
       raise TypeError, 'String given'
     else
-      super(other) # code args explicitly to avoid implicit block of ZSuperNode
+      other =~ self 
     end
   end
 
@@ -278,8 +315,6 @@ class String
     replace(x)
   end
 
-  primitive 'casecmp', 'equalsNoCase:'
-
   primitive '_atEquals', 'at:equals:'
 
   #     str.chomp(separator=$/)   => new_str
@@ -308,19 +343,20 @@ class String
   def chomp!(sep=$/)
     return if sep.nil? || self.empty?
     sep = Type.coerce_to(sep, String, :to_str)
+    my_size = self.size
 
     if (sep == $/ && sep == "\n") || sep == "\n"
       last_ch = self[-1]
       diminish_by = 0
       if last_ch == ?\n
-        diminish_by += 1 if self[-2] == ?\r && self.size > 1
+        diminish_by += 1 if self[-2] == ?\r && my_size > 1
       elsif last_ch != ?\r
         return
       end
       diminish_by += 1
-      self.size=(self.length - diminish_by)
+      self.size=(my_size - diminish_by)
     elsif sep.size == 0
-      size = self.size
+      size = my_size
       while size > 0 && self[size-1] == ?\n
         if size > 1 && self[size-2] == ?\r
           size -= 2
@@ -328,11 +364,11 @@ class String
           size -= 1
         end
       end
-      return if size == self.size
+      return if size == my_size
       self.size=(size)
     else
       sep_size = sep.size
-      size = self.size
+      size = my_size
       return if sep_size > size
       sep_size = -sep_size
       while sep_size < 0
@@ -372,7 +408,6 @@ class String
   #  <code>String#chomp!</code>.
   def chop!
     mySize = self.length
-    raise TypeError, "can't modify frozen string" if frozen?
     if mySize > 0
       if self[-1].equal?(0xa)
         if mySize > 1 && self[-2].equal?(0xd)
@@ -473,7 +508,7 @@ class String
       end
 
       if i > 0 && self[i-1] == newline &&
-          (ssize < 2 || sep._compare_substring(self, i-ssize, ssize) == 0)
+          (ssize < 2 || self._compare_substring(sep, i-ssize, ssize) == 0)
         line = self[last, i-last]
         # line.taint if tainted?
         yield line
@@ -496,10 +531,11 @@ class String
   alias each_line each
 
   def _compare_substring(other, start, size)
-    if start > self.size || start + self.size < 0
+    my_size = self.size
+    if start > my_size || start + my_size < 0
       raise IndexError, "index #{start} out of string"
     end
-    self <=> other[start,size]
+    self <=> other[start, size]
   end
 
   def each_byte
@@ -711,7 +747,10 @@ class String
   end
 
   def include?(item)
-    !self.index(item).equal?(nil)
+    if item._isFixnum
+      item = item % 256
+    end
+    self.index(item)._not_equal?(nil)
   end
 
   primitive_nobridge '_indexOfByte', 'indexOfByte:startingAt:'
@@ -728,7 +767,9 @@ class String
       return nil if item > 255 || item < 0
       st_idx = self._indexOfByte(item % 256, offset + 1)
     elsif item._isRegexp
-      st_idx = item._index_string(self, offset) + 1
+      idx = item._index_string(self, offset)
+      return nil if idx.equal?(nil)
+      st_idx = idx + 1
     else
       # try to coerce to a number or string and try again,
       #   will raise TypeError if item is a Symbol .
@@ -742,21 +783,30 @@ class String
   primitive '_insertAllAt', 'insertAll:at:'
   def insert(index, string)
     # account for smalltalk index
+    index = Type.coerce_to(index, Integer, :to_int)
+    string = Type.coerce_to(string, String, :to_str)
     idx = index < 0 ? index + size + 2 : index + 1
-    raise IndexError, "index #{index} out of string" if idx <= 0 || idx > size + 1
+    if idx <= 0 || idx > size + 1
+      raise IndexError, "index #{index} out of string" 
+    end
     _insertAllAt(string, idx) # Flip order of parameters
     self
   end
 
-  primitive 'intern', 'asSymbol'
+  primitive '_as_symbol', 'asSymbol'
+
+  def intern
+    if self.size.equal?(0)
+      raise ArgumentError , 'cannot intern zero sized String'
+    end
+    self._as_symbol
+  end
+
   primitive 'length', 'size'
 
   primitive 'lstrip', 'trimLeadingSeparators'
-  primitive '_lstrip!', '_removeLeadingSeparators' # in .mcz
-  def lstrip!
-    raise TypeError, "can't modify frozen string" if frozen?
-    _lstrip!
-  end
+
+  primitive 'lstrip!', '_removeLeadingSeparators' # in .mcz
 
   def match(pattern)
     if pattern._isRegexp
