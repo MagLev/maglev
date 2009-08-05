@@ -381,7 +381,11 @@ class File
       begin
         blk.call(f)
       ensure
-        f.close rescue nil
+        begin
+          f.close 
+        rescue StandardError
+          nil
+        end
       end
     else
       f
