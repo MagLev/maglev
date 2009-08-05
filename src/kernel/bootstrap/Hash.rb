@@ -152,15 +152,7 @@ class Hash
     unless other.length.equal?(self.length)
       return false
     end
-    unless other.default == self.default
-      return false
-    end
-    each { |k,v|
-       unless other[k] == v	# TODO handle recursive refs
-         return false
-       end
-    }
-    true
+    self._is_equal(other)
   end
 
   def eql?(other)
@@ -174,14 +166,39 @@ class Hash
     unless other.length.equal?(self.length)
       return false
     end
+    self._is_equal(other)
+  end
+
+  def _is_equal(other)
     unless other.default == self.default
       return false
     end
-    each { |k,v|
-       unless other[k] == v	# TODO handle recursive refs
-         return false
-       end
-    }
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    begin
+      self.each { | k, v |
+	ov = other[k]
+	if v.equal?(ov)
+	  # ok
+	elsif ts.include?(v) || ts.include?(ov)
+          if v.equal?(self) && ov.equal?(other)
+            # ok
+          elsif v.equal?(other) && ov.equal?(self)
+            # ok
+          else
+            raise ArgumentError, 'recursion too complex for Hash#=='
+          end
+        elsif v == ov
+          # ok
+        else
+          return false 
+        end
+      }
+    ensure
+      if added
+        ts.remove(self)
+      end
+    end
     true
   end
 
