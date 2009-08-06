@@ -446,6 +446,16 @@ class Object
       self.class.name.to_s
     end
 
+    def _k_to_int
+      # sent from C code in primitive 767 for sprintf
+      begin
+        v = self.to_int
+      rescue
+        v = Kernel.Integer(self)
+      end
+      v
+    end
+  
 end
 
 
