@@ -41,12 +41,6 @@ module Kernel
   primitive_nobridge 'autoload', 'rubyKernelAutoload:file:'
   primitive_nobridge 'autoload?', 'rubyKernelAutoloadFileFor:'
 
-  # Kernel#autoload?: STUB: Always returns nil.
-  def autoload?(name)
-    _stub_warn('Kernel#autoload?: always returns nil')
-    nil
-  end
-
   primitive_nobridge 'at_exit&', 'atExit:'
 
   # binding defined in Kernel2.rb

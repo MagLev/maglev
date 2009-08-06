@@ -97,26 +97,25 @@ class Object
     #  __send__ defined per MRI, non-overrideable version of send
     #  redefinition of __send__  disallowed by parser after bootstrap finished.
     primitive_nobridge_env '__send__',  'rubySend', ':'
-    primitive_nobridge_env '__send__',  'rubySend', ':with:'  
+    primitive_nobridge_env '__send__',  'rubySend', ':with:'
     primitive_nobridge_env '__send__',  'rubySend', ':with:with:'
     primitive_nobridge_env '__send__',  'rubySend', ':with:with:with:'
-    primitive_nobridge_env '__send__&', 'rubySend', ':block:' 
+    primitive_nobridge_env '__send__&', 'rubySend', ':block:'
     primitive_nobridge_env '__send__&', 'rubySend', ':with:block:'
     primitive_nobridge_env '__send__&', 'rubySend', ':with:with:block:'
     primitive_nobridge_env '__send__&', 'rubySend', ':with:with:with:block:'
     primitive_nobridge_env '__send__*', 'rubySend', ':withArgs:'
     primitive_env          '__send__*&', 'rubySend', ':withArgs:block:'
 
-
     # redefinition of __perform___ disallowed by parser after bootstrap finished.
-    # __perform___  requires next to last arg to be a Symbol with proper suffix 
-    #   for the number of with: keywords;  
-    #   and last arg is envId 
+    # __perform___  requires next to last arg to be a Symbol with proper suffix
+    #   for the number of with: keywords;
+    #   and last arg is envId
     # it is used by RubyParser
     primitive_nobridge '__perform__se', 'with:with:perform:env:'
     #
     # redefinition of __perform_method disallowed after bootstrap,
-    #  it is used by implementation of eval 
+    #  it is used by implementation of eval
     primitive_nobridge '__perform_meth', 'performMethod:'
 
     primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
@@ -140,7 +139,7 @@ class Object
     primitive 'freeze', 'immediateInvariant'
     primitive 'frozen?', 'isInvariant'
 
-    # _set_nostubbing prevents stubbing ram oops to objectIds in in-memory 
+    # _set_nostubbing prevents stubbing ram oops to objectIds in in-memory
     #  instance variables that reference committed objects .  should only
     # be used in limited cases when initializing transient state .
     primitive '_set_nostubbing', '_setNoStubbing'
@@ -271,14 +270,14 @@ class Object
     end
 
     # block_given?  is implemented by the ruby parser .
-    # implementation in Kernel2.rb handles  sends 
+    # implementation in Kernel2.rb handles  sends
     # Attempts to reimplement  block_given? outside of bootstrap code
     #    will fail with a compile error.
 
     # equal?  is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
     # Attempts to reimplement equal? will fail with a compile error.
- 
+
     primitive_nobridge 'equal?', '_rubyEqualQ:'    # so send will work
 
     # _not_equal? is implemented by the ruby parser and optimized to
@@ -456,6 +455,26 @@ class Object
       v
     end
   
+    ############################################################
+    # MagLev API methods on Object
+    #
+    # These methods are part of MagLev's persistence and debug APIs.
+    #
+    # TODO:
+    #   Should we wrap these in a module and only include them
+    #   if requested?
+    ############################################################
+
+    # returns true if the receiver existed in GemStone at the time the
+    # current transaction began.  Returns false otherwise.
+    primitive_nobridge 'committed?', 'isCommitted'
+
+    # Returns an Array of objects in the current session's temporary object
+    # memory that reference the receiver.  The search continues until all
+    # such objects have been found.  The result may contain both permenent
+    # and temporary objects and may vary from run to run.  Does not abort
+    # the current transaction.
+    primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 end
 
 
