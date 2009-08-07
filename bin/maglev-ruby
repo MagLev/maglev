@@ -186,6 +186,13 @@ trap "rm -f $dbscript $stdinscript" EXIT
 rm -f $dbscript
 cat $MAGLEV_HOME/etc/.topazini > $dbscript
 
+# generate a topaz exit command as last line of init file
+if [[ ! -z $debug ]]; then
+  cat - >> $dbscript <<-EOFB
+display classoops
+EOFB
+fi
+
 cat - >> $dbscript <<-EOF
 set gemstone $stone
 login
