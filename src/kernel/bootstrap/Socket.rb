@@ -150,8 +150,9 @@ class Socket
 end
 
 class IPSocket
-  class_primitive 'peeraddr', 'peeraddr'
   class_primitive 'getaddress', 'getHostAddressByName:'
+  primitive 'peeraddr', 'rubyPeerAddress'
+  primitive 'addr', 'rubyAddress'
 end
 
 class TCPSocket
@@ -162,6 +163,9 @@ class TCPSocket
   class_primitive '_open', 'open:'
 
   def self.new(host, port)
+    if host.equal?(nil)
+      host = 'localhost'
+    end
     self.open(host, port)
   end
 
@@ -179,9 +183,36 @@ class TCPServer
   # accept returns a new socket, having same non-blocking state as receiver
   primitive 'accept', 'accept'
 
-  # new and open  both create a non-blocking listening socket
-  class_primitive 'new', 'new:port:'
-  class_primitive 'open', 'new:port:'
+  # creates a non-blocking listening socket
+  class_primitive '_new', 'new:port:'
+
+  def self.new( port )
+    if port._isString
+      self.new(port , nil)
+    elsif port._isFixnum
+       self._new( 'localhost', port)
+    else
+       raise TypeError , 'expected a Fixnum port number or String hostname'
+    end
+  end
+
+  def self.new( hostname, port)
+    # port may be nil to get a random port
+    if hostname.length.equal?(0)
+      self._new( 'localhost' , port)
+    else
+      self._new( hostname, port )
+    end
+  end
+
+  def self.open( port )
+    self.new(port)
+  end
+
+  def self.open( hostname, port)
+    self.new(hostname, port)
+  end
+
 end
 
 
