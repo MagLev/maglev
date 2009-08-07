@@ -86,12 +86,7 @@ class String
     str
   end
 
-  primitive_nobridge '_concatenate', ','
-
-  def +(o)
-    other = Type.coerce_to(o, String, :to_str)
-    self._concatenate(other)
-  end
+  primitive  '+', 'rubyConcatenate:'
 
   # note smalltalk addAll:  returns arg, not receiver
   #primitive '_append', '_rubyAddAll:'
@@ -756,28 +751,28 @@ class String
   primitive_nobridge '_indexOfByte', 'indexOfByte:startingAt:'
 
   def index(item, offset=0)
-    offset = Type.coerce_to(offset, Integer, :to_int)
-    offset += size if offset < 0
-    return nil if offset < 0 || offset > size
+    zoffset = Type.coerce_to(offset, Integer, :to_int)
+    my_size = self.size
+    zoffset += my_size if zoffset < 0
+    return nil if zoffset < 0 || zoffset > my_size
 
     if item._isString
-      return offset if item.size.equal?(0)
-      st_idx = self._findStringStartingAt(item, offset + 1)
+      return zoffset if item.size.equal?(0)
+      st_idx = self._findStringStartingAt(item, zoffset + 1)
+      return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
-      st_idx = self._indexOfByte(item % 256, offset + 1)
+      st_idx = self._indexOfByte(item % 256, zoffset + 1)
+      return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
-      idx = item._index_string(self, offset)
-      return nil if idx.equal?(nil)
-      st_idx = idx + 1
+      idx = item._index_string(self, zoffset)
+      return idx
     else
       # try to coerce to a number or string and try again,
       #   will raise TypeError if item is a Symbol .
       coerced = Type.coerce_to_string_or_integer(item)
-      return self.index(coerced, offset)
+      return self.index(coerced, zoffset)
     end
-
-    return st_idx.equal?(0) ? nil : st_idx - 1
   end
 
   primitive '_insertAllAt', 'insertAll:at:'
@@ -838,7 +833,6 @@ class String
   primitive_nobridge '_reverse_from', '_reverseFrom:'
 
   def reverse!
-    raise TypeError, "can't modify frozen string" if frozen?
     self._reverse_from(self) # returns self
   end
 
@@ -852,55 +846,50 @@ class String
   def rindex(item, original_offset=Undefined)
     my_size = self.size
     if original_offset.equal?(Undefined)
-      offset = my_size
-      offset = 1 if (offset.equal?(0))
+      was_undef = true
+      zoffset = my_size.equal?(0) ? 0 : my_size - 1
+      zorig = zoffset
     else
-      offset = Type.coerce_to(original_offset, Integer, :to_int)
-      offset += my_size if offset < 0
-      offset = my_size - 1 if offset >= my_size
-      offset = offset + 1  # to one-based
+      zoffset = Type.coerce_to(original_offset, Integer, :to_int)
+      zoffset += my_size if zoffset < 0
+      zorig = zoffset
+      zoffset = my_size - 1 if zoffset >= my_size
     end
-
-    return nil if offset <= 0
+    return nil if zoffset < 0
 
     if item._isString
       if item.size.equal?(0)
-        return my_size if (offset >= my_size)
-        return (offset <= my_size) ? (offset - 1) : my_size
+        if was_undef
+          return my_size
+        elsif zorig >= my_size 
+          return my_size 
+        else
+          return zoffset
+        end
       end
-      st_idx = self._lastSubstring(item, offset)
+      st_idx = self._lastSubstring(item, zoffset + 1)
+      return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
-      st_idx = self._indexOfLastByte(item % 256 , offset)
+      st_idx = self._indexOfLastByte(item % 256 , zoffset + 1)
+      return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
-      st_idx = item._rindex_string(self, offset - 1)
-      return nil if st_idx.equal?(nil)
-      st_idx += 1
+      zidx = item._rindex_string(self, zoffset)
+      return zidx
     else
       coerced = Type.coerce_to(item, String, :to_str)
       return self.rindex(coerced, original_offset)
     end
-
-    return st_idx.equal?(0) ? nil : st_idx - 1
   end
 
   primitive 'rstrip', 'trimTrailingSeparators'
-  primitive '_rstrip!', '_removeTrailingSeparators'  # in .mcz
-  def rstrip!
-    raise TypeError, "can't modify frozen string" if frozen?
-    _rstrip!
-  end
+  primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
 
   # def scan #  implemented in common/string.rb
 
   primitive 'size', 'size'
 
   alias slice []
-
-#   def slice!(*args)
-#     raise ArgumentError, 'wrong number of arguments'
-#   end
-
 
   #     str.slice!(fixnum)           => fixnum or nil
   #     str.slice!(fixnum, fixnum)   => new_str or nil
@@ -929,19 +918,22 @@ class String
       # r.taint if self.tainted? or start.tainted?
       return r
     end
-
+    start = Type.coerce_to(start, Integer, :to_int)
     len = Type.coerce_to(a_len, Integer, :to_int)
     return nil if len < 0
-    return '' if len.equal?(0)
+    return self.class.new if len.equal?(0)
     start += sz if start < 0
     return nil if start < 0 || start > sz
-    return '' if start.equal?(sz)
+    return self.class.new if start.equal?(sz)
     #  _remove_from_to will detect frozen if changes would occur
     s = _at_length(start, len)
     stop = start + len
     stop = sz if stop > sz
     _remove_from_to(start + 1, stop) # convert to smalltalk indexing
-    s || ''
+    if s.equal?(nil)
+      return self.class.new
+    end
+    s 
   end
 
   def slice!(arg)
@@ -964,6 +956,7 @@ class String
     else
       arg = Type.coerce_to(arg, Integer, :to_int)
       s = slice!(arg, 1)
+      return nil if s.equal?(nil)
       s[0]
     end
   end
@@ -978,15 +971,12 @@ class String
     [m_begin, m_len]
   end
 
-  def split(pattern=nil, limit=nil)
+  def split(pattern=nil, limit=Undefined)
     # BEGIN RUBINIUS
     return [] if size.equal?(0)
 
-    if limit
-      if !limit.kind_of?(Integer) and limit.respond_to?(:to_int)
-        limit = limit.to_int
-      end
-
+    if limit._not_equal?(Undefined)
+      limit = Type.coerce_to(limit, Integer, :to_int)
       if limit > 0
         return [self.dup] if limit == 1
         limited = true
@@ -995,6 +985,7 @@ class String
       end
     else
       limited = false
+      limit = nil
     end
 
     pattern ||= ($; || " ")

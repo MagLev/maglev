@@ -305,19 +305,24 @@ class Regexp
     # used by String index
     start = offset.equal?(nil) ? 0 : offset
     md = self._search(string, start, nil)
-    md._storeRubyVcGlobal(0x20)
+    md._storeRubyVcGlobal(0x30)
     return nil if md.equal?(nil)
-    md.begin(0) + offset
+    md.begin(0) 
   end
 
   def _rindex_string(string, offset)
     md = self._search(string, offset, 0)
-    md._storeRubyVcGlobal(0x20)
-    return nil if md.equal?(nil)
-    return md.begin(0) if md[0].equal?(nil)
-    match_len = md.end(0) - md.begin(0)
-    return md.begin(0) + 1 if match_len.equal?(0)
-    md.begin(0)
+    md._storeRubyVcGlobal(0x30)
+    if md.equal?(nil)
+      return  offset.equal?(0) ? 0 : nil 
+    end
+    md_begin_zero = md.begin(0)
+    return md_begin_zero if md[0].equal?(nil)
+    match_len = md.end(0) - md_begin_zero
+    if match_len.equal?(0) 
+      return md_begin_zero + 1 
+    end
+    md_begin_zero
   end
 
   # TODO: limit is not used....

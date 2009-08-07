@@ -12,7 +12,8 @@ class Symbol
   end
 
   primitive_nobridge 'id2name', 'asString'
-  primitive_nobridge '==', '='
+  primitive_nobridge '==', '='  # uses Symbol>>= which is identity compare
+  primitive_nobridge 'eql?', '='  # uses Symbol>>= which is identity compare
   primitive_nobridge 'hash'
 
   # _concatenate inherited from String for now
