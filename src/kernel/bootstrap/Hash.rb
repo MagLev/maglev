@@ -141,43 +141,19 @@ class Hash
   end
 
   def ==(other)
-    if (other._isHash)
-      if (other.equal?(self))
-        return true
-      end
-    else
-      return false unless other.respond_to? :to_hash
-      other = other.to_hash
-    end
-    unless other.length.equal?(self.length)
-      return false
-    end
-    self._is_equal(other)
-  end
-
-  def eql?(other)
-    # per specs,  does not coerce the argument
     if other.equal?(self)
-      return true
+       return true
     end
-    unless other._isHash
-      return false
-    end
-    unless other.length.equal?(self.length)
-      return false
-    end
-    self._is_equal(other)
-  end
-
-  def _is_equal(other)
-    unless other.default == self.default
-      return false
-    end
+    return false unless other._isHash 
+    return false unless other.length.equal?(self.length) 
+    dflt = self.default
+    # MRI 1.8.6 does not check #  dflt == other.default  #(1.8.7 does check)
     ts = Thread._recursion_guard_set
     added = ts._add_if_absent(self)
     begin
       self.each { | k, v |
 	ov = other[k]
+        return false if ov.equal?(dflt) 
 	if v.equal?(ov)
 	  # ok
 	elsif ts.include?(v) || ts.include?(ov)
@@ -189,6 +165,45 @@ class Hash
             raise ArgumentError, 'recursion too complex for Hash#=='
           end
         elsif v == ov
+          # ok
+        else
+          return false 
+        end
+      }
+    ensure
+      if added
+        ts.remove(self)
+      end
+    end
+    true
+  end
+
+  def eql?(other)
+    # per specs,  does not coerce the argument
+    if other.equal?(self)
+      return true
+    end
+    return false unless other._isHash
+    return false unless other.length.equal?(self.length)
+    dflt = self.default
+    return false unless dflt.eql?( other.default )
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    begin
+      self.each { | k, v |
+	ov = other[k]
+        return false if ov.equal?(dflt) 
+	if v.equal?(ov)
+	  # ok
+	elsif ts.include?(v) || ts.include?(ov)
+          if v.equal?(self) && ov.equal?(other)
+            # ok
+          elsif v.equal?(other) && ov.equal?(self)
+            # ok
+          else
+            raise ArgumentError, 'recursion too complex for Hash#=='
+          end
+        elsif v.eql?(ov)
           # ok
         else
           return false 

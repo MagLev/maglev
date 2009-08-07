@@ -418,11 +418,7 @@ class Array
 
   def ==(other)
     return true if equal?(other)
-    unless other._isArray
-      return false unless other.respond_to?(:to_ary)
-      other = other.to_ary
-    end
-
+    return false unless other._isArray
     lim = self.size
     unless lim.equal?(other.size)
       return false
@@ -449,6 +445,48 @@ class Array
           # ok
         else
           return false 
+        end
+        i += 1
+      end
+    ensure
+      if added
+        ts.remove(self)
+      end
+    end
+    true
+  end
+
+  # Return true if both are the same object, or if both are arrays, and
+  # have the same number of elements and all corresponding elements are
+  # eql?.
+  #
+  def eql?(other)
+    return true if self.equal?(other)
+    return false unless other._isArray
+    lim = self.size
+    return false unless lim.equal?(other.size)
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    begin
+      i = 0
+      limi = lim
+      while i < limi
+        v = self._at(i)
+        ov = other[i]
+        if v.equal?(ov)
+          # ok
+        elsif ts.include?(v) || ts.include?(ov)
+          if v.equal?(self) && ov.equal?(other)
+            # ok
+          elsif v.equal?(other) && ov.equal?(self)
+            # ok
+          else
+            raise ArgumentError, 'recursion too complex for Array#=='
+          end
+        elsif v.eql?(ov)
+          # ok
+        else
+          return false
         end
         i += 1
       end
@@ -679,37 +717,6 @@ class Array
   end
 
   primitive 'empty?', 'isEmpty'
-
-  # Return true if both are the same object, or if both are arrays, and
-  # have the same number of elements and all corresponding elements are
-  # eql?.
-  #
-  def eql?(other)
-    return true if self.equal?(other)
-    return false unless other._isArray
-    return false unless size.equal?(other.size)
-
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
-    begin
-      i = 0
-      lim = size
-      while i < lim
-        curr = self._at(i)
-        if ts.include?(curr)
-          return false unless curr.equal?(other[i])
-        else
-          return false unless curr.eql?(other[i])
-        end
-        i += 1
-      end
-    ensure
-      if added
-        ts.remove(self)
-      end
-    end
-    true
-  end
 
   def fetch(index)
     unless index._isFixnum
