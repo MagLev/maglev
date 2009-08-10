@@ -17,7 +17,8 @@ IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
 
 ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
 ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
-ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone.log"
+ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/gs64stone"
+ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone/gs64stone.log"
 ENV['GEMSTONE']            = GEMSTONE
 
 # RUBY186P287 must be set to a ruby 1.8.6 patchlevel 287 executable

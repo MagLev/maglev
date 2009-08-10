@@ -106,9 +106,9 @@ namespace :maglev do
   # TODO: should this target also load an mcz and the primitives?
   task :initialize => :gemstone do
     cd MAGLEV_HOME do
-      mkdir_p %w(data log locks)
-      install("#{GEMSTONE}/bin/extent0.ruby.dbf", "data", :mode => 0660) unless
-        File.exists?("#{MAGLEV_HOME}/data/extent0.ruby.dbf")
+      mkdir_p %w(data/gs64stone/extent data/gs64stone/tranlog log/gs64stone locks)
+      install("#{GEMSTONE}/bin/extent0.ruby.dbf", "data/gs64stone/extent", :mode => 0660) unless
+        File.exists?("#{MAGLEV_HOME}/data/gs64stone/extent/extent0.ruby.dbf")
     end
   end
 
@@ -119,7 +119,7 @@ namespace :maglev do
     puts "==>  remove_extents"
     cd MAGLEV_HOME do
       # RxINC: is -r necessary?
-      rm_rf FileList.new("data/*dbf", "log/*", "locks/*")
+      rm_rf FileList.new("data/gs64stone/extent/*dbf", "log/gs64stone/*", "locks/*")
     end
   end
 

@@ -52,7 +52,9 @@ if [ -z "$STONENAME" ]; then
 	STONENAME=gs64stone
 fi
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-export GEMSTONE_LOG=$MAGLEV_HOME/log/$STONENAME.log
+export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME
+export GEMSTONE_LOGDIR=$MAGLEV_HOME/log/$STONENAME
+export GEMSTONE_LOG=$GEMSTONE_LOGDIR/$STONENAME.log
 export GEMSTONE=$MAGLEV_HOME/gemstone
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 # Only use $MAGLEV_HOME/etc/.topazini if normal .topazini doesn't exist
@@ -254,15 +256,30 @@ topaz-debug() {
 }
 
 initialize() {
+  # create GEMSTONE_LOGDIR if it doesn't exist
+  if [ ! -d $GEMSTONE_LOGDIR ]; then
+    mkdir -p $GEMSTONE_LOGDIR
+    chmod 750 $GEMSTONE_LOGDIR
+  fi
+  # create GEMSTONE_DATADIR if it doesn't exist
+  if [ ! -d $GEMSTONE_DATADIR ]; then
+    mkdir -p $GEMSTONE_DATADIR/extent
+    mkdir -p $GEMSTONE_DATADIR/tranlog
+    chmod 750 $GEMSTONE_DATADIR $GEMSTONE_DATADIR/extent $GEMSTONE_DATADIR/tranlog
+  fi
   # grab a virgin repository if no repository exists
-  if [ ! -e $MAGLEV_HOME/data/extent0.ruby.dbf ]; then
-    cp -p $GEMSTONE/bin/extent0.ruby.dbf $MAGLEV_HOME/data/
-    chmod 660 $MAGLEV_HOME/data/extent0.ruby.dbf
+  if [ ! -e $GEMSTONE_DATADIR/extent0.ruby.dbf ]; then
+    cp -p $GEMSTONE/bin/extent0.ruby.dbf $GEMSTONE_DATADIR/extent/
+    chmod 660 $GEMSTONE_DATADIR/extent/extent0.ruby.dbf
   fi
 }
 
 destroy() {
-  rm -rf $MAGLEV_HOME/data/*dbf $MAGLEV_HOME/log/* $MAGLEV_HOME/locks/*
+  rm -f $MAGLEV_HOME/data/$STONENAME/extent/*.dbf
+  rm -f $MAGLEV_HOME/data/$STONENAME/tranlog/*.dbf
+  rm -f $MAGLEV_HOME/log/$STONENAME/*
+  # The locks should go away by themselves
+  # rm -f $MAGLEV_HOME/locks/$STONENAME..lck $MAGLEV_HOME/locks/$STONENAME\@*
 }
 
 squeak() {
