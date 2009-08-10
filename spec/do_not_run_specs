@@ -20,10 +20,26 @@ spec/rubyspec/core/kernel/case_compare_spec.rb
 spec/rubyspec/core/kernel/eval_spec.rb
 # spec/rubyspec/core/proc/arity_spec.rb
 
+spec/rubyspec/language/throw_spec.rb
+
+spec/rubyspec/core/thread/alive_spec.rb
+spec/rubyspec/core/thread/exit_spec.rb
+spec/rubyspec/core/thread/kill_spec.rb
+spec/rubyspec/core/thread/raise_spec.rb
+spec/rubyspec/core/thread/run_spec.rb
+spec/rubyspec/core/thread/status_spec.rb
+spec/rubyspec/core/thread/stop_spec.rb
+spec/rubyspec/core/thread/terminate_spec.rb
+spec/rubyspec/core/thread/wakeup_spec.rb
+spec/rubyspec/core/thread/alive_spec.rb
+spec/rubyspec/core/thread/inspect_spec.rb
+spec/rubyspec/core/thread/kill_spec.rb
+spec/rubyspec/core/thread/raise_spec.rb
+
 # ##################################################
 # ####  MagLev does not implement
 # ##################################################
-                       
+
 spec/rubyspec/core/continuation
 spec/rubyspec/core/objectspace
 
