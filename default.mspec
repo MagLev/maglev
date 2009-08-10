@@ -7,7 +7,7 @@ DIR = File.dirname(__FILE__)
 $ci_files = [
   'spec/rubyspec/language',
   'spec/rubyspec/core',
-  'spec/localspec/language',
+#  'spec/localspec/language',
 ]
 
 # The list of known bad specs are kept in a separate file so that both the

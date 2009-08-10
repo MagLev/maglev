@@ -1,1 +1,2 @@
 fails:String#succ taints the result if self is tainted
+fails:String#succ! raises a TypeError if self is frozen

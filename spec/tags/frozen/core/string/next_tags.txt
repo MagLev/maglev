@@ -1,1 +1,2 @@
 fails:String#next taints the result if self is tainted
+fails:String#next! raises a TypeError if self is frozen

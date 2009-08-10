@@ -6,14 +6,15 @@
 # ####  These ones blow up
 # ##################################################
 
-# spec/rubyspec/language/block_spec.rb
+spec/rubyspec/language/block_spec.rb
 # spec/rubyspec/language/constants_spec.rb
-# spec/rubyspec/language/def_spec.rb
-# spec/rubyspec/language/for_spec.rb
-# spec/rubyspec/language/method_spec.rb
+spec/rubyspec/language/def_spec.rb
+spec/rubyspec/language/for_spec.rb
+spec/rubyspec/language/method_spec.rb
+spec/rubyspec/language/super_spec.rb
 # spec/rubyspec/language/next_spec.rb
 # spec/rubyspec/language/numbers_spec.rb
-# spec/rubyspec/language/precedence_spec.rb
+spec/rubyspec/language/precedence_spec.rb
 # spec/rubyspec/language/retry_spec.rb
 # spec/rubyspec/core/filetest/
 spec/rubyspec/core/kernel/case_compare_spec.rb
@@ -21,6 +22,14 @@ spec/rubyspec/core/kernel/eval_spec.rb
 # spec/rubyspec/core/proc/arity_spec.rb
 
 spec/rubyspec/language/throw_spec.rb
+spec/rubyspec/core/kernel/throw_spec.rb
+spec/rubyspec/core/kernel/gsub_spec.rb
+
+spec/rubyspec/language/versions/symbol_1.8.rb
+spec/rubyspec/core/process/waitall_spec.rb
+spec/rubyspec/core/process/wait2_spec.rb
+spec/rubyspec/core/process/wait_spec.rb
+spec/rubyspec/core/process/waitall_spec.rb
 
 spec/rubyspec/core/thread/alive_spec.rb
 spec/rubyspec/core/thread/exit_spec.rb
@@ -35,6 +44,11 @@ spec/rubyspec/core/thread/alive_spec.rb
 spec/rubyspec/core/thread/inspect_spec.rb
 spec/rubyspec/core/thread/kill_spec.rb
 spec/rubyspec/core/thread/raise_spec.rb
+
+spec/rubyspec/core/thread/raise_spec.rb
+
+spec/rubyspec/core/math/tanh_spec.rb
+spec/rubyspec/core/math/atanh_spec.rb
 
 # ##################################################
 # ####  MagLev does not implement
@@ -71,7 +85,9 @@ spec/rubyspec/language/magic_comment_spec.rb
 # These files run partially, but have a syntax or other error part way
 # through
 
-# spec/rubyspec/language/case_spec.rb
+spec/rubyspec/language/case_spec.rb
+spec/rubyspec/language/variables_spec.rb
+spec/rubyspec/core/argf/seek_spec.rb
 
 # ##################################################
 # ####  Skeletons
