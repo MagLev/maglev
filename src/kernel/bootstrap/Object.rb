@@ -168,17 +168,50 @@ class Object
 
     def _splat_lasgn_value
       # runtime support for   x = *y   , invoked from generated code
-      if self._isArray
-        sz = self.length
-        if (sz < 2)
-          if sz.equal?(0)
-            return nil
-          else
-            return self[0]
-          end
+      a = self
+      unless a._isArray
+        if a.equal?(nil)
+          return a
+        end 
+        a = a._splat_lasgn_value_coerce
+      end 
+      if a._isArray
+        sz = a.length
+        if sz < 2
+	  if sz.equal?(0)
+	    return nil
+	  else
+	    return a[0]
+	  end
         end
       end
-      self
+      a
+    end
+
+    def _splat_lasgn_value_coerce  
+      v = self
+      begin
+        v = self.to_ary
+      rescue
+        # ignore if not responding to to_ary
+      end
+      if v._not_equal?(self)
+        unless v._isArray
+          raise TypeError, 'arg to splat responded to to_ary but did not return an Array'
+        end
+      end
+      v
+    end 
+
+    def _splat_arg_value
+      a = self
+      unless a._isArray
+        a = a._splat_lasgn_value_coerce
+        unless a._isArray
+          a = [ self ]
+        end
+      end
+      a
     end
 
     def _splat_return_value_coerce
@@ -186,13 +219,13 @@ class Object
       #  so  _splat_return_value does not have complex ExecBlocks
       v = self
       begin
-  v = Type.coerce_to(self, Array, :to_ary)
+        v = Type.coerce_to(self, Array, :to_ary)
       rescue TypeError
-  begin
-    v = Type.coerce_to(self, Array, :to_a)
-  rescue TypeError
-    # ignore
-  end
+        begin
+          v = Type.coerce_to(self, Array, :to_a)
+        rescue TypeError
+          # ignore
+        end
       end
       v
     end
@@ -205,13 +238,13 @@ class Object
       end
       sz = v.length
       if sz < 2
-  if sz.equal?(0)
-    return nil
-  else
-    return v[0]
-  end
+      if sz.equal?(0)
+        return nil
       else
-  return v
+        return v[0]
+      end
+          else
+      return v
       end
     end
 
@@ -447,10 +480,15 @@ class Object
 
     def _k_to_int
       # sent from C code in primitive 767 for sprintf
+      v = nil
       begin
         v = self.to_int
       rescue
-        v = Kernel.Integer(self)
+        begin
+          v = Kernel.Integer(self)
+        rescue
+          # ignore
+        end
       end
       v
     end

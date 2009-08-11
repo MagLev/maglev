@@ -775,7 +775,8 @@ class String
     end
   end
 
-  primitive '_insertAllAt', 'insertAll:at:'
+  primitive_nobridge '_insertall_at', 'insertAll:at:'
+
   def insert(index, string)
     # account for smalltalk index
     index = Type.coerce_to(index, Integer, :to_int)
@@ -784,11 +785,11 @@ class String
     if idx <= 0 || idx > size + 1
       raise IndexError, "index #{index} out of string" 
     end
-    _insertAllAt(string, idx) # Flip order of parameters
+    _insertall_at(string, idx) # Flip order of parameters
     self
   end
 
-  primitive '_as_symbol', 'asSymbol'
+  primitive '_as_symbol', 'asSymbol'  # allows zero size Symbols
 
   def intern
     if self.size.equal?(0)
@@ -796,6 +797,7 @@ class String
     end
     self._as_symbol
   end
+  #  to_sym is aliased to intern, see below
 
   primitive 'length', 'size'
 
@@ -1076,10 +1078,20 @@ class String
   primitive 'squeeze!*', 'rubySqueezeSelf:'
   primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
 
-  primitive 'strip', 'withBlanksTrimmed' 
+  primitive '_strip', '_trimReturningSelf:' 
+
+  def strip
+    self._strip(false)
+  end
 
   def strip!
-    replace(strip)  # replace detects frozen
+    res = self._strip(true)
+    if res._not_equal?(self)
+      self.replace(res)  # replace detects frozen
+      self
+    else
+      nil
+    end 
   end
 
   # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
@@ -1238,12 +1250,37 @@ class String
   def to_i(base=10)
     base = Type.coerce_to(base, Integer, :to_int)
     if base.equal?(10)
-      str = '10r'
-      str << self._delete_underscore_strip
-      str._to_i
+      str = self
+      if self[0].equal?( ?0 ) && self[1].equal?( ?d )
+        if self[2].equal?( ?- )
+          return 0 # sign must come before base specifier
+        end
+        str = self[2, self.size - 2]
+      end
+      radix_str = '10r'
+      radix_str << str._delete_underscore_strip
+      radix_str._to_i
     else
       raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
-      self.to_inum(base, false)
+      exp_prefix = nil
+      if base.equal?(2)
+        exp_prefix = '0b'
+      elsif base.equal?(8)
+        exp_prefix = '0o'
+      elsif base.equal?(16)
+        exp_prefix = '0x'
+      end
+      str = self
+      if exp_prefix._not_equal?(nil)
+        prefix = self[0,2]
+        if prefix == exp_prefix
+          if self[2].equal?( ?- )
+            return 0 # sign must come before base specifier
+          end
+          str = self[2, self.size - 2]
+        end   
+      end
+      str.to_inum(base, false)
     end
   end
 
@@ -1252,7 +1289,7 @@ class String
   # Consider self as an integer and return value given base.
   # This is the rubinius API, but we don't care about the check param
   def to_inum(base, check=false)
-    if base == 0
+    if base.equal?(0)
       base, s = self.extract_base
     else
       s = self._delete_underscore_strip
@@ -1299,7 +1336,7 @@ class String
     end
   end
 
-  primitive_nobridge 'to_sym', 'asSymbol'
+  alias to_sym intern
 
   primitive '_tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
   #     str.tr!(from_str, to_str)   => str or nil

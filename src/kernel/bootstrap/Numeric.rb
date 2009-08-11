@@ -139,7 +139,7 @@ class Numeric
         raise ArgumentError, "increment is zero"
       end
       if block_given?
-        if (inc > 0)
+        if inc > 0
           until n > nend
             blk.call(n)
             n += inc
@@ -151,12 +151,12 @@ class Numeric
           end
         end
       else
-        if (inc > 0)
-          if n < nend
+        if inc > 0
+          unless n > nend 
             raise LocalJumpError, 'no block given'
           end
         else
-          if n > nend
+          unless n < nend
             raise LocalJumpError, 'no block given'
           end
         end

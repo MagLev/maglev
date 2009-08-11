@@ -77,6 +77,9 @@ class Range
         else
           while (x <=> llast) <= 0
             yield x
+            if (x <=> llast) == 0
+              break   # per ruby specs; llast.succ might return llast 
+            end
             x = x.succ
           end
         end

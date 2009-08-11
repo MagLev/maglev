@@ -9,7 +9,6 @@ class Array
   primitive_nobridge '_at_put', '_rubyAt:length:put:'
 
   primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
-  primitive_nobridge 'insert_all', 'insertAll:at:'
 
   primitive 'size=', 'size:'
 
@@ -59,8 +58,29 @@ class Array
   end
 
   def _as_hash
-    # called fro generated code
+    # called from generated code
     Hash[self]
+  end
+
+  primitive_nobridge '_insertall_at', 'insertAll:at:'
+
+  def _add_arguments(arg)
+    # called from generated code
+    if arg._isArray
+      if arg.size._not_equal?(0)
+        self._insertall_at(arg, self.size + 1)
+      end
+    else
+      a = arg._splat_lasgn_value_coerce 
+      if a._isArray 
+        if a.size._not_equal?(0)
+          self._insertall_at(a, self.size + 1)
+        end
+      else
+        self << a  
+      end
+    end
+    self
   end
 
   def _flatten_onto(output)
@@ -389,22 +409,23 @@ class Array
     added = ts._add_if_absent(self)
     begin
       other_size = other.size
-      lim = size > other_size ? other_size : size # lim is the min
+      my_size = size
+      lim = my_size > other_size ? other_size : my_size # lim is the min
       i = 0
       while i < lim
         curr = self._at(i)
         if ts.include?(curr)
-          unless cur.equal?(other[i])
+          unless curr.equal?(other[i])
             return 1 if size > other_size
             return -1 if size < other_size
           end
         else
-          result = self._at(i) <=> other[i]
-          return result if !(result.equal?(0))
+          result =  curr <=> other[i]
+          return result if result._not_equal?(0)
         end
         i += 1
       end
-      return size <=> other_size
+      return my_size <=> other_size
     ensure
       if added
         ts.remove(self)
@@ -601,7 +622,7 @@ class Array
 
   # Return copy of self with all nil elements removed
   def compact
-    result = []
+    result = self.class.new
     i = 0
     lim = size
     while i < lim
@@ -636,39 +657,73 @@ class Array
     self
   end
 
-  primitive_nobridge 'concat', '_rubyAddAll:'
   primitive_nobridge 'concat*', '_rubyAddAll:'
 
-  def delete(obj)
-    n = 0
-    lim = self.size
-    while (n < lim)
-      if obj == self._at(n)
-        self.delete_at(n)
-        return obj
-      end
-      n = n + 1
+  def concat(arg)
+    arg = Type.coerce_to(arg, Array, :to_ary)
+    if arg.size._not_equal?(0)
+      self._insertall_at(arg, self.size + 1) 
     end
-    return nil
+    self
+  end
+
+  def delete(obj)
+    n = self.size - 1
+    res = nil
+    while n >= 0
+      if self._at(n) == obj 
+        oidx = n + 1
+        self._remove_from_to_(oidx, oidx) 
+        res = obj
+      end
+      n = n - 1
+    end
+    return res
   end
 
   def delete(obj, &blk)
-    n = 0
+    n = self.size - 1
+    found = false
     lim = self.size
-    while (n < lim)
-      if obj == self._at(n)
-        self.delete_at(n)
-        return obj
+    while n >= 0
+      if self._at(n) == obj
+        oidx = n + 1
+        self._remove_from_to_(oidx, oidx) 
+        found = true
       end
-      n = n + 1
+      n = n - 1
     end
-    return blk.call
+    if found.equal?(false) 
+      if block_given?
+        blk.call
+      else
+        nil
+      end
+    else
+      obj
+    end
   end
 
 
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
-  primitive 'delete_at' , '_rubyDeleteAt:'
+  def delete_at(idx)
+    idx = Type.coerce_to(idx, Fixnum, :to_int)
+    sz = self.size
+    if idx < 0
+      idx = sz + idx
+      if idx < 0
+        return nil
+      end
+    end
+    if idx >= sz 
+      return nil
+    end
+    elem = self[idx]
+    oidx = idx + 1
+    self._remove_from_to_(oidx, oidx) 
+    return elem
+  end
 
   # Delete every element of self for which +block+ evalutes to +true+.
   def delete_if(&block)
@@ -714,6 +769,7 @@ class Array
 
   def each_index(&b)
     0.upto(size-1, &b)
+    self
   end
 
   primitive 'empty?', 'isEmpty'
@@ -1239,7 +1295,7 @@ class Array
 
   # Prepend elements to self.  If no elements, return unmodified self.
   def unshift(*elements)
-    insert_all(elements, 1)
+    _insertall_at(elements, 1)
     self
   end
 

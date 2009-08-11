@@ -35,8 +35,17 @@ class IdentitySet
     class_primitive 'new' , 'new'
 
     def self.with_all(*array)
-      o = new
-      o._addall(*array)
+      o = self.new
+      o._addall(array)
+      o
+    end
+
+    def self.with_all(arr)
+      unless arr._isArray
+        raise TypeError, 'expected an Array argument'
+      end
+      o = self.new
+      o._addall(arr)
       o
     end
 
