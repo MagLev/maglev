@@ -3,11 +3,3 @@ fails:Process.kill doesn't accept lowercase signal names
 fails:Process.kill doesn't tolerate leading or trailing spaces in signal names
 fails:Process.kill tests for the existence of a process without sending a signal
 fails:Process.kill raises an EPERM if permission is denied
-breaks:Process.kill sends the given signal to the specified process
-breaks:Process.kill accepts integer signal numbers
-breaks:Process.kill accepts POSIX signal names without 'SIG' prefix
-breaks:Process.kill accepts POSIX signal names with 'SIG' prefix
-breaks:Process.kill kills process groups if signal is negative
-breaks:Process.kill kills process groups if signal starts with a minus sign
-breaks:Process.kill kills process groups if signal starts with a minus sign and 'SIG'
-breaks:Process.kill sends the given signal to the current process if pid is zero

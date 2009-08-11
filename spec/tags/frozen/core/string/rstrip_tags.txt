@@ -1,3 +1,1 @@
 fails:String#rstrip taints the result when self is tainted
-fails:String#rstrip! returns nil if no modifications were made
-fails:String#rstrip! raises a TypeError if self is frozen

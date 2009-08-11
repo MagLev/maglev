@@ -1,2 +1,1 @@
-fails:Dir#each yields each directory entry in succession
 fails:Dir#each returns the directory which remains open
