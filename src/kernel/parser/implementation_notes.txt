@@ -19,7 +19,8 @@ The code in kernel/parser is a tight integration of all of the following:
   be constant, and delete code paths in the parser engine never used
   by ruby parser.  
 
-  Modified racc parser engine  ( kernel/parser/racc_parser.rb  ).
+  Modified racc parser engine  ( kernel/parser/racc_parser.rb  ),
+  which was derived from racc-1.4.6 .
   Includes rework to avoid expensive  parallel assignments
   and access parser state tables from instVars , and is tied to
   the post processing in racc.sh .
@@ -113,7 +114,7 @@ Fix Maglev Trac 565
   In the original code, the loop  "options.split(//).each do"
   probably needs to use   "o |= v" instead of "o += v"
   to handle the case of redundant/duplicate specification letters 
-  in the options string.
+  in the options string, per ruby specs
 
 Lexing of Octal numbers
   The original code in lexer.rb,  
@@ -126,6 +127,18 @@ Lexing of Octal numbers
        rb_compile_error "Illegal octal digit."
      when src.scan(/[+-]?0(o|O)?[0-7_]+|0o/) then
        int_with_base(8)
-  to allow either upper or lower case 'o' after the leading zero
+  to allow either upper or lower case 'o' after the leading zero, per ruby specs.
+
+Lexing of double quoted strings (Maglev Trac 580)
+  This  regex search in rubyparser 2.0.3's lexer.rb :
+     elsif src.scan(/\"(#{ESC_RE}|#(#{ESC_RE}|[^\{\#\@\$\"\\])|[^\"\\\#])*\"/o) then
+  does not parse this code correctly:
+    cx = "\C-\\"
+    # d = "junk"
+  The string cx winds up including part of the next line,    '# d = ' .
+  Current fix is to use a much simpler regex
+    s_matched = src.scan(/\"( |\t|\w)*\"/o)
+  to parse simple double quoted string containing space, tab, alpha or digit chars
+  and otherwise use the tSTRING_BEG   path for complex string lexing
 
 

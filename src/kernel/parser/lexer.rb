@@ -771,10 +771,10 @@ class RubyLexer
     return cres
   end # ]
 
-  def gsub_string_ESC_RE(s_matched )
-    # in separate method to avoid ref to $1 in yylex method
-    s_matched[1..-2].gsub(ESC_RE) { unescape( $1 ) }
-  end
+  #def gsub_string_ESC_RE(s_matched )
+  #  # in separate method to avoid ref to $1 in yylex method
+  #  s_matched[1..-2].gsub(ESC_RE) { unescape( $1 ) }
+  #end
 
   def unescape( s)
     r = UNESCAPE_TABLE[s]
@@ -1075,15 +1075,16 @@ class RubyLexer
             end
           end
         elsif s_ch.equal?( ?" ) # src.scan(/\"/)     # ] [
-          if (s_matched = src.scan(/\"(#{ESC_RE}|#(#{ESC_RE}|[^\{\#\@\$\"\\])|[^\"\\\#])*\"/o)) then  
-            @yacc_value = self.gsub_string_ESC_RE( s_matched ) 
+          if (s_matched = src.scan(/\"( |\t|\w)*\"/o)) 
+            # A simple double quoted string containing space, tab, alpha or digit chars
+            @yacc_value = s_matched[1, s_matched.length - 2 ]  #exclude the quotes
             @lex_state = Expr_end
             new_pos = src.pos
-            @line_num = @line_num + src.count_eols(tok_start_offset, new_pos-1)  # count LFs
             return :t_STRING
           else
+            # lex a double quoted string the hard way
             src.advance(1)
-            @lex_strterm = STRTERM_DQUOTE  # TODO202: question this
+            @lex_strterm = STRTERM_DQUOTE  
             @yacc_value = "\""
             return :tSTRING_BEG
           end
@@ -1363,9 +1364,9 @@ class RubyLexer
           if s_ch.equal?(nil)
             rb_compile_error "incomplete character syntax" # EOF
           end
-          if src.ch_is_vt_white(s_ch)     # src.check(/\s|\v/) then
+          if src.ch_is_vt_white__or_eol(s_ch)    # src.check(/\s|\v/) then
             unless (clex_state & Expr_IS_argument)._not_equal?(0)
-              ekey = src.peek( 1 )
+              ekey = s_ch
               c2 = CHAR_LIT_VT_WHITE_ERRS[ekey] 
               if c2 then
                 warning("invalid character syntax; use ?\\" + c2)
@@ -1529,26 +1530,26 @@ class RubyLexer
             return process_token(s_matched, command_state, tok_start_offset)
           elsif (s_matched = src.scan(/\$_/)) then
             @lex_state = Expr_end
-            @yacc_value = RpNameToken.new(s_matched.to_sym, tok_start_offset)
+            @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
             return :tGVAR
           elsif (s_matched = src.scan(/\$[~*$?!@\/\\;,.=:<>\"]|\$-\w?/)) then
             @lex_state = Expr_end
-            @yacc_value = RpNameToken.new(s_matched.to_sym, tok_start_offset)
+            @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
             return :tGVAR
           elsif (s_matched = src.scan(/\$([\&\`\'\+])/)) then
             @lex_state = Expr_end
             # Explicit reference to these vars as symbols...
             if last_state.equal?( Expr_fname) then
-              @yacc_value = RpNameToken.new(s_matched.to_sym, tok_start_offset)
+              @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
               return :tGVAR
             else
-              @yacc_value = src[1].to_sym
+              @yacc_value = src[1]._as_symbol
               return :tBACK_REF
             end
           elsif (s_matched = src.scan(/\$([1-9]\d*)/)) then
             @lex_state = Expr_end
             if last_state.equal?( Expr_fname) then
-              @yacc_value = RpNameToken.new(s_matched.to_sym, tok_start_offset)
+              @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
               return :tGVAR
             else
               @yacc_value = src[1].to_i
@@ -1601,16 +1602,16 @@ class RubyLexer
     # case tk
     if tt_first_ch.equal?( ?$ ) # when /^\$/ then
       @lex_state = Expr_end
-      @yacc_value = RpNameToken.new( ttoken.to_sym, tok_start_offset)
+      @yacc_value = RpNameToken.new( ttoken._as_symbol, tok_start_offset)
       result = :tGVAR
     elsif tt_first_ch.equal?( ?@ )   #  
       if ttoken[1].equal?( ?@ )  # when /^@@/ then
         @lex_state = Expr_end
-        @yacc_value = RpNameToken.new( ttoken.to_sym , tok_start_offset)
+        @yacc_value = RpNameToken.new( ttoken._as_symbol , tok_start_offset)
         result = :tCVAR
       else                   # when /^@/ then
         @lex_state = Expr_end
-        @yacc_value = RpNameToken.new( ttoken.to_sym , tok_start_offset)
+        @yacc_value = RpNameToken.new( ttoken._as_symbol , tok_start_offset)
         result = :tIVAR
       end
     else
@@ -1694,7 +1695,7 @@ class RubyLexer
       @yacc_value = RpNameToken.new( ttoken , tok_start_offset )
     end
 
-    if (last_state._not_equal?( Expr_dot)) && @parser.env[ ttoken.to_sym].equal?( :lvar)
+    if (last_state._not_equal?( Expr_dot)) && @parser.env[ ttoken._as_symbol].equal?( :lvar)
        @lex_state = Expr_end 
     end
     return result

@@ -32,7 +32,7 @@ module MagRp
       o.initialize(str, ofs, line)
     end
     def initialize(str, ofs, line)
-      @val = str.to_sym
+      @val = str._as_symbol
       @line_num = line
       @src_offset = ofs
       self
@@ -99,7 +99,8 @@ module MagRp
       @src_regions
     end
 
-    ESC_RE = /\\([0-7]{1,3}|x[0-9a-fA-F]{1,2}|M-.|(C-|c)\?|(C-|c).|[^0-7xMCc])/
+    # ESC_RE = /\\([0-7]{1,3}|x[0-9a-fA-F]{1,2}|M-.|(C-|c)\?|(C-|c).|[^0-7xMCc])/
+    # ESC_RE is no longer used (after fix for Trac 580)
 
     CHAR_LIT_VT_WHITE_ERRS = {
                     " " => 's',

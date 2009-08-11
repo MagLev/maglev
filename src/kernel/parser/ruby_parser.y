@@ -2065,7 +2065,7 @@ xstring_contents: none
                 | tSYMBOL
                     {
 		      # symbol: # | tSYMBOL
-                      result = val[vofs ].to_sym
+                      result = val[vofs ]._as_symbol
                     }
 
              sym: fname | tIVAR | tGVAR | tCVAR
@@ -2084,7 +2084,7 @@ xstring_contents: none
                         if str.size.equal?(0)
                           yyerror "empty symbol literal"
                         end
-			result = RubySymbolNode.s( str.to_sym )
+			result = RubySymbolNode.s( str._as_symbol )
                       elsif v_one.equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil

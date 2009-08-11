@@ -978,7 +978,7 @@ module MagRp # {
       body = RubyBlockNode.s( [ body ] )  # s(:block, body) 
     end
     if name_tok._isString
-      name_sym = name_tok.to_sym  # from a reserved word
+      name_sym = name_tok._as_symbol  # from a reserved word
     else
       name_sym = name_tok.symval # expect a RpNameToken
     end

@@ -5628,7 +5628,7 @@ end
 
 def _reduce_407(val, vofs)
 		      # symbol: # | tSYMBOL
-                      result = val[vofs ].to_sym
+                      result = val[vofs ]._as_symbol
                     
     result
 end
@@ -5654,7 +5654,7 @@ def _reduce_412(val, vofs)
                         if str.size.equal?(0)
                           yyerror "empty symbol literal"
                         end
-			result = RubySymbolNode.s( str.to_sym )
+			result = RubySymbolNode.s( str._as_symbol )
                       elsif v_one.equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil

@@ -221,7 +221,7 @@ module MagRp
             res = self._new
             sel = name_tok.symval.to_s 
             sel << "=" 
-            sel = sel.to_sym
+            sel = sel._as_symbol
             res.init(rcvr, sel, args)
             res.src_offset=( name_tok.src_offset)
             res
@@ -430,7 +430,7 @@ module MagRp
          primitive_nobridge 'initSelectors', 'initAsgnSel:opSel:'
          def self.s(rcvr, asgnSelTok, opSelTok, val)
            res = self._new
-           asgn_sel = (asgnSelTok.symval.to_s << '=' ).to_sym
+           asgn_sel = (asgnSelTok.symval.to_s << '=' )._as_symbol
            res.initSelectors(asgn_sel, opSelTok.symval)
            res.receiverNode=(rcvr)
            res.valueNode=(val)
@@ -438,7 +438,7 @@ module MagRp
            res
          end
          def inspect
-           "[:op_asgn2 , #{@receiverNode.inspect}, :#{@variableAsgnCallName}, :#{operatorCallName}, #{@valueNode.inspect} ]"
+           "[:op_asgn2 , #{@receiverNode.inspect}, :#{@variableAsgnCallName}, :#{@operatorCallName}, #{@valueNode.inspect} ]"
          end
        end
 
@@ -1505,7 +1505,7 @@ module MagRp
          def asDSymbolNode
            res = RubyDSymbolNode._new
            lst = @list.dup 
-           lst[0] = RubySymbolNode.s( lst[0].strNodeValue.to_sym ) 
+           lst[0] = RubySymbolNode.s( lst[0].strNodeValue._as_symbol ) 
            res.list=( lst )
            res
          end
@@ -1697,7 +1697,7 @@ module MagRp
       o.initialize(str, ofs)
     end
     def initialize(str, ofs)
-      @val = str.to_sym
+      @val = str._as_symbol
       @src_offset = ofs
       self
     end

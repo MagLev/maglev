@@ -47,7 +47,7 @@ class RpStringScanner
   end
 
   # character types to meet needs of lexer
-  CTYPE_WHITE = 0   
+  CTYPE_WHITE = 0      # WHITE types do not include the \n end-of-line character
   CTYPE_VT_WHITE = 1
   CTYPE_OTHER = 3
   CTYPE_EOF = 4
