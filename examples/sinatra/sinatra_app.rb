@@ -8,5 +8,5 @@ configure(:development) do
 end
 
 get '/' do
-  'Hello world'
+  "Sinatra #{Sinatra::VERSION} says Hello"
 end
