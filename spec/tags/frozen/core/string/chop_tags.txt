@@ -1,2 +1,1 @@
 fails:String#chop taints result when self is tainted
-fails:String#chop! raises a TypeError when self is frozen

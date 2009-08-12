@@ -12,8 +12,6 @@ fails:String#gsub with pattern and replacement sets $~ to MatchData of last matc
 fails:String#gsub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside
 fails:String#gsub with pattern and block raises a RuntimeError if the string is modified while substituting
 fails:String#gsub! with pattern and replacement taints self if replacement is tainted
-fails:String#gsub! with pattern and replacement returns nil if no modifications were made
 fails:String#gsub! with pattern and replacement raises a TypeError when self is frozen
 fails:String#gsub! with pattern and block taints self if block's result is tainted
-fails:String#gsub! with pattern and block returns nil if no modifications were made
 fails:String#gsub! with pattern and block raises a RuntimeError when self is frozen

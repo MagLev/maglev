@@ -1,2 +1,1 @@
-fails:String#+ doesn't return subclass instances
 fails:String#+ taints the result when self or other is tainted

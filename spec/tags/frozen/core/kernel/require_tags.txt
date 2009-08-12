@@ -1,28 +1,3 @@
 fails:Kernel#require is a private method
-fails:Kernel#require resolves paths relative to the current working directory
 fails:Kernel#require does not expand/resolve qualified files against $LOAD_PATH
-fails:Kernel#require loads a .rb from an absolute path
-fails:Kernel#require collapses consecutive path separators
-fails:Kernel#require loads an unqualified .rb by looking in $LOAD_PATH and returning true
-fails:Kernel#require allows unqualified files to contain path information (just not in the beginning)
-fails:Kernel#require loads a file with ./filename even if . is not in path
-fails:Kernel#require stores a non-extensioned file with its located suffix
-fails:Kernel#require appends a file with no extension with .rb/.<ext> in that order to locate file
-fails:Kernel#require prefers to use .rb over .<ext> if given non-extensioned file and both exist
-fails:Kernel#require will load file.rb when given 'file' if it exists even if file.<ext> is loaded
-fails:Kernel#require will not load file.<ext> when given 'file' if file.rb already loaded
-fails:Kernel#require appends any non-ruby extensioned file with .rb/.<ext> in that order to locate file
-fails:Kernel#require loads extension files
-fails:Kernel#require will load explicit file.<ext> even if file.rb already loaded and vice versa
-fails:Kernel#require stores the loaded file in $LOADED_FEATURES
-fails:Kernel#require will not add a bad load to LOADED_FEATURES
-fails:Kernel#require uses $LOADED_FEATURES to see whether file is already loaded
-fails:Kernel#require will not load a file whose path appears in $LOADED_FEATURES; it will return false
-fails:Kernel#require requires arbitrarily complex files (files with large numbers of AST nodes)
-fails:Kernel#require raises a LoadError if the file can't be found
-fails:Kernel#require raises a LoadError if the file exists but can't be read
-fails:Kernel#require only accepts strings
-fails:Kernel#require does not infinite loop on an rb file that requires itself
-fails:Kernel#require produces __FILE__ as the given filename and __LINE__ as the source line number
-fails:Shell expansion in Kernel#require expands a preceding ~/ to the user's home directory for building the path to search
-fails:Shell expansion in Kernel#require adds the path to $LOADED_FEATURES
+breaks:Kernel#require will not add a bad load to LOADED_FEATURES

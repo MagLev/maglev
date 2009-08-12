@@ -534,4 +534,78 @@ for more information. This API has proven to be robust and scalable enough for
 real world applications to run thousands of VMs, thousands of transactions
 per second and manage terabytes of data.
 
+=== Persistence API Summary
 
+Most of the persistence API is defined under the <tt>Maglev</tt> module.
+But there are a few persistence related methods that are on other classes
+as well.  This section gathers together the whole lot.  See the detailed
+comments in the API documentation.
+
+
+  module Maglev
+    # MaglevException                  # defined in GlobalErrors.rb
+    # NotPersistableException          # defined in GlobalErrors.rb
+    # OutsideOfTransactionException    # defined in GlobalErrors.rb
+    # CommitFailedException            # defined in GlobalErrors.rb
+
+    # The root for persistent objects
+    PERSISTENT_ROOT = Hash.new
+
+    # Execute block with the thread in transient mode
+    def transient(&block)
+    end
+
+    # Execute block with the thread in persistent mode
+    def persistent(persistable_instances=true, &block)
+    end
+
+    # Returns true if the current thread is in persistent mode.
+    def persistent?
+      RubyContext.persistence_mode
+    end
+
+    # Returns true if the current thread is in transient mode.
+    def transient?
+      not RubyContext.persistence_mode
+    end
+
+    module_function :transient, :persistent, :transient?, :persistent?
+
+
+    class CommitFailedException
+    end
+
+    # Commit the current state of the VM to the repository
+    def commit_transaction
+    end
+
+    # Refresh all persistent state from the current state of the
+    # repository.  Transient state is left untouched.
+    def abort_transaction
+    end
+
+    module_function :commit_transaction, :abort_transaction
+  end
+
+
+  class Object
+    # returns true if the receiver existed in GemStone at the time the
+    # current transaction began.  Returns false otherwise.
+    primitive_nobridge 'committed?', 'isCommitted'
+
+    # Returns an Array of objects in the current session's temporary object
+    # memory that reference the receiver.  The search continues until all
+    # such objects have been found.  The result may contain both permenent
+    # and temporary objects and may vary from run to run.  Does not abort
+    # the current transaction.
+    primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
+  end
+
+  class Module
+    # Controls whether receiver is persistable.
+    def maglev_persistable=(flag=true)
+    end
+
+    # Returns true if receiver is marked as persistable; false otherwise.
+    primitive_nobridge 'maglev_persistable?', '_persistable'
+  end

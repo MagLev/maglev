@@ -267,14 +267,14 @@ Maglev.persistent do
       end
       Maglev.commit_transaction
       test(C.new.m_meth, 'M', '011 test: m_meth')
-      test(C.new.methods.grep(/m_meth$/), ['m_meth'], '011 test: C methods')
-      test(M.methods.grep(/m_meth$/), [], '011 test: M methods')
+      test(C.new.methods.grep(/^m_meth$/), ['m_meth'], '011 test: C methods')
+      test(M.methods.grep(/^m_meth$/), [], '011 test: M methods')
     end
 
     def check_011
       test(C.new.m_meth, 'M', '011 check: m_meth')
-      test(C.new.methods.grep(/m_meth$/), ['m_meth'], '011 check: C methods')
-      test(M.methods.grep(/m_meth$/), [], '011 check: M methods')
+      test(C.new.methods.grep(/^m_meth$/), ['m_meth'], '011 check: C methods')
+      test(M.methods.grep(/^m_meth$/), [], '011 check: M methods')
     end
 
     ########################################

@@ -1,4 +1,3 @@
-fails:File.open with a block swallows StandardErrors produced by close
 fails:File.open opens file when call with a block (basic case)
 fails:File.open opens a file with mode string and block
 fails:File.open opens a file with mode num and block
