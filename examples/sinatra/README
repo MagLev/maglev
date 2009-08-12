@@ -4,7 +4,7 @@ The files in this directory are some examples of using Sinatra with MagLev.
 
 === <tt>sinatratest.rb</tt>: Run Sinatra w/o RubyGems
 
-A simple app that runs off of the 1.0.0 version of Sinatra under
+A simple app that runs from the 0.9.3 version of Sinatra under
 <tt>$MAGLEV_HOME/src/external/sinatra</tt>.  To run:
 
     $ maglev-ruby sinatratest.rb
