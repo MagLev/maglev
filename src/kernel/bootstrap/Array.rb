@@ -1144,9 +1144,12 @@ class Array
   end
 
 
-  # replace written in Smalltalk
-  # so it can use the copyFrom:to:into:startingAt  primitive
-  primitive 'replace', 'rubyReplace:'
+  primitive '_replace', 'rubyReplace:'
+
+  def replace(arg)
+    arg = Type.coerce_to(arg, Array, :to_ary)
+    self._replace(arg) 
+  end
 
   primitive 'reverse', 'reverse'
 
@@ -1227,18 +1230,26 @@ class Array
     end
   end
 
-  def slice!(x, y = nil)
-    if y
-      return [] if size.equal?(0)
-      result = self._at(x, y)
-      self._at_put(x, y , [] )
-    else
-      result = self._at(x)
-      unless result.equal?(nil)
-        self._at_put(x,  nil )
-      end
+  def slice!(start, length)
+    if self.size.equal?(0)
+      return self.class.new
+    end
+    result = self._at(start, length)
+    if result._not_equal?(nil)
+      self._at_put(start, length , [] )
     end
     result
+  end
+  primitive 'slice!' , '_rubySliceEx:length:'  #  def slice!(start, length);end
+
+  primitive '_slice_ex_range', '_rubySliceExRange:'
+
+  def slice!(arg)
+    if arg._isRange
+      self._slice_ex_range(arg)
+    else
+      self.delete_at(arg)
+    end
   end
 
   # Note: sort is listed in the Pick Axe book under both Array and Enumerable
@@ -1270,12 +1281,14 @@ class Array
   end
 
   def to_a
-    self
+    if self.class.equal?(Array)
+      self
+    else
+      Array.new( self.to_ary )
+    end
   end
 
   def to_ary
-    # TODO, if self.class is a subclass of Array , return
-    #  an Array with elements of self ???
     self
   end
 
@@ -1287,35 +1300,28 @@ class Array
   # the same length).  If self is not an array of Arrays, then we should
   # raise a TypeError trying to convert an element to an array.
   def transpose
-    return [] if size.equal?(0)
-
-    ary_size = self._at(0).size # we aren't empty
-    i = 0
-    lim = size
-    # Check all contained arrays same length before we copy any data
-    # TODO: Need to coerce to array...
-    while i < lim
-      if self._at(i).size != ary_size
-        # TODO: can't raise a particular exception yet:
-        #    raise IndexError "All contained arrays must be same length."
-        raise "All contained arrays must be of same length."
-      end
-      i += 1
-    end
-
+    my_size = self.size
     result = []
-    i = 0
-    while i < lim
-      sub_ary = self._at(i)
+    n = 0
+    el_size = 0
+    while n < my_size
+      elem = Type.coerce_to( self._at(n), Array, :to_ary)
+      if n.equal?(0)
+        el_size = elem.size 
+      elsif elem.size._not_equal?(el_size)
+	raise IndexError, 'All contained arrays must be same length'
+      end
       j = 0
-      while j < ary_size
-        # ||= doesn't yet work for array references...
-        #   result[i] ||= []
-        result[j] =  []  if result[j].equal?(nil)
-        result[j][i] = sub_ary[j]
+      while j < el_size
+        res_elem =  result[j] 
+        if res_elem.equal?(nil)
+          res_elem = []
+          result[j] = res_elem
+        end
+        res_elem[n] = elem[j]
         j += 1
       end
-      i += 1
+      n += 1
     end
     result
   end
