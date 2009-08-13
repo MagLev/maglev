@@ -12,3 +12,4 @@ including:
   MagLev systems on a single computer.
 - Ryan Davis for his implementation of ruby_parser2.0.2, which was the
   starting point for the parser implemented in the MagRp module.
+- Conrad Taylot for updating installation scripts to work in Snow Leopard
