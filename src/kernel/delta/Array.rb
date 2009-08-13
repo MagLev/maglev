@@ -302,12 +302,10 @@ class Array
     return "" if my_size.equal?(0)
     if s.equal?(Undefined)
       sep = $,
+    elsif s.equal?(nil)
+       sep = nil
     else
-      begin
-        sep = s.nil? ? nil : s.to_str
-      rescue NoMethodError
-        raise TypeError, "Cannot convert #{s.inspect} to str"
-      end
+      sep = s.to_str # let any NoMethodError be seen by caller
     end
 
     out = ""

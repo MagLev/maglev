@@ -48,10 +48,12 @@ class Array
   # the array to compare to the key
   def _assoc(key, idx)
     i = 0
-    lim = size
+    lim = self.size
     while i < lim
       el = self._at(i)
-      return el if el[idx] == key
+      if el._isArray && el[idx] == key
+        return el
+      end
       i += 1
     end
     nil
@@ -339,12 +341,14 @@ class Array
   # Repetition: if +obj+ is a string, then <tt>arr.join(str)</tt>, otherwise
   # return a new array by concatenating +obj+ copies of self.
   def *(obj)
-    if obj.respond_to? :to_str
+    if obj.respond_to?( :to_str )
       return join(obj)
     end
-
     val = Type.coerce_to(obj, Fixnum, :to_int)
-    result = self.class.new # preserve subclass
+    if val < 0
+      raise ArgumentError, "arg must be >= 0"
+    end
+    result = self.class.new 
     i = 0
     while i < val
       result.concat(self)
@@ -353,10 +357,17 @@ class Array
     result
   end
 
-  # Concatenation
-  primitive '+', ','
+  def +(arg)
+    arg = Type.coerce_to(arg, Array, :to_ary)
+    res = self.dup
+    if arg.size._not_equal?(0)
+      res._insertall_at(arg, res.size + 1) 
+    end
+    res
+  end
 
   def -(arg)
+    arg = Type.coerce_to(arg, Array, :to_ary)
     argSize = arg.size
     mySize = size
     default = []
@@ -719,7 +730,7 @@ class Array
     if idx >= sz 
       return nil
     end
-    elem = self[idx]
+    elem = self._at(idx)
     oidx = idx + 1
     self._remove_from_to_(oidx, oidx) 
     return elem
@@ -774,47 +785,66 @@ class Array
 
   primitive 'empty?', 'isEmpty'
 
-  def fetch(index)
-    unless index._isFixnum
-      index = index.to_int
-    end
+  def fetch(index, &blk)
+    # this variant gets bridge methods
+    idx = Type.coerce_to(index, Fixnum, :to_int)
     my_siz = self.length
-    if (index < 0)
-      index = my_siz + index
+    bad = false
+    if idx < 0
+      idx = my_siz + idx
+      if idx < 0
+        bad = true
+      end
     end
-    if (index >= my_siz)
-      raise IndexError
+    if idx >= my_siz
+      bad = true
     end
-    self._at(index)
+    if bad.equal?(true)
+      if block_given?
+        return blk.call(index)
+      else
+        raise IndexError , 'offset out of bounds' 
+      end
+    end
+    self._at(idx)
+  end
+
+  def fetch(index)
+    idx = Type.coerce_to(index, Fixnum, :to_int)
+    my_siz = self.length
+    if idx < 0
+      idx = my_siz + idx
+      if idx < 0
+        raise IndexError , 'Array#fetch, implied offset is negative'
+      end
+    end
+    if idx >= my_siz
+      raise IndexError , 'Array#fetch, offset beyond end'
+    end
+    self._at(idx)
   end
 
   def fetch(index, default)
-    unless index._isFixnum
-      index = index.to_int
-    end
+    idx = Type.coerce_to(index, Fixnum, :to_int)
     my_siz = self.length
-    if (index < 0)
-      index = my_siz + index
+    if idx < 0
+      idx = my_siz + idx
+      if idx < 0
+        return default
+      end
     end
-    if (index >= my_siz)
+    if idx >= my_siz
       return default
     end
-    self._at(index)
+    self._at(idx)
   end
 
-  def fetch(idx, &blk)
-    index = idx
-    unless index._isFixnum
-      index = index.to_int
+  def fetch(index, default, &blk)
+    if block_given?
+      self.fetch(index, &blk)
+    else
+      self.fetch(index, default)
     end
-    my_siz = self.length
-    if (index < 0)
-      index = my_siz + index
-    end
-    if (index >= my_siz)
-      return blk.call(idx)
-    end
-    self._at(index)
   end
 
   #  note multiple variants below
@@ -968,10 +998,11 @@ class Array
   end
 
   def first(count)
-    if count < 0
+    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    if cnt < 0
       raise ArgumentError, 'negative count'
     end
-    self._at(0 , count)
+    self._at(0, cnt)
   end
 
   def flatten
@@ -993,7 +1024,17 @@ class Array
 
   # Note: The Pick Axe book has this method documented under both Array and
   # Enumerable.
-  primitive 'include?', 'includes:'
+  def include?(obj)
+    n = 0
+    lim = self.size
+    while n < lim
+      if self._at(n) == obj
+        return true
+      end
+      n += 1
+    end
+    false
+  end
 
   def index(el)
     i = 0
@@ -1028,14 +1069,28 @@ class Array
     self
   end
 
-  primitive '_last', 'last'
-  def last(count = Undefined)
-    # Smalltalk SequenceableCollection>>last raises exception calling last
-    # on empty collection
-    if self.size.equal?(0)
-      return count.equal?(Undefined) ? nil : []
+  def last(count)
+    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    my_size = self.size
+    if cnt <= 0
+      if cnt < 0
+        raise ArgumentError, 'count must be >= 0'
+      end
+      return self.class.new
     end
-    _last
+    ofs = my_size - cnt
+    if ofs < 0
+      ofs = 0
+    end
+    self._at(ofs, cnt)
+  end
+  
+  def last
+    my_size = self.size
+    if my_size.equal?(0)
+      return nil
+    end
+    return self._at(my_size - 1)
   end
 
   primitive 'length', 'size'
@@ -1311,7 +1366,7 @@ class Array
         if beg
           j = 0
           while j < len
-            res << self[j+beg]
+            res << self._at(j+beg)
             j += 1
           end
         end
