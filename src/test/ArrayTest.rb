@@ -1177,4 +1177,20 @@ test(MyArray1.new([:a, :b, :c]),     [:a, :b, :c], 'MyArray1.new([:a, :b, :c])')
 test(MyArray1.new(2, "hello"), ["hello", "hello"], 'MyArray1.new(2, "hello")')
 test(MyArray1.new(2) { |i| i + 2 },         [2,3], 'MyArray1.new(2) { |i| i + 2 }')
 
+# Sorting this array used to raise a MNU. This test passes if no exception
+# is raised.  Inspired by minitest.
+a = [
+     "test_should_allow_expectations_to_be_added_after_creation",
+     "test_should_allow_return_value_specification",
+     "test_should_blow_up_if_not_called",
+     "test_should_blow_up_on_wrong_arguments",
+     "test_should_blow_up_on_wrong_number_of_arguments",
+     "test_should_create_stub_method",
+     "test_should_not_blow_up_if_everything_called",
+     "test_should_not_verify_if_new_expected_method_is_not_called",
+     "test_should_not_verify_if_unexpected_method_is_called",
+    ]
+max = a.size
+a = a.sort_by { rand(max) }
+
 report
