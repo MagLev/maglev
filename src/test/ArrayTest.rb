@@ -1178,7 +1178,12 @@ test(MyArray1.new(2, "hello"), ["hello", "hello"], 'MyArray1.new(2, "hello")')
 test(MyArray1.new(2) { |i| i + 2 },         [2,3], 'MyArray1.new(2) { |i| i + 2 }')
 
 # Sorting this array used to raise a MNU. This test passes if no exception
-# is raised.  Inspired by minitest.
+# is raised.  Inspired by minitest.  This test ensures Array picks up the
+# Enumerable#sort_by implementation, which invokes the { rand(max) } block
+# once per element, and then sorts on the now fixed random keys.  Just
+# passing the { rand(max) } block as the comparator for each pairwise
+# comparison makes the sorting function non symmetric which messes up the
+# underlying sort.
 a = [
      "test_should_allow_expectations_to_be_added_after_creation",
      "test_should_allow_return_value_specification",
@@ -1192,5 +1197,10 @@ a = [
     ]
 max = a.size
 a = a.sort_by { rand(max) }
+
+# Example from pick axe Enumerable#sort_by
+words = %w{ puma cat bass ant aardvark gnu fish }
+sorted = words.sort_by { |w| [w.length, w] }
+test(sorted, %w{ ant cat gnu bass fish puma aardvark }, 'multilevel sort')
 
 report
