@@ -1,5 +1,4 @@
 hangs:Thread#stop? describes a running thread
-fails:Thread#stop? describes a dying running thread
 hangs:Thread#stop? describes a dying sleeping thread
 fails:Thread#stop? reports aborting on a killed thread
 hangs:Thread.stop causes the current thread to sleep indefinitely
