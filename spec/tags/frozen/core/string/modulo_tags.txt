@@ -6,7 +6,6 @@ fails:String#% calls to_int on width star and precision star tokens
 fails:String#% tries to convert the argument to Array by calling #to_ary
 fails:String#% always taints the result when the format string is tainted
 fails:String#% supports binary formats using %b for negative numbers
-breaks:String#% supports character formats using %c
 fails:String#% supports octal formats using %o for negative numbers
 fails:String#% taints result for %p when argument.inspect is tainted
 fails:String#% taints result for %s when argument is tainted

@@ -1,1 +1,0 @@
-fails:String#to_i doesn't handle foreign base specifiers when base is > 0

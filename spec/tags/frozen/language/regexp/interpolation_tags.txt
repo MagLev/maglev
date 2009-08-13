@@ -1,0 +1,2 @@
+fails:Regexps with interpolation throws NoMethodError on missing to_s
+fails:Regexps with interpolation throws RegexpError for malformed interpolation

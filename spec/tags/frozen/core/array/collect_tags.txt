@@ -1,3 +1,0 @@
-breaks:Array#collect returns the evaluated value of block if it broke in the block
-breaks:Array#collect returns a copy of self if no block given
-breaks:Array#collect! returns the evaluated value of block but its contents is partially modified, if it broke in the block

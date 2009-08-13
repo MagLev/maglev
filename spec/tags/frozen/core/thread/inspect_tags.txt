@@ -1,10 +1,6 @@
-fails:Thread#inspect can check it's own status
 hangs:Thread#inspect describes a running thread
-breaks:Thread#inspect describes a sleeping thread
-breaks:Thread#inspect describes a blocked thread
-breaks:Thread#inspect describes a completed thread
-breaks:Thread#inspect describes a killed thread
-breaks:Thread#inspect describes a thread with an uncaught exception
-breaks:Thread#inspect describes a dying running thread
-breaks:Thread#inspect describes a dying sleeping thread
-breaks:Thread#inspect reports aborting on a killed thread
+fails:Thread#inspect describes a completed thread
+fails:Thread#inspect describes a killed thread
+fails:Thread#inspect describes a thread with an uncaught exception
+fails:Thread#inspect describes a dying running thread
+fails:Thread#inspect reports aborting on a killed thread

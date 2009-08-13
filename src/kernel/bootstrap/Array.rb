@@ -73,13 +73,13 @@ class Array
         self._insertall_at(arg, self.size + 1)
       end
     else
-      a = arg._splat_lasgn_value_coerce 
-      if a._isArray 
+      a = arg._splat_lasgn_value_coerce
+      if a._isArray
         if a.size._not_equal?(0)
           self._insertall_at(a, self.size + 1)
         end
       else
-        self << a  
+        self << a
       end
     end
     self
@@ -348,7 +348,7 @@ class Array
     if val < 0
       raise ArgumentError, "arg must be >= 0"
     end
-    result = self.class.new 
+    result = self.class.new
     i = 0
     while i < val
       result.concat(self)
@@ -361,7 +361,7 @@ class Array
     arg = Type.coerce_to(arg, Array, :to_ary)
     res = self.dup
     if arg.size._not_equal?(0)
-      res._insertall_at(arg, res.size + 1) 
+      res._insertall_at(arg, res.size + 1)
     end
     res
   end
@@ -464,10 +464,10 @@ class Array
         v = self._at(i)
         ov = other[i]
         if v.equal?(ov)
-	  # ok
+    # ok
         elsif ts.include?(v) || ts.include?(ov)
           if v.equal?(self) && ov.equal?(other)
-            # ok 
+            # ok
           elsif v.equal?(other) && ov.equal?(self)
             # ok
           else
@@ -476,7 +476,7 @@ class Array
         elsif v == ov
           # ok
         else
-          return false 
+          return false
         end
         i += 1
       end
@@ -673,7 +673,7 @@ class Array
   def concat(arg)
     arg = Type.coerce_to(arg, Array, :to_ary)
     if arg.size._not_equal?(0)
-      self._insertall_at(arg, self.size + 1) 
+      self._insertall_at(arg, self.size + 1)
     end
     self
   end
@@ -682,9 +682,9 @@ class Array
     n = self.size - 1
     res = nil
     while n >= 0
-      if self._at(n) == obj 
+      if self._at(n) == obj
         oidx = n + 1
-        self._remove_from_to_(oidx, oidx) 
+        self._remove_from_to_(oidx, oidx)
         res = obj
       end
       n = n - 1
@@ -699,12 +699,12 @@ class Array
     while n >= 0
       if self._at(n) == obj
         oidx = n + 1
-        self._remove_from_to_(oidx, oidx) 
+        self._remove_from_to_(oidx, oidx)
         found = true
       end
       n = n - 1
     end
-    if found.equal?(false) 
+    if found.equal?(false)
       if block_given?
         blk.call
       else
@@ -727,12 +727,12 @@ class Array
         return nil
       end
     end
-    if idx >= sz 
+    if idx >= sz
       return nil
     end
     elem = self._at(idx)
     oidx = idx + 1
-    self._remove_from_to_(oidx, oidx) 
+    self._remove_from_to_(oidx, oidx)
     return elem
   end
 
@@ -803,7 +803,7 @@ class Array
       if block_given?
         return blk.call(index)
       else
-        raise IndexError , 'offset out of bounds' 
+        raise IndexError , 'offset out of bounds'
       end
     end
     self._at(idx)
@@ -1084,7 +1084,7 @@ class Array
     end
     self._at(ofs, cnt)
   end
-  
+
   def last
     my_size = self.size
     if my_size.equal?(0)
@@ -1275,10 +1275,11 @@ class Array
     d
   end
 
-  primitive 'sort_by2&', 'sortBy:'
-  def sort_by(&block)
-    sort_by2{|a,b| block.call(a) <= block.call(b)}
-  end
+  # sort_by: Do NOT implement an optimized version.  Pick up the
+  # Enumerable#sort_by impl
+  #
+  # sort_by is required toimplement the Schwartzian Transform.  See pick
+  # axe Enumerable#sort_by for a full discussion.
 
   def to_a
     if self.class.equal?(Array)

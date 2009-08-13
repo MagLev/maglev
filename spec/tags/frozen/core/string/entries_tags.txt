@@ -1,1 +1,0 @@
-fails:String#entries returns an empty array for empty strings

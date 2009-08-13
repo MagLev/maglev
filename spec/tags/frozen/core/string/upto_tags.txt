@@ -1,1 +1,0 @@
-fails:String#upto raises a TypeError on symbols

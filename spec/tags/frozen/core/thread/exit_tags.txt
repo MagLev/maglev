@@ -1,9 +1,5 @@
-breaks:Thread#exit can be rescued by outer rescue clause when inner ensure clause raises exception
-breaks:Thread#exit is deferred if ensure clause does Thread.stop
-breaks:Thread#exit sets $! in outer ensure clause if inner ensure clause raises exception
 fails:Thread#exit killing dying sleeping thread wakes up thread
-fails:Thread#exit kills sleeping thread
-fails:Thread#exit runs ensure clause
 fails:Thread#exit runs nested ensure clauses
 hangs:Thread#exit killing dying running does nothing
 hangs:Thread#exit does not deadlock when called from within the thread while being joined from without
+fails:Thread#exit sets $! in outer ensure clause if inner ensure clause raises exception
