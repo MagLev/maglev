@@ -21,7 +21,7 @@ module Enumerable
   def each_cons(arg, &block)
     n = Type.coerce_to( arg, Integer, :to_int)
     unless n > 0
-      raise TypeError, 'enum_cons, arg must be > 0'
+      raise TypeError, 'each_cons, arg must be > 0'
     end
     array = []
     elements = self.to_a
@@ -38,7 +38,7 @@ module Enumerable
     end
   end
 
-  def enum_cons(arg)
+  def enum_cons(n)
     Enumerable::Enumerator.new(self, :each_cons, n)
   end
 
