@@ -1,6 +1,6 @@
 class Env
     # A ruby reference to ENV that resolves to ::ENV results in access
-    #  to a  RubyTransientConstantAssociation , which redirects access to 
+    # to a  transient Ruby constant , whose value is
     # the one transient instance of Env , stored in  SessionTemps current .
 
     class_primitive_nobridge '_getenv', '_getenv:'
@@ -38,6 +38,17 @@ class Env
     end
 
     def []=(key, val)
+      if key._isString 
+        if key.index('GEMSTONE').equal?(0)
+          raise 'you may not change GEMSTONE* environment variables from within maglev'
+        end
+        if key.index('MAGLEV').equal?(0)
+          raise 'you may not change MAGLEV* environment variables from within maglev'
+        end
+      end
+      if val.equal?(nil)
+        val = ""
+      end
       Env._putenv(key, val)
       super(key, val)
     end
@@ -67,5 +78,8 @@ class Env
       raise NotImplementedError
     end
 
+    def to_s
+      "ENV"
+    end
 end
 

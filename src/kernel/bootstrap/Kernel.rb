@@ -50,12 +50,15 @@ module Kernel
   def method_missing(method_id, *args)
     prot = _last_dnu_protection()
     if (prot.equal?(0))
-      raise NoMethodError, "Undefined method `#{method_id}' for #{self}  "
+      text = 'Undefined method '
     elsif (prot.equal?(1))
-      raise NoMethodError, "protected method `#{method_id}' called for  #{self}"
+      text = 'protected method '
     else
-      raise NoMethodError, "private method `#{method_id}' called for  #{self}"
+      text = 'private method '
     end
+    exc = NoMethodError.exception(text)
+    exc._init( method_id , args, 1)  # FOR NOW, ASSUME envId 1
+    exc._signal
   end
 
   def caller(skip=0, limit=1000)

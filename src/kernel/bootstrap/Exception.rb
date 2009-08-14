@@ -25,6 +25,14 @@ class Exception
       self.new(message)
     end
 
+    def self.name
+      if self.equal?(Exception)
+        'Exception'  # override the smalltalk name UserException
+      else
+        super
+      end
+    end
+
     def self._validate(obj)
       # used in implementation of $! on LHS of assignment
       if (obj.kind_of?(Exception))
@@ -57,11 +65,23 @@ class Exception
     end
 
     primitive_nobridge '_message', 'messageText:'
+
     def exception(message = Undefined)
-      return self if message.equal?(Undefined)
+      if message.equal?(self) || message.equal?(Undefined)
+        return self
+      end
       e = dup
       e._message(message)
       e
+    end
+
+    def inspect
+      str = '#<'
+      str << self.class.name
+      str << ': '
+      str << message
+      str << '>'
+      str
     end
 
     def set_backtrace(array)
@@ -82,11 +102,26 @@ end
 #  order here matches order in  Exception(C)>>commentRubyMapping
 
 class SystemExit
-   # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'  
+  # Smalltalk reimplements initialize
+  primitive_nobridge '_st_initialize', 'initialize'  
+
+  def status
+    @status
+  end
+
+  def initialize(*args)
+    status = if args.first._isFixnum
+               args.shift
+             else
+               0
+             end
+    super(*args)
+    @status = status
+  end
 end
 
-class SystemStackExit
+class SystemStackError
+  # stack overflow error
 end
 class NoMemoryError
    # Smalltalk reimplements initialize
@@ -127,6 +162,33 @@ end
 class SecurityError
 end
 class SystemCallError
+  def self.new(*args)
+    if args.length < 1
+      raise ArgumentError, 'too few args' 
+    end
+    argone = args[0]
+    if argone._isString
+      exc = super(argone)
+      if args.length >= 2
+        exc.errno=(args[1] ) # the errno
+      end
+    else
+      exc = super('Unknown error')
+      exc.errno=(argone)  
+    end
+    exc
+  end
+  def errno=(errnum)
+    @gsarguments = [ errnum ]
+  end
+  def errno
+    gsa = @gsarguments
+    if gsa.equal?(nil)
+      nil
+    else
+      gsa[0]
+    end
+  end
 end
 class ThreadError
 end
@@ -134,13 +196,79 @@ class TypeError
 end
 class ZeroDivisionError
 end
+
 class NameError
    # Smalltalk reimplements initialize
    primitive_nobridge '_st_initialize', 'initialize'  
+ 
+   def self.new(msg=nil, name=nil)
+     exc = super(msg)
+     if name._not_equal?(nil)
+       exc.name=(name)
+     end
+     exc
+   end 
+   def name=(v)
+     @gsarguments = [ v ]
+   end
+   def name
+     gsa = @gsarguments
+     if gsa.equal?(nil)
+       nil
+     else
+       gsa[0]
+     end
+   end
+  
+   def inspect
+     str = super
+     n = self.name
+     if n._not_equal?(nil)
+       str << ', '
+       str << n.to_s
+     end
+     str
+   end
 end
+
 class NoMethodError  # a subclass of NameError
    # Smalltalk reimplements initialize
    primitive_nobridge '_st_initialize', 'initialize'  
+
+   def _init(selector, args_arr, envid)
+     gsa = @gsarguments
+     if selector._isSymbol
+       gsa[1] = selector
+     end
+     if args_arr._isArray
+       gsa[2] = args_arr
+     end
+     if envid._isFixnum
+       gsa[3] = envid
+     end
+     self
+   end
+
+   def selector
+     @gsarguments[1]
+   end
+   def envid
+     @gsarguments[3]
+   end
+   def args
+     a = @gsarguments[2]
+     if a.equal?(nil)
+       a = []
+     end
+     a
+   end
+
+   def inspect
+     str = super
+     str << "`" ; str << self.selector ; str << "' called"
+     str
+   end
+  
 end
 class SignalException
 end

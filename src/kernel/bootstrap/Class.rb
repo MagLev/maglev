@@ -15,13 +15,18 @@ class Class
     # do nothing
   end
 
-  def self.new(superCls=Object, &blk)
-    if (block_given?)
-      c = _rubyNew(superCls, blk)
-    else
-      c = _rubyNew(superCls, nil)
+  def self.new(super_cls=Object, &blk)
+    if super_cls._not_equal?(Object)
+      unless super_cls.is_a?(Class)
+        raise TypeError, 'superclass arg must be a Class'
+      end
     end
-    superCls._ruby_inherited(c)  # See also RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:
+    if (block_given?)
+      c = _rubyNew(super_cls, blk)
+    else
+      c = _rubyNew(super_cls, nil)
+    end
+    super_cls._ruby_inherited(c)  # See also RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:
     c
   end
 

@@ -122,9 +122,11 @@ class File
   end
 
   def self.chmod(permission, *file_names)
+    perm = Type.coerce_to(permission, Fixnum, :to_int)
     count = 0
     file_names.each { |a_name|
-      status = File._modify_file( 1, a_name, permission, nil)
+      nam = Type.coerce_to(a_name, String, :to_str)
+      status = File._modify_file( 1, nam, perm, nil)
       if (status.equal?(0))
         count = count + 1
       end
@@ -150,9 +152,12 @@ class File
   def self.delete(*file_names)
     count = 0
     file_names.each { |a_name|
-      status = File._modify_file( 0, a_name, nil, nil )
+      nam = Type.coerce_to(a_name, String, :to_str)
+      status = File._modify_file( 0, nam, nil, nil )
       if (status.equal?(0))
         count = count + 1
+      else
+        Errno.raise_errno(status, nam)
       end
     }
     return count
@@ -166,16 +171,9 @@ class File
     stat_obj.directory?
   end
 
-  def self.dirname(str)
-    if str =~ /(.+)\//
-      $1
-    else
-      if str[0] == ?/
-        "/"
-      else
-        "."
-      end
-    end
+  def self.dirname(string)
+    nam = Type.coerce_to(string, String, :to_str) 
+    File._modify_file( 14, nam, nil, nil)  # section 3 dirname()
   end
 
   def self.executable?(filename)
@@ -202,8 +200,8 @@ class File
     true
   end
 
-  class << self
-    alias exists? exist?
+  def self.exists?(path)
+    self.exist?(path)
   end
 
   # Convert path to an absolute pathname. If no directory is given,
@@ -212,39 +210,48 @@ class File
   # done on the path.  Replaces '.' and '..' in the path with the
   # appropriate path components.  Does not coalesce contiguous '/'s.
   def self.expand_path(a_path, a_dir = nil)
-    path = Type.coerce_to(a_path, String, :to_str) # nil a_path should raise TypeError
+    path = Type.coerce_to(a_path, String, :to_str) 
 
     dir = a_dir.equal?(nil) ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
     dir = Dir.pwd if dir.empty?
-
+    dir = _tilde_expand(dir)
+    dir = _cannonicalize(dir)
     return dir if path.empty?
 
     path = _tilde_expand(path)
-
     if path[0] !=  SEPARATOR[0] # relative path
       path = File.join(dir, path)
     end
-
     _cannonicalize(path)
   end
 
   # Remove .. and . from path
   def self._cannonicalize(path)
-    return path unless path['.']
-    new_parts = []
-    path.split(SEPARATOR).each do |component|
-      case component
-      when '..'
-        new_parts.pop
-      when '.'
-        # nothing: just skip it
-      when ''
-        # The split
-      else
-        new_parts << component
+    if path['.']
+      new_parts = []
+      path.split(SEPARATOR).each do |component|
+        case component
+        when '..'
+          new_parts.pop
+        when '.'
+          # nothing: just skip it
+        when ''
+          # The split
+        else
+          new_parts << component
+        end
       end
+      res = "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
+    else
+      res = path.dup
     end
-    "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
+    # remove trailing separator, if any
+    sep_siz = SEPARATOR.size
+    res_siz = res.size
+    if res_siz > sep_siz &&  res[res_siz - sep_siz, sep_siz] == SEPARATOR
+      res.size=(res_siz - sep_siz)
+    end
+    res
   end
 
   def self._tilde_expand(path)
@@ -261,7 +268,7 @@ class File
   def self.extname(filename)
     base = self.basename(filename)
     index = base.rindex('.')
-    return '' if index.equal?(nil) || index == (base.size - 1)
+    return '' if index.equal?(nil) || index == (base.size - 1) || index == 0
     base[index..-1]
   end
 
@@ -292,8 +299,8 @@ class File
   end
 
   def self.identical?(file_1, file_2)
-    stat_1 = File._stat(Type.coerce_to(file_1, String, :to_str))
-    stat_2 = File._stat(Type.coerce_to(file_2, String, :to_str))
+    stat_1 = File._stat(Type.coerce_to(file_1, String, :to_str), false)
+    stat_2 = File._stat(Type.coerce_to(file_2, String, :to_str), false)
     return false unless stat_1.ino == stat_2.ino
     return false unless stat_1.ftype == stat_2.ftype
 #     return false unless POSIX.access(orig, Constants::R_OK)
@@ -318,14 +325,22 @@ class File
   end
 
   def self.link(oldname, newname)
-    status = File._modify_file(8, oldname, newname)
+    old_nam = Type.coerce_to(oldname, String, :to_str)
+    new_nam = Type.coerce_to(newname, String, :to_str)
+    status = File._modify_file(8, old_nam, new_nam)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'File.link failed')
     end
+    status
   end
 
   def self.lstat(filename)
-    _stat(filename, true);
+    stat_obj = _stat(filename, true);
+    if stat_obj._isFixnum
+      # an error attempting to stat
+      Errno.raise_errno(stat_obj, 'File.stat failed')
+    end
+    stat_obj
   end
 
   def self.mtime(filename)
@@ -428,15 +443,17 @@ class File
     res = String.new
     status = File._modify_file(9, filename, res)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'File.readlink failed')
     end
     res
   end
 
   def self.rename(oldname, newname)
+    oldname = Type.coerce_to(oldname, String, :to_str)
+    newname = Type.coerce_to(newname, String, :to_str)
     status = File._modify_file(7, oldname, newname)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'File.rename failed')
     end
   end
 
@@ -505,11 +522,6 @@ class File
 
   def self.stat(filename)
     stat_obj = Errno.handle(_stat(filename, false), filename)
-#     stat_obj = _stat(filename, false);
-#     if (stat_obj._isFixnum)
-#       raise Errno::ENOENT
-# #      raise SystemCallError # TODO: Errno::xxx
-#     end
     stat_obj
   end
 
@@ -522,14 +534,17 @@ class File
   end
 
   def self.symlink(oldname, newname)
+    oldname = Type.coerce_to(oldname, String, :to_str)
+    newname = Type.coerce_to(newname, String, :to_str)
     status = File._modify_file(6, oldname, newname)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'File.symlink failed')
     end
+    status
   end
 
   def self.symlink?(filename)
-    stat_obj = File._stat(filename, false)
+    stat_obj = File._stat(filename, true) # lstat()
     if (stat_obj._isFixnum)
       return false  # an error attempting to stat
     end
@@ -537,10 +552,13 @@ class File
   end
 
   def self.truncate(filename, newsize)
+    filename = Type.coerce_to(filename, String, :to_str)
+    newsize = Type.coerce_to(newsize, Fixnum, :to_int)
     status = File._modify_file(2, filename, newsize)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'File.truncate failed')
     end
+    status
   end
 
   def self.umask
@@ -548,11 +566,12 @@ class File
     _umask(-1)
   end
 
-  def self.umask(newMask)
-    # set file creation mask to newMask and return previous value
-    # newMask must be >= 0 and <= 0777
-    if (newMask >= 0)
-      res = _umask(newMask)
+  def self.umask(newmask)
+    # set file creation mask to newmask and return previous value
+    # newmask must be >= 0 and <= 0777
+    newmask = Type.coerce_to(newmask, Fixnum, :to_int)
+    if (newmask >= 0)
+      res = _umask(newmask)
     else
       res = -1
     end
@@ -567,9 +586,23 @@ class File
   end
 
   def self.utime(accesstime, modtime, *filenames)
+    if accesstime._isFixnum
+      a_time = accesstime
+    elsif accesstime.is_a?(Time)
+      a_time = accesstime.seconds
+    else
+      raise TypeError, 'File.utime, accesstime must be a Time or Fixnum'
+    end
+    if accesstime._isFixnum
+      m_time = modtime
+    elsif accesstime.is_a?(Time)
+      m_time = modtime.seconds
+    else
+      raise TypeError, 'File.utime, modtime must be a Time or Fixnum'
+    end
     count = 0
     filenames.each { |a_name|
-      status = File._modify_file( 5, a_name, accesstime, modtime)
+      status = File._modify_file( 5, a_name, a_time, m_time)
       if (status.equal?(0))
         count = count + 1
       end
@@ -607,10 +640,11 @@ class File
     self.stat.atime
   end
 
-  def chmod(permission)
+  def chmod(arg)
+    permission = Type.coerce_to(arg, Fixnum, :to_int)
     status = File._modify_file( 10, @fileDescriptor, permission, nil)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'aFile.chmod failed')
     end
     return 0
   end
@@ -618,7 +652,7 @@ class File
   def chown(owner, group)
     status = File._modify_file( 12, @fileDescriptor, owner, group)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'aFile.chown failed')
     end
     return 0
   end
@@ -644,6 +678,8 @@ class File
     return nil if self.eof?
     _getc
   end
+
+  # --------- begin gets implementation  [
 
   def gets(*args)
     raise ArgumentError, 'expected 0 or 1 arg'
@@ -741,8 +777,9 @@ class File
     super(sym, arg)
   end
 
-  # end gets --------------------------------------------------
+  # --------- end gets implementation  ]
 
+  # -------- flock implementation
 
   def self.fetch_flock_constants
     # returns [ LOCK_EX, LOCK_NB, LOCK_SH, LOCK_UN ] from VM
@@ -750,7 +787,7 @@ class File
     arr = [ ]
     status = File._modify_file(13, 0, arr)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'File.fetch_flock_constants failed')
     end
     arr
   end
@@ -763,10 +800,20 @@ class File
   def flock(lock_constant)
     status = File._modify_file(11, @fileDescriptor, lock_constant)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'aFile.flock failed')
     end
+    status
   end
 
+  # -------- end flock
+
+  def inspect
+    str = super
+    if closed? 
+      str << ', closed' 
+    end
+    str
+  end
 
   def lchmod(permission)
     # not supported , lchmod() not available on Linux or Solaris
@@ -776,7 +823,7 @@ class File
   def lchown(owner, group)
     status = File._modify_file( 4, @pathName, owner, group)
     unless status.equal?(0)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'aFile.lchown failed')
     end
     return 0
   end
@@ -796,7 +843,7 @@ class File
   def stat
     res = File._fstat(@fileDescriptor, false)
     if (res._isFixnum)
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.raise_errno(status, 'aFile.stat failed')
     end
     return res
   end
@@ -818,6 +865,15 @@ class File
   # Seeks to the given position (in bytes) in +io+
   def pos=(offset)
       seek(offset, IO::SEEK_SET)
+  end
+
+  def truncate(a_length) 
+    a_length = Type.coerce_to(a_length, Fixnum, :to_int)
+    status = File._modify_file( 15, @fileDescriptor, a_length, nil)
+    unless status.equal?(0)
+      Errno.raise_errno(status, 'aFile.truncate failed')
+    end
+    return 0
   end
 
   def write(arg)

@@ -56,9 +56,10 @@ class Module
   def include?(other)
     ancests = self.ancestors
     n = 0
-    nlim = ancest.size
+    nlim = ancests.size
     while n < nlim
-      return true if ancests[n].equal?(other)
+      an_ancest = ancests[n]
+      return true if an_ancest.equal?(other)
       imods = an_ancest.included_modules
       k = 0
       klim = imods.size

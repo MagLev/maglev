@@ -1,22 +1,51 @@
 module Comparable
   def ==(other)
-    (self <=> other) == 0
+    begin
+      status = (self <=> other) 
+      if status._isNumeric
+        status == 0
+      else
+        nil
+      end
+     rescue StandardError
+       nil
+     end
   end
   
   def >(other)
-    (self <=> other) > 0
+    status =  self <=> other
+    if status._isNumeric
+      status > 0
+    else
+      raise ArgumentError, 'in Compariable#> , <=> returned a non-Numeric'
+    end
   end
   
   def <(other)
-    (self <=> other) < 0
+    status =  self <=> other
+    if status._isNumeric
+      status < 0
+    else
+      raise ArgumentError, 'in Compariable#< , <=> returned a non-Numeric'
+    end
   end
   
   def >=(other)
-    (self <=> other) >= 0
+    status =  self <=> other
+    if status._isNumeric
+      status >= 0
+    else
+      raise ArgumentError, 'in Compariable#>= , <=> returned a non-Numeric'
+    end  
   end
   
   def <=(other)
-    (self <=> other) <= 0
+    status =  self <=> other
+    if status._isNumeric
+      status <= 0
+    else
+      raise ArgumentError, 'in Compariable#<= , <=> returned a non-Numeric'
+    end
   end
   
   def between?(min, max)

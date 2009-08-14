@@ -18,7 +18,7 @@ class Time
   # BEGIN RUBINIUS
   ######################################################################
 
-  #  include Comparable
+  include Comparable
 
   ZoneOffset = {
     'UTC' => 0, 'Z' => 0,  'UT' => 0, 'GMT' => 0,

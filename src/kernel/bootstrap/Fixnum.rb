@@ -80,7 +80,7 @@ class Fixnum
 
   # to_s inherited from Integer
 
-  # TODO   to_sym
+  primitive 'to_sym', '_rubyToSym'
 
   primitive 'zero?', '_rubyEqualZero'
   primitive 'nonzero?', '_rubyNonzero'

@@ -326,16 +326,35 @@ class Array
   end
 
 
-  # Set intersection. Return new array containing elements common to two
-  # arrays.
-  # --
-  # & uses Smalltalk implementation because Ruby Hash does not
-  # support a removeKey:otherwise: in the Ruby API.
-  primitive '_intersect',  'rubyIntersect:'
-
+  # Set intersection. 
+  # Return new array containing elements common to two arrays.
   def &(other)
-    other = Type.coerce_to other, Array, :to_ary
-    _intersect(other)
+    other = Type.coerce_to(other, Array, :to_ary)
+    my_siz = self.size
+    other_siz  = other.size
+    dflt = Object.new
+    htsiz = (my_siz + other_siz) / 4
+    htsiz = 5 if htsiz < 5  
+    dict = Hash._new(htsiz)
+    n = 0
+    while n < other_siz
+      elem = other[n]
+      dict[ elem ] = elem
+      n += 1
+    end
+    res = self.class.new( my_siz < other_siz ? my_siz : other_siz )
+    n = 0
+    res_idx = 0
+    while n < my_siz
+      elem = self._at(n)
+      if dict._delete_otherwise(elem, dflt)._not_equal?(dflt)
+        res[res_idx] = elem
+        res_idx += 1
+      end
+      n += 1
+    end
+    res.size=(res_idx)
+    res
   end
 
   # Repetition: if +obj+ is a string, then <tt>arr.join(str)</tt>, otherwise
