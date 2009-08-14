@@ -93,13 +93,13 @@ Merged changes from ruby_parser2.0.3
   no substantive differences that affect Maglev code
 
 Fixes for Maglev Trac 567
-  Ryan's code does not correctly lex a string of the form
+  ruby_parser2.0.3  code does not correctly lex a string of the form
     "%w(abc\tdef)"
   Added a  \t  to the Regexp near comment 'to pick up whatever'
   in 'def tokadd_string' in lexer.rb .
 
   In 'def advance' near the comment "# Fix Trac 567" , 
-  change the return token based on "is_arg" and shutoff the
+  changed the return token based on "is_arg" and shutoff the
   arg_ambiguous warning , 
   to handle parsing of a Ruby 1.8 multi-line statement 
   with first line ending in a '+' like this:
@@ -110,14 +110,14 @@ Fixes for Maglev Trac 567
     # end of example
 
 Fix Maglev Trac 565
-  Ryan's code in "def new_regexp" in extras.rb is incorrect.
+  ruby_parser2.0.3 code in "def new_regexp" in extras.rb is incorrect.
   In the original code, the loop  "options.split(//).each do"
   probably needs to use   "o |= v" instead of "o += v"
   to handle the case of redundant/duplicate specification letters 
   in the options string, per ruby specs
 
 Lexing of Octal numbers
-  The original code in lexer.rb,  
+  ruby_parser2.0.3 code in lexer.rb,  
      when src.scan(/[+-]?0o?[0-7_]*[89]/) then
        rb_compile_error "Illegal octal digit."
      when src.scan(/[+-]?0o?[0-7_]+|0o/) then
@@ -130,15 +130,14 @@ Lexing of Octal numbers
   to allow either upper or lower case 'o' after the leading zero, per ruby specs.
 
 Lexing of double quoted strings (Maglev Trac 580)
-  This  regex search in rubyparser 2.0.3's lexer.rb :
+  This  regex search in ruby_parser2.0.3 lexer.rb :
      elsif src.scan(/\"(#{ESC_RE}|#(#{ESC_RE}|[^\{\#\@\$\"\\])|[^\"\\\#])*\"/o) then
   does not parse this code correctly:
-    cx = "\C-\\"
-    # d = "junk"
-  The string cx winds up including part of the next line,    '# d = ' .
+      cx = "\C-\\"
+      # d = "junk"
+  The string cx winds up including part of the next line,  '# d = ' .
   Current fix is to use a much simpler regex
     s_matched = src.scan(/\"( |\t|\w)*\"/o)
   to parse simple double quoted string containing space, tab, alpha or digit chars
   and otherwise use the tSTRING_BEG   path for complex string lexing
-
 
