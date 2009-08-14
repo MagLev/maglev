@@ -74,7 +74,7 @@ class ThrTest
     t = Thread.fork { $A = 97 ; Thread.pass ; $A = 87 }
     unless (x = $A) == 97 ;                     Failed() ; end
     s = t.join(1)
-    unless s.equal(t) ;                     Failed() ; end
+    unless s.equal?(t) ;                     Failed() ; end
     unless (x = $A) == 87 ;                     Failed() ; end
 
     t = Thread.fork { $A = 96 ; Thread.pass ; $A = Thread.current.keys }
