@@ -39,7 +39,7 @@ class MagLevStone < Stone
     mkdir_p tranlog_directories
   end
 
-  def replace
+  def reload
     stop if running?
     destroy!
     initialize_new_stone
