@@ -24,6 +24,10 @@ class BaseTestCase < Test::Unit::TestCase
     end
   end
 
+  def deny(*args)
+    ! assert(args)
+  end
+
   def test_abstract
     # This is an abstract test case
   end

@@ -1,13 +1,15 @@
 class GemStoneInstallation
   attr_reader :installation_directory, :config_directory, :installation_extent_directory, :base_log_directory, :backup_directory, :initial_extent_name
 
-  @current = nil
+  @@current = nil
+
+  # The current, latest and greatest version
   def self.current
-    @current ||= self.new("/opt/gemstone/product")
+    @@current ||= self.new("/opt/gemstone/product")
   end
 
   def self.current=(instance)
-    @current = instance
+    @@current = instance
   end
 
   def initialize(installation_directory,
@@ -23,9 +25,10 @@ class GemStoneInstallation
     @installation_extent_directory = installation_extent_directory
     @backup_directory = backup_directory
     @initial_extent_name = initial_extent_name
+  end
 
+  def set_gemstone_installation_environment
     ENV['GEMSTONE'] = @installation_directory
-    ENV['PATH'] += ":#{ENV['GEMSTONE']}/bin"
   end
 
   def stones
@@ -34,16 +37,28 @@ class GemStoneInstallation
     end
   end
 
-  def status
-    sh "gslist -clv"
+  # Execute command in this installation's environment
+  def gs_sh(command, &block)
+    set_gemstone_installation_environment
+    sh "$GEMSTONE/bin/#{command}", &block
+  end
+
+  def gslist
+    gs_sh "gslist -clv"
   end
 
   def stopnetldi
-    sh "stopnetldi"
+    gs_sh "stopnetldi"
   end
 
   def startnetldi
-    sh "startnetldi -g -a #{ENV['USER']}"
+    gs_sh "startnetldi -g -a #{ENV['USER']}"
+  end
+
+  def netldi_running?
+    gs_sh "gslist | grep -qe '^exists.*Netldi'" do | ok, status |
+      return status == 0
+    end
   end
 
   def initial_extent

@@ -37,7 +37,7 @@ class StoneUnitTestCase < StoneTestCase
   def test_run_topaz_file
     stone = Stone.create(TEST_STONE_NAME)
     partial_mock_stone = flexmock(stone)
-    partial_mock_stone.should_receive(:topaz_commands).with(["input test.gs", "commit"]).once.ordered
+    partial_mock_stone.should_receive(:topaz_commands).with(["input test.gs", "commit"], true).once.ordered
 
     stone.input_file("test.gs")
   end
@@ -77,12 +77,12 @@ class StoneIntegrationTestCase < StoneTestCase
   end
 
   def test_netldi
-    `stopnetldi`
-    assert `gslist` !~ /^exists.*Netldi/
-    GemStoneInstallation.current.startnetldi
-    assert `gslist` =~ /^exists.*Netldi/
     GemStoneInstallation.current.stopnetldi
-    assert `gslist` !~ /^exists.*Netldi/
+    deny GemStoneInstallation.current.netldi_running?
+    GemStoneInstallation.current.startnetldi
+    assert GemStoneInstallation.current.netldi_running?
+    GemStoneInstallation.current.stopnetldi
+    deny GemStoneInstallation.current.netldi_running?
   end
 
   def test_create_new
@@ -151,6 +151,31 @@ class StoneIntegrationTestCase < StoneTestCase
     assert content.include? "DBF_EXTENT_NAMES = #{stone.extent_filename}"
     assert content.include? "DBF_SCRATCH_DIR = #{stone.scratch_directory}"
     assert content.include? "STN_TRAN_LOG_DIRECTORIES = #{stone.tranlog_directories.join(",")}"
+  end
+
+  def test_stones_in_different_installations_uses_correct_environment
+    fake_previous_stone_name = "#{TEST_STONE_NAME}_previous"
+    ln_sf GemStoneInstallation.current.installation_directory, "/tmp/fake_previous"
+    clear_stone(fake_previous_stone_name)
+
+    current = GemStoneInstallation.current
+    previous = GemStoneInstallation.new('/tmp/fake_previous')
+    current_stone = Stone.create(TEST_STONE_NAME)
+    previous_stone = Stone.create(fake_previous_stone_name, previous)
+
+    assert current.installation_directory != previous.installation_directory
+    assert current_stone.data_directory != previous_stone.data_directory
+    assert current_stone.log_directory != previous_stone.log_directory
+
+    current_stone.running?
+    assert ENV['GEMSTONE'] == current.installation_directory
+    assert ENV['GEMSTONE_DATADIR'] == current_stone.data_directory
+    assert ENV['GEMSTONE_LOGDIR'] == current_stone.log_directory
+
+    previous_stone.running?
+    assert ENV['GEMSTONE'] == previous.installation_directory
+    assert ENV['GEMSTONE_DATADIR'] == previous_stone.data_directory
+    assert ENV['GEMSTONE_LOGDIR'] == previous_stone.log_directory
   end
 
   private

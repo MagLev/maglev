@@ -36,11 +36,11 @@ class Topaz
     @topaz_command = "#{topaz_command} 2>&1"
   end
 
-  def commands(*topaz_commands)
+  def commands(topaz_commands_array)
     fail "We expect the stone #{@stone.name} to be running if doing topaz commands. (Is this overly restrictive?)" if !@stone.running?
     IO.popen(@topaz_command, "w+") do |io|
       consume_until_prompt(io)
-      topaz_commands.each do | command |
+      topaz_commands_array.each do | command |
         command.execute_on_topaz_stream(io)
         if command != "exit" then
           consume_until_prompt(io)

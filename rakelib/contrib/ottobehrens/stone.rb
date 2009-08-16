@@ -12,19 +12,19 @@ class Stone
   attr_reader :backup_directory
   attr_reader :extent_name
 
-  def Stone.existing(name)
-    fail "Stone does not exist" if not GemStoneInstallation.current.stones.include? name
-    new(name, GemStoneInstallation.current)
+  def Stone.existing(name, gemstone_installation=GemStoneInstallation.current)
+    fail "Stone does not exist" if not gemstone_installation.stones.include? name
+    new(name, gemstone_installation)
   end
 
-  def Stone.create(name)
-    fail "Cannot create stone #{name}: the conf file already exists in #{GemStoneInstallation.current.config_directory}" if GemStoneInstallation.current.stones.include? name
-    instance = new(name, GemStoneInstallation.current)
+  def Stone.create(name, gemstone_installation=GemStoneInstallation.current)
+    fail "Cannot create stone #{name}: the conf file already exists in #{gemstone_installation.config_directory}" if gemstone_installation.stones.include? name
+    instance = new(name, gemstone_installation)
     instance.initialize_new_stone
     instance
   end
 
-  def initialize(name, gemstone_installation, username="DataCurator", password="swordfish")
+  def initialize(name, gemstone_installation=GemStoneInstallation.current, username="DataCurator", password="swordfish")
     @name = name
     @username = username
     @password = password
@@ -32,12 +32,11 @@ class Stone
     @data_directory = "#{gemstone_installation.installation_extent_directory}/#@name"
     @backup_directory = gemstone_installation.backup_directory
     @extent_name = gemstone_installation.initial_extent_name
-    @gemstone_installation = gemstone_installation ||= GemStoneInstallation.current
+    @gemstone_installation = gemstone_installation
     initialize_gemstone_environment
   end
 
   def initialize_gemstone_environment
-    ENV['GEMSTONE'] = @gemstone_installation.installation_directory
     ENV['GEMSTONE_LOGDIR'] = log_directory
     ENV['GEMSTONE_DATADIR'] = data_directory
   end
@@ -65,27 +64,27 @@ class Stone
   end
 
   def running?(wait_time = -1)
-    sh "waitstone #@name #{wait_time} 1>/dev/null" do | ok, status |
+    gs_sh "waitstone #@name #{wait_time} 1>/dev/null" do | ok, status |
       return ok
     end
   end
 
   def status
     if running?
-      sh "gslist -clv #@name"
+      gs_sh "gslist -clv #@name"
     else
       puts "#@name not running"
     end
   end
 
   def start
-    log_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
+    gs_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
     running?(10)
     self
   end
 
   def stop
-    log_sh "stopstone -i #{name} #{username} #{password}"
+    gs_sh "stopstone -i #{name} #{username} #{password}"
     self
   end
 
@@ -96,7 +95,7 @@ class Stone
 
   def full_backup
     result = run_topaz_command("SystemRepository startNewLog")
-    tranlog_number = ((/(\d*)$/.match(result.last))[1]).to_i
+    tranlog_number = (result.last.split[5]).to_i
     fail if tranlog_number < 0
 
     run_topaz_command("System startCheckpointSync")
@@ -205,9 +204,19 @@ class Stone
     topaz_commands(["run", commands.join(". "), "%"])
   end
 
+  def gs_sh(command_line, &block)
+    initialize_gemstone_environment
+    @gemstone_installation.gs_sh(command_line, &block)
+  end
+
+  def log_gs_sh(command_line)
+    log_command_line(command_line)
+    gs_sh redirect_command_line_to_logfile(command_line)
+  end
+
   def log_sh(command_line)
-    sh "echo 'SHELL_CMD #{Date.today.strftime('%F %T')}: #{command_line}' >> #{command_logfile}"
-    sh "#{command_line} 2>&1 >> #{command_logfile}"
+    log_command_line(command_line)
+    sh redirect_command_line_to_logfile(command_line)
   end
 
   def initialize_extents
@@ -215,17 +224,28 @@ class Stone
   end
 
   def topaz_commands(user_commands, login_first=true)
-    commands =  ["output append #{topaz_logfile}",
-                 "set u #{username} p #{password} gemstone #{name}" ]
-    commands <<  "login" if login_first
-    commands << ["limit oops 100",
-                 "limit bytes 1000",
-                 "display oops",
-                 "iferr 1 stack",
-                 "iferr 2 exit" ]
-    commands << user_commands
-    commands << ["output pop",
-                 "exit" ]
+    commands = ["output append #{topaz_logfile}",
+                "set u #{username} p #{password} gemstone #{name}" ]
+    commands << "login" if login_first
+    commands.push(
+                "limit oops 100",
+                "limit bytes 1000",
+                "display oops",
+                "iferr 1 stack",
+                "iferr 2 exit" ,
+                user_commands,
+                "output pop",
+                "exit")
     Topaz.new(self).commands(commands)
+  end
+
+  private 
+
+  def log_command_line(command_line)
+    File.open(command_logfile, "a") { |file| file.puts "SHELL_CMD #{Date.today.strftime('%F %T')}: #{command_line}" }
+  end
+
+  def redirect_command_line_to_logfile(command_line)
+    "#{command_line} 2>&1 >> #{command_logfile}"
   end
 end

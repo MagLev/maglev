@@ -17,21 +17,21 @@ class TopazTestCase < BaseTestCase
     @topaz.commands(["status", "exit"])
     fail "Output is #{@topaz.output[1]}" if /^Current settings are\:/ !~ @topaz.output.last
 
-    @topaz.commands("status", "exit")
+    @topaz.commands(["status", "exit"])
     fail "Output is #{@topaz.output[1]}" if /^Current settings are\:/ !~ @topaz.output.last
   end
 
   def test_login
-    @topaz.commands("set gems #{@stone.name} u DataCurator p swordfish", "login", "exit")
+    @topaz.commands(["set gems #{@stone.name} u DataCurator p swordfish", "login", "exit"])
     fail "Output is #{@topaz.output[2]}" if /^successful login/ !~ @topaz.output.last
   end
   
   def test_nested_commands
-    @topaz.commands("set gems #{@stone.name} u DataCurator p swordfish",
+    @topaz.commands(["set gems #{@stone.name} u DataCurator p swordfish",
                     "login",
                     "level 0",
                     ["printit", "| x |", "x := 6 + 4", "%"],
-                    "exit")
+                    "exit"])
     fail "Output is #{@topaz.output.last}" if /^10/ !~ @topaz.output.last
   end
 
