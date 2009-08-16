@@ -60,7 +60,7 @@ RUBY.global('CZstream', 'CZstream')
 #
 RUBY.global('Exception',    'UserException')
   RUBY.global('SystemExit',     'RubySystemExit')
-  RUBY.global('SystemStackExit',    'StackOverflow')
+  RUBY.global('SystemStackError',    'StackOverflow')
   RUBY.global('NoMemoryError',  'OutOfMemory')
   RUBY.global('ScriptError',      'RubyScriptError')
     RUBY.global('LoadError',        'RubyLoadError')

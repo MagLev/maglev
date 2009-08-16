@@ -847,6 +847,9 @@ class String
   # the search -- characters beyond this point will not be considered.
   def rindex(item, original_offset=Undefined)
     my_size = self.size
+    if my_size.equal?(0)
+      return nil
+    end
     if original_offset.equal?(Undefined)
       was_undef = true
       zoffset = my_size.equal?(0) ? 0 : my_size - 1

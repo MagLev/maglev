@@ -24,7 +24,10 @@ module FileTest
   def exist?(path)
     File.exist? path
   end
-  alias_method :exists?, :exist?
+
+  def exists?(path)
+    File.exists?(path)
+  end
 
   def file?(path)
     File.file? path
@@ -95,7 +98,7 @@ module FileTest
   end
 
   module_function(:blockdev?, :chardev?, :directory?, :executable?,
-    :executable_real?, :exist?, :file?, :grpowned?, :identical?,
+    :executable_real?, :exist?, :exists?, :file?, :grpowned?, :identical?,
     :owned?, :pipe?, :readable?, :readable_real?, :setgid?, :setuid?,
     :size, :size?, :socket?, :sticky?, :symlink?, :writable?,
     :writable_real?, :zero?)

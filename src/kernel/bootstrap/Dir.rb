@@ -51,6 +51,7 @@ class Dir
 
   def self.foreach(dirname, &block)
     Dir.entries(dirname).each(&block)
+    nil
   end
 
   def self.getwd
@@ -156,7 +157,7 @@ class Dir
     p = Type.coerce_to(pos, Fixnum, :to_i)
 
     @index = p if @range === p
-    @index # seek returns self, pos= returns @index
+    @index
   end
 
   def read
@@ -172,6 +173,7 @@ class Dir
   def rewind
     check_closed
     @index = 0
+    self
   end
 
   def seek(pos)
@@ -179,7 +181,7 @@ class Dir
     p = Type.coerce_to(pos, Fixnum, :to_i)
 
     @index = p if (0...@entries.size) === p
-    self  # seek returns self, pos= returns @index
+    self 
   end
 
   alias tell pos

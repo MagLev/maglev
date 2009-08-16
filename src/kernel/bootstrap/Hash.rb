@@ -248,7 +248,8 @@ class Hash
     end
     v
   end
-  primitive '_delete', 'removeKey:'
+  primitive '_delete', 'deleteKey:' # returns nil if key not found
+  primitive '_delete_otherwise', 'deleteKey:otherwise:'
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
@@ -302,9 +303,16 @@ class Hash
   primitive_nobridge '_at_otherwise', 'rubyAt:otherwise:'
 
   def fetch(key, dflt=Undefined, &block)
-    val = _at_otherwise(key, dflt)
-    return val unless val.equal?(Undefined)
-    return block.call(key) if block_given?
+    udef = Undefined
+    val = self._at_otherwise(key, udef)
+    return val unless val.equal?(udef)
+    if block_given?
+      if dflt._not_equal?(udef)
+        warn 'block supersedes default value argument'
+      end
+      return block.call(key) 
+    end
+    return dflt if dflt._not_equal?(udef)
     raise IndexError, "No value for #{key}"
   end
 

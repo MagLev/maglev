@@ -18,31 +18,49 @@ module Enumerable
     end
   end
 
-  def each_cons(n, &block)
+  def each_cons(arg, &block)
+    n = Type.coerce_to( arg, Integer, :to_int)
+    unless n > 0
+      raise TypeError, 'each_cons, arg must be > 0'
+    end
     array = []
     elements = self.to_a
     while elements.size > 0 do
-      array << elements[0,n] if elements[0,n].size == n
+      elem = elements[0,n]
+      array << elem if elem.size == n
       elements.shift
     end
-    array.each { |set| yield set }
-    nil
+    res = array.each { |set| yield set }
+    if res.equal?(array)
+      nil
+    else
+      res # the &block did a break
+    end
   end
 
   def enum_cons(n)
     Enumerable::Enumerator.new(self, :each_cons, n)
   end
 
-  def each_slice(slice_size, &block)
+  def each_slice(arg, &block)
+    slice_size = Type.coerce_to( arg, Integer, :to_int)
+    unless slice_size > 0
+      raise TypeError, 'each_slice, arg must be > 0'
+    end
     a = []
-    each { |element|
+    ea_res = self.each { |element|
       a << element
       if a.length == slice_size
         yield a
         a = []
       end
     }
-    yield a if a.length > 0
+    if ea_res.equal?(self)
+      yield a if a.length > 0
+      nil
+    else
+      ea_res # the &block did a break
+    end
   end
 
   def enum_slice(n)

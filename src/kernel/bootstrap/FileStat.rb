@@ -34,6 +34,12 @@ class File::Stat
   S_IWOTH  = 0000002  # W for other
   S_IXOTH  = 0000001  # X for other
 
+  # def self.name ; end # not needed, see code in Module>>initNameSpacesForExtend:
+
+  def self.new(filename)
+    File.stat(filename)
+  end
+
   def mode
     @mode
   end
@@ -124,6 +130,14 @@ class File::Stat
 
   def ino
     @ino
+  end
+
+  def inspect
+    str = "#<#{self.class.name} dev=0x#{@dev.to_s(16)}, ino=#{@ino},"
+    str << " mode=#{sprintf("%07d", @mode.to_s(8).to_i)}, nlink=#{@nlink}, uid=#{@uid},"
+    str << " gid=#{@gid}, rdev=0x#{@rdev.to_s(16)}, size=#{@size}, blksize=#{@blksize},"
+    str << " blocks=#{@blocks}, atime=#{self.atime}, mtime=#{self.mtime}, ctime=#{self.ctime}>"
+    str
   end
 
   def mtime
