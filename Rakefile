@@ -92,7 +92,7 @@ GemStoneInstallation.current.stones.each do |stone_name|
   namespace stone_name do
     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
 
-    [:start, :stop, :restart, :status, :replace, :take_snapshot, :restore_snapshot,
+    [:start, :stop, :restart, :status, :reload, :take_snapshot, :restore_snapshot,
       :reset_ruby_context].each do |action|
       task_gemstone(stone, action)
     end

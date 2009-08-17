@@ -41,7 +41,7 @@ class String
     arr = self.split("\n")
     arr.map! { |x| x.sub!(/\s*\|/,"") }
     str = arr.join("\n")
-    self.reload(str)
+    self.replace(str)
   end
 end
 
