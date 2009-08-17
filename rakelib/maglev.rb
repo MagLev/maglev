@@ -20,7 +20,7 @@ IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
 # (i.e., you can't change the stone your connected to, once you've
 # connected).  Assume that if $GEMSTONE is set correctly, then all the
 # others are too.
-unless defined? ENV['GEMSTONE']
+if ENV['GEMSTONE'].nil? or ENV['GEMSTONE'].empty?
   ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
   ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
   ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/gs64stone"
