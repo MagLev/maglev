@@ -1026,7 +1026,7 @@ module MagRp
            self
          end
          def as_accessor
-           c2node.dup
+           @constNode.dup		# fix Trac 588 ?
          end
          def inspect
            "[:cdecl, #{@constNode.inspect}, #{@valueNode.inspect}]"
