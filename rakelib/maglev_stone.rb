@@ -119,11 +119,11 @@ class MagLevStone < Stone
   def ensure_prims_loaded
     if running?
       if prims_loaded?(@name)
-        puts "Kernel already loaded."
+        puts "Kernel already loaded for #{@name}."
       else
         # Prims can't be loaded without parser running
         start_parser unless parser_running?
-        puts "Loading Kernel.  This may take a few seconds..."
+        puts "Loading Kernel for #{@name}.  This may take a few seconds..."
         input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
       end
     end
@@ -131,12 +131,13 @@ class MagLevStone < Stone
 
   def prims_loaded?(name='gs64stone')
     begin
-      Topaz.new(self).commands("output append #{topaz_logfile}",
-                               "set u DataCurator p swordfish gemstone #{name}",
-                               "login",
-                               "obj RubyPrimsLoaded",
-                               "output pop",
-                               "exit")
+      cmds = ["output append #{topaz_logfile}",
+              "set u DataCurator p swordfish gemstone #{name}",
+              "login",
+              "obj RubyPrimsLoaded",
+              "output pop",
+              "exit"]
+      Topaz.new(self).commands(cmds)
     rescue Exception => e
       # Ignore the exception.  If test for obj RubyPrimsLoaded will cause
       # topaz to exit with a non-zero exit status, which is what we want,
