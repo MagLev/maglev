@@ -208,17 +208,8 @@ class NameError
      end
      exc
    end 
-   def name=(v)
-     @gsarguments = [ v ]
-   end
-   def name
-     gsa = @gsarguments
-     if gsa.equal?(nil)
-       nil
-     else
-       gsa[0]
-     end
-   end
+   primitive_nobridge 'name=' , 'name:'
+   primitive_nobridge 'name', 'name'
   
    def inspect
      str = super
