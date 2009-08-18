@@ -9,8 +9,13 @@ class Hash
   # Class methods
   class_primitive_nobridge '_new', '_new:'
 
+  def self.allocate
+    # for spec compatibility, not used by implementation of new
+    self._st_initialized_instance
+  end
+
   def self.new(*args)
-    # first variant gets bridge methods
+    # this variant gets bridge methods
     len = args.length
     if len <= 1
       if len.equal?(0)
@@ -28,6 +33,7 @@ class Hash
   end
 
   def self.new(&block)
+    # block is expected to be a two-arg block { | aHash, aKey | ... }
     # subsequent variants replace just the corresponding bridge method
     h = self._st_initialized_instance
     if block_given?
@@ -146,14 +152,16 @@ class Hash
     end
     return false unless other._isHash 
     return false unless other.length.equal?(self.length) 
-    dflt = self.default
-    # MRI 1.8.6 does not check #  dflt == other.default  #(1.8.7 does check)
+    # Maglev is compatible with MRI 1.8.6 
+    #  by not comparing   @defaultValue == other.default  #(1.8.7 does check)
     ts = Thread._recursion_guard_set
     added = ts._add_if_absent(self)
     begin
       self.each { | k, v |
+        unless other.has_key?(k)
+          return false
+        end
 	ov = other[k]
-        return false if ov.equal?(dflt) 
 	if v.equal?(ov)
 	  # ok
 	elsif ts.include?(v) || ts.include?(ov)
@@ -222,17 +230,24 @@ class Hash
 
   primitive 'clear', 'removeAllKeys'
 
-  def _call_default_block(arg)
-    # intended to be called from Smalltalk code only
-    @defaultValue.call(arg)
-  end
-
-  def default(key=nil)
+  def default(key)
     if @defaultIsBlock.equal?(true)
-      @defaultValue.call(key)
+      @defaultValue.call(self, key)
     else
       @defaultValue
     end
+  end
+
+  def default
+    if @defaultIsBlock.equal?(true)
+      @defaultValue.call(nil)
+    else  
+      @defaultValue
+    end
+  end
+
+  def _default_value
+    @defaultValue
   end
 
   primitive 'default=', 'setDefaultValue:'
@@ -241,14 +256,16 @@ class Hash
 
   def delete(key, &blk)
     v = self._delete(key)
-    if block_given?
-      if v.equal?(@sentinel)
+    if v.equal?(@sentinel)
+      if block_given?
         return  blk.call(key)
+      else
+        return nil
       end
     end
     v
   end
-  primitive '_delete', 'deleteKey:' # returns nil if key not found
+  primitive '_delete', 'deleteKey:' # returns @sentinel if key not found
   primitive '_delete_otherwise', 'deleteKey:otherwise:'
 
   def delete_if(&block)
@@ -327,8 +344,15 @@ class Hash
 
   primitive 'index', 'keyAtValue:'
 
-  # MNI indexes
-  # MNI incicies
+  def indexes(*args)
+    # deprecated, not in 1.9 ,  use values_at  for 1.9 compatibility
+    args.collect { | key | self[key] }
+  end
+
+  def indices(*args)
+    # deprecated, not in 1.9 ,  use values_at  for 1.9 compatibility
+    args.collect { | key | self[key] }
+  end
 
   def invert
     result = {}
@@ -389,9 +413,11 @@ class Hash
 
   def shift
     pair = self._firstPair
-    return nil if  pair.equal?(nil)
+    if pair.equal?(nil)
+      return self.default(nil) 
+    end
     key = pair[0]
-    delete key
+    self.delete(key)
     return pair
   end
 
@@ -420,7 +446,7 @@ class Hash
     # RUBINIUS
     # TODO There is a maglev bug in Array#collect in dealing with nil
     # values from the block, so this impl exhibits the underlying bug.
-    args.collect { |key| self[key] }
+    args.collect { | key | self[key] }
   end
 
   # Overrides from Object
