@@ -11,8 +11,9 @@
 # without restriction.
 #
 # Hacked by Ben Matasar <ben@dabbledb.com> to work with MagLev.
-# 
-# copied from lib and code moved to module MagRp for the internal parser
+  
+# Copied from lib and code moved to module MagRp for the internal parser
+# by Allen Otis.
 
 
 module MagRp
