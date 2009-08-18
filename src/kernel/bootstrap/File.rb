@@ -888,4 +888,4 @@ class File
 end
 File._freeze_constants
 
-# STDIN, STDOUT, STDERR , $>  initialized in File2.rb
+# STDIN, STDOUT, STDERR , $>  initialized by .mcz code in RubyContext
