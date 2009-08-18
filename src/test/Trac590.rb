@@ -22,3 +22,4 @@ end
 
 raise "Failed on stdout: #{out.inspect}" unless out == "Hi\n"
 raise "Failed on stderr: #{err.inspect}" unless err == "bye\n"
+true
