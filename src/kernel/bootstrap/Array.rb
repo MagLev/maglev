@@ -1429,7 +1429,3 @@ class Array
   end
 
 end
-
-def Array(arg)
-  arg.to_a rescue [arg]
-end
