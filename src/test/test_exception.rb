@@ -113,4 +113,11 @@ rescue SystemExit => ex
   raise "Fail exit(99)" unless ex.status == 99
 end
 
+# inspect on NoMethodError was generating an error trying to coerce the
+# selector (a symbol) with to_str.
+# The test case passes if no exception is raised.
+e = NoMethodError.new
+e._init(:foo, nil, 1)
+e.inspect
+
 0
