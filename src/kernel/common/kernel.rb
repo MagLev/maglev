@@ -7,14 +7,41 @@
 #
 module Kernel
   def Float(obj)
-    if (obj._isFloat) 
-      return obj
-    end
-    raise TypeError, "can't convert nil into Float" if obj.nil?
+    return obj  if obj._isFloat
     if obj._isString
-      if obj !~ /^(\+|\-)?\d+$/ && obj !~ /^(\+|\-)?(\d_?)*\.(\d_?)+$/ && obj !~ /^[-+]?\d*\.?\d*e[-+]\d*\.?\d*/
-	raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
+      if obj =~ /[\d_]+_(e|\.)/
+        raise ArgumentError, 'trailing _ in arg to Float()'
       end
+      str = obj.lstrip  # remove leading white space
+      str.rstrip! # remove trailing white space, in place
+      sign = 1.0
+      if (idxz = str._indexOfByte( 0 , 1 )).equal?(0)  # if no null bytes
+        first_ch = str[0]
+        if first_ch.equal?( ?+ )
+          str._remove_from_to(1,1)
+        elsif first_ch.equal?( ?- )
+          sign = -1.0
+          str._remove_from_to(1,1)
+        end  
+        ok = (ra = str =~ /^[\d]+(.[\d]+)?(e[+-]?[\d]+)?/ ) ||
+             (rb = str =~ /^([\d]+|[\d]+[\d_]*[\d]+)(.([\d]+|[\d]+[\d_]*[\d]+))?(e[+-]?([\d]+|[\d]+[\d_]*[\d]+))?/ )
+      end
+      unless ok
+        raise ArgumentError, "invalid value for Float(): #{obj.inspect}"# 
+      end
+      idx = str._indexOfByte( ?_ , 1 )
+      unless idx.equal?(0)
+        if idx.equal?(str.size - 1)
+          raise ArgumentError, "invalid value for Float(): #{obj.inspect}"#
+        end
+        str = str.delete('_')
+      end
+      f = str._to_f
+if Gemstone.session_temp( :TrapFlt ) ; nil.pause ; end
+      if f.nan? 
+        raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
+      end
+      return f * sign
     end
     Type.coerce_to(obj, Float, :to_f)
   end
@@ -59,13 +86,13 @@ module Kernel
     if obj._isArray 
       return obj
     end 
-    if obj.respond_to?(:to_ary)
-      Type.coerce_to(obj, Array, :to_ary)
-    elsif obj.respond_to?(:to_a)
-      Type.coerce_to(obj, Array, :to_a)
-    else
-      [obj]
+    begin
+      res = obj.to_ary
+      return res if res._isArray
+    rescue
+      # ignore
     end
+    Type.coerce_to(obj, Array, :to_a)
   end
   module_function :Array
 
