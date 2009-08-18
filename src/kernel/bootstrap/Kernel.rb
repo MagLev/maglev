@@ -273,14 +273,14 @@ module Kernel
   end
 
   def p(obj)
-    f = STDOUT
+    f = $stdout
     f.write(obj.inspect)
     f.write("\n")   # TODO observe record sep global
     nil
   end
 
   def print(*args)
-    STDOUT.print(*args)
+    $stdout.print(*args)
     nil
   end
 
@@ -300,7 +300,7 @@ module Kernel
       else
         args = [ b, c , d ]
       end
-      STDOUT.printf(a, *args)
+      $stdout.printf(a, *args)
     end
   end
 
@@ -308,7 +308,7 @@ module Kernel
     if (a.kind_of?(IO))
       a.printf(b, c)
     else
-      STDOUT.printf(a, b, c)
+      $stdout.printf(a, b, c)
     end
   end
 
@@ -316,20 +316,20 @@ module Kernel
     if (a.kind_of?(IO))
       a.printf(b)
     else
-      STDOUT.printf(a, b)
+      $stdout.printf(a, b)
     end
   end
 
   def printf(a)
-    STDOUT.printf(a)
+    $stdout.printf(a)
   end
 
   # def proc ...  in Kernel2.rb
 
   def puts(*args)
-    f = STDOUT
+    f = $stdout
     if f.equal?(nil)
-      raise "STDOUT is nil in Kernel.puts!"
+      raise "$stdout is nil in Kernel.puts!"
     else
       f.puts(*args)
     end
@@ -337,7 +337,7 @@ module Kernel
   end
 
   def putc(arg)
-    STDOUT.putc(arg)
+    $stdout.putc(arg)
     arg
   end
 
@@ -415,9 +415,18 @@ module Kernel
 
   primitive 'sprintf*', 'sprintf:with:'
 
-  primitive_nobridge '_system', '_system:'
+  primitive_nobridge '_system_exec', '_system:'
 
-  primitive '`',   '_system:'
+  def `(arg)
+    arg = Type.coerce_to(arg, String, :to_str)
+    _system_exec(arg)
+  end
+
+  def _system(arg)
+    # called from generated code
+    arg = Type.coerce_to(arg, String, :to_str)
+    _system_exec(arg)
+  end
 
   def system(command, *args)
     cmd = command
