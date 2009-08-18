@@ -47,7 +47,7 @@ class Exception
     def initialize(message=nil)
       self._st_initialize  # initialize smalltak instvars
       if message.equal?(nil)
-        message = self.class.name 
+        message = self.class.name
       end
       @messageText = message
     end
@@ -103,7 +103,7 @@ end
 
 class SystemExit
   # Smalltalk reimplements initialize
-  primitive_nobridge '_st_initialize', 'initialize'  
+  primitive_nobridge '_st_initialize', 'initialize'
 
   def status
     @status
@@ -125,11 +125,11 @@ class SystemStackError
 end
 class NoMemoryError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'  
+   primitive_nobridge '_st_initialize', 'initialize'
 end
 class ScriptError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'  
+   primitive_nobridge '_st_initialize', 'initialize'
 end
 class LoadError  # a subclass of ScriptError
 end
@@ -164,7 +164,7 @@ end
 class SystemCallError
   def self.new(*args)
     if args.length < 1
-      raise ArgumentError, 'too few args' 
+      raise ArgumentError, 'too few args'
     end
     argone = args[0]
     if argone._isString
@@ -174,7 +174,7 @@ class SystemCallError
       end
     else
       exc = super('Unknown error')
-      exc.errno=(argone)  
+      exc.errno=(argone)
     end
     exc
   end
@@ -199,18 +199,18 @@ end
 
 class NameError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'  
- 
+   primitive_nobridge '_st_initialize', 'initialize'
+
    def self.new(msg=nil, name=nil)
      exc = super(msg)
      if name._not_equal?(nil)
        exc.name=(name)
      end
      exc
-   end 
+   end
    primitive_nobridge 'name=' , 'name:'
    primitive_nobridge 'name', 'name'
-  
+
    def inspect
      str = super
      n = self.name
@@ -224,7 +224,7 @@ end
 
 class NoMethodError  # a subclass of NameError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'  
+   primitive_nobridge '_st_initialize', 'initialize'
 
    def _init(selector, args_arr, envid)
      gsa = @gsarguments
@@ -256,10 +256,10 @@ class NoMethodError  # a subclass of NameError
 
    def inspect
      str = super
-     str << "`" ; str << self.selector ; str << "' called"
+     str << "`" ; str << self.selector.to_s ; str << "' called"
      str
    end
-  
+
 end
 class SignalException
 end
