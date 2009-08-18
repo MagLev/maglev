@@ -1,6 +1,7 @@
 This file discusses usage of the ruby parser, which was
 derived from Ryan Davis'  ruby_parser2.0.3
-For implementation notes, see  implementation.txt .
+For design discussion and implementation notes see file  
+ implementation_notes.txt .
 
 The native ruby parser is now the default.
 
