@@ -128,6 +128,17 @@ namespace :dev do
   task :stopparser => :gemstone do
     puts "No parser running on port #{PARSETREE_PORT}" unless Parser.stop.nil?
   end
+
+
+  desc "Run topaz (use rlwrap, if available)"
+  task :topaz => :gemstone do
+    sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
+  end
+
+  desc "Run debug topaz (use rlwrap, if available)"
+  task :'topaz-debug' => :gemstone do
+    sh %{ `which rlwrap 2> /dev/null` #{TOPAZDEBUG_CMD} }
+  end
 end
 
 # These are dev specific tasks we want on a per stone basis

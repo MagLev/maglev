@@ -92,15 +92,4 @@ namespace :maglev do
       rm_rf FileList.new("data/gs64stone/extent/*dbf", "log/gs64stone/*", "locks/*")
     end
   end
-
-  desc "Run topaz (use rlwrap, if available)"
-  task :topaz => :gemstone do
-    sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
-  end
-
-  desc "Run debug topaz (use rlwrap, if available)"
-  task :'topaz-debug' => :gemstone do
-    sh %{ `which rlwrap 2> /dev/null` #{TOPAZDEBUG_CMD} }
-  end
-
 end
