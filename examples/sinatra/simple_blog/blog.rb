@@ -4,7 +4,7 @@ Maglev.persistent do
   class Post
     # The key in Maglev::PERSISTENT_ROOT for storing posts
     POSTS_KEY = :posts
-    @id = 0
+    @id = -1
 
     def self.new(params)
       p = allocate
@@ -22,7 +22,7 @@ Maglev.persistent do
     end
 
     def self.new_id
-      @id += 1
+      Maglev.persistent { @id += 1 }
     end
 
     def self.add(post)
