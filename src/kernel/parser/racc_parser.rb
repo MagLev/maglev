@@ -117,10 +117,10 @@ module MagRp # {
     ###
     ### yyparse
     ###
-
-    def yyparse(recv, mid)
-      __send__(Racc_YY_Parse_Method, recv, mid, _racc_setup(), true)
-    end
+#  not used by Maglev
+#   def yyparse(recv, mid)
+#     __send__(Racc_YY_Parse_Method, recv, mid, _racc_setup(), true)
+#   end
 
     # _racc_yyparse_rb moved to  racc_init_parser.rb
 
