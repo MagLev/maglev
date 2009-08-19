@@ -1,5 +1,6 @@
 # Ruby support for the rake tasks in dev.rake.  Support for managing the
 # development environment.
+# Returns true iff there is a process listening on the PARSETREE_PORT
 
 # ######################################################################
 #                           TOPAZ COMMAND STRINGS

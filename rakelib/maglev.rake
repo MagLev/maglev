@@ -25,12 +25,6 @@ namespace :maglev do
   desc "Stop MagLev server, overwrite with empty repository!!!"
   task :'force-reload' => [:stopserver, :destroy, :initialize, :start]
 
-  desc "Start the ParseTree based parser (deprecated)"
-  task :'start-parser' => [:startparser]
-
-  desc "Stop the ParseTree based parser (deprecated)"
-  task :'stop-parser' => [:stopparser]
-
   # ======================= core tasks =======================
 
   task :startserver => :gemstone do
@@ -70,26 +64,6 @@ namespace :maglev do
     end
   end
 
-  task :startparser => :gemstone do
-    if parser_running?
-      puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
-    else
-      if valid_ruby_for_parser?
-        start_parser
-      else
-        puts "ERROR: #{PARSER_RUBY} won't run the Parse server,"
-        puts "       ruby 1.8.6 patchlevel 287 with ParseTree 3.0.3 is required."
-        puts "       Upgrade #{PARSER_RUBY} or set the environment variable"
-        puts "       RUBY186P287 to point to a ruby 1.8.6 patchlevel 287 executable."
-        exit 1
-      end
-    end
-  end
-
-  task :'startparser-debug' => :gemstone do
-    start_parser_debug
-  end
-
   task :stopserver => :gemstone do
     if server_running?
       stop_server
@@ -97,10 +71,6 @@ namespace :maglev do
     else
       puts "MagLev Server is not running."
     end
-  end
-
-  task :stopparser => :gemstone do
-    puts "No parser running on port #{PARSETREE_PORT}" unless stop_parser.nil?
   end
 
   # TODO: should this target also load an mcz and the primitives?

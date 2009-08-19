@@ -120,7 +120,7 @@ class MagLevStone < Stone
 
   def reload_prims
     # Prims can't be loaded without parser running
-    start_parser unless parser_running?
+    Parser.start
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
     input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
