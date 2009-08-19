@@ -10,6 +10,8 @@
 
 class Integer
 
+  class_primitive_nobridge '_from_string', 'fromString:'
+
   def coerce(param, &block)
     s = nil
     p = nil
@@ -274,5 +276,4 @@ class Integer
         self.chr._split_string(string, limit)
     end
 
-    # deleted _index_string
 end

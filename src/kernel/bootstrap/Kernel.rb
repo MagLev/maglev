@@ -19,8 +19,12 @@ module Kernel
     #end
   end
 
-  def load(name)
+  def load(name, wrap=false)
+    if wrap
+      raise ArgumentError , 'Kernel.load  , wrap==true not supported yet' # TODO
+    end
     RUBY.load(Type.coerce_to(name, String, :to_str))
+    true
   end
 
   def abort(string)
@@ -168,6 +172,49 @@ module Kernel
   end
 
   primitive 'global_variables', 'rubyGlobalVariables'
+
+  def gsub(regex, string)
+    string = Type.coerce_to(string, String, :to_str)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.gsub, caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    res = str.gsub(regex, string)
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def gsub(regex, &block)
+    # $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.gsub, caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    start = 0 
+    out = ''
+    str.get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
+      out << str._gsub_copyfrom_to(start, match.begin(0))
+      saveTilde = block._fetchRubyVcGlobal(0);
+      begin
+        block._setRubyVcGlobal(0, match);
+        out << block.call(match[0]).to_s
+      ensure
+        block._setRubyVcGlobal(0, saveTilde);
+      end
+      start = match.end(0)
+    end
+    out << str._copyfrom_to(start + 1, str.length)
+    out._storeRubyVcGlobal(0x21) # store into caller's $_
+    out
+  end
+
 
   # This implementation of include handles include from a main program
   primitive_nobridge '_include_module',  'includeRubyModule:'

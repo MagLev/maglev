@@ -204,15 +204,20 @@ class Regexp
 
  def __each_match(str, &block)
     # Private, does not store into callers $~
-    pos = 0
-    while(pos < str.length)
-      match = _search(str, pos, nil)
+    idx = 0
+    str_sz = str.length
+    while idx <= str_sz  # run to size+1  to match  // regex
+      match = _search(str, idx, nil)
       if match
+        block.call(match)
         pos = match.end(0)
-        if match.begin(0) == pos
+        if pos.equal?( match.begin(0) )
           pos += 1
+        end
+        if pos <= idx 
+          idx += 1
         else
-          block.call(match)
+          idx = pos
         end
       else
         return
@@ -302,27 +307,57 @@ class Regexp
   end
 
   def _index_string(string, offset)
-    # used by String index
+    # used by String#index only
     start = offset.equal?(nil) ? 0 : offset
     md = self._search(string, start, nil)
-    md._storeRubyVcGlobal(0x30)
+    md._storeRubyVcGlobal(0x40)
     return nil if md.equal?(nil)
     md.begin(0) 
   end
 
   def _rindex_string(string, offset)
-    md = self._search(string, offset, 0)
-    md._storeRubyVcGlobal(0x30)
-    if md.equal?(nil)
-      return  offset.equal?(0) ? 0 : nil 
+    res = nil
+    str_size = string.size
+    if @source.index('\G')._not_equal?(nil)
+      # We are giving wrong answers 
+      raise ArgumentError, ' \G not supported yet in String#rindex(regexp)'
+    end 
+    if offset >= str_size  
+      res_md = self._search(string, offset, 0) # search backwards
+      if res_md._not_equal?(nil)
+        res = res_md.begin(0)
+      end
+    else 
+      res_md = self._search(string, offset, str_size)  # forwards 
+      if res_md._not_equal?(nil) 
+        ofs = res_md.begin(0)
+        if ofs.equal?(offset)
+          res = ofs  # exact match at offset , use it
+        end
+      end
+      if res.equal?(nil)
+	ofs = 0
+	while ofs < offset  # loop forwards to find last match < offset
+	  md = self._search(string, ofs, str_size)
+	  if md.equal?(nil) 
+	    break
+	  end
+	  ofs = md.begin(0) 
+	  if ofs < offset 
+	    res = ofs 
+	    res_md = md
+	  end
+	  next_ofs = md.end(0)
+	  if next_ofs.equal?(ofs) 
+	    next_ofs += 1 
+	  end
+	  ofs = next_ofs
+	end
+      end
     end
-    md_begin_zero = md.begin(0)
-    return md_begin_zero if md[0].equal?(nil)
-    match_len = md.end(0) - md_begin_zero
-    if match_len.equal?(0) 
-      return md_begin_zero + 1 
-    end
-    md_begin_zero
+    res_md._storeRubyVcGlobal(0x40)
+if Gemstone.session_temp(:TrapRindex) ; nil.pause ; end
+    return res
   end
 
   # TODO: limit is not used....

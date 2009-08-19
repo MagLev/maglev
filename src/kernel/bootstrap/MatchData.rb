@@ -13,7 +13,7 @@ class MatchData
   end
 
   def to_s
-    self[0].to_s
+    self[0]
   end
 
   def begin(group)
@@ -45,7 +45,7 @@ class MatchData
   def pre_match
     res = @strPreceedingMatch
     if (res.equal?(nil))
-      res = @inputString[0..self.begin(0)-1]
+      res = @inputString[0, self.begin(0)]
       @strPreceedingMatch = res
     end
     res
@@ -98,7 +98,8 @@ class MatchData
     i = 0
     lim = self.size
     while i < lim
-      result << self[i] if block.call(self[i])
+      elem = self[i]
+      result << elem if block.call( elem )
       i += 1
     end
     result
@@ -108,13 +109,14 @@ class MatchData
   def _captures(ary)
     i = 1   # Captures do NOT include $& (the entire matched string)
     lim = length
+    in_str = @inputString
     while i < lim
       x = self.begin(i)
       if x == -1
         ary << nil
       else
         y = self.end(i)
-        ary << @inputString[x, y-x]  # GEMSTONE
+        ary << in_str[x, y-x]  # GEMSTONE
       end
       i += 1
     end

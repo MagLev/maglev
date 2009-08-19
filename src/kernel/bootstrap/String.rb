@@ -9,7 +9,7 @@ class String
 
   primitive 'size=', 'size:'
 
-  primitive_nobridge 'substring1', 'copyFrom:to:'
+  primitive_nobridge '_copyfrom_to', 'copyFrom:to:'
   primitive_nobridge '_findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '_md5sum', 'md5sum'
   primitive_nobridge '_remove_from_to', 'removeFrom:to:'
@@ -581,23 +581,32 @@ class String
   # <code>$&</code>, and <code>$'</code> will be set appropriately. The value
   # returned by the block will be substituted for the match on each call.
   #
-  # The result inherits any tainting in the original string or any supplied
-  # replacement string.
-  #
   #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
+
+  def  _gsub_copyfrom_to(from, match_start)
+    to = match_start # match_start is zero based
+    if to > (sz = self.size)
+      to = sz
+    end
+    self._copyfrom_to( from + 1 , to )
+  end
+
   def gsub(regex, str)
-    out = ""
-    start = 1
-    get_pattern(regex, true).__each_match(self) do |match|
-      out << substring1(start, match.begin(0))
+    str = Type.coerce_to(str, String, :to_str)
+    out = self.class.new
+    start = 0
+    pat = get_pattern(regex, true)
+    last_match = nil
+    pat.__each_match(self) do |match|
+      last_match = match
+      out << self._gsub_copyfrom_to(start, match.begin(0))
       out << str._to_sub_replacement(match)
-      start = match.end(0) + 1
+      start = match.end(0) 
     end
-    if start <= length
-      out << substring1(start, length)
-    end
+    out << self._copyfrom_to(start + 1, self.length)
+    last_match._storeRubyVcGlobal(0x20) # store into caller's $~ 
     out
   end
 
@@ -605,7 +614,7 @@ class String
   def _to_sub_replacement(match)
     index = 0
     result = ""
-    lim = size
+    lim = self.size
     while index < lim
       current = index
       while current < lim && self[current] != ?\\
@@ -621,21 +630,22 @@ class String
       end
       index = current + 1
 
-      result << case (cap = self[index])
-        when ?&
-          match[0]
-        when ?`
-          match.pre_match
-        when ?'
-          match.post_match
-        when ?+
-          match.captures.compact[-1].to_s
-        when ?0..?9
-          match[cap - ?0].to_s
-        when ?\\ # escaped backslash
-          '\\'
-        else     # unknown escape
-          '\\' << cap
+      cap = self[index]
+      if cap.equal?( ?& )
+          result << match[0]
+      elsif cap.equal?( ?` )
+          result << match.pre_match
+      elsif cap.equal?( ?' )
+          result << match.post_match
+      elsif cap.equal?( ?+ )
+          result << match.captures.compact[-1].to_s
+      elsif cap >= ?0 && cap <= ?9 
+          result << match[cap - ?0 ].to_s
+      elsif cap.equal?( ?\\ ) # escaped backslash
+          result << '\\'
+      else     # unknown escape
+          result << '\\' 
+          result << cap
       end
       index += 1
     end
@@ -643,12 +653,12 @@ class String
   end
 
   def _replace_match_with(match, replacement)
-    out = ""
-    out << self[0...(match.begin(0))]
+    out = self.class.new
+    out << self._gsub_copyfrom_to(0, match.begin(0) )
     unless replacement.equal?(nil)
       out << replacement._to_sub_replacement(match)
     end
-    out << ((self[(match.end(0))...length]) || "")
+    out << self._copyfrom_to(match.end(0) + 1, self.length)
     out
   end
 
@@ -656,10 +666,12 @@ class String
   def gsub(regex, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    start = 1
-    out = ''
+    start = 0
+    out = self.class.new
+    last_match = nil
     get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      out << substring1(start, match.begin(0))
+      last_match = match
+      out << self._gsub_copyfrom_to(start, match.begin(0))
       saveTilde = block._fetchRubyVcGlobal(0);
       begin
         block._setRubyVcGlobal(0, match);
@@ -667,11 +679,10 @@ class String
       ensure
         block._setRubyVcGlobal(0, saveTilde);
       end
-      start = match.end(0) + 1
+      start = match.end(0) 
     end
-    if start <= length
-      out << substring1(start, length)
-    end
+    out << self._copyfrom_to(start + 1, self.length)
+    last_match._storeRubyVcGlobal(0x20) # store into caller's $~ 
     out
   end
 
@@ -701,10 +712,10 @@ class String
   def gsub!(regex, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    start = 1
-    out = ''
+    start = 0
+    out = self.class.new
     get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      out << substring1(start, match.begin(0))
+      out << self._gsub_copyfrom_to(start, match.begin(0) )
       saveTilde = block._fetchRubyVcGlobal(0);
       begin
         block._setRubyVcGlobal(0, match);
@@ -712,11 +723,9 @@ class String
       ensure
         block._setRubyVcGlobal(0, saveTilde);
       end
-      start = match.end(0) + 1
+      start = match.end(0) 
     end
-    if start <= length
-      out << substring1(start, length)
-    end
+    out << self._copyfrom_to(start + 1, self.length)
     if self == out
       nil
     else
@@ -738,7 +747,7 @@ class String
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
     s = self._delete_underscore_strip
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
-    "16r#{$1}#{$3}"._to_i
+    Integer._from_string( "16r#{$1}#{$3}" )
   end
 
   def include?(item)
@@ -750,8 +759,24 @@ class String
 
   primitive_nobridge '_indexOfByte', 'indexOfByte:startingAt:'
 
-  def index(item, offset=0)
+  def index(item, offset)
     zoffset = Type.coerce_to(offset, Integer, :to_int)
+    self._index(item, zoffset)
+  end
+
+  def index(item)
+    # code other variants explicitly so num frames from _index_string
+    #   to caller will be constant
+    self._index(item, 0)
+  end
+  def index(item, &block)
+    self._index(item, 0)
+  end
+  def index(item, offset, &block)
+    self._index(item, offset)
+  end
+
+  def _index(item, zoffset)
     my_size = self.size
     zoffset += my_size if zoffset < 0
     return nil if zoffset < 0 || zoffset > my_size
@@ -801,9 +826,9 @@ class String
 
   primitive 'length', 'size'
 
-  primitive 'lstrip', 'trimLeadingSeparators'
+  primitive 'lstrip', '_rubyLstrip'
 
-  primitive 'lstrip!', '_removeLeadingSeparators' # in .mcz
+  primitive 'lstrip!', '_rubyLstripInPlace' # in .mcz
 
   def match(pattern)
     if pattern._isRegexp
@@ -824,8 +849,13 @@ class String
   # MNI: next!
 
   def oct
-    base, s = self.extract_base(8)
-    "#{base}r#{s}"._to_i
+    arr = self.extract_base(8)
+    base = arr[0]
+    str = arr[1]
+    s = base.to_s
+    s << ?r 
+    s << str
+    Integer._from_string(s)
   end
 
   primitive 'replace', '_rubyReplace:'
@@ -845,24 +875,39 @@ class String
   # character or pattern in self.  Returns nil if not found.  If the second
   # parameter is present, it specifies the position in the string to end
   # the search -- characters beyond this point will not be considered.
-  def rindex(item, original_offset=Undefined)
+
+  def rindex(item, original_offset)
+    _rindex(item, original_offset)
+  end
+  def rindex(item)
+    # code other variants explicitly so num frames from _rindex_string
+    #   to caller will be constant
+    _rindex(item, Undefined)
+  end
+  def rindex(item, &block)
+    _rindex(item, Undefined)
+  end
+  def rindex(item, original_offset, &block)
+    _rindex(item, original_offset)
+  end
+
+  def _rindex(item, original_offset)
     my_size = self.size
     if my_size.equal?(0)
       return nil
     end
     if original_offset.equal?(Undefined)
       was_undef = true
-      zoffset = my_size.equal?(0) ? 0 : my_size - 1
-      zorig = zoffset
+      zoffset = my_size.equal?(0) ? 0 : my_size 
     else
       zoffset = Type.coerce_to(original_offset, Integer, :to_int)
       zoffset += my_size if zoffset < 0
-      zorig = zoffset
-      zoffset = my_size - 1 if zoffset >= my_size
     end
     return nil if zoffset < 0
 
     if item._isString
+      zorig = zoffset
+      zoffset = my_size - 1 if zoffset >= my_size
       if item.size.equal?(0)
         if was_undef
           return my_size
@@ -876,9 +921,11 @@ class String
       return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
+      zoffset = my_size - 1 if zoffset >= my_size
       st_idx = self._indexOfLastByte(item % 256 , zoffset + 1)
       return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
+      zoffset = my_size  if zoffset > my_size  # allow searching for end of string
       zidx = item._rindex_string(self, zoffset)
       return zidx
     else
@@ -887,8 +934,8 @@ class String
     end
   end
 
-  primitive 'rstrip', 'trimTrailingSeparators'
-  primitive 'rstrip!', '_removeTrailingSeparators'  # in .mcz
+  primitive 'rstrip', '_rubyRstrip'
+  primitive 'rstrip!', '_rubyRstripInPlace'  # in .mcz
 
   # def scan #  implemented in common/string.rb
 
@@ -1107,12 +1154,11 @@ class String
 
     # If pattern is a string, then do NOT interpret regex special characters.
     # stores into caller's $~
-    r = if match = regex._match_vcglobals(self, 0x30)
+    r = if (match = regex._match_vcglobals(self, 0x30))
           _replace_match_with(match, replacement)
         else
           dup
         end
-    r = self.class.new(r) unless self._isString
     # r.taint if replacement.tainted? || self.tainted?
     r
   end
@@ -1121,18 +1167,15 @@ class String
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
     regex = _get_pattern(pattern, true)
-    r = if match = regex._match_vcglobals(self, 0x30)
-          _replace_match_with(match, block.call(match).to_s)
-        else
-          dup
-        end
-    r = self.class.new(r) unless self._isString
-    # r.taint if self.tainted? || pattern.tainted?
-    r
+    if (match = regex._match_vcglobals(self, 0x30))
+       res = _replace_match_with(match, block.call(match[0]).to_s)
+     else
+       res = self.dup
+     end
+    res
   end
 
   def sub!(pattern, replacement)
-    raise TypeError, "sub!: can't modify frozen string" if frozen?
 
     regex = _get_pattern(pattern, true)
     # stores into caller's $~
@@ -1148,11 +1191,10 @@ class String
   def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    raise TypeError, "sub!: can't modify frozen string" if frozen?
 
     regex = _get_pattern(pattern, true)
     if match = regex._match_vcglobals(self, 0x30)
-      replacement = block.call(match)
+      replacement = block.call(match[0])
       replace(_replace_match_with(match, replacement))
       # self.taint if replacement.tainted?
       self
@@ -1260,9 +1302,9 @@ class String
         end
         str = self[2, self.size - 2]
       end
-      radix_str = '10r'
+      radix_str = '10r'   # needed for ruby to_i semantics of 'abc'.to_i
       radix_str << str._delete_underscore_strip
-      radix_str._to_i
+      Integer._from_string(radix_str)
     else
       raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
       exp_prefix = nil
@@ -1287,17 +1329,46 @@ class String
     end
   end
 
-  primitive_nobridge '_to_i', 'asInteger'
-
   # Consider self as an integer and return value given base.
   # This is the rubinius API, but we don't care about the check param
   def to_inum(base, check=false)
-    if base.equal?(0)
-      base, s = self.extract_base
-    else
-      s = self._delete_underscore_strip
+    if check && self['__']._not_equal?(nil)
+      raise ArgumentError, "__ in string, in to_inum"
     end
-    "#{base}r#{s}"._to_i
+    if base.equal?(0)
+      arr = self.extract_base # includes  _delete_underscore_strip
+      base = arr[0]
+      str = arr[1]
+    else
+      str = self._delete_underscore_strip
+    end
+    if check
+      str = str.downcase
+      s = str
+      first_ch = s[0]
+      if first_ch.equal?( ?+ ) || first_ch.equal?( ?- )
+        s = s[1, s.length-1]
+      end
+      bad = false
+      if base.equal?(10)
+        bad =  s =~ /[^0-9]/ 
+      elsif base.equal?(8)
+        bad =  s =~ /[^0-6]/
+      elsif base.equal?(16)
+        bad =  s =~ /[^0123456789abcdef]/
+      elsif base.equal?(2)
+        bad =  s =~ /[^01]/
+      else
+        raise ArgumentError, "to_inum, unsupported base #{base} " 
+      end
+      if bad
+        raise ArgumentError, "to_inum, illegal character for base #{base} in #{self.inspect}"
+      end
+    end
+    s = base.to_s
+    s << ?r 
+    s << str
+    Integer._from_string(s)
   end
 
   # Return an array of two elements: [an_int, a_string], where an_int is
@@ -1311,6 +1382,7 @@ class String
   # "-1010".extract_base(16)   => [16, "-1010"]
   MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 }
   MAGLEV_EXTRACT_BASE_TABLE.freeze
+
   def extract_base(base=10)
     s = self._delete_underscore_strip
     s =~ /^([+-]?)(0[bdox]?)?(.*)/i
