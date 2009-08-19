@@ -8,6 +8,7 @@
 # So many GemStone/S 64 processes depend on the environment variables, we
 # just make these global.
 MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("..", File.dirname(__FILE__))
+STONENAME = ENV['STONENAME'] ||= "maglev"
 
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
 GEMSTONE = ENV['GEMSTONE'] || "#{MAGLEV_HOME}/gemstone"
@@ -23,8 +24,8 @@ IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
 if ENV['GEMSTONE'].nil? or ENV['GEMSTONE'].empty?
   ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
   ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
-  ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/maglev"
-  ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/maglev/maglev.log"
+  ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/#{STONENAME}"
+  ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/#{STONENAME}/#{STONENAME}.log"
   ENV['GEMSTONE']            = GEMSTONE
 end
 
@@ -109,10 +110,10 @@ end
 # if server is already started.
 def start_server
   sh %{
-    ${GEMSTONE}/bin/startstone maglev >/dev/null 2>&1
-    ${GEMSTONE}/bin/waitstone maglev >/dev/null 2>&1
+    ${GEMSTONE}/bin/startstone #{STONENAME} >/dev/null 2>&1
+    ${GEMSTONE}/bin/waitstone #{STONENAME} >/dev/null 2>&1
   } do |ok, status|
-    puts "GemStone server maglev started" if ok
+    puts "GemStone server #{STONENAME} started" if ok
     ok
   end
 end
@@ -121,10 +122,10 @@ end
 # Does no checking if server is already started.
 def start_server_debug
   sh %{
-    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf maglev
-    ${GEMSTONE}/bin/waitstone maglev &>/dev/null
+    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf #{STONENAME}
+    ${GEMSTONE}/bin/waitstone #{STONENAME} &>/dev/null
   } do |ok, status|
-    puts "GemStone server maglev started in verbose mode" if ok
+    puts "GemStone server #{STONENAME} started in verbose mode" if ok
     ok
   end
 end
@@ -133,10 +134,10 @@ end
 # startstone).  Does no checking if server is already started.
 def start_server_bench
   sh %{
-    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf maglev >/dev/null 2>&1
-    ${GEMSTONE}/bin/waitstone maglev >/dev/null 2>&1
+    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf #{STONENAME} >/dev/null 2>&1
+    ${GEMSTONE}/bin/waitstone #{STONENAME} >/dev/null 2>&1
   } do |ok, status|
-    puts "GemStone server maglev started with performance optimizations" if ok
+    puts "GemStone server #{STONENAME} started with performance optimizations" if ok
     ok
   end
 end
@@ -177,7 +178,7 @@ end
 
 def stop_server
   sh %{
-    ${GEMSTONE}/bin/stopstone maglev DataCurator swordfish -i >/dev/null 2>&1
+    ${GEMSTONE}/bin/stopstone #{STONENAME} DataCurator swordfish -i >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server stopped." if ok
     ok
