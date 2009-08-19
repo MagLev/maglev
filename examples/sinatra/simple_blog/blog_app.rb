@@ -80,7 +80,7 @@ get '/posts' do
   s = "<h3>Sample Blog App running on Sinatra #{Sinatra::VERSION}</h3>"
   s << "<p>Here are the #{posts.size} blog posts</p><ul>"
   posts.each do |p|
-    s << "<li>[#{p.id}]: #{p.title}</li>" if p
+    s << "<li><a href=\"/post/#{p.id}\">#{p.title}</a></li>" if p
   end
   s << "</ul>" << nav_bar
 end
