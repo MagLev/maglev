@@ -254,6 +254,11 @@ class RpStringScanner
     CTYPES_ARR[ ch ].equal?(CTYPE_UC_ALPHA)
   end
 
+  def ch_is_alpha(ch)
+    v = CTYPES_ARR[ ch ]
+    v.equal?( CTYPE_UC_ALPHA ) || v.equal?( CTYPE_LC_ALPHA )
+  end
+
   def self.ch_is_uc_alpha(ch)
     CTYPES_ARR[ ch ].equal?(CTYPE_UC_ALPHA)
   end

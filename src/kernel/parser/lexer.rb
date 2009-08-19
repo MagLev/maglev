@@ -333,27 +333,36 @@ class RubyLexer
     end   
 
     if ch.equal?( ?0 ) 
-      if src.check_advance(/0[xbd]\b/) then
-        rb_compile_error "Invalid numeric format"
-      elsif (s_matched = src.scan(/0x[a-f0-9_]+/i)) then
-        int_with_base(16, s_matched, sign)
-      elsif (s_matched = src.scan(/0b[01_]+/)) then
-        int_with_base(2, s_matched, sign)
-      elsif (s_matched = src.scan(/0d[0-9_]+/)) then
-        int_with_base(10, s_matched, sign)
-      elsif src.check_advance(/0(o|O)?[0-7_]*[89]/) then
-        rb_compile_error "Illegal octal digit."
-      elsif (s_matched = src.scan(/0(o|O)[0-7_]+/))
-        int_with_base(8, s_matched, sign)
-      elsif src.check_advance(/0(o|O)/) then
-        int_with_base(8, "0o0", sign)
+      next_ch = src.peek_ahead(1)
+      if src.ch_is_alpha( next_ch) 
+        if src.check_advance(/0[xbd]\b/) then
+          rb_compile_error "Invalid numeric format"
+        elsif (s_matched = src.scan(/0x[a-f0-9_]+/i)) then
+          int_with_base(16, s_matched, sign)
+        elsif (s_matched = src.scan(/0b[01_]+/)) then
+          int_with_base(2, s_matched, sign)
+        elsif (s_matched = src.scan(/0d[0-9_]+/)) then
+          int_with_base(10, s_matched, sign)
+        elsif src.check_advance(/0(o|O)?[0-7_]*[89]/) then
+          rb_compile_error "Illegal octal digit."
+        elsif (s_matched = src.scan(/0(o|O)[0-7_]+/))
+          int_with_base(8, s_matched, sign)
+        elsif src.check_advance(/0(o|O)/) then
+          int_with_base(8, "0o0", sign)
+        elsif (s_matched = src.scan(/[\d_]+\.[\d_]+(e[+-]?[\d_]+)?\b|[+-]?[\d_]+e[+-]?[\d_]+\b/i)) then
+          float_lit(s_matched, sign )
+        else
+          rb_compile_error "Bad number format"
+        end
+      elsif next_ch._not_equal?( ?. ) && (s_matched = src.scan(/0\b/)) then
+        int_base10(s_matched, sign)   # common case of integer literal zero
       elsif (s_matched = src.scan(/0[0-7_]+/)) then
         int_with_base(8, "0o" << s_matched, sign)
       elsif src.check_advance(/[\d_]+_(e|\.)/) then
         rb_compile_error "Trailing '_' in number."
       elsif (s_matched = src.scan(/[\d_]+\.[\d_]+(e[+-]?[\d_]+)?\b|[+-]?[\d_]+e[+-]?[\d_]+\b/i)) then
         float_lit(s_matched, sign )
-      elsif  (s_matched = src.scan(/0\b/)) then
+      elsif (s_matched = src.scan(/0\b/)) then
         int_base10(s_matched, sign)
       else
         rb_compile_error "Bad number format"
