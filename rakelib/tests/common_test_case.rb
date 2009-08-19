@@ -32,8 +32,8 @@ class BaseTestCase < Test::Unit::TestCase
     # This is an abstract test case
   end
 
-#  def teardown
-#    clear_stone(TEST_STONE_NAME)
-#  end
+  def teardown
+    clear_stone(TEST_STONE_NAME)
+  end
 
 end
