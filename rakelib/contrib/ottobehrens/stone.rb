@@ -239,7 +239,7 @@ class Stone
     Topaz.new(self).commands(commands)
   end
 
-  private 
+  private
 
   def log_command_line(command_line)
     File.open(command_logfile, "a") { |file| file.puts "SHELL_CMD #{Date.today.strftime('%F %T')}: #{command_line}" }

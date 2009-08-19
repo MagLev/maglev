@@ -81,8 +81,8 @@ namespace :stone do
   end
 end
 
-def task_gemstone(stone, action)
-  desc "#{action.to_s} #{stone.name}"
+def task_gemstone(stone, action, desc=nil)
+  desc "#{desc.nil? ? action.to_s : desc} #{stone.name}"
   task action do
     stone.send(action)
   end
@@ -91,10 +91,15 @@ end
 GemStoneInstallation.current.stones.each do |stone_name|
   namespace stone_name do
     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
-
-    [:start, :stop, :restart, :status, :reload, :take_snapshot, :restore_snapshot,
-      :reset_ruby_context].each do |action|
-      task_gemstone(stone, action)
+    [[:start,            "Start the stone"],
+     [:stop,             "Stop the stone"],
+     [:restart,          "Stop then start the stone"],
+     [:status,           "Report status of stone"],
+     [:reload,           "Destroy then create the stone"],
+     [:take_snapshot,    "Make a backup of the stone"],
+     [:restore_snapshot, "Restore the stone from the previous snapshot"]
+    ].each do |action,desc|
+      task_gemstone(stone, action, desc)
     end
   end
 end

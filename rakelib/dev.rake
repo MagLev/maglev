@@ -126,3 +126,15 @@ EOF
     cp "/Users/pmclain/GemStone/dev/maglev-gem", "bin"
   end
 end
+
+# These are dev specific tasks we want on a per stone basis
+GemStoneInstallation.current.stones.each do |stone_name|
+  namespace stone_name do
+    stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
+
+    [[:reload_prims, "Reset the ruby context, then reload primitives on stone."]
+    ].each do |action, desc|
+      task_gemstone(stone, action, desc)
+    end
+  end
+end
