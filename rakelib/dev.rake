@@ -88,7 +88,7 @@ EOF
     end
   end
 
-  desc 'Run p-tests on gs64stone'
+  desc 'Run p-tests on maglev'
   task :'quick-p-tests' do
     run_ptests
   end
@@ -119,7 +119,7 @@ EOF
     run_topaz tc_load_native_parser
   end
 
-  desc "Clear out the old ruby gems and install a new version"
+  desc "Clear out the old rubygems and install a new version"
   task :'new-gems' => 'dev:clean-gems' do
     cd('src/external/rubygems-1.3.5') do
       sh "maglev-ruby ./setup.rb --no-rdoc --no-ri"
@@ -158,7 +158,7 @@ GemStoneInstallation.current.stones.each do |stone_name|
   namespace stone_name do
     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
 
-    [[:reload_prims, "Reset the ruby context, then reload primitives on stone."]
+    [[:reload_prims, "Reset the ruby context in \"#{stone_name}\" then reload primitives"]
     ].each do |action, desc|
       task_gemstone(stone, action, desc)
     end

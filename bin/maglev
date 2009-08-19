@@ -49,7 +49,7 @@ if [ -z "$PARSETREE_PORT" ]; then
 fi
 #
 if [ -z "$STONENAME" ]; then
-	STONENAME=gs64stone
+	STONENAME=maglev
 fi
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME

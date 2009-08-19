@@ -126,7 +126,7 @@ class MagLevStone < Stone
     input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
   end
 
-  def prims_loaded?(name='gs64stone')
+  def prims_loaded?(name='maglev')
     begin
       cmds = ["output append #{topaz_logfile}",
               "set u DataCurator p swordfish gemstone #{name}",

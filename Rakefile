@@ -51,52 +51,52 @@ task :startnetldi do
   GemStoneInstallation.current.startnetldi
 end
 namespace :stone do
-  desc "List MagLev stones managed by this Rakefile"
+  desc "List MagLev servers managed by this Rakefile"
   task :list do
     puts GemStoneInstallation.current.stones.join("\n")
   end
 
-  desc "Create a new stone"
-  task :create, :stone_name do |t, args|
-    raise ArgumentError, "Task #{t.name} requires a stone name" unless args.stone_name
-    puts "Creating #{args.stone_name}"
-    MagLevStone.create(args.stone_name)
+  desc "Create a new MagLev server and repository"
+  task :create, :server_name do |t, args|
+    raise ArgumentError, "Task #{t.name} requires a new server name" unless args.server_name
+    puts "Creating #{args.server_name}"
+    MagLevStone.create(args.server_name)
   end
 
-  desc "Destroy a stone"
-  task :destroy, :stone_name do |t, args|
-    raise ArgumentError, "Task #{t.name} requires a stone name" unless args.stone_name
-    puts "Destroying #{args.stone_name}"
-    s = Stone.existing(args.stone_name)
+  desc "Destroy an existing MagLev server and repository"
+  task :destroy, :server_name do |t, args|
+    raise ArgumentError, "Task #{t.name} requires an existing server name" unless args.server_name
+    puts "Destroying #{args.server_name}"
+    s = Stone.existing(args.server_name)
     s.stop
     s.destroy!
   end
 
-  desc "Invoke a task on all stones"
+  desc "Invoke a task on all MagLev servers"
   task :all, :task_name do |t,args|
-    GemStoneInstallation.current.stones.each do |stone_name|
-      Rake::Task["#{stone_name}:#{args.task_name}"].invoke
+    GemStoneInstallation.current.stones.each do |server_name|
+      Rake::Task["#{server_name}:#{args.task_name}"].invoke
     end
   end
 end
 
 def task_gemstone(stone, action, desc=nil)
-  desc "#{desc.nil? ? action.to_s : desc} #{stone.name}"
+  desc "#{desc.nil? ? action.to_s : desc}"
   task action do
     stone.send(action)
   end
 end
 
-GemStoneInstallation.current.stones.each do |stone_name|
-  namespace stone_name do
-    stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
-    [[:start,            "Start the stone"],
-     [:stop,             "Stop the stone"],
-     [:restart,          "Stop then start the stone"],
-     [:status,           "Report status of stone"],
-     [:reload,           "Destroy then create the stone"],
-     [:take_snapshot,    "Make a backup of the stone"],
-     [:restore_snapshot, "Restore the stone from the previous snapshot"]
+GemStoneInstallation.current.stones.each do |server_name|
+  namespace server_name do
+    stone = MagLevStone.new(server_name, GemStoneInstallation.current)
+    [[:start,            "Start the \"#{server_name}\" server"],
+     [:stop,             "Stop the \"#{server_name}\" server"],
+     [:restart,          "Stop then start the \"#{server_name}\" server"],
+     [:status,           "Report status of the \"#{server_name}\" server"],
+     [:reload,           "Destroy the \"#{server_name}\" repository then load a fresh one"],
+     [:take_snapshot,    "Stop the \"#{server_name}\" server then make a backup copy of its repository"],
+     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
     ].each do |action,desc|
       task_gemstone(stone, action, desc)
     end

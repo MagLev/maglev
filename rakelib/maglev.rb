@@ -23,8 +23,8 @@ IRB_CMD = "$GEMSTONE/bin/topaz -q -I $MAGLEV_HOME/etc/.irbdebugini -l "
 if ENV['GEMSTONE'].nil? or ENV['GEMSTONE'].empty?
   ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
   ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
-  ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/gs64stone"
-  ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/gs64stone/gs64stone.log"
+  ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/maglev"
+  ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/maglev/maglev.log"
   ENV['GEMSTONE']            = GEMSTONE
 end
 
@@ -109,10 +109,10 @@ end
 # if server is already started.
 def start_server
   sh %{
-    ${GEMSTONE}/bin/startstone gs64stone >/dev/null 2>&1
-    ${GEMSTONE}/bin/waitstone gs64stone >/dev/null 2>&1
+    ${GEMSTONE}/bin/startstone maglev >/dev/null 2>&1
+    ${GEMSTONE}/bin/waitstone maglev >/dev/null 2>&1
   } do |ok, status|
-    puts "GemStone server gs64stone started" if ok
+    puts "GemStone server maglev started" if ok
     ok
   end
 end
@@ -121,10 +121,10 @@ end
 # Does no checking if server is already started.
 def start_server_debug
   sh %{
-    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf gs64stone
-    ${GEMSTONE}/bin/waitstone gs64stone &>/dev/null
+    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-debug.conf maglev
+    ${GEMSTONE}/bin/waitstone maglev &>/dev/null
   } do |ok, status|
-    puts "GemStone server gs64stone started in verbose mode" if ok
+    puts "GemStone server maglev started in verbose mode" if ok
     ok
   end
 end
@@ -133,10 +133,10 @@ end
 # startstone).  Does no checking if server is already started.
 def start_server_bench
   sh %{
-    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf gs64stone >/dev/null 2>&1
-    ${GEMSTONE}/bin/waitstone gs64stone >/dev/null 2>&1
+    ${GEMSTONE}/bin/startstone  -z ${MAGLEV_HOME}/etc/system-benchmark.conf maglev >/dev/null 2>&1
+    ${GEMSTONE}/bin/waitstone maglev >/dev/null 2>&1
   } do |ok, status|
-    puts "GemStone server gs64stone started with performance optimizations" if ok
+    puts "GemStone server maglev started with performance optimizations" if ok
     ok
   end
 end
@@ -177,7 +177,7 @@ end
 
 def stop_server
   sh %{
-    ${GEMSTONE}/bin/stopstone gs64stone DataCurator swordfish -i >/dev/null 2>&1
+    ${GEMSTONE}/bin/stopstone maglev DataCurator swordfish -i >/dev/null 2>&1
   } do |ok, status|
     puts "GemStone server stopped." if ok
     ok
