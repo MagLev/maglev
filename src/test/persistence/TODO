@@ -1,0 +1,14 @@
+
+* Make GStore work, per persistence-api
+* Check that Class.persistable=(true/false) works
+* Check Class#maglev_persistable= and Class#maglev_persistable?
+* Committing objects of non-persistable classes raises an exception
+* Write test cases for all of the use case examples in the persistance-api
+  doc.
+* Should removing a method from a persistent class in transient mode raise
+  an exception (the current behavior)?
+
+
+* Call Maglev.persistent(persistable_instances=false) do ... end
+* Tests with both transient and persistent classes getting defined and
+  committed in lots of interleavings

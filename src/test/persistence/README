@@ -1,0 +1,42 @@
+This directory contains tests for the MagLev persistence API.
+
+The easiest way to run these tests is from rake:
+
+  $ cd $MAGLEV_HOME
+  $ rake dev:p-tests
+
+The rake task creates a new stone, then it runs each of the following
+files in a fresh VM, and then destorys the test stone:
+
+  persistence_tests.rb    # Define tests in VM 1
+  run_tests.rb            # run all of the test_* methods in VM 2
+  run_checks.rb           # run all of the check_* methods in VM 3
+
+persistence_tests.rb
+  This file defines the test cases.  Each test case is split into two
+  methods:
+
+     def test_001
+       ...
+     end
+
+     def check_001
+       ...
+     end
+
+  The test_* methods will all be run, in order by run_tests.rb.  The test_*
+  methods typically write or delete objects from the persistent store,
+  which will later be checked from a different VM when run_checks.rb runs.
+
+  The check_* methods check the outcome of the corresponding test_* method,
+  but in a new VM.
+
+run_tests.rb
+  Run all of the test_* methods defined in persistence_tests.rb
+
+run_checks.rb
+  Run all of the check_* methods defined in persistence_tests.rb
+
+Since it is illegal to do certain operations from within a method
+definition, many of the test_* methods simply require a file that does all
+of the class definitions etc.  These files are named t*.rb.
