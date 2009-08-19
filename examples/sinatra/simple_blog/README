@@ -1,0 +1,41 @@
+== Simple Sinatra Blog App for MagLev
+
+This is a very simple blog app that uses Maglev persistence.
+
+=== Files
+
+* README  This file
+* blog.rb  The persistent, business classes for the app.  This code is run
+  once only.
+* blog_app.rb The Sinatra app
+* dumpdb.rb  Script that prints the contents of the db to stdout (debugging)
+* txn_wrapper.rb  Rack middleware used by <tt>blog_app.rb</tt> to wrap a
+  transaction around each HTTP request.
+
+=== To Run
+
+The app is split into a persistent part, <tt>blog.rb</tt>, and the sinatra
+driver app, <tt>blog_app.rb</tt>.  You need to load <tt>blog.rb</tt> once,
+which will define and persist the classes needed for the app, and then run
+<tt>blog_app.rb</tt> to fire up Sinatra:
+
+  $ maglev-ruby blog.rb  # only needs to be done once for a repository
+
+  $ maglev-ruby blog     # run everytime you want to start the app
+
+Then hit http://localhost:4567/
+
+=== Issues
+
+* Need better separation of model helpers and business objects.  Some of
+  the lightweight Ruby ORM solutions (DataMapper, Sequel) provide nice
+  features needed by any app.  We need some help here.
+
+=== TODO
+
+TODO for the sinatra app
+
+* Get persistence of sinatra and rack working (autoload persistence)
+* Get a template engine working
+* Try using shotgun for dev time file reloading (or Rack::Reloader)
+* Get sessions working
