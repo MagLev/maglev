@@ -1,3 +1,5 @@
+=== Note: The MagLev Parse Server is no longer used by default. The problems below can only occur if you are working on MagLev primitives or the native MagLev parser.
+
 === MagLev Parse Server not running
 
 If 'maglev status' tells you "MagLev Parse Server is not running on port 2001"
@@ -22,6 +24,7 @@ You can check which version you have installed with:
   gem list --local
 
 === Using a different default MRI version
+
 If the current MRI version on your machine is not 1.8.6 patchlevel 287, you have two options for running MagLev 
 
 1. Upgrade the default MRI installation to 1.8.6 patchlevel 287
@@ -29,6 +32,7 @@ If the current MRI version on your machine is not 1.8.6 patchlevel 287, you have
 
 === lsof
 
-'maglev status' uses the lsof command to see if the parse server
-is running. If you do not have lsof installed, or cannot run it,
-uncomment the equivalent netstat command in $MAGLEV_HOME/bin/maglev.
+'maglev status' uses the lsof command to see if the parse server is running.
+If you do not have lsof installed, or cannot run it, uncomment the equivalent
+netstat command in $MAGLEV_HOME/bin/maglev.
+

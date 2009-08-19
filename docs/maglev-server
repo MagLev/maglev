@@ -4,7 +4,7 @@ The MagLev Server is a collection of system processes that manage the
 repository, MagLev's built-in database of objects. The MagLev Server
 needs to be running before you can run Ruby code with MagLev.  Once
 the server is running, many individual MagLev Virtual Machines (VM)
-connect to the server and share the pool of objects.
+can connect to the server and share the pool of objects.
 
 
 === Start, Stop and Check Status of the MagLev Server
@@ -22,26 +22,15 @@ To check if a server is running, run <tt>rake maglev:status</tt>, or simply,
 
 If the server is not running, you'll see output like:
 
-  (in /Users/pmclain/projects/MagLev-20645.MacOSX)
-  GemStone server not running.
-  MagLev Parse Server is not running on port 2001
+  (in /congo1/users/monty/MagLev/MagLev-22152.Linux)
+  maglev not running
 
 If a server is running, you'll see output like:
 
-  (in /Users/pmclain/projects/MagLev-20645.MacOSX)
-
-  MAGLEV_HOME = /Users/pmclain/projects/MagLev-20645.MacOSX
+  (in /congo1/users/monty/MagLev/MagLev-22152.Linux)
   Status  Version    Owner    Pid   Port   Started     Type  Name
   ------ --------- --------- ----- ----- ------------ ------ ----
-    OK   3.0.0     pmclain   38889 50377 Dec 08 13:21 Netldi gs64ldi
-    OK   3.0.0     pmclain   38892 60165 Dec 08 13:21 Stone  gs64stone
-    OK   3.0.0     pmclain   38893 60157 Dec 08 13:21 cache  gs64stone@cairo.gemstone.com
-
-  MagLev Parse Server port = 2001
-  COMMAND   PID    USER   FD   TYPE    DEVICE SIZE/OFF NODE NAME
-  ruby    38918 pmclain    3u  IPv6 0x3c524bc      0t0  TCP *:2001 (LISTEN)
-  ruby    38918 pmclain    4u  IPv4 0x6d63e64      0t0  TCP *:2001 (LISTEN)
-
+    OK   3.0.0     monty     26354 33413 Aug 19 11:32 Stone  maglev
 
 ==== Starting the MagLev Server
 
@@ -56,9 +45,6 @@ To stop the MagLev Server:
 
    $ cd $MAGLEV_HOME
    $ rake maglev:stop
-   (in /Users/pmclain/projects/MagLev-20645.MacOSX)
-   GemStone server stopped.
-
 
 ==== Legacy <tt>$MAGLEV_HOME/bin/maglev</tt> script.
 
@@ -70,19 +56,22 @@ is that you do not have to cd to $MAGLEV_HOME to run <tt>maglev start</tt>,
 <tt>maglev stop</tt>, <tt>maglev status</tt>, etc.
 
 === <tt>maglev</tt>:  Control the MagLev system
-  Usage: maglev {start|start-debug|start-bench|stop|restart|status|topaz|topaz-debug|
-                 squeak|force-reload|version|help}
 
+  Usage: 
+  maglev {start|start-debug|start-bench|stop|restart|status|topaz|topaz-debug|
+          squeak|force-reload|version|help}
+  
   To control the MagLev server:
   maglev start          - Start MagLev server processes
   maglev start-debug    - Start MagLev server processes with verbose output
   maglev start-bench    - Start MagLev server with performance optimizations
-  maglev start-parser   - Force parser process to start if it's dead
   maglev stop           - Stop MagLev server processes
   maglev restart        - Restart MagLev server processes
   maglev status         - Display MagLev server status
   maglev version        - Display MagLev version number
   maglev force-reload   - Stop MagLev server, replace with empty repository!!!
+  maglev start-parser   - Start ParseTree based parser (deprecated)
+  maglev stop-parser    - Stop ParseTree based parser (deprecated)
   
   To execute other maglev commands:
   maglev topaz          - Enter a Topaz shell
@@ -90,3 +79,4 @@ is that you do not have to cd to $MAGLEV_HOME to run <tt>maglev start</tt>,
   maglev squeak         - Start optional Squeak development environment
   maglev vsd            - Start Visual Statistics Display monitoring tool
   maglev help           - Display this text
+  

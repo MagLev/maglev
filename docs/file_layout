@@ -4,20 +4,19 @@
     |
     + benchmarks    # Benchmarks from the Ruby Benchmark Suite project
     |
-    + bin           # MagLev shell scripts to run MagLev, the parse server and
-    |               # start the Gemstone VM
+    + bin           # MagLev executable scripts
     |
     + data          # The MagLev repository files
     |
     + docs          # Rdoc formatted documentation files
     |
-    + etc           # Misc config files used by topaz; demo key to unlock VM
+    + etc           # Misc config files used by topaz; demo key to run GemStone VM
     |
     + examples      # Example Ruby scripts to run under MagLev
     |
     + gci           # Some GemStone C interface files
     |
-    + gemstone      # The GemStone/Smalltalk executables, libraries, etc.
+    + gemstone      # A link to the GemStone/Smalltalk executables, libraries, etc.
     |
     + html          # created by "rake rdoc"; holds html versions of rdoc files
     |
@@ -39,9 +38,9 @@
     |
     + spec
     |  |
-    |  + mspec      # Git submodule holding a recent version of MSpec
+    |  + mspec      # Git submodule containing a recent version of MSpec
     |  |
-    |  + rubyspec   # Git submodule holding a recent version of RubySpec files
+    |  + rubyspec   # Git submodule containing a recent version of RubySpec files
     |
     + src           # MagLev Ruby source and libs
     |
