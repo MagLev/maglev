@@ -6,17 +6,6 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  desc "Reload kernel.rb (primitives) and commit it.  Starts MRI parser for prims if needed."
-  # Still requires old MRI parser for bootstrapping the prims...
-  task :reloadprims => ['maglev:start', 'maglev:startparser'] do
-    puts "=== reload primitives"
-    sh %{
-      #{TOPAZ_CMD} <<EOF
-input #{GEMSTONE}/upgrade/ruby/allprims.topaz
-EOF
-    }
-  end
-
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
 
@@ -124,6 +113,31 @@ EOF
       sh "maglev-ruby ./setup.rb --no-rdoc --no-ri"
     end
     cp "/Users/pmclain/GemStone/dev/maglev-gem", "bin"
+  end
+
+  desc "Start the ParseTree based parser (deprecated)"
+  task :startparser => :gemstone do
+    if Parser.running?
+      puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
+    else
+      Parser.start
+    end
+  end
+
+  desc "Stop the ParseTree based parser (deprecated)"
+  task :stopparser => :gemstone do
+    puts "No parser running on port #{PARSETREE_PORT}" unless Parser.stop.nil?
+  end
+
+
+  desc "Run topaz (use rlwrap, if available)"
+  task :topaz => :gemstone do
+    sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
+  end
+
+  desc "Run debug topaz (use rlwrap, if available)"
+  task :'topaz-debug' => :gemstone do
+    sh %{ `which rlwrap 2> /dev/null` #{TOPAZDEBUG_CMD} }
   end
 end
 

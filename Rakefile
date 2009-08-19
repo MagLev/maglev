@@ -2,7 +2,8 @@
 
 require 'rake/clean'
 require 'rake/rdoctask'
-require 'rakelib/maglev.rb'
+require 'rakelib/maglev'
+require 'rakelib/parser'
 
 require 'rakelib/maglev_stone.rb'
 require 'rakelib/contrib/ottobehrens/stone.rb'
@@ -39,8 +40,6 @@ task :squeak do
     puts "To fix this, correct the 'squeak' command in the gemstone script."
   end
 end
-
-
 
 desc "Stop netldi"
 task :stopnetldi do

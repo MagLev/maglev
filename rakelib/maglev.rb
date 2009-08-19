@@ -69,58 +69,6 @@ def valid_ruby_for_parser?
   && (parsetree_check.include? "installed")
 end
 
-# Returns true iff there is a process listening on the PARSETREE_PORT
-def parser_running?
-  ! parser_pid.nil?
-end
-
-# Starts a ruby parsetree_parser on PARSETREE_PORT (no checks for prior
-# running instances).
-def start_parser
-  cd "#{MAGLEV_HOME}/bin" do
-    sh %{
-      nohup #{PARSER_RUBY} parsetree_parser.rb \
-          >#{MAGLEV_HOME}/log/parsetree.log 2>/dev/null &
-      echo "MagLev Parse Server process $! starting on port #{PARSETREE_PORT}"
-    }
-  end
-  wait_for_parser
-end
-
-# Starts a ruby parsetree_parser on PARSETREE_PORT (no checks for prior
-# running instances).  Logs stderr to $MAGLEV_HOME/log/parsetree.err.
-def start_parser_debug
-  cd "#{MAGLEV_HOME}/bin" do
-    sh %{
-      nohup #{PARSER_RUBY} parsetree_parser.rb \
-          >$MAGLEV_HOME/log/parsetree.log 2>$MAGLEV_HOME/log/parsetree.err &
-      echo "MagLev DEBUG Parse Server process $! starting on port #{PARSETREE_PORT}"
-    }
-  end
-  wait_for_parser
-end
-
-def wait_for_parser
-  10.times do
-    if parser_running?
-      puts "MagLev Parse Server process running on port #{PARSETREE_PORT}"
-      return true
-    end
-    puts "Waiting for MagLev Parse Server process to start..."
-    sleep 2
-  end
-  puts "MagLev Parse Server process failed to start on port #{PARSETREE_PORT}"
-  return false
-end
-
-# Tests for the parser on port PARSETREE_PORT, and kills it if found.
-# returns the PID of the killed process, or nil if no process found on the
-# parser port.
-def stop_parser
-  kill_pid = parser_pid
-  sh %{ kill -9 #{kill_pid} } unless kill_pid.nil?
-  parser_pid
-end
 
 # Returns true iff the GemStone server is running (gslist -clp)
 def server_running?
@@ -207,7 +155,7 @@ EOF
 end
 
 def load_prims
-  start_parser unless parser_running?
+  Parser.start unless Parser.running?
   sh %{ #{TOPAZ_CMD} << EOF >/dev/null
 input #{MAGLEV_HOME}/gemstone/upgrade/ruby/allprims.topaz
 EOF
@@ -253,7 +201,7 @@ def status
     puts "GemStone server not running."
   end
 
-  if parser_running?
+  if Parser.running?
     puts "\nMagLev Parse Server port = #{PARSETREE_PORT}"
     sh %{ lsof -P -iTCP:#{PARSETREE_PORT} }
     # if you don't have permission to run lsof, use the following instead
