@@ -6,6 +6,18 @@
 namespace :dev do
   require 'rakelib/dev.rb'
 
+  desc "Reload kernel.rb (primitives) and commit it.  Starts MRI parser for prims if needed."
+  # Still requires old MRI parser for bootstrapping the prims...
+  task :reloadprims => ['maglev:start'] do
+    Parser.start
+    puts "=== reload primitives"
+    sh %{
+      #{TOPAZ_CMD} <<EOF
+input #{GEMSTONE}/upgrade/ruby/allprims.topaz
+EOF
+    }
+  end
+
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
 

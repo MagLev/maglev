@@ -1,33 +1,47 @@
+require File.expand_path('simple', File.dirname(__FILE__))
+
+result = `maglev-ruby -e 'a = [:a, :b, :c]; a<<a; puts a'`
+test(result, "a\nb\nc\n[...]\n", "recursive case")
+
+report
+
+# The original test case is below, but the recursive traverse of the FS is
+# fine, just the final puts was broken, which the above test captures.
+
+
+############################################################
 # recursion and the Pathname class.
 # Submitted by Lukas Domagala
 
-require 'pathname'
+# require 'pathname'
 
-def recursive_dir(path)
-  current_path = Pathname.new(path)
-  current_files = []
-  current_dirs = []
-  current_path.children.each do |file|
-    if file.directory?
-      current_dirs << file
-    else
-      current_files << file
-    end
-  end
+# def recursive_dir(path)
+#   current_path = Pathname.new(path)
+#   current_files = []
+#   current_dirs = []
+#   current_path.children.each do |file|
+#     if file.directory?
+#       current_dirs << file
+#     else
+#       current_files << file
+#     end
+#   end
 
-  current_dirs.each do |file|
-    recursive_dir(file)
-    @dirs << file.realpath
-  end
+#   current_dirs.each do |file|
+#     recursive_dir(file)
+#     @dirs << file.realpath
+#   end
 
-  current_files.each do |file|
-    @files << file.realpath
-  end
-end
+#   current_files.each do |file|
+#     @files << file.realpath
+#   end
+# end
 
-    @dirs = []
-    @files = []
-    recursive_dir(".")
-    puts "Directories", "---", @dirs
-    puts "Files", "---", @files
+#     @dirs = []
+#     @files = []
+#     recursive_dir(".")
+# @dirs << @dirs
+# puts @dirs
+# #    puts "Directories", "---", @dirs
+# #    puts "Files", "---", @files
 

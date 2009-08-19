@@ -149,7 +149,7 @@ class IO
       elsif elem._isArray
         begin
           ts.add(elem)
-          puts(elem)
+          elem.each { |e| puts e }
         ensure
           ts.remove(elem)
         end
@@ -237,7 +237,7 @@ class IO
     if res.equal?(nil)
       0
     else
-      res.size 
+      res.size
     end
   end
 end
