@@ -119,7 +119,7 @@ STN_HALT_ON_FATAL_ERR = FALSE;
 #=========================================================================
 
 DBF_EXTENT_NAMES = <%= extent_filename %>;
-STN_TRAN_FULL_LOGGING = FALSE;
+STN_TRAN_FULL_LOGGING = TRUE;
 STN_TRAN_LOG_DIRECTORIES = <%= tranlog_directories.join(",") %>;
 STN_TRAN_LOG_SIZES = 100, 100;
 
