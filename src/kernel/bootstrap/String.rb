@@ -1330,7 +1330,7 @@ class String
   end
 
   # Consider self as an integer and return value given base.
-  # This is the rubinius API, but we don't care about the check param
+  # From the rubinius API.
   def to_inum(base, check=false)
     if check && self['__']._not_equal?(nil)
       raise ArgumentError, "__ in string, in to_inum"
@@ -1353,7 +1353,7 @@ class String
       if base.equal?(10)
         bad =  s =~ /[^0-9]/ 
       elsif base.equal?(8)
-        bad =  s =~ /[^0-6]/
+        bad =  s =~ /[^0-7]/
       elsif base.equal?(16)
         bad =  s =~ /[^0123456789abcdef]/
       elsif base.equal?(2)
