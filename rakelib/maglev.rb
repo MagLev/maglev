@@ -32,8 +32,8 @@ end
 PARSER_RUBY                = ENV['RUBY186P287'] || "ruby"
 
 
-def run_topaz(snippet, debug=false)
-  sh %{ #{debug ? TOPAZDEBUG_CMD : TOPAZ_CMD} <<EOF
+def run_topaz(snippet)
+  sh %{ #{TOPAZ_CMD} <<EOF
 login
 #{snippet}
 EOF

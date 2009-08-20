@@ -39,13 +39,6 @@ def tc_run_vmunit
   END
 end
 
-# Returns a topaz command string that runs the benchmarks
-def tc_run_benchmarks
-  <<-END.margin
-    |inp #{"rakelib/allbench.inp"}
-  END
-end
-
 # Returns a topaz command string that will generate Ruby files that expose
 # every smalltalk class.
 def tc_gen_st_wrappers

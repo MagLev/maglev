@@ -18,7 +18,12 @@ Rake::RDocTask.new do |rd|
   rd.rdoc_files.include('README*', 'docs/*', 'LICENSES.txt', 'src/kernel/bootstrap/Maglev.rb')
 end
 
-task :default => :'maglev:status'
+task :default => :status
+
+desc "Show status of all stones"
+task :status do
+  Rake::Task['stone:all'].invoke(:status)
+end
 
 # This initializes the environment, and then ensures that there is a
 # gemstone diretory there.  Needed to pull this out, since some of the
@@ -41,15 +46,6 @@ task :squeak do
   end
 end
 
-desc "Stop netldi"
-task :stopnetldi do
-  GemStoneInstallation.current.stopnetldi
-end
-
-desc "Start netldi"
-task :startnetldi do
-  GemStoneInstallation.current.startnetldi
-end
 namespace :stone do
   desc "List MagLev servers managed by this Rakefile"
   task :list do
@@ -80,12 +76,24 @@ namespace :stone do
   end
 end
 
+namespace :netldi do
+  desc "Stop netldi"
+  task :stop do
+    GemStoneInstallation.current.stopnetldi
+  end
+  desc "Start netldi"
+  task :start do
+    GemStoneInstallation.current.startnetldi
+  end
+end
+
 def task_gemstone(stone, action, desc=nil)
   desc "#{desc.nil? ? action.to_s : desc}"
   task action do
     stone.send(action)
   end
 end
+
 
 GemStoneInstallation.current.stones.each do |server_name|
   namespace server_name do

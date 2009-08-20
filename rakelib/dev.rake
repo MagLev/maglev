@@ -33,12 +33,6 @@ EOF
     puts "Log files in log/vmunit*"
   end
 
-  desc "Run the bm smoke tests"
-  task :'bm-tests' do
-    run_topaz tc_run_benchmarks
-    puts "Log files in log/bench*"
-  end
-
   # Run block after ensuring a fresh stone has been created and started
   # The block is passed the stone (e.g., to get the stone name).  The stone
   # will be shutdown and destroyed
@@ -127,8 +121,18 @@ EOF
     cp "/Users/pmclain/GemStone/dev/maglev-gem", "bin"
   end
 
+
+
+  desc "Run topaz (use rlwrap, if available)"
+  task :topaz => :gemstone do
+    sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
+  end
+
+end
+
+namespace :parser do
   desc "Start the ParseTree based parser (deprecated)"
-  task :startparser => :gemstone do
+  task :start => :gemstone do
     if Parser.running?
       puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
     else
@@ -137,19 +141,17 @@ EOF
   end
 
   desc "Stop the ParseTree based parser (deprecated)"
-  task :stopparser => :gemstone do
+  task :stop => :gemstone do
     puts "No parser running on port #{PARSETREE_PORT}" unless Parser.stop.nil?
   end
 
-
-  desc "Run topaz (use rlwrap, if available)"
-  task :topaz => :gemstone do
-    sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
-  end
-
-  desc "Run debug topaz (use rlwrap, if available)"
-  task :'topaz-debug' => :gemstone do
-    sh %{ `which rlwrap 2> /dev/null` #{TOPAZDEBUG_CMD} }
+  desc "Show if the parser is running"
+  task :status => :gemstone do
+    if Parser.running?
+      puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
+    else
+      puts "MagLev Parse Server not running (port is #{PARSETREE_PORT})"
+    end
   end
 end
 
