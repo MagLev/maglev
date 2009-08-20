@@ -49,4 +49,19 @@ class Parser
     sh %{ kill -9 #{kill_pid} } unless kill_pid.nil?
     parser_pid
   end
+
+  # Returns the PID of the process listening on PARSETREE_PORT, or nil.
+  def self.parser_pid
+    `lsof -Fp -iTCP:#{PARSETREE_PORT}`.chomp[1..-1]
+  end
+
+  # Returns true iff there is a valid ruby 186 patchlevel 287 to run the parser
+  # Depends on parsetree_verscheck.rb printing 'installed'.
+  def self.valid_ruby_for_parser?
+    rubyversion = `#{PARSER_RUBY} --version`
+    parsetree_check = `#{PARSER_RUBY} #{MAGLEV_HOME}/bin/parsetree_verscheck.rb`
+    (rubyversion.include? "ruby 1.8.6") \
+    && (rubyversion.include? "patchlevel 287") \
+    && (parsetree_check.include? "installed")
+  end
 end

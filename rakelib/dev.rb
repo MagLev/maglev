@@ -7,6 +7,25 @@
 # ######################################################################
 # The following +tc_*+ methods generate topaz command strings based on the
 # parameters passed to them.
+class String
+  # This makes it nice to indent here documents and strip
+  # out the leading space from the here document.  A here
+  # document using this uses '|' to mark the beginning of line.
+  # E.g.,
+  #
+  #   str = <<END.margin
+  #       | This is the string.  All spaces before the '|
+  #       | and the '|' will be stripped from each line...
+  #   END
+  #
+  # From section 2.3 of The Ruby Way, 2nd Ed.
+  def margin
+    arr = self.split("\n")
+    arr.map! { |x| x.sub!(/\s*\|/,"") }
+    str = arr.join("\n")
+    self.replace(str)
+  end
+end
 
 # Returns a topaz command string that runs the set of passing vm tests
 # in src/test/vmunit.conf
