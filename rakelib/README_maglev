@@ -81,6 +81,6 @@ The following environment variables are setup:
 | GEMSTONE_DATADIR | $MAGLEV_HOME/data/devel         |
 |------------------+---------------------------------|
 
-Each MagLev server name represents a separate MagLev server instance. 
-All of these share a GemStoneInstallation (a version of the GemStone
-product installed on the machine, e.g., GemStone 3.0.0 Build: 64bit-21842
+Each MagLev server name represents a separate MagLev server instance.  All
+of these share a GemStoneInstallation (a version of the GemStone product
+installed on the machine, e.g., GemStone 3.0.0 Build: 64bit-21842)
