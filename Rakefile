@@ -61,6 +61,14 @@ task :squeak do
   end
 end
 
+desc "Create .rb files for each smalltalk class (lib/ruby/site_ruby/1.8/smalltalk/*)"
+task :stwrappers => 'maglev:start' do
+  run_on_stone(["omit resultcheck",
+                "run",
+                "RubyContext createSmalltalkFFIWrappers",
+                "%"])
+end
+
 namespace :stone do
   desc "List MagLev servers managed by this Rakefile"
   task :list do
@@ -89,6 +97,11 @@ namespace :stone do
       Rake::Task["#{server_name}:#{args.task_name}"].invoke
     end
   end
+end
+
+# Run topaz commands on a particular stone
+def run_on_stone(commands_array, stone='maglev')
+  Stone.new(stone).topaz_commands(commands_array)
 end
 
 namespace :netldi do

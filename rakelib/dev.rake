@@ -4,9 +4,8 @@
 # engineering team.
 require 'rakelib/parser'
 
-namespace :dev do
-  require 'rakelib/dev.rb'
 
+namespace :dev do
   TOPAZ_CMD = "#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
 
   desc "Run the passing specs and the vm tests"
@@ -14,8 +13,7 @@ namespace :dev do
 
   desc "Run the vm smoke tests"
   task :'vm-tests' do
-    run_topaz tc_run_vmunit
-    puts "Log files in log/vmunit*"
+    run_on_stone(["run", "RubyContext _runVmUnit", "%"])
   end
 
   desc "Run the passing specs"
@@ -94,14 +92,9 @@ namespace :dev do
     files.each { |fn| rm_r fn rescue nil }
   end
 
-  desc "Create .rb files for each smalltalk class (lib/ruby/site_ruby/1.8/smalltalk/*)"
-  task :stwrappers => ['maglev:start'] do
-    run_topaz tc_gen_st_wrappers
-  end
-
   desc "Load the MagLev native parser"
   task :load_native_parser => ['maglev:start'] do
-    run_topaz tc_load_native_parser
+    run_on_stone("inp #{"src/kernel/parser/loadrp.inp"}")
   end
 
   desc "Clear out the old rubygems and install a new version"
@@ -112,13 +105,10 @@ namespace :dev do
     cp "/Users/pmclain/GemStone/dev/maglev-gem", "bin"
   end
 
-
-
   desc "Run topaz (use rlwrap, if available)"
   task :topaz => :gemstone do
     sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
   end
-
 end
 
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
@@ -145,6 +135,7 @@ namespace :parser do
       puts "MagLev Parse Server not running (port is #{PARSETREE_PORT})"
     end
   end
+
 end
 
 # These are dev specific tasks we want on a per stone basis
