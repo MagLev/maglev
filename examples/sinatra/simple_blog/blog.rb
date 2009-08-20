@@ -1,44 +1,33 @@
-# This file defines the blog classes
+# This file defines the blog classes.  To commit the code, load this
+# file from within a Maglev.persistent block and then commit it.
+class Post
 
-Maglev.persistent do
-  class Post
-    # The key in Maglev::PERSISTENT_ROOT for storing posts
-    POSTS_KEY = :posts
-    @id = -1
+  # TODO: All of these class methods are fodder for a Maglev::Model
+  # module...
+  def self.new(params)
+    p = allocate
+    p.initialize(params)
+    add(p)
+  end
 
-    def self.new(params)
-      p = allocate
-      p.initialize(new_id, params)
-      add(p)
-      p
-    end
+  # Returns an array of all the posts
+  def self.all_posts
+    Maglev::PERSISTENT_ROOT[Post].values
+  end
 
-    def self.all_posts
-      Maglev::PERSISTENT_ROOT[POSTS_KEY]
-    end
+  def self.get(id)
+    Maglev::PERSISTENT_ROOT[Post][id.to_i]
+  end
 
-    def self.get(id)
-      Maglev::PERSISTENT_ROOT[POSTS_KEY][id.to_i]
-    end
+  def self.add(post)
+    Maglev::PERSISTENT_ROOT[Post][post.__id__] = post
+  end
 
-    def self.new_id
-      Maglev.persistent { @id += 1 }
-    end
-
-    def self.add(post)
-      all_posts[post.id] = post
-    end
-
-    attr_reader :text, :title, :id
-    def initialize(id, params)
-      @title = params[:title]
-      @text =  params[:text]
-      @id = id.to_i
-    end
+  attr_reader :text, :title
+  def initialize(params)
+    @title = params[:title]
+    @text =  params[:text]
   end
 end
 
-Maglev::PERSISTENT_ROOT[Post::POSTS_KEY] = Array.new
-
-Maglev.commit_transaction
-puts "== Committed class Post"
+Maglev::PERSISTENT_ROOT[Post] = Hash.new

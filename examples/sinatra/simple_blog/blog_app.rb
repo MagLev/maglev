@@ -25,6 +25,8 @@ end
 helpers do
   def nav_bar
     <<EOS
+<h3>Sample Blog App running on Sinatra #{Sinatra::VERSION}</h3>
+<h3>Nav Bar</h3>
 <ul>
   <li><a href="/post/new">New Post</a></li>
   <li><a href="/posts">All Posts</a></li>
@@ -32,7 +34,6 @@ helpers do
 EOS
   end
 end
-
 
 error do
   e = request.env['sinatra.error']
@@ -44,45 +45,44 @@ get '/' do
   nav_bar
 end
 
-# For to create a new post
+# To display a form for creating a new post
 get '/post/new' do
   <<EOS
+#{nav_bar}
 <form method="post" action="/post">
-Title:  <input type="text" name="title" /><br />
-Text:   <input type="text" name="text" /><br />
+  Title: <input type="text" name="title" /><br />
+  Text:  <textarea name="text" rows="10" cols="50"></textarea><br />
   <input type="submit" value="Create">
 </form>
-#{nav_bar}
 EOS
 end
 
 # REST create new post
 post '/post' do
-  "Create a new post...#{params[:title]}"
-  post = Post.new(:title => params[:title], :text => params[:text])
+  post = Post.new(params)
   Post.add(post)
-  redirect "/post/#{post.id}"
+  redirect "/post/#{post.__id__}"
 end
 
 get '/post/:id' do
   post = Post.get(params[:id])
   stop [ 404, "Page not found (id: #{params[:id]})" ] unless post
   <<EOS
-<h2>#{post.title}</h2>
-<p>#{post.text}</p>
 #{nav_bar}
+<h3>Title: #{post.title}</h3>
+<p>#{post.text}</p>
 EOS
 end
 
 # List all posts
 get '/posts' do
   posts = Post.all_posts
-  s = "<h3>Sample Blog App running on Sinatra #{Sinatra::VERSION}</h3>"
+  s = nav_bar
   s << "<p>Here are the #{posts.size} blog posts</p><ul>"
-  posts.each do |p|
-    s << "<li><a href=\"/post/#{p.id}\">#{p.title}</a></li>" if p
+  posts.each do |post|
+    s << "<li><a href=\"/post/#{post.__id__}\">#{post.title}</a></li>"
   end
-  s << "</ul>" << nav_bar
+  s << "</ul>"
 end
 
 # __END__

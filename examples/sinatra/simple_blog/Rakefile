@@ -1,0 +1,6 @@
+
+desc "Commit the base blog code to the repository"
+task :commit do
+  sh %{ maglev-ruby commit_code.rb }
+end
+

@@ -39,3 +39,38 @@ TODO for the sinatra app
 * Get a template engine working
 * Try using shotgun for dev time file reloading (or Rack::Reloader)
 * Get sessions working
+
+
+=== Discussion
+
+In the first iteration of the blog app, Posts had an id field.  This is
+legacy thinking from SQL...the reason blog posts have an id attribute is to
+facilitate finding them in the DB.  But objects are already unique and have
+a system managed __id__.  But there is a deeper problem with managing an id
+field: How do you coordinate the id across multiple threads/VMs?  The
+original code looked like:
+
+
+    class Post
+      def self.new(params)
+        p = allocate
+        p.initialize(new_id, params)
+        add(p)
+        p
+      end
+
+      def self.new_id
+        # This is a concurrency conflict waiting to happen....
+        Maglev.persistent { @id += 1 }
+      end
+      
+      ...
+      
+    end
+
+Since there is only one instance of the Post class in the repository, if
+two VMs try to update the class instance variable <tt>@id</tt>, one will
+commit first, and the other will have to deal with a failed commit.  But
+each VM has unique  post objects with different <tt>__id__</tt>'s (because
+the VM does do the hard work of ensuring globally unique ids for objects. 
+
