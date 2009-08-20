@@ -22,42 +22,19 @@ Exception.install_debug_block do |e|
   end
 end
 
-helpers do
-  def nav_bar
-    <<EOS
-<h3>Sample Blog App running on Sinatra #{Sinatra::VERSION}</h3>
-<h3>Nav Bar</h3>
-<ul>
-  <li><a href="/post/new">New Post</a></li>
-  <li><a href="/posts">All Posts</a></li>
-</ul>
-EOS
-  end
-end
-
 error do
   e = request.env['sinatra.error']
   "There was an error: #{e}"
 end
 
 get '/' do
-  #erb :index
-  nav_bar
+  redirect '/posts'
 end
 
-# To display a form for creating a new post
 get '/post/new' do
-  <<EOS
-#{nav_bar}
-<form method="post" action="/post">
-  Title: <input type="text" name="title" /><br />
-  Text:  <textarea name="text" rows="10" cols="50"></textarea><br />
-  <input type="submit" value="Create">
-</form>
-EOS
+  erb :newpost
 end
 
-# REST create new post
 post '/post' do
   post = Post.new(params)
   Post.add(post)
@@ -65,44 +42,73 @@ post '/post' do
 end
 
 get '/post/:id' do
-  post = Post.get(params[:id])
-  stop [ 404, "Page not found (id: #{params[:id]})" ] unless post
-  <<EOS
-#{nav_bar}
-<h3>Title: #{post.title}</h3>
-<p>#{post.text}</p>
-EOS
+  @post = Post.get(params[:id])
+  stop [ 404, "Page not found (id: #{params[:id]})" ] unless @post
+  erb :post
 end
 
-# List all posts
 get '/posts' do
-  posts = Post.all_posts
-  s = nav_bar
-  s << "<p>Here are the #{posts.size} blog posts</p><ul>"
-  posts.each do |post|
-    s << "<li><a href=\"/post/#{post.__id__}\">#{post.title}</a></li>"
-  end
-  s << "</ul>"
+  @posts = Post.all_posts
+  erb :index
 end
 
-# __END__
+__END__
 
-# @@ layout
-# <html>
-#   <head> <title>Simple Blog</title> </head>
-#   <body>
-#     <div id="nav">
-#       <ul>
-#         <li><a href="/post/new">New Post</a></li>
-#         <li><a href="/posts">All Posts</a></li>
-#       </ul>
-#     </div>
-#     <div id="content">
-#       <%= yield %>
-#     </div>
-#   </body>
-# </html>
+@@ layout
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>Simple Sinatra Blog</title>
+    <meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="/style.css" media="all" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1>Simple Sinatra Blog</h1>
+      </div>
+      <div id="navigation">
+        <ul class="menu">
+          <li><a href="/post/new">New Post</a></li>
+          <li><a href="/posts">All Posts</a></li>
+        </ul>
+      </div>
+      <div id="content">
+        <div class="left"><%= yield %></div>
+        <div class="right">
+          <h4>Recent Posts</h4>
+          <p>TBD</p>
+          <h4>Tags</h4>
+          <p>TBD</p>
+          <h4>About</h4>
+          <p>This is a simple sinatra blog running on MagLev</p>
+          <h4>Credit</h4>
+          <p>The layout is <a href="http://css4free.com/wp-content/uploads/templates/zineprint/">zineprint</a>, Designed by
+             <a href="http://rizzle.us.to">Rizzle Studios</a>.
+        </div>
+      </div>
+      <div id="footer">
+        Simple Sinatra Blog running on <a href="http://maglev.gemstone.com">MagLev</a>
+      </div>
+    </div>
+  </body>
+</html>
 
-# @@ index
+@@ index
+<h3>Welcome to a simple blog</h3>
+<ul>
+<% @posts.each do |post| %>
+  <li><a href="/post/<%= post.__id__ %>"> <%= post.title %></a></li>
+<% end %>
+</ul>
 
-# <h3>Welcome to a simple blog</h3>
+@@ newpost
+<form method="post" action="/post">
+  Title: <input type="text" name="title" /><br />
+  Text:  <textarea name="text" rows="10" cols="50"></textarea><br />
+  <input type="submit" value="Create">
+</form>
+
+@@ post
+<h3><%= @post.title %></h3>
+<p><%= @post.text %></p>

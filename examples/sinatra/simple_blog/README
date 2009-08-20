@@ -74,3 +74,7 @@ commit first, and the other will have to deal with a failed commit.  But
 each VM has unique  post objects with different <tt>__id__</tt>'s (because
 the VM does do the hard work of ensuring globally unique ids for objects. 
 
+
+=== Credits
+
+The layout is http://css4free.com/wp-content/uploads/templates/zineprint/
