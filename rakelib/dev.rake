@@ -162,7 +162,7 @@ GemStoneInstallation.current.stones.each do |stone_name|
 
     [[:reload_prims, "Reset the ruby context in \"#{stone_name}\" then reload primitives"]
     ].each do |action, desc|
-      task_gemstone(stone, action, desc)
+      task_gemstone(stone, action, " [DEV] #{desc}")
     end
   end
 end
