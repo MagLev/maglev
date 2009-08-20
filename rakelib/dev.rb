@@ -57,25 +57,3 @@ def tc_load_native_parser
     |inp #{"src/kernel/parser/loadrp.inp"}
   END
 end
-
-# # Returns a topaz command string that loads ../latest.mcz and commits the DB.
-# def tc_load_mcz
-#   <<-END.margin
-#     |output push loadmcz.out
-#     |display resultcheck
-#     |run
-#     || fileRepo aName ver |
-#     |fileRepo := MCDirectoryRepository new directory: (FileDirectory on: '../').
-#     |aName := 'latest.mcz'.
-#     |
-#     |ver := fileRepo loadVersionFromFileNamed: aName .
-#     |ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
-#     |GsFile gciLogServer: ver printString .
-#     |ver load .
-#     |GsFile gciLogServer: 'load done'.
-#     |^ true
-#     |%
-#     |commit
-#     |exit
-#   END
-# end

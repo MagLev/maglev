@@ -2,21 +2,12 @@
 #
 # These tasks depend on the conventions used by the GemStone MagLev
 # engineering team.
+require 'rakelib/parser'
 
 namespace :dev do
   require 'rakelib/dev.rb'
 
-  desc "Reload kernel.rb (primitives) and commit it.  Starts MRI parser for prims if needed."
-  # Still requires old MRI parser for bootstrapping the prims...
-  task :reloadprims => ['maglev:start'] do
-    Parser.start
-    puts "=== reload primitives"
-    sh %{
-      #{TOPAZ_CMD} <<EOF
-input #{GEMSTONE}/upgrade/ruby/allprims.topaz
-EOF
-    }
-  end
+  TOPAZ_CMD = "#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
 
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
@@ -130,6 +121,7 @@ EOF
 
 end
 
+PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
 namespace :parser do
   desc "Start the ParseTree based parser (deprecated)"
   task :start => :gemstone do
@@ -148,7 +140,7 @@ namespace :parser do
   desc "Show if the parser is running"
   task :status => :gemstone do
     if Parser.running?
-      puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
+      puts "MagLev Parse Server running on port #{PARSETREE_PORT}"
     else
       puts "MagLev Parse Server not running (port is #{PARSETREE_PORT})"
     end

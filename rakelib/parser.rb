@@ -1,5 +1,9 @@
 # A class to manage the old MRI Parser state
 class Parser
+  # RUBY186P287 must be set to a ruby 1.8.6 patchlevel 287 executable
+  # in order to run Parse Server. Earlier versions will fail.
+  PARSER_RUBY = ENV['RUBY186P287'] || "ruby"
+
   def self.running?
     ! parser_pid.nil?
   end
