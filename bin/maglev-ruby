@@ -19,11 +19,12 @@ OPTIONS:
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h, --help     Show this message and exit
    -I <path>      Add <path> to $LOAD_PATH
-   -M<opt>        Pass a maglev option to the VM.  This flag may be passed multiple
+   -M<opt>        MagLev specific options.  This flag may be passed multiple
                   times.  The currently recognized options are:
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
                     logSexp       Print sexpressions as they are parsed
+                    noRlwrap      invoke topaz without rlwrap
    --             End of MagLev parameters.  The next parameter is the script
                   name, then script parameters follow.
    --stone <name> Run script connecting to the named stone
@@ -58,7 +59,7 @@ fi
 
 conf_file=$MAGLEV_HOME/etc/system.conf
 # to login to an already running stone not started by
-# maglev commands, use STONENAME env variable , not the --stone option.  
+# maglev commands, use STONENAME env variable , not the --stone option.
 #  because --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
 if [ -z "$STONENAME" ]; then
 	stone=maglev
@@ -69,6 +70,7 @@ dash_e=""
 args=""
 debug=0
 maglev_options=""
+useRlwrap=1
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -114,7 +116,12 @@ do
             args="$args '$1'"
             ;;
         -M*)
-            maglev_options="$maglev_options ${1:2}"
+            sub_opt=${1:2}
+            if [[ $sub_opt == "noRlwrap" ]]; then
+                useRlwrap=
+            else
+                maglev_options="$maglev_options ${sub_opt}"
+            fi
             ;;
         -v|--verbose)
             grep ^maglev $MAGLEV_HOME/version.txt
@@ -207,7 +214,7 @@ EOF
 # If MagRpDEBUG_level is 0..2, use native parser with logging level 0, 1, or 2
 # if MagRpDEBUG_level is -1, use the old MRI parser
 if [ ! -z "${MagRpDEBUG_level}" ]; then
-  if [ ${MagRpDEBUG_level} -lt 0 ] ; then 
+  if [ ${MagRpDEBUG_level} -lt 0 ] ; then
     # echo "Using old MRI parser"
     cat - >> $dbscript <<-EOF
     SessionTemps current at: #MAGLEV_evalUseMri put: true ;
@@ -246,7 +253,7 @@ TOPAZ_CMD="$GEMSTONE/bin/topaz -l -q -I $dbscript "
 #  about how you test result of which .
 #
 rlwrapExe=$(which rlwrap 2> /dev/null )
-if [ -f "$rlwrapExe" ]; then
+if [[ $useRlwrap && -f "$rlwrapExe" ]]; then
   $rlwrapExe $TOPAZ_CMD
   exitStatus=$?
 else
