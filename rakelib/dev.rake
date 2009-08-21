@@ -109,6 +109,18 @@ namespace :dev do
   task :topaz => :gemstone do
     sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
   end
+
+  desc "Load the primitives into the default image.  This makes subsequent stone creation faster as prims already loaded."
+  task :installprims do
+    # Backup the original extent
+    cp GemStoneInstallation.current.initial_extent,
+       "#{GemStoneInstallation.current.initial_extent}.orig"
+    with_fresh_stone do |stone|
+      stone.start # loads primitives
+      stone.stop
+      cp stone.extent_filename, GemStoneInstallation.current.initial_extent
+    end
+  end
 end
 
 PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
@@ -135,7 +147,6 @@ namespace :parser do
       puts "MagLev Parse Server not running (port is #{PARSETREE_PORT})"
     end
   end
-
 end
 
 # These are dev specific tasks we want on a per stone basis

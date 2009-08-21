@@ -35,7 +35,10 @@ task :default => :status
 
 desc "Show status of all stones"
 task :status do
-  Rake::Task['stone:all'].invoke(:status)
+  ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
+  sh "$GEMSTONE/bin/gslist -clv"
+
+  # Parser status is only available if rakelib/dev.rake is shipped
   p_status = Rake::Task['parser:status']
   p_status.invoke if p_status
 end
