@@ -1,8 +1,4 @@
-== Release Notes for the MagLev Alpha release of June 2, 2009
-
-=== ParseTree
-This version requires Ruby 1.8.6 patchlevel 287 due to an incompatibility
-with patchlevel 111 and 114. It also requires the ParseTree 3.0.3 gem.
+== Release Notes for the MagLev Alpha release of August 24, 2009
 
 === Persistence support
 
