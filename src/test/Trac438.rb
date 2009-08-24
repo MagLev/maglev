@@ -10,7 +10,7 @@ m = Test438.instance_method(:test)
 mf = Test438.instance_method(:foo)
 ma = m.arity
 mfa = mf.arity
-unless ma == 1 ; raise 'error'; end;
+unless ma == -1 ; raise 'error'; end;
 unless mfa == 2 ; raise 'error'; end
 
 acd = Module.method(:const_defined?).arity
