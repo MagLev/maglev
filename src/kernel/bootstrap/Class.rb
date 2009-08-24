@@ -78,41 +78,11 @@ class Class
     obj.kind_of?(self)
   end
 
-  primitive_nobridge '_subclassOf' , 'isSubclassOf:'
-  def <= ( obj)
-    self._subclassOf(obj)
-  end
-
-  #  < <= > >=  defined for other object being a Class or Module
-  def < (obj)
-    if (self.equal?(obj))
-      res = false
-    else
-      res = self._subclassOf(obj)
-    end
-    res
-  end
-
-  def >= (obj)
-    r = self < obj
-    ! r
-  end
-
-  def > (obj)
-    r = self <= obj
-    ! r
-  end
-
-  def <=> (obj)
-    if (self.equal?(obj))
-      r = 0
-    else
-      r = (self._subclassOf(obj)) ? -1 : 1
-    end
-    r
-  end
+  #  < <= > >=  inherited from Module
 
   # name inherited from Module
+
+  primitive_nobridge 'included_modules' , 'rubyIncludedModules'
 
   def inspect
     name
@@ -142,6 +112,8 @@ class Class
     self._set_instances_persistent(flag)
   end
   primitive_nobridge '_set_instances_persistent', '_setInstancesPersistent:'
+
+  primitive_nobridge '_set_protection_classmethods*', 'setProtection:classmethods:'
 
   # Returns +true+ if instances of receiver are allowed to be
   # persisted. Returns +false+ otherwise.

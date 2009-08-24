@@ -22,7 +22,7 @@ module Kernel
   end
 
   def proc(&blk)
-    Proc.new(&blk)
+    Proc.new_lambda(&blk)
   end
 
   def rand(n=0)

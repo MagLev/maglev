@@ -3,7 +3,18 @@ class Behavior
   # Module and Class.  E.g., attr_* are needed for singletons as well as
   # normal class/modules so they are defined up here.
 
-  primitive 'alias_method', 'rubyAlias:from:'
+  primitive '_alias_method', 'rubyAlias:from:'
+
+  def alias_method(new_name, old_name)
+    unless new_name._isSymbol
+      new_name = Type.coerce_to(new_name, String, :to_str)
+    end
+    unless old_name._isSymbol
+      old_name = Type.coerce_to(old_name, String, :to_str)
+    end
+    self._alias_method(new_name, old_name) 
+  end
+
   primitive_nobridge '_module_eval_string', '_moduleEvalString:with:binding:'
   primitive_nobridge '_module_eval&', '_moduleEval:'
 
@@ -51,14 +62,6 @@ class Behavior
     end
   end
 
-  primitive_nobridge 'class_variables', 'rubyClassVarNames'   # ??? to RClass?
-
-  # def class_variable_defined?(string) ; end 
-  primitive_nobridge 'class_variable_defined?', 'rubyClassVarDefined:'
-
-  # def class_variable_get(string) ; end 
-  primitive_nobridge 'class_variable_get', 'rubyClassVarGet:'
-
   primitive_nobridge '_define_method_meth' , 'defineMethod:method:'
   primitive_nobridge '_define_method_block&' , 'defineMethod:block:'
 
@@ -78,28 +81,28 @@ class Behavior
     define_method(sym, blk)
   end
 
-  def include(*names)
-    # this variant gets bridge methods
-    names.reverse.each do |name|
-      _include_module(name)
-    end
-  end
-  def include(name)
-    # variant needed for bootstrap
-    _include_module(name)
-  end
-
   def inspect
     name
   end
 
-  primitive_nobridge 'instance_method', 'rubyUnboundMethodFor:'
-     # one arg, a Symbol
+  primitive_nobridge '_instance_method', 'rubyUnboundMethodFor:'
+
+  def instance_method(name)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    self._instance_method(name)
+  end
 
   primitive_nobridge '_method_defined', 'rubyMethodDefined:protection:'
 
-  def method_defined?(symbol)
-    _method_defined(symbol, -1)
+  def method_defined?(name)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    _method_defined(name, -1)
   end
 
   def method_added(a_symbol)
@@ -152,40 +155,32 @@ class Behavior
 
   alias class_eval module_eval
 
-  primitive_nobridge '_method_protection', 'rubyMethodProtection'
-
-  primitive_nobridge '_set_protection_methods*', 'setProtection:methods:'
-
-  def private(*names)
-    # if names empty, set default visibility for subsequent methods to private
-    _set_protection_methods(2, *names)
-  end
-
-  def public(*names)
-    #  if names empty, set default visibility for subsequent methods to public
-    _set_protection_methods(0, *names)
-  end
-
-
-  def protected(*names)
-    #  if names empty, set default visibility for subsequent methods to protected
-    _set_protection_methods(1, *names)
-  end
-
   def to_s
     name
   end
 
-  def public_method_defined?(symbol)
-    _method_defined(symbol, 0)
+  def public_method_defined?(name)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    _method_defined(name, 0)
   end
 
-  def protected_method_defined?(symbol)
-    _method_defined(symbol, 1)
+  def protected_method_defined?(name)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    _method_defined(name, 1)
   end
 
-  def private_method_defined?(symbol)
-    _method_defined(symbol, 2)
+  def private_method_defined?(name)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    _method_defined(name, 2)
   end
 
   primitive_nobridge 'remove_method', 'rubyRemoveMethod:'

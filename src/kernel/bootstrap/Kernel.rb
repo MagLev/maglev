@@ -199,7 +199,7 @@ module Kernel
     end
     start = 0 
     out = ''
-    str.get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
+    str._get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
       out << str._gsub_copyfrom_to(start, match.begin(0))
       saveTilde = block._fetchRubyVcGlobal(0);
       begin
@@ -215,6 +215,47 @@ module Kernel
     out
   end
 
+  def gsub!(regex, string)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.gsub! , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    str.gsub!(regex, string)
+  end
+
+  def gsub!(regex, &block)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.gsub! , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    start = 0
+    out = str.class.new
+    str._get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
+      out << str._gsub_copyfrom_to(start, match.begin(0) )
+      saveTilde = block._fetchRubyVcGlobal(0);
+      begin
+        block._setRubyVcGlobal(0, match);
+        out << block.call(match[0]).to_s
+      ensure
+        block._setRubyVcGlobal(0, saveTilde);
+      end
+      start = match.end(0)
+    end
+    out << str._copyfrom_to(start + 1, str.length)
+    if str == out
+      res = nil
+    else
+      str.replace(out)  # replace detects frozen
+      res = str
+    end
+    res
+  end
 
   # This implementation of include handles include from a main program
   primitive_nobridge '_include_module',  'includeRubyModule:'
@@ -319,10 +360,15 @@ module Kernel
     File.open(path, *rest, &block)
   end
 
-  def p(obj)
+  def p(*args)
+    n = 0
+    lim = args.length
     f = $stdout
-    f.write(obj.inspect)
-    f.write("\n")   # TODO observe record sep global
+    while n < lim
+      f.write(args[n].inspect)
+      f.write("\n")   # TODO observe record sep global
+      n += 1
+    end
     nil
   end
 
@@ -428,6 +474,39 @@ module Kernel
   end
   alias fail raise
 
+  def scan(pattern)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.scan, caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    str._scan(pattern)
+  end
+
+  def scan(pattern, &block)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.scan, caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    str._scan(pattern, &block)
+  end
+
+  def split(pattern=nil, limit=Undefined)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.split, caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    str.split(pattern, limit)
+  end
+
   # sleep behavior
   # PickAxe book   says argument of zero means infinite sleep
   # MRI behavior,  sleep(0) returns immediately
@@ -465,14 +544,99 @@ module Kernel
   primitive_nobridge '_system_exec', '_system:'
 
   def `(arg)
+    # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    _system_exec(arg)
+    arr = _system_exec(arg) 
+    status = arr[0]
+    unless status.equal?(0) 
+nil.pause
+      Errno.raise_errno(status, arg) 
+    end
+    arr[1]
+  end
+
+  def sub(pattern, replacement)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.sub , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    replacement = Type.coerce_to(replacement, String, :to_str)
+    regex = str._get_pattern(pattern, true)
+    r = if (match = regex._match_vcglobals(str, 0x30))
+          str._replace_match_with(match, replacement)
+        else
+          str.dup
+        end
+    r._storeRubyVcGlobal(0x21) # store into caller's $_
+    r
+  end
+
+  def sub(pattern, &block)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.sub , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    regex = str._get_pattern(pattern, true)
+    if (match = regex._match_vcglobals(str, 0x30))
+       res = str._replace_match_with(match, block.call(match[0]).to_s)
+    else
+       res = str.dup
+    end
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def sub!(pattern, replacement)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.sub! , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    regex = str._get_pattern(pattern, true)
+    # stores into caller's $~
+    if match = regex._match_vcglobals(str, 0x30)
+      str.replace( str._replace_match_with(match, replacement))
+      str
+    else
+      nil
+    end
+  end
+
+  def sub!(pattern, &block)
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Kernel.sub! , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
+    regex = str._get_pattern(pattern, true)
+    if match = regex._match_vcglobals(str, 0x30)
+      replacement = block.call(match[0])
+      str.replace( str._replace_match_with(match, replacement))
+      str
+    else
+      nil
+    end
   end
 
   def _system(arg)
-    # called from generated code
+    # called from generated code 
     arg = Type.coerce_to(arg, String, :to_str)
-    _system_exec(arg)
+    arr = _system_exec(arg) 
+    status = arr[0]
+    unless status.equal?(0) 
+      Errno.raise_errno(status, arg) 
+    end
+    arr[1]
   end
 
   def system(command, *args)
@@ -486,9 +650,11 @@ module Kernel
       cmd << args[n].to_s
       n = n + 1
     end
-    resultStr = _system(cmd)
-    if (resultStr)
-      puts resultStr
+    arr = _system_exec(cmd)
+    status = arr[0]
+    if status.equal?(0)
+      # print result string per MRI behavior, not document in Pickaxe book
+      puts arr[1]  
       return true
     end
     return false
@@ -501,6 +667,134 @@ module Kernel
   def trap(signal, &block)
     _stub_warn("Kernel#trap(signal, &block)")
   end
+
+  def _as_file(arg)
+    if arg.is_a?(File)
+      f = arg
+    else
+      fn = Type.coerce_to(arg, String, :to_str)
+      begin
+        f = File.open(fn)
+      rescue
+        f = nil 
+      end
+    end 
+    f
+  end
+
+  def _close_file(f)
+    if f.is_a?(File)
+      f.close
+    end
+  end
+
+  def test(cmd, file)
+    f = nil
+    res = false
+    begin
+      f = self._as_file(file)
+      if cmd.equal?( ?A )
+        if f.equal?(nil)
+          File.open(file) # raises ENOENT
+        end
+        res = f.atime
+      elsif cmd.equal?( ?C )
+        if f.equal?(nil)
+          File.open(file) # raises ENOENT
+        end
+        res = f.ctime
+      elsif cmd.equal?( ?M ) 
+        if f.equal?(nil)
+          File.open(file) # raises ENOENT
+        end
+        res = f.mtime
+      elsif cmd.equal?( ?b )
+        res = f._not_equal?(nil) && f.lstat.blockdev?
+      elsif cmd.equal?( ?c )
+        res = f._not_equal?(nil) && f.lstat.chardev?
+      elsif cmd.equal?( ?d )
+        res = f._not_equal?(nil) && f.lstat.directory?
+      elsif cmd.equal?( ?e )
+        res = f._not_equal?(nil)
+      elsif cmd.equal?( ?f )
+        res = f._not_equal?(nil) && f.lstat.file?
+      elsif cmd.equal?( ?g )
+        res = f._not_equal?(nil) && f.lstat.setgid?
+      elsif cmd.equal?( ?k )  
+        res = f._not_equal?(nil) && f.lstat.sticky?
+      elsif cmd.equal?( ?l )  
+        res = f._not_equal?(nil) && f.lstat.symlink?
+      elsif cmd.equal?( ?p )  
+        res = f._not_equal?(nil) && f.lstat.pipe?  # a fifo
+      elsif cmd.equal?( ?S )  
+        res = f._not_equal?(nil) && f.lstat.socket? 
+      elsif cmd.equal?( ?u )  
+        res = f._not_equal?(nil) && f.lstat.setuid?  
+      elsif cmd.equal?( ?s )
+        res = nil
+        if f._not_equal?(nil) && (sz = f.lstat.size)
+          res = sz
+        end  
+      elsif cmd.equal?( ?z )
+        res = f._not_equal?(nil) && f.lstat.size == 0    
+      elsif cmd.equal?( ?r )
+        res = f._not_equal?(nil) && f.lstat.readable?
+      elsif cmd.equal?( ?R )
+        res = f._not_equal?(nil) && f.lstat.readable_real?
+      elsif cmd.equal?( ?o )
+        res = f._not_equal?(nil) && f.lstat.owned?
+      elsif cmd.equal?( ?O )
+        res = f._not_equal?(nil) && f.lstat.rowned?
+      elsif cmd.equal?( ?G )
+        res = f._not_equal?(nil) && f.lstat.rgrpowned?
+      elsif cmd.equal?( ?w )
+        res = f._not_equal?(nil) && f.lstat.writable?
+      elsif cmd.equal?( ?W )
+        res = f._not_equal?(nil) && f.lstat.writable_real?
+      elsif cmd.equal?( ?x )
+        res = f._not_equal?(nil) && f.lstat.executable?
+      elsif cmd.equal?( ?W )
+        res = f._not_equal?(nil) && f.lstat.executable_real?
+      else
+        raise ArgumentError , 'Kernel#test , invalid first arg'
+      end
+    ensure
+      self._close_file(f)
+    end
+    res
+  end
+
+  def test(cmd, file1, file2)
+    res = false
+    fa = nil
+    fb = nil
+    begin
+      fa = self._as_file(file1)
+      fb = self._as_file(file2)
+      mta = fa.equal?(nil) ? -1 : fa.mtime 
+      mtb = fa.equal?(nil) ? -1 : fa.mtime 
+      if cmd.equal?( ?= )
+        # return true if modification times equal
+        res =  mta >= 0 && mtb >= 0 &&  mta == mtb
+      elsif cmd.equal?( ?< )
+        # return true if file1.mtime < file2.mtime
+        res =  mta >= 0 && mtb >= 0 &&  mta < mtb
+      elsif cmd.equal?( ?> )
+        # return true if file1.mtime > file2.mtime
+        res =  mta >= 0 && mtb >= 0 &&  mta > mtb
+      elsif cmd.equal?( ?- )
+        # return true if file1 is a hard link to file2
+        raise NotImplementedError , 'Kernel#test ?- '
+      else
+        raise ArgumentError
+      end
+    ensure
+      self._close_file(fa) 
+      self._close_file(fb) 
+    end
+    res
+  end
+
 
   # def throw(aSymbol); end  # implemented in smalltalk
   primitive_nobridge 'throw' , 'throw:'

@@ -443,12 +443,16 @@ class Object
       end
     end
 
-    def private_methods(unused_boolean=true)
+    def private_methods
       _ruby_methods(2)
     end
 
-    def protected_methods(unused_boolean=true)
+    def protected_methods
       _ruby_methods(1)
+    end
+
+    def public_methods
+      _ruby_methods(0)
     end
 
     def singleton_method_added(a_symbol)

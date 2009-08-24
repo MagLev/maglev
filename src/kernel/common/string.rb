@@ -61,8 +61,16 @@ class String
   #   rceu lowlr
 
   def scan(pattern)
+    self._scan(pattern)
+  end
+
+  def scan(pattern, &block)
+    self._scan(pattern, &block)
+  end
+  
+  def _scan(pattern)
     # taint = self.tainted? || pattern.tainted? # Maglev, no taint propagation
-    pattern = get_pattern(pattern, true)
+    pattern = self._get_pattern(pattern, true)
     index = 0
     last_match = nil
     ret = []
@@ -75,16 +83,16 @@ class String
       ret << val
     end
 
-    last_match._storeRubyVcGlobal(0x20) # store into caller's $~
+    last_match._storeRubyVcGlobal(0x30) # store into caller's $~
     return ret
   end
 
-  def scan(pattern, &block)
+  def _scan(pattern, &block)
     # second variant gets no bridge methods. can't rely on single
     # implementation with bridge methods when using _storeRubyVcGlobal
     # because number of frames up to caller's frame would vary .
     # taint = self.tainted? || pattern.tainted? # Maglev, no taint propagation
-    pattern = get_pattern(pattern, true)
+    pattern = self._get_pattern(pattern, true)
     index = 0
     last_match = nil
     if block_given?
@@ -95,7 +103,7 @@ class String
         val = (match.length.equal?(1) ? match[0] : match.captures)
         # val.taint if taint # Maglev, no taint propagation
 
-        last_match._storeRubyVcGlobal(0x20) # store into caller's $~
+        last_match._storeRubyVcGlobal(0x30) # store into caller's $~
         yield(val)
       end
     else
@@ -110,7 +118,7 @@ class String
       end
     end
 
-    last_match._storeRubyVcGlobal(0x20) # store into caller's $~
+    last_match._storeRubyVcGlobal(0x30) # store into caller's $~
     return ret
   end
 

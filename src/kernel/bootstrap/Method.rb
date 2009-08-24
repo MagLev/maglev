@@ -16,7 +16,7 @@ class Method
       @obj
     end
 
-    def _obj
+    def _gsmeth
       @gsmeth # instvar defined in UnboundMethod
     end
 
@@ -42,9 +42,10 @@ class Method
 
     alias_method :eql? , :==
 
-    # TODO to_proc
     def to_proc
-      Proc.new { |*args| self.call(*args) }
+      p = Proc.new { |*args| self.call(*args) }
+      p._arity=( self.arity )
+      p
     end
 
     primitive_nobridge 'unbind', 'unbind'

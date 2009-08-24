@@ -597,7 +597,7 @@ class String
     str = Type.coerce_to(str, String, :to_str)
     out = self.class.new
     start = 0
-    pat = get_pattern(regex, true)
+    pat = self._get_pattern(regex, true)
     last_match = nil
     pat.__each_match(self) do |match|
       last_match = match
@@ -669,7 +669,7 @@ class String
     start = 0
     out = self.class.new
     last_match = nil
-    get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+    self._get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
       saveTilde = block._fetchRubyVcGlobal(0);
@@ -687,18 +687,6 @@ class String
   end
 
   # From Rubinius
-  def get_pattern(pattern, quote = false)
-    unless pattern._isString || pattern._isRegexp
-      if pattern.respond_to?(:to_str)
-        pattern = pattern.to_str
-      else
-        raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
-      end
-    end
-    pattern = Regexp.quote(pattern) if quote && pattern._isString
-    pattern = Regexp.new(pattern) unless pattern._isRegexp
-    pattern
-  end
 
   def gsub!(regex, str)
     nval = gsub(regex, str)
@@ -714,7 +702,7 @@ class String
     #   blocks's home method and caller's home method are the same
     start = 0
     out = self.class.new
-    get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+    self._get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       out << self._gsub_copyfrom_to(start, match.begin(0) )
       saveTilde = block._fetchRubyVcGlobal(0);
       begin
@@ -1150,7 +1138,7 @@ class String
   # parameters.
   def sub(pattern, replacement)
     replacement = Type.coerce_to(replacement, String, :to_str)
-    regex = _get_pattern(pattern, true)
+    regex = self._get_pattern(pattern, true)
 
     # If pattern is a string, then do NOT interpret regex special characters.
     # stores into caller's $~
@@ -1166,18 +1154,17 @@ class String
   def sub(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    regex = _get_pattern(pattern, true)
+    regex = self._get_pattern(pattern, true)
     if (match = regex._match_vcglobals(self, 0x30))
        res = _replace_match_with(match, block.call(match[0]).to_s)
-     else
+    else
        res = self.dup
-     end
+    end
     res
   end
 
   def sub!(pattern, replacement)
-
-    regex = _get_pattern(pattern, true)
+    regex = self._get_pattern(pattern, true)
     # stores into caller's $~
     if match = regex._match_vcglobals(self, 0x30)
       replace(_replace_match_with(match, replacement))
@@ -1192,7 +1179,7 @@ class String
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
 
-    regex = _get_pattern(pattern, true)
+    regex = self._get_pattern(pattern, true)
     if match = regex._match_vcglobals(self, 0x30)
       replacement = block.call(match[0])
       replace(_replace_match_with(match, replacement))
@@ -1202,6 +1189,7 @@ class String
       nil
     end
   end
+
   # Do ruby conversions of a string or regexp to regexp.
   # If pattern is a string, then quote regexp special characters.
   # If pattern is neither a Regexp nor a String, try to coerce to string.
@@ -1218,7 +1206,6 @@ class String
     pattern = Regexp.new(pattern) unless pattern._isRegexp
     pattern
   end
-
 
   primitive 'succ!', 'rubySucc' # prim detects frozen if would change
 

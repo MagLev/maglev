@@ -7,14 +7,10 @@ class Module
   # loaded yet, so we have to wait until after bootstrap/File.rb is loaded
   # before you can do a puts.  Since all of the stubs in module have a
   # puts, they are temporarily there.  As they are implemented, we should
-  # pull them into here.
+  # pull them into here.  # comment maybe obsolete ??
 
   primitive_nobridge 'superclass' , '_rubySuperclass'  # resolves to impl in .mcz
 
-  primitive_nobridge 'constants',      'rubyConstants'
-  primitive_nobridge 'const_defined?', 'rubyConstDefined:'
-  primitive_nobridge '_const_get',      'rubyConstAt:'
-  primitive_nobridge 'const_set',      'rubyConstDecl:put:'
 
   # make associations holding constants of receiver invariant
   #   does not affect inherited constants
@@ -33,6 +29,182 @@ class Module
   primitive_nobridge 'freeze' , 'freezeModule'
   primitive_nobridge 'frozen?' , 'moduleFrozen'
 
+  # comparision methods
+
+  primitive_nobridge '_includes_module', '_rubySubclassOf:'
+
+  def <(other)
+    if self.equal?(other)
+      false
+    elsif other.is_a?(Module)
+      if self._includes_module(other)
+        true
+      elsif other._includes_module(self)
+        false
+      else
+        nil
+      end
+    else
+      raise TypeError , 'in Module#< , argument is not a Module'
+      nil
+    end
+  end
+
+  def <=(other)
+    if self.equal?(other)
+      true
+    elsif other.is_a?(Module)
+      if self._includes_module(other)
+        true
+      elsif other._includes_module(self)
+        false
+      else
+        nil
+      end
+    else
+      raise TypeError , 'in Module#< , argument is not a Module'
+      nil
+    end
+  end
+
+  def >(other)
+    if self.equal?(other)
+      false
+    elsif other.is_a?(Module)
+      if self._includes_module(other)
+        false
+      elsif other._includes_module(self)
+        true
+      else
+        nil
+      end
+    else
+      raise TypeError , 'in Module#> , argument is not a Module'
+      nil    
+    end
+  end
+
+  def >=(other)
+    if other.equal?(self)
+      true
+    elsif other.is_a?(Module)
+      if self._includes_module(other)
+        false
+      elsif other._includes_module(self)
+        true
+      else
+        nil
+      end
+    else
+      raise TypeError , 'in Module#>= , argument is not a Module'
+      nil
+    end
+  end
+
+  def <=>(other)
+    if self.equal?(other)
+      0
+    elsif self._includes_module(other)
+      -1
+    elsif other.is_a?(Module) && other._includes_module(self)
+      1
+    else
+      nil
+    end
+  end
+
+  def ===(obj)
+    # return true if obj is an instance of self or of one of self's descendants
+    obj.kind_of?( self)
+  end
+
+  # class variables support
+
+  primitive_nobridge 'class_variables', 'rubyClassVarNames'
+
+  primitive_nobridge '_class_var_defined', 'rubyClassVarDefined:'
+  
+  def class_variable_defined?(name)
+    unless name._isSymbol
+      if name._isNumeric
+        raise NameError, 'illegal class variable name'
+      end
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    _class_var_defined(name)
+  end
+
+  primitive_nobridge '_class_var_get', 'rubyClassVarGet:'
+
+  def class_variable_get(name) 
+    unless name._isSymbol
+      if name._isNumeric
+        raise NameError, 'illegal class variable name'
+      end
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    _class_var_get(name)
+  end
+
+  primitive_nobridge '_class_var_set', 'rubyClassVarSet:value:'
+  
+  def class_variable_set(name, value) 
+    unless name._isSymbol 
+      if name._isNumeric
+        raise NameError, 'illegal class variable name'
+      end
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    _class_var_set(name, value)
+  end
+
+  primitive_nobridge '_class_var_remove', 'rubyClassVarRemove:'
+
+  def remove_class_variable(name)
+    unless name._isSymbol 
+      if name._isNumeric
+        raise NameError, 'illegal class variable name'
+      end
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    _class_var_remove(name)
+  end
+
+  # constants access methods
+
+  primitive_nobridge 'constants', 'rubyConstants'  # includes superclasses' constants
+
+  def self.constants
+    Object.constants
+  end
+
+  primitive_nobridge '_const_defined', 'rubyConstDefined:'
+
+  def const_defined?(name)
+    # does not look in superclasses (but 1.9 does)
+    if name._isSymbol
+      sym = name
+    else
+      str = Type.coerce_to(name, String, :to_str)
+      sym = str.to_sym
+    end
+    res = self._const_defined(sym)
+    if res.equal?(false)
+      if str.equal?(nil)
+        str = name.to_s   # arg is a Symbol
+      end
+      if str =~ /^[A-Z](\w)*\z/
+        return false
+      else
+        raise NameError, 'arg to const_defined? is not a valid name for a constant'
+      end
+    end
+    res
+  end
+
+  primitive_nobridge '_const_get',      'rubyConstAt:'
+
   def const_get(name)
     unless name._isString or name._isSymbol
       name = Type.coerce_to(name, String, :to_str)
@@ -40,17 +212,47 @@ class Module
     _const_get(name)
   end
 
+  primitive_nobridge '_const_set',      'rubyConstDecl:put:'
+
+  def const_set(name, value)
+    if name._isSymbol
+      sym = name
+      str = name.to_s
+    else
+      str = Type.coerce_to(name, String, :to_str)
+      sym = nil
+    end
+    unless str =~ /^[A-Z](\w)*\z/
+      raise NameError, 'arg to const_set? is not a valid name for a constant'
+    end
+    if sym.equal?(nil)
+      sym = str.to_sym
+    end
+    self._const_set(sym, value)  
+  end
+
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)
     raise NameError, "uninitialized constant #{symbol}"
   end
 
-  # Invokes Module.append_features on each parameter (in reverse order).
-  # def include(*names) ; end  #  inherited from Behavior
+  # append_features deprecated, not implemented , see Module#included
+
+  def include(*names)
+    # this variant gets bridge methods
+    names.reverse.each do |name|
+      _include_module(name)
+    end
+  end
+  def include(name)
+    # variant needed for bootstrap
+    _include_module(name)
+  end
 
   #  define_method   is implemented in Behavior
 
-  # Invoked as a callback when a_module includes receiver
+  # Invoked as a callback when a_module includes receiver.
+  # supercedes  append_features 
   def included(a_module)
   end
 
@@ -78,14 +280,17 @@ class Module
 
   def module_function(*names)
     if names.length > 0
-      names.each{|name|
-        unless name.equal?(nil)
-          _module_funct(name)
+      names.each { |name|
+        unless name._isSymbol
+          name = Type.coerce_to(name, String, :to_str)
+          name = name.to_sym
         end
+        _module_funct(name)
       }
     else
-      _module_funct(nil)  # enable the _module_methods_all semantics
+      _module_funct(true)  # enable the _module_methods_all semantics
     end
+    self
   end
 
   # The @name fixed instVar in Module may hold a Smalltalk class name
@@ -95,6 +300,16 @@ class Module
   primitive_nobridge '_fullName', 'rubyFullName'
   def name
     _fullName
+  end
+
+  # Module.nesting is compiled to an env0 send of ( aRubyConstantRef nesting ) .
+  # Module.nesting is not usable within bootstrap code.
+  #
+  def self.nesting(*args, &blk)
+    # You may also get this error if Module.nesting is used in bootstrap code
+    # or if the receiver of nesting is not recognizable at compile time
+    # as a reference to the constant Module .
+    raise ArgumentError , 'only zero arg form of Module.nesting is supported'
   end
 
   class_primitive_nobridge 'allocate', 'newModule'
@@ -112,9 +327,40 @@ class Module
     self
   end
 
+  primitive_nobridge '_set_protection_methods*', 'setProtection:methods:'
+
+  def private(*names)
+    # if names empty, set default visibility for subsequent methods to private
+    #  and shutoff _module_methods_all 
+    _set_protection_methods(2, *names)
+  end
+
+  def public(*names)
+    #  if names empty, set default visibility for subsequent methods to public
+    #  and shutoff _module_methods_all 
+    _set_protection_methods(0, *names)
+  end
+
+
+  def protected(*names)
+    # if names empty, set default visibility for subsequent methods to protected
+    #  and shutoff _module_methods_all 
+    _set_protection_methods(1, *names)
+  end
+
+  primitive_nobridge '_set_protection_classmethods*', 'setProtection:classmethods:'
+
+  def private_class_method(*symbols)
+    _set_protection_classmethods(2, *symbols)
+  end
+
+  def public_class_method(*symbols)
+    _set_protection_classmethods(0, *symbols)
+  end
+
   primitive_nobridge 'remove_const', 'rubyRemoveConst:'
 
-  primitive_nobridge '_method_protection', 'rubyMethodProtection'
+  # primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
 
   # Controls whether receiver is persistable.
   #

@@ -178,7 +178,15 @@ class Proc
       false
     end
 
+    def _arity=(v)
+      @arity = v
+    end
+
     def arity
+      na = @arity
+      if na._not_equal?(nil)
+        return na
+      end
       blk = @block
       na = blk._numArgs 
       if na.equal?(0)
