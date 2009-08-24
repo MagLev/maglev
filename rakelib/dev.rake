@@ -140,7 +140,7 @@ namespace :parser do
     puts "No parser running on port #{PARSETREE_PORT}" unless Parser.stop.nil?
   end
 
-  desc "Show if the parser is running"
+  desc "Show if the ParseTree based parser is running"
   task :status => :gemstone do
     if Parser.running?
       puts "MagLev Parse Server running on port #{PARSETREE_PORT}"
