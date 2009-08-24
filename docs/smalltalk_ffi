@@ -9,7 +9,7 @@ code to call into the GemStone/Smalltalk evnironment.
 To generate the ruby wrappers:
 
   $ cd $MAGLEV_HOME
-  $ rake dev:stwrappers
+  $ rake stwrappers
 
 The wrapper files are placed in
 <tt>$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk</tt>
