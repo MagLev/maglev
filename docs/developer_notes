@@ -1,0 +1,76 @@
+= Notes on Developing MagLev Applications
+
+This file contains random insights into developing MagLev applications.
+
+== File View vs Repository View
+
+=== The Problem
+One thing that will probably bite you at one time or another, is that
+you'll be developing an application, commit some code, then refactor it and
+re-commit, but you'll get a mysterious bug:
+
+  Deleting a method from your file does not delete it from the repository!
+
+E.g.,
+
+  Maglev.persistent do
+
+    class Tag
+
+      attr_reader :name
+
+      def initialize(name)
+         @name = name
+      end
+
+      # Other stuff...
+    end
+
+  end
+  Maglev.commit_transaction
+
+  t = Tag.new("fred")
+
+You run the code to test it and it works.  Now you decide to refactor (you
+don't want to name your tags afterall), so you edit <tt>tag.rb</tt> and
+delete the intialize method and the reader:
+
+  Maglev.persistent do
+
+    class Tag
+      # Other stuff...
+    end
+
+  end
+  Maglev.commit_transaction
+
+  t = Tag.new
+
+You re-run the code, but you get the following error:
+
+  $ maglev-ruby tag.rb
+  -- RubyFile>>load  : loading /Users/pmclain/GemStone/dev/tag.rb
+  error , too few arguments,
+            during /Users/pmclain/GemStone/dev/tag.rb
+  -----------------------------------------------------
+  GemStone: Error         Nonfatal
+  Error, 'too few arguments'
+  Error Category: 231169 [GemStone] Number: 2023 Arg Count: 1 Context : 148473601
+  Arg 1: [69411841 sz:17 cls: 74753 String] too few arguments
+
+While the code in <tt>tag.rb</tt> is "correct", MagLev still has the old
+definition of <tt>Tag#initialize</tt> in the repository, so it is expecting
+one parameter, and the new code doesn't pass any parameters to +new+.
+
+=== The Solution
+
+Currently, the only thing to do is to reset the repository back to scratch:
+
+  $ cd $MAGLEV_HOME
+  $ rake maglev:reload
+  $ rake maglev:start
+
+Now, the second version of the file is "in-synch" with the state of the
+repository, and the code runs fine.
+
+
