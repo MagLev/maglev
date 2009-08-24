@@ -11,10 +11,20 @@ class File
 
   class_primitive_nobridge '_section2OpenConstants', '_section2OpenConstants'
 
-  # Note, these constants are OS independent values different than
+  FNM_SYSCASE  = 0x00
+  FNM_NOESCAPE = 0x01
+  FNM_PATHNAME = 0x02
+  FNM_DOTMATCH = 0x04
+  FNM_CASEFOLD = 0x08
+  
+  SEEK_SET     = 0            # set file position to offset
+  SEEK_CUR     = 1            # set file position to current + offset
+  SEEK_END     = 2            # set file position to end of file + offset
+
+  # Following constants are OS independent values different than
   #  any found on common variants of Unix. They are translated to
   #  OS dependent values by the primitives.  Use of other hardcoded values
-  #  will cause Exceptions during file openinng.
+  #  will cause Exceptions during file opening.
   APPEND = self._section2OpenConstants[:RUBY_APPEND]
   CREAT = self._section2OpenConstants[:RUBY_CREAT]
   EXCL = self._section2OpenConstants[:RUBY_EXCL]
@@ -22,9 +32,10 @@ class File
   NONBLOCK = self._section2OpenConstants[:RUBY_NONBLOCK]
   RDONLY = self._section2OpenConstants[:RUBY_RDONLY]
   RDWR = self._section2OpenConstants[:RUBY_RDWR]
+  SYNC = self._section2OpenConstants[:RUBY_SYNC]
   TRUNC = self._section2OpenConstants[:RUBY_TRUNC]
   WRONLY = self._section2OpenConstants[:RUBY_WRONLY]
-  #
+  #  see also File::Constants in IO2.rb
 
   # FILE::LOCK  constants initialized below
 
@@ -303,8 +314,8 @@ class File
     stat_2 = File._stat(Type.coerce_to(file_2, String, :to_str), false)
     return false unless stat_1.ino == stat_2.ino
     return false unless stat_1.ftype == stat_2.ftype
-#     return false unless POSIX.access(orig, Constants::R_OK)
-#     return false unless POSIX.access(copy, Constants::R_OK)
+#     return false unless POSIX.access(orig, R_OK)
+#     return false unless POSIX.access(copy, R_OK)
     return true
   end
 
