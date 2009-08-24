@@ -20,7 +20,7 @@ def test_from_deprecated_proc
   return 88 # return something different from the lambda
 end
 yb = test_from_deprecated_proc
-raise "FAIL: deprecated proc" unless yb == 99
+raise "FAIL: deprecated proc" unless yb == 88
 
 # TODO: Currently, the next test case fails in MagLev with:
 #
