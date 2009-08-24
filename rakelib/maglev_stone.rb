@@ -41,11 +41,10 @@ class MagLevStone < Stone
   end
 
   def reload
-    was_running = self.running?
-    stop if was_running
-    destroy!
-    initialize_new_stone
-    start if was_running
+    with_server_stopped do
+      destroy!
+      initialize_new_stone
+    end
   end
 
   def start
@@ -57,23 +56,11 @@ class MagLevStone < Stone
   end
 
   def take_snapshot
-    if running?
-      stop
-      make_offline_backup
-      start
-    else
-      make_offline_backup
-    end
+    with_server_stopped { make_offline_backup }
   end
 
   def restore_snapshot
-    if running?
-      stop
-      restore_offline_backup
-      start
-    else
-      restore_offline_backup
-    end
+    with_server_stopped { restore_offline_backup }
   end
 
   def make_offline_backup
@@ -148,5 +135,16 @@ class MagLevStone < Stone
 
   def topaz_session
     Topaz.new(self).interactive_session
+  end
+
+  private
+  # Executes the block with the server stopped.  Will
+  # restart the server if the server was running when
+  # with_server_stopped was called.
+  def with_server_stopped
+    was_running = self.running?
+    stop if was_running
+    yield
+    start if was_running
   end
 end
