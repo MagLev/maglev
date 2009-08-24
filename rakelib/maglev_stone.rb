@@ -41,9 +41,11 @@ class MagLevStone < Stone
   end
 
   def reload
-    stop if running?
+    was_running = self.running?
+    stop if was_running
     destroy!
     initialize_new_stone
+    start if was_running
   end
 
   def start
