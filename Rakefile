@@ -66,6 +66,7 @@ end
 
 desc "Create .rb files for each smalltalk class (lib/ruby/site_ruby/1.8/smalltalk/*)"
 task :stwrappers => 'maglev:start' do
+  puts "Creating .rb files for smalltalk classes in lib/ruby/site_ruby/1.8/smalltalk/"
   run_on_stone(["omit resultcheck",
                 "run",
                 "RubyContext createSmalltalkFFIWrappers",
@@ -81,16 +82,16 @@ namespace :stone do
   desc "Create a new MagLev server and repository"
   task :create, :server_name do |t, args|
     raise ArgumentError, "Task #{t.name} requires a new server name" unless args.server_name
-    puts "Creating #{args.server_name}"
+    puts "Creating server \"#{args.server_name}\""
     MagLevStone.create(args.server_name)
   end
 
   desc "Destroy an existing MagLev server and repository"
   task :destroy, :server_name do |t, args|
     raise ArgumentError, "Task #{t.name} requires an existing server name" unless args.server_name
-    puts "Destroying #{args.server_name}"
     s = Stone.existing(args.server_name)
     s.stop
+    puts "Destroying server \"#{args.server_name}\""
     s.destroy!
   end
 

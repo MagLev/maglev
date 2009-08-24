@@ -21,6 +21,7 @@ class MagLevStone < Stone
 
   def create_skeleton
     mkdir_p @gemstone_installation.config_directory
+    mkdir_p @gemstone_installation.backup_directory
     super
   end
 
