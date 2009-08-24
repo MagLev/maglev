@@ -1,27 +1,39 @@
 # This file defines the blog classes.  To commit the code, load this
 # file from within a Maglev.persistent block and then commit it.
+
+module Maglev::Model
+
+  module ClassMethods
+
+    def new(*params)
+      obj = allocate
+      obj.initialize(*params)
+      add(obj)
+    end
+
+    # Returns an array of all the posts
+    def all
+      Maglev::PERSISTENT_ROOT[self].values
+    end
+
+    def get(id)
+      Maglev::PERSISTENT_ROOT[self][id.to_i]
+    end
+
+    def add(obj)
+      Maglev::PERSISTENT_ROOT[self][obj.__id__] = obj
+    end
+  end
+
+  def self.included(host)
+    Maglev::PERSISTENT_ROOT[host] = Hash.new
+    host.extend(ClassMethods)
+  end
+
+end
+
 class Post
-
-  # TODO: All of these class methods are fodder for a Maglev::Model
-  # module...
-  def self.new(params)
-    p = allocate
-    p.initialize(params)
-    add(p)
-  end
-
-  # Returns an array of all the posts
-  def self.all_posts
-    Maglev::PERSISTENT_ROOT[Post].values
-  end
-
-  def self.get(id)
-    Maglev::PERSISTENT_ROOT[Post][id.to_i]
-  end
-
-  def self.add(post)
-    Maglev::PERSISTENT_ROOT[Post][post.__id__] = post
-  end
+  include Maglev::Model
 
   attr_reader :text, :title
   def initialize(params)
@@ -30,4 +42,12 @@ class Post
   end
 end
 
-Maglev::PERSISTENT_ROOT[Post] = Hash.new
+class Tag < Array
+  include Maglev::Model
+
+  attr_reader :name
+  def initialize(name)
+    @name = name
+  end
+end
+
