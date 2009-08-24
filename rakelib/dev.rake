@@ -13,7 +13,8 @@ namespace :dev do
 
   desc "Run the vm smoke tests"
   task :'vm-tests' do
-    run_on_stone(["run", "RubyContext _runVmUnit", "%"])
+    output = run_on_stone(["run", "RubyContext _runVmUnit", "%"])
+    puts output.join("\n")
   end
 
   desc "Run the passing specs"
