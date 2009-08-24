@@ -4,21 +4,22 @@ You must be running on a suitable machine and 64-bit OS. The install or
 upgrade script you used to download MagLev should have complained if
 your machine was not suitable.
  
-Some prerequisites must be installed on your machine before MagLev can
-run correctly.
+=== Parse Server prerequisites
+
+Note: The MagLev Parse Server is no longer used by default. You only need these prerequisites if you are working on MagLev primitives or the native MagLev parser.
 
 You will need the following MRI Ruby resources on your machine:
 
 1. MRI Ruby 1.8.6 (other versions are not supported)
    Patchlevel 287 is required, patchlevel 111 and 114 currently don't work
 2. RubyGems
-3. ParseTree gem (version 3.0.3 or later)
+3. ParseTree gem (version 3.0.3)
 4. Rake
 
 You can check which ParseTree version you have installed with:
    gem list --local 
 If you don't have ParseTree or have an earlier version:
-   sudo gem install ParseTree
+   sudo gem install ParseTree --version '3.0.3'
 
 === Optional prerequisites
 
