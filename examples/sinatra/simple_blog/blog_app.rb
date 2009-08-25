@@ -10,17 +10,18 @@ configure(:development) do
   set :run, true
 end
 
-Exception.install_debug_block do |e|
-  case e
-  when NoMethodError
-    puts "---- #{e} -- (#{e.class})  selector: #{e.selector} args: #{e.args} env: #{e.envid}"
-    selector = e.selector.to_s
-#    nil.pause if selector == "id"
-#    nil.pause if selector == "render_erb"
-  else
-    #puts "---- #{e} -- (#{e.class})"
-  end
-end
+# Exception.install_debug_block do |e|
+#   case e
+#   when NoMethodError
+#     puts "********** #{e} -- (#{e.class})  selector: #{e.selector} args: #{e.args.inspect} env: #{e.envid}"
+#     selector = e.selector.to_s
+# #    nil.pause if selector == "to_int"
+# #    nil.pause if selector == "id"
+# #    nil.pause if selector == "render_erb"
+#   else
+#     #puts "---- #{e} -- (#{e.class})"
+#   end
+# end
 
 error do
   e = request.env['sinatra.error']
@@ -31,13 +32,24 @@ get '/' do
   redirect '/posts'
 end
 
+get '/tag/:id' do
+  @tag = Tag.get(params[:id])
+  stop [ 404, "Page not found for tag (id: #{params[:id]})" ] unless @tag
+  erb :tag
+end
+
 get '/post/new' do
   erb :newpost
 end
 
 post '/post' do
   post = Post.new(params)
-  Post.add(post)
+  params[:tags].split.each do |tag|
+    Tag.all.find { |t| t.name == tag }
+    t ||= Tag.new(tag)
+    t << post
+    post.tags << t
+  end if params[:tags]
   redirect "/post/#{post.__id__}"
 end
 
@@ -48,7 +60,7 @@ get '/post/:id' do
 end
 
 get '/posts' do
-  @posts = Post.all_posts
+  @posts = Post.all
   erb :index
 end
 
@@ -79,6 +91,11 @@ __END__
           <h4>Recent Posts</h4>
           <p>TBD</p>
           <h4>Tags</h4>
+          <ul>
+            <% Tag.all.each do |tag| %>
+            <li><a href="/tag/<%= tag.__id__ %>"><%= tag.name %></a></li>
+            <% end %>
+          </ul>
           <p>TBD</p>
           <h4>About</h4>
           <p>This is a simple sinatra blog running on MagLev</p>
@@ -104,11 +121,23 @@ __END__
 
 @@ newpost
 <form method="post" action="/post">
-  Title: <input type="text" name="title" /><br />
-  Text:  <textarea name="text" rows="10" cols="50"></textarea><br />
-  <input type="submit" value="Create">
+  <ul>
+    <li>Title: <input type="text" name="title" /> </li>
+    <li>Tags:  <input type="text" name="tags" /> </li>
+    <li>Text:  <textarea name="text" rows="10" cols="50"></textarea></li>
+    <li><input type="submit" value="Create"></li>
+  </ul>
 </form>
 
 @@ post
 <h3><%= @post.title %></h3>
+<p> Tags: <%= @post.tags.map{ |t| t.name }.join(" ") %> </p>
 <p><%= @post.text %></p>
+
+@@ tag
+<h3>Posts tagged with <%= @tag.name %></h3>
+<ul>
+  <% @tag.each do |post| %>
+  <li><a href="/post/<%= post.__id__ %>"> <%= post.title %></a></li>
+  <% end %>
+</ul>
