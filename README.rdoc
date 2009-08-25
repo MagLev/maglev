@@ -27,6 +27,14 @@ set your <tt>MAGLEV_HOME</tt> and <tt>PATH</tt> variables:
   export MAGLEV_HOME=<path_to_the_directory_containing_this_README>
   export PATH=$MAGLEV_HOME/bin:$PATH
 
+It can also be useful to put any frequently used MagLev options (like "-d" or "-MtraceLoad")
+in the environment variable MAGLEV_OPTS so you don't have to type them on the command line,
+and executables like rackup, rake, etc. can use them without modifying those scripts.
+
+  export MAGLEV_OPTS="-d -MtraceLoad"
+
+run "maglev-ruby --help" to see possible options.
+
 === Start the MagLev server
 
 The server is started with rake:

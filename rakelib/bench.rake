@@ -111,6 +111,7 @@ namespace :bench do
     Dir[RBS_DIR + "/**/bm_*.rb"].sort.each do |name|
       Dir.chdir File.dirname(name) do
         puts "  Running #{File.basename name}"
+        puts "in #{Dir.pwd} running #{command name}" if ENV['VERBOSE']
         system "#{command name}"
       end
     end

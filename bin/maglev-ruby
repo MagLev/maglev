@@ -18,7 +18,7 @@ OPTIONS:
    -e <command>   Execute command.  May pass multiple -e
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h, --help     Show this message and exit
-   -I <path>      Add <path> to $LOAD_PATH
+   -I <path>      Add <path> to \$LOAD_PATH
    -M<opt>        MagLev specific options.  This flag may be passed multiple
                   times.  The currently recognized options are:
                     traceGlobals  Trace setting/defining global variables
