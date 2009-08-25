@@ -72,6 +72,7 @@ class Post
   # Tag the post: (a) adds reciever to the tag and (b) adds
   # each tag to recevier's @tags
   def tag(*tags)
+    p tags
     tags.each do |tag|
       tag << self
       @tags << tag
@@ -88,5 +89,12 @@ class Tag < Array
   end
   def to_s
     @name
+  end
+
+  def self.find_by_name(name)
+    Tag.detect { |t|
+      puts "t.name (#{t.name}) == name (#{name}) : #{t.name == name}"
+      t.name == name
+    }
   end
 end

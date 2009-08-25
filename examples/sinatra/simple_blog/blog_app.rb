@@ -45,10 +45,11 @@ end
 post '/post' do
   post = Post.new(params)
   params[:tags].split.each do |tag|
-    Tag.all.find { |t| t.name == tag }
-    t ||= Tag.new(tag)
-    t << post
-    post.tags << t
+    t = Tag.find_by_name(tag) || Tag.new(tag)
+    post.tag t
+#    t ||= Tag.new(tag)
+#    t << post
+#wh    post.tags << t
   end if params[:tags]
   redirect "/post/#{post.__id__}"
 end

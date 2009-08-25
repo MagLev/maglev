@@ -4,10 +4,16 @@ task :commit do
   sh %{ maglev-ruby -MnoRlwrap commit_code.rb }
 end
 
+desc "Commit the code and run the app"
+task :run => :commit do
+  sh %{ maglev-ruby -MnoRlwrap blog_app.rb }
+end
+
 "Run tets: requires patched minitest gem"
 task :tests => :commit do
   Dir.glob("test/*_tests.rb") do |t|
     sh %{ unset MAGLEV_OPTS ; maglev-ruby -MnoRlwrap #{t} }
   end
 end
+
 
