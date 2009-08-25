@@ -41,7 +41,7 @@ set -- $MAGLEV_OPTS "$@"
 
 # Make sure MAGLEV_HOME is set
 if [ -z "${MAGLEV_HOME}" ]; then
-    echo "\$MAGLEV_HOME is not set."
+    echo "$COMMAND: [Error] \$MAGLEV_HOME is not set."
     echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
     exit 1
 fi
@@ -52,7 +52,7 @@ if [ -z "${GEMSTONE}" ]; then
 fi
 # Check for topaz command to validate the $GEMSTONE directory
 if [ ! -x $GEMSTONE/bin/topaz ]; then
-    echo "$GEMSTONE does not appear to be a valid GemStone product directory"
+    echo "$COMMAND: [Error] $GEMSTONE does not appear to be a valid GemStone product directory."
     echo "To fix this, set a valid GEMSTONE in your .bashrc"
     exit 1
 fi
@@ -158,6 +158,15 @@ done
 export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 export GEMSTONE_SYS_CONF=$conf_file
 
+# Make sure the stone is ready
+$GEMSTONE/bin/waitstone $stone -1 >/dev/null
+if [ $? -ne 0 ] ; then
+    echo "$COMMAND: [Error] The MagLev server \"$stone\" is not running."
+    echo "To fix this run \"rake $stone:start\" before running $COMMAND."
+    exit 1
+fi
+
+
 if [ $# -lt 1 ]; then
   if [ -z "${dash_e}" ]; then
     # If no -e params and no script, then read commands from STDIN
@@ -172,7 +181,7 @@ fi
 
 # Make sure the argument is a valid file, or there was a -e "command" parameter
 if [[ ! -z $RUBYSCRIPT && ! -e $RUBYSCRIPT && -z $dash_e ]]; then
-    echo "$COMMAND: Error -- The file \"$RUBYSCRIPT\" does not exist"
+    echo "$COMMAND: [Error] The file \"$RUBYSCRIPT\" does not exist"
     exit 1
 fi
 
