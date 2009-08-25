@@ -3,10 +3,6 @@ require 'minitest/spec'
 
 MiniTest::Unit.autorun
 
-Exception.install_debug_block do |e|
-  puts "====== #{e.class}:  #{e}"
-  nil.pause if ArgumentError === e
-end
 describe Post do
   it "Adds newly created posts to the persistent root" do
     p0 = Post.new(:title => "The Title", :text => "Some text")

@@ -38,6 +38,13 @@ module Maglev::Model
     def add(obj)
       Maglev::PERSISTENT_ROOT[self][obj.__id__] = obj
     end
+
+    # Iterate over all saved items
+    def each
+      all.each do |el|
+        yield el
+      end
+    end
   end
 
   def self.included(host)
@@ -45,7 +52,8 @@ module Maglev::Model
     # blow away any persistent data from previous runs.  Perhaps we need a
     # migration idiom so that this can be controlled.
     Maglev::PERSISTENT_ROOT[host] = Hash.new
-    host.extend(ClassMethods)
+    host.extend ClassMethods
+    host.extend Enumerable
   end
 
 end
@@ -59,6 +67,15 @@ class Post
     @text =  params[:text]
     @timestamp = Time.now
     @tags = []
+  end
+
+  # Tag the post: (a) adds reciever to the tag and (b) adds
+  # each tag to recevier's @tags
+  def tag(*tags)
+    tags.each do |tag|
+      tag << self
+      @tags << tag
+    end
   end
 end
 
