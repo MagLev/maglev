@@ -1,2 +1,0 @@
-fails:Hash#[] calls subclass implementations of default
-fails:Hash#[] returns the default (dynamic) value for missing keys

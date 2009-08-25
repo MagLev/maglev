@@ -1,2 +1,0 @@
-fails:Proc#== returns true if self and other are both lambdas with the same body
-fails:Proc#== returns true if self and other are different kinds of procs but have the same body

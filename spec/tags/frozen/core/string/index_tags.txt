@@ -1,2 +1,0 @@
-fails:String#index with Regexp behaves the same as String#index(string) for escaped string regexps
-fails:String#index with Regexp sets $~ to MatchData of match and nil when there's none

@@ -1,1 +1,0 @@
-fails:File.lstat raises an Errno::ENOENT if the file does not exist
