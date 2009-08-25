@@ -37,7 +37,7 @@ if [ -z "$MAGLEV_HOME" ]; then
     # echo "using $PWD as MAGLEV_HOME"
     export MAGLEV_HOME=$PWD
   else
-    echo "$PWD is not a valid MAGLEV_HOME directory"
+    echo "$COMMAND: [Error] $PWD is not a valid MAGLEV_HOME directory"
     echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
     exit 1
   fi
