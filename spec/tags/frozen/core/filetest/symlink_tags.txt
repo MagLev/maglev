@@ -1,1 +1,0 @@
-fails:FileTest.symlink? returns true if the file is a link
