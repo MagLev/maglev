@@ -1,2 +1,1 @@
-fails:Method#== returns true if methods are the same
 fails:Method#== returns true on aliased methods

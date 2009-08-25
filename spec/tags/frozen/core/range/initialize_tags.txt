@@ -1,2 +1,1 @@
 fails:Range#initialize raises a NameError if passed with two or three arguments
-fails:Range#initialize raises an ArgumentError if passed with four or more arguments

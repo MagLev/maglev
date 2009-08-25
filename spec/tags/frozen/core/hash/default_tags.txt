@@ -1,2 +1,1 @@
-fails:Hash#default uses the default proc to compute a default value, passing given key
 fails:Hash#default calls default proc with nil arg if passed a default proc but no arg

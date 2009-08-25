@@ -1,4 +1,3 @@
-fails:Array#* with an integer raises an ArgumentError when passed a negative integer
 fails:Array#* with an integer copies the taint status of the original array even if the array is empty
 fails:Array#* with an integer copies the taint status of the original array if the passed count is not 0
 fails:Array#* with a string returns a string formed by concatenating each element.to_s separated by separator without trailing separator

@@ -1,15 +1,4 @@
-fails:String#gsub with pattern and replacement doesn't freak out when replacing ^
-fails:String#gsub with pattern and replacement returns a copy of self with all occurrences of pattern replaced with replacement
-fails:String#gsub with pattern and replacement treats \1 sequences without corresponding captures as empty strings
-fails:String#gsub with pattern and replacement replaces \& and \0 with the complete match
-fails:String#gsub with pattern and replacement replaces \` with everything before the current match
-fails:String#gsub with pattern and replacement replaces \' with everything after the current match
 fails:String#gsub with pattern and replacement taints the result if the original string or replacement is tainted
-fails:String#gsub with pattern and replacement tries to convert replacement to a string using to_str
-fails:String#gsub with pattern and replacement raises a TypeError when replacement can't be converted to a string
-fails:String#gsub with pattern and replacement returns subclass instances when called on a subclass
-fails:String#gsub with pattern and replacement sets $~ to MatchData of last match and nil when there's none
-fails:String#gsub with pattern and block sets $~ to MatchData of last match and nil when there's none for access from outside
 fails:String#gsub with pattern and block raises a RuntimeError if the string is modified while substituting
 fails:String#gsub! with pattern and replacement taints self if replacement is tainted
 fails:String#gsub! with pattern and replacement raises a TypeError when self is frozen

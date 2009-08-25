@@ -1,4 +1,2 @@
 fails:Module#public_method_defined? returns false if method is not a public method
 fails:Module#public_method_defined? raises an ArgumentError if called with a Fixnum
-fails:Module#public_method_defined? raises a TypeError if not passed a Symbol
-fails:Module#public_method_defined? accepts any object that is a String type

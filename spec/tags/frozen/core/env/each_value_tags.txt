@@ -1,2 +1,1 @@
 fails:ENV.each_value returns each value
-fails:ENV.each_value raises LocalJumpError if no block given

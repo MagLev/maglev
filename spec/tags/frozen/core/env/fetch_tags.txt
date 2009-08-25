@@ -1,2 +1,1 @@
 fails:ENV.fetch returns a value
-fails:ENV.fetch warns on block and default parameter given
