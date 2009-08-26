@@ -53,15 +53,16 @@ module Kernel
 
   def method_missing(method_id, *args)
     prot = _last_dnu_protection()
-    if (prot.equal?(0))
-      text = 'Undefined method '
-    elsif (prot.equal?(1))
-      text = 'protected method '
-    else
-      text = 'private method '
-    end
-    exc = NoMethodError.exception(text)
-    exc._init( method_id , args, 1)  # FOR NOW, ASSUME envId 1
+    type = if (prot.equal?(0))
+             'undefined method'
+           elsif (prot.equal?(1))
+             'protected method'
+           else
+             'private method'
+           end
+
+    exc = NoMethodError.exception("NoMethodError: #{type} `#{method_id}' for #{self}")
+    exc._init(method_id , args, 1)  # FOR NOW, ASSUME envId 1
     exc._signal
   end
 
@@ -197,7 +198,7 @@ module Kernel
     unless str._isString
       raise TypeError, '$_ is not a String'
     end
-    start = 0 
+    start = 0
     out = ''
     str._get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
       out << str._gsub_copyfrom_to(start, match.begin(0))
@@ -546,11 +547,11 @@ module Kernel
   def `(arg)
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    arr = _system_exec(arg) 
+    arr = _system_exec(arg)
     status = arr[0]
-    unless status.equal?(0) 
+    unless status.equal?(0)
 nil.pause
-      Errno.raise_errno(status, arg) 
+      Errno.raise_errno(status, arg)
     end
     arr[1]
   end
@@ -629,12 +630,12 @@ nil.pause
   end
 
   def _system(arg)
-    # called from generated code 
+    # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    arr = _system_exec(arg) 
+    arr = _system_exec(arg)
     status = arr[0]
-    unless status.equal?(0) 
-      Errno.raise_errno(status, arg) 
+    unless status.equal?(0)
+      Errno.raise_errno(status, arg)
     end
     arr[1]
   end
@@ -654,7 +655,7 @@ nil.pause
     status = arr[0]
     if status.equal?(0)
       # print result string per MRI behavior, not document in Pickaxe book
-      puts arr[1]  
+      puts arr[1]
       return true
     end
     return false
@@ -676,9 +677,9 @@ nil.pause
       begin
         f = File.open(fn)
       rescue
-        f = nil 
+        f = nil
       end
-    end 
+    end
     f
   end
 
@@ -703,7 +704,7 @@ nil.pause
           File.open(file) # raises ENOENT
         end
         res = f.ctime
-      elsif cmd.equal?( ?M ) 
+      elsif cmd.equal?( ?M )
         if f.equal?(nil)
           File.open(file) # raises ENOENT
         end
@@ -720,23 +721,23 @@ nil.pause
         res = f._not_equal?(nil) && f.lstat.file?
       elsif cmd.equal?( ?g )
         res = f._not_equal?(nil) && f.lstat.setgid?
-      elsif cmd.equal?( ?k )  
+      elsif cmd.equal?( ?k )
         res = f._not_equal?(nil) && f.lstat.sticky?
-      elsif cmd.equal?( ?l )  
+      elsif cmd.equal?( ?l )
         res = f._not_equal?(nil) && f.lstat.symlink?
-      elsif cmd.equal?( ?p )  
+      elsif cmd.equal?( ?p )
         res = f._not_equal?(nil) && f.lstat.pipe?  # a fifo
-      elsif cmd.equal?( ?S )  
-        res = f._not_equal?(nil) && f.lstat.socket? 
-      elsif cmd.equal?( ?u )  
-        res = f._not_equal?(nil) && f.lstat.setuid?  
+      elsif cmd.equal?( ?S )
+        res = f._not_equal?(nil) && f.lstat.socket?
+      elsif cmd.equal?( ?u )
+        res = f._not_equal?(nil) && f.lstat.setuid?
       elsif cmd.equal?( ?s )
         res = nil
         if f._not_equal?(nil) && (sz = f.lstat.size)
           res = sz
-        end  
+        end
       elsif cmd.equal?( ?z )
-        res = f._not_equal?(nil) && f.lstat.size == 0    
+        res = f._not_equal?(nil) && f.lstat.size == 0
       elsif cmd.equal?( ?r )
         res = f._not_equal?(nil) && f.lstat.readable?
       elsif cmd.equal?( ?R )
@@ -771,8 +772,8 @@ nil.pause
     begin
       fa = self._as_file(file1)
       fb = self._as_file(file2)
-      mta = fa.equal?(nil) ? -1 : fa.mtime 
-      mtb = fa.equal?(nil) ? -1 : fa.mtime 
+      mta = fa.equal?(nil) ? -1 : fa.mtime
+      mtb = fa.equal?(nil) ? -1 : fa.mtime
       if cmd.equal?( ?= )
         # return true if modification times equal
         res =  mta >= 0 && mtb >= 0 &&  mta == mtb
@@ -789,8 +790,8 @@ nil.pause
         raise ArgumentError
       end
     ensure
-      self._close_file(fa) 
-      self._close_file(fb) 
+      self._close_file(fa)
+      self._close_file(fb)
     end
     res
   end
