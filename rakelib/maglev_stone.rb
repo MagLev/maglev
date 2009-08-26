@@ -50,7 +50,6 @@ class MagLevStone < Stone
   def start
     # Don't start parser by defult anymore
     # start_parser unless parser_running?
-    puts "MagLev server \"#{name}\" starting..."
     super
     ensure_prims_loaded
   end
@@ -100,11 +99,7 @@ class MagLevStone < Stone
   # transaction.  Does nothing if prims are already loaded.
   def ensure_prims_loaded
     if running?
-      if prims_loaded?(@name)
-        puts "Kernel already loaded for #{@name}."
-      else
-        reload_prims
-      end
+      reload_prims unless prims_loaded?(@name)
     end
   end
 

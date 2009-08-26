@@ -115,11 +115,11 @@ def run_on_stone(commands_array, stone='maglev')
 end
 
 namespace :netldi do
-  desc "Stop netldi"
+  desc "Stop NetLDI process"
   task :stop do
     GemStoneInstallation.current.stopnetldi
   end
-  desc "Start netldi"
+  desc "Start NetLDI process"
   task :start do
     GemStoneInstallation.current.startnetldi
   end

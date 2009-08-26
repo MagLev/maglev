@@ -73,18 +73,23 @@ class Stone
     if running?
       gs_sh "gslist -clv #@name"
     else
-      puts "#@name not running"
+      puts "GemStone server \"#@name\" not running."
     end
   end
 
   def start
-    gs_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
+    # Startstone can use single or double quotes around the stone name, so check for either (Yucch)
+    gs_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name} | grep Info]:.*[\\\'\\\"]#{@name}"
     running?(10)
     self
   end
 
   def stop
-    gs_sh "stopstone -i #{name} #{username} #{password}"
+    if running?
+      gs_sh "stopstone -i #{name} #{username} #{password} 1>/dev/null"
+    else
+      puts "GemStone server \"#@name\" not running."
+    end
     self
   end
 
