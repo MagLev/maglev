@@ -36,10 +36,13 @@ Then hit http://localhost:4567/
 TODO for the sinatra app
 
 * Get persistence of sinatra and rack working (autoload persistence)
-* Get a template engine working
 * Try using shotgun for dev time file reloading (or Rack::Reloader)
 * Get sessions working
-
+* Separate the MaglevModel ane work on it
+* Get a migration for seeding basic data working
+* Performance profiling
+* Sort entries by date
+* Get partials implmented (rendering urls for tags and posts)
 
 === Discussion
 
@@ -63,16 +66,16 @@ original code looked like:
         # This is a concurrency conflict waiting to happen....
         Maglev.persistent { @id += 1 }
       end
-      
+
       ...
-      
+
     end
 
 Since there is only one instance of the Post class in the repository, if
 two VMs try to update the class instance variable <tt>@id</tt>, one will
 commit first, and the other will have to deal with a failed commit.  But
 each VM has unique  post objects with different <tt>__id__</tt>'s (because
-the VM does do the hard work of ensuring globally unique ids for objects. 
+the VM does do the hard work of ensuring globally unique ids for objects.
 
 
 === Credits

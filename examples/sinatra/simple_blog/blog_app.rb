@@ -10,19 +10,6 @@ configure(:development) do
   set :run, true
 end
 
-# Exception.install_debug_block do |e|
-#   case e
-#   when NoMethodError
-#     puts "********** #{e} -- (#{e.class})  selector: #{e.selector} args: #{e.args.inspect} env: #{e.envid}"
-#     selector = e.selector.to_s
-# #    nil.pause if selector == "to_int"
-# #    nil.pause if selector == "id"
-# #    nil.pause if selector == "render_erb"
-#   else
-#     #puts "---- #{e} -- (#{e.class})"
-#   end
-# end
-
 error do
   e = request.env['sinatra.error']
   "There was an error: #{e}"
@@ -47,9 +34,6 @@ post '/post' do
   params[:tags].split.each do |tag|
     t = Tag.find_by_name(tag) || Tag.new(tag)
     post.tag t
-#    t ||= Tag.new(tag)
-#    t << post
-#wh    post.tags << t
   end if params[:tags]
   redirect "/post/#{post.__id__}"
 end

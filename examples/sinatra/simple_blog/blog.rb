@@ -1,7 +1,6 @@
 # This file defines the blog classes.  To commit the code, load this
 # file from within a Maglev.persistent block and then commit it.
 
-
 # Maglev::Model implements a very simple and un-production-worthy
 # persistence model.  A class that includes the Maglev::Model module, will
 # automatically persist all new instances in a hash table for the class.
@@ -18,7 +17,7 @@ module Maglev::Model
     def new(*params)
       obj = allocate
       obj.initialize(*params)
-      add(obj)
+      add(obj)  # code smell
     end
 
     # Returns an array of all the posts
@@ -84,17 +83,16 @@ class Tag < Array
   include Maglev::Model
 
   attr_reader :name
+
   def initialize(name)
     @name = name.to_s
   end
+
   def to_s
     @name
   end
 
   def self.find_by_name(name)
-    Tag.detect { |t|
-      puts "t.name (#{t.name}) == name (#{name}) : #{t.name == name}"
-      t.name == name
-    }
+    Tag.detect { |t| t.name == name }
   end
 end
