@@ -8,3 +8,9 @@ Run them with 'ruby' not 'maglev-ruby', e.g.
     ruby stone_test_case.rb     # currently fails two backup tests
 
 They depend on the 'flexmock' gem.
+
+There is also a shell script that starts/stops/restarts a server called "aaa"
+It's used to make sure the rake scripts do the right thing. It will be
+replaced by a proper tests script soon. Read the script "testRakelib.sh"
+before running it with "bash -v"
+

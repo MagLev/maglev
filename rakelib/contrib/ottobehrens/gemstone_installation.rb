@@ -48,11 +48,11 @@ class GemStoneInstallation
   end
 
   def stopnetldi
-    gs_sh "stopnetldi"
+    gs_sh "stopnetldi | grep Info].*[Ss]erver"
   end
 
   def startnetldi
-    gs_sh "startnetldi -g -a #{ENV['USER']}"
+    gs_sh "startnetldi -g -a #{ENV['USER']} | grep Info].*server"
   end
 
   def netldi_running?
