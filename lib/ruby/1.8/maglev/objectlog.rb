@@ -1,3 +1,6 @@
+require 'maglev/orderedcollection'
+require 'maglev/dateandtime'
+
 ObjectLogEntry = _resolve_smalltalk_global(:ObjectLogEntry)
 class ObjectLogEntry
   # Returns the object log: a Collection of ObjectLogEntries.  The caller
@@ -42,27 +45,4 @@ class ObjectLogEntry
   end
 end
 
-OrderedCollection = _resolve_smalltalk_global(:OrderedCollection)
-class OrderedCollection
-  include Enumerable
-  primitive 'each&', 'do:'
-  primitive 'include?', 'includes:'
-  primitive 'to_a', 'asArray'
-  primitive '<<', 'add:'
-  primitive 'length', 'size'
-  primitive '_at', 'at:'
-  def [](index)
-    _at(index + 1)
-  end
-end
 
-DateAndTime = _resolve_smalltalk_global(:DateAndTime)
-class DateAndTime
-  primitive 'as_posix_seconds', 'asPosixSeconds'
-  def as_time
-    psecs = as_posix_seconds
-    secs = psecs.to_i
-    usecs = psecs - secs
-    Time.at(secs, usecs)
-  end
-end
