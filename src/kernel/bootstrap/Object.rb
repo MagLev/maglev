@@ -172,23 +172,23 @@ class Object
       unless a._isArray
         if a.equal?(nil)
           return a
-        end 
+        end
         a = a._splat_lasgn_value_coerce
-      end 
+      end
       if a._isArray
         sz = a.length
         if sz < 2
-	  if sz.equal?(0)
-	    return nil
-	  else
-	    return a[0]
-	  end
+    if sz.equal?(0)
+      return nil
+    else
+      return a[0]
+    end
         end
       end
       a
     end
 
-    def _splat_lasgn_value_coerce  
+    def _splat_lasgn_value_coerce
       v = self
       begin
         v = self.to_ary
@@ -201,7 +201,7 @@ class Object
         end
       end
       v
-    end 
+    end
 
     def _splat_arg_value
       a = self
@@ -496,7 +496,7 @@ class Object
       end
       v
     end
-  
+
     ############################################################
     # MagLev API methods on Object
     #
@@ -517,6 +517,8 @@ class Object
     # and temporary objects and may vary from run to run.  Does not abort
     # the current transaction.
     primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
+
+    class_primitive_nobridge '_object_for_oop', '_objectForOop:'
 end
 
 
