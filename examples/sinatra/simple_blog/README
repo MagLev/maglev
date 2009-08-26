@@ -25,6 +25,17 @@ which will define and persist the classes needed for the app, and then run
 
 Then hit http://localhost:4567/
 
+=== To Run the ObjectLogViewer
+
+There is a sample object log viewer / object inspector that you can run
+with:
+
+  $ maglev-ruby objectlog.rb
+
+And then hig http://localhost:4567/
+
+Still rough around the edges.
+
 === Issues
 
 * Need better separation of model helpers and business objects.  Some of
