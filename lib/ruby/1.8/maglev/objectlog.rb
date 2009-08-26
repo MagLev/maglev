@@ -22,6 +22,9 @@ class ObjectLogEntry
   # Return receiver's priority attribute
   primitive_nobridge 'priority', 'priority'
 
+  def to_s
+    inspect
+  end
 end
 
 OrderedCollection = _resolve_smalltalk_global(:OrderedCollection)
@@ -32,4 +35,8 @@ class OrderedCollection
   primitive 'to_a', 'asArray'
   primitive '<<', 'add:'
   primitive 'length', 'size'
+  primitive '_at', 'at:'
+  def [](index)
+    _at(index + 1)
+  end
 end

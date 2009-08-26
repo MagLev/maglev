@@ -12,5 +12,5 @@ log = ObjectLogEntry.object_log
 test(ole.class,        ObjectLogEntry, "1: Constructor")
 test(log.equal?(nil),  false,          "2: non-nil log")
 test(log.include?(ole), true,           "3: log entry was added")
-
+test(log[0].equal?(nil), false,         "4: [] works")
 report
