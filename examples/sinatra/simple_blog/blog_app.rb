@@ -1,8 +1,17 @@
 require 'rubygems'
 require 'sinatra'
 require 'txn_wrapper'
+require 'maglev/objectlog'
 
 use MagLevTransactionWrapper
+
+Exception.install_debug_block do |e|
+  name = e.class.name
+  unless ['RubyBreakException', 'RubyThrowException'].include? name
+    ObjectLogEntry.debug(name, e.backtrace).add_to_log
+  end
+end
+
 
 # Workaround for issue automatically starting app.
 # See comments in README file
@@ -49,6 +58,29 @@ get '/posts' do
   erb :index
 end
 
+
+#################################################
+# Object Log Support
+#################################################
+get '/objectlog' do
+  @objectlog = ObjectLogEntry.object_log
+  erb :objectlog
+end
+
+get '/entry/:id' do
+  index = params[:id].to_i
+  @object = ObjectLogEntry.object_log[index]
+  stop [ 404, "Can't find Object Log Entry for index: #{index}" ] unless @object
+  erb :objectdetail
+end
+
+get '/object/:id' do
+  oop = params[:id].to_i
+  @object = Object._object_for_oop(oop)
+  stop [ 404, "Can't find object with oop #{oop}" ] unless @object
+  erb :objectdetail
+end
+
 __END__
 
 @@ layout
@@ -68,6 +100,7 @@ __END__
         <ul class="menu">
           <li><a href="/post/new">New Post</a></li>
           <li><a href="/posts">All Posts</a></li>
+          <li><a href="/objectlog">Object Log</a></li>
         </ul>
       </div>
       <div id="content">
@@ -81,7 +114,6 @@ __END__
             <li><a href="/tag/<%= tag.__id__ %>"><%= tag.name %></a></li>
             <% end %>
           </ul>
-          <p>TBD</p>
           <h4>About</h4>
           <p>This is a simple sinatra blog running on MagLev</p>
           <h4>Credit</h4>
@@ -126,3 +158,35 @@ __END__
   <li><a href="/post/<%= post.__id__ %>"> <%= post.title %></a></li>
   <% end %>
 </ul>
+
+
+@@ objectlog
+<table>
+  <tr><th>#</th><th>Tag</th><th>Label</th><th>Object</th><th>Timestamp</th></tr>
+<% @objectlog.reverse_each_with_index do |entry,i| %>
+  <tr>
+    <td><%= i %></td>
+    <td><%= entry.tagged? ? "X" : "" %></td>
+    <td><a href="/entry/<%= i %>"> <%= entry.label %></a></td>
+    <td><%= entry.object %></td>
+    <td><%= entry.timestamp %></td>
+  </tr>
+<% end %>
+</table>
+
+@@ objectdetail
+<h3>Object Detail </h3>
+<table>
+  <tr><th>Attribute</th><th>Value</th></tr>
+  <tr><td>Class</td><td><a href="/object/<%= @object.class.object_id %>"><%= @object.class %></a></td></tr>
+  <tr><td>Oop</td><td> <%= @object.object_id %></td></tr>
+  <% @object.instance_variables.each do |var|
+       ivar = @object.instance_variable_get(var)
+  %>
+    <tr>
+      <td><%= var %></td>
+      <td><a href="/object/<%= ivar.object_id %>"><%= ivar.inspect %></td>
+    </tr>
+  <% end %>
+</table>
+

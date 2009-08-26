@@ -83,7 +83,7 @@ __END__
 @@ index
 <table>
   <tr><th>#</th><th>Tag</th><th>Label</th><th>Object</th><th>Timestamp</th></tr>
-<% @objectlog.each_with_index do |entry,i| %>
+<% @objectlog.reverse_each_with_index do |entry,i| %>
   <tr>
     <td><%= i %></td>
     <td><%= entry.tagged? ? "X" : "" %></td>
