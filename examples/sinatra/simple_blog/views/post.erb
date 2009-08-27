@@ -1,0 +1,3 @@
+<h3><%= @post.title %></h3>
+<p> Tags: <%= @post.tags.map{ |t| t.name }.join(" ") %> </p>
+<p><%= @post.text %></p>
