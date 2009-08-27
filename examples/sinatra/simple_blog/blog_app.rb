@@ -17,6 +17,17 @@ end
 # See comments in README file
 configure(:development) do
   set :run, true
+  App = {
+    :title => 'Simple Sinatra Blog',
+    :show_tags => true,
+    :nav_bar => <<-EOS
+        <ul class="menu">
+          <li><a href="/post/new">New Post</a></li>
+          <li><a href="/posts">All Posts</a></li>
+          <li><a href="/objectlog">Object Log</a></li>
+        </ul>
+    EOS
+  }
 end
 
 error do
