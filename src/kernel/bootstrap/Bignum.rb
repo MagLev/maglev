@@ -3,7 +3,9 @@ class Bignum
 
   # methods from Number or Integer reimplemented in LargeInteger,
   #   and thus needing a primitive mapping here
-  primitive 'abs', 'abs'
+  
+  # abs inherited from Integer
+  
   primitive 'floor', 'floor'
 
   primitive 'to_i', 'truncated'

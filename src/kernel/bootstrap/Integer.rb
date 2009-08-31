@@ -16,7 +16,7 @@ class Integer
     s = nil
     p = nil
     v = nil
-    unless param._isSymbol
+    unless param.equal?(nil) || param._isSymbol
       float_attempted = false
       begin
         if param._isFloat
@@ -36,9 +36,13 @@ class Integer
       unless float_attempted
 	begin
 	  unless param.equal?(nil)
-	    p = param.to_f
-	    if p._isFloat && ! p.nan?
-	      return [ p, self.to_f ]
+            if param._isString
+              v = Float(param)
+            else
+              v = param.to_f
+            end
+	    if v._isFloat && ! v.nan?
+	      return [ v, self.to_f ]
 	    end
 	  end
 	rescue
@@ -202,7 +206,13 @@ class Integer
        end 
      end
 
-#  abs inherited from Numeric
+    def abs
+      if self < 0
+	- self
+      else
+	self
+      end
+    end
 
      def ceil
        self
@@ -267,9 +277,19 @@ class Integer
 
 #  methods from Numeric
         primitive 'floor', 'floor'
-        primitive 'nonzero?', '_rubyNonzero'
         primitive 'round', 'rounded'
-        primitive 'zero?', '_rubyEqualZero'
+
+  def zero?
+    self == 0
+  end
+
+  def nonzero?
+    if self == 0
+      nil
+    else
+      self
+    end
+  end
 
 # Were in String.rb
     def _split_string(string, limit)

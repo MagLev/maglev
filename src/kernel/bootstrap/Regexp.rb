@@ -4,6 +4,7 @@ class Regexp
   IGNORECASE = 1
   EXTENDED   = 2
   MULTILINE  = 4
+  ALL_OPTIONS_MASK = 7
 
   # Regexp characters that need quoting
   META_CHARS = "\n\r\f\t " + '[]{}()|-*.\\?+^$#'
@@ -20,8 +21,8 @@ class Regexp
   primitive_nobridge 'options', 'options'
   primitive_nobridge 'to_s', 'to_s'
 
-  # class_primitive 'alloc', '_basicNew'
-
+  class_primitive_nobridge 'alloc', '_basicNew'
+  class_primitive_nobridge '_opts_from_lang', 'optsFromLang:opts:'
 
   #     Regexp.new(string [, options [, lang]])       => regexp
   #     Regexp.new(regexp)                            => regexp
@@ -50,10 +51,9 @@ class Regexp
       lang = nil
       pattern = pattern.source
     end
-    unless (options._isFixnum)
-      options = options ? IGNORECASE : 0
-    end
-    self._new(pattern, options, lang)
+    r = self.alloc
+    r.initialize(pattern, options, lang)
+    r
   end
 
   # Synonym for <code>Regexp.new</code>.
@@ -114,9 +114,29 @@ class Regexp
     !((@options & IGNORECASE).equal?(0))
   end
 
-  def initialize(str, options=nil)   # 3rd arg language ignored
+  def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
     # if options == nil, prim defautls to case insensitive
-    _compile(str, options)
+    if options.equal?(nil)
+      opts = 0
+    elsif options._isFixnum
+      opts = options & ALL_OPTIONS_MASK
+    elsif options.equal?(false)
+      opts = 0
+    else
+      opts = IGNORECASE
+    end
+    if lang._not_equal?(nil)
+      if lang._isString
+        opts = self.class._opts_from_lang(lang, opts)     
+      else
+        raise ArgumentError , 'regex.initialize lang not a String'
+      end
+    end
+    res = _compile(str, opts)
+    if res._not_equal?(self)
+      raise ArgumentError, (res.to_str)  # error from onig_new
+    end
+    res
   end
 
   def match(*args, &blk)

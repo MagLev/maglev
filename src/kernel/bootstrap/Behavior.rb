@@ -191,9 +191,8 @@ class Behavior
     self.inherited(a_class)
   end
 
-  #   for now, undef_method is same as remove_method , there is no
+  #   for now, undef_method is like remove_method , there is no
   #   other way to prevent a class responding to a selector.
-  #
-  primitive_nobridge 'undef_method', 'rubyRemoveMethod:'
+  primitive_nobridge 'undef_method', 'rubyUndefMethod:'
 
 end

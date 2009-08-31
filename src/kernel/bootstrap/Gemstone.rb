@@ -20,6 +20,10 @@ class Gemstone
     _beginTransaction
   end
 
+  class_primitive_nobridge '_object_for_oop', '_objectForOop:' # used by ObjectSpace
+    # implementation is Object>>_objectForOop:  but putting class_prim directives
+    # in Object or Fixnum may upset results of Object.singleton_methods ...
+
   class_primitive 'session_temp' , '_sessionTempsAt:'  # returns nil if not found
   class_primitive 'session_temp_put', '_sessionTempsAt:put:' # returns value stored
 

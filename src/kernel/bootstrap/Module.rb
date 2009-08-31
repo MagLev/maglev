@@ -358,7 +358,15 @@ class Module
     _set_protection_classmethods(0, *symbols)
   end
 
-  primitive_nobridge 'remove_const', 'rubyRemoveConst:'
+  primitive_nobridge '_remove_const', 'rubyRemoveConst:'
+
+  def remove_const(name)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    _remove_const(name)
+  end
 
   # primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
 

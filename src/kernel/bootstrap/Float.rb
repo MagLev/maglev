@@ -40,28 +40,38 @@ class Float
   PlusInfinity = _resolve_smalltalk_global(:PlusInfinity)
 
   def coerce(param, &block)
-    begin
-      unless param.equal?(nil)
-        v = param.to_f
+    unless param.equal?(nil)
+      begin
+        if param._isString
+          v = Float(param)
+        else
+          v = param.to_f
+        end
         if v._isFloat
           return [ v, self ]
         end
+      rescue
+        # continue execution
       end
-    rescue
-      # continue execution
     end
     super
   end
 
   def coerce(param)
     # non-bridge variant without block arg
-    begin
-      v = param.to_f
-      if v._isFloat
-        return [ v, self ]
+    unless param.equal?(nil) 
+      begin
+        if param._isString
+          v = Float(param)
+        else
+          v = param.to_f
+        end
+        if v._isFloat
+          return [ v, self ]
+        end
+      rescue
+        # continue execution
       end
-    rescue
-      # continue execution
     end
     super
   end
@@ -164,7 +174,14 @@ class Float
     end
   end
 
-  primitive_nobridge 'abs', 'abs'
+  def abs
+    if self < 0.0
+      - self
+    else
+      self
+    end
+  end
+
   primitive_nobridge 'ceil', 'ceiling'
 
   primitive_nobridge 'eql?', '_ruby_eqlQ:'
@@ -181,15 +198,26 @@ class Float
   primitive_nobridge 'to_i' , 'truncated'
   primitive_nobridge 'to_int' , 'truncated'
   primitive_nobridge 'to_s' , '_rubyAsString'  
+  primitive          'inspect' , '_rubyAsString'  
   primitive_nobridge 'truncate' , 'truncated'
-  primitive_nobridge 'zero?' , '_rubyEqualZero'
 
-# Note: nonstandard meth to format Float - for use by Benchmark 
-primitive 'to_fmt' , '_rubyAsFormattedString' 
+  # Note: nonstandard meth to format Float - for use by Benchmark 
+  primitive 'to_fmt' , '_rubyAsFormattedString' 
+
+  def zero?
+    self == 0.0
+  end
+
+  def nonzero?
+    if self == 0.0
+      nil
+    else
+      self
+    end
+  end
     
 #  methods from Numeric
   primitive_nobridge 'floor', 'floor'
-  primitive_nobridge 'nonzero?', '_rubyNonzero'
 
   def step(nend, inc, &blk)
     inc = Type.coerce_to(inc, Float, :to_f)

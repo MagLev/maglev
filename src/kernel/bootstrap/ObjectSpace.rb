@@ -1,6 +1,7 @@
 module ObjectSpace
+
   def _id2ref(object_id)
-    raise NotImplementedError, ' _id2ref not implemented'
+    Gemstone._object_for_oop(object_id)
   end
 
   def define_finalizer(obj, a_proc=nil)

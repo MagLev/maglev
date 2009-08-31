@@ -7,9 +7,13 @@ class Numeric
     if param._isNumeric && param.class.equal?(self.class)
       return [ param, self ]
     end
-    if ! param.equal?(nil) && ! param._isSymbol
+    unless param.equal?(nil) || param._isSymbol
       begin
-        p = param.to_f
+        if param._isString
+          p = Float(param)
+        else
+          p = param.to_f
+        end
         s = self.to_f
         if p._isFloat && s._isFloat && ! p.nan? && ! s.nan?
           return [p, s]
@@ -35,7 +39,13 @@ class Numeric
     end
   end
 
-  primitive 'abs', 'abs'
+  def abs
+    if self < 0
+      - self
+    else
+      self
+    end
+  end
 
   def ceil
     f = Type.coerce_to(self, Float, :to_f)
@@ -46,8 +56,8 @@ class Numeric
   #   infinite recursion after  math.n redefines quo and / for Rational
 
   def div(arg)
-    q = self._divide(arg)
-    q.to_int
+    q = self._divide(arg).to_f
+    q.floor
   end
 
   def quo(arg)
@@ -67,11 +77,15 @@ class Numeric
     [ q, r ]
   end
 
+  def dup
+    raise TypeError , 'Numeric#dup not allowed'
+  end
+
   def remainder(arg)
     unless arg._isNumeric
       raise TypeError, 'arg to remainder is not a Numeric'
     end
-    mod = self.modulo(arg)
+    mod = self % arg
     rec_neg = self < 0
     arg_neg = arg < 0
     if (rec_neg == arg_neg)
@@ -82,7 +96,10 @@ class Numeric
   end
 
   # eql?  implemented in subclasses
-  #  floor implemented in subclasses
+
+  def floor 
+    self.to_f.floor
+  end
  
   primitive '_to_float', 'asFloat'
 
@@ -99,7 +116,15 @@ class Numeric
 
   primitive 'integer?', '_isInteger'
 
-  #  nonzero?  implemented in subclasses
+  def nonzero?  
+    # reimplemented in subclasses
+    if self.zero?    
+      nil
+    else
+      self
+    end
+  end
+
   #  quo   implemented in subclasses
 
   # _max and _min allow
@@ -124,10 +149,13 @@ class Numeric
 
   def modulo(arg)
     # reimplemented in subclasses
-    (self.divmod(arg))[1]
+    self % arg
   end
 
-  # round implemented in subclasses
+  def round 
+    # reimplemented in subclasses
+    self.to_f.round
+  end
 
   def step(nend, inc, &blk) 
     if nend._isFloat or inc._isFloat
@@ -190,8 +218,13 @@ class Numeric
     self.to_i
   end
 
-  # truncated implemented in subclasses
-  # zero?  implemented in subclasses
+  def truncate
+    self.to_f.truncate
+  end
+
+  def zero?
+    self == 0
+  end
 
   def +@
     self

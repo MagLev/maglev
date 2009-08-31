@@ -517,8 +517,6 @@ class Object
     # and temporary objects and may vary from run to run.  Does not abort
     # the current transaction.
     primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
-
-    class_primitive_nobridge '_object_for_oop', '_objectForOop:'
 end
 
 

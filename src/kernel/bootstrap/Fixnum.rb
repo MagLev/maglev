@@ -70,7 +70,7 @@ class Fixnum
 
   primitive_nobridge '_bit_at', 'bitAt:'
 
-  primitive 'abs', 'abs'
+  # abs inherited from Integer
 
   primitive 'id2name', '_ruby_id2name'
 
@@ -82,7 +82,16 @@ class Fixnum
 
   primitive 'to_sym', '_rubyToSym'
 
-  primitive 'zero?', '_rubyEqualZero'
-  primitive 'nonzero?', '_rubyNonzero'
+  def zero?  
+    self.equal?(0)
+  end
+
+  def nonzero?
+    if self.equal?(0)
+      nil
+    else
+      self
+    end
+  end
 
 end
