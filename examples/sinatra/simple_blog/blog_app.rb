@@ -87,7 +87,7 @@ end
 
 get '/object/:id' do
   oop = params[:id].to_i
-  @object = Object._object_for_oop(oop)
+  @object = ObjectSpace._id2ref(oop)
   stop [ 404, "Can't find object with oop #{oop}" ] unless @object
   erb :objectdetail
 end
