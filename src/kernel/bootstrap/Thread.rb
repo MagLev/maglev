@@ -1,5 +1,6 @@
 # Maps to Smalltalk class GsProcess .  See Globals.rb
 class Thread
+  KERNEL_SRC_REGEXP = /src\/kernel/
 
   class_primitive_nobridge '_stbacktrace', 'backtraceToLevel:'
 
@@ -15,34 +16,70 @@ class Thread
     res_start_ofs = 1
     ststack = _stbacktrace(limit)
     for idx in 0..(ststack.length - 1) do
-      where, line, source = ststack[idx]
-      if /(.*) \(envId 1\)/ =~ where
-        meth = $1
-        if source
-          lines = source.split("\n").grep(/# method/)
-          unless lines.empty?
-            if /line (\d+) .* file (.*)/=~ lines[-1]
-              baseline = $1.to_i
-              file = $2
-              if file =~ %r{<file name not available>|#{maglev_home}/src}
-                # not in Ruby application code, reject the line
-                if idx.equal?(0) ; res_start_ofs = 0 ; end
-              else
-                result << "#{file[0..-2]}:#{baseline+line}: in '#{meth}'"
-              end
-            end
+      file, line, meth = _frame_info(ststack[idx])
+
+      # Kernel methods need to refer to the next app level stack info, not
+      # to the src/kernel/* files.  This should almost always be the next
+      # frame, but eval and block frames may require searching further.
+      # This search is a bit sketchy...
+      if file =~ KERNEL_SRC_REGEXP
+        file1, line1, meth1 = _find_next_user_info_for(idx+1, ststack)
+        file, line = file1, line1 if file1  # don't replace meth
+      end
+
+      meth = ":in `#{meth}'" unless meth.nil?
+      result << "#{file}:#{line}#{meth}" if file
+    end
+    result[(res_start_ofs+1)..-1]
+  end
+
+  # If the current stack frame represents kernel source
+  # ($MAGLEV_HOME/src/kernel/*), then this frame should be reported from
+  # the calling frame (if it is a user frame).  This mimics how MRI reports
+  # frames representing C code.
+  def self._find_next_user_info_for(start, stack)
+    for idx in (start..stack.length-1) do
+      file, line, meth = _frame_info(stack[idx])
+      return [file, line, meth] if file and file !~ KERNEL_SRC_REGEXP
+    end
+    return nil  # failed
+  end
+
+  # Return an array of [file_name, line_number, method_name] for the stack
+  # frame for ruby stack frames.  If include_st is true, then also return
+  # the same information for smalltalk frames.  Ignores env 2.
+  def self._frame_info(stack_frame, include_st=false)
+    where, line, source = stack_frame
+
+    if /.*>> (.*?):*\*?&? \(envId 1\)/ =~ where
+      # Process a ruby stack frame.
+      # Treat _compfileFile methods as top level calls (i.e., no 'in' part)
+      meth = $1
+      meth = nil if meth =~ /_compileFile/
+      if source
+        lines = source.split("\n").grep(/# method/)
+        unless lines.empty?
+          if /line (\d+) .* file (.*)/=~ lines[-1]
+            baseline = $1.to_i
+            file = $2
+            return [file[0..-2], baseline + line, meth]
           end
         end
-      elsif includeSt
-        if  /(.*) \(envId 0\)/ =~ where
-          meth = $1
-          result << "smalltalk:#{line}: in '#{meth}'"
-        else
-          result << "smalltalk:#{line}: in #{where} " # usually in Executed Code
-        end
+      end
+    elsif include_st
+      # Process a smalltalk stack frame
+      if  /(.*) \(envId 0\)/ =~ where
+        meth = $1
+        return ["smalltalk", line, meth]
+      else
+        return ["smalltalk", line, where]# usually in Executed Code
       end
     end
-    result[res_start_ofs..-1]
+    return nil
+  end
+
+  class << self
+    private :_find_next_user_info_for, :_frame_info
   end
 
   primitive_nobridge 'inspect', '_rubyInspect'
@@ -196,6 +233,7 @@ class Thread
   primitive_nobridge 'terminate', 'exit'
 
   primitive_nobridge 'wakeup', 'rubyResume'
+
 
 end
 
