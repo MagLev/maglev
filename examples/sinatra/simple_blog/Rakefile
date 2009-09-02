@@ -1,12 +1,12 @@
 
-desc "Commit the base blog code to the repository"
-task :commit do
-  sh %{ maglev-ruby -MnoRlwrap commit_code.rb }
+desc "Commit the base blog code to the repository."
+task :commit, :force do |t,args|
+  sh %{ maglev-ruby -MnoRlwrap commit_code.rb #{args.force} }
 end
 
 desc "Commit the code and run the app"
 task :run => :commit do
-  sh %{ maglev-ruby -MnoRlwrap blog_app.rb }
+  sh %{ $MAGLEV_HOME/bin/rackup }
 end
 
 "Run tets: requires rubygems installed and a p patched minitest gem"
@@ -15,5 +15,3 @@ task :tests => :commit do
     sh %{ unset MAGLEV_OPTS ; maglev-ruby -MnoRlwrap #{t} }
   end
 end
-
-
