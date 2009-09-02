@@ -170,6 +170,36 @@ class Regexp
 
   # END RUBINIUS
 
+  # Return true if +Regexp::IGNORECASE+ is set on this regexp
+  def casefold?
+    !((@options & IGNORECASE).equal?(0))
+  end
+
+  def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
+    # if options == nil, prim defautls to case insensitive
+    if options.equal?(nil)
+      opts = 0
+    elsif options._isFixnum
+      opts = options & ALL_OPTIONS_MASK
+    elsif options.equal?(false)
+      opts = 0
+    else
+      opts = IGNORECASE
+    end
+    if lang._not_equal?(nil)
+      if lang._isString
+        opts = self.class._opts_from_lang(lang, opts)
+      else
+        raise ArgumentError , 'regex.initialize lang not a String'
+      end
+    end
+    res = _compile(str, opts)
+    if res._not_equal?(self)
+      raise ArgumentError, (res.to_str)  # error from onig_new
+    end
+    res
+  end
+
   def match(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
@@ -284,7 +314,7 @@ class Regexp
         if pos.equal?( match.begin(0) )
           pos += 1
         end
-        if pos <= idx 
+        if pos <= idx
           idx += 1
         else
           idx = pos
@@ -357,47 +387,47 @@ class Regexp
     md = self._search(string, start, nil)
     md._storeRubyVcGlobal(0x40)
     return nil if md.equal?(nil)
-    md.begin(0) 
+    md.begin(0)
   end
 
   def _rindex_string(string, offset)
     res = nil
     str_size = string.size
     if @source.index('\G')._not_equal?(nil)
-      # We are giving wrong answers 
+      # We are giving wrong answers
       raise ArgumentError, ' \G not supported yet in String#rindex(regexp)'
-    end 
-    if offset >= str_size  
+    end
+    if offset >= str_size
       res_md = self._search(string, offset, 0) # search backwards
       if res_md._not_equal?(nil)
         res = res_md.begin(0)
       end
-    else 
-      res_md = self._search(string, offset, str_size)  # forwards 
-      if res_md._not_equal?(nil) 
+    else
+      res_md = self._search(string, offset, str_size)  # forwards
+      if res_md._not_equal?(nil)
         ofs = res_md.begin(0)
         if ofs.equal?(offset)
           res = ofs  # exact match at offset , use it
         end
       end
       if res.equal?(nil)
-	ofs = 0
-	while ofs < offset  # loop forwards to find last match < offset
-	  md = self._search(string, ofs, str_size)
-	  if md.equal?(nil) 
-	    break
-	  end
-	  ofs = md.begin(0) 
-	  if ofs < offset 
-	    res = ofs 
-	    res_md = md
-	  end
-	  next_ofs = md.end(0)
-	  if next_ofs.equal?(ofs) 
-	    next_ofs += 1 
-	  end
-	  ofs = next_ofs
-	end
+  ofs = 0
+  while ofs < offset  # loop forwards to find last match < offset
+    md = self._search(string, ofs, str_size)
+    if md.equal?(nil)
+      break
+    end
+    ofs = md.begin(0)
+    if ofs < offset
+      res = ofs
+      res_md = md
+    end
+    next_ofs = md.end(0)
+    if next_ofs.equal?(ofs)
+      next_ofs += 1
+    end
+    ofs = next_ofs
+  end
       end
     end
     res_md._storeRubyVcGlobal(0x40)
@@ -452,6 +482,17 @@ class Regexp
     end
   end
 
+  #     Regexp.union([pattern]*)   => new_str
+  #
+  #  Return a <code>Regexp</code> object that is the union of the given
+  #  <em>pattern</em>s, i.e., will match any of its parts. The <em>pattern</em>s
+  #  can be Regexp objects, in which case their options will be preserved, or
+  #  Strings. If no arguments are given, returns <code>/(?!)/</code>.
+  #
+  #     Regexp.union                         #=> /(?!)/
+  #     Regexp.union("penzance")             #=> /penzance/
+  #     Regexp.union("skiing", "sledding")   #=> /skiing|sledding/
+  #     Regexp.union(/dogs/, /cats/i)        #=> /(?-mix:dogs)|(?i-mx:cats)/
   def self.union(*args)
     len = args.length
     if len.equal?(0)
@@ -460,16 +501,16 @@ class Regexp
     n = 0
     src = ""
     while n < len
+      if n > 0
+        src << '|'
+      end
       an_arg = args[n]
       if an_arg._isRegexp
         src << an_arg.to_s
       else
         an_arg = Type.coerce_to(an_arg, String, :to_str)
-        src << an_arg
+        src << Regexp.escape(an_arg)
       end 
-      if n < len - 1
-        src << '|'
-      end
       n += 1
     end
     self.new(src)

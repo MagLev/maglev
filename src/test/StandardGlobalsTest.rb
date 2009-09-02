@@ -29,6 +29,9 @@ $LOAD_PATH << 'bar'
 test($:, $LOAD_PATH, "after modify $LOAD_PATH are equal")
 test($:.include?('bar'), true, '$LOAD_PATH << foo')
 
+bad_files = $".any? { |i| i =~ /kernel\/bootstrap/ }
+test(bad_files, false, "Found kernel files on $\" :#{$".inspect} ")
+
 # BEGIN GLOBAL PARSE CHECK
 x = $!
 x = $@
@@ -94,7 +97,7 @@ x = nil
 x = self
 x = true
 
-# x = DATA   # not supported yet  
+# x = DATA   # not supported yet
 x = FALSE
 x = NIL
 x = RUBY_PLATFORM

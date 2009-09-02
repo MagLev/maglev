@@ -2,6 +2,32 @@
 
 This is a very simple blog app that uses Maglev persistence.
 
+=== Prerequisites
+
+In order to run the applications in this directory, you need to install
+rubygem versions of rack and sinatra (see ../README).
+
+=== To Run the blog:
+
+    $ rake run
+
+Then hit http://localhost:4567/
+
+=== To run the blog manually:
+
+The app is split into a persistent part, <tt>blog.rb</tt>, and the sinatra
+driver app, <tt>blog_app.rb</tt>.  You need to load <tt>blog.rb</tt> once,
+which will define and persist the classes needed for the app:
+
+  $ maglev-ruby blog.rb  # only needs to be done once for a repository
+
+Then run <tt>blog_app.rb</tt> by using rackup
+
+  $ cd $MAGLEV_HOME/examples/sinatra/simple_blog
+  $ $MAGLEV_HOME/bin/rackup  # looks for ./config.ru
+
+Then hit http://localhost:4567/
+
 === Files
 
 * README  This file
@@ -11,19 +37,7 @@ This is a very simple blog app that uses Maglev persistence.
 * dumpdb.rb  Script that prints the contents of the db to stdout (debugging)
 * txn_wrapper.rb  Rack middleware used by <tt>blog_app.rb</tt> to wrap a
   transaction around each HTTP request.
-
-=== To Run
-
-The app is split into a persistent part, <tt>blog.rb</tt>, and the sinatra
-driver app, <tt>blog_app.rb</tt>.  You need to load <tt>blog.rb</tt> once,
-which will define and persist the classes needed for the app, and then run
-<tt>blog_app.rb</tt> to fire up Sinatra:
-
-  $ maglev-ruby blog.rb  # only needs to be done once for a repository
-
-  $ maglev-ruby blog     # run everytime you want to start the app
-
-Then hit http://localhost:4567/
+* config.ru is a Rackup file to run the app.
 
 === To Run the ObjectLogViewer
 
