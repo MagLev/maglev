@@ -113,7 +113,7 @@ Maglev.persistent do
 
     def check_003
       test(C003::XYZ,                   45, "003: C003::XYZ")
-#      test(C003.class_variable,         22, "003: Class variable")
+      test(C003.class_variable,         22, "003: Class variable")
       test(C003.class_instance_variable, 2, "003: Class instance variable")
       test(C003.new.instance_variable,   3, "003: Class instance variable")
       test(C003.maglev_persistable?,  true, "003: C003.maglev_persistable?")
@@ -231,6 +231,10 @@ Maglev.persistent do
 
     # Basic test that Module#maglev_persistable= and
     # Module#maglev_persitable? work
+    #
+# RxINC: This test is failing because the Foo.maglev_persistable does not
+# persist the Foo constant in the global namespace.
+#
 #     def test_008
 #       require 't008'
 #     end
@@ -277,23 +281,31 @@ Maglev.persistent do
       test(M.methods.grep(/^m_meth$/), [], '011 check: M methods')
     end
 
-#     def test_012
-#       # Tests for autoload
-#       Maglev.persistent do
-#         require 't012'
-#       end
-#       Maglev.commit_transaction
-#     end
+    def test_012
+      # Tests for autoload
+      Maglev.persistent do
+        require 't012'
+      end
+      Maglev.commit_transaction
+    end
 
-#     def check_012
-#       # Double check that the module got committed
-#       test(M012.class, Module, '012 check: Reference M012')
-#       # Check that the autoload setup in test_012 is active: i.e.,
-#       # reference the constant and expect the file to loaded now.
-#       test(M012::Builder.class, Class, '012 check: Reference autoload association M012::Builder')
+    def check_012
+      # Double check that the module got committed
+      test(M012.class, Module, '012 check: Reference M012')
+      # Check that the autoload setup in test_012 is active: i.e.,
+      # reference the constant and expect the file to loaded now.
+      test(M012::Builder.class, Class, '012 check: Reference autoload association M012::Builder')
 
-#       # TODO: Check both a transient and persistent reference to an autoload
-#     end
+      # TODO: Check both a transient and persistent reference to an autoload
+    end
+
+    def test_013
+      require 't013_trac595.rb'
+      test(1, 1, "t013_595 passes if no exception raised during require")
+    end
+    def check_013
+      # Nothing to check
+    end
 
     ########################################
     # Test Framework Methods
