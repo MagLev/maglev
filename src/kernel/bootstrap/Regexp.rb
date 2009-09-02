@@ -47,18 +47,81 @@ class Regexp
   #
   def self.new(pattern, options = 0, lang = nil)
     if (pattern._isRegexp)
-      options = pattern.options
+      opts = pattern.options
       lang = nil
       pattern = pattern.source
+    else
+      opts = options 
+      if opts._isFixnum 
+        opts = opts & ALL_OPTIONS_MASK
+      end
     end
     r = self.alloc
-    r.initialize(pattern, options, lang)
+    r.initialize(pattern, opts, lang)
     r
   end
 
   # Synonym for <code>Regexp.new</code>.
   def self.compile(pattern, options = 0, lang = nil)
     self.new(pattern, options, lang)
+  end
+
+  def ==(otherRegexp)
+    if (otherRegexp._isRegexp)
+      otherRegexp.source == source && otherRegexp.options == @options
+    else
+      false
+    end
+  end
+
+  def hash
+    (@source.hash) ^ ((@options & ALL_OPTIONS_MASK) .hash)
+  end
+
+  def ===(str)
+    if ( str._isString ) # if str.kind_of?(String)
+      # inline =~  so as to update callers $~
+      m = _search(str, 0, nil)
+      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      if m
+        if m.begin(0)
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  # Return true if +Regexp::IGNORECASE+ is set on this regexp
+  def casefold?
+    !((@options & IGNORECASE).equal?(0))
+  end
+
+  # def inspect  # implemented in common/regex.rb
+
+  def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
+    # if options == nil, prim defautls to case insensitive
+    if options.equal?(nil)
+      opts = 0
+    elsif options._isFixnum
+      opts = options 
+    elsif options.equal?(false)
+      opts = 0
+    else
+      opts = IGNORECASE
+    end
+    if lang._not_equal?(nil)
+      if lang._isString
+        opts = self.class._opts_from_lang(lang, opts)     
+      else
+        raise ArgumentError , 'regex.initialize lang not a String'
+      end
+    end
+    res = _compile(str, opts)
+    if res._not_equal?(self)
+      raise RegexpError, (res.to_str)  # error from onig_new
+    end
+    res
   end
 
   # BEGIN RUBINIUS
@@ -79,8 +142,6 @@ class Regexp
       _search(str, finish, start)
     end
   end
-
-  # def inspect  # implemented in common/regex.rb
 
   def match_from(str, offset)
     # search  str[offset .. str.size-1]
@@ -108,36 +169,6 @@ class Regexp
   end
 
   # END RUBINIUS
-
-  # Return true if +Regexp::IGNORECASE+ is set on this regexp
-  def casefold?
-    !((@options & IGNORECASE).equal?(0))
-  end
-
-  def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
-    # if options == nil, prim defautls to case insensitive
-    if options.equal?(nil)
-      opts = 0
-    elsif options._isFixnum
-      opts = options & ALL_OPTIONS_MASK
-    elsif options.equal?(false)
-      opts = 0
-    else
-      opts = IGNORECASE
-    end
-    if lang._not_equal?(nil)
-      if lang._isString
-        opts = self.class._opts_from_lang(lang, opts)     
-      else
-        raise ArgumentError , 'regex.initialize lang not a String'
-      end
-    end
-    res = _compile(str, opts)
-    if res._not_equal?(self)
-      raise ArgumentError, (res.to_str)  # error from onig_new
-    end
-    res
-  end
 
   def match(*args, &blk)
     # only one-arg call supported. any other invocation
@@ -173,6 +204,29 @@ class Regexp
 
   def =~(str)
     # no bridge method for this variant
+    m = _search(str, 0, nil)
+    m._storeRubyVcGlobal(0x20) # store into caller's $~
+    if (m)
+      return m.begin(0)
+    end
+    m
+  end
+
+  def ~(*args, &blk)
+    # only zero-arg call supported. any other invocation
+    # will have a bridge method interposed which would
+    #   require different args to _storeRubyVcGlobal
+    raise ArgumentError, 'expected zero args'
+  end
+  
+  def ~
+    str = self._getRubyVcGlobal(0x21) # get callers $_
+    if str.equal?(nil)
+      raise TypeError, 'Regexp#~ , caller frame has no reference to $_ '
+    end
+    unless str._isString
+      raise TypeError, '$_ is not a String'
+    end
     m = _search(str, 0, nil)
     m._storeRubyVcGlobal(0x20) # store into caller's $~
     if (m)
@@ -217,10 +271,6 @@ class Regexp
       super(sym, str)
     end
   end
-
-  # DO NOT #  def ~(aRegexp) ; end
-  # no definition for  ~  because  uses of   ~ aRegexp
-  # are  transformed to  aRegexp =~ $_   by the parser .
 
  def __each_match(str, &block)
     # Private, does not store into callers $~
@@ -269,31 +319,6 @@ class Regexp
     matches = []
     __each_match(str){|m| matches << m}
     matches
-  end
-
-  def ==(otherRegexp)
-    if (otherRegexp._isRegexp)
-      res = otherRegexp.source == source
-      res &&=  otherRegexp.kcode == self.kcode
-      res &&=  otherRegexp.casefold? == self.casefold?
-      res
-    else
-      false
-    end
-  end
-
-  def ===(str)
-    if ( str._isString ) # if str.kind_of?(String)
-      # inline =~  so as to update callers $~
-      m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
-      if m
-        if m.begin(0)
-          return true
-        end
-      end
-    end
-    false
   end
 
   def self.escape(str)
@@ -376,7 +401,6 @@ class Regexp
       end
     end
     res_md._storeRubyVcGlobal(0x40)
-if Gemstone.session_temp(:TrapRindex) ; nil.pause ; end
     return res
   end
 
@@ -426,6 +450,29 @@ if Gemstone.session_temp(:TrapRindex) ; nil.pause ; end
     else
       return m[an_int]
     end
+  end
+
+  def self.union(*args)
+    len = args.length
+    if len.equal?(0)
+      return /(?!)/
+    end
+    n = 0
+    src = ""
+    while n < len
+      an_arg = args[n]
+      if an_arg._isRegexp
+        src << an_arg.to_s
+      else
+        an_arg = Type.coerce_to(an_arg, String, :to_str)
+        src << an_arg
+      end 
+      if n < len - 1
+        src << '|'
+      end
+      n += 1
+    end
+    self.new(src)
   end
 
   class << self
