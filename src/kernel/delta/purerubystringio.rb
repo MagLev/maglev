@@ -212,7 +212,7 @@ class PureRubyStringIO < IO
 
   def print(*args)
     if @sio_closed_write ; requireWritable ; end
-    args.unshift($_) if args.empty
+    args.unshift($_) if args.empty?
     args.each { |obj| write(obj) }
     write($\) unless $\.equal?(nil)
     nil
