@@ -22,7 +22,7 @@ module Kernel
   end
 
   def proc(&blk)
-    Proc.new_lambda(&blk)
+    Proc.new_lambda(&blk)  # use new_lambda here for 1.8.6 compatibility
   end
 
   def rand(n=0)
