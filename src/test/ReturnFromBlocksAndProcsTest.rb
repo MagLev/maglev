@@ -40,4 +40,5 @@ def test_from_raw_proc
 end
 yc = test_from_raw_proc
 raise "FAIL: raw proc" unless yc == 99
+puts "OK"
 true
