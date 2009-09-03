@@ -37,7 +37,7 @@ expected =
    "src/test/CallerTest.rb:25:in `c'",
    "src/test/CallerTest.rb:19:in `b'",
    "src/test/CallerTest.rb:15:in `a'",
-   "/Users/pmclain/GemStone/snapshots/MagLev-2009-09-01/src/test/CallerTest.rb:23"]
+   "src/test/CallerTest.rb:23"]
 
 # Since the file names in the stack trace are different when invoked from
 # command line and from vm-tests, we just match the common suffix
