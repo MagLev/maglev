@@ -5,9 +5,14 @@ require 'txn_wrapper'
 
 class BlogApp < Sinatra::Base
 
+  # When running out of a classic top level Sinatra app, several options
+  # are set.  We have to set them here if we want them in a rackable app.
   set :server, ["webrick"]   # Maglev currently only supports webrick
   set :environment, :development
+  set :static, true                # Allow loading /style.css, etc.
 
+#  use Rack::Lint
+#  use Rack::Reloader   # sort-of works....
   use MagLevTransactionWrapper
 
   # Make these methods on the app?
@@ -19,6 +24,7 @@ class BlogApp < Sinatra::Base
           <li><a href="/post/new">New Post</a></li>
           <li><a href="/posts">All Posts</a></li>
           <li><a href="/objectlog">Object Log</a></li>
+          <li><a href="/debug">debug</a></li>
         </ul>
     EOS
   }
@@ -60,6 +66,10 @@ class BlogApp < Sinatra::Base
   get '/posts' do
     @posts = Post.all
     erb :blog
+  end
+
+  get '/debug' do
+    erb :debug
   end
 
   #################################################
