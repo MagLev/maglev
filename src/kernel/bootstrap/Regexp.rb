@@ -170,36 +170,6 @@ class Regexp
 
   # END RUBINIUS
 
-  # Return true if +Regexp::IGNORECASE+ is set on this regexp
-  def casefold?
-    !((@options & IGNORECASE).equal?(0))
-  end
-
-  def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
-    # if options == nil, prim defautls to case insensitive
-    if options.equal?(nil)
-      opts = 0
-    elsif options._isFixnum
-      opts = options & ALL_OPTIONS_MASK
-    elsif options.equal?(false)
-      opts = 0
-    else
-      opts = IGNORECASE
-    end
-    if lang._not_equal?(nil)
-      if lang._isString
-        opts = self.class._opts_from_lang(lang, opts)
-      else
-        raise ArgumentError , 'regex.initialize lang not a String'
-      end
-    end
-    res = _compile(str, opts)
-    if res._not_equal?(self)
-      raise ArgumentError, (res.to_str)  # error from onig_new
-    end
-    res
-  end
-
   def match(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would

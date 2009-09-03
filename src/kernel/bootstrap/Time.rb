@@ -274,6 +274,12 @@ class Time
     result.nil? ? result : result.equal?(0)
   end
 
+  def hash
+    # seconds ^ usec   # Gemstone optimization
+    micro_sec = @microseconds
+    (micro_sec / 1_000_000) ^ (micro_sec % 1_000_000) 
+  end
+
   def eql?(other)
     (self <=> other).equal?(0)
   end
@@ -388,10 +394,6 @@ class Time
 
   def getgm
     dup.gmtime
-  end
-
-  def hash
-    seconds ^ usec
   end
 
   def force_localtime

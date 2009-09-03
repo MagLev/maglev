@@ -30,7 +30,7 @@ class UnboundMethod
     if (obj.kind_of?( hm_cls))
       return _bind(obj)   # returns a Method
     else
-      raise TypeError , ('obj must be kind_of ' << (hm_class.name ))
+      raise TypeError , ('obj must be kind_of ' << (hm_cls.name ))
     end
   end
 

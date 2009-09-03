@@ -1,7 +1,5 @@
 class String
 
-  # misc
-  primitive 'hash'
 
   def to_rx
     Regexp.new(self)
@@ -105,29 +103,13 @@ class String
     self
   end
 
-  # TODO: Need primitive ST implemention for <=>
-  def <=>(o)
-    if o._isString
-      i = 0
-      o_size = o.size
-      lim = size > o_size ? o_size : size # lim is the min
-      while i < lim
-        result = self[i] <=> o[i]
-        return result unless result.equal?(0)
-        i += 1
-      end
-      return size <=> o_size
-    else
-      if o.equal?(nil)
-        return nil
-      end
-      # From Rubinius...there are a lot of strange things in how
-      # string handles <=>...
-      return nil if o._isSymbol
-      return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
-      return nil unless tmp = (o <=> self)
-      return -tmp
-    end
+  primitive_env '<=>',  '_rubyCompare' , ':'
+
+  def _prim_compare_failed(o)
+    # invoked from Smalltalk code in _rubyCompare<env>:
+    return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
+    return nil unless tmp = (o <=> self)
+    return -tmp
   end
 
   primitive_nobridge '_uppercase_at', 'rubyUpperCaseAt:' # arg is one-based
@@ -159,20 +141,22 @@ class String
     end
   end
 
-  # PERFORMANCE: String#== could use help
-  primitive '_same_value', '='  # TODO: this is incorrect...
-  def ==(other)
-    if other._isString
-      s = other
-    elsif other.respond_to? :to_str
-      return other == self  # per specs
+  primitive_env '==',   '_rubyEqual' , ':'
+  #  primitive assumes   nil.respond_to?(:to_str) == false  
+  #  primitive assumes   a_symbol.respond_to?(:to_str) == false  
+
+  primitive_env '===',   '_rubyEqual' , ':'   # === same as == for String
+
+  def _prim_equal_failed(other)
+    # invoked from Smalltalk code in _rubyEqual<env>:
+    if other.respond_to? :to_str
+      other == self  # per specs
     else
-      return false
+      false
     end
-    self._same_value(s)
   end
 
-#  alias === ==
+  primitive 'hash' , 'hash'
 
   #    str =~ obj   => fixnum or nil
   #

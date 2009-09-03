@@ -38,6 +38,8 @@ class IdentityHash
     end
   end
 
+  primitive 'hash' , '_hash'
+
   primitive_nobridge '_at_otherwise', 'at:otherwise:'
   def [](key)
     # returns the value for key, or nil if key not found

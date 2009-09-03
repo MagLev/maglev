@@ -25,6 +25,8 @@ class Fixnum
   primitive '>=', '_rubyGteq:'
   primitive '==', '_rubyEqual:'
 
+  primitive '===', '_rubyEqual:'  #  === same as == for Fixnum
+
   #  /    # note division does not produce Fractions in Ruby
   #         until math.n is required, then may produce Rationals ...
   primitive_nobridge '/', '_rubyDivide:'
