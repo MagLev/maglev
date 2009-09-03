@@ -42,7 +42,7 @@ class Struct
 
   def self.new(klass_name, *attrs, &block)
 
-    unless klass_name.nil? then
+    unless klass_name.equal?(nil) then
       # GEMSTONE
       #
       # We don't want to throw an exception just to distinguish
@@ -66,7 +66,7 @@ class Struct
       raise TypeError, e.message
     end
 
-    raise ArgumentError if attrs.any? { |attr| attr.nil? }
+    raise ArgumentError if attrs.any? { |attr| attr.equal?(nil) }
 
     klass = Class.new self do
 
@@ -80,6 +80,7 @@ class Struct
         return new(*args)
       end
 
+      include Enumerable  # GEMSTONE
     end
 
     Struct.const_set klass_name, klass if klass_name

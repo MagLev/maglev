@@ -589,7 +589,7 @@ module Enumerable
         min = o
       else
         comp = prc.call(o, min)
-        if comp.nil?
+        if comp.equal?(nil)
           raise ArgumentError, "comparison of #{o.class} with #{min} failed"
         elsif comp < 0
           min = o
@@ -621,7 +621,7 @@ module Enumerable
         max = o
       else
         comp = prc.call(o, max)
-        if comp.nil?
+        if comp.equal?(nil)
           raise ArgumentError, "comparison of #{o.class} with #{max} failed"
         elsif comp > 0
           max = o
