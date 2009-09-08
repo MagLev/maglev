@@ -8,8 +8,8 @@ The primary Ruby Benchmark Suite project is at:
   http://github.com/acangiano/ruby-benchmark-suite/
 
 Subdirectories:
-  rbs   - contains the benchmarks themselves
-  utils - contains the infrastructure necessary to run the benchmarks
+  benchmarks   - contains the benchmarks themselves
+  utils        - contains the infrastructure necessary to run the benchmarks
 
 see <tt>$MAGLEV_HOME/benchmark/utils/README</tt> for more detail.
 
@@ -17,7 +17,7 @@ Benchmarks are run using rake. Type "rake -T bench" to see options.
 
 Examples:
   rake bench
-  rake bench:file FILE=benchmark/rbs/micro-benchmarks/bm_app_tak.rb
-  rake bench:dir DIR=benchmark/rbs/micro-benchmarks
+  rake bench:file FILE=benchmark/benchmarks/micro-benchmarks/bm_app_tak.rb
+  rake bench:dir DIR=benchmark/benchmarks/micro-benchmarks
   rake bench:to_csv
 

@@ -60,7 +60,7 @@ The benchmark tasks run benchmarks from the Ruby Benchmark Suite project.
   rake bench                       # Run all the RBS benchmarks
   rake bench:dir                   # Run all the RBS benchmarks in DIR
   rake bench:file                  # Run only the RBS benchmark specified by FILE
-  rake bench:pattern               # Run all the RBS benchmarks that match PATTERN ex: PATTERN=rbs/micro-benchmarks/bm_gc*
+  rake bench:pattern               # Run all the RBS benchmarks that match PATTERN ex: PATTERN=benchmarks/micro-benchmarks/bm_gc*
   rake bench:results               # Plot the RBS benchmark results (not implemented)
   rake bench:to_csv                # Generate a CSV file of RBS results
 

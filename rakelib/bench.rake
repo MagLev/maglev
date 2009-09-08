@@ -10,7 +10,7 @@
 BASEDIR         = File.expand_path(File.dirname(__FILE__) + "/..")
 MONITOR         = BASEDIR + "/benchmark/utils/monitor.rb"
 RUNNER          = BASEDIR + "/benchmark/utils/bench.rb"
-RBS_DIR         = BASEDIR + "/benchmark/rbs"
+RBS_DIR         = BASEDIR + "/benchmark/benchmarks"
 RESULTS_DIR     = BASEDIR + "/benchmark/results"
 RBS_RESULTS_DIR = RESULTS_DIR + "/rbs"
 WEB_DIR         = RESULTS_DIR + "/web"
@@ -119,7 +119,7 @@ namespace :bench do
     puts "Done"
   end
 
-  desc "Run all the RBS benchmarks that match PATTERN ex: PATTERN=rbs/micro-benchmarks/bm_gc*"
+  desc "Run all the RBS benchmarks that match PATTERN ex: PATTERN=benchmarks/micro-benchmarks/bm_gc*"
   task :pattern => :setup do
     dir = ENV['PATTERN'] || raise("bench:pattern needs PATTERN set")
 
