@@ -79,9 +79,9 @@ Maglev.persistent do
       test(Maglev::PERSISTENT_ROOT[:hat], "A New Hat", '001 check: hat')
     end
 
-    # test_002 waiting on track 553
-
     def test_002
+      # Tests for: track 553
+      #
       # PTestPersistentConstant and PTestTransientConstant are set
       # below, this method makes sure const_set works correctly in
       # both transient and persistent modes
@@ -103,6 +103,8 @@ Maglev.persistent do
 
 
     def test_003
+      # Tests for: https://magtrac.gemstone.com/ticket/599
+      #
       # Test that a persisted class has its constants, instance variables
       # and class variables saved.
       Maglev.persistent do
