@@ -185,8 +185,8 @@ class Range
   # This does the appropriate Type.coerce_to that the specs expect.
   # +err+ is ignored for now.
   def _beg_len(len, err=0)
-    beg = Type.coerce_to(@from, Integer, :to_int)
-    the_end = Type.coerce_to(@to, Integer, :to_int)
+    beg = Type.coerce_to(@from, Fixnum, :to_int)
+    the_end = Type.coerce_to(@to, Fixnum, :to_int)
 
     if (beg < 0)
       beg += len

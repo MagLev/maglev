@@ -254,8 +254,5 @@ class Numeric
     self # no-op
   end
 
-  def _to_f_or_error
-    self.to_f
-  end
 end
 

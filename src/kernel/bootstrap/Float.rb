@@ -120,7 +120,7 @@ class Float
 
   primitive_nobridge '_raised_to', '_rubyRaisedTo:'
   def **(arg)
-    a = Type.coerce_to(arg, Float, :_to_f_or_error)
+    a = Type.coerce_to(arg, Float, :to_f)
     self._raised_to(a)
   end
 

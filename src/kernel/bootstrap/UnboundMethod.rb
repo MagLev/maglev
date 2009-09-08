@@ -10,6 +10,19 @@ class UnboundMethod
 
   primitive_nobridge '_selector_prefix', '_selectorPrefix'
 
+  def _gsmeth
+    @gsmeth 
+  end
+  def _nonbridge_meth
+    @nonBridgeMeth
+  end
+
+  def ==(other)
+    other.class.equal?(self.class) &&
+    other.arity == @arity && 
+    (other._gsmeth.equal?(@gsmeth) || other._nonbridge_meth.equal?(@nonBridgeMeth))
+  end
+
   def to_s
     str = '#<'
     str << self.class.name

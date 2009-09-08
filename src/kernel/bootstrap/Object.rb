@@ -202,7 +202,7 @@ class Object
       end
       v
     end
-
+ 
     def _splat_arg_value
       a = self
       unless a._isArray
@@ -214,27 +214,14 @@ class Object
       a
     end
 
-    def _splat_return_value_coerce
-      # in a separate method from _splat_return_value,
-      #  so  _splat_return_value does not have complex ExecBlocks
-      v = self
-      begin
-        v = Type.coerce_to(self, Array, :to_ary)
-      rescue TypeError
-        begin
-          v = Type.coerce_to(self, Array, :to_a)
-        rescue TypeError
-          # ignore
-        end
-      end
-      v
-    end
-
     def _splat_return_value
       # runtime support for  return *v  , invoked from generated code
-      v = self
-      unless v._isArray
-        v = self._splat_return_value_coerce
+      v = Type.coerce_to_or_nil(self, Array, :to_ary)
+      if v.equal?(nil)
+        v = Type.coerce_to_or_nil(self, Array, :to_a)
+        if v.equal?(nil)
+          v = self
+        end
       end
       sz = v.length
       if sz < 2

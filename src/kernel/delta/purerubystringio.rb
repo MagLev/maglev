@@ -19,20 +19,34 @@ class PureRubyStringIO < IO
   #  :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
   #  :ungetc, :write, :zip]
 
-  def self.open(string="", mode="r+")
+  def self.open(string="", mode=Undefined, &blk)
+    # mode==Undefined translated to "r" or "r+" in initialize
     if block_given? then
-      sio = new(string, mode)
-      rc = yield(sio)
-      sio.close
-      rc
+      begin
+        sio = new(string, mode)
+        rc = yield(sio)
+        rc
+      ensure
+        sio._string=(nil)
+        sio.close
+      end
     else
       new(string, mode)
     end
   end
 
   def <<(obj)
-    if @sio_closed_write ; requireWritable ; end
-    write(obj)
+    # gemstone, let @sio_closed_write be checked in syswrite
+    if @mode[0].equal?( ?a ) 
+      # in append mode, ignore position and append to the buffer
+      if @sio_closed_write ; requireWritable ; end
+      str = Type.coerce_to(obj, String, :to_s)
+      s_string = @sio_string
+      s_string << str
+      @sio_pos = s_string.size
+    else
+      write(obj)
+    end
     self
   end
 
@@ -74,17 +88,38 @@ class PureRubyStringIO < IO
 
   def each(sep_string=$/, &block)
     if @sio_closed_read ; requireReadable ; end
-    @sio_string.each(sep_string, &block)
-    @sio_pos = @sio_string.length
+    s_string = @sio_string
+    if sep_string.equal?(nil)
+      # start from current position
+      pos = @sio_pos
+      len = s_string.length - pos
+      s_string[pos, len].each( &block)
+    else 
+      # entire buffer
+      s_string.each(sep_string, &block)
+    end
+    @sio_pos = s_string.length
+    self
+  end
+
+  def each(&block)
+    # start from current position
+    if @sio_closed_read ; requireReadable ; end
+    s_string = @sio_string
+    pos = @sio_pos
+    len = s_string.length - pos
+    s_string[pos, len].each( &block)
+    self
   end
 
   def each_byte(&block)
     if @sio_closed_read ; requireReadable ; end
+    s_string = @sio_string
     len = @sio_string.length
     s_pos = @sio_pos
     while s_pos < len
       # pos must be updated before call to yield
-      byte = @sio_string[s_pos]
+      byte = s_string[s_pos]
       @sio_pos = s_pos + 1
       block.call(byte)
       s_pos = @sio_pos
@@ -96,7 +131,7 @@ class PureRubyStringIO < IO
     @sio_pos >= @sio_string.length
   end
 
-  def fcntl(integer_cmd, arg)
+  def fcntl(*args)
     raise NotImplementedError, "The fcntl() function is unimplemented on this machine", caller
   end
 
@@ -140,45 +175,91 @@ class PureRubyStringIO < IO
     res
   end
 
-  def initialize(string="", mode="r+")
-    @sio_string = string.to_s
+  def initialize(string="", mode=Undefined)
+    self._initialize(string, mode, false)
+  end
+
+  def _initialize(string="", mode=Undefined, is_reopen=false)
+    s_buf = Type.coerce_to(string, String, :to_str )
+    isfrozen = s_buf.frozen?
     @sio_lineno = 0
-    @mode = mode
+    append = false
+    if mode._isInteger
+      if mode.equal?( IO::RDONLY )
+        basemode = "r"
+      else
+        mask = IO::APPEND|IO::TRUNC
+        append = (mode & mask).equal?( IO::APPEND )
+        mode = mode & (~ mask ) 
+        if mode.equal?( IO::RDWR )
+          basemode = "w+" 
+        elsif mode.equal?( IO::WRONLY )
+          basemode = "w"
+        else
+          raise ArgumentError, "PureRubyStringIO#initialize: illegal integer mode #{mode}"
+        end
+      end
+      if is_reopen 
+        append = true
+      end
+      @mode = basemode
+    elsif mode.equal?(Undefined)
+      basemode = isfrozen ? "r" : "r+"
+      @mode = basemode
+    else
+      mode = Type.coerce_to(mode, String, :to_str )
+      basemode = mode.dup
+      isbinary = basemode.delete!("b")
+      if is_reopen 
+        append =  basemode != "w"
+      end
+      if isbinary
+        @mode = basemode + "b" # move 'b' to end for cheaper tests in <<
+      else
+        @mode = basemode
+      end
+    end
     # @relay = nil  # Gemstone, no longer used
-    case mode.delete("b")
-    when "r"
+    if basemode == "r"
       @sio_closed_read = false
       @sio_closed_write = true
       @sio_pos = 0
-    when "r+"
-      @sio_closed_read = false
-      @sio_closed_write = false
-      @sio_pos = 0
-    when "w"
-      @sio_closed_read = true
-      @sio_closed_write = false
-      @sio_pos = 0
-      @sio_string.replace("")
-    when "w+"
-      @sio_closed_read = false
-      @sio_closed_write = false
-      @sio_pos = 0
-      @sio_string.replace("")
-    when "a"
-      @sio_closed_read = true
-      @sio_closed_write = false
-      @sio_pos = @sio_string.length
-    when "a+"
-      @sio_closed_read = false
-      @sio_closed_write = false
-      @sio_pos = @sio_string.length
     else
-      raise ArgumentError, "illegal access mode #{mode}", caller
+      if isfrozen 
+        raise Errno::EACCES , "PureRubyStringIO#initialize, frozen buffer requires mode 'r'"
+      end
+      if basemode == "r+"
+	@sio_closed_read = false
+	@sio_closed_write = false
+	@sio_pos = 0
+      elsif basemode == "w"
+	@sio_closed_read = true
+	@sio_closed_write = false
+	@sio_pos = 0
+	unless append ; s_buf.replace("") ; end
+      elsif basemode == "w+"
+	@sio_closed_read = false
+	@sio_closed_write = false
+	@sio_pos = 0
+	unless append ; s_buf.replace("") ; end
+      elsif basemode == "a"
+	@sio_closed_read = true
+	@sio_closed_write = false
+	@sio_pos = s_buf.length
+      elsif basemode == "a+"
+	@sio_closed_read = false
+	@sio_closed_write = false
+	@sio_pos = s_buf.length
+      else
+	raise ArgumentError, "illegal access mode #{mode}", caller
+      end
     end
+    @sio_string = s_buf 
+    self
   end
 
   def isatty
-    flase
+    false
   end
 
   def length
@@ -191,6 +272,28 @@ class PureRubyStringIO < IO
 
   def lineno=(integer)
     @sio_lineno = integer
+  end
+
+  def reopen(obj, mode)
+    if mode._isInteger 
+      if (mode & IO::TRUNC)._not_equal?(0) && obj.frozen?
+        raise TypeError, 'cannot truncate frozen input string'
+      end
+    end
+    self._initialize(obj, mode, true)
+  end
+
+  def reopen(other_io)
+    if other_io._isString
+      self._initialize(other_io, IO::RDWR, true )
+    else
+      other_io = Type.coerce_to(other_io, PureRubyStringIO, :to_strio )
+      self._initialize(other_io.string, other_io._mode, true)
+    end
+  end
+
+  def reopen()
+    self._initialize(self.string, "w+", true)
   end
 
   def path
@@ -210,35 +313,12 @@ class PureRubyStringIO < IO
     @sio_pos = integer
   end
 
-  def print(*args)
-    if @sio_closed_write ; requireWritable ; end
-    args.unshift($_) if args.empty?
-    args.each { |obj| write(obj) }
-    write($\) unless $\.equal?(nil)
-    nil
-  end
-
-  def printf(format_string, *args)
-    if @sio_closed_write ; requireWritable ; end
-    write format(format_string, *args)
-    nil
-  end
-
-  def putc(obj)
-    if @sio_closed_write ; requireWritable ; end
-    write(obj.is_a?(Numeric) ? sprintf("%c", obj) : obj.to_s[0..0])
-    obj
-  end
-
-  def puts(*args)
-    if @sio_closed_write ; requireWritable ; end
-    args.unshift("") if args.empty?
-    args.each { |obj|
-      write obj
-      write $/
-    }
-    nil
-  end
+  #  for inherited methods, @sio_closed_write will be checked in syswrite
+  #
+  # def print(*args) ; end                 # inherited from IO
+  # def printf(format_string, *args) ; end # inherited from IO
+  # def putc(obj) ; end                    #  inherited from IO
+  # def puts(*args) ; end                  # inherited from IO
 
   def read(length=nil, buffer=nil)
     if @sio_closed_read ; requireReadable ; end
@@ -263,7 +343,7 @@ class PureRubyStringIO < IO
     s_pos += len
     @sio_pos = s_pos
     buf.replace(s_string[pstart..(s_pos - 1)])
-    r = buf.empty? && !length.equal?(nil) ? nil : buf
+    r = buf.length.equal?(0) && length._not_equal?(nil) ? nil : buf
     r
   end
 
@@ -294,18 +374,18 @@ class PureRubyStringIO < IO
   def readlines(sep_string=Undefined)
     if @sio_closed_read ; requireReadable ; end
     if sep_string.equal?(Undefined)
-      sep = $/
+      sep_string = $/
       return [] if eof?
     elsif sep_string.equal?(nil)
       return [read]
     else
-      sep = Type.coerce_to(sep_string, String, :to_str)
+      sep_string = Type.coerce_to(sep_string, String, :to_str)
     end
     raise EOFError, "End of file reached", caller if eof?
-    sep = "\n\n" if sep.empty?
+    sep_string = "\n\n" if sep_string.length.equal?(0)
     rc = []
     while ! eof
-      rc << gets(sep)
+      rc << gets(sep_string)
     end
     rc
   end
@@ -314,19 +394,7 @@ class PureRubyStringIO < IO
     @mode
   end
 
-  def reopen(other_io, mode_arg=nil)
-    # Gemstone edits to delete use of ObjectSpace
-    if other_io._isString
-      raise ArgumentError, 'wrong number of arguments (1 for 2)', caller if mode_arg.equal?(nil)
-      self.initialize(other_io, mode_arg)
-    elsif other_io.is_a?(self.class) then
-      raise ArgumentError, 'wrong number of arguments (2 for 1)', caller if ! mode_arg.equal?(nil)
-      self.initialize(other_io.string, other_io._mode)
-    else
-      raise ArgumentError, 'unsupported kind of reopen'
-    end
-    self
-  end
+  # def reopen ; end   # in delta/purerubystringio2.rb
 
   def rewind
     @sio_pos = 0
@@ -334,10 +402,17 @@ class PureRubyStringIO < IO
   end
 
   def seek(offset, whence=SEEK_SET)
+    offset = Type.coerce_to(offset, Fixnum, :to_int)
     if whence == SEEK_CUR then
       offset += @sio_pos
     elsif whence == SEEK_END then
       offset += size
+    elsif whence == SEEK_SET
+      if offset < 0
+        raise Errno::EINVAL , 'StringIO#seek, negative seek position not allowed with SEEK_SET'
+      end
+    else
+      raise ArgumentError, 'invalid second arg to StringIO#seek'
     end
     @sio_pos = offset
   end
@@ -346,8 +421,15 @@ class PureRubyStringIO < IO
     @sio_string
   end
 
-  def string=(newstring)
+  def _string=(newstring)
     @sio_string = newstring
+  end
+
+  def string=(newstring)
+    newstring = Type.coerce_to(newstring, String, :to_str)
+    @sio_string = newstring
+    self.rewind
+    newstring
   end
 
   def sync
@@ -370,14 +452,17 @@ class PureRubyStringIO < IO
     s_string = @sio_string
     my_len = s_string.length
     s_pos = @sio_pos
-    if s_pos > my_len
-      # Pad with nulls
-      s_string << ("\000" * (s_pos - my_len))
+    arg_len = str.length
+    if s_pos.equal?(my_len)
+      s_string << str
+    elsif s_pos > my_len
+      s_string.size=(s_pos) # Pad with nulls
+      s_string << str
+    else
+      s_string[s_pos, arg_len] = str
     end
-    s_string[s_pos, str.length] = str
-    str_siz = str.size
-    @sio_pos = s_pos + str_siz
-    str_siz
+    @sio_pos = s_pos + arg_len
+    arg_len
   end
 
   # In ruby 1.8.4 truncate differs from the docs in two ways.
@@ -397,20 +482,28 @@ class PureRubyStringIO < IO
   # will be simple to update as well.
   def truncate(integer)
     if @sio_closed_write ; requireWritable ; end
-    raise Errno::EINVAL, "Invalid argument - negative length", caller if integer < 0
+    new_size = Type.coerce_to(integer, Fixnum, :to_int)
+    raise Errno::EINVAL, "Invalid argument - negative length", caller if new_size < 0
     s_string = @sio_string
-    s_string[ s_string.length._max(integer) ..-1] = ""
+    old_size = s_string.length
+    if new_size < s_string.length
+      s_string[ new_size , old_size - new_size ] = ""
+    else
+      s_string.size=(new_size)
+    end
     integer
   end
 
   def ungetc(integer)
-    if @sio_closed_write ; requireWritable ; end
+    if @sio_closed_read ; requireReadable ; end
+    integer = Type.coerce_to(integer, Fixnum, :to_int)
     s_pos = @sio_pos
     if s_pos > 0 then
       @sio_pos = s_pos - 1
       putc(integer)
       @sio_pos -= 1
     end
+    nil
   end
 
   alias :each_line :each

@@ -119,7 +119,7 @@ class Integer
           if arg._isInteger 
             raise TypeError , 'coercion error in ** '
           else
-            s = Type.coerce_to(self, Float, :_to_f_or_error)
+            s = Type.coerce_to(self, Float, :to_f)
             s ** arg 
           end
         end 

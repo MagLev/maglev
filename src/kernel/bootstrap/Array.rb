@@ -279,9 +279,8 @@ class Array
   end
 
   def self._coerce_one_arg(arg)
-    begin
-      carg = Type.coerce_to(arg, Array, :to_ary)
-    rescue TypeError
+    carg = Type.coerce_to_or_nil(arg, Array, :to_ary)
+    if carg.equal?(nil)
       carg = Type.coerce_to(arg, Fixnum, :to_int)
     end
     carg

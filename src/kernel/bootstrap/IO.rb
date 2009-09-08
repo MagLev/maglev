@@ -44,40 +44,71 @@ class IO
   def print(*args)
     # TODO handle non-nil state of $\
     lim = args.length
-
-    # If no argument, print $_
-    if lim == 0
-      args = [$_]
-      lim = 1
-    end
-
-    n = 0
-    while (n < lim)
-      elem = args[n]
-      if elem.equal?(nil)
-        write("nil")
-      else
-        unless (elem._isString)
-          elem = elem.to_s
-        end
-        write(elem)
+    if lim == 0 # if no argument, print $_
+      usc = self._getRubyVcGlobal(0x21) # get callers $_
+      if usc.equal?(nil)
+        usc = "nil"
       end
-      n = n + 1
+      write(usc)
+    else
+      n = 0
+      while (n < lim)
+        elem = args[n]
+        if elem.equal?(nil)
+          elem = "nil"
+        else
+          unless (elem._isString)
+            elem = elem.to_s
+          end
+        end
+	write(elem)
+        n = n + 1
+      end
+      sep = $\
+      write(sep) unless sep.equal?(nil)
     end
+  end
 
-    sep = $\
-    write(sep) unless sep.equal?(nil)
+  def print
+    # non-bridge zero args variant  so $_ access will work
+    usc = self._getRubyVcGlobal(0x21) # get callers $_
+    if usc.equal?(nil)
+      usc = "nil"
+    end
+    write(usc)
+  end
+
+  def putc(obj)
+    if obj._isString
+      str = obj[0,1]  # write first char of arg
+    else
+      c = Type.coerce_to(obj, Integer, :to_int)
+      c = c % 256
+      str = 'x'
+      str[0] = c
+    end
+    write( str )
+    obj
   end
 
   def printf(format, *args)
-    s = sprintf(format, *args)
-    write(s)
+    write( sprintf(format, *args) )
+    nil
   end
 
-  def putc(arg)
-    # TODO putc
-    raise NotImplementedError
-  end
+  def putc(obj)
+    if obj._isString
+      str = obj[0,1]  # write first char of arg
+    else
+      c = Type.coerce_to(obj, Integer, :to_int) 
+      c = c % 256
+      str = 'x'
+      str[0] = c
+    end
+    write( str )
+    obj
+  end 
+
 
   #  Writes the given objects to <em>ios</em> as with
   #  <code>IO#print</code>. Writes a record separator (typically a
@@ -96,10 +127,11 @@ class IO
   #
   def puts(*args)
     lim = args.length
+    eol = "\n"  # the record separator,  ignores $\  #  
 
     # If no parameters, print newline
     if lim == 0
-      write("\n")
+      write(eol)
       return nil
     end
 
@@ -131,10 +163,9 @@ class IO
       else
         line = elem.to_s
       end
-
       unless line.equal?(nil)
         write(line)
-        write("\n") unless line[-1].equal?(10)
+        write(eol) unless line[-1].equal?(10)
       end
       n = n + 1
     end
@@ -181,6 +212,9 @@ class IO
     end
     data
   end
+
+  # Note, gets and readline must be reimplemented in subclasses to 
+  #  update caller's $_ see File and StringIO code for examples.
 
   ##
   # Reads a line as with IO#gets, but raises an EOFError on end of file.

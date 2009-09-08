@@ -16,10 +16,6 @@ class Method
       @obj
     end
 
-    def _gsmeth
-      @gsmeth # instvar defined in UnboundMethod
-    end
-
     def ==(other)
       # Returns true if other is the same method as self
       if (other.kind_of?(Method))
