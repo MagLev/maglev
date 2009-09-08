@@ -5,7 +5,7 @@ class String
     Regexp.new(self)
   end
 
-  primitive 'size=', 'size:'
+  primitive 'size=', 'size:'  # Note size=() not in MRI
 
   primitive_nobridge '_copyfrom_to', 'copyFrom:to:'
   primitive_nobridge '_findStringStartingAt', 'findString:startingAt:'
@@ -192,89 +192,103 @@ class String
     end
   end
 
-  primitive_nobridge '_at' , '_rubyAt:'
-  primitive_nobridge '_at_length' , '_rubyAt:length:'
-
   def [](*args)
     # This variant gets bridge methods
     raise ArgumentError, 'wrong number of arguments'
   end
 
-  def [](index)
-    if index._isRegexp
-      s = _at(index)
-      # s.taint if index.tainted?
-    elsif index._isRange
-      first, len = index._beg_len(self.length)
-      return nil if first.equal?(nil)
-      s = self._at_length(first, len)
-    elsif index._isString
-      s = self._at(index)
-      # s.taint if ! s.nil? && index.tainted?
+  primitive_nobridge_env '[]' , '_rubyAt', ':'
+  primitive_nobridge_env '_at' , '_rubyAt', ':'
+ 
+  def _prim_at_failed(index)
+    # invoked from prim failure code in _rubyAt<env>:
+    if index._isRange 
+      arr = index._beg_len(self.length)
+      if arr.equal?(nil)
+        nil
+      else
+        self._at_length( arr[0] , arr[1] )
+      end
+    elsif index._isInteger
+      raise ArgumentError, 'String#[index] primitive failed' 
     else
-      index = Type.coerce_to(index, Integer, :to_int)
-      s = self._at(index)
+      index = Type.coerce_to_Fixnum_to_int(index)
+      self._at(index)
     end
-    # s.taint if self.tainted? and not s.nil?
-    s
   end
 
-  def [](start, length)
+  primitive_nobridge_env '[]' ,         '_rubyAt', ':length:'
+  primitive_nobridge_env '_at_length' , '_rubyAt', ':length:'
+
+  def _prim_at_length_failed(start, length)
     if start._isRegexp
-      m_begin, m_len = self._match_regexp(start, length)
-      return nil if m_begin.equal?(nil)
-      s = self._at_length(m_begin, m_len)
-      # s.taint if start.tainted?
-      s
+      arr = self._match_regexp(start, length) # arr is [m_begin, m_len]
+      return nil if arr.equal?(nil)
+      # no tainted logic
+      self._at_length( arr[0] , arr[1] )
     else
-      length = Type.coerce_to(length, Integer, :to_int)
-      start = Type.coerce_to(start, Integer, :to_int)
-      s = _at_length(start, length)
+      if start._isFixnum
+        if length._isFixnum
+          raise ArgumentError, 'String#[start,length] primitive failed'
+        else 
+          length = Type.coerce_to_Fixnum_to_int(length)
+        end
+      else
+        start = Type.coerce_to_Fixnum_to_int(start)
+        length = Type.coerce_to(length, Fixnum, :to_int)
+      end  
+      # no tainted logic
       return nil if length < 0
+      self._at_length(start, length)
     end
-    # s.taint if self.tainted?
-    s
   end
 
-  primitive_nobridge '_at_put', '_rubyAt:put:'
-  primitive_nobridge '_at_length_put', '_rubyAt:length:put:'
   def []=(*args)
     # This variant gets bridge methods
     raise ArgumentError, 'wrong number of arguments'
   end
 
-  def []=(index, value)
-    val = value._isFixnum ? value : Type.coerce_to(value, String, :to_str)
-    if index._isString or index._isRegexp
-      _at_put(index, val)
+  primitive_nobridge_env '[]=',     '_rubyAt', ':put:'
+  primitive_nobridge_env '_at_put', '_rubyAt', ':put:'
+  # Smalltalk code handles  Regexp and String  first args
+
+  def _prim_at_put_failed(index, value)
+    if value._isFixnum || value._isString
+      # ok
+    else 
+      value = Type.coerce_to_String_to_str( value )
+      val_coerced = true
+    end
+    if index._isFixnum
+      unless val_coerced.equal?(true)
+        raise IndexError, ('String#[index]=, ' + " index #{index} out of range")
+      end
+      self._at_put(index, value)
+    elsif index._isRange 
+      arr = index._beg_len(self.length)
+      if arr.equal?(nil)
+        raise IndexError, ('String#[range]=' + "start out of range for range=#{index}")
+      else
+        self._at_length_put( arr[0] , arr[1], value)
+      end
     else
-      idx = Type.coerce_to(index, Integer, :to_int)
-      sz = self.size
-      idx += sz if idx < 0
-      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
-      _at_put(idx, val)
+      index = Type.coerce_to(index, Fixnum, :to_int)
+      self._at_put(index, value)
     end
     # taint if value.tainted?
-    self
+    value
   end
 
-  def []=(index, count, value)
-    if index._isRegexp
-      _at_length_put(index, count, value)
-    else
-      idx = Type.coerce_to(index, Integer, :to_int)
-      sz = self.size
-      idx += sz if idx < 0
+  primitive_nobridge_env '[]=', '_rubyAt', ':length:put:'
+  primitive_nobridge_env '_at_length_put', '_rubyAt', ':length:put:'
+  # smalltalk code handles Regexp and Fixnum first args
 
-      raise IndexError, "index #{idx} out of string" if idx < 0 or idx > sz
-
-      str_value = Type.coerce_to(value, String, :to_str)
-      raise IndexError, "index #{count} out of string" if count < 0
-
-      _at_length_put(idx, count, str_value)
-    end
-    # taint if value.tainted?
-    self
+  def _prim_at_length_put_failed(index, count, value)
+    index = Type.coerce_to(index, Fixnum, :to_int)
+    str_value = Type.coerce_to(value, String, :to_str)
+    count = Type.coerce_to(count, Fixnum, :to_int)
+    self._at_length_put(idx, count, str_value)
+    # no taint logic
   end
 
   # MNI: String#~
@@ -474,32 +488,47 @@ class String
     id = self.__id__
     my_size = self.size
     ssize = sep.size
-    newline = ssize == 0 ? ?\n : sep[ssize-1]
+    newline = ssize.equal?(0) ?  ?\n  : sep[ssize-1]
 
-    last, i = 0, ssize
-    while i < my_size
-      if ssize == 0 && self[i] == ?\n
-        if self[i+=1] != ?\n
-          i += 1
-          next
-        end
-        i += 1 while i < my_size && self[i] == ?\n
+    last = 0
+    i = ssize
+    if ssize.equal?(0)
+      while i < my_size
+	if self[i].equal?( ?\n )
+	  if self[i+=1]._not_equal?( ?\n )
+	    i += 1
+	    next
+	  end
+	  i += 1 while i < my_size && self[i].equal?( ?\n )
+	end
+
+	if i > 0 && self[i-1].equal?( newline ) &&
+	    (ssize < 2 || self._compare_substring(sep, i-ssize, ssize).equal?(0) )
+	  line = self[last, i-last]
+	  # line.taint if tainted?
+	  yield line
+	  # We don't have a way yet to check if the data was modified...
+	  #modified? id, my_size
+	  last = i
+	end
+
+	i += 1
       end
-
-      if i > 0 && self[i-1] == newline &&
-          (ssize < 2 || self._compare_substring(sep, i-ssize, ssize) == 0)
-        line = self[last, i-last]
-        # line.taint if tainted?
-        yield line
-        # We don't have a way yet to check if the data was modified...
-        #modified? id, my_size
-        last = i
+    else
+      while i < my_size
+	if i > 0 && self[i-1].equal?(newline) &&
+	    (ssize < 2 || self._compare_substring(sep, i-ssize, ssize).equal?(0))
+	  line = self[last, i-last]
+	  # line.taint if tainted?
+	  yield line
+	  # We don't have a way yet to check if the data was modified...
+	  #modified? id, my_size
+	  last = i
+	end
+	i += 1
       end
-
-      i += 1
     end
-
-    unless last == my_size
+    unless last.equal?(my_size)
       line = self[last, my_size-last+1]
       # line.taint if tainted?
       yield line
@@ -936,9 +965,9 @@ class String
   def slice!(start, a_len)
     sz = self.size
     if start._isRegexp
-      m_begin, m_len = self._match_regexp(start, a_len)
-      return nil if m_begin.equal?(nil)
-      r = slice!(m_begin, m_len)
+      arr = self._match_regexp(start, a_len) # arr is [ m_begin, m_len]
+      return nil if arr.equal?(nil)
+      r = slice!(arr[0], arr[1])
       # r.taint if self.tainted? or start.tainted?
       return r
     end
@@ -1247,20 +1276,12 @@ class String
   end
 
   primitive '_to_f', 'asFloat'
+
   def to_f
     s = self._delete_underscore_strip
-    s =~ /^([+-]?\d*(\.\d+)?\d*([eE][+-]?\d+)?)/
+    s =~ /^([+-]?\d*(\.\d+)?\d*([eE][+-]?\d+)?)/  # ignores trailing non-digits
     f = $1._to_f
     f.nan? ? 0.0 : f
-  end
-
-  def _to_f_or_error
-    s = self._delete_underscore_strip
-    f = s._to_f
-    unless f.finite?
-      raise TypeError, 'coercion to float failed'
-    end
-    f
   end
 
   def to_i(base=10)
