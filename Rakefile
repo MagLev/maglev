@@ -61,7 +61,7 @@ end
 
 desc "Run a squeak image"
 task :squeak => 'netldi:start' do
-  gem_tools = '/Applications/Maglev.app'
+  gem_tools = '/Applications/GemTools-MagLev.app'
   if File.exists?(gem_tools)
     sh %{ open #{gem_tools} }
   else
