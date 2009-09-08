@@ -10,6 +10,7 @@ class BlogApp < Sinatra::Base
   set :server, ["webrick"]   # Maglev currently only supports webrick
   set :environment, :development
   set :static, true                # Allow loading /style.css, etc.
+  set :public, File.join(File.dirname(__FILE__), 'public')
 
 #  use Rack::Lint
 #  use Rack::Reloader   # sort-of works....
