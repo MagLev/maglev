@@ -65,8 +65,8 @@ task :squeak => 'netldi:start' do
   if File.exists?(gem_tools)
     sh %{ open #{gem_tools} }
   else
-    puts "The #{gem_tools} application used by the 'squeak' command was not found on your system."
-    puts "To fix this, correct the 'squeak' command in the gemstone script."
+    puts "Cannot open #{gem_tools}"
+    puts "File does not exist."
   end
 end
 
