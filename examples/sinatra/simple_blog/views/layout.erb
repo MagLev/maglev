@@ -1,22 +1,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
-    <title><%= @title || App[:title]%></title>
+    <title><%= @title %></title>
     <meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
     <link rel="stylesheet" type="text/css" href="/style.css" media="all" />
   </head>
   <body>
     <div id="container">
       <div id="header">
-        <h1><%= @title || App[:title] %></h1>
+        <h1><%= @title %></h1>
       </div>
       <div id="navigation">
         <%= @nav_bar %>
       </div>
       <div id="content">
-        <div class="left"><%= yield %></div>
+        <div class="left">
+          <%= yield %>
+          <% if @debug %>
+          <div><%= @debug %></div>
+          <% end %>
+        </div>
         <div class="right">
-          <% if App[:show_tags] %>
+          <% if @show_tags %>
           <h4>Tags</h4>
           <ul>
             <% Tag.all.each do |tag| %>
@@ -26,7 +31,7 @@
           <% end %>
           <h4>Debug Links</h4>
           <ul>
-            <li>The <a href="/objectlog">Object Log</a> is a work in
+            <li>The <a href="/objectlog/">Object Log</a> is a work in
               progress.  It is a mini-inspector for the MagLev object log.
               You will need to put items into the object log yourself</li>
             <li>A <a href="/debug">debug</a> link, which may or may not
@@ -41,7 +46,7 @@
         </div>
       </div>
       <div id="footer">
-        <%= @title || App[:title] %> running on
+        <%= @title %> running on
         <a href="http://maglev.gemstone.com">MagLev</a>
       </div>
     </div>
