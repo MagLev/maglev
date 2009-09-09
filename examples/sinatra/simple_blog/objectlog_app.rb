@@ -15,25 +15,33 @@ class ObjectLogApp < Sinatra::Base
   set :static, true                # Allow loading /style.css, etc.
   set :app_file, __FILE__          # Affects :views, :public and :root
 
-  @@path = '/'  # The path we are mounted on.  Should be set by .ru script
-
-  def self.path=(path)
-    @@path = path
-  end
-
   def initialize(*args)
     super(*args)
     @title = "Object Log Application"
     @nav_bar = <<-EOS
         <ul class="menu">
           <li><a href="/">Main App</a></li>
-          <li><a href="#{@@path}/clear">Clear Log</a></li>
+          <li><a href="#{path_for('/clear')}">Clear Log</a></li>
         </ul>
     EOS
   end
 
+  @@script_name = ''
+
+  def self.script_name=(str)
+    @@script_name = str
+  end
+
+  def path_for(string)
+    @@script_name + string
+  end
+
+  get '/info' do
+    erb :info
+  end
+
   get '/' do
-    @debug = "<pre>objectlog_app mounted on #{@@path}</pre>"
+    STDERR.puts
     Maglev.abort_transaction  # Get a fresh object view
     @objectlog = ObjectLogEntry.object_log
     erb :objectlog
@@ -42,7 +50,7 @@ class ObjectLogApp < Sinatra::Base
   get '/clear' do
     ObjectLogEntry.object_log.clear
     ObjectLogEntry.trace("Cleared log at #{Time.now}").add_to_log
-    redirect "#{@@path}/"
+    redirect path_for('/')
   end
 
   get '/entry/:id' do

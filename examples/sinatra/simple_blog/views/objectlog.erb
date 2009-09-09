@@ -4,7 +4,7 @@
   <tr>
     <td><%= i %></td>
     <td><%= entry.tagged? ? "X" : "" %></td>
-    <td><a href="<%= @@path %>/entry/<%= i %>"> <%= entry.label %></a></td>
+    <td><a href="<%= path_for("/entry/#{i}")%>"> <%= entry.label %></a></td>
     <td><%= entry.object %></td>
     <td><%= entry.timestamp %></td>
   </tr>

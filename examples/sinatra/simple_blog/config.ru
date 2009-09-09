@@ -17,7 +17,7 @@ end
 
 map "/objectlog" do
   # Tell the ObjectLogApp where it is mounted.
-  ObjectLogApp.path = "/objectlog"
+  ObjectLogApp.script_name = "/objectlog"
   run ObjectLogApp
 end
 
