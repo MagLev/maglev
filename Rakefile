@@ -61,12 +61,27 @@ end
 
 desc "Run a squeak image"
 task :squeak => 'netldi:start' do
-  gem_tools = '/Applications/GemTools-MagLev.app'
-  if File.exists?(gem_tools)
-    sh %{ open #{gem_tools} }
+  os = `uname`.chomp
+  if os == "Darwin"
+    gem_tools = '/Applications/GemTools-MagLev.app'
+    if File.exists?(gem_tools)
+      sh %{ open #{gem_tools} }
+    else
+      puts "Cannot open #{gem_tools}"
+      puts "as that file does not exist. To fix this, download and unzip"
+      puts "http://seaside.gemstone.com/squeak/GemTools-MagLev.zip"
+      puts "then move GemTools-MagLev.app to /Applications"
+    end
   else
-    puts "Cannot open #{gem_tools}"
-    puts "File does not exist."
+    gem_tools = "#{MAGLEV_HOME}/../GemTools-MagLev.app/GemTools.sh"
+    if File.exists?(gem_tools)
+      sh "#{gem_tools}"
+    else
+      puts "Cannot open #{gem_tools}"
+      puts "as that file does not exist. To fix this, download and unzip"
+      puts "http://seaside.gemstone.com/squeak/GemTools-MagLev.zip"
+      puts "then move GemTools-MagLev.app to \$MAGLEV_HOME/../"
+    end
   end
 end
 

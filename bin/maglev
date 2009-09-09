@@ -296,16 +296,20 @@ squeak() {
           open /Applications/GemTools-MagLev.app
       else
           echo "[Error] Cannot open /Applications/GemTools-MagLev.app"
-          echo "File does not exist."
+          echo "as that file does not exist. To fix this, download and unzip"
+          echo "http://seaside.gemstone.com/squeak/GemTools-MagLev.zip"
+          echo "then move GemTools-MagLev.app to /Applications"
           exit 1
       fi
       ;;
       Linux)
       if [ -e $MAGLEV_HOME/../GemTools-MagLev.app/GemTools.sh ]; then
-          bash $MAGLEV_HOME/../GemTools-MagLev.app/GemTools.sh &
+          bash "$MAGLEV_HOME/../GemTools-MagLev.app/GemTools.sh"
       else
           echo "[Error] Cannot open \$MAGLEV_HOME/../GemTools-MagLev.app/GemTools.sh"
-          echo "File does not exist."
+          echo "as that file does not exist. To fix this, download and unzip"
+          echo "http://seaside.gemstone.com/squeak/GemTools-MagLev.zip"
+          echo "then move GemTools-MagLev.app to \$MAGLEV_HOME/../"
           exit 1
       fi
       ;;
