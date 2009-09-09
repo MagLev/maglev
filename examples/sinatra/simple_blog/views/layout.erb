@@ -11,7 +11,7 @@
         <h1><%= @title || App[:title] %></h1>
       </div>
       <div id="navigation">
-        <%= App[:nav_bar] %>
+        <%= @nav_bar %>
       </div>
       <div id="content">
         <div class="left"><%= yield %></div>
@@ -24,6 +24,15 @@
             <% end %>
           </ul>
           <% end %>
+          <h4>Debug Links</h4>
+          <ul>
+            <li>The <a href="/objectlog">Object Log</a> is a work in
+              progress.  It is a mini-inspector for the MagLev object log.
+              You will need to put items into the object log yourself</li>
+            <li>A <a href="/debug">debug</a> link, which may or may not
+            work...</li>
+          </ul>
+
           <h4>About</h4>
           <p>This is a simple sinatra application running on MagLev</p>
           <h4>Credit</h4>

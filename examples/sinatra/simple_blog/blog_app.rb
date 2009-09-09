@@ -10,10 +10,11 @@ class BlogApp < Sinatra::Base
   set :server, ["webrick"]   # Maglev currently only supports webrick
   set :environment, :development
   set :static, true                # Allow loading /style.css, etc.
-  set :public, File.join(File.dirname(__FILE__), 'public')
+  set :app_file, __FILE__          # Affects :views, :public and :root
 
-#  use Rack::Lint
-#  use Rack::Reloader   # sort-of works....
+  # use Rack::Lint
+  # use Rack::Reloader   # sort-of works....
+
   use MagLevTransactionWrapper
 
   # Make these methods on the app?
@@ -22,10 +23,8 @@ class BlogApp < Sinatra::Base
     :show_tags => true,
     :nav_bar => <<-EOS
         <ul class="menu">
-          <li><a href="/post/new">New Post</a></li>
           <li><a href="/posts">All Posts</a></li>
-          <li><a href="/objectlog">Object Log</a></li>
-          <li><a href="/debug">debug</a></li>
+          <li><a href="/post/new">New Post</a></li>
         </ul>
     EOS
   }
@@ -33,6 +32,11 @@ class BlogApp < Sinatra::Base
   error do
     e = request.env['sinatra.error']
     "There was an error: #{e}"
+  end
+
+  before do
+    # Set default nav bar
+    @nav_bar = App[:nav_bar]
   end
 
   get '/' do
@@ -51,6 +55,7 @@ class BlogApp < Sinatra::Base
 
   post '/post' do
     post = Post.new(params)
+    ObjectLogEntry.info("A Post", post).add_to_log
     params[:tags].split.each do |tag|
       t = Tag.find_by_name(tag) || Tag.new(tag)
       post.tag t
@@ -70,6 +75,7 @@ class BlogApp < Sinatra::Base
   end
 
   get '/debug' do
+    @options = options
     erb :debug
   end
 
@@ -77,8 +83,21 @@ class BlogApp < Sinatra::Base
   # Object Log Support  # TODO: make this a module...
   #################################################
   get '/objectlog' do
+    Maglev.abort_transaction  # Get a fresh object view
+    @nav_bar = <<-EOS
+        <ul class="menu">
+          <li><a href="/">Main App</a></li>
+          <li><a href="/objectlog/clear">Clear Log</a></li>
+        </ul>
+    EOS
     @objectlog = ObjectLogEntry.object_log
     erb :objectlog
+  end
+
+  get '/objectlog/clear' do
+    ObjectLogEntry.object_log.clear
+    ObjectLogEntry.trace("Cleared log at #{Time.now}").add_to_log
+    redirect '/objectlog'
   end
 
   get '/entry/:id' do
@@ -95,4 +114,3 @@ class BlogApp < Sinatra::Base
     erb :objectdetail
   end
 end
-
