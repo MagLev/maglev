@@ -8,8 +8,11 @@ class OrderedCollection
   primitive 'include?', 'includes:'
   primitive 'to_a', 'asArray'
   primitive '<<', 'add:'
-  primitive 'length', 'size'
   primitive '_at', 'at:'
+  primitive 'length', 'size'
+  primitive 'size', 'size'
+  primitive 'size=', 'size:'
+
   def [](index)
     _at(index + 1)
   end
@@ -20,4 +23,8 @@ class OrderedCollection
     self
   end
 
+  # Clear all of the elements in receiver.  (set the size to 0)
+  def clear
+    self.size = 0
+  end
 end
