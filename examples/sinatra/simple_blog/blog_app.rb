@@ -39,7 +39,7 @@ class BlogApp < Sinatra::Base
 
   get '/tag/:id' do
     @tag = Tag.get(params[:id])
-    stop [ 404, "Page not found for tag (id: #{params[:id]})" ] unless @tag
+    raise "Page not found for tag (id: #{params[:id]})" unless @tag
     erb :tag
   end
 
@@ -59,7 +59,7 @@ class BlogApp < Sinatra::Base
 
   get '/post/:id' do
     @post = Post.get(params[:id])
-    stop [ 404, "Page not found (id: #{params[:id]})" ] unless @post
+    raise "Page not found (id: #{params[:id]})" unless @post
     erb :post
   end
 
