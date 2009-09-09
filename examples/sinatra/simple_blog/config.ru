@@ -9,11 +9,14 @@ require 'objectlog_app'
 disable :run
 set :environment, :development
 
+options = { :Port => 4567, :host => 'localhost' }
+
 map "/" do
   run BlogApp
 end
 
 map "/objectlog" do
+  # Tell the ObjectLogApp where it is mounted.
   ObjectLogApp.path = "/objectlog"
   run ObjectLogApp
 end

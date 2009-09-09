@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'sinatra/base'
-#require 'maglev/objectlog'
 require 'txn_wrapper'
 
 class BlogApp < Sinatra::Base
@@ -73,39 +72,4 @@ class BlogApp < Sinatra::Base
     @options = options
     erb :debug
   end
-
-#   #################################################
-#   # Object Log Support  # TODO: make this a module...
-#   #################################################
-#   get '/objectlog' do
-#     Maglev.abort_transaction  # Get a fresh object view
-#     @nav_bar = <<-EOS
-#         <ul class="menu">
-#           <li><a href="/">Main App</a></li>
-#           <li><a href="/objectlog/clear">Clear Log</a></li>
-#         </ul>
-#     EOS
-#     @objectlog = ObjectLogEntry.object_log
-#     erb :objectlog
-#   end
-
-#   get '/objectlog/clear' do
-#     ObjectLogEntry.object_log.clear
-#     ObjectLogEntry.trace("Cleared log at #{Time.now}").add_to_log
-#     redirect '/objectlog'
-#   end
-
-#   get '/entry/:id' do
-#     index = params[:id].to_i
-#     @object = ObjectLogEntry.object_log[index]
-#     stop [ 404, "Can't find Object Log Entry for index: #{index}" ] unless @object
-#     erb :objectdetail
-#   end
-
-#   get '/object/:id' do
-#     oop = params[:id].to_i
-#     @object = ObjectSpace._id2ref(oop)
-#     stop [ 404, "Can't find object with oop #{oop}" ] unless @object
-#     erb :objectdetail
-#   end
 end

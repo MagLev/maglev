@@ -3,6 +3,9 @@ require 'sinatra/base'
 require 'maglev/objectlog'
 require 'txn_wrapper'
 
+# A simple object log viewer.  This app tries to be re-locatable.  It looks
+# at the @@path class variable for its mount point, and then makes all URLs
+# relative to that.  See config.ru for example of setting @@path.
 class ObjectLogApp < Sinatra::Base
 
   # When running out of a classic top level Sinatra app, several options
