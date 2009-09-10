@@ -1,1 +1,0 @@
-fails:UnboundMethod#bind raises TypeError if object is not kind_of? the Module the method defined in

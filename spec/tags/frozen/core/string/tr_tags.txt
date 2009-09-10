@@ -1,2 +1,1 @@
-fails:String#tr taints the result when self is tainted
 fails:String#tr! raises a TypeError if self is frozen

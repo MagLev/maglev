@@ -1,2 +1,1 @@
-fails:String#swapcase taints resulting string when self is tainted
 fails:String#swapcase! raises a TypeError when self is frozen

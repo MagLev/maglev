@@ -1,1 +1,0 @@
-fails:Array#dup copies taint status from the original
