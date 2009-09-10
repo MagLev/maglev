@@ -48,8 +48,10 @@ class ObjectLogApp < Sinatra::Base
   end
 
   get '/clear' do
+    Maglev.abort_transaction
     ObjectLogEntry.object_log.clear
     ObjectLogEntry.trace("Cleared log at #{Time.now}").add_to_log
+    Maglev.commit_transaction
     redirect path_for('/')
   end
 
