@@ -56,14 +56,14 @@ class ObjectLogApp < Sinatra::Base
   get '/entry/:id' do
     index = params[:id].to_i
     @object = ObjectLogEntry.object_log[index]
-    stop [ 404, "Can't find Object Log Entry for index: #{index}" ] unless @object
+    raise "Can't find Object Log Entry for index: #{index}" unless @object
     erb :objectdetail
   end
 
   get '/object/:id' do
     oop = params[:id].to_i
     @object = ObjectSpace._id2ref(oop)
-    stop [ 404, "Can't find object with oop #{oop}" ] unless @object
+    "Can't find object with oop #{oop}" unless @object
     erb :objectdetail
   end
 end

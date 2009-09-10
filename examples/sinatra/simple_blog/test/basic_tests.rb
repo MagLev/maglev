@@ -13,7 +13,7 @@ describe Post do
   it "Returns the newly created posts" do
     posts = Post.all
     titles = posts.map{ |p| p.title }
-    titles.must_include(["The Title"])
+    "The Title".must_include titles  # must_include is backwards....
   end
 end
 
