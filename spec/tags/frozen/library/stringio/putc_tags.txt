@@ -1,2 +1,0 @@
-fails:StringIO#putc when passed [Object] tries to convert the passed argument to an Integer using #to_int
-fails:StringIO#putc when passed [Object] raises a TypeError when the passed argument can't be coerced to Integer
