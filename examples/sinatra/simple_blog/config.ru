@@ -22,5 +22,3 @@ map "/objectlog" do
 end
 
 
-
-

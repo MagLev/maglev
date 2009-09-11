@@ -1,4 +1,3 @@
-fails:UnboundMethod#== returns true if objects refer to the same method
-fails:UnboundMethod#== returns true if either is an alias for the other
-fails:UnboundMethod#== returns true if both are aliases for a third method
-fails:UnboundMethod#== returns true if same method is extracted from the same subclass
+fails:UnboundMethod#== returns false if same method but one extracted from a subclass
+fails:UnboundMethod#== returns false if same method but extracted from two different subclasses
+fails:UnboundMethod#== returns false if methods are the same but added from an included Module

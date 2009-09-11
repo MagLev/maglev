@@ -1,1 +1,0 @@
-fails:StringIO includes the Enumerable module

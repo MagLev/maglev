@@ -1,3 +1,0 @@
-fails:Regexp.union returns /(?!)/ when passed no arguments
-fails:Regexp.union returns a regular expression that will match passed arguments
-fails:Regexp.union uses to_str to convert arguments (if not Regexp)

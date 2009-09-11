@@ -14,7 +14,6 @@
 /gemstone/
 /locks/
 /log/
-/stones/
 gemstone.old/
 debugspec.inp
 cur.inp
@@ -23,12 +22,7 @@ etc/maglev.demo.key
 *#
 version.txt
 pbm.rb
-lib/ruby/site_ruby/1.8/rubygems
-lib/ruby/site_ruby/1.8/rubygems.rb
-lib/ruby/site_ruby/1.8/ubygems.rb
-lib/ruby/site_ruby/1.8/rbconfig
 lib/ruby/site_ruby/1.8/smalltalk
-examples/persistence/gstore/pstore.db
-bin/maglev-gem
-bin/rake
 lib/maglev/gems
+examples/persistence/gstore/pstore.db
+bin/rake

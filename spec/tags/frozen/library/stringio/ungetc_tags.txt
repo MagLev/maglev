@@ -1,4 +1,0 @@
-fails:StringIO#ungetc when passed [char] returns nil
-fails:StringIO#ungetc when passed [char] tries to convert the passed length to an Integer using #to_int
-fails:StringIO#ungetc when passed [char] raises a TypeError when the passed length can't be converted to an Integer
-fails:StringIO#ungetc when self is not readable raises an IOError
