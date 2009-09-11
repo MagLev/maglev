@@ -340,11 +340,17 @@ module MagRp
        class RubyHashNode
          primitive_nobridge 'listNode=', 'listNode:'
          def self.s(list)
-           unless list.class.equal?(RubyArrayNode)
+           lst_cls = list.class
+           res = self._new
+           if lst_cls.equal?(RubyArrayNode)
+             res.listNode=(list)
+           elsif lst_cls.equal?(RubyRpCallArgs)
+             ary = RubyArrayNode._new 
+             ary.list=(list.list)
+             res.listNode=(ary)
+           else 
              raise_error("RubyHashNode.s bad arg")
            end
-           res = self._new
-           res.listNode=(list)
            res
          end
          def inspect
@@ -1387,6 +1393,10 @@ module MagRp
 
            def iter
              @iterNode
+           end
+
+           def list
+             @list
            end
 
            def append_blk_arg(node)
