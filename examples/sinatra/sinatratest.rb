@@ -4,7 +4,7 @@ $:.unshift("#{ENV['MAGLEV_HOME']}/src/external/sinatra/lib")
 require 'sinatra'
 
 configure(:development) do
-#  set :sessions, true  # Can't do this, as no openssl support
+  set :sessions, true
 #  set :logging, false
 #  set :reload,  false
   set :run,     true
@@ -23,6 +23,15 @@ get '/' do
       <h2>Hello from Sinatra</h2>
       <p>Rack: #{Rack.release}</p>
       <p>Sinatra: #{Sinatra::VERSION}</p>
+      <h2>Some test URLs</h2>
+      <ul>
+        <li><a href="/names/fred">/names/fred</a></li>
+        <li><a href="/say/hi/to/Sinatra">/say/hi/to/Sinatra</a></li>
+        <li><a href="/goto_home">/goto_home</a></li>
+        <li><a href="/session_count">/session_count</a></li>
+        <li><a href="/not_found">/not_found</a></li>
+        <li><a href="/throw_not_found">/throw_not_found</a></li>
+      </ul>
     </body>
   </html>
   EOS
@@ -48,14 +57,11 @@ get '/goto_home' do
   redirect '/'
 end
 
-# Sessions depend on cookies which depend on openssl which is not supported
-# due to c-extensions
-#
-# get '/session_count' do
-#   session["counter"] ||= 0
-#   session["counter"] += 1
-#   "count: #{session['counter']}"
-# end
+get '/session_count' do
+  session["counter"] ||= 0
+  session["counter"] += 1
+  "count: #{session['counter']}"
+end
 
 get '/not_found' do
   status 404
