@@ -1,40 +1,26 @@
 == MagLev Sinatra Examples
 
 The files in this directory are some examples of using Sinatra with MagLev.
+You must first install the sinatra gem:
 
-=== <tt>sinatratest.rb</tt>: Run Sinatra w/o RubyGems
+  $ maglev-gem install sinatra
 
-A simple app that runs from the 0.9.3 version of Sinatra under
-<tt>$MAGLEV_HOME/src/external/sinatra</tt>.  To run:
+=== <tt>sinatratest.rb</tt>: App to test basic Sinatra Features
 
+This app has several links that test various features of Sinatra.  To run:
+
+    $ cd <tt>$MAGLEV_HOME/examples/sinatra/tt>.
     $ maglev-ruby sinatratest.rb
 
 Then hit http://localhost:4567/
 
 === <tt>sinatra_app.rb</tt>: Run Sinatra from RubyGems
 
-A Sinatra app that runs from a version of Sinatra installed by rubygems.
-To run this version:
+Another simple app.
 
-1. Install rubygems-1.3.5 into MagLev by following the directions in
-   <tt>$MAGLEV_HOME/docs/applications</tt>.
-2. Install the rack and sinatra gems:
-    $ maglev-gem install rack sinatra
-3. Run the file, then hit http://localhost:4567/
-    $ maglev-ruby ./sinatra_app.rb
+=== <tt>msessions.rb</tt>: App with MagLev persistence for sessions
 
-The file <tt>sinatra_app.rb</tt> explicitly invokes the Sinatra application
-as a work-around.  Sinatra tries to figure out whether to automatically
-start the application by examining the backtrace from
-<tt>Kernel#caller</tt>, and comparing it to <tt>$0</tt> (see
-<tt>sinatra/lib/main.rb</tt>).  MagLev currently has full pathnames for the
-filename in the backtrace, but MRI uses the file name "as found on
-<tt>$LOADED_FEATURES</tt>".  Since there is a mismatch, Sinatra doesn't
-automatically start the app.
+This app uses rack Middleware to install a MagLev Rack::Session backing
+store for MagLev.  When run, the session data is persisted to MagLev
+(rather than memcached etc.).
 
-A workaround is to patch
-<tt>$MAGLEV_HOME/lib/maglev/gems/1.8.6/gems/sinatra-0.9.4/lib/sinatra/main.rb</tt>,
-and change:
-    set :run, Proc.new { $0 == app_file }
-to:
-    set :run, Proc.new { File.basename($0) == File.basename(app_file) }

@@ -1,6 +1,4 @@
-$:.unshift("#{ENV['MAGLEV_HOME']}/src/external/rack/lib")
-$:.unshift("#{ENV['MAGLEV_HOME']}/src/external/sinatra/lib")
-
+require 'rubygems'
 require 'sinatra'
 
 configure(:development) do
