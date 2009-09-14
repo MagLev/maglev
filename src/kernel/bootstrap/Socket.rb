@@ -1,8 +1,8 @@
 #   We currently do not have a BasicSocket class .
-#   Ruby BasicSocket and Socket methods are combined into Smalltalk Socket .
+#   Ruby BasicSocket and Socket methods are combined into Smalltalk RubySocket .
 #
 #   TCPSocket.class open()  does a blocking connect attempt
-#   and returns a blocking socket.
+#   and returns a non-blocking socket.
 #
 #   successful TCPServer.accept  returns a new socket whose blocking
 #   state is the same as the receiver's
@@ -10,9 +10,11 @@
 #   All other newly created sockets default to non-blocking. Use
 #      aSocket.set_blocking(false)
 #   to change a socket to blocking.
-#
-#   The above is based on the current plan to use blocking sockets
-#   for the demo and use methods defined in the existing Ruby socket API.
+#  
+#  Operations on a non-blocking socket that would block, will cause
+#  the Thread scheduler to suspend the current thread until the
+#  operation completes or fails.  Applications must use IO.select
+#  appropriately  if it is desired to not block on a socket operation.
 
 class Socket
 
@@ -28,14 +30,15 @@ class Socket
   primitive 'send', 'send:flags:'
   primitive_nobridge '<<', 'write:'
   primitive 'write', 'write:'
-  primitive 'recv', 'recv:'
-  primitive 'read', 'recv:'
 
-  def sysread(num_bytes)
-    s = self.read(num_bytes)
-    raise EOFError if s.equal?(nil)
-    return s
-  end
+  # MRI will give errors like 'IOError: sysread for buffered IO'
+  # if you mix read: and recv: and attempt recv: on a Socket with 
+  #  unread buffered input.  Maglev unifies the IO and will deliver data 
+  # in this case.
+
+  primitive 'read', 'read:'
+  primitive 'recv', 'recv:'
+  primitive 'sysread', 'recv:'
 
   def flush
     # nothing to do, no buffering in the VM for socket write operations
