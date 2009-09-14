@@ -12,7 +12,7 @@ namespace :dev do
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
 
   desc "Run the vm smoke tests"
-  task :'vm-tests' do
+  task :'vm-tests' => :stwrappers do
     output = run_on_stone(["run", "RubyContext _runVmUnit", "%"])
     puts output.join("\n")
   end
