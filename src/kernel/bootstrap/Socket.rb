@@ -18,7 +18,7 @@
 
 class Socket
 
-  # OS dependent constants initialized by smalltalk code 
+  # OS dependent constants initialized by smalltalk code
   #  in Socket>>_initTransientSocketConstants , called from RubyContext>>initTransient .
 
   # accept implemented only in TCPServer .
@@ -76,22 +76,94 @@ class Socket
 
   primitive '_getsockopt', 'getsockopt:name:'
 
+  # Gets a socket option. These are protocol and system specific, see your
+  # local sytem documentation for details. The option is returned as
+  # a String with the data being the binary value of the socket option.
+  #
+  # === Parameters
+  #  # +level+ is an integer, usually one of the SOL_ constants such as
+  #   Socket::SOL_SOCKET, or a protocol level.
+  #  # +optname+ is an integer, usually one of the SO_ constants, such
+  #   as Socket::SO_REUSEADDR.
+  #
+  # === Examples
+  #
+  # Some socket options are integers with boolean values, in this case
+  # #getsockopt could be called like this:
+  #   optval = sock.getsockopt(Socket::SOL_SOCKET,Socket::SO_REUSEADDR)
+  #   optval = optval.unpack "i"
+  #   reuseaddr = optval[0] == 0 ? false : true
+  #
+  # Some socket options are integers with numeric values, in this case
+  # #getsockopt could be called like this:
+  #   optval = sock.getsockopt(Socket::IPPROTO_IP, Socket::IP_TTL)
+  #   ipttl = optval.unpack("i")[0]
+  #
+  # Option values may be structs. Decoding them can be complex as it involves
+  # examining your system headers to determine the correct definition. An
+  # example is a +struct linger+, which may be defined in your system headers
+  # as:
+  #   struct linger {
+  #     int l_onoff;
+  #     int l_linger;
+  #   };
+  #
+  # In this case #getsockopt could be called like this:
+  #   optval =  sock.getsockopt(Socket::SOL_SOCKET, Socket::SO_LINGER)
+  #   onoff, linger = optval.unpack "ii"
   def getsockopt(level, optname)
-    #  result is a Fixnum except for
-    #  optname's SO_RCVTIMEO, SO_SNDTIMEO, SO_LINGER which return a 2 element Array
     arr = _getsockopt(level, optname)
     if arr._isFixnum
       Errno.raise(arr)
       res = nil
     elsif arr.size.equal?(1)
-      res = arr[0]  # a Fixnum
+      arr.pack("i")
     else
       # 2 element Array from SO_RCVTIMEO, SO_SNDTIMEO, or SO_LINGER
-      res = arr
+      arr.pack("ii")
     end
-    res
   end
 
+  # Sets a socket option. These are protocol and system specific, see your
+  # local sytem documentation for details.
+  #
+  # === Parameters
+  # * +level+ is an integer, usually one of the SOL_ constants such as
+  #   Socket::SOL_SOCKET, or a protocol level.
+  # * +optname+ is an integer, usually one of the SO_ constants, such
+  #   as Socket::SO_REUSEADDR.
+  # * +optval+ is the value of the option, it is passed to the underlying
+  #   setsockopt() as a pointer to a certain number of bytes. How this is
+  #   done depends on the type:
+  #   - Fixnum: value is assigned to an int, and a pointer to the int is
+  #     passed, with length of sizeof(int).
+  #   - true or false: 1 or 0 (respectively) is assigned to an int, and the
+  #     int is passed as for a Fixnum. Note that +false+ must be passed,
+  #     not +nil+.
+  #   - String: the string's data and length is passed to the socket.
+  #
+  # === Examples
+  #
+  # Some socket options are integers with boolean values, in this case
+  # #setsockopt could be called like this:
+  #   sock.setsockopt(Socket::SOL_SOCKET,Socket::SO_REUSEADDR, true)
+  #
+  # Some socket options are integers with numeric values, in this case
+  # #setsockopt could be called like this:
+  #   sock.setsockopt(Socket::IPPROTO_IP, Socket::IP_TTL, 255)
+  #
+  # Option values may be structs. Passing them can be complex as it involves
+  # examining your system headers to determine the correct definition. An
+  # example is an +ip_mreq+, which may be defined in your system headers as:
+  #   struct ip_mreq {
+  #     struct  in_addr imr_multiaddr;
+  #     struct  in_addr imr_interface;
+  #   };
+  #
+  # In this case #setsockopt could be called like this:
+  #   optval =  IPAddr.new("224.0.0.251") + Socket::INADDR_ANY
+  #   sock.setsockopt(Socket::IPPROTO_IP, Socket::IP_ADD_MEMBERSHIP, optval)
+  #
   def setsockopt(level, optname, optval)
     # optval should be a Fixnum or true or false except for
     # optname's SO_RCVTIMEO, SO_SNDTIMEO, SO_LINGER which require a 2 element Array
@@ -217,9 +289,3 @@ class TCPServer
   end
 
 end
-
-
-
-
-
-

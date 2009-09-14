@@ -3,9 +3,8 @@ require 'sinatra'
 
 # Workaround for issue automatically starting app.
 # See comments in README file
-configure(:development) do
-  set :run,     true
-end
+set :run,     true
+set :server,  'webrick'
 
 get '/' do
   "Sinatra #{Sinatra::VERSION} says Hello"
