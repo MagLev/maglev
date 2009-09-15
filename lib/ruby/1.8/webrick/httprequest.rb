@@ -8,15 +8,19 @@
 #
 # $IPR: httprequest.rb,v 1.64 2003/07/13 17:18:22 gotoyuzo Exp $
 
+require 'timeout'
 require 'uri'
+
 require 'webrick/httpversion'
 require 'webrick/httpstatus'
 require 'webrick/httputils'
 require 'webrick/cookie'
 
 module WEBrick
+
   class HTTPRequest
     BODY_CONTAINABLE_METHODS = [ "POST", "PUT" ]
+    BUFSIZE = 1024*4
 
     # Request line
     attr_reader :request_line
@@ -40,7 +44,6 @@ module WEBrick
 
     def initialize(config)
       @config = config
-      @buffer_size = @config[:InputBufferSize]
       @logger = config[:Logger]
 
       @request_line = @request_method =
@@ -69,9 +72,6 @@ module WEBrick
 
       @remaining_size = nil
       @socket = nil
-
-      @forwarded_proto = @forwarded_host = @forwarded_port =
-        @forwarded_server = @forwarded_for = nil
     end
 
     def parse(socket=nil)
@@ -84,7 +84,6 @@ module WEBrick
       end
 
       read_request_line(socket)
-
       if @http_version.major > 0
         read_header(socket)
         @header['cookie'].each{|cookie|
@@ -99,7 +98,6 @@ module WEBrick
       return if @unparsed_uri == "*"
 
       begin
-#        setup_forwarded_info
         @request_uri = parse_uri(@unparsed_uri)
         @path = HTTPUtils::unescape(@request_uri.path)
         @path = HTTPUtils::normalize_path(@path)
@@ -108,8 +106,8 @@ module WEBrick
         @query_string = @request_uri.query
         @script_name = ""
         @path_info = @path.dup
-      rescue Exception => e
-        raise HTTPStatus::BadRequest, "bad URI `#{@unparsed_uri}'. \nORIGINAL: #{e.message}"
+      rescue
+        raise HTTPStatus::BadRequest, "bad URI `#{@unparsed_uri}'."
       end
 
       if /close/io =~ self["connection"]
@@ -156,26 +154,6 @@ module WEBrick
         value = @header[k]
         yield(k, value.empty? ? nil : value.join(", "))
       }
-    end
-
-    def host
-      return @forwarded_host || @host
-    end
-
-    def port
-      return @forwarded_port || @port
-    end
-
-    def server_name
-      return @forwarded_server || @config[:ServerName]
-    end
-
-    def remote_ip
-      return self["client-ip"] || @forwarded_for || @peeraddr[3]
-    end
-
-    def ssl?
-      return @request_uri.scheme == "https"
     end
 
     def keep_alive?
@@ -244,15 +222,7 @@ module WEBrick
     private
 
     def read_request_line(socket)
-      @request_line = read_line(socket, 1024) if socket
-
-       if @request_line.nil?
-         raise HTTPStatus::EOFError
-       end
-
-      if @request_line.size >= 1024 and @request_line[-1, 1] != LF
-        raise HTTPStatus::RequestURITooLarge
-      end
+      @request_line = read_line(socket) if socket
       @request_time = Time.now
       raise HTTPStatus::EOFError unless @request_line
       if /^(\S+)\s+(\S+)(?:\s+HTTP\/(\d+\.\d+))?\r?\n/mo =~ @request_line
@@ -273,7 +243,7 @@ module WEBrick
         end
       end
       begin
-        @header = HTTPUtils::parse_header(@raw_header.join)
+        @header = HTTPUtils::parse_header(@raw_header)
       rescue => ex
         raise  HTTPStatus::BadRequest, ex.message
       end
@@ -285,9 +255,7 @@ module WEBrick
       end
       uri = URI::parse(str)
       return uri if uri.absolute?
-      if @forwarded_host
-        host, port = @forwarded_host, @forwarded_port
-      elsif self["host"]
+      if self["host"]
         pattern = /\A(#{URI::REGEXP::PATTERN::HOST})(?::(\d+))?\z/n
         host, port = *self['host'].scan(pattern)[0]
       elsif @addr.size > 0
@@ -295,7 +263,7 @@ module WEBrick
       else
         host, port = @config[:ServerName], @config[:Port]
       end
-      uri.scheme = @forwarded_proto || scheme
+      uri.scheme = scheme
       uri.host = host
       uri.port = port ? port.to_i : nil
       return URI::parse(uri.to_s)
@@ -310,8 +278,8 @@ module WEBrick
         end
       elsif self['content-length'] || @remaining_size
         @remaining_size ||= self['content-length'].to_i
-        while @remaining_size > 0
-          sz = [@buffer_size, @remaining_size].min
+        while @remaining_size > 0 
+          sz = BUFSIZE < @remaining_size ? BUFSIZE : @remaining_size
           break unless buf = read_data(socket, sz)
           @remaining_size -= buf.size
           block.call(buf)
@@ -339,7 +307,12 @@ module WEBrick
     def read_chunked(socket, block)
       chunk_size, = read_chunk_size(socket)
       while chunk_size > 0
-        data = read_data(socket, chunk_size) # read chunk-data
+        data = ""
+        while data.size < chunk_size
+          tmp = read_data(socket, chunk_size-data.size) # read chunk-data
+          break unless tmp
+          data << tmp
+        end
         if data.nil? || data.size != chunk_size
           raise BadRequest, "bad chunk data size."
         end
@@ -352,33 +325,24 @@ module WEBrick
       @remaining_size = 0
     end
 
-    def _read_data(io, method, *arg)
-      return io.__send__(method, *arg)
-      # gemstone, don't use timeout logic for now
-      # begin
-        # WEBrick::Utils.timeout(@config[:RequestTimeout]){
-        #   return io.__send__(method, *arg)
-        # }
-        # gemstone changes
-      #  return io.__send__(method, *arg)
-      #rescue Errno::ECONNRESET
-      #  return nil
-      #rescue TimeoutError
-      #  raise HTTPStatus::RequestTimeout
-      #end
-      # end gemstone don't use
+    def _read_data(io, method, arg)
+      begin
+        timeout(@config[:RequestTimeout]){
+          return io.__send__(method, arg)
+        }
+      rescue Errno::ECONNRESET
+        return nil
+      rescue TimeoutError
+        raise HTTPStatus::RequestTimeout
+      end
     end
 
-    def read_line(io, size=4096)
-      # gemstone , workaround broken perform
-      # _read_data(io, :gets, LF, size)
-      io.gets(LF)
+    def read_line(io)
+      _read_data(io, :gets, LF)
     end
 
     def read_data(io, size)
-      # gemstone , workaround broken perform
-      # _read_data(io, :read, size)
-      io.read(size)
+      _read_data(io, :read, size)
     end
 
     def parse_query()
@@ -395,26 +359,6 @@ module WEBrick
         end
       rescue => ex
         raise HTTPStatus::BadRequest, ex.message
-      end
-    end
-
-    PrivateNetworkRegexp = /
-      ^unknown$|
-      ^((::ffff:)?127.0.0.1|::1)$|
-      ^(::ffff:)?(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\.
-    /ixo
-
-    def setup_forwarded_info
-      @forwarded_server = self["x-forwarded-server"]
-      @forwarded_proto = self["x-forwarded-proto"]
-      if host_port = self["x-forwarded-host"]
-        @forwarded_host, tmp = host_port.split(/:/, 2)
-        @forwarded_port = (tmp || (@forwarded_proto == "https" ? 443 : 80)).to_i
-      end
-      if addrs = self["x-forwarded-for"]
-        addrs = addrs.split(/,/).collect(&:strip)
-        addrs.reject!{|ip| PrivateNetworkRegexp =~ ip }
-        @forwarded_for = addrs.first
       end
     end
   end

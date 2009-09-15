@@ -330,11 +330,10 @@ module WEBrick
       def hexdigest(*args)
         @h.hexdigest(args.join(":"))
       end
-
     end
 
     class ProxyDigestAuth < DigestAuth
- #     include ProxyAuthenticator
+      include ProxyAuthenticator
 
       def check_uri(req, auth_req)
         return true

@@ -19,11 +19,12 @@ end
 module WEBrick
   module Utils
     def set_non_blocking(io)
-      flag = File::NONBLOCK
-      if defined?(Fcntl::F_GETFL)
-        flag |= io.fcntl(Fcntl::F_GETFL)
-      end
-      io.fcntl(Fcntl::F_SETFL, flag)
+# Maglev, sockets non-blocking by default;  Fcntl , IO.fcntl not implem yet
+#     flag = File::NONBLOCK  
+#     if defined?(Fcntl::F_GETFL)
+#       flag |= io.fcntl(Fcntl::F_GETFL)
+#     end
+#     io.fcntl(Fcntl::F_SETFL, flag)
     end
     module_function :set_non_blocking
 
@@ -71,7 +72,6 @@ module WEBrick
         begin
           logger.debug("TCPServer.new(#{ai[3]}, #{port})") if logger
           sock = TCPServer.new(ai[3], port)
-          sock.set_blocking(true) # gemstone use blocking sockets
           port = sock.addr[1] if port == 0
           Utils::set_close_on_exec(sock)
           sockets << sock
@@ -97,80 +97,5 @@ module WEBrick
     end
     module_function :random_string
 
-    ###########
-
-    require "thread"
-    require "timeout"
-    require "singleton"
-
-    class TimeoutHandler
-#      include Singleton
-      TimeoutMutex = Mutex.new
-
-      def TimeoutHandler.register(seconds, exception)
-        TimeoutMutex.synchronize{
-          instance.register(Thread.current, Time.now + seconds, exception)
-        }
-      end
-
-      def TimeoutHandler.cancel(id)
-        TimeoutMutex.synchronize{
-          instance.cancel(Thread.current, id)
-        }
-      end
-
-      def initialize
-        @timeout_info = Hash.new
-        Thread.start{
-          while true
-            now = Time.now
-            @timeout_info.each{|thread, ary|
-              ary.dup.each{|info|
-                time, exception = *info
-                interrupt(thread, info.object_id, exception) if time < now
-              }
-            }
-            sleep 0.5
-          end
-        }
-      end
-
-      def interrupt(thread, id, exception)
-        TimeoutMutex.synchronize{
-          if cancel(thread, id) && thread.alive?
-            thread.raise(exception, "execution timeout")
-          end
-        }
-      end
-
-      def register(thread, time, exception)
-        @timeout_info[thread] ||= Array.new
-        @timeout_info[thread] << [time, exception]
-        return @timeout_info[thread].last.object_id
-      end
-
-      def cancel(thread, id)
-        if ary = @timeout_info[thread]
-          ary.delete_if{|info| info.object_id == id }
-          if ary.empty?
-            @timeout_info.delete(thread)
-          end
-          return true
-        end
-        return false
-      end
-    end
-
-    def timeout(seconds, exception=Timeout::Error)
-      return yield if seconds.nil? or seconds.zero?
-      # raise ThreadError, "timeout within critical session" if Thread.critical
-      id = TimeoutHandler.register(seconds, exception)
-      begin
-        yield(seconds)
-      ensure
-        TimeoutHandler.cancel(id)
-      end
-    end
-    module_function :timeout
   end
 end

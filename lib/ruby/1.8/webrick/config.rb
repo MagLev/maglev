@@ -33,12 +33,10 @@ module WEBrick
       :StartCallback  => nil,
       :StopCallback   => nil,
       :AcceptCallback => nil,
-      :DoNotReverseLookup => nil,
-      :ShutdownSocketWithoutClose => false,
     }
 
     # for HTTPServer, HTTPRequest, HTTPResponse ...
-    HHTTP = General.dup.update(
+    HTTP = General.dup.update(
       :Port           => 80,
       :RequestTimeout => 30,
       :HTTPVersion    => HTTPVersion.new("1.1"),
@@ -47,10 +45,9 @@ module WEBrick
       :DirectoryIndex => ["index.html","index.htm","index.cgi","index.rhtml"],
       :DocumentRoot   => nil,
       :DocumentRootOptions => { :FancyIndexing => true },
-      :RequestCallback => nil,
+      :RequestHandler => nil,
+      :RequestCallback => nil,  # alias of :RequestHandler
       :ServerAlias    => nil,
-      :InputBufferSize  => 65536, # input buffer size in reading request body
-      :OutputBufferSize => 65536, # output buffer size in sending File or IO
 
       # for HTTPProxyServer
       :ProxyAuthProc  => nil,
@@ -67,7 +64,7 @@ module WEBrick
       :Escape8bitURI  => false
     )
 
-    FFileHandler = {
+    FileHandler = {
       :NondisclosureName => [".ht*", "*~"],
       :FancyIndexing     => false,
       :HandlerTable      => {},
@@ -78,11 +75,11 @@ module WEBrick
       :AcceptableLanguages => []  # ["en", "ja", ... ]
     }
 
-    BBasicAuth = {
+    BasicAuth = {
       :AutoReloadUserDB     => true,
     }
 
-    DDigestAuth = {
+    DigestAuth = {
       :Algorithm            => 'MD5-sess', # or 'MD5' 
       :Domain               => nil,        # an array includes domain names.
       :Qop                  => [ 'auth' ], # 'auth' or 'auth-int' or both.

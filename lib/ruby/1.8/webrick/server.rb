@@ -10,6 +10,7 @@
 
 require 'thread'
 require 'socket'
+require 'timeout'
 require 'webrick/config'
 require 'webrick/log'
 
@@ -83,12 +84,21 @@ module WEBrick
           "#{self.class}#start: pid=#{$$} port=#{@config[:Port]}"
         call_callback(:StartCallback)
 
+        thgroup = ThreadGroup.new
         @status = :Running
         while @status == :Running
           begin
-            svr = @listeners[0]
-            if sock = svr.accept
-                block ? block.call(sock) : run(sock)
+            if svrs = IO.select(@listeners, nil, nil, 2.0)
+              svrs[0].each{|svr|
+                @tokens.pop          # blocks while no token is there.
+                if sock = accept_client(svr)
+                  th = start_thread(sock, &block)
+                  th[:WEBrickThread] = true
+                  thgroup.add(th)
+                else
+                  @tokens.push(nil)
+                end
+              }
             end
           rescue Errno::EBADF, IOError => ex
             # if the listening socket was closed in GenericServer#shutdown,
@@ -100,6 +110,7 @@ module WEBrick
         end
 
         @logger.info "going to shutdown ..."
+        thgroup.list.each{|th| th.join if th[:WEBrickThread] }
         call_callback(:StopCallback)
         @logger.info "#{self.class}#start done."
         @status = :Stop
@@ -119,10 +130,7 @@ module WEBrick
           addr = s.addr
           @logger.debug("close TCPSocket(#{addr[2]}, #{addr[1]})")
         end
-        s.shutdown
-        unless @config[:ShutdownSocketWithoutClose]
-          s.close
-        end
+        s.close
       }
       @listeners.clear
     end
@@ -138,10 +146,11 @@ module WEBrick
       begin
         sock = svr.accept
         sock.sync = true
-        Utils::set_non_blocking(sock) 
+        Utils::set_non_blocking(sock)
         Utils::set_close_on_exec(sock)
-      rescue Errno::ECONNRESET, Errno::ECONNABORTED,
-             Errno::EPROTO, Errno::EINVAL => ex
+      rescue Errno::ECONNRESET, Errno::ECONNABORTED, Errno::EPROTO => ex
+        # TCP connection was established but RST segment was sent
+        # from peer before calling TCPServer#accept.
       rescue Exception => ex
         msg = "#{ex.class}: #{ex.message}\n\t#{ex.backtrace[0]}"
         @logger.error msg

@@ -17,13 +17,13 @@ module WEBrick
   module HTTPServlet
 
     class CGIHandler < AbstractServlet
-      Ruby = File::join(RbConfig::CONFIG['bindir'],
-                        RbConfig::CONFIG['ruby_install_name'])
-      Ruby << RbConfig::CONFIG['EXEEXT']
-      CGIRunner = "\"#{Ruby}\" \"#{WEBrick::Config::LIBDIR}/httpservlet/cgi_runner.rb\""
+      Ruby = File::join(::Config::CONFIG['bindir'],
+                        ::Config::CONFIG['ruby_install_name'])
+      Ruby << ::Config::CONFIG['EXEEXT']
+      CGIRunner = "\"#{Ruby}\" \"#{Config::LIBDIR}/httpservlet/cgi_runner.rb\""
 
       def initialize(server, name)
-        super(server, name)
+        super
         @script_filename = name
         @tempdir = server[:TempDir]
         @cgicmd = "#{CGIRunner} #{server[:CGIInterpreter]}"
@@ -35,9 +35,7 @@ module WEBrick
 
         cgi_in = IO::popen(@cgicmd, "wb")
         cgi_out = Tempfile.new("webrick.cgiout.", @tempdir)
-        cgi_out.set_encoding("ASCII-8BIT")
         cgi_err = Tempfile.new("webrick.cgierr.", @tempdir)
-        cgi_err.set_encoding("ASCII-8BIT")
         begin
           cgi_in.sync = true
           meta = req.meta_vars
@@ -77,7 +75,7 @@ module WEBrick
         end
 
         data = "" unless data
-        raw_header, body = data.split(/^[\xd\xa]+/, 2) 
+        raw_header, body = data.split(/^[\xd\xa]+/on, 2) 
         raise HTTPStatus::InternalServerError,
           "Premature end of script headers: #{@script_filename}" if body.nil?
 

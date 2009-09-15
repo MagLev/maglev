@@ -5,7 +5,7 @@
 # Copyright (c) 2003 Internet Programming with Ruby writers. All rights
 # reserved.
 #
-# $Id: cgi.rb 14260 2007-12-17 07:03:57Z gotoyuzo $
+# $Id: cgi.rb 11708 2007-02-12 23:01:19Z shyouhei $
 
 require "webrick/httprequest"
 require "webrick/httpresponse"
@@ -47,7 +47,6 @@ module WEBrick
 
     def start(env=ENV, stdin=$stdin, stdout=$stdout)
       sock = WEBrick::CGI::Socket.new(@config, env, stdin, stdout)
-      sock.set_blocking(true) # gemstone use blocking sockets
       req = HTTPRequest.new(@config)
       res = HTTPResponse.new(@config)
       unless @config[:NPH] or defined?(MOD_RUBY)
@@ -167,19 +166,20 @@ module WEBrick
       end
   
       def setup_header
-        @env.each{|key, value|
-          case key
-          when "CONTENT_TYPE", "CONTENT_LENGTH"
-            add_header(key.gsub(/_/, "-"), value)
-          when /^HTTP_(.*)/
-            add_header($1.gsub(/_/, "-"), value)
+        add_header("CONTENT_TYPE", "Content-Type")
+        add_header("CONTENT_LENGTH", "Content-length")
+        @env.each_key{|name|
+          if /^HTTP_(.*)/ =~ name
+            add_header(name, $1.gsub(/_/, "-"))
           end
         }
       end
   
-      def add_header(hdrname, value)
-        unless value.empty?
-          @header_part << hdrname << ": " << value << CRLF
+      def add_header(envname, hdrname)
+        if value = @env[envname]
+          unless value.empty?
+            @header_part << hdrname << ": " << value << CRLF
+          end
         end
       end
 
@@ -197,8 +197,8 @@ module WEBrick
         [nil, @server_port, @server_name, @server_addr]
       end
   
-      def gets(eol=LF, size=nil)
-        input.gets(eol, size)
+      def gets(eol=LF)
+        input.gets(eol)
       end
   
       def read(size=nil)

@@ -35,7 +35,7 @@ module WEBrick
               case line
               when %r!\A[^:]+:[a-zA-Z0-9./]{13}\z!
                 user, pass = line.split(":")
-              when /:\$/, /:{SHA}/
+              when /:\$/, /:\{SHA\}/
                 raise NotImplementedError,
                       'MD5, SHA1 .htpasswd file not supported'
               else

@@ -23,16 +23,8 @@ module WEBrick
       ret = path.dup
 
       ret.gsub!(%r{/+}o, '/')                    # //      => /
-      while ret.sub!(%r{/\.(/|\Z)}o, '/'); end   # /.      => /
-      begin                                      # /foo/.. => /foo
-        match = ret.sub!(%r{/([^/]+)/\.\.(/|\Z)}o){
-          if $1 == ".."
-            raise "abnormal path `#{path}'"
-          else
-            "/"
-          end
-        }
-      end while match
+      while ret.sub!(%r'/\.(?:/|\Z)', '/'); end  # /.      => /
+      while ret.sub!(%r'/(?!\.\./)[^/]+/\.\.(?:/|\Z)', '/'); end # /foo/.. => /foo
 
       raise "abnormal path `#{path}'" if %r{/\.\.(/|\Z)} =~ ret
       ret
@@ -90,7 +82,6 @@ module WEBrick
       "tiff"  => "image/tiff",
       "txt"   => "text/plain",
       "xbm"   => "image/x-xbitmap",
-      "xhtml" => "text/html",
       "xls"   => "application/vnd.ms-excel",
       "xml"   => "text/xml",
       "xpm"   => "image/x-xpixmap",
@@ -127,7 +118,7 @@ module WEBrick
     def parse_header(raw)
       header = Hash.new([].freeze)
       field = nil
-      raw.each_line{|line|
+      raw.each{|line|
         case line
         when /^([A-Za-z0-9!\#$%&'*+\-.^_`|~]+):\s*(.*?)\s*\z/om
           field, value = $1, $2
@@ -155,8 +146,8 @@ module WEBrick
     module_function :parse_header
 
     def split_header_value(str)
-      str.scan(/((?:"(?:\\.|[^"])+?"|[^",]+)+)
-                (?:,\s*|\Z)/xn).collect{|v| v[0] }
+      str.scan(%r'\G((?:"(?:\\.|[^"])+?"|[^",]+)+)
+                    (?:,\s*|\Z)'xn).flatten
     end
     module_function :split_header_value
 
@@ -244,7 +235,7 @@ module WEBrick
         if @header
           super
         elsif str == CRLF
-          @header = HTTPUtils::parse_header(@raw_header.join)
+          @header = HTTPUtils::parse_header(@raw_header)
           if cd = self['content-disposition']
             if /\s+name="(.*?)"/ =~ cd then @name = $1 end
             if /\s+filename="(.*?)"/ =~ cd then @filename = $1 end
@@ -295,7 +286,7 @@ module WEBrick
       query = Hash.new
       if str
         str.split(/[&;]/).each{|x|
-          next if x.empty?
+          next if x.empty? 
           key, val = x.split(/=/,2)
           key = unescape_form(key)
           val = unescape_form(val.to_s)
@@ -317,7 +308,7 @@ module WEBrick
       form_data = Hash.new
       return form_data unless io
       data = nil
-      io.each_line{|line|
+      io.each{|line|
         if boundary_regexp =~ line
           if data
             data.chop!
@@ -358,7 +349,7 @@ module WEBrick
 
     def _make_regex(str) /([#{Regexp.escape(str)}])/n end
     def _make_regex!(str) /([^#{Regexp.escape(str)}])/n end
-    def _escape(str, regex) str.gsub(regex){ "%%%02X" % $1.ord } end
+    def _escape(str, regex) str.gsub(regex){ "%%%02X" % $1[0] } end
     def _unescape(str, regex) str.gsub(regex){ $1.hex.chr } end
 
     UNESCAPED = _make_regex(control+space+delims+unwise+nonascii)

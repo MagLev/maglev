@@ -16,6 +16,8 @@ require 'webrick/httpstatus'
 
 module WEBrick
   class HTTPResponse
+    BUFSIZE = 1024*4
+
     attr_reader :http_version, :status, :header
     attr_reader :cookies
     attr_accessor :reason_phrase
@@ -28,7 +30,6 @@ module WEBrick
 
     def initialize(config)
       @config = config
-      @buffer_size = config[:OutputBufferSize]
       @logger = config[:Logger]
       @header = Hash.new
       @status = HTTPStatus::RC_OK
@@ -169,7 +170,7 @@ module WEBrick
       if @http_version.major > 0
         data = status_line()
         @header.each{|key, value|
-          tmp = key.gsub(/\bwww|^te$|\b\w/){ $~[0].upcase }
+          tmp = key.gsub(/\bwww|^te$|\b\w/){|s| s.upcase }
           data << "#{tmp}: #{value}" << CRLF
         }
         @cookies.each{|cookie|
@@ -257,7 +258,7 @@ module WEBrick
         if @request_method == "HEAD"
           # do nothing
         elsif chunked?
-          while buf = @body.read(@buffer_size)
+          while buf = @body.read(BUFSIZE)
             next if buf.empty?
             data = ""
             data << format("%x", buf.size) << CRLF
@@ -281,7 +282,7 @@ module WEBrick
         # do nothing
       elsif chunked?
         remain = body ? @body.size : 0
-        while buf = @body[@sent_size, @buffer_size]
+        while buf = @body[@sent_size, BUFSIZE]
           break if buf.empty?
           data = ""
           data << format("%x", buf.size) << CRLF
@@ -300,18 +301,18 @@ module WEBrick
 
     def _send_file(output, input, offset, size)
       while offset > 0
-        sz = @buffer_size < size ? @buffer_size : size
+        sz = BUFSIZE < offset ? BUFSIZE : offset
         buf = input.read(sz)
         offset -= buf.size
       end
 
       if size == 0
-        while buf = input.read(@buffer_size)
+        while buf = input.read(BUFSIZE)
           _write_data(output, buf)
         end
       else
         while size > 0
-          sz = @buffer_size < size ? @buffer_size : size
+          sz = BUFSIZE < size ? BUFSIZE : size
           buf = input.read(sz)
           _write_data(output, buf)
           size -= buf.size

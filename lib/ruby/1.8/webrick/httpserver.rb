@@ -20,8 +20,8 @@ module WEBrick
   class HTTPServerError < ServerError; end
 
   class HTTPServer < ::WEBrick::GenericServer
-    def initialize(config={}, default=Config::HHTTP)
-      super(config, default)
+    def initialize(config={}, default=Config::HTTP)
+      super
       @http_version = HTTPVersion::convert(@config[:HTTPVersion])
 
       @mount_tab = MountTable.new
@@ -36,44 +36,32 @@ module WEBrick
           [ $stderr, AccessLog::REFERER_LOG_FORMAT ]
         ]
       end
-
+ 
       @virtual_hosts = Array.new
     end
 
     def run(sock)
-      while true
-        res = req = server = nil
+      while true 
         res = HTTPResponse.new(@config)
         req = HTTPRequest.new(@config)
         server = self
         begin
-          # gemstone use blocking sockets
-          # timeout = @config[:RequestTimeout]
-          # while timeout > 0
-          #   break if IO.select([sock], nil, nil, 0.5)
-          #   timeout = 0 if @status != :Running
-          #   timeout -= 0.5
-          # end
-          # raise HTTPStatus::EOFError if timeout <= 0
-          # end gemstone
-
-          raise HTTPStatus::EOFError if sock.eof?
-
+          timeout = @config[:RequestTimeout]
+          while timeout > 0
+            break if IO.select([sock], nil, nil, 0.5)
+            timeout = 0 if @status != :Running
+            timeout -= 0.5
+          end
+          raise HTTPStatus::EOFError if timeout <= 0 || sock.eof?
           req.parse(sock)
-
           res.request_method = req.request_method
           res.request_uri = req.request_uri
           res.request_http_version = req.http_version
           res.keep_alive = req.keep_alive?
           server = lookup_server(req) || self
-          if callback = server[:RequestCallback]
-            callback.call(req, res)
-          elsif callback = server[:RequestHandler]
-            msg = ":RequestHandler is deprecated, please use :RequestCallback"
-            @logger.warn(msg)
+          if callback = server[:RequestCallback] || server[:RequestHandler]
             callback.call(req, res)
           end
-
           server.service(req, res)
         rescue HTTPStatus::EOFError, HTTPStatus::RequestTimeout => ex
           res.set_error(ex)
@@ -83,17 +71,12 @@ module WEBrick
         rescue HTTPStatus::Status => ex
           res.status = ex.code
         rescue StandardError => ex
-          # GEMSTONE
-          # A debug hook until webapps are running well
-          nil.pause if (!!defined? RUBY_ENGINE) && !!ENV['DEBUG_WEBRICK']
-          # END GEMSTONE
           @logger.error(ex)
+nil.pause
           res.set_error(ex, true)
         ensure
           if req.request_line
-            if req.keep_alive? && res.keep_alive?
-              req.fixup()
-            end
+            req.fixup()
             res.send_response(sock)
             server.access_log(@config, req, res)
           end
@@ -205,7 +188,7 @@ module WEBrick
 
       def scan(path)
         @scanner =~ path
-        [ $~ && $~[0], $' ]
+        [ $&, $' ]
       end
 
       private
