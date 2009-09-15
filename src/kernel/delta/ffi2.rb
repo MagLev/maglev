@@ -24,7 +24,7 @@ module FFI
     primitive_nobridge '[]', '_rubyByteAt:'
     primitive_nobridge 'size', 'size'
 
-    # following use for fields of Struct 
+    # following used for fields of Struct 
     primitive_nobridge 'int16at', 'int16At:'
     primitive_nobridge 'int32at', 'int32At:'
     primitive_nobridge 'int64at', 'int64At:'
