@@ -248,4 +248,20 @@ class IO
       res.size
     end
   end
+
+  def self.select( reads, writes=nil, errs=nil, timeout=nil )
+    if timeout._isFixnum
+      ms = timeout * 1000 
+      unless ms._isFixnum && ms >= 0
+        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
+      end
+    elsif timeout._not_equal?(nil)
+      timeout = Type.coerce_to(timeout, Float, :to_f) 
+      ms = (timeout * 1000.0 ).to_int  
+      unless ms._isFixnum && ms >= 0
+        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
+      end
+    end
+    Kernel._select(reads, writes, errs, *[ ms ])
+  end
 end
