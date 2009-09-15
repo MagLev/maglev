@@ -2,7 +2,6 @@
 #   used for loading parser separately from bootstrap
 require 'kernel/parser/RpStClasses.rb'
 require 'kernel/parser/RubyNode.rb'
-require 'kernel/parser/ffi.rb'
 require 'kernel/parser/rp_classes.rb'
 require 'kernel/parser/strscan.rb'
 require 'kernel/parser/strscan2.rb'

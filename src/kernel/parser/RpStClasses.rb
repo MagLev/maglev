@@ -1,8 +1,3 @@
-module FFI
-
-  CByteArray = _resolve_smalltalk_global(:CByteArray)
-end
-
 module MagRp
   # resolution of all Smalltalk node classes 
 
