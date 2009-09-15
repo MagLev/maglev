@@ -1,3 +1,0 @@
-@frameworks.each do |name, lang|
-  xml.framework {|f| f.name(name); f.language(lang) }
-end

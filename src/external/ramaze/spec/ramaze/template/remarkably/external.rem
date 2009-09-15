@@ -1,8 +1,0 @@
-html do
-  head do
-    title "Remarkably Test"
-  end
-  body do
-    h1 "Remarkably Template"
-  end
-end
