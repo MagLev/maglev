@@ -22,6 +22,11 @@ class NilClass
     nil
   end
 
+  def gets
+    # workaround for ARGF.gets unimplemented and hanging
+    raise 'nil.gets not supported'
+  end
+
   def tainted?
     false
   end
