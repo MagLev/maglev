@@ -1,1 +1,0 @@
-div (@num1 + @num2).to_s

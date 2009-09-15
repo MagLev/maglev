@@ -19,18 +19,7 @@ sinatra
 
 benchmark
   (moved to $MAGLEV_HOME/benchmark)
-  Antonio Cangiano's set of ruby benchmarks, and some scripts to run them.
-
-Ramaze
-  A Ruby modular web framework. http://ramaze.net/
-
-  !!! NOTE !!!: Gemstone has made the following changes to the Ramaze code:
-  * lib/ramaze/reloader.rb: Commented out the test for RInotify gem, and
-    force use of File.stat.  MagLev does not currently support Ruby Gems.
-  * Thread.abort_on_exception= is a stub, so...watch out.
-
-ramaze_hello.rb
-  An in-progress test script to run a simple ramaze app.
+  Benchmarks from Antonio Cangiano's Ruby-Benchmark-Suite, and some scripts to run them.
 
 rubygems-1.3.5
   A slightly patched version of rubygems 1.3.5.  The patches are in
