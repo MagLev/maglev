@@ -72,7 +72,6 @@ module WEBrick
           res.status = ex.code
         rescue StandardError => ex
           @logger.error(ex)
-nil.pause
           res.set_error(ex, true)
         ensure
           if req.request_line
