@@ -132,4 +132,8 @@ RUBY.require 'kernel/delta/Range.rb'
 RUBY.require 'kernel/delta/Process.rb'
 RUBY.require 'kernel/delta/purerubystringio.rb'
 RUBY.require 'kernel/delta/String.rb'
+RUBY.require 'kernel/delta/ffi.rb'
+RUBY.require 'kernel/delta/ffi2.rb'
+RUBY.require 'kernel/delta/ffi_struct.rb'
+RUBY.require 'kernel/delta/memorypointer.rb'
 
