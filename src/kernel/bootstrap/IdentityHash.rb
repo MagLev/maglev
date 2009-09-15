@@ -71,7 +71,7 @@ class IdentityHash
   end
 
   primitive 'index', 'keyAtValue:'
-
+  primitive 'keys', 'keys'
   primitive 'key?', 'includesKey:'
   primitive 'length', 'size'
 

@@ -111,9 +111,10 @@ class Object
     # __perform___  requires next to last arg to be a Symbol with proper suffix
     #   for the number of with: keywords;
     #   and last arg is envId
-    # it is used by RubyParser
-    primitive_nobridge '__perform__se', 'with:with:perform:env:'
-    #
+    # __perform are used by RubyParser and FFI::StructLayout 
+    primitive_nobridge '__perform_se', 'with:perform:env:' 
+    primitive_nobridge '__perform__se', 'with:with:perform:env:' 
+     
     # redefinition of __perform_method disallowed after bootstrap,
     #  it is used by implementation of eval
     primitive_nobridge '__perform_meth', 'performMethod:'
