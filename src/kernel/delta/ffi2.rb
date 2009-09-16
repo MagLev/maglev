@@ -43,6 +43,8 @@ module FFI
     class_primitive_nobridge 'gc_malloc' , 'gcMalloc:'
       # allocates C memory which is auto-freed when instance is GC'ed
 
+    primitive_nobridge 'address' , 'memoryAddress'
+
     primitive_nobridge 'memset' , 'memset:from:to:' 
      # args are  ushort value, zero-based start offset, 
      #    zero-based end offset (-1 means to end of allocated C memory)
@@ -51,6 +53,10 @@ module FFI
       self.memset(0, 0, -1) 
     end
  
+  end
+
+  class CPointer
+    primitive_nobridge 'address' , 'memoryAddress'
   end
 
   class << self
