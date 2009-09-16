@@ -7,4 +7,4 @@ module Foo
   module Object
   end
 end
-
+true
