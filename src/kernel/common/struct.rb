@@ -127,20 +127,30 @@ class Struct
   #    joe == jane    #=> false
 
   def ==(other)
+    return true if self.equal?(other)
     return false if (self.class != other.class)
-    return false if (self.values.size != other.values.size)
+    myvals = self.values
+    othervals = other.values
+    return false if (myvals.size != othervals.size)
 
-    self.values.size.times { |i |
+    n = 0
+    lim = myvals.size
+    while n < lim
       rg = RecursionGuard
       rgstack = rg.stack
-      next if (rgstack.include?(self.values.at(i)))
-      next if (rgstack.include?(other.values.at(i)))
-      rg.inspect(self.values.at(i)) do
-        rg.inspect(other.values.at(i)) do
-          return false if (self.values.at(i) != other.values.at(i))
+      myelem = myvals.at(n)
+      unless rgstack.include?(myelem)
+        otherelem = othervals.at(n)
+        unless rgstack.include?(otherelem)
+          rg.inspect(myelem) do
+            rg.inspect(otherelem) do
+              return false if (myelem != otherelem)
+            end
+          end
         end
       end
-    }
+      n += 1
+    end
     return true
   end
 
@@ -283,9 +293,33 @@ class Struct
   # fields are equal (using <tt>eql?</tt>).
 
   def eql?(other)
-    return true if self == other
-    return false if self.class != other.class
-    to_a.eql? other
+    return true if self.equal?(other)
+    return false if (self.class != other.class)
+    myvals = self.values
+    othervals = other.values
+    return false if (myvals.size != othervals.size)
+
+    n = 0
+    lim = myvals.size
+    while n < lim
+      rg = RecursionGuard
+      rgstack = rg.stack
+      myelem = myvals.at(n)
+      unless rgstack.include?(myelem)
+        otherelem = othervals.at(n)
+        unless rgstack.include?(otherelem)
+          rg.inspect(myelem) do
+            rg.inspect(otherelem) do
+              unless myelem.eql?(otherelem)
+                return false
+              end
+            end
+          end
+        end
+      end
+      n += 1
+    end
+    return true
   end
 
   ##
