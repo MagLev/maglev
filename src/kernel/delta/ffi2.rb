@@ -1,10 +1,10 @@
 module FFI
 
-  # Maglev does not yet support:   
+  # Maglev does not yet support:
   #    FFI::Union
   #    FFI::Library.callback
 
-  # Smalltalk implementation classes 
+  # Smalltalk implementation classes
   class CLibrary
      class_primitive_nobridge 'named' , 'named:'
      class_primitive_nobridge '_has_symbol', 'hasCSymbol:'
@@ -17,14 +17,14 @@ module FFI
      # arg is [ cLibrary, fName, resType, argTypesArray, varArgsAfter]
 
     primitive_nobridge '_compile_caller', '_compileCaller:In:'
-  end   
+  end
   class CByteArray
     # following 3 methods needed by the RubyParser
     class_primitive_nobridge 'with_string', 'withAll:'
     primitive_nobridge '[]', '_rubyByteAt:'
     primitive_nobridge 'size', 'size'
 
-    # following used for fields of Struct 
+    # following used for fields of Struct
     primitive_nobridge 'int16at', 'int16At:'
     primitive_nobridge 'int32at', 'int32At:'
     primitive_nobridge 'int64at', 'int64At:'
@@ -39,18 +39,18 @@ module FFI
     primitive_nobridge 'int32_put', 'int32At:put:'
     primitive_nobridge 'int64_put', 'int64At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
-   
+
     class_primitive_nobridge 'gc_malloc' , 'gcMalloc:'
       # allocates C memory which is auto-freed when instance is GC'ed
 
-    primitive_nobridge 'memset' , 'memset:from:to:' 
-     # args are  ushort value, zero-based start offset, 
+    primitive_nobridge 'memset' , 'memset:from:to:'
+     # args are  ushort value, zero-based start offset,
      #    zero-based end offset (-1 means to end of allocated C memory)
 
     def clear
-      self.memset(0, 0, -1) 
+      self.memset(0, 0, -1)
     end
- 
+
   end
 
   class << self
@@ -75,7 +75,7 @@ module FFI
           raise TypeError, "Unable to resolve FFI type '#{type}'"
         end
       end
-      sz 
+      sz
     end
 
     def size_to_type(size)
@@ -106,9 +106,10 @@ module FFI
       carr = []
       n = 0
       while n < len
-        if a_name == USE_THIS_PROCESS_AS_LIBRARY 
+        a_name = names[n]
+        if a_name == USE_THIS_PROCESS_AS_LIBRARY
           carr[n] = nil
-        else 
+        else
           a_name = Type.coerce_to(names[n], String, :to_str)
           carr[n] = CLibrary.named(a_name)
         end
@@ -116,7 +117,7 @@ module FFI
         n += 1
       end
       @ffi_lib = arr
-      @ffi_clibs = carr 
+      @ffi_clibs = carr
     end
 
     # Attach a C function to this module. The arguments can have two forms:
@@ -151,7 +152,7 @@ module FFI
       ret = ffimod.find_type(ret)
 
       libs = @ffi_clibs
-      if libs.equal?(nil) 
+      if libs.equal?(nil)
         libs = [ nil ]
       end
       n = 0
@@ -161,11 +162,11 @@ module FFI
         if lib.equal?(nil)
           found = CLibrary._has_symbol(cname) # check entire process
         else
-          found = lib._has_symbol(cname) 
+          found = lib._has_symbol(cname)
         end
         if found
-          cf = CFunction._new([ lib, cname, ret, cargs, -1])    
-          meth = cf._compile_caller(name, self) 
+          cf = CFunction._new([ lib, cname, ret, cargs, -1])
+          meth = cf._compile_caller(name, self)
           return meth
         end
         n += 1
@@ -173,5 +174,5 @@ module FFI
       raise FFI::NotFoundError, "Unable to find FFI '#{cname}' in: #{@ffi_lib}"
     end
 
-  end 
+  end
 end
