@@ -485,10 +485,16 @@ class File
   end
 
   def self.size(filename)
+    if filename.is_a?(File)
+      filename = filename.path 
+    end
     File.stat(filename).size
   end
 
   def self.size?(filename)
+    if filename.is_a?(File)
+      filename = filename.path 
+    end
     stat_obj = File._stat(filename, false)
     if (stat_obj._isFixnum)
       return nil  # an error attempting to stat
