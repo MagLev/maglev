@@ -94,24 +94,24 @@ shift $(($OPTIND - 1))
 
 # Commands
 startserver() {
-  $GEMSTONE/bin/startnetldi -g -a $USER &>/dev/null
-  $GEMSTONE/bin/startstone $STONENAME &>/dev/null
+  $GEMSTONE/bin/startnetldi -g -a $USER | grep Info].*server
+  $GEMSTONE/bin/startstone $STONENAME | grep Info]:.*[\\\'\\\"]$STONENAME
   $GEMSTONE/bin/waitstone $STONENAME &>/dev/null
-  echo "MagLev server $STONENAME started"
+  # echo "MagLev server \"$STONENAME\" started"
 }
 
 startserver-debug() {
   $GEMSTONE/bin/startnetldi -g -a $USER
   $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-debug.conf $STONENAME
   $GEMSTONE/bin/waitstone $STONENAME
-  echo "MagLev server $STONENAME started in verbose mode"
+  # echo "MagLev server \"$STONENAME\" started in verbose mode"
 }
 
 startserver-bench() {
-  $GEMSTONE/bin/startnetldi -g -a $USER &>/dev/null
-  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-benchmark.conf $STONENAME &>/dev/null
+  $GEMSTONE/bin/startnetldi -g -a $USER | grep Info].*server
+  $GEMSTONE/bin/startstone -z $MAGLEV_HOME/etc/system-benchmark.conf $STONENAME | grep Info]:.*[\\\'\\\"]$STONENAME
   $GEMSTONE/bin/waitstone $STONENAME &>/dev/null
-  echo "MagLev server $STONENAME started with performance optimizations"
+  # echo "MagLev server \"$STONENAME\" started with performance optimizations"
 }
 
 rubyversioncheck() {
@@ -216,8 +216,8 @@ startparser-debug() {
 }
  
 stopserver() {
-  $GEMSTONE/bin/stopstone $STONENAME DataCurator swordfish -i
-  $GEMSTONE/bin/stopnetldi
+  $GEMSTONE/bin/stopstone $STONENAME DataCurator swordfish -i 1>/dev/null
+  $GEMSTONE/bin/stopnetldi | grep Info].*[Ss]erver
 }
 
 stopparser() {
