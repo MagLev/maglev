@@ -194,8 +194,9 @@ class Iconv
 
       count = Iconv.convert @handle, l1, ic, l2, oc
 
-      if oc.read_long < 0 || oc.read_long > output then
-        raise OutOfRange.new("bug?(output length = #{output - oc.read_long})", get_success(os, l2), get_failed(is, ic, l1))
+      oc_l = oc.read_long
+      if oc_l < 0 || oc_l > output then
+        raise OutOfRange.new("bug?(output length = #{output - oc_l })", get_success(os, l2), get_failed(is, ic, l1))
       end
 
       if count == -1 then
