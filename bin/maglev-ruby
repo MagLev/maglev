@@ -35,6 +35,16 @@ MagLev will also read the MAGLEV_OPTS environment variable for options.
 EOF
 }
 
+# The environment variable STONENAME is for use by internal GemStone developers and QA
+# who start the stone manually instead of using "maglev start" or "rake maglev:start"
+# If STONENAME is set, GEMSTONE_GLOBAL_DIR, GEMSTONE_SYS_CONF, and GEMSTONE_EXE_CONF
+# will not be set -- even if they are undefined.
+#
+# Existing GEMSTONE_GLOBAL_DIR, GEMSTONE_SYS_CONF env variables will never be overridden.
+# If GEMSTONE_GLOBAL_DIR is not defined, it will be set to $MAGLEV_HOME. 
+# If the _CONF environment variables are not defined, they will be set based on
+# the --stone parameter, otherwise defaulted to etc/system.conf.
+
 # Prepend the maglev options onto the passed parameters so we can parse
 # them all the same in one pass
 set -- $MAGLEV_OPTS "$@"
