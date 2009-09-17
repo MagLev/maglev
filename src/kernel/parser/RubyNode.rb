@@ -404,7 +404,7 @@ module MagRp
        class RubyModuleNode
          class_primitive_nobridge 's', 's_forRp:body:source:'
 	 def inspect
-	   "[:class , #{@cpath.inspect},  #{@bodyNode.inspect}]"   
+	   "[:module , #{@cpath.inspect},  #{@bodyNode.inspect}]"   
 	 end
        end
 
