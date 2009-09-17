@@ -57,15 +57,17 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
     exit 1
 fi
 
-conf_file=$MAGLEV_HOME/etc/system.conf
-# to login to an already running stone not started by
-# maglev commands, use STONENAME env variable , not the --stone option.
-#  because --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
+# To login to an already running stone not started by maglev commands
+# use the STONENAME env variable , not the --stone optionC, because.
+#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
 if [ -z "$STONENAME" ]; then
 	stone=maglev
+    export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+    export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 else
 	stone=$STONENAME
 fi
+
 dash_e=""
 args=""
 debug=0
@@ -76,12 +78,9 @@ do
     case "$1" in
         --stone)
             stone=$2
-            stone_conf=$MAGLEV_HOME/etc/conf.d/${stone}.conf
-            if [[ -f $stone_conf ]]
-            then
-              conf_file=$stone_conf
-            else
-              echo "Couldn't find $stone_conf"
+            export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
+            if [ ! -f $GEMSTONE_SYS_CONF ]; then
+                echo "Can't find configuration file $GEMSTONE_SYS_CONF"
               exit 2
             fi
             shift
@@ -153,10 +152,6 @@ do
     esac
     shift
 done
-
-# Environment variable settings
-export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
-export GEMSTONE_SYS_CONF=$conf_file
 
 # Make sure the stone is ready
 $GEMSTONE/bin/waitstone $stone -1 >/dev/null
