@@ -2,46 +2,49 @@
 # I created it so I could make sure the messages were consistent.
 # Use bash -v testRakelib.sh and look through output for consistency
 
-# First run `rake stone:create[aaa]` unless aaa already exists
+# First create stone test.rakelib unless it already exists
+conf_exists=0
+[ -f $MAGLEV_HOME/etc/conf.d/test.rakelib.conf ] && conf_exists=1
+[ $conf_exists -eq 0 ] && rake stone:create[test.rakelib]
 
-# Test that aaa shows up
+# Test that test.rakelib shows up
 rake stone:list
 
 # Test startup
-rake aaa:start
+rake test.rakelib:start
 
 # Test global status while running
 rake
 
 # Test local status while running
-rake aaa:status
+rake test.rakelib:status
 
 # Test startup wile running
-rake aaa:start
+rake test.rakelib:start
 
 # Test restart while running
-rake aaa:restart
-rake aaa:status
+rake test.rakelib:restart
+rake test.rakelib:status
 
 # Test reload while running
-rake aaa:reload    
-rake aaa:status
+rake test.rakelib:reload    
+rake test.rakelib:status
 
 # Test snapshot while running
-rake aaa:take_snapshot
-rake aaa:status
+rake test.rakelib:take_snapshot
+rake test.rakelib:status
 
 # Test restore while running
-rake aaa:restore_snapshot
-rake aaa:status
+rake test.rakelib:restore_snapshot
+rake test.rakelib:status
 
 # Test restart from stopped state
-rake aaa:stop
-rake aaa:restart
-rake aaa:status
+rake test.rakelib:stop
+rake test.rakelib:restart
+rake test.rakelib:status
 
 # Test shutdown
-rake aaa:stop
+rake test.rakelib:stop
 
 #==== while stopped ===
 # None of these should restart the stone
@@ -50,19 +53,19 @@ rake aaa:stop
 rake
 
 # Test local status while stopped
-rake aaa:status
+rake test.rakelib:status
 
 # Test reload while stopped
-rake aaa:reload    
-rake aaa:status
+rake test.rakelib:reload    
+rake test.rakelib:status
 
 # Test snapshot while stopped
-rake aaa:take_snapshot
-rake aaa:status
+rake test.rakelib:take_snapshot
+rake test.rakelib:status
 
 # Test restore while stopped
-rake aaa:restore_snapshot
-rake aaa:status
+rake test.rakelib:restore_snapshot
+rake test.rakelib:status
 
 #==== NetLDI ===
 
@@ -82,4 +85,5 @@ rake parser:status
 rake parser:stop
 rake parser:status
 
-# Finally run `rake stone:destroy[aaa]`
+# Finally run destroy test.rakelib if it didn't exist when we started
+[ $conf_exists -eq 0 ] && rake stone:destroy[test.rakelib]

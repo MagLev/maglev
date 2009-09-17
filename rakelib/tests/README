@@ -9,8 +9,7 @@ Run them with 'ruby' not 'maglev-ruby', e.g.
 
 They depend on the 'flexmock' gem.
 
-There is also a shell script that starts/stops/restarts a server called "aaa"
-It's used to make sure the rake scripts do the right thing. It will be
-replaced by a proper tests script soon. Read the script "testRakelib.sh"
-before running it with "bash -v"
-
+There is also a shell script that starts/stops/restarts a server called
+"test.rakelib". It's used to make sure the rake scripts do the right thing.
+It will be replaced by a proper test script one of these days. For now,
+run it with 'bash -v testRakelib.sh' and eyeball the results.
