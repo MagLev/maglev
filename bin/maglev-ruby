@@ -35,6 +35,16 @@ MagLev will also read the MAGLEV_OPTS environment variable for options.
 EOF
 }
 
+# The environment variable STONENAME is for use by internal GemStone developers and QA
+# who start the stone manually instead of using "maglev start" or "rake maglev:start"
+# If STONENAME is set, GEMSTONE_GLOBAL_DIR, GEMSTONE_SYS_CONF, and GEMSTONE_EXE_CONF
+# will not be set -- even if they are undefined.
+#
+# Existing GEMSTONE_GLOBAL_DIR, GEMSTONE_SYS_CONF env variables will never be overridden.
+# If GEMSTONE_GLOBAL_DIR is not defined, it will be set to $MAGLEV_HOME. 
+# If the _CONF environment variables are not defined, they will be set based on
+# the --stone parameter, otherwise defaulted to etc/system.conf.
+
 # Prepend the maglev options onto the passed parameters so we can parse
 # them all the same in one pass
 set -- $MAGLEV_OPTS "$@"
@@ -45,11 +55,13 @@ if [ -z "${MAGLEV_HOME}" ]; then
     echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
     exit 1
 fi
+
 # Make sure GEMSTONE is set
 if [ -z "${GEMSTONE}" ]; then
     export GEMSTONE=$MAGLEV_HOME/gemstone
     # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
 fi
+
 # Check for topaz command to validate the $GEMSTONE directory
 if [ ! -x $GEMSTONE/bin/topaz ]; then
     echo "$COMMAND: [Error] $GEMSTONE does not appear to be a valid GemStone product directory."
@@ -57,17 +69,11 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
     exit 1
 fi
 
-# To login to an already running stone not started by maglev commands
-# use the STONENAME env variable , not the --stone optionC, because.
-#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
-if [ -z "$STONENAME" ]; then
-	stone=maglev
-    export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
-    export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-else
-	stone=$STONENAME
-fi
+# Set GEMSTONE_GLOBAL_DIR unless it's already set or STONENAME is set
+# -G will unset it later if needed
+[ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 
+# Process command line args
 dash_e=""
 args=""
 debug=0
@@ -78,7 +84,9 @@ do
     case "$1" in
         --stone)
             stone=$2
-            export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
+            # Don't override any existing magic ENV variables
+            [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
+            [ -z "$GEMSTONE_EXE_CONF" ] && export GEMSTONE_EXE_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
             if [ ! -f $GEMSTONE_SYS_CONF ]; then
                 echo "Can't find configuration file $GEMSTONE_SYS_CONF"
               exit 2
@@ -135,7 +143,6 @@ do
             # but maglev-ruby is invoked with -w by some test apps
             warning=1
             ;;
-
         --)
             break
             ;;
@@ -153,6 +160,19 @@ do
     shift
 done
 
+# To login to an already running stone not started by maglev commands
+# use the STONENAME env variable , not the --stone option, because.
+#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
+# Don't override any existing magic ENV variables
+if [ -z "$STONENAME" ]; then
+	stone=maglev
+    [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+    [ -z "$GEMSTONE_EXE_CONF" ] && export GEMSTONE_EXE_CONF=$MAGLEV_HOME/etc/system.conf
+else
+    # $STONENAME was set -- don't change anything
+	stone=$STONENAME
+fi
+
 # Make sure the stone is ready
 $GEMSTONE/bin/waitstone $stone -1 >/dev/null
 if [ $? -ne 0 ] ; then
@@ -161,10 +181,9 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 
-
+# If no -e params and no script, then read commands from STDIN
 if [ $# -lt 1 ]; then
   if [ -z "${dash_e}" ]; then
-    # If no -e params and no script, then read commands from STDIN
     stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
     cat /dev/stdin > $stdinscript
     RUBYSCRIPT=$stdinscript
@@ -194,23 +213,25 @@ done
 dbscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
 trap "rm -f $dbscript $stdinscript" EXIT
 
+# Make sure $dbscript is empty
 rm -f $dbscript
-cat $MAGLEV_HOME/etc/.topazini > $dbscript
 
-# generate a topaz exit command as last line of init file
-if [[ ! -z $debug ]]; then
+### Start building a Topaz script to execute later
+cat $MAGLEV_HOME/etc/.topazini > $dbscript
+#
+if [ $debug -ne 0 ]; then
   cat - >> $dbscript <<-EOFB
 display classoops
 EOFB
 fi
-
+#
 cat - >> $dbscript <<-EOF
 set gemstone $stone
 login
 run
 |ctx|
 EOF
-
+#
 # Use MagRpDEBUG_level environment variable to select MRI or native parser
 # and set MagRpDEBUG_level
 #
@@ -231,7 +252,7 @@ EOF
 EOF
   fi
 fi
-
+#
 cat - >> $dbscript <<-EOF
 (ctx := RubyContext load: #($maglev_options) ) .
 ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) withDashE: #($dash_e) .
@@ -239,9 +260,9 @@ GsFile stdout close . "ensure final LF on stdout"
 ^ nil
 %
 EOF
-
+#
 # generate a topaz exit command as last line of init file
-if [ $debug == 0 ]; then
+if [ $debug -ne 0 ]; then
   cat - >> $dbscript <<-EOFB
 exit
 EOFB
@@ -251,11 +272,16 @@ exitifnoerror
 EOFC
 fi
 
-TOPAZ_CMD="$GEMSTONE/bin/topaz -l -q -I $dbscript "
+# echo "GEMSTONE_SYS_CONF = $GEMSTONE_SYS_CONF"
+# echo "GEMSTONE_EXE_CONF = $GEMSTONE_EXE_CONF"
+# echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"
 
-# note that   /usr/bin/which   on Solaris always produces  $?==0 , so be careful
-#  about how you test result of which .
-#
+TOPAZ_CMD="$GEMSTONE/bin/topaz -l -q -I $dbscript "
+# If debugging, don't use -q with topaz
+[ $debug -ne 0 ] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l -I $dbscript "
+
+# note that /usr/bin/which on Solaris always produces $?==0, so be careful
+#  about how you test result of which.
 rlwrapExe=$(which rlwrap 2> /dev/null )
 if [[ $useRlwrap && -f "$rlwrapExe" ]]; then
   $rlwrapExe $TOPAZ_CMD

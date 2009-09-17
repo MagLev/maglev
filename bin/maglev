@@ -48,14 +48,8 @@ if [ -z "$MAGLEV_HOME" ]; then
   fi
 fi
 #
-if [ -z "$PARSETREE_PORT" ]; then
-    # echo "using 2001 as PARSETREE_PORT"
-    export PARSETREE_PORT=2001
-fi
-#
-if [ -z "$STONENAME" ]; then
-	STONENAME=maglev
-fi
+[ -z "$PARSETREE_PORT" ] && export PARSETREE_PORT=2001
+[ -z "$STONENAME" ] && STONENAME=maglev
 export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME
 export GEMSTONE_LOGDIR=$MAGLEV_HOME/log/$STONENAME
