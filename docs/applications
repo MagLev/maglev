@@ -1,12 +1,10 @@
 == Current state of various applications
 
 This document summarizes the state of various applications under MagLev.
-MagLev does not currently support the Ruby C-extension mechanism.  Features
-of applications that depend on a C-extension do not work.
+MagLev does not currently support the Ruby C extension mechanism.  Features
+of applications that depend on a C extension do not work.
 
 === Rack
-
-An unmodified version 1.0.0 of Rack is in <tt>src/external/rack</tt>
 
 MagLev does not currently support (at least) the following Rack features:
 * openid
@@ -20,8 +18,6 @@ MagLev does not currently support (at least) the following Rack features:
 
 === Sinatra
 
-An unmodified version 0.9.3 of Sinatra is in
-<tt>src/external/sinatra</tt>.
 Much of Sinatra runs, but some things don't.
 
 The following items seem to work (at least in the simple case)
@@ -32,43 +28,16 @@ The following items seem to work (at least in the simple case)
 The following items are known not to work:
 
 * Cookies and Cookie based sessions
-  WEBrick requires openssl for cookie support. openssl is a C-based
-  library, and MagLev does not yet support ruby c-extensions.
-
-==== GemStone Patches for Sinatra
-
-GemStone has made the following modifications to the stock version of
-Sinatra:
-
-* lib/sinatra/main.rb: Stubbed out the definition of run.  The
-  implementation depended on examining the stack frames returnd by
-  Kernel#caller, but the details of filenames caused problems (MagLev
-  prints only full pathnames, while MRI prints a variety of formats).
+  WEBrick requires openssl for cookie support. openssl is a C based
+  library, and MagLev does not yet support Ruby C extensions.
 
 === RubyGems
 
-A slightly modified version of RubyGems is in the source tree under
-src/external/rubygems-1.3.5.  MagLev will run the setup.rb file, as long as
-you don't try to make the rdoc:
+A slightly modified rubygems is preinstalled as "maglev-gem". the source 
+is in src/external/rubygems-1.3.5.  
 
-    $ cd src/external/rubygems-1.3.5
-    $ maglev-ruby setup.rb --no-rdoc --no-ri
-
-This will create the RubyGems hierarchy under lib/maglev/gems/... and will
-create a bin/maglev-gem. However, you'll need to change the first line in
-bin/maglev-gem to:
-    #!/usr/bin/env maglev-ruby
-otherwise maglev-gem will act like a shell script rather than a ruby script --
-causing this type of error:
-    $ maglev-gem --version
-    /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 8: require: command not found
-    /Users/pmclain/DevelopmentMagLev/git/bin/maglev-gem: line 9: require: command not found
-
-Once you've tweaked <tt>bin/magelv-gem</tt> however, any shell scripts
-installed using rubygems will have the appropriate shebang line.
-
-We have succuessfully installed rack-1.0.0 and run a basic rack app using
-rubygems (see <tt>examples/rack/gemrack.rb</tt>):
+It's likely that many gems will not work, especially those requiring C extensions.
+However, "maglev-gem install sinatra" will install rack-1.0.0 and sinatra-0.9.4.
 
 To clean up after experimenting with gems, there is a rake task:
 

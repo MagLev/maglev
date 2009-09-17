@@ -4,19 +4,6 @@ working with these apps on MagLev should share the same code/fixes.
 
 NOTE:  See the top level docs/applications directory for more details.
 
-rack
-  Rack provides an minimal interface between webservers supporting Ruby and
-  Ruby frameworks.  See $MAGLEV_HOME/examples/rack for more info.
-  Version: 1.0.0. released on 2009-04-25.
-  See: http://rack.rubyforge.org/
-  License: MIT
-
-sinatra
-  Sinatra is a light-weight web framework for ruby.  See
-  $MAGLEV_HOME/examples/sinatra for more info.
-  Version: 0.9.3
-  License: MIT
-
 benchmark
   (moved to $MAGLEV_HOME/benchmark)
   Benchmarks from Antonio Cangiano's Ruby-Benchmark-Suite, and some scripts to run them.
