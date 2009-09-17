@@ -19,6 +19,11 @@ module Errno
     self.raise_errno(err, additional)
   end
 
+  def self.handle
+    errnum = Dir._get_clear_errno
+    self.handle(errnum, '')
+  end
+
   def self.raise_errno(errno, additional='')
     errno_exc = ERRNO_TO_EXCEPTION[errno]
     errno_exc ||= SystemCallError.new("System error (errno: #{err}):", err)

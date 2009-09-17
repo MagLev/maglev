@@ -6,6 +6,7 @@ class Dir
   class_primitive_nobridge '_getwd', '_getwd'
   class_primitive_nobridge '_new', '_new:'
   class_primitive_nobridge '_mkdir', '_mkdir:permissions:'
+  class_primitive_nobridge '_get_clear_errno', '_errno'  # gets and clears errno
 
   class_primitive_nobridge '_getgrgent', '_getgrgent:'
   class_primitive_nobridge '_getgrgid', '_getgrgid:'
