@@ -52,8 +52,6 @@ class RubyContext
   # per VM to setup the singleton methods for the top self.  See
   # <tt>RubyCompiler>>compileFileNamed:loadName:</tt> for invocation.
   def self.customize_top_self(top_self)
-    # Commented out since adding the eigneclass causes testGlobals1a.rb to
-    # fail, but only if run via RubyContext _runVmUnit.
        class << top_self
          def to_s
            "main"
