@@ -3,10 +3,12 @@
     # a subclass of CByteArray , first opening in ffi.rb
 
     def self.new(type, count, &blk)
+      # this variant  gets bridge methods
       if type._isFixnum
         elemsize = type
-      else
-        elemsize = FFI.type_size(type)
+      else 
+        modu =  FFI
+        elemsize = modu.type_size(modu.find_type(type))
       end
       count = Type.coerce_to(count, Fixnum, :to_int)
       if (count < 1)
@@ -23,13 +25,14 @@
       end
     end
       
-    def self.new(arg, &blk)
-      if arg._isFixnum
-        numbytes = arg
+    def self.new(type, &blk)
+      if type._isFixnum
+        numbytes = type
         inst = self.gc_malloc(numbytes)
         inst.initialize(1)
       else
-        elemsize = FFI.type_size(type)
+        modu =  FFI
+        elemsize = modu.type_size(modu.find_type(type))
         inst = self.gc_malloc(elemsize)
         inst.initialize(elemsize)
       end
@@ -38,6 +41,27 @@
       else
         inst
       end
+    end
+
+    def self.new(type)
+      if type._isFixnum
+        numbytes = type
+        inst = self.gc_malloc(numbytes)
+        inst.initialize(1)
+      else
+        modu =  FFI
+        elemsize = modu.type_size(modu.find_type(type))
+        inst = self.gc_malloc(elemsize)
+        inst.initialize(elemsize)
+      end
+      inst
+    end
+
+    def self.new
+      # encapsulate a single C pointer or int64
+      inst = self.gc_malloc(8)
+      inst.initialize(8)
+      inst
     end
 
     class_primitive_nobridge '_with_all', 'withAll:'
@@ -65,13 +89,18 @@
       inst
     end
 
+    # def address ; end  #  inherited from CByteArray
+
     primitive_nobridge 'autorelease', 'autoRelease'
 
     # def autorelease=(val) ; end # Maglev TODO 
+   
+    primitive_nobridge 'free' , 'setDead'
 
     def derived_from
       # the instance which owns the C memory pointed to by self,
       #  if nil, then the C memory is owned by self.
+      # may be an Integer if created by read_pointer.
       @derivedFrom
     end
 
@@ -93,10 +122,23 @@
     def read_double(val)
       self.double_at(0)
     end 
-    # def read_pointer ; end #  TODO
-    # def write_pointer ; end #  TODO
-    # def address ; end #  TODO
-    # def null? ; end #  TODO
+    def read_pointer
+      # resulting derived instance has zero size
+      self.class.from_address( self.int64at(0) )
+    end   
+    def write_pointer(val)
+      self.int64_put(0, val);
+    end
+    def read_string(num_bytes)
+      self.stringfrom_to(0, num_bytes - 1)
+    end
+    def write_string(string, num_bytes)
+      self.copyfrom_from_to_into(string, 1, num_bytes, 0)
+    end
+    
+    def null? 
+      self.address.equal?(0)
+    end
 
     def read_array_of_int(a_length)
       res = Array.new(a_length)

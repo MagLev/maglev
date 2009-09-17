@@ -40,8 +40,16 @@ module FFI
     primitive_nobridge 'int64_put', 'int64At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
 
+    primitive_nobridge 'stringfrom_to', 'stringFrom:to:'
+	# zero-based start offset,  zero-based end offset(NOT limit)
+
+    primitive_nobridge 'copyfrom_from_to_into', 'copyFrom:from:to:into:'
+       # object, one-based start, one-based end, zero-based dest offset
+
     class_primitive_nobridge 'gc_malloc' , 'gcMalloc:'
       # allocates C memory which is auto-freed when instance is GC'ed
+
+    class_primitive_nobridge 'from_address', 'fromAddress:'
 
     primitive_nobridge 'address' , 'memoryAddress'
 
@@ -49,8 +57,20 @@ module FFI
      # args are  ushort value, zero-based start offset, 
      #    zero-based end offset (-1 means to end of allocated C memory)
 
+    def self.new(size)
+      # creates an instance with C data zeroed, and to be auto-freed by GC
+      gc_malloc(size)
+    end
+
     def clear
       self.memset(0, 0, -1)
+    end
+
+    primitive_nobridge '_inspect' , '_inspect'
+    def inspect
+      str = super
+      str << self._inspect
+      str
     end
 
   end
@@ -59,7 +79,9 @@ module FFI
     primitive_nobridge 'address' , 'memoryAddress'
   end
 
-  class << self
+  module_function() # [ ===================== following are module functions
+    # these are after  'module_function' instead of inside of a 'class << self'
+    # to avoid dynamic constant refs .
 
     def find_type(name)
       unless name._isSymbol
@@ -73,7 +95,7 @@ module FFI
     end
 
     def type_size(type)
-      sz = TypeSizes[type]
+      size = TypeSizes[type]
       if size.equal?(nil)
         unless type._isSymbol
           raise TypeError, "FFI::type_size - type argument must be a Symbol"
@@ -81,7 +103,7 @@ module FFI
           raise TypeError, "Unable to resolve FFI type '#{type}'"
         end
       end
-      sz
+      size
     end
 
     def size_to_type(size)
@@ -97,7 +119,7 @@ module FFI
         raise ArgumentError , 'unsupported size'
       end
     end
-  end
+  # end module_function() ]
 
   module Library
     # Set which library or libraries +attach_function+ should

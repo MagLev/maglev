@@ -4,13 +4,31 @@ module FFI
   CLibrary = _resolve_smalltalk_global( :CLibrary )
   CFunction = _resolve_smalltalk_global( :CFunction )
   CByteArray = _resolve_smalltalk_global( :CByteArray )
+  CPointer = _resolve_smalltalk_global( :CPointer )
 
   #  Specialised error classes
   class TypeError < RuntimeError; end
 
   class NotFoundError < RuntimeError; end
 
+  class NativeError < LoadError; end
+
+  class PlatformError < FFI::NativeError; end
+
+  class SignatureError < NativeError; end
+
   USE_THIS_PROCESS_AS_LIBRARY = nil
+
+  module Platform
+
+    OS = "" # you should use Config::CONFIG['host_os']
+	    # because OS could change after you commit code
+
+    ARCH = ""
+    LIBPREFIX = "lib"
+    LIBSUFFIX = "" # suffix is appended at runtime by the
+                   # library load primitives if '.' not in lib name
+  end
 
   # mapping from Ruby type names to type names supported by CFunction
   TypeDefs = IdentityHash.from_hash( 
