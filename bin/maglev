@@ -47,16 +47,17 @@ if [ -z "$MAGLEV_HOME" ]; then
     exit 1
   fi
 fi
-#
+# Set environment variables unless they already exist
 [ -z "$PARSETREE_PORT" ] && export PARSETREE_PORT=2001
 [ -z "$STONENAME" ] && STONENAME=maglev
-export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME
-export GEMSTONE_LOGDIR=$MAGLEV_HOME/log/$STONENAME
-export GEMSTONE_BACKUPDIR=$MAGLEV_HOME/log/backups
-export GEMSTONE_LOG=$GEMSTONE_LOGDIR/$STONENAME.log
-export GEMSTONE=$MAGLEV_HOME/gemstone
-export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+[ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+[ -z "$GEMSTONE_EXE_CONF" ] && export GEMSTONE_EXE_CONF=$MAGLEV_HOME/etc/system.conf
+[ -z "$GEMSTONE_DATADIR" ] && export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME
+[ -z "$GEMSTONE_LOGDIR" ] && export GEMSTONE_LOGDIR=$MAGLEV_HOME/log/$STONENAME
+[ -z "$GEMSTONE_BACKUPDIR" ] && export GEMSTONE_BACKUPDIR=$MAGLEV_HOME/log/backups
+[ -z "$GEMSTONE_LOG" ] && export GEMSTONE_LOG=$GEMSTONE_LOGDIR/$STONENAME.log
+[ -z "$GEMSTONE" ] && export GEMSTONE=$MAGLEV_HOME/gemstone
+[ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 # Only use $MAGLEV_HOME/etc/.topazini if normal .topazini doesn't exist
 if [[ -e .topazini || -e $HOME/.topazini ]]; then
   TOPAZ_CMD="$GEMSTONE/bin/topaz -q "
