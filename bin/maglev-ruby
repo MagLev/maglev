@@ -258,7 +258,7 @@ GsFile stdout close . "ensure final LF on stdout"
 EOF
 #
 # generate a topaz exit command as last line of init file
-if [ $debug -ne 0 ]; then
+if [ $debug -eq 0 ]; then
   cat - >> $dbscript <<-EOFB
 exit
 EOFB
