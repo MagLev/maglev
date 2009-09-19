@@ -25,6 +25,7 @@ OPTIONS:
                     noRlwrap      invoke topaz without rlwrap
    --             End of MagLev parameters.  The next parameter is the programfile,
                   then any programfile arguments follow.
+   --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
    --stone <name> Run programfile connecting to the named stone
    -v, --verbose  Print version number, then turn on verbose mode
    --version      Print version number and exit
@@ -76,6 +77,7 @@ dash_e=""
 args=""
 debug=0
 maglev_options=""
+tocsize=""
 useRlwrap=1
 while [ $# -gt 0 ]
 do
@@ -116,6 +118,10 @@ do
             else
                 maglev_options="$maglev_options ${sub_opt}"
             fi
+            ;;
+        --tocsz)
+            tocsize="-T $2"
+            shift
             ;;
         --stone)
             stone=$2
@@ -268,9 +274,9 @@ exitifnoerror
 EOFC
 fi
 
-TOPAZ_CMD="$GEMSTONE/bin/topaz -l -q -I $dbscript "
+TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
 # If debugging, don't use -q with topaz
-[ $debug -ne 0 ] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l -I $dbscript "
+[ $debug -ne 0 ] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -I $dbscript "
 
 # echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"
 # echo "GEMSTONE_SYS_CONF = $GEMSTONE_SYS_CONF"
