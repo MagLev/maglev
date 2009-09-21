@@ -154,15 +154,17 @@ module MagRp
          class_primitive_nobridge 's', 's_forRp:block:bool:'
        end
          class RubyUntilNode
+           primitive_nobridge '_base_selector', 'baseSelector'
            # s_forRp:block:bool: inherited from RubyAbstractWhileNode
            def inspect
-             "[:until, @{conditionNode.inspect}, @{bodyNode.inspect}, #{@selector}]"
+             "[:until, @{conditionNode.inspect}, @{bodyNode.inspect}, #{self._base_selector}]"
            end
          end
          class RubyWhileNode
+           primitive_nobridge '_base_selector', 'baseSelector'
            # s_forRp:block:bool: inherited from RubyAbstractWhileNode
            def inspect
-             "[:while, @{conditionNode.inspect}, @{bodyNode.inspect}, #{@selector}]"
+             "[:while, @{conditionNode.inspect}, @{bodyNode.inspect}, #{self._base_selector}]"
            end
          end
 
