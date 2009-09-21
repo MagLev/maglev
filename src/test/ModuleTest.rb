@@ -140,6 +140,31 @@ class C27
 end
 test($extended[M27], C27, "C27 extend M27")
 
+# Ensure that a module_function w/o parameter gets shut off at the end
+# of a particular module opening.  This test passes if no exception raised.
+module JSON
+  module_function
+  def foo
+    puts "foo"
+  end
+end
+
+# This module opening should NOT have the module_function in effect
+module JSON
+  def bar
+    puts "bar"
+  end
+end
+
+
+JSON.foo
+begin
+  JSON.bar
+  raise "Expecting NoMethodError for JSON.bar"
+rescue NoMethodError
+  # ok
+end
+
 ################### Report and clean up #####################
 report
 Gemstone.abortTransaction if defined? RUBY_ENGINE
