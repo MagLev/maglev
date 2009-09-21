@@ -30,7 +30,7 @@ module Specs
 #       def equal?(other)
 #         false
 #       end
-#     end
+    end
 
     class RandomID
       def ==(other)

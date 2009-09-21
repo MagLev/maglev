@@ -5,5 +5,6 @@ fails:IO::foreach yields a sequence of paragraphs when the separator is an empty
 fails:IO::foreach updates $. with each yield
 fails:IO::foreach can handle non-ASCII data as separator
 fails:IO::foreach raises TypeError if the first parameter is nil
+fails:IO::foreach raises Errno::ENOENT on invalid_file_name
 fails:IO::foreach converts first parameter to string and uses as file name
 fails:IO::foreach converts second parameter to string and uses as separator, with a to_str calling for the IO
