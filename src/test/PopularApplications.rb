@@ -8,18 +8,20 @@ $: << ext_dir + 'sinatra/lib'
 
 require 'webrick'
 
-require 'rack'
+#		rack is now a gem
+# require 'rack'
 # Rack autoloads everything, so you have to mention a constant in the
 # source to force loading of it.  We don't do complete coverage, but we try
 # to load a few things.
-Rack::Handler::WEBrick
-Rack::CommonLogger
-Rack::File
-Rack::Lint
-Rack::ShowStatus
-Rack::ShowExceptions
-Rack::Static
-Rack::Request
-Rack::Response
+# Rack::Handler::WEBrick
+# Rack::CommonLogger
+# Rack::File
+# Rack::Lint
+# Rack::ShowStatus
+# Rack::ShowExceptions
+# Rack::Static
+# Rack::Request
+# Rack::Response
 
-#require 'sinatra'
+#        sinatra now a gem or unmodified code
+# require 'sinatra'
