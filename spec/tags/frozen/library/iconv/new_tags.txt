@@ -1,0 +1,2 @@
+fails:Iconv.new creates a new encoding converter
+fails:Iconv.new when called from a subclass of Iconv instantiates an object of that class
