@@ -724,6 +724,7 @@ class File
         raise IOError , self._last_err_string  # TODO: Errno::xxx
       end
     end
+    self._increment_lineno
     res
   end
 

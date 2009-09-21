@@ -213,6 +213,32 @@ class IO
     data
   end
 
+  def lineno
+    num = @lineNumber
+    if num.equal?(nil)
+      num = 0
+    end
+    num
+  end
+
+  def lineno=(integer)
+    num = Type.coerce_to(integer, Fixnum, :to_i) 
+    if num < 0
+      raise ArgumentError, 'IO#lineno= expects Integer >= 0'
+    end
+    @lineNumber = num
+    num
+  end
+
+  def _increment_lineno
+    # to be called by gets implementations
+    num = @lineNumber 
+    if num.equal?(nil)
+      num = 0
+    end
+    @lineNumber = num + 1
+  end
+
   # Note, gets and readline must be reimplemented in subclasses to 
   #  update caller's $_ see File and StringIO code for examples.
 

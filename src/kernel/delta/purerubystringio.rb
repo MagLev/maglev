@@ -182,7 +182,7 @@ class PureRubyStringIO < IO
   def _initialize(string="", mode=Undefined, is_reopen=false)
     s_buf = Type.coerce_to(string, String, :to_str )
     isfrozen = s_buf.frozen?
-    @sio_lineno = 0
+    @lineNumber = 0
     append = false
     if mode._isInteger
       if mode.equal?( IO::RDONLY )
@@ -266,13 +266,8 @@ class PureRubyStringIO < IO
     @sio_string.length
   end
 
-  def lineno
-    @sio_lineno
-  end
-
-  def lineno=(integer)
-    @sio_lineno = integer
-  end
+  # def lineno ; end # inherited from IO
+  # def lineno=(integer) ; end # inherited from IO
 
   def reopen(obj, mode)
     if mode._isInteger 
@@ -398,7 +393,7 @@ class PureRubyStringIO < IO
 
   def rewind
     @sio_pos = 0
-    @sio_lineno = 0
+    @lineNumber = 0
   end
 
   def seek(offset, whence=SEEK_SET)
@@ -532,7 +527,7 @@ class PureRubyStringIO < IO
     end
 
     if @sio_closed_read ; requireReadable ; end
-    @sio_lineno += 1
+    @lineNumber += 1
     s_pos = @sio_pos
     pstart = s_pos
     s_string = @sio_string

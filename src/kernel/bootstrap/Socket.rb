@@ -45,15 +45,37 @@ class Socket
     self
   end
 
+  primitive_nobridge '_gets', 'gets:'
+
   def gets(*args, &blk)
     raise ArgumentError, 'expected 0 or 1 arg'
     #  variants other than gets , gets(terminator) not supported
     # because bridge methods would interfere with use of _storeRubyVcGlobal
   end
-  # Smalltalk implementations of   gets  responsible for
-  #    _storeRubyVcGlobal  to  store into caller's $_ if any
-  primitive_nobridge 'gets', 'gets'
-  primitive_nobridge 'gets', 'gets:'
+  def gets
+    #no terminator specified means read all available data
+    res = self.recv(4096)
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    self._increment_lineno
+    res
+  end
+
+  def gets(separator)
+    if separator.equal?(nil)
+      res = self.recv(4096)
+    elsif separator._isString
+      if separator.length.equal?(1)
+        res = self._gets(separator[0])
+      else
+        raise ArgumentError, 'Socket#gets, multi-character separator not implemented yet'
+      end
+    else
+      raise TypeError , 'Socket#gets, separator arg must be nil or a String' 
+    end
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    self._increment_lineno
+    res
+  end
 
   primitive 'close', 'close'
   primitive '_active?', 'isActive'
