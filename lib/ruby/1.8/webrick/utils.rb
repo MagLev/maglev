@@ -19,12 +19,12 @@ end
 module WEBrick
   module Utils
     def set_non_blocking(io)
-# Maglev, sockets non-blocking by default;  Fcntl , IO.fcntl not implem yet
-#     flag = File::NONBLOCK  
-#     if defined?(Fcntl::F_GETFL)
-#       flag |= io.fcntl(Fcntl::F_GETFL)
-#     end
-#     io.fcntl(Fcntl::F_SETFL, flag)
+      flag = File::NONBLOCK  
+      if defined?(Fcntl::F_GETFL)
+        flag |= io.fcntl(Fcntl::F_GETFL)
+      end
+      fc = Fcntl 
+      io.fcntl(Fcntl::F_SETFL, flag)
     end
     module_function :set_non_blocking
 
