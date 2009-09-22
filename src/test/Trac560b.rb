@@ -5,9 +5,7 @@ def write_meg(block_size, test_size)
   a = TCPServer.new('')
   port = a.addr[1]
   client = TCPSocket.new(nil, port)
-  client.set_blocking(false)  # Maglev
   server = a.accept
-  server.set_blocking(false)  # Maglev
   receiver = Thread.new {
     rcount = 0
     loop { 
@@ -27,9 +25,6 @@ def write_meg(block_size, test_size)
   lastprt = 0
   while wcount < test_size
     numwrote = client.write(string)
-    if numwrote == 0
-      Thread.pass  # Maglev, socket would block
-    end
     wcount += numwrote
   end
   puts "wrote = #{wcount} , waiting for receiver to finish"
