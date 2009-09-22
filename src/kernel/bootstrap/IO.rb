@@ -8,6 +8,25 @@ class IO
   primitive 'sync=', 'setSync:'
   primitive 'stat',  'stat'
 
+  primitive_nobridge '_fcntl', 'fcntl:with:'
+
+  def fcntl(op, flags=0)
+    # Socket contains implementation specific to File::NONBLOCK
+    #  otherwise not yet implemented .
+    op = Type.coerce_to(op, Fixnum, :to_int)
+    arg = [ flags ]
+    status = _fcntl(op, arg )
+    if status.equal?(0)
+      return 0 # 'set' operation ok 
+    elsif status.equal?(-1)
+      return arg[0] # retrieved value for a 'get' operation
+    elsif status < -1
+      raise NotImplementedError, 'fcntl operation not implemented'
+    else
+      Errno.handle(status, 'fcntl failed')
+    end
+  end
+
   def <<(anObj)
     unless anObj._isString
       anObj = anObj.to_s

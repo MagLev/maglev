@@ -25,11 +25,29 @@ class Socket
   # bind, listen not implemented,
   #   use  TCPServer>>new:port:  to create a listening socket
 
-  # send, write, recv  function per the non-blocking state of the receiver.
-  primitive_nobridge 'send', 'send:flags:addr:'
-  primitive 'send', 'send:flags:'
+  # send, recv , syswrite function per the non-blocking state of the receiver.
+  def send(string, flags, addr)
+    unless addr.equal?(nil)
+      raise 'addr arg not supported by send'
+    end
+    unless flags.equal?(0)
+      raise 'non-zero flags not supported by send'
+    end
+    syswrite(string)
+  end
+  def send(string, flags)
+    unless flags.equal?(0)
+      raise 'non-zero flags not supported by send'
+    end
+    syswrite(string)
+  end
+  primitive_nobridge 'send', 'syswrite:'
+
+  primitive_nobridge 'syswrite', 'syswrite:'
+
+  # write uses buffered IO semantics and will wait for socket to transmit the data
   primitive_nobridge '<<', 'write:'
-  primitive 'write', 'write:'
+  primitive_nobridge 'write', 'write:'
 
   # MRI will give errors like 'IOError: sysread for buffered IO'
   # if you mix read: and recv: and attempt recv: on a Socket with 
@@ -203,9 +221,14 @@ class Socket
     end
   end
 
-  # def set_blocking(a_boolean)  ; end
-  #  this is a  workaround until fcntl() is implemented in IO.rb
-  primitive 'set_blocking', 'setBlocking:'
+  def set_blocking(a_boolean)  
+    # convenience method 
+    if a_boolean 
+      fcntl(Fcntl::F_SETFL , fcntl(Fcntl::F_GETFL) | File::NONBLOCK )
+    else
+      fcntl(Fcntl::F_SETFL , fcntl(Fcntl::F_GETFL) & (~ File::NONBLOCK) )
+    end
+  end
 
   class_primitive 'do_not_reverse_lookup=', 'setNoReverseLookup:'
   class_primitive_nobridge '_getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
@@ -244,6 +267,30 @@ class Socket
     args = [ host, service, family, socktype, protocol, flags ]
     _getaddrinfo( args )
   end
+
+  def fcntl(op, flags=0)
+    # Socket specific implemention for F_SETFL, NONBLOCK
+    op = Type.coerce_to(op, Fixnum, :to_int)
+    if op.equal?(Fcntl::F_SETFL)
+      flags = Type.coerce_to(flags, Fixnum, :to_int)
+      if (flags & File::NONBLOCK) != 0
+        @isRubyBlocking = false
+      else
+        @isRubyBlocking = true
+      end
+      flags = flags & (~ File::NONBLOCK)
+      super(op, flags)
+    elsif op.equal?(Fcntl::F_GETFL)
+      res = super(op, flags)
+      if @isRubyBlocking
+        res = res | File::NONBLOCK
+      end
+      res 
+    else
+      super(op, flags)
+    end
+  end
+
 end
 
 class IPSocket
