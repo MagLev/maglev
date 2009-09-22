@@ -51,6 +51,8 @@ module Errno
   # ENOTCONN = _resolve_smalltalk_global(:SocketErrorENOTCONN)
   # EPIPE = _resolve_smalltalk_global(:SocketErrorEPIPE)
 
+  EAGAIN = _resolve_smalltalk_global(:SocketErrorEAGAIN)
+
   # Create a class to represent +errno+.  A constant, +name+, will be added to
   # +Errno+ to store the class and the class will have the value of its
   # constant +Errno+ be +errno+.  E.g.,
