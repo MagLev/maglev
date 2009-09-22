@@ -11,8 +11,10 @@ class IO
   primitive_nobridge '_fcntl', 'fcntl:with:'
 
   def fcntl(op, flags=0)
+    # only these operations are supported by _fcntl primitive:
+    #   F_GETFD, F_GETFL, F_SETFL, FD_CLOEXEC
     # Socket contains implementation specific to File::NONBLOCK
-    #  otherwise not yet implemented .
+     
     op = Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
     status = _fcntl(op, arg )
