@@ -1,0 +1,14 @@
+task :default => :commit
+
+desc "Commit the MDB Server code to the repository."
+task :commit, :force do |t,args|
+  sh %{ maglev-ruby -MnoRlwrap commit_code.rb #{args.force} }
+end
+
+desc "Run tets: requires rubygems installed and a patched minitest gem"
+task :tests => :commit do
+  Dir.glob("*_tests.rb") do |t|
+    sh %{ maglev-ruby -MnoRlwrap #{t} }
+  end
+end
+
