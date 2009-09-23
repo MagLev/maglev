@@ -332,5 +332,11 @@ test('hello'.sub(/[aeiou]/, '*'), 'h*llo', 'sub 1')
 test('hello'.sub(/([aeiou])/, '<\1>'), 'h<e>llo', 'sub 2')
 test('hello'.sub(/./) { |s| s + ' '}, 'h ello', 'sub 3')
 #test('hello'.sub(/(?<double>l)/, '-\k<double>-'), 'he-l-lo', 'sub 4') # 1.9?
+
+# From seq.rb
+seq = 'tgcaacgacatttgaccaacttgaccattcctgcttgtagcgt'
+seq.gsub!('B','(c|g|t)')
+test(seq.length, 43, 'From seq.rb')
+
 report
 
