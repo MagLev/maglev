@@ -51,6 +51,12 @@ class CC
  def getBlock
    @block
  end
+ def block_set(arg)
+   self.block=(arg)
+ end
+ def get_block()
+   self.block()
+ end
 end
 o = CA.new
 o.ma
@@ -64,10 +70,10 @@ CA.check
 MB.check(21)
 
 oc = CC.new
-oc.block=(95)
+oc.block_set(95)
 MC.block=(96)
 unless oc.getBlock == 95 ; raise 'ERR'; end
-unless oc.block == 95 ; raise 'ERR'; end
+unless oc.get_block == 95 ; raise 'ERR'; end
 unless MC.block == 96 ; raise 'ERR'; end
 
 true

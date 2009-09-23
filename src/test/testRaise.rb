@@ -134,9 +134,8 @@ end
 true
 
 begin
-  o = []
   begin
-    o.raise
+    raise
   rescue  
     e = $!
     unless e.class.equal?(RuntimeError)  ; raise 'err' ; end
