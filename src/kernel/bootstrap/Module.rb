@@ -285,7 +285,7 @@ class Module
           name = Type.coerce_to(name, String, :to_str)
           name = name.to_sym
         end
-        _module_funct(name)
+        _module_funct(name)  
       }
     else
       _module_funct(true)  # enable the _module_methods_all semantics
