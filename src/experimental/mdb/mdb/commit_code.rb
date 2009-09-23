@@ -9,7 +9,7 @@ Maglev.abort_transaction
 if force or not defined? ::MDB
   Maglev.persistent do
     # Use load rather than require to force re-reading of the files
-    load 'database.rb'
+    load 'lib/server.rb'
   end
   Maglev.commit_transaction
   puts "== Committed MDB Server code"

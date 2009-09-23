@@ -6,9 +6,9 @@ task :commit, :force do |t,args|
 end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
-task :tests => :commit do
-  Dir.glob("*_tests.rb") do |t|
-    sh %{ maglev-ruby -MnoRlwrap #{t} }
+task :test => :commit do
+  Dir.glob("test/*_tests.rb") do |t|
+    sh %{ maglev-ruby -Ilib -MnoRlwrap #{t} }
   end
 end
 
