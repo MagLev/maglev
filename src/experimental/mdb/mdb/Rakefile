@@ -1,14 +1,26 @@
 task :default => :commit
 
+#MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby -MnoRlwrap"
+MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby"
+
+ENV.delete 'MAGLEV_OPTS'  # Get rid of -d etc.
+
 desc "Commit the MDB Server code to the repository."
 task :commit, :force do |t,args|
-  sh %{ maglev-ruby -MnoRlwrap commit_code.rb #{args.force} }
+  sh %{ maglev-ruby commit_code.rb #{args.force} }
 end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
 task :test => :commit do
   Dir.glob("test/*_tests.rb") do |t|
+    puts "Test: #{t}"
     sh %{ maglev-ruby -Ilib -MnoRlwrap #{t} }
   end
 end
 
+namespace :db do
+  desc "List the databases in the server"
+  task :list do
+    sh %{ maglev-ruby -e 'p Maglev::PERSISTENT_ROOT[MDB::Server]' }
+  end
+end

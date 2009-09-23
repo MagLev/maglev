@@ -29,15 +29,5 @@ module MDB
       @views.send(view_name.to_sym) unless @views.nil?
     end
 
-    private
-    def self.initialize_db_root
-      if Maglev::PERSISTENT_ROOT[MDB::Database].nil?
-        Maglev::PERSISTENT_ROOT[MDB::Database] = Hash.new
-      end
-      @proot = Maglev::PERSISTENT_ROOT[MDB::Database]
-    end
-
-    initialize_db_root   # rely on caller to commit
-  end
 end
 
