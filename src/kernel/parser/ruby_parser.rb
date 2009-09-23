@@ -3955,6 +3955,7 @@ def _reduce_183(val, vofs)
                       v1 = val[vofs ]
                       v2 = val[vofs + 2]
                       result = RubyDotNode.s(:dot2, v1, v2)
+		      result.src_offset=( val[vofs + 1 ].src_offset ) # of the DOT2
                     
     result
 end
@@ -3964,6 +3965,7 @@ def _reduce_184(val, vofs)
                       v1 = val[vofs ]
                       v2 = val[vofs + 2]
                       result = RubyDotNode.s(:dot3, v1, v2)
+		      result.src_offset=( val[vofs + 1 ].src_offset ) # of the DOT3
                     
     result
 end
@@ -4893,7 +4895,7 @@ def _reduce_306(val, vofs)
 		      # kCLASS cpath superclass
                       # @comments.push( @lexer.comments_ )
                       if (@in_def || @in_single > 0) then
-                        yyerror "class definition in method body"
+raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}\n cannot continue parsing."
                       end
                       @env.extend( false)
                       result = val[vofs]
