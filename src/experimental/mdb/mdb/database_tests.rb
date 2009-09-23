@@ -7,7 +7,7 @@ MiniTest::Unit.autorun
 TEST_DB_PREFIX = "minitest_db"
 TEST_DB_REGEXP = /^#{TEST_DB_PREFIX}/
 
-describe MDB::Database do
+describe "MDB::Database class side" do
   before do
     MDB::Database.db_names.each do |name|
       if name =~ TEST_DB_REGEXP
@@ -55,3 +55,4 @@ describe MDB::Database do
     end
   end
 end
+
