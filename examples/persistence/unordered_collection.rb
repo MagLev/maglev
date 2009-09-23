@@ -100,5 +100,5 @@ Benchmark.bm do |x|
 end
 
 # TODO: Clean up the indexes.  The indexes are permanently stored, and
-# must be cleaned up explicitly.
+# must be cleaned up explicitly.
 people._remove_index('age')
