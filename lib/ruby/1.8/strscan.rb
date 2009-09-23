@@ -30,12 +30,16 @@ class StringScanner
 
   def [](n)
     # coercion will be implicit by match[] primitive
-    # n = Type.coerce_to(n, Fixnum, :to_int)
-    match[n]
+    n = Type.coerce_to(n, Fixnum, :to_int)
+    begin
+      match[n]
+    rescue IndexError
+      nil
+    end
   end
 
   def bol?
-    if pos.equal?(0) 
+    if pos.equal?(0)
       return true
     end
     pminus = pos - 1
@@ -51,10 +55,10 @@ class StringScanner
     _scan(pattern, false, true)
   end
 
-  #def clear
-  #  warn "StringScanner#clear is obsolete; use #terminate instead" if $VERBOSE
-  #  terminate
-  #end
+  def clear
+    warn "StringScanner#clear is obsolete; use #terminate instead" if $VERBOSE
+    terminate
+  end
 
   def concat(str)
     @string << str
@@ -62,10 +66,10 @@ class StringScanner
   end
   alias :<< :concat # TODO: reverse
 
-  #def empty?
-  #  warn "StringScanner#empty? is obsolete; use #eos? instead?" if $VERBOSE
-  #  eos?
-  #end
+  def empty?
+    warn "StringScanner#empty? is obsolete; use #eos? instead?" if $VERBOSE
+    eos?
+  end
 
   def eos?
     @pos >= @string.size
@@ -79,10 +83,10 @@ class StringScanner
     scan(/./mn)
   end
 
-  #def getbyte
-  #  warn "StringScanner#getbyte is obsolete; use #get_byte instead" if $VERBOSE
-  #  get_byte
-  #end
+  def getbyte
+    warn "StringScanner#getbyte is obsolete; use #get_byte instead" if $VERBOSE
+    get_byte
+  end
 
   def getch
     scan(/./m)
@@ -135,10 +139,10 @@ class StringScanner
     m.to_s.size if (not m.equal?(nil))
   end
 
-  #def matchedsize
-  #  warn "StringScanner#matchedsize is obsolete; use #matched_size instead" if $VERBOSE
-  #  matched_size
-  #end
+  def matchedsize
+    warn "StringScanner#matchedsize is obsolete; use #matched_size instead" if $VERBOSE
+    matched_size
+  end
 
   def post_match
     m = @match
@@ -166,7 +170,7 @@ class StringScanner
 
   def rest_size
     p = @pos
-    ss = @string.size 
+    ss = @string.size
     if p < ss
       ss - p
     else
@@ -228,23 +232,23 @@ class StringScanner
 
   def peek( len)
     unless len._isFixnum
-      raise TypeError,'expected Fixnum'
+      raise RangeError,'expected Fixnum'
     end
     raise ArgumentError if len < 0
     return "" if len.equal?(0)
     return @string[@pos, len]
   end
 
-  #def peep len
-  #  warn "StringScanner#peep is obsolete; use #peek instead" if $VERBOSE
-  #  peek len
-  #end
+  def peep len
+    warn "StringScanner#peep is obsolete; use #peek instead" if $VERBOSE
+    peek len
+  end
 
   def _scan( pattern, succptr, getstr)
     if pattern._isString
       # ok
     elsif pattern._isRegexp
-      # ok 
+      # ok
     else
       pattern = Type.coerce_to(pattern, String, :to_str)
     end
@@ -281,7 +285,7 @@ class StringScanner
     if pattern._isString
       # ok
     elsif pattern._isRegexp
-      # ok 
+      # ok
     else
       pattern = Type.coerce_to(pattern, String, :to_str)
     end
