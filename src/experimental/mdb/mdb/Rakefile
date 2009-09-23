@@ -3,7 +3,7 @@ task :default => :commit
 #MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby -MnoRlwrap"
 MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby"
 
-ENV.delete 'MAGLEV_OPTS'  # Get rid of -d etc.
+ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
 
 desc "Commit the MDB Server code to the repository."
 task :commit, :force do |t,args|
@@ -14,7 +14,7 @@ desc "Run tets: requires rubygems installed and a patched minitest gem"
 task :test => :commit do
   Dir.glob("test/*_tests.rb") do |t|
     puts "Test: #{t}"
-    sh %{ maglev-ruby -Ilib -MnoRlwrap #{t} }
+    sh %{ maglev-ruby -Itest #{t} }
   end
 end
 

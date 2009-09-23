@@ -1,13 +1,14 @@
-# MiniTest suite for the MDB::Server
+# MiniTest suite for the MDB::Database
 require 'rubygems'
 require 'minitest/spec'
-require 'mdb/server'
+require 'mdb/database'
 
 require 'helpers'
 
 MiniTest::Unit.autorun
 
-describe "MDB::Server class side" do
+describe MDB::Database do
+
   before do
     MDB::Test.delete_test_dbs
   end
