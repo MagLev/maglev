@@ -1,7 +1,7 @@
 # MiniTest suite for the MDB::Server
 require 'rubygems'
 require 'minitest/spec'
-require 'server'
+require 'mdb/server'
 
 MiniTest::Unit.autorun
 
