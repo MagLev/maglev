@@ -133,6 +133,7 @@ class MagLevStone < Stone
   end
 
   private
+
   # Executes the block with the server stopped.  Will
   # restart the server if the server was running when
   # with_server_stopped was called.

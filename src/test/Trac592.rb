@@ -1,6 +1,7 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
-result = `maglev-ruby -e 'a = [:a, :b, :c]; a<<a; puts a'`
+# Unset MAGLEV_OPTS so that -d doesn't mess up the output
+result = `MAGLEV_OPTS= maglev-ruby -e 'a = [:a, :b, :c]; a<<a; puts a'`
 test(result, "a\nb\nc\n[...]\n", "recursive case")
 
 report

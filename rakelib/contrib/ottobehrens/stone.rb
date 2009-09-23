@@ -98,16 +98,17 @@ class Stone
     start
   end
 
+  def self.tranlog_number_from(string)
+    ((/\[.*SmallInteger\] (-?\d*)/.match(string))[1]).to_i
+  end
+
   def full_backup
+    result = run_topaz_command("System startCheckpointSync")
+    fail "Could not start checkpoint, got #{result}" if /\[.*Boolean\] true/ !~ result.last
     result = run_topaz_command("SystemRepository startNewLog")
-    tranlog_number = (result.last.split[5]).to_i
-    fail if tranlog_number < 0
-
-    run_topaz_command("System startCheckpointSync")
-    run_topaz_commands("System abortTransaction", "SystemRepository fullBackupCompressedTo: '#{extent_backup_filename_for_today}'")
-
-    # Transform is to remove the leading directory name
-    log_sh "tar --transform='s,.*/,,' -zcf #{backup_filename_for_today} #{extent_backup_filename_for_today} #{data_directory}/tranlog/tranlog#{tranlog_number}.dbf"
+    tranlog_number = Stone.tranlog_number_from(result.last)
+    fail "Could not start a new tranlog" if tranlog_number == -1
+    run_topaz_commands("System abortTransaction", "SystemRepository fullBackupCompressedTo: '#{backup_filename_prefix_for_today}'")
   end
 
   def restore_latest_full_backup
@@ -123,12 +124,24 @@ class Stone
 
   def restore_full_backup(stone_name, for_date=Date.today)
     recreate!
+    run_topaz_commands("System abortTransaction. SystemRepository restoreFromBackup: '#{backup_filename(stone_name, for_date)}'")
+    run_topaz_commands("SystemRepository commitRestore")
+  end
 
-    log_sh "tar -C '#{backup_directory}' -zxf '#{backup_filename(stone_name, for_date)}'"
-    log_sh "cp #{backup_directory}/tranlog*.dbf #{data_directory}/tranlog/"
-    run_topaz_command("System commitTransaction. SystemRepository restoreFromBackup: '#{extent_backup_filename(stone_name, for_date)}'")
-    run_topaz_command("SystemRepository restoreFromCurrentLogs")
-    run_topaz_command("SystemRepository commitRestore")
+  def backup_filename_for_today
+    backup_filename(name, Date.today)
+  end
+
+  def backup_filename_prefix_for_today
+    backup_filename_prefix(name, Date.today)
+  end
+
+  def backup_filename(for_stone_name, for_date)
+    "#{backup_filename_prefix(for_stone_name, for_date)}.gz"
+  end
+
+  def backup_filename_prefix(for_stone_name, for_date)
+    "#{backup_directory}/#{for_stone_name}_#{for_date.strftime('%F')}.full"
   end
 
   def input_file(topaz_script_filename, login_first=true)
@@ -181,26 +194,6 @@ class Stone
     @gemstone_installation.installation_directory
   end
 
-  def backup_filename_for_today
-    backup_filename(name, Date.today)
-  end
-
-  def extent_backup_filename_for_today
-    extent_backup_filename(name, Date.today)
-  end
-
-  def extent_backup_filename(for_stone_name, for_date)
-    "#{backup_filename_prefix(for_stone_name, for_date)}.full.gz"
-  end
-
-  def backup_filename(for_stone_name, for_date)
-    "#{backup_filename_prefix(for_stone_name, for_date)}.bak.tgz"
-  end
-
-  def backup_filename_prefix(for_stone_name, for_date)
-    "#{backup_directory}/#{for_stone_name}_#{for_date.strftime('%F')}"
-  end
-
   def run_topaz_command(command)
     run_topaz_commands(command)
   end
@@ -244,7 +237,7 @@ class Stone
     Topaz.new(self).commands(commands)
   end
 
-  private
+  private 
 
   def log_command_line(command_line)
     File.open(command_logfile, "a") { |file| file.puts "SHELL_CMD #{Date.today.strftime('%F %T')}: #{command_line}" }

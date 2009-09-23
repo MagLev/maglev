@@ -5,7 +5,7 @@ such as creating/starting/stopping stones, netldi, running topaz, etc.
 
 Run them with 'ruby' not 'maglev-ruby', e.g. 
     ruby topaz_test_case.rb     # should pass
-    ruby stone_test_case.rb     # currently fails two backup tests
+    ruby stone_test_case.rb     # should pass
 
 They depend on the 'flexmock' gem.
 
