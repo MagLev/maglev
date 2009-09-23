@@ -1004,12 +1004,12 @@ class RubyLexer
           if eq_code.equal?( 0 )  # src.scan(/\.\.\./) then
             src.advance(3)
             @lex_state = Expr_beg
-            @yacc_value = :"..."
+            @yacc_value = RpNameToken.new( :"..." , tok_start_offset )
             return :tDOT3
           elsif eq_code.equal?( 1 )  #  src.scan(/\.\./) then
             src.advance(2)
             @lex_state = Expr_beg
-            @yacc_value = :".."
+            @yacc_value = RpNameToken.new( :".." , tok_start_offset )
             return :tDOT2
           elsif src.scan(/\.\d/) then
             rb_compile_error "no .<digit> floating literal anymore put 0 before dot"
