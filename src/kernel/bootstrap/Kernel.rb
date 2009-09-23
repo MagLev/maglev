@@ -45,8 +45,6 @@ module Kernel
   primitive_nobridge 'autoload', 'rubyKernelAutoload:file:'
   primitive_nobridge 'autoload?', 'rubyKernelAutoloadFileFor:'
 
-  primitive_nobridge 'at_exit&', 'atExit:'
-
   # binding defined in Kernel2.rb
 
   primitive_nobridge '_last_dnu_protection', '_lastDnuProtection'
@@ -436,6 +434,25 @@ module Kernel
   end
 
   # def rand #  implemented in Kernel2.rb
+
+  def readline(sep=$/)
+    res = self.gets(sep)
+    if res.equal?(nil)
+      raise EOFError
+    end
+    res
+  end
+
+  def readlines(sep=$/)
+    res = []
+    line = self.gets(sep)
+    while line._not_equal?(nil)
+      res << line
+      line = self.gets(sep)
+    end
+    res
+  end
+ 
 
   def raise(ex_class, message)
     ex = ex_class.exception(message)
