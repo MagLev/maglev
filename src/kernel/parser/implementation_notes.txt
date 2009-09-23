@@ -141,3 +141,20 @@ Lexing of double quoted strings (Maglev Trac 580)
   to parse simple double quoted string containing space, tab, alpha or digit chars
   and otherwise use the tSTRING_BEG   path for complex string lexing
 
+22 September 2009
+  Infinite loop after parse error 'class definition in method body'
+    For this source code
+       class A
+         eval "class B; end"
+         def c
+           class C; end
+         end
+       end
+  after the call to yyerror to report the error 'class definition in method body',
+  Maglev parser reports 'class definition in method body'
+  for each subequent line in the source and then
+  goes into an infinite loop handling the EOF  token.
+  In ruby_parser.y , for  production 'kCLASS cpath superclass'
+  changed the yyerror call just   raise SyntaxError
+  and terminate the parsing.
+
