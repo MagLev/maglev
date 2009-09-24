@@ -1,0 +1,18 @@
+task :default => :setup
+
+desc "Do the setup necessary to install and run the demo"
+task :setup => :install_gems, :commit_mdb
+
+desc "Install necessary RubyGems into MagLev"
+task :install_gems do
+  puts "-- Installing rack and sinatra gems into MagLev"
+  sh %{ maglev-gem install rack sinatra }
+end
+
+desc "Commit MaglevDB server code into repository"
+task :commit_mdb do
+  puts "-- Committing MaglevDB code into repository"
+  cd 'mdb' do
+    sh 'rake commit'
+  end
+end

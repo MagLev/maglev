@@ -22,4 +22,18 @@ module MDB::Test
   def db_name(suffix)
     key = MDB::Test::TEST_DB_PREFIX + suffix
   end
+
 end
+
+#unless defined? ViewClass and ViewClass.maglev_persistable?
+STDERR.puts "== Committing the ViewClass"
+Maglev.abort_transaction
+Maglev.persistent do
+  class ViewClass
+    def self.view_42
+      42
+    end
+  end
+end
+Maglev.commit_transaction
+#end

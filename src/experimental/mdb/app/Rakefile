@@ -1,0 +1,22 @@
+task :default => :'app:run'
+
+ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
+
+# These tasks control the Sinatra application
+namespace :app do
+  desc "Run the client Sinatra app. Assumes rackup is in your path"
+  task :run do
+    #
+    sh %{ rackup client.ru }
+  end
+end
+
+# These tasks are used to manage the application's data in MDB; similar to
+# Rails migrations.
+namespace :mdb do
+  # Or, should this be mdb:create[post.rb] ?
+  desc "Create the databases on the MDB server."
+  task :create do
+    sh %{ maglev-ruby -Ilib migrations.rb }
+  end
+end

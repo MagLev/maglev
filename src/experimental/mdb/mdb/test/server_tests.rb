@@ -21,16 +21,23 @@ describe "MDB::Server class side" do
   it "raises DatabaseExists when creating a pre-existent db" do
     key = MDB::Test.db_name "X"
     MDB::Server[key].must_be_nil
-    MDB::Server.create(key)
+    MDB::Server.create(key, ViewClass)
     MDB::Server[key].wont_be_nil
-    proc { MDB::Server.create(key) }.must_raise MDB::Server::DatabaseExists
+    proc { MDB::Server.create(key, ViewClass) }.must_raise MDB::Server::DatabaseExists
+  end
+
+  it "key? returns true iff there is a db of that name" do
+    key = MDB::Test.db_name "X"
+    MDB::Server.key?(key).must_equal false
+    MDB::Server.create(key, ViewClass)
+    MDB::Server.key?(key).must_equal true
   end
 
   it "creates, deletes and accesses databases" do
     key = MDB::Test.db_name "a_db"
     MDB::Server[key].must_be_nil
 
-    MDB::Server.create(key)
+    MDB::Server.create(key, ViewClass)
     MDB::Server[key].wont_be_nil
 
     MDB::Server.delete(key)
@@ -42,7 +49,7 @@ describe "MDB::Server class side" do
     db_names = %w(foo bar quux)
     db_names.each do |name|
       full_name = (MDB::Test.db_name name).to_sym
-      MDB::Server.create(full_name)
+      MDB::Server.create(full_name, ViewClass)
       full_name.must_include MDB::Server.db_names
     end
   end

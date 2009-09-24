@@ -1,0 +1,53 @@
+= MaglevDB (MDB)
+
+This directory contains some experimental code to wrap MagLev as a Nosql
+Server (MagLevDB, AKA MDB).
+
+The MaglevDB code is in the +mdb+ directory, and a sample Sinatra
+application that connects to MaglevDB is in the +app+ directory.
+
+== Quick Start:
+
+Install prerequisites and load MDB server:
+
+    $ cd $MAGLEV_HOME/src/experimental/mdb
+    $ rake setup
+
+Run MDB server:
+
+    $ cd $MAGLEV_HOME/src/experimental/mdb/mdb
+    $ rake mdb:start  # Starts server...^C to stop it
+
+Setup client app, in a new shell:
+
+    $ cd $MAGLEV_HOME/src/experimental/mdb/app
+    $ rake mdb:create
+    $ rake app:run    # Starts client app...^C to stop it
+
+Hit http://localhost:3333/
+
+At this point, the client application is running on port 3333, and the
+MaglevDB server is running on port 4567.
+
+== Details
+
+=== Prerequisites
+
+1. MagLev must be installed and the <tt>$MAGLEV_HOME</tt> environment
+   variable must be correctly set.
+
+2> To install the required RubyGems and load the MDB server, do:
+
+    $ cd $MAGLEV_HOME/src/experimental/mdb
+    $ rake setup
+
+The +setup+ Rake task will ensure the following RubyGems are installed into
+your MagLev distribution:
+
+1. Rack
+2. Sinatra
+
+It will then load commit the MaglevDB server code into the MagLev
+repository.
+
+  NOT DONE YET

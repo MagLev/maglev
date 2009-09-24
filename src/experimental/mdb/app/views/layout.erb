@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title><%= @title %></title>
+    <meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="/style.css" media="all" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1><%= @title %></h1>
+      </div>
+      <div id="navigation">
+        <%= @nav_bar %>
+      </div>
+      <div id="content">
+        <div class="left">
+          <%= yield %>
+          <% if @debug %>
+          <div><%= @debug %></div>
+          <% end %>
+        </div>
+        <div class="right">
+          <% if @show_tags %>
+          <h4>Tags</h4>
+          <ul>
+            <% Tag.all.each do |tag| %>
+            <li><a href="/tag/<%= tag.__id__ %>"><%= tag.name %></a></li>
+            <% end %>
+          </ul>
+          <% end %>
+          <h4>Debug Links</h4>
+          <ul>
+            <li>The <a href="/objectlog/">Object Log</a> is a work in
+              progress.  It is a mini-inspector for the MagLev object log.
+              You will need to put items into the object log yourself</li>
+            <li>A <a href="/debug">debug</a> link, which may or may not
+            work...</li>
+          </ul>
+
+          <h4>About</h4>
+          <p>This is a simple sinatra application running on MagLev</p>
+          <h4>Credit</h4>
+          <p>The layout is <a href="http://css4free.com/wp-content/uploads/templates/zineprint/">zineprint</a>, Designed by
+             <a href="http://rizzle.us.to">Rizzle Studios</a>.
+        </div>
+      </div>
+      <div id="footer">
+        <%= @title %> running on
+        <a href="http://maglev.gemstone.com">MagLev</a>
+      </div>
+    </div>
+  </body>
+</html>

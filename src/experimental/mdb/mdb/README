@@ -14,6 +14,19 @@ methods.
 * Databases may be indexed on attributes of the documents held in the
   database.
 
+== Overview
+
+MDB::Server provides a RESTful CRUD api to manage MDB::Databases
+instances, plus a few methods to get Server information.
+
+MDB::Database manages a collection of documents, and manages views onto those
+objects. 
+
+   posts = Database.new(Post)
+   
+   class Post
+     
+   end
 == Example
 
 
