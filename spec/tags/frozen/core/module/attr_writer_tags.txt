@@ -1,2 +1,1 @@
-fails:Module#attr_writer converts non string/symbol/fixnum names to strings using to_str
 fails:Module#attr_writer applies current visibility to methods created

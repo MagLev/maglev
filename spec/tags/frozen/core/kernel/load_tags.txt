@@ -1,2 +1,1 @@
-fails:Kernel#load is a private method
 fails:Kernel#load allows wrapping the code in the file in an anonymous module

@@ -1,2 +1,0 @@
-fails:Kernel#gsub is a private method
-fails:Kernel#gsub! is a private method
