@@ -11,13 +11,13 @@ class Trac465
     unless na == 2 ; raise 'error' ; end
     puts "testA ok"
   end
-  
+
   def testb
     a = [ 5, 6]
     b = 0
-    x = a.each { | o | 
+    x = a.each { | o |
          b += 10
-         break 45 
+         break 45
        }
     unless b == 10 ; raise 'error' ; end
     unless x == 45 ; raise 'error' ; end
@@ -54,7 +54,7 @@ class Trac465
     puts "testD ok"
   end
 end
-  
+
 o = Trac465.new
 o.testa
 o.testb
@@ -62,4 +62,13 @@ o.testc
 o.testd
 o.teste
 puts "OK"
+
+# The original test case from Markus.
+# This test case passes if it doesn't throw an Exception.
+def g
+     yield
+     end
+
+ g { break }
+
 true
