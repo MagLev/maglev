@@ -48,5 +48,10 @@ module MDB
       Maglev.commit_transaction
       document.object_id  # TODO: Oop isn't proper doc id...
     end
+
+    # Return the number of documents stored in the database
+    def size
+      @documents.size
+    end
   end
 end
