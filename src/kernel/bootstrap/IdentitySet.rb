@@ -12,6 +12,7 @@ class IdentitySet
   primitive '_addall', 'addAll:'
   primitive 'each&', 'do:'
   primitive 'length', 'size'
+  primitive 'size', 'size'
 
   primitive_nobridge 'include?', 'includes:'
 
