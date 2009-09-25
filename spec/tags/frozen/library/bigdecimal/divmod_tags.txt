@@ -1,0 +1,5 @@
+fails:BigDecimal#mod_part_of_divmod returns self modulo other
+fails:BigDecimal#mod_part_of_divmod returns a [Float value] when the argument is Float
+fails:BigDecimal#divmod divides value, returns an array
+fails:BigDecimal#divmod array contains quotient and modulus as BigDecimal
+fails:BigDecimal#divmod Can be reversed with * and +
