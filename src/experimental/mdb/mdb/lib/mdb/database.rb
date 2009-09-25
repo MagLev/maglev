@@ -33,13 +33,20 @@ module MDB
       end
     end
 
+    def get(id)
+      @object = ObjectSpace._id2ref(id)
+    end
+
     # Add the document to the persistent set of documents this database
     # manages.  If the view class responds to :document_added, then call
-    # the document_added hook in the view.
+    # the document_added hook in the view.  Returns the new document id.
     def add(document)
+      Maglev.abort_transaction
       # TODO: Need to validate that it is not already in there?
       @documents.add(document)
       @view.document_added(document) if @view.respond_to? :document_added
+      Maglev.commit_transaction
+      document.object_id  # TODO: Oop isn't proper doc id...
     end
   end
 end

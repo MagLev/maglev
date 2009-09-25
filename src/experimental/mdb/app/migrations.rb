@@ -7,11 +7,13 @@ end
 Maglev.commit_transaction
 
 # MDB::Server etc. manages its own transactions
-key = 'post'
-if MDB::Server.key? key
-  puts "Server has db named: #{key}...updating"
-  MDB::Server.update(key, Post)
-else
-  puts "Server does not have db named: #{key}...creating"
-  MDB::Server.create(key, Post)
+[['posts', Post],
+ ['tags',   Tag]].each do |key, view|
+  if MDB::Server.key? key
+    puts "Server has db named: #{key}...updating with #{view}"
+    MDB::Server.update(key, view)
+  else
+    puts "Server does not have db named: #{key}...creating with #{view}"
+    MDB::Server.create(key, view)
+  end
 end

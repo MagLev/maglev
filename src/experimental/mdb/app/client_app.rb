@@ -50,16 +50,16 @@ class BlogApp < Sinatra::Base
   end
 
   get '/posts' do
-    json = data_for('/post/recent')
+    json = data_for('/posts/view/recent')
     @posts = JSON.parse(json)
     erb :home
   end
 
-#   get '/posts/:id' do
-#     json = data_for("/posts/#{params[:id]}")
-#     @post = JSON.parse(json)
-#     erb :post
-#   end
+  get '/posts/:id' do
+    json = data_for("/posts/#{params[:id]}")
+    @post = JSON.parse(json)
+    erb :post
+  end
 
   # Display a form to create a new blog post
   get '/posts/new' do
@@ -75,17 +75,17 @@ class BlogApp < Sinatra::Base
       :text => params[:text],
       :tags => params[:tags]
     }
-    response = put_to(new_params, '/post')
+    response = put_to(new_params, '/posts')
 
     case response.status
     when 200..299
-      json = response.content
-      post = JSON.parse json
-      redirect "/posts/#{post["id"]}"  # need to add Mash...
+      id = JSON.parse response.content
+      redirect "/posts/#{id}"
     when 300..399
       halt 404, "Can't redirect to server:  Server response #{response.status}"
     else
-      halt response.status, "Server response #{response.status}"
+      halt response.status,
+           "MDB Server: #{response.status}: #{response.content}"
     end
   end
 
@@ -98,21 +98,24 @@ class BlogApp < Sinatra::Base
   SERVER = HTTPClient.new
 
   def data_for(path)
+    url = SERVER_URI + path
     begin
-      SERVER.get_content(SERVER_URI + path)
+      SERVER.get_content(url)
     rescue HTTPClient::BadResponseError => bre
-      halt 404, "get_content: Error doing GET from database: #{bre.res.content}"
+      halt 404, "get_content: MDB Error for 'GET #{url}': #{bre.res.content}"
     end
   end
 
   def put_to(data, path)
+    url = SERVER_URI + path
     begin
-      SERVER.put(SERVER_URI + path, data)
+      SERVER.put(url)
     rescue HTTPClient::BadResponseError => bre
-      halt 404, "put_to: Error doing PUT to database: #{bre.res.content}"
+      halt 404, "put_to: MDB Error for 'PUT #{url}': #{bre.res.content}"
+    rescue Exception => e
+      halt 404, "put_to: MDB Error for 'PUT #{url}': #{e.inspect}"
     end
   end
-
 end
 
 BlogApp.run!   :host  => 'localhost', :port => 3333
