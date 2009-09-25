@@ -1,7 +1,7 @@
 = Sample MDB Client Application
 
 This directory contains a simple Sinatra Blog application written to use
-MagLev DB as the backend database.
+MagLevDB as the backend database.
 
 == Running
 

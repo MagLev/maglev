@@ -14,13 +14,86 @@ require 'httpclient'
 # Listens on port 3333
 # Contacts MDB on port 4567
 #
+#
+=begin
+
+    |------+------------+-----------------------+----------|
+    | Verb | Route      | Action                | View     |
+    |------+------------+-----------------------+----------|
+    | GET  | /          | redirect              | N/A      |
+    | GET  | /posts     | List recent posts     | :index   |
+    | GET  | /posts/new | Show new post form    | :newpost |
+    | POST | /posts     | Create post from data | :show    |
+    | GET  | /posts/:id | Show post with id     | :show    |
+    | PUT  | /posts/:id | Update post from data | :show    |
+    |------+------------+-----------------------+----------|
+
+=end
+
 class BlogApp < Sinatra::Base
   set :app_file, File.dirname(__FILE__)
   set :static, true
 
-#  require '../sinatra/log_headers.rb'
-#  use LogHeaders
+  def initialize(*args)
+    super
+    @title = "MRI Blog Using MagLevDB"
+    @nav_bar =  <<-EOS
+        <ul class="menu">
+          <li><a href="/">Home</a></li>
+          <li><a href="/posts/new">New Post</a></li>
+        </ul>
+    EOS
+  end
 
+  get '/' do
+    redirect '/posts'
+  end
+
+  get '/posts' do
+    json = data_for('/post/recent')
+    @posts = JSON.parse(json)
+    erb :home
+  end
+
+#   get '/posts/:id' do
+#     json = data_for("/posts/#{params[:id]}")
+#     @post = JSON.parse(json)
+#     erb :post
+#   end
+
+  # Display a form to create a new blog post
+  get '/posts/new' do
+    erb :newpost
+  end
+
+  # Create a new blog post
+  # Submitting a /posts/new form goes here.
+  # On success, redirects to show
+  post '/post' do
+    new_params = {
+      :title => params[:title],
+      :text => params[:text],
+      :tags => params[:tags]
+    }
+    response = put_to(new_params, '/post')
+
+    case response.status
+    when 200..299
+      json = response.content
+      post = JSON.parse json
+      redirect "/posts/#{post["id"]}"  # need to add Mash...
+    when 300..399
+      halt 404, "Can't redirect to server:  Server response #{response.status}"
+    else
+      halt response.status, "Server response #{response.status}"
+    end
+  end
+
+  #############################################
+  # MDB Communications
+  #############################################
+  # TODO: Need to move all of this detailed management of connection to MDB
+  # into an MDBClient class.
   SERVER_URI = 'http://localhost:4567'
   SERVER = HTTPClient.new
 
@@ -40,54 +113,6 @@ class BlogApp < Sinatra::Base
     end
   end
 
-  def initialize(*args)
-    super
-    @title = "MRI Blog Using MagLev DB"
-    @nav_bar =  <<-EOS
-        <ul class="menu">
-          <li><a href="/">Home</a></li>
-          <li><a href="/new/post">New Post</a></li>
-        </ul>
-    EOS
-  end
-
-  get '/' do
-    json = data_for('/post/recent')
-    @posts = JSON.parse(json)
-    erb :home
-  end
-
-#   get '/post/:id' do
-#     json = data_for("/post/#{params[:id]}")
-#     @post = JSON.parse(json)
-#     erb :post
-#   end
-
-#   # Display a form to create a new blog post
-#   get '/new/post' do
-#     erb :newpost
-#   end
-
-#   # Submitting a /new/post form goes here.
-#   post '/post' do
-#     new_params = {
-#       :title => params[:title],
-#       :text => params[:text],
-#       :tags => params[:tags]
-#     }
-#     response = put_to(new_params, '/post')
-
-#     case response.status
-#     when 200..299
-#       json = response.content
-#       post = JSON.parse json
-#       redirect "/post/#{post["id"]}"  # need to add Mash...
-#     when 300..399
-#       halt 404, "Can't redirect to server:  Server response #{response.status}"
-#     else
-#       halt response.status, "Server response #{response.status}"
-#     end
-#   end
 end
 
 BlogApp.run!   :host  => 'localhost', :port => 3333

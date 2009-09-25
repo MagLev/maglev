@@ -2,6 +2,11 @@ task :default => :'app:run'
 
 ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
 
+desc "Run tests on the application model"
+task :test do
+  test_files = Dir.glob('test/*_tests.rb')
+  sh %{ maglev-ruby -Ilib -Itest #{test_files} }
+end
 # These tasks control the Sinatra application
 namespace :app do
   desc "Run the client Sinatra app. Assumes rackup is in your path"
