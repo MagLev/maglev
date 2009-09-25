@@ -1,0 +1,2 @@
+fails:Rational.new is private
+fails:Rational.new! is private

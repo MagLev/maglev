@@ -1,0 +1,3 @@
+fails:Date#strftime should be able to parse the full day name
+fails:Date#strftime should be able to parse the short day name
+fails:Date#strftime should be able to show the commercial week

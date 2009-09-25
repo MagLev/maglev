@@ -1,0 +1,1 @@
+fails:Matrix#column_vectors returns an empty Array for empty matrices

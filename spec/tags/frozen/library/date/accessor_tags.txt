@@ -1,0 +1,11 @@
+fails:Date#day_fraction should be able to determine the day fraction for a date
+fails:Date#mjd should be able to determine the Modified Julian day for a date
+fails:Date#ld should be able to determine the Modified Julian day for a date
+fails:Date#year should be able to determine the year for a date
+fails:Date#yday should be able to determine the year for a date
+fails:Date#mon should be able to determine the month for a date
+fails:Date#mday should be able to determine the day of the month for a date
+fails:Date#wday should be able to determine the week day for a date
+fails:Date#cwyear should be able to determine the commercial year for a date
+fails:Date#cweek should be able to determine the commercial week for a date
+fails:Date#cwday should be able to determine the commercial week day for a date

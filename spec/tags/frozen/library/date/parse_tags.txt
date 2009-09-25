@@ -1,0 +1,25 @@
+fails:Date#parse can parse a day name into a Date object
+fails:Date#parse with '.' separator can parse a mmm-YYYY string into a Date object
+fails:Date#parse with '.' separator can parse a 'DD mmm YYYY' string into a Date object
+fails:Date#parse with '.' separator can parse a 'mmm DD YYYY' string into a Date object
+fails:Date#parse with '.' separator can parse a 'YYYY mmm DD' string into a Date object
+fails:Date#parse with '/' separator can parse a mmm-YYYY string into a Date object
+fails:Date#parse with '/' separator can parse a 'DD mmm YYYY' string into a Date object
+fails:Date#parse with '/' separator can parse a 'mmm DD YYYY' string into a Date object
+fails:Date#parse with '/' separator can parse a 'YYYY mmm DD' string into a Date object
+fails:Date#parse with ' ' separator can parse a mmm-YYYY string into a Date object
+fails:Date#parse with ' ' separator can parse a 'DD mmm YYYY' string into a Date object
+fails:Date#parse with ' ' separator can parse a 'mmm DD YYYY' string into a Date object
+fails:Date#parse with ' ' separator can parse a 'YYYY mmm DD' string into a Date object
+fails:Date#parse with '/' separator US-style parses a YYYYMMDD string into a Date object
+fails:Date#parse with '/' separator US-style parses a MMDDYYYY string into a Date object
+fails:Date#parse with '/' separator US-style parses a MMDDYY string into a Date object
+fails:Date#parse with '/' separator US-style parses a MMDDYY string into a Date object using the year digits as 20XX
+fails:Date#parse with '.' separator US-style parses a YYYYMMDD string into a Date object
+fails:Date#parse with '.' separator US-style parses a MMDDYYYY string into a Date object
+fails:Date#parse with '.' separator US-style parses a MMDDYY string into a Date object
+fails:Date#parse with '.' separator US-style parses a MMDDYY string into a Date object using the year digits as 20XX
+fails:Date#parse with '-' separator EU-style can parse a YYYY-MM-DD string into a Date object
+fails:Date#parse with '-' separator EU-style can parse a MM-DD-YYYY string into a Date object
+fails:Date#parse with '-' separator EU-style can parse a MM-DD-YY string into a Date object
+fails:Date#parse with '-' separator EU-style can parse a MM-DD-YY string into a Date object using the year digits as 20XX
