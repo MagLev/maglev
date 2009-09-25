@@ -1,5 +1,8 @@
 require 'mdb/common.rb'
 
+# TODO: Need to review txn/locking stgy.  Are transactions per thread, or
+# do we need to lock the db for each commit?
+
 module MDB
   # A Database is a collection of documents, plus views that can be run
   # against the documents.
@@ -21,7 +24,7 @@ module MDB
     # Called by the server if the view class is updated (e.g., methods
     # added).
     def set_view(view_class)
-      @view = view_class
+      Maglev.transaction { @view = view_class }
     end
 
     def execute_view(view_name, *params)
@@ -41,16 +44,19 @@ module MDB
     # manages.  If the view class responds to :document_added, then call
     # the document_added hook in the view.  Returns the new document id.
     def add(document)
-      Maglev.abort_transaction
-      # TODO: Need to validate that it is not already in there?
-      @documents.add(document)
-      @view.document_added(document) if @view.respond_to? :document_added
-      Maglev.commit_transaction
+      Maglev.transaction do
+        # TODO: Need to validate that it is not already in there?
+        @documents.add(document)
+        # We do the callback within the txn so that the model can
+        # persistently update data structures and commit them.
+        @view.document_added(document) if @view.respond_to? :document_added
+      end
       document.object_id  # TODO: Oop isn't proper doc id...
     end
 
     # Return the number of documents stored in the database
     def size
+      # Maglev.abort_transaction  # ???
       @documents.size
     end
   end

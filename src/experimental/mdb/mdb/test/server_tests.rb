@@ -37,6 +37,14 @@ describe 'MDB::Server class side' do
     proc { MDB::Server.create(key, ViewClass) }.must_raise MDB::Server::DatabaseExists
   end
 
+  it 'create returns the newly created db' do
+    key = MDB::Test.db_name 'X'
+    MDB::Server[key].must_be_nil
+    db = MDB::Server.create(key, ViewClass)
+    db.wont_be_nil
+    db.must_equal MDB::Server[key]
+  end
+
   it 'key? returns true iff there is a db of that name' do
     key = MDB::Test.db_name 'X'
     MDB::Server.key?(key).must_equal false

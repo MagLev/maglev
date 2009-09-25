@@ -20,6 +20,8 @@ task :test => :commit do
     puts "Test: #{t}"
     sh %{ maglev-ruby -Itest #{t} }
   end
+  puts "============ persistence tests ==============="
+  sh 'ruby test/test_persistence.rb'
 end
 
 # These tasks control the RESTful mdb_server.rb Sinatra app

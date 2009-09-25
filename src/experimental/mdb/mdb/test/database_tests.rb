@@ -39,4 +39,11 @@ describe MDB::Database do
     @db.get(id).must_equal my_document
     # TODO: need to ensure my_document is committed
   end
+
+  it 'add calls the model callback function' do
+    ViewClass.reset_count
+    ViewClass.count.must_equal 0
+    @db.add(Object.new)
+    ViewClass.count.must_equal 1
+  end
 end

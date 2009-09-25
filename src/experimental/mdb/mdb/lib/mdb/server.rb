@@ -4,6 +4,8 @@
 # away stuff a direct maglev client has loaded.  E.g., if app code loads a
 # new view class, and then tries to call Server.update within the same txn,
 # and if Server.update did an abort...
+#
+# TODO: But...we want to ensure fresh views for readers....
 
 module MDB
   class Server
@@ -37,7 +39,7 @@ module MDB
     def self.update(db_name, view_class)
       key = db_name.to_sym
       raise DatabaseNotFound.new(key) unless @proot.has_key?(key)
-      Maglev.transaction { @proot[key].set_view(view_class) }
+      @proot[key].set_view(view_class) # Database manages txn
     end
 
     # Removes the Database named +db_name+ from the Server.
@@ -59,8 +61,7 @@ module MDB
     end
 
     def self.key?(db_name)
-      key = db_name.to_sym
-      @proot.key? key
+      @proot.key? db_name.to_sym
     end
 
     private
