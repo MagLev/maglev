@@ -61,7 +61,6 @@ o.testb
 o.testc
 o.testd
 o.teste
-puts "OK"
 
 # The original test case from Markus.
 # This test case passes if it doesn't throw an Exception.
@@ -69,6 +68,7 @@ def g
      yield
      end
 
- g { break }
-
+yy = g { break 33 }
+unless yy == 33 ; raise 'error'; end
+puts "OK"
 true
