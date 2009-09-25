@@ -24,3 +24,5 @@ end
 j = JSON.new
 j.parse
 raise "FAIL" if j.count == 0
+puts "OK"
+true
