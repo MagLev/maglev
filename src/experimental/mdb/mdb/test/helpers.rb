@@ -34,6 +34,11 @@ Maglev.persistent do
       42
     end
   end
+  class ViewClass2
+    def self.view_42
+      43 # one better...
+    end
+  end
 end
 Maglev.commit_transaction
 #end
