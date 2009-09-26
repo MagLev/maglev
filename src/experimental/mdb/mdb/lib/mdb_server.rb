@@ -28,9 +28,10 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 =end
 #
 # This class will ensure that all MDB level responses have properly formed
-# JSON bodies.  The views should ensure they return just the subgraph they
-# need (or create a hash of data) so that we do not JSON-ize the entire
-# repository and send it back as a response...
+# JSON bodies, so it wraps everything in a JSON array.  The views should
+# ensure they return just the subgraph they need (or create a hash of data)
+# so that we do not JSON-ize the entire repository and send it back as a
+# response...
 class MDB::ServerApp < Sinatra::Base
 
   def initialize(*args)
@@ -40,7 +41,7 @@ class MDB::ServerApp < Sinatra::Base
 
   before do
     Maglev.abort_transaction  # refresh view of db # TODO: Is this ok?
-    content_type 'application/json'
+    content_type 'application/json'   # TODO  ; utf-8 ??
   end
 
   # This is here, rather than in the before block, since params does not
@@ -57,14 +58,14 @@ class MDB::ServerApp < Sinatra::Base
   # another server.
 
   get '/:db/:id' do
-    [get_db.get(params[:id].to_i)].to_json
+    jsonize get_db.get(params[:id].to_i)
   end
 
   # Run a view on the database.
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
   get '/:db/view/:view' do
-    get_db.execute_view(params[:view]).to_json
+    jsonize get_db.execute_view(params[:view])
   end
 
   # Create new document
@@ -74,12 +75,19 @@ class MDB::ServerApp < Sinatra::Base
   put '/:db' do
     # .string is needed since request may be a StringIO,
     # and StringIO may not be committed to the repository.
-    [get_db.add(request.body.string)].to_json
+    jsonize get_db.add(request.body.string)
   end
 
   # For testing...
   get '/:db/send/:method' do
-    [get_db.send(params[:method].to_sym)].to_json
+    jsonize get_db.send(params[:method].to_sym)
+  end
+
+  # We always wrap a response in an array, so that responses like bare
+  # strings have a container.  The client assumes all responses are JSON
+  # arrays, and will extract the first element as the content.
+  def jsonize(obj)
+    [obj].to_json
   end
 
   # Or, we could do specific handlers such as:

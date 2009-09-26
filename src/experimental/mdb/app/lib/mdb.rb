@@ -27,8 +27,17 @@ module MDB
       end
     end
 
-    def from_json(json)
-      JSON.parse json
+    def from_json(obj)
+      json = case obj
+             when HTTP::Message
+               obj.content
+             else
+               obj
+             end
+      # The MDB_SERVER app always wraps responses in an array,
+      # so we always unpack the first element to get to the real
+      # response
+      JSON.parse(json)[0]
     end
   end
 
@@ -53,15 +62,15 @@ module MDB
 
     # PUT /:db   returns docid
     def add(document)
-      db_put("/#{@db_name}", document)
+      db_put("/#{@db_name}", document.to_json)
     end
 
     def size
-      db_get("/#{@db_name}/send/size")[0]
+      db_get("/#{@db_name}/send/size")
     end
 
     def list_ids
-      db_get("/#{@db_name}/send/list_ids")[0]
+      db_get("/#{@db_name}/send/list_ids")
     end
   end
 
