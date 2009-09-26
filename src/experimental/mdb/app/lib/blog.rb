@@ -38,25 +38,21 @@ class Post
     # The JSON gem is not yet working with MagLev, so, this JSON is
     # handcrafted with Emacs, using old world techniques.
     seconds_per_day = 24 * 60 * 60
-    %Q<
-      [
-        {"title":"Blog Post the second",
-         "timestamp":"#{Time.now - (3 * seconds_per_day)}",
-         "text":"This is a really long blog post text",
-         "id":"xyzzy1",
-         "tags":["maglev"]},
-        {"title":"The first blog post",
-         "timestamp":"#{Time.now}",
-         "text":"This is a really long blog post text",
-         "id":"xyzzy",
-         "tags":["maglev", "blogs"]},
-        {"title":"Blog Post the third",
-         "timestamp":"#{Time.now - (4 * seconds_per_day)}",
-         "text":"This is a really long blog post text",
-         "id":"xyzzy2",
-         "tags":[]}
-      ]
-      >
+    [{ "title"     => "The first blog post",
+       "timestamp" => "#{Time.now}",
+       "text"      => "This is a really long blog post text",
+       "id"        => "xyzzy",
+       "tags"      => ["maglev", "blogs"]},
+     { "title"     => "Blog Post the second",
+       "timestamp" => "#{Time.now - (3 * seconds_per_day)}",
+       "text"      => "This is a really long blog post text",
+       "id"        => "xyzzy1",
+       "tags"      => ["maglev"]},
+     { "title"     => "Blog Post the third",
+       "timestamp" => "#{Time.now - (4 * seconds_per_day)}",
+       "text"      => "This is a really long blog post text",
+       "id"        => "xyzzy2",
+       "tags"      => []}]
   end
 
   #############################################

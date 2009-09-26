@@ -9,21 +9,9 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.
 #
-# == Database management
+# TODO: change doctype to json
 #
-# GET /mdb         : List the databases in MDB
-# PUT /mdb         : Not supported. (should replace all the dbs with a new set)
-# POST /mdb        : Add a new database to MDB (not supported: see PUT /mdb/:id)
-# PUT /mdb/:id     : Create a new, empty database named by id.
-# DELETE /mdb/:id  : Delete the database named by id
-#
-# == REST methods for a particular database
-#
-# GET
-# PUT
-# POST
-# DELETE
-#
+
 =begin
 
   |--------+-----------------+-----------------------------+--------------------|
@@ -50,23 +38,32 @@ class MDB::ServerApp < Sinatra::Base
     @server = MDB::Server
   end
 
+  before do
+    content_type 'application/json'
+  end
+
+  # This is here, rather than in the before block, since params does not
+  # have the path info split out until after the before block is run.
+  # Furthermore, not all paths will need the db.
+  def get_db
+    db = @server[params[:db]]
+    halt 404, "No such Database: #{params[:db]}" if db.nil?
+    db
+  end
+
   # May need to wrap all of these in transactions.  At least need to abort
   # before handling most requests, since the DB may be updated from Rake or
   # another server.
 
   get '/:db/:id' do
-    db = @server[params[:db]]
-    halt 404, "No such Database: #{params[:db]}" if db.nil?
-    db.get(params[:id].to_i).to_json
+    [get_db.get(params[:id].to_i)].to_json
   end
 
   # Run a view on the database.
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
   get '/:db/view/:view' do
-    db = @server[params[:db]]
-    halt 404, "No such Database: #{params[:db]}" if db.nil?
-    db.execute_view(params[:view])
+    get_db.execute_view(params[:view]).to_json
   end
 
   # Create new document
@@ -74,17 +71,9 @@ class MDB::ServerApp < Sinatra::Base
   # The database will add the object to its collection, and then
   # call the model added(new_object) hook.
   put '/:db' do
-    db = @server[params[:db]]
-    halt 404, "No such Database: #{params[:db]}" if db.nil?
-
-    begin
-      # .string is needed since request may be a StringIO,
-      # and StringIO may not be committed to the repository.
-      id = db.add(request.body.string)
-      [id].to_json
-    rescue Exception => e
-      halt 500, "Error: #{e}"
-    end
+    # .string is needed since request may be a StringIO,
+    # and StringIO may not be committed to the repository.
+    [get_db.add(request.body.string)].to_json
   end
 
   # Or, we could do specific handlers such as:
