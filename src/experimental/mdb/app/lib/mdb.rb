@@ -26,7 +26,6 @@ module MDB
   end
 
   class RESTDatabase < REST
-    include REST
     def initialize(url, db_name)
       @url = url
       @db_name = db_name

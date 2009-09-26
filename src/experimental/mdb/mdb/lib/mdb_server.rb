@@ -39,6 +39,7 @@ class MDB::ServerApp < Sinatra::Base
   end
 
   before do
+    Maglev.abort_transaction  # refresh view of db # TODO: Is this ok?
     content_type 'application/json'
   end
 

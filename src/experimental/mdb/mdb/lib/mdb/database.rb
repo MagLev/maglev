@@ -55,9 +55,18 @@ module MDB
     end
 
     # Return the number of documents stored in the database
-    def size
-      # Maglev.abort_transaction  # ???
-      @documents.size
+    def size;  @documents.size  end
+
+    #############################################
+    # DEBUG METHODS:
+    # TODO: remove debug methods
+    #############################################
+    def list_ids
+      # IdentitySet.map isn't working right now...
+      ids = []
+      @documents.each { |d| ids << d.object_id }
+      ids
     end
+    def clear;  @documents.clear  end
   end
 end
