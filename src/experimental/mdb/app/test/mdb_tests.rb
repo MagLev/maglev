@@ -3,7 +3,7 @@
 require 'rubygems'
 require 'minitest/spec'
 require 'mdb'
-require 'mdb_fixtures'
+require 'app_model'
 
 MiniTest::Unit.autorun
 
@@ -11,6 +11,7 @@ DB_NAME = 'rest_database_tests'
 
 describe MDB::RESTDatabase do
   before do
+    @db = MDB::RESTDatabase.new('http://localhost:4567', DB_NAME)
   end
 
   it 'starts off empty' do

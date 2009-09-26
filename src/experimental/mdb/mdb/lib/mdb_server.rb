@@ -77,6 +77,11 @@ class MDB::ServerApp < Sinatra::Base
     [get_db.add(request.body.string)].to_json
   end
 
+  # For testing...
+  get '/:db/send/:method' do
+    [get_db.send(params[:method].to_sym)].to_json
+  end
+
   # Or, we could do specific handlers such as:
   #    error MDB::DatabaseNotFound do
   #       # ...something specific for db not found errors

@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'json'
+
 module MDB
   # Manages the REST communication to MDB
   class REST
@@ -10,7 +13,7 @@ module MDB
 
     def db_get(path)
       begin
-        SERVER.get_content(@url + path)
+        from_json @server.get_content(@url + path)
       rescue HTTPClient::BadResponseError => bre
         halt 404, "get_content: Error doing GET from database: #{bre.res.content}"
       end
@@ -18,16 +21,20 @@ module MDB
 
     def db_put(path, data)
       begin
-        SERVER.put(@url + path, data)
+        from_json @server.put(@url + path, data)
       rescue HTTPClient::BadResponseError => bre
         halt 404, "put_to: Error doing PUT to database: #{bre.res.content}"
       end
+    end
+
+    def from_json(json)
+      JSON.parse json
     end
   end
 
   class RESTDatabase < REST
     def initialize(url, db_name)
-      @url = url
+      super(url)
       @db_name = db_name
     end
 
@@ -48,6 +55,14 @@ module MDB
     def add(document)
       db_put("/#{@db_name}", document)
     end
+
+    def size
+      db_get("/#{@db_name}/send/size")[0]
+    end
+
+    def list_ids
+      db_get("/#{@db_name}/send/list_ids")[0]
+    end
   end
 
   class RESTServer < REST
@@ -55,7 +70,7 @@ module MDB
     # Initialize a +RESTServer+ that will communicate with the remote
     # MDB::Server object over +url+.
     def initialize(url)
-      @url = url
+      super(url)
     end
 
     def create(db_name, view_class)
