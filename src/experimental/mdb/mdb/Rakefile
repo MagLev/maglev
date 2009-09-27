@@ -16,12 +16,19 @@ end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
 task :test => :commit do
-  Dir.glob("test/*_tests.rb") do |t|
-    puts "Test: #{t}"
-    sh %{ maglev-ruby -Itest #{t} }
-  end
+  # Some of the tests must currently run in MRI (because HTTPClient isn't
+  # working yet in Maglev.  And the rest need to be run in MagLev, so we
+  # explicitly order them etc.
+  puts "============ mdb_server tests  ==============="
+  sh 'ruby test/mdb_server_tests.rb'
+
   puts "============ persistence tests ==============="
   sh 'ruby test/test_persistence.rb'
+
+#   Dir.glob("test/*_tests.rb") do |t|
+#     puts "Test: #{t}"
+#     sh %{ maglev-ruby -Itest #{t} }
+#   end
 end
 
 # These tasks control the RESTful mdb_server.rb Sinatra app
@@ -37,4 +44,3 @@ namespace :mdb do
   end
 
 end
-

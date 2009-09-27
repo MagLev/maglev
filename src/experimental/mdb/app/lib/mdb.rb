@@ -11,20 +11,20 @@ module MDB
       @server = HTTPClient.new
     end
 
-    def db_get(path)
-      begin
-        from_json @server.get_content(@url + path)
-      rescue HTTPClient::BadResponseError => bre
-        halt 404, "get_content: Error doing GET from database: #{bre.res.content}"
-      end
+    def mdb_delete(db)
+      rest_op :delete, db
     end
 
-    def db_put(path, data)
-      begin
-        from_json @server.put(@url + path, data)
-      rescue HTTPClient::BadResponseError => bre
-        halt 404, "put_to: Error doing PUT to database: #{bre.res.content}"
-      end
+    def mdb_get(path)
+      rest_op :get, path
+    end
+
+    def mdb_put(path, data)
+      rest_op :put, path, data
+    end
+
+    def mdb_post(path, data)
+      rest_op :post, path, data
     end
 
     def from_json(obj)
@@ -39,6 +39,24 @@ module MDB
       # response
       JSON.parse(json)[0]
     end
+
+    def rest_op(op, path, data = nil)
+      begin
+        url = @url + path
+        from_json case op
+                  when :get
+                    @server.get_content url
+                  when :put
+                    @server.put url
+                  when :delete
+                    @server.delete url
+                  when :post
+                    @server.post url, data
+                  end
+      rescue HTTPClient::BadResponseError => bre
+        raise "Error doing #{op} #{path} from database: #{bre.res.content}"
+      end
+    end
   end
 
   class RESTDatabase < REST
@@ -52,25 +70,29 @@ module MDB
     #
     # GET /:db/view/:view
     def execute_view(view_name, *params)
-      db_get("/#{@db_name}/view/#{view_name}")
+      mdb_get("/#{@db_name}/view/#{view_name}")
     end
 
     # GET /:db/:id
     def get(id)
-      db_get("/#{@db_name}/#{id}")
+      mdb_get("/#{@db_name}/#{id}")
     end
 
     # PUT /:db   returns docid
     def add(document)
-      db_put("/#{@db_name}", document.to_json)
+      mdb_put("/#{@db_name}", document.to_json)
     end
 
     def size
-      db_get("/#{@db_name}/send/size")
+      mdb_get("/#{@db_name}/send/size")
     end
 
     def list_ids
-      db_get("/#{@db_name}/send/list_ids")
+      mdb_get("/#{@db_name}/send/list_ids")
+    end
+
+    def clear
+      mdb_get("/#{@db_name}/send/clear")
     end
   end
 
@@ -83,15 +105,15 @@ module MDB
     end
 
     def create(db_name, view_class)
-      raise NotImplementedError
+      mdb_post("/#{db_name}", ["view_class", view_class.name])
     end
 
     def update(db_name, view_class)
-      raise NotImplementedError
+
     end
 
     def delete(db_name)
-      raise NotImplementedError
+      mdb_delete("/#{db_name}")
     end
 
     def [](db_name)

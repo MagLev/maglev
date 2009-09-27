@@ -57,7 +57,11 @@ module MDB
 
     # Returns an array of the db names
     def self.db_names
-      @proot.keys
+      # TODO: This is throwing an exception right now...
+      # @proot.keys.inspect
+      result = []
+      @proot.each { |k,v| result << k }
+      result
     end
 
     def self.key?(db_name)

@@ -6,6 +6,14 @@ require 'json'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
+# Exception.install_debug_block do |e|
+#   puts "--- #{e} #{e.class}"
+#   case e
+#   when RuntimeError
+#     nil.pause if e.message =~ /Illegal creation of a Symbol/
+#   end
+# end
+
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.
 #
@@ -57,6 +65,18 @@ class MDB::ServerApp < Sinatra::Base
   # before handling most requests, since the DB may be updated from Rake or
   # another server.
 
+  get '/databases' do
+    # TODO: Currently raises: error , Illegal creation of a Symbol, when
+    # trying to JSONize symbols, so convert to string first until Trac 616
+    # is fixed.
+    jsonize @server.db_names.map { |name| name.to_s }
+  end
+
+  # Query if db exists
+  get '/databases/exists/:db' do
+    jsonize @server.key? params[:db]
+  end
+
   get '/:db/:id' do
     jsonize get_db.get(params[:id].to_i)
   end
@@ -78,6 +98,11 @@ class MDB::ServerApp < Sinatra::Base
     jsonize get_db.add(request.body.string)
   end
 
+  # Create a new database
+  post '/:db' do
+    jsonize @server.create(params[:db], params[:view_class])
+  end
+
   # For testing...
   get '/:db/send/:method' do
     jsonize get_db.send(params[:method].to_sym)
@@ -87,7 +112,7 @@ class MDB::ServerApp < Sinatra::Base
   # strings have a container.  The client assumes all responses are JSON
   # arrays, and will extract the first element as the content.
   def jsonize(obj)
-    [obj].to_json
+    JSON.generate [obj]
   end
 
   # Or, we could do specific handlers such as:
