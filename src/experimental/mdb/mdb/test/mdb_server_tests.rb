@@ -24,9 +24,7 @@ def handle_response(resp)
          else
            raise "get helper: Unknown type: #{resp.inspect}"
          end
-  x = JSON.parse(json)[0]
-  puts "=== JSON: #{json.inspect}  x: #{x.inspect}"
-  x
+  JSON.parse(json)[0]
 end
 
 describe 'Sinatra mdb_server: Server requests' do
@@ -38,16 +36,18 @@ describe 'Sinatra mdb_server: Server requests' do
     r.class.must_equal Array
   end
 
-  it 'responds to GET /databases/exists/:db appropriately' do
-    r = get '/databases'
-    r.each do |name|
-      r = get "/databases/exists/#{name}"
-      r.must_equal true
-    end
-  end
+# TODO: Blocked on Trac 616
+#   it 'responds to GET /databases/exists/:db appropriately' do
+#     r = get '/databases'
+#     r.each do |name|
+#       r = get "/databases/exists/#{name}"
+#       r.must_equal true
+#     end
+#   end
 
-  it 'responds to POST "/dbname" by creating a new database' do
-    r = post '/new_db'
-  end
+#   it 'responds to POST "/dbname" by creating a new database' do
+#     r = post '/new_db'
+#   end
+
 end
 

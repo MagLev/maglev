@@ -19,6 +19,11 @@ task :test => :commit do
   # Some of the tests must currently run in MRI (because HTTPClient isn't
   # working yet in Maglev.  And the rest need to be run in MagLev, so we
   # explicitly order them etc.
+  puts "============ mdb tests  ==============="
+  ['database_tests.rb', 'server_tests.rb'].each do |test|
+    sh %{ maglev-ruby -Itest test/#{test} }
+  end
+
   puts "============ mdb_server tests  ==============="
   sh 'ruby test/mdb_server_tests.rb'
 
