@@ -2,7 +2,6 @@ require 'rubygems'
 require 'sinatra'
 require 'iconv'
 require 'json'
-# require 'fake_json'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
