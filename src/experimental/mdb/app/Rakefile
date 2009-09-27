@@ -4,8 +4,9 @@ ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
 
 desc "Run tests on the application model"
 task :test => :test_fixtures do
-  test_files = Dir.glob('test/*_tests.rb')
-  sh %{ ruby -Ilib -Itest #{test_files} }
+  Dir.glob('test/*_tests.rb').each do |file|
+    sh %{ ruby -Ilib -Itest #{file} }
+  end
 end
 
 # Commit the test fixture model code needed by tests into the Maglev server
