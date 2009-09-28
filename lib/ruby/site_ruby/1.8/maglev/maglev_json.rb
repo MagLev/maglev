@@ -8,10 +8,13 @@ require 'iconv'
 require 'json'
 
 class Boolean
-  alias to_json to_s
+  def to_json(*a)
+    self.to_s
+  end
 end
+
 class Symbol
-  def to_json
+  def to_json(*a)
     "\"#{self}\""
   end
 end
