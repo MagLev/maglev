@@ -3,7 +3,7 @@ task :default => :commit
 #MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby -MnoRlwrap"
 MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby"
 
-ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
+ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib -d'   # Get rid of -d etc.
 
 # desc "Commit the MDB Server code to the repository."
 # task :commit, :force do |t,args|

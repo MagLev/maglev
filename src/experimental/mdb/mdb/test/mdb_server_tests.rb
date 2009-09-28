@@ -36,14 +36,13 @@ describe 'Sinatra mdb_server: Server requests' do
     r.class.must_equal Array
   end
 
-# TODO: Blocked on Trac 616
-#   it 'responds to GET /databases/exists/:db appropriately' do
-#     r = get '/databases'
-#     r.each do |name|
-#       r = get "/databases/exists/#{name}"
-#       r.must_equal true
-#     end
-#   end
+  it 'responds to GET /databases/exists/:db appropriately' do
+    r = get '/databases'
+    r.each do |name|
+      r = get "/databases/exists/#{name}"
+      r.must_equal "true"  # TODO: Trac 616: JSON broken, true -> "true"
+    end
+  end
 
 #   it 'responds to POST "/dbname" by creating a new database' do
 #     r = post '/new_db'

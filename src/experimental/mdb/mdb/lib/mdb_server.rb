@@ -15,10 +15,6 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.
-#
-# TODO: change doctype to json
-#
-
 =begin
 
   |--------+-----------------+-----------------------------+--------------------|
