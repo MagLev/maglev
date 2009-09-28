@@ -9,6 +9,13 @@ require 'maglev/maglev_json'
 require 'rack'
 
 require 'mdb_server'
+#require 'app_model.rb'  # For the view class # TODO: just move in here?
+
+class FixtureView
+  def view_53
+    53
+  end
+end
 
 MiniTest::Unit.autorun
 
@@ -16,10 +23,10 @@ Exception.install_debug_block do |e|
   case e
   when ArgumentError
     nil.pause
+  when NoMethodError
+    nil.pause if e.message =~ /merge/
   end
 end
-
-DB_NAME = 'mdb_server_tests_db'
 
 def get(path)
   @response = @request.get(path)
@@ -27,22 +34,26 @@ def get(path)
 end
 
 def post(path, data=nil)
-  @response = @request.post(path, data.to_json)
+  @response = @request.post(path, data)
   handle_response
 end
 
 def handle_response
-#   json = case @response
-#          when HTTP::Message
-#            resp.content
-#          else
-#            raise "get helper: Unknown type: #{resp.inspect}"
-#          end
   JSON.parse(@response.body)[0]
 end
 
-describe 'Sinatra mdb_server: Server requests' do
+
+DB_NAME   = 'mdb_server_tests_db'  # Will be created fresh in before()
+DB_NAME_2 = 'mdb_server_tests_db2' # Will be deleted in before()
+
+describe 'MDB::ServerApp: MDB::Server requests' do
+
   before do
+    [DB_NAME, DB_NAME_2].each do |name|
+      MDB::Server.delete name if MDB::Server.key? name
+    end
+    MDB::Server.create(DB_NAME, FixtureView)
+
     @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
   end
@@ -50,6 +61,7 @@ describe 'Sinatra mdb_server: Server requests' do
   it 'responds to GET "/databases" with an array' do
     r = get '/databases'
     r.class.must_equal Array
+    DB_NAME.must_include r   # must_include is backwards...
   end
 
   it 'responds to GET /databases/exists/:db appropriately' do
@@ -60,9 +72,11 @@ describe 'Sinatra mdb_server: Server requests' do
     end
   end
 
-#   it 'responds to POST "/dbname" by creating a new database' do
-#     r = post '/new_db'
-#   end
+  it 'responds to POST "/:db" and GET "/:db" correctly' do
+    r = post "/#{DB_NAME_2}", { :view_class => :FixtureView }
+    get("/databases/exists/#{DB_NAME_2}").must_equal true
 
+  end
 end
+
 

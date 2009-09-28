@@ -18,16 +18,28 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 # manage the data stored in MDB.
 =begin
 
-  |--------+-----------------+-----------------------------+--------------------|
-  | Verb   | Route           | Action                      | View               |
-  |--------+-----------------+-----------------------------+--------------------|
-  | GET    | /:db/view/:name | Run the view                | data from view     |
-  |        |                 |                             |                    |
-  | GET    | /:db/:id        | Get object :id from :db     | the object as json |
-  | PUT    | /:db/:id        | Update object :id  into :db | status             |
-  | POST   | /:db            | Database.create             | new id comes back  |
-  | DELETE | /:db/:id        | Delete object :id from :db  | status             |
-  |--------+-----------------+-----------------------------+--------------------|
+These requests correspond to methods on MDB::Server
+
+  |------+-----------------------+----------------------------+-------------------|
+  | Verb | Route                 | Action                     | View              |
+  |------+-----------------------+----------------------------+-------------------|
+  | GET  | /databases            | List the current databases | Array of strings  |
+  | GET  | /databases/exists/:db | Test if db exists          | boolean           |
+  | POST | /:db                  | Database.create            | new id comes back |
+  |------+-----------------------+----------------------------+-------------------|
+
+These requests correspond to methods on MDB::Database
+
+  |--------+-------------------+-----------------------------+--------------------|
+  | Verb   | Route             | Action                      | View               |
+  |--------+-------------------+-----------------------------+--------------------|
+  | GET    | /:db/:id          | Get object :id from :db     | the object as json |
+  | POST   | /:db/_new         | Create new document         | the object as json |
+  | PUT    | /:db/:id          | Update object :id  into :db | status             |
+  | DELETE | /:db/:id          | Delete object :id from :db  | status             |
+  | GET    | /:db/view/:name   | Run the view                | data from view     |
+  | GET    | /:db/send/:method | Send :method to ViewClass   | For testing        |
+  |--------+-------------------+-----------------------------+--------------------|
 
 =end
 #
