@@ -1,8 +1,5 @@
 task :default => :commit
 
-#MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby -MnoRlwrap"
-MAGLEV_CMD = "MAGLEV_OPTS= maglev-ruby"
-
 ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib -d'   # Get rid of -d etc.
 
 # desc "Commit the MDB Server code to the repository."
@@ -15,29 +12,30 @@ task :commit do
 end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
-task :test => :commit do
-  # Some of the tests must currently run in MRI (because HTTPClient isn't
-  # working yet in Maglev.  And the rest need to be run in MagLev, so we
-  # explicitly order them etc.
-  puts "============ mdb tests  ==============="
-  ['database_tests.rb', 'server_tests.rb'].each do |test|
-    sh %{ maglev-ruby -Itest test/#{test} }
+task :test => [:'test:mdb', :'test:mdb_server', :'test:persistence']
+
+namespace :test do
+  desc "Run the persistence tests."
+  task :persistence => :commit do
+    sh 'ruby test/test_persistence.rb'
   end
 
-  puts "============ mdb_server tests  ==============="
-  sh 'ruby test/mdb_server_tests.rb'
+  desc "Run the mdb_server tests."
+  task :mdb_server => :commit do
+    sh 'maglev-ruby test/mdb_server_tests.rb'
+  end
 
-  puts "============ persistence tests ==============="
-  sh 'ruby test/test_persistence.rb'
-
-#   Dir.glob("test/*_tests.rb") do |t|
-#     puts "Test: #{t}"
-#     sh %{ maglev-ruby -Itest #{t} }
-#   end
+  desc "Run the MDB::* tests."
+  task :mdb => :commit do
+    ['database_tests.rb', 'server_tests.rb'].each do |test|
+      sh %{ maglev-ruby -Itest test/#{test} }
+    end
+  end
 end
 
+
 # These tasks control the RESTful mdb_server.rb Sinatra app
-namespace :mdb do
+namespace :server do
   desc "Start the mdb_server app"
   task :start do
     sh %{ $MAGLEV_HOME/bin/rackup server.ru }

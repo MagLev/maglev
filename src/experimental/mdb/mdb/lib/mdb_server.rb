@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'sinatra'
-require 'iconv'
-require 'json'
+require 'maglev/maglev_json'  # TODO: workaround for Trac 616
+#require 'iconv'
+#require 'json'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
@@ -64,7 +65,8 @@ class MDB::ServerApp < Sinatra::Base
     # TODO: Currently raises: error , Illegal creation of a Symbol, when
     # trying to JSONize symbols, so convert to string first until Trac 616
     # is fixed.
-    jsonize @server.db_names.map { |name| name.to_s }
+    #jsonize @server.db_names.map { |name| name.to_s }
+    jsonize @server.db_names
   end
 
   # Query if db exists
