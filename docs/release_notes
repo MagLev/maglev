@@ -17,6 +17,16 @@ See the {Persistence API}[link:files/docs/persistence-api.html]
 * <tt>maglev-irb</tt> is not +irb+.  Eventually, <tt>maglev-irb</tt> will
   be +irb+, but not yet.
 
+=== RubyGems
+
+The json_pure gem mostly works, but does not handle Symbols, true or false
+correctly.  There is a patch in
+lib/ruby/site_ruby/1.8/maglev/maglev_json.rb to fix this.  To use it,
+replace:
+    require 'json'
+with:
+    require 'maglev/maglev_json'
+
 === Kernel
 * Note that we don't support instance variables as block arguments,
   <tt>{ |@cc| }</tt> must be coded as <tt>{ | c | @cc = c }</tt>.
