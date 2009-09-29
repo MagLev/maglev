@@ -34,7 +34,8 @@ def get(path, status=(200..299))
   # Since the real app will be running in a Rack stack with a transaction
   # wrapper around each HTTP request, in this test code, we manually wrap
   # the transactions to simulate the rack txn wrapper.
-  Maglev.transaction { @response = @request.get(path) }
+  #  Maglev.transaction { @response = @request.get(path) }
+  @response = @request.get(path)
   case status
   when Range
     s = status.include?(@response.status)

@@ -1,3 +1,4 @@
+# Used by mdb_server.rb
 class AppModel
   def view_53
     53
