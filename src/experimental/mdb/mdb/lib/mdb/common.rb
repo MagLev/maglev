@@ -10,6 +10,10 @@ module MDB
   # All MDB exceptions (that are not errors) are descendents of
   # MDB::MDBException.
   class MDBException < Exception; end
+
+  # The shared persistent counter to use for MDB.  This is used for
+  # document ids by MDB::Database.
+  SHARED_COUNTER = 128
 end
 
 module Maglev

@@ -55,21 +55,24 @@ class BlogApp < Sinatra::Base
     erb :home
   end
 
+  # Display a form to create a new blog post
+  #
+  # This route must go before /posts/:id, otherwise /posts/new matches
+  # /posts/:id and we try to find a db named 'new'
+  get '/posts/new' do
+    erb :newpost
+  end
+
   get '/posts/:id' do
     json = data_for("/posts/#{params[:id]}")
     @post = JSON.parse(json)
     erb :post
   end
 
-  # Display a form to create a new blog post
-  get '/posts/new' do
-    erb :newpost
-  end
-
   # Create a new blog post
   # Submitting a /posts/new form goes here.
   # On success, redirects to show
-  post '/post' do
+  post '/posts' do
     new_params = {
       :title => params[:title],
       :text => params[:text],

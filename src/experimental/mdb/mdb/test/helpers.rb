@@ -25,8 +25,14 @@ module MDB::Test
 
 end
 
+puts "================ $: ====="
+$:.each { |p| puts "== #{p.class}  #{p.inspect}"}
+
+puts "================ $\" ====="
+$".each { |p| puts "== #{p.class}  #{p.inspect}"}
+
 #unless defined? ViewClass and ViewClass.maglev_persistable?
-STDERR.puts "== Committing the ViewClass"
+STDERR.puts "== Committing the ViewClass : Maglev.persistent? #{Maglev.persistent?}"
 Maglev.abort_transaction
 Maglev.persistent do
   class ViewClass
@@ -34,7 +40,7 @@ Maglev.persistent do
       42
     end
 
-    def self.document_added(doc)
+    def self.document_added(id, doc)
       @count ||= 0
       @count += 1
     end

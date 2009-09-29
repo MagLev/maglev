@@ -1,16 +1,8 @@
 class Module
 
-  # NOTE: Most of the implementation of Module is in delta/Module.rb due to
-  # a bootstrapping issue: Most methods are stubbed, and as an aid to
-  # debugging, they print out a warning so we can figure out which methods
-  # really need work.  BUT, Kernel.puts requires File, which hasn't been
-  # loaded yet, so we have to wait until after bootstrap/File.rb is loaded
-  # before you can do a puts.  Since all of the stubs in module have a
-  # puts, they are temporarily there.  As they are implemented, we should
-  # pull them into here.  # comment maybe obsolete ??
+  # See also delta/Module.rb and Behavior.rb
 
   primitive_nobridge 'superclass' , '_rubySuperclass'  # resolves to impl in .mcz
-
 
   # make associations holding constants of receiver invariant
   #   does not affect inherited constants
@@ -80,7 +72,7 @@ class Module
       end
     else
       raise TypeError , 'in Module#> , argument is not a Module'
-      nil    
+      nil
     end
   end
 
@@ -123,7 +115,7 @@ class Module
   primitive_nobridge 'class_variables', 'rubyClassVarNames'
 
   primitive_nobridge '_class_var_defined', 'rubyClassVarDefined:'
-  
+
   def class_variable_defined?(name)
     unless name._isSymbol
       if name._isNumeric
@@ -136,7 +128,7 @@ class Module
 
   primitive_nobridge '_class_var_get', 'rubyClassVarGet:'
 
-  def class_variable_get(name) 
+  def class_variable_get(name)
     unless name._isSymbol
       if name._isNumeric
         raise NameError, 'illegal class variable name'
@@ -147,9 +139,9 @@ class Module
   end
 
   primitive_nobridge '_class_var_set', 'rubyClassVarSet:value:'
-  
-  def class_variable_set(name, value) 
-    unless name._isSymbol 
+
+  def class_variable_set(name, value)
+    unless name._isSymbol
       if name._isNumeric
         raise NameError, 'illegal class variable name'
       end
@@ -161,7 +153,7 @@ class Module
   primitive_nobridge '_class_var_remove', 'rubyClassVarRemove:'
 
   def remove_class_variable(name)
-    unless name._isSymbol 
+    unless name._isSymbol
       if name._isNumeric
         raise NameError, 'illegal class variable name'
       end
@@ -228,7 +220,7 @@ class Module
     if sym.equal?(nil)
       sym = str.to_sym
     end
-    self._const_set(sym, value)  
+    self._const_set(sym, value)
   end
 
   # Invoked as a callback when a reference to an undefined symbol is made.
@@ -252,7 +244,7 @@ class Module
   #  define_method   is implemented in Behavior
 
   # Invoked as a callback when a_module includes receiver.
-  # supercedes  append_features 
+  # supercedes  append_features
   def included(a_module)
   end
 
@@ -285,7 +277,7 @@ class Module
           name = Type.coerce_to(name, String, :to_str)
           name = name.to_sym
         end
-        _module_funct(name)  
+        _module_funct(name)
       }
     else
       _module_funct(true)  # enable the _module_methods_all semantics
@@ -331,20 +323,20 @@ class Module
 
   def private(*names)
     # if names empty, set default visibility for subsequent methods to private
-    #  and shutoff _module_methods_all 
+    #  and shutoff _module_methods_all
     _set_protection_methods(2, *names)
   end
 
   def public(*names)
     #  if names empty, set default visibility for subsequent methods to public
-    #  and shutoff _module_methods_all 
+    #  and shutoff _module_methods_all
     _set_protection_methods(0, *names)
   end
 
 
   def protected(*names)
     # if names empty, set default visibility for subsequent methods to protected
-    #  and shutoff _module_methods_all 
+    #  and shutoff _module_methods_all
     _set_protection_methods(1, *names)
   end
 

@@ -3,9 +3,18 @@ task :default => :'app:run'
 ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
 
 desc "Run tests on the application model"
-task :test do
-  test_files = Dir.glob('test/*_tests.rb')
-  sh %{ maglev-ruby -Ilib -Itest #{test_files} }
+task :test => :test_fixtures do
+  Dir.glob('test/*_tests.rb').each do |file|
+    sh %{ ruby -Ilib -Itest #{file} }
+  end
+end
+
+# Commit the test fixture model code needed by tests into the Maglev server
+task :test_fixtures do
+  # TODO: should probably also run ../mdb/ rake commit
+  puts "-- Loading test fixtures into maglev"
+  sh %{ maglev-ruby -Itest test/mdb_fixtures.rb }
+  puts "-- (done)"
 end
 # These tasks control the Sinatra application
 namespace :app do

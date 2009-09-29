@@ -1,5 +1,46 @@
-
 # Class Gemstone is identically Smalltalk System
+#
+# == Persistent Shared Counters
+#
+# The Gemstone class maintins a set of persistent shared counters.
+#
+# Persistent shared counters provide a means for multiple sessions to share
+# common integer values.  There are 128 persistent shared counters,
+# numbered from 1 to 128 (the index of the first counter is 1.
+#
+# Each update to a persistent shared counter causes a roundtrip to the
+# stone process.  However reading the value of a counter is handled by the
+# gem (and its page server, if any) and does not cause a roundtrip to the
+# stone.
+#
+# Persistent shared counters are globally visible to all sessions on all
+# shared page caches.
+#
+# Persistent shared counters hold 64 bit values and may be set to any
+# signed 64 bit integer value.  No limit checks are done when incrementing
+# or decrementing a counter.  Attempts to increment/decrement the counter
+# above/below the minimum/maximum value of a signed 64-bit integer will
+# cause the counter to 'roll over'.
+#
+# Persistent shared counters are independent of database transactions.
+# Updates to counters are visible immediately and aborts have no effect on
+# them.
+#
+# The values of all persistent shared counters are written to the primary
+# database extent at checkpoint time.  Updates between checkpoints are
+# written to the transaction log by the stone.  Therefore the state of the
+# persistent shared counters is recoverable after a crash, restore from
+# backup, and restore from transaction logs.
+#
+# Persistent shared counter performance is affected by the stone
+# configuration option STN_COMMITS_ASYNC.  Setting this option to TRUE will
+# result in faster update performance because the stone will respond to
+# update requests after the tranlog write has been queued but before it
+# completes.  Operating in this mode leaves a small chance of losing data
+# should the stone or host machine crash after the tranlog write was queued
+# but before it completes.  If this value is set to FALSE, the stone will
+# only respond to update requests after the tranlog write has completed."
+#
 class Gemstone
 
   # Transaction support
@@ -8,15 +49,12 @@ class Gemstone
   class_primitive '_beginTransaction', 'beginTransaction'
 
   def self.commitTransaction
-    # STDERR.write( "- Ruby  commitTransaction\n") 
     _commitTransaction
   end
   def self.abortTransaction
-    # STDERR.write( "- Ruby  abortTransaction\n") 
     _abortTransaction
   end
   def self.beginTransaction
-    # STDERR.write( "- Ruby  beginTransaction\n") 
     _beginTransaction
   end
 
@@ -66,4 +104,45 @@ class Gemstone
     _processInfo(10, nil, nil)
   end
 
+  class_primitive_nobridge '_increment_pcounter', 'persistentCounterAt:incrementBy:'
+  class_primitive_nobridge '_decrement_pcounter', 'persistentCounterAt:decrementBy:'
+
+  # Get the value of the persistent counter +arg+.  +arg+ must be in range 1 <= arg <= 128.
+  #
+  # See Gemstone class comments for details on persistent counters.
+  class_primitive_nobridge 'pcounter', 'persistentCounterAt:'
+
+  # Sets the persistent shared counter at index to the specified
+  # value.  value must be a SmallInteger or LargeInteger.
+  # For a LargeInteger,  amount must be representable as a signed
+  # 64-bit integer (between -9223372036854775808 and 9223372036854775807).
+  #
+  # Returns value, the new value of the counter.
+  #
+  # See Gemstone class comments for details on persistent counters.
+  class_primitive_nobridge 'set_pcounter', 'persistentCounterAt:put:'
+
+  # Increments the persistent shared counter at index by the specified
+  # amount.  Amount must be a SmallInteger or LargeInteger.  For a
+  # LargeInteger, amount must be representable as a signed 64-bit integer
+  # (between -9223372036854775808 and 9223372036854775807).
+  #
+  # Returns the new value of the counter after the increment.
+  #
+  # See Gemstone class comments for details on persistent counters.
+  def self.increment_pcounter(counter, by=1)
+    _increment_pcounter(counter, by)
+  end
+
+  # Decrements the persistent shared counter at index by the specified
+  # amount.  amount.  Amount must be a SmallInteger or LargeInteger.  For a
+  # LargeInteger, amount must be representable as a signed 64-bit integer
+  # (between -9223372036854775808 and 9223372036854775807).
+  #
+  # Returns the new value of the counter after the decrement.
+  #
+  # See Gemstone class comments for details on persistent counters.
+  def self.decrement_pcounter(counter, by=1)
+    _decrement_pcounter(counter, by)
+  end
 end

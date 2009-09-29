@@ -14,6 +14,7 @@ class Post
     @text =  params[:text]                       # must_not_be_nil
     @timestamp = params[:timestamp] || Time.now  # defaults
     @tags = params[:tags] || []                  # defaults
+    @id = object_id  # TODO: Need better idea?
   end
 
   # Tag the post: (a) adds reciever to the tag and (b) adds
@@ -25,38 +26,24 @@ class Post
     end
   end
 
+  # MDB::Database calls this whenever a document is added
+  def document_added(document)
+    # Update the list of recent posts (saves searching)
+    @recent_posts ||= []
+    @recent_posts << document
+    @recent_posts.shift if @recent_posts.size > 5
+  end
+
   #############################################
   #  VIEWS
   #############################################
   # TODO:
   #   1. Move the views to a Module?
 
-
   # This is a view method.  It will be invoked by the client app by sending
   # a /post/recent URL to the MDB::ServerApp.
   def self.recent
-    # The JSON gem is not yet working with MagLev, so, this JSON is
-    # handcrafted with Emacs, using old world techniques.
-    seconds_per_day = 24 * 60 * 60
-    %Q<
-      [
-        {"title":"Blog Post the second",
-         "timestamp":"#{Time.now - (3 * seconds_per_day)}",
-         "text":"This is a really long blog post text",
-         "id":"xyzzy1",
-         "tags":["maglev"]},
-        {"title":"The first blog post",
-         "timestamp":"#{Time.now}",
-         "text":"This is a really long blog post text",
-         "id":"xyzzy",
-         "tags":["maglev", "blogs"]},
-        {"title":"Blog Post the third",
-         "timestamp":"#{Time.now - (4 * seconds_per_day)}",
-         "text":"This is a really long blog post text",
-         "id":"xyzzy2",
-         "tags":[]}
-      ]
-      >
+    @recent_posts || []
   end
 
   #############################################
