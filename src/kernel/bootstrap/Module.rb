@@ -370,25 +370,21 @@ class Module
 
   # primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
 
-  # Controls whether receiver is persistable.
+  # If receiver is not already persistable , makes it persistable and 
+  # ensures that it is referenced by the parent class/module's persistent name space.
   #
-  # If the +flag+ is true, then receiver is marked to allow itself to be
-  # persisted.  Since Modules and Classes are namespaces, all of receivers
+  # Since Modules and Classes are namespaces, all of receivers
   # constants should hold persistable values or an exception will be raised
   # at commit time.
-  #
-  # If the +flag+ is false, then receiver is marked to disallow itself to
-  # be persisted.  Receiver and its instances should be removed from
-  # persistent roots before the next <tt>Maglev.commit_transaction</tt>.
   #
   # If receiver is a class, this method does not affect the persistable
   # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
-  def maglev_persistable=(flag=true)
-    self._set_persistable(flag)
+  def maglev_persistable
+    self._set_persistable
   end
-  primitive_nobridge '_set_persistable', '_setPersistable:'
+  primitive_nobridge '_set_persistable', '_setPersistable'
 
   # Returns true if receiver is marked as persistable; false otherwise.
   primitive_nobridge 'maglev_persistable?', '_persistable'
