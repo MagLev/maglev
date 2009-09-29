@@ -1,7 +1,7 @@
 class Boolean
 
 #---------------------------------
-#   NilTF.gs has implementation of Boolean>>class
+#   pre_prim_methods.gs  has implementation of Boolean>>class
 #     which returns either TrueClass or FalseClass
 
   primitive_nobridge '_isSpecial', 'isSpecial'
