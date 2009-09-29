@@ -57,8 +57,8 @@ module Kernel
     :load ,
     :abort ,
     :at_exit ,
-    :autoload ,
-    :'autoload?' ,
+#   :autoload ,	 # Kernel.autoload is used in core/kernel/autoload_spec.rb
+#   :'autoload?' ,
     :caller ,
     :catch ,
     :debugger ,
