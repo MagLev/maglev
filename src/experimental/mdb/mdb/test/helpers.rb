@@ -34,7 +34,7 @@ Maglev.persistent do
       42
     end
 
-    def self.document_added(doc)
+    def self.document_added(id, doc)
       @count ||= 0
       @count += 1
     end

@@ -32,10 +32,9 @@ describe MDB::Database do
     @db.execute_view(:view_42).must_equal 43 # Ensure new view
   end
 
-  it 'add adds the document to the saved documents and can get it' do
+  it 'adds the document to the saved documents and can get it by id' do
     my_document = Object.new
-    id = my_document.object_id
-    @db.add(my_document)
+    id = @db.add(my_document)
     @db.get(id).must_equal my_document
     # TODO: need to ensure my_document is committed
   end

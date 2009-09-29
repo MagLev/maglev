@@ -1,8 +1,6 @@
 require 'rubygems'
 require 'sinatra'
 require 'maglev/maglev_json'  # TODO: workaround for Trac 616
-#require 'iconv'
-#require 'json'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
@@ -18,28 +16,44 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 # manage the data stored in MDB.
 =begin
 
-These requests correspond to methods on MDB::Server
+  |--------+-----------------------------+-------------------------------|
+  | Verb   | Collection                  | Member                        |
+  |--------+-----------------------------+-------------------------------|
+  | GET    | List members                | Get the member                |
+  | PUT    | Replace collection          | Update member (edit)          |
+  | POST   | Create new entry; return id | unclear                       |
+  | DELETE | Delete entire collection    | Remove member from collection |
+  |--------+-----------------------------+-------------------------------|
 
-  |------+-----------------------+----------------------------+-------------------|
-  | Verb | Route                 | Action                     | View              |
-  |------+-----------------------+----------------------------+-------------------|
-  | GET  | /databases            | List the current databases | Array of strings  |
-  | GET  | /databases/exists/:db | Test if db exists          | boolean           |
-  | POST | /:db                  | Database.create            | new id comes back |
-  |------+-----------------------+----------------------------+-------------------|
+These requests correspond to methods on MDB::Server, a collection:
+
+  |--------+-------+---------------------+-------------------|
+  | Verb   | Route | Action              | View              |
+  |--------+-------+---------------------+-------------------|
+  | GET    | /     | List database names | Array of strings  |
+  | PUT    | /     | NOT SUPPORTED       |                   |
+  | POST   | /     | Database.create     | new id comes back |
+  | DELETE | /     | NOT SUPPORTED       |                   |
+  |        |       |                     |                   |
+  | GET    | /:db  | Test if db exists   | boolean           |
+  | PUT    | /:db  | NOT SUPPORTED       |                   |
+  | POST   | /:db  | Create new document | id                |
+  | DELETE | /:db  | Delete db           |                   |
+  |--------+-------+---------------------+-------------------|
 
 These requests correspond to methods on MDB::Database
 
-  |--------+-------------------+-----------------------------+--------------------|
-  | Verb   | Route             | Action                      | View               |
-  |--------+-------------------+-----------------------------+--------------------|
-  | GET    | /:db/:id          | Get object :id from :db     | the object as json |
-  | POST   | /:db/_new         | Create new document         | the object as json |
-  | PUT    | /:db/:id          | Update object :id  into :db | status             |
-  | DELETE | /:db/:id          | Delete object :id from :db  | status             |
-  | GET    | /:db/view/:name   | Run the view                | data from view     |
-  | GET    | /:db/send/:method | Send :method to ViewClass   | For testing        |
-  |--------+-------------------+-----------------------------+--------------------|
+  |--------+-------------------+------------------------------+--------------------|
+  | Verb   | Route             | Action                       | View               |
+  |--------+-------------------+------------------------------+--------------------|
+  | GET    | /:db/:id          | Get document with :id        | the object as json |
+  | PUT    | /:db/:id          | Update document :id          | status             |
+  | POST   | /:db/:id          | NOT SUPPORTED                |                    |
+  | DELETE | /:db/:id          | Delete document :id from :db | status             |
+  |        |                   |                              |                    |
+  | GET    | /:db/view/:name   | Run the view                 | data from view     |
+  | GET    | /:db/send/:method | Send :method to ViewClass    | For testing        |
+  |--------+-------------------+------------------------------+--------------------|
 
 =end
 #
@@ -73,7 +87,8 @@ class MDB::ServerApp < Sinatra::Base
   # before handling most requests, since the DB may be updated from Rake or
   # another server.
 
-  get '/databases' do
+  # List db names
+  get '/' do
     # TODO: Currently raises: error , Illegal creation of a Symbol, when
     # trying to JSONize symbols, so convert to string first until Trac 616
     # is fixed.
@@ -81,13 +96,47 @@ class MDB::ServerApp < Sinatra::Base
     jsonize @server.db_names
   end
 
+  # Create a new database
+  post '/' do
+    jsonize @server.create(params[:db], params[:view_class])
+  end
+
   # Query if db exists
-  get '/databases/exists/:db' do
+  get '/:db' do
     jsonize @server.key? params[:db]
   end
 
+  # Create new document
+  # Create a new document for the database from form data.
+  # The database will add the object to its collection, and then
+  # call the model added(new_object) hook.
+  post '/:db' do
+    # .string is needed since request may be a StringIO,
+    # and StringIO may not be committed to the repository.
+    jsonize get_db.add(request.body.string)
+  end
+
+  # Delete database
+  # The server will delete the database.
+  delete '/:db' do
+    # .string is needed since request may be a StringIO,
+    # and StringIO may not be committed to the repository.
+    jsonize @server.delete params[:db]
+  end
+
+  # Get a document
   get '/:db/:id' do
     jsonize get_db.get(params[:id].to_i)
+  end
+
+  # Update a document
+#   put '/:db/:id' do
+#     jsonize get_db.put(params[:id].to_i, data)
+#   end
+
+  # Delete a document
+  delete '/:db/:id' do
+    jsonize get_db.delete params[:id].to_i
   end
 
   # Run a view on the database.
@@ -97,21 +146,8 @@ class MDB::ServerApp < Sinatra::Base
     jsonize get_db.execute_view(params[:view])
   end
 
-  # Create new document
-  # Create a new document for the database from form data.
-  # The database will add the object to its collection, and then
-  # call the model added(new_object) hook.
-  put '/:db' do
-    # .string is needed since request may be a StringIO,
-    # and StringIO may not be committed to the repository.
-    jsonize get_db.add(request.body.string)
-  end
-
-  # Create a new database
-  post '/:db' do
-    jsonize @server.create(params[:db], params[:view_class])
-  end
-
+# TODO: /mdb is top level URL and represents the collection of dbs
+#   POST /mdb  Create new db
   # For testing...
   get '/:db/send/:method' do
     jsonize get_db.send(params[:method].to_sym)
