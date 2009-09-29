@@ -602,8 +602,8 @@ comments in the API documentation.
   end
 
   class Module
-    # Controls whether receiver is persistable.
-    def maglev_persistable=(flag=true)
+    # Sets maglev_persistable bit on the class/module to true
+    def maglev_persistable
     end
 
     # Returns true if receiver is marked as persistable; false otherwise.
