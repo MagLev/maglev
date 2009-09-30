@@ -86,8 +86,7 @@ class String
 
   primitive  '+', 'rubyConcatenate:'
 
-  # note smalltalk addAll:  returns arg, not receiver
-  #primitive '_append', '_rubyAddAll:'
+  #   note smalltalk addAll:  returns arg, not receiver
   primitive '_append', '_rubyAddAll:'
 
   def <<(arg)
