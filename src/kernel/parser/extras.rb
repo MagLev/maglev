@@ -3,7 +3,7 @@
 # require 'sexp'
 # require 'strscan'
 
-# WHY do I have to do this?!?
+# WHY do I have to do this?!?  (Ryan's question)
 class Regexp
   unless defined? ONCE then
     ONCE     = 0 # 16 # ?
@@ -33,6 +33,15 @@ class Array
       n += 1
     end
     out
+  end
+end
+
+class Symbol
+  # allow String-like access to bytes of Symbols
+  primitive_nobridge_env '[]' , '_rubyAt', ':'
+
+  def _as_symbol
+    self  
   end
 end
 
