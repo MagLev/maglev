@@ -47,6 +47,8 @@ class RubyContext
   class_primitive_nobridge 'persistence_mode=', 'persistenceMode:'
   class_primitive_nobridge 'persistable_instances', 'persistableInstances'
   class_primitive_nobridge 'persistable_instances=', 'persistableInstances:'
+  class_primitive 'clear_persistent_LOADED_FEATURES' , '_clearPersistentLoadedFeatures'
+
 
   # Customize the top level object <tt>top_self</tt>.  This is called once
   # per VM to setup the singleton methods for the top self.  See
