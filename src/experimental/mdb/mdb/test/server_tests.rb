@@ -35,6 +35,7 @@ describe 'MDB::Server class side' do
     MDB::Server.create(key, ViewClass)
     MDB::Server[key].wont_be_nil
     proc { MDB::Server.create(key, ViewClass) }.must_raise MDB::Server::DatabaseExists
+    MDB::Server.delete(key)
   end
 
   it 'create returns the newly created db' do
