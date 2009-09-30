@@ -10,7 +10,7 @@
 #   All other newly created sockets default to non-blocking. Use
 #      aSocket.set_blocking(false)
 #   to change a socket to blocking.
-#  
+#
 #  Operations on a non-blocking socket that would block, will cause
 #  the Thread scheduler to suspend the current thread until the
 #  operation completes or fails.  Applications must use IO.select
@@ -50,8 +50,8 @@ class Socket
   primitive_nobridge 'write', 'write:'
 
   # MRI will give errors like 'IOError: sysread for buffered IO'
-  # if you mix read: and recv: and attempt recv: on a Socket with 
-  #  unread buffered input.  Maglev unifies the IO and will deliver data 
+  # if you mix read: and recv: and attempt recv: on a Socket with
+  #  unread buffered input.  Maglev unifies the IO and will deliver data
   # in this case.
 
   primitive 'read', 'read:'
@@ -88,7 +88,7 @@ class Socket
         raise ArgumentError, 'Socket#gets, multi-character separator not implemented yet'
       end
     else
-      raise TypeError , 'Socket#gets, separator arg must be nil or a String' 
+      raise TypeError , 'Socket#gets, separator arg must be nil or a String'
     end
     res._storeRubyVcGlobal(0x21) # store into caller's $_
     self._increment_lineno
@@ -221,9 +221,9 @@ class Socket
     end
   end
 
-  def set_blocking(a_boolean)  
-    # convenience method 
-    if a_boolean 
+  def set_blocking(a_boolean)
+    # convenience method
+    if a_boolean
       fcntl(Fcntl::F_SETFL , fcntl(Fcntl::F_GETFL) | File::NONBLOCK )
     else
       fcntl(Fcntl::F_SETFL , fcntl(Fcntl::F_GETFL) & (~ File::NONBLOCK) )
@@ -255,8 +255,10 @@ class Socket
     else
       host = Type.coerce_to(host, String, :to_s)
     end
-    if service._isFixnum || service._isString || service.equal?(nil)
+    if service._isFixnum || service._isString
       # ok
+    elsif service.equal?(nil)
+      service = 0
     else
       service = Type.coerce_to(service, String, :to_s)
     end
@@ -285,7 +287,7 @@ class Socket
       if @isRubyBlocking
         res = res | File::NONBLOCK
       end
-      res 
+      res
     else
       super(op, flags)
     end
@@ -299,7 +301,7 @@ class IPSocket
   primitive 'addr', 'rubyAddress'
 end
 
-class TCPSocket
+class TCPSocket  # < IPSocket in VM
 
   # open binds a socket to a port and does a blocking connect,
   #  returning a blocking socket.
@@ -323,7 +325,7 @@ class TCPSocket
 
 end
 
-class TCPServer
+class TCPServer   # < TCPSocket in VM
   # accept returns a new socket, having same non-blocking state as receiver
   primitive 'accept', 'accept'
 
@@ -334,14 +336,15 @@ class TCPServer
     if port._isString
       self.new(port , nil)
     elsif port._isFixnum
-       self._new( 'localhost', port)
+       self._new( 'localhost', port == 0 ? nil : port )
     else
        raise TypeError , 'expected a Fixnum port number or String hostname'
     end
   end
 
   def self.new( hostname, port)
-    # port may be nil to get a random port
+    # port may be nil or 0 to get a random port
+    port = port.equal?(0) ? nil : port
     if hostname.length.equal?(0)
       self._new( 'localhost' , port)
     else
