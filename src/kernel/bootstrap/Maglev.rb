@@ -178,6 +178,12 @@ module Maglev
   # 5. All methods defined via <tt>Object#extend</tt> or
   #    <tt>Module#include</tt> will be done persistently.
   #
+  # 6. When the persistent_mode transitions from true to false,
+  #    the current transient $LOAD_PATH (i.e. $: )  is copied 
+  #    to persistent state.  See also discussion of $LOADED_FEATURES below.
+  #    At session startup, the transient $LOAD_PATH is initialized with
+  #    a copy of the persistent $LOAD_PATH .
+  #
   # If the current thread is already in persistent mode, the block is
   # executed and the thread remains in persistent mode (i.e., a no-op).
   #
@@ -345,5 +351,19 @@ module Maglev
     return Gemstone.abortTransaction
   end
 
-  module_function :commit_transaction, :abort_transaction
+  # $LOADED_FEATURES has a persistent Array and a transient Array .
+  # In ruby code,  $LOADED_FEATURES returns the transient Array ,
+  #  and assignment to  $LOADED_FEATURES will change the transient Array.
+  # At VM startup, the transient copy is initialized with a copy of the persistent Array
+  # A successful  'require' will update the transient Array, and if
+  # the session is currently in persistent mode will also update the persistent Array.
+  #
+  # The method clear_persistent_LOADED_FEATURES  will set the persistent Array to empty.
+  def clear_persistent_LOADED_FEATURES
+    RubyContext.clear_persistent_LOADED_FEATURES
+  end
+
+  module_function( :commit_transaction, :abort_transaction,
+	           :clear_persistent_LOADED_FEATURES )
+
 end
