@@ -1,8 +1,7 @@
 class Boolean
+  # common superclass of TrueClass and FalseClass
 
 #---------------------------------
-#   pre_prim_methods.gs  has implementation of Boolean>>class
-#     which returns either TrueClass or FalseClass
 
   primitive_nobridge '_isSpecial', 'isSpecial'
 
@@ -45,4 +44,9 @@ class Boolean
     self
   end
 
+end
+
+class TrueClass < Boolean
+end
+class FalseClass < Boolean
 end
