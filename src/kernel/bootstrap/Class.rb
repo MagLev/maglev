@@ -84,9 +84,7 @@ class Class
 
   primitive_nobridge 'included_modules' , 'rubyIncludedModules'
 
-  def inspect
-    name
-  end
+  primitive 'inspect', '_rubyInspect'
 
   def to_s
     name
