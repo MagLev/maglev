@@ -7,16 +7,11 @@ class Symbol
   # returns an Array containing all keys in the Smalltalk dictionary AllSymbols
   class_primitive_nobridge 'all_symbols', '_rubyAllSymbols'
 
-  def self.superclass
-    Object  # override because Smalltalk would return String
-  end
-
   primitive_nobridge 'id2name', 'asString'
   primitive_nobridge '==', '='  # uses Symbol>>= which is identity compare
   primitive_nobridge 'eql?', '='  # uses Symbol>>= which is identity compare
   primitive_nobridge 'hash'
 
-  # _concatenate inherited from String for now
   def inspect
     ':'._concatenate(self)
   end
@@ -59,4 +54,5 @@ class Symbol
     # MRI raises a NoMethodError
     raise TypeError , 'to_str not allowed for Symbol'
   end
+
 end
