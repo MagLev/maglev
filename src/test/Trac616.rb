@@ -13,6 +13,9 @@ end
 json_true = true.to_json
 raise "Expecting 'true' but got #{json_true.inspect}" unless json_true == "true"
 
+puts "Done"
+true
+
 # ##########################################################################
 # This code also fails, but I believe it to be due to the underlying cause
 # from above (String#to_json isn't defined, so it defaults up to Object).
@@ -23,6 +26,5 @@ raise "Expecting 'true' but got #{json_true.inspect}" unless json_true == "true"
 
 # json = [:foo].to_json
 # raise "Expected \"[\"foo\"]\" but got #{json.inspect}" unless json == "[\"foo\"]"
-
 
 
