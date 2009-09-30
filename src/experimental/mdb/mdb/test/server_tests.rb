@@ -78,4 +78,3 @@ describe 'MDB::Server class side' do
     db.execute_view(:view_42).must_equal 43  # Ensure new view is in place
   end
 end
-

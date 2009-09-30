@@ -1,6 +1,9 @@
 task :default => :commit
 
-ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib -d'   # Get rid of -d etc.
+#ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
+#ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib -MtraceLoad'
+#ENV['MAGLEV_OPTS'] = '-Ilib -d -MtraceLoad'
+ENV['MAGLEV_OPTS'] = '-Ilib -d'
 
 # desc "Commit the MDB Server code to the repository."
 # task :commit, :force do |t,args|
@@ -8,8 +11,7 @@ ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib -d'   # Get rid of -d etc.
 # end
 desc "Commit the MDB Server code to the repository."
 task :commit do
-  puts "====================== TASK: commit ===================="
-  sh %{ maglev-ruby commit_code.rb }
+  sh %{ maglev-ruby -MnoRlwrap commit_code.rb }
 end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
@@ -22,22 +24,23 @@ namespace :test do
   end
 
   desc "Run the mdb_server tests."
-  task :mdb_server => [:commit, :fixtures] do
+  task :mdb_server => [:commit, :server_fixtures] do
     sh 'maglev-ruby -Itest test/mdb_server_tests.rb'
   end
 
   desc "Run the MDB::* tests."
-  task :mdb => :commit do
-    puts "====================== TASK: mdb ===================="
+  task :mdb => [:commit, :mdb_fixtures] do
     ['database_tests.rb', 'server_tests.rb'].each do |test|
-      puts "====================== #{test} ===================="
       sh %{ maglev-ruby -Itest test/#{test} }
     end
   end
 
-  desc "Commit the test fixtures"
-  task :fixtures do
-    sh %{ maglev-ruby test/app_model.rb }
+  task :server_fixtures do
+    sh %{ maglev-ruby -MnoRlwrap test/app_model.rb }
+  end
+
+  task :mdb_fixtures do
+    sh %{ maglev-ruby -MnoRlwrap test/mdb_fixtures.rb }
   end
 end
 

@@ -98,7 +98,7 @@ class MDB::ServerApp < Sinatra::Base
 
   # Create a new database
   post '/' do
-    jsonize @server.create(params[:db], params[:view_class])
+    jsonize @server.create(params[:db_name], params[:view_class])
   end
 
   # Query if db exists
@@ -113,7 +113,9 @@ class MDB::ServerApp < Sinatra::Base
   post '/:db' do
     # .string is needed since request may be a StringIO,
     # and StringIO may not be committed to the repository.
-    jsonize get_db.add(request.body.string)
+    obj = from_json(request.body.string)
+    jsonize get_db.add(obj)
+    #jsonize get_db.add(request.body.string)
   end
 
   # Delete database
@@ -160,6 +162,9 @@ class MDB::ServerApp < Sinatra::Base
     JSON.generate [obj]
   end
 
+  def from_json(string)
+    JSON.parse(string)[0]
+  end
   # Or, we could do specific handlers such as:
   #    error MDB::DatabaseNotFound do
   #       # ...something specific for db not found errors

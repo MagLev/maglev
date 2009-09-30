@@ -1,20 +1,11 @@
 # MiniTest suite for the MDB::Database
-puts "================== require rubygems =======Maglev.persistent? #{Maglev.persistent?}============="
 require 'rubygems'
-
-puts "================== require minitest/spec ==Maglev.persistent? #{Maglev.persistent?}=================="
 require 'minitest/spec'
 
-puts "================== require mdb/database ===Maglev.persistent? #{Maglev.persistent?}================="
 require 'mdb/database'
-
-puts "================== require mdb/server ===Maglev.persistent? #{Maglev.persistent?}================="
 require 'mdb/server'
-
-puts "================== require helpers ====Maglev.persistent? #{Maglev.persistent?}================"
 require 'helpers'
 
-puts "================== DONE ===Maglev.persistent? #{Maglev.persistent?}================="
 MiniTest::Unit.autorun
 
 DB_NAME = MDB::Test.db_name 'database_tests'
