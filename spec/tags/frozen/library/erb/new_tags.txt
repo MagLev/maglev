@@ -1,0 +1,2 @@
+fails:ERB.new removes spaces around '<%- -%>' when trim_mode is '-'
+fails:ERB.new accepts a safe level as second argument

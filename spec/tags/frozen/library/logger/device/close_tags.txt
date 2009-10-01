@@ -1,0 +1,1 @@
+fails:Logger::LogDevice#close raises an error if it's already closed

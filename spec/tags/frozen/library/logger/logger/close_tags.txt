@@ -1,0 +1,1 @@
+fails:Logger#close fails when called on a closed device

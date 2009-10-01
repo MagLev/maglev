@@ -1,0 +1,1 @@
+fails:Singleton.allocate is a private method
