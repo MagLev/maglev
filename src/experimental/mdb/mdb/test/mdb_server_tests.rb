@@ -1,4 +1,4 @@
-# MiniTest suite for the MDB::Server
+# MiniTest suite for the MDB::Server using Marshal
 #
 # NOTE: Rack::Test currently does not work in MagLev, so we're using raw
 # Rack::MockRequest and Rack::MockResponse.
@@ -12,12 +12,23 @@ require 'mdb_server'
 
 MiniTest::Unit.autorun
 
-# Exception.install_debug_block do |e|
-#   case e
-#   when NoMethodError
-#     nil.pause # if e.message =~ /to_sym/
-#   end
-# end
+Exception.install_debug_block do |e|
+  case e
+  when ArgumentError, NoMethodError
+    nil.pause # if e.message =~ /to_sym/
+  end
+end
+
+SERIALIZER_CLASS =
+  case ARGV[0]
+  when 'marshal'
+    MDB::MarshalSerializer
+  when 'json'
+    MDB::JSONSerializer.new
+  else
+    raise "Uknown serialization format #{ARGV[0]}"
+  end
+SERIALIZER = SERIALIZER_CLASS.new
 
 # Get path wrapped in a transaction.  Make sure the status is success.
 # status may be either a range or a Fixnum.
@@ -43,18 +54,19 @@ def post_urlencode(path, data={ })
   handle_response
 end
 
-def post_json(path, data='')
+def post_serialized(path, data='')
+  s_data = SERIALIZER.serialize data
   e = {
-    :input => data,
-    "CONTENT_LENGTH" => data.size,
-    "CONTENT_TYPE"   => 'application/json'
+    :input => s_data,
+    "CONTENT_LENGTH" => s_data.size,
+    "CONTENT_TYPE"   => SERIALIZER.content_type
   }
 
   Maglev.transaction { @response = @request.post(path, e) }
   handle_response
 end
 
-# Decode JSON from response, if success status code (2xx)
+# Decode serialized data from response, if success status code (2xx)
 def handle_response(status=200)
   case status
   when Range
@@ -65,18 +77,14 @@ def handle_response(status=200)
   end
 
   if (200..299).include? @response.status
-    json = @response.body
-#    nil.pause
-    x = JSON.parse(@response.body)
-#    nil.pause
-    x[0]
+    obj = SERIALIZER.deserialize @response.body
   else
     nil
   end
 end
 
-DB_NAME   = 'mdb_server_tests_db'  # Will be created fresh in before()
-DB_NAME_2 = 'mdb_server_tests_db2' # Will be deleted in before()
+DB_NAME   = :mdb_server_tests_db  # Will be created fresh in before()
+DB_NAME_2 = :mdb_server_tests_db2 # Will be deleted in before()
 
 describe 'MDB::ServerApp: MDB::Server requests' do
 
@@ -86,7 +94,7 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     end
     MDB::Server.create(DB_NAME, AppModel)
 
-    @request  = Rack::MockRequest.new(MDB::ServerApp.new)
+    @request  = Rack::MockRequest.new(MDB::ServerApp.new(SERIALIZER_CLASS.new))
     @response = nil
   end
 
@@ -129,7 +137,7 @@ describe 'MDB::ServerApp: MDB::Database requests' do
     @db = MDB::Server.create(DB_NAME, AppModel)
     @doc1 = AppModel.new(1, 2)
     @doc1_id = @db.add(@doc1)
-    @request  = Rack::MockRequest.new(MDB::ServerApp.new)
+    @request  = Rack::MockRequest.new(MDB::ServerApp.new(SERIALIZER_CLASS.new))
     @response = nil
   end
 
@@ -141,13 +149,13 @@ describe 'MDB::ServerApp: MDB::Database requests' do
 #   end
 
   it 'responds to POST "/:db" by creating a new document and returning the id' do
-    id = post_json "/#{DB_NAME}", AppModel.new(3,4).to_json
+    id = post_serialized "/#{DB_NAME}", AppModel.new(3,4)
     id.wont_be_nil
 
     doc = get "/#{DB_NAME}/#{id}"
     doc.wont_be_nil
-    doc['a'].must_equal 3
-    doc['b'].must_equal 4
+    doc.a.must_equal 3
+    doc.b.must_equal 4
   end
 
 #   it 'responds to POST "/:db" and GET "/:db" correctly' do

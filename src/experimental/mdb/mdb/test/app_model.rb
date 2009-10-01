@@ -1,6 +1,7 @@
 # Used by mdb_server.rb
 Maglev.persistent do
   class AppModel
+    attr_reader :a, :b
     def view_53
       53
     end

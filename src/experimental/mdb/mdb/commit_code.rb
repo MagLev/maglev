@@ -12,6 +12,7 @@ Maglev.abort_transaction
     load 'lib/mdb/common.rb'
     load 'lib/mdb/server.rb'
     load 'lib/mdb/database.rb'
+    load 'lib/mdb/serializer.rb'
   end
   Maglev.commit_transaction
   puts "== Committed MDB Server code"
