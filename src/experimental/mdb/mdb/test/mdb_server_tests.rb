@@ -39,7 +39,6 @@ def post_urlencode(path, data={ })
     "CONTENT_LENGTH" => p.size,
     "CONTENT_TYPE"   => 'application/x-www-form-urlencoded'
   }
-  puts "============= POST(#{p}, #{e.inspect})"
   Maglev.transaction { @response = @request.post(path, e) }
   handle_response
 end
@@ -57,8 +56,6 @@ end
 
 # Decode JSON from response, if success status code (2xx)
 def handle_response(status=200)
-  puts "========= @response.status: #{@response.status}"
-  puts "========= @response.body:   #{@response.body}"
   case status
   when Range
     s = status.include?(@response.status)
@@ -107,7 +104,6 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     names = get '/'
     names.each do |name|
       r = get "/#{name}"
-      puts "-- TESTING #{name} => #{r}"
       r.must_equal true
     end
     # TODO: Add test for not found db

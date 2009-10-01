@@ -20,16 +20,32 @@ MDB::Server provides a RESTful CRUD api to manage MDB::Databases
 instances, plus a few methods to get Server information.
 
 MDB::Database manages a collection of documents, and manages views onto those
-objects. 
+objects.
 
    posts = Database.new(Post)
-   
+
    class Post
-     
+
    end
 == Example
 
 
 == TODO
 
+* 2009-10-01: Move away from using JSON
+* DRb isn't running yet on Maglev (thread.rb mutex clashes with st mutex
+  and threading).
 
+* Phase 1:
+  * Serialize ruby objects and store as ruby on MDB.
+  * Keep a plain old hash of the objects
+  * Server creates object ids (using shared persistent counters)
+  * Use HTTP and have Content-type application/mdb; the body is Marshaled
+    string.
+* Phase 2:
+  * Allow "stored procedures" on the MDB server to take object subgraphs
+    and snap them into a larger object graph on server.
+  * Allow methods to run on the larger graph.
+  * Either get DRb working, or just use raw sockets and marshal
+
+* Still need to get Marshal format working well
