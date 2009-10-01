@@ -1,11 +1,3 @@
 fails:YAML.load fails on invalid keys
 fails:YAML.load does not escape symbols
 fails:YAML.load works on complex keys
-fails:YAML.load returns a document from current io stream when io provided
-fails:YAML.load loads strings
-fails:YAML.load accepts symbols
-fails:YAML.load accepts numbers
-fails:YAML.load accepts collections
-fails:YAML.load parses start markers
-fails:YAML.load works with block sequence shortcuts
-fails:YAML.load loads a symbol key that contains spaces

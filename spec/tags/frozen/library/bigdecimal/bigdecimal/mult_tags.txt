@@ -1,2 +1,0 @@
-fails:BigDecimal#mult returns zero if self or argument is zero
-fails:BigDecimal#mult multiply self with other with (optional) precision
