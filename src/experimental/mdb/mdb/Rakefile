@@ -15,17 +15,12 @@ task :commit do
 end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
-task :test => [:'test:mdb', :'test:mdb_server', :'test:persistence']
+task :test => [:'test:mdb', :'test:json', :'test:persistence']
 
 namespace :test do
   desc "Run the persistence tests."
   task :persistence => :commit do
     sh 'ruby test/test_persistence.rb'
-  end
-
-  desc "Run the mdb_server tests."
-  task :mdb_server => [:commit, :server_fixtures] do
-    sh 'maglev-ruby -Itest test/mdb_server_tests.rb'
   end
 
   desc "Run the MDB::* tests."
@@ -35,12 +30,34 @@ namespace :test do
     end
   end
 
-  task :server_fixtures do
-    sh %{ maglev-ruby -MnoRlwrap test/app_model.rb }
-  end
 
   task :mdb_fixtures do
     sh %{ maglev-ruby -MnoRlwrap test/mdb_fixtures.rb }
+  end
+
+  # Test for the (new) Marshal based server
+  desc "Test the Marshal server"
+  task :server => :'test:server:server'
+  namespace :server do
+    task :fixtures do
+      sh %{ maglev-ruby -MnoRlwrap test/json_server/fixtures.rb }
+    end
+    task :server => [:commit, :fixtures] do
+      sh 'maglev-ruby -Itest test/json_server/mdb_server_tests.rb'
+    end
+  end
+
+  # Tests for the (original) JSON based server
+
+  desc "Test the json server"
+  task :json => :'test:json:server'
+  namespace :json do
+    task :fixtures do
+      sh %{ maglev-ruby -MnoRlwrap test/json_server/fixtures.rb }
+    end
+    task :server => [:commit, :fixtures] do
+      sh 'maglev-ruby -Itest test/json_server/mdb_server_tests.rb'
+    end
   end
 end
 
