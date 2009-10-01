@@ -20,4 +20,11 @@ test(addr[3], "0.0.0.0", 'TCPSocket.addr[3]')
 status = tcp_server.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
 test(status, 0, 'fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)')
 
+tcp_server.close
+
+# Ensure that the port parameter can be a string that represents a number
+tcp_server = TCPServer.open('localhost', '7654')
+test(tcp_server.nil?, false, 'Port numbers as strings')
+tcp_server.close
+
 report
