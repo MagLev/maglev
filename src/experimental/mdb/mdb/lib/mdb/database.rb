@@ -30,7 +30,7 @@ module MDB
     # Called by the server if the view class is updated (e.g., methods
     # added).
     def set_view(view_class)
-      @view = view_class
+      @view = validate_class(view_class)
     end
 
     def execute_view(view_name, *params)
@@ -67,6 +67,25 @@ module MDB
     def size
       @documents.size
     end
+
+    # Returns the class for view_class, or raises an MDBError.  view_class
+    # may be a class, or a string or a symbol representing the class.  This
+    # will try to walk the package hierarchy looking for the class.
+    def validate_class(view_class)
+      return view_class if view_class.class == Class
+      return false if view_class.nil?
+      begin
+        str = view_class.to_s
+        klass = Object
+        view_class.to_s.split('::').each do |prefix|
+          klass = klass.const_get(prefix.to_sym)  # will raise name error
+        end
+        klass
+      rescue NameError
+        raise MDBError.new("Bad class: #{view_class.inspect}")
+      end
+    end
+    private :validate_class
 
     #############################################
     # DEBUG METHODS:

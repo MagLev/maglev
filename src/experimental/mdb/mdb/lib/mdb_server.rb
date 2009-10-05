@@ -5,20 +5,23 @@ require 'txn_wrapper'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
-Exception.install_debug_block do |e|
-  puts "--- #{e} #{e.class}"
-  case e
-  when NoMethodError
-    nil.pause if e.message =~ /gsub/
-  when ArgumentError
-    nil.pause # if e.message =~ /Illegal creation of a Symbol/
-  end
-end
+# Exception.install_debug_block do |e|
+#   puts "--- #{e} #{e.class}"
+#   case e
+#   when NoMethodError
+#     nil.pause if e.message =~ /gsub/
+#   when ArgumentError
+#     nil.pause # if e.message =~ /Illegal creation of a Symbol/
+#   end
+# end
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
 # serialization format.
-
+#
+# For all URLs of the form /:db, it should return 404 not found if
+# the db does not exist.
+#
 =begin
 
   |--------+-----------------------------+-------------------------------|
@@ -67,8 +70,8 @@ These requests correspond to methods on MDB::Database
 # we are customized with).
 class MDB::ServerApp < Sinatra::Base
 
-  require 'log_headers'
-  use LogHeaders
+#  require 'log_headers'
+#  use LogHeaders
 
   use MagLevTransactionWrapper
 
@@ -109,9 +112,16 @@ class MDB::ServerApp < Sinatra::Base
 
   # Create a new database
   post '/' do
-    puts "=== post '/': params: #{params.inspect}"
-    result = @server.create(params[:db_name], params[:view_class])
-    @serializer.serialize(result.name)
+    # TODO: I tried to setup an error handler for MDB::MDBError, but two problems:
+    # 1: The thrown exception's class is matched exactly, not with ===, so you can't
+    #    setup a handler for a tree of exceptions
+    # 2: halt 404, didn't seem to work from in there...
+    begin
+      result = @server.create(params[:db_name], params[:view_class])
+      @serializer.serialize(result.name) # send back just the db name
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Query if db exists
@@ -124,21 +134,15 @@ class MDB::ServerApp < Sinatra::Base
   # The database will add the object to its collection, and then
   # call the model added(new_object) hook.
   post '/:db' do
-    # .string is needed since request may be a StringIO,
-    # and StringIO may not be committed to the repository.
+    # .string is needed since request may be a StringIO
     obj = @serializer.deserialize(request.body.string)
-#     y = request.body.string
-#     puts "-- MDB_SERVER: POST /#{params[:db]}: #{y}"
-#     nil.pause
-#     @serializer.serialize(get_db.add(obj))
     @serializer.serialize(get_db.add(obj))
   end
 
   # Delete database
   # The server will delete the database.
   delete '/:db' do
-    # .string is needed since request may be a StringIO,
-    # and StringIO may not be committed to the repository.
+    get_db # will raise 404 if :db not found
     @serializer.serialize(@server.delete params[:db])
   end
 
@@ -164,22 +168,16 @@ class MDB::ServerApp < Sinatra::Base
     @serializer.serialize(get_db.execute_view(params[:view]))
   end
 
-# TODO: /mdb is top level URL and represents the collection of dbs
-#   POST /mdb  Create new db
   # For testing...
   get '/:db/send/:method' do
     @serializer.serialize(get_db.send(params[:method].to_sym))
   end
 
-  # Or, we could do specific handlers such as:
-  #    error MDB::DatabaseNotFound do
-  #       # ...something specific for db not found errors
-  #    end
   error do
     "MDB::ServerApp error: #{request.env['sinatra.error'].message}"
   end
 
   not_found do
-    "MDB:ServerApp: unknown URL: #{request.path}"
+    "MDB:ServerApp: unknown URL: #{request.path} Parameters: #{params.inspect}"
   end
 end

@@ -19,6 +19,7 @@ Exception.install_debug_block do |e|
   end
 end
 
+# TODO: MDB::ServerApp only supports Marshal right now...
 SERIALIZER_CLASS =
   case ARGV[0]
   when 'marshal'
@@ -40,7 +41,7 @@ def get(path, status=(200..299))
   handle_response(status)
 end
 
-def post_urlencode(path, data={ })
+def post_urlencode(path, expected_status, data={ })
   # This only works for simple sets of parameters. Send data as urlencoded
   # form.
 
@@ -51,7 +52,7 @@ def post_urlencode(path, data={ })
     "CONTENT_TYPE"   => 'application/x-www-form-urlencoded'
   }
   Maglev.transaction { @response = @request.post(path, e) }
-  handle_response
+  handle_response(expected_status)
 end
 
 def post_serialized(path, data='')
@@ -64,6 +65,11 @@ def post_serialized(path, data='')
 
   Maglev.transaction { @response = @request.post(path, e) }
   handle_response
+end
+
+def delete(path, status=(200..299))
+  Maglev.transaction { @response = @request.delete(path) }
+  handle_response(status)
 end
 
 # Decode serialized data from response, if success status code (2xx)
@@ -94,12 +100,52 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     end
     MDB::Server.create(DB_NAME, AppModel)
 
-    @request  = Rack::MockRequest.new(MDB::ServerApp.new(SERIALIZER_CLASS.new))
+    @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
   end
 
-  it 'responds to GET "/Does/Not/Exist" with a 404' do
-    r = get '/Does/Not/Exist', 404
+
+=begin
+
+These requests correspond to methods on MDB::Server, a collection:
+
+  |--------+-------+---------------------------------------+-------------------------|
+  | Verb   | Route | Action [params]                       | Tested?                 |
+  |--------+-------+---------------------------------------+-------------------------|
+  | GET    | /     | List database names                   | yes                     |
+  | PUT    | /     | NOT SUPPORTED                         | N/A                     |
+  | POST   | /     | Database.create [db_name, view_class] | yes: urlencode version  |
+  | DELETE | /     | NOT SUPPORTED                         | N/A                     |
+  |        |       |                                       |                         |
+  | GET    | /:db  | Test if db exists                     | yes                     |
+  | PUT    | /:db  | NOT SUPPORTED                         | N/A                     |
+  | POST   | /:db  | Create new document                   | yes: serialized version |
+  | DELETE | /:db  | Delete db                             |                         |
+  |--------+-------+---------------------------------------+-------------------------|
+
+These requests correspond to methods on MDB::Database
+
+  |--------+-------------------+------------------------------+------------------|
+  | Verb   | Route             | Action                       | View             |
+  |--------+-------------------+------------------------------+------------------|
+  | GET    | /:db/:id          | Get document with :id        | serialized objec |
+  | PUT    | /:db/:id          | Update document :id          | status           |
+  | POST   | /:db/:id          | NOT SUPPORTED                |                  |
+  | DELETE | /:db/:id          | Delete document :id from :db | status           |
+  |        |                   |                              |                  |
+  | GET    | /:db/view/:name   | Run the view                 | data from view   |
+  | GET    | /:db/send/:method | Send :method to ViewClass    | For testing      |
+  |--------+-------------------+------------------------------+------------------|
+=end
+
+  # General gets
+  it 'responds to GET "/#{DB_NAME}/Does/Not/Exist" with a 404' do
+    r = get "/#{DB_NAME}/Does/Not/Exist", 404
+  end
+
+  it 'responds to get "/not_a_db_name" with false' do
+    r = get "/not_a_db_name"
+    r.must_equal false
   end
 
   it 'responds to GET "/" with an array' do
@@ -117,9 +163,10 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     # TODO: Add test for not found db
  end
 
+  # TODO: Should probably expect 201, not 200 from a successful POST
   it 'responds to POST "/" and GET "/:db" correctly' do
-    r = post_urlencode "/", { :db_name => DB_NAME_2,
-                              :view_class => :AppModel }
+    r = post_urlencode "/", 200, { :db_name => DB_NAME_2,
+                                   :view_class => :AppModel }
     get("/#{DB_NAME_2}").must_equal true
 
     # TODO: Probably need to test that the model class got installed
@@ -127,6 +174,31 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     # correct.
   end
 
+  it 'responds to POST "/" with 404 if missing :view_name' do
+    r = post_urlencode "/", 404, { :db_name => DB_NAME_2 }
+  end
+
+  it 'responds to POST "/" with 404 if missing :db_name' do
+    r = post_urlencode "/", 404, { :view_name => :AppClass }
+  end
+
+  it 'responds to POST "/" with 404 if :view_class is bad' do
+    r = post_urlencode "/", 404, { :db_name => DB_NAME_2,
+                                   :view_class => :NotAClass }
+  end
+
+  it 'responds to DELETE "/:db" by deleting the db if it exists' do
+    r = delete "/#{DB_NAME}"
+    r.must_equal true
+
+    # After the delete, shouldn't be able to get it
+    r = get "/#{DB_NAME}"
+    r.must_equal false
+  end
+
+  it 'responds to DELETE "/:db" by returning 404 if :db does not exist' do
+    r = delete "/this_is_not_a_db_name", 404
+  end
 end
 
 describe 'MDB::ServerApp: MDB::Database requests' do
@@ -137,7 +209,7 @@ describe 'MDB::ServerApp: MDB::Database requests' do
     @db = MDB::Server.create(DB_NAME, AppModel)
     @doc1 = AppModel.new(1, 2)
     @doc1_id = @db.add(@doc1)
-    @request  = Rack::MockRequest.new(MDB::ServerApp.new(SERIALIZER_CLASS.new))
+    @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
   end
 

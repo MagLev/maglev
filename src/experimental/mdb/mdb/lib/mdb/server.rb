@@ -28,6 +28,8 @@ module MDB
     # Create a new database.  Returns the new database.
     # Raises DatabaseExists, if db_name already exists.
     def self.create(db_name, view_class)
+      raise DatabaseNotFound if db_name.nil?
+      raise MDBError.new("Bad view class: #{view_class.inspect}") if view_class.nil?
       key = db_name.to_sym
       raise DatabaseExists.new(key) if @proot.has_key?(key)
       Maglev.transaction { @proot[key] = Database.new(db_name, view_class) }
