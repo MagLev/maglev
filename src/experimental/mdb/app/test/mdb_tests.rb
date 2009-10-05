@@ -11,12 +11,14 @@ DB_NAME = 'rest_database_tests'
 SERVER  = 'http://localhost:4567'
 
 describe MDB::RESTDatabase do
-  before do
+   before do
     @server = MDB::RESTServer.new SERVER
     @server.delete DB_NAME
     @db = @server.create DB_NAME, AppModel
     @db.clear
-  end
+
+#    @db = MDB::RESTDatabase.new(SERVER, DB_NAME)
+   end
 
   it 'starts off empty' do
     @db.size.must_equal 0

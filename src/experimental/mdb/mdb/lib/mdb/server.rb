@@ -46,7 +46,7 @@ module MDB
     # Raises DatabaseNotFound if there is no such database.
     def self.delete(db_name)
       key = db_name.to_sym
-      raise DatabaseNotFound.new(key) unless @proot.has_key?(key)
+      raise DatabaseNotFound.new(key.to_s) unless @proot.has_key?(key)
       Maglev.transaction { @proot.delete key }
     end
 

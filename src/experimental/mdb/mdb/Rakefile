@@ -65,7 +65,7 @@ end
 # These tasks control the RESTful mdb_server.rb Sinatra app
 namespace :server do
   desc "Start the mdb_server app"
-  task :start do
+  task :start => :commit do
     sh %{ $MAGLEV_HOME/bin/rackup server.ru }
   end
 

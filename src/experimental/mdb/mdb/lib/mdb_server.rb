@@ -1,13 +1,15 @@
 require 'rubygems'
 require 'sinatra'
 
+require 'txn_wrapper'
+
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
 Exception.install_debug_block do |e|
   puts "--- #{e} #{e.class}"
   case e
   when NoMethodError
-    nil.pause if e.message =~ /to_sym/
+    nil.pause if e.message =~ /gsub/
   when ArgumentError
     nil.pause # if e.message =~ /Illegal creation of a Symbol/
   end
@@ -68,6 +70,8 @@ class MDB::ServerApp < Sinatra::Base
   require 'log_headers'
   use LogHeaders
 
+  use MagLevTransactionWrapper
+
   def initialize
     super
     # TODO: I need to parameterize the serializer, but I can't seem to get
@@ -123,6 +127,10 @@ class MDB::ServerApp < Sinatra::Base
     # .string is needed since request may be a StringIO,
     # and StringIO may not be committed to the repository.
     obj = @serializer.deserialize(request.body.string)
+#     y = request.body.string
+#     puts "-- MDB_SERVER: POST /#{params[:db]}: #{y}"
+#     nil.pause
+#     @serializer.serialize(get_db.add(obj))
     @serializer.serialize(get_db.add(obj))
   end
 

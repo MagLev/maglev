@@ -3,6 +3,7 @@ require 'httpclient'
 
 require 'mdb/serializer'
 
+# TODO: Add proper Content-type header
 module MDB
   # Manages the REST communication to MDB and serialization
   class REST
@@ -28,15 +29,19 @@ module MDB
     end
 
     def mdb_post(path, data)
-      post_data = case data
-                  when Hash
-                    # URL encode the parameters
-                    # @server.post(@url + path, data)
-                    data
-                  else
-                    # @server.post(@url + path, @serializer.serialize(data))
-                    @serializer.serialize(data)
-                  end
+#       post_data = case data
+#                   when Hash
+#                     # URL encode the parameters
+#                     # @server.post(@url + path, data)
+#                     puts "------ mdb_post: data is hash, no serialization"
+#                     data
+#                   else
+#                     # @server.post(@url + path, @serializer.serialize(data))
+#                     puts "------ mdb_post: serialize data: #{data.inspect} (#{data.class})"
+#                     @serializer.serialize(data)
+#                   end
+
+      post_data = @serializer.serialize data
       request(:post, path, post_data)
     end
 
@@ -113,9 +118,9 @@ module MDB
       mdb_get("/#{@db_name}/#{id}")
     end
 
-    # PUT /:db   returns docid
+    # POST /:db   returns docid
     def add(document)
-      mdb_post("/#{@db_name}", @serializer.serialize(document))
+      mdb_post("/#{@db_name}", document)
     end
 
     def size
