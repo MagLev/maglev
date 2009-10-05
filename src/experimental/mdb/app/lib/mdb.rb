@@ -13,71 +13,75 @@ module MDB
     end
 
     def mdb_delete(path)
-      handle_result @server.delete(@url + path)
+      request(:delete, path)
+      #handle_response @server.delete(@url + path)
     end
 
     def mdb_get(path)
-      handle_result @server.get_content(@url + path)
+      request(:get, path)
+      #handle_response @server.get_content(@url + path)
     end
 
     def mdb_put(path, data)
-      handle_result @server.put(@url + path, @serializer.serialze(data))
+      request(:put, path, @serializer.serialize(data))
+      #handle_response @server.put(@url + path, @serializer.serialize(data))
     end
 
     def mdb_post(path, data)
-      handle_result case data
-                    when Hash
-                      # URL encode the parameters
-                      @server.post(@url + path, data)
-                    else
-                      @server.post(@url + path, @serializer.serialize(data))
-                    end
+      post_data = case data
+                  when Hash
+                    # URL encode the parameters
+                    # @server.post(@url + path, data)
+                    data
+                  else
+                    # @server.post(@url + path, @serializer.serialize(data))
+                    @serializer.serialize(data)
+                  end
+      request(:post, path, post_data)
     end
 
     private
-    # Issue the HTTP request to the MDB server, and handle the result
-    def rest_op(op, path, data = nil)
-      begin
-        result = request(op, path, data)
-        puts "===== RESULT: #{result.inspect}"
-        case result.status
-        when 200..299
-          deserialize(result)
-        else
-          raise "Error doing #{op} #{path} STATUS: #{result.status}"
-        end
-      rescue HTTPClient::BadResponseError => bre
-        raise "Error doing #{op} #{path} from database: #{bre.res.content}"
-      end
-    end
 
-    def handle_result(result)
-      begin
-        case result.status
-        when 200..299
-          deserialize(result)
-        else
-          raise "Error doing #{op} #{path} STATUS: #{result.status}"
-        end
-      rescue HTTPClient::BadResponseError => bre
-        raise "Error doing #{op} #{path} from database: #{bre.res.content}"
-      end
+    def handle_response(response)
+      result = case response
+               when HTTP::Message
+                 begin
+                   case response.status
+                   when 200..299
+                     deserialize(response)
+                   else
+                     raise "Error doing #{@method} #{@path} STATUS: #{response.status}"
+                   end
+                 rescue HTTPClient::BadResponseError => bre
+                   raise "Error doing #{@method} #{@path} from database: #{bre.res.content}"
+                 end
+               else
+                 # not an HTTP::Message
+                 puts "--- handle_response(#{response.inspect})   class #{response.class}"
+                 STDOUT.flush
+                 @serializer.deserialize response
+               end
+      @path = @method = @data = nil
+      result
     end
 
     # Issue a request based on op and provided data.
     # Returns an HTTP::Message object.
-    def request(op, path, data)
-      url = @url + path
-      case op
-      when :get
-        @server.get_content url
-      when :put
-        @server.put url
-      when :delete
-
-      when :post
-        @server.post url, data
-      end
+    def request(op, path, data = nil)
+      @path = @url + path
+      @method = op
+      @data = data
+      puts "--- request(#{@method}, #{@path}, #{@data}"
+      handle_response case op
+                      when :get
+                        @server.get_content @path
+                      when :put
+                        @server.put @path
+                      when :delete
+                        @server.delete @path
+                      when :post
+                        @server.post @path, data
+                      end
     end
 
     def deserialize(obj)
@@ -111,7 +115,7 @@ module MDB
 
     # PUT /:db   returns docid
     def add(document)
-      mdb_put("/#{@db_name}", @serializer.serialize(document))
+      mdb_post("/#{@db_name}", @serializer.serialize(document))
     end
 
     def size
@@ -135,12 +139,17 @@ module MDB
     end
 
     def create(db_name, view_class)
-      mdb_post("/", :db_name => db_name, :view_class => view_class.to_s)
+      result = mdb_post("/", :db_name => db_name, :view_class => view_class.to_s)
+      if result == db_name
+        RESTDatabase.new(@url, db_name)
+      else
+        raise result
+      end
     end
 
-    def update(db_name, view_class)
+#     def update(db_name, view_class)
 
-    end
+#     end
 
     def delete(db_name)
       mdb_delete("/#{db_name}")
