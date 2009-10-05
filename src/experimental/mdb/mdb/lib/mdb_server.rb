@@ -3,13 +3,15 @@ require 'sinatra'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
-# Exception.install_debug_block do |e|
-#   puts "--- #{e} #{e.class}"
-#   case e
-#   when RuntimeError
-#     nil.pause if e.message =~ /Illegal creation of a Symbol/
-#   end
-# end
+Exception.install_debug_block do |e|
+  puts "--- #{e} #{e.class}"
+  case e
+  when NoMethodError
+    nil.pause if e.message =~ /to_sym/
+  when ArgumentError
+    nil.pause # if e.message =~ /Illegal creation of a Symbol/
+  end
+end
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
@@ -28,19 +30,19 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
 These requests correspond to methods on MDB::Server, a collection:
 
-  |--------+-------+---------------------+-------------------|
-  | Verb   | Route | Action              | View              |
-  |--------+-------+---------------------+-------------------|
-  | GET    | /     | List database names | Array of strings  |
-  | PUT    | /     | NOT SUPPORTED       |                   |
-  | POST   | /     | Database.create     | new id comes back |
-  | DELETE | /     | NOT SUPPORTED       |                   |
-  |        |       |                     |                   |
-  | GET    | /:db  | Test if db exists   | boolean           |
-  | PUT    | /:db  | NOT SUPPORTED       |                   |
-  | POST   | /:db  | Create new document | id                |
-  | DELETE | /:db  | Delete db           |                   |
-  |--------+-------+---------------------+-------------------|
+  |--------+-------+---------------------------------------+-------------------|
+  | Verb   | Route | Action [params]                       | Result            |
+  |--------+-------+---------------------------------------+-------------------|
+  | GET    | /     | List database names                   | Array of strings  |
+  | PUT    | /     | NOT SUPPORTED                         |                   |
+  | POST   | /     | Database.create [db_name, view_class] | new id comes back |
+  | DELETE | /     | NOT SUPPORTED                         |                   |
+  |        |       |                                       |                   |
+  | GET    | /:db  | Test if db exists                     | boolean           |
+  | PUT    | /:db  | NOT SUPPORTED                         |                   |
+  | POST   | /:db  | Create new document                   | id                |
+  | DELETE | /:db  | Delete db                             |                   |
+  |--------+-------+---------------------------------------+-------------------|
 
 These requests correspond to methods on MDB::Database
 
@@ -63,10 +65,18 @@ These requests correspond to methods on MDB::Database
 # we are customized with).
 class MDB::ServerApp < Sinatra::Base
 
-  def initialize(serializer, *args)
-    super(*args)
-    raise ArgumentError if serializer.nil?
-    @serializer = serializer
+  require 'log_headers'
+  use LogHeaders
+
+  def initialize
+    super
+    # TODO: I need to parameterize the serializer, but I can't seem to get
+    # the combination of:
+    # 1: Passing parameters to the MDB::ServerApp.new(:marshal)
+    # 2: Starting from a rackup file with an app derived from Sinatra::Base
+    # 3: passing parameters like :host and :port into the appropriate level.
+    # Until then, I'll just hardcode the MarshalSerializer.
+    @serializer = MDB::MarshalSerializer.new
     @server = MDB::Server
   end
 
@@ -90,17 +100,19 @@ class MDB::ServerApp < Sinatra::Base
 
   # List db names
   get '/' do
-    @serializer.serialize @server.db_names
+    @serializer.serialize(@server.db_names)
   end
 
   # Create a new database
   post '/' do
-    @serializer.serialize @server.create(params[:db_name], params[:view_class])
+    puts "=== post '/': params: #{params.inspect}"
+    result = @server.create(params[:db_name], params[:view_class])
+    @serializer.serialize(result.name)
   end
 
   # Query if db exists
   get '/:db' do
-    @serializer.serialize @server.key? params[:db]
+    @serializer.serialize(@server.key? params[:db])
   end
 
   # Create new document
@@ -111,7 +123,7 @@ class MDB::ServerApp < Sinatra::Base
     # .string is needed since request may be a StringIO,
     # and StringIO may not be committed to the repository.
     obj = @serializer.deserialize(request.body.string)
-    @serializer.serialize get_db.add(obj)
+    @serializer.serialize(get_db.add(obj))
   end
 
   # Delete database
@@ -119,12 +131,12 @@ class MDB::ServerApp < Sinatra::Base
   delete '/:db' do
     # .string is needed since request may be a StringIO,
     # and StringIO may not be committed to the repository.
-    @serializer.serialize @server.delete params[:db]
+    @serializer.serialize(@server.delete params[:db])
   end
 
   # Get a document
   get '/:db/:id' do
-    @serializer.serialize get_db.get(params[:id].to_i)
+    @serializer.serialize(get_db.get(params[:id].to_i))
   end
 
   # Update a document
@@ -134,21 +146,21 @@ class MDB::ServerApp < Sinatra::Base
 
   # Delete a document
   delete '/:db/:id' do
-    @serializer.serialize get_db.delete params[:id].to_i
+    @serializer.serialize(get_db.delete params[:id].to_i)
   end
 
   # Run a view on the database.
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
   get '/:db/view/:view' do
-    @serializer.serialize get_db.execute_view(params[:view])
+    @serializer.serialize(get_db.execute_view(params[:view]))
   end
 
 # TODO: /mdb is top level URL and represents the collection of dbs
 #   POST /mdb  Create new db
   # For testing...
   get '/:db/send/:method' do
-    @serializer.serialize get_db.send(params[:method].to_sym)
+    @serializer.serialize(get_db.send(params[:method].to_sym))
   end
 
   # Or, we could do specific handlers such as:

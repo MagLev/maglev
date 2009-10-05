@@ -10,6 +10,7 @@ module MDB
     end
 
     def deserialize(string)
+      puts "--- #{self}.deserialize(#{string.inspect})"
       Marshal.load string
     end
   end

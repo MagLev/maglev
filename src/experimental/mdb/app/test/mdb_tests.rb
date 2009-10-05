@@ -12,19 +12,16 @@ SERVER  = 'http://localhost:4567'
 
 describe MDB::RESTDatabase do
   before do
-    @server = MDB::RESTServer.new(SERVER)
+    @server = MDB::RESTServer.new SERVER
     @server.delete DB_NAME
-    @db = @server.create DB_NAME
-#    @db = MDB::RESTDatabase.new(SERVER, DB_NAME)
+    @db = @server.create DB_NAME, AppModel
     @db.clear
   end
 
-# Tests broken due to json pure gem problem with true, false and symbols...
-#
-#   it 'starts off empty' do
-#     @db.size.must_equal 0
-#     @db.list_ids.size.must_equal 0
-#   end
+  it 'starts off empty' do
+    @db.size.must_equal 0
+    @db.list_ids.size.must_equal 0
+  end
 
 #   it 'adds documents and can retrieve them' do
 #     blog_post = { :title => 'a title', :ts => Time.now, :text => 'some text' }

@@ -17,6 +17,8 @@ module MDB
 
     class NoViewError < MDB::MDBError ;  end
 
+    attr_reader :name
+
     # Initialize a new Database. The database will remember its name, and
     # it will use the +view_class+ for all of its view requests.
     def initialize(name, view_class)

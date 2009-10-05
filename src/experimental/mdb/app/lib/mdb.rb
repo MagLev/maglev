@@ -1,61 +1,92 @@
 require 'rubygems'
-require 'json'
+require 'httpclient'
+
+require 'mdb/serializer'
 
 module MDB
-  # Manages the REST communication to MDB
+  # Manages the REST communication to MDB and serialization
   class REST
-    require 'httpclient'
-
     def initialize(url)
+      @serializer = MDB::MarshalSerializer.new
       @url = url
       @server = HTTPClient.new
     end
 
-    def mdb_delete(db)
-      rest_op :delete, db
+    def mdb_delete(path)
+      handle_result @server.delete(@url + path)
     end
 
     def mdb_get(path)
-      rest_op :get, path
+      handle_result @server.get_content(@url + path)
     end
 
     def mdb_put(path, data)
-      rest_op :put, path, data
+      handle_result @server.put(@url + path, @serializer.serialze(data))
     end
 
     def mdb_post(path, data)
-      rest_op :post, path, data
+      handle_result case data
+                    when Hash
+                      # URL encode the parameters
+                      @server.post(@url + path, data)
+                    else
+                      @server.post(@url + path, @serializer.serialize(data))
+                    end
     end
 
-    def from_json(obj)
-      json = case obj
-             when HTTP::Message
-               obj.content
-             else
-               obj
-             end
-      # The MDB_SERVER app always wraps responses in an array,
-      # so we always unpack the first element to get to the real
-      # response
-      JSON.parse(json)[0]
-    end
-
+    private
+    # Issue the HTTP request to the MDB server, and handle the result
     def rest_op(op, path, data = nil)
       begin
-        url = @url + path
-        from_json case op
-                  when :get
-                    @server.get_content url
-                  when :put
-                    @server.put url
-                  when :delete
-                    @server.delete url
-                  when :post
-                    @server.post url, data
-                  end
+        result = request(op, path, data)
+        puts "===== RESULT: #{result.inspect}"
+        case result.status
+        when 200..299
+          deserialize(result)
+        else
+          raise "Error doing #{op} #{path} STATUS: #{result.status}"
+        end
       rescue HTTPClient::BadResponseError => bre
         raise "Error doing #{op} #{path} from database: #{bre.res.content}"
       end
+    end
+
+    def handle_result(result)
+      begin
+        case result.status
+        when 200..299
+          deserialize(result)
+        else
+          raise "Error doing #{op} #{path} STATUS: #{result.status}"
+        end
+      rescue HTTPClient::BadResponseError => bre
+        raise "Error doing #{op} #{path} from database: #{bre.res.content}"
+      end
+    end
+
+    # Issue a request based on op and provided data.
+    # Returns an HTTP::Message object.
+    def request(op, path, data)
+      url = @url + path
+      case op
+      when :get
+        @server.get_content url
+      when :put
+        @server.put url
+      when :delete
+
+      when :post
+        @server.post url, data
+      end
+    end
+
+    def deserialize(obj)
+      @serializer.deserialize case obj
+                              when HTTP::Message
+                                obj.content
+                              else
+                                obj
+                              end
     end
   end
 
@@ -80,7 +111,7 @@ module MDB
 
     # PUT /:db   returns docid
     def add(document)
-      mdb_put("/#{@db_name}", document.to_json)
+      mdb_put("/#{@db_name}", @serializer.serialize(document))
     end
 
     def size
@@ -97,7 +128,6 @@ module MDB
   end
 
   class RESTServer < REST
-
     # Initialize a +RESTServer+ that will communicate with the remote
     # MDB::Server object over +url+.
     def initialize(url)
@@ -105,7 +135,7 @@ module MDB
     end
 
     def create(db_name, view_class)
-      mdb_post("/#{db_name}", ["view_class", view_class.name])
+      mdb_post("/", :db_name => db_name, :view_class => view_class.to_s)
     end
 
     def update(db_name, view_class)
