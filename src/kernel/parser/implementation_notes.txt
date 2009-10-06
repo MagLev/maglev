@@ -155,7 +155,7 @@ Lexing of double quoted strings (Maglev Trac 580)
   for each subequent line in the source and then
   goes into an infinite loop handling the EOF  token.
   In ruby_parser.y , for  production 'kCLASS cpath superclass'
-  changed the yyerror call just   raise SyntaxError
+  changed the   yyerror    call to just     raise SyntaxError
   and terminate the parsing.
 
 5 Oct 2009
@@ -167,5 +167,6 @@ Lexing of double quoted strings (Maglev Trac 580)
   was replaced by
          elsif src.check_advance(/\$\W|\$\z/) then 
             rb_compile_error "unexpected whitespace after '$' "  
-  to handle the case of a malformed comment line which has $ instead of #
+  to handle the case of a malformed comment line which has $ instead of #,  
+  such as:
      $ a comment line
