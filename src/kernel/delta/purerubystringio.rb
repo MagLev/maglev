@@ -51,6 +51,7 @@ class PureRubyStringIO < IO
   end
 
   def binmode
+    requireOpen
     self
   end
 
