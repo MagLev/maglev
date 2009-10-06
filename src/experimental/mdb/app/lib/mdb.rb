@@ -1,61 +1,101 @@
 require 'rubygems'
-require 'json'
+require 'httpclient'
 
+require 'mdb/serializer'
+
+# TODO: Add proper Content-type header
 module MDB
-  # Manages the REST communication to MDB
+  # Manages the REST communication to MDB and serialization
   class REST
-    require 'httpclient'
-
     def initialize(url)
+      @serializer = MDB::MarshalSerializer.new
       @url = url
       @server = HTTPClient.new
     end
 
-    def mdb_delete(db)
-      rest_op :delete, db
+    def mdb_delete(path)
+      request(:delete, path)
+      #handle_response @server.delete(@url + path)
     end
 
     def mdb_get(path)
-      rest_op :get, path
+      request(:get, path)
+      #handle_response @server.get_content(@url + path)
     end
 
     def mdb_put(path, data)
-      rest_op :put, path, data
+      request(:put, path, @serializer.serialize(data))
+      #handle_response @server.put(@url + path, @serializer.serialize(data))
     end
 
     def mdb_post(path, data)
-      rest_op :post, path, data
+#       post_data = case data
+#                   when Hash
+#                     # URL encode the parameters
+#                     # @server.post(@url + path, data)
+#                     puts "------ mdb_post: data is hash, no serialization"
+#                     data
+#                   else
+#                     # @server.post(@url + path, @serializer.serialize(data))
+#                     puts "------ mdb_post: serialize data: #{data.inspect} (#{data.class})"
+#                     @serializer.serialize(data)
+#                   end
+
+      post_data = @serializer.serialize data
+      request(:post, path, post_data)
     end
 
-    def from_json(obj)
-      json = case obj
-             when HTTP::Message
-               obj.content
-             else
-               obj
-             end
-      # The MDB_SERVER app always wraps responses in an array,
-      # so we always unpack the first element to get to the real
-      # response
-      JSON.parse(json)[0]
+    private
+
+    def handle_response(response)
+      result = case response
+               when HTTP::Message
+                 begin
+                   case response.status
+                   when 200..299
+                     deserialize(response)
+                   else
+                     raise "Error doing #{@method} #{@path} STATUS: #{response.status}"
+                   end
+                 rescue HTTPClient::BadResponseError => bre
+                   raise "Error doing #{@method} #{@path} from database: #{bre.res.content}"
+                 end
+               else
+                 # not an HTTP::Message
+                 puts "--- handle_response(#{response.inspect})   class #{response.class}"
+                 STDOUT.flush
+                 @serializer.deserialize response
+               end
+      @path = @method = @data = nil
+      result
     end
 
-    def rest_op(op, path, data = nil)
-      begin
-        url = @url + path
-        from_json case op
-                  when :get
-                    @server.get_content url
-                  when :put
-                    @server.put url
-                  when :delete
-                    @server.delete url
-                  when :post
-                    @server.post url, data
-                  end
-      rescue HTTPClient::BadResponseError => bre
-        raise "Error doing #{op} #{path} from database: #{bre.res.content}"
-      end
+    # Issue a request based on op and provided data.
+    # Returns an HTTP::Message object.
+    def request(op, path, data = nil)
+      @path = @url + path
+      @method = op
+      @data = data
+      puts "--- request(#{@method}, #{@path}, #{@data}"
+      handle_response case op
+                      when :get
+                        @server.get_content @path
+                      when :put
+                        @server.put @path
+                      when :delete
+                        @server.delete @path
+                      when :post
+                        @server.post @path, data
+                      end
+    end
+
+    def deserialize(obj)
+      @serializer.deserialize case obj
+                              when HTTP::Message
+                                obj.content
+                              else
+                                obj
+                              end
     end
   end
 
@@ -78,9 +118,9 @@ module MDB
       mdb_get("/#{@db_name}/#{id}")
     end
 
-    # PUT /:db   returns docid
+    # POST /:db   returns docid
     def add(document)
-      mdb_put("/#{@db_name}", document.to_json)
+      mdb_post("/#{@db_name}", document)
     end
 
     def size
@@ -97,7 +137,6 @@ module MDB
   end
 
   class RESTServer < REST
-
     # Initialize a +RESTServer+ that will communicate with the remote
     # MDB::Server object over +url+.
     def initialize(url)
@@ -105,12 +144,17 @@ module MDB
     end
 
     def create(db_name, view_class)
-      mdb_post("/#{db_name}", ["view_class", view_class.name])
+      result = mdb_post("/", :db_name => db_name, :view_class => view_class.to_s)
+      if result == db_name
+        RESTDatabase.new(@url, db_name)
+      else
+        raise result
+      end
     end
 
-    def update(db_name, view_class)
+#     def update(db_name, view_class)
 
-    end
+#     end
 
     def delete(db_name)
       mdb_delete("/#{db_name}")

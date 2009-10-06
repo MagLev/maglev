@@ -24,5 +24,15 @@ Maglev.persistent do
       43 # one better...
     end
   end
+
+  module Foo
+    module Bar
+      class ViewClass3
+        def self.view_42
+          44 # better and better
+        end
+      end
+    end
+  end
 end
 Maglev.commit_transaction

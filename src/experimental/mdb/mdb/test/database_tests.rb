@@ -17,19 +17,44 @@ describe MDB::Database do
     @db = MDB::Server[DB_NAME]
   end
 
-  it 'execute_view executes the requested view (view is symbol or string)' do
+  it 'executes the requested view (view is symbol or string)' do
     @db.execute_view('view_42').must_equal 42
     @db.execute_view(:view_42).must_equal 42
   end
 
-  it 'execute_view raises NoSuchView if there is no view of the given name' do
+  it 'raises NoSuchView if there is no view of the given name' do
     proc { @db.execute_view(:not_a_view_name) }.must_raise MDB::Database::NoViewError
   end
 
-  it 'set_view updates the view class' do
+  it 'it accepts symbols for set_view' do
+    @db.execute_view(:view_42).must_equal 42 # Ensure old view
+    @db.set_view(:ViewClass2)
+    @db.execute_view(:view_42).must_equal 43 # Ensure new view
+  end
+
+  it 'it accepts strings for set_view' do
+    @db.execute_view(:view_42).must_equal 42 # Ensure old view
+    @db.set_view("ViewClass2")
+    @db.execute_view(:view_42).must_equal 43 # Ensure new view
+  end
+
+  it 'it accepts classes for set_view' do
     @db.execute_view(:view_42).must_equal 42 # Ensure old view
     @db.set_view(ViewClass2)
     @db.execute_view(:view_42).must_equal 43 # Ensure new view
+  end
+
+  it 'it searches and finds a path given to set_view' do
+    @db.execute_view(:view_42).must_equal 42 # Ensure old view
+    @db.set_view("Foo::Bar::ViewClass3")
+    @db.execute_view(:view_42).must_equal 44 # Ensure new view
+  end
+
+  it 'raises an exception if set_view called with bogus class, string or symbol' do
+    @db.execute_view(:view_42).must_equal 42 # Ensure old view
+    proc { @db.set_view(:BogusViewClass2) }.must_raise MDB::MDBError
+    proc { @db.set_view("BogusViewClass2") }.must_raise MDB::MDBError
+    proc { @db.set_view("Foo::Bar::BogusViewClass2") }.must_raise MDB::MDBError
   end
 
   it 'adds the document to the saved documents and can get it by id' do

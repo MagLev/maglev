@@ -6,11 +6,17 @@ module MDB
     end
 
     def serialize(obj)
-      Marshal.dump obj
+      str = Marshal.dump obj
+#      puts "--- #{self}.serialize(#{obj.inspect})"
+#      puts "---    str(#{str.length}): #{str.inspect}"
+      str
     end
 
     def deserialize(string)
-      Marshal.load string
+      obj = Marshal.load string
+#      puts "--- #{self}.deserialize(#{string.inspect})  length: #{string.length}"
+#      puts "---    obj.class: #{obj.class}  #{obj.inspect}"
+      obj
     end
   end
 
