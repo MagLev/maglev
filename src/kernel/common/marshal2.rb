@@ -103,7 +103,7 @@ class Bignum
       cnt += 1
     end
 
-    str[0..1] + ms.serialize_integer(cnt / 2) + str[2..-1]
+    str[0..1] + ms.serialize_integer(cnt._divide(2) ) + str[2..-1]
   end
 end
 
@@ -188,15 +188,19 @@ end
 
 class Float
   def to_marshal(ms)
-    str = if nan? then
-            "nan"
-          elsif zero? then
-            (1.0 / self) < 0 ? '-0' : '0'
-          elsif infinite? then
-            self < 0 ? "-inf" : "inf"
-          else
-            "%.17g" % [self] + ms.serialize_float_thing(self)
-          end
+    if finite?
+      if self == 0.0
+        str = self._sign < 0 ? '-0' : '0'
+      else
+        str = "%.17g" % [self] + ms.serialize_float_thing(self)
+      end
+    elsif nan? then
+      str = "nan"
+    elsif infinite? then
+      str = self < 0 ? "-inf" : "inf"
+    else
+      raise 'logic error in Float.to_marshal'
+    end
     Marshal::TYPE_FLOAT + ms.serialize_integer(str.length) + str
   end
 end

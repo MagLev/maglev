@@ -164,13 +164,17 @@ module Marshal
 
     def construct_float
       s = get_byte_sequence
-
-      if s == "nan"
-        obj = 0.0 / 0.0
-      elsif s == "inf"
-        obj = 1.0 / 0.0
-      elsif s == "-inf"
-        obj = 1.0 / -0.0
+      last_ch = s[-1]
+      if last_ch.equal?( ?n ) || last_ch.equal?( ?f )
+        if s == "nan"
+          obj = 0.0._divide(0.0)
+        elsif s == "inf"
+          obj = 1.0._divide(0.0)
+        elsif s == "-inf"
+          obj = 1.0._divide(-0.0)
+        else
+          obj = s.to_f
+        end
       else
         obj = s.to_f
       end
@@ -464,10 +468,11 @@ module Marshal
 
     def serialize_float_thing(flt)
       str = ''
-      flt = Math.modf(Math.ldexp(Math.frexp(flt.abs)[0], 37))[0]
+      mmath = Math 
+      flt = mmath.modf(mmath.ldexp(mmath.frexp(flt.abs)[0], 37))[0]
       str << "\0" if flt > 0
       while flt > 0
-        mod_arr = Math.modf(Math.ldexp(flt, 32))
+        mod_arr = mmath.modf(mmath.ldexp(flt, 32))
         flt = mod_arr[0]
         n = mod_arr[1]
         n = n.to_i
