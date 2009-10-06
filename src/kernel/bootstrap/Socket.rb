@@ -255,7 +255,7 @@ class Socket
     else
       host = Type.coerce_to(host, String, :to_s)
     end
-    if service._isFixnum || service._isString
+    if service._isFixnum 
       # ok
     elsif service.equal?(nil)
       service = 0
