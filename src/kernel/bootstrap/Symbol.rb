@@ -1,7 +1,13 @@
 #---------------------------------
 # Symbol
-#    Smalltalk Symbol and Ruby Symbol are identical classes
-#    note in Ruby , superclass of Symbol is Object
+#    Smalltalk Symbol and Ruby Symbol are identical classes .
+#    In Smalltalk, the superclass of Symbol is String .
+#
+#    You cannot code  'class Symbol < Object' in this file
+#    because Object would not match the Smalltalk superclass.
+#    In environments >= 1, at the end of bootstrapping,
+#    the superclass of Symbol is changed to be Object by use 
+#    of RubyContext>>_fixSymbolSuperclass:  in the .mcz code.
 
 class Symbol
   # returns an Array containing all keys in the Smalltalk dictionary AllSymbols
