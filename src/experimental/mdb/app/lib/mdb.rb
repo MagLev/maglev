@@ -43,8 +43,6 @@ module MDB
       else
         post_data = @serializer.serialize data
       end
-puts "===== POST path: #{path.inspect}  "
-puts "===== POST data: #{post_data.inspect}  "
       request(:post, path, post_data)
     end
 
