@@ -70,8 +70,8 @@ These requests correspond to methods on MDB::Database
 # we are customized with).
 class MDB::ServerApp < Sinatra::Base
 
-#  require 'log_headers'
-#  use LogHeaders
+#   require 'log_headers'
+#   use LogHeaders
 
   use MagLevTransactionWrapper
 
@@ -107,14 +107,19 @@ class MDB::ServerApp < Sinatra::Base
 
   # List db names
   get '/' do
-    @serializer.serialize(@server.db_names)
+    begin
+      @serializer.serialize(@server.db_names)
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Create a new database
   post '/' do
-    # TODO: I tried to setup an error handler for MDB::MDBError, but two problems:
-    # 1: The thrown exception's class is matched exactly, not with ===, so you can't
-    #    setup a handler for a tree of exceptions
+    # TODO: I tried to setup an error handler for MDB::MDBError, but two
+    # problems:
+    # 1: The thrown exception's class is matched exactly, not with ===, so
+    #    you can't setup a handler for a tree of exceptions
     # 2: halt 404, didn't seem to work from in there...
     begin
       result = @server.create(params[:db_name], params[:view_class])
@@ -126,7 +131,11 @@ class MDB::ServerApp < Sinatra::Base
 
   # Query if db exists
   get '/:db' do
-    @serializer.serialize(@server.key? params[:db])
+    begin
+      @serializer.serialize(@server.key? params[:db])
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Create new document
@@ -134,21 +143,35 @@ class MDB::ServerApp < Sinatra::Base
   # The database will add the object to its collection, and then
   # call the model added(new_object) hook.
   post '/:db' do
-    # .string is needed since request may be a StringIO
-    obj = @serializer.deserialize(request.body.string)
-    @serializer.serialize(get_db.add(obj))
+    begin
+      data = request.POST
+      data = @serializer.deserialize data unless Hash === data
+      @serializer.serialize(get_db.add(data))
+      # .string is needed since request may be a StringIO
+      #obj = @serializer.deserialize(request.body.string)
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Delete database
   # The server will delete the database.
   delete '/:db' do
-    get_db # will raise 404 if :db not found
-    @serializer.serialize(@server.delete params[:db])
+    begin
+      get_db # will raise 404 if :db not found
+      @serializer.serialize(@server.delete params[:db])
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Get a document
   get '/:db/:id' do
-    @serializer.serialize(get_db.get(params[:id].to_i))
+    begin
+      @serializer.serialize(get_db.get(params[:id].to_i))
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Update a document
@@ -158,19 +181,31 @@ class MDB::ServerApp < Sinatra::Base
 
   # Delete a document
   delete '/:db/:id' do
-    @serializer.serialize(get_db.delete params[:id].to_i)
+    begin
+      @serializer.serialize(get_db.delete params[:id].to_i)
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # Run a view on the database.
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
   get '/:db/view/:view' do
-    @serializer.serialize(get_db.execute_view(params[:view]))
+    begin
+      @serializer.serialize(get_db.execute_view(params[:view]))
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   # For testing...
   get '/:db/send/:method' do
-    @serializer.serialize(get_db.send(params[:method].to_sym))
+    begin
+      @serializer.serialize(get_db.send(params[:method].to_sym))
+    rescue MDB::MDBError => e
+      halt 404, "MDB::ServerApp error: #{e.message}"
+    end
   end
 
   error do

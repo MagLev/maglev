@@ -15,17 +15,14 @@ module MDB
 
     def mdb_delete(path)
       request(:delete, path)
-      #handle_response @server.delete(@url + path)
     end
 
     def mdb_get(path)
       request(:get, path)
-      #handle_response @server.get_content(@url + path)
     end
 
     def mdb_put(path, data)
       request(:put, path, @serializer.serialize(data))
-      #handle_response @server.put(@url + path, @serializer.serialize(data))
     end
 
     def mdb_post(path, data)
@@ -41,7 +38,11 @@ module MDB
 #                     @serializer.serialize(data)
 #                   end
 
-      post_data = @serializer.serialize data
+      if Hash === data
+        post_data = data
+      else
+        post_data = @serializer.serialize data
+      end
       request(:post, path, post_data)
     end
 
@@ -55,7 +56,7 @@ module MDB
                    when 200..299
                      deserialize(response)
                    else
-                     raise "Error doing #{@method} #{@path} STATUS: #{response.status}"
+                     raise "Error doing #{@method} #{@path} STATUS: #{response.status} #{response.body.content}"
                    end
                  rescue HTTPClient::BadResponseError => bre
                    raise "Error doing #{@method} #{@path} from database: #{bre.res.content}"
@@ -85,7 +86,12 @@ module MDB
                       when :delete
                         @server.delete @path
                       when :post
-                        @server.post @path, data
+                        case data
+                        when Hash
+                          @server.post_content @path, data
+                        else
+                          @server.post @path, data
+                        end
                       end
     end
 
@@ -143,8 +149,13 @@ module MDB
       super(url)
     end
 
+    def key?(key)
+      mdb_get("/#{key}")
+    end
+
     def create(db_name, view_class)
-      result = mdb_post("/", :db_name => db_name, :view_class => view_class.to_s)
+      p = { :db_name => db_name, :view_class => view_class.to_s }
+      result = mdb_post("/", p)
       if result == db_name
         RESTDatabase.new(@url, db_name)
       else
