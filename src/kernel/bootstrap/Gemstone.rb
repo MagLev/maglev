@@ -65,6 +65,11 @@ class Gemstone
   # the add to closure list.  
   # Takes a single argument, a not-committed object.  
   # An argument of nil shuts off a previous trap .
+  #
+  # Should be used with   maglev-ruby -d   . After control returns
+  # topaz prompt with an error use 'stack save' 
+  # and then SEND of Object>>findReferencesInMemory: to navigate upwards
+  # from the object given by the error argument.
   class_primitive 'trap_add_to_closure_list', 'trapAddToClosureList:'
 
   class_primitive_nobridge '_object_for_oop', '_objectForOop:' # used by ObjectSpace
