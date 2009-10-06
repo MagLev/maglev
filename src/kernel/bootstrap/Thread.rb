@@ -1,6 +1,6 @@
 # Maps to Smalltalk class GsProcess .  See Globals.rb
 class Thread
-  KERNEL_SRC_REGEXP = /src\/kernel/
+  # constants are defined in Thread1.rb
 
   class_primitive_nobridge '_stbacktrace', 'backtraceToLevel:'
 
@@ -96,18 +96,29 @@ class Thread
     _stub_warn("Thread.abort_on_exception=: Does nothing")
   end
 
+  # CriticalMutex defined in Thread1.rb
+
   def self.critical
-    _stub_warn("Thread.critical: Does nothing; returns false")
-    false  #
+    CriticalMutex.locked?
   end
 
-  # MNI def self.critical= ; end
-  # use of critical= not yet supported, however the
-  #    Smalltalk class ProcessorScheduler does define rubyCritical instVar.
-  def self.critical=(flag)
-    _stub_warn("Thread.critical=: Does nothing; returns flag")
-    flag
+  def self.critical=(bool)
+    mutex = CriticalMutex
+    locked = mutex.locked?
+    if bool
+      if locked
+        return true
+      else
+        return mutex.try_lock
+      end
+    else
+      if locked
+        mutex.unlock
+      end
+      return false
+    end
   end
+
   class_primitive_nobridge 'current', '_current'
 
   class_primitive_nobridge 'exit', 'exit'
@@ -143,7 +154,12 @@ class Thread
 
   class_primitive_nobridge 'pass', 'pass'
 
-  class_primitive_nobridge 'stop', 'stop'
+  class_primitive_nobridge '_stop', 'stop'
+
+  def self.stop
+    self.critical=(false)
+    self._stop
+  end
 
   class_primitive_nobridge '_recursion_guard_set', '_recursionGuardSet'
 
