@@ -1,7 +1,7 @@
 task :default => :commit
 
-#ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
-ENV['MAGLEV_OPTS'] = '-Ilib -d'
+ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
+#ENV['MAGLEV_OPTS'] = '-Ilib -d'
 #ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib -MtraceLoad'
 #ENV['MAGLEV_OPTS'] = '-Ilib -d -MtraceLoad'
 
