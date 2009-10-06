@@ -12,9 +12,9 @@ RubyStaticScope traceLocals: 0 .
 GsNMethod traceIR: 0 .   "0 none, 1, line num of each meth, 2 full"
 
 "Exception installDebugBlock: [:ex|  nil pause ].  "
-ctx loadBootFileNamed: hm , '/src/kernel/parser/load_parser.rb' env: 2 .
-ctx loadPersistentFile: hm, '/src/kernel/parser/RubyNode_dynamic.rb' env: 2. 
-
-System commitTransaction ifFalse:[ nil error:'commit failed'].
+ctx loadBootFileNamed: hm , '/src/kernel/parser/load_parser.rb' env: 2 ;
+  commitTransaction ;
+  loadPersistentFile: hm, '/src/kernel/parser/RubyNode_dynamic.rb' env: 2 ;
+  commitTransaction .
 true
 %
