@@ -62,6 +62,11 @@ namespace :dev do
     end
   end
 
+  desc "Run persistence tests on stone per STONENAME env var"
+  task :'p-tests-STONENAME' do
+    run_ptests(nil)  
+  end
+
   def run_ptests(stone_name=nil)
     pdir = "#{MAGLEV_HOME}/src/test/persistence/"
     stone_spec = stone_name.nil? ? "" : "--stone #{stone_name}"
