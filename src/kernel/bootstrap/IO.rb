@@ -2,7 +2,14 @@ class IO
 
   # FNM*, LOCK*, APPEND ... , SEEK*  , initialized in IO2.rb
 
-  primitive 'binmode', 'binmode'
+  def binmode
+    # set receiver to binary mode. Has no effect on Unix
+    if self.closed?
+      raise IOError , 'binmode called on closed file'
+    end
+    self
+  end
+
   primitive 'fileno', 'fileDescriptor'
   primitive 'sync', 'sync'
   primitive 'sync=', 'setSync:'
@@ -260,15 +267,21 @@ class IO
     @lineNumber = num + 1
   end
 
-  # Note, gets and readline must be reimplemented in subclasses to 
-  #  update caller's $_ see File and StringIO code for examples.
-
   ##
   # Reads a line as with IO#gets, but raises an EOFError on end of file.
   def readline(separator=$/)
-    r = gets(separator)
-    raise EOFError if r.nil?
-    r
+    res = self.gets(separator)
+    raise EOFError if res.nil?
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
+  end
+
+  def readline
+    separator=$/
+    res = self.gets(separator)
+    raise EOFError if res.nil?
+    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res
   end
 
   ##

@@ -79,6 +79,12 @@ module Kernel
   # def catch(aSymbol, &aBlock); end
   primitive_nobridge_env 'catch&' , 'catch', ':do:'
 
+  def debugger
+    # signals an Exception which is not trappable by Ruby or Smalltalk
+    # and thus returns control to topaz debugger or other GCI main program.
+    nil.pause
+  end
+
   primitive_nobridge '_eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
   def eval(str, binding, file_name, line_number=1 )
@@ -433,27 +439,6 @@ module Kernel
     arg
   end
 
-  # def rand #  implemented in Kernel2.rb
-
-  def readline(sep=$/)
-    res = self.gets(sep)
-    if res.equal?(nil)
-      raise EOFError
-    end
-    res
-  end
-
-  def readlines(sep=$/)
-    res = []
-    line = self.gets(sep)
-    while line._not_equal?(nil)
-      res << line
-      line = self.gets(sep)
-    end
-    res
-  end
- 
-
   def raise(ex_class, message)
     ex = ex_class.exception(message)
     ex._signal
@@ -491,6 +476,30 @@ module Kernel
     RuntimeError._signal
   end
   alias fail raise
+
+  # def rand #  implemented in Kernel2.rb
+
+  def readline(sep=$/)
+    res = self.gets(sep)
+    if res.equal?(nil)
+      raise EOFError
+    end
+    res
+  end
+
+  def readlines(sep=$/)
+    res = []
+    line = self.gets(sep)
+    while line._not_equal?(nil)
+      res << line
+      line = self.gets(sep)
+    end
+    res
+  end
+ 
+  def require(name)
+    RUBY.require(Type.coerce_to(name, String, :to_str))
+  end
 
   def scan(pattern)
     str = self._getRubyVcGlobal(0x21) # get callers $_
@@ -558,7 +567,7 @@ module Kernel
       ms = (1000.0 * numeric).to_i
     end
     ms_slept = _sleep_ms(ms)
-    ms_slept / 1000
+    ms_slept._divide(1000)
   end
 
   def sleep_ms(milliseconds=0)
@@ -838,13 +847,35 @@ nil.pause
   # def throw(aSymbol, aValue); end  # implemented in smalltalk
   primitive_nobridge 'throw' , 'throw:with:'
 
-  def debugger
-    # signals an Exception which is not trappable by Ruby or Smalltalk
-    # and thus returns control to topaz debugger or other GCI main program.
-    nil.pause
+  primitive_nobridge '__trace_var&', 'traceGlobalVarAssign:block:'
+
+  def _call_tracevar_block(new_value, &blk)
+    # called from Smalltalk
+    blk.call(new_value)
+  end
+ 
+  def _trace_var(name, &blk)
+    unless name._isSymbol
+      name = Type.coerce_to(name, String, :to_str)
+      name = name.to_sym
+    end
+    __trace_var(name, &blk)
   end
 
-  def require(name)
-    RUBY.require(Type.coerce_to(name, String, :to_str))
+  def trace_var(name, cmd='ignored', &blk)
+    # cmd is currently ignored
+    # name must be a String or Symbol beginning with '$' 
+    # if blk is nil, has no effect
+    if block_given?
+      _trace_var(name, &blk) 
+    end
   end
+
+  def untrace_var(name, cmd='ignored')
+    # cmd is currently ignored
+    # name must be a String or Symbol beginning with '$' 
+    blk = nil
+    _trace_var(name, &blk)
+  end
+
 end
