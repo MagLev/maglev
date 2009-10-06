@@ -490,7 +490,7 @@ class Fixnum
 
   # Returns a Rational number if the result is in fact rational (i.e. +other+ < 0).
   def rpower (other)
-    if other >= 0
+    if (other <=> 0) >= 0
       self.power!(other)
     else
       Rational.new!(self,1)**other

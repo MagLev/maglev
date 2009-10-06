@@ -158,7 +158,7 @@ class Rational
   def ** (other)
     if other.kind_of?(Rational)
       other2 = other
-      if self < 0
+      if (self <=> 0) < 0
 	return Complex.new!(self, 0) ** other
       elsif other == 0
 	return Rational(1,1)
@@ -170,7 +170,7 @@ class Rational
       
       npd = numerator.prime_division
       dpd = denominator.prime_division
-      if other < 0
+      if (other <=> 0) < 0
 	other = -other
 	npd, dpd = dpd, npd
       end
@@ -230,7 +230,7 @@ class Rational
 
   def power2(other)
     if other.kind_of?(Rational)
-      if self < 0
+      if (self <=> 0) < 0
 	return Complex(self, 0) ** other
       elsif other == 0
 	return Rational(1,1)
@@ -285,12 +285,12 @@ module Math
 #      if !(x.kind_of?(Rational) and y.kind_of?(Rational))
 #	return a**Rational(1,2)
 #      end
-      if a.image >= 0 
+      if (a.image <=> 0) >= 0 
 	Complex(x, y)
       else
 	Complex(x, -y)
       end
-    elsif a >= 0
+    elsif (a <=> 0) >= 0
       rsqrt(a)
     else
       Complex(0,rsqrt(-a))
