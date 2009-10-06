@@ -58,6 +58,15 @@ class Gemstone
     _beginTransaction
   end
 
+  # Raise an exception if specified temporary object is added to the
+  # closure list during an attempt to commit. Useful in debugging 
+  # errors due to attempt to commit not-commitable objects or classes. 
+  # The exception details will include the parent object which triggered
+  # the add to closure list.  
+  # Takes a single argument, a not-committed object.  
+  # An argument of nil shuts off a previous trap .
+  class_primitive 'trap_add_to_closure_list', 'trapAddToClosureList:'
+
   class_primitive_nobridge '_object_for_oop', '_objectForOop:' # used by ObjectSpace
     # implementation is Object>>_objectForOop:  but putting class_prim directives
     # in Object or Fixnum may upset results of Object.singleton_methods ...
