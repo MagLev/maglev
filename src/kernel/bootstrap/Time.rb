@@ -210,7 +210,7 @@ class Time
   end
 
   def seconds
-    @microseconds / 1_000_000   # Gemstone
+    @microseconds._divide(1_000_000)   # Gemstone
   end
 
   def +(other)
@@ -233,7 +233,7 @@ class Time
       microsecs -=  other * 1_000_000
     elsif other.kind_of?(Time)
       delta = microsecs - other._microsecs
-      return (delta.to_f) / 1_000_000.0
+      return (delta.to_f)._divide(1_000_000.0)
     else
       other = Type.coerce_to(other, Float, :to_f)
       microsecs -= (other * 1_000_000.0).to_i
@@ -262,7 +262,7 @@ class Time
 
   def hash
     micro_sec = @microseconds
-    (micro_sec / 1_000_000) ^ (micro_sec % 1_000_000) 
+    (micro_sec._divide(1_000_000)) ^ (micro_sec % 1_000_000) 
   end
 
   def eql?(other)
@@ -318,11 +318,11 @@ class Time
   end
 
   def to_i
-    @microseconds / 1_000_000 
+    @microseconds._divide(1_000_000)
   end
 
   def to_f
-    @microseconds / 1_000_000.0 
+    @microseconds._divide(1_000_000.0)
   end
 
   ##
@@ -392,7 +392,7 @@ class Time
     # range checks on above args done in C in _c_mktime 
     year = Integer(year)
     usec = Integer(usec)
-    sec += usec / 1000000  
+    sec += usec._divide(1000000)
 
     # This logic is taken from MRI, on how to deal with 2 digit dates.
     if year < 200
@@ -554,7 +554,7 @@ class Time
     else
       off = utc_offset
       sign = off < 0 ? '-' : '+'
-      sprintf('%s%02d%02d', sign, *(off.abs / 60).divmod(60))
+      sprintf('%s%02d%02d', sign, *(off.abs._divide(60)).divmod(60))
     end
   end
   alias rfc822 rfc2822
@@ -648,7 +648,7 @@ class Time
     else
       off = utc_offset
       sign = off < 0 ? '-' : '+'
-      sprintf('%s%02d:%02d', sign, *(off.abs / 60).divmod(60))
+      sprintf('%s%02d:%02d', sign, *(off.abs._divide(60)).divmod(60))
     end
   end
   alias iso8601 xmlschema

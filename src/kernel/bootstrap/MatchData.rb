@@ -37,7 +37,7 @@ class MatchData
 
   primitive '_size', 'size'
   def size
-    _size / 2
+    _size._divide(2)
   end
 
   alias length size

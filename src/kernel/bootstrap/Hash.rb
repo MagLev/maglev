@@ -86,7 +86,7 @@ class Hash
       raise ArgumentError , 'odd number of args'
     end
     n = 0
-    tsize = numelem / 4
+    tsize = numelem._divide(4)
     if tsize < 5
       tsize = 5
     end

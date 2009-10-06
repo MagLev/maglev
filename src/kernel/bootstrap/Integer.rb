@@ -118,9 +118,12 @@ class Integer
           # handles coercion for _rubyRaisedTo:
           if arg._isInteger 
             raise TypeError , 'coercion error in ** '
+          elsif arg._isNumeric
+            c = arg.coerce(self)
+            c[0] ** c[1]
           else
-            s = Type.coerce_to(self, Float, :to_f)
-            s ** arg 
+            raise TypeError, 'numeric coercion failed'
+            nil
           end
         end 
 
