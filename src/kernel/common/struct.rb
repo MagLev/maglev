@@ -329,6 +329,11 @@ class Struct
   # Return a hash value based on this struct's contents.
 
   def hash
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    unless added
+      return 0
+    end
     to_a.hash
   end
 
