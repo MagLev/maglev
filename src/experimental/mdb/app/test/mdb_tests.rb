@@ -43,8 +43,8 @@ describe MDB::RESTDatabase do
     id.class.must_equal Fixnum
 
     copy = @db.get(id)
-    copy.must_equal data
     p copy
+    copy.must_equal data
   end
 
 end

@@ -26,27 +26,48 @@ module MDB
     end
 
     def mdb_post(path, data)
-#       post_data = case data
-#                   when Hash
-#                     # URL encode the parameters
-#                     # @server.post(@url + path, data)
-#                     puts "------ mdb_post: data is hash, no serialization"
-#                     data
-#                   else
-#                     # @server.post(@url + path, @serializer.serialize(data))
-#                     puts "------ mdb_post: serialize data: #{data.inspect} (#{data.class})"
-#                     @serializer.serialize(data)
-#                   end
-
-      if Hash === data
-        post_data = data
-      else
-        post_data = @serializer.serialize data
-      end
-      request(:post, path, post_data)
+#       if Hash === data
+#         post_data = data
+#       else
+#         post_data = @serializer.serialize data
+#       end
+#       request(:post, path, post_data)
+      request(:post, path, @serializer.serialize(data))
     end
 
     private
+
+
+    # Issue a request based on op and provided data.
+    # Returns an HTTP::Message object.
+    def request(op, path, data = nil)
+      @path = @url + path
+      @method = op
+      @data = data
+      puts "--- request(#{@method}, #{@path}, #{@data}"
+      response = case op
+                 when :get
+                   @server.get_content @path
+                 when :put
+                   @server.put @path
+                 when :delete
+                   @server.delete @path
+                 when :post
+                   #Content-Transfer-Encoding: binary
+                   @server.post @path, data, {
+          'Content-Type' => 'application/mdb',
+          'Content-Transfer-Encoding' => "binary" }
+#                    case data
+#                    when Hash
+#                      puts "=== post_content #{@path} #{@data.inspect}"
+#                      @server.post_content @path, data
+#                    else
+#                      puts "=== post #{@path} #{@data.inspect}"
+#                      @server.post @path, data
+#                    end
+                 end
+      handle_response response
+    end
 
     def handle_response(response)
       result = case response
@@ -71,33 +92,11 @@ module MDB
       result
     end
 
-    # Issue a request based on op and provided data.
-    # Returns an HTTP::Message object.
-    def request(op, path, data = nil)
-      @path = @url + path
-      @method = op
-      @data = data
-      puts "--- request(#{@method}, #{@path}, #{@data}"
-      handle_response case op
-                      when :get
-                        @server.get_content @path
-                      when :put
-                        @server.put @path
-                      when :delete
-                        @server.delete @path
-                      when :post
-                        case data
-                        when Hash
-                          @server.post_content @path, data
-                        else
-                          @server.post @path, data
-                        end
-                      end
-    end
-
     def deserialize(obj)
+      puts "--- deserialize(#{obj})"
       @serializer.deserialize case obj
                               when HTTP::Message
+                                puts "--- deserialize content (#{obj.content})"
                                 obj.content
                               else
                                 obj
@@ -163,20 +162,17 @@ module MDB
       end
     end
 
-#     def update(db_name, view_class)
-
-#     end
-
     def delete(db_name)
       mdb_delete("/#{db_name}")
     end
 
     def [](db_name)
+      # TODO: should we ask the server if db_name exists first?
       RESTDatabase.new(@url, db_name)
     end
 
     def db_names
-      raise NotImplementedError
+      mdb_get("/")
     end
   end
 end

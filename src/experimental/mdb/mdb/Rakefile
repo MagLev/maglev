@@ -73,5 +73,4 @@ namespace :server do
   task :list do
     sh %{ maglev-ruby -e 'p MDB::Server.db_names' }
   end
-
 end

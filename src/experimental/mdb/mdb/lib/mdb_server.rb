@@ -89,7 +89,15 @@ class MDB::ServerApp < Sinatra::Base
 
   before do
     Maglev.abort_transaction  # refresh view of db # TODO: Is this ok?
-    content_type @serializer.content_type
+    content_type @serializer.content_type  # Handle response type
+
+    # Unpack application/mdb data
+    case request.content_type
+    when %r{application/mdb}
+      @post_data = @serializer.deserialize request.body
+    else
+      @post_data = request.POST
+    end
   end
 
   # This is here, rather than in the before block, since params does not
@@ -122,6 +130,7 @@ class MDB::ServerApp < Sinatra::Base
     #    you can't setup a handler for a tree of exceptions
     # 2: halt 404, didn't seem to work from in there...
     begin
+      # TODO: try to use @post_data
       result = @server.create(params[:db_name], params[:view_class])
       @serializer.serialize(result.name) # send back just the db name
     rescue MDB::MDBError => e
@@ -144,11 +153,7 @@ class MDB::ServerApp < Sinatra::Base
   # call the model added(new_object) hook.
   post '/:db' do
     begin
-      data = request.POST
-      data = @serializer.deserialize data unless Hash === data
-      @serializer.serialize(get_db.add(data))
-      # .string is needed since request may be a StringIO
-      #obj = @serializer.deserialize(request.body.string)
+      @serializer.serialize get_db.add(@post_data)
     rescue MDB::MDBError => e
       halt 404, "MDB::ServerApp error: #{e.message}"
     end
