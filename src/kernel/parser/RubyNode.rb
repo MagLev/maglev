@@ -11,12 +11,10 @@ module MagRp
 
     def raise_error(msg = "")
       puts ("InternalParseError: " << msg)
-      nil.pause  # TODO delete
       raise InternalParseError, "RubyNode invalid new"
     end
     def self.raise_error(msg = "")
       puts ("InternalParseError: " << msg)
-      nil.pause  # TODO delete
       raise InternalParseError, "RubyNode invalid new"
     end
 

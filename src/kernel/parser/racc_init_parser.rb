@@ -29,7 +29,7 @@ module MagRp #
       # initialize the instance variables that are constants produced
       #  during ruby_parser.rb initialization . 
 
-      arg = MagRp::RubyParser::Racc_arg
+      arg = Racc_arg
 
       # arg[13] = true if arg.size < 14
       unless arg[13].equal?(true)

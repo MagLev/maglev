@@ -845,8 +845,8 @@ class RubyLexer
       s_ch = src.skip_vt_white
       tok_start_offset = src.pos
       if s_ch >= 256
+        space_seen = true   # whitespace was skipped
         s_ch = s_ch - 256
-        space_seen = true 
         if s_ch.equal?(256) 
           # hit EOF on current region
           regions = @src_regions
@@ -1183,12 +1183,24 @@ class RubyLexer
           self.expr_beg_push( :"[" )
 
           return result
-        elsif s_ch.equal?( ?') && (s_matched = src.scan(/\'(\\.|[^\'])*\'/)) # ] [
-          @yacc_value = s_matched[1..-2].gsub(/\\\\/, "\\").gsub(/\\'/, "'")
-          @lex_state = Expr_end
-          new_pos = src.pos
-          @line_num = @line_num + src.count_eols(tok_start_offset, new_pos-1)  # count LFs
-          return :t_STRING
+        elsif s_ch.equal?( ?')     # ] [
+          if (s_matched = src.scan(/\'(\\.|[^\'])*\'/)) 
+            unless s_matched[-1].equal?(  ?' )
+              rb_compile_error 'unterminated single-quoted string meets end of file'
+            end
+            @yacc_value = s_matched[1..-2].gsub(/\\\\/, "\\").gsub(/\\'/, "'")
+            @lex_state = Expr_end
+            new_pos = src.pos
+            @line_num = @line_num + src.count_eols(tok_start_offset, new_pos-1)  # count LFs
+            return :t_STRING
+          else 
+            src.advance(1)
+            if src.scan(/.*\'/)
+              rb_compile_error 'logic error in parsing single quoted string'
+            else
+              rb_compile_error 'unterminated single-quoted string meets end of file'
+            end
+          end
         elsif s_ch.equal?( ?| ) # src.check(/\|/) # ] [
           eq_code = src.at_equalsCONSEC_OR   # [ '||=' , '||' , '|=' ]
           if eq_code.equal?(0) # if src.scan(/\|\|\=/) 
@@ -1567,11 +1579,9 @@ class RubyLexer
           elsif (s_matched = src.scan(/\$0/)) then
             @lex_state = Expr_end
             return process_token(s_matched, command_state, tok_start_offset)
-          elsif src.check_advance(/\$\W|\$\z/) then # TODO202: remove?
-            @parser.raise_error( 'lexer unexpected match /\$\W|\$\z/ ' )   # TODO remove?
-            #@lex_state = Expr_end
-            #@yacc_value = "$"
-            #return "$"
+          elsif src.check_advance(/\$\W|\$\z/) then 
+            #@parser.raise_error( 'lexer unexpected match /\$\W|\$\z/ ' )   # TODO202 remove?
+            rb_compile_error "unexpected whitespace after '$' "  
           elsif (s_matched = src.scan(/\$\w+/))
             @lex_state = Expr_end
             return process_token(s_matched, command_state, tok_start_offset)
