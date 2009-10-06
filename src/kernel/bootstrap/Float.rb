@@ -120,8 +120,15 @@ class Float
 
   primitive_nobridge '_raised_to', '_rubyRaisedTo:'
   def **(arg)
-    a = Type.coerce_to(arg, Float, :to_f)
-    self._raised_to(a)
+    unless arg._isFloat
+      if arg._isInteger
+        arg = arg.to_f
+      else
+        c = arg.coerce(self)
+        return c[0] ** c[1] 
+      end
+    end
+    self._raised_to(arg)
   end
 
 # unaries  +@  -@  eliminated during IR generation by compiler
@@ -190,6 +197,7 @@ class Float
   primitive_nobridge 'floor', 'floor'
   primitive_nobridge 'hash'
   primitive_nobridge 'infinite?', '_ruby_infiniteQ'
+  primitive_nobridge '_sign', '_sign'  # considers -0.0 to be negative
 
   primitive_nobridge 'nan?', '_isNaN'
   primitive_nobridge 'round', 'rounded'
@@ -295,3 +303,4 @@ class Float
   primitive_nobridge  '_ldexp', 'ldexp:'
 end
 Float._freeze_constants
+
