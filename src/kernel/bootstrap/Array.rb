@@ -332,7 +332,7 @@ class Array
     my_siz = self.size
     other_siz  = other.size
     dflt = Object.new
-    htsiz = (my_siz + other_siz) / 4
+    htsiz = (my_siz + other_siz)._divide(4)
     htsiz = 5 if htsiz < 5  
     dict = Hash._new(htsiz)
     n = 0
@@ -1408,7 +1408,36 @@ class Array
   # Overrides from Object that are not documented in Array
   #   (e.g., eql? is documented in Array, so is not listed here).
 
-  primitive 'hash', '_rubyHash'
+  def hash
+    # sample at most 5 elements of receiver
+    ts = Thread._recursion_guard_set
+    added = ts._add_if_absent(self)
+    unless added
+      return 0 
+    end
+    hval = 4459 
+    begin
+      mysize = self.size
+      interval = (mysize - 1)._divide(4)
+      if interval < 1
+        interval = 1
+      end
+      n = 0
+      while n < mysize
+        elem = self._at(n)
+        eh = elem.hash
+        if eh._not_equal?(0)
+          eh = Type.coerce_to( eh, Fixnum, :to_int)
+          hval = (hval >> 1) ^ eh
+        end
+        n += interval
+      end
+    ensure
+      ts.remove(self)
+    end
+    hval 
+  end
+
 
   def inspect
     s = "["
