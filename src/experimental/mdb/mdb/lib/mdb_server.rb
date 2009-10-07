@@ -3,19 +3,21 @@ require 'sinatra'
 
 require 'txn_wrapper'
 
+require 'mdb/core_extensions'
+
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
-# Exception.install_debug_block do |e|
-#   puts "--- #{e} #{e.class}"
-#   case e
-#   when Sinatra::NotFound
-#     nil.pause
-# #  when NoMethodError
-# #     nil.pause if e.message =~ /gsub/
-# #   when ArgumentError
-# #     nil.pause # if e.message =~ /Illegal creation of a Symbol/
-#   end
-# end
+Exception.install_debug_block do |e|
+  puts "--- #{e} #{e.class}"
+  case e
+#  when Sinatra::NotFound
+#    nil.pause
+  when NoMethodError
+     nil.pause if e.message =~ /symbolize/
+#   when ArgumentError
+#     nil.pause # if e.message =~ /Illegal creation of a Symbol/
+  end
+end
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
@@ -128,15 +130,16 @@ class MDB::ServerApp < Sinatra::Base
     when %r{application/mdb}
       @post_data = @serializer.deserialize request.body
     else
-      @post_data = request.POST
+      @post_data = request.POST.dup
     end
+    @post_data.symbolize_keys if Hash === @post_data
   end
 
   # This is here, rather than in the before block, since params does not
   # have the path info split out until after the before block is run.
   # Furthermore, not all paths will need the db.
   def get_db
-    db_name = params[:db] || @post_data['db_name']
+    db_name = params[:db] || @post_data[:db_name]
     halt 400, "No :db or :db_name param" if db_name.nil?
     db = @server[db_name]
     halt 404, "No such Database: #{params[:db]}" if db.nil?
@@ -159,7 +162,7 @@ class MDB::ServerApp < Sinatra::Base
   # Create a new database
   post '/' do
     # Use strings, not symbols, for @post_data
-    result = @server.create(@post_data['db_name'], @post_data['view_class'])
+    result = @server.create(@post_data[:db_name], @post_data[:view_class])
     @serializer.serialize(result.name) # send back just the db name
   end
 

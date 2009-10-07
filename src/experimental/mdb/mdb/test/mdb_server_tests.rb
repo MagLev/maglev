@@ -62,6 +62,7 @@ def post_serialized(path, data='')
     "CONTENT_LENGTH" => s_data.size,
     "CONTENT_TYPE"   => SERIALIZER.content_type
   }
+  e['CONTENT_TRANSFER_ENCODING'] = 'binary' if SERIALIZER.content_type == 'application/mdb'
 
   Maglev.transaction { @response = @request.post(path, e) }
   handle_response
