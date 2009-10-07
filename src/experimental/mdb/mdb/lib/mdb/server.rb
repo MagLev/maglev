@@ -5,17 +5,15 @@
 # new view class, and then tries to call Server.update within the same txn,
 # and if Server.update did an abort...
 #
-# TODO: But...we want to ensure fresh views for readers....
-
+# == TODO
+# * ensure fresh views for readers.
+# * make a real class rather than all class side methods.
+#
 module MDB
   class Server
     # Raised if there is a request to create a database, but one with that
     # name already exists
     class DatabaseExists < MDBError; end
-
-    # Raised for any operation on a database, but the database is not
-    # found.
-    class DatabaseNotFound < MDBError; end
 
     def self.debug_info
       STDERR.puts "-- @proot: #{@proot.inspect}"
@@ -28,8 +26,8 @@ module MDB
     # Create a new database.  Returns the new database.
     # Raises DatabaseExists, if db_name already exists.
     def self.create(db_name, view_class)
-      raise DatabaseNotFound if db_name.nil?
-      raise MDBError.new("Bad view class: #{view_class.inspect}") if view_class.nil?
+      ensure_not_nil(db_name,    'MDB::Server.create: db_name')
+      ensure_not_nil(view_class, 'MDB::Server.create: view_class')
       key = db_name.to_sym
       raise DatabaseExists.new(key) if @proot.has_key?(key)
       Maglev.transaction { @proot[key] = Database.new(db_name, view_class) }
@@ -39,17 +37,15 @@ module MDB
     # Updates a database .  Returns new database.
     # Raises DatabaseNotFound, if db_name does not exist.
     def self.update(db_name, view_class)
-      key = db_name.to_sym
-      raise DatabaseNotFound.new(key) unless @proot.has_key?(key)
-      @proot[key].set_view(view_class) # Database manages txn
+      db = get_db(db_name, "#{self}.update")
+      db.set_view(view_class)
     end
 
     # Removes the Database named +db_name+ from the Server.
     # Raises DatabaseNotFound if there is no such database.
     def self.delete(db_name)
-      key = db_name.to_sym
-      raise DatabaseNotFound.new(key.to_s) unless @proot.has_key?(key)
-      Maglev.transaction { @proot.delete key }
+      get_db(db_name, "#{self}.delete") # ignore return value
+      Maglev.transaction { @proot.delete db_name.to_sym }
     end
 
     # Returns the database named +db_name+, or nil.
@@ -70,6 +66,8 @@ module MDB
       @proot.key? db_name.to_sym
     end
 
+    class DatabaseNotFound < MDB::MDBError; end
+
     private
     def self.initialize_db_root
       if Maglev::PERSISTENT_ROOT[MDB::Server].nil?
@@ -78,6 +76,17 @@ module MDB
       @proot = Maglev::PERSISTENT_ROOT[MDB::Server]
     end
 
-    initialize_db_root   # rely on caller to commit
+    def self.get_db(db_name, msg)
+      key = db_name.to_sym
+      unless @proot.has_key?(key)
+        raise DatabaseNotFound.new(
+          "#{msg}: db not found: #{db_name.inspect}")
+      end
+      @proot[key]
+    end
+
+    def self.ensure_not_nil(param, msg)
+      raise ArgumentError.new("#{msg}: nil") if param.nil?
+    end
   end
 end

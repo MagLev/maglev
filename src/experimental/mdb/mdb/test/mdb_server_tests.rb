@@ -12,12 +12,12 @@ require 'mdb_server'
 
 MiniTest::Unit.autorun
 
-Exception.install_debug_block do |e|
-  case e
-  when ArgumentError, NoMethodError
-    nil.pause # if e.message =~ /to_sym/
-  end
-end
+# Exception.install_debug_block do |e|
+#   case e
+#   when ArgumentError, NoMethodError
+#     nil.pause # if e.message =~ /to_sym/
+#   end
+# end
 
 # TODO: MDB::ServerApp only supports Marshal right now...
 SERIALIZER_CLASS =
@@ -166,7 +166,7 @@ These requests correspond to methods on MDB::Database
   # TODO: Should probably expect 201, not 200 from a successful POST
   it 'responds to POST "/" and GET "/:db" correctly' do
     r = post_urlencode "/", 200, { :db_name => DB_NAME_2,
-                                   :view_class => :AppModel }
+                                   :view_class => AppModel }
     get("/#{DB_NAME_2}").must_equal true
 
     # TODO: Probably need to test that the model class got installed
@@ -174,16 +174,16 @@ These requests correspond to methods on MDB::Database
     # correct.
   end
 
-  it 'responds to POST "/" with 404 if missing :view_name' do
-    r = post_urlencode "/", 404, { :db_name => DB_NAME_2 }
+  it 'responds to POST "/" with 400 if missing :view_name' do
+    r = post_urlencode "/", 400, { :db_name => DB_NAME_2 }
   end
 
-  it 'responds to POST "/" with 404 if missing :db_name' do
-    r = post_urlencode "/", 404, { :view_name => :AppClass }
+  it 'responds to POST "/" with 400 if missing :db_name' do
+    r = post_urlencode "/", 400, { :view_name => :AppClass }
   end
 
-  it 'responds to POST "/" with 404 if :view_class is bad' do
-    r = post_urlencode "/", 404, { :db_name => DB_NAME_2,
+  it 'responds to POST "/" with 400 if :view_class is bad' do
+    r = post_urlencode "/", 400, { :db_name => DB_NAME_2,
                                    :view_class => :NotAClass }
   end
 
@@ -199,6 +199,7 @@ These requests correspond to methods on MDB::Database
   it 'responds to DELETE "/:db" by returning 404 if :db does not exist' do
     r = delete "/this_is_not_a_db_name", 404
   end
+
 end
 
 describe 'MDB::ServerApp: MDB::Database requests' do

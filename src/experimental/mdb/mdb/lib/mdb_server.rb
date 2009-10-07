@@ -8,10 +8,12 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 # Exception.install_debug_block do |e|
 #   puts "--- #{e} #{e.class}"
 #   case e
-#   when NoMethodError
-#     nil.pause if e.message =~ /gsub/
-#   when ArgumentError
-#     nil.pause # if e.message =~ /Illegal creation of a Symbol/
+#   when Sinatra::NotFound
+#     nil.pause
+# #  when NoMethodError
+# #     nil.pause if e.message =~ /gsub/
+# #   when ArgumentError
+# #     nil.pause # if e.message =~ /Illegal creation of a Symbol/
 #   end
 # end
 
@@ -63,26 +65,57 @@ These requests correspond to methods on MDB::Database
   | GET    | /:db/send/:method | Send :method to ViewClass    | For testing      |
   |--------+-------------------+------------------------------+------------------|
 
+
+The server uses HTTP status codes to indicate errors:
+
+  |--------+-------------+---------------------------------------------------|
+  | Status | Name        | Meaning                                           |
+  |--------+-------------+---------------------------------------------------|
+  |    400 | Bad Request | A parameter was missing or incorrect              |
+  |--------+-------------+---------------------------------------------------|
+  |    404 | Not Found   | The resource was not found, e.g., a 404 on        |
+  |        |             | GET /foo/12 indicates no document with id 12      |
+  |        |             | in database foo, or there was no database foo     |
+  |--------+-------------+---------------------------------------------------|
+  |    403 | Forbidden   | The HTTP method (GET, POST,...) was inappropriate |
+  |        |             | for the resource.                                 |
+  |--------+-------------+---------------------------------------------------|
+
 =end
 #
 # This class will ensure that all MDB level responses have properly
 # serialized (either in JSON or Marshal, depending on the serializer object
 # we are customized with).
+#
+# == TODO
+#
+# * If an exception is thrown, then the content-type and
+#   content-transfer-encoding are left at application/mdb and binary
+#
+# * parameterize the serializer, but I can't seem to get
+#   the combination of:
+#   1: Passing parameters to the MDB::ServerApp.new(:marshal)
+#   2: Starting from a rackup file with an app derived from Sinatra::Base
+#   3: passing parameters like :host and :port into the appropriate level.
+#   Until then, I'll just hardcode the MarshalSerializer.
+#
+# * Not DRY: I tried to setup an error handler for MDB::MDBError, but two
+#   problems:
+#   1: The thrown exception's class is matched exactly, not with ===, so
+#      you can't setup a handler for a tree of exceptions
+#   2: halt 404, didn't seem to work from in there...
+#      the rescue clauses in each handler are the same. Sinatra must have a
+#      better way to do this.  The custom error handlers also cont
 class MDB::ServerApp < Sinatra::Base
 
 #   require 'log_headers'
 #   use LogHeaders
 
   use MagLevTransactionWrapper
+  set :raise_errors, false  # Otherwise, error blocks don't work
 
   def initialize
     super
-    # TODO: I need to parameterize the serializer, but I can't seem to get
-    # the combination of:
-    # 1: Passing parameters to the MDB::ServerApp.new(:marshal)
-    # 2: Starting from a rackup file with an app derived from Sinatra::Base
-    # 3: passing parameters like :host and :port into the appropriate level.
-    # Until then, I'll just hardcode the MarshalSerializer.
     @serializer = MDB::MarshalSerializer.new
     @server = MDB::Server
   end
@@ -90,7 +123,6 @@ class MDB::ServerApp < Sinatra::Base
   before do
     Maglev.abort_transaction  # refresh view of db # TODO: Is this ok?
     content_type @serializer.content_type  # Handle response type
-
     # Unpack application/mdb data
     case request.content_type
     when %r{application/mdb}
@@ -104,7 +136,9 @@ class MDB::ServerApp < Sinatra::Base
   # have the path info split out until after the before block is run.
   # Furthermore, not all paths will need the db.
   def get_db
-    db = @server[params[:db]]
+    db_name = params[:db] || @post_data['db_name']
+    halt 400, "No :db or :db_name param" if db_name.nil?
+    db = @server[db_name]
     halt 404, "No such Database: #{params[:db]}" if db.nil?
     db
   end
@@ -124,18 +158,9 @@ class MDB::ServerApp < Sinatra::Base
 
   # Create a new database
   post '/' do
-    # TODO: I tried to setup an error handler for MDB::MDBError, but two
-    # problems:
-    # 1: The thrown exception's class is matched exactly, not with ===, so
-    #    you can't setup a handler for a tree of exceptions
-    # 2: halt 404, didn't seem to work from in there...
-    begin
-      # TODO: try to use @post_data
-      result = @server.create(params[:db_name], params[:view_class])
-      @serializer.serialize(result.name) # send back just the db name
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    # Use strings, not symbols, for @post_data
+    result = @server.create(@post_data['db_name'], @post_data['view_class'])
+    @serializer.serialize(result.name) # send back just the db name
   end
 
   # Query if db exists
@@ -213,7 +238,21 @@ class MDB::ServerApp < Sinatra::Base
     end
   end
 
+  error ArgumentError do
+    halt 400, request.env['sinatra.error'].message
+  end
+
+  error MDB::Server::DatabaseNotFound do
+    halt 404, request.env['sinatra.error'].message
+  end
+
+  error MDB::MDBError do
+    halt 400, request.env['sinatra.error'].message
+  end
+
   error do
+    err = request.env['sinatra.error']
+    puts "===== err: #{err.inspect}"
     "MDB::ServerApp error: #{request.env['sinatra.error'].message}"
   end
 
