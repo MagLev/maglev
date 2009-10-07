@@ -7,87 +7,78 @@ require 'mdb/core_extensions'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
-Exception.install_debug_block do |e|
-  puts "--- #{e} #{e.class}"
-  case e
-#  when Sinatra::NotFound
-#    nil.pause
-  when NoMethodError
-     nil.pause if e.message =~ /symbolize/
-#   when ArgumentError
-#     nil.pause # if e.message =~ /Illegal creation of a Symbol/
-  end
-end
+# Exception.install_debug_block do |e|
+#   puts "--- #{e} #{e.class}"
+#   case e
+# #  when Sinatra::NotFound
+# #    nil.pause
+#   when NoMethodError
+#      nil.pause if e.message =~ /symbolize/
+# #   when ArgumentError
+# #     nil.pause # if e.message =~ /Illegal creation of a Symbol/
+#   end
+# end
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
 # serialization format.
 #
-# For all URLs of the form /:db, it should return 404 not found if
-# the db does not exist.
+# == General Use of REST verbs
 #
-=begin
-
-  |--------+-----------------------------+-------------------------------|
-  | Verb   | Collection                  | Member                        |
-  |--------+-----------------------------+-------------------------------|
-  | GET    | List members                | Get the member                |
-  | PUT    | Replace collection          | Update member (edit)          |
-  | POST   | Create new entry; return id | unclear                       |
-  | DELETE | Delete entire collection    | Remove member from collection |
-  |--------+-----------------------------+-------------------------------|
-
-These requests correspond to methods on MDB::Server, a collection:
-
-  |--------+-------+---------------------------------------+-------------------|
-  | Verb   | Route | Action [params]                       | Result            |
-  |--------+-------+---------------------------------------+-------------------|
-  | GET    | /     | List database names                   | Array of strings  |
-  | PUT    | /     | NOT SUPPORTED                         |                   |
-  | POST   | /     | Database.create [db_name, view_class] | new id comes back |
-  | DELETE | /     | NOT SUPPORTED                         |                   |
-  |        |       |                                       |                   |
-  | GET    | /:db  | Test if db exists                     | boolean           |
-  | PUT    | /:db  | NOT SUPPORTED                         |                   |
-  | POST   | /:db  | Create new document                   | id                |
-  | DELETE | /:db  | Delete db                             |                   |
-  |--------+-------+---------------------------------------+-------------------|
-
-These requests correspond to methods on MDB::Database
-
-  |--------+-------------------+------------------------------+------------------|
-  | Verb   | Route             | Action                       | View             |
-  |--------+-------------------+------------------------------+------------------|
-  | GET    | /:db/:id          | Get document with :id        | serialized objec |
-  | PUT    | /:db/:id          | Update document :id          | status           |
-  | POST   | /:db/:id          | NOT SUPPORTED                |                  |
-  | DELETE | /:db/:id          | Delete document :id from :db | status           |
-  |        |                   |                              |                  |
-  | GET    | /:db/view/:name   | Run the view                 | data from view   |
-  | GET    | /:db/send/:method | Send :method to ViewClass    | For testing      |
-  |--------+-------------------+------------------------------+------------------|
-
-
-The server uses HTTP status codes to indicate errors:
-
-  |--------+-------------+---------------------------------------------------|
-  | Status | Name        | Meaning                                           |
-  |--------+-------------+---------------------------------------------------|
-  |    400 | Bad Request | A parameter was missing or incorrect              |
-  |--------+-------------+---------------------------------------------------|
-  |    404 | Not Found   | The resource was not found, e.g., a 404 on        |
-  |        |             | GET /foo/12 indicates no document with id 12      |
-  |        |             | in database foo, or there was no database foo     |
-  |--------+-------------+---------------------------------------------------|
-  |    403 | Forbidden   | The HTTP method (GET, POST,...) was inappropriate |
-  |        |             | for the resource.                                 |
-  |--------+-------------+---------------------------------------------------|
-
-=end
+#  |--------+-----------------------------+-------------------------------|
+#  | Verb   | Collection                  | Member                        |
+#  |--------+-----------------------------+-------------------------------|
+#  | GET    | List members                | Get the member                |
+#  | PUT    | Replace collection          | Update member (edit)          |
+#  | POST   | Create new entry; return id | unclear                       |
+#  | DELETE | Delete entire collection    | Remove member from collection |
+#  |--------+-----------------------------+-------------------------------|
 #
-# This class will ensure that all MDB level responses have properly
-# serialized (either in JSON or Marshal, depending on the serializer object
-# we are customized with).
+# == REST API for MDB::Server, a collection:
+#
+#  |--------+-------+---------------------------------------+-------------------|
+#  | Verb   | Route | Action [params]                       | Result            |
+#  |--------+-------+---------------------------------------+-------------------|
+#  | GET    | /     | List database names                   | Array of strings  |
+#  | PUT    | /     | NOT SUPPORTED                         |                   |
+#  | POST   | /     | Database.create [db_name, view_class] | new id comes back |
+#  | DELETE | /     | NOT SUPPORTED                         |                   |
+#  |        |       |                                       |                   |
+#  | GET    | /:db  | Test if db exists                     | boolean           |
+#  | PUT    | /:db  | NOT SUPPORTED                         |                   |
+#  | POST   | /:db  | Create new document                   | id                |
+#  | DELETE | /:db  | Delete db                             |                   |
+#  |--------+-------+---------------------------------------+-------------------|
+#
+# == REST API for MDB::Database, a collection:
+#
+#  |--------+-------------------+------------------------------+------------------|
+#  | Verb   | Route             | Action                       | View             |
+#  |--------+-------------------+------------------------------+------------------|
+#  | GET    | /:db/:id          | Get document with :id        | serialized objec |
+#  | PUT    | /:db/:id          | Update document :id          | status           |
+#  | POST   | /:db/:id          | NOT SUPPORTED                |                  |
+#  | DELETE | /:db/:id          | Delete document :id from :db | status           |
+#  |        |                   |                              |                  |
+#  | GET    | /:db/view/:name   | Run the view                 | data from view   |
+#  | GET    | /:db/send/:method | Send :method to ViewClass    | For testing      |
+#  |--------+-------------------+------------------------------+------------------|
+#
+#
+# == The server's use of HTTP status codes
+#
+#  |--------+-------------+---------------------------------------------------|
+#  | Status | Name        | Meaning                                           |
+#  |--------+-------------+---------------------------------------------------|
+#  |    400 | Bad Request | A parameter was missing or incorrect              |
+#  |--------+-------------+---------------------------------------------------|
+#  |    404 | Not Found   | The resource was not found, e.g., a 404 on        |
+#  |        |             | GET /foo/12 indicates no document with id 12      |
+#  |        |             | in database foo, or there was no database foo     |
+#  |--------+-------------+---------------------------------------------------|
+#  |    403 | Forbidden   | The HTTP method (GET, POST,...) was inappropriate |
+#  |        |             | for the resource.                                 |
+#  |--------+-------------+---------------------------------------------------|
 #
 # == TODO
 #
@@ -101,13 +92,6 @@ The server uses HTTP status codes to indicate errors:
 #   3: passing parameters like :host and :port into the appropriate level.
 #   Until then, I'll just hardcode the MarshalSerializer.
 #
-# * Not DRY: I tried to setup an error handler for MDB::MDBError, but two
-#   problems:
-#   1: The thrown exception's class is matched exactly, not with ===, so
-#      you can't setup a handler for a tree of exceptions
-#   2: halt 404, didn't seem to work from in there...
-#      the rescue clauses in each handler are the same. Sinatra must have a
-#      better way to do this.  The custom error handlers also cont
 class MDB::ServerApp < Sinatra::Base
 
 #   require 'log_headers'
@@ -123,7 +107,6 @@ class MDB::ServerApp < Sinatra::Base
   end
 
   before do
-    Maglev.abort_transaction  # refresh view of db # TODO: Is this ok?
     content_type @serializer.content_type  # Handle response type
     # Unpack application/mdb data
     case request.content_type
@@ -255,7 +238,6 @@ class MDB::ServerApp < Sinatra::Base
 
   error do
     err = request.env['sinatra.error']
-    puts "===== err: #{err.inspect}"
     "MDB::ServerApp error: #{request.env['sinatra.error'].message}"
   end
 

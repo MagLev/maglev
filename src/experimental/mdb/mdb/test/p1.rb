@@ -26,6 +26,7 @@ Maglev.commit_transaction
 db = MDB::Server.create(key, PView)
 
 # Add some documents
-4.times { db.add(Object.new)}
+4.times { db.add(Object.new) }
+Maglev.commit_transaction
 
 
