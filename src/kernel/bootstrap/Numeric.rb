@@ -52,16 +52,22 @@ class Numeric
     f.ceil
   end
 
-  # "Internal" uses of /  must use _divide() to avoid
+  # Most internal uses of /  must use _divide() to avoid
   #   infinite recursion after  math.n redefines quo and / for Rational
 
   def div(arg)
-    q = self._divide(arg).to_f
+    unless arg._isNumeric
+      raise TypeError, 'arg to div is not a Numeric'
+    end
+    q = (self / arg).to_f
     q.floor
   end
 
   def quo(arg)
-    self._divide(arg)
+    unless arg._isNumeric
+      raise TypeError, 'arg to quo is not a Numeric'
+    end
+    self / arg
   end
 
   def divmod(arg)
