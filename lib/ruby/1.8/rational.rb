@@ -81,7 +81,7 @@ class Rational < Numeric
     if den == 1 && defined?(Unify)
       num
     else
-      new!(num, den)
+      new(num, den)
     end
   end
 
@@ -94,6 +94,9 @@ class Rational < Numeric
     new(num, den)
   end
 
+  def self.new(num, denom)
+    super
+  end
   private_class_method :new
 
   #
@@ -198,7 +201,7 @@ class Rational < Numeric
       den = @denominator * a.numerator
       Rational(num, den)
     elsif a._isInteger
-      raise ZeroDivisionError, "division by zero" if a == 0
+      raise ZeroDivisionError, "division by zero" if a.equal?( 0 )
       self / Rational.new!(a, 1)
     elsif a._isFloat
       Float(self) / a
@@ -206,6 +209,13 @@ class Rational < Numeric
       x, y = a.coerce(self)
       x / y
     end
+  end
+
+  def div(a)
+    if a._isFloat && a == 0.0
+      raise FloatDomainError, "division by zero"
+    end
+    super  
   end
 
   #
@@ -251,6 +261,9 @@ class Rational < Numeric
   #   r % 0.26             # -> 0.19
   #
   def % (other)
+    if other._isFloat && other == 0.0
+      raise FloatDomainError , 'division by 0.0'
+    end
     value = (self / other).to_i
     return self - other * value
   end
@@ -263,6 +276,11 @@ class Rational < Numeric
   #   r.divmod Rational(1,2)   # -> [3, Rational(1,4)]
   #
   def divmod(other)
+    if other._isFloat && other == 0.0
+      raise FloatDomainError , 'division by 0.0'
+    elsif other._isInteger && other.equal?( 0)
+      raise ZeroDivisionError
+    end
     value = (self / other).to_i
     return value, self - other * value
   end
