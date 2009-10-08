@@ -23,6 +23,8 @@ objects.
 == Example
 
 == TODO
+* Need a way to upload a set of files from the app dir to MDB.  These would
+  be the app's model files.  They might require certain other packages etc.
 
 * DRb isn't running yet on Maglev (thread.rb mutex clashes with st mutex
   and threading).

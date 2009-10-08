@@ -2,7 +2,7 @@
 # This test run by MRI
 require 'rubygems'
 require 'minitest/spec'
-require 'mdb'
+require 'mdb/client'
 require 'app_model'
 
 MiniTest::Unit.autorun

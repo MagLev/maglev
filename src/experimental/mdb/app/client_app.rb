@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'sinatra'
-require 'json'
-require 'httpclient'
+require 'mdb/client'
 
 # The BlogApp implements the View and Controller parts of the MVC
 # pattern.  This app receives end user http requests, invokes a model
@@ -34,8 +33,17 @@ class BlogApp < Sinatra::Base
   set :app_file, File.dirname(__FILE__)
   set :static, true
 
+  SERVER  = 'http://localhost:4567'
+  POSTS_DB = 'theBlogPosts'
+  TAGS_DB  = 'theBlogTags'
+
   def initialize(*args)
     super
+    @server = MDB::RESTServer.new SERVER
+    @posts_db = @server[POSTS_DB]
+    @tags_db  = @server[TAGS_DB]
+    puts "-- @posts_db: #{@posts_db}"
+    puts "-- @tags_db:  #{@tags_db}"
     @title = "MRI Blog Using MagLevDB"
     @nav_bar =  <<-EOS
         <ul class="menu">

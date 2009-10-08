@@ -7,6 +7,12 @@ require 'mdb/serializer'
 module MDB
   # Manages the REST communication to MDB and serialization
   class REST
+
+    # HTTP headers used for post with marshaled data
+    POST_ENCODINGS =  {
+      'Content-Type' => 'application/mdb',
+      'Content-Transfer-Encoding' => "binary" }
+
     def initialize(url)
       @url = url
       @serializer = MDB::MarshalSerializer.new
@@ -30,62 +36,46 @@ module MDB
     end
 
     private
-
-
     # Issue a request based on op and provided data.
     # Returns an HTTP::Message object.
     def request(op, path, data = nil)
+      # Save current data for exceptions in handle_response
       @path = @url + path
       @method = op
       @data = data
-      response = case op
-                 when :get
-                   @server.get_content @path
-                 when :put
-                   @server.put @path
-                 when :delete
-                   @server.delete @path
-                 when :post
-                   #Content-Transfer-Encoding: binary
-                   @server.post @path, data, {
-          'Content-Type' => 'application/mdb',
-          'Content-Transfer-Encoding' => "binary" }
-                 end
-      handle_response response
+      handle_response case op
+                      when :get
+                        @server.get_content @path
+                      when :put
+                        @server.put @path
+                      when :delete
+                        @server.delete @path
+                      when :post
+                        @server.post @path, data, POST_ENCODINGS
+                      end
     end
 
     def handle_response(response)
-      result = case response
-               when HTTP::Message
-                 begin
-                   case response.status
-                   when 200..299
-                     deserialize(response)
-                   else
-                     raise "Error doing #{@method} #{@path} STATUS: #{response.status} #{response.body.content}"
-                   end
-                 rescue HTTPClient::BadResponseError => bre
-                   raise "Error doing #{@method} #{@path} from database: #{bre.res.content}"
-                 end
-               else
-                 # not an HTTP::Message
-#                 puts "--- handle_response(#{response.inspect})   class #{response.class}"
-                 STDOUT.flush
-                 @serializer.deserialize response
-               end
-      @path = @method = @data = nil
-      result
+      case response
+      when HTTP::Message
+        begin
+          case response.status
+          when 200..299
+            deserialize(response)
+          else
+            raise "Error doing #{@method} #{@path} STATUS: #{response.status} #{response.body.content}"
+          end
+        rescue HTTPClient::BadResponseError => bre
+          raise "Error doing #{@method} #{@path} from database: #{bre.res.content}"
+        end
+      else
+        @serializer.deserialize response
+      end
     end
 
     def deserialize(obj)
-#      puts "--- deserialize(#{obj})"
-      @serializer.deserialize case obj
-                              when HTTP::Message
-#                                puts "--- deserialize content (#{obj.content})"
-                                obj.content
-                              else
-                                obj
-                              end
+      obj = obj.content if HTTP::Message === obj
+      @serializer.deserialize obj
     end
   end
 
@@ -97,8 +87,6 @@ module MDB
 
     # Return the result of running the named view on the server
     # NOTE: params not yet supported
-    #
-    # GET /:db/view/:view
     def execute_view(view_name, *params)
       @rest.get("/#{@db_name}/view/#{view_name}")
     end
