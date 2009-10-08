@@ -8,8 +8,8 @@ module MDB
   # Manages the REST communication to MDB and serialization
   class REST
     def initialize(url)
-      @serializer = MDB::MarshalSerializer.new
       @url = url
+      @serializer = MDB::MarshalSerializer.new
       @server = HTTPClient.new
     end
 
@@ -17,7 +17,7 @@ module MDB
       request(:delete, path)
     end
 
-    def mdb_get(path)
+    def get(path)
       request(:get, path)
     end
 
@@ -26,12 +26,6 @@ module MDB
     end
 
     def mdb_post(path, data)
-#       if Hash === data
-#         post_data = data
-#       else
-#         post_data = @serializer.serialize data
-#       end
-#       request(:post, path, post_data)
       request(:post, path, @serializer.serialize(data))
     end
 
@@ -44,7 +38,6 @@ module MDB
       @path = @url + path
       @method = op
       @data = data
-      puts "--- request(#{@method}, #{@path}, #{@data}"
       response = case op
                  when :get
                    @server.get_content @path
@@ -57,14 +50,6 @@ module MDB
                    @server.post @path, data, {
           'Content-Type' => 'application/mdb',
           'Content-Transfer-Encoding' => "binary" }
-#                    case data
-#                    when Hash
-#                      puts "=== post_content #{@path} #{@data.inspect}"
-#                      @server.post_content @path, data
-#                    else
-#                      puts "=== post #{@path} #{@data.inspect}"
-#                      @server.post @path, data
-#                    end
                  end
       handle_response response
     end
@@ -84,7 +69,7 @@ module MDB
                  end
                else
                  # not an HTTP::Message
-                 puts "--- handle_response(#{response.inspect})   class #{response.class}"
+#                 puts "--- handle_response(#{response.inspect})   class #{response.class}"
                  STDOUT.flush
                  @serializer.deserialize response
                end
@@ -93,10 +78,10 @@ module MDB
     end
 
     def deserialize(obj)
-      puts "--- deserialize(#{obj})"
+#      puts "--- deserialize(#{obj})"
       @serializer.deserialize case obj
                               when HTTP::Message
-                                puts "--- deserialize content (#{obj.content})"
+#                                puts "--- deserialize content (#{obj.content})"
                                 obj.content
                               else
                                 obj
@@ -104,9 +89,9 @@ module MDB
     end
   end
 
-  class RESTDatabase < REST
+  class RESTDatabase
     def initialize(url, db_name)
-      super(url)
+      @rest = REST.new(url)
       @db_name = db_name
     end
 
@@ -115,46 +100,46 @@ module MDB
     #
     # GET /:db/view/:view
     def execute_view(view_name, *params)
-      mdb_get("/#{@db_name}/view/#{view_name}")
+      @rest.get("/#{@db_name}/view/#{view_name}")
     end
 
     # GET /:db/:id
     def get(id)
-      mdb_get("/#{@db_name}/#{id}")
+      @rest.get("/#{@db_name}/#{id}")
     end
 
     # POST /:db   returns docid
     def add(document)
-      mdb_post("/#{@db_name}", document)
+      @rest.mdb_post("/#{@db_name}", document)
     end
 
     def size
-      mdb_get("/#{@db_name}/send/size")
+      @rest.get("/#{@db_name}/send/size")
     end
 
     def list_ids
-      mdb_get("/#{@db_name}/send/list_ids")
+      @rest.get("/#{@db_name}/send/list_ids")
     end
 
     def clear
-      mdb_get("/#{@db_name}/send/clear")
+      @rest.get("/#{@db_name}/send/clear")
     end
   end
 
-  class RESTServer < REST
+  class RESTServer
     # Initialize a +RESTServer+ that will communicate with the remote
     # MDB::Server object over +url+.
     def initialize(url)
-      super(url)
+      @rest = REST.new(url)
     end
 
     def key?(key)
-      mdb_get("/#{key}")
+      @rest.get("/#{key}")
     end
 
     def create(db_name, view_class)
       p = { :db_name => db_name, :view_class => view_class.to_s }
-      result = mdb_post("/", p)
+      result = @rest.mdb_post("/", p)
       if result == db_name
         RESTDatabase.new(@url, db_name)
       else
@@ -163,7 +148,7 @@ module MDB
     end
 
     def delete(db_name)
-      mdb_delete("/#{db_name}")
+      @rest.mdb_delete("/#{db_name}")
     end
 
     def [](db_name)
@@ -172,7 +157,7 @@ module MDB
     end
 
     def db_names
-      mdb_get("/")
+      @rest.get("/")
     end
   end
 end
