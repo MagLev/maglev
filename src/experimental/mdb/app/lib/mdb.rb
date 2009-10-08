@@ -13,7 +13,7 @@ module MDB
       @server = HTTPClient.new
     end
 
-    def mdb_delete(path)
+    def delete(path)
       request(:delete, path)
     end
 
@@ -21,11 +21,11 @@ module MDB
       request(:get, path)
     end
 
-    def mdb_put(path, data)
+    def put(path, data)
       request(:put, path, @serializer.serialize(data))
     end
 
-    def mdb_post(path, data)
+    def post(path, data)
       request(:post, path, @serializer.serialize(data))
     end
 
@@ -110,7 +110,7 @@ module MDB
 
     # POST /:db   returns docid
     def add(document)
-      @rest.mdb_post("/#{@db_name}", document)
+      @rest.post("/#{@db_name}", document)
     end
 
     def size
@@ -130,6 +130,7 @@ module MDB
     # Initialize a +RESTServer+ that will communicate with the remote
     # MDB::Server object over +url+.
     def initialize(url)
+      @url = url
       @rest = REST.new(url)
     end
 
@@ -139,7 +140,7 @@ module MDB
 
     def create(db_name, view_class)
       p = { :db_name => db_name, :view_class => view_class.to_s }
-      result = @rest.mdb_post("/", p)
+      result = @rest.post("/", p)
       if result == db_name
         RESTDatabase.new(@url, db_name)
       else
@@ -148,7 +149,7 @@ module MDB
     end
 
     def delete(db_name)
-      @rest.mdb_delete("/#{db_name}")
+      @rest.delete("/#{db_name}")
     end
 
     def [](db_name)
