@@ -43,6 +43,7 @@ module MDB
 
     # Removes the Database named +db_name+ from the Server.
     # Raises DatabaseNotFound if there is no such database.
+    # returns the database
     def self.delete(db_name)
       get_db(db_name, "#{self}.delete") # ignore return value
       Maglev.transaction { @proot.delete db_name.to_sym }

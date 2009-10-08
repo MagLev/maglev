@@ -8,7 +8,32 @@ require 'app_model'
 MiniTest::Unit.autorun
 
 DB_NAME = 'rest_database_tests'
+DB_NAME_2 = 'rest_database_tests2'
+
 SERVER  = 'http://localhost:4567'
+
+describe MDB::RESTServer do
+  before do
+    @server = MDB::RESTServer.new SERVER
+    [DB_NAME, DB_NAME_2].each do |name|
+      @server.delete name if @server.key? name
+    end
+    @db = @server.create DB_NAME, AppModel
+    @db.clear
+  end
+
+  it 'responds to key? properly' do
+    @server.key?(DB_NAME).must_equal true
+    @server.key?(DB_NAME_2).must_equal false
+  end
+
+  it 'creates and deletes databases on the server' do
+    db = @server.create DB_NAME_2, AppModel
+    db.wont_be_nil
+    @server.delete(DB_NAME_2).must_equal true
+    proc { @server.delete(DB_NAME_2) }.must_raise RuntimeError
+  end
+end
 
 describe MDB::RESTDatabase do
   before do
@@ -46,5 +71,4 @@ describe MDB::RESTDatabase do
     copy.x.must_equal 6
     copy.y.must_equal 7
   end
-
 end
