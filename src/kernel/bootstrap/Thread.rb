@@ -2,6 +2,22 @@
 class Thread
   # constants are defined in Thread1.rb
 
+  primitive_nobridge '[]', 'threadDataAt:'
+
+  primitive_nobridge '[]=', 'threadDataAt:put:'
+
+  def self.abort_on_exception
+    false
+  end
+
+  # MNI self.abort_on_exception=
+
+  def self.abort_on_exception=(bool)
+    _stub_warn("Thread.abort_on_exception=: Does nothing")
+  end
+
+  primitive_nobridge 'alive?' , 'alive'
+
   class_primitive_nobridge '_stbacktrace', 'backtraceToLevel:'
 
   def self._backtrace(includeSt, limit)
@@ -82,103 +98,39 @@ class Thread
     private :_find_next_user_info_for, :_frame_info
   end
 
-  primitive_nobridge 'inspect', '_rubyInspect'
-
-  primitive_nobridge '_join_group', '_joinGroup:'
-
-  def self.abort_on_exception
-    false
-  end
-
-  # MNI self.abort_on_exception=
-
-  def self.abort_on_exception=(bool)
-    _stub_warn("Thread.abort_on_exception=: Does nothing")
-  end
-
-  # CriticalMutex defined in Thread1.rb
+  # ThreadCriticalMutex defined in Thread1.rb
 
   def self.critical
-    CriticalMutex.locked?
+    ThreadCriticalMutex.locked?
   end
 
   def self.critical=(bool)
-    mutex = CriticalMutex
-    locked = mutex.locked?
+    mutex_cls = ThreadCriticalMutex
+    me = self.current
     if bool
-      if locked
-        return true
-      else
-        return mutex.try_lock
-      end
+      mutex_cls.attempt_lock(me)
     else
-      if locked
-        mutex.unlock
-      end
-      return false
-    end
+      mutex_cls.unlock_by(me)
+      false
+    end  
   end
 
   class_primitive_nobridge 'current', '_current'
 
   class_primitive_nobridge 'exit', 'exit'
-
-  primitive_nobridge '_start*&', 'rubyStart:block:'
-  class_primitive_nobridge '_basic_new', 'rubyBasicNew'
-
-  def self.new(*args, &blk)
-    thr = self._basic_new
-    thr.initialize(*args)
-    thr._start(*args, &blk)
-  end
+  primitive_nobridge 'exit', 'exit'
 
   def self.fork(&blk)
     self.start(*[], &blk)
   end
 
-  class_primitive 'start*&', 'rubyStart:block:'
-
-  primitive_nobridge '_terminate', 'terminate'
-
-  def self.kill(thread)
-    if thread.is_a(Thread)
-      thread._terminate
-    else
-      raise ArgumentError, 'not a Thread'
-    end
-  end
-
-  class_primitive_nobridge 'list', 'allProcesses'
-
-  class_primitive_nobridge 'main', 'main'
-
-  class_primitive_nobridge 'pass', 'pass'
-
-  class_primitive_nobridge '_stop', 'stop'
-
-  def self.stop
-    self.critical=(false)
-    self._stop
-  end
-
-  class_primitive_nobridge '_recursion_guard_set', '_recursionGuardSet'
-
-  primitive_nobridge '[]', 'threadDataAt:'
-
-  primitive_nobridge '[]=', 'threadDataAt:put:'
-
-  def abort_on_exception
-    false
-  end
-
-  # MNI abort_on_exception=
-
-  primitive_nobridge 'alive?' , 'alive'
-
-  primitive_nobridge 'exit', 'exit'
-  primitive_nobridge 'kill', 'exit'
-
   primitive_nobridge 'group' , 'rubyGroup'
+
+  primitive_nobridge 'inspect', '_rubyInspect'
+
+  primitive_nobridge '_is_terminated', '_isTerminated'
+
+  primitive_nobridge '_join_group', '_joinGroup:'
 
   # def join(limit); end #
   #  if limit is zero, join will return immediately
@@ -194,11 +146,35 @@ class Thread
 
   primitive_nobridge 'key?', 'includesKey:'
 
+  def self.kill(thread)
+    if thread.is_a(Thread)
+      thread._terminate
+    else
+      raise ArgumentError, 'not a Thread'
+    end
+  end
+
+  primitive_nobridge '_kill_ex', 'signalException:'
+
+  primitive_nobridge 'kill', 'exit'
+
+  class_primitive_nobridge 'list', 'allProcesses'
+
+  class_primitive_nobridge 'main', 'main'
+
+  class_primitive_nobridge '_basic_new', 'rubyBasicNew'
+
+  def self.new(*args, &blk)
+    thr = self._basic_new
+    thr.initialize(*args)
+    thr._start(*args, &blk)
+  end
+
+  class_primitive_nobridge 'pass', 'pass'
+
   primitive_nobridge 'priority', 'rubyPriority'
 
   primitive_nobridge 'priority=', 'rubyPriority:'
-
-  primitive_nobridge '_kill_ex', 'signalException:'
 
   def raise(ex_class, message)
     ex = ex_class.exception
@@ -242,14 +218,29 @@ class Thread
 
   primitive_nobridge 'status', 'rubyStatus'
 
+  class_primitive_nobridge '_recursion_guard_set', '_recursionGuardSet'
+
+  primitive_nobridge '_start*&', 'rubyStart:block:'
+
+  class_primitive 'start*&', 'rubyStart:block:'
+
   primitive_nobridge 'stop?', 'rubyStopped'
 
-  primitive_nobridge 'value' , 'joinValue'
+  class_primitive_nobridge '_stop', 'stop'
+
+  def self.stop
+    self.critical=(false)
+    self._stop
+  end
+
+  primitive_nobridge '_terminate', 'terminate'
 
   primitive_nobridge 'terminate', 'exit'
 
+  primitive_nobridge 'value' , 'joinValue'
+
   primitive_nobridge 'wakeup', 'rubyResume'
 
-
 end
+
 
