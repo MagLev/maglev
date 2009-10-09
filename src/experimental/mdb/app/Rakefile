@@ -29,7 +29,7 @@ namespace :test do
 
   desc "Run the application level tests"
   task :app do
-    sh %{ maglev-ruby -Itest test/post_tests.rb }
+    sh %{ ruby -Ilib test/post_tests.rb }
   end
 end
 

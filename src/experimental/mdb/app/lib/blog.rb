@@ -3,6 +3,12 @@
 # The file will be loaded into MagLev as an MDB Model for the Database
 # named 'post' (see Rakefile mdb:create).  The class methods in Post will
 # be available to the Sinatra client app as views from the MDB::Server.
+#
+# == TODO
+#
+# * Should each data item know their own id?  We could mixin support for
+#   adding an id field.
+#
 class Post
   attr_reader :text, :title, :timestamp, :tags
 
@@ -14,7 +20,6 @@ class Post
     @text =  params[:text]                       # must_not_be_nil
     @timestamp = params[:timestamp] || Time.now  # defaults
     @tags = params[:tags] || []                  # defaults
-    @id = object_id  # TODO: Need better idea?
   end
 
   # Tag the post: (a) adds reciever to the tag and (b) adds
@@ -37,13 +42,15 @@ class Post
   #############################################
   #  VIEWS
   #############################################
-  # TODO:
-  #   1. Move the views to a Module?
+
+  FIVE_DAYS = 5 * 60 * 60 * 24 # Number of seconds in five days
 
   # This is a view method.  It will be invoked by the client app by sending
-  # a /post/recent URL to the MDB::ServerApp.
-  def self.recent
-    @recent_posts || []
+  # Data will be a collection of posts that the database gives us.
+  def self.recent(data)
+    cutoff = Time.now - FIVE_DAYS
+    recent = data.select { |k,v| v.timestamp > cutoff }
+    recent[0..5].map { |x| x[1] }
   end
 
   #############################################

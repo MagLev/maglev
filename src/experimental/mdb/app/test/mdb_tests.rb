@@ -49,9 +49,6 @@ describe MDB::RESTDatabase do
   end
 
   it 'adds documents and can retrieve them' do
-    # TODO: the roundtrip converts symbols to strings, so define this
-    # hash with strings until we use a Mash or something
-    # Also, Time.now became a string in the roundtrip...
     blog_post = { :title => 'a title', :text => 'some text' }
     id = @db.add(blog_post)
     id.wont_be_nil
