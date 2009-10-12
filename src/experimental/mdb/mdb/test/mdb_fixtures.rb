@@ -2,7 +2,7 @@ STDERR.puts "== Committing the ViewClass : Maglev.persistent? #{Maglev.persisten
 Maglev.abort_transaction
 Maglev.persistent do
   class ViewClass
-    def self.view_42
+    def self.view_42(docs)
       42
     end
 
@@ -20,7 +20,7 @@ Maglev.persistent do
     end
   end
   class ViewClass2
-    def self.view_42
+    def self.view_42(docs)
       43 # one better...
     end
   end
@@ -28,7 +28,7 @@ Maglev.persistent do
   module Foo
     module Bar
       class ViewClass3
-        def self.view_42
+        def self.view_42(docs)
           44 # better and better
         end
       end
