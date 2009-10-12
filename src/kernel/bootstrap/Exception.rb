@@ -16,9 +16,16 @@ class Exception
     primitive_nobridge '_reraise', '_rubyReraise'
     primitive          '_signal', 'signal:'
     primitive_nobridge '_signal', 'signal'
-    primitive          'message', 'description'
+    primitive          '_description', 'description'
     primitive_nobridge '_message=', 'messageText:'
     primitive_nobridge '_st_initialize', 'initialize'
+
+    def message
+      # The messages encoded by Smalltalk exceptions are frozen,
+      # but ruby allows modifications
+      m = _description
+      m.frozen? ? m.dup : m
+    end
 
     # Define this in ruby code so we get the full env1 creation hooks
     def self.exception(message=nil)

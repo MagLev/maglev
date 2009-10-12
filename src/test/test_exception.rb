@@ -120,4 +120,15 @@ e = NoMethodError.new
 e._init(:foo, nil, 1)
 e.inspect
 
+
+# Ensure that messages returned by system errors are modifiable
+def foo(arg); end
+begin
+  foo
+rescue ArgumentError => ae
+  m = ae.message
+  m << "FFFF"
+  # pass if we don't raise an exception with the <<
+end
+
 0
