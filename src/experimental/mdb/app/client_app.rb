@@ -1,21 +1,18 @@
 require 'rubygems'
 require 'sinatra'
-require 'mdb/client'
 
-# The BlogApp implements the View and Controller parts of the MVC
-# pattern.  This app receives end user http requests, invokes a model
-# method (through a "view"), and then renders the appropriate view from the
-# model data.
-#
-# The data returned by the model is JSON.
+require 'mdb/client'
+require 'blog'
+
+# The BlogApp implements the View and Controller parts of the MVC pattern.
+# This app receives end user http requests, invokes a model method (through
+# a "view"), and then renders the appropriate view from the model data.
 #
 # Run by MRI
 # Listens on port 3333
 # Contacts MDB on port 4567
 #
-#
 =begin
-
     |------+------------+-----------------------+----------|
     | Verb | Route      | Action                | View     |
     |------+------------+-----------------------+----------|
@@ -26,13 +23,14 @@ require 'mdb/client'
     | GET  | /posts/:id | Show post with id     | :show    |
     | PUT  | /posts/:id | Update post from data | :show    |
     |------+------------+-----------------------+----------|
-
 =end
 
 class BlogApp < Sinatra::Base
   set :app_file, File.dirname(__FILE__)
   set :static, true
 
+  # TODO: These need to be shared between the migrations and the app.  put
+  # in a config file?
   SERVER  = 'http://localhost:4567'
   POSTS_DB = 'theBlogPosts'
   TAGS_DB  = 'theBlogTags'
@@ -59,6 +57,7 @@ class BlogApp < Sinatra::Base
 
   get '/posts' do
     @posts = @posts_db.execute_view(:recent)
+    puts "-- /posts: @posts: #{@posts.inspect}"
     erb :home
   end
 
@@ -71,8 +70,7 @@ class BlogApp < Sinatra::Base
   end
 
   get '/posts/:id' do
-    json = data_for("/posts/#{params[:id]}")
-    @post = JSON.parse(json)
+    @post = @posts_db.get(params[:id])
     erb :post
   end
 
@@ -80,25 +78,22 @@ class BlogApp < Sinatra::Base
   # Submitting a /posts/new form goes here.
   # On success, redirects to show
   post '/posts' do
+    tags = get_tags params
     new_params = {
       :title => params[:title],
       :text => params[:text],
-      :tags => params[:tags]
+      :tags => tags
     }
-    response = put_to(new_params, '/posts')
-
-    case response.status
-    when 200..299
-      id = JSON.parse response.content
-      redirect "/posts/#{id}"
-    when 300..399
-      halt 404, "Can't redirect to server:  Server response #{response.status}"
-    else
-      halt response.status,
-           "MDB Server: #{response.status}: #{response.content}"
-    end
+    post = Post.new(new_params)
+    id = @posts_db.add(post)
+    redirect "/posts/#{id}"
   end
 
+  def get_tags(params)
+    puts "TAGS: #{params[:tags].inspect}"
+    tags = params[:tags].split
+    tags.map { |t| Tag.new(t) }
+  end
 end
 
-BlogApp.run!   :host  => 'localhost', :port => 3333
+# BlogApp.run!   :host  => 'localhost', :port => 3333

@@ -5,11 +5,26 @@ ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
 # These tasks control the Sinatra application
 namespace :app do
   desc "Run the client Sinatra app. Assumes rackup is in your path"
-  task :run do
+  task :run => :migrations do
     sh %{ rackup client.ru }
   end
-end
 
+  desc "Run the applications migrations file"
+  task :migrations do
+    sh %{ maglev-ruby -Ilib migrations.rb }
+  end
+
+  desc "Clear out the posts and tags dbs"
+  task :cleardb do
+    cmd =<<-EOS
+      'MDB::Server["theBlogPosts"].clear
+      MDB::Server["theBlogTags"].clear
+      Maglev.commit_transaction'
+    EOS
+    p cmd
+    sh %{ maglev-ruby -e #{cmd}}
+  end
+end
 
 desc "Run all of the tests"
 task :test => [ :'test:rest', :'test:app']
@@ -30,15 +45,5 @@ namespace :test do
   desc "Run the application level tests"
   task :app do
     sh %{ ruby -Ilib test/post_tests.rb }
-  end
-end
-
-# These tasks are used to manage the application's data in MDB; similar to
-# Rails migrations.
-namespace :mdb do
-  # Or, should this be mdb:create[post.rb] ?
-  desc "Create the databases on the MDB server."
-  task :create do
-    sh %{ maglev-ruby -Ilib migrations.rb }
   end
 end

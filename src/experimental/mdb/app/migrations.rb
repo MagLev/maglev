@@ -7,8 +7,8 @@ end
 Maglev.commit_transaction
 
 # MDB::Server etc. manages its own transactions
-[['posts', Post],
- ['tags',   Tag]].each do |key, view|
+[['theBlogPosts', Post],
+ ['theBlogTags',   Tag]].each do |key, view|
   if MDB::Server.key? key
     puts "Server has db named: #{key}...updating with #{view}"
     MDB::Server.update(key, view)

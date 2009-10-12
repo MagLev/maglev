@@ -1,7 +1,7 @@
 task :default => :setup
 
 desc "Do the setup necessary to install and run the demo"
-task :setup => :install_gems, :commit_mdb
+task :setup => [:install_gems, :commit_mdb]
 
 desc "Install necessary RubyGems into MagLev"
 task :install_gems do
