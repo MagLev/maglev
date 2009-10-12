@@ -7,17 +7,17 @@ require 'mdb/core_extensions'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
-# Exception.install_debug_block do |e|
-#   puts "--- #{e} #{e.class}"
-#   case e
-# #  when Sinatra::NotFound
-# #    nil.pause
+Exception.install_debug_block do |e|
+  puts "--- #{e} #{e.class}"
+  case e
+#  when Sinatra::NotFound
+#    nil.pause
 #   when NoMethodError
 #      nil.pause if e.message =~ /symbolize/
-# #   when ArgumentError
-# #     nil.pause # if e.message =~ /Illegal creation of a Symbol/
-#   end
-# end
+   when ArgumentError
+    nil.pause # if e.message =~ /Illegal creation of a Symbol/
+  end
+end
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
@@ -225,7 +225,10 @@ class MDB::ServerApp < Sinatra::Base
   end
 
   error ArgumentError do
-    halt 400, request.env['sinatra.error'].message
+    e = request.env['sinatra.error']
+    msg = e.message
+    msg << e.backtrace.join("\n")
+    halt 400, msg
   end
 
   error MDB::Server::DatabaseNotFound do

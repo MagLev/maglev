@@ -33,15 +33,12 @@ class BlogApp < Sinatra::Base
   # in a config file?
   SERVER  = 'http://localhost:4567'
   POSTS_DB = 'theBlogPosts'
-  TAGS_DB  = 'theBlogTags'
 
   def initialize(*args)
     super
     @server = MDB::RESTServer.new SERVER
     @posts_db = @server[POSTS_DB]
-    @tags_db  = @server[TAGS_DB]
     puts "-- @posts_db: #{@posts_db}"
-    puts "-- @tags_db:  #{@tags_db}"
     @title = "MRI Blog Using MagLevDB"
     @nav_bar =  <<-EOS
         <ul class="menu">
@@ -92,8 +89,6 @@ class BlogApp < Sinatra::Base
   def get_tags(params)
     puts "TAGS: #{params[:tags].inspect}"
     tags = params[:tags].split
-    tags.map { |t| Tag.new(t) }
+    tags.map { |t| t.to_sym }
   end
 end
-
-# BlogApp.run!   :host  => 'localhost', :port => 3333

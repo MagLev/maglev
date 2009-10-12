@@ -57,6 +57,10 @@ module MDB
       doc_id = Gemstone.increment_pcounter(MDB::SHARED_COUNTER)
       raise DocumentAlreadyExists if @documents.key? doc_id # Shouldn't happen...
       @documents[doc_id] = document
+
+      # set the id field, if it has one
+      document.id = doc_id if document.respond_to? :id=
+
       # We do the callback within the txn so that the model can
       # persistently update data structures and commit them.
       @view.document_added(doc_id, document) if @view.respond_to? :document_added

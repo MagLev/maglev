@@ -12,6 +12,9 @@
 class Post
   attr_reader :text, :title, :timestamp, :tags
 
+  # TODO: this field should be managed by MDBModel mixin
+  attr_accessor :id
+
   def initialize(params)
     # TODO: Here we see an opportunity to add ActiveRecord style
     # validations and default values. OTOH, perhaps its more typing to add
@@ -22,17 +25,8 @@ class Post
     @tags = params[:tags] || []                  # defaults
   end
 
-  # Tag the post: (a) adds reciever to the tag and (b) adds
-  # each tag to recevier's @tags
-  def tag(*tags)
-    tags.each do |tag|
-      tag << self
-      @tags << tag
-    end
-  end
-
   # MDB::Database calls this whenever a document is added
-  def document_added(document)
+  def document_added(id, document)
     # Update the list of recent posts (saves searching)
     @recent_posts ||= []
     @recent_posts << document
@@ -52,30 +46,5 @@ class Post
     recent = data.select { |k,v| v.timestamp > cutoff }
     recent[0..5].map { |x| x[1] }
   end
-
-  #############################################
-  # Stuff to be injected by the database
-  #############################################
-  class << self
-    attr_reader :database
-    def set_db(database)
-      @database = database
-    end
-  end
 end
 
-class Tag < Array
-  attr_reader :name
-
-  def initialize(name)
-    @name = name.to_s
-  end
-
-  def to_s
-    @name
-  end
-
-  def self.find_by_name(name)
-    Tag.detect { |t| t.name == name }
-  end
-end
