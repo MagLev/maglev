@@ -22,6 +22,10 @@ describe MDB::Database do
     @db.execute_view(:view_42).must_equal 42
   end
 
+  it 'properly passes parameters to views' do
+    @db.execute_view(:view_55_plus, 11).must_equal 66
+  end
+
   it 'raises NoSuchView if there is no view of the given name' do
     proc { @db.execute_view(:not_a_view_name) }.must_raise MDB::Database::NoViewError
   end
