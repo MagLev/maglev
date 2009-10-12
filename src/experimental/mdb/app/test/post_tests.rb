@@ -12,12 +12,11 @@ describe Post do
     @data = Hash.new
     now = Time.now
     10.times do |i|
-      created_on =
-        @data[i] = Post.new({
+      @data[i] = Post.new({
         :title => "Title #{i}",
         :text => "Text #{i}",
         :timestamp => now -  SECONDS_PER_DAY * i, # create a time-stamp i days ago
-        :tags => ['maglev', 'blog']})
+        :tags => [Tag.new('maglev'), Tag.new('blog')]})
     end
   end
 
@@ -46,6 +45,13 @@ describe Post do
     recent_posts = Post.recent(@data)
     recent_posts.size.must_equal 5
     recent_posts.each { |p| p.class.must_equal Post}
+  end
+
+  it 'knows what tags it is tagged with' do
+    @data.each do |_,post|
+      post.tagged_with?('maglev').must_equal true
+      post.tagged_with?('maglevitate').must_equal false
+    end
   end
 end
 

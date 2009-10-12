@@ -33,12 +33,14 @@ class BlogApp < Sinatra::Base
   # in a config file?
   SERVER  = 'http://localhost:4567'
   POSTS_DB = 'theBlogPosts'
+  TAGS_DB  = 'theBlogTags'
 
   def initialize(*args)
     super
     @server = MDB::RESTServer.new SERVER
     @posts_db = @server[POSTS_DB]
     puts "-- @posts_db: #{@posts_db}"
+    puts "-- @tags_db:  #{@tags_db}"
     @title = "MRI Blog Using MagLevDB"
     @nav_bar =  <<-EOS
         <ul class="menu">

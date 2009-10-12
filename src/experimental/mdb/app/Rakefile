@@ -45,5 +45,6 @@ namespace :test do
   desc "Run the application level tests"
   task :app do
     sh %{ ruby -Ilib test/post_tests.rb }
+    sh %{ ruby -Ilib test/tag_tests.rb }
   end
 end

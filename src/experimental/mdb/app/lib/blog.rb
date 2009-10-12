@@ -15,6 +15,11 @@ class Post
   # TODO: this field should be managed by MDBModel mixin
   attr_accessor :id
 
+  # Takes a hash of params => value mappings.  Recognized params:
+  # 1. :title      Expects a string
+  # 2. :text       Expects a string
+  # 3. :timestamp  Expects a Time
+  # 4. :tags       Expects an array of strings or symbols
   def initialize(params)
     # TODO: Here we see an opportunity to add ActiveRecord style
     # validations and default values. OTOH, perhaps its more typing to add
@@ -22,7 +27,20 @@ class Post
     @title = params[:title]                      # must_not_be_nil
     @text =  params[:text]                       # must_not_be_nil
     @timestamp = params[:timestamp] || Time.now  # defaults
-    @tags = params[:tags] || []                  # defaults
+    @tags = params[:tags] || []
+  end
+
+  def tag(*tags)
+    tags.each do |tag|
+      tag << self
+      @tags << tag
+    end
+  end
+
+  # Returns true iff one of this post's tags is named tag_name
+  def tagged_with?(tag_name)
+    tn = tag_name.to_s
+    !!@tags.detect { |tag| tag.name.to_s == tn }
   end
 
   # MDB::Database calls this whenever a document is added
@@ -37,14 +55,53 @@ class Post
   #  VIEWS
   #############################################
 
-  FIVE_DAYS = 5 * 60 * 60 * 24 # Number of seconds in five days
+  class << self
+    FIVE_DAYS = 5 * 60 * 60 * 24 # Number of seconds in five days
 
-  # This is a view method.  It will be invoked by the client app by sending
-  # Data will be a collection of posts that the database gives us.
-  def self.recent(data)
-    cutoff = Time.now - FIVE_DAYS
-    recent = data.select { |k,v| v.timestamp > cutoff }
-    recent[0..5].map { |x| x[1] }
+    # This is a view method.  It will be invoked by the client app by sending
+    # Data will be a collection of posts that the database gives us.
+    def recent(posts)
+      cutoff = Time.now - FIVE_DAYS
+      recent = posts.select { |k,v| v.timestamp > cutoff }
+      recent[0..5].map { |x| x[1] }
+    end
+
+    def tagged_with(posts, tag_name)
+      # Need to be careful sym vs string
+      tn = tag_name.to_s
+      tagged_posts = posts.select do |p|
+        p.tags.includes? tags
+      end
+
+    end
   end
 end
 
+# NOTE: Tag used to derive from Array, but MagLev has a bug in unmarshal
+# and it can't read an MRI marshaled subclass of Array.  So, for right now,
+# we delegate to an array and implement a few extra methods.
+class Tag
+  attr_reader :name
+
+  def initialize(name)
+    @name = name.to_s
+    @tagged = Array.new
+  end
+
+  def to_s
+    @name
+  end
+
+  def <<(tagged_item)
+    @tagged << tagged_item
+  end
+
+  def each(&block)
+    @tagged.each(&block)
+  end
+
+  def self.find_by_name(tags, name)
+    tn = name.to_s
+    tags.inject([]) { |acc,(id,tag)| acc << tag if tag.name == tn; acc }
+  end
+end
