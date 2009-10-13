@@ -10,6 +10,10 @@ Maglev.persistent do
       55 + count.to_i
     end
 
+    def self.view_66(docs, count)
+      66 + count.to_i
+    end
+
     def self.document_added(id, doc)
       @count ||= 0
       @count += 1

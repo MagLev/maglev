@@ -42,7 +42,7 @@ module MDB
       # Save current data for exceptions in handle_response
       @path = @url + path
       @method = op
-      @data = data
+      @data = data.nil? ? [] : [data]
       begin
         handle_response case op
                         when :get
@@ -52,7 +52,7 @@ module MDB
                         when :delete
                           @server.delete @path
                         when :post
-                          @server.post @path, data, POST_ENCODINGS
+                          @server.post @path, @data, POST_ENCODINGS
                         end
       rescue Errno::ECONNRESET
         if retry_count > 0
@@ -96,7 +96,7 @@ module MDB
     # Return the result of running the named view on the server
     # NOTE: params not yet supported
     def execute_view(view_name, *params)
-      @rest.get("/#{@db_name}/view/#{view_name}")
+      @rest.post("/#{@db_name}/view/#{view_name}", params)
     end
 
     # GET /:db/:id

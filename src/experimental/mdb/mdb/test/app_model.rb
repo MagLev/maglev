@@ -2,8 +2,17 @@
 Maglev.persistent do
   class AppModel
     attr_reader :a, :b
-    def view_53(documents)
+    def self.view_42(docs)
+      42
+    end
+    def self.view_67(docs, count, ary)
+      67 + count.to_i + ary.size
+    end
+    def self.view_53(documents)
       53
+    end
+    def self.view_66(documents, count)
+      66 + count.to_i
     end
     def initialize(a, b)
       @a, @b = a, b

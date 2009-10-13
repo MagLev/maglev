@@ -13,6 +13,7 @@ require 'mdb_server'
 MiniTest::Unit.autorun
 
 # Exception.install_debug_block do |e|
+#   puts "--- #{e.class}  #{e.inspect}"
 #   case e
 #   when ArgumentError, NoMethodError
 #     nil.pause # if e.message =~ /to_sym/
@@ -44,7 +45,6 @@ end
 def post_urlencode(path, expected_status, data={ })
   # This only works for simple sets of parameters. Send data as urlencoded
   # form.
-
   p = data.inject("") { |acc, (key, value)| acc << "#{key}=#{value}&" }.chop
   e = {
     :input => p,
@@ -55,15 +55,16 @@ def post_urlencode(path, expected_status, data={ })
   handle_response(expected_status)
 end
 
-def post_serialized(path, data='')
+def post_serialized(path, *data)
+  # Always wrap data in an array (*data).  If we send an empty array, that
+  # means no data to send to server.
   s_data = SERIALIZER.serialize data
   e = {
     :input => s_data,
     "CONTENT_LENGTH" => s_data.size,
     "CONTENT_TYPE"   => SERIALIZER.content_type
-  }
+    }
   e['CONTENT_TRANSFER_ENCODING'] = 'binary' if SERIALIZER.content_type == 'application/mdb'
-
   Maglev.transaction { @response = @request.post(path, e) }
   handle_response
 end
@@ -105,7 +106,6 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     @response = nil
   end
 
-
 =begin
 
 These requests correspond to methods on MDB::Server, a collection:
@@ -134,7 +134,7 @@ These requests correspond to methods on MDB::Database
   | POST   | /:db/:id          | NOT SUPPORTED                |                  |
   | DELETE | /:db/:id          | Delete document :id from :db | status           |
   |        |                   |                              |                  |
-  | GET    | /:db/view/:name   | Run the view                 | data from view   |
+  | POST   | /:db/view/:name   | Run the view                 | data from view   |
   | GET    | /:db/send/:method | Send :method to ViewClass    | For testing      |
   |--------+-------------------+------------------------------+------------------|
 =end
@@ -200,7 +200,6 @@ These requests correspond to methods on MDB::Database
   it 'responds to DELETE "/:db" by returning 404 if :db does not exist' do
     r = delete "/this_is_not_a_db_name", 404
   end
-
 end
 
 describe 'MDB::ServerApp: MDB::Database requests' do
@@ -215,13 +214,6 @@ describe 'MDB::ServerApp: MDB::Database requests' do
     @response = nil
   end
 
-#   it 'responds to GET "/:db/:id" by returning the to_json of the document' do
-#     doc = get "/#{DB_NAME}/#{@doc1_id}"
-#     doc.wont_be_nil
-#     doc['a'].must_equal 1
-#     doc['b'].must_equal 2
-#   end
-
   it 'responds to POST "/:db" by creating a new document and returning the id' do
     id = post_serialized "/#{DB_NAME}", AppModel.new(3,4)
     id.wont_be_nil
@@ -232,13 +224,18 @@ describe 'MDB::ServerApp: MDB::Database requests' do
     doc.b.must_equal 4
   end
 
-#   it 'responds to POST "/:db" and GET "/:db" correctly' do
-#     r = post "/#{DB_NAME_2}", { :view_class => :AppModel }
-#     get("/#{DB_NAME_2}").must_equal true
+  it 'executes views for POST /:db/view/:view (no args)' do
+    result = post_serialized "/#{DB_NAME}/view/view_42"
+    result.must_equal 42
+  end
 
-#     # TODO: Probably need to test that the model class got installed
-#     # correctly.  Only way to do that is to est if the view methods are
-#     # correct.
-#   end
+  it 'executes views for POST /:db/view/:view (one arg)' do
+    result = post_serialized "/#{DB_NAME}/view/view_66", 11
+    result.must_equal 77
+  end
 
+  it 'executes views for POST /:db/view/:view (two args)' do
+    result = post_serialized "/#{DB_NAME}/view/view_67", 11, [:foo, :bar]
+    result.must_equal 80
+  end
 end

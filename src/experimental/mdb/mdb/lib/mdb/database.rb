@@ -35,10 +35,11 @@ module MDB
 
     def execute_view(view_name, *params)
       view_sym = view_name.to_sym
+      args = [@documents] + params[0..-1]
       begin
-        @view.send view_sym, @documents, *params # DANGER!
+        @view.send view_sym, *args
       rescue NoMethodError
-        raise NoViewError.new("Database #{@name}: no view named: #{view_name}")
+        raise NoViewError.new("Database #{@name}: no view named: #{view_sym} view class: #{@view}")
       end
     end
 

@@ -7,17 +7,17 @@ require 'mdb/core_extensions'
 
 raise "==== Commit MDB Classes"  unless defined? MDB::Server
 
-Exception.install_debug_block do |e|
-  puts "--- #{e} #{e.class}"
-  case e
-#  when Sinatra::NotFound
-#    nil.pause
-#   when NoMethodError
-#      nil.pause if e.message =~ /symbolize/
-   when ArgumentError
-    nil.pause # if e.message =~ /Illegal creation of a Symbol/
-  end
-end
+# Exception.install_debug_block do |e|
+#   puts "--- #{e} #{e.class}"
+#   case e
+# #  when Sinatra::NotFound
+# #    nil.pause
+# #   when NoMethodError
+# #      nil.pause if e.message =~ /symbolize/
+#    when ArgumentError
+#     nil.pause # if e.message =~ /Illegal creation of a Symbol/
+#   end
+# end
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
@@ -60,7 +60,7 @@ end
 #  | POST   | /:db/:id          | NOT SUPPORTED                |                  |
 #  | DELETE | /:db/:id          | Delete document :id from :db | status           |
 #  |        |                   |                              |                  |
-#  | GET    | /:db/view/:name   | Run the view                 | data from view   |
+#  | POST   | /:db/view/:name   | Run the view                 | data from view   |
 #  | GET    | /:db/send/:method | Send :method to ViewClass    | For testing      |
 #  |--------+-------------------+------------------------------+------------------|
 #
@@ -109,20 +109,23 @@ class MDB::ServerApp < Sinatra::Base
   before do
     content_type @serializer.content_type  # Handle response type
     # Unpack application/mdb data
+    @post_hash = nil
+    @post_data = nil
     case request.content_type
     when %r{application/mdb}
-      @post_data = @serializer.deserialize request.body
+      @post_data = @serializer.deserialize(request.body)
+      @post_data.each { |el| el.symbolize_keys if Hash === el }
     else
-      @post_data = request.POST.dup
+      @post_hash = request.POST.dup
+      @post_hash.symbolize_keys
     end
-    @post_data.symbolize_keys if Hash === @post_data
   end
 
   # This is here, rather than in the before block, since params does not
   # have the path info split out until after the before block is run.
   # Furthermore, not all paths will need the db.
   def get_db
-    db_name = params[:db] || @post_data[:db_name]
+    db_name = params[:db] || @post_hash[:db_name]
     halt 400, "No :db or :db_name param" if db_name.nil?
     db = @server[db_name]
     halt 404, "No such Database: #{params[:db]}" if db.nil?
@@ -145,7 +148,7 @@ class MDB::ServerApp < Sinatra::Base
   # Create a new database
   post '/' do
     # Use strings, not symbols, for @post_data
-    result = @server.create(@post_data[:db_name], @post_data[:view_class])
+    result = @server.create(@post_hash[:db_name], @post_hash[:view_class])
     @serializer.serialize(result.name) # send back just the db name
   end
 
@@ -164,7 +167,7 @@ class MDB::ServerApp < Sinatra::Base
   # call the model added(new_object) hook.
   post '/:db' do
     begin
-      @serializer.serialize get_db.add(@post_data)
+      @serializer.serialize get_db.add(@post_data[0])
     rescue MDB::MDBError => e
       halt 404, "MDB::ServerApp error: #{e.message}"
     end
@@ -207,9 +210,14 @@ class MDB::ServerApp < Sinatra::Base
   # Run a view on the database.
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
-  get '/:db/view/:view' do
+  post '/:db/view/:view' do
     begin
-      @serializer.serialize(get_db.execute_view(params[:view]))
+      # Do not unpack @post_data.  We want to pass an empty array here to indicate
+      # no params sent (if that is the case).
+      # puts "=== /#{params[:db]}/view/#{params[:view]}:  @post_data: #{@post_data.inspect}"
+      args = [params[:view]]
+      args = args + @post_data unless @post_data.nil?
+      @serializer.serialize(get_db.execute_view(*args))
     rescue MDB::MDBError => e
       halt 404, "MDB::ServerApp error: #{e.message}"
     end

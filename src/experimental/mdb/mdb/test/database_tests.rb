@@ -17,13 +17,20 @@ describe MDB::Database do
     @db = MDB::Server[DB_NAME]
   end
 
-  it 'executes the requested view (view is symbol or string)' do
+  it 'executes the requested view (view is symbol or string): no view parameters' do
     @db.execute_view('view_42').must_equal 42
     @db.execute_view(:view_42).must_equal 42
   end
 
-  it 'properly passes parameters to views' do
-    @db.execute_view(:view_55_plus, 11).must_equal 66
+  it 'executes the requested view (view is symbol or string): one view parameter' do
+    @db.execute_view("view_55_plus", 11).must_equal 66
+    @db.execute_view(:view_55_plus,  12).must_equal 67
+  end
+
+  it 'executes the requested view (view is symbol or string): two view parameters' do
+    # View 67 sums: 67 + count + ary.length
+    @db.execute_view("view_67", 5, [:foo, :bar]).must_equal 74
+    @db.execute_view(:view_67,  5, [:foo]).must_equal 73
   end
 
   it 'raises NoSuchView if there is no view of the given name' do
