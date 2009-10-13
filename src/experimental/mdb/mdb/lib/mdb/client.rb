@@ -3,7 +3,6 @@ require 'httpclient'
 
 require 'mdb/serializer'
 
-# TODO: Add proper Content-type header
 module MDB
   # Manages the REST communication to MDB and serialization
   class REST
@@ -39,20 +38,29 @@ module MDB
     # Issue a request based on op and provided data.
     # Returns an HTTP::Message object.
     def request(op, path, data = nil)
+      retry_count = 1
       # Save current data for exceptions in handle_response
       @path = @url + path
       @method = op
       @data = data
-      handle_response case op
-                      when :get
-                        @server.get_content @path
-                      when :put
-                        @server.put @path
-                      when :delete
-                        @server.delete @path
-                      when :post
-                        @server.post @path, data, POST_ENCODINGS
-                      end
+      begin
+        handle_response case op
+                        when :get
+                          @server.get_content @path
+                        when :put
+                          @server.put @path
+                        when :delete
+                          @server.delete @path
+                        when :post
+                          @server.post @path, data, POST_ENCODINGS
+                        end
+      rescue Errno::ECONNRESET
+        if retry_count > 0
+          retry_count -= 1
+          retry
+        end
+        raise
+      end
     end
 
     def handle_response(response)
