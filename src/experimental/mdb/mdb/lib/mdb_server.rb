@@ -12,10 +12,22 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 #   case e
 # #  when Sinatra::NotFound
 # #    nil.pause
-# #   when NoMethodError
-# #      nil.pause if e.message =~ /symbolize/
-#    when ArgumentError
-#     nil.pause # if e.message =~ /Illegal creation of a Symbol/
+#    when NoMethodError
+#     nil.pause  unless e.message =~ /extension|coerce|to_ary/
+# #   when ArgumentError
+# #    nil.pause # if e.message =~ /Illegal creation of a Symbol/
+#   end
+# end
+
+# Exception.install_debug_block do |e|
+#   puts "--- #{e} #{e.class}"
+#   case e
+# #  when Sinatra::NotFound
+# #    nil.pause
+#    when NoMethodError
+#     nil.pause # if e.message =~ /symbolize/
+# #   when ArgumentError
+# #    nil.pause # if e.message =~ /Illegal creation of a Symbol/
 #   end
 # end
 
@@ -109,15 +121,20 @@ class MDB::ServerApp < Sinatra::Base
   before do
     content_type @serializer.content_type  # Handle response type
     # Unpack application/mdb data
+#    puts "==== before: #{request.env['REQUEST_METHOD']}  #{request.env['REQUEST_URI']}"
     @post_hash = nil
     @post_data = nil
     case request.content_type
     when %r{application/mdb}
       @post_data = @serializer.deserialize(request.body)
+#      puts "==== @post_data: #{@post_data.inspect}"
       @post_data.each { |el| el.symbolize_keys if Hash === el }
+#      puts "==== @post_data: #{@post_data.inspect}"
     else
       @post_hash = request.POST.dup
+#      puts "==== @post_hash: #{@post_hash.inspect}"
       @post_hash.symbolize_keys
+#      puts "==== @post_hash: #{@post_hash.inspect}"
     end
   end
 
@@ -147,8 +164,8 @@ class MDB::ServerApp < Sinatra::Base
 
   # Create a new database
   post '/' do
-    # Use strings, not symbols, for @post_data
-    result = @server.create(@post_hash[:db_name], @post_hash[:view_class])
+    h = @post_data[0]
+    result = @server.create(h[:db_name], h[:view_class])
     @serializer.serialize(result.name) # send back just the db name
   end
 
@@ -233,26 +250,40 @@ class MDB::ServerApp < Sinatra::Base
   end
 
   error ArgumentError do
-    e = request.env['sinatra.error']
-    msg = e.message
-    msg << e.backtrace.join("\n")
-    halt 400, msg
+#     e = request.env['sinatra.error']
+#     msg = e.message
+#     msg << e.backtrace.join("\n")
+    halt 400, err_msg
   end
 
   error MDB::Server::DatabaseNotFound do
-    halt 404, request.env['sinatra.error'].message
+    halt 404, err_msg
   end
 
   error MDB::MDBError do
-    halt 400, request.env['sinatra.error'].message
+    halt 400, err_msg
   end
 
   error do
-    err = request.env['sinatra.error']
-    "MDB::ServerApp error: #{request.env['sinatra.error'].message}"
+    err_msg
   end
 
   not_found do
-    "MDB:ServerApp: unknown URL: #{request.path} Parameters: #{params.inspect}"
+    err_msg "unknown URL: #{request.path} Parameters: #{params.inspect}"
+  end
+
+  def err_msg(msg='')
+    m = 'MDB::ServerApp error: '
+    m << msg
+
+    e = request.env['sinatra.error']
+    if e.nil?
+      m << "  (No exception available)"
+    else
+      m << "  #{e.class} #{e.inspect}"
+      m << e.message if e.respond_to? :message
+      m << e.backtrace.join("\n")
+    end
+    m
   end
 end

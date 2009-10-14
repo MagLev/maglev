@@ -34,6 +34,10 @@ module MDB
       request(:post, path, @serializer.serialize(data))
     end
 
+    def post_urlencode(path, data={ })
+      request(:post_urlencode, path, data)
+    end
+
     private
     # Issue a request based on op and provided data.
     # Returns an HTTP::Message object.
@@ -42,7 +46,8 @@ module MDB
       # Save current data for exceptions in handle_response
       @path = @url + path
       @method = op
-      @data = data.nil? ? [] : [data]
+      @data = data
+#      @data = data.nil? ? [] : [data]
       begin
         handle_response case op
                         when :get
@@ -52,7 +57,15 @@ module MDB
                         when :delete
                           @server.delete @path
                         when :post
+                          puts "-------- @path: #{@path.inspect}"
+                          puts "-------- @data: #{@data.inspect}"
                           @server.post @path, @data, POST_ENCODINGS
+                        when :post_urlencode
+                          @data = hash2urlencoded
+                          e = { :input => p,
+                                "CONTENT_LENGTH" => p.size,
+                                "CONTENT_TYPE"   => 'application/x-www-form-urlencoded' }
+                          @server.post @path, @data, e
                         end
       rescue Errno::ECONNRESET
         if retry_count > 0
@@ -61,6 +74,10 @@ module MDB
         end
         raise
       end
+    end
+
+    def hash2urlencoded(h)
+      h.inject("") { |acc, (key, value)| acc << "#{key}=#{value}&"}.chop
     end
 
     def handle_response(response)
@@ -77,7 +94,9 @@ module MDB
           raise "Error doing #{@method} #{@path} from database: #{bre.res.content}"
         end
       else
-        @serializer.deserialize response
+        x = @serializer.deserialize(response)
+        puts "--- handle_response returning: #{x.inspect}  (#{x.class})"
+        x[0]
       end
     end
 
@@ -135,13 +154,14 @@ module MDB
     end
 
     def create(db_name, view_class)
-      p = { :db_name => db_name, :view_class => view_class.to_s }
-      result = @rest.post("/", p)
+      result = @rest.post("/", :db_name => db_name, :view_class => view_class.to_s)
+#       p = { :db_name => db_name, :view_class => view_class.to_s }
+#       result = @rest.post_urlencode("/", p)
       if result == db_name
-        RESTDatabase.new(@url, db_name)
-      else
-        raise result
-      end
+         RESTDatabase.new(@url, db_name)
+       else
+         raise result
+       end
     end
 
     def delete(db_name)

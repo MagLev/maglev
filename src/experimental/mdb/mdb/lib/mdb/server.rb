@@ -45,7 +45,7 @@ module MDB
     # Raises DatabaseNotFound if there is no such database.
     # returns the database
     def self.delete(db_name)
-      get_db(db_name, "#{self}.delete") # ignore return value
+      get_db(db_name, "#{self}.delete") # raises DatabaseNotFound if necessary
       Maglev.transaction { @proot.delete db_name.to_sym }
     end
 

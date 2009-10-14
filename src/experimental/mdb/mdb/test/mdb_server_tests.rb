@@ -32,32 +32,16 @@ SERIALIZER_CLASS =
   end
 SERIALIZER = SERIALIZER_CLASS.new
 
-# Get path wrapped in a transaction.  Make sure the status is success.
-# status may be either a range or a Fixnum.
-def get(path, status=(200..299))
+def get(path)
   # Since the real app will be running in a Rack stack with a transaction
   # wrapper around each HTTP request, in this test code, we manually wrap
   # the transactions to simulate the rack txn wrapper.
   Maglev.transaction { @response = @request.get(path) }
-  handle_response(status)
+  handle_response
 end
 
-def post_urlencode(path, expected_status, data={ })
-  # This only works for simple sets of parameters. Send data as urlencoded
-  # form.
-  p = data.inject("") { |acc, (key, value)| acc << "#{key}=#{value}&" }.chop
-  e = {
-    :input => p,
-    "CONTENT_LENGTH" => p.size,
-    "CONTENT_TYPE"   => 'application/x-www-form-urlencoded'
-  }
-  Maglev.transaction { @response = @request.post(path, e) }
-  handle_response(expected_status)
-end
-
-def post_serialized(path, *data)
-  # Always wrap data in an array (*data).  If we send an empty array, that
-  # means no data to send to server.
+def post(path, *data)
+  # *data wraps data in an array, which is what we need to send.
   s_data = SERIALIZER.serialize data
   e = {
     :input => s_data,
@@ -69,19 +53,19 @@ def post_serialized(path, *data)
   handle_response
 end
 
-def delete(path, status=(200..299))
+def delete(path)
   Maglev.transaction { @response = @request.delete(path) }
-  handle_response(status)
+  handle_response
 end
 
 # Decode serialized data from response, if success status code (2xx)
-def handle_response(status=200)
-  case status
+def handle_response
+  case @expected_status
   when Range
-    s = status.include?(@response.status)
+    s = @expected_status.include?(@response.status)
     s.must_equal true
   else
-    @response.status.must_equal status
+    @response.status.must_equal @expected_status
   end
 
   if (200..299).include? @response.status
@@ -101,9 +85,9 @@ describe 'MDB::ServerApp: MDB::Server requests' do
       MDB::Server.delete name if MDB::Server.key? name
     end
     MDB::Server.create(DB_NAME, AppModel)
-
     @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
+    @expected_status = 200
   end
 
 =begin
@@ -141,7 +125,8 @@ These requests correspond to methods on MDB::Database
 
   # General gets
   it 'responds to GET "/#{DB_NAME}/Does/Not/Exist" with a 404' do
-    r = get "/#{DB_NAME}/Does/Not/Exist", 404
+    @expected_status = 404
+    r = get "/#{DB_NAME}/Does/Not/Exist"
   end
 
   it 'responds to get "/not_a_db_name" with false' do
@@ -164,28 +149,25 @@ These requests correspond to methods on MDB::Database
     # TODO: Add test for not found db
  end
 
-  # TODO: Should probably expect 201, not 200 from a successful POST
   it 'responds to POST "/" and GET "/:db" correctly' do
-    r = post_urlencode "/", 200, { :db_name => DB_NAME_2,
-                                   :view_class => AppModel }
+    r = post "/", { :db_name => DB_NAME_2, :view_class => AppModel }
     get("/#{DB_NAME_2}").must_equal true
-
-    # TODO: Probably need to test that the model class got installed
-    # correctly.  Only way to do that is to est if the view methods are
-    # correct.
   end
 
   it 'responds to POST "/" with 400 if missing :view_name' do
-    r = post_urlencode "/", 400, { :db_name => DB_NAME_2 }
+    @expected_status = 400
+    r = post "/", { :db_name => DB_NAME_2 }
   end
 
   it 'responds to POST "/" with 400 if missing :db_name' do
-    r = post_urlencode "/", 400, { :view_name => :AppClass }
+    @expected_status = 400
+    r = post "/", { :view_name => :AppClass }
   end
 
   it 'responds to POST "/" with 400 if :view_class is bad' do
-    r = post_urlencode "/", 400, { :db_name => DB_NAME_2,
-                                   :view_class => :NotAClass }
+    @expected_status = 400
+    r = post "/", { :db_name => DB_NAME_2,
+                               :view_class => :NotAClass }
   end
 
   it 'responds to DELETE "/:db" by deleting the db if it exists' do
@@ -198,7 +180,8 @@ These requests correspond to methods on MDB::Database
   end
 
   it 'responds to DELETE "/:db" by returning 404 if :db does not exist' do
-    r = delete "/this_is_not_a_db_name", 404
+    @expected_status = 404
+    r = delete "/this_is_not_a_db_name"
   end
 end
 
@@ -212,10 +195,11 @@ describe 'MDB::ServerApp: MDB::Database requests' do
     @doc1_id = @db.add(@doc1)
     @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
+    @expected_status = 200
   end
 
   it 'responds to POST "/:db" by creating a new document and returning the id' do
-    id = post_serialized "/#{DB_NAME}", AppModel.new(3,4)
+    id = post "/#{DB_NAME}", AppModel.new(3,4)
     id.wont_be_nil
 
     doc = get "/#{DB_NAME}/#{id}"
@@ -225,17 +209,17 @@ describe 'MDB::ServerApp: MDB::Database requests' do
   end
 
   it 'executes views for POST /:db/view/:view (no args)' do
-    result = post_serialized "/#{DB_NAME}/view/view_42"
+    result = post "/#{DB_NAME}/view/view_42"
     result.must_equal 42
   end
 
   it 'executes views for POST /:db/view/:view (one arg)' do
-    result = post_serialized "/#{DB_NAME}/view/view_66", 11
+    result = post "/#{DB_NAME}/view/view_66", 11
     result.must_equal 77
   end
 
   it 'executes views for POST /:db/view/:view (two args)' do
-    result = post_serialized "/#{DB_NAME}/view/view_67", 11, [:foo, :bar]
+    result = post "/#{DB_NAME}/view/view_67", 11, [:foo, :bar]
     result.must_equal 80
   end
 end

@@ -6,11 +6,12 @@ module MDB
     end
 
     def serialize(obj)
-      str = Marshal.dump obj
+      #Marshal.dump(obj.nil? ? [] : [obj])
+      Marshal.dump obj
     end
 
     def deserialize(string)
-      obj = Marshal.load string
+      Marshal.load string
     end
   end
 
