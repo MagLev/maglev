@@ -1,4 +1,6 @@
 # MiniTest suite for the MDB::Database
+# Fixtures are in mdb_fixtures.rb, loaded by ../Rakefile
+
 require 'rubygems'
 require 'minitest/spec'
 
