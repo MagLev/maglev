@@ -40,7 +40,7 @@ class Post
     end
   end
 
-  # Returns true iff one of this post's tags is named tag_name
+  # Returns true iff at least one of this post's tags is named tag_name
   def tagged_with?(tag_name)
     @tags.any? { |tag| tag.matches tag_name }
   end
@@ -82,7 +82,6 @@ class Post
       @recent_posts.pop if @recent_posts.size > 5
     end
   end
-
 end
 
 # NOTE: Tag used to derive from Array, but MagLev has a bug in unmarshal
@@ -113,7 +112,7 @@ class Tag
   end
 
   def self.find_by_name(tags, name)
-    tags.inject([]) do |acc,(id,tag)|
+    tags.inject([]) do |acc, (id,tag)|
       acc << tag if tag.matches name
       acc
     end

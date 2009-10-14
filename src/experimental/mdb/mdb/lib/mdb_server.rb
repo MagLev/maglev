@@ -1,23 +1,9 @@
 require 'rubygems'
 require 'sinatra'
-
 require 'txn_wrapper'
-
 require 'mdb/core_extensions'
 
-raise "==== Commit MDB Classes"  unless defined? MDB::Server
-
-# Exception.install_debug_block do |e|
-#   puts "--- #{e} #{e.class}"
-#   case e
-# #  when Sinatra::NotFound
-# #    nil.pause
-#    when NoMethodError
-#     nil.pause  unless e.message =~ /extension|coerce|to_ary/
-# #   when ArgumentError
-# #    nil.pause # if e.message =~ /Illegal creation of a Symbol/
-#   end
-# end
+raise "==== MDB Classes not committed" unless defined? MDB::Server
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
@@ -84,18 +70,8 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 #
 # * If an exception is thrown, then the content-type and
 #   content-transfer-encoding are left at application/mdb and binary
-#
-# * parameterize the serializer, but I can't seem to get
-#   the combination of:
-#   1: Passing parameters to the MDB::ServerApp.new(:marshal)
-#   2: Starting from a rackup file with an app derived from Sinatra::Base
-#   3: passing parameters like :host and :port into the appropriate level.
-#   Until then, I'll just hardcode the MarshalSerializer.
-#
-class MDB::ServerApp < Sinatra::Base
 
-#   require 'log_headers'
-#   use LogHeaders
+class MDB::ServerApp < Sinatra::Base
 
   use MagLevTransactionWrapper
   set :raise_errors, false  # Otherwise, error blocks don't work
@@ -109,21 +85,16 @@ class MDB::ServerApp < Sinatra::Base
   before do
     content_type @serializer.content_type  # Handle response type
     # Unpack application/mdb data
-#    puts "==== before: #{request.env.inspect}"
-#    puts "==== before: #{request.env['REQUEST_METHOD']}  #{request.env['PATH_INFO']}"
+    #puts "==== before: #{request.env['REQUEST_METHOD']}  #{request.env['PATH_INFO']}"
     @post_hash = nil
     @post_data = nil
     case request.content_type
     when %r{application/mdb}
       @post_data = @serializer.deserialize(request.body)
-#      puts "==== @post_data: #{@post_data.inspect}"
       @post_data.each { |el| el.symbolize_keys if Hash === el }
-#      puts "==== @post_data: #{@post_data.inspect}"
     else
       @post_hash = request.POST.dup
-#      puts "==== @post_hash: #{@post_hash.inspect}"
       @post_hash.symbolize_keys
-#      puts "==== @post_hash: #{@post_hash.inspect}"
     end
   end
 

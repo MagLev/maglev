@@ -5,24 +5,13 @@
 
 require 'rubygems'
 require 'minitest/spec'
-require 'maglev/maglev_json'
 require 'rack'
 
 require 'mdb_server'
 
 MiniTest::Unit.autorun
 
-# TODO: MDB::ServerApp only supports Marshal right now...
-SERIALIZER_CLASS =
-  case ARGV[0]
-  when 'marshal'
-    MDB::MarshalSerializer
-  when 'json'
-    MDB::JSONSerializer.new
-  else
-    raise "Uknown serialization format #{ARGV[0]}"
-  end
-SERIALIZER = SERIALIZER_CLASS.new
+SERIALIZER = MDB::MarshalSerializer.new
 
 def get(path)
   # Since the real app will be running in a Rack stack with a transaction
@@ -39,7 +28,7 @@ def post(path, *data)
     :input => s_data,
     "CONTENT_LENGTH" => s_data.size,
     "CONTENT_TYPE"   => SERIALIZER.content_type
-    }
+  }
   e['CONTENT_TRANSFER_ENCODING'] = 'binary' if SERIALIZER.content_type == 'application/mdb'
   Maglev.transaction { @response = @request.post(path, e) }
   handle_response
@@ -84,23 +73,23 @@ describe 'MDB::ServerApp: MDB::Server requests' do
 
 =begin
 
-These requests correspond to methods on MDB::Server, a collection:
+  These requests correspond to methods on MDB::Server, a collection:
 
-  |--------+-------+---------------------------------------+-------------------------|
-  | Verb   | Route | Action [params]                       | Tested?                 |
-  |--------+-------+---------------------------------------+-------------------------|
-  | GET    | /     | List database names                   | yes                     |
-  | PUT    | /     | NOT SUPPORTED                         | N/A                     |
-  | POST   | /     | Database.create [db_name, view_class] | yes: urlencode version  |
-  | DELETE | /     | NOT SUPPORTED                         | N/A                     |
-  |        |       |                                       |                         |
-  | GET    | /:db  | Test if db exists                     | yes                     |
-  | PUT    | /:db  | NOT SUPPORTED                         | N/A                     |
-  | POST   | /:db  | Create new document                   | yes: serialized version |
-  | DELETE | /:db  | Delete db                             |                         |
-  |--------+-------+---------------------------------------+-------------------------|
+  |--------+-------+------------------------------------+-------------------------|
+  | Verb   | Route | Action [params]                    | Tested?                 |
+  |--------+-------+------------------------------------+-------------------------|
+  | GET    | /     | List database names                | yes                     |
+  | PUT    | /     | NOT SUPPORTED                      | N/A                     |
+  | POST   | /     | Database.create [name, view_class] | yes: urlencode version  |
+  | DELETE | /     | NOT SUPPORTED                      | N/A                     |
+  |        |       |                                    |                         |
+  | GET    | /:db  | Test if db exists                  | yes                     |
+  | PUT    | /:db  | NOT SUPPORTED                      | N/A                     |
+  | POST   | /:db  | Create new document                | yes: serialized version |
+  | DELETE | /:db  | Delete db                          |                         |
+  |--------+-------+------------------------------------+-------------------------|
 
-These requests correspond to methods on MDB::Database
+  These requests correspond to methods on MDB::Database
 
   |--------+-------------------+------------------------------+------------------|
   | Verb   | Route             | Action                       | View             |
@@ -139,7 +128,7 @@ These requests correspond to methods on MDB::Database
       r.must_equal true
     end
     # TODO: Add test for not found db
- end
+  end
 
   it 'responds to POST "/" and GET "/:db" correctly' do
     r = post "/", { :db_name => DB_NAME_2, :view_class => AppModel }
@@ -158,8 +147,7 @@ These requests correspond to methods on MDB::Database
 
   it 'responds to POST "/" with 400 if :view_class is bad' do
     @expected_status = 400
-    r = post "/", { :db_name => DB_NAME_2,
-                               :view_class => :NotAClass }
+    r = post "/", { :db_name => DB_NAME_2, :view_class => :NotAClass }
   end
 
   it 'responds to DELETE "/:db" by deleting the db if it exists' do

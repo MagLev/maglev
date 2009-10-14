@@ -40,17 +40,7 @@ namespace :test do
   task :server => :'test:server:server'
   namespace :server do
     task :server => [:commit, :mdb_server_fixtures] do
-      sh 'maglev-ruby -Itest test/mdb_server_tests.rb marshal'
-    end
-  end
-
-  # Tests for the (original) JSON based server
-
-  desc "Test the json server"
-  task :json => :'test:json:server'
-  namespace :json do
-    task :server => [:commit, :mdb_server_fixtures] do
-      sh 'maglev-ruby -Itest test/server/mdb_server_tests.rb json'
+      sh 'maglev-ruby -Itest test/mdb_server_tests.rb'
     end
   end
 end
