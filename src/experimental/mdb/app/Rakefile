@@ -42,7 +42,7 @@ namespace :test do
     puts "-- (done)"
   end
 
-  desc "Run the application level tests"
+  desc "Test app data structures (Post, Tag)"
   task :app do
     sh %{ ruby -Ilib test/post_tests.rb }
     sh %{ ruby -Ilib test/tag_tests.rb }

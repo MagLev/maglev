@@ -1,3 +1,7 @@
 <h3><%= @post.title %></h3>
-<p> Tags: <%= @post.tags.map{ |t| t.to_s }.join(" ") %> </p>
+<p>Tags:
+  <% @post.tags.each do |tag| %>
+    <a href="/tag/<%= tag.to_s %>"><%= tag.to_s %> </a>&nbsp;
+  <% end %>
+</p>
 <p><%= @post.text %></p>

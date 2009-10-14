@@ -13,16 +13,18 @@ require 'blog'
 # Contacts MDB on port 4567
 #
 =begin
-    |------+------------+-----------------------+----------|
-    | Verb | Route      | Action                | View     |
-    |------+------------+-----------------------+----------|
-    | GET  | /          | redirect              | N/A      |
-    | GET  | /posts     | List recent posts     | :index   |
-    | GET  | /posts/new | Show new post form    | :newpost |
-    | POST | /posts     | Create post from data | :show    |
-    | GET  | /posts/:id | Show post with id     | :show    |
-    | PUT  | /posts/:id | Update post from data | :show    |
-    |------+------------+-----------------------+----------|
+    |------+------------+-----------------------------+----------|
+    | Verb | Route      | Action                      | View     |
+    |------+------------+-----------------------------+----------|
+    | GET  | /          | redirect                    | N/A      |
+    | GET  | /posts     | List recent posts           | :home    |
+    | GET  | /posts/new | Show new post form          | :newpost |
+    | POST | /posts     | Create post from data       | :show    |
+    | GET  | /posts/:id | Show post with id           | :show    |
+    | PUT  | /posts/:id | Update post from data       | :show    |
+    |      |            |                             |          |
+    | GET  | /tag/:name | Get posts tagged with :name | :home    |
+    |------+------------+-----------------------------+----------|
 =end
 
 class BlogApp < Sinatra::Base
@@ -92,5 +94,10 @@ class BlogApp < Sinatra::Base
     puts "TAGS: #{params[:tags].inspect}"
     tags = params[:tags].split
     tags.map { |t| t.to_sym }
+  end
+
+  get "/tag/:name" do
+    @posts = @posts_db.execute_view(:tagged_with, params[:name])
+    erb :home
   end
 end
