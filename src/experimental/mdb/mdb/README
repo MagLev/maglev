@@ -42,3 +42,6 @@ objects.
   * Either get DRb working, or just use raw sockets and marshal
 
 * Still need to get Marshal format working well
+
+== TODO
+* Use ObjectLog for debug

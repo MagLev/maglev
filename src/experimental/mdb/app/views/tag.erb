@@ -1,6 +1,6 @@
 <h3>Posts tagged with <%= @tag.name %></h3>
 <ul>
-  <% @tag.each do |post| %>
+  <% @posts.each do |post| %>
   <li><a href="/posts/<%= post.id %>"> <%= post.title %></a></li>
   <% end %>
 </ul>

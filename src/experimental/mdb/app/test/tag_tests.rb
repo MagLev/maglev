@@ -29,4 +29,8 @@ describe Tag do
     x = Tag.find_by_name @tags, :quux
     x.size.must_equal 1
   end
+
+  it 'tag name compares to strings' do
+    @tags.select { |id,tag| tag.name == 'quux' }.size.must_equal 1
+  end
 end

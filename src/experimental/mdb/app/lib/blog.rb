@@ -63,15 +63,16 @@ class Post
     def recent(posts)
       cutoff = Time.now - FIVE_DAYS
       recent = posts.select { |k,v| v.timestamp > cutoff }
-      recent[0...5].map { |x| x[1] }
+      recent = recent[0...5].map { |x| x[1] }
+      recent.sort {|a,b| b.timestamp <=> a.timestamp } # reverse by time
     end
 
     def tagged_with(posts, tag_name)
       # Need to be careful sym vs string
+      # TODO: Should probably help view writers by doing the project.
+      #   perhaps pass in a query as a block, and it manages the id and projection.
       tn = tag_name.to_s
-      tagged_posts = posts.select do |p|
-        p.tags.includes? tags
-      end
+      posts.select { |id,post| post.tagged_with? tn }.map { |x| x[1] }
     end
   end
 end

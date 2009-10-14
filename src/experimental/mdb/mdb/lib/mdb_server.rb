@@ -148,11 +148,7 @@ class MDB::ServerApp < Sinatra::Base
 
   # List db names
   get '/' do
-    begin
-      @serializer.serialize(@server.db_names)
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    @serializer.serialize(@server.db_names)
   end
 
   # Create a new database
@@ -164,11 +160,7 @@ class MDB::ServerApp < Sinatra::Base
 
   # Query if db exists
   get '/:db' do
-    begin
-      @serializer.serialize(@server.key? params[:db])
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    @serializer.serialize(@server.key? params[:db])
   end
 
   # Create new document
@@ -176,64 +168,40 @@ class MDB::ServerApp < Sinatra::Base
   # The database will add the object to its collection, and then
   # call the model added(new_object) hook.
   post '/:db' do
-    begin
-      @serializer.serialize get_db.add(@post_data[0])
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    @serializer.serialize get_db.add(@post_data[0])
   end
 
   # Delete database
   # The server will delete the database.
   delete '/:db' do
-    begin
-      get_db # will raise 404 if :db not found
-      @serializer.serialize(@server.delete params[:db])
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    get_db       # will raise 404 if :db not found
+    @serializer.serialize(@server.delete params[:db])
   end
 
   # Get a document
   get '/:db/:id' do
-    begin
-      @serializer.serialize(get_db.get(params[:id].to_i))
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    @serializer.serialize(get_db.get(params[:id].to_i))
   end
 
   # Delete a document
   delete '/:db/:id' do
-    begin
-      @serializer.serialize(get_db.delete params[:id].to_i)
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    @serializer.serialize(get_db.delete params[:id].to_i)
   end
 
   # Run a view on the database.
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
   post '/:db/view/:view' do
-    begin
-      # Do not unpack @post_data.  We want to pass an empty array here to indicate
-      # no params sent (if that is the case).
-      args = [params[:view]]
-      args = args + @post_data unless @post_data.nil?
-      @serializer.serialize(get_db.execute_view(*args))
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    puts "-- POST '/params[:db]/view/params[:view]: @post_data: #{@post_data.inspect}"
+    args = [params[:view]]
+    args = args + @post_data unless @post_data.nil?
+    puts "-- POST '/params[:db]/view/params[:view]: @args: #{@args.inspect}"
+    @serializer.serialize(get_db.execute_view(*args))
   end
 
   # For testing...
   get '/:db/send/:method' do
-    begin
-      @serializer.serialize(get_db.send(params[:method].to_sym))
-    rescue MDB::MDBError => e
-      halt 404, "MDB::ServerApp error: #{e.message}"
-    end
+    @serializer.serialize(get_db.send(params[:method].to_sym))
   end
 
   error ArgumentError do
@@ -256,15 +224,15 @@ class MDB::ServerApp < Sinatra::Base
     err_msg "unknown URL: #{request.path} Parameters: #{params.inspect}"
   end
 
-  def err_msg(msg='')
+  def err_msg(msg=nil)
     m = 'MDB::ServerApp error: '
-    m << msg
-
+    m << msg unless msg.nil?
+    m << "\n#{request.env['REQUEST_METHOD']}  #{request.env['PATH_INFO']}\n"
     e = request.env['sinatra.error']
     if e.nil?
-      m << "  (No exception available)"
+      m << "  (No exception available)\n"
     else
-      m << "  #{e.class} #{e.inspect}"
+      m << "  #{e.class} #{e.inspect}\n"
       m << e.message if e.respond_to? :message
       m << e.backtrace.join("\n")
     end
