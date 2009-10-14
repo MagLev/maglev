@@ -31,7 +31,7 @@ namespace :test do
 
   desc "Load fixtures for mdb_server tests"
   task :mdb_server_fixtures do
-    sh %{ maglev-ruby -MnoRlwrap test/app_model.rb }
+    sh %{ maglev-ruby -MnoRlwrap test/mdb_server_fixtures.rb }
   end
 
   # Test for the (new) Marshal based server

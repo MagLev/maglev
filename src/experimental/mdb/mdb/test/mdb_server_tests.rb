@@ -12,14 +12,6 @@ require 'mdb_server'
 
 MiniTest::Unit.autorun
 
-# Exception.install_debug_block do |e|
-#   puts "--- #{e.class}  #{e.inspect}"
-#   case e
-#   when ArgumentError, NoMethodError
-#     nil.pause # if e.message =~ /to_sym/
-#   end
-# end
-
 # TODO: MDB::ServerApp only supports Marshal right now...
 SERIALIZER_CLASS =
   case ARGV[0]

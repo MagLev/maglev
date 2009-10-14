@@ -192,10 +192,10 @@ class MDB::ServerApp < Sinatra::Base
   # Returns view data.
   # On error, returns appropriate HTTP status code and error message.
   post '/:db/view/:view' do
-    puts "-- POST '/params[:db]/view/params[:view]: @post_data: #{@post_data.inspect}"
+    # puts "-- POST '/params[:db]/view/params[:view]: @post_data: #{@post_data.inspect}"
     args = [params[:view]]
     args = args + @post_data unless @post_data.nil?
-    puts "-- POST '/params[:db]/view/params[:view]: @args: #{@args.inspect}"
+    # puts "-- POST '/params[:db]/view/params[:view]: @args: #{@args.inspect}"
     @serializer.serialize(get_db.execute_view(*args))
   end
 
