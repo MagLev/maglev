@@ -19,18 +19,6 @@ raise "==== Commit MDB Classes"  unless defined? MDB::Server
 #   end
 # end
 
-# Exception.install_debug_block do |e|
-#   puts "--- #{e} #{e.class}"
-#   case e
-# #  when Sinatra::NotFound
-# #    nil.pause
-#    when NoMethodError
-#     nil.pause # if e.message =~ /symbolize/
-# #   when ArgumentError
-# #    nil.pause # if e.message =~ /Illegal creation of a Symbol/
-#   end
-# end
-
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
 # serialization format.
@@ -121,7 +109,8 @@ class MDB::ServerApp < Sinatra::Base
   before do
     content_type @serializer.content_type  # Handle response type
     # Unpack application/mdb data
-#    puts "==== before: #{request.env['REQUEST_METHOD']}  #{request.env['REQUEST_URI']}"
+#    puts "==== before: #{request.env.inspect}"
+#    puts "==== before: #{request.env['REQUEST_METHOD']}  #{request.env['PATH_INFO']}"
     @post_hash = nil
     @post_data = nil
     case request.content_type
@@ -152,6 +141,10 @@ class MDB::ServerApp < Sinatra::Base
   # May need to wrap all of these in transactions.  At least need to abort
   # before handling most requests, since the DB may be updated from Rake or
   # another server.
+
+  get '/_debug' do
+    @server.debug_info
+  end
 
   # List db names
   get '/' do
@@ -210,11 +203,6 @@ class MDB::ServerApp < Sinatra::Base
     end
   end
 
-  # Update a document
-#   put '/:db/:id' do
-#     @serializer.serialize get_db.put(params[:id].to_i, data)
-#   end
-
   # Delete a document
   delete '/:db/:id' do
     begin
@@ -231,7 +219,6 @@ class MDB::ServerApp < Sinatra::Base
     begin
       # Do not unpack @post_data.  We want to pass an empty array here to indicate
       # no params sent (if that is the case).
-      # puts "=== /#{params[:db]}/view/#{params[:view]}:  @post_data: #{@post_data.inspect}"
       args = [params[:view]]
       args = args + @post_data unless @post_data.nil?
       @serializer.serialize(get_db.execute_view(*args))
@@ -250,9 +237,6 @@ class MDB::ServerApp < Sinatra::Base
   end
 
   error ArgumentError do
-#     e = request.env['sinatra.error']
-#     msg = e.message
-#     msg << e.backtrace.join("\n")
     halt 400, err_msg
   end
 

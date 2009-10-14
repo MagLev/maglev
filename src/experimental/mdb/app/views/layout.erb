@@ -46,8 +46,9 @@
         </div>
       </div>
       <div id="footer">
-        <%= @title %> running on
-        <a href="http://maglev.gemstone.com">MagLev</a>
+        <%= @title %>
+        (running on <%= (defined? RUBY_ENGINE) ? RUBY_ENGINE : "MRI" %>
+        version <%= RUBY_VERSION %>)
       </div>
     </div>
   </body>

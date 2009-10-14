@@ -63,7 +63,7 @@ class Post
     def recent(posts)
       cutoff = Time.now - FIVE_DAYS
       recent = posts.select { |k,v| v.timestamp > cutoff }
-      recent[0..5].map { |x| x[1] }
+      recent[0...5].map { |x| x[1] }
     end
 
     def tagged_with(posts, tag_name)
@@ -72,7 +72,6 @@ class Post
       tagged_posts = posts.select do |p|
         p.tags.includes? tags
       end
-
     end
   end
 end

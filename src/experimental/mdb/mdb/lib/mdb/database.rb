@@ -38,6 +38,7 @@ module MDB
       result << "\tview methods: #{view_methods}\n"
       result << "\tdocument count: #{size}\n"
     end
+
     # Called by the server if the view class is updated (e.g., methods
     # added).
     def set_view(view_class)
@@ -49,10 +50,12 @@ module MDB
       args = [@documents] + params[0..-1]
       begin
         @view.send view_sym, *args
-      rescue NoMethodError
-        raise NoViewError.new("DB: #{@name}: no view named: #{view_sym} view class: #{@view}")
-      rescue ArgumentError => ae
-        raise NoViewError.new("DB #{@name}: arg error #{ae.message} trying to run #{view_sym} view class: #{@view} with args #{args.inspect}")
+      rescue Exception => e
+        raise NoViewError.new  <<-EOS
+           DB #{@name}: Unable to execute view
+           Exception: #{e.class} #{e.message}:
+           Trying to run #{view_sym} on view class: #{@view} with args #{args.inspect}
+           EOS
       end
     end
 

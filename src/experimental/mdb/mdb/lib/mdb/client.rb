@@ -27,11 +27,13 @@ module MDB
     end
 
     def put(path, data)
-      request(:put, path, @serializer.serialize([data]))
+      # Data should already be wrapped in an array
+      request(:put, path, @serializer.serialize(data))
     end
 
     def post(path, data)
-      request(:post, path, @serializer.serialize([data]))
+      # Data should already be wrapped in an array
+      request(:post, path, @serializer.serialize(data))
     end
 
     private
@@ -93,8 +95,6 @@ module MDB
       @db_name = db_name
     end
 
-    # Return the result of running the named view on the server
-    # NOTE: params not yet supported
     def execute_view(view_name, *params)
       @rest.post("/#{@db_name}/view/#{view_name}", params)
     end
@@ -106,7 +106,7 @@ module MDB
 
     # POST /:db   returns docid
     def add(document)
-      @rest.post("/#{@db_name}", document)
+      @rest.post("/#{@db_name}", [document])
     end
 
     def size
@@ -135,7 +135,7 @@ module MDB
     end
 
     def create(db_name, view_class)
-      result = @rest.post("/", :db_name => db_name, :view_class => view_class.to_s)
+      result = @rest.post("/", [{:db_name => db_name, :view_class => view_class.to_s}])
       if result == db_name
          RESTDatabase.new(@url, db_name)
        else
