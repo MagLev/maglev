@@ -55,6 +55,6 @@ namespace :server do
 
   desc "List the databases in the server"
   task :list do
-    sh %{ maglev-ruby -e 'p MDB::Server.db_names' }
+    sh %{ maglev-ruby -e 'p MDB::Server.server.db_names' }
   end
 end

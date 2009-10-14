@@ -4,6 +4,7 @@ require 'txn_wrapper'
 require 'mdb/core_extensions'
 
 raise "==== MDB Classes not committed" unless defined? MDB::Server
+raise "==== MDB root not set" if MDB::Server.server.nil?
 
 # REST interface to MaglevDB.  Accepts RESTful HTTP requests to access and
 # manage the data stored in MDB.  This server uses ruby Marshal as the
@@ -79,7 +80,7 @@ class MDB::ServerApp < Sinatra::Base
   def initialize
     super
     @serializer = MDB::MarshalSerializer.new
-    @server = MDB::Server
+    @server = MDB::Server.server
   end
 
   before do

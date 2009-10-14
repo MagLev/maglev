@@ -12,72 +12,73 @@ MiniTest::Unit.autorun
 describe 'MDB::Server class side' do
   before do
     MDB::Test.delete_test_dbs
+    @server = MDB::Server.server
   end
 
   it 'creates, deletes and accesses databases' do
     key = MDB::Test.db_name 'a_db'
-    MDB::Server[key].must_be_nil
+    @server[key].must_be_nil
 
-    MDB::Server.create(key, ViewClass)
-    MDB::Server[key].wont_be_nil
+    @server.create(key, ViewClass)
+    @server[key].wont_be_nil
 
-    MDB::Server.delete(key)
-    MDB::Server[key].must_be_nil
+    @server.delete(key)
+    @server[key].must_be_nil
   end
 
   it 'delete raises DatabaseNotFound when deleteing a non-existent db' do
     key = MDB::Test.db_name 'bogus'
-    MDB::Server[key].must_be_nil
-    proc { MDB::Server.delete(key) }.must_raise MDB::Server::DatabaseNotFound
+    @server[key].must_be_nil
+    proc { @server.delete(key) }.must_raise MDB::Server::DatabaseNotFound
   end
 
   it 'create raises DatabaseExists when db already exists' do
     key = MDB::Test.db_name 'X'
-    MDB::Server[key].must_be_nil
-    MDB::Server.create(key, ViewClass)
-    MDB::Server[key].wont_be_nil
-    proc { MDB::Server.create(key, ViewClass) }.must_raise MDB::Server::DatabaseExists
-    MDB::Server.delete(key)
+    @server[key].must_be_nil
+    @server.create(key, ViewClass)
+    @server[key].wont_be_nil
+    proc { @server.create(key, ViewClass) }.must_raise MDB::Server::DatabaseExists
+    @server.delete(key)
   end
 
   it 'create returns the newly created db' do
     key = MDB::Test.db_name 'X'
-    MDB::Server[key].must_be_nil
-    db = MDB::Server.create(key, ViewClass)
+    @server[key].must_be_nil
+    db = @server.create(key, ViewClass)
     db.wont_be_nil
-    db.must_equal MDB::Server[key]
+    db.must_equal @server[key]
   end
 
   it 'key? returns true iff there is a db of that name' do
     key = MDB::Test.db_name 'X'
-    MDB::Server.key?(key).must_equal false
-    MDB::Server.create(key, ViewClass)
-    MDB::Server.key?(key).must_equal true
+    @server.key?(key).must_equal false
+    @server.create(key, ViewClass)
+    @server.key?(key).must_equal true
   end
 
   it 'db_names lists the databases it has' do
-    MDB::Server.db_names.grep(MDB::Test::TEST_DB_PREFIX).must_be_empty
+    @server.db_names.grep(MDB::Test::TEST_DB_PREFIX).must_be_empty
     db_names = %w(foo bar quux)
     db_names.each do |name|
       full_name = (MDB::Test.db_name name).to_sym
-      MDB::Server.create(full_name, ViewClass)
-      full_name.must_include MDB::Server.db_names
+      @server.create(full_name, ViewClass)
+      full_name.must_include @server.db_names
     end
   end
 
   it 'update edits existing databases with new views' do
     key = MDB::Test.db_name 'X'
-    MDB::Server[key].must_be_nil
-    proc { MDB::Server.update(key, ViewClass) }.must_raise MDB::Server::DatabaseNotFound
+    @server[key].must_be_nil
+    proc { @server.update(key, ViewClass) }.must_raise MDB::Server::DatabaseNotFound
   end
 
   it 'update raises DatabaseNotFound if the database does not exist' do
     key = MDB::Test.db_name 'X'
-    MDB::Server[key].must_be_nil
-    MDB::Server.create(key, ViewClass)
-    db = MDB::Server[key]
+    @server[key].must_be_nil
+    @server.create(key, ViewClass)
+    db = @server[key]
     db.execute_view(:view_42).must_equal 42  # Ensure old view is in place
-    MDB::Server.update(key, ViewClass2)
+    @server.update(key, ViewClass2)
     db.execute_view(:view_42).must_equal 43  # Ensure new view is in place
   end
 end

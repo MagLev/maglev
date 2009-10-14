@@ -62,10 +62,11 @@ DB_NAME_2 = :mdb_server_tests_db2 # Will be deleted in before()
 describe 'MDB::ServerApp: MDB::Server requests' do
 
   before do
+    server = MDB::Server.server
     [DB_NAME, DB_NAME_2].each do |name|
-      MDB::Server.delete name if MDB::Server.key? name
+      server.delete name if server.key? name
     end
-    MDB::Server.create(DB_NAME, AppModel)
+    server.create(DB_NAME, AppModel)
     @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
     @expected_status = 200
@@ -167,10 +168,11 @@ end
 
 describe 'MDB::ServerApp: MDB::Database requests' do
   before do
+    server = MDB::Server.server
     [DB_NAME, DB_NAME_2].each do |name|
-      MDB::Server.delete name if MDB::Server.key? name
+      server.delete name if server.key? name
     end
-    @db = MDB::Server.create(DB_NAME, AppModel)
+    @db = server.create(DB_NAME, AppModel)
     @doc1 = AppModel.new(1, 2)
     @doc1_id = @db.add(@doc1)
     @request  = Rack::MockRequest.new(MDB::ServerApp.new)

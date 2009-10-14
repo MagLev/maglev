@@ -1,8 +1,9 @@
 # Clean out a previous test DB if it exists
 key = 'PERSISTENT_DB_TEST'
-if MDB::Server.key?(key)
+server = MDB::Server.server
+if server.key?(key)
   puts "Deleting old database #{key}"
-  MDB::Server.delete key
+  server.delete key
 end
 
 
@@ -23,7 +24,7 @@ end
 Maglev.commit_transaction
 
 # Create the DB
-db = MDB::Server.create(key, PView)
+db = server.create(key, PView)
 
 # Add some documents
 4.times { db.add(Object.new) }

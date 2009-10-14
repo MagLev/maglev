@@ -6,15 +6,16 @@ Maglev.persistent do
 end
 Maglev.commit_transaction
 
+server = MDB::Server.server
 # MDB::Server etc. manages its own transactions
 [['theBlogPosts', Post],
  ['theBlogTags',   Tag]
 ].each do |key, view|
-  if MDB::Server.key? key
+  if server.key? key
     puts "Server has db named: #{key}...updating with #{view}"
-    MDB::Server.update(key, view)
+    server.update(key, view)
   else
     puts "Server does not have db named: #{key}...creating with #{view}"
-    MDB::Server.create(key, view)
+    server.create(key, view)
   end
 end

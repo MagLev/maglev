@@ -15,8 +15,7 @@ DB_NAME = MDB::Test.db_name 'database_tests'
 describe MDB::Database do
   before do
     MDB::Test.delete_test_dbs
-    MDB::Server.create(DB_NAME, ViewClass)
-    @db = MDB::Server[DB_NAME]
+    @db = MDB::Server.server.create(DB_NAME, ViewClass)
   end
 
   it 'executes the requested view (view is symbol or string): no view parameters' do

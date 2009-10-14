@@ -1,8 +1,8 @@
 # Assumes p1 has been run
 
 key = 'PERSISTENT_DB_TEST'
-
-db = MDB::Server[key]
+server = MDB::Server.server
+db = server[key]
 raise "Can't find db" if db.nil?
 
 actual = db.size
