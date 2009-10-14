@@ -51,3 +51,16 @@ It will then load commit the MaglevDB server code into the MagLev
 repository.
 
   NOT DONE YET
+
+== TODO / Bugs
+
+* commit code doesn't report errors.  E.g., I changed a model class from:
+      class Tag < Array ... end
+  to
+      class Tag ... end
+  And i did not get any indication that the migration failed, due to "wrong
+  superclass".
+
+* Need a migration strategy.  E.g., if you change your class (rather than
+  just adding methods), how do you migrate your old, saved instances?
+
