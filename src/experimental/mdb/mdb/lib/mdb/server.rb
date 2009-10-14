@@ -16,11 +16,13 @@ module MDB
     class DatabaseExists < MDBError; end
 
     def self.debug_info
-      STDERR.puts "-- @proot: #{@proot.inspect}"
-      STDERR.puts "-- @proot.keys: #{@proot.keys.inspect}"
+      result = " Debug Information for MDB::Server:\n"
+      result << "\t@proot:      #{@proot.inspect}\n"
+      result << "\t@proot.keys: #{@proot.keys.inspect}\n"
       @proot.each do |key, value|
-        STDERR.puts "-- #{key.inspect} => #{value.inspect}"
+        result << value.debug_info
       end
+      result
     end
 
     # Create a new database.  Returns the new database.

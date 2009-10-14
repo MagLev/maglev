@@ -17,6 +17,8 @@ module MDB
 
     class NoViewError < MDB::MDBError ;  end
 
+    class ViewArgumentError < MDB::MDBError ;  end
+
     attr_reader :name
 
     # Initialize a new Database. The database will remember its name, and
@@ -27,6 +29,15 @@ module MDB
       @documents = Hash.new
     end
 
+    def debug_info
+      result = "==== Database debug_info for #{name}\n"
+      result << "\tview_class: #{@view.inspect}\n"
+      view_methods = class << @view
+                       self.instance_methods(false).inject("") { |acc,m| acc << " #{m.to_s}" }
+                     end
+      result << "\tview methods: #{view_methods}\n"
+      result << "\tdocument count: #{size}\n"
+    end
     # Called by the server if the view class is updated (e.g., methods
     # added).
     def set_view(view_class)
@@ -39,7 +50,9 @@ module MDB
       begin
         @view.send view_sym, *args
       rescue NoMethodError
-        raise NoViewError.new("Database #{@name}: no view named: #{view_sym} view class: #{@view}")
+        raise NoViewError.new("DB: #{@name}: no view named: #{view_sym} view class: #{@view}")
+      rescue ArgumentError => ae
+        raise NoViewError.new("DB #{@name}: arg error #{ae.message} trying to run #{view_sym} view class: #{@view} with args #{args.inspect}")
       end
     end
 
