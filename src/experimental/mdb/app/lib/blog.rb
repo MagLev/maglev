@@ -1,13 +1,16 @@
 # This file represents the Model in the MVC pattern.
 #
-# The file will be loaded into MagLev as an MDB Model for the Database
-# named 'post' (see Rakefile mdb:create).  The class methods in Post will
-# be available to the Sinatra client app as views from the MDB::Server.
+# This model file is written to illustrate the map / reduce application
+# model.
+#
+# * MDB stores lots of disconnected model graphs, and the queries use a
+#   map-reduce strategy to search the disconnected graphs for results.
+#
+# * The MRI web app has thin controllers and thin views, but very fat model
+#   (this file).
 #
 # == TODO
 #
-# * Should each data item know their own id?  We could mixin support for
-#   adding an id field.
 #
 class Post
   attr_reader :text, :title, :timestamp, :tags
@@ -39,16 +42,7 @@ class Post
 
   # Returns true iff one of this post's tags is named tag_name
   def tagged_with?(tag_name)
-    tn = tag_name.to_s
-    !!@tags.detect { |tag| tag.name.to_s == tn }
-  end
-
-  # MDB::Database calls this whenever a document is added
-  def document_added(id, document)
-    # Update the list of recent posts (saves searching)
-    @recent_posts ||= []
-    @recent_posts << document
-    @recent_posts.shift if @recent_posts.size > 5
+    @tags.any? { |tag| tag.matches tag_name }
   end
 
   #############################################
@@ -56,25 +50,39 @@ class Post
   #############################################
 
   class << self
-    FIVE_DAYS = 5 * 60 * 60 * 24 # Number of seconds in five days
-
-    # This is a view method.  It will be invoked by the client app by sending
-    # Data will be a collection of posts that the database gives us.
+    # This is a view method.  It will be invoked by the client app by
+    # sending Data will be a collection of posts that the database gives
+    # us.  This version does a search against the entire db of posts, and
+    # then reduces.
     def recent(posts)
-      cutoff = Time.now - FIVE_DAYS
-      recent = posts.select { |k,v| v.timestamp > cutoff }
-      recent = recent[0...5].map { |x| x[1] }
-      recent.sort {|a,b| b.timestamp <=> a.timestamp } # reverse by time
+      posts.values.sort { |a,b| b.timestamp <=> a.timestamp }[0...5]
+    end
+
+    # This version just returns @recent_posts array, which is updated every
+    # time a new blog post is created.
+    def recent_fast(posts)
+      @recent_posts || []  # dup for in-maglev queries?
     end
 
     def tagged_with(posts, tag_name)
-      # Need to be careful sym vs string
-      # TODO: Should probably help view writers by doing the project.
-      #   perhaps pass in a query as a block, and it manages the id and projection.
-      tn = tag_name.to_s
-      posts.select { |id,post| post.tagged_with? tn }.map { |x| x[1] }
+      # TODO: Should probably help view writers by doing the projection.
+      #       perhaps pass in a query as a block, and it manages the id and
+      #       projection.
+      posts.inject([]) do |acc, (id,post)|
+        acc << post if post.tagged_with? tag_name
+        acc
+      end
+    end
+
+    # MDB::Database calls this whenever a document is added
+    def document_added(id, document)
+      # Update the list of recent posts (saves searching)
+      @recent_posts ||= []
+      @recent_posts.unshift document  # put at beginning
+      @recent_posts.pop if @recent_posts.size > 5
     end
   end
+
 end
 
 # NOTE: Tag used to derive from Array, but MagLev has a bug in unmarshal
@@ -100,8 +108,14 @@ class Tag
     @tagged.each(&block)
   end
 
+  def matches(name)
+    @name == name.to_s
+  end
+
   def self.find_by_name(tags, name)
-    tn = name.to_s
-    tags.inject([]) { |acc,(id,tag)| acc << tag if tag.name == tn; acc }
+    tags.inject([]) do |acc,(id,tag)|
+      acc << tag if tag.matches name
+      acc
+    end
   end
 end
