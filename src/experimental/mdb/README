@@ -8,10 +8,16 @@ application that connects to MaglevDB is in the +app+ directory.
 
 == Quick Start:
 
+Make sure the maglev server has been started:
+
+    $ cd $MAGLEV_HOME
+    $ rake maglev:start
+
 Install prerequisites and load MDB server:
 
     $ cd $MAGLEV_HOME/src/experimental/mdb
-    $ rake setup
+    $ rake install_gems   # Install serveral gems into MagLev and MRI
+    $ rake commit         # Commit code into MDB
 
 Run MDB server:
 
