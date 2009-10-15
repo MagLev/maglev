@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cd `dirname $0`
+
+BRANCH=`git branch | grep ^* |sed s/\*\ //`
+echo "\n\n\nDifferences on branch $BRANCH:"
+git diff --name-status origin/$BRANCH
+git config --unset-all user.email
+git config --unset-all user.name
+echo "So that we know who (really) pushed this, please type your email address now. Ctrl-C to cancel."
+read EMAIL
+echo "And your name. Ctrl-C to cancel."
+read USERNAME
+git config user.email $EMAIL
+git config user.name "$USERNAME"
+echo "Pushing as $USERNAME at $EMAIL"
+git push github-push

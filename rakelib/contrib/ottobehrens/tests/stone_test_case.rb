@@ -31,6 +31,27 @@ class StoneUnitTestCase < StoneTestCase
     stone.restore_full_backup('anotherstone', Date.civil(2005, 5, 13))
   end
 
+  def test_copy_running_stone
+    stone = Stone.create(TEST_STONE_NAME)
+    flexmock(stone).should_receive(:running?).and_return(true).once
+    # Can not copy a running stone
+    assert_raises(RuntimeError) { stone.copy_to(nil) }
+  end
+
+  def test_copy_stopped_stone
+    copy_to_stone_name = "copy_of_#{TEST_STONE_NAME}"
+    clear_stone(copy_to_stone_name)
+
+    stone = Stone.create(TEST_STONE_NAME)
+    to_stone = Stone.create(copy_to_stone_name)
+    partial_mock_stone = flexmock(stone)
+    partial_mock_stone.should_receive(:log_sh).with("cp #{stone.extent_filename} #{to_stone.extent_filename}").once
+    partial_mock_stone.should_receive(:running?).and_return(false).once
+    flexmock(to_stone).should_receive(:running?).and_return(false).once
+
+    stone.copy_to(to_stone)
+  end
+
   def test_run_topaz_file
     stone = Stone.create(TEST_STONE_NAME)
     partial_mock_stone = flexmock(stone)
@@ -76,7 +97,23 @@ class StoneIntegrationTestCase < StoneTestCase
     random_method_name = add_restore_worked_in_userglobals(stone)
     stone.full_backup
     stone.restore_latest_full_backup
-    assert_nothing_raised { stone.run_topaz_command("UserGlobals at: ##{random_method_name}") }
+    assert_random_value_present(stone, random_method_name)
+  end
+
+  def test_copy_stopped_stone
+    copy_to_stone_name = "copy_to_#{TEST_STONE_NAME}"
+    clear_stone(copy_to_stone_name)
+
+    stone = Stone.create(TEST_STONE_NAME)
+    stone.start
+    random_value = add_restore_worked_in_userglobals(stone)
+    stone.stop
+
+    copy_to_stone = Stone.create(copy_to_stone_name)
+    stone.copy_to(copy_to_stone)
+    copy_to_stone.start
+    assert_random_value_present(copy_to_stone, random_value)
+    clear_stone(copy_to_stone_name)
   end
 
   def test_netldi
@@ -145,7 +182,7 @@ class StoneIntegrationTestCase < StoneTestCase
     config_filename = "#{GemStoneInstallation.current.config_directory}/#{TEST_STONE_NAME}.conf"
     assert ! (File.exist? config_filename)
 
-    stone = Stone.new(TEST_STONE_NAME, GemStoneInstallation.current).create_config_file
+    stone = Stone.new(TEST_STONE_NAME).create_config_file
 
     assert File.exists? config_filename
     assert GemStoneInstallation.current.stones.include?(TEST_STONE_NAME)
@@ -183,6 +220,10 @@ class StoneIntegrationTestCase < StoneTestCase
 
   private
   
+  def assert_random_value_present(stone, random_value)
+    assert_nothing_raised { stone.run_topaz_command("UserGlobals at: ##{random_value}") }
+  end
+
   def add_restore_worked_in_userglobals(stone)
     random_key = "restoreWorked#{rand 1000}"
     stone.topaz_commands([
@@ -192,5 +233,4 @@ class StoneIntegrationTestCase < StoneTestCase
                           ])
     return random_key
   end
-
 end

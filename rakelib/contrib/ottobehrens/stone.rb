@@ -5,7 +5,6 @@ require 'date'
 
 class Stone
   attr_accessor :username, :password
-
   attr_reader :name
   attr_reader :log_directory
   attr_reader :data_directory
@@ -37,6 +36,7 @@ class Stone
   end
 
   def initialize_gemstone_environment
+    @gemstone_installation.set_gemstone_installation_environment
     ENV['GEMSTONE_LOGDIR'] = log_directory
     ENV['GEMSTONE_DATADIR'] = data_directory
   end
@@ -44,7 +44,7 @@ class Stone
   # Bare bones stone with nothing loaded, specialise for your situation
   def initialize_new_stone
     create_skeleton
-    initialize_extents
+    copy_clean_extent
   end
 
   def create_skeleton
@@ -98,13 +98,25 @@ class Stone
     start
   end
 
+  def copy_to(copy_stone)
+    fail "You can not copy a running stone" if running?
+    fail "You can not copy to a stone that is running" if copy_stone.running?
+    copy_stone.create_skeleton
+    install(extent_filename, copy_stone.extent_filename, :mode => 0660)
+  end
+
   def self.tranlog_number_from(string)
     ((/\[.*SmallInteger\] (-?\d*)/.match(string))[1]).to_i
   end
 
+  def log_sh(command_line)
+    log_command_line(command_line)
+    sh redirect_command_line_to_logfile(command_line)
+  end
+
   def full_backup
     result = run_topaz_command("System startCheckpointSync")
-    fail "Could not start checkpoint, got #{result}" if /\[.*Boolean\] true/ !~ result.last
+    fail "Could not start checkpoint, got #{result.last}" if /\[.*Boolean\] true/ !~ result.last
     result = run_topaz_command("SystemRepository startNewLog")
     tranlog_number = Stone.tranlog_number_from(result.last)
     fail "Could not start a new tranlog" if tranlog_number == -1
@@ -212,12 +224,7 @@ class Stone
     gs_sh redirect_command_line_to_logfile(command_line)
   end
 
-  def log_sh(command_line)
-    log_command_line(command_line)
-    sh redirect_command_line_to_logfile(command_line)
-  end
-
-  def initialize_extents
+  def copy_clean_extent
     install(@gemstone_installation.initial_extent, extent_filename, :mode => 0660)
   end
 
@@ -230,14 +237,14 @@ class Stone
                 "limit bytes 1000",
                 "display oops",
                 "iferr 1 stack",
-                "iferr 2 exit" ,
+                "iferr 2 exit 3",
                 user_commands,
                 "output pop",
                 "exit")
     Topaz.new(self).commands(commands)
   end
 
-  private 
+  private
 
   def log_command_line(command_line)
     File.open(command_logfile, "a") { |file| file.puts "SHELL_CMD #{Date.today.strftime('%F %T')}: #{command_line}" }
