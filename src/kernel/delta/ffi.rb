@@ -21,7 +21,7 @@ module FFI
 
   module Platform
 
-    OS = "" # you should use Config::CONFIG['host_os']
+    OS = "" # you must use Config::CONFIG['host_os']
 	    # because OS could change after you commit code
 
     ARCH = ""

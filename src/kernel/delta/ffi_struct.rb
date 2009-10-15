@@ -246,7 +246,7 @@ module FFI
     end
 
     def self.hash_layout(spec)
-      raise "FFI::Struct hash_layout not supported by Maglev" 
+      raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout" 
     end
 
     def self.array_layout(spec)
