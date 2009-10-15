@@ -1,0 +1,56 @@
+<h3>Object Detail for: <%= @object %></h3>
+<ul>
+  <li>Class: <a href="<%= path_for("/object/#{@object.class.object_id}") %>"><%= @object.class %></a></li>
+  <li>Object ID: <%= @object.object_id %>
+</ul>
+
+<h4>Object Attributes</h4>
+<table>
+  <tr><th>Attribute</th><th>Value</th></tr>
+  <% @object.instance_variables.each do |var|
+       ivar = @object.instance_variable_get(var) %>
+    <tr>
+      <td><%= var %></td>
+      <td><a href="<%= path_for("/object/#{ivar.object_id}") %>"><%= ivar.inspect %></td>
+    </tr>
+  <% end %>
+</table>
+
+<% case @object
+   when Hash %>
+  <h4>Hash contents</h4>
+  <p>The hash has <%= @object.size %> elements </p>
+  <table>
+    <tr><th>Key</th><th>Value</th></tr>
+      <% @object.each do |k,v| %>
+        <tr>
+          <td><a href="<%= path_for("/object/#{k.object_id}") %>"><%= k.to_s %></a></td>
+          <td><a href="<%= path_for("/object/#{v.object_id}") %>"><%= v.to_s %></a></td>
+      <% end %>
+  </table>
+<% when Array %>  
+  <h4>Array contents</h4>
+  <p>The array has <%= @object.size %> elements </p>
+  <table>
+    <tr><th>Key</th><th>Value</th></tr>
+      <% @object.each_with_index do |v,i| %>
+        <tr>
+          <td><%= i %></td>
+          <td><a href="<%= path_for("/object/#{v.object_id}") %>"><%= v.to_s %></a></td>
+      <% end %>
+  </table>
+<% when Class %>
+  <h4>Instance Methods</h4>
+    <ul>
+    <% @object.instance_methods(false).each do |m| %>
+      <li><%= m %></li>
+    <% end %>
+    </ul>
+  <h4>Class Methods</h4>
+    <ul>
+    <% klass = class << @object; self; end
+       klass.instance_methods(false).each do |m| %>
+         <li><%= m %></li>
+       <% end %>
+    </ul>
+<% end %>
