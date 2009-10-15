@@ -35,7 +35,6 @@ class BlogApp < Sinatra::Base
   # in a config file?
   SERVER  = 'http://localhost:4567'
   POSTS_DB = 'theBlogPosts'
-#  TAGS_DB  = 'theBlogTags'
 
   def initialize(*args)
     super
@@ -58,6 +57,12 @@ class BlogApp < Sinatra::Base
     @posts = @posts_db.execute_view(:recent)
     puts "-- /posts: @posts: #{@posts.inspect}"
     erb :home
+  end
+
+  get '/debug' do
+    @debug_info = @server.debug_info
+    puts "--- debug info: #{@debug_info}"
+    erb :debug
   end
 
   # Display a form to create a new blog post

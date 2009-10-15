@@ -114,8 +114,8 @@ class MDB::ServerApp < Sinatra::Base
   # before handling most requests, since the DB may be updated from Rake or
   # another server.
 
-  get '/_debug' do
-    @server.debug_info
+  get '/debug_info' do
+    @serializer.serialize(@server.debug_info)
   end
 
   # List db names
@@ -140,7 +140,7 @@ class MDB::ServerApp < Sinatra::Base
   # The database will add the object to its collection, and then
   # call the model added(new_object) hook.
   post '/:db' do
-    @serializer.serialize get_db.add(@post_data[0])
+    @serializer.serialize(get_db.add(@post_data[0]))
   end
 
   # Delete database

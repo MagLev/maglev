@@ -21,7 +21,6 @@ module MDB
 
     def debug_info
       result = "Debug Information for MDB::Server:\n"
-      result << "\t@dbs:      #{@dbs.inspect}\n"
       result << "\t@dbs.keys: #{@dbs.keys.inspect}\n"
       @dbs.each { |key, value| result << value.debug_info }
       result

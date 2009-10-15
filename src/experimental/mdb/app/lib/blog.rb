@@ -55,7 +55,7 @@ class Post
     # us.  This version does a search against the entire db of posts, and
     # then reduces.
     def recent(posts)
-      posts.values.sort { |a,b| b.timestamp <=> a.timestamp }[0...5]
+      posts.values.sort { |a,b| b.timestamp <=> a.timestamp }[0..4] # reverse sort
     end
 
     # This version just returns @recent_posts array, which is updated every
@@ -78,7 +78,7 @@ class Post
     def document_added(id, document)
       # Update the list of recent posts (saves searching)
       @recent_posts ||= []
-      @recent_posts.unshift document  # put at beginning
+      @recent_posts.unshift document
       @recent_posts.pop if @recent_posts.size > 5
     end
   end
@@ -87,6 +87,10 @@ end
 # NOTE: Tag used to derive from Array, but MagLev has a bug in unmarshal
 # and it can't read an MRI marshaled subclass of Array.  So, for right now,
 # we delegate to an array and implement a few extra methods.
+#
+# In this version (disconnected graph), tags may as well be represented as
+# strings or symbols, as they are duplicated and only contain one post.
+# The fully connected graph example makes this class worthwile.
 class Tag
   attr_reader :name
 
