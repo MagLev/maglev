@@ -291,8 +291,28 @@ module MagRp # {
 
     def on_error(t, val, vstack)
       # reworked for better messages, not sure how to continue parsing.
-      puts "parse error on value #{val.inspect} #{token_to_str(t)} "
-      puts "SyntaxError: missing or unexpected #{val.inspect} , near line #{@lexer.lineno_} " 
+      str = "parse error on value #{val.inspect} "
+      hint = ""
+      if t._not_equal?(nil)
+        str << " #{token_to_str(t)} "
+      end
+      if val.equal?(nil) 
+        hint = " (check for incomplete statement)"
+        str << hint
+      elsif val == 'end'
+        if @lexer.near_eos?(3)
+          ofs = @env.first_top_level_def_offset
+          if ofs > 0
+            lnum = @lexer.line_for_offset(ofs)
+            hint = " (check end(s) before 'def' near line #{lnum})"
+            str << hint
+          else
+          end
+        else
+        end
+      end  
+      puts str
+      puts "SyntaxError: missing or unexpected #{val.inspect} #{hint}, near line #{@lexer.lineno_} " 
       @syntax_err_count += 1
       raise SyntaxError
     end

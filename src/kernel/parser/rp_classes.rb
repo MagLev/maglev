@@ -61,10 +61,16 @@ module MagRp
       @arr = []
       @curridx = -ENTRY_SIZE
       @extend_ofs_last_unextend = -1
+      @first_top_level_def_offset = -1
+      @module_count = 0
     end
 
     def last_closed_def_offset
       @extend_ofs_last_unextend
+    end
+
+    def first_top_level_def_offset
+      @first_top_level_def_offset
     end
 
     def scanner=( scanner )
@@ -75,7 +81,7 @@ module MagRp
   end # }
   Environment._freeze_constants
 
-  class RubyLexer
+  class RubyLexer # {
     def command_start_
       @command_start
     end
@@ -179,6 +185,14 @@ module MagRp
       @line_num
     end
 
+    def _keyword_table
+      @keyword_table  # a Hash , replaces Keyword.keyword
+    end
+
+    def last_else_src_offset
+      @last_else_src_offset
+    end
+
     EOF = :eof_haha!
     
     # ruby constants for strings (should this be moved somewhere else?)
@@ -236,8 +250,90 @@ module MagRp
 
     Expr_IS_beg_mid_dot_arg_cmdarg = Expr_beg | Expr_mid | Expr_dot | Expr_arg | Expr_cmdArg
 
-  end
+  end # }
   RubyLexer._freeze_constants
+
+  class Keyword # {
+#     class KWtable		# class no longer used
+#	attr_accessor :name, :state, :id0, :id1 
+#	def initialize(name, id=[], state=nil)
+#	  @name  = name
+#	  @id0, @id1 = id
+#	  @state = state
+#	end
+#      end
+
+      ##
+      # :stopdoc:
+      #
+      # lexer states changed to Fixnums, see rp_classes.rb 
+      #  Expr_beg    = ignore newline, +/- is a sign.
+      #  Expr_end    = newline significant, +/- is a operator.
+      #  Expr_arg    = newline significant, +/- is a operator.
+      #  Expr_cmdarg = newline significant, +/- is a operator.
+      #  Expr_endarg = newline significant, +/- is a operator.
+      #  Expr_mid    = newline significant, +/- is a operator.
+      #  Expr_fname  = ignore newline, no reserved words.
+      #  Expr_dot    = right after . or ::, no reserved words.
+      #  Expr_class  = immediate after class, no here document.
+
+      wordlist = [
+		    # negated new state means yacc_value gets encapsulated in an RpNameToken
+		    # and/or gets other special handling
+		  ["end",      [:kEND,      :kEND        , RubyLexer::Expr_end   ]],
+		  ["else",     [:kELSE,     :kELSE       , RubyLexer::Expr_beg   ]],
+		  ["case",     [:kCASE,     :kCASE       , - RubyLexer::Expr_beg   ]],
+		  ["ensure",   [:kENSURE,   :kENSURE     , RubyLexer::Expr_beg   ]],
+		  ["module",   [:kMODULE,   :kMODULE     , RubyLexer::Expr_beg   ]],
+		  ["elsif",    [:kELSIF,    :kELSIF      , RubyLexer::Expr_beg   ]],
+		  ["def",      [:kDEF,      :kDEF        , - RubyLexer::Expr_fname ]],  
+		  ["rescue",   [:kRESCUE,   :kRESCUE_MOD , - RubyLexer::Expr_mid   ]],  
+		  ["not",      [:kNOT,      :kNOT        , RubyLexer::Expr_beg   ]],
+		  ["then",     [:kTHEN,     :kTHEN       , RubyLexer::Expr_beg   ]],
+		  ["yield",    [:kYIELD,    :kYIELD      , - RubyLexer::Expr_arg   ]],
+		  ["for",      [:kFOR,      :kFOR        , RubyLexer::Expr_beg   ]],
+		  ["self",     [:kSELF,     :kSELF       , RubyLexer::Expr_end   ]],
+		  ["false",    [:kFALSE,    :kFALSE      , RubyLexer::Expr_end   ]],
+		  ["retry",    [:kRETRY,    :kRETRY      , - RubyLexer::Expr_end   ]],
+		  ["return",   [:kRETURN,   :kRETURN     , - RubyLexer::Expr_mid   ]],
+		  ["true",     [:kTRUE,     :kTRUE       , RubyLexer::Expr_end   ]],
+		  ["if",       [:kIF,       :kIF_MOD     , - RubyLexer::Expr_beg   ]], 
+		  ["defined?", [:kDEFINED,  :kDEFINED    , RubyLexer::Expr_arg   ]],
+		  ["super",    [:kSUPER,    :kSUPER      , - RubyLexer::Expr_arg   ]], 
+		  ["undef",    [:kUNDEF,    :kUNDEF      , - RubyLexer::Expr_fname ]],
+		  ["break",    [:kBREAK,    :kBREAK      , - RubyLexer::Expr_mid   ]],
+		  ["in",       [:kIN,       :kIN         , RubyLexer::Expr_beg   ]],
+		  ["do",       [:kDO,       :kDO         , - RubyLexer::Expr_beg   ]], 
+		  ["nil",      [:kNIL,      :kNIL        , RubyLexer::Expr_end   ]],
+		  ["until",    [:kUNTIL,    :kUNTIL_MOD  , - RubyLexer::Expr_beg   ]], 
+		  ["unless",   [:kUNLESS,   :kUNLESS_MOD , - RubyLexer::Expr_beg   ]], 
+		  ["or",       [:kOR,       :kOR         , RubyLexer::Expr_beg   ]],
+		  ["next",     [:kNEXT,     :kNEXT       , - RubyLexer::Expr_mid   ]],
+		  ["when",     [:kWHEN,     :kWHEN       , - RubyLexer::Expr_beg   ]],
+		  ["redo",     [:kREDO,     :kREDO       , - RubyLexer::Expr_end   ]],
+		  ["and",      [:kAND,      :kAND        , RubyLexer::Expr_beg   ]],
+		  ["begin",    [:kBEGIN,    :kBEGIN      , RubyLexer::Expr_beg   ]],
+		  ["__LINE__", [:k__LINE__, :k__LINE__   , RubyLexer::Expr_end   ]],
+		  ["class",    [:kCLASS,    :kCLASS      , - RubyLexer::Expr_class ]],
+		  ["__FILE__", [:k__FILE__, :k__FILE__   , RubyLexer::Expr_end   ]],
+		  ["END",      [:klEND,     :klEND       , RubyLexer::Expr_end   ]],
+		  ["BEGIN",    [:klBEGIN,   :klBEGIN     , RubyLexer::Expr_end   ]],
+		  ["while",    [:kWHILE,    :kWHILE_MOD  , - RubyLexer::Expr_beg   ]], 
+		  ["alias",    [:kALIAS,    :kALIAS      , - RubyLexer::Expr_fname ]]
+		 ]
+
+      # :startdoc:
+
+      ht = Hash.new
+      WORDLIST = ht
+      wordlist.each { | elem |
+        ht[ elem[0] ] = elem[1]
+      } 
+ 
+      # def self.keyword( str)  ; end # no longer used
+
+  end # }
+  Keyword._freeze_constants
 
   class SrcRegion
     # describes a portion of the source string, used in heredoc implementation

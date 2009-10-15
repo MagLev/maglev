@@ -4,12 +4,6 @@
 
 module MagRp
 
-class Keyword # {
-  def self.keyword( str)   # in second opening for non-dynamic WORDLIST ref
-    WORDLIST[str]
-  end
-end
-
 class RubyLexer
   # attr's in first opening in rp_classes.rb
 
@@ -18,6 +12,8 @@ class RubyLexer
     @cmdarg = StackState.new()
     @nest = 0
     @line_num = 1
+    @keyword_table = Keyword::WORDLIST 
+    @last_else_src_offset = -1
     # @comments  not used, this parser not for use to implement RDoc
     @mydebug = MagRp::debug > 1
     reset
@@ -55,6 +51,11 @@ class RubyLexer
     @src_scanner.src_line_for_offset(byte_ofs)
   end
 
+  def near_eos?(margin)
+    # used by syntax error hints
+    @src_scanner.near_eos?(margin)
+  end
+
   def self.state_to_s(v)
     # used in debugging only
     if v == Expr_beg 
@@ -84,7 +85,7 @@ class RubyLexer
   # def is_argument ; end ;  # deleted
 
   def arg_ambiguous
-    self.warning("Ambiguous first argument to method call")
+    self.warning("Ambiguous first argument to method call, near line #{@line_num}")
   end
 
   def expr_beg_push( val )
@@ -1035,7 +1036,7 @@ class RubyLexer
             if clex_state.equal?( Expr_cmdArg) then
               result = :tLPAREN_ARG
             elsif clex_state.equal?( Expr_arg) then
-              msg = "don't put space before argument parentheses"
+              msg = "don't put space before argument parentheses, near line #{@line_num}"
               if @mydebug ; msg << " (A)" ; end 
               warning(msg)
               result = :tLPAREN2
@@ -1660,16 +1661,19 @@ class RubyLexer
 
       unless clex_state.equal?( Expr_dot) then
         # See if it is a reserved word.
-        keyword = Keyword.keyword( ttoken)
+        kwarr = @keyword_table[ ttoken ] # was keyword = Keyword.keyword[ttoken]
 
-        if keyword then
+        if kwarr then
           # clex_state holds "old state" and we update @lex_state
           #   with new state to be valid after return
-          kw_state = keyword.state
-          kw_id_zero = keyword.id0 
+          kw_state = kwarr[2] # was keyword.state
+          kw_id_zero = kwarr[0] # was keyword.id0 
           if kw_state >= 0
             @lex_state = kw_state
             @yacc_value = ttoken
+            if kw_id_zero.equal?( :kELSE )
+              @last_else_src_offset = tok_start_offset # for hints and warnings
+            end
           else
             @lex_state  =  0 - kw_state
 
@@ -1693,7 +1697,7 @@ class RubyLexer
           if clex_state.equal?( Expr_beg )
             return kw_id_zero 
           end
-          kw_id_one = keyword.id1
+          kw_id_one = kwarr[1] # was keyword.id1
           if ( kw_id_zero._not_equal?(  kw_id_one ) )
             @lex_state = Expr_beg 
           end
