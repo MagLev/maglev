@@ -24,7 +24,7 @@
           <% if @show_tags %>
           <h4>Tags</h4>
           <ul>
-            <% Tag.all.each do |tag| %>
+            <% SimpleTag.all.each do |tag| %>
             <li><a href="/tag/<%= tag.__id__ %>"><%= tag.name %></a></li>
             <% end %>
           </ul>

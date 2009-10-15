@@ -1,3 +1,4 @@
+# -*- ruby  -*-
 require 'lib/mdb_server'
 require '../../../examples/sinatra/object_inspector/objectlog_app'
 

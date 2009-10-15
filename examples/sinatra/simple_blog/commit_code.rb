@@ -5,7 +5,7 @@
 force = ARGV[0] =~ /force/
 
 Maglev.abort_transaction
-if force or not defined? Post
+if force or not defined? SimplePost
   Maglev.persistent do
     # Use load rather than require to force re-reading of the files
     load 'blog.rb'

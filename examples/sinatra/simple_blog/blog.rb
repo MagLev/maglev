@@ -57,7 +57,7 @@ module Maglev::Model
 
 end
 
-class Post
+class SimplePost
   include Maglev::Model
 
   attr_reader :text, :title, :timestamp, :tags
@@ -79,7 +79,7 @@ class Post
   end
 end
 
-class Tag < Array
+class SimpleTag < Array
   include Maglev::Model
 
   attr_reader :name
@@ -93,6 +93,6 @@ class Tag < Array
   end
 
   def self.find_by_name(name)
-    Tag.detect { |t| t.name == name }
+    SimpleTag.detect { |t| t.name == name }
   end
 end
