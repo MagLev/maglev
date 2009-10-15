@@ -110,27 +110,6 @@ class MDB::ServerApp < Sinatra::Base
     db
   end
 
-  # Entry point to object viewer
-  get '/_object/object' do
-    puts "--- GET /_object"
-    begin
-      @object = @server
-      content_type 'text/html'
-      erb :objectdetail
-    rescue Exception => e
-      puts "--- #{e.class}   #{e.message}"
-    end
-  end
-
-  # Generic object viewer
-  get '/_object/object/:id' do
-    content_type 'text/html'
-    oop = params[:id].to_i
-    @object = ObjectSpace._id2ref(oop)
-    raise "Can't find object with oop #{oop}" unless @object
-    erb :objectdetail
-  end
-
   get '/debug_info' do
     @serializer.serialize(@server.debug_info)
   end
@@ -227,35 +206,5 @@ class MDB::ServerApp < Sinatra::Base
     end
     m
   end
-
-  def path_for(x)
-    "/_object#{x}"
-  end
-#   template :objectdetail do
-#     <<-EOS
-# <h3>Object Detail for <%= @object %></h3>
-# <table>
-#   <tr><th>Attribute</th><th>Value</th></tr>
-#   <tr>
-#     <td>Class</td>
-#     <td>
-#       <a href="<%= "/_object/#{@object.class.object_id}" %>"><%= @object.class %></a>
-#     </td>
-#   </tr>
-#   <tr><td>Oop</td><td> <%= @object.object_id %></td></tr>
-#   <% @object.instance_variables.each do |var| %>
-#     <tr>
-#       <td>whatever</td>
-#       <td>whatever</td>
-#     </tr>
-#   <% end %>
-# </table>
-#   EOS
-#   end
-
-#   template :objectdetailX do
-#     <<-EOS
-#   EOS
-#   end
 end
 

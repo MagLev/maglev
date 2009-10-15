@@ -1,0 +1,12 @@
+<table>
+  <tr><th>#</th><th>Tag</th><th>Label</th><th>Object</th><th>Timestamp</th></tr>
+<% @objectlog.reverse_each_with_index do |entry,i| %>
+  <tr>
+    <td><%= i %></td>
+    <td><%= entry.tagged? ? "X" : "" %></td>
+    <td><a href="<%= path_for("/entry/#{i}")%>"> <%= entry.label %></a></td>
+    <td><%= entry.object %></td>
+    <td><%= entry.timestamp %></td>
+  </tr>
+<% end %>
+</table>
