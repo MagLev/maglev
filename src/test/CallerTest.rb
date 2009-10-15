@@ -33,8 +33,8 @@ back_trace = a(1,2,3)
 
 expected =
   ["src/test/CallerTest.rb:23:in `c'",
-   "src/test/CallerTest.rb:25:in `each'",
-   "src/test/CallerTest.rb:25:in `c'",
+   "src/test/CallerTest.rb:26:in `each'",
+   "src/test/CallerTest.rb:26:in `c'",
    "src/test/CallerTest.rb:19:in `b'",
    "src/test/CallerTest.rb:15:in `a'",
    "src/test/CallerTest.rb:23"]

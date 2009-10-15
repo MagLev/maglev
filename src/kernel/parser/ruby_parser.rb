@@ -3072,7 +3072,7 @@ def _reduce_20(val, vofs)
                       if (@in_def || @in_single > 0) then
                         yyerror "BEGIN in method"
                       end
-                      @env.extend( false)
+                      @env.extend( false, nil)
                       result = val[vofs]
                     
     result
@@ -3272,7 +3272,7 @@ end
 
 def _reduce_50(val, vofs)
 			# cmd_brace_block: tLBRACE_ARG
-			@env.extend( true ) # (:dynamic)
+			@env.extend( true , nil) # (:dynamic)
 			result = -902 #  @lexer.lineno_
 		      
     result
@@ -4224,7 +4224,7 @@ end
 
 def _reduce_219(val, vofs)
 		      #  | command opt_nl
-                      warning 'parenthesize argument(s) for future version'
+                      warning('parenthesize argument(s) for future version')
                       # result = s(:array, val_[0])
                       result = RubyRpCallArgs.s( val[vofs ])
                     
@@ -4278,7 +4278,7 @@ end
 
 def _reduce_226(val, vofs)
 		      #  | tLPAREN2 block_call opt_nl tRPAREN
-                      warning "parenthesize argument(s) for future version"
+                      warning( "parenthesize argument(s) for future version")
                       # result = s(:array, val_[1])
                       result = RubyRpCallArgs.s( val[vofs + 1])
                     
@@ -4287,7 +4287,7 @@ end
 
 def _reduce_227(val, vofs)
 		      # | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN
-                      warning "parenthesize argument(s) for future version"
+                      warning( "parenthesize argument(s) for future version")
                       # result = val_[1].add val_[3]
                       result = val[vofs + 1].append(  val[vofs + 3] )
                     
@@ -4300,7 +4300,7 @@ end
 
 def _reduce_230(val, vofs)
 		      # call_args: command
-                      warning "parenthesize argument(s) for future version"
+                      warning( "parenthesize argument(s) for future version")
                       # result = s(:array, val_[0])
                       result = RubyRpCallArgs.s( val[vofs ])
                     
@@ -4506,7 +4506,7 @@ end
 
 def _reduce_255(val, vofs)
 		      # open_args: call_args #   tRPAREN 
-                      msg = "don't put space before argument parentheses"
+        msg = "don't put space before argument parentheses, near line #{@lexer.lineno_}"
                       if @mydebug ; msg << " (B)" ; end 
                       warning(msg)
                       result = nil
@@ -4525,7 +4525,7 @@ end
 def _reduce_257(val, vofs)
 		      #  | tLPAREN_ARG call_args2
 		      #    tRPAREN
-                      msg = "don't put space before argument parentheses"
+        msg = "don't put space before argument parentheses, near line #{@lexer.lineno_}"
                       if @mydebug ; msg << " (C)" ; end 
                       warning(msg)
                       result = val[vofs + 1]
@@ -4636,7 +4636,7 @@ end
 
 def _reduce_277(val, vofs)
 		      # primary: #  opt_nl tRPAREN
-                      warning "(...) interpreted as grouped expression"
+          warning "(...) interpreted as grouped expression, near line #{@lexer.lineno_}"
                       result = val[vofs + 1]
                     
     result
@@ -4897,7 +4897,7 @@ def _reduce_306(val, vofs)
                       if (@in_def || @in_single > 0) then
 raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}\n cannot continue parsing."
                       end
-                      @env.extend( false)
+                      @env.extend( false, :module )
                       result = val[vofs]
                     
     result
@@ -4923,7 +4923,7 @@ def _reduce_309(val, vofs)
 		      # | kCLASS tLSHFT # term
                       result = @in_single
                       @in_single = 0
-                      @env.extend( false)
+                      @env.extend( false, :module )
                     
     result
 end
@@ -4942,7 +4942,7 @@ def _reduce_311(val, vofs)
                       if   @in_def or @in_single > 0
                         yyerror "module definition in method body" 
                       end
-                      @env.extend( false)
+                      @env.extend( false, :module )
                       result = val[vofs]
                     
     result
@@ -4961,7 +4961,7 @@ def _reduce_313(val, vofs)
                       lx = @lexer
                       # @comments.push( lx.comments_ )
                       @in_def = true
-                      @env.extend( false)
+                      @env.extend( false, :def )
                       result =  -907  # dummy result, replaces [line, beginOfLine]
                     
     result
@@ -4989,7 +4989,7 @@ end
 def _reduce_316(val, vofs)
 		      # | kDEF singleton dot_or_colon # fname
                       @in_single += 1
-                      @env.extend( false)
+                      @env.extend( false, :def )
                       @lexer.lex_state=( RubyLexer::Expr_end )# force for args
                       result = val[vofs]
                     
@@ -5113,7 +5113,7 @@ end
 
 def _reduce_340(val, vofs)
 		      # do_block: kDO_BLOCK
-		      @env.extend( true ) # (:dynamic)
+		      @env.extend( true , nil ) # (:dynamic)
                       result = val[vofs]
                     
     result
@@ -5213,7 +5213,7 @@ end
 
 def _reduce_352(val, vofs)
 		      # brace_block: tLCURLY
-		      @env.extend( true ) # (:dynamic)
+		      @env.extend( true , nil ) # (:dynamic)
                       result = -909 # @lexer.lineno_
                     
     result
@@ -5239,7 +5239,7 @@ end
 
 def _reduce_355(val, vofs)
 		      # brace_block: tLCURLY # | kDO
-		      @env.extend( true ) # (:dynamic)
+		      @env.extend( true , nil ) # (:dynamic)
                       result = -910 # @lexer.lineno_      
                     
     result

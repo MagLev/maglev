@@ -10,8 +10,6 @@
 
 class Integer
 
-  class_primitive_nobridge '_from_string', 'fromString:'
-
   def coerce(param, &block)
     s = nil
     p = nil
@@ -298,5 +296,17 @@ class Integer
     def _split_string(string, limit)
         self.chr._split_string(string, limit)
     end
+
+# primitive added to support BigDecimal implementation
+
+  class_primitive_nobridge '_from_string', 'fromString:'
+
+  primitive_nobridge '_decimal_digits_length_approx', '_decimalDigitsLength:' 
+    # argument is useApproximationBoolean , if true result may  be
+    # slightly smaller than actual number of digits
+
+  primitive_nobridge '_min', 'min:'  # Smalltalk coercion on arg
+  primitive_nobridge '_max', 'max:'  # Smalltalk coercion on arg
+  primitive_nobridge '_quo_rem', 'quoRem:into:' # Smalltalk coercion on arg
 
 end

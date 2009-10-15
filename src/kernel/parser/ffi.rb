@@ -1,3 +1,5 @@
+# this file no longer used by parser, now that FFI is loaded
+#   as part of the bootstrap classes for env 2.
 module FFI
 
   class CByteArray

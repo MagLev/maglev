@@ -206,8 +206,11 @@ class Float
   primitive_nobridge 'to_i' , 'truncated'
   primitive_nobridge 'to_int' , 'truncated'
   primitive_nobridge 'to_s' , '_rubyAsString'  
+  primitive_nobridge '_as_string' , 'asString'   # Smalltalk format sd.d...dEsee
   primitive          'inspect' , '_rubyAsString'  
   primitive_nobridge 'truncate' , 'truncated'
+
+#  primitive_nobridge '_decimal_float_parts', '_decimalFloatParts'
 
   # Note: nonstandard meth to format Float - for use by Benchmark 
   primitive 'to_fmt' , '_rubyAsFormattedString' 

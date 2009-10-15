@@ -742,6 +742,15 @@ class String
     str.strip
   end
 
+  def _delete_underscore
+    str = self
+    idx = str._indexOfByte( ?_ , 1 )
+    unless idx.equal?(0)
+      str = str.delete('_')
+    end
+    str
+  end
+
   def hex
     # Because 0b1 is a proper hex number, rather than the binary number 1,
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.

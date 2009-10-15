@@ -115,6 +115,10 @@ class RpStringScanner
     @pos >= @limit
   end
 
+  def near_eos?(margin)
+    @pos >= (@limit - margin)
+  end
+
   def getch
     # scan(/./m)  # m modifier means . matches LF
     p = @pos 

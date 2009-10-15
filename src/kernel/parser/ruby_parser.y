@@ -156,7 +156,7 @@ rule
                       if (@in_def || @in_single > 0) then
                         yyerror "BEGIN in method"
                       end
-                      @env.extend( false)
+                      @env.extend( false, nil)
                       result = val[vofs]
                     }
                     tLCURLY compstmt tRCURLY
@@ -307,7 +307,7 @@ rule
    cmd_brace_block: tLBRACE_ARG
 		      {
 			# cmd_brace_block: tLBRACE_ARG
-			@env.extend( true ) # (:dynamic)
+			@env.extend( true , nil) # (:dynamic)
 			result = -902 #  @lexer.lineno_
 		      }
 		      opt_block_var
@@ -961,7 +961,7 @@ rule
                 | command opt_nl
                     {
 		      #  | command opt_nl
-                      warning 'parenthesize argument(s) for future version'
+                      warning('parenthesize argument(s) for future version')
                       # result = s(:array, val_[0])
                       result = RubyRpCallArgs.s( val[vofs ])
                     }
@@ -1002,14 +1002,14 @@ rule
                 | tLPAREN2 block_call opt_nl tRPAREN
                     {
 		      #  | tLPAREN2 block_call opt_nl tRPAREN
-                      warning "parenthesize argument(s) for future version"
+                      warning( "parenthesize argument(s) for future version")
                       # result = s(:array, val_[1])
                       result = RubyRpCallArgs.s( val[vofs + 1])
                     }
                 | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN
                     {
 		      # | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN
-                      warning "parenthesize argument(s) for future version"
+                      warning( "parenthesize argument(s) for future version")
                       # result = val_[1].add val_[3]
                       result = val[vofs + 1].append(  val[vofs + 3] )
                     }
@@ -1020,7 +1020,7 @@ rule
        call_args: command
                     {
 		      # call_args: command
-                      warning "parenthesize argument(s) for future version"
+                      warning( "parenthesize argument(s) for future version")
                       # result = s(:array, val_[0])
                       result = RubyRpCallArgs.s( val[vofs ])
                     }
@@ -1181,7 +1181,7 @@ rule
                     tRPAREN
                     {
 		      # open_args: call_args #   tRPAREN 
-                      msg = "don't put space before argument parentheses"
+        msg = "don't put space before argument parentheses, near line #{@lexer.lineno_}"
                       if @mydebug ; msg << " (B)" ; end 
                       warning(msg)
                       result = nil
@@ -1196,7 +1196,7 @@ rule
                     {
 		      #  | tLPAREN_ARG call_args2
 		      #    tRPAREN
-                      msg = "don't put space before argument parentheses"
+        msg = "don't put space before argument parentheses, near line #{@lexer.lineno_}"
                       if @mydebug ; msg << " (C)" ; end 
                       warning(msg)
                       result = val[vofs + 1]
@@ -1281,7 +1281,7 @@ rule
                     opt_nl tRPAREN
                     {
 		      # primary: #  opt_nl tRPAREN
-                      warning "(...) interpreted as grouped expression"
+          warning "(...) interpreted as grouped expression, near line #{@lexer.lineno_}"
                       result = val[vofs + 1]
                     }
                 | tLPAREN compstmt tRPAREN
@@ -1485,7 +1485,7 @@ rule
                       if (@in_def || @in_single > 0) then
 raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}\n cannot continue parsing."
                       end
-                      @env.extend( false)
+                      @env.extend( false, :module )
                       result = val[vofs]
                     }
                     bodystmt kEND
@@ -1505,7 +1505,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
 		      # | kCLASS tLSHFT # term
                       result = @in_single
                       @in_single = 0
-                      @env.extend( false)
+                      @env.extend( false, :module )
                     }
                     bodystmt kEND
                     {
@@ -1520,7 +1520,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                       if   @in_def or @in_single > 0
                         yyerror "module definition in method body" 
                       end
-                      @env.extend( false)
+                      @env.extend( false, :module )
                       result = val[vofs]
                     }
                     bodystmt kEND
@@ -1535,7 +1535,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                       lx = @lexer
                       # @comments.push( lx.comments_ )
                       @in_def = true
-                      @env.extend( false)
+                      @env.extend( false, :def )
                       result =  -907  # dummy result, replaces [line, beginOfLine]
                     }
                     f_arglist bodystmt kEND
@@ -1557,7 +1557,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                     {
 		      # | kDEF singleton dot_or_colon # fname
                       @in_single += 1
-                      @env.extend( false)
+                      @env.extend( false, :def )
                       @lexer.lex_state=( RubyLexer::Expr_end )# force for args
                       result = val[vofs]
                     }
@@ -1652,7 +1652,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
         do_block: kDO_BLOCK
                     {
 		      # do_block: kDO_BLOCK
-		      @env.extend( true ) # (:dynamic)
+		      @env.extend( true , nil ) # (:dynamic)
                       result = val[vofs]
                     }
                     opt_block_var
@@ -1731,7 +1731,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
      brace_block: tLCURLY
                     {
 		      # brace_block: tLCURLY
-		      @env.extend( true ) # (:dynamic)
+		      @env.extend( true , nil ) # (:dynamic)
                       result = -909 # @lexer.lineno_
                     }
                     opt_block_var
@@ -1751,7 +1751,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                 | kDO
                     {
 		      # brace_block: tLCURLY # | kDO
-		      @env.extend( true ) # (:dynamic)
+		      @env.extend( true , nil ) # (:dynamic)
                       result = -910 # @lexer.lineno_      
                     }
                  opt_block_var

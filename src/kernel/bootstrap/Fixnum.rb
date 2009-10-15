@@ -1,6 +1,8 @@
 class Fixnum
   # Fixnum is identically  Smalltalk SmallInteger
 
+  MAX = 0xfffffffffffffff
+
   def self.induced_from(obj)
     i = Type.coerce_to(obj, Integer, :to_int)
     unless i._isFixnum
@@ -97,3 +99,4 @@ class Fixnum
   end
 
 end
+Fixnum._freeze_constants

@@ -67,7 +67,7 @@ RUBY.require 'kernel/bootstrap/Symbol.rb'
 RUBY.require 'kernel/bootstrap/Regexp.rb'
 RUBY.require 'kernel/bootstrap/MatchData.rb'
 RUBY.require 'kernel/bootstrap/Exception.rb'
-RUBY.require 'kernel/bootstrap/Globals2.rb'
+# Globals2 deleted
 RUBY.require 'kernel/bootstrap/Env.rb'
 RUBY.require 'kernel/bootstrap/Errno.rb'
 RUBY.require 'kernel/bootstrap/Dir.rb'
@@ -103,6 +103,8 @@ RUBY.require 'kernel/bootstrap/RubyContext.rb'
 RUBY.require 'kernel/bootstrap/zlib_czstream.rb'
 RUBY.require 'kernel/bootstrap/Maglev.rb'
 RUBY.require 'kernel/bootstrap/TransientShortArray.rb'
+RUBY.require 'kernel/bootstrap/bigdecimal1.rb'
+RUBY.require 'kernel/bootstrap/bigdecimal.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
