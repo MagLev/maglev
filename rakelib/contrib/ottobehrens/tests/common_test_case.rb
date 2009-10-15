@@ -11,16 +11,19 @@ require 'date'
 TEST_STONE_NAME = 'unit.test'
 
 class BaseTestCase < Test::Unit::TestCase
+  def installation
+    GemStoneInstallation.current
+  end
+
   def setup
     clear_stone(TEST_STONE_NAME)
   end
 
   def clear_stone(stone_name)
-    if GemStoneInstallation.current.stones.include? stone_name
-      stone = Stone.existing(stone_name)
+    if installation.stones.include? stone_name
+      stone = Stone.existing(stone_name, installation)
       stone.stop
-      rm stone.system_config_filename
-      rm_rf stone.data_directory
+      stone.destroy!
     end
   end
 
@@ -30,5 +33,9 @@ class BaseTestCase < Test::Unit::TestCase
 
   def test_abstract
     # This is an abstract test case
+  end
+
+  def teardown
+    clear_stone(TEST_STONE_NAME)
   end
 end
