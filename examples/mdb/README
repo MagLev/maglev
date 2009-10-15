@@ -15,18 +15,18 @@ Make sure the maglev server has been started:
 
 Install prerequisites and load MDB server:
 
-    $ cd $MAGLEV_HOME/src/experimental/mdb
+    $ cd $MAGLEV_HOME/examples/mdb
     $ rake install_gems   # Install serveral gems into MagLev and MRI
     $ rake commit         # Commit code into MDB
 
 Run MDB server:
 
-    $ cd $MAGLEV_HOME/src/experimental/mdb/mdb
+    $ cd $MAGLEV_HOME/examples/mdb/mdb
     $ rake server:start  # Starts server...^C to stop it
 
 Setup client app, in a new shell:
 
-    $ cd $MAGLEV_HOME/src/experimental/mdb/app
+    $ cd $MAGLEV_HOME/examples/mdb/app
     $ rake app:run    # Runs migrations, then starts client app...^C to stop it
 
 Hit http://localhost:3333/
@@ -43,7 +43,7 @@ MaglevDB server is running on port 4567.
 
 2> To install the required RubyGems and load the MDB server, do:
 
-    $ cd $MAGLEV_HOME/src/experimental/mdb
+    $ cd $MAGLEV_HOME/examples/mdb
     $ rake setup
 
 The +setup+ Rake task will ensure the following RubyGems are installed into

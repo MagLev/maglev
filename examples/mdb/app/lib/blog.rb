@@ -45,6 +45,10 @@ class Post
     @tags.any? { |tag| tag.matches tag_name }
   end
 
+  def to_s
+    "Post: @title '#{@title}'  @timestamp #{@timestamp}..."
+  end
+
   #############################################
   #  VIEWS
   #############################################
@@ -101,6 +105,10 @@ class Tag
 
   def to_s
     @name
+  end
+
+  def inspect
+    "Tag #{@name}"
   end
 
   def <<(tagged_item)

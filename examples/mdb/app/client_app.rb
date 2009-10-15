@@ -55,13 +55,11 @@ class BlogApp < Sinatra::Base
 
   get '/posts' do
     @posts = @posts_db.execute_view(:recent)
-    puts "-- /posts: @posts: #{@posts.inspect}"
     erb :home
   end
 
   get '/debug' do
     @debug_info = @server.debug_info
-    puts "--- debug info: #{@debug_info}"
     erb :debug
   end
 
@@ -94,7 +92,6 @@ class BlogApp < Sinatra::Base
   end
 
   def get_tags(params)
-    puts "TAGS: #{params[:tags].inspect}"
     tags = params[:tags].split
     tags.map { |t| Tag.new t }
   end
@@ -103,7 +100,6 @@ class BlogApp < Sinatra::Base
     # TODO: I'm sending a string, rather than a tag back to the db
     @posts = @posts_db.execute_view(:tagged_with, params[:name])
     @tag = Tag.new params[:name]
-    puts "=== @posts with #{params[:name]}: #{@posts.inspect}"
     erb :tag
   end
 end
