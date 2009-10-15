@@ -19,6 +19,7 @@ RUBY.global('Hash', 'RubyHash')
 RUBY.global('IdentityHash', 'RubyIdentityHash')
 RUBY.global('Integer', 'Integer')
 RUBY.global('Bignum', 'LargeInteger')
+RUBY.global('BigDecimal', 'RubyBigDecimal')
 RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
