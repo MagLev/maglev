@@ -5,7 +5,7 @@ ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
 
 desc "Commit the MDB Server code to the repository."
 task :commit do
-  sh %{ maglev-ruby -MnoRlwrap commit_code.rb }
+  sh 'maglev-ruby -MnoRlwrap commit_code.rb'
 end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
@@ -20,18 +20,18 @@ namespace :test do
   desc "Run the MDB::* tests."
   task :mdb => [:commit, :mdb_fixtures] do
     ['server_tests.rb', 'database_tests.rb'].each do |test|
-      sh %{ maglev-ruby -Itest test/#{test} }
+      sh "maglev-ruby -Itest test/#{test}"
     end
   end
 
   desc "Load fixtures for MDB::* tests"
   task :mdb_fixtures do
-    sh %{ maglev-ruby -MnoRlwrap test/mdb_fixtures.rb }
+    sh "maglev-ruby -MnoRlwrap test/mdb_fixtures.rb"
   end
 
   desc "Load fixtures for mdb_server tests"
   task :mdb_server_fixtures do
-    sh %{ maglev-ruby -MnoRlwrap test/mdb_server_fixtures.rb }
+    sh "maglev-ruby -MnoRlwrap test/mdb_server_fixtures.rb"
   end
 
   # Test for the (new) Marshal based server
@@ -55,6 +55,11 @@ namespace :server do
 
   desc "List the databases in the server"
   task :list do
-    sh %{ maglev-ruby -e 'p MDB::Server.server.db_names' }
+    sh "maglev-ruby -e 'p MDB::Server.server.db_names'"
+  end
+
+  desc "Print out debug info on the server"
+  task :debug do
+    sh "maglev-ruby -e 'puts MDB::Server.server.debug_info'"
   end
 end

@@ -16,13 +16,12 @@ Install prerequisites and load MDB server:
 Run MDB server:
 
     $ cd $MAGLEV_HOME/src/experimental/mdb/mdb
-    $ rake mdb:start  # Starts server...^C to stop it
+    $ rake server:start  # Starts server...^C to stop it
 
 Setup client app, in a new shell:
 
     $ cd $MAGLEV_HOME/src/experimental/mdb/app
-    $ rake mdb:create
-    $ rake app:run    # Starts client app...^C to stop it
+    $ rake app:run    # Runs migrations, then starts client app...^C to stop it
 
 Hit http://localhost:3333/
 

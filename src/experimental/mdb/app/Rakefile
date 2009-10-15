@@ -6,12 +6,12 @@ ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
 namespace :app do
   desc "Run the client Sinatra app. Assumes rackup is in your path"
   task :run => :migrations do
-    sh %{ rackup client.ru }
+    sh "rackup client.ru"
   end
 
   desc "Run the applications migrations file"
   task :migrations do
-    sh %{ maglev-ruby -Ilib migrations.rb }
+    sh "maglev-ruby -Ilib migrations.rb"
   end
 
   desc "Clear out the posts and tags dbs"
@@ -22,8 +22,7 @@ namespace :app do
       server["theBlogTags"].clear
       Maglev.commit_transaction'
     EOS
-    p cmd
-    sh %{ maglev-ruby -e #{cmd}}
+    sh "maglev-ruby -e #{cmd}"
   end
 end
 
@@ -32,20 +31,18 @@ task :test => [ :'test:rest', :'test:app']
 namespace :test do
   desc "Test the MDB::REST* wrappers."
   task :rest => :rest_fixtures do
-    sh %{ ruby -Ilib -Itest -I../mdb/lib test/mdb_tests.rb }
+    sh "ruby -Ilib -Itest -I../mdb/lib test/mdb_tests.rb"
   end
 
   # Commit the test fixture model code needed by tests into the Maglev server
   task :rest_fixtures do
     # TODO: should probably also run ../mdb/ rake commit
-    puts "-- Loading test fixtures into maglev"
-    sh %{ maglev-ruby -Itest test/mdb_fixtures.rb }
-    puts "-- (done)"
+    sh "maglev-ruby -Itest test/mdb_fixtures.rb"
   end
 
   desc "Test app data structures (Post, Tag)"
   task :app do
-    sh %{ ruby -Ilib test/post_tests.rb }
-    sh %{ ruby -Ilib test/tag_tests.rb }
+    sh "ruby -Ilib test/post_tests.rb"
+    sh "ruby -Ilib test/tag_tests.rb"
   end
 end
