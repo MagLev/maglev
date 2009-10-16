@@ -17,11 +17,10 @@ WEB_DIR         = RESULTS_DIR + "/web"
 
 ITERATIONS      = (ENV['ITERATIONS'] || 5).to_i
 TIMEOUT         = (ENV['TIMEOUT'] || 300).to_i
-METER_MEMORY    = ENV['METER_MEMORY'] || 'yes'
 VM              = ENV['VM'] || "#{BASEDIR}/bin/maglev-ruby"
 
 def command(name)
-  "ruby #{MONITOR} #{TIMEOUT} '#{VM}' #{RUNNER} #{name} #{ITERATIONS} #{report} #{METER_MEMORY}"
+  "ruby #{MONITOR} #{TIMEOUT} '#{VM}' #{RUNNER} #{name} #{ITERATIONS} #{report}"
 end
 
 # Cache the name so it is only generated once during an invocation.
