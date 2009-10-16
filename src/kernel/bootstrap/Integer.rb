@@ -297,7 +297,7 @@ class Integer
         self.chr._split_string(string, limit)
     end
 
-# primitive added to support BigDecimal implementation
+# primitives added to support BigDecimal implementation
 
   class_primitive_nobridge '_from_string', 'fromString:'
 
