@@ -34,6 +34,8 @@ class Fixnum
   primitive_nobridge '/', '_rubyDivide:'
   primitive_nobridge '_divide', '_rubyDivide:'
 
+  primitive_nobridge '_quo_rem', 'quoRem:into:' # Smalltalk coercion on arg, used by BigDecimal
+
   primitive_nobridge '%', '_rubyModulo:'
   primitive_nobridge 'modulo', '_rubyModulo:'
 
