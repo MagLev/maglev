@@ -38,7 +38,7 @@ class BlogApp < Sinatra::Base
   end
 
   get '/tag/:id' do
-    @tag = Tag.get(params[:id])
+    @tag = SimpleTag.get(params[:id])
     raise "Page not found for tag (id: #{params[:id]})" unless @tag
     erb :tag
   end
@@ -48,23 +48,23 @@ class BlogApp < Sinatra::Base
   end
 
   post '/post' do
-    post = Post.new(params)
+    post = SimplePost.new(params)
     ObjectLogEntry.info("A Post", post).add_to_log
     params[:tags].split.each do |tag|
-      t = Tag.find_by_name(tag) || Tag.new(tag)
+      t = SimpleTag.find_by_name(tag) || SimpleTag.new(tag)
       post.tag t
     end if params[:tags]
     redirect "/post/#{post.__id__}"
   end
 
   get '/post/:id' do
-    @post = Post.get(params[:id])
+    @post = SimplePost.get(params[:id])
     raise "Page not found (id: #{params[:id]})" unless @post
     erb :post
   end
 
   get '/posts' do
-    @posts = Post.all
+    @posts = SimplePost.all
     erb :blog
   end
 

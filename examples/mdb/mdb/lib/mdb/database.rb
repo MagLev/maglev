@@ -30,13 +30,14 @@ module MDB
     end
 
     def debug_info
-      result = "==== Database debug_info for #{name}\n"
+      result = "==== Database #{name}: Debug Info:\n"
       result << "\tview_class: #{@view.inspect}\n"
       view_methods = class << @view
                        self.instance_methods(false).inject("") { |acc,m| acc << " #{m.to_s}" }
                      end
       result << "\tview methods: #{view_methods}\n"
       result << "\tdocument count: #{size}\n"
+      result
     end
 
     # Called by the server if the view class is updated (e.g., methods

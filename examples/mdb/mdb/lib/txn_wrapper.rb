@@ -23,7 +23,7 @@ class MagLevTransactionWrapper
 
   # A Commit-worthy status is success (2xx) or a redirect.
   def committable?(status)
-    ! status.nil? &&  (200..399).include?(status)
+    ! status.nil? && (200..399).include?(status)
   end
 
 end

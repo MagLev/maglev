@@ -164,6 +164,12 @@ describe 'MDB::ServerApp: MDB::Server requests' do
     @expected_status = 404
     r = delete "/this_is_not_a_db_name"
   end
+
+  it 'provides debug info with GET /debug_info' do
+    info = get '/debug_info'
+    info.class.must_equal String
+    (info.size > 10).must_equal true
+  end
 end
 
 describe 'MDB::ServerApp: MDB::Database requests' do

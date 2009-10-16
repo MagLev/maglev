@@ -1,0 +1,20 @@
+#header {
+	margin-top: 0px;
+	background: #4A4947;
+	width: 950px;
+	height: 86px;
+}
+#navigation {
+	background: #E6E5E0;
+	border-left: solid #DBDAD5 1px;
+	border-right: solid #DBDAD5 1px;
+	border-bottom: solid #DBDAD5 1px;
+	width: 918px;
+	height: 35px;
+	text-align: right;
+	padding-left: 30px;
+}
+#content {
+	width: 950px;
+	margin-top: 30px;
+}

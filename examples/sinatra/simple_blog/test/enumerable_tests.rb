@@ -11,7 +11,7 @@ Exception.install_debug_block do |e|
   end
 end
 
-describe Post do
+describe SimplePost do
   before do
     5.times do |i|
       Post.new(:title => "Title #{i}", :text => "Text #{i}")
@@ -19,7 +19,7 @@ describe Post do
   end
 
   it "responds to each correctly" do
-    titles = Post.map { |p| p.title }
+    titles = SimplePost.map { |p| p.title }
     titles.size.must_equal 5
   end
 end
