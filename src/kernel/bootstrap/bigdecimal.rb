@@ -596,9 +596,8 @@ class BigDecimal
       count -= 3                # count now 7..9
     end
     if count > 0
-      arr = [ nil, nil ]
       divisor = TEN_POWER_TABLE[count] 
-      val._quo_rem( divisor , arr)
+      arr = val._quo_rem( divisor , [ nil, nil ] )
       val = arr[0]
       rem = arr[1]
       if rem._not_equal?(0)
@@ -623,23 +622,44 @@ class BigDecimal
     #   where count tells how many trailing zeros were removed.
     val = an_integer
     count = 0
-    if val > 0
-      if (val % 10).equal?(0)
-        while (val >= 1000_000_000) && (val % 1000_000_000).equal?(0)
-          val = val._divide(1000_000_000)
-          count += 9
-        end
-        while (val >= 1000) && (val % 1000).equal?(0)
-          val = val._divide(1000)
-          count += 3
-        end
-        while (val >= 10) && (val % 10).equal?(0)
-          val = val._divide(10)
-          count += 1
+    qr_first = val._quo_rem( 10,  [nil,nil] )
+    if qr_first[0]._not_equal?(0) && qr_first[1].equal?(0)
+      #  (val > 10) && (val % 10) == 0) == true
+      more_than_one_zero = false
+      qr = [nil,nil]
+      if val >= 1000_000_000 
+        val._quo_rem( 1000_000_000 ,  qr )
+        while (v_next = qr[0])._not_equal?(0) && qr[1].equal?(0) 
+	  # ((val >= 1000_000_000) && (val % 1000_000_000)==0)==true  
+	  val = v_next
+	  count += 9
+	  more_than_one_zero = true
+	  val._quo_rem( 1000_000_000, qr)
         end
       end
+      val._quo_rem( 1000, qr )
+      while (v_next = qr[0])._not_equal?(0) && qr[1].equal?(0) 
+	# ((val >= 10000) && (val % 1000)==0)==true  
+	val = v_next
+	count += 3
+	more_than_one_zero = true
+	val._quo_rem( 1000, qr )
+      end
+      if more_than_one_zero
+	val._quo_rem( 10 , qr )
+      else          
+	qr = qr_first
+      end
+      while (v_next = qr[0])._not_equal?(0) && qr[1].equal?(0)
+	# ((val >= 10) && (val % 10).equal?(0))==true
+	val = v_next
+	count += 1
+	val._quo_rem( 10 , qr )
+      end
     end
-    [ val , count ] 
+    qr_first[0] = val # reuse qr_first as result array
+    qr_first[1] = count
+    qr_first
   end
 
   def _multiply_by_tenpower(an_integer, power)

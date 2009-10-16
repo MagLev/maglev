@@ -76,10 +76,24 @@ class String
       raise ArgumentError , 'arg must be positive'
     end
     str = self.class.new
-    k = 0
-    while k < n
+    if n >= 64 
+      kstr = self.class.new 
+      kstr << self
+      k = 1
+      klim = n >> 4
+      # grow kstr to max of 1/16 of result size or 16K bytes
+      while k < klim && kstr.length < 8000 
+        kstr << kstr 
+        k = k * 2
+      end
+      while n > k
+        str << kstr
+        n -= k
+      end   
+    end
+    while n > 0
       str << self
-      k = k + 1
+      n -= 1
     end
     str
   end
