@@ -66,6 +66,7 @@ module MDB
     end
 
     def handle_response(response)
+      puts "--- response: #{response.inspect}"
       case response
       when HTTP::Message
         begin
@@ -120,6 +121,10 @@ module MDB
     def clear
       @rest.get("/#{@db_name}/send/clear")
     end
+
+    def debug_info
+      @rest.get("/#{@db_name}/debug_info")
+    end
   end
 
   class RESTServer
@@ -154,6 +159,10 @@ module MDB
 
     def db_names
       @rest.get("/")
+    end
+
+    def debug_info
+      @rest.get("/debug_info")
     end
   end
 end

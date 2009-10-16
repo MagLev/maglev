@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'sinatra/base'
 require 'maglev/objectlog'
-require 'txn_wrapper'
 
 # A simple object log viewer.  This app tries to be re-locatable.  It looks
 # at the @@path class variable for its mount point, and then makes all URLs
@@ -13,23 +12,42 @@ class ObjectLogApp < Sinatra::Base
   set :server, ["webrick"]   # Maglev currently only supports webrick
   set :environment, :development
   set :static, true                # Allow loading /style.css, etc.
-  set :app_file, __FILE__          # Affects :views, :public and :root
+
+  # Setup for :views, :public and :root
+  set :app_file, File.expand_path(__FILE__)
+#  set :app_file, d
+#  set :views,  File.join(d, 'views')
+#  set :public, File.join(d, 'public')
 
   def initialize(*args)
     super(*args)
     @title = "Object Log Application"
+    # NOTE: Main App URL is a hack...works with most examples
     @nav_bar = <<-EOS
         <ul class="menu">
-          <li><a href="/">Main App</a></li>
+          <li><a href="#{@@main_app_url}">Main App</a></li>
+          <li><a href="#{path_for('/')}">Main Object</a></li>
+          <li><a href="#{path_for('/objectlog')}">ObjectLog</a></li>
           <li><a href="#{path_for('/clear')}">Clear Log</a></li>
         </ul>
     EOS
   end
 
   @@script_name = ''
+  @@main_app_url = '/'
+  @@main_object  = ObjectLogEntry.object_log
 
   def self.script_name=(str)
     @@script_name = str
+  end
+
+  def self.main_app_url=(str)
+    @@main_app_url = str
+  end
+
+  def self.main_object=(eval_str)
+    @@main_object = eval eval_str
+    puts "----- MAIN OBJECT: #{@@main_object}"
   end
 
   def path_for(string)
@@ -37,11 +55,26 @@ class ObjectLogApp < Sinatra::Base
   end
 
   get '/info' do
-    erb :info
+    <<-EOS
+<h3>ObjectLog Info</h3>
+<ul>
+  <li>:app_file  #{options.app_file.inspect} </li>
+  <li>:views     #{options.views.inspect} </li>
+  <li>:public    #{options.public.inspect} </li>
+  <li>:root      #{options.root.inspect} </li>
+  <li>@@main_object: #{@@main_object.inspect} (#{@@main_object.class})</li>
+</ul>
+    EOS
+#    erb :info
   end
 
   get '/' do
-    STDERR.puts
+    Maglev.abort_transaction  # Get a fresh object view
+    @object = @@main_object
+    erb :objectdetail
+  end
+
+  get '/objectlog' do
     Maglev.abort_transaction  # Get a fresh object view
     @objectlog = ObjectLogEntry.object_log
     erb :objectlog
@@ -62,6 +95,7 @@ class ObjectLogApp < Sinatra::Base
     erb :objectdetail
   end
 
+  # Allows introspection of an arbitrary object
   get '/object/:id' do
     oop = params[:id].to_i
     @object = ObjectSpace._id2ref(oop)

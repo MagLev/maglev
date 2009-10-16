@@ -24,30 +24,35 @@
           <% if @show_tags %>
           <h4>Tags</h4>
           <ul>
-            <% SimpleTag.all.each do |tag| %>
-            <li><a href="/tag/<%= tag.__id__ %>"><%= tag.name %></a></li>
+            <% Tag.all.each do |tag| %>
+            <!--            <li><a href="/tag/<%= tag.__id__ %>"><%= tag.name %></a></li> -->
             <% end %>
           </ul>
           <% end %>
-          <h4>Debug Links</h4>
+          <h4>Debug</h4>
           <ul>
-            <li>The <a href="/objectlog/">Object Log</a> is a work in
-              progress.  It is a mini-inspector for the MagLev object log.
-              You will need to put items into the object log yourself</li>
-            <li>A <a href="/debug">debug</a> link, which may or may not
-            work...</li>
+            <li>Show <a href="/debug">debug info</a> for the MDB server.</li>
+            <li><a href="http://localhost:4567/objectlog/">MDB::Server
+            object viewer</a></li>
           </ul>
 
           <h4>About</h4>
-          <p>This is a simple sinatra application running on MagLev</p>
+          <p>
+            This is a simple sinatra application running on MRI that uses
+            MaglevDB (MDB) as its database.  The MRI app communicates with
+            MDB via an HTTP REST api and uses ruby marshal format for
+            data transfer.
+          </p>
           <h4>Credit</h4>
-          <p>The layout is <a href="http://css4free.com/wp-content/uploads/templates/zineprint/">zineprint</a>, Designed by
-             <a href="http://rizzle.us.to">Rizzle Studios</a>.
+          <p>The layout is
+            <a href="http://css4free.com/wp-content/uploads/templates/zineprint/">zineprint</a>,
+            Designed by <a href="http://rizzle.us.to">Rizzle Studios</a>.
         </div>
       </div>
       <div id="footer">
-        <%= @title %> running on
-        <a href="http://maglev.gemstone.com">MagLev</a>
+        <%= @title %>
+        (running on <%= (defined? RUBY_ENGINE) ? RUBY_ENGINE : "MRI" %>
+        version <%= RUBY_VERSION %>)
       </div>
     </div>
   </body>
