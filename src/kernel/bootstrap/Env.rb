@@ -38,11 +38,11 @@ class Env
     end
 
     def []=(key, val)
-      if key._isString 
+      if key._isString
         if key.index('GEMSTONE').equal?(0)
           raise 'you may not change GEMSTONE* environment variables from within maglev'
         end
-        if key.index('MAGLEV').equal?(0)
+        if key.index('MAGLEV').equal?(0) and key != 'MAGLEV_OPTS'
           raise 'you may not change MAGLEV* environment variables from within maglev'
         end
       end
@@ -59,7 +59,7 @@ class Env
 
     def clear
       raise NotImplementedError
-    end 
+    end
 
     def delete(aKey, &aBlock)
       # can't delete from C environment, can only []=(aKey,'')
@@ -68,7 +68,7 @@ class Env
     def delete(aKey)
       raise NotImplementedError
     end
-    def delete_if(&block)     
+    def delete_if(&block)
        raise NotImplementedError
     end
     def merge(aHash)

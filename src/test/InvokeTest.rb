@@ -4,7 +4,7 @@ require File.expand_path('simple', File.dirname(__FILE__))
 
 # this is so we can run this file with either MRI or MagLev
 A_OUT = defined?(RUBY_ENGINE) ? 'maglev-ruby' : 'ruby'
-#puts "=== A_OUT: #{A_OUT}"
+ENV['MAGLEV_OPTS'] = ''  # Ensure -MtraceLoad doesn't mess us up
 
 # ############################################################
 # Ensure __FILE__ is correct
@@ -30,6 +30,9 @@ test_cases.each_with_index do |tc,i|
     test(`#{A_OUT} #{tc.prefix}echo__FILE__.rb`, tc.result, "[#{i}] #{tc}")
   end
 end
+
+# Make sure if file does not end in .rb, that __FILE__ does not end in .rb
+test(`#{A_OUT} #{here}/lib/echo__FILE__`, "#{here}/lib/echo__FILE__\n", 'no .rb')
 
 # ############################################################
 # Ensure #" ($LOADED_FEATURES) is set correctly
