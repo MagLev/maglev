@@ -1,2 +1,0 @@
-fails:Math#log returns the natural logarithm for Complex numbers
-fails:Math.log returns the natural logarithm for Complex numbers

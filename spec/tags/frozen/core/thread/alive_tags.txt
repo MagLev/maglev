@@ -1,2 +1,3 @@
 hangs:Thread#alive? describes a running thread
 fails:Thread#alive? reports aborting on a killed thread
+fails:Thread#alive? describes a dying running thread

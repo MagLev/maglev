@@ -1,5 +1,4 @@
 fails:Module#autoload sets the autoload constant in the constants table
-fails:Module#autoload loads the registered constant into a dynamically created class
 fails:Module#autoload loads the registered constant when it is opened as a class
 fails:Module#autoload loads the registered constant when it is opened as a module
 fails:Module#autoload does not load the file when the constant is already set

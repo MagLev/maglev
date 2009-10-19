@@ -1,6 +1,5 @@
 fails:Date#civil creates a Date for -4712 by default
 fails:Date#civil creates a date with arguments
 fails:Date#civil creats a Date for different calendar reform dates
-fails:Date#civil doesn't blow up (illegal instruction and segfault, respectively) when fed huge numbers
 fails:Date#valid_civil? should be able to determine if a date is valid
 fails:Date#valid_civil? should be able to handle negative months and days

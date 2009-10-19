@@ -3,3 +3,4 @@ fails:Thread#exit runs nested ensure clauses
 hangs:Thread#exit killing dying running does nothing
 hangs:Thread#exit does not deadlock when called from within the thread while being joined from without
 fails:Thread#exit sets $! in outer ensure clause if inner ensure clause raises exception
+fails:Thread#exit cannot be rescued

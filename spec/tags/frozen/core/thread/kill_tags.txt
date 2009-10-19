@@ -3,3 +3,4 @@ fails:Thread#kill killing dying sleeping thread wakes up thread
 hangs:Thread#kill killing dying running does nothing
 hangs:Thread#kill does not deadlock when called from within the thread while being joined from without
 fails:Thread#kill sets $! in outer ensure clause if inner ensure clause raises exception
+fails:Thread#kill cannot be rescued
