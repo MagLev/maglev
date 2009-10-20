@@ -80,6 +80,7 @@ class Proc
       if blk._isBlock
         inst = self.allocate
         b = blk._copyForRuby(2) # transform break bytecodes if any
+        b.freeze
         inst._initialize(&b)
         inst.initialize
         return inst
@@ -94,6 +95,7 @@ class Proc
       if blk._isBlock
         inst = self.allocate
         b = blk._copyForRuby(2) # transform break bytecodes if any
+        b.freeze
         inst._initialize(&b)
         inst.initialize
         return inst
@@ -112,11 +114,13 @@ class Proc
       if blk._isBlock
         inst = self.allocate
         b = blk._copyForRuby(0)
+        b.freeze
         inst._initialize(&b)
         return inst
       elsif blk.is_a?(Proc)
         pb = blk._block
         b = pb._copyForRuby(0)
+        b.freeze
         if (b.equal?(pb)) 
           return blk  # the argument blk  is already a lambda
         else
