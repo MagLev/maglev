@@ -32,12 +32,12 @@ back_trace = a(1,2,3)
 # END of line number sensitive code
 
 expected =
-  ["src/test/CallerTest.rb:23:in `c'",
-   "src/test/CallerTest.rb:26:in `each'",
-   "src/test/CallerTest.rb:26:in `c'",
+  ["src/test/CallerTest.rb:25:in `c'",
+   "src/test/CallerTest.rb:24:in `each'", # (line 24 in this file)
+   "src/test/CallerTest.rb:24:in `c'",
    "src/test/CallerTest.rb:19:in `b'",
    "src/test/CallerTest.rb:15:in `a'",
-   "src/test/CallerTest.rb:23"]
+   "src/test/CallerTest.rb:30"]
 
 # Since the file names in the stack trace are different when invoked from
 # command line and from vm-tests, we just match the common suffix
