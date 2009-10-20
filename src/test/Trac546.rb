@@ -26,4 +26,34 @@ spec_code=<<EOS
 EOS
 
 xx = eval(spec_code, binding, "foo")
+
+# more test cases from recent (15Oct09) rubyspecs
+$A = "aa"
+class C546
+  def ma
+       lambda do
+         begin
+           return 98
+         ensure
+           $A = $A + "bb"
+         end
+       end
+  end
+  def mb
+       lambda do
+         begin
+           break 97 
+         ensure
+           $A = $A + "cc"
+         end
+       end
+  end
+end
+
+x = C546.new.ma.call
+unless x == 98 ; raise 'error'; end
+y = C546.new.mb.call
+unless y == 97 ; raise 'error'; end
+unless $A == 'aabbcc' ; raise 'error'; end
+
 true
