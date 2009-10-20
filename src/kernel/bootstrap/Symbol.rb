@@ -56,9 +56,8 @@ class Symbol
     end
   end
 
-  def to_str
-    # MRI raises a NoMethodError
-    raise TypeError , 'to_str not allowed for Symbol'
+  def taint
+    self # do nothing
   end
 
 end
