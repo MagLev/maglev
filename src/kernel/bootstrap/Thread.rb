@@ -42,9 +42,8 @@ class Thread
         file1, line1, meth1 = _find_next_user_info_for(idx+1, ststack)
         file, line = file1, line1 if file1  # don't replace meth
       end
-
       meth = ":in `#{meth}'" unless meth.nil?
-      result << "#{file}:#{line}#{meth}" if file
+      result << "#{file}:#{line}#{meth}"  if file 
     end
     result[(res_start_ofs+1)..-1]
   end
@@ -73,12 +72,15 @@ class Thread
       meth = $1
       meth = nil if meth =~ /_compileFile/
       if source
+        # get baseline and file name from comment at end of method's source
         lines = source.split("\n").grep(/# method/)
         unless lines.empty?
           if /line (\d+) .* file (.*)/=~ lines[-1]
-            baseline = $1.to_i
+            baseline = $1.to_i   
             file = $2
-            return [file[0..-2], baseline + line, meth]
+            # baseline and line are both 1-based , so -1 here
+            lnum = baseline + line - 1 
+            return [file[0..-2], lnum , meth]
           end
         end
       end
