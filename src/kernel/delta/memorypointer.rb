@@ -93,9 +93,13 @@
 
     primitive_nobridge 'autorelease', 'autoRelease'
 
-    # def autorelease=(val) ; end # Maglev TODO 
+    primitive_nobridge 'autorelease=', 'autoRelease:'
+      # argument must be a boolean, false means disable auto-free
+      #  all other values ignored.
    
     primitive_nobridge 'free' , 'setDead'
+      # does not actually free C memory. subsequent attempts
+      # to access C memory will raise an exception.
 
     def derived_from
       # the instance which owns the C memory pointed to by self,

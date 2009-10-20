@@ -127,16 +127,31 @@ module FFI
       @type_size = 1
     end
     def initialize(elem_size)
+      unless elem_size._isFixnum && elem_size > 0
+        raise TypeError, 'element size must be a Fixnum > 0'
+      end
       @type_size = elem_size
     end
     def type_size
       @type_size
     end
-    def _type_size=(v)
-      @type_size = v
+    def _type_size=(elem_size)
+      unless elem_size._isFixnum && elem_size > 0
+        raise TypeError, 'element size must be a Fixnum > 0'
+      end
+      @type_size = elem_size 
     end
      
     # remainder of implementation in memorypointer.rb
+  end
+
+  class AutoPointer < MemoryPointer
+    # All Maglev MemoryPointer's have auto-free behavior unless
+    #  auto-free explicitly disabled on an instance
+  end
+
+  class Buffer < MemoryPointer
+    # remainder of implementation in buffer.rb
   end
 
   class StructLayout

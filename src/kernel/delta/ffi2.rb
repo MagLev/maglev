@@ -39,6 +39,7 @@ module FFI
     primitive_nobridge 'int32_put', 'int32At:put:'
     primitive_nobridge 'int64_put', 'int64At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
+    primitive_nobridge '_unsigned_wordsize_at', '_unsigned:at:'
 
     primitive_nobridge 'stringfrom_to', 'stringFrom:to:'
 	# zero-based start offset,  zero-based end offset(NOT limit)
@@ -56,6 +57,11 @@ module FFI
     primitive_nobridge 'memset' , 'memset:from:to:' 
      # args are  ushort value, zero-based start offset, 
      #    zero-based end offset (-1 means to end of allocated C memory)
+
+    def _search_for_zerobyte(offset)
+      # result -1 if no null byte found
+      self._unsigned_wordsize_at(-1, offset) 
+    end
 
     def self.new(size)
       # creates an instance with C data zeroed, and to be auto-freed by GC
