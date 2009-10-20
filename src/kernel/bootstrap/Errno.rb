@@ -24,10 +24,27 @@ module Errno
     self.handle(errnum, '')
   end
 
+  def self._new_for_errno(errno)
+    cls = ERRNO_TO_EXCEPTION[errno];
+    if cls.equal?(nil)
+      return nil
+    end
+    exc = cls.allocate
+    exc._st_initialize
+    exc.errno=(errno)
+    exc
+  end
+
   def self.raise_errno(errno, additional='')
-    errno_exc = ERRNO_TO_EXCEPTION[errno]
-    errno_exc ||= SystemCallError.new("System error (errno: #{err}):", err)
-    raise errno_exc, additional
+    exc = self._new_for_errno(errno)
+    if exc.equal?(nil) 
+      exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
+      ex._signal
+    end
+    if additional._isString && additional.length > 0
+      exc._message=(additional)
+    end
+    exc._signal 
   end
   private
 

@@ -174,14 +174,31 @@ class SystemCallError
       raise ArgumentError, 'too few args'
     end
     argone = args[0]
-    if argone._isString
-      exc = super(argone)
-      if args.length >= 2
-        exc.errno=(args[1] ) # the errno
-      end
+    argtwo = nil
+    errnum = nil
+    if argone._isFixnum
+      errnum = argone
+      msg = nil
+    elsif argone._isString
+      msg = argone
+      if args.length >= 2 
+        argtwo = args[1]
+        if argtwo._isFixnum
+          errnum = argtwo
+        end
+      end  
+    end
+    if errnum._not_equal?(nil)
+      exc = Errno._new_for_errno(errnum)
+    end
+    if exc.equal?(nil)
+      exc = self.allocate
+      exc.errno=(errnum)
+    end
+    if msg.equal?(nil)
+      exc._message=('Unknown error')
     else
-      exc = super('Unknown error')
-      exc.errno=(argone)
+      exc._message=(msg)
     end
     exc
   end
