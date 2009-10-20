@@ -30,7 +30,7 @@ module WEBrick
 
     def set_close_on_exec(io)
       if defined?(Fcntl::FD_CLOEXEC)
-        io.fcntl(Fcntl::FD_CLOEXEC, 1)
+        io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)  # Maglev fix
       end
     end
     module_function :set_close_on_exec
