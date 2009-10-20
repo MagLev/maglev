@@ -77,11 +77,12 @@ class String
     end
     str = self.class.new
     if n >= 64 
+      # optimization to reduce number of iterations for large n
       kstr = self.class.new 
       kstr << self
       k = 1
-      klim = n >> 4
-      # grow kstr to max of 1/16 of result size or 16K bytes
+      klim = n._divide(16)
+      # grow kstr to max of ( 1/16 of result size , 16K bytes)
       while k < klim && kstr.length < 8000 
         kstr << kstr 
         k = k * 2
