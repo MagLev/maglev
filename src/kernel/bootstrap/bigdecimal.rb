@@ -603,7 +603,7 @@ class BigDecimal
       if rem._not_equal?(0)
         mode = ROUNDING_mode
         if mode.equal?(0) # ROUND_HALF_UP
-          if rem > (divisor >> 1) 
+          if rem > (divisor._divide(2) ) 
             val += 1
           end
         elsif mode.equal?(1) # ROUND_UP
@@ -1072,7 +1072,7 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
       divisor._init_normal( 1, 1, d_exp )
       divisor._set_precision(UNLIM_PRECISION)
       reduced_bd = self.div(divisor, 0)
-      r_expon = d_exp >> 1
+      r_expon = d_exp._divide(2)
     elsif true_exp < -300
       m_exp = 0 - (true_exp + 300) 
       if (m_exp & 1) == 1
@@ -1082,7 +1082,7 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
       mu._init_normal( 1, 1, m_exp )
       mu._set_precision(UNLIM_PRECISION)
       reduced_bd = self.mult(mu, 0)
-      r_expon = (0 - m_exp) >> 1
+      r_expon = (0 - m_exp)._divide(2)
     else
       reduced_bd = self
       r_expon = 0
