@@ -283,7 +283,7 @@ module MagRp
 		  ["end",      [:kEND,      :kEND        , RubyLexer::Expr_end   ]],
 		  ["else",     [:kELSE,     :kELSE       , RubyLexer::Expr_beg   ]],
 		  ["case",     [:kCASE,     :kCASE       , - RubyLexer::Expr_beg   ]],
-		  ["ensure",   [:kENSURE,   :kENSURE     , RubyLexer::Expr_beg   ]],
+		  ["ensure",   [:kENSURE,   :kENSURE     , - RubyLexer::Expr_beg   ]],
 		  ["module",   [:kMODULE,   :kMODULE     , RubyLexer::Expr_beg   ]],
 		  ["elsif",    [:kELSIF,    :kELSIF      , RubyLexer::Expr_beg   ]],
 		  ["def",      [:kDEF,      :kDEF        , - RubyLexer::Expr_fname ]],  

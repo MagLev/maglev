@@ -1842,11 +1842,11 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                     {
 		      # opt_ensure: kENSURE compstmt
                       v_one = val[vofs + 1]
-                      if (v_one != nil) then
-                        result = v_one
-                      else
-                        result = RubyNilNode._new # s(:nil)
+                      if v_one.equal?(nil)
+                        v_one = RubyNilNode._new # s(:nil)
                       end
+                      result = RubyEnsureNode.s( v_one )
+                      result.src_offset=( val[vofs ].src_offset ) # kENSURE position
                     }
                 | none
 

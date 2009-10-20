@@ -1069,11 +1069,12 @@ class RubyLexer
             @yacc_value = :"=>"
             return :tASSOC
           else #  if src.scan(/\=/) then
+            # was_begin_of_line and scan(/begin(?=\s)/) 
             s_ch = src.advance_peek(1)
             if s_ch.equal?( ?b ) and 
                (src.peek_ahead(-2).equal?( ?\n ) or src.pos.equal?(1)) and 
                src.check_advance(/begin(?=\s)/) 
-              #  was_begin_of_line and scan(/begin(?=\s)/) 
+              # handle multi-line comment  begin= ... =end  
               unless src.check_advance(/.*?\n=end\s*(\n|\z)/m) then
                 rb_compile_error("embedded document meets end of file")
               end

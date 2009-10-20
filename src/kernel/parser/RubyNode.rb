@@ -323,14 +323,16 @@ module MagRp
        end
 
        class RubyEnsureNode
-         def self.s(body, ensure_body)
+         def self.s(ensure_body)
            res = self._new
-           res.init(body, ensure_body)
+           res.init(ensure_body)
          end
-         def init(body, ensure_body)
-           @bodyNode = body
+         def init(ensure_body)
            @ensureNode = ensure_body
            self
+         end
+         def set_body(node)
+           @bodyNode = node
          end
          def inspect
            "[:ensure, #{@bodyNode.inspect}, #{@ensureNode.inspect}]"

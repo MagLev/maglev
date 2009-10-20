@@ -5350,11 +5350,11 @@ end
 def _reduce_371(val, vofs)
 		      # opt_ensure: kENSURE compstmt
                       v_one = val[vofs + 1]
-                      if (v_one != nil) then
-                        result = v_one
-                      else
-                        result = RubyNilNode._new # s(:nil)
+                      if v_one.equal?(nil)
+                        v_one = RubyNilNode._new # s(:nil)
                       end
+                      result = RubyEnsureNode.s( v_one )
+                      result.src_offset=( val[vofs ].src_offset ) # kENSURE position
                     
     result
 end

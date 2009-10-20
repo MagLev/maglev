@@ -54,9 +54,6 @@ module MagRp # {
       @goto_check = TransientShortArray._with_shorts(@goto_check).freeze
       @goto_default = @goto_default
       @goto_pointer = @goto_pointer
-      @lexer = nil
-      @env = nil 
-      @syntax_err_count = 0
       rt = @reduce_table.dup
       len = rt.size
       idx = 0
@@ -69,6 +66,9 @@ module MagRp # {
       rt.freeze
       @reduce_table = rt
       @token_table = @token_table
+      @lexer = nil
+      @env = nil 
+      @syntax_err_count = 0
       self._set_nostubbing
       self
     end
@@ -88,6 +88,10 @@ module MagRp # {
       @racc_error_status = 0
     end
 
+    def env
+      @env
+    end
+
     # remaining code is in files racc_init_parser.rb and racc_parser.rb 
 
   end # ]
@@ -96,8 +100,19 @@ module MagRp # {
 
     VERSION = '2.0.2'
 
-    attr_accessor :lexer, :in_def, :in_single, :file_name , :syntax_err_count
-    attr_reader :env , :source_string
+    def _bind_instvars
+      # Used to initialze a transient copy of MagTemplate, returns receiver
+      @in_single = 0
+      @in_def = false
+      super
+    end
+
+    def file_name
+      @file_name
+    end
+    def source_string
+      @source_string
+    end
 
     InvalidAssignableLhs = IdentitySet.with_all(
        [ :self , :nil , :true , :false , :"__LINE__" , :"__FILE__" ] )

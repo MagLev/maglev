@@ -577,7 +577,7 @@ module MagRp # {
       end
       if first_ch.equal?( ?_ )
 	if id.equal?(:__FILE__)   
-	  return RubyStrNode.s( self.file_name )        
+	  return RubyStrNode.s( @file_name )        
 	elsif id.equal?(:__LINE__) # s(:lit...)  # id was a RpNameToken
 	  return RubyFixnumNode.s( src_ofs )
 	end
@@ -764,8 +764,9 @@ module MagRp # {
 	result = block_append(result, v_two)  # may create a new :block
       end
       v_three = val[vofs + 3]
-      if v_three
-	result = RubyEnsureNode.s( result, v_three)  # s(:ensure )
+      if v_three  # v_three is a RubyEnsureNode
+        v_three.set_body( result ) 
+	result = v_three 
       end
       return result
     end
@@ -1165,8 +1166,8 @@ module MagRp # {
       result = RubySClassNode.s(recv, body)
       result.src_offset=( cls_token.src_offset )
 
-      self.in_def = in_def
-      self.in_single = in_single
+      @in_def = in_def
+      @in_single = in_single
       result
     end
 
@@ -1322,7 +1323,7 @@ module MagRp # {
       unless str._isString
 	raise ArgumentError, 'expected a string'
       end
-      @file_name = load_name
+      @file_name = load_name  # used for __FILE__
       @source_string = str 
       @lexer.install_source( str )
       ast = self._racc_do_parse_rb()

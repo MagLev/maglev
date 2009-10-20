@@ -27,9 +27,6 @@ module MagRp
       if t.equal?(nil)
         t = MagTemplate.dup # make copy of persistent template
         t._bind_instvars
-        t.in_def = false
-        t.in_single = 0
-        t.syntax_err_count = 0
         Gemstone.session_temp_put( key, t) 
       end
       res = t.dup
