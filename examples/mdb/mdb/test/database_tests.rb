@@ -82,4 +82,16 @@ describe MDB::Database do
     @db.add(Object.new)
     ViewClass.count.must_equal 1
   end
+
+  it 'iterates over the documents' do
+    # When no documents, should be 0
+    count = 0
+    @db.each { |d| count += 1 }
+    count.must_equal 0
+
+    4.times { |i| @db.add(Object.new) }
+    count = 0
+    @db.each { |d| count += 1 }
+    count.must_equal 4
+  end
 end

@@ -109,6 +109,10 @@ module MDB
     end
     private :validate_class
 
+    def each
+      @documents.each { |d| yield d }
+    end
+
     #############################################
     # DEBUG METHODS:
     # TODO: remove debug methods
