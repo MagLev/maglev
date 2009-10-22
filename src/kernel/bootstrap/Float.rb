@@ -39,41 +39,23 @@ class Float
 
   PlusInfinity = _resolve_smalltalk_global(:PlusInfinity)
 
-  def coerce(param, &block)
-    unless param.equal?(nil)
-      begin
-        if param._isString
-          v = Float(param)
-        else
-          v = param.to_f
-        end
-        if v._isFloat
-          return [ v, self ]
-        end
-      rescue
-        # continue execution
-      end
-    end
-    super
-  end
-
   def coerce(param)
-    # non-bridge variant without block arg
-    unless param.equal?(nil) 
-      begin
-        if param._isString
-          v = Float(param)
-        else
-          v = param.to_f
-        end
-        if v._isFloat
-          return [ v, self ]
-        end
-      rescue
-        # continue execution
-      end
+    if param._isInteger
+      return [ param.to_f, self]
     end
-    super
+    begin
+      if param._isNumeric
+        v = param.to_f
+      elsif param._isString
+        v = Float(param)
+      end
+      if v._isFloat
+        return [ v, self ]
+      end
+    rescue
+        # continue execution
+    end
+    super(param)
   end
 
   def self.induced_from(obj)
@@ -108,12 +90,7 @@ class Float
     if a == 0.0
       raise FloatDomainError ,'arg to divmod was zero'
     end
-    q = (self._divide(a)).floor
-    r = self % a 
-    unless (self < 0.0).equal?(a < 0.0)
-      r = r + a
-    end
-    [ q, r ]
+    [ (self._divide(a)).floor , self % a  ]
   end
 
   # quo inherited from Numeric

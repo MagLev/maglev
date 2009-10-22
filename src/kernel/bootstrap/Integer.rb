@@ -10,57 +10,17 @@
 
 class Integer
 
-  def coerce(param, &block)
-    s = nil
-    p = nil
-    v = nil
-    unless param.equal?(nil) || param._isSymbol
-      float_attempted = false
-      begin
-        if param._isFloat
-          float_attempted = true
-          s = self.to_f 
-          if s._isFloat && ! s.nan?
-            return [ param, s ] 
-          end
-        end
-	v = param.to_int
-	if v._isInteger
-	  return [ v, self ]
-	end
-      rescue
-        # continue execution
-      end
-      unless float_attempted
-	begin
-	  unless param.equal?(nil)
-            if param._isString
-              v = Float(param)
-            else
-              v = param.to_f
-            end
-	    if v._isFloat && ! v.nan?
-	      return [ v, self.to_f ]
-	    end
-	  end
-	rescue
-	  # continue execution
-	end 
-      end
-    end
-    super
-  end
-
   def coerce(param)
-    # non-bridge variant to optimize common case of float arg and no block
+    # handle common case of float arg, else defer to Numeric
     if param._isFloat
-      s = self.to_f
+      s = self.to_f 
       if s._isFloat && ! s.nan?
         return [ param, s ]
-      end 
+      end
+    elsif param._isInteger
+      return [ param, self ]
     end
-    blk = nil
-    self.coerce(param, &blk)
+    super(param)
   end
 
   def self.induced_from(obj)

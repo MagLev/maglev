@@ -3,7 +3,7 @@
 
 class Numeric
 
-  def coerce(param, &block)
+  def coerce(param)
     if param._isNumeric && param.class.equal?(self.class)
       return [ param, self ]
     end
