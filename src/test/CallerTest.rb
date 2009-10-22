@@ -39,16 +39,22 @@ expected =
    "src/test/CallerTest.rb:15:in `a'",
    "src/test/CallerTest.rb:30"]
 
+bt_suffixes = []
+back_trace.each do | str | 
+  bt_suffixes << str[-25, 25]
+end
+
 # Since the file names in the stack trace are different when invoked from
 # command line and from vm-tests, we just match the common suffix
 expected.each_with_index do |frame, i|
+  exp_line = frame
   ex_file, ex_line, ex_meth = frame.split(':')
+  act_line = back_trace[i]
   file, line, meth = back_trace[i].split(':')
-
   file_result = file.match /#{ex_file}/
-  test(file_result.nil?, false, "file: expected[#{i}]: #{frame}  actual: #{file}")
-  test(line, ex_line, "line: expected[#{i}]: #{frame}")
-  test(meth, ex_meth, "meth: expected[#{i}]: #{frame}")
+  test(file_result.nil?, false, "filename")
+  test(line, ex_line, "line")
+  test(meth, ex_meth, "meth")
 end
 #test(back_trace, expected, "Backtrace")
 
