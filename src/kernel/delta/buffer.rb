@@ -87,6 +87,17 @@ module FFI
       self.int8_put(offset + len, 0)  # add a null byte
     end
 
+    def put_pointer(ofs, memory_pointer)
+      pval = memory_pointer.read_pointer()
+      self.put_long(ofs, pval);
+    end
+
+    def get_pointer(ofs)
+      p = MemoryPointer.new
+      p.write_pointer( self.get_long(ofs))
+      p
+    end
+
     def total
       self.size
     end

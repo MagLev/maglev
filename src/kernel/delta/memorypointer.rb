@@ -64,6 +64,8 @@
       inst
     end
 
+    # def initialize ; end #   in ffi.rb
+
     class_primitive_nobridge '_with_all', 'withAll:'
 
     def self.from_string(string)
@@ -127,8 +129,7 @@
       self.double_at(0)
     end 
     def read_pointer
-      # resulting derived instance has zero size
-      self.class.from_address( self.int64at(0) )
+      self.int64at(0) 
     end   
     def write_pointer(val)
       self.int64_put(0, val);
@@ -139,7 +140,14 @@
     def write_string(string, num_bytes)
       self.copyfrom_from_to_into(string, 1, num_bytes, 0)
     end
-    
+
+    def put_string(offset, string)
+      len = string.length
+      self.copyfrom_from_to_into(string, 1, len, offset)
+                                # obj, one-based, one-base, zero-based
+      self.int8_put(offset + len, 0)  # add a null byte
+    end
+
     def null? 
       self.address.equal?(0)
     end
@@ -182,6 +190,20 @@
         n += 1
       end
       res
+    end
+
+    def ==(a_memory_pointer)
+      unless a_memory_pointer.kind_of?(self) 
+        return false
+      end
+      a_memory_pointer.read_pointer() == self.read_pointer()
+    end
+
+    def write_array_of_pointer(ary)
+      ofs = 0
+      ary.each do | elem |
+        p = elem.to_ptr
+      end
     end
    
     # def read_array_of_type(type, reader, length) ; end # TODO
