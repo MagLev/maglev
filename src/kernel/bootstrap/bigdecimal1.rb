@@ -8,16 +8,11 @@
 #    It assumes an efficient underlying Bignum implementation,
 #    and a C primitive in Integer to count the number of decimal digits.
 #
-#  BigDecimal is identically Smalltalk class RubyBigDecimal .
-#  having the class defined in Smalltalk is purely for debugging ease.
 
-def BigDecimal(string, _precs=0)
-  BigDecimal.new(string, _precs)
-end
-
-class BigDecimal 
-  #  defined as   class BigDecimal < Numeric   in Smalltalk
+class BigDecimal < Numeric
   # See stdlib/ext/bigdecimal for MatzRuby implementation.
+
+  # for internal structure see comments under accessors in bigdecimal1.rb
 
   include Comparable
 

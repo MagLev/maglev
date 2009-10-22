@@ -1,6 +1,12 @@
+# file bigdecimal.rb , comes after bigdecimal1.rb during bootstrap
+
+def BigDecimal(string, _precs=0)
+  BigDecimal.new(string, _precs)
+end
+
 class BigDecimal
-  # most constants defined in bigdecimal1.rb
-  # for internal structure see comments under accessors
+  # most constants defined in bigdecimal1.rb 
+  # for internal structure see comments under Accessors below
 
   #################
   # Class methods #
@@ -577,7 +583,7 @@ class BigDecimal
     elsif other._isNumeric
       [BigDecimal(other.to_s), self]
     else
-      raise TypeError, 'coercion failed'
+      raise TypeError, 'coercion to BigDecimal failed'
     end
   end
 
