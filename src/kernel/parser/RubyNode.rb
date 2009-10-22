@@ -155,14 +155,14 @@ module MagRp
            primitive_nobridge '_base_selector', 'baseSelector'
            # s_forRp:block:bool: inherited from RubyAbstractWhileNode
            def inspect
-             "[:until, @{conditionNode.inspect}, @{bodyNode.inspect}, #{self._base_selector}]"
+             "[:until, #{@conditionNode.inspect}, #{@bodyNode.inspect}, #{self._base_selector}]"
            end
          end
          class RubyWhileNode
            primitive_nobridge '_base_selector', 'baseSelector'
            # s_forRp:block:bool: inherited from RubyAbstractWhileNode
            def inspect
-             "[:while, @{conditionNode.inspect}, @{bodyNode.inspect}, #{self._base_selector}]"
+             "[:while, #{@conditionNode.inspect}, #{@bodyNode.inspect}, #{self._base_selector}]"
            end
          end
 
@@ -1460,7 +1460,12 @@ module MagRp
          def inspect
            res = "\n[:block, "
            if @list
-             @list.each { | ea |  res << ", #{ea.inspect}" }
+             sep = ""
+             @list.each { | ea |  
+                res << sep 
+                res << "#{ea.inspect}" 
+                sep = ", "
+             }
            end
            res << "]"
            res
