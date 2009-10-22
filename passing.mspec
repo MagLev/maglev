@@ -10,7 +10,7 @@ class MSpecScript
   # Read the conf file, removing trailing newlines and filter out comments
   # and empty lines.
   passing_specs = IO.readlines(conf_file).map { |line| "#{spec_dir}#{line.chomp}"}
-  passing_specs.reject! { |line| line =~ /^\s*$|^\s*#/ }
+  passing_specs.reject! { |line| line =~ /#{spec_dir}\s*$|#{spec_dir}\s*#/ }
 
   # An ordered list of the directories containing specs to run
   set :files, passing_specs
