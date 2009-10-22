@@ -1,5 +1,5 @@
 class Mutex
-  # Mutex is identically the Smalltalk class TransientMutex
+  # Mutex is identically the Smalltalk class RubyTransientMutex
 
   class_primitive_nobridge '_new', 'forRubyMutualExclusion'
 
@@ -20,18 +20,43 @@ class Mutex
 
   primitive_nobridge 'locked?', 'isLocked'
 
-  primitive_nobridge 'try_lock', 'tryLock'
+  primitive_nobridge '_trylock', 'tryLock'
+  primitive_nobridge '_lock', 'wait'
+  primitive_nobridge '_unlock', 'signal'
 
-  primitive_nobridge 'lock', 'wait'
+  def lock
+    self._lock
+    @owner = Thread.current
+    self
+  end
 
-  primitive_nobridge 'unlock', 'signal'
+  def try_lock
+    if self._trylock
+      @owner = Thread.current
+      return true
+    end
+    false  
+  end
+
+  def unlock
+    if locked?
+      unless @owner.equal?(Thread.current)
+        raise ThreadError, 'Mutex#unlock, not owned by current thread'
+      end
+      self._unlock
+      @owner = nil
+    else
+      raise ThreadError, 'Mutex#unlock, the mutex is not locked'
+    end
+  end
 
   def synchronize( &block )
     self.lock
     begin
       yield
     ensure
-      self.unlock
+      self._unlock
+      @owner = nil
     end
   end
 end

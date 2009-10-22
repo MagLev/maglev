@@ -19,14 +19,13 @@ RUBY.global('Hash', 'RubyHash')
 RUBY.global('IdentityHash', 'RubyIdentityHash')
 RUBY.global('Integer', 'Integer')
 RUBY.global('Bignum', 'LargeInteger')
-RUBY.global('BigDecimal', 'RubyBigDecimal')
 RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMeth')  # RubyMeth , RubyUnboundMeth defined in .mcz
 RUBY.global('Module', 'Module')    # for class Module
-RUBY.global('Mutex', 'TransientMutex')
+RUBY.global('Mutex', 'RubyTransientMutex')
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
