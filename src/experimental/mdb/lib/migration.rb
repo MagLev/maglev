@@ -1,3 +1,9 @@
+require 'maglev/ruby_compiler'
+
+class Object
+  primitive_nobridge 'become', 'become:'
+end
+
 module Maglev
 
   # The Migration module provides support for managing versions of a class
@@ -15,10 +21,10 @@ module Maglev
   module Migration
 
     # Migrate to a new version of Class or Module.  The new class / module
-    # definition is in file.  +klass+ is a string or symobl that represents
-    # the fully qualified class name of the Class or Module to migrate
-    # (e.g., 'Maglev::Foo').
-    #
+    # definition is in the string +ruby_code+.  +klass+ is a string or
+    # symobl that represents the fully qualified class name of the Class or
+    # Module to migrate (e.g., 'Maglev::Foo').  This method calls
+    # Maglev.abort_transaction and Maglev.commit_transaction.
     #
     # TODO:
     # * What about other classes/modules in the file?
@@ -26,8 +32,33 @@ module Maglev
     # * What about nested classes etc.
     # * How do you migrate an entire inheritance hierarchy?
     # * What about classes defined programatically in the file?
-    def migrate(klass, file)
+    def migrate(klass, ruby_code, klass_exists=true)
+      Maglev.abort_transaction
+
+      old_class = remove_from_parent klass if klass_exists
+
+      compiler = RubyCompiler.new
+      Maglev.persistent { compiler.compile ruby_code }
+      new_class = get_path(klass)[-1]
+      puts "-- old_class:  #{old_class.inspect} (#{old_class.__id__})"
+      puts "-- new_class:  #{new_class.inspect} (#{new_class.__id__})"
+      puts "-- new_class methods: #{new_class.methods(false).inspect}"
+      raise "Migrate: Can't find new version of #{klass}" unless new_class
+      Maglev.commit_transaction # instance migration needs new txn context
+
+      if klass_exists
+        instances = Repository.instance.list_instances([old_class])[0]
+        puts "-- Migrating #{instances.size} instances of #{klass.inspect}"
+        # TODO: What to do if the new class does not define a migrate_from?
+        instances.each do |old_instance|
+          new_instance = new_class.allocate
+          new_instance.migrate_from old_instance
+          new_instance.become old_instance
+        end
+        Maglev.commit_transaction
+      end
     end
+    module_function :migrate
 
     # Remove the Class or Module named +path_to_class+ from its parent's
     # namespace.  +path_to_class+ is a string or symbol for the path to a
@@ -39,8 +70,9 @@ module Maglev
       parent = path.pop || Object
       raise "#{path_to_class} not a class or module" unless Module === target
       raise "#{parent.inspect} (parent of #{path_to_class}) is not a class or module" unless Module === parent
-      parent.send :remove_const, target.name.to_sym
+      Maglev.persistent { parent.send :remove_const, target.name.to_sym }
       # TODO: Check for Object etc?
+      # TODO: Commit here?
     end
     module_function :remove_from_parent
 
