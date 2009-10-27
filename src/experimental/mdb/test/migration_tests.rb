@@ -19,8 +19,11 @@ MiniTest::Unit.autorun
 #   end
 # end
 
-
 describe Maglev::Migration do
+  before do
+    clear_fixtures
+  end
+
   it "can find fully qualified classes and modules" do
     [['Object',         [Object]],
      ['::Object',       [Object]],
@@ -58,7 +61,6 @@ describe Maglev::Migration do
 
   describe 'immediate migration' do
     it 'must create persistable classes on the first migration' do
-      clear_fixtures
       proc { Data.new(i) }.must_raise NameError
       ruby_source = contents_of 'version_one.rb'
       Maglev::Migration.migrate(:Data, ruby_source, false)
@@ -71,9 +73,6 @@ describe Maglev::Migration do
     end
 
     it 'must upgrade classes on the second migration' do
-      # Clear repository of all old versions of Data, then load the V1 of
-      # data via a migration.
-      clear_fixtures
       ruby_source = contents_of 'version_one.rb'
       Maglev::Migration.migrate(:Data, ruby_source, false)
 
@@ -108,7 +107,6 @@ describe Maglev::Migration do
     end
 
     it 'must migrate all instance variables by default' do
-      clear_fixtures
       ruby_source = contents_of 'default_one.rb'
       Maglev::Migration.migrate(:DefaultV1, ruby_source, false)
 
@@ -116,10 +114,6 @@ describe Maglev::Migration do
       d = DefaultV1.new; d.a = 10; data << d
       d = DefaultV1.new; d.b = 20; data << d
       d = DefaultV1.new; d.a = 10; d.b = 20; data << d
-
-      DefaultV1::CONST_ONE.must_equal 1
-      DefaultV1::CONST_TWO.must_equal 2
-      (defined? DefaultV1::CONST_THREE).must_be_nil
 
       ruby_source = contents_of 'default_two.rb'
       Maglev::Migration.migrate(:DefaultV1, ruby_source, true)
@@ -129,19 +123,41 @@ describe Maglev::Migration do
         data[i].b.must_equal x[1]
         data[i].c.must_equal x[2]
       end
+    end
+
+    it 'must migrate deletions of constants and methods' do
+      ruby_source = contents_of 'default_one.rb'
+      Maglev::Migration.migrate(:DefaultV1, ruby_source, false)
+
+      DefaultV1::CONST_ONE.must_equal 1
+      DefaultV1::CONST_TWO.must_equal 2
+      (defined? DefaultV1::CONST_THREE).must_be_nil
+
+      d = DefaultV1.new
+      d.m1.must_equal 1
+      d.m2.must_equal 2
+      proc { d.m3 }.must_raise NoMethodError
+
+      ruby_source = contents_of 'default_two.rb'
+      Maglev::Migration.migrate(:DefaultV1, ruby_source, true)
 
       (defined? DefaultV1::CONST_ONE).must_be_nil
       DefaultV1::CONST_TWO.must_equal 4
       DefaultV1::CONST_THREE.must_equal 3
+
+      # d = DefaultV1.new
+      d.m1.must_equal 1
+      proc { d.m2 }.must_raise NoMethodError
+      d.m3.must_equal 3
     end
   end
+
   describe 'lazy migration' do
     # The first migration must be non lazy
 
     it 'must upgrade classes on the second migration' do
       # Clear repository of all old versions of Data, then load the V1 of
       # data via a migration.
-      clear_fixtures
       ruby_source = contents_of 'version_one.rb'
       Maglev::Migration.migrate(:Data, ruby_source, false) # non-lazy
 
@@ -174,6 +190,48 @@ describe Maglev::Migration do
         d.y.must_equal i * 3
         d.migrated.must_equal true
       end
+    end
+
+    it 'should support multiple levels of migration' do
+    end
+  end
+
+  describe "failure modes" do
+    before do
+      ruby_source = contents_of 'bad_code_00.rb'
+      Maglev::Migration.migrate(:BadCode, ruby_source, false)
+      @data = fresh_root
+      @data << BadCode.new(123)
+    end
+
+    it 'should not trash old class if code does not compile' do
+
+      # Loading bad code raises an exception
+      proc {
+        ruby_source = contents_of 'bad_code_01.rb'
+        Maglev::Migration.migrate(:BadCode, ruby_source, false)
+      }.must_raise SyntaxError
+
+      # The old data is still there
+      @data[0].id.must_equal 123
+
+      # The class does not have the new constant
+      BadCode.const_defined?(:FOO).must_equal false
+    end
+
+    it '(non lazy) should raise an error if problem during migration' do
+      @data << BadCode.new(2)
+      @data << BadCode.new(0)
+      @data << BadCode.new(1)
+      proc {
+        ruby_source = contents_of 'bad_migration.rb'
+        Maglev::Migration.migrate(:BadCode, ruby_source, true)
+      }.must_raise Maglev::Migration::MigrationFailed
+
+      # Since we don't know the order the migrations were run, the only
+      # thing we can do is ensure the code is committed, remove the
+      # offending item, and rerun the migration.
+      BadCode::Version.must_equal 2
     end
   end
 end

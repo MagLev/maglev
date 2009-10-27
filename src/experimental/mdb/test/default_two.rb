@@ -5,6 +5,7 @@ class DefaultV1
   attr_accessor :a, :b, :c
   def m1; 1 end
   # def m2; 2 end  # Remove a Method
+  def m3; 3 end
 
   # Use default migrate_from code
   # def migrate_from

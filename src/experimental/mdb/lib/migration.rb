@@ -36,6 +36,15 @@ module Maglev
   #    application refers to the classes by name, rather than by reference.
   #
   module Migration
+    class MigrationFailed < RuntimeError
+      attr_reader :old_class, :new_class, :original_exception
+      def initialize(msg, old_class, new_class, root=nil)
+        super(msg)
+        @old_class = old_class
+        @new_class = new_class
+        @original_exception = root
+      end
+    end
 
     # Migrate to a new version of Class or Module.  The new class / module
     # definition is in the string +ruby_code+.  +klass+ is a string or
@@ -45,6 +54,11 @@ module Maglev
     # instances.  If +migrate_instances+ is true, then the new class
     # definition should define a migrate_from method(old_instance), which
     # will be called during the migration to migrate to the new instance.
+    #
+    # Returns the version of klass in exsitence at the start of the method
+    # call (the "old" version).  This is useful in case the ruby_code
+    # commits fine (replacing klass with the new version), but the
+    # migration fails.  You can then reissue a migration call.
     #
     # This method calls Maglev.abort_transaction and
     # Maglev.commit_transaction.
@@ -64,24 +78,30 @@ module Maglev
       compiler = RubyCompiler.new
       Maglev.persistent { compiler.compile ruby_code }
       new_class = get_path(klass)[-1]
+      # TODO: should we abort if we are going to raise this?
       raise "Migrate: Can't find new version of #{klass}" unless new_class
       Maglev.commit_transaction
 
-
-      if migrate_instances # instance migration runs in own transaction
-        instances = Maglev::Repository.instance.list_instances([old_class])[0]
-        # TODO: What to do if the new class does not define a migrate_from?
-        instances.each do |old_instance|
-          new_instance = new_class.allocate
-          new_instance.migrate_from old_instance
-          new_instance.become old_instance
-        end
-        Maglev.commit_transaction
-      end
+      migrate_instances(old_class, new_class) if migrate_instances
+      return old_class
     end
     module_function :migrate
 
-
+    # Migrate instances of old_class to new_class.  This does an abort and a commit.
+    def migrate_instances(old_class, new_class)
+      instances = Maglev::Repository.instance.list_instances([old_class])[0]
+      # TODO: What to do if the new class does not define a migrate_from?
+      instances.each do |old_instance|
+        new_instance = new_class.allocate
+        new_instance.migrate_from old_instance
+        new_instance.become old_instance
+      end
+      Maglev.commit_transaction
+    rescue Exception => e
+      m = "Migration failed from #{old_class.name} => #{new_class.name}"
+      raise MigrationFailed.new(m, old_class, new_class, e)
+    end
+    module_function :migrate_instances
 
     # Migrate to a new version of Class or Module.  The new class / module
     # definition is in the string +ruby_code+.  +klass+ is a string or
