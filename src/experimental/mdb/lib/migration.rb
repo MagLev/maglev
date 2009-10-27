@@ -1,7 +1,24 @@
 require 'maglev/ruby_compiler'
 
+require 'maglev/repository'
+
+# TODO: Move these to bootstrap
 class Object
-  primitive_nobridge 'become', 'become:'
+  # We use _becomeMinimalChecks: because self is on the stack (call to
+  # method_missing, and the call to the original method that triggered the
+  # method_missing), and become: doesn't allow that.
+  #
+  # TODO: Still need to check for indexes
+  primitive_nobridge 'become', '_becomeMinimalChecks:'
+  def migrate_from(other)
+    # default migration implementation just copies existing instance
+    # variables.
+    other.instance_variables.each do |name|
+      sym = name.to_s
+      val = other.instance_variable_get(sym)
+      instance_variable_set(sym, val)
+    end
+  end
 end
 
 module Maglev
@@ -23,8 +40,14 @@ module Maglev
     # Migrate to a new version of Class or Module.  The new class / module
     # definition is in the string +ruby_code+.  +klass+ is a string or
     # symobl that represents the fully qualified class name of the Class or
-    # Module to migrate (e.g., 'Maglev::Foo').  This method calls
-    # Maglev.abort_transaction and Maglev.commit_transaction.
+    # Module to migrate (e.g., 'Maglev::Foo').  +migrate_instances+ is a
+    # boolean that controls whether or not to migrate old instances to new
+    # instances.  If +migrate_instances+ is true, then the new class
+    # definition should define a migrate_from method(old_instance), which
+    # will be called during the migration to migrate to the new instance.
+    #
+    # This method calls Maglev.abort_transaction and
+    # Maglev.commit_transaction.
     #
     # TODO:
     # * What about other classes/modules in the file?
@@ -32,23 +55,20 @@ module Maglev
     # * What about nested classes etc.
     # * How do you migrate an entire inheritance hierarchy?
     # * What about classes defined programatically in the file?
-    def migrate(klass, ruby_code, klass_exists=true)
+    # * What about singleton classes...the migrate_from method needs to deal with it?
+    def migrate(klass, ruby_code, migrate_instances=true)
       Maglev.abort_transaction
 
-      old_class = remove_from_parent klass if klass_exists
+      old_class = remove_from_parent klass if migrate_instances
 
       compiler = RubyCompiler.new
       Maglev.persistent { compiler.compile ruby_code }
       new_class = get_path(klass)[-1]
-      puts "-- old_class:  #{old_class.inspect} (#{old_class.__id__})"
-      puts "-- new_class:  #{new_class.inspect} (#{new_class.__id__})"
-      puts "-- new_class methods: #{new_class.methods(false).inspect}"
       raise "Migrate: Can't find new version of #{klass}" unless new_class
       Maglev.commit_transaction # instance migration needs new txn context
 
-      if klass_exists
-        instances = Repository.instance.list_instances([old_class])[0]
-        puts "-- Migrating #{instances.size} instances of #{klass.inspect}"
+      if migrate_instances
+        instances = Maglev::Repository.instance.list_instances([old_class])[0]
         # TODO: What to do if the new class does not define a migrate_from?
         instances.each do |old_instance|
           new_instance = new_class.allocate
@@ -59,6 +79,82 @@ module Maglev
       end
     end
     module_function :migrate
+
+
+
+    # Migrate to a new version of Class or Module.  The new class / module
+    # definition is in the string +ruby_code+.  +klass+ is a string or
+    # symobl that represents the fully qualified class name of the Class or
+    # Module to migrate (e.g., 'Maglev::Foo').  This method calls
+    # Maglev.abort_transaction and Maglev.commit_transaction.
+    #
+    # Instances will permanently migrate, only if there is a commit.  This
+    # code does not execute a per-instance commit.  It is up to the code
+    # calling a potential old method to do the commit.
+    #
+    # This code does a commit (to commit the changes to effect lazy
+    # migration).
+    #
+    # TODO:
+    # * What about other classes/modules in the file?
+    # * What if klass is not in file? (should allow data migrations)
+    # * What about nested classes etc.
+    # * How do you migrate an entire inheritance hierarchy?
+    # * What about classes defined programatically in the file?
+    def migrate_lazily(old_class_name, new_class_name, ruby_code)
+      Maglev.abort_transaction
+
+      old_class = remove_from_parent old_class_name
+
+      compiler = RubyCompiler.new
+      Maglev.persistent { compiler.compile ruby_code }
+      new_class = get_path(new_class_name)[-1]
+      raise "Migrate: Can't find new version of #{new_class_name}" unless new_class
+      Maglev.commit_transaction # instance migration needs new txn context
+      skip_methods = ['instance_variable_get', 'method_missing', 'puts']
+      mclass = class << old_class; self end
+
+      # Setup old class so that any method send, will trigger the
+      # migration, and then resend on the new instance.
+      Maglev.persistent do
+        # If the instances have singleton classes, then those will still be
+        # active under the current scheme....
+        #
+        # Don't override the class methods.???
+        #
+        old_class.module_eval do
+          @@_target_class = new_class
+          #puts "Set #{self}'s target class to #{new_class}"
+
+          def method_missing(name, *args, &blk)
+            new_instance = @@_target_class.allocate
+            new_instance.migrate_from self
+            new_instance.become self
+            # At this point, self and new_instance have swapped identities, i.e.,
+            # new_instance now points to the old instance. We want to execute
+            # the method on the new instance, which is now self...
+            self.send(name, *args, &blk)
+          end
+        end
+
+        # Now we undefine all the methods we can on the class.  Use
+        # undef_method so we don't search superclasses.  We'll need a few
+        # methods during migration, so we skip a few.
+        old_class.instance_methods(false).each { |m|
+          unless skip_methods.include? m
+            #puts "-- #{old_class.inspect}: undef_method  #{m.inspect}  (#{m.to_sym})"
+            old_class.send(:undef_method, m.to_sym)
+          end
+        }
+        # TODO: protect any methods needed by migration....
+        mclass.instance_methods(true).each { |m|
+          #puts "-- #{self} undef_method (class) #{m.inspect}"
+          mclass.undef_method m.to_sym
+        }
+      end
+      Maglev.commit_transaction
+    end
+    module_function :migrate_lazily
 
     # Remove the Class or Module named +path_to_class+ from its parent's
     # namespace.  +path_to_class+ is a string or symbol for the path to a
@@ -93,3 +189,6 @@ module Maglev
 
   end
 end
+
+# puts "Adding #{Maglev::Migration} (#{Maglev::Migration.__id__}) to trap"
+# Gemstone.trap_add_to_closure_list Maglev::Migration
