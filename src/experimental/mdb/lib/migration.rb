@@ -65,9 +65,10 @@ module Maglev
       Maglev.persistent { compiler.compile ruby_code }
       new_class = get_path(klass)[-1]
       raise "Migrate: Can't find new version of #{klass}" unless new_class
-      Maglev.commit_transaction # instance migration needs new txn context
+      Maglev.commit_transaction
 
-      if migrate_instances
+
+      if migrate_instances # instance migration runs in own transaction
         instances = Maglev::Repository.instance.list_instances([old_class])[0]
         # TODO: What to do if the new class does not define a migrate_from?
         instances.each do |old_instance|
@@ -179,16 +180,12 @@ module Maglev
       result = klass.to_s.split('::').inject([Object]) do |acc,el|
         parent = acc[-1]
         raise NameError unless Module === parent
-        acc << parent.const_get(el) unless el.empty?
+        acc << parent.const_get(el.to_sym) unless el.empty?
         acc
       end
       result.shift if result[0] == result[1] # If klass is 'Object' or '::Object'
       result
     end
     module_function :get_path
-
   end
 end
-
-# puts "Adding #{Maglev::Migration} (#{Maglev::Migration.__id__}) to trap"
-# Gemstone.trap_add_to_closure_list Maglev::Migration
