@@ -16,7 +16,20 @@ Then hit http://localhost:4567/
 
 === <tt>sinatra_app.rb</tt>: Run Sinatra from RubyGems
 
-Another simple app.
+Another simple app.  This one also has a test case using MiniTest and
+Rack::Test (based on http://www.sinatrarb.com/testing.html).
+
+
+To Run the test case, you'll need the sinatra, rack and minitest gems
+installed into MagLev, then:
+
+    $ maglev-ruby sinatra_app_test.rb
+    Loaded suite sinatra_app_test
+    Started
+    .
+    Finished in 0.122495 seconds.
+
+    1 tests, 2 assertions, 0 failures, 0 errors, 0 skips
 
 === <tt>msessions.rb</tt>: App with MagLev persistence for sessions
 
