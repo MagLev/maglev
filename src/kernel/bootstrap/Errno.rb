@@ -37,14 +37,14 @@ module Errno
 
   def self.raise_errno(errno, additional='')
     exc = self._new_for_errno(errno)
-    if exc.equal?(nil) 
+    if exc.equal?(nil)
       exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
       ex._signal
     end
     if additional._isString && additional.length > 0
       exc._message=(additional)
     end
-    exc._signal 
+    exc._signal
   end
   private
 
@@ -116,3 +116,6 @@ module Errno
 
   create_all_errno_classes
 end
+
+# Create Errno specific error messages here
+Errno::ENOENT.class_eval { def message; "No such file or directory - #{_description}" }
