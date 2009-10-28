@@ -140,7 +140,7 @@ module IRB
          $DEBUG = true
       when /^-r(.+)?/
         opt = $1 || ARGV.shift
-  	cnf[:LOAD_MODULES].push opt if opt
+    cnf[:LOAD_MODULES].push opt if opt
       when /^-I(.+)?/
         opt = $1 || ARGV.shift
         load_path.concat(opt.split(File::PATH_SEPARATOR)) if opt
@@ -224,13 +224,14 @@ module IRB
   IRBRC_EXT = "rc"
   def IRB.rc_file(ext = IRBRC_EXT)
     cnf = IRB.conf
-    wtf = nil
     if !cnf[:RC_NAME_GENERATOR]
-      cnf[:RC_NAME_GENERATOR] = proc { |rc| wtf }
       rc_file_generators do |rcgen|
-      if File.exist?(fn = rcgen.call(ext))
-        wtf ||= fn
-      end
+        cnf[:RC_NAME_GENERATOR] ||= rcgen
+        print rcgen.call(IRBRC_EXT),"\n"
+        if File.exist?(rcgen.call(IRBRC_EXT))
+          cnf[:RC_NAME_GENERATOR] = rcgen
+          break
+        end
       end
     end
     cnf[:RC_NAME_GENERATOR].call ext
