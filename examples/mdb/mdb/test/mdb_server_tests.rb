@@ -6,6 +6,7 @@
 require 'rubygems'
 require 'minitest/spec'
 require 'rack'
+#require 'rack/test'
 
 require 'mdb_server'
 
@@ -56,24 +57,30 @@ def handle_response
   end
 end
 
+def contents_of(file_name)
+  IO.read File.join(File.dirname(__FILE__), file_name)
+end
+
 DB_NAME   = :mdb_server_tests_db  # Will be created fresh in before()
 DB_NAME_2 = :mdb_server_tests_db2 # Will be deleted in before()
 
-describe 'MDB::ServerApp: MDB::Server requests' do
-
+describe 'MDB::ServerApp' do
   before do
-    server = MDB::Server.server
-    [DB_NAME, DB_NAME_2].each do |name|
-      server.delete name if server.key? name
-    end
-    server.create(DB_NAME, AppModel)
     @request  = Rack::MockRequest.new(MDB::ServerApp.new)
     @response = nil
     @expected_status = 200
   end
 
-=begin
+  describe 'MDB::Server requests' do
+    before do
+      server = MDB::Server.server
+      [DB_NAME, DB_NAME_2].each do |name|
+        server.delete name if server.key? name
+      end
+      server.create(DB_NAME, AppModel)
+    end
 
+=begin
   These requests correspond to methods on MDB::Server, a collection:
 
   |--------+-------+------------------------------------+-------------------------|
@@ -105,109 +112,137 @@ describe 'MDB::ServerApp: MDB::Server requests' do
   |--------+-------------------+------------------------------+------------------|
 =end
 
-  # General gets
-  it 'responds to GET "/#{DB_NAME}/Does/Not/Exist" with a 404' do
-    @expected_status = 404
-    r = get "/#{DB_NAME}/Does/Not/Exist"
-  end
+    # General gets
+    it 'responds to GET "/#{DB_NAME}/Does/Not/Exist" with a 404' do
+      @expected_status = 404
+      r = get "/#{DB_NAME}/Does/Not/Exist"
+    end
 
-  it 'responds to get "/not_a_db_name" with false' do
-    r = get "/not_a_db_name"
-    r.must_equal false
-  end
+    it 'responds to get "/not_a_db_name" with false' do
+      r = get "/not_a_db_name"
+      r.must_equal false
+    end
 
-  it 'responds to GET "/" with an array' do
-    r = get '/'
-    r.class.must_equal Array
-    DB_NAME.must_include r   # must_include is backwards...
-  end
+    it 'responds to GET "/" with an array' do
+      r = get '/'
+      r.class.must_equal Array
+      DB_NAME.must_include r   # must_include is backwards...
+    end
 
-  it 'responds to GET "/:db" with a boolean for databases that exist' do
-    names = get '/'
-    names.each do |name|
-      r = get "/#{name}"
+    it 'responds to GET "/:db" with a boolean for databases that exist' do
+      names = get '/'
+      names.each do |name|
+        r = get "/#{name}"
+        r.must_equal true
+      end
+      # TODO: Add test for not found db
+    end
+
+    it 'responds to POST "/" and GET "/:db" correctly' do
+      r = post "/", { :db_name => DB_NAME_2, :view_class => AppModel }
+      get("/#{DB_NAME_2}").must_equal true
+    end
+
+    it 'responds to POST "/" with 400 if missing :view_name' do
+      @expected_status = 400
+      r = post "/", { :db_name => DB_NAME_2 }
+    end
+
+    it 'responds to POST "/" with 400 if missing :db_name' do
+      @expected_status = 400
+      r = post "/", { :view_name => :AppClass }
+    end
+
+    it 'responds to POST "/" with 400 if :view_class is bad' do
+      @expected_status = 400
+      r = post "/", { :db_name => DB_NAME_2, :view_class => :NotAClass }
+    end
+
+    it 'responds to DELETE "/:db" by deleting the db if it exists' do
+      r = delete "/#{DB_NAME}"
       r.must_equal true
+
+      # After the delete, shouldn't be able to get it
+      r = get "/#{DB_NAME}"
+      r.must_equal false
     end
-    # TODO: Add test for not found db
+
+    it 'responds to DELETE "/:db" by returning 404 if :db does not exist' do
+      @expected_status = 404
+      r = delete "/this_is_not_a_db_name"
+    end
+
+    it 'provides debug info with GET /debug_info' do
+      info = get '/debug_info'
+      info.class.must_equal String
+      (info.size > 10).must_equal true
+    end
   end
 
-  it 'responds to POST "/" and GET "/:db" correctly' do
-    r = post "/", { :db_name => DB_NAME_2, :view_class => AppModel }
-    get("/#{DB_NAME_2}").must_equal true
-  end
+  describe 'MDB::ServerApp: MDB::Database requests' do
+    before do
+      server = MDB::Server.server
+      [DB_NAME, DB_NAME_2].each do |name|
+        server.delete name if server.key? name
+      end
+      @db = server.create(DB_NAME, AppModel)
+      @doc1 = AppModel.new(1, 2)
+      @doc1_id = @db.add(@doc1)
+    end
 
-  it 'responds to POST "/" with 400 if missing :view_name' do
-    @expected_status = 400
-    r = post "/", { :db_name => DB_NAME_2 }
-  end
+    it 'responds to POST "/:db" by creating a new document and returning the id' do
+      id = post "/#{DB_NAME}", AppModel.new(3,4)
+      id.wont_be_nil
 
-  it 'responds to POST "/" with 400 if missing :db_name' do
-    @expected_status = 400
-    r = post "/", { :view_name => :AppClass }
-  end
+      doc = get "/#{DB_NAME}/#{id}"
+      doc.wont_be_nil
+      doc.a.must_equal 3
+      doc.b.must_equal 4
+    end
 
-  it 'responds to POST "/" with 400 if :view_class is bad' do
-    @expected_status = 400
-    r = post "/", { :db_name => DB_NAME_2, :view_class => :NotAClass }
-  end
+    it 'executes views for POST /:db/view/:view (no args)' do
+      result = post "/#{DB_NAME}/view/view_42"
+      result.must_equal 42
+    end
 
-  it 'responds to DELETE "/:db" by deleting the db if it exists' do
-    r = delete "/#{DB_NAME}"
-    r.must_equal true
+    it 'executes views for POST /:db/view/:view (one arg)' do
+      result = post "/#{DB_NAME}/view/view_66", 11
+      result.must_equal 77
+    end
 
-    # After the delete, shouldn't be able to get it
-    r = get "/#{DB_NAME}"
-    r.must_equal false
-  end
-
-  it 'responds to DELETE "/:db" by returning 404 if :db does not exist' do
-    @expected_status = 404
-    r = delete "/this_is_not_a_db_name"
-  end
-
-  it 'provides debug info with GET /debug_info' do
-    info = get '/debug_info'
-    info.class.must_equal String
-    (info.size > 10).must_equal true
+    it 'executes views for POST /:db/view/:view (two args)' do
+      result = post "/#{DB_NAME}/view/view_67", 11, [:foo, :bar]
+      result.must_equal 80
+    end
   end
 end
 
-describe 'MDB::ServerApp: MDB::Database requests' do
-  before do
-    server = MDB::Server.server
-    [DB_NAME, DB_NAME_2].each do |name|
-      server.delete name if server.key? name
-    end
-    @db = server.create(DB_NAME, AppModel)
-    @doc1 = AppModel.new(1, 2)
-    @doc1_id = @db.add(@doc1)
-    @request  = Rack::MockRequest.new(MDB::ServerApp.new)
-    @response = nil
-    @expected_status = 200
-  end
+# describe 'MDB::ServerApp migration' do
+#   before do
+#     server = MDB::Server.server
+#     [DB_NAME, DB_NAME_2].each do |name|
+#       server.delete name if server.key? name
+#     end
+#     server.create(DB_NAME, AppModel)
+#     @request  = Rack::MockRequest.new(MDB::ServerApp.new)
+#     @response = nil
+#     @expected_status = 200
+#   end
 
-  it 'responds to POST "/:db" by creating a new document and returning the id' do
-    id = post "/#{DB_NAME}", AppModel.new(3,4)
-    id.wont_be_nil
+# #   include Rack::Test::Methods
 
-    doc = get "/#{DB_NAME}/#{id}"
-    doc.wont_be_nil
-    doc.a.must_equal 3
-    doc.b.must_equal 4
-  end
+# #   def app
+# #     Sinatra::Application
+# #   end
 
-  it 'executes views for POST /:db/view/:view (no args)' do
-    result = post "/#{DB_NAME}/view/view_42"
-    result.must_equal 42
-  end
-
-  it 'executes views for POST /:db/view/:view (one arg)' do
-    result = post "/#{DB_NAME}/view/view_66", 11
-    result.must_equal 77
-  end
-
-  it 'executes views for POST /:db/view/:view (two args)' do
-    result = post "/#{DB_NAME}/view/view_67", 11, [:foo, :bar]
-    result.must_equal 80
-  end
-end
+#   it 'migrates a fresh class successfully' do
+#     (defined? MigrationTest).must_be_nil
+#     data = {
+#       :ruby_source => contents_of('mig_00.rb'),
+#       :klass => 'MigrationTest',
+#       :migrate_instances => false }
+#     result = post "/migrate", data
+#     result.must_equal true
+#     (defined? MigrationTest).must_equal true
+#   end
+# end
