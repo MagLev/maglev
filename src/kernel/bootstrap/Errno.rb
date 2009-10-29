@@ -118,4 +118,8 @@ module Errno
 end
 
 # Create Errno specific error messages here
-Errno::ENOENT.class_eval { def message; "No such file or directory - #{_description}" }
+Errno::ENOENT.class_eval do
+  def message
+    "No such file or directory - #{_description}"
+  end
+end
