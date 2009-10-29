@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 require 'txn_wrapper'
 require 'mdb/core_extensions'
+require 'migration/migration'  # TODO: persist?
 
 raise "==== MDB Classes not committed" unless defined? MDB::Server
 raise "==== MDB root not set" if MDB::Server.server.nil?
@@ -124,6 +125,19 @@ class MDB::ServerApp < Sinatra::Base
     h = @post_data[0]
     result = @server.create(h[:db_name], h[:view_class])
     @serializer.serialize(result.name) # send back just the db name
+  end
+
+  post '/migrate' do
+    h = @post_data[0]
+    klass = h[:klass]
+    raise ArgumentError, "No :klass for migrate." unless klass
+    ruby_source = h[:ruby_source]
+    raise ArgumentError, "No :ruby_source for migrate." unless klass
+    migrate_instances = h[:migrate_instances]
+    raise ArgumentError, "No :migrate_instances for migrate." unless klass
+
+    Maglev::Migration.migrate(klass, ruby_source, migrate_instances)
+    @serializer.serialize true
   end
 
   # Query if db exists
