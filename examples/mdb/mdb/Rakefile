@@ -1,7 +1,7 @@
 task :default => :commit
 
 ENV['MAGLEV_OPTS'] = '-Ilib -d'
-ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
+#ENV['MAGLEV_OPTS'] = '-MnoRlwrap -Ilib'   # Get rid of -d etc.
 
 desc "Commit the MDB Server code to the repository."
 task :commit do
@@ -12,6 +12,11 @@ desc "Run tets: requires rubygems installed and a patched minitest gem"
 task :test => [:'test:mdb', :'test:persistence', :'test:server']  # :'test:json',
 
 namespace :test do
+  desc "Run the migration tests"
+  task :migration do
+    sh "maglev-ruby -Ilib test/migration/migration_tests.rb"
+  end
+
   desc "Run the persistence tests."
   task :persistence => :commit do
     sh 'ruby test/test_persistence.rb'
