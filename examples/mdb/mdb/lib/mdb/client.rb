@@ -66,7 +66,7 @@ module MDB
     end
 
     def handle_response(response)
-      puts "--- response: #{response.inspect}"
+      #puts "--- response: #{response.inspect}"
       case response
       when HTTP::Message
         begin
@@ -133,6 +133,14 @@ module MDB
     def initialize(url)
       @url = url
       @rest = REST.new(url)
+    end
+
+    def migrate(klass, ruby_source, migrate_instances=false)
+      data = {
+        :ruby_source => ruby_source,
+        :klass => klass,
+        :migrate_instances => migrate_instances }
+      @rest.post("/migrate", [data])
     end
 
     def key?(key)
