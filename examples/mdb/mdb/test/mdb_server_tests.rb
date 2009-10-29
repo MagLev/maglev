@@ -242,20 +242,21 @@ describe 'MDB::ServerApp' do
 
     it 'add a new class and not migrate instances' do
       (defined? MigrationTest).must_be_nil
-      result = migrate('mig_00.rb')
-      result.must_equal true
+      migrate('mig_00.rb').must_equal true
       (defined? MigrationTest).must_equal "constant"
     end
 
-#     it 'update a class and migrate instances' do
-#       (defined? MigrationTest).must_be "constant"
-#       data = {
-#         :ruby_source => contents_of('mig_00.rb'),
-#         :klass => 'MigrationTest',
-#         :migrate_instances => false }
-#       result = post "/migrate", data
-#       result.must_equal true
-#       (defined? MigrationTest).must_equal "constant"
-#     end
+    it 'update a class and migrate instances' do
+      migrate('mig_00.rb').must_equal true
+      MigrationTest::VERSION.must_equal 0
+
+      root = Maglev::PERSISTENT_ROOT[:mdb_server_tests] = Array.new
+      root << MigrationTest.new(0)
+      Maglev.commit_transaction
+
+      migrate('mig_01.rb', true).must_equal true
+      MigrationTest::VERSION.must_equal 1
+      root[0].color.must_equal :unknown
+    end
   end
 end
