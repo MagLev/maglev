@@ -14,7 +14,7 @@ class BigDecimal < Numeric
 
   # for internal structure see comments under accessors in bigdecimal1.rb
 
-  include Comparable
+  # do not include Comparable, it does not handle NaN args properly
 
   #############
   # Constants #
@@ -31,12 +31,6 @@ class BigDecimal < Numeric
   # RADIX = '.'
   # EXP = 'E'
   # SIGNS = {-1 => MINUS, 0 => nil, 1 => PLUS} # for 
-
-  TEN_POWER_TABLE = [ 0, 10, 100, 1000, 10_000, 100_000, 1000_000,
-		     10_000_000, 100_000_000, 1000_000_000 ]
-  #   this table stops at 10**9 because multiply of a Bignum times
-  #   a Fixnum is more efficient if individual digit multiplies don't overflow
-  #   a 64bit accumulator .
 
   BASE = 1000000000  # for MRI compatibility, not used internally
 

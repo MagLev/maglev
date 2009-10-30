@@ -587,32 +587,29 @@ class BigDecimal
     end
   end
 
-  def _reduce_precis(an_integer, reduction)
+  def _reduce_precis_by(an_integer, reduction)
     # reduction is a negative number
     #   reduction is the number of l.s. digits to delete
     # returns an_integer divided by the requisite power of 10  .
     val = an_integer
     count = reduction
     if count > 9
-      while count > 12 
-	val = val._divide(1000_000_000)
-	count -= 9
-      end
-      val = val._divide(1000);  # count in range 10..12 inclusive
-      count -= 3                # count now 7..9
+      p = count - 9
+      val = val._divide( 10._raised_to( p ))
+      count -= p                # count now 9
     end
     if count > 0
-      divisor = TEN_POWER_TABLE[count] 
+      divisor = 10._raised_to( count )
       arr = val._quo_rem( divisor , [ nil, nil ] )
       val = arr[0]
       rem = arr[1]
       if rem._not_equal?(0)
-        mode = ROUNDING_mode
-        if mode.equal?(0) # ROUND_HALF_UP
+        mode = ROUNDING_mode  # a dynamic constant from post_prims/bigdecimal.rb
+        if mode.equal?(ROUND_HALF_UP)
           if rem > (divisor._divide(2) ) 
             val += 1
           end
-        elsif mode.equal?(1) # ROUND_UP
+        elsif mode.equal?( ROUND_UP)
           val += 1
         else 
           # ROUND_DOWN, add nothing
@@ -671,13 +668,8 @@ class BigDecimal
   def _multiply_by_tenpower(an_integer, power)
     val = an_integer
     if power > 0
-      while power >= 9
-        val = val * 1000_000_000
-        power -= 9
-      end
-      if power > 0
-        val = val * TEN_POWER_TABLE[power] 
-      end 
+      p = 10._raised_to( power)
+      val = val * p
     else
       raise ArgumentError , '_multiply_by_tenpower, power <= 0'
     end
@@ -687,13 +679,8 @@ class BigDecimal
   def _divide_by_tenpower(an_integer, power)
     val = an_integer
     if power > 0
-      while power >= 9
-        val = val._divide(1000_000_000)
-        power -= 9
-      end
-      if power > 0
-        val = val._divide(TEN_POWER_TABLE[power])
-      end 
+      p = 10._raised_to( power )
+      val = val._divide(p)
     else
       raise ArgumentError , '_divide_by_tenpower, power <= 0'
     end
@@ -719,6 +706,8 @@ class BigDecimal
   # Derived Arithmetic operations 
   #########################
 
+  # DEFAULT_prec is a dynamic constant, defined in  post_prims/bigdecimal.rb
+
   def +(other)
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
@@ -727,7 +716,7 @@ class BigDecimal
   end
   
   def sub(other, precs)
-    precs = Type.coerce_to( precs, Fixnum, :to_int)
+    precs = Type.coerce_to( precs, Fixnum, :to_int)  # a required argument
     raise TypeError , 'precision must be >= 0'    if precs < 0
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
@@ -775,7 +764,7 @@ class BigDecimal
 
 
   def add(other, prec_arg)  # [
-    prec_arg = Type.coerce_to( prec_arg, Fixnum, :to_int)
+    prec_arg = Type.coerce_to( prec_arg, Fixnum, :to_int) # a required arg
     raise TypeError , 'precision must be >= 0'    if prec_arg < 0
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
@@ -849,14 +838,14 @@ class BigDecimal
     r_expon += arr[1]
 
     		# adjust precision
-    p = my_prec._max(other_prec)
+    p = my_prec._max(other_prec)  # max because by default no loss of precision on add
     if prec_arg._not_equal?(0)
       p = prec_arg._min( p )
     end
     nd = r_digits._decimal_digits_length_approx(true)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
-      r_digits = _reduce_precis(r_digits, rd)
+      r_digits = _reduce_precis_by(r_digits, rd)
       r_expon += rd
     end
 
@@ -921,20 +910,19 @@ class BigDecimal
     my_prec =  @precs
     other_prec = other._precs
     		# adjust precision
-    p = my_prec._max(other_prec)
+    p = my_prec._min(other_prec)
     if prec_arg._not_equal?(0)
       p = prec_arg._min( p )
     end
     nd = r_digits._decimal_digits_length_approx(true)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
-      r_digits = _reduce_precis(r_digits, rd)
+      r_digits = _reduce_precis_by(r_digits, rd)
       r_expon += rd
     end
-
     res = self.class.allocate
     res._init_normal( r_sign, r_digits, r_expon)
-    res._set_precision(UNLIM_PRECISION)
+    res._set_precision(p)
   end # ]
   
   def div(other, prec_arg = nil) # [
@@ -987,21 +975,24 @@ class BigDecimal
       end
     end
 
-    my_nd = my_digs._decimal_digits_length_approx(true)
-    other_nd = other_digs._decimal_digits_length_approx(true)
-    delta_exp = 0
-    other_nd_lim = other_nd + 35 # to meet accuracy required by remainder_spec.rb
-    if my_nd < other_nd_lim
-      delta_exp = other_nd_lim - my_nd 
-    end
-    if prec_arg > 0 
-      delta_exp = delta_exp._max( prec_arg + 5 )
-    end
     my_prec =  @precs
     other_prec = other._precs
-    if my_prec < UNLIM_PRECISION && other_prec < UNLIM_PRECISION
-      delta_exp = delta_exp._max( my_prec._max(other_prec) )
+    my_nd = my_digs._decimal_digits_length_approx(true)
+    other_nd = other_digs._decimal_digits_length_approx(true)
+    delta_exp = prec_arg.equal?(0) ? 0 : prec_arg 
+    if my_prec < UNLIM_PRECISION 
+      delta_exp = delta_exp._max(my_prec)
     end
+    if other_prec < UNLIM_PRECISION
+      delta_exp = delta_exp._max(other_prec)
+    end
+    delta_nd = other_nd + 5 
+    if (other_nd > my_nd)
+      delta_nd += (other_nd - my_nd)*2 
+    else
+       delta_nd += 5
+    end
+    delta_exp = delta_nd._max( delta_exp) 
     if delta_exp > 0
       my_digs = _multiply_by_tenpower(my_digs, delta_exp) 
     end
@@ -1009,20 +1000,20 @@ class BigDecimal
     r_expon = my_exp - delta_exp - other_exp
 
     		# adjust precision
-    p = my_prec._max(other_prec)
+    p = my_prec._min(other_prec)
     if prec_arg._not_equal?(0)
       p = prec_arg._min( p )
     end
     nd = r_digits._decimal_digits_length_approx(true)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
-      r_digits = _reduce_precis(r_digits, rd)
+      r_digits = _reduce_precis_by(r_digits, rd)
       r_expon += rd
     end
       
     res = self.class.allocate
     res._init_normal( r_sign, r_digits, r_expon)
-    res._set_precision(UNLIM_PRECISION)
+    res._set_precision(p)
   end # ]
 
   def divmod(other_arg) # [
@@ -1044,7 +1035,6 @@ class BigDecimal
     first = (self.div(other, 0) ).floor(0)  # (first / other).floor
     prod = first.mult(other, 0) 
     second = self._add( prod, 0, 0 - prod._sign )   #  self - (first * other)
-if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
     if other_arg._isFloat
       res = [ first.to_i , second.to_f ]
     else
@@ -1098,10 +1088,10 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
     sq_bd = self.class._from_float(sq)
     if prec_arg < 14
       res = sq_bd
-      res._add_to_exp( r_expon )
       if prec_arg > 0
         res = res._add(self.class._zero(1), prec_arg, 1) # to reduce precision
       end
+      res._add_to_exp( r_expon )
     else
       # Newtons method iteration to make result more precise
       # see http://en.wikipedia.org/wiki/Newton's_method
@@ -1136,7 +1126,7 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
   end # ]
 
   # Raises self to an integer power.
-  def power(other) # [
+  def _power(other) # [
     other = Type.coerce_to( other, Fixnum, :to_int)
     kind = @special
     if kind._not_equal?(0) # not finite
@@ -1157,16 +1147,10 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
       end
     end
     if other < 0
-      # res = one.div( (self.power( other.abs) ) , 0)
-      my_pwr = self.power( 0 - other )
+      pos_pwr = self._power( 0 - other )
       one = self.class._from_integer( 1 )
-      denom = self.class._from_integer( my_pwr._digits )
-      q = one.div( denom )
-      d_pwr = self.class.allocate
-      d_pwr._init_normal( 1 , 1 , 0 - my_pwr._exp )
-      d_pwr._set_precision(UNLIM_PRECISION)
-      res = q.mult(d_pwr, 0)  # q * (1 * 10**(0 - my_pwr._exp))
-      return res
+      q = one.div( pos_pwr )
+      return q
     end
     nd = @digits ** other
     if (@sign == -1)
@@ -1181,10 +1165,33 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
     res = self.class.allocate
     res._init_normal( nsign, nd, nexp)
     res._set_precision(UNLIM_PRECISION)
-    res
   end # ]
 
+  def power(other)
+    res = self._power(other)
+    res._reduce_to_precision(@precs)
+  end
+
   alias ** power
+
+  def _reduce_to_precision(p)
+    if p != UNLIM_PRECISION
+      if p < @precs
+	r_digits = @digits
+	nd = r_digits._decimal_digits_length_approx(true)
+	rd = nd - p
+	if rd > 0  #  rd is number of digits to omit
+	  r_digits = _reduce_precis_by(r_digits, rd)
+          r_expon = @exp + rd
+	  res = self.class.allocate
+	  res._init_normal( @sign, r_digits, r_expon)
+	  res._set_precision(p)
+	  return res 
+        end
+      end
+    end
+    self
+  end
   
   # Unary minus
   def -@
@@ -1257,6 +1264,65 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
     end
   end
   alias === eql?
+
+  def <(other)
+    s = self <=> other
+    if s.equal?(nil) 
+      if other._isNumeric
+        return false  # at least one was NaN
+      end
+      raise ArgumentError, ' <=> returned a non-Numeric'
+    end
+    s < 0
+  end
+
+  def <=(other)
+    s = self <=> other
+    if s.equal?(nil) 
+      if other._isNumeric
+        return false  # at least one was NaN
+      end
+      raise ArgumentError, ' <=> returned a non-Numeric'
+    end
+    s <= 0
+  end
+
+  def >(other)
+    s = self <=> other
+    if s.equal?(nil) 
+      if other._isNumeric
+        return false  # at least one was NaN
+      end
+      raise ArgumentError, ' <=> returned a non-Numeric'
+    end
+    s > 0
+  end
+
+  def >=(other)
+    s = self <=> other
+    if s.equal?(nil) 
+      if other._isNumeric
+        return false  # at least one was NaN
+      end
+      raise ArgumentError, ' <=> returned a non-Numeric'
+    end
+    s >= 0
+  end
+
+  def ==(other)
+    s = self <=> other
+    if s.equal?(nil) 
+      if other._isNumeric
+        return false  # at least one was NaN
+      end
+      raise ArgumentError, ' <=> returned a non-Numeric'
+    end
+    s.equal?(0)
+  end
+
+  def between?(min, max)
+    (min <= self) && (self <= max)
+  end
   
   ####################
   # Other operations #
@@ -1284,20 +1350,20 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
 	  nd_frac = 0 - my_exp 
 	  rd = nd_frac - n # rd is number of digits to omit
 	  if rd > 0
-	    digs = _reduce_precis(digs, rd)
+	    digs = _reduce_precis_by(digs, rd)
 	    my_exp += rd
 	  end
 	end
       else # n < 0 , zeroing digits to left of decimal
         rd = (0 - n) - my_exp
         if rd > 0
-          digs = _reduce_precis(digs, rd)
+          digs = _reduce_precis_by(digs, rd)
           my_exp += rd
         end
       end
       res = self.class.allocate
       res._init_normal( @sign , digs, my_exp)
-      res._set_precision(UNLIM_PRECISION)
+      res._set_precision(n)
     else  # n == 0
       int_val = digs 
       if my_exp._not_equal?(0) 
@@ -1313,7 +1379,7 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
       end
       if my_exp < 0 and delta_for_fraction != 0
         # has a fractional part
-        pwr = 10 ** (0 - my_exp)
+        pwr = 10._raised_to( 0 - my_exp )
         frac = digs % pwr 
         if frac > 0 && my_sign.equal?(delta_for_fraction)
           int_val += delta_for_fraction 
@@ -1362,7 +1428,7 @@ if Gemstone.session_temp(:TrapBd) ; nil.pause ; end
     my_exp = @exp
     if my_exp < 0
       # has a fractional part
-      pwr = 10 ** (0 - my_exp)
+      pwr = 10._raised_to( 0 - my_exp)
       frac = @digits % pwr
       if frac > 0
         res = self.class.allocate
