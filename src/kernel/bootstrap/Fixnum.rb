@@ -41,6 +41,9 @@ class Fixnum
 
   primitive_nobridge '_raised_to' , '_rubyRaisedTo:'
   def **(arg)
+    if arg._isInteger && arg >= 0
+      return self._raised_to(arg) 
+    end
     if arg._isNumeric
       if (arg <=> 0) < 0
         r = self.to_f

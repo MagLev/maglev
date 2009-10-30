@@ -11,7 +11,6 @@
 class Integer
 
   def coerce(param)
-    # handle common case of float arg, else defer to Numeric
     if param._isFloat
       s = self.to_f 
       if s._isFloat && ! s.nan?
@@ -19,6 +18,8 @@ class Integer
       end
     elsif param._isInteger
       return [ param, self ]
+    elsif param._isString
+      return [ Float(param), self.to_f ]
     end
     super(param)
   end
@@ -240,7 +241,7 @@ class Integer
         primitive 'floor', 'floor'
         primitive 'round', 'rounded'
 
-  def zero?
+  def zero? 
     self == 0
   end
 

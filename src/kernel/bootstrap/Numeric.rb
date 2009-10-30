@@ -8,7 +8,7 @@ class Numeric
       return [ param, self ]
     end
     unless param.equal?(nil) || param._isSymbol
-      begin
+      begin 
         if param._isString
           p = Float(param)
         else
@@ -18,6 +18,12 @@ class Numeric
         if p._isFloat && s._isFloat && ! p.nan? && ! s.nan?
           return [p, s]
         end
+      rescue
+        # continue execution
+      end
+      begin
+        a = param.coerce(self)
+        return [ a[1], a[0] ]
       rescue
         # continue execution
       end
@@ -121,6 +127,11 @@ class Numeric
   end
 
   primitive 'integer?', '_isInteger'
+
+  def nan?
+    # needed by Complex and Rational , may be reimplemented in subclasses
+    false
+  end
 
   def nonzero?  
     # reimplemented in subclasses

@@ -49,7 +49,7 @@ class Float
       elsif param._isString
         v = Float(param)
       end
-      if v._isFloat
+      if v._isFloat && ! v.nan?
         return [ v, self ]
       end
     rescue
