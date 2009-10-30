@@ -58,7 +58,9 @@ class Numeric
   # See Complex#arg.
   #
   def arg
-    if self >= 0
+    if self.nan?
+      return self
+    elsif self >= 0
       return 0
     else
       return Math::PI
@@ -326,6 +328,55 @@ class Complex < Numeric
     end
   end
 
+  # Maglev, add other comparison methods
+  def >(other)
+    status =  self <=> other
+    if status._isNumeric
+      status > 0
+    else
+      raise ArgumentError, 'in Complex#> , <=> returned a non-Numeric'
+    end
+  end
+
+  def <(other)
+    status =  self <=> other
+    if status._isNumeric
+      status < 0
+    else
+      raise ArgumentError, 'in Complex#< , <=> returned a non-Numeric'
+    end
+  end
+
+  def >=(other)
+    status =  self <=> other
+    if status._isNumeric
+      status >= 0
+    else
+      raise ArgumentError, 'in Complex#>= , <=> returned a non-Numeric'
+    end
+  end
+
+  def <=(other)
+    status =  self <=> other
+    if status._isNumeric
+      status <= 0
+    else
+      raise ArgumentError, 'in Complex#<= , <=> returned a non-Numeric'
+    end
+  end
+
+  def coerce(other)
+    if other._isFloat
+      # return other, self.to_f  # old code
+      return [ Complex(other, 0) , self ] # Maglev fix
+    elsif other._isInteger
+      return [ Rational.new!(other, 1),  self ]
+    else
+      super
+    end
+  end
+  # end Maglev comparisons
+
   #
   # Attempts to coerce +other+ to a Complex number.
   #
@@ -535,10 +586,11 @@ module Math
   end
 
   def acos(z)
-    if Complex.generic?(z) and z >= -1 and z <= 1
+    gz = Complex.generic?(z)
+    if gz and z >= -1 and z <= 1
       acos!(z)
     else
-      -1.0.im * log( z + 1.0.im * sqrt(1.0-z*z) )
+      -1.0.im * log( z + 1.0.im * sqrt( Complex(1.0, 0) - z * z) ) 
     end
   end
 
@@ -546,7 +598,7 @@ module Math
     if Complex.generic?(z) and z >= -1 and z <= 1
       asin!(z)
     else
-      -1.0.im * log( 1.0.im * z + sqrt(1.0-z*z) )
+      -1.0.im * log( 1.0.im * z + sqrt( Complex(1.0, 0) - z * z) )
     end
   end
 
