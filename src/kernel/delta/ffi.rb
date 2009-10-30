@@ -19,19 +19,25 @@ module FFI
 
   USE_THIS_PROCESS_AS_LIBRARY = nil
 
+  # DEBUG , a dynamic constant in post_prims/ffi.rb  
+
   module Platform
 
     OS = "" # you must use Config::CONFIG['host_os']
 	    # because OS could change after you commit code
 
-    ARCH = ""
+    ARCH = ""   # arch should be determined dynamically 
     LIBPREFIX = "lib"
-    LIBSUFFIX = "" # suffix is appended at runtime by the
-                   # library load primitives if '.' not in lib name
+    LIBSUFFIX = "" # OS  dependent suffix appended at runtime by the
+                   # library load primitives if '.' not in lib name, 
+                   #    or if '.' is last character of lib name. 
+    LONG_SIZE = 64 # in bits
+    ADDRESS_SIZE = 64
   end
 
+  # tables used to translate arguments for primitives.
   # mapping from Ruby type names to type names supported by CFunction
-  TypeDefs = IdentityHash.from_hash( 
+  PrimTypeDefs = IdentityHash.from_hash( 
     { :char => :int8 ,  :uchar => :uint8 ,
       :short => :int16 , :ushort => :uint16 ,
       :int   => :int32 , :uint => :uint32 ,
@@ -48,7 +54,7 @@ module FFI
       :pointer => :ptr ,
       :void => :void ,
       :string => :'char*' ,
-      :const_string => :'const char*' } )
+      :const_string => :'const char*'} )
 
 # Body of a  :const_string  argument is copied from object memory to C
 #   memory before a function call .
@@ -57,7 +63,7 @@ module FFI
 #   after the function call. 
     
   # mapping from types supported by CFunction to sizes in bytes
-  TypeSizes = IdentityHash.from_hash( 
+  PrimTypeSizes = IdentityHash.from_hash( 
     { :int8 => 1,  :uint8 => 1,
       :int16 => 2 , :uint16 => 2 ,
       :int32 => 4 , :uint32 => 4 ,
@@ -110,15 +116,40 @@ module FFI
   #   :const_string => :'const char*' 
        } )
 
-  class Struct
-    # define the fixed instvars 
+  class Enums 
     def initialize
-      ly =  self.class._layout
-      @layout = ly
-      @bytearray = CByteArray.gc_malloc(ly.size)
+      raise 'instances of Enums not used yet'
     end
- 
-    # remainder of implementation in ffi_struct.rb
+
+    # remainder in ffi_enum.rb
+  end
+
+  class Enum
+    def name
+      @name
+    end
+    def tag
+      @name
+    end
+    def symbol_map
+      @kv_map
+    end
+    alias to_h symbol_map
+
+    def _printable_name
+      n = @name
+      if name.equal?(nil)
+        'unnamed'
+      else
+        n.to_s
+      end
+    end
+
+    def _vk_map
+      @vk_map
+    end
+
+    # remainder in ffi_enum.rb
   end
 
   class MemoryPointer < CByteArray
@@ -145,13 +176,24 @@ module FFI
     # remainder of implementation in memorypointer.rb
   end
 
+  # subclasses of MemoryPointer
   class AutoPointer < MemoryPointer
     # All Maglev MemoryPointer's have auto-free behavior unless
     #  auto-free explicitly disabled on an instance
   end
-
   class Buffer < MemoryPointer
     # remainder of implementation in buffer.rb
+  end
+
+  class Struct
+    # define the fixed instvars 
+    def initialize
+      ly =  self.class._layout
+      @layout = ly
+      @bytearray = CByteArray.gc_malloc(ly.size)
+    end
+ 
+    # remainder of implementation in ffi_struct.rb
   end
 
   class StructLayout
@@ -169,6 +211,14 @@ module FFI
     end
 
     # remainder of implementation in ffi_struct.rb
+  end
+
+  class Type
+    def initialize(a_sym, a_size, pt_sym)
+      @name = a_sym
+      @size = a_size # in bytes
+      @prim_type_name = pt_sym # a name known to CFunction, or name of another Type
+    end
   end
 
 end

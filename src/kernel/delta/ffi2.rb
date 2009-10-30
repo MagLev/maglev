@@ -9,6 +9,7 @@ module FFI
      class_primitive_nobridge 'named' , 'named:'
      class_primitive_nobridge '_has_symbol', 'hasCSymbol:'
      primitive_nobridge '_has_symbol', 'hasCSymbol:'
+     primitive_nobridge 'name', 'name'
   end
   class CFunction
     primitive_nobridge 'call_template*' , '_rubyToCcallTemplate:'
@@ -85,6 +86,40 @@ module FFI
     primitive_nobridge 'address' , 'memoryAddress'
   end
 
+  class Type
+    def name
+      @name
+    end
+    def size
+      @size
+    end
+    def _prim_type
+      @prim_type_name
+    end
+    def self._install_native_type(a_type)
+      FFI.const_set( a_type.name , a_type ) 
+    end
+    def self._initialize_native_types
+      _install_native_type( Type.new( :INT8, 1 , :int8))  # NativeType::INT8 in MRI implem
+      _install_native_type( Type.new( :UINT8, 1 , :uint8))  
+      _install_native_type( Type.new( :INT16, 2 , :int16))  
+      _install_native_type( Type.new( :UINT16, 2 , :uint16))  
+      _install_native_type( Type.new( :INT32, 4 , :int32))  
+      _install_native_type( Type.new( :UINT32, 4 , :uint32))  
+      _install_native_type( Type.new( :INT64, 8 , :int64))  
+      _install_native_type( Type.new( :UINT64, 8 , :uint64))  
+      # FLOAT32 not supported yet
+      _install_native_type( Type.new( :FLOAT64, 8 , :double))  
+      _install_native_type( Type.new( :VOID, 8 , :void))  
+      _install_native_type( Type.new( :STRING, 8 , :string))  
+      _install_native_type( Type.new( :BUFFER_INOUT, 8 , :ptr))  
+      _install_native_type( Type.new( :BUFFER_IN, 8 , :ptr))  
+      _install_native_type( Type.new( :BUFFER_OUT, 8 , :ptr))  
+      # ENUM, BOOL, CHAR_ARRAY, VARARGS  todo
+    end
+  end
+  Type._initialize_native_types
+
   module_function() # [ ===================== following are module functions
     # these are after  'module_function' instead of inside of a 'class << self'
     # to avoid dynamic constant refs .
@@ -93,7 +128,7 @@ module FFI
       unless name._isSymbol
         raise TypeError , 'ruby_name must be a Symbol'
       end
-      code = TypeDefs[name]
+      code = PrimTypeDefs[name]
       if code.equal?(nil)
         raise TypeError, "Unable to resolve FFI type '#{name}'"
       end
@@ -101,7 +136,7 @@ module FFI
     end
 
     def type_size(type)
-      size = TypeSizes[type]
+      size = PrimTypeSizes[type]
       if size.equal?(nil)
         unless type._isSymbol
           raise TypeError, "FFI::type_size - type argument must be a Symbol"
@@ -127,7 +162,7 @@ module FFI
     end
   # end module_function() ]
 
-  module Library
+  module Library # [
     # Set which library or libraries +attach_function+ should
     # look in. By default it only searches for the function in
     # the current process. If you want to specify this as one
@@ -139,19 +174,30 @@ module FFI
       arr = []
       carr = []
       n = 0
+      my_debug = FFI::DEBUG
       while n < len
         a_name = names[n]
+        puts "--FFI:  ffi_lib: adding #{a_name}" if  my_debug > 0
         if a_name == USE_THIS_PROCESS_AS_LIBRARY
           carr[n] = nil
         else
-          a_name = Type.coerce_to(names[n], String, :to_str)
-          carr[n] = CLibrary.named(a_name)
+          a_name = ::Type.coerce_to(names[n], String, :to_str)
+          cl = CLibrary.named(a_name)
+          carr[n] = cl
         end
         arr[n] = a_name
         n += 1
       end
-      @ffi_lib = arr
+      @ffi_libs = arr
       @ffi_clibs = carr
+    end
+
+    def ffi_libraries
+      if defined?(@ffi_libs) 
+        @ffi_libs
+      else
+        [] 
+      end
     end
 
     # Attach a C function to this module. The arguments can have two forms:
@@ -170,9 +216,9 @@ module FFI
     # The final argument, +ret+, is the type of the return value from the C
     # function.
     def attach_function(name, a3, a4, a5=Undefined)
-      name = Type.coerce_to(name, String, :to_s)
+      name = ::Type.coerce_to(name, String, :to_s)
       if a5._not_equal?(Undefined)
-        cname = Type.coerce_to(a3, String, :to_s)
+        cname = ::Type.coerce_to(a3, String, :to_s)
         args = a4
         ret = a5
       else
@@ -189,18 +235,28 @@ module FFI
       if libs.equal?(nil)
         libs = [ nil ]
       end
+      my_debug = DEBUG
       n = 0
       len = libs.length
       while n < len
         lib = libs[n]
         if lib.equal?(nil)
+          puts "--FFI:  attach_function: #{cname} searching process"   if my_debug > 1
           found = CLibrary._has_symbol(cname) # check entire process
+          if found && my_debug > 0
+             puts "--FFI:  attach_function: found #{cname} in process"  
+          end 
         else
+          puts "--FFI:  attach_function: #{cname} searching lib #{lib.name}"   if my_debug > 1
           found = lib._has_symbol(cname)
+          if found && my_debug > 0
+             puts "--FFI:  attach_function: found #{cname} in lib #{lib.name}"  
+          end 
         end
         if found
           cf = CFunction._new([ lib, cname, ret, cargs, -1])
-          meth = cf._compile_caller(name, self)
+          meth = cf._compile_caller(name, self)  # installs a method in self
+		# which will be installed per Maglev.persistent_mode
           return meth
         end
         n += 1
@@ -208,5 +264,78 @@ module FFI
       raise FFI::NotFoundError, "Unable to find FFI '#{cname}' in: #{@ffi_lib}"
     end
 
-  end
+    def typedef(atype, new_name)
+      if defined?(@ffi_typedefs)
+        ht = @ffi_typedefs
+      else
+        ht = Hash.new 
+        @ffi_typedefs = ht
+      end
+      unless new_name._isSymbol
+        raise TypeError , 'name must be a Symbol'
+      end
+      tcls = FFI::Type
+      code = if current.kind_of?(FFI::Type)
+	current
+      elsif current == :enum
+	if add._isArray
+	  self.enum(add)
+	else
+	  self.enum(info, add)
+	end
+      else
+	@ffi_typedefs[current] || FFI.find_type(current)
+      end
+      @ffi_typedefs[add] = code
+    end
+
+    def enum(*args)
+      # example
+      #   following define un-named enums
+      # enum(:zero, :one, :two  ) # like C   enum { zero, one, two } foo ;
+      # enum([ :zero, :one, :two ] # equivalent to above 
+      # enum([ :a , 10,  :b, 20 ])  # like C   enum { a=10; b=20; };
+      #
+      #   following define named enums (MRI FFI calls these 'tagged' enums)
+      # enum :tfoo, [ :zero, :one, :two ] # like C   typedef enum { zero, one, two } tfoo;
+      # enum :tbar  [ :a , 10,  :b, 20 ]  # like C   typedef enum { a=10; b=20; } tbar;
+      # 
+      # Examples
+      #    attach_function( :fcta, [ :int ], :void )
+      #    fcta( :two ) #   :two will be looked up in the table of all enumerated values
+      #
+      #    attach_function( :fctb, [ :tfoo ], :tbar)
+      #    fctb( :one ) #   :one will be looked up in the values for  tfoo 
+      #                 #  function result is translated from an int32 to a Symbol via tfoo
+      #
+      name = nil
+      arr = args 
+      if args.size.equal?(2)
+        name = args[0]
+        arr =  args[1]
+        unless name._isSymbol && arr._isArray
+          name = nil
+          arr = args
+        end
+      end
+      e = Enum.new(arr, name)
+      Enums.add(e)
+      if name._not_equal?(nil)
+        typedef(e, name)
+      end
+      e
+    end
+
+    def enum_type(name)
+      unless defined?(@ffi_enums)
+        return nil
+      end
+      @ffi_enums.find(name) 
+    end
+
+    def enum_value(symbol)
+      @ffi_all_enum_vals[symbol]
+    end
+
+  end #]
 end

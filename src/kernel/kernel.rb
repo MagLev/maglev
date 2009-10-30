@@ -139,5 +139,6 @@ RUBY.require 'kernel/delta/String.rb'
 RUBY.require 'kernel/delta/ffi.rb'
 RUBY.require 'kernel/delta/ffi2.rb'
 RUBY.require 'kernel/delta/ffi_struct.rb'
+# RUBY.require 'kernel/delta/ffi_enum.rb' # not used yet
 RUBY.require 'kernel/delta/memorypointer.rb'
 RUBY.require 'kernel/delta/buffer.rb'

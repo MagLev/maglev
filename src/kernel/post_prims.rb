@@ -7,4 +7,5 @@
 
 require 'kernel/post_prims/Object.rb'
 require 'kernel/post_prims/StructTms.rb'
-require 'kernel/post_prims/bigdecimal.rb'  # do not checkin
+require 'kernel/post_prims/bigdecimal.rb'  
+require 'kernel/post_prims/ffi.rb'  

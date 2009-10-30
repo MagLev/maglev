@@ -89,11 +89,11 @@ module FFI
         raise TypeError, 'field name must be a Symbol'
       end
       offset = self._check_offset(offset)
-      ctype = TypeDefs[type]
+      ctype = PrimTypeDefs[type]
       if ctype.equal?(nil)
         raise 'unrecognized field type ' , type.to_s 
       end
-      csize = TypeSizes[ctype] 
+      csize = PrimTypeSizes[ctype] 
       unless (align = @totalsize % csize) == 0 
         @totalsize += csize - align # add pad
       end 
@@ -108,11 +108,11 @@ module FFI
 
     def add_array(name, type, num_elements, offset)
       if type._isSymbol
-        ctype = TypeDefs[type]
+        ctype = PrimTypeDefs[type]
         if ctype.equal?(nil)
           raise 'unrecognized array element type ' , type.to_s
         end
-        elemsiz = TypeSizes[ctype]
+        elemsiz = PrimTypeSizes[ctype]
       elsif is_a_struct?(type)
         elemsiz = type.size
       else
