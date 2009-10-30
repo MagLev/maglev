@@ -344,6 +344,43 @@ class Rational < Numeric
     end
   end
 
+  # Maglev, add other comparison methods
+  def >(other)
+    status =  self <=> other
+    if status._isNumeric
+      status > 0
+    else
+      raise ArgumentError, 'in Rational#> , <=> returned a non-Numeric'
+    end
+  end
+
+  def <(other)
+    status =  self <=> other
+    if status._isNumeric
+      status < 0
+    else
+      raise ArgumentError, 'in Rational#< , <=> returned a non-Numeric'
+    end
+  end
+
+  def >=(other)
+    status =  self <=> other
+    if status._isNumeric
+      status >= 0
+    else
+      raise ArgumentError, 'in Rational#>= , <=> returned a non-Numeric'
+    end
+  end
+
+  def <=(other)
+    status =  self <=> other
+    if status._isNumeric
+      status <= 0
+    else
+      raise ArgumentError, 'in Rational#<= , <=> returned a non-Numeric'
+    end
+  end
+
   def coerce(other)
     if other._isFloat
       return other, self.to_f
@@ -353,6 +390,7 @@ class Rational < Numeric
       super
     end
   end
+  # end Maglev comparisons
 
   #
   # Converts the rational to an Integer.  Not the _nearest_ integer, the
