@@ -17,17 +17,49 @@
 #
 
 
-require "e2mmap.rb"
+#require "e2mmap.rb"  # Maglev, e2mmap broken
 
-module ExceptionForMatrix # :nodoc:
-  extend Exception2MessageMapper
-  def_e2message(TypeError, "wrong argument type %s (expected %s)")
-  def_e2message(ArgumentError, "Wrong # of arguments(%d for %d)")
-  
-  def_exception("ErrDimensionMismatch", "\#{self.name} dimension mismatch")
-  def_exception("ErrNotRegular", "Not Regular Matrix")
-  def_exception("ErrOperationNotDefined", "This operation(%s) can\\'t defined")
+ module ExceptionForMatrix # :nodoc:
+#  extend Exception2MessageMapper
+#  def_e2message(TypeError, "wrong argument type %s (expected %s)")
+#  def_e2message(ArgumentError, "Wrong # of arguments(%d for %d)")
+#  
+#  def_exception("ErrDimensionMismatch", "\#{self.name} dimension mismatch")
+#  def_exception("ErrNotRegular", "Not Regular Matrix")
+#  def_exception("ErrOperationNotDefined", "This operation(%s) can\\'t defined")
+
+ class ErrDimensionMismatch < RuntimeError
+   def initialize(message=nil)
+     m = "dimension mismatch"
+     if message._isString
+       m << ", "
+       m << message
+     end
+     super(m)
+   end
+ end
+ class ErrNotRegular < RuntimeError
+   def initialize(message=nil)
+     m = "Not Regular Matrix"
+     if message._isString
+       m << ", "
+       m << message
+     end
+     super(m)
+   end
+ end
+ class ErrOperationNotDefined < RuntimeError
+   def initialize(message=nil)
+     m = "operation not defined"
+     if message._isString
+       m << ", "
+       m << message
+     end
+     super(m)
+   end
+ end
 end
+
 
 #
 # The +Matrix+ class represents a mathematical matrix, and provides methods for creating
@@ -117,6 +149,15 @@ class Matrix
   #
   def Matrix.[](*rows)
     new(:init_rows, rows, false)
+  end
+
+  def self.Raise(cls, *args)  # workaround for broken e2mmap.rb
+    m = args[0]
+    if m._isString
+      raise(cls, m)
+    else
+      raise(cls, "")
+    end
   end
   
   #
@@ -208,12 +249,10 @@ class Matrix
   #     => 4 5 6
   #
   def Matrix.row_vector(row)
-
-    case row
-    when Vector
-      Matrix.rows([row.to_a], false)
-    when Array
+    if row._isArray
       Matrix.rows([row.dup], false)
+    elsif row.kind_of?(Vector)
+      Matrix.rows([row.to_a], false)
     else
       Matrix.rows([[row]], false)
     end
@@ -228,11 +267,10 @@ class Matrix
   #        6
   #
   def Matrix.column_vector(column)
-    case column
-    when Vector
-      Matrix.columns([column.to_a])
-    when Array
+    if column._isArray
       Matrix.columns([column])
+    elsif column.kind_of?( Vector )
+      Matrix.columns([column.to_a])
     else
       Matrix.columns([[column]])
     end
@@ -260,7 +298,12 @@ class Matrix
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
   #
   def [](i, j)
-    @rows[i][j]
+#   @rows[i][j]  # Maglev, fix ruby_bug "#1518", "1.9.1.129"
+    elem = @rows[i]
+    unless elem.equal?(nil)
+      elem = elem[j]
+    end
+    elem
   end
 
   #
@@ -337,15 +380,15 @@ class Matrix
   #        0 5 0
   #
   def minor(*param)
-    case param.size
-    when 2
+    psz = param.size
+    if psz == 2
       from_row = param[0].first
       size_row = param[0].end - from_row
       size_row += 1 unless param[0].exclude_end?
       from_col = param[1].first
       size_col = param[1].end - from_col
       size_col += 1 unless param[1].exclude_end?
-    when 4
+    elsif psz == 4
       from_row = param[0]
       size_row = param[1]
       from_col = param[2]
@@ -399,7 +442,7 @@ class Matrix
     
     other.compare_by_row_vectors(@rows)
   end
-  alias eql? ==
+  alias eql? ==  
   
   #
   # Not really intended for general consumption.
@@ -413,7 +456,7 @@ class Matrix
     end
     true
   end
-  
+
   #
   # Returns a clone of the matrix, so that the contents of each do not reference
   # identical objects.
@@ -446,8 +489,7 @@ class Matrix
   #        6 8
   #
   def *(m) # m is matrix or vector or number
-    case(m)
-    when Numeric
+    if m._isNumeric
       rows = @rows.collect {
         |row|
         row.collect {
@@ -456,11 +498,11 @@ class Matrix
         }
       }
       return Matrix.rows(rows, false)
-    when Vector
+    elsif m.kind_of?( Vector )
       m = Matrix.column_vector(m)
       r = self * m
       return r.column(0)
-    when Matrix
+    elsif m.kind_of?( Matrix )
       Matrix.Raise ErrDimensionMismatch if column_size != m.row_size
     
       rows = (0 .. row_size - 1).collect {
@@ -489,12 +531,12 @@ class Matrix
   #        -4 12
   #
   def +(m)
-    case m
-    when Numeric
+    if m._isNumeric
       Matrix.Raise ErrOperationNotDefined, "+"
-    when Vector
+    elsif m.kind_of?(Matrix)
+      # no coercion
+    elsif m.kind_of?(Vector)
       m = Matrix.column_vector(m)
-    when Matrix
     else
       x, y = m.coerce(self)
       return x + y
@@ -519,12 +561,12 @@ class Matrix
   #         8  1
   #
   def -(m)
-    case m
-    when Numeric
+    if m._isNumeric
       Matrix.Raise ErrOperationNotDefined, "-"
-    when Vector
+    elsif m.kind_of?(Matrix)
+      # no coercion
+    elsif m.kind_of?(Vector)
       m = Matrix.column_vector(m)
-    when Matrix
     else
       x, y = m.coerce(self)
       return x - y
@@ -549,8 +591,7 @@ class Matrix
   #        -3 -6
   #
   def /(other)
-    case other
-    when Numeric
+    if other._isNumeric
       rows = @rows.collect {
         |row|
         row.collect {
@@ -559,7 +600,7 @@ class Matrix
         }
       }
       return Matrix.rows(rows, false)
-    when Matrix
+    elsif other.kind_of?(Matrix)
       return self * other.inverse
     else
       x, y = other.coerce(self)
@@ -689,7 +730,7 @@ class Matrix
       end
       (k + 1).upto(size) do
         |i|
-        q = a[i][k] / akk
+         q = a[i][k] / akk  # with mathn , #/  produces Rationals, etc, otherwise truncates ...
         (k + 1).upto(size) do
           |j|
           a[i][j] -= a[k][j] * q
@@ -804,8 +845,7 @@ class Matrix
   # FIXME: describe #coerce.
   #
   def coerce(other)
-    case other
-    when Numeric
+    if other._isNumeric
       return Scalar.new(other), self
     else
       raise TypeError, "#{self.class} can't be coerced into #{other.class}"
@@ -873,13 +913,13 @@ class Matrix
     
     # ARITHMETIC
     def +(other)
-      case other
-      when Numeric
-        Scalar.new(@value + other)
-      when Vector, Matrix
-        Scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
-      when Scalar
-        Scalar.new(@value + other.value)
+      scalar = Scalar
+      if other.kind_of?( scalar)
+        scalar.new(@value + other.value)
+      elsif other._isNumeric
+        scalar.new(@value + other)
+      elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
+        scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
       else
         x, y = other.coerce(self)
         x + y
@@ -887,13 +927,13 @@ class Matrix
     end
     
     def -(other)
-      case other
-      when Numeric
-        Scalar.new(@value - other)
-      when Vector, Matrix
-        Scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
-      when Scalar
-        Scalar.new(@value - other.value)
+      scalar = Scalar
+      if other.kind_of?( scalar)
+        scalar.new(@value - other.value)
+      elsif other._isNumeric
+        scalar.new(@value - other)
+      elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
+        scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
       else
         x, y = other.coerce(self)
         x - y
@@ -901,10 +941,12 @@ class Matrix
     end
     
     def *(other)
-      case other
-      when Numeric
-        Scalar.new(@value * other)
-      when Vector, Matrix
+      scalar = Scalar
+      if other.kind_of?( scalar)
+        scalar.new(@value * other.value)  # Maglev addition
+      elsif other._isNumeric
+        scalar.new(@value * other)
+      elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
         other.collect{|e| @value * e}
       else
         x, y = other.coerce(self)
@@ -913,13 +955,15 @@ class Matrix
     end
     
     def / (other)
-      case other
-      when Numeric
-        Scalar.new(@value / other)
-      when Vector
-        Scalar.Raise WrongArgType, other.class, "Numeric or Scalar or Matrix"
-      when Matrix
-        self * _M.inverse
+      scalar = Scalar
+      if other.kind_of?( scalar)
+        scalar.new(@value / other.value)  # Maglev addition
+      elsif other._isNumeric
+        scalar.new(@value / other)
+      elsif other.kind_of?( Vector)
+        scalar.Raise WrongArgType, other.class, "Numeric or Scalar or Matrix"
+      elsif other.kind_of?( Matrix)
+        self * other.inverse
       else
         x, y = other.coerce(self)
         x / y
@@ -927,12 +971,14 @@ class Matrix
     end
     
     def ** (other)
-      case other
-      when Numeric
-        Scalar.new(@value ** other)
-      when Vector
-        Scalar.Raise WrongArgType, other.class, "Numeric or Scalar or Matrix"
-      when Matrix
+      scalar = Scalar
+      if other.kind_of?( scalar)
+        scalar.new(@value ** other.value)  # Maglev addition
+      elsif other._isNumeric
+        scalar.new(@value ** other)
+      elsif other.kind_of?( Vector)
+        scalar.Raise WrongArgType, other.class, "Numeric or Scalar or Matrix"
+      elsif other.kind_of?( Matrix)
         other.powered_by(self)
       else
         x, y = other.coerce(self)
@@ -1109,11 +1155,10 @@ class Vector
   # Multiplies the vector by +x+, where +x+ is a number or another vector.
   #
   def *(x)
-    case x
-    when Numeric
+    if x._isNumeric
       els = @elements.collect{|e| e * x}
       Vector.elements(els, false)
-    when Matrix
+    elsif x.kind_of?( Matrix)
       Matrix.column_vector(self) * x
     else
       s, x = x.coerce(self)
@@ -1125,15 +1170,14 @@ class Vector
   # Vector addition.
   #
   def +(v)
-    case v
-    when Vector
+    if v.kind_of?( Vector)
       Vector.Raise ErrDimensionMismatch if size != v.size
       els = collect2(v) {
         |v1, v2|
         v1 + v2
       }
       Vector.elements(els, false)
-    when Matrix
+    elsif v.kind_of?( Matrix)
       Matrix.column_vector(self) + v
     else
       s, x = v.coerce(self)
@@ -1237,8 +1281,7 @@ class Vector
   # FIXME: describe Vector#coerce.
   #
   def coerce(other)
-    case other
-    when Numeric
+    if other._isNumeric
       return Scalar.new(other), self
     else
       raise TypeError, "#{self.class} can't be coerced into #{other.class}"
