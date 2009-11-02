@@ -30,7 +30,11 @@ describe Point do
      Point.new( 1,  0, :foo),
      Point.new( 1,  2, :fooo)].each { |p| p.eql?(@p1).must_equal false }
   end
-#   it 'calculates distance from other points' do
-#     @p1.distance_from(@p2, 0).must_equal
-#   end
+
+  it 'calculates distance squared from other points' do
+    @p1.dist_sq(@p2).must_equal 405
+    @p2.dist_sq(@p1).must_equal 405
+    @p1.dist_sq(@p1).must_equal 0
+    @p2.dist_sq(@p2).must_equal 0
+  end
 end

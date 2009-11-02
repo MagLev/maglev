@@ -26,5 +26,12 @@ class Point
     @x.eql?(other.x) and @y.eql?(other.y) and @data.eql?(other.data)
   end
 
+  # Returns the distance squared from the other point
+  def dist_sq(other)
+    dx = @x - other.x
+    dy = @y - other.y
+    (dx * dx) + (dy * dy)
+  end
+
   # TODO: hash_code
 end

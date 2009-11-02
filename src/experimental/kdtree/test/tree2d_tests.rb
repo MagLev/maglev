@@ -32,7 +32,7 @@ describe Tree2D do
     it 'creates a tree with two points' do
       @two_pt_tree.wont_be_nil
       @two_pt_tree.left.wont_be_nil
-      @two_pt_tree.right.wont_be_nil
+      @two_pt_tree.right.must_be_nil
       @two_pt_tree.value.must_equal @p2
     end
 
@@ -42,6 +42,9 @@ describe Tree2D do
       tree.left.wont_be_nil
       tree.right.wont_be_nil
       tree.value.must_equal @p1
+      count = 0
+      tree.each {|el| count += 1}
+      count.must_equal 5
     end
 
     it 'splits first on axis 0' do
@@ -51,28 +54,60 @@ describe Tree2D do
       t1 = Tree2D.new [a, b, c]
       t2 = Tree2D.new [c, a, b]
       t3 = Tree2D.new [b, a, c]
+      [t1, t2, t3].each do |t|
+        t.left.value.must_equal a
+        t.left.left.must_be_nil
+        t.left.right.must_be_nil
+
+        t.value.must_equal b
+
+        t.right.value.must_equal c
+        t.right.left.must_be_nil
+        t.right.right.must_be_nil
+      end
     end
 
-    it 'creates our special tree ok' do
+    it 'splits second on axis 1' do
       a = Point.new( 0, -2, :a)
       b = Point.new(-1,  1, :b)
       c = Point.new( 1,  0, :c)
-      d = Point.new(-3,  2, :d)
-      e = Point.new(-2, -1, :e)
-      f = Point.new( 3,  2, :f)
-      g = Point.new( 2, -1, :g)
+      d = Point.new(-2, -1, :d)
+      e = Point.new(-3,  2, :e)
+      f = Point.new( 2, -1, :f)
+      g = Point.new( 3,  2, :g)
       tree = Tree2D.new [a, b, c, d, e, f, g]
       in_order_traversal = [d, b, e, a, f, c, g]
-      depth_first_order  = [d, e, b, f, g, c, a]
-#      tree.each { |el| el.value.must_equal depth_first_order.shift }
-#      tree.each { |el| p el }
+      tree.each { |el| el.must_equal in_order_traversal.shift }
     end
   end
 
-  describe 'iteration' do
+  describe 'finding and traversing fixed graphs' do
+    before do
+      @tree = Tree2D.new [@a = Point.new( 0, -2, :a),
+                          @b = Point.new(-1,  1, :b),
+                          @c = Point.new( 1,  0, :c),
+                          @d = Point.new(-2, -1, :d),
+                          @e = Point.new(-3,  2, :e),
+                          @f = Point.new( 2, -1, :f),
+                          @g = Point.new( 3,  2, :g)]
+    end
+
+    it 'finds the nearest point in known graph' do
+      target = Point.new(-2, 1, :target_point)
+      v, d = @tree.nearest(target)
+      v.must_equal @b
+    end
+  end
+
+  describe 'finding and iterating random graphs' do
+    # Random data will be constrained by:
+    NUM_DIMENSIONS = 2
+    MAX_SCALAR  = 100
+    MAX_DIST_SQ = MAX_SCALAR * MAX_SCALAR * NUM_DIMENSIONS
+
     before do
       @points = Array.new
-      30.times {|i| @points << Point.new(rand(100), rand(100), "point #{i}")}
+      100.times {|i| @points << Point.new(rand(MAX_SCALAR), rand(MAX_SCALAR), "point #{i}")}
       @tree = Tree2D.new @points
     end
 
@@ -80,6 +115,29 @@ describe Tree2D do
       seen = Hash.new(0)
       @tree.each {|el| seen[el.data] += 1 }
       seen.size.must_equal @points.size
+    end
+
+    it 'finds the nearest point (random float data)' do
+      100.times do |i|
+        target = Point.new(50.01 - rand(MAX_SCALAR), 49.87 - rand(MAX_SCALAR), :target_point)
+        expected_p, expected_d = find_nearest(target, @points)
+        expected_p.wont_be_nil
+        expected_d.wont_be_nil
+        actual_p, actual_d = @tree.nearest(target)
+        actual_p.must_equal expected_p
+      end
+    end
+
+    # Do an exhaustive search of the random data for the nearest point.
+    # Used to find the expected value for the random trees.  Returns an
+    # array of the nearest point and the distance from the target to that
+    # point.
+    def find_nearest(target, points)
+      points.inject([nil, MAX_DIST_SQ]) do |acc, current|
+        best_d = acc[1]
+        cur_dist = current.dist_sq(target)
+        cur_dist < best_d ? [current, cur_dist] : acc
+      end
     end
   end
 end
