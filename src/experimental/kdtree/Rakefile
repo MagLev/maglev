@@ -1,0 +1,14 @@
+
+task :default => :test
+
+desc "Test Tree2D class"
+task :test do
+  #  sh "maglev-ruby -I lib test/tree2d_tests.rb"
+  puts "=== TODO: Change from ruby -> maglev-ruby"
+  sh "ruby -I lib test/point_tests.rb"
+  sh "ruby -I lib test/tree2d_tests.rb"
+end
+
+task :bench do
+  sh "maglev-ruby -I lib test/benchmark.rb"
+end
