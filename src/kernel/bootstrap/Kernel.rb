@@ -159,7 +159,7 @@ module Kernel
     res
   end
 
-  def exit(arg=1)
+  def exit(arg=0)
     status = 9
     if (arg.equal?(true))
       status = 0
@@ -594,7 +594,6 @@ module Kernel
     arr = _system_exec(arg)
     status = arr[0]
     unless status.equal?(0)
-nil.pause
       Errno.raise_errno(status, arg)
     end
     arr[1]
