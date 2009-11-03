@@ -21,10 +21,32 @@ class Exception
     primitive_nobridge '_st_initialize', 'initialize'
 
     def message
-      # The messages encoded by Smalltalk exceptions are frozen,
-      # but ruby allows modifications
-      m = _description
-      m.frozen? ? m.dup : m
+      m = @messageText
+      if m.equal?(nil)
+        m = _description  # generate Smalltalk message
+      end
+      if m.frozen? 
+        # The messages encoded by Smalltalk exceptions are frozen,
+        # but ruby allows modifications
+        m = m.dup 
+      end
+      m
+    end
+
+    def self._default_ruby_message
+      nil
+    end
+
+    def _message_append(str)
+      m = @messageText
+      if m.equal?(nil)
+        m = self.message
+        if m.equal?(nil)
+          @messageText = str.to_s
+          return
+        end
+      end
+      m << str.to_s 
     end
 
     # Define this in ruby code so we get the full env1 creation hooks
@@ -71,14 +93,12 @@ class Exception
       Thread._backtrace(true, limit)
     end
 
-    primitive_nobridge '_message', 'messageText:'
-
     def exception(message = Undefined)
       if message.equal?(self) || message.equal?(Undefined)
         return self
       end
       e = dup
-      e._message(message)
+      e._message=(message)
       e
     end
 

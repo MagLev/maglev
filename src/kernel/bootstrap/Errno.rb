@@ -32,6 +32,10 @@ module Errno
     exc = cls.allocate
     exc._st_initialize
     exc.errno=(errno)
+    m = cls._default_ruby_message
+    if m._not_equal?(nil)
+      exc._message=(m)
+    end
     exc
   end
 
@@ -39,10 +43,9 @@ module Errno
     exc = self._new_for_errno(errno)
     if exc.equal?(nil)
       exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
-      ex._signal
     end
     if additional._isString && additional.length > 0
-      exc._message=(additional)
+      exc._message_append(additional)
     end
     exc._signal
   end
@@ -118,8 +121,8 @@ module Errno
 end
 
 # Create Errno specific error messages here
-Errno::ENOENT.class_eval do
-  def message
-    "No such file or directory - #{_description}"
+class Errno::ENOENT
+  def self._default_ruby_message
+    "No such file or directory - "
   end
 end
