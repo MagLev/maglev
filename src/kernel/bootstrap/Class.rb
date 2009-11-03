@@ -85,10 +85,7 @@ class Class
   primitive_nobridge 'included_modules' , 'rubyIncludedModules'
 
   primitive 'inspect', '_rubyInspect'
-
-  def to_s
-    name
-  end
+  primitive 'to_s', '_rubyInspect'
 
   # Controls whether instances of receiver are persistable.  If the flag is
   # +true+, then receiver is marked to allow instances to be persisted.
