@@ -1074,7 +1074,7 @@ module MagRp
            RubyGlobalVarNode.s(@name)
          end
          def inspect
-           "[:gasgn, :#{@name}, #{@valueNode}]"
+           "[:gasgn, :#{@name}, #{@valueNode.inspect}]"
          end
        end
 
