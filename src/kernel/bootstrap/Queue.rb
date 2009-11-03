@@ -245,7 +245,6 @@ class SizedQueue < Queue
     unless old_size == max
       @resource.broadcast
     end
-    nil.pause
     max
   end
 
