@@ -94,15 +94,19 @@ describe KDTree::Tree2D do
 
     it 'finds the nearest point in known graph' do
       target = KDTree::Point2D.new(-2, 1, :target_point)
-      v, d = @tree.nearest(target)
-      v.must_equal @b
+      v = @tree.nearest(target)
+      v.value.must_equal @b
     end
 
     it 'finds the nearest k points in known graph' do
       target = KDTree::Point2D.new(-2, 1, :target_point)
-      k = 1
-      best = @tree.nearest_k(target, k)
-      best.value.must_equal @b
+
+      best = @tree.nearest_k(target, 3)
+      best_points = best.map {|sr| sr.value }
+
+      best_points.include?(@b).must_equal true
+      best_points.include?(@d).must_equal true
+      best_points.include?(@e).must_equal true
     end
   end
 
@@ -114,7 +118,7 @@ describe KDTree::Tree2D do
 
     before do
       @points = Array.new
-      100.times {|i| @points << KDTree::Point2D.new(rand(MAX_SCALAR), rand(MAX_SCALAR), "point #{i}")}
+      1_000.times {|i| @points << KDTree::Point2D.new(rand(MAX_SCALAR), rand(MAX_SCALAR), "point #{i}")}
       @tree = KDTree::Tree2D.new @points
     end
 
@@ -129,10 +133,11 @@ describe KDTree::Tree2D do
         target = KDTree::Point2D.new(50.01 - rand(MAX_SCALAR),
                                      49.87 - rand(MAX_SCALAR),
                                      :target_point)
-        expected_p, expected_d = find_nearest(target, @points)
-        expected_p.wont_be_nil
-        expected_d.wont_be_nil
-        actual_p, actual_d = @tree.nearest(target)
+        expected = find_nearest_k(target, @points, 1)[0]
+        expected.value.wont_be_nil
+        expected.distance.wont_be_nil
+        actual = @tree.nearest(target)
+        actual.distance.must_equal expected.distance
       end
     end
 
@@ -141,19 +146,17 @@ describe KDTree::Tree2D do
         target = KDTree::Point2D.new(50.01 - rand(MAX_SCALAR),
                                      49.87 - rand(MAX_SCALAR),
                                      :target_point)
-        expected_p, expected_d = find_nearest(target, @points)
-        expected = find_nearest_k(target, @points, 1)
+        expected = find_nearest_k(target, @points, 1)[0]
+        expected.wont_be_nil
 
-        actual_p, actual_d = @tree.nearest(target)
-        actual = @tree.nearest_k(target, 1)
+        actual   = @tree.nearest(target)
+        actual_k = @tree.nearest_k(target, 1)[0]
 
         # With random data, we may have two nodes with the same
         # coordinates, or two points that are equidistant from the target.
         # Do not compare points, only the distances.
-        expected_d.must_equal expected.metric
-
-        actual.metric.must_equal expected.metric
-        actual_d.must_equal expected_d
+        expected.distance.must_equal actual.distance
+        expected.distance.must_equal actual_k.distance
       end
     end
 
@@ -162,17 +165,19 @@ describe KDTree::Tree2D do
         target = KDTree::Point2D.new(50.01 - rand(MAX_SCALAR),
                                      49.87 - rand(MAX_SCALAR),
                                      :target_point)
-        expected = find_nearest_k(target, @points, 1)
+        k = 20
+        expected = find_nearest_k(target, @points, k)
         expected.wont_be_nil
-        expected.value.wont_be_nil
-        expected.metric.wont_be_nil
-
-        actual = @tree.nearest_k(target, 1)
+        actual = @tree.nearest_k(target, k)
 
         # With random data, we may have two nodes with the same
         # coordinates, or two points that are equidistant from the target.
         # Do not compare points, only the distances.
-        actual.metric.must_equal expected.metric
+        actual.each do |a|
+          exact_match   = expected.any?{ |e| a.value == e.value }
+          same_distance = expected.any?{ |e| a.distance == e.distance }
+          (exact_match or same_distance).must_equal true
+        end
       end
     end
 
@@ -185,24 +190,13 @@ describe KDTree::Tree2D do
     it 'finds nearest_k in degenerate trees' do
     end
 
-    # Do an exhaustive search of the random data for the nearest point.
-    # Used to find the expected value for the random trees.  Returns an
-    # array of the nearest point and the distance from the target to that
-    # point.
-    def find_nearest(target, points)
-      points.inject([nil, MAX_DIST_SQ]) do |acc, current|
-        best_d = acc[1]
-        cur_dist = current.dist_sq(target)
-        cur_dist < best_d ? [current, cur_dist] : acc
-      end
-    end
-
+    # Exhaustive search of points for nodes near target.  Returns an array
+    # of at most k SearchResult objects.  Each SearchResult has a node and
+    # the distance_squared of that node from the target.
     def find_nearest_k(target, points, k=1)
-      best = KDTree::MinMetric.new
-      points.inject(best) do |acc, current|
-        best.update(current, current.dist_sq(target))
-        best
-      end
+      points.inject(BestK.new(k)) do |b, current|
+        b.add(KDTree::SearchResult.new(current, current.dist_sq(target)))
+      end.values
     end
   end
 end

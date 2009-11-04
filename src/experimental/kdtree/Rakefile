@@ -1,6 +1,6 @@
 task :default => :test
 
-ENV['MAGLEV_OPTS'] = ""
+ENV['MAGLEV_OPTS'] = ''
 
 desc "Test Tree2D class"
 task :test do
@@ -14,6 +14,6 @@ end
 
 task :bench do
   #sh "ruby -r profile -I lib test/benchmark.rb"
-  sh "maglev-ruby -I lib test/benchmark.rb"
   sh "ruby -I lib test/benchmark.rb"
+  sh "maglev-ruby -I lib test/benchmark.rb"
 end
