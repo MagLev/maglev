@@ -9,6 +9,8 @@
 #
 #
 # TODO: Instead of checking axis all the time, make subclasses for each axis?
+require 'bestk'
+
 module KDTree
 
   # Tree2D is a KD-Tree of dimension 2.
@@ -113,16 +115,15 @@ module KDTree
     # distance squared from the point to the target_point. If this tree
     # contains several points at the same distance, only one of those values
     # is returned.
+    #
+    # It is about 20% (maglev) - 40% (mri) faster to not use MinMetric in
+    # this method...
     def nearest(target_point)
-      #      Tree2D.inc_counter :nearest
       my_dist = target_point.dist_sq(@value)
       best_v = @value
       best_d = my_dist
 
-      if self.leaf?
-        #        Tree2D.inc_counter :leaf_return
-        return [best_v, best_d]
-      end
+      return [best_v, best_d] if self.leaf?
 
       # cmp = target_point[@axis] <=> @value[@axis]
       if @axis == 0
@@ -141,10 +142,10 @@ module KDTree
       when 0
         if @left
           unsearched = @right
-          @left.nearest(target_point)
+          best_v, best_d = @left.nearest(target_point)
         else
           unsearched = @left
-          @right.nearest(target_point)
+          best_v, best_d = @right.nearest(target_point)
         end
       end
 
@@ -166,8 +167,6 @@ module KDTree
         target_to_axis_d = @value.y - target_point.y
       end
       target_to_axis_d_sq = target_to_axis_d * target_to_axis_d
-      a_bool = best_d >= target_to_axis_d_sq
-      #    puts "-- #{a_bool}: best_d(#{best_d}) >=  ad(#{target_to_axis_d_sq})"
       if best_d >= target_to_axis_d_sq and not unsearched.nil?
         v, d = unsearched.nearest(target_point)
         if d < best_d
@@ -178,6 +177,69 @@ module KDTree
         #        Tree2D.inc_counter :skip
       end
       [best_v, best_d]
+    end
+
+    # Returns an array of [value, dist] which represents the value of the
+    # nearest point to the target_point in this subtree, along with the
+    # distance squared from the point to the target_point. If this tree
+    # contains several points at the same distance, only one of those values
+    # is returned.
+    def nearest_k(target_point, k=1)
+#       bestk = BestK.new(k) do |a,b|
+#         # a is better than b if the metric is smaller
+#         a
+#       end
+#       _nearest_k(target_point, bestk)
+#     end
+
+#     def _nearest_k(target_point, bestk)
+      #      Tree2D.inc_counter :nearest
+      my_dist = target_point.dist_sq(@value)
+      best = MinMetric.new(@value, my_dist)
+
+      return best if self.leaf?
+
+      cmp = if @axis == 0
+              target_point.x <=> @value.x
+            else
+              target_point.y <=> @value.y
+            end
+      # But best_v is not set if the search side is nil...
+      case cmp
+      when -1
+        unsearched = @right
+        best.update_metric(@left.nearest_k(target_point, k)) unless @left.nil?
+      when 1
+        unsearched = @left
+        best.update_metric(@right.nearest_k(target_point, k)) unless @right.nil?
+      when 0
+        if @left
+          unsearched = @right
+          best.update_metric(@left.nearest_k(target_point, k))
+        else
+          unsearched = @left
+          best.update_metric(@right.nearest_k(target_point, k))
+        end
+      end
+
+      # Am I better than the best in my sub-tree?
+      best.update(@value, my_dist)
+
+      # Check if the other side of the splitting plane is close enough for
+      # possibilities.  This will be the case if the best distance so far
+      # is larger than the distance from target node to my splitting axis
+      # (i.e., does a hypersphere of radius best_d cross the splitting axis
+      # or not).
+      target_to_axis_d = if @axis == 0
+                           @value.x - target_point.x
+                         else
+                           @value.y - target_point.y
+                         end
+      target_to_axis_d_sq = target_to_axis_d * target_to_axis_d
+      if best.metric >= target_to_axis_d_sq and not unsearched.nil?
+        best.update_metric(unsearched.nearest_k(target_point, k))
+      end
+      best
     end
 
     def eql?(other)
@@ -201,6 +263,53 @@ module KDTree
       @left.stats(depth+1, stats) if @left
       @right.stats(depth+1, stats) if @right
       stats
+    end
+  end
+
+  # Maintains a value / metric pair.  Updated data can be sent to the
+  # object, but it will only be remembered if the metric is better than the
+  # current one.
+  class MinMetric
+    attr_reader :value, :metric
+
+    def initialize(value=nil, metric=nil)
+      @value = value
+      @metric = metric
+    end
+
+    def update_metric(metric)
+      if @metric.nil? || metric.metric < @metric
+        @value = metric.value
+        @metric = metric.metric
+      end
+    end
+
+    def update(value, metric)
+      if @metric.nil? || metric < @metric
+        @value = value
+        @metric = metric
+      end
+    end
+
+    def eql?(other)
+      other and @metric.eql?(other.metric) and @value.eql?(other.value)
+    end
+
+    def hash
+      @metric.hash ^ @value.hash
+    end
+  end
+
+  class SearchResult
+    attr_reader :value, :distance
+    def initialize(value, dist)
+      @value = value
+      @distance = dist
+    end
+    def >(other)
+      # a is greater (better) than b if its distance from the target is
+      # smaller
+      other.distance > @distance
     end
   end
 
