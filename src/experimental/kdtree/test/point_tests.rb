@@ -1,13 +1,13 @@
 require 'rubygems'
 require 'minitest/spec'
-require 'point'
+require 'tree2d'
 
 MiniTest::Unit.autorun
 
-describe Point do
+describe KDTree::Point2D do
   before do
-    @p1 = Point.new( 1,  2, :foo)
-    @p2 = Point.new(10, 20, :bar)
+    @p1 = KDTree::Point2D.new( 1,  2, :foo)
+    @p2 = KDTree::Point2D.new(10, 20, :bar)
   end
 
   it 'correctly reports axis values' do
@@ -24,11 +24,11 @@ describe Point do
   it 'compares eql? correctly' do
     @p1.eql?(@p2).must_equal false
     @p2.eql?(@p1).must_equal false
-    p1 = Point.new( 1,  2, :foo)
+    p1 = KDTree::Point2D.new( 1,  2, :foo)
     @p1.eql?(p1).must_equal true
-    [Point.new( 0,  2, :foo),
-     Point.new( 1,  0, :foo),
-     Point.new( 1,  2, :fooo)].each { |p| p.eql?(@p1).must_equal false }
+    [KDTree::Point2D.new( 0,  2, :foo),
+     KDTree::Point2D.new( 1,  0, :foo),
+     KDTree::Point2D.new( 1,  2, :fooo)].each { |p| p.eql?(@p1).must_equal false }
   end
 
   it 'calculates distance squared from other points' do
@@ -36,5 +36,21 @@ describe Point do
     @p2.dist_sq(@p1).must_equal 405
     @p1.dist_sq(@p1).must_equal 0
     @p2.dist_sq(@p2).must_equal 0
+  end
+
+  it 'if p1.eql?(p2) then p1.hash == p2.hash' do
+    100.times do |i|
+      x, y, data = rand(1000), rand(1000), rand(1000)
+      p1 = KDTree::Point2D.new(x, y, data)
+      p2 = KDTree::Point2D.new(x, y, data)
+
+      p1.eql?(p1).must_equal true
+      p1.eql?(p2).must_equal true
+
+      p2.eql?(p1).must_equal true
+      p2.eql?(p2).must_equal true
+
+      p1.hash.must_equal p2.hash
+    end
   end
 end

@@ -5,10 +5,12 @@ ENV['MAGLEV_OPTS'] = ""
 desc "Test Tree2D class"
 task :test do
   puts "=== TODO: Change from ruby -> maglev-ruby"
-  sh "maglev-ruby -I lib test/point_tests.rb"
-  sh "maglev-ruby -I lib test/tree2d_tests.rb"
+  sh "ruby -I lib test/point_tests.rb"
+  sh "ruby -I lib test/tree2d_tests.rb"
 end
 
 task :bench do
+  #sh "ruby -r profile -I lib test/benchmark.rb"
   sh "maglev-ruby -I lib test/benchmark.rb"
+  sh "ruby -I lib test/benchmark.rb"
 end
