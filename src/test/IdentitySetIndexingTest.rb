@@ -1,7 +1,7 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
 idset = IdentitySet.new
-idset._create_index('id', Fixnum)
+idset.create_index('id', Fixnum)
 
 class Id
   def initialize(id)
@@ -21,7 +21,7 @@ test(idset.length, 10, 'Inserted 10 Id instances')
 10.times { |i| idset << Bar.new(i) }
 test(idset.length, 20, 'Inserted 10 Bar instances')
 
-old_ones = idset._select([:id], :>=, 7)
+old_ones = idset.select([:id], :>=, 7)
 test(old_ones.length, 6, 'Select 1 worked')
 
 report
