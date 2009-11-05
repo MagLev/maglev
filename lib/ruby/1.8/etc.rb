@@ -35,9 +35,9 @@ module Etc
   def self.getgrent
     result = if @restart_gr
                @restart_gr = false
-               Dir._getgrgent(0)
+               Dir.__getgrgent(0)
              else
-               Dir._getgrgent(1)
+               Dir.__getgrgent(1)
              end
     result.nil? ? nil : Struct::Group.new(*result)
   end
@@ -62,7 +62,7 @@ module Etc
   # Etc.getgrgid(100) -> #<struct Struct::Group name="users", passwd="x", gid=100, mem=["meta", "root"]>
   def self.getgrgid(gid)
     raise TypeError, "can't convert #{gid.class} into Integer" unless gid.is_a?(Integer)
-    result = Dir._getgrgid(gid)
+    result = Dir.__getgrgid(gid)
     raise ArgumentError, "can't find group for #{gid}" if result.nil?
     Group.new(*result)
   end
@@ -75,14 +75,14 @@ module Etc
   # Etc.getgrnam(‘users’) -> #<struct Struct::Group name="users", passwd="x", gid=100, mem=["meta", "root"]>
   def self.getgrnam(name)
     raise TypeError, "can't convert #{name.class} into String" unless name.is_a?(String)
-    result = Dir._getgrnam(name)
+    result = Dir.__getgrnam(name)
     raise ArgumentError, "can't find group for #{name}" if result.nil?
     Group.new(*result)
   end
 
   # Returns the short user name of the currently logged in user.
   def self.getlogin
-    Dir._getlogin
+    Dir.__getlogin
   end
 
   # Returns an entry from the /etc/passwd file. The first time it is called
@@ -112,9 +112,9 @@ module Etc
   def self.getpwent
     result = if @restart_pw
                @restart_pw = false
-               Dir._getpwent(0)
+               Dir.__getpwent(0)
              else
-               Dir._getpwent(1)
+               Dir.__getpwent(1)
              end
     result.nil? ? nil : Struct::Passwd.new(*result)
   end
@@ -125,7 +125,7 @@ module Etc
   # Etc.getpwnam(‘root’) -> #<struct Struct::Passwd name="root", passwd="x", uid=0, gid=0, gecos="root",dir="/root", shell="/bin/bash">
   def self.getpwnam(name)
     raise TypeError, "can't convert #{name.class} into String" unless name.is_a?(String)
-    result = Dir._getpwnam(name)
+    result = Dir.__getpwnam(name)
     raise ArgumentError, "can't find user for #{name}" if result.nil?
     Passwd.new(*result)
   end
@@ -137,12 +137,12 @@ module Etc
   # Etc.getpwnam(0) -> #<struct Struct::Passwd name="root", passwd="x", uid=0, gid=0, gecos="root",dir="/root", shell="/bin/bash">
   def self.getpwuid(uid=nil)
     if uid.nil?
-      uid = Dir._getuid
+      uid = Dir.__getuid
     elsif not uid.is_a?(Integer)
       raise TypeError, "can't convert #{uid.class} into Integer"
     end
 
-    result = Dir._getpwuid(uid)
+    result = Dir.__getpwuid(uid)
     raise ArgumentError, "can't find user for #{uid}" if result.nil?
     Passwd.new(*result)
   end
