@@ -221,7 +221,7 @@ module MagRp
             res = self._new
             sel = name_tok.symval.to_s 
             sel << "=" 
-            sel = sel._as_symbol
+            sel = sel.__as_symbol
             res.init(rcvr, sel, args)
             res.src_offset=( name_tok.src_offset)
             res
@@ -438,7 +438,7 @@ module MagRp
          primitive_nobridge 'initSelectors', 'initAsgnSel:opSel:'
          def self.s(rcvr, asgnSelTok, opSelTok, val)
            res = self._new
-           asgn_sel = (asgnSelTok.symval.to_s << '=' )._as_symbol
+           asgn_sel = (asgnSelTok.symval.to_s << '=' ).__as_symbol
            res.initSelectors(asgn_sel, opSelTok.symval)
            res.receiverNode=(rcvr)
            res.valueNode=(val)
@@ -1293,6 +1293,7 @@ module MagRp
            res.init( iter, var, body)
          end
          def init(iter, var, body)
+if Gemstone.session_temp(:TrapFor) ; nil.pause ; end
            @iterNode = iter
            @varNode = var
            @bodyNode = body 
@@ -1522,7 +1523,7 @@ module MagRp
          def asDSymbolNode
            res = RubyDSymbolNode._new
            lst = @list.dup 
-           lst[0] = RubySymbolNode.s( lst[0].strNodeValue._as_symbol ) 
+           lst[0] = RubySymbolNode.s( lst[0].strNodeValue.__as_symbol ) 
            res.list=( lst )
            res
          end
@@ -1714,7 +1715,7 @@ module MagRp
       o.initialize(str, ofs)
     end
     def initialize(str, ofs)
-      @val = str._as_symbol
+      @val = str.__as_symbol
       @src_offset = ofs
       self
     end

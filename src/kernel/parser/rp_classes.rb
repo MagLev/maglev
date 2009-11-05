@@ -32,7 +32,7 @@ module MagRp
       o.initialize(str, ofs, line)
     end
     def initialize(str, ofs, line)
-      @val = str._as_symbol
+      @val = str.__as_symbol
       @line_num = line
       @src_offset = ofs
       self
@@ -79,7 +79,7 @@ module MagRp
   
     # end of first opening,  all constants and fixed instVars defined
   end # }
-  Environment._freeze_constants
+  Environment.__freeze_constants
 
   class RubyLexer # {
     def command_start_
@@ -251,7 +251,7 @@ module MagRp
     Expr_IS_beg_mid_dot_arg_cmdarg = Expr_beg | Expr_mid | Expr_dot | Expr_arg | Expr_cmdArg
 
   end # }
-  RubyLexer._freeze_constants
+  RubyLexer.__freeze_constants
 
   class Keyword # {
 #     class KWtable		# class no longer used
@@ -277,7 +277,7 @@ module MagRp
       #  Expr_dot    = right after . or ::, no reserved words.
       #  Expr_class  = immediate after class, no here document.
 
-      wordlist = [
+      WORDLIST = [
 		    # negated new state means yacc_value gets encapsulated in an RpNameToken
 		    # and/or gets other special handling
 		  ["end",      [:kEND,      :kEND        , RubyLexer::Expr_end   ]],
@@ -291,7 +291,7 @@ module MagRp
 		  ["not",      [:kNOT,      :kNOT        , RubyLexer::Expr_beg   ]],
 		  ["then",     [:kTHEN,     :kTHEN       , RubyLexer::Expr_beg   ]],
 		  ["yield",    [:kYIELD,    :kYIELD      , - RubyLexer::Expr_arg   ]],
-		  ["for",      [:kFOR,      :kFOR        , RubyLexer::Expr_beg   ]],
+		  ["for",      [:kFOR,      :kFOR        , - RubyLexer::Expr_beg   ]],
 		  ["self",     [:kSELF,     :kSELF       , RubyLexer::Expr_end   ]],
 		  ["false",    [:kFALSE,    :kFALSE      , RubyLexer::Expr_end   ]],
 		  ["retry",    [:kRETRY,    :kRETRY      , - RubyLexer::Expr_end   ]],
@@ -322,18 +322,27 @@ module MagRp
 		  ["alias",    [:kALIAS,    :kALIAS      , - RubyLexer::Expr_fname ]]
 		 ]
 
-      # :startdoc:
-
-      ht = Hash.new
-      WORDLIST = ht
-      wordlist.each { | elem |
-        ht[ elem[0] ] = elem[1]
-      } 
- 
       # def self.keyword( str)  ; end # no longer used
 
+      def self.create_transient_wordlist
+        # create a Hash from WORDLIST, which because it is not committed
+        #  will have memory pointer references to all keys and values
+        h = Hash.new
+        WORDLIST.each { | arr |
+          k = arr[0]
+          v = arr[1].dup
+          v_siz = v.size 
+          for i in 0..v_siz-1 do
+            v[i] = v[i] # make ref a RamOop
+          end
+          h[k] = v
+        }
+        h.freeze 
+        h
+      end
+
   end # }
-  Keyword._freeze_constants
+  Keyword.__freeze_constants
 
   class SrcRegion
     # describes a portion of the source string, used in heredoc implementation

@@ -231,6 +231,6 @@ class RpStringScanner
 
   # see additional code in strscan2.rb
 end
-RpStringScanner._freeze_constants
+RpStringScanner.__freeze_constants
 
 end  # MagRp

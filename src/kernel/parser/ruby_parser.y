@@ -1477,6 +1477,7 @@ rule
                         premature_eof( val[vofs ] )
                       end
                       result = new_for( val[vofs + 4], val[vofs + 1], val[vofs + 7])
+                      result.src_offset=( val[vofs ].src_offset ) # kFOR position
                     }
                 | kCLASS cpath superclass
                     {
@@ -2067,7 +2068,7 @@ xstring_contents: none
                 | tSYMBOL
                     {
 		      # symbol: # | tSYMBOL
-                      result = val[vofs ]._as_symbol
+                      result = val[vofs ].__as_symbol
                     }
 
              sym: fname | tIVAR | tGVAR | tCVAR
@@ -2086,7 +2087,7 @@ xstring_contents: none
                         if str.size.equal?(0)
                           yyerror "empty symbol literal"
                         end
-			result = RubySymbolNode.s( str._as_symbol )
+			result = RubySymbolNode.s( str.__as_symbol )
                       elsif v_one.equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil

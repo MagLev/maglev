@@ -62,14 +62,14 @@ module MagRp # {
         rt[ofs] = rt[ofs] # fault in symbols
         idx += 3
       end
-      rt._set_nostubbing
+      rt.__set_nostubbing
       rt.freeze
       @reduce_table = rt
       @token_table = @token_table
       @lexer = nil
       @env = nil 
       @syntax_err_count = 0
-      self._set_nostubbing
+      self.__set_nostubbing
       self
     end
 
@@ -105,6 +105,14 @@ module MagRp # {
       @in_single = 0
       @in_def = false
       super
+    end
+
+    def _install_wordlist(hash)
+      @lexer_wordlist = hash
+    end
+
+    def _wordlist
+      @lexer_wordlist
     end
 
     def file_name

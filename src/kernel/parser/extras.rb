@@ -3,8 +3,12 @@
 # require 'sexp'
 # require 'strscan'
 
-# WHY do I have to do this?!?  (Ryan's question)
 class Regexp
+  class_primitive_nobridge '__new', 'new:options:lang:'  
+
+  primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
+
+  # WHY do I have to do this?!?  (Ryan's question)
   unless defined? ONCE then
     ONCE     = 0 # 16 # ?
     ENC_NONE = /x/n.options
@@ -13,7 +17,7 @@ class Regexp
     ENC_UTF8 = /x/u.options
   end
 end
-Regexp._freeze_constants
+Regexp.__freeze_constants
 
 # Fixnum#ord deleted
 
@@ -40,13 +44,32 @@ class Symbol
   # allow String-like access to bytes of Symbols
   primitive_nobridge_env '[]' , '_rubyAt', ':'
 
-  def _as_symbol
+  def __as_symbol
     self  
   end
 end
 
 # class InternalParseError < StandardError
 # end
+
+class TransientShortArray
+  # TransientShortArray supports contigous in-memory instances 
+  # up to 65Kbytes. Each element is a 16 bit integer.
+  # Instances may not be committed . 
+  #
+  # The parser uses TransientShortArrays for the in-memory
+  # copies of some of the racc state-tables,
+  # which would exceed the small-object limit of 8K bytes if 
+  # represented with normal Arrays .
+  
+  class_primitive_nobridge '_with_shorts', '_withAllShorts:'
+    # copies an Array
+    
+  primitive_nobridge '[]', '_rubyParserShortAt:'
+    # zero values are translated to a nil result
+    
+  primitive_nobridge '[]=', '_rubyShortAt:put:'
+end
 
 module MagRp # {
 
@@ -159,7 +182,7 @@ module MagRp # {
 	  end
 	  h = ary[idx ]
           if h._not_equal?(nil)
-	    h._add_keys_to(set)
+	    h.__add_keys_to(set)
           end
 	  idx -= ENTRY_SIZE
 	end
@@ -602,8 +625,7 @@ module MagRp # {
       @lexer = lx
       @env = Environment.new
       #  @comments  no longer used , this parser not for use with RDoc implementation
-
-      # inline required subset of reset # moved to new_instance method
+      lx._install_wordlist( @lexer_wordlist )
     end
 
     def reset
@@ -924,7 +946,7 @@ module MagRp # {
 	body = RubyBlockNode.s( [ body ] )  # s(:block, body) 
       end
       if name_tok._isString
-	name_sym = name_tok._as_symbol  # from a reserved word
+	name_sym = name_tok.__as_symbol  # from a reserved word
       else
 	name_sym = name_tok.symval # expect a RpNameToken
       end
@@ -1120,7 +1142,7 @@ module MagRp # {
 	node = nil
 	begin
 	  str = argnode.strNodeValue
-	  rxlit = Regexp._new( str, o, nil)
+	  rxlit = Regexp.__new( str, o, nil)
 	  node = RubyRegexpNode.s(rxlit)
 	rescue RegexpError => ex
 	  regex_beg_tok = val[vofs]  # for tREGEXP_BEG
@@ -1131,7 +1153,7 @@ module MagRp # {
 	return node
       end
       if argnode.equal?(nil)
-	rxlit = Regexp._new('', o, nil)
+	rxlit = Regexp.__new('', o, nil)
 	node = RubyRegexpNode.s(rxlit)
 	return node
       end

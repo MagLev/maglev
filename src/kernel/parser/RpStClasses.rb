@@ -1,5 +1,8 @@
+# resolution of all Smalltalk node classes 
+
+TransientShortArray = _resolve_smalltalk_global(:TransientShortArray)
+
 module MagRp
-  # resolution of all Smalltalk node classes 
 
   RubyNode = _resolve_smalltalk_global(:RubyNode)
 #    RubyAbstractCallNode
@@ -138,4 +141,4 @@ module MagRp
   RpNameToken = _resolve_smalltalk_global(:RpNameToken)
 
 end
-MagRp._freeze_constants
+MagRp.__freeze_constants

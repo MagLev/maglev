@@ -4887,6 +4887,7 @@ def _reduce_305(val, vofs)
                         premature_eof( val[vofs ] )
                       end
                       result = new_for( val[vofs + 4], val[vofs + 1], val[vofs + 7])
+                      result.src_offset=( val[vofs ].src_offset ) # kFOR position
                     
     result
 end
@@ -5630,7 +5631,7 @@ end
 
 def _reduce_407(val, vofs)
 		      # symbol: # | tSYMBOL
-                      result = val[vofs ]._as_symbol
+                      result = val[vofs ].__as_symbol
                     
     result
 end
@@ -5656,7 +5657,7 @@ def _reduce_412(val, vofs)
                         if str.size.equal?(0)
                           yyerror "empty symbol literal"
                         end
-			result = RubySymbolNode.s( str._as_symbol )
+			result = RubySymbolNode.s( str.__as_symbol )
                       elsif v_one.equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil

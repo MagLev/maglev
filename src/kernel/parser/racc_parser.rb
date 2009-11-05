@@ -27,6 +27,7 @@ module MagRp
       if t.equal?(nil)
         t = MagTemplate.dup # make copy of persistent template
         t._bind_instvars
+        t._install_wordlist( Keyword.create_transient_wordlist )
         Gemstone.session_temp_put( key, t) 
       end
       res = t.dup
@@ -183,7 +184,6 @@ module MagRp # {
         #   pass reference to whole stack and offset to val[0]
         # tmp_v = vstack[-len, len]
         # vstack[-len, len] = void_array
-        # tmp_v = vstack._copy_delete_last(len)
 
         # state[-len, len]  = void_array
         state.size=( state.size - len )
@@ -237,7 +237,7 @@ module MagRp # {
 	      @racc_user_yyerror = true   # user_yyerror
 	      return  - Racc_reduce_n 
             else
-              _reraise(ex)
+              __reraise(ex)
             end
 	end
       elsif act.equal?( - Racc_reduce_n)

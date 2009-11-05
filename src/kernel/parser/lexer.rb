@@ -12,11 +12,16 @@ class RubyLexer
     @cmdarg = StackState.new()
     @nest = 0
     @line_num = 1
-    @keyword_table = Keyword::WORDLIST 
     @last_else_src_offset = -1
     # @comments  not used, this parser not for use to implement RDoc
     @mydebug = MagRp::debug > 1
     reset
+    # @keyword_table installed by _install_wordlist from RubyParser
+  end
+
+  def _install_wordlist(hash)
+    # called from RubyParser#initialize
+    @keyword_table = hash
   end
 
   def reset
@@ -1553,26 +1558,26 @@ class RubyLexer
             return process_token(s_matched, command_state, tok_start_offset)
           elsif (s_matched = src.scan(/\$_/)) then
             @lex_state = Expr_end
-            @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+            @yacc_value = RpNameToken.new(s_matched.__as_symbol, tok_start_offset)
             return :tGVAR
           elsif (s_matched = src.scan(/\$[~*$?!@\/\\;,.=:<>\"]|\$-\w?/)) then
             @lex_state = Expr_end
-            @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+            @yacc_value = RpNameToken.new(s_matched.__as_symbol, tok_start_offset)
             return :tGVAR
           elsif (s_matched = src.scan(/\$([\&\`\'\+])/)) then
             @lex_state = Expr_end
             # Explicit reference to these vars as symbols...
             if last_state.equal?( Expr_fname) then
-              @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+              @yacc_value = RpNameToken.new(s_matched.__as_symbol, tok_start_offset)
               return :tGVAR
             else
-              @yacc_value = src[1]._as_symbol
+              @yacc_value = src[1].__as_symbol
               return :tBACK_REF
             end
           elsif (s_matched = src.scan(/\$([1-9]\d*)/)) then
             @lex_state = Expr_end
             if last_state.equal?( Expr_fname) then
-              @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+              @yacc_value = RpNameToken.new(s_matched.__as_symbol, tok_start_offset)
               return :tGVAR
             else
               @yacc_value = src[1].to_i
@@ -1623,16 +1628,16 @@ class RubyLexer
     # case tk
     if tt_first_ch.equal?( ?$ ) # when /^\$/ then
       @lex_state = Expr_end
-      @yacc_value = RpNameToken.new( ttoken._as_symbol, tok_start_offset)
+      @yacc_value = RpNameToken.new( ttoken.__as_symbol, tok_start_offset)
       result = :tGVAR
     elsif tt_first_ch.equal?( ?@ )   #  
       if ttoken[1].equal?( ?@ )  # when /^@@/ then
         @lex_state = Expr_end
-        @yacc_value = RpNameToken.new( ttoken._as_symbol , tok_start_offset)
+        @yacc_value = RpNameToken.new( ttoken.__as_symbol , tok_start_offset)
         result = :tCVAR
       else                   # when /^@/ then
         @lex_state = Expr_end
-        @yacc_value = RpNameToken.new( ttoken._as_symbol , tok_start_offset)
+        @yacc_value = RpNameToken.new( ttoken.__as_symbol , tok_start_offset)
         result = :tIVAR
       end
     else
@@ -1719,7 +1724,7 @@ class RubyLexer
       @yacc_value = RpNameToken.new( ttoken , tok_start_offset )
     end
 
-    if (last_state._not_equal?( Expr_dot)) && @parser.env[ ttoken._as_symbol].equal?( :lvar)
+    if (last_state._not_equal?( Expr_dot)) && @parser.env[ ttoken.__as_symbol].equal?( :lvar)
        @lex_state = Expr_end 
     end
     return result
