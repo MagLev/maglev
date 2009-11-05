@@ -40,7 +40,7 @@ class Integer
 
       as = pd_b.assoc(pair[0])
       if as
-	gcd *= as[0] ** ( as[1]._min( pair[1]) )
+	gcd *= as[0] ** ( as[1].__min( pair[1]) )
       end
     end
     return gcd

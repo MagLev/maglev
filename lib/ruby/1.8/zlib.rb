@@ -289,7 +289,7 @@ module Zlib
     end
 
     def inflate(string)
-      _open(false, StringIO.new(string), Zlib::Error, Zlib::Z_DEFAULT_COMPRESSION)
+      __open(false, StringIO.new(string), Zlib::Error, Zlib::Z_DEFAULT_COMPRESSION)
       buf = ''
       while ! at_eof
         buf << read(2048)
