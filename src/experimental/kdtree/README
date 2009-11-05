@@ -1,4 +1,104 @@
-The data file that has the us postal codes is provided by GeoNames.org
+= MagLev KD Tree Example
+
+== Overview
+
+This directory contains an implementation of a KD-Tree of dimension 2.
+This is a binary tree that can be used to search for 2D data, i.e., nodes
+with a latitude and longitude.
+
+== Performance
+
+The following are just back of the envelope numbers, from a single run On a
+2.4GHz Intel Core 2 Duo (MacBook) with 2G Ram.   The test creates a tree of
+one million random locations, and then searches for the nearest 100 points
+to one thousand random locations.
+
+=== MagLev
+
+    $ rake commit
+    == Committing tree2d.rb
+    == Creating tree of 1000000 random nodes
+                              user     system      total        real
+    Create Random Points  3.960000   0.100000   4.060000 (  4.074485)
+    Create random tree   60.200000   0.530000  60.730000 ( 61.173987)
+    Commit data           2.840000   1.370000   4.210000 ( 16.937614)
+    == Committed tree as Maglev::PERSISTENT_ROOT[:RANDOM_KDTREE]
+
+The times to iterate all nodes and to run of 1,000 queries for the nearest
+100 nodes in the previously committed tree:
+
+    $ rake query
+
+                         user     system      total        real
+    Iterate Nodes    1.920000   0.400000   2.320000 (  2.337565)
+
+    1000 queries for 100 nearest nodes
+                         user     system      total        real
+    Time:            2.460000   0.010000   2.470000 (  2.512542)
+    Per Query:       0.002460   0.000010   0.002470 (  0.002513)
+
+    Tree has 1,000,000 nodes
+
+=== MRI 1.8.6
+
+Times for ruby 1.8.6 (2008-08-11 patchlevel 287) [i686-darwin9.6.0]
+
+    $ ruby -Ilib bin/commit.rb
+    == Creating tree of 1000000 random nodes
+                              user     system      total        real
+    Create Random Points  4.530000   0.230000   4.760000 (  4.786161)
+    Create random tree  201.740000   1.110000 202.850000 (204.010685)
+
+                         user     system      total        real
+    Iterate Nodes    4.840000   0.020000   4.860000 (  4.865622)
+
+    1000 queries for 100 nearest nodes
+                         user     system      total        real
+    Time:           36.420000   0.140000  36.560000 ( 36.655521)
+    Per Query:       0.036420   0.000140   0.036560 (  0.036656)
+
+    Tree has 1,000,000 nodes
+
+=== MRI 1.9.1
+
+Times for ruby 1.9.1p0 (2009-01-30 revision 21907) [i386-darwin9.6.0]
+
+    $ ruby -Ilib bin/commit.rb
+    == Creating tree of 1000000 random nodes
+                              user     system      total        real
+    Create Random Points  1.510000   0.100000   1.610000 (  1.618571)
+    Create random tree   49.190000   0.360000  49.550000 ( 49.675214)
+
+                         user     system      total        real
+    Iterate Nodes    0.910000   0.010000   0.920000 (  0.914448)
+
+    1000 queries for 100 nearest nodes
+                         user     system      total        real
+    Time:            7.840000   0.110000   7.950000 (  7.970044)
+    Per Query:       0.007840   0.000110   0.007950 (  0.007970)
+
+    Tree has 1,000,000 nodes
+
+=== C-Version of KDTree gem, MRI 1.8.6
+
+There is a ruby gem written in C from:
+http://gurge.com/blog/2009/10/22/ruby-nearest-neighbor-fast-kdtree-gem/
+The following numbers are from a run on that:
+
+    $ ruby x.rb
+    == Creating tree of 1000000 random nodes
+                              user     system      total        real
+    Create Random Points  1.270000   0.120000   1.390000 (  1.392870)
+    Create random tree    1.510000   0.020000   1.530000 (  1.538959)
+
+
+    1000 queries for 100 nearest nodes
+                         user     system      total        real
+    Time:            0.040000   0.000000   0.040000 (  0.037840)
+    Per Query:       0.000040   0.000000   0.000040 (  0.000038)
+
+== Aknowledgements
+
+The data file that has the US postal codes is provided by GeoNames.org
 under a Creative Commons Attribution 3.0 License.  See etc/readme.txt for
 details.
-

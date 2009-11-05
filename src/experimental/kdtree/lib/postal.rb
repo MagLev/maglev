@@ -39,7 +39,7 @@ class PostalCode
   # API needed by Tree2D
   def x; @lat end
   def y; @lon end
-  def dist_sq(other)
+  def distance(other)
     # ok...this is euclidean distance, not spherical or anything
     # realistic...
     dx = @lat - other.x

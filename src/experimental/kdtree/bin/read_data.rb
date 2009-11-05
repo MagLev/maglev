@@ -11,9 +11,6 @@ Benchmark.bm(20) do |b|
   end
   puts "=== Parsed #{postal_codes.size} postal codes"
 
-#  stats = postal_codes.inject(Stats::Sample.new("postal codes")) do |acc,pc|
-#  end
-
   b.report("build tree") do
     tree = KDTree::Tree2D.new postal_codes
   end
@@ -28,5 +25,3 @@ Benchmark.bm(20) do |b|
     nearest.each { |sr| p sr.value }
   end
 end
-
-

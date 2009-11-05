@@ -195,7 +195,7 @@ describe KDTree::Tree2D do
     # the distance_squared of that node from the target.
     def find_nearest_k(target, points, k=1)
       points.inject(BestK.new(k)) do |b, current|
-        b.add(KDTree::SearchResult.new(current, current.dist_sq(target)))
+        b.add(KDTree::SearchResult.new(current, current.distance(target)))
       end.values
     end
   end

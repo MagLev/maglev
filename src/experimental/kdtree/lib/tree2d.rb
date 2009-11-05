@@ -3,43 +3,38 @@
 # optimizations for 2D trees (basically, instead of iterating through the
 # axis by using Point[], we access with x() and y(), which cuts down the
 # running time by quite a bit.
+#
+# == TODO
+# * Add insert_node and remove_node methods (make them (functionally)
+#   persistent).
+#
+# * Rebalance is hard for KD Trees.  Need to implement a re-generate
+#   which just completely rebuilds the tree
 
-# The points
-# given to a tree must have the following methods: cmp(axis, other)
-#
-#
-# TODO: Instead of checking axis all the time, make subclasses for each axis?
 require 'bestk'
 
 module KDTree
 
   # Tree2D is a KD-Tree of dimension 2.
-  #
-  # TODO:
-  # * Add insert_node and remove_node methods (make them (functionally)
-  #   persistent).
-  #
-  # * Rebalance is hard for KD Trees.  Need to implement a re-generate
-  #   which just completely rebuilds the tree
-  #
   class Tree2D
     attr_reader :left, :right, :value
 
-    # Creates a new Tree2D for the given points.  If points is nil or
-    # empty, will return an empty tree.  #left and #right may return nil,
-    # if there is no data on that side of the tree.  The points passed to
-    # the initialize method must respond to the following methods:
-    # * x     Return the x coordinate
-    # * y     Return the y coordinate
-    # * eql?  (and hash)
-    # * dist_sq
+    # Creates a new +Tree2D+ for the given points.  If +points+ is nil or
+    # empty, will return an empty tree.  +#left+ and +#right+ may return
+    # nil, if there is no data on that side of the tree.  The points passed
+    # to the initialize method must respond to the following methods:
+    # * #x Return the x coordinate
+    # * #y Return the y coordinate
+    # * #eql?  (and hash)
+    # * #distance(other) Return the distance from the other point
     #
-    # TODO: Should we replace nil with an empty tree?
     def initialize(points, depth=0)
       @axis = depth % 2
       return if points.nil? or points.empty?
 
-      #sorted = points.sort {|a,b| a[@axis] <=> b[@axis] }
+      # NOTE: There is a big performance boost if use the x and y
+      # accessors, rather than the [@axis] approach of:
+      #    sorted = points.sort {|a,b| a[@axis] <=> b[@axis] }
       if @axis == 0
         sorted = points.sort {|a,b| a.x <=> b.x }
       else
@@ -106,7 +101,7 @@ module KDTree
 
     # Does not return a value, only modifies +bestk+
     def _nearest_k(target_point, bestk)
-      my_result = SearchResult.new(@value, target_point.dist_sq(@value))
+      my_result = SearchResult.new(@value, target_point.distance(@value))
       if self.leaf?
         bestk.add(my_result)
         return
@@ -219,7 +214,7 @@ module KDTree
     end
 
     # Returns the distance squared from the other point
-    def dist_sq(other)
+    def distance(other)
       dx = @x - other.x
       dy = @y - other.y
       (dx * dx) + (dy * dy)

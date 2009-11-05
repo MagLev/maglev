@@ -1,9 +1,10 @@
-# Maintains a collection of elements of size K that best meet some
+# Maintains a collection of at most K elements that best meet some
 # criteria.  Elements are added to the collection, but only if they are one
-# of the K best seen.
+# of the K best seen so far.  The notion of best is supplied by the client
+# code as a block to the constructor.
 #
 # == Example:
-
+#
 # To collect the best ten random numbers, where "best" is defined as
 # "bigger" (i.e., '>'):
 #
@@ -11,7 +12,12 @@
 #     1_000.times {|i| best.add rand(100) }
 #     best.values  # => an array of the ten biggest numbers seen
 #
+# == TODO:
 #
+# The search for the worst index is linear, but it only needs to be done if
+# we clobber the old worst element.  This datastructure should really be
+# based on a SortedCollection.
+
 class BestK
   # Initializes a new BestK element to manage at most +k+ elements.  If a
   # block is given, then it is used to determine which of two objects is
@@ -45,6 +51,8 @@ class BestK
     self
   end
 
+  # Exhaustive search for the index of the worst element in receiver.
+  # Raises an exception if the collection is empty.
   def index_of_worst
     raise "empty" if @index == 0
     idx = 0
