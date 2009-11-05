@@ -14,16 +14,16 @@ test( r.to_a, [ 1,2,3,4,5] , "to_a2")
 
 # Test GemStone internal method
 [ (12..-1), (20..25), (20..1), (-20..1), (-20..-1)].each do |r|
-  test(r._beg_len(11,0), nil, "A: expect nil for #{r.inspect}")
+  test(r.__beg_len(11,0), nil, "A: expect nil for #{r.inspect}")
 end
 
 [(-1..-1), (-1...-1), (-1..0), (-1...0) ].each do |r|
-  test(r._beg_len(0,0), nil, "B: expect nil for #{r.inspect}")
+  test(r.__beg_len(0,0), nil, "B: expect nil for #{r.inspect}")
 end
 
 # Some tests the are in range
-test((1..1)._beg_len(11,0), [1,1],   "C: _beg_len ")
-test((5..-1)._beg_len(11,0), [5,6],  "D: _beg_len ")
-test((5...-1)._beg_len(11,0), [5,5], "E: _beg_len ")
+test((1..1).__beg_len(11,0), [1,1],   "C: __beg_len ")
+test((5..-1).__beg_len(11,0), [5,6],  "D: __beg_len ")
+test((5...-1).__beg_len(11,0), [5,5], "E: __beg_len ")
 
 report
