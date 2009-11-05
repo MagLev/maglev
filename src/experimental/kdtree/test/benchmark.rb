@@ -1,7 +1,7 @@
 require 'benchmark'
 require 'tree2d'
 
-num_nodes = 100_000
+num_nodes = 1_000_000
 num_queries = 100
 MAX_SCALAR = 360.0
 MID_POINT  = MAX_SCALAR / 2.0
@@ -20,7 +20,7 @@ puts "== Benchmark for #{ruby}: #{VERSION}: Num nodes: #{num_nodes}"
 
 Benchmark.bm(20) do |b|
   b.report("Create #{num_nodes} points") do
-    num_nodes.times { |i| @points << KDTree::Point2D.new(rand(), rand(360), "point #{i}") }
+    num_nodes.times { |i| @points << KDTree::Point2D.new(rand(360), rand(360), "point #{i}") }
   end
 
   b.report("Create a tree") do
@@ -30,21 +30,7 @@ Benchmark.bm(20) do |b|
   b.report("#{num_queries} nearest queries") do
     num_queries.times { |i| @tree.nearest(@targets[i]) }
   end
-  b.report("#{num_queries} nearest_k queries") do
-    num_queries.times { |i| @tree.nearest_k(@targets[i], 1) }
-  end
-
-  b.report("#{num_queries} nearest queries") do
-    num_queries.times { |i| @tree.nearest(@targets[i]) }
-  end
-  b.report("#{num_queries} nearest_k queries") do
-    num_queries.times { |i| @tree.nearest_k(@targets[i], 1) }
-  end
-
-  b.report("#{num_queries} nearest queries") do
-    num_queries.times { |i| @tree.nearest(@targets[i]) }
-  end
-  b.report("#{num_queries} nearest_k queries") do
-    num_queries.times { |i| @tree.nearest_k(@targets[i], 1) }
+  b.report("#{num_queries} nearest_k queries, k=20") do
+    num_queries.times { |i| @tree.nearest_k(@targets[i], 20) }
   end
 end
