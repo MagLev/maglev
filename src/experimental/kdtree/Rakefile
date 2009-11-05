@@ -17,3 +17,13 @@ task :bench do
   sh "ruby -I lib test/benchmark.rb"
   sh "maglev-ruby -I lib test/benchmark.rb"
 end
+
+desc "Commit the tree2d code and a tree of random data"
+task :commit do
+  sh "maglev-ruby -Ilib bin/commit.rb"
+end
+
+desc "Time Maglev queries on committed data"
+task :query do
+  sh "maglev-ruby -Ilib bin/time_queries.rb"
+end
