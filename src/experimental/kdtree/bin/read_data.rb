@@ -19,8 +19,13 @@ Benchmark.bm(20) do |b|
   end
 
   b.report("find 2 nodes") do
-    p tree.nearest_lat_lon(42.78532283730215, -97.086181640625)
-    p tree.nearest_lat_lon(42.786582654004896, -96.96773529052734)
+    tree.nearest_lat_lon(42.78532283730215, -97.086181640625)
+    tree.nearest_lat_lon(42.786582654004896, -96.96773529052734)
+  end
+  b.report("find nearest 10 nodes") do
+    target = KDTree::Point2D.new(42.78532283730215, -97.086181640625, :target)
+    nearest = tree.nearest_k(target, 10)
+    nearest.each { |sr| p sr.value }
   end
 end
 

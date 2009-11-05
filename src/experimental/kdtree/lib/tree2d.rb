@@ -25,27 +25,6 @@ module KDTree
   class Tree2D
     attr_reader :left, :right, :value
 
-    class << self
-      attr_reader :counts
-      def inc_counter(name)
-        @counts[name] += 1
-      end
-      def counter(name)
-        @counts[name]
-      end
-      def reset_counts
-        puts "#{self}.reset_counts"
-        @counts = Hash.new(0)
-      end
-
-      def report_counts(msg=nil)
-        puts "====== #{self}.counts"
-        puts msg if msg
-        @counts.each {|k,v|  puts "#{k} => #{v}" }
-      end
-    end
-    reset_counts
-
     # Creates a new Tree2D for the given points.  If points is nil or
     # empty, will return an empty tree.  #left and #right may return nil,
     # if there is no data on that side of the tree.  The points passed to
@@ -116,17 +95,16 @@ module KDTree
       nearest_k(target_point, 1)[0]
     end
 
-    # Returns an array of [value, dist] which represents the value of the
-    # nearest point to the target_point in this subtree, along with the
-    # distance squared from the point to the target_point. If this tree
-    # contains several points at the same distance, only one of those values
-    # is returned.
+    # Find the nearest +k+ nodes in receiver to +target_point+.  Returns an
+    # array of at most k SearchResults. If this tree contains several
+    # points at the same distance, at most k of them will be returned.
     def nearest_k(target_point, k=1)
       bestk = BestK.new(k)
       _nearest_k(target_point, bestk)
       bestk.values
     end
 
+    # Does not return a value, only modifies +bestk+
     def _nearest_k(target_point, bestk)
       my_result = SearchResult.new(@value, target_point.dist_sq(@value))
       if self.leaf?
@@ -174,6 +152,7 @@ module KDTree
         unsearched._nearest_k(target_point, bestk)
       end
     end
+    protected :_nearest_k
 
     def eql?(other)
       @value.eql?(other.value) and
@@ -187,15 +166,6 @@ module KDTree
 
     def to_s
       "Tree2D (to_s): value #{value.inspect} LEFT #{@left.__id__} RIGHT: #{@right.__id__}"
-    end
-
-    def stats(depth=0, stats=TreeStats.new)
-      stats.node
-      stats.depth(depth)
-      stats.children(@left, @right)
-      @left.stats(depth+1, stats) if @left
-      @right.stats(depth+1, stats) if @right
-      stats
     end
   end
 
@@ -253,38 +223,6 @@ module KDTree
       dx = @x - other.x
       dy = @y - other.y
       (dx * dx) + (dy * dy)
-    end
-  end
-
-  class TreeStats
-    def initialize
-      @counts = Hash.new(0)
-      @depth  = Hash.new(0)
-      @children = [0, 0, 0]
-    end
-
-    def node
-      @counts[:node] += 1
-    end
-
-    def depth(depth)
-      @depth[depth] += 1
-    end
-
-    def children(left, right)
-      count = 0
-      count += 1 if left
-      count += 1 if right
-      @children[count] += 1
-    end
-
-    def report
-      puts "=== Tree Stats"
-      @counts.each {|k,v| puts "    #{k} => #{v}"}
-      puts "  Depths:  #{@depth.size}"
-      @depth.keys.sort.each {|k| puts "    #{k} => #{@depth[k]}" }
-      puts "  Child counts"
-      @depth.each_with_index {|v,i|"    #{i} => #{v}" }
     end
   end
 end
