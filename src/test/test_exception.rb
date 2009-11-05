@@ -117,7 +117,7 @@ end
 # selector (a symbol) with to_str.
 # The test case passes if no exception is raised.
 e = NoMethodError.new
-e._init(:foo, nil, 1)
+e.__init(:foo, nil, 1)
 e.inspect
 
 
