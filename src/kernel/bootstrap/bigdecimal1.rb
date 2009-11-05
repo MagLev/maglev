@@ -57,7 +57,7 @@ class BigDecimal < Numeric
   # internal constant
   UNLIM_PRECISION = Fixnum::MAX
   
-  def _init_nan  
+  def __init_nan  
     # define all the fixed instVars by implementing _init_nan
     #  reimplemented in bigdecimal.rb
     @special = 2
@@ -70,5 +70,5 @@ class BigDecimal < Numeric
   end
 
 end
-BigDecimal._freeze_constants
+BigDecimal.__freeze_constants
 

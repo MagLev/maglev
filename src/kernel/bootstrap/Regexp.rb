@@ -12,17 +12,16 @@ class Regexp
   META_REPL_CHARS = 'nrft '
   META_REPL_CHARS.freeze
 
-  class_primitive_nobridge '_new', 'new:options:lang:'
-
-  primitive_nobridge '_search', '_search:from:to:'
-  primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
-  primitive_nobridge '_compile', '_compile:options:'
+  primitive_nobridge '__search', '_search:from:to:'
+  primitive_nobridge '__compile', '_compile:options:'
   primitive_nobridge 'kcode', 'kcode'
   primitive_nobridge 'options', 'options'
   primitive_nobridge 'to_s', 'to_s'
 
   class_primitive_nobridge 'alloc', '_basicNew'
-  class_primitive_nobridge '_opts_from_lang', 'optsFromLang:opts:'
+  class_primitive_nobridge '__opts_from_lang', 'optsFromLang:opts:'
+
+  # parser has additional primitive defs in src/kernel/parser/extras.rb
 
   #     Regexp.new(string [, options [, lang]])       => regexp
   #     Regexp.new(regexp)                            => regexp
@@ -81,8 +80,8 @@ class Regexp
   def ===(str)
     if ( str._isString ) # if str.kind_of?(String)
       # inline =~  so as to update callers $~
-      m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      m = __search(str, 0, nil)
+      m.__storeRubyVcGlobal(0x20) # store into caller's $~
       if m
         if m.begin(0)
           return true
@@ -112,12 +111,12 @@ class Regexp
     end
     if lang._not_equal?(nil)
       if lang._isString
-        opts = self.class._opts_from_lang(lang, opts)     
+        opts = self.class.__opts_from_lang(lang, opts)     
       else
         raise ArgumentError , 'regex.initialize lang not a String'
       end
     end
-    res = _compile(str, opts)
+    res = __compile(str, opts)
     if res._not_equal?(self)
       raise RegexpError, (res.to_str)  # error from onig_new
     end
@@ -134,12 +133,12 @@ class Regexp
       unless finish._isFixnum
         raise TypeError, 'finish must be a Fixnum'
       end
-      _search(str, start, finish)
+      __search(str, start, finish)
     else
       unless start._isFixnum
         raise TypeError, 'finish must be a Fixnum'
       end
-      _search(str, finish, start)
+      __search(str, finish, start)
     end
   end
 
@@ -153,18 +152,18 @@ class Regexp
     if (offset >= str.size)
       return nil
     end
-    _search(str, offset, sz)
+    __search(str, offset, sz)
   end
 
   def match_from_nocheck(str, offset)
     # search  str[offset .. str.size-1]
     # caller has already checked that offset < str.size
     # does not update caller's $~
-    _search(str, offset, nil)
+    __search(str, offset, nil)
   end
 
   def match_start(str, offset) # equiv to MRI's re_match
-    _search(str, offset, true )  # use onig_match()
+    __search(str, offset, true )  # use onig_match()
     # does not update caller's $~
   end
 
@@ -173,20 +172,20 @@ class Regexp
   def match(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   require different args to _storeRubyVcGlobal
+    #   require different args to __storeRubyVcGlobal
     raise ArgumentError, 'expected 1 arg'
   end
 
   def match(str)
-    m = _search(str, 0, nil)
-    m._storeRubyVcGlobal(0x20) # store into caller's $~
+    m = __search(str, 0, nil)
+    m.__storeRubyVcGlobal(0x20) # store into caller's $~
     m
   end
 
-  def _match_vcglobals(str, vcglobals_arg)
+  def __match_vcglobals(str, vcglobals_arg)
     # Private , for example, see usage in String.sub
-    m = _search(str, 0, nil)
-    m._storeRubyVcGlobal(vcglobals_arg) # store into specified $~
+    m = __search(str, 0, nil)
+    m.__storeRubyVcGlobal(vcglobals_arg) # store into specified $~
     m
   end
 
@@ -198,14 +197,14 @@ class Regexp
   def =~(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   require different args to _storeRubyVcGlobal
+    #   require different args to __storeRubyVcGlobal
     raise ArgumentError, 'expected 1 arg'
   end
 
   def =~(str)
     # no bridge method for this variant
-    m = _search(str, 0, nil)
-    m._storeRubyVcGlobal(0x20) # store into caller's $~
+    m = __search(str, 0, nil)
+    m.__storeRubyVcGlobal(0x20) # store into caller's $~
     if (m)
       return m.begin(0)
     end
@@ -215,20 +214,20 @@ class Regexp
   def ~(*args, &blk)
     # only zero-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   require different args to _storeRubyVcGlobal
+    #   require different args to __storeRubyVcGlobal
     raise ArgumentError, 'expected zero args'
   end
   
   def ~
-    str = self._getRubyVcGlobal(0x21) # get callers $_
+    str = self.__getRubyVcGlobal(0x21) # get callers $_
     if str.equal?(nil)
       raise TypeError, 'Regexp#~ , caller frame has no reference to $_ '
     end
     unless str._isString
       raise TypeError, '$_ is not a String'
     end
-    m = _search(str, 0, nil)
-    m._storeRubyVcGlobal(0x20) # store into caller's $~
+    m = __search(str, 0, nil)
+    m.__storeRubyVcGlobal(0x20) # store into caller's $~
     if (m)
       return m.begin(0)
     end
@@ -238,16 +237,16 @@ class Regexp
   # during bootstrap,  send and __send__ get no bridge methods
   def send(sym, str)
     if sym.equal?( :=~ )
-      m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      m = __search(str, 0, nil)
+      m.__storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
       m
     elsif sym.equal?(:match)
       return nil unless str && str.length > 0
-      m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      m = __search(str, 0, nil)
+      m.__storeRubyVcGlobal(0x20) # store into caller's $~
       m
     else
       super(sym, str)
@@ -256,16 +255,16 @@ class Regexp
 
   def __send__(sym, str)
     if sym.equal?( :=~ )
-      m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      m = __search(str, 0, nil)
+      m.__storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
       m
     elsif sym.equal?(:match)
       return nil unless str && str.length > 0
-      m = _search(str, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      m = __search(str, 0, nil)
+      m.__storeRubyVcGlobal(0x20) # store into caller's $~
       m
     else
       super(sym, str)
@@ -277,7 +276,7 @@ class Regexp
     idx = 0
     str_sz = str.length
     while idx <= str_sz  # run to size+1  to match  // regex
-      match = _search(str, idx, nil)
+      match = __search(str, idx, nil)
       if match
         block.call(match)
         pos = match.end(0)
@@ -299,10 +298,10 @@ class Regexp
     # Private, stores into $~ specified by vcglobals_arg
     pos = 0
     while(pos < str.length)
-      match = _search(str, pos, nil)
+      match = __search(str, pos, nil)
       if match
         # store into specified $~, in case block references it
-        match._storeRubyVcGlobal(vcglobals_arg)
+        match.__storeRubyVcGlobal(vcglobals_arg)
         pos = match.end(0)
         if match.begin(0) == pos
           pos += 1
@@ -329,7 +328,7 @@ class Regexp
     ch_str = ' '
     while i < lim
       ch = str[i]
-      m_idx = META_CHARS._indexOfByte(ch, 1)
+      m_idx = META_CHARS.__indexOfByte(ch, 1)
       if (m_idx > 0)
         if (ch <= 0x20)   # handle \n \r \f \t and " "
           escaped_ch = "\\."
@@ -351,16 +350,16 @@ class Regexp
     self
   end
 
-  def _index_string(string, offset)
+  def __index_string(string, offset)
     # used by String#index only
     start = offset.equal?(nil) ? 0 : offset
-    md = self._search(string, start, nil)
-    md._storeRubyVcGlobal(0x40)
+    md = self.__search(string, start, nil)
+    md.__storeRubyVcGlobal(0x40)
     return nil if md.equal?(nil)
     md.begin(0)
   end
 
-  def _rindex_string(string, offset)
+  def __rindex_string(string, offset)
     res = nil
     str_size = string.size
     if @source.index('\G')._not_equal?(nil)
@@ -368,12 +367,12 @@ class Regexp
       raise ArgumentError, ' \G not supported yet in String#rindex(regexp)'
     end
     if offset >= str_size
-      res_md = self._search(string, offset, 0) # search backwards
+      res_md = self.__search(string, offset, 0) # search backwards
       if res_md._not_equal?(nil)
         res = res_md.begin(0)
       end
     else
-      res_md = self._search(string, offset, str_size)  # forwards
+      res_md = self.__search(string, offset, str_size)  # forwards
       if res_md._not_equal?(nil)
         ofs = res_md.begin(0)
         if ofs.equal?(offset)
@@ -383,7 +382,7 @@ class Regexp
       if res.equal?(nil)
   ofs = 0
   while ofs < offset  # loop forwards to find last match < offset
-    md = self._search(string, ofs, str_size)
+    md = self.__search(string, ofs, str_size)
     if md.equal?(nil)
       break
     end
@@ -400,12 +399,12 @@ class Regexp
   end
       end
     end
-    res_md._storeRubyVcGlobal(0x40)
+    res_md.__storeRubyVcGlobal(0x40)
     return res
   end
 
   # TODO: limit is not used....
-  def _split_string(string, limit)
+  def __split_string(string, limit)
     result = []
     if @source == ""
       slim = string.size
@@ -438,13 +437,13 @@ class Regexp
 
   def self.last_match
     # no bridge methods for variants after first
-    m = self._getRubyVcGlobal(0x20)
+    m = self.__getRubyVcGlobal(0x20)
     return m
   end
 
   def self.last_match(an_int)
     # no bridge methods for variants after first
-    m = self._getRubyVcGlobal(0x20)
+    m = self.__getRubyVcGlobal(0x20)
     if m.equal?(nil)
       return m
     else
@@ -490,5 +489,5 @@ class Regexp
     alias_method :quote, :escape
   end
 end
-Regexp._freeze_constants
+Regexp.__freeze_constants
 

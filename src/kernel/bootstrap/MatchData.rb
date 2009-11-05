@@ -9,7 +9,7 @@ class MatchData
   end
 
   def to_a
-    _captures([self[0]])
+    __captures([self[0]])
   end
 
   def to_s
@@ -35,14 +35,15 @@ class MatchData
     at((group*2)+2)
   end
 
-  primitive '_size', 'size'
+  primitive '__size', 'size'
   def size
-    _size._divide(2)
+    __size.__divide(2)
   end
 
   alias length size
 
   def pre_match
+    # public, and also invoked from generated code for RubyBackRefNode
     res = @strPreceedingMatch
     if (res.equal?(nil))
       res = @inputString[0, self.begin(0)]
@@ -52,6 +53,7 @@ class MatchData
   end
 
   def post_match
+    # public, and also invoked from generated code for RubyBackRefNode
     res = @strFollowingMatch
     if (res.equal?(nil))
       res = @inputString[self.end(0)..-1]
@@ -60,7 +62,8 @@ class MatchData
     res
   end
 
-  def _plus_match
+  def __plus_match
+    # invoked from generated code for RubyBackRefNode
     self[ self.length - 1 ]
   end
 
@@ -83,8 +86,8 @@ class MatchData
     @inputString[idx, pre_end-idx+1]
   end
 
-  def captures  # GEMSTONE modified loop from each {...} to while
-    _captures([])
+  def captures 
+    __captures([])
   end
 
   # END RUBINIUS
@@ -106,7 +109,7 @@ class MatchData
   end
 
   # Append the captures (all but $&) to ary
-  def _captures(ary)
+  def __captures(ary)
     i = 1   # Captures do NOT include $& (the entire matched string)
     lim = length
     in_str = @inputString

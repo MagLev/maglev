@@ -2,13 +2,13 @@ class Array
   # begin private helper methods
   # TODO: Some of these don't begin with an '_'...
 
-  primitive_nobridge '_at' , '_rubyAt:'
-  primitive_nobridge '_at' , '_rubyAt:length:'
+  primitive_nobridge '__at' , '_rubyAt:'
+  primitive_nobridge '__at' , '_rubyAt:length:'
 
-  primitive_nobridge '_at_put', '_rubyAt:put:'
-  primitive_nobridge '_at_put', '_rubyAt:length:put:'
+  primitive_nobridge '__at_put', '_rubyAt:put:'
+  primitive_nobridge '__at_put', '_rubyAt:length:put:'
 
-  primitive_nobridge '_fillFromToWith', 'fillFrom:to:with:'
+  primitive_nobridge '__fillFromToWith', 'fillFrom:to:with:'
 
   primitive 'size=', 'size:'
 
@@ -16,12 +16,12 @@ class Array
   #   would suppress generation of bridge methods for private
   #   methods that should not need bridge methods
 
-  def _anySatisfyCaseLeaf( obj )
+  def __anySatisfyCaseLeaf( obj )
     # used in implementation of  while *list   within a   case
     n = 0
     lim = size
     while n < lim
-      el = self._at(n)
+      el = self.__at(n)
       if obj === el
         return true
       end
@@ -30,12 +30,12 @@ class Array
     false
   end
 
-  def _anySatisfyCaseTrue
+  def __anySatisfyCaseTrue
     # used in implementation of  while *list   within a   case
     n = 0
     lim = size
     while n < lim
-      el = self._at(n)
+      el = self.__at(n)
       if el
         return true
       end
@@ -46,11 +46,11 @@ class Array
 
   # Used by both assoc and rassoc, since they differ only in the index of
   # the array to compare to the key
-  def _assoc(key, idx)
+  def __assoc(key, idx)
     i = 0
     lim = self.size
     while i < lim
-      el = self._at(i)
+      el = self.__at(i)
       if el._isArray && el[idx] == key
         return el
       end
@@ -59,24 +59,24 @@ class Array
     nil
   end
 
-  def _as_hash
+  def __as_hash
     # called from generated code
     Hash[self]
   end
 
-  primitive_nobridge '_insertall_at', 'insertAll:at:'
+  primitive_nobridge '__insertall_at', 'insertAll:at:'
 
-  def _add_arguments(arg)
+  def __add_arguments(arg)
     # called from generated code
     if arg._isArray
       if arg.size._not_equal?(0)
-        self._insertall_at(arg, self.size + 1)
+        self.__insertall_at(arg, self.size + 1)
       end
     else
       a = arg._splat_lasgn_value_coerce
       if a._isArray
         if a.size._not_equal?(0)
-          self._insertall_at(a, self.size + 1)
+          self.__insertall_at(a, self.size + 1)
         end
       else
         self << a
@@ -85,11 +85,11 @@ class Array
     self
   end
 
-  def _flatten_onto(output)
+  def __flatten_onto(output)
     # returns true if any recursion done into child arrays
     recursed = false
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     unless added
       # self was already in the set
       raise ArgumentError, 'recursive element in flatten'
@@ -98,14 +98,14 @@ class Array
       i = 0
       lim = size
       while i < lim
-        el = self._at(i)
+        el = self.__at(i)
         if el._isArray
-          el._flatten_onto(output)
+          el.__flatten_onto(output)
           recursed = true
         elsif el.respond_to?(:to_ary)
           el = el.to_ary
           if el._isArray
-            el._flatten_onto(output)
+            el.__flatten_onto(output)
             recursed = true
           end
         else
@@ -123,12 +123,12 @@ class Array
   # end private helper methods
 
   # Array Class Methods
-  class_primitive_nobridge '_alloc', '_rubyNew:initValue:'
-  class_primitive_nobridge '_withall', '_rubyWithAll:'
+  class_primitive_nobridge '__alloc', '_rubyNew:initValue:'
+  class_primitive_nobridge '__withall', '_rubyWithAll:'
 
   # Returns a new array with the given elements.
   def self.[](*elements)
-    _withall(elements)
+    __withall(elements)
   end
 
   # implementations of new need to call initialize in case application has
@@ -163,9 +163,9 @@ class Array
     if len.equal?(0)
       self
     elsif len.equal?(1)
-      _initialize(args[0], &blk)
+      __initialize(args[0], &blk)
     elsif len.equal?(2)
-      _initialize(args[0], args[1])
+      __initialize(args[0], args[1])
     else
       raise ArgumentError, 'too many args'
     end
@@ -173,10 +173,10 @@ class Array
 
   def self.new(first, &blk)
     if first._isArray
-      a = _withall(first) # ignore the block
+      a = __withall(first) # ignore the block
     else
       siz = Type.coerce_to(first, Fixnum, :to_int)
-      a = _alloc(siz, nil)
+      a = __alloc(siz, nil)
       # blk processed by initialize
     end
     a.initialize(first, &blk)
@@ -184,10 +184,10 @@ class Array
   end
 
   def initialize(first, &blk)
-    _initialize(first, &blk)
+    __initialize(first, &blk)
   end
 
-  def _initialize(first, &blk)
+  def __initialize(first, &blk)
     if self.class.equal?(Array)
       if first._isArray
         lim = 0 # ignore any block
@@ -206,7 +206,7 @@ class Array
     if block_given?
       n = 0
       while (n < lim)
-        self._at_put(n,  blk.call(n))
+        self.__at_put(n,  blk.call(n))
         n = n + 1
       end
     end
@@ -217,9 +217,9 @@ class Array
   def self.new(a_size, value)
     if self.equal?(Array)
       s = Type.coerce_to(a_size, Fixnum, :to_int)
-      a = _alloc(s, value)
+      a = __alloc(s, value)
     else
-      a = _alloc(0, nil)
+      a = __alloc(0, nil)
     end
     a.initialize(a_size, value)
     a
@@ -235,7 +235,7 @@ class Array
     end
     self
   end
-  def _initialize(a_size, value)
+  def __initialize(a_size, value)
     if self.class.equal?(Array)
       # do nothing
     else
@@ -259,26 +259,26 @@ class Array
     #  will map to the previous 2 arg form
     if self.equal?(Array)
       if arg._isFixnum
-        a = _alloc(arg, nil)
+        a = __alloc(arg, nil)
         return a
       elsif arg._isArray
-        a = _alloc(arg.size, nil)
+        a = __alloc(arg.size, nil)
       else
-        arg = _coerce_one_arg(arg)
+        arg = __coerce_one_arg(arg)
         if arg._isFixnum
-          a = _alloc(arg, nil)
+          a = __alloc(arg, nil)
           return a
         else
-          a = _alloc(arg.size, nil)
+          a = __alloc(arg.size, nil)
         end
       end
     else
-      a = _alloc(0, nil)
+      a = __alloc(0, nil)
     end
     a.initialize(arg)
   end
 
-  def self._coerce_one_arg(arg)
+  def self.__coerce_one_arg(arg)
     carg = Type.coerce_to_or_nil(arg, Array, :to_ary)
     if carg.equal?(nil)
       carg = Type.coerce_to(arg, Fixnum, :to_int)
@@ -292,7 +292,7 @@ class Array
     elsif arg._isArray
       self.replace(arg)
     else
-      arg = Array._coerce_one_arg(arg)
+      arg = Array.__coerce_one_arg(arg)
       if arg._isFixnum
         self.size=(arg)
       else
@@ -303,7 +303,7 @@ class Array
   end
 
   def self.new
-    a = _alloc(0, nil)
+    a = __alloc(0, nil)
     a.initialize
     a
   end
@@ -315,7 +315,7 @@ class Array
 
   def self.new(&blk)
     # ignores the block
-    a = _alloc(0, nil)
+    a = __alloc(0, nil)
     a.initialize(&blk)
   end
 
@@ -324,6 +324,37 @@ class Array
     self
   end
 
+  # double quoted string literals support
+
+  def __joinStrings
+    # called from generated code
+    str = ''
+    n = 0
+    siz = self.size
+    while n < siz 
+      str << self.__at(n).to_s
+      n += 1
+    end
+    str
+  end 
+
+  def __joinStringsAsSymbol
+    # called from generated code
+    self.__joinStrings.__as_symbol
+  end 
+
+  def __joinStringsWithRegexpOptions(opts_integer)
+    # called from generated code
+    str = self.__joinStrings
+    # bypass Regexp.new because opts_integer includes both
+    #  the options and the language encoding
+    rx = Regexp.alloc
+    res = rx.__compile(str, opts_integer)
+    if res._not_equal?(rx)
+      raise RegexpError, (res.to_str)  # error from onig_new
+    end
+    res
+  end
 
   # Set intersection. 
   # Return new array containing elements common to two arrays.
@@ -332,9 +363,9 @@ class Array
     my_siz = self.size
     other_siz  = other.size
     dflt = Object.new
-    htsiz = (my_siz + other_siz)._divide(4)
+    htsiz = (my_siz + other_siz).__divide(4)
     htsiz = 5 if htsiz < 5  
-    dict = Hash._new(htsiz)
+    dict = Hash.__new(htsiz)
     n = 0
     while n < other_siz
       elem = other[n]
@@ -345,8 +376,8 @@ class Array
     n = 0
     res_idx = 0
     while n < my_siz
-      elem = self._at(n)
-      if dict._delete_otherwise(elem, dflt)._not_equal?(dflt)
+      elem = self.__at(n)
+      if dict.__delete_otherwise(elem, dflt)._not_equal?(dflt)
         res[res_idx] = elem
         res_idx += 1
       end
@@ -379,7 +410,7 @@ class Array
     arg = Type.coerce_to(arg, Array, :to_ary)
     res = self.dup
     if arg.size._not_equal?(0)
-      res._insertall_at(arg, res.size + 1)
+      res.__insertall_at(arg, res.size + 1)
     end
     res
   end
@@ -399,7 +430,7 @@ class Array
     end
     i = 0
     while i < mySize
-      el = self._at(i)
+      el = self.__at(i)
       if (h[el].equal?(default))
         res << el
       end
@@ -434,15 +465,15 @@ class Array
     # for #'_generality....
 
     other = Type.coerce_to(other, Array, :to_ary)
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     begin
       other_size = other.size
       my_size = size
       lim = my_size > other_size ? other_size : my_size # lim is the min
       i = 0
       while i < lim
-        curr = self._at(i)
+        curr = self.__at(i)
         if ts.include?(curr)
           unless curr.equal?(other[i])
             return 1 if size > other_size
@@ -473,13 +504,13 @@ class Array
     unless lim.equal?(other.size)
       return false
     end
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     begin
       i = 0
       limi = lim
       while i < limi
-        v = self._at(i)
+        v = self.__at(i)
         ov = other[i]
         if v.equal?(ov)
     # ok
@@ -515,13 +546,13 @@ class Array
     return false unless other._isArray
     lim = self.size
     return false unless lim.equal?(other.size)
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     begin
       i = 0
       limi = lim
       while i < limi
-        v = self._at(i)
+        v = self.__at(i)
         ov = other[i]
         if v.equal?(ov)
           # ok
@@ -594,7 +625,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self._at(i)
+      el = self.__at(i)
       unless hash.include? el
         ary << el
         hash[el] = el
@@ -618,7 +649,7 @@ class Array
   # Associate: Search through self (an array of arrays).  Return first
   # array whose first element matches +key+ (using +key.==+).
   def assoc(key)
-    _assoc(key, 0)
+    __assoc(key, 0)
   end
 
   primitive 'at' , '_rubyAt:'
@@ -628,26 +659,13 @@ class Array
     i = 0
     lim = size
     while i < lim
-      self._at_put(i,  b.call(self._at(i) ) )
+      self.__at_put(i,  b.call(self.__at(i) ) )
       i += 1
     end
     self
   end
 
-  primitive_nobridge '_copy_from_to', 'copyFrom:to:'
-
-  def _copy_delete_last(count)
-    # Returns an Array containing the last  count  elements of receiver
-    # and deletes those elements  from the receiver.
-    if count.equal?(0)
-      res = []
-    else
-      sz = self.size
-      res = self._copy_from_to( sz - count + 1 , sz )
-      self.size=( sz - count  )
-    end
-    res
-  end
+  primitive_nobridge '__copy_from_to', 'copyFrom:to:'
 
   # Return copy of self with all nil elements removed
   def compact
@@ -655,7 +673,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self._at(i)
+      el = self.__at(i)
       result << el unless el.equal?(nil)
       i += 1
     end
@@ -668,16 +686,16 @@ class Array
     i = 0
     lim = size
     while i < lim
-      break if self._at(i).equal?(nil)
+      break if self.__at(i).equal?(nil)
       i += 1
     end
     return nil if i.equal?(lim)
 
     fill_idx = i
     while i < lim
-      el = self._at(i)
+      el = self.__at(i)
       unless el.equal?(nil)
-        self._at_put(fill_idx,  el )
+        self.__at_put(fill_idx,  el )
         fill_idx += 1
       end
       i += 1
@@ -691,7 +709,7 @@ class Array
   def concat(arg)
     arg = Type.coerce_to(arg, Array, :to_ary)
     if arg.size._not_equal?(0)
-      self._insertall_at(arg, self.size + 1)
+      self.__insertall_at(arg, self.size + 1)
     end
     self
   end
@@ -700,9 +718,9 @@ class Array
     n = self.size - 1
     res = nil
     while n >= 0
-      if self._at(n) == obj
+      if self.__at(n) == obj
         oidx = n + 1
-        self._remove_from_to_(oidx, oidx)
+        self.__remove_from_to_(oidx, oidx)
         res = obj
       end
       n = n - 1
@@ -715,9 +733,9 @@ class Array
     found = false
     lim = self.size
     while n >= 0
-      if self._at(n) == obj
+      if self.__at(n) == obj
         oidx = n + 1
-        self._remove_from_to_(oidx, oidx)
+        self.__remove_from_to_(oidx, oidx)
         found = true
       end
       n = n - 1
@@ -748,9 +766,9 @@ class Array
     if idx >= sz
       return nil
     end
-    elem = self._at(idx)
+    elem = self.__at(idx)
     oidx = idx + 1
-    self._remove_from_to_(oidx, oidx)
+    self.__remove_from_to_(oidx, oidx)
     return elem
   end
 
@@ -759,15 +777,15 @@ class Array
     i = 0
     lim = size
     while i < lim
-      break if block.call(self._at(i) )
+      break if block.call(self.__at(i) )
       i += 1
     end
 
     fill_idx = i
     while i < lim
-      el = self._at(i)
+      el = self.__at(i)
       unless block.call(el)
-        self._at_put(fill_idx,  el)
+        self.__at_put(fill_idx,  el)
         fill_idx += 1
       end
       i += 1
@@ -780,7 +798,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      b.call(self._at(i))
+      b.call(self.__at(i))
       i += 1
     end
     self
@@ -790,7 +808,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      b.call(self._at(i), i)
+      b.call(self.__at(i), i)
       i += 1
     end
     self
@@ -824,7 +842,7 @@ class Array
         raise IndexError , 'offset out of bounds'
       end
     end
-    self._at(idx)
+    self.__at(idx)
   end
 
   def fetch(index)
@@ -839,7 +857,7 @@ class Array
     if idx >= my_siz
       raise IndexError , 'Array#fetch, offset beyond end'
     end
-    self._at(idx)
+    self.__at(idx)
   end
 
   def fetch(index, default)
@@ -854,7 +872,7 @@ class Array
     if idx >= my_siz
       return default
     end
-    self._at(idx)
+    self.__at(idx)
   end
 
   def fetch(index, default, &blk)
@@ -910,7 +928,7 @@ class Array
       self.size=(endIdx)  # grow the receiver
     end
     if (length > 0)
-      _fillFromToWith(start, endIdx, obj)
+      __fillFromToWith(start, endIdx, obj)
     end
     self
   end
@@ -965,7 +983,7 @@ class Array
     n = start
     limit = start + length
     while (n < limit)
-      self._at_put(n, blk.call(n) )
+      self.__at_put(n, blk.call(n) )
       n = n + 1
     end
     self
@@ -1012,7 +1030,7 @@ class Array
   end
 
   def first
-    self._at(0)
+    self.__at(0)
   end
 
   def first(count)
@@ -1020,18 +1038,18 @@ class Array
     if cnt < 0
       raise ArgumentError, 'negative count'
     end
-    self._at(0, cnt)
+    self.__at(0, cnt)
   end
 
   def flatten
     ary = self.class.new
-    _flatten_onto( ary )
+    __flatten_onto( ary )
     ary
   end
 
   def flatten!
     ary = []
-    recursed = _flatten_onto(ary)
+    recursed = __flatten_onto(ary)
     if recursed
       self.replace(ary)
       self
@@ -1046,7 +1064,7 @@ class Array
     n = 0
     lim = self.size
     while n < lim
-      if self._at(n) == obj
+      if self.__at(n) == obj
         return true
       end
       n += 1
@@ -1058,7 +1076,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      if self._at(i) == el
+      if self.__at(i) == el
         return i
       end
       i += 1
@@ -1100,7 +1118,7 @@ class Array
     if ofs < 0
       ofs = 0
     end
-    self._at(ofs, cnt)
+    self.__at(ofs, cnt)
   end
 
   def last
@@ -1108,7 +1126,7 @@ class Array
     if my_size.equal?(0)
       return nil
     end
-    return self._at(my_size - 1)
+    return self.__at(my_size - 1)
   end
 
   primitive 'length', 'size'
@@ -1121,7 +1139,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      count += 1 unless self._at(i).equal?(nil)
+      count += 1 unless self.__at(i).equal?(nil)
       i += 1
     end
     count
@@ -1129,7 +1147,8 @@ class Array
 
   primitive 'pack', 'rubyPack:'
 
-  def self._pack_coerce(obj, sym)
+  def self.__pack_coerce(obj, sym)
+    # sent from C code in capiprim.c 
     begin
       r = obj.__send__(sym)
     rescue Exception
@@ -1142,7 +1161,7 @@ class Array
     sz = self.size
     unless sz.equal?(0)
       idx = sz - 1
-      elem = self._at(idx)
+      elem = self.__at(idx)
       self.size=(idx)
       elem
     end
@@ -1158,15 +1177,15 @@ class Array
   # Associate: Search through self (an array of arrays).  Return first
   # array whose second element matches +key+ (using +key.==+).
   def rassoc(key)
-    _assoc(key, 1)
+    __assoc(key, 1)
   end
 
 
-  primitive '_replace', 'rubyReplace:'
+  primitive '__replace', 'rubyReplace:'
 
   def replace(arg)
     arg = Type.coerce_to(arg, Array, :to_ary)
-    self._replace(arg) 
+    self.__replace(arg) 
   end
 
   primitive 'reverse', 'reverse'
@@ -1175,10 +1194,10 @@ class Array
     low = 0
     high = self.size - 1
     while low < high
-      a = self._at(low)
-      b = self._at(high)
-      self._at_put(high, a)
-      self._at_put(low, b)
+      a = self.__at(low)
+      b = self.__at(high)
+      self.__at_put(high, a)
+      self.__at_put(low, b)
       low = low + 1
       high = high - 1
     end
@@ -1189,7 +1208,7 @@ class Array
     sz = self.size
     i = sz - 1
     while i >= 0
-      b.call(self._at(i))
+      b.call(self.__at(i))
       new_siz = self.size
       if new_siz < sz && i > 0
         sz = new_siz
@@ -1204,7 +1223,7 @@ class Array
   def rindex(el)
     i = size - 1
     while i >= 0
-      if(self._at(i) == el)
+      if(self.__at(i) == el)
         return i
       end
       i -= 1
@@ -1212,22 +1231,13 @@ class Array
     nil
   end
 
-  primitive_nobridge '_remove_from_to_', 'removeFrom:to:'
-
-  def _remove_last(count)
-    # deletes the last count elements of receiver.
-    unless count.equal?(0)
-      sz = self.size
-      self.size=( sz - count  )
-    end
-    self
-  end
+  primitive_nobridge '__remove_from_to_', 'removeFrom:to:'
 
   def shift
     sz = self.size
     unless sz.equal?(0)
-      elem = self._at(0)
-      _remove_from_to_(1, 1)
+      elem = self.__at(0)
+      __remove_from_to_(1, 1)
       elem
     end
   end
@@ -1240,7 +1250,7 @@ class Array
   def slice(*args)
     len = args.size
     if len.equal?(1)
-      slice(args._at(0))
+      slice(args.__at(0))
     elsif len.equal?(2)
       slice(args[0], args[1])
     else
@@ -1252,19 +1262,19 @@ class Array
     if self.size.equal?(0)
       return self.class.new
     end
-    result = self._at(start, length)
+    result = self.__at(start, length)
     if result._not_equal?(nil)
-      self._at_put(start, length , [] )
+      self.__at_put(start, length , [] )
     end
     result
   end
   primitive 'slice!' , '_rubySliceEx:length:'  #  def slice!(start, length);end
 
-  primitive '_slice_ex_range', '_rubySliceExRange:'
+  primitive '__slice_ex_range', '_rubySliceExRange:'
 
   def slice!(arg)
     if arg._isRange
-      self._slice_ex_range(arg)
+      self.__slice_ex_range(arg)
     else
       self.delete_at(arg)
     end
@@ -1273,22 +1283,22 @@ class Array
   # Note: sort is listed in the Pick Axe book under both Array and Enumerable
   #  Smalltalk sort: expects a block returning boolean result of a <= b
   #
-  primitive_nobridge '_sort!&', 'sort:'
+  primitive_nobridge '__sort!&', 'sort:'
 
   def sort!(&blk)
     if (block_given?)
-      _sort!{ | a, b| blk.call(a, b) <= 0 }
+      __sort!{ | a, b| blk.call(a, b) <= 0 }
     else
-      _sort!{ | a, b| (a <=> b) <= 0 }
+      __sort!{ | a, b| (a <=> b) <= 0 }
     end
   end
 
   def sort(&blk)
     d = dup
     if (block_given?)
-      d._sort!{ | a, b| blk.call(a, b) <= 0 }
+      d.__sort!{ | a, b| blk.call(a, b) <= 0 }
     else
-      d._sort!{ | a, b| (a <=> b) <= 0 }
+      d.__sort!{ | a, b| (a <=> b) <= 0 }
     end
     d
   end
@@ -1324,7 +1334,7 @@ class Array
     n = 0
     el_size = 0
     while n < my_size
-      elem = Type.coerce_to( self._at(n), Array, :to_ary)
+      elem = Type.coerce_to( self.__at(n), Array, :to_ary)
       if n.equal?(0)
         el_size = elem.size 
       elsif elem.size._not_equal?(el_size)
@@ -1351,7 +1361,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      el = self._at(i)
+      el = self.__at(i)
       unless hash.include? el
         ary << el
         hash[el] = el
@@ -1375,7 +1385,7 @@ class Array
 
   # Prepend elements to self.  If no elements, return unmodified self.
   def unshift(*elements)
-    _insertall_at(elements, 1)
+    __insertall_at(elements, 1)
     self
   end
 
@@ -1387,16 +1397,16 @@ class Array
     while (n < lim)
       idx = selectors[n]
       if (idx._isRange)
-        beg, len = idx._beg_len(self.length)
+        beg, len = idx.__beg_len(self.length)
         if beg
           j = 0
           while j < len
-            res << self._at(j+beg)
+            res << self.__at(j+beg)
             j += 1
           end
         end
       else
-        res.push(self._at(idx))
+        res.push(self.__at(idx))
       end
       n = n + 1
     end
@@ -1410,21 +1420,21 @@ class Array
 
   def hash
     # sample at most 5 elements of receiver
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     unless added
       return 0 
     end
     hval = 4459 
     begin
       mysize = self.size
-      interval = (mysize - 1)._divide(4)
+      interval = (mysize - 1).__divide(4)
       if interval < 1
         interval = 1
       end
       n = 0
       while n < mysize
-        elem = self._at(n)
+        elem = self.__at(n)
         eh = elem.hash
         if eh._not_equal?(0)
           eh = Type.coerce_to( eh, Fixnum, :to_int)
@@ -1441,8 +1451,8 @@ class Array
 
   def inspect
     s = "["
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     unless added
       s << '...]'
       return s

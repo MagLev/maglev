@@ -63,18 +63,18 @@ class Socket
     self
   end
 
-  primitive_nobridge '_gets', 'gets:'
+  primitive_nobridge '__gets', 'gets:'
 
   def gets(*args, &blk)
     raise ArgumentError, 'expected 0 or 1 arg'
     #  variants other than gets , gets(terminator) not supported
-    # because bridge methods would interfere with use of _storeRubyVcGlobal
+    # because bridge methods would interfere with use of __storeRubyVcGlobal
   end
   def gets
     #no terminator specified means read all available data
     res = self.recv(4096)
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
-    self._increment_lineno
+    res.__storeRubyVcGlobal(0x21) # store into caller's $_
+    self.__increment_lineno
     res
   end
 
@@ -83,26 +83,26 @@ class Socket
       res = self.recv(4096)
     elsif separator._isString
       if separator.length.equal?(1)
-        res = self._gets(separator[0])
+        res = self.__gets(separator[0])
       else
         raise ArgumentError, 'Socket#gets, multi-character separator not implemented yet'
       end
     else
       raise TypeError , 'Socket#gets, separator arg must be nil or a String'
     end
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
-    self._increment_lineno
+    res.__storeRubyVcGlobal(0x21) # store into caller's $_
+    self.__increment_lineno
     res
   end
 
   primitive 'close', 'close'
-  primitive '_active?', 'isActive'
+  primitive '__active?', 'isActive'
   primitive_nobridge 'shutdown', 'shutdown'
   primitive 'shutdown', 'shutdown:'
   primitive 'connected?', 'isConnected'
 
   def closed?
-    ! _active?
+    ! __active?
   end
 
   def eof?
@@ -112,9 +112,9 @@ class Socket
 
   # following 2 are in BasicSocket in Ruby 1.8 , but put in Socket for now,
 
-  primitive_nobridge '_setsockopt', 'setsockopt:name:value:'
+  primitive_nobridge '__setsockopt', 'setsockopt:name:value:'
 
-  primitive '_getsockopt', 'getsockopt:name:'
+  primitive '__getsockopt', 'getsockopt:name:'
 
   # Gets a socket option. These are protocol and system specific, see your
   # local sytem documentation for details. The option is returned as
@@ -152,7 +152,7 @@ class Socket
   #   optval =  sock.getsockopt(Socket::SOL_SOCKET, Socket::SO_LINGER)
   #   onoff, linger = optval.unpack "ii"
   def getsockopt(level, optname)
-    arr = _getsockopt(level, optname)
+    arr = __getsockopt(level, optname)
     if arr._isFixnum
       Errno.raise(arr)
       res = nil
@@ -213,7 +213,7 @@ class Socket
     elsif optval.equal?(false)
       optval = 0
     end
-    status = _setsockopt(level, optname, optval)
+    status = __setsockopt(level, optname, optval)
     if status.equal?(0)
       return self
     else
@@ -231,9 +231,9 @@ class Socket
   end
 
   class_primitive 'do_not_reverse_lookup=', 'setNoReverseLookup:'
-  class_primitive_nobridge '_getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
+  class_primitive_nobridge '__getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
   class_primitive 'gethostbyname', 'gethostbyname:'
-  class_primitive '_getservbyname', 'getservbyname:protocol:'
+  class_primitive '__getservbyname', 'getservbyname:protocol:'
   class_primitive 'gethostname', 'getLocalHostName'
   class_primitive 'new', 'new:type:proto:'
 
@@ -242,7 +242,7 @@ class Socket
     #   if the service is not found.
     s = Type.coerce_to(service, String, :to_str)
     p = Type.coerce_to(proto, String, :to_str)
-    _getservbyname(s, p)
+    __getservbyname(s, p)
   end
 
   def self.getaddrinfo(host, service, family = 0, socktype = 0,
@@ -267,7 +267,7 @@ class Socket
     protocol = Type.coerce_to(protocol, Fixnum, :to_int)
     flags = Type.coerce_to(flags, Fixnum, :to_int)
     args = [ host, service, family, socktype, protocol, flags ]
-    _getaddrinfo( args )
+    __getaddrinfo( args )
   end
 
   def fcntl(op, flags=0)
@@ -306,7 +306,7 @@ class TCPSocket  # < IPSocket in VM
   # open binds a socket to a port and does a blocking connect,
   #  returning a blocking socket.
   class_primitive 'open', 'new:port:'
-  class_primitive '_open', 'open:'
+  class_primitive '__open', 'open:'
 
   def self.new(host, port)
     if host.equal?(nil)
@@ -316,11 +316,11 @@ class TCPSocket  # < IPSocket in VM
   end
 
   def self.new(host)
-    self._open(host)
+    self.__open(host)
   end
 
   def self.open(host)
-    self._open(host)
+    self.__open(host)
   end
 
 end
@@ -330,13 +330,13 @@ class TCPServer   # < TCPSocket in VM
   primitive 'accept', 'accept'
 
   # creates a non-blocking listening socket
-  class_primitive '_new', 'new:port:'
+  class_primitive '__new', 'new:port:'
 
   def self.new( port )
     if port._isString
       self.new(port , nil)
     elsif port._isFixnum
-       self._new( 'localhost', port == 0 ? nil : port )
+       self.__new( 'localhost', port == 0 ? nil : port )
     else
        raise TypeError , 'expected a Fixnum port number or String hostname'
     end
@@ -346,9 +346,9 @@ class TCPServer   # < TCPSocket in VM
     # port may be nil or 0 to get a random port
     port = port.equal?(0) ? nil : port
     if hostname.length.equal?(0)
-      self._new( 'localhost' , port)
+      self.__new( 'localhost' , port)
     else
-      self._new( hostname, port )
+      self.__new( hostname, port )
     end
   end
 

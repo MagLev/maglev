@@ -11,7 +11,7 @@ class SmallDouble
     Float
   end
 
-  primitive_nobridge '_isSpecial', 'isSpecial'
+  primitive_nobridge '__isSpecial', 'isSpecial'
 end
 
 class Float
@@ -73,12 +73,12 @@ class Float
   primitive_nobridge '-', '_rubySubtract:'
   primitive_nobridge '*', '_rubyMultiply:'
   primitive_nobridge '/', '_rubyDivide:'
-  primitive_nobridge '_divide', '_rubyDivide:'
+  primitive_nobridge '__divide', '_rubyDivide:'
   primitive_nobridge '%', '_rubyModulo:'
   primitive_nobridge 'modulo', '_rubyModulo:'
 
   def div(arg)
-    q = self._divide(arg)
+    q = self.__divide(arg)
     q.floor
   end
 
@@ -90,12 +90,12 @@ class Float
     if a == 0.0
       raise FloatDomainError ,'arg to divmod was zero'
     end
-    [ (self._divide(a)).floor , self % a  ]
+    [ (self.__divide(a)).floor , self % a  ]
   end
 
   # quo inherited from Numeric
 
-  primitive_nobridge '_raised_to', '_rubyRaisedTo:'
+  primitive_nobridge '__raised_to', '_rubyRaisedTo:'
   def **(arg)
     unless arg._isFloat
       if arg._isInteger
@@ -105,7 +105,7 @@ class Float
         return c[0] ** c[1] 
       end
     end
-    self._raised_to(arg)
+    self.__raised_to(arg)
   end
 
 # unaries  +@  -@  eliminated during IR generation by compiler
@@ -174,20 +174,18 @@ class Float
   primitive_nobridge 'floor', 'floor'
   primitive_nobridge 'hash'
   primitive_nobridge 'infinite?', '_ruby_infiniteQ'
-  primitive_nobridge '_sign', '_sign'  # considers -0.0 to be negative
+  primitive_nobridge '__sign', '_sign'  # considers -0.0 to be negative
 
   primitive_nobridge 'nan?', '_isNaN'
   primitive_nobridge 'round', 'rounded'
   primitive_nobridge 'to_f' , 'asFloat'
-  primitive_nobridge '_to_float' , 'asFloat'
+  primitive_nobridge '__to_float' , 'asFloat'
   primitive_nobridge 'to_i' , 'truncated'
   primitive_nobridge 'to_int' , 'truncated'
   primitive_nobridge 'to_s' , '_rubyAsString'  
-  primitive_nobridge '_as_string' , 'asString'   # Smalltalk format sd.d...dEsee
+  primitive_nobridge '__as_string' , 'asString'   # Smalltalk format sd.d...dEsee
   primitive          'inspect' , '_rubyAsString'  
   primitive_nobridge 'truncate' , 'truncated'
-
-#  primitive_nobridge '_decimal_float_parts', '_decimalFloatParts'
 
   # Note: nonstandard meth to format Float - for use by Benchmark 
   primitive 'to_fmt' , '_rubyAsFormattedString' 
@@ -278,9 +276,9 @@ class Float
 
   # following 3 not intented for public use, 
   #  coercion of arguments is done in Math.rb
-  primitive_nobridge '_atan2', 'arcTan2:'
-  primitive_nobridge '_hypot', 'hypot:'
-  primitive_nobridge  '_ldexp', 'ldexp:'
+  primitive_nobridge '__atan2', 'arcTan2:'
+  primitive_nobridge '__hypot', 'hypot:'
+  primitive_nobridge  '__ldexp', 'ldexp:'
 end
-Float._freeze_constants
+Float.__freeze_constants
 

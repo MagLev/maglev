@@ -1,10 +1,10 @@
 class NilClass
-  primitive_nobridge '_isSpecial', 'isSpecial'
+  primitive_nobridge '__isSpecial', 'isSpecial'
 
-  primitive_nobridge '&', '_rubyAnd:'
+  primitive_nobridge '&', '__rubyAnd:'
   #  For receiver nil,  Or and Xor are the same
-  primitive_nobridge '^', '_rubyOr:'
-  primitive_nobridge '|', '_rubyOr:'
+  primitive_nobridge '^', '__rubyOr:'
+  primitive_nobridge '|', '__rubyOr:'
 
   primitive 'nil?' , '_rubyNilQ'
   primitive 'to_a' , '_ruby_to_a'
@@ -58,11 +58,12 @@ class NilClass
     nil
   end
 
-  def _plus_match
+  def __plus_match
     nil
   end
 
-  def _to_proc
+  def __to_proc
+    # invoked from generated code
     self
   end
 

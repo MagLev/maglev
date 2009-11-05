@@ -121,8 +121,8 @@ class Range
   # Convert this range object to a printable form (using
   # <tt>inspect</tt> to convert the start and end objects).
   def inspect
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     unless added
       return #{@excludeEnd ? "..." : ".."}
     end
@@ -184,7 +184,7 @@ class Range
   # Returns nil if the range does not cover.  See rb_range_beg_len.
   # This does the appropriate Type.coerce_to that the specs expect.
   # +err+ is ignored for now.
-  def _beg_len(len, err=0)
+  def __beg_len(len, err=0)
     beg = Type.coerce_to(@from, Fixnum, :to_int)
     the_end = Type.coerce_to(@to, Fixnum, :to_int)
 

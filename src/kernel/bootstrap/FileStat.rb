@@ -78,11 +78,11 @@ class File::Stat
   end
 
   def dev_major
-    _major(@dev)
+    __major(@dev)
   end
 
   def dev_minor
-    _minor(@dev)
+    __minor(@dev)
   end
 
   def directory?
@@ -161,11 +161,11 @@ class File::Stat
   end
 
   def rdev_major
-    _major(@rdev)
+    __major(@rdev)
   end
 
   def rdev_minor
-    _minor(@rdev)
+    __minor(@rdev)
   end
 
   def readable?
@@ -234,11 +234,11 @@ class File::Stat
   end
 
   # pull the major device number out of a dev_t
-  def _major(dev_t)
+  def __major(dev_t)
     (dev_t >> 24) & 0x0ff
   end
   # pull the minor device number out of a dev_t
-  def _minor(dev_t)
+  def __minor(dev_t)
     dev_t & 0xffffff
   end
 
@@ -255,4 +255,4 @@ class File::Stat
   end
 
 end
-File::Stat._freeze_constants
+File::Stat.__freeze_constants

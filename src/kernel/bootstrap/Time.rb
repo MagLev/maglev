@@ -62,7 +62,7 @@ class Time
   # TODO: doesn't load nsec or ivars
   #++
 
-  def self._load(data)
+  def self._load(data)  # used by Marshal
     raise TypeError, 'marshaled time format differ' unless data.length == 8
 
     major, minor = data.unpack 'VV'
@@ -94,7 +94,7 @@ class Time
   # TODO: doesn't dump nsec or ivars
   #++
 
-  def _dump(limit = nil)
+  def _dump(limit = nil)  # used by marshal
     is_gmt = @is_gmt
     unless is_gmt
       t = self.dup.gmtime
@@ -122,7 +122,7 @@ class Time
 
   def dup
     t = self.class.allocate   # Gemstone changes
-    t._init(@microseconds, @is_gmt);
+    t.__init(@microseconds, @is_gmt);
   end
 
   def self.local(first, *args)
@@ -140,7 +140,7 @@ class Time
       usec = 0
     else
       year = first
-      month = self._monthname_to_num(args[0]) 
+      month = self.__monthname_to_num(args[0]) 
       day = args[1] || 1
       hour = args[2] || 0
       minute = args[3] || 0
@@ -148,14 +148,14 @@ class Time
       usec = args[5] || 0
       isdst = -1  # ask C mktime() to determine dst
     end
-    self._mktime(second, minute, hour, day, month, year, usec, isdst, false)
+    self.__mktime(second, minute, hour, day, month, year, usec, isdst, false)
   end
 
   def self.mktime(first, *args)
     self.local(first, *args)
   end
 
-  def self._monthname_to_num(ma)
+  def self.__monthname_to_num(ma)
       # resolve month names to numbers
       if ma._isInteger
         month = ma
@@ -187,7 +187,7 @@ class Time
     else
       # set argument defaults
       year = first
-      month = self._monthname_to_num(args[0]) 
+      month = self.__monthname_to_num(args[0]) 
       day = args[1] || 1
       hour = args[2] || 0
       minute = args[3] || 0
@@ -195,7 +195,7 @@ class Time
       usec = args[5] || 0
     end
 
-    self._mktime(second, minute, hour, day, month, year, usec, 0, true)
+    self.__mktime(second, minute, hour, day, month, year, usec, 0, true)
   end
 
   # Gemstone , new implementations at end of file
@@ -210,7 +210,7 @@ class Time
   end
 
   def seconds
-    @microseconds._divide(1_000_000)   # Gemstone
+    @microseconds.__divide(1_000_000)   # Gemstone
   end
 
   def +(other)
@@ -224,7 +224,7 @@ class Time
       microsecs += (other * 1_000_000.0).to_i
     end
     t = self.class.allocate
-    t._init(microsecs, @is_gmt)
+    t.__init(microsecs, @is_gmt)
   end
 
   def -(other)
@@ -232,14 +232,14 @@ class Time
     if other._isInteger
       microsecs -=  other * 1_000_000
     elsif other.kind_of?(Time)
-      delta = microsecs - other._microsecs
-      return (delta.to_f)._divide(1_000_000.0)
+      delta = microsecs - other.__microsecs
+      return (delta.to_f).__divide(1_000_000.0)
     else
       other = Type.coerce_to(other, Float, :to_f)
       microsecs -= (other * 1_000_000.0).to_i
     end
     t = self.class.allocate
-    t._init(microsecs, @is_gmt)
+    t.__init(microsecs, @is_gmt)
   end
 
   def succ
@@ -248,7 +248,7 @@ class Time
 
   def <=>(other)
     if other.kind_of?(Time)
-      @microseconds <=> other._microsecs 
+      @microseconds <=> other.__microsecs 
     else
       nil
     end
@@ -262,7 +262,7 @@ class Time
 
   def hash
     micro_sec = @microseconds
-    (micro_sec._divide(1_000_000)) ^ (micro_sec % 1_000_000) 
+    (micro_sec.__divide(1_000_000)) ^ (micro_sec % 1_000_000) 
   end
 
   def eql?(other)
@@ -318,11 +318,11 @@ class Time
   end
 
   def to_i
-    @microseconds._divide(1_000_000)
+    @microseconds.__divide(1_000_000)
   end
 
   def to_f
-    @microseconds._divide(1_000_000.0)
+    @microseconds.__divide(1_000_000.0)
   end
 
   ##
@@ -359,14 +359,14 @@ class Time
 
   def localtime
     if @is_gmt
-      self._set_tmarray(false);
+      self.__set_tmarray(false);
     end
     self
   end
 
   def gmtime
     unless @is_gmt
-      self._set_tmarray(true);
+      self.__set_tmarray(true);
     end 
     self
   end
@@ -383,16 +383,16 @@ class Time
     dup.gmtime
   end
 
-  def self._mktime(sec, min, hour, mday, mon, year, usec, isdst=-1, from_gmt=false) 
+  def self.__mktime(sec, min, hour, mday, mon, year, usec, isdst=-1, from_gmt=false) 
     sec  = Integer(sec)
     min  = Integer(min)
     hour = Integer(hour)
     mday = Integer(mday)
-    mon  = Integer(mon)  # conversion to zero based done in C in _c_mktime
-    # range checks on above args done in C in _c_mktime 
+    mon  = Integer(mon)  # conversion to zero based done in C in __c_mktime
+    # range checks on above args done in C in __c_mktime 
     year = Integer(year)
     usec = Integer(usec)
-    sec += usec._divide(1000000)
+    sec += usec.__divide(1000000)
 
     # This logic is taken from MRI, on how to deal with 2 digit dates.
     if year < 200
@@ -412,10 +412,10 @@ class Time
              0, # yday, 
              isdst # negative means ask mktime() to determine Daylight/Standard
            ]
-    atime_t = _c_mktime(args, from_gmt)
+    atime_t = __c_mktime(args, from_gmt)
     t = self.allocate   
     microsecs = (atime_t * 1000000) + (usec % 1000000)
-    t._init(microsecs, from_gmt)
+    t.__init(microsecs, from_gmt)
   end
 
   ##
@@ -554,7 +554,7 @@ class Time
     else
       off = utc_offset
       sign = off < 0 ? '-' : '+'
-      sprintf('%s%02d%02d', sign, *(off.abs._divide(60)).divmod(60))
+      sprintf('%s%02d%02d', sign, *(off.abs.__divide(60)).divmod(60))
     end
   end
   alias rfc822 rfc2822
@@ -648,7 +648,7 @@ class Time
     else
       off = utc_offset
       sign = off < 0 ? '-' : '+'
-      sprintf('%s%02d:%02d', sign, *(off.abs._divide(60)).divmod(60))
+      sprintf('%s%02d:%02d', sign, *(off.abs.__divide(60)).divmod(60))
     end
   end
   alias iso8601 xmlschema
@@ -691,50 +691,50 @@ class Time
   class_primitive 'new'
   class_primitive 'now'
   class_primitive_nobridge 'allocate' , '_basicNew'
-  class_primitive_nobridge '_c_mktime' , 'mktime:fromGmt:'
+  class_primitive_nobridge '__c_mktime' , 'mktime:fromGmt:'
 
-  # _strftime takes a format String as the arg
-  primitive_nobridge '_strftime' , 'strftime:'
+  # __strftime takes a format String as the arg
+  primitive_nobridge '__strftime' , 'strftime:'
 
   # Smalltalk initialize takes care of all instvars,
   #   for use cases Time.new  Time.now
   primitive_nobridge 'initialize'
 
-  # _set_tmarray fills in  @is_gmt , @tm based on @microseconds 
-  primitive_nobridge '_set_tmarray', '_setTmArray:'
+  # __set_tmarray fills in  @is_gmt , @tm based on @microseconds 
+  primitive_nobridge '__set_tmarray', '_setTmArray:'
 
-  def _microsecs
+  def __microsecs
     @microseconds
   end
 
-  def _init(aMicrosecs, isGmt)
+  def __init(aMicrosecs, isGmt)
     @microseconds = aMicrosecs
-    _set_tmarray(isGmt);
+    __set_tmarray(isGmt);
     self
   end
 
   def self.at(a_time)
     res = self.allocate
     if (a_time.kind_of?(self))
-      usecs = a_time._microsecs
+      usecs = a_time.__microsecs
     elsif a_time._isInteger
       usecs = a_time * 1_000_000
     else
       a_time = Type.coerce_to(a_time, Float, :to_f)
       usecs = (a_time * 1000000.0).to_int
     end
-    res._init( usecs , false)
+    res.__init( usecs , false)
   end
 
   def self.at(secs, microsecs)
     res = self.allocate
     usecs = (secs.to_i * 1_000_000) + microsecs.to_i
-    res._init( usecs , false)
+    res.__init( usecs , false)
   end
 
   def strftime(fmt='%a %b %d %H:%M:%S %Z %Y' )
     fmt = fmt.to_str unless  fmt._isString
-    _strftime(fmt)
+    __strftime(fmt)
   end
 
   def self.times
@@ -742,5 +742,5 @@ class Time
   end
 
 end
-Time._freeze_constants
+Time.__freeze_constants
 

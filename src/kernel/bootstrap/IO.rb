@@ -15,16 +15,16 @@ class IO
   primitive 'sync=', 'setSync:'
   primitive 'stat',  'stat'
 
-  primitive_nobridge '_fcntl', 'fcntl:with:'
+  primitive_nobridge '__fcntl', 'fcntl:with:'
 
   def fcntl(op, flags=0)
-    # only these operations are supported by _fcntl primitive:
+    # only these operations are supported by __fcntl primitive:
     #   F_GETFD, F_GETFL, F_SETFL, FD_CLOEXEC
     # Socket contains implementation specific to File::NONBLOCK
      
     op = Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
-    status = _fcntl(op, arg )
+    status = __fcntl(op, arg )
     if status.equal?(0)
       return 0 # 'set' operation ok 
     elsif status.equal?(-1)
@@ -73,7 +73,7 @@ class IO
     # TODO handle non-nil state of $\
     lim = args.length
     if lim == 0 # if no argument, print $_
-      usc = self._getRubyVcGlobal(0x21) # get callers $_
+      usc = self.__getRubyVcGlobal(0x21) # get callers $_
       if usc.equal?(nil)
         usc = "nil"
       end
@@ -99,7 +99,7 @@ class IO
 
   def print
     # non-bridge zero args variant  so $_ access will work
-    usc = self._getRubyVcGlobal(0x21) # get callers $_
+    usc = self.__getRubyVcGlobal(0x21) # get callers $_
     if usc.equal?(nil)
       usc = "nil"
     end
@@ -164,7 +164,7 @@ class IO
     end
 
     n = 0
-    ts = Thread._recursion_guard_set
+    ts = Thread.__recursion_guard_set
     while (n < lim)
       suppress = false
       elem = args[n]
@@ -258,7 +258,7 @@ class IO
     num
   end
 
-  def _increment_lineno
+  def __increment_lineno
     # to be called by gets implementations
     num = @lineNumber 
     if num.equal?(nil)
@@ -272,7 +272,7 @@ class IO
   def readline(separator=$/)
     res = self.gets(separator)
     raise EOFError if res.nil?
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res.__storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end
 
@@ -280,7 +280,7 @@ class IO
     separator=$/
     res = self.gets(separator)
     raise EOFError if res.nil?
-    res._storeRubyVcGlobal(0x21) # store into caller's $_
+    res.__storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end
 
@@ -300,7 +300,7 @@ class IO
     r
   end
 
-  def _read_into(len, buf)
+  def __read_into(len, buf)
     res = self.read(len, buf)
     if res.equal?(nil)
       0

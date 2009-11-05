@@ -4,14 +4,14 @@ class Hash
   primitive 'hash' , '_hash'
   primitive 'keys', 'keys'
 
-  primitive '_add_keys_to', '_addKeysTo:'
+  primitive '__add_keys_to', '_addKeysTo:'  # used by parser
 
   # Class methods
-  class_primitive_nobridge '_new', '_new:'
+  class_primitive_nobridge '__new', '_new:'
 
   def self.allocate
     # for spec compatibility, not used by implementation of new
-    self._st_initialized_instance
+    self.__st_initialized_instance
   end
 
   def self.new(*args)
@@ -26,7 +26,7 @@ class Hash
     else
       # raises ArgumentError, too-many args, unless  a subclass of Hash
       #   has implemented forms of initialize to take > 1 arg
-      h = self._st_initialized_instance
+      h = self.__st_initialized_instance
       h.initialize(*args)
     end
     h
@@ -35,7 +35,7 @@ class Hash
   def self.new(&block)
     # block is expected to be a two-arg block { | aHash, aKey | ... }
     # subsequent variants replace just the corresponding bridge method
-    h = self._st_initialized_instance
+    h = self.__st_initialized_instance
     if block_given?
       h.initialize(&block)
     else
@@ -45,13 +45,13 @@ class Hash
   end
 
   def self.new
-    h = self._st_initialized_instance
+    h = self.__st_initialized_instance
     h.initialize
     h
   end
 
   def self.new(default_value)
-    h = self._st_initialized_instance
+    h = self.__st_initialized_instance
     h.initialize(default_value)
     h
   end
@@ -59,13 +59,13 @@ class Hash
   def self.new(default_value, &block)
     # raises ArgumentError, too-many args, unless  a subclass of Hash
     #   has implemented forms of initialize to take > 1 arg
-    h = self._st_initialized_instance
+    h = self.__st_initialized_instance
     h.initialize(default_value, &block) # raises too-many args
     h
   end
 
-  def self._st_initialized_instance
-    h = self._new(5)
+  def self.__st_initialized_instance
+    h = self.__new(5)
     # protects us from subclasses that don't call super in their initialize
     # method (i.e., Rack 1.0.0).  At least all of the smalltalk inst vars
     # will be initialized.
@@ -73,7 +73,7 @@ class Hash
     h
   end
 
-  def self._from_elements(elements)
+  def self.__from_elements(elements)
     numelem = elements.length
     if !((numelem & 1).equal?(0))
       if (numelem.equal?(1))
@@ -86,11 +86,11 @@ class Hash
       raise ArgumentError , 'odd number of args'
     end
     n = 0
-    tsize = numelem._divide(4)
+    tsize = numelem.__divide(4)
     if tsize < 5
       tsize = 5
     end
-    res = self._new(tsize)
+    res = self.__new(tsize)
     res.default=(nil)
     while (n < numelem)
       res[ elements[n] ] = elements[n + 1]
@@ -100,17 +100,17 @@ class Hash
   end
 
   def self.[](*args)
-    self._from_elements(args)
+    self.__from_elements(args)
   end
 
   def self.[](arg)
     if arg._isArray
-      self._from_elements(arg)
+      self.__from_elements(arg)
     elsif arg._isHash
       if self.equal?(arg.class)
         arg.dup
       else
-        res = self._new(arg.size)
+        res = self.__new(arg.size)
         res.default=(nil)
         arg.each_pair { |k, v| res[k] = v }
         res
@@ -154,8 +154,8 @@ class Hash
     return false unless other.length.equal?(self.length) 
     # Maglev is compatible with MRI 1.8.6 
     #  by not comparing   @defaultValue == other.default  #(1.8.7 does check)
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     begin
       self.each { | k, v |
         unless other.has_key?(k)
@@ -195,8 +195,8 @@ class Hash
     return false unless other.length.equal?(self.length)
     dflt = self.default
     return false unless dflt.eql?( other.default )
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     begin
       self.each { | k, v |
 	ov = other[k]
@@ -246,7 +246,7 @@ class Hash
     end
   end
 
-  def _default_value
+  def default_value
     @defaultValue
   end
 
@@ -255,7 +255,7 @@ class Hash
   primitive 'default_proc' , 'defaultBlock'
 
   def delete(key, &blk)
-    v = self._delete(key)
+    v = self.__delete(key)
     if v.equal?(@sentinel)
       if block_given?
         return  blk.call(key)
@@ -265,8 +265,8 @@ class Hash
     end
     v
   end
-  primitive '_delete', 'deleteKey:' # returns @sentinel if key not found
-  primitive '_delete_otherwise', 'deleteKey:otherwise:'
+  primitive '__delete', 'deleteKey:' # returns @sentinel if key not found
+  primitive '__delete_otherwise', 'deleteKey:otherwise:'
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
@@ -279,27 +279,27 @@ class Hash
       len = to_del.length
       n = 0
       while n < len
-        self.delete(to_del[n])
+        self.__delete(to_del[n])
         n += 1
       end
     end
     self
   end
 
-  def _call_block(arga, &blk)
-    "to be called from smalltalk"
+  def __call_block(arga, &blk)
+    "called from Smalltalk implementation of Hash"
      blk.call(arga)
   end
 
-  def _call_block(arga, argb, &blk)
-    "to be called from smalltalk"
+  def __call_block(arga, argb, &blk)
+    "called from Smalltalk implementation of Hash"
      blk.call(arga, argb)
   end
 
-  primitive '_each&', 'eachPairDo:'
+  primitive '__each&', 'eachPairDo:'
   def each(&blk)
     # this method needed so sender of eachPairDo: is in env 1
-    self._each(&blk)
+    self.__each(&blk)
   end
 
   primitive 'each_key&', 'eachKeyDo:'
@@ -317,11 +317,11 @@ class Hash
   # * If +block+ is given, return the value of calling +block+ with +key+
   # Fetch does not use any default values supplied when the hash was created.
   #
-  primitive_nobridge '_at_otherwise', 'rubyAt:otherwise:'
+  primitive_nobridge '__at_otherwise', 'rubyAt:otherwise:'
 
   def fetch(key, dflt=Undefined, &block)
     udef = Undefined
-    val = self._at_otherwise(key, udef)
+    val = self.__at_otherwise(key, udef)
     return val unless val.equal?(udef)
     if block_given?
       if dflt._not_equal?(udef)
@@ -409,10 +409,10 @@ class Hash
     res
   end
 
-  primitive_nobridge '_firstPair'
+  primitive_nobridge '__first_pair', '_firstPair'
 
   def shift
-    pair = self._firstPair
+    pair = self.__first_pair
     if pair.equal?(nil)
       return self.default(nil) 
     end
@@ -453,14 +453,14 @@ class Hash
   #
   # RxINC: does the primitive work?
 
-  primitive   '_basic_dup', 'rubyDup'       # use non-singleton class
-  primitive   '_basic_clone', 'rubyClone'   # use singleton class
+  primitive   '__basic_dup', 'rubyDup'       # use non-singleton class
+  primitive   '__basic_clone', 'rubyClone'   # use singleton class
 
   def inspect
     return "{}" if length.equal?(0)
     str = "{"
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     unless added
       str << '...}'
       return str

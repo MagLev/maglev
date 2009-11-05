@@ -66,7 +66,7 @@ class Integer
         primitive_nobridge '-', '_rubySubtract:'
         primitive_nobridge '*', '_rubyMultiply:'
         primitive_nobridge '/', '_rubyDivide:'
-        primitive_nobridge '_divide', '_rubyDivide:'
+        primitive_nobridge '__divide', '_rubyDivide:'
 
         primitive_nobridge '%', '_rubyModulo:'
         primitive_nobridge 'modulo', '_rubyModulo:'
@@ -153,7 +153,7 @@ class Integer
        end
      end
 
-     primitive_nobridge '_bit_at', 'bitAt:'
+     primitive_nobridge '__bit_at', 'bitAt:'
      
      def [](arg)
        a = Type.coerce_to(arg, Integer, :to_int)
@@ -161,7 +161,7 @@ class Integer
          0
        else
          if a._isFixnum
-           self._bit_at(a)
+           self.__bit_at(a)
          else
            self < 0 ? 1 : 0 
          end
@@ -184,7 +184,7 @@ class Integer
 
         def divmod(arg)
           if arg._isInteger
-            q = self._divide(arg)
+            q = self.__divide(arg)
             r = self - (q * arg)
             [ q, r ]
           elsif arg._isNumeric
@@ -203,7 +203,7 @@ class Integer
             end
             self.to_f.div(arg)
           else
-            q = self._divide(arg)
+            q = self.__divide(arg)
             q.to_int
           end
         end
@@ -212,18 +212,18 @@ class Integer
 
         
         def quo(param)
-           (self.to_f )._divide(param)
+           (self.to_f ).__divide(param)
         end
 
 #  remainder  inherited from numeric
 
         primitive 'size', 'size'
         primitive 'to_f', 'asFloat'
-        primitive '_to_float', 'asFloat'
+        primitive '__to_float', 'asFloat'
         primitive 'to_i', 'truncated'
         primitive 'to_int' , 'truncated'
 
-        primitive '_to_s_base_show', 'printStringRadix:showRadix:'
+        primitive '__to_s_base_show', 'printStringRadix:showRadix:'
 
         # primitive to_s  is the zero arg form 
         primitive 'to_s', 'asString'
@@ -232,7 +232,7 @@ class Integer
           unless base._isFixnum 
             raise TypeError, 'arg must be a Fixnum'
           end
-          _to_s_base_show(base, false)
+          __to_s_base_show(base, false)
         end
 
         primitive 'truncate' , 'truncated'
@@ -254,20 +254,20 @@ class Integer
   end
 
 # Were in String.rb
-    def _split_string(string, limit)
-        self.chr._split_string(string, limit)
+    def __split_string(string, limit)
+        self.chr.__split_string(string, limit)
     end
 
 # primitives added to support BigDecimal implementation
 
-  class_primitive_nobridge '_from_string', 'fromString:'
+  class_primitive_nobridge '__from_string', 'fromString:'
 
-  primitive_nobridge '_decimal_digits_length_approx', '_decimalDigitsLength:' 
+  primitive_nobridge '__decimal_digits_length_approx', '_decimalDigitsLength:' 
     # argument is useApproximationBoolean , if true result may  be
     # slightly smaller than actual number of digits
 
-  primitive_nobridge '_min', 'min:'  # Smalltalk coercion on arg
-  primitive_nobridge '_max', 'max:'  # Smalltalk coercion on arg
-  primitive_nobridge '_quo_rem', 'quoRem:into:' # Smalltalk coercion on arg
+  primitive_nobridge '__min', 'min:'  # Smalltalk coercion on arg
+  primitive_nobridge '__max', 'max:'  # Smalltalk coercion on arg
+  primitive_nobridge '__quo_rem', 'quoRem:into:' # Smalltalk coercion on arg
 
 end

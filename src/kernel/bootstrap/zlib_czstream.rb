@@ -14,7 +14,7 @@ class CZstream
     primitive_nobridge 'flush', 'flush'
     primitive_nobridge 'write', 'rubyWrite:count:'
 
-    primitive_nobridge '_open', 'open:io:errorClass:comprLevel:'
+    primitive_nobridge '__open', 'open:io:errorClass:comprLevel:'
 
     # Finishes the stream and flushes output buffer.
     def finish

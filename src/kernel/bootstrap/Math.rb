@@ -48,7 +48,7 @@ module Math
   def atan2(x, y)
     fx = Type.coerce_to(x, Float, :to_f )
     fy= Type.coerce_to(y, Float, :to_f )
-    r = fx._atan2(fy)
+    r = fx.__atan2(fy)
     if r.nan?
       raise Errno::EDOM
       nil
@@ -101,13 +101,13 @@ module Math
   def hypot(x, y)
     fx = Type.coerce_to(x, Float, :to_f )
     fy= Type.coerce_to(y, Float, :to_f )
-    fx._hypot(fy)
+    fx.__hypot(fy)
   end
 
   def ldexp(x, y)
    fx = Type.coerce_to(x, Float, :to_f )
    iy = Type.coerce_to(y, Fixnum, :to_int)
-   fx._ldexp(iy)
+   fx.__ldexp(iy)
   end
 
   def log(x)
@@ -218,4 +218,4 @@ module Math
     :tanh
 
 end
-Math._freeze_constants
+Math.__freeze_constants

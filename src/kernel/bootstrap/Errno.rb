@@ -20,34 +20,34 @@ module Errno
   end
 
   def self.handle
-    errnum = Dir._get_clear_errno
+    errnum = Dir.__get_clear_errno
     self.handle(errnum, '')
   end
 
-  def self._new_for_errno(errno)
+  def self.__new_for_errno(errno)
     cls = ERRNO_TO_EXCEPTION[errno];
     if cls.equal?(nil)
       return nil
     end
     exc = cls.allocate
-    exc._st_initialize
+    exc.__st_initialize
     exc.errno=(errno)
-    m = cls._default_ruby_message
+    m = cls.__default_ruby_message
     if m._not_equal?(nil)
-      exc._message=(m)
+      exc.__message=(m)
     end
     exc
   end
 
   def self.raise_errno(errno, additional='')
-    exc = self._new_for_errno(errno)
+    exc = self.__new_for_errno(errno)
     if exc.equal?(nil)
       exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
     end
     if additional._isString && additional.length > 0
-      exc._message_append(additional)
+      exc.__message_append(additional)
     end
-    exc._signal
+    exc.__signal
   end
   private
 
@@ -98,7 +98,7 @@ module Errno
 
   # Return an array of errno names, indexed by errno for this platform.
   def self.errno_names
-    Exception._errnoTables[Exception._cpuOsKind - 1] # Adjust for smalltalk
+    Exception.__errno_tables[Exception.__cpu_os_kind - 1] # Adjust for smalltalk
   end
 
   def self.create_all_errno_classes
@@ -122,7 +122,7 @@ end
 
 # Create Errno specific error messages here
 class Errno::ENOENT
-  def self._default_ruby_message
+  def self.__default_ruby_message
     "No such file or directory - "
   end
 end

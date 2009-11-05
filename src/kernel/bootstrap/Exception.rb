@@ -1,29 +1,29 @@
 # Maps to Smalltalk class UserException.  See Globals.rb
 class Exception
     class_primitive 'allocate', 'rubyBasicNew'
-    class_primitive '_signal', 'signal:'
-    class_primitive_nobridge '_signal', 'signal'
+    class_primitive '__signal', 'signal:'
+    class_primitive_nobridge '__signal', 'signal'
 
     class_primitive 'install_debug_block&', 'installDebugBlock:'
 
     # support for errno to Name translation
-    class_primitive_nobridge  '_errnoTables', 'errnoTables'
-    class_primitive_nobridge  '_errnoToName', 'errnoToName:'
-    class_primitive_nobridge  '_cpuOsKind', 'cpuOsKind'
+    class_primitive_nobridge  '__errno_tables', 'errnoTables'
+    class_primitive_nobridge  '__errno_to_name', 'errnoToName:'
+    class_primitive_nobridge  '__cpu_os_kind', 'cpuOsKind'
 
-    primitive_nobridge '_handler_active' , '_handlerActive'
+    primitive_nobridge '__handler_active' , '_handlerActive'
 
-    primitive_nobridge '_reraise', '_rubyReraise'
-    primitive          '_signal', 'signal:'
-    primitive_nobridge '_signal', 'signal'
-    primitive          '_description', 'description'
-    primitive_nobridge '_message=', 'messageText:'
-    primitive_nobridge '_st_initialize', 'initialize'
+    primitive_nobridge '__reraise', '_rubyReraise'
+    primitive          '__signal', 'signal:'
+    primitive_nobridge '__signal', 'signal'
+    primitive          '__description', 'description'
+    primitive_nobridge '__message=', 'messageText:'
+    primitive_nobridge '__st_initialize', 'initialize'
 
     def message
       m = @messageText
       if m.equal?(nil)
-        m = _description  # generate Smalltalk message
+        m = __description  # generate Smalltalk message
       end
       if m.frozen? 
         # The messages encoded by Smalltalk exceptions are frozen,
@@ -33,11 +33,11 @@ class Exception
       m
     end
 
-    def self._default_ruby_message
+    def self.__default_ruby_message
       nil
     end
 
-    def _message_append(str)
+    def __message_append(str)
       m = @messageText
       if m.equal?(nil)
         m = self.message
@@ -74,7 +74,7 @@ class Exception
     IncludeSmalltalkFrames = false;
 
     def initialize(message=nil)
-      self._st_initialize  # initialize smalltak instvars
+      self.__st_initialize  # initialize smalltak instvars
       if message.equal?(nil)
         message = self.class.name
       end
@@ -84,13 +84,13 @@ class Exception
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop
-      @stack || Thread._backtrace(IncludeSmalltalkFrames, limit)
+      @stack || Thread.__backtrace(IncludeSmalltalkFrames, limit)
     end
 
     def backtrace_st(limit = 1000)
       # include smalltalk frames in the result
       #  limit defines smalltalk stack depth at which to stop
-      Thread._backtrace(true, limit)
+      Thread.__backtrace(true, limit)
     end
 
     def exception(message = Undefined)
@@ -98,7 +98,7 @@ class Exception
         return self
       end
       e = dup
-      e._message=(message)
+      e.__message=(message)
       e
     end
 
@@ -130,7 +130,7 @@ end
 
 class SystemExit
   # Smalltalk reimplements initialize
-  primitive_nobridge '_st_initialize', 'initialize'
+  primitive_nobridge '__st_initialize', 'initialize'
 
   def status
     @status
@@ -152,11 +152,11 @@ class SystemStackError
 end
 class NoMemoryError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'
+   primitive_nobridge '__st_initialize', 'initialize'
 end
 class ScriptError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'
+   primitive_nobridge '__st_initialize', 'initialize'
 end
 class LoadError  # a subclass of ScriptError
 end
@@ -209,16 +209,16 @@ class SystemCallError
       end  
     end
     if errnum._not_equal?(nil)
-      exc = Errno._new_for_errno(errnum)
+      exc = Errno.__new_for_errno(errnum)
     end
     if exc.equal?(nil)
       exc = self.allocate
       exc.errno=(errnum)
     end
     if msg.equal?(nil)
-      exc._message=('Unknown error')
+      exc.__message=('Unknown error')
     else
-      exc._message=(msg)
+      exc.__message=(msg)
     end
     exc
   end
@@ -243,7 +243,7 @@ end
 
 class NameError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'
+   primitive_nobridge '__st_initialize', 'initialize'
 
    def self.new(msg=nil, name=nil)
      exc = super(msg)
@@ -268,9 +268,9 @@ end
 
 class NoMethodError  # a subclass of NameError
    # Smalltalk reimplements initialize
-   primitive_nobridge '_st_initialize', 'initialize'
+   primitive_nobridge '__st_initialize', 'initialize'
 
-   def _init(selector, args_arr, envid)
+   def __init(selector, args_arr, envid)
      gsa = @gsarguments
      if selector._isSymbol
        gsa[1] = selector

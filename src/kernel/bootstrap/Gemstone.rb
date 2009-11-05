@@ -44,18 +44,18 @@
 class Gemstone
 
   # Transaction support
-  class_primitive '_commitTransaction', 'commitTransaction'
-  class_primitive '_abortTransaction', 'abortTransaction'
-  class_primitive '_beginTransaction', 'beginTransaction'
+  class_primitive '__commitTransaction', 'commitTransaction'
+  class_primitive '__abortTransaction', 'abortTransaction'
+  class_primitive '__beginTransaction', 'beginTransaction'
 
   def self.commitTransaction
-    _commitTransaction
+    __commitTransaction
   end
   def self.abortTransaction
-    _abortTransaction
+    __abortTransaction
   end
   def self.beginTransaction
-    _beginTransaction
+    __beginTransaction
   end
 
   # Raise an exception if specified temporary object is added to the
@@ -72,7 +72,7 @@ class Gemstone
   # from the object given by the error argument.
   class_primitive 'trap_add_to_closure_list', 'trapAddToClosureList:'
 
-  class_primitive_nobridge '_object_for_oop', '_objectForOop:' # used by ObjectSpace
+  class_primitive_nobridge '__object_for_oop', '_objectForOop:' # used by ObjectSpace
     # implementation is Object>>_objectForOop:  but putting class_prim directives
     # in Object or Fixnum may upset results of Object.singleton_methods ...
 
@@ -80,46 +80,46 @@ class Gemstone
   class_primitive 'session_temp_put', '_sessionTempsAt:put:' # returns value stored
 
   # _processInfo includes getuid getgid, getpid, kill  and related functions
-  class_primitive_nobridge '_processInfo', '_processInfo:with:with:'
-  class_primitive_nobridge '_host_times', '_hostTimes'
+  class_primitive_nobridge '__process_info', '_processInfo:with:with:'
+  class_primitive_nobridge '__host_times', '_hostTimes'
 
   # Return the real uid for the server process
   def self.getuid
-    _processInfo(0, nil, nil)
+    __process_info(0, nil, nil)
   end
 
   # Return the effective uid for the server process
   def self.geteuid
-    _processInfo(1, nil, nil)
+    __process_info(1, nil, nil)
   end
 
   # Return the real group id for the server process
   def self.getgid
-    _processInfo(2, nil, nil)
+    __process_info(2, nil, nil)
   end
 
   # Return the effective group id for the server process
   def self.getegid
-    _processInfo(3, nil, nil)
+    __process_info(3, nil, nil)
   end
 
   # Return the process id for the server process
   def self.getpid
-    _processInfo(8, nil, nil)
+    __process_info(8, nil, nil)
   end
 
   # Return the process group id for the server process
   def self.getpgrp
-    _processInfo(9, nil, nil)
+    __process_info(9, nil, nil)
   end
 
   # Return the parent process id for the server process
   def self.getppid
-    _processInfo(10, nil, nil)
+    __process_info(10, nil, nil)
   end
 
-  class_primitive_nobridge '_increment_pcounter', 'persistentCounterAt:incrementBy:'
-  class_primitive_nobridge '_decrement_pcounter', 'persistentCounterAt:decrementBy:'
+  class_primitive_nobridge '__increment_pcounter', 'persistentCounterAt:incrementBy:'
+  class_primitive_nobridge '__decrement_pcounter', 'persistentCounterAt:decrementBy:'
 
   # Get the value of the persistent counter +arg+.  +arg+ must be in range 1 <= arg <= 128.
   #
@@ -145,7 +145,7 @@ class Gemstone
   #
   # See Gemstone class comments for details on persistent counters.
   def self.increment_pcounter(counter, by=1)
-    _increment_pcounter(counter, by)
+    __increment_pcounter(counter, by)
   end
 
   # Decrements the persistent shared counter at index by the specified
@@ -157,6 +157,6 @@ class Gemstone
   #
   # See Gemstone class comments for details on persistent counters.
   def self.decrement_pcounter(counter, by=1)
-    _decrement_pcounter(counter, by)
+    __decrement_pcounter(counter, by)
   end
 end

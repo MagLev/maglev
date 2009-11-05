@@ -30,7 +30,7 @@ class IO
   SEEK_END = File::SEEK_END # set file position to end of file + offset
 
 end
-IO._freeze_constants
+IO.__freeze_constants
 class File
   module Constants
     APPEND = File::APPEND
@@ -53,6 +53,6 @@ class File
     TRUNC = File::TRUNC
     WRONLY = File::WRONLY
   end
-  Constants._freeze_constants
+  Constants.__freeze_constants
   include Constants
 end

@@ -58,7 +58,7 @@ class Numeric
     f.ceil
   end
 
-  # Most internal uses of /  must use _divide() to avoid
+  # Most internal uses of /  must use __divide() to avoid
   #   infinite recursion after  math.n redefines quo and / for Rational
 
   def div(arg)
@@ -84,7 +84,7 @@ class Numeric
     if a == 0.0
       raise FloatDomainError ,'arg to divmod was zero'
     end
-    q = (self._divide(a)).floor
+    q = (self.__divide(a)).floor
     r = self - (q * a)
     [ q, r ]
   end
@@ -113,13 +113,13 @@ class Numeric
     self.to_f.floor
   end
  
-  primitive '_to_float', 'asFloat'
+  primitive '__to_float', 'asFloat'
 
   def hash
     h = 0
     begin
       # don't use to_f here; causes infinite recursion with mspec
-      h = self._to_float.hash
+      h = self.__to_float.hash
     rescue
       # continue execution
     end
@@ -149,14 +149,14 @@ class Numeric
   #  which is much cheaper than the typical Ruby style
   #    [a,b].max
   #
-  def _max(arg)
+  def __max(arg)
     unless arg._isNumeric
       raise TypeError, 'arg to _max is not a Numeric'
     end
     return self < arg ? arg : self
   end
 
-  def _min(arg)
+  def __min(arg)
     unless arg._isNumeric
       raise TypeError, 'arg to _min is not a Numeric'
     end

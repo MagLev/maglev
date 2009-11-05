@@ -2,7 +2,7 @@
 
 #            Ruby class name , Gemstone class name
 RUBY.global('Array', 'Array')
-RUBY.global('Behavior', 'Behavior')
+# deleted Behavior 
 RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'RClass')
@@ -43,7 +43,6 @@ RUBY.global('TCPSocket', 'TCPSocket')
 RUBY.global('Thread', 'GsProcess')
 RUBY.global('ThreadGroup', 'RubyThreadGroup')
 RUBY.global('Time', 'RubyTime')
-RUBY.global('TransientShortArray', 'TransientShortArray')
 RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 
