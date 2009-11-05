@@ -26,26 +26,28 @@ class Module
     false
   end
 
-  primitive '_ruby_methods_protection', 'rubyMethods:protection:'
+  primitive '__ruby_methods_protection', 'rubyMethods:protection:'
 
   def instance_methods(inc_super=true)
-    _ruby_methods_protection(inc_super, 0);
+    __ruby_methods_protection(inc_super, 0);
   end
 
   def public_instance_methods(inc_super=true)
-    _ruby_methods_protection(inc_super, 0);
+    __ruby_methods_protection(inc_super, 0);
   end
 
   def private_instance_methods(inc_super=true)
-    _ruby_methods_protection(inc_super, 2);
+    __ruby_methods_protection(inc_super, 2);
   end
 
   def protected_instance_methods(inc_super=true)
-    _ruby_methods_protection(inc_super, 1);
+    __ruby_methods_protection(inc_super, 1);
   end
 
   # MNI: attr
-  # MNI: extend_object
+  def extend_object(object)
+    raise NotImplementedError, 'Module#extend_object'
+  end
 
   # remove_method  implemented in Behavior
   # undef_method implemented in Behavior

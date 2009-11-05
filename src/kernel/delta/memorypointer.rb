@@ -66,11 +66,11 @@
 
     # def initialize ; end #   in ffi.rb
 
-    class_primitive_nobridge '_with_all', 'withAll:'
+    class_primitive_nobridge '__with_all', 'withAll:'
 
     def self.from_string(string)
       string = Type.coerce_to(string, String, :to_str)
-      inst = self._with_all(string)
+      inst = self.__with_all(string)
       inst.initialize(1)
       inst
     end
@@ -81,12 +81,12 @@
       self + byte_offset
     end
 
-    primitive_nobridge '_new_from', 'newFrom:numBytes:'
+    primitive_nobridge '__new_from', 'newFrom:numBytes:'
 
     def +(byteoffset)
       # return an instance derived from self
       #  instance has autofree==false, and a derivedFrom reference to self
-      inst = self._new_from(byteoffset, -2) 
+      inst = self.__new_from(byteoffset, -2) 
       inst.initialize(@type_size)
       inst
     end

@@ -223,6 +223,6 @@ module FFI
 
 end
 
-FFI._freeze_constants
+FFI.__freeze_constants
 
 # the rest of the FFI implementation is in file ffi2.rb

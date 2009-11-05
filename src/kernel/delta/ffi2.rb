@@ -7,17 +7,17 @@ module FFI
   # Smalltalk implementation classes
   class CLibrary
      class_primitive_nobridge 'named' , 'named:'
-     class_primitive_nobridge '_has_symbol', 'hasCSymbol:'
-     primitive_nobridge '_has_symbol', 'hasCSymbol:'
+     class_primitive_nobridge '__has_symbol', 'hasCSymbol:'
+     primitive_nobridge '__has_symbol', 'hasCSymbol:'
      primitive_nobridge 'name', 'name'
   end
   class CFunction
     primitive_nobridge 'call_template*' , '_rubyToCcallTemplate:'
 
-    class_primitive_nobridge '_new', '_rubyNew:'
+    class_primitive_nobridge '__new', '_rubyNew:'
      # arg is [ cLibrary, fName, resType, argTypesArray, varArgsAfter]
 
-    primitive_nobridge '_compile_caller', '_compileCaller:In:'
+    primitive_nobridge '__compile_caller', '_compileCaller:In:'
   end
   class CByteArray
     # following 3 methods needed by the RubyParser
@@ -40,7 +40,7 @@ module FFI
     primitive_nobridge 'int32_put', 'int32At:put:'
     primitive_nobridge 'int64_put', 'int64At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
-    primitive_nobridge '_unsigned_wordsize_at', '_unsigned:at:'
+    primitive_nobridge '__unsigned_wordsize_at', '_unsigned:at:'
 
     primitive_nobridge 'stringfrom_to', 'stringFrom:to:'
 	# zero-based start offset,  zero-based end offset(NOT limit)
@@ -61,7 +61,7 @@ module FFI
 
     def _search_for_zerobyte(offset)
       # result -1 if no null byte found
-      self._unsigned_wordsize_at(-1, offset) 
+      self.__unsigned_wordsize_at(-1, offset) 
     end
 
     def self.new(size)
@@ -73,10 +73,10 @@ module FFI
       self.memset(0, 0, -1)
     end
 
-    primitive_nobridge '_inspect' , '_inspect'
+    primitive_nobridge '__inspect' , '_inspect'
     def inspect
       str = super
-      str << self._inspect
+      str << self.__inspect
       str
     end
 
@@ -242,20 +242,20 @@ module FFI
         lib = libs[n]
         if lib.equal?(nil)
           puts "--FFI:  attach_function: #{cname} searching process"   if my_debug > 1
-          found = CLibrary._has_symbol(cname) # check entire process
+          found = CLibrary.__has_symbol(cname) # check entire process
           if found && my_debug > 0
              puts "--FFI:  attach_function: found #{cname} in process"  
           end 
         else
           puts "--FFI:  attach_function: #{cname} searching lib #{lib.name}"   if my_debug > 1
-          found = lib._has_symbol(cname)
+          found = lib.__has_symbol(cname)
           if found && my_debug > 0
              puts "--FFI:  attach_function: found #{cname} in lib #{lib.name}"  
           end 
         end
         if found
-          cf = CFunction._new([ lib, cname, ret, cargs, -1])
-          meth = cf._compile_caller(name, self)  # installs a method in self
+          cf = CFunction.__new([ lib, cname, ret, cargs, -1])
+          meth = cf.__compile_caller(name, self)  # installs a method in self
 		# which will be installed per Maglev.persistent_mode
           return meth
         end
