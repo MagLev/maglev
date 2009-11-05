@@ -60,5 +60,5 @@ module Marshal
   TYPE_USRMARSHAL_ch = ?U
 
 end
-Marshal._freeze_constants
+Marshal.__freeze_constants
 

@@ -4,7 +4,7 @@ module Kernel
   def Float(obj)
     return obj  if obj._isFloat
     if obj._isString
-      if obj._indexOfByte( 0 , 1 )._not_equal?(0)  
+      if obj.__indexOfByte( 0 , 1 )._not_equal?(0)  
         raise ArgumentError, 'null character in arg to Float()'
       end
       str = obj.lstrip  # remove leading white space
@@ -12,10 +12,10 @@ module Kernel
       sign = 1.0
       first_ch = str[0]
       if first_ch.equal?( ?+ )
-	str._remove_from_to(1,1)
+	str.__remove_from_to(1,1)
       elsif first_ch.equal?( ?- )
 	sign = -1.0
-	str._remove_from_to(1,1)
+	str.__remove_from_to(1,1)
       end  
       # see kernel/parser/lexer.rb for regexp's from which this code derived
       ok = (ra = str =~ /^[\d]+(.[\d]+)?(e[+-]?[\d]+)?/i ) ||
@@ -23,7 +23,7 @@ module Kernel
       unless ok
         raise ArgumentError, "invalid value for Float(): #{obj.inspect}" 
       end
-      idxu = str._indexOfByte( ?_ , 1 ) # arg/result is one-based
+      idxu = str.__indexOfByte( ?_ , 1 ) # arg/result is one-based
       unless idxu.equal?(0)
         if idxu.equal?(str.size ) ||
            (rc = str =~ /([\d]+_e)|(e_)/i )
@@ -31,7 +31,7 @@ module Kernel
         end
         str = str.dup.delete('_')
       end
-      f = str._to_f
+      f = str.__to_f
       if f.nan? 
         raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
       end
@@ -47,7 +47,7 @@ module Kernel
       return obj
     end
     if obj._isString
-      if obj._indexOfByte( 0 , 1 )._not_equal?(0)  
+      if obj.__indexOfByte( 0 , 1 )._not_equal?(0)  
         raise ArgumentError, 'null character in arg to Integer()'
       end
       str = obj.lstrip  # remove leading white space

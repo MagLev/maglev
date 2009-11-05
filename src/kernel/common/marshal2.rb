@@ -103,7 +103,7 @@ class Bignum
       cnt += 1
     end
 
-    str[0..1] + ms.serialize_integer(cnt._divide(2) ) + str[2..-1]
+    str[0..1] + ms.serialize_integer(cnt.__divide(2) ) + str[2..-1]
   end
 end
 
@@ -190,7 +190,7 @@ class Float
   def to_marshal(ms)
     if finite?
       if self == 0.0
-        str = self._sign < 0 ? '-0' : '0'
+        str = self.__sign < 0 ? '-0' : '0'
       else
         str = "%.17g" % [self] + ms.serialize_float_thing(self)
       end

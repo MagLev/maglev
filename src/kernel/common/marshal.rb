@@ -167,11 +167,11 @@ module Marshal
       last_ch = s[-1]
       if last_ch.equal?( ?n ) || last_ch.equal?( ?f )
         if s == "nan"
-          obj = 0.0._divide(0.0)
+          obj = 0.0.__divide(0.0)
         elsif s == "inf"
-          obj = 1.0._divide(0.0)
+          obj = 1.0.__divide(0.0)
         elsif s == "-inf"
-          obj = 1.0._divide(-0.0)
+          obj = 1.0.__divide(-0.0)
         else
           obj = s.to_f
         end
@@ -420,7 +420,7 @@ module Marshal
     def serialize(obj)
       raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
 
-      if obj._isSpecial
+      if obj.__isSpecial
         str = obj.to_marshal(self)
       elsif obj._isSymbol
         idx = @syms_dict[obj]
