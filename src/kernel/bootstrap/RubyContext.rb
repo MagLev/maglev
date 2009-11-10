@@ -17,7 +17,7 @@
 #   constants).
 #
 # +RUBY+ is a persistent object, and hence changes to its namespace will be
-# commited to the repository during a <tt>Gemstone.commitTransaction</tt>.
+# commited to the repository during a <tt>Maglev.commit_transaction</tt>.
 
 # RubyContext is identically Smalltalk RubyContext.
 class RubyContext

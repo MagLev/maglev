@@ -179,7 +179,7 @@ module Maglev
   #    <tt>Module#include</tt> will be done persistently.
   #
   # 6. When the persistent_mode transitions from true to false,
-  #    the current transient $LOAD_PATH (i.e. $: )  is copied 
+  #    the current transient $LOAD_PATH (i.e. $: )  is copied
   #    to persistent state.  See also discussion of $LOADED_FEATURES below.
   #    At session startup, the transient $LOAD_PATH is initialized with
   #    a copy of the persistent $LOAD_PATH .
@@ -332,7 +332,7 @@ module Maglev
   # +OutsideOfTransactionException+ if there was a failure.
   def commit_transaction
     # TODO: wrap #rtErrPrimOutsideTrans in OutsideOfTransactionException
-    unless Gemstone.commitTransaction
+    unless Maglev::System.commit_transaction
       raise CommitFailedException
     end
     return true
@@ -348,22 +348,24 @@ module Maglev
   # transaction mode is set to <tt>:manual_begin</tt>, then a new
   # transaction is not started.
   def abort_transaction
-    return Gemstone.abortTransaction
+    return Maglev::System.abort_transaction
   end
 
-  # $LOADED_FEATURES has a persistent Array and a transient Array .
-  # In ruby code,  $LOADED_FEATURES returns the transient Array ,
-  #  and assignment to  $LOADED_FEATURES will change the transient Array.
-  # At VM startup, the transient copy is initialized with a copy of the persistent Array
-  # A successful  'require' will update the transient Array, and if
-  # the session is currently in persistent mode will also update the persistent Array.
+  # $LOADED_FEATURES has a persistent Array and a transient Array .  In
+  # ruby code, $LOADED_FEATURES returns the transient Array , and
+  # assignment to $LOADED_FEATURES will change the transient Array.  At VM
+  # startup, the transient copy is initialized with a copy of the
+  # persistent Array A successful 'require' will update the transient
+  # Array, and if the session is currently in persistent mode will also
+  # update the persistent Array.
   #
-  # The method clear_persistent_LOADED_FEATURES  will set the persistent Array to empty.
+  # The method clear_persistent_LOADED_FEATURES will set the persistent
+  # Array to empty.
   def clear_persistent_LOADED_FEATURES
     RubyContext.clear_persistent_LOADED_FEATURES
   end
 
   module_function( :commit_transaction, :abort_transaction,
-	           :clear_persistent_LOADED_FEATURES )
+             :clear_persistent_LOADED_FEATURES )
 
 end

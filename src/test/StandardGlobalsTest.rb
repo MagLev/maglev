@@ -113,7 +113,7 @@ x = STDOUT
 #  END GLOBAL PARSE CHECK
 
 report
-Gemstone.abortTransaction # Don't mess up $: etc.
+Maglev.abort_transaction # Don't mess up $: etc.
 
 # This occurrence of __END__ is necessary to define the global
 # variable DATA above.

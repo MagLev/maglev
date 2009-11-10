@@ -12,7 +12,7 @@ raise "Fail A" unless results.size > 5
 results = Hash.new(1)
 1000.times do
   results[rand(100)] += 1
-  Gemstone.abortTransaction
+  Maglev.abort_transaction
 end
 raise "Fail B" if results.size < 5
 

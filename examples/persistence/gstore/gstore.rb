@@ -53,7 +53,7 @@ class GStore < PStore
       @transaction = true
       @rdonly = read_only
       @abort = false
-      Gemstone.beginTransaction
+      Maglev.begin_transaction
       @table = @all_data[@filename]
       begin
         catch(:gstore_abort_transaction) do

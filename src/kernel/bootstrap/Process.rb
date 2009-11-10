@@ -10,73 +10,73 @@ module Process
   end
 
   def self.egid
-    r = Gemstone.__process_info(3, nil, nil)
+    r = Maglev::System.__process_info(3, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.egid=(arg)
-    status = Gemstone.__process_info(5, arg, nil)
+    status = Maglev::System.__process_info(5, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.euid
-    r = Gemstone.__process_info(1, nil, nil)
+    r = Maglev::System.__process_info(1, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.euid=(arg)
-    status = Gemstone.__process_info(6, arg, nil)
+    status = Maglev::System.__process_info(6, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.gid
-    r = Gemstone.__process_info(2, nil, nil)
+    r = Maglev::System.__process_info(2, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.gid=(arg)
-    status = Gemstone.__process_info(7, arg, nil)
+    status = Maglev::System.__process_info(7, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.getpgid(arg)
-    r = Gemstone.__process_info(11, arg, nil)
+    r = Maglev::System.__process_info(11, arg, nil)
     _procInfoResultCheck(r)
   end
 
   def self.getpgrp
-    r = Gemstone.__process_info(9, nil, nil)
+    r = Maglev::System.__process_info(9, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.uid
-    r = Gemstone.__process_info(0, nil, nil)
+    r = Maglev::System.__process_info(0, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.uid=(arg)
-    status = Gemstone.__process_info(4, arg, nil)
+    status = Maglev::System.__process_info(4, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.pid
-    r = Gemstone.__process_info(8, nil, nil)
+    r = Maglev::System.__process_info(8, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.pppid
-    r = Gemstone.__process_info(10, nil, nil)
+    r = Maglev::System.__process_info(10, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.kill(signal, aPid)
     # aPid < 0 or  aPid == Process.pid() are not supported
     #    and will raise an error
-    status = Gemstone.__process_info(12, signal, aPid)
+    status = Maglev::System.__process_info(12, signal, aPid)
     _procInfoResultCheck(status)
     1
   end

@@ -56,7 +56,7 @@ class File::Stat
   def blksize
     @blksize
   end
- 
+
   def blockdev?
     (@mode & S_IFMT) == S_IFBLK
   end
@@ -125,7 +125,7 @@ class File::Stat
   end
 
   def grpowned?
-    @gid == Gemstone.getegid
+    @gid == Maglev::System.getegid
   end
 
   def ino
@@ -149,7 +149,7 @@ class File::Stat
   end
 
   def owned?
-    @uid == Gemstone.geteuid
+    @uid == Maglev::System.geteuid
   end
 
   def pipe?
@@ -195,7 +195,7 @@ class File::Stat
   end
 
   def size?
-    sz = @size 
+    sz = @size
     sz.equal?(0) ? nil : sz
   end
 
@@ -243,15 +243,15 @@ class File::Stat
   end
 
   def superuser?
-    Gemstone.getuid == 0
+    Maglev::System.getuid == 0
   end
 
   def rgrpowned?
-    @gid == Gemstone.getgid
+    @gid == Maglev::System.getgid
   end
 
   def rowned?
-    @uid == Gemstone.getuid
+    @uid == Maglev::System.getuid
   end
 
 end

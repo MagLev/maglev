@@ -36,7 +36,6 @@ RUBY.class.primitive 'global', 'installConstant:name:'
 
 RUBY.require 'kernel/bootstrap/Globals.rb'
 RUBY.require 'kernel/bootstrap/GlobalErrors.rb'
-RUBY.require 'kernel/bootstrap/Gemstone.rb'
 
 #
 # bootstrap
@@ -48,6 +47,7 @@ RUBY.require 'kernel/bootstrap/Module.rb'
 RUBY.require 'kernel/bootstrap/Class.rb'
 RUBY.require 'kernel/bootstrap/StClass.rb'
 RUBY.require 'kernel/bootstrap/Object.rb'
+RUBY.require 'kernel/bootstrap/System.rb'
 
 # deleted use of GsHelper.rb
 

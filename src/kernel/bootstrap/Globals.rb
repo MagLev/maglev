@@ -1,8 +1,9 @@
-# We define all of these globals up front so that we can open these classes later without accidentally creating new ones
+# We define all of these globals up front so that we can open these classes
+# later without accidentally creating new ones
 
 #            Ruby class name , Gemstone class name
 RUBY.global('Array', 'Array')
-# deleted Behavior 
+# deleted Behavior
 RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'RClass')
@@ -46,7 +47,7 @@ RUBY.global('Time', 'RubyTime')
 RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 
-RUBY.global('Gemstone', 'System')
+#RUBY.global('Gemstone', 'System')
 RUBY.global('RubyContext', 'RubyContext')
 RUBY.global('CZstream', 'CZstream')
 

@@ -1,10 +1,10 @@
-# 
+#
 # Tests Benchmark.realtime
-#  
+#
 
 require 'benchmark'
 
-	puts Benchmark.realtime { "a"*1_000_000 }
-	
+  puts Benchmark.realtime { "a"*1_000_000 }
+
 # Prevent saving this into RubyContext
-Gemstone.abortTransaction rescue nil
+Maglev.abort_transaction rescue nil

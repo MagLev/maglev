@@ -1,7 +1,7 @@
 module Mha
   @@mywarn = 90
   def self.warning
-    # if Gemstone.session_temp( :TrapCV ) ; nil.pause ; end
+    # if Maglev::System.session_temp( :TrapCV ) ; nil.pause ; end
     x = @@mywarn
     @@mywarn = x + 10
     x
@@ -20,7 +20,7 @@ class Haml
     end
   end
   def self.warning
-    # if Gemstone.session_temp( :TrapCV ) ; nil.pause ; end
+    # if Maglev::System.session_temp( :TrapCV ) ; nil.pause ; end
     x = @@mywarn
     @@mywarn = x + 1
     x
@@ -35,10 +35,10 @@ b = Haml.version
 unless a == 55 ; raise 'error' ; end
 unless b == 88 ; raise 'error' ; end
 
-c = Mha.warning 
+c = Mha.warning
 unless c == 90 ; raise 'error' ; end
 
-# Gemstone.session_temp_put( :TrapCV, true )
+# Maglev::System.session_temp_put( :TrapCV, true )
 d = Haml.warning
 unless d == 100 ; raise 'error' ; end
 

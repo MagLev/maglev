@@ -3,7 +3,7 @@ class TestMutex
  M = Mutex.new
 end
 
-Gemstone.commitTransaction
+Maglev.commit_transaction
 
 TestMutex::M.synchronize { puts "hello" }
 
