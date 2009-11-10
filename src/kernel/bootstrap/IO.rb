@@ -21,12 +21,12 @@ class IO
     # only these operations are supported by __fcntl primitive:
     #   F_GETFD, F_GETFL, F_SETFL, FD_CLOEXEC
     # Socket contains implementation specific to File::NONBLOCK
-     
+
     op = Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
     status = __fcntl(op, arg )
     if status.equal?(0)
-      return 0 # 'set' operation ok 
+      return 0 # 'set' operation ok
     elsif status.equal?(-1)
       return arg[0] # retrieved value for a 'get' operation
     elsif status < -1
@@ -89,7 +89,7 @@ class IO
             elem = elem.to_s
           end
         end
-	write(elem)
+  write(elem)
         n = n + 1
       end
       sep = $\
@@ -128,14 +128,14 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int) 
+      c = Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
     end
     write( str )
     obj
-  end 
+  end
 
 
   #  Writes the given objects to <em>ios</em> as with
@@ -155,7 +155,7 @@ class IO
   #
   def puts(*args)
     lim = args.length
-    eol = "\n"  # the record separator,  ignores $\  #  
+    eol = "\n"  # the record separator,  ignores $\  #
 
     # If no parameters, print newline
     if lim == 0
@@ -250,7 +250,7 @@ class IO
   end
 
   def lineno=(integer)
-    num = Type.coerce_to(integer, Fixnum, :to_i) 
+    num = Type.coerce_to(integer, Fixnum, :to_i)
     if num < 0
       raise ArgumentError, 'IO#lineno= expects Integer >= 0'
     end
@@ -260,7 +260,7 @@ class IO
 
   def __increment_lineno
     # to be called by gets implementations
-    num = @lineNumber 
+    num = @lineNumber
     if num.equal?(nil)
       num = 0
     end
@@ -311,17 +311,17 @@ class IO
 
   def self.select( reads, writes=nil, errs=nil, timeout=nil )
     if timeout._isFixnum
-      ms = timeout * 1000 
+      ms = timeout * 1000
       unless ms._isFixnum && ms >= 0
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
       end
     elsif timeout._not_equal?(nil)
-      timeout = Type.coerce_to(timeout, Float, :to_f) 
-      ms = (timeout * 1000.0 ).to_int  
+      timeout = Type.coerce_to(timeout, Float, :to_f)
+      ms = (timeout * 1000.0 ).to_int
       unless ms._isFixnum && ms >= 0
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
       end
     end
-    Kernel._select(reads, writes, errs, *[ ms ])
+    Kernel.__select(reads, writes, errs, *[ ms ])
   end
 end
