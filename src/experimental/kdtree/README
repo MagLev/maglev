@@ -6,6 +6,15 @@ This directory contains an implementation of a KD-Tree of dimension 2.
 This is a binary tree that can be used to search for 2D data, i.e., nodes
 with a latitude and longitude.
 
+== Demo
+
+The demo.rb file is a Sinatra application that allows you to enter a
+latitude and longitude (prefereably, within the US, if you're using the US
+Postal Database), and will find the nearest K zip codes to the lat/lon.  To
+run the app:
+
+    $ rake demo
+
 == Performance
 
 The following are just back of the envelope numbers, from a single run On a

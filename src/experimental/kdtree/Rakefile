@@ -14,14 +14,13 @@ end
 
 #task :demo => :migrate do
 desc "Run the migrations and the demo web app"
-#task :demo => :migrate do
-task :demo  do
+task :demo => :migrate do
   sh "#{ENV['MAGLEV_HOME']}/bin/rackup config.ru"
 end
 
 desc "Create and commit the persistent data for the demo app"
-task :migrate do
-  sh "maglev-ruby -I lib migration.rb"
+task :migrate, :force do |t,args|
+  sh "maglev-ruby -I lib migration.rb #{args.force}"
 end
 task :bench do
   #sh "ruby -r profile -I lib test/benchmark.rb"
