@@ -17,6 +17,8 @@ module KDTree
 
   # Tree2D is a KD-Tree of dimension 2.
   class Tree2D
+    include Enumerable
+
     attr_reader :left, :right, :value
 
     # Creates a new +Tree2D+ for the given points.  If +points+ is nil or
@@ -48,7 +50,8 @@ module KDTree
       @value = sorted[pivot]
     end
 
-    # Does an in-order traversal of the tree, but yields only the values
+    # Does an in-order (sorted) traversal of the tree, but yields only the
+    # values
     def each(&block)
       @left.each(&block) unless @left.nil?
       block.call(@value) if @value and block
