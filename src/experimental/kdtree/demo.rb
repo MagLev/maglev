@@ -10,11 +10,14 @@ class Demo < Sinatra::Base
   end
 
   post '/nearest' do
-    @x = params[:x].to_f
-    @y = params[:y].to_f
+    @lat = params[:lat].to_f
+    @lon = params[:lon].to_f
     @k = params[:k].to_i
-    target = KDTree::Point2D.new(@x, @y, :user_target)
-    @results = Maglev::PERSISTENT_ROOT[:kdtree_demo_data].nearest_k(target, @k)
+    @target = KDTree::Point2D.new(@lon, @lat, :user_target)
+    raw_results = Maglev::PERSISTENT_ROOT[:kdtree_demo_data].nearest_k(@target, @k)
+    @results = raw_results.map do |r|
+      [r.value, r.value.spherical_miles(@target)]
+     end.sort {|a,b| a[1] <=> b[1] }
     erb :index
   end
 end
@@ -33,32 +36,37 @@ __END__
 
 <h2>Search for nearest neighbors</h2>
 <p>
-  Enter the X and Y coordinates of a target location, and enter the number
-  of search results desired as K.  This will return the K nearest points in
-  the data base to &lt;x, y&gt;.
+  Find the nearest K zip codes to the location entered in the form.
 </p>
 <form method="post" action="/nearest">
   <ul>
-    <li>X: <input type="text" name="x" title="X" value="42.78"/></li>
-    <li>Y: <input type="text" name="y" title="Y" value="-97.09"/></li>
-    <li>K: <input type="text" name="k" title="K" value="10" /></li>
+    <li>Latitude:  <input type="text" name="lat" title="Lat" value="48.724"/></li>
+    <li>Longitude: <input type="text" name="lon" title="Lon" value="-122.488"/></li>
+    <li>K: <input type="text" name="k" title="K" value="30" /></li>
     <li><input type="submit" value="Search"></li>
   </ul>
 </form>
 
 <% if @results %>
-  <h2>Results for: [<%= @x %>, <%= @y %>] K: <%= @k %></h2>
+  <h2>Results for: <%= @lat %>, <%= @lon %> K: <%= @k %></h2>
   <table>
     <tr>
       <th>#</th>
+      <th>Zip</th>
       <th>Description</th>
-      <th>Distance</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Miles</th>
     </tr>
   <% @results.each_with_index do |r,i| %>
+  <%   pc = r[0] %>
     <tr>
       <td><%= i %></td>
-      <td><%= r.value %></td>
-      <td><%= r.distance %></td>
+      <td><%= pc.zip %></td>
+      <td><%= pc.name %>, <%= pc.state %></td>
+      <td align="right"><%= "% 3.3f" % [pc.lat] %></td>
+      <td align="right"><%= "% 3.3f" % [pc.lon] %></td>
+      <td align="right"><%= "% 5.2f" % r[1] %></td>
     </tr>
   <% end %>
   </table>

@@ -12,10 +12,13 @@ end
 postal_codes = File.dirname(__FILE__) + '/etc/US.txt'
 go_postal = File.exists? postal_codes
 
-puts "Committing tree code"
 Maglev.persistent do
-  require 'tree2d'
-  require 'postal' if go_postal
+  puts "Committing tree2d.rb"
+  load 'tree2d.rb'
+  if go_postal
+    puts "Comitting postal.rb"
+    load 'postal.rb'
+  end
 end
 Maglev.commit_transaction
 

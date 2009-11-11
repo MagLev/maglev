@@ -1,18 +1,14 @@
 task :default => :test
 
-ENV['MAGLEV_OPTS'] = ''
+ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
 
 desc "Test Tree2D class"
 task :test do
-  puts "=== TODO: Change from ruby -> maglev-ruby"
   Dir.glob('test/*_tests.rb').each do |t|
-    sh "ruby -I lib #{t}"
+    sh "maglev-ruby -I lib #{t}"
   end
-#
-#   sh "ruby -I lib test/tree2d_tests.rb"
 end
 
-#task :demo => :migrate do
 desc "Run the migrations and the demo web app"
 task :demo => :migrate do
   sh "#{ENV['MAGLEV_HOME']}/bin/rackup config.ru"
@@ -23,7 +19,6 @@ task :migrate, :force do |t,args|
   sh "maglev-ruby -I lib migration.rb #{args.force}"
 end
 task :bench do
-  #sh "ruby -r profile -I lib test/benchmark.rb"
   sh "ruby -I lib test/benchmark.rb"
   sh "maglev-ruby -I lib test/benchmark.rb"
 end
