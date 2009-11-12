@@ -332,7 +332,7 @@ module Maglev
   # +OutsideOfTransactionException+ if there was a failure.
   def commit_transaction
     # TODO: wrap #rtErrPrimOutsideTrans in OutsideOfTransactionException
-    unless Maglev::System.commit_transaction
+    unless System.commit_transaction
       raise CommitFailedException
     end
     return true
@@ -348,7 +348,7 @@ module Maglev
   # transaction mode is set to <tt>:manual_begin</tt>, then a new
   # transaction is not started.
   def abort_transaction
-    return Maglev::System.abort_transaction
+    return System.abort_transaction
   end
 
   # $LOADED_FEATURES has a persistent Array and a transient Array .  In
@@ -368,4 +368,9 @@ module Maglev
   module_function( :commit_transaction, :abort_transaction,
              :clear_persistent_LOADED_FEATURES )
 
+  def __system
+    # following ref to Maglev::System can be bound at boot compile
+    return System 
+  end
+  module_function( :__system )
 end
