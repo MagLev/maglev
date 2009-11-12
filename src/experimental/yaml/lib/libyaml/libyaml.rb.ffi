@@ -1,5 +1,10 @@
 # -*- ruby -*-
-require 'ffi'
+if defined? Maglev
+  require 'ffi'
+else
+  require 'rubygems'
+  require 'ffi'
+end
 
 # This is an experimental FFI wrapper for http://pyyaml.org/wiki/LibYAML
 #
@@ -9,7 +14,11 @@ require 'ffi'
 
 class LibYaml
   extend FFI::Library
-  ffi_lib '/Users/pmclain/external/yaml-0.1.3-64/src/.libs/libyaml-0.2.dylib'
+  if defined? Maglev
+    ffi_lib '/Users/pmclain/external/yaml-0.1.3-64/src/.libs/libyaml-0.2.dylib'
+  else
+    ffi_lib '/Users/pmclain/external/yaml-0.1.3-32/src/.libs/libyaml-0.2.dylib'
+  end
 
   ParserEventEnum = FFI::Enum.new([:yaml_no_event,
                                    :yaml_stream_start_event,
@@ -38,6 +47,8 @@ class LibYaml
   # TODO: Make classes for each?  class YamlParser < FFI::Buffer
   YAML_PARSER_T_SIZE = 480 # sizeof(yaml_parser_t)
   YAML_EVENT_T_SIZE  = 104 # sizeof(yaml_event_t)
+
+  typedef :uchar, :yaml_char_t
 
   class YamlVersionDirective < FFI::Struct
     @@@
@@ -73,37 +84,37 @@ class LibYaml
     @@@
   end
 
-  class YamlToken < FFI::Struct
-    @@@
-    struct do |s|
-      s.name 'struct yaml_token_s'
-      s.include '/Users/pmclain/external/yaml-0.1.3-64/include/yaml.h'
-      s.field :type, :yaml_token_type_t
-      s.field :data, :union  # TODO: :union isn't handled yet...
+#   class YamlToken < FFI::Struct
+#     @@@
+#     struct do |s|
+#       s.name 'struct yaml_token_s'
+#       s.include '/Users/pmclain/external/yaml-0.1.3-64/include/yaml.h'
+#       s.field :type, :yaml_token_type_t
+#       s.field :data, :union  # TODO: :union isn't handled yet...
 
-      # TODO: guts of the union....
+#       # TODO: guts of the union....
 
-      s.field :start_mark, :yaml_mark_t
-      s.field :end_mark, :yaml_mark_t
-    end
-    @@@
-  end
+#       s.field :start_mark, :yaml_mark_t
+#       s.field :end_mark, :yaml_mark_t
+#     end
+#     @@@
+#   end
 
-  class YamlEvent < FFI::Struct
-    @@@
-    struct do |s|
-      s.name 'struct yaml_event_s'
-      s.include '/Users/pmclain/external/yaml-0.1.3-64/include/yaml.h'
-      s.field :type, :yaml_event_type_t
-      s.field :data, :union  # TODO
+#   class YamlEvent < FFI::Struct
+#     @@@
+#     struct do |s|
+#       s.name 'struct yaml_event_s'
+#       s.include '/Users/pmclain/external/yaml-0.1.3-64/include/yaml.h'
+#       s.field :type, :yaml_event_type_t
+#       s.field :data, :union  # TODO
 
-      # TODO: guts of union
+#       # TODO: guts of union
 
-      s.field :start_mark, :yaml_mark_t
-      s.field :end_mark, :yaml_mark_t
-    end
-    @@@
-  end
+#       s.field :start_mark, :yaml_mark_t
+#       s.field :end_mark, :yaml_mark_t
+#     end
+#     @@@
+#   end
 #   class  < FFI::Struct
 #     @@@
 #     struct do |s|
