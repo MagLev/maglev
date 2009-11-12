@@ -1,6 +1,7 @@
-require 'yaml2.rb'
+require 'libyaml'
+require 'maml'
 
-p MAML.yaml_get_version_string
+p LibYaml.yaml_get_version_string
 yaml = "- Mark McGwire" # a small yaml filef
-parser = MAML::Parser.new(yaml)
+parser = Maml::Parser.new(yaml)
 p parser.parse
