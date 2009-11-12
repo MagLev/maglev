@@ -104,6 +104,7 @@ RUBY.require 'kernel/bootstrap/zlib_czstream.rb'
 RUBY.require 'kernel/bootstrap/Maglev.rb'
 RUBY.require 'kernel/bootstrap/bigdecimal1.rb'
 RUBY.require 'kernel/bootstrap/bigdecimal.rb'
+RUBY.require 'kernel/bootstrap/Gprof.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
