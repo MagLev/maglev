@@ -10,73 +10,73 @@ module Process
   end
 
   def self.egid
-    r = Maglev::System.__process_info(3, nil, nil)
+    r = Maglev.__system.__process_info(3, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.egid=(arg)
-    status = Maglev::System.__process_info(5, arg, nil)
+    status = Maglev.__system.__process_info(5, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.euid
-    r = Maglev::System.__process_info(1, nil, nil)
+    r = Maglev.__system.__process_info(1, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.euid=(arg)
-    status = Maglev::System.__process_info(6, arg, nil)
+    status = Maglev.__system.__process_info(6, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.gid
-    r = Maglev::System.__process_info(2, nil, nil)
+    r = Maglev.__system.__process_info(2, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.gid=(arg)
-    status = Maglev::System.__process_info(7, arg, nil)
+    status = Maglev.__system.__process_info(7, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.getpgid(arg)
-    r = Maglev::System.__process_info(11, arg, nil)
+    r = Maglev.__system.__process_info(11, arg, nil)
     _procInfoResultCheck(r)
   end
 
   def self.getpgrp
-    r = Maglev::System.__process_info(9, nil, nil)
+    r = Maglev.__system.__process_info(9, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.uid
-    r = Maglev::System.__process_info(0, nil, nil)
+    r = Maglev.__system.__process_info(0, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.uid=(arg)
-    status = Maglev::System.__process_info(4, arg, nil)
+    status = Maglev.__system.__process_info(4, arg, nil)
     _procInfoResultCheck(status)
     arg
   end
 
   def self.pid
-    r = Maglev::System.__process_info(8, nil, nil)
+    r = Maglev.__system.__process_info(8, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.pppid
-    r = Maglev::System.__process_info(10, nil, nil)
+    r = Maglev.__system.__process_info(10, nil, nil)
     _procInfoResultCheck(r)
   end
 
   def self.kill(signal, aPid)
     # aPid < 0 or  aPid == Process.pid() are not supported
     #    and will raise an error
-    status = Maglev::System.__process_info(12, signal, aPid)
+    status = Maglev.__system.__process_info(12, signal, aPid)
     _procInfoResultCheck(status)
     1
   end
