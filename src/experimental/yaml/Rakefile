@@ -1,16 +1,16 @@
 require 'rake/clean'
 
-CLEAN.include('yaml2.rb', '*~', 'a.out')
+CLEAN.include('libyaml.rb', '*~', 'a.out')
 
 task :default => :test
 
 desc "run a small test program against the generated yaml2.rb"
-task :test => 'yaml2.rb' do
+task :test => 'libyaml.rb' do
   sh "maglev-ruby main.rb"
 end
 
-desc "run yaml.rb.ffi through the struct generator"
-file 'yaml2.rb' => 'yaml.rb.ffi' do |t|
+desc "run libyaml.rb.ffi through the struct generator"
+file 'libyaml.rb' => 'libyaml.rb.ffi' do |t|
   require 'platform'
 
   require '/Users/pmclain/external/ffi/lib/ffi/tools/struct_generator'
@@ -18,5 +18,5 @@ file 'yaml2.rb' => 'yaml.rb.ffi' do |t|
   require '/Users/pmclain/external/ffi/lib/ffi/tools/generator'
 
   puts "Generating #{t.name}..." # if Rake.application.options.trace
-  FFI::Generator.new 'yaml.rb.ffi', 'yaml2.rb', {:cflags => '-m64'}
+  FFI::Generator.new 'libyaml.rb.ffi', 'libyaml.rb', {:cflags => '-m64'}
 end
