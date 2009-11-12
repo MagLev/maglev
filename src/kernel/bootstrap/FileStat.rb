@@ -1,7 +1,8 @@
 #
 # File::Stat in Ruby is identically Smalltalk GsFileStat
 
-class File::Stat
+class File
+ class Stat
 
   include Comparable
 
@@ -45,7 +46,7 @@ class File::Stat
   end
 
   def <=>(other)
-    return nil unless other.is_a?(File::Stat)
+    return nil unless other.is_a?(Stat)  # Stat resolves to File::Stat
     mtime <=> other.mtime
   end
 
@@ -125,7 +126,7 @@ class File::Stat
   end
 
   def grpowned?
-    @gid == Maglev::System.getegid
+    @gid == Maglev.__system.getegid
   end
 
   def ino
@@ -149,7 +150,7 @@ class File::Stat
   end
 
   def owned?
-    @uid == Maglev::System.geteuid
+    @uid == Maglev.__system.geteuid
   end
 
   def pipe?
@@ -243,16 +244,17 @@ class File::Stat
   end
 
   def superuser?
-    Maglev::System.getuid == 0
+    Maglev.__system.getuid == 0
   end
 
   def rgrpowned?
-    @gid == Maglev::System.getgid
+    @gid == Maglev.__system.getgid
   end
 
   def rowned?
-    @uid == Maglev::System.getuid
+    @uid == Maglev.__system.getuid
   end
 
+ end
 end
 File::Stat.__freeze_constants
