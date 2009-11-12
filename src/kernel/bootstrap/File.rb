@@ -874,7 +874,7 @@ class File
     end
   end
 
-  def seek(offset, whence = IO::SEEK_SET)
+  def seek(offset, whence = SEEK_SET)
     __seek(offset, whence)
   end
 
@@ -883,7 +883,7 @@ class File
 
   # Seeks to the given position (in bytes) in +io+
   def pos=(offset)
-      seek(offset, IO::SEEK_SET)
+      seek(offset, SEEK_SET)
   end
 
   def truncate(a_length) 
