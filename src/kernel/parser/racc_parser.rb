@@ -23,12 +23,13 @@ module MagRp
 
     def self.new_instance
       key = :MAGLEV_RubyParser_Template
-      t = Maglev::System.session_temp( key )
+      system_cls = Maglev.__system
+      t = system_cls.session_temp( key )
       if t.equal?(nil)
         t = MagTemplate.dup # make copy of persistent template
         t._bind_instvars
         t._install_wordlist( Keyword.create_transient_wordlist )
-        Maglev::System.session_temp_put( key, t)
+        system_cls.session_temp_put( key, t)
       end
       res = t.dup
       res.initialize # lexer and other per-parse state
@@ -71,7 +72,7 @@ module MagRp # {
           ntok_holder = [nil, 0]
           if i = caction_pointer[cracc_state[-1]]
             if @racc_read_next
-              if cracc_t != 0   # not EOF
+              if cracc_t._not_equal?( 0 )   # not EOF
                 tok = lex.advance
                 @racc_val = lex.yacc_value_
                 if @mydebug
@@ -99,7 +100,7 @@ module MagRp # {
             i += cracc_t
             unless i >= 0 and
                    act = caction_table[i] and
-                   caction_check[i] == cracc_state[-1]
+                   caction_check[i].equal?( cracc_state[-1] ) # comparing 2 fixnums
               act = caction_default[cracc_state[-1]]
             end
           else
@@ -140,7 +141,7 @@ module MagRp # {
   #
   cracc_error_status = @racc_error_status
   if cracc_error_status > 0
-    unless @racc_t == 1   # error token
+    unless @racc_t.equal?( 1 )  # error token
       @racc_error_status = cracc_error_status - 1
     end
   end
@@ -154,7 +155,7 @@ module MagRp # {
   throw :racc_end_parse, @racc_vstack[0]
       end
     else
-      if act._not_equal?(- Racc_reduce_n)
+      if act._not_equal?( Racc_reduce_n_negated)
   # reduce
   #       replaced  catch(:racc_jump) which had only one use case
   #       with rescue of RaccJumpError
@@ -219,7 +220,8 @@ module MagRp # {
       k1 = reduce_to - Racc_nt_base
       if i = @goto_pointer[k1]
         i += state[-1]
-        if i >= 0 and (curstate = @goto_table[i]) and @goto_check[i] == k1
+        # goto_check is an array of  16 bit fixnums
+        if i >= 0 and (curstate = @goto_table[i]) and @goto_check[i].equal?( k1 )
           cracc_state.push( curstate )
         else
           cracc_state.push( @goto_default[k1] )
@@ -235,12 +237,12 @@ module MagRp # {
             if ex.class.equal?(RaccJumpError)
         # when 1 # yyerror
         @racc_user_yyerror = true   # user_yyerror
-        return  - Racc_reduce_n
+        return  Racc_reduce_n_negated
             else
               __reraise(ex)
             end
   end
-      elsif act.equal?( - Racc_reduce_n)
+      elsif act.equal?( Racc_reduce_n_negated )
   # error
   #
         cracc_error_status = @racc_error_status
@@ -269,7 +271,7 @@ module MagRp # {
             i += 1   # error token
             if  i >= 0 and
                 (act = caction_table[i]) and
-                caction_check[i] == cracc_state[-1]
+                caction_check[i].equal?( cracc_state[-1] )  # comparing 2 fixnums
               break
             end
           end

@@ -2931,7 +2931,7 @@ Racc_debug_parser = true
 
 def _reduce_1(val, vofs)
 		      # program:
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     
     result
@@ -2979,7 +2979,7 @@ end
 def _reduce_9(val, vofs)
 		      # stmt: kALIAS fitem
                       lx = @lexer
-                      lx.lex_state=( RubyLexer::Expr_fname )
+                      lx.lex_state=( Expr_fname )
                       result = -901 # lx.lineno_
                     
     result
@@ -3674,7 +3674,7 @@ end
 
 def _reduce_99(val, vofs)
 		      # fname: tIDENTIFIER | tCONSTANT | tFID #  | op
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       result = val[vofs ]   # val_[0] is a RpNameToken
                     
     result
@@ -3682,7 +3682,7 @@ end
 
 def _reduce_100(val, vofs)
 		      # fname: tIDENTIFIER | tCONSTANT | tFID #  | reswords
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       result = val[vofs ]  # val_[0] is a RpNameToken or a String
                     
     result
@@ -3718,7 +3718,7 @@ end
 
 def _reduce_104(val, vofs)
 		      # undef_list: fitem #  | undef_list tCOMMA
-                      @lexer.lex_state=( RubyLexer::Expr_fname )
+                      @lexer.lex_state=( Expr_fname )
                     
     result
 end
@@ -4498,7 +4498,7 @@ end
 
 def _reduce_254(val, vofs)
 		      # open_args: call_args #   | tLPAREN_ARG
-                      @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      @lexer.lex_state=( Expr_endArg )
                       result = val[vofs]
                     
     result
@@ -4516,7 +4516,7 @@ end
 
 def _reduce_256(val, vofs)
 		      #  | tLPAREN_ARG call_args2
-                      @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      @lexer.lex_state=( Expr_endArg )
                       result = val[vofs]
                     
     result
@@ -4628,7 +4628,7 @@ end
 
 def _reduce_276(val, vofs)
 		      # primary: #  | tLPAREN_ARG expr
-                      @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      @lexer.lex_state=( Expr_endArg )
                       result = val[vofs]
                     
     result
@@ -4981,7 +4981,7 @@ def _reduce_315(val, vofs)
 		      # | kDEF singleton dot_or_colon
                       lx = @lexer
                       # @comments.push( lx.comments_ )
-                      lx.lex_state=( RubyLexer::Expr_fname )
+                      lx.lex_state=( Expr_fname )
                       result = val[vofs]
                     
     result
@@ -4991,7 +4991,7 @@ def _reduce_316(val, vofs)
 		      # | kDEF singleton dot_or_colon # fname
                       @in_single += 1
                       @env.extend( false, :def )
-                      @lexer.lex_state=( RubyLexer::Expr_end )# force for args
+                      @lexer.lex_state=( Expr_end )# force for args
                       result = val[vofs]
                     
     result
@@ -5420,6 +5420,7 @@ end
 def _reduce_381(val, vofs)
 		      # xstring: tXSTRING_BEG xstring_contents tSTRING_END
                       result = new_xstring( val[vofs + 1])
+                      result.src_offset=( val[vofs ].src_offset ) # tXSTRING_BEG position
                     
     result
 end
@@ -5547,7 +5548,7 @@ def _reduce_398(val, vofs)
                       lx = @lexer
                       result = lx.lex_strterm_
                       lx.lex_strterm=( nil )
-                      lx.lex_state=( RubyLexer::Expr_beg )
+                      lx.lex_state=( Expr_beg )
                     
     result
 end
@@ -5566,7 +5567,7 @@ def _reduce_400(val, vofs)
                       lx = @lexer
                       result = lx.lex_strterm_
                       lx.lex_strterm=( nil )
-                      lx.lex_state=( RubyLexer::Expr_beg )
+                      lx.lex_state=( Expr_beg )
                       lx.cond_.push( false)
                       lx.cmdarg_.push( false)
                     
@@ -5623,7 +5624,7 @@ end
 
 def _reduce_406(val, vofs)
 		      # symbol: tSYMBEG sym
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       result = val[vofs + 1].symval  # expect an RpNameToken
                     
     result
@@ -5646,7 +5647,7 @@ end
 
 def _reduce_412(val, vofs)
 		      # dsym: tSYMBEG xstring_contents tSTRING_END
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       v_one = val[vofs + 1]
 
 		      v_cls = v_one.class
@@ -5781,7 +5782,7 @@ end
 
 def _reduce_433(val, vofs)
 		      # superclass: # | tLT
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     
     result
@@ -5805,7 +5806,7 @@ end
 def _reduce_436(val, vofs)
 		      # f_arglist: tLPAREN2 f_args opt_nl tRPAREN
                       result = val[vofs + 1]
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                     
     result
 end
@@ -6036,7 +6037,7 @@ end
 
 def _reduce_466(val, vofs)
 		      # singleton: var_ref
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     
     result

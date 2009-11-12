@@ -1293,7 +1293,6 @@ module MagRp
            res.init( iter, var, body)
          end
          def init(iter, var, body)
-           if Maglev::System.session_temp(:TrapFor) ; nil.pause ; end
            @iterNode = iter
            @varNode = var
            @bodyNode = body

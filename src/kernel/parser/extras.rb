@@ -8,14 +8,7 @@ class Regexp
 
   primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
 
-  # WHY do I have to do this?!?  (Ryan's question)
-  unless defined? ONCE then
-    ONCE     = 0 # 16 # ?
-    ENC_NONE = /x/n.options
-    ENC_EUC  = /x/e.options
-    ENC_SJIS = /x/s.options
-    ENC_UTF8 = /x/u.options
-  end
+  # definitions of ONCE .. ENC_UTF8 moved to racc_def_parser.rb
 end
 Regexp.__freeze_constants
 
@@ -81,7 +74,7 @@ module MagRp # {
       #    so OFF_ constant refs can be static
 
       def reset
-	@curridx = -ENTRY_SIZE 
+	@curridx = 0 - ENTRY_SIZE 
 	self.extend(false, false)
       end
 
@@ -1114,19 +1107,19 @@ module MagRp # {
       while opt_idx < opt_len
 	ch = options[opt_idx]
 	if ch <= ?n 
-	  if ch.equal?( ?i) ; o = o | Regexp::IGNORECASE
-	  elsif ch.equal?( ?m) ; o = o | Regexp::MULTILINE
-	  elsif ch.equal?( ?n) ; encod = Regexp::ENC_NONE
-	  elsif ch.equal?( ?e) ; encod = Regexp::ENC_EUC 
+	  if ch.equal?( ?i) ; o = o | IGNORECASE
+	  elsif ch.equal?( ?m) ; o = o | MULTILINE
+	  elsif ch.equal?( ?n) ; encod = ENC_NONE
+	  elsif ch.equal?( ?e) ; encod = ENC_EUC 
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
 	    raise "unknown regexp option: #{err_str}" 
 	  end 
 	else 
-	  if ch.equal?( ?x ) ; o = o | Regexp::EXTENDED  
-	  elsif ch.equal?( ?o) ; o = o | Regexp::ONCE ; have_once = true;
-	  elsif ch.equal?( ?s) ; encod = Regexp::ENC_SJIS
-	  elsif ch.equal?( ?u) ; encod = Regexp::ENC_UTF8
+	  if ch.equal?( ?x ) ; o = o | EXTENDED  
+	  elsif ch.equal?( ?o) ; o = o | ONCE ; have_once = true;
+	  elsif ch.equal?( ?s) ; encod = ENC_SJIS
+	  elsif ch.equal?( ?u) ; encod = ENC_UTF8
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
 	    raise "unknown regexp option: #{err_str}" 

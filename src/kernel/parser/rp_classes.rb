@@ -6,7 +6,7 @@ module MagRp
     #   0 no tracing
     #   1  trace files parsed by RubyParser
     #   2  also include lexer and racc state machine tracing
-    d = Maglev::System.session_temp(:MagRpDEBUG)
+    d = Maglev::__system.session_temp(:MagRpDEBUG)
     if d.equal?(nil)
       d = 0
     end
@@ -54,12 +54,12 @@ module MagRp
     OFF_dyn = 1
     OFF_use = 2
     OFF_byte_offset = 3  # approximate location of  def , class, module
-    ENTRY_SIZE = 4
+    ENTRY_SIZE = 4  # also hardcoded in initialize
 
     def initialize
       @src_scanner = nil
       @arr = []
-      @curridx = -ENTRY_SIZE
+      @curridx = - 4 # inline -ENTRY_SIZE , avoid dynamic const ref
       @extend_ofs_last_unextend = -1
       @first_top_level_def_offset = -1
       @module_count = 0
@@ -323,23 +323,6 @@ module MagRp
      ]
 
       # def self.keyword( str)  ; end # no longer used
-
-      def self.create_transient_wordlist
-        # create a Hash from WORDLIST, which because it is not committed
-        #  will have memory pointer references to all keys and values
-        h = Hash.new
-        WORDLIST.each { | arr |
-          k = arr[0]
-          v = arr[1].dup
-          v_siz = v.size
-          for i in 0..v_siz-1 do
-            v[i] = v[i] # make ref a RamOop
-          end
-          h[k] = v
-        }
-        h.freeze
-        h
-      end
 
   end # }
   Keyword.__freeze_constants

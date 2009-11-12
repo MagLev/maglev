@@ -2,6 +2,19 @@ module MagRp
 class RpStringScanner
   # second opening so we can have non-dynamic refs to CTYPE constants
 
+  def initialize(string)
+    @string = string  # expect caller to pass a frozen string
+    sz = string.size
+    @limit = sz
+
+    #  @cbytearray used to provide faster self[n]   access to single
+    #  bytes for large (>16Kbyte) strings , and to have single copy in
+    #  C memory usable by all Regexp searches during a compilation.
+    @cbytearray = CByteArray.with_string(string)
+
+    self.reset
+  end
+
   def peek_ch
     # returns a character value, or nil if at end of source
     @cbytearray[@pos]

@@ -191,4 +191,9 @@ Lexing of double quoted strings (Maglev Trac 580)
   for the situation when there are too many 'end' in a method and the next 'def' 
   is at top level of the file instead of within a class/module .
   Uses new instVar @first_top_level_def_offset in Env , and related methods.
- 
+
+11 Nov 2009
+  Changes to lexer.rb and ruby_parser.y , to have yacc_value for tXSTRING_BEG 
+  encapsulated in an RpNameToken , so that source position of the tXSTRING_BEG 
+  can be installed in the AST .
+  various changes to optimize constant references, based on profiling.

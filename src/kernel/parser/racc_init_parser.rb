@@ -1,5 +1,10 @@
 module MagRp # 
 
+  class Parser
+     Racc_reduce_n_negated = 0 - Racc_reduce_n
+  end
+  Parser.__freeze_constants
+
   class RubyParser
 
     def analyze_arr(arr, name)
