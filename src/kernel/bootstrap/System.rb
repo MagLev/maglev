@@ -1,8 +1,8 @@
-# Class Gemstone is identically Smalltalk System
+# Class Maglev::System is identically Smalltalk System
 #
 # == Persistent Shared Counters
 #
-# The Gemstone class maintins a set of persistent shared counters.
+# Maglev::System maintins a set of persistent shared counters.
 #
 # Persistent shared counters provide a means for multiple sessions to share
 # common integer values.  There are 128 persistent shared counters,
