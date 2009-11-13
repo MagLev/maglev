@@ -15,31 +15,31 @@ describe BestK do
     bestk.values.must_equal [10]
 
     bestk.add(5)
-    bestk.values.must_equal [10,5]
+    bestk.values.sort.must_equal [5,10]
 
     bestk.add(15)
-    bestk.values.must_equal [10,5,15]
+    bestk.values.sort.must_equal [5,10,15]
 
     bestk.add(10)
-    bestk.values.must_equal [10,5,15,10]
+    bestk.values.sort.must_equal [5,10,10,15]
 
     bestk.add(-3)
-    bestk.values.must_equal [10,5,15,10,-3]
+    bestk.values.sort.must_equal [-3,5,10,10,15]
 
     bestk.add(0)
-    bestk.values.must_equal [10,5,15,10,0]
+    bestk.values.sort.must_equal [0,5,10,10,15]
 
     bestk.add(10)
-    bestk.values.must_equal [10,5,15,10,10]
+    bestk.values.sort.must_equal [5,10,10,10,15]
 
     bestk.add(10)
-    bestk.values.must_equal [10,10,15,10,10]
+    bestk.values.sort.must_equal [10,10,10,10,15]
 
     bestk.add(9)
-    bestk.values.must_equal [10,10,15,10,10]
+    bestk.values.sort.must_equal [10,10,10,10,15]
 
     bestk.add(11)
-    bestk.values.must_equal [11,10,15,10,10]
+    bestk.values.sort.must_equal [10,10,10,11,15]
   end
 
   it 'maintains the worst element' do

@@ -171,15 +171,20 @@ module KDTree
   # It implements > so that it can be used by the standard comparator in
   # nearest.
   class SearchResult
+    include Comparable
     attr_reader :value, :distance
     def initialize(value, dist)
       @value = value
       @distance = dist
     end
-    def >(other)
-      # a is greater (better) than b if its distance from the target is
-      # smaller
-      other.distance > @distance
+#     def >(other)
+#       # a is greater (better) than b if its distance from the target is
+#       # smaller
+#       other.distance > @distance
+#     end
+
+    def <=>(other)
+      other.distance <=> @distance
     end
   end
 

@@ -72,6 +72,19 @@ module Heap
         percolate_down(swap_child)
       end
     end
+
+    def values
+      if @bottom > 0
+        @data[0..(@bottom-1)].reverse
+      else
+        []
+      end
+    end
+
+    # returns an array of all values in sorted order
+    def remove_all
+      Array.new(@bottom) { |i| self.delete_top }
+    end
   end
 
 

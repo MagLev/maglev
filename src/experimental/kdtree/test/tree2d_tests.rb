@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'minitest/spec'
 require 'tree2d'
+require 'bestk'
 
 MiniTest::Unit.autorun
 
