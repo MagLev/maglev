@@ -1,5 +1,5 @@
 # A simple binary heap, that is limited to N elements
-puts "--------- HEAP"
+
 module Heap
   # A simple heap based on arrays.
   class Heap
