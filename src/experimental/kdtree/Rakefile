@@ -32,3 +32,8 @@ desc "Time Maglev queries on committed data"
 task :query do
   sh "maglev-ruby -Ilib bin/time_queries.rb"
 end
+
+desc "Run a profiled version of the queries on maglev"
+task :gprof => :migrate do
+  sh "maglev-ruby -I lib bin/gprofq.rb"
+end
