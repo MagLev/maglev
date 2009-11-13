@@ -128,7 +128,12 @@ module FFI
       unless name._isSymbol
         raise TypeError , 'ruby_name must be a Symbol'
       end
-      code = PrimTypeDefs[name]
+#      code = PrimTypeDefs[name]
+      code = if defined?(@ffi_typedefs) && @ffi_typedefs.has_key?(name)
+               @ffi_typedefs[name]
+             else
+               PrimTypeDefs[name]
+             end
       if code.equal?(nil)
         raise TypeError, "Unable to resolve FFI type '#{name}'"
       end
