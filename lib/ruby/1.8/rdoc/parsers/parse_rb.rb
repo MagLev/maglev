@@ -257,7 +257,7 @@ module RubyToken
     [:TkNL],
     [:TkEND_OF_SCRIPT],
 
-    [:TkBACKSLASH,  TkUnknownChar,  "\\"],
+    [:TkBACKSLASH,  TkUnknownChar,  '\\\\'],  # Maglev patch to string constant, was "\\"
     [:TkAT,	    TkUnknownChar,  "@"],
     [:TkDOLLAR,     TkUnknownChar,  "\$"], #"
   ]
