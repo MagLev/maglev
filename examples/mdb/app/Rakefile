@@ -1,7 +1,5 @@
 task :default => :'app:run'
 
-ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
-
 # These tasks control the Sinatra application
 namespace :app do
   desc "Run the client Sinatra app. Assumes rackup is in your path"

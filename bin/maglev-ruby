@@ -22,7 +22,7 @@ OPTIONS:
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
                     logSexp       Print sexpressions as they are parsed
-                    noRlwrap      invoke topaz without rlwrap
+                    rlwrap        invoke topaz with rlwrap, if available
    --             End of MagLev parameters.  The next parameter is the programfile,
                   then any programfile arguments follow.
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
@@ -78,7 +78,7 @@ args=""
 debug=0
 maglev_options=""
 tocsize=""
-useRlwrap=1
+useRlwrap=    # off by default
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -114,7 +114,10 @@ do
         -M*)
             sub_opt=${1:2}
             if [[ $sub_opt == "noRlwrap" ]]; then
+                echo "WARNING: -MnoRlwrap is deprecated"
                 useRlwrap=
+            elif [[ $sub_opt == "rlwrap" ]]; then
+                useRlwrap=1
             else
                 maglev_options="$maglev_options ${sub_opt}"
             fi

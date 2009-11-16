@@ -1,7 +1,5 @@
 task :default => :test
 
-ENV['MAGLEV_OPTS'] = '-MnoRlwrap'
-
 desc "Test Tree2D class"
 task :test do
   Dir.glob('test/*_tests.rb').each do |t|
