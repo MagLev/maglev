@@ -30,6 +30,11 @@ __END__
   <body>
   <%= yield %>
   </body>
+  <h4>Credits</h4>
+  <p>
+   The database of zip code locations is from
+   <a href="http://www.geonames.org">GeoNames.org</a>
+  </p>
 </html>
 
 @@index

@@ -84,7 +84,7 @@ module SM
       "Special: type=#{type}, text=#{text.dump}"
     end
   end
-  
+
   class AttributeManager
 
     NULL = "\000".freeze
@@ -151,15 +151,22 @@ module SM
       re = "(^|\\W)([#{tags}])([A-Za-z_]+?)\\2(\\W|\$)"
 #      re = "(^|\\W)([#{tags}])(\\S+?)\\2(\\W|\$)"
       1 while str.gsub!(Regexp.new(re)) {
-        attr = MATCHING_WORD_PAIRS[$2];
-        attrs.set_attrs($`.length + $1.length + $2.length, $3.length, attr)
-        $1 + NULL*$2.length + $3 + NULL*$2.length + $4
+        # GEMSTONE: Workaround Trac 632
+        #attr = MATCHING_WORD_PAIRS[$2];
+        #attrs.set_attrs($`.length + $1.length + $2.length, $3.length, attr)
+        #$1 + NULL*$2.length + $3 + NULL*$2.length + $4
+
+        one, two, three, four, md = $1, $2, $3, $4, $`
+        attr = MATCHING_WORD_PAIRS[two];
+        attrs.set_attrs(md.length + one.length + two.length, three.length, attr)
+        one + NULL*two.length + three + NULL*two.length + four
+        # END GEMSTONE
       }
 
       # then non-matching
       unless WORD_PAIR_MAP.empty?
         WORD_PAIR_MAP.each do |regexp, attr|
-          str.gsub!(regexp) { 
+          str.gsub!(regexp) {
             attrs.set_attrs($`.length + $1.length, $2.length, attr)
             NULL*$1.length + $2 + NULL*$3.length
           }
@@ -171,11 +178,20 @@ module SM
       tags = HTML_TAGS.keys.join("|")
       re = "<(#{tags})>(.*?)</\\1>"
       1 while str.gsub!(Regexp.new(re, Regexp::IGNORECASE)) {
-        attr = HTML_TAGS[$1.downcase]
-        html_length = $1.length + 2
+        # GEMSTONE: Workaround Trac 632
+        #         attr = HTML_TAGS[$1.downcase]
+        #         html_length = $1.length + 2
+        #         seq = NULL * html_length
+        #         attrs.set_attrs($`.length + html_length, $2.length, attr)
+        #         seq + $2 + seq + NULL
+
+        one, two, md = $1, $2, $`
+        attr = HTML_TAGS[one.downcase]
+        html_length = one.length + 2
         seq = NULL * html_length
-        attrs.set_attrs($`.length + html_length, $2.length, attr)
-        seq + $2 + seq + NULL
+        attrs.set_attrs(md.length + html_length, two.length, attr)
+        seq + two + seq + NULL
+        # END GEMSTONE
       }
     end
 
@@ -192,7 +208,7 @@ module SM
     # A \ in front of a character that would normally be
     # processed turns off processing. We do this by turning
     # \< into <#{PROTECT}
-    
+
     PROTECTABLE = [ "<" << "\\" ]  #"
 
 
@@ -209,7 +225,7 @@ module SM
       add_word_pair("*", "*", :BOLD)
       add_word_pair("_", "_", :EM)
       add_word_pair("+", "+", :TT)
-      
+
       add_html("em", :EM)
       add_html("i",  :EM)
       add_html("b",  :BOLD)
@@ -248,7 +264,7 @@ module SM
 
       puts("Before flow, str='#{@str.dump}'") if $DEBUG
       mask_protected_sequences
- 
+
       @attrs = AttrSpan.new(@str.length)
 
       puts("After protecting, str='#{@str.dump}'") if $DEBUG
@@ -290,7 +306,7 @@ module SM
       current_attr = 0
       str = ""
 
-      
+
       str_len = @str.length
 
       # skip leading invisible text
@@ -323,7 +339,7 @@ module SM
           i += 1
         end while i < str_len and @str[i].zero?
       end
-      
+
       # tidy up trailing text
       if start_pos < str_len
         res << copy_string(start_pos, str_len)

@@ -10,12 +10,14 @@ if defined? Maglev
   Maglev.commit_transaction
 else
   require 'tree2d'
-  require File.dirname(__FILE__) + '/time_queries.rb'
+  load File.dirname(__FILE__) + '/time_queries.rb'
 end
 
 num_nodes = 1_000_000
-MAX_SCALAR = 360.0
-MID_POINT  = MAX_SCALAR / 2.0
+unless defined? MAX_SCALAR
+  MAX_SCALAR = 360.0
+  MID_POINT  = MAX_SCALAR / 2.0
+end
 
 points = nil
 tree   = nil
@@ -36,11 +38,14 @@ Benchmark.bm(20) do |r|
 
   if defined? Maglev
     r.report("Commit data") do
-      Maglev::PERSISTENT_ROOT[:RANDOM_KDTREE] = tree    
+      Maglev::PERSISTENT_ROOT[:RANDOM_KDTREE] = tree
       Maglev.commit_transaction
     end
     puts "== Committed tree as Maglev::PERSISTENT_ROOT[:RANDOM_KDTREE]"
   end
 end
 
-time_queries(tree)
+unless defined? Maglev
+  time_queries(tree)
+end
+

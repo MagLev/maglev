@@ -12,11 +12,7 @@
 #     1_000.times {|i| best.add rand(100) }
 #     best.values  # => an array of the ten biggest numbers seen
 #
-# == TODO:
-#
-# The search for the worst index is linear, but it only needs to be done if
-# we clobber the old worst element.  This datastructure should really be
-# based on a SortedCollection.
+require 'heap'
 
 class BestK
   # Initializes a new BestK element to manage at most +k+ elements.  If a
@@ -27,11 +23,13 @@ class BestK
   #
   def initialize(k, &block)
     raise ArgumentError, "k must be greater than 0: #{k}" unless k > 0
-    @limit = k
-    @index = 0  # index of the first unused slot in @elements
-    @elements = Array.new
-    @is_better = block_given? ? block : proc {|a,b| a > b }
-    @worst_idx = 0
+    # Because we really use a heap, we need to invert the logic of the
+    # comparison, since we throw away the top element of the heap.
+    @heap = if block_given?
+              Heap::NHeap.new(k) {|a,b| not block.call(a,b) }
+            else
+              Heap::NHeap.new(k) {|a,b| a <= b }
+            end
   end
 
   # Attempt to add +el+ to receiver.  +el+ will be added if there are fewer
@@ -40,35 +38,17 @@ class BestK
   # to receiver's initializer.
   # Returns receiver.
   def add(el)
-    if @index < @limit
-      @elements[@index] = el
-      @worst_idx = @index if @is_better.call(@elements[@worst_idx], el)
-      @index += 1
-    elsif @is_better.call(el, @elements[@worst_idx])
-      @elements[@worst_idx] = el
-      @worst_idx = index_of_worst
-    end
+    @heap.add(el)
     self
-  end
-
-  # Exhaustive search for the index of the worst element in receiver.
-  # Raises an exception if the collection is empty.
-  def index_of_worst
-    raise "empty" if @index == 0
-    idx = 0
-    @elements.each_with_index do |el,i|
-      idx = i if @is_better.call(@elements[idx], @elements[i])
-    end
-    idx
   end
 
   # Return the worst element seen so far.
   def worst
-    @elements[@worst_idx]
+    @heap.top
   end
 
   # Return an array of the current best elements seen so far.
   def values
-    @elements[0..@index]
+    @heap.values
   end
 end
