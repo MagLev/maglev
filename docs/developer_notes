@@ -73,4 +73,18 @@ Currently, the only thing to do is to reset the repository back to scratch:
 Now, the second version of the file is "in-synch" with the state of the
 repository, and the code runs fine.
 
+== Performance Profiling
+
+MagLev provides a Gprof-like profiling utility to analyze the performance
+of your application.  To profile some code, simply wrap it in a block and
+pass it to <tt>Maglev::Gprof.monitor</tt>:
+
+  profile_results = Maglev.Gprof.monitor do
+    # Code to profile goes here...
+  end
+
+  puts profile_results
+
+The return value of <tt>Maglev::Gprof.monitor</tt> is a <tt>String</tt>
+with formatted results.
 
