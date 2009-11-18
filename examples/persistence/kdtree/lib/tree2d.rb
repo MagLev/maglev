@@ -132,25 +132,42 @@ module KDTree
         end
       end
 
-      # Am I better than the best in my sub-tree?
-      bestk.add(my_result)
-
-      # Check if the other side of the splitting plane is close enough for
-      # possibilities.  This will be the case if the best distance so far
-      # is larger than the distance from target node to my splitting axis
-      # (i.e., does a hypersphere of radius best_d cross the splitting axis
-      # or not).
-      target_to_axis_d = if @axis == 0
-                           @value.x - target_point.x
-                         else
-                           @value.y - target_point.y
-                         end
-      target_to_axis_d_sq = target_to_axis_d * target_to_axis_d
-      if bestk.worst.distance >= target_to_axis_d_sq and not unsearched.nil?
+      # We want to search the other side if:
+      # A: we haven't filled up our bestk yet, or
+      # B: we have a full bestk, but the other side of the splitting plane
+      #    is close enough that there might be something closer than the
+      #    best we've seen so far.
+      if not unsearched.nil? and
+          (not bestk.full? or split_plane_close_enough_to(target_point, bestk))
         unsearched._nearest_k(target_point, bestk)
       end
+
+      # Add ourself only after we check whether to search the unsearched
+      # tree.  The reason is that:
+      #    our_distance_to_target >= target_distance_to_axis
+      # so, if we add ourself before we call split_plane_close_enough_to,
+      # then we will be in bestk, so bestk distance can't be smaller than
+      # our distance, hence we will always search the other side (correct
+      # results, but inefficient).
+      bestk.add(my_result)
     end
     protected :_nearest_k
+
+    # Check if the other side of the splitting plane is close enough to
+    # target that there is the possibility that some points on the other
+    # side are better than bestk so far.  This will be the case if the best
+    # distance so far is larger than the distance from target node to my
+    # splitting axis (i.e., does a hypersphere of radius bestk cross the
+    # splitting axis or not).
+    def split_plane_close_enough_to(target, bestk)
+      target_to_axis_d = if @axis == 0
+                           @value.x - target.x
+                         else
+                           @value.y - target.y
+                         end
+      target_to_axis_d_sq = target_to_axis_d * target_to_axis_d
+      bestk.worst.distance >= target_to_axis_d_sq
+    end
 
     def eql?(other)
       @value.eql?(other.value) and
@@ -177,11 +194,6 @@ module KDTree
       @value = value
       @distance = dist
     end
-#     def >(other)
-#       # a is greater (better) than b if its distance from the target is
-#       # smaller
-#       other.distance > @distance
-#     end
 
     def <=>(other)
       other.distance <=> @distance
