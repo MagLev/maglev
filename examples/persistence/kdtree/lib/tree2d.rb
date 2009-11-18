@@ -16,6 +16,8 @@ require 'bestk'
 module KDTree
 
   # Tree2D is a KD-Tree of dimension 2.
+  #
+  # Values are stored in both the leaves and the interior nodes.
   class Tree2D
     include Enumerable
 
@@ -132,13 +134,11 @@ module KDTree
         end
       end
 
-      # We want to search the other side if:
-      # A: we haven't filled up our bestk yet, or
-      # B: we have a full bestk, but the other side of the splitting plane
-      #    is close enough that there might be something closer than the
-      #    best we've seen so far.
-      if not unsearched.nil? and
-          (not bestk.full? or split_plane_close_enough_to(target_point, bestk))
+      # We do not need to search the other child if
+      # A: we don't have another child OR
+      # B: we (a) already have enough candidates (bestk is full) and (b) we
+      #    are too far from the axis.
+      unless unsearched.nil? or (bestk.full? and axis_too_far_from(target_point, bestk))
         unsearched._nearest_k(target_point, bestk)
       end
 
@@ -153,20 +153,20 @@ module KDTree
     end
     protected :_nearest_k
 
-    # Check if the other side of the splitting plane is close enough to
-    # target that there is the possibility that some points on the other
-    # side are better than bestk so far.  This will be the case if the best
-    # distance so far is larger than the distance from target node to my
-    # splitting axis (i.e., does a hypersphere of radius bestk cross the
-    # splitting axis or not).
-    def split_plane_close_enough_to(target, bestk)
+    # Do we need to search the other side of our axis?  Or is the target
+    # node too far from the axis that we know there can't be anything
+    # closer?  We need to check the other side if the best distance so far
+    # is larger than the distance from target node to my splitting axis
+    # (i.e., does a hypersphere of radius bestk cross the splitting axis or
+    # not).
+    def axis_too_far_from(target, bestk)
       target_to_axis_d = if @axis == 0
                            @value.x - target.x
                          else
                            @value.y - target.y
                          end
       target_to_axis_d_sq = target_to_axis_d * target_to_axis_d
-      bestk.worst.distance >= target_to_axis_d_sq
+      bestk.worst.distance < target_to_axis_d_sq
     end
 
     def eql?(other)
