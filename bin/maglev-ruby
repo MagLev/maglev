@@ -114,12 +114,12 @@ do
             debugFlag=
             ;;
         -e)
-            ruby_args="${ruby_args} '-e' '${2//\'/''}'"  # smalltalk escape: ' => ''
+            ruby_args="${ruby_args}, '-e', '${2//\'/''}'"  # smalltalk escape: ' => ''
             sawDashE=1
             shift
             ;;
         -e*)
-            ruby_args="${ruby_args} '${1//\'/''}'"  # smalltalk escape: ' => ''
+            ruby_args="${ruby_args}, '${1//\'/''}'"  # smalltalk escape: ' => ''
             sawDashE=1
             ;;
         -G)
@@ -130,11 +130,11 @@ do
             exit
             ;;
         -I|-r)
-            ruby_args="$ruby_args '$1' '$2'"
+            ruby_args="${ruby_args}, '$1', '$2'"
             shift
             ;;
         -I*|-r*)
-            ruby_args="$ruby_args '$1'"
+            ruby_args="${ruby_args}, '$1'"
             ;;
         -M*)
             sub_opt=${1:2}
@@ -147,7 +147,7 @@ do
                     rlwrapFlag=1
                     ;;
                 traceGlobals|logSexp|traceLoad|commit|persistent)
-                    maglev_args="$maglev_args ${sub_opt}"
+                    maglev_args="${maglev_args}, ${sub_opt}"
                     ;;
                 *)
                     echo
@@ -245,7 +245,7 @@ fi
 # we can pass them as a literal array to Smalltalk.
 while [[ $# > 0 ]]
 do
-    script_args="$script_args '$1'"   # Do we need to smalltalk escape ' ?
+    script_args="${script_args}, '$1'"   # Do we need to smalltalk escape ' ?
     shift
 done
 
@@ -295,8 +295,8 @@ EOF
 fi
 
 cat - >> $dbscript <<-EOF
-(ctx := RubyContext load: #($maglev_args) ) .
-ctx runFileNamed: '$RUBYSCRIPT' withRubyArgs: #($ruby_args) withScriptArgs: #($script_args) .
+(ctx := RubyContext load: #(${maglev_args:1}) ) .
+ctx runFileNamed: '$RUBYSCRIPT' withRubyArgs: #[${ruby_args:1}] withScriptArgs: #[${script_args:1}] .
 GsFile stdout close . "ensure final LF on stdout"
 ^ nil
 %
