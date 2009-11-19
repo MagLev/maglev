@@ -44,5 +44,11 @@ test(`#{A_OUT} -Mpersistent -e 'p Maglev.persistent?'`, "true\n", '-Mpersistent'
 test(`#{A_OUT} -Mcommit -e 'p Maglev.persistent?'`, "true\n", '-Mcommit')
 test(`#{A_OUT} -Mpersistent -Mcommit -e 'p Maglev.persistent?'`, "true\n", '-Mcommit -Mpersistent')
 
-# ############################################################
+
+# Ensure -Mcommit and -Mpersistent start in the correct mode
+
+# Test -I works for -e
+# test(`#{A_OUT} -Ilib -e 'require "bar"' -e 'p $a_value'`, "987\n", '-I -e')
+
+
 report
