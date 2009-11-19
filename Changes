@@ -1,0 +1,12 @@
+= MagLev Change Log
+
+== Unreleased
+
+* Added -Mcommit and -Mpersistent command line parameters.
+  -Mpersistent will start the VM in persistent mode.
+  -Mcommit start the VM in persistent mode and perform a
+  Maglev.commit_transaction just before the VM exits.
+
+* rlwrap is turned off by default. Enable with -Mrlwrap.
+
+* RDoc basically works.

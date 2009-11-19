@@ -42,6 +42,16 @@ class BestK
     self
   end
 
+  # Returns 0 <= n <= k.  The number of elements currently in the
+  # collection.
+  def size
+    @heap.size
+  end
+
+  def full?
+    @heap.full?
+  end
+
   # Return the worst element seen so far.
   def worst
     @heap.top
