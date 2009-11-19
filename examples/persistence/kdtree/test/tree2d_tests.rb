@@ -102,12 +102,37 @@ describe KDTree::Tree2D do
     it 'finds the nearest k points in known graph' do
       target = KDTree::Point2D.new(-2, 1, :target_point)
 
-      best = @tree.nearest_k(target, 3)
-      best_points = best.map {|sr| sr.value }
+      best = @tree.nearest_k(target, 3).map {|sr| sr.value }
 
-      best_points.include?(@b).must_equal true
-      best_points.include?(@d).must_equal true
-      best_points.include?(@e).must_equal true
+      best.include?(@b).must_equal true
+      best.include?(@d).must_equal true
+      best.include?(@e).must_equal true
+    end
+
+    it 'handles degenerate case of nearest_k' do
+      # This test case sets up the situation where we will have a bestk of
+      # 0, but we still need to search the other side of the splitting
+      # plane, because we have not yet found k points.
+      @tree = KDTree::Tree2D.new(
+        [@a = KDTree::Point2D.new(  0.0,  0.0, :a),
+         @b = KDTree::Point2D.new( -1.0, -1.0, :b),
+         @c = KDTree::Point2D.new(  1.1,  1.1, :c)])
+
+      best = @tree.nearest_k(@a, 1).map {|sr| sr.value}
+      best.include?(@a).must_equal true
+
+      best = @tree.nearest_k(@a, 2).map {|sr| sr.value}
+      best.include?(@a).must_equal true
+      best.include?(@b).must_equal true
+
+      # The real danger for this test case, is that we don't find node c
+      # (the worst), since it is a leaf on the other side of the splitting
+      # plane, and we won't have a full bestk when we come time to decide
+      # whether to search that side or not.
+      best = @tree.nearest_k(@a, 100).map {|sr| sr.value}
+      best.include?(@a).must_equal true
+      best.include?(@b).must_equal true
+      best.include?(@c).must_equal true
     end
   end
 

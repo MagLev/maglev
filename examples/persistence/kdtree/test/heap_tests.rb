@@ -17,6 +17,15 @@ describe Heap do
     Heap::Heap.parent_idx(0).must_equal -1
   end
 
+  it 'creates manages size properly' do
+    h = Heap::Heap.new
+    h.size.must_equal 0
+    (1...10).each do |i|
+      h.add(i)
+      h.size.must_equal i
+    end
+  end
+
   it 'returns elements in min order by default' do
     h = Heap::Heap.new
     elements = [0,1,2,3,4,5,6,7,8,9].sort_by {|i| rand(100) }
@@ -66,4 +75,31 @@ describe Heap::NHeap do
 
     n.times { |i| h.delete_top.must_equal(n-1-i) }
   end
+
+  it 'knows when it is full' do
+    n = 20
+    h = Heap::NHeap.new(n) {|a,b| a > b}
+    h.full?.must_equal false
+    19.times do |i|
+      h.add(i)
+      h.full?.must_equal false
+    end
+
+    # We have N-1 elements, so we should become full, and remain full
+    5.times do
+      h.add(100)
+      h.full?.must_equal true
+    end
+
+    h.delete_top
+    h.full?.must_equal false
+    h.add(100)
+    h.full?.must_equal true
+
+    5.times do
+      h.delete_top
+      h.full?.must_equal false
+    end
+  end
+
 end

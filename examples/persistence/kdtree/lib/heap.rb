@@ -94,6 +94,11 @@ module Heap
       @limit = size
     end
 
+    # Returns true if we have N elements.
+    def full?
+      @limit == size
+    end
+
     # Adds el to the heap.  If the heap already contains N elements, then
     # it removes the top element before inserting.  Returns nil or the
     # removed element.
@@ -113,17 +118,4 @@ module Heap
       ret_value
     end
   end
-
-#   # TODO: NHeap
-
-#   class Node
-#     attr_accessor :left, :right
-#     attr_reader   :value
-
-#     def initialize(value, left=nil, right=nil)
-#       @value = value
-#       @left = left
-#       @right = right
-#     end
-#   end
 end
