@@ -688,6 +688,7 @@ class RubyLexer
       puts "   lexer: tokadd_string at byte #{src.pos} line #{@line_num}"
       puts "                     args  #{args.inspect} awords=#{awords}"
     end
+    num_eols = 0
     until src.eos? do # [
       cres = nil
       s_ch = src.peek_ch 
@@ -730,7 +731,7 @@ class RubyLexer
           src.advance(1)
           cres = self.read_escape
           symbol = (func & STR_FUNC_SYMBOL)._not_equal?( 0)
-          if symbol && cres =~ /\0/ 
+          if symbol && cres._contains_string( '\\0') # symbol && cres =~ /\0/
             # This error path not in ruby_parser2.0.2
             rb_compile_error "symbol cannot contain '\\0'" 
           end
@@ -772,13 +773,15 @@ class RubyLexer
 
         s_matched = src.scan( re )
         cres = s_matched
+        num_eols += cres._count_eols 
         symbol = (func & STR_FUNC_SYMBOL)._not_equal?( 0)
-        if symbol && cres =~ /\0/
+        if symbol && cres._contains_string( '\\0') # symbol && cres =~ /\0/
           rb_compile_error "symbol cannot contain '\\0'" 
         end
       end
       cres ||= s_matched
       @string_buffer << cres
+      @line_num += num_eols
     end # until eos #  ]
 
     cres ||= s_matched
@@ -1676,9 +1679,10 @@ class RubyLexer
 
       unless clex_state.equal?( Expr_dot) then # [
         # See if it is a reserved word.
-        kwarr = @keyword_table[ ttoken ] # was keyword = Keyword.keyword[ttoken]
+        #   was keyword = Keyword.keyword[ttoken]
+        kwarr = @keyword_table.at_casesens_otherwise(ttoken, true, nil)
 
-        if kwarr then
+        if kwarr._not_equal?(nil) 
           # clex_state holds "old state" and we update @lex_state
           #   with new state to be valid after return
           kw_state = kwarr[2] # was keyword.state
