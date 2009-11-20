@@ -1,4 +1,4 @@
-module MagRp 
+module MagRp
 
   class RubyNode
 
@@ -33,29 +33,29 @@ module MagRp
     end
     # def line ; end # not used
     # def line=(a_line) ; end # not used
-    
+
     def src_offset=(ofs)
       # returns receiver
       if ofs._isFixnum   # TODO remove check
         @position = ofs + 1 # convert to one-based
       else
-        raise_error('invalid source offset') 
-      end  
+        raise_error('invalid source offset')
+      end
     end
 
     def srcOffset
-      @position  # result is one based 
+      @position  # result is one based
     end
     def src_offset
-      # result is zero based 
+      # result is zero based
       p = self.srcOffset
       if p.equal?(nil)
-        raise_error('missing source offset') 
+        raise_error('missing source offset')
         return nil
       end
       p - 1
     end
- 
+
     def srcOffset=(ofs)
       # returns receiver , arg is one based
       if ofs._isFixnum
@@ -101,7 +101,7 @@ module MagRp
     def init(val)
       @value = val
       self
-    end 
+    end
     def kbegin_value
       @value
     end
@@ -135,13 +135,13 @@ module MagRp
              @receiverNode = rcvrNode
              self
            end
-           def inspect 
+           def inspect
              "[:match2, #{@receiverNode.inspect} , #{@valueNode.inspect}]"
            end
          end
 
          class RubyMatchZeroNode
-           # s(:match ) --> :match2,   produces a RubyMatch2Node 
+           # s(:match ) --> :match2,   produces a RubyMatch2Node
            class_primitive_nobridge 's', 's_forRp:' # one arg, a regexNode"
            def inspect
              raise_error # expect no instances
@@ -169,7 +169,7 @@ module MagRp
        class RubyAliasNode
          def self.s(newnam, oldnam)
            res = self._new
-           res.init(newnam, oldnam) 
+           res.init(newnam, oldnam)
          end
          def init(newnam, oldnam)
            @newName = newnam # a RubySymbolNode
@@ -219,9 +219,9 @@ module MagRp
           end
           def self.s_tk(rcvr, name_tok, args)
             res = self._new
-            sel = name_tok.symval.to_s 
-            sel << "=" 
-            sel = sel._as_symbol
+            sel = name_tok.symval.to_s
+            sel << "="
+            sel = sel.__as_symbol
             res.init(rcvr, sel, args)
             res.src_offset=( name_tok.src_offset)
             res
@@ -236,7 +236,7 @@ module MagRp
             args = @argsNode
             if args.equal?(nil)
               @argsNode = RubyRpCallArgs.s( rhs )
-            else  
+            else
               args.append( rhs )
             end
             self
@@ -254,14 +254,14 @@ module MagRp
            if rhs.equal?(nil)
              raise_error("invalid nil arg")
            end
-           @argsNode.append(rhs) 
+           @argsNode.append(rhs)
            self
          end
          def rcvr
            @receiverNode
          end
          def inspect
-           "\n  [:call, #{@receiverNode.inspect}, :#{@callName}, #{@argsNode.inspect}]" 
+           "\n  [:call, #{@receiverNode.inspect}, :#{@callName}, #{@argsNode.inspect}]"
          end
        end
 
@@ -302,23 +302,24 @@ module MagRp
            #    label = "flip#{node.hash}"
            #    env[label] = :lvar
            #    return s(:flip3, node[1], node[2])
-	   label = "flip#{self.hash}"
-	   env = aMagRp.env
-	   env[label] = :lvar 
+     label = 'flip'
+     label << self.object_id.to_s 
+     env = aMagRp.env
+     env[label] = :lvar # label is the only use of anon-Symbol key added to Env
            if @exclusive  # dot3
              raise_error # AST has never seen a flip3 yet
              nil
-           else   # dot2 
+           else   # dot2
              RubyFlipNode.s( @beginNode , @endNode ) # s(:flip2 )
            end
          end
          def inspect
-           if @exclusive 
-             sym = :dot3 
-           else 
+           if @exclusive
+             sym = :dot3
+           else
              sym =  :dot2
            end
-           "[:#{sym}, #{@beginNode.inspect}, #{@endNode.inspect}]" 
+           "[:#{sym}, #{@beginNode.inspect}, #{@endNode.inspect}]"
          end
        end
 
@@ -347,10 +348,10 @@ module MagRp
            if lst_cls.equal?(RubyArrayNode)
              res.listNode=(list)
            elsif lst_cls.equal?(RubyRpCallArgs)
-             ary = RubyArrayNode._new 
+             ary = RubyArrayNode._new
              ary.list=(list.list)
              res.listNode=(ary)
-           else 
+           else
              raise_error("RubyHashNode.s bad arg")
            end
            res
@@ -363,7 +364,7 @@ module MagRp
        class RubyIfNode
          def self.s(cond, tb, eb)
            res = self._new
-           res.init(cond, tb, eb) 
+           res.init(cond, tb, eb)
          end
          def init(cond, tb, eb)
            @condition = cond
@@ -387,7 +388,7 @@ module MagRp
 
        class RubyMethodDefNode
          class_primitive_nobridge 's', 's_forRp:args:body:'
-         primitive_nobridge 'start_line=', 'startLine:' 
+         primitive_nobridge 'start_line=', 'startLine:'
        end
          class RubyDefnNode
            # def self.s # inherited
@@ -405,23 +406,23 @@ module MagRp
 
        class RubyModuleNode
          class_primitive_nobridge 's', 's_forRp:body:source:'
-	 def inspect
-	   "[:module , #{@cpath.inspect},  #{@bodyNode.inspect}]"   
-	 end
+   def inspect
+     "[:module , #{@cpath.inspect},  #{@bodyNode.inspect}]"
+   end
        end
 
          class RubyClassNode
            class_primitive_nobridge 's', 's_forRp:superCls:body:source:'
-           def inspect   
+           def inspect
              "[:class , #{@cpath.inspect}, #{@superNode.inspect}, #{@bodyNode.inspect}]"
            end
-         end 
+         end
 
        class RubyNotNode
          def self.s(arg)
            res = self._new
            res.init(arg)
-         end        
+         end
          def init(arg)
            @conditionNode = arg
            self
@@ -438,11 +439,11 @@ module MagRp
          primitive_nobridge 'initSelectors', 'initAsgnSel:opSel:'
          def self.s(rcvr, asgnSelTok, opSelTok, val)
            res = self._new
-           asgn_sel = (asgnSelTok.symval.to_s << '=' )._as_symbol
+           asgn_sel = (asgnSelTok.symval.to_s << '=' ).__as_symbol
            res.initSelectors(asgn_sel, opSelTok.symval)
            res.receiverNode=(rcvr)
            res.valueNode=(val)
-           res.src_offset=( asgnSelTok.src_offset ) 
+           res.src_offset=( asgnSelTok.src_offset )
            res
          end
          def inspect
@@ -458,11 +459,11 @@ module MagRp
          def init(first, second)
            @firstNode = first
            @secondNode = second
-           self 
+           self
          end
          def inspect
            "[:op_asgn_and, #{@firstNode.inspect}, #{@secondNode.inspect} ]"
-         end 
+         end
        end
 
        class RubyOpAsgnOrNode
@@ -473,17 +474,17 @@ module MagRp
          def init(first, second)
            @firstNode = first
            @secondNode = second
-           self 
+           self
          end
          def inspect
            "[:op_asgn_or, #{@firstNode.inspect}, #{@secondNode.inspect} ]"
-         end 
+         end
        end
 
        class RubyOpElementAsgnNode
          def self.s(rcvr, args, asgn_tok, val)
            res = self._new
-           res.init( rcvr, args, asgn_tok, val) 
+           res.init( rcvr, args, asgn_tok, val)
          end
          def init(rcvr, args, asgn_tok, val)
            @receiverNode = rcvr
@@ -494,7 +495,7 @@ module MagRp
            self
          end
          def inspect
-           "[:op_asgn1, #{@receiverNode.inspect}, #{@argsNode.inspect} :#{@callName}, #{@valueNode.inspect}]" 
+           "[:op_asgn1, #{@receiverNode.inspect}, #{@argsNode.inspect} :#{@callName}, #{@valueNode.inspect}]"
          end
        end
 
@@ -527,14 +528,14 @@ module MagRp
            res = self._new
            res.init(body, rescuebody, elsebody)
          end
-	 def init(body, rescuebody, elsebody)
-	   @bodyNode = body
-	   @rescueBodyNode = rescuebody
-	   @elseNode = elsebody
+   def init(body, rescuebody, elsebody)
+     @bodyNode = body
+     @rescueBodyNode = rescuebody
+     @elseNode = elsebody
            self
-         end   
+         end
          def inspect
-          "[:rescue, #{@bodyNode.inspect}, <rescue>#{@rescueBodyNode.inspect}, <else> #{@elseNode.inspect}]" 
+          "[:rescue, #{@bodyNode.inspect}, <rescue>#{@rescueBodyNode.inspect}, <else> #{@elseNode.inspect}]"
          end
        end
 
@@ -554,7 +555,7 @@ module MagRp
            res
          end
          def inspect
-           "\n  [:super, #{@argsNode.inspect}, #{@iterNode.inspect} ]" 
+           "\n  [:super, #{@argsNode.inspect}, #{@iterNode.inspect} ]"
          end
        end
 
@@ -576,7 +577,7 @@ module MagRp
          def self.s(args)
            res = self._new
            res.argsNode=(args)
-           res 
+           res
          end
          # not sure how we are getting @arrayWrapper bool from RP
          def inspect
@@ -594,11 +595,11 @@ module MagRp
 
        class RubyAbstractBreakNode
          primitive_nobridge 'valueNode=', 'valueNode:'
-	 def self.s(val)
-	   res = self._new
-	   res.valueNode=(val)
-	   res
-	 end
+   def self.s(val)
+     res = self._new
+     res.valueNode=(val)
+     res
+   end
        end
 
          class RubyBreakNode
@@ -634,7 +635,7 @@ module MagRp
        end
      end
        class RubyAbstractNumberNode
-         class_primitive 'value_to_number', 'valueToNumber:' 
+         class_primitive 'value_to_number', 'valueToNumber:'
          def self.s(val)
            if val._isFixnum
              res = RubyFixnumNode._new
@@ -656,17 +657,17 @@ module MagRp
            else
              raise_error("invalid arg to RubyAbstractNumberNode")
              res = nil
-           end 
+           end
            res
          end
        end
-         
+
 
          class RubyFixnumNode
            # RubyFixnumNode may hold either Fixnum or Bignum value
            # instance created by RubyAbstractNumberNode
            def init(num)
-             @value = num 
+             @value = num
              self
            end
            def inspect
@@ -674,7 +675,7 @@ module MagRp
            end
          end
 
-	 class RubyFloatNode
+   class RubyFloatNode
            # instance created by RubyAbstractNumberNode
            def init(num)
              @value = num
@@ -761,7 +762,7 @@ module MagRp
          def init(the_sym)
            @name = the_sym
            self
-         end 
+         end
          def strNodeValue
            @name
          end
@@ -786,7 +787,7 @@ module MagRp
          def self.s(sym)
            res = self._new
            res.name=(sym)
-           res 
+           res
          end
          def inspect
            "[:cvar, :#{@name} ]"
@@ -810,7 +811,7 @@ module MagRp
            primitive_nobridge 'leftNode=', 'leftNode:'
            def self.s(left, name_tok)
              res = self._new
-             res.leftNode=(left) 
+             res.leftNode=(left)
              res.name=(name_tok.symval)
              res.src_offset=( name_tok.src_offset )
              res
@@ -899,7 +900,7 @@ module MagRp
      class RubyArgsNode
        # self._new  inherited, all instVars left as nil
        def add_arg(sym)
-         unless sym._isSymbol 
+         unless sym._isSymbol
            raise_error("add_arg - arg not a Symbol")
          end
          args = @arguments
@@ -930,7 +931,7 @@ module MagRp
        end
 
        def add_star_arg(sym)
-         unless sym._isSymbol 
+         unless sym._isSymbol
            raise_error("add_star_arg - arg not a Symbol")
          end
          if @restArgNode.equal?(nil)
@@ -951,7 +952,7 @@ module MagRp
            @optArgs = node
          else
            raise_error('optional_arg already assigned')
-         end 
+         end
          self
        end
 
@@ -968,7 +969,7 @@ module MagRp
          unless @blockArgNode.equal?(nil)
            res << ', [:block_arg, '
            res << @blockArgNode.name.to_s
-           res << '],' 
+           res << '],'
          end
          res
        end
@@ -979,7 +980,7 @@ module MagRp
        primitive_nobridge 'identifier',  'identifier'
        def self.s(sym)
          res = self._new
-         res.identifier=(sym) 
+         res.identifier=(sym)
          res
        end
        def inspect
@@ -1034,7 +1035,7 @@ module MagRp
            self
          end
          def as_accessor
-           @constNode.dup		# fix Trac 588 ?
+           @constNode.dup   # fix Trac 588 ?
          end
          def inspect
            "[:cdecl, #{@constNode.inspect}, #{@valueNode.inspect}]"
@@ -1074,7 +1075,7 @@ module MagRp
            RubyGlobalVarNode.s(@name)
          end
          def inspect
-           "[:gasgn, :#{@name}, #{@valueNode}]"
+           "[:gasgn, :#{@name}, #{@valueNode.inspect}]"
          end
        end
 
@@ -1142,13 +1143,13 @@ module MagRp
          def self.s(nam, val)
            res = self._new
            res.init(nam, val)
-         end 
+         end
          def init(nam, val)
-           @name = nam 
+           @name = nam
            @valueNode = val
            @isBlockArg = false
            self
-         end 
+         end
          def node_assign_set_rhs(rhs)
            if @valueNode.equal?(nil)
              @valueNode = rhs
@@ -1190,7 +1191,7 @@ module MagRp
          res = self._new  # inherited
          res.name=(sym)
          res
-       end 
+       end
        def inspect
          "[:block_arg, #{@name} ]"
        end
@@ -1210,7 +1211,7 @@ module MagRp
 
      class RubyCaseNode
        class_primitive_nobridge 's', 's_ForRp:body:' # s_ForRp: exprNode body: caseBody
-       def inspect   
+       def inspect
          "[:case, #{@caseNode.inspect}, #{@caseBody.inspect}]"
        end
      end
@@ -1223,7 +1224,7 @@ module MagRp
          res
        end
        def inspect
-         "[:defined, @{expressionNode.inspect} ]"
+         "[:defined, #{@expressionNode.inspect} ]"
        end
      end
 
@@ -1235,7 +1236,7 @@ module MagRp
          res
        end
        def str_dstr_evstr_kind
-	 2
+   2
        end
        def evStrBody
          @body
@@ -1248,7 +1249,7 @@ module MagRp
        end
      end
 
-     class RubyFlipNode 
+     class RubyFlipNode
        def self.s(first, second)
          res = self._new
          res.init(first, second)
@@ -1279,11 +1280,11 @@ module MagRp
            @callNode = aCallNode
          else
            raise_error("call node already assigned")
-         end 
+         end
          @position = aCallNode.srcOffset()  # one-based already
        end
        def inspect
-         "[:iterRp, #{@callNode.inspect}, #{@varNode.inspect}, #{@bodyNode.inspect} ]" 
+         "[:iterRp, #{@callNode.inspect}, #{@varNode.inspect}, #{@bodyNode.inspect} ]"
        end
      end
 
@@ -1295,7 +1296,7 @@ module MagRp
          def init(iter, var, body)
            @iterNode = iter
            @varNode = var
-           @bodyNode = body 
+           @bodyNode = body
            self
          end
          def inspect
@@ -1309,20 +1310,20 @@ module MagRp
        primitive_nobridge 'append', '_append:'  # returns receiver
        def inspect_list
          res = ""
-	 if @list
-	   sep = ""
-	   @list.each { | ea |  
-              res << (sep << "#{ea.inspect}") 
+   if @list
+     sep = ""
+     @list.each { | ea |
+              res << (sep << "#{ea.inspect}")
               sep = ", "
            }
-	 end
-	 res
+   end
+   res
        end
      end
 
 
        class RubyArrayNode
-         class_primitive_nobridge '_new', '_new' # inits @list to Smalltalk #() 
+         class_primitive_nobridge '_new', '_new' # inits @list to Smalltalk #()
          primitive_nobridge 'list', 'list'
          primitive_nobridge 'list=', 'list:'
          class_primitive_nobridge 's', '_new:'  # one arg
@@ -1427,11 +1428,11 @@ module MagRp
        class RubyBlockNode
          def self.s(a_list)
            res = self._new
-           res.list=(a_list)  # a_list should be an Array 
+           res.list=(a_list)  # a_list should be an Array
            res
          end
          def append_to_block(val)
-           @list << val 
+           @list << val
          end
          def prepend_to_block(val)
            @list.insert(0, val)
@@ -1453,7 +1454,7 @@ module MagRp
              n = 0
              while n < sz
                lst[n] = lst[n].kbegin_value
-               n = n + 1 
+               n = n + 1
              end
            end
          end
@@ -1461,9 +1462,9 @@ module MagRp
            res = "\n[:block, "
            if @list
              sep = ""
-             @list.each { | ea |  
-                res << sep 
-                res << "#{ea.inspect}" 
+             @list.each { | ea |
+                res << sep
+                res << "#{ea.inspect}"
                 sep = ", "
              }
            end
@@ -1502,7 +1503,7 @@ module MagRp
            res = self._new
            res.list=(arg)
            res
-         end  
+         end
          def size
            @list.size
          end
@@ -1521,8 +1522,8 @@ module MagRp
 
          def asDSymbolNode
            res = RubyDSymbolNode._new
-           lst = @list.dup 
-           lst[0] = RubySymbolNode.s( lst[0].strNodeValue._as_symbol ) 
+           lst = @list.dup
+           lst[0] = RubySymbolNode.s( lst[0].strNodeValue.__as_symbol )
            res.list=( lst )
            res
          end
@@ -1547,7 +1548,7 @@ module MagRp
            res = self._new
            res.list=(arg)
            res
-         end  
+         end
          def inspect
           "[:dsym, #{self.inspect_list}]"
          end
@@ -1626,7 +1627,7 @@ module MagRp
          res = self._new
          res.valueNode=(val)
          res
-       end  
+       end
        def inspect
          "[:return, #{@valueNode.inspect} ]"
        end
@@ -1657,7 +1658,7 @@ module MagRp
      class RubySplatNode
        primitive_nobridge 'node=', 'node:'
        def self.s(arg)
-         res = self._new 
+         res = self._new
          res.node=(arg)
          res
        end
@@ -1714,7 +1715,7 @@ module MagRp
       o.initialize(str, ofs)
     end
     def initialize(str, ofs)
-      @val = str._as_symbol
+      @val = str.__as_symbol
       @src_offset = ofs
       self
     end
@@ -1729,5 +1730,33 @@ module MagRp
     end
   end
 
+  class GsMethodDictionary  # used by racc state machine token_table
+    class_primitive '__new', 'new:'
+
+    def initialize(*args)
+      raise 'normal instance creation disallowed, must use __new'
+    end
+
+    def self.from_hash(a_hash)
+      dict = self.__new(a_hash.size) 
+      a_hash.each { | k,v |
+        dict.at_put(k, v)
+      }
+      dict 
+    end
+    primitive 'at_put', 'at:put:' 
+    primitive 'at_otherwise', 'at:otherwise:'
+  end
+
+  class StringKeyValueDictionary  # used in the lexer
+    class_primitive '__new', 'new:'
+
+    def initialize(*args)
+      raise 'normal instance creation disallowed, must use __new'
+    end
+
+    primitive 'at_put', 'at:put:'
+    primitive 'at_casesens_otherwise', '_stringAt:caseSensitive:otherwise:'
+  end
 end
 

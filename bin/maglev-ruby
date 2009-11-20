@@ -5,42 +5,55 @@ COMMAND="`basename $0`"
 
 usage()
 {
-cat << EOF
+    cat << EOF
 Usage: $COMMAND [switches] [--] [programfile] [arguments]
 
     Execute a Ruby file with MagLev
 
 OPTIONS:
    --copyright    Print copyright and exit
-   -d, --debug    Set debugging flags. Allows topaz debugging.
+   -d, --debug    Set debug flag. Allows topaz debugging.
+   +d             Set debug flag off.
    -e 'command'   Execute command. Several -e's allowed. Omit [programfile]
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h, --help     Show this message and exit
    -I <path>      Add <path> to \$LOAD_PATH
+   -r library     Require library before running
    -M<opt>        MagLev specific options.  This flag may be passed multiple
                   times.  The currently recognized options are:
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
                     logSexp       Print sexpressions as they are parsed
-                    noRlwrap      invoke topaz without rlwrap
-   --             End of MagLev parameters.  The next parameter is the programfile,
-                  then any programfile arguments follow.
+                    rlwrap        invoke topaz with rlwrap, if available
+                    commit        wrap script in Maglev.persistent block and
+                                  commit; implies -Mpersistent.  E.g.,:
+                                     maglev-ruby -Mcommit -e 'require "foo"'
+                                  Will read the foo library in persistent
+                                  mode, and then commit the code, and any
+                                  persistent data it created, to the
+                                  repository
+                    persistent    Start the VM in persistent mode (default is
+                                  transient mode)
+   --             End of MagLev parameters.  The next parameter is the
+                  programfile, then any programfile arguments follow.
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
    --stone <name> Run programfile connecting to the named stone
    -v, --verbose  Print version number, then turn on verbose mode
    --version      Print version number and exit
 
-Options can be set in the MAGLEV_OPTS environment variable as well as on the command line.
+Options can be set in the MAGLEV_OPTS environment variable as well as on the
+command line.  Command line options override \$MAGLEV_OPTS
+
 EOF
 }
 
 # The environment variable STONENAME is for use by internal GemStone developers and QA
 # who start the stone manually instead of using "maglev start" or "rake maglev:start"
-# If STONENAME is set, GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF will not be set 
+# If STONENAME is set, GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF will not be set
 # -- even if they are undefined.
 #
 # Existing GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF env variables will never be
-# overridden. If GEMSTONE_GLOBAL_DIR is not defined, it will be set to $MAGLEV_HOME. 
+# overridden. If GEMSTONE_GLOBAL_DIR is not defined, it will be set to $MAGLEV_HOME.
 # If the GEMSTONE_SYS_CONF environment variables is not defined, it will be set
 # based on the --stone parameter, otherwise defaulted to etc/system.conf.
 
@@ -72,13 +85,21 @@ fi
 # -G will unset it later if needed
 [ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 
-# Process command line args
-dash_e=""
-args=""
-debug=0
-maglev_options=""
+# All of the command line arguments passed to this shell script will either
+# be processed and totally consumed by this shell script (e.g., -Mrlwrap
+# affects how we invoke the MagLev VM), or passed into the VM in one of the
+# following variables:
+RUBYSCRIPT=     # The name of the .rb file to run (or "-", if reading from stdin)
+ruby_args=""    # Standard ruby options passed to VM, e.g., "-Ilib" "-e '...'"
+script_args=""  # Arguments that will be passed to the ruby script in ARGV
+maglev_args=""  # MagLev specific Arguments that MagLev interprets before invoking the script
+
+# The following flags and parameters are used by this shell script
 tocsize=""
-useRlwrap=1
+libs=""
+debugFlag=    # off by default
+rlwrapFlag=    # off by default
+sawDashE=
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -87,15 +108,19 @@ do
             exit
             ;;
         -d|--debug)
-            debug=1
+            debugFlag=1
+            ;;
+        +d)
+            debugFlag=
             ;;
         -e)
-            dash_e="${dash_e} '${2//\'/''}'"  # smalltalk escape: ' => ''
+            ruby_args="${ruby_args}, '-e', '${2//\'/''}'"  # smalltalk escape: ' => ''
+            sawDashE=1
             shift
             ;;
         -e*)
-            x="${1:2}"
-            dash_e="${dash_e} '${x//\'/''}'" # smalltalk escape: ' => ''
+            ruby_args="${ruby_args}, '${1//\'/''}'"  # smalltalk escape: ' => ''
+            sawDashE=1
             ;;
         -G)
             unset GEMSTONE_GLOBAL_DIR
@@ -104,20 +129,33 @@ do
             usage
             exit
             ;;
-        -I)
-            args="$args '$1' '$2'"
+        -I|-r)
+            ruby_args="${ruby_args}, '$1', '$2'"
             shift
             ;;
-        -I*)
-            args="$args '$1'"
+        -I*|-r*)
+            ruby_args="${ruby_args}, '$1'"
             ;;
         -M*)
             sub_opt=${1:2}
-            if [[ $sub_opt == "noRlwrap" ]]; then
-                useRlwrap=
-            else
-                maglev_options="$maglev_options ${sub_opt}"
-            fi
+            case $sub_opt in
+                noRlwrap)
+                    echo "WARNING: -MnoRlwrap is deprecated"
+                    rlwrapFlag=
+                    ;;
+                rlwrap)
+                    rlwrapFlag=1
+                    ;;
+                traceGlobals|logSexp|traceLoad|commit|persistent)
+                    maglev_args="${maglev_args}, ${sub_opt}"
+                    ;;
+                *)
+                    echo
+                    echo "Unknown option: $1"
+                    echo
+                    usage
+                    exit 1
+            esac
             ;;
         --tocsz)
             tocsize="-T $2"
@@ -129,7 +167,7 @@ do
             [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
             if [ ! -f $GEMSTONE_SYS_CONF ]; then
                 echo "Can't find configuration file $GEMSTONE_SYS_CONF"
-              exit 2
+                exit 2
             fi
             shift
             ;;
@@ -144,7 +182,7 @@ do
         -w)
             # -w doesn't do anything at present
             # but maglev-ruby is invoked with -w by some test apps
-            warning=1
+            # warning=1
             ;;
         --)
             break
@@ -168,35 +206,36 @@ done
 #  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
 # Don't override any existing magic ENV variables
 if [ -z "$STONENAME" ]; then
-	stone=maglev
+    stone=maglev
     [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 else
     # $STONENAME was set -- don't change anything
-	stone=$STONENAME
+    stone=$STONENAME
 fi
 
 # Make sure the stone is ready
 $GEMSTONE/bin/waitstone $stone -1 >/dev/null
-if [ $? -ne 0 ] ; then
+if [[ $? -ne 0 ]] ; then
     echo "$COMMAND: [Error] The MagLev server \"$stone\" is not running."
     echo "To fix this run \"rake $stone:start\" before running $COMMAND."
     exit 1
 fi
 
 # If no -e params and no script, then read commands from STDIN
-if [ $# -lt 1 ]; then
-  if [ -z "${dash_e}" ]; then
-    stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
-    cat /dev/stdin > $stdinscript
-    RUBYSCRIPT=$stdinscript
-  fi
+if [[ $# -lt 1 ]]; then
+#    if [ -z "${dash_e}" ]; then
+    if [[ ! $sawDashE ]]; then
+        stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
+        cat /dev/stdin > $stdinscript
+        RUBYSCRIPT=$stdinscript
+    fi
 else
-  RUBYSCRIPT=$1
-  shift
+    RUBYSCRIPT=$1
+    shift
 fi
 
 # Make sure the argument is a valid file, or there was a -e "command" parameter
-if [[ ! -z $RUBYSCRIPT && ! -e $RUBYSCRIPT && -z $dash_e ]]; then
+if [[ ! -z $RUBYSCRIPT && ! -e $RUBYSCRIPT && ! $sawDashE ]]; then
     echo "$COMMAND: [Error] The file \"$RUBYSCRIPT\" does not exist"
     exit 1
 fi
@@ -206,7 +245,7 @@ fi
 # we can pass them as a literal array to Smalltalk.
 while [[ $# > 0 ]]
 do
-    args="$args '$1'"
+    script_args="${script_args}, '$1'"   # Do we need to smalltalk escape ' ?
     shift
 done
 
@@ -221,8 +260,8 @@ rm -f $dbscript
 ### Start building a Topaz script to execute later
 cat $MAGLEV_HOME/etc/.topazini > $dbscript
 #
-if [ $debug -ne 0 ]; then
-  cat - >> $dbscript <<-EOFB
+if [[ $debugFlag ]]; then
+    cat - >> $dbscript <<-EOFB
 display classoops
 EOFB
 fi
@@ -241,42 +280,42 @@ EOF
 # If MagRpDEBUG_level is 0..2, use native parser with logging level 0, 1, or 2
 # if MagRpDEBUG_level is -1, use the old MRI parser
 if [ ! -z "${MagRpDEBUG_level}" ]; then
-  if [ ${MagRpDEBUG_level} -lt 0 ] ; then
+    if [ ${MagRpDEBUG_level} -lt 0 ] ; then
     # echo "Using old MRI parser"
-    cat - >> $dbscript <<-EOF
+        cat - >> $dbscript <<-EOF
     SessionTemps current at: #MAGLEV_evalUseMri put: true ;
       at: #MAGLEV_loadUseMri put: true .
 EOF
-  else
+    else
     # echo "Using new native parser with MagRpDEBUG_level $MagRpDEBUG_level"
-    cat - >> $dbscript <<-EOF
+        cat - >> $dbscript <<-EOF
     SessionTemps current at: #MagRpDEBUG put: ${MagRpDEBUG_level} .
 EOF
-  fi
+    fi
 fi
-#
+
 cat - >> $dbscript <<-EOF
-(ctx := RubyContext load: #($maglev_options) ) .
-ctx runFileNamed: '$RUBYSCRIPT' withARGV: #($args) withDashE: #($dash_e) .
+(ctx := RubyContext load: #(${maglev_args:1}) ) .
+ctx runFileNamed: '$RUBYSCRIPT' withRubyArgs: #[${ruby_args:1}] withScriptArgs: #[${script_args:1}] .
 GsFile stdout close . "ensure final LF on stdout"
 ^ nil
 %
 EOF
 #
 # generate a topaz exit command as last line of init file
-if [ $debug -eq 0 ]; then
-  cat - >> $dbscript <<-EOFB
+if [[ ! $debugFlag  ]]; then
+    cat - >> $dbscript <<-EOFB
 exit
 EOFB
 else
-  cat - >> $dbscript <<-EOFC
+    cat - >> $dbscript <<-EOFC
 exitifnoerror
 EOFC
 fi
 
 TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
 # If debugging, don't use -q with topaz
-[ $debug -ne 0 ] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -I $dbscript "
+[[ $debugFlag  ]] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -I $dbscript "
 
 # echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"
 # echo "GEMSTONE_SYS_CONF = $GEMSTONE_SYS_CONF"
@@ -286,12 +325,12 @@ TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
 # note that /usr/bin/which on Solaris always produces $?==0, so be careful
 #  about how you test result of which.
 rlwrapExe=$(which rlwrap 2> /dev/null )
-if [[ $useRlwrap && -f "$rlwrapExe" ]]; then
-  $rlwrapExe $TOPAZ_CMD
-  exitStatus=$?
+if [[ $rlwrapFlag && -f "$rlwrapExe" ]]; then
+    $rlwrapExe $TOPAZ_CMD
+    exitStatus=$?
 else
-  $TOPAZ_CMD
-  exitStatus=$?
+    $TOPAZ_CMD
+    exitStatus=$?
 fi
 
 exit $exitStatus

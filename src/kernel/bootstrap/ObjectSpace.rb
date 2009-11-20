@@ -1,7 +1,7 @@
 module ObjectSpace
 
   def _id2ref(object_id)
-    Gemstone._object_for_oop(object_id)
+    Maglev.__system.__object_for_oop(object_id)
   end
 
   def define_finalizer(obj, a_proc=nil)

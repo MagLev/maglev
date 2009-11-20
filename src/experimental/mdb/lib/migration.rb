@@ -181,6 +181,7 @@ module Maglev
     # namespace.  +path_to_class+ is a string or symbol for the path to a
     # class or module, e.g., 'Object::Foo::Bar', or "Foo::Bar".
     # Raises NameError if +path_to_class+ does not name a constant.
+    # Returns the removed object.
     def remove_from_parent(path_to_class)
       path = get_path path_to_class
       target = path.pop

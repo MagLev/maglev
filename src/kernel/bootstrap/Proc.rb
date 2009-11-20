@@ -11,14 +11,14 @@ end
 class ExecBlock
   # creating subclasses of ExecBlock is not allowed
   # extending ExecBlock is not allowed outside of bootstrap
-  primitive_nobridge '_numArgs', 'numArgs'
-  primitive_nobridge '_lastStar', 'lastRubyArgIsStar'
-  primitive_nobridge '_noDeclaredArgs', 'noRubyDeclaredArgs'
+  primitive_nobridge '__num_args', 'numArgs'
+  primitive_nobridge '__last_star', 'lastRubyArgIsStar'
+  primitive_nobridge '__no_declared_args', 'noRubyDeclaredArgs'
 
-  primitive_nobridge '_fetchRubyVcGlobal', '_rubyVcGlobalAt:'
-  primitive_nobridge '_setRubyVcGlobal', '_rubyVcGlobalAt:put:'
+  primitive_nobridge '__fetchRubyVcGlobal', '_rubyVcGlobalAt:'
+  primitive_nobridge '__setRubyVcGlobal', '_rubyVcGlobalAt:put:'
 
-  primitive_nobridge '_copyForRuby', '_copyForRuby:'
+  primitive_nobridge '__copy_for_ruby', '_copyForRuby:'
     #  one Fixnum arg,  0 == for lambda, 1 == for define_method , 
     #     2 == for non-lambda  proc 
 
@@ -50,13 +50,13 @@ class ExecBlock
     end
 
     def arity
-      na = self._numArgs 
+      na = self.__num_args 
       if na.equal?(0)
-        if (self._noDeclaredArgs)
+        if self.__no_declared_args
           na = -1  # for Proc.new { }.arity == -1
         end 
       else
-        if (self._lastStar) 
+        if self.__last_star
           na = -(na)  # negated (num required args + 1)
         end
       end
@@ -68,7 +68,8 @@ class ExecBlock
     def to_proc
       Proc.new(self)
     end
-    def _to_proc
+    def __to_proc
+      # invoked from generated code
       Proc.new(self)
     end
 end
@@ -79,9 +80,9 @@ class Proc
     def self.new(&blk)
       if blk._isBlock
         inst = self.allocate
-        b = blk._copyForRuby(2) # transform break bytecodes if any
+        b = blk.__copy_for_ruby(2) # transform break bytecodes if any
         b.freeze
-        inst._initialize(&b)
+        inst.__initialize(&b)
         inst.initialize
         return inst
       elsif blk.is_a?(Proc)
@@ -94,9 +95,9 @@ class Proc
     def self.new(blk)
       if blk._isBlock
         inst = self.allocate
-        b = blk._copyForRuby(2) # transform break bytecodes if any
+        b = blk.__copy_for_ruby(2) # transform break bytecodes if any
         b.freeze
-        inst._initialize(&b)
+        inst.__initialize(&b)
         inst.initialize
         return inst
       else
@@ -113,19 +114,19 @@ class Proc
     def self.new_lambda(&blk)
       if blk._isBlock
         inst = self.allocate
-        b = blk._copyForRuby(0)
+        b = blk.__copy_for_ruby(0)
         b.freeze
-        inst._initialize(&b)
+        inst.__initialize(&b)
         return inst
       elsif blk.is_a?(Proc)
-        pb = blk._block
-        b = pb._copyForRuby(0)
+        pb = blk.__block
+        b = pb.__copy_for_ruby(0)
         b.freeze
-        if (b.equal?(pb)) 
+        if b.equal?(pb)
           return blk  # the argument blk  is already a lambda
         else
           inst = self.allocate
-          inst._initialize(&b) 
+          inst.__initialize(&b) 
           return inst
         end
       else
@@ -138,20 +139,20 @@ class Proc
       raise ArgumentError, 'tried to create Proc object without a block'
     end
 
-    def _block
+    def __block
       @block
     end
 
-    def _initialize(&blk)
+    def __initialize(&blk)
       @block = blk
     end
 
     # private primitives for $~ implementation only
-    def _fetchRubyVcGlobal(ofs)
-      @block._fetchRubyVcGlobal(ofs)
+    def __fetchRubyVcGlobal(ofs)
+      @block.__fetchRubyVcGlobal(ofs)
     end
-    def _setRubyVcGlobal(ofs, val)
-      @block._setRubyVcGlobal(ofs, val)
+    def __setRubyVcGlobal(ofs, val)
+      @block.__setRubyVcGlobal(ofs, val)
     end
 
     def []
@@ -176,12 +177,12 @@ class Proc
 
     def ==(other)
       if other.is_a?(Proc)
-        return @block.equal?(other._block)
+        return @block.equal?(other.__block)
       end
       false
     end
 
-    def _arity=(v)
+    def __arity=(v)
       @arity = v
     end
 
@@ -191,13 +192,13 @@ class Proc
         return na
       end
       blk = @block
-      na = blk._numArgs 
+      na = blk.__num_args 
       if na.equal?(0)
-        if (blk._noDeclaredArgs)
+        if blk.__no_declared_args
           na = -1  # for Proc.new { }.arity == -1
         end 
       else
-        if (blk._lastStar) 
+        if blk.__last_star
           na = -(na)  # negated (num required args + 1)
         end
       end
@@ -234,7 +235,7 @@ class Proc
     def to_proc
       self
     end
-    def _to_proc
+    def __to_proc
       self
     end
 

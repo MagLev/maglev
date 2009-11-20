@@ -20,7 +20,7 @@ class ::Digest::MD5 < ::Digest::Base
 
   def finish
     data = Type.coerce_to(@data, String, :to_s)
-    sum = data._md5sum
+    sum = data.__md5sum
     to_str(sum)
   end
 

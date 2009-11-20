@@ -1,21 +1,21 @@
 class Dir
 
   # private primitives
-  class_primitive_nobridge '_rmdir', '_rmdir:'
-  class_primitive_nobridge '_chdir', '_chdir:'
-  class_primitive_nobridge '_getwd', '_getwd'
-  class_primitive_nobridge '_new', '_new:'
-  class_primitive_nobridge '_mkdir', '_mkdir:permissions:'
-  class_primitive_nobridge '_get_clear_errno', '_errno'  # gets and clears errno
+  class_primitive_nobridge '__rmdir', '_rmdir:'
+  class_primitive_nobridge '__chdir', '_chdir:'
+  class_primitive_nobridge '__getwd', '_getwd'
+  class_primitive_nobridge '__new', '_new:'
+  class_primitive_nobridge '__mkdir', '_mkdir:permissions:'
+  class_primitive_nobridge '__get_clear_errno', '_errno'  # gets and clears errno
 
-  class_primitive_nobridge '_getgrgent', '_getgrgent:'
-  class_primitive_nobridge '_getgrgid', '_getgrgid:'
-  class_primitive_nobridge '_getgrnam', '_getgrnam:'
-  class_primitive_nobridge '_getlogin', '_getlogin'
-  class_primitive_nobridge '_getpwent', '_getpwent:'
-  class_primitive_nobridge '_getpwnam', '_getpwnam:'
-  class_primitive_nobridge '_getpwuid', '_getpwuid:'
-  class_primitive_nobridge '_getuid',   '_getuid'
+  class_primitive_nobridge '__getgrgent', '_getgrgent:'
+  class_primitive_nobridge '__getgrgid', '_getgrgid:'
+  class_primitive_nobridge '__getgrnam', '_getgrnam:'
+  class_primitive_nobridge '__getlogin', '_getlogin'
+  class_primitive_nobridge '__getpwent', '_getpwent:'
+  class_primitive_nobridge '__getpwnam', '_getpwnam:'
+  class_primitive_nobridge '__getpwuid', '_getpwuid:'
+  class_primitive_nobridge '__getuid',   '_getuid'
 
   # Class Methods
 
@@ -24,17 +24,17 @@ class Dir
     path = Type.coerce_to(path, String, :to_str)
     if block_given?
       original_path = self.getwd
-      Errno.handle(_chdir(path), "chdir #{path}")
+      Errno.handle(__chdir(path), "chdir #{path}")
 
       begin
         value = yield path
       ensure
-        Errno.handle(_chdir(original_path), "chdir back to #{original_path}")
+        Errno.handle(__chdir(original_path), "chdir back to #{original_path}")
       end
 
       return value
     else
-      Errno.handle(_chdir(path), "chdir #{path}")
+      Errno.handle(__chdir(path), "chdir #{path}")
     end
   end
 
@@ -43,7 +43,7 @@ class Dir
   end
 
   def self.delete(dirname)
-    Errno.handle(_rmdir(dirname), "delete #{dirname}")
+    Errno.handle(__rmdir(dirname), "delete #{dirname}")
   end
 
   def self.entries(dirname)
@@ -56,7 +56,7 @@ class Dir
   end
 
   def self.getwd
-    Errno.handle(_getwd, "getwd")
+    Errno.handle(__getwd, "getwd")
   end
 
   # if not nil, permissions must be >= 0 and <= 0777 if permissions==nil ,
@@ -66,13 +66,13 @@ class Dir
     # MRI does not allow conversion of nil to 0 for this method...
     raise TypeError, "no implicit conversion from nil to integer" if permissions.equal?(nil)
     permissions = Type.coerce_to(permissions, Integer, :to_i)
-    Errno.handle(_mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
+    Errno.handle(__mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
   end
 
   def self.new(*args, &blk)
     # first variant gets bridge methods
     if (args.length > 0)
-      d = _new(args[0])
+      d = __new(args[0])
       Errno.handle(d, dirname)
       d.initialize(*args, &blk)
     else
@@ -82,7 +82,7 @@ class Dir
 
   def self.new(dirname)
     # replaces the corresponding bridge method only
-    d = _new(dirname)
+    d = __new(dirname)
     Errno.handle(d, dirname)
     d.initialize(dirname)
     d
@@ -108,11 +108,11 @@ class Dir
   end
 
   def self.rmdir(dirname)
-    Errno.handle(_rmdir(dirname), "rmdir #{dirname}")
+    Errno.handle(__rmdir(dirname), "rmdir #{dirname}")
   end
 
   def self.unlink(dirname)
-    Errno.handle(_rmdir(dirname), "unlink #{dirname}")
+    Errno.handle(__rmdir(dirname), "unlink #{dirname}")
   end
 
 
@@ -120,7 +120,7 @@ class Dir
 
   def initialize(path)
     @path    = path
-    # @entries has been filled in by _new primitive
+    # @entries has been filled in by __new primitive
     @index   = 0
     @closed  = false
     @range   = 0...@entries.length

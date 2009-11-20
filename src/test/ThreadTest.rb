@@ -90,7 +90,8 @@ class ThrTest
 
     t = Thread.fork { $A = 20 ; Thread.pass; $A = $A + 20000 }
     unless $A == 20 ;							Failed() ; end
-    unless t.priority == 0;						Failed() ; end
+    unless (tp = t.priority) == 0; Failed() ; end # have seen failure with tp==25 here
+					#   when ordering of vmunit.conf changed
     t.priority=(-5)
     tb = Thread.fork { $A = $A + 100 ; Thread.pass; $A = $A + 1000 }
     unless $A == 120;							Failed() ; end 

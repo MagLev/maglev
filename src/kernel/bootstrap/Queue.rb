@@ -47,19 +47,19 @@ class ConditionVariable
 
   class_primitive 'allocate', 'rubyBasicNew'
 
-  primitive_nobridge '_wait', 'wait'
+  primitive_nobridge '__wait', 'wait'
 
-  primitive_nobridge '_wait_seconds', 'waitForSeconds:'
+  primitive_nobridge '__wait_seconds', 'waitForSeconds:'
 
   # Releases the lock held in +mutex+ and waits; reacquires the lock on wakeup.
   #
   def wait(mutex, timeout=nil)
     mutex.unlock
     if timeout.equal?(nil)
-      self._wait
+      self.__wait
       was_signaled = true
     else 
-      was_signaled = self._wait_seconds(timeout) # returns false if timed out
+      was_signaled = self.__wait_seconds(timeout) # returns false if timed out
     end
     mutex.lock
     if was_signaled
@@ -245,7 +245,6 @@ class SizedQueue < Queue
     unless old_size == max
       @resource.broadcast
     end
-    nil.pause
     max
   end
 

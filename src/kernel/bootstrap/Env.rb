@@ -3,8 +3,8 @@ class Env
     # to a  transient Ruby constant , whose value is
     # the one transient instance of Env , stored in  SessionTemps current .
 
-    class_primitive_nobridge '_getenv', '_getenv:'
-    class_primitive_nobridge '_putenv', '_putenv:with:'
+    class_primitive_nobridge '__getenv', '_getenv:'
+    class_primitive_nobridge '__putenv', '_putenv:with:'
 
     def self.new
       raise NotImplementedError
@@ -24,14 +24,14 @@ class Env
       self.dup
     end
 
-    primitive '_at_put' , 'rubyAt:put:' # resolves to RubyHash>>rubyAt:put:
+    primitive '__at_put' , 'rubyAt:put:' # resolves to RubyHash>>rubyAt:put:
 
     def [](key)
       v = super(key)
       if v.equal?(nil)
-        v = Env._getenv(key)
+        v = Env.__getenv(key)
         unless v.equal?(nil)
-          self._at_put(key, v)
+          self.__at_put(key, v)
         end
       end
       v
@@ -49,7 +49,7 @@ class Env
       if val.equal?(nil)
         val = ""
       end
-      Env._putenv(key, val)
+      Env.__putenv(key, val)
       super(key, val)
     end
 

@@ -1,6 +1,6 @@
 module Process
   def self.times
-    arr = Gemstone._host_times
+    arr = Maglev.__system.__host_times
     Struct::Tms.new(*arr)
   end
 

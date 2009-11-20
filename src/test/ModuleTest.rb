@@ -167,6 +167,6 @@ end
 
 ################### Report and clean up #####################
 report
-Gemstone.abortTransaction if defined? RUBY_ENGINE
+Maglev.abort_transaction if defined? RUBY_ENGINE
 true
 

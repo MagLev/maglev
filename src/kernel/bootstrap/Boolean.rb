@@ -3,13 +3,13 @@ class Boolean
 
 #---------------------------------
 
-  primitive_nobridge '_isSpecial', 'isSpecial'
+  primitive_nobridge '__isSpecial', 'isSpecial'
 
-  primitive_nobridge '^', '_rubyXor:'
+  primitive_nobridge '^', '__rubyXor:'
 
-  primitive_nobridge '&', '_rubyAnd:'
+  primitive_nobridge '&', '__rubyAnd:'
 
-  primitive_nobridge '|' , '_rubyOr:'
+  primitive_nobridge '|' , '__rubyOr:'
 
   primitive_nobridge 'not'
 

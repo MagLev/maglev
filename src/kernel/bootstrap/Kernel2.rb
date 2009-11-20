@@ -5,11 +5,11 @@ module Kernel
   def binding
     # usually the block argument is synthesized by the parser.
     # this case is used to create the top-level binding.
-    Binding.new( self._binding_ctx(0), self, nil )
+    Binding.new( self.__binding_ctx(0), self, nil )
   end
 
   def binding(&blk)
-    Binding.new( self._binding_ctx(0), self , blk)
+    Binding.new( self.__binding_ctx(0), self , blk)
   end
   module_function :binding
 

@@ -1,4 +1,4 @@
-# test for Behavior#instance_method, Object#method, Module#define_method
+# test for Module#instance_method, Object#method, Module#define_method
 class CDefineMeth
   def initialize
     @num = 20

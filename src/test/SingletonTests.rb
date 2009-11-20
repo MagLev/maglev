@@ -120,4 +120,4 @@ test(Object.new.singleton_methods(false), [], 'ObjectMixin instance false')
 
 report
 
-Gemstone.abortTransaction if defined? RUBY_ENGINE
+Maglev.abort_transaction if defined? Maglev

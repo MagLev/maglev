@@ -1,7 +1,6 @@
 # file marshal.rb 
 # depends on: module.rb class.rb
 
-
 module Marshal
 
   class State # [
@@ -167,11 +166,11 @@ module Marshal
       last_ch = s[-1]
       if last_ch.equal?( ?n ) || last_ch.equal?( ?f )
         if s == "nan"
-          obj = 0.0._divide(0.0)
+          obj = 0.0.__divide(0.0)
         elsif s == "inf"
-          obj = 1.0._divide(0.0)
+          obj = 1.0.__divide(0.0)
         elsif s == "-inf"
-          obj = 1.0._divide(-0.0)
+          obj = 1.0.__divide(-0.0)
         else
           obj = s.to_f
         end
@@ -420,7 +419,7 @@ module Marshal
     def serialize(obj)
       raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
 
-      if obj._isSpecial
+      if obj.__isSpecial
         str = obj.to_marshal(self)
       elsif obj._isSymbol
         idx = @syms_dict[obj]
@@ -665,6 +664,27 @@ module Marshal
   end
 
 end
+
+class Object
+  # replicate some constants so code in marshal2.rb can resolve at boot compile
+  Marshal__TYPE_OBJECT = Marshal::TYPE_OBJECT
+  Marshal__TYPE_NIL = Marshal::TYPE_NIL
+  Marshal__TYPE_TRUE = Marshal::TYPE_TRUE
+  Marshal__TYPE_FALSE = Marshal::TYPE_FALSE
+  Marshal__TYPE_CLASS = Marshal::TYPE_CLASS
+  Marshal__TYPE_MODULE = Marshal::TYPE_MODULE
+  Marshal__TYPE_SYMBOL = Marshal::TYPE_SYMBOL
+  Marshal__TYPE_STRING = Marshal::TYPE_STRING
+  Marshal__TYPE_FIXNUM = Marshal::TYPE_FIXNUM
+  Marshal__TYPE_BIGNUM = Marshal::TYPE_BIGNUM
+  Marshal__TYPE_REGEXP = Marshal::TYPE_REGEXP 
+  Marshal__TYPE_STRUCT = Marshal::TYPE_STRUCT 
+  Marshal__TYPE_ARRAY = Marshal::TYPE_ARRAY
+  Marshal__TYPE_HASH_DEF = Marshal::TYPE_HASH_DEF
+  Marshal__TYPE_HASH = Marshal::TYPE_HASH
+  Marshal__TYPE_FLOAT = Marshal::TYPE_FLOAT
+end
+
 
 # optimization, code moved to common/marshal2.rb
 #  so constants can be resolved during bootstrap compile

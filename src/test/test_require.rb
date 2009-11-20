@@ -85,5 +85,5 @@ test($bar, true, "require 'bar' finds only 'bar.rb', not 'bar'")
 # puts "foo:       #{$foo}"
 
 
-Gemstone.abortTransaction  # Clear anything we might have done...
+Maglev.abort_transaction  # Clear anything we might have done...
 report

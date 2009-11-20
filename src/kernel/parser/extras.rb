@@ -3,17 +3,14 @@
 # require 'sexp'
 # require 'strscan'
 
-# WHY do I have to do this?!?  (Ryan's question)
 class Regexp
-  unless defined? ONCE then
-    ONCE     = 0 # 16 # ?
-    ENC_NONE = /x/n.options
-    ENC_EUC  = /x/e.options
-    ENC_SJIS = /x/s.options
-    ENC_UTF8 = /x/u.options
-  end
+  class_primitive_nobridge '__new', 'new:options:lang:'  
+
+  primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
+
+  # definitions of ONCE .. ENC_UTF8 moved to racc_def_parser.rb
 end
-Regexp._freeze_constants
+Regexp.__freeze_constants
 
 # Fixnum#ord deleted
 
@@ -36,17 +33,55 @@ class Array
   end
 end
 
+class String
+  def _count_eols
+    count = 0
+    idx = 1
+    while true
+      idx = self.__indexOfByte( ?\n , idx )
+      if idx.equal?(0)
+        return count
+      end
+      count += 1
+      idx += 1
+    end
+  end
+
+  def _contains_string(a_string)
+    self.__findStringStartingAt(a_string, 1)._not_equal?(0)
+  end
+end
+
 class Symbol
   # allow String-like access to bytes of Symbols
   primitive_nobridge_env '[]' , '_rubyAt', ':'
 
-  def _as_symbol
+  def __as_symbol
     self  
   end
 end
 
 # class InternalParseError < StandardError
 # end
+
+class TransientShortArray
+  # TransientShortArray supports contigous in-memory instances 
+  # up to 65Kbytes. Each element is a 16 bit integer.
+  # Instances may not be committed . 
+  #
+  # The parser uses TransientShortArrays for the in-memory
+  # copies of some of the racc state-tables,
+  # which would exceed the small-object limit of 8K bytes if 
+  # represented with normal Arrays .
+  
+  class_primitive_nobridge '_with_shorts', '_withAllShorts:'
+    # copies an Array
+    
+  primitive_nobridge '[]', '_rubyParserShortAt:'
+    # zero values are translated to a nil result
+    
+  primitive_nobridge '[]=', '_rubyShortAt:put:'
+end
 
 module MagRp # {
 
@@ -58,7 +93,7 @@ module MagRp # {
       #    so OFF_ constant refs can be static
 
       def reset
-	@curridx = -ENTRY_SIZE 
+	@curridx = 0 - ENTRY_SIZE 
 	self.extend(false, false)
       end
 
@@ -159,7 +194,7 @@ module MagRp # {
 	  end
 	  h = ary[idx ]
           if h._not_equal?(nil)
-	    h._add_keys_to(set)
+	    h.__add_keys_to(set)
           end
 	  idx -= ENTRY_SIZE
 	end
@@ -602,8 +637,7 @@ module MagRp # {
       @lexer = lx
       @env = Environment.new
       #  @comments  no longer used , this parser not for use with RDoc implementation
-
-      # inline required subset of reset # moved to new_instance method
+      lx._install_wordlist( @lexer_wordlist )
     end
 
     def reset
@@ -924,7 +958,7 @@ module MagRp # {
 	body = RubyBlockNode.s( [ body ] )  # s(:block, body) 
       end
       if name_tok._isString
-	name_sym = name_tok._as_symbol  # from a reserved word
+	name_sym = name_tok.__as_symbol  # from a reserved word
       else
 	name_sym = name_tok.symval # expect a RpNameToken
       end
@@ -1092,19 +1126,19 @@ module MagRp # {
       while opt_idx < opt_len
 	ch = options[opt_idx]
 	if ch <= ?n 
-	  if ch.equal?( ?i) ; o = o | Regexp::IGNORECASE
-	  elsif ch.equal?( ?m) ; o = o | Regexp::MULTILINE
-	  elsif ch.equal?( ?n) ; encod = Regexp::ENC_NONE
-	  elsif ch.equal?( ?e) ; encod = Regexp::ENC_EUC 
+	  if ch.equal?( ?i) ; o = o | IGNORECASE
+	  elsif ch.equal?( ?m) ; o = o | MULTILINE
+	  elsif ch.equal?( ?n) ; encod = ENC_NONE
+	  elsif ch.equal?( ?e) ; encod = ENC_EUC 
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
 	    raise "unknown regexp option: #{err_str}" 
 	  end 
 	else 
-	  if ch.equal?( ?x ) ; o = o | Regexp::EXTENDED  
-	  elsif ch.equal?( ?o) ; o = o | Regexp::ONCE ; have_once = true;
-	  elsif ch.equal?( ?s) ; encod = Regexp::ENC_SJIS
-	  elsif ch.equal?( ?u) ; encod = Regexp::ENC_UTF8
+	  if ch.equal?( ?x ) ; o = o | EXTENDED  
+	  elsif ch.equal?( ?o) ; o = o | ONCE ; have_once = true;
+	  elsif ch.equal?( ?s) ; encod = ENC_SJIS
+	  elsif ch.equal?( ?u) ; encod = ENC_UTF8
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
 	    raise "unknown regexp option: #{err_str}" 
@@ -1120,7 +1154,7 @@ module MagRp # {
 	node = nil
 	begin
 	  str = argnode.strNodeValue
-	  rxlit = Regexp._new( str, o, nil)
+	  rxlit = Regexp.__new( str, o, nil)
 	  node = RubyRegexpNode.s(rxlit)
 	rescue RegexpError => ex
 	  regex_beg_tok = val[vofs]  # for tREGEXP_BEG
@@ -1131,7 +1165,7 @@ module MagRp # {
 	return node
       end
       if argnode.equal?(nil)
-	rxlit = Regexp._new('', o, nil)
+	rxlit = Regexp.__new('', o, nil)
 	node = RubyRegexpNode.s(rxlit)
 	return node
       end
@@ -1392,6 +1426,19 @@ module MagRp # {
 
     def backref_assign_error( a_val)  # method missing from rp202 code
       raise_error( "backref_assign_error" )
+    end
+
+    def string_to_symbol(str)
+      unless str._isString
+        raise_error('expected value to be a String')
+      end
+      if str.size.equal?(0)
+        yyerror( 'empty symbol literal' )
+      end
+      if str.__index(0, 0)._not_equal?(nil)
+        yyerror( 'symbol string may not contain `\\0\' ')
+      end
+      str.__as_symbol
     end
 
   end  # }

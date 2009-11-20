@@ -5,7 +5,7 @@ unless a == [ String, Enumerable, Comparable, Object, Kernel ]
 end
 
 a = String.class.ancestors
-unless a == [Class, Module, Behavior, Object, Kernel]
+unless a == [Class, Module, Object, Kernel]
   raise 'error'
 end
 

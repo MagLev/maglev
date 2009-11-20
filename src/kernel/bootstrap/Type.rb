@@ -45,7 +45,7 @@ module Type
   #    x :=  o _isInteger ifTrue:[ o ]
   #                 ifFalse:[ Type.coerce_to_Integer_to_int(o) ]
   #
-  def self.coerce_to_Array_to_ary(obj)
+  def self.__coerce_to_Array_to_ary(obj)
      begin
        ret = obj.to_ary
      rescue Exception => e
@@ -55,7 +55,7 @@ module Type
      return ret if ret._isArray
      raise TypeError, "Coercion error: obj.to_ary did NOT return an Array"
   end
-  def self.coerce_to_Array_to_ary_or_nil(obj)
+  def self.__coerce_to_Array_to_ary_or_nil(obj)
      begin
        ret = obj.to_ary
      rescue Exception 
@@ -66,7 +66,7 @@ module Type
   end
 
 
-  def self.coerce_to_Array_to_a(obj)
+  def self.__coerce_to_Array_to_a(obj)
      begin
        ret = obj.to_a
      rescue Exception => e
@@ -76,7 +76,7 @@ module Type
      return ret if ret._isArray
      raise TypeError, "Coercion error: obj.to_a did NOT return an Array"
   end
-  def self.coerce_to_Array_to_a_or_nil(obj)
+  def self.__coerce_to_Array_to_a_or_nil(obj)
      begin
        ret = obj.to_a
      rescue Exception 
@@ -86,7 +86,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_Fixnum_to_int(obj)
+  def self.__coerce_to_Fixnum_to_int(obj)
      begin
        ret = obj.to_int
      rescue Exception => e
@@ -96,7 +96,7 @@ module Type
      return ret if ret._isFixnum
      raise TypeError, "Coercion error: obj.to_int did NOT return an Fixnum"
   end
-  def self.coerce_to_Fixnum_to_int_or_nil(obj)
+  def self.__coerce_to_Fixnum_to_int_or_nil(obj)
      begin
        ret = obj.to_int
      rescue Exception 
@@ -106,12 +106,12 @@ module Type
      nil
   end
 
-  def self.coerce_to_Float_to_f(obj)
+  def self.__coerce_to_Float_to_f(obj)
      begin
        if obj._isString  
          # avoid String#to_f which returns 0.0 for non-numeric strings,
          #   or ignores trailing non-numeric chars
-         ret = obj._delete_underscore_strip._to_f
+         ret = obj.__delete_underscore_strip.__to_f
        else
          ret = obj.to_f
        end
@@ -128,12 +128,12 @@ module Type
      end
      raise TypeError, "Coercion error: obj.to_f did not return a Float"
   end
-  def self.coerce_to_Float_to_f_or_nil(obj)
+  def self.__coerce_to_Float_to_f_or_nil(obj)
      begin
        if obj._isString
          # avoid String#to_f which returns 0.0 for non-numeric strings,
          #   or ignores trailing non-numeric chars
-         ret = obj._delete_underscore_strip._to_f
+         ret = obj.__delete_underscore_strip.__to_f
        else
          ret = obj.to_f
        end
@@ -150,7 +150,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_Hash_to_hash(obj)
+  def self.__coerce_to_Hash_to_hash(obj)
      begin
        ret = obj.to_hash
      rescue Exception => e
@@ -160,7 +160,7 @@ module Type
      return ret if ret._isHash
      raise TypeError, "Coercion error: obj.to_hash did NOT return a Hash"
   end
-  def self.coerce_to_Hash_to_hash_or_nil(obj)
+  def self.__coerce_to_Hash_to_hash_or_nil(obj)
      begin
        ret = obj.to_hash
      rescue Exception
@@ -170,7 +170,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_Integer_to_i(obj)
+  def self.__coerce_to_Integer_to_i(obj)
      begin
        ret = obj.to_i
      rescue Exception => e
@@ -180,7 +180,7 @@ module Type
      return ret if ret._isInteger
      raise TypeError, "Coercion error: obj.to_i did NOT return an Integer"
   end
-  def self.coerce_to_Integer_to_i_or_nil(obj)
+  def self.__coerce_to_Integer_to_i_or_nil(obj)
      begin
        ret = obj.to_i
      rescue Exception
@@ -190,7 +190,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_Integer_to_int(obj)
+  def self.__coerce_to_Integer_to_int(obj)
      begin
        ret = obj.to_int
      rescue Exception => e
@@ -200,7 +200,7 @@ module Type
      return ret if ret._isInteger
      raise TypeError, "Coercion error: obj.to_int did NOT return an Integer"
   end
-  def self.coerce_to_Integer_to_int_or_nil(obj)
+  def self.__coerce_to_Integer_to_int_or_nil(obj)
      begin
        ret = obj.to_int
      rescue Exception
@@ -210,7 +210,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_String_to_s(obj)
+  def self.__coerce_to_String_to_s(obj)
      begin
        ret = obj.to_s
      rescue Exception => e
@@ -220,7 +220,7 @@ module Type
      return ret if ret._isString
      raise TypeError, "Coercion error: obj.to_s did NOT return a String"
   end
-  def self.coerce_to_String_to_s_or_nil(obj)
+  def self.__coerce_to_String_to_s_or_nil(obj)
      begin
        ret = obj.to_s
      rescue Exception
@@ -230,7 +230,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_String_to_str(obj)
+  def self.__coerce_to_String_to_str(obj)
      begin
        ret = obj.to_str
      rescue Exception => e
@@ -240,7 +240,7 @@ module Type
      return ret if ret._isString
      raise TypeError, "Coercion error: obj.to_str did NOT return a String"
   end
-  def self.coerce_to_String_to_str_or_nil(obj)
+  def self.__coerce_to_String_to_str_or_nil(obj)
      begin
        ret = obj.to_str
      rescue Exception
@@ -250,7 +250,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_Symbol_to_sym(obj)
+  def self.__coerce_to_Symbol_to_sym(obj)
      begin
        ret = obj.to_sym
      rescue Exception => e
@@ -260,7 +260,7 @@ module Type
      return ret if ret._isSymbol
      raise TypeError, "Coercion error: obj.to_sym did NOT return a Symbol"
   end
-  def self.coerce_to_Symbol_to_sym_or_nil(obj)
+  def self.__coerce_to_Symbol_to_sym_or_nil(obj)
      begin
        ret = obj.to_sym
      rescue Exception
@@ -270,7 +270,7 @@ module Type
      nil
   end
 
-  def self.coerce_to_string_or_integer(item)
+  def self.__coerce_to_string_or_integer(item)
     if item._isSymbol
       raise TypeError, 'cannot convert Symbol to String'
     else

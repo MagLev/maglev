@@ -20,19 +20,10 @@ class RpStringScanner
     @limit
   end
 
-  def initialize(string)
-    @string = string  # expect caller to pass a frozen string
-    sz = string.size
-    @limit = sz
+  # def initialize(string) ; end # in strscan2.rb
 
-    #  @cbytearray used to provide faster self[n]   access to single
-    #  bytes for large (>16Kbyte) strings , and to have single copy in
-    #  C memory usable by all Regexp searches during a compilation.
-    @cbytearray = FFI::CByteArray.with_string(string) 
-
-    # @mydebug = MagRp::debug > 2
-    self.reset
-  end
+  # replicate constant so it can be resolved at boot compile time in strscan2.rb
+  CByteArray = FFI::CByteArray 
 
   def set_pos_limit(pos, lim)
     @pos = pos
@@ -231,6 +222,14 @@ class RpStringScanner
 
   # see additional code in strscan2.rb
 end
-RpStringScanner._freeze_constants
+RpStringScanner.__freeze_constants
+
+class RubyLexer
+  # replicate some constants heavily used by lexer so they
+  #  can be resolved at bootstrap compile time
+  CTYPE_DIGIT = RpStringScanner::CTYPE_DIGIT
+  CTYPE_EOF = RpStringScanner::CTYPE_EOF
+  CTYPE_SIGN = RpStringScanner::CTYPE_SIGN
+end
 
 end  # MagRp

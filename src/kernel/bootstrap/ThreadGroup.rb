@@ -8,13 +8,18 @@ class ThreadGroup
   # def self.default; end #  returns the equivalent of  ThreadGroup::Default
   class_primitive_nobridge 'default', 'default'
 
-  class_primitive_nobridge 'new', 'new'
+  class_primitive_nobridge '__new', 'new'
+
+  def self.new(*args)
+    inst = self.__new
+    inst.initialize(*args)
+  end
 
   def add(thread)
     if @closed
       raise ThreadError,'cannot alter enclosed thread group'
     else
-      thread._join_group(self)
+      thread.__join_group(self)
     end
   end
 

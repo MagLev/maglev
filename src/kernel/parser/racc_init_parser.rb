@@ -1,5 +1,10 @@
 module MagRp # 
 
+  class Parser
+     Racc_reduce_n_negated = 0 - Racc_reduce_n
+  end
+  Parser.__freeze_constants
+
   class RubyParser
 
     def analyze_arr(arr, name)
@@ -60,14 +65,15 @@ module MagRp #
         if sym.equal?( :_reduce_none ) && reduc_tab[idx].equal?( 1 )
           new_sym = :_reduce_noneOne  # for "no net change to vstack" optimization
         else
-          new_sym = (sym.to_s << '::' )._as_symbol  # so we can use __perform__se
+          new_sym = (sym.to_s << '::' ).__as_symbol  # so we can use __perform__se
         end
         reduc_tab[idx + 2] = new_sym
         idx += 3
       end
       @reduce_table   = reduc_tab.freeze
 
-      id_h = IdentityHash.from_hash( arg[10] )
+      # GsMethodDictionary more efficient than IdentityHash for small dictionary
+      id_h = GsMethodDictionary.from_hash( arg[10] )  # arg[10] is racc_token_table
       id_h.freeze
       @token_table =  id_h 
 
@@ -135,8 +141,8 @@ module MagRp #
 #      }
 #    end
   end
-  RubyParser._freeze_constants
+  RubyParser.__freeze_constants
 
-  _smalltalk_global_put(:RubyParser , RubyParser)  # store into UserGlobals
+  __smalltalk_global_put(:RubyParser , RubyParser)  # store into UserGlobals
 
 end

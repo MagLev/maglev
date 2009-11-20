@@ -2,14 +2,23 @@ module FFI
 
   # The smalltalk implementation classes
   CLibrary = _resolve_smalltalk_global( :CLibrary )
+  class CLibrary
+    PersistentLibraries = []
+  end
+#  CLibrary.__freeze_constants
+
   CFunction = _resolve_smalltalk_global( :CFunction )
   CByteArray = _resolve_smalltalk_global( :CByteArray )
   CPointer = _resolve_smalltalk_global( :CPointer )
 
   #  Specialised error classes
-  class TypeError < RuntimeError; end
 
-  class NotFoundError < RuntimeError; end
+  # class TypeError < RuntimeError; end # don't define, specs are expecting ::TypeError
+
+  class NullPointerError < RuntimeError; end  # TODO, fix C prims to use NullPointerError
+					      #   instead of ::ArgumentError
+
+  class NotFoundError < LoadError; end
 
   class NativeError < LoadError; end
 
@@ -20,7 +29,7 @@ module FFI
   USE_THIS_PROCESS_AS_LIBRARY = nil
 
   # DEBUG , a dynamic constant in post_prims/ffi.rb  
-
+  
   module Platform
 
     OS = "" # you must use Config::CONFIG['host_os']
@@ -33,6 +42,7 @@ module FFI
                    #    or if '.' is last character of lib name. 
     LONG_SIZE = 64 # in bits
     ADDRESS_SIZE = 64
+    LIBC = 'libc'  # may need OS dependent logic eventually?
   end
 
   # tables used to translate arguments for primitives.
@@ -49,11 +59,16 @@ module FFI
       :size_t => :uint64 , 
       :long_long => :int64 ,
       :ulong_long => :uint64 ,
-#      :float  =>  :double ,  # not supported yet by CFunction primitives
+      # :float  =>  :xxxx # float not imple yet
       :double =>  :double ,
       :pointer => :ptr ,
+      :ptr => :ptr ,
+      :buffer_out => :ptr , # a CByteArray written into by C function
+      :buffer_in => :ptr  , # a CByteArray read by C function
+      :buffer_inout => :ptr  , # a CByteArray read/written by C function
       :void => :void ,
       :string => :'char*' ,
+      :'char*' => :'char*' ,
       :const_string => :'const char*'} )
 
 # Body of a  :const_string  argument is copied from object memory to C
@@ -76,53 +91,59 @@ module FFI
 
   StructAccessors = IdentityHash.from_hash( 
     # values are selectors for use with __perform_se
-    { :char =>  :'uint8at:' ,  :uchar => :'uint8at:' ,
-      :short => :'int16at:' , :ushort => :'uint16at:' ,
-      :int   => :'int32at:' , :uint => :'uint32at:' ,
-      :long  => :'int64at:' , :ulong => :'uint64at:' ,
-      :int8 =>  :'int8at:',  :uint8 => :'uint8at:' ,
-      :int16 => :'int16at:' , :uint16 => :'uint16at:' ,
-      :int32 => :'int32at:' , :uint32 => :'uint32at:' ,
+    { :char =>  :'get_uchar:' ,  :uchar => :'get_uchar:' ,
+      :short => :'get_short:' , :ushort => :'get_ushort:' ,
+      :int   => :'get_int:' , :uint => :'get_uint:' ,
+      :long  => :'get_long:' , :ulong => :'get_ulong:' ,
+      :int8 =>  :'int8at:',  :uint8 => :'get_uchar:' ,
+      :int16 => :'get_short:' , :uint16 => :'get_ushort:' ,
+      :int32 => :'get_int:' , :uint32 => :'get_uint:' ,
       :int64 => :'int64at:' , :uint64 => :'uint64at:' ,
       :size_t => :'uint64at:' ,
       :long_long => :'int64at:' ,
       :ulong_long => :'uint64at:' ,
   #    :float  =>  :double ,  
       :double =>  :'double_at:' ,
-  #   :pointer => :ptr ,
+      :ptr => :'__struct_pointer_at:',
   #   :void => :void ,
-  #   :string => :'char*' ,
+      :'char*' => :'char_star_at:' ,
+      :string => :'char_star_at:' ,
   #   :const_string => :'const char*' 
        } )
     
   StructSetters = IdentityHash.from_hash( 
    # values are selectors for use with __perform__se
-    { :char => :'int8_put::' ,  :uchar => :'int8_put::' ,
-      :short => :'int16_put::' , :ushort => :'int16_put::' ,
-      :int   => :'int32_put::' , :uint => :'int32_put::' ,
+    { :char => :'int8_put::' ,  :uchar => :'put_uchar::' ,
+      :short => :'put_short::' , :ushort => :'put_ushort::' ,
+      :int   => :'put_int::' , :uint => :'put_int::' ,
       :long  => :'int64_put::' , :ulong => :'int64_put::' ,
-      :int8 => :'int8_put::',  :uint8 => :'int8_put::' ,
-      :int16 => :'int16_put::' , :uint16 => :'int16_put::' ,
-      :int32 => :'int32_put::' , :uint32 => :'int32_put::' ,
+      :int8 => :'int8_put::',  :uint8 => :'put_uchar::' ,
+      :int16 => :'put_short::' , :uint16 => :'put_short::' ,
+      :int32 => :'put_int::' , :uint32 => :'put_int::' ,
       :int64 => :'int64_put::' , :uint64 => :'int64_put::' ,
       :size_t => :'int64_put::' ,
       :long_long => :'int64_put::' ,
       :ulong_long => :'int64_put::' ,
   #    :float  =>  :double ,  
       :double =>  :'double_put::' ,
-  #   :pointer => :ptr ,
+      :ptr => :'__pointer_at_put::' ,
   #   :void => :void ,
-  #   :string => :'char*' ,
+      :'char*' => :'char_star_put::'
   #   :const_string => :'const char*' 
        } )
 
   class Enums 
+    Persistent_Enums = []    
+    Persistent_NamedEnums = IdentityHash.new
+    Persistent_kv_map = IdentityHash.new
+
     def initialize
       raise 'instances of Enums not used yet'
     end
 
     # remainder in ffi_enum.rb
   end
+#  Enums.__freeze_constants
 
   class Enum
     def name
@@ -136,7 +157,7 @@ module FFI
     end
     alias to_h symbol_map
 
-    def _printable_name
+    def __printable_name
       n = @name
       if name.equal?(nil)
         'unnamed'
@@ -145,14 +166,14 @@ module FFI
       end
     end
 
-    def _vk_map
+    def __vk_map
       @vk_map
     end
 
     # remainder in ffi_enum.rb
   end
 
-  class MemoryPointer < CByteArray
+  class Pointer < CByteArray
     # define the fixed instvars 
     def initialize
       @type_size = 1
@@ -163,10 +184,13 @@ module FFI
       end
       @type_size = elem_size
     end
+    def __initialize(elem_size)
+      @type_size = elem_size
+    end
     def type_size
       @type_size
     end
-    def _type_size=(elem_size)
+    def __type_size=(elem_size)
       unless elem_size._isFixnum && elem_size > 0
         raise TypeError, 'element size must be a Fixnum > 0'
       end
@@ -176,24 +200,30 @@ module FFI
     # remainder of implementation in memorypointer.rb
   end
 
-  # subclasses of MemoryPointer
-  class AutoPointer < MemoryPointer
+  # subclasses of Pointer
+
+  class MemoryPointer < Pointer
+    # all behavior is in Pointer
+  end
+
+  class AutoPointer < Pointer
     # All Maglev MemoryPointer's have auto-free behavior unless
     #  auto-free explicitly disabled on an instance
   end
-  class Buffer < MemoryPointer
-    # remainder of implementation in buffer.rb
+  class Buffer < Pointer
+    # all behavior is in Pointer
   end
 
-  class Struct
+  class Struct < CByteArray
     # define the fixed instvars 
-    def initialize
-      ly =  self.class._layout
+    def __set_layout(ly)
       @layout = ly
-      @bytearray = CByteArray.gc_malloc(ly.size)
-    end
- 
+    end 
+
     # remainder of implementation in ffi_struct.rb
+  end
+
+  class Union < FFI::Struct # need FFI:: to properly resolve during bootstrap
   end
 
   class StructLayout
@@ -204,6 +234,7 @@ module FFI
       @members = []
       @offsets = []
       @sizes = []
+      @elem_sizes = [] # used for array elements
       @accessors = []
       @setters = []
       @totalsize = 0
@@ -213,7 +244,12 @@ module FFI
     # remainder of implementation in ffi_struct.rb
   end
 
+  class UnionLayout < StructLayout
+  end
+
   class Type
+    PersistentTypes = IdentityHash.new
+
     def initialize(a_sym, a_size, pt_sym)
       @name = a_sym
       @size = a_size # in bytes
@@ -223,6 +259,6 @@ module FFI
 
 end
 
-FFI._freeze_constants
+# FFI.__freeze_constants  # do not checkin as commented out
 
 # the rest of the FFI implementation is in file ffi2.rb

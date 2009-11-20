@@ -107,7 +107,7 @@ test((m & some_methods).sort, some_methods, "Object#methods 1")
 # This test creates an array with an instance of all the concrete classes
 # and then inspects it to make sure inspect is well defined on all Classes.
 #
-require 'socket'
+#require 'socket'
 x = [ [1,2,3],                    # Array
   999898989898989898989898989898, # Bignum
   binding,
@@ -118,8 +118,8 @@ x = [ [1,2,3],                    # Array
   Errno::EBADF,
   Exception.new,
   STDERR,                          # IO
-  File.open("/tmp/foo", "w+"),     # File
-  File.stat("/tmp"),               # FileStat
+  File.open(__FILE__, "r"),        # File
+  File.stat(__FILE__),             # FileStat
   10,                              # Fixnum
   10.4,                            # Float
   { "a" => 1},                     # Hash
@@ -133,7 +133,7 @@ x = [ [1,2,3],                    # Array
   Random.new,
   (0..4),
   /xyz/,
-#  TCPSocket.open('localhost', 7777),
+#  TCPSocket.open('localhost'),
   "a string",
   Struct.new(:foo, :bar),
   :a_symbol,

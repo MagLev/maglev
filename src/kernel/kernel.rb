@@ -36,7 +36,6 @@ RUBY.class.primitive 'global', 'installConstant:name:'
 
 RUBY.require 'kernel/bootstrap/Globals.rb'
 RUBY.require 'kernel/bootstrap/GlobalErrors.rb'
-RUBY.require 'kernel/bootstrap/Gemstone.rb'
 
 #
 # bootstrap
@@ -44,10 +43,11 @@ RUBY.require 'kernel/bootstrap/Gemstone.rb'
 RUBY.require 'kernel/bootstrap/Type.rb'
 RUBY.require 'kernel/bootstrap/Kernel.rb'
 RUBY.require 'kernel/bootstrap/Module.rb'
-RUBY.require 'kernel/bootstrap/Behavior.rb'
+# deleted Behavior.rb
 RUBY.require 'kernel/bootstrap/Class.rb'
 RUBY.require 'kernel/bootstrap/StClass.rb'
 RUBY.require 'kernel/bootstrap/Object.rb'
+RUBY.require 'kernel/bootstrap/System.rb'
 
 # deleted use of GsHelper.rb
 
@@ -102,9 +102,9 @@ RUBY.require 'kernel/bootstrap/File2.rb'
 RUBY.require 'kernel/bootstrap/RubyContext.rb'
 RUBY.require 'kernel/bootstrap/zlib_czstream.rb'
 RUBY.require 'kernel/bootstrap/Maglev.rb'
-RUBY.require 'kernel/bootstrap/TransientShortArray.rb'
 RUBY.require 'kernel/bootstrap/bigdecimal1.rb'
 RUBY.require 'kernel/bootstrap/bigdecimal.rb'
+RUBY.require 'kernel/bootstrap/Gprof.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
@@ -136,9 +136,14 @@ RUBY.require 'kernel/delta/Range.rb'
 RUBY.require 'kernel/delta/Process.rb'
 RUBY.require 'kernel/delta/purerubystringio.rb'
 RUBY.require 'kernel/delta/String.rb'
-RUBY.require 'kernel/delta/ffi.rb'
-RUBY.require 'kernel/delta/ffi2.rb'
-RUBY.require 'kernel/delta/ffi_struct.rb'
-# RUBY.require 'kernel/delta/ffi_enum.rb' # not used yet
-RUBY.require 'kernel/delta/memorypointer.rb'
-RUBY.require 'kernel/delta/buffer.rb'
+#
+# the parser loads it's own subset of FFI in env 2 ,
+# the smalltalk script for loading prims, sets MAGLEV_primLoadFFI for env 1 only
+if Maglev::System.session_temp( :MAGLEV_primLoadFFI )  
+  RUBY.require 'kernel/delta/ffi.rb'
+  RUBY.require 'kernel/delta/ffi2.rb'
+  RUBY.require 'kernel/delta/ffi_struct.rb'
+  RUBY.require 'kernel/delta/ffi_enum.rb'
+  RUBY.require 'kernel/delta/pointer.rb'
+  RUBY.require 'kernel/delta/buffer.rb'
+end

@@ -35,9 +35,20 @@ end
 test(`#{A_OUT} #{here}/lib/echo__FILE__`, "#{here}/lib/echo__FILE__\n", 'no .rb')
 
 # ############################################################
-# Ensure #" ($LOADED_FEATURES) is set correctly
+# Ensure -Mcommit and -Mpersistent start in the correct mode
 # ############################################################
+test(`#{A_OUT} -e 'p Maglev.persistent?'`, "false\n", 'default is transient mode')
+test(`#{A_OUT} -e 'p Maglev.transient?'`, "true\n",   'default is transient mode 2')
+
+test(`#{A_OUT} -Mpersistent -e 'p Maglev.persistent?'`, "true\n", '-Mpersistent')
+test(`#{A_OUT} -Mcommit -e 'p Maglev.persistent?'`, "true\n", '-Mcommit')
+test(`#{A_OUT} -Mpersistent -Mcommit -e 'p Maglev.persistent?'`, "true\n", '-Mcommit -Mpersistent')
 
 
-# ############################################################
+# Ensure -Mcommit and -Mpersistent start in the correct mode
+
+# Test -I works for -e
+# test(`#{A_OUT} -Ilib -e 'require "bar"' -e 'p $a_value'`, "987\n", '-I -e')
+
+
 report

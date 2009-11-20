@@ -15,51 +15,21 @@
 #
 # See classes Matrix and Vector for documentation. 
 #
+# Maglev - changes to optimize loops to be inline-loops where there was not a yield
+#          in the body of the loop.
 
 
-#require "e2mmap.rb"  # Maglev, e2mmap broken
+require "e2mmap.rb"  
 
- module ExceptionForMatrix # :nodoc:
-#  extend Exception2MessageMapper
-#  def_e2message(TypeError, "wrong argument type %s (expected %s)")
-#  def_e2message(ArgumentError, "Wrong # of arguments(%d for %d)")
-#  
-#  def_exception("ErrDimensionMismatch", "\#{self.name} dimension mismatch")
-#  def_exception("ErrNotRegular", "Not Regular Matrix")
-#  def_exception("ErrOperationNotDefined", "This operation(%s) can\\'t defined")
-
- class ErrDimensionMismatch < RuntimeError
-   def initialize(message=nil)
-     m = "dimension mismatch"
-     if message._isString
-       m << ", "
-       m << message
-     end
-     super(m)
-   end
- end
- class ErrNotRegular < RuntimeError
-   def initialize(message=nil)
-     m = "Not Regular Matrix"
-     if message._isString
-       m << ", "
-       m << message
-     end
-     super(m)
-   end
- end
- class ErrOperationNotDefined < RuntimeError
-   def initialize(message=nil)
-     m = "operation not defined"
-     if message._isString
-       m << ", "
-       m << message
-     end
-     super(m)
-   end
- end
+module ExceptionForMatrix # :nodoc:
+   extend Exception2MessageMapper
+   def_e2message(TypeError, "wrong argument type %s (expected %s)")
+   def_e2message(ArgumentError, "Wrong # of arguments(%d for %d)")
+   
+   def_exception("ErrDimensionMismatch", "\#{self.name} dimension mismatch")
+   def_exception("ErrNotRegular", "Not Regular Matrix")
+   def_exception("ErrOperationNotDefined", "This operation(%s) can\\'t defined")
 end
-
 
 #
 # The +Matrix+ class represents a mathematical matrix, and provides methods for creating
@@ -179,13 +149,24 @@ class Matrix
   #
   #
   def Matrix.columns(columns)
-    rows = (0 .. columns[0].size - 1).collect {
-      |i|
-      (0 .. columns.size - 1).collect {
-        |j|
-        columns[j][i]
-      }
-    }
+    #rows = (0 .. columns[0].size - 1).collect { |i|
+    #  (0 .. columns.size - 1).collect { |j|
+    #    columns[j][i]
+    #  }
+    #}
+    c_size = columns.size
+    czero = columns[0]
+    r_siz = czero.size
+    array_cls = Array
+    rows = array_cls.new(r_siz)
+    for i in 0..r_siz-1 do 
+      inner_res = array_cls.new(c_size)
+      for j in 0..c_size-1 do
+        inner_res[j] = columns[j][i]   
+      end
+      rows[i] = inner_res
+    end
+
     Matrix.rows(rows, false)
   end
   
@@ -198,13 +179,15 @@ class Matrix
   #
   def Matrix.diagonal(*values)
     size = values.size
-    rows = (0 .. size  - 1).collect {
-      |j|
-      row = Array.new(size).fill(0, 0, size)
+    array_cls = Array
+    # rows = (0 .. size  - 1).collect { |j| ... }
+    rows = array_cls.new(size)
+    for j in 0..size-1 do
+      row = array_cls.new(size).fill(0, 0, size)
       row[j] = values[j]
-      row
-    }
-    rows(rows, false)
+      rows[j] = row
+    end
+    self.rows(rows, false)
   end
   
   #
@@ -249,12 +232,13 @@ class Matrix
   #     => 4 5 6
   #
   def Matrix.row_vector(row)
+    matrix_cls = Matrix
     if row._isArray
-      Matrix.rows([row.dup], false)
+      matrix_cls.rows([row.dup], false)
     elsif row.kind_of?(Vector)
-      Matrix.rows([row.to_a], false)
+      matrix_cls.rows([row.to_a], false)
     else
-      Matrix.rows([[row]], false)
+      matrix_cls.rows([[row]], false)
     end
   end
   
@@ -267,12 +251,13 @@ class Matrix
   #        6
   #
   def Matrix.column_vector(column)
+    matrix_cls = Matrix
     if column._isArray
-      Matrix.columns([column])
+      matrix_cls.columns([column])
     elsif column.kind_of?( Vector )
-      Matrix.columns([column.to_a])
+      matrix_cls.columns([column.to_a])
     else
-      Matrix.columns([[column]])
+      matrix_cls.columns([[column]])
     end
   end
 
@@ -286,7 +271,12 @@ class Matrix
   
   def init_rows(rows, copy)
     if copy
-      @rows = rows.collect{|row| row.dup}
+      r_size = rows.size
+      c_rows = Array.new(r_size)
+      for i in 0..r_size-1 do
+        c_rows[i] = rows[i].dup
+      end
+      @rows = c_rows
     else
       @rows = rows
     end
@@ -298,7 +288,7 @@ class Matrix
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
   #
   def [](i, j)
-#   @rows[i][j]  # Maglev, fix ruby_bug "#1518", "1.9.1.129"
+    #  @rows[i][j]  # Maglev, fix ruby_bug "#1518", "1.9.1.129"
     elem = @rows[i]
     unless elem.equal?(nil)
       elem = elem[j]
@@ -349,11 +339,13 @@ class Matrix
         yield @rows[i][j]
       end
     else
-      col = (0 .. row_size - 1).collect {
-        |i|
-        @rows[i][j]
-      }
-      Vector.elements(col, false)
+      rows = @rows
+      r_size = rows.size
+      cols = Array.new(r_size)
+      for i in 0..r_size-1 do
+        cols[i] = rows[i][j]
+      end
+      Vector.elements(cols, false)
     end
   end
   
@@ -381,6 +373,7 @@ class Matrix
   #
   def minor(*param)
     psz = param.size
+    matrix_cls = Matrix
     if psz == 2
       from_row = param[0].first
       size_row = param[0].end - from_row
@@ -394,14 +387,27 @@ class Matrix
       from_col = param[2]
       size_col = param[3]
     else
-      Matrix.Raise ArgumentError, param.inspect
+      matrix_cls.Raise ArgumentError, param.inspect
     end
-    
-    rows = @rows[from_row, size_row].collect{
-      |row|
-      row[from_col, size_col]
-    }
-    Matrix.rows(rows, false)
+    # rows = @rows[from_row, size_row].collect{ |row|
+    #  row[from_col, size_col]
+    # }
+    my_rows = @rows
+    my_rows_size = my_rows.size
+    ridx = from_row
+#   if (ridx >= my_rows_size)
+#     raise ArgumentError, 'start_row out of bounds'
+#   end
+    r_lim = (ridx + size_row).__min(my_rows_size)
+    res_rows = Array.new(r_lim - ridx)
+    res_idx = 0 
+    while ridx < r_lim
+      a_row = my_rows[ridx]
+      res_rows[res_idx] = a_row[from_col, size_col]	
+      res_idx += 1
+      ridx += 1
+    end
+    matrix_cls.rows(res_rows, false)
   end
  
   #--
@@ -448,11 +454,12 @@ class Matrix
   # Not really intended for general consumption.
   #
   def compare_by_row_vectors(rows)
-    return false unless @rows.size == rows.size
+    my_rows = @rows
+    sz = my_rows.size 
+    return false unless sz == rows.size
     
-    0.upto(@rows.size - 1) do
-      |i|
-      return false unless @rows[i] == rows[i]
+    for i in 0..sz-1 do
+      return false unless my_rows[i] == rows[i]
     end
     true
   end
@@ -470,9 +477,13 @@ class Matrix
   #
   def hash
     value = 0
-    for row in @rows
-      for e in row
-        value ^= e.hash
+    my_rows = @rows
+    r_size = my_rows.size
+    for i in 0..r_size-1 do
+      a_row = my_rows[i]
+      a_size = a_row.size
+      for j in 0..a_size-1 do
+        value ^= a_row[j].hash
       end
     end
     return value
@@ -489,38 +500,60 @@ class Matrix
   #        6 8
   #
   def *(m) # m is matrix or vector or number
+    matrix_cls = Matrix
+    array_cls = Array
     if m._isNumeric
-      rows = @rows.collect {
-        |row|
-        row.collect {
-          |e|
-          e * m
-        }
-      }
-      return Matrix.rows(rows, false)
+      # rows = @rows.collect { |row|
+      #   row.collect { |e| e * m }
+      # }
+      my_rows = @rows
+      my_rows_size = my_rows.size
+      rows = array_cls.new(my_rows_size)
+      for i in 0..my_rows_size-1 do
+        row = my_rows[i]
+        r_size = row.size
+        res_row = array_cls.new(r_size)
+        for j in 0..r_size-1 do
+          res_row[j] = row[j] * m
+        end
+        rows[i] = res_row
+      end
+      return matrix_cls.rows(rows, false)
     elsif m.kind_of?( Vector )
-      m = Matrix.column_vector(m)
+      m = matrix_cls.column_vector(m)
       r = self * m
       return r.column(0)
-    elsif m.kind_of?( Matrix )
-      Matrix.Raise ErrDimensionMismatch if column_size != m.row_size
-    
-      rows = (0 .. row_size - 1).collect {
-        |i|
-        (0 .. m.column_size - 1).collect {
-          |j|
+    elsif m.kind_of?( matrix_cls )
+      # Matrix.Raise ErrDimensionMismatch if column_size != m.row_size
+      # rows = (0 .. row_size - 1).collect { |i|
+      #   (0 .. m.column_size - 1).collect { |j|
+      #     vij = 0
+      #     0.upto(column_size - 1) { |k| vij += self[i, k] * m[k, j] }
+      #     vij
+      #   }
+      # }
+      my_column_size = self.column_size
+      other_column_size = m.column_size
+      matrix_cls.Raise ErrDimensionMismatch if my_column_size != m.row_size
+      my_rows = @rows
+      my_rows_size = my_rows.size
+      rows = array_cls.new(my_rows_size)
+      for i in 0..my_rows_size-1 do
+        res_row = array_cls.new(other_column_size)
+        for j in 0..other_column_size-1 do
           vij = 0
-          0.upto(column_size - 1) do
-            |k|
-            vij += self[i, k] * m[k, j]
+          for k in 0..my_column_size-1 do
+            vij += self[i, k] * m[k, j]	
           end
           vij
-        }
-      }
-      return Matrix.rows(rows, false)
+          res_row[j] = vij
+        end
+        rows[i] = res_row
+      end
+      return matrix_cls.rows(rows, false)
     else
-      x, y = m.coerce(self)
-      return x * y
+      cr = m.coerce(self)
+      return cr[0] * cr[1]
     end
   end
   
@@ -531,27 +564,37 @@ class Matrix
   #        -4 12
   #
   def +(m)
+    matrix_cls = Matrix
     if m._isNumeric
-      Matrix.Raise ErrOperationNotDefined, "+"
-    elsif m.kind_of?(Matrix)
+      matrix_cls.Raise ErrOperationNotDefined, "+"
+    elsif m.kind_of?(matrix_cls)
       # no coercion
     elsif m.kind_of?(Vector)
-      m = Matrix.column_vector(m)
+      m = matrix_cls.column_vector(m)
     else
-      x, y = m.coerce(self)
-      return x + y
+      cr = m.coerce(self)
+      return cr[0] | cr[1]
     end
     
-    Matrix.Raise ErrDimensionMismatch unless row_size == m.row_size and column_size == m.column_size
-    
-    rows = (0 .. row_size - 1).collect {
-      |i|
-      (0 .. column_size - 1).collect {
-        |j|
-        self[i, j] + m[i, j]
-      }
-    }
-    Matrix.rows(rows, false)
+    my_rows = @rows
+    my_rows_size = my_rows.size
+    my_column_size = self.column_size
+
+    matrix_cls.Raise ErrDimensionMismatch unless my_rows_size == m.row_size and my_column_size == m.column_size
+    #rows = (0 .. row_size - 1).collect { |i|
+    #  (0 .. column_size - 1).collect { |j|
+    #    self[i, j] + m[i, j]
+    #  }
+    array_cls = Array
+    rows = array_cls.new(my_rows_size)
+    for i in 0..my_rows_size-1 do
+      a_row = array_cls.new(my_column_size)
+      for j in 0..my_column_size-1 do
+        a_row[j] = self[i, j] + m[i, j]
+      end
+      rows[i] = a_row
+    end
+    matrix_cls.rows(rows, false)
   end
 
   #
@@ -561,27 +604,39 @@ class Matrix
   #         8  1
   #
   def -(m)
+   matrix_cls = Matrix
     if m._isNumeric
-      Matrix.Raise ErrOperationNotDefined, "-"
-    elsif m.kind_of?(Matrix)
+      matrix_cls.Raise ErrOperationNotDefined, "-"
+    elsif m.kind_of?(matrix_cls)
       # no coercion
     elsif m.kind_of?(Vector)
-      m = Matrix.column_vector(m)
+      m = matrix_cls.column_vector(m)
     else
-      x, y = m.coerce(self)
-      return x - y
+      cr = m.coerce(self)
+      return cr[0] - cr[1]
     end
+
+    my_rows = @rows
+    my_rows_size = my_rows.size
+    my_column_size = self.column_size
     
-    Matrix.Raise ErrDimensionMismatch unless row_size == m.row_size and column_size == m.column_size
+    matrix_cls.Raise ErrDimensionMismatch unless my_rows_size == m.row_size and my_column_size == m.column_size
     
-    rows = (0 .. row_size - 1).collect {
-      |i|
-      (0 .. column_size - 1).collect {
-        |j|
-        self[i, j] - m[i, j]
-      }
-    }
-    Matrix.rows(rows, false)
+    #rows = (0 .. row_size - 1).collect { |i|
+    #  (0 .. column_size - 1).collect { |j|
+    #    self[i, j] - m[i, j]
+    #  }
+    #}
+    array_cls = Array
+    rows = array_cls.new(my_rows_size)
+    for i in 0..my_rows_size-1 do
+      a_row = array_cls.new(my_column_size)
+      for j in 0..my_column_size-1 do
+        a_row[j] = self[i, j] - m[i, j]
+      end
+      rows[i] = a_row
+    end
+    matrix_cls.rows(rows, false)
   end
   
   #
@@ -591,20 +646,30 @@ class Matrix
   #        -3 -6
   #
   def /(other)
+    matrix_cls = Matrix
     if other._isNumeric
-      rows = @rows.collect {
-        |row|
-        row.collect {
-          |e|
-          e / other
-        }
-      }
-      return Matrix.rows(rows, false)
-    elsif other.kind_of?(Matrix)
+      # rows = @rows.collect { |row|
+      #   row.collect { |e| e / other }
+      # }
+      array_cls = Array
+      my_rows = @rows
+      my_rows_size = my_rows.size
+      rows = array_cls.new(my_rows_size)
+      for i in 0..my_rows_size-1 do
+        row = my_rows[i]
+        r_size = row.size
+        res_row = array_cls.new(r_size)
+        for j in 0..r_size-1 do
+          res_row[j] = row[j] / other 
+        end
+        rows[i] = res_row
+      end
+      return matrix_cls.rows(rows, false)
+    elsif other.kind_of?(matrix_cls)
       return self * other.inverse
     else
-      x, y = other.coerce(self)
-      rerurn x / y
+      cr = other.coerce(self)
+      rerurn cr[0] / cr[1]
     end
   end
 
@@ -627,6 +692,7 @@ class Matrix
     size = row_size - 1
     a = src.to_a
     
+    my_rows = @rows
     for k in 0..size
       if (akk = a[k][k]) == 0
         i = k
@@ -634,7 +700,7 @@ class Matrix
           Matrix.Raise ErrNotRegular if (i += 1) > size
         end while a[i][k] == 0
         a[i], a[k] = a[k], a[i]
-        @rows[i], @rows[k] = @rows[k], @rows[i]
+        my_rows[i], my_rows[k] = my_rows[k], my_rows[i]
         akk = a[k][k]
       end
       
@@ -643,23 +709,31 @@ class Matrix
         q = a[i][k] / akk
         a[i][k] = 0
         
-        (k + 1).upto(size) do   
-          |j|
+        #(k + 1).upto(size) do
+        j = k + 1
+        while j <= size 
           a[i][j] -= a[k][j] * q
+          j += 1
         end
-        0.upto(size) do
-          |j|
-          @rows[i][j] -= @rows[k][j] * q
+        # 0.upto(size) do
+        j = 0
+        while j <= size
+          my_rows[i][j] -= my_rows[k][j] * q
+          j += 1
         end
       end
       
-      (k + 1).upto(size) do
-        |j|
+      #(k + 1).upto(size) do
+      j = k + 1
+      while j <= size
         a[k][j] /= akk
+        j += 1
       end
-      0.upto(size) do
-        |j|
-        @rows[k][j] /= akk
+      # 0.upto(size) do
+      j = 0
+      while j <= size
+        my_rows[k][j] /= akk
+        j += 1
       end
     end
     self
@@ -728,13 +802,17 @@ class Matrix
         akk = a[k][k]
         det *= -1
       end
-      (k + 1).upto(size) do
-        |i|
-         q = a[i][k] / akk  # with mathn , #/  produces Rationals, etc, otherwise truncates ...
-        (k + 1).upto(size) do
-          |j|
+      # (k + 1).upto(size) do
+      i = k + 1
+      while i <= size
+        q = a[i][k] / akk  # with mathn , #/  produces Rationals, etc, otherwise truncates ...
+        # (k + 1).upto(size) do
+        j = k + 1
+        while j <= size
           a[i][j] -= a[k][j] * q
+          j += 1
         end
+        i += 1
       end
       det *= akk
     end while (k += 1) <= size
@@ -784,9 +862,11 @@ class Matrix
             end
           end while a[k][i] == 0
           if exists
-            k.upto(a_column_size - 1) do
-              |j|
+            # k.upto(a_column_size - 1) do
+            j = k
+            while j < a_column_size
               a[j][k], a[j][i] = a[j][i], a[j][k]
+              j += 1
             end
             akk = a[k][k]
           else
@@ -794,13 +874,17 @@ class Matrix
           end
         end
       end
-      (k + 1).upto(a_row_size - 1) do
-        |i|
+      # (k + 1).upto(a_row_size - 1) do
+      i = k + 1
+      while i < a_row_size
         q = a[i][k] / akk
-        (k + 1).upto(a_column_size - 1) do
-          |j|
+        # (k + 1).upto(a_column_size - 1) do
+        j = k + 1
+        while j < a_column_size
           a[i][j] -= a[k][j] * q
+          j += 1
         end
+        i += 1
       end
       rank += 1
     end while (k += 1) <= a_column_size - 1
@@ -814,9 +898,11 @@ class Matrix
   #
   def trace
     tr = 0
-    0.upto(column_size - 1) do
-      |i|
-      tr += @rows[i][i]
+    # 0.upto(column_size - 1) do
+    my_rows = @rows
+    col_size = my_rows[0].size 
+    for i in 0..col_size-1 do 
+      tr += my_rows[i][i]
     end
     tr
   end
@@ -856,29 +942,51 @@ class Matrix
   # Returns an array of the row vectors of the matrix.  See Vector.
   #
   def row_vectors
-    rows = (0 .. row_size - 1).collect {
-      |i|
-      row(i)
-    }
-    rows
+    # (0 .. row_size - 1).collect { |i| row(i) }
+    my_rows = @rows
+    r_size = my_rows.size
+    res = Array.new(r_size)
+    vector_cls = Vector
+    for i in 0..r_size-1 do
+      a_row = my_rows[i]
+      res[i] = vector_cls.elements(a_row) 
+    end
+    res
   end
   
   #
   # Returns an array of the column vectors of the matrix.  See Vector.
   #
   def column_vectors
-    columns = (0 .. column_size - 1).collect {
-      |i|
-      column(i)
-    }
-    columns
+    # (0 .. column_size - 1).collect { |i| column(i) }
+    my_rows = @rows
+    r_size = my_rows.size
+    col_size = my_rows[0].size
+    vector_cls = Vector
+    array_cls = Array
+    res = array_cls.new(col_size)
+    for j in 0..col_size-1 do
+      a_col = array_cls.new(r_size)
+      for i in 0..r_size-1 do
+        a_col[i] = my_rows[i][j]
+      end
+      res[j] = Vector.elements(a_col, false)
+    end
+    res
   end
   
   #
   # Returns an array of arrays that describe the rows of the matrix.
   #
   def to_a
-    @rows.collect{|row| row.collect{|e| e}}
+    # @rows.collect{|row| row.collect{|e| e}}  
+    my_rows = @rows
+    r_size = my_rows.size
+    res = Array.new(r_size)
+    for i in 0..r_size-1 do
+      res[i] = my_rows[i].dup
+    end
+    res
   end
   
   #--
@@ -891,7 +999,7 @@ class Matrix
   def to_s
     "Matrix[" + @rows.collect{
       |row|
-      "[" + row.collect{|e| e.to_s}.join(", ") + "]"
+      "[" + row.collect{|e| e.to_s}.join(", ") + "]"  # no yield
     }.join(", ")+"]"
   end
   
@@ -921,8 +1029,8 @@ class Matrix
       elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
         scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
       else
-        x, y = other.coerce(self)
-        x + y
+        cr = other.coerce(self)
+        cr[0] + cr[1] 
       end
     end
     
@@ -935,8 +1043,8 @@ class Matrix
       elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
         scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
       else
-        x, y = other.coerce(self)
-        x - y
+        cr = other.coerce(self)
+        cr[0] - cr[1]
       end
     end
     
@@ -949,8 +1057,8 @@ class Matrix
       elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
         other.collect{|e| @value * e}
       else
-        x, y = other.coerce(self)
-        x * y
+        cr = other.coerce(self)
+        cr[0] * cr[1]
       end
     end
     
@@ -965,8 +1073,8 @@ class Matrix
       elsif other.kind_of?( Matrix)
         self * other.inverse
       else
-        x, y = other.coerce(self)
-        x / y
+        cr = other.coerce(self)
+        cr[0] / cr[1]
       end
     end
     
@@ -981,8 +1089,8 @@ class Matrix
       elsif other.kind_of?( Matrix)
         other.powered_by(self)
       else
-        x, y = other.coerce(self)
-        x ** y
+        cr = other.coerce(self)
+        cr[0] ** cr[1]
       end
     end
   end
@@ -1093,11 +1201,12 @@ class Vector
   # Iterate over the elements of this vector and +v+ in conjunction.
   #
   def each2(v) # :yield: e1, e2
-    Vector.Raise ErrDimensionMismatch if size != v.size
-    0.upto(size - 1) do
+    my_size = size
+    Vector.Raise ErrDimensionMismatch if my_size != v.size
+    0.upto(my_size - 1) do
       |i|
       yield @elements[i], v[i]
-    end
+    end 
   end
   
   #
@@ -1105,11 +1214,12 @@ class Vector
   # in conjunction.
   #
   def collect2(v) # :yield: e1, e2
-    Vector.Raise ErrDimensionMismatch if size != v.size
-    (0 .. size - 1).collect do
+    my_size = size
+    Vector.Raise ErrDimensionMismatch if my_size != v.size
+    (0 .. my_size - 1).collect do
       |i|
       yield @elements[i], v[i]
-    end
+    end 
   end
 
   #--
@@ -1156,13 +1266,23 @@ class Vector
   #
   def *(x)
     if x._isNumeric
-      els = @elements.collect{|e| e * x}
+      # els = @elements.collect{|e| e * x}  
+      my_elems = @elements
+      e_size = my_elems.size
+      els = Array.new(e_size)
+      for i in 0..e_size-1 do
+        els[i] = my_elems[i] * x
+      end
+
       Vector.elements(els, false)
-    elsif x.kind_of?( Matrix)
-      Matrix.column_vector(self) * x
     else
-      s, x = x.coerce(self)
-      s * x
+      matrix_cls = Matrix
+      if x.kind_of?( matrix_cls )
+        matrix_cls.column_vector(self) * x
+      else
+        cr = x.coerce(self)
+        cr[0] * cr[1]
+      end
     end
   end
 
@@ -1170,18 +1290,27 @@ class Vector
   # Vector addition.
   #
   def +(v)
-    if v.kind_of?( Vector)
-      Vector.Raise ErrDimensionMismatch if size != v.size
-      els = collect2(v) {
-        |v1, v2|
-        v1 + v2
-      }
-      Vector.elements(els, false)
-    elsif v.kind_of?( Matrix)
-      Matrix.column_vector(self) + v
+    vector_cls = Vector
+    if v.kind_of?( vector_cls)
+      # els = collect2(v) {  |v1, v2| v1 + v2 }
+      elems = @elements
+      my_size = elems.size
+      other_size = v.size
+      vector_cls.Raise ErrDimensionMismatch if my_size != other_size
+      els = Array.new(my_size)
+      for i in 0..my_size-1 do
+        els[i] = elems[i] + v[i]
+      end
+
+      vector_cls.elements(els, false)
     else
-      s, x = v.coerce(self)
-      s + x
+      matrix_cls = Matrix
+      if v.kind_of?( matrix_cls )
+        matrix_cls.column_vector(self) + v
+      else
+        cr = v.coerce(self)
+        cr[0] + cr[1]
+      end
     end
   end
 
@@ -1189,19 +1318,27 @@ class Vector
   # Vector subtraction.
   #
   def -(v)
-    case v
-    when Vector
-      Vector.Raise ErrDimensionMismatch if size != v.size
-      els = collect2(v) {
-        |v1, v2|
-        v1 - v2
-      }
-      Vector.elements(els, false)
-    when Matrix
-      Matrix.column_vector(self) - v
+    vector_cls = Vector
+    if v.kind_of?( vector_cls )
+      # els = collect2(v) { |v1, v2| v1 - v2 }
+      elems = @elements
+      my_size = elems.size
+      other_size = v.size
+      vector_cls.Raise ErrDimensionMismatch if my_size != other_size
+      els = Array.new(my_size)
+      for i in 0..my_size-1 do
+        els[i] = elems[i] - v[i]
+      end
+
+      vector_cls.elements(els, false)
     else
-      s, x = v.coerce(self)
-      s - x
+      matrix_cls = Matrix
+      if v.kind_of?( matrix_cls )
+        matrix_cls.column_vector(self) - v
+      else
+        cr = v.coerce(self)
+        cr[0] - cr[1]
+      end 
     end
   end
   
@@ -1214,13 +1351,17 @@ class Vector
   #   Vector[4,7].inner_product Vector[10,1]  => 47
   #
   def inner_product(v)
-    Vector.Raise ErrDimensionMismatch if size != v.size
-    
     p = 0
-    each2(v) {
-      |v1, v2|
-      p += v1 * v2
-    }
+
+    # each2(v) { |v1, v2| p += v1 * v2 }
+    elems = @elements
+    my_size = elems.size
+    other_size = v.size
+    Vector.Raise ErrDimensionMismatch if my_size != other_size
+    for i in 0..my_size-1 do
+      p += elems[i] * v[i]
+    end
+
     p
   end
   
@@ -1228,11 +1369,17 @@ class Vector
   # Like Array#collect.
   #
   def collect # :yield: e
-    els = @elements.collect {
-      |v|
-      yield v
-    }
-    Vector.elements(els, false)
+    elems = @elements
+    sz = elems.size
+    res = []
+    i = 0
+    lim = sz - 1
+    while i < lim
+      res << yield(elems[i])
+       i += 1
+    end
+    res
+    Vector.elements(res, false)
   end
   alias map collect
   
@@ -1253,8 +1400,12 @@ class Vector
   #
   def r
     v = 0
-    for e in @elements
-      v += e*e
+    # for e in @elements ; v += e*e ; end
+    my_elems = @elements
+    my_size = my_elems.size
+    for i in 0..my_size-1 do
+      e = my_elems[i]
+      v += e * e
     end
     return Math.sqrt(v)
   end

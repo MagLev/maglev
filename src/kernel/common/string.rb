@@ -1,9 +1,9 @@
 class String
-  primitive '_splice', 'copyReplaceFrom:to:with:'
+  primitive '__splice', 'copyReplaceFrom:to:with:'
 
   # This is a rubinius helper function
   def splice!(start, count, replacement)
-    replace _splice(start+1, start+count, replacement)
+    replace __splice(start+1, start+count, replacement)
   end
 
 
@@ -70,7 +70,7 @@ class String
   
   def _scan(pattern)
     # taint = self.tainted? || pattern.tainted? # Maglev, no taint propagation
-    pattern = self._get_pattern(pattern, true)
+    pattern = self.__get_pattern(pattern, true)
     index = 0
     last_match = nil
     ret = []
@@ -83,16 +83,16 @@ class String
       ret << val
     end
 
-    last_match._storeRubyVcGlobal(0x30) # store into caller's $~
+    last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
     return ret
   end
 
   def _scan(pattern, &block)
     # second variant gets no bridge methods. can't rely on single
-    # implementation with bridge methods when using _storeRubyVcGlobal
+    # implementation with bridge methods when using __storeRubyVcGlobal
     # because number of frames up to caller's frame would vary .
     # taint = self.tainted? || pattern.tainted? # Maglev, no taint propagation
-    pattern = self._get_pattern(pattern, true)
+    pattern = self.__get_pattern(pattern, true)
     index = 0
     last_match = nil
     if block_given?
@@ -103,7 +103,7 @@ class String
         val = (match.length.equal?(1) ? match[0] : match.captures)
         # val.taint if taint # Maglev, no taint propagation
 
-        last_match._storeRubyVcGlobal(0x30) # store into caller's $~
+        last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
         yield(val)
       end
     else
@@ -118,7 +118,7 @@ class String
       end
     end
 
-    last_match._storeRubyVcGlobal(0x30) # store into caller's $~
+    last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
     return ret
   end
 

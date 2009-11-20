@@ -21,7 +21,7 @@ class BigDecimal
 
   def self.induced_from(obj) 
     if obj._isInteger
-      self._from_integer(obj)
+      self.__from_integer(obj)
     elsif obj.kind_of?(BigDecimal)
       obj
     else
@@ -49,30 +49,30 @@ class BigDecimal
   # private Accessors
   ###############################
 
-  def _kind
+  def __kind
     @special  # a Fixnum, 0 for finite, 1 for infinite, 2 for nan
   end
 
-  def _digits
+  def __digits
     @digits  # a Fixnum or Bignum 
   end
 
-  def _exp
+  def __exp
     @exp # a Fixnum , the power of 10 by which to multiply @digits
          # to get the actual value.
          # A value of 0 means that @digits is the integer part
          #   of the BigDecimal and the fractional part is zero.
   end
 
-  def _sign
+  def __sign
     @sign  # a Fixnum -1 or 1 
   end
 
-  def _add_to_exp(v)
+  def __add_to_exp(v)
     @exp = @exp + v
   end
 
-  def _precs
+  def __precs
     @precs # number of digits of precision , always > 0 
   end
 
@@ -90,7 +90,7 @@ class BigDecimal
     e = @exp
     digs = @digits
     unless digs == 0
-      e += digs._decimal_digits_length_approx(false)
+      e += digs.__decimal_digits_length_approx(false)
     end
     e
   end
@@ -146,7 +146,7 @@ class BigDecimal
 
   def precs
     if @special.equal?(0)
-      sigfigs = @digits._decimal_digits_length_approx(false)
+      sigfigs = @digits.__decimal_digits_length_approx(false)
       p = @precs
       if p.equal?(0)
         p = sigfigs + 10
@@ -162,15 +162,15 @@ class BigDecimal
   # Constructors and initializers
   ###############################
 
-  def self._nan
+  def self.__nan
     if RAISE_on_NaN
       raise FloatDomainError , 'result would be a NaN'
     end 
     res = self.allocate
-    res._init_nan
+    res.__init_nan
   end
 
-  def _init_nan
+  def __init_nan
     @special = 2 
     @precs = UNLIM_PRECISION
     @sign = 1
@@ -180,15 +180,15 @@ class BigDecimal
     self
   end
 
-  def self._infinity(sign)
+  def self.__infinity(sign)
     if RAISE_on_INF
       raise FloatDomainError , 'result would be infinite'
     end 
     res = self.allocate
-    res._init_infinity(sign)
+    res.__init_infinity(sign)
   end
 
-  def _init_infinity(sign_arg)
+  def __init_infinity(sign_arg)
     @special = 1
     @sign = sign_arg
     @precs = UNLIM_PRECISION
@@ -198,7 +198,7 @@ class BigDecimal
     self
   end
 
-  def _init_zero(sign_arg)
+  def __init_zero(sign_arg)
     @special = 0
     @sign = sign_arg
     @precs = UNLIM_PRECISION
@@ -208,17 +208,17 @@ class BigDecimal
     self
   end
 
-  def self._zero(sign)
+  def self.__zero(sign)
     res = self.allocate
-    res._init_zero(sign)
+    res.__init_zero(sign)
   end
 
-  def self._from_integer(val)
+  def self.__from_integer(val)
     res = self.allocate
-    res._init_from_integer(val)
+    res.__init_from_integer(val)
   end
 
-  def _init_from_integer(val)
+  def __init_from_integer(val)
     @special = 0
     if val < 0
       @sign = -1
@@ -226,8 +226,8 @@ class BigDecimal
     else
       @sign = 1
     end
-    nd = val._decimal_digits_length_approx(true)
-    arr = _reduce_trailing_zeros(val)
+    nd = val.__decimal_digits_length_approx(true)
+    arr = __reduce_trailing_zeros(val)
     digs = arr[0]
     exp =  arr[1]  # number of trailing zeros removed
     unless exp._isFixnum
@@ -239,14 +239,14 @@ class BigDecimal
     self
   end
 
-  def self._from_float(val)
+  def self.__from_float(val)
     res = self.allocate
-    res._init_from_float(val)
+    res.__init_from_float(val)
   end
 
-  def _init_from_float(flt)
+  def __init_from_float(flt)
     if flt.finite?
-      str = flt._as_string  # Smalltalk print format sd.ddddEsee
+      str = flt.__as_string  # Smalltalk print format sd.ddddEsee
       len = str.length
       exp_idx = len
       exp_done = false
@@ -281,7 +281,7 @@ class BigDecimal
       mant_str[0] = ch
       idx += 2 # skip the two chars 'd.'  
       mant_str << str[idx , exp_idx - idx]
-      digs = Integer._from_string(mant_str)
+      digs = Integer.__from_string(mant_str)
       @digits = digs
       exp += 1 #  flt._as_string produced  d.dddEee , convert to 0.ddddEee for BigDecimal
       exp -= mant_str.length  #  so @digits is an Integer
@@ -290,14 +290,14 @@ class BigDecimal
       @special = 0
       @precs = 16  # 16 is the limit of 8 byte IEEE float 
     elsif flt.infinite?
-      self._init_infinity( flt > 0.0 ? 1 : -1)
+      self.__init_infinity( flt > 0.0 ? 1 : -1)
     else
-      self._init_nan
+      self.__init_nan
     end
     self
   end
 
-  def _init_normal( res_sign, res_digits, res_exp)
+  def __init_normal( res_sign, res_digits, res_exp)
     unless res_exp._isFixnum
       raise FloatDomainError, 'exponent of a BigDecimal exceeds Fixnum range'
     end
@@ -312,8 +312,8 @@ class BigDecimal
     self
   end
 
-  def _set_precision( p )
-    # a separate method from _init_normal, since Maglev has a max of 3 non-array
+  def __set_precision( p )
+    # a separate method from __init_normal, since Maglev has a max of 3 non-array
     # args to a method, without incurring bridge method or argument wrapping overhead.
     @precs = p
     self
@@ -334,15 +334,15 @@ class BigDecimal
       sgn = -1
     end
     if first_ch.equal?( ?N ) && v == "NaN"
-      self._init_nan
+      self.__init_nan
       return
     elsif first_ch.equal?( ?I ) && v =~ /^[-+]?Infinity$/
-      self._init_infinity(sgn)
+      self.__init_infinity(sgn)
       return
     end
     @sign = sgn
     @special = 0 
-    v = v._delete_underscore
+    v = v.__delete_underscore
     m = /^\s*(([-+]?)(\d*)(?:\.(\d*))?(?:[EeDd]([-+]?\d+))?).*$/.match(v)
     mant = 0
     expon = 0
@@ -366,14 +366,14 @@ class BigDecimal
 	  frlen = fend_idx + 1
 	end
 	frac_prefix_str = frac_str[0, frlen] # without trailing zeros
-	frac = i_cls._from_string( frac_prefix_str )
+	frac = i_cls.__from_string( frac_prefix_str )
       end
       int_str = m[3]
       nd_int = int_str.length
       if nd_int.equal?(0) 
         int = 0
       elsif int_str[0].equal?( ?0 )
-        int = i_cls._from_string( int_str ) # leading zero digit
+        int = i_cls.__from_string( int_str ) # leading zero digit
       else
         j = nd_int - 1
         if frac_str.equal?(nil)
@@ -383,10 +383,10 @@ class BigDecimal
             j -= 1
           end
         end
-        int = i_cls._from_string( int_str[0, j+1] )
+        int = i_cls.__from_string( int_str[0, j+1] )
       end
       exp_str =  m[5]
-      expon +=  exp_str.equal?(nil) ? 0 : i_cls._from_string(  exp_str )
+      expon +=  exp_str.equal?(nil) ? 0 : i_cls.__from_string(  exp_str )
       if int == 0 && frac != 0   
         expon -= frlen # adjust for decimal point at rhs of internal digits
 	# adjust precision for number of leading zeros in fraction
@@ -398,7 +398,7 @@ class BigDecimal
       elsif frac_prefix_str._not_equal?(nil)
 	# multiply int by 10**frac_prefix_str.length
 	count = frac_prefix_str.length
-	int = _multiply_by_tenpower(int, count)
+	int = __multiply_by_tenpower(int, count)
 	expon -= count
       end 
       mant = int + frac
@@ -451,9 +451,9 @@ class BigDecimal
     val = @digits
     if exp._not_equal?(0) 
       if exp > 0
-        val = _multiply_by_tenpower(val, exp)
+        val = __multiply_by_tenpower(val, exp)
       else
-        val = _divide_by_tenpower(val, 0 - exp)
+        val = __divide_by_tenpower(val, 0 - exp)
       end
     end
     if @sign._not_equal?(1)
@@ -575,9 +575,9 @@ class BigDecimal
 
   def coerce(other)
     if other._isInteger
-      [ BigDecimal._from_integer(other), self ]
+      [ BigDecimal.__from_integer(other), self ]
     elsif other._isFloat
-      [ BigDecimal._from_float(other), self]
+      [ BigDecimal.__from_float(other), self]
     elsif other.kind_of?(BigDecimal)
       [other, self]
     elsif other._isNumeric
@@ -587,7 +587,7 @@ class BigDecimal
     end
   end
 
-  def _reduce_precis_by(an_integer, reduction)
+  def __reduce_precis_by(an_integer, reduction)
     # reduction is a negative number
     #   reduction is the number of l.s. digits to delete
     # returns an_integer divided by the requisite power of 10  .
@@ -595,18 +595,18 @@ class BigDecimal
     count = reduction
     if count > 9
       p = count - 9
-      val = val._divide( 10._raised_to( p ))
+      val = val.__divide( 10.__raised_to( p ))
       count -= p                # count now 9
     end
     if count > 0
-      divisor = 10._raised_to( count )
-      arr = val._quo_rem( divisor , [ nil, nil ] )
+      divisor = 10.__raised_to( count )
+      arr = val.__quo_rem( divisor , [ nil, nil ] )
       val = arr[0]
       rem = arr[1]
       if rem._not_equal?(0)
         mode = ROUNDING_mode  # a dynamic constant from post_prims/bigdecimal.rb
         if mode.equal?(ROUND_HALF_UP)
-          if rem > (divisor._divide(2) ) 
+          if rem > (divisor.__divide(2) ) 
             val += 1
           end
         elsif mode.equal?( ROUND_UP)
@@ -619,37 +619,37 @@ class BigDecimal
     val
   end
 
-  def _reduce_trailing_zeros(an_integer)
+  def __reduce_trailing_zeros(an_integer)
     # removes trailing decimal zero digits from an_integer 
     # returns  [ reduced_integer, count ] ,
     #   where count tells how many trailing zeros were removed.
     val = an_integer
     count = 0
-    qr_first = val._quo_rem( 10,  [nil,nil] )
+    qr_first = val.__quo_rem( 10,  [nil,nil] )
     if qr_first[0]._not_equal?(0) && qr_first[1].equal?(0)
       #  (val > 10) && (val % 10) == 0) == true
       more_than_one_zero = false
       qr = [nil,nil]
       if val >= 1000_000_000 
-        val._quo_rem( 1000_000_000 ,  qr )
+        val.__quo_rem( 1000_000_000 ,  qr )
         while (v_next = qr[0])._not_equal?(0) && qr[1].equal?(0) 
 	  # ((val >= 1000_000_000) && (val % 1000_000_000)==0)==true  
 	  val = v_next
 	  count += 9
 	  more_than_one_zero = true
-	  val._quo_rem( 1000_000_000, qr)
+	  val.__quo_rem( 1000_000_000, qr)
         end
       end
-      val._quo_rem( 1000, qr )
+      val.__quo_rem( 1000, qr )
       while (v_next = qr[0])._not_equal?(0) && qr[1].equal?(0) 
 	# ((val >= 10000) && (val % 1000)==0)==true  
 	val = v_next
 	count += 3
 	more_than_one_zero = true
-	val._quo_rem( 1000, qr )
+	val.__quo_rem( 1000, qr )
       end
       if more_than_one_zero
-	val._quo_rem( 10 , qr )
+	val.__quo_rem( 10 , qr )
       else          
 	qr = qr_first
       end
@@ -657,7 +657,7 @@ class BigDecimal
 	# ((val >= 10) && (val % 10).equal?(0))==true
 	val = v_next
 	count += 1
-	val._quo_rem( 10 , qr )
+	val.__quo_rem( 10 , qr )
       end
     end
     qr_first[0] = val # reuse qr_first as result array
@@ -665,37 +665,37 @@ class BigDecimal
     qr_first
   end
 
-  def _multiply_by_tenpower(an_integer, power)
+  def __multiply_by_tenpower(an_integer, power)
     val = an_integer
     if power > 0
-      p = 10._raised_to( power)
+      p = 10.__raised_to( power)
       val = val * p
     else
-      raise ArgumentError , '_multiply_by_tenpower, power <= 0'
+      raise ArgumentError , '__multiply_by_tenpower, power <= 0'
     end
     val 
   end
 
-  def _divide_by_tenpower(an_integer, power)
+  def __divide_by_tenpower(an_integer, power)
     val = an_integer
     if power > 0
-      p = 10._raised_to( power )
-      val = val._divide(p)
+      p = 10.__raised_to( power )
+      val = val.__divide(p)
     else
-      raise ArgumentError , '_divide_by_tenpower, power <= 0'
+      raise ArgumentError , '__divide_by_tenpower, power <= 0'
     end
     val 
   end
 
-  def _negated
+  def __negated
     my_kind = @special
     if my_kind.equal?(0)
       res = self.class.allocate
-      res._init_normal(  0 - @sign, @digits , @exp)
-      res._set_precision( @precs )
+      res.__init_normal(  0 - @sign, @digits , @exp)
+      res.__set_precision( @precs )
     elsif my_kind.equal?(1)
       res = self.class.allocate
-      res._init_infinity( 0 - @sign )
+      res.__init_infinity( 0 - @sign )
     else
       res = self # nan
     end
@@ -712,7 +712,7 @@ class BigDecimal
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
     end
-    self._add(other, DEFAULT_prec, other._sign)
+    self.__add(other, DEFAULT_prec, other.__sign)
   end
   
   def sub(other, precs)
@@ -721,14 +721,14 @@ class BigDecimal
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
     end
-    self._add(other, precs, 0 - other._sign  )
+    self.__add(other, precs, 0 - other.__sign  )
   end
 
   def -(other)
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
     end
-    self._add(other, DEFAULT_prec, 0 - other._sign )
+    self.__add(other, DEFAULT_prec, 0 - other.__sign )
   end
 
   def *(other)
@@ -746,7 +746,7 @@ class BigDecimal
     end
     mod = self.modulo(other)
 
-    if (@sign * other._sign < 0)
+    if (@sign * other.__sign < 0)
       return mod - other
     else
       return mod
@@ -769,29 +769,29 @@ class BigDecimal
     unless other.kind_of?(BigDecimal)
       other = self.coerce(other)[0]
     end
-    self._add(other, prec_arg, other._sign)
+    self.__add(other, prec_arg, other.__sign)
   end
 
-  def _add(other, prec_arg, other_sign)
+  def __add(other, prec_arg, other_sign)
     my_kind = @special # 0 for normal, 1 for Infinity, 2 for NaN 
-    other_kind = other._kind
+    other_kind = other.__kind
     my_sign =  @sign
     unless (my_kind + other_kind).equal?(0)  
       # at least one is not finite
       if my_kind.equal?(2) or other_kind.equal?(2) 
-        return self.class._nan  # at least one NaN
+        return self.class.__nan  # at least one NaN
       elsif my_kind.equal?(1) and other_kind.equal?(1) and my_sign._not_equal?(other_sign)
-        return self.class._nan # infinity + -infinity
+        return self.class.__nan # infinity + -infinity
       elsif my_kind.equal?(1) 
-        return self.class._infinity( my_sign )  #  infinity + x  
+        return self.class.__infinity( my_sign )  #  infinity + x  
       elsif other_kind.equal?(1) 
-        return self.class._infinity( other_sign)  # x + infinity  
+        return self.class.__infinity( other_sign)  # x + infinity  
       end
     end
     my_digs = @digits
     my_exp = @exp
-    other_digs = other._digits
-    other_exp = other._exp
+    other_digs = other.__digits
+    other_exp = other.__exp
     if prec_arg.equal?(0)
       if my_digs == 0 and other_sign == my_sign 
         return other  # 0 + other
@@ -800,17 +800,17 @@ class BigDecimal
       end
     end
     my_prec =  @precs
-    other_prec = other._precs
+    other_prec = other.__precs
     if my_exp < other_exp
       delta_exp = other_exp - my_exp
-      other_digs = self._multiply_by_tenpower(other_digs, delta_exp)
+      other_digs = self.__multiply_by_tenpower(other_digs, delta_exp)
       if other_prec < UNLIM_PRECISION
         other_prec += delta_exp
       end
       r_expon = my_exp
     elsif my_exp > other_exp
       delta_exp = my_exp - other_exp
-      my_digs = self._multiply_by_tenpower(my_digs, delta_exp)
+      my_digs = self.__multiply_by_tenpower(my_digs, delta_exp)
       if my_prec < UNLIM_PRECISION
         my_prec += delta_exp
       end
@@ -833,25 +833,25 @@ class BigDecimal
         r_digits = 0 - r_digits
       end
     end
-    arr = _reduce_trailing_zeros(r_digits)
+    arr = __reduce_trailing_zeros(r_digits)
     r_digits = arr[0]
     r_expon += arr[1]
 
     		# adjust precision
-    p = my_prec._max(other_prec)  # max because by default no loss of precision on add
+    p = my_prec.__max(other_prec)  # max because by default no loss of precision on add
     if prec_arg._not_equal?(0)
-      p = prec_arg._min( p )
+      p = prec_arg.__min( p )
     end
-    nd = r_digits._decimal_digits_length_approx(true)
+    nd = r_digits.__decimal_digits_length_approx(true)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
-      r_digits = _reduce_precis_by(r_digits, rd)
+      r_digits = __reduce_precis_by(r_digits, rd)
       r_expon += rd
     end
 
     res = self.class.allocate
-    res._init_normal( r_sign, r_digits, r_expon)
-    res._set_precision(p)
+    res.__init_normal( r_sign, r_digits, r_expon)
+    res.__set_precision(p)
   end # ]
 
   def mult(other, prec_arg = nil) # [
@@ -865,64 +865,64 @@ class BigDecimal
       other = self.coerce(other)[0]
     end
     my_kind = @special # 0 for normal, 1 for Infinity, 2 for NaN 
-    other_kind = other._kind
+    other_kind = other.__kind
     my_sign =  @sign
-    other_sign = other._sign
+    other_sign = other.__sign
     r_sign =  my_sign * other_sign 
     unless (my_kind + other_kind).equal?(0)  
       my_zero = self.zero?
       other_zero = other.zero?
       if my_kind.equal?(2) or other_kind.equal?(2)
-        return self.class._nan # at least one is Nan
+        return self.class.__nan # at least one is Nan
       elsif (my_kind.equal?(1) and other_zero) or (my_zero and other_kind.equal?(1) )
-        return self.class._nan   # a zero * an Infinity --> nan
+        return self.class.__nan   # a zero * an Infinity --> nan
       elsif my_kind.equal?(1)   # self is an Infinity
         if ( r_sign < 0) == my_sign < 0    
           return self 
         else
-          return self._negated
+          return self.__negated
         end
       elsif other_kind.equal?(1)  # other is an Infinity
         if ( r_sign < 0) == my_sign < 0
           return other
         else
-          return other._negated
+          return other.__negated
         end
       else
         raise 'logic error BigDecimal#mult non-finite'
       end
     end
     my_digs = @digits
-    other_digs = other._digits
+    other_digs = other.__digits
     if my_digs == 0 or other_digs == 0
-      res = self.class._zero( r_sign )
+      res = self.class.__zero( r_sign )
     end
     my_exp = @exp
-    other_exp = other._exp
+    other_exp = other.__exp
  
     r_digs = my_digs * other_digs 
     r_expon =  my_exp + other_exp 
 
-    arr = _reduce_trailing_zeros( r_digs )
+    arr = __reduce_trailing_zeros( r_digs )
     r_digits = arr[0]
     r_expon += arr[1]
 
     my_prec =  @precs
-    other_prec = other._precs
+    other_prec = other.__precs
     		# adjust precision
-    p = my_prec._min(other_prec)
+    p = my_prec.__min(other_prec)
     if prec_arg._not_equal?(0)
-      p = prec_arg._min( p )
+      p = prec_arg.__min( p )
     end
-    nd = r_digits._decimal_digits_length_approx(true)
+    nd = r_digits.__decimal_digits_length_approx(true)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
-      r_digits = _reduce_precis_by(r_digits, rd)
+      r_digits = __reduce_precis_by(r_digits, rd)
       r_expon += rd
     end
     res = self.class.allocate
-    res._init_normal( r_sign, r_digits, r_expon)
-    res._set_precision(p)
+    res.__init_normal( r_sign, r_digits, r_expon)
+    res.__set_precision(p)
   end # ]
   
   def div(other, prec_arg = nil) # [
@@ -936,55 +936,55 @@ class BigDecimal
       other = self.coerce(other)[0]
     end
     my_kind = @special # 0 for normal, 1 for Infinity, 2 for NaN
-    other_kind = other._kind
+    other_kind = other.__kind
     my_sign =  @sign 
-    other_sign = other._sign 
+    other_sign = other.__sign 
     r_sign =  my_sign * other_sign
     unless (my_kind + other_kind).equal?(0)
       # at least one is not finite
       if my_kind.equal?(2) or other_kind.equal?(2) 
-        return self.class._nan  # at least one NaN
+        return self.class.__nan  # at least one NaN
       elsif other_kind.equal?(1)  # other is infinite
         if my_kind.equal?(1)
-          return self.class._nan  # infinity/infinity
+          return self.class.__nan  # infinity/infinity
         elsif prec_arg.equal?(0)
-          return self.class._nan  # finite/infinity and no precision specified
+          return self.class.__nan  # finite/infinity and no precision specified
         else
-          return self.class._zero(1) # positive zero
+          return self.class.__zero(1) # positive zero
         end
       elsif my_kind.equal?(1) # infinity / finite
         if prec_arg.equal?(0)
-          return self.class._nan # no precision specified
+          return self.class.__nan # no precision specified
         else
-          return self.class._infinity( r_sign  )
+          return self.class.__infinity( r_sign  )
         end
       end
     end
     my_digs = @digits
     my_exp = @exp
-    other_digs = other._digits
-    other_exp = other._exp
+    other_digs = other.__digits
+    other_exp = other.__exp
     if other_digs.equal?(0)
       if RAISE_on_ZERODIV
         raise FloatDomainError, 'divide by zero'
       end
       if my_digs == 0 or prec_arg.equal?(0)
-        return self.class._nan # 0 / 0 , or finite/0 with default precision
+        return self.class.__nan # 0 / 0 , or finite/0 with default precision
       else
-        return self.class._infinity( other_sign )  # finite non-zero / 0
+        return self.class.__infinity( other_sign )  # finite non-zero / 0
       end
     end
 
     my_prec =  @precs
-    other_prec = other._precs
-    my_nd = my_digs._decimal_digits_length_approx(true)
-    other_nd = other_digs._decimal_digits_length_approx(true)
+    other_prec = other.__precs
+    my_nd = my_digs.__decimal_digits_length_approx(true)
+    other_nd = other_digs.__decimal_digits_length_approx(true)
     delta_exp = prec_arg.equal?(0) ? 0 : prec_arg 
     if my_prec < UNLIM_PRECISION 
-      delta_exp = delta_exp._max(my_prec)
+      delta_exp = delta_exp.__max(my_prec)
     end
     if other_prec < UNLIM_PRECISION
-      delta_exp = delta_exp._max(other_prec)
+      delta_exp = delta_exp.__max(other_prec)
     end
     delta_nd = other_nd + 5 
     if (other_nd > my_nd)
@@ -992,28 +992,28 @@ class BigDecimal
     else
        delta_nd += 5
     end
-    delta_exp = delta_nd._max( delta_exp) 
+    delta_exp = delta_nd.__max( delta_exp) 
     if delta_exp > 0
-      my_digs = _multiply_by_tenpower(my_digs, delta_exp) 
+      my_digs = __multiply_by_tenpower(my_digs, delta_exp) 
     end
-    r_digits = my_digs._divide( other_digs )
+    r_digits = my_digs.__divide( other_digs )
     r_expon = my_exp - delta_exp - other_exp
 
     		# adjust precision
-    p = my_prec._min(other_prec)
+    p = my_prec.__min(other_prec)
     if prec_arg._not_equal?(0)
-      p = prec_arg._min( p )
+      p = prec_arg.__min( p )
     end
-    nd = r_digits._decimal_digits_length_approx(true)
+    nd = r_digits.__decimal_digits_length_approx(true)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
-      r_digits = _reduce_precis_by(r_digits, rd)
+      r_digits = __reduce_precis_by(r_digits, rd)
       r_expon += rd
     end
       
     res = self.class.allocate
-    res._init_normal( r_sign, r_digits, r_expon)
-    res._set_precision(p)
+    res.__init_normal( r_sign, r_digits, r_expon)
+    res.__set_precision(p)
   end # ]
 
   def divmod(other_arg) # [
@@ -1022,19 +1022,19 @@ class BigDecimal
       other = self.coerce(other)[0]
     end
     my_kind = @special
-    other_kind = other._kind
+    other_kind = other.__kind
     if my_kind._not_equal?(0) # self.infinite? or self.nan?
       cls = self.class
-      return [ cls._nan, cls._nan ]
+      return [ cls.__nan, cls.__nan ]
     end
     if other_kind._not_equal?(0) or other.zero?
       cls = self.class
-      return [ cls._nan, cls._nan ]
+      return [ cls.__nan, cls.__nan ]
     end
 
     first = (self.div(other, 0) ).floor(0)  # (first / other).floor
     prod = first.mult(other, 0) 
-    second = self._add( prod, 0, 0 - prod._sign )   #  self - (first * other)
+    second = self.__add( prod, 0, 0 - prod.__sign )   #  self - (first * other)
     if other_arg._isFloat
       res = [ first.to_i , second.to_f ]
     else
@@ -1065,52 +1065,52 @@ class BigDecimal
         d_exp += 1 # make it even
       end
       divisor = self.class.allocate
-      divisor._init_normal( 1, 1, d_exp )
-      divisor._set_precision(UNLIM_PRECISION)
+      divisor.__init_normal( 1, 1, d_exp )
+      divisor.__set_precision(UNLIM_PRECISION)
       reduced_bd = self.div(divisor, 0)
-      r_expon = d_exp._divide(2)
+      r_expon = d_exp.__divide(2)
     elsif true_exp < -300
       m_exp = 0 - (true_exp + 300) 
       if (m_exp & 1) == 1
         m_exp += 1 # make it even
       end
       mu = self.class.allocate
-      mu._init_normal( 1, 1, m_exp )
-      mu._set_precision(UNLIM_PRECISION)
+      mu.__init_normal( 1, 1, m_exp )
+      mu.__set_precision(UNLIM_PRECISION)
       reduced_bd = self.mult(mu, 0)
-      r_expon = (0 - m_exp)._divide(2)
+      r_expon = (0 - m_exp).__divide(2)
     else
       reduced_bd = self
       r_expon = 0
     end
     f = reduced_bd.to_f
     sq = f.sqrt   # use the Float math support 
-    sq_bd = self.class._from_float(sq)
+    sq_bd = self.class.__from_float(sq)
     if prec_arg < 14
       res = sq_bd
       if prec_arg > 0
-        res = res._add(self.class._zero(1), prec_arg, 1) # to reduce precision
+        res = res.__add(self.class.__zero(1), prec_arg, 1) # to reduce precision
       end
-      res._add_to_exp( r_expon )
+      res.__add_to_exp( r_expon )
     else
       # Newtons method iteration to make result more precise
       # see http://en.wikipedia.org/wiki/Newton's_method
       margin = sq_bd.clone
-      margin._add_to_exp( 0 - prec_arg - 1) # margin = sq / (10**(prec_arg + 1))
+      margin.__add_to_exp( 0 - prec_arg - 1) # margin = sq / (10**(prec_arg + 1))
       x = sq_bd
-      x._add_to_exp( r_expon )
-      x._set_precision(UNLIM_PRECISION)
+      x.__add_to_exp( r_expon )
+      x.__set_precision(UNLIM_PRECISION)
       done = false
       my_sign_negated = 0 - my_sign
       until done
-        delta = (x.mult(x, 0))._add(self, 0, my_sign_negated ) # delta = (x * x) - self 
-        delta_sign = delta._sign
+        delta = (x.mult(x, 0)).__add(self, 0, my_sign_negated ) # delta = (x * x) - self 
+        delta_sign = delta.__sign
         if delta_sign < 0
-          diff = margin._add(delta, 0, delta_sign )
+          diff = margin.__add(delta, 0, delta_sign )
         else
-          diff = margin._add(delta, 0, 0 - delta_sign ) # margin - sub
+          diff = margin.__add(delta, 0, 0 - delta_sign ) # margin - sub
         end
-        done = diff._sign > 0 # done = margin > delta 
+        done = diff.__sign > 0 # done = margin > delta 
         unless done
           # goal is x,  such that x*x == self
           # f(x) is   x**2 - self
@@ -1126,29 +1126,29 @@ class BigDecimal
   end # ]
 
   # Raises self to an integer power.
-  def _power(other) # [
+  def __power(other) # [
     other = Type.coerce_to( other, Fixnum, :to_int)
     kind = @special
     if kind._not_equal?(0) # not finite
-      return self.class._nan
+      return self.class.__nan
     elsif self.zero?
       if other > 0
-        return self.class._zero(1) 
+        return self.class.__zero(1) 
       elsif other == 0
-        return self.class._from_integer( 1 )
+        return self.class.__from_integer( 1 )
       else
-        return self.class._infinity(1)
+        return self.class.__infinity(1)
       end
     end
     if other == 0 
-      one = self.class._from_integer( 1 )
+      one = self.class.__from_integer( 1 )
       if self == one 
         return one
       end
     end
     if other < 0
-      pos_pwr = self._power( 0 - other )
-      one = self.class._from_integer( 1 )
+      pos_pwr = self.__power( 0 - other )
+      one = self.class.__from_integer( 1 )
       q = one.div( pos_pwr )
       return q
     end
@@ -1159,33 +1159,33 @@ class BigDecimal
       nsign = 1
     end
     nexp = @exp * other   
-    arr = _reduce_trailing_zeros(nd)
+    arr = __reduce_trailing_zeros(nd)
     nd = arr[0]
     nexp += arr[1]
     res = self.class.allocate
-    res._init_normal( nsign, nd, nexp)
-    res._set_precision(UNLIM_PRECISION)
+    res.__init_normal( nsign, nd, nexp)
+    res.__set_precision(UNLIM_PRECISION)
   end # ]
 
   def power(other)
-    res = self._power(other)
-    res._reduce_to_precision(@precs)
+    res = self.__power(other)
+    res.__reduce_to_precision(@precs)
   end
 
   alias ** power
 
-  def _reduce_to_precision(p)
+  def __reduce_to_precision(p)
     if p != UNLIM_PRECISION
       if p < @precs
 	r_digits = @digits
-	nd = r_digits._decimal_digits_length_approx(true)
+	nd = r_digits.__decimal_digits_length_approx(true)
 	rd = nd - p
 	if rd > 0  #  rd is number of digits to omit
-	  r_digits = _reduce_precis_by(r_digits, rd)
+	  r_digits = __reduce_precis_by(r_digits, rd)
           r_expon = @exp + rd
 	  res = self.class.allocate
-	  res._init_normal( @sign, r_digits, r_expon)
-	  res._set_precision(p)
+	  res.__init_normal( @sign, r_digits, r_expon)
+	  res.__set_precision(p)
 	  return res 
         end
       end
@@ -1195,7 +1195,7 @@ class BigDecimal
   
   # Unary minus
   def -@
-    self._negated
+    self.__negated
   end
 
   def <=>(other) # [
@@ -1212,7 +1212,7 @@ class BigDecimal
     if !other.kind_of?(BigDecimal)
       return self <=> self.coerce(other)[0]
     end
-    other_kind = other._kind
+    other_kind = other.__kind
     if (my_kind + other_kind)._not_equal?(0)  
       # not both finite
       if my_kind.equal?(2) or other_kind.equal?(2) 
@@ -1222,33 +1222,33 @@ class BigDecimal
       if my_kind.equal?(1) 
         if other_kind.equal?(1)
           # both infinite
-          return @sign <=> other._sign
+          return @sign <=> other.__sign
         else
           return @sign # self infinite, other finite
         end
       else
         # self finite, other infinite
-        return  0 - other._sign 
+        return  0 - other.__sign 
       end
     end
-    res = (@sign <=> other._sign)
+    res = (@sign <=> other.__sign)
     digs = @digits
     if res._not_equal?(0)
-      if digs == 0 and other._digits == 0
+      if digs == 0 and other.__digits == 0
         return 0
       else
         return res
       end
     end
-    res = (@exp <=> other._exp)
+    res = (@exp <=> other.__exp)
     if res.equal?(0)
-      return @digits <=> other._digits
+      return @digits <=> other.__digits
     end
-    diff = self._add(other , 0, 0 - other._sign )  # self - other
+    diff = self.__add(other , 0, 0 - other.__sign )  # self - other
     if diff.zero?
       return 0
     end
-    return diff._sign
+    return diff.__sign
   end # ]
   
   def eql?(other)
@@ -1333,11 +1333,11 @@ class BigDecimal
     if @sign.equal?(1) 
       self
     else
-      self._negated
+      self.__negated
     end
   end
 
-  def _truncate(n, delta_for_fraction) # [
+  def __truncate(n, delta_for_fraction) # [
     kind = @special
     if kind._not_equal?(0) 
       return self  # Infinity or NaN
@@ -1350,27 +1350,27 @@ class BigDecimal
 	  nd_frac = 0 - my_exp 
 	  rd = nd_frac - n # rd is number of digits to omit
 	  if rd > 0
-	    digs = _reduce_precis_by(digs, rd)
+	    digs = __reduce_precis_by(digs, rd)
 	    my_exp += rd
 	  end
 	end
       else # n < 0 , zeroing digits to left of decimal
         rd = (0 - n) - my_exp
         if rd > 0
-          digs = _reduce_precis_by(digs, rd)
+          digs = __reduce_precis_by(digs, rd)
           my_exp += rd
         end
       end
       res = self.class.allocate
-      res._init_normal( @sign , digs, my_exp)
-      res._set_precision(n)
+      res.__init_normal( @sign , digs, my_exp)
+      res.__set_precision(n)
     else  # n == 0
       int_val = digs 
       if my_exp._not_equal?(0) 
         if my_exp > 0
-          int_val = _multiply_by_tenpower(digs, my_exp)
+          int_val = __multiply_by_tenpower(digs, my_exp)
         else
-          int_val = _divide_by_tenpower(digs, 0 - my_exp)
+          int_val = __divide_by_tenpower(digs, 0 - my_exp)
         end
       end
       my_sign = @sign
@@ -1379,14 +1379,14 @@ class BigDecimal
       end
       if my_exp < 0 and delta_for_fraction != 0
         # has a fractional part
-        pwr = 10._raised_to( 0 - my_exp )
+        pwr = 10.__raised_to( 0 - my_exp )
         frac = digs % pwr 
         if frac > 0 && my_sign.equal?(delta_for_fraction)
           int_val += delta_for_fraction 
         end
       end
       res = self.class.allocate
-      res._init_from_integer(int_val) 
+      res.__init_from_integer(int_val) 
     end
   end # ]
   
@@ -1396,7 +1396,7 @@ class BigDecimal
     #    with precision reduced to n digits to right of the decimal point
     # if n < 0, zeros (0-n) digits to left of decimal point
     n = Type.coerce_to( n, Fixnum, :to_int)
-    self._truncate(n, 1)
+    self.__truncate(n, 1)
   end
   
   def fix
@@ -1404,7 +1404,7 @@ class BigDecimal
     my_exp = @exp
     if my_exp < 0
       int_val = self.to_i
-      self.class._from_integer(int_val)
+      self.class.__from_integer(int_val)
     else   
       self  # contains no fractional part
     end
@@ -1416,7 +1416,7 @@ class BigDecimal
     #    with precision reduced to n digits to right of the decimal point
     # if n < 0, zeros (0-n) digits to left of decimal point
     n = Type.coerce_to( n, Fixnum, :to_int)
-    self._truncate(n, -1)
+    self.__truncate(n, -1)
   end
   
   def frac
@@ -1428,15 +1428,15 @@ class BigDecimal
     my_exp = @exp
     if my_exp < 0
       # has a fractional part
-      pwr = 10._raised_to( 0 - my_exp)
+      pwr = 10.__raised_to( 0 - my_exp)
       frac = @digits % pwr
       if frac > 0
         res = self.class.allocate
-        res._init_normal(@sign, frac , my_exp)
-        return res._set_precision(UNLIM_PRECISION)
+        res.__init_normal(@sign, frac , my_exp)
+        return res.__set_precision(UNLIM_PRECISION)
       end
     end
-    return self.class._zero(1)
+    return self.class.__zero(1)
   end
     
   def split
@@ -1460,7 +1460,7 @@ class BigDecimal
     #    with precision reduced to n digits to right of the decimal point
     # if n < 0, zeros (0-n) digits to left of decimal point
     n = Type.coerce_to( n, Fixnum, :to_int)
-    self._truncate(n, 0)
+    self.__truncate(n, 0)
   end
 
 end

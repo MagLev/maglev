@@ -64,7 +64,7 @@ module Enumerable
     def mergesort(xs, &block)
       arr = []
       xs.each { | o | arr << o }
-      arr._sort!(&block)  # sorts array in place
+      arr.__sort!(&block)  # sorts array in place
       arr
     end
 

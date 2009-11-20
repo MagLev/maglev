@@ -1,9 +1,13 @@
 # file marshal2.rb
 
+# the constants Marshal__* are defined in Object in marshal.rb,
+# so they can be resolved at compile time in this file,
+# and replicate values of the respective Marshal:: constants
+
 class Object
   def to_marshal(ms, strip_ivars = false)
     out = ms.serialize_extended_object(self)
-    out << Marshal::TYPE_OBJECT
+    out << Marshal__TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
     #out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
     out << ms.serialize_instance_variables_suffix(self, self.instance_variables)
@@ -14,7 +18,7 @@ end
 class Range
   def to_marshal(ms)
     out = ms.serialize_extended_object(self)
-    out << Marshal::TYPE_OBJECT
+    out << Marshal__TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
     out << ms.serialize_ivars( [ :begin , self.begin,
                                  :end , self.end,
@@ -36,27 +40,27 @@ end
 
 class NilClass
   def to_marshal(ms)
-    Marshal::TYPE_NIL
+    Marshal__TYPE_NIL
   end
 end
 
 class Boolean
   def to_marshal(ms)
-    self.equal?(true) ? Marshal::TYPE_TRUE : Marshal::TYPE_FALSE
+    self.equal?(true) ? Marshal__TYPE_TRUE : Marshal__TYPE_FALSE
   end
 end
 
 class Class
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous class #{self}" if self.name == ''
-    Marshal::TYPE_CLASS + ms.serialize_integer(name.length) + name
+    Marshal__TYPE_CLASS + ms.serialize_integer(name.length) + name
   end
 end
 
 class Module
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous module #{self}" if self.name == ''
-    Marshal::TYPE_MODULE + ms.serialize_integer(name.length) + name
+    Marshal__TYPE_MODULE + ms.serialize_integer(name.length) + name
   end
 end
 
@@ -64,7 +68,7 @@ class Symbol
   def to_marshal(ms)
     # caller responsible for find_symlink (i.e. lookup in syms_dict )
     str = to_s
-    Marshal::TYPE_SYMBOL + ms.serialize_integer(str.length) + str
+    Marshal__TYPE_SYMBOL + ms.serialize_integer(str.length) + str
   end
 end
 
@@ -74,7 +78,7 @@ class String
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, String)
-    out << Marshal::TYPE_STRING
+    out << Marshal__TYPE_STRING
     out << ms.serialize_integer(self.length) << self
     out << ms.serialize_instance_variables_suffix(self, ivars[0])
   end
@@ -82,13 +86,13 @@ end
 
 class Fixnum
   def to_marshal(ms)
-    Marshal::TYPE_FIXNUM + ms.serialize_integer(self)
+    Marshal__TYPE_FIXNUM + ms.serialize_integer(self)
   end
 end
 
 class Bignum
   def to_marshal(ms)
-    str = Marshal::TYPE_BIGNUM + (self < 0 ? '-' : '+')
+    str = Marshal__TYPE_BIGNUM + (self < 0 ? '-' : '+')
     cnt = 0
     num = self.abs
 
@@ -103,7 +107,7 @@ class Bignum
       cnt += 1
     end
 
-    str[0..1] + ms.serialize_integer(cnt._divide(2) ) + str[2..-1]
+    str[0..1] + ms.serialize_integer(cnt.__divide(2) ) + str[2..-1]
   end
 end
 
@@ -114,7 +118,7 @@ class Regexp
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Regexp)
-    out << Marshal::TYPE_REGEXP
+    out << Marshal__TYPE_REGEXP
     out << ms.serialize_integer(str.length) + str
     out << ms.to_byte(options & 0x7)
     out << ms.serialize_instance_variables_suffix(self, ivars[0])
@@ -127,7 +131,7 @@ class Struct
     out =  ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
 
-    out << Marshal::TYPE_STRUCT
+    out << Marshal__TYPE_STRUCT
 
     out << ms.serialize(self.class.name.to_sym)
     out << ms.serialize_integer(self.length)
@@ -148,7 +152,7 @@ class Array
     out = ms.serialize_instance_variables_prefix(self, ivars)
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Array)
-    out << Marshal::TYPE_ARRAY
+    out << Marshal__TYPE_ARRAY
     out << ms.serialize_integer(self.length)
     # Gemstone, optimization to use while loop
     n = 0
@@ -171,7 +175,7 @@ class Hash
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, Hash)
     default_val = self.default
-    out << (default_val ? Marshal::TYPE_HASH_DEF : Marshal::TYPE_HASH)
+    out << (default_val ? Marshal__TYPE_HASH_DEF : Marshal__TYPE_HASH)
     len = self.length
     out << ms.serialize_integer(len)
     unless len.equal?(0) then
@@ -190,7 +194,7 @@ class Float
   def to_marshal(ms)
     if finite?
       if self == 0.0
-        str = self._sign < 0 ? '-0' : '0'
+        str = self.__sign < 0 ? '-0' : '0'
       else
         str = "%.17g" % [self] + ms.serialize_float_thing(self)
       end
@@ -201,6 +205,6 @@ class Float
     else
       raise 'logic error in Float.to_marshal'
     end
-    Marshal::TYPE_FLOAT + ms.serialize_integer(str.length) + str
+    Marshal__TYPE_FLOAT + ms.serialize_integer(str.length) + str
   end
 end

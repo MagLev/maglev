@@ -123,7 +123,7 @@ module Zlib
 
     def initialize(io)
       @io = io
-      @zstream = Zlib::ZStream.open_read(io, GzipFile::Error)
+      @zstream = ZStream.open_read(io, Error) # Error resolves to GzipFile::Error
       super()
       arr = @zstream.read_header()
       @orig_name = arr[0]
@@ -170,8 +170,8 @@ module Zlib
     # respond to the +write+ method that behaves same as write method in IO
     # class.
 
-    def initialize(io, level = Zlib::Z_DEFAULT_COMPRESSION,
-                   strategy = Zlib::Z_DEFAULT_STRATEGY)
+    def initialize(io, level = Z_DEFAULT_COMPRESSION,
+                   strategy = Z_DEFAULT_STRATEGY)
       @level = level
       @strategy = strategy
       @io = io
@@ -184,14 +184,14 @@ module Zlib
     def comment=(v)
       # Set the comment
       unless @zstream.equal?(nil) then
-        raise GzipFile::Error, 'header is already written'
+        raise Error, 'header is already written' # Error resolves to GzipFile::Error
       end
       @comment = v
     end
 
     def mtime=(time)
       unless @zstream.equal?(nil) then
-        raise GzipFile::Error, 'header is already written'
+        raise Error, 'header is already written' # Error resolves to GzipFile::Error
       end
       @mtime = Integer(time)
     end
@@ -199,7 +199,7 @@ module Zlib
     def orig_name=(v)
       # Set the original name
       unless @zstream.equal?(nil) then
-        raise GzipFile::Error, 'header is already written'
+        raise Error, 'header is already written' # Error resolves to GzipFile::Error
       end
       @orig_name = v
     end
@@ -219,7 +219,7 @@ module Zlib
       if (lev < Z_DEFAULT_COMPRESSION || lev > Z_BEST_COMPRESSION)
         raise ArgumentError, 'compression level out of range'
       end
-      @zstream = Zlib::ZStream.open_write(@io, GzipFile::Error, lev)
+      @zstream = ZStream.open_write(@io, Error, lev) # Error resolves to GzipFile::Error
       tim = @mtime.to_i
       unless tim._isFixnum
         raise ArgumentError, 'mtime must be a Fixnum'
@@ -289,7 +289,7 @@ module Zlib
     end
 
     def inflate(string)
-      _open(false, StringIO.new(string), Zlib::Error, Zlib::Z_DEFAULT_COMPRESSION)
+      __open(false, StringIO.new(string), Error, Z_DEFAULT_COMPRESSION) # Error resolves to Zlib::Error
       buf = ''
       while ! at_eof
         buf << read(2048)

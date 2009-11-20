@@ -29,32 +29,32 @@ class Object
     # _isStringOrSymbol # smalltalk _isOneByteString
 
 
-    #   _isSpecial is used by marshal.rb . It is not a special selector
-    primitive_nobridge '_isSpecial', 'isSpecial'
+    #   __isSpecial is used by marshal.rb . It is not a special selector
+    primitive_nobridge '__isSpecial', 'isSpecial'
 
-    def _isBehavior
+    def __isBehavior
       false
     end
 
-    #  Private method _each: contains on:do: handler for RubyBreakException ,
-    #  all env1 sends of each& are compiled as sends of _each&
-    #  Attempts to reimplement _each& will fail with a compile error.
-    primitive_nobridge_env '_each&',   '_rubyEach' , ':'
+    #  Private method __each contains on:do: handler for RubyBreakException ,
+    #  all env1 sends of each& are compiled as sends of __each&
+    #  Attempts to reimplement __each& will fail with a compile error.
+    primitive_nobridge_env '__each&',   '_rubyEach' , ':'
 
-    # _storeRubyVcGlobal is used by methods that need to store into
+    # __storeRubyVcGlobal is used by methods that need to store into
     #   caller(s) definition(if any) of $~ or $_  .
     #  Receiver is value to be stored.
     #  See smalltalk code in Object for documentation.
-    primitive_nobridge '_storeRubyVcGlobal' , '_storeRubyVcGlobal:'
-    #  _getRubyVcGlobal returns caller(s) value of $~ or $_ , or nil
-    primitive_nobridge '_getRubyVcGlobal' , '_getRubyVcGlobal:'
+    primitive_nobridge '__storeRubyVcGlobal' , '_storeRubyVcGlobal:'
+    #  __getRubyVcGlobal returns caller(s) value of $~ or $_ , or nil
+    primitive_nobridge '__getRubyVcGlobal' , '_getRubyVcGlobal:'
 
     # argument to _bindingContext: is number of frames up from sender
     #   of Object.binding from which to create the binding .
     #  Parser has to know about methods which may send _binding_ctx,
     #  to ensure such methods are created with a VariableContext.
     #  see setSendsBinding and the *BindingNode , *EvalNode classes in .mcz
-    primitive_nobridge '_binding_ctx' , '_bindingContext:'
+    primitive_nobridge '__binding_ctx' , '_bindingContext:'
 
     # Special semantics for send of  super  while in bootstrap:
     #   During bootstrap, a send of super passes a block arg only
@@ -78,16 +78,16 @@ class Object
     primitive 'nil?' , '_rubyNilQ'
 
     # rubySend: methods implemented in .mcz
-    primitive_nobridge_env 'send',  'rubySend', ':'
-    primitive_nobridge_env 'send',  'rubySend', ':with:'
-    primitive_nobridge_env 'send',  'rubySend', ':with:with:'
-    primitive_nobridge_env 'send',  'rubySend', ':with:with:with:'
-    primitive_nobridge_env 'send&', 'rubySend', ':block:'
-    primitive_nobridge_env 'send&', 'rubySend', ':with:block:'
-    primitive_nobridge_env 'send&', 'rubySend', ':with:with:block:'
-    primitive_nobridge_env 'send&', 'rubySend', ':with:with:with:block:'
-    primitive_nobridge_env 'send*', 'rubySend', ':withArgs:'
-    primitive_env          'send*&' , 'rubySend', ':withArgs:block:'
+    primitive_nobridge_env 'send',  '__rubySend', ':'
+    primitive_nobridge_env 'send',  '__rubySend', ':with:'
+    primitive_nobridge_env 'send',  '__rubySend', ':with:with:'
+    primitive_nobridge_env 'send',  '__rubySend', ':with:with:with:'
+    primitive_nobridge_env 'send&', '__rubySend', ':block:'
+    primitive_nobridge_env 'send&', '__rubySend', ':with:block:'
+    primitive_nobridge_env 'send&', '__rubySend', ':with:with:block:'
+    primitive_nobridge_env 'send&', '__rubySend', ':with:with:with:block:'
+    primitive_nobridge_env 'send*', '__rubySend', ':withArgs:'
+    primitive_env          'send*&' , '__rubySend', ':withArgs:block:'
 
     #  'send:*&' , '__send__:*&' special cased in  installBridgeMethodsFor ,
     #   to have no bridges.
@@ -96,16 +96,16 @@ class Object
 
     #  __send__ defined per MRI, non-overrideable version of send
     #  redefinition of __send__  disallowed by parser after bootstrap finished.
-    primitive_nobridge_env '__send__',  'rubySend', ':'
-    primitive_nobridge_env '__send__',  'rubySend', ':with:'
-    primitive_nobridge_env '__send__',  'rubySend', ':with:with:'
-    primitive_nobridge_env '__send__',  'rubySend', ':with:with:with:'
-    primitive_nobridge_env '__send__&', 'rubySend', ':block:'
-    primitive_nobridge_env '__send__&', 'rubySend', ':with:block:'
-    primitive_nobridge_env '__send__&', 'rubySend', ':with:with:block:'
-    primitive_nobridge_env '__send__&', 'rubySend', ':with:with:with:block:'
-    primitive_nobridge_env '__send__*', 'rubySend', ':withArgs:'
-    primitive_env          '__send__*&', 'rubySend', ':withArgs:block:'
+    primitive_nobridge_env '__send__',  '__rubySend', ':'
+    primitive_nobridge_env '__send__',  '__rubySend', ':with:'
+    primitive_nobridge_env '__send__',  '__rubySend', ':with:with:'
+    primitive_nobridge_env '__send__',  '__rubySend', ':with:with:with:'
+    primitive_nobridge_env '__send__&', '__rubySend', ':block:'
+    primitive_nobridge_env '__send__&', '__rubySend', ':with:block:'
+    primitive_nobridge_env '__send__&', '__rubySend', ':with:with:block:'
+    primitive_nobridge_env '__send__&', '__rubySend', ':with:with:with:block:'
+    primitive_nobridge_env '__send__*', '__rubySend', ':withArgs:'
+    primitive_env          '__send__*&', '__rubySend', ':withArgs:block:'
 
     # redefinition of __perform___ disallowed by parser after bootstrap finished.
     # __perform___  requires next to last arg to be a Symbol with proper suffix
@@ -119,17 +119,17 @@ class Object
     #  it is used by implementation of eval
     primitive_nobridge '__perform_meth', 'performMethod:'
 
-    primitive   '_basic_dup', '_rubyBasicDup'      # use non-singleton class
-    primitive   '_basic_clone', '_basicCopy' # use singleton class
+    primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
+    primitive   '__basic_clone', '_basicCopy' # use singleton class
 
     def dup
-      res = self._basic_dup
+      res = self.__basic_dup
       res.initialize_copy(self)
       res
     end
 
     def clone
-      res = self._basic_clone
+      res = self.__basic_clone
       res.initialize_copy(self)
       if self.frozen?
         res.freeze
@@ -143,7 +143,7 @@ class Object
     # _set_nostubbing prevents stubbing ram oops to objectIds in in-memory
     #  instance variables that reference committed objects .  should only
     # be used in limited cases when initializing transient state .
-    primitive '_set_nostubbing', '_setNoStubbing'
+    primitive '__set_nostubbing', '_setNoStubbing'
 
     # install this prim so  anObj.send(:kind_of?, aCls)   will work
     primitive_nobridge 'kind_of?' , '_rubyKindOf:'
@@ -152,7 +152,7 @@ class Object
     # Reimplementation of is_a?  is disallowed, it is compiled direct to a bytecode
     primitive_nobridge 'is_a?' , '_rubyKindOf:'
 
-    primitive_nobridge '_responds_to', '_respondsTo:private:flags:'
+    primitive_nobridge '__responds_to', '_respondsTo:private:flags:'
        # _responds_to flags bit masks are
        #     environmentId                   0xFF
        #     ruby lookup semantics          0x100
@@ -160,21 +160,21 @@ class Object
        #     cache successes in code_gen  0x10000
 
     def respond_to?(symbol, include_private)
-      _responds_to(symbol, include_private, 0x10101)
+      __responds_to(symbol, include_private, 0x10101)
     end
 
     def respond_to?(symbol )
-      _responds_to(symbol, false, 0x10101)
+      __responds_to(symbol, false, 0x10101)
     end
 
-    def _splat_lasgn_value
+    def __splat_lasgn_value
       # runtime support for   x = *y   , invoked from generated code
       a = self
       unless a._isArray
         if a.equal?(nil)
           return a
         end
-        a = a._splat_lasgn_value_coerce
+        a = a.__splat_lasgn_value_coerce
       end
       if a._isArray
         sz = a.length
@@ -189,7 +189,7 @@ class Object
       a
     end
 
-    def _splat_lasgn_value_coerce
+    def __splat_lasgn_value_coerce
       v = self
       begin
         v = self.to_ary
@@ -204,10 +204,10 @@ class Object
       v
     end
  
-    def _splat_arg_value
+    def __splat_arg_value
       a = self
       unless a._isArray
-        a = a._splat_lasgn_value_coerce
+        a = a.__splat_lasgn_value_coerce
         unless a._isArray
           a = [ self ]
         end
@@ -215,7 +215,7 @@ class Object
       a
     end
 
-    def _splat_return_value
+    def __splat_return_value
       # runtime support for  return *v  , invoked from generated code
       v = Type.coerce_to_or_nil(self, Array, :to_ary)
       if v.equal?(nil)
@@ -236,7 +236,7 @@ class Object
       end
     end
 
-    def _par_asgn_to_ary
+    def __par_asgn_to_ary
       # runtime support for parallel assignment, invoked from generated code
       if self._isArray
         return self
@@ -253,30 +253,30 @@ class Object
     #  trappable only by an Exception specifying exactly error 6001
     primitive 'pause', 'pause'
 
-    primitive   '_inspect', '_rubyInspect'
+    primitive   '__inspect', '_rubyInspect'
 
     def inspect
       # sender of _inspect must be in env 1
-      self._inspect
+      self.__inspect
     end
 
     #  following 3 prims must also be installed in Behavior
-    primitive_nobridge '_instVarAt', 'rubyInstvarAt:'
-    primitive_nobridge '_instVarAtPut', 'rubyInstvarAt:put:'
+    primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
+    primitive_nobridge '__instvar_put', 'rubyInstvarAt:put:'
     primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
     def instance_variable_get(a_name)
       unless a_name._isStringOrSymbol
         a_name = Type.coerce_to(a_name, String, :to_str)
       end
-      _instVarAt(a_name.to_sym)
+      __instvar_get(a_name.to_sym)
     end
 
     def instance_variable_set(a_name, a_val)
       unless a_name._isStringOrSymbol
         a_name = Type.coerce_to(a_name, String, :to_str)
       end
-      _instVarAtPut(a_name.to_sym, a_val)
+      __instvar_put(a_name.to_sym, a_val)
       a_val
     end
 
@@ -350,14 +350,14 @@ class Object
       if self.class.equal?(cls)
         true
       else
-        unless cls._isBehavior
+        unless cls.__isBehavior
           raise TypeError, 'expected a Class or Module'
         end
         false
       end
     end
 
-    primitive_nobridge '_instance_eval', 'rubyEvalString:with:binding:'
+    primitive_nobridge '__instance_eval', 'rubyEvalString:with:binding:'
 
     def instance_eval(*args)
       # bridge methods would interfere with VcGlobals logic
@@ -366,38 +366,38 @@ class Object
 
     def instance_eval(str)
       string = Type.coerce_to(str, String, :to_str)
-      ctx = self._binding_ctx(0)
+      ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
-      vcgl = [ self._getRubyVcGlobal(0x20),
-               self._getRubyVcGlobal(0x21) ]
-      res = _instance_eval(string, vcgl, bnd)
-      vcgl[0]._storeRubyVcGlobal(0x20)
-      vcgl[1]._storeRubyVcGlobal(0x21)
+      vcgl = [ self.__getRubyVcGlobal(0x20),
+               self.__getRubyVcGlobal(0x21) ]
+      res = __instance_eval(string, vcgl, bnd)
+      vcgl[0].__storeRubyVcGlobal(0x20)
+      vcgl[1].__storeRubyVcGlobal(0x21)
       res
     end
 
     def instance_eval(str, file=nil)
       string = Type.coerce_to(str, String, :to_str)
-      ctx = self._binding_ctx(0)
+      ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
-      vcgl = [ self._getRubyVcGlobal(0x20),
-               self._getRubyVcGlobal(0x21) ]
-      res = _instance_eval(string, vcgl, bnd)
-      vcgl[0]._storeRubyVcGlobal(0x20)
-      vcgl[1]._storeRubyVcGlobal(0x21)
+      vcgl = [ self.__getRubyVcGlobal(0x20),
+               self.__getRubyVcGlobal(0x21) ]
+      res = __instance_eval(string, vcgl, bnd)
+      vcgl[0].__storeRubyVcGlobal(0x20)
+      vcgl[1].__storeRubyVcGlobal(0x21)
       res
     end
 
     def instance_eval(str, file=nil, line=nil)
       # TODO: Object#instance_eval: handle file and line params
       string = Type.coerce_to(str, String, :to_str)
-      ctx = self._binding_ctx(0)
+      ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
-      vcgl = [ self._getRubyVcGlobal(0x20),
-               self._getRubyVcGlobal(0x21) ]
-      res = _instance_eval(string, vcgl, bnd)
-      vcgl[0]._storeRubyVcGlobal(0x20)
-      vcgl[1]._storeRubyVcGlobal(0x21)
+      vcgl = [ self.__getRubyVcGlobal(0x20),
+               self.__getRubyVcGlobal(0x21) ]
+      res = __instance_eval(string, vcgl, bnd)
+      vcgl[0].__storeRubyVcGlobal(0x20)
+      vcgl[1].__storeRubyVcGlobal(0x21)
       res
     end
 
@@ -412,35 +412,35 @@ class Object
     #   to_s
     # end
 
-    primitive_nobridge '_ruby_singleton_methods', 'rubySingletonMethods:protection:'
+    primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
     def singleton_methods(inc_modules = true)
-      _ruby_singleton_methods(inc_modules, 0)
+      __ruby_singleton_methods(inc_modules, 0)
     end
 
-    primitive_nobridge '_ruby_methods', 'rubyMethods:'
+    primitive_nobridge '__ruby_methods', 'rubyMethods:'
 
     # If regular is true, retuns an array of the names of methods publicly
     # accessible in receiver and receiver's ancestors.  Otherwise, returns
     # an array of the names of receiver's singleton methods.
     def methods(regular = true)
       if regular
-        _ruby_methods(0) # get public methods
+        __ruby_methods(0) # get public methods
       else
-        _ruby_singleton_methods(false, 0)
+        __ruby_singleton_methods(false, 0)
       end
     end
 
     def private_methods
-      _ruby_methods(2)
+      __ruby_methods(2)
     end
 
     def protected_methods
-      _ruby_methods(1)
+      __ruby_methods(1)
     end
 
     def public_methods
-      _ruby_methods(0)
+      __ruby_methods(0)
     end
 
     def singleton_method_added(a_symbol)
@@ -470,7 +470,7 @@ class Object
       self.class.name.to_s
     end
 
-    def _k_to_int
+    def __k_to_int
       # sent from C code in primitive 767 for sprintf
       v = nil
       begin

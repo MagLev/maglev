@@ -1,8 +1,0 @@
-task :default => :query
-task :commit do
-  sh "maglev-ruby build_graph.rb"
-end
-
-task :query => :commit do
-  sh "maglev-ruby query.rb"
-end

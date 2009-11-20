@@ -1,7 +1,8 @@
 #
 # File::Stat in Ruby is identically Smalltalk GsFileStat
 
-class File::Stat
+class File
+ class Stat
 
   include Comparable
 
@@ -45,7 +46,7 @@ class File::Stat
   end
 
   def <=>(other)
-    return nil unless other.is_a?(File::Stat)
+    return nil unless other.is_a?(Stat)  # Stat resolves to File::Stat
     mtime <=> other.mtime
   end
 
@@ -56,7 +57,7 @@ class File::Stat
   def blksize
     @blksize
   end
- 
+
   def blockdev?
     (@mode & S_IFMT) == S_IFBLK
   end
@@ -78,11 +79,11 @@ class File::Stat
   end
 
   def dev_major
-    _major(@dev)
+    __major(@dev)
   end
 
   def dev_minor
-    _minor(@dev)
+    __minor(@dev)
   end
 
   def directory?
@@ -125,7 +126,7 @@ class File::Stat
   end
 
   def grpowned?
-    @gid == Gemstone.getegid
+    @gid == Maglev.__system.getegid
   end
 
   def ino
@@ -149,7 +150,7 @@ class File::Stat
   end
 
   def owned?
-    @uid == Gemstone.geteuid
+    @uid == Maglev.__system.geteuid
   end
 
   def pipe?
@@ -161,11 +162,11 @@ class File::Stat
   end
 
   def rdev_major
-    _major(@rdev)
+    __major(@rdev)
   end
 
   def rdev_minor
-    _minor(@rdev)
+    __minor(@rdev)
   end
 
   def readable?
@@ -195,7 +196,7 @@ class File::Stat
   end
 
   def size?
-    sz = @size 
+    sz = @size
     sz.equal?(0) ? nil : sz
   end
 
@@ -234,25 +235,26 @@ class File::Stat
   end
 
   # pull the major device number out of a dev_t
-  def _major(dev_t)
+  def __major(dev_t)
     (dev_t >> 24) & 0x0ff
   end
   # pull the minor device number out of a dev_t
-  def _minor(dev_t)
+  def __minor(dev_t)
     dev_t & 0xffffff
   end
 
   def superuser?
-    Gemstone.getuid == 0
+    Maglev.__system.getuid == 0
   end
 
   def rgrpowned?
-    @gid == Gemstone.getgid
+    @gid == Maglev.__system.getgid
   end
 
   def rowned?
-    @uid == Gemstone.getuid
+    @uid == Maglev.__system.getuid
   end
 
+ end
 end
-File::Stat._freeze_constants
+File::Stat.__freeze_constants

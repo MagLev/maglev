@@ -8,7 +8,7 @@ class Class
 
   primitive_nobridge 'superclass', 'superClass'
 
-  class_primitive_nobridge_env '_rubyNew', '_rubyNew', ':do:'
+  class_primitive_nobridge_env '__ruby_new', '_rubyNew', ':do:'
 
   def inherited(a_subclass)
     # .mcz code will not invoke this during bootstrap.
@@ -22,11 +22,11 @@ class Class
       end
     end
     if (block_given?)
-      c = _rubyNew(super_cls, blk)
+      c = __ruby_new(super_cls, blk)
     else
-      c = _rubyNew(super_cls, nil)
+      c = __ruby_new(super_cls, nil)
     end
-    super_cls._ruby_inherited(c)  # See also RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:
+    super_cls.__ruby_inherited(c)  # See also RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:
     c
   end
 
@@ -80,15 +80,10 @@ class Class
 
   #  < <= > >=  inherited from Module
 
-  # name inherited from Module
-
   primitive_nobridge 'included_modules' , 'rubyIncludedModules'
 
   primitive 'inspect', '_rubyInspect'
-
-  def to_s
-    name
-  end
+  primitive 'to_s', '_rubyInspect'
 
   # Controls whether instances of receiver are persistable.  If the flag is
   # +true+, then receiver is marked to allow instances to be persisted.
@@ -107,11 +102,11 @@ class Class
     unless self.maglev_persistable?
       raise Maglev::NotPersistableException
     end
-    self._set_instances_persistent(flag)
+    self.__set_instances_persistent(flag)
   end
-  primitive_nobridge '_set_instances_persistent', '_setInstancesPersistent:'
+  primitive_nobridge '__set_instances_persistent', '_setInstancesPersistent:'
 
-  primitive_nobridge '_set_protection_classmethods*', 'setProtection:classmethods:'
+  primitive_nobridge '__set_protection_classmethods*', 'setProtection:classmethods:'
 
   # Returns +true+ if instances of receiver are allowed to be
   # persisted. Returns +false+ otherwise.

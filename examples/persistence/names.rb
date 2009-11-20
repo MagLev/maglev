@@ -55,12 +55,19 @@ class RandomNameGenerator
     'Flores', 'Washington', 'Butler', 'Simmons', 'Foster', 'Gonzales',
     'Bryant', 'Alexander', 'Russell', 'Griffin', 'Diaz', 'Hayes', ]
 
-  # Return an array of [first_name, sur_name] for the given gender.
-  # The gender should be either :male or :female
-  def self.name_for(gender)
-    first_names = gender.equal?(:male) ? MALE_NAMES : FEMALE_NAMES
+  # Return an array of [first_name, sur_name] for the given gender.  If
+  # gender is neither :male nor :female, the gender will be randomly
+  # selected.
+  # Returns an array of [first_name, surname]
+  def self.name_for(gender=nil)
+    first_names = case gender
+                  when :male
+                    MALE_NAMES
+                  when :female
+                    FEMALE_NAMES
+                  else
+                    rand(2) == 0 ? MALE_NAMES : FEMALE_NAMES
+                  end
     [ first_names.at(rand(100)), SURNAMES.at(rand(100)) ]
   end
-
 end
-

@@ -62,14 +62,14 @@ module MagRp # {
         rt[ofs] = rt[ofs] # fault in symbols
         idx += 3
       end
-      rt._set_nostubbing
+      rt.__set_nostubbing
       rt.freeze
       @reduce_table = rt
       @token_table = @token_table
       @lexer = nil
       @env = nil 
       @syntax_err_count = 0
-      self._set_nostubbing
+      self.__set_nostubbing
       self
     end
 
@@ -107,6 +107,14 @@ module MagRp # {
       super
     end
 
+    def _install_wordlist(hash)
+      @lexer_wordlist = hash
+    end
+
+    def _wordlist
+      @lexer_wordlist
+    end
+
     def file_name
       @file_name
     end
@@ -117,6 +125,58 @@ module MagRp # {
     InvalidAssignableLhs = IdentitySet.with_all(
        [ :self , :nil , :true , :false , :"__LINE__" , :"__FILE__" ] )
 
+    # replicate some constants from Regexp so they can be
+    # resolved at boot compile time in extras.rb
+    IGNORECASE = Regexp::IGNORECASE
+    MULTILINE = Regexp::MULTILINE
+    EXTENDED = Regexp::EXTENDED
+    #  defined?  not supported during boostrap
+    #  assume Regexp::ONCE not defined in 1.8.6
+    #if defined?( Regexp::ONCE)
+    #  ONCE = Regexp::ONCE
+    #  ENC_NONE = Regexp::ENC_NONE
+    #  ENC_EUC = Regexp::ENC_EUC
+    #  ENC_SJIS = Regexp::ENC_SJIS
+    #  ENC_UTF8 = Regexp::ENC_UTF8
+    #else
+      ONCE     = 0 # 16 # ?
+      ENC_NONE = /x/n.options
+      ENC_EUC  = /x/e.options
+      ENC_SJIS = /x/s.options
+      ENC_UTF8 = /x/u.options
+    #end
+
+    # replicate some constants from the lexer so they can be
+    #  bound at boot compile time in ruby_parser.rb
+    Expr_beg = RubyLexer::Expr_beg
+    Expr_end = RubyLexer::Expr_end
+    Expr_fname = RubyLexer::Expr_fname
+    Expr_endArg = RubyLexer::Expr_endArg
+
+  end # ]
+  RubyParser.__freeze_constants
+
+  class Keyword # [
+    def self.create_transient_wordlist
+      # create a StringKeyValueDictionary from WORDLIST, 
+      # The dictionary, which is not committed,
+      #  will have memory pointer references to all keys and values
+      # Use a StringKeyValueDictionary instead of a Hash
+      #  because it has a C primitive for at() .
+      list = WORDLIST
+      h = StringKeyValueDictionary.__new( list.size )
+      list.each { | arr |
+	k = arr[0]
+	v = arr[1].dup
+	v_siz = v.size
+	for i in 0..v_siz-1 do
+	  v[i] = v[i] # make ref a RamOop
+	end
+	h.at_put(k, v)
+      }
+      h.freeze
+      h
+    end
   end # ]
 
 end # }

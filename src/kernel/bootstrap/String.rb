@@ -7,24 +7,24 @@ class String
 
   primitive 'size=', 'size:'  # Note size=() not in MRI
 
-  primitive_nobridge '_copyfrom_to', 'copyFrom:to:'
-  primitive_nobridge '_findStringStartingAt', 'findString:startingAt:'
-  primitive_nobridge '_md5sum', 'md5sum'
-  primitive_nobridge '_remove_from_to', 'removeFrom:to:'
-  class_primitive_nobridge '_withAll', 'withAll:'
-  class_primitive_nobridge '_alloc', '_basicNew'
+  primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
+  primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
+  primitive_nobridge '__md5sum', 'md5sum'     # used by lib file  digest/md5.rb
+  primitive_nobridge '__remove_from_to', 'removeFrom:to:'
+  class_primitive_nobridge '__withAll', 'withAll:'
+  class_primitive_nobridge '__alloc', '_basicNew'
 
   def self.new(str)
     if self.equal?(String) 
       if str._isString
-        s = _withAll(str)
+        s = __withAll(str)
       else
-        s = _alloc
+        s = __alloc
         str = Type.coerce_to(str, String, :to_str)
         s.replace(str) 
       end      
     else
-      s = _alloc
+      s = __alloc
     end
     s.initialize(str)
     s
@@ -42,7 +42,7 @@ class String
 
   def self.new()
     # no bridge methods for this variant
-    s = _alloc
+    s = __alloc
     s.initialize
     s
   end
@@ -81,7 +81,7 @@ class String
       kstr = self.class.new 
       kstr << self
       k = 1
-      klim = n._divide(16)
+      klim = n.__divide(16)
       # grow kstr to max of ( 1/16 of result size , 16K bytes)
       while k < klim && kstr.length < 8000 
         kstr << kstr 
@@ -102,7 +102,7 @@ class String
   primitive  '+', 'rubyConcatenate:'
 
   #   note smalltalk addAll:  returns arg, not receiver
-  primitive '_append', '_rubyAddAll:'
+  primitive '__append', '_rubyAddAll:'
 
   def <<(arg)
     raise TypeError, "<<: can't modify frozen string" if self.frozen?
@@ -112,21 +112,21 @@ class String
     else
       other = Type.coerce_to(arg, String, :to_str)
     end
-    self._append(other)
+    self.__append(other)
     # self.taint if other.tainted?
     self
   end
 
   primitive_env '<=>',  '_rubyCompare' , ':'
 
-  def _prim_compare_failed(o)
+  def __prim_compare_failed(o)
     # invoked from Smalltalk code in _rubyCompare<env>:
     return nil unless o.respond_to?(:to_str) && o.respond_to?(:<=>)
     return nil unless tmp = (o <=> self)
     return -tmp
   end
 
-  primitive_nobridge '_uppercase_at', 'rubyUpperCaseAt:' # arg is one-based
+  primitive_nobridge '__uppercaseAt', 'rubyUpperCaseAt:' # arg is one-based
 
   def casecmp(o)
     # case-insensitive version of String#<=>
@@ -135,8 +135,8 @@ class String
       o_size = o.size
       lim = size > o_size ? o_size : size # lim is the min
       while i <= lim
-        sc = self._uppercase_at(i)
-        oc = o._uppercase_at(i)
+        sc = self.__uppercaseAt(i)
+        oc = o.__uppercaseAt(i)
         result = sc <=> oc
         return result unless result.equal?(0)
         i += 1
@@ -161,7 +161,7 @@ class String
 
   primitive_env '===',   '_rubyEqual' , ':'   # === same as == for String
 
-  def _prim_equal_failed(other)
+  def __prim_equal_failed(other)
     # invoked from Smalltalk code in _rubyEqual<env>:
     if other.respond_to? :to_str
       other == self  # per specs
@@ -185,7 +185,7 @@ class String
   def =~(*args, &blk)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
-    #   require different args to _storeRubyVcGlobal
+    #   require different args to __storeRubyVcGlobal
     raise ArgumentError, 'expected 1 arg'
   end
 
@@ -193,8 +193,8 @@ class String
     # no bridge method for this variant
     # =~ is mostly translated to  :match  Sexpression by parser ...
     if other._isRegexp
-      m = other._search(self, 0, nil)
-      m._storeRubyVcGlobal(0x20) # store into caller's $~
+      m = other.__search(self, 0, nil)
+      m.__storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
@@ -212,48 +212,49 @@ class String
   end
 
   primitive_nobridge_env '[]' , '_rubyAt', ':'
-  primitive_nobridge_env '_at' , '_rubyAt', ':'
+  primitive_nobridge_env '__at' , '_rubyAt', ':'
  
-  def _prim_at_failed(index)
+  def __prim_at_failed(index)
     # invoked from prim failure code in _rubyAt<env>:
     if index._isRange 
-      arr = index._beg_len(self.length)
+      arr = index.__beg_len(self.length)
       if arr.equal?(nil)
         nil
       else
-        self._at_length( arr[0] , arr[1] )
+        self.__at_length( arr[0] , arr[1] )
       end
     elsif index._isInteger
       raise ArgumentError, 'String#[index] primitive failed' 
     else
-      index = Type.coerce_to_Fixnum_to_int(index)
-      self._at(index)
+      index = Type.__coerce_to_Fixnum_to_int(index)
+      self.__at(index)
     end
   end
 
   primitive_nobridge_env '[]' ,         '_rubyAt', ':length:'
-  primitive_nobridge_env '_at_length' , '_rubyAt', ':length:'
+  primitive_nobridge_env '__at_length' , '_rubyAt', ':length:'
 
-  def _prim_at_length_failed(start, length)
+  def __prim_at_length_failed(start, length)
+    # called from Smalltalk
     if start._isRegexp
-      arr = self._match_regexp(start, length) # arr is [m_begin, m_len]
+      arr = self.__match_regexp(start, length) # arr is [m_begin, m_len]
       return nil if arr.equal?(nil)
       # no tainted logic
-      self._at_length( arr[0] , arr[1] )
+      self.__at_length( arr[0] , arr[1] )
     else
       if start._isFixnum
         if length._isFixnum
           raise ArgumentError, 'String#[start,length] primitive failed'
         else 
-          length = Type.coerce_to_Fixnum_to_int(length)
+          length = Type.__coerce_to_Fixnum_to_int(length)
         end
       else
-        start = Type.coerce_to_Fixnum_to_int(start)
+        start = Type.__coerce_to_Fixnum_to_int(start)
         length = Type.coerce_to(length, Fixnum, :to_int)
       end  
       # no tainted logic
       return nil if length < 0
-      self._at_length(start, length)
+      self.__at_length(start, length)
     end
   end
 
@@ -263,66 +264,67 @@ class String
   end
 
   primitive_nobridge_env '[]=',     '_rubyAt', ':put:'
-  primitive_nobridge_env '_at_put', '_rubyAt', ':put:'
+  primitive_nobridge_env '__at_put', '_rubyAt', ':put:'
   # Smalltalk code handles  Regexp and String  first args
 
-  def _prim_at_put_failed(index, value)
+  def __prim_at_put_failed(index, value)
+    # called from Smalltalk
     if value._isFixnum || value._isString
       # ok
     else 
-      value = Type.coerce_to_String_to_str( value )
+      value = Type.__coerce_to_String_to_str( value )
       val_coerced = true
     end
     if index._isFixnum
       unless val_coerced.equal?(true)
         raise IndexError, ('String#[index]=, ' + " index #{index} out of range")
       end
-      self._at_put(index, value)
+      self.__at_put(index, value)
     elsif index._isRange 
-      arr = index._beg_len(self.length)
+      arr = index.__beg_len(self.length)
       if arr.equal?(nil)
         raise IndexError, ('String#[range]=' + "start out of range for range=#{index}")
       else
-        self._at_length_put( arr[0] , arr[1], value)
+        self.__at_length_put( arr[0] , arr[1], value)
       end
     else
       index = Type.coerce_to(index, Fixnum, :to_int)
-      self._at_put(index, value)
+      self.__at_put(index, value)
     end
     # taint if value.tainted?
     value
   end
 
   primitive_nobridge_env '[]=', '_rubyAt', ':length:put:'
-  primitive_nobridge_env '_at_length_put', '_rubyAt', ':length:put:'
+  primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
   # smalltalk code handles Regexp and Fixnum first args
 
-  def _prim_at_length_put_failed(index, count, value)
+  def __prim_at_length_put_failed(index, count, value)
     index = Type.coerce_to(index, Fixnum, :to_int)
     str_value = Type.coerce_to(value, String, :to_str)
     count = Type.coerce_to(count, Fixnum, :to_int)
-    self._at_length_put(idx, count, str_value)
+    self.__at_length_put(idx, count, str_value)
     # no taint logic
   end
 
   # MNI: String#~
 
-  primitive '_capitalize', 'rubyCapitalize'
+  primitive '__capitalize', 'rubyCapitalize'
 
   def capitalize
-    x = _capitalize
+    x = __capitalize
     # x.taint if self.tainted?
     x
   end
 
   def capitalize!
     raise TypeError, "can't modify frozen string" if frozen?
-    x = _capitalize
+    x = __capitalize
     return nil if x == self
     replace(x)
   end
 
-  primitive '_atEquals', 'at:equals:'
+  # primitive '_atEquals', 'at:equals:'
 
   #     str.chomp(separator=$/)   => new_str
   #
@@ -441,25 +443,25 @@ class String
   primitive 'delete!*', 'rubyDeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
-  primitive '_downcase', 'asLowercase'
-  primitive '_downcase!', 'rubyDowncaseInPlace'
+  primitive '__downcase', 'asLowercase'
+  primitive '__downcase!', 'rubyDowncaseInPlace'
 
   def downcase
-    s = _downcase
+    s = __downcase
     # s.taint if self.tainted?
     s
   end
 
   def downcase!
     raise TypeError, "can't modify frozen string" if frozen?
-    _downcase!
+    __downcase!
   end
 
-  primitive '_dumpInto' , 'rubyDumpInto:'
+  primitive '__dumpInto' , 'rubyDumpInto:'
 
   def dump
     res = self.class.new
-    self._dumpInto(res)
+    self.__dumpInto(res)
     res
   end
 
@@ -517,7 +519,7 @@ class String
 	end
 
 	if i > 0 && self[i-1].equal?( newline ) &&
-	    (ssize < 2 || self._compare_substring(sep, i-ssize, ssize).equal?(0) )
+	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize).equal?(0) )
 	  line = self[last, i-last]
 	  # line.taint if tainted?
 	  yield line
@@ -531,7 +533,7 @@ class String
     else
       while i < my_size
 	if i > 0 && self[i-1].equal?(newline) &&
-	    (ssize < 2 || self._compare_substring(sep, i-ssize, ssize).equal?(0))
+	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize).equal?(0))
 	  line = self[last, i-last]
 	  # line.taint if tainted?
 	  yield line
@@ -552,7 +554,7 @@ class String
   end
   alias each_line each
 
-  def _compare_substring(other, start, size)
+  def __compare_substring(other, start, size)
     my_size = self.size
     if start > my_size || start + my_size < 0
       raise IndexError, "index #{start} out of string"
@@ -617,28 +619,28 @@ class String
     if to > (sz = self.size)
       to = sz
     end
-    self._copyfrom_to( from + 1 , to )
+    self.__copyfrom_to( from + 1 , to )
   end
 
   def gsub(regex, str)
     str = Type.coerce_to(str, String, :to_str)
     out = self.class.new
     start = 0
-    pat = self._get_pattern(regex, true)
+    pat = self.__get_pattern(regex, true)
     last_match = nil
     pat.__each_match(self) do |match|
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
-      out << str._to_sub_replacement(match)
+      out << str.__to_sub_replacement(match)
       start = match.end(0) 
     end
-    out << self._copyfrom_to(start + 1, self.length)
-    last_match._storeRubyVcGlobal(0x20) # store into caller's $~ 
+    out << self.__copyfrom_to(start + 1, self.length)
+    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~ 
     out
   end
 
   # From Rubinius
-  def _to_sub_replacement(match)
+  def __to_sub_replacement(match)
     index = 0
     result = ""
     lim = self.size
@@ -679,13 +681,13 @@ class String
     return result
   end
 
-  def _replace_match_with(match, replacement)
+  def __replace_match_with(match, replacement)
     out = self.class.new
     out << self._gsub_copyfrom_to(0, match.begin(0) )
     unless replacement.equal?(nil)
-      out << replacement._to_sub_replacement(match)
+      out << replacement.__to_sub_replacement(match)
     end
-    out << self._copyfrom_to(match.end(0) + 1, self.length)
+    out << self.__copyfrom_to(match.end(0) + 1, self.length)
     out
   end
 
@@ -696,20 +698,20 @@ class String
     start = 0
     out = self.class.new
     last_match = nil
-    self._get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
-      saveTilde = block._fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0);
       begin
-        block._setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match);
         out << block.call(match[0]).to_s
       ensure
-        block._setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde);
       end
       start = match.end(0) 
     end
-    out << self._copyfrom_to(start + 1, self.length)
-    last_match._storeRubyVcGlobal(0x20) # store into caller's $~ 
+    out << self.__copyfrom_to(start + 1, self.length)
+    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~ 
     out
   end
 
@@ -729,18 +731,18 @@ class String
     #   blocks's home method and caller's home method are the same
     start = 0
     out = self.class.new
-    self._get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       out << self._gsub_copyfrom_to(start, match.begin(0) )
-      saveTilde = block._fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0);
       begin
-        block._setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match);
         out << block.call(match[0]).to_s
       ensure
-        block._setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde);
       end
       start = match.end(0) 
     end
-    out << self._copyfrom_to(start + 1, self.length)
+    out << self.__copyfrom_to(start + 1, self.length)
     if self == out
       nil
     else
@@ -748,18 +750,18 @@ class String
     end
   end
 
-  def _delete_underscore_strip
+  def __delete_underscore_strip
     str = self
-    idx = str._indexOfByte( ?_ , 1 )
+    idx = str.__indexOfByte( ?_ , 1 )
     unless idx.equal?(0)
       str = str.delete('_')
     end
     str.strip
   end
 
-  def _delete_underscore
+  def __delete_underscore
     str = self
-    idx = str._indexOfByte( ?_ , 1 )
+    idx = str.__indexOfByte( ?_ , 1 )
     unless idx.equal?(0)
       str = str.delete('_')
     end
@@ -769,9 +771,9 @@ class String
   def hex
     # Because 0b1 is a proper hex number, rather than the binary number 1,
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
-    s = self._delete_underscore_strip
+    s = self.__delete_underscore_strip
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
-    Integer._from_string( "16r#{$1}#{$3}" )
+    Integer.__from_string( "16r#{$1}#{$3}" )
   end
 
   def include?(item)
@@ -781,50 +783,50 @@ class String
     self.index(item)._not_equal?(nil)
   end
 
-  primitive_nobridge '_indexOfByte', 'indexOfByte:startingAt:'
+  primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'
 
   def index(item, offset)
     zoffset = Type.coerce_to(offset, Integer, :to_int)
-    self._index(item, zoffset)
+    self.__index(item, zoffset)
   end
 
   def index(item)
-    # code other variants explicitly so num frames from _index_string
+    # code other variants explicitly so num frames from __index_string
     #   to caller will be constant
-    self._index(item, 0)
+    self.__index(item, 0)
   end
   def index(item, &block)
-    self._index(item, 0)
+    self.__index(item, 0)
   end
   def index(item, offset, &block)
-    self._index(item, offset)
+    self.__index(item, offset)
   end
 
-  def _index(item, zoffset)
+  def __index(item, zoffset)
     my_size = self.size
     zoffset += my_size if zoffset < 0
     return nil if zoffset < 0 || zoffset > my_size
 
     if item._isString
       return zoffset if item.size.equal?(0)
-      st_idx = self._findStringStartingAt(item, zoffset + 1)
+      st_idx = self.__findStringStartingAt(item, zoffset + 1)
       return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
-      st_idx = self._indexOfByte(item % 256, zoffset + 1)
+      st_idx = self.__indexOfByte(item % 256, zoffset + 1)
       return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
-      idx = item._index_string(self, zoffset)
+      idx = item.__index_string(self, zoffset)
       return idx
     else
       # try to coerce to a number or string and try again,
       #   will raise TypeError if item is a Symbol .
-      coerced = Type.coerce_to_string_or_integer(item)
+      coerced = Type.__coerce_to_string_or_integer(item)
       return self.index(coerced, zoffset)
     end
   end
 
-  primitive_nobridge '_insertall_at', 'insertAll:at:'
+  primitive_nobridge '__insertall_at', 'insertAll:at:'
 
   def insert(index, string)
     # account for smalltalk index
@@ -834,17 +836,20 @@ class String
     if idx <= 0 || idx > size + 1
       raise IndexError, "index #{index} out of string" 
     end
-    _insertall_at(string, idx) # Flip order of parameters
+    __insertall_at(string, idx) # Flip order of parameters
     self
   end
 
-  primitive '_as_symbol', 'asSymbol'  # allows zero size Symbols
+  primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
 
   def intern
     if self.size.equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
     end
-    self._as_symbol
+    if self.__index(0, 0)._not_equal?(nil) 
+      raise ArgumentError, 'symbol string may not contain `\\0\' '
+    end
+    self.__as_symbol
   end
   #  to_sym is aliased to intern, see below
 
@@ -866,7 +871,7 @@ class String
           raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
       end
     end
-    regexp._match_vcglobals(self, 0x30)
+    regexp.__match_vcglobals(self, 0x30)
   end
 
   # MNI: next
@@ -879,21 +884,21 @@ class String
     s = base.to_s
     s << ?r 
     s << str
-    Integer._from_string(s)
+    Integer.__from_string(s)
   end
 
   primitive 'replace', '_rubyReplace:'
 
   primitive          'reverse', 'reverse'
 
-  primitive_nobridge '_reverse_from', '_reverseFrom:'
+  primitive_nobridge '__reverse_from', '_reverseFrom:'
 
   def reverse!
-    self._reverse_from(self) # returns self
+    self.__reverse_from(self) # returns self
   end
 
-  primitive_nobridge '_lastSubstring', 'findLastSubString:startingAt:'
-  primitive_nobridge '_indexOfLastByte', 'indexOfLastByte:startingAt:'
+  primitive_nobridge '__lastSubstring', 'findLastSubString:startingAt:'
+  primitive_nobridge '__indexOfLastByte', 'indexOfLastByte:startingAt:'
 
   # Return the index of the last occurrence of the given substring,
   # character or pattern in self.  Returns nil if not found.  If the second
@@ -901,21 +906,21 @@ class String
   # the search -- characters beyond this point will not be considered.
 
   def rindex(item, original_offset)
-    _rindex(item, original_offset)
+    __rindex(item, original_offset)
   end
   def rindex(item)
-    # code other variants explicitly so num frames from _rindex_string
+    # code other variants explicitly so num frames from __rindex_string
     #   to caller will be constant
-    _rindex(item, Undefined)
+    __rindex(item, Undefined)
   end
   def rindex(item, &block)
-    _rindex(item, Undefined)
+    __rindex(item, Undefined)
   end
   def rindex(item, original_offset, &block)
-    _rindex(item, original_offset)
+    __rindex(item, original_offset)
   end
 
-  def _rindex(item, original_offset)
+  def __rindex(item, original_offset)
     my_size = self.size
     if my_size.equal?(0)
       return nil
@@ -941,16 +946,16 @@ class String
           return zoffset
         end
       end
-      st_idx = self._lastSubstring(item, zoffset + 1)
+      st_idx = self.__lastSubstring(item, zoffset + 1)
       return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
       zoffset = my_size - 1 if zoffset >= my_size
-      st_idx = self._indexOfLastByte(item % 256 , zoffset + 1)
+      st_idx = self.__indexOfLastByte(item % 256 , zoffset + 1)
       return st_idx.equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
       zoffset = my_size  if zoffset > my_size  # allow searching for end of string
-      zidx = item._rindex_string(self, zoffset)
+      zidx = item.__rindex_string(self, zoffset)
       return zidx
     else
       coerced = Type.coerce_to(item, String, :to_str)
@@ -988,7 +993,7 @@ class String
   def slice!(start, a_len)
     sz = self.size
     if start._isRegexp
-      arr = self._match_regexp(start, a_len) # arr is [ m_begin, m_len]
+      arr = self.__match_regexp(start, a_len) # arr is [ m_begin, m_len]
       return nil if arr.equal?(nil)
       r = slice!(arr[0], arr[1])
       # r.taint if self.tainted? or start.tainted?
@@ -1001,11 +1006,11 @@ class String
     start += sz if start < 0
     return nil if start < 0 || start > sz
     return self.class.new if start.equal?(sz)
-    #  _remove_from_to will detect frozen if changes would occur
-    s = _at_length(start, len)
+    #  __remove_from_to will detect frozen if changes would occur
+    s = __at_length(start, len)
     stop = start + len
     stop = sz if stop > sz
-    _remove_from_to(start + 1, stop) # convert to smalltalk indexing
+    __remove_from_to(start + 1, stop) # convert to smalltalk indexing
     if s.equal?(nil)
       return self.class.new
     end
@@ -1022,11 +1027,11 @@ class String
       len = md.end(0) - start
       slice!(start, len)
     elsif arg._isRange
-      first, len = arg._beg_len(self.length)
+      first, len = arg.__beg_len(self.length)
       return nil if first.equal?(nil)
       slice!(first, len)
     elsif arg._isString
-      start = self._findStringStartingAt(arg, 1)
+      start = self.__findStringStartingAt(arg, 1)
       return nil if start.equal?(0)
       slice!(start - 1, arg.length) # adjust coming from smalltalk
     else
@@ -1037,7 +1042,7 @@ class String
     end
   end
 
-  def _match_regexp(regexp, length)
+  def __match_regexp(regexp, length)
     md = regexp.match(self)
     return nil if md.equal?(nil)
     idx = Type.coerce_to(length, Integer, :to_int)
@@ -1142,8 +1147,8 @@ class String
     ret
   end
 
-  def _split_string(string, limit)
-    Regexp.new(self)._split_string(string, limit)
+  def __split_string(string, limit)
+    Regexp.new(self).__split_string(string, limit)
   end
 
   primitive 'squeeze*', 'rubySqueeze:'
@@ -1152,14 +1157,14 @@ class String
   primitive 'squeeze!*', 'rubySqueezeSelf:'
   primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
 
-  primitive '_strip', '_trimReturningSelf:' 
+  primitive '__strip', '_trimReturningSelf:' 
 
   def strip
-    self._strip(false)
+    self.__strip(false)
   end
 
   def strip!
-    res = self._strip(true)
+    res = self.__strip(true)
     if res._not_equal?(self)
       self.replace(res)  # replace detects frozen
       self
@@ -1174,12 +1179,12 @@ class String
   # parameters.
   def sub(pattern, replacement)
     replacement = Type.coerce_to(replacement, String, :to_str)
-    regex = self._get_pattern(pattern, true)
+    regex = self.__get_pattern(pattern, true)
 
     # If pattern is a string, then do NOT interpret regex special characters.
     # stores into caller's $~
-    r = if (match = regex._match_vcglobals(self, 0x30))
-          _replace_match_with(match, replacement)
+    r = if (match = regex.__match_vcglobals(self, 0x30))
+          __replace_match_with(match, replacement)
         else
           dup
         end
@@ -1190,9 +1195,9 @@ class String
   def sub(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-    regex = self._get_pattern(pattern, true)
-    if (match = regex._match_vcglobals(self, 0x30))
-       res = _replace_match_with(match, block.call(match[0]).to_s)
+    regex = self.__get_pattern(pattern, true)
+    if (match = regex.__match_vcglobals(self, 0x30))
+       res = __replace_match_with(match, block.call(match[0]).to_s)
     else
        res = self.dup
     end
@@ -1200,10 +1205,10 @@ class String
   end
 
   def sub!(pattern, replacement)
-    regex = self._get_pattern(pattern, true)
+    regex = self.__get_pattern(pattern, true)
     # stores into caller's $~
-    if match = regex._match_vcglobals(self, 0x30)
-      replace(_replace_match_with(match, replacement))
+    if match = regex.__match_vcglobals(self, 0x30)
+      replace(__replace_match_with(match, replacement))
       # self.taint if replacement.tainted?
       self
     else
@@ -1215,10 +1220,10 @@ class String
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
 
-    regex = self._get_pattern(pattern, true)
-    if match = regex._match_vcglobals(self, 0x30)
+    regex = self.__get_pattern(pattern, true)
+    if match = regex.__match_vcglobals(self, 0x30)
       replacement = block.call(match[0])
-      replace(_replace_match_with(match, replacement))
+      replace(__replace_match_with(match, replacement))
       # self.taint if replacement.tainted?
       self
     else
@@ -1229,7 +1234,7 @@ class String
   # Do ruby conversions of a string or regexp to regexp.
   # If pattern is a string, then quote regexp special characters.
   # If pattern is neither a Regexp nor a String, try to coerce to string.
-  def _get_pattern(pattern, quote = false)
+  def __get_pattern(pattern, quote = false)
     unless pattern._isString || pattern._isRegexp
       if pattern.respond_to?(:to_str)
         pattern = pattern.to_str
@@ -1298,12 +1303,12 @@ class String
     s
   end
 
-  primitive '_to_f', 'asFloat'
+  primitive '__to_f', 'asFloat'
 
   def to_f
-    s = self._delete_underscore_strip
+    s = self.__delete_underscore_strip
     s =~ /^([+-]?\d*(\.\d+)?\d*([eE][+-]?\d+)?)/  # ignores trailing non-digits
-    f = $1._to_f
+    f = $1.__to_f
     f.nan? ? 0.0 : f
   end
 
@@ -1318,8 +1323,8 @@ class String
         str = self[2, self.size - 2]
       end
       radix_str = '10r'   # needed for ruby to_i semantics of 'abc'.to_i
-      radix_str << str._delete_underscore_strip
-      Integer._from_string(radix_str)
+      radix_str << str.__delete_underscore_strip
+      Integer.__from_string(radix_str)
     else
       raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
       exp_prefix = nil
@@ -1351,11 +1356,11 @@ class String
       raise ArgumentError, "__ in string, in to_inum"
     end
     if base.equal?(0)
-      arr = self.extract_base # includes  _delete_underscore_strip
+      arr = self.extract_base # includes  __delete_underscore_strip
       base = arr[0]
       str = arr[1]
     else
-      str = self._delete_underscore_strip
+      str = self.__delete_underscore_strip
     end
     if check
       str = str.downcase
@@ -1383,7 +1388,7 @@ class String
     s = base.to_s
     s << ?r 
     s << str
-    Integer._from_string(s)
+    Integer.__from_string(s)
   end
 
   # Return an array of two elements: [an_int, a_string], where an_int is
@@ -1399,7 +1404,7 @@ class String
   MAGLEV_EXTRACT_BASE_TABLE.freeze
 
   def extract_base(base=10)
-    s = self._delete_underscore_strip
+    s = self.__delete_underscore_strip
     s =~ /^([+-]?)(0[bdox]?)?(.*)/i
     dtwo = $2
     base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo.equal?(nil)
@@ -1428,7 +1433,7 @@ class String
 
   alias to_sym intern
 
-  primitive '_tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
+  primitive '__tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
   #     str.tr!(from_str, to_str)   => str or nil
   #
   #  Translates <i>str</i> in place, using the same rules as
@@ -1437,7 +1442,7 @@ class String
   def tr!(from_str, to_str)
     from = Type.coerce_to(from_str, String, :to_str)
     to   = Type.coerce_to(to_str,   String, :to_str)
-    _tr!(from, to)
+    __tr!(from, to)
   end
 
   #     str.tr(from_str, to_str)   => new_str
@@ -1460,14 +1465,14 @@ class String
     s
   end
 
-  primitive '_tr_s!', 'rubyTrSqueezeFrom:to:'  # prim detects frozen if would change
+  primitive '__tr_s!', 'rubyTrSqueezeFrom:to:'  # prim detects frozen if would change
   #     str.tr_s!(from_str, to_str)   => str or nil
   #
   #  Performs <code>String#tr_s</code> processing on <i>str</i> in place,
   #  returning <i>str</i>, or <code>nil</code> if no changes were made.
   def tr_s!(from_str, to_str)
     return nil if from_str.empty?
-    _tr_s!(from_str, to_str)
+    __tr_s!(from_str, to_str)
   end
 
   #     str.tr_s(from_str, to_str)   => new_str
@@ -1484,17 +1489,12 @@ class String
     to   = Type.coerce_to(to_str,   String, :to_str)
     str = self.dup
     # str.taint if self.tainted?
-    str._tr_s!(from, to) || str
+    str.__tr_s!(from, to) || str
   end
 
   primitive 'unpack', 'rubyUnpack:'
 
-  primitive '_upcase', 'asUppercase'
-  def upcase
-    r = _upcase
-    # r.taint if tainted?
-    r
-  end
+  primitive 'upcase', 'asUppercase'   # no taint propagation
 
   primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
 

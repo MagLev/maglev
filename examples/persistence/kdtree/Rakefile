@@ -1,0 +1,37 @@
+task :default => :test
+
+desc "Test Tree2D class"
+task :test do
+  Dir.glob('test/*_tests.rb').each do |t|
+    sh "maglev-ruby -I lib #{t}"
+  end
+end
+
+desc "Run the migrations and the demo web app"
+task :demo => :migrate do
+  sh "#{ENV['MAGLEV_HOME']}/bin/rackup config.ru"
+end
+
+desc "Create and commit the persistent data for the demo app"
+task :migrate, :force do |t,args|
+  sh "maglev-ruby -I lib migration.rb #{args.force}"
+end
+task :bench do
+  sh "ruby -I lib test/benchmark.rb"
+  sh "maglev-ruby -I lib test/benchmark.rb"
+end
+
+desc "Commit the tree2d code and a tree of random data"
+task :commit do
+  sh "maglev-ruby -Ilib bin/commit.rb"
+end
+
+desc "Time Maglev queries on committed data"
+task :query do
+  sh "maglev-ruby -Ilib bin/time_queries.rb"
+end
+
+desc "Run a profiled version of the queries on maglev"
+task :gprof => :migrate do
+  sh "maglev-ruby -I lib bin/gprofq.rb"
+end

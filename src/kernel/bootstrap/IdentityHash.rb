@@ -4,15 +4,15 @@ class IdentityHash
   #   i.e.  equal?()  ,  to compare keys.
 
   # Class methods
-  class_primitive_nobridge '_new', 'new'
+  class_primitive_nobridge '__new', 'new'
 
   def self.new
     # args are ignored
-    _new
+    __new
   end
 
   def self.from_hash(a_hash)
-    ih = self._new 
+    ih = self.__new 
     a_hash.each { | k,v |
       ih[k] = v
     }
@@ -40,10 +40,10 @@ class IdentityHash
 
   primitive 'hash' , '_hash'
 
-  primitive_nobridge '_at_otherwise', 'at:otherwise:'
+  primitive_nobridge '__at_otherwise', 'at:otherwise:'
   def [](key)
     # returns the value for key, or nil if key not found
-    _at_otherwise(key, nil)
+    __at_otherwise(key, nil)
   end
 
   primitive_nobridge '[]=', 'at:put:'
@@ -97,14 +97,14 @@ class IdentityHash
 
   # Overrides from Object
 
-  primitive   '_basic_dup', 'rubyDup'       # use non-singleton class
-  primitive   '_basic_clone', 'rubyClone'   # use singleton class
+  primitive   '__basic_dup', 'rubyDup'       # use non-singleton class
+  primitive   '__basic_clone', 'rubyClone'   # use singleton class
 
   def inspect
     return "{}" if length.equal?(0)
     str = "{"
-    ts = Thread._recursion_guard_set
-    added = ts._add_if_absent(self)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
     unless added
       str << '...}'
       return str

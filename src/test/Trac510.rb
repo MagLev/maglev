@@ -16,12 +16,12 @@
 begin
   puts "File size of non-existing file is: #{File.new('/testing')}"
 rescue Errno::ENOENT => e1
-  raise "Bad message" unless e1.message == "No such file or directory - /testing"
+  m = e1.message
+  raise "Bad message" unless m == "No such file or directory - /testing"
 rescue Exception => e
   puts "#{e.class}: #{e.inspect}"
   raise "Failed: expecting Errno::ENOENT but got #{e.class}"
 end
-
 puts "File size of non-existing file is: #{File.new('/testing')}"
 #mri    = `ruby        -e 'p File.size(\"/testing\")' 2>&1`
 #maglev = `maglev-ruby -e 'p File.size(\"/testing\")' 2>&1`

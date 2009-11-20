@@ -12,11 +12,16 @@ class RubyLexer
     @cmdarg = StackState.new()
     @nest = 0
     @line_num = 1
-    @keyword_table = Keyword::WORDLIST 
     @last_else_src_offset = -1
     # @comments  not used, this parser not for use to implement RDoc
     @mydebug = MagRp::debug > 1
     reset
+    # @keyword_table installed by _install_wordlist from RubyParser
+  end
+
+  def _install_wordlist(hash)
+    # called from RubyParser#initialize
+    @keyword_table = hash
   end
 
   def reset
@@ -209,6 +214,7 @@ class RubyLexer
   def heredoc_identifier( src )       # [
     # caller has just gotten success from src.check_advance(/\<\</) 
     term = nil
+    term_pos = src.pos
     func = STR_FUNC_BORING
     cstring_buffer = []
     @string_buffer = cstring_buffer
@@ -219,6 +225,7 @@ class RubyLexer
     indent = false
     if src.check_advance(/(-?)(['"`])(.*?)\2/) then
       term = src[2]
+      term_pos = src.pos + 2
       unless src[1].empty? then
         func |= STR_FUNC_INDENT
         indent = true
@@ -235,6 +242,7 @@ class RubyLexer
       rb_compile_error "unterminated here document identifier"
     elsif src.check_advance(/(-?)(\w+)/) then
       term = '"'
+      term_pos = src.pos
       func |= STR_DQUOTE
       unless src[1].empty? then
         func |= STR_FUNC_INDENT
@@ -274,7 +282,7 @@ class RubyLexer
     @lex_strterm = [:heredoc, func, eos, eos_re ]
 
     if term == '`' then
-      @yacc_value = "`"
+      @yacc_value = RpNameToken.new( :"`" , term_pos )
       return :tXSTRING_BEG
     else
       @yacc_value = "\""
@@ -432,12 +440,12 @@ class RubyLexer
 
     # token_type, @yacc_value = nil, "%#{c}#{beg}"
     token_type = nil
-    @yacc_value = "%#{c}#{beg}"
+    y_value = "%#{c}#{beg}"
 
     c_ch = c[0]
     if c_ch.equal?( ?Q ) # when 'Q' then
       ch = short_hand ? nnd : c + beg
-      @yacc_value = "%#{ch}"
+      y_value = "%#{ch}"
       token_type = :tSTRING_BEG
       string_type =  STR_DQUOTE
     elsif c_ch.equal?( ?q ) # when 'q' then
@@ -454,6 +462,7 @@ class RubyLexer
     elsif c_ch.equal?( ?x ) #  when 'x' then
       token_type = :tXSTRING_BEG
       string_type =   STR_XQUOTE
+      y_value = RpNameToken.new( y_value , src.pos )
     elsif c_ch.equal?( ?r ) #   when 'r' then
       token_type = :tREGEXP_BEG
       string_type =   STR_REGEXP
@@ -462,6 +471,8 @@ class RubyLexer
       token_type = :tSYMBEG
       string_type =  STR_SSYM
     end
+
+    @yacc_value = y_value
 
     if token_type.equal?(nil)
       rb_compile_error "Bad %string type. Expected [Qqwxr\W], found '#{c}'." 
@@ -677,6 +688,7 @@ class RubyLexer
       puts "   lexer: tokadd_string at byte #{src.pos} line #{@line_num}"
       puts "                     args  #{args.inspect} awords=#{awords}"
     end
+    num_eols = 0
     until src.eos? do # [
       cres = nil
       s_ch = src.peek_ch 
@@ -719,7 +731,7 @@ class RubyLexer
           src.advance(1)
           cres = self.read_escape
           symbol = (func & STR_FUNC_SYMBOL)._not_equal?( 0)
-          if symbol && cres =~ /\0/ 
+          if symbol && cres._contains_string( '\\0') # symbol && cres =~ /\0/
             # This error path not in ruby_parser2.0.2
             rb_compile_error "symbol cannot contain '\\0'" 
           end
@@ -761,13 +773,15 @@ class RubyLexer
 
         s_matched = src.scan( re )
         cres = s_matched
+        num_eols += cres._count_eols 
         symbol = (func & STR_FUNC_SYMBOL)._not_equal?( 0)
-        if symbol && cres =~ /\0/
+        if symbol && cres._contains_string( '\\0') # symbol && cres =~ /\0/
           rb_compile_error "symbol cannot contain '\\0'" 
         end
       end
       cres ||= s_matched
       @string_buffer << cres
+      @line_num += num_eols
     end # until eos #  ]
 
     cres ||= s_matched
@@ -869,8 +883,8 @@ class RubyLexer
         end
       end
       s_ch_type = src.type_of_ch(s_ch)
-      if (s_ch_type >= RpStringScanner::CTYPE_DIGIT) # [
-        if s_ch_type.equal?( RpStringScanner::CTYPE_DIGIT) 
+      if (s_ch_type >= CTYPE_DIGIT) # [
+        if s_ch_type.equal?( CTYPE_DIGIT) 
           return parse_number
         else
           # must be CTYPE_LC_ALPHA , CTYPE_UC_ALPHA or CTYPE_UNDERSCORE
@@ -888,8 +902,8 @@ class RubyLexer
           end
           return process_token(s_matched, command_state, tok_start_offset)
         end
-      elsif s_ch_type >= RpStringScanner::CTYPE_EOF  # ] [
-        if s_ch_type.equal?( RpStringScanner::CTYPE_SIGN) #  src.scan(/[+-]/))  # [
+      elsif s_ch_type >= CTYPE_EOF  # ] [
+        if s_ch_type.equal?( CTYPE_SIGN) #  src.scan(/[+-]/))  # [
           src.advance(1)
           if s_ch.equal?( ?+ ) 
             utype = :tUPLUS
@@ -1372,7 +1386,7 @@ class RubyLexer
             return :tBACK_REF2
           end
           @lex_strterm = STRTERM_XQUOTE 
-          @yacc_value = "`"
+          @yacc_value = RpNameToken.new( :"`" , tok_start_offset )
           return :tXSTRING_BEG
         elsif s_ch.equal?( ?? ) # src.scan(/\?/)  # ] [
           src.advance(1)
@@ -1553,26 +1567,26 @@ class RubyLexer
             return process_token(s_matched, command_state, tok_start_offset)
           elsif (s_matched = src.scan(/\$_/)) then
             @lex_state = Expr_end
-            @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+            @yacc_value = RpNameToken.new(s_matched, tok_start_offset)
             return :tGVAR
           elsif (s_matched = src.scan(/\$[~*$?!@\/\\;,.=:<>\"]|\$-\w?/)) then
             @lex_state = Expr_end
-            @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+            @yacc_value = RpNameToken.new(s_matched, tok_start_offset)
             return :tGVAR
           elsif (s_matched = src.scan(/\$([\&\`\'\+])/)) then
             @lex_state = Expr_end
             # Explicit reference to these vars as symbols...
             if last_state.equal?( Expr_fname) then
-              @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+              @yacc_value = RpNameToken.new(s_matched, tok_start_offset)
               return :tGVAR
             else
-              @yacc_value = src[1]._as_symbol
+              @yacc_value = src[1].__as_symbol
               return :tBACK_REF
             end
           elsif (s_matched = src.scan(/\$([1-9]\d*)/)) then
             @lex_state = Expr_end
             if last_state.equal?( Expr_fname) then
-              @yacc_value = RpNameToken.new(s_matched._as_symbol, tok_start_offset)
+              @yacc_value = RpNameToken.new(s_matched, tok_start_offset)
               return :tGVAR
             else
               @yacc_value = src[1].to_i
@@ -1623,19 +1637,22 @@ class RubyLexer
     # case tk
     if tt_first_ch.equal?( ?$ ) # when /^\$/ then
       @lex_state = Expr_end
-      @yacc_value = RpNameToken.new( ttoken._as_symbol, tok_start_offset)
+      y_value = RpNameToken.new( ttoken, tok_start_offset)
+      @yacc_value = y_value
       result = :tGVAR
     elsif tt_first_ch.equal?( ?@ )   #  
       if ttoken[1].equal?( ?@ )  # when /^@@/ then
         @lex_state = Expr_end
-        @yacc_value = RpNameToken.new( ttoken._as_symbol , tok_start_offset)
+        y_value = RpNameToken.new( ttoken, tok_start_offset)
+        @yacc_value = y_value
         result = :tCVAR
       else                   # when /^@/ then
         @lex_state = Expr_end
-        @yacc_value = RpNameToken.new( ttoken._as_symbol , tok_start_offset)
+        y_value = RpNameToken.new( ttoken, tok_start_offset)
+        @yacc_value = y_value
         result = :tIVAR
       end
-    else
+    else # [
       tt_last_ch = ttoken[ttoken.size - 1]
       if tt_last_ch.equal?( ?! ) || tt_last_ch.equal?( ?? )  # ttoken =~ /[!?]$/
         result = :tFID
@@ -1660,11 +1677,12 @@ class RubyLexer
         end
       end
 
-      unless clex_state.equal?( Expr_dot) then
+      unless clex_state.equal?( Expr_dot) then # [
         # See if it is a reserved word.
-        kwarr = @keyword_table[ ttoken ] # was keyword = Keyword.keyword[ttoken]
+        #   was keyword = Keyword.keyword[ttoken]
+        kwarr = @keyword_table.at_casesens_otherwise(ttoken, true, nil)
 
-        if kwarr then
+        if kwarr._not_equal?(nil) 
           # clex_state holds "old state" and we update @lex_state
           #   with new state to be valid after return
           kw_state = kwarr[2] # was keyword.state
@@ -1704,7 +1722,7 @@ class RubyLexer
           end
           return kw_id_one
         end
-      end
+      end # ]
 
 
       if (clex_state & Expr_IS_beg_mid_dot_arg_cmdarg)._not_equal?( 0)  then
@@ -1716,10 +1734,16 @@ class RubyLexer
       else
         @lex_state = Expr_end
       end
-      @yacc_value = RpNameToken.new( ttoken , tok_start_offset )
-    end
+      y_value = RpNameToken.new( ttoken , tok_start_offset )
+      @yacc_value = y_value
+    end # ]
 
-    if (last_state._not_equal?( Expr_dot)) && @parser.env[ ttoken._as_symbol].equal?( :lvar)
+    # unless  ttoken.__as_symbol.equal?( y_value.symval )   # uncomment for debugging
+    #   puts 'Inconsistent ttoken'  
+    #   nil.pause
+    # end
+    #
+    if (last_state._not_equal?( Expr_dot)) && @parser.env[ y_value.symval ].equal?( :lvar)
        @lex_state = Expr_end 
     end
     return result

@@ -72,7 +72,7 @@ module MDB
     # new document id.
     def add(document)
       # TODO: Need to validate that it is not already in there?
-      doc_id = Gemstone.increment_pcounter(MDB::SHARED_COUNTER)
+      doc_id = Maglev::System.increment_pcounter(MDB::SHARED_COUNTER)
       raise DocumentAlreadyExists if @documents.key? doc_id # Shouldn't happen...
       @documents[doc_id] = document
 

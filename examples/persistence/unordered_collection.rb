@@ -1,7 +1,7 @@
 # This is an example of maglev persistence on unordered collections with
 # indexing.
 #
-$:.unshift File.dirname(__FILE__)
+# $:.unshift File.dirname(__FILE__)
 
 require 'benchmark'
 require 'names'
@@ -68,7 +68,7 @@ end
 # on the age field of elements of the set.  We can then efficiently search
 # and sort by age on the set.
 people = IdentitySet.new
-people._create_index('age', Fixnum)
+people.create_index('age', Fixnum)
 
 Benchmark.bm do |x|
   population = 100_000
@@ -78,7 +78,7 @@ Benchmark.bm do |x|
   }
 
   x.report("Find the youngsters") {
-    youngsters = people._select([:age], :<, 25)
+    youngsters = people.select([:age], :<, 25)
   }
   puts "Found #{youngsters.length} youngsters"
 
@@ -86,8 +86,8 @@ Benchmark.bm do |x|
   # field (marital_status).  We then intersect the sets to get the result
   old_hermits = nil
   x.report("Find old hermits") {
-    old_ones = people._select([:age], :>=, 75)
-    hermits  = people._select([:marital_status], :==, :hermit)
+    old_ones = people.select([:age], :>=, 75)
+    hermits  = people.select([:marital_status], :==, :hermit)
     old_hermits = hermits * old_ones
   }
 
@@ -101,4 +101,4 @@ end
 
 # TODO: Clean up the indexes.  The indexes are permanently stored, and
 # must be cleaned up explicitly.
-people._remove_index('age')
+people.remove_index('age')

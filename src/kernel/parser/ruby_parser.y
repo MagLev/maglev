@@ -47,7 +47,7 @@ rule
 
          program:   {
 		      # program:
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     }
                     compstmt
@@ -85,7 +85,7 @@ rule
                     {
 		      # stmt: kALIAS fitem
                       lx = @lexer
-                      lx.lex_state=( RubyLexer::Expr_fname )
+                      lx.lex_state=( Expr_fname )
                       result = -901 # lx.lineno_
                     }
                     fitem
@@ -627,14 +627,14 @@ rule
                 | op
                     {
 		      # fname: tIDENTIFIER | tCONSTANT | tFID #  | op
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       result = val[vofs ]   # val_[0] is a RpNameToken
                     }
 
                 | reswords
                     {
 		      # fname: tIDENTIFIER | tCONSTANT | tFID #  | reswords
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       result = val[vofs ]  # val_[0] is a RpNameToken or a String
                     }
 
@@ -665,7 +665,7 @@ rule
                 | undef_list tCOMMA
                     {
 		      # undef_list: fitem #  | undef_list tCOMMA
-                      @lexer.lex_state=( RubyLexer::Expr_fname )
+                      @lexer.lex_state=( Expr_fname )
                     }
                     fitem
                     {
@@ -1175,7 +1175,7 @@ rule
                 | tLPAREN_ARG
                     {
 		      # open_args: call_args #   | tLPAREN_ARG
-                      @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      @lexer.lex_state=( Expr_endArg )
                       result = val[vofs]
                     }
                     tRPAREN
@@ -1189,7 +1189,7 @@ rule
                 | tLPAREN_ARG call_args2
                     {
 		      #  | tLPAREN_ARG call_args2
-                      @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      @lexer.lex_state=( Expr_endArg )
                       result = val[vofs]
                     }
                     tRPAREN
@@ -1275,7 +1275,7 @@ rule
                 | tLPAREN_ARG expr
                     {
 		      # primary: #  | tLPAREN_ARG expr
-                      @lexer.lex_state=( RubyLexer::Expr_endArg )
+                      @lexer.lex_state=( Expr_endArg )
                       result = val[vofs]
                     }
                     opt_nl tRPAREN
@@ -1477,6 +1477,7 @@ rule
                         premature_eof( val[vofs ] )
                       end
                       result = new_for( val[vofs + 4], val[vofs + 1], val[vofs + 7])
+                      result.src_offset=( val[vofs ].src_offset ) # kFOR position
                     }
                 | kCLASS cpath superclass
                     {
@@ -1550,7 +1551,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
 		      # | kDEF singleton dot_or_colon
                       lx = @lexer
                       # @comments.push( lx.comments_ )
-                      lx.lex_state=( RubyLexer::Expr_fname )
+                      lx.lex_state=( Expr_fname )
                       result = val[vofs]
                     }
                     fname
@@ -1558,7 +1559,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
 		      # | kDEF singleton dot_or_colon # fname
                       @in_single += 1
                       @env.extend( false, :def )
-                      @lexer.lex_state=( RubyLexer::Expr_end )# force for args
+                      @lexer.lex_state=( Expr_end )# force for args
                       result = val[vofs]
                     }
                     f_arglist bodystmt kEND
@@ -1897,6 +1898,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                     {
 		      # xstring: tXSTRING_BEG xstring_contents tSTRING_END
                       result = new_xstring( val[vofs + 1])
+                      result.src_offset=( val[vofs ].src_offset ) # tXSTRING_BEG position
                     }
 
           regexp: tREGEXP_BEG xstring_contents tREGEXP_END
@@ -2000,7 +2002,7 @@ xstring_contents: none
                       lx = @lexer
                       result = lx.lex_strterm_
                       lx.lex_strterm=( nil )
-                      lx.lex_state=( RubyLexer::Expr_beg )
+                      lx.lex_state=( Expr_beg )
                     }
                     string_dvar
                     {
@@ -2015,7 +2017,7 @@ xstring_contents: none
                       lx = @lexer
                       result = lx.lex_strterm_
                       lx.lex_strterm=( nil )
-                      lx.lex_state=( RubyLexer::Expr_beg )
+                      lx.lex_state=( Expr_beg )
                       lx.cond_.push( false)
                       lx.cmdarg_.push( false)
                     }
@@ -2061,13 +2063,13 @@ xstring_contents: none
           symbol: tSYMBEG sym
                     {
 		      # symbol: tSYMBEG sym
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       result = val[vofs + 1].symval  # expect an RpNameToken
                     }
                 | tSYMBOL
                     {
 		      # symbol: # | tSYMBOL
-                      result = val[vofs ]._as_symbol
+                      result = self.string_to_symbol( val[vofs ] )
                     }
 
              sym: fname | tIVAR | tGVAR | tCVAR
@@ -2075,7 +2077,7 @@ xstring_contents: none
             dsym: tSYMBEG xstring_contents tSTRING_END
                     {
 		      # dsym: tSYMBEG xstring_contents tSTRING_END
-                      @lexer.lex_state=( RubyLexer::Expr_end )
+                      @lexer.lex_state=( Expr_end )
                       v_one = val[vofs + 1]
 
 		      v_cls = v_one.class
@@ -2083,10 +2085,7 @@ xstring_contents: none
 		        result =v_one.asDSymbolNode 
                       elsif v_cls.equal?(RubyStrNode) # convert :str to :sym
                         str = v_one.strNodeValue
-                        if str.size.equal?(0)
-                          yyerror "empty symbol literal"
-                        end
-			result = RubySymbolNode.s( str._as_symbol )
+			result = RubySymbolNode.s( self.string_to_symbol(str) )
                       elsif v_one.equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil
@@ -2167,7 +2166,7 @@ xstring_contents: none
                 | tLT
                     {
 		      # superclass: # | tLT
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     }
                     expr_value term
@@ -2186,7 +2185,7 @@ xstring_contents: none
                     {
 		      # f_arglist: tLPAREN2 f_args opt_nl tRPAREN
                       result = val[vofs + 1]
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                     }
                 | f_args term
                     {
@@ -2371,7 +2370,7 @@ xstring_contents: none
                 | tLPAREN2
                     {
 		      # singleton: var_ref
-                      @lexer.lex_state=( RubyLexer::Expr_beg )
+                      @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     }
                     expr opt_nl tRPAREN

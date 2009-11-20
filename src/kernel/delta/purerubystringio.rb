@@ -543,10 +543,10 @@ class PureRubyStringIO < IO
         s_len = s_string.length
         if s_pos >= s_len
           @sio_pos = s_pos
-          nil._storeRubyVcGlobal(vc_frame_arg) # store into caller's $_
+          nil.__storeRubyVcGlobal(vc_frame_arg) # store into caller's $_
           return nil  # EOF
         end
-        s_pos = s_len._max(s_pos)
+        s_pos = s_len.__max(s_pos)
       end
       res = s_string[pstart..s_pos]
       if (found)
@@ -554,7 +554,7 @@ class PureRubyStringIO < IO
       end
       @sio_pos = s_pos
     end
-    res._storeRubyVcGlobal(vc_frame_arg) # store into caller's $_
+    res.__storeRubyVcGlobal(vc_frame_arg) # store into caller's $_
     res
   end
 

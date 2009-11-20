@@ -7,7 +7,7 @@ class Thread
   class ThreadCriticalMutex 
 
     # initializes/returns the one instance from   SessionTemps current 
-    class_primitive_nobridge '_instance', 'instance'
+    class_primitive_nobridge '__instance', 'instance'
 
     primitive_nobridge 'locked?', 'isLocked'
 
@@ -22,11 +22,11 @@ class Thread
     end
 
     def self.locked_by(a_thread)
-      self._instance.locked_by(a_thread)
+      self.__instance.locked_by(a_thread)
     end
 
     def self.locked?
-      self._instance.locked?
+      self.__instance.locked?
     end
   
     def locked_by(a_thread)
@@ -34,7 +34,7 @@ class Thread
     end
 
     def self.attempt_lock(a_thread)
-      self._instance.attempt_lock(a_thread)
+      self.__instance.attempt_lock(a_thread)
     end
 
     def attempt_lock(a_thread)
@@ -51,7 +51,7 @@ class Thread
     end
 
     def self.unlock_by(a_thread)
-      self._instance.unlock_by(a_thread)
+      self.__instance.unlock_by(a_thread)
     end
 
     def unlock_by(a_thread)
@@ -61,7 +61,7 @@ class Thread
         self.unlock
       elsif own.equal?(nil)
         # do nothing
-      elsif own._is_terminated
+      elsif own.__is_terminated
         @owner = nil
         self.unlock
       else

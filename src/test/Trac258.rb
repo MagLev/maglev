@@ -15,5 +15,5 @@ end
 test(M.constants, ["A"], 'M.constants for A')
 
 report
-Gemstone.abortTransaction if defined? RUBY_ENGINE
+Maglev.abort_transaction if defined? Maglev
 true

@@ -19,7 +19,7 @@ class Fixnum
   #    + - * >= <= < &  
   #  are special sends and may not be reimplemented in Fixnum.
 
-  primitive_nobridge '_isSpecial', 'isSpecial'
+  primitive_nobridge '__isSpecial', 'isSpecial'
 
   primitive '<',  '_rubyLt:'
   primitive '<=', '_rubyLteq:'
@@ -32,17 +32,17 @@ class Fixnum
   #  /    # note division does not produce Fractions in Ruby
   #         until math.n is required, then may produce Rationals ...
   primitive_nobridge '/', '_rubyDivide:'
-  primitive_nobridge '_divide', '_rubyDivide:'
+  primitive_nobridge '__divide', '_rubyDivide:'
 
-  primitive_nobridge '_quo_rem', 'quoRem:into:' # Smalltalk coercion on arg, used by BigDecimal
+  primitive_nobridge '__quo_rem', 'quoRem:into:' # Smalltalk coercion on arg, used by BigDecimal
 
   primitive_nobridge '%', '_rubyModulo:'
   primitive_nobridge 'modulo', '_rubyModulo:'
 
-  primitive_nobridge '_raised_to' , '_rubyRaisedTo:'
+  primitive_nobridge '__raised_to' , '_rubyRaisedTo:'
   def **(arg)
     if arg._isInteger && arg >= 0
-      return self._raised_to(arg) 
+      return self.__raised_to(arg) 
     end
     if arg._isNumeric
       if (arg <=> 0) < 0
@@ -50,7 +50,7 @@ class Fixnum
         return r ** arg
       end
     end
-    self._raised_to(arg)
+    self.__raised_to(arg)
   end
 
   # unaries  +@  -@  eliminated during IR generation by compiler
@@ -77,7 +77,7 @@ class Fixnum
     end
   end
 
-  primitive_nobridge '_bit_at', 'bitAt:'
+  primitive_nobridge '__bit_at', 'bitAt:'
 
   # abs inherited from Integer
 
@@ -104,4 +104,4 @@ class Fixnum
   end
 
 end
-Fixnum._freeze_constants
+Fixnum.__freeze_constants
