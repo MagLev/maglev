@@ -302,9 +302,10 @@ module MagRp
            #    label = "flip#{node.hash}"
            #    env[label] = :lvar
            #    return s(:flip3, node[1], node[2])
-     label = "flip#{self.hash}"
+     label = 'flip'
+     label << self.object_id.to_s 
      env = aMagRp.env
-     env[label] = :lvar
+     env[label] = :lvar # label is the only use of anon-Symbol key added to Env
            if @exclusive  # dot3
              raise_error # AST has never seen a flip3 yet
              nil
@@ -1223,7 +1224,7 @@ module MagRp
          res
        end
        def inspect
-         "[:defined, @{expressionNode.inspect} ]"
+         "[:defined, #{@expressionNode.inspect} ]"
        end
      end
 
@@ -1729,5 +1730,33 @@ module MagRp
     end
   end
 
+  class GsMethodDictionary  # used by racc state machine token_table
+    class_primitive '__new', 'new:'
+
+    def initialize(*args)
+      raise 'normal instance creation disallowed, must use __new'
+    end
+
+    def self.from_hash(a_hash)
+      dict = self.__new(a_hash.size) 
+      a_hash.each { | k,v |
+        dict.at_put(k, v)
+      }
+      dict 
+    end
+    primitive 'at_put', 'at:put:' 
+    primitive 'at_otherwise', 'at:otherwise:'
+  end
+
+  class StringKeyValueDictionary  # used in the lexer
+    class_primitive '__new', 'new:'
+
+    def initialize(*args)
+      raise 'normal instance creation disallowed, must use __new'
+    end
+
+    primitive 'at_put', 'at:put:'
+    primitive 'at_casesens_otherwise', '_stringAt:caseSensitive:otherwise:'
+  end
 end
 
