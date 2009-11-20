@@ -846,6 +846,9 @@ class String
     if self.size.equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
     end
+    if self.__index(0, 0)._not_equal?(nil) 
+      raise ArgumentError, 'symbol string may not contain `\\0\' '
+    end
     self.__as_symbol
   end
   #  to_sym is aliased to intern, see below

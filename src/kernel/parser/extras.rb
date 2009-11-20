@@ -33,6 +33,25 @@ class Array
   end
 end
 
+class String
+  def _count_eols
+    count = 0
+    idx = 1
+    while true
+      idx = self.__indexOfByte( ?\n , idx )
+      if idx.equal?(0)
+        return count
+      end
+      count += 1
+      idx += 1
+    end
+  end
+
+  def _contains_string(a_string)
+    self.__findStringStartingAt(a_string, 1)._not_equal?(0)
+  end
+end
+
 class Symbol
   # allow String-like access to bytes of Symbols
   primitive_nobridge_env '[]' , '_rubyAt', ':'
@@ -1407,6 +1426,19 @@ module MagRp # {
 
     def backref_assign_error( a_val)  # method missing from rp202 code
       raise_error( "backref_assign_error" )
+    end
+
+    def string_to_symbol(str)
+      unless str._isString
+        raise_error('expected value to be a String')
+      end
+      if str.size.equal?(0)
+        yyerror( 'empty symbol literal' )
+      end
+      if str.__index(0, 0)._not_equal?(nil)
+        yyerror( 'symbol string may not contain `\\0\' ')
+      end
+      str.__as_symbol
     end
 
   end  # }

@@ -140,5 +140,9 @@ module MagRp
 
   RpNameToken = _resolve_smalltalk_global(:RpNameToken)
 
+  GsMethodDictionary = _resolve_smalltalk_global(:GsMethodDictionary)
+
+  StringKeyValueDictionary = _resolve_smalltalk_global(:StringKeyValueDictionary)
+
 end
 MagRp.__freeze_constants

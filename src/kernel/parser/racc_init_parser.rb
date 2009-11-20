@@ -72,7 +72,8 @@ module MagRp #
       end
       @reduce_table   = reduc_tab.freeze
 
-      id_h = IdentityHash.from_hash( arg[10] )
+      # GsMethodDictionary more efficient than IdentityHash for small dictionary
+      id_h = GsMethodDictionary.from_hash( arg[10] )  # arg[10] is racc_token_table
       id_h.freeze
       @token_table =  id_h 
 

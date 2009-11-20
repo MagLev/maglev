@@ -1,7 +1,7 @@
 # This is an example of maglev persistence on unordered collections with
 # indexing.
 #
-$:.unshift File.dirname(__FILE__)
+# $:.unshift File.dirname(__FILE__)
 
 require 'benchmark'
 require 'names'

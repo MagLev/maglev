@@ -63,7 +63,7 @@ module MagRp # {
         caction_pointer = @action_pointer
         caction_check = @action_check
         caction_default = @action_default
-        ctoken_table = @token_table
+        ctoken_table = @token_table  # a GsMethodDictionary 
         caction_table = @action_table
         lex = @lexer
         not_eof = true
@@ -82,14 +82,14 @@ module MagRp # {
                   if @env.is_extended
                     # attempt to issue premature eof error
                     tok = :kEND  # and yacc_value will be :eof
-                    cracc_t = (ctoken_table[tok] or 1)
+                    cracc_t = (ctoken_table.at_otherwise(tok, nil) or 1)
                   else
                     cracc_t = 0
                   end
                   @racc_t = cracc_t
                 else
-                  cracc_t = ctoken_table[tok]
-                  unless cracc_t
+                  cracc_t = ctoken_table.at_otherwise(tok, nil)
+                  if cracc_t.equal?(nil) #  unless cracc_t
                     cracc_t = 1  # error token
                     @racc_t = cracc_t
                   end

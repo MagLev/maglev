@@ -302,7 +302,7 @@ module MagRp
       ["super",    [:kSUPER,    :kSUPER      , - RubyLexer::Expr_arg   ]],
       ["undef",    [:kUNDEF,    :kUNDEF      , - RubyLexer::Expr_fname ]],
       ["break",    [:kBREAK,    :kBREAK      , - RubyLexer::Expr_mid   ]],
-      ["in",       [:kIN,       :kIN         , RubyLexer::Expr_beg   ]],
+      ["in",       [:kIN,       :kIN         , - RubyLexer::Expr_beg   ]],
       ["do",       [:kDO,       :kDO         , - RubyLexer::Expr_beg   ]],
       ["nil",      [:kNIL,      :kNIL        , RubyLexer::Expr_end   ]],
       ["until",    [:kUNTIL,    :kUNTIL_MOD  , - RubyLexer::Expr_beg   ]],
