@@ -158,18 +158,21 @@ module MagRp # {
 
   class Keyword # [
     def self.create_transient_wordlist
-      # create a Hash from WORDLIST, 
-      # The Hash, which is not committed,
+      # create a StringKeyValueDictionary from WORDLIST, 
+      # The dictionary, which is not committed,
       #  will have memory pointer references to all keys and values
-      h = Hash.new
-      WORDLIST.each { | arr |
+      # Use a StringKeyValueDictionary instead of a Hash
+      #  because it has a C primitive for at() .
+      list = WORDLIST
+      h = StringKeyValueDictionary.__new( list.size )
+      list.each { | arr |
 	k = arr[0]
 	v = arr[1].dup
 	v_siz = v.size
 	for i in 0..v_siz-1 do
 	  v[i] = v[i] # make ref a RamOop
 	end
-	h[k] = v
+	h.at_put(k, v)
       }
       h.freeze
       h
