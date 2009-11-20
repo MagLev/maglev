@@ -20,9 +20,6 @@ cur.inp
 etc/maglev.demo.key
 .#*
 *#
-version.txt
-pbm.rb
 lib/ruby/site_ruby/1.8/smalltalk
 lib/maglev/gems
 examples/persistence/gstore/pstore.db
-bin/rake

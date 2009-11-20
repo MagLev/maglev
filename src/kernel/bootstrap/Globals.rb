@@ -1,8 +1,9 @@
-# We define all of these globals up front so that we can open these classes later without accidentally creating new ones
+# We define all of these globals up front so that we can open these classes
+# later without accidentally creating new ones
 
 #            Ruby class name , Gemstone class name
 RUBY.global('Array', 'Array')
-RUBY.global('Behavior', 'Behavior')
+# deleted Behavior
 RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'RClass')
@@ -43,11 +44,10 @@ RUBY.global('TCPSocket', 'TCPSocket')
 RUBY.global('Thread', 'GsProcess')
 RUBY.global('ThreadGroup', 'RubyThreadGroup')
 RUBY.global('Time', 'RubyTime')
-RUBY.global('TransientShortArray', 'TransientShortArray')
 RUBY.global('TrueClass', 'TrueClass')
 RUBY.global('UnboundMethod', 'RubyUnboundMeth')
 
-RUBY.global('Gemstone', 'System')
+#RUBY.global('Gemstone', 'System')
 RUBY.global('RubyContext', 'RubyContext')
 RUBY.global('CZstream', 'CZstream')
 
@@ -146,10 +146,10 @@ RUBY_ENGINE = 'maglev'
 RUBY_PLATFORM = 'Unspecified.platform'
 RUBY_VERSION = '1.8.6'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2009-11-02'
+RUBY_RELEASE_DATE = '2009-11-20'
 RUBY_PATCHLEVEL = 114  # TODO: this is what MRI 1.8.6 shows...
 
-VERSION = '22477-1047'
+VERSION = '22578-1067'
 # If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
 # If false, the handling is unchanged: exception is reported along with the
 #  stringified stack.
