@@ -2069,7 +2069,7 @@ xstring_contents: none
                 | tSYMBOL
                     {
 		      # symbol: # | tSYMBOL
-                      result = val[vofs ].__as_symbol
+                      result = self.string_to_symbol( val[vofs ] )
                     }
 
              sym: fname | tIVAR | tGVAR | tCVAR
@@ -2085,10 +2085,7 @@ xstring_contents: none
 		        result =v_one.asDSymbolNode 
                       elsif v_cls.equal?(RubyStrNode) # convert :str to :sym
                         str = v_one.strNodeValue
-                        if str.size.equal?(0)
-                          yyerror "empty symbol literal"
-                        end
-			result = RubySymbolNode.s( str.__as_symbol )
+			result = RubySymbolNode.s( self.string_to_symbol(str) )
                       elsif v_one.equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil
