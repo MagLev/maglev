@@ -1,0 +1,4 @@
+desc "Demo of using unordered collections with indexes."
+task :default do
+  sh "maglev-ruby unordered_collection.rb"
+end

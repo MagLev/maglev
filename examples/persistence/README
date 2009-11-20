@@ -1,0 +1,14 @@
+This directory contains demos using MagLev persistence.
+
+The gstore directory is a demo of how you might implement the standard ruby
+PStore library using MagLev persistence, rather than the filesystem and
+marshal.  It is a proof of concept only.
+
+kdtree contains a pure Ruby implementation of a KD Tree (a
+multi-dimensional binary tree).  The demo shows how to search for the
+nearest items to a given location.  The database of known locations (postal
+codes, coffee shops, etc.) is stored persistently in a pure ruby data
+structure within MagLev.
+
+
+
