@@ -16,6 +16,9 @@ require File.expand_path('simple', File.dirname(__FILE__))
 #
 #  Ruby handles the non "x = " case fine.
 
+# Test that ARGV is not frozen
+test(ARGV.frozen?, false, "ARGV.frozen")
+
 # Test initial values
 test($VERBOSE, false, "$VERBOSE initial value")
 test($DEBUG,   false, "$DEBUG   initial value")
@@ -31,6 +34,7 @@ test($:.include?('bar'), true, '$LOAD_PATH << foo')
 
 bad_files = $".any? { |i| i =~ /kernel\/bootstrap/ }
 test(bad_files, false, "Found kernel files on $\" :#{$".inspect} ")
+
 
 # BEGIN GLOBAL PARSE CHECK
 x = $!
