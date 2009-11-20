@@ -136,9 +136,14 @@ RUBY.require 'kernel/delta/Range.rb'
 RUBY.require 'kernel/delta/Process.rb'
 RUBY.require 'kernel/delta/purerubystringio.rb'
 RUBY.require 'kernel/delta/String.rb'
-RUBY.require 'kernel/delta/ffi.rb'
-RUBY.require 'kernel/delta/ffi2.rb'
-RUBY.require 'kernel/delta/ffi_struct.rb'
-RUBY.require 'kernel/delta/ffi_enum.rb' # not used yet
-RUBY.require 'kernel/delta/memorypointer.rb'
-RUBY.require 'kernel/delta/buffer.rb'
+#
+# the parser loads it's own subset of FFI in env 2 ,
+# the smalltalk script for loading prims, sets MAGLEV_primLoadFFI for env 1 only
+if Maglev::System.session_temp( :MAGLEV_primLoadFFI )  
+  RUBY.require 'kernel/delta/ffi.rb'
+  RUBY.require 'kernel/delta/ffi2.rb'
+  RUBY.require 'kernel/delta/ffi_struct.rb'
+  RUBY.require 'kernel/delta/ffi_enum.rb'
+  RUBY.require 'kernel/delta/pointer.rb'
+  RUBY.require 'kernel/delta/buffer.rb'
+end
