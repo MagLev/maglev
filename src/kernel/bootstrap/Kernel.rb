@@ -440,14 +440,30 @@ module Kernel
   end
 
   def raise(ex_class, message)
-    ex = ex_class.exception(message)
-    ex.__signal
+    if ex_class._isString
+      msg = ex_class 
+      if message._isString
+         msg << message
+      end
+      raise(RuntimeError, msg)
+    else
+      ex = ex_class.exception(message)
+      ex.__signal
+    end
   end
 
   def raise(ex_class, message, stack)
-    ex = ex_class.exception(message)
-    ex.set_backtrace(stack)
-    ex.__signal
+    if ex_class._isString
+      msg = ex_class 
+      if message._isString
+         msg << message
+      end
+      raise(RuntimeError, msg, stack)
+    else
+      ex = ex_class.exception(message)
+      ex.set_backtrace(stack)
+      ex.__signal
+    end
   end
 
   def raise(msg)
