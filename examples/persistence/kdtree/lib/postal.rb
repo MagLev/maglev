@@ -1,5 +1,9 @@
 # This class represents the name and location of each of the postal codes
 # (zip codes) in the US.  It conforms to the api expected for Tree2D.
+#
+# It can read data in the format provided by
+# http://www.geonames.org
+#
 class PostalCode
   attr_reader :lon, :lat, :name, :zip
 

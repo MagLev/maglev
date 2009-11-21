@@ -4,9 +4,7 @@ require 'benchmark'
 
 if defined? Maglev
   puts "== Committing tree2d.rb"
-  Maglev.persistent do
-    require 'tree2d'
-  end
+  Maglev.persistent { require 'tree2d'}
   Maglev.commit_transaction
 else
   require 'tree2d'
@@ -14,26 +12,12 @@ else
 end
 
 num_nodes = 1_000_000
-unless defined? MAX_SCALAR
-  MAX_SCALAR = 360.0
-  MID_POINT  = MAX_SCALAR / 2.0
-end
-
-points = nil
-tree   = nil
+tree = nil
 
 puts "== Creating tree of #{num_nodes} random nodes"
 Benchmark.bm(20) do |r|
-  r.report("Create Random Points") do
-    points = Array.new(num_nodes) do |i|
-      KDTree::Point2D.new(rand(MAX_SCALAR) - MID_POINT,
-                          rand(MAX_SCALAR) - MID_POINT,
-                          i)
-    end
-  end
-
   r.report("Create random tree") do
-    tree = KDTree::Tree2D.new(points)
+    tree = Collections::Tree2D.random num_nodes
   end
 
   if defined? Maglev

@@ -1,17 +1,17 @@
 require 'rubygems'
 require 'minitest/spec'
 require 'tree2d'
-require 'bestk'
+require 'heap'
 
 MiniTest::Unit.autorun
 
-describe KDTree::Tree2D do
+describe Collections::Tree2D do
   before do
-    @empty_tree = KDTree::Tree2D.new []
-    @p1 = KDTree::Point2D.new(0, 1, :point1)
-    @p2 = KDTree::Point2D.new(0, 2, :point2)
-    @one_pt_tree = KDTree::Tree2D.new [@p1]
-    @two_pt_tree = KDTree::Tree2D.new [@p1, @p2]
+    @empty_tree = Collections::Tree2D.new []
+    @p1 = Collections::Point2D.new(0, 1, :point1)
+    @p2 = Collections::Point2D.new(0, 2, :point2)
+    @one_pt_tree = Collections::Tree2D.new [@p1]
+    @two_pt_tree = Collections::Tree2D.new [@p1, @p2]
   end
 
   describe 'creation' do
@@ -37,7 +37,7 @@ describe KDTree::Tree2D do
     end
 
     it 'creates a tree with all the same points' do
-      tree = KDTree::Tree2D.new [@p1, @p1, @p1, @p1, @p1]
+      tree = Collections::Tree2D.new [@p1, @p1, @p1, @p1, @p1]
       tree.wont_be_nil
       tree.left.wont_be_nil
       tree.right.wont_be_nil
@@ -48,12 +48,12 @@ describe KDTree::Tree2D do
     end
 
     it 'splits first on axis 0' do
-      a = KDTree::Point2D.new(-1,  0, :a)
-      b = KDTree::Point2D.new( 0,  0, :b)
-      c = KDTree::Point2D.new( 1,  0, :c)
-      t1 = KDTree::Tree2D.new [a, b, c]
-      t2 = KDTree::Tree2D.new [c, a, b]
-      t3 = KDTree::Tree2D.new [b, a, c]
+      a = Collections::Point2D.new(-1,  0, :a)
+      b = Collections::Point2D.new( 0,  0, :b)
+      c = Collections::Point2D.new( 1,  0, :c)
+      t1 = Collections::Tree2D.new [a, b, c]
+      t2 = Collections::Tree2D.new [c, a, b]
+      t3 = Collections::Tree2D.new [b, a, c]
       [t1, t2, t3].each do |t|
         t.left.value.must_equal a
         t.left.left.must_be_nil
@@ -68,14 +68,14 @@ describe KDTree::Tree2D do
     end
 
     it 'splits second on axis 1' do
-      a = KDTree::Point2D.new( 0, -2, :a)
-      b = KDTree::Point2D.new(-1,  1, :b)
-      c = KDTree::Point2D.new( 1,  0, :c)
-      d = KDTree::Point2D.new(-2, -1, :d)
-      e = KDTree::Point2D.new(-3,  2, :e)
-      f = KDTree::Point2D.new( 2, -1, :f)
-      g = KDTree::Point2D.new( 3,  2, :g)
-      tree = KDTree::Tree2D.new [a, b, c, d, e, f, g]
+      a = Collections::Point2D.new( 0, -2, :a)
+      b = Collections::Point2D.new(-1,  1, :b)
+      c = Collections::Point2D.new( 1,  0, :c)
+      d = Collections::Point2D.new(-2, -1, :d)
+      e = Collections::Point2D.new(-3,  2, :e)
+      f = Collections::Point2D.new( 2, -1, :f)
+      g = Collections::Point2D.new( 3,  2, :g)
+      tree = Collections::Tree2D.new [a, b, c, d, e, f, g]
       in_order_traversal = [d, b, e, a, f, c, g]
       tree.each { |el| el.must_equal in_order_traversal.shift }
     end
@@ -83,24 +83,24 @@ describe KDTree::Tree2D do
 
   describe 'finding and traversing fixed graphs' do
     before do
-      @tree = KDTree::Tree2D.new(
-        [@a = KDTree::Point2D.new( 0, -2, :a),
-         @b = KDTree::Point2D.new(-1,  1, :b),
-         @c = KDTree::Point2D.new( 1,  0, :c),
-         @d = KDTree::Point2D.new(-2, -1, :d),
-         @e = KDTree::Point2D.new(-3,  2, :e),
-         @f = KDTree::Point2D.new( 2, -1, :f),
-         @g = KDTree::Point2D.new( 3,  2, :g)])
+      @tree = Collections::Tree2D.new(
+        [@a = Collections::Point2D.new( 0, -2, :a),
+         @b = Collections::Point2D.new(-1,  1, :b),
+         @c = Collections::Point2D.new( 1,  0, :c),
+         @d = Collections::Point2D.new(-2, -1, :d),
+         @e = Collections::Point2D.new(-3,  2, :e),
+         @f = Collections::Point2D.new( 2, -1, :f),
+         @g = Collections::Point2D.new( 3,  2, :g)])
     end
 
     it 'finds the nearest point in known graph' do
-      target = KDTree::Point2D.new(-2, 1, :target_point)
+      target = Collections::Point2D.new(-2, 1, :target_point)
       v = @tree.nearest(target)
       v.value.must_equal @b
     end
 
     it 'finds the nearest k points in known graph' do
-      target = KDTree::Point2D.new(-2, 1, :target_point)
+      target = Collections::Point2D.new(-2, 1, :target_point)
 
       best = @tree.nearest_k(target, 3).map {|sr| sr.value }
 
@@ -113,10 +113,10 @@ describe KDTree::Tree2D do
       # This test case sets up the situation where we will have a bestk of
       # 0, but we still need to search the other side of the splitting
       # plane, because we have not yet found k points.
-      @tree = KDTree::Tree2D.new(
-        [@a = KDTree::Point2D.new(  0.0,  0.0, :a),
-         @b = KDTree::Point2D.new( -1.0, -1.0, :b),
-         @c = KDTree::Point2D.new(  1.1,  1.1, :c)])
+      @tree = Collections::Tree2D.new(
+        [@a = Collections::Point2D.new(  0.0,  0.0, :a),
+         @b = Collections::Point2D.new( -1.0, -1.0, :b),
+         @c = Collections::Point2D.new(  1.1,  1.1, :c)])
 
       best = @tree.nearest_k(@a, 1).map {|sr| sr.value}
       best.include?(@a).must_equal true
@@ -143,9 +143,15 @@ describe KDTree::Tree2D do
     MAX_DIST_SQ = MAX_SCALAR * MAX_SCALAR * NUM_DIMENSIONS
 
     before do
-      @points = Array.new
-      1_000.times {|i| @points << KDTree::Point2D.new(rand(MAX_SCALAR), rand(MAX_SCALAR), "point #{i}")}
-      @tree = KDTree::Tree2D.new @points
+      @points = Array.new(1_000) do |i|
+        Collections::Point2D.new(rand(MAX_SCALAR),
+                                 rand(MAX_SCALAR),
+                                 "point #{i}")
+      end
+      @tree = Collections::Tree2D.new @points
+      @target = Collections::Point2D.new(50.01 - rand(MAX_SCALAR),
+                                         49.87 - rand(MAX_SCALAR),
+                                         :target_point)
     end
 
     it 'traverses all nodes with each' do
@@ -156,27 +162,21 @@ describe KDTree::Tree2D do
 
     it 'finds the nearest point (random float data)' do
       100.times do |i|
-        target = KDTree::Point2D.new(50.01 - rand(MAX_SCALAR),
-                                     49.87 - rand(MAX_SCALAR),
-                                     :target_point)
-        expected = find_nearest_k(target, @points, 1)[0]
+        expected = find_nearest_k(@target, @points, 1)[0]
         expected.value.wont_be_nil
         expected.distance.wont_be_nil
-        actual = @tree.nearest(target)
+        actual = @tree.nearest(@target)
         actual.distance.must_equal expected.distance
       end
     end
 
     it 'finds the same nodes with nearest and nearest_k' do
       500.times do |i|
-        target = KDTree::Point2D.new(50.01 - rand(MAX_SCALAR),
-                                     49.87 - rand(MAX_SCALAR),
-                                     :target_point)
-        expected = find_nearest_k(target, @points, 1)[0]
+        expected = find_nearest_k(@target, @points, 1)[0]
         expected.wont_be_nil
 
-        actual   = @tree.nearest(target)
-        actual_k = @tree.nearest_k(target, 1)[0]
+        actual   = @tree.nearest(@target)
+        actual_k = @tree.nearest_k(@target, 1)[0]
 
         # With random data, we may have two nodes with the same
         # coordinates, or two points that are equidistant from the target.
@@ -188,13 +188,10 @@ describe KDTree::Tree2D do
 
     it 'finds the nearest_k points (random float data)' do
       500.times do |i|
-        target = KDTree::Point2D.new(50.01 - rand(MAX_SCALAR),
-                                     49.87 - rand(MAX_SCALAR),
-                                     :target_point)
         k = 20
-        expected = find_nearest_k(target, @points, k)
+        expected = find_nearest_k(@target, @points, k)
         expected.wont_be_nil
-        actual = @tree.nearest_k(target, k)
+        actual = @tree.nearest_k(@target, k)
 
         # With random data, we may have two nodes with the same
         # coordinates, or two points that are equidistant from the target.
@@ -207,21 +204,12 @@ describe KDTree::Tree2D do
       end
     end
 
-    it 'finds nearest_k with an exact match high up the tree' do
-    end
-
-    it 'finds nearest_k with k > num nodes' do
-    end
-
-    it 'finds nearest_k in degenerate trees' do
-    end
-
     # Exhaustive search of points for nodes near target.  Returns an array
     # of at most k SearchResult objects.  Each SearchResult has a node and
     # the distance_squared of that node from the target.
     def find_nearest_k(target, points, k=1)
-      points.inject(BestK.new(k)) do |b, current|
-        b.add(KDTree::SearchResult.new(current, current.distance(target)))
+      points.inject(Collections::BestK.new(k)) do |b, current|
+        b.add(Collections::SearchResult.new(current, current.distance(target)))
       end.values
     end
   end

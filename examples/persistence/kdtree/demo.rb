@@ -1,9 +1,10 @@
-require 'rubygems'
 require 'sinatra'
 
 class Demo < Sinatra::Base
   set :server, ['webrick']
   use_in_file_templates!
+
+  TREE = Maglev::PERSISTENT_ROOT[:kdtree_demo_data]
 
   get '/' do
     erb :index
@@ -14,7 +15,7 @@ class Demo < Sinatra::Base
     @lon = params[:lon].to_f
     @k = params[:k].to_i
     @target = KDTree::Point2D.new(@lon, @lat, :user_target)
-    raw_results = Maglev::PERSISTENT_ROOT[:kdtree_demo_data].nearest_k(@target, @k)
+    raw_results = TREE.nearest_k(@target, @k)
     @results = raw_results.map do |r|
       [r.value, r.value.spherical_miles(@target)]
      end.sort {|a,b| a[1] <=> b[1] }
@@ -26,7 +27,7 @@ __END__
 
 @@layout
 <html>
-  <head><title>Maglev KDTree Demo</title></head>
+  <head><title>MagLev KDTree Demo</title></head>
   <body>
   <%= yield %>
   </body>
