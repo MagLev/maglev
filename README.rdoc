@@ -2,12 +2,28 @@
 
 Please see LICENSES.txt[link:files/LICENSES_txt.html] in this directory.
 
+== Getting started
+
+The simplest way to install and run MagLev is to use the
+installer[http://maglev-discussion.googlegroups.com/web/MagLev-installer.zip]
+available from the
+{MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion/].
+This installer/updater creates a separate (sub)directory for each new version of MagLev.
+
+If you want to participate in MagLev development, or just live on the
+bleeding edge, you can clone the MagLev github repository, i.e. `git
+clone git://github.com/MagLev/maglev.git` To use it, you need to run
+install.sh at least once. After that, everytime you do a 'git pull' you
+need to run update.sh to ensure you have the corresponding GemStone 3.x
+binaries. Otherwise, you might get version skew that prevents MagLev
+from running correctly.  You'll have all the functionality of git,
+but unless you create a new clone for each release, you may be unable
+to revert to an earlier version.
+
 == Prerequisites
 
 Some prerequisites must be installed on your machine before MagLev can
 run correctly. For details, see the Prerequisites[link:files/docs/prerequisites.html] file in the docs directory.
-
-A MagLev build requires a compatible version of the GemStone 3.x binaries. Use the installer mentioned below to ensure your MagLev and GemStone versions are in sync. Simply cloning this repository could result in an indeterminate state that won't run with any GemStone build.
 
 == Documentation
 
