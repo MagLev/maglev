@@ -109,6 +109,9 @@ cd $MAGLEV_HOME
 mkdir -p locks
 # and the correct updated keyfile
 ln -sf maglev.demo.key-$OS etc/maglev.demo.key
+# Make sure we have specs and benchmarks.
+echo "[Info] updating MSpec, RubySpec, and RBS submodules"
+git submodule update --init 
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable /usr/bin/rake
