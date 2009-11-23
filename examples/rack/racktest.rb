@@ -1,5 +1,3 @@
-$:.unshift "#{ENV['MAGLEV_HOME']}/src/external/rack/lib"
-
 require 'rack'
 require 'webrick'
 

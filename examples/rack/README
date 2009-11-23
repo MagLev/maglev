@@ -1,4 +1,15 @@
-This directory contains a few simple apps to test that rack works in
-MagLev.  rackup is not yet working.  All apps run on http://localhost:9292.
+This directory contains examples of using Rack with MagLev.
 
-Just run them like: "$ maglev-ruby app1.rb"
+== Setup
+
+These demos assume you've already installed Rack via Ruby Gems:
+
+  $ $MAGLEV_HOME/bin/maglev-gem install rack
+
+All apps run on http://localhost:9292.
+
+== Run
+
+The demos can be run via rake.
+
+
