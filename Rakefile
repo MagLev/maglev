@@ -27,7 +27,7 @@ CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html', 'vmunit.log', 
 CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk', 'version.txt')
 
 Rake::RDocTask.new do |rd|
-  rd.main = "README2.rdoc"
+  rd.main = "README.rdoc"
   rd.rdoc_files.include('README*', 'docs/*', 'LICENSES.txt', 'src/kernel/bootstrap/Maglev.rb')
 end
 
