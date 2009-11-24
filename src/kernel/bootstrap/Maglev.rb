@@ -351,6 +351,16 @@ module Maglev
     return System.abort_transaction
   end
 
+  # Starts a new transaction for the session.  An abort is done before
+  # the new transaction is started - giving the session a new snapshot of
+  # the repository.
+  #
+  # If any permanent objects had been written by the session, their state
+  # is aborted.  This method returns nil.  def begin_transaction
+  def begin_transaction
+    return System.begin_transaction
+  end
+
   # $LOADED_FEATURES has a persistent Array and a transient Array .  In
   # ruby code, $LOADED_FEATURES returns the transient Array , and
   # assignment to $LOADED_FEATURES will change the transient Array.  At VM
@@ -370,7 +380,7 @@ module Maglev
 
   def __system
     # following ref to Maglev::System can be bound at boot compile
-    return System 
+    return System
   end
   module_function( :__system )
 end
