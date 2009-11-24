@@ -1,16 +1,4 @@
 class Array
-  # begin private helper methods
-  # TODO: Some of these don't begin with an '_'...
-
-  primitive_nobridge '__at' , '_rubyAt:'
-  primitive_nobridge '__at' , '_rubyAt:length:'
-
-  primitive_nobridge '__at_put', '_rubyAt:put:'
-  primitive_nobridge '__at_put', '_rubyAt:length:put:'
-
-  primitive_nobridge '__fillFromToWith', 'fillFrom:to:with:'
-
-  primitive 'size=', 'size:'
 
   # TODO consider a method prefix __nobr__ which during load prims
   #   would suppress generation of bridge methods for private
@@ -64,6 +52,7 @@ class Array
     Hash[self]
   end
 
+  primitive_nobridge '__fillFromToWith', 'fillFrom:to:with:'
   primitive_nobridge '__insertall_at', 'insertAll:at:'
 
   def __add_arguments(arg)
@@ -340,7 +329,8 @@ class Array
 
   def __joinStringsAsSymbol
     # called from generated code
-    self.__joinStrings.__as_symbol
+    # use intern to reject empty symbol and ?0 characters
+    self.__joinStrings.intern  
   end 
 
   def __joinStringsWithRegexpOptions(opts_integer)
@@ -602,6 +592,15 @@ class Array
 
   primitive_nobridge '[]' , '_rubyAt:'
   primitive_nobridge '[]' , '_rubyAt:length:'
+
+  # variants for use within bootstrap code, after the first use of second arg,
+  #  so first use will show up in profiling results.
+  primitive_nobridge '__at' , '_rubyAt:'
+  primitive_nobridge '__at' , '_rubyAt:length:'
+
+  primitive_nobridge '__at_put', '_rubyAt:put:'
+  primitive_nobridge '__at_put', '_rubyAt:length:put:'
+
 
   def [](*args)
     len = args.size
@@ -1243,6 +1242,7 @@ class Array
   end
 
   primitive 'size'
+  primitive 'size=', 'size:'
 
   primitive 'slice', '_rubyAt:'
   primitive 'slice', '_rubyAt:length:'
