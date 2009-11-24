@@ -42,19 +42,12 @@ module MagRp # {
     end
 
     def _bind_instvars
+      # defines the fixed instVars
       # ensures instvars are ram_oops , returns self
       # Used to initialze a transient copy of MagTemplate
       @mydebug = MagRp::debug > 1
-      @racc_debug_out = @racc_debug_out
-      @action_table = TransientShortArray._with_shorts(@action_table).freeze
-      @action_check = TransientShortArray._with_shorts(@action_check).freeze
-      @action_default = @action_default
-      @action_pointer = @action_pointer
-      @goto_table = TransientShortArray._with_shorts(@goto_table).freeze
-      @goto_check = TransientShortArray._with_shorts(@goto_check).freeze
-      @goto_default = @goto_default
-      @goto_pointer = @goto_pointer
-      rt = @reduce_table.dup
+
+      rt = @reduce_table.dup  # size about 1497
       len = rt.size
       idx = 0
       while idx < len
@@ -65,12 +58,61 @@ module MagRp # {
       rt.__set_nostubbing
       rt.freeze
       @reduce_table = rt
+
+      _validate_goto_tables
+
+      @racc_debug_out = @racc_debug_out
+      @action_table = TransientShortArray._with_shorts(@action_table).freeze # size about 23880
+      @action_check = TransientShortArray._with_shorts(@action_check).freeze #  same size as action_table
+      @action_default = @action_default  # size about 896
+      @action_pointer = @action_pointer  #   same size as action_default
+      @goto_table = TransientShortArray._with_shorts(@goto_table).freeze # size about 2302
+      @goto_check = TransientShortArray._with_shorts(@goto_check).freeze #  same size as goto_table
+      @goto_default = @goto_default # size about 141
+      @goto_pointer = @goto_pointer #   same size as  goto_default
+
       @token_table = @token_table
       @lexer = nil
       @env = nil 
       @syntax_err_count = 0
+      @save_last_len = nil
+      @counts_array = nil
+      _init_counts_array
       self.__set_nostubbing
       self
+    end
+
+    def _validate_goto_tables
+      goto_table = @goto_table
+      goto_check = @goto_check.dup
+      @goto_check = goto_check  
+      goto_pointer = @goto_pointer
+      lim = goto_table.size
+      unless lim == goto_check.size
+        raise 'inconsistent goto table sizes'
+      end
+      # ensure that nils in @goto_table and @goto_check match.
+      #  remember that the TransientShortArrays represent nils as 0
+      #  and the primitive _rubyParserShortAt:   translates 0 to nil on read
+      n = 0
+      while n < lim
+        chk = goto_check[n]
+        unless (goto_table[n].equal?(nil)).equal?( chk.equal?(nil) )
+          raise 'mismatch on nils in goto tables' 
+        end
+        n += 1
+      end 
+      n = 0
+      reduce_table = @reduce_table
+      n = 0
+      lim = reduce_table.size
+      while n < lim
+        val = reduce_table[n+1] - Racc_nt_base
+        if val >= 0x7FFF
+          raise "reduce_table.#{n} - Racc_nt_base exceeds 0x7FFF "
+        end
+        n += 3
+      end
     end
 
     def _racc_init_sysvars

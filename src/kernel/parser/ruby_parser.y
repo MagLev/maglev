@@ -154,7 +154,7 @@ rule
                     {
 		      # | klBEGIN
                       if (@in_def || @in_single > 0) then
-                        yyerror "BEGIN in method"
+                        raise SyntaxError , "BEGIN in method" 
                       end
                       @env.extend( false, nil)
                       result = val[vofs]
@@ -508,7 +508,7 @@ rule
                     {
 		      # mlhs_node: variable #  | primary_value tCOLON2 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
                     # all RubyColon2Node.s  expect second arg to be a RpNameToken
                     #  result = s(:const, s(:colon2, val_[0], val_[2].to_sym), nil)
@@ -520,7 +520,7 @@ rule
                     {
 		      # mlhs_node: variable #  | tCOLON3 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
                       # all RubyColon3Node.s  expects arg to be a RpNameToken
                       # result = s(:const, nil, s(:colon3, val_[1].to_sym))
@@ -570,7 +570,7 @@ rule
                     {
 		      # lhs: variable #  | primary_value tCOLON2 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
                       # result = s(:const, s(:colon2, val_[0], val_[2].to_sym))
              nam = val[vofs + 2] 
@@ -581,7 +581,7 @@ rule
                     {
 		      # lhs: variable #  | tCOLON3 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
 
                       # result = s(:const, s(:colon3, val_[1].to_sym))
@@ -1519,7 +1519,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
 		      # | kMODULE cpath
                       # @comments.push( @lexer.comments_ )
                       if   @in_def or @in_single > 0
-                        yyerror "module definition in method body" 
+                        raise SyntaxError,  "module definition in method body" 
                       end
                       @env.extend( false, :module )
                       result = val[vofs]
@@ -1764,7 +1764,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                     {
 		      # brace_block: tLCURLY # compstmt kEND
                       if val[vofs + 5].equal?( :tEOF )
-                        premature_eof( val[vofs + 1] )
+                        premature_eof( val[vofs] )
                       end
                       args = val[vofs + 2]
                       body = val[vofs + 4]
@@ -2069,7 +2069,7 @@ xstring_contents: none
                 | tSYMBOL
                     {
 		      # symbol: # | tSYMBOL
-                      result = self.string_to_symbol( val[vofs ] )
+                      result =  val[vofs ].__as_symbol 
                     }
 
              sym: fname | tIVAR | tGVAR | tCVAR
@@ -2268,19 +2268,19 @@ xstring_contents: none
       f_norm_arg: tCONSTANT
                     {
 		      # f_norm_arg: tCONSTANT
-                      yyerror "formal argument cannot be a constant: #{val[vofs ]}"
+                      raise SyntaxError, "formal argument cannot be a constant: #{val[vofs ]}"
                       result = val[vofs]
                     }
                 | tIVAR
                     {
 		      # f_norm_arg: # | tIVAR
-                      yyerror "formal argument cannot be an instance variable"
+                      raise SyntaxError, "formal argument cannot be an instance variable"
                       result = val[vofs]
                     }
                 | tCVAR
                     {
 		      # f_norm_arg: # | tCVAR
-                      yyerror "formal argument cannot be a class variable"
+                      raise SyntaxError, "formal argument cannot be a class variable"
                       result = val[vofs]
                     }
                 | tIDENTIFIER
