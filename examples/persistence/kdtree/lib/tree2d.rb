@@ -22,7 +22,7 @@ module Collections
 
     # Create a Tree2D with +size+ nodes randomly located.
     def self.random(size=1_000)
-      new(Array.new(num_nodes) { |i| Point2D.random("point #{i}") })
+      new(Array.new(size) { |i| Point2D.random("point #{i}") })
     end
 
     attr_reader :left, :right, :value

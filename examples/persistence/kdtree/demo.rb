@@ -14,7 +14,7 @@ class Demo < Sinatra::Base
     @lat = params[:lat].to_f
     @lon = params[:lon].to_f
     @k = params[:k].to_i
-    @target = KDTree::Point2D.new(@lon, @lat, :user_target)
+    @target = Collections::Point2D.new(@lon, @lat, :user_target)
     raw_results = TREE.nearest_k(@target, @k)
     @results = raw_results.map do |r|
       [r.value, r.value.spherical_miles(@target)]

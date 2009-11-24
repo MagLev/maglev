@@ -1,7 +1,10 @@
 require 'benchmark'
 require 'tree2d'
 
-num_nodes = 1_000_000
+# NOTE: at a million nodes, it takes most of the rubies a couple of minutes
+#       to create the tree...
+#  num_nodes = 1_000_000
+num_nodes = 100_000
 num_queries = 100
 MAX_SCALAR = 360.0
 MID_POINT  = MAX_SCALAR / 2.0

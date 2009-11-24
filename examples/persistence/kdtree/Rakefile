@@ -1,4 +1,4 @@
-task :default => :test
+task :default => 'maglev:demo'
 
 MAGLEV = (not ENV['MAGLEV_HOME'].nil?) and File.directory? ENV['MAGLEV_HOME']
 

@@ -124,6 +124,7 @@ module Collections
   #     1_000.times {|i| best.add rand(100) }
   #     best.values  # => an array of the ten biggest numbers seen
   #
+  # Work around Trac634 instead of deriving fr
   class BestK < Heap
     # Initializes a new BestK element to manage at most +k+ elements.  If a
     # block is given, then it is used to determine which of two objects is
@@ -135,10 +136,16 @@ module Collections
       raise ArgumentError, "k must be greater than 0: #{k}" unless k > 0
       # Because we really use a heap, we need to invert the logic of the
       # comparison, since we throw away the top element of the heap.
-      cmp = block_given? ?
-              Proc.new {|a,b| not block.call(a,b) } :
-              Proc.new {|a,b| a <= b }
-      super(k, &cmp)
+        cmp = block_given? ?
+          Proc.new {|a,b| not block.call(a,b) } :
+          Proc.new {|a,b| a <= b }
+
+      # Hack to work around trac 634: We should be able to pass the compare
+      # block via initialize.  Until the bug is fixed, directly set the cmp
+      # instvar.
+      #super(k, &cmp)
+      super(k)
+      @cmp = cmp
       @limit = k
     end
 
