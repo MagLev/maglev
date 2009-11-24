@@ -8,13 +8,13 @@
 *.rbc
 *.swp
 *tmproj
+/gemstone
 /backups/
 /data/
 /html/
 /gemstone/
 /locks/
 /log/
-gemstone.old/
 debugspec.inp
 cur.inp
 etc/maglev.demo.key
