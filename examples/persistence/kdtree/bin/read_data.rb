@@ -12,7 +12,7 @@ Benchmark.bm(20) do |b|
   puts "=== Parsed #{postal_codes.size} postal codes"
 
   b.report("build tree") do
-    tree = KDTree::Tree2D.new postal_codes
+    tree = Collections::Tree2D.new postal_codes
   end
 
   b.report("find 2 nodes") do
@@ -20,7 +20,9 @@ Benchmark.bm(20) do |b|
     tree.nearest_lat_lon(42.786582654004896, -96.96773529052734)
   end
   b.report("find nearest 10 nodes") do
-    target = KDTree::Point2D.new(42.78532283730215, -97.086181640625, :target)
+    target = Collections::Point2D.new(42.78532283730215,
+                                      -97.086181640625,
+                                      :target)
     nearest = tree.nearest_k(target, 10)
     nearest.each { |sr| p sr.value }
   end

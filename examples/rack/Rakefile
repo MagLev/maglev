@@ -1,0 +1,17 @@
+task :default => :racklobster
+
+desc "Run hello world rack app"
+task :hello do
+  sh "maglev-ruby -rubygems app1.rb"
+end
+
+desc "Run the rack lobster demo via rackup"
+task :racklobster do
+  sh "#{ENV['MAGLEV_HOME']}/bin/rackup lobster.ru"
+end
+
+desc "Run racktest.rb"
+task :racktest do
+  sh "maglev-ruby -rubygems racktest.rb"
+end
+

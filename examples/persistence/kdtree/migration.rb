@@ -24,17 +24,10 @@ Maglev.commit_transaction
 
 tree = if go_postal
          puts "Creating tree of US postal zones"
-         KDTree::Tree2D.new(PostalCode.parse_file postal_codes)
+         Collections::Tree2D.new(PostalCode.parse_file postal_codes)
        else
          puts "Creating tree of #{count} random points"
-         MAX_SCALAR = 360.0
-         MID_POINT  = 180.0
-         points = Array.new(50_000) do |i|
-              [rand(MAX_SCALAR) - MID_POINT,
-              rand(MAX_SCALAR) - MID_POINT,
-              i]
-         end
-         KDTree::Tree2D.new(points)
+         Collections::Tree2D.random(50_000)
        end
 Maglev::PERSISTENT_ROOT[:kdtree_demo_data] = tree
 Maglev.commit_transaction

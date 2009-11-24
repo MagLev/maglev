@@ -1,4 +1,4 @@
-# Start of a KD Tree library.  Right now, only 2D trees are supported, but
+# Start of a KD Tree library.  Currently, only 2D trees are supported, but
 # the general algorithm should work for higher dimensions.  There are a few
 # optimizations for 2D trees (basically, instead of iterating through the
 # axis by using Point[], we access with x() and y(), which cuts down the
@@ -11,15 +11,19 @@
 # * Rebalance is hard for KD Trees.  Need to implement a re-generate
 #   which just completely rebuilds the tree
 
-require 'bestk'
+require 'heap'
 
-module KDTree
-
+module Collections
   # Tree2D is a KD-Tree of dimension 2.
   #
   # Values are stored in both the leaves and the interior nodes.
   class Tree2D
     include Enumerable
+
+    # Create a Tree2D with +size+ nodes randomly located.
+    def self.random(size=1_000)
+      new(Array.new(size) { |i| Point2D.random("point #{i}") })
+    end
 
     attr_reader :left, :right, :value
 
@@ -203,6 +207,14 @@ module KDTree
   # A Point2D contains two coordinates, x and y, and may have some data
   # associated with it.
   class Point2D
+    MAX_SCALAR = 360.0
+    MID_POINT  = MAX_SCALAR / 2.0
+
+    # Return Point2D with random lat and lon.  Default name is :target.
+    def self.random(name=:target)
+      new(rand(MAX_SCALAR) - MID_POINT, rand(MAX_SCALAR) - MID_POINT, name)
+    end
+
     attr_reader :x, :y, :data
 
     def initialize(x, y, data=nil)

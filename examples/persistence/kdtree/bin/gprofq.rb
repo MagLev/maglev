@@ -1,7 +1,3 @@
-
-MAX_SCALAR = 360.0
-MID_POINT  = MAX_SCALAR / 2.0
-
 def time_queries(a_tree)
   num_queries = 10
   k = 100
@@ -9,9 +5,7 @@ def time_queries(a_tree)
 
   puts "creating random targets (not profiled)"
   targets = Array.new(num_queries) do |i|
-    KDTree::Point2D.new(rand(MAX_SCALAR) - MID_POINT,
-                        rand(MAX_SCALAR) - MID_POINT,
-                        :target)
+    Collections::Point2D.random("target #{i}")
   end
 
   puts "Profiling #{num_queries} queries"
@@ -21,7 +15,6 @@ def time_queries(a_tree)
   results = Maglev::Gprof.monitor do
     num_queries.times { |i| a_tree.nearest_k(targets[i], k) }
   end
-
   puts results
 end
 
