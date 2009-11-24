@@ -1421,7 +1421,15 @@ module MagRp
              self
            end
            def inspect
-             self._inspect("callargs")
+             res = "[:callargs "
+             if @list
+               @list.each { | ea |  res << ", #{ea.inspect}" }
+             end
+             if @iterNode 
+               res << ", #{@iterNode.inspect}"
+             end
+             res << "]"
+             res
            end
          end
 
