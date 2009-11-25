@@ -75,22 +75,23 @@ Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
 
 == Tips and troubleshooting
 
-* MagLev has {ACID transactions}[http://en.wikipedia.org/wiki/ACID].
-  To share persistent objects between two running
-  VM's you need to make use of <tt>Maglev.commit_transaction</tt> and
-  <tt>Maglev.abort_transaction</tt>.
-  Read the persistence-api docs for more info.
-
 * rake needs to be in your PATH. It's needed to install and to bootstrap MagLev.
   The MagLev installer expects rake to be in /usr/bin/rake. You shouldn't install
   rake into MagLev -- it won't work.
 
-* If you get this error:
+* You need to start MagLev before running "maglev-ruby", "maglev-gem", or "maglev-irb". Either
+  "rake maglev:start" or "maglev start" will do that. While not strictly required it's better to
+  stop MagLev before turning off your machine. i.e. "rake maglev:stop" or "maglev stop".
+
+* If you get this error when running maglev:start:
     rake aborted!
     Don't know how to build task 'maglev:start'
   it indicates /usr/bin/rake wasn't found during installation and so important
   steps were skipped. You can re-run the installer, or try this:
     rake stone:create[maglev]
+
+* if you get an error starting maglev-irb, try "maglev-irb -f". It's likely
+  something in your .irbrc is breaking maglev-irb.
 
 * RubyGems 1.3.5 is preinstalled. The command to use it is "maglev-gem". For
   example: "maglev-gem install sinatra" will install both Sinatra and Rack
@@ -105,7 +106,9 @@ Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
   If it's not, either reinstall MagLev or correct the first line of
   bin/maglev-gem
 
-* You need to start MagLev before running "maglev-ruby", "maglev-gem", maglev-irb". Either
-  "rake maglev:start" or "maglev start" will do that. While not strictly required it's better to
-  stop MagLev before turning off your machine. i.e. "rake maglev:stop" or "maglev stop".
+* MagLev has {ACID transactions}[http://en.wikipedia.org/wiki/ACID].
+  To share persistent objects between two running
+  VM's you need to make use of <tt>Maglev.commit_transaction</tt> and
+  <tt>Maglev.abort_transaction</tt>.
+  Read the persistence-api docs for more info.
 
