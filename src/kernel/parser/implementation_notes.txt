@@ -202,3 +202,58 @@ Lexing of double quoted strings (Maglev Trac 580)
   Added logic to tokadd_string() in Lexer, to count end-of-lines
   contained in a string constant using " , see  _count_eols  uses.
 
+23 Nov 2009
+  For the original code in racc_parser.rb
+      elsif act == -reduce_n
+        #
+        # error
+        #
+        case @racc_error_status
+        when 0
+          unless arg[21]    # user_yyerror
+            nerr += 1
+            on_error @racc_t, @racc_val, @racc_vstack
+          end
+        when 3
+          if @racc_t == 0   # is $
+            throw :racc_end_parse, nil
+          end
+          @racc_read_next = true
+        end
+   Change the Maglev logic to be equivalent to
+      elsif act == -reduce_n
+        #
+        # error
+        #
+        if @racc_t == 0   # is $
+          throw :racc_end_parse, nil
+        end
+        case @racc_error_status
+        when 0
+          unless arg[21]    # user_yyerror
+            nerr += 1
+            on_error @racc_t, @racc_val, @racc_vstack
+          end
+        when 3
+          @racc_read_next = true
+        end
+   To avoid infinite loop when  production of
+      SyntaxError: empty symbol literal 
+   is followed by EOF
+
+   For these error paths in  ruby_parser.y,
+     "BEGIN in method"   
+     "module definition in method body"
+     "formal argument cannot be a constant: 
+     "formal argument cannot be an instance variable"
+     "formal argument cannot be a class variable"
+   change from calling yyerror to   raise SyntaxError to avoid infinite shift
+   after hitting EOF .
+
+   In ruby_parser.y , make all paths with
+     "dynamic constant assignment" 
+   use     raise SyntaxError     to ensure errors get raised
+
+   In     def assignable      in  extras.rb,
+   add logic to detect dynamic constant assignment, for a case
+   not detected in the .y file.

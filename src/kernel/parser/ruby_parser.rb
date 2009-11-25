@@ -3070,7 +3070,7 @@ end
 def _reduce_20(val, vofs)
 		      # | klBEGIN
                       if (@in_def || @in_single > 0) then
-                        yyerror "BEGIN in method"
+                        raise SyntaxError , "BEGIN in method" 
                       end
                       @env.extend( false, nil)
                       result = val[vofs]
@@ -3523,7 +3523,7 @@ end
 def _reduce_80(val, vofs)
 		      # mlhs_node: variable #  | primary_value tCOLON2 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
                     # all RubyColon2Node.s  expect second arg to be a RpNameToken
                     #  result = s(:const, s(:colon2, val_[0], val_[2].to_sym), nil)
@@ -3537,7 +3537,7 @@ end
 def _reduce_81(val, vofs)
 		      # mlhs_node: variable #  | tCOLON3 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
                       # all RubyColon3Node.s  expects arg to be a RpNameToken
                       # result = s(:const, nil, s(:colon3, val_[1].to_sym))
@@ -3600,7 +3600,7 @@ end
 def _reduce_88(val, vofs)
 		      # lhs: variable #  | primary_value tCOLON2 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
                       # result = s(:const, s(:colon2, val_[0], val_[2].to_sym))
              nam = val[vofs + 2] 
@@ -3613,7 +3613,7 @@ end
 def _reduce_89(val, vofs)
 		      # lhs: variable #  | tCOLON3 tCONSTANT
                       if (@in_def || @in_single > 0) then
-                        yyerror "dynamic constant assignment"
+                        raise SyntaxError,  "dynamic constant assignment"
                       end
 
                       # result = s(:const, s(:colon3, val_[1].to_sym))
@@ -4941,7 +4941,7 @@ def _reduce_311(val, vofs)
 		      # | kMODULE cpath
                       # @comments.push( @lexer.comments_ )
                       if   @in_def or @in_single > 0
-                        yyerror "module definition in method body" 
+                        raise SyntaxError,  "module definition in method body" 
                       end
                       @env.extend( false, :module )
                       result = val[vofs]
@@ -5256,7 +5256,7 @@ end
 def _reduce_357(val, vofs)
 		      # brace_block: tLCURLY # compstmt kEND
                       if val[vofs + 5].equal?( :tEOF )
-                        premature_eof( val[vofs + 1] )
+                        premature_eof( val[vofs] )
                       end
                       args = val[vofs + 2]
                       body = val[vofs + 4]
@@ -5632,7 +5632,7 @@ end
 
 def _reduce_407(val, vofs)
 		      # symbol: # | tSYMBOL
-                      result = self.string_to_symbol( val[vofs ] )
+                      result =  val[vofs ].__as_symbol 
                     
     result
 end
@@ -5906,7 +5906,7 @@ end
 
 def _reduce_447(val, vofs)
 		      # f_norm_arg: tCONSTANT
-                      yyerror "formal argument cannot be a constant: #{val[vofs ]}"
+                      raise SyntaxError, "formal argument cannot be a constant: #{val[vofs ]}"
                       result = val[vofs]
                     
     result
@@ -5914,7 +5914,7 @@ end
 
 def _reduce_448(val, vofs)
 		      # f_norm_arg: # | tIVAR
-                      yyerror "formal argument cannot be an instance variable"
+                      raise SyntaxError, "formal argument cannot be an instance variable"
                       result = val[vofs]
                     
     result
@@ -5922,7 +5922,7 @@ end
 
 def _reduce_449(val, vofs)
 		      # f_norm_arg: # | tCVAR
-                      yyerror "formal argument cannot be a class variable"
+                      raise SyntaxError, "formal argument cannot be a class variable"
                       result = val[vofs]
                     
     result

@@ -57,11 +57,12 @@ class Object
     primitive_nobridge '__binding_ctx' , '_bindingContext:'
 
     # Special semantics for send of  super  while in bootstrap:
-    #   During bootstrap, a send of super passes a block arg only
-    #   if no args specified, otherwise only the exact args to super
-    #   are passed.
+    #   During bootstrap, a send of super with no args specified
+    #   passes an implicit block argument(the declared block parameter or nil),
+    #   otherwise only the exact args to super are passed.
+    #
     #   Outside of bootstrap,  super alway passes an explicit or implicit
-    #   block argument.    See RubySuperNode in .mcz and Trac 454.
+    #   block argument.  See RubySuperNode in .mcz and Trac 454,634 .
 
     # End private helper methods
 

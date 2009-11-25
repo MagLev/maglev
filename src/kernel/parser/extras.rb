@@ -50,6 +50,9 @@ class String
   def _contains_string(a_string)
     self.__findStringStartingAt(a_string, 1)._not_equal?(0)
   end
+  def _contains_byte(bytevalue)
+    self.__indexOfByte(bytevalue, 1)._not_equal?(0)
+  end
 end
 
 class Symbol
@@ -369,6 +372,10 @@ module MagRp # {
 	elsif first_ch.equal?( ?$ )
 	  result = RubyGlobalAsgnNode.s(id, value) # s(:gasgn )
 	elsif RpStringScanner.ch_is_uc_alpha(first_ch)   # A-Z
+          if @in_def || @in_single > 0
+	    line = self.line_for(lhs)
+            raise SyntaxError , "dynamic constant assignment of #{id} near line #{line}"
+          end
 	  c2node = RubyColon2Node.simple(id, src_ofs )
 	  result = RubyConstDeclNode.s(c2node, value) # s(:cdecl )
 	  result.src_offset=( src_ofs )
@@ -1253,9 +1260,11 @@ module MagRp # {
     end
 
     def premature_eof( name_tok )
-      line = self.line_for(name_tok)
       msg = 'syntax error, unexpected $end, expecting kEND'
-      msg << ", for   #{name_tok.symval} near line #{line}, "
+      if name_tok.class.equal?(RpNameToken)
+        line = self.line_for(name_tok)
+        msg << ", for   #{name_tok.symval} near line #{line}, "
+      end
       msg << self.last_closed_def_message
       raise SyntaxError , msg
     end
@@ -1413,8 +1422,6 @@ module MagRp # {
     def warning( s)
       puts "RpWarning: #{s}"
     end
-
-    #alias :old_yyerror :yyerror # added printout to yyerror
 
     def raise_error(msg)
       puts "InternalParseError: #{msg}"
