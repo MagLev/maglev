@@ -83,7 +83,7 @@ module MagRp # {
           return res
         rescue Exception => ex
           if MagRp::debug > 1
-            nil.pause
+            nil.pause  # stop for debugging before altering vstack
           end
           last_len = @save_last_len
           if last_len._not_equal?(nil)
