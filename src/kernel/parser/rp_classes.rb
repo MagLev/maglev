@@ -279,7 +279,8 @@ module MagRp
 
       WORDLIST = [
         # negated new state means yacc_value gets encapsulated in an RpNameToken
-        # and/or gets other special handling
+        # and/or gets other special handling . Any reserved word which can
+        # also be a method name needs encapsulation in an RpNameToken.
       ["end",      [:kEND,      :kEND        , RubyLexer::Expr_end   ]],
       ["else",     [:kELSE,     :kELSE       , RubyLexer::Expr_beg   ]],
       ["case",     [:kCASE,     :kCASE       , - RubyLexer::Expr_beg   ]],
@@ -288,15 +289,15 @@ module MagRp
       ["elsif",    [:kELSIF,    :kELSIF      , RubyLexer::Expr_beg   ]],
       ["def",      [:kDEF,      :kDEF        , - RubyLexer::Expr_fname ]],
       ["rescue",   [:kRESCUE,   :kRESCUE_MOD , - RubyLexer::Expr_mid   ]],
-      ["not",      [:kNOT,      :kNOT        , RubyLexer::Expr_beg   ]],
+      ["not",      [:kNOT,      :kNOT        , - RubyLexer::Expr_beg   ]],
       ["then",     [:kTHEN,     :kTHEN       , RubyLexer::Expr_beg   ]],
       ["yield",    [:kYIELD,    :kYIELD      , - RubyLexer::Expr_arg   ]],
       ["for",      [:kFOR,      :kFOR        , - RubyLexer::Expr_beg   ]],
       ["self",     [:kSELF,     :kSELF       , RubyLexer::Expr_end   ]],
-      ["false",    [:kFALSE,    :kFALSE      , RubyLexer::Expr_end   ]],
+      ["false",    [:kFALSE,    :kFALSE      , - RubyLexer::Expr_end   ]],
       ["retry",    [:kRETRY,    :kRETRY      , - RubyLexer::Expr_end   ]],
       ["return",   [:kRETURN,   :kRETURN     , - RubyLexer::Expr_mid   ]],
-      ["true",     [:kTRUE,     :kTRUE       , RubyLexer::Expr_end   ]],
+      ["true",     [:kTRUE,     :kTRUE       , - RubyLexer::Expr_end   ]],
       ["if",       [:kIF,       :kIF_MOD     , - RubyLexer::Expr_beg   ]],
       ["defined?", [:kDEFINED,  :kDEFINED    , RubyLexer::Expr_arg   ]],
       ["super",    [:kSUPER,    :kSUPER      , - RubyLexer::Expr_arg   ]],
