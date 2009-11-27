@@ -77,7 +77,9 @@ module MagRp # {
       evalact_exc_res = nil
       while true
         begin
-          res = _racc_parse_inner(call_count, evalact_exc_res)
+          res = catch(:racc_end_parse) {
+            _racc_parse_inner(call_count, evalact_exc_res)
+          }
           return res
         rescue Exception => ex
           last_len = @save_last_len
@@ -98,82 +100,81 @@ module MagRp # {
     end
 
     def _racc_parse_inner(call_count, evalact_exc_res) # [
-      catch(:racc_end_parse) {
-        if call_count.equal?(1)
-          tok = nil
-          act = nil
-          i = nil
-          # nerr = 0
-          # not_eof = true
-        else
-          # finish evalact loop after a RaccJumpError was rescued
-          act = evalact_exc_res
-          while act
-            act = _racc_evalact(act)
-          end
-        end
-        # cache instVars in method temps
-        caction_check = @action_check
-        caction_default = @action_default
-        caction_pointer = @action_pointer
-        caction_table = @action_table
-        cgoto_check = @goto_check
-        cgoto_default = @goto_default
-        cgoto_pointer = @goto_pointer
-        cgoto_table = @goto_table
-        cracc_error_status = @racc_error_status
-        cracc_read_next = @racc_read_next
-        cracc_state = @racc_state
-        cracc_t        = @racc_t
-        cracc_val      = @racc_val
-        creduce_table  = @reduce_table
-        ctoken_table = @token_table    # a GsMethodDictionary
-        lex = @lexer
-        vstack   = @racc_vstack
+      if call_count.equal?(1)
+	tok = nil
+	act = nil
+	i = nil
+	# nerr = 0
+	# not_eof = true
+      else
+	# finish evalact loop after a RaccJumpError was rescued
+	act = evalact_exc_res
+	while act
+	  act = _racc_evalact(act)
+	end
+      end
+      # cache instVars in method temps
+      caction_check = @action_check
+      caction_default = @action_default
+      caction_pointer = @action_pointer
+      caction_table = @action_table
+      cgoto_check = @goto_check
+      cgoto_default = @goto_default
+      cgoto_pointer = @goto_pointer
+      cgoto_table = @goto_table
+      cracc_error_status = @racc_error_status
+      cracc_read_next = @racc_read_next
+      cracc_state = @racc_state
+      cracc_t        = @racc_t
+      cracc_val      = @racc_val
+      creduce_table  = @reduce_table
+      ctoken_table = @token_table    # a GsMethodDictionary
+      lex = @lexer
+      vstack   = @racc_vstack
 
-        while true # [
+      while true # [
 
-          if i = caction_pointer[cracc_state[-1]]
-            if cracc_read_next and cracc_t._not_equal?( 0 )   # not EOF
-                tok = lex.advance   #  next_token()
-                cracc_val = lex.yacc_value_
-                @racc_val = cracc_val  # store new value
+	if i = caction_pointer[cracc_state[-1]]
+	  if cracc_read_next and cracc_t._not_equal?( 0 )   # not EOF
+	      tok = lex.advance   #  next_token()
+	      cracc_val = lex.yacc_value_
+	      @racc_val = cracc_val  # store new value
 
-                if tok.equal?( :tEOF ) # EOF
-                  if @env.is_extended
-                    # attempt to issue premature eof error
-                    tok = :kEND  # and yacc_value will be :eof
-                    cracc_t = (ctoken_table.at_otherwise(tok, nil) or 1)
-                  else
-                    cracc_t = 0
-                  end
-                  cracc_t = cracc_t
-                else
-                  cracc_t = ctoken_table.at_otherwise(tok, nil)
-                  if cracc_t.equal?(nil) #  unless cracc_t
-                    cracc_t = 1  # error token
-                  end
-                end
-                cracc_read_next = false
+	      if tok.equal?( :tEOF ) # EOF
+		if @env.is_extended
+		  # attempt to issue premature eof error
+		  tok = :kEND  # and yacc_value will be :eof
+		  cracc_t = (ctoken_table.at_otherwise(tok, nil) or 1)
+		else
+		  cracc_t = 0
+		end
+		cracc_t = cracc_t
+	      else
+		cracc_t = ctoken_table.at_otherwise(tok, nil)
+		if cracc_t.equal?(nil) #  unless cracc_t
+		  cracc_t = 1  # error token
+		end
+	      end
+	      cracc_read_next = false
 
-            end
-            i += cracc_t
-            unless i >= 0 and
-                   act = caction_table[i] and
-                   caction_check[i].equal?( cracc_state[-1] ) # comparing 2 fixnums
+	  end
+	  i += cracc_t
+	  unless i >= 0 and
+		 act = caction_table[i] and
+		 caction_check[i].equal?( cracc_state[-1] ) # comparing 2 fixnums
 
-              act = caction_default[cracc_state[-1]]
-            end
-          else
+	    act = caction_default[cracc_state[-1]]
+	  end
+	else
 
-            act = caction_default[cracc_state[-1]]
-          end
-          while true
+	  act = caction_default[cracc_state[-1]]
+	end
+	while true
 # inline  _racc_evalact 
-            ## uncache 
-            #@racc_t = cracc_t
-            #@racc_read_next = cracc_read_next
-            #act = _racc_evalact(act)
+	  ## uncache 
+	  #@racc_t = cracc_t
+	  #@racc_read_next = cracc_read_next
+	  #act = _racc_evalact(act)
 		# begin file evalact_body.rbm4
 		# undefine the m4 macro l_e_n which conflicts with a method temp
  
@@ -312,19 +313,18 @@ module MagRp # {
 		# end file evalact_body.rbm4
 
    
-            ## recache
-            #cracc_val = @racc_val  
-            #cracc_read_next = @racc_read_next
+	  ## recache
+	  #cracc_val = @racc_val  
+	  #cracc_read_next = @racc_read_next
 # end inline  _racc_evalact 
 
-            unless act
-              break 
-            end
+	  unless act
+	    break 
+	  end
 
-          end
-        end # ]
-      }
-    end
+	end
+      end # ]
+    end # ]
 
     # _racc_yyparse_rb moved to  racc_init_parser.rb
 

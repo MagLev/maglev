@@ -257,7 +257,7 @@ module RubyToken
     [:TkNL],
     [:TkEND_OF_SCRIPT],
 
-    [:TkBACKSLASH,  TkUnknownChar,  '\\\\'],  # Maglev patch to string constant, was "\\"
+    [:TkBACKSLASH,  TkUnknownChar,  "\\" ],
     [:TkAT,	    TkUnknownChar,  "@"],
     [:TkDOLLAR,     TkUnknownChar,  "\$"], #"
   ]
@@ -289,7 +289,7 @@ module RubyToken
     end
     TkSymbol2Token[token_n.intern] = token_c
 
-    if token_c <= TkOp
+    if (cxx = token_c <= (tyy = TkOp))
       token_c.class_eval %{
         def self.op_name; "#{reading}"; end
       }

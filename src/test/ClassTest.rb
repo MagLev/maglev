@@ -75,5 +75,59 @@ end
 d = D.new(1)
 test(d.x, 1, "d.x")
 
+class A ; end
+class B1 < A ; end
+class B2 < A ; end
+unless (x = B1 < B2).equal?(nil) ; raise 'error'; end
+unless (x = B2 < B1).equal?(nil) ; raise 'error'; end
+unless (x = B1 < A).equal?(true) ; raise 'error'; end
+unless (x = B2 < A).equal?(true) ; raise 'error'; end
+unless (x = A < B1 ).equal?(false) ; raise 'error'; end
+unless (x = A < B2 ).equal?(false) ; raise 'error'; end
+
+unless (x = B1 <= B2).equal?(nil) ; raise 'error'; end
+unless (x = B2 <= B1).equal?(nil) ; raise 'error'; end
+unless (x = B1 <= A).equal?(true) ; raise 'error'; end
+unless (x = B2 <= A).equal?(true) ; raise 'error'; end
+unless (x = A <= B1 ).equal?(false) ; raise 'error'; end
+unless (x = A <= B2 ).equal?(false) ; raise 'error'; end
+unless (x = B1 <= B1 ).equal?(true) ; raise 'error'; end
+
+unless (x = B1 > B2).equal?(nil) ; raise 'error'; end
+unless (x = B2 > B1).equal?(nil) ; raise 'error'; end
+unless (x = B1 > A).equal?(false) ; raise 'error'; end
+unless (x = B2 > A).equal?(false) ; raise 'error'; end
+unless (x = A > B1 ).equal?(true) ; raise 'error'; end
+unless (x = A > B2 ).equal?(true) ; raise 'error'; end
+
+unless (x = B1 >= B2).equal?(nil) ; raise 'error'; end
+unless (x = B2 >= B1).equal?(nil) ; raise 'error'; end
+unless (x = B1 >= A).equal?(false) ; raise 'error'; end
+unless (x = B2 >= A).equal?(false) ; raise 'error'; end
+unless (x = A >= B1 ).equal?(true) ; raise 'error'; end
+unless (x = A >= B2 ).equal?(true) ; raise 'error'; end
+unless (x = B1 >= B1 ).equal?(true) ; raise 'error'; end
+
+class Token ; end
+class TkOp < Token ; end
+class TkUnknownChar < Token ; end
+class TkBACKSLASH < TkUnknownChar ; end
+
+unless (x = TkBACKSLASH <= TkOp).equal?(nil) ; raise 'error'; end
+
+class TX
+  def self.ma
+    token_c = TkBACKSLASH
+    tyy = TkOp
+    if token_c <= TkOp
+      raise 'error'
+    else
+      # ok
+    end
+  end
+end
+
+TX.ma
+
 report
 true
