@@ -3,12 +3,12 @@ def time_queries(a_tree)
   k = 100
   count = 0
 
-  puts "creating random targets (not profiled)"
+  STDERR.puts "creating random targets (not profiled)"
   targets = Array.new(num_queries) do |i|
     Collections::Point2D.random("target #{i}")
   end
 
-  puts "Profiling #{num_queries} queries"
+  STDERR.puts "Profiling #{num_queries} queries"
 
   a_tree = Maglev::PERSISTENT_ROOT[:kdtree_demo_data]
 

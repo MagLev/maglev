@@ -48,6 +48,8 @@ namespace :maglev do
 
   desc 'Run a profiled version of the queries on maglev'
   task :gprof => :migrate do
-    sh 'maglev-ruby -I lib bin/gprofq.rb'
+    out = 'profile.out'
+    sh "maglev-ruby -I lib bin/gprofq.rb > #{out}"
+    puts "Profile data is in #{out}"
   end
 end
