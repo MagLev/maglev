@@ -1,0 +1,23 @@
+= Use MagLev as an HTTP Session Store
+
+This is a quick prototype of using MagLev persistence to store HTTP session
+data.  The session store is implemented as Rack middleware in
+<tt>maglev_session.rb</tt>.  <tt>msessions.rb</tt> is a simple Sinatra
+application that uses the MagLev session store.
+
+== Run:
+
+To run:
+
+  $ rake run
+
+Then hit http://localhost:4567/
+
+If you run several web browser sessions, you'll see all of the sessions
+listed, and each one increments its count separately.  If you stop the
+Sinatra app, and then restart it, you should see your session count pick up
+from where you left it (the session data can persist independently of the
+VM).
+
+
+
