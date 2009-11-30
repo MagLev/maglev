@@ -1,0 +1,7 @@
+task :default => :index
+
+desc "Demo of using unordered collections with indexes."
+task :index do
+  puts "The unordered_collection.rb file is broken pending changes to VM"
+  #sh "maglev-ruby unordered_collection.rb"
+end
