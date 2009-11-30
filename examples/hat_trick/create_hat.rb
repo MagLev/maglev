@@ -23,3 +23,5 @@ Maglev.persistent do
   Maglev::PERSISTENT_ROOT[:hat] = Hat.new
 end
 Maglev.commit_transaction
+
+puts "Created empty hat at Maglev::PERSISTENT_ROOT[:hat]:    #{Maglev::PERSISTENT_ROOT[:hat].inspect}"
