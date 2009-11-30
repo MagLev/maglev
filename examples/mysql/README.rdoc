@@ -1,0 +1,33 @@
+= MagLev and MySQL
+
+MagLev ships with a copy of the pure ruby MySQL driver in the
+<code>lib/ruby/site_ruby/1.8/ruby-mysql</code> directory.  The script in
+this directory demonstrates how to connect MagLev to MySQL using driver.
+
+== Setup
+
+You'll have to have MySQL already up and running, and then edit the
+configuration section of <code>mysql.rb</code> to reflect your setup:
+
+  # CONFIGURATION
+  host = 'localhost'
+  user = 'webuser'
+  pass = 'webuser'
+
+== Run
+
+To run, just use rake:
+  
+  $ rake
+  (in /Users/pmclain/GemStone/checkouts/git/examples/mysql)
+  maglev-ruby mysql.rb
+  Created database
+  Database test_db selected
+  Table created
+  Rows inserted
+  Select complete
+  Update complete
+  Tabled dropped
+  Database test_db dropped
+  Connection closed
+
