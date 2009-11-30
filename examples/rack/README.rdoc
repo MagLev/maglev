@@ -1,3 +1,5 @@
+= MagLev examples using Rack
+
 This directory contains examples of using Rack with MagLev.
 
 == Setup
@@ -11,5 +13,4 @@ All apps run on http://localhost:9292.
 == Run
 
 The demos can be run via rake.
-
 
