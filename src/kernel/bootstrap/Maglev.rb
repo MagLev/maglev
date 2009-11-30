@@ -376,7 +376,7 @@ module Maglev
   end
 
   module_function( :commit_transaction, :abort_transaction,
-             :clear_persistent_LOADED_FEATURES )
+                   :begin_transaction,  :clear_persistent_LOADED_FEATURES )
 
   def __system
     # following ref to Maglev::System can be bound at boot compile

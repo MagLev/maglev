@@ -1,0 +1,11 @@
+task :default => [:maglev, :mri]
+
+desc "Run the demo using MagLev and GStore"
+task :maglev do
+  sh "maglev-ruby main.rb"
+end
+
+desc "Run the demo using mri and PStore"
+task :mri do
+  sh "ruby main.rb"
+end
