@@ -3,11 +3,6 @@
 
 task :default => :objectlog
 
-desc "Commit the base blog code to the repository."
-task :commit, :force do |t,args|
-  sh %{ maglev-ruby commit_code.rb #{args.force} }
-end
-
 desc "Run the objectlog app standalone."
 task :objectlog  do
   sh %{ $MAGLEV_HOME/bin/rackup objectlog.ru }

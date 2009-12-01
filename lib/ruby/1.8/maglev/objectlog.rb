@@ -11,7 +11,7 @@ ObjectLogEntry = _resolve_smalltalk_global(:ObjectLogEntry)
 # and then later login from some other VM to inspect the object log.  E.g.,
 # in your buggy code do:
 #
-#     if strande_condition_holds(some_object)
+#     if strange_condition_holds(some_object)
 #       ObjectLogEntry.debug("This is a strange one", some_object).add_to_log
 #       Maglev.commit_transaction  # or rely on some other mechanism to commit...
 #     end
@@ -70,7 +70,6 @@ class ObjectLogEntry
     _trace(msg, obj)
   end
 
-
   # Return the level assigned for debug entries (5)
   class_primitive 'debug_level', 'debug'
   class_primitive '_debug', 'debug:object:'
@@ -79,7 +78,6 @@ class ObjectLogEntry
   def self.debug(msg, obj=nil)
     _debug(msg, obj)
   end
-
 
   # Return the level assigned for info entries (4)
   class_primitive 'info_level', 'info'
@@ -90,7 +88,6 @@ class ObjectLogEntry
     _info(msg, obj)
   end
 
-
   # Return the level assigned for warn entries (3)
   class_primitive 'warn_level', 'warn'
   class_primitive '_warn', 'warn:object:'
@@ -99,7 +96,6 @@ class ObjectLogEntry
   def self.warn(msg, obj=nil)
     _warn(msg, obj)
   end
-
 
   # Return the level assigned for error entries (2)
   class_primitive 'error_level', 'error'
