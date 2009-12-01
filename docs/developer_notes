@@ -79,7 +79,7 @@ MagLev provides a Gprof-like profiling utility to analyze the performance
 of your application.  To profile some code, simply wrap it in a block and
 pass it to <tt>Maglev::Gprof.monitor</tt>:
 
-  profile_results = Maglev.Gprof.monitor do
+  profile_results = Maglev::Gprof.monitor do
     # Code to profile goes here...
   end
 
