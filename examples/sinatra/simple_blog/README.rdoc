@@ -1,42 +1,38 @@
-== Simple Sinatra Blog App for MagLev
+= Simple Sinatra Blog App for MagLev
 
-This directory contains two Sinatra apps that can be run either standalone,
-or together.  The apps demonstrate MagLev persistence, and show the MagLev
-ObjectLog.
+This directory contains a simple blog app for Sinatra.  The blog uses
+MagLev for persistence.  It also integrates with the
+<tt>../object_inspector</tt> app to show some debug capabilities.
 
 === Prerequisites
 
 In order to run the applications in this directory, you need to install
-rubygem versions of rack and sinatra (see ../README).
+rubygem versions of rack and sinatra (see ../README.rdoc).
 
 === To Run the combined apps:
 
-    $ rake run
+    $ rake blog
 
-Then hit http://localhost:4567/
+Then hit http://localhost:4444/
 
-=== To run either the blog manually:
+=== Details
 
 The app is split into a persistent part, <tt>blog.rb</tt>, and the sinatra
-driver app, <tt>blog_app.rb</tt>.  You need to load <tt>blog.rb</tt> once,
-which will define and persist the classes needed for the app:
+driver app, <tt>blog_app.rb</tt>.  The blog code, <tt>blog.rb</tt>, needs
+to be persistently loaded once.  This is handled by rake and the
+<tt>commit_code.rb</tt> file:
 
-  $ maglev-ruby blog.rb  # only needs to be done once for a repository
+  $ rake commit
 
-Then run <tt>blog_app.rb</tt> by using rackup
+To run the Sinatra app,
 
-  $ cd $MAGLEV_HOME/examples/sinatra/simple_blog
-  $ $MAGLEV_HOME/bin/rackup  blog.ru
-
-Then hit http://localhost:4567/
+  $ rake blog
 
 === Files
 
-* README      This file
-* Rakefile    A Rakefile to run the various apps
-* blog.rb     The persistent, business classes for the app.  This code is run
-  once only.
-* blog.ru     A rackup file for the blog.
+* README.rdoc This file
+* Rakefile    The Rakefile
+* blog.rb     The persistent, business classes for the app.  This code is run once only.
 * blog_app.rb The Sinatra app
 * commit_code.rb  Code to commit the business logic code to the MagLev repository
 * config.ru   Rackup file to run both the blog and objectlog apps.
@@ -48,17 +44,6 @@ Then hit http://localhost:4567/
 * txn_wrapper.rb Rack middleware used by <tt>blog_app.rb</tt> to wrap a
   transaction around each HTTP request.
 * views       Sinatra view directory
-
-=== To Run the ObjectLogViewer
-
-There is a sample object log viewer / object inspector that you can run
-with:
-
-  $ maglev-ruby objectlog.rb
-
-And then hig http://localhost:4567/
-
-Still rough around the edges.
 
 === Issues
 
@@ -72,10 +57,8 @@ TODO for the sinatra app
 
 * Get persistence of sinatra and rack working (autoload persistence)
 * Try using shotgun for dev time file reloading (or Rack::Reloader)
-* Get sessions working (Blocked on cookie support)
-* Separate the MaglevModel ane work on it
+* Separate the MaglevModel and work on it
 * Get a migration for seeding basic data working
-* Performance profiling
 * Get partials implmented (rendering urls for tags and posts)
 * Add an "about" page that explains the app etc.
 

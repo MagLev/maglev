@@ -1,9 +1,9 @@
 = MagLev Sinatra Examples
 
 The files in this directory are some examples of using Sinatra with MagLev.
-You must first install the Sinatra gem:
+You must first install the Sinatra and Rack gems:
 
-  $ maglev-gem install sinatra
+  $ maglev-gem install sinatra rack
 
 == Simple Examples
 

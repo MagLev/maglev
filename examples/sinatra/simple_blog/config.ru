@@ -22,6 +22,4 @@ map "/objectlog" do
   ObjectLogApp.main_app_url = "http://localhost:4444/"  # A somewhat informed guess
   ObjectLogApp.main_object  = "Maglev::PERSISTENT_ROOT[SimplePost]"
   run ObjectLogApp
-#   ObjectLogApp.script_name = "/objectlog"
-#   run ObjectLogApp
 end
