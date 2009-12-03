@@ -156,7 +156,7 @@ class Rational
   alias power! **
 
   def ** (other)
-    if other.kind_of?(Rational)
+    if other._kind_of?(Rational)
       other2 = other
       if (self <=> 0) < 0
 	return Complex.new!(self, 0) ** other
@@ -229,7 +229,7 @@ class Rational
   end
 
   def power2(other)
-    if other.kind_of?(Rational)
+    if other._kind_of?(Rational)
       if (self <=> 0) < 0
 	return Complex(self, 0) ** other
       elsif other == 0
@@ -275,7 +275,7 @@ end
 
 module Math
   def sqrt(a)
-    if a.kind_of?(Complex)
+    if a._kind_of?(Complex)
       abs = sqrt(a.real*a.real + a.image*a.image)
 #      if not abs.kind_of?(Rational)
 #	return a**Rational(1,2)
@@ -300,7 +300,7 @@ module Math
   def rsqrt(a)
     if a._isFloat
       sqrt!(a)
-    elsif a.kind_of?(Rational)
+    elsif a._kind_of?(Rational)
       rsqrt(a.numerator)/rsqrt(a.denominator)
     else
       src = a
