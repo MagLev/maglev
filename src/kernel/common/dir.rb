@@ -33,7 +33,7 @@ class Dir
   end
 
   def self.find_dirsep(pattern, flags)
-    escape = (flags & File::FNM_NOESCAPE).equal?(0)
+    escape = (flags & File::FNM_NOESCAPE)._equal?(0)
     open = false
 
     chars = pattern.split ''
@@ -55,7 +55,7 @@ class Dir
   end
 
   def self.glob_brace_expand(pattern, flags, matches)
-    escape = (flags & File::FNM_NOESCAPE).equal?(0)
+    escape = (flags & File::FNM_NOESCAPE)._equal?(0)
 
     rbrace = nil
     lbrace = nil
@@ -70,7 +70,7 @@ class Dir
         next
       end
 
-      if char == '{' and nest.equal?(0) then
+      if char == '{' and nest._equal?(0) then
         lbrace = i
         nest += 1
       end
@@ -93,7 +93,7 @@ class Dir
         pos += 1
         last = pos
 
-        while pos < rbrace and not (chars[pos] == ',' and nest.equal?(0)) do
+        while pos < rbrace and not (chars[pos] == ',' and nest._equal?(0)) do
           nest += 1 if chars[pos] == '{'
           nest -= 1 if chars[pos] == '}'
 
@@ -124,7 +124,7 @@ class Dir
   def self.glob_helper(path, dirsep, exist, isdir, pattern, start, stop, flags, matches)
     status = nil
     plain = magic = recursive = match_all = match_dir = false
-    escape = (flags & File::FNM_NOESCAPE).equal?(0)
+    escape = (flags & File::FNM_NOESCAPE)._equal?(0)
 
     last_type = nil
 
@@ -282,8 +282,8 @@ class Dir
   end
 
   def self.glob_magic?(pattern, flags)
-    escape = (flags & File::FNM_NOESCAPE).equal?(0)
-    nocase = (flags & File::FNM_CASEFOLD).equal?(0)
+    escape = (flags & File::FNM_NOESCAPE)._equal?(0)
+    nocase = (flags & File::FNM_CASEFOLD)._equal?(0)
 
     chars = pattern.split ''
 

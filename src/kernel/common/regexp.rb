@@ -7,7 +7,7 @@ class Regexp
     str = '/'
     while n < src_siz
       ch = src[n]
-      if ch.equal?( ?/ )
+      if ch._equal?( ?/ )
         str << "\\/"
       else
         str << ch

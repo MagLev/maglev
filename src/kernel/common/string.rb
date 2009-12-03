@@ -78,7 +78,7 @@ class String
     while match = pattern.match_from(self, index)
       index = match.collapsing? ? match.end(0) + 1 : match.end(0)
       last_match = match
-      val = (match.length.equal?(1) ? match[0] : match.captures)
+      val = (match.length._equal?(1) ? match[0] : match.captures)
       # val.taint if taint # Maglev, no taint propagation
       ret << val
     end
@@ -100,7 +100,7 @@ class String
       while match = pattern.match_from(self, index)
         index = match.collapsing? ? match.end(0) + 1 : match.end(0)
         last_match = match
-        val = (match.length.equal?(1) ? match[0] : match.captures)
+        val = (match.length._equal?(1) ? match[0] : match.captures)
         # val.taint if taint # Maglev, no taint propagation
 
         last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
@@ -111,7 +111,7 @@ class String
       while match = pattern.match_from(self, index)
         index = match.collapsing? ? match.end(0) + 1 : match.end(0)
         last_match = match
-        val = (match.length.equal?(1) ? match[0] : match.captures)
+        val = (match.length._equal?(1) ? match[0] : match.captures)
         # val.taint if taint # Maglev, no taint propagation
 
         ret << val
