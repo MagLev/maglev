@@ -6,7 +6,7 @@ module FFI
 
     def __get(fieldname, cbytearray)
       idx = @members_dict[fieldname]
-      if idx.equal?(nil)
+      if idx._equal?(nil)
         raise  ArgumentError, 'invalid field name'
       end
       ofs = @offsets[idx] 
@@ -17,8 +17,8 @@ module FFI
           mp = MemoryPointer.__fromRegionOf(cbytearray, ofs, siz)
           mp.__initialize(elem_siz)
           mp
-        else  # a nested Struct , elem_siz.kind_of?(Struct.class) == true
-          unless elem_siz.kind_of?(Struct.class)  # do not checkin
+        else  # a nested Struct , elem_siz._kind_of?(Struct.class) == true
+          unless elem_siz._kind_of?(Struct.class)  # do not checkin
              raise TypeError, 'logic error, expected a Struct class'
           end
           nested_struct_cls = elem_siz
@@ -34,7 +34,7 @@ module FFI
 
     def __put(fieldname, cbytearray, value)
       idx = @members_dict[fieldname]
-      if idx.equal?(nil)
+      if idx._equal?(nil)
         raise  ArgumentError, 'invalid field name'
       end
       ofs = @offsets[idx]
@@ -84,7 +84,7 @@ module FFI
     end
 
     def __add_member_name(name)
-      if @members_dict[name].equal?(nil)
+      if @members_dict[name]._equal?(nil)
         @members_dict[name] = @members.size
       else
         raise 'duplicate field name #{name}'
@@ -92,7 +92,7 @@ module FFI
     end
 
     def __check_offset(offset)
-      if offset.equal?(nil)
+      if offset._equal?(nil)
         offset = @totalsize
       else
         unless offset._isFixnum && offset >= 0
@@ -107,12 +107,12 @@ module FFI
     
     def __add_accessors( ctype )
       rubysel = StructAccessors[ctype]
-      if rubysel.equal?(nil)
+      if rubysel._equal?(nil)
         raise 'internal error, inconsistent StructAccessors'
       end
       @accessors << rubysel  
       rubysel = StructSetters[ctype]
-      if rubysel.equal?(nil)
+      if rubysel._equal?(nil)
         raise 'internal error, inconsistent StructSetters'
       end
       @setters << rubysel  
@@ -130,8 +130,8 @@ module FFI
       offset = self.__check_offset(offset)
       ctype = PrimTypeDefs[type]
       nstruct = nil
-      if ctype.equal?(nil)
-        if type.kind_of?(Struct.class)
+      if ctype._equal?(nil)
+        if type._kind_of?(Struct.class)
           nstruct = type  # a nested Struct
           csize = type.size
         else 
@@ -148,7 +148,7 @@ module FFI
       @members << name
       ofs = @totalsize
       @offsets << ofs
-      if nstruct.equal?(nil)
+      if nstruct._equal?(nil)
         @elem_sizes << 0
         @sizes << csize
         self.__add_accessors( ctype )
@@ -166,7 +166,7 @@ module FFI
       # Returns size in bytes of the added array
       if type._isSymbol
         ctype = PrimTypeDefs[type]
-        if ctype.equal?(nil)
+        if ctype._equal?(nil)
           raise 'unrecognized array element type ' , type.to_s
         end
         elemsiz = PrimTypeSizes[ctype]
@@ -240,18 +240,18 @@ module FFI
   class Struct # [
 
     def self.new(*args)
-      if args.size.equal?(1) 
+      if args.size._equal?(1) 
         ly = @cl_layout
         if ly._not_equal?(nil)
           arg = args[0]
-          if arg.kind_of?(CByteArray)
+          if arg._kind_of?(CByteArray)
             ly_siz = ly.size
             ba_siz = arg.total
             if ba_siz < ly_siz 
               raise ArgumentError, "argument CByteArray is too small for a Struct  #{self.name}"
             end
             inst = self.__fromRegionOf( arg, 0, ly_siz ) 
-          elsif arg.kind_of?(CPointer)
+          elsif arg._kind_of?(CPointer)
             inst = self.__fromCPointer( arg , ly.size )
           else
             raise TypeError, "cannot construct a Struct from a #{arg.class.name}"
@@ -372,11 +372,11 @@ module FFI
     end
 
     def self.is_a_struct?(type)
-      type.is_a?(Class) and type < Struct
+      type._is_a?(Class) and type < Struct
     end
 
     def self.find_type(type, mod = nil)
-      return type if is_a_struct?(type) or type.is_a?(::Array)
+      return type if is_a_struct?(type) or type._is_a?(::Array)
       mod ? mod.find_type(type) : FFI.find_type(type)
     end
 
@@ -391,7 +391,7 @@ module FFI
       while i < spec.size
         name = spec[i]
         type = spec[i + 1]
-        if type.equal?(nil)
+        if type._equal?(nil)
           raise ArgumentError, "odd sized layout spec, type nil for #{name}" 
         end
         i += 2
@@ -402,9 +402,9 @@ module FFI
         else
           offset = nil
         end
-        if type.kind_of?(Class) && type < Struct
+        if type._kind_of?(Class) && type < Struct
           builder.add_field(name, type, offset)
-        elsif type.kind_of?(::Array)
+        elsif type._kind_of?(::Array)
           builder.add_array(name, find_type(type[0], mod), type[1], offset)
         else
           builder.add_field(name, find_type(type, mod), offset)
@@ -417,17 +417,17 @@ module FFI
 
     def self.layout(*spec)
       sp_size = spec.size
-      if sp_size.equal?(0)
+      if sp_size._equal?(0)
         return @cl_layout 
       end
-      if sp_size.equal?(1) 
-         if spec[0].kind_of?(Hash) 
+      if sp_size._equal?(1) 
+         if spec[0]._isHash 
             raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout" 
          end
          raise ArgumentError , 'minimum argument size is 2'
       end
-      cspec = spec[0].kind_of?(Hash) ? hash_layout(*spec) : array_layout(*spec)
-      unless self.equal?(Struct)
+      cspec = spec[0]._isHash ? hash_layout(*spec) : array_layout(*spec)
+      unless self._equal?(Struct)
         @cl_layout = cspec 
       end
       return cspec

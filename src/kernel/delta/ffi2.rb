@@ -139,7 +139,7 @@ module FFI
     def __struct_pointer_at(byteoffset)
       cpointer = self.__pointer_at(byteoffset)
       mp_cls = MemoryPointer
-      if cpointer.equal?(nil)
+      if cpointer._equal?(nil)
         return mp_cls.__new_null 
       end
       mp = mp_cls.new
@@ -187,14 +187,14 @@ module FFI
     class_primitive_nobridge '__new_null', 'newNull'
 
     def ==(other)
-      unless other.kind_of?(CPointer)
+      unless other._kind_of?(CPointer)
         return false;
       end
       self.address == other.address
     end
 
     def null? 
-      self.address.equal?(0)
+      self.address._equal?(0)
     end
 
     def hash
@@ -293,10 +293,10 @@ module FFI
            return t
         end
       end
-      if query.kind_of?(Struct.class)
+      if query._kind_of?(Struct.class)
         return :ptr
       end
-      if query.kind_of?(Enum)
+      if query._kind_of?(Enum)
         t = Enums.find(query)  
         if t._not_equal?(nil)
            return t
@@ -315,9 +315,9 @@ module FFI
         t = find_type(prev)
         if t._isSymbol
           return t
-        elsif t.kind_of?(Enum)
+        elsif t._kind_of?(Enum)
           return t
-        elsif t.kind_of?(Type)
+        elsif t._kind_of?(Type)
           prev = t
         else
           raise TypeError, 'result of find_type is not a Type, Enum or Symbol'
@@ -328,7 +328,7 @@ module FFI
     def type_size(type)
       t = find_base_type(type)
       size = PrimTypeSizes[t]
-      if size.equal?(nil)
+      if size._equal?(nil)
         unless type._isSymbol
           raise TypeError, "FFI::type_size - type argument must be a Symbol"
         else
@@ -339,13 +339,13 @@ module FFI
     end
 
     def size_to_type(size)
-      if size.equal?(4)
+      if size._equal?(4)
         return :int
-      elsif size.equal?(2)
+      elsif size._equal?(2)
         return :short
-      elsif size.equal?(1)
+      elsif size._equal?(1)
         return :char
-      elsif size.equal?(8)
+      elsif size._equal?(8)
         return :long
       else
         raise ArgumentError , 'unsupported size'
@@ -419,7 +419,7 @@ module FFI
       have_varargs = false
       var_args_after = -1
       args.each { |t| 
-        if t.equal?(:varargs)
+        if t._equal?(:varargs)
           have_varargs = true
           var_args_after = c_args.size
         elsif have_varargs
@@ -428,7 +428,7 @@ module FFI
           bt = ffimod.find_base_type(t) 
           if bt._isSymbol
             c_args << bt
-          elsif bt.kind_of?(Enum)
+          elsif bt._kind_of?(Enum)
             enum_args << st_argnum ; enum_args << bt 
             c_args << :int64 
           else
@@ -437,13 +437,13 @@ module FFI
           st_argnum += 1
         end
       }
-      if enum_args.size.equal?(0)
+      if enum_args.size._equal?(0)
         enum_args = nil
       end
       ret = ffimod.find_base_type(ret)
       enum_ret = nil
       unless ret._isSymbol 
-        if ret.kind_of?(Enum)
+        if ret._kind_of?(Enum)
           enum_ret = ret
           ret = :int64   
         else
@@ -451,19 +451,19 @@ module FFI
         end
       end
       libs = CLibrary.__clibraries
-      if libs.equal?(nil)
+      if libs._equal?(nil)
         libs = [ nil ]
       end
       my_debug = DEBUG
       n = 0
       len = libs.length
-      if len.equal?(0)
+      if len._equal?(0)
         libs = [ nil ] # search process by default
         len = 1
       end 
       while n < len
         lib = libs[n]
-        if lib.equal?(nil)
+        if lib._equal?(nil)
           puts "--FFI:  attach_function: #{cname} searching process"   if my_debug > 1
           found = CLibrary.__has_symbol(cname) # check entire process
           if found && my_debug > 0
@@ -492,12 +492,12 @@ module FFI
       unless new_name._isSymbol
         raise TypeError , 'name must be a Symbol'
       end
-      if new_name.equal?(atype)
+      if new_name._equal?(atype)
         raise TypeError , 'cannot define a type in terms of itself'
       end
-      code = if atype.kind_of?(Type)
+      code = if atype._kind_of?(Type)
                atype
-             elsif atype.equal?( :enum )
+             elsif atype._equal?( :enum )
                if new_name._isArray
                  self.enum(new_name)
                else
@@ -530,9 +530,9 @@ module FFI
     #
     def enum(*args)
       arg_siz = args.size
-      if arg_siz.equal?(1)
+      if arg_siz._equal?(1)
         return enum(nil, args[0])
-      elsif arg_siz.equal?(2) 
+      elsif arg_siz._equal?(2) 
         a1 = args[0]
         a2 = args[1]
         if a1._isSymbol && a2._isArray

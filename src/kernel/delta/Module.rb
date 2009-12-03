@@ -13,14 +13,14 @@ class Module
   end
 
   def include?(other)
-    unless other.is_a?(Module) && ! other.is_a?(Class)
+    unless other._is_a?(Module) && ! other._is_a?(Class)
       raise TypeError, 'Module#include? , argument not a Module'
     end
     imods = self.included_modules
     k = 0
     klim = imods.size
     while k < klim
-      return true if imods[k].equal?(other)
+      return true if imods[k]._equal?(other)
       k += 1
     end
     false

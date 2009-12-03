@@ -25,7 +25,7 @@ module FFI
       # this variant  gets bridge methods
       if type._isFixnum
         elemsize = type
-      elsif type.kind_of?(Struct.class)
+      elsif type._kind_of?(Struct.class)
         elemsize = type.size
       else 
         modu =  FFI
@@ -61,7 +61,7 @@ module FFI
         inst = self.__gc_malloc(numbytes)
         inst.initialize(1)
       else
-        if type.kind_of?(Struct.class)
+        if type._kind_of?(Struct.class)
           elemsize = type.size
         else
           modu =  FFI

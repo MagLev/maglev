@@ -80,7 +80,7 @@ class Array
       end
       n = n + 1
     end
-    if ifnone_proc.equal?(nil)
+    if ifnone_proc._equal?(nil)
       nil
     else
       ifnone_proc.call
@@ -152,7 +152,7 @@ class Array
   alias map collect
 
   def max(&blk)
-    return nil if size.equal?(0)
+    return nil if size._equal?(0)
 
     max_v = self.__at(0)
     i = 1
@@ -178,7 +178,7 @@ class Array
   primitive 'member?', 'includes:'
 
   def min(&blk)
-    return nil if size.equal?(0)
+    return nil if size._equal?(0)
 
     min_v = self.__at(0)
     i = 1
@@ -299,10 +299,10 @@ class Array
     # this is mostly Rubinius code, but modified for our API
     # Put in delta since we need the recursion guard found in common.
     my_size = size
-    return "" if my_size.equal?(0)
-    if s.equal?(Undefined)
+    return "" if my_size._equal?(0)
+    if s._equal?(Undefined)
       sep = $,
-    elsif s.equal?(nil)
+    elsif s._equal?(nil)
        sep = nil
     else
       sep = s.to_str # let any NoMethodError be seen by caller
@@ -314,7 +314,7 @@ class Array
     ts = Thread.__recursion_guard_set
     while (i < my_size)
       elem = at(i)
-      out << sep unless (sep.equal?(nil) || i == 0)
+      out << sep unless (sep._equal?(nil) || i == 0)
 
       if elem._isArray
 	added = ts.__add_if_absent(self)

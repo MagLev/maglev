@@ -6,7 +6,7 @@
       # this variant  gets bridge methods
       if type._isFixnum
         elemsize = type
-      elsif type.kind_of?(Struct.class)
+      elsif type._kind_of?(Struct.class)
         elemsize = type.size
       else 
         modu =  FFI
@@ -38,14 +38,14 @@
 
     def self.new(type)
       if type._isFixnum
-        if type.equal?(0)
+        if type._equal?(0)
           return self.__new_null # the NULL pointer
         end
         numbytes = type
         inst = self.__gc_malloc(numbytes)
         inst.initialize(1)
       else
-        if type.kind_of?(Struct.class)
+        if type._kind_of?(Struct.class)
           elemsize = type.size
         else
           modu =  FFI
@@ -157,7 +157,7 @@
     end 
     def read_pointer
       cpointer = self.__pointer_at(0)  # returns a CPointer
-      if cpointer.equal?(nil)
+      if cpointer._equal?(nil)
         return CPointer.__new_null
       end
       cpointer
@@ -171,7 +171,7 @@
 
     def get_pointer(ofs)
       cpointer = self.__pointer_at(ofs)
-      if cpointer.equal?(nil)
+      if cpointer._equal?(nil)
         return MemoryPointer.__new_null
       end
       p = MemoryPointer.new
@@ -213,7 +213,7 @@
     end
 
     def null? 
-      self.address.equal?(0)
+      self.address._equal?(0)
     end
 
     def read_array_of_int(length)
@@ -269,7 +269,7 @@
     end
 
     def ==(pointer)
-      unless pointer.kind_of?(self.class) 
+      unless pointer._kind_of?(self.class) 
         return false
       end
       pointer.__pointer_at(0).address == self.__pointer_at(0).address
@@ -308,7 +308,7 @@
       limit = self.total
       while ofs < limit 
         str = self.char_star_at(ofs)
-        if str.equal?(nil)
+        if str._equal?(nil)
           return res
         end
         res << str
