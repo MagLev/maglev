@@ -64,7 +64,7 @@ class Set
   def initialize(enum = nil, &block) # :yields: o
     @hash ||= Hash.new
 
-    enum.equal?(nil) and return
+    enum._equal?(nil) and return
 
     if block
       enum.each { |o| add(block[o]) }
@@ -101,7 +101,7 @@ class Set
     if enum.class == self.class
       @hash.replace(enum.instance_eval { @hash })
     else
-      enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+      enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
       clear
       enum.each { |o| add(o) }
     end
@@ -116,7 +116,7 @@ class Set
 
   def flatten_merge(set, seen = Set.new)
     set.each { |e|
-      if e.is_a?(Set)
+      if e._is_a?(Set)
 	if seen.include?(e_id = e.object_id)
 	  raise ArgumentError, "tried to flatten recursive Set"
 	end
@@ -142,7 +142,7 @@ class Set
   # Equivalent to Set#flatten, but replaces the receiver with the
   # result in place.  Returns nil if no modifications were made.
   def flatten!
-    if detect { |e| e.is_a?(Set) }
+    if detect { |e| e._is_a?(Set) }
       replace(flatten())
     else
       nil
@@ -157,28 +157,28 @@ class Set
 
   # Returns true if the set is a superset of the given set.
   def superset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set._is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if size < set.size
     set.all? { |o| include?(o) }
   end
 
   # Returns true if the set is a proper superset of the given set.
   def proper_superset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set._is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if size <= set.size
     set.all? { |o| include?(o) }
   end
 
   # Returns true if the set is a subset of the given set.
   def subset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set._is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if set.size < size
     all? { |o| set.include?(o) }
   end
 
   # Returns true if the set is a proper subset of the given set.
   def proper_subset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set._is_a?(Set) or raise ArgumentError, "value must be a set"
     return false if set.size <= size
     all? { |o| set.include?(o) }
   end
@@ -251,10 +251,10 @@ class Set
   # Merges the elements of the given enumerable object to the set and
   # returns self.
   def merge(enum)
-    if enum.is_a?(Set)
+    if enum._is_a?(Set)
       @hash.update(enum.instance_eval { @hash })
     else
-      enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+      enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
       enum.each { |o| add(o) }
     end
 
@@ -264,7 +264,7 @@ class Set
   # Deletes every element that appears in the given enumerable object
   # and returns self.
   def subtract(enum)
-    enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+    enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
     enum.each { |o| delete(o) }
     self
   end
@@ -272,7 +272,7 @@ class Set
   # Returns a new set built by merging the set and the elements of the
   # given enumerable object.
   def |(enum)
-    enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+    enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
     dup.merge(enum)
   end
   alias + |		##
@@ -281,7 +281,7 @@ class Set
   # Returns a new set built by duplicating the set, removing every
   # element that appears in the given enumerable object.
   def -(enum)
-    enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+    enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
     dup.subtract(enum)
   end
   alias difference -	##
@@ -289,7 +289,7 @@ class Set
   # Returns a new set containing elements common to the set and the
   # given enumerable object.
   def &(enum)
-    enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+    enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
     n = self.class.new
     enum.each { |o| n.add(o) if include?(o) }
     n
@@ -300,7 +300,7 @@ class Set
   # and the given enumerable object.  (set ^ enum) is equivalent to
   # ((set | enum) - (set & enum)).
   def ^(enum)
-    enum.is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
+    enum._is_a?(Enumerable) or raise ArgumentError, "value must be enumerable"
     n = Set.new(enum)
     each { |o| if n.include?(o) then n.delete(o) else n.add(o) end }
     n
@@ -309,9 +309,9 @@ class Set
   # Returns true if two sets are equal.  The equality of each couple
   # of elements is defined according to Object#eql?.
   def ==(set)
-    equal?(set) and return true
+    _equal?(set) and return true
 
-    set.is_a?(Set) && size == set.size or return false
+    set._is_a?(Set) && size == set.size or return false
 
     hash = @hash.dup
     set.all? { |o| hash.include?(o) }
@@ -322,7 +322,7 @@ class Set
   end
 
   def eql?(o)	# :nodoc:
-    return false unless o.is_a?(Set)
+    return false unless o._is_a?(Set)
     @hash.eql?(o.instance_eval{@hash})
   end
 
