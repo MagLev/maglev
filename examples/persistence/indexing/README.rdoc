@@ -1,0 +1,12 @@
+= MagLev indexing example
+
+== NOTE:
+
+This example does not currently work.  We are waiting on a VM fix for
+indexing.
+
+== Overview
+
+This example shows how to add an index onto an unordered collection of
+data.  The index will allow fast search / retrieval of objects based on the
+values of their attributes.

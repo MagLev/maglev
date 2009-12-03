@@ -7,9 +7,8 @@
 # As a consequence, after the unit tests run, then webrick will fire up.
 # So, in sinatra_app.rb, we test for DO_NOT_RUN, and if it is defined, then
 # we don't set the :run to true....
-DO_NOT_RUN = true  
+DO_NOT_RUN = true
 
-require 'rubygems'
 require 'sinatra_app'
 require 'minitest/unit'
 require 'rack/test'

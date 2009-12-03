@@ -1,0 +1,4 @@
+desc "Run the demo script"
+task :default do
+  sh 'maglev-ruby mysql.rb'
+end
