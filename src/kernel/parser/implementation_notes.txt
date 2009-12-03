@@ -6,7 +6,7 @@ The code in kernel/parser is a tight integration of all of the following:
   ruby_parser's .y  file
   ruby_parser's supporting .rb files (extras.rb, etc)
     all of above have modifications to emit instances of our AST tree classes,
-    and no longer know how to emit instances of your Sexp class.
+    and no longer know how to emit instances of the Sexp class.
     The new class encapsulating tokens and byte offsets is RpNameToken .
 
   modified strscan.rb integrated with new Regexp primitives in Maglev
@@ -78,7 +78,8 @@ As of 5 June 09, algorithmic changes since ruby_parser2.0.2 include
   in files rp_classes.rb , extras.rb .  The reported position of the
   missing end will not be 100% accurate, but for the common case of
   a def/class/module/if  missing an "end" ,  an approximate line number
-  is given which should speed up finding the missing end .
+  is given for the last def/class/module which was successfully closed
+  out during parsing.  
 
   Fixes to lexer to parse these symbol literals
      :-@
@@ -188,7 +189,7 @@ Lexing of double quoted strings (Maglev Trac 580)
 
   Added a heuristic to generate the text
       check end(s) before 'def' near line NNN
-  for the situation when there are too many 'end' in a method and the next 'def' 
+  for the situation when there are too many 'end' in a method and the next 'def'
   is at top level of the file instead of within a class/module .
   Uses new instVar @first_top_level_def_offset in Env , and related methods.
 
@@ -257,3 +258,18 @@ Lexing of double quoted strings (Maglev Trac 580)
    In     def assignable      in  extras.rb,
    add logic to detect dynamic constant assignment, for a case
    not detected in the .y file.
+
+24 Nov 2009
+  More optimization based on profiling with Maglev::Gprof, which
+  showed that the racc state machine was taking a lot more time
+  than the lexer.
+  This cuts the time spent in the racc state machine in half.
+  Use m4 to inline the body of _racc_evalact in the new 
+  method _racc_parse_inner, and move the rescue of exceptions out 
+  of _racc_parse_inner.  Also put the lexer through m4 so we
+  don't do debug printout checks in the production code.
+  The source  files   evalact_body.rbm4  racc_parser.rbm4 lexer.rbm4
+  are now used to produce generated files racc_parser.rb, lexer.rb .
+  racc.sh now takes a -D option if you want to enable detailed debug
+  printing in the parser. 
+
