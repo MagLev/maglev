@@ -149,7 +149,7 @@ class Thread
   primitive_nobridge 'key?', 'includesKey:'
 
   def self.kill(thread)
-    if thread.is_a(Thread)
+    if thread._is_a?(Thread)
       thread.__terminate
     else
       raise ArgumentError, 'not a Thread'
@@ -180,7 +180,7 @@ class Thread
 
   def raise(ex_class, message)
     ex = ex_class.exception
-    if self.equal?(Thread.current)
+    if self._equal?(Thread.current)
       ex.signal(message)
     else
       ex.__message=(message)
@@ -200,7 +200,7 @@ class Thread
       # msg should be a subclass of Exception or
       #  an object that returns a new exception
       ex = msg.exception
-      if self.equal?(Thread.current)
+      if self._equal?(Thread.current)
         ex.signal
       else
          self.__kill_ex(ex)

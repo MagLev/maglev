@@ -51,9 +51,9 @@ module Kernel
 
   def method_missing(method_id, *args)
     prot = __last_dnu_protection()
-    type = if (prot.equal?(0))
+    type = if (prot._equal?(0))
              'undefined method'
-           elsif (prot.equal?(1))
+           elsif (prot._equal?(1))
              'protected method'
            else
              'private method'
@@ -90,17 +90,17 @@ module Kernel
   def eval(str, binding, file_name, line_number=1 )
     # use __binding_ctx(1) and 0x3? because one extra stack frame due to bridging methods .
     # max send site is :::* , call is via a :::* to :::: bridge meth .
-    if binding.equal?(nil)
+    if binding._equal?(nil)
       ctx = self.__binding_ctx(1)
       bnd = Binding.new(ctx, self, nil)
     else
       bnd = binding
-      unless bnd.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+      unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     end
     vcgl = [ self.__getRubyVcGlobal(0x30) ,
       self.__getRubyVcGlobal(0x31) , nil ]
     blk = bnd.block
-    unless blk.equal?(nil)
+    unless blk._equal?(nil)
       vcgl << blk
     end
     res = __eval_with_position(str, bnd, vcgl, file_name, line_number )
@@ -116,7 +116,7 @@ module Kernel
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
              self.__getRubyVcGlobal(0x21) , self ]
     blk = bnd.block
-    unless blk.equal?(nil)
+    unless blk._equal?(nil)
       vcgl << blk
     end
     res = __eval_with_position(str, bnd, vcgl, nil, 0 )
@@ -130,7 +130,7 @@ module Kernel
     bnd = Binding.new(ctx, self, nil)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
              self.__getRubyVcGlobal(0x21) , self ]
-    unless blk.equal?(nil)
+    unless blk._equal?(nil)
       vcgl << blk
     end
     res = __eval_with_position(str, bnd, vcgl, nil, 0 )
@@ -140,17 +140,17 @@ module Kernel
   end
 
   def eval(str, binding)
-    if binding.equal?(nil)
+    if binding._equal?(nil)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
     else
       bnd = binding
-      unless bnd.is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+      unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     end
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
       self.__getRubyVcGlobal(0x21), nil ]
     blk = bnd.block
-    unless blk.equal?(nil)
+    unless blk._equal?(nil)
       vcgl << blk
     end
     res = __eval_with_position(str, bnd, vcgl, nil, 0 )
@@ -161,7 +161,7 @@ module Kernel
 
   def exit(arg=0)
     status = 9
-    if (arg.equal?(true))
+    if (arg._equal?(true))
       status = 0
     elsif (arg._isInteger)
       status = arg
@@ -181,7 +181,7 @@ module Kernel
   def gsub(regex, string)
     string = Type.coerce_to(string, String, :to_str)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.gsub, caller frame has no reference to $_ '
     end
     unless str._isString
@@ -196,7 +196,7 @@ module Kernel
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.gsub, caller frame has no reference to $_ '
     end
     unless str._isString
@@ -222,7 +222,7 @@ module Kernel
 
   def gsub!(regex, string)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.gsub! , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -233,7 +233,7 @@ module Kernel
 
   def gsub!(regex, &block)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.gsub! , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -359,7 +359,7 @@ module Kernel
   def open(name, *rest, &block)
     path = Type.coerce_to(name, String, :to_str)
 
-    if path._isString and path[0].equal?(?|)
+    if path._isString and path[0]._equal?(?|)
       return IO.popen(path[1..-1], *rest, &block)
     end
     File.open(path, *rest, &block)
@@ -383,7 +383,7 @@ module Kernel
   end
 
   def printf(a, b, c, *d)
-    if (a.kind_of?(IO))
+    if (a._kind_of?(IO))
       if (d._isArray)
         args = [ c ]
         args.concat(*d)
@@ -403,7 +403,7 @@ module Kernel
   end
 
   def printf(a, b, c)
-    if (a.kind_of?(IO))
+    if (a._kind_of?(IO))
       a.printf(b, c)
     else
       $stdout.printf(a, b, c)
@@ -411,7 +411,7 @@ module Kernel
   end
 
   def printf(a, b)
-    if (a.kind_of?(IO))
+    if (a._kind_of?(IO))
       a.printf(b)
     else
       $stdout.printf(a, b)
@@ -426,7 +426,7 @@ module Kernel
 
   def puts(*args)
     f = $stdout
-    if f.equal?(nil)
+    if f._equal?(nil)
       raise "$stdout is nil in Kernel.puts!"
     else
       f.puts(*args)
@@ -497,7 +497,7 @@ module Kernel
 
   def readline(sep=$/)
     res = self.gets(sep)
-    if res.equal?(nil)
+    if res._equal?(nil)
       raise EOFError
     end
     res
@@ -519,7 +519,7 @@ module Kernel
 
   def scan(pattern)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.scan, caller frame has no reference to $_ '
     end
     unless str._isString
@@ -530,7 +530,7 @@ module Kernel
 
   def scan(pattern, &block)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.scan, caller frame has no reference to $_ '
     end
     unless str._isString
@@ -559,7 +559,7 @@ module Kernel
 
   def split(pattern=nil, limit=Undefined)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.split, caller frame has no reference to $_ '
     end
     unless str._isString
@@ -609,7 +609,7 @@ module Kernel
     arg = Type.coerce_to(arg, String, :to_str)
     arr = __system_exec(arg)
     status = arr[0]
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, arg)
     end
     arr[1]
@@ -617,7 +617,7 @@ module Kernel
 
   def sub(pattern, replacement)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.sub , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -636,7 +636,7 @@ module Kernel
 
   def sub(pattern, &block)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.sub , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -654,7 +654,7 @@ module Kernel
 
   def sub!(pattern, replacement)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.sub! , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -672,7 +672,7 @@ module Kernel
 
   def sub!(pattern, &block)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Kernel.sub! , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -693,7 +693,7 @@ module Kernel
     arg = Type.coerce_to(arg, String, :to_str)
     arr = __system_exec(arg)
     status = arr[0]
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, arg)
     end
     arr[1]
@@ -712,7 +712,7 @@ module Kernel
     end
     arr = __system_exec(cmd)
     status = arr[0]
-    if status.equal?(0)
+    if status._equal?(0)
       # print result string per MRI behavior, not document in Pickaxe book
       puts arr[1]
       return true
@@ -729,7 +729,7 @@ module Kernel
   end
 
   def __as_file(arg)
-    if arg.is_a?(File)
+    if arg._is_a?(File)
       f = arg
     else
       fn = Type.coerce_to(arg, String, :to_str)
@@ -743,7 +743,7 @@ module Kernel
   end
 
   def __close_file(f)
-    if f.is_a?(File)
+    if f._is_a?(File)
       f.close
     end
   end
@@ -753,67 +753,67 @@ module Kernel
     res = false
     begin
       f = self.__as_file(file)
-      if cmd.equal?( ?A )
-        if f.equal?(nil)
+      if cmd._equal?( ?A )
+        if f._equal?(nil)
           File.open(file) # raises ENOENT
         end
         res = f.atime
-      elsif cmd.equal?( ?C )
-        if f.equal?(nil)
+      elsif cmd._equal?( ?C )
+        if f._equal?(nil)
           File.open(file) # raises ENOENT
         end
         res = f.ctime
-      elsif cmd.equal?( ?M )
-        if f.equal?(nil)
+      elsif cmd._equal?( ?M )
+        if f._equal?(nil)
           File.open(file) # raises ENOENT
         end
         res = f.mtime
-      elsif cmd.equal?( ?b )
+      elsif cmd._equal?( ?b )
         res = f._not_equal?(nil) && f.lstat.blockdev?
-      elsif cmd.equal?( ?c )
+      elsif cmd._equal?( ?c )
         res = f._not_equal?(nil) && f.lstat.chardev?
-      elsif cmd.equal?( ?d )
+      elsif cmd._equal?( ?d )
         res = f._not_equal?(nil) && f.lstat.directory?
-      elsif cmd.equal?( ?e )
+      elsif cmd._equal?( ?e )
         res = f._not_equal?(nil)
-      elsif cmd.equal?( ?f )
+      elsif cmd._equal?( ?f )
         res = f._not_equal?(nil) && f.lstat.file?
-      elsif cmd.equal?( ?g )
+      elsif cmd._equal?( ?g )
         res = f._not_equal?(nil) && f.lstat.setgid?
-      elsif cmd.equal?( ?k )
+      elsif cmd._equal?( ?k )
         res = f._not_equal?(nil) && f.lstat.sticky?
-      elsif cmd.equal?( ?l )
+      elsif cmd._equal?( ?l )
         res = f._not_equal?(nil) && f.lstat.symlink?
-      elsif cmd.equal?( ?p )
+      elsif cmd._equal?( ?p )
         res = f._not_equal?(nil) && f.lstat.pipe?  # a fifo
-      elsif cmd.equal?( ?S )
+      elsif cmd._equal?( ?S )
         res = f._not_equal?(nil) && f.lstat.socket?
-      elsif cmd.equal?( ?u )
+      elsif cmd._equal?( ?u )
         res = f._not_equal?(nil) && f.lstat.setuid?
-      elsif cmd.equal?( ?s )
+      elsif cmd._equal?( ?s )
         res = nil
         if f._not_equal?(nil) && (sz = f.lstat.size)
           res = sz
         end
-      elsif cmd.equal?( ?z )
+      elsif cmd._equal?( ?z )
         res = f._not_equal?(nil) && f.lstat.size == 0
-      elsif cmd.equal?( ?r )
+      elsif cmd._equal?( ?r )
         res = f._not_equal?(nil) && f.lstat.readable?
-      elsif cmd.equal?( ?R )
+      elsif cmd._equal?( ?R )
         res = f._not_equal?(nil) && f.lstat.readable_real?
-      elsif cmd.equal?( ?o )
+      elsif cmd._equal?( ?o )
         res = f._not_equal?(nil) && f.lstat.owned?
-      elsif cmd.equal?( ?O )
+      elsif cmd._equal?( ?O )
         res = f._not_equal?(nil) && f.lstat.rowned?
-      elsif cmd.equal?( ?G )
+      elsif cmd._equal?( ?G )
         res = f._not_equal?(nil) && f.lstat.rgrpowned?
-      elsif cmd.equal?( ?w )
+      elsif cmd._equal?( ?w )
         res = f._not_equal?(nil) && f.lstat.writable?
-      elsif cmd.equal?( ?W )
+      elsif cmd._equal?( ?W )
         res = f._not_equal?(nil) && f.lstat.writable_real?
-      elsif cmd.equal?( ?x )
+      elsif cmd._equal?( ?x )
         res = f._not_equal?(nil) && f.lstat.executable?
-      elsif cmd.equal?( ?W )
+      elsif cmd._equal?( ?W )
         res = f._not_equal?(nil) && f.lstat.executable_real?
       else
         raise ArgumentError , 'Kernel#test , invalid first arg'
@@ -831,18 +831,18 @@ module Kernel
     begin
       fa = self.__as_file(file1)
       fb = self.__as_file(file2)
-      mta = fa.equal?(nil) ? -1 : fa.mtime
-      mtb = fa.equal?(nil) ? -1 : fa.mtime
-      if cmd.equal?( ?= )
+      mta = fa._equal?(nil) ? -1 : fa.mtime
+      mtb = fa._equal?(nil) ? -1 : fa.mtime
+      if cmd._equal?( ?= )
         # return true if modification times equal
         res =  mta >= 0 && mtb >= 0 &&  mta == mtb
-      elsif cmd.equal?( ?< )
+      elsif cmd._equal?( ?< )
         # return true if file1.mtime < file2.mtime
         res =  mta >= 0 && mtb >= 0 &&  mta < mtb
-      elsif cmd.equal?( ?> )
+      elsif cmd._equal?( ?> )
         # return true if file1.mtime > file2.mtime
         res =  mta >= 0 && mtb >= 0 &&  mta > mtb
-      elsif cmd.equal?( ?- )
+      elsif cmd._equal?( ?- )
         # return true if file1 is a hard link to file2
         raise NotImplementedError , 'Kernel#test ?- '
       else

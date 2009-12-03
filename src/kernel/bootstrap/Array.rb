@@ -126,11 +126,11 @@ class Array
     # this variant gets bridge methods
     len = args.length
     if len <= 2
-      if  len.equal?(2)
+      if  len._equal?(2)
         a = self.new(args[0], args[1])
-      elsif len.equal?(1)
+      elsif len._equal?(1)
         a = self.new(args[0])
-      elsif len.equal?(0)
+      elsif len._equal?(0)
         a = self.new
       end
       a
@@ -149,11 +149,11 @@ class Array
     # with explicit args, e.g. super(x,y).
 
     len = args.length
-    if len.equal?(0)
+    if len._equal?(0)
       self
-    elsif len.equal?(1)
+    elsif len._equal?(1)
       __initialize(args[0], &blk)
-    elsif len.equal?(2)
+    elsif len._equal?(2)
       __initialize(args[0], args[1])
     else
       raise ArgumentError, 'too many args'
@@ -177,7 +177,7 @@ class Array
   end
 
   def __initialize(first, &blk)
-    if self.class.equal?(Array)
+    if self.class._equal?(Array)
       if first._isArray
         lim = 0 # ignore any block
       else
@@ -204,7 +204,7 @@ class Array
 
 
   def self.new(a_size, value)
-    if self.equal?(Array)
+    if self._equal?(Array)
       s = Type.coerce_to(a_size, Fixnum, :to_int)
       a = __alloc(s, value)
     else
@@ -215,7 +215,7 @@ class Array
   end
 
   def initialize(a_size, value)
-    if self.class.equal?(Array)
+    if self.class._equal?(Array)
       # do nothing
     else
       s = Type.coerce_to(a_size, Fixnum, :to_int)
@@ -225,7 +225,7 @@ class Array
     self
   end
   def __initialize(a_size, value)
-    if self.class.equal?(Array)
+    if self.class._equal?(Array)
       # do nothing
     else
       s = Type.coerce_to(a_size, Fixnum, :to_int)
@@ -246,7 +246,7 @@ class Array
   def self.new(arg)
     # this method will have no bridge methods, all the bridges
     #  will map to the previous 2 arg form
-    if self.equal?(Array)
+    if self._equal?(Array)
       if arg._isFixnum
         a = __alloc(arg, nil)
         return a
@@ -269,7 +269,7 @@ class Array
 
   def self.__coerce_one_arg(arg)
     carg = Type.coerce_to_or_nil(arg, Array, :to_ary)
-    if carg.equal?(nil)
+    if carg._equal?(nil)
       carg = Type.coerce_to(arg, Fixnum, :to_int)
     end
     carg
@@ -421,7 +421,7 @@ class Array
     i = 0
     while i < mySize
       el = self.__at(i)
-      if (h[el].equal?(default))
+      if (h[el]._equal?(default))
         res << el
       end
       i = i + 1
@@ -465,7 +465,7 @@ class Array
       while i < lim
         curr = self.__at(i)
         if ts.include?(curr)
-          unless curr.equal?(other[i])
+          unless curr._equal?(other[i])
             return 1 if size > other_size
             return -1 if size < other_size
           end
@@ -491,7 +491,7 @@ class Array
     return true if equal?(other)
     return false unless other._isArray
     lim = self.size
-    unless lim.equal?(other.size)
+    unless lim._equal?(other.size)
       return false
     end
     ts = Thread.__recursion_guard_set
@@ -502,12 +502,12 @@ class Array
       while i < limi
         v = self.__at(i)
         ov = other[i]
-        if v.equal?(ov)
+        if v._equal?(ov)
     # ok
         elsif ts.include?(v) || ts.include?(ov)
-          if v.equal?(self) && ov.equal?(other)
+          if v._equal?(self) && ov._equal?(other)
             # ok
-          elsif v.equal?(other) && ov.equal?(self)
+          elsif v._equal?(other) && ov._equal?(self)
             # ok
           else
             raise ArgumentError, 'recursion too complex for Array#=='
@@ -532,10 +532,10 @@ class Array
   # eql?.
   #
   def eql?(other)
-    return true if self.equal?(other)
+    return true if self._equal?(other)
     return false unless other._isArray
     lim = self.size
-    return false unless lim.equal?(other.size)
+    return false unless lim._equal?(other.size)
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
     begin
@@ -544,12 +544,12 @@ class Array
       while i < limi
         v = self.__at(i)
         ov = other[i]
-        if v.equal?(ov)
+        if v._equal?(ov)
           # ok
         elsif ts.include?(v) || ts.include?(ov)
-          if v.equal?(self) && ov.equal?(other)
+          if v._equal?(self) && ov._equal?(other)
             # ok
-          elsif v.equal?(other) && ov.equal?(self)
+          elsif v._equal?(other) && ov._equal?(self)
             # ok
           else
             raise ArgumentError, 'recursion too complex for Array#=='
@@ -604,9 +604,9 @@ class Array
 
   def [](*args)
     len = args.size
-    if len.equal?(1)
+    if len._equal?(1)
       slice(args[0])
-    elsif len.equal?(2)
+    elsif len._equal?(2)
       slice(args[0], args[1])
     else
       raise ArgumentError, 'expected 1 or 2 args'
@@ -673,7 +673,7 @@ class Array
     lim = size
     while i < lim
       el = self.__at(i)
-      result << el unless el.equal?(nil)
+      result << el unless el._equal?(nil)
       i += 1
     end
     result
@@ -685,15 +685,15 @@ class Array
     i = 0
     lim = size
     while i < lim
-      break if self.__at(i).equal?(nil)
+      break if self.__at(i)._equal?(nil)
       i += 1
     end
-    return nil if i.equal?(lim)
+    return nil if i._equal?(lim)
 
     fill_idx = i
     while i < lim
       el = self.__at(i)
-      unless el.equal?(nil)
+      unless el._equal?(nil)
         self.__at_put(fill_idx,  el )
         fill_idx += 1
       end
@@ -739,7 +739,7 @@ class Array
       end
       n = n - 1
     end
-    if found.equal?(false)
+    if found._equal?(false)
       if block_given?
         blk.call
       else
@@ -834,7 +834,7 @@ class Array
     if idx >= my_siz
       bad = true
     end
-    if bad.equal?(true)
+    if bad._equal?(true)
       if block_given?
         return blk.call(index)
       else
@@ -884,7 +884,7 @@ class Array
 
   #  note multiple variants below
   def fill(obj, start=nil, length=nil)
-    if start.equal?(nil)
+    if start._equal?(nil)
       start = 0
     else
       start = Type.coerce_to(start, Fixnum, :to_int)
@@ -893,8 +893,8 @@ class Array
     sz = self.size
 
     unless length._isFixnum
-      unless length.equal?(nil)
-        if (length.kind_of?(Bignum))
+      unless length._equal?(nil)
+        if (length._kind_of?(Bignum))
           raise RangeError, "#{length} too big" if length >= 2**63
         else
           length = Type.coerce_to(length, Fixnum, :to_int)
@@ -910,7 +910,7 @@ class Array
       end
     end
 
-    if length.equal?(nil)
+    if length._equal?(nil)
       if start >= sz
         # no modifications if index greater than end and no size
         return self
@@ -957,7 +957,7 @@ class Array
   def fill(start=nil, length=nil , &blk)
     # note no bridge methods for second and later variants
     unless start._isFixnum
-      if start.equal?(nil)
+      if start._equal?(nil)
         start = 0
       else
         start = start.to_int
@@ -972,7 +972,7 @@ class Array
       end
     end
 
-    if length.equal?(nil)
+    if length._equal?(nil)
       length = sz - start
     else
       unless length._isFixnum
@@ -1122,7 +1122,7 @@ class Array
 
   def last
     my_size = self.size
-    if my_size.equal?(0)
+    if my_size._equal?(0)
       return nil
     end
     return self.__at(my_size - 1)
@@ -1138,7 +1138,7 @@ class Array
     i = 0
     lim = size
     while i < lim
-      count += 1 unless self.__at(i).equal?(nil)
+      count += 1 unless self.__at(i)._equal?(nil)
       i += 1
     end
     count
@@ -1158,7 +1158,7 @@ class Array
 
   def pop
     sz = self.size
-    unless sz.equal?(0)
+    unless sz._equal?(0)
       idx = sz - 1
       elem = self.__at(idx)
       self.size=(idx)
@@ -1234,7 +1234,7 @@ class Array
 
   def shift
     sz = self.size
-    unless sz.equal?(0)
+    unless sz._equal?(0)
       elem = self.__at(0)
       __remove_from_to_(1, 1)
       elem
@@ -1249,9 +1249,9 @@ class Array
 
   def slice(*args)
     len = args.size
-    if len.equal?(1)
+    if len._equal?(1)
       slice(args.__at(0))
-    elsif len.equal?(2)
+    elsif len._equal?(2)
       slice(args[0], args[1])
     else
       raise ArgumentError, 'expected 1 or 2 args'
@@ -1259,7 +1259,7 @@ class Array
   end
 
   def slice!(start, length)
-    if self.size.equal?(0)
+    if self.size._equal?(0)
       return self.class.new
     end
     result = self.__at(start, length)
@@ -1310,7 +1310,7 @@ class Array
   # axe Enumerable#sort_by for a full discussion.
 
   def to_a
-    if self.class.equal?(Array)
+    if self.class._equal?(Array)
       self
     else
       Array.new( self.to_ary )
@@ -1335,7 +1335,7 @@ class Array
     el_size = 0
     while n < my_size
       elem = Type.coerce_to( self.__at(n), Array, :to_ary)
-      if n.equal?(0)
+      if n._equal?(0)
         el_size = elem.size 
       elsif elem.size._not_equal?(el_size)
 	raise IndexError, 'All contained arrays must be same length'
@@ -1343,7 +1343,7 @@ class Array
       j = 0
       while j < el_size
         res_elem =  result[j] 
-        if res_elem.equal?(nil)
+        if res_elem._equal?(nil)
           res_elem = []
           result[j] = res_elem
         end
@@ -1374,7 +1374,7 @@ class Array
   def uniq!
     old_size = size
     r = uniq
-    if old_size.equal?(r.size)
+    if old_size._equal?(r.size)
       nil
     else
       # Only try to replace if size changed.  This prevents

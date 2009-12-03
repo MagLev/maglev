@@ -12,7 +12,7 @@ class File
 
   def self.__validate_stdout_value(file)
     # used in generated code value for     $stdout = file
-    unless file.equal?(nil)
+    unless file._equal?(nil)
       if file.respond_to?(:write)
         return file
       end

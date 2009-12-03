@@ -17,7 +17,7 @@ class Class
 
   def self.new(super_cls=Object, &blk)
     if super_cls._not_equal?(Object)
-      unless super_cls.is_a?(Class)
+      unless super_cls._is_a?(Class)
         raise TypeError, 'superclass arg must be a Class'
       end
     end
@@ -75,7 +75,7 @@ class Class
   # Reimplementations of === in ruby code will not be used by rescue clauses.
   #
   def === (obj)
-    obj.kind_of?(self)
+    obj._kind_of?(self)
   end
 
   #  < <= > >=  inherited from Module

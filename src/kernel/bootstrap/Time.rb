@@ -12,15 +12,22 @@ class Time
   include Comparable
 
   ZoneOffset = {
-    'UTC' => 0, 'Z' => 0,  'UT' => 0, 'GMT' => 0,
-    'EST' => -5, 'EDT' => -4, 'CST' => -6, 'CDT' => -5,
-    'CET' => 1, 'CEST' => 2,
-    'MST' => -7, 'MDT' => -6, 'PST' => -8, 'PDT' => -7,
-    'A' => +1, 'B' => +2, 'C' => +3, 'D' => +4, 'E' => +5,
-    'F' => +6, 'G' => +7, 'H' => +8, 'I' => +9, 'K' => +10,
-    'L' => +11, 'M' => +12, 'N' => -1, 'O' => -2, 'P' => -3,
-    'Q' => -4, 'R' => -5, 'S' => -6, 'T' => -7, 'U' => -8,
-    'V' => -9, 'W' => -10, 'X' => -11, 'Y' => -12, }
+      'UTC' => 0,
+      # ISO 8601
+      'Z' => 0,
+      # RFC 822
+      'UT' => 0, 'GMT' => 0,
+      'EST' => -5, 'EDT' => -4,
+      'CST' => -6, 'CDT' => -5,
+      'MST' => -7, 'MDT' => -6,
+      'PST' => -8, 'PDT' => -7,
+      # Following definition of military zones is original one.
+      # See RFC 1123 and RFC 2822 for the error in RFC 822.
+      'A' => +1, 'B' => +2, 'C' => +3, 'D' => +4,  'E' => +5,  'F' => +6,
+      'G' => +7, 'H' => +8, 'I' => +9, 'K' => +10, 'L' => +11, 'M' => +12,
+      'N' => -1, 'O' => -2, 'P' => -3, 'Q' => -4,  'R' => -5,  'S' => -6,
+      'T' => -7, 'U' => -8, 'V' => -9, 'W' => -10, 'X' => -11, 'Y' => -12,
+  }
 
   MonthValue = {
     'JAN' => 1, 'FEB' => 2, 'MAR' => 3, 'APR' => 4, 'MAY' => 5, 'JUN' => 6,
@@ -163,7 +170,7 @@ class Time
         ma = Type.coerce_to_or_nil(ma, String, :to_str)
 	if ma._isString
 	  mint = ma.to_i
-	  if mint.equal?(0)
+	  if mint._equal?(0)
 	    month = MonthValue[ ma.upcase] || raise(ArgumentError.new('argument out of range'))
 	  else
 	    month = mint
@@ -217,7 +224,7 @@ class Time
     microsecs = @microseconds
     if other._isInteger
       microsecs +=  other * 1_000_000
-    elsif other.kind_of?(Time)
+    elsif other._kind_of?(Time)
       raise TypeError , 'Time#+  , arg may not be a Time'
     else
       other = Type.coerce_to(other, Float, :to_f)
@@ -231,7 +238,7 @@ class Time
     microsecs = @microseconds
     if other._isInteger
       microsecs -=  other * 1_000_000
-    elsif other.kind_of?(Time)
+    elsif other._kind_of?(Time)
       delta = microsecs - other.__microsecs
       return (delta.to_f).__divide(1_000_000.0)
     else
@@ -247,7 +254,7 @@ class Time
   end
 
   def <=>(other)
-    if other.kind_of?(Time)
+    if other._kind_of?(Time)
       @microseconds <=> other.__microsecs 
     else
       nil
@@ -257,7 +264,7 @@ class Time
   # It seems that MRI return nil if other isn't a Time object
   def ==(other)
     result = self <=> other
-    result.nil? ? result : result.equal?(0)
+    result.nil? ? result : result._equal?(0)
   end
 
   def hash
@@ -266,7 +273,7 @@ class Time
   end
 
   def eql?(other)
-    (self <=> other).equal?(0)
+    (self <=> other)._equal?(0)
   end
 
   def asctime
@@ -424,9 +431,11 @@ class Time
   # +want_gmt+ says whether the caller wants a gmtime or local time object.
 
   def at_gmt(sec, usec, want_gmt)  # GEMSTONE
-    if sec.kind_of?(Integer) || usec
-      sec  = Type.coerce_to(sec, Integer, :to_i)
+    if sec._isInteger 
       usec = usec ? usec.to_i : 0
+    elsif usec
+      sec  = Type.coerce_to(sec, Integer, :to_i)
+      usec = usec.to_i 
     else
       sec  = Type.coerce_to(sec, Float, :to_f)
       usec = ((sec % 1) * 1_000_000).to_i
@@ -444,225 +453,6 @@ class Time
     end
   end
 
-
-  def self.month_days(y, m)
-    if ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0)
-      LeapYearMonthDays[m-1]
-    else
-      CommonYearMonthDays[m-1]
-    end
-  end
-
-  def self.apply_offset(year, mon, day, hour, min, sec, off)
-    if off < 0
-      off = -off
-      off, o = off.divmod(60)
-      if o != 0 then sec += o; o, sec = sec.divmod(60); off += o end
-      off, o = off.divmod(60)
-      if o != 0 then min += o; o, min = min.divmod(60); off += o end
-      off, o = off.divmod(24)
-      if o != 0 then hour += o; o, hour = hour.divmod(24); off += o end
-      if off != 0
-        day += off
-        if month_days(year, mon) < day
-          mon += 1
-          if 12 < mon
-            mon = 1
-            year += 1
-          end
-          day = 1
-        end
-      end
-    elsif 0 < off
-      off, o = off.divmod(60)
-      if o != 0 then sec -= o; o, sec = sec.divmod(60); off -= o end
-      off, o = off.divmod(60)
-      if o != 0 then min -= o; o, min = min.divmod(60); off -= o end
-      off, o = off.divmod(24)
-      if o != 0 then hour -= o; o, hour = hour.divmod(24); off -= o end
-      if off != 0 then
-        day -= off
-        if day < 1
-          mon -= 1
-          if mon < 1
-            year -= 1
-            mon = 12
-          end
-          day = month_days(year, mon)
-        end
-      end
-    end
-    return year, mon, day, hour, min, sec
-  end
-
-    def rfc2822(date)
-      if /\A\s*
-          (?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s*,\s*)?
-          (\d{1,2})\s+
-          (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+
-          (\d{2,})\s+
-          (\d{2})\s*
-          :\s*(\d{2})\s*
-          (?::\s*(\d{2}))?\s+
-          ([+-]\d{4}|
-           UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-IK-Z])/ix =~ date
-        # Since RFC 2822 permit comments, the regexp has no right anchor.
-        day = $1.to_i
-        mon = MonthValue[$2.upcase]
-        year = $3.to_i
-        hour = $4.to_i
-        min = $5.to_i
-        sec = $6 ? $6.to_i : 0
-        zone = $7
-
-        # following year completion is compliant with RFC 2822.
-        year = if year < 50
-                 2000 + year
-               elsif year < 1000
-                 1900 + year
-               else
-                 year
-               end
-
-        year, mon, day, hour, min, sec =
-          apply_offset(year, mon, day, hour, min, sec, zone_offset(zone))
-        t = self.utc(year, mon, day, hour, min, sec)
-        t.localtime if !zone_utc?(zone)
-        t
-      else
-        raise ArgumentError.new("not RFC 2822 compliant date: #{date.inspect}")
-      end
-    end
-    alias rfc822 rfc2822
-
-
-  # Returns a string which represents the time as date-time defined by RFC 2822:
-  #
-  #   day-of-week, DD month-name CCYY hh:mm:ss zone
-  #
-  # where zone is [+-]hhmm.
-  #
-  # If +self+ is a UTC time, -0000 is used as zone.
-  #
-  def rfc2822
-    sprintf('%s, %02d %s %d %02d:%02d:%02d ',
-      RFC2822_DAY_NAME[wday],
-      day, RFC2822_MONTH_NAME[mon-1], year,
-      hour, min, sec) +
-    if utc?
-      '-0000'
-    else
-      off = utc_offset
-      sign = off < 0 ? '-' : '+'
-      sprintf('%s%02d%02d', sign, *(off.abs.__divide(60)).divmod(60))
-    end
-  end
-  alias rfc822 rfc2822
-
-  # Returns a string which represents the time as rfc1123-date of HTTP-date
-  # defined by RFC 2616:
-  #
-  #   day-of-week, DD month-name CCYY hh:mm:ss GMT
-  #
-  # Note that the result is always UTC (GMT).
-  #
-  def httpdate
-    t = dup.utc
-    sprintf('%s, %02d %s %d %02d:%02d:%02d GMT',
-      RFC2822_DAY_NAME[t.wday],
-      t.day, RFC2822_MONTH_NAME[t.mon-1], t.year,
-      t.hour, t.min, t.sec)
-  end
-
-    # Parses +date+ as HTTP-date defined by RFC 2616 and converts it to a Time
-    # object.
-    #
-    # ArgumentError is raised if +date+ is not compliant with RFC 2616 or Time
-    # class cannot represent specified date.
-    #
-    # See #httpdate for more information on this format.
-    #
-    def httpdate(date)
-      if /\A\s*
-          (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\x20
-          (\d{2})\x20
-          (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\x20
-          (\d{4})\x20
-          (\d{2}):(\d{2}):(\d{2})\x20
-          GMT
-          \s*\z/ix =~ date
-        self.rfc2822(date)
-      elsif /\A\s*
-             (?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\x20
-             (\d\d)-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d\d)\x20
-             (\d\d):(\d\d):(\d\d)\x20
-             GMT
-             \s*\z/ix =~ date
-        year = $3.to_i
-        if year < 50
-          year += 2000
-        else
-          year += 1900
-        end
-        self.utc(year, $2, $1.to_i, $4.to_i, $5.to_i, $6.to_i)
-      elsif /\A\s*
-             (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\x20
-             (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\x20
-             (\d\d|\x20\d)\x20
-             (\d\d):(\d\d):(\d\d)\x20
-             (\d{4})
-             \s*\z/ix =~ date
-        self.utc($6.to_i, MonthValue[$1.upcase], $2.to_i,
-                 $3.to_i, $4.to_i, $5.to_i)
-      else
-        raise ArgumentError.new("not RFC 2616 compliant date: #{date.inspect}")
-      end
-    end
-
-
-  # Returns a string which represents the time as dateTime defined by XML
-  # Schema:
-  #
-  #   CCYY-MM-DDThh:mm:ssTZD
-  #   CCYY-MM-DDThh:mm:ss.sssTZD
-  #
-  # where TZD is Z or [+-]hh:mm.
-  #
-  # If self is a UTC time, Z is used as TZD.  [+-]hh:mm is used otherwise.
-  #
-  # +fractional_seconds+ specifies a number of digits of fractional seconds.
-  # Its default value is 0.
-  #
-  def xmlschema(fraction_digits=0)
-    sprintf('%d-%02d-%02dT%02d:%02d:%02d',
-      year, mon, day, hour, min, sec) +
-    if fraction_digits == 0
-      ''
-    elsif fraction_digits <= 9
-      '.' + sprintf('%09d', nsec)[0, fraction_digits]
-    else
-      '.' + sprintf('%09d', nsec) + '0' * (fraction_digits - 9)
-    end +
-    if utc?
-      'Z'
-    else
-      off = utc_offset
-      sign = off < 0 ? '-' : '+'
-      sprintf('%s%02d:%02d', sign, *(off.abs.__divide(60)).divmod(60))
-    end
-  end
-  alias iso8601 xmlschema
-
-
-
-  # GEMSTONE, not used
-  #  public
-  #
-  #   class << self
-  #     alias_method :now,    :new
-  #     alias_method :mktime, :local
-  #     alias_method :utc,    :gm
-  #   end
 
   def self.utc(first, *args)    # GEMSTONE
     gm(first, *args)
@@ -715,7 +505,7 @@ class Time
 
   def self.at(a_time)
     res = self.allocate
-    if (a_time.kind_of?(self))
+    if (a_time._kind_of?(self))
       usecs = a_time.__microsecs
     elsif a_time._isInteger
       usecs = a_time * 1_000_000

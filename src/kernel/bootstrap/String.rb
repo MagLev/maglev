@@ -15,7 +15,7 @@ class String
   class_primitive_nobridge '__alloc', '_basicNew'
 
   def self.new(str)
-    if self.equal?(String) 
+    if self._equal?(String) 
       if str._isString
         s = __withAll(str)
       else
@@ -31,7 +31,7 @@ class String
   end
 
   def initialize(str)
-    if self.class.equal?(String)
+    if self.class._equal?(String)
       # do nothing
     else
       str = Type.coerce_to(str, String, :to_str)
@@ -138,12 +138,12 @@ class String
         sc = self.__uppercaseAt(i)
         oc = o.__uppercaseAt(i)
         result = sc <=> oc
-        return result unless result.equal?(0)
+        return result unless result._equal?(0)
         i += 1
       end
       return size <=> o_size
     else
-      if o.equal?(nil)
+      if o._equal?(nil)
         return nil
       end
       # From Rubinius...there are a lot of strange things in how
@@ -218,7 +218,7 @@ class String
     # invoked from prim failure code in _rubyAt<env>:
     if index._isRange 
       arr = index.__beg_len(self.length)
-      if arr.equal?(nil)
+      if arr._equal?(nil)
         nil
       else
         self.__at_length( arr[0] , arr[1] )
@@ -238,7 +238,7 @@ class String
     # called from Smalltalk
     if start._isRegexp
       arr = self.__match_regexp(start, length) # arr is [m_begin, m_len]
-      return nil if arr.equal?(nil)
+      return nil if arr._equal?(nil)
       # no tainted logic
       self.__at_length( arr[0] , arr[1] )
     else
@@ -276,13 +276,13 @@ class String
       val_coerced = true
     end
     if index._isFixnum
-      unless val_coerced.equal?(true)
+      unless val_coerced._equal?(true)
         raise IndexError, ('String#[index]=, ' + " index #{index} out of range")
       end
       self.__at_put(index, value)
     elsif index._isRange 
       arr = index.__beg_len(self.length)
-      if arr.equal?(nil)
+      if arr._equal?(nil)
         raise IndexError, ('String#[range]=' + "start out of range for range=#{index}")
       else
         self.__at_length_put( arr[0] , arr[1], value)
@@ -418,8 +418,8 @@ class String
   def chop!
     mySize = self.length
     if mySize > 0
-      if self[-1].equal?(0xa)
-        if mySize > 1 && self[-2].equal?(0xd)
+      if self[-1]._equal?(0xa)
+        if mySize > 1 && self[-2]._equal?(0xd)
       self.size=(mySize - 2)
     else
       self.size=(mySize - 1)
@@ -493,7 +493,7 @@ class String
   #   "world"
   def each(a_sep=$/, &block)
     # Modified Rubinius
-    if a_sep.equal?(nil)
+    if a_sep._equal?(nil)
       block.call(self)
       return self
     end
@@ -504,22 +504,22 @@ class String
     id = self.__id__
     my_size = self.size
     ssize = sep.size
-    newline = ssize.equal?(0) ?  ?\n  : sep[ssize-1]
+    newline = ssize._equal?(0) ?  ?\n  : sep[ssize-1]
 
     last = 0
     i = ssize
-    if ssize.equal?(0)
+    if ssize._equal?(0)
       while i < my_size
-	if self[i].equal?( ?\n )
+	if self[i]._equal?( ?\n )
 	  if self[i+=1]._not_equal?( ?\n )
 	    i += 1
 	    next
 	  end
-	  i += 1 while i < my_size && self[i].equal?( ?\n )
+	  i += 1 while i < my_size && self[i]._equal?( ?\n )
 	end
 
-	if i > 0 && self[i-1].equal?( newline ) &&
-	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize).equal?(0) )
+	if i > 0 && self[i-1]._equal?( newline ) &&
+	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0) )
 	  line = self[last, i-last]
 	  # line.taint if tainted?
 	  yield line
@@ -532,8 +532,8 @@ class String
       end
     else
       while i < my_size
-	if i > 0 && self[i-1].equal?(newline) &&
-	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize).equal?(0))
+	if i > 0 && self[i-1]._equal?(newline) &&
+	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0))
 	  line = self[last, i-last]
 	  # line.taint if tainted?
 	  yield line
@@ -544,7 +544,7 @@ class String
 	i += 1
       end
     end
-    unless last.equal?(my_size)
+    unless last._equal?(my_size)
       line = self[last, my_size-last+1]
       # line.taint if tainted?
       yield line
@@ -660,17 +660,17 @@ class String
       index = current + 1
 
       cap = self[index]
-      if cap.equal?( ?& )
+      if cap._equal?( ?& )
           result << match[0]
-      elsif cap.equal?( ?` )
+      elsif cap._equal?( ?` )
           result << match.pre_match
-      elsif cap.equal?( ?' )
+      elsif cap._equal?( ?' )
           result << match.post_match
-      elsif cap.equal?( ?+ )
+      elsif cap._equal?( ?+ )
           result << match.captures.compact[-1].to_s
       elsif cap >= ?0 && cap <= ?9 
           result << match[cap - ?0 ].to_s
-      elsif cap.equal?( ?\\ ) # escaped backslash
+      elsif cap._equal?( ?\\ ) # escaped backslash
           result << '\\'
       else     # unknown escape
           result << '\\' 
@@ -684,7 +684,7 @@ class String
   def __replace_match_with(match, replacement)
     out = self.class.new
     out << self._gsub_copyfrom_to(0, match.begin(0) )
-    unless replacement.equal?(nil)
+    unless replacement._equal?(nil)
       out << replacement.__to_sub_replacement(match)
     end
     out << self.__copyfrom_to(match.end(0) + 1, self.length)
@@ -753,7 +753,7 @@ class String
   def __delete_underscore_strip
     str = self
     idx = str.__indexOfByte( ?_ , 1 )
-    unless idx.equal?(0)
+    unless idx._equal?(0)
       str = str.delete('_')
     end
     str.strip
@@ -762,7 +762,7 @@ class String
   def __delete_underscore
     str = self
     idx = str.__indexOfByte( ?_ , 1 )
-    unless idx.equal?(0)
+    unless idx._equal?(0)
       str = str.delete('_')
     end
     str
@@ -808,13 +808,13 @@ class String
     return nil if zoffset < 0 || zoffset > my_size
 
     if item._isString
-      return zoffset if item.size.equal?(0)
+      return zoffset if item.size._equal?(0)
       st_idx = self.__findStringStartingAt(item, zoffset + 1)
-      return st_idx.equal?(0) ? nil : st_idx - 1
+      return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
       st_idx = self.__indexOfByte(item % 256, zoffset + 1)
-      return st_idx.equal?(0) ? nil : st_idx - 1
+      return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
       idx = item.__index_string(self, zoffset)
       return idx
@@ -843,7 +843,7 @@ class String
   primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
 
   def intern
-    if self.size.equal?(0)
+    if self.size._equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
     end
     if self.__index(0, 0)._not_equal?(nil) 
@@ -922,12 +922,12 @@ class String
 
   def __rindex(item, original_offset)
     my_size = self.size
-    if my_size.equal?(0)
+    if my_size._equal?(0)
       return nil
     end
-    if original_offset.equal?(Undefined)
+    if original_offset._equal?(Undefined)
       was_undef = true
-      zoffset = my_size.equal?(0) ? 0 : my_size 
+      zoffset = my_size._equal?(0) ? 0 : my_size 
     else
       zoffset = Type.coerce_to(original_offset, Integer, :to_int)
       zoffset += my_size if zoffset < 0
@@ -937,7 +937,7 @@ class String
     if item._isString
       zorig = zoffset
       zoffset = my_size - 1 if zoffset >= my_size
-      if item.size.equal?(0)
+      if item.size._equal?(0)
         if was_undef
           return my_size
         elsif zorig >= my_size 
@@ -947,12 +947,12 @@ class String
         end
       end
       st_idx = self.__lastSubstring(item, zoffset + 1)
-      return st_idx.equal?(0) ? nil : st_idx - 1
+      return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
       return nil if item > 255 || item < 0
       zoffset = my_size - 1 if zoffset >= my_size
       st_idx = self.__indexOfLastByte(item % 256 , zoffset + 1)
-      return st_idx.equal?(0) ? nil : st_idx - 1
+      return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
       zoffset = my_size  if zoffset > my_size  # allow searching for end of string
       zidx = item.__rindex_string(self, zoffset)
@@ -994,7 +994,7 @@ class String
     sz = self.size
     if start._isRegexp
       arr = self.__match_regexp(start, a_len) # arr is [ m_begin, m_len]
-      return nil if arr.equal?(nil)
+      return nil if arr._equal?(nil)
       r = slice!(arr[0], arr[1])
       # r.taint if self.tainted? or start.tainted?
       return r
@@ -1002,16 +1002,16 @@ class String
     start = Type.coerce_to(start, Integer, :to_int)
     len = Type.coerce_to(a_len, Integer, :to_int)
     return nil if len < 0
-    return self.class.new if len.equal?(0)
+    return self.class.new if len._equal?(0)
     start += sz if start < 0
     return nil if start < 0 || start > sz
-    return self.class.new if start.equal?(sz)
+    return self.class.new if start._equal?(sz)
     #  __remove_from_to will detect frozen if changes would occur
     s = __at_length(start, len)
     stop = start + len
     stop = sz if stop > sz
     __remove_from_to(start + 1, stop) # convert to smalltalk indexing
-    if s.equal?(nil)
+    if s._equal?(nil)
       return self.class.new
     end
     s 
@@ -1021,30 +1021,30 @@ class String
     # Do NOT check for frozen here...fails specs
     if arg._isRegexp
       md = arg.match(self)
-      return nil if md.equal?(nil)
+      return nil if md._equal?(nil)
       raise TypeError, "can't modify frozen string" if self.frozen?
       start = md.begin(0)
       len = md.end(0) - start
       slice!(start, len)
     elsif arg._isRange
       first, len = arg.__beg_len(self.length)
-      return nil if first.equal?(nil)
+      return nil if first._equal?(nil)
       slice!(first, len)
     elsif arg._isString
       start = self.__findStringStartingAt(arg, 1)
-      return nil if start.equal?(0)
+      return nil if start._equal?(0)
       slice!(start - 1, arg.length) # adjust coming from smalltalk
     else
       arg = Type.coerce_to(arg, Integer, :to_int)
       s = slice!(arg, 1)
-      return nil if s.equal?(nil)
+      return nil if s._equal?(nil)
       s[0]
     end
   end
 
   def __match_regexp(regexp, length)
     md = regexp.match(self)
-    return nil if md.equal?(nil)
+    return nil if md._equal?(nil)
     idx = Type.coerce_to(length, Integer, :to_int)
     return nil if idx >= md.size or idx < 0
     m_begin = md.begin(idx)
@@ -1054,7 +1054,7 @@ class String
 
   def split(pattern=nil, limit=Undefined)
     # BEGIN RUBINIUS
-    return [] if size.equal?(0)
+    return [] if size._equal?(0)
 
     if limit._not_equal?(Undefined)
       limit = Type.coerce_to(limit, Integer, :to_int)
@@ -1074,9 +1074,9 @@ class String
     if pattern == ' '
       spaces = true
       pattern = /\s+/
-    elsif pattern.equal?(nil)
+    elsif pattern._equal?(nil)
       pattern = /\s+/
-    elsif pattern.kind_of?(Regexp)
+    elsif pattern._isRegexp
       # Pass
     else
       pattern = Type.coerce_to(pattern, String, :to_str)
@@ -1093,7 +1093,7 @@ class String
 
       collapsed = match.collapsing?
 
-      if !collapsed || !(match.begin(0).equal?(0))
+      if !collapsed || !(match.begin(0)._equal?(0))
         ret << match.pre_match_from(last_match ? last_match.end(0) : 0)
         ret.push(*match.captures.compact)
       end
@@ -1109,15 +1109,15 @@ class String
       last_match = match
     end
 
-    if ! last_match.equal?(nil)           # GEMSTONE
+    if ! last_match._equal?(nil)           # GEMSTONE
       pm = last_match.post_match  # GEMSTONE
-      ret << (pm.equal?(nil) ? "" : pm)  # GEMSTONE
+      ret << (pm._equal?(nil) ? "" : pm)  # GEMSTONE
     elsif ret.empty?
       ret << self.dup
     end
 
     # Trim from end
-    if !ret.empty? and (limit.equal?(0) || limit.equal?(nil) )
+    if !ret.empty? and (limit._equal?(0) || limit._equal?(nil) )
       while s = ret.last and s.empty?
         ret.pop
       end
@@ -1314,10 +1314,10 @@ class String
 
   def to_i(base=10)
     base = Type.coerce_to(base, Integer, :to_int)
-    if base.equal?(10)
+    if base._equal?(10)
       str = self
-      if self[0].equal?( ?0 ) && self[1].equal?( ?d )
-        if self[2].equal?( ?- )
+      if self[0]._equal?( ?0 ) && self[1]._equal?( ?d )
+        if self[2]._equal?( ?- )
           return 0 # sign must come before base specifier
         end
         str = self[2, self.size - 2]
@@ -1328,18 +1328,18 @@ class String
     else
       raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
       exp_prefix = nil
-      if base.equal?(2)
+      if base._equal?(2)
         exp_prefix = '0b'
-      elsif base.equal?(8)
+      elsif base._equal?(8)
         exp_prefix = '0o'
-      elsif base.equal?(16)
+      elsif base._equal?(16)
         exp_prefix = '0x'
       end
       str = self
       if exp_prefix._not_equal?(nil)
         prefix = self[0,2]
         if prefix == exp_prefix
-          if self[2].equal?( ?- )
+          if self[2]._equal?( ?- )
             return 0 # sign must come before base specifier
           end
           str = self[2, self.size - 2]
@@ -1355,7 +1355,7 @@ class String
     if check && self['__']._not_equal?(nil)
       raise ArgumentError, "__ in string, in to_inum"
     end
-    if base.equal?(0)
+    if base._equal?(0)
       arr = self.extract_base # includes  __delete_underscore_strip
       base = arr[0]
       str = arr[1]
@@ -1366,17 +1366,17 @@ class String
       str = str.downcase
       s = str
       first_ch = s[0]
-      if first_ch.equal?( ?+ ) || first_ch.equal?( ?- )
+      if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
         s = s[1, s.length-1]
       end
       bad = false
-      if base.equal?(10)
+      if base._equal?(10)
         bad =  s =~ /[^0-9]/ 
-      elsif base.equal?(8)
+      elsif base._equal?(8)
         bad =  s =~ /[^0-7]/
-      elsif base.equal?(16)
+      elsif base._equal?(16)
         bad =  s =~ /[^0123456789abcdef]/
-      elsif base.equal?(2)
+      elsif base._equal?(2)
         bad =  s =~ /[^01]/
       else
         raise ArgumentError, "to_inum, unsupported base #{base} " 
@@ -1407,7 +1407,7 @@ class String
     s = self.__delete_underscore_strip
     s =~ /^([+-]?)(0[bdox]?)?(.*)/i
     dtwo = $2
-    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo.equal?(nil)
+    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo._equal?(nil)
     [ base, "#{$1}#{$3}" ]
   end
 
@@ -1416,7 +1416,7 @@ class String
   end
 
   def to_s
-    if self.class.equal?(String)
+    if self.class._equal?(String)
       self
     else
       String.new(self)
@@ -1424,7 +1424,7 @@ class String
   end
 
   def to_str
-    if self.class.equal?(String)
+    if self.class._equal?(String)
       self
     else
       String.new(self)
@@ -1511,7 +1511,7 @@ class String
 
   def >(other)
     o = (self <=> other)
-    if o.equal?(nil)
+    if o._equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
     o > 0
@@ -1519,7 +1519,7 @@ class String
 
   def <(other)
     o = (self <=> other)
-    if o.equal?(nil)
+    if o._equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
     o < 0
@@ -1527,7 +1527,7 @@ class String
 
   def >=(other)
     o = (self <=> other)
-    if o.equal?(nil)
+    if o._equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
     o >= 0
@@ -1535,7 +1535,7 @@ class String
 
   def <=(other)
     o = (self <=> other)
-    if o.equal?(nil)
+    if o._equal?(nil)
       raise ArgumentError, 'comparision failed'
     end
     o <= 0
@@ -1568,7 +1568,7 @@ class String
   # work is done in smalltalk.
   def justify(width, direction, padstr=" ")
     padstr = Type.coerce_to(padstr, String, :to_str)
-    raise ArgumentError, "zero width padding" if padstr.size.equal?(0)
+    raise ArgumentError, "zero width padding" if padstr.size._equal?(0)
 
     width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
     sz = size

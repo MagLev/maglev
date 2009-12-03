@@ -14,26 +14,26 @@ module Type
   # Equivalent to MRI's rb_convert_type().
   def self.coerce_to(obj, cls, meth)
     # this default implementation should only be used by non-bootstrap code
-    return obj if obj.kind_of?(cls)
+    return obj if obj._kind_of?(cls)
     begin
       ret = obj.__send__(meth)
     rescue Exception => e
       raise TypeError, "Coercion error: #{obj.inspect}.#{meth} => #{cls} failed:\n" \
                           "(#{e.message})"
     end
-    return ret if ret.kind_of?(cls)   
+    return ret if ret._kind_of?(cls)   
     raise TypeError, "Coercion error: obj.#{meth} did NOT return a #{cls} (was #{ret.class})"
   end
 
   def self.coerce_to_or_nil(obj, cls, meth)
     # this default implementation should only be used by non-bootstrap code
-    return obj if obj.kind_of?(cls)
+    return obj if obj._kind_of?(cls)
     begin
       ret = obj.__send__(meth)
     rescue Exception 
       # ignore
     end
-    return ret if ret.kind_of?(cls)
+    return ret if ret._kind_of?(cls)
     nil
   end
 
@@ -119,7 +119,7 @@ module Type
        raise TypeError, "Coercion error: #{obj.inspect}.to_f => Float failed:\n" \
                        "(#{e.message})"
      end
-     unless obj.equal?(nil)
+     unless obj._equal?(nil)
        if ret._isFloat
          unless ret.nan?
            return ret
@@ -140,7 +140,7 @@ module Type
      rescue Exception
        # ignore
      end
-     unless obj.equal?(nil)
+     unless obj._equal?(nil)
        if ret._isFloat
          unless ret.nan?
            return ret
@@ -275,7 +275,7 @@ module Type
       raise TypeError, 'cannot convert Symbol to String'
     else
       coereced = self.coerce_to_or_nil(item, Integer, :to_int)
-      if coereced.equal?(nil)
+      if coereced._equal?(nil)
         coereced = self.coerce_to(item, String, :to_str)
         # May raise, if not a string, but let that flow to caller
       end

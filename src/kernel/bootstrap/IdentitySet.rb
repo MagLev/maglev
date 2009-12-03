@@ -100,7 +100,7 @@ class IdentitySet
 
   def count(item = Undefined)
     seq = 0
-    unless item.equal? Undefined
+    unless item._equal?(Undefined)
       each { |o| seq += 1 if item == o }
     else
       each { |o| seq += 1 if yield(o) }

@@ -90,7 +90,7 @@ class File
   end
 
   def self.__stat(name, is_lstat)
-    unless name.equal?(nil)
+    unless name._equal?(nil)
       name = Type.coerce_to(name, String, :to_str)
     end
     __stat_isLstat(name, is_lstat)
@@ -104,17 +104,17 @@ class File
     return '/' if fn.eql?('/')
 
     b = fn.split('/')[-1]
-    return '' if b.equal?(nil)
+    return '' if b._equal?(nil)
 
     if suffix.eql?('.*')
       index = b.rindex('.')
     else
       index = b.rindex(suffix)
-      if (not index.equal?(nil)) && ((index + suffix.size) != b.size)
+      if (not index._equal?(nil)) && ((index + suffix.size) != b.size)
         index = nil
       end
     end
-    return index.equal?(nil) ? b : b[0,index]
+    return index._equal?(nil) ? b : b[0,index]
   end
 
   def self.blockdev?(filename)
@@ -139,7 +139,7 @@ class File
     file_names.each { |a_name|
       nam = Type.coerce_to(a_name, String, :to_str)
       status = File.__modify_file( 1, nam, perm, nil)
-      if (status.equal?(0))
+      if (status._equal?(0))
         count = count + 1
       end
     }
@@ -150,7 +150,7 @@ class File
     count = 0
     file_names.each { |a_name|
       status = File.__modify_file( 3, a_name, owner, group)
-      if (status.equal?(0))
+      if (status._equal?(0))
         count = count + 1
       end
     }
@@ -166,7 +166,7 @@ class File
     file_names.each { |a_name|
       nam = Type.coerce_to(a_name, String, :to_str)
       status = File.__modify_file( 0, nam, nil, nil )
-      if (status.equal?(0))
+      if (status._equal?(0))
         count = count + 1
       else
         Errno.raise_errno(status, nam)
@@ -224,7 +224,7 @@ class File
   def self.expand_path(a_path, a_dir = nil)
     path = Type.coerce_to(a_path, String, :to_str) 
 
-    dir = a_dir.equal?(nil) ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
+    dir = a_dir._equal?(nil) ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
     dir = Dir.pwd if dir.empty?
     dir = __tilde_expand(dir)
     dir = __cannonicalize(dir)
@@ -280,7 +280,7 @@ class File
   def self.extname(filename)
     base = self.basename(filename)
     index = base.rindex('.')
-    return '' if index.equal?(nil) || index == (base.size - 1) || index == 0
+    return '' if index._equal?(nil) || index == (base.size - 1) || index == 0
     base[index..-1]
   end
 
@@ -296,7 +296,7 @@ class File
   # MNI: File.fnmatch?
 
   def self.ftype(*names)
-    unless names.length.equal?(1)
+    unless names.length._equal?(1)
       raise ArgumentError , 'expected 1 arg'
     end
     File.stat(names[0]).ftype
@@ -329,7 +329,7 @@ class File
     count = 0
     file_names.each { |a_name|
       status = File.__modify_file( 4, a_name, owner, group)
-      if (status.equal?(0))
+      if (status._equal?(0))
         count = count + 1
       end
     }
@@ -340,7 +340,7 @@ class File
     old_nam = Type.coerce_to(oldname, String, :to_str)
     new_nam = Type.coerce_to(newname, String, :to_str)
     status = File.__modify_file(8, old_nam, new_nam)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'File.link failed')
     end
     status
@@ -370,11 +370,11 @@ class File
     end
     filename = Type.coerce_to(filename, String, :to_str)
     nargs = 1
-    if mode.equal?(Undefined)
+    if mode._equal?(Undefined)
       mode = 'r'
       nargs = 2
     else
-      if permission.equal?(Undefined)
+      if permission._equal?(Undefined)
         nargs = 2
       else
         unless permission._isFixnum
@@ -383,7 +383,7 @@ class File
         nargs = 3
       end
     end
-    if nargs.equal?(2)
+    if nargs._equal?(2)
       if mode._isString
         f = self.__fopen(filename, mode)
       elsif mode._isFixnum
@@ -397,7 +397,7 @@ class File
       else
         stat_obj = self.__stat(filename, false) # does file exist before we create?
         f = self.__fopen(filename, mode)
-        Errno.raise_errno(stat_obj, filename) if f.equal?(nil)
+        Errno.raise_errno(stat_obj, filename) if f._equal?(nil)
         f.chmod(permission) if stat_obj._isFixnum # chmod new files (if couldn't stat it)
       end
     end
@@ -454,7 +454,7 @@ class File
   def self.readlink(filename)
     res = String.new
     status = File.__modify_file(9, filename, res)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'File.readlink failed')
     end
     res
@@ -464,7 +464,7 @@ class File
     oldname = Type.coerce_to(oldname, String, :to_str)
     newname = Type.coerce_to(newname, String, :to_str)
     status = File.__modify_file(7, oldname, newname)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'File.rename failed')
     end
   end
@@ -486,14 +486,14 @@ class File
   end
 
   def self.size(filename)
-    if filename.is_a?(File)
+    if filename._is_a?(File)
       filename = filename.path 
     end
     File.stat(filename).size
   end
 
   def self.size?(filename)
-    if filename.is_a?(File)
+    if filename._is_a?(File)
       filename = filename.path 
     end
     stat_obj = self.__stat(filename, false)
@@ -513,23 +513,23 @@ class File
 
   def self.split(arg)
     arg = Type.coerce_to(arg, String, :to_str)
-    if arg.size.equal?(0)
+    if arg.size._equal?(0)
       return [ '.' , '' ]
     end
     str = arg.dup
     changed = true
-    until changed.equal?(nil)
+    until changed._equal?(nil)
       changed = str.gsub!('//', '/') 
     end
     idx = str.rindex('/')
-    if idx.equal?(str.size - 1)
+    if idx._equal?(str.size - 1)
       str.size=(str.size - 1)
     end
     idx = str.rindex('/')
-    if idx.equal?(nil) 
+    if idx._equal?(nil) 
       return [ '.', str ]
     end 
-    if idx.equal?(0)
+    if idx._equal?(0)
       left = '/' 
     else
       left = str[0, idx] 
@@ -555,7 +555,7 @@ class File
     oldname = Type.coerce_to(oldname, String, :to_str)
     newname = Type.coerce_to(newname, String, :to_str)
     status = File.__modify_file(6, oldname, newname)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'File.symlink failed')
     end
     status
@@ -573,7 +573,7 @@ class File
     filename = Type.coerce_to(filename, String, :to_str)
     newsize = Type.coerce_to(newsize, Fixnum, :to_int)
     status = File.__modify_file(2, filename, newsize)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'File.truncate failed')
     end
     status
@@ -606,14 +606,14 @@ class File
   def self.utime(accesstime, modtime, *filenames)
     if accesstime._isFixnum
       a_time = accesstime
-    elsif accesstime.is_a?(Time)
+    elsif accesstime._is_a?(Time)
       a_time = accesstime.seconds
     else
       raise TypeError, 'File.utime, accesstime must be a Time or Fixnum'
     end
     if accesstime._isFixnum
       m_time = modtime
-    elsif accesstime.is_a?(Time)
+    elsif accesstime._is_a?(Time)
       m_time = modtime.seconds
     else
       raise TypeError, 'File.utime, modtime must be a Time or Fixnum'
@@ -621,7 +621,7 @@ class File
     count = 0
     filenames.each { |a_name|
       status = File.__modify_file( 5, a_name, a_time, m_time)
-      if (status.equal?(0))
+      if (status._equal?(0))
         count = count + 1
       end
     }
@@ -661,7 +661,7 @@ class File
   def chmod(arg)
     permission = Type.coerce_to(arg, Fixnum, :to_int)
     status = File.__modify_file( 10, @fileDescriptor, permission, nil)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.chmod failed')
     end
     return 0
@@ -669,7 +669,7 @@ class File
 
   def chown(owner, group)
     status = File.__modify_file( 12, @fileDescriptor, owner, group)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.chown failed')
     end
     return 0
@@ -685,7 +685,7 @@ class File
 
   def eof?
     status = self.__at_end
-    if (status.equal?(nil))
+    if (status._equal?(nil))
       raise IOError
     end
     status
@@ -720,8 +720,8 @@ class File
 
   def __next_line(sep)
     res = __next_line_to(sep)
-    if res.equal?(nil)
-      unless __last_err_code.equal?(0)
+    if res._equal?(nil)
+      unless __last_err_code._equal?(0)
         raise IOError , self.__last_err_string  # TODO: Errno::xxx
       end
     end
@@ -732,7 +732,7 @@ class File
   def read(a_length=Undefined, a_buffer=Undefined)
     raise IOError, 'read: closed stream' unless __is_open
 
-    read_all_bytes = a_length.equal?(Undefined) || a_length.nil?
+    read_all_bytes = a_length._equal?(Undefined) || a_length.nil?
     unless read_all_bytes
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
@@ -743,23 +743,23 @@ class File
       return read_all_bytes ? '' : nil
     end
 
-    data = if a_buffer.equal?(Undefined)
+    data = if a_buffer._equal?(Undefined)
              data = read_all_bytes ? __read : __read(length)
            else
              buffer = Type.coerce_to(a_buffer, String, :to_str)
-             length = self.stat.size if length.equal?(nil)
+             length = self.stat.size if length._equal?(nil)
              num_read = __read_into(length, buffer)
-             raise IOError, 'error' if num_read.equal?(nil)
+             raise IOError, 'error' if num_read._equal?(nil)
              buffer.size = num_read # truncate buffer
              buffer
            end
-    data = '' if data.equal?(nil)
+    data = '' if data._equal?(nil)
     data
   end
 
   # during bootstrap,  send and __send__ get no bridge methods
   def send(sym)
-    if (sym.equal?(:gets))
+    if (sym._equal?(:gets))
       sep=$/
       res = __next_line( sep[0] )
       res.__storeRubyVcGlobal(0x21) # store into caller's $_
@@ -769,7 +769,7 @@ class File
   end
 
   def send(sym, arg)
-    if (sym.equal?(:gets))
+    if (sym._equal?(:gets))
       res = __next_line( arg[0] )
       res.__storeRubyVcGlobal(0x21) # store into caller's $_
       return res
@@ -778,7 +778,7 @@ class File
   end
 
   def __send__(sym)
-    if (sym.equal?(:gets))
+    if (sym._equal?(:gets))
       sep=$/
       res = __next_line( sep[0] )
       res.__storeRubyVcGlobal(0x21) # store into caller's $_
@@ -788,7 +788,7 @@ class File
   end
 
   def __send__(sym, arg)
-    if (sym.equal?(:gets))
+    if (sym._equal?(:gets))
       res = __next_line( arg[0] )
       res.__storeRubyVcGlobal(0x21) # store into caller's $_
       return res
@@ -805,7 +805,7 @@ class File
     #  they will be -1 on Solaris , where flock not supported
     arr = [ ]
     status = File.__modify_file(13, 0, arr)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'File.fetch_flock_constants failed')
     end
     arr
@@ -818,7 +818,7 @@ class File
 
   def flock(lock_constant)
     status = File.__modify_file(11, @fileDescriptor, lock_constant)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.flock failed')
     end
     status
@@ -841,7 +841,7 @@ class File
 
   def lchown(owner, group)
     status = File.__modify_file( 4, @pathName, owner, group)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.lchown failed')
     end
     return 0
@@ -868,7 +868,7 @@ class File
   end
 
   def each_line(&block)
-    sep = ($/.equal?(nil) ? 10 : $/[0])
+    sep = ($/._equal?(nil) ? 10 : $/[0])
     until eof?
       block.call( __next_line( sep ) )
     end
@@ -889,7 +889,7 @@ class File
   def truncate(a_length) 
     a_length = Type.coerce_to(a_length, Fixnum, :to_int)
     status = File.__modify_file( 15, @fileDescriptor, a_length, nil)
-    unless status.equal?(0)
+    unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.truncate failed')
     end
     return 0
@@ -898,7 +898,7 @@ class File
   def write(arg)
     arg = Type.coerce_to(arg, String, :to_s)
     count = self.__write(arg)
-    if count.equal?(nil)
+    if count._equal?(nil)
       raise IOError , self.__last_err_string  # TODO: Errno::xxx
     end
     count

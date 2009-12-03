@@ -51,7 +51,7 @@ class ExecBlock
 
     def arity
       na = self.__num_args 
-      if na.equal?(0)
+      if na._equal?(0)
         if self.__no_declared_args
           na = -1  # for Proc.new { }.arity == -1
         end 
@@ -85,7 +85,7 @@ class Proc
         inst.__initialize(&b)
         inst.initialize
         return inst
-      elsif blk.is_a?(Proc)
+      elsif blk._is_a?(Proc)
         return blk
       else
         raise ArgumentError, 'tried to create Proc object without a block' 
@@ -118,11 +118,11 @@ class Proc
         b.freeze
         inst.__initialize(&b)
         return inst
-      elsif blk.is_a?(Proc)
+      elsif blk._is_a?(Proc)
         pb = blk.__block
         b = pb.__copy_for_ruby(0)
         b.freeze
-        if b.equal?(pb)
+        if b._equal?(pb)
           return blk  # the argument blk  is already a lambda
         else
           inst = self.allocate
@@ -176,8 +176,8 @@ class Proc
     end
 
     def ==(other)
-      if other.is_a?(Proc)
-        return @block.equal?(other.__block)
+      if other._is_a?(Proc)
+        return @block._equal?(other.__block)
       end
       false
     end
@@ -193,7 +193,7 @@ class Proc
       end
       blk = @block
       na = blk.__num_args 
-      if na.equal?(0)
+      if na._equal?(0)
         if blk.__no_declared_args
           na = -1  # for Proc.new { }.arity == -1
         end 

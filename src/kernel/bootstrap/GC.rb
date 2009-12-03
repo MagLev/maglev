@@ -1,5 +1,5 @@
 module GC
-  # The Gemstone in-memory garbage collector runs 
+  # The Maglev in-memory garbage collector runs 
   #  automatically whenever GC is required.
   #  It cannot be disabled.
 
@@ -8,7 +8,7 @@ module GC
   end
 
   def self.enable
-    true
+    false # gc is never disabled
   end
 
   def self.disable

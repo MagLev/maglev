@@ -18,9 +18,9 @@ class UnboundMethod
   end
 
   def ==(other)
-    other.class.equal?(self.class) &&
+    other.class._equal?(self.class) &&
     other.arity == @arity && 
-    (other.__gsmeth.equal?(@gsmeth) || other.__nonbridge_meth.equal?(@nonBridgeMeth))
+    (other.__gsmeth._equal?(@gsmeth) || other.__nonbridge_meth._equal?(@nonBridgeMeth))
   end
 
   def to_s
@@ -40,7 +40,7 @@ class UnboundMethod
 
   def bind(obj)
     hm_cls = self.__home_class 
-    if (obj.kind_of?( hm_cls))
+    if (obj._kind_of?( hm_cls))
       return __bind(obj)   # returns a Method
     else
       raise TypeError , ('obj must be kind_of ' << (hm_cls.name ))

@@ -18,9 +18,9 @@ class Method
 
     def ==(other)
       # Returns true if other is the same method as self
-      if (other.kind_of?(Method))
-        return @obj.equal?(other.__obj) &&
-         @gsmeth.equal?(other.__gsmeth)
+      if (other._kind_of?(Method))
+        return @obj._equal?(other.__obj) &&
+         @gsmeth._equal?(other.__gsmeth)
       else
         return false
       end

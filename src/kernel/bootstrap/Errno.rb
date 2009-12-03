@@ -15,7 +15,7 @@ module Errno
   #     end
   def self.handle(err, additional='')
     return err unless err._isSmallInteger  # Not an errno
-    return err if err.equal?(0)                 # errno signifying no error
+    return err if err._equal?(0)                 # errno signifying no error
     self.raise_errno(err, additional)
   end
 
@@ -26,7 +26,7 @@ module Errno
 
   def self.__new_for_errno(errno)
     cls = ERRNO_TO_EXCEPTION[errno];
-    if cls.equal?(nil)
+    if cls._equal?(nil)
       return nil
     end
     exc = cls.allocate
@@ -41,7 +41,7 @@ module Errno
 
   def self.raise_errno(errno, additional='')
     exc = self.__new_for_errno(errno)
-    if exc.equal?(nil)
+    if exc._equal?(nil)
       exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
     end
     if additional._isString && additional.length > 0
