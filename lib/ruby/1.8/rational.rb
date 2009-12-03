@@ -29,7 +29,7 @@
 #   Rational(1.1, 2.3)      # -> NoMethodError
 #
 def Rational(a, b = 1)
-  if a.kind_of?(Rational) && b == 1
+  if a._kind_of?(Rational) && b == 1
     a
   else
     Rational.reduce(a, b)
@@ -125,7 +125,7 @@ class Rational < Numeric
   #   r + 0.5                # -> 1.25
   #
   def + (a)
-    if a.kind_of?(Rational)
+    if a._kind_of?(Rational)
       num = @numerator * a.denominator
       num_a = a.numerator * @denominator
       Rational(num + num_a, @denominator * a.denominator)
@@ -149,7 +149,7 @@ class Rational < Numeric
   #   r - 0.5              # -> 0.25
   #
   def - (a)
-    if a.kind_of?(Rational)
+    if a._kind_of?(Rational)
       num = @numerator * a.denominator
       num_a = a.numerator * @denominator
       Rational(num - num_a, @denominator*a.denominator)
@@ -174,7 +174,7 @@ class Rational < Numeric
   #   r * Rational(1,2)    # -> Rational(3,8)
   #
   def * (a)
-    if a.kind_of?(Rational)
+    if a._kind_of?(Rational)
       num = @numerator * a.numerator
       den = @denominator * a.denominator
       Rational(num, den)
@@ -196,12 +196,12 @@ class Rational < Numeric
   #   r / Rational(1,2)    # -> Rational(3,2)
   #
   def / (a)
-    if a.kind_of?(Rational)
+    if a._kind_of?(Rational)
       num = @numerator * a.denominator
       den = @denominator * a.numerator
       Rational(num, den)
     elsif a._isInteger
-      raise ZeroDivisionError, "division by zero" if a.equal?( 0 )
+      raise ZeroDivisionError, "division by zero" if a._equal?( 0 )
       self / Rational.new!(a, 1)
     elsif a._isFloat
       Float(self) / a
@@ -228,7 +228,7 @@ class Rational < Numeric
   #   r ** Rational(1,2)   # -> 0.866025403784439
   #
   def ** (other)
-    if other.kind_of?(Rational)
+    if other._kind_of?(Rational)
       Float(self) ** other
     elsif other._isInteger
       if other > 0
@@ -278,7 +278,7 @@ class Rational < Numeric
   def divmod(other)
     if other._isFloat && other == 0.0
       raise FloatDomainError , 'division by 0.0'
-    elsif other._isInteger && other.equal?( 0)
+    elsif other._isInteger && other._equal?( 0)
       raise ZeroDivisionError
     end
     value = (self / other).to_i
@@ -306,7 +306,7 @@ class Rational < Numeric
   # Don't use Rational.new!
   #
   def == (other)
-    if other.kind_of?(Rational)
+    if other._kind_of?(Rational)
       @numerator == other.numerator and @denominator == other.denominator
     elsif other._isInteger
       self == Rational.new!(other, 1)
@@ -321,7 +321,7 @@ class Rational < Numeric
   # Standard comparison operator.
   #
   def <=> (other)
-    if other.kind_of?(Rational)
+    if other._kind_of?(Rational)
       num = @numerator * other.denominator
       num_a = other.numerator * @denominator
       v = num - num_a
