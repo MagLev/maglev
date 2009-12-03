@@ -23,7 +23,6 @@ module WEBrick
       if defined?(Fcntl::F_GETFL)
         flag |= io.fcntl(Fcntl::F_GETFL)
       end
-      fc = Fcntl 
       io.fcntl(Fcntl::F_SETFL, flag)
     end
     module_function :set_non_blocking
