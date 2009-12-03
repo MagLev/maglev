@@ -75,16 +75,6 @@ spec/rubyspec/library/cgi/queryextension/value
 spec/rubyspec/library/cgi/queryextension/value/shared
 spec/rubyspec/library/cgi/queryextension/shared
 spec/rubyspec/library/cgi/tagmaker
-spec/rubyspec/library/csv
-spec/rubyspec/library/csv/basicwriter
-spec/rubyspec/library/csv/streambuf
-spec/rubyspec/library/csv/writer
-spec/rubyspec/library/csv/ioreader
-spec/rubyspec/library/csv/stringreader
-spec/rubyspec/library/csv/iobuf
-spec/rubyspec/library/csv/reader
-spec/rubyspec/library/csv/cell
-spec/rubyspec/library/csv/fixtures
 spec/rubyspec/library/digest
 spec/rubyspec/library/digest/sha512
 spec/rubyspec/library/digest/sha512/shared

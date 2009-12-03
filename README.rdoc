@@ -18,7 +18,7 @@ or want access to the absolute latest code. It changes more slowly than the
 github version, and it has undergone more testing.
 
 You'll need to know a version number to install.
-The MagLev Alpha version on 27-Nov-09 is 22603. Check for later versions on 
+The MagLev Alpha version on 03-Dec-09 is 22619. Check for later versions on 
 Twitter[http://twitter.com/maglev] or the {MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
 
 First, download and unzip the installer from
@@ -30,8 +30,8 @@ memory settings. It's safe to run multiple times, it won't overwrite
 things it's already done. Subsequently, use <tt>upgradeMaglev.sh</tt>. 
 It skips the checks run by <tt>installMaglev.sh</tt>. You must supply the
 version number as a parameter, <em>e.g.</em>
-  ./installMaglev.sh 22603
-  ./upgradeMaglev.sh 22603
+  ./installMaglev.sh 22619
+  ./upgradeMaglev.sh 22619
 
 The installer is somewhat verbose. That's so you can more easily debug
 installation problems.
@@ -105,6 +105,34 @@ Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
     #!/usr/bin/env maglev-ruby
   If it's not, either reinstall MagLev or correct the first line of
   bin/maglev-gem
+
+* If you get an error like this when running "maglev-gem install sinatra":
+    ERROR:  While executing gem ... (NoMethodError)
+        NoMethodError: undefined method `component_ary' for
+  MagLev may be having a problem parsing your .gemrc.
+  Try removing duplicates from your .gemrc, especially if some have trailing 
+  slashes and some don't. We're currently investigating this further.
+      - http://gemcutter.org
+      - http://gems.rubyforge.org/
+      - http://gems.github.com
+      - http://gemcutter.org/
+      - http://gems.rubyforge.org
+
+* If you get a "NoMethodError" such as the following:
+        Coercion error: nil.to_str => String failed:
+    (NoMethodError: undefined method `to_str' for )
+  It will help us debug it if you send a stack trace. 
+  Setting "-d" in the environment variable MAGLEV_OPTS should leave you
+  at a topaz prompt when you hit the error. Then execute the following
+  sequence of commands. Be aware you may see a lot of output, which will
+  also wind up in the file "stack.out"
+    output push stack.out
+    where
+    stack
+    output pop
+  Other useful MAGLEV_OPTS switches include "traceload", i.e.:
+    export MAGLEV_OPTS="-d -MtraceLoad"
+  for more info on MAGLEV_OPTS type "maglev-ruby -h"
 
 * MagLev has {ACID transactions}[http://en.wikipedia.org/wiki/ACID].
   To share persistent objects between two running
