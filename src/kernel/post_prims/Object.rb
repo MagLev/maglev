@@ -10,7 +10,7 @@ class Object
   end
 
   def tainted?
-    @tainted.equal?(true)
+    @tainted._equal?(true)
   end
 
   def untaint

@@ -19,17 +19,17 @@ class BigDecimal
 
   def self._mode(sym)
     # gets the specified mode
-    if sym.equal?( :ROUND_MODE )
+    if sym._equal?( :ROUND_MODE )
       return ROUNDING_mode
-    elsif sym.equal?( :EXCEPTION_NaN ) 
+    elsif sym._equal?( :EXCEPTION_NaN ) 
       return RAISE_on_NaN
-    elsif sym.equal?( :EXCEPTION_INFINITY )
+    elsif sym._equal?( :EXCEPTION_INFINITY )
       return RAISE_on_INF 
-    elsif sym.equal?( :EXCEPTION_UNDERFLOW )
+    elsif sym._equal?( :EXCEPTION_UNDERFLOW )
       return RAISE_on_UNDERF 
-    elsif sym.equal?( :EXCEPTION_OVERFLOW )
+    elsif sym._equal?( :EXCEPTION_OVERFLOW )
       return RAISE_on_OVERF
-    elsif sym.equal?( :EXCEPTION_ZERODIVIDE )
+    elsif sym._equal?( :EXCEPTION_ZERODIVIDE )
       return RAISE_on_ZERODIV
     else
       raise ArgumentError, 'unrecognized first arg to BigDecimal::mode, #{sym}'
@@ -39,25 +39,25 @@ class BigDecimal
   def self._set_mode(sym, v)
     # sets the specified mode modification will be transient or persistent
     # per the current state of  Maglev.persistent?
-    if sym.equal?( :ROUND_MODE )
+    if sym._equal?( :ROUND_MODE )
       v = Type.coerce_to(v, Fixnum, :to_int)
       if v < ROUND_DOWN or v > ROUND_UP
         raise ArgumentError, 'rounding mode must be one of -1,0,1'
       end
       self.const_set( :ROUNDING_mode , v)
     else
-      unless v.equal?(true) or v.equal?(false)
+      unless v._equal?(true) or v._equal?(false)
         raise ArgumentError, 'second arg to mode must be true or false'
       end
-      if sym.equal?( :EXCEPTION_NaN )
+      if sym._equal?( :EXCEPTION_NaN )
         self.const_set( :RAISE_on_NaN , v)
-      elsif sym.equal?( :EXCEPTION_INFINITY )
+      elsif sym._equal?( :EXCEPTION_INFINITY )
         self.const_set( :RAISE_on_INF , v)
-      elsif sym.equal?( :EXCEPTION_UNDERFLOW )
+      elsif sym._equal?( :EXCEPTION_UNDERFLOW )
         self.const_set( :RAISE_on_UNDERF , v)
-      elsif sym.equal?( :EXCEPTION_OVERFLOW )
+      elsif sym._equal?( :EXCEPTION_OVERFLOW )
         # value ignored, we always throw error
-      elsif sym.equal?( :EXCEPTION_ZERODIVIDE )
+      elsif sym._equal?( :EXCEPTION_ZERODIVIDE )
         self.const_set( :RAISE_on_ZERODIV , v)
       else
         raise ArgumentError, 'unrecognized first arg to BigDecimal::mode, #{sym}'
