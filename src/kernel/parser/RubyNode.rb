@@ -49,7 +49,7 @@ module MagRp
     def src_offset
       # result is zero based
       p = self.srcOffset
-      if p.equal?(nil)
+      if p._equal?(nil)
         raise_error('missing source offset')
         return nil
       end
@@ -234,7 +234,7 @@ module MagRp
           end
           def node_assign_set_rhs(rhs)
             args = @argsNode
-            if args.equal?(nil)
+            if args._equal?(nil)
               @argsNode = RubyRpCallArgs.s( rhs )
             else
               args.append( rhs )
@@ -251,7 +251,7 @@ module MagRp
          primitive_nobridge 'iter=', 'iterNode:'
          def node_assign_set_rhs(rhs)
            # append rhs to args list of this call
-           if rhs.equal?(nil)
+           if rhs._equal?(nil)
              raise_error("invalid nil arg")
            end
            @argsNode.append(rhs)
@@ -290,7 +290,7 @@ module MagRp
          def init(sym, a, b)
            @beginNode = a
            @endNode = b
-           @exclusive = sym.equal?(:dot3)
+           @exclusive = sym._equal?(:dot3)
            self
          end
          def as_cond(aMagRp)
@@ -345,9 +345,9 @@ module MagRp
          def self.s(list)
            lst_cls = list.class
            res = self._new
-           if lst_cls.equal?(RubyArrayNode)
+           if lst_cls._equal?(RubyArrayNode)
              res.listNode=(list)
-           elsif lst_cls.equal?(RubyRpCallArgs)
+           elsif lst_cls._equal?(RubyRpCallArgs)
              ary = RubyArrayNode._new
              ary.list=(list.list)
              res.listNode=(ary)
@@ -522,7 +522,7 @@ module MagRp
 
        class RubyRescueNode
          def self.s(body, rescuebody, elsebody)
-           unless rescuebody.class.equal?(RubyRescueBodyNode)
+           unless rescuebody.class._equal?(RubyRescueBodyNode)
              raise_error # bad arg
            end
            res = self._new
@@ -904,7 +904,7 @@ module MagRp
            raise_error("add_arg - arg not a Symbol")
          end
          args = @arguments
-         if args.equal?(nil)
+         if args._equal?(nil)
            args = RubyListNode._new
            @arguments = args
          end
@@ -913,11 +913,11 @@ module MagRp
        end
 
        def add_block_arg(arg)
-         if arg.equal?(nil)
+         if arg._equal?(nil)
            # do nothing  ,    opt_f_block_arg term is nil
          else
-           if @blockArgNode.equal?(nil)
-             if arg.class.equal?( RubyBlockArgNode )
+           if @blockArgNode._equal?(nil)
+             if arg.class._equal?( RubyBlockArgNode )
                @blockArgNode = arg
              else
                # expect an RpNameToken
@@ -934,7 +934,7 @@ module MagRp
          unless sym._isSymbol
            raise_error("add_star_arg - arg not a Symbol")
          end
-         if @restArgNode.equal?(nil)
+         if @restArgNode._equal?(nil)
            @restArgNode = RubyArgumentNode.s(sym)
          else
            raise_error('RubyArgsNode - star arg already installed')
@@ -944,11 +944,11 @@ module MagRp
 
        def add_optional_arg(node)
          # maybe node is an Array of :lasgn ??
-         unless node.class.equal?(RubyBlockNode)
+         unless node.class._equal?(RubyBlockNode)
            raise_error("add_optional_arg bad arg kind")
          end
          oblk = @optArgs
-         if oblk.equal?(nil)
+         if oblk._equal?(nil)
            @optArgs = node
          else
            raise_error('optional_arg already assigned')
@@ -958,15 +958,15 @@ module MagRp
 
        def inspect
          res = "[:args "
-         unless @arguments.equal?(nil)
+         unless @arguments._equal?(nil)
            res << @arguments.inspect_list
          end
-         unless @restArgNode.equal?(nil)
+         unless @restArgNode._equal?(nil)
            res << ', :"*'
            res << @restArgNode.identifier.to_s
          end
          res << "]"
-         unless @blockArgNode.equal?(nil)
+         unless @blockArgNode._equal?(nil)
            res << ', [:block_arg, '
            res << @blockArgNode.name.to_s
            res << '],'
@@ -1004,7 +1004,7 @@ module MagRp
            RubyClassVarNode.s(@name)
          end
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1027,7 +1027,7 @@ module MagRp
            self
          end
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1044,7 +1044,7 @@ module MagRp
 
        class RubyDAsgnNode
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1064,7 +1064,7 @@ module MagRp
          #  s_ForRp:value:  includes SpecialGlobalNodeClasses logic
          class_primitive_nobridge 's', 's_ForRp:value:'
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1087,7 +1087,7 @@ module MagRp
 
        class RubyGlobalNotAssignable
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1101,7 +1101,7 @@ module MagRp
 
        class RubyGlobalLastExceptionAsgn
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1124,7 +1124,7 @@ module MagRp
            self
          end
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1151,7 +1151,7 @@ module MagRp
            self
          end
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1172,7 +1172,7 @@ module MagRp
 
        class RubyVcGlobalAsgNode
          def node_assign_set_rhs(rhs)
-           if @valueNode.equal?(nil)
+           if @valueNode._equal?(nil)
              @valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1242,7 +1242,7 @@ module MagRp
          @body
        end
        def evStrBodyIsStrNode
-         @body.class.equal?(RubyStrNode)
+         @body.class._equal?(RubyStrNode)
        end
        def inspect
         "[:evstr, #{@body.inspect}]"
@@ -1276,7 +1276,7 @@ module MagRp
          self
        end
        def call=(aCallNode)
-         if @callNode.equal?(nil)
+         if @callNode._equal?(nil)
            @callNode = aCallNode
          else
            raise_error("call node already assigned")
@@ -1334,7 +1334,7 @@ module MagRp
            @list[idx]  # returns nil if list is empty
          end
          def append(v)
-           if v.equal?(nil)
+           if v._equal?(nil)
              raise_error('invalid nil arg')
            end
            self._append(v)
@@ -1380,14 +1380,14 @@ module MagRp
            #  .mcz contains reimplementation of hasRestArg
 
            def is_empty
-             @list.size.equal?(0) && @iterNode.equal?(nil)
+             @list.size._equal?(0) && @iterNode._equal?(nil)
            end
 
            def append_arg(v)
-             if v.equal?(nil)
+             if v._equal?(nil)
                raise_error('invalid nil arg')
              end
-             if v.class.equal?(RubyBlockPassNode)
+             if v.class._equal?(RubyBlockPassNode)
                raise_error('must use append_blk_arg ')
              end
              self._append(v)
@@ -1403,7 +1403,7 @@ module MagRp
            end
 
            def append_blk_arg(node)
-             if @iterNode.equal?(nil)
+             if @iterNode._equal?(nil)
                @iterNode = node
              else
                raise_error("block argument already present")
@@ -1412,9 +1412,9 @@ module MagRp
            end
            def as_yield_args
              lst = @list
-             if lst.size.equal?( 1) && @iterNode.equal?(nil)
+             if lst.size._equal?( 1) && @iterNode._equal?(nil)
                nod = lst[0]
-               if nod.class.equal?( RubySplatNode)
+               if nod.class._equal?( RubySplatNode)
                  return nod  # for   yield *one_arg
                end
              end
@@ -1449,7 +1449,7 @@ module MagRp
          def isEmptyBlockNode
            lst = @list
            if lst
-             lst.size.equal?(0)
+             lst.size._equal?(0)
            else
              true
            end
@@ -1573,9 +1573,9 @@ module MagRp
        # def init ; end #  is in  RubyNode_dynamic.rb
 
        def masgn_append_arg(val)
-         if @thirdNode.equal?( nil)
+         if @thirdNode._equal?( nil)
            f = @firstNode
-           if f.equal?(nil)
+           if f._equal?(nil)
              # path probably never taken
              raise_error(' masgn_append_arg lhs is nil')
              @thirdNode = RubyArrayNode.s( val )
@@ -1590,9 +1590,9 @@ module MagRp
          self
        end
        def append_mrhs(val)
-         if @thirdNode.equal?(nil)
+         if @thirdNode._equal?(nil)
            v_cls = val.class
-           if v_cls.equal?( RubyRpCallArgs) || v_cls.equal?( RubySplatNode)
+           if v_cls._equal?( RubyRpCallArgs) || v_cls._equal?( RubySplatNode)
              @thirdNode = val
            else
              raise_error('append_mrhs invalid arg')
@@ -1652,7 +1652,7 @@ module MagRp
            str = @source
            lnum = 1
            while ofs <= byte_ofs
-             if str[ofs].equal?( ?\n )
+             if str[ofs]._equal?( ?\n )
                lnum += 1
              end
              ofs += 1

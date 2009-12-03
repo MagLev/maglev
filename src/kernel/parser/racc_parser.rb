@@ -42,7 +42,7 @@ module MagRp
       key = :MAGLEV_RubyParser_Template
       system_cls = Maglev.__system
       t = system_cls.session_temp( key )
-      if t.equal?(nil)
+      if t._equal?(nil)
         t = MagTemplate.dup # make copy of persistent template
         t._bind_instvars
         t._install_wordlist( Keyword.create_transient_wordlist )
@@ -90,7 +90,7 @@ module MagRp # {
             vstack = @racc_vstack 
             vstack.size=( vstack.size - last_len )
           end
-          if ex.class.equal?(RaccJumpError)
+          if ex.class._equal?(RaccJumpError)
              # when 1 # yyerror
              @racc_user_yyerror = true   # user_yyerror
              evalact_exc_res =  Racc_reduce_n_negated
@@ -103,7 +103,7 @@ module MagRp # {
     end
 
     def _racc_parse_inner(call_count, evalact_exc_res) # [
-      if call_count.equal?(1)
+      if call_count._equal?(1)
 	tok = nil
 	act = nil
 	i = nil
@@ -143,7 +143,7 @@ module MagRp # {
 	      cracc_val = lex.yacc_value_
 	      @racc_val = cracc_val  # store new value
 
-	      if tok.equal?( :tEOF ) # EOF
+	      if tok._equal?( :tEOF ) # EOF
 		if @env.is_extended
 		  # attempt to issue premature eof error
 		  tok = :kEND  # and yacc_value will be :eof
@@ -154,7 +154,7 @@ module MagRp # {
 		cracc_t = cracc_t
 	      else
 		cracc_t = ctoken_table.at_otherwise(tok, nil)
-		if cracc_t.equal?(nil) #  unless cracc_t
+		if cracc_t._equal?(nil) #  unless cracc_t
 		  cracc_t = 1  # error token
 		end
 	      end
@@ -164,7 +164,7 @@ module MagRp # {
 	  i += cracc_t
 	  unless i >= 0 and
 		 act = caction_table[i] and
-		 caction_check[i].equal?( cracc_state[-1] ) # comparing 2 fixnums
+		 caction_check[i]._equal?( cracc_state[-1] ) # comparing 2 fixnums
 
 	    act = caction_default[cracc_state[-1]]
 	  end
@@ -184,7 +184,7 @@ module MagRp # {
  
   while true # [
     if act >= 0
-      # if act.equal?(0)   # check not needed
+      # if act._equal?(0)   # check not needed
       #   raise_error("_racc_evalact, unexpected act==0")
       # end
       if act._not_equal?(Racc_shift_n)
@@ -192,7 +192,7 @@ module MagRp # {
 	#
 
 	if cracc_error_status > 0
-	  unless cracc_t.equal?( 1 )  # error token
+	  unless cracc_t._equal?( 1 )  # error token
             cracc_error_status -= 1
 	    @racc_error_status = cracc_error_status
 	  end
@@ -219,7 +219,7 @@ module MagRp # {
 	# method_id = creduce_table[i+2]
 	sel = creduce_table[i+2]
 
-	if sel.equal?( :_reduce_noneOne )
+	if sel._equal?( :_reduce_noneOne )
 	  # optimization - no net change to vstack
 	  # state[-len, len]  = void_array
 	  state.size=( state.size - len )
@@ -262,7 +262,7 @@ module MagRp # {
 	  i += state[-1]
           #  _validate_goto_tables has ensured that
           #  for any non-nil @goto_check[i] , @goto_table[i] is also non-nil
-	  if i >= 0 and cgoto_check[i].equal?( k1 )
+	  if i >= 0 and cgoto_check[i]._equal?( k1 )
 
 	    cracc_state.push( cgoto_table[i] )
 	  else
@@ -274,18 +274,18 @@ module MagRp # {
 	  cracc_state.push( cgoto_default[k1] )
 	end
 # end inline _racc_do_reduce ]
-      elsif act.equal?( Racc_reduce_n_negated )
+      elsif act._equal?( Racc_reduce_n_negated )
         # error
         #
-	if cracc_t.equal?( 0)   # is EOF
+	if cracc_t._equal?( 0)   # is EOF
 	  throw( :racc_end_parse, nil )
 	end
-        if cracc_error_status.equal?(0)
+        if cracc_error_status._equal?(0)
           unless @racc_user_yyerror # unless arg[21]    # user_yyerror
             @save_last_len = nil
             on_error( cracc_t, cracc_val, vstack )
           end
-        elsif cracc_error_status.equal?(3)
+        elsif cracc_error_status._equal?(3)
           cracc_read_next = true
         end
         @racc_user_yyerror = false
@@ -295,7 +295,7 @@ module MagRp # {
             i += 1   # error token
             if  i >= 0 and
                 (act = caction_table[i]) and
-                caction_check[i].equal?( cracc_state[-1] )  # comparing 2 fixnums
+                caction_check[i]._equal?( cracc_state[-1] )  # comparing 2 fixnums
               break
             end
           end
@@ -357,7 +357,7 @@ module MagRp # {
  
   while true # [
     if act >= 0
-      # if act.equal?(0)   # check not needed
+      # if act._equal?(0)   # check not needed
       #   raise_error("_racc_evalact, unexpected act==0")
       # end
       if act._not_equal?(Racc_shift_n)
@@ -365,7 +365,7 @@ module MagRp # {
 	#
 
 	if cracc_error_status > 0
-	  unless cracc_t.equal?( 1 )  # error token
+	  unless cracc_t._equal?( 1 )  # error token
             cracc_error_status -= 1
 	    @racc_error_status = cracc_error_status
 	  end
@@ -392,7 +392,7 @@ module MagRp # {
 	# method_id = creduce_table[i+2]
 	sel = creduce_table[i+2]
 
-	if sel.equal?( :_reduce_noneOne )
+	if sel._equal?( :_reduce_noneOne )
 	  # optimization - no net change to vstack
 	  # state[-len, len]  = void_array
 	  state.size=( state.size - len )
@@ -435,7 +435,7 @@ module MagRp # {
 	  i += state[-1]
           #  _validate_goto_tables has ensured that
           #  for any non-nil @goto_check[i] , @goto_table[i] is also non-nil
-	  if i >= 0 and cgoto_check[i].equal?( k1 )
+	  if i >= 0 and cgoto_check[i]._equal?( k1 )
 
 	    cracc_state.push( cgoto_table[i] )
 	  else
@@ -447,18 +447,18 @@ module MagRp # {
 	  cracc_state.push( cgoto_default[k1] )
 	end
 # end inline _racc_do_reduce ]
-      elsif act.equal?( Racc_reduce_n_negated )
+      elsif act._equal?( Racc_reduce_n_negated )
         # error
         #
-	if cracc_t.equal?( 0)   # is EOF
+	if cracc_t._equal?( 0)   # is EOF
 	  throw( :racc_end_parse, nil )
 	end
-        if cracc_error_status.equal?(0)
+        if cracc_error_status._equal?(0)
           unless @racc_user_yyerror # unless arg[21]    # user_yyerror
             @save_last_len = nil
             on_error( cracc_t, cracc_val, vstack )
           end
-        elsif cracc_error_status.equal?(3)
+        elsif cracc_error_status._equal?(3)
           cracc_read_next = true
         end
         @racc_user_yyerror = false
@@ -468,7 +468,7 @@ module MagRp # {
             i += 1   # error token
             if  i >= 0 and
                 (act = caction_table[i]) and
-                caction_check[i].equal?( cracc_state[-1] )  # comparing 2 fixnums
+                caction_check[i]._equal?( cracc_state[-1] )  # comparing 2 fixnums
               break
             end
           end
@@ -500,7 +500,7 @@ module MagRp # {
       if t._not_equal?(nil)
         str << " #{token_to_str(t)} "
       end
-      if val.equal?(nil)
+      if val._equal?(nil)
         hint = " (check for incomplete statement)"
         str << hint
       elsif val == 'end'
@@ -618,7 +618,7 @@ module MagRp # {
     def token_to_str(t)
       #   used for error messages
       # self.class::Racc_token_to_s_table[t]
-      if t.equal?(nil)
+      if t._equal?(nil)
         "nil"
       else
         RubyParser::Racc_token_to_s_table[t]

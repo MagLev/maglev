@@ -3305,7 +3305,7 @@ def _reduce_54(val, vofs)
                       result = new_fcall( val[vofs ], val[vofs + 1])
                       v_two = val[vofs + 2]
                       if v_two then
-                        if v_two.class.equal?(RubyBlockPassNode) # v_two[0] == :block_pass 
+                        if v_two.class._equal?(RubyBlockPassNode) # v_two[0] == :block_pass 
                           raise "both block arg and actual block given"
                         end
                         # result, operation = val_[2], result
@@ -3345,7 +3345,7 @@ def _reduce_58(val, vofs)
                       result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3])
                       if val[vofs + 4] then
                         #if result[0] == :block_pass then # REFACTOR
-                        if result.rcvr.class.equal?(RubyBlockPassNode) 
+                        if result.rcvr.class._equal?(RubyBlockPassNode) 
                           raise "both block arg and actual block given"
                         end
                         raise_error("dont know how to append to selector") 
@@ -3893,7 +3893,7 @@ end
 def _reduce_176(val, vofs)
 		      # | primary_value tLBRACK_STR aref_args tRBRACK tOP_ASGN arg
                       v_two = val[vofs + 2]
-                      unless v_two.class.equal?(RubyRpCallArgs) ; 
+                      unless v_two.class._equal?(RubyRpCallArgs) ; 
                         raise_error('aref_args is not a RubyRpCallArgs')
                       end
                       result = RubyOpElementAsgnNode.s(val[vofs ], v_two, val[vofs + 4], val[vofs + 5])
@@ -4035,7 +4035,7 @@ end
 def _reduce_193(val, vofs)
 		      # | tUPLUS arg
                       v_one = val[vofs + 1]
-                      if v_one.kind_of?(RubyAbstractLiteralNode) # val_[1][0] == :lit 
+                      if v_one._kind_of?(RubyAbstractLiteralNode) # val_[1][0] == :lit 
                         result = v_one
                       else
                         sel_tok = RpNameToken.new( :"+@" , val[vofs ].src_offset )
@@ -4613,7 +4613,7 @@ end
 
 def _reduce_275(val, vofs)
 		      # primary: kBEGIN bodystmt kEND
-                      if val[vofs + 2].equal?( :tEOF )
+                      if val[vofs + 2]._equal?( :tEOF )
                         raise SyntaxError, 'unexpected $end, expecting kEND for kBEGIN'
                       end
                       v_two = val[vofs + 1]  # the  bodystmt
@@ -4758,7 +4758,7 @@ end
 
 def _reduce_292(val, vofs)
 		      # primary:  # | kIF expr_value then compstmt if_tail kEND
-                      if val[vofs + 5].equal?( :tEOF )
+                      if val[vofs + 5]._equal?( :tEOF )
                         premature_eof( val[vofs ] )
                       end
                       result = new_if( val[vofs + 1], val[vofs + 3], val[vofs + 4] )
@@ -4769,7 +4769,7 @@ end
 
 def _reduce_293(val, vofs)
 		      # primary:  # | kUNLESS expr_value then compstmt opt_else kEND
-                      if val[vofs + 5].equal?( :tEOF )
+                      if val[vofs + 5]._equal?( :tEOF )
                         premature_eof( val[vofs ] )
                       end
                       result = new_if( val[vofs + 1], val[vofs + 4], val[vofs + 3])
@@ -4796,7 +4796,7 @@ end
 
 def _reduce_296(val, vofs)
 		      # kWHILE  # compstmt kEND
-                      if val[vofs + 6].equal?(:tEOF)
+                      if val[vofs + 6]._equal?(:tEOF)
                         premature_eof( val[vofs ] )
                       end
                       result = new_while( val[vofs + 5], val[vofs + 2])
@@ -4823,7 +4823,7 @@ end
 
 def _reduce_299(val, vofs)
 		      # kUNTIL compstmt kEND
-                      if val[vofs + 6].equal?(:tEOF)
+                      if val[vofs + 6]._equal?(:tEOF)
                         premature_eof( val[vofs ] )
                       end
                       result = new_until( val[vofs + 5], val[vofs + 2] )
@@ -4834,7 +4834,7 @@ end
 
 def _reduce_300(val, vofs)
 		      #  | kCASE expr_value opt_terms case_body kEND
-                      if val[vofs + 4].equal?( :tEOF )
+                      if val[vofs + 4]._equal?( :tEOF )
                         premature_eof( val[vofs ] )
                       end
                       result = new_case( val[vofs + 1], val[vofs + 3])
@@ -4845,7 +4845,7 @@ end
 
 def _reduce_301(val, vofs)
 		      # | kCASE    opt_terms case_body kEND
-                      if val[vofs + 3].equal?( :tEOF )
+                      if val[vofs + 3]._equal?( :tEOF )
                         premature_eof( val[vofs ] )
                       end
                       result = new_case( nil, val[vofs + 2] )
@@ -4856,7 +4856,7 @@ end
 
 def _reduce_302(val, vofs)
 		      # | kCASE opt_terms kELSE compstmt kEND
-                      if val[vofs + 4].equal?( :tEOF )
+                      if val[vofs + 4]._equal?( :tEOF )
                         premature_eof( val[vofs ] )
                       end
                       result = new_case( nil, val[vofs + 3] )
@@ -4883,7 +4883,7 @@ end
 
 def _reduce_305(val, vofs)
 		      #  kFOR # compstmt kEND
-                      if val[vofs + 8].equal?( :tEOF )
+                      if val[vofs + 8]._equal?( :tEOF )
                         premature_eof( val[vofs ] )
                       end
                       result = new_for( val[vofs + 4], val[vofs + 1], val[vofs + 7])
@@ -5129,7 +5129,7 @@ end
 
 def _reduce_342(val, vofs)
 		      # do_block: kDO_BLOCK # compstmt kEND
-                      if val[vofs + 5].equal?( :tEOF )
+                      if val[vofs + 5]._equal?( :tEOF )
                         premature_eof( val[vofs] )  # of kDO
                       end
                       vars   = val[vofs + 2]
@@ -5143,9 +5143,9 @@ end
 def _reduce_343(val, vofs)
 		      # block_call: command do_block
                       v_zero = val[vofs ]
-                      if v_zero.equal?(nil)
+                      if v_zero._equal?(nil)
                         # ok
-                      elsif v_zero.class.equal?(RubyBlockPassNode) 
+                      elsif v_zero.class._equal?(RubyBlockPassNode) 
                         raise SyntaxError, "Both block arg and actual block given." 
                       end
                       iter = val[vofs + 1]
@@ -5255,7 +5255,7 @@ end
 
 def _reduce_357(val, vofs)
 		      # brace_block: tLCURLY # compstmt kEND
-                      if val[vofs + 5].equal?( :tEOF )
+                      if val[vofs + 5]._equal?( :tEOF )
                         premature_eof( val[vofs] )
                       end
                       args = val[vofs + 2]
@@ -5309,7 +5309,7 @@ def _reduce_364(val, vofs)
                       if var 
                         rhs = RubyGlobalVarNode.s( :"$!" )  # s(:gvar )
                         asgn = node_assign(var, rhs )
-                        if body.equal?(nil)
+                        if body._equal?(nil)
                           body = RubyBlockNode.s( [ asgn ] )
                         else
                           body = body.prepend_to_block( asgn )
@@ -5351,7 +5351,7 @@ end
 def _reduce_371(val, vofs)
 		      # opt_ensure: kENSURE compstmt
                       v_one = val[vofs + 1]
-                      if v_one.equal?(nil)
+                      if v_one._equal?(nil)
                         v_one = RubyNilNode._new # s(:nil)
                       end
                       result = RubyEnsureNode.s( v_one )
@@ -5385,7 +5385,7 @@ def _reduce_376(val, vofs)
                       # val_[0] = s(:dstr, val[0].value) if val[0][0] == :evstr 
                       # result = val_[0]
                       v_zero = val[vofs ] 
-                      if v_zero.class.equal?(RubyEvStrNode)
+                      if v_zero.class._equal?(RubyEvStrNode)
                         result = RubyDStrNode.s( [ v_zero.evStrBody ] )
                       else
                         result = v_zero
@@ -5458,7 +5458,7 @@ def _reduce_386(val, vofs)
                       # word = val_[1][0] == :evstr ? s(:dstr, "", val[1]) : val[1] #
                       # result = val_[0] << word
                       v_one = val[vofs + 1]
-                      if v_one.class.equal?(RubyEvStrNode)
+                      if v_one.class._equal?(RubyEvStrNode)
                         word = RubyDStrNode.s([ RubyStrNode.s('') , v_one ])
                       else
                         word = v_one
@@ -5582,11 +5582,11 @@ def _reduce_401(val, vofs)
                       lx.cmdarg_.lexpop
 
                       v_two = val[vofs + 2] 
-                      if v_two.equal?(nil) 
+                      if v_two._equal?(nil) 
                         result = RubyEvStrNode.s(nil) #  s(:evstr ) 
                       else 
                         knd = v_two.str_dstr_evstr_kind  # MNU here if "unknown rescue body"
-                        if knd.equal?(nil) 
+                        if knd._equal?(nil) 
                            result = RubyEvStrNode.s(v_two)
                         else
                            result = v_two  # v_two is one of  :str :dstr: evstr
@@ -5651,15 +5651,15 @@ def _reduce_412(val, vofs)
                       v_one = val[vofs + 1]
 
 		      v_cls = v_one.class
-		      if v_cls.equal?(RubyDStrNode)  # convert :dstr to :dsym
+		      if v_cls._equal?(RubyDStrNode)  # convert :dstr to :dsym
 		        result =v_one.asDSymbolNode 
-                      elsif v_cls.equal?(RubyStrNode) # convert :str to :sym
+                      elsif v_cls._equal?(RubyStrNode) # convert :str to :sym
                         str = v_one.strNodeValue
 			result = RubySymbolNode.s( self.string_to_symbol(str) )
-                      elsif v_one.equal?( nil) 
+                      elsif v_one._equal?( nil) 
                         yyerror "empty symbol literal" 
                         result = nil
-                      elsif v_cls.equal?(RubyEvStrNode)
+                      elsif v_cls._equal?(RubyEvStrNode)
                         result = RubyDSymbolNode.s([ RubyStrNode.s('') , v_one ])
                         # result = s(:dsym, "", result)
                       else
@@ -6043,7 +6043,7 @@ end
 def _reduce_467(val, vofs)
 		      # singleton: # expr opt_nl tRPAREN
                       result = val[vofs + 2]
-		      if result.kind_of?(RubyAbstractLiteralNode)
+		      if result._kind_of?(RubyAbstractLiteralNode)
                         yyerror "Can't define singleton method for literals." 
 		      end
                     
@@ -6070,7 +6070,7 @@ def _reduce_470(val, vofs)
                       # if (size % 2 != 1) then # != 1 because of leading :array
                       v_zero = val[vofs ]
                       size = v_zero.arrayLength
-                      unless (size & 1).equal?(0)
+                      unless (size & 1)._equal?(0)
                         yyerror "Odd number (#{size}) list for Hash. #{v_zero.inspect}"
                       end
                       result = v_zero

@@ -49,7 +49,7 @@ class RpStringScanner
     str = @cbytearray
     while p < lim
       ch = str[p]
-      if ch.equal?( ?\n ) 
+      if ch._equal?( ?\n ) 
         @pos = p
         return true
       end
@@ -94,7 +94,7 @@ class RpStringScanner
     str = @cbytearray
     count = 0
     while n <= end_ofs
-      if str[n].equal?( ?\n )
+      if str[n]._equal?( ?\n )
         count += 1
       end
       n += 1
@@ -110,8 +110,8 @@ class RpStringScanner
     # else return 2 ; end
     str = @cbytearray
     idx = @pos + 1
-    if str[idx].equal?( ?. )
-      if str[idx+1].equal?( ?. )
+    if str[idx]._equal?( ?. )
+      if str[idx+1]._equal?( ?. )
         return 0  # found '...'
       else
         return 1  # found '..'
@@ -126,15 +126,15 @@ class RpStringScanner
     str = @cbytearray
     idx = @pos + 1
     ch_two = str[idx]
-    if ch_two.equal?( ?= )
-      if str[idx+1].equal?( ?= )
+    if ch_two._equal?( ?= )
+      if str[idx+1]._equal?( ?= )
         return 0 # found '==='
       else
         return 1 # found '=='
       end
-    elsif ch_two.equal?( ?~ )
+    elsif ch_two._equal?( ?~ )
       return 2   # found '=~'
-    elsif ch_two.equal?( ?> )
+    elsif ch_two._equal?( ?> )
       return 3   # found '=>'
     end  
     4
@@ -146,13 +146,13 @@ class RpStringScanner
     str = @cbytearray
     idx = @pos + 1
     ch_two = str[idx]
-    if ch_two.equal?( ?| )
-      if str[idx + 1].equal?( ?= )
+    if ch_two._equal?( ?| )
+      if str[idx + 1]._equal?( ?= )
         return 0  # found  '||='
       else
         return 1  # found '||'
       end
-    elsif ch_two.equal?( ?= )
+    elsif ch_two._equal?( ?= )
       return 2   # found '|='
     end
     3
@@ -164,13 +164,13 @@ class RpStringScanner
     str = @cbytearray
     idx = @pos + 1
     ch_two = str[idx]
-    if ch_two.equal?( ?* )
-      if str[idx + 1].equal?( ?= )
+    if ch_two._equal?( ?* )
+      if str[idx + 1]._equal?( ?= )
         return 0  # found  '**='
       else
         return 1  # found '**'
       end
-    elsif ch_two.equal?( ?= )
+    elsif ch_two._equal?( ?= )
       return 2   # found '*='
     end
     3
@@ -183,14 +183,14 @@ class RpStringScanner
     idx = @pos + 1
     ch_two = str[idx]
     ch_three = str[idx + 1]
-    if ch_two.equal?( ?= )
-      if ch_three.equal?( ?> )
+    if ch_two._equal?( ?= )
+      if ch_three._equal?( ?> )
         return 0
       else
         return 1
       end
-    elsif ch_two.equal?( ?< )
-      if ch_three.equal?( ?= )
+    elsif ch_two._equal?( ?< )
+      if ch_three._equal?( ?= )
         return 2
       else
         return 3
@@ -205,10 +205,10 @@ class RpStringScanner
     str = @cbytearray
     idx = @pos + 1
     ch_two = str[idx]
-    if ch_two.equal? ( ?= )
+    if ch_two._equal? ( ?= )
       return 0
-    elsif ch_two.equal?( ?> )
-      if str[idx + 1].equal?( ?= )
+    elsif ch_two._equal?( ?> )
+      if str[idx + 1]._equal?( ?= )
         return 1
       else
         return 2
@@ -223,13 +223,13 @@ class RpStringScanner
     str = @cbytearray
     idx = @pos + 1
     ch_two = str[idx]
-    if ch_two.equal? ( ?& )
-      if str[idx + 1].equal?( ?= )
+    if ch_two._equal? ( ?& )
+      if str[idx + 1]._equal?( ?= )
         return 0
       else
         return 1
       end
-    elsif ch_two.equal?( ?= )
+    elsif ch_two._equal?( ?= )
       return 2
     end
     3
@@ -241,11 +241,11 @@ class RpStringScanner
 
   def peek_is_white
     ch = @cbytearray[@pos]
-    CTYPES_ARR[ ch ].equal?(CTYPE_WHITE)
+    CTYPES_ARR[ ch ]._equal?(CTYPE_WHITE)
   end
 
   def ch_is_digit(ch)
-    CTYPES_ARR[ ch ].equal?(CTYPE_DIGIT)
+    CTYPES_ARR[ ch ]._equal?(CTYPE_DIGIT)
   end
 
   def ch_is_digit_alpha_uscore(ch)
@@ -253,27 +253,27 @@ class RpStringScanner
   end
 
   def ch_is_white(ch)
-    CTYPES_ARR[ ch ].equal?(CTYPE_WHITE)
+    CTYPES_ARR[ ch ]._equal?(CTYPE_WHITE)
   end
 
   def ch_is_vt_white__or_eol(ch)
-    if ch.equal?( ?\n )
+    if ch._equal?( ?\n )
       return true
     end
     CTYPES_ARR[ ch ] <= CTYPE_VT_WHITE
   end
 
   def ch_is_uc_alpha(ch)
-    CTYPES_ARR[ ch ].equal?(CTYPE_UC_ALPHA)
+    CTYPES_ARR[ ch ]._equal?(CTYPE_UC_ALPHA)
   end
 
   def ch_is_alpha(ch)
     v = CTYPES_ARR[ ch ]
-    v.equal?( CTYPE_UC_ALPHA ) || v.equal?( CTYPE_LC_ALPHA )
+    v._equal?( CTYPE_UC_ALPHA ) || v._equal?( CTYPE_LC_ALPHA )
   end
 
   def self.ch_is_uc_alpha(ch)
-    CTYPES_ARR[ ch ].equal?(CTYPE_UC_ALPHA)
+    CTYPES_ARR[ ch ]._equal?(CTYPE_UC_ALPHA)
   end
 
   def backup(count)
@@ -293,7 +293,7 @@ class RpStringScanner
       str = @cbytearray
       lnum = 1
       while ofs <= byte_ofs
-	if str[ofs].equal?( ?\n )
+	if str[ofs]._equal?( ?\n )
 	  lnum += 1 
 	end
 	ofs += 1
@@ -313,7 +313,7 @@ class RpStringScanner
       lnum = 1
       prev_eol_ofs = 0
       while ofs <= byte_ofs
-	if str[ofs].equal?( ?\n )
+	if str[ofs]._equal?( ?\n )
           prev_eol_ofs = ofs
 	  lnum += 1 
 	end
@@ -321,7 +321,7 @@ class RpStringScanner
       end
       lim = @limit
       while ofs < lim
-        if (str[ofs].equal?( ?\n ))
+        if (str[ofs]._equal?( ?\n ))
           lstr = @string[prev_eol_ofs + 1, ofs - prev_eol_ofs]
           return "line #{lnum}: #{lstr}" 
         end
