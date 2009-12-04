@@ -37,7 +37,7 @@ class PureRubyStringIO < IO
 
   def <<(obj)
     # gemstone, let @sio_closed_write be checked in syswrite
-    if @mode[0].equal?( ?a ) 
+    if @mode[0]._equal?( ?a ) 
       # in append mode, ignore position and append to the buffer
       if @sio_closed_write ; requireWritable ; end
       str = Type.coerce_to(obj, String, :to_s)
@@ -90,7 +90,7 @@ class PureRubyStringIO < IO
   def each(sep_string=$/, &block)
     if @sio_closed_read ; requireReadable ; end
     s_string = @sio_string
-    if sep_string.equal?(nil)
+    if sep_string._equal?(nil)
       # start from current position
       pos = @sio_pos
       len = s_string.length - pos
@@ -152,7 +152,7 @@ class PureRubyStringIO < IO
     if @sio_closed_read ; requireReadable ; end
     pos = @sio_pos
     char = @sio_string[pos]
-    unless char.equal?(nil)
+    unless char._equal?(nil)
       @sio_pos = pos +  1
     end
     char
@@ -186,15 +186,15 @@ class PureRubyStringIO < IO
     @lineNumber = 0
     append = false
     if mode._isInteger
-      if mode.equal?( IO::RDONLY )
+      if mode._equal?( IO::RDONLY )
         basemode = "r"
       else
         mask = IO::APPEND|IO::TRUNC
-        append = (mode & mask).equal?( IO::APPEND )
+        append = (mode & mask)._equal?( IO::APPEND )
         mode = mode & (~ mask ) 
-        if mode.equal?( IO::RDWR )
+        if mode._equal?( IO::RDWR )
           basemode = "w+" 
-        elsif mode.equal?( IO::WRONLY )
+        elsif mode._equal?( IO::WRONLY )
           basemode = "w"
         else
           raise ArgumentError, "PureRubyStringIO#initialize: illegal integer mode #{mode}"
@@ -204,7 +204,7 @@ class PureRubyStringIO < IO
         append = true
       end
       @mode = basemode
-    elsif mode.equal?(Undefined)
+    elsif mode._equal?(Undefined)
       basemode = isfrozen ? "r" : "r+"
       @mode = basemode
     else
@@ -318,16 +318,16 @@ class PureRubyStringIO < IO
 
   def read(length=nil, buffer=nil)
     if @sio_closed_read ; requireReadable ; end
-    buf = buffer.equal?(nil) ? "" : Type.coerce_to(buffer, String, :to_str)
+    buf = buffer._equal?(nil) ? "" : Type.coerce_to(buffer, String, :to_str)
 
     s_pos = @sio_pos
     s_string = @sio_string
     bytes_left = (s_string.length - s_pos)
-    if length.equal?(nil)
+    if length._equal?(nil)
       len = bytes_left
     else
       len = Type.coerce_to(length, Fixnum, :to_int)
-      return "" if len.equal?(0)  # only in case length = 0 is passed in
+      return "" if len._equal?(0)  # only in case length = 0 is passed in
     end
     if bytes_left < len
       len = bytes_left
@@ -339,7 +339,7 @@ class PureRubyStringIO < IO
     s_pos += len
     @sio_pos = s_pos
     buf.replace(s_string[pstart..(s_pos - 1)])
-    r = buf.length.equal?(0) && length._not_equal?(nil) ? nil : buf
+    r = buf.length._equal?(0) && length._not_equal?(nil) ? nil : buf
     r
   end
 
@@ -369,16 +369,16 @@ class PureRubyStringIO < IO
 
   def readlines(sep_string=Undefined)
     if @sio_closed_read ; requireReadable ; end
-    if sep_string.equal?(Undefined)
+    if sep_string._equal?(Undefined)
       sep_string = $/
       return [] if eof?
-    elsif sep_string.equal?(nil)
+    elsif sep_string._equal?(nil)
       return [read]
     else
       sep_string = Type.coerce_to(sep_string, String, :to_str)
     end
     raise EOFError, "End of file reached", caller if eof?
-    sep_string = "\n\n" if sep_string.length.equal?(0)
+    sep_string = "\n\n" if sep_string.length._equal?(0)
     rc = []
     while ! eof
       rc << gets(sep_string)
@@ -449,7 +449,7 @@ class PureRubyStringIO < IO
     my_len = s_string.length
     s_pos = @sio_pos
     arg_len = str.length
-    if s_pos.equal?(my_len)
+    if s_pos._equal?(my_len)
       s_string << str
     elsif s_pos > my_len
       s_string.size=(s_pos) # Pad with nulls
@@ -519,7 +519,7 @@ class PureRubyStringIO < IO
   private
 
   def _gets(a_sep_string, vc_frame_arg)
-    sep_is_nil = a_sep_string.equal?(nil)
+    sep_is_nil = a_sep_string._equal?(nil)
     unless sep_is_nil
       sep_string = Type.coerce_to(a_sep_string, String, :to_str)
     end

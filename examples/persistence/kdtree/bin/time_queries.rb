@@ -1,7 +1,6 @@
 # Commit the KD Tree Code, then create and commit a tree of random
 # locations.
 require 'benchmark'
-require 'utils'
 
 if defined? Maglev
   raise "No Committed Data; run: 'rake commit' first." if Maglev::PERSISTENT_ROOT[:RANDOM_KDTREE].nil?
@@ -19,7 +18,7 @@ def time_queries(a_tree)
   end
 
   tms = Benchmark.measure do
-    num_queries.times { a_tree.nearest_k(Utils.random_point, k) }
+    num_queries.times { a_tree.nearest_k(Collections::Point2D.random(:random), k) }
   end
 
   times = [tms.utime, tms.stime, tms.total, tms.real]

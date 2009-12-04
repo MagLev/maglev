@@ -4,10 +4,10 @@
 class Numeric
 
   def coerce(param)
-    if param._isNumeric && param.class.equal?(self.class)
+    if param._isNumeric && param.class._equal?(self.class)
       return [ param, self ]
     end
-    unless param.equal?(nil) || param._isSymbol
+    unless param._equal?(nil) || param._isSymbol
       begin 
         if param._isString
           p = Float(param)

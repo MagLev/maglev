@@ -5,7 +5,7 @@ class Struct
   # definition of [] (in common/struct.rb) and allow calls with only one
   # parameter to pass, and all others fail.
   def [](*vars)
-    if vars.length.equal?(1)
+    if vars.length._equal?(1)
       self[vars[0]]  # defined in common/struct.rb
     else
       raise ArgumentError, "wrong number of arguments (#{vars.length} for 1)"

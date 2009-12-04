@@ -28,9 +28,9 @@ class Env
 
     def [](key)
       v = super(key)
-      if v.equal?(nil)
+      if v._equal?(nil)
         v = Env.__getenv(key)
-        unless v.equal?(nil)
+        unless v._equal?(nil)
           self.__at_put(key, v)
         end
       end
@@ -39,14 +39,14 @@ class Env
 
     def []=(key, val)
       if key._isString
-        if key.index('GEMSTONE').equal?(0)
+        if key.index('GEMSTONE')._equal?(0)
           raise 'you may not change GEMSTONE* environment variables from within maglev'
         end
-        if key.index('MAGLEV').equal?(0) and key != 'MAGLEV_OPTS'
+        if key.index('MAGLEV')._equal?(0) and key != 'MAGLEV_OPTS'
           raise 'you may not change MAGLEV* environment variables from within maglev'
         end
       end
-      if val.equal?(nil)
+      if val._equal?(nil)
         val = ""
       end
       Env.__putenv(key, val)

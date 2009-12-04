@@ -52,10 +52,10 @@ module FFI
     end
 
     def ==(other)
-      unless other.kind_of?(Enum)
+      unless other._kind_of?(Enum)
         return false
       end
-      @name.equal?(other.name) && __kv_pairs == other.__kv_pairs
+      @name._equal?(other.name) && __kv_pairs == other.__kv_pairs
     end
 
     def hash
@@ -126,7 +126,7 @@ module FFI
 
       def self.__find_named_enum(sym) 
         v = self.__Transient_NamedEnums[sym]
-        if v.equal?(nil)
+        if v._equal?(nil)
           v = Persistent_NamedEnums[sym]
         end
         v
@@ -134,7 +134,7 @@ module FFI
 
       def self.__enum_symbol_to_value(sym)
         v = self.__Transient_kv_map[sym]
-        if v.equal?(nil)
+        if v._equal?(nil)
           v = Persistent_kv_map[sym]
         end
         v
@@ -209,7 +209,7 @@ module FFI
           # check all names in the enum to detect duplicate names wrt previous Enums
           sym = pairs[n]
           val = pairs[n+1]
-          if val.equal?(nil)
+          if val._equal?(nil)
             raise ArgumentError, "in an Enum, value for #{sym} is nil "
           end
           prev = self.__enum_symbol_to_value(sym) # search kv_maps
@@ -237,7 +237,7 @@ module FFI
           end
           # look for an unnamed Enum containing query as the name of a value 
           return enums_cls.__enum_for_symbol(query) 
-        elsif query.kind_of?(Enum)
+        elsif query._kind_of?(Enum)
           nam = query.name
           if nam._not_equal?(nil)
             return self.__find_named_enum(nam)

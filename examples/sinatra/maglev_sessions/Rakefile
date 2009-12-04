@@ -1,0 +1,6 @@
+task :default => :run
+
+desc "Run the demo app."
+task :run do
+  sh 'maglev-ruby msessions.rb'
+end

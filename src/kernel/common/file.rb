@@ -21,8 +21,8 @@ class File
 
   def self.range(pattern, pstart, pend, test, flags)
     ok = false
-    escape = (flags & FNM_NOESCAPE).equal?(0)
-    case_sensitive = (flags & FNM_CASEFOLD).equal?(0)
+    escape = (flags & FNM_NOESCAPE)._equal?(0)
+    case_sensitive = (flags & FNM_CASEFOLD)._equal?(0)
     neg = pattern[pstart] == ?! || pattern[pstart] == ?^
 
     pstart += 1 if neg
@@ -55,10 +55,10 @@ class File
   def self.name_match(pattern, str, flags, patstart, patend, strstart, strend)
     index = strstart
     pstart = patstart
-    escape   = (flags & FNM_NOESCAPE).equal?(0)
-    pathname = !( (flags & FNM_PATHNAME).equal?(0))
-    period   = (flags & FNM_DOTMATCH).equal?(0)
-    nocase   = !( (flags & FNM_CASEFOLD).equal?(0))
+    escape   = (flags & FNM_NOESCAPE)._equal?(0)
+    pathname = !( (flags & FNM_PATHNAME)._equal?(0))
+    period   = (flags & FNM_DOTMATCH)._equal?(0)
+    nocase   = !( (flags & FNM_CASEFOLD)._equal?(0))
 
     while pstart < patend do
       char = pattern[pstart]

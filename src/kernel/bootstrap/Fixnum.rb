@@ -92,11 +92,11 @@ class Fixnum
   primitive 'to_sym', '_rubyToSym'
 
   def zero?  
-    self.equal?(0)
+    self._equal?(0)
   end
 
   def nonzero?
-    if self.equal?(0)
+    if self._equal?(0)
       nil
     else
       self

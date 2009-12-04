@@ -61,6 +61,8 @@ module MagRp # {
 
       _validate_goto_tables
 
+      # fault-in all of the following and convert some to TransientShortArray,
+      #  for faster access
       @racc_debug_out = @racc_debug_out
       @action_table = TransientShortArray._with_shorts(@action_table).freeze # size about 23880
       @action_check = TransientShortArray._with_shorts(@action_check).freeze #  same size as action_table
@@ -78,7 +80,7 @@ module MagRp # {
       @save_last_len = nil
       @counts_array = nil
       _init_counts_array
-      self.__set_nostubbing
+      self.__set_nostubbing  # prevent stubbing of refs to the faulted-in objects
       self
     end
 
@@ -97,7 +99,7 @@ module MagRp # {
       n = 0
       while n < lim
         chk = goto_check[n]
-        unless (goto_table[n].equal?(nil)).equal?( chk.equal?(nil) )
+        unless (goto_table[n]._equal?(nil))._equal?( chk._equal?(nil) )
           raise 'mismatch on nils in goto tables' 
         end
         n += 1

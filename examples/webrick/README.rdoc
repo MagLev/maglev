@@ -1,0 +1,5 @@
+= MagLev WEBrick example
+
+Shows how to run WEBrick under MagLev:
+
+  $ rake

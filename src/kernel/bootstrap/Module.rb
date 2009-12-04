@@ -64,7 +64,7 @@ class Module
 
   def define_method(sym, meth)
     m = meth
-    if m.is_a?(Proc)
+    if m._is_a?(Proc)
       m = meth.__block
     end
     if m._isBlock
@@ -213,9 +213,9 @@ class Module
   primitive_nobridge '__includes_module', '_rubySubclassOf:'
 
   def <(other)
-    if self.equal?(other)
+    if self._equal?(other)
       false
-    elsif other.is_a?(Module)
+    elsif other._is_a?(Module)
       if self.__includes_module(other)
         true
       elsif other.__includes_module(self)
@@ -230,9 +230,9 @@ class Module
   end
 
   def <=(other)
-    if self.equal?(other)
+    if self._equal?(other)
       true
-    elsif other.is_a?(Module)
+    elsif other._is_a?(Module)
       if self.__includes_module(other)
         true
       elsif other.__includes_module(self)
@@ -247,9 +247,9 @@ class Module
   end
 
   def >(other)
-    if self.equal?(other)
+    if self._equal?(other)
       false
-    elsif other.is_a?(Module)
+    elsif other._is_a?(Module)
       if self.__includes_module(other)
         false
       elsif other.__includes_module(self)
@@ -264,9 +264,9 @@ class Module
   end
 
   def >=(other)
-    if other.equal?(self)
+    if other._equal?(self)
       true
-    elsif other.is_a?(Module)
+    elsif other._is_a?(Module)
       if self.__includes_module(other)
         false
       elsif other.__includes_module(self)
@@ -281,11 +281,11 @@ class Module
   end
 
   def <=>(other)
-    if self.equal?(other)
+    if self._equal?(other)
       0
     elsif self.__includes_module(other)
       -1
-    elsif other.is_a?(Module) && other.__includes_module(self)
+    elsif other._is_a?(Module) && other.__includes_module(self)
       1
     else
       nil
@@ -294,7 +294,7 @@ class Module
 
   def ===(obj)
     # return true if obj is an instance of self or of one of self's descendants
-    obj.kind_of?( self)
+    obj._kind_of?( self)
   end
 
   # class variables support
@@ -369,8 +369,8 @@ class Module
       sym = str.to_sym
     end
     res = self.__const_defined(sym)
-    if res.equal?(false)
-      if str.equal?(nil)
+    if res._equal?(false)
+      if str._equal?(nil)
         str = name.to_s   # arg is a Symbol
       end
       if str =~ /^[A-Z](\w)*\z/
@@ -404,7 +404,7 @@ class Module
     unless str =~ /^[A-Z](\w)*\z/
       raise NameError, 'arg to const_set? is not a valid name for a constant'
     end
-    if sym.equal?(nil)
+    if sym._equal?(nil)
       sym = str.to_sym
     end
     self.__const_set(sym, value)

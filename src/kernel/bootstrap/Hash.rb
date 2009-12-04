@@ -18,7 +18,7 @@ class Hash
     # this variant gets bridge methods
     len = args.length
     if len <= 1
-      if len.equal?(0)
+      if len._equal?(0)
         h = self.new
       else
         h = self.new(args[0])
@@ -75,8 +75,8 @@ class Hash
 
   def self.__from_elements(elements)
     numelem = elements.length
-    if !((numelem & 1).equal?(0))
-      if (numelem.equal?(1))
+    if !((numelem & 1)._equal?(0))
+      if (numelem._equal?(1))
         first = elements[0]
         if (first._isHash)
           return self[first]
@@ -107,7 +107,7 @@ class Hash
     if arg._isArray
       self.__from_elements(arg)
     elsif arg._isHash
-      if self.equal?(arg.class)
+      if self._equal?(arg.class)
         arg.dup
       else
         res = self.__new(arg.size)
@@ -147,11 +147,11 @@ class Hash
   end
 
   def ==(other)
-    if other.equal?(self)
+    if other._equal?(self)
        return true
     end
     return false unless other._isHash 
-    return false unless other.length.equal?(self.length) 
+    return false unless other.length._equal?(self.length) 
     # Maglev is compatible with MRI 1.8.6 
     #  by not comparing   @defaultValue == other.default  #(1.8.7 does check)
     ts = Thread.__recursion_guard_set
@@ -162,12 +162,12 @@ class Hash
           return false
         end
 	ov = other[k]
-	if v.equal?(ov)
+	if v._equal?(ov)
 	  # ok
 	elsif ts.include?(v) || ts.include?(ov)
-          if v.equal?(self) && ov.equal?(other)
+          if v._equal?(self) && ov._equal?(other)
             # ok
-          elsif v.equal?(other) && ov.equal?(self)
+          elsif v._equal?(other) && ov._equal?(self)
             # ok
           else
             raise ArgumentError, 'recursion too complex for Hash#=='
@@ -188,11 +188,11 @@ class Hash
 
   def eql?(other)
     # per specs,  does not coerce the argument
-    if other.equal?(self)
+    if other._equal?(self)
       return true
     end
     return false unless other._isHash
-    return false unless other.length.equal?(self.length)
+    return false unless other.length._equal?(self.length)
     dflt = self.default
     return false unless dflt.eql?( other.default )
     ts = Thread.__recursion_guard_set
@@ -200,13 +200,13 @@ class Hash
     begin
       self.each { | k, v |
 	ov = other[k]
-        return false if ov.equal?(dflt) 
-	if v.equal?(ov)
+        return false if ov._equal?(dflt) 
+	if v._equal?(ov)
 	  # ok
 	elsif ts.include?(v) || ts.include?(ov)
-          if v.equal?(self) && ov.equal?(other)
+          if v._equal?(self) && ov._equal?(other)
             # ok
-          elsif v.equal?(other) && ov.equal?(self)
+          elsif v._equal?(other) && ov._equal?(self)
             # ok
           else
             raise ArgumentError, 'recursion too complex for Hash#=='
@@ -231,7 +231,7 @@ class Hash
   primitive 'clear', 'removeAllKeys'
 
   def default(key)
-    if @defaultIsBlock.equal?(true)
+    if @defaultIsBlock._equal?(true)
       @defaultValue.call(self, key)
     else
       @defaultValue
@@ -239,7 +239,7 @@ class Hash
   end
 
   def default
-    if @defaultIsBlock.equal?(true)
+    if @defaultIsBlock._equal?(true)
       @defaultValue.call(nil)
     else  
       @defaultValue
@@ -256,7 +256,7 @@ class Hash
 
   def delete(key, &blk)
     v = self.__delete(key)
-    if v.equal?(@sentinel)
+    if v._equal?(@sentinel)
       if block_given?
         return  blk.call(key)
       else
@@ -270,7 +270,7 @@ class Hash
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
-    unless size.equal?(0)
+    unless size._equal?(0)
       raise LocalJumpError, "no block given" unless block_given?
 
       # Do this in 2 steps, so we're not altering the structure while we walk it.
@@ -307,7 +307,7 @@ class Hash
   primitive 'each_value&', 'eachValueDo:'
 
   def empty?
-    size.equal?(0)
+    size._equal?(0)
   end
 
   # Return a value from the hash for the given +key+.  If +key+ is not
@@ -322,7 +322,7 @@ class Hash
   def fetch(key, dflt=Undefined, &block)
     udef = Undefined
     val = self.__at_otherwise(key, udef)
-    return val unless val.equal?(udef)
+    return val unless val._equal?(udef)
     if block_given?
       if dflt._not_equal?(udef)
         warn 'block supersedes default value argument'
@@ -413,7 +413,7 @@ class Hash
 
   def shift
     pair = self.__first_pair
-    if pair.equal?(nil)
+    if pair._equal?(nil)
       return self.default(nil) 
     end
     key = pair[0]
@@ -457,7 +457,7 @@ class Hash
   primitive   '__basic_clone', 'rubyClone'   # use singleton class
 
   def inspect
-    return "{}" if length.equal?(0)
+    return "{}" if length._equal?(0)
     str = "{"
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)

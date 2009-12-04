@@ -40,7 +40,7 @@ class Mutex
 
   def unlock
     if locked?
-      unless @owner.equal?(Thread.current)
+      unless @owner._equal?(Thread.current)
         raise ThreadError, 'Mutex#unlock, not owned by current thread'
       end
       self.__unlock

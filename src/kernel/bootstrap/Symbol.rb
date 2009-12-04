@@ -48,14 +48,6 @@ class Symbol
     value.__send__(self)
   end
 
-  def respond_to?(sym)
-    if sym.equal?(:to_str)
-      false
-    else
-      super(sym)
-    end
-  end
-
   def taint
     self # do nothing
   end

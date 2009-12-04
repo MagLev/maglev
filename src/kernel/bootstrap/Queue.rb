@@ -55,7 +55,7 @@ class ConditionVariable
   #
   def wait(mutex, timeout=nil)
     mutex.unlock
-    if timeout.equal?(nil)
+    if timeout._equal?(nil)
       self.__wait
       was_signaled = true
     else 
@@ -153,7 +153,7 @@ class Queue
     while true
       @mutex.synchronize do
         q = @que
-        if q.size.equal?(0)
+        if q.size._equal?(0)
           raise ThreadError, "queue empty" if non_block
           @resource.wait(@mutex)
         else
@@ -179,7 +179,7 @@ class Queue
   # Returns +true+ if the queue is empty.
   #
   def empty?
-    @que.size.equal?(0)
+    @que.size._equal?(0)
   end
 
   #
@@ -284,7 +284,7 @@ class SizedQueue < Queue
     while true
       @mutex.synchronize do
         q = @que
-        if q.size.equal?(0)
+        if q.size._equal?(0)
           raise ThreadError, "queue empty" if non_block
           @resource.wait(@mutex)
         else

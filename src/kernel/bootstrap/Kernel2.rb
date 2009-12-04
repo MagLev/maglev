@@ -31,7 +31,7 @@ module Kernel
 
   def rand(n=0)
     limit = n.to_i.abs
-    if limit.equal?(0)
+    if limit._equal?(0)
       RandomInstance.next
     else
       RandomInstance.next(limit) - 1
@@ -40,7 +40,7 @@ module Kernel
   module_function :rand
 
   def srand(number=nil)
-    if number.equal?(nil)
+    if number._equal?(nil)
       number = Time.now.to_i
     else
       number = number.to_i

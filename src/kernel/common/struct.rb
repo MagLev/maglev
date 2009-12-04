@@ -42,7 +42,7 @@ class Struct
 
   def self.new(klass_name, *attrs, &block)
 
-    unless klass_name.equal?(nil) then
+    unless klass_name._equal?(nil) then
       # GEMSTONE
       #
       # We don't want to throw an exception just to distinguish
@@ -66,7 +66,7 @@ class Struct
       raise TypeError, e.message
     end
 
-    raise ArgumentError if attrs.any? { |attr| attr.equal?(nil) }
+    raise ArgumentError if attrs.any? { |attr| attr._equal?(nil) }
 
     klass = Class.new self do
 
@@ -127,7 +127,7 @@ class Struct
   #    joe == jane    #=> false
 
   def ==(other)
-    return true if self.equal?(other)
+    return true if self._equal?(other)
     return false if (self.class != other.class)
     myvals = self.values
     othervals = other.values
@@ -293,7 +293,7 @@ class Struct
   # fields are equal (using <tt>eql?</tt>).
 
   def eql?(other)
-    return true if self.equal?(other)
+    return true if self._equal?(other)
     return false if (self.class != other.class)
     myvals = self.values
     othervals = other.values

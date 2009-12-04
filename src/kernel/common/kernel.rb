@@ -11,9 +11,9 @@ module Kernel
       str.rstrip! # remove trailing white space, in place
       sign = 1.0
       first_ch = str[0]
-      if first_ch.equal?( ?+ )
+      if first_ch._equal?( ?+ )
 	str.__remove_from_to(1,1)
-      elsif first_ch.equal?( ?- )
+      elsif first_ch._equal?( ?- )
 	sign = -1.0
 	str.__remove_from_to(1,1)
       end  
@@ -24,8 +24,8 @@ module Kernel
         raise ArgumentError, "invalid value for Float(): #{obj.inspect}" 
       end
       idxu = str.__indexOfByte( ?_ , 1 ) # arg/result is one-based
-      unless idxu.equal?(0)
-        if idxu.equal?(str.size ) ||
+      unless idxu._equal?(0)
+        if idxu._equal?(str.size ) ||
            (rc = str =~ /([\d]+_e)|(e_)/i )
           raise ArgumentError, "invalid value for Float(): #{obj.inspect}"#
         end
@@ -52,15 +52,15 @@ module Kernel
       end
       str = obj.lstrip  # remove leading white space
       str.rstrip! # remove trailing white space, in place
-      if str.size.equal?(0)
+      if str.size._equal?(0)
 	raise ArgumentError, "invalid value for Integer: (empty string)"
       end
-      if str[0].equal?( ?_ ) || str[-1].equal?( ?_ ) 
+      if str[0]._equal?( ?_ ) || str[-1]._equal?( ?_ ) 
         raise ArgumentError, "invalid value for Integer: #{obj.inspect}"
       end
       return str.to_inum(0, true)
     end
-    if obj.equal?(nil)
+    if obj._equal?(nil)
       return 0
     end
     val = nil
@@ -68,7 +68,7 @@ module Kernel
       val = obj.to_int
     rescue Exception
     end
-    if val.equal?(nil)
+    if val._equal?(nil)
       begin
         val = obj.to_i
       rescue Exception
@@ -118,7 +118,7 @@ module Kernel
 #  private :FloatValue   # TODO: uncomment
 
   def warn(warning)
-    $stderr.write "#{warning}\n" unless $VERBOSE.equal?(nil)
+    $stderr.write "#{warning}\n" unless $VERBOSE._equal?(nil)
     nil
   end
   module_function :warn

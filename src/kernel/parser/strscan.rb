@@ -96,10 +96,10 @@ class RpStringScanner
 
   def beginning_of_line?
     p = @pos
-    if p.equal?(0) 
+    if p._equal?(0) 
       return true
     end
-    @cbytearray[p - 1].equal?( ?\n  )
+    @cbytearray[p - 1]._equal?( ?\n  )
   end
 
   def eos?
@@ -140,16 +140,16 @@ class RpStringScanner
   def matched
     # match.to_s if matched?
     m = @match
-    m.to_s if (not m.equal?(nil)) 
+    m.to_s if (not m._equal?(nil)) 
   end
 
   def matched?
-    not @match.equal?(nil)
+    not @match._equal?(nil)
   end
 
   def matched_size
     m = @match
-    m.to_s.size if (not m.equal?(nil))
+    m.to_s.size if (not m._equal?(nil))
   end
 
   def rest

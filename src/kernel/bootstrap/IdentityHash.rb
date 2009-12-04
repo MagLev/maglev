@@ -20,11 +20,11 @@ class IdentityHash
   end
 
   def ==(other)
-    if (other.class.equal?(self.class))
-      if (other.equal?(self))
+    if (other.class._equal?(self.class))
+      if (other._equal?(self))
         return true
       end
-      unless other.length.equal?(self.length)
+      unless other.length._equal?(self.length)
         return false
       end
       each { |k,v|
@@ -58,7 +58,7 @@ class IdentityHash
   primitive 'each_value&', 'valuesDo:'
 
   def empty?
-    size.equal?(0)
+    size._equal?(0)
   end
 
   primitive 'has_key?', 'includesKey:'
@@ -101,7 +101,7 @@ class IdentityHash
   primitive   '__basic_clone', 'rubyClone'   # use singleton class
 
   def inspect
-    return "{}" if length.equal?(0)
+    return "{}" if length._equal?(0)
     str = "{"
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)

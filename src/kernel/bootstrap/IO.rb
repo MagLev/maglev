@@ -25,9 +25,9 @@ class IO
     op = Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
     status = __fcntl(op, arg )
-    if status.equal?(0)
+    if status._equal?(0)
       return 0 # 'set' operation ok
-    elsif status.equal?(-1)
+    elsif status._equal?(-1)
       return arg[0] # retrieved value for a 'get' operation
     elsif status < -1
       raise NotImplementedError, 'fcntl operation not implemented'
@@ -74,7 +74,7 @@ class IO
     lim = args.length
     if lim == 0 # if no argument, print $_
       usc = self.__getRubyVcGlobal(0x21) # get callers $_
-      if usc.equal?(nil)
+      if usc._equal?(nil)
         usc = "nil"
       end
       write(usc)
@@ -82,7 +82,7 @@ class IO
       n = 0
       while (n < lim)
         elem = args[n]
-        if elem.equal?(nil)
+        if elem._equal?(nil)
           elem = "nil"
         else
           unless (elem._isString)
@@ -93,14 +93,14 @@ class IO
         n = n + 1
       end
       sep = $\
-      write(sep) unless sep.equal?(nil)
+      write(sep) unless sep._equal?(nil)
     end
   end
 
   def print
     # non-bridge zero args variant  so $_ access will work
     usc = self.__getRubyVcGlobal(0x21) # get callers $_
-    if usc.equal?(nil)
+    if usc._equal?(nil)
       usc = "nil"
     end
     write(usc)
@@ -169,7 +169,7 @@ class IO
       suppress = false
       elem = args[n]
       line = ''
-      if elem.equal?(nil)
+      if elem._equal?(nil)
         line = "nil"
       elsif elem._isString
         line = elem
@@ -191,9 +191,9 @@ class IO
       else
         line = elem.to_s
       end
-      unless line.equal?(nil)
+      unless line._equal?(nil)
         write(line)
-        write(eol) unless line[-1].equal?(10)
+        write(eol) unless line[-1]._equal?(10)
       end
       n = n + 1
     end
@@ -219,7 +219,7 @@ class IO
              end
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
-    read_all_bytes = length.equal?(Undefined) || length.nil?
+    read_all_bytes = length._equal?(Undefined) || length.nil?
     unless read_all_bytes
       length = Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
@@ -243,7 +243,7 @@ class IO
 
   def lineno
     num = @lineNumber
-    if num.equal?(nil)
+    if num._equal?(nil)
       num = 0
     end
     num
@@ -261,7 +261,7 @@ class IO
   def __increment_lineno
     # to be called by gets implementations
     num = @lineNumber
-    if num.equal?(nil)
+    if num._equal?(nil)
       num = 0
     end
     @lineNumber = num + 1
@@ -302,7 +302,7 @@ class IO
 
   def __read_into(len, buf)
     res = self.read(len, buf)
-    if res.equal?(nil)
+    if res._equal?(nil)
       0
     else
       res.size

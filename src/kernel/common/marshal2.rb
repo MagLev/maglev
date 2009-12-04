@@ -26,11 +26,11 @@ class Range
     out
   end
   def from_marshal(ivar, value)
-    if ivar.equal?(:begin)
+    if ivar._equal?(:begin)
       @from = value
-    elsif ivar.equal?( :end)
+    elsif ivar._equal?( :end)
       @to = value
-    elsif ivar.equal?( :excl)
+    elsif ivar._equal?( :excl)
       @excludeEnd = value
     else
       raise TypeError, 'unrecognized instvar in Range#from_marshal'
@@ -46,7 +46,7 @@ end
 
 class Boolean
   def to_marshal(ms)
-    self.equal?(true) ? Marshal__TYPE_TRUE : Marshal__TYPE_FALSE
+    self._equal?(true) ? Marshal__TYPE_TRUE : Marshal__TYPE_FALSE
   end
 end
 
@@ -178,7 +178,7 @@ class Hash
     out << (default_val ? Marshal__TYPE_HASH_DEF : Marshal__TYPE_HASH)
     len = self.length
     out << ms.serialize_integer(len)
-    unless len.equal?(0) then
+    unless len._equal?(0) then
       each_pair do |(key, val)|
         out << ms.serialize(key)
         out << ms.serialize(val)

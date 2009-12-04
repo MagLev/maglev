@@ -162,11 +162,10 @@ class Matrix
     for i in 0..r_siz-1 do 
       inner_res = array_cls.new(c_size)
       for j in 0..c_size-1 do
-        inner_res[j] = columns[j][i]   
+	inner_res[j] = columns[j][i]   
       end
       rows[i] = inner_res
     end
-
     Matrix.rows(rows, false)
   end
   
@@ -235,7 +234,7 @@ class Matrix
     matrix_cls = Matrix
     if row._isArray
       matrix_cls.rows([row.dup], false)
-    elsif row.kind_of?(Vector)
+    elsif row._kind_of?(Vector)
       matrix_cls.rows([row.to_a], false)
     else
       matrix_cls.rows([[row]], false)
@@ -254,7 +253,7 @@ class Matrix
     matrix_cls = Matrix
     if column._isArray
       matrix_cls.columns([column])
-    elsif column.kind_of?( Vector )
+    elsif column._kind_of?( Vector )
       matrix_cls.columns([column.to_a])
     else
       matrix_cls.columns([[column]])
@@ -268,16 +267,53 @@ class Matrix
   def initialize(init_method, *argv)
     self.send(init_method, *argv)
   end
+
+  def __init_check_row(arow)
+    if arow._isArray
+      return arow
+    end
+    if arow._kind_of?( Vector )
+      return arow.__elements
+    end
+    Type.coerce_to( arow, Array, :to_ary )
+  end
   
   def init_rows(rows, copy)
     if copy
       r_size = rows.size
       c_rows = Array.new(r_size)
-      for i in 0..r_size-1 do
-        c_rows[i] = rows[i].dup
+      if r_size > 0
+        arow = __init_check_row(rows[0])
+        first_row_size = arow.size
+        c_rows[0] = arow.dup
+        for i in 1..r_size-1 do
+          arow = __init_check_row(rows[i])
+          if arow.size._not_equal?( first_row_size)
+            self.class.Raise( ErrDimensionMismatch , 'rows have varying sizes')
+          end
+          c_rows[i] = arow.dup
+        end
       end
       @rows = c_rows
     else
+      # per library/matrix/constructor_spec.rb must check elements of arg
+      r_size = rows.size
+      if r_size > 0
+        brow = __init_check_row(arow = rows[0])
+        if brow._not_equal?(arow)
+          rows[0] = brow
+        end 
+        first_row_size = brow.size
+        for i in 1..r_size-1 do
+          brow = __init_check_row(rows[i])
+          if brow.size._not_equal?( first_row_size)
+            self.class.Raise( ErrDimensionMismatch , 'rows have varying sizes')
+          end
+          if brow._not_equal?(arow)
+            rows[i] = brow
+          end
+        end
+      end
       @rows = rows
     end
     self
@@ -290,7 +326,7 @@ class Matrix
   def [](i, j)
     #  @rows[i][j]  # Maglev, fix ruby_bug "#1518", "1.9.1.129"
     elem = @rows[i]
-    unless elem.equal?(nil)
+    unless elem._equal?(nil)
       elem = elem[j]
     end
     elem
@@ -310,7 +346,11 @@ class Matrix
   # result.
   #
   def column_size
-    @rows[0].size
+    first_row = @rows[0]
+    if first_row._equal?(nil)
+      return 0
+    end
+    first_row.size
   end
 
   #
@@ -519,11 +559,11 @@ class Matrix
         rows[i] = res_row
       end
       return matrix_cls.rows(rows, false)
-    elsif m.kind_of?( Vector )
+    elsif m._kind_of?( Vector )
       m = matrix_cls.column_vector(m)
       r = self * m
       return r.column(0)
-    elsif m.kind_of?( matrix_cls )
+    elsif m._kind_of?( matrix_cls )
       # Matrix.Raise ErrDimensionMismatch if column_size != m.row_size
       # rows = (0 .. row_size - 1).collect { |i|
       #   (0 .. m.column_size - 1).collect { |j|
@@ -567,9 +607,9 @@ class Matrix
     matrix_cls = Matrix
     if m._isNumeric
       matrix_cls.Raise ErrOperationNotDefined, "+"
-    elsif m.kind_of?(matrix_cls)
+    elsif m._kind_of?(matrix_cls)
       # no coercion
-    elsif m.kind_of?(Vector)
+    elsif m._kind_of?(Vector)
       m = matrix_cls.column_vector(m)
     else
       cr = m.coerce(self)
@@ -607,9 +647,9 @@ class Matrix
    matrix_cls = Matrix
     if m._isNumeric
       matrix_cls.Raise ErrOperationNotDefined, "-"
-    elsif m.kind_of?(matrix_cls)
+    elsif m._kind_of?(matrix_cls)
       # no coercion
-    elsif m.kind_of?(Vector)
+    elsif m._kind_of?(Vector)
       m = matrix_cls.column_vector(m)
     else
       cr = m.coerce(self)
@@ -665,7 +705,7 @@ class Matrix
         rows[i] = res_row
       end
       return matrix_cls.rows(rows, false)
-    elsif other.kind_of?(matrix_cls)
+    elsif other._kind_of?(matrix_cls)
       return self * other.inverse
     else
       cr = other.coerce(self)
@@ -767,7 +807,7 @@ class Matrix
         n -= 1
       end
       z
-    elsif other._isFloat || defined?(Rational) && other.kind_of?(Rational)
+    elsif other._isFloat || defined?(Rational) && other._kind_of?(Rational)
       Matrix.Raise ErrOperationNotDefined, "**"
     else
       Matrix.Raise ErrOperationNotDefined, "**"
@@ -897,14 +937,18 @@ class Matrix
   #     => 16
   #
   def trace
-    tr = 0
+    sum = 0
     # 0.upto(column_size - 1) do
     my_rows = @rows
     col_size = my_rows[0].size 
     for i in 0..col_size-1 do 
-      tr += my_rows[i][i]
+      row = my_rows[i]
+      if row._equal?(nil)
+        Matrix.Raise(ErrDimensionMismatch, 'not square') 
+      end
+      sum += row[i]
     end
-    tr
+    sum
   end
   alias tr trace
   
@@ -1022,11 +1066,11 @@ class Matrix
     # ARITHMETIC
     def +(other)
       scalar = Scalar
-      if other.kind_of?( scalar)
+      if other._kind_of?( scalar)
         scalar.new(@value + other.value)
       elsif other._isNumeric
         scalar.new(@value + other)
-      elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
+      elsif other._kind_of?( Vector) || other._kind_of?( Matrix)
         scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
       else
         cr = other.coerce(self)
@@ -1036,11 +1080,11 @@ class Matrix
     
     def -(other)
       scalar = Scalar
-      if other.kind_of?( scalar)
+      if other._kind_of?( scalar)
         scalar.new(@value - other.value)
       elsif other._isNumeric
         scalar.new(@value - other)
-      elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
+      elsif other._kind_of?( Vector) || other._kind_of?( Matrix)
         scalar.Raise WrongArgType, other.class, "Numeric or Scalar"
       else
         cr = other.coerce(self)
@@ -1050,11 +1094,11 @@ class Matrix
     
     def *(other)
       scalar = Scalar
-      if other.kind_of?( scalar)
+      if other._kind_of?( scalar)
         scalar.new(@value * other.value)  # Maglev addition
       elsif other._isNumeric
         scalar.new(@value * other)
-      elsif other.kind_of?( Vector) || other.kind_of?( Matrix)
+      elsif other._kind_of?( Vector) || other._kind_of?( Matrix)
         other.collect{|e| @value * e}
       else
         cr = other.coerce(self)
@@ -1064,13 +1108,13 @@ class Matrix
     
     def / (other)
       scalar = Scalar
-      if other.kind_of?( scalar)
+      if other._kind_of?( scalar)
         scalar.new(@value / other.value)  # Maglev addition
       elsif other._isNumeric
         scalar.new(@value / other)
-      elsif other.kind_of?( Vector)
+      elsif other._kind_of?( Vector)
         scalar.Raise WrongArgType, other.class, "Numeric or Scalar or Matrix"
-      elsif other.kind_of?( Matrix)
+      elsif other._kind_of?( Matrix)
         self * other.inverse
       else
         cr = other.coerce(self)
@@ -1080,13 +1124,13 @@ class Matrix
     
     def ** (other)
       scalar = Scalar
-      if other.kind_of?( scalar)
+      if other._kind_of?( scalar)
         scalar.new(@value ** other.value)  # Maglev addition
       elsif other._isNumeric
         scalar.new(@value ** other)
-      elsif other.kind_of?( Vector)
+      elsif other._kind_of?( Vector)
         scalar.Raise WrongArgType, other.class, "Numeric or Scalar or Matrix"
-      elsif other.kind_of?( Matrix)
+      elsif other._kind_of?( Matrix)
         other.powered_by(self)
       else
         cr = other.coerce(self)
@@ -1179,6 +1223,9 @@ class Vector
   
   # ACCESSING
          
+  def __elements
+    return @elements
+  end
   #
   # Returns element number +i+ (starting at zero) of the vector.
   #
@@ -1277,7 +1324,7 @@ class Vector
       Vector.elements(els, false)
     else
       matrix_cls = Matrix
-      if x.kind_of?( matrix_cls )
+      if x._kind_of?( matrix_cls )
         matrix_cls.column_vector(self) * x
       else
         cr = x.coerce(self)
@@ -1291,7 +1338,7 @@ class Vector
   #
   def +(v)
     vector_cls = Vector
-    if v.kind_of?( vector_cls)
+    if v._kind_of?( vector_cls)
       # els = collect2(v) {  |v1, v2| v1 + v2 }
       elems = @elements
       my_size = elems.size
@@ -1305,7 +1352,7 @@ class Vector
       vector_cls.elements(els, false)
     else
       matrix_cls = Matrix
-      if v.kind_of?( matrix_cls )
+      if v._kind_of?( matrix_cls )
         matrix_cls.column_vector(self) + v
       else
         cr = v.coerce(self)
@@ -1319,7 +1366,7 @@ class Vector
   #
   def -(v)
     vector_cls = Vector
-    if v.kind_of?( vector_cls )
+    if v._kind_of?( vector_cls )
       # els = collect2(v) { |v1, v2| v1 - v2 }
       elems = @elements
       my_size = elems.size
@@ -1333,7 +1380,7 @@ class Vector
       vector_cls.elements(els, false)
     else
       matrix_cls = Matrix
-      if v.kind_of?( matrix_cls )
+      if v._kind_of?( matrix_cls )
         matrix_cls.column_vector(self) - v
       else
         cr = v.coerce(self)

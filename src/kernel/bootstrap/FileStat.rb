@@ -46,7 +46,7 @@ class File
   end
 
   def <=>(other)
-    return nil unless other.is_a?(Stat)  # Stat resolves to File::Stat
+    return nil unless other._is_a?(Stat)  # Stat resolves to File::Stat
     mtime <=> other.mtime
   end
 
@@ -197,7 +197,7 @@ class File
 
   def size?
     sz = @size
-    sz.equal?(0) ? nil : sz
+    sz._equal?(0) ? nil : sz
   end
 
   def socket?
@@ -231,7 +231,7 @@ class File
   end
 
   def zero?
-    @size.equal?(0)
+    @size._equal?(0)
   end
 
   # pull the major device number out of a dev_t

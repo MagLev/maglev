@@ -39,7 +39,7 @@ module Enumerable
         if block_given?
           mergesort(xs) { | a, b| 
             c = prc.call(a, b) 
-            if c.equal?(nil)
+            if c._equal?(nil)
               raise ArgumentError, 'not comparable'
             end
             c <= 0
@@ -47,7 +47,7 @@ module Enumerable
         else
           mergesort(xs) { |a, b| 
             c = (a <=> b)
-            if c.equal?(nil)
+            if c._equal?(nil)
               raise ArgumentError, 'not comparable'
             end
             c <= 0
@@ -73,10 +73,10 @@ module Enumerable
 
       pivot = Undefined
       xs.each { |o| pivot = o; break }
-      return xs if pivot.equal? Undefined
+      return xs if pivot._equal? Undefined
 
       lmr = xs.group_by do |o|
-        if o.equal?(pivot)
+        if o._equal?(pivot)
           0
         else
           yield(o, pivot)
@@ -261,7 +261,7 @@ module Enumerable
 
   def count(item = Undefined)
     seq = 0
-    unless item.equal? Undefined
+    unless item._equal? Undefined
       each { |o| seq += 1 if item == o }
     else
       each { |o| seq += 1 if yield(o) }
@@ -407,14 +407,14 @@ module Enumerable
 
   def inject(memo = Undefined)
     each { |o|
-      if memo.equal? Undefined
+      if memo._equal? Undefined
         memo = o
       else
         memo = yield(memo, o)
       end
     }
 
-    memo.equal?(Undefined) ? nil : memo
+    memo._equal?(Undefined) ? nil : memo
   end
 
   ##
@@ -565,7 +565,7 @@ module Enumerable
     prc = Proc.new { |obj| obj } unless block_given?
     times = 0
     each { |o| times += 1 if prc.call(o) }
-    times.equal?(0)
+    times._equal?(0)
   end
 
   ##
@@ -585,11 +585,11 @@ module Enumerable
     prc = Proc.new { |a, b| a <=> b } unless block_given?
     min = Undefined
     each do |o|
-      if min.equal? Undefined
+      if min._equal? Undefined
         min = o
       else
         comp = prc.call(o, min)
-        if comp.equal?(nil)
+        if comp._equal?(nil)
           raise ArgumentError, "comparison of #{o.class} with #{min} failed"
         elsif comp < 0
           min = o
@@ -597,7 +597,7 @@ module Enumerable
       end
     end
 
-    min.equal?(Undefined) ? nil : min
+    min._equal?(Undefined) ? nil : min
   end
 
   ##
@@ -617,11 +617,11 @@ module Enumerable
     prc = Proc.new { |a, b| a <=> b } unless block_given?
     max = Undefined
     each do |o|
-      if max.equal? Undefined
+      if max._equal? Undefined
         max = o
       else
         comp = prc.call(o, max)
-        if comp.equal?(nil)
+        if comp._equal?(nil)
           raise ArgumentError, "comparison of #{o.class} with #{max} failed"
         elsif comp > 0
           max = o
@@ -629,7 +629,7 @@ module Enumerable
       end
     end
 
-    max.equal?(Undefined) ? nil : max
+    max._equal?(Undefined) ? nil : max
   end
 
   ##
@@ -651,12 +651,12 @@ module Enumerable
     each do |o|
       value = yield(o)
 
-      if min_obj.equal?(Undefined) or (min_value <=> value) > 0
+      if min_obj._equal?(Undefined) or (min_value <=> value) > 0
         min_obj, min_value = o, value
       end
     end
 
-    min_obj.equal?(Undefined) ? nil : min_obj
+    min_obj._equal?(Undefined) ? nil : min_obj
   end
 
   ##
@@ -678,12 +678,12 @@ module Enumerable
     each do |o|
       value = yield(o)
 
-      if max_obj.equal?(Undefined) or (max_value <=> value) < 0
+      if max_obj._equal?(Undefined) or (max_value <=> value) < 0
         max_obj, max_value = o, value
       end
     end
 
-    max_obj.equal?(Undefined) ? nil : max_obj
+    max_obj._equal?(Undefined) ? nil : max_obj
   end
 
 

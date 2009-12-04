@@ -45,7 +45,7 @@ class MatchData
   def pre_match
     # public, and also invoked from generated code for RubyBackRefNode
     res = @strPreceedingMatch
-    if (res.equal?(nil))
+    if (res._equal?(nil))
       res = @inputString[0, self.begin(0)]
       @strPreceedingMatch = res
     end
@@ -55,7 +55,7 @@ class MatchData
   def post_match
     # public, and also invoked from generated code for RubyBackRefNode
     res = @strFollowingMatch
-    if (res.equal?(nil))
+    if (res._equal?(nil))
       res = @inputString[self.end(0)..-1]
       @strFollowingMatch = res
     end
@@ -81,8 +81,9 @@ class MatchData
   end
 
   def pre_match_from(idx)
-    return "" if self.begin(0).equal?(0) # GEMSTONE
-    pre_end = self.begin(0) - 1
+    beg_zero = self.begin(0)
+    return "" if beg_zero._equal?(0) # GEMSTONE
+    pre_end = beg_zero - 1
     @inputString[idx, pre_end-idx+1]
   end
 

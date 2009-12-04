@@ -78,7 +78,7 @@ class Regexp
   end
 
   def ===(str)
-    if ( str._isString ) # if str.kind_of?(String)
+    if ( str._isString ) 
       # inline =~  so as to update callers $~
       m = __search(str, 0, nil)
       m.__storeRubyVcGlobal(0x20) # store into caller's $~
@@ -93,18 +93,18 @@ class Regexp
 
   # Return true if +Regexp::IGNORECASE+ is set on this regexp
   def casefold?
-    !((@options & IGNORECASE).equal?(0))
+    !((@options & IGNORECASE)._equal?(0))
   end
 
   # def inspect  # implemented in common/regex.rb
 
   def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
     # if options == nil, prim defautls to case insensitive
-    if options.equal?(nil)
+    if options._equal?(nil)
       opts = 0
     elsif options._isFixnum
       opts = options 
-    elsif options.equal?(false)
+    elsif options._equal?(false)
       opts = 0
     else
       opts = IGNORECASE
@@ -145,7 +145,7 @@ class Regexp
   def match_from(str, offset)
     # search  str[offset .. str.size-1]
     # does not update caller's $~
-    if str.equal?(nil)
+    if str._equal?(nil)
       return nil
     end
     sz = str.size
@@ -220,7 +220,7 @@ class Regexp
   
   def ~
     str = self.__getRubyVcGlobal(0x21) # get callers $_
-    if str.equal?(nil)
+    if str._equal?(nil)
       raise TypeError, 'Regexp#~ , caller frame has no reference to $_ '
     end
     unless str._isString
@@ -236,14 +236,14 @@ class Regexp
 
   # during bootstrap,  send and __send__ get no bridge methods
   def send(sym, str)
-    if sym.equal?( :=~ )
+    if sym._equal?( :=~ )
       m = __search(str, 0, nil)
       m.__storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
       m
-    elsif sym.equal?(:match)
+    elsif sym._equal?(:match)
       return nil unless str && str.length > 0
       m = __search(str, 0, nil)
       m.__storeRubyVcGlobal(0x20) # store into caller's $~
@@ -254,14 +254,14 @@ class Regexp
   end
 
   def __send__(sym, str)
-    if sym.equal?( :=~ )
+    if sym._equal?( :=~ )
       m = __search(str, 0, nil)
       m.__storeRubyVcGlobal(0x20) # store into caller's $~
       if (m)
         return m.begin(0)
       end
       m
-    elsif sym.equal?(:match)
+    elsif sym._equal?(:match)
       return nil unless str && str.length > 0
       m = __search(str, 0, nil)
       m.__storeRubyVcGlobal(0x20) # store into caller's $~
@@ -280,7 +280,7 @@ class Regexp
       if match
         block.call(match)
         pos = match.end(0)
-        if pos.equal?( match.begin(0) )
+        if pos._equal?( match.begin(0) )
           pos += 1
         end
         if pos <= idx
@@ -352,10 +352,10 @@ class Regexp
 
   def __index_string(string, offset)
     # used by String#index only
-    start = offset.equal?(nil) ? 0 : offset
+    start = offset._equal?(nil) ? 0 : offset
     md = self.__search(string, start, nil)
     md.__storeRubyVcGlobal(0x40)
-    return nil if md.equal?(nil)
+    return nil if md._equal?(nil)
     md.begin(0)
   end
 
@@ -375,15 +375,15 @@ class Regexp
       res_md = self.__search(string, offset, str_size)  # forwards
       if res_md._not_equal?(nil)
         ofs = res_md.begin(0)
-        if ofs.equal?(offset)
+        if ofs._equal?(offset)
           res = ofs  # exact match at offset , use it
         end
       end
-      if res.equal?(nil)
+      if res._equal?(nil)
   ofs = 0
   while ofs < offset  # loop forwards to find last match < offset
     md = self.__search(string, ofs, str_size)
-    if md.equal?(nil)
+    if md._equal?(nil)
       break
     end
     ofs = md.begin(0)
@@ -392,7 +392,7 @@ class Regexp
       res_md = md
     end
     next_ofs = md.end(0)
-    if next_ofs.equal?(ofs)
+    if next_ofs._equal?(ofs)
       next_ofs += 1
     end
     ofs = next_ofs
@@ -444,7 +444,7 @@ class Regexp
   def self.last_match(an_int)
     # no bridge methods for variants after first
     m = self.__getRubyVcGlobal(0x20)
-    if m.equal?(nil)
+    if m._equal?(nil)
       return m
     else
       return m[an_int]
@@ -464,7 +464,7 @@ class Regexp
   #     Regexp.union(/dogs/, /cats/i)        #=> /(?-mix:dogs)|(?i-mx:cats)/
   def self.union(*args)
     len = args.length
-    if len.equal?(0)
+    if len._equal?(0)
       return /(?!)/
     end
     n = 0

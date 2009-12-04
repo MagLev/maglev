@@ -22,7 +22,7 @@ class Exception
 
     def message
       m = @messageText
-      if m.equal?(nil)
+      if m._equal?(nil)
         m = __description  # generate Smalltalk message
       end
       if m.frozen? 
@@ -39,9 +39,9 @@ class Exception
 
     def __message_append(str)
       m = @messageText
-      if m.equal?(nil)
+      if m._equal?(nil)
         m = self.message
-        if m.equal?(nil)
+        if m._equal?(nil)
           @messageText = str.to_s
           return
         end
@@ -55,7 +55,7 @@ class Exception
     end
 
     def self.name
-      if self.equal?(Exception)
+      if self._equal?(Exception)
         'Exception'  # override the smalltalk name UserException
       else
         super
@@ -64,7 +64,7 @@ class Exception
 
     def self._validate(obj)
       # used in implementation of $! on LHS of assignment
-      if (obj.kind_of?(Exception))
+      if (obj._kind_of?(Exception))
         return obj
       else
         raise ArgumentError, 'not an Exception'
@@ -75,7 +75,7 @@ class Exception
 
     def initialize(message=nil)
       self.__st_initialize  # initialize smalltak instvars
-      if message.equal?(nil)
+      if message._equal?(nil)
         message = self.class.name
       end
       @messageText = message
@@ -94,7 +94,7 @@ class Exception
     end
 
     def exception(message = Undefined)
-      if message.equal?(self) || message.equal?(Undefined)
+      if message._equal?(self) || message._equal?(Undefined)
         return self
       end
       e = dup
@@ -116,11 +116,11 @@ class Exception
     end
 
     def to_s
-      (m = message).equal?(nil) ? self.class.name : m
+      (m = message)._equal?(nil) ? self.class.name : m
     end
 
     def to_str
-      (m = message).equal?(nil) ? self.class.name : m
+      (m = message)._equal?(nil) ? self.class.name : m
     end
 end
 
@@ -211,11 +211,11 @@ class SystemCallError
     if errnum._not_equal?(nil)
       exc = Errno.__new_for_errno(errnum)
     end
-    if exc.equal?(nil)
+    if exc._equal?(nil)
       exc = self.allocate
       exc.errno=(errnum)
     end
-    if msg.equal?(nil)
+    if msg._equal?(nil)
       exc.__message=('Unknown error')
     else
       exc.__message=(msg)
@@ -227,7 +227,7 @@ class SystemCallError
   end
   def errno
     gsa = @gsarguments
-    if gsa.equal?(nil)
+    if gsa._equal?(nil)
       nil
     else
       gsa[0]
@@ -292,7 +292,7 @@ class NoMethodError  # a subclass of NameError
    end
    def args
      a = @gsarguments[2]
-     if a.equal?(nil)
+     if a._equal?(nil)
        a = []
      end
      a

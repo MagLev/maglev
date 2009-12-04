@@ -149,7 +149,7 @@
     end
 
     def null? 
-      self.address.equal?(0)
+      self.address._equal?(0)
     end
 
     def read_array_of_int(a_length)
@@ -193,7 +193,7 @@
     end
 
     def ==(a_memory_pointer)
-      unless a_memory_pointer.kind_of?(self) 
+      unless a_memory_pointer._kind_of?(self) 
         return false
       end
       a_memory_pointer.read_pointer() == self.read_pointer()

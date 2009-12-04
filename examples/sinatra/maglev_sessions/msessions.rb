@@ -2,17 +2,13 @@ require 'rubygems'
 require 'sinatra'
 require 'maglev_session'
 
+# This example shows how to use a MagLev backed HTTP sesssion store.  The
+# sessions are managed by the code in maglev_session.rb, and loaded as rack
+# middleware.
 use MaglevSession
 
 set :run, true
-
-# Exception.install_debug_block do |e|
-#   puts "-- (#{e.class}) -- #{e} "
-#   case e
-#   when ArgumentError
-#     nil.pause
-#   end
-# end
+set :server, ['webrick']
 
 get '/' do
   session["counter"] ||= 0
@@ -35,7 +31,7 @@ __END__
   </head>
   <body>
     <h2>Simple MagLev Backed Sessions</h2>
-    <%= yield %>  
+    <%= yield %>
   </body>
 </html>
 
@@ -47,9 +43,9 @@ __END__
   <h3>Other Sessions</h3>
   <ul>
   <% if @sessions %>
-  <% @sessions.each_pair do |id, val| %>
-    <li>Session <%= id.to_s %> <%= val.inspect %></li>
-  <% end %>
+    <% @sessions.each_pair do |id, val| %>
+      <li>Session <%= id.to_s %> <%= val.inspect %></li>
+    <% end %>
   <% else %>
     <p>There do not appear to be any sessions...</p>
   <% end %>

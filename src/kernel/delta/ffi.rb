@@ -159,7 +159,7 @@ module FFI
 
     def __printable_name
       n = @name
-      if name.equal?(nil)
+      if name._equal?(nil)
         'unnamed'
       else
         n.to_s

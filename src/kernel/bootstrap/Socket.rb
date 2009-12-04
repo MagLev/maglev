@@ -27,16 +27,16 @@ class Socket
 
   # send, recv , syswrite function per the non-blocking state of the receiver.
   def send(string, flags, addr)
-    unless addr.equal?(nil)
+    unless addr._equal?(nil)
       raise 'addr arg not supported by send'
     end
-    unless flags.equal?(0)
+    unless flags._equal?(0)
       raise 'non-zero flags not supported by send'
     end
     syswrite(string)
   end
   def send(string, flags)
-    unless flags.equal?(0)
+    unless flags._equal?(0)
       raise 'non-zero flags not supported by send'
     end
     syswrite(string)
@@ -79,10 +79,10 @@ class Socket
   end
 
   def gets(separator)
-    if separator.equal?(nil)
+    if separator._equal?(nil)
       res = self.recv(4096)
     elsif separator._isString
-      if separator.length.equal?(1)
+      if separator.length._equal?(1)
         res = self.__gets(separator[0])
       else
         raise ArgumentError, 'Socket#gets, multi-character separator not implemented yet'
@@ -156,7 +156,7 @@ class Socket
     if arr._isFixnum
       Errno.raise(arr)
       res = nil
-    elsif arr.size.equal?(1)
+    elsif arr.size._equal?(1)
       arr.pack("i")
     else
       # 2 element Array from SO_RCVTIMEO, SO_SNDTIMEO, or SO_LINGER
@@ -208,13 +208,13 @@ class Socket
     # optval should be a Fixnum or true or false except for
     # optname's SO_RCVTIMEO, SO_SNDTIMEO, SO_LINGER which require a 2 element Array
     #   of Fixnums .
-    if optval.equal?(true)
+    if optval._equal?(true)
       optval = 1
-    elsif optval.equal?(false)
+    elsif optval._equal?(false)
       optval = 0
     end
     status = __setsockopt(level, optname, optval)
-    if status.equal?(0)
+    if status._equal?(0)
       return self
     else
       Errno.raise(status)
@@ -250,14 +250,14 @@ class Socket
     # implementation in Smalltalk layer is incomplete ,
     #   result will only include a single entry for the specified host
     #   and service, assuming TCP protocol.
-    if host.equal?(nil)
+    if host._equal?(nil)
       host = 'localhost'
     else
       host = Type.coerce_to(host, String, :to_s)
     end
     if service._isFixnum 
       # ok
-    elsif service.equal?(nil)
+    elsif service._equal?(nil)
       service = 0
     else
       service = Type.coerce_to(service, String, :to_s)
@@ -273,7 +273,7 @@ class Socket
   def fcntl(op, flags=0)
     # Socket specific implemention for F_SETFL, NONBLOCK
     op = Type.coerce_to(op, Fixnum, :to_int)
-    if op.equal?(Fcntl::F_SETFL)
+    if op._equal?(Fcntl::F_SETFL)
       flags = Type.coerce_to(flags, Fixnum, :to_int)
       if (flags & File::NONBLOCK) != 0
         @isRubyBlocking = false
@@ -282,7 +282,7 @@ class Socket
       end
       flags = flags & (~ File::NONBLOCK)
       super(op, flags)
-    elsif op.equal?(Fcntl::F_GETFL)
+    elsif op._equal?(Fcntl::F_GETFL)
       res = super(op, flags)
       if @isRubyBlocking
         res = res | File::NONBLOCK
@@ -309,7 +309,7 @@ class TCPSocket  # < IPSocket in VM
   class_primitive '__open', 'open:'
 
   def self.new(host, port)
-    if host.equal?(nil)
+    if host._equal?(nil)
       host = 'localhost'
     end
     self.open(host, port)
@@ -344,8 +344,8 @@ class TCPServer   # < TCPSocket in VM
 
   def self.new( hostname, port)
     # port may be nil or 0 to get a random port
-    port = port.equal?(0) ? nil : port
-    if hostname.length.equal?(0)
+    port = port._equal?(0) ? nil : port
+    if hostname.length._equal?(0)
       self.__new( 'localhost' , port)
     else
       self.__new( hostname, port )

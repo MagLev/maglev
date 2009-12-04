@@ -18,7 +18,7 @@ class Boolean
   end
 
   def to_s
-    self.equal?(true) ? "true" : "false"
+    self._equal?(true) ? "true" : "false"
   end
 
   def frozen?

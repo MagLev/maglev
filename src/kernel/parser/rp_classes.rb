@@ -7,7 +7,7 @@ module MagRp
     #   1  trace files parsed by RubyParser
     #   2  also include lexer and racc state machine tracing
     d = Maglev::__system.session_temp(:MagRpDEBUG)
-    if d.equal?(nil)
+    if d._equal?(nil)
       d = 0
     end
     d
@@ -143,7 +143,7 @@ module MagRp
     def lex_strterm=(v)
       if v._not_equal?(nil)           # TODO remove consistency check
         sym = v[0]
-        unless sym.equal?( :strterm ) || sym.equal?( :heredoc )
+        unless sym._equal?( :strterm ) || sym._equal?( :heredoc )
           raise 'invalid arg to lex_strterm='
         end
       end

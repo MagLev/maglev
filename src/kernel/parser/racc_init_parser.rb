@@ -17,7 +17,7 @@ module MagRp #
         nilcount = 0
         while n < sz
           v = arr[n]
-          if v.equal?(nil)
+          if v._equal?(nil)
             nilcount += 1
           else
             if v < min ; min = v ; end
@@ -37,7 +37,7 @@ module MagRp #
       arg = Racc_arg
 
       # arg[13] = true if arg.size < 14
-      unless arg[13].equal?(true)
+      unless arg[13]._equal?(true)
          raise "unexpected racc_use_result_var==false"
       end
       @action_table   = arg[0].freeze
@@ -62,7 +62,7 @@ module MagRp #
       idx = 0
       while idx < reduc_len 
         sym = reduc_tab[idx + 2]
-        if sym.equal?( :_reduce_none ) && reduc_tab[idx].equal?( 1 )
+        if sym._equal?( :_reduce_none ) && reduc_tab[idx]._equal?( 1 )
           new_sym = :_reduce_noneOne  # for "no net change to vstack" optimization
         else
           new_sym = (sym.to_s << '::' ).__as_symbol  # so we can use __perform__se

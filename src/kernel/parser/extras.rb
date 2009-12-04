@@ -39,7 +39,7 @@ class String
     idx = 1
     while true
       idx = self.__indexOfByte( ?\n , idx )
-      if idx.equal?(0)
+      if idx._equal?(0)
         return count
       end
       count += 1
@@ -110,13 +110,13 @@ module MagRp # {
         pos = @src_scanner.pos
         ary[idx + OFF_byte_offset] = pos
         if kind_sym._not_equal?( nil )
-          if kind_sym.equal?( :def )
-            if idx.equal?(ENTRY_SIZE) and @first_top_level_def_offset.equal?(-1)
+          if kind_sym._equal?( :def )
+            if idx._equal?(ENTRY_SIZE) and @first_top_level_def_offset._equal?(-1)
               if @module_count > 0
                 @first_top_level_def_offset = pos
               end
             end
-          elsif kind_sym.equal?( :module )
+          elsif kind_sym._equal?( :module )
             @module_count = @module_count + 1
           end
         end  
@@ -148,7 +148,7 @@ module MagRp # {
 	      return v
 	    end
           end
-          if ary[idx + OFF_dyn].equal?( false)
+          if ary[idx + OFF_dyn]._equal?( false)
             break # exit loop , we just probed first non-dynamic scope
           end
 	  idx -= ENTRY_SIZE
@@ -158,14 +158,14 @@ module MagRp # {
 
       def []=( k, v)
 	# raise "no" if v == true
-	if v.equal?(true)
+	if v._equal?(true)
 	  raise "Environment:[]= , invalid true arg"
 	end
 	# self.current[k] = v
         idx = @curridx
         ary = @arr
 	h = ary[idx ]
-        if h.equal?(nil)
+        if h._equal?(nil)
           h = Hash.new 
           ary[idx ] = h 
         end
@@ -192,7 +192,7 @@ module MagRp # {
 	ary = @arr
 	set = IdentitySet.new
 	while idx >= 0
-	  if ary[idx + OFF_dyn].equal?( false) 
+	  if ary[idx + OFF_dyn]._equal?( false) 
 	    break # exit while loop
 	  end
 	  h = ary[idx ]
@@ -206,7 +206,7 @@ module MagRp # {
 
       def dynamic?
 	# @dyn[0] != false
-	@arr[@curridx + OFF_dyn].equal?( true )
+	@arr[@curridx + OFF_dyn]._equal?( true )
       end
 
       def use( id)
@@ -222,7 +222,7 @@ module MagRp # {
           if h_env._not_equal?(nil)
 	    if h_env[id]
 	      h_use = ary[idx + OFF_use]
-              if h_use.equal?(nil)
+              if h_use._equal?(nil)
                 h_use = Hash.new
                 ary[idx + OFF_use] = h_use
               end
@@ -277,7 +277,7 @@ module MagRp # {
             self[new_sz - 1] = a
           end
           self.size=( new_sz )
-        elsif sz.equal?(0)
+        elsif sz._equal?(0)
           raise('lexpop underflow')
         else
           # no change if stack size == 1
@@ -291,7 +291,7 @@ module MagRp # {
 	# r = @stack.pop
 	r = self[ sz_minus_1 ]
 	# @stack.push false if @stack.size == 0
-	if sz_minus_1.equal?(0)
+	if sz_minus_1._equal?(0)
 	  self[ sz_minus_1 ] = false
 	else
 	  self.size=( sz_minus_1 )
@@ -315,7 +315,7 @@ module MagRp # {
       # for syntax error messages
       # returns a String
       num = -1
-      if name_tok.is_a?(RpNameToken)
+      if name_tok._is_a?(RpNameToken)
 	byte_ofs = name_tok.src_offset
 	num = @lexer.line_for_offset(byte_ofs)
       end
@@ -345,10 +345,10 @@ module MagRp # {
 
     def assignable(lhs, value) # value maybe nil    # [
       lhs_cls = lhs.class
-      if lhs_cls.equal?(RpNameToken)
+      if lhs_cls._equal?(RpNameToken)
 	id = lhs.symval 
 	src_ofs = lhs.src_offset 
-      elsif lhs.kind_of?( RubyAbstractLiteralNode )
+      elsif lhs._kind_of?( RubyAbstractLiteralNode )
 	raise SyntaxError, "Can't change the value of #{lhs.nameForError}"
       else
 	raise_error("assignable - invalid lhs")
@@ -360,8 +360,8 @@ module MagRp # {
       first_ch = id[0]
       result = nil
       if first_ch <= ?Z
-	if first_ch.equal?(  ?@ )
-	  if id[1].equal?( ?@ )
+	if first_ch._equal?(  ?@ )
+	  if id[1]._equal?( ?@ )
 	    # asgn = self.in_def || self.in_single > 0
 	    # s((asgn ? :cvasgn : :cvdecl), id)
 	    #   maglev, :cvasgn , :cvdecl  both have same production
@@ -369,7 +369,7 @@ module MagRp # {
 	  else
 	    result = RubyInstAsgnNode.s(id, value) # s(:iasgn )
 	  end
-	elsif first_ch.equal?( ?$ )
+	elsif first_ch._equal?( ?$ )
 	  result = RubyGlobalAsgnNode.s(id, value) # s(:gasgn )
 	elsif RpStringScanner.ch_is_uc_alpha(first_ch)   # A-Z
           if @in_def || @in_single > 0
@@ -381,24 +381,24 @@ module MagRp # {
 	  result.src_offset=( src_ofs )
 	end
       end
-      if result.equal?(nil) 
+      if result._equal?(nil) 
 	cenv = @env
 	type = cenv[id]
-	if type.equal?( :lvar) 
+	if type._equal?( :lvar) 
 	  result = RubyLocalAsgnNode.s(id, value) # s(:lasgn )
 	  result.src_offset=( src_ofs )
 	  return result;
-	elsif type.equal?( nil ) || type.equal?(:dvar)
-	   if cenv.current_at(id).equal?(  :dvar)  then
+	elsif type._equal?( nil ) || type._equal?(:dvar)
+	   if cenv.current_at(id)._equal?(  :dvar)  then
 	     # ok
-	   elsif type.equal?( :dvar) then
+	   elsif type._equal?( :dvar) then
 	     @env.use(id)
 	   end
 	   result = RubyLocalAsgnNode.s(id, value) # s(:lasgn )
 	else
 	   raise "in assignable:  unknown type: #{@env[id]}"
 	end
-	if type.equal?( nil)
+	if type._equal?( nil)
 	  cenv[id] = :lvar
 	end
       else
@@ -422,26 +422,26 @@ module MagRp # {
       first_ch = id[0]
       ok = nil
       if first_ch <= ?Z
-	if first_ch.equal?(  ?@ )
-	  if id[1].equal?( ?@ )
+	if first_ch._equal?(  ?@ )
+	  if id[1]._equal?( ?@ )
 	    ok = true # for s(:cvasgn ) , s(:cvdecl)
 	  else
 	    ok = true # for s(:iasgn )
 	  end
-	elsif first_ch.equal?( ?$ )
+	elsif first_ch._equal?( ?$ )
 	  ok = true # for  s(:gasgn )
 	elsif RpStringScanner.ch_is_uc_alpha(first_ch)
 	  ok = true # s(:cdecl )
 	end
       end
-      if ok.equal?(nil) 
+      if ok._equal?(nil) 
 	type = @env[id]
-	if type.equal?( :lvar) 
+	if type._equal?( :lvar) 
 	  #ok
-	elsif type.equal?( nil ) || type.equal?(:dvar)
-	   if @env.current_at(id).equal?(  :dvar)  then
+	elsif type._equal?( nil ) || type._equal?(:dvar)
+	   if @env.current_at(id)._equal?(  :dvar)  then
 	     # ok
-	   elsif type.equal?( :dvar) then
+	   elsif type._equal?( :dvar) then
 	     @env.use(id)
 	   end
 	   #
@@ -449,17 +449,17 @@ module MagRp # {
 	   raise "in assignable:  unknown type: #{@env[id]}"
 	end
       end
-      if type.equal?( nil)
+      if type._equal?( nil)
 	@env[id] = :lvar
       end
       nil
     end
 
     def min_line(a_line, b_line)
-      if a_line.equal?(nil)
+      if a_line._equal?(nil)
 	return b_line
       end
-      if b_line.equal?(nil)
+      if b_line._equal?(nil)
 	return a_line
       end
       return a_line < b_line ? a_line : b_line
@@ -475,7 +475,7 @@ module MagRp # {
       # when :lit, :str then  # :str produces a subclass of what :lit produces
       #  return tail
       # end
-      if head.kind_of?(RubyAbstractLiteralNode)
+      if head._kind_of?(RubyAbstractLiteralNode)
 	return tail
       end
 
@@ -483,7 +483,7 @@ module MagRp # {
       head = head.kbegin_value
 
       #  head = s(:block, head) unless head[0] == :block
-      unless head.class.equal?(RubyBlockNode)
+      unless head.class._equal?(RubyBlockNode)
 	head = RubyBlockNode.s( [ head ] )
       end
 
@@ -497,7 +497,7 @@ module MagRp # {
     end
 
     def cond_or_nil(node)
-      if node.equal?(nil)
+      if node._equal?(nil)
 	nil
       else
 	cond(node)
@@ -548,11 +548,11 @@ module MagRp # {
 	#  return s(:match2, lhs, rhs) if Regexp === lhs.last
 	#end
 	l_cls = lhs.class
-	if l_cls.equal?(RubyDRegexpNode)  # :dregx and :dregx_once
+	if l_cls._equal?(RubyDRegexpNode)  # :dregx and :dregx_once
 	  res = RubyMatch2Node.s(lhs, rhs)
 	  res.src_offset=( sel_tok.src_offset )
 	  return res
-	elsif l_cls.equal?(RubyRegexpNode)
+	elsif l_cls._equal?(RubyRegexpNode)
 	  res = RubyMatch2Node.s(lhs, rhs)
 	  res.src_offset=( sel_tok.src_offset )
 	  return res
@@ -567,11 +567,11 @@ module MagRp # {
 	#  return s(:match3, rhs, lhs) if Regexp === rhs.last
 	#end
 	r_cls = rhs.class
-	if r_cls.equal?(RubyDRegexpNode)  # :dregx and :dregx_once
+	if r_cls._equal?(RubyDRegexpNode)  # :dregx and :dregx_once
 	  res = RubyMatch2Node.s(rhs, lhs)  # we use Match2Node for :match3
 	  res.src_offset=( sel_tok.src_offset )
 	  return res
-	elsif r_cls.equal?(RubyRegexpNode)
+	elsif r_cls._equal?(RubyRegexpNode)
 	  res = RubyMatch2Node.s(rhs, lhs)
 	  res.src_offset=( sel_tok.src_offset )
 	  return res
@@ -587,15 +587,15 @@ module MagRp # {
     def gettable(arg)
       # raise "no: #{id.inspect}" if Sexp === id
       #  id = id.to_sym if Sexp   === id # HACK
-      if arg.class.equal?(RpNameToken)
+      if arg.class._equal?(RpNameToken)
 	id = arg.symval
 	src_ofs = arg.src_offset
       elsif arg._isSymbol
 	id = arg 
-	return RubySelfNode._new if id.equal?(:self) # s(:self)
-	return RubyNilNode._new  if id.equal?(:nil)  # s(:nil)  
-	return RubyTrueNode._new if id.equal?(:true) # s(:true)
-	return RubyFalseNode._new if id.equal?(:false) # s(:false) 
+	return RubySelfNode._new if id._equal?(:self) # s(:self)
+	return RubyNilNode._new  if id._equal?(:nil)  # s(:nil)  
+	return RubyTrueNode._new if id._equal?(:true) # s(:true)
+	return RubyFalseNode._new if id._equal?(:false) # s(:false) 
 	src_ofs = nil
       else
 	raise_error("gettable unrecognized argument kind")
@@ -603,13 +603,13 @@ module MagRp # {
       
       first_ch = id[0]
       if first_ch <= ?Z
-	if first_ch.equal?(  ?@ )
-	  if id[1].equal?( ?@ )
+	if first_ch._equal?(  ?@ )
+	  if id[1]._equal?( ?@ )
 	    return RubyClassVarNode.s(id) # s(:cvar, id)
 	  else
 	    return RubyInstVarNode.s(id)  # s(:ivar, id)   
 	  end
-	elsif first_ch.equal?( ?$ )
+	elsif first_ch._equal?( ?$ )
 	  res = RubyGlobalVarNode.s( id)  # s(:gvar )
 	  res.src_offset=( src_ofs )
 	  return res
@@ -617,18 +617,18 @@ module MagRp # {
 	  return RubyConstNode.s( id, src_ofs )  # s(:const )
 	end 
       end
-      if first_ch.equal?( ?_ )
-	if id.equal?(:__FILE__)   
+      if first_ch._equal?( ?_ )
+	if id._equal?(:__FILE__)   
 	  return RubyStrNode.s( @file_name )        
-	elsif id.equal?(:__LINE__) # s(:lit...)  # id was a RpNameToken
+	elsif id._equal?(:__LINE__) # s(:lit...)  # id was a RpNameToken
 	  return RubyFixnumNode.s( src_ofs )
 	end
       end
       cenv = @env
       type = cenv[id]
-      if type.equal?(:lvar) then
+      if type._equal?(:lvar) then
 	return RubyLocalVarNode.s(id)  # rp202 code always took this path ???
-      elsif type.equal?(:dvar) && cenv.dynamic? then
+      elsif type._equal?(:dvar) && cenv.dynamic? then
 	return RubyLocalVarNode.s(id)  # s(:lvar, id)  
       else
 	# return  s(:call, nil, id, s(:arglist))  
@@ -657,10 +657,10 @@ module MagRp # {
       # list = s(:array, list) unless Sexp === list && list.first == :array
       # list << item
       arrayCls = RubyRpCallArgs
-      if list.equal?(nil)
+      if list._equal?(nil)
 	return arrayCls.s( item) 
       end
-      unless list.class.equal?(arrayCls) 
+      unless list.class._equal?(arrayCls) 
 	list = arrayCls.s(list)
       end
       list.append(item)
@@ -672,7 +672,7 @@ module MagRp # {
       # list.insert 1, item
       # list
       arrayCls = RubyRpCallArgs
-      if list.class.equal?(arrayCls)
+      if list.class._equal?(arrayCls)
 	list.prepend(item)  
       else
 	list = arrayCls.s(item, list)  
@@ -691,23 +691,23 @@ module MagRp # {
       htype = head.str_dstr_evstr_kind()  # 0,1,2  or nil
       ttype = tail.str_dstr_evstr_kind()
 
-      if htype.equal?(2)  # htype == :evstr
+      if htype._equal?(2)  # htype == :evstr
 	head = RubyDStrNode.s([ RubyStrNode.s('') , head] )   
       end
 
       # case ttype
-      if ttype.equal?(0) #  when :str then
-	if htype.equal?(0) #  htype == :str
+      if ttype._equal?(0) #  when :str then
+	if htype._equal?(0) #  htype == :str
 	  # append tail's String to head's String
 	  head.appendString( tail.strNodeValue )  # head[-1] << tail[-1]
-	elsif  htype.equal?(1) and head.size.equal?(1) # htype == :dstr and head.size == 2 
+	elsif  htype._equal?(1) and head.size._equal?(1) # htype == :dstr and head.size == 2 
 	  # head is a dstr with a StrNode and no  further list elements
 	  head.appendToHeadString( tail.strNodeValue ) #  head[-1] << tail[-1]
 	else  # htype == :dstr , or was :evstr changed to :dstr above
 	  head.appendToList( tail ) 
 	end
-      elsif ttype.equal?(1)  # when :dstr then
-	if htype.equal?(0) #   htype == :str then
+      elsif ttype._equal?(1)  # when :dstr then
+	if htype._equal?(0) #   htype == :str then
 	  # tail[1] = head[-1] + tail[1]
 	  tail.appendToHeadString( head.strNodeValue )
 	  head = tail
@@ -723,11 +723,11 @@ module MagRp # {
 	  end
 	  head.dstrList.push( *t_list)
 	end
-      elsif ttype.equal?(2)  #   when :evstr then  # tail is EvStrNode
+      elsif ttype._equal?(2)  #   when :evstr then  # tail is EvStrNode
 	# head[0] = :dstr if htype == :str
-	if htype.equal?(0)  # head is StrNode
+	if htype._equal?(0)  # head is StrNode
 	  t_body = tail.evStrBody
-	  if t_body.class.equal?(RubyStrNode)
+	  if t_body.class._equal?(RubyStrNode)
 	    head.appendString( t_body.strNodeValue )
 	  else
 	    dstr = RubyDStrNode.s( [ head, tail ] )
@@ -758,10 +758,10 @@ module MagRp # {
 
     def logop(cls, left, right )
       left = value_expr(left)
-      if left and left.class.equal?(cls) and not left.paren then
+      if left and left.class._equal?(cls) and not left.paren then
 	node = left
 	second = nil
-	while (second = node.secondNode) && second.class.equal?(cls) and not second.paren 
+	while (second = node.secondNode) && second.class._equal?(cls) and not second.paren 
 	  node = second
 	end
 	node.secondNode=( cls.s( second, right ) )
@@ -773,7 +773,7 @@ module MagRp # {
     def new_aref( val, vofs )
       # used from    | primary_value "[" aref_args tRBRACK
       v_two = val[vofs + 2]  # the aref_args , an arguments list
-      if v_two.equal?(nil)
+      if v_two._equal?(nil)
 	v_two = RubyRpCallArgs._new
       end
       res = RubyCallNode.s( val[vofs ], :"[]" , v_two )
@@ -799,7 +799,7 @@ module MagRp # {
 	r_else = val[vofs + 2]
 	result = RubyRescueNode.s( r_body, rescuebody, r_else) # s(:rescue )
 	result.src_offset=( rescuebody.src_offset )
-      elsif not (v_two = val[vofs + 2]).equal?(nil) then
+      elsif not (v_two = val[vofs + 2])._equal?(nil) then
 	lnum = self.line_for_offset( @lexer.last_else_src_offset )
 	warning("else without rescue is useless, near line #{lnum} ")
 	result = block_append(result, v_two)  # may create a new :block
@@ -814,18 +814,18 @@ module MagRp # {
 
     def new_fcall( sel_tok , arg)
       # receiver is self
-      if arg.equal?(nil)
+      if arg._equal?(nil)
 	#  args ||= s(:arglist) , i.e. zero args
 	return new_vcall(RubySelfNode._new, sel_tok)
       end
       arg_cls = arg.class
-      if arg_cls.equal?(RubyRpCallArgs)
+      if arg_cls._equal?(RubyRpCallArgs)
 	lst = arg.list
-	if lst.size.equal?(0)
+	if lst.size._equal?(0)
 	  return new_vcall(RubySelfNode._new, sel_tok)
 	end
 	result = RubyFCallNode.s( sel_tok.symval, arg ) # s(:vcall )
-      elsif arg_cls.equal?( RubyBlockPassNode )
+      elsif arg_cls._equal?( RubyBlockPassNode )
 	result = RubyFCallNode.s( sel_tok.symval , nil) # s(:vcall )
 	result.iter=( arg )
       else
@@ -848,18 +848,18 @@ module MagRp # {
       # used where rp202 had   new_call(r,sel,v[n]) without explicit s(:arglist, v)
       # convert arg list to a RubyRpCallArgs for hasRestArg AST->IR phase
       # generate VCallNode if possible, else FCallNode, else CallNode
-      if arg.equal?(nil)
+      if arg._equal?(nil)
 	#  args ||= s(:arglist) , i.e. zero args
 	return new_vcall(recv, sel_tok)       # DONE
       end
       arg_cls = arg.class
-      if arg_cls.equal?(RubyRpCallArgs)
+      if arg_cls._equal?(RubyRpCallArgs)
 	if arg.is_empty
 	  return new_vcall(recv, sel_tok)     # DONE
 	end
 	cArgs = arg
-      elsif arg_cls.equal?( RubyBlockPassNode )
-	if recv.class.equal?( RubySelfNode )
+      elsif arg_cls._equal?( RubyBlockPassNode )
+	if recv.class._equal?( RubySelfNode )
 	  result = RubyFCallNode.s( recv , sel_tok.symval , nil ) # s(:fcall)
 	else
 	  result = RubyCallNode.s( recv, sel_tok.symval , nil )  # s(:call )
@@ -871,7 +871,7 @@ module MagRp # {
 	cArgs = RubyRpCallArgs._new
 	cArgs.list=( [ arg ] ) 
       end
-      if recv.class.equal?( RubySelfNode )
+      if recv.class._equal?( RubySelfNode )
 	result = RubyFCallNode.s( recv , sel_tok.symval , cArgs ) # s(:fcall)
       else
 	result = RubyCallNode.s( recv, sel_tok.symval , cArgs )  # s(:call )
@@ -883,14 +883,14 @@ module MagRp # {
     def new_call_1(recv, sel_tok , argone)
       # used where  rp202 had  new_call(r,sel, s(:arglist, argone))
       #   argone should never be a RubyBlockPassNode 
-      if argone.equal?(nil)
+      if argone._equal?(nil)
 	raise_error("new_call_1 unexpected nil arg")
 	cArgs = nil
       else
 	cArgs = RubyRpCallArgs._new  # s(:array )
 	cArgs.list=( [ argone ] ) 
       end
-      if recv.class.equal?( RubySelfNode )
+      if recv.class._equal?( RubySelfNode )
 	result = RubyFCallNode.s( recv , sel_tok.symval , cArgs ) # s(:fcall)
       else
 	result = RubyCallNode.s( recv, sel_tok.symval , cArgs )  # s(:call )
@@ -914,7 +914,7 @@ module MagRp # {
       superclass = val[vofs + 2]
       body = val[vofs + 4]             
       k_end = val[vofs + 5]
-      if k_end.equal?( :tEOF )
+      if k_end._equal?( :tEOF )
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	line = self.line_for(path)
 	msg << ", for   class    near line #{line} \n"
@@ -947,7 +947,7 @@ module MagRp # {
       args = val[vofs + 3]
       body = val[vofs + 4]
       k_end = val[vofs + 5]   # yacc_value for kEND synthesized EOF
-      if k_end.equal?( :tEOF )
+      if k_end._equal?( :tEOF )
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	msg << ", for   def   near line #{def_tok.line} "
 	msg << self.last_closed_def_message
@@ -957,9 +957,9 @@ module MagRp # {
       # body ||= s(:nil)
       # body ||= s(:block)
       # body = s(:block, body) unless body.first == :block 
-      if body.equal?(nil)
+      if body._equal?(nil)
 	body = RubyBlockNode._new
-      elsif body.class.equal?(RubyBlockNode)
+      elsif body.class._equal?(RubyBlockNode)
 	# ok
       else
 	body = RubyBlockNode.s( [ body ] )  # s(:block, body) 
@@ -984,7 +984,7 @@ module MagRp # {
       args = val[vofs + 6]
       body = val[vofs + 7]
       k_end = val[vofs + 8]   # yacc_value for kEND synthesized EOF
-      if k_end.equal?( :tEOF )
+      if k_end._equal?( :tEOF )
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	line = self.line_for(name_tok)
 	msg << ", for   def    near line #{line} "
@@ -994,9 +994,9 @@ module MagRp # {
 
       #body ||= s(:block)
       #body = s(:block, body) unless body.first == :block  
-      if body.equal?(nil)
+      if body._equal?(nil)
 	body = RubyBlockNode.s( [] )
-      elsif body.class.equal?(RubyBlockNode)
+      elsif body.class._equal?(RubyBlockNode)
 	# ok
       else
 	body = RubyBlockNode.s( [ body ] )  # s(:block, body)
@@ -1024,7 +1024,7 @@ module MagRp # {
       # c, t, f = c.last, f, t if c[0] == :not
       # s(:if, c, t, f)
       c = carg.as_cond(self)
-      if c.class.equal?(RubyNotNode)
+      if c.class._equal?(RubyNotNode)
 	res = RubyIfNode.s( c.conditionNode, f, t)  # s(:if )
       else
 	res = RubyIfNode.s( c, t, f)  # s(:if )
@@ -1033,7 +1033,7 @@ module MagRp # {
     end
 
     def new_iter(args, body)
-      if args.class.equal?( RubyGlobalAsgnNode) 
+      if args.class._equal?( RubyGlobalAsgnNode) 
 	lnum = self.line_for_offset( args.src_offset )
 	msg = 'assignment to global variable not supported as block arg, '
 	msg << "near line #{line} "
@@ -1049,7 +1049,7 @@ module MagRp # {
       else
 	src_line = nil
       end
-      if lhs.equal?(nil)
+      if lhs._equal?(nil)
 	raise_error("lhs is nil in new_parasgn")
       end
       n = RubyParAsgnRpNode.s(lhs, src_line)
@@ -1074,7 +1074,7 @@ module MagRp # {
       path = val[vofs + 1]
       body = val[vofs + 3]
       k_end = val[vofs + 4]   # yacc_value for kEND synthesized EOF
-      if k_end.equal?( :tEOF )
+      if k_end._equal?( :tEOF )
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	line = self.line_for(path)
 	msg << ", for   module    near line #{line} "
@@ -1100,12 +1100,12 @@ module MagRp # {
       new_lhs = lhs.as_accessor 
       arg = arg.kbegin_value
 
-      if asgn_op.equal?(:"||")
+      if asgn_op._equal?(:"||")
 	lhs.node_assign_set_rhs(arg)
 	# s(:op_asgn_or, self.gettable(name), lhs)
 	res = RubyOpAsgnOrNode.s(  new_lhs, lhs )
 	res.src_offset=( asgn_sel_tok.src_offset )
-      elsif asgn_op.equal?(:"&&")
+      elsif asgn_op._equal?(:"&&")
 	lhs.node_assign_set_rhs(arg)
 	# s(:op_asgn_and, self.gettable(name), lhs)
 	res = RubyOpAsgnAndNode.s( new_lhs, lhs )
@@ -1133,19 +1133,19 @@ module MagRp # {
       while opt_idx < opt_len
 	ch = options[opt_idx]
 	if ch <= ?n 
-	  if ch.equal?( ?i) ; o = o | IGNORECASE
-	  elsif ch.equal?( ?m) ; o = o | MULTILINE
-	  elsif ch.equal?( ?n) ; encod = ENC_NONE
-	  elsif ch.equal?( ?e) ; encod = ENC_EUC 
+	  if ch._equal?( ?i) ; o = o | IGNORECASE
+	  elsif ch._equal?( ?m) ; o = o | MULTILINE
+	  elsif ch._equal?( ?n) ; encod = ENC_NONE
+	  elsif ch._equal?( ?e) ; encod = ENC_EUC 
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
 	    raise "unknown regexp option: #{err_str}" 
 	  end 
 	else 
-	  if ch.equal?( ?x ) ; o = o | EXTENDED  
-	  elsif ch.equal?( ?o) ; o = o | ONCE ; have_once = true;
-	  elsif ch.equal?( ?s) ; encod = ENC_SJIS
-	  elsif ch.equal?( ?u) ; encod = ENC_UTF8
+	  if ch._equal?( ?x ) ; o = o | EXTENDED  
+	  elsif ch._equal?( ?o) ; o = o | ONCE ; have_once = true;
+	  elsif ch._equal?( ?s) ; encod = ENC_SJIS
+	  elsif ch._equal?( ?u) ; encod = ENC_UTF8
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
 	    raise "unknown regexp option: #{err_str}" 
@@ -1156,7 +1156,7 @@ module MagRp # {
       o = o | encod
       argnode = val[vofs + 1]
       arg_cls = argnode.class
-      if  arg_cls.equal?(RubyStrNode) 
+      if  arg_cls._equal?(RubyStrNode) 
 	# simple regexp, don't care about have_once because no substitutions
 	node = nil
 	begin
@@ -1171,13 +1171,13 @@ module MagRp # {
 	end
 	return node
       end
-      if argnode.equal?(nil)
+      if argnode._equal?(nil)
 	rxlit = Regexp.__new('', o, nil)
 	node = RubyRegexpNode.s(rxlit)
 	return node
       end
       node = have_once ? RubyDRegexpOnceNode._new : RubyDRegexpNode._new
-      if arg_cls.equal?(RubyDStrNode) # when :dstr 
+      if arg_cls._equal?(RubyDStrNode) # when :dstr 
 	node.list=( argnode.list )
       else
 	d_list = [ RubyStrNode.s(''), argnode ]
@@ -1195,7 +1195,7 @@ module MagRp # {
       in_single = val[vofs + 5]
       body = val[vofs + 6]
       k_end = val[vofs + 7]   # yacc_value for kEND synthesized EOF
-      if k_end.equal?( :tEOF )
+      if k_end._equal?( :tEOF )
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	msg << ", for   class   near line #{def_tok.line} "
 	msg << self.last_closed_def_message
@@ -1217,13 +1217,13 @@ module MagRp # {
       args = val[vofs + 1]
       aryCls = RubyRpCallArgs 
       arg_cls = args.class
-      if args.equal?(nil)
+      if args._equal?(nil)
 	# maybe this should be zsuper ??, but that's not what rp202 does
 	res = RubySuperNode.s( aryCls._new  )
-      elsif arg_cls.equal?(RubyBlockPassNode) # args[0] == :block_pass then
+      elsif arg_cls._equal?(RubyBlockPassNode) # args[0] == :block_pass then
 	res = RubySuperNode.s( aryCls._new  )
 	res.iter=(args)
-      elsif arg_cls.equal?(aryCls)
+      elsif arg_cls._equal?(aryCls)
 	res = RubySuperNode.s( args )
       else
 	raise_error("new_super, invalid args")
@@ -1251,7 +1251,7 @@ module MagRp # {
 
     def new_until(block, expr)
       # expr = (expr.first == :not ? expr.last : s(:not, expr))
-      if expr.class.equal?(RubyNotNode)
+      if expr.class._equal?(RubyNotNode)
 	expr = expr.conditionNode
       else
 	expr = RubyNotNode.s(expr)
@@ -1261,7 +1261,7 @@ module MagRp # {
 
     def premature_eof( name_tok )
       msg = 'syntax error, unexpected $end, expecting kEND'
-      if name_tok.class.equal?(RpNameToken)
+      if name_tok.class._equal?(RpNameToken)
         line = self.line_for(name_tok)
         msg << ", for   #{name_tok.symval} near line #{line}, "
       end
@@ -1272,7 +1272,7 @@ module MagRp # {
     def new_while( block, expr)
       preBool= true  # argument value from .y was always true
       # block, pre = block.last, false if block && block[0] == :begin
-      if block.class.equal?(RubyKBeginNode)
+      if block.class._equal?(RubyKBeginNode)
 	block = block.kbegin_value
 	preBool = false
       end
@@ -1283,7 +1283,7 @@ module MagRp # {
       #         else
       #           s(:while, expr, block, pre)
       #         end
-      if expr.class.equal?(RubyNotNode) 
+      if expr.class._equal?(RubyNotNode) 
 	result = RubyUntilNode.s( expr.conditionNode, block, preBool)
       else
 	result = RubyWhileNode.s(expr, block, preBool)
@@ -1292,14 +1292,14 @@ module MagRp # {
     end
 
     def new_xstring( str)
-      if str.equal?(nil)
+      if str._equal?(nil)
 	res = RubyXStrNode.s( '' )
       else
 	# might need become on this path ???
 	knd = str.str_dstr_evstr_kind
-	if knd.equal?(0) # when :str
+	if knd._equal?(0) # when :str
 	  res = RubyXStrNode.s( str.strNodeValue ) # str[0] = :xstr
-	elsif knd.equal?(1) #  when :dstr
+	elsif knd._equal?(1) #  when :dstr
 	  res = RubyDXStrNode._new 
 	  res.list=( str.list )
 	else
@@ -1313,14 +1313,14 @@ module MagRp # {
     def new_yield(args )
       args_cls = args.class
     
-      if args.equal?(nil)
+      if args._equal?(nil)
 	#  args ||= s(:arglist) , i.e. zero args
 	cArgs = RubyRpCallArgs._new #  list left as nil 
       else
 	args_cls = args.class
-	if args_cls.equal?(RubyRpCallArgs)
+	if args_cls._equal?(RubyRpCallArgs)
 	  cArgs = args.as_yield_args
-	elsif args_cls.equal?(RubyBlockPassNode)
+	elsif args_cls._equal?(RubyBlockPassNode)
 	  raise SyntaxError, "Block argument should not be given." 
 	else
 	  raise_error("new_yield, unregognized args")
@@ -1355,7 +1355,7 @@ module MagRp # {
       #  lhs << rhs
 
       new_lhs = lhs.node_assign_set_rhs(rhs)  # may raise error
-      unless new_lhs.equal?(lhs)
+      unless new_lhs._equal?(lhs)
 	# :const to :cdecl conversion, or similar
 	new_lhs._become(lhs) 
       end
@@ -1393,7 +1393,7 @@ module MagRp # {
 	raise SyntaxError, "block argument should not be given"
       end
       lst = node.list
-      if lst.size.equal?(1)
+      if lst.size._equal?(1)
 	node = lst[0]
       end
       node
@@ -1439,7 +1439,7 @@ module MagRp # {
       unless str._isString
         raise_error('expected value to be a String')
       end
-      if str.size.equal?(0)
+      if str.size._equal?(0)
         yyerror( 'empty symbol literal' )
       end
       if str.__index(0, 0)._not_equal?(nil)

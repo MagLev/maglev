@@ -289,7 +289,7 @@ module RubyToken
     end
     TkSymbol2Token[token_n.intern] = token_c
 
-    if (cxx = token_c <= (tyy = TkOp))
+    if token_c <= TkOp
       token_c.class_eval %{
         def self.op_name; "#{reading}"; end
       }

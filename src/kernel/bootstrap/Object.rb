@@ -72,11 +72,12 @@ class Object
     primitive 'object_id', 'asOop'
     primitive '__id__' , 'asOop'
 
-    #  not   is a special selector,
-    #   GsComSelectorLeaf>>selector:  translates #not to bytecode Bc_rubyNOT
-    # primitive 'not'
-
     primitive 'nil?' , '_rubyNilQ'
+
+    # compiler translates ! and  not   tokens to  _not 
+    def not
+      self._not # _not is a special send compiled direct to a bytecode
+    end
 
     # rubySend: methods implemented in .mcz
     primitive_nobridge_env 'send',  '__rubySend', ':'
@@ -146,12 +147,13 @@ class Object
     # be used in limited cases when initializing transient state .
     primitive '__set_nostubbing', '_setNoStubbing'
 
-    # install this prim so  anObj.send(:kind_of?, aCls)   will work
-    primitive_nobridge 'kind_of?' , '_rubyKindOf:'
+    def kind_of?(amodule)
+      self._kind_of?(amodule)  # _kind_of? is a special send compiled direct to a bytecode
+    end
 
-    # install this prim so  anObj.send(:is_a?, aCls)   will work
-    # Reimplementation of is_a?  is disallowed, it is compiled direct to a bytecode
-    primitive_nobridge 'is_a?' , '_rubyKindOf:'
+    def is_a?(amodule)
+      self._is_a?(amodule) # _is_a? is a special send compiled direct to a bytecode
+    end 
 
     primitive_nobridge '__responds_to', '_respondsTo:private:flags:'
        # _responds_to flags bit masks are
@@ -172,7 +174,7 @@ class Object
       # runtime support for   x = *y   , invoked from generated code
       a = self
       unless a._isArray
-        if a.equal?(nil)
+        if a._equal?(nil)
           return a
         end
         a = a.__splat_lasgn_value_coerce
@@ -180,7 +182,7 @@ class Object
       if a._isArray
         sz = a.length
         if sz < 2
-    if sz.equal?(0)
+    if sz._equal?(0)
       return nil
     else
       return a[0]
@@ -219,15 +221,15 @@ class Object
     def __splat_return_value
       # runtime support for  return *v  , invoked from generated code
       v = Type.coerce_to_or_nil(self, Array, :to_ary)
-      if v.equal?(nil)
+      if v._equal?(nil)
         v = Type.coerce_to_or_nil(self, Array, :to_a)
-        if v.equal?(nil)
+        if v._equal?(nil)
           v = self
         end
       end
       sz = v.length
       if sz < 2
-      if sz.equal?(0)
+      if sz._equal?(0)
         return nil
       else
         return v[0]
@@ -296,11 +298,9 @@ class Object
     # Attempts to reimplement  block_given? outside of bootstrap code
     #    will fail with a compile error.
 
-    # equal?  is implemented by the ruby parser and optimized to
-    #  a special bytecode by the code generator.
-    # Attempts to reimplement equal? will fail with a compile error.
-
-    primitive_nobridge 'equal?', '_rubyEqualQ:'    # so send will work
+    def equal?(anobject)
+      self._equal?(anobject) # _equal? is a special send compiled direct to a bytecode
+    end
 
     # _not_equal? is implemented by the ruby parser and optimized to
     #  a special bytecode by the code generator.
@@ -348,7 +348,7 @@ class Object
 
     def instance_of?(cls)
       # Modified from RUBINIUS
-      if self.class.equal?(cls)
+      if self.class._equal?(cls)
         true
       else
         unless cls.__isBehavior
@@ -513,7 +513,7 @@ end
 # user and the user not passing anything for a defaulted value.  E.g.,:
 #
 #   def foo(required_param, optional_param=Undefined)
-#     if optional_param.equal?( Undefined )
+#     if optional_param._equal?( Undefined )
 #       puts "User did not pass a value"
 #     else
 #       puts "Users passed #{optional_param} (which may be nil)"

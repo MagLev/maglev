@@ -4,7 +4,7 @@ undefine(`len')
  
   while true # [
     if act >= 0
-      # if act.equal?(0)   # check not needed
+      # if act._equal?(0)   # check not needed
       #   raise_error("_racc_evalact, unexpected act==0")
       # end
       if act._not_equal?(Racc_shift_n)
@@ -14,7 +14,7 @@ ifdef(`PARSER_DEBUG', `
         @counts_array[7] += 1 # evalact_shift
 ')
 	if cracc_error_status > 0
-	  unless cracc_t.equal?( 1 )  # error token
+	  unless cracc_t._equal?( 1 )  # error token
             cracc_error_status -= 1
 	    @racc_error_status = cracc_error_status
 	  end
@@ -41,7 +41,7 @@ ifdef(`PARSER_DEBUG', `
 	# method_id = creduce_table[i+2]
 	sel = creduce_table[i+2]
 
-	if sel.equal?( :_reduce_noneOne )
+	if sel._equal?( :_reduce_noneOne )
 	  # optimization - no net change to vstack
 	  # state[-len, len]  = void_array
 	  state.size=( state.size - len )
@@ -89,7 +89,7 @@ ifdef(`PARSER_DEBUG', `
 	  i += state[-1]
           #  _validate_goto_tables has ensured that
           #  for any non-nil @goto_check[i] , @goto_table[i] is also non-nil
-	  if i >= 0 and cgoto_check[i].equal?( k1 )
+	  if i >= 0 and cgoto_check[i]._equal?( k1 )
 ifdef(`PARSER_DEBUG', `
 	    @counts_array[10] += 1 # evalact_gotoA
 ')
@@ -107,18 +107,18 @@ ifdef(`PARSER_DEBUG', `
 	  cracc_state.push( cgoto_default[k1] )
 	end
 # end inline _racc_do_reduce ]
-      elsif act.equal?( Racc_reduce_n_negated )
+      elsif act._equal?( Racc_reduce_n_negated )
         # error
         #
-	if cracc_t.equal?( 0)   # is EOF
+	if cracc_t._equal?( 0)   # is EOF
 	  throw( :racc_end_parse, nil )
 	end
-        if cracc_error_status.equal?(0)
+        if cracc_error_status._equal?(0)
           unless @racc_user_yyerror # unless arg[21]    # user_yyerror
             @save_last_len = nil
             on_error( cracc_t, cracc_val, vstack )
           end
-        elsif cracc_error_status.equal?(3)
+        elsif cracc_error_status._equal?(3)
           cracc_read_next = true
         end
         @racc_user_yyerror = false
@@ -128,7 +128,7 @@ ifdef(`PARSER_DEBUG', `
             i += 1   # error token
             if  i >= 0 and
                 (act = caction_table[i]) and
-                caction_check[i].equal?( cracc_state[-1] )  # comparing 2 fixnums
+                caction_check[i]._equal?( cracc_state[-1] )  # comparing 2 fixnums
               break
             end
           end

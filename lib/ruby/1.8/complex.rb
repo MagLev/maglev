@@ -90,7 +90,7 @@ end
 # <tt>a+bi</tt>.
 #
 def Complex(a, b = 0)
-  if b == 0 and (a.kind_of?(Complex) or defined? Complex::Unify)
+  if b == 0 and (a._kind_of?(Complex) or defined? Complex::Unify)
     a
   else
     Complex.new( a.real-b.imag, a.imag+b.real )
@@ -108,7 +108,7 @@ class Complex < Numeric
   def Complex.generic?(other) # :nodoc:
     other._isInteger or
     other._isFloat or
-    (defined?(Rational) and other.kind_of?(Rational))
+    (defined?(Rational) and other._kind_of?(Rational))
   end
 
   #
@@ -127,9 +127,9 @@ class Complex < Numeric
 
   def initialize(a, b)
     raise TypeError, "non numeric 1st arg `#{a.inspect}'" if !a._isNumeric
-    raise TypeError, "`#{a.inspect}' for 1st arg" if a.kind_of? Complex
+    raise TypeError, "`#{a.inspect}' for 1st arg" if a._kind_of? Complex
     raise TypeError, "non numeric 2nd arg `#{b.inspect}'" if !b._isNumeric
-    raise TypeError, "`#{b.inspect}' for 2nd arg" if b.kind_of? Complex
+    raise TypeError, "`#{b.inspect}' for 2nd arg" if b._kind_of? Complex
     @real = a
     @image = b
   end
@@ -138,7 +138,7 @@ class Complex < Numeric
   # Addition with real or complex number.
   #
   def + (other)
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       re = @real + other.real
       im = @image + other.image
       Complex(re, im)
@@ -154,7 +154,7 @@ class Complex < Numeric
   # Subtraction with real or complex number.
   #
   def - (other)
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       re = @real - other.real
       im = @image - other.image
       Complex(re, im)
@@ -170,7 +170,7 @@ class Complex < Numeric
   # Multiplication with real or complex number.
   #
   def * (other)
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       re = @real*other.real - @image*other.image
       im = @real*other.image + @image*other.real
       Complex(re, im)
@@ -186,7 +186,7 @@ class Complex < Numeric
   # Division by real or complex number.
   #
   def / (other)
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       self*other.conjugate/other.abs2
     elsif Complex.generic?(other)
       Complex(@real/other, @image/other)
@@ -203,7 +203,7 @@ class Complex < Numeric
     if other == 0
       return Complex(1)
     end
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       r, theta = polar
       ore = other.real
       oim = other.image
@@ -245,7 +245,7 @@ class Complex < Numeric
   # Remainder after division by a real or complex number.
   #
   def % (other)
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       Complex(@real % other.real, @image % other.image)
     elsif Complex.generic?(other)
       Complex(@real % other, @image % other)
@@ -319,7 +319,7 @@ class Complex < Numeric
   # Test for numerical equality (<tt>a == a + 0<i>i</i></tt>).
   #
   def == (other)
-    if other.kind_of?(Complex)
+    if other._kind_of?(Complex)
       @real == other.real and @image == other.image
     elsif Complex.generic?(other)
       @real == other and @image == 0
@@ -409,7 +409,7 @@ class Complex < Numeric
   #
   def to_s
     if @real != 0
-      if defined?(Rational) and @image.kind_of?(Rational) and @image.denominator != 1
+      if defined?(Rational) and @image._kind_of?(Rational) and @image.denominator != 1
 	if @image >= 0
 	  @real.to_s+"+("+@image.to_s+")i"
 	else
@@ -423,7 +423,7 @@ class Complex < Numeric
 	end
       end
     else
-      if defined?(Rational) and @image.kind_of?(Rational) and @image.denominator != 1
+      if defined?(Rational) and @image._kind_of?(Rational) and @image.denominator != 1
 	"("+@image.to_s+")i"
       else
 	@image.to_s+"i"

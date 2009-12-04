@@ -55,61 +55,61 @@ module Marshal
     def construct(ivar_index = nil, call_proc = true) # [
       type = consume_byte
 
-      if type.equal?(TYPE_NIL_ch)
+      if type._equal?(TYPE_NIL_ch)
         obj = nil
-      elsif type.equal?( TYPE_TRUE_ch )
+      elsif type._equal?( TYPE_TRUE_ch )
         obj = true
-      elsif type.equal?( TYPE_FALSE_ch )
+      elsif type._equal?( TYPE_FALSE_ch )
         obj = false
-      elsif type.equal?( TYPE_FIXNUM_ch )
+      elsif type._equal?( TYPE_FIXNUM_ch )
         obj = construct_integer
-      elsif type.equal?( TYPE_LINK_ch )
+      elsif type._equal?( TYPE_LINK_ch )
         num = construct_integer
         obj = @objs_input_arr[num]
-        raise ArgumentError, "dump format error (unlinked)" if obj.equal?(nil)
+        raise ArgumentError, "dump format error (unlinked)" if obj._equal?(nil)
         return obj
-      elsif type.equal?( TYPE_SYMLINK_ch )
+      elsif type._equal?( TYPE_SYMLINK_ch )
         num = construct_integer
         obj = @syms_input_arr[num]
-        raise ArgumentError, "dump format error (symbol unlinked)" if obj.equal?(nil)
+        raise ArgumentError, "dump format error (symbol unlinked)" if obj._equal?(nil)
         return obj
-      elsif type.equal?( TYPE_STRING_ch)
+      elsif type._equal?( TYPE_STRING_ch)
         obj = construct_string
         call obj if call_proc
-      elsif type.equal?( TYPE_ARRAY_ch )
+      elsif type._equal?( TYPE_ARRAY_ch )
         obj = construct_array
         call obj if call_proc
-      elsif type.equal?( TYPE_SYMBOL_ch )
+      elsif type._equal?( TYPE_SYMBOL_ch )
         obj = construct_symbol
-      elsif type.equal?( TYPE_FLOAT_ch )
+      elsif type._equal?( TYPE_FLOAT_ch )
         obj = construct_float
-      elsif type.equal?( TYPE_BIGNUM_ch )
+      elsif type._equal?( TYPE_BIGNUM_ch )
         obj = construct_bignum
-      elsif type.equal?( TYPE_CLASS_ch) || type.equal?( TYPE_MODULE_ch)
+      elsif type._equal?( TYPE_CLASS_ch) || type._equal?( TYPE_MODULE_ch)
         name = construct_symbol
         #obj = Object.const_get(name)
         obj = get_scoped_constant(name)
         store_unique_object(obj)
         call obj if call_proc
-      elsif type.equal?( TYPE_REGEXP_ch )
+      elsif type._equal?( TYPE_REGEXP_ch )
         obj = construct_regexp
         call obj if call_proc
-      elsif type.equal?( TYPE_HASH_ch) || type.equal?( TYPE_HASH_DEF_ch)
+      elsif type._equal?( TYPE_HASH_ch) || type._equal?( TYPE_HASH_DEF_ch)
         obj = construct_hash(type)
         call obj if call_proc
-      elsif type.equal?( TYPE_STRUCT_ch )
+      elsif type._equal?( TYPE_STRUCT_ch )
         obj = construct_struct
         call obj if call_proc
-      elsif type.equal?( TYPE_OBJECT_ch )
+      elsif type._equal?( TYPE_OBJECT_ch )
         obj = construct_object
         call obj if call_proc
-      elsif type.equal?( TYPE_USERDEF_ch )
+      elsif type._equal?( TYPE_USERDEF_ch )
         obj = construct_user_defined ivar_index
         call obj if call_proc
-      elsif type.equal?( TYPE_USRMARSHAL_ch )
+      elsif type._equal?( TYPE_USRMARSHAL_ch )
         obj = construct_user_marshal
         call obj if call_proc
-      elsif type.equal?( TYPE_EXTENDED_ch )
+      elsif type._equal?( TYPE_EXTENDED_ch )
         @modules ||= []
         name = get_symbol
         # @modules << Object.const_get(name)
@@ -118,13 +118,13 @@ module Marshal
         extend_object( obj)
         call obj if call_proc
 
-      elsif type.equal?( TYPE_UCLASS_ch )
+      elsif type._equal?( TYPE_UCLASS_ch )
         name = get_symbol
         @user_class = name
         obj = construct( nil, false)
         call obj if call_proc
 
-      elsif type.equal?( TYPE_IVAR_ch )
+      elsif type._equal?( TYPE_IVAR_ch )
         ivar_index = @has_ivar.length
         @has_ivar.push(true)
         obj = construct(ivar_index, false)
@@ -164,7 +164,7 @@ module Marshal
     def construct_float
       s = get_byte_sequence
       last_ch = s[-1]
-      if last_ch.equal?( ?n ) || last_ch.equal?( ?f )
+      if last_ch._equal?( ?n ) || last_ch._equal?( ?f )
         if s == "nan"
           obj = 0.0.__divide(0.0)
         elsif s == "inf"
@@ -190,7 +190,7 @@ module Marshal
         obj[key] = val
       end
 
-      obj.default = construct if type.equal?( TYPE_HASH_DEF_ch)
+      obj.default = construct if type._equal?( TYPE_HASH_DEF_ch)
 
       obj
     end
@@ -356,7 +356,7 @@ module Marshal
       # returns an Array of Symbols
       h = MAGLEV_MARSHAL_CLASS_CACHE
       arr = h[a_class]
-      if arr.equal?(nil)
+      if arr._equal?(nil)
         #        arr = a_class.ancestor_modules_names - ['Enumerable']
         arr = []
         sup = obj.class.superclass
@@ -370,7 +370,7 @@ module Marshal
 #      sup = obj.metaclass.superclass
       sup = obj.class.superclass
 #     while sup and [Module].include? sup.class do
-      while sup and sup.class.equal?( Module ) do
+      while sup and sup.class._equal?( Module ) do
         names << sup.name
         sup = sup.superclass
       end
@@ -399,11 +399,11 @@ module Marshal
 
     def get_symbol
       type = consume_byte
-      if type.equal?(TYPE_SYMBOL_ch)
+      if type._equal?(TYPE_SYMBOL_ch)
         @call = false
         obj = construct_symbol
         @call = true
-      elsif type.equal?(TYPE_SYMLINK_ch)
+      elsif type._equal?(TYPE_SYMLINK_ch)
         num = construct_integer
         obj = @syms_input_arr[num]
       else
@@ -417,13 +417,13 @@ module Marshal
     end
 
     def serialize(obj)
-      raise ArgumentError, "exceed depth limit" if @depth.equal?(0)
+      raise ArgumentError, "exceed depth limit" if @depth._equal?(0)
 
       if obj.__isSpecial
         str = obj.to_marshal(self)
       elsif obj._isSymbol
         idx = @syms_dict[obj]
-        if idx.equal?(nil)
+        if idx._equal?(nil)
           add_output_sym(obj)
           str = obj.to_marshal(self)
         else
@@ -432,7 +432,7 @@ module Marshal
         end
       else
         idx = @objs_dict[obj]
-        if idx.equal?(nil)
+        if idx._equal?(nil)
           @depth -= 1;
           if obj.respond_to? :_dump then
             add_output_obj(obj)
@@ -480,7 +480,7 @@ module Marshal
         str << to_byte(n >> 8)
         str << to_byte(n & 0x7fffffff)
       end
-      str.chop! while str[-1].equal?(0)
+      str.chop! while str[-1]._equal?(0)
       str
     end
 
@@ -529,7 +529,7 @@ module Marshal
     end
 
     def serialize_integer(n)
-      if n.equal?(0)
+      if n._equal?(0)
         s = to_byte(n)
       elsif n > 0 and n < 123
         s = to_byte(n + 5)
@@ -542,7 +542,7 @@ module Marshal
           s << to_byte(n)
           n >>= 8
           cnt += 1
-          break if n.equal?(0) or n.equal?(-1)
+          break if n._equal?(0) or n._equal?(-1)
         end
         s[0] = to_byte(n < 0 ? 256 - cnt : cnt)
       end
@@ -550,7 +550,7 @@ module Marshal
     end
 
     def serialize_user_class(obj, cls)
-      if obj.class.equal?(cls)
+      if obj.class._equal?(cls)
         ''
       else
         TYPE_UCLASS + serialize(obj.class.name.to_sym)
@@ -608,7 +608,7 @@ module Marshal
   end  # ]
 
   def self.dump(obj, an_io=nil, limit=nil)
-    if limit.equal?(nil)
+    if limit._equal?(nil)
       if an_io._isFixnum
         limit = an_io
         an_io = nil
@@ -616,7 +616,7 @@ module Marshal
         limit = -1
       end
     end
-    if limit.equal?(nil)
+    if limit._equal?(nil)
       depth = -1
     else
       depth = Type.coerce_to(limit, Fixnum, :to_int )

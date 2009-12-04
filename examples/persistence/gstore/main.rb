@@ -5,26 +5,26 @@
 #   * Remove the gstore.db from GStore before each run.
 #   * Do reads and writes
 #   * Different workloads (many readers, a few writers, etc.)
-
 if defined? Maglev
-  # Whereas the MagLev persistence API is not quite ready yet,
-  # and whereas GStore does a commit, which doesn't save the methods,
-  # and whereas we want to run this multiple times,
-  # be it resolved to use load rather than require for maglev...
-  load 'benchmark.rb'
-  load 'gstore.rb'
-
+  Maglev.persistent do
+    # If we are running in MagLev, we need to persist the code for pstore
+    # and gstore.  But, we only need to do it once, so we test for that
+    # case here.
+    require 'pstore' unless defined? PStore
+    require 'gstore' unless defined? GStore
+  end
+  Maglev.commit_transaction
   file = 'gstore.db'
   GStore.rm(file)
   db = GStore.new(file)
 else
-  require 'benchmark'
   require 'pstore'
-
   file = 'pstore.db'
   File.delete(file) if File.exists?(file)
   db = PStore.new(file)
 end
+require 'benchmark'
+
 
 def create_data(db, inner_count=500, outer_count=10)
   samples = Hash.new
@@ -40,7 +40,6 @@ def create_data(db, inner_count=500, outer_count=10)
 end
 
 def verify_samples(db, samples)
-  #puts "Verifying #{samples.length} samples"
   samples.each do |k,v|
     db.transaction { |ps| raise "Bad read data" unless ps[k.to_s] == v }
   end
@@ -65,12 +64,11 @@ def random_reads_and_writes(db, count)
       end
     end
   end
-  #puts "Did #{write_count} writes and #{read_count} reads (#{bytes_read})"
 end
 
 Benchmark.bm do |x|
   samples = nil
   x.report("write") { samples = create_data(db, 2_000, 100) }
   x.report("read ") { verify_samples(db, samples) }
-  x.report("r/w  ") { random_reads_and_writes(db, 1000) }
+  x.report("r/w  ") { random_reads_and_writes(db, 1_000) }
 end

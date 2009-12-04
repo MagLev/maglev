@@ -5,7 +5,7 @@ module MagRp
     def paren
       @paren ||= false
       v = @paren      # @paren is a dynamic IV  
-      if v.equal?(nil)
+      if v._equal?(nil)
         v = false
       end
       v 
