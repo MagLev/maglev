@@ -106,18 +106,6 @@ Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
   If it's not, either reinstall MagLev or correct the first line of
   bin/maglev-gem
 
-* If you get an error like this when running "maglev-gem install sinatra":
-    ERROR:  While executing gem ... (NoMethodError)
-        NoMethodError: undefined method `component_ary' for
-  MagLev may be having a problem parsing your .gemrc.
-  Try removing duplicates from your .gemrc, especially if some have trailing 
-  slashes and some don't. We're currently investigating this further.
-      - http://gemcutter.org
-      - http://gems.rubyforge.org/
-      - http://gems.github.com
-      - http://gemcutter.org/
-      - http://gems.rubyforge.org
-
 * If you get a "NoMethodError" such as the following:
         Coercion error: nil.to_str => String failed:
     (NoMethodError: undefined method `to_str' for )
