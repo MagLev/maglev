@@ -423,8 +423,31 @@ class BHash < Hash
   def initialize
     # don't call super
   end
+  def self.testLarge
+    # ensure rebuildTable: tested in presense of nil keys
+    h = self.new
+    n = 0
+    h[nil] = :nilValue
+    while n < 1000
+      h[n] = n * 10 
+      h[n.to_s] = 0 - n 
+      n += 1
+    end
+    unless h.size == 2001 ; raise 'error'; end
+    n = 0
+    unless (x = h[nil])._equal?( :nilValue)  ; raise 'error'; end
+    while n < 1000
+      unless (x = h[n]) == n * 10   ; raise 'error'; end
+      unless (x = h[n.to_s]) == 0 - n   ; raise 'error'; end
+      n += 1
+    end
+    h
+    unless h.size == 2001 ; raise 'error'; end
+  end
 end
 bh = BHash.new
 bh['foo']
+
+BHash.testLarge
 
 report
