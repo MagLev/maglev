@@ -75,7 +75,7 @@ do
             exit
             ;;
         v)
-            grep ^maglev $MAGLEV_HOME/version.txt
+            echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             exit
             ;;
         ?)
@@ -236,7 +236,7 @@ status() {
 }
 
 version() {
-  grep ^maglev $MAGLEV_HOME/version.txt
+  echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
 }
 
 topaz() {

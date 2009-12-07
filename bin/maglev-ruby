@@ -172,11 +172,11 @@ do
             shift
             ;;
         -v|--verbose)
-            grep ^maglev $MAGLEV_HOME/version.txt
+            echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             if [ $# -eq 1 ]; then exit; fi
             ;;
         --version)
-            grep ^maglev $MAGLEV_HOME/version.txt
+            echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             exit
             ;;
         -w)
