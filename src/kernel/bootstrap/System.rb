@@ -163,5 +163,27 @@ module Maglev
     def self.decrement_pcounter(counter, by=1)
       __decrement_pcounter(counter, by)
     end
+
+    # Methods for looking at the size of Temporary Object Space (a major
+    # contributer to the VM memory footprint)
+
+    # Returns the approximate number of bytes of temporary object memory
+    # being used to store objects.
+    class_primitive 'temp_obj_space_used', '_tempObjSpaceUsed'
+
+    # Returns the approximate maximum number of bytes of temporary object
+    # memory which is usable for storing objects.
+    class_primitive 'temp_obj_space_max', '_tempObjSpaceMax'
+
+    # Returns the approximate percentage of temporary object memory which
+    # is in use to store temporary objects.  This is equivalent to the
+    # expression:
+    #
+    #    (System.temp_obj_space_used * 100) / (System.temp_obj_space_max)
+    #
+    # Note that it is possible for the result to be slightly greater than
+    # 100%. This result indicates temporary memory is almost completely
+    # full.
+    class_primitive 'temp_obj_space_percent_used', '_tempObjSpacePercentUsed'
   end
 end
