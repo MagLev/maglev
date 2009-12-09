@@ -15,14 +15,14 @@ class String
   class_primitive_nobridge '__alloc', '_basicNew'
 
   def self.new(str)
-    if self._equal?(String) 
+    if self._equal?(String)
       if str._isString
         s = __withAll(str)
       else
         s = __alloc
         str = Type.coerce_to(str, String, :to_str)
-        s.replace(str) 
-      end      
+        s.replace(str)
+      end
     else
       s = __alloc
     end
@@ -76,21 +76,21 @@ class String
       raise ArgumentError , 'arg must be positive'
     end
     str = self.class.new
-    if n >= 64 
+    if n >= 64
       # optimization to reduce number of iterations for large n
-      kstr = self.class.new 
+      kstr = self.class.new
       kstr << self
       k = 1
       klim = n.__divide(16)
       # grow kstr to max of ( 1/16 of result size , 16K bytes)
-      while k < klim && kstr.length < 8000 
-        kstr << kstr 
+      while k < klim && kstr.length < 8000
+        kstr << kstr
         k = k * 2
       end
       while n > k
         str << kstr
         n -= k
-      end   
+      end
     end
     while n > 0
       str << self
@@ -156,8 +156,8 @@ class String
   end
 
   primitive_env '==',   '_rubyEqual' , ':'
-  #  primitive assumes   nil.respond_to?(:to_str) == false  
-  #  primitive assumes   a_symbol.respond_to?(:to_str) == false  
+  #  primitive assumes   nil.respond_to?(:to_str) == false
+  #  primitive assumes   a_symbol.respond_to?(:to_str) == false
 
   primitive_env '===',   '_rubyEqual' , ':'   # === same as == for String
 
@@ -202,7 +202,7 @@ class String
     elsif other._isString
       raise TypeError, 'String given'
     else
-      other =~ self 
+      other =~ self
     end
   end
 
@@ -213,10 +213,10 @@ class String
 
   primitive_nobridge_env '[]' , '_rubyAt', ':'
   primitive_nobridge_env '__at' , '_rubyAt', ':'
- 
+
   def __prim_at_failed(index)
     # invoked from prim failure code in _rubyAt<env>:
-    if index._isRange 
+    if index._isRange
       arr = index.__beg_len(self.length)
       if arr._equal?(nil)
         nil
@@ -224,7 +224,7 @@ class String
         self.__at_length( arr[0] , arr[1] )
       end
     elsif index._isInteger
-      raise ArgumentError, 'String#[index] primitive failed' 
+      raise ArgumentError, 'String#[index] primitive failed'
     else
       index = Type.__coerce_to_Fixnum_to_int(index)
       self.__at(index)
@@ -245,13 +245,13 @@ class String
       if start._isFixnum
         if length._isFixnum
           raise ArgumentError, 'String#[start,length] primitive failed'
-        else 
+        else
           length = Type.__coerce_to_Fixnum_to_int(length)
         end
       else
         start = Type.__coerce_to_Fixnum_to_int(start)
         length = Type.coerce_to(length, Fixnum, :to_int)
-      end  
+      end
       # no tainted logic
       return nil if length < 0
       self.__at_length(start, length)
@@ -271,7 +271,7 @@ class String
     # called from Smalltalk
     if value._isFixnum || value._isString
       # ok
-    else 
+    else
       value = Type.__coerce_to_String_to_str( value )
       val_coerced = true
     end
@@ -280,7 +280,7 @@ class String
         raise IndexError, ('String#[index]=, ' + " index #{index} out of range")
       end
       self.__at_put(index, value)
-    elsif index._isRange 
+    elsif index._isRange
       arr = index.__beg_len(self.length)
       if arr._equal?(nil)
         raise IndexError, ('String#[range]=' + "start out of range for range=#{index}")
@@ -323,8 +323,6 @@ class String
     return nil if x == self
     replace(x)
   end
-
-  # primitive '_atEquals', 'at:equals:'
 
   #     str.chomp(separator=$/)   => new_str
   #
@@ -510,38 +508,38 @@ class String
     i = ssize
     if ssize._equal?(0)
       while i < my_size
-	if self[i]._equal?( ?\n )
-	  if self[i+=1]._not_equal?( ?\n )
-	    i += 1
-	    next
-	  end
-	  i += 1 while i < my_size && self[i]._equal?( ?\n )
-	end
+  if self[i]._equal?( ?\n )
+    if self[i+=1]._not_equal?( ?\n )
+      i += 1
+      next
+    end
+    i += 1 while i < my_size && self[i]._equal?( ?\n )
+  end
 
-	if i > 0 && self[i-1]._equal?( newline ) &&
-	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0) )
-	  line = self[last, i-last]
-	  # line.taint if tainted?
-	  yield line
-	  # We don't have a way yet to check if the data was modified...
-	  #modified? id, my_size
-	  last = i
-	end
+  if i > 0 && self[i-1]._equal?( newline ) &&
+      (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0) )
+    line = self[last, i-last]
+    # line.taint if tainted?
+    yield line
+    # We don't have a way yet to check if the data was modified...
+    #modified? id, my_size
+    last = i
+  end
 
-	i += 1
+  i += 1
       end
     else
       while i < my_size
-	if i > 0 && self[i-1]._equal?(newline) &&
-	    (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0))
-	  line = self[last, i-last]
-	  # line.taint if tainted?
-	  yield line
-	  # We don't have a way yet to check if the data was modified...
-	  #modified? id, my_size
-	  last = i
-	end
-	i += 1
+  if i > 0 && self[i-1]._equal?(newline) &&
+      (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0))
+    line = self[last, i-last]
+    # line.taint if tainted?
+    yield line
+    # We don't have a way yet to check if the data was modified...
+    #modified? id, my_size
+    last = i
+  end
+  i += 1
       end
     end
     unless last._equal?(my_size)
@@ -632,10 +630,10 @@ class String
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
       out << str.__to_sub_replacement(match)
-      start = match.end(0) 
+      start = match.end(0)
     end
     out << self.__copyfrom_to(start + 1, self.length)
-    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~ 
+    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
     out
   end
 
@@ -668,12 +666,12 @@ class String
           result << match.post_match
       elsif cap._equal?( ?+ )
           result << match.captures.compact[-1].to_s
-      elsif cap >= ?0 && cap <= ?9 
+      elsif cap >= ?0 && cap <= ?9
           result << match[cap - ?0 ].to_s
       elsif cap._equal?( ?\\ ) # escaped backslash
           result << '\\'
       else     # unknown escape
-          result << '\\' 
+          result << '\\'
           result << cap
       end
       index += 1
@@ -708,10 +706,10 @@ class String
       ensure
         block.__setRubyVcGlobal(0, saveTilde);
       end
-      start = match.end(0) 
+      start = match.end(0)
     end
     out << self.__copyfrom_to(start + 1, self.length)
-    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~ 
+    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
     out
   end
 
@@ -719,7 +717,7 @@ class String
 
   def gsub!(regex, str)
     nval = gsub(regex, str)
-    if self == nval 
+    if self == nval
       nil
     else
       replace(nval)  # replace detects frozen
@@ -740,7 +738,7 @@ class String
       ensure
         block.__setRubyVcGlobal(0, saveTilde);
       end
-      start = match.end(0) 
+      start = match.end(0)
     end
     out << self.__copyfrom_to(start + 1, self.length)
     if self == out
@@ -834,7 +832,7 @@ class String
     string = Type.coerce_to(string, String, :to_str)
     idx = index < 0 ? index + size + 2 : index + 1
     if idx <= 0 || idx > size + 1
-      raise IndexError, "index #{index} out of string" 
+      raise IndexError, "index #{index} out of string"
     end
     __insertall_at(string, idx) # Flip order of parameters
     self
@@ -846,7 +844,7 @@ class String
     if self.size._equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
     end
-    if self.__index(0, 0)._not_equal?(nil) 
+    if self.__index(0, 0)._not_equal?(nil)
       raise ArgumentError, 'symbol string may not contain `\\0\' '
     end
     self.__as_symbol
@@ -882,7 +880,7 @@ class String
     base = arr[0]
     str = arr[1]
     s = base.to_s
-    s << ?r 
+    s << ?r
     s << str
     Integer.__from_string(s)
   end
@@ -927,7 +925,7 @@ class String
     end
     if original_offset._equal?(Undefined)
       was_undef = true
-      zoffset = my_size._equal?(0) ? 0 : my_size 
+      zoffset = my_size._equal?(0) ? 0 : my_size
     else
       zoffset = Type.coerce_to(original_offset, Integer, :to_int)
       zoffset += my_size if zoffset < 0
@@ -940,8 +938,8 @@ class String
       if item.size._equal?(0)
         if was_undef
           return my_size
-        elsif zorig >= my_size 
-          return my_size 
+        elsif zorig >= my_size
+          return my_size
         else
           return zoffset
         end
@@ -1014,7 +1012,7 @@ class String
     if s._equal?(nil)
       return self.class.new
     end
-    s 
+    s
   end
 
   def slice!(arg)
@@ -1052,33 +1050,177 @@ class String
     [m_begin, m_len]
   end
 
+  #  call-seq:
+  #     str.split(pattern=$;, [limit])   => anArray
+  #
+  #  Divides <i>str</i> into substrings based on a delimiter, returning an array
+  #  of these substrings.
+  #
+  #  If <i>pattern</i> is a <code>String</code>, then its contents are used as
+  #  the delimiter when splitting <i>str</i>. If <i>pattern</i> is a single
+  #  space, <i>str</i> is split on whitespace, with leading whitespace and runs
+  #  of contiguous whitespace characters ignored.
+  #
+  #  If <i>pattern</i> is a <code>Regexp</code>, <i>str</i> is divided where the
+  #  pattern matches. Whenever the pattern matches a zero-length string,
+  #  <i>str</i> is split into individual characters.
+  #
+  #  If <i>pattern</i> is omitted, the value of <code>$;</code> is used.  If
+  #  <code>$;</code> is <code>nil</code> (which is the default), <i>str</i> is
+  #  split on whitespace as if ` ' were specified.
+  #
+  #  If the <i>limit</i> parameter is omitted, trailing null fields are
+  #  suppressed. If <i>limit</i> is a positive number, at most that number of
+  #  fields will be returned (if <i>limit</i> is <code>1</code>, the entire
+  #  string is returned as the only entry in an array). If negative, there is no
+  #  limit to the number of fields returned, and trailing null fields are not
+  #  suppressed.
+  #
+  #     " now's  the time".split        #=> ["now's", "the", "time"]
+  #     " now's  the time".split(' ')   #=> ["now's", "the", "time"]
+  #     " now's  the time".split(/ /)   #=> ["", "now's", "", "the", "time"]
+  #     "1, 2.34,56, 7".split(%r{,\s*}) #=> ["1", "2.34", "56", "7"]
+  #     "hello".split(//)               #=> ["h", "e", "l", "l", "o"]
+  #     "hello".split(//, 3)            #=> ["h", "e", "llo"]
+  #     "hi mom".split(%r{\s*})         #=> ["h", "i", "m", "o", "m"]
+  #
+  #     "mellow yellow".split("ello")   #=> ["m", "w y", "w"]
+  #     "1,2,,3,4,,".split(',')         #=> ["1", "2", "", "3", "4"]
+  #     "1,2,,3,4,,".split(',', 4)      #=> ["1", "2", "", "3,4,,"]
+  #     "1,2,,3,4,,".split(',', -4)     #=> ["1", "2", "", "3", "4", "", ""]
   def split(pattern=nil, limit=Undefined)
-    # BEGIN RUBINIUS
     return [] if size._equal?(0)
 
-    if limit._not_equal?(Undefined)
-      limit = Type.coerce_to(limit, Integer, :to_int)
-      if limit > 0
-        return [self.dup] if limit == 1
-        limited = true
-      else
-        limited = false
-      end
-    else
+    if limit._equal?(Undefined)
+      suppress_trailing_empty = true
       limited = false
       limit = nil
+    else
+      limit = Type.coerce_to(limit, Integer, :to_int)
+      return [self.dup] if limit._equal?(1)
+      limited = limit > 0 ? true : false
+      suppress_trailing_empty = limit._equal?(0)
     end
 
     pattern ||= ($; || " ")
 
-    if pattern == ' '
-      spaces = true
-      pattern = /\s+/
-    elsif pattern._equal?(nil)
-      pattern = /\s+/
-    elsif pattern._isRegexp
-      # Pass
-    else
+    result = if pattern == ''
+               __split_chars(limit, limited, suppress_trailing_empty)
+             elsif  pattern == ' '
+               __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
+             elsif pattern._isString
+               __split_string_on(pattern, limit, limited, suppress_trailing_empty)
+             else
+               __split_regex(pattern, limit, limited, suppress_trailing_empty)
+             end
+    result
+  end
+
+  # Takes a 1-based offset, goes directly to c-primitive
+  primitive '__at_equals', 'at:equals:'
+
+  def __split_string_on(delim, limit, limited, suppress_trailing_empty)
+    results = []
+    delim_length = delim.size
+
+    count = start = current = 0
+    num = limited ? limit - 1 : 0
+    lim = self.size
+
+    first_char = delim[0]
+    while current < lim
+      if self[current]._equal?(first_char) and self.__at_equals(current + 1, delim)
+        results << self[start, (current - start)]
+        count += 1
+        start = current + delim_length
+        current = start
+        break if limited and count == num
+      else
+        current += 1
+      end
+    end
+
+    results << self[start, (lim-start)] unless limited and count > limit
+    if suppress_trailing_empty
+      while s = results.last and s.empty?
+        results.pop
+      end
+    end
+    results
+  end
+
+  def __is_whitespace(char)
+    char._equal?(?\ ) ||
+      char._equal?(?\t) ||
+      char._equal?(?\n) ||
+      char._equal?(?\r) ||
+      char._equal?(?\v)
+  end
+
+  # Skip contiguous whitespace starting at index and return the index of
+  # the first non-whitespace character.  If the end of the string is white
+  # space, then the length of the string is returned (i.e., an index past
+  # the end).
+  def __skip_contiguous_whitespace(index)
+    lim = self.size
+    while(index < lim)
+      char = self[index]
+      return index unless char <= 32 and __is_whitespace(char)  # \t \n etc. are less than space which is 32
+      index += 1
+    end
+    return index
+  end
+
+  def __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
+    results = []
+
+    eos = self.size
+    count = 0
+    start = current = __skip_contiguous_whitespace(0)
+    num = limited ? limit - 1 : 0
+
+    while current < eos
+      char = self[current]
+      if char <= 32 and __is_whitespace(char)
+        results << self[start, (current - start)]
+        count += 1
+        start = __skip_contiguous_whitespace(current)
+        current = start
+        break if limited and count == num
+      else
+        current += 1
+      end
+    end
+
+    last = self[start, (eos-start)]
+    results << last unless last.empty? and suppress_trailing_empty
+    results
+  end
+
+  # Split on each character, honoring the limits.
+  def __split_chars(limit, limited, suppress_trailing_empty)
+    result = []
+
+    # lim will be the number of single characters in the result.  If we are
+    # limited, then the last element will be the rest of the string:
+    #    'hi!'.split('', 2)   # => ['h', 'i!']
+    lim = self.size
+    lim = (limit-1) if limited and limit < lim
+
+    index = 0
+    while index < lim
+      result << self[index, 1]
+      index += 1
+    end
+
+    result << self[index, (self.size - index)] if limited
+    # self[0,0] returns an instance of the recievier: support for sub-classes
+    result << self[0,0] unless suppress_trailing_empty || limited
+    result
+  end
+
+  def __split_regex(pattern, limit, limited, suppress_trailing_empty)
+    unless pattern._isRegexp
       pattern = Type.coerce_to(pattern, String, :to_str)
       pattern = Regexp.new(Regexp.quote(pattern))
     end
@@ -1109,46 +1251,27 @@ class String
       last_match = match
     end
 
-    if ! last_match._equal?(nil)           # GEMSTONE
-      pm = last_match.post_match  # GEMSTONE
-      ret << (pm._equal?(nil) ? "" : pm)  # GEMSTONE
+    if ! last_match._equal?(nil)
+      pm = last_match.post_match
+      # self[0,0] returns an instance of the recievier: support for sub-classes
+      ret << (pm._equal?(nil) ? self[0,0] : pm)
     elsif ret.empty?
       ret << self.dup
     end
 
     # Trim from end
-    if !ret.empty? and (limit._equal?(0) || limit._equal?(nil) )
+    if suppress_trailing_empty
       while s = ret.last and s.empty?
         ret.pop
       end
     end
 
-    # Trim from front
-    if !ret.empty? and spaces
-      while s = ret.first and s.empty?
-        ret.shift
-      end
-    end
-
-    # BEGIN GEMSTONE
     # If we are matching the empty string, and we have matches, then
     # we need to tack on the trailing empty string match.
-    if ret && limit && limit < 0 && last_match && last_match.collapsing?
-      ret << ''
-    end
-    # END GEMSTONE
-
-    # Support subclasses
+    # self[0,0] returns an instance of the recievier: support for sub-classes
+    ret << self[0,0] if ret && limit && limit < 0 && last_match && last_match.collapsing?
     ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
-
-    # Taint all
-    # ret = ret.map { |str| str.taint } if self.tainted?
-
     ret
-  end
-
-  def __split_string(string, limit)
-    Regexp.new(self).__split_string(string, limit)
   end
 
   primitive 'squeeze*', 'rubySqueeze:'
@@ -1157,7 +1280,7 @@ class String
   primitive 'squeeze!*', 'rubySqueezeSelf:'
   primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
 
-  primitive '__strip', '_trimReturningSelf:' 
+  primitive '__strip', '_trimReturningSelf:'
 
   def strip
     self.__strip(false)
@@ -1170,7 +1293,7 @@ class String
       self
     else
       nil
-    end 
+    end
   end
 
   # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
@@ -1343,7 +1466,7 @@ class String
             return 0 # sign must come before base specifier
           end
           str = self[2, self.size - 2]
-        end   
+        end
       end
       str.to_inum(base, false)
     end
@@ -1371,7 +1494,7 @@ class String
       end
       bad = false
       if base._equal?(10)
-        bad =  s =~ /[^0-9]/ 
+        bad =  s =~ /[^0-9]/
       elsif base._equal?(8)
         bad =  s =~ /[^0-7]/
       elsif base._equal?(16)
@@ -1379,14 +1502,14 @@ class String
       elsif base._equal?(2)
         bad =  s =~ /[^01]/
       else
-        raise ArgumentError, "to_inum, unsupported base #{base} " 
+        raise ArgumentError, "to_inum, unsupported base #{base} "
       end
       if bad
         raise ArgumentError, "to_inum, illegal character for base #{base} in #{self.inspect}"
       end
     end
     s = base.to_s
-    s << ?r 
+    s << ?r
     s << str
     Integer.__from_string(s)
   end

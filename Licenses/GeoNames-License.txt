@@ -1,0 +1,9 @@
+The KD-Tree example in examples/persistence/kdtree contains a list of
+US Zipcodes (examples/persistence/kdtree/US.txt) from a GeoNames.org
+dataset licensed under a Creative Commons Attribution 3.0 License.
+See http://creativecommons.org/licenses/by/3.0/
+
+If you use this example dataset, you should also give attribution to GeoNames.
+The GeoNames geographical database covers all countries and contains
+over eight million placenames that are available for download free of charge.
+
