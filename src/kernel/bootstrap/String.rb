@@ -324,8 +324,6 @@ class String
     replace(x)
   end
 
-  # primitive '_atEquals', 'at:equals:'
-
   #     str.chomp(separator=$/)   => new_str
   #
   #  Returns a new <code>String</code> with the given record separator removed
@@ -1115,11 +1113,11 @@ class String
              else
                __split_regex(pattern, limit, limited, suppress_trailing_empty)
              end
-
-    # Support subclasses
-    result = result.map { |str| self.class.new(str) } if !self.instance_of?(String)
     result
   end
+
+  # Takes a 1-based offset, goes directly to c-primitive
+  primitive '__at_equals', 'at:equals:'
 
   def __split_string_on(delim, limit, limited, suppress_trailing_empty)
     results = []
@@ -1129,8 +1127,9 @@ class String
     num = limited ? limit - 1 : 0
     lim = self.size
 
+    first_char = delim[0]
     while current < lim
-      if self[current, delim_length] == delim
+      if self[current]._equal?(first_char) and self.__at_equals(current + 1, delim)
         results << self[start, (current - start)]
         count += 1
         start = current + delim_length
@@ -1151,11 +1150,11 @@ class String
   end
 
   def __is_whitespace(char)
-    char == ?\  ||
-      char == ?\t ||
-      char == ?\n ||
-      char == ?\r ||
-      char == ?\v
+    char._equal?(?\ ) ||
+      char._equal?(?\t) ||
+      char._equal?(?\n) ||
+      char._equal?(?\r) ||
+      char._equal?(?\v)
   end
 
   # Skip contiguous whitespace starting at index and return the index of
@@ -1165,7 +1164,8 @@ class String
   def __skip_contiguous_whitespace(index)
     lim = self.size
     while(index < lim)
-      return index unless __is_whitespace(self[index])
+      char = self[index]
+      return index unless char <= 32 and __is_whitespace(char)  # \t \n etc. are less than space which is 32
       index += 1
     end
     return index
@@ -1180,7 +1180,8 @@ class String
     num = limited ? limit - 1 : 0
 
     while current < eos
-      if __is_whitespace(self[current])
+      char = self[current]
+      if char <= 32 and __is_whitespace(char)
         results << self[start, (current - start)]
         count += 1
         start = __skip_contiguous_whitespace(current)
@@ -1213,7 +1214,8 @@ class String
     end
 
     result << self[index, (self.size - index)] if limited
-    result << "" unless suppress_trailing_empty || limited
+    # self[0,0] returns an instance of the recievier: support for sub-classes
+    result << self[0,0] unless suppress_trailing_empty || limited
     result
   end
 
@@ -1251,7 +1253,8 @@ class String
 
     if ! last_match._equal?(nil)
       pm = last_match.post_match
-      ret << (pm._equal?(nil) ? "" : pm)
+      # self[0,0] returns an instance of the recievier: support for sub-classes
+      ret << (pm._equal?(nil) ? self[0,0] : pm)
     elsif ret.empty?
       ret << self.dup
     end
@@ -1265,7 +1268,9 @@ class String
 
     # If we are matching the empty string, and we have matches, then
     # we need to tack on the trailing empty string match.
-    ret << '' if ret && limit && limit < 0 && last_match && last_match.collapsing?
+    # self[0,0] returns an instance of the recievier: support for sub-classes
+    ret << self[0,0] if ret && limit && limit < 0 && last_match && last_match.collapsing?
+    ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
     ret
   end
 
