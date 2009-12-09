@@ -29,7 +29,7 @@ To recreate Avi's demo:
 
 In shell 1 (the magician's shell), start IRB:
 
-  $ cd $MAGLEV_HOME/examples/hat_trick
+  $ cd $MAGLEV_HOME/examples/persistence/hat_trick
   $ maglev-irb
 
 Now we persistently load the Hat and Rabbit classes, and commit that code
@@ -48,7 +48,7 @@ We can take a quick peek at the hat, and see that it is empty:
 
 In shell 2 (the magician's assistent), start IRB:
 
-  $ cd $MAGLEV_HOME/examples/hat_trick
+  $ cd $MAGLEV_HOME/examples/persistence/hat_trick
   $ maglev-irb
 
 At this point, assuming IRB was started *after* the magician committed the

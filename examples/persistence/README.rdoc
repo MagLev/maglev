@@ -1,22 +1,36 @@
 = MagLev Persistence Examples
 
-This directory contains demos using MagLev persistence.
-
-== GStore
-
-The gstore directory is a demo of how you might implement the standard ruby
-PStore library using MagLev persistence, rather than the filesystem and
-marshal.  It is a proof of concept only.
+This directory contains demos and examples using MagLev persistence.
 
 == KDTree
 
-kdtree contains a pure Ruby implementation of a KD Tree (a
-multi-dimensional binary tree).  The demo shows how to search for the
-nearest items to a given location.  The database of known locations (postal
-codes, coffee shops, etc.) is stored persistently in a pure ruby data
-structure within MagLev.
+The kdtree directory contains a pure Ruby implementation of a KD-Tree
+(a multi-dimensional binary tree).  The demo shows how to search for
+items closest to a given location.  The database of known locations
+(postal codes, coffee shops, etc.) is stored persistently in a pure ruby
+data structure within MagLev.
+
+== MDB
+
+The mdb directory contains experimental code to wrap MagLev as a NoSQL
+Server (MagLevDB, AKA MDB), and make it available to other applications.
+The sample app can be run from MRI, and will connect to the MagLev VM
+running the MDB server code using HTTP.
+
+== GStore
+
+The gstore directory is a demo of how you might implement the standard
+ruby PStore library using MagLev persistence, rather than the filesystem
+and marshal.  It is a proof of concept only.
+
+== Hat Trick
+
+The hat_trick directory holds a recreation of the "Hat Trick"
+performed by Avi Bryant at RailsConf 2008, which you can see at
+http://vimeo.com/1147409 The code has changed since then, and this
+example shows the new approach.
 
 == Indexing
 
-This is an example of how to index an unordered collection.
+An example of how to index an unordered collection.
 
