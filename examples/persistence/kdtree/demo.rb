@@ -9,6 +9,7 @@ class Demo < Sinatra::Base
   get '/' do
     @lat =   48.724
     @lon = -122.488
+    @k = 30
     erb :index
   end
 
@@ -50,7 +51,7 @@ __END__
   <ul>
     <li>Latitude:  <input type="text" name="lat" title="Lat" value="<%= @lat %>"/></li>
     <li>Longitude: <input type="text" name="lon" title="Lon" value="<%= @lon %>"/></li>
-    <li>K: <input type="text" name="k" title="K" value="30" /></li>
+    <li>K: <input type="text" name="k" title="K" value="<%= @k %>" /></li>
     <li><input type="submit" value="Search"></li>
   </ul>
 </form>
