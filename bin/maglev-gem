@@ -4,6 +4,10 @@
 # All rights reserved.
 # See LICENSE.txt for permissions.
 #++
+#
+#  to run with debugging option,
+#   export MAGLEV_OPTS='-d'
+#  before invoking this file.
 
 require 'rubygems'
 require 'rubygems/gem_runner'
