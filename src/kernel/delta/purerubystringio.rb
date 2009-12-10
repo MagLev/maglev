@@ -75,7 +75,6 @@ class PureRubyStringIO < IO
   end
 
   def closed?
-
     closed_read? && closed_write?
   end
 
@@ -145,6 +144,7 @@ class PureRubyStringIO < IO
   end
 
   def fsync
+    if @sio_closed_write ; requireWritable ; end
     0
   end
 
@@ -158,23 +158,8 @@ class PureRubyStringIO < IO
     char
   end
 
-  # Gemstone, install variants of gets to store into caller's $_
-  #   see private  def _gets; ...  at end of file
-  def gets(*args)
-    raise ArgumentError, 'expected 0 or 1 arg'
-  end
-
-  def gets(sep_string=$/)
-    # variant after first gets no bridges   # gemstone
-    res = self._gets(sep_string, 0x31)
-    res
-  end
-
-  def gets
-    # variant after first gets no bridges   # gemstone
-    res = self._gets( $/, 0x31 )
-    res
-  end
+  # def gets ; end # implemented in IO
+  #  see also __gets  below
 
   def initialize(string="", mode=Undefined)
     self._initialize(string, mode, false)
@@ -301,12 +286,19 @@ class PureRubyStringIO < IO
   end
 
   def pos
+    #if closed?  # uncomment for 1.8.7
+    #  raise IOError, 'IO#pos on closed IO'
+    #end
     @sio_pos
   end
 
   def pos=(integer)
-    raise Errno::EINVAL, "Invalid argument", caller if integer < 0
-    @sio_pos = integer
+    if closed?
+      raise IOError, 'IO#pos on closed IO'
+    end
+    p = Type.coerce_to(integer, Fixnum, :to_int)
+    raise Errno::EINVAL, "argument must be >= 0", caller if p < 0
+    @sio_pos = p
   end
 
   #  for inherited methods, @sio_closed_write will be checked in syswrite
@@ -357,14 +349,14 @@ class PureRubyStringIO < IO
     # variant after first gets no bridges   # gemstone
     if @sio_closed_read ; requireReadable ; end
     raise EOFError, "End of file reached", caller if eof?
-    self._gets(sep, 0x31)
+    self.__gets(sep, 0x31)
   end
 
   def readline
     # variant after first gets no bridges   # gemstone
     if @sio_closed_read ; requireReadable ; end
     raise EOFError, "End of file reached", caller if eof?
-    self._gets($/, 0x31)
+    self.__gets($/, 0x31)
   end
 
   def readlines(sep_string=Undefined)
@@ -411,6 +403,7 @@ class PureRubyStringIO < IO
       raise ArgumentError, 'invalid second arg to StringIO#seek'
     end
     @sio_pos = offset
+    0
   end
 
   def string
@@ -518,7 +511,7 @@ class PureRubyStringIO < IO
 
   private
 
-  def _gets(a_sep_string, vc_frame_arg)
+  def __gets(a_sep_string, vc_frame_arg)
     sep_is_nil = a_sep_string._equal?(nil)
     unless sep_is_nil
       sep_string = Type.coerce_to(a_sep_string, String, :to_str)
