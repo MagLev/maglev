@@ -13,6 +13,7 @@ class String
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
+  class_primitive_nobridge '__new', 'new:'
 
   def self.new(str)
     if self._equal?(String)
