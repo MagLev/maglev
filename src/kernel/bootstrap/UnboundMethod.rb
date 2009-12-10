@@ -13,14 +13,14 @@ class UnboundMethod
   def __gsmeth
     @gsmeth 
   end
-  def __nonbridge_meth
-    @nonBridgeMeth
-  end
+
+  primitive '__nonbridge_meth', '_nonBridgeMeth'
 
   def ==(other)
     other.class._equal?(self.class) &&
-    other.arity == @arity && 
-    (other.__gsmeth._equal?(@gsmeth) || other.__nonbridge_meth._equal?(@nonBridgeMeth))
+    other.arity == self.arity && 
+    (other.__gsmeth._equal?(@gsmeth) || 
+       other.__nonbridge_meth._equal?(self.__nonbridge_meth ))
   end
 
   def to_s
