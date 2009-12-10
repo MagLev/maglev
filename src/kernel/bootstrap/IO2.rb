@@ -56,3 +56,7 @@ class File
   Constants.__freeze_constants
   include Constants
 end
+
+class IO
+  include File::Constants
+end
