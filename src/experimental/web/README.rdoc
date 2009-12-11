@@ -1,0 +1,34 @@
+= Getting MagLev to work with Lighttpd and SCGI
+
+This directory contains an example of running a MagLev web-app using
+Lighttpd and SCGI.  SCGI was chosen as there is a pure ruby gem for it.
+
+== Setup
+
+1. Make sure you have Lighttpd installed (not covered here).
+2. Install gems into maglev:
+
+     $ maglev-gem install scgi rack sinatra
+
+== Run
+
+To start the MagLev SCGI process:
+
+  $ rake maglev
+
+Then, from another shell, start lighttpd:
+
+  $ rake server
+
+You should then be able to connect to http://localhost:3000/foo.scgi
+
+== Profiling MagLev
+
+The <tt>rack_app.rb</tt> file contains a simple rack based app that can be
+used in conjunction with the <tt>abprof</tt> rake task to profile MagLev in
+a web environment.  In three separate shells:
+
+  $ maglev-ruby rack_app.rb    # start maglev in an scgi instance
+  $ rake server                # start lighttpd talking to scgi
+  $ rake abprof                # profile maglev
+

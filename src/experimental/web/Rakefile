@@ -3,16 +3,38 @@ directory 'log'
 
 desc "Run MagLev on the SCGI app"
 task :maglev do
-  sh "maglev-ruby -rubygems scgi_app.rb"
+  sh "#{ENV['MAGLEV_HOME']}/bin/rackup scgi.ru"
 end
 
 desc "Run MRI on the SCGI app"
 task :mri do
-  sh "ruby -rubygems scgi_app.rb"
+  sh "rackup scgi.ru"
 end
 
 desc "Rm the log files and start the lighttpd server"
 task :server => 'log' do
-  rm_f ['lighttpd.error.log', 'lighttpd.access.log']
+  rm_f ['log/error.log', 'log/access.log']
   sh '/opt/local/sbin/lighttpd -D -f lighttpd.conf '
+end
+
+desc "Run Apache Bench against the server + maglev and profile output."
+task :abprof do
+  sh 'curl http://localhost:3000/start'
+  # ab options:
+  #     -k   use keep alive
+  #     -c   concurrency level
+  #     -t   time limit (max number of seconds)
+  sh 'ab -c 1 -t 10 http://127.0.0.1:3000/i'
+#  sh 'ab -kc 10 -t 40 http://127.0.0.1:3000/'
+  sh 'curl http://localhost:3000/stop'
+  sh 'curl http://localhost:3000/report'
+end
+
+desc "Run Apache Bench against the server"
+task :ab do
+  # ab options:
+  #     -k   use keep alive
+  #     -c   concurrency level
+  #     -t   time limit (max number of seconds)
+  sh 'ab -c 1 -t 10 http://127.0.0.1:3000/'
 end

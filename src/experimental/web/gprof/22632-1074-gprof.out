@@ -1,0 +1,1448 @@
+This is the original run, where we see the binding taking 1/3 of our time
+
+  6755   34.61   UnboundMethod             # __bind: (ruby prim)
+  6749   34.58   RubyUnboundMeth           >> method:env:
+  6731   34.49   RubyUnboundMeth           >> _nonBridgeGsMethod:
+  6457   33.08   Behavior                  >> rubySelectorsWithPrefix:env:
+
+curl http://localhost:3000/start
+(in /Users/pmclain/GemStone/checkouts/git/src/experimental/web)
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0    14    0    14    0     0   2414      0 --:--:-- --:--:-- --:--:--  2414  0    14    0    14    0     0   2098      0 --:--:-- --:--:-- --:--:--     0
+<p>started</p>ab -c 1 -t 10 http://127.0.0.1:3000/i
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Finished 459 requests
+
+
+Server Software:        lighttpd/1.4.25
+Server Hostname:        127.0.0.1
+Server Port:            3000
+
+Document Path:          /i
+Document Length:        410 bytes
+
+Concurrency Level:      1
+Time taken for tests:   10.010 seconds
+Complete requests:      459
+Failed requests:        0
+Write errors:           0
+Non-2xx responses:      459
+Total transferred:      264384 bytes
+HTML transferred:       188190 bytes
+Requests per second:    45.86 [#/sec] (mean)
+Time per request:       21.807 [ms] (mean)
+Time per request:       21.807 [ms] (mean, across all concurrent requests)
+Transfer rate:          25.79 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    21   22   7.3     21     141
+Waiting:       21   22   7.3     21     141
+Total:         21   22   7.3     21     142
+
+Percentage of the requests served within a certain time (ms)
+  50%     21
+  66%     21
+  75%     21
+  80%     21
+  90%     22
+  95%     22
+  98%     23
+  99%     24
+ 100%    142 (longest request)
+curl http://localhost:3000/stop
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0    14    0    14    0     0    669      0 --:--:-- --:--:-- --:--:--   669  0    14    0    14    0     0    642      0 --:--:-- --:--:-- --:--:--     0
+<p>stopped</p>curl http://localhost:3000/report
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0<pre>================
+STATISTICAL SAMPLING RESULTS
+elapsed CPU time:    10623 ms
+monitoring interval: 500000 ns
+
+ tally       %   class and method name
+------   -----   --------------------------------------
+  1744    8.94   AbstractDictionary        >> _basicAt:
+   873    4.47   IdentityBag               # <<: (ruby prim)
+   860    4.41   Array                     >> at:
+   780    4.00   GsMethodDictionary        >> keysAndValuesDo:
+   668    3.42   SmallInteger              >> >
+   605    3.10   String                    >> rubySelectorPrefixSymbol
+   545    2.79   block in KeyValueDictionary # each_key& (ruby prim)
+   543    2.78   String                    # __split_string_on::::
+   537    2.75   Collection                >> do:
+   525    2.69   String                    # []: (ruby prim)
+   513    2.63   block in KeyValueDictionary # keys (ruby prim)
+   508    2.60   block in Behavior         >> rubySelectorsWithPrefix:env:
+   456    2.34   Array                     >> _at:
+   438    2.24   AbstractDictionary        >> _at:
+   360    1.84   SmallInteger              >> <=
+   352    1.80   Array                     >> at:put:
+   344    1.76   AbstractCollisionBucket   >> at:put:keyValDict_coll:
+   265    1.36   RubyHash                  >> keysAndValuesDo:
+   260    1.33   SmallInteger              >> //
+   238    1.22   String                    >> _trMapping:
+   237    1.21   String                    >> at:
+   233    1.19   Character class           >> withValue:
+   216    1.11   String                    # eql?: (ruby prim)
+   209    1.07   Array                     >> _at:put:
+   207    1.06   AbstractDictionary        >> _basicAt:put:
+   203    1.04   KeyValueDictionary        >> keyAt:
+   201    1.03   CharacterCollection       # __downcase (ruby prim)
+   189    0.97   Character                 >> asLowercase
+   187    0.96   String                    >> at:put:
+   183    0.94   KeyValueDictionary        >> valueAt:
+   181    0.93   String                    >> hash
+   168    0.86   SmallInteger              >> \\
+   165    0.85   RubyCollisionBucket       >> compareKey:with:
+   155    0.79   Object                    >> __threadSaveCallerEnv
+   150    0.77   RubyHash                  >> hashFunction:
+   140    0.72   Object                    # frozen? (ruby prim)
+   134    0.69   Object                    >> _basicSize
+   131    0.67   Object                    >> size
+   131    0.67   KeyValueDictionary        # []=:: (ruby prim)
+   129    0.66   Integer class             >> _selectedPrimeGreaterThan:
+   117    0.60   AbstractCollisionBucket   >> tableSize
+   116    0.59   KeyValueDictionary        >> atHash:putKey:
+   113    0.58   String                    # length (ruby prim)
+   107    0.55   Array                     # []: (ruby prim)
+    95    0.49   GsSocket                  >> _threeArgPrim:with:with:with:
+    91    0.47   RubyHash                  >> rubyAt:put:
+    88    0.45   KeyValueDictionary        >> atHash:putValue:
+    84    0.43   Class                     >> new:
+    82    0.42   Object                    >> at:
+    79    0.40   String                    # __append: (ruby prim)
+    74    0.38   AbstractCollisionBucket   >> searchForKey:
+    69    0.35   Object                    >> class
+    68    0.35   Object                    # __basic_dup (ruby prim)
+    67    0.34   String                    # <<:
+    63    0.32   RubyHash                  >> compareKey:with:
+    60    0.31   Object                    >> segment
+    57    0.29   ProcessorScheduler        >> _doPoll:timeout:
+    54    0.28   String                    # []:: (ruby prim)
+    54    0.28   Object                    >> basicAt:
+    54    0.28   ProcessorScheduler        >> _updateTimerThread:priority:
+    53    0.27   Array                     # <<: (ruby prim)
+    53    0.27   Object                    # dup
+    51    0.26   Object                    >> assignToSegment:
+    50    0.26   AbstractCollisionBucket class >> new:
+    49    0.25   Array                     >> atOrNil:
+    47    0.24   KeyValueDictionary        >> rebuildTable:
+    46    0.24   Object                    # freeze (ruby prim)
+    45    0.23   Hash                      # []: (ruby prim)
+    45    0.23   RubyHash                  >> at:put:
+    44    0.23   SmallInteger              >> bitShift:
+    43    0.22   Object                    >> _changeToSegment:
+    42    0.22   String                    # __at_equals:: (ruby prim)
+    42    0.22   AbstractCollisionBucket class >> new
+    41    0.21   IdentityBag               >> _addAll:
+    41    0.21   RubyConstantRef           >> resolveConst
+    38    0.19   block in Behavior         >> compiledMethodAt:environmentId:otherwise:usePackages:
+    38    0.19   Regexp                    # __search::: (ruby prim)
+    38    0.19   block in KeyValueDictionary >> rebuildTable:
+    37    0.19   MatchData                 # begin:
+    36    0.18   #<Class:Hash>             # __from_elements:
+    35    0.18   KeyValueDictionary        >> tableSize:
+    34    0.17   Object                    # __responds_to::: (ruby prim)
+    32    0.16   KeyValueDictionary        # __at_otherwise:: (ruby prim)
+    31    0.16   RubyHash class            >> _basicNew:
+    30    0.15   String                    # __copyfrom_to:: (ruby prim)
+    30    0.15   String                    # to_s
+    27    0.14   AbstractCollisionBucket   >> at:otherwise:
+    26    0.13   MatchData                 # end:
+    26    0.13   Object class              >> new
+    26    0.13   String                    # downcase
+    25    0.13   Class                     >> new
+    25    0.13   Hash                      # default=: (ruby prim)
+    25    0.13   block in String           # gsub::
+    24    0.12   TransientSemaphore        >> semaphore
+    24    0.12   Array                     # __joinStrings
+    23    0.12   Regexp                    # __each_match:&
+    23    0.12   Array                     # each&
+    22    0.11   IdentityBag               >> _at:
+    22    0.11   #<Class:Thread>           # current (ruby prim)
+    22    0.11   Hash                      # delete:&
+    22    0.11   block in Object           # __each& (ruby prim)
+    21    0.11   GsMethodDictionary        >> at:otherwise:
+    20    0.10   Module                    >> transientMethodDictForEnv:
+    20    0.10   #<Class:Hash>             # __new: (ruby prim)
+    20    0.10   String                    # _gsub_copyfrom_to::
+    20    0.10   block in Hash             # merge!:&
+    19    0.10   System class              >> _protectedMode
+    19    0.10   Fixnum                    # >: (ruby prim)
+    19    0.10   Array                     # __as_hash
+    19    0.10   Behavior                  >> compiledMethodAt:environmentId:otherwise:usePackages:
+    19    0.10   Object                    >> species
+    19    0.10   Hash                      # __each& (ruby prim)
+    19    0.10   block in Hash             # __each& (ruby prim)
+    17    0.09   SmallInteger              >> <
+    17    0.09   ProcessorScheduler        >> _reapEvents:
+    17    0.09   String                    # ==: (ruby prim)
+    17    0.09   Array                     >> _addAllFromNsc:
+    16    0.08   GsSocket                  >> _twoArgPrim:with:with:
+    16    0.08   Object                    # respond_to?:
+    16    0.08   Hash                      # __delete: (ruby prim)
+    16    0.08   Object                    # __each& (ruby prim)
+    16    0.08   Object                    >> _rubyInstvarAt:
+    16    0.08   String                    # __to_sub_replacement:
+    15    0.08   Symbol class              >> _existingWithAll:
+    15    0.08   Hash                      # delete:
+    14    0.07   KeyValueDictionary        >> removeKey:otherwise:
+    14    0.07   KeyValueDictionary class  >> new:
+    14    0.07   block in Behavior         >> compiledMethodAt:environmentId:otherwise:usePackages:
+    14    0.07   Array                     # include?:
+    13    0.07   GsSocket                  >> _zeroArgPrim:
+    13    0.07   #<Class:Hash>             # []:
+    12    0.06   GsNMethod                 >> isRubyBridgeMethod
+    12    0.06   AbstractCollisionBucket   >> valueAt:
+    12    0.06   IdentityBag               # each& (ruby prim)
+    12    0.06   Behavior                  >> compiledMethodAt:environmentId:otherwise:
+    12    0.06   String                    # split:
+    12    0.06   Fixnum                    # /: (ruby prim)
+    11    0.06   Behavior                  >> _basicNew
+    11    0.06   TransientSemaphore        >> signal
+    11    0.06   Hash                      # default:
+    11    0.06   Object                    # __par_asgn_to_ary
+    11    0.06   block in RubyUnboundMeth  >> _nonBridgeGsMethod:
+    10    0.05   Fixnum                    # &: (ruby prim)
+    10    0.05   Hash                      # __basic_dup (ruby prim)
+    10    0.05   Object                    >> _rubyInstvarAt:put:privateSize:
+    10    0.05   TransientSemaphore        >> wait
+    10    0.05   SequenceableCollection    # __insertall_at:: (ruby prim)
+     9    0.05   Semaphore                 # unlock (ruby prim)
+     9    0.05   Regexp                    # match:
+     9    0.05   Mutex                     # lock
+     9    0.05   Hash                      # []=::&
+     9    0.05   RubyCompilerStack         >> pop:
+     9    0.05   Rack::Utils::HeaderHash   # []=::
+     9    0.05   Kernel                    >> catch1:do:
+     9    0.05   IdentityDictionary        >> hashFunction:
+     8    0.04   Exception                 >> _executeEnsuresBelow:
+     8    0.04   ExecBlock                 >> setSelf:
+     8    0.04   Behavior                  # allocate (ruby prim)
+     8    0.04   ProcessorScheduler        >> _sizeNoShrink:
+     8    0.04   Hash                      # merge:
+     8    0.04   Exception                 >> _executeHandler:
+     8    0.04   Semaphore                 # lock (ruby prim)
+     8    0.04   Rack::Utils::HeaderHash   # delete:
+     8    0.04   IdentityCollisionBucket   >> searchForKey:
+     7    0.04   SequenceableCollection    # __remove_from_to_:: (ruby prim)
+     7    0.04   SequenceableCollection    >> removeAtIndex:
+     7    0.04   block in Mutex            # synchronize&
+     7    0.04   Rack::Utils::HeaderHash   # delete:&
+     7    0.04   ProcessorScheduler        >> _timeoutNow
+     7    0.04   Object                    # hash (ruby prim)
+     6    0.03   Behavior                  >> rubyClassInstVarNamed:env:
+     6    0.03   GsProcess                 >> priority
+     6    0.03   Socket                    # <<: (ruby prim)
+     6    0.03   Hash                      # merge!:&
+     6    0.03   block in SCGI::Processor  # handle_client:
+     6    0.03   Array                     # concat* (ruby prim)
+     6    0.03   Array                     >> addLast:
+     6    0.03   ProcessorScheduler        >> activeProcess
+     6    0.03   String                    >> copy
+     6    0.03   KeyValueDictionary        >> fillFrom:to:with:
+     6    0.03   GsProcess                 >> _scheduler
+     6    0.03   Object                    >> _basicSize:
+     6    0.03   RubyHash                  >> keysDo:
+     6    0.03   Module                    >> nameSpace:
+     5    0.03   KeyValueDictionary        >> _at:otherwise:
+     5    0.03   GsProcess class           >> _rubyThreadDataAt:
+     5    0.03   Object                    # size=: (ruby prim)
+     5    0.03   RubyCompilerStack         >> push:
+     5    0.03   block in Rack::Handler::SCGI # process_request:::
+     5    0.03   Socket                    # read: (ruby prim)
+     5    0.03   #<Class:Integer>          # __from_string: (ruby prim)
+     5    0.03   Queue                     # pop:
+     5    0.03   Character                 >> _category
+     5    0.03   ProcessorScheduler        >> _runNextProcess
+     5    0.03   block in Object           # instance_eval& (ruby prim)
+     5    0.03   RubyUnboundMeth           >> _nonBridgeGsMethod:
+     5    0.03   ProcessorScheduler        >> _findReadyProcess:
+     5    0.03   Rack::Utils::HeaderHash   # initialize:
+     5    0.03   Object                    >> identityHash
+     5    0.03   String                    >> addAll:
+     5    0.03   GsProcess                 >> _reapSignal:
+     5    0.03   GsNMethod                 >> isMethodForBlock
+     4    0.02   Array                     >> atOrMissingArgErr:
+     4    0.02   Integer                   # to_s (ruby prim)
+     4    0.02   Mutex                     # unlock
+     4    0.02   Rack::Request             # query_string
+     4    0.02   Rack::Utils               # parse_nested_query::
+     4    0.02   MatchData                 # size
+     4    0.02   String                    # __findStringStartingAt:: (ruby prim)
+     4    0.02   String                    >> sequenceExpand:
+     4    0.02   #<Class:Hash>             # __st_initialized_instance
+     4    0.02   GsSocket                  # __active? (ruby prim)
+     4    0.02   Hash                      # merge:&
+     4    0.02   #<Class:Thread>           # new*&
+     4    0.02   UnboundMethod             # __bind: (ruby prim)
+     4    0.02   block in Sinatra::Base    # invoke&
+     4    0.02   String                    # __split_string_on:::*
+     4    0.02   block in Queue            # pop:
+     4    0.02   block in SCGI::Processor  # handle_client:
+     4    0.02   block in Sinatra::Base    # route!&
+     4    0.02   Object                    # __storeRubyVcGlobal: (ruby prim)
+     4    0.02   Object                    # __splat_arg_value
+     4    0.02   Exception                 >> _getEnsuresBelow:
+     4    0.02   #<Class:Object>           # __object_for_oop: (ruby prim)
+     4    0.02   String                    >> codePointAt:
+     4    0.02   ProcessorScheduler        >> _add:toSet:
+     4    0.02   ProcessorScheduler        >> _switchFrom:to:
+     4    0.02   Array                     # last
+     4    0.02   Behavior                  >> rubyBasicNew_stBaseClass:
+     4    0.02   RubyNameSpace             >> fullName
+     4    0.02   GsNMethod                 >> rubyOptArgsBits
+     3    0.02   TransientMutex            # locked? (ruby prim)
+     3    0.02   RubyTransientNameSpace    >> resolveConstant:
+     3    0.02   RClass                    >> rubyFullName:
+     3    0.02   #<Class:Sinatra::Base>    # static*
+     3    0.02   Mutex                     # synchronize&
+     3    0.02   Rack::Response            # []=::
+     3    0.02   Array                     >> addAll:excludingFirst:
+     3    0.02   GsProcess                 >> _start
+     3    0.02   #<Class:Sinatra::Base>    # media_type:
+     3    0.02   String                    # __delete_underscore_strip
+     3    0.02   Socket                    # accept (ruby prim)
+     3    0.02   GsNMethod                 >> inClass
+     3    0.02   block in SCGI::Processor  # handle_client:
+     3    0.02   Rack::Request             # POST
+     3    0.02   block in SCGI::Processor  # listen:
+     3    0.02   Sinatra::Helpers          # content_type:
+     3    0.02   RubyUnboundMeth           >> method:env:
+     3    0.02   Sinatra::Base             # invoke&
+     3    0.02   String                    # tr::
+     3    0.02   Rack::Response            # initialize:::&
+     3    0.02   #<Class:Hash>             # []*
+     3    0.02   String                    # split::
+     3    0.02   ConditionVariable         # wait::
+     3    0.02   Method                    # call*&
+     3    0.02   Rack::Utils::HeaderHash   # []=::&
+     3    0.02   block in Object           # instance_eval& (ruby prim)
+     3    0.02   Object                    # put:: (ruby prim)
+     3    0.02   Collection                >> isEmpty
+     3    0.02   GsProcess                 >> _setTerminatedWithResult:
+     3    0.02   #<Class:String>           # __withAll: (ruby prim)
+     3    0.02   Module                    >> transientNameSpaceForStore:
+     3    0.02   ExecBlock                 # __copy_for_ruby: (ruby prim)
+     3    0.02   ProcessorScheduler        >> _addReadyProcess:to:
+     3    0.02   RubyProc                  >> setSelf:
+     3    0.02   Array                     # inject:&
+     3    0.02   Delay                     >> priority
+     3    0.02   RubySocket class          >> _basicNew
+     3    0.02   Hash                      # []:&
+     3    0.02   Thread                    # join: (ruby prim)
+     3    0.02   Array                     # shift
+     3    0.02   Array                     # any?
+     3    0.02   Array                     # any?&
+     3    0.02   String                    >> add:
+     3    0.02   Object                    # ==: (ruby prim)
+     3    0.02   ExceptionSet              >> addException:
+     2    0.01   Behavior                  >> _rubyInstvarAt:
+     2    0.01   GsSocket                  # close (ruby prim)
+     2    0.01   Hash                      # has_key?: (ruby prim)
+     2    0.01   ExecBlock                 >> _valueOnUnwind
+     2    0.01   Rack::Request             # request_method
+     2    0.01   #<Class:Exception>        # exception:
+     2    0.01   Module                    # name&
+     2    0.01   Module                    # name (ruby prim)
+     2    0.01   Set                       # include?:
+     2    0.01   #<Class:Sinatra::Base>    # static?*
+     2    0.01   block in #<Class:Sinatra::Base> # set::
+     2    0.01   Class                     # new:
+     2    0.01   String                    >> sequenceExpand
+     2    0.01   PureRubyStringIO          # read::
+     2    0.01   String                    # size=: (ruby prim)
+     2    0.01   block in Rack::Handler::SCGI # process_request:::
+     2    0.01   #<Class:Hash>             # new&
+     2    0.01   Rack::Request             # media_type
+     2    0.01   Sinatra::Base             # GET (?-mix:.*[^\/]$)*&
+     2    0.01   String                    # gsub:&
+     2    0.01   RubyCompilerState class   >> initializeForNewThread:
+     2    0.01   String                    # to_i
+     2    0.01   String                    # to_i:
+     2    0.01   CharacterCollection       # __strip: (ruby prim)
+     2    0.01   Character                 >> isSeparator
+     2    0.01   ProcessorScheduler        >> _waitForSocket:
+     2    0.01   Socket                    # closed?
+     2    0.01   Rack::Request             # path_info
+     2    0.01   PureRubyStringIO          # read
+     2    0.01   SCGI::Processor           # handle_client:
+     2    0.01   Thread                    # __start*& (ruby prim)
+     2    0.01   ProcessorScheduler        >> yield
+     2    0.01   Sinatra::Base             # error_block!::
+     2    0.01   Sinatra::Base             # error_block!*&
+     2    0.01   ExecBlock                 >> value
+     2    0.01   Sinatra::Base             # handle_not_found!:
+     2    0.01   UnboundMethod             # bind:
+     2    0.01   String                    # tr!::
+     2    0.01   Rack::Request             # GET
+     2    0.01   Hash                      # replace:
+     2    0.01   Hash                      # merge!:
+     2    0.01   Method                    # call*
+     2    0.01   block in #<Class:Sinatra::Base> # route:::&
+     2    0.01   ProcessorScheduler        >> _reschedule
+     2    0.01   block in Rack::Handler::SCGI # process_request:::
+     2    0.01   Enumerable                # inject:&
+     2    0.01   ConditionVariable         # wait:
+     2    0.01   Object                    # instance_eval& (ruby prim)
+     2    0.01   block in Enumerable       # inject:&
+     2    0.01   RubySymbolAssociation     >> globalVarValue
+     2    0.01   String                    # __get_pattern::
+     2    0.01   Integer                   # eql?: (ruby prim)
+     2    0.01   ProcessorScheduler        >> _scheduleProcess:
+     2    0.01   Thread                    # __is_terminated (ruby prim)
+     2    0.01   block in #<Class:Sinatra::Base> # set::
+     2    0.01   GsSocket                  >> _scheduler
+     2    0.01   #<Class:Proc>             # new_lambda&
+     2    0.01   PureRubyStringIO          # initialize::
+     2    0.01   Range                     # __beg_len:
+     2    0.01   ProcessorScheduler        >> activePriority
+     2    0.01   Queue                     # length
+     2    0.01   block in Behavior         >> selectorsForEnvironment:usePackages:
+     2    0.01   GsSocket                  >> _reapEvents
+     2    0.01   Integer                   >> _rubyTo:
+     2    0.01   System class              >> _sessionStateAt:
+     2    0.01   block in SCGI::Processor  # collect_thread:
+     2    0.01   Thread                    # join
+     2    0.01   Thread                    # value (ruby prim)
+     2    0.01   Integer                   # hash (ruby prim)
+     2    0.01   Object                    # eql?:
+     2    0.01   Exception                 # __handler_active (ruby prim)
+     2    0.01   IdentityBag               # to_a (ruby prim)
+     1    0.01   #<Class:Sinatra::Base>    # routes
+     1    0.01   Array                     # pop
+     1    0.01   block in Kernel           # catch:& (ruby prim)
+     1    0.01   Exception                 >> return:
+     1    0.01   RubyCompilerState         >> initializeForNewThread:
+     1    0.01   SymbolDictionary          >> at:otherwise:
+     1    0.01   IdentitySet               # __addall: (ruby prim)
+     1    0.01   IdentityBag               >> addAll:
+     1    0.01   Module                    >> rubyGlobalVar:
+     1    0.01   IdentityDictionary        >> associationAt:otherwise:
+     1    0.01   SCGI::Processor           # collect_thread:
+     1    0.01   #<Class:NameError>        # new:
+     1    0.01   #<Class:NameError>        # new::
+     1    0.01   Exception                 # initialize:
+     1    0.01   #<Class:Exception>        # name
+     1    0.01   GsNMethod                 >> rubyArity
+     1    0.01   GsNMethod                 >> selector
+     1    0.01   #<Class:Sinatra::Base>    # static
+     1    0.01   Rack::Utils               # parse_nested_query:
+     1    0.01   String                    # replace: (ruby prim)
+     1    0.01   Sinatra::Base             # pass
+     1    0.01   Kernel                    >> throw:
+     1    0.01   MatchData                 # captures
+     1    0.01   Rack::Utils::Multipart    # parse_multipart:
+     1    0.01   AbstractCollisionBucket   >> removeKey:otherwise:
+     1    0.01   Queue                     # pop
+     1    0.01   Regexp                    # __each_match_vcgl::&
+     1    0.01   Sinatra::Base             # indifferent_params:
+     1    0.01   Regexp                    # __match_vcglobals::
+     1    0.01   GsProcess                 >> _startRuby:
+     1    0.01   String                    # strip
+     1    0.01   block in GsProcess        >> _startRuby:
+     1    0.01   block in SCGI::Processor  # handle_client:
+     1    0.01   #<Class:Thread>           # new&
+     1    0.01   String                    # gsub::
+     1    0.01   Enumerable                # any?
+     1    0.01   #<Class:Proc>             # new&
+     1    0.01   Kernel                    # raise:
+     1    0.01   Behavior                  >> rubySelectorsWithPrefix:env:
+     1    0.01   Behavior                  >> selectorsForEnvironment:
+     1    0.01   KeyValueDictionary        # each_key& (ruby prim)
+     1    0.01   String                    # __tr!:: (ruby prim)
+     1    0.01   Class                     # new
+     1    0.01   ProcessorScheduler        >> _waitOnSema:
+     1    0.01   block in Rack::Handler::SCGI # process_request:::
+     1    0.01   Rack::Chunked             # call:
+     1    0.01   Rack::Utils::HeaderHash   # []:
+     1    0.01   #<Class:Hash>             # new:
+     1    0.01   Rack::ContentLength       # call:
+     1    0.01   Sinatra::Base             # call:
+     1    0.01   Sinatra::Response         # finish
+     1    0.01   Rack::Utils::HeaderHash   # to_hash
+     1    0.01   ProfMonitor               >> _zeroArgPrim:
+     1    0.01   block in Sinatra::Base    # route!&
+     1    0.01   System class              >> _readClock
+     1    0.01   ProfMonitor               # stop_and_report (ruby prim)
+     1    0.01   SmallInteger              >> >=
+     1    0.01   Semaphore                 >> add:
+     1    0.01   Exception                 >> _debugException:
+     1    0.01   ProcessorScheduler        >> _remove:fromSet:
+     1    0.01   String                    # __indexOfByte:: (ruby prim)
+     1    0.01   Fixnum                    # ==: (ruby prim)
+     1    0.01   Sinatra::Base             # options
+     1    0.01   GsNMethod                 >> homeMethod
+     1    0.01   #<Class:Exception>        # allocate (ruby prim)
+     1    0.01   GsProcess class           >> _rubyThreadDataAt:put:
+     1    0.01   GsNMethod                 >> numArgs
+     1    0.01   Semaphore                 # locked? (ruby prim)
+     1    0.01   SmallInteger              >> =
+     1    0.01   SymbolDictionary          >> associationAt:otherwise:
+     1    0.01   String                    >> size
+     1    0.01   SortedCollection          >> indexOfIdentical:
+     1    0.01   RClass                    >> isMeta
+     1    0.01   Behavior                  >> persistentMethodDictForEnv:
+     1    0.01   PureRubyStringIO          # _initialize:::
+     1    0.01   Hash                      # initialize&
+     1    0.01   String                    # __prim_at_failed:
+     1    0.01   Range class               >> from:to:
+     1    0.01   SessionTemps class        >> current
+     1    0.01   #<Class:Thread>           # __basic_new (ruby prim)
+     1    0.01   Hash                      # keys (ruby prim)
+     1    0.01   ExceptionSet              >> at:put:
+     1    0.01   GsProcess                 >> _setPriority:
+     1    0.01   Sinatra::Base             # error_block!:
+     1    0.01   #<Class:Sinatra::Base>    # errors
+     1    0.01   #<Class:Sinatra::Base>    # filters
+     1    0.01   Queue                     # push:
+     1    0.01   block in Queue            # push:
+     0    0.00   106 other methods
+ 19518  100.00   Total
+
+
+================
+STATISTICAL STACK SAMPLING RESULTS
+elapsed CPU time:    10623 ms
+monitoring interval: 500000 ns
+
+ total       %   class and method name
+------   -----   --------------------------------------
+ 17759   90.99   ExecBlock                 >> rescue1:do:
+ 14952   76.61   ExecBlock                 >> ensure:
+ 12346   63.25   ExecBlock                 >> on:do:
+  9846   50.45   block in Object           # instance_eval& (ruby prim)
+  9806   50.24   Object                    # instance_eval& (ruby prim)
+  9738   49.89   Sinatra::Base             # route!&
+  8743   44.79   Sinatra::Base             # route!
+  8293   42.49   Kernel                    >> catch1:do:
+  8111   41.56   Object                    # __each& (ruby prim)
+  8095   41.47   block in Object           # __each& (ruby prim)
+  8073   41.36   Array                     # each&
+  7000   35.86   block in Sinatra::Base    # route!&
+  6854   35.12   block in Sinatra::Base    # route!&
+  6850   35.10   Sinatra::Base             # route_eval&
+  6841   35.05   block in #<Class:Sinatra::Base> # route:::&
+  6763   34.65   UnboundMethod             # bind:
+  6755   34.61   UnboundMethod             # __bind: (ruby prim)
+  6749   34.58   RubyUnboundMeth           >> method:env:
+  6731   34.49   RubyUnboundMeth           >> _nonBridgeGsMethod:
+  6457   33.08   Behavior                  >> rubySelectorsWithPrefix:env:
+  6086   31.18   block in Sinatra::Base    # dispatch!
+  5921   30.34   KeyValueDictionary        # []=:: (ruby prim)
+  5109   26.18   RubyHash                  >> rubyAt:put:
+  5048   25.86   SCGI::Processor           # read_header::
+  4689   24.02   block in SCGI::Processor  # handle_client:
+  4573   23.43   Sinatra::Base             # dispatch!
+  4483   22.97   RubyHash                  >> keysAndValuesDo:
+  4235   21.70   Behavior                  >> selectorsForEnvironment:
+  4234   21.69   Behavior                  >> selectorsForEnvironment:usePackages:
+  4210   21.57   block in Behavior         >> selectorsForEnvironment:usePackages:
+  4162   21.32   KeyValueDictionary        # keys (ruby prim)
+  4161   21.32   KeyValueDictionary        # each_key& (ruby prim)
+  4160   21.31   GsMethodDictionary        >> keysAndValuesDo:
+  4156   21.29   Hash                      # __each& (ruby prim)
+  4126   21.14   block in Hash             # __each& (ruby prim)
+  3449   17.67   Rack::Handler::SCGI       # process_request:::
+  2739   14.03   block in Sinatra::Base    # call!:
+  2567   13.15   #<Class:Hash>             # __from_elements:
+  2553   13.08   Hash                      # merge!:&
+  2495   12.78   Hash                      # merge!:
+  2400   12.30   block in SCGI::Processor  # handle_client:
+  2278   11.67   block in Hash             # merge!:&
+  2220   11.37   Collection                >> do:
+  1966   10.07   KeyValueDictionary        >> rebuildTable:
+  1911    9.79   block in KeyValueDictionary # each_key& (ruby prim)
+  1904    9.76   block in Sinatra::Base    # invoke&
+  1744    8.94   AbstractDictionary        >> _basicAt:
+  1724    8.83   Rack::Chunked             # call:
+  1719    8.81   Hash                      # replace:
+  1702    8.72   #<Class:Hash>             # []*
+  1452    7.44   Rack::Utils::HeaderHash   # []=::
+  1443    7.39   Rack::Utils::HeaderHash   # []=::&
+  1427    7.31   Rack::ContentLength       # call:
+  1366    7.00   block in KeyValueDictionary # keys (ruby prim)
+  1330    6.81   AbstractCollisionBucket   >> at:put:keyValDict_coll:
+  1321    6.77   #<Class:Hash>             # new:
+  1273    6.52   RubyHash                  >> at:put:
+  1263    6.47   String                    # split::
+  1260    6.46   String                    # split:
+  1246    6.38   String                    # __split_string_on:::*
+  1238    6.34   String                    # __split_string_on::::
+  1216    6.23   Rack::Utils::HeaderHash   # initialize:
+  1128    5.78   block in Behavior         >> rubySelectorsWithPrefix:env:
+  1061    5.44   Sinatra::Base             # call!:
+  1020    5.23   Kernel                    # raise:
+  1011    5.18   Sinatra::Base             # route_missing
+  1010    5.17   Exception                 # __signal (ruby prim)
+  1010    5.17   Exception                 >> _executeHandler:
+   993    5.09   block in Rack::Utils::HeaderHash # initialize:
+   968    4.96   block in Sinatra::Base    # dispatch!
+   968    4.96   ExecBlock                 >> value
+   966    4.95   block in Sinatra::Base    # dispatch!
+   966    4.95   Sinatra::Base             # handle_not_found!:
+   958    4.91   Sinatra::Base             # error_block!*&
+   929    4.76   String                    # downcase
+   923    4.73   Sinatra::Base             # error_block!::
+   903    4.63   CharacterCollection       # __downcase (ruby prim)
+   900    4.61   Array                     # __as_hash
+   899    4.61   block in Sinatra::Base    # error_block!*&
+   896    4.59   Sinatra::Base             # call:
+   881    4.51   #<Class:Hash>             # []:
+   873    4.47   IdentityBag               # <<: (ruby prim)
+   862    4.42   block in #<Class:Sinatra::Base> # __compileClass
+   860    4.41   Array                     >> at:
+   810    4.15   Rack::Utils               # unescape:
+   790    4.05   String                    # tr::
+   783    4.01   String                    # tr!::
+   781    4.00   String                    # __tr!:: (ruby prim)
+   770    3.95   String                    >> _trMapping:
+   764    3.91   Integer class             >> _selectedPrimeGreaterThan:
+   718    3.68   #<Class:Hash>             # __new: (ruby prim)
+   698    3.58   KeyValueDictionary class  >> new:
+   681    3.49   Sinatra::Request          # params
+   668    3.42   SmallInteger              >> >
+   667    3.42   block in Sinatra::Request # params
+   605    3.10   String                    >> rubySelectorPrefixSymbol
+   603    3.09   Hash                      # []: (ruby prim)
+   588    3.01   Rack::Utils::HeaderHash   # delete:
+   580    2.97   Rack::Utils::HeaderHash   # delete:&
+   561    2.87   Sinatra::Base             # invoke&
+   531    2.72   String                    # []: (ruby prim)
+   525    2.69   KeyValueDictionary        # __at_otherwise:: (ruby prim)
+   507    2.60   RubyHash                  >> hashFunction:
+   494    2.53   Rack::Response            # initialize
+   494    2.53   Rack::Response            # initialize:::&
+   484    2.48   Class                     # new
+   456    2.34   Array                     >> _at:
+   447    2.29   Sinatra::Response         # finish
+   446    2.29   Sinatra::Response         # finish&
+   440    2.25   String                    # gsub::
+   438    2.24   AbstractDictionary        >> _at:
+   428    2.19   Regexp                    # __each_match:&
+   424    2.17   KeyValueDictionary        >> atHash:putKey:
+   423    2.17   Rack::Request             # POST
+   416    2.13   KeyValueDictionary        >> valueAt:
+   398    2.04   KeyValueDictionary        >> atHash:putValue:
+   391    2.00   KeyValueDictionary        >> keyAt:
+   360    1.84   SmallInteger              >> <=
+   359    1.84   Rack::Utils::HeaderHash   # to_hash
+   352    1.80   Array                     >> at:put:
+   336    1.72   AbstractCollisionBucket   >> tableSize
+   330    1.69   RubyCollisionBucket       >> compareKey:with:
+   321    1.64   block in String           # gsub::
+   319    1.63   Sinatra::Helpers          # content_type:
+   316    1.62   Sinatra::Helpers          # content_type::
+   312    1.60   block in Rack::Handler::SCGI # process_request:::
+   287    1.47   AbstractCollisionBucket   >> at:otherwise:
+   264    1.35   Enumerable                # inject:&
+   260    1.33   SmallInteger              >> //
+   251    1.29   IdentityBag               # each& (ruby prim)
+   248    1.27   AbstractCollisionBucket   >> searchForKey:
+   241    1.23   Hash                      # []=::&
+   237    1.21   String                    >> at:
+   233    1.19   Character class           >> withValue:
+   218    1.12   Rack::Response            # []=::
+   217    1.11   Rack::Request             # GET
+   216    1.11   String                    # eql?: (ruby prim)
+   216    1.11   block in RubyUnboundMeth  >> _nonBridgeGsMethod:
+   215    1.10   ProcessorScheduler        >> _reapEvents:
+   209    1.07   Array                     >> _at:put:
+   207    1.06   Hash                      # delete:&
+   207    1.06   AbstractDictionary        >> _basicAt:put:
+   205    1.05   block in Mutex            # synchronize&
+   200    1.02   block in SCGI::Processor  # listen:
+   198    1.01   block in Enumerable       # inject:&
+   197    1.01   String                    # <<:
+   196    1.00   block in Rack::Utils::HeaderHash # to_hash
+   194    0.99   block in Rack::Handler::SCGI # process_request:::
+   193    0.99   Object                    # dup
+   192    0.98   ProcessorScheduler        >> _findReadyProcess:
+   189    0.97   Character                 >> asLowercase
+   188    0.96   block in Kernel           # loop& (ruby prim)
+   187    0.96   String                    >> at:put:
+   185    0.95   Hash                      # __delete: (ruby prim)
+   184    0.94   #<Class:Hash>             # __st_initialized_instance
+   181    0.93   String                    >> hash
+   178    0.91   block in Queue            # pop:
+   170    0.87   Behavior                  >> compiledMethodAt:environmentId:otherwise:
+   168    0.86   SmallInteger              >> \\
+   158    0.81   Behavior                  >> compiledMethodAt:environmentId:otherwise:usePackages:
+   155    0.79   KeyValueDictionary        >> removeKey:otherwise:
+   155    0.79   Object                    >> __threadSaveCallerEnv
+   153    0.78   ConditionVariable         # wait:
+   152    0.78   Mutex                     # synchronize&
+   151    0.77   ConditionVariable         # wait::
+   150    0.77   Hash                      # merge:
+   150    0.77   KeyValueDictionary        >> tableSize:
+   148    0.76   Array                     # __joinStrings
+   148    0.76   ProcessorScheduler        >> _reschedule
+   142    0.73   Hash                      # merge:&
+   140    0.72   Object                    # frozen? (ruby prim)
+   138    0.71   Hash                      # delete:
+   137    0.70   AbstractCollisionBucket class >> new
+   136    0.70   TransientSemaphore        >> wait
+   134    0.69   Sinatra::Base             # indifferent_params:
+   134    0.69   Object                    >> _basicSize
+   131    0.67   Object                    >> size
+   123    0.63   Rack::Utils::HeaderHash   # []:
+   122    0.63   block in KeyValueDictionary >> rebuildTable:
+   122    0.63   Rack::Utils::HeaderHash   # []:&
+   121    0.62   block in SCGI::Processor  # handle_client:
+   119    0.61   RubyHash                  >> compareKey:with:
+   117    0.60   Rack::Utils               # parse_nested_query:
+   117    0.60   SCGI::Processor           # handle_client:
+   116    0.59   Rack::Utils               # parse_nested_query::
+   113    0.58   String                    # length (ruby prim)
+   113    0.58   Semaphore                 # lock (ruby prim)
+   112    0.57   block in Rack::Handler::SCGI # process_request:::
+   107    0.55   Array                     # []: (ruby prim)
+   106    0.54   block in Behavior         >> compiledMethodAt:environmentId:otherwise:usePackages:
+   101    0.52   ProcessorScheduler        >> _waitOnSema:
+    98    0.50   Queue                     # pop:
+    98    0.50   Object                    >> basicAt:
+    95    0.49   AbstractCollisionBucket class >> new:
+    95    0.49   GsSocket                  >> _threeArgPrim:with:with:with:
+    94    0.48   Object                    >> assignToSegment:
+    84    0.43   Class                     >> new:
+    82    0.42   Object                    >> at:
+    81    0.42   Socket                    # <<: (ruby prim)
+    79    0.40   String                    # __append: (ruby prim)
+    79    0.40   #<Class:Thread>           # new&
+    78    0.40   Behavior                  >> _rubyInstvarAt:
+    78    0.40   Socket                    # accept (ruby prim)
+    78    0.40   #<Class:Thread>           # new*&
+    75    0.38   Hash                      # __basic_dup (ruby prim)
+    74    0.38   String                    # _gsub_copyfrom_to::
+    72    0.37   Behavior                  >> rubyClassInstVarNamed:env:
+    70    0.36   Queue                     # pop
+    70    0.36   Method                    # call*
+    69    0.35   KeyValueDictionary        >> _at:otherwise:
+    69    0.35   MatchData                 # begin:
+    69    0.35   Object                    >> class
+    69    0.35   Thread                    # __start*& (ruby prim)
+    68    0.35   Object                    # __basic_dup (ruby prim)
+    68    0.35   Hash                      # default=: (ruby prim)
+    65    0.33   block in GsProcess        >> _startRuby:
+    64    0.33   ProcessorScheduler        >> yield
+    63    0.32   block in SCGI::Processor  # listen:
+    62    0.32   Method                    # call*&
+    61    0.31   Sinatra::Base             # indifferent_hash
+    61    0.31   #<Class:Hash>             # new&
+    60    0.31   MatchData                 # end:
+    60    0.31   Object                    >> segment
+    57    0.29   Sinatra::Base             # GET (?-mix:.*[^\/]$)*&
+    57    0.29   ProcessorScheduler        >> _doPoll:timeout:
+    56    0.29   GsSocket                  >> _waitForReadReady
+    55    0.28   RubyTransientNameSpace    >> resolveConstant:
+    55    0.28   Kernel                    # loop& (ruby prim)
+    54    0.28   String                    # []:: (ruby prim)
+    54    0.28   ProcessorScheduler        >> _updateTimerThread:priority:
+    53    0.27   Array                     # <<: (ruby prim)
+    53    0.27   ProcessorScheduler        >> _waitForSocket:
+    52    0.27   Socket                    # read: (ruby prim)
+    52    0.27   ProcessorScheduler        >> _runNextProcess
+    51    0.26   Object class              >> new
+    50    0.26   Object                    # respond_to?:
+    50    0.26   Sinatra::Base             # GET (?-mix:.*[^\/]$)*
+    50    0.26   block in #<Class:Sinatra::Base> # __compileClass
+    50    0.26   String                    # to_s
+    49    0.25   TransientSemaphore        >> signal
+    49    0.25   Array                     >> atOrNil:
+    48    0.25   Rack::Request             # form_data?
+    48    0.25   Object                    >> species
+    46    0.24   Object                    # freeze (ruby prim)
+    45    0.23   String                    # to_i
+    44    0.23   SmallInteger              >> bitShift:
+    44    0.23   Mutex                     # lock
+    43    0.22   IdentitySet               # __addall: (ruby prim)
+    43    0.22   Object                    >> _changeToSegment:
+    43    0.22   Rack::Request             # media_type
+    43    0.22   String                    # to_i:
+    43    0.22   #<Class:Sinatra::Base>    # errors
+    42    0.22   IdentityBag               >> addAll:
+    42    0.22   Class                     # new:
+    42    0.22   String                    # __at_equals:: (ruby prim)
+    42    0.22   Rack::Request             # path_info
+    41    0.21   IdentityBag               >> _addAll:
+    41    0.21   RubyConstantRef           >> resolveConst
+    41    0.21   Rack::Request             # request_method
+    41    0.21   Rack::Request             # content_type
+    38    0.19   block in SCGI::Processor  # listen:
+    38    0.19   Regexp                    # __search::: (ruby prim)
+    38    0.19   block in Sinatra::Base    # call!:
+    38    0.19   Sinatra::Base             # error_block!:
+    37    0.19   GsNMethod                 >> isRubyBridgeMethod
+    36    0.18   Module                    >> transientMethodDictForEnv:
+    35    0.18   #<Class:Exception>        # exception
+    35    0.18   #<Class:Exception>        # exception:
+    35    0.18   Sinatra::Base             # pass
+    34    0.17   Object                    # __responds_to::: (ruby prim)
+    34    0.17   Kernel                    >> throw:
+    33    0.17   #<Class:NameError>        # new:
+    33    0.17   Rack::Request             # query_string
+    33    0.17   Queue                     # push:
+    32    0.16   #<Class:NameError>        # new::
+    32    0.16   Rack::Utils::Multipart    # parse_multipart:
+    31    0.16   Exception                 >> return:
+    31    0.16   Semaphore                 # unlock (ruby prim)
+    31    0.16   RubyHash class            >> _basicNew:
+    31    0.16   PureRubyStringIO          # read
+    31    0.16   String                    # __to_sub_replacement:
+    30    0.15   Exception                 >> _executeEnsuresBelow:
+    30    0.15   String                    # __copyfrom_to:: (ruby prim)
+    29    0.15   Exception                 # initialize:
+    29    0.15   PureRubyStringIO          # read::
+    28    0.14   Module                    >> rubyGlobalVar:
+    28    0.14   block in Object           # instance_eval& (ruby prim)
+    28    0.14   Array                     # concat* (ruby prim)
+    28    0.14   Hash                      # []:&
+    27    0.14   Set                       # include?:
+    27    0.14   String                    # __delete_underscore_strip
+    27    0.14   AbstractCollisionBucket   >> valueAt:
+    26    0.13   block in Kernel           # catch:& (ruby prim)
+    26    0.13   Mutex                     # unlock
+    26    0.13   Array                     # include?:
+    25    0.13   Hash                      # has_key?: (ruby prim)
+    25    0.13   Class                     >> new
+    24    0.12   Regexp                    # match:
+    24    0.12   #<Class:Exception>        # name
+    24    0.12   TransientSemaphore        >> semaphore
+    24    0.12   AbstractCollisionBucket   >> removeKey:otherwise:
+    23    0.12   #<Class:Exception>        # name&
+    23    0.12   Module                    # name&
+    23    0.12   String                    # strip
+    23    0.12   RubyCompilerStack         >> pop:
+    23    0.12   Enumerable                # any?
+    22    0.11   IdentityBag               >> _at:
+    22    0.11   #<Class:Thread>           # current (ruby prim)
+    22    0.11   SequenceableCollection    >> removeAtIndex:
+    22    0.11   CharacterCollection       # __strip: (ruby prim)
+    22    0.11   Enumerable                # any?&
+    22    0.11   block in Queue            # push:
+    21    0.11   Module                    # name (ruby prim)
+    21    0.11   GsMethodDictionary        >> at:otherwise:
+    21    0.11   #<Class:Sinatra::Base>    # filters
+    21    0.11   IdentityBag               # to_a (ruby prim)
+    20    0.10   block in Rack::Handler::SCGI # process_request:::
+    20    0.10   String                    # gsub:&
+    20    0.10   GsProcess                 >> _start
+    20    0.10   GsProcess                 >> _startRuby:
+    20    0.10   Hash                      # keys (ruby prim)
+    19    0.10   System class              >> _protectedMode
+    19    0.10   RClass                    >> rubyFullName:
+    19    0.10   Fixnum                    # >: (ruby prim)
+    19    0.10   Sinatra::Helpers          # media_type:
+    19    0.10   #<Class:Sinatra::Base>    # media_type:
+    19    0.10   block in SCGI::Processor  # handle_client:
+    18    0.09   GsProcess class           >> _rubyThreadDataAt:
+    18    0.09   IdentityDictionary        >> associationAt:otherwise:
+    18    0.09   RubyCompilerState class   >> initializeForNewThread:
+    18    0.09   RubyNameSpace             >> fullName
+    17    0.09   #<Class:Sinatra::Base>    # routes
+    17    0.09   block in Mutex            # synchronize&
+    17    0.09   SmallInteger              >> <
+    17    0.09   String                    # ==: (ruby prim)
+    17    0.09   RubyHash                  >> keysDo:
+    17    0.09   Array                     >> _addAllFromNsc:
+    16    0.08   SCGI::Processor           # collect_thread:
+    16    0.08   GsSocket                  >> _twoArgPrim:with:with:
+    16    0.08   Object                    >> _rubyInstvarAt:
+    15    0.08   GsSocket                  # close (ruby prim)
+    15    0.08   Symbol class              >> _existingWithAll:
+    15    0.08   GsNMethod                 >> rubyArity
+    15    0.08   String                    # include?:
+    15    0.08   String                    # index:
+    15    0.08   String                    # __index::
+    15    0.08   String                    >> sequenceExpand:
+    15    0.08   IdentityDictionary        >> hashFunction:
+    14    0.07   block in Rack::Handler::SCGI # process_request:::
+    14    0.07   block in Behavior         >> compiledMethodAt:environmentId:otherwise:usePackages:
+    14    0.07   Array                     # last
+    14    0.07   Module                    >> nameSpace:
+    13    0.07   GsSocket                  >> _zeroArgPrim:
+    13    0.07   GsProcess                 >> priority
+    13    0.07   #<Class:Sinatra::Base>    # static?
+    13    0.07   #<Class:Sinatra::Base>    # static?*
+    12    0.06   String                    # __findStringStartingAt:: (ruby prim)
+    12    0.06   Fixnum                    # /: (ruby prim)
+    12    0.06   Delay                     >> priority
+    12    0.06   GsProcess                 >> _reapSignal:
+    12    0.06   block in SCGI::Processor  # collect_thread:
+    12    0.06   GsNMethod                 >> isMethodForBlock
+    11    0.06   Behavior                  >> _basicNew
+    11    0.06   RubyCompilerStack         >> push:
+    11    0.06   block in #<Class:Sinatra::Base> # set::
+    11    0.06   Array                     >> addAll:excludingFirst:
+    11    0.06   Hash                      # default:
+    11    0.06   Object                    # __par_asgn_to_ary
+    11    0.06   Thread                    # join
+    10    0.05   Fixnum                    # &: (ruby prim)
+    10    0.05   String                    >> sequenceExpand
+    10    0.05   Object                    >> _rubyInstvarAt:put:privateSize:
+    10    0.05   Exception class           >> addException:
+    10    0.05   Character                 >> isSeparator
+    10    0.05   GsNMethod                 >> inClass
+    10    0.05   SequenceableCollection    # __insertall_at:: (ruby prim)
+    10    0.05   Kernel                    # lambda&
+    10    0.05   #<Class:Proc>             # new_lambda&
+     9    0.05   Object                    # __rubySend1:
+     9    0.05   #<Class:Sinatra::Base>    # static
+     9    0.05   Thread                    # value (ruby prim)
+     8    0.04   CharacterCollection       >> _findString:startingAt:ignoreCase:
+     8    0.04   TransientMutex            # locked? (ruby prim)
+     8    0.04   ExecBlock                 >> _valueOnUnwind
+     8    0.04   GsNMethod                 >> selector
+     8    0.04   #<Class:Sinatra::Base>    # static*
+     8    0.04   ExecBlock                 >> setSelf:
+     8    0.04   Behavior                  # allocate (ruby prim)
+     8    0.04   ProcessorScheduler        >> _sizeNoShrink:
+     8    0.04   IdentityCollisionBucket   >> searchForKey:
+     8    0.04   ExceptionSet              >> addException:
+     7    0.04   SequenceableCollection    # __remove_from_to_:: (ruby prim)
+     7    0.04   String                    # replace: (ruby prim)
+     7    0.04   ProcessorScheduler        >> _timeoutNow
+     7    0.04   Object                    # hash (ruby prim)
+     7    0.04   GsSocket                  >> _reapEvents
+     7    0.04   Integer                   >> _rubyTo:
+     7    0.04   Thread                    # join: (ruby prim)
+     7    0.04   GsNMethod                 >> rubyOptArgsBits
+     6    0.03   RubyCompilerState         >> initializeForNewThread:
+     6    0.03   MatchData                 # captures
+     6    0.03   Socket                    # closed?
+     6    0.03   Collection                >> isEmpty
+     6    0.03   Array                     >> addLast:
+     6    0.03   ProcessorScheduler        >> activeProcess
+     6    0.03   Module                    >> transientNameSpaceForStore:
+     6    0.03   String                    >> copy
+     6    0.03   KeyValueDictionary        >> fillFrom:to:with:
+     6    0.03   GsProcess                 >> _scheduler
+     6    0.03   Object                    >> _basicSize:
+     6    0.03   String                    # __prim_at_failed:
+     6    0.03   Array                     # any?
+     6    0.03   Exception                 # __handler_active (ruby prim)
+     6    0.03   UnboundMethod             # __home_class (ruby prim)
+     5    0.03   Object                    # size=: (ruby prim)
+     5    0.03   MatchData                 # __captures:
+     5    0.03   MatchData                 # size
+     5    0.03   #<Class:Integer>          # __from_string: (ruby prim)
+     5    0.03   Regexp                    # __each_match_vcgl::&
+     5    0.03   Character                 >> _category
+     5    0.03   Object                    >> identityHash
+     5    0.03   String                    >> addAll:
+     5    0.03   PureRubyStringIO          # initialize:
+     5    0.03   PureRubyStringIO          # initialize::
+     5    0.03   ProcessorScheduler        >> activePriority
+     5    0.03   Range class               >> from:to:
+     5    0.03   Behavior                  >> basicNew
+     5    0.03   Array                     # shift
+     4    0.02   Array                     >> atOrMissingArgErr:
+     4    0.02   Integer                   # to_s (ruby prim)
+     4    0.02   GsSocket                  # __active? (ruby prim)
+     4    0.02   Object                    # __storeRubyVcGlobal: (ruby prim)
+     4    0.02   Object                    # __splat_arg_value
+     4    0.02   ProcessorScheduler        >> _scheduleProcess:
+     4    0.02   Exception                 >> _getEnsuresBelow:
+     4    0.02   GsProcess                 >> join:
+     4    0.02   #<Class:Object>           # __object_for_oop: (ruby prim)
+     4    0.02   String                    >> codePointAt:
+     4    0.02   ProcessorScheduler        >> _add:toSet:
+     4    0.02   ProcessorScheduler        >> _switchFrom:to:
+     4    0.02   RubyProc                  >> setSelf:
+     4    0.02   Array                     # inject:&
+     4    0.02   Hash                      # initialize&
+     4    0.02   #<Class:Thread>           # __basic_new (ruby prim)
+     4    0.02   Behavior                  >> rubyBasicNew_stBaseClass:
+     4    0.02   ExceptionSet              >> at:put:
+     4    0.02   Object                    # eql?:
+     4    0.02   SequenceableCollection    >> removeFirst
+     3    0.02   Array                     # pop
+     3    0.02   #<Class:String>           # new
+     3    0.02   #<Class:Proc>             # new&
+     3    0.02   GsNMethod                 >> homeMethod
+     3    0.02   GsProcess class           >> _rubyThreadDataAt:put:
+     3    0.02   Object                    # put:: (ruby prim)
+     3    0.02   RubySymbolAssociation     >> globalVarValue
+     3    0.02   Integer                   # eql?: (ruby prim)
+     3    0.02   GsProcess                 >> _setTerminatedWithResult:
+     3    0.02   #<Class:String>           # __withAll: (ruby prim)
+     3    0.02   ExecBlock                 # __copy_for_ruby: (ruby prim)
+     3    0.02   ProcessorScheduler        >> _addReadyProcess:to:
+     3    0.02   PureRubyStringIO          # _initialize:::
+     3    0.02   Queue                     # length
+     3    0.02   System class              >> _gsReturnToC
+     3    0.02   RubySocket class          >> _basicNew
+     3    0.02   SessionTemps class        >> current
+     3    0.02   Array                     # any?&
+     3    0.02   String                    >> add:
+     3    0.02   ProcessorScheduler        >> _scheduleNewProcess:
+     3    0.02   Object                    # ==: (ruby prim)
+     2    0.01   SymbolDictionary          >> at:otherwise:
+     2    0.01   String                    # size=: (ruby prim)
+     2    0.01   String                    # sub!::
+     2    0.01   Regexp                    # __match_vcglobals::
+     2    0.01   Class                     # new*&
+     2    0.01   Sinatra::Base             # options
+     2    0.01   #<Class:Exception>        # allocate (ruby prim)
+     2    0.01   String                    # __get_pattern::
+     2    0.01   Thread                    # __is_terminated (ruby prim)
+     2    0.01   block in #<Class:Sinatra::Base> # set::
+     2    0.01   GsSocket                  >> _scheduler
+     2    0.01   Range                     # __beg_len:
+     2    0.01   Array                     # to_a
+     2    0.01   block in Behavior         >> selectorsForEnvironment:usePackages:
+     2    0.01   System class              >> _sessionStateAt:
+     2    0.01   Integer                   # hash (ruby prim)
+     1    0.01   SCGIApp                   # GET /start*&
+     1    0.01   SCGIApp                   # GET /start*
+     1    0.01   block in #<Class:SCGIApp> # __compileClass
+     1    0.01   ProfMonitor               # resume_sampling (ruby prim)
+     1    0.01   ProfMonitor               >> _zeroArgPrim:
+     1    0.01   block in RubyCompiler     >> compileFileNamed:loadName:env:
+     1    0.01   Object                    # __compileFile
+     1    0.01   Kernel                    # eval:::
+     1    0.01   Kernel                    # eval::::
+     1    0.01   Kernel                    # __eval_with_position:::*
+     1    0.01   Kernel                    # __eval_with_position::::: (ruby prim)
+     1    0.01   block in Kernel           # __eval_with_position::::: (ruby prim)
+     1    0.01   RubyCompiler              >> evaluateString:binding:with:fileName:lineNumber:env:
+     1    0.01   RubyCompiler              >> evaluateString:with:withSelf:binding:fileName:lineNumber:env:
+     1    0.01   block in RubyCompiler     >> evaluateString:with:withSelf:binding:fileName:lineNumber:env:
+     1    0.01   Object                    # __evalCaller::
+     1    0.01   block in Object           # __evalCaller::
+     1    0.01   Object                    # __compileEval
+     1    0.01   block in Object           # __compileEval
+     1    0.01   Class                     # new&
+     1    0.01   Rack::Builder             # initialize*&
+     1    0.01   Rack::Builder             # initialize&
+     1    0.01   block in Object           # __compileEval
+     1    0.01   #<Class:Sinatra::Base>    # new
+     1    0.01   #<Class:Sinatra::Base>    # new*&
+     1    0.01   SCGIApp                   # initialize*&
+     1    0.01   #<Class:ProfMonitor>      # create: (ruby prim)
+     1    0.01   ProfMonitor               >> startMonitoring
+     1    0.01   System class              >> _readClock
+     1    0.01   SCGIApp                   # GET /report*&
+     1    0.01   SCGIApp                   # GET /report*
+     1    0.01   block in #<Class:SCGIApp> # __compileClass
+     1    0.01   ProfMonitor               # stop_and_report (ruby prim)
+     1    0.01   SmallInteger              >> >=
+     1    0.01   Semaphore                 >> add:
+     1    0.01   Exception                 >> _debugException:
+     1    0.01   ProcessorScheduler        >> _remove:fromSet:
+     1    0.01   String                    # __indexOfByte:: (ruby prim)
+     1    0.01   Fixnum                    # ==: (ruby prim)
+     1    0.01   Magnitude                 # __min: (ruby prim)
+     1    0.01   GsNMethod                 >> numArgs
+     1    0.01   Semaphore                 # locked? (ruby prim)
+     1    0.01   Exception class           >> new
+     1    0.01   SmallInteger              >> =
+     1    0.01   SymbolDictionary          >> associationAt:otherwise:
+     1    0.01   block in Sinatra::Response # finish&
+     1    0.01   String                    >> size
+     1    0.01   GsProcess                 >> _signalJoiners
+     1    0.01   ProcessorScheduler        >> _delayUnschedule:
+     1    0.01   SortedCollection          >> removeIdentical:otherwise:
+     1    0.01   SortedCollection          >> indexOfIdentical:
+     1    0.01   Delay                     >> highPriorityWait
+     1    0.01   Delay                     >> _wait:
+     1    0.01   GsProcess                 >> _wait
+     1    0.01   RClass                    >> isMeta
+     1    0.01   Behavior                  >> persistentMethodDictForEnv:
+     1    0.01   GsProcess                 >> _setPriority:
+ 19518  100.00   Total
+
+
+================
+STATISTICAL METHOD SENDERS RESULTS
+elapsed CPU time:    10623 ms
+monitoring interval: 500000 ns
+
+     %       %                     Parent
+  self  total   total  local  Method
+  Time   Time      ms    %         Child
+------ ------  ------  -----  -----------
+
+                  363.0    3.8       Sinatra::Request # params
+                 2488.9   25.8       Sinatra::Base # dispatch!
+                 1301.9   13.5       block in SCGI::Processor # handle_client:
+                    6.5    0.1       SCGI::Processor # collect_thread:
+                 4508.7   46.6       Kernel       >> catch1:do:
+=    0.0   91.0  9665.6    0.0  ExecBlock    >> rescue1:do:
+                  961.7    9.9       block in Sinatra::Base # invoke&
+                  363.0    3.8       block in Sinatra::Request # params
+                 1903.8   19.7       block in SCGI::Processor # handle_client:
+                 2700.1   27.9       block in Sinatra::Base # dispatch!
+                 3730.4   38.6       block in Sinatra::Base # route!&
+                    6.5    0.1       block in SCGI::Processor # collect_thread:
+-----------------------------------------------------
+
+                    0.5    0.0       Object       # __evalCaller::
+                   64.2    0.8       block in SCGI::Processor # handle_client:
+                 5322.9   65.4       Object       # instance_eval& (ruby prim)
+                    0.5    0.0       Object       # __compileEval
+                    0.5    0.0       RubyCompiler >> evaluateString:with:withSelf:binding:fileName:lineNumber:env:
+                   65.3    0.8       Mutex        # synchronize&
+                   65.3    0.8       Behavior     >> compiledMethodAt:environmentId:otherwise:usePackages:
+                 2292.5   28.2       Behavior     >> selectorsForEnvironment:usePackages:
+                  116.5    1.4       Rack::Handler::SCGI # process_request:::
+                    0.5    0.0       Kernel       # __eval_with_position::::: (ruby prim)
+=    0.0   76.6  8137.9    0.0  ExecBlock    >> ensure:
+                    6.0    0.1       block in Mutex # synchronize&
+                   10.9    0.1       block in Rack::Handler::SCGI # process_request:::
+                   57.7    0.7       block in Behavior >> compiledMethodAt:environmentId:otherwise:usePackages:
+                   10.3    0.1       block in SCGI::Processor # handle_client:
+                    8.2    0.1       block in Object # instance_eval& (ruby prim)
+                    7.6    0.1       block in Behavior >> compiledMethodAt:environmentId:otherwise:usePackages:
+                 2291.4   28.2       block in Behavior >> selectorsForEnvironment:usePackages:
+                  188.9    2.3       block in SCGI::Processor # handle_client:
+                   64.2    0.8       block in Mutex # synchronize&
+                  150.8    1.9       block in Rack::Handler::SCGI # process_request:::
+                    0.5    0.0       block in Kernel # __eval_with_position::::: (ruby prim)
+                    0.5    0.0       block in RubyCompiler >> evaluateString:with:withSelf:binding:fileName:lineNumber:env:
+                    0.5    0.0       block in Object # __evalCaller::
+                    0.5    0.0       block in Object # __compileEval
+                 5338.7   65.6       block in Object # instance_eval& (ruby prim)
+                    1.1    0.0       block in Behavior >> selectorsForEnvironment:usePackages:
+-----------------------------------------------------
+
+                 4405.8   65.6       Object       # __each& (ruby prim)
+                   29.9    0.4       Kernel       # loop& (ruby prim)
+                    2.2    0.0       GsProcess    >> _startRuby:
+                 2245.6   33.4       Hash         # __each& (ruby prim)
+=    0.0   63.3  6719.5    0.0  ExecBlock    >> on:do:
+                   15.2    0.2       block in GsProcess >> _startRuby:
+                   52.8    0.8       block in Kernel # loop& (ruby prim)
+                 2245.6   33.4       block in Hash # __each& (ruby prim)
+                 4405.8   65.6       block in Object # __each& (ruby prim)
+-----------------------------------------------------
+
+                 5338.7   99.6       ExecBlock    >> ensure:
+=    0.0   50.4  5358.9    0.0  block in Object # instance_eval& (ruby prim)
+                    2.2    0.0       ExecBlock    >> setSelf:
+                  469.2    8.8       block in #<Class:Sinatra::Base> # __compileClass
+                 1139.2   21.3       block in Sinatra::Base # call!:
+                 3723.3   69.5       block in #<Class:Sinatra::Base> # route:::&
+                    0.5    0.0       block in Object # __compileEval
+                    2.2    0.0       RubyProc     >> setSelf:
+                   20.7    0.4       block in Sinatra::Base # call!:
+-----------------------------------------------------
+
+                 3728.2   69.9       Sinatra::Base # route_eval&
+                  474.6    8.9       block in Sinatra::Base # error_block!*&
+                    0.5    0.0       Rack::Builder # initialize&
+                 1034.1   19.4       block in Sinatra::Base # invoke&
+=    0.0   50.2  5337.1    0.0  Object       # instance_eval& (ruby prim)
+                    7.1    0.1       GsProcess class >> _rubyThreadDataAt:
+                    6.0    0.1       RubyCompilerStack >> push:
+                 5322.9   99.7       ExecBlock    >> ensure:
+-----------------------------------------------------
+
+                 4758.5   89.8       Sinatra::Base # route!
+=    0.0   49.9  5300.1    0.0  Sinatra::Base # route!&
+                    9.3    0.2       #<Class:Sinatra::Base> # routes
+                    2.2    0.0       RubyConstantRef >> resolveConst
+                   10.9    0.2       Rack::Request # request_method
+                    2.2    0.0       Object       # respond_to?:
+                   72.9    1.4       Sinatra::Base # indifferent_params:
+                    1.6    0.0       Object       >> class
+                   12.0    0.2       Rack::Request # path_info
+                  534.5   10.1       Sinatra::Base # route_missing
+                  440.9    8.3       Rack::Utils  # unescape:
+                  370.6    7.0       Sinatra::Request # params
+                    7.1    0.1       Hash         # []: (ruby prim)
+                 3824.6   72.2       Object       # __each& (ruby prim)
+                   11.4    0.2       #<Class:Sinatra::Base> # filters
+-----------------------------------------------------
+
+                 3312.4   69.6       block in Sinatra::Base # dispatch!
+=    0.0   44.8  4758.5    0.0  Sinatra::Base # route!
+                 4758.5  100.0       Sinatra::Base # route!&
+-----------------------------------------------------
+
+                  302.6    6.7       Sinatra::Base # invoke&
+                 3730.4   82.6       block in Sinatra::Base # route!&
+=    0.0   42.5  4513.6    0.1  Kernel       >> catch1:do:
+                 4508.7   99.9       ExecBlock    >> rescue1:do:
+-----------------------------------------------------
+
+                   12.0    0.3       block in Rack::Handler::SCGI # process_request:::
+                    1.6    0.0       block in Sinatra::Base # route!&
+                   68.0    1.5       block in Rack::Handler::SCGI # process_request:::
+                    7.1    0.2       Rack::Utils  # parse_nested_query::
+                 3824.6   86.6       Sinatra::Base # route!&
+                    2.2    0.0       Rack::Response # initialize:::&
+                  496.4   11.2       Sinatra::Base # error_block!*&
+                    2.7    0.1       Hash         # replace:
+=    0.1   41.6  4414.5    0.2  Object       # __each& (ruby prim)
+                 4405.8   99.8       ExecBlock    >> on:do:
+-----------------------------------------------------
+
+                 4405.8  100.0       ExecBlock    >> on:do:
+=    0.1   41.5  4405.8    0.3  block in Object # __each& (ruby prim)
+                 4393.9   99.7       Array        # each&
+-----------------------------------------------------
+
+                 4393.9  100.0       block in Object # __each& (ruby prim)
+=    0.1   41.4  4393.9    0.3  Array        # each&
+                   61.0    1.4       block in Rack::Handler::SCGI # process_request:::
+                    7.6    0.2       block in Rack::Handler::SCGI # process_request:::
+                    6.0    0.1       Object       >> size
+                    7.6    0.2       Array        # []: (ruby prim)
+                  489.3   11.1       block in Sinatra::Base # error_block!*&
+                 3809.9   86.7       block in Sinatra::Base # route!&
+-----------------------------------------------------
+
+                 3809.9  100.0       Array        # each&
+=    0.0   35.9  3809.9    0.1  block in Sinatra::Base # route!&
+                   13.1    0.3       Regexp       # match:
+                    3.3    0.1       MatchData    # captures
+                    4.4    0.1       Object       >> _rubyInstvarAt:put:privateSize:
+                   26.7    0.7       Hash         # merge:
+                   25.6    0.7       Array        # __as_hash
+                 3730.4   97.9       Kernel       >> catch1:do:
+                    1.1    0.0       Array        # to_a
+                    3.3    0.1       Array        # any?
+-----------------------------------------------------
+
+                 3730.4  100.0       ExecBlock    >> rescue1:do:
+=    0.0   35.1  3730.4    0.0  block in Sinatra::Base # route!&
+                    1.6    0.0       Object       # __each& (ruby prim)
+                 3728.2   99.9       Sinatra::Base # route_eval&
+-----------------------------------------------------
+
+                 3728.2  100.0       block in Sinatra::Base # route!&
+=    0.0   35.1  3728.2    0.0  Sinatra::Base # route_eval&
+                 3728.2  100.0       Object       # instance_eval& (ruby prim)
+-----------------------------------------------------
+
+                 3723.3  100.0       block in Object # instance_eval& (ruby prim)
+=    0.0   35.0  3723.3    0.0  block in #<Class:Sinatra::Base> # route:::&
+                 3680.9   98.9       UnboundMethod # bind:
+                   38.1    1.0       Method       # call*
+                    0.5    0.0       Object       # __splat_arg_value
+                    2.7    0.1       Object       >> _rubyInstvarAt:
+-----------------------------------------------------
+
+                 3680.9  100.0       block in #<Class:Sinatra::Base> # route:::&
+=    0.0   34.7  3680.9    0.0  UnboundMethod # bind:
+                 3676.5   99.9       UnboundMethod # __bind: (ruby prim)
+                    3.3    0.1       UnboundMethod # __home_class (ruby prim)
+-----------------------------------------------------
+
+                 3676.5  100.0       UnboundMethod # bind:
+=    0.0   34.6  3676.5    0.1  UnboundMethod # __bind: (ruby prim)
+                    1.1    0.0       Behavior     >> _basicNew
+                 3673.3   99.9       RubyUnboundMeth >> method:env:
+-----------------------------------------------------
+
+                 3673.3  100.0       UnboundMethod # __bind: (ruby prim)
+=    0.0   34.6  3673.3    0.0  RubyUnboundMeth >> method:env:
+                    8.2    0.2       GsNMethod    >> rubyArity
+                 3663.5   99.7       RubyUnboundMeth >> _nonBridgeGsMethod:
+-----------------------------------------------------
+
+                 3663.5  100.0       RubyUnboundMeth >> method:env:
+=    0.0   34.5  3663.5    0.1  RubyUnboundMeth >> _nonBridgeGsMethod:
+                    1.1    0.0       GsNMethod    >> isRubyBridgeMethod
+                    1.1    0.0       GsNMethod    >> selector
+                    3.8    0.1       GsNMethod    >> inClass
+                  136.6    3.7       IdentityBag  # each& (ruby prim)
+                    2.7    0.1       String       >> rubySelectorPrefixSymbol
+                 3514.3   95.9       Behavior     >> rubySelectorsWithPrefix:env:
+                    1.1    0.0       GsNMethod    >> isMethodForBlock
+-----------------------------------------------------
+
+                 3514.3  100.0       RubyUnboundMeth >> _nonBridgeGsMethod:
+=    0.0   33.1  3514.3    0.0  Behavior     >> rubySelectorsWithPrefix:env:
+                    0.5    0.0       Object class >> new
+                 1208.3   34.4       Collection   >> do:
+                 2305.0   65.6       Behavior     >> selectorsForEnvironment:
+-----------------------------------------------------
+
+                 2700.1   81.5       ExecBlock    >> rescue1:do:
+=    0.0   31.2  3312.4    0.0  block in Sinatra::Base # dispatch!
+                 3312.4  100.0       Sinatra::Base # route!
+-----------------------------------------------------
+
+                  668.4   20.7       RubyHash     >> at:put:
+                 2554.2   79.3       RubyHash     >> rubyAt:put:
+=    0.7   30.3  3222.6    2.2  KeyValueDictionary # []=:: (ruby prim)
+                   51.2    1.6       Object       >> assignToSegment:
+                   44.6    1.4       RubyHash     >> compareKey:with:
+                  143.7    4.5       KeyValueDictionary >> keyAt:
+                   32.7    1.0       Object       >> segment
+                  213.4    6.6       KeyValueDictionary >> atHash:putValue:
+                  211.2    6.6       RubyHash     >> hashFunction:
+                   60.4    1.9       Integer class >> _selectedPrimeGreaterThan:
+                  152.9    4.7       KeyValueDictionary >> valueAt:
+                   74.6    2.3       AbstractCollisionBucket class >> new
+                  723.9   22.5       AbstractCollisionBucket >> at:put:keyValDict_coll:
+                 1070.0   33.2       KeyValueDictionary >> rebuildTable:
+                  225.9    7.0       KeyValueDictionary >> atHash:putKey:
+                  147.0    4.6       SmallInteger >> >
+-----------------------------------------------------
+
+                   76.2    2.7       block in Rack::Utils::HeaderHash # to_hash
+                   20.7    0.7       Sinatra::Base # handle_not_found!:
+                   44.1    1.6       Rack::Request # GET
+                 1002.0   36.0       #<Class:Hash> # __from_elements:
+                 1229.0   44.2       block in Hash # merge!:&
+                  126.3    4.5       Hash         # []=::&
+                   96.9    3.5       Rack::Utils::HeaderHash # []=::&
+                   95.8    3.4       Rack::Request # POST
+                   89.8    3.2       Rack::Handler::SCGI # process_request:::
+=    0.5   26.2  2780.7    1.8  RubyHash     >> rubyAt:put:
+                   23.4    0.8       Object       # freeze (ruby prim)
+                   46.3    1.7       Object       >> __threadSaveCallerEnv
+                   47.9    1.7       Object       # frozen? (ruby prim)
+                   59.3    2.1       Object       # dup
+                 2554.2   91.9       KeyValueDictionary # []=:: (ruby prim)
+-----------------------------------------------------
+
+                 2499.8   91.0       block in SCGI::Processor # handle_client:
+=    0.0   25.9  2747.5    0.0  SCGI::Processor # read_header::
+                    0.5    0.0       RubyConstantRef >> resolveConst
+                    0.5    0.0       Fixnum       # >: (ruby prim)
+                   11.4    0.4       String       # to_i
+                    1.6    0.1       Socket       # closed?
+                   17.4    0.6       Hash         # []: (ruby prim)
+                  926.3   33.7       #<Class:Hash> # []*
+                  648.2   23.6       String       # split:
+                 1138.6   41.4       Rack::Handler::SCGI # process_request:::
+                    1.1    0.0       Object       # __splat_arg_value
+                    1.6    0.1       Queue        # length
+-----------------------------------------------------
+
+                 1903.8   74.6       ExecBlock    >> rescue1:do:
+=    0.0   24.0  2552.1    0.1  block in SCGI::Processor # handle_client:
+                   28.3    1.1       Socket       # read: (ruby prim)
+                    1.6    0.1       String       # length (ruby prim)
+                   13.1    0.5       String       # to_i
+                    4.9    0.2       String       # <<:
+                 2499.8   98.0       SCGI::Processor # read_header::
+                    2.2    0.1       String       # ==: (ruby prim)
+-----------------------------------------------------
+
+                 1490.7   59.9       block in Sinatra::Base # call!:
+=    0.0   23.4  2488.9    0.0  Sinatra::Base # dispatch!
+                 2488.9  100.0       ExecBlock    >> rescue1:do:
+-----------------------------------------------------
+
+                 2235.3   91.6       block in Hash # __each& (ruby prim)
+                  204.6    8.4       KeyValueDictionary >> rebuildTable:
+=    1.4   23.0  2439.9    5.9  RubyHash     >> keysAndValuesDo:
+                   12.5    0.5       Object       >> _basicSize
+                   66.4    2.7       block in KeyValueDictionary >> rebuildTable:
+                   93.1    3.8       Array        >> _at:
+                  130.1    5.3       AbstractDictionary >> _at:
+                 1239.8   50.8       block in Hash # merge!:&
+                  105.6    4.3       block in Rack::Handler::SCGI # process_request:::
+                  540.5   22.2       block in Rack::Utils::HeaderHash # initialize:
+                  107.8    4.4       block in Enumerable # inject:&
+-----------------------------------------------------
+
+                 2305.0  100.0       Behavior     >> rubySelectorsWithPrefix:env:
+=    0.0   21.7  2305.0    0.0  Behavior     >> selectorsForEnvironment:
+                 2304.4  100.0       Behavior     >> selectorsForEnvironment:usePackages:
+-----------------------------------------------------
+
+                 2304.4  100.0       Behavior     >> selectorsForEnvironment:
+=    0.0   21.7  2304.4    0.0  Behavior     >> selectorsForEnvironment:usePackages:
+                    0.5    0.0       Object class >> new
+                 2292.5   99.5       ExecBlock    >> ensure:
+                   11.4    0.5       IdentityBag  # to_a (ruby prim)
+-----------------------------------------------------
+
+                 2291.4  100.0       ExecBlock    >> ensure:
+=    0.0   21.6  2291.4    0.0  block in Behavior >> selectorsForEnvironment:usePackages:
+                    2.2    0.1       Module       >> transientMethodDictForEnv:
+                   23.4    1.0       IdentitySet  # __addall: (ruby prim)
+                 2265.2   98.9       KeyValueDictionary # keys (ruby prim)
+                    0.5    0.0       Behavior     >> persistentMethodDictForEnv:
+-----------------------------------------------------
+
+                 2265.2  100.0       block in Behavior >> selectorsForEnvironment:usePackages:
+=    0.0   21.3  2265.2    0.0  KeyValueDictionary # keys (ruby prim)
+                    0.5    0.0       Object class >> new
+                 2264.7  100.0       KeyValueDictionary # each_ke 12  630k   12 81660    0     0  19681      0  0:00:32  0:00:04  0:00:28 25940 12  630k   12 81660    0     0  15856      0  0:00:40  0:00:05  0:00:35 19681 12  630k   12 81660    0     0  13277      0  0:00:48  0:00:06  0:00:42 15859 12  630k   12 81660    0     0  11419      0  0:00:56  0:00:07  0:00:49 15859 12  630k   12 81660    0     0  10017      0  0:01:04  0:00:08  0:00:56 15856 12  630k   12 81660    0     0   8926      0  0:01:12  0:00:09  0:01:03     0 12  630k   12 81660    0     0   8925      0  0:01:12  0:00:09  0:01:03     0
+curl: (18) transfer closed with 564471 bytes remaining to read
+y& (ruby prim)
+-----------------------------------------------------
+
+                 2264.7  100.0       KeyValueDictionary # keys (ruby prim)
+=    0.0   21.3  2264.7    0.0  KeyValueDictionary # each_key& (ruby prim)
+                 2264.2  100.0       GsMethodDictionary >> keysAndValuesDo:
+-----------------------------------------------------
+
+                 2264.2  100.0       KeyValueDictionary # each_key& (ruby prim)
+=    4.0   21.3  2264.2   18.8  GsMethodDictionary >> keysAndValuesDo:
+                    1.1    0.0       Object       >> _basicSize
+                 1040.1   45.9       block in KeyValueDictionary # each_key& (ruby prim)
+                  798.4   35.3       AbstractDictionary >> _basicAt:
+-----------------------------------------------------
+
+                    8.7    0.4       Sinatra::Base # indifferent_params:
+                 1386.2   61.3       Hash         # merge!:&
+                  142.6    6.3       Enumerable   # inject:&
+                  592.2   26.2       Rack::Utils::HeaderHash # initialize:
+                  121.9    5.4       block in Rack::Handler::SCGI # process_request:::
+                   10.3    0.5       Enumerable   # any?&
+=    0.1   21.3  2262.0    0.5  Hash         # __each& (ruby prim)
+                    6.0    0.3       Object       >> __threadSaveCallerEnv
+                 2245.6   99.3       ExecBlock    >> on:do:
+-----------------------------------------------------
+
+                 2245.6  100.0       ExecBlock    >> on:do:
+=    0.1   21.1  2245.6    0.5  block in Hash # __each& (ruby prim)
+                 2235.3   99.5       RubyHash     >> keysAndValuesDo:
+-----------------------------------------------------
+
+                 1138.6   60.7       SCGI::Processor # read_header::
+=    0.0   17.7  1877.2    0.0  Rack::Handler::SCGI # process_request:::
+                   15.2    0.8       Module       >> rubyGlobalVar:
+                    0.5    0.0       RubyConstantRef >> resolveConst
+                    1.6    0.1       Object       # respond_to?:
+                    4.4    0.2       Class        # new:
+                   25.6    1.4       Hash         # delete:
+                  199.2   10.6       Array        # __as_hash
+                    0.5    0.0       Object       # __par_asgn_to_ary
+                   84.9    4.5       Hash         # []: (ruby prim)
+                  602.0   32.1       Hash         # replace:
+                  157.3    8.4       Hash         # merge!:
+                   89.8    4.8       RubyHash     >> rubyAt:put:
+                    8.2    0.4       String       # split::
+                  563.9   30.0       Rack::Chunked # call:
+                  116.5    6.2       ExecBlock    >> ensure:
+                    1.6    0.1       Array        >> atOrNil:
+                    6.0    0.3       Array        # include?:
+-----------------------------------------------------
+
+                 1139.2   76.4       block in Object # instance_eval& (ruby prim)
+=    0.0   14.0  1490.7    0.0  block in Sinatra::Base # call!:
+                 1490.7  100.0       Sinatra::Base # dispatch!
+-----------------------------------------------------
+
+                  924.7   66.2       #<Class:Hash> # []*
+                  472.4   33.8       #<Class:Hash> # []:
+=    0.2   13.2  1397.1    1.4  #<Class:Hash> # __from_elements:
+                    5.4    0.4       Fixnum       # &: (ruby prim)
+                    7.1    0.5       Object       >> size
+                   28.3    2.0       Array        # []: (ruby prim)
+                   27.2    1.9       Hash         # default=: (ruby prim)
+                  301.0   21.5       #<Class:Hash> # __new: (ruby prim)
+                 1002.0   71.7       RubyHash     >> rubyAt:put:
+                    6.5    0.5       Fixnum       # /: (ruby prim)
+------------rake aborted!
+Command failed with status (18): [curl http://localhost:3000/report...]
+/Users/pmclain/GemStone/checkouts/git/src/experimental/web/Rakefile:30
+(See full trace by running task with --trace)
