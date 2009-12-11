@@ -10,12 +10,50 @@ class IO
     self
   end
 
-  primitive 'fileno', 'fileDescriptor'
-  primitive 'sync', 'sync'
-  primitive 'sync=', 'setSync:'
-  primitive 'stat',  'stat'
+  def dup
+    raise NotImplementedError
+  end
 
   primitive_nobridge '__fcntl', 'fcntl:with:'
+
+  def each_byte(&block)
+    if block_given?
+      while true
+        buf = self.read(4096)
+        len = buf.size
+        if len._equal?(0)
+          return
+        end
+        n = 0
+        while n < len
+          block.call( buf[n] )
+          n += 1
+        end
+      end
+    end
+  end
+
+  def each_line(sep=$/, &block)
+    if sep._equal?(nil)
+      block.call( self.__contents )
+    else
+      sep = Type.coerce_to(sep, String, :to_str)
+      if sep.size._equal?(0)
+        while not eof?
+          para = self.__next_paragraph
+          block.call(para)
+        end
+      else
+        sep_ch = sep[0]
+        while not eof?
+          block.call( self.__next_line( sep_ch ) )
+        end
+      end
+    end
+    self
+  end
+
+  alias each each_line 
 
   def fcntl(op, flags=0)
     # only these operations are supported by __fcntl primitive:
@@ -36,14 +74,148 @@ class IO
     end
   end
 
-  def <<(anObj)
-    unless anObj._isString
-      anObj = anObj.to_s
+  primitive '__fileno', 'fileDescriptor'
+
+  def fileno
+    if self.closed?
+      raise IOError, 'cannot get fileno of a closed IO'
     end
-    self.write(anObj)
+    self.__fileno
   end
 
-  # NOTE: IO#read() is deprecated...perhaps we don't bother?
+  alias to_i fileno
+
+  def self.for_fd(fd_int, modestring)
+    raise NotImplementedError , 'IO.for_fd not supported yet'
+  end
+
+  def self.foreach(filename, sep=$/, &block)
+    f = File.open(filename, 'r')
+    f.each_line(sep) { | str | 
+      block.call(str)
+    }
+    nil
+  end
+
+  # def fsync ; end # subclass responsibility
+
+  def gets(*args)    # [  begin gets implementation
+    raise ArgumentError, 'expected 0 or 1 arg'
+  end
+  
+  def gets(sep_string)
+    # variant after first gets no bridges   
+    res = self.__gets(sep_string, 0x31)
+    res 
+  end
+  
+  def gets
+    # variant after first gets no bridges  
+    res = self.__gets( $/, 0x31 ) 
+    res
+  end
+
+  def __gets(a_sep, vcGlobalIdx)
+    # __gets maybe reimplemented in subclasses
+    if a_sep._equal?(nil)
+      res = __contents
+      self.__increment_lineno
+    else
+      sep = Type.coerce_to(a_sep, String, :to_str)
+      sep_len = sep.length
+      if sep_len._equal?(1)
+        res = self.__next_line(sep[0])
+      elsif sep_len._equal?(0)
+        res = self.eof?  ?  nil : self.__next_paragraph
+      else
+        raise ArgumentError, 'IO#gets, multi-character separator not implemented yet'
+      end
+    end
+    res.__storeRubyVcGlobal( vcGlobalIdx ) # store into caller's $_
+    res
+  end
+
+  def __next_paragraph
+    # caller has checked for not eof? 
+    para = ''
+    while true  # add non-empty lines to result
+      str = self.__next_line_to( 10 )
+      if str._equal?(nil)
+        unless __last_err_code._equal?(0)
+          raise IOError , self.__last_err_string  # TODO: Errno::xxx
+        end
+        return nil
+      end
+      para << str
+      if eof?
+        self.__increment_lineno # count paragraphs, not lines
+        return para
+      end
+      ch = self.__peek_byte
+      if ch._equal?(10) 
+        para << self.read(1)  # add first empty line
+        while true   # skip subsequent empty lines 
+          break if eof?
+          ch = self.__peek_byte
+          if ch._not_equal?(10)
+            self.__increment_lineno # count paragraphs, not lines
+            return para
+          end
+          self.read(1)
+        end
+      end
+    end
+  end
+
+  def __next_line(sep_ch)
+    res = __next_line_to(sep_ch)
+    if res._equal?(nil)
+      unless __last_err_code._equal?(0)
+        raise IOError , self.__last_err_string  # TODO: Errno::xxx
+      end
+    else
+      self.__increment_lineno
+    end
+    res
+  end
+
+  # reimplement send so $_ maintained for gets
+  def send(sym)
+    if (sym._equal?(:gets))
+      return __gets($/ , 0x31)
+    end
+    super(sym)
+  end
+
+  def send(sym, arg)
+    if (sym._equal?(:gets))
+      return __gets(arg, 0x31)
+    end
+    super(sym, arg)
+  end
+
+  def __send__(sym)
+    if (sym._equal?(:gets))
+      return __gets($/ , 0x31)
+    end
+    super(sym)
+  end
+
+  def __send__(sym, arg)
+    if (sym._equal?(:gets))
+      return __gets(arg , 0x31)
+    end
+    super(sym, arg)
+  end
+
+  # ]   end of gets implementation
+
+  # NOTE: IO#read() is deprecated...perhaps we don't bother? 
+  #   read is implemented in subclasses
+
+  def initialize(*args, &block)
+    raise NotImplementedError , 'IO.new not supported yet'
+  end
 
   # Returns true if io is associated with a terminal device (tty), and
   # returns false otherwise.
@@ -52,9 +224,58 @@ class IO
   end
   alias tty? isatty
 
+  def lineno
+    if closed?
+      raise IOError, 'IO#lineno on a closed IO'
+    end
+    num = @lineNumber
+    if num._equal?(nil)
+      num = 0
+    end
+    num
+  end
+
+  def lineno=(integer)
+    if closed?
+      raise IOError, 'IO#lineno= on a closed IO'
+    end
+    num = Type.coerce_to(integer, Fixnum, :to_int)
+    @lineNumber = num
+    num
+  end
+
+  def __increment_lineno
+    # to be called by gets implementations
+    num = @lineNumber
+    if num._equal?(nil)
+      num = 0
+    end
+    num += 1
+    @lineNumber = num 
+    $. = num
+    num
+  end
+
+  def self.open(int_fd, mode_string, &block)
+    raise NotImplementedError
+  end
+
+  def pid
+    nil  # need to change after self.popen and self.pipe implemented
+  end
+
   def self.popen(cmd, mode="r", &block)
     raise NotImplementedError
   end
+
+  def <<(anObj)
+    unless anObj._isString
+      anObj = anObj.to_s
+    end
+    self.write(anObj)
+  end
+
+  # def pos ; end # subclass responsibility
 
   #  Writes the given object(s) to <em>ios</em>. The stream must be
   #  opened for writing. If the output record separator (<code>$\\</code>)
@@ -241,32 +462,6 @@ class IO
     data
   end
 
-  def lineno
-    num = @lineNumber
-    if num._equal?(nil)
-      num = 0
-    end
-    num
-  end
-
-  def lineno=(integer)
-    num = Type.coerce_to(integer, Fixnum, :to_i)
-    if num < 0
-      raise ArgumentError, 'IO#lineno= expects Integer >= 0'
-    end
-    @lineNumber = num
-    num
-  end
-
-  def __increment_lineno
-    # to be called by gets implementations
-    num = @lineNumber
-    if num._equal?(nil)
-      num = 0
-    end
-    @lineNumber = num + 1
-  end
-
   ##
   # Reads a line as with IO#gets, but raises an EOFError on end of file.
   def readline(separator=$/)
@@ -282,6 +477,14 @@ class IO
     raise EOFError if res.nil?
     res.__storeRubyVcGlobal(0x21) # store into caller's $_
     res
+  end
+
+  def readchar 
+    ch = self.getc
+    if ch._equal?(nil)
+      raise EOFError, 'EOF during readchar'
+    end
+    ch
   end
 
   ##
@@ -309,6 +512,18 @@ class IO
     end
   end
 
+  # def reopen; end #  subclass responsibility
+
+  # def rewind ; end # subclass responsibility
+
+  # def seek ; end # subclass responsibility
+
+  # sysseek does not work on Sockets yet
+  def sysseek(offset, whence = SEEK_SET)
+    self.seek(offset, whence)
+    self.pos
+  end
+
   def self.select( reads, writes=nil, errs=nil, timeout=nil )
     if timeout._isFixnum
       ms = timeout * 1000
@@ -324,4 +539,29 @@ class IO
     end
     Kernel.__select(reads, writes, errs, *[ ms ])
   end
+
+  primitive 'stat',  'stat'
+ 
+  primitive 'sync', 'sync'
+
+  # sync= has no effect, in Maglev  File and Socket never buffer output
+  primitive 'sync=', 'setSync:'  
+
+  def self.sysopen(filename, mode=Undefined, permission=Undefined)
+    f = File.open(filename, mode, permission)
+    f.__fileno 
+  end
+
+  # def sysread(length, buffer); end # subclass responsibility
+
+  # def syswrite(length, buffer); end # subclass responsibility
+
+  # def tell ; end # subclass responsibility
+
+  def to_io
+    self
+  end
+
+  # def ungetc ; end # subclass responsibility
+
 end

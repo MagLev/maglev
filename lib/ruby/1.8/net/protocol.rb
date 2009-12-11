@@ -130,10 +130,7 @@ module Net # :nodoc:
 
     def rbuf_fill
       timeout(@read_timeout) {
-        str = @io.sysread(1024)
-        if str._equal?(nil)  # TODO, remove workaround to sysread problems
-          raise EOFError
-        end
+        str = @io.sysread(1500) # use buf size > typical MTU
         @rbuf << str
       }
     end

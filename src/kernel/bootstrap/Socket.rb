@@ -1,118 +1,127 @@
-#   We currently do not have a BasicSocket class .
-#   Ruby BasicSocket and Socket methods are combined into Smalltalk RubySocket .
-#
-#   TCPSocket.class open()  does a blocking connect attempt
-#   and returns a non-blocking socket.
-#
-#   successful TCPServer.accept  returns a new socket whose blocking
-#   state is the same as the receiver's
-#
-#   All other newly created sockets default to non-blocking. Use
-#      aSocket.set_blocking(false)
-#   to change a socket to blocking.
-#
-#  Operations on a non-blocking socket that would block, will cause
-#  the Thread scheduler to suspend the current thread until the
-#  operation completes or fails.  Applications must use IO.select
-#  appropriately  if it is desired to not block on a socket operation.
+#   Maglev does not have a BasicSocket class ,
+#   methods that would be in BasicSocket in MRI are implemented in Socket .
 
-class Socket
+class Socket # [
 
   # OS dependent constants initialized by smalltalk code
   #  in Socket>>_initTransientSocketConstants , called from RubyContext>>initTransient .
+
+  primitive '__active?', 'isActive'
 
   # accept implemented only in TCPServer .
   # bind, listen not implemented,
   #   use  TCPServer>>new:port:  to create a listening socket
 
-  # send, recv , syswrite function per the non-blocking state of the receiver.
-  def send(string, flags, addr)
-    unless addr._equal?(nil)
-      raise 'addr arg not supported by send'
-    end
-    unless flags._equal?(0)
-      raise 'non-zero flags not supported by send'
-    end
-    syswrite(string)
-  end
-  def send(string, flags)
-    unless flags._equal?(0)
-      raise 'non-zero flags not supported by send'
-    end
-    syswrite(string)
-  end
-  primitive_nobridge 'send', 'syswrite:'
+  primitive '__close', 'close'
 
-  primitive_nobridge 'syswrite', 'syswrite:'
-
-  # write uses buffered IO semantics and will wait for socket to transmit the data
-  primitive_nobridge '<<', 'write:'
-  primitive_nobridge 'write', 'write:'
-
-  # MRI will give errors like 'IOError: sysread for buffered IO'
-  # if you mix read: and recv: and attempt recv: on a Socket with
-  #  unread buffered input.  Maglev unifies the IO and will deliver data
-  # in this case.
-
-  primitive 'read', 'read:'
-  primitive 'recv', 'recv:'
-  primitive 'sysread', 'recv:'
-
-  def flush
-    # nothing to do, no buffering in the VM for socket write operations
-    self
-  end
-
-  primitive_nobridge '__gets', 'gets:'
-
-  def gets(*args, &blk)
-    raise ArgumentError, 'expected 0 or 1 arg'
-    #  variants other than gets , gets(terminator) not supported
-    # because bridge methods would interfere with use of __storeRubyVcGlobal
-  end
-  def gets
-    #no terminator specified means read all available data
-    res = self.recv(4096)
-    res.__storeRubyVcGlobal(0x21) # store into caller's $_
-    self.__increment_lineno
-    res
-  end
-
-  def gets(separator)
-    if separator._equal?(nil)
-      res = self.recv(4096)
-    elsif separator._isString
-      if separator.length._equal?(1)
-        res = self.__gets(separator[0])
-      else
-        raise ArgumentError, 'Socket#gets, multi-character separator not implemented yet'
-      end
+  def close
+    if self.__active? 
+      self.__close
     else
-      raise TypeError , 'Socket#gets, separator arg must be nil or a String'
+      raise IOError, 'already closed'
     end
-    res.__storeRubyVcGlobal(0x21) # store into caller's $_
-    self.__increment_lineno
-    res
+    nil 
   end
 
-  primitive 'close', 'close'
-  primitive '__active?', 'isActive'
-  primitive_nobridge 'shutdown', 'shutdown'
-  primitive 'shutdown', 'shutdown:'
-  primitive 'connected?', 'isConnected'
+  primitive '__clear_buffer', '_clearReadBuffer'
 
   def closed?
     ! __active?
   end
 
-  def eof?
-    conn = connected?
-    !conn
+  def __contents
+    self.read(4096)
   end
 
-  # following 2 are in BasicSocket in Ruby 1.8 , but put in Socket for now,
+  primitive 'connected?', 'isConnected'
 
-  primitive_nobridge '__setsockopt', 'setsockopt:name:value:'
+  class_primitive 'do_not_reverse_lookup=', 'setNoReverseLookup:'
+
+  def eof?
+    ! self.connected?
+  end
+
+  def fcntl(op, flags=0)
+    # Socket specific implemention for F_SETFL, NONBLOCK
+    op = Type.coerce_to(op, Fixnum, :to_int)
+    if op._equal?(Fcntl::F_SETFL)
+      flags = Type.coerce_to(flags, Fixnum, :to_int)
+      if (flags & File::NONBLOCK) != 0
+        @isRubyBlocking = false
+      else
+        @isRubyBlocking = true
+      end
+      flags = flags & (~ File::NONBLOCK)
+      super(op, flags)
+    elsif op._equal?(Fcntl::F_GETFL)
+      res = super(op, flags)
+      if @isRubyBlocking
+        res = res | File::NONBLOCK
+      end
+      res
+    else
+      super(op, flags)
+    end
+  end
+
+  def flush
+    # nothing to do, no buffering in the VM for socket write operations
+    if closed?
+      raise IOError, 'cannot flush a closed Socket'
+    end
+    self
+  end
+
+  def fsync
+    if closed?
+      raise IOError, 'cannot fsync a closed Socket'
+    end
+    0 # nothing to do for a socket
+  end
+
+  class_primitive_nobridge '__getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
+  class_primitive 'gethostbyname', 'gethostbyname:'
+  class_primitive '__getservbyname', 'getservbyname:protocol:'
+  class_primitive 'gethostname', 'getLocalHostName'
+
+  def self.getservbyname(service, proto='tcp')
+    # returns a port number as a Fixnum , or raises an error
+    #   if the service is not found.
+    s = Type.coerce_to(service, String, :to_str)
+    p = Type.coerce_to(proto, String, :to_str)
+    __getservbyname(s, p)
+  end
+
+  def self.getaddrinfo(host, service, family = 0, socktype = 0,
+      protocol = 0, flags = 0)
+    # implementation in Smalltalk layer is incomplete ,
+    #   result will only include a single entry for the specified host
+    #   and service, assuming TCP protocol.
+    if host._equal?(nil)
+      host = 'localhost'
+    else
+      host = Type.coerce_to(host, String, :to_s)
+    end
+    if service._isFixnum 
+      # ok
+    elsif service._equal?(nil)
+      service = 0
+    else
+      service = Type.coerce_to(service, String, :to_s)
+    end
+    family = Type.coerce_to(family, Fixnum, :to_int)
+    socktype = Type.coerce_to(socktype, Fixnum, :to_int)
+    protocol = Type.coerce_to(protocol, Fixnum, :to_int)
+    flags = Type.coerce_to(flags, Fixnum, :to_int)
+    args = [ host, service, family, socktype, protocol, flags ]
+    __getaddrinfo( args )
+  end
+
+  primitive_nobridge '__next_line_to', 'getLine:'
+
+  primitive_nobridge 'getc', 'getByte'
+
+  # def gets; end # implemented in IO
 
   primitive '__getsockopt', 'getsockopt:name:'
 
@@ -164,6 +173,76 @@ class Socket
     end
   end
 
+  primitive '__last_err_code', 'lastErrorCode'
+  primitive '__last_err_string', 'lastErrorString'
+
+  class_primitive 'new', 'new:type:proto:'
+
+  primitive '__peek_byte', '_peek'
+
+  def rewind
+    self.__clear_buffer # clear the read buffer
+    self.lineno=(0)
+  end
+
+  # MRI will give errors like 'IOError: sysread for buffered IO'
+  # if you mix read: and recv: and attempt recv: on a Socket with
+  #  unread buffered input.  Maglev unifies the IO and will deliver data
+  # in this case.
+
+  # read exactly length bytes from the socket.
+  # If a Ruby Socket is non-blocking , read will raise EAGAIN
+  # if no data is available.  
+  # If a Ruby Socket is blocking, read will wait for specified number
+  # of bytes to be received, allowing other Ruby Threads to run.
+  def read(length)
+    buf = String.__new(length)
+    __read_into(length, buf, length)
+  end
+  
+  primitive '__read_into', 'read:into:minLength:' # raises EOFError on socket eof
+
+  # def recv(length) ; end #  receive up to length bytes from the socket.
+  #  If a Ruby Socket is non-blocking , recv will raise EAGAIN
+  #  if no data is available.  The size of the result will be >= 1 and <= length.
+  primitive 'recv', 'recv:'
+
+  def seek(offset, whence) # raise not implemented error
+    raise NotImplementedError
+  end
+
+  # send attempts to write specified string to the underlying socket.
+  # If a Ruby Socket is non-blocking , and the underlying C socket is
+  # blocked on output,  a send will raise an EAGAIN error.
+  # Returns number of bytes written which may be less than requested.
+  def send(string, flags, addr)
+    unless addr._equal?(nil)
+      raise 'addr arg not supported by send'
+    end
+    unless flags._equal?(0)
+      raise 'non-zero flags not supported by send'
+    end
+    syswrite(string)
+  end
+  def send(string, flags)
+    unless flags._equal?(0)
+      raise 'non-zero flags not supported by send'
+    end
+    syswrite(string)
+  end
+
+  primitive_nobridge 'send', 'syswrite:'    # one arg form send(string)
+
+  # syswrite attempts to write specified string to the underlying socket.
+  # If a Ruby Socket is non-blocking , and the underlying C socket is
+  # blocked on output,  a syswrite will raise an EAGAIN error.
+  # Returns number of bytes written which may be less than requested.
+  primitive_nobridge 'syswrite', 'syswrite:'
+
+  # following 2 are in BasicSocket in Ruby 1.8 , but put in Socket for now,
+
+  primitive_nobridge '__setsockopt', 'setsockopt:name:value:'
+
   # Sets a socket option. These are protocol and system specific, see your
   # local sytem documentation for details.
   #
@@ -196,7 +275,7 @@ class Socket
   # examining your system headers to determine the correct definition. An
   # example is an +ip_mreq+, which may be defined in your system headers as:
   #   struct ip_mreq {
-  #     struct  in_addr imr_multiaddr;
+  #may     struct  in_addr imr_multiaddr;
   #     struct  in_addr imr_interface;
   #   };
   #
@@ -230,70 +309,66 @@ class Socket
     end
   end
 
-  class_primitive 'do_not_reverse_lookup=', 'setNoReverseLookup:'
-  class_primitive_nobridge '__getaddrinfo', '_getaddrinfo:'  # one arg , an Array of 6 elements
-  class_primitive 'gethostbyname', 'gethostbyname:'
-  class_primitive '__getservbyname', 'getservbyname:protocol:'
-  class_primitive 'gethostname', 'getLocalHostName'
-  class_primitive 'new', 'new:type:proto:'
+  primitive_nobridge 'shutdown', 'shutdown'
+  primitive 'shutdown', 'shutdown:'
 
-  def self.getservbyname(service, proto='tcp')
-    # returns a port number as a Fixnum , or raises an error
-    #   if the service is not found.
-    s = Type.coerce_to(service, String, :to_str)
-    p = Type.coerce_to(proto, String, :to_str)
-    __getservbyname(s, p)
+  # Read up to 4096 bytes from the socket
+  # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
+  # if no data is available.  
+  def sysread
+    str = self.recv(4096)
+    if str._equal?(nil)
+      raise EOFError, "End of file on socket"
+    end
+    str
   end
 
-  def self.getaddrinfo(host, service, family = 0, socktype = 0,
-      protocol = 0, flags = 0)
-    # implementation in Smalltalk layer is incomplete ,
-    #   result will only include a single entry for the specified host
-    #   and service, assuming TCP protocol.
-    if host._equal?(nil)
-      host = 'localhost'
+  # If length is nil, read available data from socket
+  # else read up to length bytes from socket .
+  # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
+  # if no data is available.  
+  def sysread(length)
+    if length._equal?(nil)  
+      len = 4096
     else
-      host = Type.coerce_to(host, String, :to_s)
+      len = Type.coerce_to(length, Fixnum, :to_int)
+      raise ArgumentError, "length must not be negative" if len < 0
     end
-    if service._isFixnum 
-      # ok
-    elsif service._equal?(nil)
-      service = 0
-    else
-      service = Type.coerce_to(service, String, :to_s)
+    str = self.recv(len)
+    if str._equal?(nil)
+      raise EOFError, "End of file on socket"
     end
-    family = Type.coerce_to(family, Fixnum, :to_int)
-    socktype = Type.coerce_to(socktype, Fixnum, :to_int)
-    protocol = Type.coerce_to(protocol, Fixnum, :to_int)
-    flags = Type.coerce_to(flags, Fixnum, :to_int)
-    args = [ host, service, family, socktype, protocol, flags ]
-    __getaddrinfo( args )
+    str
   end
 
-  def fcntl(op, flags=0)
-    # Socket specific implemention for F_SETFL, NONBLOCK
-    op = Type.coerce_to(op, Fixnum, :to_int)
-    if op._equal?(Fcntl::F_SETFL)
-      flags = Type.coerce_to(flags, Fixnum, :to_int)
-      if (flags & File::NONBLOCK) != 0
-        @isRubyBlocking = false
-      else
-        @isRubyBlocking = true
-      end
-      flags = flags & (~ File::NONBLOCK)
-      super(op, flags)
-    elsif op._equal?(Fcntl::F_GETFL)
-      res = super(op, flags)
-      if @isRubyBlocking
-        res = res | File::NONBLOCK
-      end
-      res
+  # Read up to length bytes from the socket into the specified buffer.
+  # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
+  # if no data is available.  
+  def sysread(length, a_buffer)
+    if length._equal?(nil)
+      len = 1500
     else
-      super(op, flags)
+      len = Type.coerce_to(length, Fixnum, :to_int)
+      raise ArgumentError, "length must not be negative" if len < 0
     end
+    buffer = Type.coerce_to(a_buffer, String, :to_str)
+    self.__read_into(len, buffer, 1)  # grows buffer if needed
+    buffer
   end
 
-end
+
+  primitive 'ungetc', 'ungetByte:'
+
+  # << uses buffered IO semantics and will wait for socket to transmit all the data.
+  # never raises EAGAIN.
+  primitive_nobridge '<<', 'write:'
+
+  # write uses buffered IO semantics and will wait for socket to transmit all the data
+  # never raises EAGAIN.
+  primitive_nobridge 'write', 'write:'
+
+end # ]
+
 
 class IPSocket
   class_primitive 'getaddress', 'getHostAddressByName:'

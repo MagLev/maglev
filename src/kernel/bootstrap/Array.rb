@@ -488,7 +488,7 @@ class Array
   # Need to either overwrite or allow a mixin.
 
   def ==(other)
-    return true if equal?(other)
+    return true if self._equal?(other)
     return false unless other._isArray
     lim = self.size
     unless lim._equal?(other.size)

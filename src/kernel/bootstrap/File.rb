@@ -2,12 +2,12 @@
 # File in Ruby is identically Smalltalk GsFile
 class File
 
-  ALT_SEPARATOR  = nil
-  PATH_SEPARATOR = ':'
-  SEPARATOR      = '/'
-  Separator      = SEPARATOR
+ALT_SEPARATOR  = nil
+PATH_SEPARATOR = ':'
+SEPARATOR      = '/'
+Separator      = SEPARATOR
 
-  Stat = _resolve_smalltalk_global(:GsFileStat)
+Stat = _resolve_smalltalk_global(:GsFileStat)
 
   class_primitive_nobridge '__section2OpenConstants', '_section2OpenConstants'
 
@@ -16,15 +16,15 @@ class File
   FNM_PATHNAME = 0x02
   FNM_DOTMATCH = 0x04
   FNM_CASEFOLD = 0x08
-  
+
   SEEK_SET     = 0            # set file position to offset
   SEEK_CUR     = 1            # set file position to current + offset
   SEEK_END     = 2            # set file position to end of file + offset
 
-  # Following constants are OS independent values different than
-  #  any found on common variants of Unix. They are translated to
-  #  OS dependent values by the primitives.  Use of other hardcoded values
-  #  will cause Exceptions during file opening.
+# Following constants are OS independent values different than
+#  any found on common variants of Unix. They are translated to
+#  OS dependent values by the primitives.  Use of other hardcoded values
+#  will cause Exceptions during file opening.
   APPEND = self.__section2OpenConstants[:RUBY_APPEND]
   CREAT = self.__section2OpenConstants[:RUBY_CREAT]
   EXCL = self.__section2OpenConstants[:RUBY_EXCL]
@@ -35,25 +35,36 @@ class File
   SYNC = self.__section2OpenConstants[:RUBY_SYNC]
   TRUNC = self.__section2OpenConstants[:RUBY_TRUNC]
   WRONLY = self.__section2OpenConstants[:RUBY_WRONLY]
-  #  see also File::Constants in IO2.rb
+#  see also File::Constants in IO2.rb
 
-  # FILE::LOCK  constants initialized below
+# FILE::LOCK  constants initialized below
 
-  primitive 'close', 'close'
-  # << inherited from IO
-  primitive '__write', 'addAll:'
-  primitive '__getc', 'nextByte'
-  primitive '__next_line_to', 'nextLineTo:'
+  primitive '__close', 'close'
+
+  def close
+    if self.__is_open 
+      self.__close
+    else
+      raise IOError, 'already closed'
+    end
+    nil 
+  end
+
+  primitive_nobridge '__write', 'addAll:'
+  primitive_nobridge '__getc', 'nextByte'
+  primitive_nobridge '__peek_byte', 'peekByte'
+  primitive_nobridge '__next_line_to', 'nextLineTo:'
   primitive_nobridge '__at_end', 'atEnd'
-  primitive '__read', 'next:'
-  primitive '__read', 'contents'  # zero arg variant
+  primitive_nobridge '__next', 'next:'
+  primitive_nobridge '__contents', 'contents'  # zero arg variant
 
   primitive '__read_into', 'read:into:'
-  primitive 'flush', 'flush'
-  primitive 'rewind', 'rewind'
-  primitive '__is_open', 'isOpen'
-  primitive '__last_err_string', 'lastErrorString'
-  primitive '__last_err_code', 'lastErrorCode'
+  primitive '__flush', 'flush'
+  primitive '__rewind', 'rewind'
+  primitive_nobridge '__is_open', 'isOpen'
+  primitive_nobridge '__last_err_string', 'lastErrorString'
+  primitive_nobridge '__last_err_code', 'lastErrorCode'
+  primitive_nobridge '__readable', '_isReadable'
   primitive_nobridge '__seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '__fstat','fstat:isLstat:'
@@ -80,13 +91,6 @@ class File
 
   def self.atime(filename)
     File.stat(filename).atime
-  end
-
-  def each(separator=$/, &block)
-    sep = separator[0]
-    until eof?
-      block.call(__next_line(sep))
-    end
   end
 
   def self.__stat(name, is_lstat)
@@ -684,6 +688,9 @@ class File
   end
 
   def eof?
+    unless self.__readable
+      raise IOError , 'file not opened for read'
+    end
     status = self.__at_end
     if (status._equal?(nil))
       raise IOError
@@ -693,8 +700,7 @@ class File
 
   def getc
     raise IOError, 'getc: closed stream' unless __is_open
-    return nil if self.eof?
-    __getc
+    self.__getc  # a byte value or nil for eof
   end
 
   # --------- begin gets implementation  [
@@ -705,93 +711,119 @@ class File
 
   def gets(sep)
     # variant after first gets no bridges
-    res = __next_line( sep[0] )
-    res.__storeRubyVcGlobal(0x21) # store into caller's $_
-    res
+    __gets(sep, 0x31)
   end
 
   def gets
     # variant after first gets no bridges
-    sep=$/
-    res = __next_line( sep[0] )
-    res.__storeRubyVcGlobal(0x21) # store into caller's $_
-    res
+    __gets($/, 0x31)
   end
 
-  def __next_line(sep)
-    res = __next_line_to(sep)
-    if res._equal?(nil)
-      unless __last_err_code._equal?(0)
-        raise IOError , self.__last_err_string  # TODO: Errno::xxx
-      end
-    end
-    self.__increment_lineno
-    res
-  end
+  # def __gets; end # implemented in IO
 
-  def read(a_length=Undefined, a_buffer=Undefined)
+  def read
     raise IOError, 'read: closed stream' unless __is_open
+    if self.eof?
+      return ''
+    end
+    data = __contents 
+    data = '' if data._equal?(nil)
+    data
+  end
 
-    read_all_bytes = a_length._equal?(Undefined) || a_length.nil?
+  def read(a_length)
+    raise IOError, 'read: closed stream' unless __is_open
+    read_all_bytes = a_length._equal?(nil) 
     unless read_all_bytes
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
       return nil if self.pos > self.stat.size
     end
-
     if self.eof?
       return read_all_bytes ? '' : nil
     end
-
-    data = if a_buffer._equal?(Undefined)
-             data = read_all_bytes ? __read : __read(length)
-           else
-             buffer = Type.coerce_to(a_buffer, String, :to_str)
-             length = self.stat.size if length._equal?(nil)
-             num_read = __read_into(length, buffer)
-             raise IOError, 'error' if num_read._equal?(nil)
-             buffer.size = num_read # truncate buffer
-             buffer
-           end
+    data = read_all_bytes ? __contents : __next(length)
     data = '' if data._equal?(nil)
     data
+  end
+
+  def read(a_length, a_buffer)
+    raise IOError, 'read: closed stream' unless __is_open
+    read_all_bytes = a_length._equal?(nil) 
+    unless read_all_bytes
+      length = Type.coerce_to(a_length, Fixnum, :to_int)
+      raise ArgumentError, "length must not be negative" if length < 0
+      return nil if self.pos > self.stat.size
+    end
+    if self.eof?
+      return read_all_bytes ? '' : nil
+    end
+    buffer = Type.coerce_to(a_buffer, String, :to_str)
+    length = self.stat.size if length._equal?(nil)
+    num_read = __read_into(length, buffer)
+    raise IOError, 'error' if num_read._equal?(nil)
+    buffer.size = num_read # truncate buffer
+    buffer
+  end
+
+  def sysread
+    if self.eof?
+      raise EOFError, "End of file reached"
+    end
+    str = self.__contents
+    if str._equal?(nil)
+      raise EOFError, "End of file reached"
+    end
+    str
+  end
+
+  def sysread(length)
+    if self.eof?
+      raise EOFError, "End of file reached"
+    end
+    str = self.read(length)
+    if str._equal?(nil)
+      raise EOFError, "End of file reached"
+    end
+    str
+  end
+
+  def sysread(length, buffer)
+    if self.eof?
+      raise EOFError, "End of file reached"
+    end
+    str = self.read(length, buffer)
+    if str._equal?(nil)
+      raise EOFError, "End of file reached"
+    end
+    str
   end
 
   # during bootstrap,  send and __send__ get no bridge methods
   def send(sym)
     if (sym._equal?(:gets))
-      sep=$/
-      res = __next_line( sep[0] )
-      res.__storeRubyVcGlobal(0x21) # store into caller's $_
-      return res
+      return __gets($/ , 0x31)
     end
     super(sym)
   end
 
   def send(sym, arg)
     if (sym._equal?(:gets))
-      res = __next_line( arg[0] )
-      res.__storeRubyVcGlobal(0x21) # store into caller's $_
-      return res
+      return __gets(arg, 0x31)
     end
     super(sym, arg)
   end
 
   def __send__(sym)
     if (sym._equal?(:gets))
-      sep=$/
-      res = __next_line( sep[0] )
-      res.__storeRubyVcGlobal(0x21) # store into caller's $_
-      return res
+      return __gets($/ , 0x31)
     end
     super(sym)
   end
 
   def __send__(sym, arg)
     if (sym._equal?(:gets))
-      res = __next_line( arg[0] )
-      res.__storeRubyVcGlobal(0x21) # store into caller's $_
-      return res
+      return __gets(arg , 0x31)
     end
     super(sym, arg)
   end
@@ -826,6 +858,24 @@ class File
 
   # -------- end flock
 
+  def flush
+    if closed?
+      raise IOError, 'cannot flush a closed File'
+    end
+    self.__flush
+  end
+
+  def fsync
+    if closed?
+      raise IOError, 'cannot flush a closed File'
+    end
+    status = File.__modify_file(16, @fileDescriptor, nil, nil)
+    unless status._equal?(0)
+      Errno.raise_errno(status, 'aFile.fsync failed') 
+    end
+    0
+  end
+  
   def inspect
     str = super
     if closed? 
@@ -855,11 +905,19 @@ class File
     self.stat.mtime
   end
 
+  def rewind
+    self.__rewind
+    self.lineno=(0)
+  end
+
   def path
     @pathName
   end
 
   def stat
+    if closed?
+      raise IOError, 'File#stat on a closed File'
+    end
     res = File.__fstat(@fileDescriptor, false)
     if (res._isFixnum)
       Errno.raise_errno(status, 'aFile.stat failed')
@@ -867,24 +925,37 @@ class File
     return res
   end
 
-  def each_line(&block)
-    sep = ($/._equal?(nil) ? 10 : $/[0])
-    until eof?
-      block.call( __next_line( sep ) )
-    end
-  end
+  # each_line inherited from IO
 
   def seek(offset, whence = SEEK_SET)
-    __seek(offset, whence)
+    offset = Type.coerce_to(offset, Fixnum, :to_int)
+    pos = __seek(offset, whence)
+    if pos._equal?(nil)
+      Errno.raise_errno(self.__last_err_code, 'seek failed')
+    end
+    0 
   end
 
   # Return the current offset (in bytes) of +io+
-  primitive_nobridge 'pos', 'position'
+  primitive_nobridge '__pos', 'position'
+
+  def pos
+    if closed?
+      raise IOError, 'IO#pos on closed IO'
+    end
+    self.__pos
+  end
 
   # Seeks to the given position (in bytes) in +io+
   def pos=(offset)
-      seek(offset, SEEK_SET)
+    if closed?
+      raise IOError, 'IO#pos on closed IO'
+    end
+    ofs = Type.coerce_to(offset, Fixnum, :to_int)
+    seek(ofs, SEEK_SET)
   end
+
+  alias tell pos
 
   def truncate(a_length) 
     a_length = Type.coerce_to(a_length, Fixnum, :to_int)
@@ -895,6 +966,8 @@ class File
     return 0
   end
 
+  primitive 'ungetc', 'ungetByte:'  
+
   def write(arg)
     arg = Type.coerce_to(arg, String, :to_s)
     count = self.__write(arg)
@@ -903,6 +976,8 @@ class File
     end
     count
   end
+
+  alias :syswrite :write
 
 end
 File.__freeze_constants
