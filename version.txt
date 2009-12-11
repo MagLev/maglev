@@ -1,6 +1,6 @@
-maglev 0.6 (ruby 1.8.6) (2009-12-07 rev 22624-1073) 
-GEMSTONE: 3.0.0 Build: 64bit-22624
-MONTICELLO: MagLev-ao.1073.mcz
-MAGLEV: commit 051153128337b57515a21c3bab96b3a52bd4eb44
-        Author: Monty Williams <monty.williams@gemstone.com>
-        Date:   Mon Dec 7 11:50:44 2009 -0800
+maglev 0.6 (ruby 1.8.6) (2009-12-10 rev 22635-1076) 
+GEMSTONE: 3.0.0 Build: 64bit-22635
+MONTICELLO: MagLev-ao.1076.mcz
+MAGLEV: commit e37f1e658bd8e3e4012dddaeee2c6dea9c6e48c0
+        Author: Allen Otis <otisa@abaco.gemstone.com>
+        Date:   Thu Dec 10 15:46:37 2009 -0800
