@@ -1,1 +1,5 @@
 log
+x.rb
+y.rb
+*.gprof
+baseline
