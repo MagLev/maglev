@@ -1,7 +1,6 @@
 require 'sinatra'
 
 class SCGIApp < Sinatra::Base
-  set :server, ['scgi']
 
   def initialize(*args)
     super
@@ -27,7 +26,7 @@ class SCGIApp < Sinatra::Base
   end
 
   get '/' do
-    "<h2>hello from scgi lang</h2>"
+    "<h2>hello from scgi land</h2>"
   end
 end
 

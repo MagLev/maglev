@@ -24,8 +24,8 @@ task :abprof do
   #     -k   use keep alive
   #     -c   concurrency level
   #     -t   time limit (max number of seconds)
-  sh 'ab -c 1 -t 10 http://127.0.0.1:3000/foo.scgi'
-#  sh 'ab -kc 10 -t 40 http://127.0.0.1:3000/foo.scgi'
+  sh 'ab -c 1 -t 10 http://127.0.0.1:3000/i'
+#  sh 'ab -kc 10 -t 40 http://127.0.0.1:3000/'
   sh 'curl http://localhost:3000/stop'
   sh 'curl http://localhost:3000/report'
 end
@@ -36,5 +36,5 @@ task :ab do
   #     -k   use keep alive
   #     -c   concurrency level
   #     -t   time limit (max number of seconds)
-  sh 'ab -c 1 -t 10 http://127.0.0.1:3000/foo.scgi'
+  sh 'ab -c 1 -t 10 http://127.0.0.1:3000/'
 end

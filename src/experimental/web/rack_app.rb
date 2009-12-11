@@ -1,3 +1,7 @@
+# A bare-bones app to do Gprof testing of MagLev w/o Sinatra in the way.
+#
+# Usage: maglev-ruby rack_app.rb
+
 require 'rack'
 
 app = Proc.new do |env|
