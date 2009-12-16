@@ -1,12 +1,31 @@
 = MagLev Change Log
 
-== Unreleased
+== Unreleased Changes
 
+* Removed old workaround for json and trac 616, which has been fixed.
+  If you were doing:     require 'maglev_json'
+  You must instead do:   require 'json'
+
+== Changes for 22635
+* Performance improvements for binding, some string operations
+* fixes to pass more core/io specs.
+* Moved mdb and hat_trick to examples/persistence.
+* More Gprof support.  Add ability to suspend and resume sampling.
+* Added methods to read temp obj size to System
+
+== Changes for 22619
+
+* Added parsedate.rb
+* make _equal? , _is_a? , _not , _kind_of ?  special selectors
+  make equal?, is_a? , not, kind_of?  public methods in Object .
+* Added lib/ruby/1.8/csv.rb which passes all 37 RubySpecs
+* Clean up of many examples
+* Fix GStore example.  Make begin_transaction a module function.
 * Added -Mcommit and -Mpersistent command line parameters.
   -Mpersistent will start the VM in persistent mode.
   -Mcommit start the VM in persistent mode and perform a
   Maglev.commit_transaction just before the VM exits.
-
 * rlwrap is turned off by default. Enable with -Mrlwrap.
-
 * RDoc basically works.
+
+== End of file ==
