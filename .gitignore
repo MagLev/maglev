@@ -15,10 +15,17 @@
 /gemstone/
 /locks/
 /log/
-/src/baseline
-/src/baseline/
-/src/experimental
-/src/experimental/
+# gitignore keeps finding files in unnecessary directories
+# since it doesn't really track directories per se
+# hopefully, these wildcards will keep the bloat down
+/src/baseline/*
+/src/baseline/*/*
+/src/baseline/*/*/*
+/src/baseline/*/*/*/*
+/src/experimental/*
+/src/experimental/*/*
+/src/experimental/*/*/*
+/src/experimental/*/*/*/*
 debugspec.inp
 cur.inp
 etc/maglev.demo.key
