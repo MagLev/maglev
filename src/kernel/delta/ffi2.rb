@@ -15,7 +15,7 @@ module FFI
       if RubyContext.persistence_mode
         arr = PersistentLibraries
         arr[0] = lib_names
-        arr[1] = clibraries 
+        arr[1] = clibraries
       end
       $__FFI_CLibrary_TransientLibraries = [ lib_names, clibraries ]
     end
@@ -51,7 +51,7 @@ module FFI
     primitive_nobridge '[]', '_rubyByteAt:'
     primitive_nobridge 'size', 'size'
 
-    
+
 
     # following used for fields of Struct
     primitive_nobridge 'int8at', 'int8At:'
@@ -65,12 +65,12 @@ module FFI
     primitive_nobridge 'uint64at', 'uint64At:'
     primitive_nobridge 'get_long', 'int64At:'
     primitive_nobridge 'get_long_long', 'int64At:'
-    primitive_nobridge 'get_int64', 'int64At:' 
+    primitive_nobridge 'get_int64', 'int64At:'
     primitive_nobridge 'get_ulong', 'uint64At:'
     primitive_nobridge 'get_ulong_long', 'uint64At:'
     primitive_nobridge 'double_at', 'doubleAt:'
-    primitive_nobridge 'get_float64', 'doubleAt:' 
-    primitive_nobridge 'get_double', 'doubleAt:' 
+    primitive_nobridge 'get_float64', 'doubleAt:'
+    primitive_nobridge 'get_double', 'doubleAt:'
     primitive_nobridge 'double_put', 'doubleAt:put:'
     primitive_nobridge 'put_char', 'int8At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
@@ -123,7 +123,7 @@ module FFI
     primitive_nobridge 'autorelease=', 'autoRelease:'
       # argument must be a boolean, false means disable auto-free
       #  all other values ignored.
-   
+
     primitive_nobridge 'free' , 'setDead'
       # does not actually free C memory. subsequent attempts
       # to access C memory will raise an exception.
@@ -140,7 +140,7 @@ module FFI
       cpointer = self.__pointer_at(byteoffset)
       mp_cls = MemoryPointer
       if cpointer._equal?(nil)
-        return mp_cls.__new_null 
+        return mp_cls.__new_null
       end
       mp = mp_cls.new
       mp.put_long(0, cpointer.address)
@@ -193,7 +193,7 @@ module FFI
       self.address == other.address
     end
 
-    def null? 
+    def null?
       self.address._equal?(0)
     end
 
@@ -238,7 +238,7 @@ module FFI
         PersistentTypes[name] = val
       end
     end
- 
+
     def self.__install_native_type(a_type)
       FFI.const_set( a_type.name , a_type )
     end
@@ -284,7 +284,7 @@ module FFI
 
     def errno
       Dir.__get_clear_errno
-    end 
+    end
 
     def find_type(query)
       if query._isSymbol
@@ -297,7 +297,7 @@ module FFI
         return :ptr
       end
       if query._kind_of?(Enum)
-        t = Enums.find(query)  
+        t = Enums.find(query)
         if t._not_equal?(nil)
            return t
         end
@@ -311,7 +311,7 @@ module FFI
       while true
         unless set.__add_if_absent(prev)
           raise Error, 'infinite loop in find_base_type'
-        end 
+        end
         t = find_type(prev)
         if t._isSymbol
           return t
@@ -368,7 +368,11 @@ module FFI
       my_debug = FFI::DEBUG
       while n < len
         a_name = names[n]
-        puts "--FFI:  ffi_lib: adding #{a_name}" if  my_debug > 0
+        if  my_debug > 0
+          debug_name = a_name == USE_THIS_PROCESS_AS_LIBRARY ?
+            "USE_THIS_PROCESS_AS_LIBRARY" : a_name.inspect
+          puts "--FFI:  ffi_lib: adding #{debug_name}"
+        end
         if a_name == USE_THIS_PROCESS_AS_LIBRARY
           libs << nil
         else
@@ -418,19 +422,19 @@ module FFI
       c_args = []
       have_varargs = false
       var_args_after = -1
-      args.each { |t| 
+      args.each { |t|
         if t._equal?(:varargs)
           have_varargs = true
           var_args_after = c_args.size
         elsif have_varargs
           raise TypeError , 'no more args allowed after :varargs'
         else
-          bt = ffimod.find_base_type(t) 
+          bt = ffimod.find_base_type(t)
           if bt._isSymbol
             c_args << bt
           elsif bt._kind_of?(Enum)
-            enum_args << st_argnum ; enum_args << bt 
-            c_args << :int64 
+            enum_args << st_argnum ; enum_args << bt
+            c_args << :int64
           else
             raise TypeError, 'unrecognized base argument type #{bt}'
           end
@@ -442,10 +446,10 @@ module FFI
       end
       ret = ffimod.find_base_type(ret)
       enum_ret = nil
-      unless ret._isSymbol 
+      unless ret._isSymbol
         if ret._kind_of?(Enum)
           enum_ret = ret
-          ret = :int64   
+          ret = :int64
         else
           raise TypeError, 'unrecognized base return type #{ret}'
         end
@@ -460,7 +464,7 @@ module FFI
       if len._equal?(0)
         libs = [ nil ] # search process by default
         len = 1
-      end 
+      end
       while n < len
         lib = libs[n]
         if lib._equal?(nil)
@@ -480,12 +484,12 @@ module FFI
           cf = CFunction.__new([ lib, cname, ret, c_args, var_args_after ])
           # install a method in self, derived from a rubyToCcallTemplate variant,
           #    which will be installed per RubyContext.persistent_mode
-          meth = cf.__compile_caller(name, self, [ Enums , enum_args , enum_ret ] )  
+          meth = cf.__compile_caller(name, self, [ Enums , enum_args , enum_ret ] )
           return meth
         end
         n += 1
       end
-      raise FFI::NotFoundError, "Unable to find FFI '#{cname}' in: #{@ffi_lib}"
+      raise FFI::NotFoundError, "Unable to find FFI '#{cname}' in library: #{libs.inspect}"
     end
 
     def typedef(atype, new_name)
@@ -501,13 +505,13 @@ module FFI
                if new_name._isArray
                  self.enum(new_name)
                else
-                 # self.enum(info, new_name)  # don't understand what info is 
+                 # self.enum(info, new_name)  # don't understand what info is
                  raise TypeError , 'unrecognized args to typedef'
                end
              else
                FFI.find_type(atype)
              end
-      Type.__add_type(new_name, code) 
+      Type.__add_type(new_name, code)
     end
 
     # Examples
@@ -532,7 +536,7 @@ module FFI
       arg_siz = args.size
       if arg_siz._equal?(1)
         return enum(nil, args[0])
-      elsif arg_siz._equal?(2) 
+      elsif arg_siz._equal?(2)
         a1 = args[0]
         a2 = args[1]
         if a1._isSymbol && a2._isArray

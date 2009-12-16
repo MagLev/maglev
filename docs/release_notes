@@ -1,51 +1,61 @@
-== Release Notes for the MagLev Alpha release of August 24, 2009
+= Release Notes for the MagLev Alpha
+== <tt>$MAGLEV_HOME/lib</tt>
+=== iconv:  'Unable to find FFI 'iconv_open' in: ,
 
-=== Persistence support
+On Mac OSX, a require of iconv may result in the following error message:
+
+  ERROR 2023, Error, 'Unable to find FFI 'iconv_open' in: ,
+
+This has been seen on machines with the MacPorts version of libiconv.dylib
+installed AND the <tt>DYLD_FALLBACK_LIBRARY_PATH</tt> environment variable
+set to load the MacPorts version.  This is because the names of the
+routines in the MacPorts version of iconv are different than the names in
+the Apple supplied iconv.
+
+Here are the names in the Apple provided iconv:
+
+  $ nm /usr/lib/libiconv.dylib | grep iconv_open
+  000150b5 T _iconv_open
+  000158cc T _libiconv_open
+
+Here are the names in the MacPorts version:
+
+    $ nm /opt/local/lib/libiconv.dylib | grep iconv_open
+    0000000000017f30 T _libiconv_open
+    0000000000018a60 T _libiconv_open_into
+
+Solution is to ensure the DYLD_FALLBACK_LIBRARY_PATH environment variable
+is not set when running MagLev.
+
+== Persistence support
 
 See the {Persistence API}[link:files/docs/persistence-api.html]
 
-=== Special methods
+== Special methods
 * Underscore + camelCase = GemStone unmodifiable code.  There are several
   methods that begin with an underscore and are camelCase,
   e.g. <tt>_isArray</tt>.  MagLev will not allow you to re-define these
   methods.
-* <tt>equal?</tt> is also a special case, and you are unable to re-define
-  it.
 
-=== <tt>maglev-irb</tt>
+== RubyGems
 
-* <tt>maglev-irb</tt> is not +irb+.  Eventually, <tt>maglev-irb</tt> will
-  be +irb+, but not yet.
+MagLev comes with a copy of RubyGems 1.3.5 pre-installed.  There is one
+patch to work around an oddity of the MRI zlib handling.
 
-=== RubyGems
-
-The json_pure gem mostly works, but does not handle Symbols, true or false
-correctly.  There is a patch in
-lib/ruby/site_ruby/1.8/maglev/maglev_json.rb to fix this.  To use it,
-replace:
-    require 'json'
-with:
-    require 'maglev/maglev_json'
-
-=== Kernel
+== Kernel
 * Note that we don't support instance variables as block arguments,
   <tt>{ |@cc| }</tt> must be coded as <tt>{ | c | @cc = c }</tt>.
-* <tt>Kernel#autoload</tt> is a stub.  It does an immediate require of the
-  file.
-* <tt>Kernel#autoload?</tt> is a stub.  It always returns nil.
 * <tt>Kernel#require</tt>: Tilde expansion is done only on <tt>~/...</tt>,
   not on <tt>~user/...</tt>, <tt>$"</tt> is not updated
 
-=== Threads
-* <tt>ThreadGroup</tt> is a stub.
-
 === Noise from rlwrap
-* In some cases, <tt>rlwrap</tt> (see Prerequisites[link:files/docs/prerequisites.html]) will output noise while typing at a Topaz prompt (Linux only).
+* In some cases, <tt>rlwrap</tt> (see
+  Prerequisites[link:files/docs/prerequisites.html]) will output noise
+  while typing at a Topaz prompt (Linux only).
 
-=== Misc
+== Unsupported Features
 * +ARGF+ is not supported.
 * Continuations are not supported.
-* +ObjectSpace+ is not supported.
-* <tt>Object.equal?</tt> may not be overridden.  For performance reasons,
-  it is a special selector.
+* Most methods in +ObjectSpace+ are stubs that raise
+  +NotImplementedError+.
 * String#unpack and Array#pack do not support pointers ('p' and 'P').
