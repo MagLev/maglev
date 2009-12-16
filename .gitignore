@@ -15,7 +15,9 @@
 /gemstone/
 /locks/
 /log/
+/src/baseline
 /src/baseline/
+/src/experimental
 /src/experimental/
 debugspec.inp
 cur.inp
