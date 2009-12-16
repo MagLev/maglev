@@ -368,7 +368,11 @@ module FFI
       my_debug = FFI::DEBUG
       while n < len
         a_name = names[n]
-        puts "--FFI:  ffi_lib: adding #{a_name}" if  my_debug > 0
+        if  my_debug > 0
+          debug_name = a_name == USE_THIS_PROCESS_AS_LIBRARY ?
+            "USE_THIS_PROCESS_AS_LIBRARY" : a_name.inspect
+          puts "--FFI:  ffi_lib: adding #{debug_name}"
+        end
         if a_name == USE_THIS_PROCESS_AS_LIBRARY
           libs << nil
         else
