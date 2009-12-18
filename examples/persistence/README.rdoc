@@ -10,6 +10,14 @@ items closest to a given location.  The database of known locations
 (postal codes, coffee shops, etc.) is stored persistently in a pure ruby
 data structure within MagLev.
 
+== KDTree Using Google Maps API
+
+This directory contains an implementation of a KD-Tree of dimension two
+using Google Maps API as the GUI.  A KD-Tree is a binary tree that can 
+be used to search for 2D data, i.e., nodes with a latitude and longitude.
+In this demo, only the closest zipcode (i.e. k = 1) for a selected latitude
+and longitude will be displayed along with the location of the selection.
+
 == MDB
 
 The mdb directory contains experimental code to wrap MagLev as a NoSQL
