@@ -50,27 +50,33 @@ function initialize() {
 
 
 function postAjaxRequest( params ) {
-  
-  // post an Ajax request to the server and store the response in 'result'.
-  new Ajax.Request( 'http://localhost:3333/nearest', {
-    method: 'post',
-    parameters: params,
-    onSuccess: function( transport ) {
-      
-                  // evaluate the response from the server
-                  var result = transport.responseText.evalJSON();
-                  
-                  // create a new info window, open it, and extend 
-                  // it from the current marker on the map.
-                  attachInfoWindow( marker, 0, result );
-                  
-               },
-    onFailure: function(){ alert( 'Something went wrong...' ); }
-    
-  });
-  
-}
 
+  // initiate an Ajax request to the server and store the response in 'result'.
+  $.ajax({
+
+    url: 'http://localhost:3333/nearest',
+    type: 'POST',
+    dataType: 'json',
+    data: params,
+
+    success: function( locations ) {
+     
+      // evaluate the response from the server
+      var location = locations[ 0 ];
+                        
+      // create a new info window, open it, and extend 
+      // it from the current marker on the map.
+      attachInfoWindow( marker, 0, location );
+
+    },
+
+    error: function( xhr ) {
+      alert( 'Something went wrong...' + xhr.status );
+    }
+
+  });
+
+}
 
 function placeMarker(location) {
 
@@ -81,14 +87,15 @@ function placeMarker(location) {
     });
 
   map.setCenter(location);
+  
 }
 
-function attachInfoWindow( marker, number, result ) {
+function attachInfoWindow( marker, number, location ) {
 
   var markerLocation = marker.getPosition();
   var latitude = markerLocation.lat();
   var longitude = markerLocation.lng();
-  var zipcode = result.zipcode;
+  var zipcode = location['zipcode'];
 
   var contentString  = '<div id="info_window">';
       contentString += '<ul>';
@@ -98,11 +105,13 @@ function attachInfoWindow( marker, number, result ) {
       contentString += '</ul';
       contentString += '</div>';
 
-  infoWindow = new google.maps.InfoWindow(
-      { content: contentString,
-        zIndex: number
-      });
+  infoWindow = new google.maps.InfoWindow( { content: contentString, zIndex: number } );
 
   infoWindow.open( map, marker );
 }
+
+$(document).ready(function() {
+  initialize();
+});
+
 

@@ -4,24 +4,24 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     
-    <!-- add the Google Maps library -->
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false" charset="utf-8"></script>
-    
-    <!-- add the prototype library -->
-    <script type="text/javascript" src="/javascripts/prototype-1.6.0.3.js" charset="utf-8"></script>
-    
-    <!-- add the Google Maps helper -->
-    <script type="text/javascript" src="/javascripts/google-maps-helper.js" charset="utf-8"></script>
-    
     <!-- add the application stylesheet -->
-    <link rel="stylesheet" href="/stylesheets/demo.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="/stylesheets/application.css" type="text/css" media="screen" charset="utf-8" />
   </head>
-  <body onload="initialize();">
+  <body>
     <%= yield %>
     <h4>Credits</h4>
     <p>
       The database of zip code locations is from
       <a href="http://www.geonames.org">GeoNames.org</a>
     </p>
+    
+    <!-- add the Google Maps library -->
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false" charset="utf-8"></script>
+        
+    <!-- add the jQuery library -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" charset="utf-8"></script>
+
+    <!-- add the Google Maps helper -->
+    <script type="text/javascript" src="/javascripts/application.js" charset="utf-8"></script>
   </body>
 </html>
