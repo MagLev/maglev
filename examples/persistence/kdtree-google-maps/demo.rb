@@ -21,23 +21,39 @@ class Demo < Sinatra::Base
   end
 
   post '/nearest' do
+    
+    p params
 
-    @lat = params[:lat].to_f
-    @lon = params[:lon].to_f
-    @k = params[:k].to_i
+    # store the request parameters into instance variables.
+    @lat = params[ :lat ].to_f
+    @lon = params[ :lon ].to_f
+    @k   = params[ :k ].to_i
 
+    # retrieve the 2D data for the selected location.
     @target = Collections::Point2D.new( @lon, @lat, :user_target )
+    
+    # p "@target => #{@target}"
 
-    raw_results = TREE.nearest_k(@target, @k)
+    # extract the k raw results for the target from the tree.
+    raw_results = TREE.nearest_k( @target, @k )
 
+    # generate an array of hashes and sort the locations in 
+    # ascending order by miles.
     @results = raw_results.map do |r|
-      [r.value, r.value.spherical_miles(@target)]
-    end.sort {|a,b| a[1] <=> b[1] }
-
-    # retrieve the zipcode from the resultset.
-    zipcode = @results[0][0].zip
-
-    { "zipcode" => zipcode }.to_json
+      
+      { 
+        :latitude  => r.value.lat, 
+        :longitude => r.value.lon,
+        :city      => r.value.name,
+        :state     => r.value.state,
+        :zipcode   => r.value.zip,
+        :miles     => r.value.spherical_miles( @target )
+      } 
+  
+    end.sort_by { |location| location[ :miles ] }
+ 
+    @results.to_json
+    
   end
 
 end
