@@ -105,10 +105,7 @@ function attachInfoWindow( marker, number, location ) {
       contentString += '</ul';
       contentString += '</div>';
 
-  infoWindow = new google.maps.InfoWindow(
-      { content: contentString,
-        zIndex: number
-      });
+  infoWindow = new google.maps.InfoWindow( { content: contentString, zIndex: number } );
 
   infoWindow.open( map, marker );
 }
