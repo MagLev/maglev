@@ -21,8 +21,6 @@ class Demo < Sinatra::Base
   end
 
   post '/nearest' do
-    
-    p params
 
     # store the request parameters into instance variables.
     @lat = params[ :lat ].to_f
@@ -31,8 +29,6 @@ class Demo < Sinatra::Base
 
     # retrieve the 2D data for the selected location.
     @target = Collections::Point2D.new( @lon, @lat, :user_target )
-    
-    # p "@target => #{@target}"
 
     # extract the k raw results for the target from the tree.
     raw_results = TREE.nearest_k( @target, @k )
