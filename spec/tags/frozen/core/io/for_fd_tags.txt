@@ -5,7 +5,6 @@ fails:IO.for_fd raises TypeError if not given an Integer or #to_int
 fails:IO.for_fd raises ArgumentError if not given any arguments
 fails:IO.for_fd raises EBADF if the file descriptor given is not a valid and open one
 fails:IO.for_fd raises EINVAL if mode is not compatible with the descriptor's current mode
-fails:IO.for_fd raises IOError on closed stream
 fails:IO.for_fd does not close the stream automatically if given a block
 fails:IO.for_fd emits a warning if given a block
 fails:IO.for_fd accepts only one argument

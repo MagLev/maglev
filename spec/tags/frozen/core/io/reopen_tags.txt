@@ -1,4 +1,6 @@
 fails:IO#reopen raises IOError on closed stream
+fails:IO#reopen raises IOError when called on closed stream
+fails:IO#reopen should not raise IOError when called on closed stream with path
 fails:IO#reopen reassociates self to another file/descriptor but returns self
 fails:IO#reopen reassociates self with a new stream opened on path, when self in initial state
 fails:IO#reopen reassociates self with a new stream opened on path, after some reads
