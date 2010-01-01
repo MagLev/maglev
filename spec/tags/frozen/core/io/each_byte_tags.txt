@@ -1,4 +1,0 @@
-fails:IO#each_byte raises IOError on closed stream
-fails:IO#each_byte yields each byte
-fails:IO#each_byte works on empty streams
-fails:IO#each_byte yields a LocalJumpError when passed no block
