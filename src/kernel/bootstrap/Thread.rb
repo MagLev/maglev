@@ -18,6 +18,14 @@ class Thread
 
   primitive_nobridge 'alive?' , 'alive'
 
+  # eval support
+  def self.__atEvalBinding_put(symbol, value )
+    # returns value . used only for temps created by an eval 
+    binding = self.current[  :__evalArgs ][0]
+    binding.__put_temp( symbol, value )
+    value
+  end
+
   class_primitive_nobridge '__stbacktrace', 'backtraceToLevel:'
 
   def self.__backtrace(includeSt, limit)
