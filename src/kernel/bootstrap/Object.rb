@@ -71,6 +71,7 @@ class Object
     primitive 'hash'
     primitive 'object_id', 'asOop'
     primitive '__id__' , 'asOop'
+    primitive '__identity_hash', 'identityHash'
 
     primitive 'nil?' , '_rubyNilQ'
 
@@ -404,6 +405,32 @@ class Object
 
     primitive_nobridge_env 'instance_eval&', 'rubyEval', ':'
 
+    def __evalCaller(args, gsnmeth)
+      $~ = args[0]
+      $_ = args[1]
+      rcvr = args[2] 
+      begin
+	res = rcvr.__perform_meth(gsnmeth)
+      ensure
+	args[0] = $~ 
+	args[1] = $_ 
+      end
+      res
+    end
+
+    def self.__evalCaller(args, gsnmeth)
+      $~ = args[0]
+      $_ = args[1]
+      rcvr = args[2] 
+      begin
+	res = rcvr.__perform_meth(gsnmeth)
+      ensure
+	args[0] = $~ 
+	args[1] = $_ 
+      end
+      res
+    end
+
     # Object should NOT have a to_str.  If to_str is implementd by passing
     # to to_s, then by default all objects can convert to a string!  But we
     # want classes to make an effort in order to convert their objects to
@@ -509,8 +536,8 @@ class Object
 end
 
 
-# Sentinal value used to distinguish between nil as a value passed by the
-# user and the user not passing anything for a defaulted value.  E.g.,:
+# Undefined is a sentinal value used to distinguish between nil as a value passed 
+# by the user and the user not passing anything for a defaulted value.  E.g.,:
 #
 #   def foo(required_param, optional_param=Undefined)
 #     if optional_param._equal?( Undefined )

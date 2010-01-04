@@ -52,7 +52,7 @@ class Array
     Hash[self]
   end
 
-  primitive_nobridge '__fillFromToWith', 'fillFrom:to:with:'
+  primitive_nobridge '__fill_resize', 'fillFrom:resizeTo:with:'
   primitive_nobridge '__insertall_at', 'insertAll:at:'
 
   def __add_arguments(arg)
@@ -367,7 +367,7 @@ class Array
     res_idx = 0
     while n < my_siz
       elem = self.__at(n)
-      if dict.__delete_otherwise(elem, dflt)._not_equal?(dflt)
+      if dict.__delete_ifpresent(elem) 
         res[res_idx] = elem
         res_idx += 1
       end
@@ -443,17 +443,6 @@ class Array
   #
   # If other is not an array, raise a type error "TypeError
   def <=>(other)
-    # TODO: need to get a coercion idiom going...
-    #
-    # [1] <=> "a" Should throw a TypeError: can't convert String into Array.
-    # but, "a".to_a => ["a"]...
-
-    # TODO: need to throw a type error in many(?) situations, certainly
-    # with strings....
-
-    # TODO: [1,2,3] <=> ["a"] should return nil, but throws a No method
-    # for #'_generality....
-
     other = Type.coerce_to(other, Array, :to_ary)
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
@@ -924,10 +913,13 @@ class Array
 
     start += 1         # start, end both 1-based now
     if (endIdx > sz)
-      self.size=(endIdx)  # grow the receiver
-    end
-    if (length > 0)
-      __fillFromToWith(start, endIdx, obj)
+      if length > 0
+        __fill_resize(start, endIdx, obj) # resize and fill 
+      else
+        self.size=(endIdx)  # grow the receiver
+      end
+    elsif (length > 0)
+      __fill_resize(start, 0 - endIdx, obj) # fill without resize
     end
     self
   end

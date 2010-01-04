@@ -27,4 +27,7 @@
 # but the eval does not have access to it.
 scope = Object.new.instance_eval { binding }
 eval('_hamlout = "FOO"', scope)
-puts eval("_hamlout", scope)     # => prints "FOO" in MRI
+ax = eval("_hamlout", scope)     # => prints "FOO" in MRI
+puts ax
+unless ax = 'FOO' ; raise 'error'; end
+true

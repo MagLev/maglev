@@ -17,6 +17,7 @@ class Symbol
   primitive_nobridge '==', '='  # uses Symbol>>= which is identity compare
   primitive_nobridge 'eql?', '='  # uses Symbol>>= which is identity compare
   primitive_nobridge 'hash'
+  primitive '__at_equals', 'at:equals:' # one-based offset
 
   def inspect
     ':'._concatenate(self)
