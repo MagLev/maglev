@@ -1,2 +1,3 @@
 fails:ERB.new removes spaces around '<%- -%>' when trim_mode is '-'
 fails:ERB.new accepts a safe level as second argument
+breaks:ERB.new not support '<%-= expr %> even when trim_mode is '-'

@@ -1,1 +1,0 @@
-fails:Matrix#** multiples the Matrix by itself _n_ times
