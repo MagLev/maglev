@@ -1,0 +1,2 @@
+fails:TCPSocket.new refuses the connection when there is no server to connect to
+fails:TCPSocket.new has an address once it has connected to a listening server
