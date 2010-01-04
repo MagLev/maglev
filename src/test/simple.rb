@@ -21,8 +21,9 @@ def failed_test(msg, expected, actual)
 end
 
 def register_failure(msg, expected, actual)
-  $failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
-  x = $failed
+  emsg = "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
+  $failed << emsg
+  puts emsg
   unless ENV['SIMPLE_NO_PAUSE']  # don't pause if the env says not to...
     nil.pause if defined? RUBY_ENGINE # Keep MRI from trying to pause
   end
