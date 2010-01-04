@@ -105,12 +105,8 @@ RUBY.global("GsNMethod", "GsNMethod")
 ARGF = nil # TODO a real implementation
 
 # Notes on various globals
-begin
-  #  $/ is auto-initialized to "\n" by parser at first ref .
-  x = $/
-  #  $; is auto-initialized to nil if referenced, by RubySexpParser .
-  y = $;
-end
+#  $/ is auto-initialized to "\n" by parser at first ref .
+#  $; is auto-initialized to nil if referenced, by RubySexpParser .
 
 #  $!  translated to rescue block block-arg-ref  or to the global $!
 #    by RubyGlobalVarNode and RubyRescueBodyNode
