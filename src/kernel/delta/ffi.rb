@@ -26,9 +26,14 @@ module FFI
 
   class SignatureError < NativeError; end
 
-  USE_THIS_PROCESS_AS_LIBRARY = nil
 
   # DEBUG , a dynamic constant in post_prims/ffi.rb  
+
+  module Library
+    CURRENT_PROCESS = 'useCurrentProcess'
+  end
+
+  USE_THIS_PROCESS_AS_LIBRARY = Library::CURRENT_PROCESS # deprecated
   
   module Platform
 
