@@ -1,2 +1,0 @@
-fails:FileTest.exists? return true if the file exist
-fails:FileTest.exists? return true if the file exist using the alias exists?
