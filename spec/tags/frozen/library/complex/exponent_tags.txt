@@ -1,2 +1,1 @@
-fails:Complex#** with Integer returns self raised to the given power
 fails:Complex#** with Object tries to coerce self into other
