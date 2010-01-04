@@ -813,7 +813,7 @@ module MagRp # {
     end
 
     def new_fcall( sel_tok , arg)
-      # receiver is self
+      # receiver is implicit self
       if arg._equal?(nil)
 	#  args ||= s(:arglist) , i.e. zero args
 	return new_vcall(RubySelfNode._new, sel_tok)
@@ -824,22 +824,43 @@ module MagRp # {
 	if lst.size._equal?(0)
 	  return new_vcall(RubySelfNode._new, sel_tok)
 	end
-	result = RubyFCallNode.s( sel_tok.symval, arg ) # s(:vcall )
+        sym = check_selector( sel_tok )
+	result = RubyFCallNode.s( RubySelfNode._new, sym, arg ) # s(:vcall )
       elsif arg_cls._equal?( RubyBlockPassNode )
-	result = RubyFCallNode.s( sel_tok.symval , nil) # s(:vcall )
+        sym = check_selector( sel_tok )
+	result = RubyFCallNode.s( RubySelfNode._new, sym, nil) # s(:vcall )
 	result.iter=( arg )
       else
+        sym = check_selector( sel_tok )
 	cArgs = RubyRpCallArgs._new
 	cArgs.list=( [ arg ] )
-	result = RubyFCallNode.s( sel_tok.symval, cArgs ) # s(:vcall )
+	result = RubyFCallNode.s( RubySelfNode._new, sym , cArgs ) # s(:vcall )
       end
       result.src_offset=( sel_tok.src_offset )
       result
     end
 
+    def check_selector(sel_tok)
+      # returns selector symbol , guards against malformed elsif 
+      sel = sel_tok.symval
+      if sel[0]._equal?( ?e )
+        # Maglev enhancement, guard against malformed   elsif 
+        if sel._equal?( :elseif ) || sel._equal?( :elif )
+          # disallow the other forms of elsif common in script languages
+	  line = self.line_for(sel_tok)
+          raise SyntaxError , "malformed elsif, see '#{sel}' at line #{line}"
+        elsif sel.__at_equals(1, 'else') # one-based offset
+	  line = self.line_for(sel_tok)
+          warning("possible malformed elsif, see '#{sel}' at line #{line}")
+        end
+      end 
+      sel
+    end
+
     def new_vcall(recv, sel_tok)
       # call with void , i.e. zero , args
-      result = RubyVCallNode.s(recv, sel_tok.symval)
+      sym = check_selector( sel_tok )
+      result = RubyVCallNode.s(recv, sym)
       result.src_offset=( sel_tok.src_offset )
       result
     end
@@ -1404,9 +1425,7 @@ module MagRp # {
       # node[2] = value_expr(node[2]) if node and node[0] == :if
       # node  # e_nd of  original code
       #
-      node = oldnode.kbegin_value
-      node.ifNode_kbegin_remove2
-      node
+      oldnode.kbegin_value
     end
 
     def void_stmts(node)

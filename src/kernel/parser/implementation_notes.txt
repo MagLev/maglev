@@ -143,19 +143,19 @@ Lexing of double quoted strings (Maglev Trac 580)
   and otherwise use the tSTRING_BEG   path for complex string lexing
 
 22 September 2009
-  Infinite loop after parse error 'class definition in method body'
-    For this source code
+  For this source code
        class A
          eval "class B; end"
          def c
            class C; end
          end
        end
-  after the call to yyerror to report the error 'class definition in method body',
-  Maglev parser reports 'class definition in method body'
+  got infinite loop after the parse error 'class definition in method body'
+  after the call to yyerror to report the error 'class definition in method body'.
+  Maglev parser reported 'class definition in method body'
   for each subequent line in the source and then
-  goes into an infinite loop handling the EOF  token.
-  In ruby_parser.y , for  production 'kCLASS cpath superclass'
+  went into an infinite loop handling the EOF  token.
+  To fix, in ruby_parser.y , for  production 'kCLASS cpath superclass'
   changed the   yyerror    call to just     raise SyntaxError
   and terminate the parsing.
 
@@ -197,11 +197,11 @@ Lexing of double quoted strings (Maglev Trac 580)
   Changes to lexer.rb and ruby_parser.y , to have yacc_value for tXSTRING_BEG 
   encapsulated in an RpNameToken , so that source position of the tXSTRING_BEG 
   can be installed in the AST .
-  various changes to optimize constant references, based on profiling.
+  Various changes to optimize constant references, based on profiling.
 
 13 Nov 2009
   Added logic to tokadd_string() in Lexer, to count end-of-lines
-  contained in a string constant using " , see  _count_eols  uses.
+  contained in a double-quoted string constant , see  uses of  _count_eols  
 
 23 Nov 2009
   For the original code in racc_parser.rb
@@ -272,4 +272,12 @@ Lexing of double quoted strings (Maglev Trac 580)
   are now used to produce generated files racc_parser.rb, lexer.rb .
   racc.sh now takes a -D option if you want to enable detailed debug
   printing in the parser. 
+
+17 Dec 2009
+  Add warning about malformed elsif
+  and disallow    elseif    in a vcall or fcall message send .
+  See  def/uses of check_selector() in extras.rb .
+  If disallowing  elseif  breaks existing Ruby code we will backoff the check.
+  Inspired by wasting an hour+ debugging a problem in bootstrap/Hash.rb 
+  caused by  an    if ... elseif ... end     statement, which is legal syntax.
 
