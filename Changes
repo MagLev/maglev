@@ -1,13 +1,13 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Changes for 22681
 
-  optimize fetch/store to Ruby global variables
-  Rewrite Hash, IdentityHash to no longer inherit from Smalltalk
+* Optimize fetch/store to Ruby global variables
+* Rewrite Hash, IdentityHash to no longer inherit from Smalltalk
   KeyValueDictionary ; the implementations are closer to pure Ruby.
-  Fix parser failure part of Trac 483.
-  Fix Trac 641 .
-  Changes to Thread implementation to go with changes to Smalltalk
+* Fix parser failure part of Trac 483.
+* Fix Trac 641.
+* Changes to Thread implementation to go with changes to Smalltalk
   implementation of GsProcess>>terminate .
 
 * Removed old workaround for json and trac 616, which has been fixed.
