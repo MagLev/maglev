@@ -142,10 +142,10 @@ RUBY_ENGINE = 'maglev'
 RUBY_PLATFORM = 'Unspecified.platform'
 RUBY_VERSION = '1.8.6'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2009-12-10'
+RUBY_RELEASE_DATE = '2010-01-04'
 RUBY_PATCHLEVEL = 114  # TODO: this is what MRI 1.8.6 shows...
 
-VERSION = '22635-1076'
+VERSION = '22683-1088'
 # If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
 # If false, the handling is unchanged: exception is reported along with the
 #  stringified stack.
