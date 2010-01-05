@@ -28,9 +28,6 @@ module MagRp
     def kbegin_value
       self
     end
-    def ifNode_kbegin_remove2
-      self
-    end
     # def line ; end # not used
     # def line=(a_line) ; end # not used
 
@@ -104,6 +101,9 @@ module MagRp
     end
     def kbegin_value
       @value
+    end
+    def inspect
+      "[:KBegin , #{@value.inspect} ]"
     end
   end
 
@@ -275,7 +275,7 @@ module MagRp
        class RubyFCallNode
          # receiverNode is alway self
          class_primitive_nobridge 's', 's_forRp:sel:args:'  # assumes rcvr is self
-         class_primitive_nobridge 's', 's_forRp:args:'  # synthesizes SelfNode for rcvr
+
          primitive_nobridge 'iter=', 'iterNode:'
          def inspect
            "\n  [:fcall, :#{@callName}, #{@argsNode.inspect} ]"
@@ -366,20 +366,14 @@ module MagRp
            res = self._new
            res.init(cond, tb, eb)
          end
+
          def init(cond, tb, eb)
            @condition = cond
-           @thenBody =  tb
-           @elseBody =  eb
+           @thenBody =  tb._equal?(nil) ? nil : tb.kbegin_value
+           @elseBody =  eb._equal?(nil) ? nil : eb.kbegin_value
            self
          end
-         def ifNode_kbegin_remove2
-           then_body = @thenBody
-           if then_body._not_equal?(nil)
-             ntb = then_body.kbegin_value
-             @thenBody = ntb
-             ntb.ifNode_kbegin_remove2
-           end
-         end
+
          def inspect
            "[:if, #{@condition.inspect}, #{@thenBody.inspect}, #{@elseBody.inspect}]"
          end
@@ -1711,7 +1705,7 @@ module MagRp
          self
        end
        def inspect
-         "[:when , #{@expressionNodes.inspect}, #{@bodyNode.inspect}, <nxt>#{@nextCase.inspect} ]"
+         "[:when , #{@expressionNodes.inspect}, #{@bodyNode.inspect},\n <nxtWhen> #{@nextCase.inspect} ]"
        end
      end
 

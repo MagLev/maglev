@@ -43,7 +43,7 @@ end
 
 5.times do
   # $nwords is used to avoid constant reassignment warnings
-  path = ENV[ :MAGLEV_HOME ] + '/src/test/holmes.txt' 
+  path = ENV[ :MAGLEV_HOME ] + '/src/test/Trac578data.txt' 
   $nwords = train(words(File.new(path).read))
   if correct("speling") == "spelling"
     puts "Spelling successfully corrected."

@@ -357,7 +357,7 @@ module FFI
     # Set which library or libraries +attach_function+ should
     # look in. By default it only searches for the function in
     # the current process. If you want to specify this as one
-    # of the locations, add FFI::USE_THIS_PROCESS_AS_LIBRARY.
+    # of the locations, add FFI::Library::CURRENT_PROCESS 
     # The libraries are tried in the order given.
     #
     def ffi_lib(*names)
@@ -369,11 +369,11 @@ module FFI
       while n < len
         a_name = names[n]
         if  my_debug > 0
-          debug_name = a_name == USE_THIS_PROCESS_AS_LIBRARY ?
-            "USE_THIS_PROCESS_AS_LIBRARY" : a_name.inspect
+          debug_name = a_name == CURRENT_PROCESS ?
+            "CURRENT_PROCESS" : a_name.inspect
           puts "--FFI:  ffi_lib: adding #{debug_name}"
         end
-        if a_name == USE_THIS_PROCESS_AS_LIBRARY
+        if a_name == CURRENT_PROCESS || a_name._equal?(nil)
           libs << nil
         else
           a_name = ::Type.coerce_to(names[n], String, :to_str)

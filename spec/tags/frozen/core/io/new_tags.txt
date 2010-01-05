@@ -5,7 +5,6 @@ fails:IO.new raises TypeError if not given an Integer or #to_int
 fails:IO.new raises ArgumentError if not given any arguments
 fails:IO.new raises EBADF if the file descriptor given is not a valid and open one
 fails:IO.new raises EINVAL if mode is not compatible with the descriptor's current mode
-fails:IO.new raises IOError on closed stream
 fails:IO.new does not close the stream automatically if given a block
 fails:IO.new emits a warning if given a block
 fails:IO.new accepts only one argument

@@ -1,4 +1,0 @@
-fails:IO#readline returns the next line on the stream
-fails:IO#readline goes back to first position after a rewind
-fails:IO#readline is modified by the cursor position
-fails:IO#readline assigns the returned line to $_

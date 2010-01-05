@@ -1,1 +1,4 @@
 fails:Regexps with modifers does not do thread synchronization for /o
+breaks:Regexps with modifers supports modifier combinations
+breaks:Regexps with modifers supports (?imx-imx) (inline modifiers)
+breaks:Regexps with modifers supports (?imx-imx:expr) (scoped inline modifiers)

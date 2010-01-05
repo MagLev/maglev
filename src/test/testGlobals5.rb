@@ -20,7 +20,7 @@ a2 = defined?($xx)
 $xx = 99
 a3 = defined?($xx)
 z = $xx
-unless [ a1, b, a2, a3, z ] == [ nil, nil, nil, 'global-variable', 99]
+unless (ax = [ a1, b, a2, a3, z ]) == [ nil, nil, nil, 'global-variable', 99]
   raise 'Error'
 end
 

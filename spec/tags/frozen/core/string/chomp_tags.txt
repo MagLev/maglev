@@ -1,2 +1,0 @@
-fails:String#chomp! with separator modifies self in place and returns self
-fails:String#chomp! with separator raises a TypeError when self is frozen

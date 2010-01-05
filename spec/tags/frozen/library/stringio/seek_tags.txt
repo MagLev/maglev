@@ -1,0 +1,1 @@
+fails:StringIO#seek raises an Errno::EINVAL error on incorrect whence argument

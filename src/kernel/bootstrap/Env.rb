@@ -24,14 +24,12 @@ class Env
       self.dup
     end
 
-    primitive '__at_put' , 'rubyAt:put:' # resolves to RubyHash>>rubyAt:put:
-
     def [](key)
-      v = super(key)
+      v = __atkey(key)
       if v._equal?(nil)
         v = Env.__getenv(key)
         unless v._equal?(nil)
-          self.__at_put(key, v)
+          self.__atkey_put( key, v ) # __atkey_put implemented in Hash
         end
       end
       v
@@ -50,7 +48,7 @@ class Env
         val = ""
       end
       Env.__putenv(key, val)
-      super(key, val)
+      self.__atkey_put(key, val) # __atkey_put implemented in Hash 
     end
 
     def store(key, val)
