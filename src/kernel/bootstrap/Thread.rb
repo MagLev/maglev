@@ -21,8 +21,13 @@ class Thread
   # eval support
   def self.__atEvalBinding_put(symbol, value )
     # returns value . used only for temps created by an eval 
-    binding = self.current[  :__evalArgs ][0]
-    binding.__put_temp( symbol, value )
+    cx = self.current[  :__evalArgs ]
+    unless cx._equal?(nil)
+      binding = cx[0]
+      unless binding._equal?(nil)
+        binding.__put_temp( symbol, value )
+      end
+    end
     value
   end
 
