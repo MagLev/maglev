@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-== Changes for 22681
+== Changes for 22683
 
 * Optimize fetch/store to Ruby global variables
 * Rewrite Hash, IdentityHash to no longer inherit from Smalltalk
