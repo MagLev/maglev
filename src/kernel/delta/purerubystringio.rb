@@ -400,7 +400,7 @@ class PureRubyStringIO < IO
         raise Errno::EINVAL , 'StringIO#seek, negative seek position not allowed with SEEK_SET'
       end
     else
-      raise ArgumentError, 'invalid second arg to StringIO#seek'
+      raise Errno::EINVAL, 'invalid second arg to StringIO#seek'
     end
     @sio_pos = offset
     0
