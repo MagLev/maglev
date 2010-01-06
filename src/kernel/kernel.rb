@@ -47,6 +47,7 @@ RUBY.require 'kernel/bootstrap/Module.rb'
 RUBY.require 'kernel/bootstrap/Class.rb'
 RUBY.require 'kernel/bootstrap/StClass.rb'
 RUBY.require 'kernel/bootstrap/Object.rb'
+RUBY.require 'kernel/bootstrap/System1.rb'
 RUBY.require 'kernel/bootstrap/System.rb'
 
 # deleted use of GsHelper.rb
@@ -141,8 +142,9 @@ RUBY.require 'kernel/delta/String.rb'
 # the parser loads it's own subset of FFI in env 2 ,
 # the smalltalk script for loading prims, sets MAGLEV_primLoadFFI for env 1 only
 if Maglev::System.session_temp( :MAGLEV_primLoadFFI )  
-  RUBY.require 'kernel/delta/ffi.rb'
+  RUBY.require 'kernel/delta/ffi1.rb'
   RUBY.require 'kernel/delta/ffi2.rb'
+  RUBY.require 'kernel/delta/ffi3.rb'
   RUBY.require 'kernel/delta/ffi_struct.rb'
   RUBY.require 'kernel/delta/ffi_enum.rb'
   RUBY.require 'kernel/delta/pointer.rb'
