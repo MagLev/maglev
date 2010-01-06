@@ -1,3 +1,8 @@
+# Test that doing a puts of a recursive array, prints out correctly.
+#
+# This version of the test uses STDOUT Trac592a.rb uses StringIO.  This
+# version ensures that topaz doesn't insert extraneous newlines.
+# Trac592a.rb ensures the puts method works correctly.
 require File.expand_path('simple', File.dirname(__FILE__))
 
 # Unset MAGLEV_OPTS so that -d doesn't mess up the output
