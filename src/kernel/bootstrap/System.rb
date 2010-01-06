@@ -43,7 +43,7 @@
 #
 
 module Maglev
-  System = Object._resolve_smalltalk_global(:System)
+  # System resolved to Smalltalk class in System1.rb
   class System
 
     # Transaction support
