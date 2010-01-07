@@ -1,5 +1,13 @@
 = MagLev Change Log
 
+== Unreleased Changes
+
+* Fixes to make haml work better
+* Fixes to constant definitions
+* Fixes regression in Trac 592
+* Fixes Trac 641a and 645
+* Fixes compile error on Sparc Solaris
+
 == Changes for 22683  2010-01-04
 
 * Optimize fetch/store to Ruby global variables
