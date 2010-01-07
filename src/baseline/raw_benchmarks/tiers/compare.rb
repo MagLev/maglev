@@ -17,11 +17,14 @@ STDOUT.sync = true
 case ARGV.first
 when "--all"
   ARGV.shift
-  ARGV.unshift "ruby", "ruby19", "macruby", "jruby --fast", "../../bin/rbx"
+  ARGV.unshift "maglev-ruby", "ruby", "ruby19", "jruby", "jruby --fast", "$RUBINIUS_HOME/bin/rbx"
 when "--all-int"
   ARGV.shift
-  ARGV.unshift "ruby", "ruby19", "macruby", "jruby", "jruby --fast",
-               "../../bin/rbx -Xint", "../../bin/rbx"
+  ARGV.unshift "maglev-ruby", "ruby", "ruby19", "jruby", "jruby --fast",
+               "$RUBINIUS_HOME/bin/rbx -Xint", "$RUBINIUS_HOME/bin/rbx"
+when "--maglev"
+  ARGV.shift
+  ARGV.unshift "maglev-ruby"
 when "--rbx"
   ARGV.shift
   ARGV.unshift "../../bin/rbx"
