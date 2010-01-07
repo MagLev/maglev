@@ -1,6 +1,6 @@
 require 'rake/clean'
 
-CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out')
+CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out', 'c/*o', 'c/parser')
 
 task :default => :test
 
@@ -22,5 +22,29 @@ file 'lib/libyaml/libyaml.rb' => 'lib/libyaml/libyaml.rb.ffi' do |t|
   puts "Generating #{t.name}..." # if Rake.application.options.trace
   cd 'lib/libyaml' do
     FFI::Generator.new 'libyaml.rb.ffi', 'libyaml.rb', {:cflags => '-m64'}
+  end
+end
+
+
+namespace :parser do
+  I_DIR = "/Users/pmclain/external/yaml-0.1.3-64/include"
+  L_DIR = "/Users/pmclain/external/yaml-0.1.3-64/src/.libs"
+
+  CFLAGS  = "-m64 -Wall -I#{I_DIR}"
+  LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
+
+  desc "Run the test parser on some input"
+  task :run => 'c/parser' do
+    sh 'export DYLD_LIBRARY_PATH=/Users/pmclain/external/yaml-0.1.3-64/src/.libs ; c/parser'
+  end
+
+  task 'c/parser' => ['c/parser.o'] do
+    # gcc -Wall -m64 -L/Users/pmclain/external/yaml-0.1.3-64/src/.libs -lyaml  parser.o -o parser
+    sh "gcc #{LFLAGS} c/parser.o -o c/parser"
+  end
+
+  file 'c/parser.o' do
+    # gcc -m64 -Wall -I/Users/pmclain/external/yaml-0.1.3-64/include -c -o parser.o parser.c
+    sh "gcc #{CFLAGS} -c -o c/parser.o c/parser.c"
   end
 end
