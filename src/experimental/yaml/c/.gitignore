@@ -1,2 +1,4 @@
 *.o
-parser
+*.dylib
+main
+dmain

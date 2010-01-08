@@ -2,11 +2,11 @@
 
 #include <yaml.h>
 
-static void my_handle_event(yaml_event_t *event);
+void my_handle_event(yaml_event_t *event);
 
 
 /* TODO: accept an IO object as well? */
-static int parse(const unsigned char *input)
+int parse(const unsigned char *input)
 {
   yaml_parser_t parser;
   size_t length = strlen(input);
@@ -31,8 +31,7 @@ static int parse(const unsigned char *input)
   }
 }
 
-static void my_handle_event(yaml_event_t *event) {
-  fprintf(stderr, "handle_event\n");
+void my_handle_event(yaml_event_t *event) {
   switch(event->type) {
 
   case YAML_STREAM_START_EVENT:
@@ -93,10 +92,4 @@ static void my_handle_event(yaml_event_t *event) {
     fprintf(stderr, "UNRECOGNIZED EVENT: %d\n", event->type);
     break;
   }
-}
-
-int main(int argc, char **argv) {
-  const unsigned char *input = "--- a";
-  parse(input);
-  return 0;
 }

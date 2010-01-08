@@ -1,7 +1,7 @@
 require 'rake/clean'
 
-CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out', 'c/*o', 'c/parser')
-
+CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out', 'c/*o')
+CLOBBER.include('c/main', 'c/*.dylib', 'c/dmain')
 task :default => :test
 
 desc "run a small test program against the generated yaml2.rb"
@@ -25,26 +25,52 @@ file 'lib/libyaml/libyaml.rb' => 'lib/libyaml/libyaml.rb.ffi' do |t|
   end
 end
 
-
 namespace :parser do
   I_DIR = "/Users/pmclain/external/yaml-0.1.3-64/include"
   L_DIR = "/Users/pmclain/external/yaml-0.1.3-64/src/.libs"
+  X_DIR = "/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c"
 
   CFLAGS  = "-m64 -Wall -I#{I_DIR}"
   LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
 
   desc "Run the test parser on some input"
-  task :run => 'c/parser' do
-    sh 'export DYLD_LIBRARY_PATH=/Users/pmclain/external/yaml-0.1.3-64/src/.libs ; c/parser'
+  task :run => ['c/main'] do
+    sh 'export DYLD_LIBRARY_PATH=/Users/pmclain/external/yaml-0.1.3-64/src/.libs ; c/main'
   end
 
-  task 'c/parser' => ['c/parser.o'] do
+  task :drun => ['c/dmain'] do
+    p = "#{X_DIR}:#{L_DIR}"
+    sh "export DYLD_LIBRARY_PATH=#{p} ; c/dmain"
+  end
+
+  desc "Create the parser dylib"
+  #  file 'c/parser.dylib' do
+  task 'c/libparser.dylib' => ['c/parser.o'] do
+    # gcc -dynamiclib \
+    #     -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0,-install_name,/usr/local/lib/libfoo.1.dylib
+    #     -o libfoo.1.dylib $(OBJ)
+    opts = "-L#{L_DIR} -lyaml"
+    sh "gcc -m64 -dynamiclib #{opts} -o c/libparser.dylib c/parser.o"
+  end
+
+  task 'c/dmain' => ['c/libparser.dylib', 'c/main.o'] do
     # gcc -Wall -m64 -L/Users/pmclain/external/yaml-0.1.3-64/src/.libs -lyaml  parser.o -o parser
-    sh "gcc #{LFLAGS} c/parser.o -o c/parser"
+    yaml_opts   = "-L#{L_DIR} -lyaml"
+    parser_opts = "-L/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c -lparser"
+    sh "gcc #{LFLAGS} #{parser_opts} c/main.o -o c/dmain"
+  end
+
+  task 'c/main' => ['c/parser.o', 'c/main.o'] do
+    # gcc -Wall -m64 -L/Users/pmclain/external/yaml-0.1.3-64/src/.libs -lyaml  parser.o -o parser
+    sh "gcc #{LFLAGS} c/main.o c/parser.o  -o c/main"
   end
 
   file 'c/parser.o' do
     # gcc -m64 -Wall -I/Users/pmclain/external/yaml-0.1.3-64/include -c -o parser.o parser.c
     sh "gcc #{CFLAGS} -c -o c/parser.o c/parser.c"
+  end
+
+  file 'c/main.o' do
+    sh "gcc #{CFLAGS} -c -o c/main.o c/main.c"
   end
 end
