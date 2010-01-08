@@ -1,17 +1,28 @@
 #include <string.h>
 
 #include <yaml.h>
+#include "parser.h"
 
-void my_handle_event(yaml_event_t *event);
+/* void my_handle_event(yaml_event_t *event); */
 
+/*
+ * Allocate a new parser context and initialize it.
+ */
+parser_context_t *parser_new() {
+  parser_context_t *parser_context = malloc(sizeof(parser_context_t));
+  yaml_parser_initialize(&(parser_context->parser));
+  return parser_context;
+}
 
 /* TODO: accept an IO object as well? */
-int parse(const unsigned char *input)
+int parse(parser_context_t *parser_context, const unsigned char *input)
 {
-  yaml_parser_t parser;
-  size_t length = strlen(input);
-
+  /*
+  yaml_parser_t parser = parser;
   yaml_parser_initialize(&parser);
+  */
+  yaml_parser_t parser = parser_context->parser;
+  size_t length = strlen(input);
   yaml_parser_set_input_string(&parser, input, length);
 
   int done = 0;

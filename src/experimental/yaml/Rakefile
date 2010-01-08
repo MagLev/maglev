@@ -2,7 +2,8 @@ require 'rake/clean'
 
 CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out', 'c/*o')
 CLOBBER.include('c/main', 'c/*.dylib', 'c/dmain')
-task :default => :test
+# task :default => :test
+task :default => :'parser:drun'
 
 desc "run a small test program against the generated yaml2.rb"
 task :test => 'lib/libyaml/libyaml.rb' do
