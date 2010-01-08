@@ -75,3 +75,9 @@ namespace :parser do
     sh "gcc #{CFLAGS} -c -o c/main.o c/main.c"
   end
 end
+
+desc "Run dmain under gdb"
+task :gdb => ['c/dmain'] do
+    p = "#{X_DIR}:#{L_DIR}"
+    sh "export DYLD_LIBRARY_PATH=#{p} ; gdb c/dmain"
+end
