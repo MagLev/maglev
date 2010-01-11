@@ -20,6 +20,8 @@ class Exception
     primitive_nobridge '__message=', 'messageText:'
     primitive_nobridge '__st_initialize', 'initialize'
 
+    primitive_nobridge '__basic_dup', '_basicCopy'
+
     def message
       m = @messageText
       if m._equal?(nil)
