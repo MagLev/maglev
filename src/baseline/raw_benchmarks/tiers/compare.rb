@@ -22,6 +22,18 @@ when "--all-int"
   ARGV.shift
   ARGV.unshift "maglev-ruby", "ruby", "ruby19", "jruby", "jruby --fast",
                "$RUBINIUS_HOME/bin/rbx -Xint", "$RUBINIUS_HOME/bin/rbx"
+when "--rbx-ml"
+  ARGV.shift
+  ARGV.unshift "$RUBINIUS_HOME/bin/rbx", "maglev-ruby"
+when "--mri-ml"
+  ARGV.shift
+  ARGV.unshift "ruby", "maglev-ruby"
+when "--ruby19-ml"
+  ARGV.shift
+  ARGV.unshift "ruby19", "maglev-ruby"
+when "--jruby-ml"
+  ARGV.shift
+  ARGV.unshift "jruby", "maglev-ruby"
 when "--maglev"
   ARGV.shift
   ARGV.unshift "maglev-ruby"

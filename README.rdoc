@@ -3,13 +3,15 @@
 === Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.
 * 64-bit Linux, Mac OS X, or Solaris X86 operating system
-* a version of rake installed in /usr/bin/rake 
+* a version of ruby and rake to use during installation
 * root access so you can increase default shared memory settings (only during initial install)
 
 == Getting started
 
 Create a MagLev directory. Its name doesn't matter. Put the installer or git clone there.
-It needs to be writable, as files are put there by installations and updates.
+It needs to be writable, as files are put there by installations and updates. If you 
+install using RVM (http://rvm.beginrescueend.com/), it will use ~/.rvm or the rvm_path
+specified in your .rvmrc.
 
 === Installing the zipped version
 
@@ -65,9 +67,17 @@ Why? The install/upgrade script creates a new copy of the MagLev data
 repository including persistent kernel code. The scripts make one level of backup, but
 we won't be providing migration scripts during Alpha.
 
+=== Installing under RVM
+
+This methodology is useful if you want to compare behavior of various Ruby implementations.
+INstalle using <tt>rvm install maglev</tt>. See http://rvm.beginrescueend.com/ for details
+of using RVM. RVM will start a MagLev server when you <tt>rvm use maglev</tt>. The server
+is left running if you "rvm use <another impl>". You'll stll be able to use <tt>maglev-ruby</tt>
+if you set your $MAGLEV_HOME appropriately.
+
 == Running MagLev
 
-Start the server by either running <tt>rake maglev:start</tt> from within your $MAGLEV_HOME directory tree, or running <tt>maglev start</tt> (which counts on $MAGLEV_HOME being set and $MAGLEV_HOME/bin being in your $PATH.
+Start the server by either running <tt>rake maglev:start</tt> from within your $MAGLEV_HOME directory tree, or running <tt>maglev start</tt> (which counts on $MAGLEV_HOME being set and $MAGLEV_HOME/bin being in your $PATH. If you have RVM set up, you can run <tt>rvm use maglev</tt>.
 
 Useful commands include <tt>maglev-irb</tt>, <tt>maglev-ruby</tt>, and <tt>maglev-gem</tt>. MagLev code is in <tt>src</tt>, examples are in <tt>examples</tt>, some docs are in <tt>html</tt>. You'll find a few README files, too. 
 
@@ -76,8 +86,7 @@ Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
 == Tips and troubleshooting
 
 * rake needs to be in your PATH. It's needed to install and to bootstrap MagLev.
-  The MagLev installer expects rake to be in /usr/bin/rake. You shouldn't install
-  rake into MagLev -- it won't work.
+  You shouldn't install the rake gem into MagLev -- it won't work.
 
 * You need to start MagLev before running "maglev-ruby", "maglev-gem", or "maglev-irb". Either
   "rake maglev:start" or "maglev start" will do that. While not strictly required it's better to
@@ -86,7 +95,7 @@ Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
 * If you get this error when running maglev:start:
     rake aborted!
     Don't know how to build task 'maglev:start'
-  it indicates /usr/bin/rake wasn't found during installation and so important
+  it indicates rake wasn't found during installation and so important
   steps were skipped. You can re-run the installer, or try this:
     rake stone:create[maglev]
 

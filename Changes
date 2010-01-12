@@ -7,6 +7,8 @@
 * Fixes regression in Trac 592
 * Fixes Trac 641a and 645
 * Fixes compile error on Sparc Solaris
+* Installable using RVM - http://rvm.beginrescueend.com/
+* Changed installers to use .tar.gz format rather than .zip
 
 == Changes for 22683  2010-01-04
 
