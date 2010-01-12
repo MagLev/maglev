@@ -10,7 +10,7 @@
 
 Create a MagLev directory. Its name doesn't matter. Put the installer or git clone there.
 It needs to be writable, as files are put there by installations and updates. If you 
-install using RVM (http://rvm.beginrescueend.com/), it will use ~/.rvm or the rvm_path
+install using RVM (http://rvm.beginrescueend.com), it will use ~/.rvm or the rvm_path
 specified in your .rvmrc.
 
 === Installing the zipped version
@@ -70,14 +70,14 @@ we won't be providing migration scripts during Alpha.
 === Installing under RVM
 
 This methodology is useful if you want to compare behavior of various Ruby implementations.
-INstalle using <tt>rvm install maglev</tt>. See http://rvm.beginrescueend.com/ for details
+Install using <tt>rvm install maglev</tt>. See http://rvm.beginrescueend.com for details
 of using RVM. RVM will start a MagLev server when you <tt>rvm use maglev</tt>. The server
-is left running if you "rvm use <another impl>". You'll stll be able to use <tt>maglev-ruby</tt>
-if you set your $MAGLEV_HOME appropriately.
+is left running if you "rvm use <another impl>" so you'll stll be able to use <tt>maglev-ruby</tt>
+if you set your $MAGLEV_HOME and $PATH appropriately.
 
 == Running MagLev
 
-Start the server by either running <tt>rake maglev:start</tt> from within your $MAGLEV_HOME directory tree, or running <tt>maglev start</tt> (which counts on $MAGLEV_HOME being set and $MAGLEV_HOME/bin being in your $PATH. If you have RVM set up, you can run <tt>rvm use maglev</tt>.
+Start the server by either running <tt>rake maglev:start</tt> from within your $MAGLEV_HOME directory tree, or running <tt>maglev start</tt> (which counts on $MAGLEV_HOME being set and $MAGLEV_HOME/bin being in your $PATH. If you have RVM installed, you can run <tt>rvm use maglev</tt>.
 
 Useful commands include <tt>maglev-irb</tt>, <tt>maglev-ruby</tt>, and <tt>maglev-gem</tt>. MagLev code is in <tt>src</tt>, examples are in <tt>examples</tt>, some docs are in <tt>html</tt>. You'll find a few README files, too. 
 
