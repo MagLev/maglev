@@ -1,14 +1,17 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Changes for 22710  2010-0112
 
 * Fixes to make haml work better
+* Fixes to make rack 1.1 work
 * Fixes to constant definitions
+* Implemented Process::Status
 * Fixes regression in Trac 592
 * Fixes Trac 641a , 645, 647, 649
 * Fixes compile error on Sparc Solaris
-* Installable using RVM - http://rvm.beginrescueend.com/
+* Installable using RVM. See:  http://rvm.beginrescueend.com/
 * Changed installers to use .tar.gz format rather than .zip
+* Changed downloads from .zip to .tar.gz format.
 
 == Changes for 22683  2010-01-04
 
