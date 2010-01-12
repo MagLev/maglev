@@ -5,7 +5,7 @@ time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
 
 # deleted line chgrp $(id -g) #{fname} # get 'Illegal variable name.' from shell
 %x{
-  touch -t 199910201234 #{fname} 
+  touch -t 199910201234 #{fname}
   chmod 0707 #{fname}
 }
 file = File.open fname
@@ -15,8 +15,8 @@ file.close
 test(stat.atime, time, 'atime') # TODO: Time needs ==
 test(stat.blockdev?, false, 'blockdev?')
 
-sx = `ls -s #{fname}` 
-bx = sx.split[0].to_i 
+sx = `ls -s #{fname}`
+bx = sx.split[0].to_i
 test(stat.blocks, bx , 'blocks')
 
 # coverage for Trac 647
@@ -41,7 +41,7 @@ test(stat.directory?, false, 'directory?')
 test(stat.file?, true, 'file?')
 test(stat.ftype, 'file', 'ftype')
 test(stat.gid, `ls -ln #{fname}`.split[3].to_i, 'gid')
-test(stat.grpowned?, true, 'grpowned?')
+#test(stat.grpowned?, true, 'grpowned?')
 test(stat.ino, `ls -i #{fname}`.split[0].to_i, 'ino')
 #test(stat.mode, 33223, 'mode')
 test(stat.mtime, time, 'mtime')
