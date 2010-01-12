@@ -234,22 +234,20 @@ Maglev.persistent do
     # Basic test that Module#maglev_persistable= and
     # Module#maglev_persitable? work
     #
-# RxINC: This test is failing because the Foo.maglev_persistable does not
-# persist the Foo constant in the global namespace.
-#
-#     def test_008
-#       require 't008'
-#     end
-#     def check_008
-#       foos = Maglev::PERSISTENT_ROOT[:my_favorite_foos]
-#       test(foos.size, 1, '008: Maglev::PERSISTENT_ROOT[:my_favorite_foos].size')
-#       test(Foo.maglev_persistable?, true, '008: Foo.maglev_persistable?')
-#     end
+    def test_008
+      require 't008'
+    end
 
-#     # Test that wrapping Maglev.persistent and Maglev.transient around a require works
+    def check_008
+      foos = Maglev::PERSISTENT_ROOT[:my_favorite_foos]
+      test(foos.size, 1, '008: Maglev::PERSISTENT_ROOT[:my_favorite_foos].size')
+      test(Foo456.maglev_persistable?, true, '008: Foo456.maglev_persistable?')
+    end
+
+#     # Test that wrapping Maglev.persistent and Maglev.transient around a
+#     # require works
 #     def test_009
 #     end
-
 #     def check_009
 #     end
 

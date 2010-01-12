@@ -2,12 +2,12 @@
 # File in Ruby is identically Smalltalk GsFile
 class File
 
-ALT_SEPARATOR  = nil
-PATH_SEPARATOR = ':'
-SEPARATOR      = '/'
-Separator      = SEPARATOR
+  ALT_SEPARATOR  = nil
+  PATH_SEPARATOR = ':'
+  SEPARATOR      = '/'
+  Separator      = SEPARATOR
 
-Stat = _resolve_smalltalk_global(:GsFileStat)
+  Stat = _resolve_smalltalk_global(:GsFileStat)
 
   class_primitive_nobridge '__section2OpenConstants', '_section2OpenConstants'
 

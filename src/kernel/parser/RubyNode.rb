@@ -817,7 +817,7 @@ module MagRp
              res
            end
            def inspect
-             "[:colon2, #{@leftNode}, #{@name}]"
+             "[:colon2, #{@leftNode.inspect}, #{@name}]"
            end
          end
 
@@ -1006,7 +1006,7 @@ module MagRp
            self
          end
          def inspect
-           "[:cvasgn, :#{@name}, #{@valueNode}]"
+           "[:cvasgn, :#{@name}, #{@valueNode.inspect}]"
          end
        end
 
@@ -1050,7 +1050,7 @@ module MagRp
            # probably return a RubyDVarNode
          end
          def inspect
-           "[:dasgn, :#{@name}, #{@valueNode}]"
+           "[:dasgn, :#{@name}, #{@valueNode.inspect}]"
          end
        end
 
@@ -1089,7 +1089,7 @@ module MagRp
            self
          end
          def inspect
-           "[:gasgnNotAssignable, :#{@name}, #{@valueNode}]"
+           "[:gasgnNotAssignable, :#{@name}, #{@valueNode.inspect}]"
          end
        end
 
@@ -1103,7 +1103,7 @@ module MagRp
            self
          end
          def inspect
-           "[:gasgnLastExc, #{@valueNode}]"
+           "[:gasgnLastExc, #{@valueNode.inspect}]"
          end
        end
 
@@ -1129,7 +1129,7 @@ module MagRp
            RubyInstVarNode.s(@name)
          end
          def inspect
-           "[:iasgn, :#{@name}, #{@valueNode}]"
+           "[:iasgn, :#{@name}, #{@valueNode.inspect}]"
          end
        end
 

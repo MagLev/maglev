@@ -9,8 +9,9 @@ class Object
     #  example without a block argument
     #    primitive_nobridge '_foo*' , '_foo:a:b:c:d:'
 
-    #  installed by RubyContext>>installPrimitiveBootstrap :
-    #    primitive_nobridge 'class', 'class' # installed in Object
+    # class is installed by RubyContext>>installPrimitiveBootstrap: , but we
+    #  install again here to get bridge methods
+    primitive_nobridge 'class', 'class' 
 
     #  Reimplementation of the following special selectors is disallowed
     #  by the parser and they are optimized by code generator to special bytecodes.

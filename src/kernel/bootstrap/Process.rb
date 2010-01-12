@@ -1,5 +1,8 @@
 module Process
 
+  Status = _resolve_smalltalk_global( :RubyProcessStatus ) 
+  # implementation of Process::Status  in delta/Process.rb
+
   def self._procInfoResultCheck(status)
     if (status < 0)
       errnoValue = - status
@@ -91,3 +94,4 @@ module Process
   end
 
 end
+Process.__freeze_constants
