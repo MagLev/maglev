@@ -75,7 +75,7 @@ void set_parser_event(parser_event_t *p_event, yaml_event_t *event) {
 
   switch(event->type) {
   case YAML_STREAM_START_EVENT:
-    /* TODO: pass back the character encoding */
+    p_event->encoding = event->data.stream_start.encoding;
     break;
 
   case YAML_STREAM_END_EVENT:
@@ -83,7 +83,21 @@ void set_parser_event(parser_event_t *p_event, yaml_event_t *event) {
     break;
 
   case YAML_DOCUMENT_START_EVENT:
-    /* TODO: */
+    /* Encode document version info */
+    if (event->data.document_start.version_directive) {
+      p_event->version_major = event->data.document_start.version_directive->major;
+      p_event->version_minor = event->data.document_start.version_directive->minor;
+    }
+    /* Encode tag directives */
+    if (event->data.document_start.tag_directives.start) {
+      int num_tags =
+        (event->data.document_start.tag_directives.end -
+         event->data.document_start.tag_directives.start) / sizeof(yaml_tag_directive_t *);
+      fprintf(stderr, "num_tags: %d (%d)\n", num_tags,         (event->data.document_start.tag_directives.end -
+         event->data.document_start.tag_directives.start) );
+      /* TODO: */
+    }
+    
     break;
 
   case YAML_DOCUMENT_END_EVENT:

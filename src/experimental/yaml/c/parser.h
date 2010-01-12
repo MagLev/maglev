@@ -14,6 +14,12 @@
 #define IS_VALID_PARSER_CONTEXT(context)         \
   (context != NULL && (context->parser_validp))
 
+/*
+typedef enum parser_character_endocing_e {
+  ANY, UTF8, UTF_16LE, UTF_16BE
+} parser_character_endocing_t;
+*/
+
 typedef enum parser_event_type_e {
   /*
    * NOTE: The first eleven values are the same as
@@ -53,7 +59,12 @@ typedef struct parser_context_s {
  */
 typedef struct parser_event_s {
   parser_event_type_t type;
-  
+
+  int encoding;
+
+  int version_major;
+  int version_minor;
+
   size_t yaml_line;     /* Error info */
   size_t yaml_column;   /* Error info */
 } parser_event_t;

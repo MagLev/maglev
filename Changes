@@ -5,7 +5,7 @@
 * Fixes to make haml work better
 * Fixes to constant definitions
 * Fixes regression in Trac 592
-* Fixes Trac 641a and 645
+* Fixes Trac 641a , 645, 647, 649
 * Fixes compile error on Sparc Solaris
 * Installable using RVM - http://rvm.beginrescueend.com/
 * Changed installers to use .tar.gz format rather than .zip
