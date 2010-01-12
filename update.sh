@@ -1,11 +1,11 @@
 #! /bin/bash
 
 #=========================================================================
-# Copyright (C) GemStone Systems, Inc. 2009.
+# Copyright (C) GemStone Systems, Inc. 2010.
 #
 # Name - update.sh
 #
-# Purpose - Automatically update to a new version of MagLev and GemStone
+# Purpose - Automatically update to a new version of GemStone
 #           in an existing git repository cloned from MagLev on github.  
 #           Be both verbose and idempotent, so we can easily diagnose
 #           any problems.
@@ -13,13 +13,12 @@
 # $Id:$
 #
 # Description:
-#    Does a basic update of MagLev
-#    Setup for manual MagLev startup rather than automatic startup upon boot
+#    Updates GemStone to a version corresponsing to $MAGLEV_HOME/version.txt
 #    Safe to run multiple times. Only saves one prior backup repository though.
 #
 # Actions:
-#    Download the GemStone product zipfile into the parent directory
-#    Uncompress the GemStone zipfile into the parent directory
+#    Download the GemStone archive into the parent directory
+#    Uncompress the GemStone archive in the parent directory
 #    Update the gemstone link to point to the new GemStone
 #    Backup any existing 'maglev' repository
 #    Wipeout any previous 'maglev' configuration file
@@ -30,13 +29,13 @@
 #=========================================================================
 
 if [ -x bin/maglev-ruby ]; then
-  # echo "using $PWD as MAGLEV_HOME"
-  export MAGLEV_HOME=$PWD
+    # echo "using $PWD as MAGLEV_HOME"
+    export MAGLEV_HOME=$PWD
 else
-  echo "[Error] $PWD is not a valid maglev git repository"
-  echo "To fix this, 'clone git://github.com:MagLev/maglev.git'"
-  echo "then run install.sh from the resulting directory."
-  exit 1
+    echo "[Error] $PWD is not a valid MagLev directory"
+    echo "To fix this, 'clone git://github.com:MagLev/maglev.git'"
+    echo "then run install.sh from the resulting directory."
+    exit 1
 fi
 
 # Check that the parent directory is writable
@@ -47,27 +46,23 @@ if [ ! -w ".." ]; then
     exit 1
 fi
 
-# Detect operating system
-OS=`uname -s`
-[ $OS = "Darwin" ] && OS="MacOSX"
-[ $OS = "SunOS" ] && [ "`uname -m`" = "i86pc" ] && OS="Solaris-x86"
-
-gsvers=`grep ^GEMSTONE version.txt | cut -f2 -d-`
-mlvers="MagLev-${gsvers}.${OS}"
-gsname="GemStone-${gsvers}.${OS}"
-zipfile=${gsname}.zip
-
 # We should run this as a normal user, not root.
 if [ `id | cut -f2 -d= | cut -f1 -d\(` -eq 0 ]; then
     echo "[Error] This script should be run as a normal user, not root."
     exit 1
 fi
 
+# Detect operating system
+PLATFORM="`uname -sm | tr ' ' '-'`"
+gsvers=`grep ^GEMSTONE version.txt | cut -f2 -d-`
+gss_name="GemStone-${gsvers}.${PLATFORM}"
+gss_file=${gss_name}.tar.gz
+
 # We're good to go. Let user know.
 machine_name="`uname -n`"
-echo "[Info] Starting installation of $mlvers on $machine_name"
+echo "[Info] Starting upgrade to $gss_name on $machine_name"
 
-# Look for either wget or curl to download MagLev
+# Look for either wget or curl to download GemStone
 if [ -e "`which wget`" ]; then
     cmd="`which wget`"
 elif [ -e "`which curl`" ]; then
@@ -81,26 +76,27 @@ fi
 cd $MAGLEV_HOME/..
 
 # Download appropriate version of GemStone
-if [ ! -e $zipfile ]; then
-    echo "[Info] Downloading GemStone archive using ${cmd}"
-    $cmd http://glass-downloads.gemstone.com/maglev/$zipfile
+if [ ! -e $gss_file ]; then
+    echo "[Info] Downloading $gss_file using ${cmd}"
+    $cmd http://glass-downloads.gemstone.com/maglev/$gss_file
 else
-    echo "[Info] $zipfile already exists"
+    echo "[Info] $gss_file already exists"
     echo "to replace it, remove or rename it and rerun this script"
 fi
 
-# Unzip the downloaded archive into the current directory
-echo "[Info] Uncompressing GemStone archive into $PWD"
-if [ ! -e $gsname ]; then
-    unzip -q $zipfile
+# Uncompress the downloaded GemStone archive in the current directory
+echo "[Info] Uncompressing $gss_file in $PWD"
+if [ ! -e $gss_name ]; then
+    gunzip -c $gss_file | tar xf -
 else
-    echo "[Warning] $gsname already exists"
+    echo "[Warning] $gss_name already exists"
     echo "to replace it, remove or rename it and rerun this script"
 fi
 
-echo "[Info] Linking gemstone to ${PWD}/$gsname"
+# Create a link to the GemStone directory
+echo "[Info] Linking $gss_name to ${MAGLEV_HOME}/gemstone"
 rm -f $MAGLEV_HOME/gemstone
-ln -s ${PWD}/$gsname $MAGLEV_HOME/gemstone
+ln -sf ${PWD}/$gss_name $MAGLEV_HOME/gemstone
 
 # Finally get back to the MagLev directory
 cd $MAGLEV_HOME
@@ -108,7 +104,8 @@ cd $MAGLEV_HOME
 # Make sure we have a locks directory
 mkdir -p locks
 # and the correct updated keyfile
-ln -sf maglev.demo.key-$OS etc/maglev.demo.key
+rm -f etc/maglev.demo.key
+ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
 echo "[Info] updating MSpec, RubySpec, and RBS submodules"
 git submodule update --init 
@@ -136,7 +133,7 @@ else
     echo "Skipping creation of default 'maglev' repository and HTML documentation."
 fi
 
-echo "[Info] Finished upgrade to $mlvers on $machine_name"
+echo "[Info] Finished upgrade to $gss_name on $machine_name"
 echo ""
 echo "[Info] MagLev version information:"
 cat version.txt
