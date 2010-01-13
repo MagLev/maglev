@@ -2,40 +2,9 @@
 
 === Synopsis
 
-MagLev now includes a slightly modified copy of irb called maglev-irb. <b>This documentation applies to the deprecated maglev-irb version, temporarily renamed topaz-irb.</b> We'll update the docs soon.
-
-MagLev provides an IRB-like utility, <tt>$MAGLEV_HOME/bin/maglev-irb</tt>.
-It provides a minimal interactive environment, but is neither robust nor a
-full irb implementation. GemStone plans to offer a full implementation of 
-ruby IRB in a future release.
-
-  Usage: maglev-irb [options]
-  OPTIONS:
-     -d      Run in debugging mode
-     -G      Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
-     -h      Show help message
-     -v      Print version number
-
-=== Commands
-
-<tt>maglev-irb</tt> supports the following special commands:
-
-[+STOP+]            Clear the input buffer.
-[+BEGIN+]           Begin a transaction.
-[+ABORT+]           Abort the current transaction.
-[+COMMIT+ or +END+] Commit/end the current transaction.
-[<tt>^D</tt> or +quit+]       Exit <tt>maglev-irb</tt>.
-
-=== Prompts
-
-The <tt>maglev-irb</tt> prompt changes to indicate its state:
-
-[<tt>>></tt>]  Autocommit is on, and buffer is empty.
-[<tt>*></tt>]  Autocommit is off, and buffer is empty.
-[<tt>..</tt>]  Buffer contains info
-
-
-
+MagLev now includes a slightly modified copy of irb called
+maglev-irb. <b>This documentation applies to the deprecated maglev-irb
+version, temporarily renamed topaz-irb.</b> We'll update the docs soon.
 
 
 

@@ -11,8 +11,6 @@ MagLev does not currently support (at least) the following Rack features:
 * mongrel
 * memcache
 * thin
-* showexceptions (depends on erb)
-* showstatus (depends on erb)
 * cookies (depends on openssl)
 * fastcgi
 

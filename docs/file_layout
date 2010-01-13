@@ -2,70 +2,88 @@
 
   $MAGLEV_HOME
     |
-    + benchmarks    # Benchmarks from the Ruby Benchmark Suite project
+    + backups/       # Default location for repository backups
     |
-    + bin           # MagLev executable scripts
+    + benchmark/     # Benchmarks from the Ruby Benchmark Suite project
     |
-    + data          # The MagLev repository files
+    + bin/           # MagLev executable scripts
     |
-    + docs          # Rdoc formatted documentation files
+    + data/          # The MagLev repository files.  One subdir per stone
+    |  |
+    |  + maglev/     # The default repository
+    |     |
+    |     + extent/  # Holds the repository image
+    |     |
+    |     + tranlog/ # Holds the transaction logs
     |
-    + etc           # Misc config files used by topaz; demo key to run GemStone VM
+    + docs/          # Rdoc formatted documentation files
     |
-    + examples      # Example Ruby scripts to run under MagLev
+    + etc/           # Misc config files used by topaz; demo key to run GemStone VM
+    |  |
+    |  + conf.d/     # The per-repository configuration files.
     |
-    + gci           # Some GemStone C interface files
+    + examples/      # Example Ruby scripts to run under MagLev
     |
-    + gemstone      # A link to the GemStone/Smalltalk executables, libraries, etc.
+    + gci/           # Some GemStone C interface files
     |
-    + html          # created by "rake rdoc"; holds html versions of rdoc files
+    + gemstone/      # A link to the GemStone/Smalltalk executables, libraries, etc.
     |
-    + lib           # The root of the ruby lib directory.  This is usually
+    + html/          # created by "rake rdoc"; holds html versions of rdoc files
+    |
+    + lib/           # The root of the ruby lib directory.  This is usually
     |  |               installed in /usr/local or /opt/local etc.
-    |  + ruby
+    |  + ruby/
     |     |
-    |     + 1.8     # Standard ruby library files go here
+    |     + 1.8/     # Standard ruby library files go here
     |     |
-    |     + gems    # Managed by RubyGems
+    |     + gems/    # Managed by RubyGems
     |     |
-    |     + site_ruby
+    |     + site_ruby/
     |
-    + locks         # Lock files used by the GemStone VM
+    + locks/         # Lock files used by the GemStone VM
     |
-    + log           # Log files created by MagLev components
+    + log/           # Log files created by MagLev components; one subdir
+    |  |               per repository
+    |  + maglev/
     |
-    + rakelib       # Rake scripts and supporting Ruby files
+    + rakelib/       # Rake scripts and supporting Ruby files
     |
-    + spec
+    + spec/
     |  |
-    |  + mspec      # Git submodule containing a recent version of MSpec
+    |  + mspec/      # Git submodule containing a recent version of MSpec
     |  |
-    |  + rubyspec   # Git submodule containing a recent version of RubySpec files
+    |  + rubyspec/   # Git submodule containing a recent version of RubySpec files
     |
-    + src           # MagLev Ruby source and libs
-    |
-    + tools         # Tools for developers
+    + src/           # MagLev Ruby source and libs
 
 === Source File Layout
 
   $MAGLEV_HOME/src
     |
-    + external       # Frozen copies of files from other sources so
-    |                # developers are immune from sudden changes
-    |                # that might disrupt testing
+    + baseline/        # Original copies of certain systems
     |
-    + kernel         # The core and language files pre-loaded into the image
-    |  |             # These files are reloaded with "rake dev:reloadprims"
-    |  |
-    |  + kernel.rb   # File that controls the load order of kernel files
-    |  |
-    |  + bootstrap   # These files are loaded in the first wave and provide
-    |  |             # the basic/core functionality
-    |  |
-    |  + common      # Files that are common between MagLev and Rubinius
-    |  |             # (or at least mostly identical)
-    |  |
-    |  + delta       # Files that are loaded after the common files to
-    |                # overload MagLev functions on top of the common ones.
+    + external/        # Frozen copies of files from other sources so
+    |                  # developers are immune from sudden changes
+    |                  # that might disrupt testing
     |
-    + test           # smoke tests run before committing code
+    + kernel/          # The core and language files pre-loaded into the image
+    |  |               # These files are reloaded with "rake dev:reloadprims"
+    |  |
+    |  + bootstrap/    # These files are loaded in the first wave and provide
+    |  |               # the basic/core functionality
+    |  |
+    |  + common/       # Files that are common between MagLev and Rubinius
+    |  |               # (or at least mostly identical)
+    |  |
+    |  + delta/        # Files that are loaded after the common files to
+    |  |               # overload MagLev functions on top of the common ones.
+    |  |
+    |  + kernel.rb     # File that controls the load order of kernel files
+    |  |
+    |  + parser/       # Pure ruby parser code
+    |  |
+    |  + post_prims/   # Code run after primitives are loaded
+    |  |
+    |  + post_prims.rb # Code run after primitives are loaded
+    |
+    + test/            # smoke tests run before committing code
