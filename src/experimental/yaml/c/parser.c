@@ -28,6 +28,10 @@ void free_parser_context(parser_context_t *context) {
   free(context);
 }
 
+parser_event_t *create_event() {
+  return (parser_event_t *)malloc(sizeof(parser_event_t));
+}
+
 void free_event(parser_event_t *event) {
   assert(event);
   /* TODO: need to free any allocated stuff */
@@ -97,7 +101,7 @@ void set_parser_event(parser_event_t *p_event, yaml_event_t *event) {
          event->data.document_start.tag_directives.start) );
       /* TODO: */
     }
-    
+
     break;
 
   case YAML_DOCUMENT_END_EVENT:

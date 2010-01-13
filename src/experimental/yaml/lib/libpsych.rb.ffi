@@ -1,0 +1,120 @@
+# TODO:
+#   need to ensure all data structures are released/free()d
+
+module Psych
+  # LibPsych wraps libparser.dylib.  libparser is a layer of support to
+  # hide the complexity of libyaml with its deeply nested structs and
+  # unions.  libparser is designed to pass into ruby just the items
+  # required by Psych.
+  class LibPsych
+    extend FFI::Library
+    ffi_lib '/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c/libpsych.dylib'
+
+    attach_function :next_event, [:pointer, :pointer], :void
+    attach_function :create_parser_context, [], :pointer
+    attach_function :create_event, [], :pointer
+
+    ParserEventEnum = FFI::Enum.new([:no_event,
+                                     :stream_start_event,
+                                     :stream_end_event,
+                                     :document_start_event,
+                                     :document_end_event,
+                                     :alias_event,
+                                     :scalar_event,
+                                     :sequence_start_event,
+                                     :sequence_end_event,
+                                     :mapping_start_event,
+                                     :mapping_end_event,
+                                     :parse_error_event],
+                                    :parser_event_type_e)
+
+    class ParserEvent < FFI::Struct
+      @@@
+      struct do |s|
+        s.name 'struct parser_event_s'
+        s.include '/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c/parser.h'
+        s.field :type,   :int
+        s.field :encoding, :int
+        s.field :version_major,  :int
+        s.field :version_minor,  :int
+        s.field :yaml_line, :size_t
+        s.field :yaml_column, :size_t
+      end
+      @@@
+    end
+  end
+
+
+  class Parser
+    def parse(string, handler)
+      c_parser = Psych::LibPsych.create_parser_context(string)
+      c_event = Psych::LibPsych.create_event()
+      done = false
+      while not done
+        Psych::LibPsych.next_event(c_parser, c_event)
+        event = Psych::LibPsych::ParserEvent.new(c_event)
+        case Psych::LibPsych::ParserEventEnum[event[:type]]
+        when :no_event
+          puts "#{self}: No Event"
+
+        when :stream_start_event
+          handler.start_stream( event[:encoding] )
+
+        when :stream_end_event
+          handler.end_stream
+          done = true
+
+        when :document_start_event
+          version = :stub_version
+          tag_directives = :stub_tag_directives
+          implicit = :stub_implicit
+          handler.start_document(version, tag_directives, implicit)
+
+        when :document_end_event
+          implicit = :stub_implicit
+          handler.end_document(implicit)
+
+        when :alias_event
+          anchor = :stub_anchor
+          handler.alias(anchor)
+          
+        when :scalar_event
+          value = :stub_value
+          anchor = :stub_anchor
+          tag = :stub_tag
+          plain = :stub_plain
+          quoted = :stub_quoted
+          style = :stub_style
+          handler.scalar(value, anchor, tag, plain, quoted, style)
+
+        when :sequence_start_event
+          anchor = :stub_anchor
+          tag = :stub_tag
+          implicit = :stub_implicit
+          style = :stub_style
+          handler.start_sequence(anchor, tag, implicit, style)
+
+        when :sequence_end_event
+          handler.end_sequence
+          
+        when :mapping_start_event
+          anchor = :stub_anchor
+          tag = :stub_tag
+          implicit = :stub_implicit
+          style = :stub_style
+          handler.start_mapping(anchor, tag, implicit, style)
+          
+        when :mapping_end_event
+          handler.end_mapping
+          
+        when :parse_error_event
+          puts "#{self}: ERROR"
+          done = true
+        else
+          puts "#{self}: UNKNOWN EVENT"
+          done = true
+        end
+      end
+    end
+  end
+end

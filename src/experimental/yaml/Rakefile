@@ -1,83 +1,50 @@
 require 'rake/clean'
 
-CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out', 'c/*o')
+CLEAN.include('lib/libpsych.rb', '*~', 'a.out', 'c/*o')
 CLOBBER.include('c/main', 'c/*.dylib', 'c/dmain')
-# task :default => :test
-task :default => :'parser:drun'
 
-desc "run a small test program against the generated yaml2.rb"
-task :test => 'lib/libyaml/libyaml.rb' do
-  #sh "ruby -Ilib main.rb"
-  sh "maglev-ruby -Ilib main.rb"
-end
+I_DIR = "/Users/pmclain/external/yaml-0.1.3-64/include"
+L_DIR = "/Users/pmclain/external/yaml-0.1.3-64/src/.libs"
+X_DIR = "/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c"
 
-desc "run libyaml.rb.ffi through the struct generator"
-file 'lib/libyaml/libyaml.rb' => 'lib/libyaml/libyaml.rb.ffi' do |t|
+CFLAGS  = "-m64 -Wall -I#{I_DIR}"
+LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
+
+task :default => :run
+
+rule '.rb' => ['.rb.ffi'] do |t|
+  dir      = File.dirname  t.source
+  ffi_name = File.basename t.source
+  rb_name  = File.basename t.name
 
   require 'lib/libyaml/platform'
-
   require '/Users/pmclain/external/ffi/lib/ffi/tools/struct_generator'
   require '/Users/pmclain/external/ffi/lib/ffi/tools/const_generator'
   require '/Users/pmclain/external/ffi/lib/ffi/tools/generator'
 
-  puts "Generating #{t.name}..." # if Rake.application.options.trace
-  cd 'lib/libyaml' do
-    FFI::Generator.new 'libyaml.rb.ffi', 'libyaml.rb', {:cflags => '-m64'}
+  puts "Generating #{t.name}..."
+  cd dir do
+    FFI::Generator.new ffi_name, rb_name, {:cflags => CFLAGS}
   end
 end
 
+desc "Run the t.rb file"
+task :run => ['lib/libpsych.rb', 'parser:c/libpsych.dylib'] do
+  sh "export DYLD_LIBRARY_PATH=#{L_DIR}:#{X_DIR} ; maglev-ruby -Ilib main.rb"
+end
+
 namespace :parser do
-  I_DIR = "/Users/pmclain/external/yaml-0.1.3-64/include"
-  L_DIR = "/Users/pmclain/external/yaml-0.1.3-64/src/.libs"
-  X_DIR = "/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c"
-
-  CFLAGS  = "-m64 -Wall -I#{I_DIR}"
-  LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
-
-  desc "Run the test parser on some input"
-  task :run => ['c/main'] do
-    sh 'export DYLD_LIBRARY_PATH=/Users/pmclain/external/yaml-0.1.3-64/src/.libs ; c/main'
-  end
-
-  task :drun => ['c/dmain'] do
-    p = "#{X_DIR}:#{L_DIR}"
-    sh "export DYLD_LIBRARY_PATH=#{p} ; c/dmain"
-  end
-
-  desc "Create the parser dylib"
-  #  file 'c/parser.dylib' do
-  task 'c/libparser.dylib' => ['c/parser.o'] do
+  desc "Create libpsych.dylib"
+  task 'c/libpsych.dylib' => ['c/parser.o'] do
     # gcc -dynamiclib \
     #     -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0,-install_name,/usr/local/lib/libfoo.1.dylib
     #     -o libfoo.1.dylib $(OBJ)
     opts = "-L#{L_DIR} -lyaml"
-    sh "gcc -m64 -dynamiclib #{opts} -o c/libparser.dylib c/parser.o"
-  end
-
-  task 'c/dmain' => ['c/libparser.dylib', 'c/main.o'] do
-    # gcc -Wall -m64 -L/Users/pmclain/external/yaml-0.1.3-64/src/.libs -lyaml  parser.o -o parser
-    yaml_opts   = "-L#{L_DIR} -lyaml"
-    parser_opts = "-L/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c -lparser"
-    sh "gcc #{LFLAGS} #{parser_opts} c/main.o -o c/dmain"
-  end
-
-  task 'c/main' => ['c/parser.o', 'c/main.o'] do
-    # gcc -Wall -m64 -L/Users/pmclain/external/yaml-0.1.3-64/src/.libs -lyaml  parser.o -o parser
-    sh "gcc #{LFLAGS} c/main.o c/parser.o  -o c/main"
+    sh "gcc -m64 -dynamiclib #{opts} -o c/libpsych.dylib c/parser.o"
   end
 
   file 'c/parser.o' do
     # gcc -m64 -Wall -I/Users/pmclain/external/yaml-0.1.3-64/include -c -o parser.o parser.c
     sh "gcc #{CFLAGS} -c -o c/parser.o c/parser.c"
   end
-
-  file 'c/main.o' do
-    sh "gcc #{CFLAGS} -c -o c/main.o c/main.c"
-  end
-end
-
-desc "Run dmain under gdb"
-task :gdb => ['c/dmain'] do
-    p = "#{X_DIR}:#{L_DIR}"
-    sh "export DYLD_LIBRARY_PATH=#{p} ; gdb c/dmain"
 end

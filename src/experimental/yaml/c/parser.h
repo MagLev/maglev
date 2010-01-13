@@ -74,6 +74,14 @@ int parse(parser_context_t *parser_context);
 /* Create a new parser context.  This contains the parser */
 parser_context_t *create_parser_context();
 
+/* Create a new event struct. */
+parser_event_t *create_event();
+
+/* Get the next event for the parser context; modifies *event */
+parser_event_t *next_event(parser_context_t *parser_context,
+                           parser_event_t *event);
+
+
 /* Get a string name for the event type */
 char *event_name_for(const parser_event_type_t type);
 
