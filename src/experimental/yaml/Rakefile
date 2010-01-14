@@ -1,26 +1,42 @@
 require 'rake/clean'
 
 CLEAN.include('lib/libpsych.rb', '*~', 'a.out', 'c/*o')
-CLOBBER.include('c/main', 'c/*.dylib', 'c/dmain')
+CLOBBER.include('c/main', 'c/libpsych.*', 'c/dmain')
 
-I_DIR = "/Users/pmclain/external/yaml-0.1.3-64/include"
-L_DIR = "/Users/pmclain/external/yaml-0.1.3-64/src/.libs"
-X_DIR = "/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c"
+YAML_DIR = "#{ENV['HOME']}/external/yaml-0.1.3"
+FFI_DIR  = "#{ENV['HOME']}/external/ffi"
 
-CFLAGS  = "-m64 -Wall -I#{I_DIR}"
+I_DIR = "#{YAML_DIR}/include"
+L_DIR = "#{YAML_DIR}/src/.libs"
+X_DIR = "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c"
+
+UNAME = `uname`.chomp
+case UNAME
+when "Linux"
+  CFLAGS  = "-m64 -Wall -I#{I_DIR} -fPIC"
+  LIBPSYCH = 'c/libpsych.so'
+when "Darwin"
+  CFLAGS  = "-m64 -Wall -I#{I_DIR}"
+  LIBPSYCH = 'c/libpsych.dylib'
+else
+  raise "Rakefile doesn't support #{`uname`}"
+end
+
+
 LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
 
 task :default => :run
 
 rule '.rb' => ['.rb.ffi'] do |t|
+  puts "---- rule: task: #{t.name}"
   dir      = File.dirname  t.source
   ffi_name = File.basename t.source
   rb_name  = File.basename t.name
 
   require 'lib/libyaml/platform'
-  require '/Users/pmclain/external/ffi/lib/ffi/tools/struct_generator'
-  require '/Users/pmclain/external/ffi/lib/ffi/tools/const_generator'
-  require '/Users/pmclain/external/ffi/lib/ffi/tools/generator'
+  require "#{FFI_DIR}/lib/ffi/tools/struct_generator"
+  require "#{FFI_DIR}/lib/ffi/tools/const_generator"
+  require "#{FFI_DIR}/lib/ffi/tools/generator"
 
   puts "Generating #{t.name}..."
   cd dir do
@@ -29,18 +45,33 @@ rule '.rb' => ['.rb.ffi'] do |t|
 end
 
 desc "Run the t.rb file"
-task :run => ['lib/libpsych.rb', 'parser:c/libpsych.dylib'] do
-  sh "export DYLD_LIBRARY_PATH=#{L_DIR}:#{X_DIR} ; maglev-ruby -Ilib main.rb"
+task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
+  case UNAME
+  when "Linux"
+    p = "LD_LIBRARY_PATH"
+  when "Darwin"
+    p = "DYLD_LIBRARY_PATH"
+  end
+  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -Ilib main.rb"
+  sh cmd
 end
 
 namespace :parser do
-  desc "Create libpsych.dylib"
-  task 'c/libpsych.dylib' => ['c/parser.o'] do
+  desc "Create #{LIBPSYCH}"
+  task "#{LIBPSYCH}" => ['c/parser.o'] do
     # gcc -dynamiclib \
     #     -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0,-install_name,/usr/local/lib/libfoo.1.dylib
     #     -o libfoo.1.dylib $(OBJ)
     opts = "-L#{L_DIR} -lyaml"
-    sh "gcc -m64 -dynamiclib #{opts} -o c/libpsych.dylib c/parser.o"
+
+    case UNAME
+    when "Linux"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,libpsych.so -o #{LIBPSYCH} c/parser.o"
+    when "Darwin"
+      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} c/parser.o"
+    else
+      raise "Rakefile doesn't support #{`uname`}"
+    end
   end
 
   file 'c/parser.o' do

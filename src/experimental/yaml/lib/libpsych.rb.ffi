@@ -8,7 +8,7 @@ module Psych
   # required by Psych.
   class LibPsych
     extend FFI::Library
-    ffi_lib '/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c/libpsych.dylib'
+    ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
 
     attach_function :next_event, [:pointer, :pointer], :void
     attach_function :create_parser_context, [], :pointer
@@ -35,7 +35,7 @@ module Psych
       @@@
       struct do |s|
         s.name 'struct parser_event_s'
-        s.include '/Users/pmclain/GemStone/checkouts/git/src/experimental/yaml/c/parser.h'
+        s.include "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/parser.h"
         s.field :type,          :int
         s.field :encoding,      :int
 
