@@ -9,16 +9,15 @@
 #ifndef __PBM_PARSER_H
 #define __PBM_PARSER_H
 
+#include <sys/types.h>
 #include <yaml.h>
 
 #define IS_VALID_PARSER_CONTEXT(context)         \
   (context != NULL && (context->parser_validp))
 
-/*
-typedef enum parser_character_endocing_e {
+typedef enum parser_character_encoding_e {
   ANY, UTF8, UTF_16LE, UTF_16BE
-} parser_character_endocing_t;
-*/
+} parser_character_encoding_t;
 
 typedef enum parser_event_type_e {
   /*
@@ -59,15 +58,38 @@ typedef struct parser_context_s {
  */
 typedef struct parser_event_s {
   parser_event_type_t type;
-
   int encoding;
 
   int version_major;
   int version_minor;
 
-  size_t yaml_line;     /* Error info */
-  size_t yaml_column;   /* Error info */
+  int  num_tags;
+  char **tag_directives;
+
+  size_t yaml_line;
+  size_t yaml_column;
+
+  char *scalar;
+  long  scalar_length;
+
+  long style;
+
+  char *anchor;
+  char *tag;
+  u_char flag;
 } parser_event_t;
+/* #define VERSION_FLAG 0x01 */
+/* #define HAS_VERSION(event) \ */
+/*   (event->flags & VERSION_FLAG) != 0 */
+
+#define HAS_VERSION_FLAG     (1 << 0)  /* 0x01 */
+#define IMPLICIT_FLAG        (1 << 1)  /* 0x02 */
+#define QUOTE_FLAG           (1 << 2)  /* 0x04 */
+#define PLAIN_IMPLICIT_FLAG  (1 << 3)  /* 0x08 */
+#define QUOTED_IMPLICIT_FLAG (1 << 4)  /* 0x10 */
+
+void set_event_flag(parser_event_t *event, u_char flag);
+u_char get_event_flag(parser_event_t *event, u_char flag);
 
 int parse(parser_context_t *parser_context);
 
