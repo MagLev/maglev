@@ -48,13 +48,15 @@ typedef enum parser_event_type_e {
 typedef struct parser_context_s {
   yaml_parser_t parser;
   int parser_validp;
-  char *input;
+  yaml_char_t *input;
 } parser_context_t;
 
 
 /*
  * TODO: Make a union, once I've figured out all of the data
  * that gets passed, and who passes it.
+ *
+ * NOTE: yaml_char_t is unsigned char
  */
 typedef struct parser_event_s {
   parser_event_type_t type;
@@ -64,18 +66,18 @@ typedef struct parser_event_s {
   int version_minor;
 
   int  num_tags;
-  char **tag_directives;
+  yaml_char_t **tag_directives;
 
   size_t yaml_line;
   size_t yaml_column;
 
-  char *scalar;
+  yaml_char_t *scalar;
   long  scalar_length;
 
   long style;
 
-  char *anchor;
-  char *tag;
+  yaml_char_t *anchor;
+  yaml_char_t *tag;
   u_char flag;
 } parser_event_t;
 /* #define VERSION_FLAG 0x01 */

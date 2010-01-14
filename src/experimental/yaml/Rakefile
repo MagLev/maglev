@@ -52,7 +52,7 @@ task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
   when "Darwin"
     p = "DYLD_LIBRARY_PATH"
   end
-  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -Ilib main.rb"
+  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -d -Ilib main.rb"
   sh cmd
 end
 
@@ -75,7 +75,14 @@ namespace :parser do
   end
 
   file 'c/parser.o' do
-    # gcc -m64 -Wall -I/Users/pmclain/external/yaml-0.1.3-64/include -c -o parser.o parser.c
-    sh "gcc #{CFLAGS} -c -o c/parser.o c/parser.c"
+    puts "COMPILE:    gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
+    sh "gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
+  end
+
+  desc "Compile files with lots of warnings"
+  task :lint do
+    rm_f 'c/parser.o'
+    puts "LINT:  gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
+    sh "gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
   end
 end

@@ -1,0 +1,3 @@
+lib/libpsych.rb
+c/libpsych.so
+c/libpsych.dylib

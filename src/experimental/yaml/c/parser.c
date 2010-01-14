@@ -76,14 +76,15 @@ void set_parser_event(parser_event_t *p_event, yaml_event_t *event) {
       int num_tags = ((end - start)/sizeof(yaml_tag_directive_t *)) + 1;
 
       p_event->num_tags = num_tags;
-      p_event->tag_directives = calloc(2*num_tags, sizeof(char *));
-      char *current_tag = p_event->tag_directives;
+      p_event->tag_directives = (yaml_char_t **)calloc(2*num_tags, sizeof(yaml_char_t *));
+      yaml_char_t **current_tag = p_event->tag_directives;
       for(; start != end; start++) {
         *current_tag++ = start->handle;
         *current_tag++ = start->prefix;
         fprintf(stderr, "Tag handle: '%s'\n", start->handle);
         fprintf(stderr, "Tag prefix: '%s'\n", start->prefix);
       }
+      fprintf(stderr, "p_event version: %s\n", p_event->tag_directives[0]);
     }
     break;
 
@@ -162,12 +163,18 @@ parser_event_t *next_event(parser_context_t *parser_context,
   if (!yaml_parser_parse(parser, &libyaml_event)) {
       fprintf(stderr, "PARSE ERROR\n");
 
+      /* For GDB */
+      size_t line = parser->mark.line;
+      size_t column = parser->mark.column;
+
+      pause_for_debug();
+      
       event->type = PARSE_ERROR_EVENT;
       event->yaml_line   = parser->mark.line;
       event->yaml_column = parser->mark.column;
 
+      yaml_event_delete(&libyaml_event);
       invalidate_parser(parser_context);
-
       return event;
   }
 
@@ -177,15 +184,21 @@ parser_event_t *next_event(parser_context_t *parser_context,
   return event;
 }
 
-
+void pause_for_debug() {
+  fprintf(stderr, "PID %d pausing for debugger\n", getpid());
+  int wait_for_debug = 1;
+  while (wait_for_debug) {
+    sleep(2);
+  }
+}
 /*
  * Allocate a new parser context and initialize it.  The parser context
  * holds the libyaml parser and the input string.
  */
-parser_context_t *create_parser_context(const char *input) {
+parser_context_t *create_parser_context(yaml_char_t *input) {
   parser_context_t *parser_context = malloc(sizeof(parser_context_t));
   memset(parser_context, 0, sizeof(parser_context_t));
-  size_t length = strlen(input);
+  size_t length = strlen((char *)input);    /* RxINC */
   yaml_parser_t *parser = &(parser_context->parser);
 
   yaml_parser_initialize(parser);
@@ -194,3 +207,4 @@ parser_context_t *create_parser_context(const char *input) {
   parser_context->parser_validp = 1;
   return parser_context;
 }
+
