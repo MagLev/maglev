@@ -34,6 +34,8 @@ OPTIONS:
                                   repository
                     persistent    Start the VM in persistent mode (default is
                                   transient mode)
+   -S             MagLev will search for the ruby script on the PATH environment
+                  variable, unless the script name begins with '/'.
    --             End of MagLev parameters.  The next parameter is the
                   programfile, then any programfile arguments follow.
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
@@ -98,8 +100,10 @@ maglev_args=""  # MagLev specific Arguments that MagLev interprets before invoki
 tocsize=""
 libs=""
 debugFlag=    # off by default
-rlwrapFlag=    # off by default
+rlwrapFlag=   # off by default
 sawDashE=
+searchPathFlag=
+
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -157,6 +161,7 @@ do
                     exit 1
             esac
             ;;
+        -S) searchPathFlag=1 ;;
         --tocsz)
             tocsize="-T $2"
             shift
@@ -232,6 +237,22 @@ if [[ $# -lt 1 ]]; then
 else
     RUBYSCRIPT=$1
     shift
+fi
+
+
+# Process the -S parameter, which searches for RUBYSCRIPT on $PATH,
+# unless $RUBYSCRIPT begins with /
+if [[ $searchPathFlag && $RUBYSCRIPT != /* ]]; then
+    OLD_IFS=$IFS
+    IFS=:
+    for p in $PATH
+    do
+        if [[ -e "$p/$RUBYSCRIPT" ]]; then
+            RUBYSCRIPT="$p/$RUBYSCRIPT"
+            break
+        fi
+    done
+    IFS=$OLD_IFS
 fi
 
 # Make sure the argument is a valid file, or there was a -e "command" parameter
