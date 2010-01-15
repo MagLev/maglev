@@ -20,7 +20,7 @@ or want access to the absolute latest code. It changes more slowly than the
 github version, and it has undergone more testing.
 
 You'll need to know a version number to install.
-The MagLev Alpha version on 12-Jan-10 is 22710. Check for later versions on 
+The MagLev Alpha version on 15-Jan-10 is 22725. Check for later versions on 
 Twitter[http://twitter.com/maglev] or the {MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
 
 First, download and unzip the installer from
@@ -32,8 +32,8 @@ memory settings. It's safe to run multiple times, it won't overwrite
 things it's already done. Subsequently, use <tt>upgradeMaglev.sh</tt>. 
 It skips the checks run by <tt>installMaglev.sh</tt>. You must supply the
 version number as a parameter, <em>e.g.</em>
-  ./installMaglev.sh 22710
-  ./upgradeMaglev.sh 22710
+  ./installMaglev.sh 22725
+  ./upgradeMaglev.sh 22725
 
 The installer is somewhat verbose. That's so you can more easily debug
 installation problems.
@@ -69,11 +69,21 @@ we won't be providing migration scripts during Alpha.
 
 === Installing under RVM
 
-This methodology is useful if you want to compare behavior of various Ruby implementations.
-Install using <tt>rvm install maglev</tt>. See http://rvm.beginrescueend.com for details
-of using RVM. RVM will start a MagLev server when you <tt>rvm use maglev</tt>. The server
-is left running if you "rvm use <another impl>" so you'll stll be able to use <tt>maglev-ruby</tt>
-if you set your $MAGLEV_HOME and $PATH appropriately.
+RVM is useful if you want to compare behavior of various Ruby implementations
+or versions of MagLev.  Install using <tt>rvm install maglev</tt>. 
+See http://rvm.beginrescueend.com for details of using RVM. 
+
+RVM will automatically start a MagLev server when you <tt>rvm use maglev</tt>. 
+That server is left running if you <tt>rvm use any_other_Ruby</tt>.
+To stop your MagLev server run <tt>rvm use maglev; maglev stop</tt>.
+
+<b>Note:</b> <tt>maglev stop</tt> will only stop the version of MagLev currently in use.
+If you're using more than one, you'll have to <tt>maglev stop</tt> each of them -- e.g.
+<tt>rvm use maglev-22683; maglev stop; rvm use maglev-22725; maglev stop</tt>.
+
+<b>ProTip:</b> To kill all the MagLev servers rather than shut them down gracefully, run
+<tt>ps -ef | grep /sys/stoned</tt> and kill the <tt>stoned</tt> processes that show up.
+It takes a short time before they shut down, as they do a bit of cleanup first.
 
 == Running MagLev
 

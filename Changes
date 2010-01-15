@@ -1,5 +1,10 @@
 = MagLev Change Log
 
+== Changes for 22725  2010-0115
+
+* Enhancements to make MagLev run under RVM
+* Fixed bug that prevented Rake from running
+
 == Changes for 22710  2010-0112
 
 * Fixes to make haml work better
