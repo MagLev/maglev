@@ -12,8 +12,10 @@
 #include <sys/types.h>
 #include <yaml.h>
 
+#define VALIDP 0xef23
 #define IS_VALID_PARSER_CONTEXT(context)         \
-  (context != NULL && (context->parser_validp))
+  ((context != NULL) && ((context->parser_validp) == VALIDP))
+
 
 typedef enum parser_character_encoding_e {
   ANY, UTF8, UTF_16LE, UTF_16BE
@@ -45,10 +47,15 @@ typedef enum parser_event_type_e {
   PARSE_ERROR_EVENT
 } parser_event_type_t;
 
+/*
+ * This holds all of the libyaml parsing structs for one
+ * ruby object.
+ */
 typedef struct parser_context_s {
   yaml_parser_t parser;
+  yaml_event_t  event;
   int parser_validp;
-  yaml_char_t *input;
+  yaml_char_t *input;  /* Not needed?? debug only? */
 } parser_context_t;
 
 
@@ -101,10 +108,15 @@ parser_context_t *create_parser_context();
 /* Create a new event struct. */
 parser_event_t *create_event();
 
+/* Release space from a previously created event */
+void release_event(parser_event_t *event);
+
 /* Get the next event for the parser context; modifies *event */
 parser_event_t *next_event(parser_context_t *parser_context,
                            parser_event_t *event);
 
+/* Free the embeded yaml_event_t */
+void free_parser_context_event(parser_context_t *parser_context);
 
 /* Get a string name for the event type */
 char *event_name_for(const parser_event_type_t type);
