@@ -127,7 +127,6 @@ module FFI
       unless name._isSymbol
         raise TypeError, 'field name must be a Symbol'
       end
-      offset = self.__check_offset(offset)
       ctype = PrimTypeDefs[type]
       nstruct = nil
       if ctype._equal?(nil)
@@ -144,6 +143,7 @@ module FFI
       unless (align = @totalsize % csize) == 0 
         @totalsize += csize - align # add pad
       end 
+      offset = self.__check_offset(offset)
       self.__add_member_name(name)
       @members << name
       ofs = @totalsize
@@ -182,10 +182,10 @@ module FFI
       if csize > 100000000000
         raise "total Array size must be <= 100.0e9 bytes" 
       end
-      offset = self.__check_offset(offset)
       unless (align = @totalsize % elemsiz) == 0
         @totalsize += elemsiz - align # add pad
       end
+      offset = self.__check_offset(offset)
       self.__add_member_name(name)
       @members << name
       @offsets << @totalsize
