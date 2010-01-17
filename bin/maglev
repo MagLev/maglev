@@ -50,13 +50,13 @@ fi
 # Set environment variables unless they already exist
 [ -z "$PARSETREE_PORT" ] && export PARSETREE_PORT=2001
 [ -z "$STONENAME" ] && STONENAME=maglev
-[ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-[ -z "$GEMSTONE_DATADIR" ] && export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME
-[ -z "$GEMSTONE_LOGDIR" ] && export GEMSTONE_LOGDIR=$MAGLEV_HOME/log/$STONENAME
-[ -z "$GEMSTONE_BACKUPDIR" ] && export GEMSTONE_BACKUPDIR=$MAGLEV_HOME/log/backups
-[ -z "$GEMSTONE_LOG" ] && export GEMSTONE_LOG=$GEMSTONE_LOGDIR/$STONENAME.log
 [ -z "$GEMSTONE" ] && export GEMSTONE=$MAGLEV_HOME/gemstone
 [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+[ -z "$GEMSTONE_LOGDIR" ] && export GEMSTONE_LOGDIR=$MAGLEV_HOME/log/$STONENAME
+[ -z "$GEMSTONE_LOG" ] && export GEMSTONE_LOG=$GEMSTONE_LOGDIR/$STONENAME.log
+[ -z "$GEMSTONE_DATADIR" ] && export GEMSTONE_DATADIR=$MAGLEV_HOME/data/$STONENAME
+[ -z "$GEMSTONE_BACKUPDIR" ] && export GEMSTONE_BACKUPDIR=$MAGLEV_HOME/backups
+[ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 # Only use $MAGLEV_HOME/etc/.topazini if normal .topazini doesn't exist
 if [[ -e .topazini || -e $HOME/.topazini ]]; then
   TOPAZ_CMD="$GEMSTONE/bin/topaz -q -l "
@@ -259,11 +259,39 @@ initialize() {
     mkdir -p $GEMSTONE_LOGDIR
     chmod 750 $GEMSTONE_LOGDIR
   fi
+  # create GEMSTONE_GLOBAL_DIR/locks if it doesn't exist
+  if [ ! -d $GEMSTONE_GLOBAL_DIR/locks ]; then
+    mkdir -p $GEMSTONE_GLOBAL_DIR/locks
+    chmod 750 $GEMSTONE_GLOBAL_DIR/locks
+  fi
   # create GEMSTONE_DATADIR if it doesn't exist
   if [ ! -d $GEMSTONE_DATADIR ]; then
     mkdir -p $GEMSTONE_DATADIR/extent
     mkdir -p $GEMSTONE_DATADIR/tranlog
     chmod 750 $GEMSTONE_DATADIR $GEMSTONE_DATADIR/extent $GEMSTONE_DATADIR/tranlog
+  fi
+  # create etc/conf.d and etc/conf.d/maglev.conf if it doesn't exist
+  if [ ! -d etc/conf.d ]; then
+    mkdir -p etc/conf.d
+    cp $GEMSTONE_SYS_CONF etc/conf.d/maglev.conf
+    chmod 750 etc/conf.d etc/conf.d/maglev.conf
+  fi
+  # link in etc/maglev.demo.key keyfile if one isn't there. 
+  # etc/maglev.demo.key is a real file in the .tar.gz download, 
+  # but a softlink in the github clone since the keyfile is platform specific
+  if [ ! -e etc/maglev.demo.key ]; then
+      if [ -e etc/maglev.demo.key-$PLATFORM ]; then 
+        ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
+      else
+        echo "[Error] Missing keyfile etc/maglev.demo.key-$PLATFORM"
+        echo "To fix this, copy a keyfile from http://github.com/MagLev/maglev"
+        exit 1
+      fi
+  fi
+  # create GEMSTONE_BACKUPDIR if it doesn't exist
+  if [ ! -d $GEMSTONE_BACKUPDIR ]; then
+    mkdir -p $GEMSTONE_BACKUPDIR
+    chmod 750 $GEMSTONE_BACKUPDIR
   fi
   # grab a virgin repository if no repository exists
   if [ ! -e $GEMSTONE_DATADIR/extent/extent0.ruby.dbf ]; then

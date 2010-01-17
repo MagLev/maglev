@@ -85,6 +85,10 @@ If you're using more than one, you'll have to <tt>maglev stop</tt> each of them 
 <tt>ps -ef | grep /sys/stoned</tt> and kill the <tt>stoned</tt> processes that show up.
 It takes a short time before they shut down, as they do a bit of cleanup first.
 
+<b>Note:</b> When running rake from MagLev, you cannot perform tasks which affect 
+MagLev itself, like <tt>rake maglev:stop</tt>. You have to use the <tt>bin/maglev</tt>
+shell script instead.
+
 == Running MagLev
 
 Start the server by either running <tt>rake maglev:start</tt> from within your $MAGLEV_HOME directory tree, or running <tt>maglev start</tt> (which counts on $MAGLEV_HOME being set and $MAGLEV_HOME/bin being in your $PATH. If you have RVM installed, you can run <tt>rvm use maglev</tt>.
