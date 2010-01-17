@@ -254,6 +254,7 @@ topaz-debug() {
 }
 
 initialize() {
+    # Directory creations necessary because a new "git clone" doesn't have them
   # create GEMSTONE_LOGDIR if it doesn't exist
   if [ ! -d $GEMSTONE_LOGDIR ]; then
     mkdir -p $GEMSTONE_LOGDIR
@@ -269,24 +270,6 @@ initialize() {
     mkdir -p $GEMSTONE_DATADIR/extent
     mkdir -p $GEMSTONE_DATADIR/tranlog
     chmod 750 $GEMSTONE_DATADIR $GEMSTONE_DATADIR/extent $GEMSTONE_DATADIR/tranlog
-  fi
-  # create etc/conf.d and etc/conf.d/maglev.conf if it doesn't exist
-  if [ ! -d etc/conf.d ]; then
-    mkdir -p etc/conf.d
-    cp $GEMSTONE_SYS_CONF etc/conf.d/maglev.conf
-    chmod 750 etc/conf.d etc/conf.d/maglev.conf
-  fi
-  # link in etc/maglev.demo.key keyfile if one isn't there. 
-  # etc/maglev.demo.key is a real file in the .tar.gz download, 
-  # but a softlink in the github clone since the keyfile is platform specific
-  if [ ! -e etc/maglev.demo.key ]; then
-      if [ -e etc/maglev.demo.key-$PLATFORM ]; then 
-        ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
-      else
-        echo "[Error] Missing keyfile etc/maglev.demo.key-$PLATFORM"
-        echo "To fix this, copy a keyfile from http://github.com/MagLev/maglev"
-        exit 1
-      fi
   fi
   # create GEMSTONE_BACKUPDIR if it doesn't exist
   if [ ! -d $GEMSTONE_BACKUPDIR ]; then
