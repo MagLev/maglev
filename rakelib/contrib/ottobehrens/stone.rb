@@ -32,7 +32,9 @@ class Stone
     @backup_directory = gemstone_installation.backup_directory
     @extent_name = gemstone_installation.initial_extent_name
     @gemstone_installation = gemstone_installation
-    initialize_gemstone_environment
+    if ENV['GEMSTONE'].nil? or ENV['GEMSTONE'].empty?
+      initialize_gemstone_environment
+    end
   end
 
   def initialize_gemstone_environment
