@@ -118,6 +118,9 @@ module FFI
       @setters << rubysel  
     end
 
+    def __alignment
+      @alignment
+    end
 
     def add_field(name, type, offset)
       # Returns size in bytes of the added field
@@ -133,16 +136,25 @@ module FFI
         if type._kind_of?(Struct.class)
           nstruct = type  # a nested Struct
           csize = type.size
+          s_alignment = type.__alignment
+          unless (align = @totalsize % s_alignment) == 0 
+            @totalsize += s_alignment - align # add pad
+          end 
+          if s_alignment > @alignment
+            @alignment = s_alignment
+          end
         else 
           raise 'unrecognized field type ' , type.to_s 
-          csize = 8
         end
       else
         csize = PrimTypeSizes[ctype] 
+        unless (align = @totalsize % csize) == 0 
+          @totalsize += csize - align # add pad
+        end 
+        if csize > @alignment
+          @alignment = csize
+        end
       end
-      unless (align = @totalsize % csize) == 0 
-        @totalsize += csize - align # add pad
-      end 
       offset = self.__check_offset(offset)
       self.__add_member_name(name)
       @members << name
@@ -290,7 +302,7 @@ module FFI
     end
 
     def self.align
-      8
+      @cl_layout.__alignment
     end
 
     def self.offsets
@@ -299,14 +311,14 @@ module FFI
 
     def self.offset_of(field_name)
       @cl_layout.offset_of(field_name)
-    end
+      end
 
     def size
       @layout.size
     end
 
     def align
-      8
+      @layout.__alignment
     end
 
     def members
