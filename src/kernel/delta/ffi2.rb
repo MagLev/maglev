@@ -45,8 +45,12 @@ module FFI
     LIBC = 'libc'  # may need OS dependent logic eventually?
   end
 
-  # tables used to translate arguments for primitives.
-  # mapping from Ruby type names to type names supported by CFunction
+  # Mapping from Ruby type names to type names supported by CFunction
+  # If you add new keys to this dictionary, you must also
+  # modify  CFunction(C)>>_addRubyPrimTypes in image/ruby/Capi_ruby.gs
+  # and rexecute as SystemUser , if the new key is to be understood 
+  # as the type of a varArg argument.
+  #
   PrimTypeDefs = IdentityHash.from_hash( 
     { :char => :int8 ,  :uchar => :uint8 ,
       :short => :int16 , :ushort => :uint16 ,
