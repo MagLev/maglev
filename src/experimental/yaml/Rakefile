@@ -1,26 +1,120 @@
 require 'rake/clean'
 
-CLEAN.include('lib/libyaml/libyaml.rb', '*~', 'a.out')
+CLEAN.include('lib/libpsych.rb', '*~', 'a.out', 'c/*o')
+CLOBBER.include('c/main', 'c/libpsych.*', 'c/dmain')
 
-task :default => :test
+YAML_DIR = "#{ENV['HOME']}/external/yaml-0.1.3"
+FFI_DIR  = "#{ENV['HOME']}/external/ffi"
 
-desc "run a small test program against the generated yaml2.rb"
-task :test => 'lib/libyaml/libyaml.rb' do
-  #sh "ruby -Ilib main.rb"
-  sh "maglev-ruby -Ilib main.rb"
+I_DIR = "#{YAML_DIR}/include"
+L_DIR = "#{YAML_DIR}/src/.libs"
+X_DIR = "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c"
+
+UNAME = `uname`.chomp
+case UNAME
+when "Linux"
+  CFLAGS  = "-m64 -Wall -g -I#{I_DIR} -fPIC"
+  LIBPSYCH = 'c/libpsych.so'
+when "Darwin"
+  CFLAGS  = "-m64 -Wall -g -I#{I_DIR}"
+  LIBPSYCH = 'c/libpsych.dylib'
+else
+  raise "Rakefile doesn't support #{`uname`}"
 end
 
-desc "run libyaml.rb.ffi through the struct generator"
-file 'lib/libyaml/libyaml.rb' => 'lib/libyaml/libyaml.rb.ffi' do |t|
 
+LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
+
+task :default => :run
+
+rule '.rb' => ['.rb.ffi'] do |t|
   require 'lib/libyaml/platform'
+  require "#{FFI_DIR}/lib/ffi/tools/struct_generator"
+  require "#{FFI_DIR}/lib/ffi/tools/const_generator"
+  require "#{FFI_DIR}/lib/ffi/tools/generator"
 
-  require '/Users/pmclain/external/ffi/lib/ffi/tools/struct_generator'
-  require '/Users/pmclain/external/ffi/lib/ffi/tools/const_generator'
-  require '/Users/pmclain/external/ffi/lib/ffi/tools/generator'
-
-  puts "Generating #{t.name}..." # if Rake.application.options.trace
-  cd 'lib/libyaml' do
-    FFI::Generator.new 'libyaml.rb.ffi', 'libyaml.rb', {:cflags => '-m64'}
+  puts "Generating #{t.name}..."
+  cd( File.dirname(t.source) ) do
+    FFI::Generator.new( File.basename(t.source),
+                        File.basename(t.name),
+                        {:cflags => CFLAGS} )
   end
 end
+
+rule '.o' => ['.c'] do |t|
+  cd( File.dirname(t.source) ) do
+    sh "gcc #{CFLAGS} -c -o #{File.basename t.name} #{File.basename t.source}"
+  end
+end
+
+desc "Run the t.rb file"
+task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
+  case UNAME
+  when "Linux"
+    p = "LD_LIBRARY_PATH"
+  when "Darwin"
+    p = "DYLD_LIBRARY_PATH"
+  end
+  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -d -Ilib main.rb"
+  sh cmd
+end
+
+namespace :parser do
+  desc "Create #{LIBPSYCH}"
+  task "#{LIBPSYCH}" => ['c/parser.o'] do
+    # gcc -dynamiclib \
+    #     -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0,-install_name,/usr/local/lib/libfoo.1.dylib
+    #     -o libfoo.1.dylib $(OBJ)
+    opts = "-L#{L_DIR} -lyaml"
+
+    case UNAME
+    when "Linux"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,libpsych.so -o #{LIBPSYCH} c/parser.o"
+    when "Darwin"
+      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} c/parser.o"
+    else
+      raise "Rakefile doesn't support #{`uname`}"
+    end
+  end
+
+#   file 'c/parser.o' do
+#     puts "COMPILE:    gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
+#     sh "gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
+#   end
+
+  desc "Compile files with lots of warnings"
+  task :lint do
+    rm_f 'c/parser.o'
+    puts "LINT:  gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
+    sh "gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
+  end
+end
+
+LIBTEST="c/libtest.dylib"
+namespace :test do
+  desc "Create #{LIBTEST}"
+  task "#{LIBTEST}" => ['c/test.o'] do
+    opts = ""
+    case UNAME
+    when "Linux"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{LIBTEST} -o #{LIBTEST} c/test.o"
+    when "Darwin"
+      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBTEST} c/test.o"
+    else
+      raise "Rakefile doesn't support #{`uname`}"
+    end
+  end
+end
+
+desc "Run the t.rb file"
+task :testit => ['lib/libtest.rb', "test:#{LIBTEST}"] do
+  case UNAME
+  when "Linux"
+    p = "LD_LIBRARY_PATH"
+  when "Darwin"
+    p = "DYLD_LIBRARY_PATH"
+  end
+  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -d -Ilib test.rb"
+  sh cmd
+end
+

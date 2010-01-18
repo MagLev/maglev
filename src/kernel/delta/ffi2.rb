@@ -4,14 +4,14 @@ module FFI
   class CLibrary
     PersistentLibraries = []
   end
-  # do not CLibrary.__freeze_constants, so PersistentLibraries not frozen 
+  # do not CLibrary.__freeze_constants, so PersistentLibraries not frozen
 
   #  Specialised error classes
 
   # class TypeError < RuntimeError; end # don't define, specs are expecting ::TypeError
 
   class NullPointerError < RuntimeError; end  # TODO, fix C prims to use NullPointerError
-					      #   instead of ::ArgumentError
+                #   instead of ::ArgumentError
 
   class NotFoundError < LoadError; end
 
@@ -22,29 +22,31 @@ module FFI
   class SignatureError < NativeError; end
 
 
-  # DEBUG , a dynamic constant in post_prims/ffi.rb  
+  # DEBUG , a dynamic constant in post_prims/ffi.rb
 
   module Library
     CURRENT_PROCESS = 'useCurrentProcess'
   end
 
   USE_THIS_PROCESS_AS_LIBRARY = Library::CURRENT_PROCESS # deprecated
-  
+
   module Platform
 
     OS = "" # you must use Config::CONFIG['host_os']
-	    # because OS could change after you commit code
+      # because OS could change after you commit code
 
-    ARCH = ""   # arch should be determined dynamically 
+    ARCH = ""   # arch should be determined dynamically
     LIBPREFIX = "lib"
     LIBSUFFIX = "" # OS  dependent suffix appended at runtime by the
-                   # library load primitives if '.' not in lib name, 
-                   #    or if '.' is last character of lib name. 
+                   # library load primitives if '.' not in lib name,
+                   #    or if '.' is last character of lib name.
     LONG_SIZE = 64 # in bits
     ADDRESS_SIZE = 64
     LIBC = 'libc'  # may need OS dependent logic eventually?
   end
 
+  # Tables used to translate arguments for primitives.
+  
   # Mapping from Ruby type names to type names supported by CFunction
   # If you add new keys to this dictionary, you must also
   # modify  CFunction(C)>>_addRubyPrimTypes in image/ruby/Capi_ruby.gs
@@ -60,7 +62,7 @@ module FFI
       :int16 => :int16 , :uint16 => :uint16 ,
       :int32 => :int32 , :uint32 => :uint32 ,
       :int64 => :int64 , :uint64 => :uint64,
-      :size_t => :uint64 , 
+      :size_t => :uint64 ,
       :long_long => :int64 ,
       :ulong_long => :uint64 ,
       # :float  =>  :xxxx # float not imple yet
@@ -79,10 +81,10 @@ module FFI
 #   memory before a function call .
 # Body of a  :string  argument is copied from object memory to C memory
 #   before a function call, and is then copied back to object memory
-#   after the function call. 
-    
+#   after the function call.
+
   # mapping from types supported by CFunction to sizes in bytes
-  PrimTypeSizes = IdentityHash.from_hash( 
+  PrimTypeSizes = IdentityHash.from_hash(
     { :int8 => 1,  :uint8 => 1,
       :int16 => 2 , :uint16 => 2 ,
       :int32 => 4 , :uint32 => 4 ,
@@ -93,7 +95,7 @@ module FFI
       :'char*' => 8,
       :'const char*' => 8 } )
 
-  StructAccessors = IdentityHash.from_hash( 
+  StructAccessors = IdentityHash.from_hash(
     # values are selectors for use with __perform_se
     { :char =>  :'get_uchar:' ,  :uchar => :'get_uchar:' ,
       :short => :'get_short:' , :ushort => :'get_ushort:' ,
@@ -106,16 +108,16 @@ module FFI
       :size_t => :'uint64at:' ,
       :long_long => :'int64at:' ,
       :ulong_long => :'uint64at:' ,
-  #    :float  =>  :double ,  
+  #    :float  =>  :double ,
       :double =>  :'double_at:' ,
       :ptr => :'__struct_pointer_at:',
   #   :void => :void ,
       :'char*' => :'char_star_at:' ,
       :string => :'char_star_at:' ,
-  #   :const_string => :'const char*' 
+  #   :const_string => :'const char*'
        } )
-    
-  StructSetters = IdentityHash.from_hash( 
+
+  StructSetters = IdentityHash.from_hash(
    # values are selectors for use with __perform__se
     { :char => :'int8_put::' ,  :uchar => :'put_uchar::' ,
       :short => :'put_short::' , :ushort => :'put_ushort::' ,
@@ -128,16 +130,16 @@ module FFI
       :size_t => :'int64_put::' ,
       :long_long => :'int64_put::' ,
       :ulong_long => :'int64_put::' ,
-  #    :float  =>  :double ,  
+  #    :float  =>  :double ,
       :double =>  :'double_put::' ,
       :ptr => :'__pointer_at_put::' ,
   #   :void => :void ,
       :'char*' => :'char_star_put::'
-  #   :const_string => :'const char*' 
+  #   :const_string => :'const char*'
        } )
 
-  class Enums 
-    Persistent_Enums = []    
+  class Enums
+    Persistent_Enums = []
     Persistent_NamedEnums = IdentityHash.new
     Persistent_kv_map = IdentityHash.new
 
@@ -178,7 +180,7 @@ module FFI
   end
 
   class Pointer < CByteArray
-    # define the fixed instvars 
+    # define the fixed instvars
     def initialize
       @type_size = 1
     end
@@ -198,9 +200,9 @@ module FFI
       unless elem_size._isFixnum && elem_size > 0
         raise TypeError, 'element size must be a Fixnum > 0'
       end
-      @type_size = elem_size 
+      @type_size = elem_size
     end
-     
+
     # remainder of implementation in memorypointer.rb
   end
 
@@ -219,10 +221,10 @@ module FFI
   end
 
   class Struct < CByteArray
-    # define the fixed instvars 
+    # define the fixed instvars
     def __set_layout(ly)
       @layout = ly
-    end 
+    end
 
     # remainder of implementation in ffi_struct.rb
   end
@@ -231,10 +233,10 @@ module FFI
   end
 
   class StructLayout
-    # define the fixed instvars 
+    # define the fixed instvars
     def initialize
-      @members_dict = IdentityHash.new # keys are Symbols, 
-				       #  values are offsets into @members...@setters
+      @members_dict = IdentityHash.new # keys are Symbols,
+               #  values are offsets into @members...@setters
       @members = []
       @offsets = []
       @sizes = []
@@ -243,6 +245,7 @@ module FFI
       @setters = []
       @totalsize = 0
       @closed = false
+      @alignment = 0
     end
 
     # remainder of implementation in ffi_struct.rb
@@ -262,6 +265,6 @@ module FFI
   end
 
 end
-FFI.__freeze_constants  
+FFI.__freeze_constants
 
 # the rest of the FFI implementation is in file ffi2.rb

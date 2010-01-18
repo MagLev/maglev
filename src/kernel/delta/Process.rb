@@ -44,6 +44,71 @@ module Process
     # MNI: Process::UID.switch
   end
 
+  class Status	# [
+    # Process::Status is identical to Smalltalk  RubyProcessStatus, 
+    #    see bootstrap/Process.rb
+    #
+    # In the current implementation, an instance is only available
+    # after a child process has finished execution.
+ 
+    def __status
+      @stat
+    end
+    
+    def ==(other)
+      if other._is_a?( Status )
+        @stat == other.__status
+      else
+        false
+      end
+    end
+
+    def &(fixnum)
+      arg = Type.coerce_to(fixnum, Fixnum, :to_int)
+      @stat & arg
+    end
+
+    def >>(fixnum)
+      arg = Type.coerce_to(fixnum, Fixnum, :to_int)
+      @stat >> arg
+    end
+
+    # coredump?  # MNI
+
+    def exited?
+      # instances of Process::Status not available while a child is running
+      true
+    end
+
+    def exitstatus
+      # equivalent to posix WEXITSTATUS macro
+      (@stat >> 8) & 0xFF
+    end
+
+    # pid    #  MNI
+    # signaled?  # MNI
+
+    def success?
+      @stat == 0
+    end 
+
+    # stopped? # MNI
+    # stopsig  # MNI
+    # termsig  # MNI
+
+    def to_i
+      @stat
+    end 
+
+    def to_int
+      @stat
+    end 
+
+    def to_s
+      @stat.to_s
+    end
+  end  # ]
+
   module Sys
     def self.getegid
       Process.egid
@@ -101,3 +166,4 @@ module Process
     end
   end
 end
+Process.__freeze_constants

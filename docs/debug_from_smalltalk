@@ -1,0 +1,151 @@
+= Debugging MagLev from Smalltalk
+
+This file has a couple of examples of debugging MagLev from the Smalltalk
+side.  These are old examples, and may have diverged from reality...
+
+== Catching exceptions in Topaz
+
+This example demonstrates a couple of things:
+1. Invoking MagLev from the Topaz prompt
+2. Using the new exception hook to catch an exception
+
+=== Run MagLev from the Topaz prompt
+
+This scenario shows how to debug a ruby program (RubyGems) from the Topaz
+prompt.
+
+==== Install RubyGems
+To get <tt>bin/maglev-gem</tt> installed, do the following:
+
+  $ cd $MAGLEV_HOME/src/external/rubygems-1.3.1
+  $ maglev-ruby setup.rb --no-rdoc --no-ri
+
+This installs RubyGems into <tt>$MAGLEV_HOME/lib/...</tt> and puts
+<tt>maglev-gem</tt> into <tt>$MAGLEV_HOME/bin</tt>.
+
+====  Start Topaz:
+
+  $ cd $MAGLEV_HOME
+  $ rake maglev:topaz
+  (in /Users/pmclain/projects/maglev/git)
+  topaz 1>
+
+==== Set debug env in Topaz
+
+Before invoking the ruby program, we want to setup some debug help.  Create
+<tt>$MAGLEV_HOME/gem.inp</tt> and put the following in it:
+
+  run
+  |boring boringExceptions|
+
+    RubyContext load  .
+
+    " ------------------------------------------------------------------
+      Set VM debug flags for the run.
+      ------------------------------------------------------------------ "
+
+    RubyParseTreeClient logSexp: false .   "Print sexp from parser"
+    RubyGlobalScopN traceGlobals: 0 .
+    RubyStaticScope traceLocals: 0 .
+    RubyFile traceLoad: true .             "Print file names when they load"
+    GsNMethod traceIR: 0 .
+
+    " ------------------------------------------------------------------
+      RubyGems throws a couple of exceptions during normal processing,
+      mostly to discover that various libraries do not exist, or to force
+      the loading of a library.  The following Smalltalk array holds the
+      error messages from these boring exceptionns, so we can filter them
+      in the exception handler.
+      ------------------------------------------------------------------ "
+
+    boringExceptions := #(
+      'no such file to load -- rubygems/defaults'
+      'uninitialized constant InstallCommand'
+      'no such file to load -- openssl'
+      ) .
+
+    " ------------------------------------------------------------------
+      This installs an exception handler that will be invoked for every
+      exception thrown.  It prints the message from all exceptions, and
+      then checks to see if the exception is interesting.  If it is, then
+      it pauses the VM and drops down into the Topaz prompt.
+      ------------------------------------------------------------------ "
+
+    Exception installDebugBlock: [:ex|
+      GsFile gciLogServer: '==== "', ex asString, '" (', ex class name, ') ====' .
+      boring := boringExceptions anySatisfy: [:x| ex asString includesString: x ] .
+      boring ifFalse: [ nil pause ] .
+    ] .
+
+
+    " ------------------------------------------------------------------
+      Setup the ARGV array for the script, and then run it.
+      ------------------------------------------------------------------ "
+    RubyContext default setARGV: #( 'install' 'rake' ) scriptName: 'maglev-gem' .
+    RubyContext loadFileNamed: './bin/maglev-gem' .
+  %
+
+This Smalltalk code sets up a number of debugging variables, and installs
+an exception handling hook that will intercept all exceptions.  It then
+invokes <tt>./bin/maglev-gem install rake</tt>, and will break back to the
+Topaz prompt when it hits an "interesting" exception.
+
+==== Run it
+
+To invoke the script:
+
+  topaz 1> input gem.inp
+
+Topaz will echo the script to output, and then run it.  Since we are
+tracing loads, we see output like:
+
+  -- RubyFile>>load  : loading /Users/pmclain/projects/maglev/git/bin/maglev-gem
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/rubygems_version.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/defaults.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/1.8/thread.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/1.8/rbconfig.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/exceptions.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/version.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/requirement.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/dependency.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/gem_path_searcher.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/source_index.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/user_interaction.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/specification.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/platform.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/builder.rb
+  ==== "no such file to load -- rubygems/defaults/operating_system" (RubyLoadError) ====
+  ==== "no such file to load -- rubygems/defaults/maglev" (RubyLoadError) ====
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/config_file.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/1.8/yaml.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/1.8/rbyaml.rb
+  ...
+
+There are also a couple of boring exceptions printed.  After a bit, we get
+to the real exception:
+
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/1.8/time.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/local_remote_options.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/validator.rb
+  -- RubyFile>>load  : loading $MAGLEV_HOME/lib/ruby/site_ruby/1.8/rubygems/version_option.rb
+  ==== "Undefined method `do_not_reverse_lookup=' for Socket  " (MessageNotUnderstood) ====
+  Execution has been suspended by a "pause" or "halt" message.
+  topaz 1>
+
+In this case, the problem is obvious: we haven't implemented
+<tt>Socket#do_not_reverse_lookup=</tt>....
+
+=== Using Squeak to Debug
+
+Download and install the GemTools squeak image from the website.
+Fire up GemTools, and login to the GemStone VM.
+From the GemStone transcript window, issue the following commands:
+
+  RubyDirectory _chdir: (RubyEnv _getenv:'MAGLEV_HOME') .
+  RubyContext load: #() .
+  RubyContext default runFileNamed: 'my_file.rb' withARGV: #() .
+
+The debugging environment is not quite the same as a standard script (e.g.,
+__FILE__ and $0 are not set correctly), but if you don't depend on those,
+then this is a possible way to debug/explore your ruby program.

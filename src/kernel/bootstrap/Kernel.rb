@@ -295,6 +295,7 @@ module Kernel
   #  automatically closed when the block terminates. The call
   #  returns the value of the block.
   #
+#  Following pipe behavior probably not implemented yet in Maglev. 
   #  If <i>path</i> starts with a pipe character, a subprocess is
   #  created, connected to the caller by a pair of pipes. The returned
   #  <code>IO</code> object may be used to write to the standard input
@@ -607,12 +608,12 @@ module Kernel
   def `(arg)
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    arr = __system_exec(arg)
-    status = arr[0]
+    arr = __system_exec(arg)  #   raw_status is arr[0]
+    status = arr[1]
     unless status._equal?(0)
       Errno.raise_errno(status, arg)
     end
-    arr[1]
+    arr[2]
   end
 
   def sub(pattern, replacement)
@@ -691,12 +692,12 @@ module Kernel
   def __system(arg)
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    arr = __system_exec(arg)
-    status = arr[0]
+    arr = __system_exec(arg)  #   raw_status is arr[0]
+    status = arr[1]
     unless status._equal?(0)
       Errno.raise_errno(status, arg)
     end
-    arr[1]
+    arr[2]
   end
 
   def system(command, *args)
@@ -710,11 +711,11 @@ module Kernel
       cmd << args[n].to_s
       n = n + 1
     end
-    arr = __system_exec(cmd)
-    status = arr[0]
+    arr = __system_exec(cmd)  #   raw_status is arr[0]
+    status = arr[1]
     if status._equal?(0)
-      # print result string per MRI behavior, not document in Pickaxe book
-      puts arr[1]
+      # print result string per MRI behavior, not documented in Pickaxe book
+      puts arr[2]
       return true
     end
     return false

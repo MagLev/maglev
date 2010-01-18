@@ -1,6 +1,24 @@
 = MagLev Change Log
 
-== Changes for 22683
+== Changes for 22725  2010-0115
+
+* Enhancements to make MagLev run under RVM
+* Fixed bug that prevented Rake from running
+
+== Changes for 22710  2010-0112
+
+* Fixes to make haml work better
+* Fixes to make rack 1.1 work
+* Fixes to constant definitions
+* Implemented Process::Status
+* Fixes regression in Trac 592
+* Fixes Trac 641a , 645, 647, 649
+* Fixes compile error on Sparc Solaris
+* Installable using RVM. See:  http://rvm.beginrescueend.com/
+* Changed installers to use .tar.gz format rather than .zip
+* Changed downloads from .zip to .tar.gz format.
+
+== Changes for 22683  2010-01-04
 
 * Optimize fetch/store to Ruby global variables
 * Rewrite Hash, IdentityHash to no longer inherit from Smalltalk
@@ -9,19 +27,19 @@
 * Fix Trac 641.
 * Changes to Thread implementation to go with changes to Smalltalk
   implementation of GsProcess>>terminate .
-
 * Removed old workaround for json and trac 616, which has been fixed.
   If you were doing:     require 'maglev_json'
   You must instead do:   require 'json'
 
-== Changes for 22635
+== Changes for 22635  2009-12-10
+
 * Performance improvements for binding, some string operations
 * fixes to pass more core/io specs.
 * Moved mdb and hat_trick to examples/persistence.
 * More Gprof support.  Add ability to suspend and resume sampling.
 * Added methods temp_obj_space*  to System
 
-== Changes for 22619
+== Changes for 22619  2009-12-03
 
 * Added parsedate.rb
 * make _equal? , _is_a? , _not , _kind_of ?  special selectors
