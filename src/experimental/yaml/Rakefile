@@ -13,10 +13,10 @@ X_DIR = "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c"
 UNAME = `uname`.chomp
 case UNAME
 when "Linux"
-  CFLAGS  = "-m64 -Wall -I#{I_DIR} -fPIC"
+  CFLAGS  = "-m64 -Wall -g -I#{I_DIR} -fPIC"
   LIBPSYCH = 'c/libpsych.so'
 when "Darwin"
-  CFLAGS  = "-m64 -Wall -I#{I_DIR}"
+  CFLAGS  = "-m64 -Wall -g -I#{I_DIR}"
   LIBPSYCH = 'c/libpsych.dylib'
 else
   raise "Rakefile doesn't support #{`uname`}"
@@ -28,19 +28,22 @@ LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
 task :default => :run
 
 rule '.rb' => ['.rb.ffi'] do |t|
-  puts "---- rule: task: #{t.name}"
-  dir      = File.dirname  t.source
-  ffi_name = File.basename t.source
-  rb_name  = File.basename t.name
-
   require 'lib/libyaml/platform'
   require "#{FFI_DIR}/lib/ffi/tools/struct_generator"
   require "#{FFI_DIR}/lib/ffi/tools/const_generator"
   require "#{FFI_DIR}/lib/ffi/tools/generator"
 
   puts "Generating #{t.name}..."
-  cd dir do
-    FFI::Generator.new ffi_name, rb_name, {:cflags => CFLAGS}
+  cd( File.dirname(t.source) ) do
+    FFI::Generator.new( File.basename(t.source),
+                        File.basename(t.name),
+                        {:cflags => CFLAGS} )
+  end
+end
+
+rule '.o' => ['.c'] do |t|
+  cd( File.dirname(t.source) ) do
+    sh "gcc #{CFLAGS} -c -o #{File.basename t.name} #{File.basename t.source}"
   end
 end
 
@@ -74,10 +77,10 @@ namespace :parser do
     end
   end
 
-  file 'c/parser.o' do
-    puts "COMPILE:    gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
-    sh "gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
-  end
+#   file 'c/parser.o' do
+#     puts "COMPILE:    gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
+#     sh "gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
+#   end
 
   desc "Compile files with lots of warnings"
   task :lint do
@@ -86,3 +89,32 @@ namespace :parser do
     sh "gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
   end
 end
+
+LIBTEST="c/libtest.dylib"
+namespace :test do
+  desc "Create #{LIBTEST}"
+  task "#{LIBTEST}" => ['c/test.o'] do
+    opts = ""
+    case UNAME
+    when "Linux"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{LIBTEST} -o #{LIBTEST} c/test.o"
+    when "Darwin"
+      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBTEST} c/test.o"
+    else
+      raise "Rakefile doesn't support #{`uname`}"
+    end
+  end
+end
+
+desc "Run the t.rb file"
+task :testit => ['lib/libtest.rb', "test:#{LIBTEST}"] do
+  case UNAME
+  when "Linux"
+    p = "LD_LIBRARY_PATH"
+  when "Darwin"
+    p = "DYLD_LIBRARY_PATH"
+  end
+  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -d -Ilib test.rb"
+  sh cmd
+end
+
