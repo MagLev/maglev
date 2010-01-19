@@ -1,7 +1,7 @@
 require 'rake/clean'
 
-CLEAN.include('lib/libpsych.rb', '*~', 'a.out', 'c/*o')
-CLOBBER.include('c/main', 'c/libpsych.*', 'c/dmain')
+CLEAN.include('*~', 'a.out', 'c/*o', 'gem_*_code.log')
+CLOBBER.include('c/libpsych.*')
 
 YAML_DIR = "#{ENV['HOME']}/external/yaml-0.1.3"
 FFI_DIR  = "#{ENV['HOME']}/external/ffi"
@@ -13,33 +13,24 @@ X_DIR = "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c"
 UNAME = `uname`.chomp
 case UNAME
 when "Linux"
-  CFLAGS  = "-m64 -Wall -g -I#{I_DIR} -fPIC"
-  LIBPSYCH = 'c/libpsych.so'
+  CFLAGS   = "-m64 -Wall -g -I#{I_DIR} -fPIC"
+  DL_EXT   = 'so'
 when "Darwin"
   CFLAGS  = "-m64 -Wall -g -I#{I_DIR}"
-  LIBPSYCH = 'c/libpsych.dylib'
+  DL_EXT   = 'dylib'
 else
   raise "Rakefile doesn't support #{`uname`}"
 end
 
+LIBTEST  = "c/libtest.#{DL_EXT}"
+LIBPSYCH = "c/libpsych.#{DL_EXT}"
 
 LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
 
 task :default => :run
 
-rule '.rb' => ['.rb.ffi'] do |t|
-  require 'lib/libyaml/platform'
-  require "#{FFI_DIR}/lib/ffi/tools/struct_generator"
-  require "#{FFI_DIR}/lib/ffi/tools/const_generator"
-  require "#{FFI_DIR}/lib/ffi/tools/generator"
-
-  puts "Generating #{t.name}..."
-  cd( File.dirname(t.source) ) do
-    FFI::Generator.new( File.basename(t.source),
-                        File.basename(t.name),
-                        {:cflags => CFLAGS} )
-  end
-end
+desc "Create #{LIBPSYCH} dynamic libraray"
+task :libpsych => ["parser:#{LIBPSYCH}"]
 
 rule '.o' => ['.c'] do |t|
   cd( File.dirname(t.source) ) do
@@ -60,27 +51,18 @@ task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
 end
 
 namespace :parser do
-  desc "Create #{LIBPSYCH}"
   task "#{LIBPSYCH}" => ['c/parser.o'] do
-    # gcc -dynamiclib \
-    #     -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-compatibility_version,1.0,-current_version,1.0,-install_name,/usr/local/lib/libfoo.1.dylib
-    #     -o libfoo.1.dylib $(OBJ)
     opts = "-L#{L_DIR} -lyaml"
 
     case UNAME
     when "Linux"
-      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,libpsych.so -o #{LIBPSYCH} c/parser.o"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} c/parser.o"
     when "Darwin"
       sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} c/parser.o"
     else
       raise "Rakefile doesn't support #{`uname`}"
     end
   end
-
-#   file 'c/parser.o' do
-#     puts "COMPILE:    gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
-#     sh "gcc #{CFLAGS} -Wall -g -c -o c/parser.o c/parser.c"
-#   end
 
   desc "Compile files with lots of warnings"
   task :lint do
@@ -90,7 +72,6 @@ namespace :parser do
   end
 end
 
-LIBTEST="c/libtest.dylib"
 namespace :test do
   desc "Create #{LIBTEST}"
   task "#{LIBTEST}" => ['c/test.o'] do

@@ -1,4 +1,2 @@
-lib/libpsych.rb
-lib/libtest.rb
 c/libpsych.so
 c/libpsych.dylib
