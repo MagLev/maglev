@@ -26,13 +26,13 @@ typedef enum parser_event_type_e {
 
 typedef struct parser_s {
   parser_event_type_t type;
-  union {
-    struct {
+  union data_u {
+    struct scalar_s {
       char *value;
       size_t length;
     } scalar;
 
-    struct {
+    struct version_s {
       int major;
       int minor;
     } version_directive;

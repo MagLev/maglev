@@ -33,31 +33,20 @@ module Psych
                                        :parser_character_encoding_e)
 
     class ParserEvent < FFI::Struct
-      @@@
-      struct do |s|
-        s.name 'struct parser_event_s'
-        s.include "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/parser.h"
-        s.field :type,          :int
-        s.field :encoding,      :int
-
-        s.field :version_major, :int
-        s.field :version_minor, :int
-
-        s.field :num_tags,       :int
-        s.field :tag_directives, :pointer
-
-        s.field :yaml_line,     :size_t
-        s.field :yaml_column,   :size_t
-
-        s.field :scalar,        :pointer  # char * of given length
-        s.field :scalar_length, :long
-
-        s.field :style,         :long
-        s.field :anchor,        :string
-        s.field :tag,           :string
-        s.field :flag,          :uchar
-      end
-      @@@
+      layout :type,           :int,
+             :encoding,       :int,
+             :version_major,  :int,
+             :version_minor,  :int,
+             :num_tags,       :int,
+             :tag_directives, :pointer,
+             :yaml_line,      :size_t,
+             :yaml_column,    :size_t,
+             :scalar,         :pointer,
+             :scalar_length,  :long,
+             :style,          :long,
+             :anchor,         :string,
+             :tag,            :string,
+             :flag,           :uchar
 
       VERSION_FLAG  = 0x01;
       IMPLICIT_FLAG = 0x02;
