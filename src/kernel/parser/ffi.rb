@@ -5,7 +5,7 @@ module FFI
   CByteArray = _resolve_smalltalk_global( :CByteArray )
   class CByteArray
     # methods in Smalltalk CByteArray class needed by the string scanner
-    class_primitive_nobridge 'with_string', 'withAll:'
+    class_primitive_nobridge 'with_string', '_vmOwnedWithAll:'
 
     primitive_nobridge '[]', '_rubyByteAt:'
     primitive_nobridge 'size', 'size'

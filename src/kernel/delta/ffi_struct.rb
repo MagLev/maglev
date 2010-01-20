@@ -14,11 +14,11 @@ module FFI
       if elem_siz._not_equal?(0)
         if elem_siz._isFixnum   # a nested array
           siz = @sizes[idx]
-          mp = MemoryPointer.__fromRegionOf(cbytearray, ofs, siz)
+          mp = Pointer.__fromRegionOf(cbytearray, ofs, siz)
           mp.__initialize(elem_siz)
           mp
         else  # a nested Struct , elem_siz._kind_of?(Struct.class) == true
-          unless elem_siz._kind_of?(Struct.class)  # do not checkin
+          unless elem_siz._kind_of?(Struct.class) 
              raise TypeError, 'logic error, expected a Struct class'
           end
           nested_struct_cls = elem_siz
