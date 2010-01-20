@@ -6,19 +6,28 @@ module Psych
   # hide the complexity of libyaml with its deeply nested structs and
   # unions.  libparser is designed to pass into ruby just the items
   # required by Psych.
+
+  class PsychSyntaxError < SyntaxError
+  end
+
   class LibPsych
     extend FFI::Library
     ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
 
     # Creates a new parser context given a string.
-    # Returns a pointer to the context
     #   parser_context_t *create_parser_context(unsigned char *input);
     attach_function :create_parser_context, [ :pointer ], :pointer
 
-    # Returns
-    # parser_event_t *next_event(parser_context_t *parser_context);
+    # Returns a pointer to a ParserEvent that describes the next event in
+    # the YAML event stream.
+    #   parser_event_t *next_event(parser_context_t *parser_context);
     attach_function :next_event, [:pointer], :pointer
 
+    # Frees a parser context created by create_parser_context
+    #   void free_parser_context(parser_context_t *context);
+    attach_function :free_parser_context, [ :pointer ], :void
+
+    # An Enum that describes the YAML parser events.  ParserEvent[:type]
     ParserEventEnum = FFI::Enum.new([:no_event,
                                      :stream_start_event,
                                      :stream_end_event,
@@ -33,28 +42,34 @@ module Psych
                                      :parse_error_event],
                                     :parser_event_type_e)
 
+    # An Enum that describes the character encodings returned as part of a
+    # :stream_start_event
     ParserEncodingEnum = FFI::Enum.new([:any, :utf8, :utf_16le, :utf_16be],
                                        :parser_character_encoding_e)
 
+    # Encapsulates a YAML parser event.  Wraps parser_context_t.  Parsing a
+    # YAML file will generate a sequence of ParserEvents.
     class ParserEvent < FFI::Struct
       layout :type,           :int,
              :encoding,       :int,
              :version_major,  :int,
              :version_minor,  :int,
              :num_tags,       :int,
-             :tag_directives, :pointer,
+             :tag_directives, :pointer,   # unsigned char **
              :yaml_line,      :size_t,
              :yaml_column,    :size_t,
-             :scalar,         :pointer,
+             :scalar,         :pointer,   # unsigned char * ;  May contain NULL characters
              :scalar_length,  :long,
              :style,          :long,
-             :anchor,         :string,
-             :tag,            :string,
+             :anchor,         :string,    # unsigned char *
+             :tag,            :string,    # unsigned char *
              :flag,           :uchar
 
-      VERSION_FLAG  = 0x01;
-      IMPLICIT_FLAG = 0x02;
-      QUOTE_FLAG    = 0x04;
+      VERSION_FLAG        = 0x01;
+      IMPLICIT_FLAG       = 0x02;
+      QUOTE_FLAG          = 0x04;
+      PLAIN_IMPLICIT_FLAG = 0x08;
+      QUOTED_IMPLICIT_FLAG = 0x10;
 
       def has_version?
         (self[:flag] & VERSION_FLAG) != 0
@@ -66,6 +81,14 @@ module Psych
 
       def quoted?
         (self[:flag] & QUOTE_FLAG) != 0
+      end
+
+      def plain_implicit?
+        (self[:flag] & PLAIN_IMPLICIT_FLAG) != 0
+      end
+
+      def quoted_implicit?
+        (self[:flag] & QUOTED_IMPLICIT_FLAG) != 0
       end
 
       # TODO: Should we raise an exception if the event type isn't correct?
@@ -87,20 +110,33 @@ module Psych
         end
       end
 
+      # Returns a string ecnoding the scalar value of the event.  The
+      # string may contain embedded nulls.
       def value
-        :stub_value
+        case event_type
+        when :scalar_event
+          self[:scalar].read_string(self[:scalar_length])
+        else
+          nil
+        end
       end
 
       def tag
-        :stub_tag
-      end
-
-      def plain
-        :stub_plain
+        case event_type
+        when :scalar_event, :sequence_start_event, :mapping_start_event
+          self[:tag]
+        else
+          nil
+        end
       end
 
       def style
-        :stub_style
+        case event_type
+        when :scalar_event, :sequence_start_event, :mapping_start_event
+          self[:style]
+        else
+          nil
+        end
       end
 
       def tag_directives
@@ -209,8 +245,8 @@ module Psych
           handler.scalar( event.value,
                           event.anchor,
                           event.tag,
-                          event.plain,
-                          event.quoted?,
+                          event.plain_implicit?,
+                          event.quoted_implicit?,
                           event.style )
 
         when :sequence_start_event
@@ -232,11 +268,9 @@ module Psych
           handler.end_mapping
 
         when :parse_error_event
-          puts "#{self}: ERROR"
-          done = true
+          raise PsychSyntaxError.new "Syntax error at Line: #{event.yaml_line} Column: #{event.yaml_column}"
         else
-          puts "#{self}: UNKNOWN EVENT"
-          done = true
+          raise "#{self}: UNKNOWN EVENT: #{event[:type]}"
         end
       end
     end
