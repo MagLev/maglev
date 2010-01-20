@@ -29,6 +29,9 @@ LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
 
 task :default => :run
 
+desc "Create #{LIBPSYCH} dynamic libraray"
+task :libpsych => ["parser:#{LIBPSYCH}"]
+
 rule '.o' => ['.c'] do |t|
   cd( File.dirname(t.source) ) do
     sh "gcc #{CFLAGS} -c -o #{File.basename t.name} #{File.basename t.source}"
@@ -48,7 +51,6 @@ task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
 end
 
 namespace :parser do
-  desc "Create #{LIBPSYCH}"
   task "#{LIBPSYCH}" => ['c/parser.o'] do
     opts = "-L#{L_DIR} -lyaml"
 
