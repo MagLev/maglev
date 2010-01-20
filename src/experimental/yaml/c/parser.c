@@ -5,6 +5,8 @@
 #include <yaml.h>
 #include "parser.h"
 
+void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event);
+
 /* void my_handle_event(yaml_event_t *event); */
 void set_event_flag(parser_event_t *event, u_char flag) {
   event->flag |= flag;
@@ -15,6 +17,24 @@ u_char get_event_flag(parser_event_t *event, u_char flag) {
   return (event->flag & flag) != 0;
 }
 
+/* Clean up allocated memory in the interior structs. */
+void free_event_data(parser_context_t *parser_context) {
+  if (IS_VALID_PARSER_CONTEXT(parser_context)) {
+    /* Free libyaml structs */
+    yaml_event_delete(&(parser_context->event));
+
+    /* Free data held in the parser_event_t */
+
+    /* The actual tag_directives are freed by libyaml; we just free the array */
+    parser_event_t *event = &(parser_context->psych_event);
+    if (event->tag_directives) {
+      free(event->tag_directives);
+    }
+
+    memset(&(parser_context->psych_event), 0, sizeof(parser_event_t));
+  }
+}
+
 /* API: Called from Ruby */
 void free_parser_context(parser_context_t *context) {
   fflush(stderr);
@@ -22,6 +42,23 @@ void free_parser_context(parser_context_t *context) {
   fflush(stderr);
   assert(context);
   free(context);
+}
+
+void pause_for_debug() {
+  fprintf(stderr, "+++ PID %d pausing for debugger\n", getpid());
+  fflush(stderr);
+  int wait_for_debug = 1;
+  while (wait_for_debug) {
+    sleep(2);
+  }
+}
+
+void invalidate_parser(parser_context_t *parser_context) {
+  fprintf(stderr, "+++ invalidate_parser\n");
+  fflush(stderr);
+  assert(IS_VALID_PARSER_CONTEXT(parser_context));
+  free_event_data(parser_context);
+  parser_context->parser_validp = 0;
 }
 
 /* API: Called from Ruby */
@@ -79,40 +116,7 @@ parser_context_t *create_parser_context(unsigned char *input) {
   return parser_context;
 }
 
-/* Clean up allocated memory in the interior structs. */
-void free_event_data(parser_context_t *parser_context) {
-  if (IS_VALID_PARSER_CONTEXT(parser_context)) {
-    /* Free libyaml structs */
-    yaml_event_delete(&(parser_context->event));
 
-    /* Free data held in the parser_event_t */
-
-    /* The actual tag_directives are freed by libyaml; we just free the array */
-    parser_event_t *event = &(parser_context->psych_event);
-    if (event->tag_directives) {
-      free(event->tag_directives);
-    }
-
-    memset(&(parser_context->psych_event), 0, sizeof(parser_event_t));
-  }
-}
-
-void invalidate_parser(parser_context_t *parser_context) {
-  fprintf(stderr, "+++ invalidate_parser\n");
-  fflush(stderr);
-  assert(IS_VALID_PARSER_CONTEXT(parser_context));
-  free_event_data(parser_context);
-  parser_context->parser_validp = 0;
-}
-
-void pause_for_debug() {
-  fprintf(stderr, "+++ PID %d pausing for debugger\n", getpid());
-  fflush(stderr);
-  int wait_for_debug = 1;
-  while (wait_for_debug) {
-    sleep(2);
-  }
-}
 
 /*
  * This copies relevant state out of the yaml_event, simplifies it and
