@@ -19,13 +19,17 @@ class LibTest
                                    :parse_error_event],
                                   :parser_event_type_e)
   class ScalarStruct < FFI::Struct
-    layout(:value, :string,
-           :length, :size_t)
+    layout( :value, :string,
+            :length, :size_t )
+
+    def string_value
+      self[:value]
+    end
   end
 
   class VersionStruct < FFI::Struct
-    layout(:major, :int,
-           :minor, :int)
+    layout( :major, :int,
+            :minor, :int )
 
     def major
       self[:major]
@@ -41,13 +45,13 @@ class LibTest
   end
 
   class DataUnion < FFI::Union
-    layout(:scalar, ScalarStruct,
-           :version_directive, VersionStruct)
+    layout :scalar,            ScalarStruct,
+           :version_directive, VersionStruct
   end
 
   class Parser < FFI::Struct
-    layout(:type, :int,
-           :data, DataUnion)
+    layout :type, :int,
+           :data, DataUnion
 
     def data
       self[:data]
