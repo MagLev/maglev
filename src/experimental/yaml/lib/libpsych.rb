@@ -10,10 +10,14 @@ module Psych
     extend FFI::Library
     ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
 
-    attach_function :next_event, [:pointer, :pointer], :void
+    # Creates a new parser context given a string.
+    # Returns a pointer to the context
+    #   parser_context_t *create_parser_context(unsigned char *input);
     attach_function :create_parser_context, [ :pointer ], :pointer
-    attach_function :create_event, [], :pointer
-    attach_function :free_parser_context_event, [:pointer], :void
+
+    # Returns
+    # parser_event_t *next_event(parser_context_t *parser_context);
+    attach_function :next_event, [:pointer], :pointer
 
     ParserEventEnum = FFI::Enum.new([:no_event,
                                      :stream_start_event,
@@ -116,32 +120,32 @@ module Psych
           #    [ "!",     "tag:gemstone.com,2009",
           #      "!foo!", "tag:foo.com,1832" ]
           #
-          debug = :one
-          puts "-- DEBUG path #{debug}"
-          case debug
-          when :one
-            tag_dirs = self[:tag_directives]
-            puts "-- :one:  tag_dirs #{tag_dirs.inspect}"
-            strings = tag_dirs.get_array_of_string(0, 2*num_tags)
-          when :two
-            tag_dirs = self[:tag_directives].read_pointer
-            tag_ptr = FFI::MemoryPointer.new
-            puts "-- Attempt read_pointer from #{tag_dirs.inspect}"
-            tag_ptr.write_pointer(tag_dirs.read_pointer)
-            strings = tag_ptr.get_array_of_string(0, 2*num_tags)
-#          tag_ptr = tag_dirs.read_pointer
-#          tag_ptr = FFI::MemoryPointer.new(tag_dirs.read_pointer)
+#           debug = :one
+#           puts "-- DEBUG path #{debug}"
+#           case debug
+#           when :one
+#             tag_dirs = self[:tag_directives]
+#             puts "-- :one:  tag_dirs #{tag_dirs.inspect}"
+#             strings = tag_dirs.get_array_of_string(0, 2*num_tags)
+#           when :two
+#             tag_dirs = self[:tag_directives].read_pointer
+#             tag_ptr = FFI::MemoryPointer.new
+#             puts "-- Attempt read_pointer from #{tag_dirs.inspect}"
+#             tag_ptr.write_pointer(tag_dirs.read_pointer)
+#             strings = tag_ptr.get_array_of_string(0, 2*num_tags)
+# #          tag_ptr = tag_dirs.read_pointer
+# #          tag_ptr = FFI::MemoryPointer.new(tag_dirs.read_pointer)
 
-          end
-          puts "-- path: #{debug}: strings: #{strings.inspect}"
+#           end
+#           puts "-- path: #{debug}: strings: #{strings.inspect}"
 
-          result = []
-          tag = idx = 0
-          while (tag < num_tags)
-            res << [strings[idx], strings[idx + 1]]
-            idx += 2
-          end
-          result
+#           result = []
+#           tag = idx = 0
+#           while (tag < num_tags)
+#             res << [strings[idx], strings[idx + 1]]
+#             idx += 2
+#           end
+#           result
         end
       end
 
@@ -171,11 +175,10 @@ module Psych
       # parse (which is long enough).
       input_buf = FFI::Pointer.from_string(string)
       c_parser_context = Psych::LibPsych.create_parser_context(input_buf)
-      c_parser_event = Psych::LibPsych.create_event()
       done = false
       while not done
-        Psych::LibPsych.next_event(c_parser_context, c_parser_event)
-        event = Psych::LibPsych::ParserEvent.new(c_parser_event)
+        event_ptr = Psych::LibPsych.next_event(c_parser_context)
+        event = Psych::LibPsych::ParserEvent.new(event_ptr)
 
         case event.event_type
         when :no_event
@@ -235,10 +238,6 @@ module Psych
           puts "#{self}: UNKNOWN EVENT"
           done = true
         end
-
-        # Need to free the yaml event struct embeded in the parser context
-        # after the handler has dealt with it.
-        Psych::LibPsych.free_parser_context_event(c_parser_context)
       end
     end
   end
