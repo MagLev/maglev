@@ -135,10 +135,6 @@ void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
     psych_event->encoding = yaml_event->data.stream_start.encoding;
     break;
 
-  case YAML_STREAM_END_EVENT:
-    /* Nothing */
-    break;
-
   case YAML_DOCUMENT_START_EVENT:
     /* Record implicit flag */
     if (yaml_event->data.document_start.implicit == 1) {
@@ -173,7 +169,9 @@ void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
     break;
 
   case YAML_DOCUMENT_END_EVENT:
-    /* Nothing */
+    if (yaml_event->data.document_end.implicit == 1) {
+      set_event_flag(psych_event, IMPLICIT_FLAG);
+    }
     break;
 
   case YAML_ALIAS_EVENT:
@@ -181,37 +179,51 @@ void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
     break;
 
   case YAML_SCALAR_EVENT:
-    psych_event->scalar = yaml_event->data.scalar.value;
+    psych_event->scalar        = yaml_event->data.scalar.value;
     psych_event->scalar_length = (long)yaml_event->data.scalar.length;
-    psych_event->anchor = yaml_event->data.scalar.anchor;
-    psych_event->tag = yaml_event->data.scalar.tag;
+    psych_event->anchor        = yaml_event->data.scalar.anchor;
+    psych_event->tag           = yaml_event->data.scalar.tag;
+    psych_event->style         = yaml_event->data.scalar.style;
     if (yaml_event->data.scalar.plain_implicit) {
       set_event_flag(psych_event, PLAIN_IMPLICIT_FLAG);
     }
     if (yaml_event->data.scalar.quoted_implicit) {
       set_event_flag(psych_event, QUOTED_IMPLICIT_FLAG);
     }
-    psych_event->style = yaml_event->data.scalar.style;
     break;
 
   case YAML_SEQUENCE_START_EVENT:
-    /* TODO: */
+    psych_event->anchor   = yaml_event->data.sequence_start.anchor;
+    psych_event->tag      = yaml_event->data.sequence_start.tag;
+    psych_event->style    = yaml_event->data.sequence_start.style;
+    if (yaml_event->data.sequence_start.implicit) {
+      set_event_flag(psych_event, IMPLICIT_FLAG);
+    }
     break;
 
   case YAML_SEQUENCE_END_EVENT:
-    /* TODO: */
+    /* Nothing */
     break;
 
   case YAML_MAPPING_START_EVENT:
-    /* TODO: */
+    psych_event->anchor   = yaml_event->data.mapping_start.anchor;
+    psych_event->tag      = yaml_event->data.mapping_start.tag;
+    psych_event->style    = yaml_event->data.mapping_start.style;
+    if (yaml_event->data.mapping_start.implicit) {
+      set_event_flag(psych_event, IMPLICIT_FLAG);
+    }
     break;
 
   case YAML_MAPPING_END_EVENT:
-    /* TODO: */
+    /* Nothing */
     break;
 
   case YAML_NO_EVENT:
-    /* TODO: */
+    /* Nothing */
+    break;
+
+  case YAML_STREAM_END_EVENT:
+    /* Nothing */
     break;
 
   default:
