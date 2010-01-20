@@ -33,3 +33,4 @@ The plan for MagLev is to duplicate the C-extension using FFI, and then
 * Should we require the user to install a proper 64bit libyaml?
 
 
+* Looks like psych changed from event symbols to event strings.

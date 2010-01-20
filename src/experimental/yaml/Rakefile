@@ -15,9 +15,11 @@ case UNAME
 when "Linux"
   CFLAGS   = "-m64 -Wall -g -I#{I_DIR} -fPIC"
   DL_EXT   = 'so'
+  SH_L_PATH = "LD_LIBRARY_PATH=#{L_DIR}:#{X_DIR}"
 when "Darwin"
   CFLAGS  = "-m64 -Wall -g -I#{I_DIR}"
   DL_EXT   = 'dylib'
+  SH_L_PATH = "DYLD_LIBRARY_PATH=#{L_DIR}:#{X_DIR}"
 else
   raise "Rakefile doesn't support #{`uname`}"
 end
@@ -40,14 +42,7 @@ end
 
 desc "Run the t.rb file"
 task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
-  case UNAME
-  when "Linux"
-    p = "LD_LIBRARY_PATH"
-  when "Darwin"
-    p = "DYLD_LIBRARY_PATH"
-  end
-  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -d -Ilib main.rb"
-  sh cmd
+  sh "export #{SH_L_PATH} ; maglev-ruby -d -Ilib main.rb"
 end
 
 namespace :parser do
@@ -73,6 +68,11 @@ namespace :parser do
 end
 
 namespace :test do
+  desc "Test the emitter code from ruby"
+  task :emitter do
+    sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_emitter.rb"
+  end
+
   desc "Create #{LIBTEST}"
   task "#{LIBTEST}" => ['c/test.o'] do
     opts = ""

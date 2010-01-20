@@ -1,4 +1,6 @@
-require 'libpsych'
+
+require 'psych'
+
 class StubHandler
   def start_stream encoding
     puts "start of stream"

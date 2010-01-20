@@ -7,9 +7,6 @@ module Psych
   # unions.  libparser is designed to pass into ruby just the items
   # required by Psych.
 
-  class PsychSyntaxError < SyntaxError
-  end
-
   class LibPsych
     extend FFI::Library
     ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
@@ -191,86 +188,6 @@ module Psych
           :stub_anchor
         else
           :stub_not_implemented
-        end
-      end
-    end
-  end
-
-
-  class Parser
-    def parse(string, handler)
-      # We need to make a stable copy of the ruby string.  If we just pass
-      # the string directly as "create_parser_context(string)", then the gc
-      # is free to collect the c-data struct when create_parser_context
-      # returns (the auto-copied data is only good for the duration of that
-      # particular c-call).  BUT, we then want to pass the c_parser_context (which
-      # references the string) into the next c-call, so we need a more
-      # permanent solution.  By creating input_buf, we have copied the
-      # content of string into c-memory that won't be gc'd until input_buf
-      # is gc'd, i.e., it will survive for the duration of this call to
-      # parse (which is long enough).
-      input_buf = FFI::Pointer.from_string(string)
-      c_parser_context = Psych::LibPsych.create_parser_context(input_buf)
-      done = false
-      while not done
-        event_ptr = Psych::LibPsych.next_event(c_parser_context)
-        event = Psych::LibPsych::ParserEvent.new(event_ptr)
-
-        case event.event_type
-        when :no_event
-          puts "#{self}: No Event"
-
-        when :stream_start_event
-          handler.start_stream( event.character_encoding )
-
-        when :stream_end_event
-          handler.end_stream
-          done = true
-
-        when :document_start_event
-          handler.start_document( event.version,
-                                  event.tag_directives,
-                                  event.implicit? )
-
-        when :document_end_event
-          handler.end_document( event.implicit? )
-
-        when :alias_event
-          handler.alias( event.anchor )
-
-        when :scalar_event
-          # TODO: Need to associate the current encoding with
-          #       the scalar string...
-          #           rb_enc_associate_index(val, encoding);
-          handler.scalar( event.value,
-                          event.anchor,
-                          event.tag,
-                          event.plain_implicit?,
-                          event.quoted_implicit?,
-                          event.style )
-
-        when :sequence_start_event
-          handler.start_sequence( event.anchor,
-                                  event.tag,
-                                  event.implicit?,
-                                  event.style )
-
-        when :sequence_end_event
-          handler.end_sequence
-
-        when :mapping_start_event
-          handler.start_mapping( event.anchor,
-                                 event.tag,
-                                 event.implicit?,
-                                 event.style )
-
-        when :mapping_end_event
-          handler.end_mapping
-
-        when :parse_error_event
-          raise PsychSyntaxError.new "Syntax error at Line: #{event.yaml_line} Column: #{event.yaml_column}"
-        else
-          raise "#{self}: UNKNOWN EVENT: #{event[:type]}"
         end
       end
     end
