@@ -112,7 +112,10 @@ module Psych
       def value
         case event_type
         when :scalar_event
-          self[:scalar].read_string(self[:scalar_length])
+          x = self[:scalar]
+          length = self[:scalar_length]
+          puts "-- #{self}.value: #{length} byte string..."
+          length == 0 ? "" : x.read_string(length)
         else
           nil
         end
@@ -142,50 +145,32 @@ module Psych
         if num_tags < 0
           raise ArgumentError.new "num_tags (#{num_tags}) should be positive"
         end
-        if num_tags == 0
-          []
-        else
-          [:stub]  # RxINC
-          # The parser library returns an array of strings: two strings
-          # (prefix and handle) for each tag.  E.g., here is an array that
-          # represents two tags:
-          #
-          #    [ "!",     "tag:gemstone.com,2009",
-          #      "!foo!", "tag:foo.com,1832" ]
-          #
-#           debug = :one
-#           puts "-- DEBUG path #{debug}"
-#           case debug
-#           when :one
-#             tag_dirs = self[:tag_directives]
-#             puts "-- :one:  tag_dirs #{tag_dirs.inspect}"
-#             strings = tag_dirs.get_array_of_string(0, 2*num_tags)
-#           when :two
-#             tag_dirs = self[:tag_directives].read_pointer
-#             tag_ptr = FFI::MemoryPointer.new
-#             puts "-- Attempt read_pointer from #{tag_dirs.inspect}"
-#             tag_ptr.write_pointer(tag_dirs.read_pointer)
-#             strings = tag_ptr.get_array_of_string(0, 2*num_tags)
-# #          tag_ptr = tag_dirs.read_pointer
-# #          tag_ptr = FFI::MemoryPointer.new(tag_dirs.read_pointer)
+        # The parser library returns an array of strings: two strings
+        # (prefix and handle) for each tag.  E.g., here is an array that
+        # represents two tags:
+        #
+        #    [ "!",     "tag:gemstone.com,2009",
+        #      "!foo!", "tag:foo.com,1832" ]
+        #
+        result = []
+        if num_tags > 0
+          num_strings = 2 * num_tags
+          tag_dirs = self[:tag_directives]
+          strings = tag_dirs.get_array_of_string(0, num_strings)
 
-#           end
-#           puts "-- path: #{debug}: strings: #{strings.inspect}"
-
-#           result = []
-#           tag = idx = 0
-#           while (tag < num_tags)
-#             res << [strings[idx], strings[idx + 1]]
-#             idx += 2
-#           end
-#           result
+          idx = 0
+          while (idx < num_strings)
+            result << [strings[idx], strings[idx + 1]]
+            idx += 2
+          end
         end
+        result
       end
 
       def anchor
         case event_type
         when :alias_event, :scalar_event, :sequence_start_event, :mapping_start_event
-          :stub_anchor
+          self[:anchor]
         else
           :stub_not_implemented
         end
