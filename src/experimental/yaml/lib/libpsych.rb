@@ -68,6 +68,24 @@ module Psych
       PLAIN_IMPLICIT_FLAG = 0x08;
       QUOTED_IMPLICIT_FLAG = 0x10;
 
+      # Return a string describing the current line and column in the YAML
+      # being parsed.
+      def position
+        "Line: #{self[:yaml_line]} Column: #{self[:yaml_column]}"
+      end
+
+      # If the event is an error, then return the emedded error message
+      # from libyaml.  If the event is not an error, return the empty
+      # string.
+      def error_message
+        case event_type
+        when :parse_error_event
+          self[:scalar].get_string(0)
+        else
+          ""
+        end
+      end
+
       def has_version?
         (self[:flag] & VERSION_FLAG) != 0
       end
@@ -149,7 +167,7 @@ module Psych
         # (prefix and handle) for each tag.  E.g., here is an array that
         # represents two tags:
         #
-        #    [ "!",     "tag:gemstone.com,2009",
+        #    [ "!",     nil,
         #      "!foo!", "tag:foo.com,1832" ]
         #
         result = []

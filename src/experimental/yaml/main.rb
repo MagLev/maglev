@@ -75,13 +75,18 @@ yaml = [
         "---\ntime: 20:30:20\nplayer: Sammy Sosa\naction: strike (miss)...\n",
        ]
 
-puts "PARSING YAML: #{yaml.inspect}"
-yaml.each do |y|
-  parser = Psych::Parser.new
-  puts
-  puts
-  puts "------ YAML -----------------"
-  puts y
-  puts "-" * 50
-  parser.parse(y, h)
-end
+# puts "PARSING YAML: #{yaml.inspect}"
+# yaml.each do |y|
+#   parser = Psych::Parser.new
+#   puts
+#   puts
+#   puts "------ YAML -----------------"
+#   puts y
+#   puts "-" * 50
+#   parser.parse(y, h)
+# end
+
+# Test an error case
+puts "------ YAML  error case-----------------"
+parser = Psych::Parser.new
+parser.parse("invoice: foo\nbar:baz\n", h)

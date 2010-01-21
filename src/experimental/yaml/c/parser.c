@@ -19,7 +19,11 @@ u_char get_event_flag(parser_event_t *event, u_char flag) {
 
 /* Clean up allocated memory in the interior structs. */
 void free_event_data(parser_context_t *parser_context) {
-  if (IS_VALID_PARSER_CONTEXT(parser_context)) {
+  fprintf(stderr, "+++ free_parser_context\n");
+  fflush(stderr);
+  if (parser_context != NULL) {
+    fprintf(stderr, "+++ free_parser_context: doing work\n");
+    fflush(stderr);
     /* Free libyaml structs */
     yaml_event_delete(&(parser_context->event));
 
@@ -29,6 +33,7 @@ void free_event_data(parser_context_t *parser_context) {
     parser_event_t *event = &(parser_context->psych_event);
     if (event->tag_directives) {
       free(event->tag_directives);
+      event->tag_directives = NULL;
     }
 
     memset(&(parser_context->psych_event), 0, sizeof(parser_event_t));
@@ -37,10 +42,10 @@ void free_event_data(parser_context_t *parser_context) {
 
 /* API: Called from Ruby */
 void free_parser_context(parser_context_t *context) {
-  fflush(stderr);
   fprintf(stderr, "+++ free_parser_context\n");
   fflush(stderr);
   assert(context);
+  free_event_data(context);
   free(context);
 }
 
@@ -53,11 +58,14 @@ void pause_for_debug() {
   }
 }
 
+/*
+ * Mark parser as invalid (e.g., due to error).  Does NOT free anything
+ * (error context still needs to be processed by Ruby).
+ */
 void invalidate_parser(parser_context_t *parser_context) {
   fprintf(stderr, "+++ invalidate_parser\n");
   fflush(stderr);
   assert(IS_VALID_PARSER_CONTEXT(parser_context));
-  free_event_data(parser_context);
   parser_context->parser_validp = 0;
 }
 
@@ -77,18 +85,23 @@ parser_event_t *next_event(parser_context_t *parser_context) {
       /* For GDB
       size_t line = parser->mark.line;
       size_t column = parser->mark.column;
-      */
       pause_for_debug();
+      */
 
       result->type = PARSE_ERROR_EVENT;
-      result->yaml_line   = parser->mark.line;
-      result->yaml_column = parser->mark.column;
-
+      result->yaml_line   = parser->problem_mark.line;
+      result->yaml_column = parser->problem_mark.column;
+      result->scalar      = parser->problem;
+      fprintf(stderr, "+++ Line: %d Column %d: %s\n",
+              parser->problem_mark.line,parser->problem_mark.column,parser->problem);
       /* We have copied only integers out of the event, so safe to delete */
       yaml_event_delete(libyaml_event);
       invalidate_parser(parser_context);
       return result;
   }
+
+  result->yaml_line   = parser->mark.line;
+  result->yaml_column = parser->mark.column;
   copy_event(result, libyaml_event);
   return result;
 }
@@ -128,7 +141,7 @@ void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
   /* the psych_event is already memset() to 0 */
 
   /* for non-errors, parser events and yaml parser events map directly */
-  psych_event->type = yaml_event->type;
+  psych_event->type         = yaml_event->type;
 
   switch(yaml_event->type) {
   case YAML_STREAM_START_EVENT:

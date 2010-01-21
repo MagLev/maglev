@@ -83,7 +83,12 @@ module Psych
           handler.end_mapping
 
         when :parse_error_event
-          raise PsychSyntaxError.new "Syntax error at Line: #{event.yaml_line} Column: #{event.yaml_column}"
+          e = event
+          msg_ptr = event[:scalar]
+          nil.pause
+          msg = msg_ptr.get_string(0)
+          nil.pause
+          raise PsychSyntaxError.new "Syntax error at #{event.position}: #{event.error_message}"
         else
           raise "#{self}: UNKNOWN EVENT: #{event[:type]}"
         end

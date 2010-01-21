@@ -65,6 +65,7 @@ typedef struct parser_event_s {
   int  num_tags;
   yaml_char_t **tag_directives;
 
+  /* Info about the position of the current token in input */
   size_t yaml_line;
   size_t yaml_column;
 
