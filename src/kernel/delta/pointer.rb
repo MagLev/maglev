@@ -325,7 +325,7 @@
       limit = self.total
       while n < length 
         ofs = byte_offset + (n << 3)
-        if ofs > limit
+        if ofs >= limit
           res << nil
         else
           str = self.char_star_at(ofs )
