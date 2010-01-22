@@ -146,7 +146,7 @@ rule
                       # result = s(:rescue, val_[0], s(:resbody, s(:array), val_[2]))
                       resbody = RubyRescueBodyNode.s(nil, val[vofs + 2])
                       result = RubyRescueNode.s( val[vofs ], resbody, nil)
-                      ofs = val[vofs + 1].src_offset  # # kRESCUE position
+                      ofs = val[vofs + 1].src_offset  # kRESCUE position
                       result.src_offset=( ofs )
                       resbody.src_offset=( ofs )
                     }
@@ -1704,22 +1704,22 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                     }
                 | primary_value tDOT operation2 opt_paren_args
                     {
-		      # # method_call: | primary_value tDOT operation2 opt_paren_args
+		      # method_call: | primary_value tDOT operation2 opt_paren_args
                       result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3] )
                     }
                 | primary_value tCOLON2 operation2 paren_args
                     {
-		      # # method_call: | primary_value tCOLON2 operation2 paren_args
+		      # method_call: | primary_value tCOLON2 operation2 paren_args
                       result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3] )
                     }
                 | primary_value tCOLON2 operation3
                     {
-		      # # method_call: | primary_value tCOLON2 operation3
+		      # method_call: | primary_value tCOLON2 operation3
                       result = new_vcall( val[vofs ], val[vofs + 2] )
                     }
                 | kSUPER paren_args
                     {
-		      # # method_call: | kSUPER paren_args
+		      # method_call: | kSUPER paren_args
                       result = new_super( val , vofs )
                     }
                 | kSUPER
@@ -1788,7 +1788,7 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                     }
                 | tSTAR arg_value
                     {
-		      # # when_args: args # | tSTAR arg_value
+		      # when_args: args # | tSTAR arg_value
                       # result = s(:array, s(:when, val_[1], nil))
                       wh = RubyWhenNode.s( val[vofs + 1], nil, nil)
                       wh.src_offset=(   val[vofs ].src_offset ) # tSTAR position
