@@ -315,7 +315,7 @@
       while n < length 
         ofs = byte_offset + (n << 3)
         if ofs >= limit
-          res << nil
+          raise IndexError, "beyond end of receiver's C memory"
         else
           str = self.char_star_at(ofs )
           res << str
