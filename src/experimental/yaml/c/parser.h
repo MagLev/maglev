@@ -48,21 +48,11 @@ typedef enum parser_event_type_e {
 } parser_event_type_t;
 
 /*
- * This holds all of the libyaml parsing structs for one
- * ruby object.
- */
-typedef struct parser_context_s {
-  yaml_parser_t parser;
-  yaml_event_t  event;
-  int parser_validp;
-  yaml_char_t *input;  /* Not needed?? debug only? */
-} parser_context_t;
-
-
-/*
- * TODO: Make a union, once I've figured out all of the data
- * that gets passed, and who passes it.
+ * This is the simplified version of the information in a yaml_event_t.
+ * This is the only information the psych handler depends on.
  *
+ * TODO: Make a union, once I've figured out all of the data that gets
+ * passed, and who passes it.
  * NOTE: yaml_char_t is unsigned char
  */
 typedef struct parser_event_s {
@@ -75,6 +65,7 @@ typedef struct parser_event_s {
   int  num_tags;
   yaml_char_t **tag_directives;
 
+  /* Info about the position of the current token in input */
   size_t yaml_line;
   size_t yaml_column;
 
@@ -97,28 +88,35 @@ typedef struct parser_event_s {
 #define PLAIN_IMPLICIT_FLAG  (1 << 3)  /* 0x08 */
 #define QUOTED_IMPLICIT_FLAG (1 << 4)  /* 0x10 */
 
-void set_event_flag(parser_event_t *event, u_char flag);
-u_char get_event_flag(parser_event_t *event, u_char flag);
+/*
+ * Each ruby Parser object has one parser_context_t to hold its parsing
+ * state.  This includes the libyaml parser
+ */
+typedef struct parser_context_s {
+  yaml_parser_t parser;        /* The libyaml parser        */
+  yaml_event_t  event;         /* the current libyaml event */
+  parser_event_t psych_event;  /* digested version of event */
+  yaml_char_t *input;          /* Not needed?? debug only?  */
+  int parser_validp;
+} parser_context_t;
 
-int parse(parser_context_t *parser_context);
+/*
+ * API Calls
+ */
 
 /* Create a new parser context.  This contains the parser */
-parser_context_t *create_parser_context();
+parser_context_t *create_parser_context(unsigned char *input);
 
-/* Create a new event struct. */
-parser_event_t *create_event();
+/*
+ * Get the next event for the parser context. The data in the returned
+ * parser_event_t is good until the next call to next_event().  All data
+ * stored in the event_t is released at the beginning of the next call to
+ * next_event().  All data in the event is freed when the parser_context is
+ * freed via a call to free_parser_context_event().
+ */
+parser_event_t *next_event(parser_context_t *parser_context);
 
-/* Release space from a previously created event */
-void release_event(parser_event_t *event);
-
-/* Get the next event for the parser context; modifies *event */
-parser_event_t *next_event(parser_context_t *parser_context,
-                           parser_event_t *event);
-
-/* Free the embeded yaml_event_t */
+/* Free memory associated with the parser context */
 void free_parser_context_event(parser_context_t *parser_context);
-
-/* Get a string name for the event type */
-char *event_name_for(const parser_event_type_t type);
 
 #endif

@@ -31,7 +31,6 @@ module FFI
   USE_THIS_PROCESS_AS_LIBRARY = Library::CURRENT_PROCESS # deprecated
 
   module Platform
-
     OS = "" # you must use Config::CONFIG['host_os']
       # because OS could change after you commit code
 
@@ -45,9 +44,15 @@ module FFI
     LIBC = 'libc'  # may need OS dependent logic eventually?
   end
 
-  # tables used to translate arguments for primitives.
-  # mapping from Ruby type names to type names supported by CFunction
-  PrimTypeDefs = IdentityHash.from_hash(
+  # Tables used to translate arguments for primitives.
+  
+  # Mapping from Ruby type names to type names supported by CFunction
+  # If you add new keys to this dictionary, you must also
+  # modify  CFunction(C)>>_addRubyPrimTypes in image/ruby/Capi_ruby.gs
+  # and rexecute as SystemUser , if the new key is to be understood 
+  # as the type of a varArg argument.
+  #
+  PrimTypeDefs = IdentityHash.from_hash( 
     { :char => :int8 ,  :uchar => :uint8 ,
       :short => :int16 , :ushort => :uint16 ,
       :int   => :int32 , :uint => :uint32 ,
@@ -176,7 +181,9 @@ module FFI
   class Pointer < CByteArray
     # define the fixed instvars
     def initialize
-      @type_size = 1
+      @type_size = 1  
+      # note @type_size maybe nil if instance created by 
+      #    CByteArray pointer_at primitive
     end
     def initialize(elem_size)
       unless elem_size._isFixnum && elem_size > 0
@@ -188,7 +195,11 @@ module FFI
       @type_size = elem_size
     end
     def type_size
-      @type_size
+      ts = @type_size
+      if ts._equal?(nil)
+        ts = 1
+      end
+      ts
     end
     def __type_size=(elem_size)
       unless elem_size._isFixnum && elem_size > 0
@@ -197,13 +208,13 @@ module FFI
       @type_size = elem_size
     end
 
-    # remainder of implementation in memorypointer.rb
+    # remainder of implementation in pointer.rb
   end
 
   # subclasses of Pointer
 
   class MemoryPointer < Pointer
-    # all behavior is in Pointer
+    # all behavior inherited from Pointer
   end
 
   class AutoPointer < Pointer

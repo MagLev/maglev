@@ -78,21 +78,21 @@
     end
 
     def [](element_offset)
-      elem_size = @type_size
+      elem_size = self.type_size
       byte_offset = element_offset * elem_size
       # self + byte_offset # old code
-      self.__signed_wordsize_at(elem_size, byte_offset)  
+      self.__signed_wordsize_at(elem_size, byte_offset, nil)  
     end
  
     def to_a
-      elem_size = @type_size
+      elem_size = self.type_size
       siz = self.total
       ofs = 0
       res_size = siz.__divide(elem_size)
       ary = Array.new(res_size)
       n = 0
       while ofs < siz
-        ary[n] = self.__signed_wordsize_at(elem_size, ofs)
+        ary[n] = self.__signed_wordsize_at(elem_size, ofs, nil)
         ofs += elem_size
         n += 1
       end
@@ -101,7 +101,7 @@
 
     def each(&b)
       i = 0
-      lim = self.size.__divide(@type_size)
+      lim = self.size.__divide(self.type_size)
       while i < lim
         b.call(self[i])
         i += 1
@@ -111,7 +111,7 @@
 
     def each_with_index(&b)
       i = 0
-      lim = self.size.__divide(@type_size)
+      lim = self.size.__divide(self.type_size)
       while i < lim
         b.call(self[i], i)
         i += 1
@@ -126,7 +126,7 @@
       # return an instance derived from self
       #  instance has autofree==false, and a derivedFrom reference to self
       inst = self.__new_from(byteoffset, -2) 
-      inst.initialize(@type_size)
+      inst.initialize(self.type_size)
       inst
     end
 
@@ -156,11 +156,7 @@
       self.double_at(0)
     end 
     def read_pointer
-      cpointer = self.__pointer_at(0)  # returns a CPointer
-      if cpointer._equal?(nil)
-        return CPointer.__new_null
-      end
-      cpointer
+      self.__pointer_at(0, Pointer) # returns a derived pointer
     end
     def write_pointer(val)
       self.put_pointer(0, val);
@@ -170,14 +166,7 @@
     primitive_nobridge 'put_pointer', 'pointerAt:put:'
 
     def get_pointer(ofs)
-      cpointer = self.__pointer_at(ofs)
-      if cpointer._equal?(nil)
-        return MemoryPointer.__new_null
-      end
-      p = MemoryPointer.new
-      p.put_long(0, cpointer.address);
-      p.__set_derived_from(self)
-      p
+      self.__pointer_at(ofs, Pointer)
     end
 
     def read_string(num_bytes)
@@ -269,10 +258,10 @@
     end
 
     def ==(pointer)
-      unless pointer._kind_of?(self.class) 
+      unless pointer._kind_of?(Pointer) || pointer._kind_of?(CPointer)
         return false
       end
-      pointer.__pointer_at(0).address == self.__pointer_at(0).address
+      pointer.address == self.address
     end
 
     def write_array_of_pointer(ary)
@@ -295,7 +284,7 @@
       length = length.__min(self.total.__divide(8))
       n = 0
       while n < length 
-        res[n] = self.__pointer_at(n << 3)
+        res[n] = self.__pointer_at(n << 3, Pointer)
         n += 1
       end
       res

@@ -5,50 +5,51 @@
 #include <yaml.h>
 #include "parser.h"
 
+void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event);
+
 /* void my_handle_event(yaml_event_t *event); */
 void set_event_flag(parser_event_t *event, u_char flag) {
   event->flag |= flag;
 }
 
+/* RxINC: Not used?? */
 u_char get_event_flag(parser_event_t *event, u_char flag) {
   return (event->flag & flag) != 0;
 }
 
-void free_parser_context(parser_context_t *context) {
+/* Clean up allocated memory in the interior structs. */
+void free_event_data(parser_context_t *parser_context) {
+  fprintf(stderr, "+++ free_parser_context\n");
   fflush(stderr);
+  if (parser_context != NULL) {
+    fprintf(stderr, "+++ free_parser_context: doing work\n");
+    fflush(stderr);
+    /* Free libyaml structs */
+    yaml_event_delete(&(parser_context->event));
+
+    /* Free data held in the parser_event_t */
+
+    /* The actual tag_directives are freed by libyaml; we just free the array */
+    parser_event_t *event = &(parser_context->psych_event);
+    if (event->tag_directives) {
+      free(event->tag_directives);
+      event->tag_directives = NULL;
+    }
+
+    memset(&(parser_context->psych_event), 0, sizeof(parser_event_t));
+  }
+}
+
+/* API: Called from Ruby */
+void free_parser_context(parser_context_t *context) {
   fprintf(stderr, "+++ free_parser_context\n");
   fflush(stderr);
   assert(context);
+  free_event_data(context);
   free(context);
 }
 
-parser_event_t *create_event() {
-  return (parser_event_t *)malloc(sizeof(parser_event_t));
-}
-
-/* Frees all allocated pointers in event; does not free event itself. */
-void free_event(parser_event_t *event) {
-  fflush(stderr);
-  fprintf(stderr, "+++ free_event\n");
-  fflush(stderr);
-  assert(event);
-
-  /* The actual tag_directives are freed by libyaml; we just free the array */
-  if (event->tag_directives)
-    free(event->tag_directives);
-}
-
-void invalidate_parser(parser_context_t *parser_context) {
-  fflush(stderr);
-  fprintf(stderr, "+++ invalidate_parser\n");
-  fflush(stderr);
-  assert(IS_VALID_PARSER_CONTEXT(parser_context));
-  yaml_parser_delete(&(parser_context->parser));
-  parser_context->parser_validp = 0;
-}
-
 void pause_for_debug() {
-  fflush(stderr);
   fprintf(stderr, "+++ PID %d pausing for debugger\n", getpid());
   fflush(stderr);
   int wait_for_debug = 1;
@@ -58,25 +59,93 @@ void pause_for_debug() {
 }
 
 /*
+ * Mark parser as invalid (e.g., due to error).  Does NOT free anything
+ * (error context still needs to be processed by Ruby).
+ */
+void invalidate_parser(parser_context_t *parser_context) {
+  fprintf(stderr, "+++ invalidate_parser\n");
+  fflush(stderr);
+  assert(IS_VALID_PARSER_CONTEXT(parser_context));
+  parser_context->parser_validp = 0;
+}
+
+/* API: Called from Ruby */
+parser_event_t *next_event(parser_context_t *parser_context) {
+  assert(IS_VALID_PARSER_CONTEXT(parser_context));
+
+  yaml_event_t *libyaml_event = &(parser_context->event);
+  yaml_parser_t *parser = &(parser_context->parser);
+  parser_event_t *result = &(parser_context->psych_event);
+
+  free_event_data(parser_context);
+
+  if (!yaml_parser_parse(parser, libyaml_event)) {
+      fprintf(stderr, "+++ PARSE ERROR\n");
+
+      /* For GDB
+      size_t line = parser->mark.line;
+      size_t column = parser->mark.column;
+      pause_for_debug();
+      */
+
+      result->type = PARSE_ERROR_EVENT;
+      result->yaml_line   = parser->problem_mark.line;
+      result->yaml_column = parser->problem_mark.column;
+      result->scalar      = parser->problem;
+      fprintf(stderr, "+++ Line: %d Column %d: %s\n",
+              parser->problem_mark.line,parser->problem_mark.column,parser->problem);
+      /* We have copied only integers out of the event, so safe to delete */
+      yaml_event_delete(libyaml_event);
+      invalidate_parser(parser_context);
+      return result;
+  }
+
+  result->yaml_line   = parser->mark.line;
+  result->yaml_column = parser->mark.column;
+  copy_event(result, libyaml_event);
+  return result;
+}
+
+
+/*
+ * API: Called from Ruby.
+ *
+ * Allocate a new parser context and initialize it.  The parser context
+ * holds the libyaml parser, the yaml event struct used for this parser and
+ * the input string.
+ */
+parser_context_t *create_parser_context(unsigned char *input) {
+  parser_context_t *parser_context = malloc(sizeof(parser_context_t));
+  memset(parser_context, 0, sizeof(parser_context_t));
+
+  size_t length = strlen((char *)input);    /* RxINC */
+
+  yaml_parser_t *parser = &(parser_context->parser);
+  yaml_parser_initialize(parser);
+  yaml_parser_set_input_string(parser, (unsigned char *)input, length);
+
+  parser_context->input = input; /* should I make a copy? */
+  parser_context->parser_validp = VALIDP;
+  return parser_context;
+}
+
+
+
+/*
  * This copies relevant state out of the yaml_event, simplifies it and
  * stores state into the psych_event.  This simplified state is all that is
- * needed by the Psych code.
+ * needed by the Psych code.  Assumes the psych_event is already cleared.
  */
-void set_parser_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
+void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
 
-  /* RxINC: When/were should we free psych_event alloc memory? */
-  memset(psych_event, 0, sizeof(parser_event_t));
+  /* the psych_event is already memset() to 0 */
 
   /* for non-errors, parser events and yaml parser events map directly */
-  psych_event->type = yaml_event->type;
+  psych_event->type         = yaml_event->type;
 
   switch(yaml_event->type) {
   case YAML_STREAM_START_EVENT:
     psych_event->encoding = yaml_event->data.stream_start.encoding;
-    break;
-
-  case YAML_STREAM_END_EVENT:
-    /* Nothing */
     break;
 
   case YAML_DOCUMENT_START_EVENT:
@@ -107,14 +176,15 @@ void set_parser_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
       }
       fflush(stderr);
       current_tag = psych_event->tag_directives;
-      fprintf(stderr, "+++ current_tag:  %X\n", current_tag);
       fprintf(stderr, "+++ current_tag[0]: '%s'\n", current_tag[0]);
       fprintf(stderr, "+++ current_tag[1]: '%s'\n", current_tag[1]);
     }
     break;
 
   case YAML_DOCUMENT_END_EVENT:
-    /* Nothing */
+    if (yaml_event->data.document_end.implicit == 1) {
+      set_event_flag(psych_event, IMPLICIT_FLAG);
+    }
     break;
 
   case YAML_ALIAS_EVENT:
@@ -122,37 +192,51 @@ void set_parser_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
     break;
 
   case YAML_SCALAR_EVENT:
-    psych_event->scalar = yaml_event->data.scalar.value;
+    psych_event->scalar        = yaml_event->data.scalar.value;
     psych_event->scalar_length = (long)yaml_event->data.scalar.length;
-    psych_event->anchor = yaml_event->data.scalar.anchor;
-    psych_event->tag = yaml_event->data.scalar.tag;
+    psych_event->anchor        = yaml_event->data.scalar.anchor;
+    psych_event->tag           = yaml_event->data.scalar.tag;
+    psych_event->style         = yaml_event->data.scalar.style;
     if (yaml_event->data.scalar.plain_implicit) {
       set_event_flag(psych_event, PLAIN_IMPLICIT_FLAG);
     }
     if (yaml_event->data.scalar.quoted_implicit) {
       set_event_flag(psych_event, QUOTED_IMPLICIT_FLAG);
     }
-    psych_event->style = yaml_event->data.scalar.style;
     break;
 
   case YAML_SEQUENCE_START_EVENT:
-    /* TODO: */
+    psych_event->anchor   = yaml_event->data.sequence_start.anchor;
+    psych_event->tag      = yaml_event->data.sequence_start.tag;
+    psych_event->style    = yaml_event->data.sequence_start.style;
+    if (yaml_event->data.sequence_start.implicit) {
+      set_event_flag(psych_event, IMPLICIT_FLAG);
+    }
     break;
 
   case YAML_SEQUENCE_END_EVENT:
-    /* TODO: */
+    /* Nothing */
     break;
 
   case YAML_MAPPING_START_EVENT:
-    /* TODO: */
+    psych_event->anchor   = yaml_event->data.mapping_start.anchor;
+    psych_event->tag      = yaml_event->data.mapping_start.tag;
+    psych_event->style    = yaml_event->data.mapping_start.style;
+    if (yaml_event->data.mapping_start.implicit) {
+      set_event_flag(psych_event, IMPLICIT_FLAG);
+    }
     break;
 
   case YAML_MAPPING_END_EVENT:
-    /* TODO: */
+    /* Nothing */
     break;
 
   case YAML_NO_EVENT:
-    /* TODO: */
+    /* Nothing */
+    break;
+
+  case YAML_STREAM_END_EVENT:
+    /* Nothing */
     break;
 
   default:
@@ -161,6 +245,7 @@ void set_parser_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
   }
 }
 
+/* Unused ? */
 char *event_name_for(const parser_event_type_t type) {
   switch(type) {
   case NO_EVENT:             return "NO_EVENT";
@@ -176,65 +261,4 @@ char *event_name_for(const parser_event_type_t type) {
   case MAPPING_END_EVENT:    return "MAPPING_END_EVENT";
   default:                   return "NOT AN EVENT";
   }
-}
-
-parser_event_t *next_event(parser_context_t *parser_context, parser_event_t *event) {
-  assert(IS_VALID_PARSER_CONTEXT(parser_context));
-
-  yaml_event_t *libyaml_event = &(parser_context->event);
-  yaml_parser_t *parser = &(parser_context->parser);
-
-  if (!yaml_parser_parse(parser, libyaml_event)) {
-      fprintf(stderr, "+++ PARSE ERROR\n");
-
-      /* For GDB 
-      size_t line = parser->mark.line;
-      size_t column = parser->mark.column;
-      */
-      pause_for_debug();
-
-      event->type = PARSE_ERROR_EVENT;
-      event->yaml_line   = parser->mark.line;
-      event->yaml_column = parser->mark.column;
-
-      /*  yaml_event_delete(libyaml_event); */ /* RxINC: ?? */
-      invalidate_parser(parser_context);
-      return event;
-  }
-
-  set_parser_event(event, libyaml_event);
-
-  /*  yaml_event_delete(libyaml_event); */
-  return event;
-}
-
-/*
- * Release the yaml_event_t embedded in the parser context.
- */
-void free_parser_context_event(parser_context_t *parser_context) {
-  fflush(stderr);
-  fprintf(stderr, "+++ free_parser_context_event ... (yaml_event_delete)\n");
-  fflush(stderr);
-  assert(IS_VALID_PARSER_CONTEXT(parser_context));
-  yaml_event_delete(&(parser_context->event));
-}
-
-/*
- * Allocate a new parser context and initialize it.  The parser context
- * holds the libyaml parser, the yaml event struct used for this parser and
- * the input string.
- */
-parser_context_t *create_parser_context(yaml_char_t *input) {
-  parser_context_t *parser_context = malloc(sizeof(parser_context_t));
-  memset(parser_context, 0, sizeof(parser_context_t));
-
-  size_t length = strlen((char *)input);    /* RxINC */
-
-  yaml_parser_t *parser = &(parser_context->parser);
-  yaml_parser_initialize(parser);
-  yaml_parser_set_input_string(parser, (unsigned char *)input, length);
-
-  parser_context->input = input; /* should I make a copy? */
-  parser_context->parser_validp = VALIDP;
-  return parser_context;
 }

@@ -45,7 +45,8 @@ module FFI
 
     primitive_nobridge '__compile_caller', '_compileCaller:In:enums:'
   end
-  class CByteArray
+
+  class CByteArray # [
     # following 3 methods needed by the RubyParser
     class_primitive_nobridge 'with_string', 'withAll:'
     primitive_nobridge '[]', '_rubyByteAt:'
@@ -87,7 +88,7 @@ module FFI
     primitive_nobridge 'put_long_long' , 'int64At:put:'
     primitive_nobridge 'put_ulong_long' , 'int64At:put:'
     primitive_nobridge '__unsigned_wordsize_at', '_unsigned:at:'
-    primitive_nobridge '__signed_wordsize_at', '_signed:at:'
+    primitive_nobridge '__signed_wordsize_at', '_signed:at:with:'
     primitive_nobridge 'total', 'size'
 
     # more variants used by Pointer, Buffer , Struct
@@ -97,11 +98,11 @@ module FFI
 
     primitive_nobridge 'char_star_at' , 'stringFromCharStarAt:'
     primitive_nobridge 'char_star_put' , 'pointerAt:put:'
-    primitive_nobridge '__pointer_at' , 'pointerAt:'
+    primitive_nobridge '__pointer_at' , 'pointerAt:resultClass:'
 
     # def __pointer_at_put(byteoffset, pointer) ; end
     #   pointer is a kind of CByteArray or a CPointer, or nil
-    primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'
+    primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'   # yyy
 
     primitive_nobridge '__set_derived_from' , 'derivedFrom:'
 
@@ -136,16 +137,8 @@ module FFI
     class_primitive_nobridge '__fromRegionOf' , 'fromRegionOf:offset:numBytes:'
     class_primitive_nobridge '__fromCPointer' , 'fromCPointer:numBytes:'
 
-    def __struct_pointer_at(byteoffset)
-      cpointer = self.__pointer_at(byteoffset)
-      mp_cls = MemoryPointer
-      if cpointer._equal?(nil)
-        return mp_cls.__new_null
-      end
-      mp = mp_cls.new
-      mp.put_long(0, cpointer.address)
-      mp.__set_derived_from(self)
-      mp
+    def __struct_pointer_at(byteoffset) 
+      return self.__pointer_at(byteoffset, MemoryPointer)
     end
 
     def __search_for_zerobyte(offset)
@@ -175,12 +168,12 @@ module FFI
     end
 
     def to_ptr
-      CPointer.__new_from(self)
+      Pointer.__fromRegionOf( self, 0, self.size );
     end
 
-  end
+  end # ]
 
-  class CPointer
+  class CPointer # [
     primitive_nobridge 'address' , 'memoryAddress'
 
     class_primitive_nobridge '__new_from', 'newFrom:'
@@ -200,7 +193,7 @@ module FFI
     def hash
       self.address.hash
     end
-  end
+  end # ]
 
   class Type
     def self.__PersistentTypes
