@@ -5,7 +5,8 @@ module MagRp
     # MagRpDEBUG values are
     #   0 no tracing
     #   1  trace files parsed by RubyParser
-    #   2  also include lexer and racc state machine tracing
+    #   2  include lexer and racc state machine tracing (requires 
+    #        parser to be generated with racc.sh -D before loading prims)
     d = Maglev::__system.session_temp(:MagRpDEBUG)
     if d._equal?(nil)
       d = 0
