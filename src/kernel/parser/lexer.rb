@@ -926,7 +926,7 @@ class RubyLexer
           is_arg = (clex_state & Expr_IS_argument)._not_equal?(0)
           if ( (clex_state & Expr_IS_beg_mid)._not_equal?( 0) ||
                ( is_arg && space_seen && 
-                    ! src.ch_is_white(s_ch)) )   #  !src.check(/\s/))) 
+                    ! src.ch_is_white__or_eol(s_ch)) )   #  !src.check(/\s/))) 
             #if is_arg	# shutoff warning, Trac 567
             #  arg_ambiguous
             #end
@@ -1143,7 +1143,7 @@ class RubyLexer
 	  # ?: / then / when
 	  s_ch = src.peek_ch
 	  if ( (clex_state & Expr_IS_end_endarg)._not_equal?(0) ||
-	       src.ch_is_white(s_ch) )         # src.check(/\s/) then
+	       src.ch_is_white__or_eol(s_ch) )         # src.check(/\s/) then
 	    @lex_state = Expr_beg
 	    @yacc_value = :":"
 	    return :tCOLON
@@ -1262,7 +1262,7 @@ class RubyLexer
             src.advance(1) 
             clex_state = @lex_state
             result = if (clex_state & Expr_IS_argument)._not_equal?(0) && space_seen &&
-                          ! src.peek_is_white    #  && src.check(/\S/) 
+                          ! src.peek_is_white__or_eol  #  && src.check(/\S/) 
 
 
                        :tSTAR
@@ -1438,7 +1438,7 @@ class RubyLexer
             src.advance(1)
             clex_state = @lex_state
             result = if (clex_state & Expr_IS_argument)._not_equal?(0) && space_seen &&
-                         ! src.peek_is_white  # ! src.check(/\s/) then
+                         ! src.peek_is_white__or_eol  # ! src.check(/\s/) then
 
                        @yacc_value = :"&"
                        :tAMPER
@@ -1537,7 +1537,7 @@ class RubyLexer
           end
 
           if (clex_state & Expr_IS_argument)._not_equal?(0) && space_seen && 
-                 ! src.peek_is_white #  ! src.check(/\s/) 
+                 ! src.peek_is_white__or_eol #  ! src.check(/\s/) 
             return parse_quote
           end
 

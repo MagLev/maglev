@@ -1,6 +1,18 @@
 = MagLev Change Log
 
-== Changes for 22725  2010-0115
+== Changes for 22780  2010-01-22
+* Fix Trac 652
+* Fix Trac 653 in Lexer
+* Various FFI 
+* Fix infinite loop on Sparc in high-res profiling
+* Optimize Integer>>\\  to not compute unneeded quotient.
+* In topaz, SET CLASS with no arg will print name of the current class
+* Fix retry of timer thread connect in socketprim.c
+* Fixes in GS for SOX complience
+* Fixes for FFI alignment of nested structs and unions
+* Fixes for RVM compliance
+
+== Changes for 22725  2010-01-15
 
 * Enhancements to make MagLev run under RVM
 * Fixed bug that prevented Rake from running

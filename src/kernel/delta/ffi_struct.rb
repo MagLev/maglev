@@ -9,21 +9,21 @@ module FFI
       if idx._equal?(nil)
         raise  ArgumentError, 'invalid field name'
       end
-      ofs = @offsets[idx] 
+      ofs = @offsets[idx]
       elem_siz = @elem_sizes[idx]
       if elem_siz._not_equal?(0)
         if elem_siz._isFixnum   # a nested array
           siz = @sizes[idx]
-          mp = MemoryPointer.__fromRegionOf(cbytearray, ofs, siz)
+          mp = Pointer.__fromRegionOf(cbytearray, ofs, siz)
           mp.__initialize(elem_siz)
           mp
         else  # a nested Struct , elem_siz._kind_of?(Struct.class) == true
-          unless elem_siz._kind_of?(Struct.class)  # do not checkin
+          unless elem_siz._kind_of?(Struct.class) 
              raise TypeError, 'logic error, expected a Struct class'
           end
           nested_struct_cls = elem_siz
           struct = nested_struct_cls.__fromRegionOf(cbytearray, ofs,  elem_siz.size)
-          struct.__set_layout( nested_struct_cls.__cl_layout )  
+          struct.__set_layout( nested_struct_cls.__cl_layout )
           struct.__initialize
         end
       else
@@ -104,20 +104,23 @@ module FFI
       end
       offset
     end
-    
+
     def __add_accessors( ctype )
       rubysel = StructAccessors[ctype]
       if rubysel._equal?(nil)
         raise 'internal error, inconsistent StructAccessors'
       end
-      @accessors << rubysel  
+      @accessors << rubysel
       rubysel = StructSetters[ctype]
       if rubysel._equal?(nil)
         raise 'internal error, inconsistent StructSetters'
       end
-      @setters << rubysel  
+      @setters << rubysel
     end
 
+    def __alignment
+      @alignment
+    end
 
     def add_field(name, type, offset)
       # Returns size in bytes of the added field
@@ -133,16 +136,25 @@ module FFI
         if type._kind_of?(Struct.class)
           nstruct = type  # a nested Struct
           csize = type.size
-        else 
-          raise 'unrecognized field type ' , type.to_s 
-          csize = 8
+          s_alignment = type.align
+          unless (align = @totalsize % s_alignment) == 0
+            @totalsize += s_alignment - align # add pad
+          end
+          if s_alignment > @alignment
+            @alignment = s_alignment
+          end
+        else
+          raise 'unrecognized field type ' , type.to_s
         end
       else
-        csize = PrimTypeSizes[ctype] 
+        csize = PrimTypeSizes[ctype]
+        unless (align = @totalsize % csize) == 0
+          @totalsize += csize - align # add pad
+        end
+        if csize > @alignment
+          @alignment = csize
+        end
       end
-      unless (align = @totalsize % csize) == 0 
-        @totalsize += csize - align # add pad
-      end 
       offset = self.__check_offset(offset)
       self.__add_member_name(name)
       @members << name
@@ -152,14 +164,14 @@ module FFI
         @elem_sizes << 0
         @sizes << csize
         self.__add_accessors( ctype )
-      else 
+      else
         @elem_sizes << nstruct  # a nested Struct
         @sizes << csize
         @accessors << nil
         @setters << nil
       end
       @totalsize += csize
-      csize 
+      csize
     end
 
     def add_array(name, type, num_elements, offset)
@@ -180,7 +192,7 @@ module FFI
       end
       csize = elemsiz * num_elements
       if csize > 100000000000
-        raise "total Array size must be <= 100.0e9 bytes" 
+        raise "total Array size must be <= 100.0e9 bytes"
       end
       unless (align = @totalsize % elemsiz) == 0
         @totalsize += elemsiz - align # add pad
@@ -216,7 +228,7 @@ module FFI
       end
       if elem_siz > save_size
         @totalsize = elem_siz
-      end  
+      end
       elem_siz
     end
 
@@ -240,17 +252,17 @@ module FFI
   class Struct # [
 
     def self.new(*args)
-      if args.size._equal?(1) 
+      if args.size._equal?(1)
         ly = @cl_layout
         if ly._not_equal?(nil)
           arg = args[0]
           if arg._kind_of?(CByteArray)
             ly_siz = ly.size
             ba_siz = arg.total
-            if ba_siz < ly_siz 
+            if ba_siz < ly_siz
               raise ArgumentError, "argument CByteArray is too small for a Struct  #{self.name}"
             end
-            inst = self.__fromRegionOf( arg, 0, ly_siz ) 
+            inst = self.__fromRegionOf( arg, 0, ly_siz )
           elsif arg._kind_of?(CPointer)
             inst = self.__fromCPointer( arg , ly.size )
           else
@@ -290,7 +302,7 @@ module FFI
     end
 
     def self.align
-      8
+      @cl_layout.__alignment
     end
 
     def self.offsets
@@ -299,14 +311,14 @@ module FFI
 
     def self.offset_of(field_name)
       @cl_layout.offset_of(field_name)
-    end
+      end
 
     def size
       @layout.size
     end
 
     def align
-      8
+      @layout.__alignment
     end
 
     def members
@@ -381,7 +393,7 @@ module FFI
     end
 
     def self.hash_layout(*spec)
-      raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout" 
+      raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
     end
 
     def self.array_layout(*spec)
@@ -392,7 +404,7 @@ module FFI
         name = spec[i]
         type = spec[i + 1]
         if type._equal?(nil)
-          raise ArgumentError, "odd sized layout spec, type nil for #{name}" 
+          raise ArgumentError, "odd sized layout spec, type nil for #{name}"
         end
         i += 2
         # If the next param is a Fixnum, it specifies the offset
@@ -408,7 +420,7 @@ module FFI
           builder.add_array(name, find_type(type[0], mod), type[1], offset)
         else
           builder.add_field(name, find_type(type, mod), offset)
-        end 
+        end
       end
       builder.close
       builder
@@ -418,17 +430,17 @@ module FFI
     def self.layout(*spec)
       sp_size = spec.size
       if sp_size._equal?(0)
-        return @cl_layout 
+        return @cl_layout
       end
-      if sp_size._equal?(1) 
-         if spec[0]._isHash 
-            raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout" 
+      if sp_size._equal?(1)
+         if spec[0]._isHash
+            raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
          end
          raise ArgumentError , 'minimum argument size is 2'
       end
       cspec = spec[0]._isHash ? hash_layout(*spec) : array_layout(*spec)
       unless self._equal?(Struct)
-        @cl_layout = cspec 
+        @cl_layout = cspec
       end
       return cspec
     end
@@ -437,7 +449,7 @@ module FFI
       @cl_layout
     end
 
-    def self.alloc_in 
+    def self.alloc_in
       self.new
     end
 
@@ -445,7 +457,7 @@ module FFI
       self.new
     end
 
-    # def initialize ; end # in ffi.rb to get fixed instvars 
+    # def initialize ; end # in ffi.rb to get fixed instvars
 
   end  # ]
 

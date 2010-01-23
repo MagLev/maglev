@@ -244,6 +244,14 @@ class RpStringScanner
     CTYPES_ARR[ ch ]._equal?(CTYPE_WHITE)
   end
 
+  def peek_is_white__or_eol
+    ch = @cbytearray[@pos]
+    if ch._equal?( ?\n )
+      return true
+    end
+    CTYPES_ARR[ ch ]._equal?(CTYPE_WHITE)
+  end
+
   def ch_is_digit(ch)
     CTYPES_ARR[ ch ]._equal?(CTYPE_DIGIT)
   end
@@ -253,6 +261,13 @@ class RpStringScanner
   end
 
   def ch_is_white(ch)
+    CTYPES_ARR[ ch ]._equal?(CTYPE_WHITE)
+  end
+
+  def ch_is_white__or_eol(ch)
+    if ch._equal?( ?\n )
+      return true
+    end
     CTYPES_ARR[ ch ]._equal?(CTYPE_WHITE)
   end
 

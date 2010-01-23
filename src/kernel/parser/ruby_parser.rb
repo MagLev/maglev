@@ -3060,7 +3060,7 @@ def _reduce_19(val, vofs)
                       # result = s(:rescue, val_[0], s(:resbody, s(:array), val_[2]))
                       resbody = RubyRescueBodyNode.s(nil, val[vofs + 2])
                       result = RubyRescueNode.s( val[vofs ], resbody, nil)
-                      ofs = val[vofs + 1].src_offset  # # kRESCUE position
+                      ofs = val[vofs + 1].src_offset  # kRESCUE position
                       result.src_offset=( ofs )
                       resbody.src_offset=( ofs )
                     
@@ -5177,28 +5177,28 @@ def _reduce_346(val, vofs)
 end
 
 def _reduce_347(val, vofs)
-		      # # method_call: | primary_value tDOT operation2 opt_paren_args
+		      # method_call: | primary_value tDOT operation2 opt_paren_args
                       result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3] )
                     
     result
 end
 
 def _reduce_348(val, vofs)
-		      # # method_call: | primary_value tCOLON2 operation2 paren_args
+		      # method_call: | primary_value tCOLON2 operation2 paren_args
                       result = new_call(val[vofs ], val[vofs + 2], val[vofs + 3] )
                     
     result
 end
 
 def _reduce_349(val, vofs)
-		      # # method_call: | primary_value tCOLON2 operation3
+		      # method_call: | primary_value tCOLON2 operation3
                       result = new_vcall( val[vofs ], val[vofs + 2] )
                     
     result
 end
 
 def _reduce_350(val, vofs)
-		      # # method_call: | kSUPER paren_args
+		      # method_call: | kSUPER paren_args
                       result = new_super( val , vofs )
                     
     result
@@ -5285,7 +5285,7 @@ def _reduce_360(val, vofs)
 end
 
 def _reduce_361(val, vofs)
-		      # # when_args: args # | tSTAR arg_value
+		      # when_args: args # | tSTAR arg_value
                       # result = s(:array, s(:when, val_[1], nil))
                       wh = RubyWhenNode.s( val[vofs + 1], nil, nil)
                       wh.src_offset=(   val[vofs ].src_offset ) # tSTAR position
