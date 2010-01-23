@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-Changes for 22771 2010-01-22
+== Changes for 22774  2010-01-22
 * Fix Trac 652
 * Fix Trac 653 in Lexer
 * Various FFI 
