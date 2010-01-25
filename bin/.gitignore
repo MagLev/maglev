@@ -9,3 +9,4 @@ html2haml
 sass
 haml
 css2sass
+use_minitest

@@ -19,11 +19,11 @@ Then hit http://localhost:4567/
 
 === Sinatra App and Test
 
-<tt>sinatra_app.rb</tt> and <tt>sinatra_app_test.rb</tt> are simple
-hello world app and an associated MiniTest for it that shows how
+<tt>sinatra_app.rb</tt> and <tt>sinatra_app_test.rb</tt> are simple hello
+world app and an associated MiniTest for it that shows how
 <tt>rack/test</tt> works with MagLev.  To Run the test case, you'll need
-the <tt>sinatra</tt>, <tt>rack</tt> and <tt>minitest</tt> gems installed
-into MagLev.
+the <tt>sinatra</tt>, <tt>rack</tt>, <tt>rack-test</tt> and
+<tt>minitest</tt> gems installed into MagLev.
 
 To run the tests:
 
