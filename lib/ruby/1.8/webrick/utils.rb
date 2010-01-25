@@ -19,7 +19,7 @@ end
 module WEBrick
   module Utils
     def set_non_blocking(io)
-      flag = File::NONBLOCK  
+      flag = File::NONBLOCK
       if defined?(Fcntl::F_GETFL)
         flag |= io.fcntl(Fcntl::F_GETFL)
       end
@@ -29,7 +29,7 @@ module WEBrick
 
     def set_close_on_exec(io)
       if defined?(Fcntl::FD_CLOEXEC)
-        io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)  # Maglev fix
+        io.fcntl(Fcntl::FD_CLOEXEC, 1)
       end
     end
     module_function :set_close_on_exec
