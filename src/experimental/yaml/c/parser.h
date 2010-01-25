@@ -119,4 +119,10 @@ parser_event_t *next_event(parser_context_t *parser_context);
 /* Free memory associated with the parser context */
 void free_parser_context_event(parser_context_t *parser_context);
 
+/*
+ * API: Ruby calls this
+ * version_info should be pointer to memory to hold 3 ints.
+ * The major, minor and patch level of lib yaml will be returned.
+ */
+void libyaml_version(int version_info[]);
 #endif

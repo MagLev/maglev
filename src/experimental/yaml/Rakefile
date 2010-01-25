@@ -24,9 +24,7 @@ else
   raise "Rakefile doesn't support #{`uname`}"
 end
 
-LIBTEST  = "c/libtest.#{DL_EXT}"
 LIBPSYCH = "c/libpsych.#{DL_EXT}"
-
 LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
 
 task :default => :run
@@ -73,29 +71,13 @@ namespace :test do
     sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_emitter.rb"
   end
 
-  desc "Create #{LIBTEST}"
-  task "#{LIBTEST}" => ['c/test.o'] do
-    opts = ""
-    case UNAME
-    when "Linux"
-      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{LIBTEST} -o #{LIBTEST} c/test.o"
-    when "Darwin"
-      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBTEST} c/test.o"
-    else
-      raise "Rakefile doesn't support #{`uname`}"
-    end
+  desc "Test the parser code from ruby"
+  task :parser do
+    sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_parser.rb"
   end
 end
 
-desc "Run the t.rb file"
-task :testit => ['lib/libtest.rb', "test:#{LIBTEST}"] do
-  case UNAME
-  when "Linux"
-    p = "LD_LIBRARY_PATH"
-  when "Darwin"
-    p = "DYLD_LIBRARY_PATH"
-  end
-  cmd = "export #{p}=#{L_DIR}:#{X_DIR} ; maglev-ruby -d -Ilib test.rb"
-  sh cmd
+desc "Run a ruby file using libpsych.dylib"
+task :runrb, :rbfile do |task, args|
+  sh "export #{SH_L_PATH} ; maglev-ruby -Ilib #{args.rbfile}"
 end
-
