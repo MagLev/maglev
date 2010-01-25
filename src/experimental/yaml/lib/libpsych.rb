@@ -11,6 +11,10 @@ module Psych
     extend FFI::Library
     ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
 
+    # Gets an array of the major, minor, patch level for the loaded libyaml.
+    #  void libyaml_version(int version_info[]);
+    attach_function :libyaml_version, [:pointer], :void
+
     # Creates a new parser context given a string.
     #   parser_context_t *create_parser_context(unsigned char *input);
     attach_function :create_parser_context, [ :pointer ], :pointer
@@ -195,4 +199,5 @@ module Psych
       end
     end
   end
+
 end

@@ -1,9 +1,4 @@
-if defined? Maglev
-else
-  $:.unshift
-end
-require 'psych'
-
+require 'psych_ml'
 
 Psych.dump("foo")
 

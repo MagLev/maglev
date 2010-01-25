@@ -1,5 +1,5 @@
 
-require 'psych'
+require 'psych_ml'
 
 class StubHandler
   def start_stream encoding

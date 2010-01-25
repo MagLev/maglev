@@ -244,6 +244,10 @@ void copy_event(parser_event_t *psych_event, yaml_event_t *yaml_event) {
     break;
   }
 }
+/* API: Ruby calls this */
+void libyaml_version(int version_info[]) {
+  yaml_get_version(version_info, &version_info[1], &version_info[2]);
+}
 
 /* Unused ? */
 char *event_name_for(const parser_event_type_t type) {
