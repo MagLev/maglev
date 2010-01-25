@@ -29,7 +29,10 @@ module WEBrick
 
     def set_close_on_exec(io)
       if defined?(Fcntl::FD_CLOEXEC)
-        io.fcntl(Fcntl::FD_CLOEXEC, 1)
+        # BEGIN GEMSTONE
+        # io.fcntl(Fcntl::FD_CLOEXEC, 1)
+        io.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+        # END GEMSTONE
       end
     end
     module_function :set_close_on_exec
@@ -86,13 +89,13 @@ module WEBrick
 
     RAND_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                  "0123456789" +
-                 "abcdefghijklmnopqrstuvwxyz" 
+                 "abcdefghijklmnopqrstuvwxyz"
 
     def random_string(len)
       rand_max = RAND_CHARS.size
-      ret = "" 
+      ret = ""
       len.times{ ret << RAND_CHARS[rand(rand_max)] }
-      ret 
+      ret
     end
     module_function :random_string
 
