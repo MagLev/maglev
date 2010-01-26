@@ -1,5 +1,10 @@
 = MagLev Change Log
 
+== Unreleased Changes
+
+* Fix Trac 654,655 in the IR generator phase of Ruby parser
+* Webrick updated with security patch from 1.8.6p388
+
 == Changes for 22780  2010-01-22
 * Fix Trac 652
 * Fix Trac 653 in Lexer
