@@ -136,7 +136,6 @@ module Psych
         when :scalar_event
           x = self[:scalar]
           length = self[:scalar_length]
-          puts "-- #{self}.value: #{length} byte string..."
           length == 0 ? "" : x.read_string(length)
         else
           nil
@@ -163,7 +162,7 @@ module Psych
 
       def tag_directives
         num_tags = self[:num_tags]
-        puts "-- #{self}.tag_directives:  num_tags: #{num_tags}"
+#        puts "-- #{self}.tag_directives:  num_tags: #{num_tags}"
         if num_tags < 0
           raise ArgumentError.new "num_tags (#{num_tags}) should be positive"
         end

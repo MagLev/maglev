@@ -10,7 +10,12 @@ module Psych
     UTF16LE = LibPsych::ParserEncodingEnum[:utf_16le]
     UTF16BE = LibPsych::ParserEncodingEnum[:utf_16be]
 
-    def parse(string, handler)
+    #     def parse(string)
+    #       __parse(string, @handler)
+    #     end
+
+    #     def __parse(string, handler)
+    def parse(string)
       # We need to make a stable copy of the ruby string.  If we just pass
       # the string directly as "create_parser_context(string)", then the gc
       # is free to collect the c-data struct when create_parser_context
@@ -36,51 +41,51 @@ module Psych
           puts "#{self}: No Event"
 
         when :stream_start_event
-          handler.start_stream(event.character_encoding)
+          @handler.start_stream(event.character_encoding)
 
         when :stream_end_event
-          handler.end_stream
+          @handler.end_stream
           done = true
 
         when :document_start_event
-          handler.start_document(event.version,
-                                 event.tag_directives,
-                                 event.implicit?)
+          @handler.start_document(event.version,
+                                  event.tag_directives,
+                                  event.implicit?)
 
         when :document_end_event
-          handler.end_document(event.implicit?)
+          @handler.end_document(event.implicit?)
 
         when :alias_event
-          handler.alias(event.anchor)
+          @handler.alias(event.anchor)
 
         when :scalar_event
           # TODO: Need to associate the current encoding with
           #       the scalar string...
           #           rb_enc_associate_index(val, encoding);
-          handler.scalar(event.value,
-                         event.anchor,
-                         event.tag,
-                         event.plain_implicit?,
-                         event.quoted_implicit?,
-                         event.style)
+          @handler.scalar(event.value,
+                          event.anchor,
+                          event.tag,
+                          event.plain_implicit?,
+                          event.quoted_implicit?,
+                          event.style)
 
         when :sequence_start_event
-          handler.start_sequence(event.anchor,
+          @handler.start_sequence(event.anchor,
+                                  event.tag,
+                                  event.implicit?,
+                                  event.style)
+
+        when :sequence_end_event
+          @handler.end_sequence
+
+        when :mapping_start_event
+          @handler.start_mapping(event.anchor,
                                  event.tag,
                                  event.implicit?,
                                  event.style)
 
-        when :sequence_end_event
-          handler.end_sequence
-
-        when :mapping_start_event
-          handler.start_mapping(event.anchor,
-                                event.tag,
-                                event.implicit?,
-                                event.style)
-
         when :mapping_end_event
-          handler.end_mapping
+          @handler.end_mapping
 
         when :parse_error_event
           e = event
