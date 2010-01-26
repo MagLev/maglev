@@ -3,7 +3,14 @@ class C
 end
 c = C.new
 
-# MRI complains on this, but MagLev prints 12
-class << c
-  p @@c_var
+$aa = 4 
+begin
+  class << c
+    # MRI complains on this, but MagLev gets 12
+    $aa = @@c_var
+  end
+rescue NameError
+  $aa = 9
 end
+unless $aa == 9 ; raise 'error'; end
+true
