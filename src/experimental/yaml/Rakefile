@@ -50,14 +50,17 @@ task :env do
   ENV[L_PATH_NAME]=SH_L_VALUE
 end
 namespace :parser do
-  task "#{LIBPSYCH}" => ['c/parser.o'] do
+  SRC  = FileList['c/*.c']
+  OBJS = SRC.ext('o')
+
+  task "#{LIBPSYCH}" => OBJS do
     opts = "-L#{L_DIR} -lyaml"
 
     case UNAME
     when "Linux"
-      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} c/parser.o"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} #{OBJS}"
     when "Darwin"
-      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} c/parser.o"
+      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} #{OBJS}"
     else
       raise "Rakefile doesn't support #{`uname`}"
     end
@@ -71,20 +74,19 @@ namespace :parser do
   end
 end
 
+desc "Run all of the tests"
+task :test => 'test:all'
 namespace :test do
-  desc "Test the emitter code from ruby"
-  task :emitter do
-    sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_emitter.rb"
+  task :all => [:parser, :emitter]
+
+  desc "Test parsing YAML"
+  task :parser => [:libpsych, :env] do
+    sh "maglev-ruby -rubygems -Ilib tests/parser_tests.rb"
   end
 
-  desc "Test YAML through the Psych front door"
-  task :psych => [:libpsych, :env] do
-    sh 'echo DYLD_LIBRARY_PATH is: $DYLD_LIBRARY_PATH'
-    sh "maglev-ruby -Ilib test_parser.rb"
-  end
-  desc "Test the parser code from rubyXXX"
-  task :parserx do
-    sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_parser.rb"
+  desc "Test emitting YAML"
+  task :emitter => [:libpsych, :env] do
+    sh "maglev-ruby -rubygems -Ilib tests/emitter_tests.rb"
   end
 end
 

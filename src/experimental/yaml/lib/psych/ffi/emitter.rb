@@ -1,15 +1,18 @@
-# This file is the ruby version of the psych ext/psych/emitter.c
-# It uses the FFI lib, libpsych.rb, as a wrapper for libyaml
 module Psych
-  class Emitter
-    def initialize
+  class Handler
+  end
+
+  # This class represents psych's emitter.c
+  class Emitter < Handler
+    def initialize(io)
+      @io = io
       puts "--  initialize"
-      # TODO
     end
 
-    def start_stream
-      puts "--  start_stream"
-      # TODO
+    def start_stream(encoding)
+      puts "--  start_stream(#{encoding})"
+      Psych::LibPsych.start_stream(encoding)
+      self
     end
 
     def end_stream
@@ -17,22 +20,22 @@ module Psych
       # TODO
     end
 
-    def start_document
+    def start_document(version, tag_directives, implicit)
       puts "--  start_document"
       # TODO
     end
 
-    def end_document
+    def end_document(implicit)
       puts "--  end_document"
       # TODO
     end
 
-    def scalar
+    def scalar(value, anchor, tag, plain, quoted, style)
       puts "--  scalar"
       # TODO
     end
 
-    def start_sequence
+    def start_sequence(anchor, tag, implicit, style)
       puts "--  start_sequence"
       # TODO
     end
@@ -42,7 +45,7 @@ module Psych
       # TODO
     end
 
-    def start_mapping
+    def start_mapping(anchor, tag, implicit, style)
       puts "--  start_mapping"
       # TODO
     end
@@ -52,7 +55,7 @@ module Psych
       # TODO
     end
 
-    def alias
+    def alias(anchor)
       puts "--  alias"
       # TODO
     end

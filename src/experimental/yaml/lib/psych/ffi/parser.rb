@@ -90,9 +90,7 @@ module Psych
         when :parse_error_event
           e = event
           msg_ptr = event[:scalar]
-          nil.pause
           msg = msg_ptr.get_string(0)
-          nil.pause
           raise PsychSyntaxError.new "Syntax error at #{event.position}: #{event.error_message}"
         else
           raise "#{self}: UNKNOWN EVENT: #{event[:type]}"
