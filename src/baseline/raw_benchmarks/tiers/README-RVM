@@ -23,6 +23,9 @@ as follows:
 
 If you don't specify a YAML_DIR, it will find all of them.
 
+Note: This directory is self contained. Running the benchmarks can create
+lots of files, so you may not want to run it inside your git repo.
+
 TODO: make nowarmup a switch
 TODO: parameterize number of iterations, baseline impl, etc.
 TODO: add a switch to invert the division in the normalization. Useful for implementers.
