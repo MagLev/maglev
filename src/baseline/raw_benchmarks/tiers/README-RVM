@@ -1,0 +1,21 @@
+Wayne Seguin provided a shell script to run Evan Phoenix's tiers
+benchmarks on all Rubies installed with RVM. See benchmark_rvm_rubies.sh
+for details.
+
+I modified Evan's compare.rb so it would pick up the names of the RVM installed
+Rubies from the rvm directories. Otherwise they would all have just been called "ruby".
+
+I wrote a Rakefile to generate a .csv spreadsheet that parses the run.yaml files
+produced by Wayne and generates a spreadsheet containing normalized geometric means.
+
+To run the generic tests I suggest: 
+
+nohup benchmark_rvm_rubies.sh all &
+
+The default baseline is ruby-1.8.6-p383. To generate a comparison agains another impl,
+run the Rakefile against another BASELINE as follows:
+rake YAML_DIR=runs/2010-01-23 BASELINE=ruby-1.8.7-p248
+
+If you don't specify a YAML_DIR, it will find all of them.
+
+-- Monty
