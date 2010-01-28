@@ -30,16 +30,13 @@ timestamp="$(date +'%Y-%m-%d')"
 
 for tier in $tiers ; do
   output_path="$(pwd)/runs/$timestamp/$tier"
-  echo "==> mkdir -p $output_path"
   mkdir -p $output_path
 
   echo -e "\n[$timestamp]\n" > "$output_path/error.log"
 
   export NO_TIMEOUT=1
 
-  echo "==> ruby compare-rvm-nowarmup.rb $tier $list "
   ruby compare-rvm-nowarmup.rb $tier $list 2>> "$output_path/error.log" | tee "$output_path/run.yaml"
-  if [[ $? -eq 0 ]] ; then
-    rake YAML_DIR="$(pwd)/runs/$timestamp" BASELINE="ruby-1.8.6-p383"
-  fi
 done
+
+rake YAML_DIR="$(pwd)/runs/$timestamp" BASELINE="ruby-1.8.6-p383"

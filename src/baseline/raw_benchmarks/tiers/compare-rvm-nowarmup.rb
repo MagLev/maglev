@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-util_dir = File.expand_path "#{File.dirname(__FILE__)}/../utils"
+util_dir = File.expand_path "#{File.dirname(__FILE__)}"
 
 tier = ARGV.shift
 
