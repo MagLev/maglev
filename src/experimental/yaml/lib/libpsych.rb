@@ -11,6 +11,10 @@ module Psych
     extend FFI::Library
     ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
 
+    ##################################################
+    # Parser support
+    ##################################################
+
     # Gets an array of the major, minor, patch level for the loaded libyaml.
     #  void libyaml_version(int version_info[]);
     attach_function :libyaml_version, [:pointer], :void
@@ -197,6 +201,26 @@ module Psych
         end
       end
     end
-  end
 
+
+    ##################################################
+    # Emitter support
+    ##################################################
+
+    # Emit a stream start event
+    #   int emit_start_stream(yaml_emitter_t *emitter, yaml_encoding_t encoding);
+    attach_function :emit_start_stream, [:pointer, :int], :int
+
+    # int emit_start_document(yaml_emitter_t *emitter,
+    #                         int *version,
+    #                         unsigned char **tag_directives,
+    #                         int num_tags,
+    #                         int implicit);
+    #
+    attach_function :emit_start_document, [:pointer, :pointer, :pointer, :int, :int], :int
+
+    # Create the emitter object
+    #   yaml_emitter_t *create_emitter();
+    attach_function :create_emitter, [], :pointer
+  end
 end
