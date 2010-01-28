@@ -206,6 +206,27 @@ module Psych
     ##################################################
     # Emitter support
     ##################################################
+    class EmitterContext < FFI::Struct
+      layout :emitter,        :pointer,
+             :buffer,         :pointer,
+             :buffer_size,    :size_t,
+             :char_count,     :size_t
+
+      def emitter
+        self[:emitter]
+      end
+
+      # Flush any accummulated bytes of output to the IO object
+      def flush(io)
+        count = self[:char_count]
+        if count > 0
+          str = self[:buffer].read_string(count)
+          bytes_written = io.write(str)
+          raise "Only able to flush #{bytes_written} of #{count} bytes to #{io}" unless bytes_written == count
+          self[:char_count] = 0
+        end
+      end
+    end
 
     # Emit a stream start event
     #   int emit_start_stream(yaml_emitter_t *emitter, yaml_encoding_t encoding);
@@ -219,8 +240,27 @@ module Psych
     #
     attach_function :emit_start_document, [:pointer, :pointer, :pointer, :int, :int], :int
 
-    # Create the emitter object
-    #   yaml_emitter_t *create_emitter();
-    attach_function :create_emitter, [], :pointer
+    # int emit_scalar(yaml_emitter_t *emitter,
+    #                 yaml_char_t *value,
+    #                 yaml_char_t *anchor,    /* May be NULL */
+    #                 yaml_char_t *tag,       /* May be NULL */
+    #                 size_t value_len,
+    #                 int plain,
+    #                 int quoted,
+    #                 yaml_scalar_style_t style);
+    attach_function :emit_scalar, [:pointer, :string, :size_t, :pointer, :pointer, :int, :int, :int], :int
+    # int emit_end_document(yaml_emitter_t *emitter, int implicit);
+    attach_function :emit_end_document, [:pointer, :int], :int
+
+    # int emit_end_stream(yaml_emitter_t *emitter);
+    attach_function :emit_end_stream, [:pointer], :int
+
+    # Create the emitter context object
+    #   emitter_context_t *create_emitter();
+    attach_function :create_emitter_context, [], :pointer
+
+    # Free the emitter context object
+    #   void free_emitter(emitter_context_t *emitter);
+    attach_function :free_emitter_context, [:pointer], :void
   end
 end

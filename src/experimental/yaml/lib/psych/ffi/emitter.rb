@@ -9,18 +9,23 @@ module Psych
     def initialize(io)
       puts "--  initialize"
       @io = io
-      @emitter = Psych::LibPsych.create_emitter
+      @emitter_context =
+        Psych::LibPsych::EmitterContext.new Psych::LibPsych.create_emitter_context
     end
 
     def start_stream(encoding)
       puts "--  start_stream(#{encoding})"
-      Psych::LibPsych.emit_start_stream(@emitter, encoding)
+      do_emit(Psych::LibPsych.emit_start_stream(@emitter_context.emitter, encoding))
       self
     end
 
     def end_stream
       puts "--  end_stream"
-      # TODO
+      do_emit(Psych::LibPsych.emit_end_stream(@emitter_context.emitter))
+      self
+    ensure
+      Psych::LibPsych.free_emitter_context(@emitter_context)
+      @emitter_context = nil
     end
 
     #   version         # => [1, 1]
@@ -30,59 +35,27 @@ module Psych
       puts "--  start_document(#{version.inspect}, #{tag_directives.inspect}, #{implicit.inspect})"
 
       wrap_tag_directives(tag_directives)
-      Psych::LibPsych.emit_start_document(@emitter,
-                                          wrap_version(version),
-                                          wrap_tag_directives(tag_directives),
-                                          tag_directives.length,
-                                          implicit ? 1 : 0)
+      do_emit(Psych::LibPsych.emit_start_document(@emitter_context.emitter,
+                                                       wrap_version(version),
+                                                       wrap_tag_directives(tag_directives),
+                                                       tag_directives.length,
+                                                       implicit ? 1 : 0))
       self
-    end
-
-    def wrap_version(version)
-      version = [1,1] if version.nil? or version.empty?
-      version_ptr = FFI::MemoryPointer.new(:int, version.length)
-      version_ptr.write_array_of_int(version);
-      version_ptr
-    end
-
-    def wrap_tag_directives(tag_directives)
-      directives = tag_directives.flatten
-      raise ArgumentError "tag tuple must be of length 2" unless directives.length % 2 == 0
-      if directives.size > 0
-        strptrs = []
-        directives.each {|s| strptrs << FFI::MemoryPointer.from_string(s) }
-        strptrs.each {|p| p p}
-        directives_ptr = FFI::MemoryPointer.new(:pointer, directives.length)
-        directives_ptr.write_array_of_pointer(strptrs)
-
-        directives_ptr_ptr = FFI::MemoryPointer.new(:pointer)
-        directives_ptr_ptr.write_pointer(directives_ptr)
-      else
-        directives_ptr_ptr = nil
-      end
-      puts "== directives_ptr:     #{directives_ptr.inspect}  [0]: #{directives_ptr[0].to_s(16)}"
-      puts "== directives_ptr_ptr: #{directives_ptr_ptr.inspect} [0]: #{directives_ptr_ptr[0].to_s(16)}"
-      directives_ptr_ptr
-    end
-
-    def wrap_anchor(anchor)
-
     end
 
     def end_document(implicit)
       puts "--  end_document"
-      # TODO
+      do_emit(Psych::LibPsych.emit_end_document(@emitter_context.emitter, implicit ? 1 : 0))
+      self
     end
 
     def scalar(value, anchor, tag, plain, quoted, style)
       puts "--  scalar"
-      Psych::LibPsych.emit_scalar(@emitter,
-                                  wrap_value(value),
-                                  wrap_anchor(anchor),
-                                  wrap_tag(tag),
-                                  wrap_plain(plain),
-                                  wrap_quoted(quoted),
-                                  wrap_style(style))
+      do_emit(Psych::LibPsych.emit_scalar(@emitter_context.emitter,
+                                               value, value.length,
+                                               wrap_string_or_nil(anchor),
+                                               wrap_string_or_nil(tag),
+                                               plain  ? 1 : 0, quoted ? 1 : 0, style))
       self
     end
 
@@ -110,5 +83,48 @@ module Psych
       puts "--  alias"
       # TODO
     end
+
+    # Check the error status of one of the libyaml emitter functions.
+    # If there is accummulated output, then push it into our IO object
+    def do_emit(status)
+      if status == 0
+        raise Psych::LibPsych.get_error_string(@emitter_context.emitter)
+      end
+      @emitter_context.flush(@io)
+    end
+
+    def wrap_string_or_nil(string)
+      string.nil? ? FFI::MemoryPointer::NULL :
+                    FFI::MemoryPointer.from_string(string)
+    end
+
+    def wrap_version(version)
+      version = [1,1] if version.nil? or version.empty?
+      version_ptr = FFI::MemoryPointer.new(:int, version.length)
+      version_ptr.write_array_of_int(version);
+      puts "--- version_ptr: #{version_ptr.inspect}"
+      version_ptr
+    end
+
+    # Given tag_pointers: [ ["!", ":gemstone:"], ... ], Return a
+    # MemoryPointer representing the char ** of the flattened tag_pointers.
+    def wrap_tag_directives(tag_directives)
+      directives = tag_directives.flatten
+      raise ArgumentError "tag tuple must be of length 2" unless directives.length % 2 == 0
+      if directives.size > 0
+        strptrs = []
+        directives.each {|s| strptrs << FFI::MemoryPointer.from_string(s) }
+        strptrs.each {|p| p p}
+        directives_ptr = FFI::MemoryPointer.new(:pointer, directives.length)
+        directives_ptr.write_array_of_pointer(strptrs)
+      else
+        directives_ptr_ptr = nil
+      end
+      directives_ptr
+    end
+
+#     def wrap_anchor(anchor)
+
+#     end
   end
 end

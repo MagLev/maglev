@@ -49,8 +49,18 @@ describe "libpsych low level emitter" do
     emitter = Psych::Emitter.new(sio)
     emitter.start_stream(Psych::Parser::UTF8)
     emitter.start_document([1,1], [["!", "tag:gemstone.com:2010:"]], false)
-#     emitter.scalar()
-#     emitter.end_document()
-#     emitter.end_stream()
+
+    value = "foo"
+    tag = "!str"
+    anchor = nil
+    plain = false
+    quoted = false
+    style = 3
+    emitter.scalar(value, anchor, tag, plain, quoted, style)
+
+    emitter.end_document(false)
+    emitter.end_stream()
+
+    sio.string.must_equal "--- foo\n"
   end
 end
