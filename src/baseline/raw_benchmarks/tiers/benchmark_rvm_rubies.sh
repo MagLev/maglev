@@ -6,7 +6,7 @@ if [[ -z "$token" ]] ; then
   tiers="0"
 elif [[ "$token" = "all" ]] ; then
   tiers="$(ls | awk '/^[0-9]+$/')"
-elif [[ "$token" -gt 0 ]] ; then
+elif [[ "$token" -ge 0 ]] ; then
   tiers="$token"
 else
   echo -e "The first parameter must be either a positive integer for the tier #, 'all' for all tiers, or a comma separated list of tier #'s: 0,1'"
