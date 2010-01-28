@@ -44,7 +44,7 @@ files.each do |file|
   puts "  runs:"
   ARGV.each do |runtime|
     # print "    #{File.basename runtime}: "
-    print "    #{File.basename(File.dirname(File.dirname(runtime))): }"
+    print "    #{File.basename(File.dirname(File.dirname(runtime)))}: "
     str = `#{runtime} #{util_dir}/harness-nowarmup.rb #{file} 2>&1`
     if $?.exitstatus != 0
       if str.strip == "TIMEOUT"
