@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# There are a few tasks that can't be done using rake while running MagLev, such as
+# starting or reloading MagLev itself: "rake maglev:start" or "rake status".
+# One workaround is to use the "maglev" shell script: "maglev start" or "maglev status".
+# However, if you are using RVM (http://rvm.beginrescueend.com/) this "rake-rvm" script
+# can be used invoke the rake from Ruby 1.8.7.
+#
+# "rvm-rake maglev:start" or "rvm-rake status"
+#
+# It's an imperfect solution, but a usable hack for now.
+
+COMMAND="`basename $0`"
+
+if [[ -e ${rvm_bin_path}/rvm ]] ; then
+  $rvm_bin_path/rvm 1.8.7 rake $@
+else
+  echo "$COMMAND: [Error] This script requires RVM (http://rvm.beginrescueend.com/)"
+fi
