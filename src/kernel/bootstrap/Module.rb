@@ -15,8 +15,7 @@ class Module
     self.__alias_method(new_name, old_name) 
   end
 
-  primitive_nobridge '__module_eval_string', '_moduleEvalString:with:binding:'
-  primitive_nobridge '__module_eval&', '_moduleEval:'
+  primitive_nobridge '__module_eval_string', '_moduleEvalString:with:binding:lexPath:'
 
   primitive_nobridge 'ancestor_modules_names', 'rubyAncestorModulesNames' 
 
@@ -46,16 +45,22 @@ class Module
   end
 
   def attr_reader(*names)
+    bnd = Binding.__basic_new(self)
+    fake_vcglbl = [nil,nil]
     names.each do |n|
       the_name = self.__attr_type_check(n)
-      module_eval "def #{the_name}; @#{the_name}; end"
+      str = "def #{the_name}; @#{the_name}; end" 
+      self.__module_eval_string( str, fake_vcglbl, bnd, nil )
     end
   end
 
   def attr_writer(*names)
+    bnd = Binding.__basic_new(self)
+    fake_vcglbl = [nil,nil]
     names.each do |n|
       the_name = self.__attr_type_check(n)
-      module_eval "def #{the_name}=(v); @#{the_name} = v; end"
+      str = "def #{the_name}=(v); @#{the_name} = v; end" 
+      self.__module_eval_string( str, fake_vcglbl, bnd, nil )
     end
   end
 
@@ -116,42 +121,60 @@ class Module
     self.singleton_method_removed(a_symbol)
   end
 
-  def module_eval(*args)
-    # bridge methods would interfere with VcGlobals logic
-    raise ArgumentError, 'expected 1 arg'
-  end
-
-  def module_eval(str)
+  def module_eval(__lex_path, str, file, *args)
+    # __lex_path arg is synthesized by the parser in calling code
+    __stub_warn("Behavior#module_eval: ignoring file and line numbers")
+    if args.size > 1 
+      raise ArgumentError, 'too many args'
+    end
     string = Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(0)
     bnd = Binding.new(ctx, self, nil)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
              self.__getRubyVcGlobal(0x21) ]
-    res = __module_eval_string(string, vcgl, bnd)
+    res = __module_eval_string(string, vcgl, bnd, __lex_path)
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
-  def module_eval(&block)
-    # no VcGlobal logic here, the block uses $~ of it's home context
-    __module_eval(&block)
-  end
-
-  def module_eval(str, file=nil, line=nil)
+  def module_eval(__lex_path, str, file)
+    # __lex_path arg is synthesized by the parser in calling code
     __stub_warn("Behavior#module_eval: ignoring file and line numbers")
     string = Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(0)
     bnd = Binding.new(ctx, self, nil)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
              self.__getRubyVcGlobal(0x21) ]
-    res = __module_eval_string(string, vcgl, bnd)
+    res = __module_eval_string(string, vcgl, bnd, __lex_path)
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
+  def module_eval(__lex_path, str)
+    # __lex_path arg is synthesized by the parser in calling code
+    string = Type.coerce_to(str, String, :to_str)
+    ctx = self.__binding_ctx(0)
+    bnd = Binding.new(ctx, self, nil)
+    vcgl = [ self.__getRubyVcGlobal(0x20) ,
+             self.__getRubyVcGlobal(0x21) ]
+    res = __module_eval_string(string, vcgl, bnd, __lex_path)
+    vcgl[0].__storeRubyVcGlobal(0x20)
+    vcgl[1].__storeRubyVcGlobal(0x21)
+    res
+  end
+
+  # def module_eval(str) ; end 
+  # could be sent via  __send__ or send, but not supported yet 
+  # You must code evals explicitly.
+
+  primitive_nobridge_env 'module_eval&', '_moduleEval', ':block:'
+    # first arg, __lex_path,  is synthesized by the parser in calling code, and ignored
+    # no VcGlobal logic here, the block uses $~ of it's home context
+
   alias class_eval module_eval
+
 
   def public_method_defined?(name)
     unless name._isSymbol

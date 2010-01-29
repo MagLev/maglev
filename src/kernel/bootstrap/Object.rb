@@ -360,51 +360,59 @@ class Object
       end
     end
 
-    primitive_nobridge '__instance_eval', 'rubyEvalString:with:binding:'
+    primitive_nobridge '__instance_eval', 'instanceEvalString:with:binding:lexPath:'
 
-    def instance_eval(*args)
-      # bridge methods would interfere with VcGlobals logic
-      raise ArgumentError, 'wrong number of args'
-    end
-
-    def instance_eval(str)
+    def instance_eval(__lex_path, str, file, *args)
+      # __lex_path arg is synthesized by the parser in calling code
+      # TODO: Object#instance_eval: handle file and line params
+      if args.size > 1
+        raise ArgumentError, 'too many args'
+      end
       string = Type.coerce_to(str, String, :to_str)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
-      res = __instance_eval(string, vcgl, bnd)
+      res = __instance_eval(string, vcgl, bnd, __lex_path)
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
       res
     end
 
-    def instance_eval(str, file=nil)
-      string = Type.coerce_to(str, String, :to_str)
-      ctx = self.__binding_ctx(0)
-      bnd = Binding.new(ctx, self, nil)
-      vcgl = [ self.__getRubyVcGlobal(0x20),
-               self.__getRubyVcGlobal(0x21) ]
-      res = __instance_eval(string, vcgl, bnd)
-      vcgl[0].__storeRubyVcGlobal(0x20)
-      vcgl[1].__storeRubyVcGlobal(0x21)
-      res
-    end
-
-    def instance_eval(str, file=nil, line=nil)
+    def instance_eval(__lex_path, str, file)
+      # __lex_path arg is synthesized by the parser in calling code
       # TODO: Object#instance_eval: handle file and line params
       string = Type.coerce_to(str, String, :to_str)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
-      res = __instance_eval(string, vcgl, bnd)
+      res = __instance_eval(string, vcgl, bnd, __lex_path)
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
       res
     end
 
-    primitive_nobridge_env 'instance_eval&', 'rubyEval', ':'
+    def instance_eval(__lex_path, str)
+      # __lex_path arg is synthesized by the parser in calling code
+      string = Type.coerce_to(str, String, :to_str)
+      ctx = self.__binding_ctx(0)
+      bnd = Binding.new(ctx, self, nil)
+      vcgl = [ self.__getRubyVcGlobal(0x20),
+               self.__getRubyVcGlobal(0x21) ]
+      res = __instance_eval(string, vcgl, bnd, __lex_path)
+      vcgl[0].__storeRubyVcGlobal(0x20)
+      vcgl[1].__storeRubyVcGlobal(0x21)
+      res
+    end
+
+    # def instance_eval(str) ; end 
+    # could be sent via  __send__ or send, but not supported yet 
+    # You must code evals explicitly.
+
+    primitive_nobridge_env 'instance_eval&', 'rubyEval', ':block:'
+      # __lex_path arg from the parser  is ignored
+      # no VcGlobal logic here, the block uses $~ of it's home context
 
     def __evalCaller(args, gsnmeth)
       $~ = args[0]
