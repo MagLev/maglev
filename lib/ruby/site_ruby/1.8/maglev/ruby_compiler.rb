@@ -1,6 +1,6 @@
 RubyCompiler = _resolve_smalltalk_global(:RubyCompiler)
 class RubyCompiler
-  primitive_nobridge '_compile', 'compileString:loadName:env:'
+  primitive_nobridge '_compile', 'compileString:loadName:'
 
   # Compile and evaluate ("run") ruby source code from a string.
   # file_name is used as the file name associated with the source (__FILE__
@@ -30,7 +30,7 @@ class RubyCompiler
   #     (but I *think* I was compiled from Some Bogus File Name (or other))
   #
   def compile(ruby_source_string, file_name="<a String>")
-    _compile(ruby_source_string.freeze, file_name, 1)
+    _compile(ruby_source_string.freeze, file_name)
   end
 
 end
