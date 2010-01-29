@@ -5,6 +5,8 @@ BASEDIR           = File.expand_path(File.dirname(__FILE__))
 YAML_DIR          = ENV['YAML_DIR'] || BASEDIR 
 OUTPUT_DIR        = ENV['OUTPUT_DIR'] || BASEDIR + "/results"
 BASELINE          = ENV['BASELINE'] || "ruby-1.8.6-p383"
+# Normalize time or speed. time: lower numbers better, speed: higher numbers better. 
+NORMALIZE         = ENV['NORMALIZE'] || "time"
 
 task :default => :to_csv
 
@@ -42,7 +44,7 @@ task :to_csv => :setup do
             benchfile = benchmark['file']
             benchruns = benchmark['runs']
             # Print header row
-            if needs_header then
+            if needs_header
               number_of_impls = benchruns.keys.size
               row += 1
               first_data_row = row + 1
@@ -79,8 +81,12 @@ task :to_csv => :setup do
             # Print normalized times
             1.upto(number_of_impls) do |n|
               compare_column = 65 + n
-              cell = "#{baseline_column}#{row}/"
-              cell << (compare_column) << "#{row}"
+              cell = ""
+              if NORMALIZE == "time"
+                cell << "#{baseline_column}#{row}/" << (compare_column) << "#{row}"
+              else
+                cell << (compare_column) << "#{row}/#{baseline_column}#{row}"
+              end
               outfile.print ",=$#{cell}"
             end
             outfile.puts

@@ -1,5 +1,12 @@
  module FFI
-   class Pointer  
+   class MemoryPointer
+    def inspect
+      "#<FFI::MemoryPointer address=0x#{self.address.to_s(16)} size=#{self.size}>"
+    end
+    alias :to_i :address
+   end
+
+   class Pointer
     # a subclass of CByteArray , first opening in ffi.rb
 
     def self.new(type, count, &blk)
@@ -8,7 +15,7 @@
         elemsize = type
       elsif type._kind_of?(Struct.class)
         elemsize = type.size
-      else 
+      else
         modu =  FFI
         elemsize = modu.type_size(modu.find_type(type))
       end
@@ -26,7 +33,7 @@
         inst
       end
     end
-      
+
     def self.new(type, &blk)
       inst = self.new(type)
       if block_given?
@@ -58,7 +65,7 @@
     end
 
     def self.new
-      # result can hold a single C pointer or int64 
+      # result can hold a single C pointer or int64
       inst = self.__gc_malloc(8)
       inst.initialize(1)
       inst
@@ -81,9 +88,9 @@
       elem_size = self.type_size
       byte_offset = element_offset * elem_size
       # self + byte_offset # old code
-      self.__signed_wordsize_at(elem_size, byte_offset, nil)  
+      self.__signed_wordsize_at(elem_size, byte_offset, nil)
     end
- 
+
     def to_a
       elem_size = self.type_size
       siz = self.total
@@ -105,8 +112,8 @@
       while i < lim
         b.call(self[i])
         i += 1
-      end 
-      self 
+      end
+      self
     end
 
     def each_with_index(&b)
@@ -125,7 +132,7 @@
     def +(byteoffset)
       # return an instance derived from self
       #  instance has autofree==false, and a derivedFrom reference to self
-      inst = self.__new_from(byteoffset, -2) 
+      inst = self.__new_from(byteoffset, -2)
       inst.initialize(self.type_size)
       inst
     end
@@ -151,10 +158,10 @@
     end
     def write_double(val)
       self.double_put(0, val)
-    end 
+    end
     def read_double(val)
       self.double_at(0)
-    end 
+    end
     def read_pointer
       self.__pointer_at(0, Pointer) # returns a derived pointer
     end
@@ -182,13 +189,13 @@
     end
 
     def get_string(offset)
-       zofs = self.__search_for_zerobyte(offset) 
-       lim = zofs < 0 ? self.size : zofs 
+       zofs = self.__search_for_zerobyte(offset)
+       lim = zofs < 0 ? self.size : zofs
        self.stringfrom_to(offset, lim - 1)  # both args zero based
     end
     def get_string(offset, length)
        zofs = self.__search_for_zerobyte(offset) # result zero based
-       lim = zofs < 0 ? offset + length  : zofs 
+       lim = zofs < 0 ? offset + length  : zofs
        if lim > (sz = self.size)
          lim = sz
        end
@@ -202,7 +209,7 @@
       self.int8_put(offset + len, 0)  # add a null byte
     end
 
-    def null? 
+    def null?
       self.address._equal?(0)
     end
 
@@ -211,7 +218,7 @@
       length = length.__min(self.total.__divide(4))
       res = Array.new(length)
       n = 0
-      while n < length 
+      while n < length
         res[n] = self.get_int(n << 2)
         n += 1
       end
@@ -223,7 +230,7 @@
       length = length.__min(self.total.__divide(8))
       res = Array.new(length)
       n = 0
-      while n < length 
+      while n < length
         res[n] = self.int64at(n << 3)
         n += 1
       end
@@ -243,7 +250,7 @@
       end
       self
     end
-    
+
     def write_array_of_long(ary)
       unless ary._isArray ; raise TypeError, 'expected an Array'; end
       len = ary.length
@@ -266,7 +273,7 @@
     end
 
     def write_array_of_pointer(ary)
-      # ary should be an Array of CByteArray's 
+      # ary should be an Array of CByteArray's
       unless ary._isArray ; raise TypeError, 'expected an Array'; end
       len = ary.length
       if len > self.total.__divide(8)
@@ -274,7 +281,7 @@
       end
       n = 0
       while n < len
-        self.__pointer_at_put( n << 3 , ary[n] )       
+        self.__pointer_at_put( n << 3 , ary[n] )
         n += 1
       end
     end
@@ -284,7 +291,7 @@
       res = Array.new(length)
       length = length.__min(self.total.__divide(8))
       n = 0
-      while n < length 
+      while n < length
         res[n] = self.__pointer_at(n << 3, Pointer)
         n += 1
       end
@@ -296,7 +303,7 @@
       res = []
       ofs = byte_offset
       limit = self.total
-      while ofs < limit 
+      while ofs < limit
         str = self.char_star_at(ofs)
         if str._equal?(nil)
           return res
@@ -313,7 +320,7 @@
       res = []
       n = 0
       limit = self.total
-      while n < length 
+      while n < length
         ofs = byte_offset + (n << 3)
         if ofs >= limit
           raise IndexError, "beyond end of receiver's C memory"
@@ -325,9 +332,13 @@
       end
       res
     end
-  
 
-    # following not yet used in rubyspecs 
+    def inspect
+      "#<FFI::Pointer address=0x#{self.address.to_s(16)}>"
+    end
+    alias :to_i :address
+
+    # following not yet used in rubyspecs
     # def read_array_of_type(type, reader, length) ; end # TODO
     # def write_array_of_type(type, writer, ary); ; end # TODO
     # def get_at_offset(offset, type) ; end # TODO

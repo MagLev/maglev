@@ -17,6 +17,6 @@
 
 # After we load our code, stuff the real psych's lib onto the load path and
 # then load Psych's ruby code.
-$:.unshift "/Users/pmclain/external/psych/lib"
-load "/Users/pmclain/external/psych/lib/psych.rb"
+$:.unshift "#{ENV['HOME']}/external/psych/lib"
+load "#{ENV['HOME']}/external/psych/lib/psych.rb"
 # require 'psych'

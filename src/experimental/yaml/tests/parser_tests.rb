@@ -9,5 +9,10 @@ describe Psych::Parser do
     o = Psych.load("--- foo")
     o.must_equal "foo"
   end
-end
 
+  # Blocked on Trac 656
+  it 'loads a sequence' do
+    o = Psych.load("- a\n- b\n- c\n")
+    o.must_equal ["a", "b", "c"]
+  end
+end
