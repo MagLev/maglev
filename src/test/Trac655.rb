@@ -11,16 +11,17 @@
 #                   end
 # end
 
-def middleware
-  @middleware ||= begin
+class CM
+  def middleware
+    @middleware ||= begin
                     m = Hash.new
                     m["development"] = :foo
                     m
                   end
+  end
 end
 
-x = middleware
-p x.class        # MRI prints "Hash"   MagLev prints "ExecBlock"
-
-y = x["development"]
-p y.class        # MRI prints "Array"   MagLev prints "Hash"
+x = CM.new.middleware
+unless x == { 'development' => :foo } ; raise 'error'; end
+puts "OK"
+true
