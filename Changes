@@ -1,12 +1,17 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Changes for 22804  2010-01-29
 
 * Fix Trac 654,655 in the IR generator phase of Ruby parser
 * Webrick updated with security patch from 1.8.6p388
 * Fixed --stone option to maglev-ruby
 * Added Maglev::System.stone_name to return the name of the stone the VM is
   connected to.
+* Fix Trac 656
+* More fixes to eval for constant resolution
+* Improve commit performance by changes in AIO usage
+* Improve tranlog write performance by avoiding unnecessary fsync() calls
+* Added new stats StnAioFsyncCount and StnAioTimeInFsyncMs
 
 == Changes for 22780  2010-01-22
 * Fix Trac 652
