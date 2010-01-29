@@ -303,7 +303,7 @@ module FFI
       set = IdentitySet.new
       while true
         unless set.__add_if_absent(prev)
-          raise Error, 'infinite loop in find_base_type'
+          raise RuntimeError, 'infinite loop in find_base_type'
         end
         t = find_type(prev)
         if t._isSymbol
