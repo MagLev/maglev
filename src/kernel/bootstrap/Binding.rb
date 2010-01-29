@@ -14,6 +14,21 @@ class Binding
     # if this code changed see also RubyBinding>>ctx:mainSelf: 
   end
 
+  def self.__basic_new(a_self)
+    bnd = self.allocate
+    bnd.__init(a_self)
+  end
+
+  def __init(a_self)
+    @selfObj = a_self
+    @block = nil
+    @forModuleEval = false
+    @tmpsDict = nil
+    @names = []
+    @staticLink = nil
+    self
+  end
+
   def block
     @block
   end

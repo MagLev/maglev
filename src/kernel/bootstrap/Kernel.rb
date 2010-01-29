@@ -85,32 +85,39 @@ module Kernel
     nil.pause
   end
 
-  primitive_nobridge '__eval_with_position', '_eval:binding:with:fileName:lineNumber:'
+  primitive_nobridge '__eval_with_position', '_eval:binding:with:fileName:lineNumber:lexPath:'
 
-  def eval(str, binding, file_name, line_number=1 )
-    # use __binding_ctx(1) and 0x3? because one extra stack frame due to bridging methods .
-    # max send site is :::* , call is via a :::* to :::: bridge meth .
+  def eval(__lex_path, str, binding, file, *args)
+    # __lex_path arg is synthesized by the parser in calling code
+    line = 0
+    if (asz = args.size) > 0 
+      if (asz > 1)
+        raise ArgumentError, 'too many args'
+      end
+      line = args[0]
+    end
     if binding._equal?(nil)
-      ctx = self.__binding_ctx(1)
+      ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
     else
       bnd = binding
       unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
     end
-    vcgl = [ self.__getRubyVcGlobal(0x30) ,
-      self.__getRubyVcGlobal(0x31) , nil ]
+    vcgl = [ self.__getRubyVcGlobal(0x20) ,
+      self.__getRubyVcGlobal(0x21) , nil ]
     blk = bnd.block
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, file_name, line_number )
-    vcgl[0].__storeRubyVcGlobal(0x30)
-    vcgl[1].__storeRubyVcGlobal(0x31)
+    res = __eval_with_position(str, bnd, vcgl, file, line, __lex_path )
+    vcgl[0].__storeRubyVcGlobal(0x20)
+    vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
-  def eval(str)
+  def eval(__lex_path, str, file)
     # no bridge methods for this and subsequent variants
+    # __lex_path arg is synthesized by the parser in calling code
     ctx = self.__binding_ctx(0)
     bnd = Binding.new(ctx, self, nil)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
@@ -119,13 +126,31 @@ module Kernel
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, nil, 0 )
+    res = __eval_with_position(str, bnd, vcgl, file, 0 , __lex_path)
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
-  def eval(str, &blk)
+  def eval(__lex_path, str)
+    # no bridge methods for this and subsequent variants
+    # __lex_path arg is synthesized by the parser in calling code
+    ctx = self.__binding_ctx(0)
+    bnd = Binding.new(ctx, self, nil)
+    vcgl = [ self.__getRubyVcGlobal(0x20) ,
+             self.__getRubyVcGlobal(0x21) , self ]
+    blk = bnd.block
+    unless blk._equal?(nil)
+      vcgl << blk
+    end
+    res = __eval_with_position(str, bnd, vcgl, nil, 0 , __lex_path)
+    vcgl[0].__storeRubyVcGlobal(0x20)
+    vcgl[1].__storeRubyVcGlobal(0x21)
+    res
+  end
+
+  def eval(__lex_path, str, &blk)
+    # __lex_path arg is synthesized by the parser in calling code
     ctx = self.__binding_ctx(0)
     bnd = Binding.new(ctx, self, nil)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
@@ -133,13 +158,18 @@ module Kernel
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, nil, 0 )
+    res = __eval_with_position(str, bnd, vcgl, nil, 0, __lex_path )
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
-  def eval(str, binding)
+  # def eval(str) ; end 
+  # could be sent via  __send__ or send, but not supported yet 
+  # You must code evals explicitly.
+
+  def eval(__lex_path, str, binding)
+    # __lex_path arg is synthesized by the parser in calling code
     if binding._equal?(nil)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
@@ -153,7 +183,7 @@ module Kernel
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, nil, 0 )
+    res = __eval_with_position(str, bnd, vcgl, nil, 0, __lex_path )
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
