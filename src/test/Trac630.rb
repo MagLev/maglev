@@ -1,9 +1,10 @@
 # From minitest
-module Kernel
-  def describe(desc, &block)
+module MX
+  AX = 9930
+  def self.describe(desc, &block)
     stack = MiniTest::Spec.describe_stack
     name = desc.to_s.capitalize
-    cls = Object.class_eval "class #{name} < #{stack.last}; end; #{name}"
+    cls = Object.class_eval "$y = AX ; class #{name} < #{stack.last}; end; #{name}"
     block.call
     cls
   end
@@ -20,9 +21,10 @@ class MiniTest::Spec
 end
 
 $b = 0
-cx = describe :foo do
-  $b = 5
-end
+cx = MX::describe( :foo ) { $b = 5 }
+
 unless $b == 5 ; raise 'error'; end
-unless cx.name == 'Foo' ; raise 'error'; end
+puts cx.inspect
+unless (nx = cx.name) == 'Foo' ; raise 'error'; end
+unless $y == 9930 ; raise 'error'; end
 true
