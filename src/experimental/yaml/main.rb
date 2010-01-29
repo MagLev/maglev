@@ -1,5 +1,5 @@
 
-require 'psych_ml'
+require 'psych'
 
 class StubHandler
   def start_stream encoding
@@ -88,5 +88,5 @@ yaml = [
 
 # Test an error case
 puts "------ YAML  error case-----------------"
-parser = Psych::Parser.new
-parser.parse("invoice: foo\nbar:baz\n", h)
+parser = Psych::Parser.new(h)
+parser.parse("invoice: foo\nbar:baz\n")

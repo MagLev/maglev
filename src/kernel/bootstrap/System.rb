@@ -185,5 +185,16 @@ module Maglev
     # 100%. This result indicates temporary memory is almost completely
     # full.
     class_primitive 'temp_obj_space_percent_used', '_tempObjSpacePercentUsed'
+
+    # Returns the full network name of the stone this VM is connected to.r
+    class_primitive '__stone_name', 'stoneName'
+
+    # Returns the name of the stone the VM is connected to.  If +full+ is
+    # true, returns the full network name (e.g., "!TCP\#server!maglev").
+    # If +full+ is false (default), returns just the stone name (e.g.,
+    # "maglev").
+    def self.stone_name(full=false)
+      full ? __stone_name : __stone_name[/.*!(.*)$/,1]
+    end
   end
 end

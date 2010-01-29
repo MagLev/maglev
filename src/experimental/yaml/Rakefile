@@ -9,17 +9,20 @@ FFI_DIR  = "#{ENV['HOME']}/external/ffi"
 I_DIR = "#{YAML_DIR}/include"
 L_DIR = "#{YAML_DIR}/src/.libs"
 X_DIR = "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c"
+SH_L_VALUE = "#{L_DIR}:#{X_DIR}"
 
 UNAME = `uname`.chomp
 case UNAME
 when "Linux"
   CFLAGS   = "-m64 -Wall -g -I#{I_DIR} -fPIC"
   DL_EXT   = 'so'
-  SH_L_PATH = "LD_LIBRARY_PATH=#{L_DIR}:#{X_DIR}"
+  L_PATH_NAME = "LD_LIBRARY_PATH"
+  SH_L_PATH = "LD_LIBRARY_PATH=#{SH_L_VALUE}"
 when "Darwin"
   CFLAGS  = "-m64 -Wall -g -I#{I_DIR}"
   DL_EXT   = 'dylib'
-  SH_L_PATH = "DYLD_LIBRARY_PATH=#{L_DIR}:#{X_DIR}"
+  L_PATH_NAME = "DYLD_LIBRARY_PATH"
+  SH_L_PATH = "DYLD_LIBRARY_PATH=#{SH_L_VALUE}"
 else
   raise "Rakefile doesn't support #{`uname`}"
 end
@@ -43,15 +46,21 @@ task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
   sh "export #{SH_L_PATH} ; maglev-ruby -d -Ilib main.rb"
 end
 
+task :env do
+  ENV[L_PATH_NAME]=SH_L_VALUE
+end
 namespace :parser do
-  task "#{LIBPSYCH}" => ['c/parser.o'] do
+  SRC  = FileList['c/*.c']
+  OBJS = SRC.ext('o')
+
+  task "#{LIBPSYCH}" => OBJS do
     opts = "-L#{L_DIR} -lyaml"
 
     case UNAME
     when "Linux"
-      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} c/parser.o"
+      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} #{OBJS}"
     when "Darwin"
-      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} c/parser.o"
+      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} #{OBJS}"
     else
       raise "Rakefile doesn't support #{`uname`}"
     end
@@ -65,15 +74,19 @@ namespace :parser do
   end
 end
 
+desc "Run all of the tests"
+task :test => 'test:all'
 namespace :test do
-  desc "Test the emitter code from ruby"
-  task :emitter do
-    sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_emitter.rb"
+  task :all => [:parser, :emitter]
+
+  desc "Test parsing YAML"
+  task :parser => [:libpsych, :env] do
+    sh "maglev-ruby -rubygems -Ilib tests/parser_tests.rb"
   end
 
-  desc "Test the parser code from ruby"
-  task :parser do
-    sh "export #{SH_L_PATH} ; maglev-ruby -Ilib test_parser.rb"
+  desc "Test emitting YAML"
+  task :emitter => [:libpsych, :env] do
+    sh "maglev-ruby -rubygems -Ilib tests/emitter_tests.rb"
   end
 end
 

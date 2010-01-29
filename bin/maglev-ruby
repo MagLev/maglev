@@ -104,6 +104,18 @@ rlwrapFlag=   # off by default
 sawDashE=
 searchPathFlag=
 
+# To login to an already running stone not started by maglev commands
+# use the STONENAME env variable , not the --stone option, because.
+#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
+# Don't override any existing magic ENV variables
+if [ -z "$STONENAME" ]; then
+    stone=maglev
+    [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+else
+    # $STONENAME was set -- don't change anything
+    stone=$STONENAME
+fi
+
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -206,17 +218,6 @@ do
     shift
 done
 
-# To login to an already running stone not started by maglev commands
-# use the STONENAME env variable , not the --stone option, because.
-#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
-# Don't override any existing magic ENV variables
-if [ -z "$STONENAME" ]; then
-    stone=maglev
-    [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-else
-    # $STONENAME was set -- don't change anything
-    stone=$STONENAME
-fi
 
 # Make sure the stone is ready
 $GEMSTONE/bin/waitstone $stone -1 >/dev/null

@@ -11,6 +11,10 @@ module Psych
     extend FFI::Library
     ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
 
+    ##################################################
+    # Parser support
+    ##################################################
+
     # Gets an array of the major, minor, patch level for the loaded libyaml.
     #  void libyaml_version(int version_info[]);
     attach_function :libyaml_version, [:pointer], :void
@@ -136,7 +140,6 @@ module Psych
         when :scalar_event
           x = self[:scalar]
           length = self[:scalar_length]
-          puts "-- #{self}.value: #{length} byte string..."
           length == 0 ? "" : x.read_string(length)
         else
           nil
@@ -163,7 +166,7 @@ module Psych
 
       def tag_directives
         num_tags = self[:num_tags]
-        puts "-- #{self}.tag_directives:  num_tags: #{num_tags}"
+#        puts "-- #{self}.tag_directives:  num_tags: #{num_tags}"
         if num_tags < 0
           raise ArgumentError.new "num_tags (#{num_tags}) should be positive"
         end
@@ -198,6 +201,66 @@ module Psych
         end
       end
     end
-  end
 
+
+    ##################################################
+    # Emitter support
+    ##################################################
+    class EmitterContext < FFI::Struct
+      layout :emitter,        :pointer,
+             :buffer,         :pointer,
+             :buffer_size,    :size_t,
+             :char_count,     :size_t
+
+      def emitter
+        self[:emitter]
+      end
+
+      # Flush any accummulated bytes of output to the IO object
+      def flush(io)
+        count = self[:char_count]
+        if count > 0
+          str = self[:buffer].read_string(count)
+          bytes_written = io.write(str)
+          raise "Only able to flush #{bytes_written} of #{count} bytes to #{io}" unless bytes_written == count
+          self[:char_count] = 0
+        end
+      end
+    end
+
+    # Emit a stream start event
+    #   int emit_start_stream(yaml_emitter_t *emitter, yaml_encoding_t encoding);
+    attach_function :emit_start_stream, [:pointer, :int], :int
+
+    # int emit_start_document(yaml_emitter_t *emitter,
+    #                         int *version,
+    #                         unsigned char **tag_directives,
+    #                         int num_tags,
+    #                         int implicit);
+    #
+    attach_function :emit_start_document, [:pointer, :pointer, :pointer, :int, :int], :int
+
+    # int emit_scalar(yaml_emitter_t *emitter,
+    #                 yaml_char_t *value,
+    #                 yaml_char_t *anchor,    /* May be NULL */
+    #                 yaml_char_t *tag,       /* May be NULL */
+    #                 size_t value_len,
+    #                 int plain,
+    #                 int quoted,
+    #                 yaml_scalar_style_t style);
+    attach_function :emit_scalar, [:pointer, :string, :size_t, :pointer, :pointer, :int, :int, :int], :int
+    # int emit_end_document(yaml_emitter_t *emitter, int implicit);
+    attach_function :emit_end_document, [:pointer, :int], :int
+
+    # int emit_end_stream(yaml_emitter_t *emitter);
+    attach_function :emit_end_stream, [:pointer], :int
+
+    # Create the emitter context object
+    #   emitter_context_t *create_emitter();
+    attach_function :create_emitter_context, [], :pointer
+
+    # Free the emitter context object
+    #   void free_emitter(emitter_context_t *emitter);
+    attach_function :free_emitter_context, [:pointer], :void
+  end
 end
