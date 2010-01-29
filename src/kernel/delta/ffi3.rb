@@ -70,8 +70,11 @@ module FFI
     primitive_nobridge 'get_ulong', 'uint64At:'
     primitive_nobridge 'get_ulong_long', 'uint64At:'
     primitive_nobridge 'double_at', 'doubleAt:'
+    primitive_nobridge 'float_at', 'floatAt:'
+    primitive_nobridge 'get_float32', 'floatAt:'
     primitive_nobridge 'get_float64', 'doubleAt:'
     primitive_nobridge 'get_double', 'doubleAt:'
+    primitive_nobridge 'float_put',  'floatAt:put:'
     primitive_nobridge 'double_put', 'doubleAt:put:'
     primitive_nobridge 'put_char', 'int8At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
@@ -245,7 +248,7 @@ module FFI
       __install_native_type( Type.new( :TYPE_UINT32, 4 , :uint32))
       __install_native_type( Type.new( :TYPE_INT64, 8 , :int64))
       __install_native_type( Type.new( :TYPE_UINT64, 8 , :uint64))
-      # FLOAT32 not supported yet
+      __install_native_type( Type.new( :TYPE_FLOAT32, 4 , :float))
       __install_native_type( Type.new( :TYPE_FLOAT64, 8 , :double))
       __install_native_type( Type.new( :TYPE_VOID, 8 , :void))
       __install_native_type( Type.new( :TYPE_STRING, 8 , :string))
