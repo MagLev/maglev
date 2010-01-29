@@ -173,8 +173,9 @@
       self.stringfrom_to(0, num_bytes - 1)
     end
     def read_string
-      num_bytes = self.total
-      self.stringfrom_to(0, num_bytes - 1)
+      zofs = self.__search_for_zerobyte(0)
+      lim = zofs < 0 ? self.total : zofs 
+      self.stringfrom_to(0, lim - 1)
     end
     def write_string(string, num_bytes)
       self.copyfrom_from_to_into(string, 1, num_bytes, 0)
