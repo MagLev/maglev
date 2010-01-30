@@ -1,7 +1,8 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Changes for 22804
 
+* Fix Trac 656 in implemention of eval 
 * Fix Trac 654,655 in the IR generator phase of Ruby parser
 * Webrick updated with security patch from 1.8.6p388
 * Fixed --stone option to maglev-ruby
