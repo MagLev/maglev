@@ -19,6 +19,9 @@ rake
 # Test local status while running
 rake test.rakelib:status
 
+# Test we are actually using the stone we expect
+maglev-ruby --stone test.rakelib -e 'puts "test.rakelib should == #{Maglev::System.stone_name}"'
+
 # Test startup wile running
 rake test.rakelib:start
 
