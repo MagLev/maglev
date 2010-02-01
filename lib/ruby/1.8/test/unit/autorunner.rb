@@ -11,11 +11,11 @@ module Test
         r.process_args(argv)
         r.run
       end
-      
+
       def self.standalone?
         return false unless("-e" == $0)
-        ObjectSpace.each_object(Class) do |klass|
-          return false if(klass < TestCase)
+        TestCase::DECENDANT_CLASSES.each do |klass|
+          return false
         end
         true
       end

@@ -10,11 +10,11 @@ module Test
         attr_reader :pattern, :exclude
         attr_accessor :base
 
-        def initialize(dir=::Dir, file=::File, object_space=::ObjectSpace, req=nil)
+        def initialize(dir=::Dir, file=::File, object_space=nil, req=nil)
           super()
           @dir = dir
           @file = file
-          @object_space = object_space
+          # object_space is ignored
           @req = req
           @pattern = [/\btest_.*\.rb\Z/m]
           @exclude = []
@@ -43,8 +43,8 @@ module Test
 
         def find_test_cases(ignore=[])
           cases = []
-          @object_space.each_object(Class) do |c|
-            cases << c if(c < TestCase && !ignore.include?(c))
+          TestCase::DECENDANT_CLASSES.each do |c|
+            cases << c if !ignore.include?(c)
           end
           ignore.concat(cases)
           cases
@@ -54,7 +54,7 @@ module Test
           sub_suites = []
           path = realdir(name)
           if @file.directory?(path)
-	    dir_name = name unless name == '.'
+      dir_name = name unless name == '.'
             @dir.entries(path).each do |e|
               next if(e == '.' || e == '..')
               e_name = dir_name ? @file.join(dir_name, e) : e
@@ -94,13 +94,13 @@ module Test
           $:.delete_at($:.rindex(dir)) if(dir)
         end
 
-	def realdir(path)
-	  if @base
-	    @file.join(@base, path)
-	  else
-	    path
-	  end
-	end
+  def realdir(path)
+    if @base
+      @file.join(@base, path)
+    else
+      path
+    end
+  end
       end
     end
   end
