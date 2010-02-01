@@ -35,17 +35,17 @@ module Enumerable
         @sorter.call(xs, &prc)
       else
         # quicksort(xs, &prc)
-        #    use Smalltalk mergesort from Array 
+        #    use Smalltalk mergesort from Array
         if block_given?
-          mergesort(xs) { | a, b| 
-            c = prc.call(a, b) 
+          mergesort(xs) { | a, b|
+            c = prc.call(a, b)
             if c._equal?(nil)
               raise ArgumentError, 'not comparable'
             end
             c <= 0
           }
         else
-          mergesort(xs) { |a, b| 
+          mergesort(xs) { |a, b|
             c = (a <=> b)
             if c._equal?(nil)
               raise ArgumentError, 'not comparable'
@@ -252,8 +252,9 @@ module Enumerable
   #   enum.count(item)             => int
   #   enum.count { | obj | block } => int
   #
-  # Returns the number of items in +enum+ for which equals to +item+. If a
-  # block is given, counts the number of elements yielding a true value.
+  # Returns the number of items in +enum+ that equal +item+ or for which
+  # the block returns a true value.  Returns the number of all elements in
+  # +enum+ if neither a block nor an argument is given.
   #
   #   ary = [1, 2, 4, 2]
   #   ary.count(2)          # => 2
@@ -261,10 +262,14 @@ module Enumerable
 
   def count(item = Undefined)
     seq = 0
-    unless item._equal? Undefined
-      each { |o| seq += 1 if item == o }
+    if item._equal? Undefined
+      if block_given?
+        each { |o| seq += 1 if yield(o) }
+      else
+        each { |o| seq += 1 }
+      end
     else
-      each { |o| seq += 1 if yield(o) }
+      each { |o| seq += 1 if item == o }
     end
     seq
   end
