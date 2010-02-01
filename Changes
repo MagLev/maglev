@@ -1,5 +1,10 @@
 = MagLev Change Log
 
+== Unreleased Changes
+
+* Fix persistence-api documentation: fixed bogus references to
+  Module#persistable= 
+
 == Changes for 22804  2010-01-29
 
 * Fix Trac 656 in implemention of eval 
