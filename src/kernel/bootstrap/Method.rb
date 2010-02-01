@@ -5,7 +5,7 @@ class GsNMethod
 
    primitive_nobridge '__call_star*&' , '_executeInContext:star:block:'
 
-   primitive_nobridge 'inspect', '_rubyInspect' 
+   primitive_nobridge 'inspect', '_rubyInspect'
 end
 
 class Method
@@ -14,6 +14,10 @@ class Method
 
     def __obj
       @obj
+    end
+
+    def __to_proc
+      self
     end
 
     def ==(other)

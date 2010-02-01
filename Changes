@@ -2,13 +2,15 @@
 
 == Unreleased Changes
 
-* Fix persistence-api documentation: fixed bogus references to
-  Module#persistable= 
+* persistence-api documentation: fixed bogus references to
+  Module#persistable=
 * Fix Trac 657 in implementation of class variables
+* Test::Unit now works
+* Fix Enumerable#count for no-parameter case
 
 == Changes for 22804  2010-01-29
 
-* Fix Trac 656 in implemention of eval 
+* Fix Trac 656 in implemention of eval
 * Fix Trac 654,655 in the IR generator phase of Ruby parser
 * Webrick updated with security patch from 1.8.6p388
 * Fixed --stone option to maglev-ruby
@@ -23,7 +25,7 @@
 
 * Fix Trac 652
 * Fix Trac 653 in Lexer
-* Various FFI 
+* Various FFI
 * Fix infinite loop on Sparc in high-res profiling
 * Optimize Integer>>\\  to not compute unneeded quotient.
 * In topaz, SET CLASS with no arg will print name of the current class
