@@ -12,13 +12,13 @@
 #
 $-I.unshift File.dirname($0)
 
-def STDIN.tty?
-    true
-    end
+# def STDIN.tty?
+#     true
+#     end
 
-def to_s
-    "main"
-    end
+# def to_s
+#     "main"
+#     end
 
 require "irb"
 
