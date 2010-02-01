@@ -1,4 +1,33 @@
 # From http://copypastel.com/rofl/A_Maglev_Store-y
+
+module Foo
+  def self.included(klass)
+
+    klass.class_eval do
+      @@var = "Access me"
+
+      # metaclass
+      class << self
+        def var
+          @@var
+        end
+      end
+    end
+
+  end
+end
+
+class Bar
+  include Foo
+end
+
+Bar.var
+# => NameError: undefined class variable @@var
+
+
+
+
+# This code also fails
 #
 #   $ maglev-ruby $pbm
 #   ["@@store"]
@@ -10,24 +39,24 @@
 #   ["@@store"]
 #   true
 
-module Persistable
-  def self.included(klass)
-    klass.class_eval do
-      @@store = [:foo]
+# module Persistable
+#   def self.included(klass)
+#     klass.class_eval do
+#       @@store = [:foo]
 
-      class << self
-        include Enumerable
-        def each(&block)
-          @@store.each &block
-        end
-      end
-    end
-  end
-end
+#       class << self
+#         include Enumerable
+#         def each(&block)
+#           @@store.each &block
+#         end
+#       end
+#     end
+#   end
+# end
 
-class C
-  include Persistable
-end
+# class C
+#   include Persistable
+# end
 
-p C.class_variables
-p C.all?
+# p C.class_variables
+# p C.all?
