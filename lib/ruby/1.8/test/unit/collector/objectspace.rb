@@ -9,21 +9,18 @@ module Test
     module Collector
       class ObjectSpace
         include Collector
-        
-        NAME = 'collected from the ObjectSpace'
-        
-        def initialize(source=::ObjectSpace)
+
+        NAME = 'collected from subclasses of TestSuite'
+
+        def initialize()
           super()
-          @source = source
         end
-        
+
         def collect(name=NAME)
           suite = TestSuite.new(name)
           sub_suites = []
-          @source.each_object(Class) do |klass|
-            if(Test::Unit::TestCase > klass)
-              add_suite(sub_suites, klass.suite)
-            end
+          TestCase::DECENDANT_CLASSES.each do |klass|
+            add_suite(sub_suites, klass.suite)
           end
           sort(sub_suites).each{|s| suite << s}
           suite
