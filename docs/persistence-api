@@ -45,7 +45,7 @@ In the MagLev Persistence model, an object is persisted by:
 * Calling <tt>Maglev.commit_transaction</tt>
 
 A Class is made persistable by either marking it explicitly,
-<tt>MyClass.maglev_persistable = true</tt>, or by having its initial
+<tt>MyClass.maglev_persistable</tt>, or by having its initial
 class declaration run within a persistent block:
   Maglev.persistent do
     class MyClass
@@ -133,7 +133,7 @@ Since every object has a reference to its class object and each class
 object has a reference to its superclass (and mixed in modules), in order
 to persist an object, you must also persist its class (and the whole
 ancestor chain as well).  The VM maintains flags in each class and module
-that marks whether it (<tt>Module#maglev_persistable=</tt>,
+that marks whether it (<tt>Module#maglev_persistable</tt>,
 <tt>Module#maglev_persistable?</tt>) and its instances
 (<tt>Class#maglev_instances_persistable=</tt>,
 <tt>Class#maglev_instances_persistable?</tt>) are allowed to be persisted.
@@ -210,7 +210,7 @@ There are two ways to use the MagLev persistence API to mark classes for
 persistence:
 
 * Use of <tt>Maglev.persistent</tt> and <tt>Maglev.transient</tt>
-* Use of <tt>Module#maglev_persistable=</tt>
+* Use of <tt>Module#maglev_persistable</tt>
 
 ===== <tt>Maglev.persistent</tt> and <tt>Maglev.transient</tt> Basics
 
@@ -293,12 +293,12 @@ Currently, each thread starts in transient mode.  In the future, there may
 be flags to the VM to control whether threads start off in transient or
 persistent mode.
 
-===== <tt>Module#maglev_persistable=</tt> Basics
+===== <tt>Module#maglev_persistable</tt> Basics
 
-The other mechanism to control persistence is to explicitly
-set/clear the persistable flag on individual classes and modules.
-<tt>MyClass.persistable = true</tt> marks the class as persistable, so
-that instances of the class may be persisted.  Additionally, it stages for
+The other mechanism to control persistence is to explicitly set the
+persistable flag on individual classes and modules.
+<tt>MyClass.persistable</tt> marks the class as persistable, so that
+instances of the class may be persisted.  Additionally, it stages for
 commit, the class and all of its constants, (class) instance variables,
 class variables, methods and class methods. Finally, the constant naming
 the class, if appropriate, is persisted within the appropriate namespace,
@@ -306,7 +306,7 @@ if that namespace is persistent.
 
 A class may be persisted by issuing the following command:
 
-    MyClass.persistable = true   # stage the class for persistence
+    MyClass.persistable          # stage the class for persistence
     Maglev.commit_transaction    # commit the repository
 
 In order to successfully persist a class, all of the classes in its superclass
@@ -401,9 +401,8 @@ the current VM will see them), and thus avoids unnecessary commit conflicts.
 
 ==== Persisting "Data", or Objects
 
-To persist an object, its class must first be marked
-<tt>persistable=</tt>, then, just follow the normal rules of MagLev
-persistence:
+To persist an object, its class must first be marked <tt>persistable</tt>,
+then, just follow the normal rules of MagLev persistence:
 
 * Attach the object to a persistent root
 * Call <tt>Maglev.commit_transaction</tt>
@@ -501,7 +500,7 @@ class, and then commit the object:
     end
 
     # Mark the class as persistable
-    Foo.persistable = true
+    Foo.persistable
 
     # Create a space in PERSISTENT_ROOT to hold persistent Foo objects:
     Maglev::PERSISTENT_ROOT[:my_favorite_foos] = Array.new
