@@ -5,6 +5,7 @@
 * Fix persistence-api documentation: fixed bogus references to
   Module#persistable= 
 * Fix Trac 657 in implementation of class variables
+* Test::Unit now works
 
 == Changes for 22804  2010-01-29
 
