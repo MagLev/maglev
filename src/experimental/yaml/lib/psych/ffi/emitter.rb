@@ -118,7 +118,7 @@ module Psych
         directives_ptr = FFI::MemoryPointer.new(:pointer, directives.length)
         directives_ptr.write_array_of_pointer(strptrs)
       else
-        directives_ptr_ptr = nil
+        directives_ptr = FFI::MemoryPointer::NULL
       end
       directives_ptr
     end

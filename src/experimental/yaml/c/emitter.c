@@ -142,13 +142,15 @@ int emit_start_document(yaml_emitter_t *emitter,
 
   yaml_tag_directive_t *head = NULL;
   yaml_tag_directive_t *tail = NULL;
-  head = calloc(num_tags * 2, sizeof(yaml_tag_directive_t));
-  tail = head;
-  unsigned char **cur = tag_directives;
-  for(i=0; i<num_tags; i++) {
-    tail->handle = *cur++;
-    tail->prefix = *cur++;
-    tail++;
+  if (num_tags > 0) {
+    head = calloc(num_tags * 2, sizeof(yaml_tag_directive_t));
+    tail = head;
+    unsigned char **cur = tag_directives;
+    for(i=0; i<num_tags; i++) {
+      tail->handle = *cur++;
+      tail->prefix = *cur++;
+      tail++;
+    }
   }
 
   yaml_event_t event;
