@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+== Unreleased changes
+
+* Added Enumerable#each_slice (but no Enumerator support).
+
 == Changes for 22814  2010-02-02
 
 * Fix Trac 657 and Trac 659
