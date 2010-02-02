@@ -2,7 +2,7 @@
 #   irb/lib/tracer.rb - 
 #   	$Release Version: 0.9.5$
 #   	$Revision: 11708 $
-#   	$Date: 2007-02-13 08:01:19 +0900 (Tue, 13 Feb 2007) $
+#   	$Date: 2007-02-12 16:01:19 -0700 (Mon, 12 Feb 2007) $
 #   	by Keiju ISHITSUKA(keiju@ruby-lang.org)
 #
 # --
@@ -18,8 +18,7 @@ module IRB
     Tracer.verbose = false
     Tracer.add_filter {
       |event, file, line, id, binding, *rests|
-      cnf = IRB.conf 
-      /^#{Regexp.quote(cnf[:IRB_LIB_PATH])}/ !~ file and
+      /^#{Regexp.quote(@CONF[:IRB_LIB_PATH])}/ !~ file and
 	File::basename(file) != "irb.rb"
     }
   end

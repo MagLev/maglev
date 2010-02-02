@@ -2,7 +2,7 @@
 #   irb/input-method.rb - input methods used irb
 #   	$Release Version: 0.9.5$
 #   	$Revision: 11708 $
-#   	$Date: 2007-02-13 08:01:19 +0900 (Tue, 13 Feb 2007) $
+#   	$Date: 2007-02-12 16:01:19 -0700 (Mon, 12 Feb 2007) $
 #   	by Keiju ISHITSUKA(keiju@ruby-lang.org)
 #
 # --
@@ -35,9 +35,6 @@ module IRB
     def readable_atfer_eof?
       false
     end
-    def to_s
-      "#{self.class.name}:#{@file_name}"
-    end  
   end
   
   class StdioInputMethod < InputMethod
