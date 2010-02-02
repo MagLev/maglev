@@ -1,7 +1,9 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Changes for 22814  2010-02-02
 
+* Fix Trac 657 and Trac 659
+* Fix assertion failure in Ruby 'break' in 'slow' build.
 * persistence-api documentation: fixed bogus references to
   Module#persistable=
 * Fix Trac 657 in implementation of class variables
