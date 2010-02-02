@@ -83,11 +83,12 @@ emitter_context_t *create_emitter_context() {
 
   /* RxINC: Hack until we get callbacks */
   yaml_emitter_set_output(context->emitter, buffer_writer, context);
+
+  return context;
 }
 
-
-char *get_error_string(yaml_emitter_t *emitter) {
-  emitter->problem;
+const char *get_error_string(yaml_emitter_t *emitter) {
+  return emitter->problem;
 }
 
 /* void emit(yaml_emitter_t *emitter, yaml_event_t *event) { */
@@ -190,6 +191,72 @@ int emit_scalar(yaml_emitter_t *emitter,
                                plain,
                                quoted,
                                style);
+  return yaml_emitter_emit(emitter, &event);
+}
+
+/*
+ * API: Ruby calls this
+ *
+ * emitter:   The emitter
+ * anchor:    NULL or a string
+ * tag:       NULL or a string
+ * implicit:  0 or 1
+ * style:     the style
+ */
+int emit_start_sequence(yaml_emitter_t *emitter,
+                        yaml_char_t *anchor,
+                        yaml_char_t *tag,
+                        int implicit,
+                        yaml_scalar_style_t style) {
+  fprintf(stderr, "+++ emit_start_sequence(emitter,...)\n");
+  yaml_event_t event;
+  yaml_sequence_start_event_initialize(&event, anchor, tag, implicit, style);
+  return yaml_emitter_emit(emitter, &event);
+}
+/*
+ * API: Ruby calls this
+ */
+int emit_end_sequence(yaml_emitter_t *emitter) {
+  fprintf(stderr, "+++ emit_end_sequence(emitter,...)\n");
+  yaml_event_t event;
+  yaml_sequence_end_event_initialize(&event);
+  return yaml_emitter_emit(emitter, &event);
+}
+/*
+ * API: Ruby calls this
+ *
+ * emitter:   The emitter
+ * anchor:    NULL or a string
+ * tag:       NULL or a string
+ * implicit:  0 or 1
+ * style:     the style
+ */
+int emit_start_mapping(yaml_emitter_t *emitter,
+                       yaml_char_t *anchor,
+                       yaml_char_t *tag,
+                       int implicit,
+                       yaml_scalar_style_t style) {
+  fprintf(stderr, "+++ emit_start_mapping(emitter,...)\n");
+  yaml_event_t event;
+  yaml_mapping_start_event_initialize(&event, anchor, tag, implicit, style);
+  return yaml_emitter_emit(emitter, &event);
+}
+/*
+ * API: Ruby calls this
+ */
+int emit_end_mapping(yaml_emitter_t *emitter) {
+  fprintf(stderr, "+++ emit_end_mapping(emitter,...)\n");
+  yaml_event_t event;
+  yaml_mapping_end_event_initialize(&event);
+  return yaml_emitter_emit(emitter, &event);
+}
+/*
+ * API: Ruby calls this
+ */
+int emit_alias(yaml_emitter_t *emitter, yaml_char_t *anchor) {
+  fprintf(stderr, "+++ emit_alias(emitter,...)\n");
+  yaml_event_t event;
+  yaml_alias_event_initialize(&event, anchor);
   return yaml_emitter_emit(emitter, &event);
 }
 

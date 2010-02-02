@@ -262,5 +262,36 @@ module Psych
     # Free the emitter context object
     #   void free_emitter(emitter_context_t *emitter);
     attach_function :free_emitter_context, [:pointer], :void
+
+    # int emit_start_sequence(yaml_emitter_t *emitter
+    #                         yaml_char_t *anchor,
+    #                         yaml_char_t *tag,
+    #                        int implicit,
+    #                        yaml_scalar_style_t style);
+    attach_function :emit_start_sequence, [:pointer, :pointer, :pointer, :int, :int], :int
+
+    # int emit_end_sequence(yaml_emitter_t *emitter);
+    attach_function :emit_end_sequence, [:pointer], :int
+
+    # Use :pointer rather than :string, since passing NULL is ok and
+    # expected.
+    #  emitter:   The emitter
+    #  anchor:    NULL or a string
+    #  tag:       NULL or a string
+    #  implicit:  0 or 1
+    #  style:     the style
+    #
+    # int emit_start_mapping(yaml_emitter_t *emitter
+    #                        yaml_char_t *anchor,
+    #                        yaml_char_t *tag,
+    #                        int implicit,
+    #                        yaml_scalar_style_t style) {
+    attach_function :emit_start_mapping, [:pointer, :pointer, :pointer, :int, :int], :int
+
+    # int emit_end_mapping(yaml_emitter_t *emitter);
+    attach_function :emit_end_mapping, [:pointer], :int
+
+    # int emit_alias(yaml_emitter_t *emitter, yaml_char_t *anchor);
+    attach_function :emit_alias, [:pointer, :pointer], :int
   end
 end
