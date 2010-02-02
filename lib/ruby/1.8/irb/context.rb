@@ -2,7 +2,7 @@
 #   irb/context.rb - irb context
 #   	$Release Version: 0.9.5$
 #   	$Revision: 11708 $
-#   	$Date: 2007-02-13 08:01:19 +0900 (Tue, 13 Feb 2007) $
+#   	$Date: 2007-02-12 16:01:19 -0700 (Mon, 12 Feb 2007) $
 #   	by Keiju ISHITSUKA(keiju@ruby-lang.org)
 #
 # --
@@ -215,13 +215,10 @@ module IRB
     end
 
     def evaluate(line, line_no)
-      #p :enter_context_evaluate
       @line_no = line_no
-      result = set_last_value(@workspace.evaluate(self, line, irb_path, line_no))
+      set_last_value(@workspace.evaluate(self, line, irb_path, line_no))
 #      @workspace.evaluate("_ = IRB.conf[:MAIN_CONTEXT]._")
 #      @_ = @workspace.evaluate(line, irb_path, line_no)
-      #p :leave_context_evaluate
-      result
     end
 
     alias __exit__ exit
@@ -237,8 +234,8 @@ module IRB
     def inspect
       array = []
       for ivar in instance_variables.sort{|e1, e2| e1 <=> e2}
-	name = ivar.sub(/^@(.*)$/){ |m| (Regexp.last_match || m).captures[0]}
-        val = instance_eval(ivar)
+	name = ivar.sub(/^@(.*)$/){$1}
+	val = instance_eval(ivar)
 	case ivar
 	when *NOPRINTING_IVARS
 	  array.push format("conf.%s=%s", name, "...")
