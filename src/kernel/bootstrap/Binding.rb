@@ -26,7 +26,15 @@ class Binding
     @tmpsDict = nil
     @names = []
     @staticLink = nil
+    @lexicalScope = nil
     self
+  end
+
+  def __set_lex_scope(a_scope)
+    unless a_scope._is_a?(LexicalPath)
+      raise ArgumentError, 'expected instance of Binding::LexicalPath; send of :binding or :eval not supported'
+    end
+    @lexicalScope = a_scope
   end
 
   def block

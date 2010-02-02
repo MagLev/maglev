@@ -247,7 +247,7 @@ module MagRp
        end
 
        class RubyCallNode
-         class_primitive_nobridge 's', 's_forRp:sel:args:'  # assumes rcvr is self
+         class_primitive_nobridge 's', 's_forRp:sel:args:'  
          primitive_nobridge 'iter=', 'iterNode:'
          def node_assign_set_rhs(rhs)
            # append rhs to args list of this call
@@ -266,6 +266,7 @@ module MagRp
        end
 
        class RubyVCallNode
+         # a VCall has no args coded in the source code
          class_primitive 's', 's_forRp:selector:'
          def inspect
            "\n  [:vcall, #{@rcvrNode.inspect}, :#{@callName}]"
@@ -273,8 +274,10 @@ module MagRp
        end
 
        class RubyFCallNode
-         # receiverNode is alway self
-         class_primitive_nobridge 's', 's_forRp:sel:args:'  # assumes rcvr is self
+         # a FCall node has no receiver coded in the source code,
+          
+         class_primitive_nobridge 's', 's_forRp:sel:args:'  
+            # caller generates an implicit self for receiver
 
          primitive_nobridge 'iter=', 'iterNode:'
          def inspect

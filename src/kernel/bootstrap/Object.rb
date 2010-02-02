@@ -360,7 +360,7 @@ class Object
       end
     end
 
-    primitive_nobridge '__instance_eval', 'instanceEvalString:with:binding:lexPath:'
+    primitive_nobridge '__instance_eval', 'instanceEvalString:with:binding:'
 
     def instance_eval(__lex_path, str, file, *args)
       # __lex_path arg is synthesized by the parser in calling code
@@ -371,9 +371,10 @@ class Object
       string = Type.coerce_to(str, String, :to_str)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
+      bnd.__set_lex_scope(__lex_path)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
-      res = __instance_eval(string, vcgl, bnd, __lex_path)
+      res = __instance_eval(string, vcgl, bnd )
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
       res
@@ -385,9 +386,10 @@ class Object
       string = Type.coerce_to(str, String, :to_str)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
+      bnd.__set_lex_scope(__lex_path)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
-      res = __instance_eval(string, vcgl, bnd, __lex_path)
+      res = __instance_eval(string, vcgl, bnd )
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
       res
@@ -398,20 +400,24 @@ class Object
       string = Type.coerce_to(str, String, :to_str)
       ctx = self.__binding_ctx(0)
       bnd = Binding.new(ctx, self, nil)
+      bnd.__set_lex_scope(__lex_path)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
-      res = __instance_eval(string, vcgl, bnd, __lex_path)
+      res = __instance_eval(string, vcgl, bnd )
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
       res
     end
 
-    # def instance_eval(str) ; end 
-    # could be sent via  __send__ or send, but not supported yet 
-    # You must code evals explicitly.
+    def instance_eval(str) 
+      # could be sent via  __send__ or send, but not supported yet
+      # You must code evals explicitly.
+      raise ArgumentError, 'too few args, send of :instance_eval not supported'
+    end
 
     primitive_nobridge_env 'instance_eval&', 'rubyEval', ':block:'
-      # __lex_path arg from the parser  is ignored
+      # __lex_path arg from the parser  is ignored , because there is no
+      #   source string to compile.
       # no VcGlobal logic here, the block uses $~ of it's home context
 
     def __evalCaller(args, gsnmeth)
