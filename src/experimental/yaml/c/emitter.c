@@ -125,9 +125,11 @@ int emit_start_document(yaml_emitter_t *emitter,
   int i;
   fprintf(stderr, "+++ emit_start_document\n");
   fprintf(stderr, "+++    version: [%d, %d]  (ptr: %p)\n", version[0], version[1], version);
-  fprintf(stderr, "+++    tag_directives: num_tags: %d  implicit: %d\n", num_tags, implicit);
-  fprintf(stderr, "+++    tag_directives: %p  *tag_directives: %p\n", tag_directives, *tag_directives);
-  fprintf(stderr, "+++    tag_directives: [0] %p  [1] %p\n", tag_directives[0], tag_directives[1]);
+  if (tag_directives) {
+    fprintf(stderr, "+++    tag_directives: num_tags: %d  implicit: %d\n", num_tags, implicit);
+    fprintf(stderr, "+++    tag_directives: %p  *tag_directives: %p\n", tag_directives, *tag_directives);
+    fprintf(stderr, "+++    tag_directives: [0] %p  [1] %p\n", tag_directives[0], tag_directives[1]);
+  }
 
   int num_strs = num_tags * 2;
   for(i=0; i< num_strs; i++) {
