@@ -3,14 +3,34 @@ module Kernel
   #  in the bootstrap
 
   def binding
-    # usually the block argument is synthesized by the parser.
-    # this case is used to create the top-level binding.
-    Binding.new( self.__binding_ctx(0), self, nil )
+    # could be sent via  __send__ or send, but not supported yet
+    # You must code binding calls explicitly.
+    raise ArgumentError, 'too few args, send of :binding not supported'
+    # before fix of Trac660 this path used to create the top-level binding.
+    #Binding.new( self.__binding_ctx(0), self, nil )
+  end
+ 
+  def binding(&blk)
+    # could be sent via  __send__ or send, but not supported yet
+    # You must code binding calls explicitly.
+    raise ArgumentError, 'too few args, send of :binding not supported'
   end
 
-  def binding(&blk)
-    Binding.new( self.__binding_ctx(0), self , blk)
+  def binding(__lex_path)
+    # __lex_path arg is synthesized by the parser.
+    bnd = Binding.new( self.__binding_ctx(0), self , nil)
+    bnd.__set_lex_scope(__lex_path)
+    bnd 
   end
+
+  def binding(__lex_path, &blk)
+    # __lex_path arg is synthesized by the parser.
+    # usually the block argument is synthesized by the parser.
+    bnd = Binding.new( self.__binding_ctx(0), self , blk)
+    bnd.__set_lex_scope(__lex_path)
+    bnd 
+  end
+
   module_function :binding
 
   def block_given?(&blk)

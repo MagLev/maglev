@@ -85,10 +85,11 @@ module Kernel
     nil.pause
   end
 
-  primitive_nobridge '__eval_with_position', '_eval:binding:with:fileName:lineNumber:lexPath:'
+  primitive_nobridge '__eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
   def eval(__lex_path, str, binding, file, *args)
     # __lex_path arg is synthesized by the parser in calling code
+    # calls to here always come through bridge method eval:::*, thus ctx(1), and 0x3N
     line = 0
     if (asz = args.size) > 0 
       if (asz > 1)
@@ -97,36 +98,44 @@ module Kernel
       line = args[0]
     end
     if binding._equal?(nil)
-      ctx = self.__binding_ctx(0)
+      ctx = self.__binding_ctx(1)
       bnd = Binding.new(ctx, self, nil)
+      bnd.__set_lex_scope(__lex_path)
     else
       bnd = binding
       unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+      # __lex_path arg ignored, passed binding has precedence
     end
-    vcgl = [ self.__getRubyVcGlobal(0x20) ,
-      self.__getRubyVcGlobal(0x21) , nil ]
+    vcgl = [ self.__getRubyVcGlobal(0x30) ,
+      self.__getRubyVcGlobal(0x31) , nil ]
     blk = bnd.block
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, file, line, __lex_path )
-    vcgl[0].__storeRubyVcGlobal(0x20)
-    vcgl[1].__storeRubyVcGlobal(0x21)
+    res = __eval_with_position(str, bnd, vcgl, file, line )
+    vcgl[0].__storeRubyVcGlobal(0x30)
+    vcgl[1].__storeRubyVcGlobal(0x31)
     res
   end
 
-  def eval(__lex_path, str, file)
-    # no bridge methods for this and subsequent variants
-    # __lex_path arg is synthesized by the parser in calling code
-    ctx = self.__binding_ctx(0)
-    bnd = Binding.new(ctx, self, nil)
+  def eval(__lex_path, str, binding)
+    # __lex_path arg is synthesized by the parser in calling code,
+    if binding._equal?(nil)
+      ctx = self.__binding_ctx(0)
+      bnd = Binding.new(ctx, self, nil)
+      bnd.__set_lex_scope(__lex_path)
+    else
+      bnd = binding
+      unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+      # __lex_path arg ignored, passed binding has precedence
+    end
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
-             self.__getRubyVcGlobal(0x21) , self ]
+      self.__getRubyVcGlobal(0x21), nil ]
     blk = bnd.block
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, file, 0 , __lex_path)
+    res = __eval_with_position(str, bnd, vcgl, nil, 0 )
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
@@ -137,56 +146,39 @@ module Kernel
     # __lex_path arg is synthesized by the parser in calling code
     ctx = self.__binding_ctx(0)
     bnd = Binding.new(ctx, self, nil)
+    bnd.__set_lex_scope(__lex_path)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
              self.__getRubyVcGlobal(0x21) , self ]
     blk = bnd.block
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, nil, 0 , __lex_path)
+    res = __eval_with_position(str, bnd, vcgl, nil, 0 )
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
   def eval(__lex_path, str, &blk)
-    # __lex_path arg is synthesized by the parser in calling code
+    # __lex_path arg is synthesized by the parser in calling code,
     ctx = self.__binding_ctx(0)
     bnd = Binding.new(ctx, self, nil)
+    bnd.__set_lex_scope(__lex_path)
     vcgl = [ self.__getRubyVcGlobal(0x20) ,
              self.__getRubyVcGlobal(0x21) , self ]
     unless blk._equal?(nil)
       vcgl << blk
     end
-    res = __eval_with_position(str, bnd, vcgl, nil, 0, __lex_path )
+    res = __eval_with_position(str, bnd, vcgl, nil, 0 )
     vcgl[0].__storeRubyVcGlobal(0x20)
     vcgl[1].__storeRubyVcGlobal(0x21)
     res
   end
 
-  # def eval(str) ; end 
-  # could be sent via  __send__ or send, but not supported yet 
-  # You must code evals explicitly.
-
-  def eval(__lex_path, str, binding)
-    # __lex_path arg is synthesized by the parser in calling code
-    if binding._equal?(nil)
-      ctx = self.__binding_ctx(0)
-      bnd = Binding.new(ctx, self, nil)
-    else
-      bnd = binding
-      unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
-    end
-    vcgl = [ self.__getRubyVcGlobal(0x20) ,
-      self.__getRubyVcGlobal(0x21), nil ]
-    blk = bnd.block
-    unless blk._equal?(nil)
-      vcgl << blk
-    end
-    res = __eval_with_position(str, bnd, vcgl, nil, 0, __lex_path )
-    vcgl[0].__storeRubyVcGlobal(0x20)
-    vcgl[1].__storeRubyVcGlobal(0x21)
-    res
+  def eval(str) 
+    # could be sent via  __send__ or send, but not supported yet 
+    # You must code evals explicitly.
+    raise ArgumentError, 'too few args, send of :eval not supported'
   end
 
   def exit(arg=0)
