@@ -4,9 +4,10 @@
 
 * Added Enumerable#each_slice (but no Enumerator support).
 
-== Changes for 22814  2010-02-02
+== Changes for 22816  2010-02-02
 
-* Fix Trac 657 and Trac 659
+* Replaxced previously patched irb with unpatched irb.rb and irb library
+* Fix Trac 657, 659, 661
 * Fix assertion failure in Ruby 'break' in 'slow' build.
 * persistence-api documentation: fixed bogus references to
   Module#persistable=
