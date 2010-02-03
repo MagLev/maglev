@@ -729,6 +729,41 @@ module Enumerable
     self
   end
 
+  #  call-seq:
+  #    e.each_slice(n) {...}
+  #    e.each_slice(n)
+  #
+  #  Iterates the given block for each slice of <n> elements.  If no
+  #  block is given, returns an enumerator.
+  #
+  #  e.g.:
+  #      (1..10).each_slice(3) {|a| p a}
+  #      # outputs below
+  #      [1, 2, 3]
+  #      [4, 5, 6]
+  #      [7, 8, 9]
+  #      [10]
+  #
+  # NOTE: MagLev does not yet support Enumerators
+  def each_slice(n)
+    if block_given?
+      res = []
+      count = 0
+      each do |x|
+        res << x
+        count += 1
+        if count == n
+          yield res
+          count = 0
+          res.clear
+        end
+      end
+      yield res if count > 0
+    else
+      raise NotImplementedError.new("Enumerable#each_slice: MagLev does not yet support enumerators")
+    end
+  end
+
   ##
   # :call-seq:
   #    enum.zip(arg, ...)                   => array
