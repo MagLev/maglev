@@ -91,10 +91,7 @@ You should now be able to run a simple ruby script:
 
 === <tt>maglev-irb</tt>: Open an interactive maglev shell
 
-MagLev now includes a slightly modified copy of irb called maglev-irb. References in this documentation to maglev-irb currently apply to a deprecated maglev-irb version. We'll update the docs soon.
-
-MagLev provides an IRB-like utility, <tt>$MAGLEV_HOME/bin/maglev-irb</tt>.
-It provides a minimal interactive environment with some limitations:
+MagLev now includes a slightly modified copy of irb called maglev-irb.
 
   $ maglev-irb
   >> 1 + 1
@@ -105,9 +102,11 @@ It provides a minimal interactive environment with some limitations:
   *> ^D
   $
 
+Using <tt>Maglev.commit_transaction</tt> in maglev-irb is not supported.
 
-See {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html] for details.
-
+If you get an error when starting maglev-irb, it's likely
+something in your .irbrc is breaking maglev-irb. Try
+<tt>maglev-irb -f</tt> which will bypass loading your .irbrc.
 
 == Next Steps
 
