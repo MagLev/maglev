@@ -5,4 +5,4 @@
     next
 }
 
-{ print "echo '==> Running " $1 "'; maglev-irb < '" $1 "'" }
+{ print "echo '==> Running " $1 "'; maglev-irb -f < '" $1 "'" }
