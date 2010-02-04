@@ -9,7 +9,7 @@ module Psych
 
   class LibPsych
     extend FFI::Library
-    ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
+    ffi_lib "#{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych"
 
     ##################################################
     # Parser support

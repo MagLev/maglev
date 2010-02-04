@@ -1,12 +1,9 @@
 require 'rake/clean'
 
 CLEAN.include('*~', 'gem_*_code.log')
-# CLOBBER.include()
 
-YAML_DIR = "/Users/pmclain/GemStone/checkouts/gss64bit_3.0"
 FFI_DIR  = "#{ENV['HOME']}/external/ffi"
-
-LIB_DIR = "/Users/pmclain/GemStone/checkouts/gss64bit_3.0/slow/yaml/install42/lib"
+LIB_DIR = "#{ENV['HOME']}/GemStone/checkouts/gss64bit_3.0/slow/yaml/install42/lib"
 
 UNAME = `uname`.chomp
 case UNAME
@@ -36,6 +33,11 @@ task :env do
   puts "#{L_PATH_NAME}: #{ENV[L_PATH_NAME]}"
 end
 
+desc "Temporary: link the svn versions of libyaml and libpsych into $MAGLEV_HOME/gemstone/..."
+task :devlinks do
+  sh "ln -sf #{LIB_DIR}/libyaml-0.2.dylib #{ENV['MAGLEV_HOME']}/gemstone/lib/libyaml.dylib"
+  sh "ln -sf #{LIB_DIR}/libpsych.dylib    #{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych.dylib"
+end
 # namespace :parser do
 #   SRC  = FileList['c/*.c']
 #   OBJS = SRC.ext('o')
