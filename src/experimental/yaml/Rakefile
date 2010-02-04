@@ -1,78 +1,65 @@
 require 'rake/clean'
 
-CLEAN.include('*~', 'a.out', 'c/*o', 'gem_*_code.log')
-CLOBBER.include('c/libpsych.*')
+CLEAN.include('*~', 'gem_*_code.log')
+# CLOBBER.include()
 
-YAML_DIR = "#{ENV['HOME']}/external/yaml-0.1.3"
+YAML_DIR = "/Users/pmclain/GemStone/checkouts/gss64bit_3.0"
 FFI_DIR  = "#{ENV['HOME']}/external/ffi"
 
-I_DIR = "#{YAML_DIR}/include"
-L_DIR = "#{YAML_DIR}/src/.libs"
-X_DIR = "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c"
-SH_L_VALUE = "#{L_DIR}:#{X_DIR}"
+LIB_DIR = "/Users/pmclain/GemStone/checkouts/gss64bit_3.0/slow/yaml/install42/lib"
 
 UNAME = `uname`.chomp
 case UNAME
 when "Linux"
-  CFLAGS   = "-m64 -Wall -g -I#{I_DIR} -fPIC"
   DL_EXT   = 'so'
   L_PATH_NAME = "LD_LIBRARY_PATH"
-  SH_L_PATH = "LD_LIBRARY_PATH=#{SH_L_VALUE}"
+  SH_L_PATH = "LD_LIBRARY_PATH=#{LIB_DIR}"
 when "Darwin"
-  CFLAGS  = "-m64 -Wall -g -I#{I_DIR}"
   DL_EXT   = 'dylib'
   L_PATH_NAME = "DYLD_LIBRARY_PATH"
-  SH_L_PATH = "DYLD_LIBRARY_PATH=#{SH_L_VALUE}"
+  SH_L_PATH = "DYLD_LIBRARY_PATH=#{LIB_DIR}"
 else
   raise "Rakefile doesn't support #{`uname`}"
 end
 
-LIBPSYCH = "c/libpsych.#{DL_EXT}"
-LFLAGS  = "-Wall -m64 -L#{L_DIR} -lyaml"
+LIBPSYCH = "#{LIB_DIR}/libpsych.#{DL_EXT}"
 
 task :default => :run
 
-desc "Create #{LIBPSYCH} dynamic libraray"
-task :libpsych => ["parser:#{LIBPSYCH}"]
-
-rule '.o' => ['.c'] do |t|
-  cd( File.dirname(t.source) ) do
-    sh "gcc #{CFLAGS} -c -o #{File.basename t.name} #{File.basename t.source}"
-  end
-end
-
 desc "Run the t.rb file"
-task :run => ['lib/libpsych.rb', "parser:#{LIBPSYCH}"] do
+task :run => ['lib/libpsych.rb'] do
   sh "export #{SH_L_PATH} ; maglev-ruby -d -Ilib main.rb"
 end
 
 task :env do
-  ENV[L_PATH_NAME]=SH_L_VALUE
+  ENV[L_PATH_NAME] = LIB_DIR
+  puts "#{L_PATH_NAME}: #{ENV[L_PATH_NAME]}"
 end
-namespace :parser do
-  SRC  = FileList['c/*.c']
-  OBJS = SRC.ext('o')
 
-  task "#{LIBPSYCH}" => OBJS do
-    opts = "-L#{L_DIR} -lyaml"
+# namespace :parser do
+#   SRC  = FileList['c/*.c']
+#   OBJS = SRC.ext('o')
 
-    case UNAME
-    when "Linux"
-      sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} #{OBJS}"
-    when "Darwin"
-      sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} #{OBJS}"
-    else
-      raise "Rakefile doesn't support #{`uname`}"
-    end
-  end
+#   task "#{LIBPSYCH}" => OBJS do
+#     opts = "-L#{L_DIR} -lyaml"
 
-  desc "Compile files with lots of warnings"
-  task :lint do
-    rm_f 'c/parser.o'
-    puts "LINT:  gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
-    sh "gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
-  end
-end
+#     case UNAME
+#     when "Linux"
+#       sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} #{OBJS}"
+#     when "Darwin"
+#       sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} #{OBJS}"
+#     else
+#       raise "Rakefile doesn't support #{`uname`}"
+#     end
+#   end
+
+#   desc "Compile files with lots of warnings"
+#   task :lint do
+#     rm_f 'c/parser.o'
+#     puts "LINT:  gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
+#     sh "gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
+#   end
+# end
 
 desc "Run all of the tests"
 task :test => 'test:all'
@@ -80,12 +67,12 @@ namespace :test do
   task :all => [:parser, :emitter]
 
   desc "Test parsing YAML"
-  task :parser => [:libpsych, :env] do
+  task :parser => [:env] do
     sh "maglev-ruby -rubygems -Ilib tests/parser_tests.rb"
   end
 
   desc "Test emitting YAML"
-  task :emitter => [:libpsych, :env] do
+  task :emitter => [:env] do
     sh "maglev-ruby -rubygems -Ilib tests/emitter_tests.rb"
   end
 end
