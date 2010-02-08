@@ -2,7 +2,6 @@ require 'rake/clean'
 
 CLEAN.include('*~', 'gem_*_code.log')
 
-FFI_DIR  = "#{ENV['HOME']}/external/ffi"
 LIB_DIR = "#{ENV['HOME']}/GemStone/checkouts/gss64bit_3.0/slow/yaml/install42/lib"
 
 UNAME = `uname`.chomp
@@ -21,7 +20,7 @@ end
 
 LIBPSYCH = "#{LIB_DIR}/libpsych.#{DL_EXT}"
 
-task :default => :run
+task :default => :test
 
 desc "Run the t.rb file"
 task :run => ['lib/libpsych.rb'] do
@@ -38,30 +37,6 @@ task :devlinks do
   sh "ln -sf #{LIB_DIR}/libyaml-0.2.dylib #{ENV['MAGLEV_HOME']}/gemstone/lib/libyaml.dylib"
   sh "ln -sf #{LIB_DIR}/libpsych.dylib    #{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych.dylib"
 end
-# namespace :parser do
-#   SRC  = FileList['c/*.c']
-#   OBJS = SRC.ext('o')
-
-#   task "#{LIBPSYCH}" => OBJS do
-#     opts = "-L#{L_DIR} -lyaml"
-
-#     case UNAME
-#     when "Linux"
-#       sh "gcc -shared #{opts} -m64 -Wl,-soname -Wl,#{File.basename LIBPSYCH} -o #{LIBPSYCH} #{OBJS}"
-#     when "Darwin"
-#       sh "gcc -m64 -dynamiclib #{opts} -o #{LIBPSYCH} #{OBJS}"
-#     else
-#       raise "Rakefile doesn't support #{`uname`}"
-#     end
-#   end
-
-#   desc "Compile files with lots of warnings"
-#   task :lint do
-#     rm_f 'c/parser.o'
-#     puts "LINT:  gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
-#     sh "gcc #{CFLAGS} -Wall -O2 -c -o c/parser.o c/parser.c"
-#   end
-# end
 
 desc "Run all of the tests"
 task :test => 'test:all'
@@ -76,6 +51,11 @@ namespace :test do
   desc "Test emitting YAML"
   task :emitter => [:env] do
     sh "maglev-ruby -rubygems -Ilib tests/emitter_tests.rb"
+  end
+
+  desc "Test calling from Psych"
+  task :psych => [:env] do
+    sh "maglev-ruby -rubygems -Ilib -Itests tests/psych_tests.rb"
   end
 end
 
