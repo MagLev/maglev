@@ -168,7 +168,6 @@ module Psych
 
       def tag_directives
         num_tags = self[:num_tags]
-#        puts "-- #{self}.tag_directives:  num_tags: #{num_tags}"
         if num_tags < 0
           raise ArgumentError.new "num_tags (#{num_tags}) should be positive"
         end
@@ -184,7 +183,6 @@ module Psych
           num_strings = 2 * num_tags
           tag_dirs = self[:tag_directives]
           strings = tag_dirs.get_array_of_string(0, num_strings)
-
           idx = 0
           while (idx < num_strings)
             result << [strings[idx], strings[idx + 1]]

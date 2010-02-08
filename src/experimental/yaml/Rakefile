@@ -2,17 +2,19 @@ require 'rake/clean'
 
 CLEAN.include('*~', 'gem_*_code.log')
 
-LIB_DIR = "#{ENV['HOME']}/GemStone/checkouts/gss64bit_3.0/slow/yaml/install42/lib"
+LIB_BASE = "#{ENV['HOME']}/GemStone/checkouts/gss64bit_3.0/slow/yaml"
 
 UNAME = `uname`.chomp
 case UNAME
 when "Linux"
   DL_EXT   = 'so'
   L_PATH_NAME = "LD_LIBRARY_PATH"
+  LIB_DIR = "#{LIB_BASE}/install50/lib"
   SH_L_PATH = "LD_LIBRARY_PATH=#{LIB_DIR}"
 when "Darwin"
   DL_EXT   = 'dylib'
   L_PATH_NAME = "DYLD_LIBRARY_PATH"
+  LIB_DIR = "#{LIB_BASE}/install42/lib"
   SH_L_PATH = "DYLD_LIBRARY_PATH=#{LIB_DIR}"
 else
   raise "Rakefile doesn't support #{`uname`}"
@@ -34,8 +36,16 @@ end
 
 desc "Temporary: link the svn versions of libyaml and libpsych into $MAGLEV_HOME/gemstone/..."
 task :devlinks do
-  sh "ln -sf #{LIB_DIR}/libyaml-0.2.dylib #{ENV['MAGLEV_HOME']}/gemstone/lib/libyaml.dylib"
-  sh "ln -sf #{LIB_DIR}/libpsych.dylib    #{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych.dylib"
+  case UNAME
+  when "Linux"
+    sh "ln -sf #{LIB_DIR}/libyaml.so  #{ENV['MAGLEV_HOME']}/gemstone/lib/libyaml.so"
+    sh "ln -sf #{LIB_DIR}/libpsych.so #{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych.so"
+  when "Darwin"
+    sh "ln -sf #{LIB_DIR}/libyaml-0.2.dylib #{ENV['MAGLEV_HOME']}/gemstone/lib/libyaml.dylib"
+    sh "ln -sf #{LIB_DIR}/libpsych.dylib    #{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych.dylib"
+  else
+    puts "links on #{UNAME} not supported"
+  end
 end
 
 desc "Run all of the tests"
