@@ -1,3 +1,10 @@
+To run a set of benchmarks against every rvm installed ruby do:
+  
+  nohup benchmark_rvm_rubies.sh all &
+
+NOTE: first do "rvm use maglev; rvm system" to make sure a Maglev stone 
+is running under rvm.
+
 The Rakefile parses the run.yaml files produced by the compare scripts
 and generates a .csv file or web page containing normalized geometric means.
 

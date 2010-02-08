@@ -9,6 +9,11 @@ BASELINE          = ENV['BASELINE'] || "ruby-1.8.6-p383"
 NORMALIZE         = ENV['NORMALIZE'] || "time"
 TIMESTAMP         = ENV['TIMESTAMP'] || "#{Time.now.strftime "%Y-%m-%d"}"
 
+os = `uname`.chomp
+host = `uname -n`.chomp
+ident = "#{os}-#{host}"
+tier = File.basename(YAML_DIR)
+
 task :default => :to_csv
 
 desc "Generate a web page with at graph of benchmark results"
@@ -27,13 +32,17 @@ task :to_web => :setup do
   tails = []
   subtitle = ""
   cell = ""
+  graphtype = ""
 
-  puts "Creating Tiers Benchmark Graph"
   if NORMALIZE == "time"
-    html_report = "#{OUTPUT_DIR}/Graph_time_#{TIMESTAMP}.html"
+    graphtype = "time"
+    html_report = "#{OUTPUT_DIR}/graph_time_#{ident}_#{TIMESTAMP}_tier#{tier}.html"
   else
-    html_report = "#{OUTPUT_DIR}/Graph_speed_#{TIMESTAMP}.html"
+    graphtype = "speed"
+    html_report = "#{OUTPUT_DIR}/graph_speed_#{ident}_#{TIMESTAMP}_tier#{tier}.html"
   end
+
+  puts "Creating Tier #{tier} Benchmark Graph for #{graphtype}"
   puts "  Writing web page to #{html_report}"
 
   File.open html_report, "w" do |htmlfile|
@@ -154,7 +163,7 @@ task :to_csv => :setup do
   cell = ""
 
   puts "Creating Tiers Benchmark spreadsheet"
-  csv_report = "#{OUTPUT_DIR}/Speadsheet_#{TIMESTAMP}.csv"
+  csv_report = "#{OUTPUT_DIR}/spreadsheet_#{ident}_#{TIMESTAMP}.csv"
   puts "  Writing spreadsheet to #{csv_report}"
 
   File.open csv_report, "w" do |csvfile|
