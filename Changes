@@ -1,7 +1,14 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Unreleased changes
 
+* Added Enumerable#each_slice (but no Enumerator support).
+
+== Changes for 22816  2010-02-02
+
+* Replaced previously patched irb with unpatched irb.rb and irb library
+* Fix Trac 657, 659, 661
+* Fix assertion failure in Ruby 'break' in 'slow' build.
 * persistence-api documentation: fixed bogus references to
   Module#persistable=
 * Fix Trac 657 in implementation of class variables

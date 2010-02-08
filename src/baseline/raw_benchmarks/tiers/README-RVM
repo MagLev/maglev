@@ -1,24 +1,8 @@
-Wayne Seguin provided a shell script to run Evan Phoenix's "tiers"
-benchmarks on all Rubies installed with RVM. See benchmark_rvm_rubies.sh
-for details.
+The Rakefile parses the run.yaml files produced by the compare scripts
+and generates a .csv file or web page containing normalized geometric means.
 
-I modified Evan's compare.rb so it would pick up the names of the
-RVM installed Rubies from the rvm directories. Otherwise they would
-all have just been called "ruby". Since it was using median
-values, I removed the warmup. It's not significant and it could
-be useful to see that information.
-
-I wrote a Rakefile to generate a .csv spreadsheet that parses the
-run.yaml files produced by Wayne's script and generates a spreadsheet
-containing normalized geometric means. 
-
-To run the generic tests and generate a comparison spreadsheet:
-
-  nohup ./benchmark_rvm_rubies.sh all &
-
-Note: This directory is self contained. Running the benchmarks can create
-lots of files, so you may not want to run it inside your git repo.
-
+  rake to_csv  # Generate a CSV file of benchmark results
+  rake to_web  # Generate a web page with at graph of benchmark results
 
 
 Rakefile ENV variable usage and examples:
@@ -33,7 +17,7 @@ generate a comparison agains another Ruby:
   rake BASELINE=ruby-1.8.7-p248
 
 The default YAML_DIR is the current directory. To narrow the results:
-  rake YAML_DIR=runs/2010-01-23
+  rake YAML_DIR=runs/2010-01-04
 
 The default is to compare normalized times (i.e. lower numbers are better)
 To use speed instead:
@@ -42,10 +26,7 @@ To use speed instead:
 The default OUTPUT_DIR is ./results. To put results elsewhere:
   rake OUTPUT_DIR=~/benchmark_performance
 
-
-
 Note: all runs to be compared in the spreadsheet should be against the same rubies.
 Otherwise, the overall Geometric Mean can not be computed.
 
-TODO: make nowarmup a switch
-TODO: parameterize number of iterations, baseline impl, etc.
+TODO: parameterize number of iterations, etc.
