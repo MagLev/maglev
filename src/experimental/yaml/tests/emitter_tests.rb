@@ -10,6 +10,7 @@ Exception.install_debug_block do |e|
     nil.pause
   end
 end
+
 describe Psych::Emitter do
   it 'Psych.dump("foo") produces valid YAML' do
     yaml = Psych.dump("foo")
@@ -68,13 +69,3 @@ EOS
 EOS
   end
 end
-
-
-# "%YAML 1.1\n%TAG ! tag:gemstone.com:2010\n--- !<%21str>\n\"foo\"\n...\n"
-# not
-# "%YAML 1.1\n%TAG ! tag:gemstone.com:2010:\n--- !<%21str> \"foo\"\n...\n".
-
-Expected
-"%YAML 1.1\n%TAG ! tag:gemstone.com:2010:\n--- !<%21str>\n\"foo\"\n...\n"
-"%YAML 1.1\n%TAG ! tag:gemstone.com:2010:\n--- !<%21str> \"foo\"\n...\n".
-

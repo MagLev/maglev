@@ -7,7 +7,7 @@ MiniTest::Unit.autorun
 Exception.install_debug_block do |e|
   puts "-- #{e}    (#{e.class})"
   case e
-  when IndexError
+  when IndexError, ArgumentError
     nil.pause
   end
 end
