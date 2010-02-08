@@ -8,11 +8,10 @@ BASELINE          = ENV['BASELINE'] || "ruby-1.8.6-p383"
 # Normalize time or speed. time: lower numbers better, speed: higher numbers better. 
 NORMALIZE         = ENV['NORMALIZE'] || "time"
 TIMESTAMP         = ENV['TIMESTAMP'] || "#{Time.now.strftime "%Y-%m-%d"}"
-
-os = `uname`.chomp
-host = `uname -n`.chomp
-ident = "#{os}-#{host}"
-tier = File.basename(YAML_DIR)
+OS                = `uname`.chomp
+HOST              = `uname -n`.chomp
+IDENT             = ENV['IDENT'] || "#{OS}-#{HOST}_"   # Note trailing underscore
+TIER              = File.basename(YAML_DIR)
 
 task :default => :to_csv
 
@@ -36,13 +35,13 @@ task :to_web => :setup do
 
   if NORMALIZE == "time"
     graphtype = "time"
-    html_report = "#{OUTPUT_DIR}/graph_time_#{ident}_#{TIMESTAMP}_tier#{tier}.html"
+    html_report = "#{OUTPUT_DIR}/graph_time_#{IDENT}#{TIMESTAMP}_tier#{TIER}.html"
   else
     graphtype = "speed"
-    html_report = "#{OUTPUT_DIR}/graph_speed_#{ident}_#{TIMESTAMP}_tier#{tier}.html"
+    html_report = "#{OUTPUT_DIR}/graph_speed_#{IDENT}#{TIMESTAMP}_tier#{TIER}.html"
   end
 
-  puts "Creating Tier #{tier} Benchmark Graph for #{graphtype}"
+  puts "Creating Tier #{TIER} Benchmark Graph for #{graphtype}"
   puts "  Writing web page to #{html_report}"
 
   File.open html_report, "w" do |htmlfile|
@@ -163,7 +162,7 @@ task :to_csv => :setup do
   cell = ""
 
   puts "Creating Tiers Benchmark spreadsheet"
-  csv_report = "#{OUTPUT_DIR}/spreadsheet_#{ident}_#{TIMESTAMP}.csv"
+  csv_report = "#{OUTPUT_DIR}/spreadsheet_#{IDENT}#{TIMESTAMP}.csv"
   puts "  Writing spreadsheet to #{csv_report}"
 
   File.open csv_report, "w" do |csvfile|
