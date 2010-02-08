@@ -17,26 +17,11 @@ STDOUT.sync = true
 case ARGV.first
 when "--all"
   ARGV.shift
-  ARGV.unshift "maglev-ruby", "ruby", "ruby19", "jruby", "jruby --fast", "$RUBINIUS_HOME/bin/rbx"
+  ARGV.unshift "ruby", "ruby19", "macruby", "jruby --fast", "../../bin/rbx"
 when "--all-int"
   ARGV.shift
-  ARGV.unshift "maglev-ruby", "ruby", "ruby19", "jruby", "jruby --fast",
-               "$RUBINIUS_HOME/bin/rbx -Xint", "$RUBINIUS_HOME/bin/rbx"
-when "--rbx-ml"
-  ARGV.shift
-  ARGV.unshift "$RUBINIUS_HOME/bin/rbx", "maglev-ruby"
-when "--mri-ml"
-  ARGV.shift
-  ARGV.unshift "ruby", "maglev-ruby"
-when "--ruby19-ml"
-  ARGV.shift
-  ARGV.unshift "ruby19", "maglev-ruby"
-when "--jruby-ml"
-  ARGV.shift
-  ARGV.unshift "jruby", "maglev-ruby"
-when "--maglev"
-  ARGV.shift
-  ARGV.unshift "maglev-ruby"
+  ARGV.unshift "ruby", "ruby19", "macruby", "jruby", "jruby --fast",
+               "../../bin/rbx -Xint", "../../bin/rbx"
 when "--rbx"
   ARGV.shift
   ARGV.unshift "../../bin/rbx"
@@ -71,14 +56,24 @@ files.each do |file|
       m = /TIME (.*)/.match(str)
       if m
         puts
+        puts "      time:"
         nums = m[1].split(" ").map { |i| i.to_i }
-        puts "      median: #{median nums}"
-        puts "      times: [#{m[1].split(" ").join(', ')}]"
-      elsif str.strip == "TIMEOUT"
+        puts "        median: #{median nums}"
+        puts "        times: [#{m[1].split(" ").join(', ')}]"
+      elsif str.strip =~ "TIMEOUT"
         puts "TIMEOUT"
       else
         puts "FAIL"
         STDERR.puts str
+      end
+
+      m = /MEMORY (.*)/.match(str)
+      if m
+        puts
+        puts "      memory:"
+        nums = m[1].split(" ").map { |i| i.to_i }
+        puts "        median: #{median nums}"
+        puts "        memories: [#{m[1].split(" ").join(', ')}]"
       end
     end
   end

@@ -7,17 +7,141 @@ OUTPUT_DIR        = ENV['OUTPUT_DIR'] || BASEDIR + "/results"
 BASELINE          = ENV['BASELINE'] || "ruby-1.8.6-p383"
 # Normalize time or speed. time: lower numbers better, speed: higher numbers better. 
 NORMALIZE         = ENV['NORMALIZE'] || "time"
+TIMESTAMP         = ENV['TIMESTAMP'] || "#{Time.now.strftime "%Y-%m-%d"}"
 
 task :default => :to_csv
+
+desc "Generate a web page with at graph of benchmark results"
+task :to_web => :setup do
+  require 'yaml'
+
+  needs_header = true
+  group = 0
+  column = 0
+  row = 0
+  first_data_row = 0
+  last_data_row = 0
+  last_data_column = 0
+  number_of_impls = 0
+  heads = []
+  tails = []
+  subtitle = ""
+  cell = ""
+
+  puts "Creating Tiers Benchmark Graph"
+  if NORMALIZE == "time"
+    html_report = "#{OUTPUT_DIR}/Graph_time_#{TIMESTAMP}.html"
+  else
+    html_report = "#{OUTPUT_DIR}/Graph_speed_#{TIMESTAMP}.html"
+  end
+  puts "  Writing web page to #{html_report}"
+
+  File.open html_report, "w" do |htmlfile|
+  htmlfile.puts <<-HEADER
+<html>
+  <!-- Benchmark graph for #{TIMESTAMP} -->
+  <head>
+    <script type='text/javascript' src='http://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['barchart']});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+
+    HEADER
+    Dir[YAML_DIR + "/**/*.yaml"].sort.each do |ymlfile|
+      puts "  Processing #{ymlfile}"
+      File.open ymlfile, "r" do |file|
+        YAML.load_documents file do |doc|
+          doc.each do |benchmark|
+            benchfile = benchmark['file']
+            benchruns = benchmark['runs']
+            # Print header
+            if needs_header
+              number_of_impls = benchruns.keys.size
+              htmlfile.puts <<-BHEAD
+        var data#{group} = new google.visualization.DataTable();
+        data#{group}.addColumn('string', 'Ruby');
+              BHEAD
+              benchruns.keys.sort.each do |impl|
+                htmlfile.puts "        data#{group}.addColumn(\'number\', \'#{impl}\');"
+              end
+              htmlfile.puts "        data#{group}.addRows(1);"
+              # look for BASELINE
+              idx = benchruns.keys.sort.index(BASELINE)
+              if idx.nil?
+                puts "ERROR: Can't find Ruby named #{BASELINE}"
+                puts "BASELINE= should be one of: " + benchruns.keys.sort.join(" ")
+                exit 1
+              end
+              needs_header = false
+            end
+            # Print data
+            benchname = benchfile.gsub(/.*\/bm_|\.rb$/,'')
+            htmlfile.puts "        data#{group}.setValue(0, #{column}, \'#{benchname}\');"
+            column += 1
+            # Print raw median times
+            # TODO print normalized benchmark times
+            benchruns.keys.sort.each do |impl|
+              if benchruns[impl] == "ERROR"
+                htmlfile.puts "ERROR"
+              elsif benchruns[impl] == "TIMEOUT"
+                htmlfile.puts "TIMEOUT"
+              else
+                if NORMALIZE == "time"
+                  median = benchruns[impl]['time']['median']
+                else
+                  baseline_value = benchruns[BASELINE]['time']['median'].to_f
+                  median = baseline_value / benchruns[impl]['time']['median']
+                end
+                htmlfile.puts "        data#{group}.setValue(0, #{column}, #{median});"
+                column += 1
+              end
+            end
+            htmlfile.puts
+            if NORMALIZE == "time"
+              subtitle = "Elapsed time in seconds * 1000 (Shorter bars are better)"
+            else
+              subtitle = "Performance relative to #{BASELINE} (Longer bars are better)"
+            end
+            htmlfile.puts <<-BFOOT
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div#{group}'));
+        chart.draw(data#{group}, {height: 400, width: 800, showCategories: false, legend: 'left', is3D: true, legendFontSize: 14, tooltipFontSize: 18, title: '#{benchname}', titleX: '#{subtitle}' });
+            BFOOT
+            htmlfile.puts
+            needs_header = true
+            group += 1
+            column = 0
+          end
+          # group = 0
+        end
+        htmlfile.puts
+        end
+    end
+    row += 1
+    htmlfile.puts
+    htmlfile.puts <<-FOOTER1
+      }
+    </script>
+  </head>
+
+  <body>
+    FOOTER1
+    0.upto(group) do |n|
+      htmlfile.puts "    <div id='chart_div#{n}'></div>"
+    end
+    htmlfile.puts <<-FOOTER2
+  </body>
+</html>
+    FOOTER2
+    puts "Done"
+  end
+end
+
 
 desc "Generate a CSV file of benchmark results"
 task :to_csv => :setup do
   require 'yaml'
 
-  os = `uname`.chomp
-  host = `uname -n`.chomp
-  # ident = "#{os}-#{Time.now.strftime "%y%m%d"}"
-  ident = "#{os}-#{host}-#{Time.now.strftime "%y%m%d.%H%M"}"
   needs_header = true
   row = 0
   first_data_row = 0
@@ -30,12 +154,12 @@ task :to_csv => :setup do
   cell = ""
 
   puts "Creating Tiers Benchmark spreadsheet"
-  csv_report = "#{OUTPUT_DIR}/Tiers-#{ident}.csv"
+  csv_report = "#{OUTPUT_DIR}/Speadsheet_#{TIMESTAMP}.csv"
   puts "  Writing spreadsheet to #{csv_report}"
 
-  File.open csv_report, "w" do |outfile|
-  row += 1; outfile.puts "Benchmarks from #{ident}\n"
-  row += 1; outfile.puts
+  File.open csv_report, "w" do |csvfile|
+  row += 1; csvfile.puts "Benchmarks from #{TIMESTAMP}\n"
+  row += 1; csvfile.puts
     Dir[YAML_DIR + "/**/*.yaml"].sort.each do |ymlfile|
       puts "  Processing #{ymlfile}"
       File.open ymlfile, "r" do |file|
@@ -49,10 +173,10 @@ task :to_csv => :setup do
               row += 1
               first_data_row = row + 1
               heads << first_data_row
-              outfile.print "Benchmark File,"
-              outfile.print benchruns.keys.sort.join(",")
-              outfile.print ",,Fastest,Slowest,,"
-              outfile.puts benchruns.keys.sort.join(",")
+              csvfile.print "Benchmark File,"
+              csvfile.print benchruns.keys.sort.join(",")
+              csvfile.print ",,Fastest,Slowest,,"
+              csvfile.puts benchruns.keys.sort.join(",")
               # compute column of BASELINE
               baseline_column = ""
               idx = benchruns.keys.sort.index(BASELINE)
@@ -70,14 +194,20 @@ task :to_csv => :setup do
             last_data_column = 65 + benchruns.keys.size # Columns are ASCII Chars
             range = "B#{row}:"
             range << (last_data_column) << "#{row}"
-            outfile.print "#{benchfile}"
+            csvfile.print "#{benchfile}"
             # Print raw median times
             benchruns.keys.sort.each do |impl|
-              median = benchruns[impl]['median']
-              outfile.print ",#{median}"
+              if benchruns[impl] == "ERROR"
+                csvfile.print ",ERROR"
+              elsif benchruns[impl] == "TIMEOUT"
+                csvfile.print ",TIMEOUT"
+              else
+                median = benchruns[impl]['time']['median']
+                csvfile.print ",#{median}"
+              end
             end
             # Print min and max times
-            outfile.print ",,=MIN(#{range}),=MAX(#{range}),"
+            csvfile.print ",,=MIN(#{range}),=MAX(#{range}),"
             # Print normalized times
             1.upto(number_of_impls) do |n|
               compare_column = 65 + n
@@ -87,31 +217,31 @@ task :to_csv => :setup do
               else
                 cell << (compare_column) << "#{row}/#{baseline_column}#{row}"
               end
-              outfile.print ",=$#{cell}"
+              csvfile.print ",=$#{cell}"
             end
-            outfile.puts
+            csvfile.puts
           end
         end
         # Fill in formula for Geometric Mean
         last_data_row = row
         tails << last_data_row
         row += 1
-        outfile.print "Geometric Mean normalized against #{BASELINE}"
-        1.upto(number_of_impls+4) { |n| outfile.print ","}
+        csvfile.print "Geometric Mean normalized against #{BASELINE}"
+        1.upto(number_of_impls+4) { |n| csvfile.print ","}
         1.upto(number_of_impls) do |n|
           current_column = 65 + n + number_of_impls + 4
           cell = ""
           cell << current_column << "#{first_data_row}:" << current_column << "#{last_data_row}"
-          outfile.print ",=GEOMEAN(#{cell})"
+          csvfile.print ",=GEOMEAN(#{cell})"
         end
-        outfile.puts
-        row += 1; outfile.puts
+        csvfile.puts
+        row += 1; csvfile.puts
         needs_header = true
       end
     end
     row += 1
-    outfile.print "Overall Geometric Mean normalized against #{BASELINE}"
-    1.upto(number_of_impls+4) { |n| outfile.print ","}
+    csvfile.print "Overall Geometric Mean normalized against #{BASELINE}"
+    1.upto(number_of_impls+4) { |n| csvfile.print ","}
     1.upto(number_of_impls) do |n|
       current_column = 65 + n + number_of_impls + 4
       cell = ""
@@ -119,9 +249,9 @@ task :to_csv => :setup do
         cell << current_column << "#{heads[m]}:" << current_column << "#{tails[m]}"
         cell << ";" unless m == (heads.size - 1)
       end
-      outfile.print ",=GEOMEAN(#{cell})"
+      csvfile.print ",=GEOMEAN(#{cell})"
     end
-    outfile.puts
+    csvfile.puts
   end
   puts "Done"
 end
