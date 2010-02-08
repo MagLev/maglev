@@ -9,13 +9,14 @@ module Psych
 
   class LibPsych
     extend FFI::Library
-    ffi_lib "#{ENV['HOME']}/GemStone/checkouts/git/src/experimental/yaml/c/libpsych"
+    ffi_lib "#{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych"
 
     ##################################################
     # Parser support
     ##################################################
 
-    # Gets an array of the major, minor, patch level for the loaded libyaml.
+    # Gets an array of the major, minor, patch level for the loaded
+    # libyaml.
     #  void libyaml_version(int version_info[]);
     attach_function :libyaml_version, [:pointer], :void
 
@@ -63,7 +64,7 @@ module Psych
              :tag_directives, :pointer,   # unsigned char **
              :yaml_line,      :size_t,
              :yaml_column,    :size_t,
-             :scalar,         :pointer,   # unsigned char * ;  May contain NULL characters
+             :scalar,         :pointer,   # unsigned char *; May have NULLs
              :scalar_length,  :long,
              :style,          :long,
              :anchor,         :string,    # unsigned char *
@@ -117,7 +118,8 @@ module Psych
       # TODO: Should we raise an exception if the event type isn't correct?
       # Or just return nil?
       def version
-        self.has_version? ? nil : [self[:version_major,], self[:version_minor]]
+        self.has_version? ?
+          nil : [self[:version_major,], self[:version_minor]]
       end
 
       def event_type
@@ -194,7 +196,8 @@ module Psych
 
       def anchor
         case event_type
-        when :alias_event, :scalar_event, :sequence_start_event, :mapping_start_event
+        when :alias_event, :scalar_event,
+             :sequence_start_event, :mapping_start_event
           self[:anchor]
         else
           :stub_not_implemented
@@ -222,14 +225,17 @@ module Psych
         if count > 0
           str = self[:buffer].read_string(count)
           bytes_written = io.write(str)
-          raise "Only able to flush #{bytes_written} of #{count} bytes to #{io}" unless bytes_written == count
+          unless bytes_written == count
+            raise "Only flushed #{bytes_written} of #{count} bytes to #{io}"
+          end
           self[:char_count] = 0
         end
       end
     end
 
     # Emit a stream start event
-    #   int emit_start_stream(yaml_emitter_t *emitter, yaml_encoding_t encoding);
+    #   int emit_start_stream(yaml_emitter_t *emitter,
+    #                         yaml_encoding_t encoding);
     attach_function :emit_start_stream, [:pointer, :int], :int
 
     # int emit_start_document(yaml_emitter_t *emitter,
@@ -238,7 +244,8 @@ module Psych
     #                         int num_tags,
     #                         int implicit);
     #
-    attach_function :emit_start_document, [:pointer, :pointer, :pointer, :int, :int], :int
+    attach_function :emit_start_document, [:pointer, :pointer,
+                                           :pointer, :int, :int], :int
 
     # int emit_scalar(yaml_emitter_t *emitter,
     #                 yaml_char_t *value,
@@ -248,7 +255,9 @@ module Psych
     #                 int plain,
     #                 int quoted,
     #                 yaml_scalar_style_t style);
-    attach_function :emit_scalar, [:pointer, :string, :size_t, :pointer, :pointer, :int, :int, :int], :int
+    attach_function :emit_scalar, [:pointer, :string, :size_t, :pointer,
+                                   :pointer, :int, :int, :int], :int
+
     # int emit_end_document(yaml_emitter_t *emitter, int implicit);
     attach_function :emit_end_document, [:pointer, :int], :int
 
@@ -262,5 +271,41 @@ module Psych
     # Free the emitter context object
     #   void free_emitter(emitter_context_t *emitter);
     attach_function :free_emitter_context, [:pointer], :void
+
+    # int emit_start_sequence(yaml_emitter_t *emitter
+    #                         yaml_char_t *anchor,
+    #                         yaml_char_t *tag,
+    #                        int implicit,
+    #                        yaml_scalar_style_t style);
+    attach_function :emit_start_sequence, [:pointer, :pointer, :pointer,
+                                           :int, :int], :int
+
+    # int emit_end_sequence(yaml_emitter_t *emitter);
+    attach_function :emit_end_sequence, [:pointer], :int
+
+    # Use :pointer rather than :string, since passing NULL is ok and
+    # expected.
+    #  emitter:   The emitter
+    #  anchor:    NULL or a string
+    #  tag:       NULL or a string
+    #  implicit:  0 or 1
+    #  style:     the style
+    #
+    # int emit_start_mapping(yaml_emitter_t *emitter
+    #                        yaml_char_t *anchor,
+    #                        yaml_char_t *tag,
+    #                        int implicit,
+    #                        yaml_scalar_style_t style) {
+    attach_function :emit_start_mapping, [:pointer, :pointer, :pointer,
+                                          :int, :int], :int
+
+    # int emit_end_mapping(yaml_emitter_t *emitter);
+    attach_function :emit_end_mapping, [:pointer], :int
+
+    # int emit_alias(yaml_emitter_t *emitter, yaml_char_t *anchor);
+    attach_function :emit_alias, [:pointer, :pointer], :int
+
+    # If there is an error, get the libyaml error description
+    attach_function :get_error_string, [:pointer], :string
   end
 end
