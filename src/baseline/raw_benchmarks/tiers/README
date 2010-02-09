@@ -1,7 +1,7 @@
 To run a set of benchmarks against every rvm installed ruby, then
 generate web pages and a comparison spreadsheet of the results:
   
-  nohup benchmark_rvm_rubies.sh all &
+  nohup ./benchmark_rvm_rubies.sh all &
 
 The Rakefile parses the run.yaml files produced by the compare script
 and generates a .csv file or web page containing normalized geometric means.
@@ -34,7 +34,7 @@ The default OUTPUT_DIR is ./results. To put results elsewhere:
 The default output filename includes the operating system and hostname followed
 by an underscore. i.e. "Linux-aries_" You can change it:
   rake IDENT="Ubuntu_"
-  rake IDENT="Darwin_"
+  rake IDENT=""
 
 Note: all runs to be compared in the spreadsheet should be against the same rubies.
 Otherwise, the overall Geometric Mean can not be computed.

@@ -35,10 +35,10 @@ task :to_web => :setup do
 
   if NORMALIZE == "time"
     graphtype = "time"
-    html_report = "#{OUTPUT_DIR}/graph_time_#{IDENT}#{TIMESTAMP}_tier#{TIER}.html"
+    html_report = "#{OUTPUT_DIR}/graph_time_#{IDENT}#{TIMESTAMP}_#{TIER}.html"
   else
     graphtype = "speed"
-    html_report = "#{OUTPUT_DIR}/graph_speed_#{IDENT}#{TIMESTAMP}_tier#{TIER}.html"
+    html_report = "#{OUTPUT_DIR}/graph_speed_#{IDENT}#{TIMESTAMP}_#{TIER}.html"
   end
 
   puts "Creating Tier #{TIER} Benchmark Graph for #{graphtype}"
