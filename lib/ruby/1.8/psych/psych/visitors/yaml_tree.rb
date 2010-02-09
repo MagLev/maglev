@@ -151,7 +151,10 @@ module Psych
         plain = false
         quote = false
 
-        if o.index("\x00") || o.count("^ -~\t\r\n").fdiv(o.length) > 0.3
+        # GemStone:  MagLev does not yet have fdiv
+        #if o.index("\x00") || o.count("^ -~\t\r\n").fdiv(o.length) > 0.3
+        if o.index("\x00") || (o.count("^ -~\t\r\n").to_f / o.length) > 0.3
+        # End GemStone
           str   = [o].pack('m').chomp
           tag   = '!binary'
         else
