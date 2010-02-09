@@ -181,7 +181,7 @@
     end
     def read_string
       zofs = self.__search_for_zerobyte(0)
-      lim = zofs < 0 ? self.total : zofs 
+      lim = zofs < 0 ? self.total : zofs
       self.stringfrom_to(0, lim - 1)
     end
     def write_string(string, num_bytes)
@@ -304,12 +304,12 @@
       ofs = byte_offset
       limit = self.total
       while ofs < limit
-        str = self.char_star_at(ofs)
-        if str._equal?(nil)
-          return res
-        end
-        res << str
-        ofs += 8
+	str = self.char_star_at(ofs)
+	if str._equal?(nil)
+	  return res
+	end
+	res << str
+	ofs += 8
       end
       res
     end
@@ -320,15 +320,24 @@
       res = []
       n = 0
       limit = self.total
-      while n < length
-        ofs = byte_offset + (n << 3)
-        if ofs >= limit
-          raise IndexError, "beyond end of receiver's C memory"
-        else
+      if limit._equal?(0)
+        while n < length
+          ofs = byte_offset + (n << 3)
           str = self.char_star_at(ofs )
           res << str
+          n += 1
         end
-        n += 1
+      else
+        while n < length
+          ofs = byte_offset + (n << 3)
+          if ofs >= limit
+            raise IndexError, "beyond end of receiver's C memory"
+          else
+            str = self.char_star_at(ofs )
+            res << str
+          end
+          n += 1
+        end
       end
       res
     end

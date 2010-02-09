@@ -61,27 +61,41 @@ module Psych
 
     def start_sequence(anchor, tag, implicit, style)
       puts "--  start_sequence"
-      # TODO
+      do_emit(Psych::LibPsych.emit_start_sequence(@emitter_context.emitter,
+                                                  wrap_string_or_nil(anchor),
+                                                  wrap_string_or_nil(tag),
+                                                  implicit ? 1 : 0,
+                                                  style))
+      self
     end
 
     def end_sequence
       puts "--  end_sequence"
-      # TODO
+      do_emit(Psych::LibPsych.emit_end_sequence(@emitter_context.emitter))
+      self
     end
 
     def start_mapping(anchor, tag, implicit, style)
       puts "--  start_mapping"
-      # TODO
+      do_emit(Psych::LibPsych.emit_start_mapping(@emitter_context.emitter,
+                                                 wrap_string_or_nil(anchor),
+                                                 wrap_string_or_nil(tag),
+                                                 implicit ? 1 : 0,
+                                                 style))
+      self
     end
 
     def end_mapping
       puts "--  end_mapping"
-      # TODO
+      do_emit(Psych::LibPsych.emit_end_mapping(@emitter_context.emitter))
+      self
     end
 
     def alias(anchor)
       puts "--  alias"
-      # TODO
+      do_emit(Psych::LibPsych.emit_alias(@emitter_context.emitter,
+                                         wrap_string_or_nil(anchor)))
+      self
     end
 
     # Check the error status of one of the libyaml emitter functions.
@@ -118,7 +132,7 @@ module Psych
         directives_ptr = FFI::MemoryPointer.new(:pointer, directives.length)
         directives_ptr.write_array_of_pointer(strptrs)
       else
-        directives_ptr_ptr = nil
+        directives_ptr = FFI::MemoryPointer::NULL
       end
       directives_ptr
     end

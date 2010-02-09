@@ -374,6 +374,10 @@ class Object
       bnd.__set_lex_scope(__lex_path)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
+      blk = bnd.block
+      unless blk._equal?(nil)
+        vcgl << blk
+      end
       res = __instance_eval(string, vcgl, bnd )
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
@@ -389,6 +393,10 @@ class Object
       bnd.__set_lex_scope(__lex_path)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
+      blk = bnd.block
+      unless blk._equal?(nil)
+        vcgl << blk
+      end
       res = __instance_eval(string, vcgl, bnd )
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)
@@ -403,6 +411,10 @@ class Object
       bnd.__set_lex_scope(__lex_path)
       vcgl = [ self.__getRubyVcGlobal(0x20),
                self.__getRubyVcGlobal(0x21) ]
+      blk = bnd.block
+      unless blk._equal?(nil)
+        vcgl << blk
+      end
       res = __instance_eval(string, vcgl, bnd )
       vcgl[0].__storeRubyVcGlobal(0x20)
       vcgl[1].__storeRubyVcGlobal(0x21)

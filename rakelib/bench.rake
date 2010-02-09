@@ -21,16 +21,20 @@ METER_MEMORY    = ENV['METER_MEMORY'] || 'yes'
 VM              = ENV['VM'] || "#{BASEDIR}/bin/maglev-ruby"
 
 def command(name)
+  # note that we use ruby here
+  # so that we'll be using a "stable" ruby for driving the monitor
+  # thus the test candidate ruby will only be running the test.
   "ruby #{MONITOR} #{TIMEOUT} '#{VM}' #{RUNNER} #{name} #{ITERATIONS} #{report} #{METER_MEMORY}"
 end
 
 # Cache the name so it is only generated once during an invocation.
 # Eliminates having to save the name and pass it around.
 def report
-  os = `uname`.chomp
+  os = `uname`.chomp # doesn't work on doze
   host = `uname -n`.chomp
   vm = File.basename VM.split.first
   @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{os}-#{host}-#{Time.now.strftime "%y%m%d.%H%M%S"}.yaml"
+  # @report ||= "#{RBS_RESULTS_DIR}/RBS-#{vm}-#{Time.now.strftime "%y%m%d.%H%M%S"}.yaml"
 end
 
 def report_name
@@ -117,7 +121,7 @@ namespace :bench do
       end
     end
 
-    puts "Done"
+    puts "Done wrote report to #{report_name}"
   end
 
   desc "Run all the RBS benchmarks that match PATTERN ex: PATTERN=benchmarks/micro-benchmarks/bm_gc*"
@@ -134,7 +138,7 @@ namespace :bench do
       end
     end
 
-    puts "Done"
+    puts "Done wrote report to #{report_name}"
   end
 
   desc "Run all the RBS benchmarks in DIR"
@@ -151,7 +155,7 @@ namespace :bench do
       end
     end
 
-    puts "Done"
+    puts "Done wrote report to #{report_name}"
   end
 
   desc "Run only the RBS benchmark specified by FILE"
@@ -165,5 +169,7 @@ namespace :bench do
       puts "  Running #{File.basename name}"
       system "#{command name}"
     end
+
+    puts "Done wrote report to #{report_name}"
   end
 end
