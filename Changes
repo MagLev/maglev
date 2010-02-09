@@ -2,6 +2,11 @@
 
 == Unreleased changes
 
+
+== Changes for 22851  2010-02-09
+
+* Switch from RbYaml to libyaml + Psych
+* Fix Trac 664
 * Added Enumerable#each_slice (but no Enumerator support).
 
 == Changes for 22816  2010-02-02
