@@ -14,3 +14,20 @@ res = Socket::getaddrinfo(address, port,
                           Socket::SOCK_STREAM, # socket type
                           0,                   # protocol
                           Socket::AI_PASSIVE)  # flag
+puts res.inspect
+
+unless res.length == 1 ; raise 'err;'; end
+elem = res[0]
+exp = [ "AF_INET", 4567, "0.0.0.0", "0.0.0.0", 2 ]  # elements that are same on Solaris and Linux
+act = [ elem[0], elem[1], elem[2], elem[3], elem[4] ]  
+unless exp == act ; raise 'error'; end  
+
+res = Socket::getaddrinfo("moro", "http")
+puts res.inspect
+unless res.length >= 1; raise 'err;'; end # 1 on Solaris, 2 on Linux
+
+elem = res[0]
+exp = ["AF_INET", 80, "moro.gemstone.com", "10.80.250.115", 2 ]
+act = [ elem[0], elem[1], elem[2],         elem[3], elem[4] ]
+unless exp == act ; raise 'error'; end  
+true
