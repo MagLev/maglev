@@ -181,7 +181,7 @@
     end
     def read_string
       zofs = self.__search_for_zerobyte(0)
-      lim = zofs < 0 ? self.total : zofs 
+      lim = zofs < 0 ? self.total : zofs
       self.stringfrom_to(0, lim - 1)
     end
     def write_string(string, num_bytes)
@@ -325,7 +325,6 @@
           ofs = byte_offset + (n << 3)
           str = self.char_star_at(ofs )
           res << str
-          end
           n += 1
         end
       else

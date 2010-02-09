@@ -22,7 +22,7 @@ for ruby in $rubies ; do
   if [[ -x $ruby ]] ; then
     list="$list $ruby"
   else
-    list="$list $rvm_rubies_path/$ruby/bin/ruby"
+    list="$list $rvm_bin_path/$ruby"
   fi
 done
 
@@ -31,12 +31,16 @@ timestamp="$(date +'%Y-%m-%d')"
 for tier in $tiers ; do
   output_path="$(pwd)/runs/$timestamp/$tier"
   mkdir -p $output_path
-
   echo -e "\n[$timestamp]\n" > "$output_path/error.log"
-
   export NO_TIMEOUT=1
-
-  ruby compare-rvm-nowarmup.rb $tier $list 2>> "$output_path/error.log" | tee "$output_path/run.yaml"
+  ruby compare-rvm-nowarmup.rb $tier $list 2>> "$output_path/error.log" \
+    | tee "$output_path/run.yaml"
+  if [[ $? -eq 0 ]] ; then
+    rake to_web NORMALIZE=time TIMESTAMP=$timestamp YAML_DIR=runs/$timestamp/$tier \
+      OUTPUT_DIR=runs/$timestamp/$tier
+    rake to_web NORMALIZE=speed TIMESTAMP=$timestamp YAML_DIR=runs/$timestamp/$tier \
+      OUTPUT_DIR=runs/$timestamp/$tier
+  fi
 done
 
-rake YAML_DIR="$(pwd)/runs/$timestamp" BASELINE="ruby-1.8.6-p383"
+rake to_csv TIMESTAMP=$timestamp YAML_DIR=runs/$timestamp
