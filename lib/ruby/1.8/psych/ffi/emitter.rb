@@ -7,6 +7,9 @@ module Psych
   #
   # TODO: need to clean up the @emitter: Waiting on ephemeron support.
   class Emitter < Handler
+    # Creates a new emitter.
+    # cannonical defaults to false
+    # indentation defaults to 0
     def initialize(io)
       @io = io
       @emitter_context =
@@ -26,9 +29,13 @@ module Psych
       @emitter_context = nil
     end
 
-    #   version         # => [1, 1]
-    #   tag_directives  # => [["!", "tag:tenderlovemaking.com,2009:"]]
-    #   implicit        # => false
+    # If +version+ is nil or empty, then no YAML version is used.  If
+    # +version+ is present, then the emitter will output the appropriate
+    # version directive, e.g., "%YAML 1.1".
+    #
+    # version        # => [1, 1]
+    # tag_directives # => [["!", "tag:tenderlovemaking.com,2009:"]]
+    # implicit       # => false
     def start_document(version, tag_directives, implicit)
       wrap_tag_directives(tag_directives)
       do_emit(Psych::LibPsych.emit_start_document(@emitter_context.emitter,
@@ -102,10 +109,13 @@ module Psych
     end
 
     def wrap_version(version)
-      version = [1,1] if version.nil? or version.empty?
-      version_ptr = FFI::MemoryPointer.new(:int, version.length)
-      version_ptr.write_array_of_int(version);
-      version_ptr
+      if version.nil? or version.empty?
+        FFI::MemoryPointer::NULL
+      else
+        version_ptr = FFI::MemoryPointer.new(:int, version.length)
+        version_ptr.write_array_of_int(version);
+        version_ptr
+      end
     end
 
     # Given tag_pointers: [ ["!", ":gemstone:"], ... ], Return a
@@ -123,6 +133,29 @@ module Psych
         directives_ptr = FFI::MemoryPointer::NULL
       end
       directives_ptr
+    end
+
+    # Get the output style, canonical or not.
+    def canonical
+      flag = Psych::LibPsych.get_canonical(@emitter_context.emitter)
+      flag == 0 ? false : true
+    end
+
+    # Set the output style, canonical or not.
+    def canonical=(flag)
+      Psych::LibPsych.set_canonical(@emitter_context.emitter, flag ? 1 : 0)
+      flag
+    end
+
+    # Set the indentation level to +level+.
+    def set_indentation(level)
+      Psych::LibPsych.set_indentation_level(@emitter_context.emitter, level)
+      level
+    end
+
+    # Get the indentation level.
+    def indentation
+      Psych::LibPsych.get_indentation_level(@emitter_context.emitter)
     end
   end
 end

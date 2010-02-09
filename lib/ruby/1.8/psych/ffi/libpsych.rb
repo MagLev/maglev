@@ -304,6 +304,18 @@ module Psych
 
     # If there is an error, get the libyaml error description
     attach_function :get_error_string, [:pointer], :string
+
+    # Get the current indentation level for this emitter
+    attach_function :get_indentation_level, [:pointer], :int
+
+    # Set the current indentation level for this emitter
+    attach_function :set_indentation_level, [:pointer, :int], :void
+
+    # Get the current canonical style
+    attach_function :get_canonical, [:pointer], :int
+
+    # Set the current canonical style
+    attach_function :set_canonical, [:pointer, :int], :void
   end
 
   def self.libyaml_version
