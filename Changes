@@ -3,7 +3,7 @@
 == Unreleased changes
 
 
-== Changes for 22851  2010-02-09
+== Changes for 22853  2010-02-09
 
 * Switch from RbYaml to libyaml + Psych
 * Fix Trac 664
