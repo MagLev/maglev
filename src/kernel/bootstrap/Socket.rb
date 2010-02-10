@@ -93,28 +93,29 @@ class Socket # [
   end
 
   def self.getaddrinfo(host, service, family = 0, socktype = 0,
-      protocol = 0, flags = 0)
-    # implementation in Smalltalk layer is incomplete ,
-    #   result will only include a single entry for the specified host
-    #   and service, assuming TCP protocol.
-    if host._equal?(nil)
-      host = 'localhost'
-    else
+      		       protocol = 0, flags = 0)
+    unless host._equal?(nil)
       host = Type.coerce_to(host, String, :to_s)
     end
-    if service._isFixnum 
-      # ok
-    elsif service._equal?(nil)
-      service = 0
+    if service._equal?(nil)
+      serv = '0'
+    elsif service._isFixnum
+      serv = service.to_s
+    elsif service._isString
+      serv = service
     else
-      service = Type.coerce_to(service, String, :to_s)
+      raise TypeError , 'service must be nil, a Fixnum or a String'
     end
     family = Type.coerce_to(family, Fixnum, :to_int)
     socktype = Type.coerce_to(socktype, Fixnum, :to_int)
     protocol = Type.coerce_to(protocol, Fixnum, :to_int)
     flags = Type.coerce_to(flags, Fixnum, :to_int)
-    args = [ host, service, family, socktype, protocol, flags ]
-    __getaddrinfo( args )
+    args = [ host, serv, family, socktype, protocol, flags]
+    res = __getaddrinfo( args )
+    if res._isFixnum
+      Errno.raise_errno(res, 'getaddrinfo failed')
+    end
+    return res
   end
 
   primitive_nobridge '__next_line_to', 'getLine:'

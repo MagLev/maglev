@@ -4,9 +4,9 @@ require 'yaml'
 # Regular string
 test_cases =
   [
-   ["foo",  "--- foo\n"],
-   [":foo", "--- \":foo\"\n"],
-   [:foo,   "--- :foo\n" ]
+   ["foo",  "--- foo\n...\n"],
+   [":foo", "--- ':foo'\n"],
+   [:foo,   "--- :foo\n...\n" ]
   ]
 
 test_cases.each do |orig,yaml|

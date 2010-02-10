@@ -304,12 +304,12 @@
       ofs = byte_offset
       limit = self.total
       while ofs < limit
-        str = self.char_star_at(ofs)
-        if str._equal?(nil)
-          return res
-        end
-        res << str
-        ofs += 8
+	str = self.char_star_at(ofs)
+	if str._equal?(nil)
+	  return res
+	end
+	res << str
+	ofs += 8
       end
       res
     end
