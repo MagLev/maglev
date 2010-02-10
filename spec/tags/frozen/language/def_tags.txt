@@ -1,8 +1,4 @@
 fails:Redefining a singleton method does not inherit a previously set visibility 
-fails:A method defined with extreme default arguments can redefine itself when the default is evaluated
-fails:A method defined with extreme default arguments evaluates the defaults in the method's scope
-fails:A singleton method defined with extreme default arguments may use a method definition as a default
-fails:A singleton method defined with extreme default arguments evaluates the defaults in the singleton scope
 fails:A nested method definition creates a class method when evaluated in a class method
 fails:A method definition in an eval creates a class method
 fails:A method definition in an eval creates a singleton method
