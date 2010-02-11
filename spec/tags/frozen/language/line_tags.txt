@@ -1,1 +1,1 @@
-fails:The __LINE__ constant is eval aware
+fails:The __LINE__ constant equals the line number of the text inside an eval

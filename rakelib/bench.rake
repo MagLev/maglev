@@ -121,7 +121,7 @@ namespace :bench do
       end
     end
 
-    puts "Done wrote report to #{report_name}"
+    puts "Done."
   end
 
   desc "Run all the RBS benchmarks that match PATTERN ex: PATTERN=benchmarks/micro-benchmarks/bm_gc*"
@@ -138,7 +138,7 @@ namespace :bench do
       end
     end
 
-    puts "Done wrote report to #{report_name}"
+    puts "Done."
   end
 
   desc "Run all the RBS benchmarks in DIR"
@@ -155,7 +155,7 @@ namespace :bench do
       end
     end
 
-    puts "Done wrote report to #{report_name}"
+    puts "Done."
   end
 
   desc "Run only the RBS benchmark specified by FILE"
@@ -170,6 +170,6 @@ namespace :bench do
       system "#{command name}"
     end
 
-    puts "Done wrote report to #{report_name}"
+    puts "Done."
   end
 end
