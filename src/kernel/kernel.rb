@@ -139,10 +139,12 @@ RUBY.require 'kernel/delta/Range.rb'
 RUBY.require 'kernel/delta/Process.rb'
 RUBY.require 'kernel/delta/purerubystringio.rb'
 RUBY.require 'kernel/delta/String.rb'
+RUBY.require 'kernel/delta/ruby_utils.rb'
+
 #
 # the parser loads it's own subset of FFI in env 2 ,
 # the smalltalk script for loading prims, sets MAGLEV_primLoadFFI for env 1 only
-if Maglev::System.session_temp( :MAGLEV_primLoadFFI )  
+if Maglev::System.session_temp( :MAGLEV_primLoadFFI )
   RUBY.require 'kernel/delta/ffi1.rb'
   RUBY.require 'kernel/delta/ffi2.rb'
   RUBY.require 'kernel/delta/ffi3.rb'
