@@ -8,7 +8,7 @@ module Psych
 
   class LibPsych
     extend FFI::Library
-    ffi_lib "#{ENV['MAGLEV_HOME']}/gemstone/lib/libpsych"
+    ffi_lib "#{ENV['GEMSTONE']}/lib/libpsych"
 
     ##################################################
     # Parser support
@@ -17,20 +17,20 @@ module Psych
     # Gets an array of the major, minor, patch level for the loaded
     # libyaml.
     #  void libyaml_version(int version_info[]);
-    attach_function :libyaml_version, [:pointer], :void
+    attach_function( :libyaml_version, [:pointer], :void )
 
     # Creates a new parser context given a string.
     #   parser_context_t *create_parser_context(unsigned char *input);
-    attach_function :create_parser_context, [ :pointer ], :pointer
+    attach_function( :create_parser_context, [ :pointer ], :pointer)
 
     # Returns a pointer to a ParserEvent that describes the next event in
     # the YAML event stream.
     #   parser_event_t *next_event(parser_context_t *parser_context);
-    attach_function :next_event, [:pointer], :pointer
+    attach_function( :next_event, [:pointer], :pointer)
 
     # Frees a parser context created by create_parser_context
     #   void free_parser_context(parser_context_t *context);
-    attach_function :free_parser_context, [ :pointer ], :void
+    attach_function( :free_parser_context, [ :pointer ], :void)
 
     # An Enum that describes the YAML parser events.  ParserEvent[:type]
     ParserEventEnum = FFI::Enum.new([:no_event,
