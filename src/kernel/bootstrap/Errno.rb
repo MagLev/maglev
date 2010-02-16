@@ -1,6 +1,6 @@
 module Errno
   # Map an errno (small int) to the exception class for that errno
-  ERRNO_TO_EXCEPTION = [ ]
+  # ERRNO_TO_EXCEPTION = [ ]  # initialized in Errno1.rb
 
   # Given a return value from a "system or library" call, raise the
   # appropriate exception if any.  If +err+ is not a small integer, or if
@@ -37,6 +37,10 @@ module Errno
       exc.__message=(m)
     end
     exc
+  end
+
+  def self.__errno_for_class(cls)
+    EXCEPTION_CLS_TO_ERRNO[cls]
   end
 
   def self.raise_errno(errno, additional='')
@@ -87,12 +91,13 @@ module Errno
   # the semantics of rescue clauses, we make the second and subsequent
   # instances of an errno class subclasses of the first instance.
 
-  def self.create_errno_class(errno, name)
+  def self.__create_errno_class(errno, name)
     sklass = ERRNO_TO_EXCEPTION[errno] || SystemCallError
     klass = Class.new(sklass)             # create class
     const_set(name, klass)                # Assign class name
     klass.const_set(:Errno, errno)        # Set class's Errno constant
-    Errno::ERRNO_TO_EXCEPTION[errno] = klass
+    ERRNO_TO_EXCEPTION[errno] = klass
+    EXCEPTION_CLS_TO_ERRNO[klass] = errno
     klass
   end
 
@@ -101,11 +106,11 @@ module Errno
     Exception.__errno_tables[Exception.__cpu_os_kind - 1] # Adjust for smalltalk
   end
 
-  def self.create_all_errno_classes
+  def self.__create_all_errno_classes
     table = self.errno_names
     table.each_with_index do |name, st_errno|
       ruby_errno = st_errno + 1 # adjust from smalltalk indexing
-      self.create_errno_class(ruby_errno, name) unless name.nil?
+      self.__create_errno_class(ruby_errno, name) unless name.nil?
     end
     # Special cases: Some systems spel "EACCESS" as "EACCES", but user code
     # uses the longer name.  Note: Kernel#defined? is not defined during bootstrap,
@@ -113,11 +118,11 @@ module Errno
     if ! table.include?('EACCESS') && table.include?('EACCES')
       const_set('EACCESS', Errno::EACCES)
 # TODO: this is broken during bootstrap
-#      create_errno_class(Errno::EACCES::Errno, 'EACCESS')
+#      __create_errno_class(Errno::EACCES::Errno, 'EACCESS')
     end
   end
 
-  create_all_errno_classes
+  __create_all_errno_classes
 end
 
 # Create Errno specific error messages here

@@ -516,8 +516,9 @@ class PureRubyStringIO < IO
     unless sep_is_nil
       sep_string = Type.coerce_to(a_sep_string, String, :to_str)
     end
-    if !sep_is_nil && sep_string.size == 0
+    if !sep_is_nil && (sep_len = sep_string.size) == 0
       sep_string = "\n\n"
+      sep_len = 2
     end
 
     if @sio_closed_read ; requireReadable ; end
@@ -532,6 +533,7 @@ class PureRubyStringIO < IO
       found = s_string.index(sep_string, s_pos)
       if found
         s_pos = found
+        res_len = s_pos - pstart + sep_len
       else
         s_len = s_string.length
         if s_pos >= s_len
@@ -540,10 +542,11 @@ class PureRubyStringIO < IO
           return nil  # EOF
         end
         s_pos = s_len.__max(s_pos)
+        res_len = s_pos - pstart + 1
       end
-      res = s_string[pstart..s_pos]
+      res = s_string[pstart, res_len]
       if (found)
-        s_pos += sep_string.length
+        s_pos += sep_len
       end
       @sio_pos = s_pos
     end

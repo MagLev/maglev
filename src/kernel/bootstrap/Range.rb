@@ -1,4 +1,6 @@
 class Range
+  FlipFlop = _resolve_smalltalk_global(:RubyFlipFlop) # code in FlipFlop.rb
+
   primitive 'hash'
   primitive 'length', 'size'
 
@@ -204,4 +206,6 @@ class Range
     len = 0 if (len < 0)
     return [beg, len]
   end
+
 end
+Range.__freeze_constants

@@ -11,7 +11,18 @@ module Psych
     UTF16LE = LibPsych::ParserEncodingEnum[:utf_16le]
     UTF16BE = LibPsych::ParserEncodingEnum[:utf_16be]
 
-    def parse(string)
+    def parse(input)
+      # TODO: HACK until we get FFI callbacks working
+      string = case input
+               when String
+                 input
+               when File
+                 input.read
+               else
+                 raise ArgumentError,
+                 "YAML parsing Only supports Strings and (short) Files right now...(#{input.class})"
+               end
+
       # We need to make a stable copy of the ruby string.  If we just pass
       # the string directly as "create_parser_context(string)", then the gc
       # is free to collect the c-data struct when create_parser_context

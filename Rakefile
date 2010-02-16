@@ -35,7 +35,6 @@ task :default => :status
 
 desc "Show status of all stones"
 task :status do
-  ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
   sh "$GEMSTONE/bin/gslist -clv" do |ok, status|
     case status.exitstatus
     when 0, 1

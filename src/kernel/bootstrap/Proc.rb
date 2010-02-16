@@ -260,4 +260,9 @@ class Proc
       # used by smalltalk rubyEval:
       @block.call
     end
+
+    def value(a)
+      # used by smalltalk  Integer>>_rubyTimes...
+      @block.call(a)
+    end
 end

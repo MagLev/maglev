@@ -11,10 +11,12 @@ module MagRp
 
     def raise_error(msg = "")
       puts ("InternalParseError: " << msg)
+      # nil.pause
       raise InternalParseError, "RubyNode invalid new"
     end
     def self.raise_error(msg = "")
       puts ("InternalParseError: " << msg)
+      # nil.pause
       raise InternalParseError, "RubyNode invalid new"
     end
 
@@ -296,6 +298,7 @@ module MagRp
            @exclusive = sym._equal?(:dot3)
            self
          end
+
          def as_cond(aMagRp)
            #  when :dot2 then     # RubyDotNode
            #    label = "flip#{node.hash}"
@@ -309,13 +312,12 @@ module MagRp
      label << self.object_id.to_s 
      env = aMagRp.env
      env[label] = :lvar # label is the only use of anon-Symbol key added to Env
-           if @exclusive  # dot3
-             raise_error # AST has never seen a flip3 yet
-             nil
-           else   # dot2
-             RubyFlipNode.s( @beginNode , @endNode ) # s(:flip2 )
-           end
+           # both dot3 and dot2 get a FlipNode here
+           fn = RubyFlipNode.s( @beginNode , @endNode , @exclusive ) # s(:flip2 )
+           fn.src_offset=( self.src_offset )
+           fn
          end
+
          def inspect
            if @exclusive
              sym = :dot3
@@ -1247,17 +1249,19 @@ module MagRp
      end
 
      class RubyFlipNode
-       def self.s(first, second)
+       def self.s(first, second, excl)
          res = self._new
-         res.init(first, second)
+         res.init(first, second, excl)
        end
-       def init(first, second)
+       def init(first, second, excl)
          @firstNode = first
          @secondNode = second
+         @isDot3 = excl
          self
        end
        def inspect
-         "[:flip2, #{@firstNode.inspect}, #{@secondNode.inspect}]"
+         dots = @isDot3 ? '...' : '..'
+         "[:flip, #{@firstNode.inspect}, #{dots} , #{@secondNode.inspect} ]"
        end
      end
 

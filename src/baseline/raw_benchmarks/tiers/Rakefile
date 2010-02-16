@@ -51,7 +51,7 @@ task :to_web => :setup do
   <head>
     <script type='text/javascript' src='http://www.google.com/jsapi'></script>
     <script type='text/javascript'>
-      google.load('visualization', '1', {packages:['barchart']});
+      google.load('visualization', '1', {packages:['columnchart']});
       google.setOnLoadCallback(drawChart);
       function drawChart() {
 
@@ -109,11 +109,11 @@ task :to_web => :setup do
             if NORMALIZE == "time"
               subtitle = "Elapsed time in seconds * 1000 (Shorter bars are better)"
             else
-              subtitle = "Performance relative to #{BASELINE} (Longer bars are better)"
+              subtitle = "Times faster than #{BASELINE} (Longer bars are better)"
             end
             htmlfile.puts <<-BFOOT
-        var chart = new google.visualization.BarChart(document.getElementById('chart_div#{group}'));
-        chart.draw(data#{group}, {height: 400, width: 800, showCategories: false, legend: 'left', is3D: true, legendFontSize: 14, tooltipFontSize: 18, title: '#{benchname}', titleX: '#{subtitle}' });
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div#{group}'));
+        chart.draw(data#{group}, {height: 500, width: 1000, showCategories: false, legend: 'right', is3D: true, tooltipFontSize: 18, title: '#{benchname}', titleX: '#{subtitle}' });
             BFOOT
             htmlfile.puts
             needs_header = true

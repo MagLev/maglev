@@ -113,7 +113,12 @@ module Psych
   #
   # See Psych::Nodes for more information about YAML AST.
   def self.parse yaml
-    yaml_ast(yaml).children.first.children.first
+    # Begin GemStone
+    # yaml_ast(yaml).children.first.children.first
+    raise TypeError, "instance of IO needed" if yaml.nil?
+    kids = yaml_ast(yaml).children
+    kids.empty? ? false : kids.first.children.first
+    # End GemStone
   end
 
   ###

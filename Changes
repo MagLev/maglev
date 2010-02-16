@@ -1,13 +1,15 @@
 = MagLev Change Log
 
 == Unreleased changes
+* Fix Trac 665 
+* Impement  ENV.delete
 
-
-== Changes for 22853  2010-02-09
+== Changes for 22873  2010-02-15
 
 * Switch from RbYaml to libyaml + Psych
-* Fix Trac 664
 * Added Enumerable#each_slice (but no Enumerator support).
+* Fix Trac 664, 610
+* Fix Trac 483, 473, 457, 422 (fixed by a previous release)
 
 == Changes for 22816  2010-02-02
 

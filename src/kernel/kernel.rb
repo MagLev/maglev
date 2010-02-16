@@ -68,6 +68,7 @@ RUBY.require 'kernel/bootstrap/String.rb'
 RUBY.require 'kernel/bootstrap/Symbol.rb'
 RUBY.require 'kernel/bootstrap/Regexp.rb'
 RUBY.require 'kernel/bootstrap/MatchData.rb'
+RUBY.require 'kernel/bootstrap/Errno1.rb'
 RUBY.require 'kernel/bootstrap/Exception.rb'
 # Globals2 deleted
 RUBY.require 'kernel/bootstrap/Env.rb'
@@ -78,6 +79,7 @@ RUBY.require 'kernel/bootstrap/IO.rb'
 RUBY.require 'kernel/bootstrap/File.rb'
 RUBY.require 'kernel/bootstrap/IO2.rb'
 RUBY.require 'kernel/bootstrap/Range.rb'
+RUBY.require 'kernel/bootstrap/FlipFlop.rb'
 RUBY.require 'kernel/bootstrap/RecursionGuard.rb'
 RUBY.require 'kernel/bootstrap/Comparable.rb'
 RUBY.require 'kernel/bootstrap/Time.rb'
@@ -139,10 +141,12 @@ RUBY.require 'kernel/delta/Range.rb'
 RUBY.require 'kernel/delta/Process.rb'
 RUBY.require 'kernel/delta/purerubystringio.rb'
 RUBY.require 'kernel/delta/String.rb'
+RUBY.require 'kernel/delta/ruby_utils.rb'
+
 #
 # the parser loads it's own subset of FFI in env 2 ,
 # the smalltalk script for loading prims, sets MAGLEV_primLoadFFI for env 1 only
-if Maglev::System.session_temp( :MAGLEV_primLoadFFI )  
+if Maglev::System.session_temp( :MAGLEV_primLoadFFI )
   RUBY.require 'kernel/delta/ffi1.rb'
   RUBY.require 'kernel/delta/ffi2.rb'
   RUBY.require 'kernel/delta/ffi3.rb'
