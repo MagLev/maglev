@@ -1,4 +1,5 @@
-# Maps to Smalltalk class UserException.  See Globals.rb
+# Exception is identically Smalltalk class UserException 
+#
 class Exception
     class_primitive 'allocate', 'rubyBasicNew'
     class_primitive '__signal', 'signal:'
@@ -52,8 +53,12 @@ class Exception
     end
 
     # Define this in ruby code so we get the full env1 creation hooks
-    def self.exception(message=nil)
+    def self.exception(message)
       self.new(message)
+    end
+
+    def self.exception
+      self.new
     end
 
     def self.name
@@ -73,10 +78,26 @@ class Exception
       end
     end
 
-    IncludeSmalltalkFrames = false;
+    IncludeSmalltalkFrames = false
 
-    def initialize(message=nil)
+    def initialize(message)
+      # bridge methods for this variant
       self.__st_initialize  # initialize smalltak instvars
+      if message._equal?(nil)
+        message = self.class.name
+      end
+      @messageText = message
+    end
+
+    def initialize
+      self.__st_initialize  # initialize smalltak instvars
+      @messageText = self.class.name
+    end
+
+    def initialize(*args)
+      if args.length >= 1
+        message = args[0]
+      end
       if message._equal?(nil)
         message = self.class.name
       end
@@ -191,6 +212,30 @@ end
 class SecurityError
 end
 class SystemCallError
+
+  def self.exception(msg)
+    exc = self.allocate
+    exc.__st_initialize
+    n = Errno.__errno_for_class(self)
+    if n._equal?(nil)
+      n = 0
+    end 
+    exc.errno=(n) 
+    exc.__message=(msg)
+    exc
+  end
+
+  def self.exception
+    exc = self.allocate
+    exc.__st_initialize
+    n = Errno.__errno_for_class(self)
+    if n._equal?(nil)
+      n = 0
+    end 
+    exc.errno=(n) 
+    exc
+  end
+
   def self.new(*args)
     if args.length < 1
       raise ArgumentError, 'too few args'
@@ -215,6 +260,7 @@ class SystemCallError
     end
     if exc._equal?(nil)
       exc = self.allocate
+      exc.__st_initialize
       exc.errno=(errnum)
     end
     if msg._equal?(nil)
