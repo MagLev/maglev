@@ -5,6 +5,7 @@ class Env
 
     class_primitive_nobridge '__getenv', '_getenv:'
     class_primitive_nobridge '__putenv', '_putenv:with:'
+    class_primitive_nobridge '__unsetenv', '_unsetenv:'
 
     def self.new
       raise NotImplementedError
@@ -35,15 +36,28 @@ class Env
       v
     end
 
-    def []=(key, val)
+    def _update_ok(key)
+      unless key._isString
+        return false
+      end
+      if key.index('GEMSTONE')._equal?(0) ||
+         (key.index('MAGLEV')._equal?(0) and key != 'MAGLEV_OPTS')
+        return false
+      end
+      return true
+    end
+     
+
+    def __check_update(key)
       if key._isString
-        if key.index('GEMSTONE')._equal?(0)
-          raise 'you may not change GEMSTONE* environment variables from within maglev'
-        end
-        if key.index('MAGLEV')._equal?(0) and key != 'MAGLEV_OPTS'
-          raise 'you may not change MAGLEV* environment variables from within maglev'
+        unless _update_ok(key)
+          raise "you may not change #{key} environment variable from within maglev"
         end
       end
+    end
+
+    def []=(key, val)
+      self.__check_update(key)
       if val._equal?(nil)
         val = ""
       end
@@ -59,16 +73,31 @@ class Env
       raise NotImplementedError
     end
 
-    def delete(aKey, &aBlock)
-      # can't delete from C environment, can only []=(aKey,'')
-      raise NotImplementedError
+    def delete(key, &block)
+      self.__check_update(key)
+      v = self.__delete(key)
+      if v._not_equal?(RemoteNil)
+        Env.__unsetenv(key)
+        return v
+      elsif block_given?
+        return block.call(key)
+      else
+        return nil
+      end
     end
-    def delete(aKey)
-      raise NotImplementedError
-    end
+
     def delete_if(&block)
-       raise NotImplementedError
+      self.each_pair { | key , v |
+         if block.call(key, v) && self._update_ok(key)
+           v = self.__delete(key)
+           if v._not_equal?(RemoteNil)
+             Env.__unsetenv(key)
+           end
+         end
+      } 
+      self
     end
+
     def merge(aHash)
       raise NotImplementedError
     end
