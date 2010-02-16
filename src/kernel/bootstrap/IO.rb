@@ -18,19 +18,23 @@ class IO
 
   def each_byte(&block)
     if block_given?
-      while true
+      while not eof?
         buf = self.read(4096)
-        len = buf.size
-        if len._equal?(0)
-          return
+        if buf._equal?(nil)
+          return self
         end
-        n = 0
-        while n < len
-          block.call( buf[n] )
-          n += 1
+	len = buf.size
+	if len._equal?(0)
+	  return self
+	end
+	n = 0
+	while n < len
+	  block.call( buf[n] )
+	  n += 1
         end
       end
     end
+    self
   end
 
   def each_line(sep=$/, &block)
@@ -85,7 +89,7 @@ class IO
 
   alias to_i fileno
 
-  def self.for_fd(fd_int, modestring)
+  def self.for_fd(fd_int, modestring=nil)
     raise NotImplementedError , 'IO.for_fd not supported yet'
   end
 
