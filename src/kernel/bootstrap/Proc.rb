@@ -49,6 +49,11 @@ class ExecBlock
       self.call(*args)
     end
 
+    def __fficallback(*args)
+      # execution of an ExecBlock by an FFI callback invokes this method
+      self.call(*args)
+    end
+
     def arity
       na = self.__num_args 
       if na._equal?(0)
@@ -172,6 +177,11 @@ class Proc
     end
 
     def [](*args)
+      @block.call(*args)
+    end
+
+    def __fficallback(*args)
+      # execution of a Proc by an FFI callback invokes this method
       @block.call(*args)
     end
 
