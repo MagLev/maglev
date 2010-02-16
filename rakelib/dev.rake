@@ -64,7 +64,7 @@ namespace :dev do
 
   desc "Run persistence tests on stone per STONENAME env var"
   task :'p-tests-STONENAME' do
-    run_ptests(nil)  
+    run_ptests(nil)
   end
 
   def run_ptests(stone_name=nil)
@@ -164,5 +164,20 @@ GemStoneInstallation.current.stones.each do |stone_name|
     ].each do |action, desc|
       task_gemstone(stone, action, " [DEV] #{desc}")
     end
+  end
+end
+
+desc "Kill (with prejudice) the named stone"
+task :kill, :stone do |t, args|
+  stone = args.stone || 'maglev'
+  stones = `$GEMSTONE/bin/gslist -clv`
+  puts stones
+  pids = stones.grep(/(Stone|cache)\s+#{stone}/) { |l| l.split[3] }
+  if pids.empty?
+    puts "Nothing to kill for #{stone}"
+  else
+    pids = pids.join(" ")
+    puts "Killing #{stone}: #{pids}"
+    sh "kill #{pids}"
   end
 end
