@@ -1,7 +1,8 @@
 = MagLev Change Log
 
 == Unreleased changes
-
+* Fix Trac 665 
+* Impement  ENV.delete
 
 == Changes for 22873  2010-02-15
 
