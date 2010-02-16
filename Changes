@@ -3,7 +3,7 @@
 == Unreleased changes
 
 
-== Changes for 22872  2010-02-12
+== Changes for 22873  2010-02-15
 
 * Switch from RbYaml to libyaml + Psych
 * Added Enumerable#each_slice (but no Enumerator support).
