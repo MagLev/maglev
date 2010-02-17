@@ -5,3 +5,9 @@
 This example shows how to add an index onto an unordered collection of
 data.  The index will allow fast search / retrieval of objects based on the
 values of their attributes.
+
+Most of the code in the lib directory is to generate somewhat interesting
+random names, addresses and people.  The Person class is pretty simple, and
+is just to provide fodder for indexing.
+
+

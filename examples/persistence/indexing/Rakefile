@@ -1,3 +1,5 @@
+require 'rake/testtask'
+
 task :default => :index
 
 desc "Demo of using unordered collections with indexes."
@@ -5,7 +7,7 @@ task :index do
   sh "maglev-ruby unordered_collection.rb"
 end
 
-desc "Run the tests"
-task :test do
-  sh %{ maglev-ruby -Ilib test/names_test.rb }
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/*_test.rb']
 end
+
