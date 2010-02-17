@@ -2,6 +2,7 @@
 # Person can generate random people.
 
 require 'names'
+require 'address'
 
 class Person
   MARITAL_STATUS = [:single, :married, :hermit]

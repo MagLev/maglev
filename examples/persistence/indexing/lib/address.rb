@@ -10,7 +10,7 @@ class Address
   CITIES = ['Portland', 'AnyTown', 'Roseville', 'Santa Cruz', 'Bellingham',
     'Fort Collins', 'Berkeley', 'Yuma', 'Tuscon', 'Vermillion', 'St. Louis']
   STATES = ['AZ', 'CA', 'CO', 'MO', 'WA', 'OR', 'SD']
-  ZIPS = [01234, 12345, 23456, 34567, 45678]
+  ZIPS = [12345, 23456, 34567, 45678, 56789, 67890]
 
   attr_reader :street, :city, :state, :zip
 
