@@ -43,6 +43,7 @@ class Dir
   end
 
   def self.delete(dirname)
+    dirname = Type.coerce_to(dirname, String, :to_str)
     Errno.handle(__rmdir(dirname), "delete #{dirname}")
   end
 
@@ -108,10 +109,12 @@ class Dir
   end
 
   def self.rmdir(dirname)
+    dirname = Type.coerce_to(dirname, String, :to_str)
     Errno.handle(__rmdir(dirname), "rmdir #{dirname}")
   end
 
   def self.unlink(dirname)
+    dirname = Type.coerce_to(dirname, String, :to_str)
     Errno.handle(__rmdir(dirname), "unlink #{dirname}")
   end
 

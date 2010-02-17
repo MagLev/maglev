@@ -27,8 +27,10 @@ module Kernel
     true
   end
 
-  def abort(string)
-    puts string
+  def abort(string=nil)
+    unless string._equal?(nil)
+      $stderr.write("#{string}\n")
+    end
     exit(1)
   end
 

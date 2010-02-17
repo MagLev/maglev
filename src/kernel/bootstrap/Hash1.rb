@@ -13,3 +13,8 @@ class IdentityHash  < Hash
 end
 IdentityHash.__freeze_constants
 
+class Env  # created in smalltalk as RubyEnv
+  RemoteNil = _resolve_smalltalk_global(:_remoteNil)
+end
+Env.__freeze_constants
+

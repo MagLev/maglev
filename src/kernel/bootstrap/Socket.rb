@@ -6,6 +6,11 @@ class Socket # [
   # OS dependent constants initialized by smalltalk code
   #  in Socket>>_initTransientSocketConstants , called from RubyContext>>initTransient .
 
+  # All of the socket constants go into two places: (A) as constants in
+  # Socket and (B) as constants in Socket::Constants.
+  module Constants
+  end
+
   primitive '__active?', 'isActive'
 
   # accept implemented only in TCPServer .
@@ -15,12 +20,12 @@ class Socket # [
   primitive '__close', 'close'
 
   def close
-    if self.__active? 
+    if self.__active?
       self.__close
     else
       raise IOError, 'already closed'
     end
-    nil 
+    nil
   end
 
   primitive '__clear_buffer', '_clearReadBuffer'
@@ -93,7 +98,7 @@ class Socket # [
   end
 
   def self.getaddrinfo(host, service, family = 0, socktype = 0,
-      		       protocol = 0, flags = 0)
+                 protocol = 0, flags = 0)
     unless host._equal?(nil)
       host = Type.coerce_to(host, String, :to_s)
     end
@@ -193,14 +198,14 @@ class Socket # [
 
   # read exactly length bytes from the socket.
   # If a Ruby Socket is non-blocking , read will raise EAGAIN
-  # if no data is available.  
+  # if no data is available.
   # If a Ruby Socket is blocking, read will wait for specified number
   # of bytes to be received, allowing other Ruby Threads to run.
   def read(length)
     buf = String.__new(length)
     __read_into(length, buf, length)
   end
-  
+
   primitive '__read_into', 'read:into:minLength:' # raises EOFError on socket eof
 
   # def recv(length) ; end #  receive up to length bytes from the socket.
@@ -315,7 +320,7 @@ class Socket # [
 
   # Read up to 4096 bytes from the socket
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
-  # if no data is available.  
+  # if no data is available.
   def sysread
     str = self.recv(4096)
     if str._equal?(nil)
@@ -327,9 +332,9 @@ class Socket # [
   # If length is nil, read available data from socket
   # else read up to length bytes from socket .
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
-  # if no data is available.  
+  # if no data is available.
   def sysread(length)
-    if length._equal?(nil)  
+    if length._equal?(nil)
       len = 4096
     else
       len = Type.coerce_to(length, Fixnum, :to_int)
@@ -344,7 +349,7 @@ class Socket # [
 
   # Read up to length bytes from the socket into the specified buffer.
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
-  # if no data is available.  
+  # if no data is available.
   def sysread(length, a_buffer)
     if length._equal?(nil)
       len = 1500
