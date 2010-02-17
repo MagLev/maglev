@@ -1,6 +1,13 @@
-task :default => :index
+
+task :default => :demo
 
 desc "Demo of using unordered collections with indexes."
-task :index do
-  sh "maglev-ruby unordered_collection.rb"
+task :demo do
+  sh %{ maglev-ruby -Ilib index_example.rb }
 end
+
+desc "Run the tests"
+task :test do
+  sh %{ $MAGLEV_HOME/bin/testrb -Ilib #{FileList['test/*_test.rb']} }
+end
+
