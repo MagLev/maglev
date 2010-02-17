@@ -27,4 +27,8 @@ tcp_server = TCPServer.open('localhost', '7654')
 test(tcp_server.nil?, false, 'Port numbers as strings')
 tcp_server.close
 
+# Ensure that Socket::Constants is defined and has values
+test(Socket.const_defined?("Constants"), true, "Socket::Constants is defined")
+test(Socket::Constants.constants.size > 10, true, "Socket::Constants has many constants")
+
 report
