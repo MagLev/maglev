@@ -70,17 +70,16 @@ module Zlib
     MAGIC2         = 0x8b
     METHOD_DEFLATE = 8
 
-    # TODO uncomment after we understand use cases
-    # def self.wrap(*args, &block)
-    #  obj = new(*args)
-    #  if block_given? then
-    #    begin
-    #      yield obj
-    #    ensure
-    #      obj.close if obj.zstream.ready?
-    #    end
-    #  end
-    # end
+    def self.wrap(io, &block)
+      obj = self.new(io)
+      if block_given? then
+        begin
+          yield obj
+        ensure
+          obj.close 
+        end
+      end
+    end
 
     # TODO: protect against multiple calls to close, or a close after a finish
     def close
@@ -90,7 +89,7 @@ module Zlib
     end
 
     def closed?
-      @io.equal?(nil)
+      @io._equal?(nil)
     end
 
     def comment
@@ -130,13 +129,29 @@ module Zlib
       @comment = arr[1]
       @mtime = arr[2]
     end
+   
+    def rewind 
+      @zstream.close
+      @io.rewind
+      @zstream = ZStream.open_read(@io, Error)
+      arr = @zstream.read_header()
+      @orig_name = arr[0]
+      @comment = arr[1]
+      @mtime = arr[2]
+      0
+    end
 
     def eof?
       @zstream.at_eof
     end
 
     def pos
-      @zstream.total_out()
+      sio = @contents_sio
+      if sio._not_equal?(nil)
+        sio.pos
+      else
+        @zstream.total_out()
+      end
     end
 
     def read(length = nil)
@@ -159,9 +174,55 @@ module Zlib
       io
     end
 
+    def each_byte(&block)
+      sio = self.__contents_sio
+      sio.each_byte(&block)
+      self
+    end
+
+    def __contents_sio
+      sio = @contents_sio
+      if sio._equal?(nil)
+        str = String.new
+        while not eof?
+	  buf = self.read(4096)
+	  if buf._equal?(nil)
+            return str
+          end
+          str << buf
+        end
+        sio = PureRubyStringIO.open(str)
+        @contents_sio = sio
+      end
+      sio
+    end
+  
+    def each_line(sep=$/, &block)
+      sio = self.__contents_sio
+      sio.each_line(sep, &block)
+    end
+
+    alias each each_line
+
+    def getc
+      sio = self.__contents_sio
+      sio.getc
+    end
+
+    def gets(sep_string=nil)
+      sio = self.__contents_sio
+      if sep_string._equal?(nil)
+        sio.__gets( $/ , 0x41)  # called via bridge meth
+      else
+        sio.__gets(sep_string, 0x31)
+      end
+    end
+
   end # }
 
   class GzipWriter < GzipFile  # {
+
+    GzfError = GzipFile::Error 
 
     ##
     # Creates a GzipWriter object associated with +io+. +level+ and +strategy+
@@ -183,29 +244,30 @@ module Zlib
 
     def comment=(v)
       # Set the comment
-      unless @zstream.equal?(nil) then
-        raise Error, 'header is already written' # Error resolves to GzipFile::Error
+      unless @zstream._equal?(nil) then
+        raise GzfError, 'header is already written' # Error resolves to GzipFile::Error
       end
       @comment = v
     end
 
     def mtime=(time)
-      unless @zstream.equal?(nil) then
-        raise Error, 'header is already written' # Error resolves to GzipFile::Error
+      unless @zstream._equal?(nil) then
+        raise GzfError, 'header is already written' # Error resolves to GzipFile::Error
       end
-      @mtime = Integer(time)
+      t = Integer(time)
+      @mtime = t 
     end
 
     def orig_name=(v)
       # Set the original name
-      unless @zstream.equal?(nil) then
-        raise Error, 'header is already written' # Error resolves to GzipFile::Error
+      unless @zstream._equal?(nil) then
+        raise GzfError, 'header is already written' # Error resolves to GzipFile::Error
       end
       @orig_name = v
     end
 
-    def _validate_string(obj)
-      unless obj.equal?(nil)
+    def __validate_string(obj)
+      unless obj._equal?(nil)
         unless obj._isString
           raise ArgumentError, 'argument must be a String'
         end
@@ -213,8 +275,8 @@ module Zlib
     end
 
     def write_header
-      _validate_string(@orig_name)
-      _validate_string(@comment)
+      __validate_string(@orig_name)
+      __validate_string(@comment)
       lev = @level
       if (lev < Z_DEFAULT_COMPRESSION || lev > Z_BEST_COMPRESSION)
         raise ArgumentError, 'compression level out of range'
@@ -230,7 +292,7 @@ module Zlib
 
     def write(data)
       strm = @zstream
-      if strm.equal?(nil)
+      if strm._equal?(nil)
         write_header
         strm = @zstream
       end
@@ -259,13 +321,19 @@ module Zlib
     alias << write
 
     def finish
-      bs = @bufsize
       strm = @zstream
+      if strm._equal?(nil)
+        write_header
+        strm = @zstream
+      end 
+      bs = @bufsize
       if bs > 0
         strm.write(@buffer, bs)
         @bufsize = 0
       end
-      strm.flush  # writes footer
+      if strm._not_equal?(nil)
+        strm.flush  # writes footer
+      end
       @zstream = nil
       io = @io
       @io = nil
@@ -290,11 +358,43 @@ module Zlib
 
     def inflate(string)
       __open(false, StringIO.new(string), Error, Z_DEFAULT_COMPRESSION) # Error resolves to Zlib::Error
+      self.flush_next_out
+    end
+
+    def <<(string)
+      io = @ioObj
+      if io._equal?(nil)
+        __open(false, StringIO.new(string), Error, Z_DEFAULT_COMPRESSION)
+      else
+        @ioObj << string
+      end
+    end
+
+    def flush_next_out
       buf = ''
-      while ! at_eof
+      while ! at_eof 
         buf << read(2048)
       end
       buf
+    end
+
+    def finish
+      flush_next_out
+    end
+
+    def close
+      unless @isClosed
+        @isClosed = true
+        super()
+      end
+    end 
+
+    def closed?
+      @isClosed 
+    end
+    
+    def finished?
+      at_eof
     end
   end
 
