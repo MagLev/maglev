@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+== Unreleased changes
+
+* Add Symbol#to_proc
+
 == Changes for 22891  2010-02-18
 
 * Fix Trac 662, 663, 665, 666
