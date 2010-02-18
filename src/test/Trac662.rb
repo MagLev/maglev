@@ -17,6 +17,7 @@ def render(scope, &block)
 end
 
 scope = C.new
-render(scope) { 12 }
-p scope.foo
-
+render(scope) { 438 }
+fx = scope.foo 
+unless fx == '438' ; raise 'error'; end
+true
