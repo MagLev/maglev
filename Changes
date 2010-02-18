@@ -1,11 +1,13 @@
 = MagLev Change Log
 
-== Unreleased changes
-* Fix Trac 665 
+== Changes for 22891  2010-02-18
+
+* Fix Trac 662, 663, 665, 666
 * Impement  ENV.delete
 * Indexing is fixed: clean up and turn on examples/persistence/indexing
 * Add Socket::Constants
-* Fix Trac 666
+* Major underlying changes to AIO in GemStone -- replaces the use of 
+  POSIX asynchronous IO with our own thread-based IO system for writing tranlogs
 
 == Changes for 22873  2010-02-15
 

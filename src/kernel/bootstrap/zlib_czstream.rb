@@ -16,9 +16,6 @@ class CZstream
 
     primitive_nobridge '__open', 'open:io:errorClass:comprLevel:'
 
-    # Finishes the stream and flushes output buffer.
-    def finish
-    end
 end
 
 module Zlib
