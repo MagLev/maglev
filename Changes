@@ -3,6 +3,9 @@
 == Unreleased changes
 * Fix Trac 665 
 * Impement  ENV.delete
+* Indexing is fixed: clean up and turn on examples/persistence/indexing
+* Add Socket::Constants
+* Fix Trac 666
 
 == Changes for 22873  2010-02-15
 

@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+# Generates random names for a given gender
+require 'utils'
+
 class RandomNameGenerator
 
   # Top 100 female names in SSN db for birth year 1962 (most popular to least popular)

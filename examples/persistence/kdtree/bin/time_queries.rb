@@ -20,14 +20,13 @@ def time_queries(a_tree)
   tms = Benchmark.measure do
     num_queries.times { a_tree.nearest_k(Collections::Point2D.random(:random), k) }
   end
+  per_query_tms = tms / num_queries
 
-  times = [tms.utime, tms.stime, tms.total, tms.real]
-  per_query_times = times.map {|el| el / num_queries }
   puts
   puts "#{num_queries} queries for #{k} nearest nodes"
   puts "               #{Benchmark::Tms::CAPTION}"
-  puts "Time:          %10.6f %10.6f %10.6f (%10.6f)\n" % times
-  puts "Per Query:     %10.6f %10.6f %10.6f (%10.6f)\n" % per_query_times
+  puts "Time:          #{tms.format}"
+  puts "Per Query:     #{per_query_tms.format}"
 
   fmt = count.to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
   puts "\nTree has #{fmt} nodes"
