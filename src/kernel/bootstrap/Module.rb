@@ -121,74 +121,47 @@ class Module
     self.singleton_method_removed(a_symbol)
   end
 
-  def module_eval(__lex_path, str, file, *args)
-    # __lex_path arg is synthesized by the parser in calling code
-    __stub_warn("Behavior#module_eval: ignoring file and line numbers")
-    if args.size > 1 
+  def module_eval(*args, &block_arg)
+    #   should always come here via a bridge method , thus 0x3N for vcgl ...
+    nargs = args.size
+    if nargs > 5
       raise ArgumentError, 'too many args'
     end
+    blk = args[0]  # implicit_block synthesized by AST to IR code in .mcz
+    if blk._equal?(false)
+      blk = block_arg
+      if blk._not_equal?(nil)
+        if nargs > 2
+          raise ArgumentError, 'module_eval: both block and normal args given'
+        end
+        return __module_eval(nil, blk)
+      end
+    end
+    if nargs < 3
+      raise ArgumentError, 'too few args, send of :eval not supported'
+    end
+    lex_path = args[1]        # synthesized by AST to IR code in .mcz
+    str = args[2]
+    # file=args[4] # TODO
+    # line=args[5] # TODO
     string = Type.coerce_to(str, String, :to_str)
-    ctx = self.__binding_ctx(0)
-    bnd = Binding.new(ctx, self, nil)
-    bnd.__set_lex_scope(__lex_path)
-    vcgl = [ self.__getRubyVcGlobal(0x20) ,
-             self.__getRubyVcGlobal(0x21) ]
-    blk = bnd.block
-    unless blk._equal?(nil)
-      vcgl << blk
+    ctx = self.__binding_ctx(1)
+    bnd = Binding.new(ctx, self, blk)
+    bnd.__set_lex_scope(lex_path)
+    vcgl = [ self.__getRubyVcGlobal(0x30) ,
+             self.__getRubyVcGlobal(0x31) ]
+    bblk = bnd.block
+    unless bblk._equal?(nil)
+      vcgl << bblk
     end
     res = __module_eval_string(string, vcgl, bnd )
-    vcgl[0].__storeRubyVcGlobal(0x20)
-    vcgl[1].__storeRubyVcGlobal(0x21)
+    vcgl[0].__storeRubyVcGlobal(0x30)
+    vcgl[1].__storeRubyVcGlobal(0x31)
     res
   end
 
-  def module_eval(__lex_path, str, file)
-    # __lex_path arg is synthesized by the parser in calling code
-    __stub_warn("Behavior#module_eval: ignoring file and line numbers")
-    string = Type.coerce_to(str, String, :to_str)
-    ctx = self.__binding_ctx(0)
-    bnd = Binding.new(ctx, self, nil)
-    bnd.__set_lex_scope(__lex_path)
-    vcgl = [ self.__getRubyVcGlobal(0x20) ,
-             self.__getRubyVcGlobal(0x21) ]
-    blk = bnd.block
-    unless blk._equal?(nil)
-      vcgl << blk
-    end
-    res = __module_eval_string(string, vcgl, bnd )
-    vcgl[0].__storeRubyVcGlobal(0x20)
-    vcgl[1].__storeRubyVcGlobal(0x21)
-    res
-  end
-
-  def module_eval(__lex_path, str)
-    # __lex_path arg is synthesized by the parser in calling code
-    string = Type.coerce_to(str, String, :to_str)
-    ctx = self.__binding_ctx(0)
-    bnd = Binding.new(ctx, self, nil)
-    bnd.__set_lex_scope(__lex_path)
-    vcgl = [ self.__getRubyVcGlobal(0x20) ,
-             self.__getRubyVcGlobal(0x21) ]
-    blk = bnd.block
-    unless blk._equal?(nil)
-      vcgl << blk
-    end
-    res = __module_eval_string(string, vcgl, bnd )
-    vcgl[0].__storeRubyVcGlobal(0x20)
-    vcgl[1].__storeRubyVcGlobal(0x21)
-    res
-  end
-
-  def module_eval(str) 
-    # could be sent via  __send__ or send, but not supported yet 
-    # You must code evals explicitly.
-    raise ArgumentError, 'too few args, send of :eval not supported'
-  end 
-
-  primitive_nobridge_env 'module_eval&', '_moduleEval', ':block:'
-    # __lex_path arg synthesized by the parser in calling code, 
-    #   and ignored becuse there is no source string to compile
+  primitive_nobridge_env '__module_eval', '_moduleEval', ':block:'
+    # lex_path ignored, there is no source string to compile
     # no VcGlobal logic here, the block uses $~ of it's home context
 
   alias class_eval module_eval
