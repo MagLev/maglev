@@ -16,18 +16,18 @@ module Kernel
     raise ArgumentError, 'too few args, send of :binding not supported'
   end
 
-  def binding(__lex_path)
-    # __lex_path arg is synthesized by the parser.
+  def binding(lex_path)
+    # lex_path arg is synthesized by the parser.
     bnd = Binding.new( self.__binding_ctx(0), self , nil)
-    bnd.__set_lex_scope(__lex_path)
+    bnd.__set_lex_scope(lex_path)
     bnd 
   end
 
-  def binding(__lex_path, &blk)
-    # __lex_path arg is synthesized by the parser.
+  def binding(lex_path, &blk)
+    # lex_path arg is synthesized by the parser.
     # usually the block argument is synthesized by the parser.
     bnd = Binding.new( self.__binding_ctx(0), self , blk)
-    bnd.__set_lex_scope(__lex_path)
+    bnd.__set_lex_scope(lex_path)
     bnd 
   end
 
