@@ -7,7 +7,7 @@
 == Changes for 22891  2010-02-18
 
 * Fix Trac 662, 663, 665, 666
-* Impement  ENV.delete
+* Implement  ENV.delete
 * Indexing is fixed: clean up and turn on examples/persistence/indexing
 * Add Socket::Constants
 * Major underlying changes to AIO in GemStone -- replaces the use of 
