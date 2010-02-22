@@ -6,7 +6,7 @@
 #    You cannot code  'class Symbol < Object' in this file
 #    because Object would not match the Smalltalk superclass.
 #    In environments >= 1, at the end of bootstrapping,
-#    the superclass of Symbol is changed to be Object by use 
+#    the superclass of Symbol is changed to be Object by use
 #    of RubyContext>>_fixSymbolSuperclass:  in the .mcz code.
 
 class Symbol
@@ -51,6 +51,10 @@ class Symbol
 
   def taint
     self # do nothing
+  end
+
+  def to_proc
+    Proc.new { |*args| args.shift.__send__(self, *args) }
   end
 
 end

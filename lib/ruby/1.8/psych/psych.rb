@@ -109,7 +109,7 @@ module Psych
   #
   # Example:
   #
-  #   Psych.load("---\n - a\n - b") # => #<Psych::Nodes::Sequence:0x00>
+  #   Psych.parse("---\n - a\n - b") # => #<Psych::Nodes::Sequence:0x00>
   #
   # See Psych::Nodes for more information about YAML AST.
   def self.parse yaml
@@ -127,7 +127,7 @@ module Psych
   #
   # Example:
   #
-  #   Psych.load("---\n - a\n - b") # => #<Psych::Nodes::Stream:0x00>
+  #   Psych.yaml_ast("---\n - a\n - b") # => #<Psych::Nodes::Stream:0x00>
   #
   # See Psych::Nodes for more information about YAML AST.
   def self.yaml_ast yaml
@@ -144,6 +144,14 @@ module Psych
   #   Psych.dump(['a', 'b'])  # => "---\n- a\n- b\n"
   def self.dump o, options = {}
     visitor = Psych::Visitors::YAMLTree.new options
+    visitor.accept o
+    visitor.tree.to_yaml
+  end
+
+  ###
+  # Dump Ruby object +o+ to a JSON string.
+  def self.to_json o
+    visitor = Psych::Visitors::JSONTree.new(:json => true)
     visitor.accept o
     visitor.tree.to_yaml
   end
