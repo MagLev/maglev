@@ -2,12 +2,13 @@
 
 == Unreleased changes
 
+* Merged latest updates of psych into MagLev
 * Add Symbol#to_proc
 
 == Changes for 22891  2010-02-18
 
 * Switch from RbYaml to libyaml + Psych
-* Fix Trac 610, 662, 663, 664, 665, 666
+* Fix Trac 610, 640, 662, 663, 664, 665, 666
 * Fix Trac 483, 473, 457, 422 (fixed by a previous release)
 * Impement ENV.delete
 * Added Enumerable#each_slice (but no Enumerator support).
