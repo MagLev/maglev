@@ -36,6 +36,9 @@ OPTIONS:
                                   transient mode)
    -S             MagLev will search for the ruby script on the PATH environment
                   variable, unless the script name begins with '/'.
+   -w             Turn on warnings.  Sets $VERBOSE true.
+   -W<d>          Set the warning level to <d>.  <d> is a single digit 0..9.
+                  If set to 0, then no warnings are printed.  Default is 1.
    --             End of MagLev parameters.  The next parameter is the
                   programfile, then any programfile arguments follow.
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
@@ -189,6 +192,7 @@ do
             shift
             ;;
         -v|--verbose)
+            ruby_args="${ruby_args}, '-v'"
             echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             if [ $# -eq 1 ]; then exit; fi
             ;;
@@ -196,10 +200,16 @@ do
             echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             exit
             ;;
-        -w)
-            # -w doesn't do anything at present
-            # but maglev-ruby is invoked with -w by some test apps
-            # warning=1
+        -w) # Sets $VERBOSE true; read from stdin if no script
+            ruby_args="${ruby_args}, '-w'"
+            ;;
+        -W*)
+            if [[ ${1:2} =~ ^[0-9]$ ]]; then
+                ruby_args="${ruby_args}, '$1'"
+            else
+                echo "Bad parameter for -W: should be single digit"
+                exit 1
+            fi
             ;;
         --)
             break
