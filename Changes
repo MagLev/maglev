@@ -2,6 +2,9 @@
 
 == Unreleased changes
 
+* in FFI implement callback , implement C float args .
+* parser warnings  now controlled by -W, -w, -VERBOSE flags ,
+  but are always printed of a SyntaxError occurs.
 * Merged latest updates of psych into MagLev
 * Add Symbol#to_proc
 
@@ -10,7 +13,7 @@
 * Switch from RbYaml to libyaml + Psych
 * Fix Trac 610, 640, 662, 663, 664, 665, 666
 * Fix Trac 483, 473, 457, 422 (fixed by a previous release)
-* Impement ENV.delete
+* Implement ENV.delete
 * Added Enumerable#each_slice (but no Enumerator support).
 * Add Socket::Constants
 * Indexing is fixed: clean up and turn on examples/persistence/indexing
