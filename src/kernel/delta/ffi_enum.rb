@@ -92,7 +92,23 @@ module FFI
   end
 
     class Enums
-      # def initialize ; end #  in ffi.rb
+      # def initialize ; end #  in ffi2.rb
+
+      class GsMethodDictionary 
+        class_primitive '__new', 'new:'
+        def initialize(*args)
+          raise 'normal instance creation disallowed, must use __new'
+        end
+    
+	def self.from_hash(a_hash)
+	  dict = self.__new(a_hash.size)
+	  a_hash.each { | k,v |
+	    dict.at_put(k, v)
+	  }
+	  dict
+        end
+        primitive 'at_put', 'at:put:' 
+      end
 
       def self.__Transient_Enums
         if defined?($__FFI_Enums_TransientEnums)
@@ -138,6 +154,23 @@ module FFI
           v = Persistent_kv_map[sym]
         end
         v
+      end
+
+      def self.__untagged_enums_asGsMethDict
+        th = self.__Transient_kv_map
+        ph = Persistent_kv_map
+        sz = th.size + ph.size
+        gsmd = nil
+        if (sz > 0) 
+          gsmd = GsMethodDictionary.__new( sz.__divide(2) )
+          ph.each { | k, v |
+            gsmd.at_put(k, v)
+          }
+          th.each { | k, v |
+            gsmd.at_put(k, v)
+          }
+        end
+        return gsmd
       end
 
       def self.__add_named_enum(sym, enum)

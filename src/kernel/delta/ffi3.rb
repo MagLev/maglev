@@ -37,13 +37,20 @@ module FFI
     end
   end
 
-  class CFunction
+  class CCallout
     primitive_nobridge 'call_template*' , '_rubyToCcallTemplate:'
 
     class_primitive_nobridge '__new', '_rubyNew:'
      # arg is [ cLibrary, fName, resType, argTypesArray, varArgsAfter]
 
     primitive_nobridge '__compile_caller', '_compileCaller:In:enums:'
+  end
+
+  class CCallin
+
+    class_primitive_nobridge '__new', '_rubyNew:'
+    # arg is [ fName, resType, argTypesArray ]
+
   end
 
   class CByteArray # [
@@ -70,8 +77,12 @@ module FFI
     primitive_nobridge 'get_ulong', 'uint64At:'
     primitive_nobridge 'get_ulong_long', 'uint64At:'
     primitive_nobridge 'double_at', 'doubleAt:'
+    primitive_nobridge 'float_at', 'floatAt:'
+    primitive_nobridge 'get_float32', 'floatAt:'
+    primitive_nobridge 'get_float', 'floatAt:'
     primitive_nobridge 'get_float64', 'doubleAt:'
     primitive_nobridge 'get_double', 'doubleAt:'
+    primitive_nobridge 'float_put',  'floatAt:put:'
     primitive_nobridge 'double_put', 'doubleAt:put:'
     primitive_nobridge 'put_char', 'int8At:put:'
     primitive_nobridge 'int8_put', 'int8At:put:'
@@ -102,7 +113,7 @@ module FFI
 
     # def __pointer_at_put(byteoffset, pointer) ; end
     #   pointer is a kind of CByteArray or a CPointer, or nil
-    primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'   # yyy
+    primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'  
 
     primitive_nobridge '__set_derived_from' , 'derivedFrom:'
 
@@ -179,11 +190,11 @@ module FFI
     class_primitive_nobridge '__new_from', 'newFrom:'
     class_primitive_nobridge '__new_null', 'newNull'
 
-    def ==(other)
-      unless other._kind_of?(CPointer)
-        return false;
+    def ==(pointer)
+      unless pointer._kind_of?(Pointer) || pointer._kind_of?(CPointer)
+        return false
       end
-      self.address == other.address
+      pointer.address == self.address
     end
 
     def null?
@@ -245,7 +256,7 @@ module FFI
       __install_native_type( Type.new( :TYPE_UINT32, 4 , :uint32))
       __install_native_type( Type.new( :TYPE_INT64, 8 , :int64))
       __install_native_type( Type.new( :TYPE_UINT64, 8 , :uint64))
-      # FLOAT32 not supported yet
+      __install_native_type( Type.new( :TYPE_FLOAT32, 4 , :float))
       __install_native_type( Type.new( :TYPE_FLOAT64, 8 , :double))
       __install_native_type( Type.new( :TYPE_VOID, 8 , :void))
       __install_native_type( Type.new( :TYPE_STRING, 8 , :string))
@@ -310,10 +321,12 @@ module FFI
           return t
         elsif t._kind_of?(Enum)
           return t
+        elsif t._kind_of?(CCallin)
+          return t
         elsif t._kind_of?(Type)
           prev = t
         else
-          raise TypeError, 'result of find_type is not a Type, Enum or Symbol'
+          raise TypeError, 'result of find_type is not a Type, Enum , callback, or Symbol'
         end
       end
     end
@@ -382,6 +395,56 @@ module FFI
       CLibrary.__library_names
     end
 
+    # define a callback type
+    #
+    def callback(name_sym, arg_types, return_type) 
+      unless name_sym._isSymbol
+        raise TypeError, 'name of a callback must be a Symbol'
+      end 
+      prev_cb = Type.__find_type(name_sym)
+      if prev_cb._not_equal?(nil)
+        raise ArgumentError, "a callback was already defined with name #{name_sym}"
+      end
+      ffimod = FFI
+      st_argnum = 1
+      base_arg_types = []
+      arg_types.each { |t|
+        if t._equal?(:varargs)
+          raise ArgumentError, ":varargs not supported for callbacks"
+        else
+          bt = ffimod.find_base_type(t)
+          if bt._isSymbol
+            base_arg_types << bt
+          elsif bt._kind_of?(Enum)
+            raise TypeError, "Enum not supported as type of an argument to a callback"
+          elsif bt._kind_of?(CCallin)
+            raise TypeError, "a callback is not supported as an argument to a callback"
+          else
+            raise TypeError, 'unrecognized base argument type #{bt}'
+          end
+          st_argnum += 1
+        end
+      }
+      ret = ffimod.find_base_type(return_type)
+      enum_ret = nil
+      unless ret._isSymbol
+        if ret._kind_of?(Enum)
+          raise TypeError, "use of an Enum as a return type is not supported"
+        elsif ret._kind_of?(CCallin)
+          raise TypeError, "use of a callback as a return type is not supported"
+        else
+          raise TypeError, 'unrecognized base return type #{ret}'
+        end
+      end
+      cb = CCallin.__new([ name_sym, ret, base_arg_types ]) 
+      Type.__add_type( name_sym, cb )
+      return cb
+    end 
+
+    def callback(arg_types, return_type) 
+      raise ArgumentError, 'anonymous callbacks not supported'
+    end
+
     # Attach a C function to this module. The arguments can have two forms:
     #
     #   attach_function c_name, [c_arg1, c_arg2], ret
@@ -412,22 +475,24 @@ module FFI
       ffimod = FFI
       st_argnum = 1
       enum_args = []
-      c_args = []
+      base_arg_types = []
       have_varargs = false
       var_args_after = -1
       args.each { |t|
         if t._equal?(:varargs)
           have_varargs = true
-          var_args_after = c_args.size
+          var_args_after = base_arg_types.size
         elsif have_varargs
           raise TypeError , 'no more args allowed after :varargs'
         else
           bt = ffimod.find_base_type(t)
           if bt._isSymbol
-            c_args << bt
+            base_arg_types << bt
           elsif bt._kind_of?(Enum)
             enum_args << st_argnum ; enum_args << bt
-            c_args << :int64
+            base_arg_types << :int64
+          elsif bt._kind_of?(CCallin)
+            base_arg_types << bt
           else
             raise TypeError, 'unrecognized base argument type #{bt}'
           end
@@ -443,6 +508,8 @@ module FFI
         if ret._kind_of?(Enum)
           enum_ret = ret
           ret = :int64
+        elsif ret._kind_of?(CCallin)
+          raise TypeError, "use of a callback as a return type is not supported"
         else
           raise TypeError, 'unrecognized base return type #{ret}'
         end
@@ -474,7 +541,9 @@ module FFI
           end
         end
         if found
-          cf = CFunction.__new([ lib, cname, ret, c_args, var_args_after ])
+          untagged_enums = Enums::__untagged_enums_asGsMethDict 
+          cf = CCallout.__new([ lib, cname, ret, base_arg_types, var_args_after, untagged_enums ])
+
           # install a method in self, derived from a rubyToCcallTemplate variant,
           #    which will be installed per RubyContext.persistent_mode
           meth = cf.__compile_caller(name, self, [ Enums , enum_args , enum_ret ] )

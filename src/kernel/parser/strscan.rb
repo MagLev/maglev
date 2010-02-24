@@ -19,6 +19,9 @@ class RpStringScanner
   def limit
     @limit
   end
+  def parser
+    @parser
+  end
 
   # def initialize(string) ; end # in strscan2.rb
 

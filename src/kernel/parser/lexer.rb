@@ -21,14 +21,18 @@ class RubyLexer
     @line_num = 1
     @last_else_src_offset = -1
     # @comments  not used, this parser not for use to implement RDoc
-    @mydebug = MagRp::debug > 1
     reset
     # @keyword_table installed by _install_wordlist from RubyParser
   end
 
-  def _install_wordlist(hash)
+  def _install_wordlist(hash, debug_level)
     # called from RubyParser#initialize
     @keyword_table = hash
+    if debug_level._equal?(nil)
+      @mydebug = false
+    else
+      @mydebug = debug_level > 1
+    end
   end
 
   def reset
@@ -41,13 +45,14 @@ class RubyLexer
   end
 
   def install_source( src)
+    the_parser = @parser
     unless src._isString
-      raise "bad src: #{src.inspect}" 
+      the_parser.internal_error("bad src: #{src.inspect}")
     end
-    sc = RpStringScanner.new(src)
+    sc = RpStringScanner.new(src, the_parser)
     @src_scanner = sc
     @src_regions = [ ]  # stack for handling heredoc
-    ev = @parser.env
+    ev = the_parser.env
     ev.scanner=( sc )
     ev.reset
   end
@@ -89,7 +94,7 @@ class RubyLexer
     elsif v == Expr_class
       'Expr_class'
     else
-      raise 'invalid lexer state'
+      @parser.internal_error( 'invalid lexer state')
       nil
     end
   end
@@ -141,7 +146,7 @@ class RubyLexer
       regions = @src_regions
       rofs = regions.size - 1
       if rofs < 0
-        raise_error('src_regions underflow at end of heredoc')
+        @parser.internal_error('src_regions underflow at end of heredoc')
       end
       # top of regions stack is remainder of the line containing heredoc start ident
       # resume lexing that region
@@ -317,7 +322,7 @@ class RubyLexer
     if v._isFixnum && v >= 0 && v <= Expr_class
       @lex_state = v
     else
-      raise "lex_state= , invalid arg"
+      @parser.internal_error( "lex_state= , invalid arg")
     end
   end
 
@@ -558,7 +563,7 @@ class RubyLexer
 
   def rb_compile_error msg
     msg += ". near line #{@line_num}: #{@src_scanner.rest[/^.*/].inspect}"
-    raise SyntaxError, msg
+    @parser.syntax_error(msg)
   end
 
   def read_escape      # [
@@ -812,7 +817,7 @@ class RubyLexer
   end
 
   def warning(str)
-    puts str
+    @parser.warning(str)
   end
 
   ##
@@ -1394,7 +1399,7 @@ class RubyLexer
               if c2 then
                 warning("invalid character syntax; use ?\\" + c2)
               else
-                raise('logic error in LIT_VT_WHITE_ERRS  in lexer')
+                @parser.internal_error('logic error in LIT_VT_WHITE_ERRS  in lexer')
               end
             end
             # ternary
@@ -1580,7 +1585,7 @@ class RubyLexer
             @lex_state = Expr_end
             return process_token(s_matched, command_state, tok_start_offset)
           elsif src.check_advance(/\$\W|\$\z/) then 
-            #@parser.raise_error( 'lexer unexpected match /\$\W|\$\z/ ' )   # TODO202 remove?
+            # was  'lexer unexpected match /\$\W|\$\z/ ' )   # TODO202 remove?
             rb_compile_error "unexpected whitespace after '$' "  
           elsif (s_matched = src.scan(/\$\w+/))
             @lex_state = Expr_end

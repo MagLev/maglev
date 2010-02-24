@@ -2,23 +2,23 @@
 
 == Unreleased changes
 
+* in FFI implement callback , implement C float args .
+* parser warnings  now controlled by -W, -w, -VERBOSE flags ,
+  but are always printed of a SyntaxError occurs.
+* Merged latest updates of psych into MagLev
 * Add Symbol#to_proc
 
 == Changes for 22891  2010-02-18
 
-* Fix Trac 662, 663, 665, 666
-* Implement  ENV.delete
-* Indexing is fixed: clean up and turn on examples/persistence/indexing
+* Switch from RbYaml to libyaml + Psych
+* Fix Trac 610, 640, 662, 663, 664, 665, 666
+* Fix Trac 483, 473, 457, 422 (fixed by a previous release)
+* Implement ENV.delete
+* Added Enumerable#each_slice (but no Enumerator support).
 * Add Socket::Constants
+* Indexing is fixed: clean up and turn on examples/persistence/indexing
 * Major underlying changes to AIO in GemStone -- replaces the use of 
   POSIX asynchronous IO with our own thread-based IO system for writing tranlogs
-
-== Changes for 22873  2010-02-15
-
-* Switch from RbYaml to libyaml + Psych
-* Added Enumerable#each_slice (but no Enumerator support).
-* Fix Trac 664, 610
-* Fix Trac 483, 473, 457, 422 (fixed by a previous release)
 
 == Changes for 22816  2010-02-02
 

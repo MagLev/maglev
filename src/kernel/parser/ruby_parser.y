@@ -197,21 +197,21 @@ rule
                 | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
 		      # | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
-                      raise_error(":op_asgn never seen from MRI parser ")
+                      internal_error(":op_asgn never seen from MRI parser ")
                       # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
                       result = nil
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN command_call
                     {
 		      # | primary_value tDOT tCONSTANT tOP_ASGN command_call
-                      raise_error(":op_asgn never seen from MRI parser ")
+                      internal_error(":op_asgn never seen from MRI parser ")
 		      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
 		      result = nil
 		    } 
 		  | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
 		      {
 		        # | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
-                        raise_error(":op_asgn never seen from MRI parser ")
+                        internal_error(":op_asgn never seen from MRI parser ")
 			# result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
                         result = nil
 		      }
@@ -368,7 +368,7 @@ rule
                         if result.rcvr.class._equal?(RubyBlockPassNode) 
                           raise "both block arg and actual block given"
                         end
-                        raise_error("dont know how to append to selector") 
+                        internal_error("dont know how to append to selector") 
                         val[vofs + 2] << result
                         result = val[vofs + 2]
                       end
@@ -712,7 +712,7 @@ rule
 		      # | primary_value tLBRACK_STR aref_args tRBRACK tOP_ASGN arg
                       v_two = val[vofs + 2]
                       unless v_two.class._equal?(RubyRpCallArgs) ; 
-                        raise_error('aref_args is not a RubyRpCallArgs')
+                        internal_error('aref_args is not a RubyRpCallArgs')
                       end
                       result = RubyOpElementAsgnNode.s(val[vofs ], v_two, val[vofs + 4], val[vofs + 5])
                     }
@@ -733,7 +733,7 @@ rule
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
                     {
 		      # | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
-                      raise_error(":op_asgn never seen from MRI parser ")
+                      internal_error(":op_asgn never seen from MRI parser ")
                       # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
                       result = nil
                     }
@@ -2093,7 +2093,7 @@ xstring_contents: none
                         result = RubyDSymbolNode.s([ RubyStrNode.s('') , v_one ])
                         # result = s(:dsym, "", result)
                       else
-			raise_error("unimplemented dsym conversion")
+			internal_error("unimplemented dsym conversion")
                         result = nil
                       end
                     }
