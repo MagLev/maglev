@@ -45,7 +45,22 @@ module MagRp # {
       # defines the fixed instVars
       # ensures instvars are ram_oops , returns self
       # Used to initialze a transient copy of MagTemplate
-      @mydebug = MagRp::debug > 1
+      #
+      # MagRpDEBUG values from maglev-ruby script or smalltalk main program:
+      #   0 no tracing
+      #   1  trace files parsed by RubyParser
+      #   2  include lexer and racc state machine tracing (requires
+      #        parser to be generated with racc.sh -D before loading prims)
+      # MAGLEV_parseWarn is either true or false, from RubyArgs>>_parseRubyArgs:
+      system_cls = Maglev::__system 
+      debug_level = system_cls.session_temp(:MagRpDEBUG)
+      if debug_level._equal?(nil)
+        debug_level = 0
+      end
+      @debuglevel = debug_level
+      @mydebug = debug_level > 1
+      @rpwarnings = system_cls.session_temp(:MAGLEV_parseWarn)
+      @save_warnings = nil  
 
       rt = @reduce_table.dup  # size about 1497
       len = rt.size

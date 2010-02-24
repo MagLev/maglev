@@ -24,7 +24,7 @@ class Array
     while (n < sz)
       elem = at(n)
       if elem._isArray
-        raise ArgumentError, 'nested Array not supported'
+        raise ArgumentError, 'Array#_join, nested Array not supported'
       end
       out << elem.to_s
       n += 1
@@ -127,7 +127,7 @@ module MagRp # {
         @extend_ofs_last_unextend = @arr[idx + OFF_byte_offset]
 	idx = idx - ENTRY_SIZE
 	if idx < 0
-	  raise "You went too far unextending env"
+	  syntax_error("You went too far unextending env")
 	end
 	@curridx = idx
       end
@@ -159,7 +159,7 @@ module MagRp # {
       def []=( k, v)
 	# raise "no" if v == true
 	if v._equal?(true)
-	  raise "Environment:[]= , invalid true arg"
+	  internal_error("Environment:[]= , invalid true arg")
 	end
 	# self.current[k] = v
         idx = @curridx
@@ -278,7 +278,7 @@ module MagRp # {
           end
           self.size=( new_sz )
         elsif sz._equal?(0)
-          raise('lexpop underflow')
+          internal_error('lexpop underflow')
         else
           # no change if stack size == 1
         end
@@ -349,12 +349,12 @@ module MagRp # {
 	id = lhs.symval 
 	src_ofs = lhs.src_offset 
       elsif lhs._kind_of?( RubyAbstractLiteralNode )
-	raise SyntaxError, "Can't change the value of #{lhs.nameForError}"
+	syntax_error("Can't change the value of #{lhs.nameForError}")
       else
-	raise_error("assignable - invalid lhs")
+	internal_error("assignable - invalid lhs")
       end
       if InvalidAssignableLhs.include?(id)
-	raise SyntaxError, "Can't change the value of #{id}"
+	syntax_error("Can't change the value of #{id}")
       end
 
       first_ch = id[0]
@@ -374,7 +374,7 @@ module MagRp # {
 	elsif RpStringScanner.ch_is_uc_alpha(first_ch)   # A-Z
           if @in_def || @in_single > 0
 	    line = self.line_for(lhs)
-            raise SyntaxError , "dynamic constant assignment of #{id} near line #{line}"
+            syntax_error("dynamic constant assignment of #{id} near line #{line}")
           end
 	  c2node = RubyColon2Node.simple(id, src_ofs )
 	  result = RubyConstDeclNode.s(c2node, value) # s(:cdecl )
@@ -396,7 +396,7 @@ module MagRp # {
 	   end
 	   result = RubyLocalAsgnNode.s(id, value) # s(:lasgn )
 	else
-	   raise "in assignable:  unknown type: #{@env[id]}"
+	   internal_error("in assignable:  unknown type: #{@env[id]}")
 	end
 	if type._equal?( nil)
 	  cenv[id] = :lvar
@@ -413,10 +413,10 @@ module MagRp # {
       if lhs._isSymbol
 	id = lhs
 	if InvalidAssignableLhs.include?(id)
-	  raise SyntaxError, "Can't change the value of #{id}"
+	  syntax_error("Can't change the value of #{id}")
 	end
       else
-	raise_error("check_assignable arg not a symbol")
+	internal_error("check_assignable arg not a symbol")
       end
 
       first_ch = id[0]
@@ -446,7 +446,7 @@ module MagRp # {
 	   end
 	   #
 	else
-	   raise "in assignable:  unknown type: #{@env[id]}"
+	   internal_error("in assignable:  unknown type: #{@env[id]}")
 	end
       end
       if type._equal?( nil)
@@ -598,7 +598,7 @@ module MagRp # {
 	return RubyFalseNode._new if id._equal?(:false) # s(:false) 
 	src_ofs = nil
       else
-	raise_error("gettable unrecognized argument kind")
+	internal_error("gettable unrecognized argument kind")
       end 
       
       first_ch = id[0]
@@ -634,7 +634,7 @@ module MagRp # {
 	# return  s(:call, nil, id, s(:arglist))  
 	return new_vcall(RubySelfNode._new, arg )
       end
-      raise_error("identifier #{id.inspect} is not valid")
+      internal_error("identifier #{id.inspect} is not valid")
     end
 
     def initialize
@@ -644,7 +644,7 @@ module MagRp # {
       @lexer = lx
       @env = Environment.new
       #  @comments  no longer used , this parser not for use with RDoc implementation
-      lx._install_wordlist( @lexer_wordlist )
+      lx._install_wordlist( @lexer_wordlist, @debuglevel )
     end
 
     def reset
@@ -738,7 +738,7 @@ module MagRp # {
 	  head.dstrList.push( tail)
 	end
       else
-	raise_error( "literal_concat unknown type")
+	internal_error( "literal_concat unknown type")
       end
       return head
     end
@@ -848,7 +848,7 @@ module MagRp # {
         if sel._equal?( :elseif ) || sel._equal?( :elif )
           # disallow the other forms of elsif common in script languages
 	  line = self.line_for(sel_tok)
-          raise SyntaxError , "malformed elsif, see '#{sel}' at line #{line}"
+          syntax_error("malformed elsif, see '#{sel}' at line #{line}")
         elsif sel.__at_equals(1, 'else') # one-based offset
 	  line = self.line_for(sel_tok)
           warning("possible malformed elsif, see '#{sel}' at line #{line}")
@@ -905,7 +905,7 @@ module MagRp # {
       # used where  rp202 had  new_call(r,sel, s(:arglist, argone))
       #   argone should never be a RubyBlockPassNode 
       if argone._equal?(nil)
-	raise_error("new_call_1 unexpected nil arg")
+	internal_error("new_call_1 unexpected nil arg")
 	cArgs = nil
       else
 	cArgs = RubyRpCallArgs._new  # s(:array )
@@ -922,7 +922,7 @@ module MagRp # {
 
     def new_case(expr, body)
       if body.class._not_equal?(RubyWhenNode)
-	raise_error "new_case - bad body arg "
+	internal_error("new_case - bad body arg ")
       end
       # chaining of body nodes done in smalltalk
       RubyCaseNode.s(expr, body)
@@ -940,7 +940,7 @@ module MagRp # {
 	line = self.line_for(path)
 	msg << ", for   class    near line #{line} \n"
 	msg << self.last_closed_def_message
-	raise SyntaxError , msg
+	syntax_error( msg )
       end
 
       # scope = s(:scope, body).compact  
@@ -972,7 +972,7 @@ module MagRp # {
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	msg << ", for   def   near line #{def_tok.line} "
 	msg << self.last_closed_def_message
-	raise SyntaxError , msg
+	syntax_error(msg)
       end
 
       # body ||= s(:nil)
@@ -1010,7 +1010,7 @@ module MagRp # {
 	line = self.line_for(name_tok)
 	msg << ", for   def    near line #{line} "
 	msg << self.last_closed_def_message
-	raise SyntaxError , msg
+	syntax_error(msg)
       end
 
       #body ||= s(:block)
@@ -1058,7 +1058,7 @@ module MagRp # {
 	lnum = self.line_for_offset( args.src_offset )
 	msg = 'assignment to global variable not supported as block arg, '
 	msg << "near line #{line} "
-	raise SyntaxError , msg
+	syntax_error(msg)
       end
       RubyIterRpNode.s( args, body ) 
     end
@@ -1071,7 +1071,7 @@ module MagRp # {
 	src_line = nil
       end
       if lhs._equal?(nil)
-	raise_error("lhs is nil in new_parasgn")
+	internal_error("lhs is nil in new_parasgn")
       end
       n = RubyParAsgnRpNode.s(lhs, src_line)
       n.src_offset=( src_ofs)
@@ -1100,7 +1100,7 @@ module MagRp # {
 	line = self.line_for(path)
 	msg << ", for   module    near line #{line} "
 	msg << self.last_closed_def_message
-	raise SyntaxError , msg
+	syntax_error(msg)
       end
       # body = s(:scope, body).compact  
       # AST does not use scope nodes
@@ -1160,7 +1160,7 @@ module MagRp # {
 	  elsif ch._equal?( ?e) ; encod = ENC_EUC 
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
-	    raise "unknown regexp option: #{err_str}" 
+	    syntax_error( "unknown regexp option: #{err_str}"  )
 	  end 
 	else 
 	  if ch._equal?( ?x ) ; o = o | EXTENDED  
@@ -1169,7 +1169,7 @@ module MagRp # {
 	  elsif ch._equal?( ?u) ; encod = ENC_UTF8
 	  else
 	    err_str = ' ' ; err_str[0] = ch ;
-	    raise "unknown regexp option: #{err_str}" 
+	    syntax_error("unknown regexp option: #{err_str}" )
 	  end 
 	end
 	opt_idx += 1
@@ -1188,7 +1188,7 @@ module MagRp # {
 	  regex_beg_tok = val[vofs]  # for tREGEXP_BEG
 	  line = self.line_for(regex_beg_tok)
 	  msg = "near line #{line}, #{ex.message} " 
-	  raise SyntaxError , msg
+	  syntax_error(msg)
 	end
 	return node
       end
@@ -1220,7 +1220,7 @@ module MagRp # {
 	msg = 'syntax error, unexpected $end, expecting kEND'
 	msg << ", for   class   near line #{def_tok.line} "
 	msg << self.last_closed_def_message
-	raise SyntaxError , msg
+	syntax_error(msg)
       end
 
       # scope = s(:scope, body).compact  # scope not used in AST
@@ -1247,7 +1247,7 @@ module MagRp # {
       elsif arg_cls._equal?(aryCls)
 	res = RubySuperNode.s( args )
       else
-	raise_error("new_super, invalid args")
+	internal_error("new_super, invalid args")
       end
       res.src_offset=( sel_tok.src_offset )
       res
@@ -1287,7 +1287,7 @@ module MagRp # {
         msg << ", for   #{name_tok.symval} near line #{line}, "
       end
       msg << self.last_closed_def_message
-      raise SyntaxError , msg
+      syntax_error(msg)
     end
 
     def new_while( block, expr)
@@ -1342,9 +1342,9 @@ module MagRp # {
 	if args_cls._equal?(RubyRpCallArgs)
 	  cArgs = args.as_yield_args
 	elsif args_cls._equal?(RubyBlockPassNode)
-	  raise SyntaxError, "Block argument should not be given." 
+	  syntax_error("Block argument should not be given." )
 	else
-	  raise_error("new_yield, unregognized args")
+	  internal_error("new_yield, unrecognized args")
 	end
       end
       # not sure how  setArrayWrapper  logic to be handled, nextNodeForParser:
@@ -1393,7 +1393,7 @@ module MagRp # {
       ast = self._racc_do_parse_rb()
       err_count = @syntax_err_count
       if err_count._not_equal?(0)
-	raise SyntaxError , "#{err_count.to_s} syntax errors"
+	syntax_error("#{err_count.to_s} syntax errors")
       end
       ast 
     end
@@ -1411,7 +1411,7 @@ module MagRp # {
     def ret_args( node )
       # node should be a  RubyRpCallArgs
       if node.iter._not_equal?(nil)
-	raise SyntaxError, "block argument should not be given"
+	syntax_error("block argument should not be given")
       end
       lst = node.list
       if lst.size._equal?(1)
@@ -1439,24 +1439,50 @@ module MagRp # {
     end
 
     def warning( s)
-      puts "RpWarning: #{s}"
+      msg = "RpWarning: "
+      msg << s 
+      if @rpwarnings
+        puts(msg)
+      else
+        arr = @save_warnings 
+        if arr._equal?(nil)
+          arr = [ msg ]
+          @save_warnings = arr
+        else
+          arr << msg
+        end
+      end
     end
 
-    def raise_error(msg)
+    def print_saved_warnings
+      arr = @save_warnings
+      if arr._not_equal?(nil)
+        arr.each { | str | puts(str) }
+      end
+      @save_warnings = nil
+    end
+
+    def internal_error(msg)  # was raise_error
+      print_saved_warnings
       puts "InternalParseError: #{msg}"
-      if MagRp::debug > 0
+      if @debuglevel > 1
 	nil.pause  
       end
       raise InternalParseError, msg
     end
 
+    def syntax_error(msg)
+      print_saved_warnings
+      raise SyntaxError, msg
+    end 
+
     def backref_assign_error( a_val)  # method missing from rp202 code
-      raise_error( "backref_assign_error" )
+      syntax_error( "backref_assign_error" )
     end
 
     def string_to_symbol(str)
       unless str._isString
-        raise_error('expected value to be a String')
+        internal_error('expected value to be a String')
       end
       if str.size._equal?(0)
         yyerror( 'empty symbol literal' )

@@ -286,3 +286,10 @@ Lexing of double quoted strings (Maglev Trac 580)
   Regex calls like  src.check(/\s/) were not translated correctly to
   optimized forms.  Added  peek_is_white__or_eol , ch_is_white__or_eol in strscan2.rb ,
   and uses in lexer.rbm4 to implement the fix.
+
+24 Feb 2010
+  implemented print_saved_warnings(), includes logic to get 
+  warning level from SessionTemps , and suppress printing of  
+  warnings unless warnings specified by user or a syntax error occurs.
+  changed uses of raise_error() to internal_error() .
+  added syntax_error() .

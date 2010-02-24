@@ -101,6 +101,9 @@ module MagRp
     def lineno_
       @line_num
     end
+    def mydebug_
+      @mydebug
+    end
 
     def src_regions_
       @src_regions
@@ -160,10 +163,6 @@ module MagRp
 
     def string_buffer_
       @string_buffer
-    end
-
-    def mydebug_
-      @mydebug
     end
 
     # Stream of data that yylex examines.
