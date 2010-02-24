@@ -2,10 +2,11 @@ module MagRp
 class RpStringScanner
   # second opening so we can have non-dynamic refs to CTYPE constants
 
-  def initialize(string)
+  def initialize(string, the_parser)
     @string = string  # expect caller to pass a frozen string
     sz = string.size
     @limit = sz
+    @parser = the_parser
 
     #  @cbytearray used to provide faster self[n]   access to single
     #  bytes for large (>16Kbyte) strings , and to have single copy in
@@ -294,7 +295,7 @@ class RpStringScanner
   def backup(count)
     new_pos = @pos - count
     if new_pos < 0
-      raise_error('attempt to backup past start of source')
+      @parser.internal_error('attempt to backup past start of source')
     end
     @pos = new_pos
   end

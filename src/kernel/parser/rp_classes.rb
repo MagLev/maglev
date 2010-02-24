@@ -1,19 +1,6 @@
 
 module MagRp
 
-  def self.debug
-    # MagRpDEBUG values are
-    #   0 no tracing
-    #   1  trace files parsed by RubyParser
-    #   2  include lexer and racc state machine tracing (requires 
-    #        parser to be generated with racc.sh -D before loading prims)
-    d = Maglev::__system.session_temp(:MagRpDEBUG)
-    if d._equal?(nil)
-      d = 0
-    end
-    d
-  end
-
   class ScanError < StandardError; end
 
   class RaccJumpError < StandardError; end
@@ -101,6 +88,9 @@ module MagRp
     def lineno_
       @line_num
     end
+    def mydebug_
+      @mydebug
+    end
 
     def src_regions_
       @src_regions
@@ -160,10 +150,6 @@ module MagRp
 
     def string_buffer_
       @string_buffer
-    end
-
-    def mydebug_
-      @mydebug
     end
 
     # Stream of data that yylex examines.

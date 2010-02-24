@@ -82,7 +82,7 @@ module MagRp # {
           }
           return res
         rescue Exception => ex
-          if MagRp::debug > 1
+          if @debuglevel > 1
             nil.pause  # stop for debugging before altering vstack
           end
           last_len = @save_last_len
@@ -495,6 +495,7 @@ module MagRp # {
 
     def on_error(t, val, vstack)
       # reworked for better messages, not sure how to continue parsing.
+      print_saved_warnings
       str = "parse error on value #{val.inspect} "
       hint = ""
       if t._not_equal?(nil)
@@ -525,6 +526,7 @@ module MagRp # {
       # Enter error recovering mode.
       #  If this method returns,
       #  parser should enter "error recovering mode". ??
+      print_saved_warnings
       msg << ", near line #{@lexer.lineno_} "
       puts "SyntaxError: #{msg}"
       # throw :racc_jump, 1
@@ -536,7 +538,7 @@ module MagRp # {
     def yyaccept
       # appears to be unused
       #  Exit parser.
-      raise_error('unexpected call to yyaccept')
+      internal_error('unexpected call to yyaccept')
       # throw :racc_jump, 2
     end
 

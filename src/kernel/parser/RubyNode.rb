@@ -10,11 +10,13 @@ module MagRp
     primitive_nobridge '_become', '_becomeMinimalChecks:'
 
     def raise_error(msg = "")
+      # not yet implemented:  @parser.print_saved_warnings 
       puts ("InternalParseError: " << msg)
       # nil.pause
       raise InternalParseError, "RubyNode invalid new"
     end
     def self.raise_error(msg = "")
+      # not yet implemented:  @parser.print_saved_warnings 
       puts ("InternalParseError: " << msg)
       # nil.pause
       raise InternalParseError, "RubyNode invalid new"
