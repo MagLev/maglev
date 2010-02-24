@@ -64,7 +64,7 @@ module FFI
       :size_t => :uint64 ,
       :long_long => :int64 ,
       :ulong_long => :uint64 ,
-      # :float  =>  :xxxx # float not imple yet
+      :float  =>  :float ,
       :double =>  :double ,
       :pointer => :ptr ,
       :ptr => :ptr ,
@@ -88,6 +88,7 @@ module FFI
       :int16 => 2 , :uint16 => 2 ,
       :int32 => 4 , :uint32 => 4 ,
       :int64 => 8 , :uint64 => 8,
+      :float =>  4 ,
       :double =>  8 ,
       :ptr => 8 ,
       :void => 8 ,
@@ -107,7 +108,7 @@ module FFI
       :size_t => :'uint64at:' ,
       :long_long => :'int64at:' ,
       :ulong_long => :'uint64at:' ,
-  #    :float  =>  :double ,
+      :float  =>  :'float_at:' ,
       :double =>  :'double_at:' ,
       :ptr => :'__struct_pointer_at:',
   #   :void => :void ,
@@ -129,7 +130,7 @@ module FFI
       :size_t => :'int64_put::' ,
       :long_long => :'int64_put::' ,
       :ulong_long => :'int64_put::' ,
-  #    :float  =>  :double ,
+      :float  =>  :'float_put::' ,
       :double =>  :'double_put::' ,
       :ptr => :'__pointer_at_put::' ,
   #   :void => :void ,
@@ -141,6 +142,7 @@ module FFI
     Persistent_Enums = []
     Persistent_NamedEnums = IdentityHash.new
     Persistent_kv_map = IdentityHash.new
+    GsMethodDictionary = _resolve_smalltalk_global(:GsMethodDictionary)
 
     def initialize
       raise 'instances of Enums not used yet'

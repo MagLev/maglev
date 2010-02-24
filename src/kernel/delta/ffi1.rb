@@ -4,7 +4,8 @@ module FFI
   # will work.
 
   CLibrary = _resolve_smalltalk_global( :CLibrary )
-  CFunction = _resolve_smalltalk_global( :CFunction )
+  CCallout = _resolve_smalltalk_global( :CCallout )
+  CCallin = _resolve_smalltalk_global(  :CCallin )
   CByteArray = _resolve_smalltalk_global( :CByteArray )
   CPointer = _resolve_smalltalk_global( :CPointer )
 end
