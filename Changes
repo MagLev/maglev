@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-== Unreleased changes
+== Changes for 22907  2010-02-24
 
 * in FFI implement callback , implement C float args .
 * parser warnings  now controlled by -W, -w, -VERBOSE flags ,
