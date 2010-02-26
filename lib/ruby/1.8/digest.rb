@@ -1,4 +1,3 @@
-require 'digest/md5'
 
 #
 # The Digest module wraps some common methods on various hashing
