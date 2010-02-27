@@ -12,8 +12,8 @@
 # now, we'll just calculate each time.
 
 module Config
-  RUBY_VERSION == "1.8.6" or
-    raise "ruby lib version (1.8.6) doesn't match executable version (#{RUBY_VERSION})"
+  RUBY_VERSION == "1.8.7" or
+    raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
   VERSION = '1.8'
   ARCH = `uname -m`
 
@@ -60,7 +60,7 @@ module Config
   # TODO SHELL
   # TODO PATH_SEPARATOR
   CONFIG['arch']              = ARCH
-  CONFIG['ruby_version']      = '1.8.6'
+  CONFIG['ruby_version']      = '1.8.7'
   cpu_os = Exception.__cpu_os_kind 
   CONFIG['host_os']           = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
                                     darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
