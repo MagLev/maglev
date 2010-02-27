@@ -140,10 +140,10 @@ RUBY_ENGINE = 'maglev'
 # A quick hack to get specs further w/o build having to poke the right string in
 #  this slot. See ticket #76
 RUBY_PLATFORM = 'Unspecified.platform'
-RUBY_VERSION = '1.8.7'
+RUBY_VERSION = '1.8.6'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
 RUBY_RELEASE_DATE = '2010-02-26'
-RUBY_PATCHLEVEL = 249  # TODO: this is what MRI 1.8.7 shows...
+RUBY_PATCHLEVEL = 399  # TODO: this is what MRI 1.8.6 shows...
 
 VERSION = RUBY_VERSION
 # If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging

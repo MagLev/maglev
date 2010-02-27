@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+== Changes for 22926  2010-02-27
+
+* Change back to 1.8.6 for at least one more build
+
 == Changes for 22923  2010-02-26
 
 * Changing base version from 1.8.6 to 1.8.7 so we can begin 1.8.7 work
