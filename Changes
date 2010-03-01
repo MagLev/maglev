@@ -1,6 +1,17 @@
 = MagLev Change Log
 
-== Unreleased changes
+== Changes for 22932  2010-02-27
+
+* Change back to 1.8.6 for at least one more build
+* Fix Trac 669, 670
+
+== Changes for 22923  2010-02-26
+
+* Changing base version from 1.8.6 to 1.8.7 so we can begin 1.8.7 work
+* Fixed problem preventing update to RubyGems 1.3.6
+* Fixed problem on Mac with FFI callout/callin that caused YAML crashes
+
+== Changes for 22907  2010-02-24
 
 * in FFI implement callback , implement C float args .
 * parser warnings  now controlled by -W, -w, -VERBOSE flags ,

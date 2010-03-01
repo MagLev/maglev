@@ -127,19 +127,17 @@ class IO
     else
       sep = Type.coerce_to(a_sep, String, :to_str)
       sep_len = sep.length
-      if sep_len._equal?(1)
-        res = self.__next_line(sep[0])
-      elsif sep_len._equal?(0)
+      if sep_len._equal?(0)
         res = self.eof?  ?  nil : self.__next_paragraph
       else
-        raise ArgumentError, 'IO#gets, multi-character separator not implemented yet'
+        res = self.__next_line(sep)
       end
     end
     res.__storeRubyVcGlobal( vcGlobalIdx ) # store into caller's $_
     res
   end
 
-  def __next_paragraph
+  def __next_paragraph()
     # caller has checked for not eof? 
     para = ''
     while true  # add non-empty lines to result
@@ -171,8 +169,9 @@ class IO
     end
   end
 
-  def __next_line(sep_ch)
-    res = __next_line_to(sep_ch)
+  def __next_line(sep)
+    # sep is an Ascii value 0..255, or a String of size 1..128
+    res = __next_line_to(sep)
     if res._equal?(nil)
       unless __last_err_code._equal?(0)
         raise IOError , self.__last_err_string  # TODO: Errno::xxx
