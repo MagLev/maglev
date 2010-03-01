@@ -3,6 +3,7 @@
 == Changes for 22932  2010-02-27
 
 * Change back to 1.8.6 for at least one more build
+* Fix Trac 669, 670
 
 == Changes for 22923  2010-02-26
 
