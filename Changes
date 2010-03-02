@@ -1,5 +1,10 @@
 = MagLev Change Log
 
+== Changes for 22947  2010-03-01
+
+* Fix Trac 669, 670
+* YAML: Use FFI callbacks for IO
+
 == Changes for 22932  2010-02-27
 
 * Change back to 1.8.6 for at least one more build

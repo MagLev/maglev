@@ -6,6 +6,7 @@ require 'yaml'
 # This class tests the top level lib/psych/psych.rb file.
 # This is where module Psych is defined.
 class PsychModuleTest < Test::Unit::TestCase
+
   def test_psych_constants
     assert_equal('1.0.0', YAML::VERSION,         'YAML::VERSION')
     assert_equal('0.1.3', YAML::LIBYAML_VERSION, 'YAML::LIBYAML_VERSION')
@@ -68,5 +69,10 @@ EOS
 
     result = YAML.load_file(test_file)
     assert_equal(expected, result)
+  end
+
+  def test_parse_with_io
+    sio = StringIO.new("- foo\n- bar\n- :baz\n- 123")
+    assert_equal(["foo", "bar", :baz, 123], YAML.load(sio))
   end
 end

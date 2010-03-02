@@ -19,9 +19,22 @@ module Psych
     #  void libyaml_version(int version_info[]);
     attach_function( :libyaml_version, [:pointer], :void )
 
-    # Creates a new parser context given a string.
-    #   parser_context_t *create_parser_context(unsigned char *input);
-    attach_function( :create_parser_context, [ :pointer ], :pointer)
+
+    # typedef int yaml_read_handler_t(void *data, unsigned char *buffer, size_t size,
+    #                                 size_t *size_read);
+    #
+    # void            *data   Application specific data (NULL in our case)
+    # unsigned char *buffer   Buffer for the read handler to write data into
+    # size_t           size   Size of buffer
+    # size_t     *size_read   Num bytes read handler wrote into buffer
+    #
+    # Returns 1 for success; 0 for failure
+    callback :parser_read_handler, [:pointer, :pointer, :size_t, :pointer ], :int
+
+    # Creates a new parser context given a callback or input string.
+    #   parser_context_t *create_parser_context(yaml_read_handler_t *callback,
+    #                                           unsigned char *input_string));
+    attach_function( :create_parser_context, [ :parser_read_handler, :pointer ], :pointer)
 
     # Returns a pointer to a ParserEvent that describes the next event in
     # the YAML event stream.
@@ -30,7 +43,7 @@ module Psych
 
     # Frees a parser context created by create_parser_context
     #   void free_parser_context(parser_context_t *context);
-    attach_function( :free_parser_context, [ :pointer ], :void)
+    attach_function( :free_parser_context, [:pointer], :void)
 
     # An Enum that describes the YAML parser events.  ParserEvent[:type]
     ParserEventEnum = FFI::Enum.new([:no_event,
@@ -207,28 +220,29 @@ module Psych
     # Emitter support
     ##################################################
     class EmitterContext < FFI::Struct
-      layout :emitter,        :pointer,
-             :buffer,         :pointer,
-             :buffer_size,    :size_t,
-             :char_count,     :size_t
+      layout :emitter,        :pointer
 
       def emitter
         self[:emitter]
       end
 
-      # Flush any accummulated bytes of output to the IO object
-      def flush(io)
-        count = self[:char_count]
-        if count > 0
-          str = self[:buffer].read_string(count)
-          bytes_written = io.write(str)
-          unless bytes_written == count
-            raise "Only flushed #{bytes_written} of #{count} bytes to #{io}"
-          end
-          self[:char_count] = 0
-        end
-      end
+      # # Flush any accummulated bytes of output to the IO object
+      # def flush(io)
+      #   count = self[:char_count]
+      #   if count > 0
+      #     str = self[:buffer].read_string(count)
+      #     bytes_written = io.write(str)
+      #     unless bytes_written == count
+      #       raise "Only flushed #{bytes_written} of #{count} bytes to #{io}"
+      #     end
+      #     self[:char_count] = 0
+      #   end
+      # end
     end
+
+    # Called by the libyaml emitter when it has accummulated output that
+    # needs to be consumed.
+    callback :emitter_output_writer, [:pointer, :pointer, :size_t], :int
 
     # Emit a stream start event
     #   int emit_start_stream(yaml_emitter_t *emitter,
@@ -262,8 +276,8 @@ module Psych
     attach_function :emit_end_stream, [:pointer], :int
 
     # Create the emitter context object
-    #   emitter_context_t *create_emitter();
-    attach_function :create_emitter_context, [], :pointer
+    #   emitter_context_t *create_emitter(callback);
+    attach_function :create_emitter_context, [:emitter_output_writer], :pointer
 
     # Free the emitter context object
     #   void free_emitter(emitter_context_t *emitter);

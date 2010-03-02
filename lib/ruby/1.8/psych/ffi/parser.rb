@@ -12,33 +12,40 @@ module Psych
     UTF16BE = LibPsych::ParserEncodingEnum[:utf_16be]
 
     def parse(input)
-      # TODO: HACK until we get FFI callbacks working
-      string = case input
-               when String
-                 input
-               when File
-                 input.read
-               else
-                 raise ArgumentError,
-                 "YAML parsing Only supports Strings and (short) Files right now...(#{input.class})"
-               end
 
-      # We need to make a stable copy of the ruby string.  If we just pass
-      # the string directly as "create_parser_context(string)", then the gc
-      # is free to collect the c-data struct when create_parser_context
-      # returns (the auto-copied data is only good for the duration of that
-      # particular c-call).  BUT, we then want to pass the c_parser_context (which
-      # references the string) into the next c-call, so we need a more
-      # permanent solution.  By creating input_buf, we have copied the
-      # content of string into c-memory that won't be gc'd until input_buf
-      # is gc'd, i.e., it will survive for the duration of this call to
-      # parse (which is long enough).
-      input_buf = FFI::Pointer.from_string(string)
-      c_parser_context = Psych::LibPsych.create_parser_context(input_buf)
+      c_parser_context =
+        case input
+        when String
+          # We need to make a stable copy of the ruby string.  If we just
+          # pass the string directly as "create_parser_context(string)",
+          # then the gc is free to collect the c-data struct when
+          # create_parser_context returns (the auto-copied data is only
+          # good for the duration of that particular c-call).  BUT, we then
+          # want to pass the c_parser_context (which references the string)
+          # into the next c-call, so we need a more permanent solution.  By
+          # creating input_buf, we have copied the content of string into
+          # c-memory that won't be gc'd until input_buf is gc'd, i.e., it
+          # will survive for the duration of this call to parse (which is
+          # long enough).
+          input_buf = FFI::Pointer.from_string(input)
+          Psych::LibPsych.create_parser_context(nil, input_buf)
+
+        when IO
+          callback = Proc.new do |ignored, buffer, bufsize, num_bytes|
+            str = input.read(bufsize)
+            len = str.nil? ? 0 : str.length
+            buffer.to_ptr.write_string(str, len) if len > 0
+            num_bytes.int64_put(0, len)
+            1
+          end
+          Psych::LibPsych.create_parser_context(callback, nil)
+
+        else
+          raise ArgumentError,
+          "YAML.parse: Unsupported input: (#{input.class})"
+        end
+
       done = false
-
-      # MagLev FFI does not yet support callbacks, so we put the main loop
-      # in ruby, and do the per-event callbacks from ruby.
       while not done
         event_ptr = Psych::LibPsych.next_event(c_parser_context)
         event = Psych::LibPsych::ParserEvent.new(event_ptr)
