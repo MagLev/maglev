@@ -12,8 +12,17 @@ module Psych
     # indentation defaults to 0
     def initialize(io)
       @io = io
-      @emitter_context =
-        Psych::LibPsych::EmitterContext.new Psych::LibPsych.create_emitter_context
+      @emitter_callback = Proc.new do |context, buffer, count|
+        str = buffer.stringfrom_to(0, count-1)
+        bytes_written = @io.write(str)
+        unless bytes_written == count
+          raise "Only flushed #{bytes_written} of #{count} bytes to #{@io}"
+        end
+        1  # yaml_write_handler_t should return 1 for success, 0 for failure
+      end
+
+      c_emitter_context = Psych::LibPsych.create_emitter_context(@emitter_callback)
+      @emitter_context  = Psych::LibPsych::EmitterContext.new(c_emitter_context)
     end
 
     def start_stream(encoding)
@@ -39,10 +48,10 @@ module Psych
     def start_document(version, tag_directives, implicit)
       wrap_tag_directives(tag_directives)
       do_emit(Psych::LibPsych.emit_start_document(@emitter_context.emitter,
-                                                       wrap_version(version),
-                                                       wrap_tag_directives(tag_directives),
-                                                       tag_directives.length,
-                                                       implicit ? 1 : 0))
+                                                  wrap_version(version),
+                                                  wrap_tag_directives(tag_directives),
+                                                  tag_directives.length,
+                                                  implicit ? 1 : 0))
       self
     end
 
@@ -100,7 +109,6 @@ module Psych
       if status == 0
         raise Psych::LibPsych.get_error_string(@emitter_context.emitter)
       end
-      @emitter_context.flush(@io)
     end
 
     def wrap_string_or_nil(string)
