@@ -1,12 +1,6 @@
-# -*- ruby  -*-
+
 require 'lib/mdb_server'
 require '../../../examples/sinatra/object_inspector/objectlog_app'
-
-disable :run
-set :environment, :development
-set :server, ["webrick"]   # Maglev currently only supports webrick
-
-options = { :Port => 4567, :host => 'localhost' }
 
 map "/" do
   run MDB::ServerApp
