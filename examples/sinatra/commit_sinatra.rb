@@ -10,10 +10,7 @@
 # the versions you have.
 
 gem_dir     = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8.6/gems"
-sinatra_dir = "#{gem_dir}/sinatra-0.9.4/lib"
-rack_dir    = "#{gem_dir}/rack-1.0.1/lib"
-
-[sinatra_dir, rack_dir].each do |dir|
+Dir.glob("#{gem_dir}/{rack-[0-9]*,sinatra-[0-9]*}").each do |dir|
   raise "Could not find #{dir}" unless File.directory? dir
   $:.unshift dir
 end
