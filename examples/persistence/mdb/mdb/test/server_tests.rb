@@ -62,7 +62,7 @@ describe 'MDB::Server class side' do
     db_names.each do |name|
       full_name = (MDB::Test.db_name name).to_sym
       @server.create(full_name, ViewClass)
-      full_name.must_include @server.db_names
+      @server.db_names.must_include full_name
     end
   end
 

@@ -1,6 +1,6 @@
 task :default => :commit
 
-ENV['MAGLEV_OPTS'] = '-Ilib -d'
+ENV['MAGLEV_OPTS'] = '-Ilib'
 
 desc "Commit the MDB Server code to the repository."
 task :commit do
