@@ -14,6 +14,10 @@ The demo.rb file is a Sinatra application that allows you to enter a
 latitude and longitude (preferably, within the US, if you're using the US
 Postal Database), and will find the nearest K zip codes to the lat/lon.  
 
+Prerequisite: You must have the json_pure gem installed:
+
+  $ maglev-gem install json_pure
+
 To run the app, just run rake:
 
   $ rake
