@@ -23,7 +23,8 @@ if ENV['GEMSTONE'].nil? or ENV['GEMSTONE'].empty?
 end
 verbose false  # turn off rake's chatter about all the sh commands
 
-CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html', 'vmunit.log', 'topazerrors.log')
+CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html',
+              'vmunit.log', 'topazerrors.log', 'gem_*_code.log')
 CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk', 'version.txt')
 
 Rake::RDocTask.new do |rd|
