@@ -1,9 +1,11 @@
 = MagLev Change Log
 
-== Changes for 22947  2010-03-01
+== Changes for 22949  2010-03-02
 
-* Fix Trac 669, 670
+* Fix Trac 669, 670, 671, 673
+* Miscellaneous cleanup of examples
 * YAML: Use FFI callbacks for IO
+* A few underlying changes/bugfixes in GemStone
 
 == Changes for 22932  2010-02-27
 

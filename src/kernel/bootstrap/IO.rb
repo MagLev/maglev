@@ -48,9 +48,8 @@ class IO
           block.call(para)
         end
       else
-        sep_ch = sep[0]
         while not eof?
-          block.call( self.__next_line( sep_ch ) )
+          block.call( self.__next_line( sep ) )
         end
       end
     end

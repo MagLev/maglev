@@ -100,7 +100,7 @@ module MagRp
        RubyLocalAsgnNode = _resolve_smalltalk_global(:RubyLocalAsgnNode)
        RubyVcGlobalAsgNode = _resolve_smalltalk_global(:RubyVcGlobalAsgNode)
 #        RubyVcGlobalLastMatchAsgn
-#    RubyBeginNode
+     RubyBeginNode = _resolve_smalltalk_global(:RubyBeginNode)
      RubyBlockArgNode = _resolve_smalltalk_global(:RubyBlockArgNode)
      RubyBlockPassNode = _resolve_smalltalk_global(:RubyBlockPassNode)
      RubyCaseNode = _resolve_smalltalk_global(:RubyCaseNode)
