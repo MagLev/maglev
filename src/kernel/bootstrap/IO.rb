@@ -10,6 +10,14 @@ class IO
     self
   end
 
+  def bytes()  # added for 1.8.7
+    return IoByteEnumerator.new(self, :each_byte, nil)
+  end
+
+  def chars()  # added for 1.8.7
+    return IoCharEnumerator.new(self, :each_char, nil)
+  end
+
   def dup
     raise NotImplementedError
   end
@@ -37,27 +45,76 @@ class IO
     self
   end
 
-  def each_line(sep=$/, &block)
-    if sep._equal?(nil)
-      block.call( self.__contents )
-    else
-      sep = Type.coerce_to(sep, String, :to_str)
-      if sep.size._equal?(0)
-        while not eof?
-          para = self.__next_paragraph
-          block.call(para)
+  def each_byte()  # added for 1.8.7
+    return IoByteEnumerator.new(self, :each_byte, nil)
+  end
+
+  def each_char(&block)  # added for 1.8.7
+    if block_given?
+      while not eof?
+        buf = self.read(4096)
+        if buf._equal?(nil)
+          return self
         end
-      else
-        sep_ch = sep[0]
-        while not eof?
-          block.call( self.__next_line( sep_ch ) )
+	len = buf.size
+	if len._equal?(0)
+	  return self
+	end
+	n = 0
+	while n < len
+          str = String.new(1)
+          str[0] = buf[n]
+	  block.call( str )
+	  n += 1
         end
       end
     end
     self
   end
 
+  def each_char()  # added for 1.8.7
+    return IoCharEnumerator.new(self, :each_char, nil)
+  end
+
+  def __next_line(sep)
+    # used by Enumerators
+    if sep._equal?(nil)
+      self.__contents 
+    elsif sep.__size._equal?(0)
+      self.__next_paragraph
+    else
+      self.__next_line( sep )
+    end
+  end
+
+  def each_line(sep=$/, &block)
+    if sep._equal?(nil)
+      block.call( self.__contents )
+    else
+      sep = Type.coerce_to(sep, String, :to_str)
+      if sep.__size._equal?(0)
+        while not eof?
+          para = self.__next_paragraph
+          block.call(para)
+        end
+      else
+        while not eof?
+          block.call( self.__next_line( sep ))
+        end
+      end
+    end
+    self
+  end
+
+  def each_line(sep=$/)  # added for 1.8.7
+    return IoEnumerator.new(self, :each_line, sep)
+  end
+
   alias each each_line 
+
+  def lines(sep=$/)  # added for 1.8.7
+    return IoEnumerator.new(self, :each_line, sep)
+  end
 
   def fcntl(op, flags=0)
     # only these operations are supported by __fcntl primitive:
@@ -101,7 +158,19 @@ class IO
     nil
   end
 
+  def self.foreach(filename, sep=$/) # added for 1.8.7
+    # returns an Enumerator
+    f = File.open(filename, 'r')
+    return f.each_line(sep)
+  end
+
   # def fsync ; end # subclass responsibility
+
+  # def getc ; end # subclass responsibility
+
+  def getbyte  # added for 1.8.7
+    self.getc
+  end 
 
   def gets(*args)    # [  begin gets implementation
     raise ArgumentError, 'expected 0 or 1 arg'
