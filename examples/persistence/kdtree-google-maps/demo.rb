@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'sinatra/base'
-require 'json/pure'
+require 'json'
 
 class Demo < Sinatra::Base
 
@@ -33,23 +33,23 @@ class Demo < Sinatra::Base
     # extract the k raw results for the target from the tree.
     raw_results = TREE.nearest_k( @target, @k )
 
-    # generate an array of hashes and sort the locations in 
+    # generate an array of hashes and sort the locations in
     # ascending order by miles.
     @results = raw_results.map do |r|
-      
-      { 
-        :latitude  => r.value.lat, 
+
+      {
+        :latitude  => r.value.lat,
         :longitude => r.value.lon,
         :city      => r.value.name,
         :state     => r.value.state,
         :zipcode   => r.value.zip,
         :miles     => r.value.spherical_miles( @target )
-      } 
-  
+      }
+
     end.sort_by { |location| location[ :miles ] }
- 
+
     @results.to_json
-    
+
   end
 
 end

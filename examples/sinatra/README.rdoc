@@ -5,6 +5,10 @@ You must first install the Sinatra and Rack gems:
 
   $ maglev-gem install sinatra rack
 
+If you want to run the tests, you'll also need RackTest:
+
+  $ maglev-gem install rack-test
+
 == Simple Examples
 
 === Hello

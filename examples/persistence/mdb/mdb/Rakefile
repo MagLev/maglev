@@ -1,6 +1,6 @@
 task :default => :commit
 
-ENV['MAGLEV_OPTS'] = '-Ilib -d'
+ENV['MAGLEV_OPTS'] = '-Ilib'
 
 desc "Commit the MDB Server code to the repository."
 task :commit do
@@ -54,8 +54,7 @@ end
 namespace :server do
   desc "Start the mdb_server app"
   task :start => :commit do
-#    sh %{ $MAGLEV_HOME/bin/rackup server.ru }
-    sh %{ MAGLEV_OPTS='-d' $MAGLEV_HOME/bin/rackup config.ru }
+    sh %{ MAGLEV_OPTS='-d' $MAGLEV_HOME/bin/rackup --port 4567 --server webrick config.ru }
   end
 
   desc "List the databases in the server"

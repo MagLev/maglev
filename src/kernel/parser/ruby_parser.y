@@ -1269,7 +1269,7 @@ rule
                       unless v_two then
                         result = RubyNilNode._new # s(:nil)
                       else
-                        result = RubyKBeginNode.s( v_two ) # s(:begin )
+                        result = RubyBeginNode.s( v_two ) # s(:begin )
                       end
                     }
                 | tLPAREN_ARG expr
