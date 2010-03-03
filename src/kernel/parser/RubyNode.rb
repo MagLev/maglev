@@ -93,21 +93,20 @@ module MagRp
     end
   end
 
-  class RubyKBeginNode < RubyNode
-    # instances not present in AST but used during parser execution
+  class RubyBeginNode 
     def self.s(val)
       res = self._new
       res.init(val)
     end
     def init(val)
-      @value = val
+      @bodyNode = val
       self
     end
     def kbegin_value
-      @value
+      @bodyNode
     end
     def inspect
-      "[:KBegin , #{@value.inspect} ]"
+      "[:Begin , #{@bodyNode.inspect} ]"
     end
   end
 

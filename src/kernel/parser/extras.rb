@@ -1293,7 +1293,7 @@ module MagRp # {
     def new_while( block, expr)
       preBool= true  # argument value from .y was always true
       # block, pre = block.last, false if block && block[0] == :begin
-      if block.class._equal?(RubyKBeginNode)
+      if block.class._equal?(RubyBeginNode)
 	block = block.kbegin_value
 	preBool = false
       end
@@ -1399,7 +1399,7 @@ module MagRp # {
     end
 
     # deleted  remove_begin,  
-    #  replaced by kbegin_value implemented in RubyNode and RubyKBeginNode
+    #  replaced by kbegin_value implemented in RubyNode and RubyBeginNode
     #def remove_begin node
     #  oldnode = node
     #  if node and :begin == node[0] and node.size == 2 then
