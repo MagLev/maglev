@@ -4620,7 +4620,7 @@ def _reduce_275(val, vofs)
                       unless v_two then
                         result = RubyNilNode._new # s(:nil)
                       else
-                        result = RubyKBeginNode.s( v_two ) # s(:begin )
+                        result = RubyBeginNode.s( v_two ) # s(:begin )
                       end
                     
     result
