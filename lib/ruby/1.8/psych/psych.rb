@@ -191,5 +191,9 @@ module Psych
     attr_accessor :domain_types
   end
 
+  # Hack to move on rails3.  replace when psych gets it
+  def self.add_builtin_type(*args)
+    puts "-- STUB: #{self}.add_builtin_type(#{args.inspect})"
+  end
   # :startdoc:
 end
