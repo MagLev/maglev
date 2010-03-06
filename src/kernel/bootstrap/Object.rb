@@ -126,12 +126,6 @@ class Object
   primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
   primitive   '__basic_clone', '_basicCopy' # use singleton class
 
-  def dup
-    res = self.__basic_dup
-    res.initialize_copy(self)
-    res
-  end
-
   def clone
     res = self.__basic_clone
     res.initialize_copy(self)
@@ -139,6 +133,18 @@ class Object
       res.freeze
     end
     res
+  end
+
+  def dup
+    res = self.__basic_dup
+    res.initialize_copy(self)
+    res
+  end
+
+  def enum_for(sym = :each , *args)  # added in 1.8.7
+    # the receiver must implement the specified method that
+    #  would return an enumerator
+    self.__send__(sym, *args) 
   end
 
   primitive 'freeze', 'immediateInvariant'
@@ -430,14 +436,14 @@ class Object
     res
   end
 
-  # Object should NOT have a to_str.  If to_str is implementd by passing
-  # to to_s, then by default all objects can convert to a string!  But we
-  # want classes to make an effort in order to convert their objects to
-  # strings.
-  #
-  # def to_str
-  #   to_s
-  # end
+  def instance_exec(*args, &block) # added for 1.8.7
+    blk = block.__set_self(self) 
+    blk.call(*args) 
+  end
+ 
+  def instance_exec(*args) 
+    raise LocalJumpError, 'no block given'
+  end 
 
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
@@ -484,9 +490,20 @@ class Object
 
   # TODO   singleton_method_removed
 
+  def tap(&block)	# added for 1.8.7
+    block.call(self)
+    self
+  end
+
   def to_a
      # remove this method for MRI 1.9 compatibility
      [ self ]
+  end
+
+  def to_enum(sym = :each , *args)  # added in 1.8.7
+    # the receiver must implement the specified method that
+    #  would return an enumerator
+    self.__send__(sym, *args) 
   end
 
   def to_fmt
@@ -496,6 +513,15 @@ class Object
   def to_s
     self.class.name.to_s
   end
+
+  # Object should NOT have a to_str.  If to_str is implementd by passing
+  # to to_s, then by default all objects can convert to a string!  But we
+  # want classes to make an effort in order to convert their objects to
+  # strings.
+  #
+  # def to_str
+  #   to_s
+  # end
 
   def __k_to_int
     # sent from C code in primitive 767 for sprintf
@@ -532,19 +558,22 @@ class Object
   # and temporary objects and may vary from run to run.  Does not abort
   # the current transaction.
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
+
+  # Undefined is a sentinal value used to distinguish between nil as a value passed 
+  # by the user and the user not passing anything for a defaulted value.  E.g.,:
+  #
+  #   def foo(required_param, optional_param=Undefined)
+  #     if optional_param._equal?( Undefined )
+  #       puts "User did not pass a value"
+  #     else
+  #       puts "Users passed #{optional_param} (which may be nil)"
+  #     fi
+  #   end
+  #
+  Undefined = Object.new
+  Undefined.freeze
 end
+Object.__freeze_constants
 
 
-# Undefined is a sentinal value used to distinguish between nil as a value passed 
-# by the user and the user not passing anything for a defaulted value.  E.g.,:
-#
-#   def foo(required_param, optional_param=Undefined)
-#     if optional_param._equal?( Undefined )
-#       puts "User did not pass a value"
-#     else
-#       puts "Users passed #{optional_param} (which may be nil)"
-#     fi
-#   end
-#
-Undefined = Object.new
 
