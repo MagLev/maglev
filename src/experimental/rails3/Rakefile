@@ -1,9 +1,13 @@
 
-R3DIR = '/Users/pmclain/external/rails'
+task :default => :test
 
-task :default => :model
-
-desc "Run the active model tests"
-task :model do
-  sh "maglev-ruby -I#{R3DIR}/activemodel/lib model_test.rb"
+desc "Run the tests"
+task :test do
+  sh %{
+    $MAGLEV_HOME/bin/testrb \
+      -Irails/activesupport/lib \
+      -Irails/activemodel/lib \
+      -Itest \
+      #{FileList['test/*_test.rb']}
+  }
 end
