@@ -79,8 +79,8 @@ class Module
     end
   end
 
-  def define_method(sym, &blk)
-    define_method(sym, blk)
+  def define_method(sym, &block)
+    define_method(sym, block)
   end
 
   primitive_nobridge '__instance_method', 'rubyUnboundMethodFor:'
@@ -426,7 +426,9 @@ class Module
 
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)
-    raise NameError, "uninitialized constant #{symbol}"
+    # final implementation in delta/Module.rb , this implementation avoids MNU
+    #   while constructing the exception
+    raise NameError, 'uninitialized constant during bootstrap'
   end
 
   # append_features deprecated, not implemented , see Module#included
@@ -495,7 +497,7 @@ class Module
   # Module.nesting is compiled to an env0 send of ( aRubyConstantRef nesting ) .
   # Module.nesting is not usable within bootstrap code.
   #
-  def self.nesting(*args, &blk)
+  def self.nesting(*args, &block)
     # You may also get this error if Module.nesting is used in bootstrap code
     # or if the receiver of nesting is not recognizable at compile time
     # as a reference to the constant Module .
