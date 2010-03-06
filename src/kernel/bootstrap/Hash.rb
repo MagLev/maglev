@@ -70,22 +70,49 @@ class Hash
   end
 
   def self.__from_elements(elements)
-    numelem = elements.length
-    if (numelem & 1)._equal?(1)
-      if (numelem._equal?(1))
-        first = elements.__at(0)
-        if (first._isHash)
-          return self.__atkey(first)
-        end
-        return Type.coerce_to(first, Hash, :to_hash)
+    first = elements.__at(0)
+    if first._isArray			# changes for 1.8.7
+      res = self.__from_array_of_pairs(elements)
+    else
+      numelem = elements.length
+      if (numelem & 1)._equal?(1)
+	if numelem._equal?(1)
+	  if first._isHash
+	    return self.__atkey(first)
+	  end
+	  return Type.coerce_to(first, Hash, :to_hash)
+	end
+	raise ArgumentError , 'odd number of args'
       end
-      raise ArgumentError , 'odd number of args'
+      n = 0
+      res = self.__new(numelem)
+      while n < numelem
+        res.__atkey_put( elements.__at(n) , elements.__at(n + 1))
+        n += 2
+      end
     end
+    res
+  end
+
+  def self.__from_array_of_pairs(elements)  # added for 1.8.7
+    # handle an array of pairs, skipping elements that are not arrays of size 2
     n = 0
+    numelem = elements.length
     res = self.__new(numelem)
-    while (n < numelem)
-      res.__atkey_put( elements.__at(n) , elements.__at(n + 1))
-      n += 2
+    while n < numelem
+      pair = nil
+      begin
+        pair = Type.coerce_to( elements.__at(n), Array, :to_ary )
+      rescue
+        # ignore coercion errors
+      end
+      if pair._not_equal?(nil)
+        p_size = pair.__size
+        if p_size <= 2 && p_size > 0
+          res.__atkey_put( pair.__at(0), pair.__at(1) )
+        end
+      end
+      n += 1
     end
     res
   end
@@ -562,11 +589,11 @@ class Hash
     return RemoteNil
   end
 
-  def delete(key, &blk)
+  def delete(key, &block)
     v = self.__delete(key)
     if v._equal?(RemoteNil)
       if block_given?
-        return  blk.call(key)
+        return  block.call(key)
       else
         return nil
       end
@@ -657,9 +684,10 @@ class Hash
 
   def delete_if(&block)
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
-    unless @numElements._equal?(0)
-      raise LocalJumpError, "no block given" unless block_given?
-
+    # maglev 1.8.7 does not support returning an Enumerator due to complex side effects
+    unless block_given?
+      raise LocalJumpError, "no block given"	# changes for 1.8.7 
+    else
       # Do this in 2 steps, so we're not altering the structure while we walk it.
       to_del = []
       each_pair { |k, v| to_del << k if yield(k, v) }
@@ -734,6 +762,9 @@ class Hash
   end
 
   def each_pair(&block)
+    unless block_given?
+      return HashEnumerator.new(self, :each_pair) # for 1.8.7
+    end
     lim = @tableSize 
     lim = lim + lim
     kofs = 0
@@ -766,6 +797,9 @@ class Hash
   alias each each_pair 
 
   def each_key(&block) 
+    unless block_given?
+      return HashKeyEnumerator.new(self, :each_key) # for 1.8.7
+    end
     lim = @tableSize
     lim = lim + lim
     kofs = 0
@@ -798,6 +832,9 @@ class Hash
   end
 
   def each_value(&block)
+    unless block_given?
+      return HashKeyEnumerator.new(self, :each_value) # for 1.8.7
+    end
     lim = @tableSize
     lim = lim + lim
     kofs = 0
@@ -947,6 +984,9 @@ class Hash
   end
 
   def reject(&block)
+    unless block_given?
+      return HashEnumerator.new(self, :reject ) # for 1.8.7
+    end
     self.dup.delete_if(&block)
   end
 
@@ -957,6 +997,8 @@ class Hash
     self
   end
 
+  # def reject!() ; end # TODO for 1.8.7 , complex side effects
+
   def replace(hash)
     hash = Type.coerce_to(hash, Hash, :to_hash)
     self.__clear( hash.size )
@@ -965,6 +1007,9 @@ class Hash
   end
 
   def select(&block)
+    unless block_given?
+      return HashEnumerator.new(self, :select) # for 1.8.7
+    end
     res = []
     each_pair { |k, v|
        if yield(k,v)
