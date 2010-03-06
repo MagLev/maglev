@@ -31,7 +31,7 @@ Dir.chdir(test_dir) do
 
   test(Dir.glob("[ax].rb"),        ['a.rb'],               'Dir.glob with []')
   # TODO: Fix bug and uncomment
-  #test(Dir.glob("{a,b}.rb").sort,       ['a.rb', 'b.rb'],       'Dir.glob with {}')
+  test(Dir.glob("{a,b}.rb").sort,       ['a.rb', 'b.rb'],       'Dir.glob with {}')
   test(Dir.glob("**/even_deeper"), ['deeper/even_deeper'], 'Dir.glob with **')
 end
 

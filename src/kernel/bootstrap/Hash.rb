@@ -2,14 +2,14 @@ class Hash
 
   # Class methods
 
-  class_primitive_nobridge '__allocate', '_basicNew:' 
-	#  tableSize arg converted to near-by prime
+  class_primitive_nobridge '__allocate', '_basicNew:'
+  #  tableSize arg converted to near-by prime
         # initializes @tableSize, @collisionLimit, @numCollisions, @numElements
         #  @defaultOrParent = nil , @defaultIsBlock = false
         # varying instVars initialized to RemoteNil
 
   def self.allocate
-    # for spec compatibility, not used by this implementation 
+    # for spec compatibility, not used by this implementation
     self.__allocate(7)
   end
 
@@ -144,8 +144,13 @@ class Hash
     if (args.length > 1)
       raise ArgumentError, 'too many args'
     end
-    self.initialize(args.__at(0))
+
+    # Do not call self.initialize: can lead to stack overflow from derived
+    # classes (Trac 675)
+    # self.initialize(args.__at(0))
+    self.default=(args.__at(0))
   end
+
   def initialize  # zero args
     # allocation includes self.default=(nil)
     self
@@ -165,9 +170,9 @@ class Hash
     if other._equal?(self)
        return true
     end
-    return false unless other._isHash 
-    return false unless other.length._equal?(self.length) 
-    # Maglev is compatible with MRI 1.8.6 
+    return false unless other._isHash
+    return false unless other.length._equal?(self.length)
+    # Maglev is compatible with MRI 1.8.6
     #  by not comparing   @defaultOrParent == other.default  #(1.8.7 does check)
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
@@ -176,10 +181,10 @@ class Hash
         unless other.has_key?(k)
           return false
         end
-	ov = other.__atkey(k)
-	if v._equal?(ov)
-	  # ok
-	elsif ts.include?(v) || ts.include?(ov)
+  ov = other.__atkey(k)
+  if v._equal?(ov)
+    # ok
+  elsif ts.include?(v) || ts.include?(ov)
           if v._equal?(self) && ov._equal?(other)
             # ok
           elsif v._equal?(other) && ov._equal?(self)
@@ -190,7 +195,7 @@ class Hash
         elsif v == ov
           # ok
         else
-          return false 
+          return false
         end
       }
     ensure
@@ -214,11 +219,11 @@ class Hash
     added = ts.__add_if_absent(self)
     begin
       self.each_pair { | k, v |
-	ov = other.__atkey(k)
-        return false if ov._equal?(dflt) 
-	if v._equal?(ov)
-	  # ok
-	elsif ts.include?(v) || ts.include?(ov)
+  ov = other.__atkey(k)
+        return false if ov._equal?(dflt)
+  if v._equal?(ov)
+    # ok
+  elsif ts.include?(v) || ts.include?(ov)
           if v._equal?(self) && ov._equal?(other)
             # ok
           elsif v._equal?(other) && ov._equal?(self)
@@ -229,7 +234,7 @@ class Hash
         elsif v.eql?(ov)
           # ok
         else
-          return false 
+          return false
         end
       }
     ensure
@@ -252,7 +257,7 @@ class Hash
                  # raises error if arg negative, or past end
 
   def __add_keys_to(set)  # used by parser # [
-    lim = @tableSize 
+    lim = @tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -279,7 +284,7 @@ class Hash
         end
       end
       kofs += 2
-    end 
+    end
   end # ]
 
   def __atkey(key)  # [
@@ -290,15 +295,15 @@ class Hash
       k = self.__at(kofs)
       if k._not_equal?(RemoteNil)
         if key.eql?( k )
-	  return v
+    return v
         end
-      elsif v._isFixnum  
+      elsif v._isFixnum
         idx = v  # internal collision chain
         begin
-	  if key.eql?( self.__at(idx) )
+    if key.eql?( self.__at(idx) )
             return self.__at(idx + 1)
           end
-	  idx = self.__at(idx + 2)
+    idx = self.__at(idx + 2)
         end while idx._isFixnum
       else
         v = v.__bucket_at(key, kh) # a collision bucket
@@ -332,8 +337,8 @@ class Hash
           idx = self.__at(idx + 2)
         end while idx._isFixnum
       end
-    end 
-    RemoteNil # indicates not-found 
+    end
+    RemoteNil # indicates not-found
   end
 
   def __at_orRNil(key)
@@ -360,15 +365,15 @@ class Hash
     end
     return RemoteNil
   end
-      
-  primitive_nobridge '__at_put', '_atZ:put:'  # prim 860 , zero based arg  
-			# auto grow for store of 1 to 3 past end
+
+  primitive_nobridge '__at_put', '_atZ:put:'  # prim 860 , zero based arg
+      # auto grow for store of 1 to 3 past end
 
   primitive '__varying_size', '_basicSize'
   primitive '__varying_size=', '_basicSize:'
 
   def __atkey_put(key, value) # [
-    if key._isString 
+    if key._isString
       unless key.frozen?
         key = key.dup
         key.freeze
@@ -385,12 +390,12 @@ class Hash
           return value
         else
           # convert entry to collision chain or bucket
-          empty_idx = self.__varying_size 
-          if empty_idx <= 2014	
+          empty_idx = self.__varying_size
+          if empty_idx <= 2014
             self.__at_put(empty_idx + 5, nil) # auto-grows
             self.__at_put(empty_idx + 3,  key)
             self.__at_put(empty_idx + 4, value)
-            self.__at_put(empty_idx + 2, empty_idx + 3) 
+            self.__at_put(empty_idx + 2, empty_idx + 3)
             self.__at_put(empty_idx + 0, k)
             self.__at_put(empty_idx + 1, v)
             self.__at_put(kofs,     RemoteNil )
@@ -416,18 +421,18 @@ class Hash
             end
           elsif key.eql?( ck )
             self.__at_put(idx + 1, value)
-            return value 
+            return value
           end
           last_idx = idx
           idx = self.__at(idx + 2)
         end while idx._isFixnum
-        if empty_idx._equal?(nil)   
+        if empty_idx._equal?(nil)
           # did not find an empty coll chain entry
           empty_idx = self.__varying_size
           self.__at_put(last_idx + 2, empty_idx)
-        end  
+        end
         self.__at_put(empty_idx + 2, nil) # auto-grows
-        self.__at_put(empty_idx, key)  
+        self.__at_put(empty_idx, key)
         self.__at_put(empty_idx + 1, value)
         delta = 1
       else
@@ -466,14 +471,14 @@ class Hash
         else
           # convert entry to collision chain
           empty_idx = self.__varying_size
-	  self.__at_put(empty_idx + 5, nil) # auto-grows
-	  self.__at_put(empty_idx + 3,  key)
-	  self.__at_put(empty_idx + 4, value)
-	  self.__at_put(empty_idx + 2, empty_idx + 3)
-	  self.__at_put(empty_idx + 0, k)
-	  self.__at_put(empty_idx + 1, v)
-	  self.__at_put(kofs,     RemoteNil )
-	  self.__at_put(kofs + 1, empty_idx)
+    self.__at_put(empty_idx + 5, nil) # auto-grows
+    self.__at_put(empty_idx + 3,  key)
+    self.__at_put(empty_idx + 4, value)
+    self.__at_put(empty_idx + 2, empty_idx + 3)
+    self.__at_put(empty_idx + 0, k)
+    self.__at_put(empty_idx + 1, v)
+    self.__at_put(kofs,     RemoteNil )
+    self.__at_put(kofs + 1, empty_idx)
           return 1
         end
       elsif v._isFixnum
@@ -487,18 +492,18 @@ class Hash
             end
           elsif key.eql?( ck )
             self.__at_put(idx + 1, value)
-            return 0 
+            return 0
           end
           last_idx = idx
           idx = self.__at(idx + 2)
         end while idx._isFixnum
-        if empty_idx._equal?(nil) 
+        if empty_idx._equal?(nil)
           # did not find an empty coll chain entry
           empty_idx = self.__varying_size
           self.__at_put(last_idx + 2, empty_idx)
-        end  
+        end
         self.__at_put(empty_idx + 2, nil) # auto-grows
-        self.__at_put(empty_idx, key)  
+        self.__at_put(empty_idx, key)
         self.__at_put(empty_idx + 1, value)
       else
         raise 'Inconsistent Hash collision bucket'
@@ -530,27 +535,27 @@ class Hash
           return v
         end
       elsif v._isFixnum
-	idx = v  # internal collision chain
-	begin
-	  ck = self.__at(idx)
-	  if key.eql?( ck )
-	    v = self.__at(idx + 1)
-	    self.__at_put(idx , RemoteNil)
-	    self.__at_put(idx + 1, RemoteNil)
-	    @numElements = @numElements - 1
-	    @numCollisions = @numCollisions - 1
-	    return v 
-	  end
-	  idx = self.__at(idx + 2)
-	end while idx._isFixnum
+  idx = v  # internal collision chain
+  begin
+    ck = self.__at(idx)
+    if key.eql?( ck )
+      v = self.__at(idx + 1)
+      self.__at_put(idx , RemoteNil)
+      self.__at_put(idx + 1, RemoteNil)
+      @numElements = @numElements - 1
+      @numCollisions = @numCollisions - 1
+      return v
+    end
+    idx = self.__at(idx + 2)
+  end while idx._isFixnum
       else
-	# a collision bucket
-	val = v.__bucket_delete( key, kh )
-	if val._not_equal?(RemoteNil)
-	  @numElements = @numElements - 1
-	  @numCollisions = @numCollisions - 1
-	end
-	return val
+  # a collision bucket
+  val = v.__bucket_delete( key, kh )
+  if val._not_equal?(RemoteNil)
+    @numElements = @numElements - 1
+    @numCollisions = @numCollisions - 1
+  end
+  return val
       end
     end
     return RemoteNil # not found
@@ -566,7 +571,7 @@ class Hash
           self.__at_put(kofs + 1 , RemoteNil)
           self.__at_put(kofs + 1, RemoteNil)
           @numElements = @numElements - 1
-          return v 
+          return v
         end
       elsif v._isFixnum
         idx = v  # internal collision chain
@@ -578,7 +583,7 @@ class Hash
             self.__at_put(idx + 1, RemoteNil)
             @numElements = @numElements - 1
             # @numCollisions not maintained in buckets
-            return v 
+            return v
           end
           idx = self.__at(idx + 2)
         end while idx._isFixnum
@@ -613,11 +618,11 @@ class Hash
     # returns true if key was found
     self.__delete(key)._not_equal?(RemoteNil)
   end
- 
+
   primitive '__fill_resize', 'fillFrom:resizeTo:with:' # args 1 is one-based
 
   def clear
-    ts = @tableSize 
+    ts = @tableSize
     if ts > 20
       ts = 19
     end
@@ -631,7 +636,7 @@ class Hash
     @collisionLimit = arr.__at(1)
     ts = arr.__at(0)
     @tableSize = ts
-    two_ts = ts + ts 
+    two_ts = ts + ts
     self.__fill_resize(1, two_ts, RemoteNil) # one-based first arg
     @numElements = 0
     @numCollisions = 0
@@ -649,19 +654,19 @@ class Hash
   def default
     if @defaultIsBlock
       @defaultOrParent.call(nil)
-    else  
+    else
       @defaultOrParent
     end
   end
 
   def __parent
     # message only valid for collision buckets
-    @defaultOrParent 
+    @defaultOrParent
   end
 
-  def __parent=(h)  
+  def __parent=(h)
     # message only valid for collision buckets
-    @defaultOrParent = h 
+    @defaultOrParent = h
   end
 
   def default=(value)
@@ -709,22 +714,22 @@ class Hash
   end
 
   primitive_nobridge '__become', '_becomeMinimalChecks:'
- 
+
   def __rebuild(new_size)
     # puts "start rebuild ( "
     nhash = self.class.__new(new_size)
     nhash.default=( @defaultOrParent )
     save_cl = nhash.__set_collision_limit(Fixnum_MAX) # prevent recursive rebuild
 
-    nhash.__become(self) # before populating new implementation 
-			 #   so new buckets get proper parent ref
-    nhash.__merge_into(self) 
+    nhash.__become(self) # before populating new implementation
+       #   so new buckets get proper parent ref
+    nhash.__merge_into(self)
 
     self.__set_collision_limit(save_cl)
     # puts " ) end rebuild to ts #{@tableSize} from ts #{nhash.__tableSize} size #{@numElements}"
     self
   end
-  
+
   def rehash
     if self.frozen?
       raise TypeError, 'rehash called on frozen instance of Hash'
@@ -776,11 +781,11 @@ class Hash
           block.call(k, v)
         elsif v._isFixnum
           # internal collision chain
-	  idx = v
-	  begin
-	    ck = self.__at(idx)
-	    if ck._not_equal?(RemoteNil)
-	      block.call(ck, self.__at(idx + 1) )
+    idx = v
+    begin
+      ck = self.__at(idx)
+      if ck._not_equal?(RemoteNil)
+        block.call(ck, self.__at(idx + 1) )
             end
             idx = self.__at(idx + 2)
           end while idx._isFixnum
@@ -790,11 +795,11 @@ class Hash
         end
       end
       kofs += 2
-    end 
+    end
     self
   end
 
-  alias each each_pair 
+  alias each each_pair
 
   def each_key(&block) 
     unless block_given?
@@ -806,23 +811,23 @@ class Hash
     while kofs < lim
       k = self.__at(kofs)
       if k._not_equal?(RemoteNil)
-        block.call(k) 
+        block.call(k)
       else
         v = self.__at(kofs + 1)
         if v._not_equal?(RemoteNil)
-          if v._isFixnum 
+          if v._isFixnum
             # internal collision chain
             idx = v
             begin
               ck = self.__at(idx)
               if ck._not_equal?(RemoteNil)
                 block.call(ck)
-              end       
+              end
               idx = self.__at(idx + 2)
             end while idx._isFixnum
           else
             # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
-            v.each_key(&block) 
+            v.each_key(&block)
           end
         end
       end
@@ -846,7 +851,7 @@ class Hash
           block.call( v)
         elsif v._isFixnum
           # internal collision chain
-          idx = v 
+          idx = v
           begin
             ck = self.__at(idx)
             if ck._not_equal?(RemoteNil)
@@ -896,7 +901,7 @@ class Hash
 
   def has_value?(val)
     self.each_pair { |k,v|
-      return true if v == val 
+      return true if v == val
     }
     false
   end
@@ -920,8 +925,8 @@ class Hash
 
   def invert
     # per specs, does not return inst of a subclass
-    result = Hash.__new(@tableSize)  
-    self.each_pair { |k,v| 
+    result = Hash.__new(@tableSize)
+    self.each_pair { |k,v|
       result.__atkey_put( v,  k )
     }
     result
@@ -933,27 +938,27 @@ class Hash
     self.each_key { | k |
       arr.__at_put(idx, k)
       idx += 1
-    } 
+    }
     arr
   end
 
-  alias key? has_key?  
+  alias key? has_key?
 
   def length
     @numElements
   end
-    
+
   def merge(other, &block)
     other = Type.coerce_to(other, Hash, :to_hash)
     other_siz = other.size
     my_siz = @numElements
     res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-    if res_siz > (ts = @tableSize)  && ts < 1009 
+    if res_siz > (ts = @tableSize)  && ts < 1009
       h = self.class.__new(res_siz)
       self.__merge_into(h)
     else
       h = self.dup
-    end 
+    end
     h.__merge!(other, &block)
   end
 
@@ -962,8 +967,8 @@ class Hash
     other_siz = other.size
     my_siz = @numElements
     res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-    if res_siz > (ts = @tableSize)  && ts < 1009 
-      self.__rebuild(res_siz) 
+    if res_siz > (ts = @tableSize)  && ts < 1009
+      self.__rebuild(res_siz)
     end
     self.__merge!(other, &block)
   end
@@ -1029,13 +1034,13 @@ class Hash
   def shift
     pair = self.__first_pair
     if pair._equal?(nil)
-      return self.default(nil) 
+      return self.default(nil)
     end
     self.__delete(pair.__at(0))
     return pair
   end
 
-  alias size length 
+  alias size length
 
   alias store __atkey_put
 
@@ -1047,14 +1052,14 @@ class Hash
     to_a.join
   end
 
-  alias update merge! 
+  alias update merge!
 
   alias value? has_value?
 
   def values
     arr = Array.new(@numElements)
     idx = 0
-    self.each_pair { | k, v | 
+    self.each_pair { | k, v |
       arr.__at_put(idx,  v)
       idx += 1
     }
@@ -1071,7 +1076,7 @@ class Hash
   # inherit __basic_clone from Object
 
   def __clone_buckets
-    lim = @tableSize 
+    lim = @tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -1079,29 +1084,29 @@ class Hash
       if v._not_equal?(RemoteNil)
         k = self.__at(kofs)
         if k._not_equal?(RemoteNil)
-          # a k,v pair 
+          # a k,v pair
         elsif v._isFixnum
           # internal collision chain
         else
-          # a collision bucket 
+          # a collision bucket
           nbucket = v.clone
           nbucket.__parent=(self)
           self.__at_put(kofs + 1, nbucket )
         end
       end
       kofs += 2
-    end 
+    end
   end
 
   def dup
     nhash = self.__basic_dup
-    nhash.__clone_buckets 
+    nhash.__clone_buckets
     nhash
   end
 
   def clone
     nhash = self.__basic_clone
-    nhash.__clone_buckets 
+    nhash.__clone_buckets
     nhash
   end
 

@@ -1,7 +1,7 @@
 class Module
 
-  # See also delta/Module.rb 
-  
+  # See also delta/Module.rb
+
   # code formerly in Behavior.rb  # [
   primitive '__alias_method', 'rubyAlias:from:'
 
@@ -12,12 +12,12 @@ class Module
     unless old_name._isSymbol
       old_name = Type.coerce_to(old_name, String, :to_str)
     end
-    self.__alias_method(new_name, old_name) 
+    self.__alias_method(new_name, old_name)
   end
 
   primitive_nobridge '__module_eval_string', '_moduleEvalString:with:binding:'
 
-  primitive_nobridge 'ancestor_modules_names', 'rubyAncestorModulesNames' 
+  primitive_nobridge 'ancestor_modules_names', 'rubyAncestorModulesNames'
 
   def __isBehavior
     true
@@ -49,7 +49,7 @@ class Module
     fake_vcglbl = [nil,nil]
     names.each do |n|
       the_name = self.__attr_type_check(n)
-      str = "def #{the_name}; @#{the_name}; end" 
+      str = "def #{the_name}; @#{the_name}; end"
       self.__module_eval_string( str, fake_vcglbl, bnd )
     end
   end
@@ -59,7 +59,7 @@ class Module
     fake_vcglbl = [nil,nil]
     names.each do |n|
       the_name = self.__attr_type_check(n)
-      str = "def #{the_name}=(v); @#{the_name} = v; end" 
+      str = "def #{the_name}=(v); @#{the_name} = v; end"
       self.__module_eval_string( str, fake_vcglbl, bnd )
     end
   end
@@ -110,14 +110,14 @@ class Module
 
   def method_added(a_symbol)
     # invoked from code in .mcz when a method is compiled into receiver
-    # overrides the bootstrap implementation in Behavior_ruby.gs 
-    # note also implementation of method_added in Module 
+    # overrides the bootstrap implementation in Behavior_ruby.gs
+    # note also implementation of method_added in Module
     self.singleton_method_added(a_symbol)
   end
 
   def method_removed(a_symbol)
     # invoked from code in .mcz when a method is removed from receiver
-    # note also implementation of method_removed in Module 
+    # note also implementation of method_removed in Module
     self.singleton_method_removed(a_symbol)
   end
 
@@ -433,6 +433,9 @@ class Module
 
   # append_features deprecated, not implemented , see Module#included
 
+  def append_features(other)
+  end
+
   def include(*names)
     # this variant gets bridge methods
     names.reverse.each do |name|
@@ -562,7 +565,7 @@ class Module
 
   # primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
 
-  # If receiver is not already persistable , makes it persistable and 
+  # If receiver is not already persistable , makes it persistable and
   # ensures that it is referenced by the parent class/module's persistent name space.
   #
   # Since Modules and Classes are namespaces, all of receivers
