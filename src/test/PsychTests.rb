@@ -76,3 +76,11 @@ EOS
     assert_equal(["foo", "bar", :baz, 123], YAML.load(sio))
   end
 end
+
+class GemStonePsychPatchesTest < Test::Unit::TestCase
+  # Patched to_yaml.rb to recognize !ruby/sym
+  def test_symbol_patch
+    assert_equal(:foo,  YAML.load("!ruby/sym foo"))
+    assert_equal(:quux, YAML.load("!ruby/symbol quux"))
+  end
+end
