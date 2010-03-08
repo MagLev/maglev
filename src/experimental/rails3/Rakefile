@@ -11,3 +11,13 @@ task :test do
       #{FileList['test/*_test.rb']}
   }
 end
+
+task :mri do
+  sh %{
+    testrb \
+      -Irails/activesupport/lib \
+      -Irails/activemodel/lib \
+      -Itest \
+      #{FileList['test/*_test.rb']}
+  }
+end

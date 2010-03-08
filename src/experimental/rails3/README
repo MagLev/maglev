@@ -1,0 +1,54 @@
+# Notes on MagLev and Rails3
+
+## Pre-Requisites
+
+You'll need to install the i18n gem:
+
+  $ maglev-gem install i18n
+
+Then you can just do "rake" to run the tests.
+
+## Rails 3 Source
+
+The rails3 source is in the rails subdirectory (a git submodule).  It is
+tracking the Rails GitHub repository HEAD (rails3 work is going on there).
+
+## Patchs
+
+This section lists some patches and workarounds in effect for this code.
+
++ ActiveModel: Needs Psych#add_builtin_type
+
+  I patched $MAGLEV_HOME/lib/ruby/1.8/psych/psych.rb to add a STUB version
+  of Psych#add_builtin_type It does nothing, but so far, the rails stuff
+  seems to work.  Aaron Patterson has assured me that he will eventualy get
+  add_builtin_type implemeneted.
+
+
++ ActiveSupport: en.yml
+  The en.yml file contains some syck specific additions: Use of ':' in
+  front of a bare word to indicate a symbol:
+
+     ---
+     :foo     # Syck returns the symbol foo
+
+  The YAML grammar does not allow an unquoted ':' in this manner.  So, I've
+  changed the example to
+
+     ---
+     !ruby/sym foo
+
+  Which works in both Syck and a (patched) Psych.  Psych does not yet
+  support symbols, but it is a two line fix:
+
+  --- a/lib/ruby/1.8/psych/psych/visitors/to_ruby.rb
+  +++ b/lib/ruby/1.8/psych/psych/visitors/to_ruby.rb
+  @@ -74,6 +74,8 @@ module Psych
+             }
+             args.push(args.delete_at(1) == '...')
+             Range.new(*args)
+  +        when /^!ruby\/sym(bol)?:?(.*)?$/
+  +          o.value.to_sym
+           else
+             @ss.tokenize o.value
+           end
