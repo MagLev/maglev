@@ -21,8 +21,8 @@ test(idset.length, 10, 'Inserted 10 Id instances')
 10.times { |i| idset << Bar.new(i) }
 test(idset.length, 20, 'Inserted 10 Bar instances')
 
-old_ones = idset.select([:id], :>=, 7)
-test(old_ones.length, 6, 'Select 1 worked')
+old_ones = idset.search([:id], :>=, 7)
+test(old_ones.length, 6, 'Search 1 worked')
 
 report
 

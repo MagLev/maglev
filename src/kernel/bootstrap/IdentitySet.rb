@@ -153,10 +153,12 @@ class IdentitySet
   # my_peeps is an IdentitySet) with all of the Person objects whose age
   # field is less than 25.
   #
-  #     youngsters = my_peeps.select([:age], :<, 25)
+  #     youngsters = my_peeps.search([:age], :<, 25)
   #
-  # The following comparsison operators are allowed: TBD...
-  primitive_nobridge 'select', 'select:comparing:with:'
+  # The name of this method was chosen so that it doesn't conflict with any
+  # well known methods (e.g., Enumerable#select, Enumerable#find*, Rails
+  # find* etc.).
+  primitive_nobridge 'search', 'select:comparing:with:'
 
   # Remove an the specified index from receiver.
   #
