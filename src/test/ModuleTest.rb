@@ -165,6 +165,32 @@ rescue NoMethodError
   # ok
 end
 
+
+# Test that append_feature gets called before inherited and that
+# the proper include stuff is done/not-done
+
+$append_features_called = nil
+$included_called = nil
+module MAppendFeatures
+  def self.append_features(other)
+    raise "append_features already called" unless $append_features_called.nil?
+    raise "included already called" unless $included_called.nil?
+    $append_features_called = true
+  end
+
+  def self.included(other)
+    raise "append_features already called" unless $append_features_called.equal?(true)
+    raise "included already called" unless $included_called.nil?
+    $included_called = true
+  end
+end
+
+class CAppendFeatures
+  include MAppendFeatures
+end
+raise "append_features not called" unless $append_features_called
+raise "included not called" unless $included_called
+
 ################### Report and clean up #####################
 report
 Maglev.abort_transaction if defined? RUBY_ENGINE

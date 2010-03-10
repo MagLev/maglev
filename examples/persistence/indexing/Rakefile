@@ -6,6 +6,26 @@ task :demo do
   sh %{ maglev-ruby -Ilib index_example.rb }
 end
 
+desc "Search the large committed People set"
+task :search do
+  sh %{ maglev-ruby search_random_people.rb }
+end
+
+desc "Commit the code and data needed for the search task"
+task :commit => ['commit:code', 'commit:data']
+
+namespace :commit do
+  desc "Commit the code to the repository"
+  task :code do
+    sh %{ maglev-ruby -Mcommit -Ilib -e 'require "person"' }
+  end
+
+  desc "Commit a set of 100_000 random people (depends on commit:code)"
+  task :data do
+    sh %{ maglev-ruby create_random_people.rb 100_000 commit }
+  end
+end
+
 desc "Run the tests"
 task :test do
   sh %{ $MAGLEV_HOME/bin/testrb -Ilib #{FileList['test/*_test.rb']} }

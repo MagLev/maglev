@@ -108,16 +108,55 @@ class IdentitySet
     seq
   end
 
-  primitive_nobridge 'select', 'select:'
-  alias_method :find_all, :select
+  def find_all
+    result = Array.new
+    each { |o| result << o if yield(o) }
+    result
+  end
+  alias_method :select, :find_all
 
-  primitive_nobridge 'reject', 'reject:'
-  primitive_nobridge 'collect', 'collect:'
+  def reject
+    result = Array.new
+    each { |o| result << o unless yield(o) }
+    result
+  end
+
+  def collect
+    result = Array.new
+    if block_given?
+      each { |o| result << yield(o) }
+    else
+      each { |o| result << o }
+    end
+    result
+  end
   alias_method :map, :collect
 
-  primitive_nobridge 'inject', 'inject:into:'
-  primitive_nobridge 'all?', 'allSatisfy:'
-  primitive_nobridge 'any?', 'anySatisfy:'
+  def inject(memo = Undefined)
+    each { |o|
+      if memo._equal? Undefined
+        memo = o
+      else
+        memo = yield(memo, o)
+      end
+    }
+    memo._equal?(Undefined) ? nil : memo
+  end
+
+  def all?
+    if block_given?
+      each { |e| return false unless yield(e) }
+    else
+      each { |e| return false unless e }
+    end
+    true
+  end
+
+  def any?(&prc)
+    prc = Proc.new { |obj| obj } unless block_given?
+    each { |o| return true if prc.call(o) }
+    false
+  end
 
   # ##################################################
   #                  EXPERIMENTAL:
@@ -153,10 +192,12 @@ class IdentitySet
   # my_peeps is an IdentitySet) with all of the Person objects whose age
   # field is less than 25.
   #
-  #     youngsters = my_peeps.select([:age], :<, 25)
+  #     youngsters = my_peeps.search([:age], :<, 25)
   #
-  # The following comparsison operators are allowed: TBD...
-  primitive_nobridge 'select', 'select:comparing:with:'
+  # The name of this method was chosen so that it doesn't conflict with any
+  # well known methods (e.g., Enumerable#select, Enumerable#find*, Rails
+  # find* etc.).
+  primitive_nobridge 'search', 'select:comparing:with:'
 
   # Remove an the specified index from receiver.
   #
