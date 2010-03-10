@@ -1,5 +1,23 @@
 = MagLev Change Log
 
+== Changes for 22985  2010-03-09
+
+* Add callback to Module#append_features
+* Fixes and enhancements for underlying GemStone stats
+  Added: 
+    PermGenFullCount - Number of times the perm gen space was found to be full.
+    CodeGenFullCount - Number of times the code gen space was found to be full.
+    OldGenFullCount - Number of times the old gen space was found to be full.
+    VoteOnDeadCount -  Number of times the session has voted on dead objects.
+    ScavsPromToMkSwCount - Number of times a scavenge operation was promoted 
+      to a Mark/Sweep operation.
+    LastMarkSweepReasonCode - An internal code which indicates the reason for
+      the last Mark/Sweep operation.
+    LastScavengeReasonCode - An internal code which indicates the reason for 
+      the last scavenge operation.
+* Changed the index search method from 'select' to 'search'
+  to avoid conflict with Enumerable#select.
+
 == Changes for 22949  2010-03-02
 
 * Fix Trac 669, 670, 671, 673

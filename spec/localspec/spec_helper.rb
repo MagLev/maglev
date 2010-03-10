@@ -1,1 +1,0 @@
-../rubyspec/spec_helper.rb
