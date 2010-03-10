@@ -1,14 +1,37 @@
 = MagLev indexing example
 
-== Overview
+This directory contains an example of using MagLev's built-in indexing
+support to provide fast, search on unordered collections.  There are two
+demos and some tests.
 
-The main examples to study here is test/index_test.rb.  This example shows
-how to add an index onto an unordered collection of data.  The index will
-allow fast search / retrieval of objects based on the values of their
-attributes.
+== Simple Demo
 
-Most of the code in the lib directory is to generate somewhat interesting
-random names, addresses and people.  The Person class is pretty simple, and
-is just to provide fodder for indexing.
+<tt>index_example.rb</tt> is a single file overview of indexing with
+comments.  This is probably the first file to look at.  To run it:
+
+  $ rake demo
+
+== Persistent Demo
+
+<tt>create_random_people.rb</tt> and <tt>search_random_people.rb</tt>
+comprise a second example using MagLev persistence with the indexes.
+<tt>
+
+<tt>create_random_people.rb</tt> creates a collection of 100,000 random
+people, indexes the collection on the 'age' field, and then commits it to
+the repository.
+
+<tt>search_random_people.rb</tt> runs indexed and non-indexed queries
+against the persisted data.
+
+To run:
+
+  $ rake commit     # runs create_random_people and commits
+  $ rake search     # runs search_random_people
+
+== Lib
+
+The lib directory contains the base code that defines the Person class, and
+supports creating random instances.
 
 
