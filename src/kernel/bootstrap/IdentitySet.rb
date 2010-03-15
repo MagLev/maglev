@@ -4,10 +4,24 @@ class IdentitySet
 
   primitive_nobridge '<<', 'add:'
   primitive_nobridge 'add', 'add:'
+  def add?(o)
+    self.include?(o) ? nil : self.add(o)
+  end
+
   primitive_nobridge '__add_if_absent', '_addIfAbsent:'
-  primitive_nobridge '*'
+
+  primitive_nobridge '&', '*'
+  primitive_nobridge 'intersection', '*'
+
+  # Returns a new set built by merging the set and the elements of the
+  # given enumerable object.
   primitive_nobridge '+'
+  primitive_nobridge '|', '+'
+  primitive_nobridge 'union', '+'
+
   primitive_nobridge '-'
+  primitive_nobridge 'difference', '-'
+
   primitive_nobridge '==' , '='
   primitive '__addall', 'addAll:'
   primitive 'each&', 'do:'
@@ -15,12 +29,42 @@ class IdentitySet
   primitive 'size', 'size'
 
   primitive_nobridge 'include?', 'includes:'
+  primitive_nobridge 'member?', 'includes:'
+  primitive_nobridge 'superset?', 'includesAllOf:'
+  def proper_superset?(other)
+    return false if size <= other.size
+    self.superset?(other)
+  end
 
+  def subset?(other)
+    other.superset?(self)
+  end
+
+  def proper_subset?(other)
+    other.proper_superset?(self)
+  end
+
+  # Removes anObject from the receiver and returns anObject. Returns nil if
+  # anObject is missing from the receiver.
+  primitive_nobridge 'delete?', 'removeIfPresent:'
   primitive_nobridge 'remove', 'removeIfPresent:'
+
+  # Deletes the given object from the set and returns self.  Use +subtract+
+  # to delete several items at once.
+  def delete(o)
+    delete?(o)
+    self
+  end
+
+  # Deletes every element of the set for which block evaluates to
+  # true, and returns self.
+  def delete_if
+    dup.each { |o| self.delete(o) if yield(o) }
+    self
+  end
+
   primitive_nobridge 'pop', 'removeIfPresent:'
   # returns argument, or nil if object was not present
-
-  primitive_nobridge 'delete?', 'removeIfPresent:'
 
   primitive_nobridge '__basic_dup', '_basicCopy'  # uses singleton class for now
   primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
@@ -29,9 +73,20 @@ class IdentitySet
   # primitive_nobridge '__detect', 'detect:' # not used yet
 
   primitive_nobridge 'to_a' , 'asArray'
+  primitive_nobridge 'empty?', 'isEmpty'
+
+  # TODO
+  #   clear, replace, flatten_merge, flatten, flatten!, collect!, reject!, merge, ^
 
   def delete(obj)
     delete?(obj)
+    self
+  end
+
+  # Deletes every element that appears in the given enumerable object
+  # and returns self.
+  def subtract(enum)
+    enum.each {|o| delete(o)}
     self
   end
 
