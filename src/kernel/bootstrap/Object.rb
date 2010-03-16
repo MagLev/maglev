@@ -460,7 +460,7 @@ class Object
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
   def singleton_methods(inc_modules = true)
-    __ruby_singleton_methods(inc_modules, 0)
+    Module.__filter_method_names(__ruby_singleton_methods(inc_modules, 0))
   end
 
   primitive_nobridge '__ruby_methods', 'rubyMethods:'
@@ -469,23 +469,23 @@ class Object
   # accessible in receiver and receiver's ancestors.  Otherwise, returns
   # an array of the names of receiver's singleton methods.
   def methods(regular = true)
+    set = self.__ruby_singleton_methods(false, 0)
     if regular
-      __ruby_methods(0) # get public methods
-    else
-      __ruby_singleton_methods(false, 0)
+      set =  set + self.__ruby_methods(0) # get public methods
     end
+    Module.__filter_method_names(set)
   end
 
   def private_methods
-    __ruby_methods(2)
+    Module.__filter_method_names(__ruby_methods(2))
   end
 
   def protected_methods
-    __ruby_methods(1)
+    Module.__filter_method_names(__ruby_methods(1))
   end
 
-  def public_methods
-    __ruby_methods(0)
+  def public_methods(ignored_arg = true)
+    self.methods(true)
   end
 
   def singleton_method_added(a_symbol)

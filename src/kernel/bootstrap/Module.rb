@@ -17,6 +17,11 @@ class Module
 
   primitive_nobridge '__module_eval_string', '_moduleEvalString:with:binding:'
 
+  # def __filter_method_names(identity_set) ; end
+  #   arg is an IdentitySet of Symbols, 
+  #   result is an Array of Strings, excluding  those beginning with '__' 
+  class_primitive_nobridge '__filter_method_names', 'excludeInternalMethodNames:' 
+
   primitive_nobridge 'ancestor_modules_names', 'rubyAncestorModulesNames'
 
   def __isBehavior
