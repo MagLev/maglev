@@ -40,6 +40,8 @@
 # $Id$
 #
 
+# Maglev edits  for some constants already loaded by bootstrap code
+
 require 'parsedate'
 
 #
@@ -47,11 +49,11 @@ require 'parsedate'
 # documentation for the time.rb library.
 #
 class Time
-  class << Time # [
+  class << Time
 
     # ZoneOffset loaded by bootstrap/Time.rb
 
-    def zone_offset(zone, year=Time.now.year)
+    def zone_offset(zone, year=self.now.year)
       off = nil
       zone = zone.upcase
       if /\A([+-])(\d\d):?(\d\d)\z/ =~ zone
@@ -60,9 +62,9 @@ class Time
         off = zone.to_i * 3600
       elsif ZoneOffset.include?(zone)
         off = ZoneOffset[zone] * 3600
-      elsif ((t = Time.local(year, 1, 1)).zone.upcase == zone rescue false)
+      elsif ((t = self.local(year, 1, 1)).zone.upcase == zone rescue false)
         off = t.utc_offset
-      elsif ((t = Time.local(year, 7, 1)).zone.upcase == zone rescue false)
+      elsif ((t = self.local(year, 7, 1)).zone.upcase == zone rescue false)
         off = t.utc_offset
       end
       off
@@ -163,7 +165,7 @@ class Time
       if off
         year, mon, day, hour, min, sec =
           apply_offset(year, mon, day, hour, min, sec, off)
-        t = Time.utc(year, mon, day, hour, min, sec, usec)
+        t = self.utc(year, mon, day, hour, min, sec, usec)
         t.localtime if !zone_utc?(zone)
         t
       else
@@ -222,7 +224,7 @@ class Time
     #
     # A failure for Time.parse should be checked, though.
     #
-    def parse(date, now=Time.now)
+    def parse(date, now=self.now)
       d = Date._parse(date, false)
       year = d[:year]
       year = yield(year) if year && block_given?
@@ -346,21 +348,21 @@ class Time
         min = $5.to_i
         sec = $6.to_i
         usec = 0
-        usec = $7.to_f * 1000000 if $7
+        usec = ($7[1..-1] + '000000')[0,6].to_i if $7
         if $8
           zone = $8
           year, mon, day, hour, min, sec =
             apply_offset(year, mon, day, hour, min, sec, zone_offset(zone))
-          Time.utc(year, mon, day, hour, min, sec, usec)
+          self.utc(year, mon, day, hour, min, sec, usec)
         else
-          Time.local(year, mon, day, hour, min, sec, usec)
+          self.local(year, mon, day, hour, min, sec, usec)
         end
       else
         raise ArgumentError.new("invalid date: #{date.inspect}")
       end
     end
     alias iso8601 xmlschema
-  end # class << self  # ]
+  end # class << self
 
   #
   # Returns a string which represents the time as date-time defined by RFC 2822:
@@ -440,10 +442,10 @@ class Time
   alias iso8601 xmlschema
 end
 
-if __FILE__ == $0  # [
+if __FILE__ == $0
   require 'test/unit'
 
-  class TimeExtentionTest < Test::Unit::TestCase # :nodoc: # [
+  class TimeExtentionTest < Test::Unit::TestCase # :nodoc:
     def test_rfc822
       assert_equal(Time.utc(1976, 8, 26, 14, 30) + 4 * 3600,
                    Time.rfc2822("26 Aug 76 14:30 EDT"))
@@ -599,6 +601,8 @@ if __FILE__ == $0  # [
         t = Time.utc(1960, 12, 31, 23, 0, 0, 123456)
         assert_equal("1960-12-31T23:00:00.123456Z", t.xmlschema(6))
       end
+
+      assert_equal(249, Time.xmlschema("2008-06-05T23:49:23.000249+09:00").usec)
     end
 
     def test_completion
@@ -771,5 +775,5 @@ if __FILE__ == $0  # [
     def test_parse_fraction
       assert_equal(500000, Time.parse("2000-01-01T00:00:00.5+00:00").tv_usec)
     end
-  end # ]
-end # ]
+  end
+end

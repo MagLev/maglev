@@ -4,8 +4,13 @@ class IdentitySet
 
   primitive_nobridge '<<', 'add:'
   primitive_nobridge 'add', 'add:'
+
   def add?(o)
-    self.include?(o) ? nil : self.add(o)
+    added = self.__add_if_absent(o)
+    unless added
+      return nil
+    end
+    self
   end
 
   primitive_nobridge '__add_if_absent', '_addIfAbsent:'

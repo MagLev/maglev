@@ -1,5 +1,4 @@
-# Trac 676
-
+# simplified test for Trac 676
 
 class A
   def ma

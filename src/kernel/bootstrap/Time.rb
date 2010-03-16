@@ -264,7 +264,7 @@ class Time
   # It seems that MRI return nil if other isn't a Time object
   def ==(other)
     result = self <=> other
-    result.nil? ? result : result._equal?(0)
+    result._equal?(nil) ? result : result._equal?(0)
   end
 
   def hash

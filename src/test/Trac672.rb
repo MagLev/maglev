@@ -4,8 +4,17 @@
 XYZ = 10
 
 module Foo
-  p defined? XYZ     # should be "constant"
-  p defined? ::XYZ   # should be "constant"
-  p Foo::XYZ         # should be nil, but is 10
-  raise "XYZ should not be defined" if defined? Foo::XYZ
+  ax = defined? XYZ     # should be "constant"
+  unless ax == 'constant'; raise 'error'; end
+  bx = defined? ::XYZ   # should be "constant"
+  unless bx == 'constant'; raise 'error'; end
+  begin
+    cx = Foo::XYZ
+    raise 'error , Foo::XYZ should not be defined'
+  rescue NameError
+    # ok
+  end
+  dx = defined?(Foo::XYZ)
+  unless dx.equal?(nil) ; raise 'error'; end
 end
+true

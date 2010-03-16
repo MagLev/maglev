@@ -1,8 +1,8 @@
 # = forwardable - Support for the Delegation Pattern
 #
 #    $Release Version: 1.1$
-#    $Revision: 11708 $
-#    $Date: 2007-02-13 08:01:19 +0900 (Tue, 13 Feb 2007) $
+#    $Revision: 16857 $
+#    $Date: 2008-06-06 17:05:24 +0900 (Fri, 06 Jun 2008) $
 #    by Keiju ISHITSUKA(keiju@ishitsuka.com)
 #
 #    Documentation by James Edward Gray II and Gavin Sinclair
@@ -38,7 +38,7 @@
 #       @q = [ ]    # prepare delegate object
 #     end
 #     
-#     # setup prefered interface, enq() and deq()...
+#     # setup preferred interface, enq() and deq()...
 #     def_delegator :@q, :push, :enq
 #     def_delegator :@q, :shift, :deq
 #     

@@ -12,8 +12,8 @@
 # now, we'll just calculate each time.
 
 module Config
-  RUBY_VERSION == "1.8.6" or
-    raise "ruby lib version (1.8.6) doesn't match executable version (#{RUBY_VERSION})"
+  RUBY_VERSION == "1.8.7" or
+    raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
   VERSION = '1.8'
   ARCH = `uname -m`
 

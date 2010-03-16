@@ -45,10 +45,12 @@ module BigMath
   # If x is infinite or NaN, returns NaN.
   def sin(x, prec)
     raise ArgumentError, "Zero or negative precision for sin" if prec <= 0
+    bigDecimal = BigDecimal
     return BigDecimal("NaN") if x.infinite? || x.nan?
-    n    = prec + BigDecimal.double_fig
-    one  = BigDecimal("1")
-    two  = BigDecimal("2")
+    bigd_fig = bigDecimal.double_fig
+    n    = prec + bigd_fig
+    one  = bigDecimal.induced_from(1)
+    two  = bigDecimal.induced_from(2)
     x1   = x
     x2   = x.mult(x,n)
     sign = 1
@@ -57,7 +59,7 @@ module BigMath
     i    = one
     z    = one
     while d.nonzero? && ((m = n - (y.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       sign = -sign
       x1  = x2.mult(x1,n)
       i  += two
@@ -73,19 +75,21 @@ module BigMath
   # If x is infinite or NaN, returns NaN.
   def cos(x, prec)
     raise ArgumentError, "Zero or negative precision for cos" if prec <= 0
+    bigDecimal = BigDecimal
     return BigDecimal("NaN") if x.infinite? || x.nan?
-    n    = prec + BigDecimal.double_fig
-    one  = BigDecimal("1")
-    two  = BigDecimal("2")
+    bigd_fig = bigDecimal.double_fig
+    n    = prec + bigd_fig
+    one  = bigDecimal.induced_from(1)
+    two  = bigDecimal.induced_from(2)
     x1 = one
     x2 = x.mult(x,n)
     sign = 1
     y = one
     d = y
-    i = BigDecimal("0")
+    i = bigDecimal.induced_from(0)
     z = one
     while d.nonzero? && ((m = n - (y.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       sign = -sign
       x1  = x2.mult(x1,n)
       i  += two
@@ -102,16 +106,18 @@ module BigMath
   # Raises an argument error if x > 1.
   def atan(x, prec)
     raise ArgumentError, "Zero or negative precision for atan" if prec <= 0
+    bigDecimal = BigDecimal
     return BigDecimal("NaN") if x.infinite? || x.nan?
     raise ArgumentError, "x.abs must be less than 1.0" if x.abs>=1
-    n    = prec + BigDecimal.double_fig
+    bigd_fig = bigDecimal.double_fig
+    n    = prec + bigd_fig
     y = x
     d = y
     t = x
-    r = BigDecimal("3")
+    r = bigDecimal.induced_from(3)
     x2 = x.mult(x,n)
     while d.nonzero? && ((m = n - (y.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       t = -t.mult(x2,n)
       d = t.div(r,m)
       y += d
@@ -129,16 +135,18 @@ module BigMath
   # -> "0.271828182845904523536028752390026306410273E1"
   def exp(x, prec)
     raise ArgumentError, "Zero or negative precision for exp" if prec <= 0
+    bigDecimal = BigDecimal
     return BigDecimal("NaN") if x.infinite? || x.nan?
-    n    = prec + BigDecimal.double_fig
-    one  = BigDecimal("1")
+    bigd_fig = bigDecimal.double_fig
+    n    = prec + bigd_fig
+    one  = bigDecimal.induced_from(1)
     x1 = one
     y  = one
     d  = y
     z  = one
     i  = 0
     while d.nonzero? && ((m = n - (y.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       x1  = x1.mult(x,n)
       i += 1
       z *= i
@@ -156,16 +164,18 @@ module BigMath
   def log(x, prec)
     raise ArgumentError, "Zero or negative argument for log" if x <= 0 || prec <= 0
     return x if x.infinite? || x.nan?
-    one = BigDecimal("1")
-    two = BigDecimal("2")
-    n  = prec + BigDecimal.double_fig
+    bigDecimal = BigDecimal
+    one = bigDecimal.induced_from(1)
+    two = bigDecimal.induced_from(2)
+    bigd_fig = bigDecimal.double_fig
+    n  = prec + bigd_fig
     x  = (x - one).div(x + one,n)
     x2 = x.mult(x,n)
     y  = x
     d  = y
     i = one
     while d.nonzero? && ((m = n - (y.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       x  = x2.mult(x,n)
       i += two
       d  = x.div(i,m)
@@ -177,22 +187,24 @@ module BigMath
   # Computes the value of pi to the specified number of digits of precision.
   def PI(prec)
     raise ArgumentError, "Zero or negative argument for PI" if prec <= 0
-    n      = prec + BigDecimal.double_fig
-    zero   = BigDecimal("0")
-    one    = BigDecimal("1")
-    two    = BigDecimal("2")
+    bigDecimal = BigDecimal
+    bigd_fig = bigDecimal.double_fig
+    n      = prec + bigd_fig
+    zero   = bigDecimal.induced_from(0)
+    one    = bigDecimal.induced_from(1)
+    two    = bigDecimal.induced_from(2)
 
     m25    = BigDecimal("-0.04")
-    m57121 = BigDecimal("-57121")
+    m57121 = bigDecimal.induced_from(-57121)
 
     pi     = zero
 
     d = one
     k = one
     w = one
-    t = BigDecimal("-80")
+    t = bigDecimal.induced_from(-80)
     while d.nonzero? && ((m = n - (pi.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       t   = t*m25
       d   = t.div(k,m)
       k   = k+two
@@ -202,9 +214,9 @@ module BigMath
     d = one
     k = one
     w = one
-    t = BigDecimal("956")
+    t = bigDecimal.induced_from(956)
     while d.nonzero? && ((m = n - (pi.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       t   = t.div(m57121,n)
       d   = t.div(k,m)
       pi  = pi + d
@@ -217,14 +229,15 @@ module BigMath
   # digits of precision.
   def E(prec)
     raise ArgumentError, "Zero or negative precision for E" if prec <= 0
-    n    = prec + BigDecimal.double_fig
-    one  = BigDecimal("1")
+    bigd_fig = bigDecimal.double_fig
+    n    = prec + bigd_fig
+    one  = bigDecimal.induced_from(1)
     y  = one
     d  = y
     z  = one
     i  = 0
     while d.nonzero? && ((m = n - (y.exponent - d.exponent).abs) > 0)
-      m = BigDecimal.double_fig if m < BigDecimal.double_fig
+      m = bigd_fig if m < bigd_fig
       i += 1
       z *= i
       d  = one.div(z,m)

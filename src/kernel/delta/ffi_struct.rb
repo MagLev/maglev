@@ -4,7 +4,7 @@ module FFI
 
     # def initialize ;end  # in ffi.rb for fixed instvars
 
-    def __get(fieldname, cbytearray)
+    def __get(fieldname, a_pointer)
       idx = @members_dict[fieldname]
       if idx._equal?(nil)
         raise  ArgumentError, 'invalid field name'
@@ -14,7 +14,7 @@ module FFI
       if elem_siz._not_equal?(0)
         if elem_siz._isFixnum   # a nested array
           siz = @sizes[idx]
-          mp = Pointer.__fromRegionOf(cbytearray, ofs, siz)
+          mp = Pointer.__fromRegionOf(a_pointer, ofs, siz)
           mp.__initialize(elem_siz)
           mp
         else  # a nested Struct , elem_siz._kind_of?(Struct.class) == true
@@ -22,17 +22,17 @@ module FFI
              raise TypeError, 'logic error, expected a Struct class'
           end
           nested_struct_cls = elem_siz
-          struct = nested_struct_cls.__fromRegionOf(cbytearray, ofs,  elem_siz.size)
+          struct = nested_struct_cls.__fromRegionOf(a_pointer, ofs,  elem_siz.size)
           struct.__set_layout( nested_struct_cls.__cl_layout )
           struct.__initialize
         end
       else
         sel = @accessors[idx]
-        cbytearray.__perform_se(ofs, sel, 1)  # assumes envId 1
+        a_pointer.__perform_se(ofs, sel, 1)  # assumes envId 1
       end
     end
 
-    def __put(fieldname, cbytearray, value)
+    def __put(fieldname, a_pointer, value)
       idx = @members_dict[fieldname]
       if idx._equal?(nil)
         raise  ArgumentError, 'invalid field name'
@@ -44,7 +44,7 @@ module FFI
         nil
       else
         sel = @setters[idx]
-        cbytearray.__perform__se(ofs, value, sel, 1)  # assumes envId 1
+        a_pointer.__perform__se(ofs, value, sel, 1)  # assumes envId 1
       end
     end
 
@@ -256,11 +256,11 @@ module FFI
         ly = @cl_layout
         if ly._not_equal?(nil)
           arg = args[0]
-          if arg._kind_of?(CByteArray)
+          if arg._kind_of?(Pointer)
             ly_siz = ly.size
             ba_siz = arg.total
             if ba_siz < ly_siz
-              raise ArgumentError, "argument CByteArray is too small for a Struct  #{self.name}"
+              raise ArgumentError, "argument Pointer is too small for a Struct  #{self.name}"
             end
             inst = self.__fromRegionOf( arg, 0, ly_siz )
           elsif arg._kind_of?(CPointer)

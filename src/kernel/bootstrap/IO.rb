@@ -11,11 +11,11 @@ class IO
   end
 
   def bytes()  # added for 1.8.7
-    return IoByteEnumerator.new(self, :each_byte, nil)
+    return IoByteEnumerator.new(self, :each_byte)
   end
 
   def chars()  # added for 1.8.7
-    return IoCharEnumerator.new(self, :each_char, nil)
+    return IoCharEnumerator.new(self, :each_char)
   end
 
   def dup
@@ -25,55 +25,49 @@ class IO
   primitive_nobridge '__fcntl', 'fcntl:with:'
 
   def each_byte(&block)
-    if block_given?
-      while not eof?
-        buf = self.read(4096)
-        if buf._equal?(nil)
-          return self
-        end
-	len = buf.size
-	if len._equal?(0)
-	  return self
-	end
-	n = 0
-	while n < len
-	  block.call( buf[n] )
-	  n += 1
-        end
+    unless block_given?
+      return IoByteEnumerator.new(self, :each_byte) # for 1.8.7
+    end
+    while not eof?
+      buf = self.read(4096)
+      if buf._equal?(nil)
+	return self
+      end
+      len = buf.size
+      if len._equal?(0)
+	return self
+      end
+      n = 0
+      while n < len
+	block.call( buf[n] )
+	n += 1
       end
     end
     self
   end
 
-  def each_byte()  # added for 1.8.7
-    return IoByteEnumerator.new(self, :each_byte, nil)
-  end
-
-  def each_char(&block)  # added for 1.8.7
-    if block_given?
-      while not eof?
-        buf = self.read(4096)
-        if buf._equal?(nil)
-          return self
-        end
-	len = buf.size
-	if len._equal?(0)
-	  return self
-	end
-	n = 0
-	while n < len
-          str = String.new(1)
-          str[0] = buf[n]
-	  block.call( str )
-	  n += 1
-        end
+  def each_char(&block)  
+    unless block_given?
+      return IoCharEnumerator.new(self, :each_char) # for 1.8.7
+    end
+    while not eof?
+      buf = self.read(4096)
+      if buf._equal?(nil)
+	return self
+      end
+      len = buf.size
+      if len._equal?(0)
+	return self
+      end
+      n = 0
+      while n < len
+	str = ' ' 
+	str[0] = buf[n]
+	block.call( str )
+	n += 1
       end
     end
     self
-  end
-
-  def each_char()  # added for 1.8.7
-    return IoCharEnumerator.new(self, :each_char, nil)
   end
 
   def __next_line(sep)
@@ -88,6 +82,9 @@ class IO
   end
 
   def each_line(sep=$/, &block)
+    unless block_given?
+      return IoEnumerator.new(self, :each_line, sep)  # for 1.8.7
+    end
     if sep._equal?(nil)
       block.call( self.__contents )
     else
@@ -104,10 +101,6 @@ class IO
       end
     end
     self
-  end
-
-  def each_line(sep=$/)  # added for 1.8.7
-    return IoEnumerator.new(self, :each_line, sep)
   end
 
   alias each each_line 
@@ -152,17 +145,15 @@ class IO
 
   def self.foreach(filename, sep=$/, &block)
     f = File.open(filename, 'r')
+    unless block_given?
+      return f.each_line(sep)  # return an Enumerator, for 1.8.7
+    end
     f.each_line(sep) { | str | 
       block.call(str)
     }
     nil
   end
 
-  def self.foreach(filename, sep=$/) # added for 1.8.7
-    # returns an Enumerator
-    f = File.open(filename, 'r')
-    return f.each_line(sep)
-  end
 
   # def fsync ; end # subclass responsibility
 
@@ -505,14 +496,14 @@ class IO
   #
   # Returns the empty string for empty files, unless length is passed, then returns nil
   def self.read(name, length=Undefined, an_offset=0)
-    offset = if an_offset.nil?
+    offset = if an_offset._equal?(nil)
                0
              else
                Type.coerce_to(an_offset, Fixnum, :to_int)
              end
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
-    read_all_bytes = length._equal?(Undefined) || length.nil?
+    read_all_bytes = length._equal?(Undefined) || length._equal?(nil)
     unless read_all_bytes
       length = Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
@@ -538,7 +529,7 @@ class IO
   # Reads a line as with IO#gets, but raises an EOFError on end of file.
   def readline(separator=$/)
     res = self.gets(separator)
-    raise EOFError if res.nil?
+    raise EOFError if res._equal?(nil)
     res.__storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end
@@ -546,7 +537,7 @@ class IO
   def readline
     separator=$/
     res = self.gets(separator)
-    raise EOFError if res.nil?
+    raise EOFError if res._equal?(nil)
     res.__storeRubyVcGlobal(0x21) # store into caller's $_
     res
   end

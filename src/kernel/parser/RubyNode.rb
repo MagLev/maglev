@@ -270,6 +270,7 @@ module MagRp
 
        class RubyVCallNode
          # a VCall has no args coded in the source code
+         #  it may have no receiver
          class_primitive 's', 's_forRp:selector:'
          def inspect
            "\n  [:vcall, #{@rcvrNode.inspect}, :#{@callName}]"
@@ -1342,6 +1343,19 @@ module MagRp
            self._append(v)
            self
          end
+
+         def append_for_mlhs(v)
+           prev = @list[-1]
+           if prev._not_equal?(nil) && prev.isAmpersandBlockParam
+             return false
+           end
+           if v._equal?(nil)
+             raise_error('invalid nil arg')
+           end
+           self._append(v)
+           true
+         end           
+ 
          def arrayDup
            res = RubyArrayNode._new
            res.list=( @list.dup )
@@ -1350,6 +1364,7 @@ module MagRp
          def arrayLength
            @list.length
          end
+ 
          primitive_nobridge 'prepend' , '_prepend:'  # returns receiver
 
          def srcOffset
@@ -1378,7 +1393,7 @@ module MagRp
        end
 
          class RubyRpCallArgs
-           # most meths  inherited from RubyArraynode
+           # most meths  inherited from RubyArrayNode
            #  .mcz contains reimplementation of hasRestArg
 
            def is_empty
@@ -1574,6 +1589,25 @@ module MagRp
 
        # def init ; end #  is in  RubyNode_dynamic.rb
 
+       def append_mrhs(val)
+         if @thirdNode._equal?(nil)
+           v_cls = val.class
+           if v_cls._equal?( RubyRpCallArgs) || v_cls._equal?( RubySplatNode)
+             @thirdNode = val
+           else
+             raise_error('append_mrhs invalid arg')
+           end
+         else
+           raise_error('append_mrhs rhs already present')
+         end
+         self
+       end
+
+       def isAmpersandBlockParam
+         lv = @firstNode.list.last
+         lv._not_equal?(nil) && lv.isAmpersandBlockParam
+       end
+
        def masgn_append_arg(val)
          if @thirdNode._equal?( nil)
            f = @firstNode
@@ -1591,19 +1625,7 @@ module MagRp
          end
          self
        end
-       def append_mrhs(val)
-         if @thirdNode._equal?(nil)
-           v_cls = val.class
-           if v_cls._equal?( RubyRpCallArgs) || v_cls._equal?( RubySplatNode)
-             @thirdNode = val
-           else
-             raise_error('append_mrhs invalid arg')
-           end
-         else
-           raise_error('append_mrhs rhs already present')
-         end
-         self
-       end
+     
        def inspect
          "\n[:masgnRp bofs #{@position.inspect}, #{@firstNode.inspect}, #{@thirdNode.inspect}]"
        end

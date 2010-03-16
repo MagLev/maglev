@@ -20,4 +20,14 @@ module GC
     # has no effect
   end
 
+  def self.stress	# added for 1.8.7
+    false
+  end
+
+  def self.stress=(bool)	# added for 1.8.7
+    # has no effect
+    false  
+  end
+ 
+
 end

@@ -4239,3 +4239,6 @@ module Foo
       0xffee => [0, 0, nil, "\342\227\213", nil, nil, nil]
      }
 end
+
+unless Foo::UNICODE_DATA.size == 4233 ; raise 'error'; end
+true

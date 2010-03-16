@@ -368,7 +368,7 @@ class File
     self.open(filename, mode, permission)
   end
 
-  def self.open(filename, mode=Undefined, permission=Undefined, &blk)
+  def self.open(filename, mode=Undefined, permission=Undefined, &block)
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
@@ -410,7 +410,7 @@ class File
 
     if block_given?
       begin
-        blk.call(f)
+        block.call(f)
       ensure
         begin
           f.close 

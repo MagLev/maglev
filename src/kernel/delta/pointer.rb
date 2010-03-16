@@ -1,15 +1,14 @@
- module FFI
-   class MemoryPointer
+module FFI
+  class MemoryPointer
     def inspect
-      "#<FFI::MemoryPointer address=0x#{self.address.to_s(16)} size=#{self.size}>"
+      "#<FFI::MemoryPointer #{self.__inspect}"
     end
     alias :to_i :address
-   end
+  end
 
-   class Pointer
-    # a subclass of CByteArray , first opening in ffi.rb
+  class Pointer # [
 
-    def self.new(type, count, &blk)
+    def self.new(type, count, &block)
       # this variant  gets bridge methods
       if type._isFixnum
         elemsize = type
@@ -26,7 +25,6 @@
       numbytes = count * elemsize
       inst = self.__gc_malloc(numbytes)
       inst.initialize(elemsize)
-      inst
       if block_given?
         yield(inst)
       else
@@ -34,7 +32,7 @@
       end
     end
 
-    def self.new(type, &blk)
+    def self.new(type, &block)
       inst = self.new(type)
       if block_given?
         yield(inst)
@@ -71,9 +69,31 @@
       inst
     end
 
-    NULL = self.new(0);
+    NULL = self.new(0)
 
-    # def initialize ; end #   in ffi.rb
+    def initialize
+      @typeSize = 1  
+    end 
+    def initialize(elem_size)
+      unless elem_size._isFixnum && elem_size > 0
+        raise TypeError, 'element size must be a Fixnum > 0'
+      end
+      @typeSize = elem_size
+    end
+    def __initialize(elem_size)
+      @typeSize = elem_size
+    end
+
+    def type_size
+      @typeSize
+    end
+
+    def __type_size=(elem_size)
+      unless elem_size._isFixnum && elem_size > 0
+        raise TypeError, 'element size must be a Fixnum > 0'
+      end
+      @typeSize = elem_size
+    end
 
     class_primitive_nobridge '__with_all', 'withAll:'
 
@@ -91,44 +111,6 @@
       self.__signed_wordsize_at(elem_size, byte_offset, nil)
     end
 
-    def to_a
-      elem_size = self.type_size
-      siz = self.total
-      ofs = 0
-      res_size = siz.__divide(elem_size)
-      ary = Array.new(res_size)
-      n = 0
-      while ofs < siz
-        ary[n] = self.__signed_wordsize_at(elem_size, ofs, nil)
-        ofs += elem_size
-        n += 1
-      end
-      ary
-    end
-
-    def each(&b)
-      i = 0
-      lim = self.size.__divide(self.type_size)
-      while i < lim
-        b.call(self[i])
-        i += 1
-      end
-      self
-    end
-
-    def each_with_index(&b)
-      i = 0
-      lim = self.size.__divide(self.type_size)
-      while i < lim
-        b.call(self[i], i)
-        i += 1
-      end
-      self
-    end
-
-
-    primitive_nobridge '__new_from', 'newFrom:numBytes:'
-
     def +(byteoffset)
       # return an instance derived from self
       #  instance has autofree==false, and a derivedFrom reference to self
@@ -137,11 +119,54 @@
       inst
     end
 
+    primitive_nobridge '__new_from', 'newFrom:numBytes:'
+
+    def ==(pointer)
+      unless pointer._kind_of?(Pointer) || pointer._kind_of?(CPointer)
+        return false
+      end
+      pointer.address == self.address
+    end
+
     def derived_from
       # the instance which owns the C memory pointed to by self,
       #  if nil, then the C memory is owned by self.
       # may be an Integer if created by read_pointer.
       @derivedFrom
+    end
+
+    def each(&block)
+      unless block_given?
+        return self.to_a.each()  # added for 1.8.7
+      end
+      i = 0
+      lim = self.size.__divide(self.type_size)
+      while i < lim
+        block.call(self[i])
+        i += 1
+      end
+      self
+    end
+
+    def each_with_index(&block)
+      unless block_given?
+        return self.to_a.each_with_index()  # added for 1.8.7
+      end
+      i = 0
+      lim = self.size.__divide(self.type_size)
+      while i < lim
+        block.call(self[i], i)
+        i += 1
+      end
+      self
+    end
+
+    def get_pointer(ofs)
+      self.__pointer_at(ofs, Pointer)
+    end
+
+    def inspect
+      "#<FFI::Pointer #{self.__inspect}"
     end
 
     def read_int
@@ -171,10 +196,6 @@
 
     # def put_pointer(ofs, memory_pointer) ; end
     primitive_nobridge 'put_pointer', 'pointerAt:put:'
-
-    def get_pointer(ofs)
-      self.__pointer_at(ofs, Pointer)
-    end
 
     def read_string(num_bytes)
       self.stringfrom_to(0, num_bytes - 1)
@@ -265,15 +286,8 @@
       self
     end
 
-    def ==(pointer)
-      unless pointer._kind_of?(Pointer) || pointer._kind_of?(CPointer)
-        return false
-      end
-      pointer.address == self.address
-    end
-
     def write_array_of_pointer(ary)
-      # ary should be an Array of CByteArray's
+      # ary should be an Array of Pointer's 
       unless ary._isArray ; raise TypeError, 'expected an Array'; end
       len = ary.length
       if len > self.total.__divide(8)
@@ -304,12 +318,12 @@
       ofs = byte_offset
       limit = self.total
       while ofs < limit
-	str = self.char_star_at(ofs)
-	if str._equal?(nil)
-	  return res
-	end
-	res << str
-	ofs += 8
+       str = self.char_star_at(ofs)
+       if str._equal?(nil)
+         return res
+       end
+       res << str
+       ofs += 8
       end
       res
     end
@@ -342,15 +356,31 @@
       res
     end
 
-    def inspect
-      "#<FFI::Pointer address=0x#{self.address.to_s(16)}>"
+    def to_a
+      elem_size = self.type_size
+      siz = self.total
+      ofs = 0
+      res_size = siz.__divide(elem_size)
+      ary = Array.new(res_size)
+      n = 0
+      while ofs < siz
+        ary[n] = self.__signed_wordsize_at(elem_size, ofs, nil)
+        ofs += elem_size
+        n += 1
+      end
+      ary
     end
+
     alias :to_i :address
+
+    def to_ptr
+      self
+    end
 
     # following not yet used in rubyspecs
     # def read_array_of_type(type, reader, length) ; end # TODO
     # def write_array_of_type(type, writer, ary); ; end # TODO
     # def get_at_offset(offset, type) ; end # TODO
     # def set_at_offset(offset, type, val) ; end # TODO
-  end
+  end # ]
 end

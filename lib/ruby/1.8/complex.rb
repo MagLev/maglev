@@ -25,6 +25,10 @@
 #    cosh sinh tanh acos asin atan atan2 acosh asinh atanh
 #
 
+# Maglev edits
+#   optimization: replace kind_of?  with _kind_of?
+#   optimization: use  _isInteger, _isFloat, _isNumeric where possible
+#   move  creation of Complex::I to second opening of Complex
 
 #
 # Numeric is a built-in class on which Fixnum, Bignum, etc., are based.  Here
@@ -58,7 +62,8 @@ class Numeric
   # See Complex#arg.
   #
   def arg
-    if self.nan?
+    # Math.atan2!(0, self)
+    if self.nan?  # maglev use the algorithm from 1.8.6 to pass specs
       return self
     elsif self >= 0
       return 0
@@ -104,10 +109,12 @@ class Complex < Numeric
   @RCS_ID='-$Id: complex.rb,v 1.3 1998/07/08 10:05:28 keiju Exp keiju $-'
 
   undef step
+  undef div, divmod
+  undef floor, truncate, ceil, round
 
   def Complex.generic?(other) # :nodoc:
-    other._isInteger or
-    other._isFloat or
+    other._isInteger or # other.kind_of?(Integer) or
+    other._isFloat or   # other.kind_of?(Float) or
     (defined?(Rational) and other._kind_of?(Rational))
   end
 
@@ -126,7 +133,7 @@ class Complex < Numeric
   end
 
   def initialize(a, b)
-    raise TypeError, "non numeric 1st arg `#{a.inspect}'" if !a._isNumeric
+    raise TypeError, "non numeric 1st arg `#{a.inspect}'" if !a._isNumeric 
     raise TypeError, "`#{a.inspect}' for 1st arg" if a._kind_of? Complex
     raise TypeError, "non numeric 2nd arg `#{b.inspect}'" if !b._isNumeric
     raise TypeError, "`#{b.inspect}' for 2nd arg" if b._kind_of? Complex
@@ -196,6 +203,10 @@ class Complex < Numeric
     end
   end
   
+  def quo(other)
+    Complex(@real.quo(1), @image.quo(1)) / other
+  end
+
   #
   # Raise this complex number to the given (real or complex) power.
   #
@@ -257,7 +268,7 @@ class Complex < Numeric
   
 #--
 #    def divmod(other)
-#      if other.kind_of?(Complex)
+#      if other._kind_of?(Complex)
 #        rdiv, rmod = @real.divmod(other.real)
 #        idiv, imod = @image.divmod(other.image)
 #        return Complex(rdiv, idiv), Complex(rmod, rmod)
@@ -365,17 +376,6 @@ class Complex < Numeric
     end
   end
 
-  def coerce(other)
-    if other._isFloat
-      # return other, self.to_f  # old code
-      return [ Complex(other, 0) , self ] # Maglev fix
-    elsif other._isInteger
-      return [ Rational.new!(other, 1),  self ]
-    else
-      super
-    end
-  end
-  # end Maglev comparisons
 
   #
   # Attempts to coerce +other+ to a Complex number.
@@ -449,7 +449,7 @@ class Complex < Numeric
   #
   # +I+ is the imaginary number.  It exists at point (0,1) on the complex plane.
   #
-  # I = Complex(0,1) # Gemstone, moved
+  # I = Complex(0,1) # Maglev moved to below
   
   # The real part of a complex number.
   attr :real
@@ -462,8 +462,37 @@ end
 
 class Complex
   # +I+ is the imaginary number.  It exists at point (0,1) on the complex plane.
-  
-  I = Complex(0,1)  # Gemstone , create first instance after defining class
+  I = Complex(0,1)  # Maglev , create first instance after defining class
+end
+
+
+class Integer
+
+  unless defined?(1.numerator)
+    def numerator() self end
+    def denominator() 1 end
+
+    def gcd(other)
+      min = self.abs
+      max = other.abs
+      while min > 0
+        tmp = min
+        min = max % min
+        max = tmp
+      end
+      max
+    end
+
+    def lcm(other)
+      if self.zero? or other.zero?
+        0
+      else
+        (self.div(self.gcd(other)) * other).abs
+      end
+    end
+
+  end
+
 end
 
 module Math
@@ -586,11 +615,10 @@ module Math
   end
 
   def acos(z)
-    gz = Complex.generic?(z)
-    if gz and z >= -1 and z <= 1
+    if Complex.generic?(z) and z >= -1 and z <= 1
       acos!(z)
     else
-      -1.0.im * log( z + 1.0.im * sqrt( Complex(1.0, 0) - z * z) ) 
+      -1.0.im * log( z + 1.0.im * sqrt(1.0-z*z) )
     end
   end
 
@@ -598,7 +626,7 @@ module Math
     if Complex.generic?(z) and z >= -1 and z <= 1
       asin!(z)
     else
-      -1.0.im * log( 1.0.im * z + sqrt( Complex(1.0, 0) - z * z) )
+      -1.0.im * log( 1.0.im * z + sqrt(1.0-z*z) )
     end
   end
 

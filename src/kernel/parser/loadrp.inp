@@ -6,7 +6,7 @@ SessionTemps current
    at: #MAGLEV_loadUseMri put: true ;
    at: #MAGLEV_evalUseMri put: true .
 ctx := RubyContext load:#( ) env: 2 . "traceLoad logSexp allIvsDynamic"
-RubyContext bootWarnings: false .  "enable/disable:  warning dynamic constant"
+RubyContext bootWarnings: true .  "enable/disable:  warning dynamic constant"
 RubyNameSpace traceGlobals: 0 .
 RubyStaticScope traceLocals: 0 .
 GsNMethod traceIR: 0 .   "0 none, 1, line num of each meth, 2 full"

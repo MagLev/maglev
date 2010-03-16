@@ -15,14 +15,14 @@ class Class
     # do nothing
   end
 
-  def self.new(super_cls=Object, &blk)
+  def self.new(super_cls=Object, &block)
     if super_cls._not_equal?(Object)
       unless super_cls._is_a?(Class)
         raise TypeError, 'superclass arg must be a Class'
       end
     end
     if (block_given?)
-      c = __ruby_new(super_cls, blk)
+      c = __ruby_new(super_cls, block)
     else
       c = __ruby_new(super_cls, nil)
     end

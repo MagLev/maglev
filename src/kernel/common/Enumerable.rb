@@ -1,5 +1,5 @@
 
-# RUBINIUS: This file taken directly from Rubinius
+# RUBINIUS: This file taken from Rubinius, and modified.
 
 # depends on: module.rb class.rb
 
@@ -20,7 +20,7 @@ module Enumerable
   # any other methods than #each. If needed, class-specific versions of any of
   # these methods can be written *in those classes* to override these.
 
-  class Sort
+  class Sort  # [
 
     def initialize(sorter = nil)
       @sorter = sorter
@@ -58,15 +58,14 @@ module Enumerable
 
     alias_method :call, :sort
 
-    ##
-    # Sort an Enumerable using simple quicksort (not optimized)
-
     def mergesort(xs, &block)
       arr = []
       xs.each { | o | arr << o }
       arr.__sort!(&block)  # sorts array in place
-      arr
     end
+
+    ##
+    # Sort an Enumerable using simple quicksort (not optimized)
 
     def quicksort(xs, &prc)
       return [] unless xs
@@ -84,9 +83,7 @@ module Enumerable
       end
       quicksort(lmr[-1], &prc) + lmr[0] + quicksort(lmr[1], &prc)
     end
-  end
 
-  class Sort
     class SortedElement
       def initialize(val, sort_id)
         @value, @sort_id = val, sort_id
@@ -103,32 +100,455 @@ module Enumerable
         @sort_id <=> other.sort_id
       end
     end
-  end
 
-  class Sort
-    def sort_by(xs)
-      # The ary and its elements sould be inmutable while sorting
+    # Sort#sort_by  in Enumerable2.rb , 
+    #    for compile-time resolution of SortedElement
 
-      elements = xs.map { |x| SortedElement.new(x, yield(x)) }
-      sort(elements).map { |e| e.value }
+  end # ]
+  Sort.__freeze_constants
+
+  # :call-seq:
+  #   enum.all?                     => true or false
+  #   enum.all? { |obj| block }   => true or false
+  #
+  # Passes each element of the collection to the given block. The method
+  # returns true if the block never returns false or nil. If the block is not
+  # given, Ruby adds an implicit block of <tt>{ |obj| obj }</tt> (that is all?
+  # will return true only if none of the collection members are
+  # false or nil.)
+  #
+  #   %w[ant bear cat].all? { |word| word.length >= 3}   #=> true
+  #   %w[ant bear cat].all? { |word| word.length >= 4}   #=> false
+  #   [ nil, true, 99 ].all?                             #=> false
+
+  def all?(&block)
+    if block_given?
+      each { |e| return false unless block.call(e) }
+    else
+      each { |e| return false unless e }
     end
+    true
   end
 
   ##
   # :call-seq:
-  #   enum.to_a      =>    array
-  #   enum.entries   =>    array
+  #    enum.any? [{ |obj| block } ]   => true or false
   #
-  # Returns an array containing the items in +enum+.
+  # Passes each element of the collection to the given block. The method
+  # returns true if the block ever returns a value other than false or nil. If
+  # the block is not given, Ruby adds an implicit block of <tt>{ |obj| obj
+  # }</tt> (that is any? will return true if at least one of the collection
+  # members is not false or nil.
   #
-  #   (1..7).to_a                       #=> [1, 2, 3, 4, 5, 6, 7]
-  #   { 'a'=>1, 'b'=>2, 'c'=>3 }.to_a   #=> [["a", 1], ["b", 2], ["c", 3]]
+  #   %w[ant bear cat].any? { |word| word.length >= 3}   #=> true
+  #   %w[ant bear cat].any? { |word| word.length >= 4}   #=> true
+  #   [ nil, true, 99 ].any?                             #=> true
 
-  def to_a
-    collect { |e| e }
+  def any?(&block)
+    if block_given?
+      each { |o| return true if block.call(o) }
+    else
+      each { |o| return true if o } # for 1.8.7
+    end
+    false
   end
 
-  alias_method :entries, :to_a
+  ##
+  # :call-seq:
+  #   enum.collect { | obj | block }  => array
+  #   enum.map     { | obj | block }  => array
+  #
+  # Returns a new array with the results of running +block+ once for every
+  # element in +enum+.
+  #
+  #   (1..4).collect { |i| i*i }   #=> [1, 4, 9, 16]
+  #   (1..4).collect { "cat"  }   #=> ["cat", "cat", "cat", "cat"]
+
+  def collect(&block)
+    ary = []
+    if block_given?
+      self.each { |o| ary << block.call(o) }
+    else
+      self.each { |o| ary << o }
+    end
+    ary
+  end
+
+  alias_method :map, :collect
+
+  ##
+  # :call-seq:
+  #   enum.count(item)             => int
+  #   enum.count { | obj | block } => int
+  #
+  # Returns the number of items in +enum+ that equal +item+ or for which
+  # the block returns a true value.  Returns the number of all elements in
+  # +enum+ if neither a block nor an argument is given.
+  #
+  #   ary = [1, 2, 4, 2]
+  #   ary.count(2)          # => 2
+  #   ary.count{ |x|x%2==0}  # => 3
+
+  def count(item=Undefined, &block)
+    seq = 0
+    if item._equal?(Undefined)
+      if block_given?
+        self.each { |o| seq += 1 if block.call(o) }
+      else
+        self.each { |o| seq += 1 }
+      end
+    else
+      self.each { |o| seq += 1 if item == o }
+    end
+    seq
+  end
+
+  def cycle(count=Fixnum__MAX, &block)
+    if count._equal?(nil)
+      cnt = Fixnum__MAX
+    else
+      cnt = Type.coerce_to( count, Fixnum, :to_int)
+    end
+    unless block_given?
+      # Returns an Enumerator
+      return self.to_a.cycle(cnt)
+    end
+    if cnt <= 0
+      return nil
+    end
+    self.to_a.cycle(cnt, &block)
+  end
+
+  def drop(count)
+    cnt = Type.coerce_to( count, Fixnum, :to_int)
+    self.to_a.drop(cnt) 
+  end
+
+  def drop_while(&block)
+    self.to_a.drop_while(&block)
+  end
+
+  def each_cons(count, &block)  # added for 1.8.7
+    cnt = Type.coerce_to( count, Fixnum, :to_int)
+    unless cnt > 0
+      raise TypeError, 'each_cons, arg must be > 0'
+    end
+    unless block_given?
+      return ArrayCombinationEnumerator.new( cnt , self, :each_cons )
+    end
+    holder = [ 1 ]
+    ea_res = holder.each { | unused_x | 
+      array = []
+      elements = self.to_a
+      num_elem = elements.__size
+      idx = 0
+      last = num_elem - cnt
+      while idx <= last
+        sub_arr = elements[idx, cnt]
+        block.call(sub_arr)
+        idx += 1 
+      end
+    }
+    if ea_res._not_equal?(holder)
+      return ea_res  # break out of the block
+    end
+    nil
+  end
+
+  ##
+  # :call-seq:
+  #   enum.each_with_index { |obj, i| block }  -> enum
+  #
+  # Calls +block+ with two arguments, the item and its index, for
+  # each item in +enum+.
+  #
+  #   hash = {}
+  #   %w[cat dog wombat].each_with_index { |item, index|
+  #     hash[item] = index
+  #   }
+  #
+  #   p hash   #=> {"cat"=>0, "wombat"=>2, "dog"=>1}
+  #
+  def each_with_index(&block)
+    unless block_given?
+      # returns an Enumerator	for 1.8.7
+      return self.to_a.each_with_index()
+    end
+    idx = 0
+    self.each { |o| block.call(o, idx)
+      idx += 1 
+    }
+    self
+  end
+
+  #  call-seq:
+  #    e.each_slice(n) {...}
+  #    e.each_slice(n)
+  #
+  #  Iterates the given block for each slice of <n> elements.  If no
+  #  block is given, returns an enumerator.
+  #
+  #  e.g.:
+  #      (1..10).each_slice(3) {|a| p a}
+  #      # outputs below
+  #      [1, 2, 3]
+  #      [4, 5, 6]
+  #      [7, 8, 9]
+  #      [10]
+  #
+  def each_slice(count, &block)	# rewritten for 1.8.7
+    slice_size = Type.coerce_to( count, Integer, :to_int)
+    unless slice_size > 0
+      raise TypeError, 'each_slice, arg must be > 0'
+    end
+    unless block_given?
+      return ArrayCombinationEnumerator.new( slice_size , self, :each_slice )
+    end
+    n = 0
+    broke = false
+    a_slice = Array.new(slice_size)
+    ea_res = self.each { | elem |
+      a_slice.__at_put(n, elem)
+      n += 1
+      if n._equal?(slice_size)
+        broke = true
+        block.call( a_slice )
+        broke = false
+        a_slice = Array.new(slice_size)
+        n = 0
+      end
+    }
+    if broke
+      return ea_res # the &block did a break
+    end
+    if n > 0
+      a_slice.size=(n)
+      block.call( a_slice )
+    end
+    nil
+  end
+
+  def enum_cons(count)		 # added for 1.8.7
+    return self.each_cons(count)
+  end
+
+  def enum_slice(count)		 # added for 1.8.7
+    return self.each_slice(count)
+  end
+
+  def enum_with_index()		# added for 1.8.7
+    return self.each_with_index()
+  end
+  
+  ##
+  # :call-seq:
+  #   enum.detect(ifnone = nil) { | obj | block }  => obj or nil
+  #   enum.find(ifnone = nil)   { | obj | block }  => obj or nil
+  #
+  # Passes each entry in +enum+ to +block+>. Returns the first for which
+  # +block+ is not false.  If no object matches, calls +ifnone+ and returns
+  # its result when it is specified, or returns nil
+  #
+  #   (1..10).detect  { |i| i % 5 == 0 and i % 7 == 0 }   #=> nil
+  #   (1..100).detect { |i| i % 5 == 0 and i % 7 == 0 }   #=> 35
+
+  def find(ifnone=nil, &block)
+    unless block_given?
+      return FirstEnumerator.new(self, :find, ifnone) # for 1.8.7
+    end
+    each { |o| return o if block.call(o) }
+    ifnone.call if ifnone
+  end
+
+  alias_method :detect, :find
+
+  ##
+  # :call-seq:
+  #   enum.find_index()   { | obj | block }  => int
+  #
+  # Passes each entry in +enum+ to +block+. Returns the index for the first
+  # for which +block+ is not false. If no object matches, returns
+  # nil.
+  #
+  #   (1..10).find_index  { |i| i % 5 == 0 and i % 7 == 0 }   #=> nil
+  #   (1..100).find_index { |i| i % 5 == 0 and i % 7 == 0 }   #=> 35
+
+  def find_index(object=Undefined, &block)
+    idx = -1 
+    if object._equal?(Undefined)
+      unless block_given?
+        return FirstEnumerator.new(self, :first_index) # for 1.8.7
+      end
+      self.each { |o| idx += 1; return idx if block.call(o) }
+    else
+      # ignore block when first arg is given
+      self.each { |o| idx += 1; return idx if o == object }
+    end  
+    nil
+  end
+
+  ##
+  # :call-seq:
+  #   enum.find_all { | obj | block }  => array
+  #   enum.select   { | obj | block }  => array
+  #
+  # Returns an array containing all elements of +enum+ for which +block+ is
+  # not false (see also Enumerable#reject).
+  #
+  #   (1..10).find_all { |i|  i % 3 == 0 }   #=> [3, 6, 9]
+
+  def find_all(&block)
+    unless block_given?
+      return ArraySelectEnumerator.new(self, :find_all) # for 1.8.7
+    end
+    ary = []
+    self.each { |o|
+      if block.call(o)
+        ary << o
+      end
+    }
+    ary
+  end
+
+  alias_method :select, :find_all
+
+  ##
+  # :call-seq:
+  #   enum.first      => obj or nil
+  #   enum.first(n)   => an_array
+  #
+  # Returns the first element, or the first +n+ elements, of the enumerable.
+  # If the enumerable is empty, the first form returns nil, and the second
+  # form returns an empty array.
+
+  def first(count)
+    # return Array of first count elements of the enumeration
+    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    if cnt <= 0
+      if cnt._equal?(0)
+        return []
+      end
+      raise ArgumentError, 'negative count'
+    end
+    arr = []
+    n = 0
+    self.each { |o| 
+      arr << o
+      n += 1
+      if n >= cnt
+        return arr
+      end
+    }
+    return arr
+  end
+
+  def first()
+    # returns first element of the enumeration , or nil 
+    self.each { |o| return o }
+    nil
+  end
+
+  # :call-seq:
+  #   enum.include?(obj)     => true or false
+  #   enum.member?(obj)      => true or false
+  #
+  # Returns true if any member of +enum+ equals +obj+. Equality is tested
+  # using #==.
+  #
+  #   IO.constants.include? "SEEK_SET"          #=> true
+  #   IO.constants.include? "SEEK_NO_FURTHER"   #=> false
+
+  def include?(obj)
+    each { |o| return true if obj == o }
+    false
+  end
+
+  alias_method :member?, :include?
+
+  ##
+  # :call-seq:
+  #   enum.inject(initial) { | memo, obj | block }  => obj
+  #   enum.inject          { | memo, obj | block }  => obj
+  #
+  # Combines the elements of +enum+ by applying the block to an accumulator
+  # value (+memo+) and each element in turn. At each step, +memo+ is set
+  # to the value returned by the block. The first form lets you supply an
+  # initial value for +memo+. The second form uses the first element of the
+  # collection as a the initial value (and skips that element while
+  # iterating).
+  #
+  # Sum some numbers:
+  #
+  #   (5..10).inject { |sum, n| sum + n }              #=> 45
+  #
+  # Multiply some numbers:
+  #
+  #   (5..10).inject(1) { |product, n| product * n }   #=> 151200
+  #
+  # Find the longest word:
+  #
+  #   longest = %w[ cat sheep bear ].inject do |memo,word|
+  #      memo.length > word.length ? memo : word
+  #   end
+  #
+  #   longest                                         #=> "sheep"
+  #
+  # Find the length of the longest word:
+  #
+  #   longest = %w[ cat sheep bear ].inject(0) do |memo,word|
+  #      memo >= word.length ? memo : word.length
+  #   end
+  #
+  #   longest                                         #=> 5
+
+  def inject(initial, &block)
+    memo = initial
+    self.each { |o|
+      memo = block.call(memo, o) 
+    }
+    memo
+  end
+
+  def inject(&block)
+    un_defined = Undefined
+    memo = un_defined
+    each { |o|
+      if memo._equal?(un_defined)
+        memo = o
+      else
+        memo = block.call(memo, o)
+      end
+    }
+    memo._equal?(un_defined) ? nil : memo
+  end
+
+  def inject(initial, binary_op_sym) # added for 1.8.7
+    memo = initial
+    self.each { |o|
+      memo = memo.__send__(binary_op_sym, o)    
+    }
+    memo
+  end
+
+  def inject(initial, binary_op_sym, &block_ignored) # added for 1.8.7
+    self.inject(initial, binary_op_sym)
+  end
+
+  def inject(binary_op_sym) # added for 1.8.7
+    un_defined = Undefined
+    memo = un_defined
+    each { |o|
+      if memo._equal?(un_defined) 
+        memo = o
+      else
+        memo = memo.__send__(binary_op_sym, o)
+      end
+    } 
+    memo._equal?(un_defined) ? nil : memo
+  end
+
+
+  alias_method :reduce, :inject  # added for 1.8.7
 
   ##
   # :call-seq:
@@ -145,18 +565,401 @@ module Enumerable
   #   res = c.grep(/SEEK/) { |v| IO.const_get(v) }
   #   res                    #=> [2, 0, 1]
 
-  def grep(pattern)
+  def grep(pattern, &block)
     ary = []
-    each do |o|
-      if pattern === o
-        ary << (block_given? ? yield(o) : o)
-      end
+    if block_given?
+      self.each { |o|
+        if pattern === o
+          ary << block.call(o) 
+        end
+      }
+    else
+      self.each { |o|
+        if pattern === o
+          ary << o
+        end
+      }
     end
     ary
   end
 
-  def sorter
-    Enumerable::Sort.new
+  ##
+  # :call-seq:
+  #   enum.group_by { | obj | block }  => a_hash
+  #
+  # Returns a hash, which keys are evaluated result from the block, and values
+  # are arrays of elements in +enum+ corresponding to the key.
+  #
+  #    (1..6).group_by { |i| i%3}   #=> {0=>[3, 6], 1=>[1, 4], 2=>[2, 5]}
+
+  def group_by(&block)
+    unless block_given?
+      return ArrayEnumerator.new( self.to_a, :group_by ) # for 1.8.7
+    end
+    h = {}
+    self.each { |o|
+      key = block.call(o)
+      if h.key?(key)
+        h[key] << o
+      else
+        h[key] = [o]
+      end
+    }
+    h
+  end
+
+  ##
+  # :call-seq:
+  #   enum.max                   => obj
+  #   enum.max { |a,b| block }   => obj
+  #
+  # Returns the object in +enum+ with the maximum value. The first form
+  # assumes all objects implement Comparable; the second uses the block to
+  # return <tt>a <=> b</tt>.
+  #
+  #    a = %w[albatross dog horse]
+  #    a.max                                  #=> "horse"
+  #    a.max { |a,b| a.length <=> b.length }   #=> "albatross"
+  #
+  def max(&block)
+    un_defined = Undefined
+    v = un_defined
+    if block_given?
+      self.each { |o|
+	if v._equal?(un_defined)
+	  v = o
+	else
+	  c = block.call(o, v) 
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{v} failed"
+	  end
+	  if c > 0
+	    v = o
+	  end
+	end
+      } 
+    else  # block not given, rewritten for 1.8.7
+      self.each { |o|
+	if v._equal?(un_defined)
+	  v = o
+	else
+	  c =  o <=> v
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{v} failed"
+	  end
+	  if c > 0
+	    v = o
+	  end
+	end
+      } 
+    end
+    v._equal?(un_defined) ? nil : v
+  end
+
+
+  ##
+  # :call-seq:
+  #   enum.max_by { | obj| block }   => obj
+  #
+  # Uses the values returned by the given block as a substitute for the real
+  # object to determine what is considered the largest object in +enum+ using
+  # <tt>lhs <=> rhs</tt>. In the event of a tie, the object that appears first
+  # in #each is chosen. Returns the "largest" object or nil if the enum is
+  # empty.
+  #
+  #   a = %w[albatross dog horse]
+  #   a.max_by { |x| x.length }   #=> "albatross"
+
+  def max_by(&block)
+    unless block_given?
+      return FirstEnumerator.new(self.to_a, :max_by) # for 1.8.7
+    end
+    un_defined = Undefined
+    max_obj = un_defined
+    max_value = un_defined
+
+    self.each { |o|
+      val = block.call(o)
+      if max_obj._equal?(un_defined) or (max_value <=> val) < 0
+        max_obj = o
+        max_value = val
+      end
+    }
+    max_obj._equal?(un_defined) ? nil : max_obj
+  end
+
+  ##
+  # :call-seq:
+  #   enum.min                    => obj
+  #   enum.min { | a,b | block }  => obj
+  #
+  # Returns the object in +enum+ with the minimum value. The first form
+  # assumes all objects implement Comparable; the second uses the block to
+  # return <tt>a <=> b</tt>.
+  #
+  #   a = %w[albatross dog horse]
+  #   a.min                                  #=> "albatross"
+  #   a.min { |a,b| a.length <=> b.length }   #=> "dog"
+
+  def min(&block)
+    un_defined = Undefined
+    v = un_defined
+    if block_given?
+      self.each { |o|
+	if v._equal?(un_defined)
+	  v = o
+	else
+	  c = block.call(o, v) 
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{v} failed"
+	  end
+	  if c < 0
+	    v = o
+	  end
+	end
+      } 
+    else 	# no block given, rewritten for 1.8.7
+      self.each { |o|
+	if v._equal?(un_defined)
+	  v = o
+	else
+	  c =  o <=> v
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{v} failed"
+	  end
+	  if c < 0
+	    v = o
+	  end
+	end
+      } 
+    end
+    v._equal?(un_defined) ? nil : v
+  end
+
+  ##
+  # :call-seq:
+  #   enum.min_by { |obj| block }   => obj
+  #
+  # Uses the values returned by the given block as a substitute for the real
+  # object to determine what is considered the smallest object in +enum+ using
+  # <tt>lhs <=> rhs</tt>. In the event of a tie, the object that appears first
+  # in #each is chosen. Returns the "smallest" object or nil if the enum is
+  # empty.
+  #
+  #   a = %w[albatross dog horse]
+  #   a.min_by { |x| x.length }   #=> "dog"
+
+  def min_by(&block)
+    unless block_given?
+      return ArrayEnumerator.new( self.to_a, :group_by ) # for 1.8.7
+    end
+    un_defined = Undefined
+    min_obj = un_defined
+    min_value = un_defined
+
+    self.each { |o|
+      val = block.call(o)
+      if min_obj._equal?(un_defined) or (min_value <=> val) > 0
+        min_obj = o
+        min_value = val
+      end
+    }
+    min_obj._equal?(un_defined) ? nil : min_obj
+  end
+
+  # minmax added for 1.8.7
+
+  def minmax(&block)
+    un_defined = Undefined
+    mino = un_defined
+    maxo = un_defined
+    if block_given?
+      self.each { |o|
+	if mino._equal?(un_defined)
+	  mino = o
+	  maxo = o
+	else
+	  c = block.call(o, mino) 
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{mino} failed"
+	  end
+	  if c < 0
+	    mino = o
+	  end
+	  c = block.call(o, maxo) 
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{maxo} failed"
+	  end
+	  if c > 0
+	    maxo = o
+	  end
+	end
+      } 
+    else
+      self.each { |o|
+	if mino._equal?(un_defined)
+	  mino = o
+	  maxo = o
+	else 
+	  c = o <=> mino
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{mino} failed"
+	  end
+	  if c < 0
+	    mino = o
+	  end
+	  c = o <=> maxo
+	  if c._equal?(nil)
+	    raise ArgumentError, "comparison of #{o.class} with #{maxo} failed"
+	  end
+	  if c > 0
+	    maxo = o
+	  end
+	end
+      } 
+    end
+    mino._equal?(un_defined) ? [ nil, nil] : [ mino, maxo ]
+  end
+
+  def minmax_by(&block)  # added for 1.8.7
+    # block should be a one-argument block
+    unless block_given?
+      return FirstEnumerator.new(self.to_a, :minmax_by ) # for 1.8.7
+    end
+    un_defined = Undefined
+    minv = un_defined
+    mino = nil
+    maxv = un_defined
+    maxo = nil
+    self.each { |o|
+      if minv._equal?(un_defined)
+        minv = block.call(o)
+        maxv = minv
+        mino = o
+        maxo = o
+      else
+        v = block.call(o)
+        c =  v <=> minv
+        if c._equal?(nil)
+          raise ArgumentError, "comparison of #{v.class} with #{minv} failed"
+        end
+        if c < 0
+          minv = v
+          mino = o
+        end
+        c = v <=> maxv
+        if c._equal?(nil)
+          raise ArgumentError, "comparison of #{o.class} with #{maxv} failed"
+        end
+        if c > 0
+          maxv = v
+          maxo = o
+        end
+      end
+    } 
+    minv._equal?(un_defined) ? [ nil, nil] : [ mino, maxo ]
+  end
+
+  ##
+  # :call-seq:
+  #   enum.none?                   => true or false
+  #   enum.none? { |obj| block }   => true or false
+  #
+  # Passes each element of the collection to the given block. The method
+  # returns true if the block never returns true for all elements. If the
+  # block is not given, none? will return true only if any of the collection
+  # members is true.
+  #
+  #    %w{ant bear cat}.none? { |word| word.length == 4}   #=> true
+  #    %w{ant bear cat}.none? { |word| word.length >= 4}   #=> false
+  #    [ nil, true, 99 ].none?                             #=> true
+
+  def none?(&block)
+    if block_given?
+      self.each { |o| 
+        if block.call(o) 
+          return false
+        end
+      }
+    else
+      self.each { |o| 
+        if o
+          return false
+        end
+      }
+    end
+    true
+  end
+
+
+  ##
+  # :call-seq:
+  #   enum.one?                   => true or false
+  #   enum.one? { |obj| block }   => true or false
+  #
+  # Passes each element of the collection to the given block. The method
+  # returns true if the block returns true exactly once. If the block is not
+  # given, one? will return true only if exactly one of the collection members
+  # are true.
+  #
+  #   %w[ant bear cat].one? { |word| word.length == 4}   #=> true
+  #   %w[ant bear cat].one? { |word| word.length >= 4}   #=> false
+  #   [ nil, true, 99 ].one?                             #=> true
+
+  def one?(&block)
+    count = 0
+    if block_given?
+      each { |o| count += 1 if block.call(o) }
+    else
+      each { |o| count += 1 if o }   # for 1.8.7
+    end
+    count == 1
+  end
+
+
+  ##
+  # :call-seq:
+  #   enum.partition { | obj | block }  => [ true_array, false_array ]
+  #
+  # Returns two arrays, the first containing the elements of +enum+ for which
+  # the block evaluates to true, the second containing the rest.
+  #
+  #   (1..6).partition { |i| (i&1).zero?}   #=> [[2, 4, 6], [1, 3, 5]]
+
+  def partition(&block)
+    unless block_given?
+      return ArraySelectEnumerator.new(self, :partition) # for 1.8.7
+    end
+    left = []
+    right = []
+    each { |o| block.call(o) ? left.push(o) : right.push(o) }
+    return [left, right]
+  end
+
+  ##
+  # :call-seq:
+  #   enum.reject { | obj | block }  => array
+  #
+  # Returns an array for all elements of +enum+ for which +block+ is false
+  # (see also Enumerable#find_all).
+  #
+  #    (1..10).reject { |i|  i % 3 == 0 }   #=> [1, 2, 4, 5, 7, 8, 10]
+
+  def reject(&block)
+    unless block_given?
+      return ArraySelectEnumerator.new(self, :reject) # for 1.8.7
+    end
+    ary = []
+    each { |o|
+      unless block.call(o)
+        ary << o
+      end
+    }
+    ary
+  end
+
+  def reverse_each(&block) 	# added for 1.8.7
+    self.to_a.reverse_each(&block)
   end
 
   ##
@@ -174,9 +977,11 @@ module Enumerable
   #   %w(rhea kea flea).sort         #=> ["flea", "kea", "rhea"]
   #   (1..10).sort { |a,b| b <=> a}  #=> [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
-  def sort(&prc)
-    sorter.sort(self, &prc)
+  def sort(&block)
+    self.sorter.sort(self, &block)
   end
+
+  # def sorter; end # in Enumerable2.rb
 
   ##
   # :call-seq:
@@ -243,526 +1048,80 @@ module Enumerable
   #   sorted = Dir["#"].sort_by { |f| test(?M, f)}
   #   sorted   #=> ["mon", "tues", "wed", "thurs"]
 
-  def sort_by(&prc)
-    sorter.sort_by(self, &prc)
+  def sort_by(&block)
+    unless block_given?
+      return FirstEnumerator.new(self, :sort_by)  # for 1.8.7
+    end
+    self.sorter.sort_by(self, &block)
   end
-
-  ##
-  # :call-seq:
-  #   enum.count(item)             => int
-  #   enum.count { | obj | block } => int
-  #
-  # Returns the number of items in +enum+ that equal +item+ or for which
-  # the block returns a true value.  Returns the number of all elements in
-  # +enum+ if neither a block nor an argument is given.
-  #
-  #   ary = [1, 2, 4, 2]
-  #   ary.count(2)          # => 2
-  #   ary.count{ |x|x%2==0}  # => 3
-
-  def count(item = Undefined)
-    seq = 0
-    if item._equal? Undefined
-      if block_given?
-        each { |o| seq += 1 if yield(o) }
-      else
-        each { |o| seq += 1 }
+ 
+  def take(count)	# added for 1.8.7
+    cnt = Type.coerce_to( count, Fixnum, :to_int)
+    if cnt <= 0
+      if cnt < 0
+        raise ArgumentError, 'arg to take must be >= 0'
       end
-    else
-      each { |o| seq += 1 if item == o }
+      return []
     end
-    seq
-  end
-
-  ##
-  # :call-seq:
-  #   enum.detect(ifnone = nil) { | obj | block }  => obj or nil
-  #   enum.find(ifnone = nil)   { | obj | block }  => obj or nil
-  #
-  # Passes each entry in +enum+ to +block+>. Returns the first for which
-  # +block+ is not false.  If no object matches, calls +ifnone+ and returns
-  # its result when it is specified, or returns nil
-  #
-  #   (1..10).detect  { |i| i % 5 == 0 and i % 7 == 0 }   #=> nil
-  #   (1..100).detect { |i| i % 5 == 0 and i % 7 == 0 }   #=> 35
-
-  def find(ifnone = nil)
-    each { |o| return o if yield(o) }
-    ifnone.call if ifnone
-  end
-
-  alias_method :detect, :find
-
-  ##
-  # :call-seq:
-  #   enum.find_index(ifnone = nil)   { | obj | block }  => int
-  #
-  # Passes each entry in +enum+ to +block+. Returns the index for the first
-  # for which +block+ is not false. If no object matches, returns
-  # nil.
-  #
-  #   (1..10).find_index  { |i| i % 5 == 0 and i % 7 == 0 }   #=> nil
-  #   (1..100).find_index { |i| i % 5 == 0 and i % 7 == 0 }   #=> 35
-
-  def find_index(ifnone = nil)
-    idx = -1
-    each { |o| idx += 1; return idx if yield(o) }
-    ifnone.call if ifnone
-  end
-
-  ##
-  # :call-seq:
-  #   enum.find_all { | obj | block }  => array
-  #   enum.select   { | obj | block }  => array
-  #
-  # Returns an array containing all elements of +enum+ for which +block+ is
-  # not false (see also Enumerable#reject).
-  #
-  #   (1..10).find_all { |i|  i % 3 == 0 }   #=> [3, 6, 9]
-
-  def find_all
-    ary = []
-    each do |o|
-      if yield(o)
-        ary << o
-      end
-    end
-    ary
-  end
-
-  alias_method :select, :find_all
-
-  ##
-  # :call-seq:
-  #   enum.reject { | obj | block }  => array
-  #
-  # Returns an array for all elements of +enum+ for which +block+ is false
-  # (see also Enumerable#find_all).
-  #
-  #    (1..10).reject { |i|  i % 3 == 0 }   #=> [1, 2, 4, 5, 7, 8, 10]
-
-  def reject
-    ary = []
-    each do |o|
-      unless yield(o)
-        ary << o
-      end
-    end
-    ary
-  end
-
-  ##
-  # :call-seq:
-  #   enum.collect { | obj | block }  => array
-  #   enum.map     { | obj | block }  => array
-  #
-  # Returns a new array with the results of running +block+ once for every
-  # element in +enum+.
-  #
-  #   (1..4).collect { |i| i*i }   #=> [1, 4, 9, 16]
-  #   (1..4).collect { "cat"  }   #=> ["cat", "cat", "cat", "cat"]
-
-  def collect
-    ary = []
-    if block_given?
-      each { |o| ary << yield(o) }
-    else
-      each { |o| ary << o }
-    end
-    ary
-  end
-
-  alias_method :map, :collect
-
-  ##
-  # :call-seq:
-  #   enum.inject(initial) { | memo, obj | block }  => obj
-  #   enum.inject          { | memo, obj | block }  => obj
-  #
-  # Combines the elements of +enum+ by applying the block to an accumulator
-  # value (+memo+) and each element in turn. At each step, +memo+ is set
-  # to the value returned by the block. The first form lets you supply an
-  # initial value for +memo+. The second form uses the first element of the
-  # collection as a the initial value (and skips that element while
-  # iterating).
-  #
-  # Sum some numbers:
-  #
-  #   (5..10).inject { |sum, n| sum + n }              #=> 45
-  #
-  # Multiply some numbers:
-  #
-  #   (5..10).inject(1) { |product, n| product * n }   #=> 151200
-  #
-  # Find the longest word:
-  #
-  #   longest = %w[ cat sheep bear ].inject do |memo,word|
-  #      memo.length > word.length ? memo : word
-  #   end
-  #
-  #   longest                                         #=> "sheep"
-  #
-  # Find the length of the longest word:
-  #
-  #   longest = %w[ cat sheep bear ].inject(0) do |memo,word|
-  #      memo >= word.length ? memo : word.length
-  #   end
-  #
-  #   longest                                         #=> 5
-
-  def inject(memo = Undefined)
-    each { |o|
-      if memo._equal? Undefined
-        memo = o
-      else
-        memo = yield(memo, o)
+    arr = [] 
+    res_size = 0
+    self.each { |o|
+      arr << o
+      res_size += 1
+      if res_size._equal?(cnt)
+        return arr
       end
     }
-
-    memo._equal?(Undefined) ? nil : memo
+    arr
   end
 
-  ##
-  # :call-seq:
-  #   enum.partition { | obj | block }  => [ true_array, false_array ]
-  #
-  # Returns two arrays, the first containing the elements of +enum+ for which
-  # the block evaluates to true, the second containing the rest.
-  #
-  #   (1..6).partition { |i| (i&1).zero?}   #=> [[2, 4, 6], [1, 3, 5]]
-
-  def partition
-    left = []
-    right = []
-    each { |o| yield(o) ? left.push(o) : right.push(o) }
-    return [left, right]
-  end
-
-  ##
-  # :call-seq:
-  #   enum.group_by { | obj | block }  => a_hash
-  #
-  # Returns a hash, which keys are evaluated result from the block, and values
-  # are arrays of elements in +enum+ corresponding to the key.
-  #
-  #    (1..6).group_by { |i| i%3}   #=> {0=>[3, 6], 1=>[1, 4], 2=>[2, 5]}
-
-  def group_by
-    h = {}
-    each do |o|
-      key = yield(o)
-      if h.key?(key)
-        h[key] << o
-      else
-        h[key] = [o]
+  def take_while(&block)  # added for 1.8.7
+    unless block_given?
+      # returns an Enumerator
+      return self.to_a.take_while()
+    end
+    brk_flag = false
+    arr = []
+    darr = []
+    blk_res = nil
+    n = 0
+    broke = false
+    enum_res = self.each { |elem|
+      n += 1
+      broke = true
+      blk_res = block.call(elem)
+      broke = false
+      darr << blk_res
+      unless blk_res
+        break
       end
+      arr << elem
+    }
+    if broke
+      return enum_res  # the argument block did a break
     end
-    h
+    arr
   end
 
   ##
   # :call-seq:
-  #   enum.first      => obj or nil
-  #   enum.first(n)   => an_array
+  #   enum.to_a      =>    array
+  #   enum.entries   =>    array
   #
-  # Returns the first element, or the first +n+ elements, of the enumerable.
-  # If the enumerable is empty, the first form returns nil, and the second
-  # form returns an empty array.
+  # Returns an array containing the items in +enum+.
+  #
+  #   (1..7).to_a                       #=> [1, 2, 3, 4, 5, 6, 7]
+  #   { 'a'=>1, 'b'=>2, 'c'=>3 }.to_a   #=> [["a", 1], ["b", 2], ["c", 3]]
 
-  def first(n = nil)
-    if n && n < 0
-      raise ArgumentError, "Invalid number of elements given."
-    end
-    if n
-      each do |o|
-        return o
-      end
-      nil
-    else
-      ary = []
-      each do |o|
-        return ary if ary.size == n
-        ary << o
-      end
-      ary
-    end
+  def to_a
+    ary = []
+    self.each { |o| 
+      ary << o 
+    }
+    ary
   end
 
-  # :call-seq:
-  #   enum.all?                     => true or false
-  #   enum.all? { |obj| block }   => true or false
-  #
-  # Passes each element of the collection to the given block. The method
-  # returns true if the block never returns false or nil. If the block is not
-  # given, Ruby adds an implicit block of <tt>{ |obj| obj }</tt> (that is all?
-  # will return true only if none of the collection members are
-  # false or nil.)
-  #
-  #   %w[ant bear cat].all? { |word| word.length >= 3}   #=> true
-  #   %w[ant bear cat].all? { |word| word.length >= 4}   #=> false
-  #   [ nil, true, 99 ].all?                             #=> false
-
-  def all?
-    if block_given?
-      each { |e| return false unless yield(e) }
-    else
-      each { |e| return false unless e }
-    end
-    true
-  end
-
-  ##
-  # :call-seq:
-  #    enum.any? [{ |obj| block } ]   => true or false
-  #
-  # Passes each element of the collection to the given block. The method
-  # returns true if the block ever returns a value other than false or nil. If
-  # the block is not given, Ruby adds an implicit block of <tt>{ |obj| obj
-  # }</tt> (that is any? will return true if at least one of the collection
-  # members is not false or nil.
-  #
-  #   %w[ant bear cat].any? { |word| word.length >= 3}   #=> true
-  #   %w[ant bear cat].any? { |word| word.length >= 4}   #=> true
-  #   [ nil, true, 99 ].any?                             #=> true
-
-  def any?(&prc)
-    prc = Proc.new { |obj| obj } unless block_given?
-    each { |o| return true if prc.call(o) }
-    false
-  end
-
-  ##
-  # :call-seq:
-  #   enum.one?                   => true or false
-  #   enum.one? { |obj| block }   => true or false
-  #
-  # Passes each element of the collection to the given block. The method
-  # returns true if the block returns true exactly once. If the block is not
-  # given, one? will return true only if exactly one of the collection members
-  # are true.
-  #
-  #   %w[ant bear cat].one? { |word| word.length == 4}   #=> true
-  #   %w[ant bear cat].one? { |word| word.length >= 4}   #=> false
-  #   [ nil, true, 99 ].one?                             #=> true
-
-  def one?(&prc)
-    prc = Proc.new { |obj| obj } unless block_given?
-    times = 0
-    each { |o| times += 1 if prc.call(o) }
-    times == 1
-  end
-
-  ##
-  # :call-seq:
-  #   enum.none?                   => true or false
-  #   enum.none? { |obj| block }   => true or false
-  #
-  # Passes each element of the collection to the given block. The method
-  # returns true if the block never returns true for all elements. If the
-  # block is not given, none? will return true only if any of the collection
-  # members is true.
-  #
-  #    %w{ant bear cat}.none? { |word| word.length == 4}   #=> true
-  #    %w{ant bear cat}.none? { |word| word.length >= 4}   #=> false
-  #    [ nil, true, 99 ].none?                             #=> true
-
-  def none?(&prc)
-    prc = Proc.new { |obj| obj } unless block_given?
-    times = 0
-    each { |o| times += 1 if prc.call(o) }
-    times._equal?(0)
-  end
-
-  ##
-  # :call-seq:
-  #   enum.min                    => obj
-  #   enum.min { | a,b | block }  => obj
-  #
-  # Returns the object in +enum+ with the minimum value. The first form
-  # assumes all objects implement Comparable; the second uses the block to
-  # return <tt>a <=> b</tt>.
-  #
-  #   a = %w[albatross dog horse]
-  #   a.min                                  #=> "albatross"
-  #   a.min { |a,b| a.length <=> b.length }   #=> "dog"
-
-  def min(&prc)
-    prc = Proc.new { |a, b| a <=> b } unless block_given?
-    min = Undefined
-    each do |o|
-      if min._equal? Undefined
-        min = o
-      else
-        comp = prc.call(o, min)
-        if comp._equal?(nil)
-          raise ArgumentError, "comparison of #{o.class} with #{min} failed"
-        elsif comp < 0
-          min = o
-        end
-      end
-    end
-
-    min._equal?(Undefined) ? nil : min
-  end
-
-  ##
-  # :call-seq:
-  #   enum.max                   => obj
-  #   enum.max { |a,b| block }   => obj
-  #
-  # Returns the object in +enum+ with the maximum value. The first form
-  # assumes all objects implement Comparable; the second uses the block to
-  # return <tt>a <=> b</tt>.
-  #
-  #    a = %w[albatross dog horse]
-  #    a.max                                  #=> "horse"
-  #    a.max { |a,b| a.length <=> b.length }   #=> "albatross"
-
-  def max(&prc)
-    prc = Proc.new { |a, b| a <=> b } unless block_given?
-    max = Undefined
-    each do |o|
-      if max._equal? Undefined
-        max = o
-      else
-        comp = prc.call(o, max)
-        if comp._equal?(nil)
-          raise ArgumentError, "comparison of #{o.class} with #{max} failed"
-        elsif comp > 0
-          max = o
-        end
-      end
-    end
-
-    max._equal?(Undefined) ? nil : max
-  end
-
-  ##
-  # :call-seq:
-  #   enum.min_by { |obj| block }   => obj
-  #
-  # Uses the values returned by the given block as a substitute for the real
-  # object to determine what is considered the smallest object in +enum+ using
-  # <tt>lhs <=> rhs</tt>. In the event of a tie, the object that appears first
-  # in #each is chosen. Returns the "smallest" object or nil if the enum is
-  # empty.
-  #
-  #   a = %w[albatross dog horse]
-  #   a.min_by { |x| x.length }   #=> "dog"
-
-  def min_by()
-    min_obj, min_value = Undefined, Undefined
-
-    each do |o|
-      value = yield(o)
-
-      if min_obj._equal?(Undefined) or (min_value <=> value) > 0
-        min_obj, min_value = o, value
-      end
-    end
-
-    min_obj._equal?(Undefined) ? nil : min_obj
-  end
-
-  ##
-  # :call-seq:
-  #   enum.max_by { | obj| block }   => obj
-  #
-  # Uses the values returned by the given block as a substitute for the real
-  # object to determine what is considered the largest object in +enum+ using
-  # <tt>lhs <=> rhs</tt>. In the event of a tie, the object that appears first
-  # in #each is chosen. Returns the "largest" object or nil if the enum is
-  # empty.
-  #
-  #   a = %w[albatross dog horse]
-  #   a.max_by { |x| x.length }   #=> "albatross"
-
-  def max_by()
-    max_obj, max_value = Undefined, Undefined
-
-    each do |o|
-      value = yield(o)
-
-      if max_obj._equal?(Undefined) or (max_value <=> value) < 0
-        max_obj, max_value = o, value
-      end
-    end
-
-    max_obj._equal?(Undefined) ? nil : max_obj
-  end
-
-
-  # :call-seq:
-  #   enum.include?(obj)     => true or false
-  #   enum.member?(obj)      => true or false
-  #
-  # Returns true if any member of +enum+ equals +obj+. Equality is tested
-  # using #==.
-  #
-  #   IO.constants.include? "SEEK_SET"          #=> true
-  #   IO.constants.include? "SEEK_NO_FURTHER"   #=> false
-
-  def include?(obj)
-    each { |o| return true if obj == o }
-    false
-  end
-
-  alias_method :member?, :include?
-
-  ##
-  # :call-seq:
-  #   enum.each_with_index { |obj, i| block }  -> enum
-  #
-  # Calls +block+ with two arguments, the item and its index, for
-  # each item in +enum+.
-  #
-  #   hash = {}
-  #   %w[cat dog wombat].each_with_index { |item, index|
-  #     hash[item] = index
-  #   }
-  #
-  #   p hash   #=> {"cat"=>0, "wombat"=>2, "dog"=>1}
-
-  def each_with_index
-    idx = 0
-    each { |o| yield(o, idx); idx += 1 }
-    self
-  end
-
-  #  call-seq:
-  #    e.each_slice(n) {...}
-  #    e.each_slice(n)
-  #
-  #  Iterates the given block for each slice of <n> elements.  If no
-  #  block is given, returns an enumerator.
-  #
-  #  e.g.:
-  #      (1..10).each_slice(3) {|a| p a}
-  #      # outputs below
-  #      [1, 2, 3]
-  #      [4, 5, 6]
-  #      [7, 8, 9]
-  #      [10]
-  #
-  # NOTE: MagLev does not yet support Enumerators
-  def each_slice(n)
-    if block_given?
-      res = []
-      count = 0
-      each do |x|
-        res << x
-        count += 1
-        if count == n
-          yield res
-          count = 0
-          res.clear
-        end
-      end
-      yield res if count > 0
-    else
-      raise NotImplementedError.new("Enumerable#each_slice: MagLev does not yet support enumerators")
-    end
-  end
+  alias_method :entries, :to_a
 
   ##
   # :call-seq:
@@ -792,8 +1151,6 @@ module Enumerable
     end
     result unless block_given?
   end
-
-
 end
-
+Enumerable.__freeze_constants
 

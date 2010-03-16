@@ -431,8 +431,8 @@ class Module
     raise NameError, 'uninitialized constant during bootstrap'
   end
 
-  # append_features deprecated, not implemented , see Module#included
-
+  # append_features deprecated, but reimplemented by Rails3 ,
+  #   it is invoked from .mcz code prior to the actual include of the module
   def append_features(other)
   end
 
@@ -446,8 +446,6 @@ class Module
     # variant needed for bootstrap
     __include_module(name)
   end
-
-  #  define_method   is implemented in Behavior
 
   # Invoked as a callback when a_module includes receiver.
   # supercedes  append_features

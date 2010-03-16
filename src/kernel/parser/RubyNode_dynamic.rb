@@ -13,7 +13,22 @@ module MagRp
     def paren=(v)
       @paren = v      # @paren is a dynamic IV  
     end
+ 
+    def isAmpersandBlockParam
+      false
+    end
   end 
+
+ 
+
+  class RubyLocalAsgnNode
+    def setAmpersandBlockParam
+      @isAmpersandBlockParam = true
+    end
+    def isAmpersandBlockParam
+      @isAmpersandBlockParam
+    end
+  end
 
   class RubyParAsgnRpNode
 

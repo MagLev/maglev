@@ -47,6 +47,9 @@ ifdef(`PARSER_DEBUG', `
 	  state.size=( state.size - len )
 ifdef(`PARSER_DEBUG', `
 	  @counts_array[8] += 1 # reduce_noneOne
+	  if @mydebug 
+            Kernel.print("_reduce_noneOne \n")
+          end
 ')
 	else
 
@@ -68,7 +71,14 @@ ifdef(`PARSER_DEBUG', `
 	  @racc_t =         cracc_t  # uncache
 	  @racc_read_next = cracc_read_next # uncache   
 ifdef(`PARSER_DEBUG', `
-	  if @mydebug ; puts "      #{sel}" ; end
+	  if @mydebug 
+            Kernel.print(" #{sel} ") 
+            if sel._equal?( :"_reduce_none::" )
+              Kernel.print("\n")
+            else
+              # end-of-line will be printed by yDebugTrace 
+            end
+          end
 	  @counts_array[9] += 1 # perform_reduce
 ')
 

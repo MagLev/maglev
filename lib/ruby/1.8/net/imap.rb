@@ -284,9 +284,11 @@ module Net
 
     # Disconnects from the server.
     def disconnect
-      if SSL::SSLSocket === @sock
+      begin
+        # try to call SSL::SSLSocket#io.
         @sock.io.shutdown
-      else
+      rescue NoMethodError
+        # @sock is not an SSL::SSLSocket.
         @sock.shutdown
       end
       @receiver_thread.join
@@ -2762,11 +2764,16 @@ module Net
           match(T_SPACE)
           result = ResponseCode.new(name, number)
         else
-          match(T_SPACE)
-          @lex_state = EXPR_CTEXT
-          token = match(T_TEXT)
-          @lex_state = EXPR_BEG
-          result = ResponseCode.new(name, token.value)
+          token = lookahead
+          if token.symbol == T_SPACE
+            shift_token
+            @lex_state = EXPR_CTEXT
+            token = match(T_TEXT)
+            @lex_state = EXPR_BEG
+            result = ResponseCode.new(name, token.value)
+          else
+            result = ResponseCode.new(name, nil)
+          end
         end
         match(T_RBRA)
         @lex_state = EXPR_RTEXT

@@ -110,7 +110,7 @@ module Errno
     table = self.errno_names
     table.each_with_index do |name, st_errno|
       ruby_errno = st_errno + 1 # adjust from smalltalk indexing
-      self.__create_errno_class(ruby_errno, name) unless name.nil?
+      self.__create_errno_class(ruby_errno, name) unless name._equal?(nil)
     end
     # Special cases: Some systems spel "EACCESS" as "EACCES", but user code
     # uses the longer name.  Note: Kernel#defined? is not defined during bootstrap,

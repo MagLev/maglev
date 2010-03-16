@@ -15,7 +15,7 @@ require 'webrick/config'
 require 'webrick/httpstatus'
 require 'webrick/httpauth/authenticator'
 require 'digest/md5'
-require 'digest/sha1'
+require 'digest/sha2' # maglev replace SHA1 with SHA2 for 1.8.7
 
 module WEBrick
   module HTTPAuth
@@ -49,8 +49,8 @@ module WEBrick
         case @algorithm
         when 'MD5','MD5-sess'
           @h = Digest::MD5
-        when 'SHA1','SHA1-sess'  # it is a bonus feature :-)
-          @h = Digest::SHA1
+        when 'SHA2','SHA2-sess'  # it is a bonus feature :-) # maglev SHA2 replaces SHA1 for 1.8.7
+          @h = Digest::SHA2
         else
           msg = format('Alogrithm "%s" is not supported.', @algorithm)
           raise ArgumentError.new(msg)

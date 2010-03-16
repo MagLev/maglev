@@ -1,8 +1,4 @@
 module Enumerable
-  def sorter
-    Sort.new
-  end
-
   class Sort
     def sort_by(xs)
       # The ary and its elements sould be inmutable while sorting
@@ -11,6 +7,5 @@ module Enumerable
       sort(elements).map { |e| e.value }
     end
   end
-
 end
-
+Enumerable.__freeze_constants

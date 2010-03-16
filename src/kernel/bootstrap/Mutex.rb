@@ -3,10 +3,10 @@ class Mutex
 
   class_primitive_nobridge '__new', 'forRubyMutualExclusion'
 
-  def self.new(*args, &blk)
+  def self.new(*args, &block)
     # first variant gets bridge methods
     m = self.__new
-    m.initialize(*args, &blk)
+    m.initialize(*args, &block)
     m
   end
 

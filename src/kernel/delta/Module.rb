@@ -12,6 +12,11 @@ class Module
     raise NotImplementedError , "Module#clone"
   end
 
+  # Invoked as a callback when a reference to an undefined symbol is made.
+  def const_missing(symbol)
+    raise NameError, "uninitialized constant #{symbol}"
+  end
+
   def include?(other)
     unless other._is_a?(Module) && ! other._is_a?(Class)
       raise TypeError, 'Module#include? , argument not a Module'

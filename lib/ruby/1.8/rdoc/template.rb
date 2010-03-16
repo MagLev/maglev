@@ -62,7 +62,7 @@ class TemplatePage
     def find_scalar(key)
       @stack.reverse_each do |level|
         if val = level[key]
-          return val unless val._isArray
+          return val unless val.kind_of? Array
         end
       end
       raise "Template error: can't find variable '#{key}'"
@@ -181,7 +181,7 @@ class TemplatePage
         body = lines.read_up_to(/^END:#{tag}/)
         inner_values = @context.lookup(tag)
         raise "unknown tag: #{tag}" unless inner_values
-        raise "not array: #{tag}"   unless inner_values._isArray
+        raise "not array: #{tag}"   unless inner_values.kind_of?(Array)
         inner_values.each do |vals|
           result << substitute_into(body.dup, vals)
         end
@@ -206,7 +206,7 @@ class TemplatePage
       ref = @context.lookup($1)
       name = @context.find_scalar($2)
 
-      if ref and !ref._isArray
+      if ref and !ref.kind_of?(Array)
 	"<a href=\"#{ref}\">#{name}</a>"
       else
 	name

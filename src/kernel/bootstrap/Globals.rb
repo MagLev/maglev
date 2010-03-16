@@ -76,6 +76,7 @@ RUBY.global('Exception',    'UserException')
         RUBY.global('EOFError',     'EOFError')
         RUBY.global('SocketError',  'SocketError')
       RUBY.global('IndexError',     'OffsetError')
+        RUBY.global('StopIteration',     'RubyStopIterationError')
       RUBY.global('LocalJumpError',     'CannotReturn')
       RUBY.global('RangeError',     'RangeError')
         RUBY.global('FloatDomainError', 'FloatingPointError')
@@ -101,8 +102,7 @@ RUBY.global("GsNMethod", "GsNMethod")
 
 # ----------------------------------------------------------
 
-# ARGV initialized in .mcz, in RubyTransientConstantAssociation>>initGlobals:
-ARGF = nil # TODO a real implementation
+# ARGV, ARGF initialized in .mcz, in RubyContext>>__initTransient:
 
 # Notes on various globals
 #  $/ is auto-initialized to "\n" by parser at first ref .
@@ -144,13 +144,10 @@ RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
 RUBY_RELEASE_DATE = '2010-02-26'
 RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
+RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
+RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
 VERSION = RUBY_VERSION
-# If DEBUG_SPEC is true an executing rubyspec pauses on exception for topaz debugging
-# If false, the handling is unchanged: exception is reported along with the
-#  stringified stack.
-# Value is examined by mspec/runner/mspec.rb.
-DEBUG_SPEC = false
 
 TRUE  = true
 FALSE = false

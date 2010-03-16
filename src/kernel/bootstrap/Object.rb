@@ -144,7 +144,14 @@ class Object
   def enum_for(sym = :each , *args)  # added in 1.8.7
     # the receiver must implement the specified method that
     #  would return an enumerator
-    self.__send__(sym, *args) 
+    ts = Thread.__recursion_guard_set
+    unless ts.__add_if_absent(self)
+      # catch infinite recursion from typical MRI usage pattern
+      raise RuntimeError, 'Enumerator creation is subclass responsibility'
+    end
+    enumerator = self.__send__(sym, *args) 
+    ts.remove(self)
+    enumerator
   end
 
   primitive 'freeze', 'immediateInvariant'
@@ -274,11 +281,11 @@ class Object
   #  following 3 prims must also be installed in Behavior
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
   primitive_nobridge '__instvar_put', 'rubyInstvarAt:put:'
+  primitive_nobridge '__instvar_defined', 'rubyInstvarDefined:'
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
-  # TODO: this could be a prim for performance
   def instance_variable_defined?(name)
-    self.instance_variables.include? name
+    self.__instvar_defined(name)
   end
 
   def instance_variable_get(a_name)

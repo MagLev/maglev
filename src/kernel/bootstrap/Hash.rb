@@ -97,7 +97,7 @@ class Hash
   def self.__from_array_of_pairs(elements)  # added for 1.8.7
     # handle an array of pairs, skipping elements that are not arrays of size 2
     n = 0
-    numelem = elements.length
+    numelem = elements.__size
     res = self.__new(numelem)
     while n < numelem
       pair = nil
@@ -116,6 +116,18 @@ class Hash
     end
     res
   end
+
+  def self.__from_array(arr)
+    # used by Array#__as_hash, from generated code , added for 1.8.7
+    lim = arr.__size
+    res = self.__new( lim.__divide(2) ) 
+    n = 0
+    while n < lim
+      res.__atkey_put( arr.__at(n), arr.__at(n + 1) )
+      n += 2
+    end
+    res 
+  end  
 
   def self.[](*args)
     self.__from_elements(args)
@@ -966,23 +978,43 @@ class Hash
     other = Type.coerce_to(other, Hash, :to_hash)
     other_siz = other.size
     my_siz = @numElements
-    res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-    if res_siz > (ts = @tableSize)  && ts < 1009
-      self.__rebuild(res_siz)
+    if other._not_equal?(self)
+      res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
+      if res_siz > (ts = @tableSize)  && ts < 1009
+        self.__rebuild(res_siz)
+      end
     end
     self.__merge!(other, &block)
   end
 
   def __merge!(other, &block)
     if block_given?
-      other.each_pair { |k, v|
-        if self.has_key?( k)
-          self.__atkey_put(k,  yield(k, self.__atkey(k), v))
-        else
-          self.__atkey_put(k, v)
+      if other._equal?(self)
+        pairs_siz = @numElements  * 2
+        pairs = Array.new( pairs_siz )
+        n = 0
+        self.each_pair { |k, v|
+          pairs[n] = k
+          pairs[n+1] = v
+          n += 2
+        }
+        n = 0
+        while n < pairs_siz
+          k = pairs.__at(n)
+          v = pairs.__at(n + 1)
+          self.__atkey_put(k,  block.call(k, v, v))
+          n += 2 
         end
-      }
-    else
+      else
+        other.each_pair { |k, v|
+          if self.has_key?( k)
+            self.__atkey_put(k,  block.call(k, self.__atkey(k), v))
+          else
+            self.__atkey_put(k, v)
+          end
+        }
+      end
+    elsif other._not_equal?(self)
       other.__merge_into(self)
     end
     self

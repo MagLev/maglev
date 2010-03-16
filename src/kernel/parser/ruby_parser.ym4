@@ -703,6 +703,7 @@ rule
                     {
 		      yTrace("undef_list: | undef_list tCOMMA")
                       @lexer.lex_state=( Expr_fname )
+		      result = val[vofs]  # missing from Ryan's 2.0.2 code
                     }
                     fitem
                     {
@@ -1214,7 +1215,7 @@ rule
                     {
 		      yTrace("open_args: tLPAREN_ARG")
                       @lexer.lex_state=( Expr_endArg )
-                      result = val[vofs]
+                      result = val[vofs] # missing from Ryan's code
                     }
                     tRPAREN
                     {
@@ -1538,9 +1539,9 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                       result = @in_def
                       @in_def = false
                     }
-                    t_erm
+                    Term
                     {
-		      yTrace("primary | kCLASS ___ t_erm")
+		      yTrace("primary | kCLASS ___ Term")
                       result = @in_single
                       @in_single = 0
                       @env.extend( false, :module )
@@ -1638,12 +1639,12 @@ raise SyntaxError, "class definition in method body, near line #{@lexer.lineno_}
                       result = value_expr(val[vofs ])
                     }
 
-            then: t_erm
+            then: Term
                 | tCOLON
                 | kTHEN
-                | t_erm kTHEN
+                | Term kTHEN
 
-              do: t_erm
+              do: Term
                 | tCOLON
                 | kDO_COND
 
@@ -2216,9 +2217,9 @@ xstring_contents: none
 			      result = RubyBackRefNode.s( val[vofs ] )
 			    }
 
-      superclass: t_erm
+      superclass: Term
                     {
-		      yTrace("superclass: t_erm")
+		      yTrace("superclass: Term")
                       result = nil
                     }
                 | tLT
@@ -2227,14 +2228,14 @@ xstring_contents: none
                       @lexer.lex_state=( Expr_beg )
                       result = val[vofs]
                     }
-                    expr_value t_erm
+                    expr_value Term
                     {
-		      yTrace("superclass: | tLT ___ expr_value t_erm")
+		      yTrace("superclass: | tLT ___ expr_value Term")
                       result = val[vofs + 2]
                     }
-                | error t_erm
+                | error Term
                     {
-		      yTrace("superclass: | error t_erm")
+		      yTrace("superclass: | error Term")
                       leave_error_recovery_mode()
                       result = nil
                     }
@@ -2245,9 +2246,9 @@ xstring_contents: none
                       result = val[vofs + 1]
                       @lexer.lex_state=( Expr_beg )
                     }
-                | f_args t_erm 
+                | f_args Term 
  		    {
-                      yTrace("f_arglist: | f_args t_erm")
+                      yTrace("f_arglist: | f_args Term")
                       result = val[vofs ]
                     }
 
@@ -2488,15 +2489,15 @@ xstring_contents: none
           opt_nl:  | tNL
          trailer:  | tNL | tCOMMA
 
-            t_erm: tSEMI 
+            Term: tSEMI 
                       {  
-                        yTrace("t_erm: tSEMI")
+                        yTrace("Term: tSEMI")
                         leave_error_recovery_mode() 
                         result = val[vofs] 
                       }
                 | tNL
 
-           terms: t_erm    Y_TRACE_val_vofs("terms: t_erm ")
+           terms: Term    Y_TRACE_val_vofs("terms: Term ")
                 | terms tSEMI 
                     {  
 		      yTrace("terms: | terms tSEMI")

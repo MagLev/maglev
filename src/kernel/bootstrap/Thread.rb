@@ -20,6 +20,7 @@ class Thread
 
   # eval support
   def self.__atEvalBinding_put(symbol, value )
+    # called by generated code
     # returns value . used only for temps created by an eval 
     cx = self.current[  :__evalArgs ]
     unless cx._equal?(nil)
@@ -29,6 +30,19 @@ class Thread
       end
     end
     value
+  end
+
+  def self.__evalHomeMethod	# added for 1.8.7
+    # called by generated code
+    res = nil
+    cx = self.current[  :__evalArgs ]
+    unless cx._equal?(nil)
+      binding = cx[0]
+      unless binding._equal?(nil)
+        res = binding.__home_method
+      end
+    end
+    res.__name
   end
 
   class_primitive_nobridge '__stbacktrace', 'backtraceToLevel:'
@@ -55,7 +69,7 @@ class Thread
         file1, line1, meth1 = __find_next_user_info_for(idx+1, ststack)
         file, line = file1, line1 if file1  # don't replace meth
       end
-      meth = ":in `#{meth}'" unless meth.nil?
+      meth = ":in `#{meth}'" unless meth._equal?(nil) 
       result << "#{file}:#{line}#{meth}"  if file 
     end
     result[(res_start_ofs+1)..-1]
@@ -135,8 +149,8 @@ class Thread
   class_primitive_nobridge 'exit', 'exit'
   primitive_nobridge 'exit', 'exit'
 
-  def self.fork(&blk)
-    self.start(*[], &blk)
+  def self.fork(&block)
+    self.start(*[], &block)
   end
 
   primitive_nobridge 'group' , 'rubyGroup'
@@ -179,10 +193,10 @@ class Thread
 
   class_primitive_nobridge '__basic_new', 'rubyBasicNew'
 
-  def self.new(*args, &blk)
+  def self.new(*args, &block)
     thr = self.__basic_new
     thr.initialize(*args)
-    thr.__start(*args, &blk)
+    thr.__start(*args, &block)
   end
 
   class_primitive_nobridge 'pass', 'pass'

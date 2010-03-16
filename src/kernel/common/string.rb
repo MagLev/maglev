@@ -1,14 +1,8 @@
 class String
-  primitive '__splice', 'copyReplaceFrom:to:with:'
 
-  # This is a rubinius helper function
-  def splice!(start, count, replacement)
-    replace __splice(start+1, start+count, replacement)
-  end
+  # primitive '__splice', 'copyReplaceFrom:to:with:' # no longer used
 
-
-  def upto(stop)
-    #stop = StringValue(stop)
+  def upto(stop, exclusive=false, &block) # changes for 1.8.7
     unless stop._isString
       if stop._isSymbol 
         raise TypeError , 'upto does not support Symbol arg'
@@ -17,16 +11,19 @@ class String
     end
     return self if self > stop
 
-    after_stop = stop.succ
+    stop_val = stop
+    unless exclusive
+      stop_val = stop.succ
+    end
     current = self
 
-    until current == after_stop
-      yield current
-      #current = StringValue(current.succ)
+    stop_sz = stop.__size
+    until current == stop_val
+      block.call(current)
       current = Type.coerce_to(current.succ, String, :to_str)
-      break if current.size > stop.size || current.size == 0
+      curr_sz = current.__size
+      break if curr_sz._equal?(0) || curr_sz > stop_sz 
     end
-
     self
   end
 
@@ -78,7 +75,7 @@ class String
     while match = pattern.match_from(self, index)
       index = match.collapsing? ? match.end(0) + 1 : match.end(0)
       last_match = match
-      val = (match.length._equal?(1) ? match[0] : match.captures)
+      val = (match.length._equal?(1) ? match.__at(0) : match.captures)
       # val.taint if taint # Maglev, no taint propagation
       ret << val
     end
@@ -100,7 +97,7 @@ class String
       while match = pattern.match_from(self, index)
         index = match.collapsing? ? match.end(0) + 1 : match.end(0)
         last_match = match
-        val = (match.length._equal?(1) ? match[0] : match.captures)
+        val = (match.length._equal?(1) ? match.__at(0) : match.captures)
         # val.taint if taint # Maglev, no taint propagation
 
         last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
@@ -111,7 +108,7 @@ class String
       while match = pattern.match_from(self, index)
         index = match.collapsing? ? match.end(0) + 1 : match.end(0)
         last_match = match
-        val = (match.length._equal?(1) ? match[0] : match.captures)
+        val = (match.length._equal?(1) ? match.__at(0) : match.captures)
         # val.taint if taint # Maglev, no taint propagation
 
         ret << val

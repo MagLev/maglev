@@ -9,7 +9,11 @@ The code in kernel/parser is a tight integration of all of the following:
     and no longer know how to emit instances of the Sexp class.
     The new class encapsulating tokens and byte offsets is RpNameToken .
 
-  modified strscan.rb integrated with new Regexp primitives in Maglev
+  (March 2010) The .y file has been renamed to .ym4 and is pre-processed
+  with the racc.sh script using m4 , to include/exclude runtime
+  implementation of the yTrace() and Y_TRACE_val_vofs tracing (more below).
+
+  Modified strscan.rb integrated with new Regexp primitives in Maglev
   to operate against a C memory copy of the frozen  source string, thus
   reducing  copying between object memory and C memory for Regexp operations
   by the lexer .
@@ -25,7 +29,7 @@ The code in kernel/parser is a tight integration of all of the following:
   and access parser state tables from instVars , and is tied to
   the post processing in racc.sh .
 
-  The .y file and the racc_parser.rb now avoid copying the last "len"
+  The .ym4 file and the racc_parser.rb now avoid copying the last "len"
   elements of the value stack for each reduce method. Rather 
   the offset to val[0] is passed to each reduce method, and 
   the value stack is truncated as needed after the reduce method returns.
@@ -155,7 +159,7 @@ Lexing of double quoted strings (Maglev Trac 580)
   Maglev parser reported 'class definition in method body'
   for each subequent line in the source and then
   went into an infinite loop handling the EOF  token.
-  To fix, in ruby_parser.y , for  production 'kCLASS cpath superclass'
+  To fix, in ruby_parser.ym4 , for  production 'kCLASS cpath superclass'
   changed the   yyerror    call to just     raise SyntaxError
   and terminate the parsing.
 
@@ -194,7 +198,7 @@ Lexing of double quoted strings (Maglev Trac 580)
   Uses new instVar @first_top_level_def_offset in Env , and related methods.
 
 11 Nov 2009
-  Changes to lexer.rb and ruby_parser.y , to have yacc_value for tXSTRING_BEG 
+  Changes to lexer.rb and ruby_parser.ym4 , to have yacc_value for tXSTRING_BEG 
   encapsulated in an RpNameToken , so that source position of the tXSTRING_BEG 
   can be installed in the AST .
   Various changes to optimize constant references, based on profiling.
@@ -242,7 +246,7 @@ Lexing of double quoted strings (Maglev Trac 580)
       SyntaxError: empty symbol literal 
    is followed by EOF
 
-   For these error paths in  ruby_parser.y,
+   For these error paths in  ruby_parser.ym4,
      "BEGIN in method"   
      "module definition in method body"
      "formal argument cannot be a constant: 
@@ -251,13 +255,13 @@ Lexing of double quoted strings (Maglev Trac 580)
    change from calling yyerror to   raise SyntaxError to avoid infinite shift
    after hitting EOF .
 
-   In ruby_parser.y , make all paths with
+   In ruby_parser.ym4 , make all paths with
      "dynamic constant assignment" 
    use     raise SyntaxError     to ensure errors get raised
 
    In     def assignable      in  extras.rb,
    add logic to detect dynamic constant assignment, for a case
-   not detected in the .y file.
+   not detected in the .ym4 file.
 
 24 Nov 2009
   More optimization based on profiling with Maglev::Gprof, which
@@ -279,7 +283,8 @@ Lexing of double quoted strings (Maglev Trac 580)
   See  def/uses of check_selector() in extras.rb .
   If disallowing  elseif  breaks existing Ruby code we will backoff the check.
   Inspired by wasting an hour+ debugging a problem in bootstrap/Hash.rb 
-  caused by  an    if ... elseif ... end     statement, which is legal syntax.
+  caused by  an    if ... elseif ... end     statement, which is legal syntax
+  and never executes the intended else clause .
 
 22 Jan 2010
   Fix Trac653 in the lexer.   
@@ -288,8 +293,53 @@ Lexing of double quoted strings (Maglev Trac 580)
   and uses in lexer.rbm4 to implement the fix.
 
 24 Feb 2010
-  implemented print_saved_warnings(), includes logic to get 
+  Implemented print_saved_warnings(), includes logic to get 
   warning level from SessionTemps , and suppress printing of  
   warnings unless warnings specified by user or a syntax error occurs.
-  changed uses of raise_error() to internal_error() .
-  added syntax_error() .
+  Changed uses of raise_error() to internal_error() .
+  Added syntax_error() .
+
+March 2010
+  To support changes for 1.8.7, renamed ruby_parser.y to ruby_parser.ym4 .
+  File ruby_parser.y is produced by the racc.sh script as an output
+  of m4, using ruby_parser.ym4 as an input.
+
+  Edited ruby_parser.ym4 to add yTrace() and Y_TRACE_val_vofs()
+  macro calls to provide more readable runtime tracing of the parser.
+
+  Renamed some of the items in the grammar to avoid short names being
+  substrings within longer names, for easier searching with a text editor.
+        old grammar item        new grammar item
+        -----------------        ------------------
+        aref_args                aref__args
+        block_var                blck_var
+        bodystmt                 body_stamt
+        brace_block              brace_blck
+        compstmt                 comp_stamt
+        mlhs                     mLhs
+        opt_terms                opt_termms
+        stmts                    sttmts
+        term                     Term
+        var_lhs                  varLhs
+
+  For Ruby 1.8.7, added the productions 
+     mlhs_basic: | mlhs_head tAMPER variable
+     mlhs_basic: | tAMPER variable 
+  and the append_for_mlhs() method to implement block parameter for a block
+
+  Found the following problems in the original ruby_parser.y grammar file,
+    For the production
+       undef_list:  | undef_list tCOMMA
+    there is no assignment to   result 
+    For the production
+       open_args: | tLPAREN_ARG
+    there is no assignment to   result 
+
+  Fixed double increment of @line_num in tokadd_string() in lexer,
+  seen when parsing multi-line Regex constants, by moving the
+     @line_num += num_eols
+  outside of the loop  beginning with
+     until src.eos? do
+
+  Fix missing increment of @line_num when processing line ending with ?\  .
+

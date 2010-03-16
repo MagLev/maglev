@@ -1,8 +1,8 @@
 #
 #   irb.rb - irb main module
 #   	$Release Version: 0.9.5 $
-#   	$Revision: 17127 $
-#   	$Date: 2008-06-12 21:02:17 -0600 (Thu, 12 Jun 2008) $
+#   	$Revision: 24483 $
+#   	$Date: 2009-08-09 17:44:15 +0900 (Sun, 09 Aug 2009) $
 #   	by Keiju ISHITSUKA(keiju@ruby-lang.org)
 #
 # --
@@ -23,7 +23,7 @@ require "irb/locale"
 STDOUT.sync = true
 
 module IRB
-  @RCS_ID='-$Id: irb.rb 17127 2008-06-13 03:02:17Z shyouhei $-'
+  @RCS_ID='-$Id: irb.rb 24483 2009-08-09 08:44:15Z shyouhei $-'
 
   class Abort < Exception;end
 
@@ -65,11 +65,19 @@ module IRB
     trap("SIGINT") do
       irb.signal_handle
     end
-    
-    catch(:IRB_EXIT) do
-      irb.eval_input
+
+    begin
+      catch(:IRB_EXIT) do
+	irb.eval_input
+      end
+    ensure
+      irb_at_exit
     end
 #    print "\n"
+  end
+
+  def IRB.irb_at_exit
+    @CONF[:AT_EXIT].each{|hook| hook.call}
   end
 
   def IRB.irb_exit(irb, ret)
@@ -151,12 +159,19 @@ module IRB
 	    output_value if @context.echo?
 	    exc = nil
 	  rescue Interrupt => exc
+#           if ::MAGLEV_DEBUG_IRB
+#             nil.pause
+#           end
 	  rescue SystemExit, SignalException
 	    raise
 	  rescue Exception => exc
+#           if ::MAGLEV_DEBUG_IRB
+#             nil.pause
+#           end
 	  end
 	  if exc
-	    print exc.class, ": ", exc, "\n"
+	   print exc.class, ": ", exc, "\n"
+#          unless ::MAGLEV_DEBUG_IRB # [
 	    if exc.backtrace[0] =~ /irb(2)?(\/.*|-.*|\.rb)?:/ && exc.class.to_s !~ /^IRB/
 	      irb_bug = true 
 	    else
@@ -186,6 +201,7 @@ module IRB
 	      print lasts.join("\n")
 	    end
 	    print "Maybe IRB bug!!\n" if irb_bug
+#          end # maglev ]
 	  end
           if $SAFE > 2
             abort "Error: irb does not work for $SAFE level higher than 2"

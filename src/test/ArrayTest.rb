@@ -996,7 +996,7 @@ test(a.slice!(4),    nil,           "slice! 15")
 test(a,              [1,2],         "slice! 16")
 
 test(a.slice!(4,0),  nil,           "slice! 17")
-test(a,              [1,2,nil,nil], "slice! 18")
+test(a,              [1,2], "slice! 18")   # result changes with 1.8.7
 
 a = [1,2]
 test(a[4,10] = nil,  nil,             "assign  1")

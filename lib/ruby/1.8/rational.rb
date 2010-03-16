@@ -17,6 +17,9 @@
 # See Rational for full documentation.
 #
 
+# Maglev edits
+#   optimization of kind_of?() , use _isFloat, _isInteger where possible,
+#     otherwise use _kind_of?
 
 #
 # Creates a Rational number (i.e. a fraction).  +a+ and +b+ should be Integers:
@@ -81,7 +84,7 @@ class Rational < Numeric
     if den == 1 && defined?(Unify)
       num
     else
-      new(num, den)
+      new(num, den)  # maglev change
     end
   end
 
@@ -94,9 +97,10 @@ class Rational < Numeric
     new(num, den)
   end
 
-  def self.new(num, denom)
+  def self.new(num, denom)  # maglev addition
     super
   end
+
   private_class_method :new
 
   #
@@ -211,13 +215,6 @@ class Rational < Numeric
     end
   end
 
-  def div(a)
-    if a._isFloat && a == 0.0
-      raise FloatDomainError, "division by zero"
-    end
-    super  
-  end
-
   #
   # Returns this value raised to the given power.
   #
@@ -250,6 +247,13 @@ class Rational < Numeric
     end
   end
 
+  def div(other)
+    if other._isFloat && other == 0.0  # maglev
+      raise FloatDomainError, "division by zero"
+    end
+    (self / other).floor
+  end
+
   #
   # Returns the remainder when this value is divided by +other+.
   #
@@ -261,10 +265,10 @@ class Rational < Numeric
   #   r % 0.26             # -> 0.19
   #
   def % (other)
-    if other._isFloat && other == 0.0
+    if other._isFloat && other == 0.0  # maglev change
       raise FloatDomainError , 'division by 0.0'
     end
-    value = (self / other).to_i
+    value = (self / other).floor
     return self - other * value
   end
 
@@ -276,12 +280,12 @@ class Rational < Numeric
   #   r.divmod Rational(1,2)   # -> [3, Rational(1,4)]
   #
   def divmod(other)
-    if other._isFloat && other == 0.0
+    if other._isFloat && other == 0.0 	# maglev changes
       raise FloatDomainError , 'division by 0.0'
     elsif other._isInteger && other._equal?( 0)
-      raise ZeroDivisionError
-    end
-    value = (self / other).to_i
+      raise ZeroDivisionError	
+    end			# end maglev
+    value = (self / other).floor
     return value, self - other * value
   end
 
@@ -290,7 +294,7 @@ class Rational < Numeric
   #
   def abs
     if @numerator > 0
-      Rational.new!(@numerator, @denominator)
+      self
     else
       Rational.new!(-@numerator, @denominator)
     end
@@ -362,7 +366,6 @@ class Rational < Numeric
       raise ArgumentError, 'in Rational#< , <=> returned a non-Numeric'
     end
   end
-
   def >=(other)
     status =  self <=> other
     if status._isNumeric
@@ -380,6 +383,7 @@ class Rational < Numeric
       raise ArgumentError, 'in Rational#<= , <=> returned a non-Numeric'
     end
   end
+  # end Maglev comparison methods
 
   def coerce(other)
     if other._isFloat
@@ -390,21 +394,48 @@ class Rational < Numeric
       super
     end
   end
-  # end Maglev comparisons
 
   #
   # Converts the rational to an Integer.  Not the _nearest_ integer, the
   # truncated integer.  Study the following example carefully:
   #   Rational(+7,4).to_i             # -> 1
-  #   Rational(-7,4).to_i             # -> -2
+  #   Rational(-7,4).to_i             # -> -1
   #   (-1.75).to_i                    # -> -1
   #
   # In other words:
   #   Rational(-7,4) == -1.75                 # -> true
-  #   Rational(-7,4).to_i == (-1.75).to_i     # false
+  #   Rational(-7,4).to_i == (-1.75).to_i     # -> true
   #
-  def to_i
-    Integer(@numerator.div(@denominator))
+
+
+  def floor()
+    @numerator.div(@denominator)
+  end
+
+  def ceil()
+    -((-@numerator).div(@denominator))
+  end
+
+  def truncate()
+    if @numerator < 0
+      return -((-@numerator).div(@denominator))
+    end
+    @numerator.div(@denominator)
+  end
+
+  alias_method :to_i, :truncate
+
+  def round()
+    if @numerator < 0
+      num = -@numerator
+      num = num * 2 + @denominator
+      den = @denominator * 2
+      -(num.div(den))
+    else
+      num = @numerator * 2 + @denominator
+      den = @denominator * 2
+      num.div(den)
+    end
   end
 
   #
@@ -536,51 +567,56 @@ class Integer
   end
 end
 
-class Fixnum
-  undef quo
-  # If Rational is defined, returns a Rational number instead of a Fixnum.
+class Integer  # maglev change,  was class Fixnum
+  # Maglev implements quo in Integer and Bignum,Fixnum both
+  #  inherit that implementation
+  
+  # remove_method :quo  # can't remove from persistent class, just override
+
+  # If Rational is defined, returns a Rational number instead of a Float.
   def quo(other)
-    Rational.new!(self,1) / other
+    Rational.new!(self, 1) / other
   end
   alias rdiv quo
 
   # Returns a Rational number if the result is in fact rational (i.e. +other+ < 0).
   def rpower (other)
-    if (other <=> 0) >= 0
-      self.power!(other)
-    else
-      Rational.new!(self,1)**other
-    end
-  end
-
-  unless defined? 1.power!
-    alias power! **
-    alias ** rpower
-  end
-end
-
-class Bignum
-  unless defined? Complex
-    alias power! **
-  end
-
-  undef quo
-  # If Rational is defined, returns a Rational number instead of a Bignum.
-  def quo(other)
-    Rational.new!(self,1) / other
-  end
-  alias rdiv quo
-
-  # Returns a Rational number if the result is in fact rational (i.e. +other+ < 0).
-  def rpower (other)
-    if other >= 0
+    if (other <=> 0) >= 0  # maglev change
       self.power!(other)
     else
       Rational.new!(self, 1)**other
     end
   end
 
-  unless defined? Complex
+end
+
+# class Bignum	 # Maglev , we do this once in Integer
+#   remove_method :quo
+# 
+#   # If Rational is defined, returns a Rational number instead of a Float.
+#   def quo(other)
+#     Rational.new!(self, 1) / other
+#   end
+#   alias rdiv quo
+# 
+#   # Returns a Rational number if the result is in fact rational (i.e. +other+ < 0).
+#   def rpower (other)
+#     if other >= 0
+#       self.power!(other)
+#     else
+#       Rational.new!(self, 1)**other
+#     end
+#   end
+# 
+# end
+
+unless defined? 1.power!
+  class Fixnum
+    alias power! **
+    alias ** rpower
+  end
+  class Bignum
+    alias power! **
     alias ** rpower
   end
 end

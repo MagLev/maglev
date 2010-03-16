@@ -8,7 +8,7 @@ class IO
   #  a[0]   #=> "This is line one\n"
   def self.readlines(name, sep_string = $/)
     io = File.open( Type.coerce_to(name, String, :to_str), 'r')
-    return if io.nil?
+    return if io._equal?(nil)
 
     begin
       io.readlines(sep_string)

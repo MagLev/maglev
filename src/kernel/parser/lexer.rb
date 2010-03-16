@@ -187,7 +187,7 @@ class RubyLexer
         if cres == "\n" then
           cstring_buffer << cres
           src.advance(1) # past \n
-          @line_num = @line_num + 1
+          @line_num += 1		# count_eols
         else
           @yacc_value = cstring_buffer._join.delete("\r")
           return :tSTRING_CONTENT
@@ -205,7 +205,7 @@ class RubyLexer
           err_msg = "can't match #{eos_re.inspect} anywhere in "
           rb_compile_error( err_msg)
         end
-        @line_num = @line_num + 1
+        @line_num += 1		# count_eols
         found_eos = src.check(eos_re)
       end
     end
@@ -263,7 +263,7 @@ class RubyLexer
       # src is now at start of first data line of the heredoc
       # push a SrcRegion for remainder of line containing the heredoc start ident
       remainder_of_line_limit = src.pos
-      @line_num = @line_num + 1
+      @line_num += 1 	# count_eols
       rem_region = SrcRegion.new( remainder_of_line_lnum, remainder_of_line_ofs,
 				 remainder_of_line_limit);
       csrc_regions = @src_regions  
@@ -507,24 +507,27 @@ class RubyLexer
     awords = (func & STR_FUNC_AWORDS)._not_equal?( 0 )
 
 
+    save_pos = src.pos
     if awords and src.check_advance(/\s+/)
       space = true 
     end
-    # TODO  count embedded  LF  within string constants 
     if @nest == 0 && src.check_advance( term_re ) then
       if awords then
         strterm_descr[1] = nil   # we see func==nil next time and produce STRING_END
-        return :tSPACE
+        tok_res = :tSPACE
       elsif (func & STR_FUNC_REGEXP)._not_equal?( 0 ) then
         @yacc_value = self.regx_options
-        return :tREGEXP_END
+        tok_res = :tREGEXP_END
       else
         @yacc_value = term
-        return :tSTRING_END
+        tok_res = :tSTRING_END
       end
+      @line_num += src.count_eols(save_pos, src.pos - 1)
+      return tok_res
     end
 
     if space then
+      @line_num += src.count_eols(save_pos, src.pos - 1)
       return :tSPACE
     end
 
@@ -778,8 +781,9 @@ class RubyLexer
       end
       cres ||= s_matched
       @string_buffer << cres
-      @line_num += num_eols
     end # until eos #  ]
+
+    @line_num += num_eols
 
     cres ||= s_matched
     if src.eos?
@@ -788,11 +792,6 @@ class RubyLexer
 
     return cres
   end # ]
-
-  #def gsub_string_ESC_RE(s_matched )
-  #  # in separate method to avoid ref to $1 in yylex method
-  #  s_matched[1..-2].gsub(ESC_RE) { unescape( $1 ) }
-  #end
 
   def unescape( s)
     r = UNESCAPE_TABLE[s]
@@ -843,20 +842,23 @@ class RubyLexer
 
     c = ''
     space_seen = false
-    src = @src_scanner
 
     command_state = @command_start
     @command_start = false
 
     last_state = @lex_state
+    src = @src_scanner
 
+    # loop_count = 0
     while true # [
+      # loop_count += 1
+      # start_vt_skip = src.pos
       s_ch = src.skip_vt_white
       tok_start_offset = src.pos
-      if s_ch >= 256
+      if s_ch >= 256 # [
         space_seen = true   # whitespace was skipped
         s_ch = s_ch - 256
-        if s_ch._equal?(256) 
+        if s_ch._equal?(256)  # [
           # hit EOF on current region
           regions = @src_regions
           rofs = regions.size - 1
@@ -872,8 +874,8 @@ class RubyLexer
           end 
           @yacc_value = :tEOF 
           return :tEOF
-        end
-      end
+        end #  ]
+      end # ]
       s_ch_type = src.type_of_ch(s_ch)
       if (s_ch_type >= CTYPE_DIGIT) # [
         if s_ch_type._equal?( CTYPE_DIGIT) 
@@ -975,8 +977,8 @@ class RubyLexer
             lf_count += 1             # consume consecutive empty lines
             s_ch = src.advance_peek(1)
           end
-          @line_num = @line_num + lf_count
-
+          @line_num += lf_count		# count_eols
+          # puts "  line #{@line_num}  lf_count #{lf_count} pos #{src.pos}"
           if (@lex_state & Expr_IS_beg_fname_dot_class)._not_equal?(0) then
             next
           end
@@ -1084,6 +1086,8 @@ class RubyLexer
               unless src.check_advance(/.*?\n=end\s*(\n|\z)/m) then
                 rb_compile_error("embedded document meets end of file")
               end
+              # count lines in the comment
+              @line_num += src.count_eols(src.match.begin(0), src.pos - 1)
               next
             else
               self.fix_arg_lex_state
@@ -1092,11 +1096,14 @@ class RubyLexer
             end
           end
         elsif s_ch._equal?( ?" ) # src.scan(/\"/)     # ] [
+          save_pos = src.pos
           if (s_matched = src.scan(/\"( |\t|\w)*\"/o)) 
             # A simple double quoted string containing space, tab, alpha or digit chars
             @yacc_value = s_matched[1, s_matched.length - 2 ]  #exclude the quotes
             @lex_state = Expr_end
             new_pos = src.pos
+            @line_num += src.count_eols(save_pos, new_pos-1)
+            # puts "  line #{@line_num}  lf_count #{lf_count} pos #{src.pos}"
             return :t_STRING
           else
             # lex a double quoted string the hard way
@@ -1144,25 +1151,25 @@ class RubyLexer
             end
           end
           #  elsif src.scan(/\:/) then 
-	  src.advance(1)
-	  # ?: / then / when
-	  s_ch = src.peek_ch
-	  if ( (clex_state & Expr_IS_end_endarg)._not_equal?(0) ||
-	       src.ch_is_white__or_eol(s_ch) )         # src.check(/\s/) then
-	    @lex_state = Expr_beg
-	    @yacc_value = :":"
-	    return :tCOLON
-	  end
-	  if s_ch._equal?( ?' ) # when src.scan(/\'/) then
-	    src.advance(1)
-	    @lex_strterm = STRTERM_SSYM 
-	  elsif s_ch._equal?( ?\" ) #  when src.scan(/\"/) then
-	    src.advance(1)
-	    @lex_strterm = STRTERM_DSYM 
-	  end
-	  @lex_state = Expr_fname
-	  @yacc_value = :":"
-	  return :tSYMBEG
+          src.advance(1)
+          # ?: / then / when
+          s_ch = src.peek_ch
+          if ( (clex_state & Expr_IS_end_endarg)._not_equal?(0) ||
+               src.ch_is_white__or_eol(s_ch) )         # src.check(/\s/) then
+            @lex_state = Expr_beg
+            @yacc_value = :":"
+            return :tCOLON
+          end
+          if s_ch._equal?( ?' ) # when src.scan(/\'/) then
+            src.advance(1)
+            @lex_strterm = STRTERM_SSYM 
+          elsif s_ch._equal?( ?\" ) #  when src.scan(/\"/) then
+            src.advance(1)
+            @lex_strterm = STRTERM_DSYM 
+          end
+          @lex_state = Expr_fname
+          @yacc_value = :":"
+          return :tSYMBEG
         elsif s_ch._equal?( ?[ ) # src.scan(/\[/) then    # ] # ] [
           src.advance(1)
           result = :tLBRACK_STR  # was "["
@@ -1199,7 +1206,8 @@ class RubyLexer
             @yacc_value = s_matched[1..-2].gsub(/\\\\/, "\\").gsub(/\\'/, "'")
             @lex_state = Expr_end
             new_pos = src.pos
-            @line_num = @line_num + src.count_eols(tok_start_offset, new_pos-1)  # count LFs
+            @line_num += src.count_eols(tok_start_offset, new_pos-1)
+            # puts "  line #{@line_num}  lf_count #{lf_count} pos #{src.pos}"
             return :t_STRING
           else 
             src.advance(1)
@@ -1523,6 +1531,7 @@ class RubyLexer
           src.advance(1)
           if src.peek_ch._equal?( ?\n ) # src.scan(/\n/) 
             src.advance(1)
+            @line_num += 1    # count_eols
             space_seen = true 
             next
           end

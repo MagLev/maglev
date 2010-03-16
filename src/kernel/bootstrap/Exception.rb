@@ -199,6 +199,8 @@ class SocketError  # a subclass of IOError
 end
 class IndexError
 end
+class StopIteration # a subclass of IndexError, added in 1.8.7
+end
 class LocalJumpError
 end
 class RuntimeError
@@ -367,3 +369,4 @@ end
 # class TimeoutError
 #  class_primitive_nobridge 'timeout', 'timeout:do:'
 # end
+Object.__freeze_constants

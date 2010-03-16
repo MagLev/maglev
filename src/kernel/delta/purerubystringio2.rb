@@ -6,28 +6,33 @@ class PureRubyStringIO
     unless block_given?
       return IoEnumerator.new(self, :each, sep_string) # for 1.8.7
     end
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     s_string = @sio_string
     if sep_string._equal?(nil)
-      # start from current position
+      # from current position
       pos = @sio_pos
       len = s_string.length - pos
-      block.call( s_string[pos, len] )
+      s_string[pos, len].each( &block)
     else 
       # entire buffer
-      s_string.each(sep_string, &block)
+      #s_string.each(sep_string, &block)
+      # 1.8.7, from current position
+      pos = @sio_pos
+      len = s_string.length - pos
+      s_string[pos, len].each(sep_string, &block)
     end
     @sio_pos = s_string.length
     self
   end
 
-  alias :each_line :each
+  alias each_line each
+  alias lines     each  # for 1.8.7
 
   def each_byte(&block)
     unless block_given?
       return IoByteEnumerator.new(self, :each_byte)  # for 1.8.7
     end
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     s_string = @sio_string
     len = @sio_string.length
     s_pos = @sio_pos
@@ -40,6 +45,30 @@ class PureRubyStringIO
     end
     self
   end
+
+  alias bytes each_byte
+
+  def each_char(&block)
+    unless block_given?
+      return IoCharEnumerator.new(self, :each_char)  # for 1.8.7
+    end
+    if @sio_closed_read ; __require_readable ; end
+    s_string = @sio_string
+    len = @sio_string.length
+    s_pos = @sio_pos
+    while s_pos < len
+      # pos must be updated before call to yield
+      byte = s_string[s_pos]
+      @sio_pos = s_pos + 1
+      str = ' '
+      str[0] = byte
+      block.call(str)
+      s_pos = @sio_pos
+    end
+    self
+  end
+
+  alias chars each_char
 
   def reopen(obj, mode)
     if mode._isInteger 

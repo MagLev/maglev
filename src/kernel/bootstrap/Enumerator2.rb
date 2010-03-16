@@ -14,6 +14,19 @@ module Enumerable
     end
   end
 
+  class StringByteEnumerator < Enumerator
+    def next
+      # return an element,  @obj[ofs]
+      str = @obj
+      ofs = @ofs
+      if ofs >= str.__size
+        raise StopIteration
+      end
+      @ofs = ofs + 1
+      str.__at(ofs)
+    end
+  end
+
   class StringCharEnumerator < Enumerator
     def next
       # return an element,  @obj[ofs]
@@ -447,12 +460,17 @@ module Enumerable
 
   class RangeEnumerator <  NumericEnumerator
     def initialize(object, enum_sel, increment)
-      super(object, enum_sel)
-      @start = object.begin # aRange.@from
-      @ofs = start
-      @last = object.end  # aRange.@to  
+      # not using super.initialize 
+      strt = object.begin # aRange.@from
+      lst = object.end  # aRange.@to  
+      @enum_selector = enum_sel
+      @obj = object
+      @start = strt 
+      @ofs = strt
+      @last = lst
       @inc = increment
       @exclude_end = object.exclude_end?
+      @extra_args = []
       unless @start._isNumeric 
         unless @exclude_end
           @last = @last.succ
@@ -531,6 +549,7 @@ module Enumerable
       @last = 0 
       @sep = separator
       @idx = separator.size
+      @extra_args = [ separator ]
     end
 
     def next # [
@@ -663,6 +682,7 @@ end
 Range.__freeze_constants
 
 class String
+  StringByteEnumerator = Enumerable::StringByteEnumerator
   StringCharEnumerator = Enumerable::StringCharEnumerator
   StringEachEnumerator  = Enumerable::StringEachEnumerator
   ArrayEnumerator = Enumerable::ArrayEnumerator
