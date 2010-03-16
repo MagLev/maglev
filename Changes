@@ -1,5 +1,8 @@
 = MagLev Change Log
 
+  Ruby version is now 1.8.7 .
+  Fix Trac 646, 672, 676, 677
+
 == Changes for 22985  2010-03-09
 
 * Add callback to Module#append_features
