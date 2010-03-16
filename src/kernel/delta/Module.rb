@@ -34,19 +34,19 @@ class Module
   primitive '__ruby_methods_protection', 'rubyMethods:protection:'
 
   def instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 0);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 0))
   end
 
   def public_instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 0);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 0))
   end
 
   def private_instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 2);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 2))
   end
 
   def protected_instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 1);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 1))
   end
 
   # MNI: attr
