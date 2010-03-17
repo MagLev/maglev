@@ -1203,4 +1203,10 @@ words = %w{ puma cat bass ant aardvark gnu fish }
 sorted = words.sort_by { |w| [w.length, w] }
 test(sorted, %w{ ant cat gnu bass fish puma aardvark }, 'multilevel sort')
 
+# Bug Test: MagLev was throwing the following exception:
+#   error , An index range was specified for a sequenceable collection with
+#   the starting index 1 greater than the ending index 0.,
+# Passes if no exception thrown
+test(Array.new(0,0), [], "No exception with Array.new(0,0)")
+
 report
