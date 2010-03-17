@@ -1,0 +1,11 @@
+task :default => :maglev
+
+desc "run the test case with maglev (default)"
+task :maglev do
+  sh %{ $MAGLEV_HOME/bin/spec bowling_spec.rb }
+end
+
+desc "run the test case with mri"
+task :mri do
+  sh %{ /opt/ruby/ruby/bin/spec bowling_spec.rb }
+end
