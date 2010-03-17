@@ -60,11 +60,11 @@ module Config
   # TODO SHELL
   # TODO PATH_SEPARATOR
   CONFIG['arch']              = ARCH
-  CONFIG['ruby_version']      = '1.8.6'
-  cpu_os = Exception.__cpu_os_kind 
+  CONFIG['ruby_version']      = '1.8.7'
+  cpu_os = Exception.__cpu_os_kind
   CONFIG['host_os']           = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
                                     darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
-  if cpu_os == 7 
+  if cpu_os == 7
     CONFIG['DLEXT'] = 'sl' # HPUX
   else
     CONFIG['DLEXT'] = 'so' # other unix
