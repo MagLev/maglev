@@ -22,7 +22,7 @@ class TestSearch < Test::Unit::TestCase
     # Pick someone so we can search for a value that exists
     target_age = @a_person.age
 
-    result = @people.search([:age], :==, target_age)
+    result = @people.search([:age], :eql, target_age)
     assert_not_nil(result, "Result should not be nil")
     assert(result.size > 0, "There should be at least one person of target age")
   end
@@ -31,7 +31,7 @@ class TestSearch < Test::Unit::TestCase
     # Pick someone so we can search for a value that exists
     target_age = @a_person.age
 
-    result = @people.search([:age], :==, target_age)
+    result = @people.search([:age], :eql, target_age)
     assert_not_nil(result, "Result should not be nil")
     assert(result.size > 0, "There should be at least one person of target age")
   end

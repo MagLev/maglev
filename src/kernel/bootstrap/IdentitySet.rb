@@ -246,6 +246,7 @@ class IdentitySet
   # A collection may have multiple indexes.
   primitive_nobridge 'create_index', 'createEqualityIndexOn:withLastElementClass:'
 
+  primitive_nobridge '_search', 'select:comparing:with:'
   # Search the identity set for elements matching some criteria.  Makes
   # use of the index.  Assume my_peeps is setup per comments for
   # create_index.  The following code will return an IdentitySet (since
@@ -254,10 +255,38 @@ class IdentitySet
   #
   #     youngsters = my_peeps.search([:age], :<, 25)
   #
+  # The supported comparison operations are
+  # 1. <tt>:equal       # equal? (identical)</tt>
+  # 2. <tt>:not_equal   # not equal? (not identical)</tt>
+  # 3. <tt>:eql         # eql? (==)</tt>
+  # 4. <tt>:not_eqll    # not eql? (!=)</tt>
+  # 5. <tt>:lt          # less than</tt>
+  # 6. <tt>:lte         # less than or equal</tt>
+  # 7. <tt>:gt          # greater than</tt>
+  # 8. <tt>:gte         # greater than or equal</tt>
+  #
   # The name of this method was chosen so that it doesn't conflict with any
   # well known methods (e.g., Enumerable#select, Enumerable#find*, Rails
   # find* etc.).
-  primitive_nobridge 'search', 'select:comparing:with:'
+
+  # Ruby to smalltalk translation of query ops
+  QUERY_OPS = {
+    :equal     => :==,
+    :not_equal => :'~~',
+    :eql       => :'=',
+    :not_eql   => :'~=',
+    :lt        => :<,
+    :lte       => :<=,
+    :gt        => :>,
+    :gte       => :>=,
+  }
+
+
+  def search(operand_path, query_op, query_val)
+    st_op = QUERY_OPS[query_op]
+    raise ArgumentError, "Unsupported query_op #{query_op.inspect}" if st_op.nil?
+    _search(operand_path, st_op, query_val)
+  end
 
   # Remove an the specified index from receiver.
   #

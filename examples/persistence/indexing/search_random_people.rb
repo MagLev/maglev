@@ -3,7 +3,7 @@ require 'benchmark'
 Benchmark.bm do |x|
   youngsters = nil
   x.report("search the youngsters") {
-    youngsters = Person::RANDOM_PEOPLE.search([:age], :<, 25)
+    youngsters = Person::RANDOM_PEOPLE.search([:age], :lt, 25)
   }
   puts "Found #{youngsters.length} youngsters"
 
@@ -18,12 +18,12 @@ Benchmark.bm do |x|
 
   hermits = nil
   x.report("Find the youngsters") {
-    hermits  = Person::RANDOM_PEOPLE.search([:marital_status], :==, :hermit)
+    hermits  = Person::RANDOM_PEOPLE.search([:marital_status], :eql, :hermit)
   }
   puts "Found #{hermits.length} hermits"
 
   young_hermits = nil
-  x.report("Intersect  hermits with youngsters") { young_hermits = hermits * youngsters }
+  x.report("Intersect  hermits with youngsters") { young_hermits = hermits & youngsters }
   puts "Found #{young_hermits.length} young hermits"
 end
 
