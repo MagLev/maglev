@@ -112,8 +112,23 @@ class IdentitySet
     o
   end
 
+  # Return string with human readable representation of receiver.
+  # E.g., "#<IdentitySet: {1, 2, 3}>".
   def inspect
-    "[[#{length}]]"
+    s = "#<IdentitySet: {"
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
+    unless added
+      s << '...}'
+      return s
+    end
+    begin
+      s << ( collect {|ea| ea.inspect }.join(", ") )
+      s << "}"
+    ensure
+      ts.remove(self)
+    end
+    s
   end
 
   def group_by(&block)
@@ -219,13 +234,21 @@ class IdentitySet
   end
 
   # ##################################################
-  #                  EXPERIMENTAL:
+  #          Index and Selection block support
   # ##################################################
-  #
-  # experimental support for the indicies and "selection blocks" Still to
-  # be done: Need to expose Rc* (reduced conflict) versions for high
-  # concurrency scenarios.  The current API is probably good enough to
-  # get feedback on the direction we should take...
+
+  # Ruby to smalltalk translation of query ops used in the indexed query
+  # functions (search, search_between, etc.)
+  QUERY_OPS = {
+    :equal     => :==,
+    :not_equal => :'~~',
+    :eql       => :'=',
+    :not_eql   => :'~=',
+    :lt        => :<,
+    :lte       => :<=,
+    :gt        => :>,
+    :gte       => :>=,
+  }
 
   # Creates an index on the path specified by the string.  The equality
   # index is ordered according to the sort-provided comparison operators
@@ -236,24 +259,27 @@ class IdentitySet
   #   (a Fixnum) of the Person class:
   #
   #     class Person
-  #       attr_reader :name, :age  # probably need fixed instVars here
+  #       attr_reader :name, :age  # Needs to be a fixed instance variable
   #       ...
   #     end
   #
-  #     my_peeps = IdentitySet.new   # Will contain only Person objects
-  #     my_peeps.create_index('age', Fixnum)
+  #     # People must contain only object that have an @age instance
+  #     # variable, and the value must be nil or a Fixnum
+  #
+  #     people = IdentitySet.new
+  #     people.create_index('age', Fixnum)
   #
   # A collection may have multiple indexes.
   primitive_nobridge 'create_index', 'createEqualityIndexOn:withLastElementClass:'
 
   primitive_nobridge '_search', 'select:comparing:with:'
   # Search the identity set for elements matching some criteria.  Makes
-  # use of the index.  Assume my_peeps is setup per comments for
+  # use of the index.  Assume people is setup per comments for
   # create_index.  The following code will return an IdentitySet (since
-  # my_peeps is an IdentitySet) with all of the Person objects whose age
+  # people is an IdentitySet) with all of the Person objects whose age
   # field is less than 25.
   #
-  #     youngsters = my_peeps.search([:age], :<, 25)
+  #     youngsters = people.search([:age], :<, 25)
   #
   # The supported comparison operations are
   # 1. <tt>:equal       # equal? (identical)</tt>
@@ -268,24 +294,29 @@ class IdentitySet
   # The name of this method was chosen so that it doesn't conflict with any
   # well known methods (e.g., Enumerable#select, Enumerable#find*, Rails
   # find* etc.).
-
-  # Ruby to smalltalk translation of query ops
-  QUERY_OPS = {
-    :equal     => :==,
-    :not_equal => :'~~',
-    :eql       => :'=',
-    :not_eql   => :'~=',
-    :lt        => :<,
-    :lte       => :<=,
-    :gt        => :>,
-    :gte       => :>=,
-  }
-
-
   def search(operand_path, query_op, query_val)
     st_op = QUERY_OPS[query_op]
     raise ArgumentError, "Unsupported query_op #{query_op.inspect}" if st_op.nil?
     _search(operand_path, st_op, query_val)
+  end
+
+  primitive_nobridge '_search_between', 'low:comparing:select:comparing:high:'
+  # Search receiver for elements between +low_value+ and +high_value+.  By
+  # default, the comparison operator for the low value is <tt>:lte</tt> and
+  # the comparison operator for the high end is <tt>:lt</tt>.  E.g., to
+  # search for people 18-25 (including 18 year olds, but excluding 25 year
+  # olds):
+  #
+  #   results = people.search_between([:age], 18, 25)
+  #
+  # If you wanted to exclude 18 year olds, and include 25 year olds, the
+  # following will work:
+  #
+  #   results = people.search_between([:age], 18, 25, :lt, :lte)
+  #
+  # The list of operands is listed in the #search doc.
+  def search_between(operand_path, low_value, high_value, low_op=:lte, high_op=:lt)
+    _search_between(low_value, QUERY_OPS[low_op], operand_path, QUERY_OPS[high_op], high_value)
   end
 
   # Remove an the specified index from receiver.
@@ -294,7 +325,7 @@ class IdentitySet
   # destroyed (think running your test cases, over and over and not
   # cleaning up the indexes...). .
   #
-  #    my_peeps.remove_index('age')
+  #    people.remove_index('age')
   primitive_nobridge 'remove_index', 'removeIdentityIndexOn:'
 
   # Remove all indexes from the receiver

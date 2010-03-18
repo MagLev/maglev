@@ -17,6 +17,14 @@ class IdentitySetTests < Test::Unit::TestCase
     assert(! @set.include?(2))
   end
 
+  def test_it_is_a_set
+    s = IdentitySet.new
+    o = Object.new
+    10.times { s << o }
+    assert_equal(1, s.size)
+    assert(s.include? o)
+  end
+
   def test_enumerable_methods
     assert_equal([0,1,2,3], @set.select    {|i| i < 4},          "select")
     assert_equal(3,         @set.find      {|i| i == 3 },        "find")
