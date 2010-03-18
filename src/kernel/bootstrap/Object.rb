@@ -281,12 +281,9 @@ class Object
   #  following 3 prims must also be installed in Behavior
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
   primitive_nobridge '__instvar_put', 'rubyInstvarAt:put:'
-  primitive_nobridge '__instvar_defined', 'rubyInstvarDefined:'
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'
 
-  def instance_variable_defined?(name)
-    self.__instvar_defined(name)
-  end
+  primitive 'instance_variable_defined?' , 'rubyIvDefined:'
 
   def instance_variable_get(a_name)
     unless a_name._isStringOrSymbol
@@ -372,7 +369,7 @@ class Object
       true
     else
       unless cls.__isBehavior
-  raise TypeError, 'expected a Class or Module'
+        raise TypeError, 'expected a Class or Module'
       end
       false
     end
