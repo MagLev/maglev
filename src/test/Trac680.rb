@@ -1,9 +1,11 @@
 # From RSpec
 
-superclass = ['::StandardError', 'Test::Unit::AssertionFailedError'].map do |c|
+arr = ['::RangeError', '::ArgumentError'].map do |c|
   eval(c) rescue nil
 end
-p superclass
+unless arr == [ RangeError, ArgumentError ] ; raise 'error' ; end
+puts arr.inspect
+true
 
 # module Foo
 #   superclass = ['Test::Unit::AssertionFailedError', '::StandardError'].map do |c|

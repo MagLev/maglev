@@ -4239,6 +4239,14 @@ module Foo
       0xffee => [0, 0, nil, "\342\227\213", nil, nil, nil]
      }
 end
-
 unless Foo::UNICODE_DATA.size == 4233 ; raise 'error'; end
+msg = nil
+begin
+  require 'src/test/Trac677b.rb'
+rescue => ex
+  msg = ex.message
+end
+unless msg == 'compilerError 1033: blocks or if statements can only be nested 255 levels'
+  raise 'error'
+end
 true

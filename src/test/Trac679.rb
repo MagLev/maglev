@@ -18,12 +18,16 @@ module ActiveSupport
         base.instance_variable_get("@_dependencies") << self
         return false
       else
-        return false if base < self
+        if base < self
+          return false 
+        end
         @_dependencies.each { |dep| base.send(:include, dep) }
         super
         base.extend const_get("ClassMethods") if const_defined?("ClassMethods")
         base.send :include, const_get("InstanceMethods") if const_defined?("InstanceMethods")
-        base.class_eval(&@_included_block) if instance_variable_defined?("@_included_block")
+        if instance_variable_defined?("@_included_block")
+          base.class_eval(&@_included_block) 
+        end
       end
     end
 
@@ -63,13 +67,13 @@ module Validations
   extend ActiveSupport::Concern
 
   included do
-    class_attribute :_validators
+    class_attribute( :_validators)
     self._validators = Hash.new { |h,k| h[k] = [] }
   end
 
   module ClassMethods
     def validates_with
-      _validators[:foo] << 10
+      _validators[:foo] << 679
     end
     def validates_each(*attr_names, &block)
       validates_with
@@ -77,10 +81,13 @@ module Validations
   end
 end
 
-class Foo
+ax = class Foo
   include Validations
   attr_accessor :first_name
   validates_each :first_name do |record, attr, value|
     puts "validating"
   end
 end
+
+unless ax == [ 679 ] ; raise 'error'; end
+true
