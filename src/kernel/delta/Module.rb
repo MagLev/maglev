@@ -1,13 +1,5 @@
 class Module
 
-  #  Class methods
-
-  # MNI: new
-
-  #  Instance methods
-
-  # class_variables inherited from Behavior
-
   def clone
     raise NotImplementedError , "Module#clone"
   end
@@ -49,12 +41,8 @@ class Module
     Module.__filter_method_names(__ruby_methods_protection(inc_super, 1))
   end
 
-  # MNI: attr
   def extend_object(object)
     raise NotImplementedError, 'Module#extend_object'
   end
-
-  # remove_method  implemented in Behavior
-  # undef_method implemented in Behavior
 
 end
