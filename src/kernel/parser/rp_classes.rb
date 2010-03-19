@@ -51,6 +51,7 @@ module MagRp
       @extend_ofs_last_unextend = -1
       @first_top_level_def_offset = -1
       @module_count = 0
+      @in_block_params = false
     end
 
     def last_closed_def_offset
@@ -128,14 +129,14 @@ module MagRp
       @lex_state
     end
 
-    def lex_strterm_
+    def lex_strTerm_
       @lex_strterm
     end
-    def lex_strterm=(v)
+    def lex_strTerm=(v)
       if v._not_equal?(nil)           # TODO remove consistency check
         sym = v[0]
         unless sym._equal?( :strterm ) || sym._equal?( :heredoc )
-          raise 'invalid arg to lex_strterm='
+          raise 'invalid arg to lex_strTerm='
         end
       end
       @lex_strterm = v

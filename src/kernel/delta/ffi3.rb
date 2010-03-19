@@ -53,13 +53,10 @@ module FFI
 
   end
 
-  class CByteArray # [
-    # following 3 methods needed by the RubyParser
-    class_primitive_nobridge 'with_string', 'withAll:'
+  class Pointer # [
+
     primitive_nobridge '[]', '_rubyByteAt:'
     primitive_nobridge 'size', 'size'
-
-
 
     # following used for fields of Struct
     primitive_nobridge 'int8at', 'int8At:'
@@ -112,7 +109,7 @@ module FFI
     primitive_nobridge '__pointer_at' , 'pointerAt:resultClass:'
 
     # def __pointer_at_put(byteoffset, pointer) ; end
-    #   pointer is a kind of CByteArray or a CPointer, or nil
+    #   pointer is a kind of Pointer or a CPointer, or nil
     primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'  
 
     primitive_nobridge '__set_derived_from' , 'derivedFrom:'
@@ -158,29 +155,17 @@ module FFI
     end
 
 
-    def self.new(size)
-      # creates an instance with C data zeroed, and to be auto-freed by GC
-      __gc_malloc(size)
-    end
-
-    def self.__new_null
-      __malloc(-1)
-    end
-
     def clear
       self.memset(0, 0, -1)
     end
 
     primitive_nobridge '__inspect' , '_inspect'
-    def inspect
-      str = super
-      str << self.__inspect
-      str
+
+    def self.__new_null
+      __malloc(-1)
     end
 
-    def to_ptr
-      Pointer.__fromRegionOf( self, 0, self.size );
-    end
+    # remainder of Pointer methods in pointer.rb
 
   end # ]
 
@@ -638,5 +623,5 @@ module FFI
       Enums.__enum_symbol_to_value(symbol)
     end
 
-  end #]
+  end # ]
 end

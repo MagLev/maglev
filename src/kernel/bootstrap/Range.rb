@@ -2,7 +2,6 @@ class Range
   FlipFlop = _resolve_smalltalk_global(:RubyFlipFlop) # code in FlipFlop.rb
 
   primitive 'hash'
-  primitive 'length', 'size'
 
   def begin
     @from
@@ -27,19 +26,22 @@ class Range
     return true
   end
 
-  def each
+  def each(&block)
+    unless block_given?
+      return RangeEnumerator.new(self, :each, 1) # for 1.8.7
+    end
           # adapted from fix contributed by Markus
     x = @from
     llast = @to
     if x._isFixnum
       if @excludeEnd
         while x < llast
-          yield x
+          block.call( x )
           x = x + 1
         end
       else
         while x <= llast
-          yield x
+          block.call( x )
           x = x + 1
         end
       end
@@ -49,36 +51,36 @@ class Range
         sz = llast.size
         if @excludeEnd
           while (x < llast) and (x.size <= sz)
-            yield x
+            block.call( x )
             x = x.succ
           end
         else
           while (x <= llast) and (x.size <= sz)
-            yield x
+            block.call( x )
             x = x.succ
           end
         end
       elsif x._isNumeric && llast._isNumeric
         if @excludeEnd
           while x < llast
-            yield x
+            block.call( x )
             x = x.succ
           end
         else
           while x <= llast
-            yield x
+            block.call( x )
             x = x.succ
           end
         end
       else
         if @excludeEnd
           while (x <=> llast) < 0
-            yield x
+            block.call( x )
             x = x.succ
           end
         else
           while (x <=> llast) <= 0
-            yield x
+            block.call( x )
             if (x <=> llast) == 0
               break   # per ruby specs; llast.succ might return llast 
             end
@@ -86,10 +88,9 @@ class Range
           end
         end
       end
-   end
+    end
+    self   # change for 1.8.7
   end
-
-  primitive 'end', '_to'
 
   def eql?(other)
     other._isRange &&
@@ -102,6 +103,18 @@ class Range
 
   def exclude_end?
     @excludeEnd
+  end
+
+  def __limit
+    if @excludeEnd
+      @to
+    else
+      @to + @by
+    end
+  end
+
+  def length
+    ((self.__limit - @from).__divide( @by )).__max(0) 
   end
 
   def initialize(fromArg, toArg, exclusive=false)
@@ -137,6 +150,7 @@ class Range
   end
 
   def step(n=1, &block)
+    # algorithm replicated in RangeEnumerator
     current = @from
     lim = @to
     if @from._isNumeric
@@ -145,6 +159,9 @@ class Range
       end
       if (n <= 0)
         raise ArgumentError, 'increment for step must be > 0'
+      end
+      unless block_given?
+        return RangeEnumerator.new(self, :step, n)  # for 1.8.7
       end
       if @excludeEnd
         begin
@@ -158,6 +175,9 @@ class Range
         end while current <= lim
       end
     else
+      unless block_given?
+        return RangeEnumerator.new(self, :step, n)  # for 1.8.7
+      end
       unless @excludeEnd
         lim = lim.succ
       end
@@ -181,12 +201,32 @@ class Range
     result
   end
 
+  def __integer_to_a
+    # assumes receiver is a simple range with @from <= @to
+    n = @from
+    last = @to
+    unless n._isFixnum && last._isFixnum 
+      raise TypeError, 'Range is not over Fixnums'
+    end
+    if @excludeEnd
+      last -= 1
+    end
+    count = (last - n).__max(0)
+    res = Array.new(count)
+    idx = 0
+    while n <= last
+      res[idx] = n
+      n += 1
+      idx += 1
+    end
+  end
+
   # Given a target length, +len+, Calculate whether this range covers the given length.
   # If it does, return the beginning and length of the "string" of length +len+.
-  # Returns nil if the range does not cover.  See rb_range_beg_len.
+  # Returns nil if the range does not cover.  
   # This does the appropriate Type.coerce_to that the specs expect.
   # +err+ is ignored for now.
-  def __beg_len(len, err=0)
+  def __beg_len(len)
     beg = Type.coerce_to(@from, Fixnum, :to_int)
     the_end = Type.coerce_to(@to, Fixnum, :to_int)
 
@@ -195,10 +235,8 @@ class Range
       return nil if (beg < 0)
     end
 
-    if (err == 0 || err == 2)
-      return nil if (beg > len)
-      the_end = len if (the_end > len)
-    end
+    return nil if (beg > len)
+    the_end = len if (the_end > len)
 
     the_end += len if (the_end < 0)
     the_end += 1 unless @excludeEnd

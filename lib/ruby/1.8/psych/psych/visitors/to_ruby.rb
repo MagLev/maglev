@@ -74,6 +74,8 @@ module Psych
           }
           args.push(args.delete_at(1) == '...')
           Range.new(*args)
+        when /^!ruby\/sym(bol)?:?(.*)?$/
+          o.value.to_sym
         else
           @ss.tokenize o.value
         end

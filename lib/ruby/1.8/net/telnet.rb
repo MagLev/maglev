@@ -164,7 +164,7 @@ module Net
     CR   = "\015"   
     LF   = "\012" 
     EOL  = CR + LF 
-    REVISION = '$Id: telnet.rb 17270 2008-06-15 13:34:40Z shyouhei $'
+    REVISION = '$Id: telnet.rb 16458 2008-05-18 15:02:36Z knu $'
     # :startdoc:
 
     #
@@ -520,12 +520,17 @@ module Net
     #            value specified when this instance was created will be
     #            used, or, failing that, the default value of 0 seconds,
     #            which means not to wait for more input.
+    # FailEOF:: if true, when the remote end closes the connection then an
+    #           EOFError will be raised. Otherwise, defaults to the old
+    #           behaviour that the function will return whatever data
+    #           has been received already, or nil if nothing was received.
     #           
     def waitfor(options) # :yield: recvdata
       time_out = @options["Timeout"]
       waittime = @options["Waittime"]
+      fail_eof = @options["FailEOF"]
 
-      if options._isHash
+      if options.kind_of?(Hash)
         prompt   = if options.has_key?("Match")
                      options["Match"]
                    elsif options.has_key?("Prompt")
@@ -535,6 +540,7 @@ module Net
                    end
         time_out = options["Timeout"]  if options.has_key?("Timeout")
         waittime = options["Waittime"] if options.has_key?("Waittime")
+        fail_eof = options["FailEOF"]  if options.has_key?("FailEOF")
       else
         prompt = options
       end
@@ -586,6 +592,7 @@ module Net
           line += buf
           yield buf if block_given?
         rescue EOFError # End of file reached
+          raise if fail_eof
           if line == ''
             line = nil
             yield nil if block_given?
@@ -672,7 +679,7 @@ module Net
       match    = @options["Prompt"]
       time_out = @options["Timeout"]
 
-      if options._isHash
+      if options.kind_of?(Hash)
         string   = options["String"]
         match    = options["Match"]   if options.has_key?("Match")
         time_out = options["Timeout"] if options.has_key?("Timeout")
@@ -713,7 +720,7 @@ module Net
     def login(options, password = nil) # :yield: recvdata
       login_prompt = /[Ll]ogin[: ]*\z/n
       password_prompt = /[Pp]ass(?:word|phrase)[: ]*\z/n
-      if options._isHash
+      if options.kind_of?(Hash)
         username = options["Name"]
         password = options["Password"]
 	login_prompt = options["LoginPrompt"] if options["LoginPrompt"]

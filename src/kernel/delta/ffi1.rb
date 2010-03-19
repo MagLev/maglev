@@ -6,6 +6,6 @@ module FFI
   CLibrary = _resolve_smalltalk_global( :CLibrary )
   CCallout = _resolve_smalltalk_global( :CCallout )
   CCallin = _resolve_smalltalk_global(  :CCallin )
-  CByteArray = _resolve_smalltalk_global( :CByteArray )
+  Pointer = _resolve_smalltalk_global( :CByteArray )
   CPointer = _resolve_smalltalk_global( :CPointer )
 end

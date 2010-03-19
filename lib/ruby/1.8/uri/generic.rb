@@ -3,13 +3,13 @@
 #
 # Author:: Akira Yamada <akira@ruby-lang.org>
 # License:: You can redistribute it and/or modify it under the same term as Ruby.
-# Revision:: $Id: generic.rb 11751 2007-02-15 07:45:04Z knu $
+# Revision:: $Id: generic.rb 16085 2008-04-19 11:56:22Z knu $
 #
 
 require 'uri/common'
 
 module URI
-
+  
   #
   # Base class for all URI classes.
   # Implements generic URI syntax as per RFC 2396.
@@ -32,10 +32,10 @@ module URI
     end
 
     COMPONENT = [
-      :scheme,
-      :userinfo, :host, :port, :registry,
-      :path, :opaque,
-      :query,
+      :scheme, 
+      :userinfo, :host, :port, :registry, 
+      :path, :opaque, 
+      :query, 
       :fragment
     ].freeze
 
@@ -63,7 +63,7 @@ module URI
     # == Description
     #
     # At first, tries to create a new URI::Generic instance using
-    # URI::Generic::build. But, if exception URI::InvalidComponentError is raised,
+    # URI::Generic::build. But, if exception URI::InvalidComponentError is raised, 
     # then it URI::Escape.escape all URI components and tries again.
     #
     #
@@ -72,7 +72,7 @@ module URI
         return self.build(args)
       rescue InvalidComponentError
         if args._isArray
-          return self.build(args.collect{|x|
+          return self.build(args.collect{|x| 
             if x
               URI.escape(x)
             else
@@ -118,7 +118,7 @@ module URI
           end
         end
       else
-        raise ArgumentError,
+        raise ArgumentError, 
         "expected Array of or Hash of components of #{self.class} (#{self.class.component.join(', ')})"
       end
 
@@ -153,10 +153,10 @@ module URI
     #
     # Creates a new URI::Generic instance from ``generic'' components without check.
     #
-    def initialize(scheme,
-                   userinfo, host, port, registry,
-                   path, opaque,
-                   query,
+    def initialize(scheme, 
+                   userinfo, host, port, registry, 
+                   path, opaque, 
+                   query, 
                    fragment,
                    arg_check = false)
       @scheme = nil
@@ -192,10 +192,10 @@ module URI
         self.set_fragment(fragment)
       end
       if @registry && !self.class.use_registry
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "the scheme #{@scheme} does not accept registry part: #{@registry} (or bad hostname?)"
       end
-
+      
       @scheme.freeze if @scheme
       self.set_path('') if !@path && !@opaque # (see RFC2396 Section 5.2)
       self.set_port(self.default_port) if self.default_port && !@port
@@ -259,7 +259,7 @@ module URI
 
     def check_user(v)
       if @registry || @opaque
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "can not set user with registry or opaque"
       end
 
@@ -276,7 +276,7 @@ module URI
 
     def check_password(v, user = @user)
       if @registry || @opaque
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "can not set password with registry or opaque"
       end
       return v unless v
@@ -312,7 +312,7 @@ module URI
       set_user(user)
       # returns user
     end
-
+    
     def password=(password)
       check_password(password)
       set_password(password)
@@ -320,7 +320,7 @@ module URI
     end
 
     def set_userinfo(user, password = nil)
-      unless password
+      unless password 
         user, password = split_userinfo(user)
       end
       @user     = user
@@ -377,7 +377,7 @@ module URI
       return v unless v
 
       if @registry || @opaque
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "can not set host with registry or opaque"
       elsif HOST !~ v
         raise InvalidComponentError,
@@ -403,7 +403,7 @@ module URI
       return v unless v
 
       if @registry || @opaque
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "can not set port with registry or opaque"
       elsif !v._isFixnum && PORT !~ v
         raise InvalidComponentError,
@@ -439,7 +439,7 @@ module URI
       # authority     = server | reg_name
       # server        = [ [ userinfo "@" ] hostport ]
       if @host || @port || @user # userinfo = @user + ':' + @password
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "can not set registry with host, port, or userinfo"
       elsif v && REGISTRY !~ v
         raise InvalidComponentError,
@@ -466,18 +466,18 @@ module URI
       # absoluteURI   = scheme ":" ( hier_part | opaque_part )
       # hier_part     = ( net_path | abs_path ) [ "?" query ]
       if v && @opaque
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "path conflicts with opaque"
       end
 
       if @scheme
         if v && v != '' && ABS_PATH !~ v
-          raise InvalidComponentError,
+          raise InvalidComponentError, 
             "bad component(expected absolute path component): #{v}"
         end
       else
         if v && v != '' && ABS_PATH !~ v && REL_PATH !~ v
-          raise InvalidComponentError,
+          raise InvalidComponentError, 
             "bad component(expected relative path component): #{v}"
         end
       end
@@ -504,12 +504,12 @@ module URI
       # absoluteURI   = scheme ":" ( hier_part | opaque_part )
       # hier_part     = ( net_path | abs_path ) [ "?" query ]
       if @opaque
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "query conflicts with opaque"
       end
 
       if v && v != '' && QUERY !~ v
-          raise InvalidComponentError,
+          raise InvalidComponentError, 
             "bad component(expected query component): #{v}"
         end
 
@@ -535,7 +535,7 @@ module URI
       # absoluteURI   = scheme ":" ( hier_part | opaque_part )
       # hier_part     = ( net_path | abs_path ) [ "?" query ]
       if @host || @port || @user || @path  # userinfo = @user + ':' + @password
-        raise InvalidURIError,
+        raise InvalidURIError, 
           "can not set opaque with host, port, userinfo or path"
       elsif v && OPAQUE !~ v
         raise InvalidComponentError,
@@ -561,7 +561,7 @@ module URI
       return v unless v
 
       if v && v != '' && FRAGMENT !~ v
-        raise InvalidComponentError,
+        raise InvalidComponentError, 
           "bad component(expected fragment component): #{v}"
       end
 
@@ -616,65 +616,65 @@ module URI
     private :split_path
 
     def merge_path(base, rel)
+
       # RFC2396, Section 5.2, 5)
-      if rel[0] == ?/ #/
-        # RFC2396, Section 5.2, 5)
-        return rel
+      # RFC2396, Section 5.2, 6)
+      base_path = split_path(base)
+      rel_path  = split_path(rel)
 
-      else
-        # RFC2396, Section 5.2, 6)
-        base_path = split_path(base)
-        rel_path  = split_path(rel)
-
-        # RFC2396, Section 5.2, 6), a)
-  base_path << '' if base_path.last == '..'
-  while i = base_path.index('..')
-    base_path.slice!(i - 1, 2)
-        end
-        if base_path.empty?
-          base_path = [''] # keep '/' for root directory
-        else
-    base_path.pop
-        end
-
-        # RFC2396, Section 5.2, 6), c)
-        # RFC2396, Section 5.2, 6), d)
-        rel_path.push('') if rel_path.last == '.' || rel_path.last == '..'
-        rel_path.delete('.')
-
-        # RFC2396, Section 5.2, 6), e)
-        tmp = []
-        rel_path.each do |x|
-          if x == '..' &&
-              !(tmp.empty? || tmp.last == '..')
-            tmp.pop
-          else
-            tmp << x
-          end
-        end
-
-        add_trailer_slash = true
-        while x = tmp.shift
-          if x == '..' && base_path.size > 1
-            # RFC2396, Section 4
-            # a .. or . in an absolute path has no special meaning
-            base_path.pop
-          else
-            # if x == '..'
-            #   valid absolute (but abnormal) path "/../..."
-            # else
-            #   valid absolute path
-            # end
-            base_path << x
-            tmp.each {|t| base_path << t}
-            add_trailer_slash = false
-            break
-          end
-        end
-        base_path.push('') if add_trailer_slash
-
-        return base_path.join('/')
+      # RFC2396, Section 5.2, 6), a)
+      base_path << '' if base_path.last == '..'
+      while i = base_path.index('..')
+        base_path.slice!(i - 1, 2)
       end
+
+      if (first = rel_path.first) and first.empty?
+        base_path.clear
+        rel_path.shift
+      end
+
+      # RFC2396, Section 5.2, 6), c)
+      # RFC2396, Section 5.2, 6), d)
+      rel_path.push('') if rel_path.last == '.' || rel_path.last == '..'
+      rel_path.delete('.')
+
+      # RFC2396, Section 5.2, 6), e)
+      tmp = []
+      rel_path.each do |x|
+        if x == '..' &&
+            !(tmp.empty? || tmp.last == '..')
+          tmp.pop
+        else
+          tmp << x
+        end
+      end
+
+      add_trailer_slash = !tmp.empty?
+      if base_path.empty?
+        base_path = [''] # keep '/' for root directory
+      elsif add_trailer_slash
+        base_path.pop
+      end
+      while x = tmp.shift
+        if x == '..'
+          # RFC2396, Section 4
+          # a .. or . in an absolute path has no special meaning
+          base_path.pop if base_path.size > 1
+        else
+          # if x == '..'
+          #   valid absolute (but abnormal) path "/../..."
+          # else
+          #   valid absolute path
+          # end
+          base_path << x
+          tmp.each {|t| base_path << t}
+          add_trailer_slash = false
+          break
+        end
+      end
+      base_path.push('') if add_trailer_slash
+
+      return base_path.join('/')
     end
     private :merge_path
 
@@ -779,12 +779,12 @@ module URI
       end
 
       if self.relative? && oth.relative?
-        raise BadURIError,
+        raise BadURIError, 
           "both URI are relative"
       end
 
       if self.absolute? && oth.absolute?
-        #raise BadURIError,
+        #raise BadURIError, 
         #  "both URI are absolute"
         # hmm... should return oth for usability?
         return oth, oth
@@ -805,7 +805,7 @@ module URI
       src_path = split_path(src)
       dst_path = split_path(dst)
 
-      # hmm... dst has abnormal absolute path,
+      # hmm... dst has abnormal absolute path, 
       # like "/./", "/../", "/x/../", ...
       if dst_path.include?('..') ||
           dst_path.include?('.')
@@ -850,11 +850,11 @@ module URI
       end
 
       if self.relative?
-        raise BadURIError,
+        raise BadURIError, 
           "relative URI: #{self}"
       end
       if oth.relative?
-        raise BadURIError,
+        raise BadURIError, 
           "relative URI: #{oth}"
       end
 
@@ -862,16 +862,16 @@ module URI
         return self, self.dup
       end
       rel = URI::Generic.new(nil, # it is relative URI
-                             self.userinfo, self.host, self.port,
+                             self.userinfo, self.host, self.port, 
                              self.registry, self.path, self.opaque,
                              self.query, self.fragment)
 
       if rel.userinfo != oth.userinfo ||
           rel.host.to_s.downcase != oth.host.to_s.downcase ||
           rel.port != oth.port
-  if self.userinfo.nil? && self.host.nil?
-    return self, self.dup
-  end
+	if self.userinfo.nil? && self.host.nil?
+	  return self, self.dup
+	end
         rel.set_port(nil) if rel.port == oth.default_port
         return rel, rel
       end
@@ -950,7 +950,7 @@ module URI
     #   uri = URI.parse('http://my.example.com')
     #   p uri.route_to('http://my.example.com/main.rbx?page=1')
     #   #=> #<URI::Generic:0x2020c2f6 URL:/main.rbx?page=1>
-    #
+    #    
     def route_to(oth)
       case oth
       when Generic
@@ -966,7 +966,7 @@ module URI
 
     #
     # Returns normalized URI
-    #
+    # 
     def normalize
       uri = dup
       uri.normalize!
@@ -982,7 +982,7 @@ module URI
       end
       if host && host != host.downcase
         set_host(self.host.downcase)
-      end
+      end        
     end
 
     def path_query
@@ -996,7 +996,7 @@ module URI
 
     #
     # Constructs String from URI
-    #
+    # 
     def to_s
       str = ''
       if @scheme
@@ -1054,9 +1054,8 @@ module URI
     end
 
     def eql?(oth)
-      return true if self.equal?(oth)
-      self.class.equal?(oth.class) &&
-        self.component_ary.eql?(oth.component_ary)
+      return true if self._equal?(oth)
+      self.class._equal?(oth.class) && self.component_ary.eql?(oth.component_ary)
     end
 
 =begin
@@ -1099,14 +1098,22 @@ module URI
         if component.include?(c)
           self.send(c)
         else
-          raise ArgumentError,
+          raise ArgumentError, 
             "expected of components of #{self.class} (#{self.class.component.join(', ')})"
         end
       end
     end
 
-    def inspect
-      sprintf("#<%s:%#0x URL:%s>", self.class.to_s, self.object_id, self.to_s)
+#   @@to_s = Kernel.instance_method(:to_s)		# ask Peter
+#   def inspect
+#     @@to_s.bind(self).call.sub!(/>\z/) {" URL:#{self}>"}
+#   end
+
+    def inspect 	# maglev patch
+      str = "#<#{self.class.name}:"
+      str << sprintf("0x%x", self.__id__)
+      str << " URL:#{self.to_s} >"
+      str
     end
 
     def coerce(oth)

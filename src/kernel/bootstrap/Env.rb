@@ -69,7 +69,7 @@ class Env
      self.[]=(key, val)
     end
 
-    def clear
+    def clear    # not allowed by Maglev
       raise NotImplementedError
     end
 

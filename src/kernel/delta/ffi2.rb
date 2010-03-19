@@ -68,9 +68,9 @@ module FFI
       :double =>  :double ,
       :pointer => :ptr ,
       :ptr => :ptr ,
-      :buffer_out => :ptr , # a CByteArray written into by C function
-      :buffer_in => :ptr  , # a CByteArray read by C function
-      :buffer_inout => :ptr  , # a CByteArray read/written by C function
+      :buffer_out => :ptr , # a Pointer written into by C function
+      :buffer_in => :ptr  , # a Pointer read by C function
+      :buffer_inout => :ptr  , # a Pointer read/written by C function
       :void => :void ,
       :string => :'char*' ,
       :'char*' => :'char*' ,
@@ -180,39 +180,6 @@ module FFI
     # remainder in ffi_enum.rb
   end
 
-  class Pointer < CByteArray
-    # define the fixed instvars
-    def initialize
-      @type_size = 1  
-      # note @type_size maybe nil if instance created by 
-      #    CByteArray pointer_at primitive
-    end
-    def initialize(elem_size)
-      unless elem_size._isFixnum && elem_size > 0
-        raise TypeError, 'element size must be a Fixnum > 0'
-      end
-      @type_size = elem_size
-    end
-    def __initialize(elem_size)
-      @type_size = elem_size
-    end
-    def type_size
-      ts = @type_size
-      if ts._equal?(nil)
-        ts = 1
-      end
-      ts
-    end
-    def __type_size=(elem_size)
-      unless elem_size._isFixnum && elem_size > 0
-        raise TypeError, 'element size must be a Fixnum > 0'
-      end
-      @type_size = elem_size
-    end
-
-    # remainder of implementation in pointer.rb
-  end
-
   # subclasses of Pointer
 
   class MemoryPointer < Pointer
@@ -227,7 +194,7 @@ module FFI
     # all behavior is in Pointer
   end
 
-  class Struct < CByteArray
+  class Struct < Pointer
     # define the fixed instvars
     def __set_layout(ly)
       @layout = ly

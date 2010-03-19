@@ -22,6 +22,12 @@ mspec
   As of 2009-06-28, this is at version 1.5.12 of mspec.
   git://github.com/rubyspec/mspec
 
+  To update to a new version of the mspec and rubyspec submodules,
+  first save any edits to the submodule by renaming directories or
+  using git stash, etc.
+  Then in top of git checkout (i.e. in parent of this directory) do this:
+    git submodule update --init
+
 rubyspec
   A git submodule that tracks the rubyspecs.
   As of 2009-06-28, this was the HEAD from the rubyspec git repository.

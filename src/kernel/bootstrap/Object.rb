@@ -11,7 +11,7 @@ class Object
 
   # class is installed by RubyContext>>installPrimitiveBootstrap: , but we
   #  install again here to get bridge methods
-  primitive_nobridge 'class', 'class' 
+  primitive_nobridge 'class', 'class'
 
   #  Reimplementation of the following special selectors is disallowed
   #  by the parser and they are optimized by code generator to special bytecodes.
@@ -76,7 +76,7 @@ class Object
 
   primitive 'nil?' , '_rubyNilQ'
 
-  # compiler translates ! and  not   tokens to  _not 
+  # compiler translates ! and  not   tokens to  _not
   def not
     self._not # _not is a special send compiled direct to a bytecode
   end
@@ -115,22 +115,16 @@ class Object
   # __perform___  requires next to last arg to be a Symbol with proper suffix
   #   for the number of with: keywords;
   #   and last arg is envId
-  # __perform are used by RubyParser and FFI::StructLayout 
-  primitive_nobridge '__perform_se', 'with:perform:env:' 
-  primitive_nobridge '__perform__se', 'with:with:perform:env:' 
-   
+  # __perform are used by RubyParser and FFI::StructLayout
+  primitive_nobridge '__perform_se', 'with:perform:env:'
+  primitive_nobridge '__perform__se', 'with:with:perform:env:'
+
   # redefinition of __perform_method disallowed after bootstrap,
   #  it is used by implementation of eval
   primitive_nobridge '__perform_meth', 'performMethod:'
 
   primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
   primitive   '__basic_clone', '_basicCopy' # use singleton class
-
-  def dup
-    res = self.__basic_dup
-    res.initialize_copy(self)
-    res
-  end
 
   def clone
     res = self.__basic_clone
@@ -139,6 +133,25 @@ class Object
       res.freeze
     end
     res
+  end
+
+  def dup
+    res = self.__basic_dup
+    res.initialize_copy(self)
+    res
+  end
+
+  def enum_for(sym = :each , *args)  # added in 1.8.7
+    # the receiver must implement the specified method that
+    #  would return an enumerator
+    ts = Thread.__recursion_guard_set
+    unless ts.__add_if_absent(self)
+      # catch infinite recursion from typical MRI usage pattern
+      raise RuntimeError, 'Enumerator creation is subclass responsibility'
+    end
+    enumerator = self.__send__(sym, *args) 
+    ts.remove(self)
+    enumerator
   end
 
   primitive 'freeze', 'immediateInvariant'
@@ -155,7 +168,7 @@ class Object
 
   def is_a?(amodule)
     self._is_a?(amodule) # _is_a? is a special send compiled direct to a bytecode
-  end 
+  end
 
   primitive_nobridge '__responds_to', '_respondsTo:private:flags:'
      # _responds_to flags bit masks are
@@ -177,7 +190,7 @@ class Object
     a = self
     unless a._isArray
       if a._equal?(nil)
-	return a
+  return a
       end
       a = a.__splat_lasgn_value_coerce
     end
@@ -203,7 +216,7 @@ class Object
     end
     if v._not_equal?(self)
       unless v._isArray
-	raise TypeError, 'arg to splat responded to to_ary but did not return an Array'
+  raise TypeError, 'arg to splat responded to to_ary but did not return an Array'
       end
     end
     v
@@ -214,7 +227,7 @@ class Object
     unless a._isArray
       a = a.__splat_lasgn_value_coerce
       unless a._isArray
-	a = [ self ]
+  a = [ self ]
       end
     end
     a
@@ -226,7 +239,7 @@ class Object
     if v._equal?(nil)
       v = Type.coerce_to_or_nil(self, Array, :to_a)
       if v._equal?(nil)
-	v = self
+  v = self
       end
     end
     sz = v.length
@@ -236,7 +249,7 @@ class Object
     else
       return v[0]
     end
-	else
+  else
     return v
     end
   end
@@ -269,6 +282,8 @@ class Object
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
   primitive_nobridge '__instvar_put', 'rubyInstvarAt:put:'
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'
+
+  primitive 'instance_variable_defined?' , 'rubyIvDefined:'
 
   def instance_variable_get(a_name)
     unless a_name._isStringOrSymbol
@@ -315,11 +330,11 @@ class Object
   def extend(*modules)
     if (modules.length > 0)
       cl = class << self
-	     self
-	   end
+       self
+     end
       modules.each do |aModule|
-	cl.include(aModule)
-	aModule.extended(self)
+  cl.include(aModule)
+  aModule.extended(self)
       end
     end
     self
@@ -354,7 +369,7 @@ class Object
       true
     else
       unless cls.__isBehavior
-	raise TypeError, 'expected a Class or Module'
+        raise TypeError, 'expected a Class or Module'
       end
       false
     end
@@ -389,7 +404,7 @@ class Object
     bnd = Binding.new(ctx, self, blk)
     bnd.__set_lex_scope(lex_path)
     vcgl = [ self.__getRubyVcGlobal(0x30),
-	     self.__getRubyVcGlobal(0x31) ]
+       self.__getRubyVcGlobal(0x31) ]
     bblk = bnd.block
     unless bblk._equal?(nil)
       vcgl << bblk
@@ -407,12 +422,12 @@ class Object
   def __evalCaller(args, gsnmeth)
     $~ = args[0]
     $_ = args[1]
-    rcvr = args[2] 
+    rcvr = args[2]
     begin
       res = rcvr.__perform_meth(gsnmeth)
     ensure
-      args[0] = $~ 
-      args[1] = $_ 
+      args[0] = $~
+      args[1] = $_
     end
     res
   end
@@ -420,29 +435,29 @@ class Object
   def self.__evalCaller(args, gsnmeth)
     $~ = args[0]
     $_ = args[1]
-    rcvr = args[2] 
+    rcvr = args[2]
     begin
       res = rcvr.__perform_meth(gsnmeth)
     ensure
-      args[0] = $~ 
-      args[1] = $_ 
+      args[0] = $~
+      args[1] = $_
     end
     res
   end
 
-  # Object should NOT have a to_str.  If to_str is implementd by passing
-  # to to_s, then by default all objects can convert to a string!  But we
-  # want classes to make an effort in order to convert their objects to
-  # strings.
-  #
-  # def to_str
-  #   to_s
-  # end
+  def instance_exec(*args, &block) # added for 1.8.7
+    blk = block.__set_self(self) 
+    blk.call(*args) 
+  end
+ 
+  def instance_exec(*args) 
+    raise LocalJumpError, 'no block given'
+  end 
 
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
   def singleton_methods(inc_modules = true)
-    __ruby_singleton_methods(inc_modules, 0)
+    Module.__filter_method_names(__ruby_singleton_methods(inc_modules, 0))
   end
 
   primitive_nobridge '__ruby_methods', 'rubyMethods:'
@@ -451,23 +466,23 @@ class Object
   # accessible in receiver and receiver's ancestors.  Otherwise, returns
   # an array of the names of receiver's singleton methods.
   def methods(regular = true)
+    set = self.__ruby_singleton_methods(false, 0)
     if regular
-      __ruby_methods(0) # get public methods
-    else
-      __ruby_singleton_methods(false, 0)
+      set =  set + self.__ruby_methods(0) # get public methods
     end
+    Module.__filter_method_names(set)
   end
 
   def private_methods
-    __ruby_methods(2)
+    Module.__filter_method_names(__ruby_methods(2))
   end
 
   def protected_methods
-    __ruby_methods(1)
+    Module.__filter_method_names(__ruby_methods(1))
   end
 
-  def public_methods
-    __ruby_methods(0)
+  def public_methods(ignored_arg = true)
+    self.methods(true)
   end
 
   def singleton_method_added(a_symbol)
@@ -484,9 +499,20 @@ class Object
 
   # TODO   singleton_method_removed
 
+  def tap(&block)	# added for 1.8.7
+    block.call(self)
+    self
+  end
+
   def to_a
      # remove this method for MRI 1.9 compatibility
      [ self ]
+  end
+
+  def to_enum(sym = :each , *args)  # added in 1.8.7
+    # the receiver must implement the specified method that
+    #  would return an enumerator
+    self.__send__(sym, *args) 
   end
 
   def to_fmt
@@ -497,6 +523,15 @@ class Object
     self.class.name.to_s
   end
 
+  # Object should NOT have a to_str.  If to_str is implementd by passing
+  # to to_s, then by default all objects can convert to a string!  But we
+  # want classes to make an effort in order to convert their objects to
+  # strings.
+  #
+  # def to_str
+  #   to_s
+  # end
+
   def __k_to_int
     # sent from C code in primitive 767 for sprintf
     v = nil
@@ -504,9 +539,9 @@ class Object
       v = self.to_int
     rescue
       begin
-	v = Kernel.Integer(self)
+  v = Kernel.Integer(self)
       rescue
-	# ignore
+  # ignore
       end
     end
     v
@@ -532,19 +567,20 @@ class Object
   # and temporary objects and may vary from run to run.  Does not abort
   # the current transaction.
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
+
+  # Undefined is a sentinal value used to distinguish between nil as a value passed 
+  # by the user and the user not passing anything for a defaulted value.  E.g.,:
+  #
+  #   def foo(required_param, optional_param=Undefined)
+  #     if optional_param._equal?( Undefined )
+  #       puts "User did not pass a value"
+  #     else
+  #       puts "Users passed #{optional_param} (which may be nil)"
+  #     fi
+  #   end
+  #
+  Undefined = Object.new
+  Undefined.freeze
 end
-
-
-# Undefined is a sentinal value used to distinguish between nil as a value passed 
-# by the user and the user not passing anything for a defaulted value.  E.g.,:
-#
-#   def foo(required_param, optional_param=Undefined)
-#     if optional_param._equal?( Undefined )
-#       puts "User did not pass a value"
-#     else
-#       puts "Users passed #{optional_param} (which may be nil)"
-#     fi
-#   end
-#
-Undefined = Object.new
+Object.__freeze_constants
 

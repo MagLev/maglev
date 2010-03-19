@@ -1,15 +1,12 @@
 class Module
 
-  #  Class methods
-
-  # MNI: new
-
-  #  Instance methods
-
-  # class_variables inherited from Behavior
-
   def clone
     raise NotImplementedError , "Module#clone"
+  end
+
+  # Invoked as a callback when a reference to an undefined symbol is made.
+  def const_missing(symbol)
+    raise NameError, "uninitialized constant #{symbol}"
   end
 
   def include?(other)
@@ -29,27 +26,23 @@ class Module
   primitive '__ruby_methods_protection', 'rubyMethods:protection:'
 
   def instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 0);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 0))
   end
 
   def public_instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 0);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 0))
   end
 
   def private_instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 2);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 2))
   end
 
   def protected_instance_methods(inc_super=true)
-    __ruby_methods_protection(inc_super, 1);
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, 1))
   end
 
-  # MNI: attr
   def extend_object(object)
     raise NotImplementedError, 'Module#extend_object'
   end
-
-  # remove_method  implemented in Behavior
-  # undef_method implemented in Behavior
 
 end

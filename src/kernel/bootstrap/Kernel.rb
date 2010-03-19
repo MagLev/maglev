@@ -51,6 +51,22 @@ module Kernel
 
   primitive_nobridge '__last_dnu_protection', '_lastDnuProtection'
 
+  def __method__(*args, &block)  # added for 1.8.7
+    # always come here via a bridge method
+    unless args.__size._equal?(0)
+      raise ArgumentError, 'too many args'
+    end
+    ctx_arr = self.__binding_ctx(1)
+    mth = ctx_arr[-1]
+    sel = nil
+    unless mth._equal?(nil)
+      sel = mth.__name 
+    end
+    sel
+  end
+
+  # def __callee ; end # not needed for 1.9, generated code uses __method__
+
   def method_missing(method_id, *args)
     prot = __last_dnu_protection()
     type = if (prot._equal?(0))
@@ -836,25 +852,25 @@ module Kernel
 
   primitive_nobridge '__trace_global_assign&', 'traceGlobalVarAssign:block:'
 
-  def __call_tracevar_block(new_value, &blk)
+  def __call_tracevar_block(new_value, &block)
     # called from Smalltalk
-    blk.call(new_value)
+    block.call(new_value)
   end
  
-  def __trace_var(name, &blk)
+  def __trace_var(name, &block)
     unless name._isSymbol
       name = Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
-    __trace_global_assign(name, &blk)
+    __trace_global_assign(name, &block)
   end
 
-  def trace_var(name, cmd='ignored', &blk)
+  def trace_var(name, cmd='ignored', &block)
     # cmd is currently ignored
     # name must be a String or Symbol beginning with '$' 
-    # if blk is nil, has no effect
+    # if block is nil, has no effect
     if block_given?
-      __trace_var(name, &blk) 
+      __trace_var(name, &block) 
     end
   end
 

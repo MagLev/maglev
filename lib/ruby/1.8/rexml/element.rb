@@ -360,7 +360,7 @@ module REXML
     # Iterates through the children, yielding for each Element that
     # has a particular text set.
     # text:: 
-    #   the text to search for.  If nil, or not supplied, will itterate
+    #   the text to search for.  If nil, or not supplied, will iterate
     #   over all +Element+ children that contain at least one +Text+ node.
     # max:: 
     #   (optional) causes this method to return after yielding
@@ -492,7 +492,7 @@ module REXML
     def text=( text )
       if text.kind_of? String
         text = Text.new( text, whitespace(), nil, raw() )
-      elsif text and !text.kind_of? Text
+      elsif !text.nil? and !text.kind_of? Text
         text = Text.new( text.to_s, whitespace(), nil, raw() )
       end
       old_text = get_text
@@ -989,7 +989,7 @@ module REXML
     end
     alias :size :length
 
-    # Itterates over the attributes of an Element.  Yields actual Attribute
+    # Iterates over the attributes of an Element.  Yields actual Attribute
     # nodes, not String values.
     # 
     #  doc = Document.new '<a x="1" y="2"/>'
@@ -1006,7 +1006,7 @@ module REXML
       end
     end
 
-    # Itterates over each attribute of an Element, yielding the expanded name
+    # Iterates over each attribute of an Element, yielding the expanded name
     # and value as a pair of Strings.
     #
     #  doc = Document.new '<a x="1" y="2"/>'

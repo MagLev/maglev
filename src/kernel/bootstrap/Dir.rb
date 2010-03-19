@@ -56,6 +56,11 @@ class Dir
     nil
   end
 
+  def self.foreach(dirname) # added in 1.8.7
+    # returns an Enumerator
+    Dir.new(dirname).each()
+  end
+
   def self.getwd
     Errno.handle(__getwd, "getwd")
   end
@@ -70,12 +75,12 @@ class Dir
     Errno.handle(__mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
   end
 
-  def self.new(*args, &blk)
+  def self.new(*args, &block)
     # first variant gets bridge methods
     if (args.length > 0)
       d = __new(args[0])
       Errno.handle(d, dirname)
-      d.initialize(*args, &blk)
+      d.initialize(*args, &block)
     else
       raise ArgumentError, 'too few args'
     end
@@ -137,7 +142,9 @@ class Dir
 
   def each(&block)
     check_closed
-
+    unless block_given?
+      return DirEnumerator.new(self, :each) # for 1.8.7
+    end
     i = 0
     lim = @entries.size
     while i < lim
@@ -146,8 +153,12 @@ class Dir
     end
   end
 
+  def __entries
+    @entries
+  end
+
   def path
-    check_closed
+    # 1.8.7, do not  check_closed
     @path
   end
 
@@ -177,7 +188,7 @@ class Dir
   def rewind
     check_closed
     @index = 0
-    self
+    self 	# change for 1.8.7
   end
 
   def seek(pos)

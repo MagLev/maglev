@@ -17,7 +17,7 @@
 #
 class Float 
   def to_d
-    BigDecimal(self.to_s)
+    BigDecimal.__from_float(self)
   end
 end
 
@@ -57,9 +57,10 @@ class Rational < Numeric
   # Converts a Rational to a BigDecimal
   def to_d(nFig=0)
      num = self.numerator.to_s
+     bigDecimal = BigDecimal
      if nFig<=0
-        nFig = BigDecimal.double_fig*2+1
+        nFig = bigDecimal.double_fig*2+1
      end
-     BigDecimal.new(num).div(self.denominator,nFig)
+     bigDecimal.induced_from(num).div(self.denominator,nFig)
   end
 end

@@ -996,7 +996,7 @@ test(a.slice!(4),    nil,           "slice! 15")
 test(a,              [1,2],         "slice! 16")
 
 test(a.slice!(4,0),  nil,           "slice! 17")
-test(a,              [1,2,nil,nil], "slice! 18")
+test(a,              [1,2], "slice! 18")   # result changes with 1.8.7
 
 a = [1,2]
 test(a[4,10] = nil,  nil,             "assign  1")
@@ -1202,5 +1202,11 @@ a = a.sort_by { rand(max) }
 words = %w{ puma cat bass ant aardvark gnu fish }
 sorted = words.sort_by { |w| [w.length, w] }
 test(sorted, %w{ ant cat gnu bass fish puma aardvark }, 'multilevel sort')
+
+# Bug Test: MagLev was throwing the following exception:
+#   error , An index range was specified for a sequenceable collection with
+#   the starting index 1 greater than the ending index 0.,
+# Passes if no exception thrown
+test(Array.new(0,0), [], "No exception with Array.new(0,0)")
 
 report

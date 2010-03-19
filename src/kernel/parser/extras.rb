@@ -122,6 +122,14 @@ module MagRp # {
         end  
       end
 
+      def in_block_params=(v)
+        @in_block_params = v
+      end
+
+      def in_block_params
+        @in_block_params
+      end
+
       def unextend
         idx = @curridx
         @extend_ofs_last_unextend = @arr[idx + OFF_byte_offset]
@@ -952,7 +960,7 @@ module MagRp # {
       result
     end
 
-    def new_compstmt( v_zero )
+    def new_compstamt( v_zero )
       result = void_stmts(v_zero )
       if result
 	result = result.kbegin_value 
@@ -1064,17 +1072,20 @@ module MagRp # {
     end
 
     def new_parasgn(lhs, src_ofs)
+      src_line = 1
       if @mydebug 
-	# src_ofs is zero based
-	src_line = @lexer.src_line_for_offset(src_ofs + 1)
-      else
-	src_line = nil
+        if src_ofs._not_equal?(nil) 
+	  # src_ofs is zero based
+	  src_line = @lexer.src_line_for_offset(src_ofs + 1)
+        end
       end
       if lhs._equal?(nil)
 	internal_error("lhs is nil in new_parasgn")
       end
       n = RubyParAsgnRpNode.s(lhs, src_line)
-      n.src_offset=( src_ofs)
+      unless src_ofs._equal?(nil)
+        n.src_offset=( src_ofs)
+      end
       n
     end
 

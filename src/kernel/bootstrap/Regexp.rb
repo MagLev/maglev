@@ -169,7 +169,7 @@ class Regexp
 
   # END RUBINIUS
 
-  def match(*args, &blk)
+  def match(*args, &block)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
@@ -194,7 +194,7 @@ class Regexp
     @source
   end
 
-  def =~(*args, &blk)
+  def =~(*args, &block)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
@@ -211,7 +211,7 @@ class Regexp
     m
   end
 
-  def ~(*args, &blk)
+  def ~(*args, &block)
     # only zero-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
@@ -464,6 +464,13 @@ class Regexp
   #     Regexp.union(/dogs/, /cats/i)        #=> /(?-mix:dogs)|(?i-mx:cats)/
   def self.union(*args)
     len = args.length
+    if len._equal?(1) 
+      arr = args[0]
+      if arr._isArray
+        args = arr
+        len = arr.length
+      end
+    end
     if len._equal?(0)
       return /(?!)/
     end

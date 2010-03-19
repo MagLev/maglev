@@ -20,8 +20,8 @@ class TestIndex < Test::Unit::TestCase
     @people = nil
   end
 
-  def test_one_level_select
-    elderly = @people.select([:age], :>=, 55)
+  def test_one_level_search
+    elderly = @people.search([:age], :gte, 55)
     assert_not_nil(elderly, "The result should not be nil")
     assert_operator(elderly.size, :>=, 1, "Ought to be at least one old person")
   end
@@ -35,14 +35,14 @@ class TestIndex < Test::Unit::TestCase
     results = Array.new
     times   = Array.new
     times << Benchmark.measure do
-      results << many_people.select([:age], :<, 25)
+      results << many_people.search([:age], :lt, 25)
     end
 
     begin
       # Create an index and then re-measure
       many_people.create_index('age', Fixnum)
       times << Benchmark.measure do
-        results << many_people.select([:age], :<, 25)
+        results << many_people.search([:age], :lt, 25)
       end
 
       splits = times.map{ |tms| [tms.utime, tms.stime, tms.total, tms.real] }

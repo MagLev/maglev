@@ -1,4 +1,4 @@
-GemStone Systems, Inc.  WEB EDITION SOFTWARE LICENSE AGREEMENT
+﻿GemStone Systems, Inc.  WEB EDITION SOFTWARE LICENSE AGREEMENT
 
 	This Agreement is between GemStone and Licensee, as each is
 	defined below.	Licensee's installation of the Software Products,
@@ -6,6 +6,8 @@ GemStone Systems, Inc.  WEB EDITION SOFTWARE LICENSE AGREEMENT
 	assent, indicates Licensee's acceptance of the terms and
 	conditions of this Agreement.  The scope of the license granted,
 	as specified in this Agreement is defined in Section 2 below.
+	Where GemStone and Licensee have entered into a separate Software
+	License Agreement, the terms of that Agreement shall govern.
 
 DEFINITIONS.  As used in this Agreement:
 
@@ -160,6 +162,24 @@ security precautions, such as data backup, testing and error detection
 procedures, which are necessary in order to ensure that errors in the
 Software Products and the applications using the Software Products do
 not cause adverse consequences.
+
+As indicated above, in addition to proprietary code developed and/or owned
+by GemStone, the Software Products may include computer code licensed
+under the GNU Lesser General Public License (LGPL) or other open source
+licenses ("open source software" or "OSS").  The text of those licenses
+are available online or shall be provided to Licensee upon written
+request to GemStone.  Nothing in this Agreement overrides the terms of
+the relevant open source licenses with respect to the OSS covered by that
+license or requires either party to act in contradiction to that OSS
+license.  Notwithstanding Sections 6.2(a) and (b) above which prohibit
+Licensee from reverse engineering or modifying the Software Products,
+Licensee may modify a "Library" (as that term is defined in the LGPL)
+and Licensee may reverse engineer and modify the proprietary portions
+of the Software Product that use that Library solely for Licensee's
+own use as necessary to debug those modifications.  However, Licensee
+acknowledges that any modification it elects to make to the Software
+Product will terminate all warranty, maintenance and support obligations
+for the Software Product that has been modified.
 
 KEY FILES.  Licensee acknowledges that the Software Products contain
 Key Files that are a form of disabling code.  For the purpose of this
@@ -355,7 +375,7 @@ Name:
 
 Title:
 
-Date: 
+Date:
 
 
 LICENSEE:

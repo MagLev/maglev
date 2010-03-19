@@ -21,4 +21,3 @@ module Maglev
   class CommitFailedException < MaglevException ; end
 
 end
-

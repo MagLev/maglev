@@ -18,9 +18,9 @@
 # Copied from lib and code moved to module MagRp for the internal parser
 # by Allen Otis.
 
-module MagRp # {
+module MagRp # [
 
-  class Parser # 
+  class Parser # [
     def _init_counts_array
 
     end
@@ -30,11 +30,9 @@ module MagRp # {
       puts "Parser::print_counts,   parser was not generated with   racc.sh -D"
 
     end
-  end
-end
+  end # ]
 
-module MagRp
-  class RubyParser
+  class RubyParser # [
 
     # initialziation of MagTemplate is in first opening in  racc_init_parser.rb
 
@@ -52,11 +50,11 @@ module MagRp
       res.initialize # lexer and other per-parse state
       res
     end
-  end
-end
+  end # ]
+end # ]
 
-module MagRp # {
-  class Parser
+module MagRp # [
+  class Parser # [
     ###
     ### do_parse
     ###
@@ -542,7 +540,7 @@ module MagRp # {
       # throw :racc_jump, 2
     end
 
-    def yyerrok
+    def leave_error_recovery_mode  # was yyerrok
       # Leave error recovering mode.
       @racc_error_status = 0
     end
@@ -627,6 +625,8 @@ module MagRp # {
       end
     end
 
-  end
+   
 
-end # }
+  end # ]
+
+end # ]

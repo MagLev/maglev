@@ -1,10 +1,10 @@
 # == Pretty-printer for Ruby objects.
-#
+# 
 # = Which seems better?
-#
+# 
 # non-pretty-printed output by #p is:
 #   #<PP:0x81fedf0 @genspace=#<Proc:0x81feda0>, @group_queue=#<PrettyPrint::GroupQueue:0x81fed3c @queue=[[#<PrettyPrint::Group:0x81fed78 @breakables=[], @depth=0, @break=false>], []]>, @buffer=[], @newline="\n", @group_stack=[#<PrettyPrint::Group:0x81fed78 @breakables=[], @depth=0, @break=false>], @buffer_width=0, @indent=0, @maxwidth=79, @output_width=2, @output=#<IO:0x8114ee4>>
-#
+# 
 # pretty-printed output by #pp is:
 #   #<PP:0x81fedf0
 #    @buffer=[],
@@ -22,17 +22,17 @@
 #    @newline="\n",
 #    @output=#<IO:0x8114ee4>,
 #    @output_width=2>
-#
+# 
 # I like the latter.  If you do too, this library is for you.
-#
+# 
 # = Usage
-#
+# 
 #   pp(obj)
 #
 # output +obj+ to +$>+ in pretty printed format.
-#
+# 
 # It returns +nil+.
-#
+# 
 # = Output Customization
 # To define your customized pretty printing function for your classes,
 # redefine a method #pretty_print(+pp+) in the class.
@@ -67,10 +67,10 @@ end
 class PP < PrettyPrint
   # Outputs +obj+ to +out+ in pretty printed format of
   # +width+ columns in width.
-  #
+  # 
   # If +out+ is omitted, +$>+ is assumed.
   # If +width+ is omitted, 79 is assumed.
-  #
+  # 
   # PP.pp returns +out+.
   def PP.pp(obj, out=$>, width=79)
     q = PP.new(out, width)
@@ -82,7 +82,7 @@ class PP < PrettyPrint
 
   # Outputs +obj+ to +out+ like PP.pp but with no indent and
   # newline.
-  #
+  # 
   # PP.singleline_pp returns +out+.
   def PP.singleline_pp(obj, out=$>)
     q = SingleLine.new(out)
@@ -124,7 +124,7 @@ class PP < PrettyPrint
 
     # Adds +obj+ to the pretty printing buffer
     # using Object#pretty_print or Object#pretty_print_cycle.
-    #
+    # 
     # Object#pretty_print_cycle is used when +obj+ is already
     # printed, a.k.a the object reference chain has a cycle.
     def pp(obj)
@@ -144,7 +144,7 @@ class PP < PrettyPrint
     end
 
     # A convenience method which is same as follows:
-    #
+    # 
     #   group(1, '#<' + obj.class.name, '>') { ... }
     def object_group(obj, &block) # :yield:
       group(1, '#<' + obj.class.name, '>', &block)
@@ -157,7 +157,7 @@ class PP < PrettyPrint
     end
 
     # A convenience method which is same as follows:
-    #
+    # 
     #   text ','
     #   breakable
     def comma_breakable
@@ -167,23 +167,23 @@ class PP < PrettyPrint
 
     # Adds a separated list.
     # The list is separated by comma with breakable space, by default.
-    #
+    # 
     # #seplist iterates the +list+ using +iter_method+.
     # It yields each object to the block given for #seplist.
     # The procedure +separator_proc+ is called between each yields.
-    #
+    # 
     # If the iteration is zero times, +separator_proc+ is not called at all.
-    #
+    # 
     # If +separator_proc+ is nil or not given,
     # +lambda { comma_breakable }+ is used.
     # If +iter_method+ is not given, :each is used.
-    #
+    # 
     # For example, following 3 code fragments has similar effect.
-    #
+    # 
     #   q.seplist([1,2,3]) {|v| xxx v }
-    #
+    # 
     #   q.seplist([1,2,3], lambda { comma_breakable }, :each) {|v| xxx v }
-    #
+    # 
     #   xxx 1
     #   q.comma_breakable
     #   xxx 2
@@ -247,17 +247,17 @@ class PP < PrettyPrint
 
     # A default pretty printing method for general objects.
     # It calls #pretty_print_instance_variables to list instance variables.
-    #
+    # 
     # If +self+ has a customized (redefined) #inspect method,
     # the result of self.inspect is used but it obviously has no
     # line break hints.
-    #
+    # 
     # This module provides predefined #pretty_print methods for some of
     # the most commonly used built-in classes for convenience.
     def pretty_print(q)
-      if /\(Kernel\)#/ !~ method(:inspect).inspect
+      if /\(Kernel\)#/ !~ Object.instance_method(:method).bind(self).call(:inspect).inspect
         q.text self.inspect
-      elsif /\(Kernel\)#/ !~ method(:to_s).inspect && instance_variables.empty?
+      elsif /\(Kernel\)#/ !~ Object.instance_method(:method).bind(self).call(:to_s).inspect && instance_variables.empty?
         q.text self.to_s
       else
         q.pp_object(self)
@@ -274,7 +274,7 @@ class PP < PrettyPrint
     end
 
     # Returns a sorted array of instance variable names.
-    #
+    # 
     # This method should return an array of names of instance variables as symbols or strings as:
     # +[:@a, :@b]+.
     def pretty_print_instance_variables
@@ -283,13 +283,13 @@ class PP < PrettyPrint
 
     # Is #inspect implementation using #pretty_print.
     # If you implement #pretty_print, it can be used as follows.
-    #
+    # 
     #   alias inspect pretty_print_inspect
     #
     # However, doing this requires that every class that #inspect is called on
     # implement #pretty_print, or a RuntimeError will be raised.
     def pretty_print_inspect
-      if /\(PP::ObjectMixin\)#/ =~ method(:pretty_print).inspect
+      if /\(PP::ObjectMixin\)#/ =~ Object.instance_method(:method).bind(self).call(:pretty_print).inspect
         raise "pretty_print is not overridden for #{self.class}"
       end
       PP.singleline_pp(self, '')
@@ -360,7 +360,7 @@ end
 class File
   class Stat
     def pretty_print(q)
-      require 'etc'
+      require 'etc' # maglev changes from etc.so
       q.object_group(self) {
         q.breakable
         q.text sprintf("dev=0x%x", self.dev); q.comma_breakable
@@ -488,6 +488,13 @@ if __FILE__ == $0
       a = OverriddenStruct.new(1,2)
       assert_equal("#<struct Struct::OverriddenStruct members=1, class=2>\n", PP.pp(a, ''))
     end
+
+    def test_redefined_method
+      o = ""
+      def o.method
+      end
+      assert_equal(%(""\n), PP.pp(o, ""))
+    end
   end
 
   class HasInspect
@@ -576,7 +583,7 @@ if __FILE__ == $0
       result = PP.pp(a, '')
       assert_equal("#{a.inspect}\n", result)
     end
-
+    
     def test_to_s_without_iv
       a = Object.new
       def a.to_s() "aaa" end

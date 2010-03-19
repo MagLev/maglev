@@ -1,8 +1,14 @@
-class PureRubyStringIO < IO
-  # loaded during bootstrap so we can have multiple implementations of gets
-  #   to handle updating of caller's $_
+class PureRubyStringIO  < IO
+  # PureRubyStringIO is loaded during bootstrap so we can have multiple 
+  # implementations of gets to handle updating of caller's $_
+
+  # For 1.8.7 , deleted appending of caller to exception messages,
+  #   in interest of performance.  
 
   include Enumerable
+
+  IoEnumerator = Enumerable::IoEnumerator
+  IoByteEnumerator = Enumerable::IoByteEnumerator
 
   SEEK_CUR = IO::SEEK_CUR
   SEEK_END = IO::SEEK_END
@@ -19,7 +25,7 @@ class PureRubyStringIO < IO
   #  :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
   #  :ungetc, :write, :zip]
 
-  def self.open(string="", mode=Undefined, &blk)
+  def self.open(string="", mode=Undefined, &block)
     # mode==Undefined translated to "r" or "r+" in initialize
     if block_given? then
       begin
@@ -39,7 +45,7 @@ class PureRubyStringIO < IO
     # gemstone, let @sio_closed_write be checked in syswrite
     if @mode[0]._equal?( ?a ) 
       # in append mode, ignore position and append to the buffer
-      if @sio_closed_write ; requireWritable ; end
+      if @sio_closed_write ; __require_writable ; end
       str = Type.coerce_to(obj, String, :to_s)
       s_string = @sio_string
       s_string << str
@@ -51,25 +57,25 @@ class PureRubyStringIO < IO
   end
 
   def binmode
-    requireOpen
+    __require_open
     self
   end
 
   def close
-    requireOpen
+    __require_open
     @sio_closed_read = true
     @sio_closed_write = true
     nil
   end
 
   def close_read
-    raise IOError, "closing non-duplex IO for reading", caller if closed_read?
+    raise(IOError, "closing non-duplex IO for reading") if closed_read?
     @sio_closed_read = true
     nil
   end
 
   def close_write
-    raise IOError, "closing non-duplex IO for writing", caller if closed_write?
+    raise(IOError, "closing non-duplex IO for writing") if closed_write?
     @sio_closed_write = true
     nil
   end
@@ -86,48 +92,11 @@ class PureRubyStringIO < IO
     @sio_closed_write
   end
 
-  def each(sep_string=$/, &block)
-    if @sio_closed_read ; requireReadable ; end
-    s_string = @sio_string
-    if sep_string._equal?(nil)
-      # start from current position
-      pos = @sio_pos
-      len = s_string.length - pos
-      s_string[pos, len].each( &block)
-    else 
-      # entire buffer
-      s_string.each(sep_string, &block)
-    end
-    @sio_pos = s_string.length
-    self
-  end
-
-  def each(&block)
-    # start from current position
-    if @sio_closed_read ; requireReadable ; end
-    s_string = @sio_string
-    pos = @sio_pos
-    len = s_string.length - pos
-    s_string[pos, len].each( &block)
-    self
-  end
-
-  def each_byte(&block)
-    if @sio_closed_read ; requireReadable ; end
-    s_string = @sio_string
-    len = @sio_string.length
-    s_pos = @sio_pos
-    while s_pos < len
-      # pos must be updated before call to yield
-      byte = s_string[s_pos]
-      @sio_pos = s_pos + 1
-      block.call(byte)
-      s_pos = @sio_pos
-    end
-  end
+  # def each ; end      # in purerubystringio2.rb
+  # def each_byte ; end # in purerubystringio2.rb
 
   def eof
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     @sio_pos >= @sio_string.length
   end
 
@@ -144,12 +113,12 @@ class PureRubyStringIO < IO
   end
 
   def fsync
-    if @sio_closed_write ; requireWritable ; end
+    if @sio_closed_write ; __require_writable ; end
     0
   end
 
   def getc
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     pos = @sio_pos
     char = @sio_string[pos]
     unless char._equal?(nil)
@@ -255,27 +224,7 @@ class PureRubyStringIO < IO
   # def lineno ; end # inherited from IO
   # def lineno=(integer) ; end # inherited from IO
 
-  def reopen(obj, mode)
-    if mode._isInteger 
-      if (mode & IO::TRUNC)._not_equal?(0) && obj.frozen?
-        raise TypeError, 'cannot truncate frozen input string'
-      end
-    end
-    self._initialize(obj, mode, true)
-  end
-
-  def reopen(other_io)
-    if other_io._isString
-      self._initialize(other_io, IO::RDWR, true )
-    else
-      other_io = Type.coerce_to(other_io, PureRubyStringIO, :to_strio )
-      self._initialize(other_io.string, other_io._mode, true)
-    end
-  end
-
-  def reopen()
-    self._initialize(self.string, "w+", true)
-  end
+  # def reopen ; end # in purerubystringio2.rb
 
   def path
     nil
@@ -297,7 +246,7 @@ class PureRubyStringIO < IO
       raise IOError, 'IO#pos on closed IO'
     end
     p = Type.coerce_to(integer, Fixnum, :to_int)
-    raise Errno::EINVAL, "argument must be >= 0", caller if p < 0
+    raise( Errno::EINVAL, "argument must be >= 0") if p < 0
     @sio_pos = p
   end
 
@@ -309,7 +258,7 @@ class PureRubyStringIO < IO
   # def puts(*args) ; end                  # inherited from IO
 
   def read(length=nil, buffer=nil)
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     buf = buffer._equal?(nil) ? "" : Type.coerce_to(buffer, String, :to_str)
 
     s_pos = @sio_pos
@@ -336,8 +285,20 @@ class PureRubyStringIO < IO
   end
 
   def readchar
-    if @sio_closed_read ; requireReadable ; end
-    raise EOFError, "End of file reached", caller if eof?
+    if @sio_closed_read ; __require_readable ; end
+    raise(EOFError, "End of file reached") if eof?
+    getc
+  end
+
+  def getbyte    # added for 1.8.7
+    if @sio_closed_read ; __require_readable ; end
+    return nil  if eof?
+    getc
+  end
+
+  def readbyte    # added for 1.8.7
+    if @sio_closed_read ; __require_readable ; end
+    raise(EOFError, "End of file reached") if eof?
     getc
   end
 
@@ -347,20 +308,20 @@ class PureRubyStringIO < IO
 
   def readline(sep=$/)
     # variant after first gets no bridges   # gemstone
-    if @sio_closed_read ; requireReadable ; end
-    raise EOFError, "End of file reached", caller if eof?
+    if @sio_closed_read ; __require_readable ; end
+    raise(EOFError, "End of file reached") if eof?
     self.__gets(sep, 0x31)
   end
 
   def readline
     # variant after first gets no bridges   # gemstone
-    if @sio_closed_read ; requireReadable ; end
-    raise EOFError, "End of file reached", caller if eof?
+    if @sio_closed_read ; __require_readable ; end
+    raise(EOFError, "End of file reached") if eof?
     self.__gets($/, 0x31)
   end
 
   def readlines(sep_string=Undefined)
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     if sep_string._equal?(Undefined)
       sep_string = $/
       return [] if eof?
@@ -369,7 +330,7 @@ class PureRubyStringIO < IO
     else
       sep_string = Type.coerce_to(sep_string, String, :to_str)
     end
-    raise EOFError, "End of file reached", caller if eof?
+    raise(EOFError, "End of file reached") if eof?
     sep_string = "\n\n" if sep_string.length._equal?(0)
     rc = []
     while ! eof
@@ -390,6 +351,9 @@ class PureRubyStringIO < IO
   end
 
   def seek(offset, whence=SEEK_SET)
+    if closed?
+      raise(IOError, "not opened in seek")
+    end
     offset = Type.coerce_to(offset, Fixnum, :to_int)
     if whence == SEEK_CUR then
       offset += @sio_pos
@@ -430,13 +394,13 @@ class PureRubyStringIO < IO
   end
 
   def sysread(length=nil, buffer=nil)
-    if @sio_closed_read ; requireReadable ; end
-    raise EOFError, "End of file reached", caller if eof?
+    if @sio_closed_read ; __require_readable ; end
+    raise(EOFError, "End of file reached") if eof?
     read(length, buffer)
   end
 
   def syswrite(string)
-    if @sio_closed_write ; requireWritable ; end
+    if @sio_closed_write ; __require_writable ; end
     str = Type.coerce_to(string, String, :to_s)
     s_string = @sio_string
     my_len = s_string.length
@@ -470,9 +434,9 @@ class PureRubyStringIO < IO
   # version. Should the C version change to match the docs the ruby version
   # will be simple to update as well.
   def truncate(integer)
-    if @sio_closed_write ; requireWritable ; end
+    if @sio_closed_write ; __require_writable ; end
     new_size = Type.coerce_to(integer, Fixnum, :to_int)
-    raise Errno::EINVAL, "Invalid argument - negative length", caller if new_size < 0
+    raise(Errno::EINVAL, "Invalid argument - negative length") if new_size < 0
     s_string = @sio_string
     old_size = s_string.length
     if new_size < s_string.length
@@ -484,7 +448,7 @@ class PureRubyStringIO < IO
   end
 
   def ungetc(integer)
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     integer = Type.coerce_to(integer, Fixnum, :to_int)
     s_pos = @sio_pos
     if s_pos > 0 then
@@ -495,7 +459,6 @@ class PureRubyStringIO < IO
     nil
   end
 
-  alias :each_line :each
   alias :eof? :eof
   alias :size :length
   alias :tty? :isatty
@@ -521,7 +484,7 @@ class PureRubyStringIO < IO
       sep_len = 2
     end
 
-    if @sio_closed_read ; requireReadable ; end
+    if @sio_closed_read ; __require_readable ; end
     @lineNumber += 1
     s_pos = @sio_pos
     pstart = s_pos
@@ -554,16 +517,17 @@ class PureRubyStringIO < IO
     res
   end
 
-  def requireReadable
-    raise IOError, "not opened for reading", caller[1..-1] if @sio_closed_read
+  def __require_readable
+    raise(IOError, "not opened for reading", caller[1..-1]) if @sio_closed_read
   end
 
-  def requireWritable
-    raise IOError, "not opened for writing", caller[1..-1] if @sio_closed_write
+  def __require_writable
+    raise(IOError, "not opened for writing", caller[1..-1]) if @sio_closed_write
   end
 
-  def requireOpen
-    raise IOError, "closed stream", caller[1..-1] if @sio_closed_read && @sio_closed_write
+  def __require_open
+    raise(IOError, "closed stream", caller[1..-1]) if @sio_closed_read && @sio_closed_write
   end
 
 end
+PureRubyStringIO.__freeze_constants

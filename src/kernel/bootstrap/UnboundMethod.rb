@@ -6,9 +6,13 @@ class UnboundMethod
 
   primitive_nobridge 'arity', 'arity'
   primitive_nobridge '__bind', 'bind:'
+
   primitive_nobridge '__home_class', 'homeClass'
+  primitive_nobridge 'owner', 'homeClass'  # for 1.8.7
 
   primitive_nobridge '__selector_prefix', '_selectorPrefix'
+
+  primitive_nobridge 'name', '_selectorPrefix'  # for 1.8.7
 
   def __gsmeth
     @gsmeth 

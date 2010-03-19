@@ -384,3 +384,5 @@ module Maglev
   end
   module_function( :__system )
 end
+
+Maglev.__freeze_constants

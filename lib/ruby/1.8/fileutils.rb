@@ -984,6 +984,7 @@ module FileUtils
 
     def fu_get_gid(group)   #:nodoc:
       return nil unless group
+      group = group.to_s
       if /\A\d+\z/ =~ group
       then group.to_i
       else Etc.getgrnam(group).gid
@@ -1035,11 +1036,11 @@ module FileUtils
 #       created = true
 #       retry if t
 #     end
-# Gemstone, alternate implementation not dependent on exact Errno::ENOENT
+# [ Maglev, alternate implementation not dependent on exact Errno::ENOENT
       if File.exist?(path)
         if t
           File.utime(t, t, path)
-        end  
+        end
       elsif nocreate
         # nothing more
       else
@@ -1047,6 +1048,7 @@ module FileUtils
           ;
         }
       end
+# Maglev ]
     end
   end
   module_function :touch

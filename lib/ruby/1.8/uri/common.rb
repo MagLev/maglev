@@ -1,7 +1,7 @@
 # = uri/common.rb
 #
 # Author:: Akira Yamada <akira@ruby-lang.org>
-# Revision:: $Id: common.rb 11747 2007-02-15 02:41:45Z knu $
+# Revision:: $Id: common.rb 14178 2007-12-10 09:31:55Z matz $
 # License:: 
 #   You can redistribute it and/or modify it under the same term as Ruby.
 #
@@ -549,8 +549,8 @@ module URI
   #   # => ["http://foo.example.com/bla", "mailto:test@example.com"]
   #
   def self.extract(str, schemes = nil, &block)
-    if block
-      str.scan(regexp(schemes)) { block.call $& }
+    if block_given?
+      str.scan(regexp(schemes)) { yield $& }
       nil
     else
       result = []

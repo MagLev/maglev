@@ -174,54 +174,27 @@ class Numeric
     self.to_f.round
   end
 
-  def step(nend, inc, &blk) 
+  def step(nend, inc=1, &block) 
     if nend._isFloat or inc._isFloat
       s = Type.coerce_to(self, Float, :to_f)
-      s.step(nend, inc, &blk)
-    else
-      n = self
-      if inc == 0 
-        raise ArgumentError, "increment is zero"
-      end
-      if block_given?
-        if inc > 0
-          until n > nend
-            blk.call(n)
-            n += inc
-          end
-        else
-          until n < nend
-            blk.call(n)
-            n += inc
-          end
-        end
-      else
-        if inc > 0
-          unless n > nend 
-            raise LocalJumpError, 'no block given'
-          end
-        else
-          unless n < nend
-            raise LocalJumpError, 'no block given'
-          end
-        end
-      end
+      return s.step(nend, inc, &block)
     end
-  end
-
-  def step(nend, &blk)
-    if nend._isFloat
-      s = Type.coerce_to(self, Float, :to_f)
-      s.step(nend, &blk)
+    n = self
+    if inc == 0 
+      raise ArgumentError, "increment is zero"
+    end
+    unless block_given?
+      return NumericEnumerator.new(self, self, nend, inc) # for 1.8.7
+    end
+    if inc > 0
+      until n > nend
+	block.call(n)
+	n += inc
+      end
     else
-      n = self
-      if block_given?
-        until n > nend 
-	  blk.call(n)
-	  n += 1
-        end
-      elsif n < nend
-        raise LocalJumpError, 'no block given'
+      until n < nend
+	block.call(n)
+	n += inc
       end
     end
   end

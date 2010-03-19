@@ -22,7 +22,10 @@ class ExecBlock
     #  one Fixnum arg,  0 == for lambda, 1 == for define_method , 
     #     2 == for non-lambda  proc 
 
-  # call, call:, call::, call::: will be compiled to special bytecodes
+  primitive_nobridge '__set_self', 'setSelf:'
+
+  # call, call:, call::, call::: , call&, call:&, call::&
+  #  will be compiled to special bytecodes
   #  and won't use the bridge methods generated for  call*
 
   # bridge methods generated for call*  will be used but the actual
@@ -43,6 +46,18 @@ class ExecBlock
 
     def [](a, b, c)
       self.call(a, b, c)
+    end
+
+    def [](&block)
+      self.call(&block)
+    end
+
+    def [](a, &block)
+      self.call(a, &block)
+    end
+
+    def [](a, b, &block)
+      self.call(a, b, &block)
     end
 
     def [](*args)
@@ -82,25 +97,25 @@ end
 
 class Proc 
    # Proc is identically  the smalltalk class RubyProc  
-    def self.new(&blk)
-      if blk._isBlock
+    def self.new(&block)
+      if block._isBlock
         inst = self.allocate
-        b = blk.__copy_for_ruby(2) # transform break bytecodes if any
+        b = block.__copy_for_ruby(2) # transform break bytecodes if any
         b.freeze
         inst.__initialize(&b)
         inst.initialize
         return inst
-      elsif blk._is_a?(Proc)
-        return blk
+      elsif block._is_a?(Proc)
+        return block
       else
         raise ArgumentError, 'tried to create Proc object without a block' 
       end
     end
 
-    def self.new(blk)
-      if blk._isBlock
+    def self.new(block)
+      if block._isBlock
         inst = self.allocate
-        b = blk.__copy_for_ruby(2) # transform break bytecodes if any
+        b = block.__copy_for_ruby(2) # transform break bytecodes if any
         b.freeze
         inst.__initialize(&b)
         inst.initialize
@@ -116,19 +131,19 @@ class Proc
       raise ArgumentError, 'tried to create Proc object without a block'
     end
 
-    def self.new_lambda(&blk)
-      if blk._isBlock
+    def self.new_lambda(&block)
+      if block._isBlock
         inst = self.allocate
-        b = blk.__copy_for_ruby(0)
+        b = block.__copy_for_ruby(0)
         b.freeze
         inst.__initialize(&b)
         return inst
-      elsif blk._is_a?(Proc)
-        pb = blk.__block
+      elsif block._is_a?(Proc)
+        pb = block.__block
         b = pb.__copy_for_ruby(0)
         b.freeze
         if b._equal?(pb)
-          return blk  # the argument blk  is already a lambda
+          return block  # the argument block  is already a lambda
         else
           inst = self.allocate
           inst.__initialize(&b) 
@@ -148,8 +163,8 @@ class Proc
       @block
     end
 
-    def __initialize(&blk)
-      @block = blk
+    def __initialize(&block_arg)
+      @block = block_arg
     end
 
     # private primitives for $~ implementation only
@@ -158,6 +173,10 @@ class Proc
     end
     def __setRubyVcGlobal(ofs, val)
       @block.__setRubyVcGlobal(ofs, val)
+    end
+
+    def __set_self(obj)
+      @block.__set_self(obj)
     end
 
     def []
@@ -174,6 +193,18 @@ class Proc
 
     def [](a, b, c)
       @block.call(a, b, c)
+    end
+
+    def [](&block)
+      @block.call(&block)
+    end
+
+    def [](a, &block)
+      @block.call(a, &block)
+    end
+
+    def [](a, b, &block)
+      @block.call(a, b, &block)
     end
 
     def [](*args)
@@ -215,8 +246,8 @@ class Proc
       na
     end
 
-    def call(*args)
-      @block.call(*args)
+    def call(*args, &block)
+      @block.call(*args, &block)
     end
     def call
       # this and following variants get no bridge methods
@@ -230,6 +261,15 @@ class Proc
     end
     def call(a, b, c)
       @block.call(a, b, c)
+    end
+    def call(&block)
+      @block.call(&block)
+    end
+    def call(a, &block)
+      @block.call(a, &block)
+    end
+    def call(a, b, &block)
+      @block.call(a, b, &block)
     end
 
     #  Creating a Binding from a Proc is not yet supported.

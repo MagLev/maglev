@@ -11,7 +11,7 @@ class Binding
     @block = blk
     @forModuleEval = false
     @tmpsDict = nil
-    # if this code changed see also RubyBinding>>ctx:mainSelf: 
+    @homeMeth = binding_context[-1]	# for 1.8.7
   end
 
   def self.__basic_new(a_self)
@@ -37,11 +37,48 @@ class Binding
     @lexicalScope = a_scope
   end
 
+  def __home_method
+    @homeMeth  # for 1.8.7
+  end
+
   def block
     @block
   end
 
-  # eval support methods
+  def eval(*args)		# added for 1.8.7
+    # should always come here via bridge method
+    nargs = args.size
+    if nargs < 3
+      raise ArgumentError, 'too few args, send of :eval not supported'
+    end
+    if nargs > 5
+      raise ArgumentError, 'too many args'
+    end
+    blk = args[0] # implicit block arg, synthesized by AST to IR code in .mcz
+    if blk._equal?(false)
+      blk = block_arg
+    end
+    lex_path = args[1]       # synthesized by AST to IR code in .mcz
+    str = args[2]
+    bnd = self
+    file = args[3]
+    line = args[4]
+    if line._equal?(nil)
+      line = 0
+    end
+    vcgl = [ self.__getRubyVcGlobal(0x30) ,
+             self.__getRubyVcGlobal(0x31) , nil ]
+    bblk = bnd.block
+    unless bblk._equal?(nil)
+      vcgl << bblk
+    end
+    res = __eval_with_position(str, bnd, vcgl, file, line )
+    vcgl[0].__storeRubyVcGlobal(0x30)
+    vcgl[1].__storeRubyVcGlobal(0x31)
+    res
+  end
+
+  
   def __context
     @staticLink # a VariableContext
   end

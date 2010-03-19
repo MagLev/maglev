@@ -256,7 +256,12 @@ class Struct
   #    12345
 
   def each(&block)
-    return values.each(&block)
+    return self.values.each(&block)
+  end
+
+  def each()  # added for 1.8.7
+    # Returns an ArrayEnumerator
+    return self.values.each()
   end
 
   ##
@@ -276,10 +281,24 @@ class Struct
   #    address => 123 Maple, Anytown NC
   #    zip => 12345
 
-  def each_pair
-    raise LocalJumpError unless block_given? # HACK yield should do this
-    _attrs.map { |var| yield var, instance_variable_get("@#{var}") }
+  def each_pair(&block)
+    unless block_given?
+      # for 1.8.7, returns an ArrayEnumerator
+      pairs = []
+      self._attrs.map { |var| pairs << [ var, self.instance_variable_get("@#{var}") ] }
+      return pairs.each()
+    end
+    self._attrs.map { |var| 
+         block.call(var, self.instance_variable_get("@#{var}") )
+    }
   end
+
+  def each_pair() # added for 1.8.7
+    # returns an ArrayEnumerator
+    pairs = []
+    self._attrs.map { |var| pairs << [ var, self.instance_variable_get("@#{var}") ] }
+    return pairs.each()
+  end 
 
   ##
   # call-seq:

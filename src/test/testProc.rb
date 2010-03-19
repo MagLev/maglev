@@ -86,3 +86,15 @@ end
 test_arity(-1, "A") { true }
 test_arity(1, "A") { |x| true }
 test_arity(2, "A") { |x,y| true }
+
+# coverage added for 1.8.7 syntax changes (last arg to a block can have &)
+#
+sel = :call  
+pa = Proc.new {|&blk| blk.send( sel ) }
+x = pa.send( sel ) {150 + 100 }
+unless x == 250 ; raise 'error'; end
+
+pb = Proc.new {|aa, &blk| blk.call(aa, 5) }
+y = pb.call(300 ) {|m,n| m + n }
+unless y == 305 ; raise 'error'; end
+true

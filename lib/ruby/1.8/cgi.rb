@@ -284,7 +284,7 @@ class CGI
   # Standard internet newline sequence
   EOL = CR + LF
 
-  REVISION = '$Id: cgi.rb 17815 2008-07-02 10:06:15Z shyouhei $' #:nodoc:
+  REVISION = '$Id: cgi.rb 26086 2009-12-14 02:40:07Z shyouhei $' #:nodoc:
 
   NEEDS_BINMODE = true if /WIN/ni.match(RUBY_PLATFORM) 
 
@@ -306,7 +306,7 @@ class CGI
     "METHOD_NOT_ALLOWED"  => "405 Method Not Allowed",
     "NOT_ACCEPTABLE"      => "406 Not Acceptable",
     "LENGTH_REQUIRED"     => "411 Length Required",
-    "PRECONDITION_FAILED" => "412 Rrecondition Failed",
+    "PRECONDITION_FAILED" => "412 Precondition Failed",
     "SERVER_ERROR"        => "500 Internal Server Error",
     "NOT_IMPLEMENTED"     => "501 Method Not Implemented",
     "BAD_GATEWAY"         => "502 Bad Gateway",
@@ -385,7 +385,7 @@ class CGI
           end
         end
       when /\A#x([0-9a-f]+)\z/ni then
-        if $1.hex < 256
+        if $1.hex < 128
           $1.hex.chr
         else
           if $1.hex < 65536 and ($KCODE[0] == ?u or $KCODE[0] == ?U)
@@ -415,7 +415,7 @@ class CGI
   #   print CGI::escapeElement('<BR><A HREF="url"></A>', ["A", "IMG"])
   #     # "<BR>&lt;A HREF=&quot;url&quot;&gt;&lt;/A&gt"
   def CGI::escapeElement(string, *elements)
-    elements = elements[0] if elements[0]._isArray
+    elements = elements[0] if elements[0].kind_of?(Array)
     unless elements.empty?
       string.gsub(/<\/?(?:#{elements.join("|")})(?!\w)(?:.|\n)*?>/ni) do
         CGI::escapeHTML($&)
@@ -436,7 +436,7 @@ class CGI
   #           CGI::escapeHTML('<BR><A HREF="url"></A>'), ["A", "IMG"])
   #     # "&lt;BR&gt;<A HREF="url"></A>"
   def CGI::unescapeElement(string, *elements)
-    elements = elements[0] if elements[0]._isArray
+    elements = elements[0] if elements[0].kind_of?(Array)
     unless elements.empty?
       string.gsub(/&lt;\/?(?:#{elements.join("|")})(?!\w)(?:.|\n)*?&gt;/ni) do
         CGI::unescapeHTML($&)
@@ -603,14 +603,14 @@ class CGI
     end
 
     if options.has_key?("cookie")
-      if options["cookie"]._isString or
+      if options["cookie"].kind_of?(String) or
            options["cookie"].kind_of?(Cookie)
         buf += "Set-Cookie: " + options.delete("cookie").to_s + EOL
-      elsif options["cookie"]._isArray
+      elsif options["cookie"].kind_of?(Array)
         options.delete("cookie").each{|cookie|
           buf += "Set-Cookie: " + cookie.to_s + EOL
         }
-      elsif options["cookie"]._isHash
+      elsif options["cookie"].kind_of?(Hash)
         options.delete("cookie").each_value{|cookie|
           buf += "Set-Cookie: " + cookie.to_s + EOL
         }
@@ -702,7 +702,7 @@ class CGI
   # to "ja".
   def out(options = "text/html") # :yield:
 
-    options = { "type" => options } if options._isString
+    options = { "type" => options } if options.kind_of?(String)
     content = yield
 
     if options.has_key?("charset")
@@ -792,11 +792,16 @@ class CGI
     #
     # These keywords correspond to attributes of the cookie object.
     def initialize(name = "", *value)
-      options = if name._isString
-                  { "name" => name, "value" => value }
-                else
-                  name
-                end
+      if name.kind_of?(String)
+        @name = name
+        @value = value
+        %r|^(.*/)|.match(ENV["SCRIPT_NAME"])
+        @path = ($1 or "")
+        @secure = false
+        return super(@value)
+      end
+
+      options = name
       unless options.has_key?("name")
         raise ArgumentError, "`name' required"
       end
@@ -817,8 +822,8 @@ class CGI
       super(@value)
     end
 
-    attr_accessor("name", "value", "path", "domain", "expires")
-    attr_reader("secure")
+    attr_accessor("name", "path", "domain", "expires")
+    attr_reader("secure", "value")
 
     # Set whether the Cookie is a secure cookie or not.
     #
@@ -828,16 +833,16 @@ class CGI
       @secure
     end
 
+    def value=(val)
+      @value.replace(Array(val))
+    end
+
     # Convert the Cookie to its string representation.
     def to_s
       buf = ""
       buf += @name + '='
 
-      if @value._isString
-        buf += CGI::escape(@value)
-      else
-        buf += @value.collect{|v| CGI::escape(v) }.join("&")
-      end
+      buf += @value.map { |v| CGI::escape(v) }.join("&")
 
       if @domain
         buf += '; domain=' + @domain
@@ -880,7 +885,7 @@ class CGI
       if cookies.has_key?(name)
         values = cookies[name].value + values
       end
-      cookies[name] = Cookie::new({ "name" => name, "value" => values })
+      cookies[name] = Cookie::new(name, *values)
     end
 
     cookies
@@ -1084,7 +1089,12 @@ class CGI
             %|(offline mode: enter name=value pairs on standard input)\n|
           )
         end
-        readlines.join(' ').gsub(/\n/n, '')
+        array = readlines rescue nil
+        if not array.nil?
+          array.join(' ').gsub(/\n/n, '')
+        else
+          ""
+        end
       end.gsub(/\\=/n, '%3D').gsub(/\\&/n, '%26')
 
       words = Shellwords.shellwords(string)
@@ -1312,7 +1322,7 @@ class CGI
     #     # => "<A HREF=\"http://www.example.com\" TARGET=\"_top\">Example</A>"
     #
     def a(href = "") # :yield:
-      attributes = if href._isString
+      attributes = if href.kind_of?(String)
                      { "HREF" => href }
                    else
                      href
@@ -1334,7 +1344,7 @@ class CGI
     #   base("http://www.example.com/cgi")
     #     # => "<BASE HREF=\"http://www.example.com/cgi\">"
     def base(href = "") # :yield:
-      attributes = if href._isString
+      attributes = if href.kind_of?(String)
                      { "HREF" => href }
                    else
                      href
@@ -1357,7 +1367,7 @@ class CGI
     #   blockquote("http://www.example.com/quotes/foo.html") { "Foo!" }
     #     #=> "<BLOCKQUOTE CITE=\"http://www.example.com/quotes/foo.html\">Foo!</BLOCKQUOTE>
     def blockquote(cite = nil)  # :yield:
-      attributes = if cite._isString
+      attributes = if cite.kind_of?(String)
                      { "CITE" => cite }
                    else
                      cite or ""
@@ -1381,7 +1391,7 @@ class CGI
     #   caption("left") { "Capital Cities" }
     #     # => <CAPTION ALIGN=\"left\">Capital Cities</CAPTION>
     def caption(align = nil) # :yield:
-      attributes = if align._isString
+      attributes = if align.kind_of?(String)
                      { "ALIGN" => align }
                    else
                      align or ""
@@ -1411,7 +1421,7 @@ class CGI
     #   checkbox("name", "value", true)
     #     # = checkbox("NAME" => "name", "VALUE" => "value", "CHECKED" => true)
     def checkbox(name = "", value = nil, checked = nil)
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "TYPE" => "checkbox", "NAME" => name,
                        "VALUE" => value, "CHECKED" => checked }
                    else
@@ -1465,12 +1475,12 @@ class CGI
     #   checkbox_group("NAME" => "name",
     #                    "VALUES" => [["1", "Foo"], ["2", "Bar", true], "Baz"])
     def checkbox_group(name = "", *values)
-      if name._isHash
+      if name.kind_of?(Hash)
         values = name["VALUES"]
         name = name["NAME"]
       end
       values.collect{|value|
-        if value._isString
+        if value.kind_of?(String)
           checkbox(name, value) + value
         else
           if value[value.size - 1] == true
@@ -1507,7 +1517,7 @@ class CGI
     #   file_field("NAME" => "name", "SIZE" => 40)
     #     # <INPUT TYPE="file" NAME="name" SIZE="40">
     def file_field(name = "", size = 20, maxlength = nil)
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "TYPE" => "file", "NAME" => name,
                        "SIZE" => size.to_s }
                    else
@@ -1541,7 +1551,7 @@ class CGI
     #   form("METHOD" => "post", "ENCTYPE" => "enctype") { "string" }
     #     # <FORM METHOD="post" ENCTYPE="enctype">string</FORM>
     def form(method = "post", action = script_name, enctype = "application/x-www-form-urlencoded")
-      attributes = if method._isString
+      attributes = if method.kind_of?(String)
                      { "METHOD" => method, "ACTION" => action,
                        "ENCTYPE" => enctype } 
                    else
@@ -1582,7 +1592,7 @@ class CGI
     #   hidden("NAME" => "name", "VALUE" => "reset", "ID" => "foo")
     #     # <INPUT TYPE="hidden" NAME="name" VALUE="value" ID="foo">
     def hidden(name = "", value = nil)
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "TYPE" => "hidden", "NAME" => name, "VALUE" => value }
                    else
                      name["TYPE"] = "hidden"
@@ -1683,7 +1693,7 @@ class CGI
     #   image_button("SRC" => "url", "ATL" => "strng")
     #     # <INPUT TYPE="image" SRC="url" ALT="string">
     def image_button(src = "", name = nil, alt = nil)
-      attributes = if src._isString
+      attributes = if src.kind_of?(String)
                      { "TYPE" => "image", "SRC" => src, "NAME" => name,
                        "ALT" => alt }
                    else
@@ -1709,7 +1719,7 @@ class CGI
     #   img("SRC" => "src", "ALT" => "alt", "WIDTH" => 100, "HEIGHT" => 50)
     #     # <IMG SRC="src" ALT="alt" WIDTH="100" HEIGHT="50">
     def img(src = "", alt = "", width = nil, height = nil)
-      attributes = if src._isString
+      attributes = if src.kind_of?(String)
                      { "SRC" => src, "ALT" => alt }
                    else
                      src
@@ -1737,7 +1747,7 @@ class CGI
     def multipart_form(action = nil, enctype = "multipart/form-data")
       attributes = if action == nil
                      { "METHOD" => "post", "ENCTYPE" => enctype } 
-                   elsif action._isString
+                   elsif action.kind_of?(String)
                      { "METHOD" => "post", "ACTION" => action,
                        "ENCTYPE" => enctype } 
                    else
@@ -1777,7 +1787,7 @@ class CGI
     #   password_field("NAME" => "name", "VALUE" => "value")
     #     # <INPUT TYPE="password" NAME="name" VALUE="value">
     def password_field(name = "", value = nil, size = 40, maxlength = nil)
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "TYPE" => "password", "NAME" => name,
                        "VALUE" => value, "SIZE" => size.to_s }
                    else
@@ -1833,7 +1843,7 @@ class CGI
     #     # </SELECT>
     def popup_menu(name = "", *values)
 
-      if name._isHash
+      if name.kind_of?(Hash)
         values   = name["VALUES"]
         size     = name["SIZE"].to_s if name["SIZE"]
         multiple = name["MULTIPLE"]
@@ -1846,7 +1856,7 @@ class CGI
       select({ "NAME" => name, "SIZE" => size,
                "MULTIPLE" => multiple }){
         values.collect{|value|
-          if value._isString
+          if value.kind_of?(String)
             option({ "VALUE" => value }){ value }
           else
             if value[value.size - 1] == true
@@ -1881,7 +1891,7 @@ class CGI
     #   radio_button("NAME" => "name", "VALUE" => "value", "ID" => "foo")
     #     # <INPUT TYPE="radio" NAME="name" VALUE="value" ID="foo">
     def radio_button(name = "", value = nil, checked = nil)
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "TYPE" => "radio", "NAME" => name,
                        "VALUE" => value, "CHECKED" => checked }
                    else
@@ -1920,12 +1930,12 @@ class CGI
     #   radio_group("NAME" => "name",
     #                 "VALUES" => [["1", "Foo"], ["2", "Bar", true], "Baz"])
     def radio_group(name = "", *values)
-      if name._isHash
+      if name.kind_of?(Hash)
         values = name["VALUES"]
         name = name["NAME"]
       end
       values.collect{|value|
-        if value._isString
+        if value.kind_of?(String)
           radio_button(name, value) + value
         else
           if value[value.size - 1] == true
@@ -1955,7 +1965,7 @@ class CGI
     #   reset("VALUE" => "reset", "ID" => "foo")
     #     # <INPUT TYPE="reset" VALUE="reset" ID="foo">
     def reset(value = nil, name = nil)
-      attributes = if (not value) or value._isString
+      attributes = if (not value) or value.kind_of?(String)
                      { "TYPE" => "reset", "VALUE" => value, "NAME" => name }
                    else
                      value["TYPE"] = "reset"
@@ -1985,7 +1995,7 @@ class CGI
     #   submit("VALUE" => "ok", "NAME" => "button1", "ID" => "foo")
     #     # <INPUT TYPE="submit" VALUE="ok" NAME="button1" ID="foo">
     def submit(value = nil, name = nil)
-      attributes = if (not value) or value._isString
+      attributes = if (not value) or value.kind_of?(String)
                      { "TYPE" => "submit", "VALUE" => value, "NAME" => name }
                    else
                      value["TYPE"] = "submit"
@@ -2017,7 +2027,7 @@ class CGI
     #   text_field("NAME" => "name", "VALUE" => "value")
     #     # <INPUT TYPE="text" NAME="name" VALUE="value">
     def text_field(name = "", value = nil, size = 40, maxlength = nil)
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "TYPE" => "text", "NAME" => name, "VALUE" => value,
                        "SIZE" => size.to_s }
                    else
@@ -2043,7 +2053,7 @@ class CGI
     #   textarea("name", 40, 5)
     #      # = textarea("NAME" => "name", "COLS" => 40, "ROWS" => 5)
     def textarea(name = "", cols = 70, rows = 10)  # :yield:
-      attributes = if name._isString
+      attributes = if name.kind_of?(String)
                      { "NAME" => name, "COLS" => cols.to_s,
                        "ROWS" => rows.to_s }
                    else

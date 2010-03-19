@@ -115,6 +115,7 @@
 # implementation, see SimpleDelegator.
 #
 class Delegator
+  IgnoreBacktracePat = %r"\A#{Regexp.quote(__FILE__)}:\d+:in `"
 
   #
   # Pass in the _obj_ to delegate method calls to.  All methods supported by
@@ -133,14 +134,12 @@ class Delegator
     for method in obj.methods
       next if preserved.include? method
       begin
-	eval <<-EOS
+	eval <<-EOS, nil, __FILE__, __LINE__+1
 	  def self.#{method}(*args, &block)
 	    begin
 	      __getobj__.__send__(:#{method}, *args, &block)
-	    rescue Exception
-	      $@.delete_if{|s| /:in `__getobj__'$/ =~ s} #`
-	      $@.delete_if{|s| /^\\(eval\\):/ =~ s}
-	      Kernel::raise
+	    ensure
+	      $@.delete_if{|s|IgnoreBacktracePat=~s} if $@
 	    end
 	  end
 	EOS
@@ -152,12 +151,12 @@ class Delegator
   alias initialize_methods initialize
 
   # Handles the magic of delegation through \_\_getobj\_\_.
-  def method_missing(m, *args)
+  def method_missing(m, *args, &block)
     target = self.__getobj__
     unless target.respond_to?(m)
-      super(m, *args)
+      super(m, *args, &block)
     end
-    target.__send__(m, *args)
+    target.__send__(m, *args, &block)
   end
 
   # 
@@ -251,7 +250,7 @@ SimpleDelegater = SimpleDelegator
 # your class.
 #
 #   class MyClass < DelegateClass( ClassToDelegateTo )    # Step 1
-#     def initiaize
+#     def initialize
 #       super(obj_of_ClassToDelegateTo)                   # Step 2
 #     end
 #   end
@@ -265,11 +264,11 @@ def DelegateClass(superclass)
     def initialize(obj)  # :nodoc:
       @_dc_obj = obj
     end
-    def method_missing(m, *args)  # :nodoc:
+    def method_missing(m, *args, &block)  # :nodoc:
       unless @_dc_obj.respond_to?(m)
-        super(m, *args)
+        super(m, *args, &block)
       end
-      @_dc_obj.__send__(m, *args)
+      @_dc_obj.__send__(m, *args, &block)
     end
     def respond_to?(m, include_private = false)  # :nodoc:
       return true if super
@@ -295,13 +294,12 @@ def DelegateClass(superclass)
   }
   for method in methods
     begin
-      klass.module_eval <<-EOS
+      klass.module_eval <<-EOS, __FILE__, __LINE__+1
         def #{method}(*args, &block)
 	  begin
 	    @_dc_obj.__send__(:#{method}, *args, &block)
-	  rescue
-	    $@[0,2] = nil
-	    raise
+	  ensure
+	    $@.delete_if{|s| ::Delegator::IgnoreBacktracePat =~ s} if $@
 	  end
 	end
       EOS

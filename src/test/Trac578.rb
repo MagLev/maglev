@@ -43,12 +43,16 @@ end
 
 5.times do
   # $nwords is used to avoid constant reassignment warnings
-  path = ENV[ :MAGLEV_HOME ] + '/src/test/Trac578data.txt' 
+  path = ENV[ :MAGLEV_HOME ] + '/src/test/Trac578data.txt'
   $nwords = train(words(File.new(path).read))
-  if correct("speling") == "spelling"
+  expected = "breathing"
+  actual = correct("braething")
+#  expected = "spelling"
+#  actual = correct("speling")
+  if actual == expected
     puts "Spelling successfully corrected."
   else
     # raise is used so that the error appears in the reports
-    raise "Failed to correct spelling."
+    raise "Failed to correct spelling: expected '#{expected}' but was '#{actual}'"
   end
 end

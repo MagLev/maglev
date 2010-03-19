@@ -21,7 +21,7 @@ module FFI
       self.new(type, count)
     end
 
-    def self.new(type, count, &blk)
+    def self.new(type, count, &block)
       # this variant  gets bridge methods
       if type._isFixnum
         elemsize = type
@@ -46,7 +46,7 @@ module FFI
       end
     end
       
-    def self.new(type, &blk)
+    def self.new(type, &block)
       inst = self.new(type)
       if block_given?
         yield(inst)
@@ -115,7 +115,7 @@ module FFI
     end
 
     # def put_pointer(byteoffset, pointer) ; end
-    #  pointer is a kind of CByteArray or a CPointer, or nil
+    #  pointer is a kind of Pointer or a CPointer, or nil
     primitive_nobridge 'put_pointer', 'pointerAt:put:'
 
     def get_pointer(ofs)

@@ -5,8 +5,6 @@ class String
     Regexp.new(self)
   end
 
-  primitive 'size=', 'size:'  # Note size=() not in MRI
-
   primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '__md5sum', 'md5sum'     # used by lib file  digest/md5.rb
@@ -84,7 +82,7 @@ class String
       k = 1
       klim = n.__divide(16)
       # grow kstr to max of ( 1/16 of result size , 16K bytes)
-      while k < klim && kstr.length < 8000
+      while k < klim && kstr.__size < 8000
         kstr << kstr
         k = k * 2
       end
@@ -129,11 +127,61 @@ class String
 
   primitive_nobridge '__uppercaseAt', 'rubyUpperCaseAt:' # arg is one-based
 
+  primitive 'bytesize', 'size'  # added for 1.8.7
+
+  def bytes(&block)   # added for 1.8.7
+    unless block_given?
+      return StringByteEnumerator.new(self, :bytes)
+    end
+    arr = [1]
+    broke = false
+    ea_res = arr.each { |ignore|
+      n = 0
+      lim = self.__size
+      while n < lim
+        ch = self.__at(n)
+        broke = true
+        block.call( ch )
+        broke = false
+        n += 1
+      end
+    }
+    if broke
+      return ea_res  # the argument block did a break
+    end
+    self
+  end
+
+  def chars(&block)	# added for 1.8.7
+    # Maglev not yet KCODE aware
+    unless block_given?
+      return StringCharEnumerator.new(self, :chars)
+    end
+    arr = [1]
+    broke = false
+    ea_res = arr.each { |ignore|
+      n = 0
+      lim = self.__size
+      while n < lim
+        str = ' '
+        str[0] = self.__at(n)
+        broke = true
+        block.call( str )
+        broke = false
+        n += 1
+      end
+    }
+    if broke
+      return ea_res  # the argument block did a break
+    end
+    self
+  end
+
   def casecmp(o)
     # case-insensitive version of String#<=>
     if o._isString
       i = 1
-      o_size = o.size
+      o_size = o.__size
       lim = size > o_size ? o_size : size # lim is the min
       while i <= lim
         sc = self.__uppercaseAt(i)
@@ -183,7 +231,7 @@ class String
   #
   #    "cat o' 9 tails" =~ /\d/   #=> 7
   #    "cat o' 9 tails" =~ 9      #=> false
-  def =~(*args, &blk)
+  def =~(*args, &block)
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
@@ -218,11 +266,11 @@ class String
   def __prim_at_failed(index)
     # invoked from prim failure code in _rubyAt<env>:
     if index._isRange
-      arr = index.__beg_len(self.length)
+      arr = index.__beg_len(self.__size)
       if arr._equal?(nil)
         nil
       else
-        self.__at_length( arr[0] , arr[1] )
+        self.__at( arr[0] , arr[1] )
       end
     elsif index._isInteger
       raise ArgumentError, 'String#[index] primitive failed'
@@ -233,7 +281,7 @@ class String
   end
 
   primitive_nobridge_env '[]' ,         '_rubyAt', ':length:'
-  primitive_nobridge_env '__at_length' , '_rubyAt', ':length:'
+  primitive_nobridge_env '__at' , '_rubyAt', ':length:'
 
   def __prim_at_length_failed(start, length)
     # called from Smalltalk
@@ -241,7 +289,7 @@ class String
       arr = self.__match_regexp(start, length) # arr is [m_begin, m_len]
       return nil if arr._equal?(nil)
       # no tainted logic
-      self.__at_length( arr[0] , arr[1] )
+      self.__at( arr[0] , arr[1] )
     else
       if start._isFixnum
         if length._isFixnum
@@ -255,7 +303,7 @@ class String
       end
       # no tainted logic
       return nil if length < 0
-      self.__at_length(start, length)
+      self.__at(start, length)
     end
   end
 
@@ -282,7 +330,7 @@ class String
       end
       self.__at_put(index, value)
     elsif index._isRange
-      arr = index.__beg_len(self.length)
+      arr = index.__beg_len(self.__size)
       if arr._equal?(nil)
         raise IndexError, ('String#[range]=' + "start out of range for range=#{index}")
       else
@@ -325,6 +373,11 @@ class String
     replace(x)
   end
 
+  def center(width, padstr = " ") # from Rubinius
+    centered = self.dup
+    centered.justify(width, :center, padstr)
+  end
+
   #     str.chomp(separator=$/)   => new_str
   #
   #  Returns a new <code>String</code> with the given record separator removed
@@ -341,53 +394,60 @@ class String
   #     "hello \n there".chomp   #=> "hello \n there"
   #     "hello".chomp("llo")     #=> "he"
   def chomp(separator=$/)
-    (str = self.dup).chomp!(separator) || str
+    str = self.dup
+    res = str.chomp!(separator) 
+    if res._equal?(nil)
+      res = str
+    end
+    res
   end
 
   #     str.chomp!(separator=$/)   => str or nil
   #
   #  Modifies <i>str</i> in place as described for <code>String#chomp</code>,
   #  returning <i>str</i>, or <code>nil</code> if no modifications were made.
-  def chomp!(sep=$/)
-    return if sep.nil? || self.empty?
+  def chomp!(sep=$/) 
+    return nil  if sep._equal?(nil)
+    my_size = self.__size
+    return nil  if my_size._equal?(0)
     sep = Type.coerce_to(sep, String, :to_str)
-    my_size = self.size
-
-    if (sep == $/ && sep == "\n") || sep == "\n"
-      last_ch = self[-1]
+    if sep == "\n"
+      last_ch = self.__at(-1)
       diminish_by = 0
-      if last_ch == ?\n
-        diminish_by += 1 if self[-2] == ?\r && my_size > 1
-      elsif last_ch != ?\r
-        return
+      if last_ch._equal?( ?\n )
+        diminish_by += 1 if self.__at(-2)._equal?( ?\r ) && my_size > 1
+      elsif last_ch._not_equal?( ?\r )
+        return nil
       end
       diminish_by += 1
-      self.size=(my_size - diminish_by)
-    elsif sep.size == 0
-      size = my_size
-      while size > 0 && self[size-1] == ?\n
-        if size > 1 && self[size-2] == ?\r
-          size -= 2
-        else
-          size -= 1
-        end
-      end
-      return if size == my_size
-      self.size=(size)
+      self.__size=(my_size - diminish_by)
     else
-      sep_size = sep.size
-      size = my_size
-      return if sep_size > size
-      sep_size = -sep_size
-      while sep_size < 0
-        return if sep[sep_size] != self[sep_size]
-        sep_size += 1
+      separator_sz = sep.__size
+      if separator_sz._equal?(0)
+        sz = my_size
+        while sz > 0 && self.__at(sz-1)._equal?( ?\n )
+          if sz > 1 && self.__at(sz-2)._equal?( ?\r )
+            sz -= 2 
+          else
+            sz -= 1 
+          end
+        end
+        return nil  if sz._equal?( my_size )
+        self.__size=(sz)
+      else
+        sep_size = separator_sz
+        sz = my_size
+        return nil  if sep_size > sz 
+        sep_size = -sep_size
+        while sep_size < 0
+          return nil  if sep.__at(sep_size) != self.__at(sep_size)
+          sep_size += 1
+        end
+        self.__size=(sz - separator_sz)
       end
-      self.size=(size - sep.size)
     end
     self
-  end
-
+  end 
 
   #  call-seq:
   #     str.chop   => new_str
@@ -415,16 +475,16 @@ class String
   #  or <code>nil</code> if <i>str</i> is the empty string.  See also
   #  <code>String#chomp!</code>.
   def chop!
-    mySize = self.length
-    if mySize > 0
-      if self[-1]._equal?(0xa)
-        if mySize > 1 && self[-2]._equal?(0xd)
-      self.size=(mySize - 2)
-    else
-      self.size=(mySize - 1)
+    my_size = self.__size
+    if my_size > 0
+      if self.__at(-1)._equal?( ?\n )
+        if my_size > 1 && self.__at(-2)._equal?( ?\r )
+          self.__size=(my_size - 2)
+	else
+	  self.__size=(my_size - 1)
         end
       else
-        self.size=(mySize - 1)
+        self.__size=(my_size - 1)
       end
       return self
     end
@@ -490,106 +550,127 @@ class String
   #   Example three
   #   "hello\n\n\n"
   #   "world"
+
   def each(a_sep=$/, &block)
     # Modified Rubinius
+    unless block_given?
+      return StringEachEnumerator.new(self, :each , a_sep) # for 1.8.7
+    end
     if a_sep._equal?(nil)
       block.call(self)
       return self
     end
-
     sep = Type.coerce_to(a_sep, String, :to_str)
-    raise LocalJumpError, 'no block given' unless block_given?
 
-    id = self.__id__
-    my_size = self.size
-    ssize = sep.size
-    newline = ssize._equal?(0) ?  ?\n  : sep[ssize-1]
+    # algorithm replicated in   StringEachEnumerator
+    # id = self.__id__
+    my_size = self.__size
+    sep_size = sep.__size
+    newline = sep_size._equal?(0) ?  ?\n  : sep.__at(sep_size - 1)
 
     last = 0
-    i = ssize
-    if ssize._equal?(0)
+    i = sep_size
+    if sep_size._equal?(0)
       while i < my_size
-  if self[i]._equal?( ?\n )
-    if self[i+=1]._not_equal?( ?\n )
-      i += 1
-      next
-    end
-    i += 1 while i < my_size && self[i]._equal?( ?\n )
-  end
-
-  if i > 0 && self[i-1]._equal?( newline ) &&
-      (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0) )
-    line = self[last, i-last]
-    # line.taint if tainted?
-    yield line
-    # We don't have a way yet to check if the data was modified...
-    #modified? id, my_size
-    last = i
-  end
-
-  i += 1
+	if self.__at(i)._equal?( ?\n )
+	  if self.__at(i+=1)._not_equal?( ?\n )
+	    i += 1
+	    next
+	  end
+          i += 1 while i < my_size && self.__at(i)._equal?( ?\n )
+        end
+        if i > 0 && self.__at(i-1)._equal?( newline ) 
+	  line = self.__at(last, i-last)
+	  # line.taint if tainted?
+	  block.call( line )
+	  # We don't have a way yet to check if the data was modified...
+	  #modified? id, my_size
+	  last = i
+	end
+        i += 1
       end
     else
       while i < my_size
-  if i > 0 && self[i-1]._equal?(newline) &&
-      (ssize < 2 || self.__compare_substring(sep, i-ssize, ssize)._equal?(0))
-    line = self[last, i-last]
-    # line.taint if tainted?
-    yield line
-    # We don't have a way yet to check if the data was modified...
-    #modified? id, my_size
-    last = i
-  end
-  i += 1
+        if i > 0 && self.__at(i-1)._equal?(newline) &&
+            (sep_size < 2 || self.__at_equals( i - sep_size + 1, sep))
+	  line = self.__at(last, i-last)
+	  # line.taint if tainted?
+	  block.call( line )
+	  # We don't have a way yet to check if the data was modified...
+	  #modified? id, my_size
+	  last = i
+	end
+	i += 1
       end
     end
     unless last._equal?(my_size)
-      line = self[last, my_size-last+1]
+      line = self.__at(last, my_size-last+1)
       # line.taint if tainted?
-      yield line
+      block.call( line)
     end
-
     self
   end
+
   alias each_line each
 
-  def __compare_substring(other, start, size)
-    my_size = self.size
-    if start > my_size || start + my_size < 0
-      raise IndexError, "index #{start} out of string"
+  def each_byte(&block)
+    unless block_given?
+      return ArrayEnumerator.new(self, :each_byte) # for 1.8.7
     end
-    self <=> other[start, size]
-  end
-
-  def each_byte
     n = 0
     # Do not cache size before looping.  Specs require
-    # us to go to new end when string grows or shrinks
-    # in the yield.
-    while n < self.size
-      yield self[n]
+    # us to go to new end when string grows or shrinks in the yield.
+    while n < self.__size
+      block.call( self.__at(n) )
       n = n + 1
     end
     self
   end
 
-  # each_char appears to be a Rubinius extension
-  #  for each character of self, pass a one character String
-  #  containing that character to the block
-  def each_char(&blk)
-    n = 0
-    lim = self.size
-    while n < lim
-      temp = ' '
-      temp[0] = self[n]
-      blk.call(temp)
-      n = n + 1
-    end
-  end
+  alias each_char chars		# changed to an alias  for 1.8.7
 
   primitive 'empty?', 'isEmpty'
+
+  def end_with?(*args)  # added for 1.8.7
+    n = 0 
+    lim = args.__size
+    my_siz = self.__size
+    while n < lim
+      str = args[n]
+      begin
+        str = Type.coerce_to(str, String, :to_str)
+        if self.__at_equals(my_siz - str.__size + 1 , str) 
+          return true
+        end
+      rescue
+        # ignore non-coercable arg
+      end
+      n += 1
+    end
+    false
+  end
+
   primitive 'eql?', '='
 
+  # Return an array of two elements: [an_int, a_string], where an_int is
+  # base, unless self contains a base specifier (e.g., "0x", "0b", etc.),
+  # in which case, an_int is the appropriate base.  a_string is self with
+  # any base specifier removed.
+  #
+  # "0x10" => [16, 10]
+  # "-0b1010".__extract_base     => [2, "-1010"]
+  # "-0b1010".__extract_base(16) => [2, "-1010"]
+  # "-1010".__extract_base(16)   => [16, "-1010"]
+  MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 }
+  MAGLEV_EXTRACT_BASE_TABLE.freeze
+
+  def __extract_base(base)
+    # for 1.8.7,  caller responsible for delete underscores and strip
+    self =~ /^([+-]?)(0[bdox]?)?(.*)/i
+    dtwo = $2
+    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo._equal?(nil)
+    [ base, "#{$1}#{$3}" ]
+  end
 
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
   # replaced with either <i>replacement</i> or the value of the block. The
@@ -613,9 +694,9 @@ class String
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
 
-  def  _gsub_copyfrom_to(from, match_start)
+  def _gsub_copyfrom_to(from, match_start)
     to = match_start # match_start is zero based
-    if to > (sz = self.size)
+    if to > (sz = self.__size)
       to = sz
     end
     self.__copyfrom_to( from + 1 , to )
@@ -633,7 +714,7 @@ class String
       out << str.__to_sub_replacement(match)
       start = match.end(0)
     end
-    out << self.__copyfrom_to(start + 1, self.length)
+    out << self.__copyfrom_to(start + 1, self.__size)
     last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
     out
   end
@@ -642,13 +723,13 @@ class String
   def __to_sub_replacement(match)
     index = 0
     result = ""
-    lim = self.size
+    lim = self.__size
     while index < lim
       current = index
-      while current < lim && self[current] != ?\\
+      while current < lim && self.__at(current) != ?\\
         current += 1
       end
-      result << self[index, current - index]
+      result << self.__at(index, current - index)
       break if current == lim
 
       # found backslash escape, looking next
@@ -658,17 +739,17 @@ class String
       end
       index = current + 1
 
-      cap = self[index]
+      cap = self.__at(index)
       if cap._equal?( ?& )
-          result << match[0]
+          result << match.__at(0)
       elsif cap._equal?( ?` )
           result << match.pre_match
       elsif cap._equal?( ?' )
           result << match.post_match
       elsif cap._equal?( ?+ )
-          result << match.captures.compact[-1].to_s
+          result << match.captures.compact.__at(-1).to_s
       elsif cap >= ?0 && cap <= ?9
-          result << match[cap - ?0 ].to_s
+          result << match.__at(cap - ?0 ).to_s
       elsif cap._equal?( ?\\ ) # escaped backslash
           result << '\\'
       else     # unknown escape
@@ -686,14 +767,19 @@ class String
     unless replacement._equal?(nil)
       out << replacement.__to_sub_replacement(match)
     end
-    out << self.__copyfrom_to(match.end(0) + 1, self.length)
+    out << self.__copyfrom_to(match.end(0) + 1, self.__size)
     out
   end
 
 
   def gsub(regex, &block)
-    # $~ and related variables will be valid in block if
+    # if block_given?,
+    #  $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
+    unless block_given?
+      # updating of $~ not implemented yet on  this path
+      return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
+    end
     start = 0
     out = self.class.new
     last_match = nil
@@ -703,20 +789,19 @@ class String
       saveTilde = block.__fetchRubyVcGlobal(0);
       begin
         block.__setRubyVcGlobal(0, match);
-        out << block.call(match[0]).to_s
+        out << block.call(match.__at(0)).to_s
       ensure
         block.__setRubyVcGlobal(0, saveTilde);
       end
       start = match.end(0)
     end
-    out << self.__copyfrom_to(start + 1, self.length)
+    out << self.__copyfrom_to(start + 1, self.__size)
     last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
     out
   end
 
-  # From Rubinius
-
   def gsub!(regex, str)
+    # From Rubinius
     nval = gsub(regex, str)
     if self == nval
       nil
@@ -726,6 +811,7 @@ class String
   end
 
   def gsub!(regex, &block)
+    # From Rubinius
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
     start = 0
@@ -735,13 +821,13 @@ class String
       saveTilde = block.__fetchRubyVcGlobal(0);
       begin
         block.__setRubyVcGlobal(0, match);
-        out << block.call(match[0]).to_s
+        out << block.call(match.__at(0)).to_s
       ensure
         block.__setRubyVcGlobal(0, saveTilde);
       end
       start = match.end(0)
     end
-    out << self.__copyfrom_to(start + 1, self.length)
+    out << self.__copyfrom_to(start + 1, self.__size)
     if self == out
       nil
     else
@@ -751,12 +837,46 @@ class String
 
   def __delete_underscore_strip
     str = self
+    idx = 1
     idx = str.__indexOfByte( ?_ , 1 )
     unless idx._equal?(0)
       str = str.delete('_')
     end
     str.strip
   end
+
+  def __delete_single_underscores_strip
+    str = self.dup
+    idx = 0
+    dest_idx = nil
+    lim = str.__size    
+    ch = str.__at(idx)
+    while idx < lim
+      nxt = str.__at(idx + 1)
+      if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
+        dest_idx = idx
+        break  
+      end
+      idx += 1
+      ch = nxt
+    end
+    while idx < lim
+      nxt = str.__at(idx + 1)
+      if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
+	# do not include ch in result
+      else
+        str[dest_idx] = ch
+        dest_idx += 1
+      end
+      idx += 1
+      ch = nxt
+    end 
+    if dest_idx._not_equal?(nil)
+      str.size=(dest_idx)
+    end
+    str.strip
+  end
+
 
   def __delete_underscore
     str = self
@@ -770,7 +890,8 @@ class String
   def hex
     # Because 0b1 is a proper hex number, rather than the binary number 1,
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
-    s = self.__delete_underscore_strip
+
+    s = self.__delete_single_underscores_strip  # for 1.8.7 
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
     Integer.__from_string( "16r#{$1}#{$3}" )
   end
@@ -782,7 +903,7 @@ class String
     self.index(item)._not_equal?(nil)
   end
 
-  primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'
+  primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'  # one-based offset/result
 
   def index(item, offset)
     zoffset = Type.coerce_to(offset, Integer, :to_int)
@@ -802,12 +923,12 @@ class String
   end
 
   def __index(item, zoffset)
-    my_size = self.size
+    my_size = self.__size
     zoffset += my_size if zoffset < 0
     return nil if zoffset < 0 || zoffset > my_size
 
     if item._isString
-      return zoffset if item.size._equal?(0)
+      return zoffset if item.__size._equal?(0)
       st_idx = self.__findStringStartingAt(item, zoffset + 1)
       return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isInteger
@@ -841,8 +962,10 @@ class String
 
   primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
 
+  primitive 'inspect', '_rubyPrintString'  
+
   def intern
-    if self.size._equal?(0)
+    if self.__size._equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
     end
     if self.__index(0, 0)._not_equal?(nil)
@@ -852,7 +975,35 @@ class String
   end
   #  to_sym is aliased to intern, see below
 
+  primitive "_paddedToWithString", "padded:to:withString:"
+
+  def justify(width, direction, padstr=" ")
+    # This started off as Rubinius, but was heavily modified since most
+    # work is done in smalltalk.
+    padstr = Type.coerce_to(padstr, String, :to_str)
+    raise ArgumentError, "zero width padding" if padstr.__size._equal?(0)
+
+    width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
+    sz = size
+    if width > sz
+      padsize = width - sz
+    else
+      return dup
+    end
+
+    _paddedToWithString(direction, width, padstr)
+    # taint if padstr.tainted?
+    self
+  end
+
   primitive 'length', 'size'
+
+  alias lines each  # added for 1.8.7  , String#each goes away in 1.9
+
+  def ljust(width, padstr = " ") # from Rubinius
+    justified = dup
+    justified.justify(width, :left, padstr)
+  end
 
   primitive 'lstrip', '_rubyLstrip'
 
@@ -877,13 +1028,47 @@ class String
   # MNI: next!
 
   def oct
-    arr = self.extract_base(8)
-    base = arr[0]
-    str = arr[1]
+    str = self.__delete_single_underscores_strip  # for 1.8.7 
+    arr = str.__extract_base(8)
+    base = arr.__at(0)
+    str = arr.__at(1)
     s = base.to_s
     s << ?r
     s << str
     Integer.__from_string(s)
+  end
+
+  def partition(pattern)  # added for 1.8.7
+    if pattern._isString
+      arg_siz = pattern.__size
+      if arg_siz._not_equal?(0)
+        st_idx = self.__findStringStartingAt(pattern, 1)
+        if st_idx._not_equal?(0)
+          z_idx = st_idx - 1
+          return [self[0, z_idx ] , self[z_idx , arg_siz] , self[z_idx + arg_siz, self.__size]]
+        end
+      end
+      return [ self.dup , '', '' ]
+    elsif pattern._isRegexp
+      md = pattern.__search(self, 0, nil) 
+      if md._not_equal?(nil)
+        idx = md.begin(0)
+        mid = md[0]
+        return [ self[0, idx], mid , self[idx + mid.__size, self.__size] ]
+      end
+      return [ self.dup , '', '' ]
+    else
+      pstr = Type.coerce_to(pattern, String, :to_str)
+      return self.partition(pstr)
+    end
+  end
+ 
+  def partition(&block)
+    # reimplement for 1.8.7, otherwise bridge meths hide the implem in Enumerable.
+    left = []
+    right = []
+    each { |o| block.call(o) ? left.push(o) : right.push(o) }
+    return [left, right]
   end
 
   primitive 'replace', '_rubyReplace:'
@@ -920,7 +1105,7 @@ class String
   end
 
   def __rindex(item, original_offset)
-    my_size = self.size
+    my_size = self.__size
     if my_size._equal?(0)
       return nil
     end
@@ -936,7 +1121,7 @@ class String
     if item._isString
       zorig = zoffset
       zoffset = my_size - 1 if zoffset >= my_size
-      if item.size._equal?(0)
+      if item.__size._equal?(0)
         if was_undef
           return my_size
         elsif zorig >= my_size
@@ -962,12 +1147,47 @@ class String
     end
   end
 
+  def rjust(width, padstr = " ") # from Rubinius
+    justified = dup
+    justified.justify(width, :right, padstr)
+  end
+
+  def rpartition(pattern)  # added for 1.8.7
+    my_siz = self.__size 
+    if pattern._isString
+      arg_siz = pattern.__size
+      if arg_siz._not_equal?(0)
+        st_idx = self.__lastSubstring(pattern, my_siz)
+        if st_idx._not_equal?(0)
+          z_idx = st_idx - 1
+          return [self[0, z_idx], self[z_idx , arg_siz], self[z_idx + arg_siz, self.__size]]
+        end
+      end
+      return [ '', '', self.dup ]
+    elsif pattern._isRegexp
+      md = pattern.__search(self, my_siz , 0) 
+      if md._not_equal?(nil)
+        idx = md.begin(0)
+        mid = md[0]
+        return [ self[0, idx], mid , self[idx + mid.__size, self.__size] ]
+      end
+      return [ '', '', self.dup ]
+    else
+      pstr = Type.coerce_to(pattern, String, :to_str)
+      return self.rpartition(pstr)
+    end
+  end
+
   primitive 'rstrip', '_rubyRstrip'
   primitive 'rstrip!', '_rubyRstripInPlace'  # in .mcz
 
   # def scan #  implemented in common/string.rb
 
   primitive 'size', 'size'
+  primitive '__size', 'size'
+
+  primitive 'size=', 'size:'  # Note size=() not in MRI
+  primitive '__size=', 'size:'  
 
   alias slice []
 
@@ -990,11 +1210,11 @@ class String
   #     string.slice!("r")      #=> "r"
   #     string                  #=> "thing"
   def slice!(start, a_len)
-    sz = self.size
+    sz = self.__size
     if start._isRegexp
       arr = self.__match_regexp(start, a_len) # arr is [ m_begin, m_len]
       return nil if arr._equal?(nil)
-      r = slice!(arr[0], arr[1])
+      r = slice!(arr.__at(0), arr.__at(1))
       # r.taint if self.tainted? or start.tainted?
       return r
     end
@@ -1006,7 +1226,7 @@ class String
     return nil if start < 0 || start > sz
     return self.class.new if start._equal?(sz)
     #  __remove_from_to will detect frozen if changes would occur
-    s = __at_length(start, len)
+    s = __at(start, len)
     stop = start + len
     stop = sz if stop > sz
     __remove_from_to(start + 1, stop) # convert to smalltalk indexing
@@ -1026,18 +1246,18 @@ class String
       len = md.end(0) - start
       slice!(start, len)
     elsif arg._isRange
-      first, len = arg.__beg_len(self.length)
+      first, len = arg.__beg_len(self.__size)
       return nil if first._equal?(nil)
       slice!(first, len)
     elsif arg._isString
       start = self.__findStringStartingAt(arg, 1)
       return nil if start._equal?(0)
-      slice!(start - 1, arg.length) # adjust coming from smalltalk
+      slice!(start - 1, arg.__size) # adjust coming from smalltalk
     else
       arg = Type.coerce_to(arg, Integer, :to_int)
       s = slice!(arg, 1)
       return nil if s._equal?(nil)
-      s[0]
+      s.__at(0)
     end
   end
 
@@ -1090,7 +1310,7 @@ class String
   #     "1,2,,3,4,,".split(',', 4)      #=> ["1", "2", "", "3,4,,"]
   #     "1,2,,3,4,,".split(',', -4)     #=> ["1", "2", "", "3", "4", "", ""]
   def split(pattern=nil, limit=Undefined)
-    return [] if size._equal?(0)
+    return [] if self.__size._equal?(0)
 
     if limit._equal?(Undefined)
       suppress_trailing_empty = true
@@ -1117,21 +1337,20 @@ class String
     result
   end
 
-  # Takes a 1-based offset, goes directly to c-primitive
-  primitive '__at_equals', 'at:equals:'
+  primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
 
   def __split_string_on(delim, limit, limited, suppress_trailing_empty)
     results = []
-    delim_length = delim.size
+    delim_length = delim.__size
 
     count = start = current = 0
     num = limited ? limit - 1 : 0
-    lim = self.size
+    lim = self.__size
 
-    first_char = delim[0]
+    first_char = delim.__at(0)
     while current < lim
-      if self[current]._equal?(first_char) and self.__at_equals(current + 1, delim)
-        results << self[start, (current - start)]
+      if self.__at(current)._equal?(first_char) and self.__at_equals(current + 1, delim)
+        results << self.__at(start, (current - start))
         count += 1
         start = current + delim_length
         current = start
@@ -1141,7 +1360,7 @@ class String
       end
     end
 
-    results << self[start, (lim-start)] unless limited and count > limit
+    results << self.__at(start, (lim-start)) unless limited and count > limit
     if suppress_trailing_empty
       while s = results.last and s.empty?
         results.pop
@@ -1163,9 +1382,9 @@ class String
   # space, then the length of the string is returned (i.e., an index past
   # the end).
   def __skip_contiguous_whitespace(index)
-    lim = self.size
+    lim = self.__size
     while(index < lim)
-      char = self[index]
+      char = self.__at(index)
       return index unless char <= 32 and __is_whitespace(char)  # \t \n etc. are less than space which is 32
       index += 1
     end
@@ -1175,15 +1394,15 @@ class String
   def __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
     results = []
 
-    eos = self.size
+    eos = self.__size
     count = 0
     start = current = __skip_contiguous_whitespace(0)
     num = limited ? limit - 1 : 0
 
     while current < eos
-      char = self[current]
+      char = self.__at(current)
       if char <= 32 and __is_whitespace(char)
-        results << self[start, (current - start)]
+        results << self.__at(start, (current - start))
         count += 1
         start = __skip_contiguous_whitespace(current)
         current = start
@@ -1193,7 +1412,7 @@ class String
       end
     end
 
-    last = self[start, (eos-start)]
+    last = self.__at(start, (eos-start))
     results << last unless last.empty? and suppress_trailing_empty
     results
   end
@@ -1205,18 +1424,19 @@ class String
     # lim will be the number of single characters in the result.  If we are
     # limited, then the last element will be the rest of the string:
     #    'hi!'.split('', 2)   # => ['h', 'i!']
-    lim = self.size
+    my_siz = self.__size
+    lim = my_siz
     lim = (limit-1) if limited and limit < lim
 
     index = 0
     while index < lim
-      result << self[index, 1]
+      result << self.__at(index, 1)
       index += 1
     end
 
-    result << self[index, (self.size - index)] if limited
+    result << self.__at(index, (my_siz - index)) if limited
     # self[0,0] returns an instance of the recievier: support for sub-classes
-    result << self[0,0] unless suppress_trailing_empty || limited
+    result << self.__at(0,0) unless suppress_trailing_empty || limited
     result
   end
 
@@ -1232,7 +1452,7 @@ class String
     last_match = nil
 
     while match = pattern.match_from(self, start)
-      break if limited && limit - ret.size <= 1
+      break if limited && limit - ret.__size <= 1
 
       collapsed = match.collapsing?
 
@@ -1255,7 +1475,7 @@ class String
     if ! last_match._equal?(nil)
       pm = last_match.post_match
       # self[0,0] returns an instance of the recievier: support for sub-classes
-      ret << (pm._equal?(nil) ? self[0,0] : pm)
+      ret << (pm._equal?(nil) ? self.__at(0,0) : pm)
     elsif ret.empty?
       ret << self.dup
     end
@@ -1270,7 +1490,7 @@ class String
     # If we are matching the empty string, and we have matches, then
     # we need to tack on the trailing empty string match.
     # self[0,0] returns an instance of the recievier: support for sub-classes
-    ret << self[0,0] if ret && limit && limit < 0 && last_match && last_match.collapsing?
+    ret << self.__at(0,0) if ret && limit && limit < 0 && last_match && last_match.collapsing?
     ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
     ret
   end
@@ -1280,6 +1500,24 @@ class String
 
   primitive 'squeeze!*', 'rubySqueezeSelf:'
   primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
+
+  def start_with?(*args)  # added for 1.8.7
+    n = 0 
+    lim = args.__size
+    while n < lim
+      str = args[n]
+      begin
+        str = Type.coerce_to(str, String, :to_str)
+        if self.__at_equals(1 , str) 
+          return true
+        end
+      rescue
+        # ignore elements of args not coercable
+      end
+      n += 1
+    end
+    false
+  end
 
   primitive '__strip', '_trimReturningSelf:'
 
@@ -1321,7 +1559,7 @@ class String
     #   blocks's home method and caller's home method are the same
     regex = self.__get_pattern(pattern, true)
     if (match = regex.__match_vcglobals(self, 0x30))
-       res = __replace_match_with(match, block.call(match[0]).to_s)
+       res = __replace_match_with(match, block.call(match.__at(0)).to_s)
     else
        res = self.dup
     end
@@ -1346,7 +1584,7 @@ class String
 
     regex = self.__get_pattern(pattern, true)
     if match = regex.__match_vcglobals(self, 0x30)
-      replacement = block.call(match[0])
+      replacement = block.call(match.__at(0))
       replace(__replace_match_with(match, replacement))
       # self.taint if replacement.tainted?
       self
@@ -1405,13 +1643,13 @@ class String
   def sum(power=16)
     tot = 0
     n = 0
-    lim = self.size
+    lim = self.__size
     unless power._isFixnum
       power = power.to_int
     end
     mod = (1 << power) - 1
     while n < lim
-      tot = tot + self[n]
+      tot = tot + self.__at(n)
       tot = tot & mod
       n = n + 1
     end
@@ -1440,11 +1678,11 @@ class String
     base = Type.coerce_to(base, Integer, :to_int)
     if base._equal?(10)
       str = self
-      if self[0]._equal?( ?0 ) && self[1]._equal?( ?d )
-        if self[2]._equal?( ?- )
+      if self.__at(0)._equal?( ?0 ) && self.__at(1)._equal?( ?d )
+        if self.__at(2)._equal?( ?- )
           return 0 # sign must come before base specifier
         end
-        str = self[2, self.size - 2]
+        str = self.__at(2, self.__size - 2)
       end
       radix_str = '10r'   # needed for ruby to_i semantics of 'abc'.to_i
       radix_str << str.__delete_underscore_strip
@@ -1461,12 +1699,12 @@ class String
       end
       str = self
       if exp_prefix._not_equal?(nil)
-        prefix = self[0,2]
+        prefix = self.__at(0,2)
         if prefix == exp_prefix
-          if self[2]._equal?( ?- )
+          if self.__at(2)._equal?( ?- )
             return 0 # sign must come before base specifier
           end
-          str = self[2, self.size - 2]
+          str = self.__at(2, self.__size - 2)
         end
       end
       str.to_inum(base, false)
@@ -1476,22 +1714,21 @@ class String
   # Consider self as an integer and return value given base.
   # From the rubinius API.
   def to_inum(base, check=false)
-    if check && self['__']._not_equal?(nil)
+    if check && self.__at('__')._not_equal?(nil)
       raise ArgumentError, "__ in string, in to_inum"
     end
+    str = self.__delete_underscore_strip
     if base._equal?(0)
-      arr = self.extract_base # includes  __delete_underscore_strip
-      base = arr[0]
-      str = arr[1]
-    else
-      str = self.__delete_underscore_strip
+      arr = str.__extract_base(10) 
+      base = arr.__at(0)
+      str = arr.__at(1)
     end
     if check
       str = str.downcase
       s = str
-      first_ch = s[0]
+      first_ch = s.__at(0)
       if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
-        s = s[1, s.length-1]
+        s = s.__at(1, s.__size - 1)
       end
       bad = false
       if base._equal?(10)
@@ -1513,26 +1750,6 @@ class String
     s << ?r
     s << str
     Integer.__from_string(s)
-  end
-
-  # Return an array of two elements: [an_int, a_string], where an_int is
-  # base, unless self contains a base specifier (e.g., "0x", "0b", etc.),
-  # in which case, an_int is the appropriate base.  a_string is self with
-  # any base specifier removed.
-  #
-  # "0x10" => [16, 10]
-  # "-0b1010".extract_base     => [2, "-1010"]
-  # "-0b1010".extract_base(16) => [2, "-1010"]
-  # "-1010".extract_base(16)   => [16, "-1010"]
-  MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 }
-  MAGLEV_EXTRACT_BASE_TABLE.freeze
-
-  def extract_base(base=10)
-    s = self.__delete_underscore_strip
-    s =~ /^([+-]?)(0[bdox]?)?(.*)/i
-    dtwo = $2
-    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo._equal?(nil)
-    [ base, "#{$1}#{$3}" ]
   end
 
   def to_a
@@ -1624,14 +1841,9 @@ class String
 
   # MNI: upto
 
-  # ====== Object
-  primitive 'inspect', '_rubyPrintString'
-
   # dup, clone  inherited from Object
 
-  # ====== Comparable:
-  # RxINC: This is a cut-n-paste to get things working for mspec.
-  # Need to either overwrite or allow a mixin.
+  # ====== overrides of methods from Comparable:
 
   def >(other)
     o = (self <=> other)
@@ -1669,41 +1881,4 @@ class String
     (min <= self) && (self <= max)
   end
 
-  ###### Rubinius Code Here
-
-  def rjust(width, padstr = " ")
-    justified = dup
-    justified.justify(width, :right, padstr)
-  end
-
-  def ljust(width, padstr = " ")
-    justified = dup
-    justified.justify(width, :left, padstr)
-  end
-
-  def center(width, padstr = " ")
-    centered = dup
-    centered.justify(width, :center, padstr)
-  end
-
-  primitive "_paddedToWithString", "padded:to:withString:"
-
-  # This started off as Rubinius, but was heavily modified since most
-  # work is done in smalltalk.
-  def justify(width, direction, padstr=" ")
-    padstr = Type.coerce_to(padstr, String, :to_str)
-    raise ArgumentError, "zero width padding" if padstr.size._equal?(0)
-
-    width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
-    sz = size
-    if width > sz
-      padsize = width - sz
-    else
-      return dup
-    end
-
-    _paddedToWithString(direction, width, padstr)
-    # taint if padstr.tainted?
-    self
-  end
 end
