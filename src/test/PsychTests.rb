@@ -141,4 +141,25 @@ EOYAML
   end
 end
 
+class TestAliasAndAnchor < Test::Unit::TestCase
+  def test_mri_compatibility
+    yaml = <<EOYAML
+---
+- &id001 !ruby/object {}
 
+- *id001
+- *id001
+EOYAML
+    result = YAML.load yaml
+    result.each {|el| assert_same(result[0], el) }
+  end
+
+  def test_anchor_alias_round_trip
+    o = Object.new
+    original = [o,o,o]
+
+    yaml = YAML.dump original
+    result = YAML.load yaml
+    result.each {|el| assert_same(result[0], el) }
+  end
+end
