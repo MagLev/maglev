@@ -1,6 +1,9 @@
 #!/bin/bash
 #
 # Runs the equivalent of "maglev irb"
+#
+# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
+#
 ### this file is deprecated, and will be removed once it's replacment has been fully tested
 
 COMMAND="`basename $0`"

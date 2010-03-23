@@ -1,5 +1,11 @@
 = MagLev Change Log
 
+== Unreleased Changes 
+
+* Merged latest changes psych mastwr on github
+* Fixed bug in psych
+* Fixed writing of alias and anchor in YAML
+
 == Changes for 23101  2010-03-22
 
 * Fix YAML issue with "maglev-gem install" for Sinatra 0.9.6

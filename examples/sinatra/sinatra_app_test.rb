@@ -25,7 +25,7 @@ class HelloWorldTest < MiniTest::Unit::TestCase
   def test_it_says_hello_world
     get '/'
     assert last_response.ok?, "response not ok"
-    assert last_response.body == 'Sinatra 0.9.4 says Hello', "response content wrong: #{last_response.body}"
+    assert last_response.body =~ /Sinatra \d.\d.\d says Hello/, "response content wrong: #{last_response.body}"
   end
 end
 

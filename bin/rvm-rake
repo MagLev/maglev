@@ -9,6 +9,8 @@
 # "rvm-rake maglev:start" or "rvm-rake status"
 #
 # It's an imperfect solution, but a usable hack for now.
+#
+# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
 
 COMMAND="`basename $0`"
 

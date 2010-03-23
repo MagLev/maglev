@@ -3,6 +3,27 @@ OR USING THIS SOFTWARE. BY DOWNLOADING OR USING THIS SOFTWARE YOU ARE
 AGREEING TO BE BOUND BY THE TERMS OF THESE LICENSES. IF YOU DO NOT AGREE
 TO THE TERMS OF THESE LICENSES, DO NOT DOWNLOAD OR USE THE SOFTWARE.
 
+In addition to proprietary code owned by GemStone, GemStone's software
+products (the "GemStone Products") include computer code licensed
+under various open source licenses ("open source software" or "OSS").
+The text of each of those licenses is available in the files in this
+directory listed below.
+
+Nothing in GemStone's End User License Agreement or any other document
+to which GemStone is a party or by which it is bound overrides the terms
+of the relevant open source licenses with respect to the OSS covered by
+that license or requires either party to take any action that conflicts
+with that OSS license.
+
+However, if an OSS license permits a licensee to modify any of the
+GemStone Products and a licensee elects to exercise that right, that
+modification will terminate GemStone's warranty, and any maintenance
+and support obligations, for that GemStone Product.
+
+Although these licenses are included in the appropriate files throughout
+the distribution, we've copied them to this centralized location for
+easier reference.
+
 Ruby source code written by GemStone Systems, Inc. is licensed under the
 MIT license:
    MagLev-MIT-License.txt

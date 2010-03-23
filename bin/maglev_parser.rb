@@ -2,6 +2,8 @@
 # A ParseTree parser class for parsing MagLev files.  This file is used by
 # the parsetree_parser.rb script to launch the MagLev parse service.
 #
+# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
+
 require 'rubygems'
 gem 'ParseTree', '3.0.3'
 require 'parse_tree'
