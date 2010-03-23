@@ -1,4 +1,7 @@
 # Check that ParseTree Gem version 3.0.3 is installed
+#
+# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
+
 begin
   require 'rubygems'
   rescue LoadError => exc
