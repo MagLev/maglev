@@ -191,6 +191,16 @@ end
 raise "append_features not called" unless $append_features_called
 raise "included not called" unless $included_called
 
+
+# The block passed to new was not being passed to the initialize method
+class MRSpec < Module
+  def initialize(*args, &block)
+    raise "No block passed to #{self}.initialize" unless block_given?
+  end
+end
+
+x = MRSpec.new(123) { "a block" }
+
 ################### Report and clean up #####################
 report
 Maglev.abort_transaction if defined? RUBY_ENGINE
