@@ -20,5 +20,5 @@ end
 
 desc "run the test case with mri"
 task :mri do
-  sh %{ /opt/ruby/ruby/bin/spec bowling_spec.rb }
+  sh %{ /opt/ruby/ruby/bin/spec -rubygems bowling_spec.rb }
 end
