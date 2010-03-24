@@ -52,7 +52,7 @@
 
 * in FFI implement callback , implement C float args .
 * parser warnings  now controlled by -W, -w, -VERBOSE flags ,
-  but are always printed of a SyntaxError occurs.
+  but are always printed if a SyntaxError occurs.
 * Merged latest updates of psych into MagLev
 * Add Symbol#to_proc
 
