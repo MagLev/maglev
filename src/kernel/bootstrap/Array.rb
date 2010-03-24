@@ -89,7 +89,7 @@ class Array
       while i < lim
         el = self.__at(i)
         if level > 0
-          if el._isArray 
+          if el._isArray
             el.__flatten_onto(output, level - 1)
             recursed = true
           elsif el.respond_to?(:to_ary)
@@ -269,6 +269,7 @@ class Array
       a = __alloc(0, nil)
     end
     a.initialize(arg)
+    a
   end
 
   def self.__coerce_one_arg(arg)
@@ -310,6 +311,7 @@ class Array
     # ignores the block
     a = __alloc(0, nil)
     a.initialize(&block)
+    a
   end
 
   def initialize(&block)
@@ -324,18 +326,18 @@ class Array
     str = ''
     n = 0
     siz = self.__size
-    while n < siz 
+    while n < siz
       str << self.__at(n).to_s
       n += 1
     end
     str
-  end 
+  end
 
   def __joinStringsAsSymbol
     # called from generated code
     # use intern to reject empty symbol and ?0 characters
-    self.__joinStrings.intern  
-  end 
+    self.__joinStrings.intern
+  end
 
   def __joinStringsWithRegexpOptions(opts_integer)
     # called from generated code
@@ -350,7 +352,7 @@ class Array
     res
   end
 
-  # Set intersection. 
+  # Set intersection.
   # Return new array containing elements common to two arrays.
   def &(other)
     other = Type.coerce_to(other, Array, :to_ary)
@@ -358,7 +360,7 @@ class Array
     other_siz  = other.__size
     dflt = Object.new
     htsiz = (my_siz + other_siz).__divide(4)
-    htsiz = 5 if htsiz < 5  
+    htsiz = 5 if htsiz < 5
     dict = Hash.__new(htsiz)
     n = 0
     while n < other_siz
@@ -371,7 +373,7 @@ class Array
     res_idx = 0
     while n < my_siz
       elem = self.__at(n)
-      if dict.__delete_ifpresent(elem) 
+      if dict.__delete_ifpresent(elem)
         res[res_idx] = elem
         res_idx += 1
       end
@@ -653,7 +655,7 @@ class Array
   # def clone ; end # inherited from Object
 
   def collect!(&block)
-    unless block_given? 
+    unless block_given?
       return ArrayEnumerator.new(self, :collect! ) # for 1.8.7
     end
     i = 0
@@ -663,7 +665,7 @@ class Array
       i += 1
     }
     if i < sz
-      return enum_res 
+      return enum_res
     end
     self
   end
@@ -717,11 +719,11 @@ class Array
     self
   end
 
-  def cycle(count=Fixnum__MAX, &block) 
+  def cycle(count=Fixnum__MAX, &block)
     if count._equal?(nil)
       count = Fixnum__MAX
     end
-    unless block_given? 
+    unless block_given?
       return ArrayCycleEnumerator.new(self, count) # for 1.8.7
     end
     lim = Type.coerce_to(count, Fixnum , :to_int)
@@ -732,8 +734,8 @@ class Array
     sz = self.__size
     while cnt < lim
       n = 0
-      enum_res = self.each { |elem| 
-        block.call(elem) 
+      enum_res = self.each { |elem|
+        block.call(elem)
         n += 1
       }
       if n < sz
@@ -830,14 +832,14 @@ class Array
     # return an Array containing self[count .. self.size -1]
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
-      raise ArgumentError, 'arg to drop must be >= 0' 
+      raise ArgumentError, 'arg to drop must be >= 0'
     end
     sz = self.__size
     if cnt >= sz
       return []
     end
     return self.__at(cnt, sz) # primitive truncates sz arg
-  end 
+  end
 
   def drop_while(&block)
     unless block_given?
@@ -847,14 +849,14 @@ class Array
     broke = false
     n = 0
     all_true = true
-    enum_res = self.each { |elem| 
+    enum_res = self.each { |elem|
       broke = true
       blk_res =  block.call(elem)
       broke = false
       unless blk_res
         all_true = false
-        break 
-      end 
+        break
+      end
       n += 1
     }
     if broke
@@ -1012,7 +1014,7 @@ class Array
     start += 1         # start, end both 1-based now
     if endIdx > sz
       if length > 0
-        __fill_resize(start, endIdx, obj) # resize and fill 
+        __fill_resize(start, endIdx, obj) # resize and fill
       else
         self.__size=(endIdx)  # grow the receiver
       end
@@ -1136,7 +1138,7 @@ class Array
       return self
     end
     ary = self.class.new
-    if lev < 0 
+    if lev < 0
       lev = Fixnum__MAX
     end
     __flatten_onto( ary , lev )
@@ -1146,10 +1148,10 @@ class Array
   def flatten!(level = -1)  # level arg added for 1.8.7
     lev = Type.coerce_to(level, Fixnum, :to_int)
     if lev._equal?(0)
-      return nil  
+      return nil
     end
     ary = []
-    if lev < 0 
+    if lev < 0
       lev = Fixnum__MAX
     end
     recursed = __flatten_onto(ary, lev)
@@ -1166,9 +1168,9 @@ class Array
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
     unless added
-      return 0 
+      return 0
     end
-    hval = 4459 
+    hval = 4459
     begin
       mysize = self.__size
       interval = (mysize - 1).__divide(4)
@@ -1188,7 +1190,7 @@ class Array
     ensure
       ts.remove(self)
     end
-    hval 
+    hval
   end
 
   # Note: The Pick Axe book has this method documented under both Array and
@@ -1321,7 +1323,7 @@ class Array
   primitive 'pack', 'rubyPack:'
 
   def self.__pack_coerce(obj, sym)
-    # sent from C code in capiprim.c 
+    # sent from C code in capiprim.c
     begin
       r = obj.__send__(sym)
     rescue Exception
@@ -1380,7 +1382,7 @@ class Array
 
   def replace(arg)
     arg = Type.coerce_to(arg, Array, :to_ary)
-    self.__replace(arg) 
+    self.__replace(arg)
   end
 
   primitive 'reverse', 'reverse'
@@ -1461,11 +1463,11 @@ class Array
     if sz._equal?(0) || cnt._equal?(0)
       return []
     end
-    if sz < cnt 
+    if sz < cnt
       res = self.dup
       self.__size=(0)
       return res
-    end 
+    end
     res = self.__at(0, cnt)
     self.__remove_from_to_(1, cnt)  # one-based args
     return res
@@ -1490,8 +1492,8 @@ class Array
   end
 
   def slice!(start, length)
-    start = Type.coerce_to(start, Fixnum, :to_int)  
-    length = Type.coerce_to(length, Fixnum, :to_int)  
+    start = Type.coerce_to(start, Fixnum, :to_int)
+    length = Type.coerce_to(length, Fixnum, :to_int)
     my_siz = self.__size
     if my_siz._equal?(0)
       return self.class.new
@@ -1573,10 +1575,10 @@ class Array
     # return an Array containing self[0 .. count-1 ]
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
-      raise ArgumentError, 'arg to take must be >= 0' 
+      raise ArgumentError, 'arg to take must be >= 0'
     end
-    return self.__at(0, cnt) 
-  end 
+    return self.__at(0, cnt)
+  end
 
   def take_while(&block)
     unless block_given?
@@ -1585,13 +1587,13 @@ class Array
     sz = self.__size
     broke = false
     n = 0
-    enum_res = self.each { |elem| 
+    enum_res = self.each { |elem|
       broke = true
       blk_res = block.call(elem)
       broke = false
       unless blk_res
-        break 
-      end 
+        break
+      end
       n += 1
     }
     if broke
@@ -1630,11 +1632,11 @@ class Array
       if n._equal?(0)
         el_size = elem_size
       elsif elem_size._not_equal?(el_size)
-	raise IndexError, 'All contained arrays must be same length'
+  raise IndexError, 'All contained arrays must be same length'
       end
       j = 0
       while j < el_size
-        res_elem =  result[j] 
+        res_elem =  result[j]
         if res_elem._equal?(nil)
           res_elem = []
           result[j] = res_elem
@@ -1682,7 +1684,7 @@ class Array
   end
 
   def values_at(*selectors)
-    # selectors is an Array 
+    # selectors is an Array
     lim = selectors.__size
     n = 0
     res = []

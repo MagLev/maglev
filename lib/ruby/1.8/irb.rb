@@ -77,7 +77,8 @@ module IRB
   end
 
   def IRB.irb_at_exit
-    @CONF[:AT_EXIT].each{|hook| hook.call}
+    hooks = @CONF[:AT_EXIT]
+    hooks.each{|hook| hook.call} if hooks
   end
 
   def IRB.irb_exit(irb, ret)

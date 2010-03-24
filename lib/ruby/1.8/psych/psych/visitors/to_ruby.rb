@@ -19,7 +19,7 @@ module Psych
         short_name = target.tag.sub(/^!/, '').split('/', 2).last
         if Psych.domain_types.key? short_name
           url, block = Psych.domain_types[short_name]
-          return block.call "http://#{url}:#{short_name}", result
+          return block.call "#{url}:#{short_name}", result
         end
 
         result
@@ -172,7 +172,9 @@ module Psych
 
         when /^!ruby\/object:?(.*)?$/
           name = $1 || 'Object'
-          revive((resolve_class(name) || Object), o)
+          obj = revive((resolve_class(name) || Object), o)
+          @st[o.anchor] = obj if o.anchor
+          obj
         else
           hash = {}
           @st[o.anchor] = hash if o.anchor

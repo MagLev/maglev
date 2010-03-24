@@ -77,10 +77,89 @@ EOS
   end
 end
 
+
+# Support class for test_anchor_alias_bug
+class Blarg
+  attr_reader :foo
+  def initialize v
+    @foo = v
+  end
+  def ==(other)
+    other.class == self.class and @foo == other.foo
+  end
+end
+
+# Support class for test_anchor_alias_bug
+class Quux
+  attr_accessor :one, :two, :three
+  def ==(other)
+    other.class == self.class and
+      other.one == @one and
+      other.two == @two and
+      other.three ==  @three
+  end
+end
+
 class GemStonePsychPatchesTest < Test::Unit::TestCase
   # Patched to_yaml.rb to recognize !ruby/sym
   def test_symbol_patch
     assert_equal(:foo,  YAML.load("!ruby/sym foo"))
     assert_equal(:quux, YAML.load("!ruby/symbol quux"))
+  end
+
+  # There was a bug in rubygems trying to install sinatra 0.9.6.  The
+  # problem was that objects with type !ruby/object were not getting saved
+  # as an anchor.  This tests that bugfix.
+  def test_anchor_alias_bug
+    q1 = Quux.new
+    q1.one   = Blarg.new 1
+    q1.two   = Blarg.new 2
+    # @one and @three are identical, so the YAML should have @one be an
+    # anchor and @three should be an alias
+    q1.three = q1.one
+
+    yaml = YAML.dump q1
+
+    # puts yaml
+    q2 = YAML.load yaml
+
+    # This yaml was generated from MRI, so this test ensures we can read
+    # the MRI dump of the above classes.
+    yaml =<<EOYAML
+--- !ruby/object:Quux
+one: &id001 !ruby/object:Blarg
+  foo: 1
+three: *id001
+two: !ruby/object:Blarg
+  foo: 2
+EOYAML
+    q3= YAML.load(yaml)
+
+    assert_equal(q1, q2)
+    assert_equal(q1, q3)
+    assert_same(q3.one, q3.three)
+  end
+end
+
+class TestAliasAndAnchor < Test::Unit::TestCase
+  def test_mri_compatibility
+    yaml = <<EOYAML
+---
+- &id001 !ruby/object {}
+
+- *id001
+- *id001
+EOYAML
+    result = YAML.load yaml
+    result.each {|el| assert_same(result[0], el) }
+  end
+
+  def test_anchor_alias_round_trip
+    o = Object.new
+    original = [o,o,o]
+
+    yaml = YAML.dump original
+    result = YAML.load yaml
+    result.each {|el| assert_same(result[0], el) }
   end
 end

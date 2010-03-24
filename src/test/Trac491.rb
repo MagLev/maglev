@@ -8,3 +8,6 @@ raise "Fail" unless contents == ""
 # Original bug:
 file = File.read(file_name)
 x = YAML.load(file)
+
+raise "Fail 2" unless x == false
+

@@ -4,6 +4,8 @@
 #  for http requests and sends back the s-expressions for the given
 #  file/code.
 #
+# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
+#
 #  Sample URLs:
 #
 #  E.g., either of these URLs will parse $PWD/r.rb:

@@ -54,6 +54,7 @@ module Psych
         end
 
         map = append Nodes::Mapping.new(nil, tag, false)
+        register(o, map)
 
         @stack.push map
         dump_ivars(o, map)
@@ -107,7 +108,7 @@ module Psych
         if o.utc?
           formatted += ".%06dZ" % [o.usec]
         else
-          formatted += ".%06d %d:00" % [o.usec, o.gmt_offset / 3600]
+          formatted += ".%06d %+.2d:00" % [o.usec, o.gmt_offset / 3600]
         end
 
         append Nodes::Scalar.new formatted

@@ -101,6 +101,7 @@ module Psych
   #   Psych.load("--- a")           # => 'a'
   #   Psych.load("---\n - a\n - b") # => ['a', 'b']
   def self.load yaml
+    return false if yaml.nil? or yaml.empty?
     parse(yaml).to_ruby
   end
 
@@ -175,7 +176,15 @@ module Psych
   # :stopdoc:
   @domain_types = {}
   def self.add_domain_type domain, type_tag, &block
-    @domain_types[type_tag] = [domain, block]
+    @domain_types[type_tag] = ["http://#{domain}", block]
+  end
+
+  def self.add_builtin_type type_tag, &block
+    @domain_types[type_tag] = ['yaml.org', block]
+  end
+
+  def self.remove_type type_tag
+    @domain_types.delete type_tag
   end
 
   @load_tags = {}
@@ -191,9 +200,5 @@ module Psych
     attr_accessor :domain_types
   end
 
-  # Hack to move on rails3.  replace when psych gets it
-  def self.add_builtin_type(*args)
-    puts "-- STUB: #{self}.add_builtin_type(#{args.inspect})"
-  end
   # :startdoc:
 end
