@@ -1209,4 +1209,57 @@ test(sorted, %w{ ant cat gnu bass fish puma aardvark }, 'multilevel sort')
 # Passes if no exception thrown
 test(Array.new(0,0), [], "No exception with Array.new(0,0)")
 
+
+# The one arg version of Array.new was returning a.initialize, rather than a.
+# The zero arg version taking a block was also broken.
+#
+# Test each of the ways of calling new with a subclass whose initialize
+# method returns nil.  Ensure we get the object back from Foo.new rather
+# than nil.
+#
+# In the real code, the subclass initializer looked like:
+#   def initialize
+#      ...
+#      flatten!
+#   end
+# And flatten! returns nil.
+
+class Sub0 < Array
+  def initialize
+    nil
+  end
+end
+
+class Sub1 < Array
+  def initialize(foo)
+    nil
+  end
+end
+
+class Sub2 < Array
+  def initialize(x, y)
+    nil
+  end
+end
+
+x = Sub0.new
+test(x.nil?, false, "Sub0 ctor nil test")
+x = Sub0.new { 10 }
+test(x.nil?, false, "Sub0.new with block ctor nil test")
+
+
+x = Sub1.new(0)
+test(x.nil?, false, "Sub1.new(0) ctor nil test")
+x = Sub1.new(23) { 10 }
+test(x.nil?, false, "Sub1.new with block ctor nil test")
+
+x = Sub1.new([1,2,3])
+test(x.nil?, false, "Sub1.new([1,2,3]) ctor nil test")
+x = Sub1.new([1,2,3]) { 20 }
+test(x.nil?, false, "Sub1.new([1,2,3]) with block ctor nil test")
+
+x = Sub2.new(0, 20)
+test(x.nil?, false, "Sub2.new(0, 20) ctor nil test")
+# No block version for Sub2
+
 report

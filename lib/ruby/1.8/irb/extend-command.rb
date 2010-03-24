@@ -137,34 +137,34 @@ module IRB
       else
         eval %[
           def #{cmd_name}(*opts, &b)
-           ExtendCommand::#{cmd_class}.execute(irb_context, *opts, &b)
+            ExtendCommand::#{cmd_class}.execute(irb_context, *opts, &b)
           end
         ]
-     end
+      end
 
-     for ali, flag in aliases
-       @ALIASES.push [ali, cmd_name, flag]
-     end
-   end
-
-# override = {NO_OVERRIDE, OVERRIDE_PRIVATE_ONLY, OVERRIDE_ALL}
-def install_alias_method(to, from, override = NO_OVERRIDE)
-  to = to.id2name unless to.kind_of?(String)
-  from = from.id2name unless from.kind_of?(String)
-
-  if override == OVERRIDE_ALL or
-      (override == OVERRIDE_PRIVATE_ONLY) && !respond_to?(to) or
-      (override == NO_OVERRIDE) &&  !respond_to?(to, true)
-    target = self
-    (class<<self;self;end).instance_eval{
-    if target.respond_to?(to, true) &&
-        !target.respond_to?(EXCB.irb_original_method_name(to), true)
-      alias_method(EXCB.irb_original_method_name(to), to)
+      for ali, flag in aliases
+        @ALIASES.push [ali, cmd_name, flag]
+      end
     end
-    alias_method to, from
-  }
+
+    # override = {NO_OVERRIDE, OVERRIDE_PRIVATE_ONLY, OVERRIDE_ALL}
+    def install_alias_method(to, from, override = NO_OVERRIDE)
+      to = to.id2name unless to.kind_of?(String)
+      from = from.id2name unless from.kind_of?(String)
+
+      if override == OVERRIDE_ALL or
+          (override == OVERRIDE_PRIVATE_ONLY) && !respond_to?(to) or
+          (override == NO_OVERRIDE) &&  !respond_to?(to, true)
+        target = self
+        (class<<self;self;end).instance_eval {
+          if target.respond_to?(to, true) &&
+               !target.respond_to?(EXCB.irb_original_method_name(to), true)
+            alias_method(EXCB.irb_original_method_name(to), to)
+          end
+          alias_method to, from
+        }
       else
-  print "irb: warn: can't alias #{to} from #{from}.\n"
+        print "irb: warn: can't alias #{to} from #{from}.\n"
       end
     end
 
@@ -174,10 +174,10 @@ def install_alias_method(to, from, override = NO_OVERRIDE)
 
     def self.extend_object(obj)
       unless (class<<obj;ancestors;end).include?(EXCB)
-  super
-  for ali, com, flg in @ALIASES
-    obj.install_alias_method(ali, com, flg)
-  end
+        super
+        for ali, com, flg in @ALIASES
+          obj.install_alias_method(ali, com, flg)
+        end
       end
     end
 
@@ -204,15 +204,15 @@ def install_alias_method(to, from, override = NO_OVERRIDE)
 
     def self.def_extend_command(cmd_name, load_file, *aliases)
       Context.module_eval %[
-                            def #{cmd_name}(*opts, &b)
-                              Context.module_eval { remove_method(:#{cmd_name}) }
-                              require "#{load_file}"
-                              send :#{cmd_name}, *opts, &b
-                            end
-                            ]
-                            for ali in aliases
-                              alias_method ali, cmd_name
-                            end
+        def #{cmd_name}(*opts, &b)
+          Context.module_eval { remove_method(:#{cmd_name}) }
+          require "#{load_file}"
+          send :#{cmd_name}, *opts, &b
+        end
+      ]
+      for ali in aliases
+        alias_method ali, cmd_name
+      end
     end
     CE.install_extend_commands
   end
@@ -226,9 +226,9 @@ def install_alias_method(to, from, override = NO_OVERRIDE)
       module_eval %[
         alias_method alias_name, base_method
         def #{base_method}(*opts)
-    send :#{extend_method}, *opts
-    send :#{alias_name}, *opts
-  end
+          send :#{extend_method}, *opts
+          send :#{alias_name}, *opts
+        end
       ]
     end
 
@@ -240,9 +240,9 @@ def install_alias_method(to, from, override = NO_OVERRIDE)
       module_eval %[
         alias_method alias_name, base_method
         def #{base_method}(*opts)
-    send :#{alias_name}, *opts
-    send :#{extend_method}, *opts
-  end
+          send :#{alias_name}, *opts
+          send :#{extend_method}, *opts
+        end
       ]
     end
 
@@ -254,10 +254,9 @@ def install_alias_method(to, from, override = NO_OVERRIDE)
       return base_name if same_methods.empty?
       no = same_methods.size
       while !same_methods.include?(alias_name = base_name + no)
-  no += 1
+        no += 1
       end
       alias_name
     end
   end
 end
-

@@ -101,6 +101,7 @@ module Psych
   #   Psych.load("--- a")           # => 'a'
   #   Psych.load("---\n - a\n - b") # => ['a', 'b']
   def self.load yaml
+    return false if yaml.nil? or yaml.empty?
     parse(yaml).to_ruby
   end
 
