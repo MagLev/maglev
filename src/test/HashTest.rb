@@ -206,7 +206,7 @@ class HashTest
         hash1 = Hash['a', 'abc', 'b', 'def']
         hash2 = Hash['y', 'uvw', 'z', 'xyz']
         hash3 = hash1.merge(hash2)
-        ax = hash3 == hash1 
+        ax = hash3 == hash1
         bx = hash3 == hash2
         test(ax || bx, false, 'merge1')
     end
@@ -215,7 +215,7 @@ class HashTest
         hash1 = Hash['a', 'abc', 'b', 'def', 'c', 'ghi']
         hash2 = Hash['c', 'jkl', 'z', 'xyz']
         hash3 = hash1.merge(hash2)
-        ax = hash3 == hash1 
+        ax = hash3 == hash1
         bx = hash3 == hash2
         test(ax || bx, false, 'merge2')
     end
@@ -236,13 +236,13 @@ class HashTest
         h2[i] = (2*i).to_s
       }
       (20..29).each {|i| h2[i] = i.to_s }
-      h3 = h1.merge(h2) 
+      h3 = h1.merge(h2)
 
-      (0..9).each {|i| 
+      (0..9).each {|i|
          v = h3.delete( i )
          unless v == i.to_s ; raise 'error'; end
        }
-      (10..19).each {|i| 
+      (10..19).each {|i|
          v = h3.delete( i )
          unless v == (2*i).to_s ; raise 'error'; end
        }
@@ -369,8 +369,8 @@ class BHash < Hash
     n = 0
     h[nil] = :nilValue
     while n < tsize
-      h[n] = n * 10 
-      h[n.to_s] = 0 - n 
+      h[n] = n * 10
+      h[n.to_s] = 0 - n
       n += 1
     end
     # puts "done building large Hash"
@@ -400,14 +400,14 @@ class BHash < Hash
     nil_count = 1
     # puts "begin large IdentityHash"
     tsize = test_size
-    h = IdentityHash.new  
+    h = IdentityHash.new
     n = 0
     strings = []
     vals = []
     if allows_nil ; h[nil] = :nilValue ; end
     while n < tsize
       h[n] = n * 10
-      str = n.to_s 
+      str = n.to_s
       strings << str
       h[str] =  n
       vals << n
@@ -444,7 +444,7 @@ class BHash < Hash
       unless (y = h.delete(strings[vidx]))._equal?( vx = vals[vidx]); raise 'err';end
       unless (y = h.delete(n))._equal?( n * 10 ) ; raise 'err';end
       vidx -= 2
-      n += 1 
+      n += 1
     end
     vidx = vals.size - 2
     while vidx >= 0
@@ -467,8 +467,26 @@ puts "starting large Hashes "
   tsize = 50
   BHash.testLarge(tsize) # test of rebuildTable
 
-  BHash.testLargeIdentityHash(tsize) 
+  BHash.testLargeIdentityHash(tsize)
 }
 puts "done large Hashes"
+
+# A bug when doing a merge of a certain size forgetting to copy the default
+# value over to the new hash.
+#
+# From Cucumber lib/cucumber/formatter/ansicolor.rb
+orig = Hash.new do |h,k|
+  if k.to_s =~ /(.*)_param/
+    h[$1] + ',bold'
+  end
+end.merge({'undefined' => 'yellow',
+           'pending'   => 'yellow',
+           'failed'    => 'red',
+           'passed'    => 'green',
+           'outline'   => 'cyan',
+           'skipped'   => 'cyan',
+           'comment'   => 'grey',
+           'tag'       => 'cyan'})
+test(orig['pending_param'], 'yellow,bold', "merge bug")
 
 report
