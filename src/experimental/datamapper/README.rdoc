@@ -7,7 +7,28 @@
     Successfully installed addressable-2.1.1
     Successfully installed dm-core-0.10.2
 
+Install other gems
+    $ maglev-gem install data_objects
+     
 == Current Issues
 
 Trac 682:  def format()...
 
+There is a clash where @format is already an instvar name from the
+smalltalk side.  The work-around is to patch
+lib/maglev/gems/1.8.7/gems/dm-core-0.10.2/lib/dm-core/type.rb with this
+code:
+
+      # Load Property options
+      PROPERTY_OPTIONS.each do |property_option|
+        inst_var_name = (property_option == :format) ? "dm_format" : property_option
+        self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          def #{property_option}(*args)                                  # def unique(*args)
+            if args.any?                                                 #   if args.any?
+              @#{inst_var_name} = args.first                           #     @unique = args.first
+            else                                                         #   else
+              defined?(@#{inst_var_name}) ? @#{inst_var_name} : nil  #     defined?(@unique) ? @unique : nil
+            end                                                          #   end
+          end                                                            # end
+        RUBY
+      end
