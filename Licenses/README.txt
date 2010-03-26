@@ -30,7 +30,7 @@ MIT license:
 
 The GemStone Virtual Machine and associated binary files and libraries
 written by GemStone Systems, Inc. are governed by:
-   GemStone-Web-License.txt
+   GemStone-Web-License.pdf
 
 Various open source components not written by GemStone Systems, Inc. are
 included in this distribution, and covered by their respective licenses:

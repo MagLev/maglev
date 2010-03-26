@@ -10,3 +10,7 @@ sass
 haml
 css2sass
 use_minitest
+autospec
+cdiff
+decolor
+spec

@@ -10,7 +10,7 @@ class Module
 
   def self.new(*args, &block)
     m = allocate
-    m.initialize(*args)
+    m.initialize(*args,&block)
     if block_given?
       m.module_eval(&block)
     end
@@ -62,9 +62,9 @@ class Module
   end
 
   # def __filter_method_names(identity_set) ; end
-  #   arg is an IdentitySet of Symbols, 
-  #   result is an Array of Strings, excluding  those beginning with '__' 
-  class_primitive_nobridge '__filter_method_names', 'excludeInternalMethodNames:' 
+  #   arg is an IdentitySet of Symbols,
+  #   result is an Array of Strings, excluding  those beginning with '__'
+  class_primitive_nobridge '__filter_method_names', 'excludeInternalMethodNames:'
 
   primitive_nobridge 'ancestor_modules_names', 'rubyAncestorModulesNames'
 

@@ -71,18 +71,18 @@ class Hash
 
   def self.__from_elements(elements)
     first = elements.__at(0)
-    if first._isArray			# changes for 1.8.7
+    if first._isArray     # changes for 1.8.7
       res = self.__from_array_of_pairs(elements)
     else
       numelem = elements.length
       if (numelem & 1)._equal?(1)
-	if numelem._equal?(1)
-	  if first._isHash
-	    return self.__atkey(first)
-	  end
-	  return Type.coerce_to(first, Hash, :to_hash)
-	end
-	raise ArgumentError , 'odd number of args'
+  if numelem._equal?(1)
+    if first._isHash
+      return self.__atkey(first)
+    end
+    return Type.coerce_to(first, Hash, :to_hash)
+  end
+  raise ArgumentError , 'odd number of args'
       end
       n = 0
       res = self.__new(numelem)
@@ -120,14 +120,14 @@ class Hash
   def self.__from_array(arr)
     # used by Array#__as_hash, from generated code , added for 1.8.7
     lim = arr.__size
-    res = self.__new( lim.__divide(2) ) 
+    res = self.__new( lim.__divide(2) )
     n = 0
     while n < lim
       res.__atkey_put( arr.__at(n), arr.__at(n + 1) )
       n += 2
     end
-    res 
-  end  
+    res
+  end
 
   def self.[](*args)
     self.__from_elements(args)
@@ -703,7 +703,7 @@ class Hash
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
     # maglev 1.8.7 does not support returning an Enumerator due to complex side effects
     unless block_given?
-      raise LocalJumpError, "no block given"	# changes for 1.8.7 
+      raise LocalJumpError, "no block given"  # changes for 1.8.7
     else
       # Do this in 2 steps, so we're not altering the structure while we walk it.
       to_del = []
@@ -782,7 +782,7 @@ class Hash
     unless block_given?
       return HashEnumerator.new(self, :each_pair) # for 1.8.7
     end
-    lim = @tableSize 
+    lim = @tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -813,7 +813,7 @@ class Hash
 
   alias each each_pair
 
-  def each_key(&block) 
+  def each_key(&block)
     unless block_given?
       return HashKeyEnumerator.new(self, :each_key) # for 1.8.7
     end
@@ -967,6 +967,7 @@ class Hash
     res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
     if res_siz > (ts = @tableSize)  && ts < 1009
       h = self.class.__new(res_siz)
+      h.default = @defaultOrParent
       self.__merge_into(h)
     else
       h = self.dup
@@ -1003,7 +1004,7 @@ class Hash
           k = pairs.__at(n)
           v = pairs.__at(n + 1)
           self.__atkey_put(k,  block.call(k, v, v))
-          n += 2 
+          n += 2
         end
       else
         other.each_pair { |k, v|
