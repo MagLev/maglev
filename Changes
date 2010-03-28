@@ -2,7 +2,11 @@
 
 == Unreleased Changes 
 
-* Merged latest changes psych mastwr on github
+* Fix Trac 684
+* Fixed problem with Array.new returning nil for subclasses whose  
+  initialize returned nil.
+* Fixed test rake in examples to not depend on Sinatra version
+* Merged latest changes from psych master on github
 * Fixed bug in psych
 * Fixed writing of alias and anchor in YAML
 * Fix Trac 471, 621, 684  in irb .

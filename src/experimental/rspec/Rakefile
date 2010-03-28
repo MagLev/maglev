@@ -1,11 +1,24 @@
-task :default => :maglev
+# task :default => :maglev
+task :default => [:maglev, :examples]
 
 desc "run the test case with maglev (default)"
 task :maglev do
   sh %{ $MAGLEV_HOME/bin/spec bowling_spec.rb }
 end
 
+desc "Run MagLev against the RSpec examples"
+task :examples do
+  rspec_dir = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8.7/gems/rspec-1.3.0"
+  cd rspec_dir do
+    passing = FileList['examples/passing/*_spec.rb']
+    failing = FileList['examples/failing/*_spec.rb']
+
+    passing.each { |spec| sh %{ $MAGLEV_HOME/bin/spec #{spec} } }
+#    failing.each { |spec| sh %{ $MAGLEV_HOME/bin/spec #{spec} } }
+  end
+end
+
 desc "run the test case with mri"
 task :mri do
-  sh %{ /opt/ruby/ruby/bin/spec bowling_spec.rb }
+  sh %{ /opt/ruby/ruby/bin/spec -rubygems bowling_spec.rb }
 end

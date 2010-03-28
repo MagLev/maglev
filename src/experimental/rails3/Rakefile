@@ -1,23 +1,26 @@
 
 task :default => :test
 
-desc "Run the tests"
-task :test do
+desc "Run the tests: takes optional file arg: 'rake test[test/foo_test.rb]'"
+task :test, :file do |t, args|
+  test_files = args.file || FileList['test/*_test.rb']
   sh %{
     $MAGLEV_HOME/bin/testrb \
       -Irails/activesupport/lib \
       -Irails/activemodel/lib \
       -Itest \
-      #{FileList['test/*_test.rb']}
+      #{test_files}
   }
 end
 
-task :mri do
+desc "Run the tests using MRI: takes optional file arg: 'rake test[test/foo_test.rb]'"
+task :mri, :file do |t,args|
+  test_files = args.file || FileList['test/*_test.rb']
   sh %{
     testrb \
       -Irails/activesupport/lib \
       -Irails/activemodel/lib \
       -Itest \
-      #{FileList['test/*_test.rb']}
+      #{test_files}
   }
 end
