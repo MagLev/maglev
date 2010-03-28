@@ -782,6 +782,7 @@ class Hash
     unless block_given?
       return HashEnumerator.new(self, :each_pair) # for 1.8.7
     end
+    num_elem = @numElements
     lim = @tableSize 
     lim = lim + lim
     kofs = 0
@@ -793,20 +794,23 @@ class Hash
           block.call(k, v)
         elsif v._isFixnum
           # internal collision chain
-    idx = v
-    begin
-      ck = self.__at(idx)
-      if ck._not_equal?(RemoteNil)
-        block.call(ck, self.__at(idx + 1) )
-            end
+	  idx = v
+	  begin
+	    ck = self.__at(idx)
+	    if ck._not_equal?(RemoteNil)
+	      block.call(ck, self.__at(idx + 1) )
+	    end
             idx = self.__at(idx + 2)
-          end while idx._isFixnum
+	  end while idx._isFixnum
         else
-          # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
-          v.each_pair(&block)
+	  # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+	  v.each_pair(&block)
         end
       end
       kofs += 2
+    end
+    unless @numElements._equal?(num_elem)
+      raise RuntimeError, 'Hash changed during iteration'
     end
     self
   end
@@ -893,8 +897,8 @@ class Hash
   # Fetch does not use any default values supplied when the hash was created.
   #
 
-  def fetch(key, dflt=Undefined, &block)
-    udef = Undefined
+  def fetch(key, dflt=MaglevUndefined, &block)
+    udef = MaglevUndefined
     val = self.__at_orRNil(key)
     return val unless val._equal?(RemoteNil)
     if block_given?
@@ -1034,7 +1038,8 @@ class Hash
     self
   end
 
-  # def reject!() ; end # TODO for 1.8.7 , complex side effects
+  # def reject!() ; end # 1.8.7 , not implemented yet due to 
+		        #  complex side effects of   Enumerator#next
 
   def replace(hash)
     hash = Type.coerce_to(hash, Hash, :to_hash)
