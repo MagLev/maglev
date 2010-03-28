@@ -311,12 +311,12 @@ class OptionParser
     # Maglev: Patched this file.  When Trac 538 is fixed, revert this back to previous version.
     def initialize(pattern = nil, conv = nil,
                    short = nil, long = nil, arg = nil,
-                   desc = ([] if short or long), block = Undefined, &blk)
+                   desc = ([] if short or long), block = MaglevUndefined, &blk)
       raise if Array === pattern
       @pattern, @conv, @short, @long, @arg, @desc =
         pattern, conv, short, long, arg, desc
 
-      @block = if block.equal?(Undefined) and block_given?
+      @block = if block.equal?(MaglevUndefined) and block_given?
                  blk
                else
                  block
