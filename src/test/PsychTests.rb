@@ -25,11 +25,11 @@ class PsychModuleTest < Test::Unit::TestCase
     assert_equal(Psych::Nodes::Sequence, sequence.class)
   end
 
-  def test_psych_yaml_ast
-    scalar = YAML.yaml_ast("--- a")
+  def test_psych_parse_stream
+    scalar = YAML.parse_stream("--- a")
     assert_equal(Psych::Nodes::Stream, scalar.class)
 
-    sequence = YAML.yaml_ast("---\n - a\n - b")
+    sequence = YAML.parse_stream("---\n - a\n - b")
     assert_equal(Psych::Nodes::Stream, sequence.class)
   end
 
