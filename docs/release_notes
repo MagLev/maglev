@@ -37,6 +37,25 @@ See the {Persistence API}[link:files/docs/persistence-api.html]
   e.g. <tt>_isArray</tt>.  MagLev will not allow you to re-define these
   methods.
 
+* The method names (selectors) <tt>eval</tt>, <tt>class_eval</tt>,
+  <tt>module_eval</tt> and <tt>instance_eval</tt> are handled specially in
+  maglev.  If you define a method with one of those selectors, then you'll
+  get an error when trying to call it.  E.g., given:
+
+    class C
+      def eval(an_arg)
+        ...
+      end
+    end
+
+    C.new.eval("puts 10")
+
+  When you run it, you'll get:
+
+    error , too many arguments,
+              during foo.rb
+    ERROR 2023, Error, 'too many arguments' (ArgumentError)
+
 == RubyGems
 
 MagLev comes with a copy of RubyGems 1.3.5 pre-installed.  There is one
@@ -58,4 +77,4 @@ patch to work around an oddity of the MRI zlib handling.
 * Continuations are not supported.
 * Most methods in +ObjectSpace+ are stubs that raise
   +NotImplementedError+.
-* String#unpack and Array#pack do not support pointers ('p' and 'P').
+* <tt>String#unpack</tt> and <tt>Array#pack</tt> do not support pointers ('p' and 'P').
