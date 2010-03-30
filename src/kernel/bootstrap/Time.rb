@@ -104,6 +104,7 @@ class Time
   def _dump(limit = nil)  # used by marshal
     is_gmt = @is_gmt
     unless is_gmt
+      # Maglev deviation, always dumping in GMT format
       t = self.dup.gmtime
       return t._dump
     end
@@ -129,7 +130,7 @@ class Time
 
   def dup
     t = self.class.allocate   # Gemstone changes
-    t.__init(@microseconds, @is_gmt);
+    t.__init(@microseconds, @is_gmt)
   end
 
   def self.local(first, *args)
@@ -227,8 +228,16 @@ class Time
     elsif other._kind_of?(Time)
       raise TypeError , 'Time#+  , arg may not be a Time'
     else
+      # addition with rounding to nearest microsecond
       other = Type.coerce_to(other, Float, :to_f)
-      microsecs += (other * 1_000_000.0).to_i
+      if other > 0.0
+        microsecs += ((other + 0.0000005) * 1_000_000.0).to_i
+      elsif other <= 0.0
+        unless other == 0.0
+          microsecs += ((other - 0.0000005) * 1_000_000.0).to_i
+        end
+      end
+   
     end
     t = self.class.allocate
     t.__init(microsecs, @is_gmt)
@@ -366,14 +375,14 @@ class Time
 
   def localtime
     if @is_gmt
-      self.__set_tmarray(false);
+      self.__set_tmarray(false)
     end
     self
   end
 
   def gmtime
     unless @is_gmt
-      self.__set_tmarray(true);
+      self.__set_tmarray(true)
     end 
     self
   end
@@ -499,7 +508,7 @@ class Time
 
   def __init(aMicrosecs, isGmt)
     @microseconds = aMicrosecs
-    __set_tmarray(isGmt);
+    __set_tmarray(isGmt)
     self
   end
 

@@ -87,12 +87,16 @@ class Env
     end
 
     def delete_if(&block)
+      arr = []
       self.each_pair { | key , v |
          if block.call(key, v) && self._update_ok(key)
-           v = self.__delete(key)
-           if v._not_equal?(RemoteNil)
-             Env.__unsetenv(key)
-           end
+           arr.__push( key )
+         end
+      }
+      arr.each { |key|
+         v = self.__delete(key)
+         if v._not_equal?(RemoteNil)
+           Env.__unsetenv(key)
          end
       } 
       self

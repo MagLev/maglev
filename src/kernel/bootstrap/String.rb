@@ -570,7 +570,20 @@ class String
 
     last = 0
     i = sep_size
-    if sep_size._equal?(0)
+    if sep_size._equal?(1)
+      i += 1
+      while i < my_size
+        if self.__at(i-1)._equal?(newline) 
+	  line = self.__at(last, i-last)
+	  # line.taint if tainted?
+	  block.call( line )
+	  # We don't have a way yet to check if the data was modified...
+	  #modified? id, my_size
+	  last = i
+	end
+        i += 1
+      end
+    elsif sep_size._equal?(0)
       while i < my_size
 	if self.__at(i)._equal?( ?\n )
 	  if self.__at(i+=1)._not_equal?( ?\n )
@@ -590,8 +603,9 @@ class String
         i += 1
       end
     else
+      i += 1
       while i < my_size
-        if i > 0 && self.__at(i-1)._equal?(newline) &&
+        if self.__at(i-1)._equal?(newline) &&
             (sep_size < 2 || self.__at_equals( i - sep_size + 1, sep))
 	  line = self.__at(last, i-last)
 	  # line.taint if tainted?
@@ -600,7 +614,7 @@ class String
 	  #modified? id, my_size
 	  last = i
 	end
-	i += 1
+        i += 1
       end
     end
     unless last._equal?(my_size)
@@ -786,12 +800,12 @@ class String
     self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
-      saveTilde = block.__fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0)
       begin
-        block.__setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match)
         out << block.call(match.__at(0)).to_s
       ensure
-        block.__setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
@@ -818,12 +832,12 @@ class String
     out = self.class.new
     self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       out << self._gsub_copyfrom_to(start, match.begin(0) )
-      saveTilde = block.__fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0)
       begin
-        block.__setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match)
         out << block.call(match.__at(0)).to_s
       ensure
-        block.__setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
@@ -1051,6 +1065,7 @@ class String
       return [ self.dup , '', '' ]
     elsif pattern._isRegexp
       md = pattern.__search(self, 0, nil) 
+      md.__storeRubyVcGlobal(0x20) # store into caller's $~
       if md._not_equal?(nil)
         idx = md.begin(0)
         mid = md[0]
@@ -1095,10 +1110,10 @@ class String
   def rindex(item)
     # code other variants explicitly so num frames from __rindex_string
     #   to caller will be constant
-    __rindex(item, Undefined)
+    __rindex(item, MaglevUndefined)
   end
   def rindex(item, &block)
-    __rindex(item, Undefined)
+    __rindex(item, MaglevUndefined)
   end
   def rindex(item, original_offset, &block)
     __rindex(item, original_offset)
@@ -1109,7 +1124,7 @@ class String
     if my_size._equal?(0)
       return nil
     end
-    if original_offset._equal?(Undefined)
+    if original_offset._equal?(MaglevUndefined)
       was_undef = true
       zoffset = my_size._equal?(0) ? 0 : my_size
     else
@@ -1166,6 +1181,7 @@ class String
       return [ '', '', self.dup ]
     elsif pattern._isRegexp
       md = pattern.__search(self, my_siz , 0) 
+      md.__storeRubyVcGlobal(0x20) # store into caller's $~
       if md._not_equal?(nil)
         idx = md.begin(0)
         mid = md[0]
@@ -1309,10 +1325,10 @@ class String
   #     "1,2,,3,4,,".split(',')         #=> ["1", "2", "", "3", "4"]
   #     "1,2,,3,4,,".split(',', 4)      #=> ["1", "2", "", "3,4,,"]
   #     "1,2,,3,4,,".split(',', -4)     #=> ["1", "2", "", "3", "4", "", ""]
-  def split(pattern=nil, limit=Undefined)
+  def split(pattern=nil, limit=MaglevUndefined)
     return [] if self.__size._equal?(0)
 
-    if limit._equal?(Undefined)
+    if limit._equal?(MaglevUndefined)
       suppress_trailing_empty = true
       limited = false
       limit = nil
@@ -1752,9 +1768,7 @@ class String
     Integer.__from_string(s)
   end
 
-  def to_a
-    self.empty? ? [] : [self]
-  end
+  # to_a inherited from Enumerable,  uses each 
 
   def to_s
     if self.class._equal?(String)

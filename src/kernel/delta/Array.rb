@@ -154,13 +154,45 @@ class Array
     result
   end
 
-  def grep(pattern)
+  def grep(pattern, &block)
     result = []
     i = 0
     lim = self.__size
-    while i < lim
-      result.__push(self.__at(i)) if pattern === self.__at(i)
-      i += 1
+    if block_given?
+      if pattern._isRegexp
+        saveTilde = block.__fetchRubyVcGlobal(0)
+        begin
+          while i < lim
+            elem = self.__at(i)
+            if elem._isString  # inline  Regexp#===
+              md = pattern.__search(elem, 0, nil)
+              if md && md.begin(0)
+                block.__setRubyVcGlobal(0, md)
+                result.__push( block.call( elem ) )
+              end
+            end
+            i += 1
+          end
+        ensure
+          block.__setRubyVcGlobal(0, saveTilde)
+        end
+      else
+        while i < lim
+          elem = self.__at(i)
+          if pattern === elem
+            result.__push( block.call( elem))
+          end
+          i += 1
+        end
+      end
+    else
+      while i < lim
+        elem = self.__at(i)
+        if pattern === elem
+          result.__push(elem)
+        end
+        i += 1
+      end
     end
     result
   end
@@ -207,7 +239,7 @@ class Array
   end
 
   def inject(binary_op_sym) # added for 1.8.7
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     memo = un_defined
     my_size = self.__size
     n = 0
@@ -227,12 +259,12 @@ class Array
   # the Array to strings, inserting a separator between
   # each. The separator defaults to $,. Detects recursive
   # Arrays.
-  def join(s = Undefined)
+  def join(s = MaglevUndefined)
     # this is mostly Rubinius code, but modified for our API
     # Put in delta since we need the recursion guard found in common.
     my_size = self.__size
     return "" if my_size._equal?(0)
-    if s._equal?(Undefined)
+    if s._equal?(MaglevUndefined)
       sep = $,
     elsif s._equal?(nil)
        sep = nil

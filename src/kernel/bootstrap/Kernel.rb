@@ -193,12 +193,12 @@ module Kernel
     out = ''
     str.__get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
       out << str._gsub_copyfrom_to(start, match.begin(0))
-      saveTilde = block.__fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0)
       begin
-        block.__setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match)
         out << block.call(match[0]).to_s
       ensure
-        block.__setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
@@ -230,12 +230,12 @@ module Kernel
     out = str.class.new
     str.__get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
       out << str._gsub_copyfrom_to(start, match.begin(0) )
-      saveTilde = block.__fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0)
       begin
-        block.__setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match)
         out << block.call(match[0]).to_s
       ensure
-        block.__setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
@@ -545,7 +545,7 @@ module Kernel
     Kernel.__select(reads, writes, errs, *[ ms ])
   end
 
-  def split(pattern=nil, limit=Undefined)
+  def split(pattern=nil, limit=MaglevUndefined)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
     if str._equal?(nil)
       raise TypeError, 'Kernel.split, caller frame has no reference to $_ '

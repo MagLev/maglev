@@ -971,7 +971,7 @@ class Hash
     res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
     if res_siz > (ts = @tableSize)  && ts < 1009
       h = self.class.__new(res_siz)
-      h.default = @defaultOrParent
+      h.default=( @defaultOrParent )
       self.__merge_into(h)
     else
       h = self.dup

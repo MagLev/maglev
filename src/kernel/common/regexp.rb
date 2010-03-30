@@ -8,7 +8,11 @@ class Regexp
     while n < src_siz
       ch = src[n]
       if ch._equal?( ?/ )
-        str << "\\/"
+        if n > 0 && src[n-1]._equal?( ?\\ )
+          str << ch
+        else
+          str << "\\/"
+        end
       else
         str << ch
       end

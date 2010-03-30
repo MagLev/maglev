@@ -99,7 +99,7 @@ class Regexp
   # def inspect  # implemented in common/regex.rb
 
   def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
-    # if options == nil, prim defautls to case insensitive
+    # if options == nil, prim defaults to case insensitive
     if options._equal?(nil)
       opts = 0
     elsif options._isFixnum
@@ -476,12 +476,19 @@ class Regexp
     end
     n = 0
     src = ""
+    k_cod = nil  # nil or a String
     while n < len
       if n > 0
         src << '|'
       end
       an_arg = args[n]
       if an_arg._isRegexp
+        s_kcode = an_arg.kcode
+        if k_cod._equal?(nil)
+          k_cod = s_kcode
+        elsif s_kcode != k_cod
+          raise ArgumentError, 'mixed kcode in Regexp.union'
+        end
         src << an_arg.to_s
       else
         an_arg = Type.coerce_to(an_arg, String, :to_str)
@@ -489,7 +496,7 @@ class Regexp
       end 
       n += 1
     end
-    self.new(src)
+    self.new(src, 0, k_cod)
   end
 
   class << self

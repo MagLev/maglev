@@ -25,7 +25,7 @@ module Errno
   end
 
   def self.__new_for_errno(errno)
-    cls = ERRNO_TO_EXCEPTION[errno];
+    cls = ERRNO_TO_EXCEPTION[errno]
     if cls._equal?(nil)
       return nil
     end

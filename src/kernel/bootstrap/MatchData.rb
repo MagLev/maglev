@@ -11,8 +11,20 @@ class MatchData
   primitive '__at' , '_rubyAt:length:'
 
   def inspect
-    matches = self.__at(0, -1)
-    "MatchData: #{matches.inspect}"
+    str = '#<'
+    str << self.class.name
+    str << ' '
+    str << self.__at(0).inspect
+    idx = 1
+    cp = self.captures
+    cp_len = cp.__size
+    while idx <= cp_len
+      str << " #{idx}:"
+      str << cp.__at(idx-1).inspect
+      idx += 1
+    end
+    str << '>'
+    str
   end
 
   def begin(group)

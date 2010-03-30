@@ -191,7 +191,7 @@ module FFI
       self.__pointer_at(0, Pointer) # returns a derived pointer
     end
     def write_pointer(val)
-      self.put_pointer(0, val);
+      self.put_pointer(0, val)
     end
 
     # def put_pointer(ofs, memory_pointer) ; end

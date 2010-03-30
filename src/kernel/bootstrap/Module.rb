@@ -26,15 +26,17 @@ class Module
   def append_features(other)
   end
 
-  def include(*names)
+  def include(*modules)
     # this variant gets bridge methods
-    names.reverse.each do |name|
-      __include_module(name)
+    modules.reverse.each do |a_module|
+      __include_module(a_module)
+      a_module.included(self)
     end
   end
-  def include(name)
+  def include(a_module)
     # variant needed for bootstrap
-    __include_module(name)
+    __include_module(a_module)
+    a_module.included(self)
   end
 
   # Invoked as a callback when a_module includes receiver.
@@ -491,6 +493,8 @@ class Module
   end
 
   primitive_nobridge '__remove_const', 'rubyRemoveConst:'
+
+  primitive 'remove_instance_variable', 'rubyRemoveIv:'
 
   def remove_const(name)
     unless name._isSymbol
