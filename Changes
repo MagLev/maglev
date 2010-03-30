@@ -9,7 +9,7 @@
 * Fixed bug in psych
 * Fixed writing of alias and anchor in YAML
 * Fix Trac 471, 621, 684  in irb .
-* Fix Trac 685, 686 .
+* Fix Trac 685, 686, 690 .
 
 == Changes for 23101  2010-03-22
 
