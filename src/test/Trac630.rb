@@ -5,7 +5,9 @@ module MX
     stack = MiniTest::Spec.describe_stack
     name = desc.to_s.capitalize
     cls = Object.class_eval "$y = AX ; class #{name} < #{stack.last}; end; #{name}"
+    unless $b == 0 ; raise 'error'; end
     block.call
+    unless $b == 5 ; raise 'error'; end
     cls
   end
 end
