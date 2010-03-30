@@ -7,7 +7,7 @@ require 'psych/parser'
 require 'psych/omap'
 require 'psych/set'
 require 'psych/coder'
-require 'psych/yaml'
+require 'psych/core_ext'
 
 ###
 # = Overview
@@ -46,7 +46,7 @@ require 'psych/yaml'
 #
 # Psych provides access to an AST produced from parsing a YAML document.  This
 # tree is built using the Psych::Parser and Psych::TreeBuilder.  The AST can
-# be examined and manipulated freely.  Please see Psych::yaml_ast,
+# be examined and manipulated freely.  Please see Psych::parse_stream,
 # Psych::Nodes, and Psych::Nodes::Node for more information on dealing with
 # YAML syntax trees.
 #
@@ -115,11 +115,25 @@ module Psych
   # See Psych::Nodes for more information about YAML AST.
   def self.parse yaml
     # Begin GemStone
-    # yaml_ast(yaml).children.first.children.first
+    # parse_stream(yaml).children.first.children.first
     raise TypeError, "instance of IO needed" if yaml.nil?
-    kids = yaml_ast(yaml).children
+    kids = parse_stream(yaml).children
     kids.empty? ? false : kids.first.children.first
     # End GemStone
+  end
+
+  ###
+  # Parse a file at +filename+. Returns the YAML AST.
+  def self.parse_file filename
+    File.open filename do |f|
+      parse f
+    end
+  end
+
+  ###
+  # Returns a default parser
+  def self.parser
+    Psych::Parser.new(TreeBuilder.new)
   end
 
   ###
@@ -131,8 +145,8 @@ module Psych
   #   Psych.yaml_ast("---\n - a\n - b") # => #<Psych::Nodes::Stream:0x00>
   #
   # See Psych::Nodes for more information about YAML AST.
-  def self.yaml_ast yaml
-    parser = Psych::Parser.new(TreeBuilder.new)
+  def self.parse_stream yaml
+    parser = self.parser
     parser.parse yaml
     parser.handler.root
   end
@@ -145,7 +159,21 @@ module Psych
   #   Psych.dump(['a', 'b'])  # => "---\n- a\n- b\n"
   def self.dump o, options = {}
     visitor = Psych::Visitors::YAMLTree.new options
-    visitor.accept o
+    visitor << o
+    visitor.tree.to_yaml
+  end
+
+  ###
+  # Dump a list of objects as separate documents to a document stream.
+  #
+  # Example:
+  #
+  #   Psych.dump_stream("foo\n  ", {}) # => "--- ! \"foo\\n  \"\n--- {}\n"
+  def self.dump_stream *objects
+    visitor = Psych::Visitors::YAMLTree.new {}
+    objects.each do |o|
+      visitor << o
+    end
     visitor.tree.to_yaml
   end
 
@@ -153,17 +181,27 @@ module Psych
   # Dump Ruby object +o+ to a JSON string.
   def self.to_json o
     visitor = Psych::Visitors::JSONTree.new(:json => true)
-    visitor.accept o
+    visitor << o
     visitor.tree.to_yaml
   end
 
   ###
-  # Load multiple documents given in +yaml+, yielding each document to
-  # the block provided.
+  # Load multiple documents given in +yaml+.  Returns the parsed documents
+  # as a list.  For example:
+  #
+  #   Psych.load_documents("--- foo\n...\n--- bar\n...") # => ['foo', 'bar']
+  #
+  def self.load_stream yaml
+    parse_stream(yaml).children.map { |child| child.to_ruby }
+  end
+
   def self.load_documents yaml, &block
-    yaml_ast(yaml).children.each do |child|
-      block.call child.to_ruby
+    if $VERBOSE
+      warn "#{caller[0]}: load_documents is deprecated, use load_stream"
     end
+    list = load_stream yaml
+    return list unless block_given?
+    list.each(&block)
   end
 
   ###

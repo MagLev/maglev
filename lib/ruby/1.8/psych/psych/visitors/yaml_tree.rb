@@ -5,12 +5,11 @@ module Psych
 
       def initialize options = {}
         super()
-        @json = options[:json]
-        @tree = Nodes::Stream.new
-        @tree.children << create_document
-        @stack = @tree.children.dup
-        @st = {}
-        @ss = ScalarScanner.new
+        @json  = options[:json]
+        @tree  = Nodes::Stream.new
+        @stack = []
+        @st    = {}
+        @ss    = ScalarScanner.new
 
         @dispatch_cache = Hash.new do |h,klass|
           method = "visit_#{(klass.name || '').split('::').join('_')}"
@@ -21,6 +20,13 @@ module Psych
 
           h[klass] = method
         end
+      end
+
+      def << object
+        doc = create_document
+        @stack << doc
+        @tree.children << doc
+        accept object
       end
 
       def accept target
@@ -127,7 +133,7 @@ module Psych
       def visit_Complex o
         map = append Nodes::Mapping.new(nil, '!ruby/object:Complex', false)
 
-        ['real', o.real.to_s, 'image', o.image.to_s].each do |m|
+        ['real', o.real.to_s, 'image', o.imag.to_s].each do |m|
           map.children << Nodes::Scalar.new(m)
         end
       end

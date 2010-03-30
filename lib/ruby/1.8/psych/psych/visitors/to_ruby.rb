@@ -9,12 +9,12 @@ module Psych
         super
         @st = {}
         @ss = ScalarScanner.new
+        @domain_types = Psych.domain_types
       end
 
       def accept target
         result = super
-        return result unless target.tag
-        return result if Psych.domain_types.empty?
+        return result if @domain_types.empty? || !target.tag
 
         short_name = target.tag.sub(/^!/, '').split('/', 2).last
         if Psych.domain_types.key? short_name
@@ -178,8 +178,22 @@ module Psych
         else
           hash = {}
           @st[o.anchor] = hash if o.anchor
+
           o.children.each_slice(2) { |k,v|
-            hash[accept(k)] = accept(v)
+            key = accept(k)
+
+            if key == '<<' && Nodes::Alias === v
+              # FIXME: remove this when "<<" syntax is deprecated
+              if $VERBOSE
+                where = caller.find { |x| x !~ /psych/ }
+                warn where
+                warn "\"<<: *#{v.anchor}\" is no longer supported, please switch to \"*#{v.anchor}\""
+              end
+              return accept(v)
+            else
+              hash[key] = accept(v)
+            end
+
           }
           hash
         end
