@@ -9,7 +9,12 @@ class C
     p args     # MRI:
     raise "Wrong num args #{args.size} expecting 3" unless args.size == 3
   end
+ 
+  def self.test
+    pat = []
+    self.new.zero(:one, :long, "pre", true, *pat) 
+    true
+  end
 end
 
-pat = []
-C.new.zero(:one, :long, "pre", true, *pat) # complete lint 1469
+C.test
