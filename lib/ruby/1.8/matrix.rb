@@ -396,9 +396,19 @@ class Matrix
   #     => 1  4
   #        9 16
   #
-  def collect # :yield: e
-    rows = @rows.collect{|row| row.collect{|e| yield e}}
-    Matrix.rows(rows, false)
+  def collect(&block) # :yield: e
+    # unless block_given? 
+    #   Enumerator subclass not implemented yet for 1.8.7 
+    #   MRI 1.8.7 p249 does not implement the Enumerator either
+    # end
+    rows = @rows
+    r_size = rows.size
+    c_rows = Array.new(r_size)
+    for i in 0..r_size-1 do
+      a_row = rows[i]
+      c_rows[i] = a_row.collect{|e| yield(e) }
+    end
+    Matrix.rows(c_rows, false)
   end
   alias map collect
   
