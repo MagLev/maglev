@@ -37,15 +37,8 @@ module Gem::VersionOption
       Gem::Requirement.new value
     end
 
-    # BEGIN GEMSTONE
-    #
-    # Trac 686: Maglev messes up passing *foo if foo is an empty array
-    xargs = ['-v', '--version VERSION', Gem::Requirement, "Specify version of gem to #{task}"]
-    xargs = xargs + wrap unless wrap.empty?
-    # add_option('-v', '--version VERSION', Gem::Requirement,
-    #            "Specify version of gem to #{task}", *wrap) do
-    add_option(*xargs) do
-    # END GEMSTONE
+    add_option('-v', '--version VERSION', Gem::Requirement,
+               "Specify version of gem to #{task}", *wrap) do
                  |value, options|
       options[:version] = value
       options[:prerelease] = true if value.prerelease?

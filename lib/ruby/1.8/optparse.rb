@@ -219,12 +219,8 @@ class OptionParser
   #
   module Completion
     def complete(key, icase = false, pat = nil)
-      # GEMSTONE Workaround for Trac 686
-      # pat ||= Regexp.new('\A' + Regexp.quote(key).gsub(/\w+\b/, '\&\w*'), icase)
-      if pat.nil? or pat.empty?
-         pat = Regexp.new('\A' + Regexp.quote(key).gsub(/\w+\b/, '\&\w*'), icase)
-      end
-      # END GEMSTONE
+      pat ||= Regexp.new('\A' + Regexp.quote(key).gsub(/\w+\b/, '\&\w*'),
+                         icase)
       canon, sw, k, v, cn = nil
       candidates = []
       each do |k, *v|
