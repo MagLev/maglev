@@ -265,7 +265,7 @@ class RubyLexer
       remainder_of_line_limit = src.pos
       @line_num += 1 	# count_eols
       rem_region = SrcRegion.new( remainder_of_line_lnum, remainder_of_line_ofs,
-				 remainder_of_line_limit);
+				 remainder_of_line_limit)
       csrc_regions = @src_regions  
       rofs = csrc_regions.size - 1
       if (rofs >= 0)   # handling a nested heredoc
@@ -883,7 +883,7 @@ class RubyLexer
         else
           # must be CTYPE_LC_ALPHA , CTYPE_UC_ALPHA or CTYPE_UNDERSCORE
           if s_ch._equal?( ?_ )
-            if src.beginning_of_line? && src.check_advance(/\__END__(\n|\Z)/) then
+            if src.beginning_of_line? && src.check_advance(/\__END__(\n|\r\n|\Z)/) then
               # TODO initialize  transient constant value of DATA  (Pickaxe page 337)
               #     to be remainder of source string after line with __END__,
               #     ONLY IF current source file is the main program file.

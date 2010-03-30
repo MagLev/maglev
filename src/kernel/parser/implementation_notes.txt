@@ -343,3 +343,4 @@ March 2010
 
   Fix missing increment of @line_num when processing line ending with ?\  .
 
+  Fix lexer detection of __END__  to work with DOS files (with cr-lf end-of-lines)

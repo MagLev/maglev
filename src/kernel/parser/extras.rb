@@ -395,7 +395,7 @@ module MagRp # {
 	if type._equal?( :lvar) 
 	  result = RubyLocalAsgnNode.s(id, value) # s(:lasgn )
 	  result.src_offset=( src_ofs )
-	  return result;
+	  return result
 	elsif type._equal?( nil ) || type._equal?(:dvar)
 	   if cenv.current_at(id)._equal?(  :dvar)  then
 	     # ok
@@ -1170,16 +1170,16 @@ module MagRp # {
 	  elsif ch._equal?( ?n) ; encod = ENC_NONE
 	  elsif ch._equal?( ?e) ; encod = ENC_EUC 
 	  else
-	    err_str = ' ' ; err_str[0] = ch ;
+	    err_str = ' ' ; err_str[0] = ch 
 	    syntax_error( "unknown regexp option: #{err_str}"  )
 	  end 
 	else 
 	  if ch._equal?( ?x ) ; o = o | EXTENDED  
-	  elsif ch._equal?( ?o) ; o = o | ONCE ; have_once = true;
+	  elsif ch._equal?( ?o) ; o = o | ONCE ; have_once = true
 	  elsif ch._equal?( ?s) ; encod = ENC_SJIS
 	  elsif ch._equal?( ?u) ; encod = ENC_UTF8
 	  else
-	    err_str = ' ' ; err_str[0] = ch ;
+	    err_str = ' ' ; err_str[0] = ch 
 	    syntax_error("unknown regexp option: #{err_str}" )
 	  end 
 	end
