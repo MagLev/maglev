@@ -2,7 +2,6 @@
 
 == Unreleased Changes 
 
-* Fix Trac 684
 * Fixed problem with Array.new returning nil for subclasses whose  
   initialize returned nil.
 * Fixed test rake in examples to not depend on Sinatra version
@@ -10,6 +9,7 @@
 * Fixed bug in psych
 * Fixed writing of alias and anchor in YAML
 * Fix Trac 471, 621, 684  in irb .
+* Fix Trac 685, 686 .
 
 == Changes for 23101  2010-03-22
 
