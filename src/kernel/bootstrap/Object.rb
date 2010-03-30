@@ -397,28 +397,24 @@ class Object
   def instance_eval(*args, &block_arg)
     #   should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
-    if nargs > 5
+    if nargs < 1
+      if block_arg._not_equal?(nil) 
+        return __instance_eval(nil, block_arg)
+      end
+      raise ArgumentError, 'too few args'
+    end
+    if nargs > 3
       raise ArgumentError, 'too many args'
     end
-    blk = args[0]  # implicit_block synthesized by AST to IR code in .mcz
-    if blk._equal?(false)
-      blk = block_arg
-      if blk._not_equal?(nil)
-        if nargs > 2
-          raise ArgumentError, 'instance_eval: both block and normal args given'
-        end
-        return __instance_eval(nil, blk)
-      end
-    end
-    if nargs < 3
-      raise ArgumentError, 'too few args, send of :instance_eval not supported'
-    end
-    lex_path = args[1]       # synthesized by AST to IR code in .mcz
-    str = args[2]
-    # file=args[3] ; line=args[4] #  TODO, ignored for now
+    # no ArgumentError for both string and explicit block args yet ; 
+    #  passing implicit block_arg if no explicit block arg, so it can
+    #  be put in the binding...
+    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    str = args[0]
+    # file=args[1] ; line=args[2] #  TODO, ignored for now
     string = Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
-    bnd = Binding.new(ctx, self, blk)
+    bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
     vcgl = [ self.__getRubyVcGlobal(0x30),
        self.__getRubyVcGlobal(0x31) ]

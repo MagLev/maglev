@@ -45,24 +45,20 @@ class Binding
     @block
   end
 
-  def eval(*args)		# added for 1.8.7
+  def eval(*args, &block_arg)		# added for 1.8.7
     # should always come here via bridge method
     nargs = args.size
-    if nargs < 3
+    if nargs < 1
       raise ArgumentError, 'too few args, send of :eval not supported'
     end
-    if nargs > 5
+    if nargs > 3
       raise ArgumentError, 'too many args'
     end
-    blk = args[0] # implicit block arg, synthesized by AST to IR code in .mcz
-    if blk._equal?(false)
-      blk = block_arg
-    end
-    lex_path = args[1]       # synthesized by AST to IR code in .mcz
-    str = args[2]
+    # lex_path = self.__getRubyVcGlobal(0x32) # not used, use path already in self
+    str = args[0]
     bnd = self
-    file = args[3]
-    line = args[4]
+    file = args[1]
+    line = args[2]
     if line._equal?(nil)
       line = 0
     end
