@@ -6,7 +6,7 @@
 #
 # Persistent shared counters provide a means for multiple sessions to share
 # common integer values.  There are 128 persistent shared counters,
-# numbered from 1 to 128 (the index of the first counter is 1.
+# numbered from 1 to 128. The index of the first counter is 1.
 #
 # Each update to a persistent shared counter causes a roundtrip to the
 # stone process.  However reading the value of a counter is handled by the
@@ -186,7 +186,7 @@ module Maglev
     # full.
     class_primitive 'temp_obj_space_percent_used', '_tempObjSpacePercentUsed'
 
-    # Returns the full network name of the stone this VM is connected to.r
+    # Returns the full network name of the stone this VM is connected to.
     class_primitive '__stone_name', 'stoneName'
 
     # Returns the name of the stone the VM is connected to.  If +full+ is
