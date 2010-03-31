@@ -114,12 +114,8 @@ module Psych
   #
   # See Psych::Nodes for more information about YAML AST.
   def self.parse yaml
-    # Begin GemStone
-    # parse_stream(yaml).children.first.children.first
-    raise TypeError, "instance of IO needed" if yaml.nil?
-    kids = parse_stream(yaml).children
-    kids.empty? ? false : kids.first.children.first
-    # End GemStone
+    children = parse_stream(yaml).children
+    children.empty? ? false : children.first.children.first
   end
 
   ###
@@ -142,7 +138,7 @@ module Psych
   #
   # Example:
   #
-  #   Psych.yaml_ast("---\n - a\n - b") # => #<Psych::Nodes::Stream:0x00>
+  #   Psych.parse_stream("---\n - a\n - b") # => #<Psych::Nodes::Stream:0x00>
   #
   # See Psych::Nodes for more information about YAML AST.
   def self.parse_stream yaml
