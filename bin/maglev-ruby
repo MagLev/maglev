@@ -307,6 +307,11 @@ login
 run
 |ctx|
 EOF
+if [[ $debugFlag ]]; then
+    cat - >> $dbscript <<-EOFC
+  SessionTemps current at:#Maglev_ruby_debugFlag put: true .
+EOFC
+fi
 #
 # Use MagRpDEBUG_level environment variable to select MRI or native parser
 # and set MagRpDEBUG_level
