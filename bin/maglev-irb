@@ -16,6 +16,8 @@ def STDIN.tty?
   true
 end
 
+# MAGLEV_DEBUG_IRB = true # uncomment here and in irb.rb to debug
+
 # def to_s
 #     "main"
 #     end
