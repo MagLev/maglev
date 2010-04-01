@@ -2,6 +2,7 @@
 
 == Unreleased Changes 
 
+* Updated to RubyGems 1.3.6
 * Fixed problem with Array.new returning nil for subclasses whose  
   initialize returned nil.
 * Fixed test rake in examples to not depend on Sinatra version
