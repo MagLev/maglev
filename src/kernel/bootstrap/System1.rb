@@ -1,5 +1,6 @@
 module Maglev
   # resolve separate from implementation, so 
-  #  dynamic constant definitions, if any, will work
-  System = Object._resolve_smalltalk_global(:System)
+  #  constant refs can be  bound at bootstrap compile time
+
+  System = Object.__resolve_smalltalk_global(:System)
 end

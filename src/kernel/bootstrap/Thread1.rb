@@ -3,7 +3,7 @@
 class Thread
   KERNEL_SRC_REGEXP = /src\/kernel/
 
-  ThreadCriticalMutex = _resolve_smalltalk_global( :RubyThreadCriticalMutex)
+  ThreadCriticalMutex = __resolve_smalltalk_global( :RubyThreadCriticalMutex)
   class ThreadCriticalMutex 
 
     # initializes/returns the one instance from   SessionTemps current 

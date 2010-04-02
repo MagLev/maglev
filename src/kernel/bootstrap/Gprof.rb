@@ -2,7 +2,7 @@
 #
 
 module Maglev
-  Gprof = Object._resolve_smalltalk_global(:ProfMonitorTree)
+  Gprof = Object.__resolve_smalltalk_global(:ProfMonitorTree)
   class Gprof
 
     class_primitive '__monitor&', 'monitorIntervalNs:block:'

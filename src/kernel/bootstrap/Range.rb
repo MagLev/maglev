@@ -1,5 +1,5 @@
 class Range
-  FlipFlop = _resolve_smalltalk_global(:RubyFlipFlop) # code in FlipFlop.rb
+  FlipFlop = __resolve_smalltalk_global(:RubyFlipFlop) # code in FlipFlop.rb
 
   primitive 'hash'
 

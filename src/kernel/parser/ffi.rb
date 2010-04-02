@@ -2,7 +2,7 @@
 #  The full FFI is not loaded in environment 2
 module FFI
 
-  CByteArray = _resolve_smalltalk_global( :CByteArray )
+  CByteArray =  __resolve_smalltalk_global( :CByteArray )
   class CByteArray
     # methods in Smalltalk CByteArray class needed by the string scanner
     class_primitive_nobridge 'with_string', '_vmOwnedWithAll:'

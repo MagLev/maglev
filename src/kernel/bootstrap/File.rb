@@ -7,7 +7,7 @@ class File
   SEPARATOR      = '/'
   Separator      = SEPARATOR
 
-  Stat = _resolve_smalltalk_global(:GsFileStat)
+  Stat = __resolve_smalltalk_global(:GsFileStat)
 
   class_primitive_nobridge '__section2OpenConstants', '_section2OpenConstants'
 

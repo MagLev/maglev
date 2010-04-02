@@ -142,7 +142,7 @@ module FFI
     Persistent_Enums = []
     Persistent_NamedEnums = IdentityHash.new
     Persistent_kv_map = IdentityHash.new
-    GsMethodDictionary = _resolve_smalltalk_global(:GsMethodDictionary)
+    GsMethodDictionary =  __resolve_smalltalk_global(:GsMethodDictionary)
 
     def initialize
       raise 'instances of Enums not used yet'

@@ -32,12 +32,12 @@ class Float
   MIN      = 2.2250738585072014E-308 # smallest positive float not a subnormal
   MIN_10_EXP = -307
   MIN_EXP  = -1021 
-  NaN      = _resolve_smalltalk_global(:PlusQuietNaN)
+  NaN      = __resolve_smalltalk_global(:PlusQuietNaN)
   RADIX    = 2
   ROUNDS   = 1  # towards nearest representable value,
      #  there is no support for changing rounding mode in the VM.
 
-  PlusInfinity = _resolve_smalltalk_global(:PlusInfinity)
+  PlusInfinity = __resolve_smalltalk_global(:PlusInfinity)
 
   def coerce(param)
     if param._isInteger

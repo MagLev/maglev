@@ -1,6 +1,6 @@
 module Kernel
 
-  primitive_nobridge '_resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
+  primitive_nobridge '__resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
   # _smalltalk_global_put for use by bootstrap code only
   primitive_nobridge '__smalltalk_global_put', 'smalltalkUserGlobalsAt:put:'
