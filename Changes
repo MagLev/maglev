@@ -2,14 +2,15 @@
 
 == Unreleased Changes 
 
+* Updated to RubyGems 1.3.6
 * Fixed problem with Array.new returning nil for subclasses whose  
   initialize returned nil.
 * Fixed test rake in examples to not depend on Sinatra version
 * Merged latest changes from psych master on github
-* Fixed bug in psych
+* Fixed bug in psych: handling of empty and white-space only strings
 * Fixed writing of alias and anchor in YAML
 * Fix Trac 471, 621, 684  in irb .
-* Fix Trac 685, 686, 690, 691, 631 .
+* Fix Trac 631, 685, 686, 690, 691, 692 .
 * Implemented ObjectSpace#define_finalizer 
 
 == Changes for 23101  2010-03-22

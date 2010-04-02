@@ -1,4 +1,5 @@
 #!/usr/bin/env maglev-ruby
+# -*- ruby -*-
 #
 # Note: This script will not work if maglev-ruby is not in your path.
 #     So you should add something like the following line to your .bashrc

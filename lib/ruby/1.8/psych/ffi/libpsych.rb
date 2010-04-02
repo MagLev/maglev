@@ -266,7 +266,7 @@ module Psych
     #                 int plain,
     #                 int quoted,
     #                 yaml_scalar_style_t style);
-    attach_function :emit_scalar, [:pointer, :string, :size_t, :pointer,
+    attach_function :emit_scalar, [:pointer, :const_string, :size_t, :pointer,
                                    :pointer, :int, :int, :int], :int
 
     # int emit_end_document(yaml_emitter_t *emitter, int implicit);
