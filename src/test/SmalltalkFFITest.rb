@@ -10,11 +10,11 @@ require 'smalltalk/System'
 puts Smalltalk::System._st_inTransaction # Crashes system
 
 require 'smalltalk/SymbolSet'
-s = Smalltalk::SymbolSet._st_new(10)
+s = Smalltalk::SymbolSet._st_new_(10)
 
 require 'smalltalk/IdentityBag'
 ibcls = Smalltalk::IdentityBag
-b = ibcls._st_new(10)
+b = ibcls._st_new_(10)
 puts b._st_hash
 puts b._st_getIndexInfo
 
