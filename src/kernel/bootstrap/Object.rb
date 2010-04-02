@@ -71,7 +71,8 @@ class Object
   primitive 'halt'
   primitive 'hash'
   primitive 'object_id', 'asOop'
-  primitive '__id__' , 'asOop'
+  primitive '__id__' , 'asOop'  # included in public names query results
+  primitive '__id' , 'asOop'  
   primitive '__identity_hash', 'identityHash'
 
   primitive 'nil?' , '_rubyNilQ'
