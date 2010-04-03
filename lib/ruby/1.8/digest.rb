@@ -147,8 +147,8 @@ module Digest
     # If a _string_ is given, returns the hash value for the given
     # _string_, resetting the digest to the initial state before and
     # after the process.
-    def digest(string = Undefined)
-      if string.equal?(Undefined)
+    def digest(string = MaglevUndefined)
+      if string.equal?(MaglevUndefined)
         # Currently, getting the digest is non-destructive, so just
         # calculate and return (don't bother cloning)
         klone = clone
@@ -184,8 +184,8 @@ module Digest
     # If a _string_ is given, returns the hash value for the given
     # _string_ in a hex-encoded form, resetting the digest to the initial
     # state before and after the process.
-    def hexdigest(string = Undefined)
-      if string.equal?(Undefined)
+    def hexdigest(string = MaglevUndefined)
+      if string.equal?(MaglevUndefined)
         # Currently, getting the digest is non-destructive, so just
         # calculate and return (don't bother cloning)
         klone = clone

@@ -1,4 +1,4 @@
-RubyCompiler = _resolve_smalltalk_global(:RubyCompiler)
+RubyCompiler = __resolve_smalltalk_global(:RubyCompiler)
 class RubyCompiler
   primitive_nobridge '_compile', 'compileString:loadName:'
 

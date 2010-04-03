@@ -243,7 +243,7 @@ module MagRp # [
 	  @racc_read_next = cracc_read_next # uncache   
 
 
-	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 );
+	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 )
 
 	  cracc_error_status = @racc_error_status # recache
 	  # @racc_t not changed by reduce methods
@@ -416,7 +416,7 @@ module MagRp # [
 	  @racc_read_next = cracc_read_next # uncache   
 
 
-	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 );
+	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 )
 
 	  cracc_error_status = @racc_error_status # recache
 	  # @racc_t not changed by reduce methods

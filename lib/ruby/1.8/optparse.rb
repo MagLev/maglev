@@ -219,12 +219,8 @@ class OptionParser
   #
   module Completion
     def complete(key, icase = false, pat = nil)
-      # GEMSTONE Workaround for Trac 686
-      # pat ||= Regexp.new('\A' + Regexp.quote(key).gsub(/\w+\b/, '\&\w*'), icase)
-      if pat.nil? or pat.empty?
-         pat = Regexp.new('\A' + Regexp.quote(key).gsub(/\w+\b/, '\&\w*'), icase)
-      end
-      # END GEMSTONE
+      pat ||= Regexp.new('\A' + Regexp.quote(key).gsub(/\w+\b/, '\&\w*'),
+                         icase)
       canon, sw, k, v, cn = nil
       candidates = []
       each do |k, *v|
@@ -315,12 +311,12 @@ class OptionParser
     # Maglev: Patched this file.  When Trac 538 is fixed, revert this back to previous version.
     def initialize(pattern = nil, conv = nil,
                    short = nil, long = nil, arg = nil,
-                   desc = ([] if short or long), block = Undefined, &blk)
+                   desc = ([] if short or long), block = MaglevUndefined, &blk)
       raise if Array === pattern
       @pattern, @conv, @short, @long, @arg, @desc =
         pattern, conv, short, long, arg, desc
 
-      @block = if block.equal?(Undefined) and block_given?
+      @block = if block.equal?(MaglevUndefined) and block_given?
                  blk
                else
                  block

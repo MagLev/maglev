@@ -1,4 +1,4 @@
-DateAndTime = _resolve_smalltalk_global(:DateAndTime)
+DateAndTime = __resolve_smalltalk_global(:DateAndTime)
 class DateAndTime
   primitive 'as_posix_seconds', 'asPosixSeconds'
   def as_time

@@ -49,7 +49,7 @@ module Marshal
   TYPE_SYMBOL = ':'
   TYPE_SYMBOL_ch = ?:
   TYPE_SYMLINK = ';'
-  TYPE_SYMLINK_ch = ?;
+  TYPE_SYMLINK_ch = ?; 
   TYPE_TRUE = 'T'
   TYPE_TRUE_ch = ?T
   TYPE_UCLASS = 'C'

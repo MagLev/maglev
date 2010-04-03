@@ -173,9 +173,9 @@ class IdentitySet
   #   ary.count(2)          # => 2
   #   ary.count{ |x|x%2==0}  # => 3
 
-  def count(item = Undefined)
+  def count(item = MaglevUndefined)
     seq = 0
-    unless item._equal?(Undefined)
+    unless item._equal?(MaglevUndefined)
       each { |o| seq += 1 if item == o }
     else
       each { |o| seq += 1 if yield(o) }
@@ -207,15 +207,15 @@ class IdentitySet
   end
   alias_method :map, :collect
 
-  def inject(memo = Undefined)
+  def inject(memo = MaglevUndefined)
     each { |o|
-      if memo._equal? Undefined
+      if memo._equal?( MaglevUndefined)
         memo = o
       else
         memo = yield(memo, o)
       end
     }
-    memo._equal?(Undefined) ? nil : memo
+    memo._equal?(MaglevUndefined) ? nil : memo
   end
 
   def all?
@@ -227,9 +227,12 @@ class IdentitySet
     true
   end
 
-  def any?(&prc)
-    prc = Proc.new { |obj| obj } unless block_given?
-    each { |o| return true if prc.call(o) }
+  def any?(&block)
+    if block_given?
+      each { |o| return true if block.call(o) }
+    else 
+      each { |o| return true if o }
+    end
     false
   end
 
@@ -239,7 +242,7 @@ class IdentitySet
 
   # Ruby to smalltalk translation of query ops used in the indexed query
   # functions (search, search_between, etc.)
-  QUERY_OPS = {
+  QUERY_OPS = IdentityHash.from_hash( {
     :equal     => :==,
     :not_equal => :'~~',
     :eql       => :'=',
@@ -247,8 +250,7 @@ class IdentitySet
     :lt        => :<,
     :lte       => :<=,
     :gt        => :>,
-    :gte       => :>=,
-  }
+    :gte       => :>= }  ).freeze
 
   # Creates an index on the path specified by the string.  The equality
   # index is ordered according to the sort-provided comparison operators

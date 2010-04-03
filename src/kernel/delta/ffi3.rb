@@ -445,9 +445,9 @@ module FFI
     #
     # The final argument, +ret+, is the type of the return value from the C
     # function.
-    def attach_function(name, a3, a4, a5=Undefined)
+    def attach_function(name, a3, a4, a5=MaglevUndefined)
       name = ::Type.coerce_to(name, String, :to_s)
-      if a5._not_equal?(Undefined)
+      if a5._not_equal?(MaglevUndefined)
         cname = ::Type.coerce_to(a3, String, :to_s)
         args = a4
         ret = a5

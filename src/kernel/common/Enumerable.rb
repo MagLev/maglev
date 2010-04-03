@@ -70,9 +70,9 @@ module Enumerable
     def quicksort(xs, &prc)
       return [] unless xs
 
-      pivot = Undefined
+      pivot = MaglevUndefined
       xs.each { |o| pivot = o; break }
-      return xs if pivot._equal? Undefined
+      return xs if pivot._equal?( MaglevUndefined)
 
       lmr = xs.group_by do |o|
         if o._equal?(pivot)
@@ -189,9 +189,9 @@ module Enumerable
   #   ary.count(2)          # => 2
   #   ary.count{ |x|x%2==0}  # => 3
 
-  def count(item=Undefined, &block)
+  def count(item=MaglevUndefined, &block)
     seq = 0
-    if item._equal?(Undefined)
+    if item._equal?(MaglevUndefined)
       if block_given?
         self.each { |o| seq += 1 if block.call(o) }
       else
@@ -373,9 +373,9 @@ module Enumerable
   #   (1..10).find_index  { |i| i % 5 == 0 and i % 7 == 0 }   #=> nil
   #   (1..100).find_index { |i| i % 5 == 0 and i % 7 == 0 }   #=> 35
 
-  def find_index(object=Undefined, &block)
+  def find_index(object=MaglevUndefined, &block)
     idx = -1 
-    if object._equal?(Undefined)
+    if object._equal?(MaglevUndefined)
       unless block_given?
         return FirstEnumerator.new(self, :first_index) # for 1.8.7
       end
@@ -510,7 +510,7 @@ module Enumerable
   end
 
   def inject(&block)
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     memo = un_defined
     each { |o|
       if memo._equal?(un_defined)
@@ -535,7 +535,7 @@ module Enumerable
   end
 
   def inject(binary_op_sym) # added for 1.8.7
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     memo = un_defined
     each { |o|
       if memo._equal?(un_defined) 
@@ -568,15 +568,32 @@ module Enumerable
   def grep(pattern, &block)
     ary = []
     if block_given?
-      self.each { |o|
-        if pattern === o
-          ary << block.call(o) 
+      if pattern._isRegexp
+        saveTilde = block.__fetchRubyVcGlobal(0);
+        begin
+	  self.each { |elem|
+	    if elem._isString  # inline Regexp#===
+	      md = pattern.__search(elem, 0, nil)
+	      if md && md.begin(0)
+		block.__setRubyVcGlobal(0, md)
+		ary.__push( block.call( elem ) )
+              end
+            end
+	  }
+        ensure
+          block.__setRubyVcGlobal(0, saveTilde)
         end
-      }
+      else
+        self.each { |o|
+          if pattern === o
+            ary.__push(block.call(o))
+          end
+        }
+      end
     else
       self.each { |o|
         if pattern === o
-          ary << o
+          ary.__push(o)
         end
       }
     end
@@ -622,7 +639,7 @@ module Enumerable
   #    a.max { |a,b| a.length <=> b.length }   #=> "albatross"
   #
   def max(&block)
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     v = un_defined
     if block_given?
       self.each { |o|
@@ -674,7 +691,7 @@ module Enumerable
     unless block_given?
       return FirstEnumerator.new(self.to_a, :max_by) # for 1.8.7
     end
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     max_obj = un_defined
     max_value = un_defined
 
@@ -702,7 +719,7 @@ module Enumerable
   #   a.min { |a,b| a.length <=> b.length }   #=> "dog"
 
   def min(&block)
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     v = un_defined
     if block_given?
       self.each { |o|
@@ -753,7 +770,7 @@ module Enumerable
     unless block_given?
       return ArrayEnumerator.new( self.to_a, :group_by ) # for 1.8.7
     end
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     min_obj = un_defined
     min_value = un_defined
 
@@ -770,7 +787,7 @@ module Enumerable
   # minmax added for 1.8.7
 
   def minmax(&block)
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     mino = un_defined
     maxo = un_defined
     if block_given?
@@ -826,7 +843,7 @@ module Enumerable
     unless block_given?
       return FirstEnumerator.new(self.to_a, :minmax_by ) # for 1.8.7
     end
-    un_defined = Undefined
+    un_defined = MaglevUndefined
     minv = un_defined
     mino = nil
     maxv = un_defined

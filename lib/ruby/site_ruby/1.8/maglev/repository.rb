@@ -1,11 +1,11 @@
 module Maglev
-  Repository = _resolve_smalltalk_global(:Repository)
+  Repository = __resolve_smalltalk_global(:Repository)
   class Repository
 
     # Returns the current repository (equivalent to the Smalltalk global
     # SystemRepository).
     def self.instance
-      _resolve_smalltalk_global(:SystemRepository)
+      __resolve_smalltalk_global(:SystemRepository)
     end
 
     # Usage: Repository.instance.list_instances(array_of_classes).

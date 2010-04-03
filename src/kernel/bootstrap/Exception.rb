@@ -23,7 +23,7 @@ class Exception
 
     primitive_nobridge '__basic_dup', '_basicCopy'
 
-    def message
+    def __message
       m = @messageText
       if m._equal?(nil)
         m = __description  # generate Smalltalk message
@@ -34,6 +34,10 @@ class Exception
         m = m.dup 
       end
       m
+    end
+
+    def message
+      self.to_s
     end
 
     def self.__default_ruby_message
@@ -53,8 +57,8 @@ class Exception
     end
 
     # Define this in ruby code so we get the full env1 creation hooks
-    def self.exception(message)
-      self.new(message)
+    def self.exception(msg)
+      self.new(msg)
     end
 
     def self.exception
@@ -80,13 +84,13 @@ class Exception
 
     IncludeSmalltalkFrames = false
 
-    def initialize(message)
+    def initialize(msg)
       # bridge methods for this variant
       self.__st_initialize  # initialize smalltak instvars
-      if message._equal?(nil)
-        message = self.class.name
+      if msg._equal?(nil)
+        msg = self.class.name
       end
-      @messageText = message
+      @messageText = msg
     end
 
     def initialize
@@ -96,12 +100,12 @@ class Exception
 
     def initialize(*args)
       if args.length >= 1
-        message = args[0]
+        msg = args[0]
       end
-      if message._equal?(nil)
-        message = self.class.name
+      if msg._equal?(nil)
+        msg = self.class.name
       end
-      @messageText = message
+      @messageText = msg
     end
 
     def backtrace(limit = 1000)
@@ -116,12 +120,12 @@ class Exception
       Thread.__backtrace(true, limit)
     end
 
-    def exception(message = Undefined)
-      if message._equal?(self) || message._equal?(Undefined)
+    def exception(msg = MaglevUndefined)
+      if msg._equal?(self) || msg._equal?(MaglevUndefined)
         return self
       end
       e = dup
-      e.__message=(message)
+      e.__message=(msg)
       e
     end
 
@@ -129,7 +133,7 @@ class Exception
       str = '#<'
       str << self.class.name
       str << ': '
-      str << message
+      str << self.message
       str << '>'
       str
     end
@@ -139,11 +143,11 @@ class Exception
     end
 
     def to_s
-      (m = message)._equal?(nil) ? self.class.name : m
+      (m = self.__message)._equal?(nil) ? self.class.name : m
     end
 
     def to_str
-      (m = message)._equal?(nil) ? self.class.name : m
+      (m = self.__message)._equal?(nil) ? self.class.name : m
     end
 end
 

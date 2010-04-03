@@ -1221,7 +1221,7 @@ class Array
 
   def index(&block)  # added for 1.8.7
     unless block_given?
-      return FirstEnumerator.new(self, :index );
+      return FirstEnumerator.new(self, :index )
     end
     i = 0
     lim = self.__size
@@ -1500,13 +1500,16 @@ class Array
     end
     if start < 0
       start = my_siz + start
-    end
-if Maglev::System.session_temp(:TrapSlice) ; nil.pause ; end
-    if start >= my_siz  # 1.8.7, no change to self if start out of bounds
-      if start._equal?(my_siz)
-        return []
+      if start < 0 # 1.8.7
+        return nil
       end
-      return nil
+    else
+      if start >= my_siz	# 1.8.7, no change to self if start out of bounds
+	if start._equal?(my_siz)
+	  return []
+	end
+	return nil
+      end
     end
     result = self.__at(start, length)
     if result._not_equal?(nil) && length._not_equal?(0)
@@ -1519,7 +1522,11 @@ if Maglev::System.session_temp(:TrapSlice) ; nil.pause ; end
     if arg._isRange
       start = Type.coerce_to(arg.begin, Fixnum, :to_int)
       if start < 0
-        start = self.__size + start
+        my_siz = self.__size
+        start = my_siz + start
+        if start < 0 # 1.8.7
+          return nil
+        end
       end
       last = Type.coerce_to(arg.end, Fixnum, :to_int)
       if last < 0

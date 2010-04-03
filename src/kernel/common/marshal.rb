@@ -433,7 +433,7 @@ module Marshal
       else
         idx = @objs_dict[obj]
         if idx._equal?(nil)
-          @depth -= 1;
+          @depth -= 1
           if obj.respond_to? :_dump then
             add_output_obj(obj)
             str = serialize_user_defined obj

@@ -1,6 +1,6 @@
 module Kernel
 
-  primitive_nobridge '_resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
+  primitive_nobridge '__resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
   # _smalltalk_global_put for use by bootstrap code only
   primitive_nobridge '__smalltalk_global_put', 'smalltalkUserGlobalsAt:put:'
@@ -108,27 +108,23 @@ module Kernel
   def eval(*args, &block_arg)
     #   should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
-    if nargs < 3
-      raise ArgumentError, 'too few args, send of :eval not supported'
+    if nargs < 1
+      raise ArgumentError, 'too few args'
     end
-    if nargs > 6
+    if nargs > 4
       raise ArgumentError, 'too many args'
     end
-    blk = args[0] # implicit block arg, synthesized by AST to IR code in .mcz
-    if blk._equal?(false)
-      blk = block_arg
-    end
-    lex_path = args[1]       # synthesized by AST to IR code in .mcz
-    str = args[2]
-    bnd = args[3]
-    file = args[4]
-    line = args[5]
+    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    str = args[0]
+    bnd = args[1]
+    file = args[2]
+    line = args[3]
     if line._equal?(nil)
       line = 0
     end
     if bnd._equal?(nil)
       ctx = self.__binding_ctx(1)
-      bnd = Binding.new(ctx, self, blk)
+      bnd = Binding.new(ctx, self, block_arg)
       bnd.__set_lex_scope(lex_path)
     else
       unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
@@ -193,12 +189,12 @@ module Kernel
     out = ''
     str.__get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
       out << str._gsub_copyfrom_to(start, match.begin(0))
-      saveTilde = block.__fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0)
       begin
-        block.__setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match)
         out << block.call(match[0]).to_s
       ensure
-        block.__setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
@@ -230,12 +226,12 @@ module Kernel
     out = str.class.new
     str.__get_pattern(regex, true).__each_match_vcgl(str, 0x30) do |match|
       out << str._gsub_copyfrom_to(start, match.begin(0) )
-      saveTilde = block.__fetchRubyVcGlobal(0);
+      saveTilde = block.__fetchRubyVcGlobal(0)
       begin
-        block.__setRubyVcGlobal(0, match);
+        block.__setRubyVcGlobal(0, match)
         out << block.call(match[0]).to_s
       ensure
-        block.__setRubyVcGlobal(0, saveTilde);
+        block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
@@ -545,7 +541,7 @@ module Kernel
     Kernel.__select(reads, writes, errs, *[ ms ])
   end
 
-  def split(pattern=nil, limit=Undefined)
+  def split(pattern=nil, limit=MaglevUndefined)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
     if str._equal?(nil)
       raise TypeError, 'Kernel.split, caller frame has no reference to $_ '

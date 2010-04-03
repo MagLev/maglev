@@ -495,7 +495,7 @@ class IO
   #  IO.read("testfile", 20, 10)   #=> "ne one\nThis is line "
   #
   # Returns the empty string for empty files, unless length is passed, then returns nil
-  def self.read(name, length=Undefined, an_offset=0)
+  def self.read(name, length=MaglevUndefined, an_offset=0)
     offset = if an_offset._equal?(nil)
                0
              else
@@ -503,7 +503,7 @@ class IO
              end
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
-    read_all_bytes = length._equal?(Undefined) || length._equal?(nil)
+    read_all_bytes = length._equal?(MaglevUndefined) || length._equal?(nil)
     unless read_all_bytes
       length = Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
@@ -610,7 +610,7 @@ class IO
   # sync= has no effect, in Maglev  File and Socket never buffer output
   primitive 'sync=', 'setSync:'  
 
-  def self.sysopen(filename, mode=Undefined, permission=Undefined)
+  def self.sysopen(filename, mode=MaglevUndefined, permission=MaglevUndefined)
     f = File.open(filename, mode, permission)
     f.__fileno 
   end

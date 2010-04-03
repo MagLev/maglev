@@ -82,7 +82,7 @@ ifdef(`PARSER_DEBUG', `
 	  @counts_array[9] += 1 # perform_reduce
 ')
 
-	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 );
+	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 )
 
 	  cracc_error_status = @racc_error_status # recache
 	  # @racc_t not changed by reduce methods

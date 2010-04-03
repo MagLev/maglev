@@ -172,8 +172,11 @@ module IRB
       "irb_" + method_name + "_org"
     end
 
-    def self.extend_object(obj)
-      unless (class<<obj;ancestors;end).include?(EXCB)
+    EXTENDED_DONE = IdentitySet.new
+
+    def self.extended(obj)  # was  self.extend_object 
+      # unless (class<<obj;ancestors;end).include?(EXCB)
+      if EXTENDED_DONE.add?(obj)
         super
         for ali, com, flg in @ALIASES
           obj.install_alias_method(ali, com, flg)

@@ -201,6 +201,7 @@ class Gem::Package::TarInput
 
   def zipped_stream(entry)
     if defined? Rubinius or defined? Maglev then
+      # these implementations have working Zlib
       zis = Zlib::GzipReader.new entry
       dis = zis.read
       is = StringIO.new(dis)

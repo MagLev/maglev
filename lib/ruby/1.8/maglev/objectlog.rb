@@ -1,7 +1,7 @@
 require 'maglev/orderedcollection'
 require 'maglev/dateandtime'
 
-ObjectLogEntry = _resolve_smalltalk_global(:ObjectLogEntry)
+ObjectLogEntry = __resolve_smalltalk_global(:ObjectLogEntry)
 
 # ObjectLogEntries are objects that can be inserted into a distributed,
 # persistent queue for later retrieval.  They are typically used as an aid

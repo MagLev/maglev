@@ -1,4 +1,4 @@
-OrderedCollection = _resolve_smalltalk_global(:OrderedCollection)
+OrderedCollection = __resolve_smalltalk_global(:OrderedCollection)
 class OrderedCollection
   include Enumerable
   primitive 'each&', 'do:'

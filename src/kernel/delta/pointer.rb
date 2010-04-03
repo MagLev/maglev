@@ -1,7 +1,7 @@
 module FFI
   class MemoryPointer
     def inspect
-      "#<FFI::MemoryPointer #{self.__inspect}"
+      "#<FFI::MemoryPointer #{self.__inspect}>"
     end
     alias :to_i :address
   end
@@ -72,8 +72,8 @@ module FFI
     NULL = self.new(0)
 
     def initialize
-      @typeSize = 1  
-    end 
+      @typeSize = 1
+    end
     def initialize(elem_size)
       unless elem_size._isFixnum && elem_size > 0
         raise TypeError, 'element size must be a Fixnum > 0'
@@ -166,7 +166,7 @@ module FFI
     end
 
     def inspect
-      "#<FFI::Pointer #{self.__inspect}"
+      "#<FFI::Pointer #{self.__inspect}>"
     end
 
     def read_int
@@ -191,7 +191,7 @@ module FFI
       self.__pointer_at(0, Pointer) # returns a derived pointer
     end
     def write_pointer(val)
-      self.put_pointer(0, val);
+      self.put_pointer(0, val)
     end
 
     # def put_pointer(ofs, memory_pointer) ; end
@@ -287,7 +287,7 @@ module FFI
     end
 
     def write_array_of_pointer(ary)
-      # ary should be an Array of Pointer's 
+      # ary should be an Array of Pointer's
       unless ary._isArray ; raise TypeError, 'expected an Array'; end
       len = ary.length
       if len > self.total.__divide(8)

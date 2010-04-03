@@ -1,5 +1,5 @@
 class Range
-  FlipFlop = _resolve_smalltalk_global(:RubyFlipFlop) # code in FlipFlop.rb
+  FlipFlop = __resolve_smalltalk_global(:RubyFlipFlop) # code in FlipFlop.rb
 
   primitive 'hash'
 
@@ -18,10 +18,11 @@ class Range
   end
 
   def ===(n)
-    return false if n < @from
-    return false if n > @to
+    return false if (n <=> @from)  < 0
+    to_cmp = n <=> @to
+    return false if to_cmp > 0
     if @excludeEnd
-      return false if n == @to
+      return false if to_cmp == 0
     end
     return true
   end

@@ -7,7 +7,7 @@ class File
   SEPARATOR      = '/'
   Separator      = SEPARATOR
 
-  Stat = _resolve_smalltalk_global(:GsFileStat)
+  Stat = __resolve_smalltalk_global(:GsFileStat)
 
   class_primitive_nobridge '__section2OpenConstants', '_section2OpenConstants'
 
@@ -351,7 +351,7 @@ class File
   end
 
   def self.lstat(filename)
-    stat_obj = __stat(filename, true);
+    stat_obj = __stat(filename, true)
     if stat_obj._isFixnum
       # an error attempting to stat
       Errno.raise_errno(stat_obj, 'File.stat failed')
@@ -364,21 +364,21 @@ class File
   end
 
 
-  def self.new(filename, mode=Undefined, permission=Undefined)
+  def self.new(filename, mode=MaglevUndefined, permission=MaglevUndefined)
     self.open(filename, mode, permission)
   end
 
-  def self.open(filename, mode=Undefined, permission=Undefined, &block)
+  def self.open(filename, mode=MaglevUndefined, permission=MaglevUndefined, &block)
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
     filename = Type.coerce_to(filename, String, :to_str)
     nargs = 1
-    if mode._equal?(Undefined)
+    if mode._equal?(MaglevUndefined)
       mode = 'r'
       nargs = 2
     else
-      if permission._equal?(Undefined)
+      if permission._equal?(MaglevUndefined)
         nargs = 2
       else
         unless permission._isFixnum

@@ -1,6 +1,6 @@
 module Process
 
-  Status = _resolve_smalltalk_global( :RubyProcessStatus ) 
+  Status = __resolve_smalltalk_global( :RubyProcessStatus ) 
   # implementation of Process::Status  in delta/Process.rb
 
   def self._procInfoResultCheck(status)

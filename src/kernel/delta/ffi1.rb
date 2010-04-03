@@ -3,9 +3,9 @@ module FFI
   # as a class during ffi.rb, and dynamic constant definitions, if any,
   # will work.
 
-  CLibrary = _resolve_smalltalk_global( :CLibrary )
-  CCallout = _resolve_smalltalk_global( :CCallout )
-  CCallin = _resolve_smalltalk_global(  :CCallin )
-  Pointer = _resolve_smalltalk_global( :CByteArray )
-  CPointer = _resolve_smalltalk_global( :CPointer )
+  CLibrary = __resolve_smalltalk_global( :CLibrary )
+  CCallout = __resolve_smalltalk_global( :CCallout )
+  CCallin =  __resolve_smalltalk_global(  :CCallin )
+  Pointer =  __resolve_smalltalk_global( :CByteArray )
+  CPointer = __resolve_smalltalk_global( :CPointer )
 end

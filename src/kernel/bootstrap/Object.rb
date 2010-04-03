@@ -71,7 +71,8 @@ class Object
   primitive 'halt'
   primitive 'hash'
   primitive 'object_id', 'asOop'
-  primitive '__id__' , 'asOop'
+  primitive '__id__' , 'asOop'  # included in public names query results
+  primitive '__id' , 'asOop'  
   primitive '__identity_hash', 'identityHash'
 
   primitive 'nil?' , '_rubyNilQ'
@@ -113,7 +114,7 @@ class Object
 
   # redefinition of __perform___ disallowed by parser after bootstrap finished.
   # __perform___  requires next to last arg to be a Symbol with proper suffix
-  #   for the number of with: keywords;
+  #   for the number of with: keywords
   #   and last arg is envId
   # __perform are used by RubyParser and FFI::StructLayout
   primitive_nobridge '__perform_se', 'with:perform:env:'
@@ -190,18 +191,18 @@ class Object
     a = self
     unless a._isArray
       if a._equal?(nil)
-  return a
+        return a
       end
       a = a.__splat_lasgn_value_coerce
     end
     if a._isArray
       sz = a.length
       if sz < 2
-  if sz._equal?(0)
-    return nil
-  else
-    return a[0]
-  end
+        if sz._equal?(0)
+          return nil
+        else
+          return a[0]
+        end
       end
     end
     a
@@ -216,7 +217,7 @@ class Object
     end
     if v._not_equal?(self)
       unless v._isArray
-  raise TypeError, 'arg to splat responded to to_ary but did not return an Array'
+        raise TypeError, 'arg to splat responded to to_ary but did not return an Array'
       end
     end
     v
@@ -227,7 +228,7 @@ class Object
     unless a._isArray
       a = a.__splat_lasgn_value_coerce
       unless a._isArray
-  a = [ self ]
+        a = [ self ]
       end
     end
     a
@@ -239,18 +240,18 @@ class Object
     if v._equal?(nil)
       v = Type.coerce_to_or_nil(self, Array, :to_a)
       if v._equal?(nil)
-  v = self
+        v = self
       end
     end
     sz = v.length
     if sz < 2
-    if sz._equal?(0)
-      return nil
+      if sz._equal?(0)
+        return nil
+      else
+        return v[0]
+      end
     else
-      return v[0]
-    end
-  else
-    return v
+      return v
     end
   end
 
@@ -258,8 +259,25 @@ class Object
     # runtime support for parallel assignment, invoked from generated code
     if self._isArray
       return self
+    elsif self._equal?(nil)
+      return [ nil ]
     elsif self.respond_to?(:to_ary)
       return self.to_ary
+    else
+      return [ self ]
+    end
+  end
+
+  def __par_asgn_star_to_ary
+    # runtime support for parallel assignment, invoked from generated code
+    if self._isArray
+      return self
+    elsif self._equal?(nil)
+      return [ nil ]
+    elsif self.respond_to?(:to_ary)
+      return self.to_ary
+    elsif self.respond_to?(:to_a)
+      return self.to_a
     else
       return [ self ]
     end
@@ -330,11 +348,11 @@ class Object
   def extend(*modules)
     if (modules.length > 0)
       cl = class << self
-       self
-     end
-      modules.each do |aModule|
-  cl.include(aModule)
-  aModule.extended(self)
+        self
+      end
+      modules.each do |a_module|
+        cl.__include_module(a_module)
+        a_module.extended(self)
       end
     end
     self
@@ -380,28 +398,24 @@ class Object
   def instance_eval(*args, &block_arg)
     #   should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
-    if nargs > 5
+    if nargs < 1
+      if block_arg._not_equal?(nil) 
+        return __instance_eval(nil, block_arg)
+      end
+      raise ArgumentError, 'too few args'
+    end
+    if nargs > 3
       raise ArgumentError, 'too many args'
     end
-    blk = args[0]  # implicit_block synthesized by AST to IR code in .mcz
-    if blk._equal?(false)
-      blk = block_arg
-      if blk._not_equal?(nil)
-        if nargs > 2
-          raise ArgumentError, 'instance_eval: both block and normal args given'
-        end
-        return __instance_eval(nil, blk)
-      end
-    end
-    if nargs < 3
-      raise ArgumentError, 'too few args, send of :instance_eval not supported'
-    end
-    lex_path = args[1]       # synthesized by AST to IR code in .mcz
-    str = args[2]
-    # file=args[3] ; line=args[4] #  TODO, ignored for now
+    # no ArgumentError for both string and explicit block args yet ; 
+    #  passing implicit block_arg if no explicit block arg, so it can
+    #  be put in the binding...
+    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    str = args[0]
+    # file=args[1] ; line=args[2] #  TODO, ignored for now
     string = Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
-    bnd = Binding.new(ctx, self, blk)
+    bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
     vcgl = [ self.__getRubyVcGlobal(0x30),
        self.__getRubyVcGlobal(0x31) ]
@@ -455,6 +469,8 @@ class Object
   end 
 
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
+
+  primitive 'remove_instance_variable', 'rubyRemoveIv:'
 
   def singleton_methods(inc_modules = true)
     Module.__filter_method_names(__ruby_singleton_methods(inc_modules, 0))
@@ -539,9 +555,9 @@ class Object
       v = self.to_int
     rescue
       begin
-  v = Kernel.Integer(self)
+        v = Kernel.Integer(self)
       rescue
-  # ignore
+        # ignore
       end
     end
     v
@@ -568,19 +584,19 @@ class Object
   # the current transaction.
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 
-  # Undefined is a sentinal value used to distinguish between nil as a value passed 
+  # MaglevUndefined is a sentinal value used to distinguish between nil as a value passed 
   # by the user and the user not passing anything for a defaulted value.  E.g.,:
   #
-  #   def foo(required_param, optional_param=Undefined)
-  #     if optional_param._equal?( Undefined )
+  #   def foo(required_param, optional_param=MaglevUndefined)
+  #     if optional_param._equal?( MaglevUndefined )
   #       puts "User did not pass a value"
   #     else
   #       puts "Users passed #{optional_param} (which may be nil)"
   #     fi
   #   end
   #
-  Undefined = Object.new
-  Undefined.freeze
+  MaglevUndefined = Object.new
+  MaglevUndefined.freeze
 end
 Object.__freeze_constants
 

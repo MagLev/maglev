@@ -41,21 +41,21 @@ module MagRp #
          raise "unexpected racc_use_result_var==false"
       end
       @action_table   = arg[0].freeze
-      analyze_arr(@action_table, "@action_table");
+      analyze_arr(@action_table, "@action_table")
       @action_check   = arg[1].freeze
-      analyze_arr(@action_check, "@action_check");
+      analyze_arr(@action_check, "@action_check")
       @action_default = arg[2].freeze
-      analyze_arr(@action_default, "@action_default");
+      analyze_arr(@action_default, "@action_default")
       @action_pointer = arg[3].freeze
-      analyze_arr(@action_pointer, "@action_pointer");
+      analyze_arr(@action_pointer, "@action_pointer")
       @goto_table     = arg[4].freeze
-      analyze_arr(@goto_table, "@goto_table");
+      analyze_arr(@goto_table, "@goto_table")
       @goto_check     = arg[5].freeze
-      analyze_arr(@goto_check, "@goto_check");
+      analyze_arr(@goto_check, "@goto_check")
       @goto_default   = arg[6].freeze
-      analyze_arr(@goto_default, "@goto_default");
+      analyze_arr(@goto_default, "@goto_default")
       @goto_pointer   = arg[7].freeze
-      analyze_arr(@goto_pointer, "@goto_pointer");
+      analyze_arr(@goto_pointer, "@goto_pointer")
       # Racc_nt_base  is a constant # arg[8]
       reduc_tab = arg[9]
       reduc_len = reduc_tab.size

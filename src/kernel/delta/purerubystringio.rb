@@ -25,8 +25,8 @@ class PureRubyStringIO  < IO
   #  :sort_by, :string, :string=, :sync, :sync=, :sysread, :syswrite, :tell, :truncate, :tty?,
   #  :ungetc, :write, :zip]
 
-  def self.open(string="", mode=Undefined, &block)
-    # mode==Undefined translated to "r" or "r+" in initialize
+  def self.open(string="", mode=MaglevUndefined, &block)
+    # mode==MaglevUndefined translated to "r" or "r+" in initialize
     if block_given? then
       begin
         sio = new(string, mode)
@@ -130,11 +130,11 @@ class PureRubyStringIO  < IO
   # def gets ; end # implemented in IO
   #  see also __gets  below
 
-  def initialize(string="", mode=Undefined)
+  def initialize(string="", mode=MaglevUndefined)
     self._initialize(string, mode, false)
   end
 
-  def _initialize(string="", mode=Undefined, is_reopen=false)
+  def _initialize(string="", mode=MaglevUndefined, is_reopen=false)
     s_buf = Type.coerce_to(string, String, :to_str )
     isfrozen = s_buf.frozen?
     @lineNumber = 0
@@ -158,7 +158,7 @@ class PureRubyStringIO  < IO
         append = true
       end
       @mode = basemode
-    elsif mode._equal?(Undefined)
+    elsif mode._equal?(MaglevUndefined)
       basemode = isfrozen ? "r" : "r+"
       @mode = basemode
     else
@@ -320,9 +320,9 @@ class PureRubyStringIO  < IO
     self.__gets($/, 0x31)
   end
 
-  def readlines(sep_string=Undefined)
+  def readlines(sep_string=MaglevUndefined)
     if @sio_closed_read ; __require_readable ; end
-    if sep_string._equal?(Undefined)
+    if sep_string._equal?(MaglevUndefined)
       sep_string = $/
       return [] if eof?
     elsif sep_string._equal?(nil)
