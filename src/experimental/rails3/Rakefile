@@ -13,6 +13,17 @@ task :test, :file do |t, args|
   }
 end
 
+desc "Run the std app my_app with maglev"
+task :app do
+  cd('my_app') do
+    sh %{ maglev-ruby \
+            -I../rails/activesupport/lib \
+            -I../rails/activemodel/lib \
+            script/rails server
+    }
+  end
+end
+
 desc "Run the tests using MRI: takes optional file arg: 'rake test[test/foo_test.rb]'"
 task :mri, :file do |t,args|
   test_files = args.file || FileList['test/*_test.rb']
