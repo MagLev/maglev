@@ -24,7 +24,19 @@ This section lists some patches and workarounds in effect for this code.
   seems to work.  Aaron Patterson has assured me that he will eventualy get
   add_builtin_type implemeneted.
 
++ Bundler
 
+  Requiring yaml in MRI will define to_yaml_properties on Object.  In
+  Psych, to_yaml_properties is designed to be an override that is called,
+  only if defined.  rails3 assumes to_yaml_properties is defined on Object,
+  and so rails3 blows up with Psych.  Specifically, in
+  bundler-0.9.13/lib/bundler/rubygems_ext.rb:
+
+    alias :to_yaml_properties_before_crazy to_yaml_properties
+
+  I've patched Object to define to_yaml_properties while working on rails.
+  See the core_ext.rb file.
+  
 + ActiveSupport: en.yml
   The en.yml file contains some syck specific additions: Use of ':' in
   front of a bare word to indicate a symbol:

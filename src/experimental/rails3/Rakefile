@@ -19,6 +19,7 @@ task :app do
     sh %{ maglev-ruby \
             -I../rails/activesupport/lib \
             -I../rails/activemodel/lib \
+            -r ../core_ext.rb \
             script/rails server
     }
   end
