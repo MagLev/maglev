@@ -2,7 +2,11 @@ require 'sinatra'
 
 class Demo < Sinatra::Base
   set :server, ['webrick']
-  use_in_file_templates!
+  if Sinatra::VERSION =~ /^0\.*/
+    use_in_file_templates!
+  else
+    enable :inline_templates  # Sinatra 1.0 and later
+  end
 
   TREE = Maglev::PERSISTENT_ROOT[:kdtree_demo_data]
 
