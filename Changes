@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+== Unreleased changes  2010-04-05
+
+* Fix Trac 695, 696
+
 == Changes for 23171  2010-04-02
 
 * Updated to RubyGems 1.3.6
