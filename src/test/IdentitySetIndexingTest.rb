@@ -8,16 +8,67 @@ class Id
   end
 end
 
-class Bar
-  def initialize(id)
-    @id = id
+class Address
+  def initialize
+    @zipcode = rand(9000)
   end
 end
 
-class TestBasicIndexSupport < Test::Unit::TestCase
+class Bar
+  def initialize(id)
+    @id = id
+    @address = Address.new
+  end
+end
+
+
+class TestIndexeManagement < Test::Unit::TestCase
+  def test_indexed_paths
+    @idset = IdentitySet.new
+    equality_indexes = @idset.equality_indexed_paths
+    identity_indexes = @idset.identity_indexed_paths
+    assert_equal(0, equality_indexes.size)
+    assert_equal(0, identity_indexes.size)
+    assert_equal(:none, @idset.kinds_of_index_on('id'))
+
+    # Don't use Fixnum, since it maps to SmallInteger, and for
+    # SmallInteger, identity and equality are the same, so the system
+    # creates just the identity index and maps an equality index on it for
+    # free...
+    @idset.create_equality_index('id', String)
+    equality_indexes = @idset.equality_indexed_paths
+    identity_indexes = @idset.identity_indexed_paths
+    assert_equal(1, equality_indexes.size)
+    assert_equal(0, identity_indexes.size)
+    assert_equal(:equality, @idset.kinds_of_index_on('id'))
+
+    @idset.create_identity_index('id')
+    equality_indexes = @idset.equality_indexed_paths
+    identity_indexes = @idset.identity_indexed_paths
+    assert_equal(1, equality_indexes.size)
+    assert_equal(1, identity_indexes.size)
+    assert_equal(:equalityAndIdentity, @idset.kinds_of_index_on('id'))
+
+    @idset.remove_identity_index('id')
+    equality_indexes = @idset.equality_indexed_paths
+    identity_indexes = @idset.identity_indexed_paths
+    assert_equal(1, equality_indexes.size)
+    assert_equal(0, identity_indexes.size)
+    assert_equal(:equality, @idset.kinds_of_index_on('id'))
+
+    # Currently a bug: raises a RuntimeError:
+    # @idset.remove_equality_index('id')
+    # equality_indexes = @idset.equality_indexed_paths
+    # identity_indexes = @idset.identity_indexed_paths
+    # assert_equal(0, equality_indexes.size)
+    # assert_equal(0, identity_indexes.size)
+  end
+end
+
+class TestBasicEqualityIndexSupport < Test::Unit::TestCase
   def setup
     @idset = IdentitySet.new
-    @idset.create_index('id', Fixnum)
+    @idset.create_equality_index('id', Fixnum)
     @idx = Array.new
     10.times do |i|
       @idx[i] = Id.new(i)
