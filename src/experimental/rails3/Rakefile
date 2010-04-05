@@ -1,38 +1,31 @@
 
 task :default => :test
+RAILS_INCLUDES = %w(actionmailer
+                    actionpack
+                    activemodel
+                    activerecord
+                    activeresource
+                    activesupport
+                    railties).inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
+
+MH = ENV['MAGLEV_HOME']
+RAILS_INCLUDES << " -I#{MH}/lib/maglev/gems/1.8.7/gems/tzinfo-0.3.19/lib"
 
 desc "Run the tests: takes optional file arg: 'rake test[test/foo_test.rb]'"
 task :test, :file do |t, args|
   test_files = args.file || FileList['test/*_test.rb']
-  sh %{
-    $MAGLEV_HOME/bin/testrb \
-      -Irails/activesupport/lib \
-      -Irails/activemodel/lib \
-      -Itest \
-      #{test_files}
-  }
+  sh %{ $MAGLEV_HOME/bin/testrb #{RAILS_INCLUDES} -Itest #{test_files} }
 end
 
 desc "Run the std app my_app with maglev"
 task :app do
   cd('my_app') do
-    sh %{ maglev-ruby \
-            -I../rails/activesupport/lib \
-            -I../rails/activemodel/lib \
-            -r ../core_ext.rb \
-            script/rails server
-    }
+    sh %{ maglev-ruby #{RAILS_INCLUDES} -r tzinfo -r ../core_ext.rb script/rails server }
   end
 end
 
 desc "Run the tests using MRI: takes optional file arg: 'rake test[test/foo_test.rb]'"
 task :mri, :file do |t,args|
   test_files = args.file || FileList['test/*_test.rb']
-  sh %{
-    testrb \
-      -Irails/activesupport/lib \
-      -Irails/activemodel/lib \
-      -Itest \
-      #{test_files}
-  }
+  sh %{ testrb #{RAILS_INCLUDES} -Itest #{test_files} }
 end
