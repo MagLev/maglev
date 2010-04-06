@@ -151,11 +151,13 @@ class IdentitySet
     sum(&block) / length
   end
 
-  # ##################################################
+  #--
   # Add some of Enumerable's methods.  An Identity set is a
   # Non-sequenceable Collection, hence not all of Enumerable
   # is applicable.
-  # ##################################################
+  #++
+
+
   def find(ifnone = nil)
     each { |o| return o if yield(o) }
     ifnone.call if ifnone
@@ -230,7 +232,7 @@ class IdentitySet
   def any?(&block)
     if block_given?
       each { |o| return true if block.call(o) }
-    else 
+    else
       each { |o| return true if o }
     end
     false
@@ -258,21 +260,53 @@ class IdentitySet
   #
   # Example:
   #   Create an index for a set of people.  The index is on the age field
-  #   (a Fixnum) of the Person class:
+  #   (a Fixnum) of the Person class.  The objects are sorted using the
+  #   comparison functions defined by the 'Fixnum' class (i.e., 'age' will
+  #   be sorted numerically).
   #
   #     class Person
   #       attr_reader :name, :age  # Needs to be a fixed instance variable
   #       ...
   #     end
   #
-  #     # People must contain only object that have an @age instance
+  #     # People must contain only objects that have an @age instance
   #     # variable, and the value must be nil or a Fixnum
   #
   #     people = IdentitySet.new
-  #     people.create_index('age', Fixnum)
+  #     people.create_equality_index('age', Fixnum)
+  #     people << Person.new(...)
   #
   # A collection may have multiple indexes.
-  primitive_nobridge 'create_index', 'createEqualityIndexOn:withLastElementClass:'
+  primitive_nobridge 'create_equality_index', 'createEqualityIndexOn:withLastElementClass:'
+
+
+  # Creates an identity index on the path specified by the string.  An
+  # identity index uses object identity for the comparison.  Generates an
+  # error if +path+ is not a path for the element kind of the receiver or
+  # if any term of the path except the last term is not constrained.
+  #
+  # If an error occurs during index creation, it may not be possible to
+  # commit the current transaction later.
+  #
+  # Example:
+  #     class Employee
+  #       attr_reader :name, :address  # Needs to be a fixed instance variable
+  #       ...
+  #     end
+  #
+  #     class Address
+  #        attr_reader :zipcode, ...
+  #        ...
+  #     end
+  #
+  #     # Employees must contain only objects that have an @address that
+  #     # has a zip code.
+  #
+  #     employees = IdentitySet.new
+  #     employees.create_identity_index('address.zipcode')
+  #     employees << Employee.new("Fred", Address.new(...))
+  #
+  primitive_nobridge 'create_identity_index', 'createIdentityIndexOn:'
 
   primitive_nobridge '_search', 'select:comparing:with:'
   # Search the identity set for elements matching some criteria.  Makes
@@ -321,17 +355,36 @@ class IdentitySet
     _search_between(low_value, QUERY_OPS[low_op], operand_path, QUERY_OPS[high_op], high_value)
   end
 
-  # Remove an the specified index from receiver.
+  # Remove the specified index from receiver.
   #
   # Indexes will stay around, even if the collection they index is
   # destroyed (think running your test cases, over and over and not
   # cleaning up the indexes...). .
   #
   #    people.remove_index('age')
-  primitive_nobridge 'remove_index', 'removeIdentityIndexOn:'
+  primitive_nobridge 'remove_identity_index', 'removeIdentityIndexOn:'
+
+  primitive_nobridge 'remove_equality_index', 'removeEqualityIndexOn:'
 
   # Remove all indexes from the receiver
   primitive_nobridge 'remove_all_indexes', 'removeAllIndexes'
 
+  # Returns an Array of Strings, each of which represents a path for which
+  # an equality index exists in the receiver.  Each path originates with
+  # the elements of the receiver.
+  primitive_nobridge 'equality_indexed_paths', 'equalityIndexedPaths'
+
+  # Returns an Array of Strings, each of which represents a path for which
+  # an identity index exists in the receiver.  Each path originates with
+  # the elements of the receiver.
+  primitive_nobridge 'identity_indexed_paths', 'identityIndexedPaths'
+
+  # Returns a Symbol that indicates the kinds of indexes into the receiver
+  # that exist on 'path': :identity, :equality, :equalityAndIdentity,
+  # or :none (either 'path' is not a path for the element kind of the
+  # receiver, or no indexes into the receiver exist on 'path').
+  primitive_nobridge 'kinds_of_index_on', 'kindsOfIndexOn:'
+
   # TODO: Expose the IndexManager so you can list un-referenced indexes...
+  # TODO: createRc*IndexOn:
 end

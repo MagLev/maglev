@@ -26,3 +26,14 @@ class Type
     end
   end
 end
+
+
+# Another instance from Rails:
+class Railtie
+  class << self
+    def subclasses
+      @subclasses ||= []
+    end
+  end
+end
+
