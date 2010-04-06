@@ -38,7 +38,6 @@ included in this distribution, and covered by their respective licenses:
    ffi-License.txt - Ruby Foreign Function Interface
    GeoNames-License.txt - List of Zipcodes from GeoNames.org
    LibYaml-License.txt - libyaml shared library
-   Linenoise-License.txt - Linenoise line editing library
    MRI-COPYING.txt and MRI-LEGAL.txt - MRI 1.8.6 and 1.8.7
    Oniguruma-COPYING.txt - Oniguruma Regex
    Psych-License.txt - lib/ruby/1.8/psych Yaml code
