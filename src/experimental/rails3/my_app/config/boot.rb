@@ -1,17 +1,14 @@
-# Use Bundler (preferred)
+# Use locked gems if present.
 begin
   require File.expand_path('../../.bundle/environment', __FILE__)
-rescue LoadError
-  require 'rubygems'
-  require 'bundler'
-  Bundler.setup
 
-  # To use 2.x style vendor/rails and RubyGems
-  #
-  # vendor_rails = File.expand_path('../../vendor/rails', __FILE__)
-  # if File.exist?(vendor_rails)
-  #   Dir["#{vendor_rails}/*/lib"].each { |path| $:.unshift(path) }
-  # end
-  #
-  # require 'rubygems'
+rescue LoadError
+  # Otherwise, use RubyGems.
+  require 'rubygems'
+
+  # And set up the gems listed in the Gemfile.
+  if File.exist?(File.expand_path('../../Gemfile', __FILE__))
+    require 'bundler'
+    Bundler.setup
+  end
 end

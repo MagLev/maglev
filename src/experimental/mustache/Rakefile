@@ -1,0 +1,12 @@
+task :default => :maglev
+
+desc "Run the mustache demo.rb file with MagLev (default)"
+task :maglev do
+  sh %{ maglev-ruby -rubygems demo.rb }
+end
+
+desc "Run the mustache demo.rb file with MRI"
+task :mri do
+  sh %{ ruby -rubygems demo.rb }
+end
+

@@ -9,14 +9,14 @@ class TestIndex < Test::Unit::TestCase
   def setup
     # Create an IdentitySet with an index on last name
     @people = IdentitySet.new
-    @people.create_index('age', Fixnum)
+    @people.create_identity_index('age')
     NUM.times { @people << Person.random }
   end
 
   def teardown
     # Must remove the index, since they are permanent (their lifetime
     # may be greater than the lifetime of the associated collection).
-    @people.remove_index('age')
+    @people.remove_identity_index('age')
     @people = nil
   end
 
@@ -40,7 +40,7 @@ class TestIndex < Test::Unit::TestCase
 
     begin
       # Create an index and then re-measure
-      many_people.create_index('age', Fixnum)
+      many_people.create_identity_index('age')
       times << Benchmark.measure do
         results << many_people.search([:age], :lt, 25)
       end
@@ -50,7 +50,7 @@ class TestIndex < Test::Unit::TestCase
       assert_operator(splits[0][2], :>, splits[1][2])
     ensure
       puts "Removing index..."
-      many_people.remove_index('age')
+      many_people.remove_identity_index('age')
     end
   end
 
