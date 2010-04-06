@@ -1,5 +1,11 @@
 = MagLev Change Log
 
+== Changes for 23187  2010-04-06
+
+* Added line editor support using Linenoise library
+* Fix Trac 699 and part of 694
+* Comment out kconv in irb since it depends on a C extension
+
 == Changes for 23171  2010-04-02
 
 * Updated to RubyGems 1.3.6
