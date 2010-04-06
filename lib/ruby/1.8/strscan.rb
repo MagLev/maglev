@@ -76,7 +76,12 @@ class StringScanner
   end
 
   def exist?( pattern)
-    _scan( pattern, false, false)
+    p = _scan( pattern, false, false)
+    if p._equal?(nil)
+      p
+    else
+      @pos > 0 ? p -1 : p 
+    end
   end
 
   def get_byte
@@ -276,7 +281,7 @@ class StringScanner
     if getstr then
       m
     else
-      m.size
+      m.size 
     end
   end
   private :_scan
