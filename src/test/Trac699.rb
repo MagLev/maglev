@@ -1,9 +1,16 @@
 # Trac699.rb
 class C
-  autoload :PBM, "#{File.dirname(__FILE__)}/Trac699a.rb"
+  ax = autoload :PBM, "#{File.dirname(__FILE__)}/Trac699a.rb"
+  #puts "ax #{ax.inspect}"
   def x
-    p PBM::X
+    #aa = C::PBM
+    #puts "aa #{aa}"
+    bb = PBM::X
+    #puts "bb #{bb}"
+    bb
   end
 end
 
-C.new.x
+unless C.new.x == 10699 ; raise 'error'; end
+#puts "OK"
+true
