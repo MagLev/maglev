@@ -39,12 +39,12 @@ module IRB
 
     def String(mes)
       mes = super(mes)
-      case @lang
-      when /^ja/
-	mes = Kconv::kconv(mes, lc2kconv(@lang))
-      else
-	mes
-      end
+#     case @lang		# Patch until kconv.rb works (see Trac 694)
+#     when /^ja/
+#       mes = Kconv::kconv(mes, lc2kconv(@lang))
+#     else
+#	mes
+#     end
       mes
     end
 

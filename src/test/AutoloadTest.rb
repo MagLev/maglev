@@ -40,5 +40,17 @@ autoload(:AutoFoo, $dir + '/AutoloadHelper2.rb')
 ma = AutoFoo::AConstant
 test(ma , "Some value", '[13] Kernel autoload')
 
+# from Trac 694 
+autoload( :Foo694 , File.expand_path('empty_file.rb', File.dirname(__FILE__)))
+$fooa = 0
+begin
+  fx = Foo694
+  $fooa = 10
+rescue NameError
+  $fooa = 20
+end
+unless (fy = $fooa) == 20 ; raise 'error'; end
+  
+
 report
 true

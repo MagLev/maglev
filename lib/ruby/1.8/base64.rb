@@ -11,7 +11,7 @@
 # See Base64 for documentation.
 #
 
-require "kconv"
+# require "kconv"  # Patch until kconv.rb works (see Trac 694)
 
 
 # The Base64 module provides for the encoding (#encode64) and decoding
