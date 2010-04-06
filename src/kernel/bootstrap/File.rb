@@ -901,6 +901,13 @@ class File
     File.__stat(@pathName, true)
   end
 
+  primitive_nobridge '__line_editor_read', 'nextLineTo:prompt:'
+
+  def line_editor_readline(prompt_string)
+    sep = 10
+    self.__line_editor_read(sep, prompt_string)
+  end
+
   def mtime
     self.stat.mtime
   end
