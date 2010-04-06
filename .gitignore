@@ -8,24 +8,13 @@
 *.rbc
 *.swp
 *tmproj
-/gemstone
 /backups/
 /data/
 /html/
 /gemstone/
 /locks/
 /log/
-# gitignore keeps finding files in unnecessary directories
-# since it doesn't really track directories per se
-# hopefully, these wildcards will keep the bloat down
-/src/baseline/*
-/src/baseline/*/*
-/src/baseline/*/*/*
-/src/baseline/*/*/*/*
-/src/experimental/*
-/src/experimental/*/*
-/src/experimental/*/*/*
-/src/experimental/*/*/*/*
+/src/experimental/
 debugspec.inp
 cur.inp
 etc/maglev.demo.key
@@ -34,3 +23,6 @@ etc/maglev.demo.key
 lib/ruby/site_ruby/1.8/smalltalk
 lib/maglev/gems
 examples/persistence/gstore/pstore.db
+.yardoc
+doc
+out
