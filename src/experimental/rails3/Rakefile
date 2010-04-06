@@ -13,8 +13,10 @@ RAILS_INCLUDES << " -I#{MH}/lib/maglev/gems/1.8.7/gems/tzinfo-0.3.19/lib"
 
 desc "Run the tests: takes optional file arg: 'rake test[test/foo_test.rb]'"
 task :test, :file do |t, args|
-  test_files = args.file || FileList['test/*_test.rb']
-  sh %{ $MAGLEV_HOME/bin/testrb #{RAILS_INCLUDES} -Itest #{test_files} }
+  cd('test') do
+    test_files = args.file || FileList['*_test.rb']
+    sh %{ $MAGLEV_HOME/bin/testrb #{RAILS_INCLUDES} -I. #{test_files} }
+  end
 end
 
 desc "Run the std app my_app with maglev"

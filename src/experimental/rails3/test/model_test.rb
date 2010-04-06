@@ -4,17 +4,17 @@ require 'test/unit'
 gem 'i18n'
 
 require 'active_model'
-require 'person'
+require 'tperson'
 require 'yaml'
 # Test that we can include ActiveModel::Validations and make use of it
 class TestActiveModelValidations < Test::Unit::TestCase
 
   def test_valid_and_invalid
-    p = Person.new('Foo', 'Bar')
+    p = TPerson.new('Foo', 'Bar')
     assert(p.valid?)
     assert(! p.invalid?)
 
-    p = Person.new('Foo', nil)
+    p = TPerson.new('Foo', nil)
     assert(p.invalid?)
     assert(! p.valid?)
   end
@@ -22,7 +22,7 @@ class TestActiveModelValidations < Test::Unit::TestCase
   def test_validates_each
     # The person class has a validates_each block that does not allow first
     # or last names that start with 'z'.
-    p = Person.new('fred', 'flintstone')
+    p = TPerson.new('fred', 'flintstone')
     assert(p.valid?)
     p.last_name = 'zoolander'
     assert(p.invalid?)
