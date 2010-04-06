@@ -1,0 +1,4 @@
+desc "Run hello.rb"
+task :default do
+  sh %{ maglev-ruby hello.rb }
+end
