@@ -20,3 +20,6 @@ memcached_top
 rails
 rake2thor
 thor
+cucumber
+rake
+tt
