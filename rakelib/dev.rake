@@ -167,9 +167,19 @@ GemStoneInstallation.current.stones.each do |stone_name|
   end
 end
 
-desc "Kill (with prejudice) the named stone"
+desc "Kill the named stone"
 task :kill, :stone do |t, args|
   stone = args.stone || 'maglev'
+  kill_stone(stone)
+end
+
+desc "Kill -9 the named stone"
+task :killkill, :stone do |t, args|
+  stone = args.stone || 'maglev'
+  kill_stone(stone, '-9')
+end
+
+def kill_stone(stone, sig='')
   stones = `$GEMSTONE/bin/gslist -clv`
   puts stones
   pids = stones.grep(/(Stone|cache)\s+#{stone}/) { |l| l.split[3] }
@@ -178,6 +188,6 @@ task :kill, :stone do |t, args|
   else
     pids = pids.join(" ")
     puts "Killing #{stone}: #{pids}"
-    sh "kill #{pids}"
+    sh "kill #{sig} #{pids}"
   end
 end
