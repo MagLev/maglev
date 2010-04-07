@@ -3,7 +3,7 @@
 == Changes for 23191  2010-04-06
 
 * Added line editor support using Linenoise library
-* Fix Trac 695, 696 699 and part of 694
+* Fix Trac 682, 695, 696 699 and part of 694
 * Comment out kconv in irb since it depends on a C extension
 
 == Changes for 23171  2010-04-02
