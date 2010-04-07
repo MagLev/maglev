@@ -1,7 +1,6 @@
 require 'sinatra'
 
 class Demo < Sinatra::Base
-  set :server, ['webrick']
   if Sinatra::VERSION =~ /^0\.*/
     use_in_file_templates!
   else

@@ -10,7 +10,7 @@ with a latitude and longitude.
 
 The demo.rb file is a Sinatra application that allows you to enter a
 latitude and longitude (preferably, within the US, if you're using the US
-Postal Database), and will find the nearest K zip codes to the lat/lon.  
+Postal Database), and will find the nearest N zip codes to the lat/lon.
 
 To run the app, just run rake:
 
@@ -29,15 +29,16 @@ The demo will show up in Sinatra at: http://localhost:3333/
 
 == Profile Ruby Code
 
-You can MagLev with profiling turned on and take a look at the performance
-details (see which methods are called the most, and from where, etc.):
+You can run MagLev with profiling turned on and take a look at the
+performance details (see which methods are called the most, and from where,
+etc.):
 
   $ rake maglev:gprof    # dumps output in ./profile.out
   $ more profile.out
 
 == Performance
 
-The following are just back of the envelope numbers, from a single run On a
+The following are just back of the envelope numbers, from a single run on a
 2.4GHz Intel Core 2 Duo (MacBook) with 2G Ram.   The test creates a tree of
 one million random locations, then performs one thousand searches on the
 tree. Each search is for the nearest 100 points to a different random
@@ -45,9 +46,9 @@ location.
 
 === Summary
 
-The times to iterate all nodes and to run of 1,000 queries for the nearest
-100 nodes in Maglev, MRI 1.8.6, MRI 1.9.2 and MRI 1.8.6 + KDTree Gem (C
-implementation) are, fastest to slowest:
+The table below lists the time to run 1,000 queries for the nearest 100
+nodes in Maglev, MRI 1.8.6, MRI 1.9.2 and MRI 1.8.6 + KDTree Gem (C
+implementation), fastest to slowest:
 
   MRI + C-extension gem:
                            user     system      total        real
@@ -76,6 +77,9 @@ since we commit the tree into persistent memory.  That means we can run the
 queries in a different VM than the one that created the data.  MRI is
 forced to create the tree and run the queries in the same VM.
 
+
+Here are the times to create and commit the data in MagLev:
+
   $ rake maglev:commit
   == Committing tree2d.rb
   == Creating tree of 1000000 random nodes
@@ -85,8 +89,8 @@ forced to create the tree and run the queries in the same VM.
   Commit data           2.700000   1.050000   3.750000 (  7.259246)
   == Committed tree as Maglev::PERSISTENT_ROOT[:RANDOM_KDTREE]
 
-The times to iterate all nodes and to run of 1,000 queries for the nearest
-100 nodes in the previously committed tree:
+The time to iterate all nodes and the time to run 1,000 queries for the
+nearest 100 nodes in the previously committed tree in MagLev:
 
   $ rake maglev:query
 
