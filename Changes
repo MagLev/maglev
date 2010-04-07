@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-== Changes for 23189  2010-04-06
+== Changes for 23191  2010-04-06
 
 * Added line editor support using Linenoise library
 * Fix Trac 695, 696 699 and part of 694
