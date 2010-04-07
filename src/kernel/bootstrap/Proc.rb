@@ -160,79 +160,79 @@ class Proc
     end
 
     def __block
-      @block
+      @_st_block
     end
 
     def __initialize(&block_arg)
-      @block = block_arg
+      @_st_block = block_arg
     end
 
     # private primitives for $~ implementation only
     def __fetchRubyVcGlobal(ofs)
-      @block.__fetchRubyVcGlobal(ofs)
+      @_st_block.__fetchRubyVcGlobal(ofs)
     end
     def __setRubyVcGlobal(ofs, val)
-      @block.__setRubyVcGlobal(ofs, val)
+      @_st_block.__setRubyVcGlobal(ofs, val)
     end
 
     def __set_self(obj)
-      @block.__set_self(obj)
+      @_st_block.__set_self(obj)
     end
 
     def []
-      @block.call
+      @_st_block.call
     end
 
     def [](a)
-      @block.call(a)
+      @_st_block.call(a)
     end
 
     def [](a, b)
-      @block.call(a, b)
+      @_st_block.call(a, b)
     end
 
     def [](a, b, c)
-      @block.call(a, b, c)
+      @_st_block.call(a, b, c)
     end
 
     def [](&block)
-      @block.call(&block)
+      @_st_block.call(&block)
     end
 
     def [](a, &block)
-      @block.call(a, &block)
+      @_st_block.call(a, &block)
     end
 
     def [](a, b, &block)
-      @block.call(a, b, &block)
+      @_st_block.call(a, b, &block)
     end
 
     def [](*args)
-      @block.call(*args)
+      @_st_block.call(*args)
     end
 
     def __fficallback(*args)
       # execution of a Proc by an FFI callback invokes this method
-      @block.call(*args)
+      @_st_block.call(*args)
     end
 
     def ==(other)
       if other._is_a?(Proc)
-        return @block._equal?(other.__block)
+        return @_st_block._equal?(other.__block)
       end
       false
     end
 
     def __arity=(v)
-      @arity = v
+      @_st_arity = v
     end
 
     def arity
-      na = @arity
+      na = @_st_arity
       if na._not_equal?(nil)
         return na
       end
-      blk = @block
+      blk = @_st_block
       na = blk.__num_args 
       if na._equal?(0)
         if blk.__no_declared_args
@@ -247,29 +247,29 @@ class Proc
     end
 
     def call(*args, &block)
-      @block.call(*args, &block)
+      @_st_block.call(*args, &block)
     end
     def call
       # this and following variants get no bridge methods
-      @block.call
+      @_st_block.call
     end
     def call(a)
-      @block.call(a)
+      @_st_block.call(a)
     end
     def call(a, b)
-      @block.call(a, b)
+      @_st_block.call(a, b)
     end
     def call(a, b, c)
-      @block.call(a, b, c)
+      @_st_block.call(a, b, c)
     end
     def call(&block)
-      @block.call(&block)
+      @_st_block.call(&block)
     end
     def call(a, &block)
-      @block.call(a, &block)
+      @_st_block.call(a, &block)
     end
     def call(a, b, &block)
-      @block.call(a, b, &block)
+      @_st_block.call(a, b, &block)
     end
 
     #  Creating a Binding from a Proc is not yet supported.
@@ -298,11 +298,11 @@ class Proc
 
     def value
       # used by smalltalk rubyEval:
-      @block.call
+      @_st_block.call
     end
 
     def value(a)
       # used by smalltalk  Integer>>_rubyTimes...
-      @block.call(a)
+      @_st_block.call(a)
     end
 end

@@ -5,13 +5,13 @@ class Binding
 
   def initialize( binding_context , obj, blk )
     info = Binding.__build_names( binding_context )
-    @staticLink = info[0]   # staticLink may be nil
-    @names = info[1]
-    @selfObj = obj 
-    @block = blk
-    @forModuleEval = false
-    @tmpsDict = nil
-    @homeMeth = binding_context[-1]	# for 1.8.7
+    @_st_staticLink = info[0]   # staticLink may be nil
+    @_st_names = info[1]
+    @_st_selfObj = obj 
+    @_st_block = blk
+    @_st_forModuleEval = false
+    @_st_tmpsDict = nil
+    @_st_homeMeth = binding_context[-1]	# for 1.8.7
   end
 
   def self.__basic_new(a_self)
@@ -20,13 +20,13 @@ class Binding
   end
 
   def __init(a_self)
-    @selfObj = a_self
-    @block = nil
-    @forModuleEval = false
-    @tmpsDict = nil
-    @names = []
-    @staticLink = nil
-    @lexicalScope = nil
+    @_st_selfObj = a_self
+    @_st_block = nil
+    @_st_forModuleEval = false
+    @_st_tmpsDict = nil
+    @_st_names = []
+    @_st_staticLink = nil
+    @_st_lexicalScope = nil
     self
   end
 
@@ -34,15 +34,15 @@ class Binding
     unless a_scope._is_a?(LexicalPath)
       raise ArgumentError, 'expected instance of Binding::LexicalPath; send of :binding or :eval not supported'
     end
-    @lexicalScope = a_scope
+    @_st_lexicalScope = a_scope
   end
 
   def __home_method
-    @homeMeth  # for 1.8.7
+    @_st_homeMeth  # for 1.8.7
   end
 
   def block
-    @block
+    @_st_block
   end
 
   def eval(*args, &block_arg)		# added for 1.8.7
@@ -76,24 +76,24 @@ class Binding
 
   
   def __context
-    @staticLink # a VariableContext
+    @_st_staticLink # a VariableContext
   end
 
   def __get_temp( symbol )
     # only used for temps not in the starting VariableContext
-    @tmpsDict[ symbol ]
+    @_st_tmpsDict[ symbol ]
   end
 
   def __put_temp( symbol, value )
     # returns value
     # only used for temps not in the starting VariableContext
-    h = @tmpsDict
+    h = @_st_tmpsDict
     if h._equal?(nil)
       h = IdentityHash.new
-      @tmpsDict = h
+      @_st_tmpsDict = h
     end
     unless h.has_key?( symbol )
-      (nms = @names) << symbol 
+      (nms = @_st_names) << symbol 
       nms << nil 
     end
     h[ symbol ] = value

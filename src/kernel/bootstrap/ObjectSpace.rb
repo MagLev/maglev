@@ -22,9 +22,9 @@ module ObjectSpace
     end
 
     def __finalize_done(dict)
-      oid = @obj.__id
-      @obj = nil
-      @procs = nil
+      oid = @_st_obj.__id
+      @_st_obj = nil
+      @_st_procs = nil
       dict.__delete(oid)
       nil
     end

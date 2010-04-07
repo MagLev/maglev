@@ -16,7 +16,7 @@ class ThreadGroup
   end
 
   def add(thread)
-    if @closed
+    if @_st_closed
       raise ThreadError,'cannot alter enclosed thread group'
     else
       thread.__join_group(self)
@@ -24,11 +24,11 @@ class ThreadGroup
   end
 
   def enclosed?
-    @closed
+    @_st_closed
   end
 
   def enclose
-    @closed = true
+    @_st_closed = true
   end
 
   # TODO,  freeze does not yet prevent starting threads

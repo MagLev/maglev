@@ -52,12 +52,12 @@ module Process
     # after a child process has finished execution.
  
     def __status
-      @stat
+      @_st_stat
     end
     
     def ==(other)
       if other._is_a?( Status )
-        @stat == other.__status
+        @_st_stat == other.__status
       else
         false
       end
@@ -65,12 +65,12 @@ module Process
 
     def &(fixnum)
       arg = Type.coerce_to(fixnum, Fixnum, :to_int)
-      @stat & arg
+      @_st_stat & arg
     end
 
     def >>(fixnum)
       arg = Type.coerce_to(fixnum, Fixnum, :to_int)
-      @stat >> arg
+      @_st_stat >> arg
     end
 
     # coredump?  # MNI
@@ -82,14 +82,14 @@ module Process
 
     def exitstatus
       # equivalent to posix WEXITSTATUS macro
-      (@stat >> 8) & 0xFF
+      (@_st_stat >> 8) & 0xFF
     end
 
     # pid    #  MNI
     # signaled?  # MNI
 
     def success?
-      @stat == 0
+      @_st_stat == 0
     end 
 
     # stopped? # MNI
@@ -97,15 +97,15 @@ module Process
     # termsig  # MNI
 
     def to_i
-      @stat
+      @_st_stat
     end 
 
     def to_int
-      @stat
+      @_st_stat
     end 
 
     def to_s
-      @stat.to_s
+      @_st_stat.to_s
     end
   end  # ]
 

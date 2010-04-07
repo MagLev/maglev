@@ -24,7 +24,7 @@ class Exception
     primitive_nobridge '__basic_dup', '_basicCopy'
 
     def __message
-      m = @messageText
+      m = @_st_messageText
       if m._equal?(nil)
         m = __description  # generate Smalltalk message
       end
@@ -45,11 +45,11 @@ class Exception
     end
 
     def __message_append(str)
-      m = @messageText
+      m = @_st_messageText
       if m._equal?(nil)
         m = self.message
         if m._equal?(nil)
-          @messageText = str.to_s
+          @_st_messageText = str.to_s
           return
         end
       end
@@ -90,12 +90,12 @@ class Exception
       if msg._equal?(nil)
         msg = self.class.name
       end
-      @messageText = msg
+      @_st_messageText = msg
     end
 
     def initialize
       self.__st_initialize  # initialize smalltak instvars
-      @messageText = self.class.name
+      @_st_messageText = self.class.name
     end
 
     def initialize(*args)
@@ -105,13 +105,13 @@ class Exception
       if msg._equal?(nil)
         msg = self.class.name
       end
-      @messageText = msg
+      @_st_messageText = msg
     end
 
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop
-      @stack || Thread.__backtrace(IncludeSmalltalkFrames, limit)
+      @_st_stack || Thread.__backtrace(IncludeSmalltalkFrames, limit)
     end
 
     def backtrace_st(limit = 1000)
@@ -139,7 +139,7 @@ class Exception
     end
 
     def set_backtrace(array)
-      @stack = array
+      @_st_stack = array
     end
 
     def to_s
@@ -160,7 +160,7 @@ class SystemExit
   primitive_nobridge '__st_initialize', 'initialize'
 
   def status
-    @status
+    @_st_status
   end
 
   def initialize(*args)
@@ -170,7 +170,7 @@ class SystemExit
                0
              end
     super(*args)
-    @status = status
+    @_st_status = status
   end
 end
 
@@ -277,10 +277,10 @@ class SystemCallError
     exc
   end
   def errno=(errnum)
-    @gsarguments = [ errnum ]
+    @_st_gsarguments = [ errnum ]
   end
   def errno
-    gsa = @gsarguments
+    gsa = @_st_gsarguments
     if gsa._equal?(nil)
       nil
     else
@@ -325,7 +325,7 @@ class NoMethodError  # a subclass of NameError
    primitive_nobridge '__st_initialize', 'initialize'
 
    def __init(selector, args_arr, envid)
-     gsa = @gsarguments
+     gsa = @_st_gsarguments
      if selector._isSymbol
        gsa[1] = selector
      end
@@ -339,13 +339,13 @@ class NoMethodError  # a subclass of NameError
    end
 
    def selector
-     @gsarguments[1]
+     @_st_gsarguments[1]
    end
    def envid
-     @gsarguments[3]
+     @_st_gsarguments[3]
    end
    def args
-     a = @gsarguments[2]
+     a = @_st_gsarguments[2]
      if a._equal?(nil)
        a = []
      end

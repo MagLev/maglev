@@ -664,7 +664,7 @@ class File
 
   def chmod(arg)
     permission = Type.coerce_to(arg, Fixnum, :to_int)
-    status = File.__modify_file( 10, @fileDescriptor, permission, nil)
+    status = File.__modify_file( 10, @_st_fileDescriptor, permission, nil)
     unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.chmod failed')
     end
@@ -672,7 +672,7 @@ class File
   end
 
   def chown(owner, group)
-    status = File.__modify_file( 12, @fileDescriptor, owner, group)
+    status = File.__modify_file( 12, @_st_fileDescriptor, owner, group)
     unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.chown failed')
     end
@@ -849,7 +849,7 @@ class File
   LOCK_UN = fetch_flock_constants()[3]
 
   def flock(lock_constant)
-    status = File.__modify_file(11, @fileDescriptor, lock_constant)
+    status = File.__modify_file(11, @_st_fileDescriptor, lock_constant)
     unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.flock failed')
     end
@@ -869,7 +869,7 @@ class File
     if closed?
       raise IOError, 'cannot flush a closed File'
     end
-    status = File.__modify_file(16, @fileDescriptor, nil, nil)
+    status = File.__modify_file(16, @_st_fileDescriptor, nil, nil)
     unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.fsync failed') 
     end
@@ -890,7 +890,7 @@ class File
   end
 
   def lchown(owner, group)
-    status = File.__modify_file( 4, @pathName, owner, group)
+    status = File.__modify_file( 4, @_st_pathName, owner, group)
     unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.lchown failed')
     end
@@ -898,7 +898,7 @@ class File
   end
 
   def lstat
-    File.__stat(@pathName, true)
+    File.__stat(@_st_pathName, true)
   end
 
   primitive_nobridge '__line_editor_read', 'nextLineTo:prompt:'
@@ -918,14 +918,14 @@ class File
   end
 
   def path
-    @pathName
+    @_st_pathName
   end
 
   def stat
     if closed?
       raise IOError, 'File#stat on a closed File'
     end
-    res = File.__fstat(@fileDescriptor, false)
+    res = File.__fstat(@_st_fileDescriptor, false)
     if (res._isFixnum)
       Errno.raise_errno(status, 'aFile.stat failed')
     end
@@ -966,7 +966,7 @@ class File
 
   def truncate(a_length) 
     a_length = Type.coerce_to(a_length, Fixnum, :to_int)
-    status = File.__modify_file( 15, @fileDescriptor, a_length, nil)
+    status = File.__modify_file( 15, @_st_fileDescriptor, a_length, nil)
     unless status._equal?(0)
       Errno.raise_errno(status, 'aFile.truncate failed')
     end

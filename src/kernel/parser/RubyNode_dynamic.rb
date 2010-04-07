@@ -23,7 +23,7 @@ module MagRp
 
   class RubyLocalAsgnNode
     def setAmpersandBlockParam
-      @isAmpersandBlockParam = true
+      @isAmpersandBlockParam = true # dynamic IV
     end
     def isAmpersandBlockParam
       @isAmpersandBlockParam
@@ -33,9 +33,9 @@ module MagRp
   class RubyParAsgnRpNode
 
        def init(first, src_line )
-         @firstNode = first
-         # @secondNode = nil  # not used
-         @thirdNode = nil
+         @_st_firstNode = first
+         # @_st_secondNode = nil  # not used
+         @_st_thirdNode = nil
          if src_line._not_equal?(nil)
            @srcLine = src_line  # for debugging , a dynamic iv 
          end

@@ -127,17 +127,17 @@ class Dir
   # Instance Methods
 
   def initialize(path)
-    @path    = path
+    @_st_path    = path
     # @entries has been filled in by __new primitive
-    @index   = 0
-    @closed  = false
-    @range   = 0...@entries.length
+    @_st_index   = 0
+    @_st_closed  = false
+    @_st_range   = 0...@_st_entries.length
     self
   end
 
   def close
-    raise IOError, "in 'close'" if @closed
-    @closed = true
+    raise IOError, "in 'close'" if @_st_closed
+    @_st_closed = true
   end
 
   def each(&block)
@@ -146,48 +146,48 @@ class Dir
       return DirEnumerator.new(self, :each) # for 1.8.7
     end
     i = 0
-    lim = @entries.size
+    lim = @_st_entries.size
     while i < lim
-      block.call(@entries[i])
+      block.call(@_st_entries[i])
       i = i + 1
     end
   end
 
   def __entries
-    @entries
+    @_st_entries
   end
 
   def path
     # 1.8.7, do not  check_closed
-    @path
+    @_st_path
   end
 
   def pos
     check_closed
-    @index
+    @_st_index
   end
 
   def pos=(pos)
     check_closed
     p = Type.coerce_to(pos, Fixnum, :to_i)
 
-    @index = p if @range === p
-    @index
+    @_st_index = p if @_st_range === p
+    @_st_index
   end
 
   def read
     check_closed
 
-    return nil unless @range === @index
+    return nil unless @_st_range === @_st_index
 
-    result = @entries[@index]
-    @index += 1
+    result = @_st_entries[@_st_index]
+    @_st_index += 1
     result
   end
 
   def rewind
     check_closed
-    @index = 0
+    @_st_index = 0
     self 	# change for 1.8.7
   end
 
@@ -195,13 +195,13 @@ class Dir
     check_closed
     p = Type.coerce_to(pos, Fixnum, :to_i)
 
-    @index = p if (0...@entries.size) === p
+    @_st_index = p if (0...@_st_entries.size) === p
     self 
   end
 
   alias tell pos
 
   def check_closed
-    raise IOError, "closed directory" if @closed
+    raise IOError, "closed directory" if @_st_closed
   end
 end

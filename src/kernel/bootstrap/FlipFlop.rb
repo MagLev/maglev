@@ -15,7 +15,7 @@ class Range
 
     def __update_from_to(expr1val, expr2val)
       # runtime for 2 dots form
-      s = @theState
+      s = @_st_theState
       unless s
         if expr1val
           s = true
@@ -23,12 +23,12 @@ class Range
           if expr2val
             new_state = false
           end
-          @theState = new_state
+          @_st_theState = new_state
         end
       else
         if expr2val
           new_state = false
-          @theState = new_state
+          @_st_theState = new_state
         end
       end
       s
@@ -36,15 +36,15 @@ class Range
 
     def __update_from_to3(expr1val, expr2val)
       # runtime for 3 dots form
-      s = @theState
+      s = @_st_theState
       unless s
         if expr1val
           s = true
-          @theState = s
+          @_st_theState = s
         end
       else
         if expr2val
-          @theState = false 
+          @_st_theState = false 
         end
       end
       s

@@ -8,7 +8,7 @@ class Hash
   alias member? has_key?
 
   def to_a
-    ary = Array.new(@numElements)
+    ary = Array.new(@_st_numElements)
     n = 0
     self.each_pair { | k, v | 
       ary[n] = [ k , v ] 

@@ -21,7 +21,7 @@ class IdentityHash
 
   def __atkey(key)  # [
     kh = key.__identity_hash
-    kofs = kh % @tableSize  ; kofs += kofs
+    kofs = kh % @_st_tableSize  ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -52,7 +52,7 @@ class IdentityHash
   def __bucket_at(key, khash)  
     # parent is a Hash , khash is the result of key.__identity_hash
     # returns value for key, or RemoteNil if key not found
-    kofs = khash % @tableSize ; kofs += kofs
+    kofs = khash % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -75,7 +75,7 @@ class IdentityHash
 
   def __at_orRNil(key)  
     kh = key.__identity_hash
-    kofs = kh % @tableSize ; kofs += kofs
+    kofs = kh % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -100,7 +100,7 @@ class IdentityHash
       
   def __atkey_put(key, value) # [
     kh = key.__identity_hash
-    kofs = kh % @tableSize ; kofs += kofs
+    kofs = kh % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -159,18 +159,18 @@ class IdentityHash
         # a collision bucket
         delta = v.__bucket_at_put( key, kh, value)
       end
-      nelem = @numElements + delta  # delta is zero or 1
-      @numElements = nelem
-      ncoll = @numCollisions + delta
-      @numCollisions = ncoll
-      if ncoll > @collisionLimit
+      nelem = @_st_numElements + delta  # delta is zero or 1
+      @_st_numElements = nelem
+      ncoll = @_st_numCollisions + delta
+      @_st_numCollisions = ncoll
+      if ncoll > @_st_collisionLimit
         self.__rebuild( (nelem.to_f * 2).to_i )
       end
     else
       # empty entry in hash table
       self.__at_put(kofs , key)
       self.__at_put(kofs + 1, value)
-      @numElements = @numElements + 1
+      @_st_numElements = @_st_numElements + 1
     end
     value # return
   end # ]
@@ -181,7 +181,7 @@ class IdentityHash
   def __bucket_at_put( key, khash, value)
     # returns 1 if a new entry added to bucket,
     #         0 if key found and value replaced
-    kofs = khash % @tableSize ; kofs += kofs
+    kofs = khash % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -234,15 +234,15 @@ class IdentityHash
       self.__at_put(kofs , key)
       self.__at_put(kofs + 1, value)
     end
-    @numElements = @numElements + 1
-    # @numCollisions  not maintained in buckets
+    @_st_numElements = @_st_numElements + 1
+    # @_st_numCollisions  not maintained in buckets
     return 1
   end
 
   def __delete(key) # [  
     # returns value removed, or RemoteNil
     kh = key.__identity_hash
-    kofs = kh % @tableSize ; kofs += kofs
+    kofs = kh % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -250,7 +250,7 @@ class IdentityHash
         if key._equal?( k )
           self.__at_put(kofs + 1 , RemoteNil)
           self.__at_put(kofs + 1, RemoteNil)
-          @numElements = @numElements - 1
+          @_st_numElements = @_st_numElements - 1
           return v
         end
       elsif v._isFixnum
@@ -261,8 +261,8 @@ class IdentityHash
             v = self.__at(idx + 1)
             self.__at_put(idx , RemoteNil)
             self.__at_put(idx + 1, RemoteNil)
-            @numElements = @numElements - 1
-            @numCollisions = @numCollisions - 1
+            @_st_numElements = @_st_numElements - 1
+            @_st_numCollisions = @_st_numCollisions - 1
             return v 
           end
           idx = self.__at(idx + 2)
@@ -271,8 +271,8 @@ class IdentityHash
         # a collision bucket
         val = v.__bucket_delete( key, kh )
         if val._not_equal?(RemoteNil)
-          @numElements = @numElements - 1
-          @numCollisions = @numCollisions - 1
+          @_st_numElements = @_st_numElements - 1
+          @_st_numCollisions = @_st_numCollisions - 1
         end
         return val
       end
@@ -281,7 +281,7 @@ class IdentityHash
   end # ]
 
   def __bucket_delete( key, khash )  
-    kofs = khash % @tableSize  ; kofs += kofs
+    kofs = khash % @_st_tableSize  ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -289,7 +289,7 @@ class IdentityHash
         if key._equal?( k )
           self.__at_put(kofs + 1 , RemoteNil)
           self.__at_put(kofs + 1, RemoteNil)
-          @numElements = @numElements - 1
+          @_st_numElements = @_st_numElements - 1
           return v 
         end
       elsif v._isFixnum
@@ -300,8 +300,8 @@ class IdentityHash
             v = self.__at(idx + 1)
             self.__at_put(idx , RemoteNil)
             self.__at_put(idx + 1, RemoteNil)
-            @numElements = @numElements - 1
-            # @numCollisions not maintained in buckets
+            @_st_numElements = @_st_numElements - 1
+            # @_st_numCollisions not maintained in buckets
             return v 
           end
           idx = self.__at(idx + 2)

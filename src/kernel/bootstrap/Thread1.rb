@@ -30,7 +30,7 @@ class Thread
     end
   
     def locked_by(a_thread)
-      @owner._equal?(a_thread) && self.locked?
+      @_st_owner._equal?(a_thread) && self.locked?
     end
 
     def self.attempt_lock(a_thread)
@@ -38,10 +38,10 @@ class Thread
     end
 
     def attempt_lock(a_thread)
-      own = @owner
+      own = @_st_owner
       if own._equal?(nil)
         if self.try_lock
-          @owner = a_thread
+          @_st_owner = a_thread
           return true 
         end 
       elsif own._equal?(a_thread)
@@ -55,14 +55,14 @@ class Thread
     end
 
     def unlock_by(a_thread)
-      own = @owner
+      own = @_st_owner
       if own._equal?(a_thread)
-        @owner = nil
+        @_st_owner = nil
         self.unlock
       elsif own._equal?(nil)
         # do nothing
       elsif own.__is_terminated
-        @owner = nil
+        @_st_owner = nil
         self.unlock
       else
         raise 'cannot unlock, owned by another thread'

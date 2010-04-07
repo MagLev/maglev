@@ -14,6 +14,7 @@ class Foo
 end
 
 val = "x"
+ff = Foo
 Foo.store(:foo, val)
 
 test(Foo.retrieve(:foo), val, 'the test')

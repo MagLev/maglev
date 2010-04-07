@@ -2,6 +2,8 @@ class Module
 
   # See also delta/Module.rb
 
+  primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
+
   def __isBehavior
     true
   end
@@ -439,10 +441,10 @@ class Module
     self
   end
 
-  # The @name fixed instVar in Module may hold a Smalltalk class name
+  # The @_st_name fixed instVar in Module may hold a Smalltalk class name
   # which may be different from the Ruby name for the Module .
   # The  rubyFullName method obtains the name from the Module's
-  # rubyNameSpace if possible, before using @name .
+  # rubyNameSpace if possible, before using @_st_name .
   primitive 'name', 'rubyFullName'
 
   # Module.nesting is compiled to an env0 send of ( aRubyConstantRef nesting ) .

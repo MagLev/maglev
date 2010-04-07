@@ -53,20 +53,20 @@ class MatchData
 
   def pre_match  	# from Rubinius
     # public, and also invoked from generated code for RubyBackRefNode
-    res = @strPreceedingMatch
+    res = @_st_strPreceedingMatch
     if (res._equal?(nil))
-      res = @inputString[0, self.begin(0)]
-      @strPreceedingMatch = res
+      res = @_st_inputString[0, self.begin(0)]
+      @_st_strPreceedingMatch = res
     end
     res
   end
 
   def post_match
     # public, and also invoked from generated code for RubyBackRefNode
-    res = @strFollowingMatch
+    res = @_st_strFollowingMatch
     if (res._equal?(nil))
-      res = @inputString[self.end(0)..-1]
-      @strFollowingMatch = res
+      res = @_st_inputString[self.end(0)..-1]
+      @_st_strFollowingMatch = res
     end
     res
   end
@@ -77,7 +77,7 @@ class MatchData
   end
 
   def string
-    @inputString
+    @_st_inputString
   end
 
 
@@ -89,7 +89,7 @@ class MatchData
     beg_zero = self.begin(0)
     return "" if beg_zero._equal?(0) # maglev
     pre_end = beg_zero - 1
-    @inputString[idx, pre_end-idx+1]
+    @_st_inputString[idx, pre_end-idx+1]
   end
 
   def select(&block)

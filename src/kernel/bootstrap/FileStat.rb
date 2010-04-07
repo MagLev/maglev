@@ -42,7 +42,7 @@ class File
   end
 
   def mode
-    @mode
+    @_st_mode
   end
 
   def <=>(other)
@@ -51,65 +51,65 @@ class File
   end
 
   def atime
-    Time.at @atime
+    Time.at @_st_atime
   end
 
   def blksize
-    @blksize
+    @_st_blksize
   end
 
   def blockdev?
-    (@mode & S_IFMT) == S_IFBLK
+    (@_st_mode & S_IFMT) == S_IFBLK
   end
 
   def blocks
-    @blocks
+    @_st_blocks
   end
 
   def chardev?
-    (@mode & S_IFMT) == S_IFCHR
+    (@_st_mode & S_IFMT) == S_IFCHR
   end
 
   def ctime
-    Time.at @ctime
+    Time.at @_st_ctime
   end
 
   def dev
-    @dev
+    @_st_dev
   end
 
   def dev_major
-    __major(@dev)
+    __major(@_st_dev)
   end
 
   def dev_minor
-    __minor(@dev)
+    __minor(@_st_dev)
   end
 
   def directory?
-    (@mode & S_IFMT) == S_IFDIR
+    (@_st_mode & S_IFMT) == S_IFDIR
   end
 
   def executable?
     return true if superuser?
-    return @mode & S_IXUSR != 0 if owned?
-    return @mode & S_IXGRP != 0 if grpowned?
-    return @mode & S_IXOTH != 0
+    return @_st_mode & S_IXUSR != 0 if owned?
+    return @_st_mode & S_IXGRP != 0 if grpowned?
+    return @_st_mode & S_IXOTH != 0
   end
 
   def executable_real?
     return true if superuser?
-    return @mode & S_IXUSR != 0 if rowned?
-    return @mode & S_IXGRP != 0 if rgrpowned?
-    return @mode & S_IXOTH != 0
+    return @_st_mode & S_IXUSR != 0 if rowned?
+    return @_st_mode & S_IXGRP != 0 if rgrpowned?
+    return @_st_mode & S_IXOTH != 0
   end
 
   def file?
-    (@mode & S_IFMT) == S_IFREG
+    (@_st_mode & S_IFMT) == S_IFREG
   end
 
   def ftype
-    case @mode & S_IFMT
+    case @_st_mode & S_IFMT
     when S_IFBLK : 'blockSpecial'
     when S_IFCHR : 'characterSpecial'
     when S_IFDIR : 'directory'
@@ -122,116 +122,116 @@ class File
   end
 
   def gid
-    @gid
+    @_st_gid
   end
 
   def grpowned?
-    @gid == Maglev.__system.getegid
+    @_st_gid == Maglev.__system.getegid
   end
 
   def ino
-    @ino
+    @_st_ino
   end
 
   def inspect
-    str = "#<#{self.class.name} dev=0x#{@dev.to_s(16)}, ino=#{@ino},"
-    str << " mode=#{sprintf("%07d", @mode.to_s(8).to_i)}, nlink=#{@nlink}, uid=#{@uid},"
-    str << " gid=#{@gid}, rdev=0x#{@rdev.to_s(16)}, size=#{@size}, blksize=#{@blksize},"
-    str << " blocks=#{@blocks}, atime=#{self.atime}, mtime=#{self.mtime}, ctime=#{self.ctime}>"
+    str = "#<#{self.class.name} dev=0x#{@_st_dev.to_s(16)}, ino=#{@_st_ino},"
+    str << " mode=#{sprintf("%07d", @_st_mode.to_s(8).to_i)}, nlink=#{@_st_nlink}, uid=#{@_st_uid},"
+    str << " gid=#{@_st_gid}, rdev=0x#{@_st_rdev.to_s(16)}, size=#{@_st_size}, blksize=#{@_st_blksize},"
+    str << " blocks=#{@_st_blocks}, atime=#{self.atime}, mtime=#{self.mtime}, ctime=#{self.ctime}>"
     str
   end
 
   def mtime
-    Time.at @mtime
+    Time.at @_st_mtime
   end
 
   def nlink
-    @nlink
+    @_st_nlink
   end
 
   def owned?
-    @uid == Maglev.__system.geteuid
+    @_st_uid == Maglev.__system.geteuid
   end
 
   def pipe?
-    (@mode & S_IFMT) == S_IFIFO
+    (@_st_mode & S_IFMT) == S_IFIFO
   end
 
   def rdev
-    @rdev
+    @_st_rdev
   end
 
   def rdev_major
-    __major(@rdev)
+    __major(@_st_rdev)
   end
 
   def rdev_minor
-    __minor(@rdev)
+    __minor(@_st_rdev)
   end
 
   def readable?
     return true if superuser?
-    return @mode & S_IRUSR != 0 if owned?
-    return @mode & S_IRGRP != 0 if grpowned?
-    return @mode & S_IROTH != 0
+    return @_st_mode & S_IRUSR != 0 if owned?
+    return @_st_mode & S_IRGRP != 0 if grpowned?
+    return @_st_mode & S_IROTH != 0
   end
 
   def readable_real?
     return true if superuser?
-    return @mode & S_IRUSR != 0 if rowned?
-    return @mode & S_IRGRP != 0 if rgrpowned?
-    return @mode & S_IROTH != 0
+    return @_st_mode & S_IRUSR != 0 if rowned?
+    return @_st_mode & S_IRGRP != 0 if rgrpowned?
+    return @_st_mode & S_IROTH != 0
   end
 
   def setgid?
-    (@mode & S_IFMT) == S_ISGID
+    (@_st_mode & S_IFMT) == S_ISGID
   end
 
   def setuid?
-    (@mode & S_ISUID) != 0
+    (@_st_mode & S_ISUID) != 0
   end
 
   def size
-    @size
+    @_st_size
   end
 
   def size?
-    sz = @size
+    sz = @_st_size
     sz._equal?(0) ? nil : sz
   end
 
   def socket?
-    (@mode & S_IFMT) == S_IFSOCK
+    (@_st_mode & S_IFMT) == S_IFSOCK
   end
 
   def sticky?
-    (@mode & S_ISVTX) != 0
+    (@_st_mode & S_ISVTX) != 0
   end
 
   def symlink?
-    (@mode & S_IFMT) == S_IFLNK
+    (@_st_mode & S_IFMT) == S_IFLNK
   end
 
   def uid
-    @uid
+    @_st_uid
   end
 
   def writable?
     return true if superuser?
-    return @mode & S_IWUSR != 0 if owned?
-    return @mode & S_IWGRP != 0 if grpowned?
-    return @mode & S_IWOTH != 0
+    return @_st_mode & S_IWUSR != 0 if owned?
+    return @_st_mode & S_IWGRP != 0 if grpowned?
+    return @_st_mode & S_IWOTH != 0
   end
 
   def writable_real?
     return true if superuser?
-    return @mode & S_IWUSR != 0 if rowned?
-    return @mode & S_IWGRP != 0 if rgrpowned?
-    return @mode & S_IWOTH != 0
+    return @_st_mode & S_IWUSR != 0 if rowned?
+    return @_st_mode & S_IWGRP != 0 if rgrpowned?
+    return @_st_mode & S_IWOTH != 0
   end
 
   def zero?
-    @size._equal?(0)
+    @_st_size._equal?(0)
   end
 
   # pull the major device number out of a dev_t
@@ -248,11 +248,11 @@ class File
   end
 
   def rgrpowned?
-    @gid == Maglev.__system.getgid
+    @_st_gid == Maglev.__system.getgid
   end
 
   def rowned?
-    @uid == Maglev.__system.getuid
+    @_st_uid == Maglev.__system.getuid
   end
 
  end
