@@ -4,4 +4,5 @@ module ObjectSpace
 
   Finalizer = Object.__resolve_smalltalk_global(:RubyFinalizer)
   System = Object.__resolve_smalltalk_global(:System)
+  Repository = Object.__resolve_smalltalk_global(:Repository)
 end

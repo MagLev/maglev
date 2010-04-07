@@ -3,6 +3,10 @@ module ObjectSpace
     class_primitive_nobridge '__session_state', '_sessionStateAt:'
   end
 
+  class Repository
+    class_primitive_nobridge '__loaded_classes', '_loadedClasses:'
+  end
+
   class Finalizer  # identically smalltalk RubyFinalizer
 
     # Finalizers are not useable during bootstrap.
@@ -108,5 +112,13 @@ module ObjectSpace
     nil
   end
 
-  module_function :_id2ref, :define_finalizer, :each_object, :garbage_collect, :undefine_finalizer
+  def loaded_classes(include_modules=true)
+    # Returns an Array of Classes 
+    #  or an Array of Classes and Module which are loaded in memory.
+    # does not include meta classes, meta modules, or virtual classes.
+    with_modules = include_modules ? true : false 
+    Repository.__loaded_classes(with_modules)
+  end
+
+  module_function :_id2ref, :define_finalizer, :each_object, :garbage_collect, :undefine_finalizer, :loaded_classes
 end
