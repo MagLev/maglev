@@ -13,10 +13,10 @@ task :blog => :commit do
   sh %{ $MAGLEV_HOME/bin/rackup config.ru }
 end
 
-"Run tets: requires rubygems installed and a patched minitest gem"
+desc "Run tets: requires rubygems installed and a patched minitest gem"
 task :tests => :commit do
-  Dir.glob("test/*_tests.rb") do |t|
+  Dir.glob("test/*_tests.rb").each do |t|
+    puts "running #{t}"
     sh %{ maglev-ruby #{t} }
   end
 end
-

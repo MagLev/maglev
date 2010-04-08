@@ -18,7 +18,7 @@ class BlogApp < Sinatra::Base
 
   def initialize(*args)
     super
-    @title = 'Simple Sinatra Blog'
+    @title = 'Simple MagLev Powered Blog'
     @nav_bar =  <<-EOS
         <ul class="menu">
           <li><a href="/posts">All Posts</a></li>
@@ -48,10 +48,10 @@ class BlogApp < Sinatra::Base
   end
 
   post '/post' do
-    post = SimplePost.new(params)
+    post = SimplePost.persistent_new(params)
     ObjectLogEntry.info("A Post", post).add_to_log
     params[:tags].split.each do |tag|
-      t = SimpleTag.find_by_name(tag) || SimpleTag.new(tag)
+      t = SimpleTag.find_by_name(tag) || SimpleTag.persistent_new(tag)
       post.tag t
     end if params[:tags]
     redirect "/post/#{post.__id__}"
