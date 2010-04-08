@@ -36,7 +36,7 @@ This section lists some patches and workarounds in effect for this code.
 
   I've patched Object to define to_yaml_properties while working on rails.
   See the core_ext.rb file.
-  
+
 + ActiveSupport: en.yml
   The en.yml file contains some syck specific additions: Use of ':' in
   front of a bare word to indicate a symbol:
@@ -64,3 +64,23 @@ This section lists some patches and workarounds in effect for this code.
            else
              @ss.tokenize o.value
            end
+
++ Turn on -MallIvsDynamic
+
+  There are a few places (e.g., application.rb) that create an instance of
+  a class before the first closing of that class (i.e., before
+  immediateInvariant has been called on the class).  That raises an
+  exception. If you run with -MallIvsDynamic, then all instance variables
+  will be dynamic, so we can send immediateInvariant before the closing of
+  the class and thus allow instance creation.  The price is that everything
+  runs slower.
+
+  We could also wrap just specific classes with:
+
+     Maglev::System.session_temp_put( :MAGLEV_allIvsDynamic, true )
+     class X
+       ...
+     end
+     Maglev::System.session_temp_put( :MAGLEV_allIvsDynamic, false )
+
+  This is turned on in the Rakefile.
