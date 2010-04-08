@@ -15,8 +15,5 @@ end
 
 desc "Run tets: requires rubygems installed and a patched minitest gem"
 task :tests => :commit do
-  Dir.glob("test/*_tests.rb").each do |t|
-    puts "running #{t}"
-    sh %{ maglev-ruby #{t} }
-  end
+  Dir.glob('test/*_tests.rb').each { |t| sh "maglev-ruby -I lib #{t}" }
 end
