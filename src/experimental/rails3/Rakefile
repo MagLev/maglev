@@ -22,7 +22,7 @@ end
 desc "Run the std app my_app with maglev"
 task :app do
   cd('my_app') do
-    sh %{ maglev-ruby #{RAILS_INCLUDES} -r tzinfo -r ../core_ext.rb script/rails server }
+    sh %{ maglev-ruby -MallIvsDynamic #{RAILS_INCLUDES} -r tzinfo -r ../core_ext.rb script/rails server }
   end
 end
 
