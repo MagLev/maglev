@@ -28,23 +28,6 @@ To run the Sinatra app,
 
   $ rake blog
 
-=== Files
-
-* README.rdoc This file
-* Rakefile    The Rakefile
-* blog.rb     The persistent, business classes for the app.  This code is run once only.
-* blog_app.rb The Sinatra app
-* commit_code.rb  Code to commit the business logic code to the MagLev repository
-* config.ru   Rackup file to run both the blog and objectlog apps.
-* dumpdb.rb   Script that prints the contents of the db to stdout (debugging)
-* objectlog.ru  Rackup file to run just the objectlog
-* objectlog_app.rb  The object log app
-* public            Web root for the running apps
-* test        Some MiniTest tests for the business logic
-* txn_wrapper.rb Rack middleware used by <tt>blog_app.rb</tt> to wrap a
-  transaction around each HTTP request.
-* views       Sinatra view directory
-
 === Issues
 
 * Need better separation of model helpers and business objects.  Some of
