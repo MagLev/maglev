@@ -1365,6 +1365,7 @@ class Array
 
   primitive 'push*', '_rubyAddAll:'
   primitive_nobridge 'push', '_rubyAddLast:'
+  primitive '__push*', '_rubyAddAll:'
   primitive_nobridge '__push', '_rubyAddLast:'
   def push
     # zero args variant does nothing
