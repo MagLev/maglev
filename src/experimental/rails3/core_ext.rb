@@ -7,5 +7,7 @@ class Object
   def to_yaml_properties
     instance_variables
   end
+  def self.yaml_as(tag)
+    Psych.add_tag(tag, self)
+  end
 end
-
