@@ -67,14 +67,14 @@ class Regexp
 
   def ==(otherRegexp)
     if (otherRegexp._isRegexp)
-      otherRegexp.source == source && otherRegexp.options == @options
+      otherRegexp.source == source && otherRegexp.options == @_st_options
     else
       false
     end
   end
 
   def hash
-    (@source.hash) ^ ((@options & ALL_OPTIONS_MASK) .hash)
+    (@_st_source.hash) ^ ((@_st_options & ALL_OPTIONS_MASK) .hash)
   end
 
   def ===(str)
@@ -93,7 +93,7 @@ class Regexp
 
   # Return true if +Regexp::IGNORECASE+ is set on this regexp
   def casefold?
-    !((@options & IGNORECASE)._equal?(0))
+    !((@_st_options & IGNORECASE)._equal?(0))
   end
 
   # def inspect  # implemented in common/regex.rb
@@ -191,7 +191,7 @@ class Regexp
 
   def source
     # return the original string of the pattern
-    @source
+    @_st_source
   end
 
   def =~(*args, &block)
@@ -362,7 +362,7 @@ class Regexp
   def __rindex_string(string, offset)
     res = nil
     str_size = string.size
-    if @source.index('\G')._not_equal?(nil)
+    if @_st_source.index('\G')._not_equal?(nil)
       # We are giving wrong answers
       raise ArgumentError, ' \G not supported yet in String#rindex(regexp)'
     end
@@ -406,7 +406,7 @@ class Regexp
   # TODO: limit is not used....
   def __split_string(string, limit)
     result = []
-    if @source == ""
+    if @_st_source == ""
       slim = string.size
       i = 0
       while i < slim

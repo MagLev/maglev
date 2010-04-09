@@ -4,24 +4,24 @@ class Range
   primitive 'hash'
 
   def begin
-    @from
+    @_st_from
   end
   def first
-    @from
+    @_st_from
   end
 
   def end
-    @to
+    @_st_to
   end
   def last
-    @to
+    @_st_to
   end
 
   def ===(n)
-    return false if (n <=> @from)  < 0
-    to_cmp = n <=> @to
+    return false if (n <=> @_st_from)  < 0
+    to_cmp = n <=> @_st_to
     return false if to_cmp > 0
-    if @excludeEnd
+    if @_st_excludeEnd
       return false if to_cmp == 0
     end
     return true
@@ -32,10 +32,10 @@ class Range
       return RangeEnumerator.new(self, :each, 1) # for 1.8.7
     end
           # adapted from fix contributed by Markus
-    x = @from
-    llast = @to
+    x = @_st_from
+    llast = @_st_to
     if x._isFixnum
-      if @excludeEnd
+      if @_st_excludeEnd
         while x < llast
           block.call( x )
           x = x + 1
@@ -50,7 +50,7 @@ class Range
       raise TypeError, "can't iterate from #{x.class}" unless x.respond_to?(:succ)
       if llast._isString
         sz = llast.size
-        if @excludeEnd
+        if @_st_excludeEnd
           while (x < llast) and (x.size <= sz)
             block.call( x )
             x = x.succ
@@ -62,7 +62,7 @@ class Range
           end
         end
       elsif x._isNumeric && llast._isNumeric
-        if @excludeEnd
+        if @_st_excludeEnd
           while x < llast
             block.call( x )
             x = x.succ
@@ -74,7 +74,7 @@ class Range
           end
         end
       else
-        if @excludeEnd
+        if @_st_excludeEnd
           while (x <=> llast) < 0
             block.call( x )
             x = x.succ
@@ -95,27 +95,27 @@ class Range
 
   def eql?(other)
     other._isRange &&
-      @from.eql?(other.first) &&
-      @to.eql?(other.last) &&
-      @excludeEnd.eql?(other.exclude_end?)
+      @_st_from.eql?(other.first) &&
+      @_st_to.eql?(other.last) &&
+      @_st_excludeEnd.eql?(other.exclude_end?)
   end
 
   alias == eql?
 
   def exclude_end?
-    @excludeEnd
+    @_st_excludeEnd
   end
 
   def __limit
-    if @excludeEnd
-      @to
+    if @_st_excludeEnd
+      @_st_to
     else
-      @to + @by
+      @_st_to + @_st_by
     end
   end
 
   def length
-    ((self.__limit - @from).__divide( @by )).__max(0) 
+    ((self.__limit - @_st_from).__divide( @_st_by )).__max(0) 
   end
 
   def initialize(fromArg, toArg, exclusive=false)
@@ -128,10 +128,10 @@ class Range
       end
     end
 
-    @from = fromArg
-    @to = toArg
-    @by = 1
-    @excludeEnd = exclusive
+    @_st_from = fromArg
+    @_st_to = toArg
+    @_st_by = 1
+    @_st_excludeEnd = exclusive
   end
 
   # Convert this range object to a printable form (using
@@ -140,10 +140,10 @@ class Range
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
     unless added
-      return #{@excludeEnd ? "..." : ".."}
+      return #{@_st_excludeEnd ? "..." : ".."}
     end
     begin
-      s = "#{@from.inspect}#{@excludeEnd ? "..." : ".."}#{@to.inspect}"
+      s = "#{@_st_from.inspect}#{@_st_excludeEnd ? "..." : ".."}#{@_st_to.inspect}"
     ensure
       ts.remove(self)
     end
@@ -152,9 +152,9 @@ class Range
 
   def step(n=1, &block)
     # algorithm replicated in RangeEnumerator
-    current = @from
-    lim = @to
-    if @from._isNumeric
+    current = @_st_from
+    lim = @_st_to
+    if @_st_from._isNumeric
       unless n._isNumeric
         n = Type.coerce_to(n, Integer, :to_int)
       end
@@ -164,7 +164,7 @@ class Range
       unless block_given?
         return RangeEnumerator.new(self, :step, n)  # for 1.8.7
       end
-      if @excludeEnd
+      if @_st_excludeEnd
         begin
           block.call(current)
           current += n
@@ -179,7 +179,7 @@ class Range
       unless block_given?
         return RangeEnumerator.new(self, :step, n)  # for 1.8.7
       end
-      unless @excludeEnd
+      unless @_st_excludeEnd
         lim = lim.succ
       end
       begin
@@ -191,7 +191,7 @@ class Range
   end
 
   def to_s
-    "#{@from}#{@excludeEnd ? "..." : ".."}#{@to}"
+    "#{@_st_from}#{@_st_excludeEnd ? "..." : ".."}#{@_st_to}"
   end
 
   # We don't use the smalltalk asArray method, since it uses '+' rather
@@ -203,13 +203,13 @@ class Range
   end
 
   def __integer_to_a
-    # assumes receiver is a simple range with @from <= @to
-    n = @from
-    last = @to
+    # assumes receiver is a simple range with @_st_from <= @_st_to
+    n = @_st_from
+    last = @_st_to
     unless n._isFixnum && last._isFixnum 
       raise TypeError, 'Range is not over Fixnums'
     end
-    if @excludeEnd
+    if @_st_excludeEnd
       last -= 1
     end
     count = (last - n).__max(0)
@@ -228,8 +228,8 @@ class Range
   # This does the appropriate Type.coerce_to that the specs expect.
   # +err+ is ignored for now.
   def __beg_len(len)
-    beg = Type.coerce_to(@from, Fixnum, :to_int)
-    the_end = Type.coerce_to(@to, Fixnum, :to_int)
+    beg = Type.coerce_to(@_st_from, Fixnum, :to_int)
+    the_end = Type.coerce_to(@_st_to, Fixnum, :to_int)
 
     if (beg < 0)
       beg += len
@@ -240,7 +240,7 @@ class Range
     the_end = len if (the_end > len)
 
     the_end += len if (the_end < 0)
-    the_end += 1 unless @excludeEnd
+    the_end += 1 unless @_st_excludeEnd
     len = the_end - beg
     len = 0 if (len < 0)
     return [beg, len]

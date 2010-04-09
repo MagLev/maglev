@@ -11,12 +11,16 @@ module Readline
   end
 
   class HistoryArray < Array
-    def push(line)
+    def push(*lines)
       # based on usage seen in irb
-      if self.__size >= 200
-        self.__remove_from_to_(1, 1)  # one-based args
+      sz = self.__size
+      if sz >= 200
+        count = sz.__min(lines.__size)
+        if count > 0
+          self.__remove_from_to_(1, count )  # one-based args
+        end
       end
-      self.__push(line)
+      self.__push(*lines)
     end
   end
    

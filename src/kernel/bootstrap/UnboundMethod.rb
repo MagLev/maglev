@@ -15,7 +15,7 @@ class UnboundMethod
   primitive_nobridge 'name', '_selectorPrefix'  # for 1.8.7
 
   def __gsmeth
-    @gsmeth 
+    @_st_gsmeth 
   end
 
   primitive '__nonbridge_meth', '_nonBridgeMeth'
@@ -23,7 +23,7 @@ class UnboundMethod
   def ==(other)
     other.class._equal?(self.class) &&
     other.arity == self.arity && 
-    (other.__gsmeth._equal?(@gsmeth) || 
+    (other.__gsmeth._equal?(@_st_gsmeth) || 
        other.__nonbridge_meth._equal?(self.__nonbridge_meth ))
   end
 

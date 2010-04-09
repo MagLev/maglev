@@ -72,27 +72,27 @@ module FFI
     NULL = self.new(0)
 
     def initialize
-      @typeSize = 1
+      @_st_typeSize = 1
     end
     def initialize(elem_size)
       unless elem_size._isFixnum && elem_size > 0
         raise TypeError, 'element size must be a Fixnum > 0'
       end
-      @typeSize = elem_size
+      @_st_typeSize = elem_size
     end
     def __initialize(elem_size)
-      @typeSize = elem_size
+      @_st_typeSize = elem_size
     end
 
     def type_size
-      @typeSize
+      @_st_typeSize
     end
 
     def __type_size=(elem_size)
       unless elem_size._isFixnum && elem_size > 0
         raise TypeError, 'element size must be a Fixnum > 0'
       end
-      @typeSize = elem_size
+      @_st_typeSize = elem_size
     end
 
     class_primitive_nobridge '__with_all', 'withAll:'
@@ -132,7 +132,7 @@ module FFI
       # the instance which owns the C memory pointed to by self,
       #  if nil, then the C memory is owned by self.
       # may be an Integer if created by read_pointer.
-      @derivedFrom
+      @_st_derivedFrom
     end
 
     def each(&block)

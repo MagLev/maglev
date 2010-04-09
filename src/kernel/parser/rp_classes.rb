@@ -20,13 +20,13 @@ module MagRp
       o.initialize(str, ofs, line)
     end
     def initialize(str, ofs, line)
-      @val = str.__as_symbol
+      @_st_val = str.__as_symbol
       @line_num = line
-      @src_offset = ofs
+      @_st_src_offset = ofs
       self
     end
     def inspect
-      "(DefnNameToken #{@val}  @#{@src_offset} line:#{@line_num})"
+      "(DefnNameToken #{@_st_val}  @#{@_st_src_offset} line:#{@line_num})"
     end
   end
 

@@ -476,7 +476,7 @@ class String
   #  <code>String#chomp!</code>.
   def chop!
     my_size = self.__size
-    if my_size > 0
+    if my_size._not_equal?( 0 )
       if self.__at(-1)._equal?( ?\n )
         if my_size > 1 && self.__at(-2)._equal?( ?\r )
           self.__size=(my_size - 2)

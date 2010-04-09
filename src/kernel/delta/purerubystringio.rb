@@ -137,7 +137,7 @@ class PureRubyStringIO  < IO
   def _initialize(string="", mode=MaglevUndefined, is_reopen=false)
     s_buf = Type.coerce_to(string, String, :to_str )
     isfrozen = s_buf.frozen?
-    @lineNumber = 0
+    @_st_lineNumber = 0  # IV inherited from IO
     append = false
     if mode._isInteger
       if mode._equal?( IO::RDONLY )
@@ -347,7 +347,7 @@ class PureRubyStringIO  < IO
 
   def rewind
     @sio_pos = 0
-    @lineNumber = 0
+    @_st_lineNumber = 0
   end
 
   def seek(offset, whence=SEEK_SET)
@@ -485,7 +485,7 @@ class PureRubyStringIO  < IO
     end
 
     if @sio_closed_read ; __require_readable ; end
-    @lineNumber += 1
+    @_st_lineNumber += 1
     s_pos = @sio_pos
     pstart = s_pos
     s_string = @sio_string

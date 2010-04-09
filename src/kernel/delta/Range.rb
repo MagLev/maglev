@@ -3,12 +3,12 @@ class Range
 
   def member?(val)
     # implementation to conform to rubyspecs, Pickaxe docs incorrect
-    fr = @from
+    fr = @_st_from
     if fr._isNumeric && val._isNumeric
-      if @excludeEnd
-        val >= fr && val < @to
+      if @_st_excludeEnd
+        val >= fr && val < @_st_to
       else
-        val >= fr && val <= @to
+        val >= fr && val <= @_st_to
       end
     else
       self.step(1) { |i| 

@@ -52,15 +52,15 @@ class Socket # [
     if op._equal?(Fcntl::F_SETFL)
       flags = Type.coerce_to(flags, Fixnum, :to_int)
       if (flags & File::NONBLOCK) != 0
-        @isRubyBlocking = false
+        @_st_isRubyBlocking = false
       else
-        @isRubyBlocking = true
+        @_st_isRubyBlocking = true
       end
       flags = flags & (~ File::NONBLOCK)
       super(op, flags)
     elsif op._equal?(Fcntl::F_GETFL)
       res = super(op, flags)
-      if @isRubyBlocking
+      if @_st_isRubyBlocking
         res = res | File::NONBLOCK
       end
       res

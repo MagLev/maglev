@@ -23,7 +23,7 @@ people = IdentitySet.new
 # NOTE: this sorting is done on the @age instance variable, and does not
 # depend on an instance method named "age".  We will put People objects in
 # the set.  People have a name, age, gender and address.
-people.create_identity_index('age')
+people.create_identity_index('@age')
 
 Benchmark.bm do |x|
 #  population = 100_000
@@ -34,7 +34,7 @@ Benchmark.bm do |x|
   }
 
   x.report("Find the youngsters") {
-    youngsters = people.search([:age], :lt, 25)
+    youngsters = people.search([:'@age'], :lt, 25)
   }
   puts "Found #{youngsters.length} youngsters"
 
@@ -42,8 +42,8 @@ Benchmark.bm do |x|
   # field (marital_status).  We then intersect the sets to get the result
   old_hermits = nil
   x.report("Find old hermits") {
-    old_ones = people.search([:age], :gte, 75)
-    hermits  = people.search([:marital_status], :eql, :hermit)
+    old_ones = people.search([:'@age'], :gte, 75)
+    hermits  = people.search([:'@marital_status'], :eql, :hermit)
     old_hermits = hermits & old_ones
   }
 
@@ -58,14 +58,14 @@ Benchmark.bm do |x|
 
   # We can add another index and use it as well.  Here we index on the zip
   # code of the person's address.  This is a "multi-level" index.
-  people.create_identity_index('address.zip')
+  people.create_identity_index('@address.@zip')
 
   # now, search for young people in the lucrative 45678 zip code
   puts "="*20, " Some lucrative youngsters...", "="*20
   lucrative_youngsters = nil
   x.report("Youngsters in 45678") {
-    young_ones = people.search([:age], :lte, 25)
-    lucrative  = people.search([:address, :zip], :eql, 45678)
+    young_ones = people.search([:'@age'], :lte, 25)
+    lucrative  = people.search([:'@address', :'@zip'], :eql, 45678)
     lucrative_youngsters = young_ones & lucrative
   }
   count = 0

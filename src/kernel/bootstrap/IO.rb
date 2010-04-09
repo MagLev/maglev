@@ -291,7 +291,7 @@ class IO
     if closed?
       raise IOError, 'IO#lineno on a closed IO'
     end
-    num = @lineNumber
+    num = @_st_lineNumber
     if num._equal?(nil)
       num = 0
     end
@@ -303,18 +303,18 @@ class IO
       raise IOError, 'IO#lineno= on a closed IO'
     end
     num = Type.coerce_to(integer, Fixnum, :to_int)
-    @lineNumber = num
+    @_st_lineNumber = num
     num
   end
 
   def __increment_lineno
     # to be called by gets implementations
-    num = @lineNumber
+    num = @_st_lineNumber
     if num._equal?(nil)
       num = 0
     end
     num += 1
-    @lineNumber = num 
+    @_st_lineNumber = num 
     $. = num
     num
   end

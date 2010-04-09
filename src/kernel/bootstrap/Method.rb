@@ -15,10 +15,10 @@ class Method
     #   RubyMethod is defined in the .mcz
 
     def __obj
-      @obj
+      @_st_obj
     end
     def receiver  # for 1.8.7
-      @obj
+      @_st_obj
     end
 
     def __to_proc
@@ -28,8 +28,8 @@ class Method
     def ==(other)
       # Returns true if other is the same method as self
       if (other._kind_of?(Method))
-        return @obj._equal?(other.__obj) &&
-         @gsmeth._equal?(other.__gsmeth)
+        return @_st_obj._equal?(other.__obj) &&
+         @_st_gsmeth._equal?(other.__gsmeth)
       else
         return false
       end
@@ -38,11 +38,11 @@ class Method
     # arity inherited from UnboundMethod
 
     def call(*args, &block)
-      @gsmeth.__call_star(@obj, *args, &block)
+      @_st_gsmeth.__call_star(@_st_obj, *args, &block)
     end
 
     def [](*args, &block)
-      @gsmeth.__call_star(@obj, *args, &block)
+      @_st_gsmeth.__call_star(@_st_obj, *args, &block)
     end
 
     alias_method :eql? , :==

@@ -108,7 +108,7 @@ class Hash
       end
       if pair._not_equal?(nil)
         p_size = pair.__size
-        if p_size <= 2 && p_size > 0
+        if p_size <= 2 && p_size._not_equal?( 0 )
           res.__atkey_put( pair.__at(0), pair.__at(1) )
         end
       end
@@ -258,18 +258,18 @@ class Hash
   end
 
   def hash
-    97633 ^ @numElements
+    97633 ^ @_st_numElements
   end
 
   def __tableSize
-    @tableSize
+    @_st_tableSize
   end
 
   primitive '__at', '_atZ:'  # prim 858 , zero based arg
                  # raises error if arg negative, or past end
 
   def __add_keys_to(set)  # used by parser # [
-    lim = @tableSize
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -301,7 +301,7 @@ class Hash
 
   def __atkey(key)  # [
     kh = key.hash
-    kofs = kh % @tableSize  ; kofs += kofs
+    kofs = kh % @_st_tableSize  ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -332,7 +332,7 @@ class Hash
   def __bucket_at(key, khash)
     # parent is a Hash , khash is the result of key.hash
     # returns value for key, or RemoteNil if key not found
-    kofs = khash % @tableSize ; kofs += kofs
+    kofs = khash % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -355,7 +355,7 @@ class Hash
 
   def __at_orRNil(key)
     kh = key.hash
-    kofs = kh % @tableSize ; kofs += kofs
+    kofs = kh % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -392,7 +392,7 @@ class Hash
       end
     end
     kh = key.hash
-    kofs = kh % @tableSize ; kofs += kofs
+    kofs = kh % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -451,18 +451,18 @@ class Hash
         # a collision bucket
         delta = v.__bucket_at_put( key, kh, value)
       end
-      nelem = @numElements + delta  # delta is zero or 1
-      @numElements = nelem
-      ncoll = @numCollisions + delta
-      @numCollisions = ncoll
-      if ncoll > @collisionLimit
+      nelem = @_st_numElements + delta  # delta is zero or 1
+      @_st_numElements = nelem
+      ncoll = @_st_numCollisions + delta
+      @_st_numCollisions = ncoll
+      if ncoll > @_st_collisionLimit
         self.__rebuild( (nelem.to_f * 2).to_i )
       end
     else
       # empty entry in hash table
       self.__at_put(kofs , key)
       self.__at_put(kofs + 1, value)
-      @numElements = @numElements + 1
+      @_st_numElements = @_st_numElements + 1
     end
     value # return
   end # ]
@@ -472,7 +472,7 @@ class Hash
   def __bucket_at_put( key, khash, value)
     # returns 1 if a new entry added to bucket,
     #         0 if key found and value replaced
-    kofs = khash % @tableSize ; kofs += kofs
+    kofs = khash % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -521,13 +521,13 @@ class Hash
         raise 'Inconsistent Hash collision bucket'
         return 0
       end
-      @numElements = @numElements + 1
-      # @numCollisions  not maintained in buckets
+      @_st_numElements = @_st_numElements + 1
+      # @_st_numCollisions  not maintained in buckets
     else
       # empty entry in hash table
       self.__at_put(kofs , key)
       self.__at_put(kofs + 1, value)
-      @numElements = @numElements + 1
+      @_st_numElements = @_st_numElements + 1
     end
     return 1
   end
@@ -535,7 +535,7 @@ class Hash
   def __delete(key) # [
     # returns value removed, or RemoteNil
     kh = key.hash
-    kofs = kh % @tableSize ; kofs += kofs
+    kofs = kh % @_st_tableSize ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -543,7 +543,7 @@ class Hash
         if key.eql?( k )
           self.__at_put(kofs + 1 , RemoteNil)
           self.__at_put(kofs + 1, RemoteNil)
-          @numElements = @numElements - 1
+          @_st_numElements = @_st_numElements - 1
           return v
         end
       elsif v._isFixnum
@@ -554,8 +554,8 @@ class Hash
       v = self.__at(idx + 1)
       self.__at_put(idx , RemoteNil)
       self.__at_put(idx + 1, RemoteNil)
-      @numElements = @numElements - 1
-      @numCollisions = @numCollisions - 1
+      @_st_numElements = @_st_numElements - 1
+      @_st_numCollisions = @_st_numCollisions - 1
       return v
     end
     idx = self.__at(idx + 2)
@@ -564,8 +564,8 @@ class Hash
   # a collision bucket
   val = v.__bucket_delete( key, kh )
   if val._not_equal?(RemoteNil)
-    @numElements = @numElements - 1
-    @numCollisions = @numCollisions - 1
+    @_st_numElements = @_st_numElements - 1
+    @_st_numCollisions = @_st_numCollisions - 1
   end
   return val
       end
@@ -574,7 +574,7 @@ class Hash
   end # ]
 
   def __bucket_delete( key, khash )
-    kofs = khash % @tableSize  ; kofs += kofs
+    kofs = khash % @_st_tableSize  ; kofs += kofs
     v = self.__at(kofs + 1)
     if v._not_equal?(RemoteNil)
       k = self.__at(kofs)
@@ -582,7 +582,7 @@ class Hash
         if key.eql?( k )
           self.__at_put(kofs + 1 , RemoteNil)
           self.__at_put(kofs + 1, RemoteNil)
-          @numElements = @numElements - 1
+          @_st_numElements = @_st_numElements - 1
           return v
         end
       elsif v._isFixnum
@@ -593,8 +593,8 @@ class Hash
             v = self.__at(idx + 1)
             self.__at_put(idx , RemoteNil)
             self.__at_put(idx + 1, RemoteNil)
-            @numElements = @numElements - 1
-            # @numCollisions not maintained in buckets
+            @_st_numElements = @_st_numElements - 1
+            # @_st_numCollisions not maintained in buckets
             return v
           end
           idx = self.__at(idx + 2)
@@ -634,7 +634,7 @@ class Hash
   primitive '__fill_resize', 'fillFrom:resizeTo:with:' # args 1 is one-based
 
   def clear
-    ts = @tableSize
+    ts = @_st_tableSize
     if ts > 20
       ts = 19
     end
@@ -645,52 +645,52 @@ class Hash
 
   def __clear(new_size)
     arr = self.__prime_sizes(new_size)
-    @collisionLimit = arr.__at(1)
+    @_st_collisionLimit = arr.__at(1)
     ts = arr.__at(0)
-    @tableSize = ts
+    @_st_tableSize = ts
     two_ts = ts + ts
     self.__fill_resize(1, two_ts, RemoteNil) # one-based first arg
-    @numElements = 0
-    @numCollisions = 0
+    @_st_numElements = 0
+    @_st_numCollisions = 0
     self
   end
 
   def default(key)
-    if @defaultIsBlock
-      @defaultOrParent.call(self, key)
+    if @_st_defaultIsBlock
+      @_st_defaultOrParent.call(self, key)
     else
-      @defaultOrParent
+      @_st_defaultOrParent
     end
   end
 
   def default
-    if @defaultIsBlock
-      @defaultOrParent.call(nil)
+    if @_st_defaultIsBlock
+      @_st_defaultOrParent.call(nil)
     else
-      @defaultOrParent
+      @_st_defaultOrParent
     end
   end
 
   def __parent
     # message only valid for collision buckets
-    @defaultOrParent
+    @_st_defaultOrParent
   end
 
   def __parent=(h)
     # message only valid for collision buckets
-    @defaultOrParent = h
+    @_st_defaultOrParent = h
   end
 
   def default=(value)
     # returns receiver
-    @defaultOrParent = value
-    @defaultIsBlock = value._isBlock
+    @_st_defaultOrParent = value
+    @_st_defaultIsBlock = value._isBlock
     self
   end
 
   def default_proc
-    if @defaultIsBlock
-      @defaultOrParent
+    if @_st_defaultIsBlock
+      @_st_defaultOrParent
     else
       nil
     end
@@ -720,8 +720,8 @@ class Hash
 
   def __set_collision_limit(cl)
     # returns previous collision limit
-    res = @collisionLimit
-    @collisionLimit = cl
+    res = @_st_collisionLimit
+    @_st_collisionLimit = cl
     res
   end
 
@@ -730,7 +730,7 @@ class Hash
   def __rebuild(new_size)
     # puts "start rebuild ( "
     nhash = self.class.__new(new_size)
-    nhash.default=( @defaultOrParent )
+    nhash.default=( @_st_defaultOrParent )
     save_cl = nhash.__set_collision_limit(Fixnum_MAX) # prevent recursive rebuild
 
     nhash.__become(self) # before populating new implementation
@@ -738,7 +738,7 @@ class Hash
     nhash.__merge_into(self)
 
     self.__set_collision_limit(save_cl)
-    # puts " ) end rebuild to ts #{@tableSize} from ts #{nhash.__tableSize} size #{@numElements}"
+    # puts " ) end rebuild to ts #{@_st_tableSize} from ts #{nhash.__tableSize} size #{@_st_numElements}"
     self
   end
 
@@ -746,11 +746,11 @@ class Hash
     if self.frozen?
       raise TypeError, 'rehash called on frozen instance of Hash'
     end
-    self.__rebuild(@numElements)
+    self.__rebuild(@_st_numElements)
   end
 
   def __merge_into(other)
-    lim = @tableSize
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -782,8 +782,8 @@ class Hash
     unless block_given?
       return HashEnumerator.new(self, :each_pair) # for 1.8.7
     end
-    num_elem = @numElements
-    lim = @tableSize 
+    num_elem = @_st_numElements
+    lim = @_st_tableSize 
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -809,7 +809,7 @@ class Hash
       end
       kofs += 2
     end
-    unless @numElements._equal?(num_elem)
+    unless @_st_numElements._equal?(num_elem)
       raise RuntimeError, 'Hash changed during iteration'
     end
     self
@@ -821,7 +821,7 @@ class Hash
     unless block_given?
       return HashKeyEnumerator.new(self, :each_key) # for 1.8.7
     end
-    lim = @tableSize
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -856,7 +856,7 @@ class Hash
     unless block_given?
       return HashKeyEnumerator.new(self, :each_value) # for 1.8.7
     end
-    lim = @tableSize
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -886,7 +886,7 @@ class Hash
   end
 
   def empty?
-    @numElements._equal?(0)
+    @_st_numElements._equal?(0)
   end
 
   # Return a value from the hash for the given +key+.  If +key+ is not
@@ -941,7 +941,7 @@ class Hash
 
   def invert
     # per specs, does not return inst of a subclass
-    result = Hash.__new(@tableSize)
+    result = Hash.__new(@_st_tableSize)
     self.each_pair { |k,v|
       result.__atkey_put( v,  k )
     }
@@ -949,7 +949,7 @@ class Hash
   end
 
   def keys
-    arr = Array.new(@numElements)
+    arr = Array.new(@_st_numElements)
     idx = 0
     self.each_key { | k |
       arr.__at_put(idx, k)
@@ -961,17 +961,17 @@ class Hash
   alias key? has_key?
 
   def length
-    @numElements
+    @_st_numElements
   end
 
   def merge(other, &block)
     other = Type.coerce_to(other, Hash, :to_hash)
     other_siz = other.size
-    my_siz = @numElements
+    my_siz = @_st_numElements
     res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-    if res_siz > (ts = @tableSize)  && ts < 1009
+    if res_siz > (ts = @_st_tableSize)  && ts < 1009
       h = self.class.__new(res_siz)
-      h.default=( @defaultOrParent )
+      h.default=( @_st_defaultOrParent )
       self.__merge_into(h)
     else
       h = self.dup
@@ -982,10 +982,10 @@ class Hash
   def merge!(other, &block)
     other = Type.coerce_to(other, Hash, :to_hash)
     other_siz = other.size
-    my_siz = @numElements
+    my_siz = @_st_numElements
     if other._not_equal?(self)
       res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-      if res_siz > (ts = @tableSize)  && ts < 1009
+      if res_siz > (ts = @_st_tableSize)  && ts < 1009
         self.__rebuild(res_siz)
       end
     end
@@ -995,7 +995,7 @@ class Hash
   def __merge!(other, &block)
     if block_given?
       if other._equal?(self)
-        pairs_siz = @numElements  * 2
+        pairs_siz = @_st_numElements  * 2
         pairs = Array.new( pairs_siz )
         n = 0
         self.each_pair { |k, v|
@@ -1095,7 +1095,7 @@ class Hash
   alias value? has_value?
 
   def values
-    arr = Array.new(@numElements)
+    arr = Array.new(@_st_numElements)
     idx = 0
     self.each_pair { | k, v |
       arr.__at_put(idx,  v)
@@ -1114,7 +1114,7 @@ class Hash
   # inherit __basic_clone from Object
 
   def __clone_buckets
-    lim = @tableSize
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -1149,7 +1149,7 @@ class Hash
   end
 
   def inspect
-    return "{}" if @numElements._equal?(0)
+    return "{}" if @_st_numElements._equal?(0)
     str = "{"
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)

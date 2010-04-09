@@ -37,6 +37,8 @@ OPTIONS:
                                   repository
                     persistent    Start the VM in persistent mode (default is
                                   transient mode)
+                    allIvsDynamic Start the VM so all instance variables are
+                                  dynamic.
    -S             MagLev will search for the ruby script on the PATH environment
                   variable, unless the script name begins with '/'.
    -w             Turn on warnings.  Sets $VERBOSE true.
@@ -168,7 +170,7 @@ do
                 rlwrap)
                     rlwrapFlag=1
                     ;;
-                traceGlobals|logSexp|traceLoad|commit|persistent)
+                traceGlobals|logSexp|traceLoad|commit|persistent|allIvsDynamic)
                     maglev_args="${maglev_args}, ${sub_opt}"
                     ;;
                 *)

@@ -26,13 +26,13 @@ class Mutex
 
   def lock
     self.__lock
-    @owner = Thread.current
+    @_st_owner = Thread.current
     self
   end
 
   def try_lock
     if self.__trylock
-      @owner = Thread.current
+      @_st_owner = Thread.current
       return true
     end
     false  
@@ -40,11 +40,11 @@ class Mutex
 
   def unlock
     if locked?
-      unless @owner._equal?(Thread.current)
+      unless @_st_owner._equal?(Thread.current)
         raise ThreadError, 'Mutex#unlock, not owned by current thread'
       end
       self.__unlock
-      @owner = nil
+      @_st_owner = nil
     else
       raise ThreadError, 'Mutex#unlock, the mutex is not locked'
     end
@@ -56,7 +56,7 @@ class Mutex
       yield
     ensure
       self.__unlock
-      @owner = nil
+      @_st_owner = nil
     end
   end
 end

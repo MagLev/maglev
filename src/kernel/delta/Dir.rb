@@ -4,6 +4,6 @@ class Dir
   # Overrides of Enumerable
   def entries
     check_closed
-    @entries
+    @_st_entries
   end
 end

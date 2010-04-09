@@ -296,7 +296,6 @@ class Object
     self.__inspect
   end
 
-  #  following 3 prims must also be installed in Behavior
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
   primitive_nobridge '__instvar_put', 'rubyInstvarAt:put:'
   primitive_nobridge 'instance_variables', 'rubyInstvarNames'

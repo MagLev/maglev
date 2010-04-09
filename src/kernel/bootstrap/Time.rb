@@ -102,13 +102,13 @@ class Time
   #++
 
   def _dump(limit = nil)  # used by marshal
-    is_gmt = @is_gmt
+    is_gmt = @_st_is_gmt
     unless is_gmt
       # Maglev deviation, always dumping in GMT format
       t = self.dup.gmtime
       return t._dump
     end
-    tm = @tm
+    tm = @_st_tm
     year = tm[TM_FIELDS[:year]]
     if (year & 0xffff) != year then
       raise ArgumentError, "year too big to marshal: #{year}"
@@ -130,7 +130,7 @@ class Time
 
   def dup
     t = self.class.allocate   # Gemstone changes
-    t.__init(@microseconds, @is_gmt)
+    t.__init(@_st_microseconds, @_st_is_gmt)
   end
 
   def self.local(first, *args)
@@ -210,7 +210,7 @@ class Time
   #   def self.at ; end
 
   def inspect
-    if @is_gmt
+    if @_st_is_gmt
       strftime("%a %b %d %H:%M:%S UTC %Y")
     else
       strftime("%a %b %d %H:%M:%S %z %Y")
@@ -218,11 +218,11 @@ class Time
   end
 
   def seconds
-    @microseconds.__divide(1_000_000)   # Gemstone
+    @_st_microseconds.__divide(1_000_000)   # Gemstone
   end
 
   def +(other)
-    microsecs = @microseconds
+    microsecs = @_st_microseconds
     if other._isInteger
       microsecs +=  other * 1_000_000
     elsif other._kind_of?(Time)
@@ -240,11 +240,11 @@ class Time
    
     end
     t = self.class.allocate
-    t.__init(microsecs, @is_gmt)
+    t.__init(microsecs, @_st_is_gmt)
   end
 
   def -(other)
-    microsecs = @microseconds
+    microsecs = @_st_microseconds
     if other._isInteger
       microsecs -=  other * 1_000_000
     elsif other._kind_of?(Time)
@@ -255,7 +255,7 @@ class Time
       microsecs -= (other * 1_000_000.0).to_i
     end
     t = self.class.allocate
-    t.__init(microsecs, @is_gmt)
+    t.__init(microsecs, @_st_is_gmt)
   end
 
   def succ
@@ -264,7 +264,7 @@ class Time
 
   def <=>(other)
     if other._kind_of?(Time)
-      @microseconds <=> other.__microsecs 
+      @_st_microseconds <=> other.__microsecs 
     else
       nil
     end
@@ -277,7 +277,7 @@ class Time
   end
 
   def hash
-    micro_sec = @microseconds
+    micro_sec = @_st_microseconds
     (micro_sec.__divide(1_000_000)) ^ (micro_sec % 1_000_000) 
   end
 
@@ -290,31 +290,31 @@ class Time
   end
 
   def hour
-    @tm[2]
+    @_st_tm[2]
   end
 
   def min
-    @tm[1]
+    @_st_tm[1]
   end
 
   def sec
-    @tm[0]
+    @_st_tm[0]
   end
 
   def day
-    @tm[3]
+    @_st_tm[3]
   end
 
   def year
-    @tm[5] + 1900
+    @_st_tm[5] + 1900
   end
 
   def yday
-    @tm[7] + 1
+    @_st_tm[7] + 1
   end
 
   def wday
-    @tm[6]
+    @_st_tm[6]
   end
 
   def zone
@@ -322,23 +322,23 @@ class Time
   end
 
   def mon
-    @tm[4] + 1
+    @_st_tm[4] + 1
   end
 
   def gmt?
-    @is_gmt
+    @_st_is_gmt
   end
 
   def usec
-    @microseconds % 1_000_000 
+    @_st_microseconds % 1_000_000 
   end
 
   def to_i
-    @microseconds.__divide(1_000_000)
+    @_st_microseconds.__divide(1_000_000)
   end
 
   def to_f
-    @microseconds.__divide(1_000_000.0)
+    @_st_microseconds.__divide(1_000_000.0)
   end
 
   ##
@@ -349,7 +349,7 @@ class Time
   end
 
   def gmt_offset
-    return 0 if @is_gmt
+    return 0 if @_st_is_gmt
 
     other = dup.gmtime
 
@@ -374,21 +374,21 @@ class Time
   end
 
   def localtime
-    if @is_gmt
+    if @_st_is_gmt
       self.__set_tmarray(false)
     end
     self
   end
 
   def gmtime
-    unless @is_gmt
+    unless @_st_is_gmt
       self.__set_tmarray(true)
     end 
     self
   end
 
   def dst?
-    @tm[8]._not_equal?(0)
+    @_st_tm[8]._not_equal?(0)
   end
 
   def getlocal
@@ -453,7 +453,7 @@ class Time
 
     usec = usec + (sec * 1000000)
 
-    @microseconds =  usec
+    @_st_microseconds =  usec
 
     if want_gmt
       force_gmtime
@@ -503,11 +503,11 @@ class Time
   primitive_nobridge '__set_tmarray', '_setTmArray:'
 
   def __microsecs
-    @microseconds
+    @_st_microseconds
   end
 
   def __init(aMicrosecs, isGmt)
-    @microseconds = aMicrosecs
+    @_st_microseconds = aMicrosecs
     __set_tmarray(isGmt)
     self
   end

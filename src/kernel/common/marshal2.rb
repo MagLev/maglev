@@ -27,11 +27,11 @@ class Range
   end
   def from_marshal(ivar, value)
     if ivar._equal?(:begin)
-      @from = value
+      @_st_from = value
     elsif ivar._equal?( :end)
-      @to = value
+      @_st_to = value
     elsif ivar._equal?( :excl)
-      @excludeEnd = value
+      @_st_excludeEnd = value
     else
       raise TypeError, 'unrecognized instvar in Range#from_marshal'
     end
