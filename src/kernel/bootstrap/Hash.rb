@@ -108,7 +108,7 @@ class Hash
       end
       if pair._not_equal?(nil)
         p_size = pair.__size
-        if p_size <= 2 && p_size > 0
+        if p_size <= 2 && p_size._not_equal?( 0 )
           res.__atkey_put( pair.__at(0), pair.__at(1) )
         end
       end
