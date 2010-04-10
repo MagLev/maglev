@@ -1,7 +1,7 @@
 # This file defines the blog classes.  To commit the code, load this
 # file from within a Maglev.persistent block and then commit it.
 
-# Maglev::Model implements a very simple and un-production-worthy
+# Maglev::Model implements a very simple, and un-production-worthy,
 # persistence model.  A class that includes the Maglev::Model module, will
 # automatically persist all new instances in a hash table for the class.
 # If the module is re-included (or the file that defines the class is
@@ -12,12 +12,13 @@ module Maglev::Model
   # includes this module.
   module ClassMethods
 
-    # Create a new instance, and add it to the hash of persisted instances
-    # for this class.
-    def new(*params)
-      obj = allocate
-      obj.initialize(*params)
-      add(obj)  # code smell
+    # Creates a new instance and stages the new instance.  Equivalent to:
+    #   instance = new(*args)
+    #   stage instance
+    def persistent_new(*args)
+      instance = new(*args)
+      stage instance
+      instance
     end
 
     # Returns an array of all the posts
@@ -32,9 +33,10 @@ module Maglev::Model
       Maglev::PERSISTENT_ROOT[self][id.to_i]
     end
 
-    # Add +obj+ to the set of persisted objects for this class.
-    # called by new()
-    def add(obj)
+    # Stages +obj+ in the collection of persisted objects for this class.
+    # This method does not commit, so the object will not be committed
+    # until client code calls <tt>Maglev#commit_transaction</tt>.
+    def stage(obj)
       Maglev::PERSISTENT_ROOT[self][obj.__id__] = obj
     end
 

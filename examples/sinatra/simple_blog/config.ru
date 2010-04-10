@@ -1,16 +1,11 @@
-# -*- ruby -*-
 # This runs both the blog app and the object log viewer as separate
 # Sinatra apps in the same process
+#
+#\ --port 4444 --host localhost --server 'webrick'
 
 require 'sinatra'
-
 require 'blog_app'
 require '../object_inspector/objectlog_app'
-
-disable :run
-set :environment, :development
-
-options = { :Port => 4444, :host => 'localhost' }
 
 map "/" do
   run BlogApp

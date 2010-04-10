@@ -26,8 +26,17 @@ task :app do
   end
 end
 
-desc "Run the tests using MRI: takes optional file arg: 'rake test[test/foo_test.rb]'"
-task :mri, :file do |t,args|
-  test_files = args.file || FileList['test/*_test.rb']
-  sh %{ testrb #{RAILS_INCLUDES} -Itest #{test_files} }
+namespace :mri do
+  desc "Run the tests using MRI: takes optional file arg: 'rake test[test/foo_test.rb]'"
+  task :tests, :file do |t,args|
+    test_files = args.file || FileList['test/*_test.rb']
+    sh %{ testrb #{RAILS_INCLUDES} -Itest #{test_files} }
+  end
+
+  desc "Run the app using MRI"
+  task :app do
+    cd('my_app') do
+      sh %{ ruby script/rails server }
+    end
+  end
 end
