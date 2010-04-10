@@ -11,15 +11,15 @@ rubygem versions of rack and sinatra (see ../README.rdoc).
 
 === To Run the combined apps:
 
-    $ rake blog
+    $ rake
 
 Then hit http://localhost:4444/
 
 === Details
 
-The app is split into a persistent part, <tt>blog.rb</tt>, and the sinatra
-driver app, <tt>blog_app.rb</tt>.  The blog code, <tt>blog.rb</tt>, needs
-to be persistently loaded once.  This is handled by rake and the
+The app is split into a persistent part (<tt>blog.rb</tt>) and a sinatra
+driver app (<tt>blog_app.rb</tt>).  The persistent code needs to be written
+to the MagLev repository once.  This is handled by rake and the
 <tt>commit_code.rb</tt> file:
 
   $ rake commit
@@ -27,23 +27,6 @@ to be persistently loaded once.  This is handled by rake and the
 To run the Sinatra app,
 
   $ rake blog
-
-=== Files
-
-* README.rdoc This file
-* Rakefile    The Rakefile
-* blog.rb     The persistent, business classes for the app.  This code is run once only.
-* blog_app.rb The Sinatra app
-* commit_code.rb  Code to commit the business logic code to the MagLev repository
-* config.ru   Rackup file to run both the blog and objectlog apps.
-* dumpdb.rb   Script that prints the contents of the db to stdout (debugging)
-* objectlog.ru  Rackup file to run just the objectlog
-* objectlog_app.rb  The object log app
-* public            Web root for the running apps
-* test        Some MiniTest tests for the business logic
-* txn_wrapper.rb Rack middleware used by <tt>blog_app.rb</tt> to wrap a
-  transaction around each HTTP request.
-* views       Sinatra view directory
 
 === Issues
 
@@ -60,7 +43,6 @@ TODO for the sinatra app
 * Separate the MaglevModel and work on it
 * Get a migration for seeding basic data working
 * Get partials implmented (rendering urls for tags and posts)
-* Add an "about" page that explains the app etc.
 
 === Discussion
 

@@ -178,12 +178,8 @@ class Object
      #     ruby receiver is self         0x1000 (for future use)
      #     cache successes in code_gen  0x10000
 
-  def respond_to?(symbol, include_private)
+  def respond_to?(symbol, include_private=false)
     __responds_to(symbol, include_private, 0x10101)
-  end
-
-  def respond_to?(symbol )
-    __responds_to(symbol, false, 0x10101)
   end
 
   def __splat_lasgn_value
@@ -514,7 +510,7 @@ class Object
 
   # TODO   singleton_method_removed
 
-  def tap(&block)	# added for 1.8.7
+  def tap(&block) # added for 1.8.7
     block.call(self)
     self
   end
