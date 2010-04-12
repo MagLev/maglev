@@ -30,7 +30,7 @@ people = IdentitySet.new
 # NOTE: this sorting is done on the @age instance variable, and does not
 # depend on an instance method named "age".  We will put People objects in
 # the set.  People have a name, age, gender and address.
-people.create_identity_index('age')
+people.create_identity_index('@age')
 
 # Now we add people to the set.  As each object is added to the set, the
 # indexing subsystem will update its data structures to keep the population
