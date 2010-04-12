@@ -2,9 +2,9 @@
 
 ## Pre-Requisites
 
-You'll need to install the i18n gem:
+You'll need to install some gems:
 
-  $ maglev-gem install i18n
+  $ maglev-gem install i18n rack-mount rack multimap
 
 Then you can just do "rake" to run the tests.
 
