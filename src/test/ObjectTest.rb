@@ -153,5 +153,47 @@ test(result.length > 20,     true, 'Object.methods B')
   test(result.include?(m_name), true, "Object.methods.include?(#{m_name})")
 end
 
+# respond_to? was having issues with bridge logic and sends of zsuper
+#
+class C
+  def quux
+    10
+  end
+  private :quux
+
+  def respond_to?(*args)
+    super
+  end
+end
+
+c = C.new
+
+test(c.respond_to?(:to_s),        true, "respond_to? A")
+test(c.respond_to?(:to_s, true),  true, "respond_to? B")
+test(c.respond_to?(:to_s, false), true, "respond_to? C")
+
+test(c.respond_to?(:quux),        false, "respond_to? D")
+test(c.respond_to?(:quux, true),  true,  "respond_to? E")
+test(c.respond_to?(:quux, false), false, "respond_to? F")
+
+args = [:to_s]
+test(c.respond_to?(*args), true, "respond_to? G")
+
+args = [:to_s, true]
+test(c.respond_to?(*args), true, "respond_to? H")
+
+args = [:to_s, false]
+test(c.respond_to?(*args), true, "respond_to? I")
+
+
+args = [:quux]
+test(c.respond_to?(*args), false, "respond_to? J")
+
+args = [:quux, true]
+test(c.respond_to?(*args), true, "respond_to? K")
+
+args = [:quux, false]
+test(c.respond_to?(*args), false, "respond_to? L")
+
 report
 true

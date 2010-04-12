@@ -3,18 +3,11 @@ require 'minitest/spec'
 
 MiniTest::Unit.autorun
 
-Exception.install_debug_block do |e|
-  puts "=== (#{e.class}): ====== #{e}"
-  case e
-  when ArgumentError, NoMethodError
-    nil.pause
-  end
-end
-
 describe SimplePost do
   before do
+    Maglev::PERSISTENT_ROOT[SimplePost].clear
     5.times do |i|
-      Post.new(:title => "Title #{i}", :text => "Text #{i}")
+      SimplePost.persistent_new(:title => "Title #{i}", :text => "Text #{i}")
     end
   end
 

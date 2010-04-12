@@ -515,7 +515,7 @@ class Object
 
   # TODO   singleton_method_removed
 
-  def tap(&block)	# added for 1.8.7
+  def tap(&block) # added for 1.8.7
     block.call(self)
     self
   end
