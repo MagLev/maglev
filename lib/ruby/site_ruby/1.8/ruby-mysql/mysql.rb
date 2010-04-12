@@ -4,16 +4,6 @@
 # tommy@tmtm.org
 #
 
-# GEMSTONE
-if defined? Maglev
-  # The driver defines a finalizer, but MagLev does not yet support
-  # finalization.  The default implentation raises a NotImplementedError.
-  # We override that so we can run the driver.
-  def ObjectSpace.define_finalizer(*args)
-  end
-end
-# END GEMSTONE
-
 class Mysql
 
   VERSION = "4.0-ruby-0.2.5"
