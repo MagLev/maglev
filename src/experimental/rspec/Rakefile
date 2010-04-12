@@ -1,8 +1,8 @@
 # task :default => :maglev
-task :default => [:maglev, :examples]
+task :default => [:rspec, :examples, :cucumber]
 
 desc "run the test case with maglev (default)"
-task :maglev do
+task :rspec do
   sh %{ $MAGLEV_HOME/bin/spec bowling_spec.rb }
 end
 
@@ -18,7 +18,22 @@ task :examples do
   end
 end
 
-desc "run the test case with mri"
-task :mri do
-  sh %{ /opt/ruby/ruby/bin/spec -rubygems bowling_spec.rb }
+desc "run the cucumber test case with mri"
+task :cucumber do
+  puts "\n=== NOTE: There should be nice pretty output...\n"
+  sh %{ $MAGLEV_HOME/bin/cucumber features/greeter_says_hello.feature }
 end
+
+namespace :mri do
+  desc "run the rspec test case with mri"
+  task :rspec do
+    sh %{ /opt/ruby/ruby/bin/spec -rubygems bowling_spec.rb }
+  end
+
+
+  desc "run the cucumber test case with mri"
+  task :cucumber do
+    sh %{ cucumber features/greeter_says_hello.feature }
+  end
+end
+
