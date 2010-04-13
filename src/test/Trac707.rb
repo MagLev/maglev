@@ -84,6 +84,7 @@ class TestClassMethods < Test::Unit::TestCase
      [:public_instance_methods,    BIG_RANGE, ONE],
      [:private_instance_methods,   BIG_RANGE, ONE],
      [:protected_instance_methods, ONE,       ONE]].each do |meth,t_range, f_range|
+      acls = AClass
       actual = AClass.send(meth)
       assert(t_range.include?(actual.size),
              "AClass.#{meth}():  Expected range: #{t_range} Actual: #{actual.size}")
@@ -98,3 +99,4 @@ class TestClassMethods < Test::Unit::TestCase
     end
   end
 end
+
