@@ -45,6 +45,10 @@ module Test
       def assert_block(message="assert_block failed.") # :yields: 
         _wrap_assertion do
           if (! yield)
+            if Maglev::System.session_temp( :Maglev_ruby_debugFlag)
+              puts "AssertionFailed"
+              nil.pause
+            end
             raise AssertionFailedError.new(message.to_s)
           end
         end
