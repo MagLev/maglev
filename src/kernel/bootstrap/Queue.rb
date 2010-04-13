@@ -280,6 +280,7 @@ class SizedQueue < Queue
   #
   # Retrieves data from the queue and runs a waiting thread, if any.
   #
+
   def pop(non_block=false)
     while true
       @mutex.synchronize do
@@ -297,14 +298,6 @@ class SizedQueue < Queue
           return retval
         end
       end
-    end
-  end
-
-  def pop(*args)
-    if args.size > 0
-      pop(args[0])
-    else
-      pop(false)
     end
   end
 

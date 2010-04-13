@@ -421,7 +421,10 @@ module Enumerable
   # If the enumerable is empty, the first form returns nil, and the second
   # form returns an empty array.
 
-  def first(count)
+  def first(count=MaglevUndefined)
+    if count._equal?(MaglevUndefined)
+      return self.first()
+    end
     # return Array of first count elements of the enumeration
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt <= 0
@@ -469,6 +472,8 @@ module Enumerable
   # :call-seq:
   #   enum.inject(initial) { | memo, obj | block }  => obj
   #   enum.inject          { | memo, obj | block }  => obj
+  #   enum.inject(initial, binary_op_sym)
+  #   enum.inject(binary_op_sym) 
   #
   # Combines the elements of +enum+ by applying the block to an accumulator
   # value (+memo+) and each element in turn. At each step, +memo+ is set
@@ -501,6 +506,22 @@ module Enumerable
   #
   #   longest                                         #=> 5
 
+  def inject(initial=MaglevUndefined, bin_op=MaglevUndefined, &block) # added for 1.8.7
+    uu = MaglevUndefined
+    if bin_op._equal?(uu)
+      if initial._equal?(uu)
+        self.inject(&block)
+      elsif block_given?
+        self.inject(initial, &block) 
+      else
+	self.inject(initial) # arg 1 is a bin_op
+      end
+    else
+      # per specs, ignore block if 2 args given
+      self.inject(initial, bin_op)
+    end
+  end
+
   def inject(initial, &block)
     memo = initial
     self.each { |o|
@@ -510,16 +531,16 @@ module Enumerable
   end
 
   def inject(&block)
-    un_defined = MaglevUndefined
-    memo = un_defined
+    uu = MaglevUndefined
+    memo = uu
     each { |o|
-      if memo._equal?(un_defined)
+      if memo._equal?(uu)
         memo = o
       else
         memo = block.call(memo, o)
       end
     }
-    memo._equal?(un_defined) ? nil : memo
+    memo._equal?(uu) ? nil : memo
   end
 
   def inject(initial, binary_op_sym) # added for 1.8.7
@@ -530,23 +551,18 @@ module Enumerable
     memo
   end
 
-  def inject(initial, binary_op_sym, &block_ignored) # added for 1.8.7
-    self.inject(initial, binary_op_sym)
-  end
-
   def inject(binary_op_sym) # added for 1.8.7
-    un_defined = MaglevUndefined
-    memo = un_defined
+    uu = MaglevUndefined
+    memo = uu
     each { |o|
-      if memo._equal?(un_defined) 
+      if memo._equal?(uu) 
         memo = o
       else
         memo = memo.__send__(binary_op_sym, o)
       end
     } 
-    memo._equal?(un_defined) ? nil : memo
+    memo._equal?(uu) ? nil : memo
   end
-
 
   alias_method :reduce, :inject  # added for 1.8.7
 

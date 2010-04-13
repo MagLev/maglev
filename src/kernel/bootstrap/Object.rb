@@ -179,7 +179,13 @@ class Object
      #     cache successes in code_gen  0x10000
 
   def respond_to?(symbol, include_private=false)
+    # variant with bridges
     __responds_to(symbol, include_private, 0x10101)
+  end
+
+  def respond_to?(symbol )
+    # optimize most common form to replace bridge method
+    __responds_to(symbol, false, 0x10101)
   end
 
   def __splat_lasgn_value
@@ -455,14 +461,13 @@ class Object
   end
 
   def instance_exec(*args, &block) # added for 1.8.7
+    unless block_given?
+      raise LocalJumpError, 'no block given'
+    end
     blk = block.__set_self(self) 
     blk.call(*args) 
   end
  
-  def instance_exec(*args) 
-    raise LocalJumpError, 'no block given'
-  end 
-
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
   primitive 'remove_instance_variable', 'rubyRemoveIv:'

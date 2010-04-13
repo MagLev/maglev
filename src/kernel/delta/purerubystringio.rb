@@ -303,7 +303,7 @@ class PureRubyStringIO  < IO
   end
 
   def readline(*args)
-    raise ArgumentError, 'expected 0 or 1 arg'
+    raise ArgumentError, 'expected 0 or 1 arg with no block'
   end
 
   def readline(sep=$/)

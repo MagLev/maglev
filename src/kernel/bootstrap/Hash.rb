@@ -655,7 +655,10 @@ class Hash
     self
   end
 
-  def default(key)
+  def default(key=MaglevUndefined)
+    if key._equal?(MaglevUndefined) 
+      return self.default()
+    end 
     if @_st_defaultIsBlock
       @_st_defaultOrParent.call(self, key)
     else

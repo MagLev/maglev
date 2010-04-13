@@ -64,7 +64,7 @@ class String
   def scan(pattern, &block)
     self._scan(pattern, &block)
   end
-  
+
   def _scan(pattern)
     # taint = self.tainted? || pattern.tainted? # Maglev, no taint propagation
     pattern = self.__get_pattern(pattern, true)

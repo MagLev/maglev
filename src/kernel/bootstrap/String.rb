@@ -919,24 +919,36 @@ class String
 
   primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'  # one-based offset/result
 
-  def index(item, offset)
-    zoffset = Type.coerce_to(offset, Integer, :to_int)
-    self.__index(item, zoffset)
+  def index(item, offset=MaglevUndefined, &block)
+    # came here via a bridge from args*
+    if offset._equal?(MaglevUndefined)
+      self.__index(item, 0, 0x50)  
+    else
+      offset = Type.coerce_to(offset, Integer, :to_int)
+      self.__index(item, offset, 0x50)
+    end
   end
 
   def index(item)
     # code other variants explicitly so num frames from __index_string
     #   to caller will be constant
-    self.__index(item, 0)
-  end
-  def index(item, &block)
-    self.__index(item, 0)
-  end
-  def index(item, offset, &block)
-    self.__index(item, offset)
+    self.__index(item, 0, 0x40)
   end
 
-  def __index(item, zoffset)
+  def index(item, &block)
+    self.__index(item, 0, 0x40)
+  end
+
+  def index(item, offset)
+    offset = Type.coerce_to(offset, Integer, :to_int)
+    self.__index(item, offset, 0x40)
+  end
+
+  def index(item, offset, &block)
+    self.__index(item, offset, 0x40)
+  end
+
+  def __index(item, zoffset, vcgl_idx)
     my_size = self.__size
     zoffset += my_size if zoffset < 0
     return nil if zoffset < 0 || zoffset > my_size
@@ -950,7 +962,7 @@ class String
       st_idx = self.__indexOfByte(item % 256, zoffset + 1)
       return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
-      idx = item.__index_string(self, zoffset)
+      idx = item.__index_string(self, zoffset, vcgl_idx)
       return idx
     else
       # try to coerce to a number or string and try again,
@@ -982,7 +994,7 @@ class String
     if self.__size._equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
     end
-    if self.__index(0, 0)._not_equal?(nil)
+    if self.__indexOfByte(0, 1)._not_equal?(0)
       raise ArgumentError, 'symbol string may not contain `\\0\' '
     end
     self.__as_symbol
@@ -1104,22 +1116,26 @@ class String
   # parameter is present, it specifies the position in the string to end
   # the search -- characters beyond this point will not be considered.
 
-  def rindex(item, original_offset)
-    __rindex(item, original_offset)
-  end
-  def rindex(item)
-    # code other variants explicitly so num frames from __rindex_string
-    #   to caller will be constant
-    __rindex(item, MaglevUndefined)
-  end
-  def rindex(item, &block)
-    __rindex(item, MaglevUndefined)
-  end
-  def rindex(item, original_offset, &block)
-    __rindex(item, original_offset)
+  def rindex(item, offset=MaglevUndefined, &block)
+    self.__index(item, offset, 0x50)  # came here via a bridge from args*
   end
 
-  def __rindex(item, original_offset)
+  def rindex(item)
+    # code other variants explicitly so num frames to __rindex_string known
+    __rindex(item, MaglevUndefined, 0x40)
+  end
+  def rindex(item, &block)
+    __rindex(item, MaglevUndefined, 0x40)
+  end
+  def rindex(item, original_offset, &block)
+    __rindex(item, original_offset, 0x40)
+  end
+
+  def rindex(item, original_offset)
+    __rindex(item, original_offset, 0x40)
+  end
+
+  def __rindex(item, original_offset, vcgl_idx)
     my_size = self.__size
     if my_size._equal?(0)
       return nil
@@ -1154,7 +1170,7 @@ class String
       return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
       zoffset = my_size  if zoffset > my_size  # allow searching for end of string
-      zidx = item.__rindex_string(self, zoffset)
+      zidx = item.__rindex_string(self, zoffset, vcgl_idx)
       return zidx
     else
       coerced = Type.coerce_to(item, String, :to_str)
@@ -1225,6 +1241,15 @@ class String
   #     string.slice!(/s.*t/)   #=> "sa st"
   #     string.slice!("r")      #=> "r"
   #     string                  #=> "thing"
+
+  def slice!(a1, a2=MaglevUndefined, &block)
+    if a2._equal?(MaglevUndefined)
+      self.slice!(a1)
+    else
+      self.slice!(a1, a2)
+    end
+  end
+
   def slice!(start, a_len)
     sz = self.__size
     if start._isRegexp
@@ -1555,6 +1580,13 @@ class String
   # with either +replacement+ or the value of the block.  See the
   # description of <tt>String#gsub</tt> for a description of the
   # parameters.
+
+  # If we were to implement
+  #   def sub(pattern, replacement=MaglevUndefined, &block) ; end
+  # to support fully general  send or super() ,
+  # would still have problems in that
+  # we don't know number of frames up stack to find caller's $~
+
   def sub(pattern, replacement)
     replacement = Type.coerce_to(replacement, String, :to_str)
     regex = self.__get_pattern(pattern, true)
@@ -1581,6 +1613,12 @@ class String
     end
     res
   end
+
+  # If we were to implement
+  #   def sub!(pattern, replacement=MaglevUndefined, &block) ; end
+  # to support fully general  send or super() ,
+  # would still have problems in that
+  # we don't know number of frames up stack to find caller's $~
 
   def sub!(pattern, replacement)
     regex = self.__get_pattern(pattern, true)

@@ -26,7 +26,8 @@ class Module
   primitive '__ruby_methods_protection', 'rubyMethods:protection:'
 
   def instance_methods(inc_super=true)
-    Module.__filter_method_names(__ruby_methods_protection(inc_super, 0))
+    # include both protected and public methods
+    Module.__filter_method_names(__ruby_methods_protection(inc_super, -1))
   end
 
   def public_instance_methods(inc_super=true)

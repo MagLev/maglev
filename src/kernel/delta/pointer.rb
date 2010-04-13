@@ -8,8 +8,16 @@ module FFI
 
   class Pointer # [
 
-    def self.new(type, count, &block)
+    def self.new(type, count=MaglevUndefined, &block)
       # this variant  gets bridge methods
+      uu = MaglevUndefined
+      if count._equal?(uu)
+        if type._equal?(uu)
+          return self.new()
+        else
+          return self.new(type, &block)
+        end
+      end
       if type._isFixnum
         elemsize = type
       elsif type._kind_of?(Struct.class)
@@ -71,14 +79,17 @@ module FFI
 
     NULL = self.new(0)
 
-    def initialize
-      @_st_typeSize = 1
-    end
-    def initialize(elem_size)
-      unless elem_size._isFixnum && elem_size > 0
+    def initialize(elem_size=MaglevUndefined)
+      if elem_size._isFixnum && elem_size > 0
+        @_st_typeSize = elem_size
+      elsif elem_size._equal?(MaglevUndefined)
+        @_st_typeSize = 1
+      else
         raise TypeError, 'element size must be a Fixnum > 0'
       end
-      @_st_typeSize = elem_size
+    end
+    def initialize
+      @_st_typeSize = 1
     end
     def __initialize(elem_size)
       @_st_typeSize = elem_size
@@ -197,7 +208,10 @@ module FFI
     # def put_pointer(ofs, memory_pointer) ; end
     primitive_nobridge 'put_pointer', 'pointerAt:put:'
 
-    def read_string(num_bytes)
+    def read_string(num_bytes=MaglevUndefined)
+      if num_bytes._equal?(MaglevUndefined)
+        return self.read_string()
+      end
       self.stringfrom_to(0, num_bytes - 1)
     end
     def read_string
@@ -209,18 +223,22 @@ module FFI
       self.copyfrom_from_to_into(string, 1, num_bytes, 0)
     end
 
-    def get_string(offset)
-       zofs = self.__search_for_zerobyte(offset)
-       lim = zofs < 0 ? self.size : zofs
-       self.stringfrom_to(offset, lim - 1)  # both args zero based
-    end
-    def get_string(offset, length)
+    def get_string(offset, length=MaglevUndefined)
+       if length._equal?(MaglevUndefined)
+         return self.get_string(offset)
+       end 
        zofs = self.__search_for_zerobyte(offset) # result zero based
        lim = zofs < 0 ? offset + length  : zofs
        if lim > (sz = self.size)
          lim = sz
        end
       self.stringfrom_to(offset, lim-1) # both args zero based
+    end
+
+    def get_string(offset)
+       zofs = self.__search_for_zerobyte(offset)
+       lim = zofs < 0 ? self.size : zofs
+       self.stringfrom_to(offset, lim - 1)  # both args zero based
     end
 
     def put_string(offset, string)
@@ -312,25 +330,14 @@ module FFI
       res
     end
 
-    def get_array_of_string(byte_offset)
-      unless byte_offset._isFixnum ; raise TypeError, 'offset must be a Fixnum'; end
-      res = []
-      ofs = byte_offset
-      limit = self.total
-      while ofs < limit
-       str = self.char_star_at(ofs)
-       if str._equal?(nil)
-         return res
-       end
-       res << str
-       ofs += 8
+    def get_array_of_string(byte_offset, length=MaglevUndefined)
+      unless length._isFixnum 
+        if length._equal?(MaglevUndefined)
+          return self.get_array_of_string(byte_offset)
+        end
+        raise TypeError, 'length must be a Fixnum'
       end
-      res
-    end
-
-    def get_array_of_string(byte_offset, length)
       unless byte_offset._isFixnum ; raise TypeError, 'offset must be a Fixnum'; end
-      unless length._isFixnum ; raise TypeError, 'length must be a Fixnum'; end
       res = []
       n = 0
       limit = self.total
@@ -352,6 +359,22 @@ module FFI
           end
           n += 1
         end
+      end
+      res
+    end
+
+    def get_array_of_string(byte_offset)
+      unless byte_offset._isFixnum ; raise TypeError, 'offset must be a Fixnum'; end
+      res = []
+      ofs = byte_offset
+      limit = self.total
+      while ofs < limit
+       str = self.char_star_at(ofs)
+       if str._equal?(nil)
+         return res
+       end
+       res << str
+       ofs += 8
       end
       res
     end

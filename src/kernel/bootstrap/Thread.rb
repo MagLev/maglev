@@ -205,6 +205,11 @@ class Thread
 
   primitive_nobridge 'priority=', 'rubyPriority:'
 
+  def raise(ex_class, message, *args)
+    # TODO  args is callback info not yet implemented
+    self.raise(ex_class, message)
+  end
+
   def raise(ex_class, message)
     ex = ex_class.exception
     if self._equal?(Thread.current)
@@ -213,11 +218,6 @@ class Thread
       ex.__message=(message)
       self.__kill_ex(ex)
     end
-  end
-
-  def raise(ex_class, message, *args)
-    # TODO  args is callback info not yet implemented
-    self.raise(ex_class, message)
   end
 
   def raise(msg)

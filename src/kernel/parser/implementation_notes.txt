@@ -268,7 +268,7 @@ Lexing of double quoted strings (Maglev Trac 580)
   showed that the racc state machine was taking a lot more time
   than the lexer.
   This cuts the time spent in the racc state machine in half.
-  Use m4 to inline the body of _racc_evalact in the new 
+  Use m4 preprocessor to inline the body of _racc_evalact in the new 
   method _racc_parse_inner, and move the rescue of exceptions out 
   of _racc_parse_inner.  Also put the lexer through m4 so we
   don't do debug printout checks in the production code.

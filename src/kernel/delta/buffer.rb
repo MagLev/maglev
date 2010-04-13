@@ -21,8 +21,11 @@ module FFI
       self.new(type, count)
     end
 
-    def self.new(type, count, &block)
+    def self.new(type, count=MaglevUndefined, &block)
       # this variant  gets bridge methods
+      if count._equal?(MaglevUndefined)
+        return self.new(type, &block)
+      end
       if type._isFixnum
         elemsize = type
       elsif type._kind_of?(Struct.class)
@@ -73,18 +76,26 @@ module FFI
       inst
     end
 
-    def put_bytes(offset, string, src_offset, src_size)
+    def put_bytes(offset, string, src_offset=MaglevUndefined, src_size=MaglevUndefined)
+      uu = MaglevUndefined
+      if src_size._equal?(uu)
+        if src_offset._equal?(uu)
+          return self.put_bytes(offset, string)
+        else
+          return self.put_bytes(offset, string, src_offset)
+        end
+      end
       # this variant gets bridge methods
 	   # obj, one-based start offset, one-based end offset, zero-based 
       self.copyfrom_from_to_into(string, src_offset + 1, 
 			src_offset + src_size, offset)
     end
-    def put_bytes(offset, string)
-      self.copyfrom_from_to_into(string, 1, string.length, offset)
-			 	# obj, one-based, one-base, zero-based
-    end
     def put_bytes(offset, string, src_offset)
       self.copyfrom_from_to_into(string, src_offset + 1,  string.length, offset)
+			 	# obj, one-based, one-base, zero-based
+    end
+    def put_bytes(offset, string)
+      self.copyfrom_from_to_into(string, 1, string.length, offset)
 			 	# obj, one-based, one-base, zero-based
     end
 
@@ -92,19 +103,22 @@ module FFI
       self.stringfrom_to(offset, length-1) # both args zero based
     end
 
-    def get_string(offset)
-       zofs = self.__search_for_zerobyte(offset) 
-       lim = zofs < 0 ? self.size : zofs 
-       self.stringfrom_to(offset, lim - 1)  # both args zero based
+    def get_string(offset, length=MaglevUndefined)
+      if length._equal?(MaglevUndefined)
+        return self.get_string(offset)
+      end
+      zofs = self.__search_for_zerobyte(offset) # result zero based
+      lim = zofs < 0 ? offset + length  : zofs 
+      if lim > (sz = self.size)
+        lim = sz
+      end
+      self.stringfrom_to(offset, lim-1) # both args zero based
     end
 
-    def get_string(offset, length)
-       zofs = self.__search_for_zerobyte(offset) # result zero based
-       lim = zofs < 0 ? offset + length  : zofs 
-       if lim > (sz = self.size)
-         lim = sz
-       end
-      self.stringfrom_to(offset, lim-1) # both args zero based
+    def get_string(offset)
+      zofs = self.__search_for_zerobyte(offset) 
+      lim = zofs < 0 ? self.size : zofs 
+      self.stringfrom_to(offset, lim - 1)  # both args zero based
     end
 
     def put_string(offset, string)

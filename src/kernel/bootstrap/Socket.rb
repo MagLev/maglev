@@ -230,6 +230,7 @@ class Socket # [
     end
     syswrite(string)
   end
+
   def send(string, flags)
     unless flags._equal?(0)
       raise 'non-zero flags not supported by send'
@@ -318,18 +319,29 @@ class Socket # [
   primitive_nobridge 'shutdown', 'shutdown'
   primitive 'shutdown', 'shutdown:'
 
-  # Read up to 4096 bytes from the socket
+  # Read up to length bytes from the socket into the specified buffer.
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
   # if no data is available.
-  def sysread
-    str = self.recv(4096)
-    if str._equal?(nil)
-      raise EOFError, "End of file on socket"
+  def sysread(length=MaglevUndefined, a_buffer=MaglevUndefined)
+    uu = MaglevUndefined
+    if a_buffer._equal?(uu)
+      if length._equal?(uu)
+        length = nil
+      end
+      return self.sysread(length)
     end
-    str
+    if length._equal?(uu) || length._equal?(nil)
+      len = 1500
+    else
+      len = Type.coerce_to(length, Fixnum, :to_int)
+      raise ArgumentError, "length must not be negative" if len < 0
+    end
+    buffer = Type.coerce_to(a_buffer, String, :to_str)
+    self.__read_into(len, buffer, 1)  # grows buffer if needed
+    buffer
   end
 
-  # If length is nil, read available data from socket
+  # If length is nil or not given, read up to 4096 bytes from socket
   # else read up to length bytes from socket .
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
   # if no data is available.
@@ -346,22 +358,6 @@ class Socket # [
     end
     str
   end
-
-  # Read up to length bytes from the socket into the specified buffer.
-  # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
-  # if no data is available.
-  def sysread(length, a_buffer)
-    if length._equal?(nil)
-      len = 1500
-    else
-      len = Type.coerce_to(length, Fixnum, :to_int)
-      raise ArgumentError, "length must not be negative" if len < 0
-    end
-    buffer = Type.coerce_to(a_buffer, String, :to_str)
-    self.__read_into(len, buffer, 1)  # grows buffer if needed
-    buffer
-  end
-
 
   primitive 'ungetc', 'ungetByte:'
 
@@ -382,22 +378,22 @@ class IPSocket
   primitive 'addr', 'rubyAddress'
 end
 
-class TCPSocket  # < IPSocket in VM
+class TCPSocket  # < IPSocket in Smalltalk bootstrap
 
   # open binds a socket to a port and does a blocking connect,
   #  returning a blocking socket.
   class_primitive 'open', 'new:port:'
   class_primitive '__open', 'open:'
 
-  def self.new(host, port)
+  def self.new(host, port=MaglevUndefined)
     if host._equal?(nil)
       host = 'localhost'
     end
-    self.open(host, port)
-  end
-
-  def self.new(host)
-    self.__open(host)
+    if port._equal?(MaglevUndefined)
+      self.__open(host)
+    else
+      self.open(host, port)
+    end
   end
 
   def self.open(host)
@@ -406,39 +402,39 @@ class TCPSocket  # < IPSocket in VM
 
 end
 
-class TCPServer   # < TCPSocket in VM
+class TCPServer   # < TCPSocket in Smalltalk bootstrap
   # accept returns a new socket, having same non-blocking state as receiver
   primitive 'accept', 'accept'
 
   # creates a non-blocking listening socket
   class_primitive '__new', 'new:port:'
 
-  def self.new( port )
-    if port._isString
-      self.new(port , nil)
-    elsif port._isFixnum
-       self.__new( 'localhost', port == 0 ? nil : port )
+  def self.new( a1, a2=MaglevUndefined)
+    if a2._equal?(MaglevUndefined)
+      port = a1
+      if port._isString
+        self.new(port , nil)
+      elsif port._isFixnum
+         self.__new( 'localhost', port == 0 ? nil : port )
+      else
+         raise TypeError , 'expected a Fixnum port number or String hostname'
+      end
     else
-       raise TypeError , 'expected a Fixnum port number or String hostname'
+      hostname = a1
+      port = a2
+      # port may be nil or 0 to get a random port
+      port = port._equal?(0) ? nil : port
+      hostname = Type.coerce_to(hostname, String, :to_str)
+      if hostname.length._equal?(0)
+        self.__new( 'localhost' , port)
+      else
+        self.__new( hostname, port )
+      end
     end
   end
 
-  def self.new( hostname, port)
-    # port may be nil or 0 to get a random port
-    port = port._equal?(0) ? nil : port
-    if hostname.length._equal?(0)
-      self.__new( 'localhost' , port)
-    else
-      self.__new( hostname, port )
-    end
-  end
-
-  def self.open( port )
-    self.new(port)
-  end
-
-  def self.open( hostname, port)
-    self.new(hostname, port)
+  def self.open(a1, a2=MaglevUndefined)
+    self.new(a1, a2)
   end
 
 end

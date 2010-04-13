@@ -2,98 +2,7 @@ class IdentitySet
   # Set is identically  Smalltalk IdentitySet
   #  an IdentitySet will never contain nil  ,  add(nil) will have no effect .
 
-  primitive_nobridge '<<', 'add:'
-  primitive_nobridge 'add', 'add:'
-
-  def add?(o)
-    added = self.__add_if_absent(o)
-    unless added
-      return nil
-    end
-    self
-  end
-
-  primitive_nobridge '__add_if_absent', '_addIfAbsent:'
-
-  primitive_nobridge '&', '*'
-  primitive_nobridge 'intersection', '*'
-
-  # Returns a new set built by merging the set and the elements of the
-  # given enumerable object.
-  primitive_nobridge '+'
-  primitive_nobridge '|', '+'
-  primitive_nobridge 'union', '+'
-
-  primitive_nobridge '-'
-  primitive_nobridge 'difference', '-'
-
-  primitive_nobridge '==' , '='
-  primitive '__addall', 'addAll:'
-  primitive 'each&', 'do:'
-  primitive 'length', 'size'
-  primitive 'size', 'size'
-
-  primitive_nobridge 'include?', 'includes:'
-  primitive_nobridge 'member?', 'includes:'
-  primitive_nobridge 'superset?', 'includesAllOf:'
-  def proper_superset?(other)
-    return false if size <= other.size
-    self.superset?(other)
-  end
-
-  def subset?(other)
-    other.superset?(self)
-  end
-
-  def proper_subset?(other)
-    other.proper_superset?(self)
-  end
-
-  # Removes anObject from the receiver and returns anObject. Returns nil if
-  # anObject is missing from the receiver.
-  primitive_nobridge 'delete?', 'removeIfPresent:'
-  primitive_nobridge 'remove', 'removeIfPresent:'
-
-  # Deletes the given object from the set and returns self.  Use +subtract+
-  # to delete several items at once.
-  def delete(o)
-    delete?(o)
-    self
-  end
-
-  # Deletes every element of the set for which block evaluates to
-  # true, and returns self.
-  def delete_if
-    dup.each { |o| self.delete(o) if yield(o) }
-    self
-  end
-
-  primitive_nobridge 'pop', 'removeIfPresent:'
-  # returns argument, or nil if object was not present
-
-  primitive_nobridge '__basic_dup', '_basicCopy'  # uses singleton class for now
-  primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
-  # dup, clone inherited from Object
-
-  # primitive_nobridge '__detect', 'detect:' # not used yet
-
-  primitive_nobridge 'to_a' , 'asArray'
-  primitive_nobridge 'empty?', 'isEmpty'
-
-  # TODO
-  #   clear, replace, flatten_merge, flatten, flatten!, collect!, reject!, merge, ^
-
-  def delete(obj)
-    delete?(obj)
-    self
-  end
-
-  # Deletes every element that appears in the given enumerable object
-  # and returns self.
-  def subtract(enum)
-    enum.each {|o| delete(o)}
-    self
-  end
+  # ------------------
 
   class_primitive 'new' , 'new'
 
@@ -110,6 +19,101 @@ class IdentitySet
     o = self.new
     o.__addall(arr)
     o
+  end
+
+  # ------------------
+
+  # add(nil) will have no effect 
+
+  primitive_nobridge '<<', 'add:'
+  primitive_nobridge 'add', 'add:'
+
+  def add?(o)
+    added = self.__add_if_absent(o)
+    unless added
+      return nil
+    end
+    self
+  end
+
+  primitive_nobridge '__add_if_absent', '_addIfAbsent:'
+
+  # Removes anObject from the receiver and returns anObject. Returns nil if
+  # anObject is missing from the receiver.
+  primitive_nobridge 'delete?', 'removeIfPresent:'
+  primitive_nobridge 'remove', 'removeIfPresent:'
+  primitive_nobridge 'pop', 'removeIfPresent:'
+
+  primitive_nobridge 'empty?', 'isEmpty'
+
+  primitive_nobridge 'include?', 'includes:'
+  primitive_nobridge 'member?', 'includes:'
+
+  primitive_nobridge '&', '*'
+  primitive_nobridge 'intersection', '*'
+
+  # Returns a new set built by merging the set and the elements of the
+  # given enumerable object.
+  primitive_nobridge '+'
+  primitive_nobridge '|', '+'
+  primitive_nobridge 'union', '+'
+
+  primitive_nobridge '-'
+  primitive_nobridge 'difference', '-'
+
+  primitive_nobridge '==' , '='
+  primitive '__addall', 'addAll:'
+
+  primitive 'length', 'size'
+  primitive 'size', 'size'
+
+  primitive_nobridge 'to_a' , 'asArray'
+
+  primitive_nobridge '__basic_dup', '_basicCopy'  # uses singleton class for now
+  primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
+  # dup, clone inherited from Object
+
+  # -------- following methods alphabetized 
+  #  see also Enumerable and indexing support sections below
+
+  def avg(&block)
+    self.sum(&block) / length
+  end
+
+  # Deletes the given object from the set and returns self.  Use +subtract+
+  # to delete several items at once.
+  def delete(obj)
+    delete?(obj)
+    self
+  end
+
+  # Deletes every element of the set for which block evaluates to
+  # true, and returns self.
+  def delete_if
+    dup.each { |o| self.delete(o) if yield(o) }
+    self
+  end
+
+  primitive_nobridge '__at', '_at:'  # one-based offset
+
+  def each(&block)
+    siz = self.size
+    n = 1
+    while n <= siz
+      block.call( self.__at(n))
+      n += 1
+    end 
+    self
+  end
+
+  def group_by(&block)
+    groups = {}
+    self.each { |item|
+      val = block.call(item)
+      group = groups[val] ||= IdentitySet.new
+      group << item
+    }
+    groups
   end
 
   # Return string with human readable representation of receiver.
@@ -131,27 +135,39 @@ class IdentitySet
     s
   end
 
-  def group_by(&block)
-    groups = {}
-    each do |item|
-      val = block.call(item)
-      group = groups[val] ||= IdentitySet.new
-      group << item
-    end
-    groups
+  def proper_superset?(other)
+    return false if size <= other.size
+    self.superset?(other)
   end
+
+  def proper_subset?(other)
+    other.proper_superset?(self)
+  end
+
+  def subset?(other)
+    other.superset?(self)
+  end
+
+  primitive_nobridge 'superset?', 'includesAllOf:'
+
+  # Deletes every element that appears in the given enumerable object
+  # and returns self.
+  def subtract(enum)
+    enum.each {|o| delete(o)}
+    self
+  end
+
 
   def sum(&block)
     s = 0
-    each{|e| s += block.call(e)}
+    self.each{|e| s += block.call(e)}
     s
   end
 
-  def avg(&block)
-    sum(&block) / length
-  end
+  # TODO
+  #   clear, replace, flatten_merge, flatten, flatten!, collect!, reject!, merge, ^
 
-  #--
+  #--------------
   # Add some of Enumerable's methods.  An Identity set is a
   # Non-sequenceable Collection, hence not all of Enumerable
   # is applicable.
@@ -159,7 +175,7 @@ class IdentitySet
 
 
   def find(ifnone = nil)
-    each { |o| return o if yield(o) }
+    self.each { |o| return o if yield(o) }
     ifnone.call if ifnone
   end
 
@@ -175,56 +191,70 @@ class IdentitySet
   #   ary.count(2)          # => 2
   #   ary.count{ |x|x%2==0}  # => 3
 
-  def count(item = MaglevUndefined)
+  def count(item = MaglevUndefined, &block)
     seq = 0
-    unless item._equal?(MaglevUndefined)
-      each { |o| seq += 1 if item == o }
+    if item._equal?(MaglevUndefined)
+      self.count(&block)
     else
-      each { |o| seq += 1 if yield(o) }
+      self.count(item)
     end
     seq
   end
 
-  def find_all
-    result = Array.new
-    each { |o| result << o if yield(o) }
+  def count(item)
+    seq = 0
+    self.each { |o| seq += 1 if item == o }
+    seq
+  end
+
+  def count(&block)
+    seq = 0
+    self.each { |o| seq += 1 if block.call(o) }
+    seq
+  end
+
+  def find_all(&block)
+    result = []
+    self.each { |o| result << o if block.call(o) }
     result
   end
   alias_method :select, :find_all
 
-  def reject
-    result = Array.new
-    each { |o| result << o unless yield(o) }
+  def reject(&block)
+    result = []
+    self.each { |o| result << o unless block.call(o) }
     result
   end
 
-  def collect
-    result = Array.new
+  def collect(&block)
+    result = []
     if block_given?
-      each { |o| result << yield(o) }
+      self.each { |o| result << yield(o) }
     else
-      each { |o| result << o }
+      self.each { |o| result << o }
     end
     result
   end
   alias_method :map, :collect
 
-  def inject(memo = MaglevUndefined)
-    each { |o|
-      if memo._equal?( MaglevUndefined)
+  def inject(memo = MaglevUndefined, &block)
+    uu = MaglevUndefined
+    self.each { |o|
+      if memo._equal?(uu)
         memo = o
       else
-        memo = yield(memo, o)
+        memo = block.call(memo, o)
       end
     }
-    memo._equal?(MaglevUndefined) ? nil : memo
+    memo._equal?(uu) ? nil : memo
   end
 
-  def all?
+
+  def all?(&block)
     if block_given?
-      each { |e| return false unless yield(e) }
+      self.each { |e| return false unless block.call(e) }
     else
-      each { |e| return false unless e }
+      self.each { |e| return false unless e }
     end
     true
   end
@@ -238,6 +268,7 @@ class IdentitySet
     false
   end
 
+  # -------------
   # ##################################################
   #          Index and Selection block support
   # ##################################################

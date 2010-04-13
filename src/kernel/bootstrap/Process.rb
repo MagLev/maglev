@@ -76,7 +76,7 @@ module Process
     _procInfoResultCheck(r)
   end
 
-  def self.kill(signal, aPid)
+  def self.__kill(signal, aPid)
     # aPid < 0 or  aPid == Process.pid() are not supported
     #    and will raise an error
     status = Maglev.__system.__process_info(12, signal, aPid)
@@ -87,7 +87,7 @@ module Process
   def self.kill(signal, *pids)
     count = 0
     pids.each { |aPid|
-      self.kill(signal, aPid)
+      self.__kill(signal, aPid)
       count = count + 1
     }
     return count

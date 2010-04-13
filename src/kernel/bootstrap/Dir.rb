@@ -51,14 +51,14 @@ class Dir
     Dir.new(dirname).entries
   end
 
-  def self.foreach(dirname, &block)
-    Dir.entries(dirname).each(&block)
-    nil
-  end
-
-  def self.foreach(dirname) # added in 1.8.7
-    # returns an Enumerator
-    Dir.new(dirname).each()
+  def self.foreach(dirname, &block)  # changed for 1.8.7
+    if block_given?
+      Dir.entries(dirname).each(&block)
+      nil
+    else
+      # return an Enumerator
+      Dir.new(dirname).each()
+    end
   end
 
   def self.getwd

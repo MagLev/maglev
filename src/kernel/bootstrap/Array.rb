@@ -746,20 +746,6 @@ class Array
     nil
   end
 
-  def delete(obj)
-    n = self.__size - 1
-    res = nil
-    while n >= 0
-      if self.__at(n) == obj
-        oidx = n + 1
-        self.__remove_from_to_(oidx, oidx)
-        res = obj
-      end
-      n = n - 1
-    end
-    return res
-  end
-
   def delete(obj, &block)
     n = self.__size - 1
     found = false
@@ -780,6 +766,20 @@ class Array
     else
       obj
     end
+  end
+
+  def delete(obj)
+    n = self.__size - 1
+    res = nil
+    while n >= 0
+      if self.__at(n) == obj
+        oidx = n + 1
+        self.__remove_from_to_(oidx, oidx)
+        res = obj
+      end
+      n = n - 1
+    end
+    return res
   end
 
 
@@ -913,8 +913,19 @@ class Array
 
   primitive 'empty?', 'isEmpty'
 
+  def fetch(index, default=MaglevUndefined, &block)
+    # variant with bridge methods
+    if block_given?
+      # per specs, block has precedence over default
+      self.fetch(index, &block)  
+    elsif default._equal?(MaglevUndefined) 
+      self.fetch(index)
+    else
+      self.fetch(index, default)
+    end
+  end
+
   def fetch(index, &block)
-    # this variant gets bridge methods
     idx = Type.coerce_to(index, Fixnum, :to_int)
     my_siz = self.__size
     bad = false
@@ -967,16 +978,116 @@ class Array
     self.__at(idx)
   end
 
-  def fetch(index, default, &block)
-    if block_given?
-      self.fetch(index, &block)
+  def fill(a1=MaglevUndefined, a2=MaglevUndefined, a3=MaglevUndefined, &block)
+    uu = MaglevUndefined
+    if a3._equal?(uu)
+      if a2._equal?(uu)
+        if a1._equal?(uu)
+          # zero args
+          self.fill(nil, nil, &block)  # fails if no block given
+        else
+          # one arg
+          self.fill(a1, &block) # fails if no block given
+        end
+      else
+        # 2 args
+        if block_given?
+          self.fill(a1, a2, &block)
+        else
+          self.fill(a1, a2)
+        end
+      end
     else
-      self.fetch(index, default)
+      self.fill(a1, a2, a3)  # 3 args, block ignored
     end
   end
 
-  #  note multiple variants below
-  def fill(obj, start=nil, length=nil)
+  def fill(&block)
+    # no bridge methods for second and later variants
+    fill(nil, nil, &block)
+    self
+  end
+
+  def fill(start, &block)
+    if start._isRange
+      s = Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s += self.__size if s < 0
+      e += self.__size if e < 0
+      if start.exclude_end?
+        return self if s == e
+        e -= 1
+      end
+      raise RangeError, "#{start.inspect} out of range" if s < 0
+      return self if e < 0
+      s.upto(e) do | n |
+        self[n] = block.call(n)
+      end
+    elsif block_given?
+      self.fill(start, nil, &block) 
+    else
+      self.fill(start, nil, nil)
+    end
+    self
+  end
+
+  def fill(obj, start)
+    # note no bridge methods for second and later variants
+    if start._isRange
+      s = Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s += self.__size if s < 0
+      e += self.__size if e < 0
+      if start.exclude_end?
+        return self if s == e
+        e -= 1
+      end
+      raise RangeError, "#{start.inspect} out of range" if s < 0
+      return self if e < 0
+      s.upto(e) do | n |
+        self[n] = obj
+      end
+    else
+      fill(obj, start, nil)
+    end
+    self
+  end
+
+  def fill(start, length, &block)
+    unless start._isFixnum
+      if start._equal?(nil)
+        start = 0
+      else
+        start = Type.coerce_to(start, Fixnum, :to_int)
+      end
+    end
+    sz = self.__size
+    if start < 0
+      start = sz + start
+      if start < 0
+        start = 0
+      end
+    end
+    if length._equal?(nil)
+      length = sz - start
+    else
+      unless length._isFixnum
+        length = length.to_int
+      end
+    end
+    n = start
+    limit = start + length
+    unless block_given?
+      raise ArgumentError, 'no block given'
+    end
+    while n < limit
+      self.__at_put(n, block.call(n) )
+      n = n + 1
+    end
+    self
+  end
+
+  def fill(obj, start, length)
     if start._equal?(nil)
       start = 0
     else
@@ -1024,112 +1135,16 @@ class Array
     self
   end
 
-  def fill(obj, start)
-    # note no bridge methods for second and later variants
-    if start._isRange
-      s = Type.coerce_to(start.begin, Fixnum, :to_int)
-      e = Type.coerce_to(start.end,   Fixnum, :to_int)
-      s += self.__size if s < 0
-      e += self.__size if e < 0
-      if start.exclude_end?
-        return self if s == e
-        e -= 1
-      end
-      raise RangeError, "#{start.inspect} out of range" if s < 0
-      return self if e < 0
-      s.upto(e) do | n |
-        self[n] = obj
-      end
-    else
-      fill(obj, start, nil)
-    end
-    self
-  end
-
-  def fill(start=nil, length=nil , &block)
-    # note no bridge methods for second and later variants
-    unless start._isFixnum
-      if start._equal?(nil)
-        start = 0
-      else
-        start = start.to_int
-      end
-    end
-
-    sz = self.__size
-    if start < 0
-      start = sz + start
-      if start < 0
-        start = 0
-      end
-    end
-
-    if length._equal?(nil)
-      length = sz - start
-    else
-      unless length._isFixnum
-        length = length.to_int
-      end
-    end
-    n = start
-    limit = start + length
-    while (n < limit)
-      self.__at_put(n, block.call(n) )
-      n = n + 1
-    end
-    self
-  end
-
-  def fill(&block)
-    # note no bridge methods for second and later variants
-    fill(nil, nil, &block)
-    self
-  end
-
-  def fill(start, &block)
-    # note no bridge methods for second and later variants
-    if start._isRange
-      s = Type.coerce_to(start.begin, Fixnum, :to_int)
-      e = Type.coerce_to(start.end,   Fixnum, :to_int)
-      s += self.__size if s < 0
-      e += self.__size if e < 0
-      if start.exclude_end?
-        return self if s == e
-        e -= 1
-      end
-      raise RangeError, "#{start.inspect} out of range" if s < 0
-      return self if e < 0
-      s.upto(e) do | n |
-        self[n] = yield n
-      end
-    else
-      fill(start, nil, &block)
-    end
-    self
-  end
-
-  def fill(a, b, c, *d)
-    if d.__size > 0
-      raise ArgumentError , 'too many args'
-    else
-      return fill(a, b, c)
-    end
-  end
-
-  def fill(a, b, c, &block)
-    raise ArgumentError , 'too many args'
-  end
-
-  def first
-    self.__at(0)
-  end
-
-  def first(count)
+  def first(count = 0)
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'negative count'
     end
     self.__at(0, cnt)
+  end
+
+  def first
+    self.__at(0)
   end
 
   def flatten(level = -1)  # level arg added for 1.8.7
@@ -1207,6 +1222,14 @@ class Array
     false
   end
 
+  def index(a1=MaglevUndefined, &block)  # added for 1.8.7
+    if a1._equal?(MaglevUndefined)
+      self.index(&block)
+    else
+      self.index(a1) # ignore block when first arg given
+    end
+  end
+
   def index(element)
     i = 0
     lim = self.__size
@@ -1232,11 +1255,6 @@ class Array
       i += 1
     end
     nil
-  end
-
-  def index(object, &block)  # added for 1.8.7
-    # ignore block when first arg is given
-    self.index(object)
   end
 
   alias find_index index  # added for 1.8.7
@@ -1332,18 +1350,10 @@ class Array
     r
   end
 
-  def pop
-    sz = self.__size
-    elem = nil
-    unless sz._equal?(0)
-      idx = sz - 1
-      elem = self.__at(idx)
-      self.__size=(idx)
-    end
-    elem
-  end
-
-  def pop(count)  # added in 1.8.7
+  def pop(count=MaglevUndefined)  # added in 1.8.7
+    if count._equal?(MaglevUndefined) 
+      return self.pop()
+    end 
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'arg to pop must be >= 0'
@@ -1361,6 +1371,17 @@ class Array
     res = self.__at(idx, cnt)
     self.__size=(idx)
     res
+  end
+
+  def pop
+    sz = self.__size
+    elem = nil
+    unless sz._equal?(0)
+      idx = sz - 1
+      elem = self.__at(idx)
+      self.__size=(idx)
+    end
+    elem
   end
 
   primitive 'push*', '_rubyAddAll:'
@@ -1421,6 +1442,22 @@ class Array
     self
   end
 
+  
+  def rindex(a1=MaglevUndefined, &block) # added for 1.8.7
+    if a1._equal?(MaglevUndefined)
+      i = self.__size - 1
+      while i >= 0
+        if block.call(self.__at(i))
+          return i
+        end
+        i -= 1
+      end
+      nil
+    else
+      self.rindex(a1)
+    end
+  end
+
   def rindex(element)
     i = self.__size - 1
     while i >= 0
@@ -1432,30 +1469,12 @@ class Array
     nil
   end
 
-  def rindex(&block) # added for 1.8.7
-    i = self.__size - 1
-    while i >= 0
-      if block.call(self.__at(i))
-        return i
-      end
-      i -= 1
-    end
-    nil
-  end
-
   primitive_nobridge '__remove_from_to_', 'removeFrom:to:'
 
-  def shift
-    sz = self.__size
-    elem = nil
-    unless sz._equal?(0)
-      elem = self.__at(0)
-      self.__remove_from_to_(1, 1)  # one-based args
+  def shift(count=MaglevUndefined)  # added in 1.8.7
+    if count._equal?(MaglevUndefined) 
+      return self.shift()
     end
-    elem
-  end
-
-  def shift(count)  # added in 1.8.7
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'arg to shift must be >= 0'
@@ -1474,12 +1493,19 @@ class Array
     return res
   end
 
+  def shift
+    sz = self.__size
+    elem = nil
+    unless sz._equal?(0)
+      elem = self.__at(0)
+      self.__remove_from_to_(1, 1)  # one-based args
+    end
+    elem
+  end
+
   primitive 'size'
   primitive 'size=', 'size:'
   primitive '__size=', 'size:'
-
-  primitive 'slice', '_rubyAt:'
-  primitive 'slice', '_rubyAt:length:'
 
   def slice(*args)
     len = args.__size
@@ -1491,6 +1517,9 @@ class Array
       raise ArgumentError, 'expected 1 or 2 args'
     end
   end
+
+  primitive_nobridge 'slice', '_rubyAt:'
+  primitive_nobridge 'slice', '_rubyAt:length:'
 
   def slice!(start, length)
     start = Type.coerce_to(start, Fixnum, :to_int)

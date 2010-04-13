@@ -32,6 +32,11 @@ class ExecBlock
   #   send of call* will be a special bytecode.
   primitive          'call*' , '_rubyCall:'
 
+    def [](*args, &block)
+      self.call(*args, &block)
+    end
+
+    # optimize common variants to avoid bridge method 
     def []
       self.call
     end
@@ -48,6 +53,10 @@ class ExecBlock
       self.call(a, b, c)
     end
 
+    def [](*args)
+      self.call(*args)
+    end
+
     def [](&block)
       self.call(&block)
     end
@@ -60,8 +69,8 @@ class ExecBlock
       self.call(a, b, &block)
     end
 
-    def [](*args)
-      self.call(*args)
+    def [](a, b, c, &block)
+      self.call(a, b, c, &block)
     end
 
     def __fficallback(*args)
@@ -179,6 +188,11 @@ class Proc
       @_st_block.__set_self(obj)
     end
 
+    def [](*args, &block)
+      @_st_block.call(*args, &block)
+    end
+
+    # optimize common variants to avoid bridge methods
     def []
       @_st_block.call
     end
@@ -207,8 +221,8 @@ class Proc
       @_st_block.call(a, b, &block)
     end
 
-    def [](*args)
-      @_st_block.call(*args)
+    def [](a, b, c, &block)
+      @_st_block.call(a, b, c, &block)
     end
 
     def __fficallback(*args)
@@ -249,8 +263,9 @@ class Proc
     def call(*args, &block)
       @_st_block.call(*args, &block)
     end
+
+    # optimize common variants to avoid bridge methods
     def call
-      # this and following variants get no bridge methods
       @_st_block.call
     end
     def call(a)
@@ -270,6 +285,9 @@ class Proc
     end
     def call(a, b, &block)
       @_st_block.call(a, b, &block)
+    end
+    def call(a, b, c, &block)
+      @_st_block.call(a, b, c, &block)
     end
 
     #  Creating a Binding from a Proc is not yet supported.
@@ -296,13 +314,14 @@ class Proc
       self
     end
 
+    def value(a)
+      # used by smalltalk rubyEval*
+      @_st_block.call(a)
+    end
+
     def value
-      # used by smalltalk rubyEval:
+      # used by smalltalk _rubyLoop*
       @_st_block.call
     end
 
-    def value(a)
-      # used by smalltalk  Integer>>_rubyTimes...
-      @_st_block.call(a)
-    end
 end

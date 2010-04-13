@@ -197,6 +197,33 @@ class Array
     result
   end
 
+  def inject(initial=MaglevUndefined, bin_op=MaglevUndefined, &block) # added for 1.8.7
+    uu = MaglevUndefined
+    if bin_op._equal?(uu)
+      if initial._equal?(uu)
+        self.inject(&block)
+      elsif block_given? 
+        self.inject(initial, &block)
+      else
+        self.inject(initial) # arg 1 is a bin_op
+      end
+    else
+      # per specs, ignore block if 2 args given
+      self.inject(initial, bin_op)
+    end 
+  end
+
+  def inject(initial, &block)
+    accum = initial
+    my_size = self.__size
+    n = 0
+    while n < my_size
+      accum = block.call(accum, self.__at(n))
+      n = n + 1
+    end
+    accum
+  end
+
   def inject(&block)
     my_size = self.__size
     accum = nil
@@ -212,17 +239,6 @@ class Array
     accum
   end
 
-  def inject(initial, &block)
-    accum = initial
-    my_size = self.__size
-    n = 0
-    while n < my_size
-      accum = block.call(accum, self.__at(n))
-      n = n + 1
-    end
-    accum
-  end
-
   def inject(initial, binary_op_sym) # added for 1.8.7
     memo = initial
     my_size = self.__size
@@ -232,10 +248,6 @@ class Array
       n = n + 1
     end
     memo
-  end
-
-  def inject(initial, binary_op_sym, &block_ignored) # added for 1.8.7
-    self.inject(initial, binary_op_sym)
   end
 
   def inject(binary_op_sym) # added for 1.8.7

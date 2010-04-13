@@ -17,7 +17,7 @@ class BigDecimal
   #  would exceed 130176 bits , due to the limitations of the Bignum implementation.
 
 
-  def self._mode(sym)
+  def self.__mode(sym)
     # gets the specified mode
     if sym._equal?( :ROUND_MODE )
       return ROUNDING_mode
@@ -36,7 +36,7 @@ class BigDecimal
     end
   end
 
-  def self._set_mode(sym, v)
+  def self.__set_mode(sym, v)
     # sets the specified mode modification will be transient or persistent
     # per the current state of  Maglev.persistent?
     if sym._equal?( :ROUND_MODE )

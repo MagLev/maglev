@@ -1,5 +1,7 @@
 = MagLev Change Log
 
+* Fix Trac 707, 708, 709
+
 == Changes for 23245  2010-04-12
 
 * Removed workarounds for fixed bugs

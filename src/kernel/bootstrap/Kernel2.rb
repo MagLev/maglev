@@ -2,6 +2,14 @@ module Kernel
   # file Kernel2.rb  , parts of kernel that must be deferred to later
   #  in the bootstrap
 
+  def binding(lex_path, &block)
+    # lex_path arg is synthesized by the parser.
+    # usually the block argument is synthesized by the parser.
+    bnd = Binding.new( self.__binding_ctx(0), self , block)
+    bnd.__set_lex_scope(lex_path)
+    bnd 
+  end
+
   def binding
     # could be sent via  __send__ or send, but not supported yet
     # You must code binding calls explicitly.
@@ -19,14 +27,6 @@ module Kernel
   def binding(lex_path)
     # lex_path arg is synthesized by the parser.
     bnd = Binding.new( self.__binding_ctx(0), self , nil)
-    bnd.__set_lex_scope(lex_path)
-    bnd 
-  end
-
-  def binding(lex_path, &block)
-    # lex_path arg is synthesized by the parser.
-    # usually the block argument is synthesized by the parser.
-    bnd = Binding.new( self.__binding_ctx(0), self , block)
     bnd.__set_lex_scope(lex_path)
     bnd 
   end
