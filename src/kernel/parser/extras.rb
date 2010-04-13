@@ -1498,7 +1498,7 @@ module MagRp # {
       if str.size._equal?(0)
         yyerror( 'empty symbol literal' )
       end
-      if str.__index(0, 0)._not_equal?(nil)
+      if str.__indexOfByte(0, 1)._not_equal?(0)
         yyerror( 'symbol string may not contain `\\0\' ')
       end
       str.__as_symbol

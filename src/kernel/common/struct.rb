@@ -256,7 +256,11 @@ class Struct
   #    12345
 
   def each(&block)
-    return self.values.each(&block)
+    if block_given?
+      return self.values.each(&block)
+    else
+      return self.values.each()
+    end
   end
 
   def each()  # added for 1.8.7

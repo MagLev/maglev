@@ -70,10 +70,20 @@ class PureRubyStringIO
 
   alias chars each_char
 
-  def reopen(obj, mode)
+  def reopen(obj=MaglevUndefined, mode=MaglevUndefined)
+    # this variant gets bridge mehods
     if mode._isInteger 
       if (mode & IO::TRUNC)._not_equal?(0) && obj.frozen?
         raise TypeError, 'cannot truncate frozen input string'
+      end
+    else
+      uu = MaglevUndefined
+      if mode._equal?(uu)
+        if obj._equal?(uu) 
+          return self.reopen()
+        else
+          return self.reopen(obj)
+        end
       end
     end
     self._initialize(obj, mode, true)
@@ -91,5 +101,4 @@ class PureRubyStringIO
   def reopen()
     self._initialize(self.string, "w+", true)
   end
-
 end

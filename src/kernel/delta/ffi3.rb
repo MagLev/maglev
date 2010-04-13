@@ -382,7 +382,11 @@ module FFI
 
     # define a callback type
     #
-    def callback(name_sym, arg_types, return_type) 
+    def callback(name_sym, arg_types, return_type=MaglevUndefined) 
+      if return_type._equal?(MaglevUndefined)
+        # per JRuby, assume 2 args and name_sym was omitted
+        raise ArgumentError, 'anonymous callbacks not supported'
+      end
       unless name_sym._isSymbol
         raise TypeError, 'name of a callback must be a Symbol'
       end 
@@ -425,10 +429,6 @@ module FFI
       Type.__add_type( name_sym, cb )
       return cb
     end 
-
-    def callback(arg_types, return_type) 
-      raise ArgumentError, 'anonymous callbacks not supported'
-    end
 
     # Attach a C function to this module. The arguments can have two forms:
     #
