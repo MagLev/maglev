@@ -33,15 +33,19 @@ class BigDecimal
     VERSION
   end
 
-  def self.mode(sym)
-    # gets the specified mode
-    self._mode(sym)  # implem in post_prims/bigdecimal.rb
-  end
-
-  def self.mode(sym, value)
+  def self.mode(sym, value=MaglevUndefined)
     # sets the specified mode. modification will be transient or persistent
     # per the current state of  Maglev.persistent?
-    self._set_mode(sym, value) # implem in post_prims/bigdecimal.rb
+    if value._equal?(MaglevUndefined)
+      self.__mode(sym)
+    else
+      self.__set_mode(sym, value) # implem in post_prims/bigdecimal.rb
+    end
+  end
+
+  def self.mode(sym)
+    # gets the specified mode
+    self.__mode(sym)  # implem in post_prims/bigdecimal.rb
   end
 
 

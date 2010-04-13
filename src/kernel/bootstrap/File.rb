@@ -705,46 +705,31 @@ class File
 
   # --------- begin gets implementation  [
 
-  def gets(*args)
-    raise ArgumentError, 'expected 0 or 1 arg'
+  def gets(*args)    # [  begin gets implementation
+    raise ArgumentError, 'expected 0 or 1 arg with no block'
   end
 
   def gets(sep)
-    # variant after first gets no bridges
     __gets(sep, 0x31)
   end
 
   def gets
-    # variant after first gets no bridges
     __gets($/, 0x31)
   end
 
   # def __gets; end # implemented in IO
 
-  def read
-    raise IOError, 'read: closed stream' unless __is_open
-    if self.eof?
-      return ''
+  def read(a1=MaglevUndefined, a2=MaglevUndefined)
+    uu = MaglevUndefined
+    if a2._equal?(uu)
+      if a1._equal?(uu)
+        self.read()
+      else
+        self.read(a1)
+      end
+    else
+      self.read(a1, a2)
     end
-    data = __contents 
-    data = '' if data._equal?(nil)
-    data
-  end
-
-  def read(a_length)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
-      length = Type.coerce_to(a_length, Fixnum, :to_int)
-      raise ArgumentError, "length must not be negative" if length < 0
-      return nil if self.pos > self.stat.size
-    end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
-    data = read_all_bytes ? __contents : __next(length)
-    data = '' if data._equal?(nil)
-    data
   end
 
   def read(a_length, a_buffer)
@@ -766,11 +751,50 @@ class File
     buffer
   end
 
-  def sysread
+  def read(a_length)
+    raise IOError, 'read: closed stream' unless __is_open
+    read_all_bytes = a_length._equal?(nil) 
+    unless read_all_bytes
+      length = Type.coerce_to(a_length, Fixnum, :to_int)
+      raise ArgumentError, "length must not be negative" if length < 0
+      return nil if self.pos > self.stat.size
+    end
+    if self.eof?
+      return read_all_bytes ? '' : nil
+    end
+    data = read_all_bytes ? __contents : __next(length)
+    data = '' if data._equal?(nil)
+    data
+  end
+
+  def read
+    raise IOError, 'read: closed stream' unless __is_open
+    if self.eof?
+      return ''
+    end
+    data = __contents 
+    data = '' if data._equal?(nil)
+    data
+  end
+
+  def sysread(a1=MaglevUndefined, a2=MaglevUndefined)
+    uu = MaglevUndefined
+    if a2._equal?(uu)
+      if a1._equal?(uu)
+        self.sysread()
+      else
+        self.sysread(a1)
+      end
+    else
+      self.sysread(a1, a2)
+    end
+  end
+
+  def sysread(length, buffer)
     if self.eof?
       raise EOFError, "End of file reached"
     end
-    str = self.__contents
+    str = self.read(length, buffer)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
     end
@@ -788,16 +812,17 @@ class File
     str
   end
 
-  def sysread(length, buffer)
+  def sysread
     if self.eof?
       raise EOFError, "End of file reached"
     end
-    str = self.read(length, buffer)
+    str = self.__contents
     if str._equal?(nil)
       raise EOFError, "End of file reached"
     end
     str
   end
+
 
   # during bootstrap,  send and __send__ get no bridge methods
   def send(sym)

@@ -173,7 +173,7 @@ class Regexp
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
-    raise ArgumentError, 'expected 1 arg'
+    raise ArgumentError, 'expected 1 arg with no block'
   end
 
   def match(str)
@@ -198,7 +198,7 @@ class Regexp
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
-    raise ArgumentError, 'expected 1 arg'
+    raise ArgumentError, 'expected 1 arg with no block'
   end
 
   def =~(str)
@@ -215,7 +215,7 @@ class Regexp
     # only zero-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
-    raise ArgumentError, 'expected zero args'
+    raise ArgumentError, 'expected zero args with no block'
   end
   
   def ~
@@ -350,7 +350,7 @@ class Regexp
     self
   end
 
-  def __index_string(string, offset)
+  def __index_string(string, offset, vcgl_idx)
     # used by String#index only
     start = offset._equal?(nil) ? 0 : offset
     md = self.__search(string, start, nil)
@@ -359,7 +359,7 @@ class Regexp
     md.begin(0)
   end
 
-  def __rindex_string(string, offset)
+  def __rindex_string(string, offset, vcgl_idx)
     res = nil
     str_size = string.size
     if @_st_source.index('\G')._not_equal?(nil)
@@ -399,7 +399,7 @@ class Regexp
   end
       end
     end
-    res_md.__storeRubyVcGlobal(0x40)
+    res_md.__storeRubyVcGlobal(vcgl_idx)
     return res
   end
 
@@ -432,7 +432,7 @@ class Regexp
   #   that triggers a non-deletable method temp definition in the IR
 
   def self.last_match(*args)
-    raise ArgumentError , 'expected 0 or 1 arg'
+    raise ArgumentError , 'expected 0 or 1 arg with no block'
   end
 
   def self.last_match

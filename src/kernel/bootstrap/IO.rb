@@ -164,7 +164,7 @@ class IO
   end 
 
   def gets(*args)    # [  begin gets implementation
-    raise ArgumentError, 'expected 0 or 1 arg'
+    raise ArgumentError, 'expected 0 or 1 arg, with no block'
   end
   
   def gets(sep_string)

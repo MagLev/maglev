@@ -247,12 +247,14 @@ module Kernel
 
   # This implementation of include handles include from a main program
   primitive_nobridge '__include_module',  'includeRubyModule:'
+
   def include(*names)
     # this variant gets bridge methods
     names.reverse.each do |name|
       __include_module(name)
     end
   end
+
   def include(name)
     # variant needed for bootstrap
     __include_module(name)
@@ -704,12 +706,12 @@ module Kernel
     return false
   end
 
-  def trap(signal, proc)
-    __stub_warn("Kernel#trap(signal, proc)")
-  end
-
-  def trap(signal, &block)
-    __stub_warn("Kernel#trap(signal, &block)")
+  def trap(signal, proc=MaglevUndefined, &block)
+     if proc._equal?(MaglevUndefined)
+       __stub_warn("Kernel#trap(signal, &block)")
+     else
+      __stub_warn("Kernel#trap(signal, proc)")
+     end
   end
 
   def __as_file(arg)
@@ -730,6 +732,40 @@ module Kernel
     if f._is_a?(File)
       f.close
     end
+  end
+
+  def test(cmd, file1, file2=MaglevUndefined)
+    if file2._equal?(MaglevUndefined)
+      return self.test(cmd, file1)
+    end
+    res = false
+    fa = nil
+    fb = nil
+    begin
+      fa = self.__as_file(file1)
+      fb = self.__as_file(file2)
+      mta = fa._equal?(nil) ? -1 : fa.mtime
+      mtb = fa._equal?(nil) ? -1 : fa.mtime
+      if cmd._equal?( ?= )
+        # return true if modification times equal
+        res =  mta >= 0 && mtb >= 0 &&  mta == mtb
+      elsif cmd._equal?( ?< )
+        # return true if file1.mtime < file2.mtime
+        res =  mta >= 0 && mtb >= 0 &&  mta < mtb
+      elsif cmd._equal?( ?> )
+        # return true if file1.mtime > file2.mtime
+        res =  mta >= 0 && mtb >= 0 &&  mta > mtb
+      elsif cmd._equal?( ?- )
+        # return true if file1 is a hard link to file2
+        raise NotImplementedError , 'Kernel#test ?- '
+      else
+        raise ArgumentError
+      end
+    ensure
+      self.__close_file(fa)
+      self.__close_file(fb)
+    end
+    res
   end
 
   def test(cmd, file)
@@ -808,43 +844,11 @@ module Kernel
     res
   end
 
-  def test(cmd, file1, file2)
-    res = false
-    fa = nil
-    fb = nil
-    begin
-      fa = self.__as_file(file1)
-      fb = self.__as_file(file2)
-      mta = fa._equal?(nil) ? -1 : fa.mtime
-      mtb = fa._equal?(nil) ? -1 : fa.mtime
-      if cmd._equal?( ?= )
-        # return true if modification times equal
-        res =  mta >= 0 && mtb >= 0 &&  mta == mtb
-      elsif cmd._equal?( ?< )
-        # return true if file1.mtime < file2.mtime
-        res =  mta >= 0 && mtb >= 0 &&  mta < mtb
-      elsif cmd._equal?( ?> )
-        # return true if file1.mtime > file2.mtime
-        res =  mta >= 0 && mtb >= 0 &&  mta > mtb
-      elsif cmd._equal?( ?- )
-        # return true if file1 is a hard link to file2
-        raise NotImplementedError , 'Kernel#test ?- '
-      else
-        raise ArgumentError
-      end
-    ensure
-      self.__close_file(fa)
-      self.__close_file(fb)
-    end
-    res
-  end
-
+  # def throw(aSymbol, aValue); end  # implemented in smalltalk
+  primitive_nobridge 'throw' , 'throw:with:'
 
   # def throw(aSymbol); end  # implemented in smalltalk
   primitive_nobridge 'throw' , 'throw:'
-
-  # def throw(aSymbol, aValue); end  # implemented in smalltalk
-  primitive_nobridge 'throw' , 'throw:with:'
 
   primitive_nobridge '__trace_global_assign&', 'traceGlobalVarAssign:block:'
 
@@ -861,7 +865,7 @@ module Kernel
     __trace_global_assign(name, &block)
   end
 
-  def trace_var(name, cmd='ignored', &block)
+  def trace_var(name, ignored_cmd=MaglevUndefined , &block)
     # cmd is currently ignored
     # name must be a String or Symbol beginning with '$' 
     # if block is nil, has no effect
@@ -870,7 +874,7 @@ module Kernel
     end
   end
 
-  def untrace_var(name, cmd='ignored')
+  def untrace_var(name, ignored_cmd=MaglevUndefined)
     # cmd is currently ignored
     # name must be a String or Symbol beginning with '$' 
     blk = nil  #  shut off tracing for specified name
