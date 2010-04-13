@@ -1,20 +1,14 @@
-require 'rubygems'
+# require 'rubygems'
 require 'sinatra/base'
-require 'txn_wrapper'
 
+# A simple Sinatra blob app using MagLev.  This file depends on the
+# config.ru to add the MagLevTransactionWrapper into the rack stack.  The
+# transaction wrapper wraps each HTTP request in a MagLev transaction.  The
+# MagLev.commit_transaction call is done by the transaction wrapper which
+# will then commit any new posts, tags or changes to persistent data.
 class BlogApp < Sinatra::Base
 
-  # When running out of a classic top level Sinatra app, several options
-  # are set.  We have to set them here if we want them in a rackable app.
-  set :server, ["webrick"]   # Maglev currently only supports webrick
-  set :environment, :development
-  set :static, true                # Allow loading /style.css, etc.
-  set :app_file, __FILE__          # Affects :views, :public and :root
-
-  # use Rack::Lint
-  # use Rack::Reloader   # sort-of works....
-
-  use MagLevTransactionWrapper
+  set :app_file, __FILE__ # Affects :views, :public and :root
 
   def initialize(*args)
     super

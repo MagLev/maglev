@@ -1,11 +1,14 @@
 # This runs both the blog app and the object log viewer as separate
 # Sinatra apps in the same process
 #
-#\ --port 4444 --host localhost --server 'webrick'
+#\ --port 4444 --host localhost
 
 require 'sinatra'
 require 'blog_app'
 require '../object_inspector/objectlog_app'
+require 'txn_wrapper'
+
+use MagLevTransactionWrapper
 
 map "/" do
   run BlogApp

@@ -81,7 +81,13 @@ class Stone
 
   def start
     # Startstone can use single or double quotes around the stone name, so check for either (Yucch)
-    gs_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name} | grep Info]:.*[\\\'\\\"]#{@name}"
+    #
+    # Trac 528: The original code here did gs_sh "startstone ... | grep ..."
+    # The problem is that if startstone fails, gs_sh returns the exit status of the last
+    # process in the pipeline (grep) which is 0, hiding the error from startstone.
+    # The simplest fix is to simply not filter the startstone output...
+    #gs_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name} | grep Info]:.*[\\\'\\\"]#{@name}"
+    gs_sh "startstone -z #{system_config_filename} -l #{File.join(log_directory, @name)}.log #{@name}"
     running?(10)
     self
   end

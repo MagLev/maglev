@@ -14,6 +14,10 @@ configuration section of <code>mysql.rb</code> to reflect your setup:
   user = 'webuser'
   pass = 'webuser'
 
+If you are running MySQL5, you may have problems with old style
+authentication.  See http://dev.mysql.com/doc/refman/5.1/en/old-client.html
+for workarounds
+
 == Run
 
 To run, just use rake:

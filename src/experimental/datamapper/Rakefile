@@ -1,6 +1,6 @@
 task :default => :demo
 
-desc "Run a simple demo in MagLev"
+desc "Run a simple demo in MagLev (default)"
 task :demo do
   sh %{ maglev-ruby demo.rb }
 end

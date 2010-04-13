@@ -40,3 +40,10 @@ namespace :mri do
     end
   end
 end
+
+
+desc "Run multitest in maglev"
+task :mm do
+  mmlib = '/Users/pmclain/external/multimap/lib'
+  sh %{ maglev-ruby -I #{mmlib} multitest.rb }  
+end
