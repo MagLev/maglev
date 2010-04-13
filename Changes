@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-== Changes for 23244  2010-04-12
+== Changes for 23245  2010-04-12
 
 * Removed workarounds for fixed bugs
 * Fix Trac 150, 159, 404, 485, 490, 528, 710
