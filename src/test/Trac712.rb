@@ -19,8 +19,11 @@ end
 class Time
   class << self
     def _load(foo)
+      987
     end
   end
 end
 
-Time._load("")
+ax = Time._load("")
+unless ax == 987 ; raise 'error'; end
+true
