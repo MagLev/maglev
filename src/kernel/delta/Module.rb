@@ -23,6 +23,8 @@ class Module
     false
   end
 
+  primitive_nobridge '__ruby_methods', 'rubyMethods:'
+
   primitive '__ruby_methods_protection', 'rubyMethods:protection:'
 
   def instance_methods(inc_super=true)
