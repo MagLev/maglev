@@ -27,6 +27,14 @@ class Module
 
   primitive '__ruby_methods_protection', 'rubyMethods:protection:'
 
+  def methods(regular = true)
+    set = self.__ruby_singleton_methods(false, -1)  # include protected meths
+    if regular
+      set =  set + self.__ruby_methods(-1) # include protected meths
+    end
+    Module.__filter_method_names(set)
+  end
+
   def instance_methods(inc_super=true)
     # include both protected and public methods
     Module.__filter_method_names(__ruby_methods_protection(inc_super, -1))
@@ -43,6 +51,8 @@ class Module
   def protected_instance_methods(inc_super=true)
     Module.__filter_method_names(__ruby_methods_protection(inc_super, 1))
   end
+
+
 
   def extend_object(object)
     raise NotImplementedError, 'Module#extend_object'

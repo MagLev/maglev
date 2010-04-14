@@ -365,6 +365,24 @@ module FFI
       self
     end
 
+    def self.layout(*spec)
+      sp_size = spec.size
+      if sp_size._equal?(0)
+        return @cl_layout
+      end
+      if sp_size._equal?(1)
+         if spec[0]._isHash
+            raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
+         end
+         raise ArgumentError , 'minimum argument size is 2'
+      end
+      cspec = spec[0]._isHash ? hash_layout(*spec) : array_layout(*spec)
+      unless self._equal?(Struct)
+        @cl_layout = cspec
+      end
+      return cspec
+    end
+
     protected # --------------------------------
 
 #   def self.callback(params, ret)
@@ -424,25 +442,6 @@ module FFI
       end
       builder.close
       builder
-    end
-
-
-    def self.layout(*spec)
-      sp_size = spec.size
-      if sp_size._equal?(0)
-        return @cl_layout
-      end
-      if sp_size._equal?(1)
-         if spec[0]._isHash
-            raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
-         end
-         raise ArgumentError , 'minimum argument size is 2'
-      end
-      cspec = spec[0]._isHash ? hash_layout(*spec) : array_layout(*spec)
-      unless self._equal?(Struct)
-        @cl_layout = cspec
-      end
-      return cspec
     end
 
     def self.__cl_layout

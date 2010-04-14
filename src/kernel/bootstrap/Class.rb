@@ -8,6 +8,8 @@ class Class
 
   primitive_nobridge 'superclass', 'superClass'
 
+  primitive_nobridge '__ruby_methods', 'rubyMethods:'
+
   class_primitive_nobridge_env '__ruby_new', '_rubyNew', ':do:'
 
   def inherited(a_subclass)
