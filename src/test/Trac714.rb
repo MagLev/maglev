@@ -13,8 +13,8 @@ module Base
   protected
 
   def load_file
-    puts "respond_to?: #{respond_to?(:load_yml)}"
     raise 'Fail' unless respond_to?(:load_yml)
+    714
   end
 
   def load_yml
@@ -29,5 +29,6 @@ class C
   end
 end
 
-C.new.m
-
+x = C.new.m
+unless x == 714 ; raise 'error'; end
+true

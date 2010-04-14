@@ -482,19 +482,20 @@ class Object
   # accessible in receiver and receiver's ancestors.  Otherwise, returns
   # an array of the names of receiver's singleton methods.
   def methods(regular = true)
-    set = self.__ruby_singleton_methods(false, 0)
     if regular
-      set =  set + self.__ruby_methods(0) # get public methods
+      set = self.__ruby_methods(-1) # incl protected meths
+    else
+      set = self.__ruby_singleton_methods(false, -1) # incl protected meths
     end
     Module.__filter_method_names(set)
   end
 
   def private_methods
-    Module.__filter_method_names(__ruby_methods(2))
+    Module.__filter_method_names(self.__ruby_methods(2))
   end
 
   def protected_methods
-    Module.__filter_method_names(__ruby_methods(1))
+    Module.__filter_method_names(self.__ruby_methods(1))
   end
 
   def public_methods(ignored_arg = true)
