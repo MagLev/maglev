@@ -39,7 +39,7 @@ result = c.protected_instance_methods
 test(result.size, 0, "Empty Class protected_instance_methods")
 
 result = c.private_instance_methods
-test(result.size > 60, true, "Empty Class private_instance_methods")
+test(result.size > 50, true, "Empty Class private_instance_methods")
 
 
 
@@ -52,6 +52,7 @@ class AClass
   protected
   def quux ; 30; end
 end
+ac = AClass
 
 result = AClass.instance_methods
 test(result.size > 30, true, "AClass instance_methods")
@@ -63,6 +64,6 @@ result = AClass.protected_instance_methods
 test(result.size, 1, "AClass protected_instance_methods")
 
 result = AClass.private_instance_methods
-test(result.size > 60, true, "AClass private_instance_methods")
+test(result.size > 50, true, "AClass private_instance_methods")
 
 report
