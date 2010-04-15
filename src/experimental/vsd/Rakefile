@@ -1,0 +1,5 @@
+task :default => :tests
+task :tests, :file do |t,args|
+  test_files = args.file || FileList['test/*_test.rb']
+  sh %{ $MAGLEV_HOME/bin/testrb -Ilib #{test_files} }
+end
