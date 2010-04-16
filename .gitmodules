@@ -9,4 +9,4 @@
 	url = git://github.com/acangiano/ruby-benchmark-suite.git
 [submodule "src/experimental/rails3/rails"]
 	path = src/experimental/rails3/rails
-	url = git://github.com/rails/rails.git
+	url = file:///export/smalltalk/maglev/git/rails.git
