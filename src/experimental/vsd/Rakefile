@@ -2,7 +2,7 @@ task :default => :tests
 
 desc "Run a perf test"
 task :run do
-  sh %{ maglev-ruby -Ilib script.rb }  
+  sh %{ maglev-ruby -Ilib bin/script.rb }  
 end
 
 desc "Test the vsd code"
@@ -16,4 +16,14 @@ task :commit do
   cd('../../../examples/persistence/indexing') do
     sh %{ rake commit }
   end
+end
+
+desc "commit index test data"
+task :commitidx do
+  sh %{ maglev-ruby -Ilib bin/data.rb }
+end
+
+desc "Run a test of the indexing performance"
+task :testidx do
+  sh %{ maglev-ruby -Ilib bin/test_index.rb }
 end

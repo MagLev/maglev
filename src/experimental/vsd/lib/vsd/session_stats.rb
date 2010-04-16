@@ -14,6 +14,10 @@ module VSD
 
     STAT_NAMES = NAME_TO_INDEX.keys.sort
 
+    def self.my_index
+      Maglev::System.my_cache_slot  # RxINC: adjust from smalltalk? -1 ?? do it in System
+    end
+
     # return the statistics object for the local shared page cache.
     def self.spc_statistics
       SessionStats.new(0, "Shared Page Cache")
@@ -32,7 +36,7 @@ module VSD
       stats
     end
 
-    attr_reader :name
+    attr_reader :name, :stats
 
     # Initializes a new SessionStats object.  The object will monitor
     # statistics in the session slot +session_id+ (See
@@ -70,7 +74,7 @@ module VSD
     def -(other)
       raise ArgumentError, "Only takes another SessionStats" unless other.kind_of? SessionStats
       new_stats = Utils.mapcar(@stats, other.stats) {|x,y| x.kind_of?(Numeric) ? x - y : x}
-      SessionStats.new(@session_id, "#{@name} - #{other.name}", other_stats)
+      SessionStats.new(@session_id, "#{@name} - #{other.name}", new_stats)
     end
 
     # def x(other)
