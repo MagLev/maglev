@@ -1,5 +1,10 @@
 = MagLev Change Log
 
+== Changes for 23275  2010-04-16
+
+* Fix Trac 581, 683
+* Switched indexing example from identity to equality indexes
+
 == Changes for 23265  2010-04-14
 
 * Fix Trac 707, 708, 709, 712, 713, 714
