@@ -51,39 +51,105 @@ module Maglev
     class_primitive '__abortTransaction', 'abortTransaction'
     class_primitive '__beginTransaction', 'beginTransaction'
 
+    # Attempts to update the persistent state of the Repository to include
+    # changes made by this transaction.
+    #
+    # If the commit operation succeeds, then this method returns +true+,
+    # and the current transaction's changes, if any, become a part of the
+    # persistent Repository.  After the repository update, the session
+    # exits the current transaction.  If the transaction mode is
+    # <tt>:autoBegin</tt>, then the session enters a new transaction.  If
+    # the transaction mode is <tt>:manualBegin</tt>, then the session
+    # remains outside of a transaction.
+    #
+    # If conflicts prevent the repository update, then this method returns
+    # +false+.  Call the <tt>transactionConflicts</tt> (TBD: not
+    # implemented in ruby yet) method to determine the nature of the
+    # conflicts.  If the session is outside of a transaction, then this
+    # method raises the error <tt>#rtErrPrimOutsideTrans</tt>.
+    #
+    # This method also updates the session's view of GemStone.  If the
+    # commit operation succeeds, then all objects in the session's view are
+    # consistent with the current state of GemStone.  If the commit fails,
+    # then this method retains all the changes that were made to objects
+    # within the current transaction.  However, commits made by other
+    # sessions are visible to the extent that changes in this transaction
+    # do not conflict with them.
+    #
+    # Returns +true+ if commit was read-only or succeeded , +false+ if
+    # there was a failure.
     def self.commit_transaction
       __commitTransaction
     end
+
+    # Rolls back all modifications made to committed GemStone objects and
+    # provides the session with a new view of the most recently committed
+    # GemStone state.
+    #
+    # These operations are performed whether or not the session was
+    # previously in a transaction.  If the transaction mode is set to
+    # <tt>:autoBegin</tt>, then a new transaction is started.  If the
+    # transaction mode is set to <tt>:manualBegin</tt>, then a new
+    # transaction is not started.
     def self.abort_transaction
       __abortTransaction
     end
+
+    # Starts a new transaction for the session.  An abort is done before
+    # the new transaction is started - giving the session a new snapshot of
+    # the repository.
+    #
+    # If any permanent objects had been written by the session, their state
+    # is aborted.  This method returns the receiver (+System+).
     def self.begin_transaction
       __beginTransaction
     end
 
     # Raise an exception if specified temporary object is added to the
-    # closure list during an attempt to commit. Useful in debugging
-    # errors due to attempt to commit not-commitable objects or classes.
-    # The exception details will include the parent object which triggered
-    # the add to closure list.
-    # Takes a single argument, a not-committed object.
-    # An argument of nil shuts off a previous trap .
+    # closure list during an attempt to commit. Useful in debugging errors
+    # due to attempt to commit not-commitable objects or classes.  The
+    # exception details will include the parent object which triggered the
+    # add to closure list.  Takes a single argument, a not-committed
+    # object.  An argument of +nil+ shuts off a previous trap .
     #
-    # Should be used with   maglev-ruby -d   . After control returns
-    # topaz prompt with an error use 'stack save'
-    # and then SEND of Object>>findReferencesInMemory: to navigate upwards
-    # from the object given by the error argument.
+    # Should be used with <tt>maglev-ruby -d</tt>. After control returns
+    # topaz prompt with an error use 'stack save' and then SEND of
+    # Object>>findReferencesInMemory: to navigate upwards from the object
+    # given by the error argument.
     class_primitive 'trap_add_to_closure_list', 'trapAddToClosureList:'
 
-    class_primitive_nobridge '__object_for_oop', '_objectForOop:' # used by ObjectSpace
     # implementation is Object>>_objectForOop:  but putting class_prim directives
     # in Object or Fixnum may upset results of Object.singleton_methods ...
+    class_primitive_nobridge '__object_for_oop', '_objectForOop:' # used by ObjectSpace
 
-    class_primitive 'session_temp' , '_sessionTempsAt:'  # returns nil if not found
+    # Return the value in the Session Temps structure at the given key.
+    # Returns nil if not found.
+    class_primitive 'session_temp' , '_sessionTempsAt:'
+
+    # Set the value in the Session Temps structure at the given key to value.
+    # Returns the value stored.
     class_primitive 'session_temp_put', '_sessionTempsAt:put:' # returns value stored
 
     # _processInfo includes getuid getgid, getpid, kill  and related functions
     class_primitive_nobridge '__process_info', '_processInfo:with:with:'
+
+    # return a 4 element Array holding the elements of the struct tms result from
+    #  clock_t times(struct tms *buffer)
+    #
+    # The Array elements are tms_utime, tms_stime, tms_cutime, tms_cstime,
+    # and each element ia s Float in units of seconds.
+    #
+    #   tms_utime is the CPU time used while executing instructions in the
+    #   user space of the calling process.
+    #
+    #   tms_stime is the CPU time used by the system on behalf of the
+    #   calling process.
+    #
+    #   tms_cutime is the sum of the tms_utime and the tms_cutime of the
+    #   child processes.
+    #
+    #   tms_cstime is the sum of the tms_stime and the tms_cstime of the
+    #   child processes.
     class_primitive_nobridge '__host_times', '_hostTimes'
 
     # Return the real uid for the server process
@@ -121,7 +187,41 @@ module Maglev
       __process_info(10, nil, nil)
     end
 
+    # Returns a Fixnum representing the session of the sender.
+    class_primitive_nobridge 'session_id', 'session'
+
+    # Return a SmallInteger which is the number of sessions present in the
+    # system, including the Symbol Gem, garbage collection sessions, but
+    # not the page manager session.
+    class_primitive_nobridge 'session_count', 'currentSessionCount'
+
+    # Returns a formatted String containing, for each current GemStone
+    # session, the session number and userId.
+    #
+    # This method requires SessionAccess privilege if there is more than
+    # one session logged in.
+    class_primitive_nobridge 'session_names', 'currentSessionNames'
+
+    # Increments the persistent shared counter at index by the specified
+    # amount.  Amount must be a Fixnum or LargeInteger. For a LargeInteger,
+    # amount must be representable as a signed 64-bit integer (between
+    # -9223372036854775808 and 9223372036854775807).
+    #
+    # Returns the new value of the counter after the increment.
+    #
+    # See class comments above for more information on persistent shared
+    # counters.
     class_primitive_nobridge '__increment_pcounter', 'persistentCounterAt:incrementBy:'
+
+    # Decrements the persistent shared counter at index by the specified
+    # amount.  Amount must be a Fixnum or LargeInteger. For a LargeInteger,
+    # amount must be representable as a signed 64-bit integer (between
+    # -9223372036854775808 and 9223372036854775807).
+    #
+    # Returns the new value of the counter after the decrement.
+    #
+    # See class comments above for more information on persistent shared
+    # counters.
     class_primitive_nobridge '__decrement_pcounter', 'persistentCounterAt:decrementBy:'
 
     # Get the value of the persistent counter +arg+.  +arg+ must be in
@@ -196,5 +296,54 @@ module Maglev
     def self.stone_name(full=false)
       full ? __stone_name : __stone_name[/.*!(.*)$/,1]
     end
+
+    # ########################################
+    # Support for statmonitor statistics
+    #
+    # See the GS64 System Administration Guide, Appendix G: "statmonitor
+    # and VSD reference" for details on the statistics system.
+    # ########################################
+
+    # Returns an Array whose contents are described by the result of the
+    # _cache_statistics_description method.  The Array contains statistics
+    # for the specified slot in the GemStone shared memory cache to which
+    # this session is attached.
+    #
+    # The argument should be a Fixnum between 0 and the number of process
+    # slots in the shared cache minus 1, inclusive.  If the argument is
+    # outside the range of valid process slots, or the session executing
+    # this method is not using a shared cache, generate an error.  If the
+    # slot specified is an inactive slot, returns nil.  The method
+    # _cache_slot_for_sssion_id may be used to determine the process slot
+    # of a session on the same shared cache.
+    #
+    # The process slots that are predefined are:
+    #
+    #    slot 0: The shared page cache monitor.
+    #
+    #    slot 1: The Stone if the cache is on the same machine as the Stone.
+    #            Otherwise, a page server that is used to monitor the cache for
+    #            the Stone.
+    #
+    # No other slots are guaranteed.  However, slot 2 is the often the page server
+    # and slot 3 is often the GcGem.  These depend to some extent on the relative
+    # speed of the processes during startup.  In addition, the GcGem can be
+    # shut down, and when it is restarted, it is unlikely to end up at the same
+    # position.
+    class_primitive_nobridge '_cache_statistics', 'cacheStatistics:'
+
+    # Returns an Array of Strings describing the result of the method
+    # _cache_tatistics.
+    #
+    # A new Array of new Strings is created every time this primitive is
+    # called, so the application may wish to cache the result.
+    class_primitive_nobridge '_cache_statistics_description', 'cacheStatisticsDescription'
+
+    # Returns the process slot in the SharedPageCache that corresponds to
+    # my process.  If the SharedPageCache is not in use, returns -1.
+    class_primitive_nobridge 'my_cache_slot', 'myCacheProcessSlot'
+
+    # Returns the cache statistics for the current session.
+    class_primitive_nobridge 'my_cache_statistics', 'myCacheStatistics'
   end
 end

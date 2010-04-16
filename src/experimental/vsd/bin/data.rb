@@ -1,13 +1,17 @@
 Maglev.persistent do
+
   class Data
     ALL_DATA = nil
+
     attr_reader :age, :weight, :length
+
     def initialize(age, weight, length)
       @age = age
       @weight = weight
       @length = length
     end
   end
+
   Data::ALL_DATA = IdentitySet.new
   Data::ALL_DATA.create_identity_index('@age')
   Data::ALL_DATA.create_identity_index('@weight')
@@ -15,7 +19,7 @@ Maglev.persistent do
 end
 Maglev.commit_transaction
 
-10.times do 
+10.times do
   10_000.times do |i|
     Data::ALL_DATA << Data.new(rand(100), rand(100), rand(100))
   end
