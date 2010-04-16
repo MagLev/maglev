@@ -23,11 +23,10 @@ people = IdentitySet.new
 # NOTE: this sorting is done on the @age instance variable, and does not
 # depend on an instance method named "age".  We will put People objects in
 # the set.  People have a name, age, gender and address.
-people.create_identity_index('@age')
+people.create_equality_index('@age', Fixnum)
 
 Benchmark.bm do |x|
-#  population = 100_000
-  population = 10_000
+  population = 100_000
   youngsters = nil
   x.report("Create #{population} People in indexed set") {
     population.times { people << Person.random }
@@ -39,7 +38,10 @@ Benchmark.bm do |x|
   puts "Found #{youngsters.length} youngsters"
 
   # This shows doing a query on an indexed field (age) and a non-indexed
-  # field (marital_status).  We then intersect the sets to get the result
+  # field (marital_status).  We then intersect the sets to get the
+  # result. Since this includes a search on an non-indexed field, this
+  # results in a table scan.  You could put an index on the @marital_status
+  # field to turn it into a fully indexed query.
   old_hermits = nil
   x.report("Find old hermits") {
     old_ones = people.search([:'@age'], :gte, 75)
@@ -58,7 +60,7 @@ Benchmark.bm do |x|
 
   # We can add another index and use it as well.  Here we index on the zip
   # code of the person's address.  This is a "multi-level" index.
-  people.create_identity_index('@address.@zip')
+  people.create_equality_index('@address.@zip', Fixnum)
 
   # now, search for young people in the lucrative 45678 zip code
   puts "="*20, " Some lucrative youngsters...", "="*20
