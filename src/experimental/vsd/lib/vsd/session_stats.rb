@@ -79,6 +79,17 @@ module VSD
       new_stats = Utils.mapcar(@stats, other.stats) {|x,y| x.kind_of?(Numeric) ? x - y : x}
       SessionStats.new(@session_id, "#{@name} - #{other.name}", new_stats)
     end
+
+    # Returns a string describing the given stats.
+    def report(stat_names)
+      label_length = stat_names.inject(0) {|max,i| i.length > max ? i.length : max }
+      format = "%#{label_length}.#{label_length}s =>  %s\n"
+      r = ''
+      stat_names.each do |name|
+        r << sprintf(format, name, self[name].to_s)
+      end
+      r
+    end
   end
 
 end

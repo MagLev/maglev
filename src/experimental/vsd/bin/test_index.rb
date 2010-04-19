@@ -15,19 +15,16 @@ def show_diff(s1, s2)
   end
 end
 
-start_stats = VSD::SessionStats.my_statistics
-start_spc_stats = VSD::SessionStats.spc_statistics
+stats = VSD::StatSeries.my_series
+stats.sample
 
-young = Data::ALL_DATA.search([:'@age'], :lt, 25)
+young = Data::ALL_DATA.search([:'@age'],    :lt, 25)
+light = Data::ALL_DATA.search([:'@weight'], :lt, 33)
+young_and_light = young & light
 
-stop_stats = VSD::SessionStats.my_statistics
-stop_spc_stats = VSD::SessionStats.spc_statistics
+stats.sample
 
-
-show_diff(stop_spc_stats, start_spc_stats)
-show_diff(stop_stats, start_stats)
-# heavy = Data::ALL_DATA.search([:'@weight'], :gt, 75)
-
-# young_heavy = young & heavy
+puts "Num young #{young.size}  Num light #{light.size} Num young_and_light #{young_and_light.size}"
+puts stats.diff.report(%w( ProcessName ObjectsRead ))
 
 
