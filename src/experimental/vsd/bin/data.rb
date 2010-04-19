@@ -13,8 +13,8 @@ Maglev.persistent do
   end
 
   Data::ALL_DATA = IdentitySet.new
-  Data::ALL_DATA.create_identity_index('@age')
-  Data::ALL_DATA.create_identity_index('@weight')
+  Data::ALL_DATA.create_equality_index('@age', Fixnum)
+  Data::ALL_DATA.create_equality_index('@weight', Fixnum)
   # Don't do length.... just to test efficiency
 end
 Maglev.commit_transaction
