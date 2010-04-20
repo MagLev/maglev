@@ -1,2 +1,2 @@
 fails:StringScanner#getch is multi-byte character sensitive
-fails:StringScanner#getch does not accept any arguments
+fails:StringScanner#getch always returns instance of String, never a String subclass

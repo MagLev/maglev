@@ -1,3 +1,0 @@
-fails:Rational.reduce returns a new Rational with the passed numerator and denominator reduced to their lowest terms
-fails:Rational.reduce raises a ZeroDivisionError when the passed denominator is 0
-fails:Rational.reduce when Unify is defined returns an Integer when the reduced denominator is 1
