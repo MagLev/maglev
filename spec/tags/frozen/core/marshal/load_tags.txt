@@ -3,6 +3,11 @@ fails:Marshal::load loads a user-marshaled extended object
 fails:Marshal::load loads an extended Object
 fails:Marshal::load loads an extended Regexp
 fails:Marshal::load loads a extended_user_regexp having ivar
+fails:Marshal::load raises an ArgumentError when the dumped data is truncated
 fails:Marshal::load doesn't call the proc for recursively visited data
 fails:Marshal::load loads an Array with proc
 fails:Marshal::load loads a array containing the same objects
+fails:Marshal::load preserves hash ivars when hash contains a string having ivar
+fails:Marshal::load returns an untainted object if source is untainted
+fails:Marshal::load returns a tainted object if source is tainted
+fails:Marshal::load preserves taintedness of nested structure

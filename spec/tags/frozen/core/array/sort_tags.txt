@@ -1,1 +1,2 @@
+fails:Array#sort raises an error if objects can't be compared
 fails:Array#sort! temporarily freezes self and recovers after sorted

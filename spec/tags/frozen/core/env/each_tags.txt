@@ -1,1 +1,2 @@
 fails:ENV.each returns each pair
+fails:ENV.each returns an Enumerator if called without a block

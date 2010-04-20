@@ -1,0 +1,1 @@
+fails:Array#collect! returns an Enumerator when no block given, and the enumerator can modify the original array
