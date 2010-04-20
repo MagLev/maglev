@@ -1,8 +1,3 @@
-fails:Thread.critical= should be sticky
-fails:Thread.critical= allows all non-bool arguments
-fails:Thread.critical= does not change status of other existing threads
-fails:Thread.critical= is reentrant
-fails:Thread.critical= can be mismatched
-fails:Thread.critical= defers exit
-fails:Thread.critical= is not reset if the critical thread is killed
 hangs:Thread.critical= schedules other threads on Thread.stop
+fails:Thread.critical= does not change status of other existing threads
+fails:Thread.critical= defers exit
