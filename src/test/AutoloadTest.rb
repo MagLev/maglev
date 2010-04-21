@@ -12,12 +12,14 @@ test(AutoA.autoload?(:AutoB), nil, "[1] autoload? before autoload")
 test(defined? :AutoA,   'expression',  "[2]")
 test(defined? AutoA::AutoB, nil, "[3]")
 test(defined? AutoA::AutoB, nil, "[4]")
+test(AutoA.const_defined?(:AutoB), false, "[4a]")
 
 module AutoA
   autoload(:AutoB, $dir + '/AutoloadHelper.rb')
 end
 
 
+test(AutoA.const_defined?(:AutoB), true, "[5a]")
 test(defined? :AutoA,   'expression',  "[5] :A should be defined before")
 test(defined? AutoA::AutoB, "constant", "[6] A::B should not be defined before autoload")
 test(defined? AutoA::AutoB, "constant", "[7] calling defined? should NOT have defined A::B")
