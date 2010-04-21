@@ -1,3 +1,1 @@
-fails:Module#include calls #append_features(self) in reversed order on each module
-fails:Module#include does not import methods to modules and classes
 fails:Module#include detects cyclic includes

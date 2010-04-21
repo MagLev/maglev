@@ -1,3 +1,0 @@
-fails:Enumerator.new aliases the second argument to :each
-fails:Enumerator.new doesn't check for the presence of the iterator method
-fails:Enumerator.new uses the latest define iterator method

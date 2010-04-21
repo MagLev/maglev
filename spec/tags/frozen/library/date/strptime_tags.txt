@@ -1,4 +1,5 @@
-fails:Date#strftime should be able to parse the full day name
-fails:Date#strftime should be able to parse the short day name
-fails:Date#strftime should be able to show the week number with the week starting on sunday and monday
-fails:Date#strftime should be able to show the commercial week
+fails:Date#strptime parses a full day name
+fails:Date#strptime parses a short day name
+fails:Date#strptime parses a week number for a week starting on Monday
+fails:Date#strptime parses a full date
+fails:Date#strptime parses a date given in full notation

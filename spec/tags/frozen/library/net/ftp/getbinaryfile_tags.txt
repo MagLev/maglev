@@ -1,0 +1,22 @@
+hangs:Net::FTP#getbinaryfile sends the RETR command to the server
+hangs:Net::FTP#getbinaryfile returns nil
+hangs:Net::FTP#getbinaryfile saves the contents of the passed remote file to the passed local file
+hangs:Net::FTP#getbinaryfile when passed a block yields the received content as binary blocks of the passed size
+hangs:Net::FTP#getbinaryfile when resuming an existing file saves the remaining content of the passed remote file to the passed local file
+
+fails:Net::FTP#getbinaryfile when resuming an existing file and the REST command fails raises a Net::FTPProtoError when the response code is 550
+fails:Net::FTP#getbinaryfile when resuming an existing file and the REST command fails raises a Net::FTPPermError when the response code is 500
+fails:Net::FTP#getbinaryfile when resuming an existing file and the REST command fails raises a Net::FTPPermError when the response code is 501
+fails:Net::FTP#getbinaryfile when resuming an existing file and the REST command fails raises a Net::FTPPermError when the response code is 502
+fails:Net::FTP#getbinaryfile when resuming an existing file and the REST command fails raises a Net::FTPPermError when the response code is 530
+fails:Net::FTP#getbinaryfile when the RETR command fails raises a Net::FTPProtoError when the response code is 550
+fails:Net::FTP#getbinaryfile when the RETR command fails raises a Net::FTPPermError when the response code is 500
+fails:Net::FTP#getbinaryfile when the RETR command fails raises a Net::FTPPermError when the response code is 501
+fails:Net::FTP#getbinaryfile when the RETR command fails raises a Net::FTPPermError when the response code is 530
+fails:Net::FTP#getbinaryfile when switching type fails raises a Net::FTPPermError when the response code is 500
+fails:Net::FTP#getbinaryfile when switching type fails raises a Net::FTPPermError when the response code is 501
+fails:Net::FTP#getbinaryfile when switching type fails raises a Net::FTPPermError when the response code is 504
+fails:Net::FTP#getbinaryfile when switching type fails raises a Net::FTPPermError when the response code is 530
+fails:Net::FTP#getbinaryfile when opening the data port fails raises a Net::FTPPermError when the response code is 500
+fails:Net::FTP#getbinaryfile when opening the data port fails raises a Net::FTPPermError when the response code is 501
+fails:Net::FTP#getbinaryfile when opening the data port fails raises a Net::FTPPermError when the response code is 530

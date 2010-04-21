@@ -1,4 +1,5 @@
 fails:String#scan returns an array containing all matches
+fails:String#scan respects $KCODE when the pattern collapses to nothing
 fails:String#scan stores groups as arrays in the returned arrays
 fails:String#scan taints the match strings if self is tainted, unless the taint happens in the method call
 fails:String#scan with pattern and block taints the match strings if self is tainted, unless the tain happens inside the scan

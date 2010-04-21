@@ -1,11 +1,5 @@
-fails:IO.new returns a new IO object
-fails:IO.new takes an Integer or #to_int argument as the descriptor to open
-fails:IO.new associates new IO with the old descriptor so each IO directly affects the other
-fails:IO.new raises TypeError if not given an Integer or #to_int
-fails:IO.new raises ArgumentError if not given any arguments
-fails:IO.new raises EBADF if the file descriptor given is not a valid and open one
-fails:IO.new raises EINVAL if mode is not compatible with the descriptor's current mode
-fails:IO.new does not close the stream automatically if given a block
-fails:IO.new emits a warning if given a block
-fails:IO.new accepts only one argument
-fails:IO.new cannot open an IO with incompatible flags
+fails:IO.new creates an IO instance from a Fixnum argument
+fails:IO.new calls #to_int on an object to convert to a Fixnum
+fails:IO.new raises an Errno::EBADF if the file descriptor is not valid
+fails:IO.new raises an IOError if passed a closed stream
+fails:IO.new raises an Errno::EINVAL if the new mode is not compatible with the descriptor's current mode

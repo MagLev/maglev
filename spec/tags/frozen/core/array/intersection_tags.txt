@@ -1,1 +1,0 @@
-fails:Array#& does return subclass instances for Array subclasses

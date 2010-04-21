@@ -1,2 +1,1 @@
-fails:Numeric#coerce calls #to_f to convert other if self responds to #to_f
 fails:Numeric#coerce raises an ArgumentError when passed a String

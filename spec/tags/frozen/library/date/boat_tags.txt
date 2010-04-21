@@ -1,1 +1,0 @@
-fails:Date#<=> should be able to compare to another numeric
