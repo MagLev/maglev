@@ -489,4 +489,18 @@ end.merge({'undefined' => 'yellow',
            'tag'       => 'cyan'})
 test(orig['pending_param'], 'yellow,bold', "merge bug")
 
+# Test case from rails:
+#
+# Maglev was complaining of "too many args" on the super call, due to block
+# being passed behind the scenes.
+#
+# Test case passes if no exception
+class Foo < Hash
+  def initialize(a,b,c)
+    super(a)
+  end
+end
+
+f = Foo.new(0,1,2) { 10 }
+
 report

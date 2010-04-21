@@ -167,15 +167,37 @@ class Hash
     # allocation includes self.default=(nil)
     self
   end
+
+
+  # :nodoc:
+  # Do NOT define this variant:
+  #
+  #  def initialize(one_arg, &block)
+  #    raise ArgumentError, 'too many args'
+  #    self
+  #  end
+  #
+  # This variant was added to pass specs that complained about block being
+  # passed with a one arg initializer.  The problem is that with other
+  # fixes that try to pass the block implicitly onto a super call, the
+  # following call to super fails:
+  #
+  # class Foo < Hash
+  #   def initialize(x,y,z)  # called with a block
+  #      ...use block...
+  #      super(x)            # does not pass block
+  #   end
+  # end
+  #
+  # Fix is to do a check for block_given? in the one arg initializer.  The
+  # specs pass and rails runs.
   def initialize(one_arg)
+    raise ArgumentError, 'too many args' if block_given?
     self.default=(one_arg)
   end
+
   def initialize(&block)
     self.default=(block)
-  end
-  def initialize(one_arg, &block)
-    raise ArgumentError, 'too many args'
-    self
   end
 
   def ==(other)
@@ -656,9 +678,9 @@ class Hash
   end
 
   def default(key=MaglevUndefined)
-    if key._equal?(MaglevUndefined) 
+    if key._equal?(MaglevUndefined)
       return self.default()
-    end 
+    end
     if @_st_defaultIsBlock
       @_st_defaultOrParent.call(self, key)
     else
@@ -786,7 +808,7 @@ class Hash
       return HashEnumerator.new(self, :each_pair) # for 1.8.7
     end
     num_elem = @_st_numElements
-    lim = @_st_tableSize 
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -797,17 +819,17 @@ class Hash
           block.call(k, v)
         elsif v._isFixnum
           # internal collision chain
-	  idx = v
-	  begin
-	    ck = self.__at(idx)
-	    if ck._not_equal?(RemoteNil)
-	      block.call(ck, self.__at(idx + 1) )
-	    end
+    idx = v
+    begin
+      ck = self.__at(idx)
+      if ck._not_equal?(RemoteNil)
+        block.call(ck, self.__at(idx + 1) )
+      end
             idx = self.__at(idx + 2)
-	  end while idx._isFixnum
+    end while idx._isFixnum
         else
-	  # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
-	  v.each_pair(&block)
+    # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+    v.each_pair(&block)
         end
       end
       kofs += 2
@@ -1042,8 +1064,8 @@ class Hash
     self
   end
 
-  # def reject!() ; end # 1.8.7 , not implemented yet due to 
-		        #  complex side effects of   Enumerator#next
+  # def reject!() ; end # 1.8.7 , not implemented yet due to
+            #  complex side effects of   Enumerator#next
 
   def replace(hash)
     hash = Type.coerce_to(hash, Hash, :to_hash)
