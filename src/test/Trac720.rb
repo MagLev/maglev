@@ -31,32 +31,98 @@
 #  /Users/pmclain/GemStone/dev/pbm.rb:25
 #  ERROR 2023, Error, 'fail' (RuntimeError)
 
+$aa = []
+$bb = []
 class C
   def foo
-    puts "-- A"
+    $aa << 'A'
     aborting = true
-    puts "-- B"
+    $aa << 'B'
     begin
-      puts "-- C"
+      $aa << 'C'
       yield
-      puts "-- D"
+      $aa << 'D'
       aborting = false
       #    rescue Exception => e
     ensure
-      puts "-- E"
+      $aa << 'E'
     end
-    puts "-- F"
+    $aa << 'F'
     return :foo
   ensure
-    puts "-- G"
+    $aa << 'G'
+  end
+
+  def foob
+    begin 
+      $bb << 'A'
+      raise
+      $bb << 'B'
+    ensure
+      $bb << 'C'
+      #return 9
+    end  
+    10
+  end
+
+  def do_foob
+    begin
+      $bb << foob
+    rescue 
+      $bb << 'D'
+    end
+  end
+
+  def fooc
+    begin
+      return 7
+    ensure
+      return 8
+    end
+  end
+
+  def food
+    begin
+      $dd << 'A'
+    ensure
+      $dd << 'B'
+      raise 
+    end
   end
 end
 
 c = C.new
 
-#begin
-  c.foo { puts "In Block"; raise 'fail' }
-#rescue
-#  puts "In top level"
-#end
+begin
+  c.foo { 
+    $aa << 'InBlock'
+    raise 'anError' 
+  }
+rescue
+  $aa << 'H'
+end
+puts "$aa = #{$aa.inspect}"
+unless $aa == ["A", "B", "C", "InBlock", "E", "G", "H"] ; raise 'failed1'; end
 
+begin
+  C.new.do_foob
+rescue
+  $bb << 'H2'
+end
+puts "$bb = #{$bb.inspect}"
+unless $bb == ["A", "C", "D"] ; raise 'failed2'; end
+
+cx = C.new.fooc
+puts "fooc = #{cx}"
+unless cx == 8 ; raise 'failed3'; end
+
+$dd = []
+begin 
+  C.new.food
+rescue
+  $dd << 'C'
+end
+puts "$dd = #{$dd.inspect}"
+unless $dd == ["A", "B", "C"] ; raise 'failed4'; end
+
+true
