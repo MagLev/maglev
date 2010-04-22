@@ -1,7 +1,12 @@
 = MagLev Change Log
 
+== Changes for 23351  2010-04-22
+
+* Retagged RubySpecs to account for our switch to 1.8.7
 * Fix Trac 716, 718, 719, 720
   Signal.trap will raise MNU for now.
+* Optimize uses of ensure during Ruby bootstrap code
+* Numerous improvements in underlying GemStone 3.0 system.
 
 == Changes for 23275  2010-04-16
 
