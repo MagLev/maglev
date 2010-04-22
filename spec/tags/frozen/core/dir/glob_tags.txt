@@ -1,2 +1,3 @@
+fails:Dir.glob respects the order of {} expressions, expanding left most first
 fails:Dir.glob matches multiple recursives
 fails:Dir.glob returns nil for directories current user has no permission to read

@@ -3,7 +3,7 @@ module Readline
 
   # callers of readline responsible for HISTORY.push
   #
-  def readline(prompt, ignored_boolean)
+  def readline(prompt, ignored_boolean=false)
     unless (prompt._isStringOrSymbol)
       prompt = prompt.call  # expecting a Proc
     end

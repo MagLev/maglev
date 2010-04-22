@@ -1,2 +1,0 @@
-fails:Date#jd should be able to determine the Julian day for a Date object
-fails:Date#julian? should mark a day before the calendar reform as Julian

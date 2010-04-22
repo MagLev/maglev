@@ -1,2 +1,0 @@
-fails:Date#>> should add a number of months to a Date
-fails:Date#>> should result in the last day of a month if the day doesn't exist

@@ -1,0 +1,2 @@
+hangs:Net::HTTP.get_response when passed URI returns the response for the specified uri
+hangs:Net::HTTP.get_response when passed host, path, port returns the response for the specified host-path-combination

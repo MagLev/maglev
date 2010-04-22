@@ -22,6 +22,7 @@ class Bar
 end
 
 
+
 class TestIndexeManagement < Test::Unit::TestCase
   def test_indexed_paths
     @idset = IdentitySet.new
@@ -29,35 +30,35 @@ class TestIndexeManagement < Test::Unit::TestCase
     identity_indexes = @idset.identity_indexed_paths
     assert_equal(0, equality_indexes.size)
     assert_equal(0, identity_indexes.size)
-    assert_equal(:none, @idset.kinds_of_index_on('id'))
+    assert_equal(:none, @idset.kinds_of_index_on('@id'))
 
     # Don't use Fixnum, since it maps to SmallInteger, and for
     # SmallInteger, identity and equality are the same, so the system
     # creates just the identity index and maps an equality index on it for
     # free...
-    @idset.create_equality_index('id', String)
+    @idset.create_equality_index('@id', String)
     equality_indexes = @idset.equality_indexed_paths
     identity_indexes = @idset.identity_indexed_paths
     assert_equal(1, equality_indexes.size)
     assert_equal(0, identity_indexes.size)
-    assert_equal(:equality, @idset.kinds_of_index_on('id'))
+    assert_equal(:equality, @idset.kinds_of_index_on('@id'))
 
-    @idset.create_identity_index('id')
+    @idset.create_identity_index('@id')
     equality_indexes = @idset.equality_indexed_paths
     identity_indexes = @idset.identity_indexed_paths
     assert_equal(1, equality_indexes.size)
     assert_equal(1, identity_indexes.size)
-    assert_equal(:equalityAndIdentity, @idset.kinds_of_index_on('id'))
+    assert_equal(:equalityAndIdentity, @idset.kinds_of_index_on('@id'))
 
-    @idset.remove_identity_index('id')
+    @idset.remove_identity_index('@id')
     equality_indexes = @idset.equality_indexed_paths
     identity_indexes = @idset.identity_indexed_paths
     assert_equal(1, equality_indexes.size)
     assert_equal(0, identity_indexes.size)
-    assert_equal(:equality, @idset.kinds_of_index_on('id'))
+    assert_equal(:equality, @idset.kinds_of_index_on('@id'))
 
     # Currently a bug: raises a RuntimeError:
-    # @idset.remove_equality_index('id')
+    # @idset.remove_equality_index('@id')
     # equality_indexes = @idset.equality_indexed_paths
     # identity_indexes = @idset.identity_indexed_paths
     # assert_equal(0, equality_indexes.size)
@@ -68,7 +69,7 @@ end
 class TestBasicEqualityIndexSupport < Test::Unit::TestCase
   def setup
     @idset = IdentitySet.new
-    @idset.create_equality_index('id', Fixnum)
+    @idset.create_equality_index('@id', Fixnum)
     @idx = Array.new
     10.times do |i|
       @idx[i] = Id.new(i)
@@ -84,45 +85,44 @@ class TestBasicEqualityIndexSupport < Test::Unit::TestCase
     # Add Bar instances to set with Id instances
     10.times { |i| @idset << Bar.new(i) }
     assert_equal(20, @idset.length, 'Inserted 10 Bar instances')
-    id_2 = @idset.search([:id], :eql, 2)
+    id_2 = @idset.search([:'@id'], :eql, 2)
     assert_equal(2, id_2.size)
   end
 
   def test_search_comparison_operators
     # The supported comparison operations are :==, :=, :<, :<=, :>, :>=.
-    x = @idset.search([:id], :eql, 9)
+    x = @idset.search([:'@id'], :eql, 9)
     assert_equal(1, x.size)
-    x.each {|i| puts "---- #{i.inspect}"}
     assert(x.include?(@idx[9]))
 
-    x = @idset.search([:id], :not_eql, 9)
+    x = @idset.search([:'@id'], :not_eql, 9)
     assert_equal(9, x.size)
     assert(! x.include?(@idx[9]))
 
-    x = @idset.search([:id], :equal, 8)
+    x = @idset.search([:'@id'], :equal, 8)
     assert_equal(1, x.size)
     assert(x.include?(@idx[8]))
 
-    x = @idset.search([:id], :not_equal, 8)
+    x = @idset.search([:'@id'], :not_equal, 8)
     assert_equal(9, x.size)
     assert(! x.include?(@idx[8]))
 
-    x = @idset.search([:id], :lt, 2)
+    x = @idset.search([:'@id'], :lt, 2)
     assert_equal(2, x.size)
     assert(x.include?(@idx[0]))
     assert(x.include?(@idx[1]))
 
-    x = @idset.search([:id], :lte, 2)
+    x = @idset.search([:'@id'], :lte, 2)
     assert_equal(3, x.size)
     assert(x.include?(@idx[0]))
     assert(x.include?(@idx[1]))
     assert(x.include?(@idx[2]))
 
-    x = @idset.search([:id], :gt, 8)
+    x = @idset.search([:'@id'], :gt, 8)
     assert_equal(1, x.size)
     assert(x.include?(@idx[9]))
 
-    x = @idset.search([:id], :gte, 8)
+    x = @idset.search([:'@id'], :gte, 8)
     assert_equal(2, x.size)
     assert(x.include?(@idx[9]))
     assert(x.include?(@idx[8]))
@@ -130,44 +130,44 @@ class TestBasicEqualityIndexSupport < Test::Unit::TestCase
 
   def test_raises_error_on_bad_op
     assert_raise ArgumentError do
-      @idset.search([:id], :foo, 8)
+      @idset.search([:'@id'], :foo, 8)
     end
   end
 
 
   def test_search_between
-    x = @idset.search_between([:id], 0, 1)
+    x = @idset.search_between([:'@id'], 0, 1)
     assert_equal(1, x.size)
     assert(x.include?(@idx[0]))
 
-    x = @idset.search_between([:id], 3, 5)
+    x = @idset.search_between([:'@id'], 3, 5)
     assert_equal(2, x.size)
     assert(x.include?(@idx[3]))
     assert(x.include?(@idx[4]))
 
-    x = @idset.search_between([:id], 3, 5, :lt, :lte)
+    x = @idset.search_between([:'@id'], 3, 5, :lt, :lte)
     assert_equal(2, x.size)
     assert(x.include?(@idx[4]))
     assert(x.include?(@idx[5]))
 
-    x = @idset.search_between([:id], 3, 5, :lt, :lte)
+    x = @idset.search_between([:'@id'], 3, 5, :lt, :lte)
     assert_equal(2, x.size)
     assert(x.include?(@idx[4]))
     assert(x.include?(@idx[5]))
 
-    x = @idset.search_between([:id], 3, 5, :lte, :lte)
+    x = @idset.search_between([:'@id'], 3, 5, :lte, :lte)
     assert_equal(3, x.size)
     assert(x.include?(@idx[3]))
     assert(x.include?(@idx[4]))
     assert(x.include?(@idx[5]))
 
-    x = @idset.search_between([:id], -5, -10, :lt, :lte)
+    x = @idset.search_between([:'@id'], -5, -10, :lt, :lte)
     assert_equal(0, x.size)
 
-    x = @idset.search_between([:id], -15, -10, :lt, :lte)
+    x = @idset.search_between([:'@id'], -15, -10, :lt, :lte)
     assert_equal(0, x.size)
 
-    x = @idset.search_between([:id], 15, 20, :lt, :lte)
+    x = @idset.search_between([:'@id'], 15, 20, :lt, :lte)
     assert_equal(0, x.size)
   end
 end
@@ -194,7 +194,9 @@ class TestRubyTime < Test::Unit::TestCase
     assert(a.time < b.time)
     assert_equal(3, set.size)
 
-    x = set.search([:time,:microseconds], :lt, b.time.__microsecs)
+    # NOTE: microseconds is a smalltalk instvar, so it does not get the '@'
+    # prefix.
+    x = set.search([:'@time', :'microseconds'], :lt, b.time.__microsecs)
     assert_equal(1, x.size)
     assert(set.include?(a))
   end

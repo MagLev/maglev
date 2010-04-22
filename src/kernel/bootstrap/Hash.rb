@@ -1,6 +1,6 @@
 class Hash
 
-  # Class methods
+  # Class methods 
 
   class_primitive_nobridge '__allocate', '_basicNew:'
   #  tableSize arg converted to near-by prime
@@ -152,29 +152,38 @@ class Hash
 
   # Instance Methods
 
-  def initialize(*args)
-    if (args.length > 1)
-      raise ArgumentError, 'too many args'
+  def initialize(*args, &block)
+    na = args.__size
+    if na._equal?(1)
+      raise ArgumentError, 'too many args' if block_given?
+      self.default=(args.__at(0))
+    elsif na._equal?(0)
+      if block_given?
+        self.default=(block)
+      else
+        # allocation includes self.default=(nil)
+      end
+    else
+      raise ArgumentError , 'too many args'
     end
+    self
+  end
 
-    # Do not call self.initialize: can lead to stack overflow from derived
-    # classes (Trac 675)
-    # self.initialize(args.__at(0))
-    self.default=(args.__at(0))
+  def initialize(obj, &block)
+    raise ArgumentError, 'too many args' if block_given?
+    self.default=(obj)
+  end
+
+  def initialize(obj)
+    self.default=(obj)
+  end
+
+  def initialize(&block)
+    self.default=(block)
   end
 
   def initialize  # zero args
     # allocation includes self.default=(nil)
-    self
-  end
-  def initialize(one_arg)
-    self.default=(one_arg)
-  end
-  def initialize(&block)
-    self.default=(block)
-  end
-  def initialize(one_arg, &block)
-    raise ArgumentError, 'too many args'
     self
   end
 
@@ -193,10 +202,10 @@ class Hash
         unless other.has_key?(k)
           return false
         end
-  ov = other.__atkey(k)
-  if v._equal?(ov)
-    # ok
-  elsif ts.include?(v) || ts.include?(ov)
+        ov = other.__atkey(k)
+        if v._equal?(ov)
+          # ok
+        elsif ts.include?(v) || ts.include?(ov)
           if v._equal?(self) && ov._equal?(other)
             # ok
           elsif v._equal?(other) && ov._equal?(self)
@@ -231,11 +240,11 @@ class Hash
     added = ts.__add_if_absent(self)
     begin
       self.each_pair { | k, v |
-  ov = other.__atkey(k)
+        ov = other.__atkey(k)
         return false if ov._equal?(dflt)
-  if v._equal?(ov)
-    # ok
-  elsif ts.include?(v) || ts.include?(ov)
+        if v._equal?(ov)
+          # ok
+        elsif ts.include?(v) || ts.include?(ov)
           if v._equal?(self) && ov._equal?(other)
             # ok
           elsif v._equal?(other) && ov._equal?(self)
@@ -656,9 +665,9 @@ class Hash
   end
 
   def default(key=MaglevUndefined)
-    if key._equal?(MaglevUndefined) 
+    if key._equal?(MaglevUndefined)
       return self.default()
-    end 
+    end
     if @_st_defaultIsBlock
       @_st_defaultOrParent.call(self, key)
     else
@@ -786,7 +795,7 @@ class Hash
       return HashEnumerator.new(self, :each_pair) # for 1.8.7
     end
     num_elem = @_st_numElements
-    lim = @_st_tableSize 
+    lim = @_st_tableSize
     lim = lim + lim
     kofs = 0
     while kofs < lim
@@ -797,17 +806,17 @@ class Hash
           block.call(k, v)
         elsif v._isFixnum
           # internal collision chain
-	  idx = v
-	  begin
-	    ck = self.__at(idx)
-	    if ck._not_equal?(RemoteNil)
-	      block.call(ck, self.__at(idx + 1) )
-	    end
+          idx = v
+          begin
+            ck = self.__at(idx)
+            if ck._not_equal?(RemoteNil)
+              block.call(ck, self.__at(idx + 1) )
+            end
             idx = self.__at(idx + 2)
-	  end while idx._isFixnum
+          end while idx._isFixnum
         else
-	  # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
-	  v.each_pair(&block)
+          # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+          v.each_pair(&block)
         end
       end
       kofs += 2
@@ -1043,7 +1052,7 @@ class Hash
   end
 
   # def reject!() ; end # 1.8.7 , not implemented yet due to 
-		        #  complex side effects of   Enumerator#next
+                        #  complex side effects of   Enumerator#next
 
   def replace(hash)
     hash = Type.coerce_to(hash, Hash, :to_hash)

@@ -1,0 +1,2 @@
+hangs:Net::HTTP#proppatch sends an proppatch request to the passed path and returns the response
+hangs:Net::HTTP#proppatch returns a Net::HTTPResponse

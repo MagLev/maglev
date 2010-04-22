@@ -1,2 +1,10 @@
-fails:Kernel#require does not expand/resolve qualified files against $LOAD_PATH
-breaks:Kernel#require will not add a bad load to LOADED_FEATURES
+fails:Kernel#require (path resolution) does not resolve a ./ relative path against $LOAD_PATH entries
+fails:Kernel#require (path resolution) does not resolve a ../ relative path against $LOAD_PATH entries
+fails:Kernel#require (file extensions) does not load a C-extension file if a .rb extensioned file is already loaded
+fails:Kernel#require (file extensions) does not load a C-extension file if a complex-extensioned .rb file is already loaded
+fails:Kernel#require ($LOAD_FEATURES) does not load a ../ relative path that is already stored
+fails:Kernel.require (path resolution) does not resolve a ./ relative path against $LOAD_PATH entries
+fails:Kernel.require (path resolution) does not resolve a ../ relative path against $LOAD_PATH entries
+fails:Kernel.require (file extensions) does not load a C-extension file if a .rb extensioned file is already loaded
+fails:Kernel.require (file extensions) does not load a C-extension file if a complex-extensioned .rb file is already loaded
+fails:Kernel.require ($LOAD_FEATURES) does not load a ../ relative path that is already stored

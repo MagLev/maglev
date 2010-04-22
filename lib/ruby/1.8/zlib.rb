@@ -6,7 +6,7 @@ module Zlib
   class Error < StandardError; end
 
   # constants from zlib.h as linked into Gemstone libgcilnk.so
-  ZLIB_VERSION = "1.2.3"
+  ZLIB_VERSION = "1.2.4"
 
   Z_NO_FLUSH    =  0
   # Z_PARTIAL_FLUSH = 1 # will be removed, use Z_SYNC_FLUSH instead
@@ -14,7 +14,9 @@ module Zlib
   Z_FULL_FLUSH    = 3  # inflate() will terminate a block of compressed data
   Z_FINISH        = 4
   Z_BLOCK         = 5  # deflate() will return at end of next block boundary,
-           #  or after the gzip header .
+                        #  or after the gzip header .
+  Z_TREES         = 6
+
   Z_OK            = 0
   Z_STREAM_END    = 1
   Z_NEED_DICT     = 2

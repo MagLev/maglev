@@ -1,5 +1,8 @@
 = MagLev Change Log
 
+* Fix Trac 716, 718, 719, 720
+  Signal.trap will raise MNU for now.
+
 == Changes for 23275  2010-04-16
 
 * Fix Trac 581, 683

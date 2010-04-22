@@ -1,1 +1,1 @@
-fails:Kernel#load allows wrapping the code in the file in an anonymous module
+fails:Kernel#load sets the enclosing scope to an anonymous module if passed true for 'wrap'

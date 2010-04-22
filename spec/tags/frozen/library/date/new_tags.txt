@@ -1,3 +1,0 @@
-fails:Date#new creates a Date for -4712 by default
-fails:Date#new creates a date with arguments
-fails:Date#new creats a Date for different calendar reform dates

@@ -1,2 +1,1 @@
-fails:Block parameters assign to local variable
-fails:Block parameters captures variables from the outer scope
+fails:A block with mismatched arguments raises ArgumentError if argument is passed, but the block takes none

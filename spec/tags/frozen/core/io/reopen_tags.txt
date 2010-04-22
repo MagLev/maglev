@@ -1,11 +1,18 @@
-fails:IO#reopen raises IOError on closed stream
-fails:IO#reopen raises IOError when called on closed stream
-fails:IO#reopen should not raise IOError when called on closed stream with path
-fails:IO#reopen reassociates self to another file/descriptor but returns self
-fails:IO#reopen reassociates self with a new stream opened on path, when self in initial state
-fails:IO#reopen reassociates self with a new stream opened on path, after some reads
-fails:IO#reopen reassociates self with a new stream opened on path, after some writes
-fails:IO#reopen reassociates self with the I/O stream specified as an argument, after some reads
-fails:IO#reopen reassociates self with the I/O stream specified as an argument, after some sysreads
-fails:IO#reopen reassociates self with the I/O stream specified as an argument, after some writes
-fails:IO#reopen reassociates self with a new stream after some reads
+fails:IO#reopen calls #to_io to convert an object
+fails:IO#reopen changes the class of the instance to the class of the object returned by #to_io
+fails:IO#reopen raises an IOError if the object returned by #to_io is closed
+fails:IO#reopen raises an TypeError if #to_io does not return an IO instance
+fails:IO#reopen raises an IOError when called on a closed stream with an object
+fails:IO#reopen raises an IOError if the IO argument is closed
+fails:IO#reopen raises an IOError when called on a closed stream with an IO
+fails:IO#reopen with a String does not raise an exception when called on a closed stream with a path
+fails:IO#reopen with a String returns self
+fails:IO#reopen with a String positions a newly created instance at the beginning of the new stream
+fails:IO#reopen with a String positions an instance that has been read from at the beginning of the new stream
+fails:IO#reopen with a String opens a path after writing to the original file descriptor
+fails:IO#reopen with an IO does not call #to_io
+fails:IO#reopen with an IO does not change the object_id
+fails:IO#reopen with an IO reads from the beginning if the other IO has not been read from
+fails:IO#reopen with an IO reads from the current position of the other IO's stream
+fails:IO#reopen with an IO associates the IO instance with the other IO's stream
+fails:IO#reopen with an IO may change the class of the instance
