@@ -65,6 +65,16 @@ class Object
   #   Outside of bootstrap,  super alway passes an explicit or implicit
   #   block argument.  See RubySuperNode in .mcz and Trac 454,634 .
 
+  # Special semantics of    ensure      while in bootstrap:
+  #   During bootstrap,  a ruby  ensure   translates to the
+  #   Smalltalk ExecBlock>>ensure:  semantics, and the 
+  #   ensure block will be executed after any rescue blocks run.
+  #   Outside of bootstrap,   ensure translates to
+  #   ExecBlock>>rubyEnsure:  and the ensure block executes before
+  #   rescue blocks higher in the stack are run.   
+  #   Use of rubyEnsure:  fixes Trac 720 .  
+  #   Use of ensure: in bootstrap code makes the ensure faster .
+
   # End private helper methods
 
   primitive_nobridge '==', '='
