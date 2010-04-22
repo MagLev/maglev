@@ -193,10 +193,10 @@ class Hash
         unless other.has_key?(k)
           return false
         end
-  ov = other.__atkey(k)
-  if v._equal?(ov)
-    # ok
-  elsif ts.include?(v) || ts.include?(ov)
+        ov = other.__atkey(k)
+        if v._equal?(ov)
+          # ok
+        elsif ts.include?(v) || ts.include?(ov)
           if v._equal?(self) && ov._equal?(other)
             # ok
           elsif v._equal?(other) && ov._equal?(self)
@@ -231,22 +231,22 @@ class Hash
     added = ts.__add_if_absent(self)
     begin
       self.each_pair { | k, v |
-  ov = other.__atkey(k)
+        ov = other.__atkey(k)
         return false if ov._equal?(dflt)
-  if v._equal?(ov)
-    # ok
-  elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Hash#=='
-          end
-        elsif v.eql?(ov)
+        if v._equal?(ov)
           # ok
+        elsif ts.include?(v) || ts.include?(ov)
+	  if v._equal?(self) && ov._equal?(other)
+	    # ok
+	  elsif v._equal?(other) && ov._equal?(self)
+	    # ok
+	  else
+	    raise ArgumentError, 'recursion too complex for Hash#=='
+	  end
+        elsif v.eql?(ov)
+	  # ok
         else
-          return false
+	  return false
         end
       }
     ensure
@@ -797,17 +797,17 @@ class Hash
           block.call(k, v)
         elsif v._isFixnum
           # internal collision chain
-	  idx = v
-	  begin
-	    ck = self.__at(idx)
-	    if ck._not_equal?(RemoteNil)
-	      block.call(ck, self.__at(idx + 1) )
-	    end
+          idx = v
+          begin
+            ck = self.__at(idx)
+            if ck._not_equal?(RemoteNil)
+              block.call(ck, self.__at(idx + 1) )
+            end
             idx = self.__at(idx + 2)
-	  end while idx._isFixnum
+          end while idx._isFixnum
         else
-	  # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
-	  v.each_pair(&block)
+          # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+          v.each_pair(&block)
         end
       end
       kofs += 2
@@ -1043,7 +1043,7 @@ class Hash
   end
 
   # def reject!() ; end # 1.8.7 , not implemented yet due to 
-		        #  complex side effects of   Enumerator#next
+                        #  complex side effects of   Enumerator#next
 
   def replace(hash)
     hash = Type.coerce_to(hash, Hash, :to_hash)
