@@ -1,6 +1,6 @@
 class Hash
 
-  # Class methods
+  # Class methods 
 
   class_primitive_nobridge '__allocate', '_basicNew:'
   #  tableSize arg converted to near-by prime
@@ -158,8 +158,11 @@ class Hash
       raise ArgumentError, 'too many args' if block_given?
       self.default=(args.__at(0))
     elsif na._equal?(0)
-      raise ArgumentError, 'expected a block' unless block_given?
-      self.default=(block)
+      if block_given?
+        self.default=(block)
+      else
+        # allocation includes self.default=(nil)
+      end
     else
       raise ArgumentError , 'too many args'
     end
