@@ -26,8 +26,9 @@ against the persisted data.
 
 To run:
 
-  $ rake commit     # runs create_random_people and commits
-  $ rake search     # runs search_random_people
+  $ rake commit          # runs create_random_people (100k) and commits
+  $ rake commit:data_1m  # creates a larger data set (1 million people)
+  $ rake search          # runs search_random_people against the committed dataset
 
 == Lib
 

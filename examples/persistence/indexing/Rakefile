@@ -1,18 +1,18 @@
 
 task :default => :demo
 
-desc "Demo of using unordered collections with indexes."
+desc "Demo of using unordered collections with indexes"
 task :demo do
   sh %{ maglev-ruby -Ilib index_example.rb }
 end
 
-desc "Search the large committed People set"
+desc "Search the currently committed People set"
 task :search do
   sh %{ maglev-ruby search_random_people.rb }
 end
 
-desc "Commit the code and data needed for the search task"
-task :commit => ['commit:code', 'commit:data']
+desc "Commit the code and data (100k) needed for the search task"
+task :commit => ['commit:code', 'commit:data_100k']
 
 namespace :commit do
   desc "Commit the code to the repository"
@@ -20,9 +20,14 @@ namespace :commit do
     sh %{ maglev-ruby -Mcommit -Ilib -e 'require "person"' }
   end
 
-  desc "Commit a set of 100_000 random people (depends on commit:code)"
-  task :data do
+  desc "Commit a set of 100_000 random People (depends on commit:code)"
+  task :data_100k do
     sh %{ maglev-ruby create_random_people.rb 100_000 commit }
+  end
+
+  desc "Commit a set of 1_000_000 random People (depends on commit:code)"
+  task :data_1m do
+    sh %{ maglev-ruby create_random_people.rb 1_000_000 commit }
   end
 end
 
