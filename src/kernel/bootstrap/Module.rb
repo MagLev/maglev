@@ -297,7 +297,7 @@ class Module
   end
 
   def module_eval(*args, &block_arg)
-    #   should always come here via a bridge method , thus 0x3N for vcgl ...
+    # should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
     if nargs < 1 
       if block_arg._not_equal?(nil)
