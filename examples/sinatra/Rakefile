@@ -15,12 +15,3 @@ task :test do
   sh 'maglev-ruby -rubygems sinatra_app_test.rb'
 end
 
-namespace :xperimental do
-  desc <<EOS
-EXPERIMENTAL: Commit Sinatra framework to MagLev. This is experimental.
-Read commit_sinatra.rb for details.
-EOS
-  task :commit do
-    sh 'maglev-ruby commit_sinatra.rb'
-  end
-end
