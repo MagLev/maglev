@@ -1,4 +1,7 @@
 = MagLev Change Log
+ 
+  Fix Trac 721 .
+  Implement Signal#trap .
 
 == Changes for 23351  2010-04-22
 
