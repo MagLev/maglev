@@ -7,9 +7,10 @@
 # Class monkey patching code from Rails3 ActiveSupport
 ######################################################################
 class Class
+  Ccx = 45
   def cattr_reader(*syms)
-#    options = syms.extract_options!
     syms.each do |sym|
+      puts "Doing class_eval for #{sym} "
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         unless defined? @@#{sym}
           @@#{sym} = nil
@@ -18,20 +19,24 @@ class Class
         def self.#{sym}
           @@#{sym}
         end
+        def self.ccx
+          # (sys =  Maglev::System).session_temp_put(:TrapResolve, true)
+           r = Ccx
+          # sys.session_temp_put(:TrapResolve, false)
+           # nil.pause # expect 99
+           r
+        end
       EOS
 
- #     unless options[:instance_reader] == false
-        class_eval(<<-EOS, __FILE__, __LINE__ + 1)
-          def #{sym}
-            @@#{sym}
-          end
-        EOS
-      end
-#    end
+      class_eval(<<-EOS, __FILE__, __LINE__ + 1)
+        def #{sym}
+          @@#{sym}
+        end
+      EOS
+    end
   end
 
   def cattr_writer(*syms)
- #   options = syms.extract_options!
     syms.each do |sym|
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         unless defined? @@#{sym}
@@ -43,16 +48,15 @@ class Class
         end
       EOS
 
-      #unless options[:instance_writer] == false
-        class_eval(<<-EOS, __FILE__, __LINE__ + 1)
-          def #{sym}=(obj)
-            @@#{sym} = obj
-          end
-        EOS
-      #end
+      class_eval(<<-EOS, __FILE__, __LINE__ + 1)
+	def #{sym}=(obj)
+	  @@#{sym} = obj
+	end
+      EOS
       self.send("#{sym}=", yield) if block_given?
     end
   end
+
 
   def cattr_accessor(*syms, &blk)
     cattr_reader(*syms)
@@ -60,15 +64,24 @@ class Class
   end
 end
 
-######################################################################
-# BEGIN BUG
-######################################################################
-
+# Maglev::System.session_temp_put(:TrapCv, true)
 class Base
+  Ccx = 99
   @@foo1 = 'foo 1 initial value'
   cattr_accessor :foo1
 
   @@foo2 = 'foo 2 initial value'
+  cattr_accessor :foo2
+
+   def self.ccx
+  #Maglev::System.session_temp_put(:TrapResolve, true)
+     r = Ccx
+   #  nil.pause # expect 99
+     r
+   end
+end
+
+class C
   cattr_accessor :foo2
 end
 
@@ -77,5 +90,15 @@ Base.foo1 = 10
 raise unless Base.foo1 == 10    # as expected
 
 # But the initial value is not recognized by MagLev
-p Base.foo2  # Maglev gets nil, rather than @@foo2
-raise 'fail foo2 initial value' unless Base.foo2 == 'foo 2 initial value'
+bcls = Base
+bcxa = Base.ccx
+bcxb = Base::Ccx
+bcxc = Base.class::Ccx
+puts "Base.ccx = #{bcxa} #{bcxb} #{bcxc}"
+fx = Base.foo2  # Maglev gets nil, rather than @@foo2
+unless [ bcxa, bcxb, bcxc] == [ 99, 99, 45 ] ; raise 'error in consts'; end
+ccx = C.ccx
+puts "C.ccx = #{ccx}"
+unless ccx == 45 ; raise 'error ccx'; end
+unless fx == 'foo 2 initial value'; raise 'fail foo2 initial value' ; end
+puts 'ok'
