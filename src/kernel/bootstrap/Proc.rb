@@ -73,6 +73,11 @@ class ExecBlock
       self.call(a, b, c, &block)
     end
 
+    def __signal_callback
+      # used by Signal#trap implemenation
+      self.call
+    end
+
     def __fficallback(*args)
       # execution of an ExecBlock by an FFI callback invokes this method
       self.call(*args)
@@ -228,6 +233,11 @@ class Proc
     def __fficallback(*args)
       # execution of a Proc by an FFI callback invokes this method
       @_st_block.call(*args)
+    end
+
+    def __signal_callback
+      # used by Signal#trap implemenation
+      @_st_block.call
     end
 
     def ==(other)

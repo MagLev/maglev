@@ -96,7 +96,6 @@ RUBY.require 'kernel/bootstrap/Mutex.rb'
 RUBY.require 'kernel/bootstrap/Thread1.rb'
 RUBY.require 'kernel/bootstrap/Thread.rb'
 RUBY.require 'kernel/bootstrap/Queue.rb'
-RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/Math.rb'
 RUBY.require 'kernel/bootstrap/Struct.rb'
 RUBY.require 'kernel/bootstrap/ThreadGroup.rb'
@@ -113,6 +112,7 @@ RUBY.require 'kernel/bootstrap/Maglev.rb'
 RUBY.require 'kernel/bootstrap/bigdecimal1.rb'
 RUBY.require 'kernel/bootstrap/bigdecimal.rb'
 RUBY.require 'kernel/bootstrap/Gprof.rb'
+RUBY.require 'kernel/bootstrap/Signal.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.
