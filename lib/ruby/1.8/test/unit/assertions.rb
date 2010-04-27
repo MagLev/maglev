@@ -123,12 +123,13 @@ EOT
           actual_exception = nil
           full_message = build_message(message, "<?> exception expected but none was thrown.", expected)
           assert_block(full_message) do
+            blk_res = false
             begin
               yield
             rescue Exception => actual_exception
-              break
+              blk_res = true
             end
-            false
+            blk_res
           end
           full_message = build_message(message, "<?> exception expected but was\n?", expected, actual_exception)
           assert_block(full_message) {_expected_exception?(actual_exception, exceptions, modules)}
