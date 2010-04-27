@@ -13,6 +13,10 @@ class NilClass
   primitive 'to_i' , '_ruby_to_i'
   primitive 'to_s' , '_ruby_to_s'
 
+  def clone
+    raise TypeError , 'cannot clone nil'
+  end
+
   def frozen?
     false
   end
