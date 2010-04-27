@@ -7,7 +7,7 @@ class String
 
   primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
-  primitive_nobridge '__md5sum', 'md5sum'     # used by lib file  digest/md5.rb
+  primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
