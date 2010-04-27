@@ -234,10 +234,12 @@ class Module
       m = meth.__block
     end
     if m._isBlock
-      __define_method_block(sym, &m)
+      res = __define_method_block(sym, &m)
     else
-      __define_method_meth(sym, meth)
+      res = __define_method_meth(sym, meth)
     end
+    self.method_added(sym)
+    res
   end
 
   def define_method(sym, &block)
