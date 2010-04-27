@@ -73,11 +73,11 @@ module Test
       attr_accessor :output_level, :filters, :to_run, :pattern, :exclude, :base, :workdir
       attr_writer :runner, :collector
 
-      def initialize(standalone)
+      def initialize(search_filesystem_bool)
         Unit.run = true
-        @standalone = standalone
+        @standalone = search_filesystem_bool
         @runner = RUNNERS[:console]
-        @collector = COLLECTORS[(standalone ? :dir : :objectspace)]
+        @collector = COLLECTORS[(search_filesystem_bool ? :dir : :objectspace)]
         @filters = []
         @to_run = []
         @output_level = UI::NORMAL
