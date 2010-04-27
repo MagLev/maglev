@@ -4,14 +4,17 @@
 
 You'll need to install some gems:
 
-  $ maglev-gem install i18n rack-mount rack multimap
+  $ maglev-gem install i18n rack-mount rack multimap arel
 
 Then you can just do "rake" to run the tests.
+To run the rails app, do "rake app"
 
 ## Rails 3 Source
 
 The rails3 source is in the rails subdirectory (a git submodule).  It is
-tracking the Rails GitHub repository HEAD (rails3 work is going on there).
+tracking /export/smalltalk/maglev/git/rails.git.  That repository holds our
+patches to rails and tracks the Rails GitHub repository.  See the readme in
+/export/smalltalk/maglev/git for more details.
 
 ## Patchs
 
@@ -84,3 +87,27 @@ This section lists some patches and workarounds in effect for this code.
      Maglev::System.session_temp_put( :MAGLEV_allIvsDynamic, false )
 
   This is turned on in the Rakefile.
+
++ I needed to patch rack-1.0.0
+
+[@cairo git (master)]$ diff -r /Users/pmclain/GemStone/checkouts/git/lib/maglev/gems/1.8.7/gems/rack-1.1.0 /opt/ruby/ruby/lib/ruby/gems/1.8/gems/rack-1.1.0/
+Only in /opt/ruby/ruby/lib/ruby/gems/1.8/gems/rack-1.1.0/: .yardoc
+diff -r /Users/pmclain/GemStone/checkouts/git/lib/maglev/gems/1.8.7/gems/rack-1.1.0/lib/rack/file.rb /opt/ruby/ruby/lib/ruby/gems/1.8/gems/rack-1.1.0/lib/rack/file.rb
+32,42c32,33
+<       r = @root
+<       pi = @path_info
+<       p = F.join(r, pi)
+<       @path = p
+< #      @path = F.join(@root, @path_info)
+< #y = F
+< #x = @path
+< #puts "===== PATH: #{@path.inspect}"
+< #puts "===== PATH: F.file? #{F.file?(@path)}"
+< #puts "===== PATH: F.readable? #{F.readable?(@path)}"
+< # nil.pause
+---
+>       @path = F.join(@root, @path_info)
+>
+69,70d59
+< puts "===== serving: #{@path}"
+<

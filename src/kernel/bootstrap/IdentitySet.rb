@@ -23,7 +23,7 @@ class IdentitySet
 
   # ------------------
 
-  # add(nil) will have no effect 
+  # add(nil) will have no effect
 
   primitive_nobridge '<<', 'add:'
   primitive_nobridge 'add', 'add:'
@@ -73,7 +73,7 @@ class IdentitySet
   primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
   # dup, clone inherited from Object
 
-  # -------- following methods alphabetized 
+  # -------- following methods alphabetized
   #  see also Enumerable and indexing support sections below
 
   def avg(&block)
@@ -102,7 +102,7 @@ class IdentitySet
     while n <= siz
       block.call( self.__at(n))
       n += 1
-    end 
+    end
     self
   end
 
@@ -384,6 +384,25 @@ class IdentitySet
   # The list of operands is listed in the #search doc.
   def search_between(operand_path, low_value, high_value, low_op=:lte, high_op=:lt)
     _search_between(low_value, QUERY_OPS[low_op], operand_path, QUERY_OPS[high_op], high_value)
+  end
+
+  # Search receiver for elements on +operand_path+ that fall within
+  # +range+.  the comparison operator for the high end is
+  # <tt>:lt</tt>.  E.g., to search for people 18-25 (including 18 year
+  # olds, but excluding 25 year olds):
+  #
+  #   results = people.search_between([:age], (18...25))
+  #
+  # If you wanted to exclude 18 year olds, and include 25 year olds, the
+  # following will work:
+  #
+  #   results = people.search_between([:age], (19..25))
+  #
+  # This method just wraps the appropriate call to
+  # <tt>search_between</tt>.
+  def search_range(operand_path, range)
+    high_op = range.exclude_end? ? QUERY_OPS[:lt] : QUERY_OPS[:lte]
+    _search_between(range.begin, QUERY_OPS[:lte], operand_path, high_op, range.end)
   end
 
   # Remove the specified index from receiver.

@@ -21,8 +21,6 @@ class Bar
   end
 end
 
-
-
 class TestIndexeManagement < Test::Unit::TestCase
   def test_indexed_paths
     @idset = IdentitySet.new
@@ -128,12 +126,22 @@ class TestBasicEqualityIndexSupport < Test::Unit::TestCase
     assert(x.include?(@idx[8]))
   end
 
-  def test_raises_error_on_bad_op
-    assert_raise ArgumentError do
-      @idset.search([:'@id'], :foo, 8)
-    end
-  end
+  def test_search_range
+    x = @idset.search_range([:'@id'], (0...1))
+    assert_equal(1, x.size)
+    assert(x.include?(@idx[0]))
 
+    x = @idset.search_range([:'@id'], (3...5))
+    assert_equal(2, x.size)
+    assert(x.include?(@idx[3]))
+    assert(x.include?(@idx[4]))
+
+    x = @idset.search_range([:'@id'], (3..5))
+    assert_equal(3, x.size)
+    assert(x.include?(@idx[3]))
+    assert(x.include?(@idx[4]))
+    assert(x.include?(@idx[5]))
+  end
 
   def test_search_between
     x = @idset.search_between([:'@id'], 0, 1)
@@ -170,6 +178,12 @@ class TestBasicEqualityIndexSupport < Test::Unit::TestCase
     x = @idset.search_between([:'@id'], 15, 20, :lt, :lte)
     assert_equal(0, x.size)
   end
+
+#   def test_raises_error_on_bad_op
+#     assert_raise ArgumentError do
+#       @idset.search([:'@id'], :foo, 8)
+#     end
+#   end
 end
 
 # Right now, there is no selction/index support for ruby Time objects.
