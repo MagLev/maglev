@@ -44,3 +44,26 @@ unless y == 22 ; raise 'err' ; end
 y = o.get_blk
 unless y == [22]; raise 'err' ; end
 true
+
+# coverage for bad bytecode optimimzation seen in rack gem under rails
+class C
+  # second opening, dynamic IVs
+  def ma
+    @dvc = mb(@dva, @dvb)
+    x = @dvc
+    x 
+  end  
+  def mb(a,b)
+    a + b
+  end
+  def initialize(a,b)
+    @dva = a
+    @dvb = b
+  end
+end
+
+c = C.new(9,200)
+x = c.ma
+unless x == 209 ; raise 'fail'; end
+true
+
