@@ -2,7 +2,7 @@ require 'person'
 
 people = IdentitySet.new
 
-people.create_equality_index(':@age', Fixnum)
+people.create_equality_index('@age', Fixnum)
 people.create_identity_index('@gender')
 people.create_equality_index('@address.@zip', Fixnum)
 
