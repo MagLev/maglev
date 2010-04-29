@@ -104,7 +104,7 @@ class ExecBlock
     end
     def __to_proc
       # invoked from generated code
-      Proc.new(self)
+      self # Proc.new(self)
     end
 end
 
