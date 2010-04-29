@@ -23,6 +23,7 @@ RUBY.global('Bignum', 'LargeInteger')
 RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
+RUBY.global('Signal', 'RubySignal')    # for module Signal
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMeth')  # RubyMeth , RubyUnboundMeth defined in .mcz
 RUBY.global('Module', 'Module')    # for class Module

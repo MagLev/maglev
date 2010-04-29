@@ -1,5 +1,21 @@
 = MagLev Change Log
 
+== Unreleased Changes
+
+* Fix RbConfig::CONFIG[ruby_version].  It was '1.8.7' and is now '1.8'.
+  You may need to rename $MAGLEV_HOMElib/maglev/gems/1.8.7 to
+  $MAGLEV_HOMElib/maglev/gems/1.8 in order to find your previously
+  installed maglev gems.
+
+== Changes for 23400  2010-04-29
+
+* Fix Trac 715, 721, 722, 726, 727
+* Implement Signal#trap
+* Add rake task to optionally create 1 million people for indexing test
+* Clean up a few rubyspec failures
+* Updated zlib sources to  zlib v1.2.4
+* More improvements in underlying GemStone 3.0 system
+
 == Changes for 23351  2010-04-22
 
 * Retagged RubySpecs to account for our switch to 1.8.7
@@ -23,9 +39,9 @@
 * Removed workarounds for fixed bugs
 * Fix Trac 150, 159, 404, 485, 490, 528, 710
 * Several changes in underlying GemStone 3.0 system
- 
+
 == Changes for 23234  2010-04-09
- 
+
 * Fix Trac 700, 702, 703, 705
 * Fix problems in Linenoise after ctrl-Z / fg
 * Numerous improvements in underlying GemStone 3.0 system.
@@ -42,7 +58,7 @@
 * Updated to RubyGems 1.3.6
 * Fixed problem exposed by Sinatra 1.0
 * Added rdoc, ri, and erb executables to bin directory
-* Fixed problem with Array.new returning nil for subclasses whose  
+* Fixed problem with Array.new returning nil for subclasses whose
   initialize returned nil.
 * Improved exception handler printout
 * Fixed test rake in examples to not depend on Sinatra version
@@ -51,7 +67,7 @@
 * Fixed writing of alias and anchor in YAML
 * Fix Trac 471, 621, 684  in irb .
 * Fix Trac 631, 685, 686, 690, 691, 692 .
-* Implemented ObjectSpace#define_finalizer 
+* Implemented ObjectSpace#define_finalizer
 * Added jcode
 * Various fixes in underlying GemStone 3.0 system.
 
@@ -72,23 +88,23 @@
 * Fix Trac 76, 122, 174, 181, 182, 189, 270, 277, 524, 558
 * FFI::Pointer is now identical to Smalltalk class CByteArray
 * Several improvements to underlying GemStone system including:
-  Refactor mutex code such that the return code from a mutex call is always 
+  Refactor mutex code such that the return code from a mutex call is always
   checked and we print out the file and line number where the error occurs.
 
 == Changes for 22985  2010-03-09
 
 * Add callback to Module#append_features
 * Fixes and enhancements for underlying GemStone stats
-  Added: 
+  Added:
     PermGenFullCount - Number of times the perm gen space was found to be full.
     CodeGenFullCount - Number of times the code gen space was found to be full.
     OldGenFullCount - Number of times the old gen space was found to be full.
     VoteOnDeadCount -  Number of times the session has voted on dead objects.
-    ScavsPromToMkSwCount - Number of times a scavenge operation was promoted 
+    ScavsPromToMkSwCount - Number of times a scavenge operation was promoted
       to a Mark/Sweep operation.
     LastMarkSweepReasonCode - An internal code which indicates the reason for
       the last Mark/Sweep operation.
-    LastScavengeReasonCode - An internal code which indicates the reason for 
+    LastScavengeReasonCode - An internal code which indicates the reason for
       the last scavenge operation.
 * Changed the index search method from 'select' to 'search'
   to avoid conflict with Enumerable#select.
@@ -127,7 +143,7 @@
 * Added Enumerable#each_slice (but no Enumerator support).
 * Add Socket::Constants
 * Indexing is fixed: clean up and turn on examples/persistence/indexing
-* Major underlying changes to AIO in GemStone -- replaces the use of 
+* Major underlying changes to AIO in GemStone -- replaces the use of
   POSIX asynchronous IO with our own thread-based IO system for writing tranlogs
 
 == Changes for 22816  2010-02-02

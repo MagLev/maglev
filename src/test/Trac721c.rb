@@ -7,39 +7,36 @@
 # Class monkey patching code from Rails3 ActiveSupport
 ######################################################################
 class Class
-  Ccx = 45
   def cattr_reader(*syms)
     syms.each do |sym|
-      puts "Doing class_eval for #{sym} "
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         unless defined? @@#{sym}
+          sx = self
           @@#{sym} = nil
         end
 
         def self.#{sym}
-          @@#{sym}
-        end
-        def self.ccx
-          # (sys =  Maglev::System).session_temp_put(:TrapResolve, true)
-           r = Ccx
-          # sys.session_temp_put(:TrapResolve, false)
-           # nil.pause # expect 99
-           r
+          r = @@#{sym}
+          # nil.pause
+          r
         end
       EOS
 
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
-        def #{sym}
-          @@#{sym}
-        end
+          def #{sym}
+            r = @@#{sym}
+            # nil.pause
+            r
+          end
       EOS
-    end
+      end
   end
 
   def cattr_writer(*syms)
     syms.each do |sym|
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         unless defined? @@#{sym}
+          sx = self
           @@#{sym} = nil
         end
 
@@ -49,14 +46,14 @@ class Class
       EOS
 
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
-	def #{sym}=(obj)
-	  @@#{sym} = obj
-	end
+          def #{sym}=(obj)
+            @@#{sym} = obj
+            # nil.pause
+          end
       EOS
       self.send("#{sym}=", yield) if block_given?
     end
   end
-
 
   def cattr_accessor(*syms, &blk)
     cattr_reader(*syms)
@@ -64,41 +61,51 @@ class Class
   end
 end
 
-# Maglev::System.session_temp_put(:TrapCv, true)
+module ActiveSupport
+  module Concern
+    def append_features(base)
+      super
+      if instance_variable_defined?("@_included_block")
+        # @_included_block.call( base)
+        base.class_eval(&@_included_block) 
+      end
+      fx1 = base.foo1
+      raise "Fail X" unless fx1 == 'foo 1 initial value'
+    end
+
+    def included(base = nil, &block)
+      @_included_block = block
+    end
+  end
+end
+
+######################################################################
+# BEGIN BUG
+######################################################################
+
+module Pages
+  extend ActiveSupport::Concern
+  included { | mod |
+    @@foo1 = 'foo 1 initial value' 
+    sx = self 
+    cattr_accessor( :foo1 )
+
+    @@foo2 = 'foo 2 initial value' 
+    cattr_accessor( :foo2 )
+  }
+end
+
 class Base
-  Ccx = 99
-  @@foo1 = 'foo 1 initial value'
-  cattr_accessor :foo1
-
-  @@foo2 = 'foo 2 initial value'
-  cattr_accessor :foo2
-
-   def self.ccx
-  #Maglev::System.session_temp_put(:TrapResolve, true)
-     r = Ccx
-   #  nil.pause # expect 99
-     r
-   end
+  include Pages
 end
 
-class C
-  cattr_accessor :foo2
-end
-
+puts "---------- begin tests --------------"
 # MagLev can use cattr_accessor to set and get the attribute:
 Base.foo1 = 10
 raise unless Base.foo1 == 10    # as expected
 
 # But the initial value is not recognized by MagLev
-bcls = Base
-bcxa = Base.ccx
-bcxb = Base::Ccx
-bcxc = Base.class::Ccx
-puts "Base.ccx = #{bcxa} #{bcxb} #{bcxc}"
-fx = Base.foo2  # Maglev gets nil, rather than @@foo2
-unless [ bcxa, bcxb, bcxc] == [ 99, 99, 45 ] ; raise 'error in consts'; end
-ccx = C.ccx
-puts "C.ccx = #{ccx}"
-unless ccx == 45 ; raise 'error ccx'; end
-unless fx == 'foo 2 initial value'; raise 'fail foo2 initial value' ; end
-puts 'ok'
+# p Base.foo2  # Maglev gets nil, rather than @@foo2
+raise 'fail foo2 initial value' unless (bfx = Base.foo2) == 'foo 2 initial value'
+
+

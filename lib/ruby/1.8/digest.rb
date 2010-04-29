@@ -18,6 +18,7 @@ module Digest
   #
   # Generates a hex-encoded version of a given _string_.
   def hexencode(value)
+    value = Type.coerce_to(value, String, :to_str)
     out = ''
     value.each_byte { |b| out << sprintf("%02x", b) }
     out
@@ -266,7 +267,9 @@ module Digest
     #   => "f02e3c85572dc9ad7cb77c2a638e3be24cc1b5bea9fdbb0b0299c9668475c534"
     #
     def self.file(name)
-      raise NotImplementedError
+      f = File.open(name, 'r')
+      contents = f.read(nil)
+      self.new(contents) 
     end
   end
 
