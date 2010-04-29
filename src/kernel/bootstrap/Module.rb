@@ -23,26 +23,31 @@ class Module
     self
   end
 
-  # append_features deprecated, but reimplemented by Rails3 ,
-  #   it is invoked from .mcz code prior to the actual include of the module
+  primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
+  primitive_nobridge '__include_module', '_includeRubyModule:'
+
+  # append_features deprecated, but needed by Rails3 
   def append_features(other)
+    if other.__check_include(self)
+      other.__include_module(self)
+    end
+    self
   end
 
   def include(*modules)
     # this variant gets bridge methods
     modules.reverse.each do |a_module|
-      __include_module(a_module)
+      a_module.append_features(self)
       a_module.included(self)
     end
   end
   def include(a_module)
     # variant needed for bootstrap
-    __include_module(a_module)
+    a_module.append_features(self)
     a_module.included(self)
   end
 
   # Invoked as a callback when a_module includes receiver.
-  # supercedes  append_features
   def included(a_module)
   end
 
@@ -254,8 +259,6 @@ class Module
   primitive_nobridge 'frozen?' , 'moduleFrozen'
 
   primitive_nobridge 'included_modules' , 'rubyIncludedModules'
-
-  primitive_nobridge '__include_module', 'includeRubyModule:'
 
   primitive_nobridge '__includes_module', '_rubySubclassOf:'
 

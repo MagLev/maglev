@@ -12,6 +12,9 @@ class Class
 
   class_primitive_nobridge_env '__ruby_new', '_rubyNew', ':do:'
 
+  primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
+  primitive_nobridge '__include_module', '_includeRubyModule:'
+
   def inherited(a_subclass)
     # .mcz code will not invoke this during bootstrap.
     # do nothing
