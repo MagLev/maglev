@@ -1,7 +1,13 @@
 = MagLev Change Log
  
-  Fix Trac 721 .
-  Implement Signal#trap .
+== Changes for 23400  2010-04-29
+
+* Fix Trac 715, 721, 722, 726, 727
+* Implement Signal#trap
+* Add rake task to optionally create 1 million people for indexing test
+* Clean up a few rubyspec failures
+* Updated zlib sources to  zlib v1.2.4 
+* More improvements in underlying GemStone 3.0 system
 
 == Changes for 23351  2010-04-22
 
