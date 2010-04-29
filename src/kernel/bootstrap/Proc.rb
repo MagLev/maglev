@@ -103,8 +103,11 @@ class ExecBlock
       Proc.new(self)
     end
     def __to_proc
-      # invoked from generated code
-      self # Proc.new(self)
+      # invoked from generated code once at start of a method, if method
+      # contains usages usages of it's incoming block arg other than passing
+      #  that block as the block arg to a method call 
+      #  (i.e. other than passing as value for & suffix char of a method call).
+      Proc.new(self)
     end
 end
 
