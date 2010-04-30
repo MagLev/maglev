@@ -36,7 +36,3 @@ task :test do
   sh %{ $MAGLEV_HOME/bin/testrb -Ilib #{FileList['test/*_test.rb']} }
 end
 
-desc "Run the blog example"
-task :blog do
-  sh %{ maglev-ruby -Ilib blog_example.rb }
-end
