@@ -17,25 +17,3 @@ MyApp::Application.configure do
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false
 end
-
-Exception.install_debug_block do |e|
-  case e.class.name
-  when 'RubyThrowException', 'RubyBreakException'
-    nil
-  when 'TypeError'
-    # nil.pause if e.message =~ /_st_fileDescriptor=/
-    nil
-  when 'NameError'
-    # nil.pause if e.message =~ /default_format not foun/
-    nil.pause if e.message =~ /no method found for update_with_lock/
-    nil
-  when 'Errno::EPERM'
-    # nil.pause
-    nil
-  when 'LoadError'
-    # nil.pause if e.message =~ /no such file to load -- arel/
-    nil
-  else
-    puts "-- #{e}    class (#{e.class}) class name: #{e.class.name}"
-  end
-end
