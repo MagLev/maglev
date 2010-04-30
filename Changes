@@ -2,13 +2,12 @@
 
 == Unreleased Changes
 
-* Fix RbConfig::CONFIG[ruby_version].  It was '1.8.7' and is now '1.8'.
-  You may need to rename $MAGLEV_HOMElib/maglev/gems/1.8.7 to
-  $MAGLEV_HOMElib/maglev/gems/1.8 in order to find your previously
-  installed maglev gems.
 
 == Changes for 23400  2010-04-29
 
+* Fix RbConfig::CONFIG[ruby_version].  It was '1.8.7' and is now '1.8'.
+  If you want to keep previously installed gems from $MAGLEV_HOMElib/maglev/gems/1.8.7
+  move them to $MAGLEV_HOMElib/maglev/gems/1.8
 * Fix Trac 715, 721, 722, 726, 727
 * Implement Signal#trap
 * Add rake task to optionally create 1 million people for indexing test
