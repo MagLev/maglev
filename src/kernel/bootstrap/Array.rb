@@ -368,7 +368,7 @@ class Array
       dict[ elem ] = elem
       n += 1
     end
-    res = self.class.new( my_siz < other_siz ? my_siz : other_siz )
+    res = self.class.__alloc( my_siz < other_siz ? my_siz : other_siz , nil )
     n = 0
     res_idx = 0
     while n < my_siz
@@ -393,7 +393,7 @@ class Array
     if val < 0
       raise ArgumentError, "arg must be >= 0"
     end
-    result = self.class.new
+    result = self.class.__alloc(0, nil)
     i = 0
     while i < val
       result.concat(self)
@@ -674,7 +674,7 @@ class Array
 
   # Return copy of self with all nil elements removed
   def compact
-    result = self.class.new
+    result = self.__basic_dup_named_ivs
     i = 0
     lim = self.__size
     while i < lim
@@ -1152,7 +1152,7 @@ class Array
     if lev._equal?(0)
       return self
     end
-    ary = self.class.new
+    ary = self.class.__alloc(0, nil)
     if lev < 0
       lev = Fixnum__MAX
     end
@@ -1304,7 +1304,7 @@ class Array
       if cnt < 0
         raise ArgumentError, 'count must be >= 0'
       end
-      return self.class.new
+      return self.class.__alloc(0, nil)
     end
     ofs = my_size - cnt
     if ofs < 0
@@ -1407,7 +1407,7 @@ class Array
     self.__replace(arg)
   end
 
-  primitive 'reverse', 'reverse'
+  primitive 'reverse', 'reverse'  # returns copy without copying named IVs
 
   def reverse!
     low = 0
@@ -1526,7 +1526,7 @@ class Array
     length = Type.coerce_to(length, Fixnum, :to_int)
     my_siz = self.__size
     if my_siz._equal?(0)
-      return self.class.new
+      return self.class.__alloc(0, nil)
     end
     if start < 0
       start = my_siz + start
@@ -1681,7 +1681,7 @@ class Array
 
   def uniq
     hash = {}
-    ary = self.class.new # Ensure we return proper subclass
+    ary = self.__basic_dup_named_ivs
     i = 0
     lim = self.__size
     while i < lim

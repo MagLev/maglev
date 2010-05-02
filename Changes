@@ -1,7 +1,10 @@
 = MagLev Change Log
 
-== Unreleased Changes
+== Changes for 23416  2010-05-02
 
+* Fix Trac 728, 729
+* Adds display lineeditor, omit lineeditor options to topaz
+* Several bugfixes to underlying GemStone 3.0 system 
 
 == Changes for 23400  2010-04-29
 
