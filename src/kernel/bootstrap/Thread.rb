@@ -12,10 +12,6 @@ class Thread
 
   # MNI self.abort_on_exception=
 
-  def self.abort_on_exception=(bool)
-    __stub_warn("Thread.abort_on_exception=: Does nothing")
-  end
-
   primitive_nobridge 'alive?' , 'alive'
 
   # eval support
