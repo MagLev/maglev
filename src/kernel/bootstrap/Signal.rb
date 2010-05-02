@@ -31,7 +31,7 @@ module Signal
       end
       num = sig
     else
-      str = Type.coerce_to(sig, String, :to_str)
+      str = Type.coerce_to(sig, String, :to_s )
       if str[0,3] == 'SIG'
         str = str[3, str.__size - 3]
       end
