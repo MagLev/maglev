@@ -197,16 +197,46 @@ class Socket # [
   # in this case.
 
   # read exactly length bytes from the socket.
+  # If length is undefined,  equivalent to recv(4096)
   # If a Ruby Socket is non-blocking , read will raise EAGAIN
   # if no data is available.
   # If a Ruby Socket is blocking, read will wait for specified number
   # of bytes to be received, allowing other Ruby Threads to run.
-  def read(length)
-    buf = String.__new(length)
-    __read_into(length, buf, length)
+
+  def read(length=MaglevUndefined, buffer=MaglevUndefined)
+    uu = MaglevUndefined
+    if length._equal?(uu)
+      self.recv(4096)
+    else 
+      length = Type.coerce_to(length, Fixnum, :to_int)
+      if buffer._equal?(uu) 
+        buf = String.__new(length)
+        self.__read_into(length, buf, length)
+      else
+        buffer = Type.coerce_to(a_buffer, String, :to_str)
+        self.__read_into(length, buffer, length)
+      end
+    end
   end
 
+  def read(length)
+    length = Type.coerce_to(length, Fixnum, :to_int)
+    buf = String.__new(length)
+    self.__read_into(length, buf, length)
+  end
+
+
   primitive '__read_into', 'read:into:minLength:' # raises EOFError on socket eof
+
+  def readpartial(length, buffer=MaglevUndefined)
+    if buffer._equal?(MaglevUndefined)
+      buf = String.__new(length)
+      self.__read_into(length, buf, length)
+    else
+      buffer = Type.coerce_to(a_buffer, String, :to_str)
+      self.__read_into(length, buffer)
+    end   
+  end
 
   # def recv(length) ; end #  receive up to length bytes from the socket.
   #  If a Ruby Socket is non-blocking , recv will raise EAGAIN
