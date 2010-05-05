@@ -202,6 +202,8 @@ class Socket # [
   # if no data is available.
   # If a Ruby Socket is blocking, read will wait for specified number
   # of bytes to be received, allowing other Ruby Threads to run.
+  # If EOF encountered on the socket, while return fewer than length bytes
+  #  or will return nil.
 
   def read(length=MaglevUndefined, buffer=MaglevUndefined)
     uu = MaglevUndefined
@@ -226,7 +228,7 @@ class Socket # [
   end
 
 
-  primitive '__read_into', 'read:into:minLength:' # raises EOFError on socket eof
+  primitive '__read_into', 'read:into:minLength:' # returns nil on socket eof
 
   def readpartial(length, buffer=MaglevUndefined)
     if buffer._equal?(MaglevUndefined)
