@@ -1229,7 +1229,8 @@ module MagRp # {
       k_end = val[vofs + 7]   # yacc_value for kEND synthesized EOF
       if k_end._equal?( :tEOF )
 	msg = 'syntax error, unexpected $end, expecting kEND'
-	msg << ", for   class   near line #{def_tok.line} "
+        line = self.line_for(cls_token)
+	msg << ", for   class   near line #{line} "
 	msg << self.last_closed_def_message
 	syntax_error(msg)
       end

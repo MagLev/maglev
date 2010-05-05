@@ -88,12 +88,17 @@ task :squeak => 'netldi:start' do
 end
 
 desc "Create .rb files for each smalltalk class (lib/ruby/site_ruby/1.8/smalltalk/*)"
-task :stwrappers => 'maglev:start' do
-  puts "Creating .rb files for smalltalk classes in lib/ruby/site_ruby/1.8/smalltalk/"
-  run_on_stone(["omit resultcheck",
-                "run",
-                "RubyContext createSmalltalkFFIWrappers",
-                "%"])
+task :stwrappers, :force  do |t, args|
+  wrapper_dir = MAGLEV_HOME + '/lib/ruby/site_ruby/1.8/smalltalk'
+  if ! File.exist?(wrapper_dir) || args.force
+    puts "Creating .rb files for smalltalk classes in lib/ruby/site_ruby/1.8/smalltalk/"
+    run_on_stone(["omit resultcheck",
+                  "run",
+                  "RubyContext createSmalltalkFFIWrappers",
+                  "%"])
+  else
+    puts "#{wrapper_dir} already exists"
+  end
 end
 
 namespace :stone do
@@ -127,7 +132,7 @@ namespace :stone do
 end
 
 # Run topaz commands on a particular stone
-def run_on_stone(commands_array, stone='maglev')
+def run_on_stone(commands_array, stone=(ENV['STONENAME'] || 'maglev'))
   Stone.new(stone).topaz_commands(commands_array)
 end
 

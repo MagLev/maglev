@@ -58,7 +58,7 @@ class File
   primitive_nobridge '__next', 'next:'
   primitive_nobridge '__contents', 'contents'  # zero arg variant
 
-  primitive '__read_into', 'read:into:'
+  primitive '__read_into', '_read:into:readAhead:'
   primitive '__flush', 'flush'
   primitive '__rewind', 'rewind'
   primitive_nobridge '__is_open', 'isOpen'
@@ -728,11 +728,11 @@ class File
         self.read(a1)
       end
     else
-      self.read(a1, a2)
+      self.__read(a1, a2)
     end
   end
 
-  def read(a_length, a_buffer)
+  def __read(a_length, a_buffer)
     raise IOError, 'read: closed stream' unless __is_open
     read_all_bytes = a_length._equal?(nil) 
     unless read_all_bytes
@@ -745,7 +745,7 @@ class File
     end
     buffer = Type.coerce_to(a_buffer, String, :to_str)
     length = self.stat.size if length._equal?(nil)
-    num_read = __read_into(length, buffer)
+    num_read = __read_into(length, buffer, true)
     raise IOError, 'error' if num_read._equal?(nil)
     buffer.size = num_read # truncate buffer
     buffer
@@ -777,6 +777,23 @@ class File
     data
   end
 
+  def readpartial(length, buffer=MaglevUndefined)
+    raise IOError, 'read: closed stream' unless __is_open
+    need_trunc = false
+    if buffer._equal?(MaglevUndefined)
+      buffer = ""
+    else
+      buffer = Type.coerce_to(buffer, String, :to_str)
+      need_trunc = true
+    end
+    num_read = self.__read_into(length, buffer, false)
+    raise IOError, 'error' if num_read._equal?(nil)
+    if need_trunc
+      buffer.size = num_read # truncate buffer
+    end
+    buffer
+  end
+
   def sysread(a1=MaglevUndefined, a2=MaglevUndefined)
     uu = MaglevUndefined
     if a2._equal?(uu)
@@ -786,11 +803,11 @@ class File
         self.sysread(a1)
       end
     else
-      self.sysread(a1, a2)
+      self.__sysread(a1, a2)
     end
   end
 
-  def sysread(length, buffer)
+  def __sysread(length, buffer)
     if self.eof?
       raise EOFError, "End of file reached"
     end
