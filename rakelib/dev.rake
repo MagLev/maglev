@@ -8,6 +8,13 @@ require 'rakelib/parser'
 namespace :dev do
   TOPAZ_CMD = "#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
 
+  task :brokenpipe do
+    output = run_on_stone(["run",
+                           "RubyContext load: #() env: 1 .",
+                           "RubyContext loadFileNamed: '/Users/pmclain/GemStone/dev/pbm.rb' env: 1 .",
+                           "%"])
+  end
+
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
 

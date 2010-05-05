@@ -1,7 +1,12 @@
 = MagLev Change Log
 
-* Fix Trac 729, 730, 731
-* Add IO#readpartial
+== Changes for 23447  2010-05-04
+
+* Fix Trac 729, 731/
+* Implements Ruby IO#readpartial for Trac 730
+* Fix hangs in various library/net rubyspecs.
+* Disable use of linenoise if rlwrap is used.
+* Several improvements to underlying GemStone 3.0 system
 
 == Changes for 23416  2010-05-02
 
