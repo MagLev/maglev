@@ -371,7 +371,7 @@ fi
 
 TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
 # If debugging, don't use -q with topaz
-[[ $debugFlag  ]] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l -q $tocsize -I $dbscript "
+[[ $debugFlag  ]] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -I $dbscript "
 
 # echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"
 # echo "GEMSTONE_SYS_CONF = $GEMSTONE_SYS_CONF"
