@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-== Changes for 23447  2010-05-04
+== Changes for 23448  2010-05-05
 
 * Fix Trac 729, 731/
 * Implements Ruby IO#readpartial for Trac 730

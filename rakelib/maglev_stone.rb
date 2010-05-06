@@ -2,13 +2,16 @@
 require File.join(File.dirname(__FILE__), 'contrib/ottobehrens/stone')
 
 # Set the GemStoneInstallation paths for a default install of MagLev, based
-# on $MAGLEV_HOME.
+# on $MAGLEV_HOME, but respect the $GEMSTONE env variable, if set
 ML = ENV['MAGLEV_HOME']
-# installation_directory, config_directory, installation_extent_directory,
-# base_log_directory, backup_directory, initial_extent_name
-GemStoneInstallation.current = GemStoneInstallation.new(
-  "#{ML}/gemstone", "#{ML}/etc/conf.d", "#{ML}/data",
-  "#{ML}/log", "#{ML}/backups", 'extent0.ruby.dbf')
+
+GemStoneInstallation.current =
+  GemStoneInstallation.new( ENV['GEMSTONE'] || "#{ML}/gemstone", # installation_directory
+                            "#{ML}/etc/conf.d",                  # config_directory
+                            "#{ML}/data",                        # installation_extent_directory
+                            "#{ML}/log",                         # base log directory
+                            "#{ML}/backups",                     # backup directory
+                            'extent0.ruby.dbf')                  # initial extent name
 
 class MagLevStone < Stone
   def config_file_template
