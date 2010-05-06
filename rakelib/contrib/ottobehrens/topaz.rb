@@ -61,6 +61,10 @@ class Topaz
     self
   end
 
+  def run_string(commands, login_first=true)
+    system "#{@topaz_command} < #{commands.path}"
+  end
+
   private
 
   def consume_until_prompt(io)
