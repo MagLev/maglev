@@ -50,7 +50,7 @@ class File
     nil 
   end
 
-  primitive_nobridge '__write', 'addAll:'
+  primitive_nobridge '__write', 'write:from:'
   primitive_nobridge '__getc', 'nextByte'
   primitive_nobridge '__peek_byte', 'peekByte'
   primitive_nobridge '__next_line_to', 'nextLineTo:'
@@ -1019,7 +1019,7 @@ class File
 
   def write(arg)
     arg = Type.coerce_to(arg, String, :to_s)
-    count = self.__write(arg)
+    count = self.__write(arg.__size, arg)
     if count._equal?(nil)
       raise IOError , self.__last_err_string  # TODO: Errno::xxx
     end
