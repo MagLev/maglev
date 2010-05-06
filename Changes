@@ -1,5 +1,7 @@
 = MagLev Change Log
 
+# implement Thread#abort_on_exception=
+
 == Changes for 23447  2010-05-04
 
 * Fix Trac 729, 731/
