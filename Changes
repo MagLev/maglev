@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+== Changes for 23462  2010-05-07
+
+* Add Add multi-threaded mfc, fdc, epoch & wsUnionSweep to underlying GemStone 3.0 system
+
 == Changes for 23460  2010-05-07
 
 * Implement Thread#abort_on_exception=
