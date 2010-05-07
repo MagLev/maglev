@@ -6,11 +6,22 @@ class Thread
 
   primitive_nobridge '[]=', 'threadDataAt:put:'
 
+  class_primitive_nobridge '__abort_on_exception', 'rubyExitOnException:'
+
   def self.abort_on_exception
-    false
+    self.__abort_on_exception(nil)
   end
 
-  # MNI self.abort_on_exception=
+  # If maglev-ruby invoked with -d  and  abort_on_exception=(true) was called,
+  # an exception not handled by a rescue will cause execution to stop
+  # for debugging at the topaz prompt before exiting the process.
+  #
+  def self.abort_on_exception=(bool)
+    # Returns the argument .
+    v = bool ? true : false  
+    self.__abort_on_exception(v)
+    bool
+  end
 
   primitive_nobridge 'alive?' , 'alive'
 
