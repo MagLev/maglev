@@ -1,6 +1,8 @@
 = MagLev Change Log
 
-# implement Thread#abort_on_exception=
+== Changes for 23460  2010-05-07
+
+* Implement Thread#abort_on_exception=
 
 == Changes for 23448  2010-05-05
 
