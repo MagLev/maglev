@@ -148,7 +148,7 @@ RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
 RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '23460-1170'
+VERSION = '23464-1170'
 
 TRUE  = true
 FALSE = false
