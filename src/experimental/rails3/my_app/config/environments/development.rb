@@ -17,3 +17,19 @@ MyApp::Application.configure do
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false
 end
+
+if defined? Maglev
+  Exception.install_debug_block do |e|
+    msg = e.instance_variable_get(:@_st_messageText)
+    case e.class.name
+    when 'NoMethodError'
+      nil.pause if msg =~ /undefined method `attribute_method_suffix' for ActiveRecord::Base/
+    when 'RubyThrowException', 'Errno::ENOENT', 'LoadError', 'RubyBreakException'
+      # ignore
+    when 'Exception'
+      nil.pause if msg =~ /return from ensure swallowed an Exception/
+    else
+      puts "-- #{e}    (#{e.class.name})"
+    end
+  end
+end

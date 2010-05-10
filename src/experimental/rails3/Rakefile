@@ -1,15 +1,18 @@
 
 task :default => :test
-RAILS_INCLUDES = %w(actionmailer
+RAILS_INCLUDES = %w(railties
+                    activeresource
+                    activerecord
+                    actionmailer
                     actionpack
                     activemodel
-                    activerecord
-                    activeresource
                     activesupport
-                    railties).inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
+                    ).reverse.inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
 
 MH = ENV['MAGLEV_HOME']
-RAILS_INCLUDES << " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.19/lib"
+TZ_INC = " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.19/lib"
+REQ = '-r tzinfo -r ../core_ext.rb'
+RAILS_INCLUDES << TZ_INC
 
 desc "Run the tests: takes optional file arg: 'rake test[test/foo_test.rb]'"
 task :test, :file do |t, args|
@@ -19,10 +22,17 @@ task :test, :file do |t, args|
   end
 end
 
+desc "Run the std app via gems in maglev"
+task :gemapp do
+  cd('my_app') do
+    sh %{ maglev-ruby -MallIvsDynamic  #{TZ_INC} #{REQ} script/rails server }
+  end
+end
+
 desc "Run the std app my_app with maglev"
 task :app do
   cd('my_app') do
-    sh %{ maglev-ruby -MallIvsDynamic #{RAILS_INCLUDES} -r tzinfo -r ../core_ext.rb script/rails server }
+    sh %{ maglev-ruby -MallIvsDynamic #{RAILS_INCLUDES} #{REQ} script/rails server }
   end
 end
 
@@ -45,5 +55,42 @@ end
 desc "Run multitest in maglev"
 task :mm do
   mmlib = '/Users/pmclain/external/multimap/lib'
-  sh %{ maglev-ruby -I #{mmlib} multitest.rb }  
+  sh %{ maglev-ruby -I #{mmlib} multitest.rb }
+end
+
+desc "cp patches to rubygems; backup originals"
+task :patchgems do
+  gemd = ENV['MAGLEV_HOME'] + '/lib/maglev/gems/1.8/gems'
+  gem_suffix = '-3.0.0.beta3'
+  patches = [
+             # Work around Trac 730: IO#readpartial is not implemented.
+             ['activesupport', 'lib/active_support/secure_random.rb'],
+
+             # Workaround a file not found problem.  Root cause TBD.
+             ['railties', 'lib/rails/application/finisher.rb'],
+             # Work around another issue removing a persistent method in
+             # transient mode.
+             ['activesupport', 'lib/active_support/dependencies.rb'],
+
+             # Workaround MagLev's prohibition on aliasing to __send__.
+             ['activesupport', 'lib/active_support/core_ext/object/try.rb'],
+
+             # Provide MagLev implementation for finding subclasses through
+             # ObjectSpace#loaded_classes rather than
+             # ObjectSpace#each_object.
+             ['activesupport', 'lib/active_support/core_ext/class/subclasses.rb'],
+
+             # Work around issue trying to remove_method on a persistent
+             # module while in transient mode.
+             ['activesupport', 'lib/active_support/core_ext/enumerable.rb']]
+  patches.each do |mod, file|
+    src = "rails/#{mod}/#{file}"
+    dest = "#{gemd}/#{mod}#{gem_suffix}/#{file}"
+    
+    # Backup original
+    cp dest, "#{dest}.orig"
+
+    # Apply patch
+    cp src, dest
+  end
 end

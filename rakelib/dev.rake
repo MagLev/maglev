@@ -6,6 +6,11 @@ require 'rakelib/parser'
 
 
 namespace :dev do
+  desc "Create some TAGS files"
+  task :tags do
+    cd('src') { sh %{ /opt/local/bin/ctags -a -e -f TAGS --tag-relative -R * }}
+  end
+
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
 
