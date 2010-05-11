@@ -276,9 +276,11 @@ class SystemCallError
     end
     exc
   end
+
   def errno=(errnum)
     @_st_gsarguments = [ errnum ]
   end
+
   def errno
     gsa = @_st_gsarguments
     if gsa._equal?(nil)
