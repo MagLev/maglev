@@ -11,4 +11,6 @@ class RegexpWithNamedGroups < Regexp
   end
 end
 
-RegexpWithNamedGroups.new('GET')
+rx = RegexpWithNamedGroups.new('GET')
+unless rx.class._equal?(RegexpWithNamedGroups) ; raise 'error'; end
+true
