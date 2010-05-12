@@ -8,19 +8,19 @@ module OpenSSL
     extend FFI::Library
 
     # TODO: dev builds are messed up and add .dylib.dylib on end
-    ffi_lib "#{ENV['GEMSTONE']}/lib/libcrypto.0.9.8.dylib"
+    ffi_lib "#{ENV['GEMSTONE']}/lib/libcrypto"
 
     # Wraps the <tt>EVP_MD_CTX</tt> struct that holds the message digest
     # information for a digest object.
     #
     #--
     # struct env_md_ctx_st
-    # 	{
-    # 	const EVP_MD *digest;
-    # 	ENGINE *engine; /* functional reference if 'digest' is ENGINE-provided */
-    # 	unsigned long flags;
-    # 	void *md_data;
-    # 	} /* EVP_MD_CTX */;
+    #   {
+    #   const EVP_MD *digest;
+    #   ENGINE *engine; /* functional reference if 'digest' is ENGINE-provided */
+    #   unsigned long flags;
+    #   void *md_data;
+    #   } /* EVP_MD_CTX */;
     #++
     class MDContext < FFI::Struct
       layout(:digest, :pointer,
