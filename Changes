@@ -1,6 +1,8 @@
 = MagLev Change Log
 
 * Fix Trac 738
+* Implement UDPSocket (fixes Trac 735)
+* Fix problem in lexical path for top-level constant defs seen in irb usage.
 
 == Changes for 23464  2010-05-07
 
