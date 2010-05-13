@@ -35,7 +35,7 @@ module Maglev
     # If +s+ is not a +String+, then call <tt>to_str</tt> on it and return
     # the value.  Converts nil to empty string.
     def self.rb_string_value(s)
-      return '' if s.nil?
+      return '' if s._equal?(nil)
       Type.coerce_to(s, String, :to_str) || ''
     end
   end
