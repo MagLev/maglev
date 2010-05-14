@@ -1,18 +1,5 @@
-hangs:Net::HTTP.start returns a new Net::HTTP object for the passed address and port
-hangs:Net::HTTP.start opens the tcp connection
 
-hangs:Net::HTTP.start when passed a block returns the blocks return value
-hangs:Net::HTTP.start when passed a block yields the new Net::HTTP object to the block
-hangs:Net::HTTP.start when passed a block opens the tcp connection before yielding
-hangs:Net::HTTP.start when passed a block closes the tcp connection after yielding
 
-hangs:Net::HTTP#start returns self
-hangs:Net::HTTP#start opens the tcp connection
 
-hangs:Net::HTTP#start when self has already been started raises an IOError
 
-hangs:Net::HTTP#start when passed a block returns the blocks return value
-hangs:Net::HTTP#start when passed a block yields the new Net::HTTP object to the block
-hangs:Net::HTTP#start when passed a block opens the tcp connection before yielding
-hangs:Net::HTTP#start when passed a block closes the tcp connection after yielding
 

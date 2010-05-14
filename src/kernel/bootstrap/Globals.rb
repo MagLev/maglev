@@ -42,6 +42,7 @@ RUBY.global('String', 'String')
 RUBY.global('Symbol', 'Symbol')
 RUBY.global('TCPServer', 'TCPServer')
 RUBY.global('TCPSocket', 'TCPSocket')
+RUBY.global('UDPSocket', 'UDPSocket')
 RUBY.global('Thread', 'GsProcess')
 RUBY.global('ThreadGroup', 'RubyThreadGroup')
 RUBY.global('Time', 'RubyTime')
@@ -143,12 +144,12 @@ RUBY_ENGINE = 'maglev'
 RUBY_PLATFORM = 'Unspecified.platform'
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2010-05-07'
+RUBY_RELEASE_DATE = '2010-05-14'
 RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
 RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '23464-1170'
+VERSION = '23508-1171'
 
 TRUE  = true
 FALSE = false

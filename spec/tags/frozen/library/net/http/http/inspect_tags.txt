@@ -1,1 +1,0 @@
-hangs:Net::HTTP#inspect returns a String representation of self

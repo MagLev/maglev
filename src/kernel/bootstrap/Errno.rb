@@ -49,6 +49,7 @@ module Errno
       exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
     end
     if additional._isString && additional.length > 0
+      exc.__message_append(', ')
       exc.__message_append(additional)
     end
     exc.__signal

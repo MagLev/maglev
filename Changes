@@ -1,5 +1,15 @@
 = MagLev Change Log
 
+== Changes for 23508  2010-05-14
+
+* Fix Trac 738
+* Implement UDPSocket (fixes Trac 735)
+* Fix problem in lexical path for top-level constant defs seen in irb usage.
+* Initial work on FFI wrapper for OpenSSL
+* More improvements and bugfixes in underlying GemStone 3.0 system
+* No longer has problems if you switch networks while a Stone is running
+  which was a real annoyance for laptop users.
+
 == Changes for 23464  2010-05-07
 
 * Add Add multi-threaded mfc, fdc, epoch & wsUnionSweep to underlying GemStone 3.0 system

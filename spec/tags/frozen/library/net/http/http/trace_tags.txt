@@ -1,2 +1,0 @@
-hangs:Net::HTTP#trace sends a TRACE request to the passed path and returns the response
-hangs:Net::HTTP#trace returns a Net::HTTPResponse

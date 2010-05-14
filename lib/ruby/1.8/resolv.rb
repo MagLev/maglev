@@ -653,7 +653,9 @@ class Resolv
         end
 
         def recv_reply
-          reply, from = @sock.recvfrom(UDPSize)
+          rarray = @sock.recvfrom(UDPSize)
+          reply = rarray[0]
+          from = rarray[1]
           return reply, [from[3],from[1]]
         end
 

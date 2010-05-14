@@ -1,2 +1,0 @@
-hangs:Net::HTTP#options sends an options request to the passed path and returns the response
-hangs:Net::HTTP#options returns a Net::HTTPResponse
