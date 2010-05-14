@@ -1,2 +1,0 @@
-hangs:Net::HTTP#put sends an put request to the passed path and returns the response
-hangs:Net::HTTP#put returns a Net::HTTPResponse

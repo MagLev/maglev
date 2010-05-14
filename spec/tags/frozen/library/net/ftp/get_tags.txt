@@ -1,8 +1,3 @@
-hangs:Net::FTP#get (binary mode) sends the RETR command to the server
-hangs:Net::FTP#get (binary mode) returns nil
-hangs:Net::FTP#get (binary mode) saves the contents of the passed remote file to the passed local file
-hangs:Net::FTP#get (binary mode) when passed a block yields the received content as binary blocks of the passed size
-hangs:Net::FTP#get (binary mode) when resuming an existing file saves the remaining content of the passed remote file to the passed local file
 
 fails:Net::FTP#get (binary mode) when opening the data port fails raises a Net::FTPPermError when the response code is 500
 fails:Net::FTP#get (binary mode) when opening the data port fails raises a Net::FTPPermError when the response code is 501
