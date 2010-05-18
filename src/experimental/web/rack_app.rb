@@ -8,13 +8,9 @@
 require 'rack'
 
 $app = Proc.new do |env|
-  $stderr.puts "-- NEW request: #{env['REQUEST_PATH']}"
 
   case env['REQUEST_PATH']
 
-  when '/foo.scgi'
-    $stderr.puts "FOO DOT SCGI"
-    
   when '/start'
     puts "START"
     ns_per_sample = Maglev::Gprof.compute_interval(10)  # figure out for 10 seconds
@@ -47,14 +43,17 @@ $app = Proc.new do |env|
 end
 
 Rack::Builder.new do
-  require 'socket'
   use Rack::ContentLength
-  #Rack::Handler::SCGI.run($app, :Host=> 'localhost', :Port => '4567')
-  #sock = Socket.new(Socket::AF_INET6, Socket::SOCK_STREAM, 0)
-  # addr = Socket.sockaddr_in(4567, 'localhost')
-  sock = TCPServer.new('127.0.0.1', 4567)
-  puts "PASSING SOCKET: #{sock.inspect}"
-  Rack::Handler::SCGI.run($app, :Socket=> sock)
-end
-#Rack::Handler::SCGI.run(app, :Host=> 'localhost', :Port => '4567')
 
+  if defined? Maglev
+    Rack::Handler::SCGI.run($app, :Host=> 'localhost', :Port => '4567')
+  else
+    # MRI by default on my Mac picks an IPV6 localhost:4567 socket.  The
+    # lighttpd scgi plugin does not handle ipv6 (though lighttpd supports
+    # ipv6)
+    require 'socket'
+    sock = TCPServer.new('127.0.0.1', 4567)
+    puts "PASSING SOCKET: #{sock.inspect}"
+    Rack::Handler::SCGI.run($app, :Socket=> sock)
+  end
+end

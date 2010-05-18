@@ -1,14 +1,27 @@
 
 directory 'log'
 
-desc "Run MagLev on the SCGI app"
-task :maglev do
-  sh "#{ENV['MAGLEV_HOME']}/bin/rackup scgi.ru"
+namespace :maglev do
+  desc "Run MagLev on the Sinatra SCGI app"
+  task :sinatra do
+    sh "#{ENV['MAGLEV_HOME']}/bin/rackup scgi.ru"
+  end
+
+  desc "Run MagLev on the rack app"
+  task :rack do
+    sh "maglev-ruby rack_app.rb"
+  end
 end
 
-desc "Run MRI on the SCGI app"
-task :mri do
-  sh "rackup scgi.ru"
+namespace :mri do
+  desc "Run MRI on the Sinatra SCGI app"
+  task :sinatra do
+    sh "rackup scgi.ru"
+  end
+  desc "Run Sinatra on the rack app"
+  task :rack do
+    sh "ruby rack_app.rb"
+  end
 end
 
 desc "Rm the log files and start the lighttpd server"

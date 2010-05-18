@@ -33,7 +33,23 @@ a web environment.  In three separate shells:
   $ rake abprof                # profile maglev
 
 
-== Configuration
+== How it works
+
+* Ruby + Rack + SCGI-gem runs and listens on port 4567
+* lighttpd runs and listens on port 3000 for http requests
+* lighttpd scgi plugin is mounted on "/" and forwards requests to port 4567
+
+The following URLs will show stats for lightty
+TODO:
+* Get multiple Maglev VMs fired up and handling
+== Issues and Workarounds
+
+=== scgi gem does trap on TERM
+
+MagLev doesn't allow trap on TERM, but the scgi gem does a trap.  Comment
+out the offending line in lib/maglev/gems/1.8/gems/scgi-0.9.1/lib/scgi.rb
+
+  # trap("TERM") { @log.info("SIGTERM, forced shutdown."); shutdown(force=true) }
 
 === IPV4 vs IPV6 issues
 
