@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+* added implementation of ARGF - do not use yet
+* Fix Trac 740
+* Fix Object#clone to include dynamic instVars in result
+
 == Changes for 23508  2010-05-14
 
 * Fix Trac 738
