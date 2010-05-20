@@ -299,6 +299,7 @@ class IO
   end
 
   def lineno=(integer)
+    # per specs, does not alter $. 
     if closed?
       raise IOError, 'IO#lineno= on a closed IO'
     end
