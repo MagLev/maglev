@@ -1,5 +1,17 @@
 = MagLev Change Log
 
+== Changes for 23529  2010-05-20
+
+* Fix Trac 740 - Socket::getaddrinfo broken for string protocols
+* Fix Object#clone to copy dynamic instVars
+* Initial cut at implementing ARGF
+* Improvements and bugfixes in underlying GemStone 3.0 system
+* Add missing libcrypto.so on some platforms.
+* Minor performance improvement to timezone offset lookup
+* Added to Smalltalk  Object>>dynamicInstVar*,  Object>>copy includes tags,
+  Object>>tagAt:* renamed to Object>>_tagAt:* and deprecated
+  optimizations to in-memory objectHeader bits accessing.
+
 == Changes for 23508  2010-05-14
 
 * Fix Trac 738
