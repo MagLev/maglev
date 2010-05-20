@@ -3,8 +3,8 @@
 == Changes for 23529  2010-05-20
 
 * Fix Trac 740 - Socket::getaddrinfo broken for string protocols
-* Fix Object#clone to copy dynamic instVars
-* Initial cut at implementing ARGF
+* Fix Object#clone to include dynamic instVars in result
+* Initial cut at implementing ARGF - do not use yet
 * Improvements and bugfixes in underlying GemStone 3.0 system
 * Add missing libcrypto.so on some platforms.
 * Minor performance improvement to timezone offset lookup

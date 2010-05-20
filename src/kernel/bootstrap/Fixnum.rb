@@ -82,6 +82,10 @@ class Fixnum
 
   # abs inherited from Integer
 
+  def clone  
+    raise TypeError , 'cannot clone a Fixnum'
+  end
+
   primitive 'id2name', '_ruby_id2name'
 
   # quo inherited from Integer

@@ -77,6 +77,7 @@ class File
   class_primitive_nobridge '__fopen', '_rubyFopen:mode:' # path is String or Fixnum, mode is a String
               # first arg determines use of fdopen or open
   class_primitive 'stdin'
+  class_primitive '__stdin', 'stdin'
   class_primitive 'stdout'
   class_primitive 'stderr'
   class_primitive_nobridge '__environmentAt', '_expandEnvVariable:isClient:'

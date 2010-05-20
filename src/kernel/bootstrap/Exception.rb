@@ -31,7 +31,9 @@ class Exception
       if m.frozen? 
         # The messages encoded by Smalltalk exceptions are frozen,
         # but ruby allows modifications
-        m = m.dup 
+        unless m._isSymbol
+          m = m.dup 
+        end
       end
       m
     end

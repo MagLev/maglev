@@ -33,10 +33,10 @@ class Symbol
 
   # You may not copy Symbols
   def dup
-    self
+    raise TypeError , 'cannot dup a Symbol'
   end
-  def clone
-    self
+  def clone  
+    raise TypeError , 'cannot clone a Symbol'
   end
 
   primitive_nobridge 'to_i', 'asOop'
