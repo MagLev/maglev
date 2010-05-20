@@ -49,21 +49,28 @@ true
 class C
   # second opening, dynamic IVs
   def ma
-    @dvc = mb(@dva, @dvb)
+    @dvc = mb(@dva, @dvb, @iva)
     x = @dvc
     x 
   end  
-  def mb(a,b)
-    a + b
+  def mb(a,b,c)
+    a + b + c
   end
-  def initialize(a,b)
+  def initialize(a,b,c)
     @dva = a
     @dvb = b
+    @iva = c
   end
 end
 
-c = C.new(9,200)
+c = C.new(9,200,5000)
 x = c.ma
-unless x == 209 ; raise 'fail'; end
+unless x == 5209 ; raise 'fail'; end
+d = c.clone 		# coverage of dup/clone with dynamic ivs
+e = c.dup
+rd = d.ma
+re = e.ma
+unless rd == 5209 ; raise 'fail'; end
+unless re == 5209 ; raise 'fail'; end
 true
 
