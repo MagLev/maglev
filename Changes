@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-== Changes for 23529  2010-05-20
+== Changes for 23530  2010-05-20
 
 * Fix Trac 740 - Socket::getaddrinfo broken for string protocols
 * Fix Object#clone to include dynamic instVars in result
