@@ -114,14 +114,41 @@ class Socket # identical to smalltalk RubySocket # [
     else
       raise TypeError , 'service must be nil, a Fixnum or a String'
     end
-    family = Type.coerce_to(family, Fixnum, :to_int)
+    if family._isStringOrSymbol
+      fstr = family.to_s		# fix Trac 740
+      # constants like AF_INET are undefined during bootstrap, and are defined
+      # transiently during normal VM initialization to be OS-dependent values 
+      #  by smalltalk code in RubyContext>>_initTransient: .
+      if fstr == 'AF_INET'
+        family = AF_INET 
+      elsif fstr == 'AF_INET6'
+        family = AF_INET6 
+      else
+        raise TypeError, "getaddrinfo: family #{fstr} not supported yet"
+      end
+    end
+    unless family._isFixnum
+      raise TypeError , 'getaddrinfo: family must be a Fixnum or a String'
+    end
     socktype = Type.coerce_to(socktype, Fixnum, :to_int)
     protocol = Type.coerce_to(protocol, Fixnum, :to_int)
     flags = Type.coerce_to(flags, Fixnum, :to_int)
     args = [ host, serv, family, socktype, protocol, flags]
-    res = __getaddrinfo( args )
+    if socktype._equal?(0)
+      # getaddrinfo() system call may give 'EAI error 9' with hints.ai_socktype==0, 
+      #  so iterate explicitly over the common socket types
+      args[3] = SOCK_STREAM
+    end
+    res = self.__getaddrinfo(args)
     if res._isString
       raise SocketError, res
+    end
+    if socktype._equal?(0)
+      args[3] = SOCK_DGRAM
+      dg_res = self.__getaddrinfo(args)
+      unless dg_res._isString
+         res.concat( dg_res)
+      end
     end
     return res
   end
