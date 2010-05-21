@@ -297,12 +297,12 @@ module Maglev
       full ? __stone_name : __stone_name[/.*!(.*)$/,1]
     end
 
-    # ########################################
+    #--
     # Support for statmonitor statistics
     #
     # See the GS64 System Administration Guide, Appendix G: "statmonitor
     # and VSD reference" for details on the statistics system.
-    # ########################################
+    #++
 
     # Returns an Array whose contents are described by the result of the
     # _cache_statistics_description method.  The Array contains statistics
@@ -345,5 +345,40 @@ module Maglev
 
     # Returns the cache statistics for the current session.
     class_primitive_nobridge 'my_cache_statistics', 'myCacheStatistics'
+
+
+    # The system reserves 47 counters for use by the application.  The
+    # *_session_stat methods access and modify these counters.
+    class_primitive_nobridge '_session_stat_at', '_sessionCacheStatAt:'
+    class_primitive_nobridge '_session_stat_at_put', '_sessionCacheStatAt:put:'
+
+    class_primitive_nobridge '_increment_session_stat', '_sessionCacheStatAt:incrementBy:'
+    class_primitive_nobridge '_decrement_session_stat', '_sessionCacheStatAt:decrementBy:'
+
+    # Gets the value of the session statistic at the specified index (which
+    # should be in the range 0 to 47).
+    def self.get_session_stat(index)
+      raise "Session stat index must be 0..47" unless (0..47).include? index
+      _session_stat_at(index)
+    end
+
+    # Set the session statistic at the specified index (which should be in
+    # the range 0 to 47) to the specified value i, which must be a Fixnum.
+    def self.set_session_stat(index, value)
+      raise "Session stat index must be 0..47" unless (0..47).include? index
+      _session_stat_at_put(index, value)
+    end
+
+    # Increments the session statistic at +index+ by +delta+ (default 1).
+    def self.increment_session_stat(index, delta=1)
+      raise "Session stat index must be 0..47" unless (0..47).include? index
+      _increment_session_stat(index, delta)
+    end
+
+    # Decrements the session statistic at +index+ by +delta+ (default 1).
+    def self.decrement_session_stat(index, delta=1)
+      raise "Session stat index must be 0..47" unless (0..47).include? index
+      _decrement_session_stat(index, delta)
+    end
   end
 end
