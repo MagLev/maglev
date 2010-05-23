@@ -1,5 +1,8 @@
 = MagLev Change Log
 
+* ARGF now works 
+* possible for for Trac 734 
+
 == Changes for 23530  2010-05-20
 
 * Fix Trac 740 - Socket::getaddrinfo broken for string protocols
