@@ -1,5 +1,7 @@
 = MagLev Change Log
 
+== Changes for 23540  2010-05-23
+
 * ARGF now works 
 * possible for for Trac 734 
 
