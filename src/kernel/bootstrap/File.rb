@@ -76,10 +76,10 @@ class File
   class_primitive_nobridge '__open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
   class_primitive_nobridge '__fopen', '_rubyFopen:mode:' # path is String or Fixnum, mode is a String
               # first arg determines use of fdopen or open
-  class_primitive 'stdin'
-  class_primitive '__stdin', 'stdin'
-  class_primitive 'stdout'
-  class_primitive 'stderr'
+  class_primitive 'stdin', '_stdinServer'
+  class_primitive '__stdin', '_stdinServer'
+  class_primitive 'stdout', '_stdoutServer'
+  class_primitive 'stderr', '_stderrServer'
   class_primitive_nobridge '__environmentAt', '_expandEnvVariable:isClient:'
   class_primitive_nobridge '__delete', 'removeServerFile:'
 
@@ -667,7 +667,7 @@ class File
     permission = Type.coerce_to(arg, Fixnum, :to_int)
     status = File.__modify_file( 10, @_st_fileDescriptor, permission, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.chmod failed')
+      Errno.raise_errno(status, 'File#chmod failed')
     end
     return 0
   end
@@ -675,7 +675,7 @@ class File
   def chown(owner, group)
     status = File.__modify_file( 12, @_st_fileDescriptor, owner, group)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.chown failed')
+      Errno.raise_errno(status, 'File#chown failed')
     end
     return 0
   end
@@ -894,7 +894,7 @@ class File
   def flock(lock_constant)
     status = File.__modify_file(11, @_st_fileDescriptor, lock_constant)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.flock failed')
+      Errno.raise_errno(status, 'File#flock failed')
     end
     status
   end
@@ -914,7 +914,7 @@ class File
     end
     status = File.__modify_file(16, @_st_fileDescriptor, nil, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.fsync failed') 
+      Errno.raise_errno(status, 'File#fsync failed') 
     end
     0
   end
@@ -935,7 +935,7 @@ class File
   def lchown(owner, group)
     status = File.__modify_file( 4, @_st_pathName, owner, group)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.lchown failed')
+      Errno.raise_errno(status, 'File#lchown failed')
     end
     return 0
   end
@@ -955,6 +955,30 @@ class File
     self.stat.mtime
   end
 
+  def __mode
+    @_st_mode
+  end
+
+  def reopen(arg1, mode=MaglevUndefined)
+    if mode._equal?(MaglevUndefined)
+      self.reopen(arg1)
+    end
+    
+  end
+
+  primitive_nobridge '__fopen', '_fopen:mode:'
+
+  def reopen(other_io)
+    unless other_io._kind_of?(File)
+      raise TypeError , 'File#reopen can only reopen another File.'
+    end
+    status = self.__fopen(other_io.path, other_io.__mode)
+    if status._isFixnum
+      Errno.raise_errno(status, 'File#reopen failed' )
+    end
+    self
+  end
+
   def rewind
     self.__rewind
     self.lineno=(0)
@@ -970,7 +994,7 @@ class File
     end
     res = File.__fstat(@_st_fileDescriptor, false)
     if (res._isFixnum)
-      Errno.raise_errno(status, 'aFile.stat failed')
+      Errno.raise_errno(status, 'File#stat failed')
     end
     return res
   end
@@ -1011,7 +1035,7 @@ class File
     a_length = Type.coerce_to(a_length, Fixnum, :to_int)
     status = File.__modify_file( 15, @_st_fileDescriptor, a_length, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.truncate failed')
+      Errno.raise_errno(status, 'File#truncate failed')
     end
     return 0
   end
