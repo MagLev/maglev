@@ -488,7 +488,7 @@ class TCPSocket  # < IPSocket in Smalltalk bootstrap
 
   # open binds a socket to a port and does a blocking connect,
   #  returning a blocking socket.
-  class_primitive 'open', 'new:port:'
+  class_primitive '__new', 'new:port:'
   class_primitive '__open', 'open:'
 
   def self.new(host, port=MaglevUndefined)
@@ -496,14 +496,18 @@ class TCPSocket  # < IPSocket in Smalltalk bootstrap
       host = 'localhost'
     end
     if port._equal?(MaglevUndefined)
-      self.__open(host)
+      res = self.__open(host)
     else
-      self.open(host, port)
+      res = self.__new(host, port)
     end
+    if res._equal?(nil)
+      raise Errno::ECONNREFUSED
+    end
+    res
   end
 
-  def self.open(host)
-    self.__open(host)
+  def self.open(host, port=MaglevUndefined)
+    self.new(host, port)
   end
 
 end
@@ -550,7 +554,11 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
     # hostname   ''   maps to INADDR_ANY
     hostname = Type.coerce_to(hostname, String, :to_str)
     port = Type.coerce_to(port, Fixnum, :to_int)
-    self.__connect(port, hostname)
+    status = self.__connect(port, hostname)
+    if status._equal?(false)
+      raise Errno::ECONNREFUSED
+    end
+    self
   end
 
   # def recvfrom(length, flags) ; end  
