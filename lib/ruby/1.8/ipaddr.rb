@@ -461,11 +461,12 @@ class IPAddr
     # It seems AI_NUMERICHOST doesn't do the job.
     #Socket.getaddrinfo(left, nil, Socket::AF_INET6, Socket::SOCK_STREAM, nil,
     #		       Socket::AI_NUMERICHOST)
-    begin
-      IPSocket.getaddress(prefix)		# test if address is vaild
-    rescue
-      raise ArgumentError, "invalid address"
-    end
+  # maglev patch, don't use IPSocket.getaddress  here , it causes spec failures
+  # begin
+  #   IPSocket.getaddress(prefix)		# test if address is vaild
+  # rescue
+  #   raise ArgumentError, "invalid address"
+  # end
     @addr = @family = nil
     if family == Socket::AF_UNSPEC || family == Socket::AF_INET
       @addr = in_addr(prefix)

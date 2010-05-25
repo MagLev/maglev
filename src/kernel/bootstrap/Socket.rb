@@ -211,6 +211,7 @@ class Socket # identical to smalltalk RubySocket # [
 
   primitive '__last_err_code', 'lastErrorCode'
   primitive '__last_err_string', 'lastErrorString'
+  class_primitive '__last_err_string', 'lastErrorString'
 
   class_primitive 'new', 'new:type:proto:'
 
@@ -467,7 +468,18 @@ end # ]
 
 
 class IPSocket
-  class_primitive 'getaddress', 'getHostAddressByName:'
+  class_primitive '__getaddress', 'getHostAddressByName:'
+
+  def self.getaddress(hostname)
+    hostname = Type.coerce_to(hostname, String, :to_str)  
+    addr = self.__getaddress(hostname)
+    if addr._equal?(nil)
+      detail = self.__last_err_string
+      raise SocketError , (detail._equal?(nil) ? 'no details' : detail)
+    end
+    addr
+  end
+
   primitive 'peeraddr', 'rubyPeerAddress'
   primitive 'addr', 'rubyAddress'
 end
