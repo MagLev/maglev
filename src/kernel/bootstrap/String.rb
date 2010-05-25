@@ -1834,7 +1834,22 @@ class String
   def tr!(from_str, to_str)
     from = Type.coerce_to(from_str, String, :to_str)
     to   = Type.coerce_to(to_str,   String, :to_str)
-    __tr!(from, to)
+
+    # Make the case for single character replacement more efficient.
+    # Avoids creating a translation table.
+    if from.size == 1 && to.size == 1
+      fchar = from[0]
+      tochar = to[0]
+      lim = size
+      i = 0
+      while (i < lim)
+        self[i] = tochar if self[i] == fchar
+        i += 1
+      end
+      self
+    else
+      __tr!(from, to)
+    end
   end
 
   #     str.tr(from_str, to_str)   => new_str
