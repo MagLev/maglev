@@ -1,6 +1,5 @@
 class String
 
-
   def to_rx
     Regexp.new(self)
   end
@@ -152,7 +151,7 @@ class String
     self
   end
 
-  def chars(&block)	# added for 1.8.7
+  def chars(&block) # added for 1.8.7
     # Maglev not yet KCODE aware
     unless block_given?
       return StringCharEnumerator.new(self, :chars)
@@ -395,7 +394,7 @@ class String
   #     "hello".chomp("llo")     #=> "he"
   def chomp(separator=$/)
     str = self.dup
-    res = str.chomp!(separator) 
+    res = str.chomp!(separator)
     if res._equal?(nil)
       res = str
     end
@@ -406,7 +405,7 @@ class String
   #
   #  Modifies <i>str</i> in place as described for <code>String#chomp</code>,
   #  returning <i>str</i>, or <code>nil</code> if no modifications were made.
-  def chomp!(sep=$/) 
+  def chomp!(sep=$/)
     return nil  if sep._equal?(nil)
     my_size = self.__size
     return nil  if my_size._equal?(0)
@@ -427,9 +426,9 @@ class String
         sz = my_size
         while sz > 0 && self.__at(sz-1)._equal?( ?\n )
           if sz > 1 && self.__at(sz-2)._equal?( ?\r )
-            sz -= 2 
+            sz -= 2
           else
-            sz -= 1 
+            sz -= 1
           end
         end
         return nil  if sz._equal?( my_size )
@@ -437,7 +436,7 @@ class String
       else
         sep_size = separator_sz
         sz = my_size
-        return nil  if sep_size > sz 
+        return nil  if sep_size > sz
         sep_size = -sep_size
         while sep_size < 0
           return nil  if sep.__at(sep_size) != self.__at(sep_size)
@@ -447,7 +446,7 @@ class String
       end
     end
     self
-  end 
+  end
 
   #  call-seq:
   #     str.chop   => new_str
@@ -480,8 +479,8 @@ class String
       if self.__at(-1)._equal?( ?\n )
         if my_size > 1 && self.__at(-2)._equal?( ?\r )
           self.__size=(my_size - 2)
-	else
-	  self.__size=(my_size - 1)
+        else
+          self.__size=(my_size - 1)
         end
       else
         self.__size=(my_size - 1)
@@ -493,8 +492,8 @@ class String
 
   alias concat <<
 
-  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
-  primitive 'count*', 'rubyCount:'
+    # arg to rubyCount: is expected to be an Array , so declare as 'count*'
+    primitive 'count*', 'rubyCount:'
 
   # MNI: crypt
 
@@ -573,33 +572,33 @@ class String
     if sep_size._equal?(1)
       i += 1
       while i < my_size
-        if self.__at(i-1)._equal?(newline) 
-	  line = self.__at(last, i-last)
-	  # line.taint if tainted?
-	  block.call( line )
-	  # We don't have a way yet to check if the data was modified...
-	  #modified? id, my_size
-	  last = i
-	end
+        if self.__at(i-1)._equal?(newline)
+          line = self.__at(last, i-last)
+          # line.taint if tainted?
+          block.call( line )
+          # We don't have a way yet to check if the data was modified...
+          #modified? id, my_size
+          last = i
+        end
         i += 1
       end
     elsif sep_size._equal?(0)
       while i < my_size
-	if self.__at(i)._equal?( ?\n )
-	  if self.__at(i+=1)._not_equal?( ?\n )
-	    i += 1
-	    next
-	  end
+        if self.__at(i)._equal?( ?\n )
+          if self.__at(i+=1)._not_equal?( ?\n )
+            i += 1
+            next
+          end
           i += 1 while i < my_size && self.__at(i)._equal?( ?\n )
         end
-        if i > 0 && self.__at(i-1)._equal?( newline ) 
-	  line = self.__at(last, i-last)
-	  # line.taint if tainted?
-	  block.call( line )
-	  # We don't have a way yet to check if the data was modified...
-	  #modified? id, my_size
-	  last = i
-	end
+        if i > 0 && self.__at(i-1)._equal?( newline )
+          line = self.__at(last, i-last)
+          # line.taint if tainted?
+          block.call( line )
+          # We don't have a way yet to check if the data was modified...
+          #modified? id, my_size
+          last = i
+        end
         i += 1
       end
     else
@@ -607,13 +606,13 @@ class String
       while i < my_size
         if self.__at(i-1)._equal?(newline) &&
             (sep_size < 2 || self.__at_equals( i - sep_size + 1, sep))
-	  line = self.__at(last, i-last)
-	  # line.taint if tainted?
-	  block.call( line )
-	  # We don't have a way yet to check if the data was modified...
-	  #modified? id, my_size
-	  last = i
-	end
+          line = self.__at(last, i-last)
+          # line.taint if tainted?
+          block.call( line )
+          # We don't have a way yet to check if the data was modified...
+          #modified? id, my_size
+          last = i
+        end
         i += 1
       end
     end
@@ -641,19 +640,19 @@ class String
     self
   end
 
-  alias each_char chars		# changed to an alias  for 1.8.7
+  alias each_char chars   # changed to an alias  for 1.8.7
 
   primitive 'empty?', 'isEmpty'
 
   def end_with?(*args)  # added for 1.8.7
-    n = 0 
+    n = 0
     lim = args.__size
     my_siz = self.__size
     while n < lim
       str = args[n]
       begin
         str = Type.coerce_to(str, String, :to_str)
-        if self.__at_equals(my_siz - str.__size + 1 , str) 
+        if self.__at_equals(my_siz - str.__size + 1 , str)
           return true
         end
       rescue
@@ -755,20 +754,20 @@ class String
 
       cap = self.__at(index)
       if cap._equal?( ?& )
-          result << match.__at(0)
+        result << match.__at(0)
       elsif cap._equal?( ?` )
-          result << match.pre_match
+        result << match.pre_match
       elsif cap._equal?( ?' )
-          result << match.post_match
+        result << match.post_match
       elsif cap._equal?( ?+ )
-          result << match.captures.compact.__at(-1).to_s
+        result << match.captures.compact.__at(-1).to_s
       elsif cap >= ?0 && cap <= ?9
-          result << match.__at(cap - ?0 ).to_s
+        result << match.__at(cap - ?0 ).to_s
       elsif cap._equal?( ?\\ ) # escaped backslash
-          result << '\\'
+        result << '\\'
       else     # unknown escape
-          result << '\\'
-          result << cap
+        result << '\\'
+        result << cap
       end
       index += 1
     end
@@ -863,13 +862,13 @@ class String
     str = self.dup
     idx = 0
     dest_idx = nil
-    lim = str.__size    
+    lim = str.__size
     ch = str.__at(idx)
     while idx < lim
       nxt = str.__at(idx + 1)
       if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
         dest_idx = idx
-        break  
+        break
       end
       idx += 1
       ch = nxt
@@ -877,14 +876,14 @@ class String
     while idx < lim
       nxt = str.__at(idx + 1)
       if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
-	# do not include ch in result
+        # do not include ch in result
       else
         str[dest_idx] = ch
         dest_idx += 1
       end
       idx += 1
       ch = nxt
-    end 
+    end
     if dest_idx._not_equal?(nil)
       str.size=(dest_idx)
     end
@@ -905,7 +904,7 @@ class String
     # Because 0b1 is a proper hex number, rather than the binary number 1,
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
 
-    s = self.__delete_single_underscores_strip  # for 1.8.7 
+    s = self.__delete_single_underscores_strip  # for 1.8.7
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
     Integer.__from_string( "16r#{$1}#{$3}" )
   end
@@ -922,7 +921,7 @@ class String
   def index(item, offset=MaglevUndefined, &block)
     # came here via a bridge from args*
     if offset._equal?(MaglevUndefined)
-      self.__index(item, 0, 0x50)  
+      self.__index(item, 0, 0x50)
     else
       offset = Type.coerce_to(offset, Integer, :to_int)
       self.__index(item, offset, 0x50)
@@ -988,7 +987,7 @@ class String
 
   primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
 
-  primitive 'inspect', '_rubyPrintString'  
+  primitive 'inspect', '_rubyPrintString'
 
   def intern
     if self.__size._equal?(0)
@@ -1044,7 +1043,7 @@ class String
       begin
         regexp = Regexp.new(pattern.to_str)
       rescue StandardError
-          raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+        raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
       end
     end
     regexp.__match_vcglobals(self, 0x30)
@@ -1054,7 +1053,7 @@ class String
   # MNI: next!
 
   def oct
-    str = self.__delete_single_underscores_strip  # for 1.8.7 
+    str = self.__delete_single_underscores_strip  # for 1.8.7
     arr = str.__extract_base(8)
     base = arr.__at(0)
     str = arr.__at(1)
@@ -1076,7 +1075,7 @@ class String
       end
       return [ self.dup , '', '' ]
     elsif pattern._isRegexp
-      md = pattern.__search(self, 0, nil) 
+      md = pattern.__search(self, 0, nil)
       md.__storeRubyVcGlobal(0x20) # store into caller's $~
       if md._not_equal?(nil)
         idx = md.begin(0)
@@ -1089,7 +1088,7 @@ class String
       return self.partition(pstr)
     end
   end
- 
+
   def partition(&block)
     # reimplement for 1.8.7, otherwise bridge meths hide the implem in Enumerable.
     left = []
@@ -1184,7 +1183,7 @@ class String
   end
 
   def rpartition(pattern)  # added for 1.8.7
-    my_siz = self.__size 
+    my_siz = self.__size
     if pattern._isString
       arg_siz = pattern.__size
       if arg_siz._not_equal?(0)
@@ -1196,7 +1195,7 @@ class String
       end
       return [ '', '', self.dup ]
     elsif pattern._isRegexp
-      md = pattern.__search(self, my_siz , 0) 
+      md = pattern.__search(self, my_siz , 0)
       md.__storeRubyVcGlobal(0x20) # store into caller's $~
       if md._not_equal?(nil)
         idx = md.begin(0)
@@ -1219,7 +1218,7 @@ class String
   primitive '__size', 'size'
 
   primitive 'size=', 'size:'  # Note size=() not in MRI
-  primitive '__size=', 'size:'  
+  primitive '__size=', 'size:'
 
   alias slice []
 
@@ -1543,13 +1542,13 @@ class String
   primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
 
   def start_with?(*args)  # added for 1.8.7
-    n = 0 
+    n = 0
     lim = args.__size
     while n < lim
       str = args[n]
       begin
         str = Type.coerce_to(str, String, :to_str)
-        if self.__at_equals(1 , str) 
+        if self.__at_equals(1 , str)
           return true
         end
       rescue
@@ -1607,9 +1606,9 @@ class String
     #   blocks's home method and caller's home method are the same
     regex = self.__get_pattern(pattern, true)
     if (match = regex.__match_vcglobals(self, 0x30))
-       res = __replace_match_with(match, block.call(match.__at(0)).to_s)
+      res = __replace_match_with(match, block.call(match.__at(0)).to_s)
     else
-       res = self.dup
+      res = self.dup
     end
     res
   end
@@ -1773,7 +1772,7 @@ class String
     end
     str = self.__delete_underscore_strip
     if base._equal?(0)
-      arr = str.__extract_base(10) 
+      arr = str.__extract_base(10)
       base = arr.__at(0)
       str = arr.__at(1)
     end
@@ -1806,7 +1805,7 @@ class String
     Integer.__from_string(s)
   end
 
-  # to_a inherited from Enumerable,  uses each 
+  # to_a inherited from Enumerable,  uses each
 
   def to_s
     if self.class._equal?(String)
