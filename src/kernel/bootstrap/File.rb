@@ -734,45 +734,39 @@ class File
   end
 
   def __read(a_length, a_buffer)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
+    raise IOError, 'read: closed stream' unless self.__is_open
+    unless a_length._equal?(nil)
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
       return nil if self.pos > self.stat.size
     end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
     buffer = Type.coerce_to(a_buffer, String, :to_str)
     length = self.stat.size if length._equal?(nil)
     num_read = __read_into(length, buffer, true)
+    if num_read._equal?(0)
+      return a_length._equal?(nil)  ? '' : nil
+    end
     raise IOError, 'error' if num_read._equal?(nil)
     buffer.size = num_read # truncate buffer
     buffer
   end
 
   def read(a_length)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
+    raise IOError, 'read: closed stream' unless self.__is_open
+    if a_length._equal?(nil)
+      self.__contents # read_all_bytes
+    else
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
-      return nil if self.pos > self.stat.size
+      if length._equal?(0)
+        return ''
+      end
+      self.__next(length)
     end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
-    data = read_all_bytes ? __contents : __next(length)
-    data = '' if data._equal?(nil)
-    data
   end
 
   def read
     raise IOError, 'read: closed stream' unless __is_open
-    if self.eof?
-      return ''
-    end
     data = __contents 
     data = '' if data._equal?(nil)
     data
@@ -809,9 +803,6 @@ class File
   end
 
   def __sysread(length, buffer)
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.read(length, buffer)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -820,9 +811,6 @@ class File
   end
 
   def sysread(length)
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.read(length)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -831,9 +819,6 @@ class File
   end
 
   def sysread
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.__contents
     if str._equal?(nil)
       raise EOFError, "End of file reached"

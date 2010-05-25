@@ -611,12 +611,13 @@ module Maglev
         return true
       end
 
-      return false if stream._equal?(File.__stdin) || argv.__size._equal?(0)
+      if stream._equal?(File.__stdin) || argv.__size._equal?(0)
+        return false
+      end
       @_st_advance = false
       fname = argv.__shift
       @_st_stream = (fname == "-" ? File.__stdin : File.open(fname, "r"))
       $FILENAME = fname
-
       return true
     end
     private :__advance!
