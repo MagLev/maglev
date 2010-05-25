@@ -7,7 +7,7 @@ task :commit do
   sh 'maglev-ruby  commit_code.rb'
 end
 
-desc "Run tets: requires rubygems installed and a patched minitest gem"
+desc "Run test: requires the minitest gem"
 task :test => [:'test:mdb', :'test:persistence', :'test:server']  # :'test:json',
 
 namespace :test do

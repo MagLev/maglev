@@ -14,6 +14,9 @@ module Signal
   # that signal.  During execution of a Block or Proc installed as
   # a signal handler,  handling of other signals eligible to 
   # be handled by Signal#trap is deferred until that block completes.
+  # If VM was invoked with -d, handling of SIGINT by this method will
+  # silently have no effect, and SIGINT will always return control to the topaz
+  # debugger.
   #
   def self.trap(sig, command=nil, &block)
     tnames = TrappableByName
@@ -24,17 +27,17 @@ module Signal
       end
       name = TrappableSignals[sig]
       if name._equal?(nil)
-        raise ArgumentError, 'signal #{sig} is not trappable from Ruby' 
+        raise ArgumentError, "signal #{sig} is not trappable from Ruby" 
       end
       num = sig
     else
-      str = Type.coerce_to(sig, String, :to_str)
+      str = Type.coerce_to(sig, String, :to_s )
       if str[0,3] == 'SIG'
         str = str[3, str.__size - 3]
       end
       num = TrappableByName[str]
       if num._equal?(nil) 
-        raise ArgumentError, 'signal #{sig} is not trappable from Ruby' 
+        raise ArgumentError, "signal #{sig} is not trappable from Ruby" 
       end
     end
     ignore = nil 
@@ -55,13 +58,13 @@ module Signal
         ignore = nil
         blk = Proc.new { Kernel.exit(0) }
       else
-        raise ArgumentError, 'Signal#trap, unsupported String command #{command}'
+        raise ArgumentError, "Signal#trap, unsupported String command #{command}"
       end
     elsif command._isBlock || command._kind_of?(Proc)
       ignore = nil
       blk = command
     else
-      raise ArgumentError, 'Signal#trap, command must be a String Proc, or Block'
+      raise ArgumentError, "Signal#trap, command must be a String Proc, or Block"
     end
     TrappedSignals[num] = blk
     self.__trap_signal(num, ignore, blk)

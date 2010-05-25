@@ -235,7 +235,7 @@ done
 
 
 # Make sure the stone is ready
-$GEMSTONE/bin/waitstone $stone -1 >/dev/null
+$GEMSTONE/bin/waitstone "$stone" -1 >/dev/null
 if [[ $? -ne 0 ]] ; then
     echo "$COMMAND: [Error] The MagLev server \"$stone\" is not running."
     echo "To fix this run \"rake $stone:start\" before running $COMMAND."
@@ -302,6 +302,20 @@ if [[ $debugFlag ]]; then
 display classoops
 EOFB
 fi
+#  turn off the built-in line editor if rlwrap requested
+if [[ $rlwrapFlag ]]; then
+  # note that /usr/bin/which on Solaris always produces $?==0, so be careful
+  #  about how you test result of which.
+  rlwrapExe=$(which rlwrap 2> /dev/null )
+  if [[ -f "$rlwrapExe" ]]; then
+    cat - >> $dbscript <<-EOFRL
+omit lineedit
+EOFRL
+  else
+    echo "WARNING: no executable found for rlwrap, using built-in line editor"
+    $rlwrapFlag=
+  fi
+fi
 #
 cat - >> $dbscript <<-EOF
 set gemstone $stone
@@ -364,10 +378,7 @@ TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
 # echo "GEMSTONE_EXE_CONF = $GEMSTONE_EXE_CONF"
 # echo "TOPAZ_CMD = $TOPAZ_CMD"
 
-# note that /usr/bin/which on Solaris always produces $?==0, so be careful
-#  about how you test result of which.
-rlwrapExe=$(which rlwrap 2> /dev/null )
-if [[ $rlwrapFlag && -f "$rlwrapExe" ]]; then
+if [[ $rlwrapFlag ]]; then
     $rlwrapExe $TOPAZ_CMD
     exitStatus=$?
 else

@@ -7,7 +7,7 @@ module Maglev
     #
     # Given the path to a class, return the class.  E.g.,
     # path might be ::Foo::Bar
-    def rb_path2class(path)
+    def self.rb_path2class(path)
       if path[0] == "#"
         raise ArgumentError, "can't retrieve anonymous class #{path}"
       end
@@ -29,7 +29,14 @@ module Maglev
       end
       ns
     end
-    module_function :rb_path2class
 
+    # rb_string_value from string.c
+    #
+    # If +s+ is not a +String+, then call <tt>to_str</tt> on it and return
+    # the value.  Converts nil to empty string.
+    def self.rb_string_value(s)
+      return '' if s._equal?(nil)
+      Type.coerce_to(s, String, :to_str) || ''
+    end
   end
 end

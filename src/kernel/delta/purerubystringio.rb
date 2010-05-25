@@ -290,6 +290,18 @@ class PureRubyStringIO  < IO
     getc
   end
 
+  def readpartial(length, buffer=MaglevUndefined)
+    if buffer._equal?(MaglevUndefined)
+      res = self.read(length, nil)
+    else
+      res = self.read(length, buffer)
+    end
+    if res._equal?(nil)
+      raise(EOFError, "End of file reached")
+    end
+    res
+  end
+
   def getbyte    # added for 1.8.7
     if @sio_closed_read ; __require_readable ; end
     return nil  if eof?

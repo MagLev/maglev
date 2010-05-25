@@ -299,6 +299,7 @@ class IO
   end
 
   def lineno=(integer)
+    # per specs, does not alter $. 
     if closed?
       raise IOError, 'IO#lineno= on a closed IO'
     end
@@ -525,6 +526,16 @@ class IO
     data
   end
 
+  # def read() ; end  # subclass responsibility
+
+  def readchar 
+    ch = self.getc
+    if ch._equal?(nil)
+      raise EOFError, 'EOF during readchar'
+    end
+    ch
+  end
+
   ##
   # Reads a line as with IO#gets, but raises an EOFError on end of file.
   def readline(separator=$/)
@@ -542,14 +553,6 @@ class IO
     res
   end
 
-  def readchar 
-    ch = self.getc
-    if ch._equal?(nil)
-      raise EOFError, 'EOF during readchar'
-    end
-    ch
-  end
-
   ##
   # Reads all of the lines in +io+ and returns them in an +array+.  Lines
   # are separated by the optional +separator+.  The stream must be opened
@@ -565,6 +568,8 @@ class IO
     end
     r
   end
+
+  # def readpartial() ; end  # subclass responsibility
 
   def __read_into(len, buf)
     res = self.read(len, buf)

@@ -12,6 +12,10 @@ class Boolean
   primitive_nobridge '|' , '__rubyOr:'
 
   primitive_nobridge 'not'
+ 
+  def clone  
+    raise TypeError , 'cannot clone true or false'
+  end
 
   def inspect
     self.to_s

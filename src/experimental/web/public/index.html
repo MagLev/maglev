@@ -1,9 +1,25 @@
 <html>
   <head>
-    <title>Test page</title>
+    <title>SCGI Test Page</title>
   </head>
   <body>
-    <h1>Hi</h1>
+    <h1>SCGI Links</h1>
+    <p>
+      This page is statically served by lighttpd.  The SCGI app is mounted
+      on "/app", and the following links tickle it.
+    </p>
+    <ul>
+      <li><a href="http://localhost:3000/app">/app</a></li>
+      <li><a href="http://localhost:3000/app/start">/app/start</a>Starts maglev Gprof</li>
+      <li><a href="http://localhost:3000/app/stop">/app/stop</a>Stops maglev Gprof</li>
+      <li><a href="http://localhost:3000/app/report">/app/report</a>Reports Gprof</li>
+    </ul>
+    <h1>Lighttpd links</h1>
+    <p>These links are for stats etc. within lighttpd.</p>
+    <ul>
+      <li><a href="http://localhost:3000/server-status">Lighttpd Status</a></li>
+      <li><a href="http://localhost:3000/server-stats">Lighttpd Statistics</a></li>
+    </ul>
   </body>
 </html>
 

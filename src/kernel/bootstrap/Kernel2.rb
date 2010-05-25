@@ -59,14 +59,14 @@ module Kernel
   end
   module_function :rand
 
-  def srand(number=nil)
-    if number._equal?(nil)
-      number = Time.now.to_i
-    else
-      number = number.to_i
-    end
+  def srand(number=MaglevUndefined)
     old_seed = RandomInstance.seed
-    RandomInstance.seed(number)
+    if number._equal?(MaglevUndefined)
+      RandomInstance.next   
+    else
+      number = Type.coerce_to(number, Fixnum, :to_int)
+      RandomInstance.seed(number)
+    end
     old_seed
   end
   module_function :srand

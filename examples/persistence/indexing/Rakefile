@@ -35,3 +35,4 @@ desc "Run the tests"
 task :test do
   sh %{ $MAGLEV_HOME/bin/testrb -Ilib #{FileList['test/*_test.rb']} }
 end
+

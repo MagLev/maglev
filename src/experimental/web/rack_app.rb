@@ -1,10 +1,14 @@
 # A bare-bones app to do Gprof testing of MagLev w/o Sinatra in the way.
 #
 # Usage: maglev-ruby rack_app.rb
+#
+# This uses a Rack SCGI handler to listen for SCGI requests.
+#   Rack::Handler::SCGI takes :Host and :Port and :Socket options
 
 require 'rack'
 
-app = Proc.new do |env|
+$app = Proc.new do |env|
+
   case env['REQUEST_PATH']
 
   when '/start'
@@ -38,5 +42,18 @@ app = Proc.new do |env|
   [200, { 'Content-Type' => 'text/html' }, "<h1>hello</h2>" ]
 end
 
-Rack::Handler::SCGI.run(app, :Host=> 'localhost', :Port => '4567')
+Rack::Builder.new do
+  use Rack::ContentLength
 
+  if defined? Maglev
+    Rack::Handler::SCGI.run($app, :Host=> 'localhost', :Port => '4567')
+  else
+    # MRI by default on my Mac picks an IPV6 localhost:4567 socket.  The
+    # lighttpd scgi plugin does not handle ipv6 (though lighttpd supports
+    # ipv6)
+    require 'socket'
+    sock = TCPServer.new('127.0.0.1', 4567)
+    puts "PASSING SOCKET: #{sock.inspect}"
+    Rack::Handler::SCGI.run($app, :Socket=> sock)
+  end
+end

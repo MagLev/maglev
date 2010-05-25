@@ -31,7 +31,9 @@ class Exception
       if m.frozen? 
         # The messages encoded by Smalltalk exceptions are frozen,
         # but ruby allows modifications
-        m = m.dup 
+        unless m._isSymbol
+          m = m.dup 
+        end
       end
       m
     end
@@ -276,9 +278,11 @@ class SystemCallError
     end
     exc
   end
+
   def errno=(errnum)
     @_st_gsarguments = [ errnum ]
   end
+
   def errno
     gsa = @_st_gsarguments
     if gsa._equal?(nil)

@@ -7,7 +7,7 @@ class String
 
   primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
-  primitive_nobridge '__md5sum', 'md5sum'     # used by lib file  digest/md5.rb
+  primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
@@ -74,10 +74,10 @@ class String
     if (n < 0)
       raise ArgumentError , 'arg must be positive'
     end
-    str = self.class.new
+    str = self.class.__alloc
     if n >= 64
       # optimization to reduce number of iterations for large n
-      kstr = self.class.new
+      kstr = self.class.__alloc
       kstr << self
       k = 1
       klim = n.__divide(16)
@@ -464,7 +464,7 @@ class String
   #     "string".chop       #=> "strin"
   #     "x".chop.chop       #=> ""
   def chop
-    str = self.class.new(self) # preserve species
+    str = self.class.__withAll(self) # preserve species
     str.chop!
     str
   end
@@ -519,7 +519,7 @@ class String
   primitive '__dumpInto' , 'rubyDumpInto:'
 
   def dump
-    res = self.class.new
+    res = self.class.__alloc
     self.__dumpInto(res)
     res
   end
@@ -718,7 +718,7 @@ class String
 
   def gsub(regex, str)
     str = Type.coerce_to(str, String, :to_str)
-    out = self.class.new
+    out = self.class.__alloc
     start = 0
     pat = self.__get_pattern(regex, true)
     last_match = nil
@@ -776,7 +776,7 @@ class String
   end
 
   def __replace_match_with(match, replacement)
-    out = self.class.new
+    out = self.class.__alloc
     out << self._gsub_copyfrom_to(0, match.begin(0) )
     unless replacement._equal?(nil)
       out << replacement.__to_sub_replacement(match)
@@ -795,7 +795,7 @@ class String
       return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
     end
     start = 0
-    out = self.class.new
+    out = self.class.__alloc
     last_match = nil
     self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       last_match = match
@@ -829,7 +829,7 @@ class String
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
     start = 0
-    out = self.class.new
+    out = self.class.__alloc
     self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       out << self._gsub_copyfrom_to(start, match.begin(0) )
       saveTilde = block.__fetchRubyVcGlobal(0)
@@ -1262,17 +1262,17 @@ class String
     start = Type.coerce_to(start, Integer, :to_int)
     len = Type.coerce_to(a_len, Integer, :to_int)
     return nil if len < 0
-    return self.class.new if len._equal?(0)
+    return self.class.__alloc if len._equal?(0)
     start += sz if start < 0
     return nil if start < 0 || start > sz
-    return self.class.new if start._equal?(sz)
+    return self.class.__alloc if start._equal?(sz)
     #  __remove_from_to will detect frozen if changes would occur
     s = __at(start, len)
     stop = start + len
     stop = sz if stop > sz
     __remove_from_to(start + 1, stop) # convert to smalltalk indexing
     if s._equal?(nil)
-      return self.class.new
+      return self.class.__alloc
     end
     s
   end
@@ -1532,7 +1532,7 @@ class String
     # we need to tack on the trailing empty string match.
     # self[0,0] returns an instance of the recievier: support for sub-classes
     ret << self.__at(0,0) if ret && limit && limit < 0 && last_match && last_match.collapsing?
-    ret = ret.map { |str| self.class.new(str) } if !self.instance_of?(String)
+    ret = ret.map { |str| self.class.__withAll(str) } if !self.instance_of?(String)
     ret
   end
 

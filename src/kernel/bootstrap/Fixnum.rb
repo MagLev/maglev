@@ -59,6 +59,7 @@ class Fixnum
   primitive_nobridge '&', '_rubyBitAnd:'
   primitive_nobridge '|', '_rubyBitOr:'
   primitive_nobridge '^', '_rubyBitXor:'
+  primitive_nobridge '__prim_xor', '_rubyBitXor:'
   primitive_nobridge '<<', '_rubyShiftLeft:'
   # >> inherited from Integer
 
@@ -80,6 +81,10 @@ class Fixnum
   primitive_nobridge '__bit_at', 'bitAt:'
 
   # abs inherited from Integer
+
+  def clone  
+    raise TypeError , 'cannot clone a Fixnum'
+  end
 
   primitive 'id2name', '_ruby_id2name'
 

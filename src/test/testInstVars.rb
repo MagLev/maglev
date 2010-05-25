@@ -44,3 +44,33 @@ unless y == 22 ; raise 'err' ; end
 y = o.get_blk
 unless y == [22]; raise 'err' ; end
 true
+
+# coverage for bad bytecode optimimzation seen in rack gem under rails
+class C
+  # second opening, dynamic IVs
+  def ma
+    @dvc = mb(@dva, @dvb, @iva)
+    x = @dvc
+    x 
+  end  
+  def mb(a,b,c)
+    a + b + c
+  end
+  def initialize(a,b,c)
+    @dva = a
+    @dvb = b
+    @iva = c
+  end
+end
+
+c = C.new(9,200,5000)
+x = c.ma
+unless x == 5209 ; raise 'fail'; end
+d = c.clone 		# coverage of dup/clone with dynamic ivs
+e = c.dup
+rd = d.ma
+re = e.ma
+unless rd == 5209 ; raise 'fail'; end
+unless re == 5209 ; raise 'fail'; end
+true
+

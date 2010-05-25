@@ -44,25 +44,52 @@ class Regexp
   #     r3 = Regexp.new('dog', Regexp::EXTENDED)   #=> /dog/x
   #     r4 = Regexp.new(r2)                        #=> /cat/i
   #
-  def self.new(pattern, options = 0, lang = nil)
+  def self.new(pattern, options = MaglevUndefined, lang = MaglevUndefined)
+    # do not pass to initialize more args than incoming non-default args
+    #  (except for case of pattern being a Regexp)
+    uu = MaglevUndefined
     if (pattern._isRegexp)
-      opts = pattern.options
-      lang = nil
-      pattern = pattern.source
+      # options ignored
+      r = self.alloc
+      r.initialize(pattern.source, pattern.options)
+    elsif options._equal?(uu)
+      r = self.alloc
+      r.initialize(pattern)
     else
       opts = options 
       if opts._isFixnum 
         opts = opts & ALL_OPTIONS_MASK
       end
+      if lang._equal?(uu)
+        r = self.alloc
+        r.initialize(pattern, opts)
+      else
+        r = self.alloc
+        r.initialize(pattern, opts, lang)
+      end
     end
-    r = self.alloc
-    r.initialize(pattern, opts, lang)
     r
   end
 
+  def self.new(pattern)
+    r = self.alloc
+    if (pattern._isRegexp)
+      r.initialize(pattern.source, pattern.options)
+    else
+      r.initialize(pattern)
+    end
+    r 
+  end
+
   # Synonym for <code>Regexp.new</code>.
-  def self.compile(pattern, options = 0, lang = nil)
-    self.new(pattern, options, lang)
+  def self.compile(pattern, options = MaglevUndefined, lang = MaglevUndefined)
+    self.new(pattern, options, lang);
+  end
+  def self.compile(pattern, options)
+    self.new(pattern, options)
+  end
+  def self.compile(pattern)
+    self.new(pattern)
   end
 
   def ==(otherRegexp)
@@ -98,12 +125,12 @@ class Regexp
 
   # def inspect  # implemented in common/regex.rb
 
-  def initialize(str, options=nil, lang=nil)   # 3rd arg language ignored
+  def initialize(str, options=nil, lang=nil) 
     # if options == nil, prim defaults to case insensitive
     if options._equal?(nil)
       opts = 0
     elsif options._isFixnum
-      opts = options 
+      opts = options
     elsif options._equal?(false)
       opts = 0
     else
@@ -111,12 +138,35 @@ class Regexp
     end
     if lang._not_equal?(nil)
       if lang._isString
-        opts = self.class.__opts_from_lang(lang, opts)     
+        opts = self.class.__opts_from_lang(lang, opts)
       else
         raise ArgumentError , 'regex.initialize lang not a String'
       end
     end
     res = __compile(str, opts)
+    if res._not_equal?(self)
+      raise RegexpError, (res.to_str)  # error from onig_new
+    end
+    res
+  end
+
+  def initialize(string)
+    res = __compile(string, 0)
+    if res._not_equal?(self)
+      raise RegexpError, (res.to_str)  # error from onig_new
+    end
+    res
+  end
+
+  def initialize(string, options)
+    if options._isFixnum
+      opts = options
+    elsif options._equal?(false) || options._equal?(nil)
+      opts = 0
+    else
+      opts = IGNORECASE
+    end
+    res = __compile(string, opts)
     if res._not_equal?(self)
       raise RegexpError, (res.to_str)  # error from onig_new
     end

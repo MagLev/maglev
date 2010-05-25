@@ -4,8 +4,9 @@ class ::Digest::MD5 < ::Digest::Base
     new(*args)
   end
 
-  def intialize(str = nil, *rest)
+  def initialize(str = nil, *rest)
     @data = str
+    self
   end
 
   def block_length
@@ -20,8 +21,7 @@ class ::Digest::MD5 < ::Digest::Base
 
   def finish
     data = Type.coerce_to(@data, String, :to_s)
-    sum = data.__md5sum
-    to_str(sum)
+    data.__md5sum  # result is a hex string
   end
 
   def reset

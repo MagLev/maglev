@@ -1,1 +1,0 @@
-hangs:Net::HTTP#copy sends a COPY request to the passed path and returns the response

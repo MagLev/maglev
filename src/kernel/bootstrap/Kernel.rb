@@ -10,15 +10,6 @@ module Kernel
   # MAGLEV_WARNSTUB = false
   # MAGLEV_SEEN = { }  # TODO, should be a transient hash
 
-  def __stub_warn(msg)
-    #if MAGLEV_WARNSTUB
-    #  unless MAGLEV_SEEN[msg]
-    #    puts "== WARN: STUB: MNI: #{msg}"
-    #    MAGLEV_SEEN[msg] = 1
-    #  end
-    #end
-  end
-
   def load(name, wrap=false)
     if wrap
       raise ArgumentError , 'Kernel.load  , wrap==true not supported yet' # TODO
@@ -706,12 +697,8 @@ module Kernel
     return false
   end
 
-  def trap(signal, proc=MaglevUndefined, &block)
-     if proc._equal?(MaglevUndefined)
-       __stub_warn("Kernel#trap(signal, &block)")
-     else
-      __stub_warn("Kernel#trap(signal, proc)")
-     end
+  def trap(sig, command=nil, &block)
+    Signal.trap(sig, command, &block)
   end
 
   def __as_file(arg)

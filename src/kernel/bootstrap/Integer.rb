@@ -61,8 +61,21 @@ class Integer
   primitive_nobridge '~', 'bitInvert'
   primitive_nobridge '&', '_rubyBitAnd:'
   primitive_nobridge '|', '_rubyBitOr:'
-  primitive_nobridge '^', '_rubyBitXor:'
+  primitive_nobridge '__prim_xor', '_rubyBitXor:'
   primitive_nobridge '<<', '_rubyShiftLeft:'
+
+  def ^(arg)
+    arg = Type.coerce_to(arg, Integer, :to_int)
+    if self < 0 && arg < 0
+      if self == arg
+        0
+      else
+        0 - ((0 - self).__prim_xor(arg))
+      end
+    else
+      __prim_xor(arg)
+    end
+  end
 
   def >>(arg)
     unless arg._isFixnum
@@ -91,7 +104,7 @@ class Integer
 
   def _bit_xor(arg)
     a = Type.coerce_to(arg, Integer, :to_int) 
-    self ^ a 
+    self.__prim_xor( a )
   end
 
   def _shift_left(arg)

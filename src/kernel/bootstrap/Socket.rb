@@ -1,7 +1,7 @@
 #   Maglev does not have a BasicSocket class ,
 #   methods that would be in BasicSocket in MRI are implemented in Socket .
 
-class Socket # [
+class Socket # identical to smalltalk RubySocket # [
 
   # OS dependent constants initialized by smalltalk code
   #  in Socket>>_initTransientSocketConstants , called from RubyContext>>initTransient .
@@ -27,6 +27,9 @@ class Socket # [
     end
     nil
   end
+
+  primitive 'close_read' , 'shutdownReading'
+  primitive 'close_write' , 'shutdownWriting'
 
   primitive '__clear_buffer', '_clearReadBuffer'
 
@@ -103,7 +106,7 @@ class Socket # [
       host = Type.coerce_to(host, String, :to_s)
     end
     if service._equal?(nil)
-      serv = '0'
+      # nil is ok
     elsif service._isFixnum
       serv = service.to_s
     elsif service._isString
@@ -111,14 +114,41 @@ class Socket # [
     else
       raise TypeError , 'service must be nil, a Fixnum or a String'
     end
-    family = Type.coerce_to(family, Fixnum, :to_int)
+    if family._isStringOrSymbol
+      fstr = family.to_s		# fix Trac 740
+      # constants like AF_INET are undefined during bootstrap, and are defined
+      # transiently during normal VM initialization to be OS-dependent values 
+      #  by smalltalk code in RubyContext>>_initTransient: .
+      if fstr == 'AF_INET'
+        family = AF_INET 
+      elsif fstr == 'AF_INET6'
+        family = AF_INET6 
+      else
+        raise TypeError, "getaddrinfo: family #{fstr} not supported yet"
+      end
+    end
+    unless family._isFixnum
+      raise TypeError , 'getaddrinfo: family must be a Fixnum or a String'
+    end
     socktype = Type.coerce_to(socktype, Fixnum, :to_int)
     protocol = Type.coerce_to(protocol, Fixnum, :to_int)
     flags = Type.coerce_to(flags, Fixnum, :to_int)
     args = [ host, serv, family, socktype, protocol, flags]
-    res = __getaddrinfo( args )
-    if res._isFixnum
-      Errno.raise_errno(res, 'getaddrinfo failed')
+    if socktype._equal?(0)
+      # getaddrinfo() system call may give 'EAI error 9' with hints.ai_socktype==0, 
+      #  so iterate explicitly over the common socket types
+      args[3] = SOCK_STREAM
+    end
+    res = self.__getaddrinfo(args)
+    if res._isString
+      raise SocketError, res
+    end
+    if socktype._equal?(0)
+      args[3] = SOCK_DGRAM
+      dg_res = self.__getaddrinfo(args)
+      unless dg_res._isString
+         res.concat( dg_res)
+      end
     end
     return res
   end
@@ -197,16 +227,48 @@ class Socket # [
   # in this case.
 
   # read exactly length bytes from the socket.
+  # If length is undefined,  equivalent to recv(4096)
   # If a Ruby Socket is non-blocking , read will raise EAGAIN
   # if no data is available.
   # If a Ruby Socket is blocking, read will wait for specified number
   # of bytes to be received, allowing other Ruby Threads to run.
-  def read(length)
-    buf = String.__new(length)
-    __read_into(length, buf, length)
+  # If EOF encountered on the socket, while return fewer than length bytes
+  #  or will return nil.
+
+  def read(length=MaglevUndefined, buffer=MaglevUndefined)
+    uu = MaglevUndefined
+    if length._equal?(uu)
+      self.recv(4096)
+    else 
+      length = Type.coerce_to(length, Fixnum, :to_int)
+      if buffer._equal?(uu) 
+        buf = String.__new(length)
+        self.__read_into(length, buf, length)
+      else
+        buffer = Type.coerce_to(a_buffer, String, :to_str)
+        self.__read_into(length, buffer, length)
+      end
+    end
   end
 
-  primitive '__read_into', 'read:into:minLength:' # raises EOFError on socket eof
+  def read(length)
+    length = Type.coerce_to(length, Fixnum, :to_int)
+    buf = String.__new(length)
+    self.__read_into(length, buf, length)
+  end
+
+
+  primitive '__read_into', 'read:into:minLength:' # returns nil on socket eof
+
+  def readpartial(length, buffer=MaglevUndefined)
+    if buffer._equal?(MaglevUndefined)
+      buf = String.__new(length)
+      self.__read_into(length, buf, length)
+    else
+      buffer = Type.coerce_to(a_buffer, String, :to_str)
+      self.__read_into(length, buffer)
+    end   
+  end
 
   # def recv(length) ; end #  receive up to length bytes from the socket.
   #  If a Ruby Socket is non-blocking , recv will raise EAGAIN
@@ -240,6 +302,38 @@ class Socket # [
 
   primitive_nobridge 'send', 'syswrite:'    # one arg form send(string)
 
+  # explicit bridge methods for send,
+  #  send gets no automatic bridge methods in bootstrap
+  def send(a1, a2, a3, *args) 
+    raise ArgumentError, 'too many args'
+  end
+  def send(a1, a2, a3, *args, &block)
+    if block_given
+      raise ArgumentError, 'no block expected'
+    end
+    self.send(a1, a2, a3, *args)
+  end
+  def send(a1, a2, a3, &block)
+    if block_given
+      raise ArgumentError, 'no block expected'
+    end
+    self.send(a1, a2, 3);
+  end
+  def send(a1, a2, &block)
+    if block_given
+      raise ArgumentError, 'no block expected'
+    end
+    self.send(a1, a2);
+  end
+  def send(a1, &block)
+  end
+  def send()
+    raise ArgumentError, 'too few args'
+  end
+  def send(&block)
+    raise ArgumentError, 'too few args'
+  end
+  
   # syswrite attempts to write specified string to the underlying socket.
   # If a Ruby Socket is non-blocking , and the underlying C socket is
   # blocked on output,  a syswrite will raise an EAGAIN error.
@@ -284,7 +378,7 @@ class Socket # [
   #   struct ip_mreq {
   #may     struct  in_addr imr_multiaddr;
   #     struct  in_addr imr_interface;
-  #   };
+  #   }; 
   #
   # In this case #setsockopt could be called like this:
   #   optval =  IPAddr.new("224.0.0.251") + Socket::INADDR_ANY
@@ -398,6 +492,89 @@ class TCPSocket  # < IPSocket in Smalltalk bootstrap
 
   def self.open(host)
     self.__open(host)
+  end
+
+end
+
+class UDPSocket # < IPSocket in Smalltalk bootstrap
+  class_primitive '__new', 'new'
+
+  def self.new(family=nil)
+   
+    unless family._equal?(nil)
+      unless family == AF_INET 
+        raise 'only AF_INET supported'
+      end
+    end
+    self.__new
+  end
+
+  def self.open(family=nil)
+    self.new(family)
+  end 
+
+  primitive '__bind', 'bind:port:'
+
+  def bind(hostname, port)
+    # hostname  '<broadcast>' maps to INADDR_BROADCAST
+    # hostname   ''   maps to INADDR_ANY
+    # port == nil maps to a random port
+    if hostname._equal?(nil)
+      hostname = ''
+    else
+      hostname = Type.coerce_to(hostname, String, :to_str)  
+    end
+    unless port._equal?(nil)
+      port = Type.coerce_to(port, Fixnum, :to_int)
+    end
+    self.__bind(hostname, port)
+    0
+  end
+
+  primitive '__connect', 'connectTo:on:'
+
+  def connect(hostname, port)
+    # hostname  '<broadcast>' maps to INADDR_BROADCAST
+    # hostname   ''   maps to INADDR_ANY
+    hostname = Type.coerce_to(hostname, String, :to_str)
+    port = Type.coerce_to(port, Fixnum, :to_int)
+    self.__connect(port, hostname)
+  end
+
+  # def recvfrom(length, flags) ; end  
+  #   non-zero flags not implemented yet
+  primitive '__recvfrom' , 'recvfrom:flags:'
+
+  def recvfrom(length, flags=0)
+    # non-zero flags not supported yet
+    self.__recvfrom(length, flags)
+  end
+
+  def recvfrom(length)
+    self.__recvfrom(length, 0)
+  end
+
+  def recvfrom_nonblock(length, flags=0)
+    # non-zero flags not supported yet
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.__recvfrom(length, flags)
+  end
+
+  def recvfrom_nonblock(length)
+    @_st_isRubyBlocking = false
+    self.__recvfrom(length, 0)
+  end
+
+  # def send(string, flags) ; end # inherited
+  
+  primitive_nobridge '__sendto*', '_send:flags:host:port:'
+
+  def send(string, flags, host, *args)
+    unless args.__size._equal?(1)
+      raise ArgumentError, 'too many args'
+    end
+    # args[0] is port
+    self.__sendto(string, flags, host, *args)
   end
 
 end

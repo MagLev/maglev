@@ -1,2 +1,0 @@
-hangs:Net::FTP#retrbinary sends the passed command to the server
-hangs:Net::FTP#retrbinary yields the received content as binary blocks of the passed size

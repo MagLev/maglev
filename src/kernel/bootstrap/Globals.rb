@@ -23,6 +23,7 @@ RUBY.global('Bignum', 'LargeInteger')
 RUBY.global('IO', 'IO')
 RUBY.global('IPSocket', 'IPSocket')
 RUBY.global('Kernel', 'Kernel')    # for module Kernel
+RUBY.global('Signal', 'RubySignal')    # for module Signal
 RUBY.global('MatchData', 'MatchData')
 RUBY.global('Method', 'RubyMeth')  # RubyMeth , RubyUnboundMeth defined in .mcz
 RUBY.global('Module', 'Module')    # for class Module
@@ -36,11 +37,13 @@ RUBY.global('Range', 'Range')
 RUBY.global('Regexp', 'Regexp')
 RUBY.global('IdentitySet', 'IdentitySet')
 RUBY.global('SmallDouble', 'SmallDouble')
+RUBY.global('BasicSocket', 'GsSocket')
 RUBY.global('Socket', 'RubySocket')
 RUBY.global('String', 'String')
 RUBY.global('Symbol', 'Symbol')
 RUBY.global('TCPServer', 'TCPServer')
 RUBY.global('TCPSocket', 'TCPSocket')
+RUBY.global('UDPSocket', 'UDPSocket')
 RUBY.global('Thread', 'GsProcess')
 RUBY.global('ThreadGroup', 'RubyThreadGroup')
 RUBY.global('Time', 'RubyTime')

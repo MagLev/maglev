@@ -6,15 +6,17 @@ require 'rakelib/parser'
 
 
 namespace :dev do
-  TOPAZ_CMD = "#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
+  desc "Create some TAGS files"
+  task :tags do
+    cd('src') { sh %{ /opt/local/bin/ctags -a -e -f TAGS --tag-relative -R * }}
+  end
 
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
 
   desc "Run the vm smoke tests"
   task :'vm-tests' => :stwrappers do
-    output = run_on_stone(["run", "RubyContext _runVmUnit", "%"])
-    puts output.join("\n")
+    Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
   end
 
   desc "Run the passing specs"
@@ -113,6 +115,7 @@ namespace :dev do
 
   desc "Run topaz (use rlwrap, if available)"
   task :topaz => :gemstone do
+    TOPAZ_CMD = "#{GEMSTONE}/bin/topaz -q -I #{MAGLEV_HOME}/etc/.topazini -l "
     sh %{ `which rlwrap 2> /dev/null` #{TOPAZ_CMD} }
   end
 

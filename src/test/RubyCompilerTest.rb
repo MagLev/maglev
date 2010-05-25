@@ -25,12 +25,16 @@ class Main {
 }
 EOBS
 
+$aa = 0
 begin
   RubyCompiler.new.compile(bad_source, 'Some Java File or Other')
 rescue SyntaxError
   # OK!
+  $aa = 99
 rescue Exception => e
   raise "Failed: Expected SyntaxError on Java code but got #{e.class}: #{e.inspect}"
+  #nil.pause
 end
+unless $aa == 99 ; raise 'fail'; end
 
 true

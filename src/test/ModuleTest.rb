@@ -173,15 +173,20 @@ $append_features_called = nil
 $included_called = nil
 module MAppendFeatures
   def self.append_features(other)
-    raise "append_features already called" unless $append_features_called.nil?
+    puts "Enter append"
     raise "included already called" unless $included_called.nil?
+    raise "append_features already called" unless $append_features_called.nil?
     $append_features_called = true
+    super(other)
+    puts "Done append"
   end
 
   def self.included(other)
-    raise "append_features already called" unless $append_features_called.equal?(true)
+    puts "Enter included"
+    raise "append_features not called" unless $append_features_called.equal?(true)
     raise "included already called" unless $included_called.nil?
     $included_called = true
+    puts "Done included"
   end
 end
 

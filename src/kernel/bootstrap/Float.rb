@@ -39,6 +39,13 @@ class Float
 
   PlusInfinity = __resolve_smalltalk_global(:PlusInfinity)
 
+  def dup  
+    raise TypeError , 'cannot dup a Float'
+  end
+  def clone  
+    raise TypeError , 'cannot clone a Float'
+  end
+
   def coerce(param)
     if param._isInteger
       return [ param.to_f, self]

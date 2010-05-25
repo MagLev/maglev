@@ -87,20 +87,3 @@ second method, is to use +rackup+, or some other means to start the
 application.  The Sinatra application in <tt>simple_blog</tt> is an example
 of this approach.
 
-=== Issue 2: Persisted version of Sinatra
-
-If you choose to persist the Sinatra code into MagLev, e.g., by running the
-following:
-
-  $ rake xperimental:commit
-
-and then try to invoke your app via the <tt>at_exit</tt> handler, it won't
-work, even if you've done <tt>set :run, true</tt>.  This is because the
-exit handler was setup in the VM that persistently read the Sinatra code,
-and was executed, to no effect, in that VM when it exited.  When you invoke
-<tt>maglev-ruby my_sinatra_app.rb</tt>, the new VM will evaluate
-<tt>require 'sinatra'</tt>, but since it has already been persistently read
-(<tt>$LOADED_FEATURES</tt> is persistently updated as well), the Sinatra
-files are no longer read, and the exit handler is not setup in the current
-VM.  You'll have to use one of the other options to run MagLev (see
-<tt>simple_blog</tt> for an example using <tt>rackup</tt>).

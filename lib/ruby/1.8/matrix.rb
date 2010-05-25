@@ -835,15 +835,20 @@ class Matrix
   #++
   
   #
-  # Returns the determinant of the matrix.  If the matrix is not square, the
-  # result is 0.
+  # Returns the determinant of the matrix.  
+  # If the matrix is not square, the ErrDimensionMismatch is raised.
+  # If the matrix is empty, result is 1
   #   Matrix[[7,6], [3,9]].determinant
   #     => 63
   #
   def determinant
-    return 0 unless square?
+    Matrix.Raise ErrDimensionMismatch unless square?
     
-    size = row_size - 1
+    rsz = row_size  
+    if rsz == 0
+      return 1
+    end
+    size = rsz - 1
     a = to_a
     
     det = 1

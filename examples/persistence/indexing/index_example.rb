@@ -33,7 +33,7 @@ Benchmark.bm do |x|
   }
 
   x.report("Find the youngsters") {
-    youngsters = people.search([:'@age'], :lt, 25)
+    youngsters = people.search([:@age], :lt, 25)
   }
   puts "Found #{youngsters.length} youngsters"
 
@@ -44,8 +44,8 @@ Benchmark.bm do |x|
   # field to turn it into a fully indexed query.
   old_hermits = nil
   x.report("Find old hermits") {
-    old_ones = people.search([:'@age'], :gte, 75)
-    hermits  = people.search([:'@marital_status'], :eql, :hermit)
+    old_ones = people.search([:@age], :gte, 75)
+    hermits  = people.search([:@marital_status], :eql, :hermit)
     old_hermits = hermits & old_ones
   }
 
@@ -66,8 +66,8 @@ Benchmark.bm do |x|
   puts "="*20, " Some lucrative youngsters...", "="*20
   lucrative_youngsters = nil
   x.report("Youngsters in 45678") {
-    young_ones = people.search([:'@age'], :lte, 25)
-    lucrative  = people.search([:'@address', :'@zip'], :eql, 45678)
+    young_ones = people.search([:@age], :lte, 25)
+    lucrative  = people.search([:@address, :@zip], :eql, 45678)
     lucrative_youngsters = young_ones & lucrative
   }
   count = 0
