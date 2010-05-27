@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+== Unreleased Changes
+
+* Update to RubyGems 1.3.7
+
 == Changes for 23540  2010-05-23
 
 * ARGF now works 
