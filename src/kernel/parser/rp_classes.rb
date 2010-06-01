@@ -68,7 +68,7 @@ module MagRp
 
     # end of first opening,  all constants and fixed instVars defined
   end # }
-  Environment.__freeze_constants
+  MagRp.freeze_consts(Environment)
 
   class RubyLexer # {
     def command_start_
@@ -239,7 +239,7 @@ module MagRp
     Expr_IS_beg_mid_dot_arg_cmdarg = Expr_beg | Expr_mid | Expr_dot | Expr_arg | Expr_cmdArg
 
   end # }
-  RubyLexer.__freeze_constants
+  MagRp.freeze_consts(RubyLexer)
 
   class Keyword # {
 #     class KWtable   # class no longer used
@@ -314,7 +314,7 @@ module MagRp
       # def self.keyword( str)  ; end # no longer used
 
   end # }
-  Keyword.__freeze_constants
+  MagRp.freeze_consts(Keyword)
 
   class SrcRegion
     # describes a portion of the source string, used in heredoc implementation

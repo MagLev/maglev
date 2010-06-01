@@ -2446,7 +2446,7 @@ xstring_contents: none
 		      # "singleton: ___ expr opt_nl tRPAREN"  
                       result = val[vofs + 2]
 		      if result._kind_of?(RubyAbstractLiteralNode)
-                        yyerror "Can't  singleton method for literals." 
+                        yyerror "Can't define singleton method for literals." 
 		      end
                     }
 

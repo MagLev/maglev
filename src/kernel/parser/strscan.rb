@@ -1,3 +1,11 @@
+class Regexp
+  class_primitive_nobridge '__new', 'new:options:lang:'  
+
+  primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
+
+  # definitions of ONCE .. ENC_UTF8 moved to racc_def_parser.rb
+end
+MagRp.freeze_consts(Regexp)
 
 module MagRp
 
@@ -225,7 +233,7 @@ class RpStringScanner
 
   # see additional code in strscan2.rb
 end
-RpStringScanner.__freeze_constants
+MagRp.freeze_consts(RpStringScanner)
 
 class RubyLexer
   # replicate some constants heavily used by lexer so they

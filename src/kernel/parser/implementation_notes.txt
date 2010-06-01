@@ -344,3 +344,11 @@ March 2010
   Fix missing increment of @line_num when processing line ending with ?\  .
 
   Fix lexer detection of __END__  to work with DOS files (with cr-lf end-of-lines)
+
+May 2010
+  Fix code in extras.rb and related methods in RubyNode.rb to detect and
+  raise SyntaxError 'void value expression'  for expressions using
+  result of a    break, next or return    as input to a method call ,
+  expression, or assignment.
+  'void value expression'  was not detected by  ruby_parser2.0.3  original code
+  
