@@ -987,7 +987,7 @@ class String
 
   primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
 
-  primitive 'inspect', '_rubyPrintString'
+  primitive 'inspect', '_rubyInspect'
 
   def intern
     if self.__size._equal?(0)
@@ -1837,13 +1837,13 @@ class String
 
     # Make the case for single character replacement more efficient.
     # Avoids creating a translation table.
-    if from.size == 1 && to.size == 1
+    if from.__size._equal?(1) && to.__size._equal?(1)
       fchar = from[0]
       tochar = to[0]
       lim = size
       i = 0
       while (i < lim)
-        self[i] = tochar if self[i] == fchar
+        self[i] = tochar if self[i]._equal?(fchar)
         i += 1
       end
       self
