@@ -13,6 +13,8 @@ class Object
   #  install again here to get bridge methods
   primitive_nobridge 'class', 'class'
 
+  primitive_nobridge '__singleton_class', 'rubySingletonClass'
+
   #  Reimplementation of the following special selectors is disallowed
   #  by the parser and they are optimized by code generator to special bytecodes.
   #  Attempts to reimplement them will cause compile-time errors.
@@ -133,6 +135,11 @@ class Object
   # redefinition of __perform_method disallowed after bootstrap,
   #  it is used by implementation of eval
   primitive_nobridge '__perform_meth', 'performMethod:'
+
+  def __perfrm_call(*args)
+    # invoked only from Object>>_doesNotUnderstand:args:envId:reason: 
+    self.call(*args) 
+  end
 
   primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
   primitive   '__basic_clone', '_basicCopy' # use singleton class
@@ -363,9 +370,7 @@ class Object
 
   def extend(*modules)
     if (modules.length > 0)
-      cl = class << self
-        self
-      end
+      cl = self.__singleton_class
       modules.each do |a_module|
         cl.__include_module(a_module)
         a_module.extended(self)
@@ -485,7 +490,17 @@ class Object
  
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
-  primitive 'remove_instance_variable', 'rubyRemoveIv:'
+  primitive_nobridge '__remove_iv', 'rubyRemoveIv:'
+
+  def remove_instance_variable(name)
+    unless name._isStringOrSymbol
+      name = Type.coerce_to(name, String, :to_str)
+    end
+    if name.__at(0)._not_equal?( ?@ )
+      raise NameError, "intance variable names must begin with '@'"
+    end
+    self.__remove_iv(name)
+  end
 
   def singleton_methods(inc_modules = true)
     Module.__filter_method_names(__ruby_singleton_methods(inc_modules, 0))
