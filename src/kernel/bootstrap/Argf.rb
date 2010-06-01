@@ -197,7 +197,7 @@ module Maglev
     #
     def filename
       __advance!
-      @_st_stream.path
+      @_st_fileName
     end
     alias_method :path, :filename
 
@@ -607,7 +607,7 @@ module Maglev
       if av_siz._equal?(0) && stream._equal?(nil)
         @_st_advance = false
         @_st_stream = File.__stdin
-        $FILENAME = "-"
+        @_st_fileName = "-"
         return true
       end
 
@@ -617,7 +617,7 @@ module Maglev
       @_st_advance = false
       fname = argv.__shift
       @_st_stream = (fname == "-" ? File.__stdin : File.open(fname, "r"))
-      $FILENAME = fname
+      @_st_fileName = fname
       return true
     end
     private :__advance!
