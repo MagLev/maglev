@@ -1,7 +1,8 @@
 class Fixnum
-  # Fixnum is identically  Smalltalk SmallInteger
+  # Fixnum is identically  Smalltalk SmallInteger, 61 bit signed integers
 
-  MAX = 0xfffffffffffffff
+  MAX =  1152921504606846975 # 0xfffffffffffffff
+  MIN = -1152921504606846976
 
   def self.induced_from(obj)
     i = Type.coerce_to(obj, Integer, :to_int)
