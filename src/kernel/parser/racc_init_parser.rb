@@ -3,7 +3,7 @@ module MagRp #
   class Parser
      Racc_reduce_n_negated = 0 - Racc_reduce_n
   end
-  Parser.__freeze_constants
+  MagRp.freeze_consts(Parser)
 
   class RubyParser
 
@@ -141,7 +141,7 @@ module MagRp #
 #      }
 #    end
   end
-  RubyParser.__freeze_constants
+  MagRp.freeze_consts(RubyParser)
 
   __smalltalk_global_put(:RubyParser , RubyParser)  # store into UserGlobals
 

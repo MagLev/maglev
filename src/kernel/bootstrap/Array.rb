@@ -1503,6 +1503,16 @@ class Array
     elem
   end
 
+  def __shift  # used by Argf implementation
+    sz = self.__size
+    elem = nil
+    unless sz._equal?(0)
+      elem = self.__at(0)
+      self.__remove_from_to_(1, 1)  # one-based args
+    end
+    elem
+  end
+
   primitive 'size'
   primitive 'size=', 'size:'
   primitive '__size=', 'size:'

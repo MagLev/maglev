@@ -51,6 +51,7 @@ module MagRp # {
       #   1  trace files parsed by RubyParser
       #   2  include lexer and racc state machine tracing (requires
       #        parser to be generated with racc.sh -D before loading prims)
+      #   3  pause for internal debugging before raising a parse error
       # MAGLEV_parseWarn is either true or false, from RubyArgs>>_parseRubyArgs:
       system_cls = Maglev::__system 
       debug_level = system_cls.session_temp(:MagRpDEBUG)
@@ -213,7 +214,7 @@ module MagRp # {
     Expr_endArg = RubyLexer::Expr_endArg
 
   end # ]
-  RubyParser.__freeze_constants
+  MagRp.freeze_consts(RubyParser)
 
   class Keyword # [
     def self.create_transient_wordlist

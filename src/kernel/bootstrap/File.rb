@@ -76,10 +76,10 @@ class File
   class_primitive_nobridge '__open', '_rubyOpen:mode:permission:'  # 1st is String, 2nd,3rd are ints
   class_primitive_nobridge '__fopen', '_rubyFopen:mode:' # path is String or Fixnum, mode is a String
               # first arg determines use of fdopen or open
-  class_primitive 'stdin'
-  class_primitive '__stdin', 'stdin'
-  class_primitive 'stdout'
-  class_primitive 'stderr'
+  class_primitive 'stdin', '_stdinServer'
+  class_primitive '__stdin', '_stdinServer'
+  class_primitive 'stdout', '_stdoutServer'
+  class_primitive 'stderr', '_stderrServer'
   class_primitive_nobridge '__environmentAt', '_expandEnvVariable:isClient:'
   class_primitive_nobridge '__delete', 'removeServerFile:'
 
@@ -667,7 +667,7 @@ class File
     permission = Type.coerce_to(arg, Fixnum, :to_int)
     status = File.__modify_file( 10, @_st_fileDescriptor, permission, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.chmod failed')
+      Errno.raise_errno(status, 'File#chmod failed')
     end
     return 0
   end
@@ -675,7 +675,7 @@ class File
   def chown(owner, group)
     status = File.__modify_file( 12, @_st_fileDescriptor, owner, group)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.chown failed')
+      Errno.raise_errno(status, 'File#chown failed')
     end
     return 0
   end
@@ -734,45 +734,39 @@ class File
   end
 
   def __read(a_length, a_buffer)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
+    raise IOError, 'read: closed stream' unless self.__is_open
+    unless a_length._equal?(nil)
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
       return nil if self.pos > self.stat.size
     end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
     buffer = Type.coerce_to(a_buffer, String, :to_str)
     length = self.stat.size if length._equal?(nil)
     num_read = __read_into(length, buffer, true)
+    if num_read._equal?(0)
+      return a_length._equal?(nil)  ? '' : nil
+    end
     raise IOError, 'error' if num_read._equal?(nil)
     buffer.size = num_read # truncate buffer
     buffer
   end
 
   def read(a_length)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
+    raise IOError, 'read: closed stream' unless self.__is_open
+    if a_length._equal?(nil)
+      self.__contents # read_all_bytes
+    else
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
-      return nil if self.pos > self.stat.size
+      if length._equal?(0)
+        return ''
+      end
+      self.__next(length)
     end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
-    data = read_all_bytes ? __contents : __next(length)
-    data = '' if data._equal?(nil)
-    data
   end
 
   def read
     raise IOError, 'read: closed stream' unless __is_open
-    if self.eof?
-      return ''
-    end
     data = __contents 
     data = '' if data._equal?(nil)
     data
@@ -809,9 +803,6 @@ class File
   end
 
   def __sysread(length, buffer)
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.read(length, buffer)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -820,9 +811,6 @@ class File
   end
 
   def sysread(length)
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.read(length)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -831,9 +819,6 @@ class File
   end
 
   def sysread
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.__contents
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -894,7 +879,7 @@ class File
   def flock(lock_constant)
     status = File.__modify_file(11, @_st_fileDescriptor, lock_constant)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.flock failed')
+      Errno.raise_errno(status, 'File#flock failed')
     end
     status
   end
@@ -914,7 +899,7 @@ class File
     end
     status = File.__modify_file(16, @_st_fileDescriptor, nil, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.fsync failed') 
+      Errno.raise_errno(status, 'File#fsync failed') 
     end
     0
   end
@@ -935,7 +920,7 @@ class File
   def lchown(owner, group)
     status = File.__modify_file( 4, @_st_pathName, owner, group)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.lchown failed')
+      Errno.raise_errno(status, 'File#lchown failed')
     end
     return 0
   end
@@ -955,6 +940,30 @@ class File
     self.stat.mtime
   end
 
+  def __mode
+    @_st_mode
+  end
+
+  def reopen(arg1, mode=MaglevUndefined)
+    if mode._equal?(MaglevUndefined)
+      self.reopen(arg1)
+    end
+    
+  end
+
+  primitive_nobridge '__fopen', '_fopen:mode:'
+
+  def reopen(other_io)
+    unless other_io._kind_of?(File)
+      raise TypeError , 'File#reopen can only reopen another File.'
+    end
+    status = self.__fopen(other_io.path, other_io.__mode)
+    if status._isFixnum
+      Errno.raise_errno(status, 'File#reopen failed' )
+    end
+    self
+  end
+
   def rewind
     self.__rewind
     self.lineno=(0)
@@ -970,7 +979,7 @@ class File
     end
     res = File.__fstat(@_st_fileDescriptor, false)
     if (res._isFixnum)
-      Errno.raise_errno(status, 'aFile.stat failed')
+      Errno.raise_errno(status, 'File#stat failed')
     end
     return res
   end
@@ -1011,7 +1020,7 @@ class File
     a_length = Type.coerce_to(a_length, Fixnum, :to_int)
     status = File.__modify_file( 15, @_st_fileDescriptor, a_length, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'aFile.truncate failed')
+      Errno.raise_errno(status, 'File#truncate failed')
     end
     return 0
   end

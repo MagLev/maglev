@@ -1,3 +1,7 @@
+#  Maglev note:  aliasing of a global which is listed as 'Thread local'
+#  will take effect at the end of file or eval in which the alias statement
+#  exists, i.e. subsequent compilations will see the alias .
+#
 #  Include the English library file in a Ruby script, and you can
 #  reference the global variables such as \VAR{\$\_} using less
 #  cryptic names, listed in the following table.% \vref{tab:english}.

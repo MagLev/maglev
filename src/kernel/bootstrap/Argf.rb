@@ -2,6 +2,7 @@
 
 module Maglev
   class Argf    # identical to smalltalk RubyArgf,   resolved in Maglev1.rb
+    include Enumerable
 
     # def initialize ; end  # in Smalltalk
 
@@ -56,8 +57,6 @@ module Maglev
         @_st_advance = true 
         @_st_lineno = 0
         @_st_stream = nil
-      else
-        raise IOError , "(first) file has not been opened"
       end
       self
     end
@@ -91,13 +90,20 @@ module Maglev
       else
         sep = Type.coerce_to(sep, String, :to_str)
         if sep.__size._equal?(0)
-          while not eof?
+          while true
             para = self.__next_paragraph
+            if para._equal?(nil)
+              return self
+            end
             block.call(para)
           end
         else
-          while not eof?
-            block.call( self.__next_line( sep ))
+          while true
+            line = self.__next_line( sep)
+            if line._equal?(nil)
+              return self
+            end
+            block.call( line )
           end
         end
       end
@@ -144,7 +150,9 @@ module Maglev
     # @see  #getc
     #
     def each_char(&block)
-      return to_enum :each_char unless block_given?
+      unless block_given?
+        return IoEnumerator.new(self, :each_char)  # for 1.8.7
+      end
       while c = getbyte()
         str = ' '
         str[0] = c 
@@ -189,7 +197,7 @@ module Maglev
     #
     def filename
       __advance!
-      @_st_stream.path
+      @_st_fileName
     end
     alias_method :path, :filename
 
@@ -234,23 +242,85 @@ module Maglev
     # The mechanism does track the line numbers,
     # and updates $. accordingly.
     #
-    def gets
-      while true          
-        return nil unless __advance!
-        stream = @_st_stream
-        line = stream.gets
+    def gets(*args)    # [  begin gets implementation
+      raise ArgumentError, 'expected 0 or 1 arg with no block'
+    end
+  
+    def gets(sep)
+      self.__gets(sep, 0x31)
+    end
 
+    def gets
+      self.__gets($/, 0x31)
+    end
+
+    def __gets(a_sep, vcGlobalIdx)
+      # __gets maybe reimplemented in subclasses
+      if a_sep._equal?(nil)
+        res = self.__contents
+        self.__increment_lineno
+      else
+        sep = Type.coerce_to(a_sep, String, :to_str)
+        sep_len = sep.length
+        if sep_len._equal?(0)
+          res = self.eof?  ?  nil : self.__next_paragraph
+        else
+          res = self.__next_line(sep)
+        end
+      end
+      res.__storeRubyVcGlobal( vcGlobalIdx ) # store into caller's $_
+      res
+    end
+
+    def __increment_lineno
+      num = @_st_lineno + 1
+      $. = num
+      @_st_lineno = num
+      num
+    end
+
+    def __next_line(sep)
+      while true          
+        unless __advance!
+          return nil
+        end
+        stream = @_st_stream
+        line = stream.__next_line_to(sep)
         unless line
           return nil if stream._equal?(File.__stdin)
           stream.close unless stream.closed?
           @_st_advance = true
           next
         end
-
-        num = @_st_lineno + 1
-        $. = num
-        @_st_lineno = num
+        self.__increment_lineno
         return line
+      end
+    end
+
+    def __contents
+      str = ''
+      while true          
+        return str unless __advance!
+        stream = @_st_stream
+        str << stream.__contents
+        return str if stream._equal?(File.__stdin)
+        stream.close unless stream.closed?
+        @_st_advance = true
+      end
+    end
+
+    def __next_paragraph
+      while true
+        return nil unless __advance!
+        stream = @_st_stream
+        para = stream.__next_paragraph
+        unless para
+          return nil if stream._equal?(File.__stdin)
+          stream.close unless stream.closed?
+          @_st_advance = true
+          next
+        end
+        return para
       end
     end
 
@@ -287,7 +357,7 @@ module Maglev
     # @todo Should this be public? --rue
     #
     def lineno=(num)
-      num = Type.coerce_to(integer, Fixnum, :to_int)
+      num = Type.coerce_to(num, Fixnum, :to_int)
       @_st_lineno = num
       $. = num
       num
@@ -410,13 +480,11 @@ module Maglev
     # @see  #gets
     #
     def readline
-      raise EOFError, "ARGF at end" unless __advance!
-
-      if line = gets()
-        return line
+      line = self.__gets($/, 0x31)
+      if line._equal?(nil)
+        raise EOFError, "ARGF at end"
       end
-
-      raise EOFError, "ARGF at end"
+      line
     end
 
     #
@@ -430,6 +498,49 @@ module Maglev
       raise ArgumentError, "no stream to rewind" unless __advance!
       @_st_stream.rewind
       @_st_lineno = 0
+    end
+
+    # during bootstrap,  send and __send__ get no bridge methods
+    def send(sym)
+      if (sym._equal?(:gets))
+	return __gets($/ , 0x31)
+      end
+      if (sym._equal?(:readline))
+        line = __gets($/ , 0x31)
+        if line._equal?(nil)
+          raise EOFError, "ARGF at end"
+        end
+        return line
+      end
+      super(sym)
+    end
+
+    def send(sym, arg)
+      if (sym._equal?(:gets))
+	return __gets(arg, 0x31)
+      end
+      super(sym, arg)
+    end
+
+    def __send__(sym)
+      if (sym._equal?(:gets))
+	return __gets($/ , 0x31)
+      end
+      if (sym._equal?(:readline))
+        line = __gets($/ , 0x31)
+        if line._equal?(nil)
+          raise EOFError, "ARGF at end"
+        end
+        return line
+      end
+      super(sym)
+    end
+
+    def __send__(sym, arg)
+      if (sym._equal?(:gets))
+	return __gets(arg , 0x31)
+      end
+      super(sym, arg)
     end
 
     #
@@ -496,16 +607,17 @@ module Maglev
       if av_siz._equal?(0) && stream._equal?(nil)
         @_st_advance = false
         @_st_stream = File.__stdin
-        $FILENAME = "-"
+        @_st_fileName = "-"
         return true
       end
 
-      return false if stream._equal?(File.__stdin)
+      if stream._equal?(File.__stdin) || argv.__size._equal?(0)
+        return false
+      end
       @_st_advance = false
-      fname = ARGV.__shift
+      fname = argv.__shift
       @_st_stream = (fname == "-" ? File.__stdin : File.open(fname, "r"))
-      $FILENAME = fname
-
+      @_st_fileName = fname
       return true
     end
     private :__advance!

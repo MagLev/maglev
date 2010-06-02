@@ -88,7 +88,7 @@ module MagRp
        RubySelfNode = __resolve_smalltalk_global(:RubySelfNode)
      RubyArgsNode = __resolve_smalltalk_global(:RubyArgsNode)
      RubyArgumentNode = __resolve_smalltalk_global(:RubyArgumentNode)
-#    RubyAssignableNode
+     RubyAssignableNode = __resolve_smalltalk_global(:RubyAssignableNode)
        RubyClassVarDeclNode = __resolve_smalltalk_global(:RubyClassVarDeclNode)
        RubyConstDeclNode = __resolve_smalltalk_global(:RubyConstDeclNode)
        RubyDAsgnNode = __resolve_smalltalk_global(:RubyDAsgnNode)
@@ -144,5 +144,9 @@ module MagRp
 
   StringKeyValueDictionary = __resolve_smalltalk_global(:StringKeyValueDictionary)
 
+  def self.freeze_consts(a_module)
+    a_module.__freeze_constants
+  end
+
 end
-MagRp.__freeze_constants
+MagRp.freeze_consts(MagRp)

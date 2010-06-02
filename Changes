@@ -1,5 +1,18 @@
 = MagLev Change Log
 
+== Changes for 23569  2010-06-01
+
+* Update to RubyGems 1.3.7
+* Fix Trac 736, 743
+* Implements the singleton_class method as workaround to Trac 745
+* Minor optimization to String#tr
+* Several improvements and bugfixes in underlying GemStone 3.0 system
+
+== Changes for 23540  2010-05-23
+
+* ARGF now works 
+* Partial solution for Trac 734 
+
 == Changes for 23530  2010-05-20
 
 * Fix Trac 740 - Socket::getaddrinfo broken for string protocols

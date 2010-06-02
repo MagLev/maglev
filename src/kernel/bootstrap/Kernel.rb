@@ -534,6 +534,13 @@ module Kernel
     Kernel.__select(reads, writes, errs, *[ ms ])
   end
 
+  # Preferred alternative to         class << self ; self ; end  .
+  # Faster and no concurrency artifacts because not
+  # reexecuting a class body  (see Trac 745).
+  def singleton_class
+    self.__singleton_class  # See Object#__singleton_class
+  end
+
   def split(pattern=nil, limit=MaglevUndefined)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
     if str._equal?(nil)

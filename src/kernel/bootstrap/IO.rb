@@ -514,14 +514,12 @@ class IO
     # nil
     data = (read_all_bytes || length == 0) ? '' : nil
     File.open(name) do |f|
-      unless f.eof?
-        f.seek(offset) unless offset.zero?
-        data = if read_all_bytes
+      f.seek(offset) unless offset.zero?
+      data = if read_all_bytes
                  f.read
                else
                  f.read(length)
                end
-      end
     end
     data
   end
