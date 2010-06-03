@@ -1,17 +1,41 @@
 class NilClass
   primitive_nobridge '__isSpecial', 'isSpecial'
 
-  primitive_nobridge '&', '__rubyAnd:'
+  def &(an_object)
+    false
+  end
   #  For receiver nil,  Or and Xor are the same
-  primitive_nobridge '^', '__rubyOr:'
-  primitive_nobridge '|', '__rubyOr:'
+  def ^(an_object)
+    if an_object
+      return true
+    end
+    false
+  end
 
-  primitive 'nil?' , '_rubyNilQ'
-  primitive 'to_a' , '_ruby_to_a'
+  def |(an_object)
+    if an_object
+      return true
+    end
+    false
+  end
 
-  primitive 'to_f' , '_ruby_to_f'
-  primitive 'to_i' , '_ruby_to_i'
-  primitive 'to_s' , '_ruby_to_s'
+  def nil?
+    true
+  end
+
+  def to_a
+    []
+  end
+
+  def to_f
+    0.0
+  end
+  def to_i
+    0
+  end
+  def to_s
+    ''
+  end
 
   def clone
     raise TypeError , 'cannot clone nil'
