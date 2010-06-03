@@ -1,7 +1,7 @@
 #  file Thread1.rb
 
 class Thread
-  KERNEL_SRC_REGEXP = /src\/kernel/
+  KERNEL_SRC_STR = "src/kernel"
 
   ThreadCriticalMutex = __resolve_smalltalk_global( :RubyThreadCriticalMutex)
   class ThreadCriticalMutex 
