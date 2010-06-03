@@ -9,8 +9,8 @@
 
 require File.expand_path('simple', File.dirname(__FILE__))
 
-# A method that will generate bridge methods with ':', '*' and '&' suffix
-# characters.
+# A method that will get bridge methods with ':', '*' and '&' suffix characters.
+#
 def a(foo,*args,&block)
   b
 end
@@ -18,15 +18,15 @@ end
 def b
   c
 end
-
+# Maglev::System.session_temp_put(:TrapStk, true)
 def c
   x = nil
   [1].each do |i|
     x = caller
+    # sa = Thread.__backtrace(true, 100)
   end
   x
 end
-
 back_trace = a(1,2,3)
 
 # END of line number sensitive code
