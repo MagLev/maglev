@@ -8,6 +8,8 @@ class GsNMethod
    primitive_nobridge 'inspect', '_rubyInspect'
 
    primitive_nobridge '__name', '_rubyName'
+
+   primitive_nobridge '__source_location', '_fileAndLine'
 end
 
 class Method
@@ -15,9 +17,6 @@ class Method
     #   RubyMethod is defined in the .mcz
 
     def __obj
-      @_st_obj
-    end
-    def receiver  # for 1.8.7
       @_st_obj
     end
 
@@ -35,13 +34,13 @@ class Method
       end
     end
 
-    # arity inherited from UnboundMethod
-
-    def call(*args, &block)
+    def [](*args, &block)
       @_st_gsmeth.__call_star(@_st_obj, *args, &block)
     end
 
-    def [](*args, &block)
+    # arity inherited from UnboundMethod
+
+    def call(*args, &block)
       @_st_gsmeth.__call_star(@_st_obj, *args, &block)
     end
 
@@ -49,6 +48,14 @@ class Method
 
     # name   is inherited  # for 1.8.7
     # owner  is inherited  # for 1.8.7
+
+    def receiver  # for 1.8.7
+      @_st_obj
+    end
+
+    def source_location  
+      @_st_gsmeth.__source_location
+    end
 
     def to_proc
       p = Proc.new { |*args| self.call(*args) }
