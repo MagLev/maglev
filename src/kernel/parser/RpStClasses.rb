@@ -62,7 +62,6 @@ module MagRp
        RubyRetryNode = __resolve_smalltalk_global(:RubyRetryNode)
      RubyAbstractLiteralNode = __resolve_smalltalk_global(:RubyAbstractLiteralNode)
        RubyAbstractNumberNode = __resolve_smalltalk_global(:RubyAbstractNumberNode)
-#        RubyBignumNode = __resolve_smalltalk_global(:RubyBignumNode)
          RubyFixnumNode = __resolve_smalltalk_global(:RubyFixnumNode)
          RubyFloatNode = __resolve_smalltalk_global(:RubyFloatNode)
        RubyFalseNode = __resolve_smalltalk_global(:RubyFalseNode)
