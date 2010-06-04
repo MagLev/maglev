@@ -6,6 +6,10 @@ class BasicSocket  # identically Smalltalk GsSocket
     raise StandardError , 'cannot create instances of BasicSocket'
   end
 
+  def self.allocate
+    raise NotImplementedError, 'BasicSocket#allocate not supported'
+  end
+
   def self.do_not_reverse_lookup
     false  # not sure if this is actually the default state
   end
