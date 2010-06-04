@@ -1,5 +1,7 @@
 = MagLev Change Log
 
+* implement Tempfile to fix Trac 644
+
 == Changes for 23577  2010-06-03
 
 * new topaz commands   whr, upr, downr   for easier Ruby debugging.
