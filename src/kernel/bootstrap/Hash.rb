@@ -299,7 +299,7 @@ class Hash
               idx = self.__at(idx + 2)
             end while idx._isFixnum
           else
-            # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+            # a collision bucket , which is a small Hash 
             v.__add_keys_to(set)
           end
         end
@@ -815,7 +815,7 @@ class Hash
             idx = self.__at(idx + 2)
           end while idx._isFixnum
         else
-          # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+          # a collision bucket , which is a small Hash 
           v.each_pair(&block)
         end
       end
@@ -854,7 +854,7 @@ class Hash
               idx = self.__at(idx + 2)
             end while idx._isFixnum
           else
-            # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+            # a collision bucket , which is a small Hash 
             v.each_key(&block)
           end
         end
@@ -888,7 +888,7 @@ class Hash
             idx = self.__at(idx + 2)
           end while idx._isFixnum
         else
-          # a collision bucket , which is a small Hash (or a RubyCollisionBucket?)
+          # a collision bucket , which is a small Hash 
           v.each_value(&block)
         end
       end
