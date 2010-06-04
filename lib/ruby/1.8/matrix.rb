@@ -719,7 +719,7 @@ class Matrix
       return self * other.inverse
     else
       cr = other.coerce(self)
-      rerurn cr[0] / cr[1]
+      return cr[0] / cr[1]
     end
   end
 

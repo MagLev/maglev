@@ -3,15 +3,6 @@
 # require 'sexp'
 # require 'strscan'
 
-class Regexp
-  class_primitive_nobridge '__new', 'new:options:lang:'  
-
-  primitive_nobridge '_matchCbytes_from_limit_string*', '_matchCBytes:from:limit:string:'
-
-  # definitions of ONCE .. ENC_UTF8 moved to racc_def_parser.rb
-end
-Regexp.__freeze_constants
-
 # Fixnum#ord deleted
 
 class Array
@@ -359,12 +350,11 @@ module MagRp # {
       elsif lhs._kind_of?( RubyAbstractLiteralNode )
 	syntax_error("Can't change the value of #{lhs.nameForError}")
       else
-	internal_error("assignable - invalid lhs")
+	syntax_error("invalid left side of assignment");
       end
       if InvalidAssignableLhs.include?(id)
 	syntax_error("Can't change the value of #{id}")
       end
-
       first_ch = id[0]
       result = nil
       if first_ch <= ?Z
@@ -764,8 +754,8 @@ module MagRp # {
   #   return s(type, left, right)
   # end
 
-    def logop(cls, left, right )
-      left = value_expr(left)
+    def logop(cls, left_arg, right )
+      left = value_expr(left_arg)
       if left and left.class._equal?(cls) and not left.paren then
 	node = left
 	second = nil
@@ -774,6 +764,9 @@ module MagRp # {
 	end
 	node.secondNode=( cls.s( second, right ) )
 	return left
+      end
+      if left.is_void_result
+        raise SyntaxError, 'void value expression'
       end
       return cls.s( left, right)
     end
@@ -1477,7 +1470,7 @@ module MagRp # {
     def internal_error(msg)  # was raise_error
       print_saved_warnings
       puts "InternalParseError: #{msg}"
-      if @debuglevel > 1
+      if @debuglevel > 2
 	nil.pause  
       end
       raise InternalParseError, msg

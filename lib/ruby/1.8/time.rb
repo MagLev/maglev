@@ -362,7 +362,7 @@ class Time
       end
     end
     alias iso8601 xmlschema
-  end # class << self
+  end # class << Time
 
   #
   # Returns a string which represents the time as date-time defined by RFC 2822:

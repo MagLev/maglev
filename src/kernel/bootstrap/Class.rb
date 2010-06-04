@@ -10,7 +10,7 @@ class Class
 
   primitive_nobridge '__ruby_methods', 'rubyMethods:'
 
-  class_primitive_nobridge_env '__ruby_new', '_rubyNew', ':do:'
+  class_primitive_nobridge_env '__ruby_new&', '_rubyNew', ':do:'
 
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
@@ -26,11 +26,7 @@ class Class
         raise TypeError, 'superclass arg must be a Class'
       end
     end
-    if (block_given?)
-      c = __ruby_new(super_cls, block)
-    else
-      c = __ruby_new(super_cls, nil)
-    end
+    c = __ruby_new(super_cls, &block)
     super_cls.__ruby_inherited(c)  # See also RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:
     c
   end

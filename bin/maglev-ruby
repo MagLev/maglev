@@ -243,16 +243,19 @@ if [[ $? -ne 0 ]] ; then
 fi
 
 # If no -e params and no script, then read commands from STDIN
-if [[ $# -lt 1 ]]; then
-#    if [ -z "${dash_e}" ]; then
-    if [[ ! $sawDashE ]]; then
+if [[ ! $sawDashE ]]; then
+  if [[ $# -lt 1 ]]; then
         stdinscript=`mktemp /tmp/${COMMAND}.XXXX` || exit 1
         cat /dev/stdin > $stdinscript
         RUBYSCRIPT=$stdinscript
-    fi
-else
+  else
     RUBYSCRIPT=$1
     shift
+  fi
+else
+  if [[ $# -lt 1 ]]; then
+    script_args=", '-'" 
+  fi
 fi
 
 
@@ -299,7 +302,8 @@ cat $MAGLEV_HOME/etc/.topazini > $dbscript
 #
 if [[ $debugFlag ]]; then
     cat - >> $dbscript <<-EOFB
-display classoops
+display oops
+omit classoops
 EOFB
 fi
 #  turn off the built-in line editor if rlwrap requested

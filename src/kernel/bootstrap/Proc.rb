@@ -22,6 +22,8 @@ class ExecBlock
     #  one Fixnum arg,  0 == for lambda, 1 == for define_method , 
     #     2 == for non-lambda  proc 
 
+  primitive_nobridge '__source_location', '_fileAndLine'
+
   primitive_nobridge '__set_self', 'setSelf:'
 
   # call, call:, call::, call::: , call&, call:&, call::&
@@ -103,10 +105,16 @@ class ExecBlock
       Proc.new(self)
     end
     def __to_proc
-      # invoked from generated code once at start of a method, if method
-      # contains usages usages of it's incoming block arg other than passing
-      #  that block as the block arg to a method call 
-      #  (i.e. other than passing as value for & suffix char of a method call).
+      # invoked from generated code when incoming block argument is
+      # used other than passing as value for & suffix char of a method call.
+      # The result of __to_proc is cached in an evaluation temporary generated
+      # as a method temp by the AST to IR transformation.
+      # Exceptions to automatic __to_proc coercion:
+      #   a) any code compiled as bootstrap code. In bootstrap code __to_proc
+      #      must be coded explicitly
+      #   b) 'NoToProcSelectors' defined by RubyAbstractCallNode>>initialize ,
+      #      defines private selectors for which receiver and/or last arg is
+      #      not automatically coerced.
       Proc.new(self)
     end
 end
@@ -318,6 +326,13 @@ class Proc
 
     def inspect
       "#<Proc>"
+    end
+
+    def source_location 
+      # exact location not implemented yet .
+      # result is an approximation, the file and line of the
+      #  home method of the block.
+      @_st_block.__source_location
     end
 
     def to_proc

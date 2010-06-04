@@ -19,6 +19,9 @@ class Symbol
   primitive_nobridge 'hash'
   primitive '__at_equals', 'at:equals:' # one-based offset
 
+  # allow String-like access to bytes of Symbols from bootstrap code 
+  primitive_nobridge_env '__at' , '_rubyAt', ':' 
+
   def inspect
     ':'._concatenate(self)
   end

@@ -497,7 +497,9 @@ class Module
 
   primitive_nobridge '__remove_const', 'rubyRemoveConst:'
 
-  primitive 'remove_instance_variable', 'rubyRemoveIv:'
+  primitive_nobridge '__remove_iv', 'rubyRemoveIv:'
+
+  # remove_instance_variable inherited from object
 
   def remove_const(name)
     unless name._isSymbol

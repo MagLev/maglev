@@ -27,6 +27,23 @@ class UnboundMethod
        other.__nonbridge_meth._equal?(self.__nonbridge_meth ))
   end
 
+  def bind(obj)
+    hm_cls = self.__home_class 
+    if (obj._kind_of?( hm_cls))
+      return __bind(obj)   # returns a Method
+    else
+      raise TypeError , ('obj must be kind_of ' << (hm_cls.name ))
+    end
+  end
+
+  def inspect
+    self.to_s
+  end
+
+  def source_location
+    @_st_gsmeth.__source_location
+  end
+
   def to_s
     str = '#<'
     str << self.class.name
@@ -36,19 +53,6 @@ class UnboundMethod
     str << self.__selector_prefix
     str << ?>
     str
-  end
-
-  def inspect
-    self.to_s
-  end
-
-  def bind(obj)
-    hm_cls = self.__home_class 
-    if (obj._kind_of?( hm_cls))
-      return __bind(obj)   # returns a Method
-    else
-      raise TypeError , ('obj must be kind_of ' << (hm_cls.name ))
-    end
   end
 
 end

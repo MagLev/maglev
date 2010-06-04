@@ -301,7 +301,7 @@ class RubyLexer
 
   def int_with_base(base, s_matched, sign)
     if s_matched[0]._equal?( ?_ ) && s_matched[1]._equal?( ?_ )  # s_matched =~ /__/
-      rb_compile_error "Invalid numeric format"
+      rb_compile_error "Invalid numeric "
     end
     str = s_matched[ 2, s_matched.size - 2 ]  # skip leading 0x 0b 0d etc
     v = str.to_i(base) * sign
@@ -311,7 +311,7 @@ class RubyLexer
 
   def float_lit( s_matched , sign)
     if s_matched[0]._equal?( ?_ ) && s_matched[1]._equal?( ?_ )  # s_matched =~ /__/
-      rb_compile_error "Invalid numeric format"
+      rb_compile_error "Invalid numeric "
     end
     @yacc_value = s_matched.to_f * sign
     :tFLOAT
@@ -349,7 +349,7 @@ class RubyLexer
       next_ch = src.peek_ahead(1)
       if src.ch_is_alpha( next_ch) 
         if src.check_advance(/0[xbd]\b/) then
-          rb_compile_error "Invalid numeric format"
+          rb_compile_error "Invalid numeric "
         elsif (s_matched = src.scan(/0x[a-f0-9_]+/i)) then
           int_with_base(16, s_matched, sign)
         elsif (s_matched = src.scan(/0b[01_]+/)) then
@@ -365,7 +365,7 @@ class RubyLexer
         elsif (s_matched = src.scan(/[\d_]+\.[\d_]+(e[+-]?[\d_]+)?\b|[+-]?[\d_]+e[+-]?[\d_]+\b/i)) then
           float_lit(s_matched, sign )
         else
-          rb_compile_error "Bad number format"
+          rb_compile_error "Bad number "
         end
       elsif next_ch._not_equal?( ?. ) && (s_matched = src.scan(/0\b/)) then
         int_base10(s_matched, sign)   # common case of integer literal zero
@@ -378,7 +378,7 @@ class RubyLexer
       elsif (s_matched = src.scan(/0\b/)) then
         int_base10(s_matched, sign)
       else
-        rb_compile_error "Bad number format"
+        rb_compile_error "Bad number "
       end
     else
       if src.check_advance(/[\d_]+_(e|\.)/) then
@@ -388,7 +388,7 @@ class RubyLexer
       elsif (s_matched = src.scan(/[\d_]+\b/)) then
         int_base10(s_matched, sign)
       else
-        rb_compile_error "Bad number format"
+        rb_compile_error "Bad number "
       end
     end
   end # ]

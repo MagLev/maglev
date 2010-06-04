@@ -54,7 +54,7 @@ class Thread
 
   class_primitive_nobridge '__stbacktrace', 'backtraceToLevel:'
 
-  def self.__backtrace(includeSt, limit)
+  def self.__backtrace(include_st, limit)
     unless limit._isFixnum
       raise ArgumentError, 'limit must be a Fixnum'
     end
@@ -66,18 +66,26 @@ class Thread
     res_start_ofs = 1
     ststack = __stbacktrace(limit)
     for idx in 0..(ststack.length - 1) do
-      file, line, meth = __frame_info(ststack[idx])
-
-      # Kernel methods need to refer to the next app level stack info, not
-      # to the src/kernel/* files.  This should almost always be the next
-      # frame, but eval and block frames may require searching further.
-      # This search is a bit sketchy...
-      if file =~ KERNEL_SRC_REGEXP
-        file1, line1, meth1 = __find_next_user_info_for(idx+1, ststack)
-        file, line = file1, line1 if file1  # don't replace meth
+      f_info = __frame_info(ststack[idx], include_st)
+      if f_info._not_equal?(nil)
+        file = f_info[0]
+        line = f_info[1]
+        meth = f_info[2]
+        # Kernel methods need to refer to the next app level stack info, not
+        # to the src/kernel/* files.  This should almost always be the next
+        # frame, but eval and block frames may require searching further.
+        # This search is a bit sketchy...
+        if file and file.include?( KERNEL_SRC_STR )
+          u_info = __find_next_user_info_for(idx+1, ststack)
+          if u_info._not_equal?(nil)
+            file = u_info[0]
+            line = u_info[1]
+            # don't replace meth
+           end
+        end
+        meth = ":in `#{meth}'" unless meth._equal?(nil) 
+        result << "#{file}:#{line}#{meth}"  if file 
       end
-      meth = ":in `#{meth}'" unless meth._equal?(nil) 
-      result << "#{file}:#{line}#{meth}"  if file 
     end
     result[(res_start_ofs+1)..-1]
   end
@@ -88,8 +96,15 @@ class Thread
   # frames representing C code.
   def self.__find_next_user_info_for(start, stack)
     for idx in (start..stack.length-1) do
-      file, line, meth = __frame_info(stack[idx])
-      return [file, line, meth] if file and file !~ KERNEL_SRC_REGEXP
+      f_info = __frame_info(stack[idx])
+      if f_info._not_equal?(nil)
+        file = f_info[0]
+        if file and ! file.include?(KERNEL_SRC_STR)
+          line = f_info[1]
+          meth = f_info[2]
+          return [file, line, meth] 
+        end
+      end
     end
     return nil  # failed
   end
@@ -98,34 +113,52 @@ class Thread
   # frame for ruby stack frames.  If include_st is true, then also return
   # the same information for smalltalk frames.  Ignores env 2.
   def self.__frame_info(stack_frame, include_st=false)
-    where, line, source = stack_frame
-
-    if /.*>> (.*?):*\*?&? \(envId 1\)/ =~ where
+    where = stack_frame[0]
+    line  = stack_frame[1]
+    env_id = stack_frame[2]
+    home_sel = stack_frame[3] # selector prefix of home
+    is_bridge = stack_frame[4]
+    file   = stack_frame[5]   # from debug info used by source_location
+    baseline = stack_frame[6]
+    
+    # if /.*# (.*?):*\*?&? \(envId 1\)/ =~ where
+    if env_id._equal?(1) && ! is_bridge
       # Process a ruby stack frame.
       # Treat _compfileFile methods as top level calls (i.e., no 'in' part)
-      meth = $1
-      meth = nil if meth =~ /_compileFile/
-      if source
-        # get baseline and file name from comment at end of method's source
-        lines = source.split("\n").grep(/# method/)
-        unless lines.empty?
-          if /line (\d+) .* file (.*)/=~ lines[-1]
-            baseline = $1.to_i   
-            file = $2
-            # baseline and line are both 1-based , so -1 here
-            lnum = baseline + line - 1 
-            return [file[0..-2], lnum , meth]
-          end
+      if home_sel
+        meth = home_sel
+        meth = nil if meth._equal?( :__compileFile )
+      end
+      if home_sel # if source
+  #     # get baseline and file name from comment at end of method's source
+  #     lines = source.split("\n").grep(/# method/)
+  #     unless lines.empty?
+  #       if /line (\d+) .* file (.*)/=~ lines[-1]
+  #         baseline = $1.to_i   
+  #         file = $2
+  #         # baseline and line are both 1-based , so -1 here
+  #         lnum = baseline + line - 1 
+  #         return [file[0..-2], lnum , meth]
+  #       end
+  #     end
+        if baseline._isFixnum
+          lnum = baseline + line - 1 # baseline and line are both 1-based, so -1
+        else
+          lnum = line
         end
+        return [ file, lnum, meth ]
       end
     elsif include_st
-      # Process a smalltalk stack frame
-      if  /(.*) \(envId 0\)/ =~ where
-        meth = $1
-        return ["smalltalk", line, meth]
+      # Process a smalltalk or bridge method stack frame
+      if env_id._equal?(1) && is_bridge
+        return ["bridge", line, home_sel]
+      elsif env_id._equal?(0)
+        return ["smalltalk", line, home_sel]
       else
-        return ["smalltalk", line, where]# usually in Executed Code
+        # exclude env_id > 1 (typically Ruby parser)
       end
+    else
+      # exclude, not env 1
     end
     return nil
   end

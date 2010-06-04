@@ -78,7 +78,7 @@ class OpenStruct
   def new_ostruct_member(name)
     name = name.to_sym
     unless self.respond_to?(name)
-      class << self; self; end.class_eval do
+      self.__singleton_class.class_eval do
         define_method(name) { @table[name] }
         define_method("#{name}=") { |x| modifiable[name] = x }
       end

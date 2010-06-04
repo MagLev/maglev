@@ -29,6 +29,9 @@ module MagRp
       raise_error("missing implem of inspect")
     end
 
+    def is_void_result
+      false
+    end
     def kbegin_value
       self
     end
@@ -270,7 +273,7 @@ module MagRp
 
        class RubyVCallNode
          # a VCall has no args coded in the source code
-         #  it may have no receiver
+         #  .mcz code assumes it always has a non-nil receiver 
          class_primitive 's', 's_forRp:selector:'
          def inspect
            "\n  [:vcall, #{@_st_rcvrNode.inspect}, :#{@_st_callName}]"
@@ -596,11 +599,14 @@ module MagRp
 
        class RubyAbstractBreakNode
          primitive_nobridge 'valueNode=', 'valueNode:'
-   def self.s(val)
-     res = self._new
-     res.valueNode=(val)
-     res
-   end
+         def is_void_result
+           true
+         end
+         def self.s(val)
+           res = self._new
+           res.valueNode=(val)
+           res
+         end
        end
 
          class RubyBreakNode
@@ -989,6 +995,8 @@ module MagRp
        end
      end
 
+     class RubyAssignableNode
+     end
 
        class RubyClassVarDeclNode
          def self.s(nam, val)
@@ -1006,6 +1014,9 @@ module MagRp
          end
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1029,6 +1040,9 @@ module MagRp
          end
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1046,6 +1060,9 @@ module MagRp
        class RubyDAsgnNode
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1066,6 +1083,9 @@ module MagRp
          class_primitive_nobridge 's', 's_ForRp:value:'
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1089,6 +1109,9 @@ module MagRp
        class RubyGlobalNotAssignable
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1103,6 +1126,9 @@ module MagRp
        class RubyGlobalLastExceptionAsgn
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1126,6 +1152,9 @@ module MagRp
          end
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1153,6 +1182,9 @@ module MagRp
          end
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1174,6 +1206,9 @@ module MagRp
        class RubyVcGlobalAsgNode
          def node_assign_set_rhs(rhs)
            if @_st_valueNode._equal?(nil)
+             if rhs.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              @_st_valueNode = rhs
            else
              raise_error("value already assigned")
@@ -1404,9 +1439,13 @@ module MagRp
              if v._equal?(nil)
                raise_error('invalid nil arg')
              end
-             if v.class._equal?(RubyBlockPassNode)
+             vcls = v.class
+             if vcls._equal?(RubyBlockPassNode)
                raise_error('must use append_blk_arg ')
              end
+             if v.is_void_result
+               raise SyntaxError, 'void value expression'
+             end 
              self._append(v)
              self
            end
@@ -1421,7 +1460,11 @@ module MagRp
 
            def append_blk_arg(node)
              if @_st_iterNode._equal?(nil)
-               @_st_iterNode = node
+               if node._equal?(nil) || node.class._equal?(RubyBlockPassNode)
+                 @_st_iterNode = node
+               else
+                 raise_error('invalid block argument')
+               end
              else
                raise_error("block argument already present")
              end
@@ -1655,6 +1698,9 @@ module MagRp
 
      class RubyReturnNode
        primitive_nobridge 'valueNode=', 'valueNode:'
+       def is_void_result
+	 true
+       end
        def self.s(val)
          res = self._new
          res.valueNode=(val)

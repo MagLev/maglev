@@ -80,7 +80,7 @@ module MagRp # [
           }
           return res
         rescue Exception => ex
-          if @debuglevel > 1
+          if @debuglevel > 2
             nil.pause  # stop for debugging before altering vstack
           end
           last_len = @save_last_len
@@ -88,12 +88,16 @@ module MagRp # [
             vstack = @racc_vstack 
             vstack.size=( vstack.size - last_len )
           end
-          if ex.class._equal?(RaccJumpError)
+          ex_cls = ex.class
+          if ex_cls._equal?(RaccJumpError)
              # when 1 # yyerror
              @racc_user_yyerror = true   # user_yyerror
              evalact_exc_res =  Racc_reduce_n_negated
              call_count += 1 
           else
+             if ex_cls._equal?(SyntaxError)
+               self.print_saved_warnings
+             end
              __reraise(ex)
           end
         end

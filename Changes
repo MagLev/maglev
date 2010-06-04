@@ -1,13 +1,21 @@
 = MagLev Change Log
 
-== Unreleased Changes
+* implement Tempfile to fix Trac 644
 
+== Changes for 23577  2010-06-03
+
+* new topaz commands   whr, upr, downr   for easier Ruby debugging.
+* implement  source_location  methods.
 * Update to RubyGems 1.3.7
+* Fix Trac 736, 743
+* Implements the singleton_class method as workaround to Trac 745
+* Minor optimization to String#tr
+* Several improvements and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23540  2010-05-23
 
 * ARGF now works 
-* possible for for Trac 734 
+* Partial solution for Trac 734 
 
 == Changes for 23530  2010-05-20
 

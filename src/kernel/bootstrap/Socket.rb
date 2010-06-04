@@ -211,6 +211,7 @@ class Socket # identical to smalltalk RubySocket # [
 
   primitive '__last_err_code', 'lastErrorCode'
   primitive '__last_err_string', 'lastErrorString'
+  class_primitive '__last_err_string', 'lastErrorString'
 
   class_primitive 'new', 'new:type:proto:'
 
@@ -467,7 +468,18 @@ end # ]
 
 
 class IPSocket
-  class_primitive 'getaddress', 'getHostAddressByName:'
+  class_primitive '__getaddress', 'getHostAddressByName:'
+
+  def self.getaddress(hostname)
+    hostname = Type.coerce_to(hostname, String, :to_str)  
+    addr = self.__getaddress(hostname)
+    if addr._equal?(nil)
+      detail = self.__last_err_string
+      raise SocketError , (detail._equal?(nil) ? 'no details' : detail)
+    end
+    addr
+  end
+
   primitive 'peeraddr', 'rubyPeerAddress'
   primitive 'addr', 'rubyAddress'
 end
@@ -476,7 +488,7 @@ class TCPSocket  # < IPSocket in Smalltalk bootstrap
 
   # open binds a socket to a port and does a blocking connect,
   #  returning a blocking socket.
-  class_primitive 'open', 'new:port:'
+  class_primitive '__new', 'new:port:'
   class_primitive '__open', 'open:'
 
   def self.new(host, port=MaglevUndefined)
@@ -484,14 +496,18 @@ class TCPSocket  # < IPSocket in Smalltalk bootstrap
       host = 'localhost'
     end
     if port._equal?(MaglevUndefined)
-      self.__open(host)
+      res = self.__open(host)
     else
-      self.open(host, port)
+      res = self.__new(host, port)
     end
+    if res._equal?(nil)
+      raise Errno::ECONNREFUSED
+    end
+    res
   end
 
-  def self.open(host)
-    self.__open(host)
+  def self.open(host, port=MaglevUndefined)
+    self.new(host, port)
   end
 
 end
@@ -538,7 +554,11 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
     # hostname   ''   maps to INADDR_ANY
     hostname = Type.coerce_to(hostname, String, :to_str)
     port = Type.coerce_to(port, Fixnum, :to_int)
-    self.__connect(port, hostname)
+    status = self.__connect(port, hostname)
+    if status._equal?(false)
+      raise Errno::ECONNREFUSED
+    end
+    self
   end
 
   # def recvfrom(length, flags) ; end  

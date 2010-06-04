@@ -90,6 +90,10 @@ class File
   # __modify_file provides access to chmod, fchmod, chown, lchown, fchown
   class_primitive '__modify_file*', '_modifyFile:fdPath:with:with:'
 
+  def self.allocate
+    raise NotImplementedError, 'File#allocate not supported'
+  end
+
   def self.atime(filename)
     File.stat(filename).atime
   end
@@ -366,10 +370,15 @@ class File
 
 
   def self.new(filename, mode=MaglevUndefined, permission=MaglevUndefined)
-    self.open(filename, mode, permission)
+    self.__create(filename, mode, permission)
   end
 
   def self.open(filename, mode=MaglevUndefined, permission=MaglevUndefined, &block)
+    self.__create(filename, mode, permission, &block)
+  end
+
+  def self.__create(filename, mode, permission, &block)
+    # __create is needed by  Tempfile implementation
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
@@ -734,45 +743,39 @@ class File
   end
 
   def __read(a_length, a_buffer)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
+    raise IOError, 'read: closed stream' unless self.__is_open
+    unless a_length._equal?(nil)
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
       return nil if self.pos > self.stat.size
     end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
     buffer = Type.coerce_to(a_buffer, String, :to_str)
     length = self.stat.size if length._equal?(nil)
     num_read = __read_into(length, buffer, true)
+    if num_read._equal?(0)
+      return a_length._equal?(nil)  ? '' : nil
+    end
     raise IOError, 'error' if num_read._equal?(nil)
     buffer.size = num_read # truncate buffer
     buffer
   end
 
   def read(a_length)
-    raise IOError, 'read: closed stream' unless __is_open
-    read_all_bytes = a_length._equal?(nil) 
-    unless read_all_bytes
+    raise IOError, 'read: closed stream' unless self.__is_open
+    if a_length._equal?(nil)
+      self.__contents # read_all_bytes
+    else
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
-      return nil if self.pos > self.stat.size
+      if length._equal?(0)
+        return ''
+      end
+      self.__next(length)
     end
-    if self.eof?
-      return read_all_bytes ? '' : nil
-    end
-    data = read_all_bytes ? __contents : __next(length)
-    data = '' if data._equal?(nil)
-    data
   end
 
   def read
     raise IOError, 'read: closed stream' unless __is_open
-    if self.eof?
-      return ''
-    end
     data = __contents 
     data = '' if data._equal?(nil)
     data
@@ -809,9 +812,6 @@ class File
   end
 
   def __sysread(length, buffer)
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.read(length, buffer)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -820,9 +820,6 @@ class File
   end
 
   def sysread(length)
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.read(length)
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -831,9 +828,6 @@ class File
   end
 
   def sysread
-    if self.eof?
-      raise EOFError, "End of file reached"
-    end
     str = self.__contents
     if str._equal?(nil)
       raise EOFError, "End of file reached"
@@ -959,23 +953,31 @@ class File
     @_st_mode
   end
 
-  def reopen(arg1, mode=MaglevUndefined)
-    if mode._equal?(MaglevUndefined)
-      self.reopen(arg1)
-    end
-    
-  end
-
   primitive_nobridge '__fopen', '_fopen:mode:'
 
-  def reopen(other_io)
-    unless other_io._kind_of?(File)
-      raise TypeError , 'File#reopen can only reopen another File.'
+  def reopen(arg1, mode=MaglevUndefined)
+    uu = MaglevUndefined
+    if arg1._isString
+      path = arg1
+      if mode._equal?(uu)
+        mode = 'r'
+      end
+    elsif arg1._kind_of?(File)
+      path = arg1.path
+      if mode._equal?(uu)
+        mode = arg1.__mode
+      end
+    else
+      raise TypeError , 'File#reopen, first arg must be a File or a String'
     end
-    status = self.__fopen(other_io.path, other_io.__mode)
-    if status._isFixnum
-      Errno.raise_errno(status, 'File#reopen failed' )
+    unless mode._isString || mode._isFixnum
+      raise TypeError, 'File#reopen, mode is neither Fixnum nor String'
     end
+    unless self.closed?
+      self.__close
+    end
+    f = self.__fopen(path, mode)
+    Errno.raise_errno(f, path ) if f._isFixnum
     self
   end
 

@@ -9,4 +9,13 @@
 #   ERROR 2407, The object LibPsych may not be committed, 'it is a transient Ruby module/class' (RuntimeError)
 
 require 'psych'
+
+# px = Psych::LibPsych   # debugging code
+# cls = class << px
+#  self
+# end
+# nil.pause
+# Maglev::System.trap_add_to_closure_list( cls )
+
 Maglev.commit_transaction
+true
