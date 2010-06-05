@@ -1,7 +1,9 @@
 = MagLev Change Log
 
-== Changes for 23569  2010-06-01
+== Changes for 23577  2010-06-03
 
+* new topaz commands   whr, upr, downr   for easier Ruby debugging.
+* implement  source_location  methods.
 * Update to RubyGems 1.3.7
 * Fix Trac 736, 743
 * Implements the singleton_class method as workaround to Trac 745

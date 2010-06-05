@@ -22,6 +22,8 @@ class ExecBlock
     #  one Fixnum arg,  0 == for lambda, 1 == for define_method , 
     #     2 == for non-lambda  proc 
 
+  primitive_nobridge '__source_location', '_fileAndLine'
+
   primitive_nobridge '__set_self', 'setSelf:'
 
   # call, call:, call::, call::: , call&, call:&, call::&
@@ -324,6 +326,13 @@ class Proc
 
     def inspect
       "#<Proc>"
+    end
+
+    def source_location 
+      # exact location not implemented yet .
+      # result is an approximation, the file and line of the
+      #  home method of the block.
+      @_st_block.__source_location
     end
 
     def to_proc

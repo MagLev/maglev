@@ -1,18 +1,10 @@
 class Boolean
-  # common superclass of TrueClass and FalseClass
+  # Boolean is the common superclass of TrueClass and FalseClass
 
 #---------------------------------
 
   primitive_nobridge '__isSpecial', 'isSpecial'
 
-  primitive_nobridge '^', '__rubyXor:'
-
-  primitive_nobridge '&', '__rubyAnd:'
-
-  primitive_nobridge '|' , '__rubyOr:'
-
-  primitive_nobridge 'not'
- 
   def clone  
     raise TypeError , 'cannot clone true or false'
   end
@@ -51,6 +43,51 @@ class Boolean
 end
 
 class TrueClass < Boolean
+
+  def &(an_object)
+    if an_object
+      return true
+    end
+    false
+  end
+
+  def |(an_object)
+    true
+  end
+
+  def ^(an_object)
+    if an_object
+      return false
+    end
+    true
+  end
+
+  def not
+    false
+  end
 end
+
 class FalseClass < Boolean
+
+  def &(an_object)
+    false
+  end
+
+  def |(an_object)
+    if an_object
+      return true
+    end
+    false
+  end
+
+  def ^(an_object)
+    if an_object
+      return true
+    end
+    false
+  end
+
+  def not
+    true
+  end
 end
