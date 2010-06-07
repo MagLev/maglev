@@ -1559,6 +1559,18 @@ class String
     false
   end
 
+  def start_with?(string)
+    begin
+      str = Type.coerce_to(string, String, :to_str)
+      if self.__at_equals(1 , str)
+        return true
+      end
+    rescue
+      # ignore arg not coercable
+    end
+    false
+  end
+
   primitive '__strip', '_trimReturningSelf:'
 
   def strip
