@@ -215,6 +215,15 @@ module Psych
         @stack.pop
       end
 
+      def visit_IdentityHash(o) # maglev
+        @stack.push append register(o, Nodes::Mapping.new(nil, '!ruby/object:IdentityHash', false))
+        o.each { |k,v|
+          accept k
+          accept v
+        }
+        @stack.pop
+      end
+
       def visit_Psych_Set o
         @stack.push append register(o, Nodes::Mapping.new(nil, '!set', false))
 
@@ -223,6 +232,16 @@ module Psych
           accept v
         end
 
+        @stack.pop
+      end
+
+      def visit_IdentitySet(o)  # maglev
+        seq = Nodes::Sequence.new(nil, '!ruby/object:IdentitySet', false)
+        register(o, seq)
+        @stack.push append seq
+        o.each { | elem |
+          accept(elem)
+        }
         @stack.pop
       end
 
