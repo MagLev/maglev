@@ -6,7 +6,8 @@ YAML = Psych
 
 [
   Object, String, Class, Hash, Array, NilClass, Float, FalseClass, TrueClass,
-  Range, Complex, Rational, Date, Time, Regexp, Exception, Struct
+  Range, Complex, Rational, Date, Time, Regexp, Exception, Struct 
+  , IdentitySet, IdentityHash  # maglev
 ].each do |klass|
   klass.send(:remove_method, :to_yaml) rescue NameError
 end
