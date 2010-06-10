@@ -10,7 +10,7 @@ RAILS_INCLUDES = %w(railties
                     ).reverse.inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
 
 MH = ENV['MAGLEV_HOME']
-TZ_INC = " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.19/lib"
+TZ_INC = " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.20/lib"
 REQ = '-r tzinfo -r ../core_ext.rb'
 RAILS_INCLUDES << TZ_INC
 
