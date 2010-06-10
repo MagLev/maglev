@@ -91,17 +91,13 @@ module Psych
 
         @stack.push map
 
-        {
-          'message'   => private_iv_get(o, 'mesg'),
-          'backtrace' => private_iv_get(o, 'backtrace'),
-        }.each do |k,v|
-          next unless v
-          map.children << Nodes::Scalar.new(k)
-          accept v
+        v = o.__message
+        if v
+          map.children << Nodes::Scalar.new('message')   
+          accept(v)
         end
-
+        # backtrace not included in output , not used by load
         dump_ivars(o, map)
-
         @stack.pop
       end
 
