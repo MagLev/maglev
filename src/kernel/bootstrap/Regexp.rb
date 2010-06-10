@@ -46,12 +46,16 @@ class Regexp
   #
   def self.new(pattern, options = MaglevUndefined, lang = MaglevUndefined)
     # do not pass to initialize more args than incoming non-default args
-    #  (except for case of pattern being a Regexp)
     uu = MaglevUndefined
     if (pattern._isRegexp)
-      # options ignored
       r = self.alloc
-      r.initialize(pattern.source, pattern.options)
+      # support sub-classes: call a version of initialize with
+      # same arity as call to new
+      if options._equal?(MaglevUndefined)
+        r.initialize(pattern)
+      else
+        r.initialize(pattern.source, pattern.options)
+      end
     elsif options._equal?(uu)
       r = self.alloc
       r.initialize(pattern)
@@ -150,8 +154,12 @@ class Regexp
     res
   end
 
-  def initialize(string)
-    res = __compile(string, 0)
+  def initialize(arg)
+    res = if arg._isString
+            __compile(arg, 0)
+          else
+            __compile(arg.source, arg.options)
+          end
     if res._not_equal?(self)
       raise RegexpError, (res.to_str)  # error from onig_new
     end
