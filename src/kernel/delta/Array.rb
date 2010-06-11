@@ -67,7 +67,7 @@ class Array
       return self.dup
     end
     sz = self.__size
-    arr = Array.new(sz)
+    arr = Array.new(sz)  # Array, not self.class
     i = 0
     enum_res = self.each { | elem |  # use self.each to handle break in block
       arr.__at_put(i, block.call( elem ))
@@ -143,7 +143,7 @@ class Array
     unless block_given?
       return ArrayEnumerator.new(self, :find_all ) # for 1.8.7
     end
-    result = []
+    result = []  # not self.class.new
     i = 0
     lim = self.__size
     while i < lim
@@ -155,7 +155,7 @@ class Array
   end
 
   def grep(pattern, &block)
-    result = []
+    result = []  # not self.class.new
     i = 0
     lim = self.__size
     if block_given?
@@ -384,7 +384,7 @@ class Array
       end
       i += 1
     end
-    [t,f]
+    [t,f]  # not self.class.new
   end
 
     ##
@@ -433,7 +433,7 @@ class Array
       self.each { |val| block.call( [val] )  }
     else
       # this is the general case
-      p = Array.new(num)
+      p = Array.new(num)    # not self.class.new
       used = String.__new(my_size)
       self.__permute__(num, p, 0, used, &block)
     end
@@ -473,14 +473,14 @@ class Array
   def product(*args)  # added in 1.8.7 # Rubinius code rewritten
     n = 0
     nargs = args.__size
-    args_res = Array.new(nargs + 2) 
+    args_res = Array.new(nargs + 2)   
     args_res.__at_put(0, self)
     while n < nargs
       an_arg = Type.coerce_to(args.__at(n), Array, :to_ary)
       n += 1
       args_res.__at_put(n,  an_arg)
     end
-    result = []
+    result = []  # not self.class.new
     args_res.__at_put(-1, result )
     idxs = Array.new(nargs + 1, 0)
     self.__product(0, args_res, idxs)
@@ -526,7 +526,7 @@ class Array
     unless block_given?
       return ArrayEnumerator.new(self, :reject ) # for 1.8.7
     end
-    result = []
+    result = self.class.new
     i = 0
     lim = self.__size
     while i < lim
@@ -604,7 +604,7 @@ class Array
       end
       nil
     else
-      out = Array.new(my_size)
+      out = Array.new(my_size)  # not self.class.new
       i = 0
       while i < my_size
 	out.__at_put(i, [] )
