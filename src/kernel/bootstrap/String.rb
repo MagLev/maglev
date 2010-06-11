@@ -492,8 +492,9 @@ class String
 
   alias concat <<
 
-    # arg to rubyCount: is expected to be an Array , so declare as 'count*'
-    primitive 'count*', 'rubyCount:'
+  # def count(*args); end 
+  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
+  primitive 'count*', 'rubyCount:'
 
   # MNI: crypt
 
