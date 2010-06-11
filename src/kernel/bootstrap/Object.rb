@@ -232,16 +232,22 @@ class Object
     a
   end
 
+  # This is called to coerce argument to an array for splat args, e.g.,
+  #   foo.bar(*x)  # will call x.__splat_lasgn_value_coerce
   def __splat_lasgn_value_coerce
     v = self
     begin
       v = self.to_ary
     rescue
-      # ignore if not responding to to_ary
+      begin
+        v = self.to_a
+      rescue
+        # ignore if not responding to to_ary or to_a
+      end
     end
     if v._not_equal?(self)
       unless v._isArray
-        raise TypeError, 'arg to splat responded to to_ary but did not return an Array'
+        raise TypeError, 'arg to splat responded to to_a or to_ary but did not return an Array'
       end
     end
     v

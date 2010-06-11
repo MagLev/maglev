@@ -116,12 +116,12 @@ class ArgsTest
 
   def test_03_noextra
     x = required_three(10, 100, 1000)
-    unless x = 1110 ; raise 'error' ; end 
+    unless x = 1110 ; raise 'error' ; end
     y = 0
     begin
       x = required_three(1,2,3,4)
       y = 1
-    rescue ArgumentError 
+    rescue ArgumentError
       y = 5
     end
     unless y == 5; raise 'error' ; end;
@@ -244,6 +244,26 @@ end
   unless x == 3281 ; raise 'error'; end
 end
 # end Trac328
+
+# Test that passing with splat will call to_a and/or to_ary if available to
+# coerce arg.
+#
+ret = []
+x = "A string"
+test(ret.push(*x), ['A string'], 'Non Array: does not respond to to_a, to_ary')
+
+def x.to_a() ; [1,2]; end
+ret.clear
+test(ret.push(*x), [1,2], 'Non Array: responds to: to_a')
+
+y = ''
+def y.to_ary() ; [7,8]; end
+ret.clear
+test(ret.push(*y), [7,8], 'Non Array: responds to: to_ary')
+
+def x.to_ary() ; [3,4]; end
+ret.clear
+test(ret.push(*x), [3,4], 'Non Array: responds to to_a, to_ary')
 
 report
 
