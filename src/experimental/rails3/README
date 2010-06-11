@@ -111,3 +111,65 @@ diff -r /Users/pmclain/GemStone/checkouts/git/lib/maglev/gems/1.8.7/gems/rack-1.
 69,70d59
 < puts "===== serving: #{@path}"
 <
+
+
+
+
+
+
+
+
+
+
+
+
+commit 1667c9c817f756bcc213b09af9959bf4f52d0a42
+Author: Peter McLain <peter.mclain@gemstone.com>
+Date:   Fri Apr 30 13:12:25 2010 -0700
+
+    Work around Trac 730: IO#readpartial is not implemented.
+
+M       activesupport/lib/active_support/secure_random.rb
+
+commit ca3bf6604a46648cd263e1c2bfef0c3529794fbf
+Author: Peter McLain <peter.mclain@gemstone.com>
+Date:   Fri Apr 30 10:59:39 2010 -0700
+
+    Workaround a file not found problem.  Root cause TBD.
+
+M       railties/lib/rails/application/finisher.rb
+
+commit 487df5430d147e4fc6e14f2577cff4980a16cf24
+Author: Peter McLain <peter.mclain@gemstone.com>
+Date:   Fri Apr 30 10:59:15 2010 -0700
+
+    Work around another issue removing a persistent method in transient mode.
+
+M       activesupport/lib/active_support/dependencies.rb
+
+commit 26a18edc4de872891f5a1ef964e1520ef17a61bd
+Author: Peter McLain <peter.mclain@gemstone.com>
+Date:   Fri Apr 30 10:52:27 2010 -0700
+
+    Workaround MagLev's prohibition on aliasing to __send__.
+
+M       activesupport/lib/active_support/core_ext/object/try.rb
+
+commit 3e267c934365a7bf79762889dc89c739e33ec8ea
+Author: Peter McLain <peter.mclain@gemstone.com>
+Date:   Fri Apr 30 10:47:09 2010 -0700
+
+    Provide MagLev implementation for finding subclasses through
+    ObjectSpace#loaded_classes rather than ObjectSpace#each_object.
+
+M       activesupport/lib/active_support/core_ext/class/subclasses.rb
+
+commit 7c524e09424a1d9904219bc93668b0798c78ce20
+Author: Peter McLain <peter.mclain@gemstone.com>
+Date:   Fri Apr 30 10:40:56 2010 -0700
+
+    Work around issue trying to remove_method on a persistent module while in
+    transient mode.
+
+M       activesupport/lib/active_support/core_ext/enumerable.rb
+
