@@ -139,8 +139,10 @@ class Array
       end
       a
     else
-      a = self.new
-      a.initialize(*args)
+      # if a subclass does not reimplement initialize*,
+      #  this path raises ArgumentError, 'too many args' 
+      a = self.new  
+      a.initialize(*args) 
       a
     end
   end
