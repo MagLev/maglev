@@ -384,7 +384,7 @@ class Array
       end
       i += 1
     end
-    [t,f]  # not self.class.new
+    [t,f]  # not self.class .new
   end
 
     ##
@@ -433,7 +433,7 @@ class Array
       self.each { |val| block.call( [val] )  }
     else
       # this is the general case
-      p = Array.new(num)    # not self.class.new
+      p = Array.new(num)    # not self.class .new
       used = String.__new(my_size)
       self.__permute__(num, p, 0, used, &block)
     end
@@ -480,7 +480,7 @@ class Array
       n += 1
       args_res.__at_put(n,  an_arg)
     end
-    result = []  # not self.class.new
+    result = []  # not self.class .new
     args_res.__at_put(-1, result )
     idxs = Array.new(nargs + 1, 0)
     self.__product(0, args_res, idxs)
@@ -604,7 +604,7 @@ class Array
       end
       nil
     else
-      out = Array.new(my_size)  # not self.class.new
+      out = Array.new(my_size)  # not self.class .new
       i = 0
       while i < my_size
 	out.__at_put(i, [] )
