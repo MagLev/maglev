@@ -47,7 +47,7 @@ class Regexp
   def self.new(pattern, options = MaglevUndefined, lang = MaglevUndefined)
     # do not pass to initialize more args than incoming non-default args
     uu = MaglevUndefined
-    if (pattern._isRegexp)
+    if pattern._isRegexp
       r = self.alloc
       # support sub-classes: call a version of initialize with
       # same arity as call to new
