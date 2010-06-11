@@ -557,7 +557,8 @@ module Kernel
   # MRI behavior,  sleep(0) returns immediately
   # Maglev, sleep(0) will be equivalent to Thread.pass
 
-  primitive_nobridge '__sleep_ms', '_highPriorityWaitForMilliseconds:'
+  primitive_nobridge '__high_priority_sleep_ms', '_highPriorityWaitForMilliseconds:'
+  primitive_nobridge '__sleep_ms', '_waitForMilliseconds:'
 
   def sleep(numeric=0)
     # returns number of seconds slept

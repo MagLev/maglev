@@ -139,13 +139,15 @@ class Array
       end
       a
     else
-      raise ArgumentError, 'too many args'
+      # if a subclass does not reimplement initialize*,
+      #  this path raises ArgumentError, 'too many args' 
+      a = self.new  
+      a.initialize(*args) 
+      a
     end
   end
 
   def initialize(*args, &block)
-    # this variant gets bridge methods
-    #
     # If a Subclass#initialize calls super(*args), then we go through this
     # variant.  That means we also have to unpack the parameters for all
     # the possible variants here.  The initialize variants below will be

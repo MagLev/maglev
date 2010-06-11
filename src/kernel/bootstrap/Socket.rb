@@ -262,6 +262,7 @@ class Socket # identical to smalltalk RubySocket # [
   primitive '__read_into', 'read:into:minLength:' # returns nil on socket eof
 
   def readpartial(length, buffer=MaglevUndefined)
+    length = Type.coerce_to(length, Fixnum, :to_int)
     if buffer._equal?(MaglevUndefined)
       buf = String.__new(length)
       self.__read_into(length, buf, length)
