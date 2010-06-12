@@ -519,9 +519,9 @@ module MagRp # [
         end
       end
       puts str
-      puts "SyntaxError: missing or unexpected #{val.inspect} #{hint}, near line #{@lexer.lineno_} "
+      msg = "missing or unexpected #{val.inspect} #{hint}, near line #{@lexer.lineno_} of #{file_name} "
       @syntax_err_count += 1
-      raise SyntaxError
+      raise SyntaxError, msg
     end
 
     def yyerror(msg = "")

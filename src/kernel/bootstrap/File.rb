@@ -90,6 +90,8 @@ class File
   # __modify_file provides access to chmod, fchmod, chown, lchown, fchown
   class_primitive '__modify_file*', '_modifyFile:fdPath:with:with:'
 
+  class_primitive_nobridge 'allocate', '_basicNew'
+
   def self.atime(filename)
     File.stat(filename).atime
   end
@@ -366,10 +368,15 @@ class File
 
 
   def self.new(filename, mode=MaglevUndefined, permission=MaglevUndefined)
-    self.open(filename, mode, permission)
+    self.__create(filename, mode, permission)
   end
 
   def self.open(filename, mode=MaglevUndefined, permission=MaglevUndefined, &block)
+    self.__create(filename, mode, permission, &block)
+  end
+
+  def self.__create(filename, mode, permission, &block)
+    # __create is needed by  Tempfile implementation
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
@@ -775,6 +782,7 @@ class File
   def readpartial(length, buffer=MaglevUndefined)
     raise IOError, 'read: closed stream' unless __is_open
     need_trunc = false
+    length = Type.coerce_to(length, Fixnum, :to_int)
     if buffer._equal?(MaglevUndefined)
       buffer = ""
     else
@@ -944,23 +952,31 @@ class File
     @_st_mode
   end
 
-  def reopen(arg1, mode=MaglevUndefined)
-    if mode._equal?(MaglevUndefined)
-      self.reopen(arg1)
-    end
-    
-  end
-
   primitive_nobridge '__fopen', '_fopen:mode:'
 
-  def reopen(other_io)
-    unless other_io._kind_of?(File)
-      raise TypeError , 'File#reopen can only reopen another File.'
+  def reopen(arg1, mode=MaglevUndefined)
+    uu = MaglevUndefined
+    if arg1._isString
+      path = arg1
+      if mode._equal?(uu)
+        mode = 'r'
+      end
+    elsif arg1._kind_of?(File)
+      path = arg1.path
+      if mode._equal?(uu)
+        mode = arg1.__mode
+      end
+    else
+      raise TypeError , 'File#reopen, first arg must be a File or a String'
     end
-    status = self.__fopen(other_io.path, other_io.__mode)
-    if status._isFixnum
-      Errno.raise_errno(status, 'File#reopen failed' )
+    unless mode._isString || mode._isFixnum
+      raise TypeError, 'File#reopen, mode is neither Fixnum nor String'
     end
+    unless self.closed?
+      self.__close
+    end
+    f = self.__fopen(path, mode)
+    Errno.raise_errno(f, path ) if f._isFixnum
     self
   end
 

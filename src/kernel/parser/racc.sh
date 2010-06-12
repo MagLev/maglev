@@ -3,6 +3,14 @@
 #  requires that /usr/local/bin/racc  exist
 #   from installation of the Ruby  gem  racc 1.4.6  .
 
+if ( "$OSTYPE" == "linux" ) then
+  # ok
+else
+  echo "don't use m4 on Solaris to produce the parser"
+  # have seen 'define' and 'format' in Ruby string constants getting swallowed 
+  exit 1
+endif
+
 if ( "$1" == "-D" ) then
   # debug and tracing code will be included in generated .rb files
   setenv M4FLAGS "-DPARSER_DEBUG"

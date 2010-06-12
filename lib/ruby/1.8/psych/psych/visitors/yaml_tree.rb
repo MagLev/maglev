@@ -91,17 +91,13 @@ module Psych
 
         @stack.push map
 
-        {
-          'message'   => private_iv_get(o, 'mesg'),
-          'backtrace' => private_iv_get(o, 'backtrace'),
-        }.each do |k,v|
-          next unless v
-          map.children << Nodes::Scalar.new(k)
-          accept v
+        v = o.__message
+        if v
+          map.children << Nodes::Scalar.new('message')   
+          accept(v)
         end
-
+        # backtrace not included in output , not used by load
         dump_ivars(o, map)
-
         @stack.pop
       end
 
@@ -215,6 +211,15 @@ module Psych
         @stack.pop
       end
 
+      def visit_IdentityHash(o) # maglev
+        @stack.push append register(o, Nodes::Mapping.new(nil, '!ruby/object:IdentityHash', false))
+        o.each { |k,v|
+          accept k
+          accept v
+        }
+        @stack.pop
+      end
+
       def visit_Psych_Set o
         @stack.push append register(o, Nodes::Mapping.new(nil, '!set', false))
 
@@ -223,6 +228,16 @@ module Psych
           accept v
         end
 
+        @stack.pop
+      end
+
+      def visit_IdentitySet(o)  # maglev
+        seq = Nodes::Sequence.new(nil, '!ruby/object:IdentitySet', false)
+        register(o, seq)
+        @stack.push append seq
+        o.each { | elem |
+          accept(elem)
+        }
         @stack.pop
       end
 

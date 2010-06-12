@@ -492,8 +492,9 @@ class String
 
   alias concat <<
 
-    # arg to rubyCount: is expected to be an Array , so declare as 'count*'
-    primitive 'count*', 'rubyCount:'
+  # def count(*args); end 
+  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
+  primitive 'count*', 'rubyCount:'
 
   # MNI: crypt
 
@@ -1555,6 +1556,18 @@ class String
         # ignore elements of args not coercable
       end
       n += 1
+    end
+    false
+  end
+
+  def start_with?(string)
+    begin
+      str = Type.coerce_to(string, String, :to_str)
+      if self.__at_equals(1 , str)
+        return true
+      end
+    rescue
+      # ignore arg not coercable
     end
     false
   end

@@ -153,10 +153,31 @@ module Psych
   # Example:
   #
   #   Psych.dump(['a', 'b'])  # => "---\n- a\n- b\n"
-  def self.dump o, options = {}
+  def self.dump(o, arg2=MaglevUndefined, arg3=MaglevUndefined)
+    uu = MaglevUndefined
+    if arg2.equal?(uu)
+      options = {}
+    elsif arg2.kind_of?(IO)
+      io = arg2
+      if arg3.equal?(uu)
+        options = {}
+      elsif arg3.kind_of?(Hash)
+        options = arg3
+      else
+        raise TypeError, 'Psych.dump, expected a Hash for third arg' 
+      end
+    elsif arg2.kind_of?(Hash)
+      options = arg2
+    else
+      raise TypeError, 'Psych.dump, expected a Hash or IO for second arg' 
+    end
     visitor = Psych::Visitors::YAMLTree.new options
     visitor << o
-    visitor.tree.to_yaml
+    res = visitor.tree.to_yaml
+    if io
+      io.write(res)
+    end
+    res
   end
 
   ###
