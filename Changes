@@ -1,12 +1,18 @@
 = MagLev Change Log
 
-* fix Trac 746
-* fix object corruption in Regexp primitives .
+== Changes for 23611  2010-06-12
+
+* fix Trac 644, 658, 693, 704, 717, 738, 746
+* fix object corruption in Regexp primitives
 * securerandom passes specs
 * implement Tempfile to fix Trac 644
-* enhance topaz   rubylookup   to automatically traverse bridge methods
-* fixes to topaz   whr, upr, downr  commands
-* fixes to yaml and securerandom 
+* enhance topaz rubylookup to automatically traverse bridge methods
+* fixes to topaz whr, upr, downr commands
+* fixes to yaml and timeout & securerandom 
+* update to latest tzinfo
+* fixes to Array#reject
+* improvements in splat args
+* Several optimizations and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23577  2010-06-03
 
