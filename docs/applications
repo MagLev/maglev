@@ -31,28 +31,14 @@ The following items are known not to work:
 
 === RubyGems
 
-A slightly modified rubygems is preinstalled as "maglev-gem". the source 
-is in src/external/rubygems-1.3.5.  
+RubyGems 1.3.7 is preinstalled as "maglev-gem".
 
 It's likely that many gems will not work, especially those requiring C extensions.
-However, "maglev-gem install sinatra" will install rack-1.0.0 and sinatra-0.9.4.
+However, "maglev-gem install sinatra" will install rack-1.1.0 and sinatra-1.0.
 
 To clean up after experimenting with gems, there is a rake task:
 
     $ rake dev:clean-gems
 
 which removes all traces of any gems you've installed.
-
-==== Gemstone Patches for RubyGems
-
-GemStone has made the following modifications to the stock version of
-RubyGems 1.3.5:
-
-* lib/rubygems/package/tar_input.rb:
-
-  The tar support throws away the gzip header before passing the archive to
-  zlib.  MagLev's zlib support expects the gzip header (and, apparently, so
-  does Rubinius).  This patch has been submitted and accepted by the
-  RubyGems project, so we expect rubygems-1.3.6 to install w/o patches to
-  the code.
 
