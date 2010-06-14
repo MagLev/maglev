@@ -287,7 +287,7 @@ module MagRp
       ["return",   [:kRETURN,   :kRETURN     , - RubyLexer::Expr_mid   ]],
       ["true",     [:kTRUE,     :kTRUE       , - RubyLexer::Expr_end   ]],
       ["if",       [:kIF,       :kIF_MOD     , - RubyLexer::Expr_beg   ]],
-      ["defined?", [:kDEFINED,  :kDEFINED    , RubyLexer::Expr_arg   ]],
+      ["defined?", [:kDEFINED,  :kDEFINED    , - RubyLexer::Expr_arg   ]],
       ["super",    [:kSUPER,    :kSUPER      , - RubyLexer::Expr_arg   ]],
       ["undef",    [:kUNDEF,    :kUNDEF      , - RubyLexer::Expr_fname ]],
       ["break",    [:kBREAK,    :kBREAK      , - RubyLexer::Expr_mid   ]],
