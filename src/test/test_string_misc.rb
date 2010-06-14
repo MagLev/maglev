@@ -338,5 +338,19 @@ seq = 'tgcaacgacatttgaccaacttgaccattcctgcttgtagcgt'
 seq.gsub!('B','(c|g|t)')
 test(seq.length, 43, 'From seq.rb')
 
+# From action_view erb.rb
+#
+
+class SafeBuffer < String
+end
+
+class OutputBuffer < SafeBuffer
+  def initialize(*)
+    super
+  end
+end
+
+OutputBuffer.new # MagLev reports too few args.
+
 report
 

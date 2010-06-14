@@ -28,6 +28,17 @@ class String
     s
   end
 
+  def initialize(*args)
+    len = args.length
+    # Do nothing for zero args (return self)
+    if len._equal?(1)
+      self.initialize(args[0])
+    elsif len > 1
+      raise ArgumentError, 'too many args'
+    end
+    self
+  end
+
   def initialize(str)
     if self.class._equal?(String)
       # do nothing
@@ -39,7 +50,6 @@ class String
   end
 
   def self.new()
-    # no bridge methods for this variant
     s = __alloc
     s.initialize
     s
