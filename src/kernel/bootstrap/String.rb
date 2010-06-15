@@ -44,8 +44,8 @@ class String
     s
   end
 
-  def initialize(*args)
-    # this version gets bridge methods
+  def initialize(*args, &block)
+    # this version gets bridge methods , block is ignored
     len = args.length
     # Do nothing for zero args (return self)
     if len._equal?(1)
@@ -67,8 +67,25 @@ class String
     self
   end
 
+  def initialize(str, &block)
+    # implement commonly used variant for performance, ignore block
+    if self.class._equal?(String)
+      # do nothing
+    else
+      str = Type.coerce_to(str, String, :to_str)
+      self.replace(str)
+    end
+    self
+  end
+
+
   def initialize
     # implement commonly used variant for performance
+    self
+  end
+
+  def initialize(&block)
+    # implement commonly used variant for performance, ignore block
     self
   end
 
