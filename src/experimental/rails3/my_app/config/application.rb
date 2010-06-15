@@ -1,6 +1,24 @@
 require File.expand_path('../boot', __FILE__)
 
-require 'rails/all'
+# GemStone: I've replaced the require of rails/all with the contents of
+# all.rb, and commented out active record.
+#
+# require 'rails/all'
+require "rails"
+
+#  active_record
+%w(
+  action_controller
+  action_mailer
+  active_resource
+  rails/test_unit
+).each do |framework|
+  begin
+    require "#{framework}/railtie"
+  rescue LoadError
+  end
+end
+
 
 # If you have a Gemfile, require the gems listed there, including any gems
 # you've limited to :test, :development, or :production.

@@ -11,8 +11,17 @@ class String
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
   class_primitive_nobridge '__new', 'new:'
+ 
+  def self.new(*args)
+    # this version gets bridge methods
+    len = args.__size
+    str = self.__alloc
+    str.initialize(*args)
+    str
+  end
 
   def self.new(str)
+    # implement commonly used variant for performance
     if self._equal?(String)
       if str._isString
         s = __withAll(str)
@@ -28,19 +37,27 @@ class String
     s
   end
 
+  def self.new()
+    # implement commonly used variant for performance
+    s = __alloc
+    s.initialize
+    s
+  end
+
   def initialize(*args)
+    # this version gets bridge methods
     len = args.length
-    if len._equal?(0)
-      # do nothing
-    elsif len._equal?(1)
+    # Do nothing for zero args (return self)
+    if len._equal?(1)
       self.initialize(args[0])
-    else
+    elsif len > 1
       raise ArgumentError, 'too many args'
-    end 
+    end
     self
   end
 
   def initialize(str)
+    # implement commonly used variant for performance
     if self.class._equal?(String)
       # do nothing
     else
@@ -50,13 +67,8 @@ class String
     self
   end
 
-  def self.new()
-    s = __alloc
-    s.initialize
-    s
-  end
-
   def initialize
+    # implement commonly used variant for performance
     self
   end
 
