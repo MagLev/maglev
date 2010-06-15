@@ -1,25 +1,28 @@
-class CZstream
-    # CZstream is not intended for use outside of the Zlib module
-
-    class_primitive_nobridge 'open_read', 'openRead:errorClass:'
-    class_primitive_nobridge 'open_write', 'openWrite:errorClass:comprLevel:'
-    class_primitive_nobridge 'allocate', '_basicNew'
-
-    primitive_nobridge 'read', 'read:'
-    primitive_nobridge 'read_header', 'header'
-    primitive_nobridge 'write_header', 'writeHeader:'
-    primitive_nobridge 'at_eof', 'atEnd'
-    primitive_nobridge 'total_out', 'position'
-    primitive_nobridge 'close', 'close'
-    primitive_nobridge 'flush', 'flush'
-    primitive_nobridge 'write', 'rubyWrite:count:'
-
-    primitive_nobridge '__open', 'open:io:errorClass:comprLevel:'
-
-end
+#  CZstream, Zlib::ZStream  defined in zlib_czstream1.rb
 
 module Zlib
 
-  ZStream = ::CZstream
+  def self.adler32(string="", initial=1)
+    string = Type.coerce_to(string, String, :to_s)
+    unless initial._isFixnum
+      # prim checks range of initial
+      raise( initial._isNumeric ? RangeError : TypeError, 
+		'adler32 initial crc must be a Fixnum >= 0')
+    end
+    ZStream.__adler32(string, initial);
+  end
 
+  def self.crc32(string="", initial=0)
+    string = Type.coerce_to(string, String, :to_s)
+    unless initial._isFixnum
+      # prim checks range of initial
+      raise( initial._isNumeric ? RangeError : TypeError,
+                'crc32 initial crc must be a Fixnum >= 0')
+    end
+    ZStream.__crc32(string, initial);
+  end
+
+  def self.crc_table
+    ZStream.__crc_table
+  end
 end
