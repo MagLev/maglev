@@ -1469,7 +1469,7 @@ module MagRp # {
 
     def internal_error(msg)  # was raise_error
       print_saved_warnings
-      puts "InternalParseError: #{msg}"
+      puts "InternalParseError: #{msg} during #{@file_name}"
       if @debuglevel > 2
 	nil.pause  
       end
@@ -1478,7 +1478,7 @@ module MagRp # {
 
     def syntax_error(msg)
       print_saved_warnings
-      raise SyntaxError, msg
+      raise SyntaxError, "#{msg} of #{@file_name}"
     end 
 
     def backref_assign_error( a_val)  # method missing from rp202 code

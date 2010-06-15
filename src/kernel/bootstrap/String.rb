@@ -28,6 +28,17 @@ class String
     s
   end
 
+  def initialize(*args)
+    len = args.length
+    # Do nothing for zero args (return self)
+    if len._equal?(1)
+      self.initialize(args[0])
+    elsif len > 1
+      raise ArgumentError, 'too many args'
+    end
+    self
+  end
+
   def initialize(str)
     if self.class._equal?(String)
       # do nothing
@@ -39,7 +50,6 @@ class String
   end
 
   def self.new()
-    # no bridge methods for this variant
     s = __alloc
     s.initialize
     s
@@ -492,8 +502,9 @@ class String
 
   alias concat <<
 
-    # arg to rubyCount: is expected to be an Array , so declare as 'count*'
-    primitive 'count*', 'rubyCount:'
+  # def count(*args); end 
+  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
+  primitive 'count*', 'rubyCount:'
 
   # MNI: crypt
 
@@ -1555,6 +1566,18 @@ class String
         # ignore elements of args not coercable
       end
       n += 1
+    end
+    false
+  end
+
+  def start_with?(string)
+    begin
+      str = Type.coerce_to(string, String, :to_str)
+      if self.__at_equals(1 , str)
+        return true
+      end
+    rescue
+      # ignore arg not coercable
     end
     false
   end

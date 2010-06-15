@@ -90,9 +90,7 @@ class File
   # __modify_file provides access to chmod, fchmod, chown, lchown, fchown
   class_primitive '__modify_file*', '_modifyFile:fdPath:with:with:'
 
-  def self.allocate
-    raise NotImplementedError, 'File#allocate not supported'
-  end
+  class_primitive_nobridge 'allocate', '_basicNew'
 
   def self.atime(filename)
     File.stat(filename).atime
@@ -784,6 +782,7 @@ class File
   def readpartial(length, buffer=MaglevUndefined)
     raise IOError, 'read: closed stream' unless __is_open
     need_trunc = false
+    length = Type.coerce_to(length, Fixnum, :to_int)
     if buffer._equal?(MaglevUndefined)
       buffer = ""
     else

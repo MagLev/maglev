@@ -12,6 +12,7 @@
 #
 
 # require "kconv"  # Patch until kconv.rb works (see Trac 694)
+                   # kconv.rb requires nkf which is a C extension
 
 
 # The Base64 module provides for the encoding (#encode64) and decoding
@@ -70,17 +71,18 @@ module Base64
   # insensitive.
 
   def decode_b(str)
-    str.gsub!(/=\?ISO-2022-JP\?B\?([!->@-~]+)\?=/i) {
-      decode64($1)
-    }
-    str = Kconv::toeuc(str)
-    str.gsub!(/=\?SHIFT_JIS\?B\?([!->@-~]+)\?=/i) {
-      decode64($1)
-    }
-    str = Kconv::toeuc(str)
-    str.gsub!(/\n/, ' ') 
-    str.gsub!(/\0/, '')
-    str
+    raise NotImplementedError, 'decode_b not available until pure ruby Kconv'
+ #  str.gsub!(/=\?ISO-2022-JP\?B\?([!->@-~]+)\?=/i) {
+ #    decode64($1)
+ #  }
+ #  str = Kconv::toeuc(str)
+ #  str.gsub!(/=\?SHIFT_JIS\?B\?([!->@-~]+)\?=/i) {
+ #    decode64($1)
+ #  }
+ #  str = Kconv::toeuc(str)
+ #  str.gsub!(/\n/, ' ') 
+ #  str.gsub!(/\0/, '')
+ #  str
   end
 
   # Returns the Base64-encoded version of +str+.

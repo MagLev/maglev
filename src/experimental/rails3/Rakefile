@@ -10,7 +10,7 @@ RAILS_INCLUDES = %w(railties
                     ).reverse.inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
 
 MH = ENV['MAGLEV_HOME']
-TZ_INC = " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.19/lib"
+TZ_INC = " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.20/lib"
 REQ = '-r tzinfo -r ../core_ext.rb'
 RAILS_INCLUDES << TZ_INC
 
@@ -58,21 +58,28 @@ task :mm do
   sh %{ maglev-ruby -I #{mmlib} multitest.rb }
 end
 
+desc "Run app on maglev from gems (should do 'rake patchgems' first)"
+task :gemapp do
+  cd('my_app') do
+    sh %{ maglev-ruby -MallIvsDynamic -r ../core_ext.rb script/rails server }
+  end
+end
+
 desc "cp patches to rubygems; backup originals"
 task :patchgems do
   gemd = ENV['MAGLEV_HOME'] + '/lib/maglev/gems/1.8/gems'
-  gem_suffix = '-3.0.0.beta3'
+  gem_suffix = '-3.0.0.beta4'
   patches = [
-             # Work around Trac 730: IO#readpartial is not implemented.
-             ['activesupport', 'lib/active_support/secure_random.rb'],
+             # # Work around Trac 730: IO#readpartial is not implemented.
+             # ['activesupport', 'lib/active_support/secure_random.rb'],
 
-             # Workaround a file not found problem.  Root cause TBD.
-             ['railties', 'lib/rails/application/finisher.rb'],
-             # Work around another issue removing a persistent method in
-             # transient mode.
+             # Work around a file not found problem.  Root cause TBD.
+#             ['railties', 'lib/rails/application/finisher.rb'],
+
+             # Work around can't remove const_missing
              ['activesupport', 'lib/active_support/dependencies.rb'],
 
-             # Workaround MagLev's prohibition on aliasing to __send__.
+             # Work around MagLev's prohibition on aliasing to __send__.
              ['activesupport', 'lib/active_support/core_ext/object/try.rb'],
 
              # Provide MagLev implementation for finding subclasses through
@@ -82,11 +89,12 @@ task :patchgems do
 
              # Work around issue trying to remove_method on a persistent
              # module while in transient mode.
-             ['activesupport', 'lib/active_support/core_ext/enumerable.rb']]
+             ['activesupport', 'lib/active_support/core_ext/enumerable.rb']
+            ]
   patches.each do |mod, file|
     src = "rails/#{mod}/#{file}"
     dest = "#{gemd}/#{mod}#{gem_suffix}/#{file}"
-    
+
     # Backup original
     cp dest, "#{dest}.orig"
 

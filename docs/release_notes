@@ -58,8 +58,7 @@ See the {Persistence API}[link:files/docs/persistence-api.html]
 
 == RubyGems
 
-MagLev comes with a copy of RubyGems 1.3.5 pre-installed.  There is one
-patch to work around an oddity of the MRI zlib handling.
+MagLev comes with a copy of RubyGems 1.3.7 pre-installed.
 
 == Kernel
 * Note that we don't support instance variables as block arguments,

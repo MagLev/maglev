@@ -123,4 +123,17 @@ module Kernel
   end
   module_function :warn
 
+
+  # from timeout.rb
+  ## 
+  # Identical to:
+  #
+  #   Timeout::timeout(n, e, &block).
+  #
+  # Defined for backwards compatibility with earlier versions of timeout.rb, see
+  # Timeout#timeout.
+  def timeout(n, e = nil, &block) # :nodoc:
+    Timeout::timeout(n, e, &block)
+  end
+
 end
