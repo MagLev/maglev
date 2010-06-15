@@ -384,7 +384,7 @@ class Object
     self
   end
 
-  def initialize(*args)
+  def initialize(*args, &block)
      self
   end
   # implement common variants to avoid runtime cost of bridge methods
@@ -398,6 +398,18 @@ class Object
     self
   end
   def initialize(a,b,c)
+    self
+  end
+  def initialize(&block)
+    self
+  end
+  def initialize(a, &block)
+    self
+  end
+  def initialize(a,b, &block)
+    self
+  end
+  def initialize(a,b,c, &block)
     self
   end
 
@@ -511,26 +523,26 @@ class Object
     Module.__filter_method_names(__ruby_singleton_methods(inc_modules, 0))
   end
 
-  primitive_nobridge '__ruby_methods', 'rubyMethods:'
+  primitive_nobridge '__ruby_methods', 'rubyMethods:protection:'
 
   # If regular is true, retuns an array of the names of methods publicly
   # accessible in receiver and receiver's ancestors.  Otherwise, returns
   # an array of the names of receiver's singleton methods.
   def methods(regular = true)
     if regular
-      set = self.__ruby_methods(-1) # incl protected meths
+      set = self.__ruby_methods(true, -1) # incl protected meths
     else
       set = self.__ruby_singleton_methods(false, -1) # incl protected meths
     end
     Module.__filter_method_names(set)
   end
 
-  def private_methods
-    Module.__filter_method_names(self.__ruby_methods(2))
+  def private_methods(include_super=true)
+    Module.__filter_method_names(self.__ruby_methods(include_super, 2))
   end
 
-  def protected_methods
-    Module.__filter_method_names(self.__ruby_methods(1))
+  def protected_methods(include_super=true)
+    Module.__filter_method_names(self.__ruby_methods(include_super, 1))
   end
 
   def public_methods(ignored_arg = true)
