@@ -108,7 +108,12 @@ class Matrix
 #  extend Exception2MessageMapper
   include ExceptionForMatrix
   
-  # instance creations
+  # instance creations # maglev need to reimplemente new to be able to make it private
+  def self.new(rows, copy)
+    inst = self.allocate
+    inst.initialize( rows, copy )
+    inst
+  end
   private_class_method :new
   
   #
@@ -118,7 +123,7 @@ class Matrix
   #          -1 66
   #
   def Matrix.[](*rows)
-    new(:init_rows, rows, false)
+    new( rows, false)
   end
 
   def self.Raise(cls, *args)  # workaround for broken e2mmap.rb
@@ -138,7 +143,7 @@ class Matrix
   #      =>  25 93
   #          -1 66
   def Matrix.rows(rows, copy = true)
-    new(:init_rows, rows, copy)
+    new(rows, copy)
   end
   
   #
@@ -264,9 +269,9 @@ class Matrix
   # This method is used by the other methods that create matrices, and is of no
   # use to general users.
   #
-  def initialize(init_method, *argv)
-    self.send(init_method, *argv)
-  end
+  #def initialize(init_method, *argv)  # maglev, eliminated the send
+  #  self.send(init_method, *argv)
+  #end
 
   def __init_check_row(arow)
     if arow._isArray
@@ -278,7 +283,7 @@ class Matrix
     Type.coerce_to( arow, Array, :to_ary )
   end
   
-  def init_rows(rows, copy)
+  def initialize(rows, copy) # maglev , renamed from init_rows
     if copy
       r_size = rows.size
       c_rows = Array.new(r_size)
@@ -318,7 +323,7 @@ class Matrix
     end
     self
   end
-  private :init_rows
+  private :initialize  # maglev allows send from within self.new
   
   #
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
