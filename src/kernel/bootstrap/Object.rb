@@ -211,7 +211,7 @@ class Object
   end
 
   def __splat_lasgn_value
-    # runtime support for   x = *y   , invoked from generated code
+    # runtime support for rhs of   x = *y , invoked from generated code
     a = self
     unless a._isArray
       if a._equal?(nil)
