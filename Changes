@@ -2,7 +2,7 @@
 
 * topaz   whr, upr, downr   no longer display bridge methods
 * add topaz commands   whrb, uprb, downrb   which include bridge methods
-* Fix Trac 747
+* Fix Trac 747, 748
 
 == Changes for 23611  2010-06-12
 
