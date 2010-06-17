@@ -12,3 +12,9 @@ module Psych
     alias :each_document :load_documents
   end
 end
+
+# Register MagLev classes with Psych
+[ IdentitySet,
+  IdentityHash ].each do |klass|
+  Psych.add_tag(klass.name, klass)
+end

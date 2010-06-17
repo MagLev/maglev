@@ -178,6 +178,23 @@ class IdentitySet
   end
 
   #--
+  # Psych/Yaml support.
+  # IdentitySet also registered in lib/ruby/1.8/psych.rb
+  #++
+
+  # Psych hook method for dumping to YAML
+  def encode_with(coder)
+    # serialize as a YAML sequence
+    coder.represent_seq(self.class.name, self.to_a)
+  end
+  
+  # Psych hook method for reviving from YAML
+  def init_with(coder)
+    p coder.seq
+    self.__addall(coder.seq)
+  end
+
+  #--
   # Add some of Enumerable's methods.  An Identity set is a
   # Non-sequenceable Collection, hence not all of Enumerable is applicable.
   #++

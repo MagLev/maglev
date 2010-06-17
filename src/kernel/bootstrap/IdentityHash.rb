@@ -27,15 +27,15 @@ class IdentityHash
       k = self.__at(kofs)
       if k._not_equal?(RemoteNil)
         if key._equal?(k)
-	  return v
+          return v
         end
       elsif v._isFixnum  
         idx = v  # internal collision chain
         begin
-	  if key._equal?(self.__at(idx) )
+          if key._equal?(self.__at(idx) )
             return self.__at(idx + 1)
           end
-	  idx = self.__at(idx + 2)
+          idx = self.__at(idx + 2)
         end while idx._isFixnum
       else
         v = v.__bucket_at(key, kh) # a collision bucket
@@ -192,14 +192,14 @@ class IdentityHash
         else
           # convert entry to collision chain
           empty_idx = self.__varying_size
-	  self.__at_put(empty_idx + 5, nil) # auto-grows
-	  self.__at_put(empty_idx + 3,  key)
-	  self.__at_put(empty_idx + 4, value)
-	  self.__at_put(empty_idx + 2, empty_idx + 3)
-	  self.__at_put(empty_idx + 0, k)
-	  self.__at_put(empty_idx + 1, v)
-	  self.__at_put(kofs,     RemoteNil )
-	  self.__at_put(kofs + 1, empty_idx)
+          self.__at_put(empty_idx + 5, nil) # auto-grows
+          self.__at_put(empty_idx + 3,  key)
+          self.__at_put(empty_idx + 4, value)
+          self.__at_put(empty_idx + 2, empty_idx + 3)
+          self.__at_put(empty_idx + 0, k)
+          self.__at_put(empty_idx + 1, v)
+          self.__at_put(kofs,     RemoteNil )
+          self.__at_put(kofs + 1, empty_idx)
         end
       elsif v._isFixnum
         idx = v  # internal collision chain
@@ -313,4 +313,19 @@ class IdentityHash
     return RemoteNil
   end
 
+  #--
+  # Psych/Yaml support.
+  # IdentityHash also registered in lib/ruby/1.8/psych.rb
+  #++
+
+  # Psych hook method for dumping to YAML
+  def encode_with(coder)
+    # serialize as a YAML sequence
+    coder.represent_map(self.class.name, self)
+  end
+
+  # Psych hook method for reviving from YAML
+  def init_with(coder)
+    coder.map.each_pair { |k,v| self.__atkey_put(k, v) }
+  end
 end
