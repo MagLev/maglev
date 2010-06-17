@@ -18,9 +18,10 @@ class ExecBlock
   primitive_nobridge '__fetchRubyVcGlobal', '_rubyVcGlobalAt:'
   primitive_nobridge '__setRubyVcGlobal', '_rubyVcGlobalAt:put:'
 
-  primitive_nobridge '__copy_for_ruby', '_copyForRuby:'
-    #  one Fixnum arg,  0 == for lambda, 1 == for define_method , 
-    #     2 == for non-lambda  proc 
+  primitive_nobridge '__copy_for_proc', '_copyForProc:'
+    #  one arg,  
+    #    0 == for lambda, 
+    #    2 == for non-lambda  proc 
 
   primitive_nobridge '__source_location', '_fileAndLine'
 
@@ -125,7 +126,7 @@ class Proc
     def self.new(&block)
       if block._isBlock
         inst = self.allocate
-        b = block.__copy_for_ruby(2) # transform break bytecodes if any
+        b = block.__copy_for_proc(2) # transform break bytecodes if any
         b.freeze
         inst.__initialize(&b)
         inst.initialize
@@ -140,7 +141,7 @@ class Proc
     def self.new(block)
       if block._isBlock
         inst = self.allocate
-        b = block.__copy_for_ruby(2) # transform break bytecodes if any
+        b = block.__copy_for_proc(2) # transform break bytecodes if any
         b.freeze
         inst.__initialize(&b)
         inst.initialize
@@ -159,13 +160,13 @@ class Proc
     def self.new_lambda(&block)
       if block._isBlock
         inst = self.allocate
-        b = block.__copy_for_ruby(0)
+        b = block.__copy_for_proc(0)
         b.freeze
         inst.__initialize(&b)
         return inst
       elsif block._is_a?(Proc)
         pb = block.__block
-        b = pb.__copy_for_ruby(0)
+        b = pb.__copy_for_proc(0)
         b.freeze
         if b._equal?(pb)
           return block  # the argument block  is already a lambda
