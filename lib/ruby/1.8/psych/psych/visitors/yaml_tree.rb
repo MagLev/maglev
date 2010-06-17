@@ -1,15 +1,18 @@
 module Psych
   module Visitors
+    ###
+    # YAMLTree builds a YAML ast given a ruby object.  For example:
+    #
+    #   builder = Psych::Visitors::YAMLTree.new
+    #   builder << { :foo => 'bar' }
+    #   builder.tree # => #<Psych::Nodes::Stream .. }
+    #
     class YAMLTree < Psych::Visitors::Visitor
-      attr_reader :tree
-
-      def initialize options = {}
+      def initialize options = {}, emitter = Psych::TreeBuilder.new
         super()
-        @json  = options[:json]
-        @tree  = Nodes::Stream.new
-        @stack = []
-        @st    = {}
-        @ss    = ScalarScanner.new
+        @emitter  = emitter
+        @st       = {}
+        @ss       = ScalarScanner.new
 
         @dispatch_cache = Hash.new do |h,klass|
           method = "visit_#{(klass.name || '').split('::').join('_')}"
@@ -22,18 +25,48 @@ module Psych
         end
       end
 
-      def << object
-        doc = create_document
-        @stack << doc
-        @tree.children << doc
-        accept object
+      def start encoding = Nodes::Stream::UTF8
+        @emitter.start_stream(encoding).tap do
+          @started = true
+        end
       end
+
+      def finish
+        @emitter.end_stream.tap do
+          @finished = true
+        end
+      end
+
+      def tree
+        finish unless finished?
+      end
+
+      def push object
+        start unless started?
+        @emitter.start_document [], [], false
+        accept object
+        @emitter.end_document
+      end
+      alias :<< :push
 
       def accept target
         # return any aliases we find
         if node = @st[target.object_id]
           node.anchor = target.object_id.to_s
-          return append Nodes::Alias.new target.object_id.to_s
+          return @emitter.alias target.object_id.to_s
+        end
+
+        if target.respond_to?(:to_yaml)
+          loc = target.method(:to_yaml).source_location.first
+          if loc !~ /(syck\/rubytypes.rb|psych\/core_ext.rb)/
+            unless target.respond_to?(:encode_with)
+              if $VERBOSE
+                warn "implementing to_yaml is deprecated, please implement \"encode_with\""
+              end
+
+              target.to_yaml(:nodump => true)
+            end
+          end
         end
 
         if target.respond_to?(:encode_with)
@@ -44,12 +77,11 @@ module Psych
       end
 
       def visit_Psych_Omap o
-        seq = Nodes::Sequence.new(nil, '!omap', false)
+        seq = @emitter.start_sequence(nil, '!omap', false, Nodes::Sequence::BLOCK)
         register(o, seq)
 
-        @stack.push append seq
         o.each { |k,v| visit_Hash k => v }
-        @stack.pop
+        @emitter.end_sequence
       end
 
       def visit_Object o
@@ -59,50 +91,48 @@ module Psych
           tag   = ['!ruby/object', klass].compact.join(':')
         end
 
-        map = append Nodes::Mapping.new(nil, tag, false)
+        map = @emitter.start_mapping(nil, tag, false, Nodes::Mapping::BLOCK)
         register(o, map)
 
-        @stack.push map
-        dump_ivars(o, map)
-        @stack.pop
+        dump_ivars o
+        @emitter.end_mapping
       end
 
       def visit_Struct o
         tag = ['!ruby/struct', o.class.name].compact.join(':')
 
-        map = register(o, Nodes::Mapping.new(nil, tag, false))
-
-        @stack.push append map
-
+        register o, @emitter.start_mapping(nil, tag, false, Nodes::Mapping::BLOCK)
         o.members.each do |member|
-          map.children <<  Nodes::Scalar.new("#{member}")
+          @emitter.scalar member.to_s, nil, nil, true, false, Nodes::Scalar::ANY
           accept o[member]
         end
 
-        dump_ivars(o, map)
+        dump_ivars o
 
-        @stack.pop
+        @emitter.end_mapping
       end
 
       def visit_Exception o
         tag = ['!ruby/exception', o.class.name].join ':'
 
-        map = append Nodes::Mapping.new(nil, tag, false)
+        @emitter.start_mapping nil, tag, false, Nodes::Mapping::BLOCK
 
-        @stack.push map
-
-        v = o.__message
-        if v
-          map.children << Nodes::Scalar.new('message')   
-          accept(v)
+        {
+          'message'   => private_iv_get(o, 'mesg'),
+          'backtrace' => private_iv_get(o, 'backtrace'),
+        }.each do |k,v|
+          next unless v
+          @emitter.scalar k, nil, nil, true, false, Nodes::Scalar::ANY
+          accept v
         end
-        # backtrace not included in output , not used by load
-        dump_ivars(o, map)
-        @stack.pop
+
+        dump_ivars o
+
+        @emitter.end_mapping
       end
 
       def visit_Regexp o
-        append Nodes::Scalar.new(o.inspect, nil, '!ruby/regexp', false)
+        @emitter.scalar o.inspect, nil, '!ruby/regexp', false, false, Nodes::Scalar::ANY
       end
 
       def visit_Time o
@@ -113,29 +143,34 @@ module Psych
           formatted += ".%06d %+.2d:00" % [o.usec, o.gmt_offset / 3600]
         end
 
-        append Nodes::Scalar.new formatted
+        @emitter.scalar formatted, nil, nil, true, false, Nodes::Scalar::ANY
       end
 
       def visit_Rational o
-        map = append Nodes::Mapping.new(nil, '!ruby/object:Rational', false)
+        @emitter.start_mapping(nil, '!ruby/object:Rational', false, Nodes::Mapping::BLOCK)
+
         [
           'denominator', o.denominator.to_s,
           'numerator', o.numerator.to_s
         ].each do |m|
-          map.children << Nodes::Scalar.new(m)
+          @emitter.scalar m, nil, nil, true, false, Nodes::Scalar::ANY
         end
+
+        @emitter.end_mapping
       end
 
       def visit_Complex o
-        map = append Nodes::Mapping.new(nil, '!ruby/object:Complex', false)
+        @emitter.start_mapping(nil, '!ruby/object:Complex', false, Nodes::Mapping::BLOCK)
 
         ['real', o.real.to_s, 'image', o.imag.to_s].each do |m|
-          map.children << Nodes::Scalar.new(m)
+          @emitter.scalar m, nil, nil, true, false, Nodes::Scalar::ANY
         end
+
+        @emitter.end_mapping
       end
 
       def visit_Integer o
-        append Nodes::Scalar.new o.to_s
+        @emitter.scalar o.to_s, nil, nil, true, false, Nodes::Scalar::ANY
       end
       alias :visit_TrueClass :visit_Integer
       alias :visit_FalseClass :visit_Integer
@@ -143,24 +178,28 @@ module Psych
 
       def visit_Float o
         if o.nan?
-          append Nodes::Scalar.new '.nan'
+          @emitter.scalar '.nan', nil, nil, true, false, Nodes::Scalar::ANY
         elsif o.infinite?
-          append Nodes::Scalar.new(o.infinite? > 0 ? '.inf' : '-.inf')
+          @emitter.scalar((o.infinite? > 0 ? '.inf' : '-.inf'),
+            nil, nil, true, false, Nodes::Scalar::ANY)
         else
-          append Nodes::Scalar.new o.to_s
+          @emitter.scalar o.to_s, nil, nil, true, false, Nodes::Scalar::ANY
         end
       end
 
       def visit_String o
         plain = false
         quote = false
+        style = Nodes::Scalar::ANY
 
         # GemStone:  MagLev does not yet have fdiv
         #if o.index("\x00") || o.count("^ -~\t\r\n").fdiv(o.length) > 0.3
         if o.index("\x00") || (o.count("^ -~\t\r\n").to_f / o.length) > 0.3
         # End GemStone
           str   = [o].pack('m').chomp
-          tag   = '!binary'
+          tag   = '!binary' # FIXME: change to below when syck is removed
+          #tag   = 'tag:yaml.org,2002:binary'
+          style = Nodes::Scalar::LITERAL
         else
           str   = o
           tag   = nil
@@ -168,23 +207,18 @@ module Psych
           plain = !quote
         end
 
-        ivars = o.respond_to?(:to_yaml_properties) ?
-          o.to_yaml_properties :
-          o.instance_variables
-
-        scalar = create_scalar str, nil, tag, plain, quote
+        ivars = find_ivars o
 
         if ivars.empty?
-          append scalar
+          @emitter.scalar str, nil, tag, plain, quote, style
         else
-          mapping = append Nodes::Mapping.new(nil, '!str', false)
+          @emitter.start_mapping nil, '!str', false, Nodes::Mapping::BLOCK
+          @emitter.scalar 'str', nil, nil, true, false, Nodes::Scalar::ANY
+          @emitter.scalar str, nil, tag, plain, quote, style
 
-          mapping.children << Nodes::Scalar.new('str')
-          mapping.children << scalar
+          dump_ivars o
 
-          @stack.push mapping
-          dump_ivars o, mapping
-          @stack.pop
+          @emitter.end_mapping
         end
       end
 
@@ -193,72 +227,61 @@ module Psych
       end
 
       def visit_Range o
-        @stack.push append Nodes::Mapping.new(nil, '!ruby/range', false)
+        @emitter.start_mapping nil, '!ruby/range', false, Nodes::Mapping::BLOCK
         ['begin', o.begin, 'end', o.end, 'excl', o.exclude_end?].each do |m|
           accept m
         end
-        @stack.pop
+        @emitter.end_mapping
       end
 
       def visit_Hash o
-        @stack.push append register(o, create_mapping)
+        register(o, @emitter.start_mapping(nil, nil, true, Psych::Nodes::Mapping::BLOCK))
 
         o.each do |k,v|
           accept k
           accept v
         end
 
-        @stack.pop
-      end
-
-      def visit_IdentityHash(o) # maglev
-        @stack.push append register(o, Nodes::Mapping.new(nil, '!ruby/object:IdentityHash', false))
-        o.each { |k,v|
-          accept k
-          accept v
-        }
-        @stack.pop
+        @emitter.end_mapping
       end
 
       def visit_Psych_Set o
-        @stack.push append register(o, Nodes::Mapping.new(nil, '!set', false))
+        register(o, @emitter.start_mapping(nil, '!set', false, Psych::Nodes::Mapping::BLOCK))
 
         o.each do |k,v|
           accept k
           accept v
         end
 
-        @stack.pop
-      end
-
-      def visit_IdentitySet(o)  # maglev
-        seq = Nodes::Sequence.new(nil, '!ruby/object:IdentitySet', false)
-        register(o, seq)
-        @stack.push append seq
-        o.each { | elem |
-          accept(elem)
-        }
-        @stack.pop
+        @emitter.end_mapping
       end
 
       def visit_Array o
-        @stack.push append register(o, create_sequence)
+        register o, @emitter.start_sequence(nil, nil, true, Nodes::Sequence::BLOCK)
         o.each { |c| accept c }
-        @stack.pop
+        @emitter.end_sequence
       end
 
       def visit_NilClass o
-        append Nodes::Scalar.new('', nil, 'tag:yaml.org,2002:null', false)
+        @emitter.scalar('', nil, 'tag:yaml.org,2002:null', false, false, Nodes::Scalar::ANY)
       end
 
       def visit_Symbol o
-        append create_scalar ":#{o}"
+        @emitter.scalar ":#{o}", nil, nil, true, false, Nodes::Scalar::ANY
       end
 
       private
-      def append o
-        @stack.last.children << o
-        o
+      # FIXME: remove this method once "to_yaml_properties" is removed
+      def find_ivars target
+        loc = target.method(:to_yaml_properties).source_location.first
+        unless loc.start_with?(Psych::DEPRECATED) || loc.end_with?('rubytypes.rb')
+          if $VERBOSE
+            warn "#{loc}: to_yaml_properties is deprecated, please implement \"encode_with(coder)\""
+          end
+          return target.to_yaml_properties
+        end
+
+        target.instance_variables
       end
 
       def register target, yaml_obj
@@ -281,49 +304,30 @@ module Psych
       def emit_coder c
         case c.type
         when :scalar
-          append create_scalar(c.scalar, nil, c.tag, c.tag.nil?)
+          @emitter.scalar c.scalar, nil, c.tag, c.tag.nil?, false, Nodes::Scalar::ANY
         when :seq
-          @stack.push append create_sequence(nil, c.tag, c.tag.nil?)
+          @emitter.start_sequence nil, c.tag, c.tag.nil?, Nodes::Sequence::BLOCK
           c.seq.each do |thing|
             accept thing
           end
-          @stack.pop
+          @emitter.end_sequence
         when :map
-          map = append Nodes::Mapping.new(nil, c.tag, c.implicit, c.style)
-          @stack.push map
+          @emitter.start_mapping nil, c.tag, c.implicit, c.style
           c.map.each do |k,v|
-            map.children << create_scalar(k)
+            @emitter.scalar k, nil, nil, true, false, Nodes::Scalar::ANY
             accept v
           end
-          @stack.pop
+          @emitter.end_mapping
         end
       end
 
-      def dump_ivars target, map
-        ivars = target.respond_to?(:to_yaml_properties) ?
-          target.to_yaml_properties :
-          target.instance_variables
+      def dump_ivars target
+        ivars = find_ivars target
 
         ivars.each do |iv|
-          map.children << create_scalar("#{iv.to_s.sub(/^@/, '')}")
+          @emitter.scalar("#{iv.to_s.sub(/^@/, '')}", nil, nil, true, false, Nodes::Scalar::ANY)
           accept target.instance_variable_get(iv)
         end
-      end
-
-      def create_document
-        Nodes::Document.new
-      end
-
-      def create_mapping
-        Nodes::Mapping.new
-      end
-
-      def create_scalar value, anchor = nil, tag = nil, plain = true, quoted = false, style = Nodes::Scalar::ANY
-        Nodes::Scalar.new(value, anchor, tag, plain, quoted, style)
-      end
-
-      def create_sequence anchor = nil, tag = nil, implicit = true, style = Nodes::Sequence::BLOCK
-        Nodes::Sequence.new(anchor, tag, implicit, style)
       end
     end
   end
