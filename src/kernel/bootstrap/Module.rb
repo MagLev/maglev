@@ -234,6 +234,7 @@ class Module
   primitive_nobridge '__define_method_block&' , 'defineMethod:block:'
 
   def define_method(sym, meth)
+    sym = Type.coerce_to(sym, Symbol, :to_sym)
     m = meth
     if m._is_a?(Proc)
       m = meth.__block
