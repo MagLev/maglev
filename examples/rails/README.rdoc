@@ -1,0 +1,41 @@
+# Notes on MagLev and Rails3
+
+## Pre-Requisites
+
+Before you can run the example rails app, you need certain gems and a
+patched copy of Rails.  To get them:
+
+  $ rake checkout
+  $ rake gems
+
+You'll need to ensure the following gems have been installed:
+
+  $ maglev-gem install i18n rack-mount rack arel erubis
+
+Then, you'll need to checkout a local copy of Rails 3, with the MagLev
+patches:
+
+  $ rake checkout
+
+And finally, you should be able to run rails
+
+  $ rake app
+
+See the +Rakefile+ for other tasks.
+
+
+## Changes to run with MagLev
+
+### Creating the Sample App
+
+* The rails script currently does not run under MagLev.  MRI 1.8.7 was used
+  to create +myapp+ with the following command:
+
+    $ ruby $MAGLEV_HOME/examples/rails/rails/bin/rails new myapp --dev
+
+* <tt>myapp/Gemfile</tt> was tweaked to use ENV['MAGLEV_HOME'] as a path
+  prefix and comment out the sqlite3 gem.
+
+* <tt>myapp/config/application.rb</tt> was edited.  <tt>require
+  'rails/all'</tt> was replaced by a list of require statements, excluding
+  +ActiveRecord+.
