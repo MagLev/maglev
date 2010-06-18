@@ -1,8 +1,13 @@
 = MagLev Change Log
 
-* topaz   whr, upr, downr   no longer display bridge methods
-* add topaz commands   whrb, uprb, downrb   which include bridge methods
+== Changes for 23673  2010-06-17
+
+* topaz whr, upr, downr no longer display bridge methods
+* add topaz commands whrb, uprb, downrb which include bridge methods
 * Fix Trac 747, 748
+* implements IdentitySet.allocate
+* Update to latest version of Psych
+* Numerous optimizations and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23611  2010-06-12
 
