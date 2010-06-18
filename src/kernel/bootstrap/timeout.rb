@@ -43,11 +43,18 @@ module Timeout
   def timeout(sec, klass = nil, &block)
     if sec._equal?(nil)
       return block.call
-    else 
-      sec = Type.coerce_to(sec, Fixnum, :to_int)
-      if sec._equal?(0)
-        return block.call
-      end
+    end
+    if sec._isFixnum
+      millisecs = sec * 1000
+    else
+      sec = Type.coerce_to(sec, Float, :to_f)
+      millisecs = (sec * 1000.0).to_int
+    end
+    unless millisecs._isFixnum
+      raise  RangeError , 'Timeout.timeout arg * 1000 must be a Fixnum'
+    end
+    if millisecs._equal?(0)
+      return block.call
     end
     raise ThreadError, "timeout within critical session" if Thread.critical
     # Maglev, optimization just use ExitException, not Class.new(ExitException)
@@ -55,7 +62,7 @@ module Timeout
     begin
       x = Thread.current
       y = Thread.start {
-        __high_priority_sleep_ms( sec * 1000 )
+        __high_priority_sleep_ms( millisecs )
         if x.alive?
           x.raise  excls, "execution expired" 
         end

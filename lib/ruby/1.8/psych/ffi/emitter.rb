@@ -61,11 +61,12 @@ module Psych
     end
 
     def scalar(value, anchor, tag, plain, quoted, style)
+      v = value.to_s
       do_emit(Psych::LibPsych.emit_scalar(@emitter_context.emitter,
-                                               value, value.length,
-                                               wrap_string_or_nil(anchor),
-                                               wrap_string_or_nil(tag),
-                                               plain  ? 1 : 0, quoted ? 1 : 0, style))
+                                          v, v.length,
+                                          wrap_string_or_nil(anchor),
+                                          wrap_string_or_nil(tag),
+                                          plain  ? 1 : 0, quoted ? 1 : 0, style))
       self
     end
 

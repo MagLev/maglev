@@ -1727,42 +1727,43 @@ ifdef(<[PARSER_DEBUG]>,
         if kwarr._not_equal?(nil) 
           # clex_state holds "old state" and we update @lex_state
           #   with new state to be valid after return
-          kw_state = kwarr[2] # was keyword.state
           kw_id_zero = kwarr[0] # was keyword.id0 
-          if kw_state >= 0
-            @lex_state = kw_state
-            @yacc_value = ttoken
-            if kw_id_zero._equal?( :kELSE )
-              @last_else_src_offset = tok_start_offset # for hints and warnings
+          if kw_id_zero._isFixnum
+            @lex_state = kwarr[2] # was keyword.state
+            if kw_id_zero._equal?(0)
+              @yacc_value = ttoken
+            else  #   kw_id_zero == 1 
+              @yacc_value = RpNameToken.new( ttoken , tok_start_offset)   
             end
-          else
-            @lex_state  =  0 - kw_state
-
-            if kw_id_zero._equal?( :kDO ) then
+            return kwarr[1] #  synthesized kw_id_zero == kw_id_one
+          elsif kw_id_zero._equal?(nil)
+            @lex_state = kwarr[2] # was keyword.state
+            kw_id_one = kwarr[1] # was keyword.id1
+            if kw_id_one._equal?( :kELSE )
+              @yacc_value = ttoken
+              @last_else_src_offset = tok_start_offset # for hints and warnings
+            elsif kw_id_one._equal?( :kDO )
               @command_start = true
               @yacc_value = RpNameToken.new( ttoken , tok_start_offset)
               return :kDO_COND  if @cond.is_in_state
-              return :kDO_BLOCK if @cmdarg.is_in_state && clex_state._not_equal?( Expr_cmdArg)
+              return :kDO_BLOCK if clex_state._not_equal?( Expr_cmdArg) && @cmdarg.is_in_state 
               return :kDO_BLOCK if clex_state._equal?( Expr_endArg )
               return :kDO
-            end
-            if kw_id_zero._equal?( :kDEF) 
-              # need a byte offset and line number for :kDEF
+            elsif kw_id_one._equal?( :kDEF )
               @yacc_value = DefnNameToken.new( ttoken, tok_start_offset, @line_num )
             else
-              # need a byte offset
-              @yacc_value = RpNameToken.new( ttoken, tok_start_offset)
+              @yacc_value = RpNameToken.new( ttoken , tok_start_offset)
             end
+            return kw_id_one #  synthesized kw_id_zero == kw_id_one
+          else  # kw_id_zero._isSymbol  and kwarr[0]._not_equal?( kwarr[1] )
+            @yacc_value = RpNameToken.new( ttoken, tok_start_offset)
+            if clex_state._equal?( Expr_beg )
+              @lex_state = kwarr[2] # was keyword.state
+              return kw_id_zero 
+            end
+            @lex_state =  Expr_beg 
+            return kwarr[1] # was keyword.id1
           end
-
-          if clex_state._equal?( Expr_beg )
-            return kw_id_zero 
-          end
-          kw_id_one = kwarr[1] # was keyword.id1
-          if ( kw_id_zero._not_equal?(  kw_id_one ) )
-            @lex_state = Expr_beg 
-          end
-          return kw_id_one
         end
       end # ]
 

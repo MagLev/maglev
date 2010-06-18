@@ -23,33 +23,33 @@ class Module
     false
   end
 
-  primitive_nobridge '__ruby_methods', 'rubyMethods:'
+  primitive_nobridge '__ruby_methods', 'rubyMethods:protection:'
 
-  primitive '__ruby_methods_protection', 'rubyMethods:protection:'
+  primitive '__ruby_instance_methods', 'rubyInstanceMethods:protection:'
 
   def methods(regular = true)
     set = self.__ruby_singleton_methods(false, -1)  # include protected meths
     if regular
-      set =  set + self.__ruby_methods(-1) # include protected meths
+      set =  set + self.__ruby_methods(true, -1) # include protected meths
     end
     Module.__filter_method_names(set)
   end
 
   def instance_methods(inc_super=true)
     # include both protected and public methods
-    Module.__filter_method_names(__ruby_methods_protection(inc_super, -1))
+    Module.__filter_method_names(__ruby_instance_methods(inc_super, -1))
   end
 
   def public_instance_methods(inc_super=true)
-    Module.__filter_method_names(__ruby_methods_protection(inc_super, 0))
+    Module.__filter_method_names(__ruby_instance_methods(inc_super, 0))
   end
 
   def private_instance_methods(inc_super=true)
-    Module.__filter_method_names(__ruby_methods_protection(inc_super, 2))
+    Module.__filter_method_names(__ruby_instance_methods(inc_super, 2))
   end
 
   def protected_instance_methods(inc_super=true)
-    Module.__filter_method_names(__ruby_methods_protection(inc_super, 1))
+    Module.__filter_method_names(__ruby_instance_methods(inc_super, 1))
   end
 
 

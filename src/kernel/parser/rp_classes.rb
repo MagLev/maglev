@@ -266,49 +266,56 @@ module MagRp
       #  Expr_class  = immediate after class, no here document.
 
       WORDLIST = [
-        # negated new state means yacc_value gets encapsulated in an RpNameToken
-        # and/or gets other special handling . Any reserved word which can
+        # elements are  reserved word , a String
+        #           kwarr [ a Symbol, a Symbol,  value for @lex_state ]
+        # kwarr[0] == nil means special handling needed
+        #         and new token is always kwarr[1]
+        # kwarr[0] == 0 means no encapsulation in an RpNameToken.
+        #         and new token is always kwarr[1]
+        # kwarr[0] == 1 means encapsulate in an RpNameToken.
+        #         and new token is always kwarr[1]
+        # Any reserved word which can
         # also be a method name needs encapsulation in an RpNameToken.
-      ["end",      [:kEND,      :kEND        , RubyLexer::Expr_end   ]],
-      ["else",     [:kELSE,     :kELSE       , RubyLexer::Expr_beg   ]],
-      ["case",     [:kCASE,     :kCASE       , - RubyLexer::Expr_beg   ]],
-      ["ensure",   [:kENSURE,   :kENSURE     , - RubyLexer::Expr_beg   ]],
-      ["module",   [:kMODULE,   :kMODULE     , RubyLexer::Expr_beg   ]],
-      ["elsif",    [:kELSIF,    :kELSIF      , RubyLexer::Expr_beg   ]],
-      ["def",      [:kDEF,      :kDEF        , - RubyLexer::Expr_fname ]],
-      ["rescue",   [:kRESCUE,   :kRESCUE_MOD , - RubyLexer::Expr_mid   ]],
-      ["not",      [:kNOT,      :kNOT        , - RubyLexer::Expr_beg   ]],
-      ["then",     [:kTHEN,     :kTHEN       , RubyLexer::Expr_beg   ]],
-      ["yield",    [:kYIELD,    :kYIELD      , - RubyLexer::Expr_arg   ]],
-      ["for",      [:kFOR,      :kFOR        , - RubyLexer::Expr_beg   ]],
-      ["self",     [:kSELF,     :kSELF       , RubyLexer::Expr_end   ]],
-      ["false",    [:kFALSE,    :kFALSE      , - RubyLexer::Expr_end   ]],
-      ["retry",    [:kRETRY,    :kRETRY      , - RubyLexer::Expr_end   ]],
-      ["return",   [:kRETURN,   :kRETURN     , - RubyLexer::Expr_mid   ]],
-      ["true",     [:kTRUE,     :kTRUE       , - RubyLexer::Expr_end   ]],
-      ["if",       [:kIF,       :kIF_MOD     , - RubyLexer::Expr_beg   ]],
-      ["defined?", [:kDEFINED,  :kDEFINED    , RubyLexer::Expr_arg   ]],
-      ["super",    [:kSUPER,    :kSUPER      , - RubyLexer::Expr_arg   ]],
-      ["undef",    [:kUNDEF,    :kUNDEF      , - RubyLexer::Expr_fname ]],
-      ["break",    [:kBREAK,    :kBREAK      , - RubyLexer::Expr_mid   ]],
-      ["in",       [:kIN,       :kIN         , - RubyLexer::Expr_beg   ]],
-      ["do",       [:kDO,       :kDO         , - RubyLexer::Expr_beg   ]],
-      ["nil",      [:kNIL,      :kNIL        , RubyLexer::Expr_end   ]],
-      ["until",    [:kUNTIL,    :kUNTIL_MOD  , - RubyLexer::Expr_beg   ]],
-      ["unless",   [:kUNLESS,   :kUNLESS_MOD , - RubyLexer::Expr_beg   ]],
-      ["or",       [:kOR,       :kOR         , RubyLexer::Expr_beg   ]],
-      ["next",     [:kNEXT,     :kNEXT       , - RubyLexer::Expr_mid   ]],
-      ["when",     [:kWHEN,     :kWHEN       , - RubyLexer::Expr_beg   ]],
-      ["redo",     [:kREDO,     :kREDO       , - RubyLexer::Expr_end   ]],
-      ["and",      [:kAND,      :kAND        , RubyLexer::Expr_beg   ]],
-      ["begin",    [:kBEGIN,    :kBEGIN      , RubyLexer::Expr_beg   ]],
-      ["__LINE__", [:k__LINE__, :k__LINE__   , RubyLexer::Expr_end   ]],
-      ["class",    [:kCLASS,    :kCLASS      , - RubyLexer::Expr_class ]],
-      ["__FILE__", [:k__FILE__, :k__FILE__   , RubyLexer::Expr_end   ]],
-      ["END",      [:klEND,     :klEND       , RubyLexer::Expr_end   ]],
-      ["BEGIN",    [:klBEGIN,   :klBEGIN     , RubyLexer::Expr_end   ]],
-      ["while",    [:kWHILE,    :kWHILE_MOD  , - RubyLexer::Expr_beg   ]],
-      ["alias",    [:kALIAS,    :kALIAS      , - RubyLexer::Expr_fname ]]
+      ["end",      [ 0,      :kEND        , RubyLexer::Expr_end   ]],
+      ["else",     [ nil ,     :kELSE       , RubyLexer::Expr_beg   ]],
+      ["case",     [ 1,     :kCASE       , RubyLexer::Expr_beg   ]],
+      ["ensure",   [ 1,   :kENSURE     , RubyLexer::Expr_beg   ]],
+      ["module",   [ 0,   :kMODULE     , RubyLexer::Expr_beg   ]],
+      ["elsif",    [ 0,    :kELSIF      , RubyLexer::Expr_beg   ]],
+      ["def",      [ nil ,      :kDEF        , RubyLexer::Expr_fname ]],
+      ["rescue",   [:kRESCUE,   :kRESCUE_MOD , RubyLexer::Expr_mid   ]],
+      ["not",      [ 1,      :kNOT        , RubyLexer::Expr_beg   ]],
+      ["then",     [ 0,     :kTHEN       , RubyLexer::Expr_beg   ]],
+      ["yield",    [ 1,    :kYIELD      , RubyLexer::Expr_arg   ]],
+      ["for",      [ 1,      :kFOR        , RubyLexer::Expr_beg   ]],
+      ["self",     [ 0,     :kSELF       , RubyLexer::Expr_end   ]],
+      ["false",    [ 1,    :kFALSE      , RubyLexer::Expr_end   ]],
+      ["retry",    [ 1,    :kRETRY      , RubyLexer::Expr_end   ]],
+      ["return",   [ 1,   :kRETURN     , RubyLexer::Expr_mid   ]],
+      ["true",     [ 1,     :kTRUE       , RubyLexer::Expr_end   ]],
+      ["if",       [ :kIF,       :kIF_MOD     , RubyLexer::Expr_beg   ]],
+      ["defined?", [ 1,  :kDEFINED    , RubyLexer::Expr_arg   ]],
+      ["super",    [ 1,    :kSUPER      , RubyLexer::Expr_arg   ]],
+      ["undef",    [ 1,    :kUNDEF      , RubyLexer::Expr_fname ]],
+      ["break",    [ 1,    :kBREAK      , RubyLexer::Expr_mid   ]],
+      ["in",       [ 1,       :kIN         , RubyLexer::Expr_beg   ]],
+      ["do",       [ nil ,       :kDO         , RubyLexer::Expr_beg   ]],
+      ["nil",      [ 0,      :kNIL        , RubyLexer::Expr_end   ]],
+      ["until",    [:kUNTIL,    :kUNTIL_MOD  , RubyLexer::Expr_beg   ]],
+      ["unless",   [:kUNLESS,   :kUNLESS_MOD , RubyLexer::Expr_beg   ]],
+      ["or",       [ 0,       :kOR         , RubyLexer::Expr_beg   ]],
+      ["next",     [ 1,     :kNEXT       , RubyLexer::Expr_mid   ]],
+      ["when",     [ 1,     :kWHEN       , RubyLexer::Expr_beg   ]],
+      ["redo",     [ 1,     :kREDO       , RubyLexer::Expr_end   ]],
+      ["and",      [ 0,      :kAND        , RubyLexer::Expr_beg   ]],
+      ["begin",    [ 0,    :kBEGIN      , RubyLexer::Expr_beg   ]],
+      ["__LINE__", [ 0,     :k__LINE__   , RubyLexer::Expr_end   ]],
+      ["class",    [ 1,    :kCLASS      , RubyLexer::Expr_class ]],
+      ["__FILE__", [ 0,     :k__FILE__   , RubyLexer::Expr_end   ]],
+      ["END",      [ 0,     :klEND       , RubyLexer::Expr_end   ]],
+      ["BEGIN",    [ 0,   :klBEGIN     , RubyLexer::Expr_end   ]],
+      ["while",    [:kWHILE,    :kWHILE_MOD  , RubyLexer::Expr_beg   ]],
+      ["alias",    [ 1,    :kALIAS      , RubyLexer::Expr_fname ]]
      ]
 
       # def self.keyword( str)  ; end # no longer used

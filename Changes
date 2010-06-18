@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+* topaz   whr, upr, downr   no longer display bridge methods
+* add topaz commands   whrb, uprb, downrb   which include bridge methods
+* Fix Trac 747, 748
+
 == Changes for 23611  2010-06-12
 
 * fix Trac 644, 658, 693, 704, 717, 738, 746

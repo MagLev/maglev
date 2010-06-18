@@ -1,4 +1,3 @@
-require 'psych/psych'
 require 'psych/nodes'
 require 'psych/visitors'
 require 'psych/handler'
@@ -8,6 +7,7 @@ require 'psych/omap'
 require 'psych/set'
 require 'psych/coder'
 require 'psych/core_ext'
+require 'psych/deprecated'
 
 ###
 # = Overview
@@ -92,6 +92,12 @@ module Psych
   # The version of libyaml Psych is using
   LIBYAML_VERSION = Psych.libyaml_version.join '.'
 
+  class Exception < RuntimeError
+  end
+
+  autoload :Stream, 'psych/stream'
+  autoload :JSON, 'psych/json'
+
   ###
   # Load +yaml+ in to a Ruby data structure.  If multiple documents are
   # provided, the object contained in the first document will be returned.
@@ -153,31 +159,15 @@ module Psych
   # Example:
   #
   #   Psych.dump(['a', 'b'])  # => "---\n- a\n- b\n"
-  def self.dump(o, arg2=MaglevUndefined, arg3=MaglevUndefined)
-    uu = MaglevUndefined
-    if arg2.equal?(uu)
-      options = {}
-    elsif arg2.kind_of?(IO)
-      io = arg2
-      if arg3.equal?(uu)
-        options = {}
-      elsif arg3.kind_of?(Hash)
-        options = arg3
-      else
-        raise TypeError, 'Psych.dump, expected a Hash for third arg' 
-      end
-    elsif arg2.kind_of?(Hash)
-      options = arg2
-    else
-      raise TypeError, 'Psych.dump, expected a Hash or IO for second arg' 
+  def self.dump o, io = nil, options = {}
+    if Hash === io
+      options = io
+      io      = nil
     end
+
     visitor = Psych::Visitors::YAMLTree.new options
     visitor << o
-    res = visitor.tree.to_yaml
-    if io
-      io.write(res)
-    end
-    res
+    visitor.tree.to_yaml io
   end
 
   ###
@@ -197,7 +187,7 @@ module Psych
   ###
   # Dump Ruby object +o+ to a JSON string.
   def self.to_json o
-    visitor = Psych::Visitors::JSONTree.new(:json => true)
+    visitor = Psych::Visitors::JSONTree.new
     visitor << o
     visitor.tree.to_yaml
   end
@@ -206,19 +196,10 @@ module Psych
   # Load multiple documents given in +yaml+.  Returns the parsed documents
   # as a list.  For example:
   #
-  #   Psych.load_documents("--- foo\n...\n--- bar\n...") # => ['foo', 'bar']
+  #   Psych.load_stream("--- foo\n...\n--- bar\n...") # => ['foo', 'bar']
   #
   def self.load_stream yaml
     parse_stream(yaml).children.map { |child| child.to_ruby }
-  end
-
-  def self.load_documents yaml, &block
-    if $VERBOSE
-      warn "#{caller[0]}: load_documents is deprecated, use load_stream"
-    end
-    list = load_stream yaml
-    return list unless block_given?
-    list.each(&block)
   end
 
   ###
@@ -231,11 +212,15 @@ module Psych
   # :stopdoc:
   @domain_types = {}
   def self.add_domain_type domain, type_tag, &block
-    @domain_types[type_tag] = ["http://#{domain}", block]
+    key = ['tag', domain, type_tag].join ':'
+    @domain_types[key] = [key, block]
+    @domain_types["tag:#{type_tag}"] = [key, block]
   end
 
   def self.add_builtin_type type_tag, &block
-    @domain_types[type_tag] = ['yaml.org', block]
+    domain = 'yaml.org,2002'
+    key = ['tag', domain, type_tag].join ':'
+    @domain_types[key] = [key, block]
   end
 
   def self.remove_type type_tag
@@ -254,6 +239,5 @@ module Psych
     attr_accessor :dump_tags
     attr_accessor :domain_types
   end
-
   # :startdoc:
 end

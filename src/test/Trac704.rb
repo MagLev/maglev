@@ -2,8 +2,8 @@
 require 'yaml'
 
 def verify_objs(orig, nobj )
-  unless orig.class.equal?( nobj.class) ; raise 'bad class';end
-  unless orig == nobj ; raise 'not equal'; end
+  unless orig.class.equal?( nobj.class) ; raise "bad class: #{nobj.class}  expecting: #{orig.class}";end
+  unless orig == nobj ; raise "orig (#{orig.inspect}) not equal to nobj (#{nobj.inspect})"; end
 end
 
 set = IdentitySet.new
