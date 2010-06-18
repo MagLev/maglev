@@ -14,6 +14,11 @@ TZ_INC = " -I#{MH}/lib/maglev/gems/1.8/gems/tzinfo-0.3.20/lib"
 REQ = '-r tzinfo -r ../core_ext.rb'
 RAILS_INCLUDES << TZ_INC
 
+desc "Create TAGS file for rails code"
+task :tags do
+  cd('rails') { sh %{ /opt/local/bin/ctags -a -e -f ../RAILS-TAGS --exclude='*/test/*' --tag-relative -R * }}
+end
+
 desc "Run the tests: takes optional file arg: 'rake test[test/foo_test.rb]'"
 task :test, :file do |t, args|
   cd('test') do

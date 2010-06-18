@@ -22,10 +22,10 @@
 # IdentitySet is identically Smalltalk IdentitySet.
 class IdentitySet
 
-  class_primitive 'new' , 'new'
+  class_primitive 'allocate', 'rubyBasicNew'
 
   def self.with_all(*array)
-    o = self.new
+    o = self.allocate
     o.__addall(array)
     o
   end
@@ -34,7 +34,7 @@ class IdentitySet
     unless arr._isArray
       raise TypeError, 'expected an Array argument'
     end
-    o = self.new
+    o = self.allocate
     o.__addall(arr)
     o
   end
@@ -175,6 +175,23 @@ class IdentitySet
     s = 0
     self.each{|e| s += block.call(e)}
     s
+  end
+
+  #--
+  # Psych/Yaml support.
+  # IdentitySet also registered in lib/ruby/1.8/psych.rb
+  #++
+
+  # Psych hook method for dumping to YAML
+  def encode_with(coder)
+    # serialize as a YAML sequence
+    coder.represent_seq(self.class.name, self.to_a)
+  end
+  
+  # Psych hook method for reviving from YAML
+  def init_with(coder)
+    p coder.seq
+    self.__addall(coder.seq)
   end
 
   #--

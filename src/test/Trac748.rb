@@ -14,17 +14,30 @@
 module AModule
 end
 
+unless defined?(Maglev)
+  class NilClass
+    def pause
+    end
+  end
+end
+
 module UrlHelpers
   def self.with(routes)
     Module.new do
+      sx = self  # sx [121237761  meta] ; self [121237761  meta]
+      #nil.pause
       define_method(:inherited) do |klass|
         # When MagLev looks for super, it is trying to find with:&, not inherited:&
         # and we get the error
-        super(klass)   
+        puts 'In defined inherted'
+        puts "self is #{self}"
+        kx = klass
+        super(kx)   
       end
     end
   end
 end
+
 
 class ApplicationController
 end
@@ -36,7 +49,13 @@ class ARoute
 end
 
 ApplicationController.instance_eval do
-  extend UrlHelpers.with(ARoute)
+  mx = UrlHelpers.with(ARoute)
+  #nil.pause
+  p self.ancestors
+  extend(mx)
+  sx = self  # sx [121240577  ApplicationController class]
+  #nil.pause
+  p self.ancestors
 end
 
 class SayController < ApplicationController
