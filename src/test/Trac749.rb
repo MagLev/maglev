@@ -1,3 +1,30 @@
+#-------------  simplified version of Trac749
+class C
+  def ma(a, &blk)
+   yield(a)
+  end
+  def mb(&blk)
+   yield
+  end
+end
+class B < C
+  def ma(a)
+    super(a) {|o| puts "In BlkA"; $mab = o }
+  end
+  def mb
+    super {|o| 
+      puts "In BlkB"
+      unless o.equal?(nil) ; raise 'fail'; end
+      $mbb = 95 
+    }
+  end
+end
+B.new.ma(54)
+B.new.mb
+unless $mab == 54 ; raise 'fail'; end
+unless $mbb == 95 ; raise 'fail'; end
+
+# --------- Trac749 original
 # From the rails 3 generator code
 class Thor
   module ThorBase
@@ -35,5 +62,6 @@ end
 
 class MyClass < Base
 end
-
 MyClass.start(:quux)
+
+
