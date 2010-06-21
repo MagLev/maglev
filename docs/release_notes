@@ -56,9 +56,100 @@ See the {Persistence API}[link:files/docs/persistence-api.html]
               during foo.rb
     ERROR 2023, Error, 'too many arguments' (ArgumentError)
 
+== MagLev Options
+
+These are the MagLev specific command line options to the maglev-ruby shell
+script.
+
+=== <tt>--stone s</tt>
+
+By default, <tt>maglev-ruby</tt> starts a VM that will attempt to connect
+to the stone (repository server) named 'maglev'.  The <tt>--stone
+astone</tt> option tells the VM to connect to the stone named 'astone'.
+
+New stones can be created and managed via the +Rakefile+ in
+<tt>$MAGLEV_HOME</tt>:
+
+  $ rake -T stone
+  (in /Users/pmclain/GemStone/checkouts/git)
+  rake stone:all[task_name]        # Invoke a task on all MagLev servers
+  rake stone:create[server_name]   # Create a new MagLev server and repository
+  rake stone:destroy[server_name]  # Destroy an existing MagLev server and repository
+  rake stone:list                  # List MagLev servers managed by this Rakefile
+
+=== <tt>-MallIvsDynamic</tt>
+
+This option tells MagLev to make all instance variables dynamic.  Normally,
+MagLev optimizes instance variables mentioned during the first opening of a
+class by making references to them a simple integer offset from a well
+known location in the object structure.  These optimized instance variables
+are known as static instance variables.  All other instance variables for
+the class, whether mentioned in a subsequent opening of the class, or
+dynamically generated, are dynamic instance variables.  MagLev must lookup
+references to dynamic instance variables by name, which takes more time
+than using a pre-computed index.
+
+If the <tt>-MallIvsDynamic</tt> flag is passed to <tt>maglev-ruby</tt>,
+then all instance variables will be dynamic, even those in the first
+opening of a class.  This is necessary if code tries to
+<tt>remove_instance_variable</tt> on a static instance variable (i.e.,
+Rails).
+
+=== <tt>-Mcommit</tt>
+
+This flag is intended as an easy way to commit code (and data) in a ruby
+file to the persistent store. The flag does two things (1) wraps the entire
+file in a persistent block, and (2) commits upon exiting.
+
+E.g., this command:
+
+  $ maglev-ruby -Mcommit foo.rb
+
+acts like this:
+
+    Maglev.persistent do
+      require 'foo.rb'
+    end
+    Maglev.commit_transaction
+
+=== <tt>-Mpersistent</tt>
+
+Starts the VM in persistent mode (normally it is started in transient
+mode).  E.g., this command:
+
+  $ maglev-ruby -Mpersistent foo.rb
+
+acts like this:
+
+    Maglev.persistent do
+      require 'foo.rb'
+    end
+
+=== <tt>-MtraceGlobals</tt>
+
+This is a debug flag that prints trace information when global variables
+are defined or have their values set.
+
+=== <tt>-MtraceLoad</tt>
+
+This is a debug flag that prints trace information as each <tt>.rb</tt>
+file is read by MagLev (from either a require or a load).
+
+=== <tt>-MlogSexp</tt>
+
+This is a debug flag that prints s-expressions as they are parsed by the parser.
+This can be pretty verbose...
+
+=== <tt>-Mrlwrap</tt>
+
+Runs MagLev with rlwrap.  This provides command line editing support if you
+end up in the topaz debugger, or for irb.
+
 == RubyGems
 
-MagLev comes with a copy of RubyGems 1.3.7 pre-installed.
+MagLev comes with a copy of RubyGems 1.3.7 pre-installed.  Gems get loaded
+into <tt>$MAGLEV_HOME/lib/maglev/gems/1.8/gems</tt>.  Gems that are based
+on a C-extension do not install or run with MagLev.
 
 == Kernel
 * Note that we don't support instance variables as block arguments,

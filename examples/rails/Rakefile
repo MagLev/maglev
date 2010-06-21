@@ -2,7 +2,7 @@
 task :default => :app
 
 file 'rails' do
-  sh %{ git clone git@github.com:MagLev/rails.git }
+  sh %{ git clone git://github.com/MagLev/rails.git }
 end
 
 desc "Checkout a local copy of rails 3 beta4 with MagLev patches."
@@ -19,8 +19,7 @@ end
 
 desc "Run the standard Rails application, myapp, with maglev."
 task :app do
-
-  # Setup a path to run rails
+  # Setup to run from the rails subdirectory: -I../rails/activerecord/lib ...
   includes = %w(railties activeresource activerecord actionmailer
                  actionpack activemodel activesupport
                ).reverse.inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
