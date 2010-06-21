@@ -1,0 +1,30 @@
+
+task :default => :app
+
+file 'rails' do
+  sh %{ git clone git://github.com/MagLev/rails.git }
+end
+
+desc "Checkout a local copy of rails 3 beta4 with MagLev patches."
+task :checkout => :rails do
+  sh %{ cd rails && git checkout maglev-beta4 }
+end
+
+desc "Ensure the required Gems are installed into MagLev."
+task :gems do
+  gems = "rack tzinfo i18n rack-mount erubis mail"
+  sh %{ maglev-gem install --no-ri --no-rdoc #{gems} }
+end
+
+
+desc "Run the standard Rails application, myapp, with maglev."
+task :app do
+  # Setup to run from the rails subdirectory: -I../rails/activerecord/lib ...
+  includes = %w(railties activeresource activerecord actionmailer
+                 actionpack activemodel activesupport
+               ).reverse.inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
+
+  cd('myapp') do
+    sh %{ maglev-ruby -MallIvsDynamic #{includes} script/rails server }
+  end
+end

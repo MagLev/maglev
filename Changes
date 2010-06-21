@@ -1,5 +1,14 @@
 = MagLev Change Log
 
+== Changes for 23687  2010-06-21
+
+* Added examples/rails   
+  This contains the standard app rails generates, with one extra controller added.
+  The rakefile will checkout the MagLev rails github repository, ensure all necessary
+  gems are installed into MagLev, and then run the app with MagLev
+* Fix Trac 749
+* A few more optimizations and bugfixes in underlying GemStone 3.0 system
+
 == Changes for 23673  2010-06-17
 
 * topaz whr, upr, downr no longer display bridge methods
