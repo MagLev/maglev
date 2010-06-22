@@ -5,10 +5,9 @@
 Before you can run the example rails app, you need certain gems and a
 patched copy of Rails.  To get them, you need to do (one time only):
 
-  $ rake checkout
+  $ rake checkout      # Requires a working copy of git
+  $ rake maglev:start  # Or 'maglev start' 
   $ rake gems
-
-You will also need a working copy of git.
 
 ## Run Rails with MagLev
 
@@ -41,6 +40,8 @@ MagLev:
 The changes to the rails code are rather minimal.  To get a good look:
 
   $ rake checkout && cd rails && git diff maglev-beta4 v3.0.0.beta4
+  or browse to:
+  http://github.com/MagLev/rails/compare/master...maglev-beta4
 
 You must pass the <tt>-MallIvsDynamic</tt> flag to MagLev in order to run
 rails (the +Rakefile+ does this).  See docs/release_notes for a discussion
