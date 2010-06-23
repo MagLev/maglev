@@ -23,6 +23,8 @@
 #   22 Kernel # method_missing:*                (envId 1) @9 line 11
 #   ...
 
+# MRI says Trac752.rb:34: protected method `to_s' called for foo:C (NoMethodError)
+
 class C
   protected
   def to_s
@@ -31,3 +33,4 @@ class C
 end
 
 puts C.new.to_s
+true
