@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+* Fix Trac 706, 750, 751, 752
+* fix code generation for   else   of a begin/rescue/else
+* Signal#trap can now trap SIGTERM 
+
 == Changes for 23687  2010-06-21
 
 * Added examples/rails   
