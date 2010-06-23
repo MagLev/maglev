@@ -88,3 +88,4 @@ end
 
 puts "------ Call routes -------"
 Application.new.handle_route
+true
