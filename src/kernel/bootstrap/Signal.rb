@@ -17,6 +17,8 @@ module Signal
   # If VM was invoked with -d, handling of SIGINT by this method will
   # silently have no effect, and SIGINT will always return control to the topaz
   # debugger.
+  # If the signal is SIGTERM, 5 seconds is allowed for the Block or Proc
+  # to execute before a Kernel.exit() is forced .
   # Returns the previously installed handler, or 'IGNORE'
   def self.trap(sig, command=nil, &block)
     #tnames = TrappableByName  # uncomment for debugging
