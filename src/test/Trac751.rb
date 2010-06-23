@@ -15,10 +15,13 @@ h1 = {
   "SERVER_PROTOCOL"=>"HTTP/1.1",
 }
 
-h2 = {}.replace(h1)
+
+h2 = {}
+h2.replace(h1)
 
 puts "h1 has nil key? #{h1.keys.include?(nil)}"
 puts "h2 has nil key? #{h2.keys.include?(nil)}"
 puts "h2[nil]: #{h2[nil].inspect}"
 
 raise "FAIL with nil key" if h2.keys.include?(nil)
+true
