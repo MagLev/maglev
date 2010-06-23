@@ -32,5 +32,11 @@ class C
   end
 end
 
-puts C.new.to_s
+begin
+  puts C.new.to_s
+rescue NoMethodError
+  # OK
+rescue SystemStackError
+  raise "FAIL: Got a stack overflow"
+end
 true
