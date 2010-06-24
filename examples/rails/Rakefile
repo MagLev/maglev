@@ -23,7 +23,7 @@ namespace :gem do
     sh %{ maglev-gem install --no-ri --no-rdoc #{gems} }
   end
 
-  desc "Install rails bete 4 gems into MagLev (will need patches)"
+  desc "Install rails beta 4 gems into MagLev (will need patches)"
   task :rails do
     sh %{ maglev-gem install rails --pre --no-ri --no-rdoc }
   end
@@ -39,7 +39,7 @@ namespace :gem do
 end
 
 
-# The tasks in this namespace are intended to aide MagLev developers when
+# The tasks in this namespace are intended to aid MagLev developers when
 # patching rails.  It allows running MagLev against the MagLev fork of
 # rails from GitHub.  The primary method of running rails should be from
 # the patched gems install, as outlined in README.rdoc.
