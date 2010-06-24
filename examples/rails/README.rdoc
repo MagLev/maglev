@@ -1,19 +1,54 @@
-# Notes on MagLev and Rails3
+# Notes on MagLev and Rails 3
 
-## Pre-Requisites
+The files in this directory allow you to run the default Rails app on
+MagLev.  Currently, MagLev is able to serve static and (simple) dynamic
+pages using a patched version of Rails 3 Beta 4.  The <tt>Rakefile</tt>
+provides tasks to setup your MagLev environment with the correct (patched)
+gems.
 
-Before you can run the example rails app, you need certain gems and a
-patched copy of Rails.  To get them, you need to do (one time only):
+## Quick Start
 
-  $ rake checkout      # Requires a working copy of git
-  $ rake maglev:start  # Or 'maglev start' 
-  $ rake gems
+Make sure the MagLev repository is running:
 
-## Run Rails with MagLev
+  $ cd $MAGLEV_HOME
+  $ rake maglev:start      # or: $MAGLEV_HOME/bin/maglev start
+
+Then install gems, rails and patch rails:
+
+  $ cd $MAGLEV_HOME/examples/rails
+  $ rake init
+
+To run the app:
 
   $ rake app
 
   Then hit http://localhost:3000/
+
+## MagLev + Rails status
+
+There is still a lot of work before Rails on MagLev is fully cooked.  You
+should expect a few spurious error messages and some errors (especially in
+logging) that do not affect page loading.  We fully expect there to be
+other bugs as pages get more complex and as you add more gems use other
+features.
+
+When running the app, there will be a couple of long pauses early on.  One
+before you see the output indicating Rails has started:
+
+  <long pause>
+  [2010-06-24 12:54:37] INFO  WEBrick 1.3.1
+  [2010-06-24 12:54:37] INFO  ruby 1.8.7 (2010-02-26) [x86_64-darwin]
+  [2010-06-24 12:54:37] INFO  WEBrick::HTTPServer#start: pid=45167 port=3000
+
+And there will be another long pause when you hit the first dynamic page.
+Both of these pauses are due to MagLev parsing and compiling Ruby code.
+Subsequent dynamic page loads should be much quicker, as MagLev only has to
+compile the code at startup.
+
+If you are interested in seeing the progress of file loads, you can set the
+following environment variable before starting the Rails app:
+
+  export MAGLEV_OPTS="-MtraceLoad"
 
 ## Changes to +myapp+
 
@@ -39,10 +74,27 @@ MagLev:
 
 The changes to the rails code are rather minimal.  To get a good look:
 
-  $ rake checkout && cd rails && git diff maglev-beta4 v3.0.0.beta4
-  or browse to:
-  http://github.com/MagLev/rails/compare/master...maglev-beta4
+  $ rake dev:checkout && cd rails && git diff maglev-beta4 v3.0.0.beta4
+
+or browse to: http://github.com/MagLev/rails/compare/master...maglev-beta4
 
 You must pass the <tt>-MallIvsDynamic</tt> flag to MagLev in order to run
 rails (the +Rakefile+ does this).  See docs/release_notes for a discussion
 of <tt>-MallIvsDynamic</tt>.
+
+## Alternate rails patch option
+
+The method described in this section is not the preferred manner to run
+patched rails, but may be used.  This method is mostly to ease MagLev
+development and rails patch management for MagLev developers.
+
+An alternative way to get a patched rails is to checkout the MagLev rails
+fork, and use one of the maglev-* branches.  This requires adjusting the
+load path.  The rake tasks in the <tt>:dev</tt> namespace manage this
+alternate method of running a patched rails version.
+
+To checkout MagLev patched fork of Rails, and run the app from that:
+
+  $ rake gem:gems             # Installs required non-rails gems
+  $ rake dev:checkout         # Checksout patched version of rails from GitHub
+  $ rake dev:app              # Run myapp using ./rails version of rails.
