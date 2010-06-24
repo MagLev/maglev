@@ -5,8 +5,15 @@
 Before you can run the example rails app, you need certain gems and a
 patched copy of Rails.  To get them, you need to do (one time only):
 
+To start the maglev server:
+
+  $ cd $MAGLEV_HOME
+  $ rake maglev:start  # or: ./bin/maglev start
+
+To checkout the patched rails and install the gems:
+
+  $ cd $MAGLEV_HOME/examples/rails
   $ rake checkout      # Requires a working copy of git
-  $ rake maglev:start  # Or 'maglev start' 
   $ rake gems
 
 ## Run Rails with MagLev
