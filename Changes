@@ -1,8 +1,12 @@
 = MagLev Change Log
 
+== Changes for 23741  2010-06-23
+
+* Fixes to eliminate need for some Rails 3 patches
 * Fix Trac 706, 750, 751, 752, 753, 754
-* fix code generation for   else   of a begin/rescue/else
+* fix code generation for else of a begin/rescue/else
 * Signal#trap can now trap SIGTERM 
+* A few more optimizations and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23687  2010-06-21
 
