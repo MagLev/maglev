@@ -117,14 +117,12 @@ module Psych
 
         @emitter.start_mapping nil, tag, false, Nodes::Mapping::BLOCK
 
-        {
-          'message'   => private_iv_get(o, 'mesg'),
-          'backtrace' => private_iv_get(o, 'backtrace'),
-        }.each do |k,v|
-          next unless v
-          @emitter.scalar k, nil, nil, true, false, Nodes::Scalar::ANY
-          accept v
+        v = o.__message  # maglev patch
+        if v
+          @emitter.scalar( 'message', nil, nil, true, false, Nodes::Scalar::ANY)
+          accept(v)
         end
+        # maglev, backtrace not included in output , not used by load 
 
         dump_ivars o
 

@@ -60,15 +60,17 @@ module Kernel
 
   def method_missing(method_id, *args)
     prot = __last_dnu_protection()
-    type = if (prot._equal?(0))
-             'undefined method'
+    msg = if (prot._equal?(0))
+             "NoMethodError: undefined method `"
            elsif (prot._equal?(1))
-             'protected method'
+             "NoMethodError: protected method `"
            else
-             'private method'
+             "NoMethodError: private method `"
            end
-
-    exc = NoMethodError.exception("NoMethodError: #{type} `#{method_id}' for #{self}")
+    msg.__append(method_id)
+    msg.__append( :"' for " )
+    msg.__append( self.__name_for_mnu )  # Fix trac 752, don't use to_s
+    exc = NoMethodError.exception(msg)
     exc.__init(method_id , args, 1)  # FOR NOW, ASSUME envId 1
     exc.__signal
   end

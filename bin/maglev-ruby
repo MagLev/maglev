@@ -138,12 +138,14 @@ do
             debugFlag=
             ;;
         -e)
-            ruby_args="${ruby_args}, '-e', '${2//\'/''}'"  # smalltalk escape: ' => ''
+            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+            ruby_args="${ruby_args}'-e' . '${2//\'/''}'"  # smalltalk escape: ' => ''
             sawDashE=1
             shift
             ;;
         -e*)
-            ruby_args="${ruby_args}, '${1//\'/''}'"  # smalltalk escape: ' => ''
+            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+            ruby_args="${ruby_args}'${1//\'/''}'"  # smalltalk escape: ' => ''
             sawDashE=1
             ;;
         -G)
@@ -154,11 +156,13 @@ do
             exit
             ;;
         -I|-r)
-            ruby_args="${ruby_args}, '$1', '$2'"
+            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+            ruby_args="${ruby_args}'$1' . '$2'"
             shift
             ;;
         -I*|-r*)
-            ruby_args="${ruby_args}, '$1'"
+            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+            ruby_args="${ruby_args}'$1'"
             ;;
         -M*)
             sub_opt=${1:2}
@@ -171,7 +175,7 @@ do
                     rlwrapFlag=1
                     ;;
                 traceGlobals|logSexp|traceLoad|commit|persistent|allIvsDynamic)
-                    maglev_args="${maglev_args}, ${sub_opt}"
+                    maglev_args="${maglev_args} ${sub_opt}"
                     ;;
                 *)
                     echo
@@ -197,7 +201,8 @@ do
             shift
             ;;
         -v|--verbose)
-            ruby_args="${ruby_args}, '-v'"
+            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+            ruby_args="${ruby_args}'-v'"
             echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             if [ $# -eq 1 ]; then exit; fi
             ;;
@@ -206,11 +211,13 @@ do
             exit
             ;;
         -w) # Sets $VERBOSE true; read from stdin if no script
-            ruby_args="${ruby_args}, '-w'"
+            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+            ruby_args="${ruby_args}'-w'"
             ;;
         -W*)
             if [[ ${1:2} =~ ^[0-9]$ ]]; then
-                ruby_args="${ruby_args}, '$1'"
+                if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+                ruby_args="${ruby_args}'$1'"
             else
                 echo "Bad parameter for -W: should be single digit"
                 exit 1
@@ -254,7 +261,8 @@ if [[ ! $sawDashE ]]; then
   fi
 else
   if [[ $# -lt 1 ]]; then
-    script_args=", '-'" 
+    if [ ! -z "$script_args" ]; then script_args="${script_args} . " ;fi
+    script_args="'-'" 
   fi
 fi
 
@@ -285,8 +293,9 @@ fi
 # we can pass them as a literal array to Smalltalk.
 while [[ $# > 0 ]]
 do
-    script_args="${script_args}, '$1'"   # Do we need to smalltalk escape ' ?
-    shift
+  if [ ! -z "$script_args" ]; then script_args="${script_args} . " ;fi
+  script_args="${script_args}'$1'" # Do we need to smalltalk escape ' ?
+  shift
 done
 
 # need to keep topaz's stdin connected to the tty always
@@ -355,8 +364,15 @@ EOF
 fi
 
 cat - >> $dbscript <<-EOF
-(ctx := RubyContext load: #(${maglev_args:1}) ) .
-ctx runFileNamed: '$RUBYSCRIPT' withRubyArgs: #[${ruby_args:1}] withScriptArgs: #[${script_args:1}] .
+System currentSegment: nil . 
+ctx := RubyContext load: #( ${maglev_args} ) .
+ SessionTemps current at: #MagRpDEBUG put: 0 .
+ "note you cannot debug Ruby MNU here"
+" Exception installDebugBlock: [:ex|  
+   (ex isKindOf:NameError) ifTrue:[ nil pause ].
+ ]. "
+ctx runFileNamed: '$RUBYSCRIPT' withRubyArgs: { ${ruby_args} }
+        withScriptArgs: {  ${script_args} } .
 GsFile stdout close . "ensure final LF on stdout"
 ^ nil
 %
@@ -374,7 +390,7 @@ EOFC
 fi
 
 TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
-# If debugging, don't use -q with topaz
+# If debugging, do not use -q with topaz
 [[ $debugFlag  ]] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -I $dbscript "
 
 # echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"

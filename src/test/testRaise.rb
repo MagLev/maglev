@@ -16,6 +16,21 @@ end
 
 n = 0
 begin
+  n = n + 1 
+  n = n + 10 
+  rescue
+    n = n + 100    
+  else
+    n = n + 1000
+  ensure
+    n = n + 10000
+end
+unless n == 11011
+  raise 'ERR'
+end
+
+n = 0
+begin
   n = n + 5 
   raise ScriptError
   n = n + 10 

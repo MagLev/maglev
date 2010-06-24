@@ -87,6 +87,8 @@ class Object
   primitive '__id' , 'asOop'  
   primitive '__identity_hash', 'identityHash'
 
+  primitive_nobridge '__name_for_mnu', '_nameForMethodMissing'
+
   primitive 'nil?' , '_rubyNilQ'
 
   # compiler translates ! and  not   tokens to  _not
