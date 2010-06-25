@@ -148,10 +148,10 @@ echo 'export PATH=$MAGLEV_HOME/bin:$PATH'
 
 # Reminder to generate Smalltalk FFI
 echo ""
-echo "[Info] After you complete this upgrade and verify MagLev is working, run"
+echo "[Info] If you want to call GemStone Smalltalk methods from Ruby, run"
 echo "  rake stwrappers"
-echo "to generate the .rb files for the GemStone/Smalltalk FFI"
-echo "in MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/"
+echo "after this upgrade has finished. This will generate .rb files you can use"
+echo "in \$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/"
 
 # End of script
 exit 0
