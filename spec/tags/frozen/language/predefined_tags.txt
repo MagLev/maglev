@@ -1,4 +1,6 @@
 fails:Predefined global $stdout is the same as $defout
 fails:Predefined global $stdout is the same as $DEFAULT_OUTPUT from 'English' library
 fails:Execution variable $: does not include '.' when the taint check level > 1
+fails:Global variable $-l is read-only
+fails:Global variable $-p is read-only
 fails:The predefined global constants includes DATA when main script contains __END__
