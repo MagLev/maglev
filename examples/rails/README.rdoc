@@ -55,10 +55,13 @@ following environment variable before starting the Rails app:
 These are the changes to the standard sample app in order to run under
 MagLev:
 
-* The rails script currently does not run under MagLev.  MRI 1.8.7 was used
-  to create +myapp+ with the following command:
+* The +rails+ script did not run under MagLev at the time +myapp+ was
+  created, so MRI 1.8.7 was used to create +myapp+ with the following
+  command:
 
     $ ruby $MAGLEV_HOME/examples/rails/rails/bin/rails new myapp --dev
+
+  MagLev has since been fixed to run the +rails+ script.
 
 * <tt>myapp/Gemfile</tt> was tweaked to use <tt>ENV['MAGLEV_HOME']</tt> as
   a path prefix and comment out the sqlite3 gem.
