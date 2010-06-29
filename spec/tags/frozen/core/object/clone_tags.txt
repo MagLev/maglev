@@ -1,1 +1,0 @@
-fails:Object#clone preserves tainted state from the original
