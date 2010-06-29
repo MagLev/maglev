@@ -1,1 +1,1 @@
-fails:BigDecimal#sqrt requires a single fixnum argument
+fails:BigDecimal#sqrt raises ArgumentError if a negative number is given

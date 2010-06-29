@@ -1,9 +1,0 @@
-fails:Net::FTP#rename when the RNFR command fails raises a Net::FTPPermError when the response code is 550
-fails:Net::FTP#rename when the RNFR command fails raises a Net::FTPPermError when the response code is 501
-fails:Net::FTP#rename when the RNFR command fails raises a Net::FTPPermError when the response code is 502
-fails:Net::FTP#rename when the RNFR command fails raises a Net::FTPPermError when the response code is 530
-fails:Net::FTP#rename when the RNTO command fails raises a Net::FTPPermError when the response code is 532
-fails:Net::FTP#rename when the RNTO command fails raises a Net::FTPPermError when the response code is 553
-fails:Net::FTP#rename when the RNTO command fails raises a Net::FTPPermError when the response code is 501
-fails:Net::FTP#rename when the RNTO command fails raises a Net::FTPPermError when the response code is 502
-fails:Net::FTP#rename when the RNTO command fails raises a Net::FTPPermError when the response code is 530
