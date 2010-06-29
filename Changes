@@ -1,5 +1,7 @@
 = MagLev Change Log
 
+* implemented UNIXSocket, UNIXServer for Trac 755
+
 == Changes for 23741  2010-06-23
 
 * Fixes to eliminate need for some Rails 3 patches
