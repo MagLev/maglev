@@ -7,8 +7,12 @@ errnosWithBadSuperclass = Errno.constants.find_all do |n|
     Errno.const_get(n).superclass != SystemCallError 
   end
 end
-test(errnosWithBadSuperclass.size, 0, "Errnos with bad superclass: #{errnosWithBadSuperclass}")
-
+test(errnosWithBadSuperclass.size, 1, "Errnos with bad superclass: #{errnosWithBadSuperclass}")
+# Errno::EAGAIN is a SocketError
+unless errnosWithBadSuperclass[0] == 'EAGAIN'
+  raise 'failed'
+end
+test(Errno::EAGAIN.superclass, SocketError, 'Errno::EAGAIN. should be a SocketError')
 test(Errno::EBADF.superclass, SystemCallError, 'Errno::EBADF should be a SystemCallError')
 
 
