@@ -1,11 +1,7 @@
-fails:Module#autoload sets the autoload constant in the constants table
 fails:Module#autoload loads the registered constant when it is opened as a class
 fails:Module#autoload loads the registered constant when it is opened as a module
 fails:Module#autoload does not load the file when the constant is already set
 fails:Module#autoload removes the constant from the constant table if load fails
-fails:Module#autoload removes the constant from the constant table if the loaded files does not define it
-fails:Module#autoload does not load the file when refering to the constant in defined?
-fails:Module#autoload does not load the file when accessing the constants table of the module
 fails:Module#autoload loads the file when opening a module that is the autoloaded constant
 fails:Module#autoload raises a NameError when the autoload file did not define the constant and a module is opened with the same name
 fails:Module#autoload raises an ArgumentError when an empty filename is given
