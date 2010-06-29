@@ -1,1 +1,0 @@
-fails:Matrix#inv returns the inverse of the Matrix (other case)

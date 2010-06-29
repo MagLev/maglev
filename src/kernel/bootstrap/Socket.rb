@@ -1,7 +1,7 @@
 #   Maglev does not have a BasicSocket class ,
 #   methods that would be in BasicSocket in MRI are implemented in Socket .
 
-class Socket # identical to smalltalk RubySocket # [
+class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   # OS dependent constants initialized by smalltalk code
   #  in Socket>>_initTransientSocketConstants , called from RubyContext>>initTransient .
@@ -30,6 +30,7 @@ class Socket # identical to smalltalk RubySocket # [
 
   primitive 'close_read' , 'shutdownReading'
   primitive 'close_write' , 'shutdownWriting'
+  primitive '__close_readwrite' , 'shutdownReadingAndWriting'
 
   primitive '__clear_buffer', '_clearReadBuffer'
 
@@ -412,8 +413,19 @@ class Socket # identical to smalltalk RubySocket # [
     end
   end
 
-  primitive_nobridge 'shutdown', 'shutdown'
-  primitive 'shutdown', 'shutdown:'
+  def shutdown(how=2)
+    how = Type.coerce_to(how, Fixnum, :to_int)
+    if how._equal?(2)
+      self.__close_readwrite
+    elsif how._equal?(1)
+      self.close_write
+    elsif how._equal?(0)
+      self.close_read
+    else
+      raise ArgumentError , 'arg to shutdown must be 0,1 or 2'
+    end
+    0
+  end
 
   # Read up to length bytes from the socket into the specified buffer.
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
@@ -468,7 +480,7 @@ class Socket # identical to smalltalk RubySocket # [
 end # ]
 
 
-class IPSocket
+class IPSocket  # < Socket in Smalltalk bootstrap
   class_primitive '__getaddress', 'getHostAddressByName:'
 
   def self.getaddress(hostname)
@@ -604,6 +616,22 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
   # accept returns a new socket, having same non-blocking state as receiver
   primitive 'accept', 'accept'
 
+  def accept_nonblock
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.accept
+  end
+
+  primitive '__listen', 'makeListener:'
+
+  def listen(queue_size=10)
+    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
+    if queue_size < 1 || queue_size > 1000
+      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
+    end
+    self.__listen(queue_size) 
+    0
+  end
+
   # creates a non-blocking listening socket
   class_primitive '__new', 'new:port:'
 
@@ -633,6 +661,116 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
 
   def self.open(a1, a2=MaglevUndefined)
     self.new(a1, a2)
+  end
+end
+
+class UNIXSocket # < Socket in Smalltalk bootstrap
+  
+  class_primitive '__new', 'new'
+
+  primitive_nobridge '__connect', 'connect:'
+
+  def self.open(path)
+    sock = self.__new
+    path = Type.coerce_to(path, String, :to_str) 
+    unless sock.__connect(path)
+      raise SocketError , "UNIXSocket connect failed for "
+    end
+    sock
+  end
+
+  class << self
+    alias new open
+  end
+
+  # returns a pair of connected sockets with no path
+  # def self.pair ; end 
+  class_primitive 'pair', 'pair'
+    
+  # returns [ af_family, path ]
+  # def addr; end 
+  primitive 'addr', 'address'
+
+  # returns a String (for a Server) or empty string (for a client)
+  def path
+    a = self.addr
+    a[1]
+  end
+
+  primitive '__peerpath', '_peerPath'
+
+  # returns [ af_family, path ] 
+  def peeraddr
+    p = self.__peerpath 
+    if p._equal?(nil)
+      return self.addr
+    end
+    [ "AF_UNIX", p ]
+  end
+
+  primitive '__recvfrom_flags' , 'recvfrom:flags:'
+
+  def __recvfrom(length, flags)
+    res = self.__recvfrom_flags(length, flags)
+    from = res[1]
+    if from[0]._equal?(nil)
+      res[1] = ["AF_UNIX", ""]
+    end
+    res
+  end
+
+  # returns [ data , [ af_family, path]]
+  # def recvfrom(length, flags) ; end  
+  #   non-zero flags not implemented yet
+  def recvfrom(length, flags=0)
+    # non-zero flags not supported yet
+    self.__recvfrom(length, flags)
+  end
+
+  def recvfrom(length)
+    self.__recvfrom(length, 0)
+  end
+
+  def recvfrom_nonblock(length, flags=0)
+    # non-zero flags not supported yet
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.__recvfrom(length, flags)
+  end
+
+  def recvfrom_nonblock(length)
+    @_st_isRubyBlocking = false
+    self.__recvfrom(length, 0)
+  end
+
+end
+
+class UNIXServer # < UNIXSocket in Smalltalk bootstrap
+
+  primitive '__listen', 'makeListener:'
+
+  primitive_nobridge '__bind', 'bind:'
+
+  def self.open(path)
+    sock = self.__new
+    path = Type.coerce_to(path, String, :to_str)
+    sock.__bind(path)
+    sock.__listen(10)  # default queue length 10
+    sock
+  end
+
+  class << self
+    alias new open
+  end
+
+  primitive 'accept', 'accept'
+
+  def peeraddr
+    raise ArgumentError , 'peeraddr not supported on UNIXServer sockets'
+  end
+
+  def accept_nonblock
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.accept
   end
 
 end

@@ -1,2 +1,1 @@
-fails:Array#compact keeps tainted status even if all elements are removed
 fails:Array#compact! raises a TypeError on a frozen array

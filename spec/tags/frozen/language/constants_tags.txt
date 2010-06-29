@@ -1,2 +1,0 @@
-fails:Literal (A::X) constant resolution with statically assigned constants does not search the singleton class of the class or module
-fails:Literal (A::X) constant resolution with dynamically assigned constants does not search the singleton class of the class or module

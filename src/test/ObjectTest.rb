@@ -195,5 +195,13 @@ test(c.respond_to?(*args), true, "respond_to? K")
 args = [:quux, false]
 test(c.respond_to?(*args), false, "respond_to? L")
 
+# There was a bug in public_methods: it didn't honor the flag.  Test the fix here.
+test(c.public_methods(false), [], 'public_methods(false) A')
+test(c.methods(false), [], 'methods(false) A')
+def c.a_singleton_method
+end
+test(c.public_methods(false), ["a_singleton_method"], 'public_methods(false) B')
+test(c.methods(false), ["a_singleton_method"], 'methods(false) B')
+
 report
 true

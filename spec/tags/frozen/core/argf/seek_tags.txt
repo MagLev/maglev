@@ -1,0 +1,4 @@
+breaks:ARGF.seek sets the absolute position relative to beginning of file
+breaks:ARGF.seek sets the position relative to current position in file
+breaks:ARGF.seek sets the absolute position relative to end of file
+breaks:ARGF.seek takes at least one argument (offset)

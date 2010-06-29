@@ -88,3 +88,16 @@ pass it to <tt>Maglev::Gprof.monitor</tt>:
 The return value of <tt>Maglev::Gprof.monitor</tt> is a <tt>String</tt>
 with formatted results.
 
+== Miscellaneous
+
+* Be careful of running applications on a stone that has a different
+  app/framework persisted on it.  E.g., if you've persisted a Sinatra app
+  on your maglev stone, then running a Rails app (even non-persisted) may
+  be affected.  Sinatra will decorate kernel classes (i.e., Object) with
+  methods that may confuse the Rails app.  It is probably best, even in
+  development, to create a separate stone for each application that you
+  persist, that way you won't accidentally confuse other apps.  This is
+  probably mostly a concern with frameworks.  You probably won't run into
+  many problems running several Sinatra apps on a stone with persisted
+  Sinatra apps.  But you probably shouldn't mix persisted Sinatra apps with
+  Rails apps etc.

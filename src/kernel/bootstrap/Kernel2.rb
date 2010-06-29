@@ -10,6 +10,11 @@ module Kernel
     bnd 
   end
 
+  # call-seq:
+  #   binding => a_binding
+  #
+  # Returns a +Binding+ object, describing the variable and method bindings
+  # at the point of call.
   def binding
     # could be sent via  __send__ or send, but not supported yet
     # You must code binding calls explicitly.
@@ -33,6 +38,7 @@ module Kernel
 
   module_function :binding
 
+  # Returns +true+ if yield would execute a block in the current context.
   def block_given?(&block)
     # this implementation present so   send   will work.
     block_given?   # implemented by parser, not a recursive send
@@ -77,7 +83,7 @@ module Kernel
     :load ,
     :abort ,
     :at_exit ,
-#   :autoload ,	 # Kernel.autoload is used in core/kernel/autoload_spec.rb
+#   :autoload ,  # Kernel.autoload is used in core/kernel/autoload_spec.rb
 #   :'autoload?' ,
     :caller ,
     :catch ,

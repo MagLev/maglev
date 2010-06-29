@@ -69,12 +69,12 @@ class Object
 
   # Special semantics of    ensure      while in bootstrap:
   #   During bootstrap,  a ruby  ensure   translates to the
-  #   Smalltalk ExecBlock>>ensure:  semantics, and the 
+  #   Smalltalk ExecBlock>>ensure:  semantics, and the
   #   ensure block will be executed after any rescue blocks run.
   #   Outside of bootstrap,   ensure translates to
   #   ExecBlock>>rubyEnsure:  and the ensure block executes before
-  #   rescue blocks higher in the stack are run.   
-  #   Use of rubyEnsure:  fixes Trac 720 .  
+  #   rescue blocks higher in the stack are run.
+  #   Use of rubyEnsure:  fixes Trac 720 .
   #   Use of ensure: in bootstrap code makes the ensure faster .
 
   # End private helper methods
@@ -84,7 +84,7 @@ class Object
   primitive 'hash'
   primitive 'object_id', 'asOop'
   primitive '__id__' , 'asOop'  # included in public names query results
-  primitive '__id' , 'asOop'  
+  primitive '__id' , 'asOop'
   primitive '__identity_hash', 'identityHash'
 
   primitive_nobridge '__name_for_mnu', '_nameForMethodMissing'
@@ -139,17 +139,17 @@ class Object
   primitive_nobridge '__perform_meth', 'performMethod:'
 
   def __perfrm_call(*args)
-    # invoked only from Object>>_doesNotUnderstand:args:envId:reason: 
-    self.call(*args) 
+    # invoked only from Object>>_doesNotUnderstand:args:envId:reason:
+    self.call(*args)
   end
 
   primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
   primitive   '__basic_clone', '_basicCopy' # use singleton class
 
-  primitive   '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs' # uses non-singleton class 
-    # and does not copy varying instVars.  
-    # For an Array, copies fixed and dynamic instVars 
-    # but not the varying instVars accesses by [] 
+  primitive   '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs' # uses non-singleton class
+    # and does not copy varying instVars.
+    # For an Array, copies fixed and dynamic instVars
+    # but not the varying instVars accesses by []
 
   def clone
     res = self.__basic_clone
@@ -174,7 +174,7 @@ class Object
       # catch infinite recursion from typical MRI usage pattern
       raise RuntimeError, 'Enumerator creation is subclass responsibility'
     end
-    enumerator = self.__send__(sym, *args) 
+    enumerator = self.__send__(sym, *args)
     ts.remove(self)
     enumerator
   end
@@ -439,7 +439,7 @@ class Object
     #   should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
     if nargs < 1
-      if block_arg._not_equal?(nil) 
+      if block_arg._not_equal?(nil)
         return __instance_eval(nil, block_arg)
       end
       raise ArgumentError, 'too few args'
@@ -447,7 +447,7 @@ class Object
     if nargs > 3
       raise ArgumentError, 'too many args'
     end
-    # no ArgumentError for both string and explicit block args yet ; 
+    # no ArgumentError for both string and explicit block args yet ;
     #  passing implicit block_arg if no explicit block arg, so it can
     #  be put in the binding...
     lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
@@ -503,10 +503,10 @@ class Object
     unless block_given?
       raise LocalJumpError, 'no block given'
     end
-    blk = block.__set_self(self) 
-    blk.call(*args) 
+    blk = block.__set_self(self)
+    blk.call(*args)
   end
- 
+
   primitive_nobridge '__ruby_singleton_methods', 'rubySingletonMethods:protection:'
 
   primitive_nobridge '__remove_iv', 'rubyRemoveIv:'
@@ -547,8 +547,11 @@ class Object
     Module.__filter_method_names(self.__ruby_methods(include_super, 1))
   end
 
-  def public_methods(ignored_arg = true)
-    self.methods(true)
+  # If regular is true, retuns an array of the names of methods publicly
+  # accessible in receiver and receiver's ancestors.  Otherwise, returns
+  # an array of the names of receiver's singleton methods.
+  def public_methods(regular = true)
+    self.methods(regular)
   end
 
   def singleton_method_added(a_symbol)
@@ -578,7 +581,7 @@ class Object
   def to_enum(sym = :each , *args)  # added in 1.8.7
     # the receiver must implement the specified method that
     #  would return an enumerator
-    self.__send__(sym, *args) 
+    self.__send__(sym, *args)
   end
 
   def to_fmt
@@ -634,7 +637,7 @@ class Object
   # the current transaction.
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 
-  # MaglevUndefined is a sentinal value used to distinguish between nil as a value passed 
+  # MaglevUndefined is a sentinal value used to distinguish between nil as a value passed
   # by the user and the user not passing anything for a defaulted value.  E.g.,:
   #
   #   def foo(required_param, optional_param=MaglevUndefined)

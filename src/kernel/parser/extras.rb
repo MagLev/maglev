@@ -636,7 +636,7 @@ module MagRp # {
     end
 
     def initialize
-      super
+      # super()  # nothing in Parser to initialize
       lx = RubyLexer.new
       lx.parser = self
       @lexer = lx

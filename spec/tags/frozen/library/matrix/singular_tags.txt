@@ -1,0 +1,2 @@
+fails:Matrix#singular? returns false for an empty 0x0 matrix
+fails:Matrix#singular? raises an error for rectangular matrices

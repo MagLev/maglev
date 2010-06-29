@@ -1,13 +1,26 @@
 fails:The defined? keyword when called with a method name having a module as receiver returns nil if the method is private
+fails:The defined? keyword when called with a method name having a module as receiver returns nil if the method is protected
 fails:The defined? keyword for an expression returns 'assignment' for assigning multiple variables
 fails:The defined? keyword for an expression returns nil for an expression with != and an undefined method
 fails:The defined? keyword for an expression returns nil for an expression with !~ and an undefined method
-fails:The defined? keyword for an expression returns nil for an expression with 'not' and an undefined method
-fails:The defined? keyword for an expression returns nil for an expression with 'not' and an unset class variable
-fails:The defined? keyword for an expression does not propagate an exception raised by a method in a 'not' expression
-fails:The defined? keyword for an expression calls a method in a 'not' expression and returns 'expression'
-fails:The defined? keyword for an expression returns nil for an expression with '!' and an undefined method
-fails:The defined? keyword for an expression returns nil for an expression with '!' and an unset class variable
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an undefined method
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset class variable
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an undefined method
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset class variable
+fails:The defined? keyword for an expression with logical connectives does not propagate an exception raised by a method in a 'not' expression
+fails:The defined? keyword for an expression with logical connectives calls a method in a 'not' expression and returns 'expression'
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with '&&/and' and an undefined method
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with '&&/and' and an unset class variable
+fails:The defined? keyword for an expression with logical connectives does not propagate an exception raised by a method in an '&&' expression
+fails:The defined? keyword for an expression with logical connectives calls a method in an '&&' expression and returns 'expression'
+fails:The defined? keyword for an expression with logical connectives does not propagate an exception raised by a method in an 'and' expression
+fails:The defined? keyword for an expression with logical connectives calls a method in an 'and' expression and returns 'expression'
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with '||/or' and an undefined method
+fails:The defined? keyword for an expression with logical connectives returns nil for an expression with '||/or' and an unset class variable
+fails:The defined? keyword for an expression with logical connectives does not propagate an exception raised by a method in an '||' expression
+fails:The defined? keyword for an expression with logical connectives calls a method in an '||' expression and returns 'expression'
+fails:The defined? keyword for an expression with logical connectives does not propagate an exception raised by a method in an 'or' expression
+fails:The defined? keyword for an expression with logical connectives calls a method in an 'or' expression and returns 'expression'
 fails:The defined? keyword for an expression with a dynamic String returns nil when the String contains a call to an undefined method
 fails:The defined? keyword for an expression with a dynamic String calls the method in the String
 fails:The defined? keyword for an expression with a dynamic String returns nil if any of the interpolated method calls are undefined

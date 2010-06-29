@@ -7,6 +7,9 @@ fails:String#% tries to convert the argument to Array by calling #to_ary
 fails:String#% always taints the result when the format string is tainted
 fails:String#% supports binary formats using %b for negative numbers
 fails:String#% calls #to_ary on argument for %c formats
+fails:String#% supports float formats using %e, and downcases -Inf, Inf, and NaN
+fails:String#% supports float formats using %E, and upcases Inf, -Inf, and NaN
+fails:String#% pads with spaces for %E with Inf, -Inf, and NaN
 fails:String#% supports octal formats using %o for negative numbers
 fails:String#% taints result for %p when argument.inspect is tainted
 fails:String#% taints result for %s when argument is tainted

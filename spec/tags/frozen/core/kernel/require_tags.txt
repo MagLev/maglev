@@ -3,8 +3,12 @@ fails:Kernel#require (path resolution) does not resolve a ../ relative path agai
 fails:Kernel#require (file extensions) does not load a C-extension file if a .rb extensioned file is already loaded
 fails:Kernel#require (file extensions) does not load a C-extension file if a complex-extensioned .rb file is already loaded
 fails:Kernel#require ($LOAD_FEATURES) does not load a ../ relative path that is already stored
+fails:Kernel#require (shell expansion) performs tilde expansion on a .rb file before storing paths in $LOADED_FEATURES
+fails:Kernel#require (shell expansion) performs tilde expansion on a non-extensioned file before storing paths in $LOADED_FEATURES
 fails:Kernel.require (path resolution) does not resolve a ./ relative path against $LOAD_PATH entries
 fails:Kernel.require (path resolution) does not resolve a ../ relative path against $LOAD_PATH entries
 fails:Kernel.require (file extensions) does not load a C-extension file if a .rb extensioned file is already loaded
 fails:Kernel.require (file extensions) does not load a C-extension file if a complex-extensioned .rb file is already loaded
 fails:Kernel.require ($LOAD_FEATURES) does not load a ../ relative path that is already stored
+fails:Kernel.require (shell expansion) performs tilde expansion on a .rb file before storing paths in $LOADED_FEATURES
+fails:Kernel.require (shell expansion) performs tilde expansion on a non-extensioned file before storing paths in $LOADED_FEATURES
