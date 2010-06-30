@@ -17,10 +17,12 @@ module Signal
   # If VM was invoked with -d, handling of SIGINT by this method will
   # silently have no effect, and SIGINT will always return control to the topaz
   # debugger.
-  #
+  # If the signal is SIGTERM, 5 seconds is allowed for the Block or Proc
+  # to execute before a Kernel.exit() is forced .
+  # Returns the previously installed handler, or 'IGNORE'
   def self.trap(sig, command=nil, &block)
-    tnames = TrappableByName
-    tsigs = TrappableSignals
+    #tnames = TrappableByName  # uncomment for debugging
+    #tsigs = TrappableSignals
     if sig._isFixnum
       if sig < 1
         raise ArgumentError, 'signal numbers must be >= 1'
@@ -46,9 +48,7 @@ module Signal
       if block_given?
         command = block
       end 
-    elsif block_given?
-      raise ArgumentError, "both command and block passed to Signal#trap"
-    end
+    end  # ignores block if both command and block given 
     if command._isString
       if command == '' || command == 'IGNORE' || command == 'SIG_IGN' 
         ignore = 1
@@ -63,11 +63,29 @@ module Signal
     elsif command._isBlock || command._kind_of?(Proc)
       ignore = nil
       blk = command
+    elsif command._equal?(nil)
+      ignore = 2 # revert to VM default 
     else
-      raise ArgumentError, "Signal#trap, command must be a String Proc, or Block"
+      raise ArgumentError, "Signal#trap, command must be a String Proc, Block, or nil"
     end
-    TrappedSignals[num] = blk
-    self.__trap_signal(num, ignore, blk)
+    res = self.__trap_signal(num, ignore, blk)
+    if res._equal?(nil)
+      res = 'IGNORE'
+    end
+    if command._equal?(nil)
+      TrappedSignals[num] = nil
+    else
+      TrappedSignals[num] = blk
+    end
+    res
+  end
+
+  def self.__name_to_number(signame)
+    num = TrappableByName[signame]
+    if num._equal?(nil) 
+      raise ArgumentError, "signal #{signame} is not trappable from Ruby" 
+    end
+    return num
   end
 
   def self.list

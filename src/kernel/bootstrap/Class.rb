@@ -8,7 +8,7 @@ class Class
 
   primitive_nobridge 'superclass', 'superClass'
 
-  primitive_nobridge '__ruby_methods', 'rubyMethods:'
+  primitive_nobridge '__ruby_methods', 'rubyMethods:protection:'
 
   class_primitive_nobridge_env '__ruby_new&', '_rubyNew', ':do:'
 

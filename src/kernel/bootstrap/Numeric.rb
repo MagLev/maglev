@@ -45,6 +45,38 @@ class Numeric
     end
   end
 
+  def <(arg)
+    c = self <=> arg
+    unless c._isFixnum
+      raise ArgumentError, 'not comparable'
+    end
+    c < 0
+  end
+
+  def <=(arg)
+    c = self <=> arg
+    unless c._isFixnum
+      raise ArgumentError, 'not comparable'
+    end
+    c <= 0
+  end
+
+  def >(arg)
+    c = self <=> arg
+    unless c._isFixnum
+      raise ArgumentError, 'not comparable'
+    end
+    c > 0
+  end
+
+  def >=(arg)
+    c = self <=> arg
+    unless c._isFixnum
+      raise ArgumentError, 'not comparable'
+    end
+    c >= 0
+  end
+
   def abs
     if self < 0
       - self

@@ -1,0 +1,3 @@
+fails:Delegator when frozen is not writeable
+fails:Delegator when frozen causes mutative calls to raise TypeError
+fails:Delegator when frozen returns false if only the delegated object is frozen

@@ -13,6 +13,8 @@ class Symbol
   # returns an Array containing all keys in the Smalltalk dictionary AllSymbols
   class_primitive_nobridge 'all_symbols', '_rubyAllSymbols'
 
+  class_primitive '__existing_symbol', '_existingWithAll:' # arg is a String
+
   primitive_nobridge 'id2name', 'asString'
   primitive_nobridge '==', '='  # uses Symbol>>= which is identity compare
   primitive_nobridge 'eql?', '='  # uses Symbol>>= which is identity compare

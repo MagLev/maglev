@@ -6,7 +6,7 @@ module Zlib
   class Error < StandardError; end
 
   # constants from zlib.h as linked into Gemstone libgcilnk.so
-  ZLIB_VERSION = "1.2.4"
+  ZLIB_VERSION = "1.2.5"
 
   Z_NO_FLUSH    =  0
   # Z_PARTIAL_FLUSH = 1 # will be removed, use Z_SYNC_FLUSH instead

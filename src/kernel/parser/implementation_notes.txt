@@ -351,4 +351,7 @@ May 2010
   result of a    break, next or return    as input to a method call ,
   expression, or assignment.
   'void value expression'  was not detected by  ruby_parser2.0.3  original code
-  
+ 
+June 2010
+  Changed the WORDLIST table used by the lexer to further optimize
+  the lexing of keywords.  See comments in the code. 

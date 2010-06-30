@@ -1,4 +1,2 @@
-fails:YAML.load returns a document from current io stream when io provided
 fails:YAML.load fails on invalid keys
 fails:YAML.load does not escape symbols
-fails:YAML.load works on complex keys

@@ -1,1 +1,0 @@
-fails:SimpleDelegator#method raises a NameError if method is no longer valid because object has changed

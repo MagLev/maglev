@@ -79,6 +79,10 @@ module Process
   def self.__kill(signal, aPid)
     # aPid < 0 or  aPid == Process.pid() are not supported
     #    and will raise an error
+    unless signal._isFixnum
+      signal = Type.coerce_to(signal, String, :to_s )
+      signal = Signal.__name_to_number(signal)
+    end
     status = Maglev.__system.__process_info(12, signal, aPid)
     _procInfoResultCheck(status)
     1

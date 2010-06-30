@@ -1,5 +1,33 @@
 = MagLev Change Log
 
+* implemented UNIXSocket, UNIXServer for Trac 755
+
+== Changes for 23741  2010-06-23
+
+* Fixes to eliminate need for some Rails 3 patches
+* Fix Trac 706, 750, 751, 752, 753, 754
+* fix code generation for else of a begin/rescue/else
+* Signal#trap can now trap SIGTERM 
+* A few more optimizations and bugfixes in underlying GemStone 3.0 system
+
+== Changes for 23687  2010-06-21
+
+* Added examples/rails   
+  This contains the standard app rails generates, with one extra controller added.
+  The rakefile will checkout the MagLev rails github repository, ensure all necessary
+  gems are installed into MagLev, and then run the app with MagLev
+* Fix Trac 749
+* A few more optimizations and bugfixes in underlying GemStone 3.0 system
+
+== Changes for 23673  2010-06-17
+
+* topaz whr, upr, downr no longer display bridge methods
+* add topaz commands whrb, uprb, downrb which include bridge methods
+* Fix Trac 747, 748
+* implements IdentitySet.allocate
+* Update to latest version of Psych
+* Numerous optimizations and bugfixes in underlying GemStone 3.0 system
+
 == Changes for 23611  2010-06-12
 
 * fix Trac 644, 658, 693, 704, 717, 738, 746

@@ -1,1 +1,1 @@
-fails:Fixnum#** switches to a Float when the number is too big
+fails:Fixnum#** returns self raised to the given power

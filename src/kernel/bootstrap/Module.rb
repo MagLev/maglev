@@ -234,6 +234,7 @@ class Module
   primitive_nobridge '__define_method_block&' , 'defineMethod:block:'
 
   def define_method(sym, meth)
+    sym = Type.coerce_to(sym, Symbol, :to_sym)
     m = meth
     if m._is_a?(Proc)
       m = meth.__block
@@ -283,7 +284,10 @@ class Module
   def method_defined?(name)
     unless name._isSymbol
       name = Type.coerce_to(name, String, :to_str)
-      name = name.to_sym
+      name = Symbol.__existing_symbol(name)
+      if name.equal?(nil)
+        return false
+      end
     end
     __method_defined(name, -1)
   end

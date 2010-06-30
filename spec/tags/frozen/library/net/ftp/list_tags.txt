@@ -2,10 +2,3 @@ fails:Net::FTP#list when the LIST command fails raises a Net::FTPPermError when 
 fails:Net::FTP#list when the LIST command fails raises a Net::FTPPermError when the response code is 501
 fails:Net::FTP#list when the LIST command fails raises a Net::FTPPermError when the response code is 502
 fails:Net::FTP#list when the LIST command fails raises a Net::FTPPermError when the response code is 530
-fails:Net::FTP#list when switching type fails raises a Net::FTPPermError when the response code is 500
-fails:Net::FTP#list when switching type fails raises a Net::FTPPermError when the response code is 501
-fails:Net::FTP#list when switching type fails raises a Net::FTPPermError when the response code is 504
-fails:Net::FTP#list when switching type fails raises a Net::FTPPermError when the response code is 530
-fails:Net::FTP#list when opening the data port fails raises a Net::FTPPermError when the response code is 500
-fails:Net::FTP#list when opening the data port fails raises a Net::FTPPermError when the response code is 501
-fails:Net::FTP#list when opening the data port fails raises a Net::FTPPermError when the response code is 530

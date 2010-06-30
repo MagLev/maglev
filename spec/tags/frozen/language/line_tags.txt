@@ -1,1 +1,1 @@
-fails:The __LINE__ constant equals the line number of the text inside an eval
+fails:The __LINE__ pseudo-variable equals the line number of the text inside an eval
