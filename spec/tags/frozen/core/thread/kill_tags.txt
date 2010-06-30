@@ -1,5 +1,3 @@
-hangs:Thread#kill killing dying running does nothing
-hangs:Thread#kill does not deadlock when called from within the thread while being joined from without
 hangs:Thread#kill killing dying sleeping thread wakes up thread
 fails:Thread#kill runs nested ensure clauses
 fails:Thread#kill can be rescued by outer rescue clause when inner ensure clause raises exception
