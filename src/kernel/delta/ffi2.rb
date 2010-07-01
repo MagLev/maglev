@@ -21,7 +21,6 @@ module FFI
 
   class SignatureError < NativeError; end
 
-
   # DEBUG , a dynamic constant in post_prims/ffi.rb
 
   module Library
@@ -45,14 +44,14 @@ module FFI
   end
 
   # Tables used to translate arguments for primitives.
-  
+
   # Mapping from Ruby type names to type names supported by CFunction
   # If you add new keys to this dictionary, you must also
   # modify  CFunction(C)>>_addRubyPrimTypes in image/ruby/Capi_ruby.gs
-  # and rexecute as SystemUser , if the new key is to be understood 
+  # and rexecute as SystemUser , if the new key is to be understood
   # as the type of a varArg argument.
   #
-  PrimTypeDefs = IdentityHash.from_hash( 
+  PrimTypeDefs = IdentityHash.from_hash(
     { :char => :int8 ,  :uchar => :uint8 ,
       :short => :int16 , :ushort => :uint16 ,
       :int   => :int32 , :uint => :uint32 ,
@@ -76,11 +75,11 @@ module FFI
       :'char*' => :'char*' ,
       :const_string => :'const char*'} )
 
-# Body of a  :const_string  argument is copied from object memory to C
-#   memory before a function call .
-# Body of a  :string  argument is copied from object memory to C memory
-#   before a function call, and is then copied back to object memory
-#   after the function call.
+  # Body of a  :const_string  argument is copied from object memory to C
+  #   memory before a function call .
+  # Body of a  :string  argument is copied from object memory to C memory
+  #   before a function call, and is then copied back to object memory
+  #   after the function call.
 
   # mapping from types supported by CFunction to sizes in bytes
   PrimTypeSizes = IdentityHash.from_hash(
@@ -190,6 +189,7 @@ module FFI
     # All Maglev MemoryPointer's have auto-free behavior unless
     #  auto-free explicitly disabled on an instance
   end
+
   class Buffer < Pointer
     # all behavior is in Pointer
   end
@@ -206,6 +206,8 @@ module FFI
   class Union < FFI::Struct # need FFI:: to properly resolve during bootstrap
   end
 
+  # FFI definition of the layout of a C struct.  An instance of this class
+  # is created and stored with the FFI Struct when Struct.layout is called.
   class StructLayout
     # define the fixed instvars
     def initialize
@@ -225,6 +227,8 @@ module FFI
     # remainder of implementation in ffi_struct.rb
   end
 
+  # FFI definition of the layout of a C union.  An instance of this class
+  # is created and stored with the FFI Union when Union.layout is called.
   class UnionLayout < StructLayout
   end
 

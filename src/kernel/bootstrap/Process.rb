@@ -6,7 +6,7 @@ module Process
   def self._procInfoResultCheck(status)
     if (status < 0)
       errnoValue = - status
-      raise SystemCallError # TODO: Errno::xxx
+      Errno.handle( errnoValue )
     else
       return status # the result value
     end
@@ -79,21 +79,26 @@ module Process
   def self.__kill(signal, aPid)
     # aPid < 0 or  aPid == Process.pid() are not supported
     #    and will raise an error
-    unless signal._isFixnum
-      signal = Type.coerce_to(signal, String, :to_s )
-      signal = Signal.__name_to_number(signal)
-    end
     status = Maglev.__system.__process_info(12, signal, aPid)
     _procInfoResultCheck(status)
     1
   end
 
   def self.kill(signal, *pids)
+    lim = pids.__size
+    if lim._equal?(0)
+      raise ArgumentError, 'Process.kill, expected at least 2 args'
+    end
+    unless signal._isFixnum
+      signal = Type.coerce_to(signal, String, :to_s )
+      signal = Signal.__name_to_number(signal)
+    end
     count = 0
-    pids.each { |aPid|
-      self.__kill(signal, aPid)
+    while count < lim
+      apid = pids[count]
+      self.__kill(signal, apid)
       count = count + 1
-    }
+    end
     return count
   end
 
