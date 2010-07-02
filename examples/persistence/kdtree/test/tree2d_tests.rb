@@ -12,6 +12,150 @@ describe Collections::Tree2D do
     @p2 = Collections::Point2D.new(0, 2, :point2)
     @one_pt_tree = Collections::Tree2D.new [@p1]
     @two_pt_tree = Collections::Tree2D.new [@p1, @p2]
+
+    # Prepare several example trees that have some properties we will test later
+    @dp1 = Collections::Point2D.new(1, 1, :depthpoint1)
+    @dp2 = Collections::Point2D.new(2, 2, :depthpoint2)
+    @dp3 = Collections::Point2D.new(3, 3, :depthpoint3)
+    @dp4 = Collections::Point2D.new(-1, -1, :depthpoint4)
+    @dp5 = Collections::Point2D.new(-2, -2, :depthpoint5)
+    @depth0_tree = Collections::Tree2D.new [] # balanced
+    @depth1_tree = Collections::Tree2D.new [@dp1] # balanced
+    @depth2_tree_a = Collections::Tree2D.new [@dp1, @dp2] # balanced
+    @depth2_tree_b = Collections::Tree2D.new [@dp1, @dp2, @dp3] # balanced
+
+    @depth3_tree_a = Collections::Tree2D.new [@dp1, @dp2] # unbalanced (note: @dp2 will be root)
+    @depth3_tree_a.insert_point @dp4
+
+    @depth3_tree_b = Collections::Tree2D.new [@dp1] # unbalanced
+    @depth3_tree_b.insert_point @dp4 # Falls to left
+    @depth3_tree_b.insert_point Collections::Point2D.new(0, 0, :zeropoint) # Falls to right of @dp4
+
+    @depth3_tree_c = Collections::Tree2D.new(((1..6).to_a.map { |n| # balanced
+       Collections::Point2D.new(n, n)
+    }))
+  end
+
+  describe 'for tree node removal' do
+    it 'removes from a 1-point tree' do
+      @one_pt_tree.remove!
+      @one_pt_tree.value.must_be_nil
+      @one_pt_tree.right.must_be_nil
+      @one_pt_tree.left.must_be_nil
+    end
+
+    it 'removes from a 2-point tree' do
+      @two_pt_tree.remove!
+      @two_pt_tree.value.wont_be_nil
+      @two_pt_tree.right.must_be_nil
+      @two_pt_tree.left.must_be_nil
+    end
+
+    it 'removes from a 3-point tree' do
+      @three_pt_tree = Collections::Tree2D.new [@dp1, @dp2, @dp3]
+      @three_pt_tree.remove!
+      @three_pt_tree.value.must_equal @dp3
+      @three_pt_tree.right.must_be_nil
+      @three_pt_tree.left.value.must_equal @dp1      
+    end
+
+    it 'removes an interior node from a depth 3 tree' do
+      # Create an unbalanced tree that extends to the right
+      # and then remove an interior node.
+      @top_pt      = Collections::Point2D.new(0, 0, :top)
+      @interior_pt = Collections::Point2D.new(1, 0, :interior)
+      @leaf_pt     = Collections::Point2D.new(1, 1, :leaf)
+      @tree = Collections::Tree2D.new [@top_pt]
+      @tree.insert_point(@interior_pt)
+      @tree.insert_point(@leaf_pt)
+
+      # Verify tree is set up right
+      @tree.value.must_equal @top_pt
+      @tree.right.value.must_equal @interior_pt 
+      @tree.right.right.value.must_equal @leaf_pt
+   
+      @tree.right.remove! # Remove interior
+
+      # Verify modified tree is correct
+      @tree.value.must_equal @top_pt
+      @tree.right.value.must_equal @leaf_pt
+      @tree.right.left.must_be_nil
+      @tree.right.right.must_be_nil
+    end
+  end
+
+  describe 'balanced tree' do
+    it 'determines if trees are balanced' do
+      @depth0_tree.balanced?.must_equal true 
+      @depth1_tree.balanced?.must_equal true 
+      @depth2_tree_a.balanced?.must_equal true 
+      @depth2_tree_b.balanced?.must_equal true 
+      @depth3_tree_a.balanced?.must_equal false
+      @depth3_tree_b.balanced?.must_equal false
+      @depth3_tree_c.balanced?.must_equal true
+    end
+  end
+
+  describe 'for maximum depth' do
+    it 'finds correct depths' do
+      @depth0_tree.max_depth.must_equal 0 
+      @depth1_tree.max_depth.must_equal 1
+      @depth2_tree_a.max_depth.must_equal 2
+      @depth2_tree_b.max_depth.must_equal 2
+      @depth3_tree_a.max_depth.must_equal 3
+      @depth3_tree_b.max_depth.must_equal 3
+      @depth3_tree_c.max_depth.must_equal 3
+    end
+  end
+
+  describe 'for insertion' do
+    before do  
+      @insert_tree = Collections::Tree2D.new []
+    end
+ 
+    it 'inserts into an empty tree to establish root' do      
+      @insert_tree.insert_point(@p1)
+      @insert_tree.value.must_equal @p1
+      @insert_tree.right.must_be_nil
+      @insert_tree.left.must_be_nil
+    end
+
+    it 'inserts into balanced 1-node tree (insertion value same as root)' do 
+      @insert_tree.insert_point(@dp1)
+      @insert_tree.insert_point(@dp1)
+      @insert_tree.value.must_equal @dp1
+      if @insert_tree.right.value then # "side" of hyperplane it ends up on is arbitrary
+        @insert_tree.right.value.must_equal @dp1 
+        @insert_tree.right.left.must_be_nil
+        @insert_tree.right.right.must_be_nil      
+        @insert_tree.left.must_be_nil
+      else
+        @insert_tree.left.value.must_equal @dp1 
+        @insert_tree.left.left.must_be_nil
+        @insert_tree.left.right.must_be_nil      
+        @insert_tree.right.must_be_nil 
+      end
+    end
+
+    it 'inserts into balanced 1-node tree (insert right)' do 
+      @insert_tree.insert_point(@dp1)
+      @insert_tree.insert_point(@dp2)
+      @insert_tree.value.must_equal @dp1
+      @insert_tree.right.value.must_equal @dp2
+      @insert_tree.right.left.must_be_nil
+      @insert_tree.right.right.must_be_nil
+      @insert_tree.left.must_be_nil
+    end
+
+    it 'inserts into balanced 1-node tree (insert left)' do       
+      @insert_tree.insert_point(@dp2)
+      @insert_tree.insert_point(@dp1)
+      @insert_tree.value.must_equal @dp2
+      @insert_tree.right.must_be_nil
+      @insert_tree.left.value.must_equal @dp1
+      @insert_tree.left.left.must_be_nil
+      @insert_tree.left.right.must_be_nil
+    end
   end
 
   describe 'creation' do
@@ -209,7 +353,7 @@ describe Collections::Tree2D do
     # the distance_squared of that node from the target.
     def find_nearest_k(target, points, k=1)
       points.inject(Collections::BestK.new(k)) do |b, current|
-        b.add(Collections::SearchResult.new(current, current.distance(target)))
+        b.add(Collections::SearchResult.new(current, current.distance_sq(target)))
       end.values
     end
   end
