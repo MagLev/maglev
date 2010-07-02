@@ -35,7 +35,7 @@ describe Collections::Tree2D do
        Collections::Point2D.new(n, n)
     }))
   end
-
+ 
   describe 'for tree node removal' do
     it 'removes from a 1-point tree' do
       @one_pt_tree.remove!
@@ -105,6 +105,22 @@ describe Collections::Tree2D do
       @depth3_tree_a.max_depth.must_equal 3
       @depth3_tree_b.max_depth.must_equal 3
       @depth3_tree_c.max_depth.must_equal 3
+    end
+  end
+  
+  describe 'for tree rebuild' do
+    it 'must rebuild as balanced tree' do   
+      @depth0_tree.rebuild
+      @depth0_tree.balanced?.must_equal true
+      
+      @depth1_tree.rebuild
+      @depth1_tree.balanced?.must_equal true
+    
+      @depth3_tree_a = @depth3_tree_a.rebuild
+      @depth3_tree_a.balanced?.must_equal true
+    
+      @depth3_tree_b = @depth3_tree_b.rebuild
+      @depth3_tree_b.balanced?.must_equal true
     end
   end
 
