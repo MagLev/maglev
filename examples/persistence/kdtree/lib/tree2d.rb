@@ -11,15 +11,13 @@ module Collections
     def self.random(size=1_000)
       new(Array.new(size) { |i| Point2D.random("point #{i}") }, 2)
     end
-
-    # Creates a new +Tree2D+ for the given points.  If +points+ is nil or
-    # empty, will return an empty tree.  +#left+ and +#right+ may return
-    # nil, if there is no data on that side of the tree.  The points passed
-    # to the initialize method must respond to the following methods:
-    # * #x Return the x coordinate
-    # * #y Return the y coordinate
-    # * #eql?  (and hash)
-    # DS // TODO: FIX THESE DOCS
+    
+    # Creates a new +Tree2D+ for the given points that lie in Euclidean space.
+    # Points should derive from class #PointKD (extend from it).  Note that
+    # there is a +Point2D+ class available for convenience.
+    # If +euclidean_points+ is nil or empty, will return an empty tree.  
+    # +#left+ and +#right+ may return nil, if there is no data on that side 
+    # of the tree.  
     def initialize(points, depth=0)
       super(points, 2, depth)
     end
