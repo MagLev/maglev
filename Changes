@@ -1,7 +1,12 @@
 = MagLev Change Log
 
+== Changes for 23767  2010-07-02
+
+* Rails example works better. No longer need to use MRI to run 'rails new myapp'
 * implemented UNIXSocket, UNIXServer for Trac 755
 * Fix Trac 758, 759
+* Fix Object#public_methods
+* Upgraded embedded zlib code to v1.2.5
 
 == Changes for 23741  2010-06-23
 
