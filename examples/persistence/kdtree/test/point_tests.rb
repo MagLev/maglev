@@ -32,10 +32,10 @@ describe Collections::Point2D do
   end
 
   it 'calculates distance squared from other points' do
-    @p1.distance(@p2).must_equal 405
-    @p2.distance(@p1).must_equal 405
-    @p1.distance(@p1).must_equal 0
-    @p2.distance(@p2).must_equal 0
+    @p1.distance_sq(@p2).must_equal 405
+    @p2.distance_sq(@p1).must_equal 405
+    @p1.distance_sq(@p1).must_equal 0
+    @p2.distance_sq(@p2).must_equal 0
   end
 
   it 'if p1.eql?(p2) then p1.hash == p2.hash' do
