@@ -110,7 +110,7 @@ module OpenSSL
     # digest was initialized or last reset.
     def finish
       string_ptr = FFI::MemoryPointer.new(:char, self.digest_length)
-      OpenSSL::LibCrypto.EVP_DigestFinal_ex(@ctx, string_ptr)
+      OpenSSL::LibCrypto.EVP_DigestFinal_ex(@ctx, string_ptr, nil)
       string_ptr.read_string
     end
 

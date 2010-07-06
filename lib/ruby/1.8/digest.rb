@@ -3,6 +3,7 @@
 # implementation of message digests for both the OpenSSL library and the
 # Digest Library.
 #++
+
 #
 # The Digest module defines a common API for various hashing algorithms
 # (MD5, SHA1, etc.).  The methods provide an algorithm agnostic API for
@@ -294,9 +295,62 @@ module Digest
     end
   end
 
-  # This abstract class provides a common interface to message digest
-  # implementation classes written in C.
+  # This abstract class provides a common implementation for message
+  # digests that will use the OpenSSL implementation.  Each derived class
+  # should call new with the appropriate OpenSSL implementation, e.g.,:
+  #
+  # 
+  # class ::Digest::MD5 < ::Digest::Base
+  #   def self.md5(string)
+  #     new(string)
+  #   end
+  #
+  #   def initialize(str = nil)
+  #     super(OpenSSL::Digest.const_get('MD5').new(str))
+  #   end
+  # end
+
   class Base < ::Digest::Class
-    # Right now, we only support MD5, so all implementation is in md5.rb
+  def initialize(impl)
+    @impl = impl # OpenSSL::Digest.const_get(algo).new(str)
+    self
+  end
+
+  def block_length
+    @impl.block_length
+  end
+
+  def digest_length
+    @impl.digest_length
+  end
+
+  alias :length :size
+
+  def finish
+    @impl.finish
+  end
+
+  def reset
+    @impl.reset
+  end
+
+  def update(arg)
+    @impl.update(arg)
+  end
+  alias :<< :update
+
+  private
+  def to_str(bignum)
+    l = digest_length
+    bytes = Array.new(l)
+    b = bignum
+    l.times do |i|
+      bytes[l - i - 1] =  b & 0xFF
+      b = b >> 8
+    end
+    bytes.pack("C*")
+ end
+    
   end
 end
+require 'openssl'
