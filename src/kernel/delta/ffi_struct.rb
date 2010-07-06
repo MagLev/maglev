@@ -334,8 +334,8 @@ module FFI
           arg = args[0]
           if arg._kind_of?(Pointer)
             ly_siz = ly.size
-            ba_siz = arg.total
-            if ba_siz < ly_siz
+            arg_siz = arg.total
+            if arg_siz._not_equal?(0) && arg_siz < ly_siz
               raise ArgumentError, "argument Pointer is too small for a Struct  #{self.name}"
             end
             inst = self.__fromRegionOf( arg, 0, ly_siz )
