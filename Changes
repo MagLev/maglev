@@ -1,5 +1,8 @@
 = MagLev Change Log
 
+* Fix Trac 760
+* Changed ctrl-d semantics of topaz line editor to be delete current character
+
 == Changes for 23767  2010-07-02
 
 * Rails example works better. No longer need to use MRI to run 'rails new myapp'
