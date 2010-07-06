@@ -315,7 +315,8 @@ module FFI
     #             :value, :double
     #   end
     #
-    # If +ptr+ is not given, creates a new struct
+    # If +ptr+ is not given, creates a new struct with memory allocated and
+    # managed by FFI.
     #
     # If +ptr+ is given, constructs a new Struct from the memory pointed to by +ptr+.
     #
@@ -326,6 +327,14 @@ module FFI
     # Memory for the struct is zeroed out.
     #
     # == Examples
+    #
+    # To create a new, zeroed out struct, just call +new+ with no args.
+    # +s+ will point to SomeStruct.size bytes of zeroed memory managed by
+    # FFI.  When s is garbage collected, the underlying memory will be
+    # freed by FFI.
+    #
+    #   s = SomeStruct.new
+    #
 
     def self.new(*args)
       if args.size._equal?(1)

@@ -34,9 +34,9 @@ module FFI
   class Pointer # [
 
     # call-seq:
-    #   Pointer.new {|ptr| block}              -> ptr to eight bytes of memory
-    #   Pointer.new(num_bytes) {|ptr| block}   -> ptr to +num_bytes+ bytes
-    #   Pointer.new(type) {|ptr| block}        -> ptr for one element of +type+
+    #   Pointer.new              {|ptr| block} -> ptr to eight bytes of memory
+    #   Pointer.new(num_bytes)   {|ptr| block} -> ptr to +num_bytes+ bytes
+    #   Pointer.new(type)        {|ptr| block} -> ptr for one element of +type+
     #   Pointer.new(type, count) {|ptr| block} -> ptr for +count+ elements of +type+
     #
     # Create and return a new Pointer.  The pointer will allocate and

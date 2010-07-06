@@ -116,7 +116,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
       raise TypeError , 'service must be nil, a Fixnum or a String'
     end
     if family._isStringOrSymbol
-      fstr = family.to_s		# fix Trac 740
+      fstr = family.to_s    # fix Trac 740
       # constants like AF_INET are undefined during bootstrap, and are defined
       # transiently during normal VM initialization to be OS-dependent values 
       #  by smalltalk code in RubyContext>>_initTransient: .
@@ -674,7 +674,7 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
     sock = self.__new
     path = Type.coerce_to(path, String, :to_str) 
     unless sock.__connect(path)
-      raise SocketError , "UNIXSocket connect failed for "
+      raise SocketError , "UNIXSocket connect failed for #{path}"
     end
     sock
   end
