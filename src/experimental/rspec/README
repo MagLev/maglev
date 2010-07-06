@@ -1,6 +1,0 @@
-
-Pre requisites:
-
-  $ maglev-gem install rspec diff-lcs
-  $ maglev-gem install cucumber
-

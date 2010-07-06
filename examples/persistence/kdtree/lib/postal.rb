@@ -1,11 +1,13 @@
+require 'tree2d'
+
 # This class represents the name and location of each of the postal codes
 # (zip codes) in the US.  It conforms to the api expected for Tree2D.
 #
 # It can read data in the format provided by
 # http://www.geonames.org
 #
-class PostalCode
-  attr_reader :lon, :lat, :name, :zip
+class PostalCode < Collections::Point2D
+  attr_reader :name, :zip
 
   # Parse a file of postal code information
   def self.parse_file(file_name)
@@ -33,8 +35,15 @@ class PostalCode
     @admin_name_2 = an2
     @admin_code_2 = ac2
     @admin_name_3 = an3
-    @lat = lat.to_f
-    @lon = lon.to_f
+    super(lon.to_f, lat.to_f)
+  end
+
+  def lat
+    y
+  end
+
+  def lon
+    x
   end
 
   def state
@@ -44,18 +53,7 @@ class PostalCode
     @admin_name_2
   end
   def to_s
-    "#{@name} [#{@admin_name_1} #{@admin_name_2} #{@admin_name_3}] #{@zip}  #{@lat} #{@lon}"
-  end
-
-  # API needed by Tree2D
-  def y; @lat end
-  def x; @lon end
-  def distance(other)
-    # ok...this is euclidean distance, not spherical or anything
-    # realistic...
-    dx = @lon - other.x
-    dy = @lat - other.y
-    (dx * dx) + (dy * dy)
+    "#{@name} [#{@admin_name_1} #{@admin_name_2} #{@admin_name_3}] #{@zip}  #{lat} #{lon}"
   end
 
   RADIAN = Math::PI / 180.0
@@ -64,8 +62,8 @@ class PostalCode
   # Approximate angular distance in radians between reciever and
   # other. Assumes both points are in same coordinate system.
   def spherical_distance(other)
-    x_rad = @lon * RADIAN
-    y_rad = @lat * RADIAN
+    x_rad = lon * RADIAN
+    y_rad = lat * RADIAN
 
     dx_rad = (x_rad - (other.x * RADIAN))
     dy_rad = (y_rad - (other.y * RADIAN))

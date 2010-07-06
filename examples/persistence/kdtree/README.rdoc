@@ -2,9 +2,9 @@
 
 == Overview
 
-This directory contains an implementation of a KD-Tree of dimension two.
-This is a binary tree that can be used to search for 2D data, i.e., nodes
-with a latitude and longitude.
+This directory contains an implementation of a KD-Tree.  A derivative class,
+Tree2D (k=2), is shown in this example.  This is a binary tree that can 
+be used to search for 2D data, i.e., nodes with a latitude and longitude.
 
 == Demo
 
@@ -37,6 +37,12 @@ etc.):
   $ more profile.out
 
 == Performance
+
+Note: Changes were made after the collection of performance results.
+Specifically, the 2D tree was transformed into a generalized K-dimension
+tree.  This made no noticable impact on new benchmarks, so the old ones 
+(which were used in http://maglevity.wordpress.com/2009/12/17/kd-trees-and-maglev/)
+have been kept intact as follows.
 
 The following are just back of the envelope numbers, from a single run on a
 2.4GHz Intel Core 2 Duo (MacBook) with 2G Ram.   The test creates a tree of
