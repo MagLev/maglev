@@ -1,7 +1,8 @@
 = MagLev Change Log
 
 * implemented UNIXSocket, UNIXServer for Trac 755
-* Fix Trac 758, 759
+* Fix Trac 758, 759, 760
+* changed ctrl-d semantics of topaz line editor to be delete current character
 
 == Changes for 23741  2010-06-23
 
