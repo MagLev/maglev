@@ -70,8 +70,10 @@ function postAjaxRequest( params ) {
 
     },
 
-    error: function( xhr ) {
-      alert( 'Something went wrong...' + xhr.status );
+    error: function( xhr, txtStatus ) {
+      alert( "Something went wrong during API request to '/nearest'!  Details:\n" 
+        + "XMLHttpRequest status: " + xhr.status + "\n"
+        + "Status: " + txtStatus );
     }
 
   });
