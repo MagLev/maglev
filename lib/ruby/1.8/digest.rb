@@ -280,7 +280,7 @@ module Digest
     def self.hexdigest(string, *rest)
       d = new(*rest)
       sum = d.digest(string)
-      Digest.hexencode(sum)
+      ::Digest.hexencode(sum)
     end
 
     # creates a digest object and reads a given file, name.
@@ -299,7 +299,6 @@ module Digest
   # digests that will use the OpenSSL implementation.  Each derived class
   # should call new with the appropriate OpenSSL implementation, e.g.,:
   #
-  # 
   # class ::Digest::MD5 < ::Digest::Base
   #   def self.md5(string)
   #     new(string)
@@ -311,46 +310,60 @@ module Digest
   # end
 
   class Base < ::Digest::Class
-  def initialize(impl)
-    @impl = impl # OpenSSL::Digest.const_get(algo).new(str)
-    self
-  end
-
-  def block_length
-    @impl.block_length
-  end
-
-  def digest_length
-    @impl.digest_length
-  end
-
-  alias :length :size
-
-  def finish
-    @impl.finish
-  end
-
-  def reset
-    @impl.reset
-  end
-
-  def update(arg)
-    @impl.update(arg)
-  end
-  alias :<< :update
-
-  private
-  def to_str(bignum)
-    l = digest_length
-    bytes = Array.new(l)
-    b = bignum
-    l.times do |i|
-      bytes[l - i - 1] =  b & 0xFF
-      b = b >> 8
+    def initialize(impl)
+      @impl = impl # OpenSSL::Digest.const_get(algo).new(str)
+      self
     end
-    bytes.pack("C*")
- end
-    
+
+    def block_length
+      @impl.block_length
+    end
+
+    def digest_length
+      @impl.digest_length
+    end
+
+    alias :length :size
+
+    def finish
+      @impl.finish
+    end
+
+    def reset
+      @impl.reset
+    end
+
+    def update(arg)
+      @impl.update(arg)
+    end
+    alias :<< :update
+
+    private
+    def to_str(bignum)
+      l = digest_length
+      bytes = Array.new(l)
+      b = bignum
+      l.times do |i|
+        bytes[l - i - 1] =  b & 0xFF
+        b = b >> 8
+      end
+      bytes.pack("C*")
+    end
   end
+
+  # ['SHA256', 'SHA512'].each do |klass_name|
+  #   klass = Class.new(::Digest::Base) do
+  #     define_method(:initialize) do |str|
+  #       super(OpenSSL::Digest.const_get(klass_name).new(str))
+  #     end
+  #
+  #     singleton = (class << klass; self; end)
+  #     singleton.class_eval{
+  #       define_method(:"#{klass_name}") {|string| new(string) }
+  #     }
+  #   end
+  #   const_set(klass_name, klass)
+  # end
 end
+
 require 'openssl'

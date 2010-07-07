@@ -38,21 +38,12 @@ data.each do |line|
 end
 test(incremental_digest.hexdigest, 'a8db36c1ad1e7577ca2139cc51b53c91', 'incremental MD5')
 
-# d = Digest::MD5.new
-# d.update(Foo::Contents)
-# dig = d.digest()
-# puts "dig.class:   #{dig.class}"
-# puts "dig.inspect: #{dig.inspect}"
-# puts "dig.to_s:    #{dig.to_s}"
-# puts "dig.to_str:  #{dig.to_str}"
-
-
-# TODO: test SHA256, SHA512 SHA384   ALso Digest::MD5.md5(string) (sha1 too)
 # Test some digests
-[ [Digest::SHA1, "\0258\301G{\227GI\377\373\370\037\235\016%\2430e@v"],
-#  [Digest::SHA256, "\304bK\241\021\346\247\035h\332\004\257\266\300!/\036\302\027\a\nC\214\215\000\200\020.\326\361>\201"]
+[[Digest::SHA1, "\0258\301G{\227GI\377\373\370\037\235\016%\2430e@v"]
+ #[Digest::SHA256, "\304bK\241\021\346\247\035h\332\004\257\266\300!/\036\302\027\a\nC\214\215\000\200\020.\326\361>\201"],
+# [Digest::SHA512, "\304\b\373\243_\023(%\311+x7R\356\270\310\320;\337\253+\235\267\334\311\224pg\276\215S\351\356;\234\264\272k\377 \f+\333\326t\322X\r6\035\2045\305A\374\r\214tA\232{2\370n"]
 ].each do |(klass, expected)|
-  test(klass.digest("some plain text"), expected, "#{klass.name} test")
+  test(klass.digest("some plain text"), expected, "#{klass} test")
 end
-  
+
 report
