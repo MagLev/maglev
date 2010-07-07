@@ -50,11 +50,13 @@ function initialize() {
 
 
 function postAjaxRequest( params ) {
+  host = location.hostname;
+  port = location.port;
+  serviceUrl = "http://" + host + ":" + port + "/nearest";
 
   // initiate an Ajax request to the server and store the response in 'result'.
   $.ajax({
-
-    url: 'http://localhost:3333/nearest',
+    url: serviceUrl,
     type: 'POST',
     dataType: 'json',
     data: params,
@@ -71,7 +73,11 @@ function postAjaxRequest( params ) {
     },
 
     error: function( xhr, txtStatus ) {
-      alert( "Something went wrong during API request to '/nearest'!  Details:\n" 
+      alert( "Something went wrong during API request to '/nearest'!  "
+        + "This may be a cross-site request failure due to your browser's security policy.  "
+        + "Check that the address " + host + " agrees with what is in your browser's URL bar.  "
+        + "\n========\n"
+        + "Details:\n" 
         + "XMLHttpRequest status: " + xhr.status + "\n"
         + "Status: " + txtStatus );
     }
