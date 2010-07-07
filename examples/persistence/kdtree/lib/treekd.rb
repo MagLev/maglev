@@ -120,14 +120,14 @@ module Collections
     # Behaves as #rebuild indicates, but allows the exclusion of points
     # in the rebuilt tree using the +exclude+ array.  Also allows
     # exclusion of just the root node through +exclude_root+.
-    def _rebuild(exclude=nil, exclude_root=false)
-      exclude = [] if exclude.nil?
+    def _rebuild(exclude=[], exclude_root=false)
       points = []
       points << @value unless exclude_root or exclude.include?(@value)
       @left.each { |pt| points << pt unless exclude.include?(pt) } unless @left.nil?
       @right.each { |pt| points << pt unless exclude.include?(pt) } unless @right.nil?
       TreeKD.new(points, @dimension)
     end
+    protected :_rebuild
 
     # Removes just the root node of this tree (that is, the "current value").  
     # After calling this method, the root value will change to one of the 
