@@ -2,9 +2,10 @@
 
 == Overview
 
-This directory contains an implementation of a KD-Tree.  A derivative class,
-Tree2D (k=2), is shown in this example.  This is a binary tree that can 
-be used to search for 2D data, i.e., nodes with a latitude and longitude.
+This directory contains an implementation of a {K-Dimensional
+Tree}[http://en.wikipedia.org/wiki/Kd-tree] (KD-Tree).  A derivative class,
+Tree2D (k=2), is shown in this example.  This is a binary tree that can be
+used to search for 2D data, i.e., nodes with a latitude and longitude.
 
 == Demo
 
@@ -12,18 +13,18 @@ The demo.rb file is a Sinatra application that allows you to enter a
 latitude and longitude (preferably, within the US, if you're using the US
 Postal Database), and will find the nearest N zip codes to the lat/lon.
 
-To run the app, just run rake:
-
-  $ rake
-
-But first: Make sure the maglev server has been started:
+1. Make sure the maglev server has been started:
 
   $ cd $MAGLEV_HOME
   $ rake maglev:start
 
-and make sure Sinatra has been installed:
+2. Make sure Sinatra has been installed:
 
   $ maglev-gem install sinatra
+
+2. Run the app:
+
+  $ rake
 
 The demo will show up in Sinatra at: http://localhost:3333/
 
@@ -40,7 +41,7 @@ etc.):
 
 Note: Changes were made after the collection of performance results.
 Specifically, the 2D tree was transformed into a generalized K-dimension
-tree.  This made no noticable impact on new benchmarks, so the old ones 
+tree.  This made no noticable impact on new benchmarks, so the old ones
 (which were used in http://maglevity.wordpress.com/2009/12/17/kd-trees-and-maglev/)
 have been kept intact as follows.
 
@@ -181,6 +182,7 @@ The following numbers are from a run on that:
 
 == Acknowledgements
 
-The data file that has the US postal codes is provided by http://GeoNames.org/
-under a Creative Commons Attribution 3.0 License.  See etc/readme.txt for
-details.
+The data file that has the US postal codes is provided by
+http://GeoNames.org/ under a Creative Commons Attribution 3.0 License.  See
+<tt>etc/readme.txt</tt>[link:files/examples/persistence/kdtree/etc/readme_txt.html]
+for details.

@@ -9,21 +9,21 @@ and then put the following in your code
   gem 'ruby-mysql', '= 2.9.2'
   require 'mysql'
 
-You will also have to run MagLev with the -MallIvsDynamic flag.
+You also need to run MagLev with the <tt>-MallIvsDynamic</tt> flag.
 
 == Setup
 
-You'll have to have MySQL already up and running, and then edit the
-configuration section of <code>mysql.rb</code> to reflect your setup:
+MySQL must already be running, thhen edit the configuration section of
+<code>mysql.rb</code> to reflect your setup:
 
   # CONFIGURATION
   host = 'localhost'
-  user = 'webuser'
-  pass = 'webuser'
+  user = 'ruby'
+  pass = 'ruby'
 
-If you get errors trying to connect to /tmp/mysql.sock, you may need to
-tell the driver where the mysqld UNIX domain socket is.  The
-MYSQL_UNIX_PORT environment variable controls this, e.g.,
+If you get errors trying to connect to <tt>/tmp/mysql.sock</tt>, you may
+need to tell the driver where the mysqld UNIX domain socket is.  The
++MYSQL_UNIX_PORT+ environment variable controls this, e.g.,
 
   $ export MYSQL_UNIX_PORT='/opt/local/var/run/mysql5/mysqld.sock'
   $ rake
@@ -52,5 +52,5 @@ MagLev ships with a copy of the pure ruby MySQL driver in the
 now deprecated.  Please use the rubygems version cited above.
 
 With the deprecated version, if you are running MySQL5, you may have
-problems with old style authentication.  See
-http://dev.mysql.com/doc/refman/5.1/en/old-client.html for workarounds
+problems with old style authentication.  For workarounds, see the
+{MySQL Documentation}[http://dev.mysql.com/doc/refman/5.1/en/old-client.html].

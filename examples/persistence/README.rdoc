@@ -1,44 +1,51 @@
 = MagLev Persistence Examples
 
-This directory contains demos and examples using MagLev persistence.
+This directory contains demos and examples using MagLev's built-in object
+persistence.
 
 == KDTree
 
-The kdtree directory contains a pure Ruby implementation of a KD-Tree
-(a multi-dimensional binary tree).  The demo shows how to search for
-items closest to a given location.  The database of known locations
-(postal codes, coffee shops, etc.) is stored persistently in a pure ruby
-data structure within MagLev.
+The kdtree[link:files/examples/persistence/KDTree/README_rdoc.html]
+directory contains a pure Ruby implementation of a KD-Tree (a
+multi-dimensional binary tree).  The demo shows how to search for items
+closest to a given location.  The database of known locations (postal
+codes, coffee shops, etc.) is stored persistently in a pure ruby data
+structure within MagLev.
 
 == KDTree Using Google Maps API
 
-This directory contains an implementation of a KD-Tree of dimension two
-using Google Maps API as the GUI.  A KD-Tree is a binary tree that can 
-be used to search for 2D data, i.e., nodes with a latitude and longitude.
-In this demo, only the closest zipcode (i.e. k = 1) for a selected latitude
-and longitude will be displayed along with the location of the selection.
+The
+<tt>kdtree-google-maps</tt>[link:files/examples/persistence/kdtree-google-maps/README_rdoc.html]
+directory contains an implementation of a KD-Tree of dimension two using
+Google Maps API as the GUI.  A KD-Tree is a binary tree that can be used to
+search for 2D data, i.e., nodes with a latitude and longitude.  In this
+demo, only the closest zipcode (i.e. k = 1) for a selected latitude and
+longitude will be displayed along with the location of the selection.
 
 == MDB
 
-The mdb directory contains experimental code to wrap MagLev as a NoSQL
-Server (MagLevDB, AKA MDB), and make it available to other applications.
-The sample app can be run from MRI, and will connect to the MagLev VM
-running the MDB server code using HTTP.
+The mdb[link:files/examples/persistence/mdb/README_rdoc.html] directory
+contains experimental code to wrap MagLev as a NoSQL Server (MagLevDB, AKA
+MDB), and make it available to other applications.  The sample app can be
+run from MRI, and will connect to the MagLev VM running the MDB server code
+using HTTP.
 
 == GStore
 
-The gstore directory is a demo of how you might implement the standard
-ruby PStore library using MagLev persistence, rather than the filesystem
-and marshal.  It is a proof of concept only.
+The gstore[link:files/examples/persistence/gstore/README_rdoc.html]
+directory is a demo of how you might implement the standard ruby PStore
+library using MagLev persistence, rather than the filesystem and marshal.
+It is a proof of concept only.
 
 == Hat Trick
 
-The hat_trick directory holds a recreation of the "Hat Trick"
-performed by Avi Bryant at RailsConf 2008, which you can see at
-http://vimeo.com/1147409 The code has changed since then, and this
-example shows the new approach.
+The hat_trick[link:files/examples/persistence/hat_trick/README_rdoc.html]
+directory holds a recreation of the "Hat Trick" performed by Avi Bryant at
+RailsConf 2008, which you can see at http://vimeo.com/1147409 The code has
+changed since then, and this example shows the new approach.
 
 == Indexing
 
-An example of how to index an unordered collection.
+The indexing[link:files/examples/persistence/indexing/README_rdoc.html]
+directory contains an example of how to index an unordered collection.
 
