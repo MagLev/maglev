@@ -13,7 +13,7 @@ You also need to run MagLev with the <tt>-MallIvsDynamic</tt> flag.
 
 == Setup
 
-MySQL must already be running, thhen edit the configuration section of
+MySQL must already be running, then edit the configuration section of
 <code>mysql.rb</code> to reflect your setup:
 
   # CONFIGURATION
