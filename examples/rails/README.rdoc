@@ -18,7 +18,7 @@ gems.
 
 3. Run the app:
      $ rake app
-  Then hit http://localhost:3000/
+   Then hit http://localhost:3000/
 
 == Rails on MagLev: Status
 
