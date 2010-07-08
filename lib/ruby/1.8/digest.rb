@@ -277,8 +277,8 @@ module Digest
     # Returns the hex-encoded hash value of a given _string_.  This is
     # almost equivalent to
     # Digest.hexencode(Digest::Class.new(*parameters).digest(string)).
-    def self.hexdigest(string, *rest)
-      d = new(*rest)
+    def self.hexdigest(string)
+      d = new(self.digest_name)
       sum = d.digest(string)
       ::Digest.hexencode(sum)
     end

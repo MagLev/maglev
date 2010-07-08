@@ -9,4 +9,9 @@ class ::Digest::SHA1 < ::Digest::Base
   def initialize(str = nil)
     super(OpenSSL::Digest.const_get('SHA1').new(str))
   end
+
+  private
+  def self.digest_name
+    'SHA1'
+  end
 end

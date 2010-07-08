@@ -109,9 +109,10 @@ module OpenSSL
     # This method produces the digest for all accumulated data since this
     # digest was initialized or last reset.
     def finish
-      string_ptr = FFI::MemoryPointer.new(:char, self.digest_length)
+      d_len = self.digest_length
+      string_ptr = FFI::MemoryPointer.new(:char, d_len)
       OpenSSL::LibCrypto.EVP_DigestFinal_ex(@ctx, string_ptr, nil)
-      string_ptr.read_string
+      string_ptr.read_string(d_len)
     end
 
     private

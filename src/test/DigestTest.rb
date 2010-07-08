@@ -46,4 +46,29 @@ test(incremental_digest.hexdigest, 'a8db36c1ad1e7577ca2139cc51b53c91', 'incremen
   test(klass.digest("some plain text"), expected, "#{klass} test")
 end
 
+# Regression from rails
+key =<<EOS
+<table><tr><td class="name">Ruby version</td><td class="value">1.8.7 (x86_64-darwin)</td></tr><tr><td class="name">RubyGems version</td><td class="value">1.3.7</td></tr><tr><td class="name">Rack version</td><td class="value">1.1</td></tr><tr><td class="name">Rails version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Action Pack version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Active Resource version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Action Mailer version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Active Support version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Application root</td><td class="value">/Users/pmclain/GemStone/checkouts/git/examples/rails/myapp</td></tr><tr><td class="name">Environment</td><td class="value">development</td></tr></table>
+EOS
+
+d = Digest::MD5.digest(key)
+expected = "\354\226FM\212\364\231\000c{\233d\303\b\257\325"
+test(d, expected, 'Digest::MD5.hexdigest rails')
+
+d = Digest::MD5.hexdigest(key)
+expected = "ec96464d8af49900637b9b64c308afd5"
+test(d, expected, 'Digest::MD5.hexdigest rails')
+
+# Examples from RDoc
+test(Digest::MD5.hexdigest("my data"),
+     "1291e1c0aa879147f51f4a279e7c2e55",
+     'MD5.hexdigest')
+
+sha1 = Digest::SHA1.new
+sha1 << "some data"
+sha1 << "more data"
+test(sha1.hexdigest,
+     "813a169342f956720ff4333f5777e629b6cb4f9a",
+     'SHA1 hexdigest rdoc')
+
 report
