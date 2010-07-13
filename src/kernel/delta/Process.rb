@@ -44,30 +44,33 @@ module Process
     # MNI: Process::UID.switch
   end
 
-  class Status	# [
-    # Process::Status is identical to Smalltalk  RubyProcessStatus, 
+  class Status  # [
+    # Process::Status is identical to Smalltalk  RubyProcessStatus,
     #    see bootstrap/Process.rb
     #
     # In the current implementation, an instance is only available
     # after a child process has finished execution.
- 
+
     def __status
       @_st_stat
     end
-    
+
+    # Returns true if the integer value of +receiver+ equals +other+.
     def ==(other)
       if other._is_a?( Status )
         @_st_stat == other.__status
       else
-        false
+        @_st_stat == other
       end
     end
 
+    # Returns the logical AND of the bits in stat with +fixnum+.
     def &(fixnum)
       arg = Type.coerce_to(fixnum, Fixnum, :to_int)
       @_st_stat & arg
     end
 
+    # Shift the bits in receiver right +fixnum+ places.
     def >>(fixnum)
       arg = Type.coerce_to(fixnum, Fixnum, :to_int)
       @_st_stat >> arg
@@ -75,6 +78,7 @@ module Process
 
     # coredump?  # MNI
 
+    # Returns true if stat exited normally.
     def exited?
       # instances of Process::Status not available while a child is running
       true
@@ -90,7 +94,7 @@ module Process
 
     def success?
       @_st_stat == 0
-    end 
+    end
 
     # stopped? # MNI
     # stopsig  # MNI
@@ -98,11 +102,11 @@ module Process
 
     def to_i
       @_st_stat
-    end 
+    end
 
     def to_int
       @_st_stat
-    end 
+    end
 
     def to_s
       @_st_stat.to_s
