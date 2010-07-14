@@ -1,6 +1,6 @@
 = MagLev Change Log
 
-* Fix Trac 760
+* Fix Trac 760, 762, 763, 764
 * Changed ctrl-d semantics of topaz line editor to be delete current character
 * Update MySQL driver support to Ruby Gems version. Deprecate
   lib/ruby/site_ruby/1.8/ruby-mysql.  See examples/mysql/README.rdoc for
