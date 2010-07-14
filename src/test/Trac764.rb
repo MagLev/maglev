@@ -10,3 +10,4 @@
 # Code that fails or not, depending on if above are commented or not
 %x{ echo "hello" }
 raise "fail c" unless $?.exitstatus == 0
+true

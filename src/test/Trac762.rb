@@ -24,3 +24,4 @@ end
 
 g = Group.new
 g.start
+true
