@@ -81,7 +81,7 @@ module OpenSSL
     end
 
     def block_length
-      raise NotImplementedError, "#{self.class.name}#block_name"
+      raise NotImplementedError, "#{self.class.name}#block_length"
     end
 
     # Returns the name of the digest algorithm.
