@@ -5,9 +5,7 @@
 This directory contains an implementation of a KD-Tree.  A derivative class,
 Tree2D (k=2), is shown in this example using the Google Maps API as the GUI.  
 This is a binary tree that can be used to search for 2D data, e.g.,
-nodes with a latitude and longitude.  In this demo, only the closest zipcode 
-(i.e. k = 1 when invoking nearest_k()) for a selected latitude and longitude 
-will be displayed along with the location of the selection. 
+nodes with a latitude and longitude.
 
 == Demo
 
@@ -191,11 +189,3 @@ The following numbers are from a run on that:
 The data file that has the US postal codes is provided by http://GeoNames.org/
 under a Creative Commons Attribution 3.0 License.  See etc/readme.txt for
 details.
-
-== TODO
-
-  - use a JSON library instead of manually constructing the JSON
-  - minimize the Prototype JS library file for better application performance
-  - cleanup the Javascript code
-  - cleanup the HTML code
-  - add some more coolness to the demo

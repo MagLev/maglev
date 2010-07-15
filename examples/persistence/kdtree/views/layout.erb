@@ -8,13 +8,22 @@
     <link rel="stylesheet" href="/stylesheets/application.css" type="text/css" media="screen" charset="utf-8" />
   </head>
   <body>
-    <%= yield %>
-    <h4>Credits</h4>
-    <p>
-      The database of zip code locations is from
-      <a href="http://www.geonames.org">GeoNames.org</a>
-    </p>
-    
+    <div>
+      <%= yield %>
+    </div>
+    <div id="footer" class="panel">
+      <div class="float_left">
+        <p>
+          <strong>Credits:</strong> 
+          The database of zip code locations is from
+          <a href="http://www.geonames.org">GeoNames.org</a>
+        </p>
+      </div>
+      <div class="float_right">
+        <span id="location_display"></span>
+      </div>
+    </div>
+      
     <!-- add the Google Maps library -->
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false" charset="utf-8"></script>
         

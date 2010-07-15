@@ -1,11 +1,12 @@
 html, body {
   margin: 0px;
   padding: 0px;
+  background-color: LightYellow;
 }
 
 #map_canvas {
   width: 100%; 
-  height: 100%;
+  height: 50%; /* Managed dynamically via js code */
 }
 
 #info_window {
@@ -23,4 +24,63 @@ html, body {
 
 #info_window li {
   padding: 1px;
+}
+
+#map_menu {
+  height: 20px;
+  padding: 10px;
+  border-width: 0px 0px 2px 0px;
+}
+
+#location_display {
+  color: red;
+  font-style: italic;
+  padding: 10px;
+}
+
+.float_left {
+  float: left;
+}
+
+.float_right {
+  float: right;
+}
+
+#footer {
+  height: 20px;
+  padding: 1px 0px 1px 10px;
+  border-width: 2px 0px 0px 0px;
+}
+
+table.results {
+  font-size: small;
+}
+table.results th {
+  color: SteelBlue;
+}
+table.results td.first {
+  color: black;
+  font-size: normal;
+}
+table.results td.other {
+  color: gray;
+  font-size: x-small;
+}
+table.results td {
+  padding: 0px 5px 0px 5px;  
+  font-style: italic;
+  text-align: center;
+}
+
+.panel {
+  background-color: LightYellow;
+  padding: 10px;
+  border-color: black;
+  border-style: solid;
+  font-size: small;
+}
+
+.explain {
+  color: DarkSlateGray;
+  font-style: italic;
 }
