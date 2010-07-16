@@ -3,13 +3,16 @@ task :default => :app
 desc "Do one-time install of gems and patch rails gems"
 task :init => [:'gem:gems', :'gem:rails', :'gem:patchrails']
 
-desc "Run myapp, with maglev from gem rails."
+desc "Run myapp, with maglev."
 task :app do
   cd('myapp') do
-    sh %{ maglev-ruby -MallIvsDynamic script/rails server }
+    # MagLev needs the -MallIvsDynamic flag to run Rails.
+    # Setting the MAGLEV_OPTS environment variable ensures the option
+    # is passed from the rails script onto maglev-ruby.
+    ENV['MAGLEV_OPTS'] = "-MallIvsDynamic"
+    sh "#{ENV['MAGLEV_HOME']}/bin/rails server"
   end
 end
-
 
 # The tasks in this namespace manage the Rails 3 Beta 4 gems, and the other
 # gems needed to run rails.  They only manage gems for MagLev installed in
