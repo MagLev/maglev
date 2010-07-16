@@ -80,32 +80,14 @@ module OpenSSL
       # Return the message digest pointer.  Equivalent to
       # <tt>EVP_MD_CTX_md(ctx)</tt>.
 
-      def get_digest
-        attempt = 1
-        case attempt
-        when 0
-          puts "---- Base code"
-          ptr = self[:digest]
-          puts "-- EVP_MD_CTX.get_digest: ptr: #{ptr.inspect}"
-          EVP_MD.new(ptr)
-        when 1
-          puts "---- Struct#__fromCPointer:"
-          ptr = self[:digest]
-          puts "-- EVP_MD_CTX.get_digest: ptr: #{ptr.inspect}"
-          layout = EVP_MD.layout
-          cptr = FFI::CPointer.__new_from(ptr)
-          puts "-- EVP_MD_CTX.get_digest: cptr: #{cptr.inspect}"
-          inst = EVP_MD.__fromCPointer(cptr, layout.size)
-          inst.__set_layout(layout)
-          inst.initialize
-          inst
-        end
-      end
+      # Return the number of bytes long the current digest is.
       def digest_length
-        get_digest.md_size
+        md.md_size
       end
+
+      # Return the EVP_MD struct used by receiver.
       def md
-        self[:digest]
+        EVP_MD.new(self[:digest])
       end
     end
 

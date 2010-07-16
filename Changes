@@ -1,7 +1,10 @@
 = MagLev Change Log
 
-* Fix Trac 760
+* Fix Trac 760, 762, 763, 764
 * Changed ctrl-d semantics of topaz line editor to be delete current character
+* Update MySQL driver support to Ruby Gems version. Deprecate
+  lib/ruby/site_ruby/1.8/ruby-mysql.  See examples/mysql/README.rdoc for
+  details
 
 == Changes for 23767  2010-07-02
 
@@ -16,12 +19,12 @@
 * Fixes to eliminate need for some Rails 3 patches
 * Fix Trac 706, 750, 751, 752, 753, 754
 * fix code generation for else of a begin/rescue/else
-* Signal#trap can now trap SIGTERM 
+* Signal#trap can now trap SIGTERM
 * A few more optimizations and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23687  2010-06-21
 
-* Added examples/rails   
+* Added examples/rails
   This contains the standard app rails generates, with one extra controller added.
   The rakefile will checkout the MagLev rails github repository, ensure all necessary
   gems are installed into MagLev, and then run the app with MagLev
@@ -45,7 +48,7 @@
 * implement Tempfile to fix Trac 644
 * enhance topaz rubylookup to automatically traverse bridge methods
 * fixes to topaz whr, upr, downr commands
-* fixes to yaml and timeout & securerandom 
+* fixes to yaml and timeout & securerandom
 * update to latest tzinfo
 * fixes to Array#reject
 * improvements in splat args
@@ -63,8 +66,8 @@
 
 == Changes for 23540  2010-05-23
 
-* ARGF now works 
-* Partial solution for Trac 734 
+* ARGF now works
+* Partial solution for Trac 734
 
 == Changes for 23530  2010-05-20
 
@@ -108,7 +111,7 @@
 
 * Fix Trac 728, 729
 * Adds display lineeditor, omit lineeditor options to topaz
-* Several bugfixes to underlying GemStone 3.0 system 
+* Several bugfixes to underlying GemStone 3.0 system
 
 == Changes for 23400  2010-04-29
 

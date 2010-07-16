@@ -14,12 +14,14 @@
 /gemstone/
 /locks/
 /log/
+gemstone.old/
 /src/experimental/
 debugspec.inp
 cur.inp
 etc/maglev.demo.key
 .#*
 *#
+pbm.rb
 lib/ruby/site_ruby/1.8/smalltalk
 lib/maglev/gems
 examples/persistence/gstore/pstore.db

@@ -14,3 +14,5 @@ including:
   starting point for the parser implemented in the MagRp module.
 - Conrad Taylor for updating installation scripts to work in Snow Leopard
 - Wayne Seguin for adding MagLev support to RVM - http://rvm.beginrescueend.com/
+- Daniel Starling for generalizing the KD-Tree example to n dimensions and adding
+  other improvements/

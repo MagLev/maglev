@@ -52,8 +52,12 @@ module OpenSSL
       self
     end
 
+    # Resets the context in preparation for calculating a new digest.  The
+    # digest algorithm will be unchanged, but all previous data is erased.
+    # Allows a single HMAC instance to be used to generate multiple,
+    # independent digests.
     def reset
-      raise NotImplementedError, "#{self.class.name}#reset"
+      OpenSSL::LibCrypto::HMAC_Init_ex(@ctx, nil, 0, nil, nil)
       @valid = true
     end
 
@@ -64,7 +68,9 @@ module OpenSSL
     # may be called multiple times, effectively concatenating +string+ to
     # the data to be hashed.
     def update(string)
-puts "=== hmac#update"      
+      raise HMACError "#update called while invalid (call reset first)"
+
+puts "=== hmac#update"
       str = Maglev::RubyUtils.rb_string_value(string)
       OpenSSL::LibCrypto.HMAC_Update(@ctx, str, str.length)
       self

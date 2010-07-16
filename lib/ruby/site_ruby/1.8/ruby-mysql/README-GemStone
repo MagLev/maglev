@@ -1,1 +1,6 @@
+This version is deprecated.  Please use the rubygems version.
+See $MAGLEV_HOME/examples/mysql/README.rdoc for details.
+
 This is version 0.2.6 of ruby-mysql, distributed under the Ruby License.
+
+

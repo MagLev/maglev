@@ -112,7 +112,8 @@ something in your .irbrc is breaking maglev-irb. Try
 
 === Examples
 
-You can try running the scripts in the +examples+ directory. 
+You can try running the scripts in the
++examples+[link:files/examples/README_rdoc.html] directory.
 
 ==== Webrick
 A simple example that starts a webrick server which you can connect

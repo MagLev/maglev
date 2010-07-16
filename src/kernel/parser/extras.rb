@@ -469,13 +469,8 @@ module MagRp # {
       return head unless tail
       return tail unless head
 
-      # case head[0]
-      # when :lit, :str then  # :str produces a subclass of what :lit produces
-      #  return tail
-      # end
-      if head._kind_of?(RubyAbstractLiteralNode)
-	return tail
-      end
+      # deleted  # when :lit, :str then  # :str 
+      # to fix Trac 764
 
       # head = remove_begin(head)
       head = head.kbegin_value

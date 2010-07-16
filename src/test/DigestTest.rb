@@ -36,21 +36,39 @@ data = [ 'some text',
 data.each do |line|
   incremental_digest << line
 end
-test(incremental_digest.hexdigest, 'a8db36c1ad1e7577ca2139cc51b53c91', 'incremental')
+test(incremental_digest.hexdigest, 'a8db36c1ad1e7577ca2139cc51b53c91', 'incremental MD5')
 
-# d = Digest::MD5.new
-# d.update(Foo::Contents)
-# dig = d.digest()
-# puts "dig.class:   #{dig.class}"
-# puts "dig.inspect: #{dig.inspect}"
-# puts "dig.to_s:    #{dig.to_s}"
-# puts "dig.to_str:  #{dig.to_str}"
+# Test some digests
+[[Digest::SHA1, "\0258\301G{\227GI\377\373\370\037\235\016%\2430e@v"]
+ #[Digest::SHA256, "\304bK\241\021\346\247\035h\332\004\257\266\300!/\036\302\027\a\nC\214\215\000\200\020.\326\361>\201"],
+# [Digest::SHA512, "\304\b\373\243_\023(%\311+x7R\356\270\310\320;\337\253+\235\267\334\311\224pg\276\215S\351\356;\234\264\272k\377 \f+\333\326t\322X\r6\035\2045\305A\374\r\214tA\232{2\370n"]
+].each do |(klass, expected)|
+  test(klass.digest("some plain text"), expected, "#{klass} test")
+end
 
-# Test a SHA1 digest
-# plain = "some plain text"
-# expected = "\0258\301G{\227GI\377\373\370\037\235\016%\2430e@v"
-# test(Digest::SHA1.digest(plain), expected, 'SHA1 test')
+# Regression from rails
+key =<<EOS
+<table><tr><td class="name">Ruby version</td><td class="value">1.8.7 (x86_64-darwin)</td></tr><tr><td class="name">RubyGems version</td><td class="value">1.3.7</td></tr><tr><td class="name">Rack version</td><td class="value">1.1</td></tr><tr><td class="name">Rails version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Action Pack version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Active Resource version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Action Mailer version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Active Support version</td><td class="value">3.0.0.beta4</td></tr><tr><td class="name">Application root</td><td class="value">/Users/pmclain/GemStone/checkouts/git/examples/rails/myapp</td></tr><tr><td class="name">Environment</td><td class="value">development</td></tr></table>
+EOS
 
-# Test incremental usage of SHA1
-#sha1 = Digest::SHA1
+d = Digest::MD5.digest(key)
+expected = "\354\226FM\212\364\231\000c{\233d\303\b\257\325"
+test(d, expected, 'Digest::MD5.hexdigest rails')
+
+d = Digest::MD5.hexdigest(key)
+expected = "ec96464d8af49900637b9b64c308afd5"
+test(d, expected, 'Digest::MD5.hexdigest rails')
+
+# Examples from RDoc
+test(Digest::MD5.hexdigest("my data"),
+     "1291e1c0aa879147f51f4a279e7c2e55",
+     'MD5.hexdigest')
+
+sha1 = Digest::SHA1.new
+sha1 << "some data"
+sha1 << "more data"
+test(sha1.hexdigest,
+     "813a169342f956720ff4333f5777e629b6cb4f9a",
+     'SHA1 hexdigest rdoc')
+
 report
