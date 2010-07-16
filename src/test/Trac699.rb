@@ -5,9 +5,13 @@ class C
   def x
     #aa = C::PBM
     #puts "aa #{aa}"
-    bb = PBM::X
+
+    #bx = PBM
+    #ax = ::PBM
+    cx = PBM::X
+
     #puts "bb #{bb}"
-    bb
+    cx
   end
 end
 

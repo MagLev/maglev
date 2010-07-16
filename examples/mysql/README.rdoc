@@ -1,17 +1,20 @@
 = MagLev and MySQL
 
-To use MySQL, install the ruby-mysql gem:
+Since MagLev does not support Ruby C-extensions, the normal mysql gem will
+not work with MagLev.  The pure ruby MySQL gem will work, at least since
+version 2.9.2.  Install the ruby-mysql gem:
 
-  $ maglev-gem install ruby-mysql -v 2.9.2
+  $ maglev-gem install ruby-mysql --version '>= 2.9.2'
 
 and then put the following in your code
 
-  gem 'ruby-mysql', '= 2.9.2'
+  gem 'ruby-mysql', '>= 2.9.2'
   require 'mysql'
 
-You also need to run MagLev with the <tt>-MallIvsDynamic</tt> flag.
+You also need to run MagLev with the <tt>-MallIvsDynamic</tt> flag anytime
+you use the ruby-mysql gem.
 
-== Setup
+== Configure the demo code
 
 MySQL must already be running, then edit the configuration section of
 <code>mysql.rb</code> to reflect your setup:

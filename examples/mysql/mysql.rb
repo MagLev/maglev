@@ -11,9 +11,10 @@
 #
 # Early versions of the MagLev alpha provided a patched version of this
 # driver in $MAGLEV_HOME/lib/ruby/site_ruby/1.8/ruby-mysql.  That version
-# is now deprecated.  You should use the version 2.9.2 from RubyGems:
+# is now deprecated.  You should use the version 2.9.2 or greater from
+# RubyGems:
 #
-#   $ maglev-gem install ruby-mysql -v 2.9.2
+#   $ maglev-gem install ruby-mysql --version '>= 2.9.2'
 #
 # This script will run with either version (comment out the gem line if you
 # want to use the deprecated version).
@@ -23,7 +24,7 @@
 
 # require 'ruby-mysql/mysql'   # deprecated version
 
-gem 'ruby-mysql', '= 2.9.2'
+gem 'ruby-mysql', '>= 2.9.2'
 require 'mysql'
 
 # CONFIGURATION
