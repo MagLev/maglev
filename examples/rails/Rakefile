@@ -19,7 +19,7 @@ namespace :gem do
 
   desc "Ensure the required non-Rails gems are installed into MagLev."
   task :gems do
-    gems = "rack tzinfo i18n rack-mount erubis mail"
+    gems = "rack tzinfo i18n rack-mount erubis mail ruby-mysql"
     sh %{ maglev-gem install --no-ri --no-rdoc #{gems} }
   end
 
