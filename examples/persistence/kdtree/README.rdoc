@@ -4,14 +4,19 @@
 
 This directory contains an implementation of a {K-Dimensional
 Tree}[http://en.wikipedia.org/wiki/Kd-tree] (KD-Tree).  A derivative class,
-Tree2D (k=2), is shown in this example.  This is a binary tree that can be
-used to search for 2D data, i.e., nodes with a latitude and longitude.
+Tree2D (k=2), is shown in this example using the Google Maps API as the GUI.
+This is a binary tree that can be used to search for 2D data, i.e., nodes
+with a latitude and longitude.
 
 == Demo
 
 The demo.rb file is a Sinatra application that allows you to enter a
 latitude and longitude (preferably, within the US, if you're using the US
-Postal Database), and will find the nearest N zip codes to the lat/lon.
+Postal Database), and will find the nearest K zip codes to the lat/lon.  
+
+Prerequisite: You must have the json_pure gem installed:
+
+  $ maglev-gem install json_pure
 
 1. Make sure the maglev server has been started:
 
