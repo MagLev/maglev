@@ -1,5 +1,9 @@
 = MagLev Change Log
 
+* Update examples/rails/README.rdoc and patch myapp.  MagLev supports a lot
+  more functionality with Rails, now that Kernel#exec is implemented.
+  MagLev can create a default app, generate controllers, and start the
+  server the normal way now.
 * Fix Trac 760, 762, 763, 764, 765
 * More fixes to autoload for Rails .
 * Changed ctrl-d semantics of topaz line editor to be delete current character
