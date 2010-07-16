@@ -1,15 +1,26 @@
 = MagLev Change Log
 
+  For more precise details see: http://bit.ly/d3C6S1
+
+== Unreleased changes
+
+== Changes for 23832  2010-07-16
+
 * Update examples/rails/README.rdoc and patch myapp.  MagLev supports a lot
   more functionality with Rails, now that Kernel#exec is implemented.
   MagLev can create a default app, generate controllers, and start the
   server the normal way now.
-* Fix Trac 760, 762, 763, 764, 765
-* More fixes to autoload for Rails .
-* Changed ctrl-d semantics of topaz line editor to be delete current character
+* Fix Trac 733, 756, 760, 762, 763, 764, 765
+* More fixes to autoload for Rails.
+* Added more Digest support
+* Changed ctrl-d semantics of topaz line editor to be 'delete current character'
 * Update MySQL driver support to Ruby Gems version. Deprecate
-  lib/ruby/site_ruby/1.8/ruby-mysql.  See examples/mysql/README.rdoc for
-  details
+  lib/ruby/site_ruby/1.8/ruby-mysql. Talks to mysql5 w/o patching.
+  See examples/mysql/README.rdoc for details.
+* Improvements in large integer addition/multiplication
+* Improved KD-Tree Demo - Thanks to Daniel Starling
+* Slightly newer LDAP version
+* More optimizations and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23767  2010-07-02
 
