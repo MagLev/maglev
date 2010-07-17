@@ -4,6 +4,8 @@
 
 == Unreleased changes
 
+* Fix Trac 768, 769
+
 == Changes for 23832  2010-07-16
 
 * Update examples/rails/README.rdoc and patch myapp.  MagLev supports a lot
