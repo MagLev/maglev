@@ -30,21 +30,7 @@ features.
 
 === ActiveRecord
 
-Currently, ActiveRecord does not work, and we are working on fixes.  In the
-meantime, you must configure around ActiveRecord.  This has already been
-done for the +myapp+ in this directory.  To configure around ActiveRecord
-in another app, edit <tt>yourapp/config/application.rb</tt> and change:
-
-  require 'rails/all'
-
-to:
-
-  require 'rails'
-  # require 'active_record/railtie'
-  require 'action_controller/railtie'
-  require 'action_mailer/railtie'
-  require 'active_resource/railtie'
-  require 'rails/test_unit/railtie'
+ActiveRecord now seems to work well enough that we no longer patch it.
 
 === Slow start up
 
@@ -78,10 +64,6 @@ MagLev:
 * Edited <tt>myapp/Gemfile</tt> to use ruby-mysql gem.  Change <tt>gem
   'mysql'</tt> to <tt>gem 'ruby-mysql', :require => 'mysql'</tt>.
 
-* <tt>myapp/config/application.rb</tt> was edited to replace <tt>require
-  'rails/all'</tt> with a list of require statements, excluding
-  +ActiveRecord+. ActiveRecord doesn't currently load under MagLev.
-
 * <tt>myapp/config/boot.rb</tt> was edited to work around {Trac
   757}[https://magtrac.gemstone.com/ticket/757]. See the track report for
   details on the workaround.
@@ -105,24 +87,6 @@ rails (the +Rakefile+ does this).  See
 <tt>docs/release_notes</tt>[link:files/docs/release_notes.html] for a
 discussion of <tt>-MallIvsDynamic</tt>.
 
-== Alternate rails patch option
-
-The method described in this section is not the preferred manner to run
-patched rails, but may be used.  This method is mostly to ease MagLev
-development and rails patch management for MagLev developers.
-
-An alternative way to get a patched rails is to checkout the MagLev rails
-fork, and use one of the maglev-* branches.  This requires adjusting the
-load path.  The rake tasks in the <tt>:dev</tt> namespace manage this
-alternate method of running a patched rails version.
-
-To checkout MagLev patched fork of Rails, and run the app from that:
-
-  $ rake gem:gems             # Installs required non-rails gems
-  $ rake dev:checkout         # Checksout patched version of rails from GitHub
-  $ rake dev:app              # Run myapp using ./rails version of rails.
-
-
 === Progress towards full Rails Lifecycle
 
 The following steps are loosely based on the {Rails Blog
@@ -132,7 +96,7 @@ are using to drive forward on getting rails working.
 1. Install rails: <tt>maglev-gem install rails --pre</tt> (works with patch)
 2. Create new rails app: <tt>$MAGLEV_HOME/bin/rails new blog</tt> (works)
 3. Run +bundle+: <tt>$MAGLEV_HOME/bin/bundle install</tt> (works)
-4. Create the database: <tt>$MAGLEV_HOME/bin/rake db:create</tt> (broken)
+4. Create the database: <tt>$MAGLEV_HOME/bin/rake db:create</tt> (works)
 5. Start server: <tt>$MAGLEV_HOME/bin/rails server</tt> (works)
 6. Load a static page: http://localhost:3000/ (works)
 7. Load a dynamic page: http://localhost:3000/rails/info/properties (works
@@ -149,7 +113,7 @@ The following sections explain details and current status for each step above.
 ==== 1. Install rails: Works with patch.
 
 Rails installs from gems, but needs one patch.  To install the rails gems,
-you can (A) run <tt>rake init</tt>, or can do the following:
+you can run <tt>rake init</tt>, or do the following:
 
 Install non-rails gems:
 
@@ -194,15 +158,21 @@ Patch ActiveSupport:
   $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_1.diff
   patching file lib/active_support/core_ext/class/subclasses.rb
 
-==== 2. Create new rails app: Works.
+==== 2. Create new rails app: Works, but must patch app files.
 
 Run:
-  $ $MAGLEV_HOME/bin/rails new myapp
+  $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
+  $ rake patch:app[myapp]
+  <edit myapp/Gemfile>
 
-You should edit <tt>myapp/Gemfile</tt> and change the <tt>gem 'mysql'</tt>
-line to be:
+The new app is correctly built, but there are two items that need to be
+upated in the new app.
 
-  gem 'ruby-mysql', :require => 'mysql'
+1. You should edit <tt>myapp/Gemfile</tt> and change the <tt>gem
+   'mysql'</tt> line to be:
+     gem 'ruby-mysql', :require => 'mysql'
+2. Workaround for  {Trac 757}[https://magtrac.gemstone.com/ticket/757]:
+   Run "rake patch:app[myapp]" to patch <tt>myapp/config/boot.rb</tt>.
 
 ==== 3. Run +bundle+: Works.
 
@@ -210,20 +180,12 @@ Run:
   $ cd myapp
   $ $MAGLEV_HOME/bin/bundle install
 
-==== 4. Create the database: Broken.
+==== 4. Create the database: Works.
 
-The next step is to run:
+Run:
   $ $MAGLEV_HOME/bin/rake db:create
 
-But, the rake task does not even exist, since we are not requiring
-<tt>active_record/railtie</tt>. If you load active record, then MagLev gets
-the following error:
-
-  rake aborted!
-  NoMethodError: undefined method `attribute_method_suffix' for
-
-Once we resolve the ActiveRecord problem, we expect this task to start
-working.
+You should now see your application databases defined in MySQL.
 
 ==== 5. Start server: Works.
 
@@ -233,7 +195,7 @@ environment variable.  This will ensure the flag gets passed from the
 +rails+ script onto <tt>maglev-ruby</tt>.
 
 You can start the server in a couple of ways.  The normal way to start a
-rails server (development) is:
+rails server is:
   $ export MAGLEV_OPTS="-MallIvsDynamic"
   $ cd myapp
   $ $MAGLEV_HOME/bin/rails server
@@ -250,8 +212,8 @@ Static pages in the app load fine under MagLev.
 ==== 7. Load a dynamic page: Works.
 
 Simple dynamic pages work fine under MagLev.  There is a slight problem
-with dynamic routes, unless some other route is defined in
-<tt>route.rb</tt>.
+with the default rails info routes, if no routes are defined in
+<tt>route.rb</tt>.  Workaround is to add some route or other.
 
 ==== 8. Generate new controller: Works with patch.
 
@@ -269,4 +231,22 @@ Running <tt>$MAGLEV_HOME/bin/rake db:migrate</tt> is untested.
 ==== 10. Running the rails console: untested
 
 Running <tt>$MAGLEV_HOME/bin/rails console</tt> is untested.
+
+== Alternate rails patch option (deprecated)
+
+The method described in this section is not the preferred manner to run
+patched rails, but may be used.  This method is mostly to ease MagLev
+development and rails patch management for MagLev developers.
+
+An alternative way to get a patched rails is to checkout the MagLev rails
+fork, and use one of the maglev-* branches.  This requires adjusting the
+load path.  The rake tasks in the <tt>:dev</tt> namespace manage this
+alternate method of running a patched rails version.
+
+To checkout MagLev patched fork of Rails, and run the app from that:
+
+  $ rake gem:gems             # Installs required non-rails gems
+  $ rake dev:checkout         # Checksout patched version of rails from GitHub
+  $ rake dev:app              # Run myapp using ./rails version of rails.
+
 
