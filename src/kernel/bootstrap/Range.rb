@@ -203,7 +203,8 @@ class Range
   end
 
   def __integer_to_a
-    # assumes receiver is a simple range with @_st_from <= @_st_to
+    # optimized implementation of to_a 
+    # which assumes receiver is a simple range with @_st_from <= @_st_to
     n = @_st_from
     last = @_st_to
     unless n._isFixnum && last._isFixnum 
@@ -220,6 +221,7 @@ class Range
       n += 1
       idx += 1
     end
+    res
   end
 
   # Given a target length, +len+, Calculate whether this range covers the given length.
