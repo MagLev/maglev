@@ -1,25 +1,29 @@
 task :default => :app
 
-desc "Do one-time install of gems and patch rails gems"
-task :init => [:'gem:gems', :'gem:rails', :'gem:patchrails']
+PATCH_DIR = File.join(File.dirname(__FILE__), "patches")
 
-desc "Run myapp, with maglev from gem rails."
+desc "Do one-time install of gems and patch rails gems"
+task :init => [:'gem:gems', :'gem:rails', :'patch:activesupport']
+
+desc "Run myapp, with maglev."
 task :app do
   cd('myapp') do
-    sh %{ maglev-ruby -MallIvsDynamic script/rails server }
+    # MagLev needs the -MallIvsDynamic flag to run Rails.
+    # Setting the MAGLEV_OPTS environment variable ensures the option
+    # is passed from the rails script onto maglev-ruby.
+    ENV['MAGLEV_OPTS'] = "-MallIvsDynamic"
+    sh "#{ENV['MAGLEV_HOME']}/bin/rails server"
   end
 end
-
 
 # The tasks in this namespace manage the Rails 3 Beta 4 gems, and the other
 # gems needed to run rails.  They only manage gems for MagLev installed in
 # $MAGLEV_HOME.  The tasks in this namespace need only be run once.
 
 namespace :gem do
-
   desc "Ensure the required non-Rails gems are installed into MagLev."
   task :gems do
-    gems = "rack tzinfo i18n rack-mount erubis mail"
+    gems = "rack tzinfo i18n rack-mount erubis mail ruby-mysql"
     sh %{ maglev-gem install --no-ri --no-rdoc #{gems} }
   end
 
@@ -27,43 +31,24 @@ namespace :gem do
   task :rails do
     sh %{ maglev-gem install rails --pre --no-ri --no-rdoc }
   end
+end
 
-  desc "Patch the v3.0.0beta4 version of rails gems"
-  task :patchrails do
+namespace :patch do
+  desc "patch appname/config/boot.rb for trac757"
+  task :app, :appname do |t,args|
+  app = args[:appname]
+  raise "Can't find application: #{app.inspect}" if app.nil? || ! File.exist?(app)
+
+    patch = File.join(PATCH_DIR, "app_config_boot_Trac757.rb")
+    cp patch, File.join(app, "config", "boot.rb")
+  end
+
+  desc "Patch v3.0.0 beta4 ActiveSupport gem."
+  task :activesupport do
     patch = File.join(File.dirname(__FILE__), 'patches/active_support_1.diff')
     puts "patch file: #{patch}"
     cd("#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/activesupport-3.0.0.beta4") do
       sh %{ patch -p2 < #{patch} }
-    end
-  end
-end
-
-
-# The tasks in this namespace are intended to aid MagLev developers when
-# patching rails.  It allows running MagLev against the MagLev fork of
-# rails from GitHub.  The primary method of running rails should be from
-# the patched gems install, as outlined in README.rdoc.
-
-namespace :dev do
-
-  file 'rails' do
-    sh %{ git clone git://github.com/MagLev/rails.git }
-  end
-
-  desc "Checkout a local copy of rails 3 beta4 with MagLev patches."
-  task :checkout => :rails do
-    sh %{ cd rails && git checkout maglev-beta4 }
-  end
-
-  desc "Run myapp from ./rails version of rails"
-  task :app do
-    # Setup to run from the rails subdirectory: -I../rails/activerecord/lib ...
-    includes = %w(railties activeresource activerecord actionmailer
-                 actionpack activemodel activesupport
-               ).reverse.inject("") { |s,p| s << " -I../rails/#{p}/lib" ; s }
-
-    cd('myapp') do
-      sh %{ maglev-ruby -MallIvsDynamic #{includes} script/rails server }
     end
   end
 end

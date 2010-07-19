@@ -4,6 +4,16 @@ module FFI
 
     # def initialize ;end  # in ffi.rb for fixed instvars
 
+    # Get a field from this struct.  This method not generally called from
+    # user code, use Struct#[] instead.
+    #
+    # The +fieldname+ is the name of a field as defined in the call to
+    # #layout.  +a_pointer+ is the pointer to the beginning of the struct.
+    #
+    # == Example
+    #
+    #  layout.__get(:next, struct_ptr)
+    #
     def __get(fieldname, a_pointer)
       idx = @members_dict[fieldname]
       if idx._equal?(nil)
@@ -18,8 +28,8 @@ module FFI
           mp.__initialize(elem_siz)
           mp
         else  # a nested Struct , elem_siz._kind_of?(Struct.class) == true
-          unless elem_siz._kind_of?(Struct.class) 
-             raise TypeError, 'logic error, expected a Struct class'
+          unless elem_siz._kind_of?(Struct.class)
+            raise TypeError, 'logic error, expected a Struct class'
           end
           nested_struct_cls = elem_siz
           struct = nested_struct_cls.__fromRegionOf(a_pointer, ofs,  elem_siz.size)
@@ -249,7 +259,82 @@ module FFI
 
   end # ]
 
+  # FFI representation of a C struct.
+  #
+  # == Basic Usage
+  #
+  # Given this C struct:
+  #
+  #   struct SomeStruct {
+  #     struct SomeStruct *next;
+  #     char              *name;
+  #     double            value;
+  #   };
+  #
+  # The following will create a Ruby FFI Struct to represent SomeStruct:
+  #
+  #   class SomeStruct < FFI::Struct
+  #     layout  :next,  :pointer,
+  #             :name,  :string,
+  #             :value, :double
+  #   end
+  #
+  # To use the struct (assume create_struct() returns a pointer to memory
+  # malloc'd by C):
+  #
+  #   struct_ptr = MyLibrary.create_struct("foo", 1.23)
+  #   my_struct = SomeStruct.new(struct_ptr)
+  #
+  #   my_struct[:value]                    # => 1.23
+  #   my_struct[:name]                     # => "foo"
+  #   my_struct[:value] = 5.67
+  #
+  # To follow the next pointer:
+  #
+  #   ptr = my_struct[:next]
+  #   next_struct = SomeStruct.new(ptr)
+  #   next_struct[:value]                  # => 2.34 (or whatever)
+  #
+  # When fields of a struct are read or writen, FFI will copy from/to
+  # C-memory at the time of the read/write.  E.g.,:
+  #
+  #   my_struct[:value]          # Copy from C memory to VM
+  #   my_struct[:value] = 3.456  # Copy from VM memory to C
+  #
   class Struct # [
+
+    # call-seq:
+    #   new       -> Struct
+    #   new(ptr)  -> Struct
+    #
+    # Assume the following struct:
+    #
+    #   class SomeStruct < FFI::Struct
+    #     layout  :next,  :pointer,
+    #             :name,  :string,
+    #             :value, :double
+    #   end
+    #
+    # If +ptr+ is not given, creates a new struct with memory allocated and
+    # managed by FFI.
+    #
+    # If +ptr+ is given, constructs a new Struct from the memory pointed to by +ptr+.
+    #
+    # Creates a new struct with
+    # When Struct#new is called, the system allocates internal storage for
+    # the size of the struct.
+    #
+    # Memory for the struct is zeroed out.
+    #
+    # == Examples
+    #
+    # To create a new, zeroed out struct, just call +new+ with no args.
+    # +s+ will point to SomeStruct.size bytes of zeroed memory managed by
+    # FFI.  When s is garbage collected, the underlying memory will be
+    # freed by FFI.
+    #
+    #   s = SomeStruct.new
+    #
 
     def self.new(*args)
       if args.size._equal?(1)
@@ -258,8 +343,8 @@ module FFI
           arg = args[0]
           if arg._kind_of?(Pointer)
             ly_siz = ly.size
-            ba_siz = arg.total
-            if ba_siz < ly_siz
+            arg_siz = arg.total
+            if arg_siz._not_equal?(0) && arg_siz < ly_siz
               raise ArgumentError, "argument Pointer is too small for a Struct  #{self.name}"
             end
             inst = self.__fromRegionOf( arg, 0, ly_siz )
@@ -293,6 +378,7 @@ module FFI
       :buffer_out
     end
 
+    # Returns the size in bytes of this Struct
     def self.size
       @cl_layout.size
     end
@@ -311,7 +397,7 @@ module FFI
 
     def self.offset_of(field_name)
       @cl_layout.offset_of(field_name)
-      end
+    end
 
     def size
       @layout.size
@@ -339,18 +425,48 @@ module FFI
 
     # def clear ; end # inherited
 
-#   def self.in  # Maglev TODO
-#     :buffer_in
-#   end
+    #   def self.in  # Maglev TODO
+    #     :buffer_in
+    #   end
 
-#   def self.out  # Maglev TODO
-#     :buffer_out
-#   end
+    #   def self.out  # Maglev TODO
+    #     :buffer_out
+    #   end
 
+    # Access a field in the struct.  +field_name+ should be one of the
+    # field names passed to #layout.
+    #
+    # == Examples
+    #
+    # Assume the following struct:
+    #
+    #   class SomeStruct < FFI::Struct
+    #     layout  :next,  :pointer,
+    #             :name,  :string,
+    #             :value, :double
+    #   end
+    #
+    #   my_struct = c_call_that_returns_ptr_to_struct()
+    #
+    # Get the double:
+    #
+    #   d = my_struct[:value]
+    #
+    # Check a pointer field to see if it is a NULL pointer, and follow
+    # pointer if not null:
+    #
+    #   unless my_struct[:next].null?
+    #     next_struct = my_struct[:next]  TODO: Wrap in ptr?
+    #   end
+    #
+    #
     def [](field_name)
       @layout.__get(field_name, self)
     end
 
+    # Assign +value+ to the +field_name+ field in the struct. +field_name+
+    # must be one of the names passed to #layout.  +value+ must be of the
+    # appropriate size for the field type.
     def []=(field_name, value)
       @layout.__put(field_name, self, value)
     end
@@ -365,16 +481,52 @@ module FFI
       self
     end
 
+    # call-seq:
+    #   layout         -> current layout
+    #   layout(array)  -> layout
+    #   layout(hash)   -> Not implemented in MagLev
+    #
+    # Define or return the current layout of receiver.
+    #
+    # If no parameters are passed, returns the current layout of this Struct.
+    #
+    # If an array is passed for the layout, returns a new Struct.  The
+    # array should be pairs of name and type, one pair for each field in
+    # the struct.  The size of the struct will be deterimined from the
+    # types of the fields, plus the alignment requirements for each field
+    # type and the order they appear in the array.
+    #
+    # If a hash is passed for the layout, MagLev raises an exception.
+    # Using a hash for the layout requires ordered hashes, which MagLev
+    # does not yet support.
+    #
+    # == Example
+    #
+    # Given this C struct:
+    #   struct SomeStruct {
+    #     struct SomeStruct *next;
+    #     char              *name;
+    #     double            value;
+    #   };
+    #
+    # The following will create a Ruby FFI Struct to represent SomeStruct:
+    #
+    #   class SomeStruct < FFI::Struct
+    #     layout  :next,  :pointer,
+    #             :name,  :string,
+    #             :value, :double
+    #   end
+    #
     def self.layout(*spec)
       sp_size = spec.size
       if sp_size._equal?(0)
         return @cl_layout
       end
       if sp_size._equal?(1)
-         if spec[0]._isHash
-            raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
-         end
-         raise ArgumentError , 'minimum argument size is 2'
+        if spec[0]._isHash
+          raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
+        end
+        raise ArgumentError , 'minimum argument size is 2'
       end
       cspec = spec[0]._isHash ? hash_layout(*spec) : array_layout(*spec)
       unless self._equal?(Struct)
@@ -385,10 +537,10 @@ module FFI
 
     protected # --------------------------------
 
-#   def self.callback(params, ret)
-#     mod = enclosing_module
-#     FFI::CallbackInfo.new(find_type(ret, mod), params.map { |e| find_type(e, mod) })
-#   end
+    #   def self.callback(params, ret)
+    #     mod = enclosing_module
+    #     FFI::CallbackInfo.new(find_type(ret, mod), params.map { |e| find_type(e, mod) })
+    #   end
 
     private # --------------------------------
 
@@ -414,6 +566,8 @@ module FFI
       raise "FFI::Struct hash_layout not supported by Maglev, must use array_layout"
     end
 
+    # Defines the layout for this struct using an array.  See #layout for
+    # details.
     def self.array_layout(*spec)
       builder = self.__layout_class.new
       mod = enclosing_module
@@ -444,6 +598,7 @@ module FFI
       builder
     end
 
+    # Returns the StructLayout or UnionLayout instance for receiver.
     def self.__cl_layout
       @cl_layout
     end
@@ -460,12 +615,11 @@ module FFI
 
   end  # ]
 
-
-  class Union # [
-
+  # FFI Representation of a C Union.
+  class Union
+    # Returns the class to use for layout (UnionLayout)
     def self.__layout_class
       UnionLayout
     end
-
-  end # ]
+  end
 end

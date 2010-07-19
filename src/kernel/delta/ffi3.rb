@@ -110,7 +110,7 @@ module FFI
 
     # def __pointer_at_put(byteoffset, pointer) ; end
     #   pointer is a kind of Pointer or a CPointer, or nil
-    primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'  
+    primitive_nobridge '__pointer_at_put' , 'pointerAt:put:'
 
     primitive_nobridge '__set_derived_from' , 'derivedFrom:'
 
@@ -145,7 +145,7 @@ module FFI
     class_primitive_nobridge '__fromRegionOf' , 'fromRegionOf:offset:numBytes:'
     class_primitive_nobridge '__fromCPointer' , 'fromCPointer:numBytes:'
 
-    def __struct_pointer_at(byteoffset) 
+    def __struct_pointer_at(byteoffset)
       return self.__pointer_at(byteoffset, MemoryPointer)
     end
 
@@ -169,6 +169,15 @@ module FFI
 
   end # ]
 
+
+  # A CPointer encapsulates a C pointer  which does not have auto-free
+  # semantics.  New instances are created by CFunction calls with result
+  # type #ptr, and are also used for certain arguments of CFunctions.
+  #
+  # A CPointer may be "derived from" some other pointer (e.g., it is a
+  # pointer to a field in a struct, which itself is represented by a
+  # pointer).  Derived pointers maintain a reference to the base pointer to
+  # pin the memory from GC.
   class CPointer # [
     primitive_nobridge 'address' , 'memoryAddress'
 
@@ -348,7 +357,7 @@ module FFI
     # Set which library or libraries +attach_function+ should
     # look in. By default it only searches for the function in
     # the current process. If you want to specify this as one
-    # of the locations, add FFI::Library::CURRENT_PROCESS 
+    # of the locations, add FFI::Library::CURRENT_PROCESS
     # The libraries are tried in the order given.
     #
     def ffi_lib(*names)
@@ -382,14 +391,14 @@ module FFI
 
     # define a callback type
     #
-    def callback(name_sym, arg_types, return_type=MaglevUndefined) 
+    def callback(name_sym, arg_types, return_type=MaglevUndefined)
       if return_type._equal?(MaglevUndefined)
         # per JRuby, assume 2 args and name_sym was omitted
         raise ArgumentError, 'anonymous callbacks not supported'
       end
       unless name_sym._isSymbol
         raise TypeError, 'name of a callback must be a Symbol'
-      end 
+      end
       prev_cb = Type.__find_type(name_sym)
       if prev_cb._not_equal?(nil)
         raise ArgumentError, "a callback was already defined with name #{name_sym}"
@@ -425,10 +434,10 @@ module FFI
           raise TypeError, 'unrecognized base return type #{ret}'
         end
       end
-      cb = CCallin.__new([ name_sym, ret, base_arg_types ]) 
+      cb = CCallin.__new([ name_sym, ret, base_arg_types ])
       Type.__add_type( name_sym, cb )
       return cb
-    end 
+    end
 
     # Attach a C function to this module. The arguments can have two forms:
     #
@@ -526,7 +535,7 @@ module FFI
           end
         end
         if found
-          untagged_enums = Enums::__untagged_enums_asGsMethDict 
+          untagged_enums = Enums::__untagged_enums_asGsMethDict
           cf = CCallout.__new([ lib, cname, ret, base_arg_types, var_args_after, untagged_enums ])
 
           # install a method in self, derived from a rubyToCcallTemplate variant,

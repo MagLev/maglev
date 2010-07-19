@@ -355,3 +355,18 @@ May 2010
 June 2010
   Changed the WORDLIST table used by the lexer to further optimize
   the lexing of keywords.  See comments in the code. 
+
+July 2010
+  Fix loss of statements. (See Trac764)
+  In the ruby_parser2.0.3  original code ,
+    220   def block_append(head, tail, strip_tail_block=false)
+    221     return head unless tail
+    222     return tail unless head
+    223 
+    224     case head[0]
+    225     when :lit, :str then
+    226       return tail
+    227     end
+  lines 224..227 inclusive should be deleted.
+       
+

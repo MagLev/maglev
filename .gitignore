@@ -15,12 +15,12 @@
 /locks/
 /log/
 gemstone.old/
+/src/experimental/
 debugspec.inp
 cur.inp
 etc/maglev.demo.key
 .#*
 *#
-version.txt
 pbm.rb
 lib/ruby/site_ruby/1.8/smalltalk
 lib/maglev/gems

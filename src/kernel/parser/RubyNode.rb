@@ -1804,7 +1804,7 @@ module MagRp
       @_st_val
     end
     def inspect
-      "(RpNameToken #{@_st_val} @_st_src_offset})"
+      "(token #{@_st_val})"
     end
   end
 

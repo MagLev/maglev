@@ -1,4 +1,5 @@
 module FFI
+  # class MemoryPointer < Pointer ... end     in ffi2.rb
   class MemoryPointer
     def inspect
       "#<FFI::MemoryPointer #{self.__inspect}>"
@@ -6,7 +7,70 @@ module FFI
     alias :to_i :address
   end
 
+
+  # Pointer is the base class for a number of other types in the FFI
+  # library (MemoryPointer, Struct, etc.).
+  #
+  # +Pointer+ is identically Smalltalk +CByteArray+.
+  #
+  # Pointer (CByteArray) encapsulates allocation of C memory or a reference
+  # to C memory.
+  #
+  # A pointer maintains a flag that controls whether <tt>free()</tt> is
+  # called when the pointer object is garbage collected by the VM.
+  #
+  # Pointers know the type of object they point to, and the size of the
+  # memory (number of elements).
+  #
+  # == Derived Pointers.
+  #
+  # A pointer may be "derived from" another pointer, which means that it
+  # points to memory managed by the parent pointer (e.g., a base pointer
+  # points to a struct, and another pointer, derived from the base, points
+  # to one field in that struct).  Each derived pointer maintains a
+  # reference to the base pointer to keep memory pinned from garbage
+  # collection.
+  #
   class Pointer # [
+
+    # call-seq:
+    #   Pointer.new              {|ptr| block} -> ptr to eight bytes of memory
+    #   Pointer.new(num_bytes)   {|ptr| block} -> ptr to +num_bytes+ bytes
+    #   Pointer.new(type)        {|ptr| block} -> ptr for one element of +type+
+    #   Pointer.new(type, count) {|ptr| block} -> ptr for +count+ elements of +type+
+    #
+    # Create and return a new Pointer.  The pointer will allocate and
+    # manage enough memory on the C-heap to hold +count+ instances of
+    # +type+.  +type+ is one of the FFI::PrimTypeDefs in <tt>ffi2.rb</tt>
+    # (e.g., +:char+, +:int32+, +:double+, +:string+, +:pointer+, etc.).
+    #
+    # If called with no parameters, returns a pointer large enough to hold
+    # a pointer, or an int64 (8 bytes).  If called with one parameter, and
+    # a count, then space for that number of elements of type is allocated.
+    #
+    # If a block is passed, then the newly created pointer is yielded to
+    # the block.
+    #
+    # Writing nil as a pointer's value creates a A C NULL pointer:
+    #
+    #   ptr = FFI::MemoryPointer.new(...)
+    #   ptr.put_pointer(0, nil)
+    #   ptr.null?   # => true
+    #
+    # == Example
+    #
+    # Create a pointer to a long and then write a value to the memory
+    # manged by the pointer and then read it back:
+    #
+    #   long_ptr = FFI::MemoryPointer.new :long
+    #   long_ptr.put_long(0, 0x12345678)
+    #   ruby_value = long_ptr.read_long
+    #
+    # Create a pointer to an array of 100 ints:
+    #
+    #   one_hundred_ints = FFI::Pointer.new(:int, 100)
+    #
+    #
 
     def self.new(type, count=MaglevUndefined, &block)
       # this variant  gets bridge methods
@@ -106,8 +170,22 @@ module FFI
       @_st_typeSize = elem_size
     end
 
+
+    # call-seq:
+    #   __with_all(an_object) -> Pointer
+    #
+    # +an_object+ may be a String, ByteArray or CByteArray.  Returns a new
+    # instance of the receiver containing a copy of the bytes of the
+    # argument.  If anObject is a String, the resulting ByteArray contains
+    # the bytes of the String plus a terminator byte with value zero.
     class_primitive_nobridge '__with_all', 'withAll:'
 
+    # Create a new Pointer that manages a copy of the string on the
+    # C-Heap. The C-memory will have an extra byte with a value of zero
+    # (i.e., the c-string is null terminated).
+    #
+    #   my_ptr = Pointer.from_string("hello")
+    #
     def self.from_string(string)
       string = Type.coerce_to(string, String, :to_str)
       inst = self.__with_all(string)
@@ -115,6 +193,11 @@ module FFI
       inst
     end
 
+    # Returns the nth element pointed to by receiver. The number of bytes
+    # returned is controlled by the type of this pointer (:int, :double,
+    # etc.).  Roughly, return element type number of bytes starting at:
+    #
+    #     pointer_base + (element_offset * element_size)
     def [](element_offset)
       elem_size = self.type_size
       byte_offset = element_offset * elem_size
@@ -224,27 +307,27 @@ module FFI
     end
 
     def get_string(offset, length=MaglevUndefined)
-       if length._equal?(MaglevUndefined)
-         return self.get_string(offset)
-       end 
-       zofs = self.__search_for_zerobyte(offset) # result zero based
-       lim = zofs < 0 ? offset + length  : zofs
-       if lim > (sz = self.size)
-         lim = sz
-       end
+      if length._equal?(MaglevUndefined)
+        return self.get_string(offset)
+      end
+      zofs = self.__search_for_zerobyte(offset) # result zero based
+      lim = zofs < 0 ? offset + length  : zofs
+      if lim > (sz = self.size)
+        lim = sz
+      end
       self.stringfrom_to(offset, lim-1) # both args zero based
     end
 
     def get_string(offset)
-       zofs = self.__search_for_zerobyte(offset)
-       lim = zofs < 0 ? self.size : zofs
-       self.stringfrom_to(offset, lim - 1)  # both args zero based
+      zofs = self.__search_for_zerobyte(offset)
+      lim = zofs < 0 ? self.size : zofs
+      self.stringfrom_to(offset, lim - 1)  # both args zero based
     end
 
     def put_string(offset, string)
       len = string.length
       self.copyfrom_from_to_into(string, 1, len, offset)
-                                # obj, one-based, one-base, zero-based
+      # obj, one-based, one-base, zero-based
       self.int8_put(offset + len, 0)  # add a null byte
     end
 
@@ -331,7 +414,7 @@ module FFI
     end
 
     def get_array_of_string(byte_offset, length=MaglevUndefined)
-      unless length._isFixnum 
+      unless length._isFixnum
         if length._equal?(MaglevUndefined)
           return self.get_array_of_string(byte_offset)
         end
@@ -369,12 +452,12 @@ module FFI
       ofs = byte_offset
       limit = self.total
       while ofs < limit
-       str = self.char_star_at(ofs)
-       if str._equal?(nil)
-         return res
-       end
-       res << str
-       ofs += 8
+        str = self.char_star_at(ofs)
+        if str._equal?(nil)
+          return res
+        end
+        res << str
+        ofs += 8
       end
       res
     end

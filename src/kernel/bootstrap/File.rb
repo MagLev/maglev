@@ -41,6 +41,8 @@ class File
 
   primitive '__close', 'close'
 
+  primitive '__disable_autoclose', '_disableAutoClose'
+
   def close
     if self.__is_open 
       self.__close

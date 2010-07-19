@@ -138,15 +138,144 @@ module Kernel
     nil.pause
   end
 
-  # call-seq:
-  #   exec(<env, > command <, args*>, <options>)
-  #
-  # MagLev: Not Implemented.  Raises NotImplementedError
-  #
-  # Replaces the current process by running the given external command.
-  def exec(*args)
-    raise NotImplementedError, "Kernel.exec is not implemented."
+  def __fd_for_exec(arg)
+    if arg._isFixnum
+      return arg  if arg >= 0 && arg <= 2
+    elsif arg._isSymbol
+      return 0 if arg._equal?(:in) 
+      return 1 if arg._equal?(:out)
+      return 2 if arg._equal?(:err)
+    elsif arg._is_a?(File)
+      return 0 if arg._equal?(STDIN)
+      return 0 if arg._equal?(STDOUT)
+      return 0 if arg._equal?(STDERR)
+    end 
+    return nil
   end
+
+  def __exec_prepare_fd_strm(fd_desc, v, dups_arr)
+    if (strm = __fd_for_exec(v))
+      dups_arr << fd_desc
+      dups_arr << strm 
+      return true
+    elsif v._isString || v._isArray
+      if v._isString
+	f = File.open(v, (fd_desc == 0) ? 'r' : 'a' )
+      else
+	f = File.open(*v)
+      end
+      f.__disable_autoclose
+      dups_arr << fd_desc
+      dups_arr << f.__fileno
+      return true
+    else
+      return false
+    end
+  end
+
+  # call-seq:
+  #   exec(command <, args*>)
+  #   exec(<env, > command <, args*>, <options>) 
+  # Replaces the current process by running the given external command.
+  # The following keys in options are not implemented
+  #    :pgroup, :rlimit_xxx , :umask .
+  def exec(*args)
+    firstarg = args[0]
+    env = nil
+    env_arr = [ false , true ]  # env_arr[0] is unsetenv_others arg to prim
+				# env_arr[1] is close_others arg to prim
+    options = nil
+    if firstarg._isHash
+      env = firstarg
+      env.each_pair { |k,v|
+        if k._isString
+          vstr = nil
+          unless v._equal?(nil)
+            vstr = Type.coerce_to(v, String, :to_str)
+          end
+          env_arr << k 
+          env_arr << vstr
+        else
+          raise ArgumentError, "non String key #{k} in env arg to exec"  
+        end
+      }
+      cmd = args[1]
+      idx = 2
+    else
+      cmd = firstarg
+      idx = 1
+    end
+    lastarg = args[-1]
+    lim = args.length
+    dups_arr = []
+    original_wd = Dir.getwd
+    wd_for_exec = nil
+    begin
+      if lastarg._isHash
+	options = lastarg
+	options.each_pair { |k, v|
+	  if k._isSymbol
+	    if k._equal?(:chdir)
+	      wd_for_exec = v
+	    elsif k._equal?(:close_others)
+              if v._equal?(true)
+                env_arr[1] = true
+              elsif v._equal?(false)
+                env_arr[1] = false
+              else
+                 raise ArgumentError, "value #{v} for :close_others neither true nor false, in exec"
+              end
+            elsif k._equal?( :unsetenv_other )
+              if v._equal?(true)
+                env_arr[0] = true
+              else
+                 raise ArgumentError, "value #{v} for :unsetenv_other is not true, in exec"
+              end
+	    else
+	       raise ArgumentError, "option #{k} not recognized for exec"
+	    end
+	  elsif k._is_a?(IO) 
+	    unless v._equal?(:close)
+	      raise ArgumentError, "anIO=>#{v} not a valid option for exec"
+	    end
+	  elsif (fd_desc = __fd_for_exec(k))
+	    unless __exec_prepare_fd_strm(fd_desc, v, dups_arr)
+	      raise ArgumentError, "bad stream #{v} for #{k}=>stream in exec"
+	    end
+	  elsif k._isArray
+	    k.each { | kelem |
+	      if (k_desc = __fd_for_exec(kelem))
+		unless __exec_prepare_fd_strm(k_desc, v, dups_arr)
+		  raise ArgumentError, "bad stream #{v} for #{kelem} of #{k}=>stream in exec"
+		end
+	      else
+		raise ArgumentError, "invalid element #{kelem} of #{k}=>stream in exec"
+	      end
+	    }
+	  else
+	    raise ArgumentError, "invalid option #{k} for exec"
+	  end
+	}
+	lim -= 1
+      end
+      cmd = Type.coerce_to(cmd, String, :to_str)
+      arguments = []
+      while idx < lim
+	arguments << Type.coerce_to(args[idx], String, :to_str)
+	idx += 1
+      end
+      if wd_for_exec
+        Dir.chdir(wd_for_exec)
+      end
+      puts "Kernel>>__execv: #{cmd}"  # do not checkin
+      self.__execv(cmd, env_arr, dups_arr, *arguments)
+      raise 'Unexpected return from Kernel.__execv'
+    ensure
+      Errno.handle(Dir.__chdir(original_wd), "chdir back to #{original_wd}")
+    end
+  end
+
+  primitive '__execv*', 'execv:envVars:fdDups:args:'
 
   primitive_nobridge '__eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 

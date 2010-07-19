@@ -1,10 +1,11 @@
 source 'http://rubygems.org'
 
-# gem 'rails', :path => '/Users/pmclain/GemStone/checkouts/git/examples/rails/rails'
-gem 'rails', :path => "#{ENV['MAGLEV_HOME']}/examples/rails/rails"
-gem 'arel',  :git => 'git://github.com/rails/arel.git'
+gem 'rails', '3.0.0.beta4'
 
-# gem 'sqlite3-ruby', :require => 'sqlite3'
+# Bundle edge Rails instead:
+# gem 'rails', :git => 'git://github.com/rails/rails.git'
+
+gem 'ruby-mysql', :require => 'mysql'
 
 # Use unicorn as the web server
 # gem 'unicorn'

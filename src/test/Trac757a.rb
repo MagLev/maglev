@@ -2,5 +2,7 @@
 #
 # required from Trac757.rb
 module Foo
-  NOT_FOUND = 1
+  class FooException < Exception
+  end
+  raise FooException
 end

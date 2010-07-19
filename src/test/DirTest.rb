@@ -35,7 +35,20 @@ Dir.chdir(test_dir) do
   test(Dir.glob("**/even_deeper"), ['deeper/even_deeper'], 'Dir.glob with **')
 end
 
+# #############################################
+# A regression found in the Rails Generators.
+base   = File.join(File.dirname(__FILE__), 'test_dir')
+lookup = File.join(base,  '**' , '{*,.[a-z]*}')
 
+# Do the Dir glob, but remove the path prefix: /..../src/test/
+x = File.dirname(__FILE__).length + 1
+actual = Dir[lookup].map { |f| f.slice(x..-1)}.sort
+
+expected = ["test_dir/.rbinit", "test_dir/README", "test_dir/a.rb", "test_dir/b.rb",
+            "test_dir/deeper", "test_dir/deeper/even_deeper"]
+test(actual, expected, 'Dir[] with complex pattern: size')
+
+# #########################
 # Test Dir#each
 d = Dir.open('.')
 results = []

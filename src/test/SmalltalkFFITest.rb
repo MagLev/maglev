@@ -2,8 +2,13 @@ dirname = "#{ENV['MAGLEV_HOME']}/lib/ruby/site_ruby/1.8/smalltalk"
 unless File.directory?(dirname)
   Dir.chdir "#{ENV['MAGLEV_HOME']}" do
     puts "generating stwrappers"
-    system 'rake stwrappers'
+    status = system('rake stwrappers')
+    unless status.equal?(true)
+      raise 'rake stwrappers NOT successful'
+    end
   end
+else
+  puts "stwrappers exists"
 end
 
 require 'smalltalk/System'

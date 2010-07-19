@@ -7,18 +7,30 @@
 
 # = Overview
 #
-# This script shows basic usage of the MySQL driver provided with MagLev.
+# This script shows basic usage of the pure ruby MySQL driver.
+#
+# Early versions of the MagLev alpha provided a patched version of this
+# driver in $MAGLEV_HOME/lib/ruby/site_ruby/1.8/ruby-mysql.  That version
+# is now deprecated.  You should use the version 2.9.2 or greater from
+# RubyGems:
+#
+#   $ maglev-gem install ruby-mysql --version '>= 2.9.2'
+#
+# This script will run with either version (comment out the gem line if you
+# want to use the deprecated version).
 #
 # To run the script, ensure you have MySQL running, and edit the variables
 # for your configuration.
 
+# require 'ruby-mysql/mysql'   # deprecated version
 
-require 'ruby-mysql/mysql'
+gem 'ruby-mysql', '>= 2.9.2'
+require 'mysql'
 
 # CONFIGURATION
 host = 'localhost'
-user = 'webuser'
-pass = 'webuser'
+user = 'ruby'
+pass = 'ruby'
 
 my = Mysql.new(host, user, pass)
 my.query("create database test_db")
