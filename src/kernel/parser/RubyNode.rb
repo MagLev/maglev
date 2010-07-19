@@ -1804,7 +1804,7 @@ module MagRp
       @_st_val
     end
     def inspect
-      "(token #{@_st_val})"
+      "(token \"#{@_st_val}\")"
     end
   end
 
