@@ -12,12 +12,22 @@ Rails Gems and other gems.
      $ cd $MAGLEV_HOME
      $ rake maglev:start      # or: $MAGLEV_HOME/bin/maglev start
 
-2. Install Rails, patch it and install other gems
+2. Install Rails, patch it and install other gems and set ENVIRONMENT
      $ cd $MAGLEV_HOME/examples/rails
      $ rake init
+     $ export MAGLEV_OPTS="-MallIvsDynamic"
+
+3. Setup the Database.  MagLev currently supports MySQL, so:
+   A. Ensure mysql is running
+   B. Ensure <tt>myapp/config/database.yml</tt> is configured for your
+      system (user, password, etc.)
+   C. Create the db
+       $ cd $MAGLEV_HOME/examples/rails/myapp
+       $ $MAGLEV_HOME/bin/rake db:create
 
 3. Run the app:
-     $ rake app
+     $ cd $MAGLEV_HOME/examples/rails/myapp
+     $ $MAGLEV_HOME/bin/rails server
    Then hit http://localhost:3000/
 
 == Rails on MagLev: Status
