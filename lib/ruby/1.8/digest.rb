@@ -35,6 +35,9 @@ module Digest
 
   autoload :MD5,  'digest/md5'
   autoload :SHA1, 'digest/sha1'
+  autoload :SHA256, 'digest/sha256'
+  autoload :SHA384, 'digest/sha384'
+  autoload :SHA512, 'digest/sha512'
 
   # call-seq:
   #     Digest.hexencode(string) -> hexencoded_string
@@ -51,11 +54,6 @@ module Digest
   # This module defines the API each digest implementation must support.
   # Provides default implementation for many of the methods.
   module Instance
-
-    #--
-    # Instance methods that *must* be overridden by subclasses.
-    #++
-
     # call-seq:
     #     digest_obj.update(string) -> digest_obj
     #     digest_obj << string -> digest_obj
@@ -117,7 +115,7 @@ module Digest
     #
     # This method is overridden by each implementation subclass.
     def block_length
-      raise NotImplementedError, "#{self} does not implement block_length()"
+      raise NotImplementedError, "#{self.class.name} does not implement block_length()"
     end
 
     # Instance methods that may be overridden
@@ -131,9 +129,9 @@ module Digest
     # given, checks whether they have the same hash value.  Otherwise
     # returns false.
     def ==(other)
-      str1 = Type.coerce_to(digest, String, :to_str)
+      str1 = Type.coerce_to(hexdigest, String, :to_str)
       if other.kind_of?(Digest::Instance)
-        str2 = Type.coerce_to(other.digest, String, :to_str)
+        str2 = Type.coerce_to(other.hexdigest, String, :to_str)
       else
         str2 = Type.coerce_to(other, String, :to_str)
       end
@@ -145,11 +143,12 @@ module Digest
     #
     # Creates a printable version of the digest object.
     def inspect
-      #  #<Digest::ClassName: xxxxx...xxxx>
       "#<#{self.class}: #{self.hexdigest}>"
     end
 
+    #--
     # Instance methods that are not normally overridden
+    #++
 
     # call-seq:
     #     digest_obj.new -> another_digest_obj
@@ -157,7 +156,9 @@ module Digest
     # Returns a new, initialized copy of the digest object.  Equivalent
     # to digest_obj.clone().reset().
     def new
-      self.clone().reset()
+      clone = self.clone
+      clone.reset
+      clone
     end
 
     # call-seq:
@@ -172,9 +173,7 @@ module Digest
     # after the process.
     def digest(string = MaglevUndefined)
       if string.equal?(MaglevUndefined)
-        # Currently, getting the digest is non-destructive, so just
-        # calculate and return (don't bother cloning)
-        klone = clone
+        klone = self.clone
         value = klone.finish
         klone.reset
       else
@@ -208,19 +207,7 @@ module Digest
     # _string_ in a hex-encoded form, resetting the digest to the initial
     # state before and after the process.
     def hexdigest(string = MaglevUndefined)
-      if string.equal?(MaglevUndefined)
-        # Currently, getting the digest is non-destructive, so just
-        # calculate and return (don't bother cloning)
-        klone = clone
-        value = klone.finish
-        klone.reset
-      else
-        reset
-        update(string)
-        value = finish
-        reset
-      end
-      Digest.hexencode(value)
+      Digest.hexencode(digest(string))
     end
 
     # call-seq:
@@ -289,7 +276,10 @@ module Digest
     #   => "f02e3c85572dc9ad7cb77c2a638e3be24cc1b5bea9fdbb0b0299c9668475c534"
     #
     def self.file(name)
-      f = File.open(name, 'r')
+      raise TypeError, "Nil passed" if name.nil?
+      name_str = name.to_str
+      raise Errno::EISDIR if File.directory?(name_str)
+      f = File.open(name_str, 'r')
       contents = f.read(nil)
       self.new(contents)
     end
@@ -338,6 +328,10 @@ module Digest
     end
     alias :<< :update
 
+    def digest(str = MaglevUndefined)
+      @impl.digest(str)
+    end
+
     private
     def to_str(bignum)
       l = digest_length
@@ -349,21 +343,20 @@ module Digest
       end
       bytes.pack("C*")
     end
+
+    # ['SHA256', 'SHA512'].each do |klass_name|
+    #   klass = Class.new(::Digest::Base) do
+    #     define_method(:initialize) do |str|
+    #       super(OpenSSL::Digest.const_get(klass_name).new(str))
+    #     end
+    #
+    #     singleton = (class << klass; self; end)
+    #     singleton.class_eval{
+    #       define_method(:"#{klass_name}") {|string| new(string) }
+    #     }
+    #   end
+    #   const_set(klass_name, klass)
+    # end
   end
-
-  # ['SHA256', 'SHA512'].each do |klass_name|
-  #   klass = Class.new(::Digest::Base) do
-  #     define_method(:initialize) do |str|
-  #       super(OpenSSL::Digest.const_get(klass_name).new(str))
-  #     end
-  #
-  #     singleton = (class << klass; self; end)
-  #     singleton.class_eval{
-  #       define_method(:"#{klass_name}") {|string| new(string) }
-  #     }
-  #   end
-  #   const_set(klass_name, klass)
-  # end
 end
-
 require 'openssl'

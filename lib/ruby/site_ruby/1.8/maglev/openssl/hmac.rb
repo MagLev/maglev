@@ -70,7 +70,6 @@ module OpenSSL
     def update(string)
       raise HMACError "#update called while invalid (call reset first)"
 
-puts "=== hmac#update"
       str = Maglev::RubyUtils.rb_string_value(string)
       OpenSSL::LibCrypto.HMAC_Update(@ctx, str, str.length)
       self
