@@ -230,26 +230,72 @@ class HashTest
     def merge3
       h1 = Hash.new
       h2 = Hash.new
-      (0..9).each {|i| h1[i] = i.to_s }
+      keys1_2 = []
+      vals_3 = []
+      (0..9).each {|i| 
+         v = i.to_s
+         h1[i] = v 
+         keys1_2 << i
+         vals_3 << v
+      }
       (10..19).each { |i|
         h1[i] = i.to_s
-        h2[i] = (2*i).to_s
+        v = (2*i).to_s
+        h2[i] = v
+        keys1_2 << i
+        vals_3 << v
       }
-      (20..29).each {|i| h2[i] = i.to_s }
+      keys_3 = keys1_2.dup 
+      (20..29).each {|i| 
+         v = i.to_s
+         h2[i] = v
+         keys_3 << i 
+        vals_3 << v
+      }
       h3 = h1.merge(h2)
+      allvalues = Array.new(30)
+      h3.each_pair { |k,v| 
+        if k < 0 || k > 29 ; raise 'error'; end
+        allvalues[k] = v 
+      } 
+      (0..29).each { |i|
+        unless (ax = allvalues[i]) == (bx = vals_3[i]) ; raise 'error'; end
+      }
+      allkeys3 = []
+      h3.each_key { |k|  allkeys3 << k }
+      unless (sorted3 = allkeys3.sort) == keys_3 ; raise 'error'; end
 
-      (0..9).each {|i|
+      (20..29).each {|i|
+        v = h3.delete(i)
+        unless v == i.to_s ; raise 'error'; end
+      }
+      allkeys3 = []
+      h3.each_key { |k|  allkeys3 << k }
+      unless (sorted3 = allkeys3.sort) == keys1_2 ; raise 'error'; end
+
+      allvalues = Array.new(20)
+      h3.each_pair { |k,v| 
+        if k < 0 || k > 19 ; raise 'error'; end
+        allvalues[k] = v
+      } 
+      (0..19).each { |i|
+        unless (ax = allvalues[i]) == (bx = vals_3[i]) ; raise 'error'; end
+      }
+      (0..9).each { |i|
          v = h3.delete( i )
          unless v == i.to_s ; raise 'error'; end
        }
       (10..19).each {|i|
          v = h3.delete( i )
          unless v == (2*i).to_s ; raise 'error'; end
-       }
-       (20..29).each {|i|
-         v = h3.delete(i)
-         unless v == i.to_s ; raise 'error'; end
-       }
+      }
+      allkeys3 = []
+      h3.each_key { |k|  allkeys3 << k }
+      unless allkeys3.size == 0 ; raise 'error'; end
+      h3.each_pair { |k,v|
+        raise 'error'
+      }
+       
       true
     end
 
@@ -390,6 +436,8 @@ class BHash < Hash
        unless (y = h.delete(n.to_s)) == 0 - n; raise 'error'; end
        n -= 1
     end
+    h.each_key {|k| raise 'error' }
+    h.each_pair {|k,v | raise 'error' }
     unless h.size == 0 ; raise 'error'; end
     # puts "done testLarge"
     true
@@ -451,6 +499,9 @@ class BHash < Hash
       unless (y = h.delete(strings[vidx]))._equal?( vals[vidx]); raise 'err';end
       vidx -= 2
     end
+    h.each_key {|k| raise 'error' }
+    h.each_pair {|k,v | raise 'error' }
+    unless h.size == 0 ; raise 'error'; end
     unless h.size == 0 ; raise 'error'; end
     # puts "done testLargeIdentityHash #{tsize}  "
   end # ]
@@ -462,11 +513,9 @@ end
 bh = BHash.new
 bh['foo']
 
-puts "starting large Hashes "
-1.times {
-  tsize = 50
+[ 50 , 500, 5000, 50000 ].each {|tsize|
+  puts "large Hashes size #{tsize}"
   BHash.testLarge(tsize) # test of rebuildTable
-
   BHash.testLargeIdentityHash(tsize)
 }
 puts "done large Hashes"
