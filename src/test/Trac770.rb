@@ -1,6 +1,9 @@
+# this test passses if it doesn't die with an inconsistent AST" and returns
+# a benchmark result "Pfannkuchen(6) = 10" TWICE.
+
 require "benchmark" 
  Benchmark.bmbm do |benchmark| 
- benchmark.report("InconsistentAST") do 
+ benchmark.report("Test InconsistentAST") do 
    #
 # From The Computer Language Benchmarks Game
 # http://shootout.alioth.debian.org/
