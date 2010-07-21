@@ -218,8 +218,7 @@ module MagRp # [
 
 	i = act * -3
 	len       = creduce_table[i]
-	# method_id = creduce_table[i+2]
-	sel = creduce_table[i+2]
+	sel = creduce_table[i+2]  # get method_id 
 
 	if sel._equal?( :_reduce_noneOne )
 	  # optimization - no net change to vstack
@@ -247,7 +246,7 @@ module MagRp # [
 	  @racc_read_next = cracc_read_next # uncache   
 
 
-	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 )
+	  vres =  __perform__se( vstack, vofs, sel, 2 )
 
 	  cracc_error_status = @racc_error_status # recache
 	  # @racc_t not changed by reduce methods
@@ -391,8 +390,7 @@ module MagRp # [
 
 	i = act * -3
 	len       = creduce_table[i]
-	# method_id = creduce_table[i+2]
-	sel = creduce_table[i+2]
+	sel = creduce_table[i+2]  # get method_id 
 
 	if sel._equal?( :_reduce_noneOne )
 	  # optimization - no net change to vstack
@@ -420,7 +418,7 @@ module MagRp # [
 	  @racc_read_next = cracc_read_next # uncache   
 
 
-	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 )
+	  vres =  __perform__se( vstack, vofs, sel, 2 )
 
 	  cracc_error_status = @racc_error_status # recache
 	  # @racc_t not changed by reduce methods
