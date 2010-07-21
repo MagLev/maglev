@@ -132,7 +132,7 @@ class Object
   #   and last arg is envId
   # __perform are used by RubyParser and FFI::StructLayout
   primitive_nobridge '__perform_se', 'with:perform:env:'
-  primitive_nobridge '__perform__se', 'with:with:perform:env:'
+  primitive_nobridge '__perform__se', 'with:with:perform:env:'  # IR generator allows up to 5 colon args before the * arg .
 
   # redefinition of __perform_method disallowed after bootstrap,
   #  it is used by implementation of eval
