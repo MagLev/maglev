@@ -20,7 +20,10 @@ To run this example:
    $ maglev-ruby --version
    maglev 0.6 (ruby 1.8.6) (2009-11-30 rev 22603-1069) [i386-darwin9.8.0]
 
-3: You can also run main.rb using MRI, or another ruby implementation:
+3: You can also run main.rb using MRI, or another ruby implementation.  If
+   you run using another ruby implementation, you will be running standard
+   Ruby pstore, with ruby serialization (i.e., you will NOT be using MagLev
+   persistence).
 
   $ rake mri      # OR: ruby main.rb
         user     system      total        real
