@@ -87,12 +87,12 @@ module Kernel
   def method_missing(method_id, *args)
     prot = __last_dnu_protection()
     msg = if (prot._equal?(0))
-             "NoMethodError: undefined method `"
-           elsif (prot._equal?(1))
-             "NoMethodError: protected method `"
-           else
-             "NoMethodError: private method `"
-           end
+            "NoMethodError: undefined method `"
+          elsif (prot._equal?(1))
+            "NoMethodError: protected method `"
+          else
+            "NoMethodError: private method `"
+          end
     msg.__append(method_id)
     msg.__append( :"' for " )
     msg.__append( self.__name_for_mnu )  # Fix trac 752, don't use to_s
@@ -160,9 +160,9 @@ module Kernel
       return true
     elsif v._isString || v._isArray
       if v._isString
-	f = File.open(v, (fd_desc == 0) ? 'r' : 'a' )
+        f = File.open(v, (fd_desc == 0) ? 'r' : 'a' )
       else
-	f = File.open(*v)
+        f = File.open(*v)
       end
       f.__disable_autoclose
       dups_arr << fd_desc
@@ -183,7 +183,7 @@ module Kernel
     firstarg = args[0]
     env = nil
     env_arr = [ false , true ]  # env_arr[0] is unsetenv_others arg to prim
-				# env_arr[1] is close_others arg to prim
+    # env_arr[1] is close_others arg to prim
     options = nil
     if firstarg._isHash
       env = firstarg
@@ -212,62 +212,61 @@ module Kernel
     wd_for_exec = nil
     begin
       if lastarg._isHash
-	options = lastarg
-	options.each_pair { |k, v|
-	  if k._isSymbol
-	    if k._equal?(:chdir)
-	      wd_for_exec = v
-	    elsif k._equal?(:close_others)
+        options = lastarg
+        options.each_pair { |k, v|
+          if k._isSymbol
+            if k._equal?(:chdir)
+              wd_for_exec = v
+            elsif k._equal?(:close_others)
               if v._equal?(true)
                 env_arr[1] = true
               elsif v._equal?(false)
                 env_arr[1] = false
               else
-                 raise ArgumentError, "value #{v} for :close_others neither true nor false, in exec"
+                raise ArgumentError, "value #{v} for :close_others neither true nor false, in exec"
               end
             elsif k._equal?( :unsetenv_other )
               if v._equal?(true)
                 env_arr[0] = true
               else
-                 raise ArgumentError, "value #{v} for :unsetenv_other is not true, in exec"
+                raise ArgumentError, "value #{v} for :unsetenv_other is not true, in exec"
               end
-	    else
-	       raise ArgumentError, "option #{k} not recognized for exec"
-	    end
-	  elsif k._is_a?(IO) 
-	    unless v._equal?(:close)
-	      raise ArgumentError, "anIO=>#{v} not a valid option for exec"
-	    end
-	  elsif (fd_desc = __fd_for_exec(k))
-	    unless __exec_prepare_fd_strm(fd_desc, v, dups_arr)
-	      raise ArgumentError, "bad stream #{v} for #{k}=>stream in exec"
-	    end
-	  elsif k._isArray
-	    k.each { | kelem |
-	      if (k_desc = __fd_for_exec(kelem))
-		unless __exec_prepare_fd_strm(k_desc, v, dups_arr)
-		  raise ArgumentError, "bad stream #{v} for #{kelem} of #{k}=>stream in exec"
-		end
-	      else
-		raise ArgumentError, "invalid element #{kelem} of #{k}=>stream in exec"
-	      end
-	    }
-	  else
-	    raise ArgumentError, "invalid option #{k} for exec"
-	  end
-	}
-	lim -= 1
+            else
+              raise ArgumentError, "option #{k} not recognized for exec"
+            end
+          elsif k._is_a?(IO) 
+            unless v._equal?(:close)
+              raise ArgumentError, "anIO=>#{v} not a valid option for exec"
+            end
+          elsif (fd_desc = __fd_for_exec(k))
+            unless __exec_prepare_fd_strm(fd_desc, v, dups_arr)
+              raise ArgumentError, "bad stream #{v} for #{k}=>stream in exec"
+            end
+          elsif k._isArray
+            k.each { | kelem |
+              if (k_desc = __fd_for_exec(kelem))
+                unless __exec_prepare_fd_strm(k_desc, v, dups_arr)
+                  raise ArgumentError, "bad stream #{v} for #{kelem} of #{k}=>stream in exec"
+                end
+              else
+                raise ArgumentError, "invalid element #{kelem} of #{k}=>stream in exec"
+              end
+            }
+          else
+            raise ArgumentError, "invalid option #{k} for exec"
+          end
+        }
+        lim -= 1
       end
       cmd = Type.coerce_to(cmd, String, :to_str)
       arguments = []
       while idx < lim
-	arguments << Type.coerce_to(args[idx], String, :to_str)
-	idx += 1
+        arguments << Type.coerce_to(args[idx], String, :to_str)
+        idx += 1
       end
       if wd_for_exec
         Dir.chdir(wd_for_exec)
       end
-      puts "Kernel>>__execv: #{cmd}"  # do not checkin
       self.__execv(cmd, env_arr, dups_arr, *arguments)
       raise 'Unexpected return from Kernel.__execv'
     ensure
@@ -476,7 +475,7 @@ module Kernel
   #  automatically closed when the block terminates. The call
   #  returns the value of the block.
   #
-#  Following pipe behavior probably not implemented yet in Maglev.
+  #  Following pipe behavior probably not implemented yet in Maglev.
   #  If <i>path</i> starts with a pipe character, a subprocess is
   #  created, connected to the caller by a pair of pipes. The returned
   #  <code>IO</code> object may be used to write to the standard input
@@ -625,7 +624,7 @@ module Kernel
     if ex_class._isString
       msg = ex_class
       if message._isString
-         msg << message
+        msg << message
       end
       raise(RuntimeError, msg)
     else
@@ -638,7 +637,7 @@ module Kernel
     if ex_class._isString
       msg = ex_class
       if message._isString
-         msg << message
+        msg << message
       end
       raise(RuntimeError, msg, stack)
     else
@@ -834,9 +833,9 @@ module Kernel
     end
     regex = str.__get_pattern(pattern, true)
     if (match = regex.__match_vcglobals(str, 0x30))
-       res = str.__replace_match_with(match, block.call(match[0]).to_s)
+      res = str.__replace_match_with(match, block.call(match[0]).to_s)
     else
-       res = str.dup
+      res = str.dup
     end
     res.__storeRubyVcGlobal(0x21) # store into caller's $_
     res
