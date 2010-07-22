@@ -6,6 +6,13 @@ class VariableContext
   # extending VariableContext is not allowed outside of bootstrap
   primitive_nobridge 'at', 'at:'
   primitive_nobridge 'put', 'at:put:'
+
+  def __evVcGput(tilde, underscore)
+    # for use by eval implementation only
+         tilde.__storeRubyVcGlobal(0x70)
+    underscore.__storeRubyVcGlobal(0x71)
+    self
+  end
 end
 
 class ExecBlock
