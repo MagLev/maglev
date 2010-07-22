@@ -450,7 +450,7 @@ class Object
     # no ArgumentError for both string and explicit block args yet ;
     #  passing implicit block_arg if no explicit block arg, so it can
     #  be put in the binding...
-    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    lex_path = self.__getRubyVcGlobal(0x32) # the __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
     # file=args[1] ; line=args[2] #  TODO, ignored for now
     string = Type.coerce_to(str, String, :to_str)
