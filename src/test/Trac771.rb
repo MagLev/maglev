@@ -4,18 +4,18 @@ $singleton_names = []
 
 module Chatty
   def self.singleton_method_added(id)
-    $singleton_names << id
     puts "Adding #{id.inspect} to #{self.name}"
+    $singleton_names << id
   end
 
   def self.singleton_method_removed(id)
-    $singleton_names.delete(id)
     puts "Removing #{id.inspect} from #{self.name}"
+    $singleton_names.delete(id)
   end
 
   def self.singleton_method_undefined(id)
-    $singleton_names.delete(id)
     puts "undef #{id.inspect} from #{self.name}"
+    $singleton_names.delete(id)
   end
 
   def self.one
@@ -41,6 +41,7 @@ module Chatty
   end
 end
 
+sx = $singleton_names
 raise "FAIL: one not removed" if $singleton_names.include? :one
 
 module Chatty
@@ -51,3 +52,4 @@ end
 
 
 raise "FAIL: two not removed" if $singleton_names.include? :two
+true

@@ -4,7 +4,7 @@
 
 == Unreleased changes
 
-* Fix Trac 768, 769, 770
+* Fix Trac 768, 769, 770, 771
 * Fix problems in Hash#delete, some optimizations in Hash.
 
 == Changes for 23832  2010-07-16
