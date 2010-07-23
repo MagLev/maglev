@@ -11,7 +11,7 @@ class String
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
   class_primitive_nobridge '__new', 'new:'
- 
+
   def self.new(*args)
     # this version gets bridge methods
     len = args.__size
@@ -530,7 +530,7 @@ class String
 
   alias concat <<
 
-  # def count(*args); end 
+  # def count(*args); end
   # arg to rubyCount: is expected to be an Array , so declare as 'count*'
   primitive 'count*', 'rubyCount:'
 
@@ -723,6 +723,14 @@ class String
     [ base, $1, $3 ]  # result is [ baseFixnum , signString, magnitudeString ]
   end
 
+  def _gsub_copyfrom_to(from, match_start)
+    to = match_start # match_start is zero based
+    if to > (sz = self.__size)
+      to = sz
+    end
+    self.__copyfrom_to( from + 1 , to )
+  end
+
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
   # replaced with either <i>replacement</i> or the value of the block. The
   # <i>pattern</i> will typically be a <code>Regexp</code>; if it is a
@@ -744,30 +752,33 @@ class String
   #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
-
-  def _gsub_copyfrom_to(from, match_start)
-    to = match_start # match_start is zero based
-    if to > (sz = self.__size)
-      to = sz
-    end
-    self.__copyfrom_to( from + 1 , to )
+  def gsub(regex, str)
+    _gsub_internal(regex, str)[0]
   end
 
-  def gsub(regex, str)
+  #-- Returns an array of [newvalue, modified], where modified is true if a
+  # substitution was performed.  The old gsub! code tried to compare self
+  # == gsub(...) to see is a substitution was performed, but that returned
+  # incorrect results for something like "replace the last 's' with an 's'"
+  # (which breaks Rails routing...)
+  #++
+  def _gsub_internal(regex, str)
+    modified = false
     str = Type.coerce_to(str, String, :to_str)
     out = self.class.__alloc
     start = 0
     pat = self.__get_pattern(regex, true)
     last_match = nil
     pat.__each_match(self) do |match|
+      modified = true
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
       out << str.__to_sub_replacement(match)
       start = match.end(0)
     end
     out << self.__copyfrom_to(start + 1, self.__size)
-    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
-    out
+    last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
+    [out, modified]
   end
 
   # From Rubinius
@@ -852,12 +863,11 @@ class String
   end
 
   def gsub!(regex, str)
-    # From Rubinius
-    nval = gsub(regex, str)
-    if self == nval
+    result = _gsub_internal(regex, str)
+    unless result[1]
       nil
     else
-      replace(nval)  # replace detects frozen
+      replace(result[0])  # replace detects frozen
     end
   end
 
@@ -1125,7 +1135,7 @@ class String
     if sign_str[0]._equal?( ?- )
       num = num * -1
     end
-    num 
+    num
   end
 
   def partition(pattern)  # added for 1.8.7

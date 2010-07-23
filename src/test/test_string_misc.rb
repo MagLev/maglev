@@ -338,6 +338,20 @@ seq = 'tgcaacgacatttgaccaacttgaccattcctgcttgtagcgt'
 seq.gsub!('B','(c|g|t)')
 test(seq.length, 43, 'From seq.rb')
 
+
+# From Rails Inflection code
+#
+# MagLev does not break out of the loop soon enough, i.e.,
+# result.gsub! is not returning truthy.
+result = "posts"
+[[ /s$/, "s"],
+ [ /$/,  "s"]].each { |(rule, replacement)|
+  break if result.gsub!(rule, replacement)
+}
+
+test(result, "posts", "Rails postss bug A")
+test("posts".gsub!(/s$/, "s"), "posts", "Rails postss bug B")
+
 # From action_view erb.rb
 #
 
