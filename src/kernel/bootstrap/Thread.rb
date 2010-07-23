@@ -26,6 +26,20 @@ class Thread
   primitive_nobridge 'alive?' , 'alive'
 
   # eval support
+  def self.__evVc
+    # Thread.current[ :__evalArgs ][0]    is a Binding
+    self.current[  :__evalArgs ][0].__context 
+  end
+  def self.__evArgs
+    self.current[  :__evalArgs ]
+  end
+  def self.__evBnd
+    self.current[  :__evalArgs ][0]
+  end
+  def self.__evBlk
+    self.current[  :__evalArgs ][1]
+  end
+
   def self.__atEvalBinding_put(symbol, value )
     # called by generated code
     # returns value . used only for temps created by an eval 

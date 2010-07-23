@@ -294,7 +294,7 @@ module Kernel
     if nargs > 4
       raise ArgumentError, 'too many args'
     end
-    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    lex_path = self.__getRubyVcGlobal(0x32) # __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
     bnd = args[1]
     file = args[2]
