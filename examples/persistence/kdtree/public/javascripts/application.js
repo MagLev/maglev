@@ -12,6 +12,11 @@ function initialize() {
   $("#num_results").focus(function() {
     this.select();
   });
+
+  // Bind handler to the go-to-zip button
+  $("#zip_jump_button").click(function() {
+    requestLocation( $("#zip_jump").val() );
+  });
   
   // Resize the map canvas on window resize
   $(window).resize(fitMapCanvas);
@@ -58,7 +63,13 @@ function searchZips(lat, lng) {
   var markerLocation = marker.getPosition();
   var latitudeS = markerLocation.lat();
   var longitudeS = markerLocation.lng();
-   
+        
+  // post an Ajax request to the server.
+  requestNearest( latitudeS, longitudeS );
+}
+
+// Makes a general request of the server
+function requestNearest( latitudeS, longitudeS ) {
   // determine how many results the user wanted (modifying the text box if there's invalid input)
   var k_results = $.trim($("#num_results").val());
   var isNumber = /^\d+$/.test(k_results);
@@ -66,21 +77,35 @@ function searchZips(lat, lng) {
   if( !isNumber || !numValid ) {
     k_results = 5; // Default to this many results if input not valid
   }
-       
+
   $("#num_results").val(k_results);
-     
+
   // create a parameter hash.
   var params = { lat: latitudeS, lon: longitudeS, k: k_results };
-        
-  // post an Ajax request to the server.
-  postAjaxRequest( params );
+
+  postAjaxRequest("nearest", params, function( locations ) {
+    // create a new info window, open it, and extend 
+    // it from the current marker on the map.
+    attachInfoWindow( marker, 0, locations );
+  });
 }
 
+function requestLocation( zipCode ) {
+  postAjaxRequest("zip_to_pos", { zip: zipCode }, function( results ) {
+    if( results.length == 0 ) {
+      // No such ZIP
+      alert('Could not find Zip code -- sorry!');
+    } else {
+      // Found it!
+      searchZips(results[0].latitude, results[0].longitude);
+    }
+  });
+}
 
-function postAjaxRequest( params ) {
+function postAjaxRequest( apiMethod, params, successCallback ) {
   host = location.hostname;
   port = location.port;
-  serviceUrl = "http://" + host + ":" + port + "/nearest";
+  serviceUrl = "http://" + host + ":" + port + "/" + apiMethod;
 
   // initiate an Ajax request to the server and store the response in 'result'.
   $.ajax({
@@ -88,17 +113,10 @@ function postAjaxRequest( params ) {
     type: 'POST',
     dataType: 'json',
     data: params,
-
-    success: function( locations ) {
-                            
-      // create a new info window, open it, and extend 
-      // it from the current marker on the map.
-      attachInfoWindow( marker, 0, locations );
-
-    },
+    success: successCallback,
 
     error: function( xhr, txtStatus ) {
-      alert( "Something went wrong during API request to '/nearest'!  "
+      alert( "Something went wrong during API request to '/"+apiMethod+"'!  "
         + "This may be a cross-site request failure due to your browser's security policy.  "
         + "Check that the address " + host + " agrees with what is in your browser's URL bar.  "
         + "\n========\n"

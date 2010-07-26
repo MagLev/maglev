@@ -20,6 +20,30 @@ class Demo < Sinatra::Base
     erb :index
   end
 
+  post '/zip_to_pos' do
+    @zip = params[ :zip ].to_i
+
+    # Find the zip code (note: in a real-world scenario, you'd 
+    # probably want to use Maglev's indexing capabilities).
+    # TODO: Tree.find would be nicer, but is currently not used here
+    # (investigating an unusual issue with it).    
+    val = nil
+    TREE.each { |v|
+      val = v if v.zip.to_i == @zip
+    }
+    #TREE.find { |val| val.zip.to_i == @zip }
+
+    # We'll return an array, but it'll be empty if there was
+    # no result.  Otherwise, it contains just one hash with
+    # a few of the important fields we want to return/
+    @results = []
+    unless val.nil? then
+      @results << { :latitude => val.lat, :longitude => val.lon }
+    end
+    
+    @results.to_json
+  end
+
   post '/nearest' do
 
     # store the request parameters into instance variables.
@@ -51,5 +75,4 @@ class Demo < Sinatra::Base
     @results.to_json
 
   end
-
 end
