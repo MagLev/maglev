@@ -4,7 +4,7 @@
 
 == Unreleased changes
 
-* Fix Trac 768, 769, 770, 771
+* Fix Trac 768, 769, 770, 771, 772
 * Fix problems in Hash#delete, some optimizations in Hash.
 * Some speedup of eval.
 
