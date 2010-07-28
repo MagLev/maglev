@@ -16,10 +16,11 @@ h = { }
 k = Rack::Mount::Analysis::Splitting::Key.new(:path_info, 0, /\.|\// )
 
 h[k] = "posts"
-
-# h[:request_method] = /GET/
-
-p h
 v = h[k]
 
-raise "FAIL" if v.nil?
+raise "FAIL" unless v == "posts"
+h[:request_method] = /GET/
+
+v = h[k]
+raise "FAIL" unless v == "posts"
+true
