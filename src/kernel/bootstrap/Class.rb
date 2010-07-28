@@ -31,6 +31,23 @@ class Class
     c
   end
 
+  class_primitive_nobridge_env '__ruby_new_fixedivs&', '_rubyNew', ':instVars:do:'
+
+  # Define a new Class using fixed instance variables for the
+  # symbols listed in ivnames.  
+  # additional instance variables may be added dynamically as usual.
+  def self.new_fixed_instvars(super_cls, ivnames, &block)
+    # supported for env 1 only
+    # ivnames must be an Array of Symbols 
+    # used by the implementation of Struct 
+    unless super_cls._is_a?(Class)
+      raise TypeError, 'superclass arg must be a Class'
+    end
+    c = __ruby_new_fixedivs(super_cls, ivnames, &block)
+    super_cls.__ruby_inherited(c)
+    c
+  end
+
   # Allocate space for a new object of self's class.  The returned object
   # is an instance of self.
   primitive 'allocate', 'rubyBasicNew'    # init fixed instVars to remoteNil
