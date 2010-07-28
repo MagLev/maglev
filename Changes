@@ -4,10 +4,17 @@
 
 == Unreleased changes
 
+== Changes for 23913  2010-07-28
+
 * Fix Trac 768, 769, 770, 771, 772
 * Optimization - creating new Struct class uses fixed instVars where possible.
 * Fix problems in Hash#delete, some optimizations in Hash.
 * Some speedup of eval.
+* Added new Topaz commands: IMPLEMENTORS, STRINGS, STRINGSIC, SENDERS, HISTORY
+* Fixed failing Digest specs
+* Optimizes some Ruby String to Integer conversions
+* Fixes some problems with Rails routes
+* More optimizations and bugfixes in underlying GemStone 3.0 system
 
 == Changes for 23832  2010-07-16
 
