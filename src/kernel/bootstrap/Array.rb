@@ -1224,6 +1224,9 @@ class Array
     false
   end
 
+  primitive '__includes_identical', 'includesIdentical:'
+  primitive '__offset1_identical', 'indexOfIdentical:' # result is one-based
+
   def index(a1=MaglevUndefined, &block)  # added for 1.8.7
     if a1._equal?(MaglevUndefined)
       self.index(&block)
