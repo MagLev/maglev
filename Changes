@@ -5,6 +5,7 @@
 == Unreleased changes
 
 * Fix Trac 768, 769, 770, 771, 772
+* Optimization - creating new Struct class uses fixed instVars where possible.
 * Fix problems in Hash#delete, some optimizations in Hash.
 * Some speedup of eval.
 
