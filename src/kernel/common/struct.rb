@@ -119,19 +119,16 @@ class Struct
 
   def instance_variables
     # Hide the ivars used to store the struct fields
-    # assume instance_variables is not a frequentl used method
-    #  and compose self.instvar_names from self.__attrs 
+    # Struct inherits no instVars from it's super classes
+    names = super()
     attrs = self.__attrs
-    lim = attrs.__size 
-    iv_names = Array.new(lim >> 1)
-    n = 0
-    idx = 0
-    while n < lim
-      iv_names[idx] = attrs[n + 1] 
-      idx += 1
-      n += 2
-    end
-    super() - iv_names
+    num_members = attrs.__size >> 1 
+    num_ivs = names.__size 
+    if num_ivs <= num_members
+      []
+    else
+      names[num_members, num_ivs - num_members]
+    end  
   end
 
   def initialize(*args)
