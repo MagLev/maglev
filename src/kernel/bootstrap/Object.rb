@@ -132,7 +132,7 @@ class Object
   #   and last arg is envId
   # __perform are used by RubyParser and FFI::StructLayout
   primitive_nobridge '__perform_se', 'with:perform:env:'
-  primitive_nobridge '__perform__se', 'with:with:perform:env:'
+  primitive_nobridge '__perform__se', 'with:with:perform:env:'  # IR generator allows up to 5 colon args before the * arg .
 
   # redefinition of __perform_method disallowed after bootstrap,
   #  it is used by implementation of eval
@@ -450,7 +450,7 @@ class Object
     # no ArgumentError for both string and explicit block args yet ;
     #  passing implicit block_arg if no explicit block arg, so it can
     #  be put in the binding...
-    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    lex_path = self.__getRubyVcGlobal(0x32) # the __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
     # file=args[1] ; line=args[2] #  TODO, ignored for now
     string = Type.coerce_to(str, String, :to_str)
@@ -566,7 +566,10 @@ class Object
   end
   #  cannot make singleton_method_removed private yet
 
-  # TODO   singleton_method_removed
+  def singleton_method_undefined(a_symbol)
+   self
+  end
+  #  cannot make singleton_method_undefined private yet
 
   def tap(&block) # added for 1.8.7
     block.call(self)

@@ -11,7 +11,7 @@ class String
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
   class_primitive_nobridge '__new', 'new:'
- 
+
   def self.new(*args)
     # this version gets bridge methods
     len = args.__size
@@ -257,8 +257,6 @@ class String
       false
     end
   end
-
-  primitive 'hash' , 'hash'
 
   #    str =~ obj   => fixnum or nil
   #
@@ -532,7 +530,7 @@ class String
 
   alias concat <<
 
-  # def count(*args); end 
+  # def count(*args); end
   # arg to rubyCount: is expected to be an Array , so declare as 'count*'
   primitive 'count*', 'rubyCount:'
 
@@ -706,24 +704,31 @@ class String
 
   primitive 'eql?', '='
 
-  # Return an array of two elements: [an_int, a_string], where an_int is
+  # Return an array of three elements: [an_int, sign_string, a_string], where an_int is
   # base, unless self contains a base specifier (e.g., "0x", "0b", etc.),
   # in which case, an_int is the appropriate base.  a_string is self with
   # any base specifier removed.
   #
-  # "0x10" => [16, 10]
-  # "-0b1010".__extract_base     => [2, "-1010"]
-  # "-0b1010".__extract_base(16) => [2, "-1010"]
-  # "-1010".__extract_base(16)   => [16, "-1010"]
-  MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 }
-  MAGLEV_EXTRACT_BASE_TABLE.freeze
+  # "0x10".__extract_base => [16, "", 10]
+  # "-0b1010".__extract_base     => [2, "-", "1010"]
+  # "-0b1010".__extract_base(16) => [2, "-", "1010"]
+  # "-1010".__extract_base(16)   => [16, "-", "1010"]
+  # MAGLEV_EXTRACT_BASE_TABLE defined in String1.rb
 
   def __extract_base(base)
     # for 1.8.7,  caller responsible for delete underscores and strip
     self =~ /^([+-]?)(0[bdox]?)?(.*)/i
     dtwo = $2
-    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo.downcase] unless dtwo._equal?(nil)
-    [ base, "#{$1}#{$3}" ]
+    base = MAGLEV_EXTRACT_BASE_TABLE[ dtwo ] unless dtwo._equal?(nil)
+    [ base, $1, $3 ]  # result is [ baseFixnum , signString, magnitudeString ]
+  end
+
+  def _gsub_copyfrom_to(from, match_start)
+    to = match_start # match_start is zero based
+    if to > (sz = self.__size)
+      to = sz
+    end
+    self.__copyfrom_to( from + 1 , to )
   end
 
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
@@ -747,30 +752,33 @@ class String
   #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
-
-  def _gsub_copyfrom_to(from, match_start)
-    to = match_start # match_start is zero based
-    if to > (sz = self.__size)
-      to = sz
-    end
-    self.__copyfrom_to( from + 1 , to )
+  def gsub(regex, str)
+    _gsub_internal(regex, str)[0]
   end
 
-  def gsub(regex, str)
+  #-- Returns an array of [newvalue, modified], where modified is true if a
+  # substitution was performed.  The old gsub! code tried to compare self
+  # == gsub(...) to see is a substitution was performed, but that returned
+  # incorrect results for something like "replace the last 's' with an 's'"
+  # (which breaks Rails routing...)
+  #++
+  def _gsub_internal(regex, str)
+    modified = false
     str = Type.coerce_to(str, String, :to_str)
     out = self.class.__alloc
     start = 0
     pat = self.__get_pattern(regex, true)
     last_match = nil
     pat.__each_match(self) do |match|
+      modified = true
       last_match = match
       out << self._gsub_copyfrom_to(start, match.begin(0))
       out << str.__to_sub_replacement(match)
       start = match.end(0)
     end
     out << self.__copyfrom_to(start + 1, self.__size)
-    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
-    out
+    last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
+    [out, modified]
   end
 
   # From Rubinius
@@ -855,12 +863,11 @@ class String
   end
 
   def gsub!(regex, str)
-    # From Rubinius
-    nval = gsub(regex, str)
-    if self == nval
+    result = _gsub_internal(regex, str)
+    unless result[1]
       nil
     else
-      replace(nval)  # replace detects frozen
+      replace(result[0])  # replace detects frozen
     end
   end
 
@@ -899,6 +906,33 @@ class String
     str.strip
   end
 
+  def __delete_underscore
+    str = self
+    idx = str.__indexOfByte( ?_ , 1 )
+    unless idx._equal?(0)
+      str = str.delete('_')
+    end
+    str
+  end
+
+  def __zreplace_first_double_underscore
+    idx = 0
+    dest_idx = nil
+    lim = self.__size
+    ch = self.__at(idx)
+    while idx < lim
+      nxt = self.__at(idx + 1)
+      if ch._equal?( ?_ ) && nxt._equal?( ?_ )
+        str = self.dup
+        str[idx] = ?Z
+        return str
+      end
+      idx += 1
+      ch = nxt
+    end
+    self
+  end
+
   def __delete_single_underscores_strip
     str = self.dup
     idx = 0
@@ -931,23 +965,17 @@ class String
     str.strip
   end
 
-
-  def __delete_underscore
-    str = self
-    idx = str.__indexOfByte( ?_ , 1 )
-    unless idx._equal?(0)
-      str = str.delete('_')
-    end
-    str
-  end
-
   def hex
     # Because 0b1 is a proper hex number, rather than the binary number 1,
     # we repeat code here and tweak for hex.  Only 0X and 0x should be removed.
-
     s = self.__delete_single_underscores_strip  # for 1.8.7
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
-    Integer.__from_string( "16r#{$1}#{$3}" )
+    sign_str = $1
+    num = Integer.__from_string_radix( $3 , 16)
+    if sign_str[0]._equal?( ?- )
+      num = num * -1
+    end
+    num
   end
 
   def include?(item)
@@ -1094,14 +1122,20 @@ class String
   # MNI: next!
 
   def oct
-    str = self.__delete_single_underscores_strip  # for 1.8.7
+    str = self.__zreplace_first_double_underscore.strip  # for 1.8.7
     arr = str.__extract_base(8)
     base = arr.__at(0)
-    str = arr.__at(1)
-    s = base.to_s
-    s << ?r
-    s << str
-    Integer.__from_string(s)
+    sign_str = arr.__at(1)
+    body = arr.__at(2)
+    first_ch = body.__at(0)
+    if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
+      return 0  # redundant sign character is not an octal digit
+    end
+    num = Integer.__from_string_radix(body, base)
+    if sign_str[0]._equal?( ?- )
+      num = num * -1
+    end
+    num
   end
 
   def partition(pattern)  # added for 1.8.7
@@ -1790,9 +1824,7 @@ class String
         end
         str = self.__at(2, self.__size - 2)
       end
-      radix_str = '10r'   # needed for ruby to_i semantics of 'abc'.to_i
-      radix_str << str.__delete_underscore_strip
-      Integer.__from_string(radix_str)
+      Integer.__from_string_radix(str.strip, 10)
     else
       raise ArgumentError, "illegal radix #{base}" if base < 0 || base == 1 || base > 36
       exp_prefix = nil
@@ -1823,19 +1855,23 @@ class String
     if check && self.__at('__')._not_equal?(nil)
       raise ArgumentError, "__ in string, in to_inum"
     end
-    str = self.__delete_underscore_strip
+    str = self.strip
+    sign_str = nil
     if base._equal?(0)
       arr = str.__extract_base(10)
       base = arr.__at(0)
-      str = arr.__at(1)
-    end
-    if check
-      str = str.downcase
+      sign_str = arr.__at(1)
+      str = arr.__at(2)
+      s = str
+    else
       s = str
       first_ch = s.__at(0)
       if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
         s = s.__at(1, s.__size - 1)
       end
+    end
+    if check
+      s = s.downcase.__delete_underscore
       bad = false
       if base._equal?(10)
         bad =  s =~ /[^0-9]/
@@ -1852,10 +1888,11 @@ class String
         raise ArgumentError, "to_inum, illegal character for base #{base} in #{self.inspect}"
       end
     end
-    s = base.to_s
-    s << ?r
-    s << str
-    Integer.__from_string(s)
+    num = Integer.__from_string_radix(str, base)
+    if sign_str._not_equal?(nil) && sign_str[0]._equal?( ?- )
+      num = num * -1
+    end
+    num
   end
 
   # to_a inherited from Enumerable,  uses each

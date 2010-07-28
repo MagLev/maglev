@@ -1,9 +1,6 @@
 require 'digest'  # lib/ruby/1.8/digest.rb
 
-# TODO: Can we rip out the EVP layer and only use HMAC instead (via hmac.rb)?
-
 module OpenSSL
-
   #--
   # This class should wrap a struct EVP_MD_CTX_create()
   # and call EVP_MD_CTX_destroy() on the context
@@ -26,7 +23,7 @@ module OpenSSL
        "SHA224", "SHA256", "SHA384", "SHA512" ]
 
     def self.digest(name, data)
-        super(data, name)
+      super(data, name)
     end
 
     # call-seq:
@@ -42,9 +39,7 @@ module OpenSSL
     #
     def initialize(digest_name, data=nil)
       @name = digest_name
-      @ctx = Digest.ossl_digest_alloc
-      message_digest = OpenSSL::LibCrypto.EVP_get_digestbyname(digest_name)
-      OpenSSL::LibCrypto.EVP_DigestInit_ex(@ctx, message_digest, nil)
+      @ctx = OpenSSL::LibCrypto.evp_md_ctx_for_digest(digest_name)
       self.update(data) unless data.nil?
     end
 
@@ -55,8 +50,7 @@ module OpenSSL
     # digest type.  All accummulated data from previous calls to #update is
     # erased.
     def reset
-      md = @ctx.md
-      OpenSSL::LibCrypto.EVP_DigestInit_ex(@ctx, md, nil)
+      @ctx.reset
       self
     end
 
@@ -67,8 +61,7 @@ module OpenSSL
     # called multiple times to accumulate the data.  Returns self.
     def update(string)
       string_v = Maglev::RubyUtils.rb_string_value(string)
-      string_ptr = FFI::MemoryPointer.from_string(string_v)
-      OpenSSL::LibCrypto.EVP_DigestUpdate(@ctx, string_ptr, string_v.length)
+      @ctx.update(string_v)
       self
     end
     alias_method :<<, :update
@@ -80,8 +73,41 @@ module OpenSSL
       @ctx.digest_length
     end
 
+    # call-seq:
+    #     digest_obj.digest -> string
+    #     digest_obj.digest(string) -> string
+    #
+    # If none is given, returns the resulting hash value of the digest,
+    # keeping the digest's state (i.e., a non-destructive "peek" at the
+    # digest for the current data).
+    #
+    # If a _string_ is given, returns the hash value for the given
+    # _string_, resetting the digest to the initial state before and
+    # after the process.
+    def digest(string = MaglevUndefined)
+      if string.equal?(MaglevUndefined)
+        copy_ctx = @ctx.clone
+        value = copy_ctx.finish
+        copy_ctx.cleanup
+        value
+      else
+        reset
+        update(string)
+        value = finish
+        reset
+        value
+      end
+    end
+
     def block_length
-      raise NotImplementedError, "#{self.class.name}#block_length"
+      # Hack: The block_size field isn't getting initialized correctly by openssl!?
+      case self.class.name
+      when /MD5|256/
+        64
+      else
+        128
+      end
+      #@ctx.block_size
     end
 
     # Returns the name of the digest algorithm.
@@ -94,40 +120,16 @@ module OpenSSL
       @ctx.md
     end
 
-    # A +Proc+ that does finalization on message digest contexts.
-    #
-    # Note: MagLev finalizers get passed the object to be finalized, not
-    # the object id.
-    FINALIZER = Proc.new do |o|
-      OpenSSL::LibCrypto.EVP_MD_CTX_destroy(o)
-    end
-
-
     # call-seq:
     #   digest.finish -> digest_string
     #
     # This method produces the digest for all accumulated data since this
     # digest was initialized or last reset.
     def finish
-      d_len = self.digest_length
-      string_ptr = FFI::MemoryPointer.new(:char, d_len)
-      OpenSSL::LibCrypto.EVP_DigestFinal_ex(@ctx, string_ptr, nil)
-      string_ptr.read_string(d_len)
+      @ctx.finish
     end
 
     private
-
-    # Allocate and return an EVP_MD_CTX context.  Registers a finalizer to
-    # destroy the context.  Raises a RuntimeError if can't allocate the
-    # context.
-    def self.ossl_digest_alloc
-      cptr = OpenSSL::LibCrypto.EVP_MD_CTX_create
-      raise 'EVP_MD_CTX_create() failed' if cptr.null?
-      ctx = OpenSSL::LibCrypto::EVP_MD_CTX.new(cptr)
-
-      ObjectSpace.define_finalizer(ctx, FINALIZER)
-      ctx
-    end
 
     # Get a digest given a string or a context.
     # E.g., Digest.get_digest_ptr('SHA1'),

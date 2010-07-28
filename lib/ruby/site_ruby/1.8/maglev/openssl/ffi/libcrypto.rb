@@ -10,6 +10,36 @@ module OpenSSL
 
     ffi_lib "#{ENV['GEMSTONE']}/lib/libcrypto"
 
+    # Creates and initializes a new <tt>EVP_MD_CTX</tt> struct for
+    # <tt>digest_name</tt>, which should be one of the recognized digest
+    # formats, e.g., "SHA1", "MD5", "SHA512".
+    def self.evp_md_ctx_for_digest(digest_name)
+      ctx = digest_alloc
+      message_digest = OpenSSL::LibCrypto.EVP_get_digestbyname(digest_name)
+      OpenSSL::LibCrypto.EVP_DigestInit_ex(ctx, message_digest, nil)
+      ctx
+    end
+
+    # A +Proc+ that does finalization on message digest contexts.
+    #
+    # Note: MagLev finalizers get passed the object to be finalized, not
+    # the object id.
+    FINALIZER = Proc.new do |o|
+      OpenSSL::LibCrypto.EVP_MD_CTX_destroy(o)
+    end
+
+    # Allocate, initialize and return an EVP_MD_CTX context.  Registers a
+    # finalizer to destroy the context.  Raises a RuntimeError if can't
+    # allocate the context.
+    def self.digest_alloc
+      cptr = OpenSSL::LibCrypto.EVP_MD_CTX_create
+      raise 'EVP_MD_CTX_create() failed' if cptr.null?
+      ctx = OpenSSL::LibCrypto::EVP_MD_CTX.new(cptr)
+      
+      ObjectSpace.define_finalizer(ctx, FINALIZER)
+      ctx
+    end
+
     # Maximum size (in bytes) of a message digest across all implementations
     # supported by libcrypto.
     EVP_MAX_MD_SIZE = 64
@@ -50,7 +80,7 @@ module OpenSSL
              :cleanup_func,        :pointer,
              :sign_func,           :pointer,
              :verify_func,         :pointer,
-             :required_pkey_type, [ :char, 5 ],
+             :required_pkey_type,  [:char, 5],
              :block_size,          :int,
              :ctx_size,            :int)
 
@@ -58,11 +88,16 @@ module OpenSSL
       def md_size
         self[:md_size]
       end
+
+      # Return the block size for the current message digest
+      def block_size
+        self[:block_size]
+      end
     end
 
     # Wraps the <tt>EVP_MD_CTX</tt> struct that holds the message digest
-    # information for a digest object.
-    #
+    # information for a digest object.  Provides many of the interface
+    # functions for a +Digest+.
     #--
     # struct env_md_ctx_st
     #   {
@@ -80,14 +115,81 @@ module OpenSSL
       # Return the message digest pointer.  Equivalent to
       # <tt>EVP_MD_CTX_md(ctx)</tt>.
 
+      # Create, initialize and return a new EVP_MD_CTX
+      def self.new_initialized_ctx
+        ctx = new
+        LibCrypto::EVP_MD_CTX_init(ctx)
+        ctx
+      end
+
+      def initialize(*args)
+        super
+        @valid = true
+      end
+
       # Return the number of bytes long the current digest is.
       def digest_length
+        check_valid
         md.md_size
+      end
+
+      # Return the block size for the message digest
+      def block_size
+        check_valid
+        md.block_size
       end
 
       # Return the EVP_MD struct used by receiver.
       def md
-        EVP_MD.new(self[:digest])
+        check_valid
+        @md ||= EVP_MD.new(self[:digest])
+        @md
+      end
+
+      # Implement <tt>Digest#reset</tt>.
+      # Reset the digest by calling <tt>EVP_DigestInit_ex</tt>, preserving
+      # the message digest type.  Returns +self+.
+      def reset
+        check_valid
+        OpenSSL::LibCrypto.EVP_DigestInit_ex(self, self.md, nil)
+        self
+      end
+
+      def clone
+        check_valid
+        klone = OpenSSL::LibCrypto::EVP_MD_CTX.new_initialized_ctx
+        OpenSSL::LibCrypto.EVP_MD_CTX_copy_ex(klone, self)
+        klone
+      end
+
+      # Implement <tt>Digest#update</tt>.  Adds +string+ to the digested
+      # data. Returns +self+.
+      def update(string)
+        check_valid
+        string_ptr = FFI::MemoryPointer.from_string(string)
+        OpenSSL::LibCrypto.EVP_DigestUpdate(self, string_ptr, string.length)
+        self
+      end
+
+      # Implement <tt>Digest#finish</tt>.  Returns the digest string
+      def finish
+        check_valid
+        d_len = self.md.md_size
+        string_ptr = FFI::MemoryPointer.new(:char, d_len)
+        OpenSSL::LibCrypto.EVP_DigestFinal_ex(self, string_ptr, nil)
+        string_ptr.read_string(d_len)
+      end
+
+      # Calls EVP_MD_CTX_cleanup on self.  Illegal to use after this is called.
+      def cleanup
+        check_valid
+        OpenSSL::LibCrypto.EVP_MD_CTX_cleanup(self)
+        @valid = false
+      end
+
+      private
+      def check_valid
+        raise "Method called after cleanup on #{self.class.name}" unless @valid
       end
     end
 
@@ -98,6 +200,29 @@ module OpenSSL
     # Loads all of the digests known to the libopenssl and makes them
     # available.  Must be called before EVP_get_digestbyname etc.
     attach_function(:OpenSSL_add_all_digests, [], :void)
+
+    #--
+    # int EVP_MD_CTX_copy_ex(EVP_MD_CTX *out,const EVP_MD_CTX *in);
+    #++
+    # Used to copy the message digest state from in to out. This is useful
+    # if large amounts of data are to be hashed which only differ in the
+    # last few bytes. out must be initialized before calling this function.
+    # +libcrypto+ uses this to implement non-destructive reads of current
+    # digest state.
+    attach_function(:EVP_MD_CTX_copy_ex, [:pointer, :pointer], :int)
+
+    #--
+    #  int EVP_MD_CTX_cleanup(EVP_MD_CTX *ctx);
+    #++
+    # EVP_MD_CTX_cleanup() cleans up digest context ctx, it should be
+    # called after a digest context is no longer needed.
+    attach_function(:EVP_MD_CTX_cleanup, [EVP_MD_CTX], :int)
+
+    #--
+    # void EVP_MD_CTX_init(EVP_MD_CTX *ctx);
+    #++
+    # Initializes the digest context
+    attach_function(:EVP_MD_CTX_init, [EVP_MD_CTX], :void)
 
     #--
     # const EVP_MD *EVP_get_digestbyname(const char *name)
@@ -242,7 +367,8 @@ module OpenSSL
     # previous versions of OpenSSL - failure to switch to HMAC_Init_ex() in
     # programs that expect it will cause them to stop working.
     #
-# TODO: make key a :string?
+    #--
+    # TODO: make key a :string?
     attach_function(:HMAC_Init_ex,
                     [:pointer, :pointer, :int, :pointer, :pointer], :int)
 
@@ -251,8 +377,10 @@ module OpenSSL
     #++
     # HMAC_Update() can be called repeatedly with chunks of the message to
     # be authenticated (len bytes at data).
-# TODO: Try changing all the HMAC_CTX* fields from :pointer to HMAC_CTX
-# TODO: make data a :string
+    #
+    #--
+    # TODO: Try changing all the HMAC_CTX* fields from :pointer to HMAC_CTX
+    # TODO: make data a :string
     attach_function(:HMAC_Update, [:pointer, :string, :int], :int)
 
     #--

@@ -316,15 +316,15 @@ class Hash
       k = self.__at(kofs)
       if k._not_equal?(RemoteNil)
         if key.eql?( k )
-    return v
+          return v
         end
       elsif v._isFixnum
         idx = v  # internal collision chain
         begin
-    if key.eql?( self.__at(idx) )
+          if key.eql?( self.__at(idx) )
             return self.__at(idx + 1)
           end
-    idx = self.__at(idx + 2)
+          idx = self.__at(idx + 2)
         end while idx._isFixnum
       else
         v = v.__bucket_at(key, kh) # a collision bucket
@@ -388,7 +388,9 @@ class Hash
   end
 
   primitive_nobridge '__at_put', '_atZ:put:'  # prim 860 , zero based arg
-      # auto grow for store of 1 to 3 past end
+      # auto grow up to 6 past end
+  primitive_nobridge '__at_put', '_atZ:putKey:value:'  # prim 892 , zero based arg
+      # auto grow up to 6 past end
 
   primitive '__varying_size', '_basicSize'
   primitive '__varying_size=', '_basicSize:'
@@ -413,21 +415,19 @@ class Hash
           # convert entry to collision chain or bucket
           empty_idx = self.__varying_size
           if empty_idx <= 2014
-            self.__at_put(empty_idx + 5, nil) # auto-grows
-            self.__at_put(empty_idx + 3,  key)
-            self.__at_put(empty_idx + 4, value)
-            self.__at_put(empty_idx + 2, empty_idx + 3)
-            self.__at_put(empty_idx + 0, k)
-            self.__at_put(empty_idx + 1, v)
-            self.__at_put(kofs,     RemoteNil )
-            self.__at_put(kofs + 1, empty_idx)
+            # store starting at empty_idx: k,v, empty_idx + 3, key, value, nil
+            #    nil is the chain terminator
+            self.__at_put(empty_idx + 4, value, nil)  # auto grows
+            self.__at_put(empty_idx + 2, empty_idx + 3, key)
+            self.__at_put(empty_idx + 0, k, v)
+            # store starting at kofs:  empty_idx, RemoteNil
+            self.__at_put(kofs,     RemoteNil, empty_idx )
           else
             bkt = Hash.__new( 7 )
             bkt.__parent=(self)
             bkt.__bucket_at_put(k, k.hash , v)
             bkt.__bucket_at_put(key, kh, value)
-            self.__at_put(kofs, RemoteNil)
-            self.__at_put(kofs + 1, bkt )
+            self.__at_put(kofs, RemoteNil, bkt)
           end
           delta = 1
         end
@@ -450,11 +450,10 @@ class Hash
         if empty_idx._equal?(nil)
           # did not find an empty coll chain entry
           empty_idx = self.__varying_size
+          self.__at_put(empty_idx + 2, nil) # auto-grow, chain terminator, fix 768
           self.__at_put(last_idx + 2, empty_idx)
         end
-        self.__at_put(empty_idx + 2, nil) # auto-grows
-        self.__at_put(empty_idx, key)
-        self.__at_put(empty_idx + 1, value)
+        self.__at_put(empty_idx, key, value )
         delta = 1
       else
         # a collision bucket
@@ -469,8 +468,7 @@ class Hash
       end
     else
       # empty entry in hash table
-      self.__at_put(kofs , key)
-      self.__at_put(kofs + 1, value)
+      self.__at_put(kofs , key, value)
       @_st_numElements = @_st_numElements + 1
     end
     value # return
@@ -492,14 +490,11 @@ class Hash
         else
           # convert entry to collision chain
           empty_idx = self.__varying_size
-    self.__at_put(empty_idx + 5, nil) # auto-grows
-    self.__at_put(empty_idx + 3,  key)
-    self.__at_put(empty_idx + 4, value)
-    self.__at_put(empty_idx + 2, empty_idx + 3)
-    self.__at_put(empty_idx + 0, k)
-    self.__at_put(empty_idx + 1, v)
-    self.__at_put(kofs,     RemoteNil )
-    self.__at_put(kofs + 1, empty_idx)
+          # store starting at empty_idx: k,v, empty_idx + 3, key, value, nil
+          self.__at_put(empty_idx + 4, value, nil )
+          self.__at_put(empty_idx + 2, empty_idx + 3, key)
+          self.__at_put(empty_idx + 0, k, v)
+          self.__at_put(kofs,     RemoteNil, empty_idx )
           return 1
         end
       elsif v._isFixnum
@@ -521,11 +516,10 @@ class Hash
         if empty_idx._equal?(nil)
           # did not find an empty coll chain entry
           empty_idx = self.__varying_size
+          self.__at_put(empty_idx + 2, nil) # auto-grow, chain terminator, fix 768
           self.__at_put(last_idx + 2, empty_idx)
         end
-        self.__at_put(empty_idx + 2, nil) # auto-grows
-        self.__at_put(empty_idx, key)
-        self.__at_put(empty_idx + 1, value)
+        self.__at_put(empty_idx, key, value)
       else
         raise 'Inconsistent Hash collision bucket'
         return 0
@@ -534,8 +528,7 @@ class Hash
       # @_st_numCollisions  not maintained in buckets
     else
       # empty entry in hash table
-      self.__at_put(kofs , key)
-      self.__at_put(kofs + 1, value)
+      self.__at_put(kofs , key, value)
       @_st_numElements = @_st_numElements + 1
     end
     return 1
@@ -550,33 +543,31 @@ class Hash
       k = self.__at(kofs)
       if k._not_equal?(RemoteNil)
         if key.eql?( k )
-          self.__at_put(kofs + 1 , RemoteNil)
-          self.__at_put(kofs + 1, RemoteNil)
+          self.__at_put(kofs, RemoteNil, RemoteNil)
           @_st_numElements = @_st_numElements - 1
           return v
         end
       elsif v._isFixnum
-  idx = v  # internal collision chain
-  begin
-    ck = self.__at(idx)
-    if key.eql?( ck )
-      v = self.__at(idx + 1)
-      self.__at_put(idx , RemoteNil)
-      self.__at_put(idx + 1, RemoteNil)
-      @_st_numElements = @_st_numElements - 1
-      @_st_numCollisions = @_st_numCollisions - 1
-      return v
-    end
-    idx = self.__at(idx + 2)
-  end while idx._isFixnum
+        idx = v  # internal collision chain
+        begin
+          ck = self.__at(idx)
+          if key.eql?( ck )
+            v = self.__at(idx + 1)
+            self.__at_put(idx , RemoteNil, RemoteNil)
+            @_st_numElements = @_st_numElements - 1
+            @_st_numCollisions = @_st_numCollisions - 1
+            return v
+          end
+          idx = self.__at(idx + 2)
+        end while idx._isFixnum
       else
-  # a collision bucket
-  val = v.__bucket_delete( key, kh )
-  if val._not_equal?(RemoteNil)
-    @_st_numElements = @_st_numElements - 1
-    @_st_numCollisions = @_st_numCollisions - 1
-  end
-  return val
+        # a collision bucket
+        val = v.__bucket_delete( key, kh )
+        if val._not_equal?(RemoteNil)
+          @_st_numElements = @_st_numElements - 1
+          @_st_numCollisions = @_st_numCollisions - 1
+        end
+      return val
       end
     end
     return RemoteNil # not found
@@ -589,8 +580,7 @@ class Hash
       k = self.__at(kofs)
       if k._not_equal?(RemoteNil)
         if key.eql?( k )
-          self.__at_put(kofs + 1 , RemoteNil)
-          self.__at_put(kofs + 1, RemoteNil)
+          self.__at_put(kofs, RemoteNil, RemoteNil)
           @_st_numElements = @_st_numElements - 1
           return v
         end
@@ -600,8 +590,7 @@ class Hash
           ck = self.__at(idx)
           if key.eql?( ck )
             v = self.__at(idx + 1)
-            self.__at_put(idx , RemoteNil)
-            self.__at_put(idx + 1, RemoteNil)
+            self.__at_put(idx , RemoteNil, RemoteNil)
             @_st_numElements = @_st_numElements - 1
             # @_st_numCollisions not maintained in buckets
             return v

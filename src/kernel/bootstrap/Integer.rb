@@ -352,6 +352,7 @@ class Integer
   # primitives added to support BigDecimal implementation
 
   class_primitive_nobridge '__from_string', 'fromString:'
+  class_primitive_nobridge '__from_string_radix', 'fromString:radix:'
 
   primitive_nobridge '__decimal_digits_length_approx', '_decimalDigitsLength:' 
     # argument is useApproximationBoolean , if true result may  be

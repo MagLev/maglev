@@ -8,6 +8,11 @@ test(dave.name,    "Dave",     "Struct A")
 test(dave.address, "123 Main", "Struct B")
 test(Struct.constants.include?("Customer"), true, "Struct C")
 
+h = Hash.new
+h[dave] = :myDave
+dave_b = h[dave]		# coverage for 772 without loading rack, rack-mount gems
+unless dave_b._equal?(:myDave ) ; raise 'fails'; end
+
 # Test creating anonymous struct
 X = Struct.new(:a, :b)
 x = X.new("A1", "B1")

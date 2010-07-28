@@ -285,7 +285,7 @@ class BigDecimal
       mant_str[0] = ch
       idx += 2 # skip the two chars 'd.'  
       mant_str << str[idx , exp_idx - idx]
-      digs = Integer.__from_string(mant_str)
+      digs = Integer.__from_string_radix(mant_str, 10)
       @digits = digs
       exp += 1 #  flt._as_string produced  d.dddEee , convert to 0.ddddEee for BigDecimal
       exp -= mant_str.length  #  so @digits is an Integer
@@ -370,14 +370,14 @@ class BigDecimal
 	  frlen = fend_idx + 1
 	end
 	frac_prefix_str = frac_str[0, frlen] # without trailing zeros
-	frac = i_cls.__from_string( frac_prefix_str )
+	frac = i_cls.__from_string_radix( frac_prefix_str , 10)
       end
       int_str = m[3]
       nd_int = int_str.length
       if nd_int._equal?(0) 
         int = 0
       elsif int_str[0]._equal?( ?0 )
-        int = i_cls.__from_string( int_str ) # leading zero digit
+        int = i_cls.__from_string_radix( int_str, 10 ) # leading zero digit
       else
         j = nd_int - 1
         if frac_str._equal?(nil)
@@ -387,10 +387,10 @@ class BigDecimal
             j -= 1
           end
         end
-        int = i_cls.__from_string( int_str[0, j+1] )
+        int = i_cls.__from_string_radix( int_str[0, j+1], 10 )
       end
       exp_str =  m[5]
-      expon +=  exp_str._equal?(nil) ? 0 : i_cls.__from_string(  exp_str )
+      expon +=  exp_str._equal?(nil) ? 0 : i_cls.__from_string_radix(  exp_str, 10 )
       if int == 0 && frac != 0   
         expon -= frlen # adjust for decimal point at rhs of internal digits
 	# adjust precision for number of leading zeros in fraction
