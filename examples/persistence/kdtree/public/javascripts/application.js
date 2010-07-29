@@ -35,10 +35,18 @@ function initialize() {
 
   // register a click event handler with our Map instance.
   google.maps.event.addListener( map, 'click', function(event) {
-     searchZips(event.latLng.lat(), event.latLng.lng());           
+     // Note: This click handler will get called when the searchZips()
+     // function is called back for our zip codes that are clickable
+     // (this is bad, since the user was not actually clicking on the 
+     // map).
+     // This would seem to be a weird bug/interaction with Google's event system,
+     // since it goes away if the zip link has no onClick() handler.
+     // In any case, the easy solution is checking for valid pixel 
+     // values -- the bad event passes negative x/y values.
+     if(event.pixel.x >= 0 && event.pixel.y >= 0) 
+       searchZips(event.latLng.lat(), event.latLng.lng());    
      return false;
    });
-
 }
 
 function searchZips(lat, lng) {
@@ -58,18 +66,19 @@ function searchZips(lat, lng) {
   
   // show our current location
   $("#location_display").text("Location: " + lat + ", " + lng);
-  
+        
+  // post an Ajax request to the server.
+  requestNearest( );
+}
+
+// Makes a request for all that is closest
+// the marker and displays it.
+function requestNearest( ) {
   // get the values for the parameter hash.
   var markerLocation = marker.getPosition();
   var latitudeS = markerLocation.lat();
   var longitudeS = markerLocation.lng();
-        
-  // post an Ajax request to the server.
-  requestNearest( latitudeS, longitudeS );
-}
 
-// Makes a general request of the server
-function requestNearest( latitudeS, longitudeS ) {
   // determine how many results the user wanted (modifying the text box if there's invalid input)
   var k_results = $.trim($("#num_results").val());
   var isNumber = /^\d+$/.test(k_results);
@@ -174,7 +183,6 @@ function attachInfoWindow( marker, number, locations ) {
   html += "</tbody> </table>";
 
   infoWindow = new google.maps.InfoWindow( { content: html, zIndex: number } );
-
   infoWindow.open( map, marker );
 }
 
