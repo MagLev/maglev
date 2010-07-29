@@ -35,14 +35,12 @@ function initialize() {
 
   // register a click event handler with our Map instance.
   google.maps.event.addListener( map, 'click', function(event) {
-     // Note: This click handler will get called when the searchZips()
-     // function is called back for our zip codes that are clickable
-     // (this is bad, since the user was not actually clicking on the 
-     // map).
-     // This would seem to be a weird bug/interaction with Google's event system,
-     // since it goes away if the zip link has no onClick() handler.
-     // In any case, the easy solution is checking for valid pixel 
-     // values -- the bad event passes negative x/y values.
+     // The condition here is to deal with a google maps API update
+     // on 2010-07-29.  A click event gets generated if you click
+     // on a zip code link (which invokves searchZips()).  As
+     // it turns out, this event contains obviously incorrect
+     // pixel x/y coordinates that are negative, so we can just
+     // ignore it.
      if(event.pixel.x >= 0 && event.pixel.y >= 0) 
        searchZips(event.latLng.lat(), event.latLng.lng());    
      return false;
