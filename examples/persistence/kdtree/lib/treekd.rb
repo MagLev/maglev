@@ -187,9 +187,19 @@ module Collections
     # Does an in-order (sorted) traversal of the tree, but yields only the
     # values
     def each(&block)
+      puts "======== #{@value} ========"
+      puts "TreeKD each: left..."
+      puts " (has left) " unless @left.nil?
       @left.each(&block) unless @left.nil?
+      puts "TreeKD each: value..."
+      puts " (has val) " unless @value.nil?
+      puts " valtest1" if @value 
+      puts " valtest2: #{block}"
       block.call(@value) if @value and block
+      puts "TreeKD each: right.."
+      puts " (has right) " unless @right.nil?
       @right.each(&block) unless @right.nil?
+      puts "TreeKD each: done."
     end
 
     # Does an pre-order traversal of the tree, yields the whole node

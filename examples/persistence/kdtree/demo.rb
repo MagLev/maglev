@@ -27,11 +27,7 @@ class Demo < Sinatra::Base
     # probably want to use Maglev's indexing capabilities).
     # TODO: Tree.find would be nicer, but is currently not used here
     # (investigating an unusual issue with it).    
-    val = nil
-    TREE.each { |v|
-      val = v if v.zip.to_i == @zip
-    }
-    #TREE.find { |val| val.zip.to_i == @zip }
+    val = TREE.find { |val| val.zip.to_i == @zip }
 
     # We'll return an array, but it'll be empty if there was
     # no result.  Otherwise, it contains just one hash with
