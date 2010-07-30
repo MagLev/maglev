@@ -292,19 +292,6 @@ class Module
     __method_defined(name, -1)
   end
 
-  def method_added(a_symbol)
-    # invoked from code in .mcz when a method is compiled into receiver
-    # overrides the bootstrap implementation in Behavior_ruby.gs
-    # note also implementation of method_added in Module
-    self.singleton_method_added(a_symbol)
-  end
-
-  def method_removed(a_symbol)
-    # invoked from code in .mcz when a method is removed from receiver
-    # note also implementation of method_removed in Module
-    self.singleton_method_removed(a_symbol)
-  end
-
   def module_eval(*args, &block_arg)
     # should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
@@ -320,7 +307,7 @@ class Module
     # no ArgumentError for both string and explicit block args yet ;
     #  passing implicit block_arg if no explicit block arg, so it can
     #  be put in the binding...
-    lex_path = self.__getRubyVcGlobal(0x32) # synthesized by AST to IR code in .mcz
+    lex_path = self.__getRubyVcGlobal(0x32) # __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
     # file=args[1] # TODO
     # line=args[2] # TODO
@@ -416,19 +403,19 @@ class Module
 
   primitive_nobridge '__set_persistable', '_setPersistable'
 
+  # Invoked as a callback when a method is added to the receiver
   def method_added(a_symbol)
-    # invoked from code in .mcz when a method is compiled into receiver
-    # overrides the bootstrap implementation in Behavior_ruby.gs
     nil
   end
 
+  # Invoked as a callback when a method is removed from the receiver
   def method_removed(a_symbol)
-    # invoked from code in .mcz when a method is removed from receiver
     nil
   end
 
   # Invoked as a callback when a method is undefined in the receiver
   def method_undefined(symbol)
+    nil
   end
 
   primitive_nobridge '__module_eval_string', '_moduleEvalString:with:binding:'

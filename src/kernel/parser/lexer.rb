@@ -295,7 +295,7 @@ class RubyLexer
   end # ]
 
   def int_base10( s_matched , sign )
-    @yacc_value = s_matched.to_i(10) * sign
+    @yacc_value = Integer.__from_string_radix(s_matched, 10) * sign
     return :tINTEGER
   end
 
@@ -304,7 +304,7 @@ class RubyLexer
       rb_compile_error "Invalid numeric "
     end
     str = s_matched[ 2, s_matched.size - 2 ]  # skip leading 0x 0b 0d etc
-    v = str.to_i(base) * sign
+    v = Integer.__from_string_radix(str, base) * sign
     @yacc_value = v
     return :tINTEGER
   end

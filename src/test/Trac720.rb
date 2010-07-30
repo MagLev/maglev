@@ -123,6 +123,7 @@ rescue
   $dd << 'C'
 end
 puts "$dd = #{$dd.inspect}"
+ddx = $dd
 unless $dd == ["A", "B", "C"] ; raise 'failed4'; end
 
 true

@@ -106,7 +106,6 @@ module Psych
           @emitter.scalar member.to_s, nil, nil, true, false, Nodes::Scalar::ANY
           accept o[member]
         end
-
         dump_ivars o
 
         @emitter.end_mapping

@@ -188,13 +188,13 @@ module Collections
     # values
     def each(&block)
       @left.each(&block) unless @left.nil?
-      block.call(@value) if @value and block
+      block.call(@value) if @value and block_given?
       @right.each(&block) unless @right.nil?
     end
 
     # Does an pre-order traversal of the tree, yields the whole node
     def pre_order(&block)
-      block.call(self) if block
+      block.call(self) if block_given?
       @left.pre_order(&block) unless @left.nil?
       @right.pre_order(&block) unless @right.nil?
     end
@@ -203,13 +203,13 @@ module Collections
     def post_order(&block)
       @left.post_order(&block) unless @left.nil?
       @right.post_order(&block) unless @right.nil?
-      block.call(self) if block
+      block.call(self) if block_given?
     end
 
     # Does an in-order traversal of the tree, yields the whole node
     def in_order(&block)
       @left.in_order(&block) unless @left.nil?
-      block.call(self) if block
+      block.call(self) if block_given?
       @right.in_order(&block) unless @right.nil?
     end
 

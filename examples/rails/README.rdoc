@@ -12,12 +12,26 @@ Rails Gems and other gems.
      $ cd $MAGLEV_HOME
      $ rake maglev:start      # or: $MAGLEV_HOME/bin/maglev start
 
-2. Install Rails, patch it and install other gems
+2. Install Rails, patch it and install other gems and set ENVIRONMENT:
      $ cd $MAGLEV_HOME/examples/rails
      $ rake init
 
+   Set ENVIRONMENT.  ActiveSupport and the MySQL driver both require
+   MagLev's <tt>-MallIvsDynamic</tt> option (i.e., most of the subsequent
+   steps):
+       $ export MAGLEV_OPTS="-MallIvsDynamic"
+
+3. Setup the Database.  MagLev currently supports MySQL, so:
+   A. Ensure mysql is running
+   B. Ensure <tt>myapp/config/database.yml</tt> is configured for your
+      system (user, password, etc.)
+   C. Create the db
+       $ cd $MAGLEV_HOME/examples/rails/myapp
+       $ $MAGLEV_HOME/bin/rake db:create
+
 3. Run the app:
-     $ rake app
+     $ cd $MAGLEV_HOME/examples/rails/myapp
+     $ $MAGLEV_HOME/bin/rails server
    Then hit http://localhost:3000/
 
 == Rails on MagLev: Status
@@ -25,12 +39,10 @@ Rails Gems and other gems.
 There is still a lot of work before Rails on MagLev is fully cooked.  You
 should expect some spurious error messages and errors (especially in
 logging) that do not affect page loading.  We fully expect there to be
-other bugs as pages get more complex and as you add more gems use other
+other bugs as pages get more complex and as you add more gems and use other
 features.
 
-=== ActiveRecord
-
-ActiveRecord now seems to work well enough that we no longer patch it.
+The most notable problem is that routes are sometimes broken (defaults).
 
 === Slow start up
 
@@ -42,7 +54,7 @@ page.  The first pause is loading and compiling all the rails code:
   [2010-06-24 12:54:37] INFO  ruby 1.8.7 (2010-02-26) [x86_64-darwin]
   [2010-06-24 12:54:37] INFO  WEBrick::HTTPServer#start: pid=45167 port=3000
 
-The second and thirs pauses occur when you hit the first static and first
+The second and third pauses occur when you hit the first static and first
 dynamic page.  All of these pauses are due to MagLev parsing and compiling
 Ruby code.  Subsequent dynamic page loads should be much quicker, as MagLev
 only has to compile the code once.  If you are running in development mode,
@@ -50,8 +62,8 @@ you'll see a couple of files get reloaded for every page, but that should
 disappear if you run in production mode.
 
 If you are interested in seeing the progress of file loads, use the
-<tt>-MallIvsDynamic</tt> flag to <tt>maglev-ruby</tt> (you can set it on
-the command line, or in the <tt>MAGLEV_OPTS</tt> env variable).
+<tt>-MtraceLoad</tt> flag to <tt>maglev-ruby</tt> (you can set it on
+the command line, or add it to the <tt>MAGLEV_OPTS</tt> env variable).
 
 == Changes to +myapp+
 
@@ -61,8 +73,8 @@ MagLev:
 * The following command was used to create +myapp+:
     $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
 
-* Edited <tt>myapp/Gemfile</tt> to use ruby-mysql gem.  Change <tt>gem
-  'mysql'</tt> to <tt>gem 'ruby-mysql', :require => 'mysql'</tt>.
+* Edited <tt>myapp/Gemfile</tt> to use <tt>ruby-mysql</tt> gem.  Change
+  <tt>gem 'mysql'</tt> to <tt>gem 'ruby-mysql', :require => 'mysql'</tt>.
 
 * <tt>myapp/config/boot.rb</tt> was edited to work around {Trac
   757}[https://magtrac.gemstone.com/ticket/757]. See the track report for
@@ -70,9 +82,9 @@ MagLev:
 
 * In order to get the "About your application's environment" link on the
   index page to work, there has to be a route defined in
-  myapp/config/routes.rb.  The demo app has a route added, so the sample
-  URL should work. See
-  {Trac 766}[https://magtrac.gemstone.com/ticket/766].
+  <tt>myapp/config/routes.rb</tt>.  The demo app has a route added, so the
+  sample URL should work. See {Trac
+  766}[https://magtrac.gemstone.com/ticket/766].
 
 === Changes to Rails Code
 
@@ -90,29 +102,36 @@ discussion of <tt>-MallIvsDynamic</tt>.
 === Progress towards full Rails Lifecycle
 
 The following steps are loosely based on the {Rails Blog
-Tutorial}[http://guides.rails.info/getting_started.html], and are what we
-are using to drive forward on getting rails working.
+Tutorial}[http://guides.rails.info/getting_started.html]. We are using
+these steps to drive forward on getting Rails working. Assuming you've
+patched ActiveSupport as described above, and you apply the patch to the
+generated app (as described in step 2), then this is the current status:
 
-1. Install rails: <tt>maglev-gem install rails --pre</tt> (works with patch)
+1. Install rails: <tt>maglev-gem install rails --pre</tt> (works)
 2. Create new rails app: <tt>$MAGLEV_HOME/bin/rails new blog</tt> (works)
 3. Run +bundle+: <tt>$MAGLEV_HOME/bin/bundle install</tt> (works)
 4. Create the database: <tt>$MAGLEV_HOME/bin/rake db:create</tt> (works)
 5. Start server: <tt>$MAGLEV_HOME/bin/rails server</tt> (works)
 6. Load a static page: http://localhost:3000/ (works)
-7. Load a dynamic page: http://localhost:3000/rails/info/properties (works
-   with patch)
+7. Load a dynamic page: http://localhost:3000/rails/info/properties (works;
+   but needs at least one route in <tt>routes.rb</tt>)
 8. Generate new controller: <tt>$MAGLEV_HOME/bin/rails generate controller
-   home index</tt> (works with workaround)
-9. Running a migrations: <tt>$MAGLEV_HOME/bin/rake db:migrate</tt>
-   (untested)
+   home index</tt> (works)
+9. Running a migrations: <tt>$MAGLEV_HOME/bin/rake db:migrate</tt> (works)
 10. Running the rails console: <tt>$MAGLEV_HOME/bin/rails console</tt>
     (untested)
+11. Run application unit tests (untested)
 
-The following sections explain details and current status for each step above.
+Once the basic life-cycle works, we plan on getting the Rails Specs to
+pass.
 
-==== 1. Install rails: Works with patch.
+Detailed explanations of each step follow.
 
-Rails installs from gems, but needs one patch.  To install the rails gems,
+==== 1. Install rails: Works
+
+Rails installs from gems, but needs one patch.
+
+To install the rails gems,
 you can run <tt>rake init</tt>, or do the following:
 
 Install non-rails gems:
@@ -152,27 +171,37 @@ Install rails gems:
   Successfully installed rails-3.0.0.beta4
   15 gems installed
 
-Patch ActiveSupport:
-
+To patch ActiveSupport, you can either do:
+  $ rake patch:activesupport
+or:
   $ cd $MAGLEV_HOME/lib/maglev/gems/1.8/gems/activesupport-3.0.0.beta4
   $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_1.diff
   patching file lib/active_support/core_ext/class/subclasses.rb
 
-==== 2. Create new rails app: Works, but must patch app files.
+The patch changes the manner in which all subclasses are found.  MagLev
+does not support <tt>ObjectSpace#each_object</tt> (since objects may be
+persisted, there can be hundres of millions of them...).  This patch allows
+finding all subclasses currently loaded in a VM.  The ActiveSupport file
+already has patches for Rubinius and JRuby.  We expect to submit this patch
+to Rails.
+
+==== 2. Create new rails app: Works, but then must patch app files.
 
 Run:
   $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
-  $ rake patch:app[myapp]
-  <edit myapp/Gemfile>
 
 The new app is correctly built, but there are two items that need to be
 upated in the new app.
 
-1. You should edit <tt>myapp/Gemfile</tt> and change the <tt>gem
-   'mysql'</tt> line to be:
+1. Copy the patched version of <tt>boot.rb</tt> into your application.
+   This is a work-around for  {Trac
+   757}[https://magtrac.gemstone.com/ticket/757].
+       $ cp $MAGLEV_HOME/examples/rails/patches/app_config_boot_Trac757.rb myapp/config/boot.rb
+
+2. Edit <tt>myapp/Gemfile</tt> and change:
+     gem 'mysql'
+   to:
      gem 'ruby-mysql', :require => 'mysql'
-2. Workaround for  {Trac 757}[https://magtrac.gemstone.com/ticket/757]:
-   Run "rake patch:app[myapp]" to patch <tt>myapp/config/boot.rb</tt>.
 
 ==== 3. Run +bundle+: Works.
 
@@ -215,22 +244,35 @@ Simple dynamic pages work fine under MagLev.  There is a slight problem
 with the default rails info routes, if no routes are defined in
 <tt>route.rb</tt>.  Workaround is to add some route or other.
 
-==== 8. Generate new controller: Works with patch.
+==== 8. Generate new controllers and scaffolding: Works (but resource
+routes break routing)
 
-<tt>myapp/config/boot.rb</tt> has been patched to work around
-{Trac 757}[https://magtrac.gemstone.com/ticket/757].   With the patch, you
-can run:
+With the patch <tt>boot.rb</tt> patch described above, you can run:
   $ $MAGLEV_HOME/bin/rails generate controller home index
-
 and generate the expected files.
 
-==== 9. Running a migrations: Untested.
+If you remove <tt>public/index.html</tt> and add <tt>root :to =>
+"home#index"</tt> into <tt>config/routes.rb</tt>, you should be able to hit
+http://localhost:3000/ and see <tt>home#index</tt>
 
-Running <tt>$MAGLEV_HOME/bin/rake db:migrate</tt> is untested.
+You can also create scaffolding:
+  $ $MAGLEV_HOME/bin/rails generate scaffold Post name:string title:string content:text
+Unfortunately, this adds <tt>resources :posts</tt> to <tt>routes.rb</tt>,
+and that seems to break the other routes...
+
+==== 9. Running a migrations: Works.
+
+Assuming you've generated the scaffolding in the previous step, you can do:
+  $ $MAGLEV_HOME/bin/rake db:migrate
+which seems to work.
 
 ==== 10. Running the rails console: untested
 
 Running <tt>$MAGLEV_HOME/bin/rails console</tt> is untested.
+
+==== 11. Running the tests: untested
+
+Running the application's unit tests has not yet been tested.
 
 == Alternate rails patch option (deprecated)
 

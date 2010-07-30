@@ -38,8 +38,7 @@ ifdef(`PARSER_DEBUG', `
 
 	i = act * -3
 	len       = creduce_table[i]
-	# method_id = creduce_table[i+2]
-	sel = creduce_table[i+2]
+	sel = creduce_table[i+2]  # get method_id 
 
 	if sel._equal?( :_reduce_noneOne )
 	  # optimization - no net change to vstack
@@ -72,17 +71,12 @@ ifdef(`PARSER_DEBUG', `
 	  @racc_read_next = cracc_read_next # uncache   
 ifdef(`PARSER_DEBUG', `
 	  if @mydebug 
-            Kernel.print(" #{sel} ") 
-            if sel._equal?( :"_reduce_none::" )
-              Kernel.print("\n")
-            else
-              # end-of-line will be printed by yDebugTrace 
-            end
+            Kernel.print(" #{sel} ") # end-of-line printed by yDebugTrace 
           end
 	  @counts_array[9] += 1 # perform_reduce
 ')
 
-	  vres =  __perform__se( vstack, vofs, creduce_table[i+2], 2 )
+	  vres =  __perform__se( vstack, vofs, sel, 2 )
 
 	  cracc_error_status = @racc_error_status # recache
 	  # @racc_t not changed by reduce methods

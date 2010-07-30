@@ -40,7 +40,7 @@ class Struct
   #    Customer.new("Dave", "123 Main")           #=> #<Customer
   # name="Dave", address="123 Main">
 
-  def self.new(klass_name, *attrs, &block)
+  def self.new(klass_name, *attrs_arg, &block)
 
     unless klass_name._equal?(nil) then
       # GEMSTONE
@@ -54,23 +54,40 @@ class Struct
       #   klass_name = nil
       # end
       if klass_name._isSymbol
-        attrs.unshift klass_name
+        attrs_arg.unshift klass_name
         klass_name = nil
       end
       # END GEMSTONE
     end
 
-    begin
-      attrs = attrs.map { |attr| attr.to_sym }
-    rescue NoMethodError => e
-      raise TypeError, e.message
+    n = 0
+    idx = 0
+    lim = attrs_arg.__size
+    field_names = Array.new(lim)
+    attrs = Array.new(lim * 2)
+    while n < lim
+      begin
+        sym = attrs_arg.__at(n).to_sym
+        if sym._equal?(nil)
+          raise ArgumentError, 'nil attribute name in Struct.new'
+        end
+        field_names[n] = sym
+        attrs[idx] = sym
+        attrs[idx + 1] = :"@#{sym}" 
+        idx += 2
+      rescue NoMethodError => e
+        raise TypeError, e.message
+      end
+      n += 1
     end
+    unless (n * 2)._equal?(idx)
+      raise ArgumentError , 'inconsistent attrs in Struct.new'
+    end
+    attrs.freeze
+    field_names.freeze
 
-    raise ArgumentError if attrs.any? { |attr| attr._equal?(nil) }
-
-    klass = Class.new self do
-
-      attr_accessor(*attrs)
+    klass = Class.new_fixed_instvars(self, field_names) { 
+      attr_accessor(*field_names)
 
       def self.new(*args)
         return subclass_new(*args)
@@ -80,31 +97,55 @@ class Struct
         return new(*args)
       end
 
-      include Enumerable  # GEMSTONE
-    end
+      include Enumerable  # Maglev
+    }
+    Struct.const_set(klass_name, klass) if klass_name
 
-    Struct.const_set klass_name, klass if klass_name
-
-    klass.const_set :STRUCT_ATTRS, attrs
+    klass.const_set(:STRUCT_ATTRS, attrs)
+    klass.const_set(:STRUCT_ATTRS_fieldNames, field_names)
 
     klass.module_eval(&block) if block
 
     return klass
   end
 
-  def _attrs # :nodoc:
+  def __attrs # :nodoc:
     return self.class.const_get(:STRUCT_ATTRS)
+  end
+
+  def __field_names # :nodoc:
+    return self.class.const_get(:STRUCT_ATTRS_fieldNames)
   end
 
   def instance_variables
     # Hide the ivars used to store the struct fields
-    super() - _attrs.map { |a| "@#{a}" }
+    # Struct inherits no instVars from it's super classes
+    names = super()
+    attrs = self.__attrs
+    num_members = attrs.__size >> 1 
+    num_ivs = names.__size 
+    if num_ivs <= num_members
+      []
+    else
+      names[num_members, num_ivs - num_members]
+    end  
   end
 
   def initialize(*args)
-    raise ArgumentError unless args.length <= _attrs.length
-    _attrs.each_with_index do |attr, i|
-      instance_variable_set "@#{attr}", args[i]
+    attrs = self.__attrs
+    lim = attrs.__size
+    n_args = args.__size 
+    if n_args > (lim >> 1)
+      raise ArgumentError , 'too many args'
+    end
+    n = 0
+    idx = 0
+    # run to the end of attrs , setting fields to nil
+    # if more fields than given in *args
+    while n < lim
+      self.instance_variable_set( attrs[n + 1], args[idx] )
+      n += 2
+      idx += 1
     end
   end
 
@@ -131,16 +172,16 @@ class Struct
     return false if (self.class != other.class)
     myvals = self.values
     othervals = other.values
-    return false if (myvals.size != othervals.size)
 
     n = 0
     lim = myvals.size
+    return false if (lim != othervals.size)
     while n < lim
       rg = RecursionGuard
       rgstack = rg.stack
-      myelem = myvals.at(n)
+      myelem = myvals.__at(n)
       unless rgstack.include?(myelem)
-        otherelem = othervals.at(n)
+        otherelem = othervals.__at(n)
         unless rgstack.include?(otherelem)
           rg.inspect(myelem) do
             rg.inspect(otherelem) do
@@ -170,30 +211,43 @@ class Struct
   #    joe[:name]    #=> "Joe Smith"
   #    joe[0]        #=> "Joe Smith"
 
-  # See Gemstone note in bootstrap/Struct.rb
-  def [](var)
+  def __iv_name_for(var)
+    # for the specified field name or number,
+    # return the instance variable name for use in an instance_variable_get
+    attrs = self.__attrs
     if var._isNumeric
       var = var.to_i
-      a_len = _attrs.length
-      if var > a_len - 1 then
-        raise IndexError, "offset #{var} too large for struct(size:#{a_len})"
+      num_fields = attrs.__size >> 1 
+      if var >= num_fields then
+	raise IndexError, "offset #{var} too large for struct(size:#{num_fields})"
       end
-      if var < -a_len then
-        raise IndexError, "offset #{var + a_len} too small for struct(size:#{a_len})"
+      if var < 0
+        if var < -num_fields then
+	  raise IndexError, "offset #{var + num_fields} too small for struct(size:#{num_fields})"
+        end
+        var = var + num_fields
       end
-      var = _attrs[var]
-    elsif var._isStringOrSymbol
-      42 # HACK
-      # ok
+      idx = (var << 1) + 1
     else
-      raise TypeError
+      if var._isString
+        var = var.to_sym
+      elsif (! var._isSymbol)
+        raise TypeError , 'expected a Numeric, String, or Symbol'
+      end
+      idx = 0                  # one-based
+      unless var.__at(0)._equal?( ?@ )
+        idx = attrs.__offset1_identical(var) 
+      end
+      if idx._equal?(0)
+        raise NameError, "no member '#{var}' in struct"
+      end
+      # idx - 1 + 1 is the instVar name 
     end
+    attrs[idx]
+  end
 
-    unless _attrs.include? var.to_sym then
-      raise NameError, "no member '#{var}' in struct"
-    end
-
-    return instance_variable_get("@#{var}")
+  def [](var)
+    return instance_variable_get(self.__iv_name_for(var))
   end
 
   ##
@@ -214,28 +268,7 @@ class Struct
   #    joe.zip    #=> "90210"
 
   def []=(var, obj)
-    if var._isNumeric 
-      var = var.to_i
-      a_len = _attrs.length
-      if var > a_len - 1 then
-        raise IndexError, "offset #{var} too large for struct(size:#{a_len})"
-      end
-      if var < -a_len then
-        raise IndexError, "offset #{var + a_len} too small for struct(size:#{a_len})"
-      end
-      var = _attrs[var]
-    elsif var._isStringOrSymbol
-      42 # HACK
-      # ok
-    else
-      raise TypeError
-    end
-
-    unless _attrs.include? var.to_s.intern then
-      raise NameError, "no member '#{var}' in struct"
-    end
-
-    return instance_variable_set("@#{var}", obj)
+    return instance_variable_set( self.__iv_name_for(var), obj)
   end
 
   ##
@@ -286,23 +319,23 @@ class Struct
   #    zip => 12345
 
   def each_pair(&block)
+    attrs = self.__attrs
+    n = 0
+    lim = attrs.__size
     unless block_given?
       # for 1.8.7, returns an ArrayEnumerator
       pairs = []
-      self._attrs.map { |var| pairs << [ var, self.instance_variable_get("@#{var}") ] }
+      while n < lim
+        pairs << [ attrs[n], self.instance_variable_get( attrs[n+1] ) ]
+        n += 2
+      end
       return pairs.each()
     end
-    self._attrs.map { |var| 
-         block.call(var, self.instance_variable_get("@#{var}") )
-    }
+    while n < lim
+      block.call( attrs[n], self.instance_variable_get( attrs[n+1] ))
+      n += 2
+    end
   end
-
-  def each_pair() # added for 1.8.7
-    # returns an ArrayEnumerator
-    pairs = []
-    self._attrs.map { |var| pairs << [ var, self.instance_variable_get("@#{var}") ] }
-    return pairs.each()
-  end 
 
   ##
   # call-seq:
@@ -327,9 +360,9 @@ class Struct
     while n < lim
       rg = RecursionGuard
       rgstack = rg.stack
-      myelem = myvals.at(n)
+      myelem = myvals.__at(n)
       unless rgstack.include?(myelem)
-        otherelem = othervals.at(n)
+        otherelem = othervals.__at(n)
         unless rgstack.include?(otherelem)
           rg.inspect(myelem) do
             rg.inspect(otherelem) do
@@ -352,12 +385,24 @@ class Struct
   # Return a hash value based on this struct's contents.
 
   def hash
-    ts = Thread.__recursion_guard_set
-    added = ts.__add_if_absent(self)
-    unless added
-      return 0
+    ary = self.to_a
+    hval = 4459
+    n = 0
+    lim = ary.__size
+    while n < lim
+      elem = ary.__at(n) 
+      if elem._is_a?(Struct)
+        eh = elem.class.name.hash
+      else    
+        eh = elem.hash 
+      end
+      if eh._not_equal?(0)
+	eh = Type.coerce_to( eh, Fixnum, :to_int)
+	hval = (hval >> 1) ^ eh
+      end 
+      n += 1
     end
-    to_a.hash
+    hval 
   end
 
   ##
@@ -372,7 +417,7 @@ class Struct
   #    joe.length   #=> 3
 
   def length
-    return _attrs.length
+    return (self.__attrs.__size) >> 1
   end
 
   alias_method :size, :length
@@ -389,7 +434,15 @@ class Struct
   #    joe.members   #=> ["name", "address", "zip"]
 
   def self.members
-    return const_get(:STRUCT_ATTRS).map { |member| member.to_s }
+    names = self.const_get(:STRUCT_ATTRS_fieldNames)
+    n = 0
+    lim = names.__size
+    res = Array.new(lim)
+    while n < lim
+      res[n] = names[n].to_s
+      n += 1
+    end
+    res
   end
 
   def members
@@ -430,7 +483,17 @@ class Struct
   #    joe.to_a[1]   #=> "123 Maple, Anytown NC"
 
   def to_a
-    return _attrs.map { |var| instance_variable_get "@#{var}" }
+    attrs = self.__attrs
+    lim = attrs.__size
+    res = Array.new(lim >> 1)
+    n = 0
+    idx = 0
+    while n < lim
+      res[idx] = self.instance_variable_get( attrs[n+1] )
+      idx += 1
+      n += 2
+    end
+    res
   end
 
   ##
@@ -445,7 +508,7 @@ class Struct
     return "[...]" if rg.inspecting?(self)
 
     rg.inspect(self) do
-      "#<struct #{self.class.name} #{_attrs.zip(self.to_a).map{|o| o[1] = o[1].inspect; o.join('=')}.join(', ') }>"
+      "#<struct #{self.class.name} #{self.__field_names.zip(self.to_a).map{|o| o[1] = o[1].inspect; o.join('=')}.join(', ') }>"
     end
   end
 

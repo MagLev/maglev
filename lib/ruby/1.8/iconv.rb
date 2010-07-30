@@ -62,7 +62,10 @@ class Iconv
     @to, @from = string_value(to), string_value(from)
     @handle = Iconv.create(@to, @from)
     begin
-      Errno.handle if @handle.address == -1
+      if @handle.address == -1
+        Errno.handle
+        raise InvalidEncoding.new("iconv_open failed, but errno==0")
+      end
     rescue Errno::EINVAL
       raise InvalidEncoding.new("invalid encoding (#{@to.inspect}, #{@from.inspect})", nil, [@to, @from])
     end
