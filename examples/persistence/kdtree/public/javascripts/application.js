@@ -1,9 +1,6 @@
 var map;
 var marker;
 var infoWindow;
-var disableClick = false; // This really shouldn't be necessary, but it prevents the
-                          // google map click handler from being tempted to catch
-                          // a click event it should not be handling.
 
 // Fits the canvas to the page
 function fitMapCanvas() {
@@ -37,9 +34,9 @@ function initialize() {
 
   // register a click event handler with our Map instance.
   google.maps.event.addListener( map, 'click', function(event) {
-     if(!disableClick)
-       searchZips(event.latLng.lat(), event.latLng.lng());
-   });
+    searchZips(event.latLng.lat(), event.latLng.lng());
+    return false;
+  });
 }
 
 function searchZips(lat, lng) {
@@ -163,6 +160,17 @@ function removeInfoWindow() {
   }
 }
 
+// Called when a zip link is clicked
+function zipLinkCallback(e, lat, lng) {
+  e = e || window.event; // Just in case the event comes out null (shouldn't happen)
+  
+  // Do the new zips search for the desired location
+  searchZips(lat, lng);
+  
+  // Stop the event from bubbling upward in to the map (http://www.quirksmode.org/js/events_order.html)
+  e.cancelBubble = true;
+}
+
 function attachInfoWindow( marker, number, locations ) {
   // By trying to remove the window again just before display, we 
   // can guarantee we won't get any leftover popups if a user (...or bug)
@@ -178,15 +186,15 @@ function attachInfoWindow( marker, number, locations ) {
       html += '  <tbody>';
   
   for(var idx in locations) {  
-    loc = locations[idx];
+    var loc = locations[idx];
     
     // First row <td>s are 'first', after that it's 'other'; used to highlight first result
-    tdTag = '<td class="' + ( (idx == 0) ? 'first' : 'other' ) + '">'; 
+    var tdTag = '<td class="' + ( (idx == 0) ? 'first' : 'other' ) + '">'; 
     
     // Generate a zip code link they can click
+    var zipCodeHtml;
     if(loc['miles'] > 0.000001)
-      zipCodeHtml = '<a href="#'+loc['zipcode']+'" onclick="searchZips('+loc['latitude']+', '+loc['longitude']+')">' + htmlEncode(loc['zipcode']) + '</a>';     
-      //zipCodeHtml = '<a href="#'+loc['zipcode']+'">' + htmlEncode(loc['zipcode']) + '</a>';  
+      zipCodeHtml = '<a href="#'+loc['zipcode']+'" onclick="zipLinkCallback(event, '+loc['latitude']+', '+loc['longitude']+')">' + htmlEncode(loc['zipcode']) + '</a>';      
     else // Don't link to zip codes we're right on top of 
       zipCodeHtml = htmlEncode(loc['zipcode']);    
 
