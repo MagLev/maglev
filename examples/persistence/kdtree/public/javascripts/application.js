@@ -1,6 +1,9 @@
 var map;
 var marker;
 var infoWindow;
+var disableClick = false; // This really shouldn't be necessary, but it prevents the
+                          // google map click handler from being tempted to catch
+                          // a click event it should not be handling.
 
 // Fits the canvas to the page
 function fitMapCanvas() {
@@ -22,7 +25,6 @@ function initialize() {
   $(window).resize(fitMapCanvas);
   fitMapCanvas();
 
-
   // let's set the initial location of the map.
   var latLng = new google.maps.LatLng( 41.6326327769545, -100.1024599609375 );
 
@@ -35,24 +37,15 @@ function initialize() {
 
   // register a click event handler with our Map instance.
   google.maps.event.addListener( map, 'click', function(event) {
-     // The condition here is to deal with a google maps API update
-     // on 2010-07-29.  A click event gets generated if you click
-     // on a zip code link (which invokves searchZips()).  As
-     // it turns out, this event contains obviously incorrect
-     // pixel x/y coordinates that are negative, so we can just
-     // ignore it.
-     if(event.pixel.x >= 0 && event.pixel.y >= 0) 
-       searchZips(event.latLng.lat(), event.latLng.lng());    
-     return false;
+     if(!disableClick)
+       searchZips(event.latLng.lat(), event.latLng.lng());
    });
 }
 
 function searchZips(lat, lng) {
-  // remove info window from the map if it exists.  
-  if ( infoWindow != null ) {
-    infoWindow.close(); 
-  }
-     
+  // Remove the previous window so the user knows something is about to happen. 
+  removeInfoWindow( );
+  
   // remove the marker from the map if it exists.
   if ( marker != null ) {
     marker.setMap(null);
@@ -90,10 +83,18 @@ function requestNearest( ) {
   // create a parameter hash.
   var params = { lat: latitudeS, lon: longitudeS, k: k_results };
 
+  // do not let the user (or the map click handler firing spuriously) click again until we resolve the request
+  disableClick = true;
+
+  // dispatch request
   postAjaxRequest("nearest", params, function( locations ) {
     // create a new info window, open it, and extend 
     // it from the current marker on the map.
     attachInfoWindow( marker, 0, locations );
+  }, 
+  function() {
+    // let the user click again
+    disableClick = false;
   });
 }
 
@@ -109,7 +110,7 @@ function requestLocation( zipCode ) {
   });
 }
 
-function postAjaxRequest( apiMethod, params, successCallback ) {
+function postAjaxRequest( apiMethod, params, successCallback, alwaysExecutedCallback ) {
   host = location.hostname;
   port = location.port;
   serviceUrl = "http://" + host + ":" + port + "/" + apiMethod;
@@ -120,7 +121,11 @@ function postAjaxRequest( apiMethod, params, successCallback ) {
     type: 'POST',
     dataType: 'json',
     data: params,
-    success: successCallback,
+    success: function(results) { 
+      successCallback(results);
+      if(alwaysExecutedCallback)
+        alwaysExecutedCallback();
+    },
 
     error: function( xhr, txtStatus ) {
       alert( "Something went wrong during API request to '/"+apiMethod+"'!  "
@@ -130,6 +135,8 @@ function postAjaxRequest( apiMethod, params, successCallback ) {
         + "Details:\n" 
         + "XMLHttpRequest status: " + xhr.status + "\n"
         + "Status: " + txtStatus );
+        
+        alwaysExecutedCallback();
     }
 
   });
@@ -148,7 +155,19 @@ function placeMarker(location) {
   
 }
 
+// This will remove the info window if it is currently present.
+function removeInfoWindow() {
+  // remove the info window
+  if ( infoWindow != null ) {
+    infoWindow.close();    
+  }
+}
+
 function attachInfoWindow( marker, number, locations ) {
+  // By trying to remove the window again just before display, we 
+  // can guarantee we won't get any leftover popups if a user (...or bug)
+  // manages to fire off two queries very close together.
+  removeInfoWindow();
 
   var markerLocation = marker.getPosition();
   var latitude = markerLocation.lat();
@@ -167,6 +186,7 @@ function attachInfoWindow( marker, number, locations ) {
     // Generate a zip code link they can click
     if(loc['miles'] > 0.000001)
       zipCodeHtml = '<a href="#'+loc['zipcode']+'" onclick="searchZips('+loc['latitude']+', '+loc['longitude']+')">' + htmlEncode(loc['zipcode']) + '</a>';     
+      //zipCodeHtml = '<a href="#'+loc['zipcode']+'">' + htmlEncode(loc['zipcode']) + '</a>';  
     else // Don't link to zip codes we're right on top of 
       zipCodeHtml = htmlEncode(loc['zipcode']);    
 
