@@ -4,6 +4,10 @@
 
 == Unreleased changes
 
+* Fix Trac 773, 775
+* Fix result checking of Iconv.create in iconv.rb (fixes Trac 774)
+* Fix various spec failures in URI, Dir, Env, File, Integer#times .
+
 == Changes for 23913  2010-07-28
 
 * Fix Trac 768, 769, 770, 771, 772

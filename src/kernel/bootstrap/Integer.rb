@@ -279,17 +279,25 @@ class Integer
     end
     arr = [1]
     broke = false
-    ea_res = arr.each { |ignore| # this each handles break from the argument block
-      k = 0
-      while k < self
-        broke = true
-	block.call(k)
-        broke = false
-	k += 1
+    k = 0
+    while k < self
+      ea_res = arr.each { |ignore| # this each handles break from the argument block
+        while k < self
+          broke = true
+	  block.call(k)
+          broke = false
+	  k += 1
+        end
+      }
+      if broke
+        if ea_res._equal?(arr)
+          # ruby_next  bytecode broke out of arr.each {} , see svn/src/intrubynext.hc
+          k += 1  # continue the iteration
+        else 
+          # the argument block did a ruby  break
+          return ea_res  
+        end
       end
-    }
-    if broke
-      return ea_res  # the argument block did a break
     end
     self
   end
