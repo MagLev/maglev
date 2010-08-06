@@ -59,10 +59,12 @@ class Env
     def []=(key, val)
       self.__check_update(key)
       if val._equal?(nil)
-        val = ""
+        Env.__unsetenv(key)
+        self.__delete(key)
+      else
+        Env.__putenv(key, val)
+        self.__atkey_put(key, val) # __atkey_put implemented in Hash 
       end
-      Env.__putenv(key, val)
-      self.__atkey_put(key, val) # __atkey_put implemented in Hash 
     end
 
     def store(key, val)

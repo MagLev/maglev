@@ -499,17 +499,35 @@ class File
     stat_obj.setuid?
   end
 
-  def self.size(filename)
-    if filename._is_a?(File)
-      filename = filename.path 
+  def self.__coerce_filename(filename)
+    fn = nil
+    if filename._isString
+      fn = filename
+    elsif filename._is_a?(File)
+      fn = filename.path
+    else
+      begin
+	fn = filename.to_str
+      rescue
+	begin
+	  fn = filename.to_io.path
+	rescue
+	end
+      end
     end
+    if fn._equal?(nil)
+      raise TypeError , 'arg not a String or File'
+    end
+    fn
+  end
+
+  def self.size(filename)
+    filename = self.__coerce_filename(filename)
     File.stat(filename).size
   end
 
   def self.size?(filename)
-    if filename._is_a?(File)
-      filename = filename.path 
-    end
+    filename = self.__coerce_filename(filename)
     stat_obj = self.__stat(filename, false)
     if (stat_obj._isFixnum)
       return nil  # an error attempting to stat
