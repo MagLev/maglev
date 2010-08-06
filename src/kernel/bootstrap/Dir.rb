@@ -95,17 +95,17 @@ class Dir
   end
 
   def self.open(dirname, &block)
-
+    dirname = Type.coerce_to(dirname, String, :to_str) # 1.9 would use to_path
     if block_given?
       begin
-        d = Dir.new dirname
-        result = yield d
+        d = Dir.new(dirname)
+        result = block.call(d)
       ensure
         d.close unless d._equal?(nil)
       end
       result
     else
-      Dir.new dirname
+      Dir.new(dirname)
     end
   end
 

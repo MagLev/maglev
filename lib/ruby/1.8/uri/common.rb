@@ -517,7 +517,11 @@ module URI
   #   # => #<URI::HTTP:0x2022ac02 URL:http://localhost/main.rbx>
   #
   def self.join(*str)
-    u = self.parse(str[0])
+    u = str[0]
+    unless u._is_a?(URI) 
+      u = Type.coerce_to(u, String, :to_str)
+      u = self.parse(u)
+    end
     str[1 .. -1].each do |x|
       u = u.merge(x)
     end
@@ -605,7 +609,12 @@ module Kernel
   #
   # This method is introduced at 1.8.2.
   def URI(uri_str) # :doc:
-    URI.parse(uri_str)
+    ucls = URI
+    if uri_str._is_a?(ucls)
+      return uri_str
+    end
+    uri_str = Type.coerce_to(uri_str, String, :to_str)
+    ucls.parse(uri_str)
   end
   module_function :URI
 end

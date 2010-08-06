@@ -19,6 +19,15 @@ namespace :dev do
     Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
   end
 
+  desc "Run maglev-gem pristine on rails gems"
+  task :pristinerails do
+    %w(actionmailer actionpack activemodel activerecord
+       activeresource activesupport arel bundler rails railties).each do |g|
+      sh "maglev-gem pristine #{g}"
+      echo "Patch maglev binaries shebang line...patch activesupport"
+    end
+  end
+  
   desc "Run the passing specs"
   task :'passing' do
     sh "spec/mspec/bin/mspec run -B passing.mspec"
