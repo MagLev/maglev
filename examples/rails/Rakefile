@@ -43,12 +43,23 @@ namespace :patch do
     cp patch, File.join(app, "config", "boot.rb")
   end
 
-  desc "Patch v3.0.0 beta4 ActiveSupport gem."
+  desc "Patch v3.0.0 beta4 or rc ActiveSupport gem."
   task :activesupport do
-    patch = File.join(File.dirname(__FILE__), 'patches/active_support_1.diff')
-    puts "patch file: #{patch}"
-    cd("#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/activesupport-3.0.0.beta4") do
-      sh %{ patch -p2 < #{patch} }
+    { "3.0.0.beta4" => "active_support_1.diff",
+      "3.0.0.rc"    => "active_support_2.diff"}.each do |version,patch|
+      as_dir = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/activesupport-#{version}"
+
+      if File.directory? as_dir
+        puts "Patching #{as_dir}"
+        patch_path = File.join(File.dirname(__FILE__), "patches/#{patch}")
+        raise "No patch for #{version} (#{patch_path})" unless File.exist? patch_path
+        cd(as_dir) do
+          sh %{ patch -p2 < #{patch_path} }
+        end
+      end
+      
     end
   end
+
+
 end
