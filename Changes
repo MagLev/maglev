@@ -2,6 +2,10 @@
 
   For more precise details see: http://bit.ly/d3C6S1
 
+== Unreleased changes
+
+* Fix Trac 778
+
 == Changes for 23981  2010-08-06
 
 * Fix Trac 773, 775
