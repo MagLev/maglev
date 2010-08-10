@@ -47,3 +47,4 @@ class Base
 end
 
 Base.new.template("Rakefile")
+true
