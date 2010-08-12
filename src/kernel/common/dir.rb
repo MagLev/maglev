@@ -2,8 +2,13 @@
 class Dir
   include Enumerable
 
-  def self.[](pattern)
-    glob(pattern, 0)
+  def self.[](*patterns)
+    files = []
+    patterns.each do |pattern|
+      pat = Type.coerce_to(pattern, String, :to_str)
+      files.concat glob(pat, 0)
+    end
+    files
   end
 
   def self.glob(pat, flags = 0)
