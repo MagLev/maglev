@@ -1,0 +1,13 @@
+--- gems/activesupport-3.0.0.rc/lib/active_support/descendants_tracker.rb	2010-08-13 13:13:25.000000000 -0700
++++ gems/activesupport-X/lib/active_support/descendants_tracker.rb	2010-08-13 13:14:56.000000000 -0700
+@@ -18,7 +18,9 @@
+     end
+ 
+     def self.clear
+-      @@direct_descendants.each do |klass, descendants|
++      keys = @@direct_descendants.keys
++      keys.each do |klass|
++        descendants = @@direct_descendants[klass]
+         if ActiveSupport::Dependencies.autoloaded?(klass)
+           @@direct_descendants.delete(klass)
+         else

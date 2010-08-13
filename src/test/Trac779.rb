@@ -25,6 +25,7 @@ class Class
     attrs.each do |name|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{name}
+          puts "In 22"
           singleton_class.logger  # This raises method not found
           raise "Fail A" unless singleton_class.methods.include?("logger")
           22
@@ -57,3 +58,4 @@ end
 result = LogSubscriber.new.logger
 p result
 raise "Fail B" unless result == 22
+true

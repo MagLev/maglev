@@ -102,6 +102,22 @@ gz_reader.close
 test(new_data, original, 'Delegate')
 
 
+# Bug test.  Writing data of specific lengths was broken.  The length
+# varied depending on how much data was in the buffer already and what the
+# half size of the buffer was.  So, we loop over a good number of sizes to
+# trigger the buggy behavior (seems that when i is 65, it triggers).
+
+
+# This test passes if no exception is raised.
+sio = StringIO.new('', "r+")
+dio = IODelegate.new(sio)
+gz_writer = Zlib::GzipWriter.new(dio)
+
+1.upto(2049) do |i|
+  gz_writer.write("x"*i)
+end
+gz_writer.close
+
 #####################
 report
 true

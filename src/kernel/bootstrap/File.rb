@@ -44,12 +44,12 @@ class File
   primitive '__disable_autoclose', '_disableAutoClose'
 
   def close
-    if self.__is_open 
+    if self.__is_open
       self.__close
     else
       raise IOError, 'already closed'
     end
-    nil 
+    nil
   end
 
   primitive_nobridge '__write', 'write:from:'
@@ -193,7 +193,7 @@ class File
   end
 
   def self.dirname(string)
-    nam = Type.coerce_to(string, String, :to_str) 
+    nam = Type.coerce_to(string, String, :to_str)
     File.__modify_file( 14, nam, nil, nil)  # section 3 dirname()
   end
 
@@ -225,54 +225,65 @@ class File
     self.exist?(path)
   end
 
-  # Convert path to an absolute pathname. If no directory is given,
-  # relative paths are rooted at the current working directory.
-  # Otherwise directory will be prefixed to the path. Tilde expansion is
-  # done on the path.  Replaces '.' and '..' in the path with the
-  # appropriate path components.  Does not coalesce contiguous '/'s.
-  def self.expand_path(a_path, a_dir = nil)
-    path = Type.coerce_to(a_path, String, :to_str) 
+  ##
+  # Converts a pathname to an absolute pathname. Relative
+  # paths are referenced from the current working directory
+  # of the process unless dir_string is given, in which case
+  # it will be used as the starting point. The given pathname
+  # may start with a ``~’’, which expands to the process owner‘s
+  # home directory (the environment variable HOME must be set
+  # correctly). "~user" expands to the named user‘s home directory.
+  #
+  #  File.expand_path("~oracle/bin")           #=> "/home/oracle/bin"
+  #  File.expand_path("../../bin", "/tmp/x")   #=> "/bin"
+  def self.expand_path(path, dir=nil)
+    path = Type.coerce_to(path, String, :to_str)
 
-    dir = a_dir._equal?(nil) ? Dir.pwd : Type.coerce_to(a_dir, String, :to_str)
-    dir = Dir.pwd if dir.empty?
-    dir = __tilde_expand(dir)
-    dir = __cannonicalize(dir)
-    return dir if path.empty?
+    first = path[0]
+    if first == ?~
+      path = __tilde_expand(path)
+    elsif first != ?/
+      if dir
+        dir = File.expand_path dir
+      else
+        dir = Dir.pwd
+      end
 
-    path = __tilde_expand(path)
-    if path[0] !=  SEPARATOR[0] # relative path
-      path = File.join(dir, path)
+      path = "#{dir}/#{path}"
     end
-    __cannonicalize(path)
-  end
 
-  # Remove .. and . from path
-  def self.__cannonicalize(path)
-    if path['.']
-      new_parts = []
-      path.split(SEPARATOR).each do |component|
-        case component
-        when '..'
-          new_parts.pop
-        when '.'
-          # nothing: just skip it
-        when ''
-          # The split
-        else
-          new_parts << component
+    items = []
+    start = 0
+    size = path.size
+
+    while index = path.index("/", start) or (start < size and index = size)
+      length = index - start
+
+      if length > 0
+        item = path[start, length]
+
+        if item == ".."
+          items.pop
+        elsif item != "."
+          items << item
         end
       end
-      res = "#{SEPARATOR}#{new_parts.join(SEPARATOR)}"
-    else
-      res = path.dup
+
+      start = index + 1
     end
-    # remove trailing separator, if any
-    sep_siz = SEPARATOR.size
-    res_siz = res.size
-    if res_siz > sep_siz &&  res[res_siz - sep_siz, sep_siz] == SEPARATOR
-      res.size=(res_siz - sep_siz)
+
+    return "/" if items.empty?
+
+    str = ""
+
+    lim = items.size
+    index = 0
+    while index < lim
+      str << "/#{items[index]}"
+      index += 1
     end
-    res
+
+    return str
   end
 
   def self.__tilde_expand(path)
@@ -280,7 +291,7 @@ class File
     when '~':   ENV['HOME']
     when '~/':  ENV['HOME'] + path[1..-1]
     when /^~([^\/])+(.*)/
-      raise NotImplementedError, "Don't handle ~user expansion yet"
+      raise NotImplementedError, "~user expansion not implemented"
     else
       path
     end
@@ -423,7 +434,7 @@ class File
         block.call(f)
       ensure
         begin
-          f.close 
+          f.close
         rescue StandardError
           nil
         end
@@ -507,12 +518,12 @@ class File
       fn = filename.path
     else
       begin
-	fn = filename.to_str
+  fn = filename.to_str
       rescue
-	begin
-	  fn = filename.to_io.path
-	rescue
-	end
+  begin
+    fn = filename.to_io.path
+  rescue
+  end
       end
     end
     if fn._equal?(nil)
@@ -551,24 +562,24 @@ class File
     str = arg.dup
     changed = true
     until changed._equal?(nil)
-      changed = str.gsub!('//', '/') 
+      changed = str.gsub!('//', '/')
     end
     idx = str.rindex('/')
     if idx._equal?(str.size - 1)
       str.size=(str.size - 1)
     end
     idx = str.rindex('/')
-    if idx._equal?(nil) 
+    if idx._equal?(nil)
       return [ '.', str ]
-    end 
+    end
     if idx._equal?(0)
-      left = '/' 
+      left = '/'
     else
-      left = str[0, idx] 
+      left = str[0, idx]
     end
     [ left , str[idx+1, str.size - idx - 1] ]
   end
-  
+
 
   def self.stat(filename)
     stat_obj = Errno.handle(__stat(filename, false), filename)
@@ -794,7 +805,7 @@ class File
 
   def read
     raise IOError, 'read: closed stream' unless __is_open
-    data = __contents 
+    data = __contents
     data = '' if data._equal?(nil)
     data
   end
@@ -927,15 +938,15 @@ class File
     end
     status = File.__modify_file(16, @_st_fileDescriptor, nil, nil)
     unless status._equal?(0)
-      Errno.raise_errno(status, 'File#fsync failed') 
+      Errno.raise_errno(status, 'File#fsync failed')
     end
     0
   end
-  
+
   def inspect
     str = super
-    if closed? 
-      str << ', closed' 
+    if closed?
+      str << ', closed'
     end
     str
   end
@@ -1028,7 +1039,7 @@ class File
     if pos._equal?(nil)
       Errno.raise_errno(self.__last_err_code, 'seek failed')
     end
-    0 
+    0
   end
 
   # Return the current offset (in bytes) of +io+
@@ -1052,7 +1063,7 @@ class File
 
   alias tell pos
 
-  def truncate(a_length) 
+  def truncate(a_length)
     a_length = Type.coerce_to(a_length, Fixnum, :to_int)
     status = File.__modify_file( 15, @_st_fileDescriptor, a_length, nil)
     unless status._equal?(0)
@@ -1061,7 +1072,7 @@ class File
     return 0
   end
 
-  primitive 'ungetc', 'ungetByte:'  
+  primitive 'ungetc', 'ungetByte:'
 
   def write(arg)
     arg = Type.coerce_to(arg, String, :to_s)

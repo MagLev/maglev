@@ -323,7 +323,7 @@ class Proc
     #  The block from which the Proc was created does not
     #  necessarily have a VariableContext so it may not even
     #  be possible to create a complete Binding.
-    def binding
+    def binding(*args, &block)
       # send of :binding not supported 
       raise NotImplementedError , 'Proc#binding not supported'
     end
