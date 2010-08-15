@@ -433,7 +433,7 @@ class Object
     end
   end
 
-  primitive_nobridge '__instance_eval_string', 'instanceEvalString:with:binding:'
+  primitive_nobridge '__instance_eval_string*', 'instanceEvalString:with:args:'
 
   def instance_eval(*args, &block_arg)
     #   should always come here via a bridge method , thus 0x3N for vcgl ...
@@ -452,7 +452,6 @@ class Object
     #  be put in the binding...
     lex_path = self.__getRubyVcGlobal(0x32) # the __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
-    # file=args[1] ; line=args[2] #  TODO, ignored for now
     string = Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
     bnd = Binding.new(ctx, self, block_arg)
@@ -463,7 +462,10 @@ class Object
     unless bblk._equal?(nil)
       vcgl << bblk
     end
-    res = __instance_eval_string(string, vcgl, bnd )
+    m_args = [ bnd, 
+                args[1], # file
+                args[2] ]  # line
+    res = __instance_eval_string(string, vcgl, *m_args )
     vcgl[0].__storeRubyVcGlobal(0x30)
     vcgl[1].__storeRubyVcGlobal(0x31)
     res

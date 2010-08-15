@@ -12,6 +12,12 @@ class PsychModuleTest < Test::Unit::TestCase
     assert_equal('0.1.3', YAML::LIBYAML_VERSION, 'YAML::LIBYAML_VERSION')
   end
 
+  # The engine is used to switch between syck and psych in MRI.
+  # Rubygems etc. sometimes test YAML::ENGINE, so we support it.
+  def test_engine
+    assert_equal('psych', YAML::ENGINE.yamler, "YAML::ENGINE.yamler")
+  end
+
   def test_psych_load
     assert_equal('a',        YAML.load("--- a"))
     assert_equal(['a', 'b'], YAML.load("---\n - a\n - b"))

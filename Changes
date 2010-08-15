@@ -2,6 +2,18 @@
 
   For more precise details see: http://bit.ly/d3C6S1
 
+== Unreleased changes
+
+== Changes for 24067  2010-08-13
+
+* Support for running Rails 3.0.0.rc (previous support was for 3.0.0.beta4)
+* Fix Trac 778, 779
+* Fix file,line args to eval
+* Fix bug in File#expand_path
+* Dir[] now allows multiple patterns
+* Fixed some bugs in YAML/Psych
+* Extensive fixes and updates to the underlying GemStone 3.0 system
+
 == Changes for 23981  2010-08-06
 
 * Fix Trac 773, 775

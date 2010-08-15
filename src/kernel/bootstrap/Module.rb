@@ -309,8 +309,6 @@ class Module
     #  be put in the binding...
     lex_path = self.__getRubyVcGlobal(0x32) # __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
-    # file=args[1] # TODO
-    # line=args[2] # TODO
     string = Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
     bnd = Binding.new(ctx, self, block_arg)
@@ -321,7 +319,10 @@ class Module
     unless bblk._equal?(nil)
       vcgl << bblk
     end
-    res = __module_eval_string(string, vcgl, bnd )
+    m_args = [ bnd, 
+               args[1], # file
+               args[2] ]  # line
+    res = __module_eval_string(string, vcgl, *m_args )
     vcgl[0].__storeRubyVcGlobal(0x30)
     vcgl[1].__storeRubyVcGlobal(0x31)
     res
@@ -418,7 +419,7 @@ class Module
     nil
   end
 
-  primitive_nobridge '__module_eval_string', '_moduleEvalString:with:binding:'
+  primitive     '__module_eval_string*', '_moduleEvalString:with:args:'
 
   primitive_nobridge '__module_funct', 'addModuleMethod:'
 

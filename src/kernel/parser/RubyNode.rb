@@ -532,10 +532,10 @@ module MagRp
            res = self._new
            res.init(body, rescuebody, elsebody)
          end
-   def init(body, rescuebody, elsebody)
-     @_st_bodyNode = body
-     @_st_rescueBodyNode = rescuebody
-     @_st_elseNode = elsebody
+         def init(body, rescuebody, elsebody)
+           @_st_bodyNode = body
+           @_st_rescueBodyNode = rescuebody
+           @_st_elseNode = elsebody
            self
          end
          def inspect

@@ -2,7 +2,7 @@
 
 The files in this directory allow you to run the default Rails app on
 MagLev.  Currently, MagLev is able to serve static and (simple) dynamic
-pages using a patched version of Rails 3 Beta 4.  The <tt>Rakefile</tt>
+pages using a patched version of Rails 3.0.0.rc.  The <tt>Rakefile</tt>
 provides tasks to setup your MagLev environment with the correct (patched)
 Rails Gems and other gems.
 
@@ -86,14 +86,6 @@ MagLev:
   sample URL should work. See {Trac
   766}[https://magtrac.gemstone.com/ticket/766].
 
-=== Changes to Rails Code
-
-The changes to the rails code are rather minimal.  To get a good look:
-
-  $ rake dev:checkout && cd rails && git diff maglev-beta4 v3.0.0.beta4
-
-or browse to: http://github.com/MagLev/rails/compare/master...maglev-beta4
-
 You must pass the <tt>-MallIvsDynamic</tt> flag to MagLev in order to run
 rails (the +Rakefile+ does this).  See
 <tt>docs/release_notes</tt>[link:files/docs/release_notes.html] for a
@@ -154,29 +146,30 @@ Install non-rails gems:
 Install rails gems:
 
   $ maglev-gem install rails --pre --no-ri --no-rdoc
-  Successfully installed activesupport-3.0.0.beta4
+  Successfully installed activesupport-3.0.0.rc
   Successfully installed builder-2.1.2
-  Successfully installed activemodel-3.0.0.beta4
-  Successfully installed rack-1.1.0
+  Successfully installed activemodel-3.0.0.rc
   Successfully installed rack-test-0.5.4
-  Successfully installed actionpack-3.0.0.beta4
+  Successfully installed actionpack-3.0.0.rc
   Successfully installed arel-0.4.0
-  Successfully installed activerecord-3.0.0.beta4
-  Successfully installed activeresource-3.0.0.beta4
-  Successfully installed actionmailer-3.0.0.beta4
-  Successfully installed rake-0.8.7
-  Successfully installed thor-0.13.7
-  Successfully installed railties-3.0.0.beta4
-  Successfully installed bundler-0.9.26
-  Successfully installed rails-3.0.0.beta4
-  15 gems installed
+  Successfully installed activerecord-3.0.0.rc
+  Successfully installed activeresource-3.0.0.rc
+  Successfully installed actionmailer-3.0.0.rc
+  Successfully installed thor-0.14.0
+  Successfully installed railties-3.0.0.rc
+  Successfully installed bundler-1.0.0.rc.5
+  Successfully installed rails-3.0.0.rc
+  13 gems installed
 
-To patch ActiveSupport, you can either do:
+
+
+To patch ActiveSupport:
   $ rake patch:activesupport
-or:
-  $ cd $MAGLEV_HOME/lib/maglev/gems/1.8/gems/activesupport-3.0.0.beta4
-  $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_1.diff
-  patching file lib/active_support/core_ext/class/subclasses.rb
+
+or
+  $ cd $MAGLEV_HOME/lib/maglev/gems/1.8/gems/activesupport-3.0.0.rc
+  $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_2.diff
+  $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_3.diff
 
 The patch changes the manner in which all subclasses are found.  MagLev
 does not support <tt>ObjectSpace#each_object</tt> (since objects may be
@@ -273,22 +266,3 @@ Running <tt>$MAGLEV_HOME/bin/rails console</tt> is untested.
 ==== 11. Running the tests: untested
 
 Running the application's unit tests has not yet been tested.
-
-== Alternate rails patch option (deprecated)
-
-The method described in this section is not the preferred manner to run
-patched rails, but may be used.  This method is mostly to ease MagLev
-development and rails patch management for MagLev developers.
-
-An alternative way to get a patched rails is to checkout the MagLev rails
-fork, and use one of the maglev-* branches.  This requires adjusting the
-load path.  The rake tasks in the <tt>:dev</tt> namespace manage this
-alternate method of running a patched rails version.
-
-To checkout MagLev patched fork of Rails, and run the app from that:
-
-  $ rake gem:gems             # Installs required non-rails gems
-  $ rake dev:checkout         # Checksout patched version of rails from GitHub
-  $ rake dev:app              # Run myapp using ./rails version of rails.
-
-
