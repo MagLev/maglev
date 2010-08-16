@@ -4,6 +4,8 @@
 
 == Unreleased changes
 
+* Fix Trac 781
+
 == Changes for 24067  2010-08-13
 
 * Support for running Rails 3.0.0.rc (previous support was for 3.0.0.beta4)

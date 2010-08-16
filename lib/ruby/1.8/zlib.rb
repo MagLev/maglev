@@ -241,6 +241,7 @@ module Zlib
       @mtime = 0
       @buffer = ''
       @bufsize = 0
+      @zstream = nil
       super()
     end
 
@@ -322,7 +323,7 @@ module Zlib
 
     alias << write
 
-    def finish
+    def finish(flags=Z_SYNC_FLUSH)
       strm = @zstream
       if strm._equal?(nil)
         write_header
@@ -333,11 +334,23 @@ module Zlib
         strm.write(@buffer, bs)
         @bufsize = 0
       end
-      if strm._not_equal?(nil)
-        strm.flush  # writes footer
+      unless flags == Z_SYNC_FLUSH
+        strm.flush(flags)  # writes footer
       end
+      @io
+    end
+
+    def flush(flags=Z_SYNC_FLUSH)
+      self.finish(flags)
+    end
+
+    def close
+      self.finish(Z_FINISH)
+      @zstream.close
       @zstream = nil
       io = @io
+      io.flush
+      io.close
       @io = nil
       io
     end

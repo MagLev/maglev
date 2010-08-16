@@ -82,6 +82,12 @@ class IODelegate
   def write(*args)
     @real_io.write(*args)
   end
+  def flush
+    @real_io.flush
+  end
+  def close
+    @real_io.close
+  end
 end
 
 # Compress the data
@@ -117,6 +123,20 @@ gz_writer = Zlib::GzipWriter.new(dio)
   gz_writer.write("x"*i)
 end
 gz_writer.close
+
+######## coverage for Trac781
+fname = data_dir + '/Trac781.gz'
+fio = File.new(fname, "w")
+gz_wr = Zlib::GzipWriter.new(fio)
+gz_wr.write('abcdef')
+gz_wr.flush
+gz_wr.write("xxx0123456789\n")
+gz_wr.flush
+gz_wr.close
+fio = File.new(fname, "r")
+gz_rd = Zlib::GzipReader.new(fio)
+str = gz_rd.read
+test(str, "abcdefxxx0123456789\n" , "Trac 781")
 
 #####################
 report

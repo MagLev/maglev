@@ -11,7 +11,13 @@ class CZstream
     primitive_nobridge 'at_eof', 'atEnd'
     primitive_nobridge 'total_out', 'position'
     primitive_nobridge 'close', 'close'
-    primitive_nobridge 'flush', 'flush'
+    primitive_nobridge '__flush', 'flush:'
+
+    def flush(flags=nil)
+      # flags == nil is equivalent to Z_FINISH
+      self.__flush(flags)
+    end
+
     primitive_nobridge 'write', 'rubyWrite:count:'
 
     primitive_nobridge '__open', 'open:io:errorClass:comprLevel:'
