@@ -349,9 +349,11 @@ module Zlib
       @zstream.close
       @zstream = nil
       io = @io
-      io.flush
-      io.close
-      @io = nil
+      if io
+        io.flush
+        io.close
+        @io = nil
+      end
       io
     end
 
