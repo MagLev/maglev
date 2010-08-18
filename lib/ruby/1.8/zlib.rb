@@ -187,8 +187,8 @@ module Zlib
       if sio._equal?(nil)
         str = String.new
         while not eof?
-	  buf = self.read(4096)
-	  if buf._equal?(nil)
+          buf = self.read(4096)
+          if buf._equal?(nil)
             return str
           end
           str << buf
@@ -350,8 +350,9 @@ module Zlib
       @zstream = nil
       io = @io
       if io
-        io.flush
-        io.close
+        # RubyGems RestrictedStream only understands #initialize and #write
+        io.flush if io.respond_to?(:flush)
+        io.close if io.respond_to?(:close)
         @io = nil
       end
       io
