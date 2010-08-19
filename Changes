@@ -4,9 +4,25 @@
 
 == Unreleased changes
 
+* Fix Trac 781
+
+== Changes for 24067  2010-08-13
+
+* Support for running Rails 3.0.0.rc (previous support was for 3.0.0.beta4)
+* Fix Trac 778, 779
+* Fix file,line args to eval
+* Fix bug in File#expand_path
+* Dir[] now allows multiple patterns
+* Fixed some bugs in YAML/Psych
+* Extensive fixes and updates to the underlying GemStone 3.0 system
+
+== Changes for 23981  2010-08-06
+
 * Fix Trac 773, 775
 * Fix result checking of Iconv.create in iconv.rb (fixes Trac 774)
 * Fix various spec failures in URI, Dir, Env, File, Integer#times .
+* Fairly extensive fixes and changes to the underlying GemStone 3.0 system
+* Daniels Starling's latest KD-Tree update
 
 == Changes for 23913  2010-07-28
 

@@ -82,6 +82,12 @@ class IODelegate
   def write(*args)
     @real_io.write(*args)
   end
+  def flush
+    @real_io.flush
+  end
+  def close
+    @real_io.close
+  end
 end
 
 # Compress the data
@@ -101,6 +107,36 @@ new_data = gz_reader.read
 gz_reader.close
 test(new_data, original, 'Delegate')
 
+
+# Bug test.  Writing data of specific lengths was broken.  The length
+# varied depending on how much data was in the buffer already and what the
+# half size of the buffer was.  So, we loop over a good number of sizes to
+# trigger the buggy behavior (seems that when i is 65, it triggers).
+
+
+# This test passes if no exception is raised.
+sio = StringIO.new('', "r+")
+dio = IODelegate.new(sio)
+gz_writer = Zlib::GzipWriter.new(dio)
+
+1.upto(2049) do |i|
+  gz_writer.write("x"*i)
+end
+gz_writer.close
+
+######## coverage for Trac781
+fname = data_dir + '/Trac781.gz'
+fio = File.new(fname, "w")
+gz_wr = Zlib::GzipWriter.new(fio)
+gz_wr.write('abcdef')
+gz_wr.flush
+gz_wr.write("xxx0123456789\n")
+gz_wr.flush
+gz_wr.close
+fio = File.new(fname, "r")
+gz_rd = Zlib::GzipReader.new(fio)
+str = gz_rd.read
+test(str, "abcdefxxx0123456789\n" , "Trac 781")
 
 #####################
 report

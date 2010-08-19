@@ -187,8 +187,8 @@ module Zlib
       if sio._equal?(nil)
         str = String.new
         while not eof?
-	  buf = self.read(4096)
-	  if buf._equal?(nil)
+          buf = self.read(4096)
+          if buf._equal?(nil)
             return str
           end
           str << buf
@@ -241,6 +241,7 @@ module Zlib
       @mtime = 0
       @buffer = ''
       @bufsize = 0
+      @zstream = nil
       super()
     end
 
@@ -322,7 +323,7 @@ module Zlib
 
     alias << write
 
-    def finish
+    def finish(flags=Z_SYNC_FLUSH)
       strm = @zstream
       if strm._equal?(nil)
         write_header
@@ -333,12 +334,27 @@ module Zlib
         strm.write(@buffer, bs)
         @bufsize = 0
       end
-      if strm._not_equal?(nil)
-        strm.flush  # writes footer
+      unless flags == Z_SYNC_FLUSH
+        strm.flush(flags)  # writes footer
       end
+      @io
+    end
+
+    def flush(flags=Z_SYNC_FLUSH)
+      self.finish(flags)
+    end
+
+    def close
+      self.finish(Z_FINISH)
+      @zstream.close
       @zstream = nil
       io = @io
-      @io = nil
+      if io
+        # RubyGems RestrictedStream only understands #initialize and #write
+        io.flush if io.respond_to?(:flush)
+        io.close if io.respond_to?(:close)
+        @io = nil
+      end
       io
     end
 
