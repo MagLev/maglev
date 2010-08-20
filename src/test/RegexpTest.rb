@@ -62,6 +62,10 @@ test(Regexp.new('.D', Regexp::IGNORECASE|Regexp::MULTILINE) =~ "\nD",
      "Multiple options A")
 
 
+# Ensure regexp.to_s quotes '/'
+test(Regexp.new('\A/rails/info/path\Z').to_s,
+     '(?-mix:\A\/rails\/info\/path\Z)',
+     'to_s quotes /')
 
 # Test a couple of regressions with MatchData and distinguishing
 # between no match and zero length string matches.
@@ -276,7 +280,6 @@ raise "ERROR" unless ret == 'def'
 # expectvalue 'dzef'
 ret = RegexpTest.new.match("abcdzefghijklmnoprqstuvwxyz", "dz*ef")
 raise "ERROR" unless ret == 'dzef'
-
 
 
 # A complex example from webrick/common.rb.  This will test that match data
