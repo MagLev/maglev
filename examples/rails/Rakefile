@@ -44,30 +44,41 @@ namespace :patch do
 
   desc "Patch v3.0.0 beta4 or rc ActiveSupport gem."
   task :activesupport do
-    { "3.0.0.beta4" => ["active_support_1.diff"],
-      "3.0.0.rc"    => ["active_support_2.diff",
-                        "active_support_3.diff",
-                        "active_support_4.diff"]}.each do |version,patches|
-      as_dir = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/activesupport-#{version}"
-
-      if File.directory? as_dir
-        puts "Patching #{as_dir}"
-        patches.each do |patch|
-          apply_patch(as_dir, patch)
-        end
-      end
-
-    end
-
+    patch_info = {
+      "activesupport-3.0.0.beta4" => ["active_support_1.diff"],
+      "activesupport-3.0.0.rc"    => ["active_support_2.diff",
+                                      "active_support_3.diff",
+                                      "active_support_4.diff"],
+    }
+    apply_patches(patch_info)
   end
 
   desc "patch the rack-mount-0.6.9 gem"
   task :rackmount do
-    p_dir = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/rack-mount-0.6.9"
-    apply_patch(p_dir, "rack_mount_1.diff")
+    patch_info = { "rack-mount-0.6.9"  => ["rack_mount_1.diff"],
+                   "rack-mount-0.6.12" => ["rack_mount_2.diff"] }
+    apply_patches(patch_info)
   end
 end
 
+# Apply several patches to a versioned gem
+# the patch_info is a hash: { 'activesupport-3.0.0.beta4' => ['patch1.diff', 'patch2.diff'],
+#                             ...}
+def apply_patches(patch_info)
+  patch_info.each do |gem_version, patches|
+    patch_dir = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/#{gem_version}"
+    if File.directory? patch_dir
+      puts "Patching #{patch_dir}"
+      patches.each do |patch|
+        apply_patch(patch_dir, patch)
+      end
+    else
+      puts "Skipping #{patch_dir} (does not exist)"
+    end
+  end
+end
+
+# Apply one patch
 def apply_patch(patch_dir, patch_file)
   if File.directory? patch_dir
     puts "Applying patch #{patch_file} in #{patch_dir}"
