@@ -212,7 +212,7 @@ class Object
     __responds_to(symbol, false, 0x10101)
   end
 
-  def __splat_lasgn_value
+  def __splat_lasgn_value(empty_value)
     # runtime support for rhs of   x = *y , invoked from generated code
     a = self
     unless a._isArray
@@ -225,7 +225,11 @@ class Object
       sz = a.length
       if sz < 2
         if sz._equal?(0)
-          return nil
+          if empty_value._equal?(nil)
+            return empty_value
+          end
+          # empty_value == _remote_nil
+          raise ArgumentError, 'too few args'
         else
           return a[0]
         end

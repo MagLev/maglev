@@ -8,11 +8,13 @@ end
 
 args = []
 k = K.new
+ok = false
 begin
   p k[*args] = 10
   raise "Fail, expecting argument error"
 rescue ArgumentError
-  # OK
+  ok = true
 rescue Exception => e
   raise e
 end
+ok
