@@ -50,10 +50,6 @@ class Symbol
   primitive_nobridge 'to_sym', 'asSymbol'
   primitive_nobridge 'exception', 'asRubyException'
 
-  def call(value)
-    value.__send__(self)
-  end
-
   def taint
     self # do nothing
   end
