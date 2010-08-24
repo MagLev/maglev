@@ -96,7 +96,7 @@ class StringScanner
   #
   # Mnemonic: it "checks" to see whether a scan will return a value.
   #
-  def check( pattern)
+  def check(pattern)
     _scan_headonly(pattern, false, true)
   end
 
@@ -162,8 +162,8 @@ class StringScanner
   #   s.scan /test/           # -> "test"
   #   s.exist? /s/            # -> 6
   #   s.exist? /e/            # -> nil
-  def exist?( pattern)
-    p = _scan( pattern, false, false)
+  def exist?(pattern)
+    p = _scan(pattern, false, false)
     if p._equal?(nil)
       p
     else
@@ -380,8 +380,8 @@ class StringScanner
   #   p s.scan(/\s+/)   # -> " "
   #   p s.scan(/\w+/)   # -> "string"
   #   p s.scan(/./)     # -> nil
-  def scan( pattern)
-    _scan_headonly( pattern, true, true)
+  def scan(pattern)
+    _scan_headonly(pattern, true, true)
   end
 
   # Scans the string until the pattern is matched. Returns the substring up
@@ -392,7 +392,7 @@ class StringScanner
   #   s.scan_until(/1/)        # -> "Fri Dec 1"
   #   s.pre_match              # -> "Fri Dec "
   #   s.scan_until(/XYZ/)      # -> nil
-  def scan_until( pattern)
+  def scan_until(pattern)
     _scan(pattern, true, true)
   end
 
@@ -402,16 +402,16 @@ class StringScanner
   # register is affected.
   #
   # "full" means "scan with full parameters".
-  def scan_full( pattern, succptr, getstr)
-    _scan_headonly( pattern, succptr, getstr)
+  def scan_full(pattern, succptr, getstr)
+    _scan_headonly(pattern, succptr, getstr)
   end
 
   # Scans the string until the pattern is matched. Returns the matched
   # string if return_string_p is true, otherwise returns the number of
   # bytes advanced. Advances the scan pointer if advance_pointer_p,
   # otherwise not. This method does affect the match register.
-  def search_full( pattern, succptr, getstr)
-    _scan( pattern, succptr, getstr)
+  def search_full(pattern, succptr, getstr)
+    _scan(pattern, succptr, getstr)
   end
 
   def self.must_C_version
@@ -431,8 +431,8 @@ class StringScanner
   #   p s.skip(/\s+/)   # -> 1
   #   p s.skip(/\w+/)   # -> 6
   #   p s.skip(/./)     # -> nil
-  def skip( pattern)
-    _scan_headonly( pattern, true, false)
+  def skip(pattern)
+    _scan_headonly(pattern, true, false)
   end
 
   # Advances the scan pointer until pattern is matched and
@@ -450,8 +450,10 @@ class StringScanner
   #   s.skip_until /12/           # -> 10
   #   s                           #
   #
-  def skip_until( pattern)
-    _scan( pattern, true, false)
+  def skip_until(pattern)
+    x = @pos || 0
+    y = _scan(pattern, true, false)
+    y.nil? ? nil : y - x
   end
 
   # Returns the string being scanned.
@@ -497,7 +499,7 @@ class StringScanner
   #   s.peek(7)          # => "test st"
   #   s.peek(7)          # => "test st"
   #
-  def peek( len)
+  def peek(len)
     unless len._isFixnum
       raise RangeError,'expected Fixnum'
     end
@@ -512,7 +514,7 @@ class StringScanner
     peek len
   end
 
-  def _scan( pattern, succptr, getstr)
+  def _scan(pattern, succptr, getstr)
     if pattern._isString
       # ok
     elsif pattern._isRegexp
@@ -538,7 +540,7 @@ class StringScanner
 
     if succptr then
       @prev_pos = ppos
-      @pos += m.size
+      @pos = mmatch.end(0)
     end
 
     if getstr then
@@ -549,7 +551,7 @@ class StringScanner
   end
   private :_scan
 
-  def _scan_headonly( pattern, succptr, getstr)
+  def _scan_headonly(pattern, succptr, getstr)
     if pattern._isString
       # ok
     elsif pattern._isRegexp
@@ -559,8 +561,10 @@ class StringScanner
     end
     @match = nil
 
+
     ppos = @pos
     sstr = @string
+
     return nil if (sstr.size - ppos) < 0 # TODO: make more elegant
 
     # rest = self.rest
