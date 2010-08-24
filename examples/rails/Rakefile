@@ -53,12 +53,6 @@ namespace :patch do
     apply_patches(patch_info)
   end
 
-  desc "patch the rack-mount-0.6.9 gem"
-  task :rackmount do
-    patch_info = { "rack-mount-0.6.9"  => ["rack_mount_1.diff"],
-                   "rack-mount-0.6.12" => ["rack_mount_2.diff"] }
-    apply_patches(patch_info)
-  end
 end
 
 # Apply several patches to a versioned gem
