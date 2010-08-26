@@ -346,7 +346,14 @@ class String
 
   def []=(*args)
     # This variant gets bridge methods
-    raise ArgumentError, 'wrong number of arguments'
+    na = args.__size
+    if na._equal?(2)
+      self[args.__at(0)] = args.__at(1)
+    elsif na._equal?(3)
+      self[args.__at(0), args.__at(1)] = args.__at(2)
+    else
+      raise ArgumentError, 'expected 2 or 3 args'
+    end
   end
 
   primitive_nobridge_env '[]=',     '_rubyAt', ':put:'
