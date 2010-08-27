@@ -345,5 +345,21 @@ obj = Marshal.load(data)
 # testing two birds with one test case...
 test(obj['flash'], { :notice => "Post was successfully created."}, "Rails Test")
 
+
+# This is the same test case, but for arrays:
+class XArray < Array
+  def <<(item)
+    super
+    raise "Fail: XArray#<< called during marshal..."
+  end
+end
+
+xa = XArray.new
+10.times { |i| xa[i] = i }  # avoid << !
+
+serialized = Marshal.dump(xa)
+xa2 = Marshal.load(serialized)
+test(xa, xa2, 'Marshal avoids Array#<< for  subclasses')
+
 report
 true

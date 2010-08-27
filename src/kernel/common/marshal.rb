@@ -141,7 +141,10 @@ module Marshal
       store_unique_object obj
 
       for k in (1..construct_integer) do
-        obj << construct
+        # See comments in #construct_hash for full explanation.
+        # Avoid methods overridable by sub classes
+        #obj << construct
+        obj.__ruby_add_last(construct)
       end
 
       obj
