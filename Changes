@@ -5,6 +5,10 @@
 == Changes for 24126  2010-08-23 
 
 * Fix Trac 781, 782, 783
+* We're making a lot of changes to the underlying GemStone system.
+  That's easy to tell because the MagLev version number is actually
+  the GemStone 3.0 SVN revision number. The version.txt file and
+  the MagLev repo itself tell the whole story.
 
 == Changes for 24067  2010-08-13
 
