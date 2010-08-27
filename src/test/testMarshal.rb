@@ -314,5 +314,20 @@ DATA.each do |description, (object, marshal, attrs)|
   test(s, marshal, description)
 end
 
+# Test case from Rails 3
+# Distilled from a problem running Rails
+require 'set'
+module ActionDispatch
+  module Flash
+    class FlashHash < Hash
+    end
+  end
+end
+
+data = "\004\b{\b\"\020_csrf_token\"1XcuLKI+cUanbHaOw4N9PEgLRl/BKd4MAPeC4+9JB9Ws=\"\017session_id\"%72a38c12f9143f3c248f9706edfcc4e0\"\nflashIC:%ActionDispatch::Flash::FlashHash{\006:\vnotice\"#Post was successfully created.\006:\n@usedo:\bSet\006:\n@hash{\006;\006T"
+
+obj = Marshal.load(data)
+test(obj['flash'], { :notice => "Post was successfully created."}, "Rails Test")
+
 report
 true

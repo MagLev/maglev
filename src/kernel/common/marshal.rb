@@ -392,7 +392,8 @@ module Marshal
     end
 
     def get_user_class
-      cls = Module.const_get(@user_class)
+      #cls = Module.const_get(@user_class)
+      cls = get_scoped_constant(@user_class)
       @user_class = nil
       cls
     end
