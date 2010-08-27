@@ -83,3 +83,4 @@ end
 
 c = C.new
 c[*["a", "b", "c"]] = "d"
+true
