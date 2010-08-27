@@ -1,4 +1,4 @@
-# file marshal.rb 
+# file marshal.rb
 # depends on: module.rb class.rb
 
 module Marshal
@@ -187,7 +187,14 @@ module Marshal
       for k in (1..construct_integer) do
         key = construct
         val = construct
-        obj[key] = val
+        # Bug fix:  Original code was:
+        #        obj[key] = val
+        # but in the case of a sub-class of Hash, will call
+        # the sub-class []=, which may not work if object not
+        # completely constructed yet.  So, "bypass" method lookup
+        # by calling directly the underlying hash store.  In marshal.c,
+        # MRI calls rb_hash_aset(v, key, value), so this is similar.
+        obj.__atkey_put(key,val)
       end
 
       obj.default = construct if type._equal?( TYPE_HASH_DEF_ch)
@@ -468,7 +475,7 @@ module Marshal
 
     def serialize_float_thing(flt)
       str = ''
-      mmath = Math 
+      mmath = Math
       flt = mmath.modf(mmath.ldexp(mmath.frexp(flt.abs)[0], 37))[0]
       str << "\0" if flt > 0
       while flt > 0
@@ -591,13 +598,13 @@ module Marshal
     end
 
     def serialize_ivars(arr)
-      siz = arr.size 
+      siz = arr.size
       str = serialize_integer( siz >> 1 )
       n = 0
-      while n < siz 
+      while n < siz
         str << arr[n].to_marshal(self)
         str << arr[n + 1].to_marshal(self)
-        n += 2 
+        n += 2
       end
       str
     end
@@ -678,8 +685,8 @@ class Object
   Marshal__TYPE_STRING = Marshal::TYPE_STRING
   Marshal__TYPE_FIXNUM = Marshal::TYPE_FIXNUM
   Marshal__TYPE_BIGNUM = Marshal::TYPE_BIGNUM
-  Marshal__TYPE_REGEXP = Marshal::TYPE_REGEXP 
-  Marshal__TYPE_STRUCT = Marshal::TYPE_STRUCT 
+  Marshal__TYPE_REGEXP = Marshal::TYPE_REGEXP
+  Marshal__TYPE_STRUCT = Marshal::TYPE_STRUCT
   Marshal__TYPE_ARRAY = Marshal::TYPE_ARRAY
   Marshal__TYPE_HASH_DEF = Marshal::TYPE_HASH_DEF
   Marshal__TYPE_HASH = Marshal::TYPE_HASH

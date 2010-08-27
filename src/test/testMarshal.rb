@@ -314,12 +314,27 @@ DATA.each do |description, (object, marshal, attrs)|
   test(s, marshal, description)
 end
 
-# Test case from Rails 3
 # Distilled from a problem running Rails
+#
+# Marshal.load(data) was raising a NameException because it was trying to do
+# Kernel.const_defined?(:'ActionDispatch::Flash::FlashHash').  The bug fix
+# was to call #get_scoped_constant() instead of #const_get.
 require 'set'
 module ActionDispatch
   module Flash
     class FlashHash < Hash
+
+      # Bug 2:
+      # A second during marshal loading was that "flash_hash[key] = value"
+      # was being used to populate the underlying Hash.  But, FlashHash#[]=
+      # referenced an as of yet uninitialized inst var, @used, and failed.
+      # Now the marshal code calls Hash#__atkey_put to "avoid" method
+      # lookup.  So, if the above passes, then this second test also
+      # passes.
+      def []=(k,v)
+        raise "Fail: FlashHash#[]= called during marshal..."
+      end
+
     end
   end
 end
@@ -327,6 +342,7 @@ end
 data = "\004\b{\b\"\020_csrf_token\"1XcuLKI+cUanbHaOw4N9PEgLRl/BKd4MAPeC4+9JB9Ws=\"\017session_id\"%72a38c12f9143f3c248f9706edfcc4e0\"\nflashIC:%ActionDispatch::Flash::FlashHash{\006:\vnotice\"#Post was successfully created.\006:\n@usedo:\bSet\006:\n@hash{\006;\006T"
 
 obj = Marshal.load(data)
+# testing two birds with one test case...
 test(obj['flash'], { :notice => "Post was successfully created."}, "Rails Test")
 
 report
