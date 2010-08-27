@@ -440,6 +440,10 @@ class Array
   # note, <<  can't use smalltalk add: , it returns arg, not receiver
   primitive '<<', '_rubyAddLast:'
 
+  # This "alias" is needed by marshal.rb.  We need an entry point that
+  # won't be overridden by sub-classes.
+  primitive_nobridge '__ruby_add_last', '_rubyAddLast:'
+
   # Comparison: Returns an integer -1, 0, or 1 if this array is less than,
   # equal to or greater than +other+.  Each object in each array is
   # compared using <tt><=></tt>.  If any value isn't equal, then that
@@ -610,8 +614,19 @@ class Array
     end
   end
 
-  primitive_nobridge '[]=', '_rubyAt:put:'
+  def []=(*args)
+    na = args.__size
+    if na._equal?(2)
+      self[args.__at(0)] = args.__at(1)
+    elsif na._equal?(3)
+      self[args.__at(0), args.__at(1)] = args.__at(2)
+    else
+      raise ArgumentError, 'expected 2 or 3 args'
+    end
+  end
+
   primitive_nobridge '[]=', '_rubyAt:length:put:'
+  primitive_nobridge '[]=', '_rubyAt:put:'
 
   # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
   def |(other)
@@ -1549,11 +1564,11 @@ class Array
         return nil
       end
     else
-      if start >= my_siz	# 1.8.7, no change to self if start out of bounds
-	if start._equal?(my_siz)
-	  return []
-	end
-	return nil
+      if start >= my_siz  # 1.8.7, no change to self if start out of bounds
+  if start._equal?(my_siz)
+    return []
+  end
+  return nil
       end
     end
     result = self.__at(start, length)

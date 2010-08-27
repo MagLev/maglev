@@ -2,7 +2,18 @@
 
   For more precise details see: http://bit.ly/d3C6S1
 
-== Unreleased changes
+== Changes for 24167  2010-08-27 
+
+* Fix Trac 781, 782, 783
+* Fix bugs in Marshal that affected Rails
+* Fix bugs affecting Rails routing
+* Back out patch to rack-mount now that 782 is fixed
+* Fix bug in StringScanner#skip_until
+* Fix bug for ruby gems tar_writer
+* We're making a lot of changes to the underlying GemStone system.
+  That's easy to tell because the MagLev version number is actually
+  the GemStone 3.0 SVN revision number. The version.txt file and
+  the MagLev git repository commit log tell the whole story.
 
 == Changes for 24067  2010-08-13
 
