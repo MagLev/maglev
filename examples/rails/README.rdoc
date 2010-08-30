@@ -180,7 +180,7 @@ The following patches are applied:
 Run:
   $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
 
-The new app is correctly built, but there are two items that need to be
+The new app is correctly built, but there are a few items that need to be
 upated in the new app.
 
 1. Copy the patched version of <tt>boot.rb</tt> into your application.
@@ -192,6 +192,12 @@ upated in the new app.
      gem 'mysql2'
    to:
      gem 'ruby-mysql', :require => 'mysql'
+
+3. Edit <tt>myapp/config/database.yml</tt>
+   Change the adapter from 'mysql2' to 'mysql'.  Depending on how your
+   MySQL is configured, you may need to add something like the following to
+   your configurations:
+     socket: /opt/local/var/run/mysql5/mysqld.sock
 
 ==== 3. Run +bundle+: Works.
 

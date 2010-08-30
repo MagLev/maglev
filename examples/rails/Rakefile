@@ -46,7 +46,8 @@ namespace :patch do
   task :activesupport do
     patch_info = {
       "activesupport-3.0.0" => ['activesupport_class_patch.diff',
-                                'activesupport_time_zone_patch.diff']
+                                'activesupport_time_zone_patch.diff',
+                                'activesupport_descendents_tracker_patch.diff']
     }
     apply_patches(patch_info)
   end
