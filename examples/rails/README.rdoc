@@ -121,7 +121,7 @@ Detailed explanations of each step follow.
 
 ==== 1. Install rails: Works
 
-Rails installs from gems, but needs one patch.
+Rails installs from gems, but needs a couple of patches.
 
 To install the rails gems,
 you can run <tt>rake init</tt>, or do the following:
@@ -166,17 +166,14 @@ Install rails gems:
 To patch ActiveSupport:
   $ rake patch:activesupport
 
-or
-  $ cd $MAGLEV_HOME/lib/maglev/gems/1.8/gems/activesupport-3.0.0.rc
-  $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_2.diff
-  $ patch -p2 < $MAGLEV_HOME/examples/rails/patches/active_support_3.diff
-
-The patch changes the manner in which all subclasses are found.  MagLev
-does not support <tt>ObjectSpace#each_object</tt> (since objects may be
-persisted, there can be hundres of millions of them...).  This patch allows
-finding all subclasses currently loaded in a VM.  The ActiveSupport file
-already has patches for Rubinius and JRuby.  We expect to submit this patch
-to Rails.
+The following patches are applied:
+1. Patch changes the manner in which all subclasses are found.  MagLev
+   does not support <tt>ObjectSpace#each_object</tt> (since objects may be
+   persisted, there can be hundres of millions of them...).  This patch allows
+   finding all subclasses currently loaded in a VM.  The ActiveSupport file
+   already has patches for Rubinius and JRuby.  We expect to submit this patch
+   to Rails.
+2. There is a patch to workaround https://magtrac.gemstone.com/ticket/757.
 
 ==== 2. Create new rails app: Works, but then must patch app files.
 
@@ -192,7 +189,7 @@ upated in the new app.
        $ cp $MAGLEV_HOME/examples/rails/patches/app_config_boot_Trac757.rb myapp/config/boot.rb
 
 2. Edit <tt>myapp/Gemfile</tt> and change:
-     gem 'mysql'
+     gem 'mysql2'
    to:
      gem 'ruby-mysql', :require => 'mysql'
 

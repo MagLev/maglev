@@ -27,9 +27,9 @@ namespace :gem do
     sh %{ maglev-gem install --no-ri --no-rdoc #{gems} }
   end
 
-  desc "Install rails beta 4 gems into MagLev (will need patches)"
+  desc "Install rails 3.0.0 gems into MagLev (will need patches)"
   task :rails do
-    sh %{ maglev-gem install rails --pre --no-ri --no-rdoc }
+    sh %{ maglev-gem install rails --version 3.0.0 --no-ri --no-rdoc }
   end
 end
 
@@ -42,17 +42,14 @@ namespace :patch do
     cp patch, File.join(app, "config", "boot.rb")
   end
 
-  desc "Patch v3.0.0 beta4 or rc ActiveSupport gem."
+  desc "Patch ActiveSupport 3.0.0 gem."
   task :activesupport do
     patch_info = {
-      "activesupport-3.0.0.beta4" => ["active_support_1.diff"],
-      "activesupport-3.0.0.rc"    => ["active_support_2.diff",
-                                      "active_support_3.diff",
-                                      "active_support_4.diff"],
+      "activesupport-3.0.0" => ['activesupport_class_patch.diff',
+                                'activesupport_time_zone_patch.diff']
     }
     apply_patches(patch_info)
   end
-
 end
 
 # Apply several patches to a versioned gem
