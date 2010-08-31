@@ -235,14 +235,18 @@ http://localhost:3000/ and see <tt>home#index</tt>
 
 You can also create scaffolding:
   $ $MAGLEV_HOME/bin/rails generate scaffold Post name:string title:string content:text
-Unfortunately, this adds <tt>resources :posts</tt> to <tt>routes.rb</tt>,
-and that seems to break the other routes...
 
 === 9. Running a migrations: Works.
 
 Assuming you've generated the scaffolding in the previous step, you can do:
   $ $MAGLEV_HOME/bin/rake db:migrate
 which seems to work.
+
+You should now be able to start the server and hit
+http://localhost:3000/posts
+
+With the posts, you can create a new one, but if you go to edit it,
+(http://localhost:3000/posts/1/edit), there is an error.
 
 === 10. Running the rails console: untested
 
