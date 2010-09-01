@@ -48,6 +48,16 @@ logging) that do not affect page loading.  We fully expect there to be
 other bugs as pages get more complex and as you add more gems and use other
 features.
 
+There are a few error messages that get printed, but you can safely ignore
+them:
+* <tt>error , near line 6, onig_new() status -121, invalid POSIX bracket
+  type of (eval),</tt>, this is just rack-mount testing if Regexp supports
+  certain character classes.  MagLev has an extra print of the error
+  message that we'll suppress in a future release.
+* <tt>binding for eval does not include CopyingBlockArgs yet</tt>
+  MagLev does not yet support copying block args to a binding yet.  So far,
+  these seem to be harmless.
+
 === Slow start up
 
 There are a couple of pauses when starting rails and when loading the first
