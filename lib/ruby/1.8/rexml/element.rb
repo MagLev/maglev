@@ -583,6 +583,7 @@ module REXML
     def add_attribute( key, value=nil )
       if key.kind_of? Attribute
         @attributes << key
+        return key
       else
         @attributes[key] = value
       end
