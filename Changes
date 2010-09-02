@@ -6,6 +6,7 @@
 
 * Update examples/rails from Rails 3.0.0.rc to Rails 3.0.0 final.
 * example/rails/Rakefile now uses bundler to install rails gems.
+* Fix Trac 785
 
 == Changes for 24167  2010-08-27
 
