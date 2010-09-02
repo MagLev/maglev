@@ -1,5 +1,5 @@
---- gems/activesupport-3.0.0.rc/lib/active_support/core_ext/class/subclasses.rb	2010-08-09 13:51:18.000000000 -0700
-+++ gems/activesupportX/lib/active_support/core_ext/class/subclasses.rb	2010-08-09 14:12:01.000000000 -0700
+--- gems/activesupport-3.0.0/lib/active_support/core_ext/class/subclasses.rb	2010-08-30 14:14:45.000000000 -0700
++++ gems/activesupportX/lib/active_support/core_ext/class/subclasses.rb	2010-08-30 14:13:33.000000000 -0700
 @@ -14,6 +14,15 @@
        end
        descendants
