@@ -236,11 +236,16 @@ class Module
   def define_method(sym, meth)
     sym = Type.coerce_to(sym, Symbol, :to_sym)
     m = meth
-    if m._is_a?(Proc)
+    if meth._is_a?(Proc)
       m = meth.__block
     end
     if m._isBlock
-      res = __define_method_block(sym, &m)
+      __define_method_block(sym, &m)  # result is a UnboundMethod
+      if (meth._is_a?(Proc))  # fix bad return type discovered during Trac 785
+        res = meth
+      else
+        res = Proc.new(&m)
+      end
     else
       res = __define_method_meth(sym, meth)
     end

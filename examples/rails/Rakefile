@@ -1,9 +1,10 @@
 task :default => :app
 
 PATCH_DIR = File.join(File.dirname(__FILE__), "patches")
+MAGLEV_HOME = ENV['MAGLEV_HOME']
 
 desc "Do one-time install of gems and patch rails gems"
-task :init => [:'gem:gems', :'gem:rails', :'patch:activesupport']
+task :init => [:'bundler:gem', :'bundler:install', :'patch:activesupport']
 
 desc "Run myapp, with maglev."
 task :app do
@@ -12,24 +13,25 @@ task :app do
     # Setting the MAGLEV_OPTS environment variable ensures the option
     # is passed from the rails script onto maglev-ruby.
     ENV['MAGLEV_OPTS'] = "-MallIvsDynamic"
-    sh "#{ENV['MAGLEV_HOME']}/bin/rails server"
+    sh "#{MAGLEV_HOME}/bin/rails server"
   end
 end
 
-# The tasks in this namespace manage the Rails 3 Beta 4 gems, and the other
-# gems needed to run rails.  They only manage gems for MagLev installed in
-# $MAGLEV_HOME.  The tasks in this namespace need only be run once.
-
-namespace :gem do
-  desc "Ensure the required non-Rails gems are installed into MagLev."
-  task :gems do
-    gems = "rack tzinfo i18n rack-mount erubis mail ruby-mysql"
-    sh %{ maglev-gem install --no-ri --no-rdoc #{gems} }
+# The tasks in this namespace use Bundler to install the appropriate Rails
+# 3.0.0 gems, and the other gems needed to run rails.  They only manage
+# gems for MagLev installed in $MAGLEV_HOME.  The tasks in this namespace
+# need only be run once.
+namespace :bundler do
+  desc "Ensure the rake and bundler gems are installed into MagLev."
+  task :gem do
+    sh %{ maglev-gem install --no-ri --no-rdoc rake bundler }
   end
 
-  desc "Install rails beta 4 gems into MagLev (will need patches)"
-  task :rails do
-    sh %{ maglev-gem install rails --pre --no-ri --no-rdoc }
+  desc "Install rails 3.0.0 gems from myapp/Gemfile.lock into MagLev"
+  task :install do
+    cd('myapp') do
+      sh %{ #{MAGLEV_HOME}/bin/bundle install }
+    end
   end
 end
 
@@ -42,17 +44,15 @@ namespace :patch do
     cp patch, File.join(app, "config", "boot.rb")
   end
 
-  desc "Patch v3.0.0 beta4 or rc ActiveSupport gem."
+  desc "Patch ActiveSupport 3.0.0 gem."
   task :activesupport do
     patch_info = {
-      "activesupport-3.0.0.beta4" => ["active_support_1.diff"],
-      "activesupport-3.0.0.rc"    => ["active_support_2.diff",
-                                      "active_support_3.diff",
-                                      "active_support_4.diff"],
+      "activesupport-3.0.0" => ['activesupport_class_patch.diff',
+                                'activesupport_time_zone_patch.diff',
+                                'activesupport_descendents_tracker_patch.diff']
     }
     apply_patches(patch_info)
   end
-
 end
 
 # Apply several patches to a versioned gem
@@ -60,7 +60,7 @@ end
 #                             ...}
 def apply_patches(patch_info)
   patch_info.each do |gem_version, patches|
-    patch_dir = "#{ENV['MAGLEV_HOME']}/lib/maglev/gems/1.8/gems/#{gem_version}"
+    patch_dir = "#{MAGLEV_HOME}/lib/maglev/gems/1.8/gems/#{gem_version}"
     if File.directory? patch_dir
       puts "Patching #{patch_dir}"
       patches.each do |patch|
