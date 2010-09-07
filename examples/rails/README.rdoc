@@ -94,18 +94,19 @@ The following steps are loosely based on the {Rails Blog
 Tutorial}[http://guides.rails.info/getting_started.html]. We are using
 these steps to drive forward on getting Rails working. Assuming you've
 patched ActiveSupport as described below, and you apply the patch to the
-generated app (as described in step 2), then this is the current status:
+generated app (as described in step 2), then everything up through step 9
+should just work:
 
-1. Install rails: <tt>maglev-gem install rails --pre</tt> (works)
-2. Create new rails app: <tt>$MAGLEV_HOME/bin/rails new blog</tt> (works)
-3. Run +bundle+: <tt>$MAGLEV_HOME/bin/bundle install</tt> (works)
-4. Create the database: <tt>$MAGLEV_HOME/bin/rake db:create</tt> (works)
-5. Start server: <tt>$MAGLEV_HOME/bin/rails server</tt> (works)
-6. Load a static page: http://localhost:3000/ (works)
-7. Load a dynamic page: http://localhost:3000/rails/info/properties (works)
+1. Install rails: <tt>maglev-gem install rails --pre</tt>
+2. Create new rails app: <tt>$MAGLEV_HOME/bin/rails new blog</tt>
+3. Run +bundle+: <tt>$MAGLEV_HOME/bin/bundle install</tt>
+4. Create the database: <tt>$MAGLEV_HOME/bin/rake db:create</tt>
+5. Start server: <tt>$MAGLEV_HOME/bin/rails server</tt>
+6. Load a static page: http://localhost:3000/
+7. Load a dynamic page: http://localhost:3000/rails/info/properties
 8. Generate new controller: <tt>$MAGLEV_HOME/bin/rails generate controller
-   home index</tt> (works)
-9. Running migrations: <tt>$MAGLEV_HOME/bin/rake db:migrate</tt> (works)
+   home index</tt>
+9. Running migrations: <tt>$MAGLEV_HOME/bin/rake db:migrate</tt>
 10. Running the rails console: <tt>$MAGLEV_HOME/bin/rails console</tt>
     (untested)
 11. Run application unit tests (untested)
@@ -115,7 +116,7 @@ pass.
 
 Detailed explanations of each step follow.
 
-=== 1. Install rails: Works
+=== 1. Install rails
 
 Rails installs from gems or bundler, but needs a couple of patches.
 You can install and patch rails using the provided rake task:
@@ -164,7 +165,7 @@ Or, you can use Bundler to install them yourself.
      $ cd $MAGLEV_HOME/examples/rails
      $ rake patch:activesupport
 
-=== 2. Create new rails app: Works, but then must patch app files.
+=== 2. Create new rails app
 
 1. Generate the application:
      $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
@@ -193,20 +194,20 @@ Or, you can use Bundler to install them yourself.
    discussion of <tt>-MallIvsDynamic</tt>.
      $ export MAGLEV_OPTS='-MallIvsDynamic'
 
-=== 3. Run +bundle+: Works.
+=== 3. Run +bundle+
 
 Run:
   $ cd myapp
   $ $MAGLEV_HOME/bin/bundle install
 
-=== 4. Create the database: Works.
+=== 4. Create the database
 
 Run:
   $ $MAGLEV_HOME/bin/rake db:create
 
 You should now see your application databases defined in MySQL.
 
-=== 5. Start server: Works.
+=== 5. Start server
 
 MagLev needs the <tt>-MallIvsDynamic</tt> option set in order to run
 Rails.  The most robust way to set this is through the <tt>MAGLEV_OPTS</tt>
@@ -224,16 +225,15 @@ An alternate method is:
   $ cd myapp
   $ maglev-ruby -MallIvsDynamic script/rails server
 
-=== 6. Load a static page: Works.
+=== 6. Load a static page
 
 Static pages in the app load fine under MagLev: http://localhost:3000/
 
-=== 7. Load a dynamic page: Works.
+=== 7. Load a dynamic page
 
 Simple dynamic pages work fine under MagLev: http://localhost:3000/rails/info/properties
 
-=== 8. Generate new controllers and scaffolding: Works (but resource
-routes break routing)
+=== 8. Generate new controllers and scaffolding
 
 Run:
   $ $MAGLEV_HOME/bin/rails generate controller home index
@@ -246,17 +246,14 @@ http://localhost:3000/ and see <tt>home#index</tt>
 You can also create scaffolding:
   $ $MAGLEV_HOME/bin/rails generate scaffold Post name:string title:string content:text
 
-=== 9. Running a migrations: Works.
+=== 9. Running a migrations
 
 Assuming you've generated the scaffolding in the previous step, you can do:
   $ $MAGLEV_HOME/bin/rake db:migrate
 which seems to work.
 
 You should now be able to start the server and hit
-http://localhost:3000/posts
-
-With the posts, you can create a new one, but if you go to edit it,
-(http://localhost:3000/posts/1/edit), there is an error.
+http://localhost:3000/posts and start managing your blog.
 
 === 10. Running the rails console: untested
 
