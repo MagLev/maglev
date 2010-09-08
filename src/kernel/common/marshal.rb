@@ -505,7 +505,9 @@ module Marshal
 
       ivars_result[0] = ivars
       if ivars.length > 0 then
-        TYPE_IVAR
+        # Don't return TYPE_IVAR.  The return value of this method is
+        # modified, and we don't want TYPE_IVAR modified
+        TYPE_IVAR.dup
       else
         ''
       end

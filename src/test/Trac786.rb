@@ -43,4 +43,8 @@ class Base
   end
 end
 
-p Base.table_name
+bb = Base
+x = bb.table_name
+unless x == 'posts' ; raise 'Failed';end
+puts "OK"
+true
