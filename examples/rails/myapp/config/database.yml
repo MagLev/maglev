@@ -28,6 +28,7 @@ test:
   username: root
   password:
   host: localhost
+  socket: /opt/local/var/run/mysql5/mysqld.sock
 
 production:
   adapter: mysql
@@ -38,3 +39,4 @@ production:
   username: root
   password:
   host: localhost
+  socket: /opt/local/var/run/mysql5/mysqld.sock

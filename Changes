@@ -2,10 +2,18 @@
 
   For more precise details see: http://bit.ly/d3C6S1
 
-== Unreleased Changes
+== Changes for 24222 2010-09-09
+
+* Added support for Rails 3.0.0
+* Fix bug where Marshal::TYPE_IVAR was being modified during object serialization
+* Fix Trac 786
+* Many fixes and improvements to the underlying GemStone 3.0 system
+
+== Changes for 24192 2010-09-02
 
 * Update examples/rails from Rails 3.0.0.rc to Rails 3.0.0 final.
 * example/rails/Rakefile now uses bundler to install rails gems.
+* Fix Trac 785
 
 == Changes for 24167  2010-08-27
 

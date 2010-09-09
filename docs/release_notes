@@ -168,3 +168,4 @@ on a C-extension do not install or run with MagLev.
 * Most methods in +ObjectSpace+ are stubs that raise
   +NotImplementedError+.
 * <tt>String#unpack</tt> and <tt>Array#pack</tt> do not support pointers ('p' and 'P').
+* <tt>Kernel#set_trace_func</tt> is not supported.
