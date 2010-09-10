@@ -149,8 +149,8 @@ worked out, the management of persistence is straightforward.  When a class
 marked persistable is actually committed to the repository, then the
 standard rules for persistence are applied (the transitive closure of
 objects reachable from that class object, is also persisted).  Among the
-items reachable from a class are its methods, its eigenclass (which holds
-the "class methods" and <tt>@bar</tt> class instance variables), its
+items reachable from a class are its methods, its singleton class (which
+holds the "class methods" and <tt>@bar</tt> class instance variables), its
 <tt>@@foo</tt> class variables, its class (Class or Module), its super
 class and any constants defined for that class.  Note that instance
 variables for instances of the class are stored with the instance, not with
@@ -318,11 +318,49 @@ Any VM already connected to the repository will see the new class
 (or modifications) the next time it does a <tt>Maglev.commit_transaction</tt>
 or a <tt>Maglev.abort_transaction</tt>.
 
-=== Eigenclasses (Singleton classes)
+=== Singleton classes
 
-The MagLev VM marks all Eigenclasses as persistable, and marks them to
-allow persistable instances.  Eigenclasses are automatically persisted by
-reachability if their object is persisted.
+The MagLev VM marks all singleton classes as persistable, and marks them to
+allow persistable instances.  Singleton classes, and their persistent
+method dictionaries, are automatically persisted by reachability if their
+object is persisted.
+
+Note: only singleton methods defined in a persistent block are persisted.
+E.g., suppose demo.rb has:
+
+  # demo.rb
+  s1 = "hello"
+  s2 = "goodbye"
+
+  Maglev::PERSISTENT_ROOT[:s1] = s1
+  Maglev::PERSISTENT_ROOT[:s2] = s2
+
+  def s1.foo
+    puts "foo called on #{self}"
+  end
+
+  Maglev.persistent do
+    def s2.foo
+      puts "foo called on #{self}"
+    end
+  end
+
+  Maglev.commit_transaction
+
+At the commit_transaction, both s1 and s2 will have their singleton classes
+saved, but only s2 will have the #foo method defined (s1's singleton class
+will have an empty persistent method dictionary):
+
+  $ maglev-ruby -e 'Maglev::PERSISTENT_ROOT[:s1].foo'
+  ERROR 2010, NoMethodError: undefined method `foo' for singleton (NoMethodError)
+
+  $ maglev-ruby -e 'Maglev::PERSISTENT_ROOT[:s2].foo'
+  foo called on goodbye
+
+It's possible that this behavior ends up be annoying.  If experience tells
+us that all singleton methods should automatically be saved, then we could
+implement that.  Conversely, it might be that by default, no singleton
+class should be saved.  Time will tell...
 
 === Re-Opening Classes to Achieve Finer Control
 
