@@ -21,12 +21,12 @@ namespace :commit do
   end
 
   desc "Commit a set of 100_000 random People (depends on commit:code)"
-  task :data_100k do
+  task :data_100k => :code do
     sh %{ maglev-ruby create_random_people.rb 100_000 commit }
   end
 
   desc "Commit a set of 1_000_000 random People (depends on commit:code)"
-  task :data_1m do
+  task :data_1m => :code do
     sh %{ maglev-ruby create_random_people.rb 1_000_000 commit }
   end
 end

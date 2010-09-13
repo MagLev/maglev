@@ -21,7 +21,7 @@ commit_p = ARGV[0] == 'commit'
 # An IdentitySet is a Set (i.e., each element occurs only once) and it uses
 # Object identity (equal?)  rather than object equality (eql?).
 
-people = IdentitySet.new
+$people = IdentitySet.new
 
 # Step Two:,  Add an Index
 #
@@ -30,15 +30,30 @@ people = IdentitySet.new
 # NOTE: this sorting is done on the @age instance variable, and does not
 # depend on an instance method named "age".  We will put People objects in
 # the set.  People have a name, age, gender and address.
-people.create_equality_index('@age', Fixnum)
+$people.create_equality_index('@age', Fixnum)
 
 # Now we add people to the set.  As each object is added to the set, the
 # indexing subsystem will update its data structures to keep the population
-# indexed on the age field.
-population_size.times { people << Person.random }
+# indexed on the age field.  We break the creation of the data up into
+# chunks for performance.  Rather than create, index and commit a million
+# people, we do it in easily digestible chunks of 100_000 to manage memory
+# and other resources.
 
-if commit_p
-  Maglev.persistent { Person::RANDOM_PEOPLE = people }
-  Maglev.commit_transaction
-  puts "Committed #{people.size} to Person::RANDOM_PEOPLE"
+$chunk_size = 100_000
+iterations, left_over = population_size.divmod($chunk_size)
+
+Maglev.persistent { Person::RANDOM_PEOPLE = $people } if commit_p
+
+def more_people(num, commit_flag)
+  num.times { $people << Person.random }
+  if commit_flag
+    puts "=== Committing next #{$chunk_size} people"
+    Maglev.commit_transaction
+  end
 end
+
+iterations.times do |n|
+  puts "=== Generating next #{$chunk_size} people"
+  more_people($chunk_size, commit_p)
+end
+more_people(left_over, commit_p) if left_over > 0

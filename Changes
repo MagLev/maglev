@@ -2,7 +2,17 @@
 
   For more precise details see: http://bit.ly/d3C6S1
 
+== Unreleased Changes
+
 == Changes for 24222 2010-09-09
+
+* Fixed problem creating indexes when running under RVM.
+* Underlying GemStone 3.0 system changes
+*   Implements partial continuations needed for Seaside
+*   Fixes GemStone bugs 40907 40910 40927 40930 40932 40936
+*   Changes numeric methods to conform to ANSI
+
+== Changes for 24209 2010-09-08
 
 * Added support for Rails 3.0.0
 * Fix bug where Marshal::TYPE_IVAR was being modified during object serialization

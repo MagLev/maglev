@@ -552,4 +552,14 @@ end
 
 f = Foo.new(0,1,2) { 10 }
 
+# Test case from I18N:  *some* modifications are allowed during iteration,
+# in particular, it looks like delete is allowed.
+
+# From I18N gem:  Test case passes if no exception
+values = { :a => "A", :b => "B" }
+values.each do |key,value|
+  values.delete(key) if key == :a
+end
+
+test(values, { :b => "B"}, "delete allowed during iteration")
 report

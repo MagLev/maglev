@@ -810,7 +810,8 @@ class Hash
       end
       kofs += 2
     end
-    unless @_st_numElements._equal?(num_elem)
+    # Use >, not .equal?, since MRI allows deletes, but not adds
+    if @_st_numElements > num_elem
       raise RuntimeError, 'Hash changed during iteration'
     end
     self
