@@ -8,6 +8,12 @@ COMMAND="`basename $0`"
 
 usage()
 {
+    if [[ -n $1 ]]
+    then
+        echo
+        echo "ERROR:  $1"
+        echo
+    fi
     cat << EOF
 Usage: $COMMAND [switches] [--] [programfile] [arguments]
 
@@ -15,6 +21,7 @@ Usage: $COMMAND [switches] [--] [programfile] [arguments]
 
 OPTIONS:
    --copyright    Print copyright and exit
+   -C <dir>       Changes directory to <dir> before executing.
    -d, --debug    Set debug flag. Allows topaz debugging.
    +d             Set debug flag off.
    -e 'command'   Execute command. Several -e's allowed. Omit [programfile]
@@ -44,6 +51,7 @@ OPTIONS:
    -w             Turn on warnings.  Sets $VERBOSE true.
    -W<d>          Set the warning level to <d>.  <d> is a single digit 0..9.
                   If set to 0, then no warnings are printed.  Default is 1.
+   -X<dir>        Changes directory to <dir> before executing (same as -C)
    --             End of MagLev parameters.  The next parameter is the
                   programfile, then any programfile arguments follow.
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
@@ -55,6 +63,13 @@ Options can be set in the MAGLEV_OPTS environment variable as well as on the
 command line.  Command line options override \$MAGLEV_OPTS
 
 EOF
+exit 1
+}
+
+add_ruby_arg()
+{
+    if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
+    ruby_args="${ruby_args}${1}"
 }
 
 # The environment variable STONENAME is for use by internal GemStone developers and QA
@@ -124,9 +139,17 @@ else
     stone=$STONENAME
 fi
 
+
 while [ $# -gt 0 ]
 do
     case "$1" in
+        -C|-X)
+            cd $2 || usage "$2: bad directory for $1"
+            shift
+            ;;
+        -C*|-X*)
+            cd ${1:2} || usage "${1:2}: bad directory"
+            ;;
         --copyright)
             echo "maglev - Copyright 2008-2010 GemStone Systems, Inc."
             exit
@@ -138,31 +161,26 @@ do
             debugFlag=
             ;;
         -e)
-            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-            ruby_args="${ruby_args}'-e' . '${2//\'/''}'"  # smalltalk escape: ' => ''
+            add_ruby_arg "'-e' . '${2//\'/''}'"  # smalltalk escape: ' => ''
             sawDashE=1
             shift
             ;;
         -e*)
-            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-            ruby_args="${ruby_args}'${1//\'/''}'"  # smalltalk escape: ' => ''
+            add_ruby_arg "'${1//\'/''}'"  # smalltalk escape: ' => ''
             sawDashE=1
             ;;
         -G)
             unset GEMSTONE_GLOBAL_DIR
             ;;
         -h|--help)
-            usage
-            exit
+            usage  # usage exits
             ;;
         -I|-r)
-            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-            ruby_args="${ruby_args}'$1' . '$2'"
+            add_ruby_arg "'$1' . '$2'"
             shift
             ;;
         -I*|-r*)
-            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-            ruby_args="${ruby_args}'$1'"
+            add_ruby_arg "'$1'"
             ;;
         -M*)
             sub_opt=${1:2}
@@ -178,11 +196,8 @@ do
                     maglev_args="${maglev_args} ${sub_opt}"
                     ;;
                 *)
-                    echo
-                    echo "Unknown option: $1"
-                    echo
-                    usage
-                    exit 1
+                    usage "Unknown option: $1"  # usage exits
+                    ;;
             esac
             ;;
         -S) searchPathFlag=1 ;;
@@ -201,8 +216,7 @@ do
             shift
             ;;
         -v|--verbose)
-            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-            ruby_args="${ruby_args}'-v'"
+            add_ruby_arg "'-v'"
             echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
             if [ $# -eq 1 ]; then exit; fi
             ;;
@@ -211,13 +225,11 @@ do
             exit
             ;;
         -w) # Sets $VERBOSE true; read from stdin if no script
-            if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-            ruby_args="${ruby_args}'-w'"
+            add_ruby_arg "'-w'"
             ;;
         -W*)
             if [[ ${1:2} =~ ^[0-9]$ ]]; then
-                if [ ! -z "$ruby_args" ]; then ruby_args="${ruby_args} . " ;fi
-                ruby_args="${ruby_args}'$1'"
+                add_ruby_arg "'$1'"
             else
                 echo "Bad parameter for -W: should be single digit"
                 exit 1
@@ -227,11 +239,7 @@ do
             break
             ;;
         -*)
-            echo
-            echo "Unrecognized option: $1"
-            echo
-            usage
-            exit
+            usage "Unrecognized option: $1"  # usage exits
             ;;
         *)
             break
@@ -262,7 +270,7 @@ if [[ ! $sawDashE ]]; then
 else
   if [[ $# -lt 1 ]]; then
     if [ ! -z "$script_args" ]; then script_args="${script_args} . " ;fi
-    script_args="'-'" 
+    script_args="'-'"
   fi
 fi
 
@@ -364,11 +372,11 @@ EOF
 fi
 
 cat - >> $dbscript <<-EOF
-System currentSegment: nil . 
+System currentSegment: nil .
 ctx := RubyContext load: #( ${maglev_args} ) .
  SessionTemps current at: #MagRpDEBUG put: 0 .
  "note you cannot debug Ruby MNU here"
-" Exception installDebugBlock: [:ex|  
+" Exception installDebugBlock: [:ex|
    (ex isKindOf:NameError) ifTrue:[ nil pause ].
  ]. "
 ctx runFileNamed: '$RUBYSCRIPT' withRubyArgs: { ${ruby_args} }

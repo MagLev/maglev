@@ -213,23 +213,19 @@ rule
                 | primary_value tDOT tIDENTIFIER tOP_ASGN command_call
                     {
 		      # "stmt: | primary_value tDOT tIDENTIFIER tOP_ASGN command_call" 
-                      internal_error(":op_asgn never seen from MRI parser ")
                       # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-                      result = nil
+                      result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
                     }
                 | primary_value tDOT tCONSTANT tOP_ASGN command_call
                     {
 		      # "stmt: | primary_value tDOT tCONSTANT tOP_ASGN command_call" 
-                      internal_error(":op_asgn never seen from MRI parser ")
 		      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-		      result = nil
+                      result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
 		    } 
 		  | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call
 		      {
 		        # "stmt: | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call" 
-                        internal_error(":op_asgn never seen from MRI parser ")
-			# result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-                        result = nil
+                        result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
 		      }
 		  | backref tOP_ASGN command_call
 		      {
@@ -785,9 +781,7 @@ rule
                 | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg
                     {
 		      # "arg: | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg" 
-                      internal_error(":op_asgn never seen from MRI parser ")
-                      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-                      result = nil
+                      result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
                     }
                 | primary_value tCOLON2 tCONSTANT tOP_ASGN arg
 

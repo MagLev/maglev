@@ -3137,27 +3137,23 @@ end
 
 def _reduce_27(val, vofs)
 		      # "stmt: | primary_value tDOT tIDENTIFIER tOP_ASGN command_call" 
-                      internal_error(":op_asgn never seen from MRI parser ")
                       # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-                      result = nil
+                      result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
                     
     result
 end
 
 def _reduce_28(val, vofs)
 		      # "stmt: | primary_value tDOT tCONSTANT tOP_ASGN command_call" 
-                      internal_error(":op_asgn never seen from MRI parser ")
 		      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-		      result = nil
+                      result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
 		    
     result
 end
 
 def _reduce_29(val, vofs)
 		        # "stmt: | primary_value tCOLON2 tIDENTIFIER tOP_ASGN command_call" 
-                        internal_error(":op_asgn never seen from MRI parser ")
-			# result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-                        result = nil
+                        result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
 		      
     result
 end
@@ -3971,9 +3967,7 @@ end
 
 def _reduce_181(val, vofs)
 		      # "arg: | primary_value tCOLON2 tIDENTIFIER tOP_ASGN arg" 
-                      internal_error(":op_asgn never seen from MRI parser ")
-                      # result = s(:op_asgn, val_[0], val_[4], val_[2], val_[3])
-                      result = nil
+                      result = RubyOpAsgnNode.s(val[vofs ], val[vofs + 2], val[vofs + 3], val[vofs + 4])
                     
     result
 end
