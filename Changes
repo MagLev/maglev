@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 788
+
 == Changes for 24222 2010-09-09
 
 * Fixed problem creating indexes when running under RVM.
