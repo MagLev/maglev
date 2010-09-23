@@ -1,7 +1,7 @@
 class Regexp
 
   # Options for passing to new
-  IGNORECASE = 1
+  IGNORECASE = 1    # if these constants change, change code in RubyParser(C)>>new_regexp
   EXTENDED   = 2
   MULTILINE  = 4
   ALL_OPTIONS_MASK = 7
