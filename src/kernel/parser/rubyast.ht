@@ -1,0 +1,233 @@
+#if !defined(RUBYAST_HT)
+#define RUBYAST_HT 1
+
+typedef enum 
+{
+  cls_RubyAbstractLiteralNode,
+  cls_RubyAbstractNumberNode,
+  cls_RubyAliasNode,
+  cls_RubyAndNode,
+  cls_RubyArgsNode,
+  cls_RubyArrayNode,
+  cls_RubyAttrAssignNode,
+  cls_RubyBackRefNode,
+  cls_RubyBeginNode,
+  cls_RubyBlockArgNode,
+  cls_RubyBlockNode,
+  cls_RubyBlockPassNode,
+  cls_RubyBreakNode,
+  cls_RubyCaseNode,
+  cls_RubyClassNode,
+  cls_RubyClassVarDeclNode,
+  cls_RubyClassVarNode,
+  cls_RubyColon2Node,
+  cls_RubyColon3Node,
+  cls_RubyConstDeclNode,
+  cls_RubyConstNode,
+  cls_RubyDefinedNode,
+  cls_RubyDotNode,
+  cls_RubyEnsureNode,
+  cls_RubyEvStrNode,
+  cls_RubyFalseNode,
+  cls_RubyForNode,
+  cls_RubyGlobalAsgnNode,
+  cls_RubyGlobalVarAliasNode,
+  cls_RubyGlobalVarNode,
+  cls_RubyHashNode,
+  cls_RubyIfNode,
+  cls_RubyInstAsgnNode,
+  cls_RubyInstVarNode,
+  cls_RubyIterRpNode,
+  cls_RubyLocalAsgnNode,
+  cls_RubyLocalVarNode,
+  cls_RubyModuleNode,
+  cls_RubyNextNode,
+  cls_RubyNilNode,
+  cls_RubyNotNode,
+  cls_RubyNthRefNode,
+  cls_RubyOpAsgnNode,
+  cls_RubyOpElementAsgnNode,
+  cls_RubyOrNode,
+  cls_RubyRedoNode,
+  cls_RubyRescueBodyNode,
+  cls_RubyRescueNode,
+  cls_RubyRetryNode,
+  cls_RubyReturnNode,
+  cls_RubyRpCallArgs,
+  cls_RubySClassNode,
+  cls_RubySValueNode,
+  cls_RubySelfNode,
+  cls_RubySplatNode,
+  cls_RubyStrNode,
+  cls_RubySymbolNode,
+  cls_RubyTrueNode,
+  cls_RubyWhenNode,
+  cls_RubyZSuperNode ,
+  cls_RubyParser,
+  cls_RubyLexStrTerm,
+  cls_RpNameToken,
+  NUM_AST_CLASSES // must be last
+} AstClassEType;
+
+typedef enum 
+{
+  // Smalltalk message selectors
+  sel_add_arg,
+  sel_add_block_arg,
+  sel_add_optional_arg,
+  sel_add_star_arg,
+  sel__append,
+  sel__appendAll,
+  sel_append_arg,
+  sel_append_arg_blkArg,
+  sel_append_arg_splatArg_blkArg,
+  sel_append_blkArg,
+  sel_appendTo_evstr2dstr,
+  sel_append_splatArg,
+  sel_append_splatArg_blk,
+  sel_append_to_block,
+  sel_arrayLength,
+  sel_backref_error,
+  sel_block_append,
+  sel_callNode_,
+  sel_colon2_name,
+  sel_colon3,
+  sel_bodyNode_,
+  sel_get_match_node,
+  sel_list_append,
+  sel_list_prepend,
+  sel_literal_concat,
+  sel_logop,
+  sel_masgn_append_arg,
+  sel_masgn_append_mrhs,
+  sel__new,
+  sel__new_,
+  sel__new_with,
+  sel_new_aref,
+  sel_new_call,
+  sel_new_call_1,
+  sel_new_call_braceBlock,
+  sel_new_defn,
+  sel_new_defs,
+  sel_new_dsym,
+  sel_new_evstr,
+  sel_new_fcall,
+  sel_new_fcall_braceBlock,
+  sel_new_if,
+  // sel_new_iter,    // not used
+  sel_new_op_asgn,
+  sel_new_parasgn,
+  sel_new_regexp,
+  sel_new_string,
+  sel_new_super,
+  sel_new_undef,
+  sel_new_until,
+  sel_new_vcall,
+  sel_new_while,
+  sel_new_xstring,
+  sel_new_yield,
+  sel_node_assign,
+  sel_opt_rescue,
+  sel_ret_args,
+  sel_s_a,
+  sel_s_a_b,
+  sel_s_a_b_c,
+  sel_s_a_b_c_d,
+  sel_s_splat_blk,
+  sel_s_a_blk,
+  sel_s_a_splat_blk,
+  sel_s_a_b_blk,
+  sel_s_a_b_splat_blk,
+  sel_a_all_b_blk,
+  sel_a_all_b_splat_blk,
+  sel_sym_srcOffset,
+  sel_setParen,
+  sel_sym_ofs_val,
+  sel_uplus_production ,
+  sel_value_expr,
+  NUM_AST_SELECTORS // must be last
+} AstSelectorEType;
+
+typedef enum {
+  a_sym_orOp,  // '|'
+  a_sym_or,  // 'or'
+  a_sym_OOR, // "||"
+  a_sym_upArrow, // '^'
+  a_sym_andOp, // '&'
+  a_sym_and, // 'and'
+  a_sym_AAND, // "&&"
+  a_sym_tCMP , // "<=>"
+  a_sym_tEQ  , // "=="
+  a_sym_gt, // '>'
+  a_sym_tGEQ, // ">="
+  a_sym_lt, // '<'
+  a_sym_tLEQ, // "<="
+  a_sym_tLSHFT, // "<<"
+  a_sym_tRSHFT, // ">>"
+  a_sym_plus, // '+'
+  a_sym_minus, // '-'
+  a_sym_star, // '*'
+  a_sym_div,  // '/' 
+  a_sym_percent, // '%'
+  a_sym_tPOW, // "**"
+  a_sym_tilde, // '~'   // also for tMATCH
+  a_sym_tripleEq, // "==="
+  a_sym_tUPLUS,  // "+@"
+  a_sym_tUMINUS, // "-@"
+  a_sym_tAREF, // "[]"
+  a_sym_tASET, // "[]="
+  a_sym_backtick, // '`'
+  a_sym_tNEQ,  // "!="
+  a_sym_tEQQ  , // "==="
+  a_sym_bang,  // "!"
+  a_sym_dot2,  // ".."
+  a_sym_dot3,  // "..."
+  a_sym_tMATCH, // "=~"
+  a_sym_tNMATCH, // "!~"
+  a_sym_colon2,  // "::"
+  a_sym_case,
+  a_sym_ensure,
+  a_sym_not,
+  a_sym_yield,
+  a_sym_for,
+  a_sym_false,
+  a_sym_retry,
+  a_sym_return,
+  a_sym_true,
+  a_sym_definedQ,
+  a_sym_super,
+  a_sym_undef,
+  a_sym_break,
+  a_sym_in,
+  a_sym_next,
+  a_sym_when,
+  a_sym_redo,
+  a_sym_class,
+  a_sym_alias,
+
+  a_sym_end,
+  a_sym_else,
+  a_sym_module,
+  a_sym_elsif,
+  a_sym_def,
+  a_sym_rescue,
+  a_sym_then,
+  a_sym_self,
+  a_sym_if,
+  a_sym_do,
+  a_sym_nil,
+  a_sym_until,
+  a_sym_unless,
+  a_sym_begin,
+  a_sym__LINE_,
+  a_sym__FILE_,
+  a_sym_END,
+  a_sym_BEGIN,
+  a_sym_while,
+  a_sym_rest_args,
+  a_sym_INVALID,
+  NUM_AST_SYMBOLS // must be last
+} AstSymbolEType ;
+
+#endif
+

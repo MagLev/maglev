@@ -1,0 +1,1015 @@
+#if !defined(RUBYAST_HF)
+#define RUBYAST_HF 1
+
+#include "lrgint.hf"
+
+class rb_parse_state;
+
+class RubyNode
+{
+ public:
+  static omObjSType* call(omObjSType *rcvr, AstSelectorEType sel_e, rb_parse_state *ps);
+  static omObjSType* call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType *arg, rb_parse_state *ps);
+  static omObjSType* call(omObjSType *rcvr, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType* b, rb_parse_state *ps);
+  static omObjSType* call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType *a, 
+			omObjSType* b, omObjSType *c, rb_parse_state *ps);
+  static omObjSType* call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType *a, 
+			omObjSType* b, omObjSType *c, omObjSType *d, rb_parse_state *ps);
+
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, omObjSType *a, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType *b, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType *b, omObjSType *c, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType *b, omObjSType *c, omObjSType *d, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType *b, omObjSType *c, omObjSType *d, 
+		        omObjSType *e, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType *b, omObjSType *c, omObjSType *d, 
+		        omObjSType *e, omObjSType *f, rb_parse_state *ps);
+
+  static void checkInstanceOf(omObjSType **objH, AstClassEType cls_e, rb_parse_state *ps);
+  static BoolType is_a(omObjSType *obj, AstClassEType cls_e, rb_parse_state *ps);
+
+  static omObjSType* setParen(omObjSType *o, rb_parse_state *ps) {
+    return call(o, sel_setParen, ps);
+  }
+  static omObjSType* basicNew(AstClassEType e_cls, rb_parse_state *ps);
+};
+
+class RpNameToken
+{
+  enum { val_ofs = 0,
+         src_offset_ofs = 1,
+         quid_ofs = 2,
+         my_cls = cls_RpNameToken };
+ public:
+
+  // TODO verify instvar offsets at session init
+  static omObjSType* srcOffsetO(rb_parse_state *ps, omObjSType *inst) {
+    if (OOP_IS_SMALL_INT(inst)) {
+      return inst;
+    }
+    OmScopeType aScope(ps->omPtr);
+    omObjSType **instH = aScope.add(inst);
+    RubyNode::checkInstanceOf(instH, (AstClassEType)my_cls, ps);
+    omObjSType *v = om::FetchOop(*instH, src_offset_ofs);
+    return v;
+  }
+  static omObjSType* srcOffsetO_noCheck(rb_parse_state *ps, omObjSType *inst) {
+    if (OOP_IS_SMALL_INT(inst)) {
+      return inst;
+    }
+    omObjSType *v = om::FetchOop(inst, src_offset_ofs);
+    return v;
+  }
+  static omObjSType* fetchQuidO(omObjSType *inst, rb_parse_state *ps) {
+    OmScopeType aScope(ps->omPtr);
+    omObjSType **instH = aScope.add(inst);
+    RubyNode::checkInstanceOf(instH, (AstClassEType)my_cls, ps);
+    omObjSType *v = om::FetchOop(*instH, quid_ofs);
+    return v;
+  }
+  static omObjSType* symval(omObjSType *inst, rb_parse_state *ps) {
+    OmScopeType aScope(ps->omPtr);
+    omObjSType **instH = aScope.add(inst);
+    RubyNode::checkInstanceOf(instH, (AstClassEType)my_cls, ps);
+    omObjSType *v = om::FetchOop(*instH, val_ofs);
+    return v;
+  }
+  static omObjSType* quidForSym(omObjSType *sym, om *omPtr);// returns a SmallInt
+
+  static int64 tLastToken();
+
+  static omObjSType* buildQuid(OopType symId, int64 tval, int64 id) {
+    // result is a SmallInteger
+    int64 symOopNum = OOP_TO_BIT(symId);
+    UTL_ASSERT(tval <= ID_TOK_MASK);
+    int64 qval = (symOopNum << ID_symOopNum_SHIFT) | tval
+                        | ((id & ID_SCOPE_MASK) << ID_SCOPE_SHIFT) ;
+    return OOP_OF_SMALL_LONG_(qval); 
+  }
+
+  static omObjSType* s(const char* str, omObjSType *srcOfs, rb_parse_state *ps);
+ 
+  static omObjSType* s(AstSymbolEType e_sym, omObjSType *srcOfs, rb_parse_state *ps);
+
+  static omObjSType* s(AstSymbolEType e_sym, rb_parse_state *ps); // srcOfs from lexer state
+
+  static omObjSType* s(rb_parse_state *ps, omObjSType *quidO); // srcOfs from lexer state
+ 
+  static omObjSType* s(omObjSType **symH, omObjSType *srcOfs, rb_parse_state *ps);
+};
+
+class RubyAbstractLiteralNode
+{
+  enum { my_cls = cls_RubyAbstractLiteralNode };
+ public:
+
+  static BoolType kind_of(omObjSType *o, rb_parse_state *ps) 
+  {
+    om *omPtr = ps->omPtr;
+    OmScopeType aScope(omPtr);
+    omObjSType **objH = aScope.add(o);
+    omObjSType *clsO =  om::FetchOop(*ps->astClassesH, my_cls);
+    return om::IsKindOf_noHist(omPtr, objH, clsO);
+  }
+};
+
+class RubyAbstractNumberNode
+{
+  enum { my_cls = cls_RubyAbstractNumberNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  }
+
+  static inline omObjSType* s(int64 v, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, LrgInt64ToOop(ps->omPtr, v), ps);
+  }
+};
+
+class RubyAliasNode
+{
+  enum { my_cls = cls_RubyAliasNode };
+ public:
+  static inline omObjSType* s(omObjSType **aH, omObjSType **bH, omObjSType *aliasTok, rb_parse_state *ps)
+  {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, aliasTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, *aH, *bH, srcOfs, ps);
+  }
+};
+
+class RubyAndNode
+{
+  enum { my_cls = cls_RubyAndNode };
+ public:
+  static omObjSType* cls(rb_parse_state *ps)
+  {
+    return om::FetchOop(*ps->astClassesH, my_cls);
+  }
+};
+class RubyArgsNode
+{
+  enum { my_cls = cls_RubyArgsNode };
+ public:
+  static inline omObjSType* new_(rb_parse_state *ps) 
+  {
+    return RubyNode::basicNew((AstClassEType)my_cls, ps);
+  }
+
+  static omObjSType* add_arg(omObjSType **instH, omObjSType *arg, rb_parse_state *ps);
+
+  static inline omObjSType* add_block_arg(omObjSType *inst, omObjSType *arg, rb_parse_state *ps)
+  {
+    return RubyNode::call(inst, sel_add_block_arg, arg, ps);
+  }
+
+  static inline omObjSType* add_optional_arg(omObjSType *inst, omObjSType *arg, rb_parse_state *ps)
+  {
+    return RubyNode::call(inst, sel_add_optional_arg, arg, ps);
+  }
+  static inline omObjSType* add_star_arg(omObjSType *inst, omObjSType *arg, rb_parse_state *ps)
+  {
+    return RubyNode::call(inst, sel_add_star_arg, arg, ps);
+  }
+  
+};
+
+class RubyArrayNode
+{
+  enum { my_cls = cls_RubyArrayNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel__new_, val, ps); 
+  }
+
+  static inline omObjSType* s_a_b(omObjSType *a, omObjSType *b, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel__new_with, a, b, ps); 
+  }
+
+  static inline omObjSType* new_(rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel__new, ps);
+  }
+
+  static inline omObjSType* append(omObjSType *inst, omObjSType *arg, rb_parse_state *ps)
+  { // returns inst
+    return RubyNode::call(inst, sel__append, arg, ps);
+  }
+
+  static inline int64 arrayLength(omObjSType *inst, rb_parse_state *ps)
+  {
+    omObjSType *lenO = RubyNode::call(inst, sel_arrayLength, ps);
+    UTL_ASSERT(OOP_IS_SMALL_INT(lenO));
+    return OOP_TO_I64(lenO);
+  }  
+
+  static inline omObjSType* appendAll(omObjSType *inst, omObjSType *arg, rb_parse_state *ps) {
+    return RubyNode::call(inst, sel__appendAll, arg, ps);
+  }
+
+  static inline omObjSType* append_for_mlhs(omObjSType *inst, omObjSType *arg, rb_parse_state *ps)
+  { // assume we don't need the prev.isAmpersandBlockParam logic with melbourne grammar
+    return append(inst, arg, ps);
+  }
+};
+
+class RubyAttrAssignNode
+{
+  enum { my_cls = cls_RubyAttrAssignNode };
+ public:
+  static inline omObjSType* s(omObjSType *rcv, omObjSType* sel, omObjSType* args,
+		       omObjSType *srcOffset, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, rcv, sel, args, srcOffset, ps); 
+  }
+};
+class RubyBackRefNode
+{
+  enum { my_cls = cls_RubyBackRefNode };
+ public:
+  static inline omObjSType* s(omObjSType *charOop, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, charOop, ps);
+  }
+};
+class RubyBeginNode
+{
+  enum { my_cls = cls_RubyBeginNode};
+ public:
+  static inline omObjSType* s(omObjSType *arg, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, arg, ps);
+  }
+};
+
+class RubyBlockArgNode
+{
+  enum { my_cls = cls_RubyBlockArgNode };
+ public:
+  static inline omObjSType* s(omObjSType *arg, rb_parse_state *ps)
+  { 
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, arg, ps);
+  }
+};
+
+class RubyBlockNode
+{
+  enum { my_cls = cls_RubyBlockNode };
+ public:
+  static inline omObjSType* s(omObjSType *node, rb_parse_state *ps)
+  { 
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, node, ps);
+  }
+  static inline omObjSType* append_to_block(omObjSType *inst, omObjSType *val, rb_parse_state *ps)
+  {
+    return RubyNode::call(inst, sel_append_to_block, val, ps);
+  }
+};
+
+class RubyBlockPassNode
+{
+  enum { my_cls = cls_RubyBlockPassNode };
+ public:
+
+  static inline BoolType is_a(omObjSType *obj, rb_parse_state *ps) {
+    return RubyNode::is_a(obj, (AstClassEType)my_cls, ps);
+  }
+
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  }
+};
+class RubyBreakNode
+{
+  enum { my_cls = cls_RubyBreakNode };
+ public:
+  static inline omObjSType* s(omObjSType **valH, omObjSType *breakTok, rb_parse_state *ps)
+  {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, breakTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, *valH, srcOfs, ps);
+  }
+};
+
+class RubyCaseNode
+{
+  enum { my_cls = cls_RubyCaseNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *expr, omObjSType* body, 
+			omObjSType* srcOfs, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, expr, body, srcOfs, ps);
+  }
+};
+
+class RubyClassNode
+{
+  enum { my_cls = cls_RubyClassNode };
+ public:
+  static inline omObjSType* s(omObjSType *path, omObjSType* superNod,
+                        omObjSType* body, omObjSType *srcStr, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, path, superNod, body, srcStr, ps);
+  }
+};
+class RubyClassVarDeclNode
+{
+  enum { my_cls = cls_RubyClassVarDeclNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *sym, omObjSType *srcOfs, omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, sym, srcOfs, val, ps);
+  }
+};
+class RubyClassVarNode
+{
+  enum { my_cls = cls_RubyClassVarNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *sym, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, sym, ps);
+  }
+};
+class RubyColon2Node
+{
+  enum { my_cls = cls_RubyColon2Node };
+ public:
+  static inline omObjSType* s(omObjSType *left, omObjSType *name_tok, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, left, name_tok, ps);
+  }
+
+  static inline omObjSType* sym(omObjSType *sym, omObjSType* srcOffset, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_sym_srcOffset, sym, srcOffset, ps);
+  }
+
+};
+class RubyColon3Node
+{
+  enum { my_cls = cls_RubyColon3Node };
+ public:
+
+  static inline omObjSType* s(omObjSType *name_tok, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, name_tok, ps);
+  }
+};
+class RubyConstDeclNode
+{
+  enum { my_cls = cls_RubyConstDeclNode };
+ public:
+
+  static inline omObjSType* colon2(omObjSType *left, omObjSType *name_tok, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_colon2_name, left, name_tok, ps);
+  }
+  static inline omObjSType* colon3(omObjSType *name_tok, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_colon3, name_tok, ps);
+  }
+  static inline omObjSType* sym(omObjSType *symO, omObjSType* srcOffset, omObjSType *val, 
+				rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_sym_ofs_val, symO, srcOffset, val, ps);
+  }
+};
+class RubyDefinedNode
+{
+  enum { my_cls = cls_RubyDefinedNode };
+ public:
+  static inline omObjSType* s(omObjSType *expr, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, expr, ps);
+  }
+};
+class RubyDotNode
+{
+  enum { my_cls = cls_RubyDotNode };
+ public:
+  static inline omObjSType* s(int64 numDots, omObjSType *a, omObjSType *b, omObjSType *srcOffset, 
+			rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, 
+			OOP_OF_SMALL_LONG_(numDots), a, b, srcOffset, ps);
+  }
+};
+class RubyEnsureNode
+{
+  enum { my_cls = cls_RubyEnsureNode };
+ public:
+  static inline omObjSType* s(omObjSType **ensureBlkH, omObjSType *ensureTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, ensureTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, *ensureBlkH, srcOfs, ps);
+  }
+  static inline omObjSType* set_body(omObjSType *inst, omObjSType *node, rb_parse_state *ps) {
+     return RubyNode::call(inst, sel_bodyNode_, node, ps);
+  }
+};
+class RubyEvStrNode
+{
+  enum { my_cls = cls_RubyEvStrNode };
+ public:
+  static inline omObjSType* s(omObjSType *body, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, body, ps);
+  }
+};
+class RubyFalseNode
+{
+  enum { my_cls = cls_RubyFalseNode };
+ public:
+  static inline omObjSType* new_(rb_parse_state *ps) 
+  {
+    return RubyNode::basicNew((AstClassEType)my_cls, ps);
+  }
+};
+class RubyForNode
+{
+  enum { my_cls = cls_RubyForNode };
+ public:
+  static inline omObjSType* s(omObjSType **iterH, omObjSType** varH, omObjSType** bodyH, 
+			omObjSType *forTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, forTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, *iterH, *varH, *bodyH, srcOfs, ps);
+  }
+};
+class RubyGlobalAsgnNode
+{
+  enum { my_cls = cls_RubyGlobalAsgnNode };
+ public:
+
+  static BoolType kind_of(omObjSType *o, rb_parse_state *ps) 
+  {
+    om *omPtr = ps->omPtr;
+    OmScopeType aScope(omPtr);
+    omObjSType **objH = aScope.add(o);
+    omObjSType *clsO =  om::FetchOop(*ps->astClassesH, my_cls);
+    return om::IsKindOf_noHist(omPtr, objH, clsO);
+  }
+
+  static inline omObjSType* s(omObjSType *sym, omObjSType *srcOfs, omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, sym, srcOfs, val, ps);
+  }
+};
+class RubyGlobalVarAliasNode
+{
+  enum { my_cls = cls_RubyGlobalVarAliasNode };
+ public:
+  static inline omObjSType* s(omObjSType *symA, omObjSType* symB, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, symA, symB, ps);
+  }
+};
+
+class RubyGlobalVarNode
+{
+  enum { my_cls = cls_RubyGlobalVarNode };
+ public:
+  static inline omObjSType* s(omObjSType *sym, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, sym, ps);
+  }
+};
+class RubyHashNode
+{
+  enum { my_cls = cls_RubyHashNode };
+ public:
+  static inline omObjSType* s(omObjSType *list, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, list, ps);
+  }
+};
+class RubyIfNode
+{
+  enum { my_cls = cls_RubyIfNode };
+ public:
+  static inline omObjSType* s(omObjSType *cond, omObjSType* tB, omObjSType* fB, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, cond, tB, fB, ps);
+  }
+};
+class RubyIterRpNode
+{
+  enum { my_cls = cls_RubyIterRpNode };
+ public:
+  static inline omObjSType* s(omObjSType *args, omObjSType *body, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, args, body, ps);
+  }
+
+  static inline omObjSType* set_call(omObjSType *inst, omObjSType *v, rb_parse_state *ps) {
+    return RubyNode::call(inst, sel_callNode_, v, ps);
+  }
+};
+
+class RubyInstAsgnNode
+{
+  enum { my_cls = cls_RubyInstAsgnNode };
+ public:
+  static inline omObjSType* s(omObjSType *sym, omObjSType *srcOfs, omObjSType* val, 
+			rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, sym, srcOfs, val, ps);
+  }
+};
+class RubyInstVarNode
+{
+  enum { my_cls = cls_RubyInstVarNode };
+ public:
+  static inline omObjSType* s(omObjSType *sym, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, sym, ps);
+  }
+};
+class RubyLocalAsgnNode
+{
+  enum { my_cls = cls_RubyLocalAsgnNode };
+ public:
+  static inline omObjSType* s(omObjSType *sym, omObjSType *srcOfs, omObjSType* val,
+                        rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, sym, srcOfs, val, ps);
+  }
+};
+class RubyLocalVarNode
+{
+  enum { my_cls = cls_RubyLocalVarNode };
+ public:
+  static inline omObjSType* s(omObjSType *sym, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, sym, ps);
+  }
+};
+class RubyModuleNode
+{
+  enum { my_cls = cls_RubyModuleNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *path, omObjSType* body, omObjSType *srcStr,
+			rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, path, body, srcStr, ps);
+  }
+};
+class RubyNextNode
+{
+  enum { my_cls = cls_RubyNextNode };
+ public:
+  static inline omObjSType* s(omObjSType **valH, omObjSType *nextTok, rb_parse_state *ps)
+  {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, nextTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, *valH, srcOfs, ps);
+  }
+};
+class RubyNilNode
+{
+  enum { my_cls = cls_RubyNilNode };
+ public:
+  static inline omObjSType* new_(rb_parse_state *ps) 
+  {
+    return RubyNode::basicNew((AstClassEType)my_cls, ps);
+  }
+};
+class RubyNotNode 
+{
+  enum { my_cls = cls_RubyNotNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  }
+};
+
+class RubyNthRefNode
+{
+  enum { my_cls = cls_RubyNthRefNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *smallInt, rb_parse_state *ps)
+  {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, smallInt, ps);
+  }
+};
+class RubyOpAsgnNode
+{
+  enum { my_cls = cls_RubyOpAsgnNode };
+ public:
+
+  static inline omObjSType* s(omObjSType *rcv, omObjSType* asgnSelTok, omObjSType* opSelTok,
+				omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, rcv, asgnSelTok, opSelTok, val, ps);
+  }
+};
+
+class RubyOpElementAsgnNode
+{
+  enum { my_cls = cls_RubyOpElementAsgnNode };
+ public:
+  static inline omObjSType* s(omObjSType *rcv, omObjSType* arefArgs, omObjSType* opSelTok,
+                                omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, rcv, arefArgs, opSelTok, val, ps);
+  } 
+
+};
+
+class RubyOrNode {
+  enum { my_cls = cls_RubyOrNode };
+ public:
+  static omObjSType* cls(rb_parse_state *ps)
+  {
+    return om::FetchOop(*ps->astClassesH, my_cls);
+  }
+};
+
+class RubyRedoNode 
+{
+  enum { my_cls = cls_RubyRedoNode };
+ public:
+  static inline omObjSType* s(omObjSType *redoTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, redoTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, srcOfs, ps);
+  }
+};
+
+class RubyRescueBodyNode
+{
+  enum { my_cls = cls_RubyRescueBodyNode };
+ public:
+  static inline omObjSType* s(omObjSType *exList, omObjSType *body, 
+		omObjSType *nextRescueBody, omObjSType *srcOfs, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, exList, body, nextRescueBody, srcOfs, ps);
+  }
+};
+class RubyRescueNode
+{
+  enum { my_cls = cls_RubyRescueNode };
+ public:
+  static inline omObjSType* s(omObjSType* body, omObjSType *rescuebody, omObjSType *elsebody,
+			omObjSType *srcOfs, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, body, rescuebody, elsebody, srcOfs, ps);
+  }
+};
+
+class RubyRetryNode
+{
+  enum { my_cls = cls_RubyRetryNode };
+ public:
+  static inline omObjSType* s(omObjSType *retryTok, rb_parse_state *ps) { 
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, retryTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, srcOfs, ps);
+  } 
+};
+class RubyReturnNode
+{
+  enum { my_cls = cls_RubyReturnNode };
+ public:
+  static inline omObjSType* s(omObjSType **valH, omObjSType *returnTok, rb_parse_state *ps) { 
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, returnTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, *valH, srcOfs, ps);
+  }
+};
+class RubyRpCallArgs
+{
+  enum { my_cls = cls_RubyRpCallArgs };
+ public:
+  static omObjSType* append_arg(omObjSType *inst, omObjSType *a, rb_parse_state *ps) {
+    return RubyNode::call(inst, sel_append_arg, a, ps); // returns inst
+  }
+  static omObjSType* append_blkArg(omObjSType *inst, omObjSType *a, rb_parse_state *ps) {
+    return RubyNode::call(inst, sel_append_blkArg, a, ps); // returns inst 
+  }
+  static omObjSType* append_splatArg_blk(omObjSType *inst, omObjSType *s, omObjSType *b, rb_parse_state *ps) {
+    return RubyNode::call(inst, sel_append_splatArg_blk, s, b, ps); // returns inst
+  }
+  static omObjSType* append_splatArg(omObjSType *inst, omObjSType *s, rb_parse_state *ps) {
+    return RubyNode::call(inst, sel_append_splatArg, s, ps); // returns inst
+  }
+  static omObjSType* append_arg_blkArg(omObjSType *inst, omObjSType *a, omObjSType* blk, rb_parse_state *ps) {
+     return RubyNode::call(inst, sel_append_arg_blkArg, a, blk, ps); // returns inst
+  }
+  static omObjSType* append_arg_splatArg_blkArg(omObjSType *inst, omObjSType *a, omObjSType *splat,
+			omObjSType* blk,  rb_parse_state *ps) {
+         return RubyNode::call(inst, sel_append_arg_splatArg_blkArg, a, splat, blk, ps); // returns inst
+  }
+  static omObjSType* s(rb_parse_state *ps) { 
+    return RubyNode::call((AstClassEType)my_cls, sel__new, ps);
+  }
+  static omObjSType* s(omObjSType *arg, rb_parse_state *ps) { 
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, arg, ps);
+  }
+  static omObjSType* s_arg_arg_blkArg(omObjSType *a, omObjSType *b, omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_blk, a, b, blk, ps);
+  }
+  static omObjSType* s_arg_arg_splatArg_blkArg(omObjSType *a, omObjSType *b, omObjSType *splat,
+		omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_splat_blk, a, b, splat, blk, ps);
+  }
+  static omObjSType* s_arg_addAll_arg_splatArg_blkArg(omObjSType *a, omObjSType *bArr,
+		omObjSType *c, omObjSType *splat, omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_a_all_b_splat_blk, a, bArr, c, splat, blk, ps);
+  }
+  static omObjSType* s_arg_addAll_arg_blkArg(omObjSType *a, omObjSType *bArr,
+		omObjSType *c, omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_a_all_b_blk, a, bArr, c, blk, ps);
+  }
+  static omObjSType* s_arg_blkArg(omObjSType *a, omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_blk, a, blk, ps);
+  }
+  static omObjSType* s_arg_splatArg_blkArg(omObjSType *a, omObjSType *splat, omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_splat_blk, a, splat, blk, ps);
+  }
+  static omObjSType* s_splatArg_blkArg(omObjSType *splat, omObjSType *blk, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_splat_blk, splat, blk, ps);
+  }
+};
+class RubySClassNode
+{
+  enum { my_cls = cls_RubySClassNode };
+ public:
+  static inline omObjSType* s(omObjSType **rcvH, omObjSType **bodyH, omObjSType *classTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, classTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, *rcvH, *bodyH, srcOfs, ps);
+  }
+};
+class RubySValueNode
+{
+  enum { my_cls = cls_RubySValueNode };
+ public:
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  }
+};
+
+class RubySelfNode
+{
+  enum { my_cls = cls_RubySelfNode };
+ public:
+  static inline omObjSType* new_(rb_parse_state *ps) 
+  {
+    return RubyNode::basicNew((AstClassEType)my_cls, ps);
+  }
+};
+class RubySplatNode
+{
+  enum { my_cls = cls_RubySplatNode };
+ public:
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  } 
+}; 
+
+class RubyStrNode
+{
+  enum { my_cls = cls_RubyStrNode };
+ public:
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  } 
+};
+class RubySymbolNode
+{
+  enum { my_cls = cls_RubySymbolNode  };
+ public:
+  static inline omObjSType* s(omObjSType *val, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, val, ps);
+  }
+};
+
+class RubyTrueNode
+{
+  enum { my_cls = cls_RubyTrueNode };
+ public:
+  static inline omObjSType* new_(rb_parse_state *ps) 
+  {
+    return RubyNode::basicNew((AstClassEType)my_cls, ps);
+  }
+};
+class RubyWhenNode 
+{
+  enum { my_cls = cls_RubyWhenNode };
+ public:
+  static inline omObjSType* s(omObjSType** exprH, omObjSType **bodyH, omObjSType **nxtH,
+			omObjSType *whenTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, whenTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, *exprH, *bodyH, *nxtH, srcOfs, ps);
+  }
+};
+
+class RubyZSuperNode 
+{
+  enum { my_cls = cls_RubyZSuperNode };
+ public:
+  static inline omObjSType* s(omObjSType *superTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, superTok);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a, srcOfs, ps);
+  }
+};
+
+class RubyLexStrTerm
+{
+  enum { my_cls = cls_RubyLexStrTerm,
+         kind_ofs = 0,  // NODE_HEREDOC or NODE_STRTERM
+         a_ofs =  1,   //  nd_lit or func
+         b_ofs =  2,   //  nd_nth or term
+         c_ofs =  3 ,  //  nd_orig or paren
+         d_ofs =  4 ,  //  lineNum or nil
+         nest_ofs = 5  //  nil    or   nesting
+        };
+ public:
+  static omObjSType* newHereDoc( rb_parse_state *ps,
+       const char* tokStr, int64 tokLen, int64 ndNth, bstring* saveLine);
+
+  static omObjSType* newStrTerm(short func, int term, int paren, rb_parse_state *ps);
+
+  static int64 kind(omObjSType *inst) { return om::FetchSmallInt_(inst, kind_ofs); }
+
+  static int64 nest(omObjSType *inst) { return om::FetchSmallInt_(inst, nest_ofs); }
+  static int64 func(omObjSType *inst) { return om::FetchSmallInt_(inst, a_ofs); }
+  static int64 term(omObjSType *inst) { return om::FetchSmallInt_(inst, b_ofs); }
+  static int64 paren(omObjSType *inst) { return om::FetchSmallInt_(inst, c_ofs); }
+  static int64 incrementNest(omObjSType **objH, int delta, rb_parse_state *ps);
+
+  static omObjSType *ndLit(omObjSType *inst) { 
+    omObjSType* strO = om::FetchOop(inst, a_ofs); 
+    UTL_ASSERT(strO->classId() == OOP_CLASS_STRING);
+    return strO;
+  }
+  static omObjSType *ndOrig(omObjSType *inst) { 
+    omObjSType* strO = om::FetchOop(inst, c_ofs); 
+    UTL_ASSERT(strO->classId() == OOP_CLASS_STRING);
+    return strO;
+  }
+  static int64 ndNth(omObjSType *inst) { return om::FetchSmallInt_(inst, b_ofs); }
+  static int lineNum(omObjSType *inst) { 
+    return om::FetchSmallInt_(inst, d_ofs) >> 32; 
+  }
+  static int lineStartOffset(omObjSType *inst) { 
+    return om::FetchSmallInt_(inst, d_ofs) & 0x7FFFFFFF;
+  }
+
+  static void set_func(omObjSType **objH, int v, rb_parse_state *ps) {
+     om::StoreSmallInt_(ps->omPtr, objH, a_ofs, v);
+  }
+};
+
+class RubyParser
+{ 
+ enum { my_cls =  cls_RubyParser };
+ public:
+
+ static omObjSType* append_evstr2dstr(omObjSType *ary, omObjSType *str, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_appendTo_evstr2dstr , ary, str, ps);
+ }
+ static omObjSType* block_append(omObjSType *head, omObjSType *tail, rb_parse_state *ps) {
+   if (tail == ram_OOP_NIL)
+     return head;
+   if (head == ram_OOP_NIL)
+     return tail;
+   return RubyNode::call((AstClassEType)my_cls, sel_block_append, head, tail, ps); 
+ }
+
+ static omObjSType* get_match_node(omObjSType *lhs, omObjSType* rhs, omObjSType *srcOfs,
+			rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_get_match_node, lhs, rhs, srcOfs, ps);
+ }
+ static omObjSType* list_append(omObjSType *list, omObjSType *item, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_list_append, list, item, ps);
+ }
+ 
+ static omObjSType* list_prepend(omObjSType *list, omObjSType *item, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_list_prepend, list, item, ps);
+ }
+
+ static omObjSType* literal_concat(omObjSType *head, omObjSType *tail, rb_parse_state *ps) {
+   if (head == ram_OOP_NIL)
+     return tail;
+   if (tail == ram_OOP_NIL)
+     return head;
+   return RubyNode::call((AstClassEType)my_cls, sel_literal_concat, head, tail, ps);
+ }
+
+ static omObjSType* logop(omObjSType *clsO, omObjSType *left, omObjSType *right, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_logop, clsO, left, right, ps);
+ }
+ static omObjSType* masgn_append_arg(omObjSType *left, omObjSType *right, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_masgn_append_arg, left, right, ps);
+ }
+ static omObjSType* masgn_append_mrhs(omObjSType *left, omObjSType *right, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_masgn_append_mrhs, left, right, ps);
+ }
+ static omObjSType* new_aref(omObjSType *rcv, omObjSType* arefArgs, omObjSType *srcOfs,
+			rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_aref, rcv, arefArgs, srcOfs, ps);
+ }
+ static omObjSType* new_call(omObjSType *rcv, omObjSType *selTok, omObjSType *args, 
+     			rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_call, rcv, selTok, args, ps);
+ }
+ static omObjSType* new_call_1(omObjSType *rcv, omObjSType *selTok, omObjSType *args, 
+                        rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_call_1, rcv, selTok, args, ps);
+ } 
+ static omObjSType* new_call_1(omObjSType **rcvH, AstSymbolEType op_sym, omObjSType **argsH, 
+			omObjSType *srcOfs, rb_parse_state *ps);
+
+ static omObjSType* new_call_braceBlock(omObjSType *rcv, omObjSType *selTok, omObjSType *args,
+				omObjSType *blkArg, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls,  sel_new_call_braceBlock, rcv, selTok, args, blkArg, ps);
+ }
+ static omObjSType* new_defn(omObjSType* nameTok, omObjSType *args, omObjSType *body,
+			omObjSType* srcOfs, int startLine, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_defn, nameTok, args, body, srcOfs, 
+			 OOP_OF_SMALL_LONG_(startLine), ps);
+ }
+ static omObjSType* new_defs(omObjSType *rcvr, omObjSType* nameTok, omObjSType *args, 
+         omObjSType *body, omObjSType* srcOfs, int startLine, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_defs, rcvr, nameTok, args, body, srcOfs, 
+			 OOP_OF_SMALL_LONG_(startLine), ps);
+ }
+ static omObjSType* new_dsym(omObjSType *val, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_dsym, val, ps);
+ }
+ static omObjSType* new_evstr(omObjSType *val, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_evstr, val, ps);
+ } 
+ static omObjSType* new_fcall(omObjSType *selTok, omObjSType *args,
+			     rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_fcall, selTok, args, ps);
+ }
+
+ static omObjSType* new_fcall_braceBlock(omObjSType *selTok, omObjSType *args, omObjSType *blkArg, 
+					rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls,  sel_new_fcall_braceBlock, selTok, args, blkArg, ps);
+ }
+ static omObjSType* new_if(omObjSType *cond, omObjSType *tBlock, omObjSType *fBlock,
+			omObjSType *srcOfs, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_if, cond, tBlock, fBlock, srcOfs, ps);
+ }
+ static omObjSType* new_op_asgn(omObjSType *lhs, omObjSType *selTok, omObjSType *arg,
+		 rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_op_asgn, lhs, selTok, arg, ps);
+ }
+
+ static omObjSType* new_parasgn(omObjSType *lhs, omObjSType *srcOfs, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_parasgn, lhs, srcOfs, ram_OOP_FALSE, ps);
+ }
+ static omObjSType* new_parasgn_trailingComma(omObjSType *lhs, omObjSType *srcOfs, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_parasgn, lhs, srcOfs, ram_OOP_TRUE, ps);
+ }
+
+ static omObjSType* new_regexp(omObjSType *val, omObjSType *options, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_regexp, val, options, ps);
+ }
+ static omObjSType* new_string(omObjSType *val, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_string, val, ps);
+ }
+ static omObjSType* new_super(omObjSType **argsH, omObjSType *superTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, superTok);
+   return RubyNode::call((AstClassEType)my_cls, sel_new_super, *argsH, srcOfs, ps);
+ }
+ static omObjSType* new_undef(omObjSType *symNode, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_undef, symNode, ps);
+ }
+ static omObjSType* new_until(omObjSType *blk, omObjSType* expr, omObjSType* srcOfs,
+	rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_until, blk, expr, srcOfs, ps);
+ }
+ static omObjSType* new_vcall(omObjSType *rcv, omObjSType *selTok, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_vcall, rcv, selTok, ps);
+ }
+
+ static omObjSType* new_while(omObjSType *blk, omObjSType* expr, omObjSType* srcOfs,
+		rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_while, blk, expr, srcOfs, ps);
+ }
+ static omObjSType* new_xstring(omObjSType *str, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_new_xstring, str, ps);
+ }
+ static omObjSType* new_yield(omObjSType **argsH, omObjSType* yieldTok, rb_parse_state *ps) {
+    omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, yieldTok);
+   return RubyNode::call((AstClassEType)my_cls, sel_new_yield, *argsH, srcOfs, ps);
+ }
+ static omObjSType* node_assign(omObjSType **lhsH, omObjSType* srcOfs, omObjSType *rhs,
+			rb_parse_state *ps);
+
+ static omObjSType* opt_rescue(omObjSType *exClasses, omObjSType* exVar, omObjSType *body,
+			     omObjSType *rescueBody, omObjSType *srcOfs, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_opt_rescue, exClasses, exVar, body,
+			rescueBody, srcOfs, ps);
+ }
+ 
+ static omObjSType* ret_args(omObjSType *aNode , rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_ret_args, aNode, ps);
+ }
+ static omObjSType* uplus_production(omObjSType *arg, omObjSType *srcOfs, rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_uplus_production, arg, srcOfs, ps);
+ }
+ static omObjSType* value_expr(omObjSType *aNode , rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_value_expr, aNode, ps);
+ }
+
+ static omObjSType* backref_error(omObjSType *aNode , rb_parse_state *ps) {
+   return RubyNode::call((AstClassEType)my_cls, sel_backref_error, aNode, ps);
+ }
+};
+
+
+#endif  // AST_H
