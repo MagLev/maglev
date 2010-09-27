@@ -48,9 +48,6 @@ task :status do
       raise "gslist failed: #{status.exitstatus}"
     end
   end
-  # Parser status is only available if rakelib/dev.rake is shipped
-  p_status = Rake::Task['parser:status']
-  p_status.invoke if p_status
 end
 
 # This initializes the environment, and then ensures that there is a
