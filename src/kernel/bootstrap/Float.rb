@@ -30,8 +30,8 @@ class Float
   MAX_10_EXP = 308  
   MAX_EXP  = 1024
   MIN      = 2.2250738585072014E-308 # smallest positive float not a subnormal
-  MIN_10_EXP = -307
-  MIN_EXP  = -1021 
+  MIN_10_EXP = -308
+  MIN_EXP  = -1022 
   NaN      = __resolve_smalltalk_global(:PlusQuietNaN)
   RADIX    = 2
   ROUNDS   = 1  # towards nearest representable value,
