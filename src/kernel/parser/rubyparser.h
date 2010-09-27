@@ -324,6 +324,7 @@ class rb_parse_state
   NODE **yyvalH;   // used to save yyvalO when growing the parser stack
   NODE **lex_strtermH;
   NODE **magicCommentsH;
+  NODE **warningsH;
 
   enum { yystack_MAXDEPTH = 10000 ,
          yystack_START_DEPTH = 1000 };
@@ -339,7 +340,7 @@ class rb_parse_state
   char *sourceBytes; // body of a CByteArray , per compilation
   char *sourcePtr;
   char *sourceLimit;
-  intptr_t  lineStartOffset;
+  intptr_t  lineStartOffset; // zero based
   intptr_t  tokStartDelta;
 
   int64 tokenOffset() {
@@ -377,7 +378,7 @@ class rb_parse_state
   BoolByteType in_defined;
   BoolByteType verbose;
   BoolByteType inStrTerm;
-  BoolByteType emit_warnings;
+  BoolByteType printWarnings;
   BoolByteType atEof;
   BoolByteType parserActive;
 

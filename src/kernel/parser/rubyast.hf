@@ -31,6 +31,9 @@ class RubyNode
   static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
 			omObjSType *a, omObjSType *b, omObjSType *c, omObjSType *d, 
 		        omObjSType *e, omObjSType *f, rb_parse_state *ps);
+  static omObjSType* call(AstClassEType cls_e, AstSelectorEType sel_e, 
+			omObjSType *a, omObjSType *b, omObjSType *c, omObjSType *d, 
+		        omObjSType *e, omObjSType *f, omObjSType *g, rb_parse_state *ps);
 
   static void checkInstanceOf(omObjSType **objH, AstClassEType cls_e, rb_parse_state *ps);
   static BoolType is_a(omObjSType *obj, AstClassEType cls_e, rb_parse_state *ps);
@@ -915,14 +918,16 @@ class RubyParser
    return RubyNode::call((AstClassEType)my_cls,  sel_new_call_braceBlock, rcv, selTok, args, blkArg, ps);
  }
  static omObjSType* new_defn(omObjSType* nameTok, omObjSType *args, omObjSType *body,
-			omObjSType* srcOfs, int startLine, rb_parse_state *ps) {
+			omObjSType* srcOfs, int startLine, 
+			omObjSType* endOfs,  rb_parse_state *ps) {
    return RubyNode::call((AstClassEType)my_cls, sel_new_defn, nameTok, args, body, srcOfs, 
-			 OOP_OF_SMALL_LONG_(startLine), ps);
+			 OOP_OF_SMALL_LONG_(startLine), endOfs, ps);
  }
  static omObjSType* new_defs(omObjSType *rcvr, omObjSType* nameTok, omObjSType *args, 
-         omObjSType *body, omObjSType* srcOfs, int startLine, rb_parse_state *ps) {
+         omObjSType *body, omObjSType* srcOfs, int startLine, 
+	 omObjSType* endOfs, rb_parse_state *ps) {
    return RubyNode::call((AstClassEType)my_cls, sel_new_defs, rcvr, nameTok, args, body, srcOfs, 
-			 OOP_OF_SMALL_LONG_(startLine), ps);
+			 OOP_OF_SMALL_LONG_(startLine), endOfs, ps);
  }
  static omObjSType* new_dsym(omObjSType *val, rb_parse_state *ps) {
    return RubyNode::call((AstClassEType)my_cls, sel_new_dsym, val, ps);

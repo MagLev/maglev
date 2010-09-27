@@ -171,6 +171,25 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
+omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
+  	 omObjSType *a, omObjSType *b, omObjSType *c, omObjSType *d, 
+	 omObjSType *e, omObjSType *f, omObjSType *g, rb_parse_state *ps)
+{
+    om *omPtr = ps->omPtr;
+    OmScopeType scp(omPtr);
+    omObjSType **aH[7]; 
+    aH[0] = scp.add( a );
+    aH[1] = scp.add( b );
+    aH[2] = scp.add( c );
+    aH[3] = scp.add( d );
+    aH[4] = scp.add( e );
+    aH[5] = scp.add( f );
+    aH[6] = scp.add( g );
+    omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
+    OopType selId = ps->astSelectorIds[sel_e];
+    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+}
+
 void RubyNode::checkInstanceOf(omObjSType **objH, AstClassEType cls_e, rb_parse_state *ps)
 {
   omObjSType *clsO =  om::FetchOop(*ps->astClassesH, cls_e);

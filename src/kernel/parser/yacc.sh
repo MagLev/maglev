@@ -9,6 +9,8 @@ fi
 fileList='rubylex_tab.hc rubyast.c rubyast.hf rubyast.ht
 rubygrammar.c rubygrammar.h rubyparser.h'
 
+srcDir=../../../../svn/src
+
 for each in $fileList
 do
   rm $srcDir/$each

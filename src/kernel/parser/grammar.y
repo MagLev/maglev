@@ -194,9 +194,19 @@ static void yytrap()
   return; // place to set breakpoint
 }
 
-static void rb_warning(const char* msg)
+static void rb_warning(rb_parse_state* ps, const char* msg)
 {
-  printf("WARNING: %s\n", msg);
+  char buf[1024];
+  snprintf(buf, sizeof(buf), "WARNING, line %d: %s\n", ps->lineNumber, msg);
+  if (ps->printWarnings) {
+    printf("%s", buf);
+  } else {
+    if (*ps->warningsH == ram_OOP_NIL) {
+      *ps->warningsH = om::NewString_(ps->omPtr, buf);
+    } else {
+      om::AppendToString(ps->omPtr, ps->warningsH, buf);
+    }
+  }
 }
 
 static void rb_compile_error(rb_parse_state* ps, const char* msg)
@@ -642,7 +652,7 @@ bodystmt        : compstmt
                         if ($2 != ram_OOP_NIL) {
                             *resH = RubyRescueNode::s($1, $2, $3, ram_OOP_NIL, vps);
                         } else if ($3 != ram_OOP_NIL) {
-                            rb_warning("else without rescue is useless");
+                            rb_warning(vps, "else without rescue is useless");
                             *resH = RubyParser::block_append(*resH, $3, vps);
                         }
                         if ($4 != ram_OOP_NIL) {  // 4 is a RubyEnsureNode
@@ -779,7 +789,7 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                        yTrace(vps, "stmt: | klEND tLCURLY comp_stamt tRCURLY");
                        rParenLexPop(vps);
                        if (vps->in_def || vps->in_single) {
-                            rb_warning("END in method; use at_exit");
+                            rb_warning(vps, "END in method; use at_exit");
                        }
                        $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, vps);
                     }
@@ -1580,7 +1590,7 @@ aref_args       : none
                 | command opt_nl
                     {
                       yTrace(vps, "aref__args: | command opt_nl");
-                      rb_warning("parenthesize argument(s) for future version");
+                      rb_warning(vps, "parenthesize argument(s) for future version");
                       $$ = RubyRpCallArgs::s($1, vps);
                     }
                 | args trailer
@@ -1591,7 +1601,7 @@ aref_args       : none
                 | args ',' tSTAR arg opt_nl
                     {
                       yTrace(vps, "aref__args: | args tCOMMA tSTAR arg opt_nl");
-                      // value_expr($4);  was in rubinius, try with out
+                      // value_expr($4);  was in rubinius, try without
                       OmScopeType aScope(vps->omPtr);
                       NODE **valH = aScope.add( RubySplatNode::s($4, vps));
                       $$ = RubyArrayNode::append( $1 , *valH, vps /*returns first arg*/);
@@ -1629,14 +1639,14 @@ paren_args      : '(' none ')'
                     {
                       yTrace(vps, "paren_args: | tLPAREN2 block_call opt_nl tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning("parenthesize argument for future version");
+		      rb_warning(vps, "parenthesize argument for future version");
                       $$ = RubyRpCallArgs::s( $2, vps);
                     }
                 | '(' args ',' block_call opt_nl ')'
                     {
                       yTrace(vps, "paren_args: | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN");
                       rParenLexPop(vps);
-                      rb_warning("parenthesize argument for future version");
+                      rb_warning(vps, "parenthesize argument for future version");
                       $$ = RubyArrayNode::append( $2, $4, vps);
                     }
                 ;
@@ -1648,7 +1658,7 @@ opt_paren_args  : none
 call_args       : command
                     {
                       yTrace(vps, "call_args: command");
-                      rb_warning("parenthesize argument(s) for future version");
+                      rb_warning(vps, "parenthesize argument(s) for future version");
 		      $$ = RubyRpCallArgs::s( $1, vps);
                     }
                 | args opt_block_arg
@@ -1811,14 +1821,14 @@ open_args       : call_args
                     {
                       yTrace(vps, "open_args: tLPAREN_ARG");
                       rParenLexPop(vps);
-                      rb_warning("don't put space before argument parentheses");
+                      rb_warning(vps, "don't put space before argument parentheses");
                       $$ = ram_OOP_NIL;
                     }
                 | tLPAREN_ARG call_args2 {vps->lex_state = EXPR_ENDARG;} ')'
                     {
                       yTrace(vps, "open_args: ___ tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning("don't put space before argument parentheses");
+		      rb_warning(vps, "don't put space before argument parentheses");
 		      $$ = $2;
                     }
                 ;
@@ -1900,7 +1910,7 @@ primary         : literal
                     {
                       yTrace(vps, "primary: ___ opt_nl tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning("(...) interpreted as grouped expression");
+		      rb_warning(vps, "(...) interpreted as grouped expression");
 		      $$ = $2;
                     }
                 | tLPAREN compstmt ')'
@@ -2178,8 +2188,9 @@ primary         : literal
 		      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1/*kDEF*/);
+                      omObjSType *endOfs = RpNameToken::srcOffsetO(vps, $6/*kEND*/);
                       NODE **resH = scp.add( RubyParser::new_defn( $2/*fname*/, $4/*arglist*/, 
-					$5/*body*/, srcOfs, lineNum, vps));
+					$5/*body*/, srcOfs, lineNum, endOfs, vps));
 		      local_pop(vps);
 		      vps->in_def--;
 		      // cur_mid = $<id>3;
@@ -2201,9 +2212,10 @@ primary         : literal
 		      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // of kDEF
+                      omObjSType *endOfs = RpNameToken::srcOffsetO(vps, $9/*kEND*/);
                       NODE **resH = scp.add( RubyParser::new_defs( $2/*rcvr (the singleton)*/, 
 			         $5/*fname*/, $7/*args*/, $8/*body*/, srcOfs, 
-				  lineNum, vps));
+				  lineNum, endOfs, vps));
 		      local_pop(vps);
 		      vps->in_single--;
                       $$ = *resH;
@@ -3190,14 +3202,16 @@ enum {
   ALNUM_MASK =     0x3,
   identchar_MASK = 0x4, 
   upper_MASK     = 0x8,
-  xdigit_MASK   = 0x10,
-  space_MASK    = 0x20
+  xdigit_MASK                = 0x10,
+  space_MASK                 = 0x20,
+  tokadd_string_special_MASK = 0x40
 };
 
 static void initCharTypes(rb_parse_state *ps)
 {
   UTL_ASSERT(ismbchar(258) == 0);
   memset(ps->charTypes, 0, sizeof(ps->charTypes));
+
   for (int c = 'a'; c <= 'z'; c++) {
     ps->charTypes[c] = alpha_MASK | identchar_MASK;
   }
@@ -3214,11 +3228,16 @@ static void initCharTypes(rb_parse_state *ps)
   for (int c = 'a'; c <= 'f'; c++) {
     ps->charTypes[c] |= xdigit_MASK;
   }
-  ps->charTypes[(int)' ' ] = space_MASK ;
-  ps->charTypes[(int)'\f'] = space_MASK ;
-  ps->charTypes[(int)'\n'] = space_MASK ;
-  ps->charTypes[(int)'\t'] = space_MASK ;
-  ps->charTypes[(int)'\v'] = space_MASK ;
+  ps->charTypes[(int)' ' ] = space_MASK | tokadd_string_special_MASK;
+  ps->charTypes[(int)'\f'] = space_MASK | tokadd_string_special_MASK;
+  ps->charTypes[(int)'\n'] = space_MASK | tokadd_string_special_MASK;
+  ps->charTypes[(int)'\t'] = space_MASK | tokadd_string_special_MASK;
+  ps->charTypes[(int)'\v'] = space_MASK | tokadd_string_special_MASK;
+
+  ps->charTypes[(int)'#'] |= tokadd_string_special_MASK;
+  ps->charTypes[(int)'\\'] |= tokadd_string_special_MASK;
+  ps->charTypes[(int)'/'] |= tokadd_string_special_MASK;
+  ps->charTypes[0]        |= tokadd_string_special_MASK;
 }
 
 static inline int isAlpha(ByteType c, rb_parse_state *ps) 
@@ -3251,6 +3270,11 @@ static inline int isSpace(ByteType c, rb_parse_state *ps)
 static inline int is_identchar(ByteType c, rb_parse_state *ps)
 {
   return ps->charTypes[c] & identchar_MASK ;
+}
+
+static inline int tokadd_string_isSpecial(ByteType c, rb_parse_state *ps)
+{
+  return ps->charTypes[c] & tokadd_string_special_MASK;
 }
 
 static bool lex_getline(rb_parse_state *ps)
@@ -3440,8 +3464,8 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     case sel_new_call: 		str = "new_call:sel:arg:"; break;
     case sel_new_call_1: 	str = "new_call_1:sel:arg:"; break;
     case sel_new_call_braceBlock: str = "new_call_braceBlock:sel:args:blkArg:"; break;
-    case sel_new_defn: 	str = "new_defn:args:body:ofs:startLine:"; break;
-    case sel_new_defs: 	str = "new_defs:name:args:body:ofs:startLine:"; break;
+    case sel_new_defn: 	str = "new_defn:args:body:ofs:startLine:endOfs:"; break;
+    case sel_new_defs: 	str = "new_defs:name:args:body:ofs:startLine:endOfs:"; break;
     case sel_new_dsym:  	str = "new_dsym:"; break;
     case sel_new_evstr: 	str = "new_evstr:"; break;
     case sel_new_fcall: 	str = "new_fcall:arg:"; break;
@@ -3631,9 +3655,10 @@ static void sessionInit(om *omPtr, rb_parse_state *ps)
 
 omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr)
 {
-  DOPRIM_ARGS(omPtr, 2);
-  // omObjSType **recH = DOPRIM_STACK_ADDR(2);
-  omObjSType **strH = DOPRIM_STACK_ADDR(1);
+  DOPRIM_ARGS(omPtr, 3);
+  // omObjSType **recH = DOPRIM_STACK_ADDR(3);
+  omObjSType **strH = DOPRIM_STACK_ADDR(2);
+  omObjSType *isWarningOop = DOPRIM_STACK(1);
 
   rb_parse_state *ps = (rb_parse_state*) omPtr->rubyParseState;
   if (ps == NULL || ! ps->parserActive) 
@@ -3646,23 +3671,34 @@ omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr)
   int64 strSize = om::FetchSize_(strO);
   char *cStr = ComHeapMalloc(ps->cst, strSize + 1);
   om::FetchCString_(strO, cStr, strSize + 1);  
-  rb_compile_error(cStr, ps);
+  if (isWarningOop == ram_OOP_TRUE) {
+    rb_warning(ps, cStr);
+  } else if (isWarningOop == ram_OOP_FALSE) {
+    rb_compile_error(cStr, ps);
+  } else {
+    return NULL;
+  }
   return ram_OOP_TRUE; // error string was saved in parser state
 }
 
 omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
 {
-  DOPRIM_ARGS(omPtr, 6);
-  // omObjSType **recH = DOPRIM_STACK_ADDR(6);
-  omObjSType **sourceH = DOPRIM_STACK_ADDR(5);
-  omObjSType **cbytesH = DOPRIM_STACK_ADDR(4); // a CByteArray
-  omObjSType *lineOop =  DOPRIM_STACK(3); 
-  omObjSType **fileNameH = DOPRIM_STACK_ADDR(2);
-  omObjSType *traceOop = DOPRIM_STACK(1);
+  DOPRIM_ARGS(omPtr, 7);
+  // omObjSType **recH = DOPRIM_STACK_ADDR(7);
+  omObjSType **sourceH = DOPRIM_STACK_ADDR(6);
+  omObjSType **cbytesH = DOPRIM_STACK_ADDR(5); // a CByteArray
+  omObjSType *lineOop =  DOPRIM_STACK(4); 
+  omObjSType **fileNameH = DOPRIM_STACK_ADDR(3);
+  omObjSType *traceOop = DOPRIM_STACK(2);
+  omObjSType *warnOop = DOPRIM_STACK(1);
   if (! OOP_IS_SMALL_INT(lineOop))
     return NULL;
   if (! OOP_IS_SMALL_INT(traceOop))
     return NULL;
+
+  BoolType printWarnings = warnOop == ram_OOP_TRUE;
+  if (! printWarnings && warnOop != ram_OOP_FALSE)
+     return NULL;
 
   int64 trace = OOP_TO_I64(traceOop);
   if (trace < 0) trace = 0;
@@ -3703,6 +3739,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   } else {
     ps->lineNumber = 0;
   }
+  ps->printWarnings = printWarnings;
 
   /* Setup an initial empty scope. */
   OmScopeType oScope(ps->omPtr);
@@ -3718,6 +3755,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->magicCommentsH = oScope.newHandle();
   ps->fileNameH = oScope.add(*fileNameH);
   ps->sourceStrH = oScope.add(*sourceH);
+  ps->warningsH = oScope.newHandle();
 
   ps->lex_pbeg = NULL;
   ps->lex_p = NULL;
@@ -3767,7 +3805,6 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->command_start = TRUE;
 
   // debug_lines = 0;
-  ps->emit_warnings = 0;
   ps->compile_for_eval = 0;
   ps->command_start = TRUE;
   ps->class_nest = 0;
@@ -3789,7 +3826,10 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   omObjSType **resH = oScope.add(ps->yystack.mark->obj); // the AST
   ps->yystack.setEmpty();  // help gc
   if (status != 0 || ps->errorCount > 0) {
-    *resH = om::NewString(omPtr, 0);
+    *resH = *ps->warningsH;
+    if (*resH == ram_OOP_NIL) {
+      *resH = om::NewString(omPtr, 0);
+    }
     char buf[512];
     const char* errStr;
     int lineNum;
@@ -4201,23 +4241,33 @@ static int tokadd_string(int func, int term, int paren, NODE **strTermH,
 
     while ((c = nextc(ps)) != -1) {
         if (paren && c == paren) {
-           RubyLexStrTerm::incrementNest(strTermH, 1, ps);
-        }
-        else if (c == term) {
-            if ( strTermH == NULL || RubyLexStrTerm::nest(*strTermH) == 0 ) {
+          RubyLexStrTerm::incrementNest(strTermH, 1, ps);
+          tokadd((char)c, ps);
+        } else if (c == term) {
+          if ( strTermH == NULL || RubyLexStrTerm::nest(*strTermH) == 0 ) {
                 pushback(c, ps);
                 break;
-            }
-            RubyLexStrTerm::incrementNest(strTermH, -1, ps);
-        }
-        else if ((func & STR_FUNC_EXPAND) && c == '#' && ps->lex_p < ps->lex_pend) {
+          }
+          RubyLexStrTerm::incrementNest(strTermH, -1, ps);
+          tokadd((char)c, ps);
+        } else if (ismbchar(c)) {
+           int i, len = mbclen(c)-1;
+
+           for (i = 0; i < len; i++) {
+                tokadd((char)c, ps);
+                c = nextc(ps);
+           }
+        } else if (! tokadd_string_isSpecial(c, ps)) {
+          // c is none of isSpace , # , \\ , / , 0
+          tokadd((char)c, ps);
+        } else {
+          if ((func & STR_FUNC_EXPAND) && c == '#' && ps->lex_p < ps->lex_pend) {
             int c2 = *(ps->lex_p);
             if (c2 == '$' || c2 == '@' || c2 == '{') {
                 pushback(c, ps);
                 break;
             }
-        }
-        else if (c == '\\') {
+          } else if (c == '\\') {
             c = nextc(ps);
             switch (c) {
               case '\n':
@@ -4249,29 +4299,20 @@ static int tokadd_string(int func, int term, int paren, NODE **strTermH,
                     tokadd('\\', ps);
                 }
             }
-        }
-        else if (ismbchar(c)) {
-            int i, len = mbclen(c)-1;
-
-            for (i = 0; i < len; i++) {
-                tokadd((char)c, ps);
-                c = nextc(ps);
-            }
-        }
-        else if ((func & STR_FUNC_QWORDS) && isSpace(c, ps)) {
+          } else if ((func & STR_FUNC_QWORDS) && isSpace(c, ps)) {
             pushback(c, ps);
             break;
-        }
-        else if ((func & STR_FUNC_REGEXP) && c == '/' && term != '/') {
-           // added for Maglev, this path not in Rubinius .y file
-           tokadd('\\', ps);
-        }
-        if (c == 0 && (func & STR_FUNC_SYMBOL)) {
+          } else if ((func & STR_FUNC_REGEXP) && c == '/' && term != '/') {
+            // added for Maglev, this path not in Rubinius .y file
+            tokadd('\\', ps);
+          }
+          if (c == 0 && (func & STR_FUNC_SYMBOL)) {
             func &= ~STR_FUNC_SYMBOL;
             rb_compile_error(ps, "symbol cannot contain '\\0'");
             continue;
+          }
+          tokadd((char)c, ps);
         }
-        tokadd((char)c, ps);
     }
     return c;
 }
@@ -4331,10 +4372,11 @@ static int parse_string(NODE** quoteH/* a RubyLexStrTerm*/ , rb_parse_state *ps)
 }
 
 
-/* Called when the lexer detects a heredoc is beginning. This pulls
-   in more characters and detects what kind of heredoc it is. */
 static int heredoc_identifier(rb_parse_state *ps)
 {
+  // Called when the lexer detects a heredoc is beginning. This pulls
+  // in more characters and detects what kind of heredoc it is. 
+
     int c = nextc(ps);
     int term = 0;
     int func = 0;
@@ -4437,12 +4479,13 @@ whole_match_p(const char *eos, int len, int indent, rb_parse_state *parse_state)
     return FALSE;
 }
 
-/* Called when the lexer knows it's inside a heredoc. This function
-   is responsible for detecting an expandions (ie #{}) in the heredoc
-   and emitting a lex token and also detecting the end of the heredoc. */
 
 static int here_document(NODE **hereH, rb_parse_state *ps)
 {
+  // Called when the lexer knows it's inside a heredoc. This function
+  // is responsible for detecting an expandions (ie #{}) in the heredoc
+  //  and emitting a lex token and also detecting the end of the heredoc. 
+
     om *omPtr = ps->omPtr;
     OmScopeType scp(omPtr);
     NODE **ndLitH = scp.add(RubyLexStrTerm::ndLit(*hereH));
@@ -4579,9 +4622,9 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
 
 #include "rubylex_tab.hc"
 
-static void arg_ambiguous()
+static void arg_ambiguous(rb_parse_state *ps)
 {
-   // rb_warning("ambiguous first argument; put parentheses or even spaces");
+  rb_warning(ps, "ambiguous first argument; put parentheses or even spaces");
 }
 
 static int IS_ARG(int lex_state)
@@ -4781,7 +4824,7 @@ static int yylex(rb_parse_state* ps)
             }
             pushback(c, ps);
             if (IS_ARG(lex_state) && space_seen && ! isSpace(c, ps)){
-                rb_warning("`*' interpreted as argument prefix");
+                rb_warning(ps, "`*' interpreted as argument prefix");
                 c = tSTAR;
             }
             else if (IS_EXPR_BEG_or_MID(lex_state)) {
@@ -4991,7 +5034,7 @@ static int yylex(rb_parse_state* ps)
                 if (c2) {
                    char msg[128];
                    snprintf(msg, sizeof(msg), "invalid character syntax; use ?\\%c", c2);
-                   rb_warning(msg);
+                   rb_warning(ps, msg);
                 }
             }
           ternary:
@@ -5004,7 +5047,7 @@ static int yylex(rb_parse_state* ps)
         else if (ismbchar(c)) {
             char msg[128];
             snprintf(msg, sizeof(msg), "multibyte character literal not supported yet; use ?\\%.3o", c);
-            rb_warning(msg);
+            rb_warning(ps, msg);
             goto ternary;
         }
         else if ( is_identchar(c, ps) /* was (ISALNUM(c) || c == '_')  */
@@ -5041,7 +5084,7 @@ static int yylex(rb_parse_state* ps)
         }
         pushback(c, ps);
         if (IS_ARG(lex_state) && space_seen && ! isSpace(c, ps)){
-            rb_warning("`&' interpreted as argument prefix");
+            rb_warning(ps, "`&' interpreted as argument prefix");
             c = tAMPER;
         }
         else if (IS_EXPR_BEG_or_MID(lex_state)) {
@@ -5404,7 +5447,7 @@ static int yylex(rb_parse_state* ps)
         pushback(c, ps);
         if (IS_ARG(lex_state) && space_seen) {
             if (! isSpace(c, ps)) {
-                arg_ambiguous();
+                arg_ambiguous(ps);
                 ps->set_lex_strterm(NEW_STRTERM(str_regexp, '/', 0, ps));
                 return tREGEXP_BEG;
             }
@@ -5462,7 +5505,7 @@ static int yylex(rb_parse_state* ps)
                 c = tLPAREN_ARG;
             }
             else if (lex_state == EXPR_ARG) {
-                rb_warning("don't put space before argument parentheses");
+                rb_warning(ps, "don't put space before argument parentheses");
                 c = '(';
             }
         }
@@ -5846,11 +5889,11 @@ static int yylex(rb_parse_state* ps)
                 // See if it is a reserved word. 
                 const kwtable *kw = mel_reserved_word(tok(ps), toklen(ps));
                 if (kw) {
-                    int64 resWordOffset = ps->lineStartOffset + ps->tokStartDelta;
+                    int64 resWordOffset = ps->lineStartOffset + ps->tokStartDelta; // zero based
                     LexStateKind state = lex_state;
                     SET_lexState( kw->state);
 
-                    omObjSType *srcOfs = OOP_OF_SMALL_LONG_(resWordOffset);
+                    omObjSType *srcOfs = OOP_OF_SMALL_LONG_(resWordOffset + 1); // one based
                     AstSymbolEType a_sym = kw->a_sym;
                     *ps->lexvalH = RpNameToken::s(a_sym, srcOfs, ps);
                     
@@ -5942,7 +5985,7 @@ static int lexPlusMinus(rb_parse_state* ps, int space_seen, int aResult, int una
             (IS_ARG(lex_state) && space_seen && ! isSpace(c, ps))) {
             int isArg = IS_ARG(lex_state);
             if (isArg) {
-              arg_ambiguous();
+              arg_ambiguous(ps);
             }
             SET_lexState( EXPR_BEG);
             pushback(c, ps);
@@ -5967,14 +6010,6 @@ static int lexPlusMinus(rb_parse_state* ps, int space_seen, int aResult, int una
 
 #undef SET_lexState
 // end of code which might change ps->lex_state
-
-static void parser_warning(rb_parse_state *ps, NODE *node, const char *mesg)
-{
-    if (ps->emit_warnings) {
-      int line = -1; // TODO byte offset to soure line // nd_line(node);
-      printf("%s:%d: warning: %s\n", ps->sourceFileName, line, mesg);
-    }
-}
 
 static NODE* asQuid(NODE* idO,  rb_parse_state *ps)
 {
@@ -6209,20 +6244,6 @@ static NODE* assignable(NODE **idH, NODE* srcOffsetArg, NODE **valH, rb_parse_st
 static void rb_backref_error(NODE *node, rb_parse_state *parse_state)
 {
    RubyParser::backref_error(node, parse_state);
-}
-
-
-static int e_option_supplied(rb_parse_state *ps)
-{
-    if (strcmp(ps->sourceFileName, "-e") == 0)
-        return TRUE;
-    return FALSE;
-}
-
-static void
-warn_unless_e_option(rb_parse_state *ps, NODE *node, const char *str)
-{
-    if (! e_option_supplied(ps)) parser_warning(ps, node, str);
 }
 
 
