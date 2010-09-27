@@ -1,12 +1,19 @@
 Maglev modified version of the 'melbourne' Ruby parser .
 
-grammar.y copied from Rubinius source code on August 6 , 2010 .
+grammar.y copied from Rubinius source code on August 6 , 2010 
+and then edited.
+
+==================
 
 To create the generated parser files
   
   build the executable  byacc/yacc per byacc/README_maglev.txt
 
-  ./yacc.sh 
+  ./yacc.sh   # runs byacc/yacc and copies generated files
+              #  to the svn/src directory 
+
+Then to get changes to show up in your Smalltalk VM,
+retrun the  slow or fast compile step of the Smalltalk product.
 
 ==========================
 algorithmic changes to the Rubinius grammar
