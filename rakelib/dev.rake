@@ -2,8 +2,6 @@
 #
 # These tasks depend on the conventions used by the GemStone MagLev
 # engineering team.
-require 'rakelib/parser'
-
 
 namespace :dev do
   desc "Create some TAGS files"
@@ -109,11 +107,6 @@ namespace :dev do
     files.each { |fn| rm_r fn rescue nil }
   end
 
-  desc "Load the MagLev native parser"
-  task :load_native_parser => ['maglev:start'] do
-    run_on_stone("inp #{"src/kernel/parser/loadrp.inp"}")
-  end
-
   desc "Clear out the old rubygems and install a new version"
   task :'new-gems' => 'dev:clean-gems' do
     cd('src/external/rubygems-1.3.5') do
@@ -137,32 +130,6 @@ namespace :dev do
       stone.start # loads primitives
       stone.stop
       cp stone.extent_filename, GemStoneInstallation.current.initial_extent
-    end
-  end
-end
-
-PARSETREE_PORT = ENV['PARSETREE_PORT'] ||= "2001"
-namespace :parser do
-  desc "Start the ParseTree based parser (deprecated)"
-  task :start => :gemstone do
-    if Parser.running?
-      puts "MagLev Parse Server process already running on port #{PARSETREE_PORT}"
-    else
-      Parser.start
-    end
-  end
-
-  desc "Stop the ParseTree based parser (deprecated)"
-  task :stop => :gemstone do
-    puts "No parser running on port #{PARSETREE_PORT}" unless Parser.stop.nil?
-  end
-
-  desc "Show if the ParseTree based parser is running"
-  task :status => :gemstone do
-    if Parser.running?
-      puts "MagLev Parse Server running on port #{PARSETREE_PORT}"
-    else
-      puts "MagLev Parse Server not running (port is #{PARSETREE_PORT})"
     end
   end
 end

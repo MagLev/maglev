@@ -4,6 +4,12 @@
 
 == Unreleased Changes
 
+* New parser based on the melbourne grammar file from Rubinius ,
+  with grammar actions calling to methods in Smalltalk.
+  MRI parse server no longer required for loading Ruby bootstrap code.
+* Fix Trac 697, 701, 784, 787, 791
+* Added -C and -X options to maglev-ruby.
+
 == Changes for 24222 2010-09-09
 
 * Fixed problem creating indexes when running under RVM.

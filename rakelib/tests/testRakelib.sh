@@ -80,13 +80,5 @@ rake netldi:stop
 
 #==== Parse Server ===
 
-# Test starting parser (needs MRI 1.8.6p287 and ParseTree 3.0.3)
-rake parser:start
-rake parser:status 
-
-# Test stopping parser
-rake parser:stop
-rake parser:status
-
 # Finally run destroy test.rakelib if it didn't exist when we started
 [ $conf_exists -eq 0 ] && rake stone:destroy[test.rakelib]

@@ -11,6 +11,11 @@ comments.  This is probably the first file to look at.  To run it:
 
   $ rake demo
 
+NOTE: if you get an error message like:
+  #<RuntimeError: The object aPerson does not have an instance variable with the given name #'@age'>
+you are probably running with the <tt>-MallIvsDynamic</tt> flag to
+maglev-ruby.  Turn off that flag and try re-running the example.
+
 == Persistent Demo
 
 <tt>create_random_people.rb</tt> and <tt>search_random_people.rb</tt>

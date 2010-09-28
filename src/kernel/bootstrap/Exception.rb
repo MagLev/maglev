@@ -101,6 +101,7 @@ class Exception
     end
 
     def initialize(*args)
+      self.__st_initialize
       if args.length >= 1
         msg = args[0]
       end
