@@ -328,7 +328,11 @@ class IdentitySet
   # path may be up to 16 levels deep.
   #
   # The instance variable that is indexed must be a fixed instance variable
-  # (defined in the first opening of the class).
+  # (defined in the first opening of the class).  I.e., if you are running
+  # MagLev with the <tt>-MallIvsDynamic</tt> flag, then you will not be
+  # able to index classes defined in that run.  You should arrange to
+  # define your classes that need indexing support in a separate run of
+  # MagLev without the <tt>-MallIvsDynamic</tt> flag.
   #
   # A collection may have multiple indexes.
   #
