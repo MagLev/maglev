@@ -3521,7 +3521,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
 
 static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
 {
-  const char* str;
+  const char* str = NULL;
   switch (e_sym) {
     case a_sym_or: 	str = "or"; 	break; 
     case a_sym_orOp: str = "|"; break;
@@ -3609,6 +3609,7 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
     case NUM_AST_SYMBOLS:
       GemSupErr_s(ERR_ArgumentError, "invalid enum value in initAstSymbol");
       str = "badSym"; //lint
+      break;
   }
   OmScopeType aScope(omPtr);
   NODE **symH = aScope.add( ObjNewSym(omPtr, str));
@@ -6223,7 +6224,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffsetArg, NODE **valH, rb_parse_st
             rb_compile_error("dynamic constant assignment", ps);
         }
         NODE *symO = quidToSymbolObj(idO, ps);
-        UTL_ASSERT(OOP_IS_SMALL_INT(srcOffset))
+        UTL_ASSERT(OOP_IS_SMALL_INT(srcOffset));
         return RubyConstDeclNode::sym(symO, srcOffset, *valH, ps);
     }
     else if (v_is_class_id(id)) {
