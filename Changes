@@ -5,7 +5,7 @@
 * New parser based on the melbourne grammar file from Rubinius ,
   with grammar actions calling to methods in Smalltalk.
   MRI parse server no longer required for loading Ruby bootstrap code.
-* Fix Trac 787, 791
+* Fix Trac 697, 701, 784, 787, 791
 
 == Changes for 24294 2010-09-22
 
