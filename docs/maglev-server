@@ -70,8 +70,6 @@ is that you do not have to cd to $MAGLEV_HOME to run <tt>maglev start</tt>,
   maglev status         - Display MagLev server status
   maglev version        - Display MagLev version number
   maglev force-reload   - Stop MagLev server, replace with empty repository!!!
-  maglev start-parser   - Start ParseTree based parser (deprecated)
-  maglev stop-parser    - Stop ParseTree based parser (deprecated)
   
   To execute other maglev commands:
   maglev topaz          - Enter a Topaz shell

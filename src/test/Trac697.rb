@@ -16,5 +16,11 @@ end
 
 p C.my_new    # Ok
 
-p C.new       # MRI raises NoMethodError; MagLev executes
-
+cx = C
+begin
+ cx.new       # MRI raises NoMethodError; MagLev executes
+ raise 'fail'
+rescue NoMethodError
+  puts "OK"
+end
+true

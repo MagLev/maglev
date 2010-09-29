@@ -34,6 +34,7 @@ written by GemStone Systems, Inc. are governed by:
 
 Various open source components not written by GemStone Systems, Inc. are
 included in this distribution, and covered by their respective licenses:
+   bstring-license.txt - Better String Library
    EY-License.txt - MSpec test execution framework and the RubySpec tests
    ffi-License.txt - Ruby Foreign Function Interface
    GeoNames-License.txt - List of Zipcodes from GeoNames.org

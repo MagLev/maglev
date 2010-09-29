@@ -6,7 +6,11 @@ class Parent
 end
 
 class Child < Parent
+end
+class Child
   public :offset
 end
 
-p Child.new.offset
+unless Child.new.offset == 10; raise 'fail'; end
+
+true

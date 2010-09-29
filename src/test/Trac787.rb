@@ -10,8 +10,11 @@ end
 class C
   include M
 
+Maglev::System.session_temp_put(:TrapM, true)
   public :foo  # This doesn't work in MagLev
 end
 
 c = C.new
-c.foo  # MagLev raises: NoMethodError: protected method `foo' for C,
+x = c.foo  # MagLev raises: NoMethodError: protected method `foo' for C,
+unless x == 10 ; raise 'failed'; end
+true
