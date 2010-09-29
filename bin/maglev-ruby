@@ -358,7 +358,6 @@ if [ ! -z "${MagRpDEBUG_level}" ]; then
         cat - >> $dbscript <<-EOF
     SessionTemps current at: #MagRpDEBUG put: ${MagRpDEBUG_level} .
 EOF
-    fi
 fi
 
 cat - >> $dbscript <<-EOF
