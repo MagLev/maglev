@@ -86,7 +86,6 @@ Run at your own risk:
 
   rake dev:clean-gems              # Clean up after a test install of rubygems
   rake dev:installprims            # Load the primitives into the default image.
-  rake dev:load_native_parser      # Load the MagLev native parser
   rake dev:new-gems                # Clear out the old rubygems and install a new version
   rake dev:p-tests[stone_name]     # Run the persistence tests on stone_name (default ptest).
   rake dev:passing                 # Run the passing specs
@@ -94,10 +93,6 @@ Run at your own risk:
   rake dev:smoke                   # Run the passing specs and the vm tests
   rake dev:topaz                   # Run topaz (use rlwrap, if available)
   rake dev:vm-tests                # Run the vm smoke tests
-
-  rake parser:start                # Start the ParseTree based parser (deprecated)
-  rake parser:status               # Show if the ParseTree based parser is running
-  rake parser:stop                 # Stop the ParseTree based parser (deprecated)
 
   rake netldi:start                # Start NetLDI process
   rake netldi:stop                 # Stop NetLDI process

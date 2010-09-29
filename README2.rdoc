@@ -135,7 +135,6 @@ Layout[link:files/docs/file_layout.html]::   Guide to the MagLev distribution fi
 Specs[link:files/docs/rubyspecs.html]::      Running +mspec+ and +rubyspecs+ with MagLev
 Rake[link:files/docs/rake.html]::            Rake tasks for MagLev
 {<tt>maglev-irb</tt>}[link:files/docs/maglev-irb.html]:: MagLev interactive utility
-Troubleshooting[link:files/docs/troubleshooting.html]:: Solutions for common problems
 Prerequisites[link:files/docs/prerequisites.html]:: External software needed by MagLev
 {Persistence API}[link:files/docs/persistence-api.html]:: Persistence and transactions
 {Smalltalk FFI}[link:files/docs/smalltalk_ffi.html]:: GemStone Smalltalk FFI
