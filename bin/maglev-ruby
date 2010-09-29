@@ -350,21 +350,11 @@ if [[ $debugFlag ]]; then
 EOFC
 fi
 #
-# Use MagRpDEBUG_level environment variable to select MRI or native parser
-# and set MagRpDEBUG_level
+# Use MagRpDEBUG_level environment variable to set MagRpDEBUG_level
+# MagRpDEBUG_level can range from 0 (minimal) to 2 (extensive)
 #
-# If MagRpDEBUG_level is not set, default is native parser with no logging
-# If MagRpDEBUG_level is 0..2, use native parser with logging level 0, 1, or 2
-# if MagRpDEBUG_level is -1, use the old MRI parser
 if [ ! -z "${MagRpDEBUG_level}" ]; then
-    if [ ${MagRpDEBUG_level} -lt 0 ] ; then
-    # echo "Using old MRI parser"
-        cat - >> $dbscript <<-EOF
-    SessionTemps current at: #MAGLEV_evalUseMri put: true ;
-      at: #MAGLEV_loadUseMri put: true .
-EOF
-    else
-    # echo "Using new native parser with MagRpDEBUG_level $MagRpDEBUG_level"
+    # echo "Using MagRpDEBUG_level $MagRpDEBUG_level"
         cat - >> $dbscript <<-EOF
     SessionTemps current at: #MagRpDEBUG put: ${MagRpDEBUG_level} .
 EOF
@@ -374,7 +364,6 @@ fi
 cat - >> $dbscript <<-EOF
 System currentSegment: nil .
 ctx := RubyContext load: #( ${maglev_args} ) .
- SessionTemps current at: #MagRpDEBUG put: 0 .
  "note you cannot debug Ruby MNU here"
 " Exception installDebugBlock: [:ex|
    (ex isKindOf:NameError) ifTrue:[ nil pause ].
