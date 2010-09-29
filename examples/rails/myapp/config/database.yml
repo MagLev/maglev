@@ -1,7 +1,7 @@
 # MySQL.  Versions 4.1 and 5.0 are recommended.
 #
 # Install the MySQL driver:
-#   gem install mysql2
+#   gem install mysql
 #
 # And be sure to use new-style password hashing:
 #   http://dev.mysql.com/doc/refman/5.0/en/old-client.html
@@ -13,7 +13,6 @@ development:
   pool: 5
   username: root
   password:
-  host: localhost
   socket: /opt/local/var/run/mysql5/mysqld.sock
 
 # Warning: The database defined as "test" will be erased and
@@ -27,7 +26,6 @@ test:
   pool: 5
   username: root
   password:
-  host: localhost
   socket: /opt/local/var/run/mysql5/mysqld.sock
 
 production:
@@ -38,5 +36,4 @@ production:
   pool: 5
   username: root
   password:
-  host: localhost
   socket: /opt/local/var/run/mysql5/mysqld.sock

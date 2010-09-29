@@ -80,7 +80,7 @@
     |  |
     |  + kernel.rb     # File that controls the load order of kernel files
     |  |
-    |  + parser/       # Pure ruby parser code
+    |  + parser/       # Ruby parser code
     |  |
     |  + post_prims/   # Code run after primitives are loaded
     |  |

@@ -48,7 +48,6 @@ if [ -z "$MAGLEV_HOME" ]; then
   fi
 fi
 # Set environment variables unless they already exist
-[ -z "$PARSETREE_PORT" ] && export PARSETREE_PORT=2001
 [ -z "$STONENAME" ] && STONENAME=maglev
 [ -z "$GEMSTONE" ] && export GEMSTONE=$MAGLEV_HOME/gemstone
 [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
@@ -105,8 +104,6 @@ startserver-bench() {
   # echo "MagLev server \"$STONENAME\" started with performance optimizations"
 }
 
-# deleted rubyversioncheck for old bootstrap parse server
-
 ensurePrimsLoaded() {
   $TOPAZ_CMD << EOF > /dev/null
     set gemstone $STONENAME
@@ -132,16 +129,6 @@ stopserver() {
 status() {
   echo "MAGLEV_HOME = $MAGLEV_HOME"
   $GEMSTONE/bin/gslist -clv
-  if (( MagRpDEBUG_level < 0 )) ; then
-    if [ ! -z "`lsof -Fp -w -iTCP:${PARSETREE_PORT}`" ]; then
-      echo "MagLev Parse Server port = $PARSETREE_PORT"
-      lsof -P -w -iTCP:${PARSETREE_PORT}
-      # if you don't have permission to run lsof, use the following instead
-      # netstat -an | grep "[:.]$PARSETREE_PORT " | grep "LISTEN"
-    else
-      echo "MagLev Parse Server is not running on port $PARSETREE_PORT"
-    fi
-  fi
 }
 
 version() {
