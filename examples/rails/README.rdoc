@@ -31,10 +31,11 @@ including the (patched) Rails Gems.
       +mysql+ driver, so make sure <tt>database.yml</tt> and +Gemfile+
       specify +mysql+ and not <tt>mysql2</tt> for new projects.
 
-   C. Create the db
+   C. Create the db and run migrations
        $ cd $MAGLEV_HOME/examples/rails/myapp
        $ $MAGLEV_HOME/bin/rake db:create
-
+       $ $MAGLEV_HOME/bin/rake db:migrate
+   
 3. Run the app:
      $ cd $MAGLEV_HOME/examples/rails/myapp
      $ $MAGLEV_HOME/bin/rails server
