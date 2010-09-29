@@ -1,0 +1,13 @@
+= Example WEB Stack for MagLev
+
+This directory contains a sample web application and configuration files
+that implement a standard WEB stack for MagLev.
+
+The sample application is used to measure performance of various aspects of
+the web environement from serving static pages, to complex reads and
+complex reads and writes.
+
+== Sample Application
+
+The sample application is a social tagging site (Delicio.us, flickr,
+etc.).

@@ -1,0 +1,15 @@
+* Notes 
+** TODO
+   + Should we add an ontology?  Give meaning to the tags (rdf)?
+** ActiveRecord
+
+   Many of the efficiencies that the MySQL paper lists, won't be available
+   for ActiveRecord, since ActiveRecord uses surrogate keys (id column)
+   rather than, e.g.,:
+
+      CREATE TABLE Tag2Post (
+        tag_id ...
+        post_id ...
+        , PRIMARY KEY pk_Tag2Post (tag_id, post_id)
+        , INDEX (post_id)
+      ) ENGINE=InnoDB;
