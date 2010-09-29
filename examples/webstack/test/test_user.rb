@@ -30,10 +30,47 @@ describe User do
     it 'should allow tweets' do
       @user1.tweet "A Tweet"
     end
-    
+
     it 'should reject long tweets' do
-      long_tweet = 
+      long_tweet =
       assert_raises(ArgumentError) { @user1.tweet '*' * 141 }
+    end
+  end
+
+  describe 'Reading Tweets' do
+    before do
+      @user3 = User.new 'User3'
+      @user1.follow @user2
+      @user1.follow @user3
+    end
+
+    it 'should remember its own tweets' do
+      10.times do |i|
+        @user2.tweet "#{@user2.name} tweet #{i}"
+        @user3.tweet "#{@user3.name} tweet #{i}"
+      end
+      assert_equal 10, @user2.tweets.size
+      assert_equal 10, @user3.tweets.size
+    end
+    
+    it 'should start with an empty timeline' do
+      assert_empty @user1.timeline
+    end
+
+    it 'should keep a timeline of last 20 tweets from friends' do
+      10.times do |i|
+        @user2.tweet "#{@user2.name} tweet #{i}"
+        @user3.tweet "#{@user3.name} tweet #{i}"
+      end
+      assert_equal 20, @user1.timeline.size
+    end
+
+    it 'should limit timeline to 20 tweets' do
+      20.times do |i|
+        @user2.tweet "#{@user2.name} tweet #{i}"
+        @user3.tweet "#{@user3.name} tweet #{i}"
+      end
+      assert_equal 20, @user1.timeline.size
     end
   end
 end
@@ -42,4 +79,3 @@ end
 describe 'User Tagging Support' do
   it 'should have a unique description'
 end
-
