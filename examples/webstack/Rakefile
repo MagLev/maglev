@@ -7,3 +7,8 @@ Rake::TestTask.new do |t|
   t.ruby_opts << '-rubygems'
   # t.verbose = true
 end
+
+desc "Run the MagTag Web App"
+task :magtag do
+  sh "$MAGLEV_HOME/bin/rackup config.ru"
+end
