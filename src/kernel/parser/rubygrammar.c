@@ -5547,6 +5547,7 @@ static void initCharTypes(rb_parse_state *ps)
   ps->charTypes[(int)' ' ] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\f'] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\n'] = space_MASK | tokadd_string_special_MASK;
+  ps->charTypes[(int)'\r'] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\t'] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\v'] = space_MASK | tokadd_string_special_MASK;
 
@@ -8797,7 +8798,7 @@ static uint64 scan_hex(const char *start, int len, int *retlen)
     *retlen = s - start;
     return retval;
 }
-/* # line 8801 "rubygrammar.c" */ 
+/* # line 8802 "rubygrammar.c" */ 
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -12055,7 +12056,7 @@ case 524:
 /* # line 3187 "grammar.y" */ 
 	{  yTrace(vps, "none:");  yyvalO = ram_OOP_NIL; }
 break;
-/* # line 12059 "rubygrammar.c" */ 
+/* # line 12060 "rubygrammar.c" */ 
     }
     if (yyvalO == NULL) {  /*compute default state result*/ 
       if (yyvalPtr != NULL) {
