@@ -1,0 +1,166 @@
+151.532[1426]starting up logger (version $Rev: 1120 $) to ../logs/129.237.161.193/unnamed316651_at15_run2_dClient0.0666666666666667_dTotal100.0_dw1000000_blockSize100000_linger0_dr125000_dt1000000_serverBpS255000/peer_number_1426_start_151.532151.log.txt
+151.544[1426]DEBUG:BM:single file doing reversion as true with dR 125000, dW 1000000 http://155.98.35.3:7779/100K.file760357, 1000000, 125000, 1000000, 100000, 0, ../logs/129.237.161.193/unnamed316651_at15_run2_dClient0.0666666666666667_dTotal100.0_dw1000000_blockSize100000_linger0_dr125000_dt1000000_serverBpS255000/peer_number_1426_start_151.532151.log.txt, 151.532151, 1426 $getAllAtBeginning false with number on the origin of 1000000
+151.558[1426]DEBUG:BM: 14:02:31 up 11 days, 19:46,  0 users,  load average: 7.31, 4.50, 3.85Tue Aug 26 14:02:31 UTC 2008Filesystem            Size  Used Avail Use% Mounted on : /dev/hdv1             4.8G  236M  4.5G   5% / : none                  4.8G  236M  4.5G   5% /tmp
+151.559[1426]DEBUG:p2p server :35253:set block manager port to 35253
+151.559[1426]DEBUG:BM (35253):post initialize for a BM
+151.560[1426]BM (35253):Start CS normal innocent get http://155.98.35.3:7779/100K.file760357 dT 1000000.000000 dR 125000.000000 dW 1000000.000000 blockSize 100000
+151.560[1426]DEBUG:BM (35253):using CS intro...(normal)
+151.560[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :start
+151.560[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :using start byte of 0 for CS
+151.561[1426]DEBUG:odhtem:adding fast gw ["129.93.229.139", 3633] -- size now 2
+151.600[1426]DEBUG:odhtem:adding fast gw ["169.229.50.7", 3633] -- size now 2
+151.693[1426]DEBUG:odhtem:adding fast gw ["193.10.133.128", 3633] -- size now 3
+151.765[1426]DEBUG:odhtem:bad opendht server:["137.189.98.32", 3633]
+151.765[1426]DEBUG:odhtem:bad opendht server:["137.189.98.30", 3633]
+151.767[1426]DEBUG:odhtem:uh oh repolling--did not poll enough opendht servers to get my previously thought minimum! 3 < 5--retrying some more--total we have now is 3
+151.901[1426]DEBUG:odhtem:adding fast gw ["147.229.10.250", 3633] -- size now 4
+151.905[1426]DEBUG:odhtem:bad opendht server:["193.63.75.18", 3633]
+151.905[1426]DEBUG:odhtem:uh oh repolling--did not poll enough opendht servers to get my previously thought minimum! 1 < 2--retrying some more--total we have now is 4
+161.580[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+171.607[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+181.614[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+191.486[1426]DEBUG:odhtem:bad opendht server:["143.215.128.194", 3633]
+191.486[1426]DEBUG:odhtem:uh oh repolling--did not poll enough opendht servers to get my previously thought minimum! 0 < 1--retrying some more--total we have now is 4
+191.487[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :unbind called last receipt useful: [] marked as wasteful once: [] type [cs straight]
+191.487[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :bad peer!! -- connection never even completed
+191.487[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :generic shutdown calling out and back, my transfer status:/? (might be over if we don't send endByte)
+191.487[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :failure passout
+191.487[1426]DEBUG:BM (35253):post CS got status failure!
+191.487[1426]DEBUG:BM (35253): asked block keeper if file was done downloading without starting up the blocks (knowing size of file...) returning without checking any for now
+191.488[1426]DEBUG:ERROR:BM (35253):meep meep uh oh -- we were about to head into p2p on a CS only run -- is the server turned on? restarting with 1799 retries remaining then we'll just give up
+191.488[1426]DEBUG:BM (35253):repeating CS in 1
+191.488[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :cancelled dt
+191.646[1426]DEBUG:odhtem:adding fast gw ["193.167.187.187", 3633] -- size now 5
+191.646[1426]DEBUG:odhtem:got at least enough opendht servers! 5
+191.647[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+192.510[1426]BM (35253):Start CS normal innocent get http://155.98.35.3:7779/100K.file760357 dT 1000000.000000 dR 125000.000000 dW 1000000.000000 blockSize 100000
+192.510[1426]DEBUG:BM (35253):using CS intro...(normal)
+192.511[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :start
+192.511[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:??]: :using start byte of 0 for CS
+192.538[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :cs straight connected to peer
+192.538[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :sent (JIT) request (0 -> )
+201.673[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+210.102[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+210.102[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :passed dT!
+210.102[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :starting dr [and its window] now!
+210.102[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :header totalFileSize 100000
+210.102[1426]DEBUG:BM (35253):setting file size to 100000
+210.103[1426]DEBUG:BM (35253):doing set file size opendht called--checking first, then setting
+210.103[1426]DEBUG:starting odht conn to [next gateway] 129.93.229.139 3633
+210.103[1426]DEBUG:odhtem:description[request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check] round[set file size check once first round] key[http://155.98.35.3:7779/100K.file760357_headers_key] 1219759409.75365 129.93.229.139 3633
+210.103[1426]odhtem:pre opendht request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check repeat_extra_times_past_this:0 uid:request [http_//155.98.35.3_7779/100K.file760357_headers_key] gws_no_0 filesize check #9:
+210.104[1426]DEBUG:starting odht conn to [next gateway] 169.229.50.7 3633
+210.104[1426]DEBUG:odhtem:description[request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check] round[set file size check once first round] key[http://155.98.35.3:7779/100K.file760357_headers_key-key_redundancy->1] 1219759409.7546 169.229.50.7 3633
+210.104[1426]odhtem:pre opendht request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check repeat_extra_times_past_this:0 uid:request [http_//155.98.35.3_7779/100K.file760357_headers_key] gws_no_0 filesize check #10:
+210.105[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1214.0 B/1214 received :([my]0=>1213/99999). Total for file 1214.0/100000, original request was for 0 - 99999
+210.105[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2648B (raw)
+210.106[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2648.0 B/2648 received :([my]1214=>3861/99999). Total for file 3862.0/100000, original request was for 0 - 99999
+210.132[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 5622B (raw)
+210.134[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 5622.0 B/5622 received :([my]3862=>9483/99999). Total for file 9484.0/100000, original request was for 0 - 99999
+210.430[1426]DEBUG:odhtem:odht_trans:request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check -> 129.93.229.139:3633 from 129.237.161.193:53968 => 129.93.229.139:3633:post open dht completed success after 0.326894s 129.93.229.139:3633
+210.430[1426]odhtem:post opendht request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check => success in 0.327101s (gw: 129.93.229.139:3633) uid:request [http_//155.98.35.3_7779/100K.file760357_headers_key] gws_no_0 filesize check #9:
+210.430[1426]DEBUG:odhtem:done with this round because (success==:success || 0==0)
+210.431[1426]DEBUG:odhtem:maybe got values back: set file size check once first round success ["100000", ""] (pm at end), old pm was ""
+210.431[1426]DEBUG:BM (35253):not re-setting file size in DHT--already set to right value at least once
+210.448[1426]DEBUG:odhtem:odht_trans:request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check -> 169.229.50.7:3633 from 129.237.161.193:55131 => 169.229.50.7:3633:post open dht completed success after 0.344025s 169.229.50.7:3633
+210.448[1426]odhtem:post opendht request [http://155.98.35.3:7779/100K.file760357_headers_key] gws_no:0 filesize check => success in 0.344245s (gw: 169.229.50.7:3633) uid:request [http_//155.98.35.3_7779/100K.file760357_headers_key] gws_no_0 filesize check #10:
+210.449[1426]DEBUG:odhtem:done with this round because (success==:success || 0==0)
+210.449[1426]DEBUG:odhtem:maybe got values back: set file size check once first round success ["100000", ""] (pm at end), old pm was ""
+210.449[1426]DEBUG:BM (35253):not re-setting file size in DHT--already set to right value at least once
+211.708[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+218.118[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+218.119[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]9484=>10931/99999). Total for file 10932.0/100000, original request was for 0 - 99999
+218.119[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+218.120[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]10932=>13827/99999). Total for file 13828.0/100000, original request was for 0 - 99999
+218.146[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+218.147[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]13828=>16723/99999). Total for file 16724.0/100000, original request was for 0 - 99999
+218.147[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2203B (raw)
+218.147[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2203.0 B/2203 received :([my]16724=>18926/99999). Total for file 18927.0/100000, original request was for 0 - 99999
+221.717[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+226.152[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 4344B (raw)
+226.153[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 4344.0 B/4344 received :([my]18927=>23270/99999). Total for file 23271.0/100000, original request was for 0 - 99999
+226.179[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 4951B (raw)
+226.180[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 4951.0 B/4951 received :([my]23271=>28221/99999). Total for file 28222.0/100000, original request was for 0 - 99999
+231.759[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+234.160[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+234.160[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]28222=>29669/99999). Total for file 29670.0/100000, original request was for 0 - 99999
+234.160[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+234.161[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]29670=>32565/99999). Total for file 32566.0/100000, original request was for 0 - 99999
+234.187[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+234.188[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]32566=>34013/99999). Total for file 34014.0/100000, original request was for 0 - 99999
+234.188[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 3446B (raw)
+234.189[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 3446.0 B/3446 received :([my]34014=>37459/99999). Total for file 37460.0/100000, original request was for 0 - 99999
+241.790[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+242.171[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+242.171[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]37460=>38907/99999). Total for file 38908.0/100000, original request was for 0 - 99999
+242.172[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+242.172[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]38908=>41803/99999). Total for file 41804.0/100000, original request was for 0 - 99999
+242.205[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 4882B (raw)
+242.206[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 4882.0 B/4882 received :([my]41804=>46685/99999). Total for file 46686.0/100000, original request was for 0 - 99999
+250.180[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+250.181[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]46686=>49581/99999). Total for file 49582.0/100000, original request was for 0 - 99999
+250.181[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+250.182[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]49582=>51029/99999). Total for file 51030.0/100000, original request was for 0 - 99999
+250.208[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+250.209[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]51030=>52477/99999). Total for file 52478.0/100000, original request was for 0 - 99999
+250.209[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 3408B (raw)
+250.209[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 3408.0 B/3408 received :([my]52478=>55885/99999). Total for file 55886.0/100000, original request was for 0 - 99999
+251.832[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+258.189[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+258.190[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]55886=>57333/99999). Total for file 57334.0/100000, original request was for 0 - 99999
+258.190[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+258.191[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]57334=>60229/99999). Total for file 60230.0/100000, original request was for 0 - 99999
+258.217[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+258.218[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]60230=>61677/99999). Total for file 61678.0/100000, original request was for 0 - 99999
+258.218[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 3420B (raw)
+258.219[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 3420.0 B/3420 received :([my]61678=>65097/99999). Total for file 65098.0/100000, original request was for 0 - 99999
+261.866[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+266.205[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+266.205[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]65098=>66545/99999). Total for file 66546.0/100000, original request was for 0 - 99999
+266.205[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+266.206[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]66546=>69441/99999). Total for file 69442.0/100000, original request was for 0 - 99999
+266.234[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 4837B (raw)
+266.234[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 4837.0 B/4837 received :([my]69442=>74278/99999). Total for file 74279.0/100000, original request was for 0 - 99999
+271.881[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+274.215[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+274.216[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]74279=>77174/99999). Total for file 77175.0/100000, original request was for 0 - 99999
+274.216[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+274.216[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]77175=>78622/99999). Total for file 78623.0/100000, original request was for 0 - 99999
+274.242[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+274.243[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]78623=>80070/99999). Total for file 80071.0/100000, original request was for 0 - 99999
+274.243[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 3451B (raw)
+274.244[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 3451.0 B/3451 received :([my]80071=>83521/99999). Total for file 83522.0/100000, original request was for 0 - 99999
+281.898[1426]DEBUG:BM (35253):ping 10 server (outgoing) conns: 0 :35253
+282.227[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+282.228[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]83522=>86417/99999). Total for file 86418.0/100000, original request was for 0 - 99999
+282.228[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+282.229[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]86418=>87865/99999). Total for file 87866.0/100000, original request was for 0 - 99999
+282.255[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2896B (raw)
+282.256[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2896.0 B/2896 received :([my]87866=>90761/99999). Total for file 90762.0/100000, original request was for 0 - 99999
+282.256[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 2017B (raw)
+282.256[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 2017.0 B/2017 received :([my]90762=>92778/99999). Total for file 92779.0/100000, original request was for 0 - 99999
+290.433[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 4344B (raw)
+290.434[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 4344.0 B/4344 received :([my]92779=>97122/99999). Total for file 97123.0/100000, original request was for 0 - 99999
+290.457[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1448B (raw)
+290.458[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1448.0 B/1448 received :([my]97123=>98570/99999). Total for file 98571.0/100000, original request was for 0 - 99999
+290.458[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :just received 1429B (raw)
+290.458[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :rec eived (useful) 1429.0 B/1429 received :([my]98571=>99999/99999). Total for file 100000.0/100000, original request was for 0 - 99999
+290.459[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :(early) DONE WITH WHOLE FILE cs straight
+290.459[1426]BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :done receiving or block done 100000/~100000.0
+290.459[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :generic shutdown calling out and back, my transfer status:100000/100000 (might be over if we don't send endByte)
+290.459[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :success since somebody else was successfull--that's success enough for me! and allows them to receive late and really not mark it and things continue on right--otherwise we report failure, start another one, which might request nothing, etc., and maybe not note the file is done -- note this lags slightly
+290.459[1426]DEBUG:BM (35253):post CS got status success!
+290.459[1426]DEBUG:BM (35253):guess CS just downloaded the whole thing
+290.459[1426]DEBUG:BM (35253):starting linger 0
+290.459[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :cancelled dt
+290.460[1426]DEBUG:BM (35253):cs straight download  [155.98.35.3:7779 => my:45848]: :unbind called last receipt useful: [true] marked as wasteful once: [] type [cs straight]
+290.460[1426]DEBUG:BM (35253):linger up --doing finalize
+290.460[1426]DEBUG:BM (35253):doing finalize
+290.460[1426]DEBUG:BM (35253):really doing finalize
+290.460[1426]DEBUG:BM (35253):done? called after finalize was already called! returning we are done, ok? --possible if the p2p server calls it during finalize, which it does
+290.460[1426]DEBUG:p2p server :35253:stopping server -- should close all clients on next_tick -- client queue length 0
+290.460[1426]DEBUG:p2p server :35253:killing length 0
+290.460[1426]DEBUG:block 0:NOT doing open dht remove as we're CS only...kind of!
+290.461[1426]DEBUG:odhtem:length still open is 0 {}
+290.461[1426]DEBUG:ERROR:BM (35253):dht says it is already done -- I would anticipate this being impossible as all the rm's should be out
+290.461[1426]BM (35253):congratulations--post cleanup called--you're done deleting uid http___155_98_35_3_7779_100K_file760357_p_1426_r_1219759351_1828 

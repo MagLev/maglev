@@ -55,6 +55,12 @@ module Process
       @_st_stat
     end
 
+    def __prim_result
+      # returns the Array that was returned by System(C)>>_performOnServer:
+      # which is [ rawStatus , childStatus, resutlStr, errMsg , errno]
+      @_st_primStatus
+    end
+
     # Returns true if the integer value of +receiver+ equals +other+.
     def ==(other)
       if other._is_a?( Status )

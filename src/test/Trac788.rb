@@ -7,4 +7,5 @@
 
 file = File.dirname(__FILE__) + '/lib/zero_length_ruby_file'
 require file
-raise "$LOADED_FEATURES does not have blank.rb" unless $LOADED_FEATURES.include? "#{file}.rb"
+lx = $LOADED_FEATURES
+raise "$LOADED_FEATURES does not have blank.rb" unless lx.include? "#{file}.rb"

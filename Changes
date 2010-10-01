@@ -4,11 +4,17 @@
 
 == Unreleased Changes
 
-* New parser based on the melbourne grammar file from Rubinius ,
+
+== Changes for 24407 2010-10-01
+
+* New parser based on the melbourne grammar file from Rubinius,
   with grammar actions calling to methods in Smalltalk.
   MRI parse server no longer required for loading Ruby bootstrap code.
-* Fix Trac 697, 701, 784, 787, 791
+* Fix Trac 697, 701, 784, 787, 788, 790, 791, 795
 * Added -C and -X options to maglev-ruby.
+* Updated a number of README's
+* Added scaffold generated files to show MySQL integration to sample rails app.
+* Various performance speedups to underlying GemStone 3.0 database technology
 
 == Changes for 24222 2010-09-09
 
