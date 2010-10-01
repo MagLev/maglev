@@ -13,9 +13,23 @@ class MagTag < Sinatra::Base
     # puts "====== @request.url:   #{@request.request_method} #{@request.url}"
     # puts "====== @request:       #{@request.inspect}"
     # puts "====== params:         #{params.inspect}"
-    if request.path_info !~ %r{/magtag\.css|/login|/signup|/debug} && @logged_in_user.nil?
+    if request.path_info !~ %r{/magtag\.css|/login|/signup|/debug|/setup} && @logged_in_user.nil?
       redirect '/login', 303
     end
+  end
+
+  get '/setup' do
+    @error = "setup done! login with user: pbm1 password: pbm1"
+    users = []
+    3.times do |i|
+      name = "pbm#{i}"
+      users << User.signup(name, name).save
+    end
+    # Everyone follows everyone else
+    users.each { |u1| users.each { |u2| u1.follow u2 unless u1 == u2} }
+    # Everyone tweets about it
+    10.times { |i| users.each { |u| u.tweet("#{u.name}[#{i}] Hey... I'm following people!") } }
+    erb :login
   end
 
   get '/debug' do

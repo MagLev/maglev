@@ -90,9 +90,11 @@ class User
 
   def save
     ALL_USERS << self
+    self
   end
 
   def delete
     ALL_USERS.delete self
+    self
   end
 end
