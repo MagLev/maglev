@@ -19,11 +19,19 @@ class MagTagTest < MiniTest::Unit::TestCase
     MagTag
   end
 
-  # Asserts that each of +strings+ is in the last_response.body somewhere
+  # Asserts that each of +strings+ is in the last_response.body
   def assert_in_body(*strings)
     strings.each do |string|
       assert !last_response.body.index(string).nil?,
              "Expected '#{string}' to be in last_response.body"
+    end
+  end
+
+  # Asserts that none of +strings+ is in the last_response.body
+  def assert_not_in_body(*strings)
+    strings.each do |string|
+      assert last_response.body.index(string).nil?,
+             "Did not expect '#{string}' to be in last_response.body"
     end
   end
 
@@ -38,7 +46,16 @@ end
 
 class  MagTagAppNavBar < MagTagTest
   def test_navbar_toggles_login_logout_depending_on_state
-    get
+    # We are not logged in
+    get '/login'
+    assert_in_body     'login'   # without '/', since it is current page (inactive link)
+    assert_not_in_body '/login'
+    assert_not_in_body '/logout'
+
+    user = login_new_user
+    get '/home'
+    assert_in_body     '/logout'
+    assert_not_in_body '/login'
   end
 end
 

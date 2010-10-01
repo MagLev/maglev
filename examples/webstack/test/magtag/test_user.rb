@@ -42,7 +42,6 @@ describe User do
     end
 
     it 'should reject long tweets' do
-      long_tweet =
       assert_raises(ArgumentError) { @user1.tweet '*' * 141 }
     end
   end

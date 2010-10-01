@@ -1,8 +1,17 @@
-* Notes 
-** TODO
+* Notes
+** Features to implement
    + Should we add an ontology?  Give meaning to the tags (rdf)?
    + Update model to use ActiveModel validation checks
      (validate_presence_of :password, :username) etc.
+   + Add
+*** TODO Add date to tweets
+*** TODO Add tweet form to home page (allow posting tweets)
+*** TODO Allow anyone to look at a user's tweets (user's home)
+*** TODO Implement mentions queue for each user
+*** TODO Add real persistence
+*** TODO Add tagging features
+*** TODO Create ORM version
+
 ** ActiveRecord
 
    Many of the efficiencies that the MySQL paper lists, won't be available

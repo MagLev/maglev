@@ -4,6 +4,22 @@ require 'magtag'
 
 class MagTag < Sinatra::Base
 
+  helpers do
+    def is_logged_in?
+      !@logged_in_user.nil?
+    end
+
+    # Returns either a static string, or a link to +page+, depending on
+    # whether we are on that page or not.
+    #
+    # @param [String] page the page to generate a link for.  Should start with '/'.
+    # @return [String] Either +page+, or an href to +page+.
+    def nav_link_for(page)
+      no_slash = page[1..-1]
+      env['PATH_INFO'] == page ? no_slash : "<a href=\"#{page}\">#{no_slash}</a>"
+    end
+  end
+
   before do
     session[:foo] = Time.now
     @logged_in_user = User.find_by_name session[:logged_in_user]
