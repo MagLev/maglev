@@ -1,7 +1,4 @@
-# Test passes if there is no syntax error.
-# Result under MRI:
-# 138.927
-# 138.927
+
 def go filename
   # assume ARGV[0] is a log
   start_time = nil
@@ -50,6 +47,6 @@ rubydoctest: can read
 
 end
 
-[2].map do |n|
-  n.times { go 'Trac795.txt' }
+[5].map do |n|
+  n.times { go ENV['MAGLEV_HOME'] + '/src/test/peer_log.txt' }
 end
