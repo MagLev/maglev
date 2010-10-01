@@ -3231,6 +3231,7 @@ static void initCharTypes(rb_parse_state *ps)
   ps->charTypes[(int)' ' ] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\f'] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\n'] = space_MASK | tokadd_string_special_MASK;
+  ps->charTypes[(int)'\r'] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\t'] = space_MASK | tokadd_string_special_MASK;
   ps->charTypes[(int)'\v'] = space_MASK | tokadd_string_special_MASK;
 
