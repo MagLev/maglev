@@ -3,12 +3,14 @@ require 'magtag_app'
 require 'minitest/unit'
 require 'rack/test'
 
+require 'testhelper'
+
 ENV['RACK_ENV'] = 'test'
 
 class MagTagTest < MiniTest::Unit::TestCase
   include Rack::Test::Methods
 
-  # Needs to be done once; needed to serve static pages, like css  
+  # Needs to be done once; needed to serve static pages, like css
   MagTag.set :public, './public'
   MagTag.set :sessions, true
   def app
@@ -34,7 +36,7 @@ end
 class MagTagLoginTest < MagTagTest
 
   def test_good_login_redirects_to_home
-    fred = create_and_login('fred', 'fred-pw')
+    fred = TestHelper.create_and_save('fred', 'fred-pw')
     refute_nil fred
 
     post '/login', { :username => fred.name, :password => fred.instance_variable_get(:@password) }
@@ -53,13 +55,9 @@ class MagTagSignupTest < MagTagTest
   def test_post_signup_adds_user_and_redirects_to_home
     name = "pbm#{rand(1000)}"
     pw   = 'pw'
-    params = {
-      'username' => name,
-      'password' => pw,
-      'confirmpassword' => pw }
     assert_nil User.find_by_name(name), "username #{name} already in Users"
 
-    post '/signup', params
+    post '/signup', { 'username' => name, 'password' => pw, 'confirmpassword' => pw }
     follow_redirect!
     assert last_response.ok?, "post /signup OK?: status: #{last_response.status}"
     assert_equal 'http://example.org/home', last_request.url, "url: #{last_request.url}"
@@ -67,27 +65,36 @@ class MagTagSignupTest < MagTagTest
   end
 
   def test_on_bad_username_it_redisplays_form
-    skip 'not written'
-    refute_nil last_response.body.index "'#{name}' already taken, try again"
+    post '/signup', { 'username' => nil, 'password' => 'pw', 'confirmpassword' => 'pw'}
+    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert_equal "http://example.org/signup", last_request.url
+    refute_nil last_response.body.index "Bad username"
   end
 
   def test_on_success_it_redirects_to_user_home
-    skip 'not written'
+    post '/signup', { 'username' => nil, 'password' => 'pw', 'confirmpassword' => 'pw'}
+    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert_equal "http://example.org/signup", last_request.url
+    refute_nil last_response.body.index "Bad username"
   end
 
   def test_password_and_confirmpassword_must_match
-    skip 'not written'
+    post '/signup', { 'username' => 'random_user', 'password' => 'pw', 'confirmpassword' => 'pw1'}
+    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert_equal "http://example.org/signup", last_request.url
+    refute_nil last_response.body.index "Passwords don't match"
   end
 
   def test_username_must_be_new
-    skip 'not written'
+    name = 'MightyUser'
+    pw = 'pw'
+    TestHelper.ensure_user_exists name
+    
+    post '/signup', { 'username' => name, 'password' => 'pw', 'confirmpassword' => 'pw'}
+    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert_equal "http://example.org/signup", last_request.url
+    refute_nil last_response.body.index "User #{name} already taken"
   end
-end
-
-def create_and_login(user, pw)
-  u = User.signup(user, pw)
-  u.save
-  u
 end
 
 MiniTest::Unit.new.run(ARGV)

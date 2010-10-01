@@ -1,6 +1,8 @@
 require "magtag/user"
 require "minitest/spec"
 
+require 'testhelper'
+
 MiniTest::Unit.autorun
 
 describe User do
@@ -100,8 +102,9 @@ describe 'User Persistence' do
 
   describe '#login' do
     it 'accepts a good password' do
-      name = 'fred'
-      pw   = 'password'
+      name, pw = 'fred', 'password'
+      TestHelper.ensure_no_user_named(name)
+
       user = User.new name, pw
       assert user.login pw
     end
@@ -109,6 +112,7 @@ describe 'User Persistence' do
 
   describe 'User.find_by_name' do
     before do
+      TestHelper.ensure_no_user_named('User1')
       @user1 = User.new 'User1', 'pw1'
     end
 
@@ -126,7 +130,7 @@ describe 'User Persistence' do
   describe 'Instance level persistence methods' do
     it '#save saves a user' do
       name = 'test_save_user'
-      ensure_no_user_named name
+      TestHelper.ensure_no_user_named name
 
       user = User.new name, 'pw'
       user.save
@@ -135,24 +139,9 @@ describe 'User Persistence' do
 
     it '#delete deletes a user' do
       name = 'test_delete_user'
-      user = ensure_user_exists name
+      user = TestHelper.ensure_user_exists name
       user.delete
       assert_nil User.find_by_name name
     end
   end
-end
-
-
-def ensure_user_exists(name)
-  user = User.find_by_name(name)
-  unless user
-    user = User.new name, name
-    user.save
-  end
-  user
-end
-
-def ensure_no_user_named(name)
-  user = User.find_by_name(name)
-  user.delete if user
 end
