@@ -6,12 +6,11 @@ module TestHelper
     u
   end
 
-  def ensure_user_exists(name)
+  def ensure_user_exists(name, pw='pw')
     user = User.find_by_name(name)
-    unless user
-      user = User.new name, 'pw'
-      user.save
-    end
+    user.delete unless user.nil?
+    user = User.new name, pw
+    user.save
     user
   end
 

@@ -66,34 +66,73 @@ class MagTagSignupTest < MagTagTest
 
   def test_on_bad_username_it_redisplays_form
     post '/signup', { 'username' => nil, 'password' => 'pw', 'confirmpassword' => 'pw'}
-    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
     refute_nil last_response.body.index "Bad username"
   end
 
   def test_on_success_it_redirects_to_user_home
     post '/signup', { 'username' => nil, 'password' => 'pw', 'confirmpassword' => 'pw'}
-    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
     refute_nil last_response.body.index "Bad username"
   end
 
   def test_password_and_confirmpassword_must_match
     post '/signup', { 'username' => 'random_user', 'password' => 'pw', 'confirmpassword' => 'pw1'}
-    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+    assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
     refute_nil last_response.body.index "Passwords don't match"
   end
 
   def test_username_must_be_new
     name = 'MightyUser'
-    pw = 'pw'
     TestHelper.ensure_user_exists name
-    
-    post '/signup', { 'username' => name, 'password' => 'pw', 'confirmpassword' => 'pw'}
-    assert last_response.ok?, "refute ok?: #{last_response.inspect}"
+
+    post '/signup', { 'username' => name, 'password' => 'pw', 'confirmpassword' => 'pw' }
+    assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
     refute_nil last_response.body.index "User #{name} already taken"
+  end
+end
+
+class MagTagLogoutTest < MagTagTest
+
+  def setup
+    @name = 'logout_user'
+    @pw   = 'pw'
+    @logged_in_user = TestHelper.ensure_user_exists @name, @pw
+
+    post '/login', { :username => @name, :password => @pw }
+    follow_redirect!
+    assert_equal 'http://example.org/home', last_request.url, "url: #{last_request.url}"
+    refute_nil last_request.session.to_hash[:logged_in_user]
+  end
+
+  def test_logout_redirects_to_login_page
+    get '/logout'
+    assert_nil last_request.session.to_hash[:logged_in_user]
+    assert last_response.redirect?, "assert redirect?: #{last_response.inspect}"
+    follow_redirect!
+    assert_equal "http://example.org/login", last_request.url
+  end
+
+  def test_logout_silent_if_not_logged_in
+    get '/logout'
+    get '/logout'
+    assert last_response.redirect?, "assert redirect?: #{last_response.inspect}"
+    follow_redirect!
+    assert_equal "http://example.org/login", last_request.url
+  end
+
+  def logged_out_user_cant_access_home_page
+    get '/logout'
+    assert_nil last_request.session.to_hash[:logged_in_user]
+
+    get '/home'
+    assert last_response.redirect?, "assert redirect?: #{last_response.inspect}"
+    follow_redirect!
+    assert_equal "http://example.org/login", last_request.url
   end
 end
 

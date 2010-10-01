@@ -34,6 +34,11 @@ class MagTag < Sinatra::Base
     login(params['username'], params['password'])
   end
 
+  get '/logout' do
+    session[:logged_in_user] = nil
+    redirect '/login'
+  end
+
   get '/signup' do # show new user registration form
     erb :signup
   end
