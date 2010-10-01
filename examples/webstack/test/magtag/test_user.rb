@@ -11,8 +11,16 @@ describe User do
     @user2 = User.new 'User2', 'pw2'
   end
 
-  it 'should have a name' do
-    assert_equal @user1.name, 'User1'
+  describe 'Accessors' do
+    it 'should have a name' do
+      assert_equal @user1.name, 'User1'
+    end
+
+    it 'should have no followers, follow no-one and have no tweets' do
+      assert_equal 0, @user1.num_followers
+      assert_equal 0, @user1.num_following
+      assert_equal 0, @user1.num_tweets
+    end
   end
 
   describe 'should maintain a list of followers and following' do
@@ -73,6 +81,7 @@ describe User do
         @user3.tweet "#{@user3.name} tweet #{i}"
       end
       assert_equal 20, @user1.timeline.size
+      assert_includes  @user1.timeline, "#{@user3.name} tweet 19"
     end
   end
 end

@@ -18,6 +18,12 @@ class MagTagTest < MiniTest::Unit::TestCase
     # Sinatra::Base, i.e., are not a classic style Sinatra App.
     MagTag
   end
+
+  # Asserts that +string+ is in the last_response.body somewhere
+  def assert_in_body(string)
+    assert !last_response.body.index(string).nil?,
+           "Expected '#{string}' to be in last_response.body"
+  end
 end
 
 class  MagTagAppTest < MagTagTest
@@ -49,7 +55,7 @@ class MagTagSignupTest < MagTagTest
   def test_get_signup
     get '/signup'
     assert last_response.ok?
-    refute_nil last_response.body.index('signup')
+    assert_in_body('signup')
   end
 
   def test_post_signup_adds_user_and_redirects_to_home
@@ -68,21 +74,21 @@ class MagTagSignupTest < MagTagTest
     post '/signup', { 'username' => nil, 'password' => 'pw', 'confirmpassword' => 'pw'}
     assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
-    refute_nil last_response.body.index "Bad username"
+    assert_in_body "Bad username"
   end
 
   def test_on_success_it_redirects_to_user_home
     post '/signup', { 'username' => nil, 'password' => 'pw', 'confirmpassword' => 'pw'}
     assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
-    refute_nil last_response.body.index "Bad username"
+    assert_in_body "Bad username"
   end
 
   def test_password_and_confirmpassword_must_match
     post '/signup', { 'username' => 'random_user', 'password' => 'pw', 'confirmpassword' => 'pw1'}
     assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
-    refute_nil last_response.body.index "Passwords don't match"
+    assert_in_body "Passwords don't match"
   end
 
   def test_username_must_be_new
@@ -92,12 +98,11 @@ class MagTagSignupTest < MagTagTest
     post '/signup', { 'username' => name, 'password' => 'pw', 'confirmpassword' => 'pw' }
     assert last_response.ok?, "assert ok?: #{last_response.inspect}"
     assert_equal "http://example.org/signup", last_request.url
-    refute_nil last_response.body.index "User #{name} already taken"
+    assert_in_body "User #{name} already taken"
   end
 end
 
 class MagTagLogoutTest < MagTagTest
-
   def setup
     @name = 'logout_user'
     @pw   = 'pw'
@@ -134,6 +139,39 @@ class MagTagLogoutTest < MagTagTest
     follow_redirect!
     assert_equal "http://example.org/login", last_request.url
   end
+end
+
+class MagTagHomeTest < MagTagTest
+
+  def setup
+    @user = login_new_user
+    assert_equal "http://example.org/home", last_request.url
+  end
+
+  def test_home_page_shows_timeline
+    assert_in_body "No items in timeline!"
+  end
+
+  def test_home_page_shows_stats
+    # Should show number of tweets, number of followers and number of following
+    assert_in_body "followers 0"
+    assert_in_body "following 0"
+    assert_in_body "tweets 0"
+  end
+
+  def test_home_page_shows_tweet_form
+    skip 'not implemented'
+  end
+end
+
+# Create a new user, log them in and return the user.
+# the password is the user name.
+def login_new_user
+  name = 'test_user_' + rand(1000).to_s
+  user = TestHelper.ensure_user_exists(name, name)
+  post '/login', { :username => user.name, :password => user.name }
+  follow_redirect!
+  user
 end
 
 MiniTest::Unit.new.run(ARGV)

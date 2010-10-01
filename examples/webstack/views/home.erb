@@ -2,6 +2,27 @@
 
 <div id="main">
   <h1>Hi <%= @logged_in_user.name %></h1>
+  <div id="stats">
+    <h2> Stats </h2>
+    <ul>
+      <li>tweets <%= @logged_in_user.num_tweets %></li>
+      <li>followers <%= @logged_in_user.num_followers %></li>
+      <li>following <%= @logged_in_user.num_following %></li>
+    </ul>
+  </div>
+  <div id="timeline">
+    <h2>Timeline</h2>
+    <% if @logged_in_user.timeline.size == 0 %>
+      No items in timeline!
+    <% else %>
+      <p>Timeline has <%= @logged_in_user.timeline.size %> entries.</p>
+      <ul>
+      <% @logged_in_user.timeline.each do |entry| %>
+        <li><%= entry %></li>
+      <% end %>
+      </ul>
+    <% end %>
+  </div>
 </div>
 
 <%= erb :footer %>
