@@ -1,8 +1,11 @@
 require 'rake/testtask'
 
+task :default => :magtag
+
 Rake::TestTask.new do |t|
   t.libs << "lib"
-  t.test_files = FileList['test/test_*.rb']
+  t.test_files = FileList['test/test_user.rb',
+                         'test/test_magtag_app.rb',]
 #  t.test_files = FileList['test/test_user.rb']
   t.ruby_opts << '-rubygems'
   # t.verbose = true
@@ -10,5 +13,5 @@ end
 
 desc "Run the MagTag Web App"
 task :magtag do
-  sh "$MAGLEV_HOME/bin/rackup config.ru"
+  sh "$MAGLEV_HOME/bin/rackup -Ilib config.ru"
 end

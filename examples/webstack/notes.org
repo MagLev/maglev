@@ -1,6 +1,8 @@
 * Notes 
 ** TODO
    + Should we add an ontology?  Give meaning to the tags (rdf)?
+   + Update model to use ActiveModel validation checks
+     (validate_presence_of :password, :username) etc.
 ** ActiveRecord
 
    Many of the efficiencies that the MySQL paper lists, won't be available

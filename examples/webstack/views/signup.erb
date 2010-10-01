@@ -1,0 +1,26 @@
+<%= erb :header %>
+
+<div id="signup">
+  <form action="signup" method="post">
+    <fieldset>
+      <legend>Signup for a MagTag account</legend>
+        <div>
+          <label for="username">Username:</label>
+          <input name="username" type="text" id="username" value="user name" />
+        </div>
+        <div>
+          <label for="password">Password:</label>
+          <input type="password" name="password" id="password" value=""/>
+        </div>
+        <div>
+          <label for="confirmpassword">Confirm Password:</label>
+          <input type="password" name="confirmpassword" id="confirmpassword" value=""/>
+        </div>
+        <div>
+          <input type="submit" id="signup" value="signup" />
+        </div>
+      </fieldset>
+  </form>
+</div>
+
+<%= erb :footer %>

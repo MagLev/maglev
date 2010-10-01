@@ -1,0 +1,14 @@
+<%= erb :header %>
+
+<div id="debug">
+  <h2>All Users</h2>
+  <ul>
+  <% User::ALL_USERS.each do |user| %>
+    <li><%= user.name %></li>
+  <% end %>
+  </ul>
+</div>
+
+<p>If you don't have an account, you may <a href="/signup">Signup for one</a>.</p>
+
+<%= erb :footer %>
