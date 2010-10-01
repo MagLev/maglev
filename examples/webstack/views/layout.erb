@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>MagTag</title>
+    <link rel="stylesheet" href="/magtag.css">
+  </head>
+  <body>
+    <div id="container">
+      <header>
+        <h1>MagTag</h1>
+      </header>
+
+      <nav>
+        <ul>
+          <% if is_logged_in? %>
+          <li><%= nav_link_for '/logout' %></li>
+          <li><%= nav_link_for '/home'   %></li>
+          <% else %>
+          <li><%= nav_link_for '/login'  %></li>
+          <li><%= nav_link_for '/signup' %></li>
+          <% end %>
+        </ul>
+        <p>Some development helper urls</p>
+        <ul>
+          <li><%= nav_link_for '/setup' %></li>
+          <li><%= nav_link_for '/debug' %></li>
+        </ul>
+      </nav>
+
+      <% if @error %>
+      <div class="error">
+        <%= @error %>
+      </div>
+      <% end %>
+
+      <%= yield %>
+
+      <footer>
+        <p>The footer</p>
+      </footer>
+    </div>
+  </body>
+</html>

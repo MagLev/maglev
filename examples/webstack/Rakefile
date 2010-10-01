@@ -6,6 +6,7 @@ Rake::TestTask.new do |t|
   t.libs << "lib"
   t.libs << "test"
   t.test_files = FileList['test/magtag/test_user.rb',
+                          'test/magtag/test_tweet.rb',
                          'test/test_magtag_app.rb',]
 #  t.test_files = FileList['test/test_user.rb']
   t.ruby_opts << '-rubygems'

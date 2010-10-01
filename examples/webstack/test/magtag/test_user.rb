@@ -1,5 +1,7 @@
-require "magtag/user"
 require "minitest/spec"
+
+require "magtag/user"
+require "magtag/tweet"
 
 require 'testhelper'
 
@@ -36,9 +38,11 @@ describe User do
     end
   end
 
-  describe 'Tweeting' do
-    it 'should allow tweets' do
-      @user1.tweet "A Tweet"
+  describe '#tweet' do
+    it 'returns a new Tweet' do
+      t = @user1.tweet "A Tweet"
+      refute_nil t
+      assert_kind_of Tweet, t
     end
 
     it 'should reject long tweets' do
@@ -80,7 +84,7 @@ describe User do
         @user3.tweet "#{@user3.name} tweet #{i}"
       end
       assert_equal 20, @user1.timeline.size
-      assert_includes  @user1.timeline, "#{@user3.name} tweet 19"
+      refute_nil @user1.timeline.detect { |t| t.text == "#{@user3.name} tweet 19" }
     end
   end
 end

@@ -1,7 +1,6 @@
 require 'sinatra'
 require 'magtag'
 
-
 class MagTag < Sinatra::Base
 
   helpers do
@@ -18,6 +17,7 @@ class MagTag < Sinatra::Base
       no_slash = page[1..-1]
       env['PATH_INFO'] == page ? no_slash : "<a href=\"#{page}\">#{no_slash}</a>"
     end
+
   end
 
   before do
@@ -51,6 +51,7 @@ class MagTag < Sinatra::Base
   get '/debug' do
     erb :debug
   end
+
 
   get '/home' do
     erb :home

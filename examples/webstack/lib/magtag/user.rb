@@ -78,10 +78,17 @@ class User
     @timeline = @timeline[1..-1] if @timeline.size > 20
   end
 
-  def tweet(msg)
-    raise ArgumentError, "Tweet Too Long: #{msg}" if msg.length > 140
-    @tweets << msg
-    @followers.each { |f| f.add_timeline msg }
+  # Creates a tweet and updates followers about the tweet
+  #
+  # @param [String] text the tweet text
+  # @return [Tweet] the new tweet.
+  #
+  # @raises [ArgumentError] if tweet text is too long.
+  def tweet(text)
+    new_tweet = Tweet.new text
+    @tweets << new_tweet
+    @followers.each { |f| f.add_timeline new_tweet }
+    new_tweet
   end
 
   def login(password)

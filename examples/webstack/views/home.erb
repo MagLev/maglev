@@ -15,8 +15,8 @@
     <% else %>
       <p>Timeline has <%= @logged_in_user.timeline.size %> entries.</p>
       <ul>
-      <% @logged_in_user.timeline.each do |entry| %>
-        <li><%= entry %></li>
+      <% @logged_in_user.timeline.each do |tweet| %>
+        <li><%= tweet.text %> [posted <%= tweet.twitterize_date %>]</li>
       <% end %>
       </ul>
     <% end %>
