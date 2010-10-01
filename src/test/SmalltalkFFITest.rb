@@ -3,7 +3,9 @@ unless File.directory?(dirname)
   Dir.chdir "#{ENV['MAGLEV_HOME']}" do
     puts "generating stwrappers"
     status = system('rake stwrappers')
-    unless status.equal?(true)
+    if status.equal?(true)
+      puts 'rake stwrappers ok'
+    else
       raise 'rake stwrappers NOT successful'
     end
   end

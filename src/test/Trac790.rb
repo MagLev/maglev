@@ -13,7 +13,8 @@ raise "Wrong exitstatus #{$?.exitstatus}" unless $?.exitstatus == 0
 
 x = `/usr/bin/env false` # This fails
 raise 'fail with output' unless x == ''
-raise "Wrong exitstatus #{$?.exitstatus}" unless $?.exitstatus == 1
+stx = $?.exitstatus
+raise "Wrong exitstatus #{stx}" unless stx == 1 || stx == 255 # solaris gets 255
 
 x = %x{ /usr/bin/env true }     # This works ok
 raise 'fail with output' unless x == ''
@@ -21,5 +22,6 @@ raise "Wrong exitstatus #{$?.exitstatus}" unless $?.exitstatus == 0
 
 x = %x{ /usr/bin/env false } # This fails
 raise 'fail with output' unless x == ''
-raise "Wrong exitstatus #{$?.exitstatus}" unless $?.exitstatus == 1
+stx = $?.exitstatus
+raise "Wrong exitstatus #{stx}" unless stx == 1 || stx == 255 # solaris gets 255
 

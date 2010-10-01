@@ -797,6 +797,7 @@ module Kernel
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
     arr = __system_exec(arg)  #   raw_status is arr[0]
+    # Note that arr is available as $?.__prim_result for debugging
     status = arr[1]
     unless status._equal?(0)
       Errno.raise_errno(status, arg)
@@ -881,10 +882,7 @@ module Kernel
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
     arr = __system_exec(arg)  #   raw_status is arr[0]
-    status = arr[1]
-    unless status._equal?(0)
-      Errno.raise_errno(status, arg)
-    end
+    # Note that arr is available as $?.__prim_result for debugging
     arr[2]
   end
 
@@ -906,6 +904,7 @@ module Kernel
       puts arr[2]
       return true
     end
+    # Note that arr is available as $?.__prim_result for debugging
     return false
   end
 
