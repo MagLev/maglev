@@ -10,7 +10,7 @@ describe Tweet do
     refute_nil t
     assert_equal msg, t.text
   end
-  
+
   it 'should limit content to 140 chars' do
     t = Tweet.new "ok"
     refute_nil t
