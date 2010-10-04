@@ -187,7 +187,7 @@ class IdentitySet
     # serialize as a YAML sequence
     coder.represent_seq(self.class.name, self.to_a)
   end
-  
+
   # Psych hook method for reviving from YAML
   def init_with(coder)
     p coder.seq
@@ -419,9 +419,10 @@ class IdentitySet
   #
   # The name of this method was chosen so that it doesn't conflict with any
   # well known methods (e.g., Enumerable#select, Enumerable#find*, Rails
-  # find* etc.).
+  # find* etc.).  The operand path is converted to symbols before processing.
   def search(operand_path, query_op, query_val)
-    _search(operand_path, st_op(query_op), query_val)
+    operand_syms = operand_path.map { |p| p.to_sym }
+    _search(operand_syms, st_op(query_op), query_val)
   end
 
   primitive_nobridge '_search_between', 'low:comparing:select:comparing:high:'
