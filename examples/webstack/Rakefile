@@ -17,3 +17,9 @@ desc "Run the MagTag Web App"
 task :magtag do
   sh "$MAGLEV_HOME/bin/rackup -Ilib config.ru"
 end
+
+desc "Commit the code for the models to MagLev"
+task :commit do
+  sh "maglev-ruby -Mcommit lib/magtag/user.rb "
+  sh "maglev-ruby -Mcommit lib/magtag/tweet.rb"
+end

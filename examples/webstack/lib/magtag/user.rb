@@ -6,11 +6,24 @@ class User
 
   class UserException < Exception; end
 
-  ALL_USERS = []
+  if defined? Maglev
+    unless defined? ALL_USERS
+      ALL_USERS = IdentitySet.new
+      ALL_USERS.create_equality_index('@name', String)
+    end
 
-  def self.find_by_name(name)
-    ALL_USERS.detect { |u| u.name == name }
+    def self.find_by_name(name)
+      # TODO: There has got to be a better way...
+      result = ALL_USERS.search([:@name], :eql, name)
+      result.size > 0 ? result.__at(1) : nil
+    end
+  else
+    ALL_USERS = []
+    def self.find_by_name(name)
+      ALL_USERS.detect { |u| u.name == name }
+    end
   end
+
 
   # Creates a new user with the given name and password if it does not
   # already exist in the database.
