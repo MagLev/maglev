@@ -1,25 +1,54 @@
 require 'rake/testtask'
 
-task :default => :magtag
+task :default => :'maglev:magtag'
+
+MBIN = ENV['MAGLEV_HOME'] + '/bin'
 
 Rake::TestTask.new do |t|
   t.libs << "lib"
   t.libs << "test"
   t.test_files = FileList['test/magtag/test_user.rb',
                           'test/magtag/test_tweet.rb',
-                         'test/test_magtag_app.rb',]
-#  t.test_files = FileList['test/test_user.rb']
+                          'test/test_magtag_app.rb',]
+  #  t.test_files = FileList['test/test_user.rb']
   t.ruby_opts << '-rubygems'
   # t.verbose = true
 end
 
-desc "Run the MagTag Web App"
-task :magtag do
-  sh "$MAGLEV_HOME/bin/rackup -Ilib config.ru"
+namespace :maglev do
+  desc "Run the MagTag Web App"
+  task :magtag do
+    bail_if_rvm_hosing_environment
+    exit 2
+    puts "Using ruby: #{`#{MBIN}/maglev-ruby -v`}"
+    sh "#{MBIN}/rackup -Ilib --port 3333 config.ru"
+  end
+
+
+  desc "Commit the code for the models to MagLev"
+  task :commit do
+    bail_if_rvm_hosing_environment
+    sh "maglev-ruby -Mcommit lib/magtag/user.rb "
+    sh "maglev-ruby -Mcommit lib/magtag/tweet.rb"
+  end
+
 end
 
-desc "Commit the code for the models to MagLev"
-task :commit do
-  sh "maglev-ruby -Mcommit lib/magtag/user.rb "
-  sh "maglev-ruby -Mcommit lib/magtag/tweet.rb"
+
+namespace :mri do
+  desc "Run the MagTag Web App"
+  task :magtag do
+    puts "Using ruby: #{`ruby -v`}"
+    sh "rackup -Ilib --port 3333 config.ru"
+  end
+end
+
+
+# RVM sets GEM_PATH, and I don't run maglev under RVM, so I detect and bail
+# if I accidentally run in an rvm-ified shell.
+def bail_if_rvm_hosing_environment
+  if ENV['rvm_path']
+    puts "ERROR: Running maglev with RVM environment"
+    exit 1
+  end
 end

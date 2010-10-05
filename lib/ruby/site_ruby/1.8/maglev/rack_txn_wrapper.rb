@@ -30,16 +30,16 @@ module Maglev
     #  The values are unmodified from the lower layer app.
     def call(env)
       begin
-        puts "=== Maglev.abort_transaction"
+#        puts "=== Maglev.abort_transaction"
         Maglev.abort_transaction
         status, headers, body = @app.call env
         [status, headers, body]
       ensure
         if committable? status
-          puts "=== Maglev.commit_transaction"
+#          puts "=== Maglev.commit_transaction"
           Maglev.commit_transaction
         else
-          puts "=== Bad status so doing: Maglev.abort_transaction"
+#          puts "=== Bad status so doing: Maglev.abort_transaction"
           Maglev.abort_transaction
         end
       end

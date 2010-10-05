@@ -24,3 +24,464 @@
         , PRIMARY KEY pk_Tag2Post (tag_id, post_id)
         , INDEX (post_id)
       ) ENGINE=InnoDB;
+** Tests and results
+*** Measure overhead of a rack middleware
+    Install an empty Rack middleware app that does nothing.  The intent is
+    to distinguish the overhead of the transaction processing vs the rack
+    overhead when using the transaction wrapper middleware.
+**** Results
+     |-------------+-----------+---------+---------+-----------|
+     | Middleware  | Ruby      | HTTPd   | req/sec |  mean req |
+     |             |           |         |  (mean) | time (ms) |
+     |-------------+-----------+---------+---------+-----------|
+     | Empty       | Maglev    | WEBrick |  336.29 |    29.736 |
+     | No mid-ware | Maglev    | WEBrick |  327.93 |    30.495 |
+     |-------------+-----------+---------+---------+-----------|
+     | Diff        |           |         |    8.36 |    -0.759 |
+     |-------------+-----------+---------+---------+-----------|
+     |-------------+-----------+---------+---------+-----------|
+     | Empty       | MRI 1.8.7 | WEBrick |  209.79 |    47.667 |
+     | No mid-ware | MRI 1.8.7 | WEBrick |  210.29 |    47.552 |
+     |-------------+-----------+---------+---------+-----------|
+     | Diff        |           |         |    -0.5 |     0.115 |
+     |-------------+-----------+---------+---------+-----------|
+     |-------------+-----------+---------+---------+-----------|
+
+     The MagLev run with the middleware was actually faster than without
+     the middleware (by about 2.5%, or so).  Let's assume that is in the
+     noise.  It is .8ms faster with the middleware
+
+**** Maglev Results
+***** Baseline: no middleware
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   30.495 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    327.93 [#/sec] (mean)
+Time per request:       30.495 [ms] (mean)
+Time per request:       3.049 [ms] (mean, across all concurrent requests)
+Transfer rate:          91.27 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.4      0      13
+Processing:     4   30   7.3     30     161
+Waiting:        4   30   7.2     29     161
+Total:          5   30   7.2     30     161
+
+Percentage of the requests served within a certain time (ms)
+  50%     30
+  66%     31
+  75%     32
+  80%     33
+  90%     36
+  95%     40
+  98%     47
+  99%     51
+ 100%    161 (longest request)
+
+***** Results running with empty middleware:
+
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   29.736 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    336.29 [#/sec] (mean)
+Time per request:       29.736 [ms] (mean)
+Time per request:       2.974 [ms] (mean, across all concurrent requests)
+Transfer rate:          93.60 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.4      0       9
+Processing:     4   30   7.7     29     173
+Waiting:        0   29   7.7     29     172
+Total:          5   30   7.7     29     173
+
+Percentage of the requests served within a certain time (ms)
+  50%     29
+  66%     30
+  75%     31
+  80%     32
+  90%     35
+  95%     38
+  98%     44
+  99%     49
+ 100%    173 (longest request)
+
+**** MRI 1.8.7 results
+***** Baseline: no middleware
+$ ruby -v
+ruby 1.8.7 (2010-01-10 patchlevel 249) [i686-darwin10.3.0]
+
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   47.552 seconds
+Complete requests:      10000
+Failed requests:        10
+   (Connect: 10, Receive: 0, Length: 0, Exceptions: 0)
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    210.29 [#/sec] (mean)
+Time per request:       47.552 [ms] (mean)
+Time per request:       4.755 [ms] (mean, across all concurrent requests)
+Transfer rate:          58.53 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    8  85.0      0    1008
+Processing:     9   39  19.2     34     109
+Waiting:        7   36  18.7     31     106
+Total:          9   47  87.5     34    1067
+
+Percentage of the requests served within a certain time (ms)
+  50%     34
+  66%     42
+  75%     57
+  80%     65
+  90%     69
+  95%     72
+  98%     77
+  99%     87
+ 100%   1067 (longest request)
+
+***** Results running with empty middleware
+$ ruby -v
+ruby 1.8.7 (2010-01-10 patchlevel 249) [i686-darwin10.3.0]
+
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   47.667 seconds
+Complete requests:      10000
+Failed requests:        8
+   (Connect: 8, Receive: 0, Length: 0, Exceptions: 0)
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    209.79 [#/sec] (mean)
+Time per request:       47.667 [ms] (mean)
+Time per request:       4.767 [ms] (mean, across all concurrent requests)
+Transfer rate:          58.39 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    8  83.8      0    1000
+Processing:     8   40  18.9     34     118
+Waiting:        7   36  18.4     31     111
+Total:          8   47  85.6     34    1050
+
+Percentage of the requests served within a certain time (ms)
+  50%     34
+  66%     41
+  75%     61
+  80%     66
+  90%     69
+  95%     71
+  98%     74
+  99%     79
+ 100%   1050 (longest request)
+
+**** MRI 1.9.2 results
+***** Baseline: no middleware
+***** Results running with empty middleware
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   39.277 seconds
+Complete requests:      10000
+Failed requests:        2
+   (Connect: 2, Receive: 0, Length: 0, Exceptions: 0)
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    254.60 [#/sec] (mean)
+Time per request:       39.277 [ms] (mean)
+Time per request:       3.928 [ms] (mean, across all concurrent requests)
+Transfer rate:          70.86 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    3  49.7      0    1000
+Processing:     6   36   7.5     38      81
+Waiting:        5   32   7.3     33      80
+Total:          6   39  50.2     38    1041
+
+Percentage of the requests served within a certain time (ms)
+  50%     38
+  66%     41
+  75%     42
+  80%     42
+  90%     44
+  95%     47
+  98%     50
+  99%     53
+ 100%   1041 (longest request)
+
+*** Measure overhead of maglev transaction wrapper
+    The transaction wrapper does a commit on every successful request.  I
+    wanted to measure how much overhead.
+**** Setup
+     Use ab to test on my laptop with WEBrick. Do one run with txn wrapper
+     on and one run with it off
+**** Results
+
+     |----------------+---------+---------+-----------|
+     | Transaction    | HTTPd   | req/sec |  mean req |
+     | Wrapper on/off |         |  (mean) | time (ms) |
+     |----------------+---------+---------+-----------|
+     | off            | WEBrick |  332.47 |    30.078 |
+     | on             | WEBrick |  246.94 |    40.496 |
+     |----------------+---------+---------+-----------|
+     | Diff           |         |   85.53 |   -10.418 |
+     | %  (off/on)    |         |  1.35 % |    0.74 % |
+
+     So, it looks like transaction processing (including overhead of Rack
+     middleware calling, etc.) adds ~ 10ms to request time.
+
+***** With txn wrapper off: 2010-10-05
+
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   30.078 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    332.47 [#/sec] (mean)
+Time per request:       30.078 [ms] (mean)
+Time per request:       3.008 [ms] (mean, across all concurrent requests)
+Transfer rate:          92.53 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.6      0      23
+Processing:     4   30   6.9     29     155
+Waiting:        4   30   6.8     29     155
+Total:          5   30   6.8     29     155
+
+Percentage of the requests served within a certain time (ms)
+  50%     29
+  66%     31
+  75%     31
+  80%     32
+  90%     35
+  95%     39
+  98%     44
+  99%     50
+ 100%    155 (longest request)
+
+***** With txn wrapper on:
+$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   40.496 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    246.94 [#/sec] (mean)
+Time per request:       40.496 [ms] (mean)
+Time per request:       4.050 [ms] (mean, across all concurrent requests)
+Transfer rate:          68.73 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.4      0      21
+Processing:     4   40   7.8     41     170
+Waiting:        2   40   7.8     40     170
+Total:          7   40   7.6     41     170
+
+Percentage of the requests served within a certain time (ms)
+  50%     41
+  66%     42
+  75%     43
+  80%     44
+  90%     46
+  95%     49
+  98%     54
+  99%     64
+ 100%    170 (longest request)

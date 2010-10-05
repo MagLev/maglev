@@ -11,3 +11,21 @@ complex reads and writes.
 
 The sample application is a social tagging site (Delicio.us, flickr,
 etc.).
+
+
+== TODO
+
+1. The transaction wrapper is committing on too many requests:
+   * get /login and other non modifying pages
+   * get /magtag.css, get /favicon.ico  (which should really be served by
+     the frontend HTTP server, and not dealt with by Sinatra).
+
+
+== Things to test
+
+1. Compare maglev performance with txn wrapper on static page, /magtag.css,
+   without txn_wrapper to see what the txn wrapper overhead is.
+
+== Notes
+
+* ab on Mac does not like "localhost", use "127.0.0.1" instead.

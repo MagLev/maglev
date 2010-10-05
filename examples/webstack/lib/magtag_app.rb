@@ -2,6 +2,7 @@ require 'sinatra'
 require 'magtag'
 
 class MagTag < Sinatra::Base
+  VERSION = '0.0.2'
 
   helpers do
     def is_logged_in?
@@ -36,13 +37,7 @@ class MagTag < Sinatra::Base
   before do
     session[:foo] = Time.now
     @logged_in_user = User.find_by_name session[:logged_in_user]
-    # puts "\n=================================="
-    # puts "====== session:        #{session.inspect}"
-    # puts "====== logged in user: #{@logged_in_user.inspect}"
-    # puts "====== @request.url:   #{@request.request_method} #{@request.url}"
-    # puts "====== @request:       #{@request.inspect}"
-    # puts "====== params:         #{params.inspect}"
-    if request.path_info !~ %r{/magtag\.css|/login|/signup|/debug|/setup} && @logged_in_user.nil?
+    if request.path_info !~ %r{/magtag\.css|/login|/signup|/debug|/setup|/info} && @logged_in_user.nil?
       redirect '/login', 303
     end
   end
@@ -75,6 +70,24 @@ class MagTag < Sinatra::Base
     erb :debug
   end
 
+  # Print info about the ruby environment in text form.  This is used by
+  # the performance testing scripts to document when and what was running
+  # for a given test run.
+  get '/info' do
+    <<EOS
+===== get /info ======================
+RUBY_ENGINE  #{defined?(RUBY_ENGINE) ? RUBY_ENGINE : "MRI"}
+Ruby         #{RUBY_VERSION}
+Sinatra      #{Sinatra::VERSION}
+Rack         #{Rack.release}
+MagTag       #{MagTag::VERSION}
+Date         #{Time.now}
+
+========== Middleware ================
+#{caller.grep(/in `call'/).join("\n")}
+======================================
+EOS
+  end
 
   get '/home' do
     erb :home
@@ -107,7 +120,7 @@ class MagTag < Sinatra::Base
       erb :signup
     end
   end
-
+  
   # Shared by login and by successful signup
   def login(user_name, password, target='/home')
     user = User.find_by_name user_name
