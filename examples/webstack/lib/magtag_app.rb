@@ -18,6 +18,19 @@ class MagTag < Sinatra::Base
       env['PATH_INFO'] == page ? no_slash : "<a href=\"#{page}\">#{no_slash}</a>"
     end
 
+    def set_flash(msg)
+      session[:flash] = msg
+    end
+
+    def get_flash
+      msg = session[:flash]
+      set_flash nil
+      msg
+    end
+
+    def has_flash?
+      !session[:flash].nil?
+    end
   end
 
   before do
@@ -34,8 +47,18 @@ class MagTag < Sinatra::Base
     end
   end
 
+  post '/tweet' do
+    begin
+      @logged_in_user.tweet params[:tweet]
+      set_flash 'Tweet success!'
+    rescue Exception => e
+      set_flash e.message
+    end
+    redirect '/home'
+  end
+
   get '/setup' do
-    @error = "setup done! login with user: pbm1 password: pbm1"
+    set_flash "setup done! login with user: pbm1 password: pbm1"
     users = []
     3.times do |i|
       name = "pbm#{i}"
@@ -80,7 +103,7 @@ class MagTag < Sinatra::Base
       user.save
       login(params['username'], params['password']) # redirects to /home
     rescue User::UserException => e
-      @error = e.message
+      set_flash e.message
       erb :signup
     end
   end
@@ -92,7 +115,7 @@ class MagTag < Sinatra::Base
       session[:logged_in_user] = user.name
       redirect target
     else
-      @error = "Incorrect username or password."
+      set_flash "Incorrect username or password."
       erb :login
     end
   end

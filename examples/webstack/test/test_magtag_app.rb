@@ -196,9 +196,36 @@ class MagTagHomeTest < MagTagTest
     # Should show number of tweets, number of followers and number of following
     assert_in_body "followers 0", "following 0", "tweets 0"
   end
+end
 
-  def test_home_page_shows_tweet_form
-    skip 'not implemented'
+class MagTagTweetTest < MagTagTest
+
+  def setup
+    @community = create_mini_community
+    @user = @community[0]
+    refute_nil @user
+    login_user @user
+    assert_on_page '/home'
+  end
+
+  def test_post_tweet_works
+    tweet_text = "test tweet from #{@user.name}."
+    post "/tweet", { :tweet => tweet_text }
+    follow_redirect!
+    assert_on_page '/home'
+    assert_in_body tweet_text
+    @user.followers.each do |follower|
+      refute_nil follower.timeline.detect { |tweet| tweet.text == tweet_text }
+    end
+  end
+
+  def test_tweet_uses_flash_for_message
+    tweet_text = "test tweet from #{@user.name}."
+    post "/tweet", { :tweet => tweet_text }
+    follow_redirect!
+    assert_on_page '/home'
+    assert_in_body 'Flash Notice'
+    assert_in_body 'Tweet success!'
   end
 end
 
@@ -222,7 +249,7 @@ end
 # about it.
 #
 # @param [User, nil] optional_user if not nil, will be added to community.
-# @patam [Fixnum, nil] size the size of the community, not including optional_user (default is 3).
+# @param [Fixnum, nil] size the size of the community, not including optional_user (default is 3).
 # @return [Array<User>] The community of users
 #
 def create_mini_community(optional_user = nil, size=3)

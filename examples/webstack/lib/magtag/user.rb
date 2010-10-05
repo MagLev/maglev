@@ -99,7 +99,7 @@ class User
   # @raises [ArgumentError] if tweet text is too long.
   def tweet(text)
     new_tweet = Tweet.new text
-    @tweets << new_tweet
+    @tweets.unshift new_tweet
     @followers.each { |f| f.add_timeline new_tweet }
     new_tweet
   end

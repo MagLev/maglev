@@ -29,9 +29,10 @@
         </ul>
       </nav>
 
-      <% if @error %>
+      <% if has_flash? %>
       <div class="error">
-        <%= @error %>
+        <h2>Flash Notice</h2>
+        <p><%= get_flash %></p>
       </div>
       <% end %>
 
