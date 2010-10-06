@@ -4,6 +4,8 @@ task :default => :'maglev:magtag'
 
 MBIN = ENV['MAGLEV_HOME'] + '/bin'
 
+RACKUP_OPTS = "-Ilib --env production --port 3333"
+
 Rake::TestTask.new do |t|
   t.libs << "lib"
   t.libs << "test"
@@ -19,9 +21,8 @@ namespace :maglev do
   desc "Run the MagTag Web App"
   task :magtag do
     bail_if_rvm_hosing_environment
-    exit 2
     puts "Using ruby: #{`#{MBIN}/maglev-ruby -v`}"
-    sh "#{MBIN}/rackup -Ilib --port 3333 config.ru"
+    sh "#{MBIN}/rackup #{RACKUP_OPTS} config.ru"
   end
 
 
@@ -39,7 +40,7 @@ namespace :mri do
   desc "Run the MagTag Web App"
   task :magtag do
     puts "Using ruby: #{`ruby -v`}"
-    sh "rackup -Ilib --port 3333 config.ru"
+    sh "rackup #{RACKUP_OPTS} config.ru"
   end
 end
 

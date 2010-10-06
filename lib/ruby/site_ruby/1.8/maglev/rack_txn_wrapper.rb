@@ -28,21 +28,14 @@ module Maglev
     # @param [Hash] env the rack environment
     # @return [Array] the standard Rack triple: [status, headers, body].
     #  The values are unmodified from the lower layer app.
+    #
+    # @todo We need to handle commit failures.
     def call(env)
-      begin
-#        puts "=== Maglev.abort_transaction"
-        Maglev.abort_transaction
-        status, headers, body = @app.call env
-        [status, headers, body]
-      ensure
-        if committable? status
-#          puts "=== Maglev.commit_transaction"
-          Maglev.commit_transaction
-        else
-#          puts "=== Bad status so doing: Maglev.abort_transaction"
-          Maglev.abort_transaction
-        end
-      end
+      Maglev.abort_transaction
+      r = @app.call env
+    ensure
+      # Don't abort if ! committable? since next request will abort anyway
+      Maglev.commit_transaction if committable? r[0]
     end
 
     # A Commit-worthy status is success (2xx) or a redirect.

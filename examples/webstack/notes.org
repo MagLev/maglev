@@ -25,35 +25,268 @@
         , INDEX (post_id)
       ) ENGINE=InnoDB;
 ** Tests and results
-*** Measure overhead of a rack middleware
+   + Tests are run in production mode.  To do this
+     1. pass "--env production" to rackup (prevents rack from adding
+        extraneous middleware, like lint etc.)
+     2. "set :environment, :production" in config.ru tells sinatra to only
+        install necessary middleware.
+     In general, we'll be running with: content_length and cookie
+     middleware.
+   + No debug output to tty
+   + All test runs start off with a "GET /info" so we can document the ruby
+     environment, date and the installed middleware.  Then we run the
+     test.
+   + TODO: Can we show the sinatra options?
+   + TODO: Can we rely on front-end httpd logging instead of common logger?
+*** Test 2: Measure the overhead of a transaction per request
+    This test was only done on Maglev, as it is the only one with built-in
+    transactions.  The setup is similar to Test 1, but we are comparing no
+    middleware to one that does a <tt>Maglev.abort_transaction</tt> at the
+    beginning of each HTTP request, and does a
+    <tt>Maglev.commit_transaction</tt> at the end of each successful HTTP
+    request.  This is done via rack middleware:
+
+      class TransactionWrapper
+        def initialize(app)
+          @app = app
+        end
+
+        def call(env)
+          begin
+            Maglev.abort_transaction
+            r = @app.call env
+          ensure
+            Maglev.commit_transaction if committable? r[0]
+          end
+        end
+
+        def committable?(status)
+          ! status.nil? &&  (200..399).include?(status)
+        end
+      end
+
+      | Without transactions | 547.64 | 18.260 |
+      | With transactions    | 494.56 | 20.220 |
+      | Difference           |  53.08 |  -1.96 |
+
+      Looks like transaction overhead (with no data to commit!) take about
+      2ms, or about 11% penalty over no transactions.
+
+**** Results w/o transaction wrapper
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  maglev
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Tue Oct 05 16:15:36 -0700 2010
+
+========== Middleware ================
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   18.260 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    547.64 [#/sec] (mean)
+Time per request:       18.260 [ms] (mean)
+Time per request:       1.826 [ms] (mean, across all concurrent requests)
+Transfer rate:          152.42 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       5
+Processing:     7   18   4.2     18     141
+Waiting:        6   18   4.2     17     141
+Total:          7   18   4.2     18     141
+
+Percentage of the requests served within a certain time (ms)
+  50%     18
+  66%     18
+  75%     19
+  80%     19
+  90%     20
+  95%     21
+  98%     23
+  99%     24
+ 100%    141 (longest request)
+
+**** Results with transaction wrapper
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  maglev
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Tue Oct 05 16:12:40 -0700 2010
+
+========== Middleware ================
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/ruby/site_ruby/1.8/maglev/rack_txn_wrapper.rb:34:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/ruby/site_ruby/1.8/maglev/rack_txn_wrapper.rb:35:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   20.220 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    494.56 [#/sec] (mean)
+Time per request:       20.220 [ms] (mean)
+Time per request:       2.022 [ms] (mean, across all concurrent requests)
+Transfer rate:          137.65 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.3      0      11
+Processing:     5   20   4.6     19     143
+Waiting:        5   20   4.6     19     142
+Total:          6   20   4.7     19     143
+
+Percentage of the requests served within a certain time (ms)
+  50%     19
+  66%     20
+  75%     21
+  80%     21
+  90%     22
+  95%     23
+  98%     26
+  99%     30
+ 100%    143 (longest request)
+
+*** Test 1: Measure overhead of a rack middleware
     Install an empty Rack middleware app that does nothing.  The intent is
     to distinguish the overhead of the transaction processing vs the rack
     overhead when using the transaction wrapper middleware.
+
+    + The file we loaded was the following 22 characters: /* Empty MagTag.css */
+
 **** Results
+
+     Basically, the overhead of the following rack app is "negligible"
+     (less than a quarter of a millisecond, or around 0.5% of an average
+     request).
+
+       class EmptyMiddleware
+         def initialize(app)
+           @app = app
+         end
+
+         def call(env)
+           @app.call env
+         end
+       end
+
      |-------------+-----------+---------+---------+-----------|
      | Middleware  | Ruby      | HTTPd   | req/sec |  mean req |
      |             |           |         |  (mean) | time (ms) |
      |-------------+-----------+---------+---------+-----------|
-     | Empty       | Maglev    | WEBrick |  336.29 |    29.736 |
-     | No mid-ware | Maglev    | WEBrick |  327.93 |    30.495 |
+     | No mid-ware | Maglev    | WEBrick |  543.91 |    18.385 |
+     | Empty       | Maglev    | WEBrick |  547.06 |    18.280 |
      |-------------+-----------+---------+---------+-----------|
-     | Diff        |           |         |    8.36 |    -0.759 |
-     |-------------+-----------+---------+---------+-----------|
-     |-------------+-----------+---------+---------+-----------|
-     | Empty       | MRI 1.8.7 | WEBrick |  209.79 |    47.667 |
-     | No mid-ware | MRI 1.8.7 | WEBrick |  210.29 |    47.552 |
-     |-------------+-----------+---------+---------+-----------|
-     | Diff        |           |         |    -0.5 |     0.115 |
+     | Diff        |           |         |         |           |
      |-------------+-----------+---------+---------+-----------|
      |-------------+-----------+---------+---------+-----------|
+     | No mid-ware | MRI 1.8.7 | WEBrick |  399.99 |    25.001 |
+     | Empty       | MRI 1.8.7 | WEBrick |  396.57 |    25.216 |
+     |-------------+-----------+---------+---------+-----------|
+     | Diff        |           |         |         |           |
+     |-------------+-----------+---------+---------+-----------|
+     |-------------+-----------+---------+---------+-----------|
+     | No mid-ware | MRI 1.9.2 | WEBrick |  388.17 |    25.762 |
+     | Empty       | MRI 1.9.2 | WEBrick |  389.38 |    25.682 |
+     |-------------+-----------+---------+---------+-----------|
+     | Diff        |           |         |         |           |
 
      The MagLev run with the middleware was actually faster than without
      the middleware (by about 2.5%, or so).  Let's assume that is in the
      noise.  It is .8ms faster with the middleware
 
+     1.9.2 is slower!!?? than 1.8.7 ?
+
 **** Maglev Results
-***** Baseline: no middleware
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+***** No middleware
+
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  maglev
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Tue Oct 05 15:52:57 -0700 2010
+
+========== Middleware ================
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
 This is ApacheBench, Version 2.3 <$Revision: 655654 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -80,38 +313,54 @@ Document Path:          /magtag.css
 Document Length:        22 bytes
 
 Concurrency Level:      10
-Time taken for tests:   30.495 seconds
+Time taken for tests:   18.385 seconds
 Complete requests:      10000
 Failed requests:        0
 Write errors:           0
 Total transferred:      2850000 bytes
 HTML transferred:       220000 bytes
-Requests per second:    327.93 [#/sec] (mean)
-Time per request:       30.495 [ms] (mean)
-Time per request:       3.049 [ms] (mean, across all concurrent requests)
-Transfer rate:          91.27 [Kbytes/sec] received
+Requests per second:    543.91 [#/sec] (mean)
+Time per request:       18.385 [ms] (mean)
+Time per request:       1.839 [ms] (mean, across all concurrent requests)
+Transfer rate:          151.38 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.4      0      13
-Processing:     4   30   7.3     30     161
-Waiting:        4   30   7.2     29     161
-Total:          5   30   7.2     30     161
+Connect:        0    0   0.3      0      22
+Processing:     6   18   4.6     18     142
+Waiting:        6   18   4.6     17     142
+Total:          9   18   4.6     18     142
 
 Percentage of the requests served within a certain time (ms)
-  50%     30
-  66%     31
-  75%     32
-  80%     33
-  90%     36
-  95%     40
-  98%     47
-  99%     51
- 100%    161 (longest request)
+  50%     18
+  66%     18
+  75%     19
+  80%     19
+  90%     20
+  95%     21
+  98%     23
+  99%     27
+ 100%    142 (longest request)
 
-***** Results running with empty middleware:
+***** Empty middleware:
 
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  maglev
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Tue Oct 05 15:50:51 -0700 2010
+
+========== Middleware ================
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/GemStone/checkouts/git/examples/webstack/lib/empty_middleware.rb:9:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
 This is ApacheBench, Version 2.3 <$Revision: 655654 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -138,41 +387,54 @@ Document Path:          /magtag.css
 Document Length:        22 bytes
 
 Concurrency Level:      10
-Time taken for tests:   29.736 seconds
+Time taken for tests:   18.280 seconds
 Complete requests:      10000
 Failed requests:        0
 Write errors:           0
 Total transferred:      2850000 bytes
 HTML transferred:       220000 bytes
-Requests per second:    336.29 [#/sec] (mean)
-Time per request:       29.736 [ms] (mean)
-Time per request:       2.974 [ms] (mean, across all concurrent requests)
-Transfer rate:          93.60 [Kbytes/sec] received
+Requests per second:    547.06 [#/sec] (mean)
+Time per request:       18.280 [ms] (mean)
+Time per request:       1.828 [ms] (mean, across all concurrent requests)
+Transfer rate:          152.26 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.4      0       9
-Processing:     4   30   7.7     29     173
-Waiting:        0   29   7.7     29     172
-Total:          5   30   7.7     29     173
+Connect:        0    0   0.2      0       8
+Processing:     4   18   4.6     17     141
+Waiting:        4   18   4.6     17     141
+Total:          4   18   4.6     18     141
 
 Percentage of the requests served within a certain time (ms)
-  50%     29
-  66%     30
-  75%     31
-  80%     32
-  90%     35
-  95%     38
-  98%     44
-  99%     49
- 100%    173 (longest request)
+  50%     18
+  66%     18
+  75%     19
+  80%     19
+  90%     20
+  95%     21
+  98%     23
+  99%     26
+ 100%    141 (longest request)
 
-**** MRI 1.8.7 results
-***** Baseline: no middleware
-$ ruby -v
-ruby 1.8.7 (2010-01-10 patchlevel 249) [i686-darwin10.3.0]
+**** MRI 1.8.7 Results
+***** No middleware
 
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  MRI
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Tue Oct 05 15:40:41 -0700 2010
+
+========== Middleware ================
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
 This is ApacheBench, Version 2.3 <$Revision: 655654 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -199,41 +461,54 @@ Document Path:          /magtag.css
 Document Length:        22 bytes
 
 Concurrency Level:      10
-Time taken for tests:   47.552 seconds
+Time taken for tests:   25.001 seconds
 Complete requests:      10000
-Failed requests:        10
-   (Connect: 10, Receive: 0, Length: 0, Exceptions: 0)
+Failed requests:        0
 Write errors:           0
 Total transferred:      2850000 bytes
 HTML transferred:       220000 bytes
-Requests per second:    210.29 [#/sec] (mean)
-Time per request:       47.552 [ms] (mean)
-Time per request:       4.755 [ms] (mean, across all concurrent requests)
-Transfer rate:          58.53 [Kbytes/sec] received
+Requests per second:    399.99 [#/sec] (mean)
+Time per request:       25.001 [ms] (mean)
+Time per request:       2.500 [ms] (mean, across all concurrent requests)
+Transfer rate:          111.32 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    8  85.0      0    1008
-Processing:     9   39  19.2     34     109
-Waiting:        7   36  18.7     31     106
-Total:          9   47  87.5     34    1067
+Connect:        0    1  35.1      0     998
+Processing:     8   24  10.8     20      62
+Waiting:        7   22  10.4     19      62
+Total:          8   25  36.6     21    1018
 
 Percentage of the requests served within a certain time (ms)
-  50%     34
-  66%     42
-  75%     57
-  80%     65
-  90%     69
-  95%     72
-  98%     77
-  99%     87
- 100%   1067 (longest request)
+  50%     21
+  66%     21
+  75%     22
+  80%     22
+  90%     50
+  95%     53
+  98%     55
+  99%     56
+ 100%   1018 (longest request)
+***** Empty middleware:
+=============================================================
 
-***** Results running with empty middleware
-$ ruby -v
-ruby 1.8.7 (2010-01-10 patchlevel 249) [i686-darwin10.3.0]
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  MRI
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Tue Oct 05 15:23:03 -0700 2010
 
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+========== Middleware ================
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+./lib/empty_middleware.rb:9:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.8.7-p302/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
 This is ApacheBench, Version 2.3 <$Revision: 655654 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -260,40 +535,54 @@ Document Path:          /magtag.css
 Document Length:        22 bytes
 
 Concurrency Level:      10
-Time taken for tests:   47.667 seconds
+Time taken for tests:   25.216 seconds
 Complete requests:      10000
-Failed requests:        8
-   (Connect: 8, Receive: 0, Length: 0, Exceptions: 0)
+Failed requests:        0
 Write errors:           0
 Total transferred:      2850000 bytes
 HTML transferred:       220000 bytes
-Requests per second:    209.79 [#/sec] (mean)
-Time per request:       47.667 [ms] (mean)
-Time per request:       4.767 [ms] (mean, across all concurrent requests)
-Transfer rate:          58.39 [Kbytes/sec] received
+Requests per second:    396.57 [#/sec] (mean)
+Time per request:       25.216 [ms] (mean)
+Time per request:       2.522 [ms] (mean, across all concurrent requests)
+Transfer rate:          110.37 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    8  83.8      0    1000
-Processing:     8   40  18.9     34     118
-Waiting:        7   36  18.4     31     111
-Total:          8   47  85.6     34    1050
+Connect:        0    1  23.5      0     977
+Processing:     7   24  10.9     21      61
+Waiting:        6   22  10.5     19      59
+Total:          8   25  25.8     21     998
 
 Percentage of the requests served within a certain time (ms)
-  50%     34
-  66%     41
-  75%     61
-  80%     66
-  90%     69
-  95%     71
-  98%     74
-  99%     79
- 100%   1050 (longest request)
+  50%     21
+  66%     22
+  75%     22
+  80%     22
+  90%     53
+  95%     54
+  98%     55
+  99%     56
+ 100%    998 (longest request)
 
-**** MRI 1.9.2 results
-***** Baseline: no middleware
-***** Results running with empty middleware
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+**** MRI 1.9.2 Results
+***** No middleware
+
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  ruby
+Ruby         1.9.2
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         2010-10-05 15:43:38 -0700
+
+========== Middleware ================
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/sinatra-1.0/lib/sinatra/base.rb:865:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
 This is ApacheBench, Version 2.3 <$Revision: 655654 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -320,168 +609,107 @@ Document Path:          /magtag.css
 Document Length:        22 bytes
 
 Concurrency Level:      10
-Time taken for tests:   39.277 seconds
+Time taken for tests:   25.762 seconds
+Complete requests:      10000
+Failed requests:        1
+   (Connect: 1, Receive: 0, Length: 0, Exceptions: 0)
+Write errors:           0
+Total transferred:      2850000 bytes
+HTML transferred:       220000 bytes
+Requests per second:    388.17 [#/sec] (mean)
+Time per request:       25.762 [ms] (mean)
+Time per request:       2.576 [ms] (mean, across all concurrent requests)
+Transfer rate:          108.04 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    2  39.4      0    1000
+Processing:     5   24   5.9     23     142
+Waiting:        0   21   5.6     20     139
+Total:          9   26  39.8     23    1029
+
+Percentage of the requests served within a certain time (ms)
+  50%     23
+  66%     26
+  75%     30
+  80%     30
+  90%     31
+  95%     32
+  98%     33
+  99%     36
+ 100%   1029 (longest request)
+
+***** Empty middleware:
+
+curl http://localhost:3333/info
+===== get /info ======================
+RUBY_ENGINE  ruby
+Ruby         1.9.2
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         2010-10-05 15:46:32 -0700
+
+========== Middleware ================
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/sinatra-1.0/lib/sinatra/base.rb:865:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/GemStone/checkouts/git/examples/webstack/lib/empty_middleware.rb:9:in `call'
+/Users/pmclain/.rvm/gems/ruby-1.9.2-p0/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+======================================
+ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        WEBrick/1.3.1
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   25.682 seconds
 Complete requests:      10000
 Failed requests:        2
    (Connect: 2, Receive: 0, Length: 0, Exceptions: 0)
 Write errors:           0
 Total transferred:      2850000 bytes
 HTML transferred:       220000 bytes
-Requests per second:    254.60 [#/sec] (mean)
-Time per request:       39.277 [ms] (mean)
-Time per request:       3.928 [ms] (mean, across all concurrent requests)
-Transfer rate:          70.86 [Kbytes/sec] received
+Requests per second:    389.38 [#/sec] (mean)
+Time per request:       25.682 [ms] (mean)
+Time per request:       2.568 [ms] (mean, across all concurrent requests)
+Transfer rate:          108.37 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    3  49.7      0    1000
-Processing:     6   36   7.5     38      81
-Waiting:        5   32   7.3     33      80
-Total:          6   39  50.2     38    1041
+Connect:        0    1  31.6      0    1007
+Processing:     8   25   5.0     23      57
+Waiting:        6   22   4.8     20      52
+Total:          8   26  31.9     23    1030
 
 Percentage of the requests served within a certain time (ms)
-  50%     38
-  66%     41
-  75%     42
-  80%     42
-  90%     44
-  95%     47
-  98%     50
-  99%     53
- 100%   1041 (longest request)
-
-*** Measure overhead of maglev transaction wrapper
-    The transaction wrapper does a commit on every successful request.  I
-    wanted to measure how much overhead.
-**** Setup
-     Use ab to test on my laptop with WEBrick. Do one run with txn wrapper
-     on and one run with it off
-**** Results
-
-     |----------------+---------+---------+-----------|
-     | Transaction    | HTTPd   | req/sec |  mean req |
-     | Wrapper on/off |         |  (mean) | time (ms) |
-     |----------------+---------+---------+-----------|
-     | off            | WEBrick |  332.47 |    30.078 |
-     | on             | WEBrick |  246.94 |    40.496 |
-     |----------------+---------+---------+-----------|
-     | Diff           |         |   85.53 |   -10.418 |
-     | %  (off/on)    |         |  1.35 % |    0.74 % |
-
-     So, it looks like transaction processing (including overhead of Rack
-     middleware calling, etc.) adds ~ 10ms to request time.
-
-***** With txn wrapper off: 2010-10-05
-
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
-This is ApacheBench, Version 2.3 <$Revision: 655654 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-Completed 1000 requests
-Completed 2000 requests
-Completed 3000 requests
-Completed 4000 requests
-Completed 5000 requests
-Completed 6000 requests
-Completed 7000 requests
-Completed 8000 requests
-Completed 9000 requests
-Completed 10000 requests
-Finished 10000 requests
-
-
-Server Software:        WEBrick/1.3.1
-Server Hostname:        127.0.0.1
-Server Port:            3333
-
-Document Path:          /magtag.css
-Document Length:        22 bytes
-
-Concurrency Level:      10
-Time taken for tests:   30.078 seconds
-Complete requests:      10000
-Failed requests:        0
-Write errors:           0
-Total transferred:      2850000 bytes
-HTML transferred:       220000 bytes
-Requests per second:    332.47 [#/sec] (mean)
-Time per request:       30.078 [ms] (mean)
-Time per request:       3.008 [ms] (mean, across all concurrent requests)
-Transfer rate:          92.53 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.6      0      23
-Processing:     4   30   6.9     29     155
-Waiting:        4   30   6.8     29     155
-Total:          5   30   6.8     29     155
-
-Percentage of the requests served within a certain time (ms)
-  50%     29
-  66%     31
-  75%     31
-  80%     32
-  90%     35
-  95%     39
-  98%     44
-  99%     50
- 100%    155 (longest request)
-
-***** With txn wrapper on:
-$ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
-This is ApacheBench, Version 2.3 <$Revision: 655654 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-Completed 1000 requests
-Completed 2000 requests
-Completed 3000 requests
-Completed 4000 requests
-Completed 5000 requests
-Completed 6000 requests
-Completed 7000 requests
-Completed 8000 requests
-Completed 9000 requests
-Completed 10000 requests
-Finished 10000 requests
-
-
-Server Software:        WEBrick/1.3.1
-Server Hostname:        127.0.0.1
-Server Port:            3333
-
-Document Path:          /magtag.css
-Document Length:        22 bytes
-
-Concurrency Level:      10
-Time taken for tests:   40.496 seconds
-Complete requests:      10000
-Failed requests:        0
-Write errors:           0
-Total transferred:      2850000 bytes
-HTML transferred:       220000 bytes
-Requests per second:    246.94 [#/sec] (mean)
-Time per request:       40.496 [ms] (mean)
-Time per request:       4.050 [ms] (mean, across all concurrent requests)
-Transfer rate:          68.73 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   1.4      0      21
-Processing:     4   40   7.8     41     170
-Waiting:        2   40   7.8     40     170
-Total:          7   40   7.6     41     170
-
-Percentage of the requests served within a certain time (ms)
-  50%     41
-  66%     42
-  75%     43
-  80%     44
-  90%     46
-  95%     49
-  98%     54
-  99%     64
- 100%    170 (longest request)
+  50%     23
+  66%     28
+  75%     30
+  80%     30
+  90%     31
+  95%     32
+  98%     34
+  99%     36
+ 100%   1030 (longest request)
