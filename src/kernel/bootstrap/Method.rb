@@ -7,6 +7,7 @@ class GsNMethod
   primitive_nobridge 'inspect', '_rubyInspect'
   primitive_nobridge '__name', '_rubyName'
   primitive_nobridge '__source_location', '_fileAndLine'
+  primitive_nobridge '__source_string', 'sourceString'
 end
 
 class Method
