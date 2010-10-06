@@ -4,14 +4,36 @@
    + Update model to use ActiveModel validation checks
      (validate_presence_of :password, :username) etc.
    + Add
-*** TODO Add date to tweets
-*** TODO Add tweet form to home page (allow posting tweets)
 *** TODO Allow anyone to look at a user's tweets (user's home)
 *** TODO Implement mentions queue for each user
-*** TODO Add real persistence
 *** TODO Add tagging features
-*** TODO Create ORM version
+*** TODO Create MRI/ORM version
+*** TODO Add handling of '/'
+*** Transaction Model
 
+    Should we try running the vm in manual transaction mode, and then begin
+    have the txn wrapper do:
+
+      def call(env)
+        Maglev.begin_transaction
+        r = @app.call(env)
+      ensure
+        if committable?(r[0])
+          Maglev.commit_transaction
+        else
+          Maglev.abort_transaction
+        end
+      end
+
+    That way, we are not in a transaction unless we are handling an HTTP
+    request.
+
+    We would need to:
+    + Expose System>>transactionMode:, System>>transactionMode and add a
+      few constants.
+    + Write wrapper methods in maglev module
+    + Add the new manual_txn_wrapper class in site_ruby
+    + Add a command line parameter to control initial txn mode.
 ** ActiveRecord
 
    Many of the efficiencies that the MySQL paper lists, won't be available
@@ -38,6 +60,124 @@
      test.
    + TODO: Can we show the sinatra options?
    + TODO: Can we rely on front-end httpd logging instead of common logger?
+*** Test 3: Load static file with lighttpd + scgi + 1 maglev VM
+    In this configuration, lighttpd is passing all requests (even for
+    static files) to MagLev via SCGI.  There is one maglev VM running
+
+    There is a problem at slightly over 8k requests (8192?) with both
+    MagLev and MRI 1.8.7.  I sometimes get a long (~11 sec) delay and then
+    it starts going again, or I get:
+
+      $ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+      This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+      Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+      Licensed to The Apache Software Foundation, http://www.apache.org/
+
+      Benchmarking 127.0.0.1 (be patient)
+      Completed 1000 requests
+      Completed 2000 requests
+      Completed 3000 requests
+      Completed 4000 requests
+      Completed 5000 requests
+      Completed 6000 requests
+      Completed 7000 requests
+      Completed 8000 requests
+      apr_poll: The timeout specified has expired (70007)
+      Total of 8183 requests completed
+      [@cairo webstack (webstack)]$
+
+    With MRI 1.8.7, I can't run ab at concurrency level 10, but 4 seems to
+    work, and I also see the ~8k slow down for about 11 seconds.
+
+    With MRI 1.9.2, I see the 11 second pause and I got the error:
+      ...
+      Completed 7000 requests
+      Completed 8000 requests
+      apr_poll: The timeout specified has expired (70007)
+      Total of 8175 requests completed
+
+      
+**** TODO Update to latest lighttpd and see if problem remains
+**** TODO See if problem is on linux, or only OSX
+**** TODO look at networking stats while doing run and see if anything amiss
+
+**** Results
+     | Ruby             | Req/Sec (mean) | Time/Req (ms) |
+     | Maglev  (no txn) |        1024.07 |         9.765 |
+     | MRI 1.8.7        |                |               |
+
+***** Maglev
+$ curl http://localhost:3333/info ; ab -n 5000 -c 10 http://127.0.0.1:3333/magtag.css
+===== get /info ======================
+RUBY_ENGINE  maglev
+Ruby         1.8.7
+Sinatra      1.0
+Rack         1.2
+MagTag       0.0.2
+Date         Wed Oct 06 11:00:11 -0700 2010
+
+========== Middleware ================
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:863:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/sinatra-1.0/lib/sinatra/base.rb:399:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/session/cookie.rb:37:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/content_length.rb:13:in `call'
+/Users/pmclain/GemStone/snapshots/current/lib/maglev/gems/1.8/gems/rack-1.2.1/lib/rack/chunked.rb:15:in `call'
+======================================
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 500 requests
+Completed 1000 requests
+Completed 1500 requests
+Completed 2000 requests
+Completed 2500 requests
+Completed 3000 requests
+Completed 3500 requests
+Completed 4000 requests
+Completed 4500 requests
+Completed 5000 requests
+Finished 5000 requests
+
+
+Server Software:        lighttpd/1.4.26
+Server Hostname:        127.0.0.1
+Server Port:            3333
+
+Document Path:          /magtag.css
+Document Length:        22 bytes
+
+Concurrency Level:      10
+Time taken for tests:   4.882 seconds
+Complete requests:      5000
+Failed requests:        0
+Write errors:           0
+Total transferred:      1375000 bytes
+HTML transferred:       110000 bytes
+Requests per second:    1024.07 [#/sec] (mean)
+Time per request:       9.765 [ms] (mean)
+Time per request:       0.976 [ms] (mean, across all concurrent requests)
+Transfer rate:          275.02 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       2
+Processing:     3   10   6.5      9     146
+Waiting:        3   10   6.5      9     146
+Total:          3   10   6.5      9     146
+
+Percentage of the requests served within a certain time (ms)
+  50%      9
+  66%     10
+  75%     10
+  80%     10
+  90%     11
+  95%     12
+  98%     14
+  99%     16
+ 100%    146 (longest request)
+
 *** Test 2: Measure the overhead of a transaction per request
     This test was only done on Maglev, as it is the only one with built-in
     transactions.  The setup is similar to Test 1, but we are comparing no

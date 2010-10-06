@@ -1,10 +1,13 @@
 require 'rake/testtask'
+require 'rake/clean'
+
+CLOBBER.include('log/*', 'rack-*.pid')
 
 task :default => :'maglev:magtag'
 
-MBIN = ENV['MAGLEV_HOME'] + '/bin'
-
-RACKUP_OPTS = "-Ilib --env production --port 3333"
+MAGLEV_HOME = ENV['MAGLEV_HOME']
+MBIN        = MAGLEV_HOME + '/bin'
+RACKUP_OPTS = "-Ilib --env production"
 
 Rake::TestTask.new do |t|
   t.libs << "lib"
@@ -22,7 +25,7 @@ namespace :maglev do
   task :magtag do
     bail_if_rvm_hosing_environment
     puts "Using ruby: #{`#{MBIN}/maglev-ruby -v`}"
-    sh "#{MBIN}/rackup #{RACKUP_OPTS} config.ru"
+    sh "#{MBIN}/rackup #{RACKUP_OPTS} --port 3333 config.ru"
   end
 
 
@@ -35,12 +38,11 @@ namespace :maglev do
 
 end
 
-
 namespace :mri do
   desc "Run the MagTag Web App"
   task :magtag do
     puts "Using ruby: #{`ruby -v`}"
-    sh "rackup #{RACKUP_OPTS} config.ru"
+    sh "rackup #{RACKUP_OPTS} --port 3333 config.ru"
   end
 end
 

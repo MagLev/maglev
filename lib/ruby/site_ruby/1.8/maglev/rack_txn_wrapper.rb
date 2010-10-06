@@ -8,7 +8,8 @@ module Maglev
 
   # This class is a sample piece of Rack middleware that starts a new
   # Maglev transaction with each HTTP request, and then commits if the
-  # response is a 2xx code.
+  # response is a 2xx code.  It is intended to be used with the VM in
+  # auto-transaction mode.
   class TransactionWrapper
 
     # Initialize receiver.  Remember the app we delegate to.
