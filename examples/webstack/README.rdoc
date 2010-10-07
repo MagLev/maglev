@@ -12,6 +12,55 @@ complex reads and writes.
 The sample application is a social tagging site (Delicio.us, flickr,
 etc.).
 
+== Options
+
+Each subsection describes a particular HTTP to MagLev connection strategy,
+describes how to configure it and discusses some pros and cons for that
+strategy.
+
+List of HTTP Servers
+* WEBrick
+* Apache
+* nginx
+* lighttpd
+* LiteSpeed
+
+List of HTTPd to WebAppServer protocols
+* SCGI
+* FCGI
+* CGI
+* LSAPI
+
+Other
+* Mongrel (evented, swiftiplied)
+* EventMachine
+* Thin
+* LSAPI LiteSpeed Web Server (lsws)
+
+=== WEBrick
+==== Description
+==== Configuration
+==== Pros / Cons
+
+=== SCGI
+==== Description
+==== Configuration
+==== Pros / Cons
+
+On the plus size, SCGI is easy to setup.
+
+=== FCGI
+==== Description
+==== Configuration
+==== Pros / Cons
+
+=== Not Considered
+
+* EventMachine based solutions were not considered, since MagLev does not
+  support Ruby C-extensions.
+
+
+
 
 == TODO
 

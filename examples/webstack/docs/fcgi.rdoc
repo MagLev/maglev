@@ -1,0 +1,14 @@
+= Notes on FCGI adapters for MagLev
+
+gem install fcgi:
+
+== FCGI 0.8.7
+
+http://raa.ruby-lang.org/project/fcgi/
+
+Download http://www.moonwolf.com/ruby/archive/ruby-fcgi-0.8.7.tar.gz
+
+
+=== Lighttpd
+
+TOOD: try running on unix domain sockets rather than TCP

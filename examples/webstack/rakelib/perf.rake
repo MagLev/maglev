@@ -26,9 +26,14 @@ end
 namespace :lighttpd do
   directory 'log'
 
-  desc "start lighttpd"
-  task :start => 'log' do
+  desc "start lighttpd listening for SCGI on port 3000"
+  task :scgi => 'log' do
     sh "lighttpd -D -f config/lighttpd.conf"
+  end
+
+  desc "start lighttpd listening for FCGI on port 3000"
+  task :fcgi => 'log' do
+    sh "lighttpd -D -f config/lighttpd-fcgi.conf"
   end
 end
 
@@ -54,6 +59,16 @@ namespace :scgi do
   task :mri192 do
     opts = "#{RACKUP_SCGI_OPTS} --pid rack-#{SCGI_PORT}.pid --port #{SCGI_PORT}"
     sh "source $HOME/.rvm/scripts/rvm ; rvm 1.9.2 && rackup #{opts} config.ru"
+  end
+end
+
+namespace :fcgi do
+  FCGI_PORT = 3000
+  RACKUP_FCGI_OPTS = "#{RACKUP_OPTS} --server FastCGI"
+  desc "1 maglev VM + scgi"
+  task :maglev do
+    opts = "#{RACKUP_FCGI_OPTS} --pid rack-#{FCGI_PORT}.pid --port #{FCGI_PORT}"
+    sh "#{MAGLEV_HOME}/bin/rackup #{opts} config-fcgi.ru"
   end
 end
 

@@ -60,6 +60,42 @@
      test.
    + TODO: Can we show the sinatra options?
    + TODO: Can we rely on front-end httpd logging instead of common logger?
+   + TODO: Make sure all debug etc. are off for running the performance
+     tests.
+*** TIME_WAIT problem
+**** Description
+     It became quickly apparent that I was running into a TIME_WAIT
+     problem.  I'd get to around 8,000 requests, and then pause for about
+     ten seconds (both mri and maglev).  Looking at netstat showed:
+
+       $ netstat -finet -n | grep TIME_WAIT | wc
+       16346   98076 1258642
+
+     So, 16k sockets waiting, and system waiting before it passes out
+     another socket...
+
+     For every connection from +ab+, there are two sockets
+
+     |---+----------+----------+----------+----------|
+     | # | Client   | Protocol | Socket   | Server   |
+     |---+----------+----------+----------+----------|
+     | 1 | ab       | HTTP     | TCP:3333 | lighttpd |
+     | 2 | lighttpd | SCGI     | TCP:3000 | Ruby     |
+     |---+----------+----------+----------+----------|
+
+**** Solutions?
+
+     1: Use one socket? In the SCGI protocol, the server indicates the end
+        of a response by closing the connection, so, there is not much hope
+        of keeping one connection per SCGI server...
+     2: Use Unix domain sockets (if on same machine)?  Can we configure
+        lighttpd and SCGI module?
+
+     3: Play with SO_LINGER ?
+
+     Could go to FCGI, since it allows multiple requests per socket as an
+     option.
+
 *** Test 3: Load static file with lighttpd + scgi + 1 maglev VM
     In this configuration, lighttpd is passing all requests (even for
     static files) to MagLev via SCGI.  There is one maglev VM running
@@ -96,7 +132,7 @@
       apr_poll: The timeout specified has expired (70007)
       Total of 8175 requests completed
 
-      
+
 **** TODO Update to latest lighttpd and see if problem remains
 **** TODO See if problem is on linux, or only OSX
 **** TODO look at networking stats while doing run and see if anything amiss
