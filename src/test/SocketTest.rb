@@ -24,7 +24,19 @@ tcp_server.close
 
 # Ensure that the port parameter can be a string that represents a number
 tcp_server = TCPServer.open('localhost', '7654')
-test(tcp_server.nil?, false, 'Port numbers as strings')
+test(tcp_server.nil?, false, 'TCPServer.open("localhost", "7456") String String')
+tcp_server.close
+
+tcp_server = TCPServer.open('localhost', 7654)
+test(tcp_server.nil?, false, 'TCPServer.open("localhost", 7456)  String Fixnum')
+tcp_server.close
+
+tcp_server = TCPServer.open('7654')
+test(tcp_server.nil?, false, 'TCPServer.open("7456")  String')
+tcp_server.close
+
+tcp_server = TCPServer.open(7654)
+test(tcp_server.nil?, false, 'TCPServer.open(7456)  Fixnum')
 tcp_server.close
 
 # Ensure that Socket::Constants is defined and has values
