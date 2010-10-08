@@ -24,6 +24,8 @@ List of HTTP Servers
 * nginx
 * lighttpd
 * LiteSpeed
+* Rainbows!
+* Unicorn
 
 List of HTTPd to WebAppServer protocols
 * SCGI
@@ -31,11 +33,38 @@ List of HTTPd to WebAppServer protocols
 * CGI
 * LSAPI
 
-Other
-* Mongrel (evented, swiftiplied)
-* EventMachine
-* Thin
-* LSAPI LiteSpeed Web Server (lsws)
+
+=== Not Considered
+==== Mongrel (evented, swiftiplied)
+
+We did not consider Mongrel, as it is based on a Ruby C-extension to
+implement the HTTP parser.
+
+The idea behind mongrel is to use the standard HTTP protocol between the
+Ruby process and the front end web server / load balancers /
+what-have-you.  This makes it easy to plug ruby VMs into many different
+web serving environments.  To make things fast, Mongrel implements the HTTP
+parser as a Ruby C-extension, and then calls into the Ruby VM once the
+request is "cooked".  Mongrel creates a thread per request, so there is the
+possibilty for multithreaded web processing, depending on whether the web
+framework grabs the GIL or not.
+
+==== Thin: Mongrel HTTP Parser + EventMachine + Rack
+
+http://code.macournoyer.com/thin/
+
+Thin uses the Mongrel front-end HTTP parser, and then uses EventMachine to
+process the requests.  Both the Mongrel HTTP parser and EventMachine are
+based on Ruby C-extensions, so we do not consider them.
+
+==== Passenger (mod_rack for Apache/nginx)
+
+http://www.modrails.com/index.html
+
+Passenger uses a C-extension.
+
+
+==== LSAPI LiteSpeed Web Server (lsws)
 
 === WEBrick
 ==== Description
@@ -43,11 +72,47 @@ Other
 ==== Pros / Cons
 
 === SCGI
+
 ==== Description
+
+SCGI is an alternative to FastCGI or CGI.  See
+http://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface
+
+Web requests come into an HTTP server (apache, nginx, lighttpd, etc.) and
+the httpd then forwards the request to a MagLev VM.  The VM is running Rack
+with the SCGI handler.  Rack then invokes the chain of handlers, ultimately
+calling into our Sinatra app.
+
 ==== Configuration
+
+1. Install the scgi gem (one time):
+     $ maglev-gem install scgi
+
+2. You'll need to configure your HTTP server to connect to the MagLev VM(s)
+   running SCGI.  Each HTTP server has its own way of configuring.  For an
+   example of a lighttpd configuration file, see
+   <tt>config/lighttpd.conf</tt>.
+
+3. Start your HTTP server
+
+     $ rake lighttpd:scgi
+
+4. Start your MagLev VM(s): you'll need to do this in a different terminal
+   than the one your HTTP server is running in:
+
+     $ rake scgi:maglev
+
+5. Connect to the web app: http://localhost:3333/login
+
 ==== Pros / Cons
 
-On the plus size, SCGI is easy to setup.
+On the plus size, SCGI is easy to setup and is reasonably snappy.  On the
+Con side, the SCGI protocol indicates the end of a response by closing the
+connection (Rack::Handler::SCGI closes the connection from the HTTP
+Server).  If the connection is TCP, this can leave a lot of sockets in
+TIME_WAIT, and you may run out of sockets for a while if you have a lot of
+requests.  Unfortunately, the SCGI gem does not support unix domain
+sockets.
 
 === FCGI
 ==== Description

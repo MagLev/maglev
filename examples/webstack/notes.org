@@ -4,6 +4,10 @@
    + Update model to use ActiveModel validation checks
      (validate_presence_of :password, :username) etc.
    + Add
+*** TODO Threading architecture for MagLev
+    + Given we only want one txn going at a time, we need to grab a lock
+      (in txn wrapper?).  But, we can allow many readers?
+      
 *** TODO Allow anyone to look at a user's tweets (user's home)
 *** TODO Implement mentions queue for each user
 *** TODO Add tagging features
@@ -95,6 +99,26 @@
 
      Could go to FCGI, since it allows multiple requests per socket as an
      option.
+
+*** Test 4: Locking vs Non-Locking transaction wrapper (no contention)
+    This test attempts to characterize how much overhead is there in
+    wrapping each HTTP request in a transaction AND grabbing a VM lock.
+    The idea is that we want to ensure there is only one thread potentially
+    modifying persistent data at a time.  This particular run shows only
+    the overhead of getting the lock and releasing it, as it is a
+    read-only, static file request.
+
+    | Wrapper                 | Req/sec | Time/req (ms) |
+    |-------------------------+---------+---------------|
+    | Non-Locking txn wrapper |     848 |          11.8 |
+    | Locking txn wrapper     |     803 |          12.4 |
+    |-------------------------+---------+---------------|
+    | Diff                    |      45 |          -0.6 |
+    | %                       |      5% |            5% |
+
+    There is a 5% overhead for grabbing and releasing a lock.
+
+    Test run with lighttpd and SCGI
 
 *** Test 3: Load static file with lighttpd + scgi + 1 maglev VM
     In this configuration, lighttpd is passing all requests (even for
