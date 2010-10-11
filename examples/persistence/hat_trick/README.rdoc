@@ -8,11 +8,14 @@ below.
 
 == Running the Hat Trick from files
 
-First, run this to create a new hat.
+First, run create_hat.rb to create a new hat. It uses "Maglev.persistent do" to load the
+Hat class, the Rabbit class and an empty instance of a Hat into the MagLev repository --
+all of which will then be available to any MagLev VM.
 
   $ maglev-ruby create_hat.rb
 
-Next, run these in any order as many times as you wish.
+Next, run these in any order as many times as you wish. Any rabbits added to the Hat by
+add_rabbit_to_hat.rb are persisted and will show up in any VM that runs show_hat_contents.rb.
 
   $ maglev-ruby add_rabbit_to_hat.rb
   $ maglev-ruby show_hat_contents.rb
