@@ -9,8 +9,8 @@ complex reads and writes.
 
 == Sample Application
 
-The sample application is a social tagging site (Delicio.us, flickr,
-etc.).
+The sample application is a twitter clone.  The next iteration will add
+tagging.
 
 == Options
 

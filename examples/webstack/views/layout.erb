@@ -15,17 +15,17 @@
       <nav>
         <ul>
           <% if is_logged_in? %>
-          <li><%= nav_link_for '/logout' %></li>
-          <li><%= nav_link_for '/home'   %></li>
+          <li><%= nav_link_for 'logout' %></li>
+          <li><%= nav_link_for 'home'   %></li>
           <% else %>
-          <li><%= nav_link_for '/login'  %></li>
-          <li><%= nav_link_for '/signup' %></li>
+          <li><%= nav_link_for 'login'  %></li>
+          <li><%= nav_link_for 'signup' %></li>
           <% end %>
         </ul>
         <p>Some development helper urls</p>
         <ul>
-          <li><%= nav_link_for '/setup' %></li>
-          <li><%= nav_link_for '/debug' %></li>
+          <li><%= nav_link_for 'setup' %></li>
+          <li><%= nav_link_for 'debug' %></li>
         </ul>
       </nav>
 

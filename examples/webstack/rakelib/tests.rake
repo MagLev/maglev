@@ -1,3 +1,7 @@
+desc "Current thing I'm working on"
+task :pbm do
+  Rake::Task['lighttpd:scgi'].invoke('')
+end
 
 namespace :tests do
 
