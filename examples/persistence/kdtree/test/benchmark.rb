@@ -18,10 +18,11 @@ end
 @targets = Array.new
 num_queries.times { |i| @targets << random_point(i) }
 
-ruby = (defined?(Maglev) ? "Maglev" : "MRI")
-puts "== Benchmark for #{ruby}: #{VERSION}: Num nodes: #{num_nodes}"
+ruby = (defined?(RUBY_DESCRIPTION) ? "#{RUBY_DESCRIPTION}" : "Ruby #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}")
+puts "== Running #{ruby}"
+puts "== Benchmark for #{num_nodes} nodes:"
 
-Benchmark.bm(20) do |b|
+Benchmark.bm(28) do |b|
   b.report("Create #{num_nodes} points") do
     num_nodes.times { |i| @points << Collections::Point2D.new(rand(360), rand(360), "point #{i}") }
   end
