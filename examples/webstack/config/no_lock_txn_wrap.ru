@@ -7,7 +7,9 @@ require 'magtag_app'
 
 use TransactionWrapper if defined? Maglev
 
-MagTag.set :public, File.expand_path(File.dirname(__FILE__)) + '/public'
+MagTag.set :public, File.expand_path(File.dirname(File.dirname(__FILE__))) + '/public'
 MagTag.set :sessions, true
 
-run MagTag.new
+map '/app' do
+  run MagTag.new
+end

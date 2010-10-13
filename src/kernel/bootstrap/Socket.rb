@@ -624,6 +624,7 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
   primitive '__listen', 'makeListener:'
 
   def listen(queue_size=10)
+puts "=== #{self}.listen(#{queue_size})"
     queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
     if queue_size < 1 || queue_size > 1000
       raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'

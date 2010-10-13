@@ -1,7 +1,8 @@
 require 'rake/testtask'
 require 'rake/clean'
 
-CLOBBER.include('log/*', 'rack-*.pid')
+CLEAN.include('log/scgi-*.out', 'log/rack-*.pid')
+CLOBBER.include('log')
 
 task :default => :'maglev:magtag'
 

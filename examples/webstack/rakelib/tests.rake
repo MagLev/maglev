@@ -1,9 +1,19 @@
-desc "Current thing I'm working on"
-task :pbm do
-  Rake::Task['lighttpd:scgi'].invoke('')
-end
-
 namespace :tests do
+
+  desc "Test performance of reading static file on Maglev; no txn wrapper."
+  task :static, :count do |t, args|
+    args.with_defaults(:count => '1')
+    pids = []
+    pids << fork_task('lighttpd:scgi', args[:count])
+    pids << fork_task('scgi:maglev', args[:count], 'config/no_txn_wrapper.ru')
+
+    puts "Waiting for startup..."
+    sleep 7
+    Rake::Task['client:ab'].invoke(5_000, "log/static-#{args[:count]}.out")
+
+    kill_and_reap pids
+  end
+
 
   desc "Test performance no lock txn wrapper"
   task :no_lock_txn do
