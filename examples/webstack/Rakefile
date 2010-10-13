@@ -45,6 +45,9 @@ namespace :mri do
   end
 end
 
+desc "Call scgi:kill! and lighttpd:kill!"
+task :kill! => ['scgi:kill!', 'lighttpd:kill!']
+
 
 # RVM sets GEM_PATH, and I don't run maglev under RVM, so I detect and bail
 # if I accidentally run in an rvm-ified shell.

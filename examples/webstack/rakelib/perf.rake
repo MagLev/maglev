@@ -84,6 +84,15 @@ namespace :scgi do
       puts "No pid files in log/"
     end
   end
+
+  desc "List pids of SCGI servers connected on sockets"
+  task :pids do
+    sh "lsof -i tcp:3000-3004" do |ok, res|
+      unless res.exitstatus == 1  # 1 means no pids found, i.e., OK!
+        puts "Error: ok #{ok}  res #{res}  res.exitstatus #{res.exitstatus}"
+      end
+    end
+  end
 end
 
 namespace :fcgi do

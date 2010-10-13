@@ -1,20 +1,6 @@
 require 'sinatra'
 require 'magtag'
 
-puts "=========== Messing with TCPServer"
-class TCPServer
-  def listen(queue_size=10)
-    nil.pause
-    puts "=== #{self}.listen(#{queue_size})"
-    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
-    if queue_size < 1 || queue_size > 1000
-      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
-    end
-    self.__listen(queue_size)
-    0
-  end
-end
-
 class MagTag < Sinatra::Base
   VERSION = '0.0.2'
 
@@ -134,7 +120,7 @@ EOS
       erb :signup
     end
   end
-  
+
   # Shared by login and by successful signup
   def login(user_name, password, target='home')
     user = User.find_by_name user_name
