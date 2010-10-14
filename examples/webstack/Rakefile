@@ -25,7 +25,7 @@ namespace :maglev do
   desc "Run the MagTag Web App"
   task :magtag do
     bail_if_rvm_hosing_environment
-    sh "#{MBIN}/rackup #{RACKUP_OPTS} --port 3333 config.ru"
+    sh "#{MBIN}/rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
   end
 
 
@@ -41,7 +41,7 @@ end
 namespace :mri do
   desc "Run the MagTag Web App"
   task :magtag do
-    sh "rackup #{RACKUP_OPTS} --port 3333 config.ru"
+    sh "rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
   end
 end
 

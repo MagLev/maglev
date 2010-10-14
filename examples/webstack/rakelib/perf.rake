@@ -11,14 +11,14 @@ namespace :webrick do
   # TODO: DRY :webrick and :scgi....there is much similar
   desc "run MRI via rvm; uses webrick"
   task :mri, :rackup_file, :version do |t, args|
-    args.with_defaults :rackup_file => 'config.ru', :version => '1.8.7'
+    args.with_defaults :rackup_file => 'config/no_txn_wrapper.ru', :version => '1.8.7'
     sh "source $HOME/.rvm/scripts/rvm ; rvm #{args[:version]} && rackup #{RACKUP_OPTS} --port 3333 #{args[:rackup_file]}"
   end
 
   desc "run maglev httpd"
   task :maglev, :rackup_file do |t, args|
     bail_if_rvm_hosing_environment
-    args.with_defaults :rackup_file => 'config.ru'
+    args.with_defaults :rackup_file => 'config/no_txn_wrapper.ru'
     sh "$MAGLEV_HOME/bin/rackup #{RACKUP_OPTS} --port 3333 #{args[:rackup_file]}"
   end
 end
@@ -70,7 +70,7 @@ namespace :scgi do
 
   desc "1 MRI VM + scgi: version is like 1.8.7 or 1.9.2"
   task :mri, :rackup_file, :version do |t, args|
-    args.with_defaults :rackup_file => 'config.ru', :version => '1.8.7'
+    args.with_defaults :rackup_file => 'config/no_txn_wrapper.ru', :version => '1.8.7'
     sh "source $HOME/.rvm/scripts/rvm ; rvm #{args[:version]} && rackup #{RACKUP_SCGI_OPTS} #{args[:rackup_file]}"
   end
 
@@ -134,6 +134,10 @@ def kill_from_pidfile(pid_file, signal='TERM')
     raise "Couldn't read file: '#{pid_file}'" unless pid = File.readlines(pid_file)
     puts "kill_from_pidfile: kill -s #{signal} #{pid}"
     sh "kill -s #{signal} #{pid}"
+    sh "kill -s #{CONT} #{pid}"  do |ok,res|
+      # send sig continue in case it is asleep
+      # ignore errors
+    end
     rm_f pid_file
     return true
   rescue
