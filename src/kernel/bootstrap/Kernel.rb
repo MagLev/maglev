@@ -792,17 +792,18 @@ module Kernel
   primitive 'sprintf*', 'sprintf:with:'
 
   primitive_nobridge '__system_exec', '_system:'
+  primitive_nobridge '__forkv_exec', '_forkvExec:'
 
   def `(arg)                         #` close quote for Emacs higlighting
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    arr = __system_exec(arg)  #   raw_status is arr[0]
+    arr = __forkv_exec(arg)  #   raw_status is arr[0]
     # Note that arr is available as $?.__prim_result for debugging
     status = arr[1]
     unless status._equal?(0)
       Errno.raise_errno(status, arg)
     end
-    arr[2]
+    arr[2]  # child stdout
   end
 
   def sub(pattern, replacement)
@@ -878,12 +879,12 @@ module Kernel
     end
   end
 
-  def __system(arg)
+  def __xstr_exec(arg)
     # called from generated code
     arg = Type.coerce_to(arg, String, :to_str)
-    arr = __system_exec(arg)  #   raw_status is arr[0]
+    arr = __forkv_exec(arg)  #   raw_status is arr[0]
     # Note that arr is available as $?.__prim_result for debugging
-    arr[2]
+    arr[2]  # child stdout
   end
 
   def system(command, *args)
@@ -898,14 +899,8 @@ module Kernel
       n = n + 1
     end
     arr = __system_exec(cmd)  #   raw_status is arr[0]
-    status = arr[1]
-    if status._equal?(0)
-      # print result string per MRI behavior, not documented in Pickaxe book
-      puts arr[2]
-      return true
-    end
     # Note that arr is available as $?.__prim_result for debugging
-    return false
+    arr[2]  # child completion boolean
   end
 
   # See <tt>Signal.trap</tt>.
