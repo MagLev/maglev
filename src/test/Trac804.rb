@@ -13,4 +13,4 @@ socket.listen( 1 )
 # The call to listen raises a SocketError: NotConnected
 p server = TCPServer.new('5555')
 p server.listen(100)
-
+true

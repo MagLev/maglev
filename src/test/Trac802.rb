@@ -5,5 +5,6 @@
 
 BIN='/bin'
 x = "echo #{`#{BIN}/echo foo`}"
-puts x
+unless x == "/bin/echo foo\n" ; raise 'Fail' ; end
+true
 
