@@ -214,9 +214,50 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   primitive '__last_err_string', 'lastErrorString'
   class_primitive '__last_err_string', 'lastErrorString'
 
+  primitive '__listen', 'makeListener:'
+
+  def listen(queue_size=10)
+    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
+    if queue_size < 1 || queue_size > 1000
+      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
+    end
+    self.__listen(queue_size)
+    0
+  end
+
   class_primitive 'new', 'new:type:proto:'
 
   primitive '__peek_byte', '_peek'
+
+  primitive_nobridge '__become', '_becomeMinimalChecks:'
+
+  def reopen(arg1, mode=MaglevUndefined)
+    if arg1._isString
+      f = File.open(arg1, mode)
+      sock = self
+      sock.__become(f)
+      return sock
+    elsif arg1._kind_of?(File)
+      sock = self
+      sock.__become(arg1)
+      return sock
+    elsif arg1._kind_of?(Socket)
+      sock = self
+      sock.__become(arg1)
+      return sock
+    elsif arg1.respond_to?( :to_path )
+      path = arg1.to_path
+      if mode._equal?(MaglevUndefined)
+        mode = 'r'
+      end
+      f = File.open(path, mode)
+      sock = self
+      sock.__become(f)
+      return sock
+    else
+      raise TypeError , 'Socket#reopen, first arg must be a File, String, or Socket'
+    end
+  end
 
   def rewind
     self.__clear_buffer # clear the read buffer
@@ -621,18 +662,6 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
     self.accept
   end
 
-  primitive '__listen', 'makeListener:'
-
-  def listen(queue_size=10)
-puts "=== #{self}.listen(#{queue_size})"
-    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
-    if queue_size < 1 || queue_size > 1000
-      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
-    end
-    self.__listen(queue_size)
-    0
-  end
-
   # creates a non-blocking listening socket
   class_primitive '__new', 'new:port:'
 
@@ -762,8 +791,6 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
 end
 
 class UNIXServer # < UNIXSocket in Smalltalk bootstrap
-
-  primitive '__listen', 'makeListener:'
 
   primitive_nobridge '__bind', 'bind:'
 

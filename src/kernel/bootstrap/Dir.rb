@@ -145,12 +145,15 @@ class Dir
     unless block_given?
       return DirEnumerator.new(self, :each) # for 1.8.7
     end
-    i = 0
+    i = @_st_index
     lim = @_st_entries.size
     while i < lim
+      next_i = i + 1
+      @_st_index = next_i
       block.call(@_st_entries[i])
-      i = i + 1
+      i = next_i
     end
+    self
   end
 
   def __entries
