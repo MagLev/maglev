@@ -985,20 +985,32 @@ class File
 
   primitive_nobridge '__fopen', '_fopen:mode:'
 
+  primitive_nobridge '__become', '_becomeMinimalChecks:'
+
   def reopen(arg1, mode=MaglevUndefined)
-    uu = MaglevUndefined
+    ofs = -1 
     if arg1._isString
       path = arg1
-      if mode._equal?(uu)
+      if mode._equal?(MaglevUndefined)
         mode = 'r'
       end
     elsif arg1._kind_of?(File)
       path = arg1.path
-      if mode._equal?(uu)
+      ofs = arg1.pos
+      if mode._equal?(MaglevUndefined)
         mode = arg1.__mode
       end
+    elsif arg1._kind_of?(Socket)
+      f = self
+      f.__become(arg1)
+      return f
+    elsif arg1.respond_to?( :to_path )
+      path = arg1.to_path
+      if mode._equal?(MaglevUndefined)
+        mode = 'r'
+      end
     else
-      raise TypeError , 'File#reopen, first arg must be a File or a String'
+      raise TypeError , 'File#reopen, first arg must be a File, String, or Socket'
     end
     unless mode._isString || mode._isFixnum
       raise TypeError, 'File#reopen, mode is neither Fixnum nor String'
@@ -1008,6 +1020,9 @@ class File
     end
     f = self.__fopen(path, mode)
     Errno.raise_errno(f, path ) if f._isFixnum
+    if ofs > 0
+      self.pos=(ofs)
+    end
     self
   end
 

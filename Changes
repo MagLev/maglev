@@ -4,11 +4,24 @@
 
 == Unreleased Changes
 
-* New parser based on the melbourne grammar file from Rubinius ,
+== Changes for 24478 2010-10-15
+
+* Fix Trac 796, 798, 799, 802, 804
+* Underlying GemStone 3.0 system changes
+*   Fix Gemstone bugs 40086, 40609, 40861, 40866, 40883, 40898, 40909, 40933, 40944, 
+    40952, 40961, 40971, 40976, 40898, 40981, 40984, 40994, 40999, 41002, 41005
+*   Fixes to almost OutOfMemory handling in IndexManager 
+
+== Changes for 24407 2010-10-01
+
+* New parser based on the melbourne grammar file from Rubinius,
   with grammar actions calling to methods in Smalltalk.
   MRI parse server no longer required for loading Ruby bootstrap code.
 * Fix Trac 697, 701, 784, 787, 788, 790, 791, 795
 * Added -C and -X options to maglev-ruby.
+* Updated a number of README's
+* Added scaffold generated files to show MySQL integration to sample rails app.
+* Various performance speedups to underlying GemStone 3.0 database technology
 
 * Fix Trac 788
 

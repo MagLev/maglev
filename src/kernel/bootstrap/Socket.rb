@@ -118,12 +118,12 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     if family._isStringOrSymbol
       fstr = family.to_s    # fix Trac 740
       # constants like AF_INET are undefined during bootstrap, and are defined
-      # transiently during normal VM initialization to be OS-dependent values 
+      # transiently during normal VM initialization to be OS-dependent values
       #  by smalltalk code in RubyContext>>_initTransient: .
       if fstr == 'AF_INET'
-        family = AF_INET 
+        family = AF_INET
       elsif fstr == 'AF_INET6'
-        family = AF_INET6 
+        family = AF_INET6
       else
         raise TypeError, "getaddrinfo: family #{fstr} not supported yet"
       end
@@ -136,7 +136,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     flags = Type.coerce_to(flags, Fixnum, :to_int)
     args = [ host, serv, family, socktype, protocol, flags]
     if socktype._equal?(0)
-      # getaddrinfo() system call may give 'EAI error 9' with hints.ai_socktype==0, 
+      # getaddrinfo() system call may give 'EAI error 9' with hints.ai_socktype==0,
       #  so iterate explicitly over the common socket types
       args[3] = SOCK_STREAM
     end
@@ -214,9 +214,50 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   primitive '__last_err_string', 'lastErrorString'
   class_primitive '__last_err_string', 'lastErrorString'
 
+  primitive '__listen', 'makeListener:'
+
+  def listen(queue_size=10)
+    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
+    if queue_size < 1 || queue_size > 1000
+      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
+    end
+    self.__listen(queue_size)
+    0
+  end
+
   class_primitive 'new', 'new:type:proto:'
 
   primitive '__peek_byte', '_peek'
+
+  primitive_nobridge '__become', '_becomeMinimalChecks:'
+
+  def reopen(arg1, mode=MaglevUndefined)
+    if arg1._isString
+      f = File.open(arg1, mode)
+      sock = self
+      sock.__become(f)
+      return sock
+    elsif arg1._kind_of?(File)
+      sock = self
+      sock.__become(arg1)
+      return sock
+    elsif arg1._kind_of?(Socket)
+      sock = self
+      sock.__become(arg1)
+      return sock
+    elsif arg1.respond_to?( :to_path )
+      path = arg1.to_path
+      if mode._equal?(MaglevUndefined)
+        mode = 'r'
+      end
+      f = File.open(path, mode)
+      sock = self
+      sock.__become(f)
+      return sock
+    else
+      raise TypeError , 'Socket#reopen, first arg must be a File, String, or Socket'
+    end
+  end
 
   def rewind
     self.__clear_buffer # clear the read buffer
@@ -241,9 +282,9 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     uu = MaglevUndefined
     if length._equal?(uu)
       self.recv(4096)
-    else 
+    else
       length = Type.coerce_to(length, Fixnum, :to_int)
-      if buffer._equal?(uu) 
+      if buffer._equal?(uu)
         buf = String.__new(length)
         self.__read_into(length, buf, length)
       else
@@ -270,7 +311,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     else
       buffer = Type.coerce_to(a_buffer, String, :to_str)
       self.__read_into(length, buffer)
-    end   
+    end
   end
 
   # def recv(length) ; end #  receive up to length bytes from the socket.
@@ -307,7 +348,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   # explicit bridge methods for send,
   #  send gets no automatic bridge methods in bootstrap
-  def send(a1, a2, a3, *args) 
+  def send(a1, a2, a3, *args)
     raise ArgumentError, 'too many args'
   end
   def send(a1, a2, a3, *args, &block)
@@ -336,7 +377,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   def send(&block)
     raise ArgumentError, 'too few args'
   end
-  
+
   # syswrite attempts to write specified string to the underlying socket.
   # If a Ruby Socket is non-blocking , and the underlying C socket is
   # blocked on output,  a syswrite will raise an EAGAIN error.
@@ -381,7 +422,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   #   struct ip_mreq {
   #may     struct  in_addr imr_multiaddr;
   #     struct  in_addr imr_interface;
-  #   }; 
+  #   };
   #
   # In this case #setsockopt could be called like this:
   #   optval =  IPAddr.new("224.0.0.251") + Socket::INADDR_ANY
@@ -484,7 +525,7 @@ class IPSocket  # < Socket in Smalltalk bootstrap
   class_primitive '__getaddress', 'getHostAddressByName:'
 
   def self.getaddress(hostname)
-    hostname = Type.coerce_to(hostname, String, :to_str)  
+    hostname = Type.coerce_to(hostname, String, :to_str)
     addr = self.__getaddress(hostname)
     if addr._equal?(nil)
       detail = self.__last_err_string
@@ -529,9 +570,9 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
   class_primitive '__new', 'new'
 
   def self.new(family=nil)
-   
+
     unless family._equal?(nil)
-      unless family == AF_INET 
+      unless family == AF_INET
         raise 'only AF_INET supported'
       end
     end
@@ -540,7 +581,7 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
 
   def self.open(family=nil)
     self.new(family)
-  end 
+  end
 
   primitive '__bind', 'bind:port:'
 
@@ -551,7 +592,7 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
     if hostname._equal?(nil)
       hostname = ''
     else
-      hostname = Type.coerce_to(hostname, String, :to_str)  
+      hostname = Type.coerce_to(hostname, String, :to_str)
     end
     unless port._equal?(nil)
       port = Type.coerce_to(port, Fixnum, :to_int)
@@ -574,7 +615,7 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
     self
   end
 
-  # def recvfrom(length, flags) ; end  
+  # def recvfrom(length, flags) ; end
   #   non-zero flags not implemented yet
   primitive '__recvfrom' , 'recvfrom:flags:'
 
@@ -599,7 +640,7 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
   end
 
   # def send(string, flags) ; end # inherited
-  
+
   primitive_nobridge '__sendto*', '_send:flags:host:port:'
 
   def send(string, flags, host, *args)
@@ -621,27 +662,29 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
     self.accept
   end
 
-  primitive '__listen', 'makeListener:'
-
-  def listen(queue_size=10)
-    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
-    if queue_size < 1 || queue_size > 1000
-      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
-    end
-    self.__listen(queue_size) 
-    0
-  end
-
   # creates a non-blocking listening socket
   class_primitive '__new', 'new:port:'
 
-  def self.new( a1, a2=MaglevUndefined)
+  # Create a new TCPServer socket.
+  #
+  # Example:
+  #   server = TCPServer.new("localhost", 1234)
+  #   server = TCPServer.new(1234)              # 'localhost' is assumed for server
+  #
+  # The port number may be either a string or a fixnum.  The hose must be a
+  # string.
+  #
+  # @param [String,Fixnum] a1 if one arg is given, then this is the port,
+  #        and 'localhost' is assumed for the host.
+  # @param [String,Fixnum] a2 if tow args are given, +a1+ is the host and +a2+
+  #        is the port.
+  def self.new(a1, a2=MaglevUndefined)
     if a2._equal?(MaglevUndefined)
       port = a1
       if port._isString
-        self.new(port , nil)
+        self.new('localhost', port)
       elsif port._isFixnum
-         self.__new( 'localhost', port == 0 ? nil : port )
+        self.__new( 'localhost', port == 0 ? nil : port )
       else
          raise TypeError , 'expected a Fixnum port number or String hostname'
       end
@@ -659,20 +702,23 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
     end
   end
 
+  # Create a new TCPServer socket.
+  #
+  # Calls TCPServer.new(a1, a2).  See TCPServer.new for details.
   def self.open(a1, a2=MaglevUndefined)
     self.new(a1, a2)
   end
 end
 
 class UNIXSocket # < Socket in Smalltalk bootstrap
-  
+
   class_primitive '__new', 'new'
 
   primitive_nobridge '__connect', 'connect:'
 
   def self.open(path)
     sock = self.__new
-    path = Type.coerce_to(path, String, :to_str) 
+    path = Type.coerce_to(path, String, :to_str)
     unless sock.__connect(path)
       raise SocketError , "UNIXSocket connect failed for #{path}"
     end
@@ -684,11 +730,11 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
   end
 
   # returns a pair of connected sockets with no path
-  # def self.pair ; end 
+  # def self.pair ; end
   class_primitive 'pair', 'pair'
-    
+
   # returns [ af_family, path ]
-  # def addr; end 
+  # def addr; end
   primitive 'addr', 'address'
 
   # returns a String (for a Server) or empty string (for a client)
@@ -699,9 +745,9 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
 
   primitive '__peerpath', '_peerPath'
 
-  # returns [ af_family, path ] 
+  # returns [ af_family, path ]
   def peeraddr
-    p = self.__peerpath 
+    p = self.__peerpath
     if p._equal?(nil)
       return self.addr
     end
@@ -720,7 +766,7 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
   end
 
   # returns [ data , [ af_family, path]]
-  # def recvfrom(length, flags) ; end  
+  # def recvfrom(length, flags) ; end
   #   non-zero flags not implemented yet
   def recvfrom(length, flags=0)
     # non-zero flags not supported yet
@@ -745,8 +791,6 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
 end
 
 class UNIXServer # < UNIXSocket in Smalltalk bootstrap
-
-  primitive '__listen', 'makeListener:'
 
   primitive_nobridge '__bind', 'bind:'
 
