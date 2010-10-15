@@ -4,6 +4,10 @@
 
 == Unreleased Changes
 
+* Fix Trac 796, 798, 799, 802, 804
+* Underlying GemStone 3.0 system changes
+*   Fix Gemstone bugs 40961, 40976,40952, 40981, 40898, 40999, 41002
+*   Fixes to almost OutOfMemory handling in IndexManager 
 
 == Changes for 24407 2010-10-01
 
