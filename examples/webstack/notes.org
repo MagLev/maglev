@@ -7,7 +7,7 @@
 *** TODO Threading architecture for MagLev
     + Given we only want one txn going at a time, we need to grab a lock
       (in txn wrapper?).  But, we can allow many readers?
-      
+
 *** TODO Allow anyone to look at a user's tweets (user's home)
 *** TODO Implement mentions queue for each user
 *** TODO Add tagging features
@@ -50,6 +50,26 @@
         , PRIMARY KEY pk_Tag2Post (tag_id, post_id)
         , INDEX (post_id)
       ) ENGINE=InnoDB;
+** Typical Ruby Web App Demands/Performance
+
+   In the unsubstantiated rumors department:
+
+   >  An example taken from a common action on one of my production apps:
+   >
+   >  View 11.4ms
+   >  Controller 5.7ms
+   >  ActiveRecord 25.9ms
+   >
+   >  That 25.9 ms could definitely be better spent serving other
+   >  requests...
+
+   And
+
+   > The other thing to keep in mind is that at least 90 to 95% of the
+   > Rails apps out there don’t get more than a dozen requests/second (a
+   > million requests/day). You can scale that kind of load pretty easily
+   > using simple approaches
+
 ** Tests and results
    + Tests are run in production mode.  To do this
      1. pass "--env production" to rackup (prevents rack from adding
@@ -66,6 +86,17 @@
    + TODO: Can we rely on front-end httpd logging instead of common logger?
    + TODO: Make sure all debug etc. are off for running the performance
      tests.
+
+
+   It might be nice to see how much caching can reduce load on server
+   (e.g., rails caching, Rack-cache, varnish etc.).
+
+   Nice to compare performance of MRI + EventMachine vs MagLev +
+   GreenThreads to see what the difference is.  The hypothesis is that the
+   GemStone/S Green Thread is very much like EventMachine reactor. (but we
+   still have the transaction limitation...).
+   
+
 *** TIME_WAIT problem
 **** Description
      It became quickly apparent that I was running into a TIME_WAIT
