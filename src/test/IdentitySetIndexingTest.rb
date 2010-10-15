@@ -79,6 +79,12 @@ class TestBasicEqualityIndexSupport < Test::Unit::TestCase
     @idset.remove_all_indexes
   end
 
+  def test_search_converts_path_to_symbols
+    x = @idset.search(['@id'], :eql, 9)
+    assert_equal(1, x.size)
+    assert(x.include?(@idx[9]))
+  end
+
   def test_mixed_class_sets
     # Add Bar instances to set with Id instances
     10.times { |i| @idset << Bar.new(i) }
