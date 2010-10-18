@@ -167,5 +167,13 @@ GemStoneInstallation.current.stones.each do |server_name|
     ].each do |action,desc|
       task_gemstone(stone, action, desc)
     end
+
+    desc "Read a GemStone Topaz .gs file into server.  Does a commit."
+    task :input_file, :file do |t, args|
+      file = args[:file]
+      raise "Need a file to read." unless file
+      raise "Can't open input file: #{file.inspect}" unless File.exists?(file)
+      stone.input_file file, true
+    end
   end
 end
