@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985.
+
 == Changes for 24478 2010-10-15
 
 * Fix Trac 796, 798, 799, 802, 804
