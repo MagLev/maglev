@@ -8,6 +8,32 @@
   of the web environment from serving static pages, to complex reads and
   complex reads and writes.
 
+** Rakefile overview
+
+   The examples in this directory (except those based on WEBrick) require
+   starting an external HTTPd, and then connecting one or more
+   appropriately configured Ruby VMs to the httpd.  So, in general, you'll
+   need to have two terminals open and issue two rake commands.  E.g.,
+
+     # Terminal 1: start 1 httpd server, configured to listen to 2 SCGI
+     # servers.
+     $ rake lighttpd:scgi[2]
+
+     # Terminal 2: start 2 MagLev SCGI servers
+     $ rake scgi:maglev[2]
+
+   And then you can hit the base url: http://localhost:3333/app/
+
+   The recipe is:
+   1. Figure out which httpd you want (e.g., lighttpd)
+   2. Figure out which httpd <-> ruby protocol you want (e.g., scgi)
+   3. Figure out how many ruby VMs you want running (e.g., 4)
+
+   Then issue the following rake tasks:
+
+   1. Start httpd using protocol and number:  <tt>rake lighttpd:scgi[4]</tt>
+   2. Start number of Ruby VMs on protocol:   <tt>rake scgi:maglev[4]</tt>
+
 ** Parts of the Web Stack
 
    The parts of the Web Stack we consider are HTTP server, and the

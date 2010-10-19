@@ -21,6 +21,8 @@ Rake::TestTask.new do |t|
   # t.verbose = true
 end
 
+directory 'log'
+
 namespace :maglev do
   desc "Run the MagTag Web App"
   task :magtag do
@@ -56,4 +58,35 @@ def bail_if_rvm_hosing_environment
     puts "ERROR: Running maglev with RVM environment"
     exit 1
   end
+end
+
+
+# Waits until the number of sockets in TIME_WAIT is below threshold
+def wait_for_TIME_WAIT_to_clear(threshold=20)
+  while true
+    count = `netstat -a inet -n|grep TIME_WAIT|wc -l`.to_i
+    return if count < threshold
+    puts "TIME_WAIT count: #{count}"
+    sleep 1
+  end
+end
+
+# Kill the pid contained in pid_file using signal (default 'TERM'), and
+# remove pid_file if success.
+def kill_from_pidfile(pid_file, signal='TERM')
+  puts "====== kill_from_pidfile(#{pid_file}, #{signal})"
+  begin
+    raise "Couldn't read file: '#{pid_file}'" unless pid = File.readlines(pid_file)
+    puts "kill_from_pidfile: kill -s #{signal} #{pid}"
+    sh "kill -s #{signal} #{pid}"
+    sh "kill -s #{CONT} #{pid}"  do |ok,res|
+      # send sig continue in case it is asleep
+      # ignore errors
+    end
+    rm_f pid_file
+    return true
+  rescue
+    puts "Failed on file '#{pid_file}'  pid '#{pid}' (pid_file not removed)"
+  end
+  false
 end
