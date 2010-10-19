@@ -1,8 +1,8 @@
 class Class
-  # Ruby Class is identically Smalltalk's RClass
+  # Ruby Class is identically Smalltalk's Metaclass3
 
   # do not # include Module
-  # Module already present as superclass of RClass in base smalltalk image
+  # Module already present as superclass of Metaclass3 in base smalltalk image
 
   primitive_nobridge 'ancestors' , 'rubyAncestors'
 
