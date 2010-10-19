@@ -4,9 +4,11 @@
 
 == Unreleased Changes
 
-* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985.
-* Added demo of Smalltalk code browser (examples/misc)
+== Changes for 24493 2010-10-19
+
+* Added simple proof-of-concept of a web/Smalltalk based code browser (examples/misc/web_tools)
 * Added Rake support for running .gs files (rake maglev:input_file foo.gs)
+* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985.
 
 == Changes for 24479 2010-10-15
 
