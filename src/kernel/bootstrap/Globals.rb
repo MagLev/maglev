@@ -6,7 +6,7 @@ RUBY.global('Array', 'Array')
 # deleted Behavior
 RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
-RUBY.global('Class', 'RClass')
+RUBY.global('Class', 'Metaclass3')
 RUBY.global('StClass', 'Class')
 RUBY.global('ConditionVariable', 'TransientSemaphore')
 RUBY.global('Dir', 'RubyDirectory')
