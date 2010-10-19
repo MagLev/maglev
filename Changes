@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* Fix Trac 803
+* Fix Gemstone bug 41011
+
 == Changes for 24493 2010-10-19
 
 * Added simple proof-of-concept of a web/Smalltalk based code browser (examples/misc/web_tools)
