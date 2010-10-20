@@ -4,14 +4,12 @@
 
 == Unreleased Changes
 
+== Changes for 24516 2010-10-20
+
 * Fix Trac 803
-* Fix Gemstone bug 41011
-
-== Changes for 24493 2010-10-19
-
-* Added simple proof-of-concept of a web/Smalltalk based code browser (examples/misc/web_tools)
+* Added example of a simple web/Smalltalk based code/stats browser (examples/misc/web_tools)
 * Added Rake support for running .gs files (rake maglev:input_file foo.gs)
-* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985.
+* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985 and 41011
 
 == Changes for 24479 2010-10-15
 
