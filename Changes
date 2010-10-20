@@ -4,9 +4,10 @@
 
 == Unreleased Changes
 
-== Changes for 24516 2010-10-20
+== Changes for 24518 2010-10-20
 
-* Fix Trac 803
+* Fix Trac 803, 805
+* Fixes a C heap corruption in the yaml code
 * Added example of a simple web/Smalltalk based code/stats browser (examples/misc/web_tools)
 * Added Rake support for running .gs files (rake maglev:input_file foo.gs)
 * In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985 and 41011
