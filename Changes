@@ -5,6 +5,7 @@
 == Unreleased Changes
 
 * Fix Trac 803, 805
+* Fix a C heap corruption in libpsych code
 * Fix Gemstone bug 41011
 
 == Changes for 24493 2010-10-19
