@@ -1,3 +1,11 @@
+# Rake file for running rack examples and tests
+# Default is to run rack lobster demo
+
+# We may be running under RVM, so define a way to check
+def maglev_using_rvm
+  ENV['rvm_path'] != "" && (/^maglev/ =~ ENV['rvm_ruby_string']) == 0
+end
+
 task :default => :racklobster
 
 desc "Run hello world rack app"
@@ -7,11 +15,19 @@ end
 
 desc "Run the rack lobster demo via rackup"
 task :racklobster do
-  sh "#{ENV['MAGLEV_HOME']}/bin/rackup lobster.ru"
+  # rackup can be in different places, need to find the correct one
+  rackup_exe = maglev_using_rvm ? \
+    "#{ENV['BUNDLE_PATH']}/bin/rackup" : "#{ENV['MAGLEV_HOME']}/bin/rackup"
+  if File.exists?("#{rackup_exe}")
+    sh "#{rackup_exe} lobster.ru"
+  else
+    puts "[Error] missing file #{rackup_exe}"
+    puts "To fix this, make sure rack is properly installed."
+    exit 1
+  end
 end
 
 desc "Run racktest.rb"
 task :racktest do
   sh "maglev-ruby -rubygems racktest.rb"
 end
-
