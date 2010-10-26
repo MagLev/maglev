@@ -13,7 +13,7 @@ rubygem versions of rack and sinatra (see <tt>../README.rdoc</t>).
 
 === To Run the Object Inspector:
 
-  $ rake run
+  $ rake objectlog
 
 Then hit http://localhost:7654/
 
