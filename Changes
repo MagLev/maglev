@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Made hat_trick easier to show using IRB
+
 == Changes for 24518 2010-10-20
 
 * Fix Trac 803, 805
