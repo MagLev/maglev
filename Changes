@@ -4,6 +4,7 @@
 
 == Unreleased Changes
 
+* Fixed bug that prevented VSD from running in Snow Leopard
 * Made hat_trick easier to show using IRB
 
 == Changes for 24518 2010-10-20

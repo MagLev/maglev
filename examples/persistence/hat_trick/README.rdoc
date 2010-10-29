@@ -92,6 +92,22 @@ In Avi's demo, he was using a pseudo version of IRB, which did an
 <tt>abort_transaction</tt> before each prompt, so it looked a bit more
 magical in the video...
 
+If you want to cheat a bit, load peek.rb. It's Proc which does an abort
+before peeking into the hat, so it will always show the latest state.
+  irb(main):005:0> load 'peek.rb'
+  => true
+  irb(main):006:0> peek = Maglev::PERSISTENT_ROOT[:peek]
+  => #<Proc>
+  irb(main):007:0> peek[:hat].contents
+  => [
+   () ()
+  ( '.' )
+  (")_(")
+  ]
+
+Note: You can peek at the current state of any key in Maglev::PERSISTENT_ROOT,
+use peek[].keys to get a list.
+
 == Things to notice
 
 Each time you invoke maglev-ruby, you are starting a fresh VM, but it can
