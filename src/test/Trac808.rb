@@ -24,3 +24,4 @@ class C
 end
 
 C.new.render(10) { "block to render" }
+true

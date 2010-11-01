@@ -43,3 +43,4 @@ end
 
 b = Base.new
 b.route
+true
