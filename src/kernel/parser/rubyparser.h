@@ -386,10 +386,10 @@ class rb_parse_state
   omObjSType **astSymbolsH; // initialzed at session startup
 
   const char* eofReason;
-  const char* firstErrorReason;
   ByteType charTypes[256];
 
   // large items at end of class
+  char firstErrorReason[4096];
   OopType astSelectorIds[NUM_AST_SELECTORS]; // initialized at session startup
 
   omObjSType* clear_lex_strterm() {

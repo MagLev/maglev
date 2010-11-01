@@ -198,7 +198,7 @@ const char *body_2[] =
     "    }}}",
     "    if (yyerrflag) goto yyinrecovery;",
     "",
-    "    yyerror(/*yyvalO*/  \"syntax error\", vps);",
+    "    yyStateError(yystate, yychar, vps);",
     "",
     "    goto yyerrlab;",
     "",
