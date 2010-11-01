@@ -38,6 +38,7 @@ class Float
      #  there is no support for changing rounding mode in the VM.
 
   PlusInfinity = __resolve_smalltalk_global(:PlusInfinity)
+  MinusInfinity = __resolve_smalltalk_global(:MinusInfinity)
 
   def dup  
     raise TypeError , 'cannot dup a Float'
@@ -223,14 +224,22 @@ class Float
       return NumericEnumerator.new(self, self, nend, inc) # for 1.8.7
     end
     if (inc > 0.0)
-      while n <= nend
-	block.call(n)
-	n += inc
+      if (nend == PlusInfinity)
+        block.call(n)  # yield once
+      else 
+        while n <= nend
+	  block.call(n)
+	  n += inc
+        end
       end
     else  
-      while n >= nend
-	block.call(n)
-	n += inc
+      if nend == MinusInfinity
+        block.call(n)  # yield once
+      else
+	while n >= nend
+	  block.call(n)
+	  n += inc
+	end
       end
     end
   end
