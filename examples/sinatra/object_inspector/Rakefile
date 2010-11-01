@@ -1,9 +1,23 @@
 # Rake file for running sinatra apps and committing code to maglev.
 # Default is to commit code (if necessary) and run both apps
 
+# We may be running under RVM, so define a way to check
+def maglev_using_rvm
+  ENV['rvm_path'] != "" && (/^maglev/ =~ ENV['rvm_ruby_string']) == 0
+end
+
 task :default => :objectlog
 
 desc "Run the objectlog app standalone."
 task :objectlog  do
-  sh %{ $MAGLEV_HOME/bin/rackup objectlog.ru }
+  # rackup can be in different places, need to find the correct one
+  rackup_exe = maglev_using_rvm ? \
+    "#{ENV['BUNDLE_PATH']}/bin/rackup" : "#{ENV['MAGLEV_HOME']}/bin/rackup"
+  if File.exists?("#{rackup_exe}")
+    sh %{ #{rackup_exe} objectlog.ru }
+  else
+    puts "[Error] missing file #{rackup_exe}"
+    puts "To fix this, make sure rack is properly installed."
+    exit 1
+  end
 end

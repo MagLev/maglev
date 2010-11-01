@@ -73,7 +73,7 @@ class Struct
         end
         field_names[n] = sym
         attrs[idx] = sym
-        attrs[idx + 1] = :"@#{sym}" 
+        attrs[idx + 1] = :"@#{sym}"
         idx += 2
       rescue NoMethodError => e
         raise TypeError, e.message
@@ -86,7 +86,7 @@ class Struct
     attrs.freeze
     field_names.freeze
 
-    klass = Class.new_fixed_instvars(self, field_names) { 
+    klass = Class.new_fixed_instvars(self, field_names) {
       attr_accessor(*field_names)
 
       def self.new(*args)
@@ -123,19 +123,19 @@ class Struct
     # Struct inherits no instVars from it's super classes
     names = super()
     attrs = self.__attrs
-    num_members = attrs.__size >> 1 
-    num_ivs = names.__size 
+    num_members = attrs.__size >> 1
+    num_ivs = names.__size
     if num_ivs <= num_members
       []
     else
       names[num_members, num_ivs - num_members]
-    end  
+    end
   end
 
   def initialize(*args)
     attrs = self.__attrs
     lim = attrs.__size
-    n_args = args.__size 
+    n_args = args.__size
     if n_args > (lim >> 1)
       raise ArgumentError , 'too many args'
     end
@@ -184,8 +184,8 @@ class Struct
       unless rgstack.include?(myelem)
         otherelem = othervals.__at(n)
         unless rgstack.include?(otherelem)
-          rg.inspect(myelem) do
-            rg.inspect(otherelem) do
+          rg.guard(myelem) do
+            rg.guard(otherelem) do
               return false if (myelem != otherelem)
             end
           end
@@ -218,13 +218,13 @@ class Struct
     attrs = self.__attrs
     if var._isNumeric
       var = var.to_i
-      num_fields = attrs.__size >> 1 
+      num_fields = attrs.__size >> 1
       if var >= num_fields then
-	raise IndexError, "offset #{var} too large for struct(size:#{num_fields})"
+  raise IndexError, "offset #{var} too large for struct(size:#{num_fields})"
       end
       if var < 0
         if var < -num_fields then
-	  raise IndexError, "offset #{var + num_fields} too small for struct(size:#{num_fields})"
+    raise IndexError, "offset #{var + num_fields} too small for struct(size:#{num_fields})"
         end
         var = var + num_fields
       end
@@ -237,12 +237,12 @@ class Struct
       end
       idx = 0                  # one-based
       unless var.__at(0)._equal?( ?@ )
-        idx = attrs.__offset1_identical(var) 
+        idx = attrs.__offset1_identical(var)
       end
       if idx._equal?(0)
         raise NameError, "no member '#{var}' in struct"
       end
-      # idx - 1 + 1 is the instVar name 
+      # idx - 1 + 1 is the instVar name
     end
     attrs[idx]
   end
@@ -365,8 +365,8 @@ class Struct
       unless rgstack.include?(myelem)
         otherelem = othervals.__at(n)
         unless rgstack.include?(otherelem)
-          rg.inspect(myelem) do
-            rg.inspect(otherelem) do
+          rg.guard(myelem) do
+            rg.guard(otherelem) do
               unless myelem.eql?(otherelem)
                 return false
               end
@@ -391,19 +391,19 @@ class Struct
     n = 0
     lim = ary.__size
     while n < lim
-      elem = ary.__at(n) 
+      elem = ary.__at(n)
       if elem._is_a?(Struct)
         eh = elem.class.name.hash
-      else    
-        eh = elem.hash 
+      else
+        eh = elem.hash
       end
       if eh._not_equal?(0)
-	eh = Type.coerce_to( eh, Fixnum, :to_int)
-	hval = (hval >> 1) ^ eh
-      end 
+  eh = Type.coerce_to( eh, Fixnum, :to_int)
+  hval = (hval >> 1) ^ eh
+      end
       n += 1
     end
-    hval 
+    hval
   end
 
   ##
@@ -506,9 +506,9 @@ class Struct
 
   def to_s
     rg = RecursionGuard
-    return "[...]" if rg.inspecting?(self)
+    return "[...]" if rg.guarding?(self)
 
-    rg.inspect(self) do
+    rg.guard(self) do
       "#<struct #{self.class.name} #{self.__field_names.zip(self.to_a).map{|o| o[1] = o[1].inspect; o.join('=')}.join(', ') }>"
     end
   end

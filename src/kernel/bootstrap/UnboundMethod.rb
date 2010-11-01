@@ -10,9 +10,9 @@ class UnboundMethod
   primitive_nobridge '__home_class', 'homeClass'
   primitive_nobridge 'owner', 'homeClass'  # for 1.8.7
 
-  primitive_nobridge '__selector_prefix', '_selectorPrefix'
-
-  primitive_nobridge 'name', '_selectorPrefix'  # for 1.8.7
+  def name
+    @_st_selPrefix.dup
+  end
 
   def __gsmeth
     @_st_gsmeth 
@@ -50,7 +50,7 @@ class UnboundMethod
     str << ': '
     str << self.__home_class.name
     str << ?#
-    str << self.__selector_prefix
+    str << @_st_selPrefix
     str << ?>
     str
   end
