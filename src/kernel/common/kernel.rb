@@ -123,6 +123,12 @@ module Kernel
   end
   module_function :warn
 
+  def __cext_warning(warning)
+    # called by  rb_warning
+    if $VERBOSE
+      $stderr.write "#{warning}\n" 
+    end
+  end
 
   # from timeout.rb
   ## 

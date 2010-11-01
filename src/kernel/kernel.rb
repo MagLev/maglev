@@ -118,6 +118,7 @@ RUBY.require 'kernel/bootstrap/Gprof.rb'
 RUBY.require 'kernel/bootstrap/Signal.rb'
 RUBY.require 'kernel/bootstrap/timeout1.rb'
 RUBY.require 'kernel/bootstrap/timeout.rb'
+RUBY.require 'kernel/bootstrap/Data.rb'
 
 # Include the common code after the basic primitives.  This is code that
 # should be identical to, or very close to, the Rubinius code.

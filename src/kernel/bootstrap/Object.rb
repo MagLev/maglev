@@ -596,6 +596,14 @@ class Object
   def to_s
     self.class.name.to_s
   end
+ 
+  def __cext_to_s
+    str = "#<"
+    str << self.class.name
+    str <<  ?:
+    str << self.__id.to_s
+    str << ?> 
+  end
 
   # Object should NOT have a to_str.  If to_str is implementd by passing
   # to to_s, then by default all objects can convert to a string!  But we
