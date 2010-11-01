@@ -4,8 +4,15 @@
 
 == Unreleased Changes
 
+== Changes for 24566 2010-11-01
+
+* Fix Trac 806, 808, 811
+* Fix problems running the Tilt gem
+* Some optimizations to String#<<
 * Fixed bug that prevented VSD from running in Snow Leopard
 * Made hat_trick easier to show using IRB
+* More details from parser for syntax errors.
+* Various fixes and enhancements to underlying GemStone 3.0  system
 
 == Changes for 24518 2010-10-20
 

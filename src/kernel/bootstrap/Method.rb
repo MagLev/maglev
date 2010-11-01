@@ -4,6 +4,8 @@ class GsNMethod
   #  extending GsNMethod is not allowed outside of bootstrap
 
   primitive_nobridge '__call_star*&' , '_executeInContext:star:block:'
+  primitive_nobridge '__call_star*&' , '_executeInContext:nonBridgeMeth:star:block:'
+  # primitive_nobridge '__call_star*' , '_executeInContext:args:' # invoked from generated bridge only
   primitive_nobridge 'inspect', '_rubyInspect'
   primitive_nobridge '__name', '_rubyName'
   primitive_nobridge '__source_location', '_fileAndLine'
@@ -32,14 +34,24 @@ class Method
     end
   end
 
-  def [](*args, &block)
-    @_st_gsmeth.__call_star(@_st_obj, *args, &block)
-  end
-
   # arity inherited from UnboundMethod
 
+  def [](*args, &block)
+    br = @_st_execBridge
+    if br._not_equal?(nil)
+      br.__call_star(@_st_obj, @_st_gsmeth, *args, &block)
+    else
+      @_st_gsmeth.__call_star(@_st_obj, *args, &block)
+    end
+  end
+
   def call(*args, &block)
-    @_st_gsmeth.__call_star(@_st_obj, *args, &block)
+    br = @_st_execBridge
+    if br._not_equal?(nil)
+      br.__call_star(@_st_obj, @_st_gsmeth, *args, &block)
+    else
+      @_st_gsmeth.__call_star(@_st_obj, *args, &block)
+    end
   end
 
   alias_method :eql? , :==

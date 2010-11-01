@@ -143,9 +143,11 @@ class String
   primitive '__append', '_rubyAddAll:'
 
   def <<(arg)
-    raise TypeError, "<<: can't modify frozen string" if self.frozen?
+    # raise TypeError, "<<: can't modify frozen string" if self.frozen? 
+    # frozen checked in __append primitive 
     if arg._isFixnum
-      raise TypeError, "<<: #{arg} out of range" if arg < 0 or arg > 255
+      # raise TypeError, "<<: #{arg} out of range" if arg < 0 or arg > 255 # in prim
+      # range checked in  __append primitive
       other = arg
     else
       other = Type.coerce_to(arg, String, :to_str)
