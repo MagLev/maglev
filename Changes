@@ -6,6 +6,8 @@
 
 * Fixed bug that prevented VSD from running in Snow Leopard
 * Made hat_trick easier to show using IRB
+* Fix Trac 806, 808, 811.  
+* More details from parser for syntax errors.
 
 == Changes for 24518 2010-10-20
 
