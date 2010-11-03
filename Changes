@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* Fix problems in getting source string for a block
+* Fix Trac 814
+
 == Changes for 24566 2010-11-01
 
 * Fix Trac 806, 808, 811
