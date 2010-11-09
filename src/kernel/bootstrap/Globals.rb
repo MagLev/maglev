@@ -63,7 +63,7 @@ RUBY.global('CZstream', 'CZstream')
 #
 #            Ruby name           Smalltalk Name
 #
-RUBY.global('Exception',    'UserException')
+RUBY.global('Exception',    'Exception')
   RUBY.global('SystemExit',     'RubySystemExit')
   RUBY.global('SystemStackError',    'StackOverflow')
   RUBY.global('NoMemoryError',  'OutOfMemory')
