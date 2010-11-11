@@ -498,8 +498,9 @@ class RubyIterRpNode
 {
   enum { my_cls = cls_RubyIterRpNode };
  public:
-  static inline omObjSType* s(omObjSType *args, omObjSType *body, rb_parse_state *ps) {
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, args, body, ps);
+  static inline omObjSType* s(omObjSType *args, omObjSType *body, omObjSType *srcOfs,
+			rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, args, body, srcOfs, ps);
   }
 
   static inline omObjSType* set_call(omObjSType *inst, omObjSType *v, rb_parse_state *ps) {
