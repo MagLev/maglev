@@ -1,4 +1,4 @@
-# Exception is identically Smalltalk class UserException 
+# Exception is identically Smalltalk class Exception 
 #
 class Exception
     class_primitive 'allocate', 'rubyBasicNew'
@@ -65,14 +65,6 @@ class Exception
 
     def self.exception
       self.new
-    end
-
-    def self.name
-      if self._equal?(Exception)
-        'Exception'  # override the smalltalk name UserException
-      else
-        super
-      end
     end
 
     def self._validate(obj)

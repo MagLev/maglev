@@ -802,7 +802,7 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                        if (vps->in_def || vps->in_single) {
                             rb_warning(vps, "END in method; use at_exit");
                        }
-                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, vps);
+                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, $2/*srcOffsetSi*/, vps);
                     }
                 | lhs '=' command_call
                     {
@@ -953,7 +953,7 @@ cmd_brace_block : tLBRACE_ARG
                     {
                         yTrace(vps, "cmd_brace_block: tLBRACE_ARG");
                         reset_block(vps);
-                        $1 = int64ToSi(vps->ruby_sourceline() );
+                        // $1 = int64ToSi(vps->ruby_sourceline() );
                     }
                   opt_block_var 
                     { 
@@ -965,7 +965,7 @@ cmd_brace_block : tLBRACE_ARG
 		      yTrace(vps, "cmd_brace_block: ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
 		      popBlockVars(vps);
-		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, vps);
+		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, $1/*srcOffsetSi*/, vps); 
                     }
                 ;
 
@@ -2423,7 +2423,7 @@ do_block        : kDO_BLOCK
                       yTrace(vps, "do_block: kDO_BLOCK");
 		      PUSH_LINE(vps, "do");
 		      reset_block(vps);
-                      $1 = int64ToSi(vps->ruby_sourceline() );
+                      // $1 = int64ToSi(vps->ruby_sourceline() );
                     }
                   opt_block_var
                     {
@@ -2436,7 +2436,8 @@ do_block        : kDO_BLOCK
                       yTrace(vps, "do_block: ___ comp_stamt kEND");
 		      POP_LINE(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, vps);
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // of kDO_BLOCK
+                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, vps);
                     }
                 ;
 
@@ -2507,7 +2508,7 @@ brace_block     : '{'
                     {
                       yTrace(vps, "brace_blck: tLCURLY");
 		      reset_block(vps);
-		      $1 = int64ToSi(vps->ruby_sourceline() );
+		      // $1 is srcOffsetSi 
                     }
                   opt_block_var 
                     { 
@@ -2518,13 +2519,13 @@ brace_block     : '{'
                       yTrace(vps, "brace_blck: tLCURLY ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, vps);
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/, vps);
                     }
                 | kDO
                     {
                       yTrace(vps, "brace_blck: | kDO");
 		      PUSH_LINE(vps, "do");
-		      $1 = int64ToSi(vps->ruby_sourceline() );
+		      // $1 is RpNameToken of 'do'
 		      reset_block(vps);
                     }
                   opt_block_var 
@@ -2536,7 +2537,8 @@ brace_block     : '{'
                       yTrace(vps, "brace_blck: | kDO ___ comp_stamt kEND");
 		      POP_LINE(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, vps);
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, vps);
                     }
                 ;
 
@@ -5564,6 +5566,7 @@ static int yylex(rb_parse_state* ps)
         COND_PUSH(ps, 0);
         CMDARG_PUSH(ps, 0);
         SET_lexState( EXPR_BEG);
+        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
         return c;
 
       case '\\':

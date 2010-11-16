@@ -96,7 +96,7 @@ test(o.singleton_methods(true),  [], "no singleton true")
 test(o.singleton_methods(false), [], "no singleton false")
 
 o.extend Foo
-test(o.singleton_methods(true),  ["foo", "bar"], "o extended true")
+test(o.singleton_methods(true),  ["bar", "foo"], "o extended true")
 test(o.singleton_methods(false), [],             "o extended false")
 
 
