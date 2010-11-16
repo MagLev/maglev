@@ -60,6 +60,7 @@ static inline int ismbchar(uint c) { return 0; }
 static inline int mbclen(char c) { return 1; }
 
 static int yyparse(rb_parse_state* parse_state);
+static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps);
 
 // ID_SCOPE_MASK , ID_LOCAL..ID_INTERNAL moved to parser.h
 
@@ -183,7 +184,10 @@ static YyStackElement* yygrowstack(rb_parse_state *ps, YyStackElement* markPtr)
 
 static int yyerror(const char *msg, rb_parse_state *ps)
 {
-  printf("%s\n", msg);
+  if (ps->firstErrorLine == -1) {
+    ps->firstErrorLine = ps->lineNumber;
+  }
+  printf("at line %d, %s\n", ps->lineNumber, msg);
   ps->errorCount += 1;
 
   return 1;
@@ -211,10 +215,17 @@ static void rb_warning(rb_parse_state* ps, const char* msg)
 
 static void rb_compile_error(rb_parse_state* ps, const char* msg)
 {
-  if (ps->firstErrorReason == NULL) {
-    ps->firstErrorReason = msg;
+  if (ps->firstErrorReason[0] == '\0') {
+    strlcpy(ps->firstErrorReason, msg, sizeof(ps->firstErrorReason));
     ps->firstErrorLine = ps->lineNumber;
   }
+  yyerror(msg, ps);
+}
+
+static void rb_compile_error_override(rb_parse_state* ps, const char* msg)
+{
+  strlcpy(ps->firstErrorReason, msg, sizeof(ps->firstErrorReason));
+  ps->firstErrorLine = ps->lineNumber;
   yyerror(msg, ps);
 }
 
@@ -791,7 +802,7 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                        if (vps->in_def || vps->in_single) {
                             rb_warning(vps, "END in method; use at_exit");
                        }
-                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, vps);
+                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, $2/*srcOffsetSi*/, vps);
                     }
                 | lhs '=' command_call
                     {
@@ -942,7 +953,7 @@ cmd_brace_block : tLBRACE_ARG
                     {
                         yTrace(vps, "cmd_brace_block: tLBRACE_ARG");
                         reset_block(vps);
-                        $1 = int64ToSi(vps->ruby_sourceline() );
+                        // $1 = int64ToSi(vps->ruby_sourceline() );
                     }
                   opt_block_var 
                     { 
@@ -954,7 +965,7 @@ cmd_brace_block : tLBRACE_ARG
 		      yTrace(vps, "cmd_brace_block: ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
 		      popBlockVars(vps);
-		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, vps);
+		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, $1/*srcOffsetSi*/, vps); 
                     }
                 ;
 
@@ -2412,7 +2423,7 @@ do_block        : kDO_BLOCK
                       yTrace(vps, "do_block: kDO_BLOCK");
 		      PUSH_LINE(vps, "do");
 		      reset_block(vps);
-                      $1 = int64ToSi(vps->ruby_sourceline() );
+                      // $1 = int64ToSi(vps->ruby_sourceline() );
                     }
                   opt_block_var
                     {
@@ -2425,7 +2436,8 @@ do_block        : kDO_BLOCK
                       yTrace(vps, "do_block: ___ comp_stamt kEND");
 		      POP_LINE(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, vps);
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // of kDO_BLOCK
+                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, vps);
                     }
                 ;
 
@@ -2496,7 +2508,7 @@ brace_block     : '{'
                     {
                       yTrace(vps, "brace_blck: tLCURLY");
 		      reset_block(vps);
-		      $1 = int64ToSi(vps->ruby_sourceline() );
+		      // $1 is srcOffsetSi 
                     }
                   opt_block_var 
                     { 
@@ -2507,13 +2519,13 @@ brace_block     : '{'
                       yTrace(vps, "brace_blck: tLCURLY ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, vps);
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/, vps);
                     }
                 | kDO
                     {
                       yTrace(vps, "brace_blck: | kDO");
 		      PUSH_LINE(vps, "do");
-		      $1 = int64ToSi(vps->ruby_sourceline() );
+		      // $1 is RpNameToken of 'do'
 		      reset_block(vps);
                     }
                   opt_block_var 
@@ -2525,7 +2537,8 @@ brace_block     : '{'
                       yTrace(vps, "brace_blck: | kDO ___ comp_stamt kEND");
 		      POP_LINE(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, vps);
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, vps);
                     }
                 ;
 
@@ -3816,9 +3829,9 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->errorCount = 0;
   // ps->cur_mid = 0;
   ps->eofReason = NULL;
-  ps->firstErrorReason = NULL;
+  ps->firstErrorReason[0] = '\0';
   ps->atEof = 0;
-  ps->firstErrorLine = 0;
+  ps->firstErrorLine = -1;
   ps->parserActive = TRUE;
 
   int status = yyparse(ps);
@@ -3834,25 +3847,25 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     }
     char buf[512];
     const char* errStr;
-    int lineNum;
-    if (ps->firstErrorReason != NULL) {
-      errStr = ps->firstErrorReason;  // may be on ComHeap
-      lineNum = ps->firstErrorLine;
-    } else {
-      errStr = "unknown syntax error"; 
+    int lineNum = ps->firstErrorLine;
+    if (lineNum < 0) {
       lineNum = ps->lineNumber;
     }
-    snprintf(buf, sizeof(buf), "%s, near line %d%s", errStr, lineNum,
-		(ps->atEof ? "; " : "") );
+    if (ps->firstErrorReason[0] != '\0') {
+      errStr = ps->firstErrorReason;
+    } else {
+      errStr = "syntax error"; 
+    }
+    snprintf(buf, sizeof(buf), "at line %d, %s", lineNum, errStr);
     om::AppendToString(omPtr, resH, buf); 
     if (ps->atEof) {
       StartPosition *strt = ps->start_lines.back();
       if (strt != NULL) {
         snprintf(buf, sizeof(buf), 
-          "unexpected EOF at line %d, missing 'end' for %s on line %d",
+          "\nunexpected EOF at line %d, missing 'end' for %s on line %d",
           	ps->lineNumber, strt->kind, strt->line );
       } else {
-        snprintf(buf, sizeof(buf), "unexpected EOF at line %d",
+        snprintf(buf, sizeof(buf), "\nunexpected EOF at line %d",
           	ps->lineNumber );
       }
       om::AppendToString(omPtr, resH, buf); 
@@ -4364,7 +4377,7 @@ static int parse_string(NODE** quoteH/* a RubyLexStrTerm*/ , rb_parse_state *ps)
     int paren = RubyLexStrTerm::paren(*quoteH);
     if (tokadd_string(func, term, paren, quoteH , ps) == -1) {
         ps->lineNumber = RubyLexStrTerm::lineNum(*quoteH);
-        rb_compile_error(ps, "unterminated string meets end of file");
+        rb_compile_error_override(ps, "unterminated string meets end of file");
         return tSTRING_END;
     }
 
@@ -4413,7 +4426,7 @@ static int heredoc_identifier(rb_parse_state *ps)
         }
         /* Ack! end of file or end of string. */
         if (c == -1) {
-            rb_compile_error(ps, "unterminated here document identifier");
+            rb_compile_error_override(ps, "unterminated here document identifier");
             return 0;
         }
 
@@ -4866,7 +4879,7 @@ static int yylex(rb_parse_state* ps)
                     ps->lex_p = ps->lex_pend;
                     c = nextc(ps);
                     if (c == -1) {
-                        rb_compile_error(ps, "embedded document meets end of file");
+                        rb_compile_error_override(ps, "embedded document meets end of file");
                         return 0;
                     }
                     if (c != '=') continue;
@@ -5553,6 +5566,7 @@ static int yylex(rb_parse_state* ps)
         COND_PUSH(ps, 0);
         CMDARG_PUSH(ps, 0);
         SET_lexState( EXPR_BEG);
+        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
         return c;
 
       case '\\':
@@ -5601,7 +5615,7 @@ static int yylex(rb_parse_state* ps)
                 }
             }
             if (c == -1 || term == -1) {
-                rb_compile_error(ps, "unterminated quoted string meets end of file");
+                rb_compile_error_override(ps, "unterminated quoted string meets end of file");
                 return 0;
             }
             paren = term;
@@ -6482,3 +6496,72 @@ static uint64 scan_hex(const char *start, int len, int *retlen)
     *retlen = s - start;
     return retval;
 }
+
+static void nameForToken(int tok, char *msg, size_t msgSize)
+{
+  const char* nam = yyname[tok];
+  if (nam != NULL) {
+    snprintf(msg, msgSize, "%s ", nam);
+  } else if (tok >= 20 && tok <= '~' ) {
+    snprintf(msg, msgSize, "'%c' ", tok);
+  } else {
+    snprintf(msg, msgSize, "\\x%x ", tok);
+  }
+}
+
+static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
+{
+  if (ps->firstErrorLine == -1 &&
+      ps->firstErrorReason[0] == '\0') {
+    ps->firstErrorLine = ps->lineNumber;
+    const short *unifiedTable = yyUnifiedTable;
+    int expectedToks[128];  // chars or lexer token values
+    int expCount = 0;
+    int shiftB = unifiedTable[yystate + sindexBASE];
+    int reduceB = unifiedTable[yystate + rindexBASE];
+    for (int ch = 0; ch <= YYMAXTOKEN; ch++) {
+      int x = shiftB + ch;
+      if (x <= YYTABLESIZE) {
+	int yChk = unifiedTable[x + checkBASE];
+	if (yChk == ch) {
+	  expectedToks[expCount] = ch; // would shift
+	  expCount += 1;
+	} else {
+          x = reduceB + ch;
+          if (x <= YYTABLESIZE) {
+	    yChk = unifiedTable[x + checkBASE];
+	    if (yChk == ch) {
+	      expectedToks[expCount] = ch; // would reduce
+	      expCount += 1;
+	    }  
+          }
+        }
+      }
+    }
+    char tokName[64];
+    nameForToken(yychar, tokName, sizeof(tokName));
+    if (expCount >= 1 && expectedToks[0] == 0) { // (un)expected EOF
+      expCount = 1; // ignore the other expected tokens
+      snprintf(ps->firstErrorReason, sizeof(ps->firstErrorReason),
+          "syntax error, found %s expected EOF ", tokName);
+    } else if (expCount > 7) {
+      expCount = 0; // too many to print
+      snprintf(ps->firstErrorReason, sizeof(ps->firstErrorReason),
+          "syntax error, unexpected %s ", tokName);
+    } else {
+      const char* sMsg = expCount == 0 ? "details not available"
+             : (expCount > 1 ? "expected one of " : "expected " );		
+      snprintf(ps->firstErrorReason, sizeof(ps->firstErrorReason),
+          "syntax error, found %s , %s" , tokName, sMsg);
+    }
+    for (int j = 0; j < expCount; j++) {
+      int tok = expectedToks[j];
+      nameForToken(tok, tokName, sizeof(tokName));
+      strlcat(ps->firstErrorReason, tokName, sizeof(ps->firstErrorReason));
+    }
+    yyerror(ps->firstErrorReason, ps);
+  } else {
+    yyerror("syntax error", ps);
+  }
+}
+

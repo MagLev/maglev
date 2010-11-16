@@ -81,6 +81,16 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     self
   end
 
+  class_primitive_nobridge '__for_fd', '_existingSocketForFd:'
+
+  def self.for_fd(fd)
+    # returns nil or an already open Socket
+    unless fd._isFixnum
+      TypeError signal:'for_fd expects a Fixnum argument' 
+    end
+    self.__for_fd(fd)
+  end
+
   def fsync
     if closed?
       raise IOError, 'cannot fsync a closed Socket'

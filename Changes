@@ -4,7 +4,30 @@
 
 == Unreleased Changes
 
-* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985.
+* Fix problems in getting source string for a block
+* Fix Trac 814
+
+== Changes for 24610 2010-11-04
+* Fixed VSD startup problem
+* several other fixes and enhancements to underlying GemStone 3.0  system
+
+== Changes for 24566 2010-11-01
+
+* Fix Trac 806, 808, 811
+* Fix problems running the Tilt gem
+* Some optimizations to String#<<
+* Fixed bug that prevented VSD from running in Snow Leopard
+* Made hat_trick easier to show using IRB
+* More details from parser for syntax errors.
+* Various fixes and enhancements to underlying GemStone 3.0  system
+
+== Changes for 24518 2010-10-20
+
+* Fix Trac 803, 805
+* Fixes a C heap corruption in the yaml code
+* Added example of a simple web/Smalltalk based code/stats browser (examples/misc/web_tools)
+* Added Rake support for running .gs files (rake maglev:input_file foo.gs)
+* In Underlying GemStone 3.0 system, rename RClass to Metaclass3; fix 40985 and 41011
 
 == Changes for 24479 2010-10-15
 

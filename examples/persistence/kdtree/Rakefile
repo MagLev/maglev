@@ -5,7 +5,12 @@ MAGLEV = (not ENV['MAGLEV_HOME'].nil?) and File.directory? ENV['MAGLEV_HOME']
 if MAGLEV
   puts "RUBY is MagLev"
   RUBY = 'maglev-ruby'
-  RACKUP = ENV['MAGLEV_HOME'] + '/bin/rackup'
+  def maglev_using_rvm
+    ENV['rvm_path'] != "" && (/^maglev/ =~ ENV['rvm_ruby_string']) == 0
+  end
+  # rackup can be in different places, need to find the correct one
+  RACKUP = maglev_using_rvm ? \
+    "#{ENV['BUNDLE_PATH']}/bin/rackup" : "#{ENV['MAGLEV_HOME']}/bin/rackup"
 else
   puts "RUBY is MRI"
   RUBY = 'ruby'

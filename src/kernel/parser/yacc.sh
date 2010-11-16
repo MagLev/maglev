@@ -13,8 +13,9 @@ srcDir=../../../../svn/src
 
 for each in $fileList
 do
-  rm $srcDir/$each
+  rm -f $srcDir/$each
   cat generated.txt $each > $srcDir/$each
+  chmod -w $srcDir/$each
 done
 
 echo "byacc ok"

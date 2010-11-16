@@ -1,5 +1,4 @@
-digraph  
-Žf+ {
+digraph  {
 	edge [fontsize=10];
 	node [shape=box,fontsize=10];
 	orientation=landscape;

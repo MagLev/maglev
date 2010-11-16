@@ -29,9 +29,10 @@ puts res.inspect
 unless res.length >= 1; raise 'err;'; end # 1 on Solaris, 2 on Linux
 
 elem = res[0]
-exp = ["AF_INET", 80, "moro.gemstone.com", "10.80.250.115", 2 ]
+expA = ["AF_INET", 80, "moro.gemstone.com", "10.80.250.115", 2 ]
+expB = ["AF_INET", 80, "moro",              "10.80.250.115", 2 ]
 act = [ elem[0], elem[1], elem[2],         elem[3], elem[4] ]
-unless exp == act
-  raise "error: expected #{exp.inspect}  actual: #{act.inspect}"
+unless act == expA || act == expB
+  raise "error: expected #{expA.inspect}  actual: #{act.inspect}"
 end
 true

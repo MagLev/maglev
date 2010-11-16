@@ -20,8 +20,8 @@
 Maglev.persistent do
   load 'hat.rb'
   load 'rabbit.rb'
-  Maglev::PERSISTENT_ROOT[:hat] = Hat.new
 end
+Maglev::PERSISTENT_ROOT[:hat] = Hat.new
 Maglev.commit_transaction
 
 puts "Created empty hat at Maglev::PERSISTENT_ROOT[:hat]:    #{Maglev::PERSISTENT_ROOT[:hat].inspect}"
