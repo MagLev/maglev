@@ -1,6 +1,13 @@
 -*- org -*-
 * Notes on Getting nginx working with MagLev
 ** Overview
+
+   This configuration uses nginx to reverse proxy to backend MagLev servers
+   using HTTP.  Currently, we are limited to using WEBrick in the MagLev
+   instances as the HTTP protocol handler.  This scenario will be more
+   interestig when C-Extension support is available and we can try faster
+   HTTP engines.
+
 *** Install nginx
     See the nginx website for instructions on installing nginx.
 
@@ -9,4 +16,16 @@
        
          $ sudo chmod 777 /opt/local/var/*/nginx
 
-***     
+*** Configure nginx
+
+    The following nginx config file sets nginx to listen on port 3000 for
+    client HTTP requests, and to reverse-proxy to MagLev instances on
+    port 3000. 
+
+*** nginx + SCGI
+
+    I didn't get SCGI working with nginx (but I didn't try real hard).
+    Several web pages indicated that nginx's SCGI implementation was broken
+    and not to use it.  I didn't investigate further.
+
+** To Do

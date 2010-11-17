@@ -100,7 +100,6 @@
     + TODO: Make sure all debug etc. are off for running the performance
       tests.
 
-
     It might be nice to see how much caching can reduce load on server
     (e.g., rails caching, Rack-cache, varnish etc.).
 
@@ -108,7 +107,6 @@
     GreenThreads to see what the difference is.  The hypothesis is that the
     GemStone/S Green Thread is very much like EventMachine reactor. (but we
     still have the transaction limitation...).
-
 
 **** TIME_WAIT problem
 ***** Description
@@ -143,6 +141,30 @@
 
       Could go to FCGI, since it allows multiple requests per socket as an
       option.
+
+**** Test 5: nginx reverse proxy to MagLev + WEBrick
+
+     This test tries to see what overhead reverse proxying via nginx + HTTP
+     adds.  This is preliminary, in that we expect the C-Extension
+     implementation will allow us to use a faster HTTP processor in the
+     MagLev instance.  This really only shows the overhead of having
+     another nginx in the mix.
+
+     Test was to get the maglev.css file from the MagLev instance (not
+     staticly served from nginx).  I compared with ab going through nginx,
+     and then going directly to the backend MagLev instance.
+
+       $ ab -n 5000 -c 10 http://127.0.0.1:3333/app/magtag.css
+       $ ab -n 5000 -c 10 http://127.0.0.1:3000/app/magtag.css
+
+     I then configured four back-end MagLev instances and ran with one
+     nginx fronting them.
+
+     | Configuration                  | Req/sec | Time/req (ms) |
+     |--------------------------------+---------+---------------|
+     | MagLev + WEBrick               |     440 |          22.7 |
+     | nginx + MagLev + WEBrick       |     390 |          25.6 |
+     | nginx + 4 x (MagLev + WEBrick) |         |               |
 
 **** Test 4: Locking vs Non-Locking transaction wrapper (no contention)
      This test attempts to characterize how much overhead is there in
@@ -199,7 +221,6 @@
        Completed 8000 requests
        apr_poll: The timeout specified has expired (70007)
        Total of 8175 requests completed
-
 
 ***** TODO Update to latest lighttpd and see if problem remains
 ***** TODO See if problem is on linux, or only OSX

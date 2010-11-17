@@ -8,9 +8,9 @@
 namespace :fcgi do
   FCGI_PORT = 3000
   RACKUP_FCGI_OPTS = "#{RACKUP_OPTS} --server FastCGI"
-  desc "1 maglev VM + scgi"
+  desc "1 maglev VM + fcgi with lighttpd bug workaround"
   task :maglev => :log do
     opts = "#{RACKUP_FCGI_OPTS} --pid log/fcgi-#{FCGI_PORT}.pid --port #{FCGI_PORT}"
-    sh "#{MAGLEV_HOME}/bin/rackup #{opts} config/fcgi.ru"
+    sh "#{MAGLEV_HOME}/bin/rackup #{opts} config/lighttpd-fcgi.ru"
   end
 end
