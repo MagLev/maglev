@@ -71,133 +71,146 @@
    > using simple approaches
 
 ** Tests and results
-   + Tests are run in production mode.  To do this
-     1. pass "--env production" to rackup (prevents rack from adding
-        extraneous middleware, like lint etc.)
-     2. "set :environment, :production" in config.ru tells sinatra to only
-        install necessary middleware.
-     In general, we'll be running with: content_length and cookie
-     middleware.
-   + No debug output to tty
-   + All test runs start off with a "GET /info" so we can document the ruby
-     environment, date and the installed middleware.  Then we run the
-     test.
-   + TODO: Can we show the sinatra options?
-   + TODO: Can we rely on front-end httpd logging instead of common logger?
-   + TODO: Make sure all debug etc. are off for running the performance
-     tests.
+*** Test Plan
+    1. Get lighttpd/scgi working and take establish baselines
+       + WEBrick baseline
+       + lighttpd/scgi baseline
+    2. Get nginx/http working and take baselines
+       + nginx/htttp/webrick base line
+    3. Get lighttpd/http working
+       + lighttpd/http baseline
+    4. Try fcgi and either nginx
+       + nginx/fcgi baseline
+    5. Wait for C-extensions then get thin working
+    6. Try to figure out time for transactions, etc.
+*** Results
+    + Tests are run in production mode.  To do this
+      1. pass "--env production" to rackup (prevents rack from adding
+         extraneous middleware, like lint etc.)
+      2. "set :environment, :production" in config.ru tells sinatra to only
+         install necessary middleware.
+      In general, we'll be running with: content_length and cookie
+      middleware.
+    + No debug output to tty
+    + All test runs start off with a "GET /info" so we can document the ruby
+      environment, date and the installed middleware.  Then we run the
+      test.
+    + TODO: Can we show the sinatra options?
+    + TODO: Can we rely on front-end httpd logging instead of common logger?
+    + TODO: Make sure all debug etc. are off for running the performance
+      tests.
 
 
-   It might be nice to see how much caching can reduce load on server
-   (e.g., rails caching, Rack-cache, varnish etc.).
+    It might be nice to see how much caching can reduce load on server
+    (e.g., rails caching, Rack-cache, varnish etc.).
 
-   Nice to compare performance of MRI + EventMachine vs MagLev +
-   GreenThreads to see what the difference is.  The hypothesis is that the
-   GemStone/S Green Thread is very much like EventMachine reactor. (but we
-   still have the transaction limitation...).
-   
-
-*** TIME_WAIT problem
-**** Description
-     It became quickly apparent that I was running into a TIME_WAIT
-     problem.  I'd get to around 8,000 requests, and then pause for about
-     ten seconds (both mri and maglev).  Looking at netstat showed:
-
-       $ netstat -finet -n | grep TIME_WAIT | wc
-       16346   98076 1258642
-
-     So, 16k sockets waiting, and system waiting before it passes out
-     another socket...
-
-     For every connection from +ab+, there are two sockets
-
-     |---+----------+----------+----------+----------|
-     | # | Client   | Protocol | Socket   | Server   |
-     |---+----------+----------+----------+----------|
-     | 1 | ab       | HTTP     | TCP:3333 | lighttpd |
-     | 2 | lighttpd | SCGI     | TCP:3000 | Ruby     |
-     |---+----------+----------+----------+----------|
-
-**** Solutions?
-
-     1: Use one socket? In the SCGI protocol, the server indicates the end
-        of a response by closing the connection, so, there is not much hope
-        of keeping one connection per SCGI server...
-     2: Use Unix domain sockets (if on same machine)?  Can we configure
-        lighttpd and SCGI module?
-
-     3: Play with SO_LINGER ?
-
-     Could go to FCGI, since it allows multiple requests per socket as an
-     option.
-
-*** Test 4: Locking vs Non-Locking transaction wrapper (no contention)
-    This test attempts to characterize how much overhead is there in
-    wrapping each HTTP request in a transaction AND grabbing a VM lock.
-    The idea is that we want to ensure there is only one thread potentially
-    modifying persistent data at a time.  This particular run shows only
-    the overhead of getting the lock and releasing it, as it is a
-    read-only, static file request.
-
-    | Wrapper                 | Req/sec | Time/req (ms) |
-    |-------------------------+---------+---------------|
-    | Non-Locking txn wrapper |     848 |          11.8 |
-    | Locking txn wrapper     |     803 |          12.4 |
-    |-------------------------+---------+---------------|
-    | Diff                    |      45 |          -0.6 |
-    | %                       |      5% |            5% |
-
-    There is a 5% overhead for grabbing and releasing a lock.
-
-    Test run with lighttpd and SCGI
-
-*** Test 3: Load static file with lighttpd + scgi + 1 maglev VM
-    In this configuration, lighttpd is passing all requests (even for
-    static files) to MagLev via SCGI.  There is one maglev VM running
-
-    There is a problem at slightly over 8k requests (8192?) with both
-    MagLev and MRI 1.8.7.  I sometimes get a long (~11 sec) delay and then
-    it starts going again, or I get:
-
-      $ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
-      This is ApacheBench, Version 2.3 <$Revision: 655654 $>
-      Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-      Licensed to The Apache Software Foundation, http://www.apache.org/
-
-      Benchmarking 127.0.0.1 (be patient)
-      Completed 1000 requests
-      Completed 2000 requests
-      Completed 3000 requests
-      Completed 4000 requests
-      Completed 5000 requests
-      Completed 6000 requests
-      Completed 7000 requests
-      Completed 8000 requests
-      apr_poll: The timeout specified has expired (70007)
-      Total of 8183 requests completed
-      [@cairo webstack (webstack)]$
-
-    With MRI 1.8.7, I can't run ab at concurrency level 10, but 4 seems to
-    work, and I also see the ~8k slow down for about 11 seconds.
-
-    With MRI 1.9.2, I see the 11 second pause and I got the error:
-      ...
-      Completed 7000 requests
-      Completed 8000 requests
-      apr_poll: The timeout specified has expired (70007)
-      Total of 8175 requests completed
+    Nice to compare performance of MRI + EventMachine vs MagLev +
+    GreenThreads to see what the difference is.  The hypothesis is that the
+    GemStone/S Green Thread is very much like EventMachine reactor. (but we
+    still have the transaction limitation...).
 
 
-**** TODO Update to latest lighttpd and see if problem remains
-**** TODO See if problem is on linux, or only OSX
-**** TODO look at networking stats while doing run and see if anything amiss
+**** TIME_WAIT problem
+***** Description
+      It became quickly apparent that I was running into a TIME_WAIT
+      problem.  I'd get to around 8,000 requests, and then pause for about
+      ten seconds (both mri and maglev).  Looking at netstat showed:
 
-**** Results
-     | Ruby             | Req/Sec (mean) | Time/Req (ms) |
-     | Maglev  (no txn) |        1024.07 |         9.765 |
-     | MRI 1.8.7        |                |               |
+        $ netstat -finet -n | grep TIME_WAIT | wc
+        16346   98076 1258642
 
-***** Maglev
+      So, 16k sockets waiting, and system waiting before it passes out
+      another socket...
+
+      For every connection from +ab+, there are two sockets
+
+      |---+----------+----------+----------+----------|
+      | # | Client   | Protocol | Socket   | Server   |
+      |---+----------+----------+----------+----------|
+      | 1 | ab       | HTTP     | TCP:3333 | lighttpd |
+      | 2 | lighttpd | SCGI     | TCP:3000 | Ruby     |
+      |---+----------+----------+----------+----------|
+
+***** Solutions?
+
+      1: Use one socket? In the SCGI protocol, the server indicates the end
+         of a response by closing the connection, so, there is not much hope
+         of keeping one connection per SCGI server...
+      2: Use Unix domain sockets (if on same machine)?  Can we configure
+         lighttpd and SCGI module?
+
+      3: Play with SO_LINGER ?
+
+      Could go to FCGI, since it allows multiple requests per socket as an
+      option.
+
+**** Test 4: Locking vs Non-Locking transaction wrapper (no contention)
+     This test attempts to characterize how much overhead is there in
+     wrapping each HTTP request in a transaction AND grabbing a VM lock.
+     The idea is that we want to ensure there is only one thread potentially
+     modifying persistent data at a time.  This particular run shows only
+     the overhead of getting the lock and releasing it, as it is a
+     read-only, static file request.
+
+     | Wrapper                 | Req/sec | Time/req (ms) |
+     |-------------------------+---------+---------------|
+     | Non-Locking txn wrapper |     848 |          11.8 |
+     | Locking txn wrapper     |     803 |          12.4 |
+     |-------------------------+---------+---------------|
+     | Diff                    |      45 |          -0.6 |
+     | %                       |      5% |            5% |
+
+     There is a 5% overhead for grabbing and releasing a lock.
+
+     Test run with lighttpd and SCGI
+
+**** Test 3: Load static file with lighttpd + scgi + 1 maglev VM
+     In this configuration, lighttpd is passing all requests (even for
+     static files) to MagLev via SCGI.  There is one maglev VM running
+
+     There is a problem at slightly over 8k requests (8192?) with both
+     MagLev and MRI 1.8.7.  I sometimes get a long (~11 sec) delay and then
+     it starts going again, or I get:
+
+       $ ab -n 10000 -c 10 http://127.0.0.1:3333/magtag.css
+       This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+       Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+       Licensed to The Apache Software Foundation, http://www.apache.org/
+
+       Benchmarking 127.0.0.1 (be patient)
+       Completed 1000 requests
+       Completed 2000 requests
+       Completed 3000 requests
+       Completed 4000 requests
+       Completed 5000 requests
+       Completed 6000 requests
+       Completed 7000 requests
+       Completed 8000 requests
+       apr_poll: The timeout specified has expired (70007)
+       Total of 8183 requests completed
+       [@cairo webstack (webstack)]$
+
+     With MRI 1.8.7, I can't run ab at concurrency level 10, but 4 seems to
+     work, and I also see the ~8k slow down for about 11 seconds.
+
+     With MRI 1.9.2, I see the 11 second pause and I got the error:
+       ...
+       Completed 7000 requests
+       Completed 8000 requests
+       apr_poll: The timeout specified has expired (70007)
+       Total of 8175 requests completed
+
+
+***** TODO Update to latest lighttpd and see if problem remains
+***** TODO See if problem is on linux, or only OSX
+***** TODO look at networking stats while doing run and see if anything amiss
+
+***** Results
+      | Ruby             | Req/Sec (mean) | Time/Req (ms) |
+      | Maglev  (no txn) |        1024.07 |         9.765 |
+      | MRI 1.8.7        |                |               |
+
+****** Maglev
 $ curl http://localhost:3333/info ; ab -n 5000 -c 10 http://127.0.0.1:3333/magtag.css
 ===== get /info ======================
 RUBY_ENGINE  maglev
@@ -269,41 +282,41 @@ Percentage of the requests served within a certain time (ms)
   99%     16
  100%    146 (longest request)
 
-*** Test 2: Measure the overhead of a transaction per request
-    This test was only done on Maglev, as it is the only one with built-in
-    transactions.  The setup is similar to Test 1, but we are comparing no
-    middleware to one that does a <tt>Maglev.abort_transaction</tt> at the
-    beginning of each HTTP request, and does a
-    <tt>Maglev.commit_transaction</tt> at the end of each successful HTTP
-    request.  This is done via rack middleware:
+**** Test 2: Measure the overhead of a transaction per request
+     This test was only done on Maglev, as it is the only one with built-in
+     transactions.  The setup is similar to Test 1, but we are comparing no
+     middleware to one that does a <tt>Maglev.abort_transaction</tt> at the
+     beginning of each HTTP request, and does a
+     <tt>Maglev.commit_transaction</tt> at the end of each successful HTTP
+     request.  This is done via rack middleware:
 
-      class TransactionWrapper
-        def initialize(app)
-          @app = app
-        end
+       class TransactionWrapper
+         def initialize(app)
+           @app = app
+         end
 
-        def call(env)
-          begin
-            Maglev.abort_transaction
-            r = @app.call env
-          ensure
-            Maglev.commit_transaction if committable? r[0]
-          end
-        end
+         def call(env)
+           begin
+             Maglev.abort_transaction
+             r = @app.call env
+           ensure
+             Maglev.commit_transaction if committable? r[0]
+           end
+         end
 
-        def committable?(status)
-          ! status.nil? &&  (200..399).include?(status)
-        end
-      end
+         def committable?(status)
+           ! status.nil? &&  (200..399).include?(status)
+         end
+       end
 
-      | Without transactions | 547.64 | 18.260 |
-      | With transactions    | 494.56 | 20.220 |
-      | Difference           |  53.08 |  -1.96 |
+       | Without transactions | 547.64 | 18.260 |
+       | With transactions    | 494.56 | 20.220 |
+       | Difference           |  53.08 |  -1.96 |
 
-      Looks like transaction overhead (with no data to commit!) take about
-      2ms, or about 11% penalty over no transactions.
+       Looks like transaction overhead (with no data to commit!) take about
+       2ms, or about 11% penalty over no transactions.
 
-**** Results w/o transaction wrapper
+***** Results w/o transaction wrapper
 curl http://localhost:3333/info
 ===== get /info ======================
 RUBY_ENGINE  maglev
@@ -375,7 +388,7 @@ Percentage of the requests served within a certain time (ms)
   99%     24
  100%    141 (longest request)
 
-**** Results with transaction wrapper
+***** Results with transaction wrapper
 curl http://localhost:3333/info
 ===== get /info ======================
 RUBY_ENGINE  maglev
@@ -449,58 +462,58 @@ Percentage of the requests served within a certain time (ms)
   99%     30
  100%    143 (longest request)
 
-*** Test 1: Measure overhead of a rack middleware
-    Install an empty Rack middleware app that does nothing.  The intent is
-    to distinguish the overhead of the transaction processing vs the rack
-    overhead when using the transaction wrapper middleware.
+**** Test 1: Measure overhead of a rack middleware
+     Install an empty Rack middleware app that does nothing.  The intent is
+     to distinguish the overhead of the transaction processing vs the rack
+     overhead when using the transaction wrapper middleware.
 
-    + The file we loaded was the following 22 characters: /* Empty MagTag.css */
+     + The file we loaded was the following 22 characters: /* Empty MagTag.css */
 
-**** Results
+***** Results
 
-     Basically, the overhead of the following rack app is "negligible"
-     (less than a quarter of a millisecond, or around 0.5% of an average
-     request).
+      Basically, the overhead of the following rack app is "negligible"
+      (less than a quarter of a millisecond, or around 0.5% of an average
+      request).
 
-       class EmptyMiddleware
-         def initialize(app)
-           @app = app
-         end
+        class EmptyMiddleware
+          def initialize(app)
+            @app = app
+          end
 
-         def call(env)
-           @app.call env
-         end
-       end
+          def call(env)
+            @app.call env
+          end
+        end
 
-     |-------------+-----------+---------+---------+-----------|
-     | Middleware  | Ruby      | HTTPd   | req/sec |  mean req |
-     |             |           |         |  (mean) | time (ms) |
-     |-------------+-----------+---------+---------+-----------|
-     | No mid-ware | Maglev    | WEBrick |  543.91 |    18.385 |
-     | Empty       | Maglev    | WEBrick |  547.06 |    18.280 |
-     |-------------+-----------+---------+---------+-----------|
-     | Diff        |           |         |         |           |
-     |-------------+-----------+---------+---------+-----------|
-     |-------------+-----------+---------+---------+-----------|
-     | No mid-ware | MRI 1.8.7 | WEBrick |  399.99 |    25.001 |
-     | Empty       | MRI 1.8.7 | WEBrick |  396.57 |    25.216 |
-     |-------------+-----------+---------+---------+-----------|
-     | Diff        |           |         |         |           |
-     |-------------+-----------+---------+---------+-----------|
-     |-------------+-----------+---------+---------+-----------|
-     | No mid-ware | MRI 1.9.2 | WEBrick |  388.17 |    25.762 |
-     | Empty       | MRI 1.9.2 | WEBrick |  389.38 |    25.682 |
-     |-------------+-----------+---------+---------+-----------|
-     | Diff        |           |         |         |           |
+      |-------------+-----------+---------+---------+-----------|
+      | Middleware  | Ruby      | HTTPd   | req/sec |  mean req |
+      |             |           |         |  (mean) | time (ms) |
+      |-------------+-----------+---------+---------+-----------|
+      | No mid-ware | Maglev    | WEBrick |  543.91 |    18.385 |
+      | Empty       | Maglev    | WEBrick |  547.06 |    18.280 |
+      |-------------+-----------+---------+---------+-----------|
+      | Diff        |           |         |         |           |
+      |-------------+-----------+---------+---------+-----------|
+      |-------------+-----------+---------+---------+-----------|
+      | No mid-ware | MRI 1.8.7 | WEBrick |  399.99 |    25.001 |
+      | Empty       | MRI 1.8.7 | WEBrick |  396.57 |    25.216 |
+      |-------------+-----------+---------+---------+-----------|
+      | Diff        |           |         |         |           |
+      |-------------+-----------+---------+---------+-----------|
+      |-------------+-----------+---------+---------+-----------|
+      | No mid-ware | MRI 1.9.2 | WEBrick |  388.17 |    25.762 |
+      | Empty       | MRI 1.9.2 | WEBrick |  389.38 |    25.682 |
+      |-------------+-----------+---------+---------+-----------|
+      | Diff        |           |         |         |           |
 
-     The MagLev run with the middleware was actually faster than without
-     the middleware (by about 2.5%, or so).  Let's assume that is in the
-     noise.  It is .8ms faster with the middleware
+      The MagLev run with the middleware was actually faster than without
+      the middleware (by about 2.5%, or so).  Let's assume that is in the
+      noise.  It is .8ms faster with the middleware
 
-     1.9.2 is slower!!?? than 1.8.7 ?
+      1.9.2 is slower!!?? than 1.8.7 ?
 
-**** Maglev Results
-***** No middleware
+***** Maglev Results
+****** No middleware
 
 curl http://localhost:3333/info
 ===== get /info ======================
@@ -573,7 +586,7 @@ Percentage of the requests served within a certain time (ms)
   99%     27
  100%    142 (longest request)
 
-***** Empty middleware:
+****** Empty middleware:
 
 curl http://localhost:3333/info
 ===== get /info ======================
@@ -647,8 +660,8 @@ Percentage of the requests served within a certain time (ms)
   99%     26
  100%    141 (longest request)
 
-**** MRI 1.8.7 Results
-***** No middleware
+***** MRI 1.8.7 Results
+****** No middleware
 
 curl http://localhost:3333/info
 ===== get /info ======================
@@ -720,7 +733,7 @@ Percentage of the requests served within a certain time (ms)
   98%     55
   99%     56
  100%   1018 (longest request)
-***** Empty middleware:
+****** Empty middleware:
 =============================================================
 
 curl http://localhost:3333/info
@@ -795,8 +808,8 @@ Percentage of the requests served within a certain time (ms)
   99%     56
  100%    998 (longest request)
 
-**** MRI 1.9.2 Results
-***** No middleware
+***** MRI 1.9.2 Results
+****** No middleware
 
 curl http://localhost:3333/info
 ===== get /info ======================
@@ -870,7 +883,7 @@ Percentage of the requests served within a certain time (ms)
   99%     36
  100%   1029 (longest request)
 
-***** Empty middleware:
+****** Empty middleware:
 
 curl http://localhost:3333/info
 ===== get /info ======================

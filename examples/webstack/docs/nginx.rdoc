@@ -1,0 +1,12 @@
+-*- org -*-
+* Notes on Getting nginx working with MagLev
+** Overview
+*** Install nginx
+    See the nginx website for instructions on installing nginx.
+
+    1. I had to change the permissions on some dirs in /opt/local/var to
+       get nginx to start (pid etc.):
+       
+         $ sudo chmod 777 /opt/local/var/*/nginx
+
+***     

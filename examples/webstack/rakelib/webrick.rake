@@ -14,9 +14,9 @@ namespace :webrick do
   end
 
   desc "run maglev httpd"
-  task :maglev, :rackup_file do |t, args|
+  task :maglev, :rackup_file, :port do |t, args|
     bail_if_rvm_hosing_environment
-    args.with_defaults :rackup_file => 'config/no_txn_wrapper.ru'
-    sh "$MAGLEV_HOME/bin/rackup #{RACKUP_OPTS} --port 3333 #{args[:rackup_file]}"
+    args.with_defaults :rackup_file => 'config/no_txn_wrapper.ru', :port => 3333
+    sh "$MAGLEV_HOME/bin/rackup #{RACKUP_OPTS} --port #{args[:port]} #{args[:rackup_file]}"
   end
 end

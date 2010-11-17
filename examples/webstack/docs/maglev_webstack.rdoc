@@ -1,0 +1,216 @@
+-*- org -*-
+** Note on C-Extensions
+
+   Many of the currently popular web components used in a Ruby deployment,
+   are based on Ruby C-Extension interfaces to an underlying fast C
+   implementation (Mongrel/Thin's HTTP parser, EventMachine, etc.).
+   Currently, MagLev does not support C-Extensions, so those components are
+   not available for use by MagLev.
+
+   We are currently implementing C-Extensions so this limitation is
+   temporary.  When we finish implementing C-Extensions, we will update
+   this investigation with details on using the newly available components.
+
+** Order of Investigation
+
+   The plan is to first investigate, debug and document how to run MagLev
+   in a variety of Web-Stacks.  Then do a MagLev-MagLev performance
+   comparison of the various options.  We will re-visit this section after
+   C-Extensions are implemented, and augment with some of the C-extension
+   based web stacks.
+
+   The next level of comparison is to compare MagLev against MRI/YARV and
+   see how the various implementations compare.  This will be with a
+   "neutral" web application (one that doesn't play to either MagLev or
+   MRI's strengths/weaknesses).
+
+   Finally, we'd like to look at some web applications (e.g., social
+   graphs) that we expect do play to MagLev's strengths.
+
+** Parts of the Web Stack
+
+   The parts of the Web Stack we consider are HTTP server, and the
+   connection protocol between the HTTP server and the MagLev VM running
+   Ruby.  We assume that all of the Web App frameworks of interest
+   integrate with Rack, so we will limit our connection protocol survey to
+   Rack adapters.
+
+   + Front end load balancers etc.
+
+   + HTTP servers (handle static files, and routing to WebApps)
+   + Protocol to Web App (CGI, FastCGI, SCGI, HTTP, etc.)
+
+   + Rack (handles other end of protocol)
+   + Web App and Framework
+
+*** Options
+
+    Each subsection describes a particular HTTP to MagLev connection
+    strategy, describes how to configure it and discusses some pros and cons
+    for that strategy.
+
+**** Protocol Options: HTTP <-> WebAppServer
+     + HTTP
+     + SCGI
+     + FastCGI
+     + CGI
+     + LSAPI
+
+**** HTTP Server Options
+     List of HTTP Servers
+     + WEBrick
+     + Apache
+     + nginx
+     + lighttpd
+     + LiteSpeed
+     + Rainbows!
+     + Unicorn
+
+** Protocols
+
+   We first look at protocols that MagLev can support, and then we look at
+   how to configure and hook-in various front-end HTTP servers.  Many of
+   the popular protocols are either implemented
+
+*** HTTP
+**** Description
+
+    Mongrel and Thin (RxINC: others?) use this approach, partly because it
+    is a well known protocol (i.e., *all* HTTP servers already speak it,
+    and most of them can reverse-proxy to the back end App Servers).
+
+    The advantage that Mongrel, and its derivatives, have over WEBrick, is
+    a fast HTTP parser written in C.  The parser is a Ruby C-Extension, so
+    it is integrated into the running Ruby VM.
+
+    Until C
+**** Install and Configuration
+**** Discussion
+*** SCGI
+**** Description
+     SCGI is an alternative to FastCGI or CGI.  See
+     http://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface
+
+     The +scgi+ gem is a pure ruby implementation of an SCGI Rack Handler,
+     and works with MagLev.
+
+***** Install and Configuration
+
+      1. Install the +scgi+ gem (one time):
+           $ maglev-gem install scgi
+
+      2. You'll need to configure your HTTP server to connect to the MagLev VM(s)
+         running SCGI.  Each HTTP server has its own way of configuring.  For an
+         example of a lighttpd configuration file, see
+         <tt>config/lighttpd-scgi-1.conf</tt>.
+
+      3. Start your HTTP server
+           $ rake lighttpd:scgi
+
+      4. Start your MagLev VM(s): you'll need to do this in a different terminal
+         than the one your HTTP server is running in:
+           $ rake scgi:maglev
+
+      5. Connect to the web app: http://localhost:3333/app/login
+
+***** Discussion
+
+      On the plus side, SCGI is easy to setup and is reasonably snappy.
+
+      Some of the down-sides of SCGI:
+      + The SCGI gem does not support Unix domain sockets.
+      + <tt>TIME_WAIT</tt> problem: the SCGI protocol indicates the end of
+        a response by closing the connection (<tt>Rack::Handler::SCGI</tt>
+        closes the connection from the HTTP Server).  The connection is
+        TCP, so this can leave a lot of sockets in <tt>TIME_WAIT</tt>, and
+        you may run out of sockets for a while if you have a lot of
+        requests.
+      + Concurrent Connection limits: The SCGI gem creates a +TCPServer+
+        socket on a particular port (ports 300-3004, in the example config
+        files).  The HTTP server connects to that port when it has an HTTP
+        request for Ruby to handle.  The default configuration for the
+        listen backlog on the +TCPServer+ socket is rather low, and the
+        system does not degrade nicely if that limit is exceeded.
+
+        TBD: Need to figure out how to increase the limit (basically, need
+        to call Socket#listen(backlog) to increase it, but currently a bug
+        ([[https://magtrac.gemstone.com/ticket/804][Trac 804]]) in MagLev does not allow setting the backlog.
+
+*** TODO FastCGI
+**** Description
+**** Install and Configuration
+**** Discussion
+*** TODO CGI
+**** Description
+**** Install and Configuration
+**** Discussion
+*** TODO LSAPI
+**** Description
+**** Install and Configuration
+**** Discussion
+
+*** X
+**** Not Considered
+***** Mongrel (evented, swiftiplied)
+
+      We did not consider Mongrel, as it is based on a Ruby C-extension to
+      implement the HTTP parser.
+
+      The idea behind Mongrel is to use the standard HTTP protocol between
+      the Ruby process and the front end web server / load balancers /
+      what-have-you.  This makes it easy to plug ruby VMs into many
+      different web serving environments.  To make things fast, Mongrel
+      implements the HTTP parser as a Ruby C-extension, and then calls into
+      the Ruby VM once the request is "cooked".  Mongrel creates a thread
+      per request, so there is the possibility for multi-threaded web
+      processing, depending on whether the web framework grabs the GIL or
+      not.
+
+***** Thin: Mongrel HTTP Parser + EventMachine + Rack
+
+      http://code.macournoyer.com/thin/
+
+      Thin uses the Mongrel front-end HTTP parser, and then uses
+      EventMachine to process the requests.  Both the Mongrel HTTP parser
+      and EventMachine are based on Ruby C-extensions, so we do not consider
+      them.
+
+***** Passenger (mod_rack for Apache/nginx)
+
+      http://www.modrails.com/index.html
+
+      Passenger uses a C-extension.
+
+
+***** LSAPI LiteSpeed Web Server (lsws)
+
+**** WEBrick
+***** Description
+***** Configuration
+***** Pros / Cons
+
+**** Not Considered
+     + EventMachine based solutions were not considered, since MagLev does
+       not support Ruby C-extensions.
+
+** TODO
+
+   1. The transaction wrapper is committing on too many requests:
+      + get /login and other non modifying pages
+      + get /magtag.css, get /favicon.ico  (which should really be served by
+        the front-end HTTP server, and not dealt with by Sinatra).
+
+** Sample Application
+
+   The sample application is a twitter clone.  The next iteration will add
+   tagging.
+
+*** TODO Write a MySQL version of the App
+*** TODO Use a job queue to post tweets etc?
+** Things to test
+
+   1. Compare maglev performance with txn wrapper on static page, /magtag.css,
+      without txn_wrapper to see what the txn wrapper overhead is.
+
+** Notes
+   + ab on Mac does not like "localhost", use "127.0.0.1" instead.

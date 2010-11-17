@@ -15,7 +15,14 @@ class MagTag < Sinatra::Base
     # @param [String] page the page to generate a link for.  Should NOT start with '/'.
     # @return [String] Either +page+, or an href to +page+.
     def nav_link_for(page)
-      env['PATH_INFO'] == page ? page : "<a href=\"#{page}\">#{page}</a>"
+      is_current_page = (page == request.path_info || page == "/#{request.path_info}")
+      is_current_page ? page : "<a href=\"#{url_for(page)}\">#{page}</a>"
+    end
+
+    # If app is mounted from rack, then we need to prepend script name.
+    def url_for(fragment)
+      fragment = "/#{fragment}" unless fragment[0,1] == '/'
+      "#{request.script_name}#{fragment}"
     end
 
     def set_flash(msg)
@@ -34,11 +41,10 @@ class MagTag < Sinatra::Base
   end
 
   before do
-    puts "======= #{request.env['PATH_INFO']}"
     session[:foo] = Time.now
     @logged_in_user = User.find_by_name session[:logged_in_user]
     if request.path_info !~ %r{/magtag\.css|/login|/signup|/debug|/setup|/info} && @logged_in_user.nil?
-      redirect 'login', 303
+      redirect url_for('/login'), 303
     end
   end
 
@@ -49,7 +55,7 @@ class MagTag < Sinatra::Base
     rescue Exception => e
       set_flash e.message
     end
-    redirect 'home'
+    redirect url_for('/home')
   end
 
   get '/setup' do
@@ -103,7 +109,7 @@ EOS
 
   get '/logout' do
     session[:logged_in_user] = nil
-    redirect 'login'
+    redirect url_for('/login')
   end
 
   get '/signup' do # show new user registration form
@@ -122,11 +128,11 @@ EOS
   end
 
   # Shared by login and by successful signup
-  def login(user_name, password, target='home')
+  def login(user_name, password, target='/home')
     user = User.find_by_name user_name
     if user && user.login(password)
       session[:logged_in_user] = user.name
-      redirect target
+      redirect url_for(target)
     else
       set_flash "Incorrect username or password."
       erb :login
