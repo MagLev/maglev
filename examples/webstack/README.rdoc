@@ -41,20 +41,26 @@ I got the following performance on my "laptop class" "server":
   |----------------------+-------|
   | Configuration        | Req/s |
   |----------------------+-------|
+  | 1 WEBrick            |   441 |
+  |----------------------+-------|
+  |----------------------+-------|
   | Lighttpd + 1 SCGI    |   843 |
   | Lighttpd + 4 SCGI    |  1334 |
   |----------------------+-------|
+  | Lighttpd + 1 FastCGI |   792 |
+  | Lighttpd + 4 FastCGI |  1282 |
+  |----------------------+-------|
+  | Lighttpd + 1 WEBrick |   369 |
+  | Lighttpd + 4 WEBrick |   661 |
+  |----------------------+-------|
+  |----------------------+-------|
 
-
-
-
-
-
-  | Lighttpd + 1 FastCGI |  789  |
-  | Lighttpd + 4 FastCGI | 1282  |
-
-
-  
+These performance results shouldn't be taken too seriously.  The real test
+will be to run a web app for many hours or days at continuous high load to
+see how garbage collection, DB transactions, memory leaks (if any) etc. all
+play into things.  Then, we will also have to look for cyclic patterns in
+the output (e.g., perhaps we average X req/sec, but there is a clear cycle
+going from 0 upto 10X and back to 0 and std dev is really large).
 
 == Docs
 

@@ -54,11 +54,17 @@ namespace :lighttpd do
     sh "lighttpd -D -f config/lighttpd-scgi-#{args[:count]}.conf"
   end
 
-  # desc "start lighttpd on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
-  # task :fcgi, :count, :needs => 'log' do |t,args|
-  #   args.with_defaults :count => '1'
-  #   sh "lighttpd -D -f config/lighttpd-fcgi-#{args[:count]}.conf"
-  # end
+  desc "start lighttpd on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+  task :fcgi, :count, :needs => 'log' do |t,args|
+    args.with_defaults :count => '1'
+    sh "lighttpd -D -f config/lighttpd-fcgi-#{args[:count]}.conf"
+  end
+
+  desc "start lighttpd on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+  task :http, :count, :needs => 'log' do |t,args|
+    args.with_defaults :count => '1'
+    sh "lighttpd -D -f config/lighttpd-http-#{args[:count]}.conf"
+  end
 end
 
 
@@ -109,19 +115,18 @@ end
 # protocols
 namespace :maglev do
 
-  # desc "run count MagLev VMs with HTTP (WEBrick) starting on port 3000; default 1 VM.
-  #       Works around a bug found in Lighttpd FastCGI (see lib/fix_lighttpd_fcgi.rb)" 
-  # task :webrick, :count, :needs => :log do |t,args|
-  #   args.with_defaults :count => '1'
-  #   rackup_on_ports("#{RACKUP_OPTS}", "config/config.ru", 'webrick', args[:count].to_i)
-  # end
+  desc "run count MagLev VMs with HTTP (WEBrick) starting on port 3000; default 1 VM."
+  task :webrick, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS}", "config/config.ru", 'webrick', args[:count].to_i)
+  end
 
-#   desc "run count MagLev VMs with FastCGI starting on port 3000; default 1 VM.
-#         Works around a bug found in Lighttpd FastCGI (see lib/fix_lighttpd_fcgi.rb)" 
-#   task :fcgi_lighttp, :count, :needs => :log do |t,args|
-#     args.with_defaults :count => '1'
-#     rackup_on_ports("#{RACKUP_OPTS} --server FastCGI", "config/lighttpd-fcgi.ru", 'fcgi', args[:count].to_i)
-#   end
+  desc "run count MagLev VMs with FastCGI starting on port 3000; default 1 VM.
+        Works around a bug found in Lighttpd FastCGI (see lib/fix_lighttpd_fcgi.rb)" 
+  task :fcgi_lighttpd, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS} --server FastCGI", "config/lighttpd-fcgi.ru", 'fcgi', args[:count].to_i)
+  end
 
   desc "run count MagLev VMs with SCGI starting on port 3000; default 1 VM." 
   task :scgi, :count, :needs => :log do |t,args|
