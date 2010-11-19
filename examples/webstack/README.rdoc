@@ -38,11 +38,23 @@ app:
 
 I got the following performance on my "laptop class" "server":
 
+  |----------------------+-------|
   | Configuration        | Req/s |
-  |----------------------+-------+
-  | Lighttpd + 1 FastCGI | 789   |
-  | Lighttpd + 4 FastCGI | 789   |
+  |----------------------+-------|
+  | Lighttpd + 1 SCGI    |   843 |
+  | Lighttpd + 4 SCGI    |  1334 |
+  |----------------------+-------|
 
+
+
+
+
+
+  | Lighttpd + 1 FastCGI |  789  |
+  | Lighttpd + 4 FastCGI | 1282  |
+
+
+  
 
 == Docs
 
@@ -83,9 +95,9 @@ started on ports 3000 - 3003.  These facts are used in the rake tasks that
 start and kill processes.
 
 Some targets:
-1. rake kill!      To kill an entire experiment (HTTPd and VMs)
-2. rake vm:kill!   To kill just the Ruby VMs on ports 3000-3003
-3. rake http:kill! To kill just the HTTPd on port 3333
+1. rake kill:all     To kill an entire experiment (HTTPd and VMs)
+2. rake kill:vms     To kill just the Ruby VMs on ports 3000-3003
+3. rake kill:httpd   To kill just the HTTPd on port 3333
 
 == Sample WebStacks
 

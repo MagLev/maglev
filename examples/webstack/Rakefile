@@ -1,3 +1,18 @@
+# Rakefile for running many combintations of HTTPd talkgin to back-en
+# MagLev VMs using FastCGI, SCGI or HTTP.
+#
+# The general recipe is to pick an httpd (nginx, lighttpd), pick a
+# connection protocol (HTTP, FastCGI, SCGI) and pick a number of backend
+# servers (1, 4), then issue rake commands.  E.g., to have nginx talk to
+# four MagLev VMs using FastCGI:
+#
+#   $ rake nginx:fcgi[4]    # start nginx with config for 4 fcgi upstream
+#   $ rake maglev:fcgi[4]   # start 4 MagLev VMs with fcgi
+#   $ rake client:ab        # hit the config with 5,000 requests using ab
+#
+# There is a namespace for each supported HTTPd.  The :maglev namespace has
+# tasks to start MagLev using the appropriate protocols.
+
 require 'rake/testtask'
 require 'rake/clean'
 require 'rakelib/utils'
@@ -11,42 +26,145 @@ MAGLEV_HOME = ENV['MAGLEV_HOME']
 MBIN        = MAGLEV_HOME + '/bin'
 RACKUP_OPTS = "-Ilib --env production"
 
-Rake::TestTask.new do |t|
-  t.libs << "lib"
-  t.libs << "test"
-  t.test_files = FileList['test/magtag/test_user.rb',
-                          'test/magtag/test_tweet.rb',
-                          'test/test_magtag_app.rb',]
-  #  t.test_files = FileList['test/test_user.rb']
-  t.ruby_opts << '-rubygems'
-  # t.verbose = true
-end
+# Rake::TestTask.new do |t|
+#   t.libs << "lib"
+#   t.libs << "test"
+#   t.test_files = FileList['test/magtag/test_user.rb',
+#                           'test/magtag/test_tweet.rb',
+#                           'test/test_magtag_app.rb',]
+#   #  t.test_files = FileList['test/test_user.rb']
+#   t.ruby_opts << '-rubygems'
+#   # t.verbose = true
+# end
 
 directory 'log'
 
+######################################################################
+#
+#  Tasks for starting httpds
+#
+######################################################################
+
+# Start the Lighttpd HTTP server on port 3333 configured to listen to 1 or
+# 4 back-end Ruby VMs using various connection protocols.
+namespace :lighttpd do
+  desc "start lighttpd on port 3333; connect to VMs with SCGI on ports 3000-3003 (default 1 VM)."
+  task :scgi, :count, :needs => 'log' do |t, args|
+    args.with_defaults :count => '1'
+    sh "lighttpd -D -f config/lighttpd-scgi-#{args[:count]}.conf"
+  end
+
+  # desc "start lighttpd on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+  # task :fcgi, :count, :needs => 'log' do |t,args|
+  #   args.with_defaults :count => '1'
+  #   sh "lighttpd -D -f config/lighttpd-fcgi-#{args[:count]}.conf"
+  # end
+end
+
+
+
+# namespace :nginx do
+#   directory 'log/nginx'
+
+#   DIR = File.dirname(File.dirname(__FILE__)) + '/'
+
+#   # desc 'start nginx listening for n MagLev servers starting at port 3000.
+#   #       This simply starts nginx with config file "config/nginx-#{n}.conf".'
+#   # task :proxy, :n, :needs => 'log/nginx' do |t, args|
+#   #   args.with_defaults :n => '1'
+#   #   config = "config/nginx-#{args[:n]}.conf"
+#   #   raise "No config file for #{args[:n]}: #{config}" unless File.exist? config
+#   #   sh "nginx -p #{DIR} -c #{config}"
+#   # end
+
+#   desc "start nginx on port 3333; connect to VMs with HTTP on ports 3000-3003 (default 1 VM)."
+#   task :http, :count, :needs => 'log/nginx' do |t,args|
+#     args.with_defaults :count => '1'
+#     sh "nginx -p #{DIR} -c config/nginx-http-#{args[:count]}.conf"
+#   end
+
+#   # desc "start nginx on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+#   # task :http, :count, :needs => 'log/nginx' do |t,args|
+#   #   args.with_defaults :count => '1'
+#   #   sh "nginx -p #{DIR} -c config/nginx-fcgi-#{args[:count]}.conf"
+#   # end
+
+#   # Prefer the standard interface of rake kill:httpd. This is just here to
+#   # document an alternate way of killing nginx
+#   task :kill! do
+#     # Pick one of the config files, all we need is the pid directive, and
+#     # it is the same in all of the nginx config files.
+#     sh "nginx -p #{DIR} -c config/nginx-1.conf -s quit"
+#   end
+# end
+
+
+######################################################################
+#
+#  Tasks for starting Ruby VMs
+#
+######################################################################
+
+# Run MagLev VMs as back-end servers on ports 3000-3003 using various
+# protocols
 namespace :maglev do
-  desc "Run the MagTag Web App"
-  task :magtag do
-    bail_if_rvm_hosing_environment
-    sh "#{MBIN}/rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
+
+  # desc "run count MagLev VMs with HTTP (WEBrick) starting on port 3000; default 1 VM.
+  #       Works around a bug found in Lighttpd FastCGI (see lib/fix_lighttpd_fcgi.rb)" 
+  # task :webrick, :count, :needs => :log do |t,args|
+  #   args.with_defaults :count => '1'
+  #   rackup_on_ports("#{RACKUP_OPTS}", "config/config.ru", 'webrick', args[:count].to_i)
+  # end
+
+#   desc "run count MagLev VMs with FastCGI starting on port 3000; default 1 VM.
+#         Works around a bug found in Lighttpd FastCGI (see lib/fix_lighttpd_fcgi.rb)" 
+#   task :fcgi_lighttp, :count, :needs => :log do |t,args|
+#     args.with_defaults :count => '1'
+#     rackup_on_ports("#{RACKUP_OPTS} --server FastCGI", "config/lighttpd-fcgi.ru", 'fcgi', args[:count].to_i)
+#   end
+
+  desc "run count MagLev VMs with SCGI starting on port 3000; default 1 VM." 
+  task :scgi, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS} --server SCGI", "config/config.ru", 'scgi', args[:count].to_i)
   end
 
-
-  desc "Commit the code for the models to MagLev"
-  task :commit do
-    bail_if_rvm_hosing_environment
-    sh "maglev-ruby -Mcommit lib/magtag/user.rb "
-    sh "maglev-ruby -Mcommit lib/magtag/tweet.rb"
-  end
-
+  # desc "run count MagLev VMs with WEBrick HTTP starting on port 3000; default 1 VM"
+  # task :webrick, :count, :port do |t, args|
+  #   args.with_defaults :count => '1', :port => '3000'
+  #   bail_if_rvm_hosing_environment
+  #   rackup_on_ports("#{RACKUP_OPTS} --port, "config/config.ru", 'webrick',
+  #                   args[:count].to_i, args[:port].to_i)
+  # end
 end
 
-namespace :mri do
-  desc "Run the MagTag Web App"
-  task :magtag do
-    sh "rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
-  end
-end
+######################################################################
+#
+#  Miscellaneous Tasks
+#
+######################################################################
+
+# # Run the Magtag application w/o a front-end HTTPd.  This was primarily
+# # used during development of the webapp.
+# namespace :magtag do
+#   desc "Run the MagTag Web App on port 3333 (this is a standalone development env; no front-end httpd)."
+#   task :maglev do
+#     bail_if_rvm_hosing_environment
+#     sh "#{MBIN}/rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
+#   end
+
+#   desc "Commit the Magtag model code to MagLev"
+#   task :commit do
+#     bail_if_rvm_hosing_environment
+#     sh "maglev-ruby -Mcommit lib/magtag/user.rb "
+#     sh "maglev-ruby -Mcommit lib/magtag/tweet.rb"
+#   end
+
+#   desc "Run the MagTag Web App with MRI"
+#   task :mri do
+#     sh "rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
+#   end
+# end
 
 namespace :kill do
   desc "kill:vms and kill:httpd"
@@ -70,7 +188,10 @@ namespace :kill do
       puts "No pids found on ports #{start} - #{start + count - 1}"
     else
       sh "kill -s #{signal} #{pids}"
-      sh "kill -s CONT #{pids}"
+      sh "kill -s CONT #{pids}" do |ok,stat|
+        # just ignore errors for CONT because the process
+        # may have already exited
+      end
     end
   end
 end
@@ -85,4 +206,13 @@ task :pids do
   end
 end
 
-
+namespace :client do
+  desc "ab for count queries (default 5_000) on http://127.0.0.1:3333/app/magtag.css"
+  task :ab, :count, :file do |t, args|
+    args.with_defaults :count => 5_000, :file => 'log/ab.out'
+    wait_for_TIME_WAIT_to_clear
+    puts "\n\n==== ab with #{args[:count]} queries ===============\n\n"
+    sh "curl http://localhost:3333/app/info | tee #{args[:file]}"
+    sh "ab -n #{args[:count]} -c 10 http://127.0.0.1:3333/app/magtag.css | tee -a #{args[:file]}"
+  end
+end
