@@ -995,3 +995,27 @@ Percentage of the requests served within a certain time (ms)
   98%     34
   99%     36
  100%   1030 (longest request)
+
+
+
+** TODO
+
+   1. The transaction wrapper is committing on too many requests:
+      + get /login and other non modifying pages
+      + get /magtag.css, get /favicon.ico  (which should really be served by
+        the front-end HTTP server, and not dealt with by Sinatra).
+
+** Sample Application
+
+   The sample application is a twitter clone.  The next iteration will add
+   tagging.
+
+*** TODO Write a MySQL version of the App
+*** TODO Use a job queue to post tweets etc?
+** Things to test
+
+   1. Compare maglev performance with txn wrapper on static page, /magtag.css,
+      without txn_wrapper to see what the txn wrapper overhead is.
+
+** Notes
+   + ab on Mac does not like "localhost", use "127.0.0.1" instead.
