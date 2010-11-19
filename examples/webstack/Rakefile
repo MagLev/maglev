@@ -1,5 +1,6 @@
 require 'rake/testtask'
 require 'rake/clean'
+require 'rakelib/utils'
 
 CLEAN.include('log/scgi-*.out', 'log/rack-*.pid')
 CLOBBER.include('log', 'scgi_temp')
@@ -47,46 +48,41 @@ namespace :mri do
   end
 end
 
-desc "Call scgi:kill! and lighttpd:kill!"
-task :kill! => ['scgi:kill!', 'lighttpd:kill!']
+namespace :kill do
+  desc "kill:vms and kill:httpd"
+  task :all => ['kill:vms', 'kill:httpd']
 
-
-# RVM sets GEM_PATH, and I don't run maglev under RVM, so I detect and bail
-# if I accidentally run in an rvm-ified shell.
-def bail_if_rvm_hosing_environment
-  if ENV['rvm_path']
-    puts "ERROR: Running maglev with RVM environment"
-    exit 1
+  desc "kill Ruby VMs listening on ports 3000-3003"
+  task :vms, :signal do |t, args|
+    args.with_defaults :signal => 'TERM'
+    kill_ports 3000, 4, args[:signal]
   end
-end
 
-
-# Waits until the number of sockets in TIME_WAIT is below threshold
-def wait_for_TIME_WAIT_to_clear(threshold=20)
-  while true
-    count = `netstat -a inet -n|grep TIME_WAIT|wc -l`.to_i
-    return if count < threshold
-    puts "TIME_WAIT count: #{count}"
-    sleep 1
+  desc "kill httpd on port 3333"
+  task :httpd, :signal do |t, args|
+    args.with_defaults :signal => 'TERM'
+    kill_ports 3333, 1, args[:signal]
   end
-end
 
-# Kill the pid contained in pid_file using signal (default 'TERM'), and
-# remove pid_file if success.
-def kill_from_pidfile(pid_file, signal='TERM')
-  puts "====== kill_from_pidfile(#{pid_file}, #{signal})"
-  begin
-    raise "Couldn't read file: '#{pid_file}'" unless pid = File.readlines(pid_file)
-    puts "kill_from_pidfile: kill -s #{signal} #{pid}"
-    sh "kill -s #{signal} #{pid}"
-    sh "kill -s #{CONT} #{pid}"  do |ok,res|
-      # send sig continue in case it is asleep
-      # ignore errors
+  def kill_ports(start=3000, count=4, signal='TERM')
+    pids = pids_on_ports(start, count).join(' ')
+    if pids.empty?
+      puts "No pids found on ports #{start} - #{start + count - 1}"
+    else
+      sh "kill -s #{signal} #{pids}"
+      sh "kill -s CONT #{pids}"
     end
-    rm_f pid_file
-    return true
-  rescue
-    puts "Failed on file '#{pid_file}'  pid '#{pid}' (pid_file not removed)"
   end
-  false
 end
+
+# Tasks to manage the MagLev/MRI web-app VMs forked by fcgi, scgi, etc.
+desc "List pids of Ruby server VMs connected on sockets 3000-3003"
+task :pids do
+  sh "lsof -P -i tcp:3000-3004" do |ok, res|
+    unless res.exitstatus == 1  # 1 means no pids found, i.e., OK!
+      puts "Error: ok #{ok}  res #{res}  res.exitstatus #{res.exitstatus}"
+    end
+  end
+end
+
+

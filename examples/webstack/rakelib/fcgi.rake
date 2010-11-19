@@ -6,11 +6,9 @@
 # 3. RVM has 1.8.7 and 1.9.2 versions of MRI
 
 namespace :fcgi do
-  FCGI_PORT = 3000
-  RACKUP_FCGI_OPTS = "#{RACKUP_OPTS} --server FastCGI"
-  desc "1 maglev VM + fcgi with lighttpd bug workaround"
-  task :maglev => :log do
-    opts = "#{RACKUP_FCGI_OPTS} --pid log/fcgi-#{FCGI_PORT}.pid --port #{FCGI_PORT}"
-    sh "#{MAGLEV_HOME}/bin/rackup #{opts} config/lighttpd-fcgi.ru"
+  desc "Start MagLev VM(s) + fcgi with lighttpd bug workaround"
+  task :lighttpdbug, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS} --server FastCGI", "config/lighttpd-fcgi.ru", 'fcgi', args[:count].to_i)
   end
 end

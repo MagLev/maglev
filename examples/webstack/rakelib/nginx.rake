@@ -19,12 +19,6 @@ namespace :nginx do
     sh "nginx -p #{DIR} -c #{config}"
   end
 
-  # desc "start nginx with a config file (default config/nginx-scgi-1.conf)"
-  # task :scgiconfig, :config, :needs => 'log' do |t, args|
-  #   args.with_defaults :config => 'config/nginx-scgi-1.conf'
-  #   sh "nginx -D -f #{args[:config]}"
-  # end
-
   desc "Kill any nginx instances running"
   task :kill! do
     # Pick one of the config files, all we need is the pid directive, and

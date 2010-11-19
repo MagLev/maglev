@@ -29,23 +29,4 @@ namespace :scgi do
     sh "source $HOME/.rvm/scripts/rvm ; rvm #{args[:version]} && rackup #{RACKUP_SCGI_OPTS} #{args[:rackup_file]}"
   end
 
-  desc "kill SCGI apps named in log/scgi-*.pid"
-  task :kill!, :signal do |t, args|
-    args.with_defaults :signal => 'TERM'
-    files = Dir.glob('log/scgi-*.pid')
-    if files.size > 0
-      files.each { |f| kill_from_pidfile f }
-    else
-      puts "No pid files in log/"
-    end
-  end
-
-  desc "List pids of SCGI servers connected on sockets"
-  task :pids do
-    sh "lsof -i tcp:3000-3004" do |ok, res|
-      unless res.exitstatus == 1  # 1 means no pids found, i.e., OK!
-        puts "Error: ok #{ok}  res #{res}  res.exitstatus #{res.exitstatus}"
-      end
-    end
-  end
 end
