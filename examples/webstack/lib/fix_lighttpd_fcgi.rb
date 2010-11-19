@@ -12,14 +12,8 @@ class FixLighttpdFastCGI
   end
 
   def call(env)
-    puts "---- BEFORE: PATH_INFO:   #{env['PATH_INFO']} "
-    puts "---- BEFORE: SCRIPT_NAME: #{env['SCRIPT_NAME']} "
-
     env['PATH_INFO'] = env['SCRIPT_NAME'] + env['PATH_INFO']
     env['SCRIPT_NAME'] = ''
-
-    puts "---- AFTER: PATH_INFO:   #{env['PATH_INFO']} "
-    puts "---- AFTER: SCRIPT_NAME: #{env['SCRIPT_NAME']} "
     @app.call env
   end
 end

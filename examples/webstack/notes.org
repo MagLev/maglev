@@ -1,4 +1,5 @@
 * Notes
+  GitHub on Unicorn:  https://github.com/blog/517-unicorn
 ** Features to implement
    + Should we add an ontology?  Give meaning to the tags (rdf)?
    + Update model to use ActiveModel validation checks
@@ -38,6 +39,22 @@
     + Write wrapper methods in maglev module
     + Add the new manual_txn_wrapper class in site_ruby
     + Add a command line parameter to control initial txn mode.
+** Order of Investigation
+
+   The plan is to first investigate, debug and document how to run MagLev
+   in a variety of Web-Stacks.  Then do a MagLev-MagLev performance
+   comparison of the various options.  We will re-visit this section after
+   C-Extensions are implemented, and augment with some of the C-extension
+   based web stacks.
+
+   The next level of comparison is to compare MagLev against MRI/YARV and
+   see how the various implementations compare.  This will be with a
+   "neutral" web application (one that doesn't play to either MagLev or
+   MRI's strengths/weaknesses).
+
+   Finally, we'd like to look at some web applications (e.g., social
+   graphs) that we expect do play to MagLev's strengths.
+
 ** ActiveRecord
 
    Many of the efficiencies that the MySQL paper lists, won't be available

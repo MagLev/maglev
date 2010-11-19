@@ -11,66 +11,61 @@
    temporary.  When we finish implementing C-Extensions, we will update
    this investigation with details on using the newly available components.
 
-** Order of Investigation
+** Summary
 
-   The plan is to first investigate, debug and document how to run MagLev
-   in a variety of Web-Stacks.  Then do a MagLev-MagLev performance
-   comparison of the various options.  We will re-visit this section after
-   C-Extensions are implemented, and augment with some of the C-extension
-   based web stacks.
-
-   The next level of comparison is to compare MagLev against MRI/YARV and
-   see how the various implementations compare.  This will be with a
-   "neutral" web application (one that doesn't play to either MagLev or
-   MRI's strengths/weaknesses).
-
-   Finally, we'd like to look at some web applications (e.g., social
-   graphs) that we expect do play to MagLev's strengths.
+   | HTTP Server | HTTP  | FastCGI | SCGI  |
+   |-------------+-------+---------+-------|
+   | nginx       | Works |         |       |
+   | lighttpd    |       |         | works |
+   | WEBrick     | Works | N/A     | N/A   |
 
 ** Parts of the Web Stack
 
-   The parts of the Web Stack we consider are HTTP server, and the
-   connection protocol between the HTTP server and the MagLev VM running
-   Ruby.  We assume that all of the Web App frameworks of interest
-   integrate with Rack, so we will limit our connection protocol survey to
-   Rack adapters.
-
-   + Front end load balancers etc.
+   This investigation considers the HTTP server, and the connection
+   protocol between the HTTP server and the MagLev VM(s) running Ruby.  We
+   assume that all of the Web App frameworks of interest integrate with
+   Rack, so we limit our survey to Rack adapters.  The web stack looks
+   like:
 
    + HTTP servers (handle static files, and routing to WebApps)
+   + [optional load balancer (haproxy)]
    + Protocol to Web App (CGI, FastCGI, SCGI, HTTP, etc.)
 
    + Rack (handles other end of protocol)
-   + Web App and Framework
+   + MagLev Web App and Framework
 
-*** Options
+** HTTP Server Options
 
-    Each subsection describes a particular HTTP to MagLev connection
-    strategy, describes how to configure it and discusses some pros and cons
-    for that strategy.
+   List of HTTP Servers
+   + WEBrick  (works)
+   + nginx    (works with FastCGI and HTTP)
+   + lighttpd
+   + LiteSpeed
 
-**** Protocol Options: HTTP <-> WebAppServer
-     + HTTP
-     + SCGI
-     + FastCGI
-     + CGI
-     + LSAPI
 
-**** HTTP Server Options
-     List of HTTP Servers
-     + WEBrick
-     + Apache
-     + nginx
-     + lighttpd
-     + LiteSpeed
-     + Rainbows!
-     + Unicorn
+   We have not yet investigated the following HTTP options, as
 
-** Protocols
+   + Rainbows! (based on Unicorn)
+   + Unicorn
+   + Apache
+
+** Connection Protocols
 
    We first look at protocols that MagLev can support, and then we look at
    how to configure and hook-in various front-end HTTP servers.  Many of
    the popular protocols are either implemented
+
+     There are several protocols used to talk between the HTTP server and
+     the back-end WebApplication:
+
+     + HTTP
+     + SCGI
+     + FastCGI
+     + CGI  (not tested)
+     + LSAPI (not tested)
+
+     We have solutions for HTTP, SCGI and FastCGI.  CGI should also work,
+     but wasn't tested.
 
 *** HTTP
 **** Description
@@ -102,16 +97,22 @@
       2. You'll need to configure your HTTP server to connect to the MagLev VM(s)
          running SCGI.  Each HTTP server has its own way of configuring.  For an
          example of a lighttpd configuration file, see
-         <tt>config/lighttpd-scgi-1.conf</tt>.
+         <tt>config/lighttpd-scgi-4.conf</tt>.
 
-      3. Start your HTTP server
-           $ rake lighttpd:scgi
+      3. Start your HTTP server using the config to listen to four servers:
 
-      4. Start your MagLev VM(s): you'll need to do this in a different terminal
+           $ rake lighttpd:scgi[4]
+
+      4. Start your MagLev VMs: you'll need to do this in a different terminal
          than the one your HTTP server is running in:
-           $ rake scgi:maglev
+
+           $ rake scgi:maglev[4]
 
       5. Connect to the web app: http://localhost:3333/app/login
+
+      6. Run apache bench against it:
+
+           $ rake client:ab
 
 ***** Discussion
 

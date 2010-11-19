@@ -1,6 +1,13 @@
 = Overview
 
-This directory contains a sample web application and configuration files
+
+    XXXXXXXXX overall: scgi has the TCP TIME_WAIT issue, so avoid if possible
+
+This directory contains examples of running WebApplications with MagLev
+using various configurations of HTTPd and protocols to talk between MagLev
+and the front-end HTTP server.
+
+sample web application and configuration files
 that implement a standard WEB stack for MagLev.
 
 The sample application is used to measure performance of various aspects of
@@ -25,6 +32,17 @@ app:
   $ rake webrick:maglev
 
   Then hit http://localhost:3333/app/
+
+
+== Performance Overview
+
+I got the following performance on my "laptop class" "server":
+
+  | Configuration        | Req/s |
+  |----------------------+-------+
+  | Lighttpd + 1 FastCGI | 789   |
+  | Lighttpd + 4 FastCGI | 789   |
+
 
 == Docs
 
@@ -58,6 +76,16 @@ Then issue the following rake tasks:
 
 1. Start httpd using protocol and number:  <tt>rake lighttpd:scgi[4]</tt>
 2. Start number of Ruby VMs on protocol:   <tt>rake scgi:maglev[4]</tt>
+
+
+By default, all HTTP servers are started on port 3333, and all Ruby VMs are
+started on ports 3000 - 3003.  These facts are used in the rake tasks that
+start and kill processes.
+
+Some targets:
+1. rake kill!      To kill an entire experiment (HTTPd and VMs)
+2. rake vm:kill!   To kill just the Ruby VMs on ports 3000-3003
+3. rake http:kill! To kill just the HTTPd on port 3333
 
 == Sample WebStacks
 
