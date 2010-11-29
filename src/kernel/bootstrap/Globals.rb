@@ -65,8 +65,8 @@ RUBY.global('CZstream', 'CZstream')
 #
 RUBY.global('Exception',    'Exception')
   RUBY.global('SystemExit',     'RubySystemExit')
-  RUBY.global('SystemStackError',    'StackOverflow')
-  RUBY.global('NoMemoryError',  'OutOfMemory')
+  RUBY.global('SystemStackError',    'AlmostOutOfStack')
+  RUBY.global('NoMemoryError',  'AlmostOutOfMemory')
   RUBY.global('ScriptError',      'RubyScriptError')
     RUBY.global('LoadError',        'RubyLoadError')
     RUBY.global('NotImplementedError',  'RubyNotImplementedError')
@@ -83,14 +83,14 @@ RUBY.global('Exception',    'Exception')
       RUBY.global('IndexError',     'OffsetError')
         RUBY.global('StopIteration',     'RubyStopIterationError')
       RUBY.global('LocalJumpError',     'CannotReturn')
-      RUBY.global('RangeError',     'RangeError')
+      RUBY.global('RangeError',     'OutOfRange')
         RUBY.global('FloatDomainError', 'FloatingPointError')
       RUBY.global('RegexpError',    'RegexpError')
-      RUBY.global('RuntimeError',   'RuntimeError')
+      RUBY.global('RuntimeError',   'RubyRuntimeError')
       RUBY.global('SecurityError',  'SecurityError')
       RUBY.global('SystemCallError',    'SystemCallError')
       RUBY.global('ThreadError',    'ThreadError')
-      RUBY.global('TypeError',  'TypeError')
+      RUBY.global('TypeError',  'ArgumentTypeError')
 
     RUBY.global('NameError',    'NameError')
       RUBY.global('NoMethodError',  'MessageNotUnderstood')
@@ -147,12 +147,12 @@ RUBY_ENGINE = 'maglev'
 RUBY_PLATFORM = 'Unspecified.platform'
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2010-11-15'
+RUBY_RELEASE_DATE = '2010-11-19'
 RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
 RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '24703-1230'
+VERSION = '24737-1230'
 
 TRUE  = true
 FALSE = false

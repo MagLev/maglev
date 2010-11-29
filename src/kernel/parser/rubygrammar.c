@@ -184,7 +184,7 @@ static int yyerror(const char *msg, rb_parse_state *ps)
   if (ps->firstErrorLine == -1) {
     ps->firstErrorLine = ps->lineNumber;
   }
-  printf("at line %d, %s\n", ps->lineNumber, msg);
+  printf("%s:%d, %s\n", ps->sourceFileName, ps->lineNumber, msg);
   ps->errorCount += 1;
 
   return 1;
@@ -6170,7 +6170,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     } else {
       errStr = "syntax error"; 
     }
-    snprintf(buf, sizeof(buf), "at line %d, %s", lineNum, errStr);
+    snprintf(buf, sizeof(buf), "%s:%d: %s", ps->sourceFileName, lineNum, errStr);
     om::AppendToString(omPtr, resH, buf); 
     if (ps->atEof) {
       StartPosition *strt = ps->start_lines.back();
@@ -8829,7 +8829,7 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
       ps->firstErrorReason[0] == '\0') {
     ps->firstErrorLine = ps->lineNumber;
     const short *unifiedTable = yyUnifiedTable;
-    int expectedToks[128];  // chars or lexer token values
+    int expectedToks[YYMAXTOKEN + 1];  // chars or lexer token values
     int expCount = 0;
     int shiftB = unifiedTable[yystate + sindexBASE];
     int reduceB = unifiedTable[yystate + rindexBASE];
@@ -8854,10 +8854,10 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
     }
     char tokName[64];
     nameForToken(yychar, tokName, sizeof(tokName));
-    if (expCount >= 1 && expectedToks[0] == 0) { // (un)expected EOF
+    if (expCount >= 1 && expectedToks[0] == 0) { // expected EOF
       expCount = 1; // ignore the other expected tokens
       snprintf(ps->firstErrorReason, sizeof(ps->firstErrorReason),
-          "syntax error, found %s expected EOF ", tokName);
+          "syntax error, unexpected %s expecting EOF ", tokName);
     } else if (expCount > 7) {
       expCount = 0; // too many to print
       snprintf(ps->firstErrorReason, sizeof(ps->firstErrorReason),
