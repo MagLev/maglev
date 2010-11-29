@@ -4,6 +4,13 @@
 
 == Unreleased Changes
 
+* Fix problems in getting source string for a block
+* Fix Trac 814
+
+== Changes for 24610 2010-11-04
+* Fixed VSD startup problem
+* several other fixes and enhancements to underlying GemStone 3.0  system
+
 == Changes for 24566 2010-11-01
 
 * Fix Trac 806, 808, 811
