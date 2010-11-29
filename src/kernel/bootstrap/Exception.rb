@@ -24,12 +24,12 @@ class Exception
     primitive_nobridge '__basic_dup', '_basicCopy'
 
     def __message
-      m = @_st_messageText
+      m = @_st_details
       if m._equal?(nil)
         m = __description  # generate Smalltalk message
       end
       if m.frozen? 
-        # The messages encoded by Smalltalk exceptions are frozen,
+        # messages encoded by Smalltalk may be frozen,
         # but ruby allows modifications
         unless m._isSymbol
           m = m.dup 
@@ -273,16 +273,11 @@ class SystemCallError
   end
 
   def errno=(errnum)
-    @_st_gsarguments = [ errnum ]
+    @_st_errno = errnum
   end
 
   def errno
-    gsa = @_st_gsarguments
-    if gsa._equal?(nil)
-      nil
-    else
-      gsa[0]
-    end
+    @_st_errno
   end
 end
 class ThreadError
@@ -322,27 +317,26 @@ class NoMethodError  # a subclass of NameError
    primitive_nobridge '__st_initialize', 'initialize'
 
    def __init(selector, args_arr, envid)
-     gsa = @_st_gsarguments
      if selector._isSymbol
-       gsa[1] = selector
+       @_st_selector = selector
      end
      if args_arr._isArray
-       gsa[2] = args_arr
+       @_st_args = args_arr
      end
      if envid._isFixnum
-       gsa[3] = envid
+       @_st_envId = envid
      end
      self
    end
 
    def selector
-     @_st_gsarguments[1]
+     @_st_selector
    end
    def envid
-     @_st_gsarguments[3]
+     @_st_envId
    end
    def args
-     a = @_st_gsarguments[2]
+     a = @_st_args
      if a._equal?(nil)
        a = []
      end

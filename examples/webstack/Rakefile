@@ -1,0 +1,198 @@
+# Rakefile for running many combintations of HTTPd talkgin to back-en
+# MagLev VMs using FastCGI, SCGI or HTTP.
+#
+# The general recipe is to pick an httpd (nginx, lighttpd), pick a
+# connection protocol (HTTP, FastCGI, SCGI) and pick a number of backend
+# servers (1, 4), then issue rake commands.  E.g., to have nginx talk to
+# four MagLev VMs using HTTP:
+#
+#   $ rake nginx:http[4]       # start nginx with config for 4 HTTP upstream
+#   $ rake maglev:webrick[4]   # start 4 MagLev VMs with fcgi
+#   $ rake client:ab           # hit the config with 5,000 requests using ab
+#
+# There is a namespace for each supported HTTPd.  The :maglev namespace has
+# tasks to start MagLev using the appropriate protocols.
+
+require 'rake/testtask'
+require 'rake/clean'
+require './rakelib/utils'
+
+CLEAN.include('log/scgi-*.out', 'log/rack-*.pid')
+CLOBBER.include('log', 'scgi_temp')
+
+task :default => :'maglev:magtag'
+
+MAGLEV_HOME = ENV['MAGLEV_HOME']
+MBIN        = MAGLEV_HOME + '/bin'
+RACKUP_OPTS = "-Ilib --env production"
+
+Rake::TestTask.new do |t|
+  t.libs << "lib"
+  t.libs << "test"
+  t.test_files = FileList['test/magtag/test_user.rb',
+                          'test/magtag/test_tweet.rb',
+                          'test/test_magtag_app.rb',]
+  #  t.test_files = FileList['test/test_user.rb']
+  t.ruby_opts << '-rubygems'
+  # t.verbose = true
+end
+
+directory 'log'
+
+######################################################################
+#
+#  Tasks for starting httpds
+#
+######################################################################
+
+# Start the Lighttpd HTTP server on port 3333 configured to listen to 1 or
+# 4 back-end Ruby VMs using various connection protocols.
+namespace :lighttpd do
+  desc "start lighttpd on port 3333; connect to VMs with SCGI on ports 3000-3003 (default 1 VM)."
+  task :scgi, :count, :needs => 'log' do |t, args|
+    args.with_defaults :count => '1'
+    sh "lighttpd -D -f config/lighttpd-scgi-#{args[:count]}.conf"
+  end
+
+  desc "start lighttpd on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+  task :fcgi, :count, :needs => 'log' do |t,args|
+    args.with_defaults :count => '1'
+    sh "lighttpd -D -f config/lighttpd-fcgi-#{args[:count]}.conf"
+  end
+
+  desc "start lighttpd on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+  task :http, :count, :needs => 'log' do |t,args|
+    args.with_defaults :count => '1'
+    sh "lighttpd -D -f config/lighttpd-http-#{args[:count]}.conf"
+  end
+end
+
+# TODO: Get nginx talking HTTP over unix domain sockets
+namespace :nginx do
+  directory 'log/nginx'
+  DIR = File.dirname(__FILE__) + '/'
+  desc "start nginx on port 3333; connect to VMs with HTTP on ports 3000-3003 (default 1 VM)."
+  task :http, :count, :needs => 'log/nginx' do |t,args|
+    args.with_defaults :count => '1'
+    sh "nginx -p #{DIR} -c config/nginx-http-#{args[:count]}.conf"
+  end
+
+  # Didn't get config of FastCGI on nginx working (PATH_INFO, SCRIPT_NAME, etc.)
+  # But long term, it is unlikely FastCGI will be correct option, so bailing on it.
+  # desc "start nginx on port 3333; connect to VMs with FastCGI on ports 3000-3003 (default 1 VM)."
+  # task :fcgi, :count, :needs => 'log/nginx' do |t,args|
+  #   args.with_defaults :count => '1'
+  #   sh "nginx -p #{DIR} -c config/nginx-fcgi-#{args[:count]}.conf"
+  # end
+end
+
+
+######################################################################
+#
+#  Tasks for starting Ruby VMs
+#
+######################################################################
+
+# Run MagLev VMs as back-end servers on ports 3000-3003 using various
+# protocols
+namespace :maglev do
+  desc "run count MagLev VMs with HTTP (WEBrick) starting on port 3000; default 1 VM."
+  task :webrick, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS}", "config/config.ru", 'webrick', args[:count].to_i)
+  end
+
+  desc "run count MagLev VMs with FastCGI starting on port 3000; default 1 VM.
+        Works around a bug found in Lighttpd FastCGI (see lib/fix_lighttpd_fcgi.rb)"
+  task :fcgi_lighttpd, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS} --server FastCGI", "config/lighttpd-fcgi.ru", 'fcgi', args[:count].to_i)
+  end
+
+  desc "run count MagLev VMs with SCGI starting on port 3000; default 1 VM."
+  task :scgi, :count, :needs => :log do |t,args|
+    args.with_defaults :count => '1'
+    rackup_on_ports("#{RACKUP_OPTS} --server SCGI", "config/config.ru", 'scgi', args[:count].to_i)
+  end
+end
+
+######################################################################
+#
+#  Miscellaneous Tasks
+#
+######################################################################
+
+namespace :kill do
+  desc "kill:vms and kill:httpd"
+  task :all => ['kill:vms', 'kill:httpd']
+
+  desc "kill Ruby VMs listening on ports 3000-3003"
+  task :vms, :signal do |t, args|
+    args.with_defaults :signal => 'TERM'
+    kill_ports 3000, 4, args[:signal]
+  end
+
+  desc "kill httpd on port 3333"
+  task :httpd, :signal do |t, args|
+    args.with_defaults :signal => 'TERM'
+    kill_ports 3333, 1, args[:signal]
+  end
+
+  def kill_ports(start=3000, count=4, signal='TERM')
+    pids = pids_on_ports(start, count).join(' ')
+    if pids.empty?
+      puts "No pids found on ports #{start} - #{start + count - 1}"
+    else
+      sh "kill -s #{signal} #{pids}"
+      sh "kill -s CONT #{pids}" do |ok,stat|
+        # just ignore errors for CONT because the process
+        # may have already exited
+      end
+    end
+  end
+end
+
+# Tasks to manage the MagLev/MRI web-app VMs forked by fcgi, scgi, etc.
+desc "List pids of Ruby server VMs connected on sockets 3000-3003"
+task :pids do
+  sh "lsof -P -i tcp:3000-3004" do |ok, res|
+    unless res.exitstatus == 1  # 1 means no pids found, i.e., OK!
+      puts "Error: ok #{ok}  res #{res}  res.exitstatus #{res.exitstatus}"
+    end
+  end
+end
+
+namespace :client do
+  desc "ab for count queries (default 5_000) on http://127.0.0.1:3333/app/magtag.css"
+  task :ab, :count, :file, :needs => :log do |t, args|
+    args.with_defaults :count => 5_000, :file => 'log/ab.out'
+    wait_for_TIME_WAIT_to_clear
+    puts "\n\n==== ab with #{args[:count]} queries ===============\n\n"
+    sh "curl http://localhost:3333/app/info | tee #{args[:file]}"
+    sh "ab -n #{args[:count]} -c 10 http://127.0.0.1:3333/app/magtag.css | tee -a #{args[:file]}"
+  end
+end
+
+# Run the Magtag application w/o a front-end HTTPd.  This was primarily
+# used during development of the webapp.
+namespace :magtag do
+  desc "Start MagLev + WEBrick running the MagTag Web App on port 3333"
+  task :maglev do
+    bail_if_rvm_hosing_environment
+    sh "#{MBIN}/rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
+  end
+
+  desc "Commit the Magtag model code to MagLev"
+  task :commit do
+    bail_if_rvm_hosing_environment
+    sh "maglev-ruby -Mcommit lib/magtag/user.rb "
+    sh "maglev-ruby -Mcommit lib/magtag/tweet.rb"
+  end
+
+  desc "Start MRI + WEBrick running the MagTag Web App on port 3333"
+  task :mri do
+    sh "rackup #{RACKUP_OPTS} --port 3333 config/no_txn_wrapper.ru"
+  end
+end
+
+

@@ -1,0 +1,25 @@
+<div id="debug">
+
+  <h2>Runtime info</h2>
+  <p>defined? Maglev <%= defined? Maglev %></p>
+
+
+  <h2>Session info</h2>
+  <p><%= request.env['rack.session'].inspect %></p>
+
+
+  <h2>PATH info</h2>
+  <table>
+  <% request.env.each do |k,v| %>
+    <tr><td><%= k %></td><td><%= v.inspect %></td></tr>
+  <% end %>
+  </table>
+
+
+  <h2>All Users</h2>
+  <ul>
+  <% User::ALL_USERS.each do |user| %>
+    <li><%= user.name %></li>
+  <% end %>
+  </ul>
+</div>

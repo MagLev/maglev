@@ -1,0 +1,47 @@
+<div id="main">
+  <h1>Hi <%= @logged_in_user.name %></h1>
+  <div id="stats">
+    <h2> Stats </h2>
+    <ul>
+      <li>tweets <%= @logged_in_user.num_tweets %></li>
+      <li>followers <%= @logged_in_user.num_followers %></li>
+      <li>following <%= @logged_in_user.num_following %></li>
+    </ul>
+  </div>
+  <div id="tweet">
+    <h2>Tweet</h2>
+    <form action="tweet" method="post">
+      <fieldset>
+        <legend>Tell people what you're doing</legend>
+          <div>
+            <label for="tweet">tweet:</label>
+            <input name="tweet" type="text" id="tweet" placeholder="tweet away..." size="140" autofocus/>
+          </div>
+          <div>
+            <input type="submit" id="submit" value="submit" />
+          </div>
+        </fieldset>
+    </form>
+
+    <h2>Recent Tweets</h2>
+    <ul>
+    <% @logged_in_user.tweets.each_with_index do |t,i| %>
+      <li><%= t.text %></li>
+    <%  break if i == 5
+       end %>
+    </ul>
+  </div>
+  <div id="timeline">
+    <h2>Timeline</h2>
+    <% if @logged_in_user.timeline.size == 0 %>
+      No items in timeline!
+    <% else %>
+      <p>Timeline has <%= @logged_in_user.timeline.size %> entries.</p>
+      <ul>
+      <% @logged_in_user.timeline.each do |tweet| %>
+        <li><%= tweet.text %> [posted <%= tweet.twitterize_date %>]</li>
+      <% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>

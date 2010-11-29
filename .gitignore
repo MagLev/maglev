@@ -29,3 +29,4 @@ examples/persistence/gstore/pstore.db
 doc
 out
 src/TAGS
+src/test/test_data/Trac781.gz
