@@ -4,8 +4,12 @@
 
 == Unreleased Changes
 
+* Added examples/webstack which has code, config and documentation on running MagLev web apps
+  with various HTTP servers (nginx, lighttpd, etc.) and using several protocols to talk to the
+   webserver (FastCGI, SCGI, HTTP)
 * Fix problems in getting source string for a block
 * Fix Trac 814
+* Implemented new exception hierarchy in underlying GemStone 3.0  system
 
 == Changes for 24610 2010-11-04
 * Fixed VSD startup problem
