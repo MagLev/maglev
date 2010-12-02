@@ -44,6 +44,31 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   primitive 'connected?', 'isConnected'
 
+  primitive '__connect', 'rubyConnect:'  
+
+  def connect(sockaddr_string)
+    # sockaddr_string is a String from sockaddr_in .
+    # return 0 if successful, else raise an Error
+    # The Thread scheduler will wait for connect to complete,
+    # allowing other green Threads to run.
+    status = self.__connect(sockaddr_string)
+    if status._isFixnum
+      Errno.raise_errno(status)
+    end
+    0
+  end
+
+  def connect_nonblock(sockaddr_string)
+    # sockaddr_string is a String from sockaddr_in .
+    # return 0 if successful, else raise an Error
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    status = self.__connect(sockaddr_string)
+    if status._isFixnum
+      Errno.raise_errno(status)
+    end
+    0
+  end
+
   class_primitive 'do_not_reverse_lookup=', 'setNoReverseLookup:'
 
   def eof?
@@ -102,6 +127,18 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   class_primitive 'gethostbyname', 'gethostbyname:'
   class_primitive '__getservbyname', 'getservbyname:protocol:'
   class_primitive 'gethostname', 'getLocalHostName'
+
+  class_primitive '__gethostbyaddr', '_gethostbyaddr:'  # one arg, a String
+
+  def self.gethostbyaddr(addr)
+    # raises TypeError if addr is not a String .
+    # returns an Array or raises an Errno .
+    arr = __gethostbyaddr(addr_string)
+    if arr._isFixnum
+      Errno.raise_errno(arr)
+    end
+    arr
+  end
 
   def self.getservbyname(service, proto='tcp')
     # returns a port number as a Fixnum , or raises an error
@@ -164,6 +201,62 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     return res
   end
 
+  # returns an Array  [hostname, servicename]
+  #  addr should be one of follows.
+  #   packed sockaddr string such as Socket.sockaddr_in(80, "127.0.0.1")
+  #   3-elements array such as ["AF_INET", 80, "127.0.0.1"]
+  #   4-elements array such as ["AF_INET", 80, ignored, "127.0.0.1"]
+  # flags should be bitwise OR of Socket::NI_* constants.
+  #
+  def self.getnameinfo(addr, flags = 0)
+    if addr._isString
+      str = addr
+    else
+      unless addr._isArray
+        raise TypeError, 'getnameinfo first arg not a String nor Array'
+      end
+      host = addr[-1] # addr[2] or addr[3]
+      port = addr[1]
+      str = Socket.sockaddr_in(port, host)
+    end
+    arr = self.__unpack_in(str, flags)
+    if arr._isFixnum
+      Errno.raise_errno(arr)
+    end
+    # arr is   [ host, service, numeric_port ]
+    [ arr[0], arr[1] ] 
+  end
+
+  class_primitive '__getsockaddr', '_getsockaddr:host:'
+  class_primitive '__getsockaddr_un', '_getsockaddrUnix:'
+
+  def self.sockaddr_in(port, host)
+    # Returns a String containing the bytes of a AF_INET/AF_INET6 sockaddr
+    if host._equal?(nil)
+      host = '127.0.0.1'
+    else
+      host = Type.coerce_to(host, String, :to_s )
+      if host.__size._equal?(0)
+        host = '0.0.0.0'
+      end
+    end
+    port = Type.coerce_to(port, String, :to_s)  # convert Fixnum to String
+    self.__getsockaddr(port, host)
+  end
+
+  def self.pack_sockaddr_in(port, host)
+    self.sockaddr_in(port, host)
+  end
+
+  def self.sockaddr_un(path)
+    # Returns a String containing the bytes of a AF_UNIX sockaddr
+    self.__getsockaddr_un(path)
+  end
+
+  def self.pack_sockaddr_un(path)
+    self.sockaddr_un(path)
+  end
+
   primitive_nobridge '__next_line_to', 'getLine:'
 
   primitive_nobridge 'getc', 'getByte'
@@ -210,8 +303,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   def getsockopt(level, optname)
     arr = __getsockopt(level, optname)
     if arr._isFixnum
-      Errno.raise(arr)
-      res = nil
+      Errno.raise_errno(arr)
     elsif arr.size._equal?(1)
       arr.pack("i")
     else
@@ -236,6 +328,18 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   end
 
   class_primitive 'new', 'new:type:proto:'
+
+  # returns a pair of connected sockets with no path, 
+  #  equivalent to UnixSocket.pair
+  # type and protocol args are ignored
+  def self.socketpair(family=nil, type=nil, protocol=nil)
+    if family._not_equal?(nil)
+      unless family == Socket::AF_UNIX 
+        raise ArgumentError, 'only AF_UNIX supported'
+      end
+    end
+    UNIXSocket.pair 
+  end
 
   primitive '__peek_byte', '_peek'
 
@@ -451,7 +555,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     if status._equal?(0)
       return self
     else
-      Errno.raise(status)
+      Errno.raise_errno(status)
     end
   end
 
@@ -477,6 +581,9 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     end
     0
   end
+
+  # returns an Array [ peerSocket , peerAddrString ]  
+  primitive 'sysaccept', 'sysAccept'
 
   # Read up to length bytes from the socket into the specified buffer.
   # If a Ruby Socket is non-blocking , sysread will raise EAGAIN
@@ -519,6 +626,29 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   end
 
   primitive 'ungetc', 'ungetByte:'
+
+  # result is an Array [ host, service, numeric_port ]
+  class_primitive '__unpack_in', '_unpackSockAddr:flags:' 
+
+  # result is a String
+  class_primitive '__unpack_un', '_unpackSockAddrUnix:' 
+
+  def self.unpack_sockaddr_in(addr_string)
+    arr = self.__unpack_in(addr_string, NI_NUMERICHOST)
+    if arr._isFixnum
+      Errno.raise_errno(arr)
+    end
+    [ arr[2], #numeric port
+      arr[0] ]  # host 
+  end
+
+  def self.unpack_sockaddr_un(addr_string)
+    arr = self.__unpack_un(addr_string)
+    if arr._isFixnum
+      Errno.raise_errno(arr)
+    end
+    arr 
+  end
 
   # << uses buffered IO semantics and will wait for socket to transmit all the data.
   # never raises EAGAIN.
