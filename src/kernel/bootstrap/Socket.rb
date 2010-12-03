@@ -19,6 +19,16 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   primitive '__close', 'close'
 
+  primitive '__bind', '_bindAddr:'  # arg is a sockaddr String
+
+  def bind(addr_string)
+    status = self.__bind(addr_string)
+    if status._isFixnum
+       Errno.raise_errno(status)
+    end
+    self
+  end
+
   def close
     if self.__active?
       self.__close
@@ -342,8 +352,11 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   end
 
   primitive '__peek_byte', '_peek'
-
   primitive_nobridge '__become', '_becomeMinimalChecks:'
+
+  # def __recvfrom_flags(length, flags) ; end
+  #   non-zero flags not implemented yet
+  primitive '__recvfrom_flags' , 'recvfrom:flags:'
 
   def reopen(arg1, mode=MaglevUndefined)
     if arg1._isString
@@ -432,6 +445,31 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   #  If a Ruby Socket is non-blocking , recv will raise EAGAIN
   #  if no data is available.  The size of the result will be >= 1 and <= length.
   primitive 'recv', 'recv:'
+
+  def recv_nonblock(length)
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.recv(length)
+  end
+
+  def recvfrom(length, flags=0)
+    # non-zero flags not supported yet
+    self.__recvfrom_flags(length, flags)
+  end
+
+  def recvfrom(length)
+    self.__recvfrom_flags(length, 0)
+  end
+
+  def recvfrom_nonblock(length, flags=0)
+    # non-zero flags not supported yet
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.__recvfrom_flags(length, flags)
+  end
+
+  def recvfrom_nonblock(length)
+    @_st_isRubyBlocking = false
+    self.__recvfrom_flags(length, 0)
+  end
 
   def seek(offset, whence) # raise not implemented error
     raise NotImplementedError
@@ -755,30 +793,6 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
     self
   end
 
-  # def recvfrom(length, flags) ; end
-  #   non-zero flags not implemented yet
-  primitive '__recvfrom' , 'recvfrom:flags:'
-
-  def recvfrom(length, flags=0)
-    # non-zero flags not supported yet
-    self.__recvfrom(length, flags)
-  end
-
-  def recvfrom(length)
-    self.__recvfrom(length, 0)
-  end
-
-  def recvfrom_nonblock(length, flags=0)
-    # non-zero flags not supported yet
-    @_st_isRubyBlocking = false  # inline set_blocking(false)
-    self.__recvfrom(length, flags)
-  end
-
-  def recvfrom_nonblock(length)
-    @_st_isRubyBlocking = false
-    self.__recvfrom(length, 0)
-  end
-
   # def send(string, flags) ; end # inherited
 
   primitive_nobridge '__sendto*', '_send:flags:host:port:'
@@ -893,8 +907,6 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
     end
     [ "AF_UNIX", p ]
   end
-
-  primitive '__recvfrom_flags' , 'recvfrom:flags:'
 
   def __recvfrom(length, flags)
     res = self.__recvfrom_flags(length, flags)

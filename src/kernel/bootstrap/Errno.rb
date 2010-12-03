@@ -116,8 +116,8 @@ module Errno
     # so munge through the errno tables
     if ! table.include?('EACCESS') && table.include?('EACCES')
       const_set('EACCESS', Errno::EACCES)
-# TODO: this is broken during bootstrap
-#      __create_errno_class(Errno::EACCES::Errno, 'EACCESS')
+      # TODO: this is broken during bootstrap
+      #      __create_errno_class(Errno::EACCES::Errno, 'EACCESS')
     end
   end
 
@@ -126,6 +126,7 @@ module Errno
   # override definition of EAGAIN so Smalltalk socket code
   # can signal using   SocketErrorEAGAIN .
   EAGAIN = __resolve_smalltalk_global(:SocketErrorEAGAIN)
+  EWOULDBLOCK = __resolve_smalltalk_global(:SocketErrorEAGAIN)  # Trac 818
 end
 
 # Create Errno specific error messages here

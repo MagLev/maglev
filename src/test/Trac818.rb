@@ -30,12 +30,17 @@ p s.recv_nonblock(10) #=> "aaa"
 ###############################################
 # Example from Socket#bind
 ###############################################
-socket = Socket.new( Socket::AF_INET, Socket::SOCK_STREAM, 0 )
-socket.setsockopt( Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true )
-sock_addr = Socket.pack_sockaddr_in( 5555, '127.0.0.1' )
-socket.bind( sock_addr )
-# sd.listen( 50 ) # 5 is what you see in all the books. Ain't enough.
-
+plat = RUBY_PLATFORM
+# the bind fails on Solaris, 'EAI error 9, service name not available'
+if plat.index('solaris')
+  puts "skipping Socket#bind example on solaris"
+else
+  socket = Socket.new( Socket::AF_INET, Socket::SOCK_STREAM, 0 )
+  socket.setsockopt( Socket::SOL_SOCKET, Socket::SO_REUSEADDR, true )
+  sock_addr = Socket.pack_sockaddr_in( 5555, '127.0.0.1' )
+  socket.bind( sock_addr )	 
+  # sd.listen( 50 ) # 5 is what you see in all the books. Ain't enough.
+end
 ###############################################
 # Example from Socket#accept_nonblock
 ###############################################
