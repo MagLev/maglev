@@ -4,12 +4,15 @@
 
 == Unreleased Changes
 
+* Fix Trac 818
+* Note,  Trac 819, 821 were fixed in 24756 .
+
 == Changes for 24756 2010-11-29
 * Added examples/webstack which has code, config and documentation on running MagLev web apps
   with various HTTP servers (nginx, lighttpd, etc.) and using several protocols to talk to the
    webserver (FastCGI, SCGI, HTTP)
 * Fix problems in getting source string for a block
-* Fix Trac 814
+* Fix Trac 814 , 819, 821
 * Implemented new exception hierarchy in underlying GemStone 3.0  system
 * Various other fixes and enhancements to underlying GemStone 3.0 system
 

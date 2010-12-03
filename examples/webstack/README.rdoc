@@ -248,7 +248,7 @@ FastCGI examples just need to "require 'fcgi'" to work.
 
 ==== Discussion
 
-FastCGI is faster than WEBrick, but is a bit of a poin to configure, and
+FastCGI is faster than WEBrick, but is a bit of a pain to configure, and
 even then, you need to fiddle with the HTTP headers before Sinatra sees the
 request.  Lighttpd was far easier to configure than nginx, and as I don't
 believe FastCGI will be in the running once MagLev supports C-Extensions, I
