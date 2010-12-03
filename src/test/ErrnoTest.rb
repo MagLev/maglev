@@ -9,7 +9,7 @@ errnosWithBadSuperclass = Errno.constants.find_all do |n|
 end
 test(errnosWithBadSuperclass.size, 2, "Errnos with bad superclass: #{errnosWithBadSuperclass}")
 # Errno::EAGAIN is a SocketError
-errnosWithBadSuperclass { | n |
+errnosWithBadSuperclass.each { | n |
   unless n == 'EAGAIN' || n == 'EWOULDBLOCK'
     raise 'failed'
   end
