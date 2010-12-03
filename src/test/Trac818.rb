@@ -39,7 +39,7 @@ if plat.index('solaris')
 else
     sock_addr = Socket.pack_sockaddr_in( 5555, '127.0.0.1' )
 end
-socket.bind( sock_addr )	 
+socket.bind( sock_addr )   
 # sd.listen( 50 ) # 5 is what you see in all the books. Ain't enough.
 ###############################################
 # Example from Socket#accept_nonblock
@@ -75,3 +75,17 @@ ensure
   File.delete("/tmp/sock")
 end
 
+# A test to ensure Socket responds to all of the appropriate methods
+s = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
+[:close_read, :close_write,   :shutdown,    :setsockopt,
+ :getsockopt,
+ :recvfrom_nonblock,
+ :recv,       :recv_nonblock, :connect,     :connect_nonblock,
+ :bind,       :listen,        :accept,      :accept_nonblock,
+ :recvfrom,   :sysaccept,     :send,
+
+ # These two are not implemented yet:
+ :getsockname,   :getpeername].each do |m|
+  # puts "#{m}: #{s.respond_to? m}"
+  raise "Fail on #{m}" unless s.respond_to? m
+end

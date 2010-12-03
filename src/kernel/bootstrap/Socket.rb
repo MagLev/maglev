@@ -13,8 +13,14 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   primitive '__active?', 'isActive'
 
-  # accept implemented only in TCPServer .
-  # bind, listen not implemented,
+  # accept returns a new socket, having same non-blocking state as receiver
+  primitive 'accept', 'accept'
+
+  def accept_nonblock
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.accept
+  end
+
   #   use  TCPServer>>new:port:  to create a listening socket
 
   primitive '__close', 'close'
@@ -808,13 +814,6 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
 end
 
 class TCPServer   # < TCPSocket in Smalltalk bootstrap
-  # accept returns a new socket, having same non-blocking state as receiver
-  primitive 'accept', 'accept'
-
-  def accept_nonblock
-    @_st_isRubyBlocking = false  # inline set_blocking(false)
-    self.accept
-  end
 
   # creates a non-blocking listening socket
   class_primitive '__new', 'new:port:'
