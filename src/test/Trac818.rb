@@ -83,8 +83,6 @@ s = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
  :recv,       :recv_nonblock, :connect,     :connect_nonblock,
  :bind,       :listen,        :accept,      :accept_nonblock,
  :recvfrom,   :sysaccept,     :send,
-
- # These two are not implemented yet:
  :getsockname,   :getpeername].each do |m|
   # puts "#{m}: #{s.respond_to? m}"
   raise "Fail on #{m}" unless s.respond_to? m
