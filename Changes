@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+== Changes for 24811 2010-12-06
+* Implement getpeername, getsockname for Ruby Sockets to make pure Ruby EventMachine work
 * Fix Trac 818
 * More fixes and enhancements to underlying GemStone 3.0  system
 
