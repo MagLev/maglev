@@ -13,8 +13,14 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   primitive '__active?', 'isActive'
 
-  # accept implemented only in TCPServer .
-  # bind, listen not implemented,
+  # accept returns a new socket, having same non-blocking state as receiver
+  primitive 'accept', 'accept'
+
+  def accept_nonblock
+    @_st_isRubyBlocking = false  # inline set_blocking(false)
+    self.accept
+  end
+
   #   use  TCPServer>>new:port:  to create a listening socket
 
   primitive '__close', 'close'
@@ -273,6 +279,28 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   # def gets; end # implemented in IO
 
+  primitive '__getpeername' , '_peerSockAddr' 
+
+  # returns a sockaddr String
+  def getpeername
+    res = self.__getpeername
+    if res._isFixnum
+      Errno.raise_errno(res)
+    end
+    res  
+  end
+
+  primitive '__getsockname' , '_socketLocation' 
+
+  # returns a sockaddr String
+  def getsockname
+    res = self.__getsockname
+    if res._isFixnum
+      Errno.raise_errno(res)
+    end
+    res  
+  end
+
   primitive '__getsockopt', 'getsockopt:name:'
 
   # Gets a socket option. These are protocol and system specific, see your
@@ -338,18 +366,6 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   end
 
   class_primitive 'new', 'new:type:proto:'
-
-  # returns a pair of connected sockets with no path, 
-  #  equivalent to UnixSocket.pair
-  # type and protocol args are ignored
-  def self.socketpair(family=nil, type=nil, protocol=nil)
-    if family._not_equal?(nil)
-      unless family == Socket::AF_UNIX 
-        raise ArgumentError, 'only AF_UNIX supported'
-      end
-    end
-    UNIXSocket.pair 
-  end
 
   primitive '__peek_byte', '_peek'
   primitive_nobridge '__become', '_becomeMinimalChecks:'
@@ -620,6 +636,18 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     0
   end
 
+  # returns a pair of connected sockets with no path, 
+  #  equivalent to UnixSocket.pair
+  # type and protocol args are ignored
+  def self.socketpair(family=nil, type=nil, protocol=nil)
+    if family._not_equal?(nil)
+      unless family == Socket::AF_UNIX 
+        raise ArgumentError, 'only AF_UNIX supported'
+      end
+    end
+    UNIXSocket.pair 
+  end
+
   # returns an Array [ peerSocket , peerAddrString ]  
   primitive 'sysaccept', 'sysAccept'
 
@@ -712,8 +740,11 @@ class IPSocket  # < Socket in Smalltalk bootstrap
     addr
   end
 
-  primitive 'peeraddr', 'rubyPeerAddress'
-  primitive 'addr', 'rubyAddress'
+  primitive 'peeraddr', 'rubyPeerAddress' # returns an Array ,
+    # [ 'AF_INET' , peerPort , peerHostName , peerIpAddrStr ]
+     
+  primitive 'addr', 'rubyAddress' # Returns an Array
+    # [ 'AF_INET' , port , hostName , ipAddrStr ]
 end
 
 class TCPSocket  # < IPSocket in Smalltalk bootstrap
@@ -808,13 +839,6 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
 end
 
 class TCPServer   # < TCPSocket in Smalltalk bootstrap
-  # accept returns a new socket, having same non-blocking state as receiver
-  primitive 'accept', 'accept'
-
-  def accept_nonblock
-    @_st_isRubyBlocking = false  # inline set_blocking(false)
-    self.accept
-  end
 
   # creates a non-blocking listening socket
   class_primitive '__new', 'new:port:'
