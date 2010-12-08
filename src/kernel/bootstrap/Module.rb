@@ -26,7 +26,7 @@ class Module
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
 
-  # append_features deprecated, but needed by Rails3 
+  # append_features deprecated, but needed by Rails3
   def append_features(other)
     if other.__check_include(self)
       other.__include_module(self)
@@ -300,14 +300,14 @@ class Module
   def module_eval(*args, &block_arg)
     # should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
-    if nargs < 1 
+    if nargs < 1
       if block_arg._not_equal?(nil)
         return __module_eval(nil, block_arg)
       end
-      raise ArgumentError, 'too few args'  
+      raise ArgumentError, 'too few args'
     end
-    if nargs > 3 
-      raise ArgumentError, 'too many args' 
+    if nargs > 3
+      raise ArgumentError, 'too many args'
     end
     # no ArgumentError for both string and explicit block args yet ;
     #  passing implicit block_arg if no explicit block arg, so it can
@@ -324,7 +324,7 @@ class Module
     unless bblk._equal?(nil)
       vcgl << bblk
     end
-    m_args = [ bnd, 
+    m_args = [ bnd,
                args[1], # file
                args[2] ]  # line
     res = __module_eval_string(string, vcgl, *m_args )
@@ -374,7 +374,10 @@ class Module
 
   primitive_nobridge 'superclass' , '_rubySuperclass'  # resolves to impl in .mcz
 
-  primitive_nobridge 'undef_method', 'rubyUndefMethod:'
+  primitive_nobridge '__undef_method', 'rubyUndefMethod:'
+  def undef_method(*names)
+    names.each { |name| __undef_method(name) }
+  end
 
   primitive_nobridge '__class_var_remove', 'rubyClassVarRemove:'
 

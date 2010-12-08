@@ -206,6 +206,28 @@ end
 
 x = MRSpec.new(123) { "a block" }
 
+#####################################################
+# Test that undef_method accepts multiple parameters
+class CXYZZY
+  def x
+  end
+
+  def y
+  end
+
+  def z
+  end
+end
+
+raise "Fail A" unless CXYZZY.instance_methods(false).size == 3
+
+class CXYZZY
+  # Maglev throws an argument error here
+  undef_method :x, :y
+end
+
+raise "Fail B" unless CXYZZY.instance_methods(false).size == 1
+
 ################### Report and clean up #####################
 report
 Maglev.abort_transaction if defined? RUBY_ENGINE
