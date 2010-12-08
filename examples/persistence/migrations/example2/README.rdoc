@@ -1,0 +1,679 @@
+= A Migration Example
+
+This directory contains code that demonstrates two approaches to handling
+data migration.  Both examples are based on the same classes.  There are
+several ruby scripts in this directory that help with the demo:
+
+  addpoints:  Adds new points to the persistent collection of points
+  app:        Our "application" class that uses points
+  install:    Installs a version of the Point class
+  reset:      Cleans out the Point class and the points array (start fresh)
+  showpoints: Show info on the current Point class and points.
+
+== The Point class and the Application
+
+The class we will migrate is a simple two-dimensional point class.  The
+first version stores data as Cartesian coordinates (<x,y>) while the second
+version of the class stores the points in polar coordinates (<r,theta>).
+
+Here is the version 1.0.0 class (<tt>point_v100.rb</tt>):
+
+  # A Two-Dimensional point, with Cartesian Coordinates (<x,y>).
+  class Point
+    VERSION = "1.0.0"
+
+    attr_reader :x, :y
+
+    def initialize(x, y)
+      @x = x
+      @y = y
+    end
+
+    def distance_to(other)
+      dx = x - other.x
+      dy = y - other.y
+      Math.sqrt((dx * dx) + (dy * dy))
+    end
+  end
+
+And here is the second version of the class (<tt>point_v200.rb</tt>):
+
+  # A Two-Dimensional point, with Polar Coordinates (<r,theta>).
+  class Point
+    VERSION = "2.0.0"
+
+    attr_reader :r, :theta
+
+    def initialize(r, theta)
+      @r = r
+      @theta = theta
+    end
+
+    def distance_to(other)
+      sum_r_sq = (@r * @r) + (other.r * other.r)
+      two_r_diff_cosines = 2 * @r * other.r * Math.cos(@theta - other.theta)
+      Math.sqrt(sum_r_sq - two_r_diff_cosines)
+    end
+  end
+
+Instances of the two classes are incompatible with each other: version 1
+instances have <tt>@x</tt> and </tt>@y</tt> instance variables and
+accessors, while version 2 instances have <tt>@r</tt> and </tt>@theta</tt>
+instance variables and accessors.
+
+== Scenario 1: Stop the world and migrate
+
+This scenario is the most straight-forward.  Our plan is
+
+1. Stop our application from running.
+2. Install the new version of the code.
+3. Migrate all old instances of the data to the new version.
+4. Start our application
+
+=== Setup
+
+To explore this scenario, we'll first erase any state that may be lurking
+from a previous run of this demo.  The script undefines the Point class,
+and resets our persistent array of points to nil:
+
+  $ ./reset
+  defined?(Point):  nil
+  Maglev::PERSISTENT_ROOT[:points]: nil
+
+First, we install the 1.0.0 version of the point class.  Read the comments
+in <tt>install</tt> file for more details.  The script simply loads
+<tt>point_v100.rb</tt> and saves the class to the repository.
+
+  $ ./install point_v100.rb
+  Installed file point_v100.rb.  Point version: 1.0.0
+
+The Point class is now permanently installed into the MagLev repository and
+all VMs will see it.  We do not yet have any point objects yet, so we
+create and save them with the <tt>addpoints</tt> script, and then examine
+the state of the repository with the <tt>showpoints</tt> script:
+
+  $ ./addpoints
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 1.0.0
+  There are 10 points:
+  [0]:  #<Point:0x8628401 @x=0 @y=0>  (VERSION 1.0.0)
+  [1]:  #<Point:0x8628301 @x=1 @y=1>  (VERSION 1.0.0)
+  [2]:  #<Point:0x8628201 @x=2 @y=2>  (VERSION 1.0.0)
+  [3]:  #<Point:0x8628101 @x=3 @y=3>  (VERSION 1.0.0)
+  [4]:  #<Point:0x8628001 @x=4 @y=4>  (VERSION 1.0.0)
+  [5]:  #<Point:0x8627f01 @x=5 @y=5>  (VERSION 1.0.0)
+  [6]:  #<Point:0x8627e01 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8627d01 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8627c01 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8627b01 @x=9 @y=9>  (VERSION 1.0.0)
+
+Finally, we run our client application, which just walks the points in our
+persistent array, and reports the distance:
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+=== The second version of the class
+
+For some reason, we decide we need to change the implementation of the
+class to use polar coordinates rather than Cartesian
+coordinates. <tt>point_v2.rb</tt> contains a the polar version of the Point
+class. If we install this class,
+
+  $ ./install point_v200.rb
+  Installed file point_v200.rb.  Point version: 2.0.0
+
+and then try to run the client app, things seem to work:
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+The reason the class still works, even though an incompatible class is
+installed, is that each instance of the old class still retains a reference
+to the version 1.0.0 Point class.  So, when the application invokes the
+<tt>distance_to</tt> method, the VM finds the version 1.0.0 method.
+
+If we create new points, they will be version 2.0.0 points:
+
+  $ ./addpoints
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 2.0.0
+  There are 20 points:
+  [0]:  #<Point:0x8628401 @x=0 @y=0>  (VERSION 1.0.0)
+  [1]:  #<Point:0x8628301 @x=1 @y=1>  (VERSION 1.0.0)
+  [2]:  #<Point:0x8628201 @x=2 @y=2>  (VERSION 1.0.0)
+  [3]:  #<Point:0x8628101 @x=3 @y=3>  (VERSION 1.0.0)
+  [4]:  #<Point:0x8628001 @x=4 @y=4>  (VERSION 1.0.0)
+  [5]:  #<Point:0x8627f01 @x=5 @y=5>  (VERSION 1.0.0)
+  [6]:  #<Point:0x8627e01 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8627d01 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8627c01 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8627b01 @x=9 @y=9>  (VERSION 1.0.0)
+  [10]:  #<Point:0x862e501 @r=0 @theta=0>  (VERSION 2.0.0)
+  [11]:  #<Point:0x862e401 @r=1 @theta=1>  (VERSION 2.0.0)
+  [12]:  #<Point:0x862e301 @r=2 @theta=2>  (VERSION 2.0.0)
+  [13]:  #<Point:0x862e201 @r=3 @theta=3>  (VERSION 2.0.0)
+  [14]:  #<Point:0x862e101 @r=4 @theta=4>  (VERSION 2.0.0)
+  [15]:  #<Point:0x862e001 @r=5 @theta=5>  (VERSION 2.0.0)
+  [16]:  #<Point:0x862df01 @r=6 @theta=6>  (VERSION 2.0.0)
+  [17]:  #<Point:0x862de01 @r=7 @theta=7>  (VERSION 2.0.0)
+  [18]:  #<Point:0x862dd01 @r=8 @theta=8>  (VERSION 2.0.0)
+  [19]:  #<Point:0x862dc01 @r=9 @theta=9>  (VERSION 2.0.0)
+
+We have a mixture of old-style Cartesian points, and new-style polar
+points.  But now if we run our app, we have a problem:
+
+  $ ./app
+  ERROR 2010 , NoMethodError: undefined method `x' for Point (MessageNotUnderstood)
+
+The problem comes when we try to find the distance between point 9 and
+point 10, i.e., we are doing:
+
+  points[9].distance_to(points[10])
+
+<tt>points[9]</tt> is an old-style point, and <tt>points[10]</tt> is a
+new-style point.  Since the <tt>distance_to</tt> message is sent to the
+old-style point, and its class is the version 1.0.0 Point class, the method
+that gets called is:
+
+    def distance_to(other)
+      dx = x - other.x
+      dy = y - other.y
+      Math.sqrt((dx * dx) + (dy * dy))
+    end
+
+The new-style <tt>points[10]</tt> object does not have a method named
+<tt>x</tt> (it has only <tt>r</tt> and <tt>theta</tt>).
+
+=== The Mechanics of the Migration
+
+We need a migration script.  We'll use the <tt>install</tt> script to
+install our new code, and we'll use <tt>migrate_100_to_200</tt> to migrate
+the data.
+
+The interesting script is <tt>migrate_100_to_200</tt>. First, there is a
+helper method, that does the simple trig necessary to create a new-style
+point the represents the same mathematical point as an old-style point:
+
+  # Create a new-style <r,theta> Point that represents the same
+  # mathematical point as the old-style <tt>cartesian_point</tt>
+  def polar_point_from(cartesian_point)
+    x = cartesian_point.x
+    y = cartesian_point.y
+
+    r = Math.sqrt((x * x) + (y * y))
+    theta = Math.atan2(y, x)
+
+    # Point is the version 2.0.0 point, so it takes r and theta and creates
+    # a new-style point
+    Point.new(r, theta)
+  end
+
+But the heart of the script is the following iteration:
+
+  Maglev::PERSISTENT_ROOT[:points].each do |old_point|
+    new_point = polar_point_from old_point
+    old_point.become new_point
+  end
+  Maglev.commit_transaction
+
+The first line is simple, it creates a new point.  After the call to
+<tt>polar_point_from</tt>, we have two objects, an old-style object and a
+new-style object that represent the same mathematical point:
+
+  variable  | Object Id | format    | Version
+  ----------+-----------+-----------+--------
+  old_point | 0x1234    | <x,y>     |   1.0.0
+  new_point | 0x5678    | <r,theta> |   2.0.0
+
+Now we get to the magic: <tt>become</tt>will swap the identities of the two
+objects (swap their object id).  After <tt>old_point.become new_point</tt>,
+the situation will be:
+
+   variable  | Object Id | format    | Version
+   ----------+-----------+-----------+--------
+   old_point | 0x1234    | <r,theta> |   2.0.0
+   new_point | 0x5678    | <x,y>     |   1.0.0
+
+The benefit of this is that any reference anywhere in the system to object
+id 0x1234, will now automatically point to the new style object.  Among
+those references elsewhere in the system is the
+<tt>Maglev::PERSISTENT_ROOT[:points]</tt> array.  It too references "the
+object with object id 0x1234", and after the <tt>become</tt> statement, it
+will see the new-style <r,theta> object!
+
+=== Run the code
+
+Enough with the theory and explanation, let's run the code from the start.
+First, we'll get back to the point where version 1.0.0 is installed, we
+have data and the 1.0.0 app is running fine:
+
+  $ ./reset
+  defined?(Point):  nil
+  Maglev::PERSISTENT_ROOT[:points]: nil
+
+  $ ./install point_v100.rb
+  Installed file point_v100.rb.  Point version: 1.0.0
+
+  $ ./addpoints
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 1.0.0
+  There are 10 points:
+  [0]:  #<Point:0x8634701 @x=0 @y=0>  (VERSION 1.0.0)
+  [1]:  #<Point:0x8634601 @x=1 @y=1>  (VERSION 1.0.0)
+  [2]:  #<Point:0x8634501 @x=2 @y=2>  (VERSION 1.0.0)
+  [3]:  #<Point:0x8634401 @x=3 @y=3>  (VERSION 1.0.0)
+  [4]:  #<Point:0x8634301 @x=4 @y=4>  (VERSION 1.0.0)
+  [5]:  #<Point:0x8634201 @x=5 @y=5>  (VERSION 1.0.0)
+  [6]:  #<Point:0x8634101 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8634001 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8633f01 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8633e01 @x=9 @y=9>  (VERSION 1.0.0)
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+Now we implement our plan:
+
+1. Stop our application from running.  In reality, you'd wait til late at
+   night, kick everyone off the app and shut it down.  For this demo, we
+   are already shut-down, so we just move on.
+
+2. Install the new version of the code.
+
+     $ ./install point_v200.rb
+     Installed file point_v200.rb.  Point version: 2.0.0
+
+3. Migrate all old instances of the data to the new version.  We do this by
+   running the migration script:
+
+     $ ./migrate_100_to_200
+     Converting: #<Point:0x8634701 @x=0 @y=0> to #<Point:0x863a201 @r=0.0 @theta=0.0>
+     Converting: #<Point:0x8634601 @x=1 @y=1> to #<Point:0x863a101 @r=1.414213562373095 @theta=0.7853981633974483>
+     Converting: #<Point:0x8634501 @x=2 @y=2> to #<Point:0x863a001 @r=2.82842712474619 @theta=0.7853981633974483>
+     Converting: #<Point:0x8634401 @x=3 @y=3> to #<Point:0x8639f01 @r=4.242640687119285 @theta=0.7853981633974483>
+     Converting: #<Point:0x8634301 @x=4 @y=4> to #<Point:0x8639e01 @r=5.656854249492381 @theta=0.7853981633974483>
+     Converting: #<Point:0x8634201 @x=5 @y=5> to #<Point:0x8639d01 @r=7.071067811865476 @theta=0.7853981633974483>
+     Converting: #<Point:0x8634101 @x=6 @y=6> to #<Point:0x8639c01 @r=8.48528137423857 @theta=0.7853981633974483>
+     Converting: #<Point:0x8634001 @x=7 @y=7> to #<Point:0x8639b01 @r=9.899494936611665 @theta=0.7853981633974483>
+     Converting: #<Point:0x8633f01 @x=8 @y=8> to #<Point:0x8639a01 @r=11.31370849898476 @theta=0.7853981633974483>
+     Converting: #<Point:0x8633e01 @x=9 @y=9> to #<Point:0x8639901 @r=12.72792206135786 @theta=0.7853981633974483>
+
+   We can now look at the points to see they are converted:
+
+     $ ./showpoints
+     The currently installed Point class is: Point VERSION: 2.0.0
+     There are 10 points:
+     [0]:  #<Point:0x8634701 @r=0.0 @theta=0.0>  (VERSION 2.0.0)
+     [1]:  #<Point:0x8634601 @r=1.414213562373095 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [2]:  #<Point:0x8634501 @r=2.82842712474619 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [3]:  #<Point:0x8634401 @r=4.242640687119285 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [4]:  #<Point:0x8634301 @r=5.656854249492381 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [5]:  #<Point:0x8634201 @r=7.071067811865476 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [6]:  #<Point:0x8634101 @r=8.48528137423857 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [7]:  #<Point:0x8634001 @r=9.899494936611665 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [8]:  #<Point:0x8633f01 @r=11.31370849898476 @theta=0.7853981633974483>  (VERSION 2.0.0)
+     [9]:  #<Point:0x8633e01 @r=12.72792206135786 @theta=0.7853981633974483>  (VERSION 2.0.0)
+
+4. Start our application.
+
+     $ ./app
+     Total distance: 12.72792206135787
+
+   It is nice to note that the total distance did not change (except in the
+   last digit, i.e., within the representational limits of floats), yet we
+   are completely on version 2.0.0.
+
+== A more complex scenario
+
+Now that we have the basic theory down, we may decide there is too much
+data to migrate all at once.  We'd like to do the data migration over
+several nights, to minimize down time for our customers.  That means our
+app must be able to run with both versions of the Point class.
+
+Our new plan is:
+1. Install Compatibility methods on 1.0.0 class.
+2. Install the 2.0.0 version of the class (with 1.0.0 compatibility
+   methods).
+3. Get a list of all the old objects.
+4. Migrate data:
+   + break up the old ids into manageable chunks
+   + for each chunk
+     + wait till late at night,
+     + stop app
+     + migrate the chunk of data
+     + restart app
+5. After all migration is done, remove the compatibility layer.
+
+You may wonder why we need to bring down the app, if it can work with both
+types of object.  The answer is that as we migrate data, we will probably
+run into commit conflicts (the migration script tries to commit the change
+of a point, at the same time the app code is modifying that point).  If we
+run our migration scripts only when the app is not running, then there will
+be no concurrency conflicts.
+
+=== Setup the scenario
+
+Setup this scenario by doing the same as the last.  First, we'll get back
+to the point where version 1.0.0 is installed, we have data and the 1.0.0
+app is running fine:
+
+  $ ./reset
+  defined?(Point):  nil
+  Maglev::PERSISTENT_ROOT[:points]: nil
+
+  $ ./install point_v100.rb
+  Installed file point_v100.rb.  Point version: 1.0.0
+
+  $ ./addpoints
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 1.0.0
+  There are 10 points:
+  [0]:  #<Point:0x8634701 @x=0 @y=0>  (VERSION 1.0.0)
+  [1]:  #<Point:0x8634601 @x=1 @y=1>  (VERSION 1.0.0)
+  [2]:  #<Point:0x8634501 @x=2 @y=2>  (VERSION 1.0.0)
+  [3]:  #<Point:0x8634401 @x=3 @y=3>  (VERSION 1.0.0)
+  [4]:  #<Point:0x8634301 @x=4 @y=4>  (VERSION 1.0.0)
+  [5]:  #<Point:0x8634201 @x=5 @y=5>  (VERSION 1.0.0)
+  [6]:  #<Point:0x8634101 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8634001 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8633f01 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8633e01 @x=9 @y=9>  (VERSION 1.0.0)
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+=== Implement the plan
+
+The primary difference between this scenario and the last, is that we need
+to run in mixed-mode for a while.  I.e., we will have both:
+
+  an_old_point.distance_to a_new_point
+
+and
+
+  a_new_point.distance_to an_old_point
+
+So the old points will have to respond to <tt>r</tt> and <tt>theta</tt>,
+and the new points will have to respond to <tt>x</tt> and </tt>y</tt>.  In
+a sense, this is more complicated than the previous scenario since we need
+compatibility in both directions, not just one.
+
+==== 1. Install Compatibility methods on 1.0.0 class.
+
+<tt>point_v101.rb</tt> contains the compatibility methods we need for the
+1.0.0 class:
+
+  # Add VERSION 2.0.0 API compatibility methods
+  # This monkey-patches the class.
+  class Point
+    def r
+      Math.sqrt((@x * @x) + (@y * @y))
+    end
+
+    def theta
+      Math.atan2(@y, @x)
+    end
+  end
+
+Since the system currently has the 1.0.0 version of Point installed, we can
+simply run the file in a persistent setting.  We'll use the
+<tt>-Mcommit</tt> option to <tt>maglev-ruby</tt>, which wraps the execution
+in a <tt>Maglev.persistent do ... end</tt> block, and does a
+<tt>Maglev.commit_transaction</tt> at the end:
+
+  $ maglev-ruby -Mcommit point_v101.rb
+
+==== 2. Install the 2.0.0 version of the class
+
+The next step is to install the version 2.0.0 class, and add the
+compatibility methods.  <tt>point_v201.rb</tt> contains the version 2.0.0
+with the compatibility methods.  We'll use the <tt>install</tt> script,
+since it manages the namespace changes:
+
+
+  $ ./install point_v201.rb
+  Installed file point_v201.rb.  Point version: 2.0.1
+
+And we test again:
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+Looks like the 2.0.1 code works with the old-style points.
+
+==== 3. Get a list of all the old objects.
+
+We now need a list of all the objects to migrate.  We have a couple of
+choices here.  In our case, there is a collection that already contains all
+the points we care about, so we can duplicate it:
+
+  Maglev::PERSISTENT_ROOT[:old_points] = Maglev::PERSISTENT_ROOT[:points].dup
+  Maglev.commit_transaction
+
+If we didn't have a pre-existing collection, we can search the repository
+for all instances of the old class (<tt>find_old.rb</tt>):
+
+  # Since we no longer have a nice handle to the old class (the 'Point'
+  # constant now references the 2.0.0 version of the class), we find an
+  # old-style object and follow its class pointer.
+
+  old_point = Maglev::PERSISTENT_ROOT[:points].detect { |p| p.class::VERSION == "1.0.0" }
+  old_class = old_point.class
+
+  raise "Couldn't find old version of class" if old_class.nil?
+
+  Maglev::PERSISTENT_ROOT[:old_points] = old_class.all_instances
+  Maglev.commit_transaction
+
+If your repository has a *lot* of instances, the list of them may be too
+big to fit into the VM memory.  The solution to that is discussed in the
+GS64 Programming Guide, Chapter 8.
+
+To create the list of old points:
+
+  $ maglev-ruby ./find_old.rb
+
+And we can inspect the old points:
+
+  $ maglev-ruby  -e 'p Maglev::PERSISTENT_ROOT[:old_points]'
+  [#<Point:0x8763201 @x=9 @y=9>, #<Point:0x8763301 @x=8 @y=8>,
+   #<Point:0x8763401 @x=7 @y=7>, #<Point:0x8763501 @x=6 @y=6>,
+   #<Point:0x8763601 @x=5 @y=5>, #<Point:0x8763701 @x=4 @y=4>,
+   #<Point:0x8763801 @x=3 @y=3>, #<Point:0x8763901 @x=2 @y=2>,
+   #<Point:0x8763a01 @x=1 @y=1>, #<Point:0x8763b01 @x=0 @y=0>]
+
+==== 4. Migrate data:
+
+Now that we have a collection with just the old instances, we just need to
+break it up into chunks and migrate each chunk.  There are several ways to
+do this.  <tt>migrate_by_chunks.rb</tt> simply pops old points off of the
+old points array and transforms them.  It does it in chunks of
+<tt>CHUNK_SIZE</tt>.
+
+We can watch the progress, and run our app in between chunks of
+conversion. First, we look at our points and see that all are old-style,
+and that there are ten points left in the old points array:
+
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 2.0.1
+  There are 10 points:
+  [0]:  #<Point:0x8763b01 @x=0 @y=0>  (VERSION 1.0.0)
+  [1]:  #<Point:0x8763a01 @x=1 @y=1>  (VERSION 1.0.0)
+  [2]:  #<Point:0x8763901 @x=2 @y=2>  (VERSION 1.0.0)
+  [3]:  #<Point:0x8763801 @x=3 @y=3>  (VERSION 1.0.0)
+  [4]:  #<Point:0x8763701 @x=4 @y=4>  (VERSION 1.0.0)
+  [5]:  #<Point:0x8763601 @x=5 @y=5>  (VERSION 1.0.0)
+  [6]:  #<Point:0x8763501 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8763401 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8763301 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8763201 @x=9 @y=9>  (VERSION 1.0.0)
+
+  $ maglev-ruby  -e 'p Maglev::PERSISTENT_ROOT[:old_points].size'
+  10
+
+Now we run the migrate script to convert the first three points:
+
+  $ maglev-ruby migrate_by_chunks.rb
+  Converting: #<Point:0x8763b01 @x=0 @y=0> to #<Point:0x865a401 @r=0.0 @theta=0.0>
+  Converting: #<Point:0x8763a01 @x=1 @y=1> to #<Point:0x865a301 @r=1.414213562373095 @theta=0.7853981633974483>
+  Converting: #<Point:0x8763901 @x=2 @y=2> to #<Point:0x865a101 @r=2.82842712474619 @theta=0.7853981633974483>
+  Processed 3 elements, 7 left
+
+We take a look at our points, and see a mix of old and new points:
+
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 2.0.1
+  There are 10 points:
+  [0]:  #<Point:0x8763b01 @r=0.0 @theta=0.0>  (VERSION 2.0.1)
+  [1]:  #<Point:0x8763a01 @r=1.414213562373095 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [2]:  #<Point:0x8763901 @r=2.82842712474619 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [3]:  #<Point:0x8763801 @x=3 @y=3>  (VERSION 1.0.0)
+  [4]:  #<Point:0x8763701 @x=4 @y=4>  (VERSION 1.0.0)
+  [5]:  #<Point:0x8763601 @x=5 @y=5>  (VERSION 1.0.0)
+  [6]:  #<Point:0x8763501 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8763401 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8763301 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8763201 @x=9 @y=9>  (VERSION 1.0.0)
+
+We see if our application still works with the mixed set of points, and it
+does:
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+
+We can do that whole iteration again:
+
+
+  $ maglev-ruby migrate_by_chunks.rb
+  Converting: #<Point:0x8763801 @x=3 @y=3> to #<Point:0x865a401 @r=4.242640687119285 @theta=0.7853981633974483>
+  Converting: #<Point:0x8763701 @x=4 @y=4> to #<Point:0x865a301 @r=5.656854249492381 @theta=0.7853981633974483>
+  Converting: #<Point:0x8763601 @x=5 @y=5> to #<Point:0x865a101 @r=7.071067811865476 @theta=0.7853981633974483>
+  Processed 3 elements, 4 left
+
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 2.0.1
+  There are 10 points:
+  [0]:  #<Point:0x8763b01 @r=0.0 @theta=0.0>  (VERSION 2.0.1)
+  [1]:  #<Point:0x8763a01 @r=1.414213562373095 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [2]:  #<Point:0x8763901 @r=2.82842712474619 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [3]:  #<Point:0x8763801 @r=4.242640687119285 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [4]:  #<Point:0x8763701 @r=5.656854249492381 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [5]:  #<Point:0x8763601 @r=7.071067811865476 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [6]:  #<Point:0x8763501 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8763401 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8763301 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8763201 @x=9 @y=9>  (VERSION 1.0.0)
+
+  $ ./app
+  Total distance: 12.72792206135786
+
+
+And we can even add new points:
+
+  $ ./addpoints
+
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 2.0.1
+  There are 20 points:
+  [0]:  #<Point:0x8763b01 @r=0.0 @theta=0.0>  (VERSION 2.0.1)
+  [1]:  #<Point:0x8763a01 @r=1.414213562373095 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [2]:  #<Point:0x8763901 @r=2.82842712474619 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [3]:  #<Point:0x8763801 @r=4.242640687119285 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [4]:  #<Point:0x8763701 @r=5.656854249492381 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [5]:  #<Point:0x8763601 @r=7.071067811865476 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [6]:  #<Point:0x8763501 @x=6 @y=6>  (VERSION 1.0.0)
+  [7]:  #<Point:0x8763401 @x=7 @y=7>  (VERSION 1.0.0)
+  [8]:  #<Point:0x8763301 @x=8 @y=8>  (VERSION 1.0.0)
+  [9]:  #<Point:0x8763201 @x=9 @y=9>  (VERSION 1.0.0)
+  [10]:  #<Point:0x865a501 @r=0 @theta=0>  (VERSION 2.0.1)
+  [11]:  #<Point:0x865a401 @r=1 @theta=1>  (VERSION 2.0.1)
+  [12]:  #<Point:0x865a301 @r=2 @theta=2>  (VERSION 2.0.1)
+  [13]:  #<Point:0x865a101 @r=3 @theta=3>  (VERSION 2.0.1)
+  [14]:  #<Point:0x865a001 @r=4 @theta=4>  (VERSION 2.0.1)
+  [15]:  #<Point:0x8659f01 @r=5 @theta=5>  (VERSION 2.0.1)
+  [16]:  #<Point:0x8659e01 @r=6 @theta=6>  (VERSION 2.0.1)
+  [17]:  #<Point:0x8659d01 @r=7 @theta=7>  (VERSION 2.0.1)
+  [18]:  #<Point:0x8659c01 @r=8 @theta=8>  (VERSION 2.0.1)
+  [19]:  #<Point:0x8659b01 @r=9 @theta=9>  (VERSION 2.0.1)
+
+  $ ./app
+  Total distance: 65.64772013827184
+
+And we can run the last two chunks of the migration and we'll be done:
+
+  $ maglev-ruby migrate_by_chunks.rb
+  Converting: #<Point:0x8763501 @x=6 @y=6> to #<Point:0x865ae01 @r=8.48528137423857 @theta=0.7853981633974483>
+  Converting: #<Point:0x8763401 @x=7 @y=7> to #<Point:0x865ad01 @r=9.899494936611665 @theta=0.7853981633974483>
+  Converting: #<Point:0x8763301 @x=8 @y=8> to #<Point:0x865ac01 @r=11.31370849898476 @theta=0.7853981633974483>
+  Processed 3 elements, 1 left
+
+  $ maglev-ruby migrate_by_chunks.rb
+  Converting: #<Point:0x8763201 @x=9 @y=9> to #<Point:0x865ae01 @r=12.72792206135786 @theta=0.7853981633974483>
+  Processed 1 elements, 0 left
+
+  $ ./showpoints
+  The currently installed Point class is: Point VERSION: 2.0.1
+  There are 20 points:
+  [0]:  #<Point:0x8763b01 @r=0.0 @theta=0.0>  (VERSION 2.0.1)
+  [1]:  #<Point:0x8763a01 @r=1.414213562373095 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [2]:  #<Point:0x8763901 @r=2.82842712474619 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [3]:  #<Point:0x8763801 @r=4.242640687119285 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [4]:  #<Point:0x8763701 @r=5.656854249492381 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [5]:  #<Point:0x8763601 @r=7.071067811865476 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [6]:  #<Point:0x8763501 @r=8.48528137423857 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [7]:  #<Point:0x8763401 @r=9.899494936611665 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [8]:  #<Point:0x8763301 @r=11.31370849898476 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [9]:  #<Point:0x8763201 @r=12.72792206135786 @theta=0.7853981633974483>  (VERSION 2.0.1)
+  [10]:  #<Point:0x865a501 @r=0 @theta=0>  (VERSION 2.0.1)
+  [11]:  #<Point:0x865a401 @r=1 @theta=1>  (VERSION 2.0.1)
+  [12]:  #<Point:0x865a301 @r=2 @theta=2>  (VERSION 2.0.1)
+  [13]:  #<Point:0x865a101 @r=3 @theta=3>  (VERSION 2.0.1)
+  [14]:  #<Point:0x865a001 @r=4 @theta=4>  (VERSION 2.0.1)
+  [15]:  #<Point:0x8659f01 @r=5 @theta=5>  (VERSION 2.0.1)
+  [16]:  #<Point:0x8659e01 @r=6 @theta=6>  (VERSION 2.0.1)
+  [17]:  #<Point:0x8659d01 @r=7 @theta=7>  (VERSION 2.0.1)
+  [18]:  #<Point:0x8659c01 @r=8 @theta=8>  (VERSION 2.0.1)
+  [19]:  #<Point:0x8659b01 @r=9 @theta=9>  (VERSION 2.0.1)
+
+  $ maglev-ruby  -e 'p Maglev::PERSISTENT_ROOT[:old_points].size'
+  0
+
+  $ ./app
+  Total distance: 65.64772013827185
+
+==== 5. After all migration is done, remove the compatibility layer.
+
+At this point, the version 1.0.0 class isn't referenced by anything (there
+are no version 1.0.0 objects, and the class has long since been removed
+from the namespace), and so it will be garbage collected.  All of the
+points in the system are now at 2.0.1, and we could, if we wanted, remove
+the compatibility methods from the class (<tt>point_v202.rb</tt>):
+
+  # A Two-Dimensional point, with Polar Coordinates (<r,theta>).
+  # This version removes the 1.0.0 compatibility methods.
+  Maglev.persistent do
+    class Point
+      undef_method :x
+      undef_method :y
+    end
+  end
+  Maglev.commit_transaction
+
+We look at the methods currently defined:
+
+  $ maglev-ruby -e 'p Point.instance_methods(false)'
+  ["r", "y", "x", "theta", "distance_to"]
+
+And then remove them and check that they are gone:
+
+  $ maglev-ruby ./point_v202.rb
+
+  $ maglev-ruby -e 'p Point.instance_methods(false)'
+  ["r", "theta", "distance_to"]
+
+And the app still runs:
+
+  $ ./app
+  Total distance: 65.64772013827185

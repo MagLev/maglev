@@ -1,0 +1,42 @@
+
+namespace :blog do
+  desc 'Inspect the current blog posts'
+  task 'inspect' do
+    sh "maglev-ruby -e 'Maglev::PERSISTENT_ROOT[:BlogPost] && Maglev::PERSISTENT_ROOT[:BlogPost].each {|p| p p}'"
+  end
+
+  FileList['example/blog_post*.rb'].each do |file|
+    version = file[/\d+/]
+    desc "Install version #{version} of the BlogPost app."
+    task :"post#{version}" do
+      sh "maglev-ruby #{file}"
+    end
+  end
+
+  FileList['example/write*.rb'].each do |file|
+    version = file[/\d+/]
+    desc "Write blog posts for version #{version}."
+    task :"write#{version}" do
+      sh "maglev-ruby #{file}"
+    end
+  end
+
+  FileList['example/client*.rb'].each do |file|
+    version = file[/\d+/]
+    desc "Run the client app verion #{version}."
+    task "client#{version}" do
+      sh "maglev-ruby #{file}"
+    end
+  end
+
+  desc 'Cleanup the repository (remove the BlogPost class and all BlogPost instances)'
+  task 'clean' do
+    sh "maglev-ruby example/cleanup.rb"
+  end
+
+
+  desc "Run the 1.0 to 1.1 migration script on persisted data."
+  task :migrate do
+    sh "maglev-ruby example/migrate.rb"
+  end
+end

@@ -1,0 +1,10 @@
+#!/usr/bin/env maglev-ruby
+# -*- ruby -*-
+#
+# Create more random points and add them to the points array
+
+Maglev::PERSISTENT_ROOT[:points] ||= []
+
+10.times { |i| Maglev::PERSISTENT_ROOT[:points] << Point.new(i,i) }
+
+Maglev.commit_transaction

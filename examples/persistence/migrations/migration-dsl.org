@@ -1,0 +1,284 @@
+* Requirements etc. for a Migration DSL
+** Overview
+
+   The Migration DSL would allow "rails-like" migrations for MagLev.
+
+*** Primary Issues
+
+**** Core Abstraction
+     What should the DSL be in terms of?  In ActiveRecord (and other ORMs),
+     the primary abstraction you work with is the RDBMs table schema (in
+     some ruby-ish DSL format).  One of MagLev's appeals is that everything
+     is a ruby object.  If we go down the path of making migrations
+     "different", we lose some of that appeal.
+
+     The programmer in AR defines the schema in a ruby-like DSL.  The
+     programmer also creates basic Model classes that mirror the schema.
+     Rails provides generators that will auto-create / sync the model and db
+     schema:
+
+       $ rails generate model Product name:string description:text
+
+     will generate a migration (in
+     myapp/db/migration/2010120212345_create_product.rb):
+
+       class CreateProducts < ActiveRecord::Migration
+         def self.up
+           create_table :products do |t|
+             t.string :name
+             t.text :description
+
+             t.timestamps
+           end
+         end
+
+         def self.down
+           drop_table :products
+         end
+       end
+
+     and will also create myapp/app/models/product.rb:
+
+       class Product < ActiveRecord::Base
+       end
+
+**** Coordination of source code and state
+     Ruby objects in MagLev have transient state and may have persistent
+     state.  The transient state is loaded from .rb files, typically at VM
+     startup.  The DSL should help the developers manage and coordinate the
+     persistent state of the repository (originally loaded from .rb files
+     long ago...) with the appropriate versions of files from the
+     file-system.
+
+     Rails helps in this regard a bit.
+**** Active Record migrations:
+    See http://guides.rubyonrails.org/migrations.html for more details on
+    rails migrations.
+
+    E.g., to create a schema in Rails:
+
+      class CreatePosts < ActiveRecord::Migration
+        def self.up
+          create_table :posts do |t|
+            t.string :name
+            t.string :title
+            t.text :content
+
+            t.timestamps
+          end
+        end
+
+        def self.down
+          drop_table :posts
+        end
+      end
+
+    Each schema change has its own Migration class that handles up and down
+    migrations.  The rake tasks allow the admin/developer to specify which
+    schema version to install into the DB, and the data migration is
+    managed as a regular migration (either combined with a schema change,
+    or as a separate migration).  E.g., here is a combined schema change +
+    data migration (note the User.update_all(...)):
+
+      class AddReceiveNewsletterToUsers < ActiveRecord::Migration
+        def self.up
+          change_table :users do |t|
+            t.boolean :receive_newsletter, :default => false
+          end
+          User.update_all ["receive_newsletter = ?", true]
+        end
+
+        def self.down
+          remove_column :users, :receive_newsletter
+        end
+      end
+
+    The Smalltalk version history features is basically the current
+    SCHEMA_VERSION stored in the db + the rake tasks to manage it.
+
+    There is no real coordination between the user's code and the schema
+    version: the developer/admin must ensure the right version of code is
+    checked out of the VCS given the db schema version.  There are tools
+    (capistrano / vlad / etc.) that help in the deployment and do some of
+    that coordination.
+
+    From the developer's perspective, the Rails migrations are "more DRY"
+    than doing it by hand (but they are not completely DRY).  The developer
+    creates a new migration, and touches up a few meta-comments in the
+    model classes, and then is ready to code the new feature:
+
+** Use Cases
+   + Add an instance variable
+   + Remove an instance variable
+   + Rename an instance variable
+   + Swap names of two instance variables
+
+   + Move instance
+
+
+   + As you migrate between classes, you'd like to keep your behavior in
+     order...version 12 data should be using version 12 methods.  In
+     Smalltalk, each (version of a) class kept its methods, so you never
+     lost information like that.
+
+** Requirements
+
+   There must be a way to associate an object with its format/schema
+   version.  The Smalltalk way to do this is with different versions of a
+   class.  The object already has space allocated to point to the class.
+   Plus, using a class solves the problem of how to keep behavior and state
+   associated correctly.
+
+   If we don't use the class, then we must add a version number somewhere,
+   and then have a mess of conditional code:
+
+      case version
+      when "1.0"
+        ...
+      when "1.1"
+        ...
+      else
+        ...
+      end
+*** Misc requirements
+    + Should we "un-name" a class when we remove it from the namespace?
+      E.g., in the cartesian vs polar point example, the Version 1.0.0
+      class still thinks its name is "Point", even after it has been
+      removed from the standard namespace.  It makes it hard to distinguish
+      from the new Point class in debug output.  So, perhaps renaming it
+      "UNNAMED: Point VERSION 1.0.0", or something, might be nice...
+
+*** Non-Requirements
+
+    + We will not detect/resolve "eval" references to old/new formats.
+      E.g., if you try to access an instance variable via:
+
+        x = obj.instance_variable_get :@foo
+
+      And @foo has been renamed to @bar, we will not detect this.  Ditto
+      class variables, class names etc.
+
+    + The really insidious case is if you've stored away a reference to a
+      class, and now we have a new version of the class:
+
+        def create_new_gizmo(...)
+          @klass ||= find_appropriate_gizmo_class(...)
+          @klass.new(...)
+        end
+
+      And if you save that object, then later, you change the appropriate
+      gizmo class to be something else, now @klass points to the older
+      version of the class...
+
+      Good application design will minimize the number of persistent
+      classes that are exposed to this risk.
+
+** Smalltalk API
+
+   Here is the Smalltalk API as a reference to features already in the base
+   product.
+
+   + Class>>sublcass:....newVersionOf:...
+   + Class>>classHistory
+       Gets the class history object
+   + Class>>addNewVersion: newClass
+       Adds a class to the class history of the receiver.
+
+   + Set migration target for a class (does not trigger migration):
+       OldClass migrateTo: NewClass
+   + Cancel migration: OldClass cancelMigration
+   + Query: OldClass migrationDestination
+   + Finding instances to migrate
+     + SystemRepository allInstances: anArrayOfClasses
+         Returns an array of arrays of the instances for the corresponding
+         classes in the input array
+     + Repository>>listInstances:, Repository>>listInstancesToHiddenSet:
+     + migrateInstancesTo:
+   + Migrating instances
+     + aLemming migrate
+     + allAnimals do: [:each | each migrate]
+     + Animal migrateInstances: aCollectionOfAnimals to: NewAnimal
+
+
+   Example migrating from cartesian to polar coords:
+
+   + On PolarPoint:
+       migrateFrom: oldPoint instVarMap: aMap
+         |x y|
+         x := oldPoint x.
+         y := oldPoint y.
+         radius := ((x*x) + (y*y)) asFloat sqrt.
+         angle  := (x/y) asFloat arcTan.
+         ^self
+
+** MagLev Migration API
+
+   The following code lists the MagLev migration API
+
+     module ObjectSpace
+       class Repository
+         # Returns a list of instances in the repository that belong to one of
+         # the classes listed in an_array.  The result of this method is an
+         # Array of Arrays, where the contents of each inner array consists of
+         # all instances whose class is equal to the corresponding element in
+         # an_array.
+         #
+         # This method aborts the current transaction; if an abort would cause
+         # unsaved changes to be lost, it raises an exception.
+         #
+         # If an_array contains multiple occurrences of a class, then the
+         # result will contain corresponding multiple occurrences of the same
+         # Array that lists the instances of that class.
+         #
+         # If an_array contains an element that is not a class or module (kind
+         # of Behavior), an error is generated.
+         #
+         # Scans the entire Repository at least once.
+         #
+         # If the argument an_array contains more than 2000 unique elements
+         # then the entire Repository will be scanned once for each group of
+         # 2000 unique elements, or fraction thereof.
+         def list_instances(an_array)
+           SystemRepository.__list_instances(an_array)
+         end
+       end
+     end
+
+     class Class
+       # Searches the entire MagLev repository for all instances of receiver
+       # (this could take a while).  This method aborts the current
+       # transaction; if an abort would cause unsaved changes to be lost, it
+       # raises an exception.  See ObjectSpace::Repository#list_instances for
+       # more details.
+       def all_instances
+         ObjectSpace::SystemRepository.list_instances([self])[0]
+       end
+     end
+
+*** Class Version History API
+
+    class Class
+
+      # Creates a new version of the receiver.
+      # Registers the new version in the name space at the location of
+      # receiver??? (what about unnamed classes?) How do we find the class
+      # in the namespace? Do we use become on the class?
+      #
+      # Should it return the new class or the old class? (probably the old,
+      # if the new is going to be registred in the name space...
+      #
+      # Should this be a class side method, and take a fqn?
+      # Does it copy all the methods?  Dup them? what?
+      #
+      # How do we go through and ensure instance variables are named
+      # correctly in the new code?
+      def new_version
+      end
+    end
+
+    + Need a way to re-write a method, changing @foo -> @bar (but that
+      isn't enough, because there can be send, eval etc.  Skip those.
+
+      Perhaps something like:
+        a_method.recompile(inst_var_name_map)
+

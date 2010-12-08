@@ -1,0 +1,30 @@
+#!/usr/bin/env maglev-ruby
+#
+# This script persistently installs a version of the Point class.
+# Call it with the name of the file to load, e.g.:
+#
+#   $ migrate point_v1.rb
+#
+
+file = ARGV[0]
+raise "Usage: migrate <filename>" if file.nil?
+raise "Can't find file #{file}" unless File.exist? file
+
+# All persistent modifications to classes, including removing the binding
+# from Object::Point to the old class, must be done in a persistent mode.
+Maglev.persistent do
+
+  # If there is already a class named "Point" in the global namespace, and
+  # we require a file that has a class definition for it, then we are
+  # re-opening the class and adding new features (i.e., monkey patching).
+  # In this case, we want to install a completely new class, so we must
+  # first remove the old name so that MagLev sees the class definition as a
+  # new definition.
+  Object.remove_const(:Point) if Object.const_defined?(:Point)
+
+  # Now that the namespace is cleared, we can load the new definition.
+  # We use load rather than require to force reading the file.
+  load file
+end
+Maglev.commit_transaction
+puts "Installed file #{file}.  Point version: #{Point::VERSION}"
