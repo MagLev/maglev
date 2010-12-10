@@ -1,0 +1,21 @@
+#!/usr/bin/env maglev-ruby
+# -*- ruby -*-
+#
+# Print information about the version of the Point class, and information
+# about the instances stored in the repository.
+
+if defined? Point
+  puts "The currently installed Point class is: #{Point.inspect} VERSION: #{Point::VERSION}"
+else
+  puts "There is no currently installed Point class."
+end
+
+
+if (points = Maglev::PERSISTENT_ROOT[:points])
+  puts "There are #{points.size} points:"
+  points.each_with_index do |point,idx|
+    puts "[#{idx}]:  #{point.inspect}  (VERSION #{point.class::VERSION})"
+  end
+else
+  puts "The points array is not present."
+end

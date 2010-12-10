@@ -1,0 +1,649 @@
+* Data Migrations in MagLev
+
+  TODO: Change "schema" to "shape"?
+
+  This document is a work in progress, i.e., incomplete, half-baked, etc.
+
+** Intro
+
+  This paper discusses issues, tools and strategies related to persistent
+  data and especially with changes to the structure of that data over
+  time.  This is a work in progress and we welcome community input.
+
+** The Problem: Evolution of Persistent Data Formats (Schema Changes)
+
+   Data has a structure that programs using it depend on.  That structure
+   tends to evolve over time as applications acquire more features: new
+   fields are added, old fields moved, reformatted, renamed or
+   deleted. When a new feature is added to an application, the previously
+   saved data is formatted differently than new data written by the
+   application.  Schema evolution becomes an issue when the data is
+   persisted.  The issues raised by schema differences arise regardless of
+   the backing store in use.  Data stored in files (e.g., the output of
+   Marshal/YAML/JSON), in RDBMS tables, Ruby objects saved in a MagLev
+   repository or even documents in a "schemaless" NoSQL DB are all subject
+   to change over time.  I'll use the terms "schema" and "format" to denote
+   the structure of data, even if the structure is implicit (the data in a
+   "schemaless" document store, is still structured in a manner
+   intelligible to the application).
+
+   There are fundamentally two approaches to dealing with schema change:
+   (1) change the data or (2) change the code.  The first entails running
+   through all of your data and ensuring it is in a consistent format by
+   migrating the old data to the new schema.  The second entails writing
+   conditional code to accommodate the various forms your data takes.
+
+   See <tt>example/example.rdoc</tt> for a concrete example of an
+   application with a simple data migration issue.
+
+   There are some simple schema changes where changing the code might be an
+   appropriate solution. E.g., adding a new "service level" field that has
+   an obvious default value could be handled with conditional code in the
+   accessors:
+
+     def service_level
+       # Initialize to bronze for old customers.  New customers
+       # have service_level set in initializer.
+       @service_level ||= :bronze
+     end
+
+   The added code and slight runtime costs may be preferable to migrating
+   millions of records for such a simple change.
+
+   Other changes to schema are complex enough or pervasive enough to
+   warrant migrating all data to the new schema.  The rest of this paper
+   concentrates on the "change the data", or data migration approach.
+
+** Data Migration
+
+   Once the specter of data migration is raised, i.e., after the programmer
+   has taken the following vow:
+
+     <em>
+     Do you, Programmer, take this Object to be part of the persistent
+     state of your application, to have and to hold, through maintenance
+     and iterations, for past and future versions, as long as the
+     application shall live?
+
+     Erm, can I get back to you on that?
+     </em>
+
+     -- Arturo Bejar http://www.erights.org/e/StateSerialization.html
+
+   + How to migrate
+     + All at once / up-front
+     + On demand
+   + Triggering event
+     + Smalltalk has clear trigger, Ruby does not
+   + How to work into process
+     + Rails-like Migrations
+     + "Git" model
+     + Roll-your-own
+   + Raw Tools provided in VM + MagLev
+
+*** How to Migrate Data
+
+    We will discuss the following types of migration:
+    + No migration
+    + Stop the world / all at once migration
+    + Lazy / on-demand migration
+
+**** No migration: Avoid the problem if possible
+
+     The primary technique to reducing the complications with data
+     migration is to avoid them if possible.  Since only changes to
+     persistent data requires migration, you can reduce the need for
+     migrations by (a) reducing the amount of persistent data and (b)
+     eliminating or reducing changes to persistent data schemas.
+
+     Even though MagLev provides the opportunity to save (almost) any of
+     your Ruby objects, that doesn't mean that all of your Ruby classes and
+     objects <em>should</em> be persistent. Only data that would be a
+     candidate for hiding behind an ORM like ActiveRecord should be
+     considered persistent.
+
+     E.g., if your shopping cart format changes, you might be able to avoid
+     migration by simply switching servers over one at a time to the new
+     code.  Old user sessions die off and the old shopping carts expire
+     naturally, and the new servers deal only with the new shopping cart
+     format.
+
+**** Stop the world / all at once migration
+
+     If you have data that really needs to be persistent, and you really do
+     need to change the schema, then the simplest migration scheme is the
+     "stop the world and migrate" scheme.
+
+     The steps are:
+     1. Stop your application.
+     2. Backup your repository
+     3. Run a migration script.
+     4. Restart the application.
+
+     There are some migrations that won't need to stop the world.  E.g., if
+     you are adding a new attribute to an object, you might be able to keep
+     the application going, run the migration to add a field to each
+     object, and then update to the code that uses the new field.
+
+     Running the migration depends on iterating over every instance of the
+     class, and updating it to the new schema.  If your application
+     maintains one or more collections that hold all of the objects of
+     interest, then you can iterate over these collections to do the
+     migration.  If your application doesn't maintain a collection of all
+     the instances to migrate, MagLev provides several methods to search
+     for instances across the entire repository.
+
+**** In-place migrations
+
+     An in-place migration is a variation of the "stop the world"
+     migration.  The idea here is that you don't want to take your
+     application down for the time it will take to do the entire migration
+     in one step, so you break it down into multiple runs (e.g., you
+     migrate 20% of your data every night for five nights).
+
+     In order for this to work, you typically do the following:
+     1. Install compatibility methods on either the old or new class,
+        whichever makes sense.  These methods allow old format objects and
+        new format objects to be used from the current application.
+     2. Install the new class with the new format, but no code that makes
+        use of the new features.  All  new instances of the class will now
+        have the new format.
+     3. Create a list of all old objects and save it.
+     4. For each migration run, stop the app, migrate a subset of the
+        remaining instances, then restart the app.
+     5. When all instances have been migrated, install the final version of
+        the new class methods, which can make full use of the new feature.
+
+**** Lazy / On-Demand migrations
+
+     Sometimes, you can easily detect when an instance needs migrating and
+     do the migration as part of normal business processing.  The outline
+     of this scenario is:
+
+     1. Install new version of application
+     2. As objects are used, the code notices the stale format and updates
+        the object to the new format before continuing with normal
+        processing.
+
+     There are dangers and caveats to this form of migration.
+     1. You risk triggering commit failures (imagine two VMs try to lazily
+        migrate the same instance at the same time).
+     2. There may be code bloat.  Over time, if there are several versions
+        of a class, you may have objects that need to migrate through many
+        versions to get to the latest.  All the code to manage those
+        migrations must stick around indefinitely.
+
+*** When to Migrate Data
+
+    The decision of when to migrate is a key consideration.  The Smalltalk
+    world has it easy: there are clear, unambiguous and inescapable
+    modifications to a class that require migration (anything that changes
+    the memory layout of an object, e.g., changes to instance variables).
+    The Smalltalk system detects and requires the developer to click
+    "migrate" or "do not migrate and revert" when such changes are
+    made.
+
+    Ruby doesn't have it so easy. The Ruby programmer must detect the need
+    for a migration, identify the affected classes and objects, and then
+    design, implement and execute the migration.
+
+**** How to manage persistent classes and data
+
+     The detection problem, "have I made a change that requires a
+     migration?", is made more difficult, if the code for persistent
+     objects is mixed in with non-persistent code.  There is little to
+     alert or remind the programmer that changes to this class may change
+     the schema of persistent objects in a manner that will break the
+     application.  Testing can help.
+
+     One approach to fixing the detection problem is to intentionally
+     disrupt the programmer when they switch between "normal coding" and
+     "persistent coding". This is the path that Rails-like migrations
+     take.  Here are some of the differences:
+
+     1. The persistent schema is stored in a different part of the
+        directory hierarchy: <tt>myapp/db/*</tt>, rather than
+        <tt>myapp/lib</tt>.
+     2. The format of the code is different (The ActiveRecord Migration
+        DSL).
+     3. The process of "activtaing" a migration is an explicit step you
+        take (rake db:migrate).
+     4. There is a separate process, and tool support (rake tasks) for
+        managing the migrations.
+
+     All of these differences from "normal coding" provide ample warning to
+     the developer that they are dealing with persistent data and that they
+     should adjust their thinking accordingly.  On the other hand, one of
+     MagLev's appeals is that everything is a ruby object.  If we go down
+     the path of making migrations "different", we lose some of that
+     appeal.
+
+     This approach can be implemented for MagLev in a "migration DSL".  We
+     can create special classes and process that separates the persistent
+     code from normal code. MagLev Ruby classes are not currently members
+     of a class history object, so lack some of the migration support
+     present in the Smalltalk world.  We can address this by making the DSL
+     manage schema/class versions.  Exposing class versions and version
+     histories to all Ruby classes introduces more complexity than it
+     solves, due to Ruby's dynamic nature (lack of a good "create a new
+     class version" trigger, all of the "normal" metaprogramming that goes
+     on and which you *don't* want to trigger a new class version, etc.).
+     I think we should expose the base features required to implement
+     migration in the core classes, and then implement a migration scheme
+     in a DSL.  The DSL would be a proposal, rather than the annointed path
+     to migration.  The MagLev team (nor anyone else at the moment) simply
+     doesn't have the experience with migration in MagLev to make a
+     definitive choice.  Better to show a path, provide base features
+     (Object>>become, etc.) and engage the community to help us with
+     developing approaches to the problem.
+
+     + How does a strategy identify objects in an old schema? (by class
+       identity/version).
+     + How does a migration recover from failure half way through?  E.g.,
+       if you are migrating instances 10k at a time, and you've succesfully
+       migrated 100k objects, and then fail with 100k left, you now have a
+       repository with a mix of old and new, but you haven't installed the
+       new code?....
+
+**** Two Migration Strategies: Class Version Based and "Ruby" migrations
+
+    You can keep the identity of your new classes, or, you can version
+    classes.  MagLev does not currently provide support for class
+    versioning out of the box.  Class versioning *is* something GemStone/S
+    provides for the Smalltalk product, but Smalltalk semantics do not
+    allow the re-opening of classes that Ruby allows.  Smalltalk requires
+    class versioning, where Ruby allows alternative data migration
+    strategies.  For background on the Smalltalk migration strategy, you
+    can read Chapter 8 of the GS64 Programming Guide.
+
+    A nice aspect of using class versioning to manage migrations, is that
+    it can manage coordinated changes of behavior with changes to schema.
+    E.g., in the example of changing the Point class from rectangular to
+    polar coordinates, you'd want to change not only schema (@x and @y
+    become @theta and @r), but you also want to change methods (e.g.,
+    "def x; @x; end" becomes a calculation, not a simple accessor.
+
+    If you don't want the complexity of versioned classes, then some other
+    mechanism must be used to coordinate the correct behavior with the
+    schema (simplest approach is to force migration of data when an old
+    instance is found, then use new behavior).
+
+
+    Smalltalk:
+    + OldClass migrateTo: NewClass  # defines the class to migrate to
+    + anInstance migrate
+    + allAnimals do: [ :each | each migrate ]
+    + Animal migrateInstances: [a, b, c] to: NewAnimal
+
+    To migrate all instances of old versions of Animal to NewAnimal:
+
+    | animalHist allAnimals|
+    animalHist := Animal classHistory.
+    allAnimals := SystemRepository listInstances: animalHist.
+
+    "returns an array of the same size as the class history.
+     Each element in the array is a set corresponing to one
+     version of the class. Each set contains all the instances of
+     that version of the class."
+
+    1 to: animalHist size-1 do: [:index|
+      (animalHist at: index) migrateInstances: (allAnimals at: index)
+                             to: (animalHist at animalHist size) ] .
+
+** The Broader Application Life Cycle
+
+   Schema changes happen in the broader context of an application
+   life-cycle.  A robust solution to the Data Migration issue must address
+   both the development and deployment phases of an application.
+
+   Consider a web application.  Typically, there are many short lived
+   development iterations, many of which are followed by a deployment of
+   the app into production.  The Data Migration solution must support quick
+   development iterations, and also deploying those changes to staging,
+   testing and deployment environments.  This means providing tools, hooks
+   or other support to coordinate the persistent schema, the state of the
+   repository and the state of non-persistent application code and other
+   files.
+
+*** Development Stage
+
+    A typical development iteration cycles through many loops of:
+
+    1. Change schema, e.g., through a migration file, e.g.:
+         $ rails generate model Product name:string description:text
+    2. Update development repository to new schema, with data migration,
+       e.g.: $ rake db:migrate
+    3. Edit client code (models, views, tests, etc.)
+    4. Edit deployment scripts  / configuration
+    5. Commit to a VCS, e.g., "$ git commit -m 'Added @foo to model'"
+
+    There may be many loops through these steps.
+
+    During development, the developer maintains the coordination between
+    the state of the repository and the state of the application code,
+    config etc.  This is done manually, and is what the developer is paid
+    to do.
+
+    In Smalltalk, the coordination between the "client code" and the
+    "repository schema" is all in the image.  In Ruby,
+
+*** Deployment and other stages
+
+    When it comes to testing and deployment, the same set of resources
+    needs to be coordinated in a different computing environment (e.g., the
+    test db and test machines, or the staging or deployment environments).
+    This is typically done via scripting (capistrano, vlad, etc.), and is
+    typically done once per environment (unless errors arise).
+
+    1. checkout the appropriate tag from VCS ($ git checkout -rV_1_0 foo)
+    2. Run the deployment script: $ cap deploy
+    3. Test
+
+** List of changes and how to deal with them
+
+   The problematic changes are ones where something about the class
+   definition is incompatible with old format instances.  In Smalltalk, this was
+   the offset of the instance variables (compiled methods have integer
+   offsets to instance variables; they don't search by name).
+   But old-style objects still refer to old-style classes (version history
+   etc.).   In ruby, there will be (typically) only one class.
+   You wouldn't want to trigger a global migration everytime somone monkey
+   patched Object...
+
+*** Add an attribute
+
+    This is a relatively easy migration.  See the +example+ directory for
+    sample code.
+
+*** Remove an attribute
+
+    The order of actions should be the opposite of add an attribute:
+    1. Remove the code that accesses the attribute
+    2. Do a data migration to remove that attribute
+
+    Note: There won't be any immediate space savings by removing the
+    attribute.
+*** Rename an attribute
+
+    Similar to remove an attribute
+
+**** Via accessors:
+
+     Consider just providing an accessor that reads the old name.  It will
+     be quicker and safer than changing the actual instance variable name.
+
+     Original:
+
+       class C
+         VERSION "1.0.0"
+
+         attr_accessor :foo
+
+         def initialize(foo)
+           @foo = foo
+         end
+       end
+
+     New:
+
+       class C
+         VERSION "1.0.1"
+
+         # attr_accessor :foo
+
+         def bar
+           @foo
+         end
+
+         def bar=(value)
+           @foo = value
+         end
+
+         def initialize(bar)
+           @foo = bar
+         end
+       end
+
+**** Via renaming
+
+     Really. Just go back and write an accessor.
+
+*** Rename a class
+*** Change superclass
+    + May require Object>>become
+*** Persistently Mixin a module
+
+    It is possible to avoid a migration here by mixing in the new module in
+    the transient space.  Leave old classes persisted, but in your app
+    startup code, do the include.  This would be done on each VM boot.
+
+    Downside: Complex
+*** Change a constant
+*** Methods
+*** Class hierarchy changes
+**** Singleton classes
+** More Complex Migration Needs
+
+   The GemStone/S Smalltalk programming environment uses Object>>become,
+   class versions and class histories to help in migration tasks.  The
+   primary benefit is support for migrating instances without stopping the
+   application.  The idea is that by simultaneously having two class
+   hierarchies (the new, currently running class hierarchy, and the old
+   version of the classes), that objects can be migrated while the
+   application runs.
+
+   The key for this to work is that objects retain a direct reference to
+   their class, which holds the methods.  Old format objects use old code
+   and new format objects use the methods in the new class.
+
+*** Example 1: Change interpretation/meaning of instance variable
+
+    TODO: Write a small app that demonstrates this?
+
+    Suppose you have an application with a Geometry class that stores
+    angles in degrees:
+
+       class Geometry
+         attr_accessor :angle   # @angle holds value in degrees
+         ...
+       end
+
+    You want to change the application to do calculations in radians.
+    The following migration strategy is possible.
+
+    1. The running application is working off of the original code (i.e.,
+       angles are in degrees).
+    2. A new version of the class is introduced.  It redefines the angle
+       accessor to convert from radians (the stored format) to degrees (the
+       format in use by the old version of the code).  At this point, there
+       are no instances of this new class, so there will be no invocations
+       of this new method yet.
+    3. A migration thread is started, which finds all old objects, and
+       migrates them to the new format.  It will atomically (a) convert the
+       value of @angle from degrees to radians, and make the class of that
+       object be the new version of the class.  Now, any of the old code
+       that gets a new object (which has @angle stored as radians) and asks
+       for its angle, will invoke the new accessor which converts back to
+       degrees and reports degrees.
+    4. After all instances have been converted, the method dictionary of
+       the new class is updated (an atomic operation) to switch over to the
+       final version of the code where everything is done in radians.
+    5. The old class file can then be freed for garbage collection.
+*** Example 2: Lazy update of objects
+
+    + Install the new class (there will be no instances of it).
+    + Replace the method dictionary of the original class, such that all
+      access to the old instances invokes a migration.
+    + As each old instance is accessed during normal business, the first
+      method invocation triggers a migration to the new class, a become,
+      and then the invocation is re-triggered on the object now that it
+      is an instance of the new class, so it gets the new method
+      dictionaries and it has had its state updated via the migration.
+
+** Tools Provided by MagLev
+   + To find instances that need migration: Class#all_instances,
+     ObjectSpace#all_instances
+   + ACID Transactions to run migration code in
+   + Should write a migration helper ala active record migrations?
+   + Object>>become etc.
+*** How to find instances in need of migration
+
+    There are two ways to search for all instances needing migration: (a)
+    use application level collections (b) search the repository.
+
+    If your application keeps all instances of interest in its own
+    application level collection (e.g., all BlogPosts are in
+    Maglev::PERSISTENT_ROOT[BlogPosts]), then you simply need to iterate
+    over that collection to find all of the instances needed for
+    migration.  Additionally, you have the opportunity to modify the setter
+    methods on the collection to check that new instances are migrated as
+    well.
+
+    If there is no reliable collection of all instances, then you'll need
+    to perform a repository search.  MagLev offers the following methods:
+
+    Class#all_instances: The <tt>all_instances</tt> method on +Class+ will
+    return a collection of all the instances of that class.  It does this
+    by searching every object in the repository, and returning those that
+    are direct instances of that class (i.e., it will not return instances
+    of subclasses).
+
+** Appendix: Differences Between Smalltalk and Ruby
+
+   Smalltalk and Ruby face a different set of persistence issues.  While
+   this paper is informed by the GemStone Smalltalk features and recipes
+   for data migration, we approach the issue from a ruby perspective, as
+   the needs of the Ruby programmer are different than the needs of the
+   Smalltalk programmer due to differences in the languages.
+
+*** Smalltalk requires instance migration; ruby does not
+
+    In Smalltalk, certain changes to a class *require* instance migration
+    (any change to instance variables, class variables or inheritance
+    hierarchy).  Smalltalk classes hold the list of instance variable
+    names, and all instances of a Smalltalk class have space allocated for
+    each instance variable defined in its class (and superclasses).  If the
+    set of instance variables changes, then the system must visit each
+    instance, and update the set of instance variables stored in it.
+    Furthermore, all methods that reference those instance variables must
+    be updated, since instance variables are encoded in a method as an
+    offset from the object header.  If the position of an instance variable
+    changes, then all methods that reference will have the wrong offset.
+    So, the Smalltalk system must re-compile all methods for a class when
+    the instance variables change.
+
+    Ruby does not store a list of instance variables in a Class.  Instead,
+    each object starts life with no instance variables, and storage is
+    allocated at runtime as methods that reference the instance variables
+    are invoked.  This means that different instances of the same Ruby
+    class can occupy different amounts of memory and have completely
+    different subsets of instance variables set for it.  Furthermore,
+    singleton classes and metaprogramming methods (instance_variable_set)
+    can set unique instance variables on some objects.
+
+*** Smalltalk knows when to version a class; Ruby does not know
+
+    The Smalltalk programming environment can detect when it is necessary to
+    create a new version of a class, and asks the programmer to confirm.
+    The Ruby environment does not have a clear dmarcation of when it is
+    necessary to create a new version of a class, so we rely on the
+    developer / admin to tell the system when to create a new version (and
+    of what).
+
+** Guidelines and Gotchas for Migration
+   + You can't "delete" an instance variable (true only for fixed inst
+     vars?).   So, if you have @foo in V1 of your class, then you abandon
+     using @foo in V2, and then re-use @foo for something else in V3, then
+     your old V1 instances will have @foo inst var, but it will be V1 data,
+     not V3 data.
+   + If we go with versioned classes, then you should not use a class as a
+     key in a hash or for other comparisons.  E.g., if you do:
+
+       # version 1 of point
+       class Point
+         # use cartesian coordinates...
+         ...
+       end
+       Maglev::PERSISTENT_ROOT[Point] = []
+       10.times { |i| Maglev::PERSISTENT_ROOT[Point] << Point.new(i,i) }
+
+
+     and then you create a new version of Point:
+       # version 2 of point
+       class Point
+         # use polar coordinates...
+         ...
+       end
+
+     Now, when you go to Maglev::PERSISTENT_ROOT[Point], you are going to
+     get nil, since Object::Point is now a new class, hence new identity.
+
+** Issues / TODO
+   + Write about commit conflicts and lazy migrations (two different VMs
+     try to lazily migrate the same old instance).
+
+   + Write a migration framework to help.  See the specs in test for more
+     details.
+
+     The reason to do this is that Ruby (esp Rails) developers are very
+     into an iterative life-cycle, where there will be many small data
+     format changes over the course of a few months (even in production).
+     They are used to a migration framework and want it regardless of the
+     ORM.
+
+   + Write sample programs for several of the most popular migrations.
+
+   + How to handle migrating instances that are indexed.
+   + How do you migrate sub-classes?
+   + How do you deal with references to classes?  If some object references
+     V1 of ClassX, and you change its class to V2, then how do you update
+     the reference held by the object?
+
+     This is only a problem if you actually version classes.  In ruby, if
+     you re-open classes, then you don't have problems???
+
+   + Migrations paradigm
+   + Version control paradigm
+     + You check in code and data
+       (this is the hook to know what classes to version, and when to
+       version them).
+       In ST, the system knows when to version a class (whenever there is a
+       structural change) and asks you to confirm.  In Ruby, we need a user
+       gesture to indicate when to checkin a new version.
+
+   + General problem of persistent data and schema changes
+   + Many NoSQL options seem to ignore this and wave the "schemaless"
+     banner.
+   + We don't have all the answers, but here are some issues, and some
+     tools.
+   + Where is behavior stored? Where is state stored? How are they
+     coordinated.  In Smalltalk, everything's an object: state stored in
+     objects, and that state has a pointer to its behavior in the (version
+     of) the class.  When you migrate a smalltalk object, it gets an
+     updated view of behavior when you migrate by pointing to the new
+     version of the class.  The old versions point to old behavior.
+
+     In Ruby, you have state in and behavior in objects, but you also have
+     behavior specified in files which are read in.  Plus MagLev has
+     transient and persistent state (and behavior).  Since we don't have
+     the class version thing, we can get our state and behavior out-of-sync
+     (plus the file being out of sync with in-memory).
+
+     Rails migrations suffer from this?!
+
+     Smalltalk seems to have state + behavior + tools to help with it all.
+     The tools know about the image and do a lot of coordination work.
+     Rails has a bunch of rake tasks, but it is not nearly as seamless.
+** Interesting Reading
+
+   http://userweb.cs.utexas.edu/~wcook/Drafts/2009/essay.pdf
+     Note the issue in section 2.3 on "Unique Implementations".  With
+     versioned classes, OO allows multiple implementations, as long as the
+     API hasn't changed (e.g., both polar and cartesian based
+     implementations of a Point class can be mixed.).
+
+   http://www.erights.org/data/serial/jhu-paper/upgrade.html
+
+   http://lambda-the-ultimate.org/node/526
+
+   http://www.erights.org/e/StateSerialization.html

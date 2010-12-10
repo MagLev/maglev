@@ -1,0 +1,12 @@
+#!/usr/bin/env maglev-ruby
+
+# Simple client of the Point class.
+
+def sum_distance(points)
+  total = 0
+  points.reverse.each_cons(2) { |c| total += c[0].distance_to(c[1]) }
+  total
+end
+
+puts "Total distance: #{sum_distance Maglev::PERSISTENT_ROOT[:points]}"
+

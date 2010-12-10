@@ -1,0 +1,13 @@
+#!/usr/bin/env maglev-ruby
+# -*- ruby -*-
+#
+# Erase the Point class and clear out the points array
+
+Maglev.persistent { Object.remove_const(:Point) } if Object.const_defined?(:Point)
+
+Maglev::PERSISTENT_ROOT.delete :points
+
+Maglev.commit_transaction
+
+puts "defined?(Point):  #{defined?(Point).inspect}"
+puts "Maglev::PERSISTENT_ROOT[:points]: #{Maglev::PERSISTENT_ROOT[:points].inspect}"
