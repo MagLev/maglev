@@ -1,0 +1,258 @@
+= An Example Data Migration Scenario
+
+The following example shows concrete instances of how schema changes in
+persisted data can be a problem, and shows how these issues can be
+resolved.  You can follow along by running the rake tasks indicated in
+parenthesis.  You can inspect the current blogs at anytime with <tt>rake
+blog:inspect</tt>.
+
+== First Release
+
+Suppose there aren't enough blog apps in the world, so we're going to write
+another one.  Since competition is pretty stiff, we rush out our first
+version (<tt>rake blog:clean</tt> followed by <tt>rake blog:post10</tt>):
+
+  Maglev.persistent do
+    class BlogPost
+      VERSION = '1.0.0'
+
+      def self.all_posts
+        Maglev::PERSISTENT_ROOT[:BlogPost]
+      end
+
+      attr_reader :title, :text
+
+      def initialize(title, text)
+        @title = title
+        @text  = text
+      end
+    end
+  end
+
+  # Initialize the posts store
+  Maglev::PERSISTENT_ROOT[:BlogPost] = []
+
+  Maglev.commit_transaction
+
+
+and people start using it (<tt>rake blog:write1</tt>):
+
+  5.times do |i|
+    BlogPost.all_posts << BlogPost.new("Title #{i}", "Text #{i}")
+  end
+  Maglev.commit_transaction
+
+We can inspect their work (<tt>rake blog:inspect</tt>):
+
+  $ rake blog:inspect
+  (in /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations)
+   maglev-ruby -e 'Maglev::PERSISTENT_ROOT[:BlogPost].each {|p| p p}'
+  #<BlogPost:0xf01a601 @title="Title 0" @text="Text 0">
+  #<BlogPost:0xf01a501 @title="Title 1" @text="Text 1">
+  #<BlogPost:0xf01a401 @title="Title 2" @text="Text 2">
+  #<BlogPost:0xf01a301 @title="Title 3" @text="Text 3">
+  #<BlogPost:0xf01a201 @title="Title 4" @text="Text 4">
+
+So we can write blog posts and store them on the server, but we want the
+public to be able to read them, so the Giga-Mega-Corp Client Division comes
+up with an application that prints all of our posts (<tt>rake
+blog:client10</tt>):
+
+  class BlogClient
+    VERSION = "1.0.0"
+
+    def print_blog_entries
+      BlogPost.all_posts.each do |p|
+        puts "-" * 50
+        puts "Title: #{p.title}"
+        puts "    #{p.text}"
+      end
+    end
+  end
+
+  BlogClient.new.print_blog_entries
+
+It works great with all of the data we have in the repository.
+
+== Forgot something...
+
+Tuesday morning, we find our mailbox full of customer requests demanding we
+add a published-on date to the application.  No problem (<tt>rake
+blog:post11</tt>):
+
+  Maglev.persistent do
+    class BlogPost
+      VERSION = '1.1.0'
+
+      def self.all_posts
+        Maglev::PERSISTENT_ROOT[:BlogPost]
+      end
+
+      attr_reader :title, :text, :date
+
+      def initialize(title, text, date=Time.now)
+        @title = title
+        @text  = text
+        @date  = date
+      end
+    end
+  end
+  Maglev.commit_transaction
+
+We upload the changes to the server and none of the servers crash and we
+head to lunch.
+
+Meanwhile, blog authors are making use of the new feature (<tt>rake
+blog:write2</tt>):
+
+  now_secs = Time.now.to_i  # number of seconds since epoch
+
+  5.times do |i|
+    pub_date = Time.at(rand(now_secs))
+    BlogPost.all_posts << BlogPost.new("Title #{i}", "Text #{i}", pub_date)
+  end
+
+  Maglev.commit_transaction
+
+And Giga-Mega-Corp is updating its client software feature (<tt>rake
+blog:client11</tt>):
+
+  class BlogClient
+    VERSION = "1.1.0"
+
+    def print_blog_entries
+      BlogPost.all_posts.each do |p|
+        puts "-" * 50
+        puts "Title: #{p.title}  (published on #{p.date.strftime("%Y-%m-%d")})"
+        puts "    #{p.text}"
+      end
+    end
+  end
+
+  BlogClient.new.print_blog_entries
+
+We come back from lunch with our mailbox full of horror stories:
+
+  $ rake blog:client11
+  (in /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations)
+  maglev-ruby client11.rb
+  --------------------------------------------------
+  #<NoMethodError: NoMethodError: undefined method `strftime' for NilClass>`strftime' called
+  /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations/client11.rb:8:in `method_missing'
+  /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations/client11.rb:8:in `print_blog_entries'
+  /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations/client11.rb:6:in `each'
+  /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations/client11.rb:6:in `print_blog_entries'
+  /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations/client11.rb:14
+  ERROR 2010, NoMethodError: undefined method `strftime' for NilClass (NoMethodError)
+  rake aborted!
+  Command failed with status (1): [maglev-ruby client11.rb...]
+  /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations/Rakefile:44
+  (See full trace by running task with --trace)
+
+Looking at our data, we see that not all of it has a <tt>@date</tt>
+instance variable (<tt>rake blog:inspect</tt>):
+
+  $ rake blog:inspect
+  (in /Users/pmclain/GemStone/checkouts/git/examples/persistence/migrations)
+   maglev-ruby -e 'Maglev::PERSISTENT_ROOT[:BlogPost].each {|p| p p}'
+  #<BlogPost:0xf01a601 @title="Title 0" @text="Text 0">
+  #<BlogPost:0xf01a501 @title="Title 1" @text="Text 1">
+  #<BlogPost:0xf01a401 @title="Title 2" @text="Text 2">
+  #<BlogPost:0xf01a301 @title="Title 3" @text="Text 3">
+  #<BlogPost:0xf01a201 @title="Title 4" @text="Text 4">
+  #<BlogPost:0xf020901 @title="Title 0" @text="Text 0" @date=Thu Aug 13 03:45:27 -0700 1987>
+  #<BlogPost:0xf020801 @title="Title 1" @text="Text 1" @date=Mon Aug 14 12:40:29 -0700 1995>
+  #<BlogPost:0xf020701 @title="Title 2" @text="Text 2" @date=Fri Sep 14 11:10:12 -0700 1990>
+  #<BlogPost:0xf020601 @title="Title 3" @text="Text 3" @date=Fri Oct 31 00:20:46 -0800 1986>
+  #<BlogPost:0xf020501 @title="Title 4" @text="Text 4" @date=Fri Oct 11 05:37:03 -0700 1985>
+
+== Tuesday Afternoon
+
+There are two approaches we can take to fix the problem
+
+1. Write conditional code to get around the inconsistent data.
+2. Ensure all data is in a consistent format.
+
+Neither of the approaches is without issue.  If we choose option one, then
+our code can become a bloated hairball (especially after many such schema
+changes).  If we choose option two, then we have to add a publication date
+to each old entry.  Updating all of the old instances can take significant
+time if you have a lot of instances to munge.
+
+=== Option One: Code Hairball
+
+After several design meetings, and two customer focus interactions,
+Giga-Mega-Corp comes up with the following client application, which works
+great on all the data (<tt>rake blog:client111</tt>):
+
+  class BlogClient
+    VERSION = "1.1.1"
+
+    def print_blog_entries
+      BlogPost.all_posts.each do |p|
+        puts "-" * 50
+
+        pub_date = (p.respond_to?(:date) && !p.date.nil?) ? p.date.strftime("%Y-%m-%d") : "Unknown"
+        puts "Title: #{p.title}  (published on #{pub_date})"
+
+        puts "    #{p.text}"
+      end
+    end
+  end
+
+  BlogClient.new.print_blog_entries
+
+=== Option two: Data Migration
+
+The other approach is to ensure all data is in the same format.  This is
+the approach most RDBMS solutions take (e.g., ActiveRecord migrations).
+Since we're adding a field, and, in general, don't know the publication
+date of the old posts, we'll create a unique marker date that is a stand-in
+for an "unknown publication date".  We make it a Time object, so that it
+can be used like any other time object, but we make it print "Unknown" for
+the publication date (<tt>rake blog:migrate</tt>):
+
+  Maglev.persistent do
+    class BlogPost
+      # Create one Time object that we use to indicate the
+      # "Unknown Publishing Date".  Set the reporting methods
+      # to report "Unknown".
+      UNKNOWN_TIME = Time.at(0)
+      class << UNKNOWN_TIME
+        def strftime(*args) "Unknown" end
+        alias to_s    strftime
+        alias inspect strftime
+      end
+      UNKNOWN_TIME.freeze
+
+      def self.migrate_10_to_11
+        BlogPost.all_posts.each do |post|
+          post.instance_variable_set(:@date, UNKNOWN_TIME) if post.date.nil?
+        end
+        Maglev.commit_transaction  # commit data changes
+      end
+    end
+  end
+  Maglev.commit_transaction  # commit code changes
+
+  BlogPost.migrate_10_to_11  # execute migration
+
+Another possible (if somewhat hairball) approach is to re-write the
+accessor to check for nil and initialize with the <tt>UNKNOWN_TIME</tt>:
+
+  class BlogPost
+
+    # Create one Time object that we use to indicate the "Unknown Publishing
+    # Date".  We also define the strftime method
+    UNKNOWN_TIME = Time.at(0)
+    class << UNKNOWN_TIME
+      def strftime(*args) "Unknown" end
+      alias to_s    strftime
+      alias inspect strftime
+    end
+
+    def date
+      @date ||= UNKNOWN_TIME
+    end
+  end
+
