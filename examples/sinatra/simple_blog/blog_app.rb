@@ -1,4 +1,3 @@
-# require 'rubygems'
 require 'sinatra/base'
 
 # A simple Sinatra blob app using MagLev.  This file depends on the
