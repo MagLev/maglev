@@ -4,7 +4,14 @@
 
 == Unreleased Changes
 
-* Fix Trac 822
+== Changes for 24854 2010-12-13
+* Fix Trac 822, 823 which resolves:
+  A couple of problems in Tilt and HAML
+  AST->IR problem with string interpolation
+* Added Gemfiles to Sinatra examples to document tested versions
+* Added Haml example (mostly for testing)
+* Work in progress on migrations examples
+* A few improvements to the underlying GemStone 3.0  system
 
 == Changes for 24811 2010-12-06
 * Implement getpeername, getsockname for Ruby Sockets to make pure Ruby EventMachine work
