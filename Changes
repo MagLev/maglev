@@ -4,6 +4,10 @@
 
 == Unreleased Changes
 
+== Changes for 24864 2010-12-14
+* No Ruby code changes
+* Fix for SEGV in Socket code on Mac OS X in underlying GemStone 3.0 system
+
 == Changes for 24854 2010-12-13
 * Fix Trac 822, 823 which resolves:
   A couple of problems in Tilt and HAML
