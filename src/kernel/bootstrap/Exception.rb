@@ -24,7 +24,7 @@ class Exception
     primitive_nobridge '__basic_dup', '_basicCopy'
 
     def __message
-      m = @_st_details
+      m = @_st_gsDetails
       if m._equal?(nil)
         m = __description  # generate Smalltalk message
       end
@@ -106,7 +106,7 @@ class Exception
     def backtrace(limit = 1000)
       # excludes smalltalk frames from the result
       #  limit defines smalltalk stack depth at which to stop
-      @_st_stack || Thread.__backtrace(IncludeSmalltalkFrames, limit)
+      @_st_gsStack || Thread.__backtrace(IncludeSmalltalkFrames, limit)
     end
 
     def backtrace_st(limit = 1000)
@@ -134,7 +134,7 @@ class Exception
     end
 
     def set_backtrace(array)
-      @_st_stack = array
+      @_st_gsStack = array
     end
 
     def to_s
@@ -321,7 +321,7 @@ class NoMethodError  # a subclass of NameError
        @_st_selector = selector
      end
      if args_arr._isArray
-       @_st_args = args_arr
+       @_st_gsArgs = args_arr
      end
      if envid._isFixnum
        @_st_envId = envid
@@ -336,7 +336,7 @@ class NoMethodError  # a subclass of NameError
      @_st_envId
    end
    def args
-     a = @_st_args
+     a = @_st_gsArgs
      if a._equal?(nil)
        a = []
      end
