@@ -1,4 +1,4 @@
-# Exception is identically Smalltalk class Exception 
+# Exception is identically Smalltalk class Exception
 #
 class Exception
     class_primitive 'allocate', 'rubyBasicNew'
@@ -28,11 +28,11 @@ class Exception
       if m._equal?(nil)
         m = __description  # generate Smalltalk message
       end
-      if m.frozen? 
+      if m.frozen?
         # messages encoded by Smalltalk may be frozen,
         # but ruby allows modifications
         unless m._isSymbol
-          m = m.dup 
+          m = m.dup
         end
       end
       m
@@ -55,7 +55,7 @@ class Exception
           return
         end
       end
-      m << str.to_s 
+      m << str.to_s
     end
 
     # Define this in ruby code so we get the full env1 creation hooks
@@ -148,7 +148,7 @@ end
 
 # open each of the subclasses of Exception that map to
 #   a Smalltalk class to initialize the ruby name space
-#  order here matches order in  Exception(C)>>commentRubyMapping
+#  order here matches order in  AbstractException(C)>>commentRubyMapping
 
 class SystemExit
   # Smalltalk reimplements initialize
@@ -156,6 +156,11 @@ class SystemExit
 
   def status
     @_st_status
+  end
+
+  # If a_bool is false, marks this exception as coming from Kernel#exit!
+  def run_at_exit_handlers=(a_bool)
+    @_st_runAtExitHandlers = a_bool
   end
 
   def initialize(*args)
@@ -220,8 +225,8 @@ class SystemCallError
     n = Errno.__errno_for_class(self)
     if n._equal?(nil)
       n = 0
-    end 
-    exc.errno=(n) 
+    end
+    exc.errno=(n)
     exc.__message=(msg)
     exc
   end
@@ -232,8 +237,8 @@ class SystemCallError
     n = Errno.__errno_for_class(self)
     if n._equal?(nil)
       n = 0
-    end 
-    exc.errno=(n) 
+    end
+    exc.errno=(n)
     exc
   end
 
@@ -249,12 +254,12 @@ class SystemCallError
       msg = nil
     elsif argone._isString
       msg = argone
-      if args.length >= 2 
+      if args.length >= 2
         argtwo = args[1]
         if argtwo._isFixnum
           errnum = argtwo
         end
-      end  
+      end
     end
     if errnum._not_equal?(nil)
       exc = Errno.__new_for_errno(errnum)

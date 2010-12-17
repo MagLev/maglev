@@ -336,15 +336,18 @@ module Kernel
     raise SystemExit.new(status)
   end
 
-  # call-seq:
-  #   exit!(true | false | status=1)
-  #
-  # MagLev: Not Implemented.  Raises NotImplementedError
-  #
   # Similar to <tt>Kernel.exit</tt>, but exception handling,
   # <tt>at_exit</tt> functions and finalizers are bypassed.
-  def exit!(*args)
-    raise NotImplementedError, "Kernel.exit! is not implemented."
+  def exit!(arg=0)
+    status = 9
+    if (arg._equal?(true))
+      status = 0
+    elsif (arg._isInteger)
+      status = arg
+    end
+    ex = SystemExit.new(status)
+    ex.run_at_exit_handlers = false
+    raise ex
   end
 
   primitive 'format*', 'sprintf:with:'
