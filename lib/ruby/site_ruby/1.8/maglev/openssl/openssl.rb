@@ -2,6 +2,9 @@
 require 'maglev/openssl/ffi/libcrypto'
 
 # This module wraps the OpenSSL library for Ruby.
+#
+# The MagLev implementation does not have all the functions the MRI version
+# has.  Some known limitations.  See Documentation for OpenSSL::Random.
 module OpenSSL
   # The version of the ruby OpenSSL library
   VERSION = '1.0.0'
@@ -14,7 +17,6 @@ module OpenSSL
 
   # Generic error, common for all classes under OpenSSL module.
   class OpenSSLError < StandardError; end
-
 
   # call-seq:
   #   OpenSSL.debug -> true | false

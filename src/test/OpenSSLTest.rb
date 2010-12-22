@@ -99,6 +99,9 @@ def test_random
   len = 134
   rbytes = OpenSSL::Random.pseudo_bytes(len)
   test(rbytes.length, len, "OpenSSL::Random.pseudo_bytes: should be #{len} bytes")
+
+  random_enough = OpenSSL::Random.status?
+  test(random_enough, true, 'OpenSSL::Random.status?')
 end
 
 test_sha1 if defined? Maglev
