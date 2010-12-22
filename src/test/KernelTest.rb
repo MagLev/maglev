@@ -55,5 +55,27 @@ end
 
 test( testEval() , true, "eval with tilde")
 
+# Ensure that Kernel#raise generates a TypeError on bogus exception class
+# parameter
+# TODO: add to rubyspecs
+
+begin
+  raise :foo  # should generate a TypeError
+rescue => e
+  test(e.class, TypeError, 'raise :foo should generate a TypeError')
+end
+
+begin
+  raise Object.new  # should generate a TypeError
+rescue => e
+  test(e.class, TypeError, 'raise Object.new should generate a TypeError')
+end
+
+begin
+  raise :quux, "Detail"  # should generate a TypeError
+rescue => e
+  test(e.class, TypeError, 'raise :quux, "msg" should generate a TypeError')
+end
+
 report
 true

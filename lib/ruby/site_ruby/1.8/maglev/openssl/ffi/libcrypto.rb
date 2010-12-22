@@ -35,7 +35,7 @@ module OpenSSL
       cptr = OpenSSL::LibCrypto.EVP_MD_CTX_create
       raise 'EVP_MD_CTX_create() failed' if cptr.null?
       ctx = OpenSSL::LibCrypto::EVP_MD_CTX.new(cptr)
-      
+
       ObjectSpace.define_finalizer(ctx, FINALIZER)
       ctx
     end
@@ -285,6 +285,7 @@ module OpenSSL
     # using EVP_MD_CTX_create().
     attach_function(:EVP_MD_CTX_destroy, [:pointer], :void)
 
+
     #-- ############################################################
     #                           HMAC Layer
     #++ ############################################################
@@ -399,6 +400,35 @@ module OpenSSL
     #--
     # void HMAC_cleanup(HMAC_CTX *ctx);
     #++
+
+    #-- ############################################################
+    #                           Random impl
+    #++ ############################################################
+
+    #--
+    # void RAND_seed(const void *buf,int num);
+    #++
+    attach_function(:RAND_seed, [:const_string, :int], :void)
+
+    #--
+    # void RAND_add(const void *buf,int num,double entropy);
+    #++
+    attach_function(:RAND_add, [:const_string, :int, :double], :void)
+
+    #--
+    # int  RAND_bytes(unsigned char *buf,int num);
+    #++
+    attach_function(:RAND_bytes, [:pointer, :int], :int)
+
+    #--
+    # int  RAND_pseudo_bytes(unsigned char *buf,int num);
+    #++
+    attach_function(:RAND_pseudo_bytes, [:pointer, :int], :int)
+
+    #--
+    # int  RAND_status(void);
+    #++
+    attach_function(:RAND_status, [], :int)
 
     #-- ############################################################
     #   Initialize
