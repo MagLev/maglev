@@ -5,6 +5,7 @@
 == Unreleased Changes
 
 == Changes for 24906 2010-12-21
+* Add OpenSSL::Random implementation.
 * "maglev-gem pristine <gem>" now installs $MAGLEV_HOME/bin files with
   proper #!/usr/bin/env line (--env-shebang).
 * Minor bugfixes in underlying GemStone 3.0 system

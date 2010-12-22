@@ -85,10 +85,27 @@ def test_use_md_specific_classes
   p digest.hexdigest
 end
 
+def test_random
+  r = OpenSSL::Random
+  test(Module, OpenSSL::Random.class, 'OpenSSL::Random is a module')
+
+  str = "foo"
+  test(OpenSSL::Random.seed(str), str, 'OpenSSL::Random.seed returns its argument')
+  test(OpenSSL::Random.random_add(str, 0.3), OpenSSL::Random, 'OpenSSL::Random.random_add return value')
+  len = 27
+  rbytes = OpenSSL::Random.random_bytes(len)
+  test(rbytes.length, len, "OpenSSL::Random.random_bytes: should be #{len} bytes")
+
+  len = 134
+  rbytes = OpenSSL::Random.pseudo_bytes(len)
+  test(rbytes.length, len, "OpenSSL::Random.pseudo_bytes: should be #{len} bytes")
+end
+
 test_sha1 if defined? Maglev
 test_crypto_digest
 test_basic_ruby_use_case
 test_openssl_module
 test_all_hmac_impls
+test_random
 
 report
