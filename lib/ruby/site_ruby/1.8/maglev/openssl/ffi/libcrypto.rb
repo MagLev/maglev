@@ -35,7 +35,7 @@ module OpenSSL
       cptr = OpenSSL::LibCrypto.EVP_MD_CTX_create
       raise 'EVP_MD_CTX_create() failed' if cptr.null?
       ctx = OpenSSL::LibCrypto::EVP_MD_CTX.new(cptr)
-      
+
       ObjectSpace.define_finalizer(ctx, FINALIZER)
       ctx
     end
@@ -426,9 +426,9 @@ module OpenSSL
     attach_function(:RAND_pseudo_bytes, [:pointer, :int], :int)
 
     #--
-    # int  RAND_egd(unsigned char *buf,int num);
+    # int  RAND_status(void);
     #++
-    attach_function(:RAND_pseudo_bytes, [:pointer, :int], :int)
+    attach_function(:RAND_status, [], :int)
 
     #-- ############################################################
     #   Initialize
