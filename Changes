@@ -4,6 +4,11 @@
 
 == Unreleased Changes
 
+== Changes for 24906 2010-12-21
+* "maglev-gem pristine <gem>" now installs $MAGLEV_HOME/bin files with
+  proper #!/usr/bin/env line (--env-shebang).
+* Minor bugfixes in underlying GemStone 3.0 system
+
 == Changes for 24893 2010-12-20
 * Fix problem running minitest 2.0.1
 * Add implementation for Kernel#exit!
