@@ -4,6 +4,11 @@
 
 == Unreleased Changes
 
+== Changes for 24924 2010-12-23
+* Updates to openssl/random.rb to help with crypto work
+* Kernel#raise now causes a TypeError, not NoMethodError, if given bad exception class
+* Underlying GemStone 3.0 system changes that didn't make it into ithe Betai release.
+
 == Changes for 24906 2010-12-21
 * Add OpenSSL::Random implementation.
 * "maglev-gem pristine <gem>" now installs $MAGLEV_HOME/bin files with
