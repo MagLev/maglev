@@ -630,8 +630,11 @@ module Kernel
         msg << message
       end
       raise(RuntimeError, msg)
-    else
+    elsif ex_class.respond_to?(:exception) && !ex_class._isSymbol
       ex = ex_class.exception(message)
+      ex.__signal
+    else
+      ex = TypeError.new("exception class/object expected: #{ex_class.inspect}")
       ex.__signal
     end
   end
@@ -643,9 +646,12 @@ module Kernel
         msg << message
       end
       raise(RuntimeError, msg, stack)
-    else
+    elsif ex_class.respond_to?(:exception) && !ex_class._isSymbol
       ex = ex_class.exception(message)
       ex.set_backtrace(stack)
+      ex.__signal
+    else
+      ex = TypeError.new("exception class/object expected: #{ex_class.inspect}")
       ex.__signal
     end
   end
@@ -653,7 +659,7 @@ module Kernel
   def raise(msg)
     if msg._isString
       raise(RuntimeError, msg)
-    else
+    elsif msg.respond_to?(:exception) && !msg._isSymbol
       # msg should be a subclass of Exception or
       #  an object that returns a new exception
       ex = msg.exception
@@ -662,6 +668,9 @@ module Kernel
       else
         ex.__signal
       end
+    else
+      ex = TypeError.new("exception class/object expected: #{msg.inspect}")
+      ex.__signal
     end
   end
 
