@@ -4,6 +4,7 @@
 
 == Unreleased Changes
 * Pre-install rake-0.8.7 gem
+* Pre-install bundler-1.0.7 gem.
 * Fix for Trac 825 - Exception backtrace is bogus
 * Changes in GemStone 3.0 stats 
 * Changes in GemStone 3.0 to improve conversion from GemStone 2.4
