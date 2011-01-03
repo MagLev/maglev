@@ -21,7 +21,6 @@ rails
 rake2thor
 thor
 cucumber
-rake
 tt
 mustache
 ramaze
