@@ -31,10 +31,9 @@ OPTIONS:
    -r library     Require library before running
    -M<opt>        MagLev specific options.  This flag may be passed multiple
                   times.  The currently recognized options are:
-                    traceGlobals  Trace setting/defining global variables
-                    traceLoad     Trace loading of ruby files
-                    logSexp       Print sexpressions as they are parsed
-                    rlwrap        invoke topaz with rlwrap, if available
+                    allIvsDynamic Start the VM so all instance variables are
+                                  dynamic.
+                    captureStack  Stack will be captured at each Exception raise.
                     commit        wrap script in Maglev.persistent block and
                                   commit; implies -Mpersistent.  E.g.,:
                                      maglev-ruby -Mcommit -e 'require "foo"'
@@ -42,10 +41,12 @@ OPTIONS:
                                   mode, and then commit the code, and any
                                   persistent data it created, to the
                                   repository
+                    logSexp       Print sexpressions as they are parsed
                     persistent    Start the VM in persistent mode (default is
                                   transient mode)
-                    allIvsDynamic Start the VM so all instance variables are
-                                  dynamic.
+                    rlwrap        invoke topaz with rlwrap, if available
+                    traceGlobals  Trace setting/defining global variables
+                    traceLoad     Trace loading of ruby files
    -S             MagLev will search for the ruby script on the PATH environment
                   variable, unless the script name begins with '/'.
    -w             Turn on warnings.  Sets $VERBOSE true.
@@ -192,7 +193,7 @@ do
                 rlwrap)
                     rlwrapFlag=1
                     ;;
-                traceGlobals|logSexp|traceLoad|commit|persistent|allIvsDynamic)
+                traceGlobals|logSexp|traceLoad|commit|persistent|allIvsDynamic|captureStack)
                     maglev_args="${maglev_args} ${sub_opt}"
                     ;;
                 *)
