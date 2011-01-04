@@ -75,12 +75,21 @@ class Thread
     unless limit > 0
       raise ArgumentError, 'limit must be > 0'
     end
+    res_start_ofs = 1
+    st_stack = __stbacktrace(limit)
+    result = self.__st_to_rubybacktrace(st_stack, include_st)
+    result[(res_start_ofs+1)..-1]
+  end
+
+  def self.__st_to_rubybacktrace(st_stack, include_st=nil)
     result = []
     maglev_home = ENV['MAGLEV_HOME']
-    res_start_ofs = 1
-    ststack = __stbacktrace(limit)
-    for idx in 0..(ststack.length - 1) do
-      f_info = __frame_info(ststack[idx], include_st)
+    if include_st._equal?(nil)
+      wlevel = $-W 
+      include_st =  wlevel._isFixnum && wlevel > 2 
+    end
+    for idx in 0..(st_stack.length - 1) do
+      f_info = __frame_info(st_stack[idx], include_st)
       if f_info._not_equal?(nil)
         file = f_info[0]
         line = f_info[1]
@@ -90,7 +99,7 @@ class Thread
         # frame, but eval and block frames may require searching further.
         # This search is a bit sketchy...
         if file and file.include?( KERNEL_SRC_STR )
-          u_info = __find_next_user_info_for(idx+1, ststack)
+          u_info = __find_next_user_info_for(idx+1, st_stack)
           if u_info._not_equal?(nil)
             file = u_info[0]
             line = u_info[1]
@@ -101,7 +110,7 @@ class Thread
         result << "#{file}:#{line}#{meth}"  if file 
       end
     end
-    result[(res_start_ofs+1)..-1]
+    result
   end
 
   # If the current stack frame represents kernel source
