@@ -3,12 +3,16 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
-* Pre-install rake-0.8.7 gem.
+* Pre-install rake-0.8.7 gem
+* Fix for Trac 825 - Exception backtrace is bogus
+* Changes in GemStone 3.0 stats 
+* Changes in GemStone 3.0 to improve conversion from GemStone 2.4
+* Other Bugfixes in underlying GemStone 3.0 system
 
 == Changes for 24924 2010-12-23
 * Updates to openssl/random.rb to help with crypto work
 * Kernel#raise now causes a TypeError, not NoMethodError, if given bad exception class
-* Underlying GemStone 3.0 system changes that didn't make it into ithe Betai release.
+* Underlying GemStone 3.0 system changes that didn't make it into the Beta release.
 
 == Changes for 24906 2010-12-21
 * Add OpenSSL::Random implementation.
