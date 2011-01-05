@@ -71,6 +71,7 @@ class TestCase
     puts "\n==========================================="
     puts "Test #{@name}: #{@status}"
     puts @exception.backtrace.join("\n") if @exception
+    exa = @exception
   end
 end
 
@@ -78,14 +79,18 @@ end
 class C
   def a; b; end
   def b; c; end
-  def c; raise "failure"; end
+  def c 
+    raise "failure"
+  end
 end
 
 tc = TestCase.new("tc1") do
   C.new.a
 end
+puts "--- Normal"
 tc.run
 tc.report
 
+puts "--- Workaround "
 tc.run_enhanced
 tc.report

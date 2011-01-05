@@ -103,16 +103,27 @@ class Exception
       @_st_messageText = msg
     end
 
-    def backtrace(limit = 1000)
-      # excludes smalltalk frames from the result
-      #  limit defines smalltalk stack depth at which to stop
-      @_st_gsStack || Thread.__backtrace(IncludeSmalltalkFrames, limit)
-    end
+    primitive_nobridge '__stbacktrace', 'backtraceToLevel:'
 
-    def backtrace_st(limit = 1000)
-      # include smalltalk frames in the result
+    def backtrace(limit = 1000)
+      # excludes smalltalk frames from the result, unless $-W > 2
       #  limit defines smalltalk stack depth at which to stop
-      Thread.__backtrace(true, limit)
+      unless limit._isFixnum
+        raise ArgumentError, 'limit must be a Fixnum'
+      end
+      unless limit > 0
+        raise ArgumentError, 'limit must be > 0'
+      end
+      oldstk = @_st_gsStack 
+      stk = self.__stbacktrace(limit)
+      if stk.size._equal?(0)
+        stk = [ 'No Stack Available, to generate stack use - ']
+      end
+      if stk._not_equal?(oldstk)
+        stk = Thread.__st_to_rubybacktrace(stk)
+        @_st_gsStack = stk
+      end
+      stk   
     end
 
     def exception(msg = MaglevUndefined)

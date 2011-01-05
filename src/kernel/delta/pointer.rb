@@ -91,8 +91,8 @@ module FFI
         elemsize = modu.type_size(modu.find_type(type))
       end
       count = Type.coerce_to(count, Fixnum, :to_int)
-      if (count < 1)
-        raise ArgumentError , 'count must be a Fixnum >= 1'
+      if (count < 0)
+        raise ArgumentError , 'count must be a Fixnum >= 0'
       end
       numbytes = count * elemsize
       inst = self.__gc_malloc(numbytes)

@@ -630,7 +630,8 @@ module Kernel
         msg << message
       end
       raise(RuntimeError, msg)
-    elsif ex_class.respond_to?(:exception) && !ex_class._isSymbol
+    elsif ex_class._is_a?(Exception) ||
+          (ex_class.respond_to?(:exception) && !ex_class._isSymbol)
       ex = ex_class.exception(message)
       ex.__signal
     else
