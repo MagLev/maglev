@@ -1,2 +1,0 @@
-fails:Dir.[] respects the order of {} expressions, expanding left most first
-fails:Dir.[] matches multiple recursives

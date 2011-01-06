@@ -1,4 +1,0 @@
-hangs:Thread#exit killing dying sleeping thread wakes up thread
-fails:Thread#exit runs nested ensure clauses
-fails:Thread#exit can be rescued by outer rescue clause when inner ensure clause raises exception
-fails:Thread#exit is deferred if ensure clause does Thread.stop

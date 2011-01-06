@@ -1,3 +1,0 @@
-fails:Proc#[] sets self's single parameter to an Array of all given values
-fails:Proc#[] can receive block arguments
-fails:Proc#call on a Proc created with Kernel#lambda or Kernel#proc treats a single Array argument as a single argument

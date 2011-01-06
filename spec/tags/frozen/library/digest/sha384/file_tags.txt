@@ -1,3 +1,0 @@
-fails:Digest::SHA384.file when passed a path to a file that exists returns a Digest::SHA384 object
-fails:Digest::SHA384.file when passed a path to a file that exists returns a Digest::SHA384 object with the correct digest
-fails:Digest::SHA384.file when passed a path to a file that exists calls #to_str on an object and returns the Digest::SHA384 with the result

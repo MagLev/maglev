@@ -1,0 +1,3 @@
+fails:File.expand_path does not replace multiple '/' at the beginning of the path
+fails:File.expand_path raises an ArgumentError if the path is not valid
+fails:File.expand_path expands ~ENV['USER'] to the user's home directory

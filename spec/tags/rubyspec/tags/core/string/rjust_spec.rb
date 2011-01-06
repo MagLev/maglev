@@ -1,0 +1,2 @@
+fails:String#rjust with length, padding taints result when self or padstr is tainted
+fails:String#rjust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self

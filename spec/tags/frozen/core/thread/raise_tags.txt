@@ -1,7 +1,0 @@
-hangs:Thread#raise on a running thread raises a RuntimeError if no exception class is given
-hangs:Thread#raise on a running thread raises the given exception
-hangs:Thread#raise on a running thread can go unhandled
-hangs:Thread#raise on a running thread raise the given argument even when there is an active exception
-fails:Thread#raise on same thread aborts execution
-fails:Thread#raise on same thread raises RuntimeError if no exception class is given
-fails:Thread#raise on same thread allows Exception, message, and backtrace parameters

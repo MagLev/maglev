@@ -1,54 +1,65 @@
-This directory contains all of the spec related files.
+-*- org -*-
+* Notes on RSpec and MSpec usage with MagLev
 
-do_not_run_specs
-  A file read by default.mspec and Don's test files that list the specs
-  under rubyspec that have a syntax error or otherwise blow up bad enough
-  that we do not even attempt to run them.  Most of these should have a
-  counterpart in localspec that has the offending bits removed.
+  This directory contains all of the spec related files.
 
-localspec
-  A directory that holds the Gemstone fixes for rubyspecs that cause MagLev
-  to choke.
-  NOTE: to get specs to run from this directory, you need to change the
-  require and load statements in the files
+** NEW
+   + Add MagLev guards
 
-  FROM:
-      require File.dirname(__FILE__) + '/../spec_helper'
-  TO:
-      require File.dirname(__FILE__) + '/../../rubyspec/language/' + '/../spec_helper'
+** OLD
 
-mspec
-  A git submodule that tracks the mspec framework.
-  As of 2009-06-28, this is at version 1.5.12 of mspec.
-  git://github.com/rubyspec/mspec
+*** do_not_run_specs
 
-  To update to a new version of the mspec and rubyspec submodules,
-  first save any edits to the submodule by renaming directories or
-  using git stash, etc.
-  Then in top of git checkout (i.e. in parent of this directory) do this:
-    git submodule update --init
+    A file read by default.mspec and Don's test files that list the specs
+    under rubyspec that have a syntax error or otherwise blow up bad enough
+    that we do not even attempt to run them.  Most of these should have a
+    counterpart in localspec that has the offending bits removed.
 
-rubyspec
-  A git submodule that tracks the rubyspecs.
-  As of 2009-06-28, this was the HEAD from the rubyspec git repository.
-  git://github.com/rubyspec/rubyspec
+*** localspec
+    A directory that holds the Gemstone fixes for rubyspecs that cause
+    MagLev to choke.
 
-  In order to work around parser problems that cannot be resolved by tagging, 
-  we've temporarily removed or altered the following files:
+    NOTE: to get specs to run from this directory, you need to change the
+    require and load statements in the files
 
-    rm -f spec/rubyspec/core/fiber/resume_spec.rb
-    rm -f spec/rubyspec/core/fiber/transfer_spec.rb
-    rm -f spec/rubyspec/core/kernel/__callee__spec.rb
-    rm -f spec/rubyspec/core/kernel/__method__spec.rb
+    FROM:
+        require File.dirname(__FILE__) + '/../spec_helper'
+    TO:
+        require File.dirname(__FILE__) + '/../../rubyspec/language/' + '/../spec_helper'
 
-    cp spec/localspec/core/module/autoload_spec.rb \
-       spec/rubyspec/core/module/autoload_spec.rb
-    cp spec/localspec/language/super_spec.rb \
-       spec/rubyspec/language/super_spec.rb
+*** mspec
+    A git submodule that tracks the mspec framework.
+    As of 2009-06-28, this is at version 1.5.12 of mspec.
+    git://github.com/rubyspec/mspec
 
-tags
-  The Gemstone rubyspec tags.  These are maintained in the git repository.
-  To get a complete run of passing specs using tags:
-  cd $MAGLEV_HOME
-  spec/mspec/bin/mspec -G fails -G breaks -G crashes -G hangs \
-    spec/rubyspec/language/ spec/rubyspec/core spec/rubyspec/library/stringio/
+    To update to a new version of the mspec and rubyspec submodules, first
+    save any edits to the submodule by renaming directories or using git
+    stash, etc. Then in top of git checkout (i.e. in parent of this
+    directory) do this:
+      $ git submodule update --init
+
+*** rubyspec
+    A git submodule that tracks the rubyspecs.
+    As of 2009-06-28, this was the HEAD from the rubyspec git repository.
+    git://github.com/rubyspec/rubyspec
+
+    In order to work around parser problems that cannot be resolved by tagging,
+    we've temporarily removed or altered the following files:
+
+      rm -f spec/rubyspec/core/fiber/resume_spec.rb
+      rm -f spec/rubyspec/core/fiber/transfer_spec.rb
+      rm -f spec/rubyspec/core/kernel/__callee__spec.rb
+      rm -f spec/rubyspec/core/kernel/__method__spec.rb
+
+      cp spec/localspec/core/module/autoload_spec.rb \
+         spec/rubyspec/core/module/autoload_spec.rb
+      cp spec/localspec/language/super_spec.rb \
+         spec/rubyspec/language/super_spec.rb
+
+*** tags
+
+    The Gemstone rubyspec tags.  These are maintained in the git
+    repository.  To get a complete run of passing specs using tags:
+      cd $MAGLEV_HOME
+      spec/mspec/bin/mspec -G fails -G breaks -G crashes -G hangs \
+        spec/rubyspec/language/ spec/rubyspec/core spec/rubyspec/library/stringio/
