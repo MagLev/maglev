@@ -1,0 +1,2 @@
+fails:StringIO#chars yields each character code in turn
+fails:StringIO#chars returns an Enumerator when passed no block

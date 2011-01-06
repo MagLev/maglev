@@ -1,0 +1,2 @@
+fails:BasicSocket.do_not_reverse_lookup causes 'peeraddr' to avoid name lookups
+fails:BasicSocket.do_not_reverse_lookup looks for numeric addresses when set to true

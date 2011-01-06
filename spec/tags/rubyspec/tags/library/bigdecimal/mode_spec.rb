@@ -1,0 +1,2 @@
+fails:BigDecimal.mode returns the appropriate value and continue the computation if the flag is false
+fails:BigDecimal.mode returns zero when too big

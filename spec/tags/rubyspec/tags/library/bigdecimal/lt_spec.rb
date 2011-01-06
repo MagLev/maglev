@@ -1,0 +1,2 @@
+fails:BigDecimal#< properly handles infinity values
+fails:BigDecimal#< properly handles NaN values
