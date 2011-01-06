@@ -366,5 +366,22 @@ end
 
 OutputBuffer.new # MagLev reports too few args.
 
+# If a subclass of string defined #<<(stuff), then that would potentially
+# mess up the implementation of other string methods that simply used << in
+# their impl (gsub, gsub!, etc.).  This tests that case.
+class BadString < String
+  def <<(stuff)
+    super('X')
+  end
+end
+
+b = BadString.new("Hello There")
+
+test(b.gsub(/[aeiou]/, '*'), "H*ll* Th*r*", "BadString gsub")
+test(b * 3, "Hello ThereHello ThereHello There", "BadString *")
+test(BadString.new("123").gsub!(/\d/, " "), "   ", "BadString gsub!")
+test(b.partition("ll"), ["He", "ll", "o There"], "BadString partition")
+test(b.split, ["Hello", "There"], "BadString split")
+
 report
 
