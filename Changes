@@ -3,9 +3,12 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+
+== Changes for 24983 2011-01-06
 * Pre-install rake-0.8.7 gem
 * Pre-install bundler-1.0.7 gem.
 * Fix for Trac 825 - Exception backtrace is bogus
+* Fix that a subclass of string defining #<< messed up pure ruby gsub etc.
 * Changes in GemStone 3.0 stats 
 * Changes in GemStone 3.0 to improve conversion from GemStone 2.4
 * Other Bugfixes in underlying GemStone 3.0 system
