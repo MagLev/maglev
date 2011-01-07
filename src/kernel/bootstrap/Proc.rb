@@ -51,7 +51,7 @@ class ExecBlock
       self.call
     end
 
-    def [](a)
+    def [](a)  # also used by Cext implementation
       self.call(a)
     end
 
@@ -63,7 +63,7 @@ class ExecBlock
       self.call(a, b, c)
     end
 
-    def [](*args)
+    def [](*args)  # also used by Cext implementation
       self.call(*args)
     end
 
@@ -90,9 +90,10 @@ class ExecBlock
 
     def __fficallback(*args)
       # execution of an ExecBlock by an FFI callback invokes this method
+      # also used by Cext
       self.call(*args)
     end
-
+ 
     def arity
       na = self.__num_args 
       if na._equal?(0)
