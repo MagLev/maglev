@@ -94,6 +94,9 @@ class NilClass
     # invoked from generated code
     self
   end
+  def __to_proc_arg
+    self
+  end
 
   def __evVcGput(tilde, underscore)
     # for use by eval implementation only

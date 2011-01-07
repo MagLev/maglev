@@ -578,6 +578,11 @@ class Object
     self
   end
 
+  def __to_proc_arg
+     # used in BlockPassNode IR
+    self.to_proc 
+  end
+
   def to_a
      # remove this method for MRI 1.9 compatibility
      [ self ]
