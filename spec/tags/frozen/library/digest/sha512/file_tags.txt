@@ -1,3 +1,0 @@
-fails:Digest::SHA512.file when passed a path to a file that exists returns a Digest::SHA512 object
-fails:Digest::SHA512.file when passed a path to a file that exists returns a Digest::SHA512 object with the correct digest
-fails:Digest::SHA512.file when passed a path to a file that exists calls #to_str on an object and returns the Digest::SHA512 with the result

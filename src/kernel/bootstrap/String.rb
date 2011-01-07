@@ -117,21 +117,21 @@ class String
     if n >= 64
       # optimization to reduce number of iterations for large n
       kstr = self.class.__alloc
-      kstr << self
+      kstr.__append_internal(self)
       k = 1
       klim = n.__divide(16)
       # grow kstr to max of ( 1/16 of result size , 16K bytes)
       while k < klim && kstr.__size < 8000
-        kstr << kstr
+        kstr.__append_internal(kstr)
         k = k * 2
       end
       while n > k
-        str << kstr
+        str.__append_internal(kstr)
         n -= k
       end
     end
     while n > 0
-      str << self
+      str.__append_internal(self)
       n -= 1
     end
     str
@@ -142,9 +142,13 @@ class String
   #   note smalltalk addAll:  returns arg, not receiver
   primitive '__append', '_rubyAddAll:'
 
-  def __concat(arg)
-    # raise TypeError, "<<: can't modify frozen string" if self.frozen? 
-    # frozen checked in __append primitive 
+  def <<(arg)
+    __append_internal(arg)
+  end
+
+  def __append_internal(arg)
+    # raise TypeError, "<<: can't modify frozen string" if self.frozen?
+    # frozen checked in __append primitive
     if arg._isFixnum
       # raise TypeError, "<<: #{arg} out of range" if arg < 0 or arg > 255 # in prim
       # range checked in  __append primitive
@@ -783,11 +787,11 @@ class String
     pat.__each_match(self) do |match|
       modified = true
       last_match = match
-      out << self._gsub_copyfrom_to(start, match.begin(0))
-      out << str.__to_sub_replacement(match)
+      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
+      out.__append_internal(str.__to_sub_replacement(match))
       start = match.end(0)
     end
-    out << self.__copyfrom_to(start + 1, self.__size)
+    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
     last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
     [out, modified]
   end
@@ -836,11 +840,11 @@ class String
 
   def __replace_match_with(match, replacement)
     out = self.class.__alloc
-    out << self._gsub_copyfrom_to(0, match.begin(0) )
+    out.__append_internal(self._gsub_copyfrom_to(0, match.begin(0) ))
     unless replacement._equal?(nil)
-      out << replacement.__to_sub_replacement(match)
+      out.__append_internal(replacement.__to_sub_replacement(match))
     end
-    out << self.__copyfrom_to(match.end(0) + 1, self.__size)
+    out.__append_internal(self.__copyfrom_to(match.end(0) + 1, self.__size))
     out
   end
 
@@ -858,17 +862,17 @@ class String
     last_match = nil
     self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
       last_match = match
-      out << self._gsub_copyfrom_to(start, match.begin(0))
+      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
       saveTilde = block.__fetchRubyVcGlobal(0)
       begin
         block.__setRubyVcGlobal(0, match)
-        out << block.call(match.__at(0)).to_s
+        out.__append_internal(block.call(match.__at(0)).to_s)
       ensure
         block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
-    out << self.__copyfrom_to(start + 1, self.__size)
+    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
     last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
     out
   end
@@ -889,17 +893,17 @@ class String
     start = 0
     out = self.class.__alloc
     self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      out << self._gsub_copyfrom_to(start, match.begin(0) )
+      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0) ))
       saveTilde = block.__fetchRubyVcGlobal(0)
       begin
         block.__setRubyVcGlobal(0, match)
-        out << block.call(match.__at(0)).to_s
+        out.__append_internal(block.call(match.__at(0)).to_s)
       ensure
         block.__setRubyVcGlobal(0, saveTilde)
       end
       start = match.end(0)
     end
-    out << self.__copyfrom_to(start + 1, self.__size)
+    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
     if self == out
       nil
     else

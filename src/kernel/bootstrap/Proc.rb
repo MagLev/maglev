@@ -126,6 +126,9 @@ class ExecBlock
       #      not automatically coerced.
       Proc.new(self)
     end
+    def __to_proc_arg
+      self
+    end
 end
 
 
@@ -348,6 +351,9 @@ class Proc
       self
     end
     def __to_proc
+      self
+    end
+    def __to_proc_arg
       self
     end
 

@@ -1,0 +1,6 @@
+fails:String#gsub with pattern and replacement respects $KCODE when the pattern collapses
+fails:String#gsub with pattern and replacement taints the result if the original string or replacement is tainted
+fails:String#gsub with pattern and block raises a RuntimeError if the string is modified while substituting
+fails:String#gsub! with pattern and replacement taints self if replacement is tainted
+fails:String#gsub! with pattern and block taints self if block's result is tainted
+fails:String#gsub! with pattern and block raises a RuntimeError if the frozen string would be modified

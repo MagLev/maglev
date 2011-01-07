@@ -1,0 +1,4 @@
+fails:Zlib::Inflate#inflate works in pass-through mode, once finished
+fails:Zlib::Inflate::inflate properly handles data in chunks
+fails:Zlib::Inflate::inflate properly handles incomplete data
+fails:Zlib::Inflate::inflate properly handles excessive data, byte-by-byte
