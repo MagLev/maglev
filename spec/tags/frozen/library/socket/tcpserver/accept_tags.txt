@@ -1,2 +1,0 @@
-hangs:TCPServer#accept can be interrupted by Thread#raise
-fails:TCPServer#accept accepts a connection and returns a TCPSocket

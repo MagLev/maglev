@@ -1,0 +1,3 @@
+fails:Time.mktime respects rare old timezones
+fails:Time.mktime should accept various year ranges
+fails:Time.mktime sets the time zone correctly for a short time zone identifier

@@ -1,1 +1,0 @@
-fails:String#<< taints self if other is tainted

@@ -1,2 +1,0 @@
-fails:Thread#alive? describes a running thread
-fails:Thread#alive? describes a dying sleeping thread

@@ -1,0 +1,5 @@
+fails:Array#reject returns subclass instance on Array subclasses
+fails:Array#reject returns an Enumerator if no block given
+fails:Array#reject! raises a TypeError on a frozen array
+fails:Array#reject! raises a TypeError on an empty frozen array
+fails:Array#reject! returns an Enumerator if no block given

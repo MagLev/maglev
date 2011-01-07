@@ -1,0 +1,2 @@
+fails:Array#shift raises a TypeError on an empty frozen array
+fails:Array#shift passed a number n as an argument raises a TypeError on a frozen array

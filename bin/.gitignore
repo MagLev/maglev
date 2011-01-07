@@ -14,7 +14,6 @@ autospec
 cdiff
 decolor
 spec
-bundle
 erubis
 memcached_top
 rails

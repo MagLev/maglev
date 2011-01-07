@@ -1,4 +1,0 @@
-fails:Process.kill requires at least two arguments
-breaks:Process.kill accepts symbols as signal names
-fails:Process.kill tests for the existence of a process without sending a signal
-fails:Process.kill raises an EPERM if permission is denied

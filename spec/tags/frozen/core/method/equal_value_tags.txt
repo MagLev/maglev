@@ -1,1 +1,0 @@
-fails:Method#== returns true on aliased methods

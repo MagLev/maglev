@@ -1,5 +1,0 @@
-fails:Basic assignment supports the {|r,| } form of block assignment
-fails:Assigning multiple values doen't call #to_ary on RHS arg when the corresponding LHS var is a splat
-fails:Multiple assignment has the proper return value
-breaks:Multiple assignments with grouping rhs cannot use parameter grouping, it is a syntax error
-breaks:Multiple assignments with splats * on the lhs has to be applied to the last parameter

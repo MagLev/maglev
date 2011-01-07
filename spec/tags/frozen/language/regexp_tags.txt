@@ -1,2 +1,0 @@
-fails:Literal Regexps disallows spaces after %r and delimiter
-breaks:Literal Regexps disallows alphabets as non-paired delimiter with %r
