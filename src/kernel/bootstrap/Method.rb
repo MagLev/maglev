@@ -68,8 +68,24 @@ class Method
   end
 
   def to_proc
-    p = Proc.new { |*args| self.call(*args) }
-    p.__arity=( self.arity )
+    n = self.arity
+    if n <= 1 
+      p = Proc.new { |*args| self.call(*args) }
+    else
+      p = Proc.new { |args| 
+        if args._isArray 
+          a = args[0]
+          if a._isArray
+            self.call(*a) 
+          else
+            self.call(*args)
+          end
+        else
+          self.call(*args)
+        end 
+      }
+    end 
+    p.__arity=( n )
     p
   end
 

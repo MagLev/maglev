@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 827 , problems with automatic to_proc coercion
+
 == Changes for 24984 2011-01-06
 * Pre-install rake-0.8.7 gem
 * Pre-install bundler-1.0.7 gem.

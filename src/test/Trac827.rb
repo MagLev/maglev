@@ -18,5 +18,10 @@ class Hook
 end
 
 
-h = Hook.new { puts "Hi" }
+h = Hook.new { 
+  puts "Hi"  
+  $ab = 5
+}
 h.run
+unless $ab == 5 ; raise 'fail'; end
+true
