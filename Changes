@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 249?? 2011-01-07
+== Changes for 24990 2011-01-07
 * Fix Trac 827 , problems with automatic to_proc coercion
 * Update underlying GemStone 3.0 system to Beta2
 
