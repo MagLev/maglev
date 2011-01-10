@@ -67,6 +67,10 @@ class Method
     @_st_gsmeth.__source_location
   end
 
+  def __to_proc_arg
+    self
+  end
+
   def to_proc
     n = self.arity
     if n <= 1 
