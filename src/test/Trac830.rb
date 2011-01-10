@@ -12,14 +12,15 @@
 module M
   class << self
     def define_module_function(name, &block)
-      define_method(name, &block)
-      module_function(name)
+      ax = define_method(name, &block)
+      bx = module_function(name)
     end
   end
 
-  define_module_function(:kernel_system, &Kernel.method(:system))
+  mx = Kernel.method(:system)
+  define_module_function(:kernel_system, &mx )
 end
 
 M::kernel_system("echo foo")  # Raises: NoMethodError: undefined method `call' for aMetaModule
-
+true
 
