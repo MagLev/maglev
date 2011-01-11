@@ -1,5 +1,5 @@
---- gems/activesupport-3.0.0/lib/active_support/descendants_tracker.rb	2010-08-30 14:37:36.000000000 -0700
-+++ gems/activesupportX/lib/active_support/descendants_tracker.rb	2010-08-30 15:06:07.000000000 -0700
+--- a/lib/active_support/descendants_tracker.rb	2010-08-30 14:37:36.000000000 -0700
++++ a/lib/active_support/descendants_tracker.rb	2010-08-30 15:06:07.000000000 -0700
 @@ -18,7 +18,12 @@
      end
  
