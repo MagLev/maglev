@@ -1,5 +1,5 @@
---- gems/activesupport-3.0.0/lib/active_support/values/time_zone.rb	2010-08-30 14:37:36.000000000 -0700
-+++ gems/activesupportX/lib/active_support/values/time_zone.rb	2010-08-30 14:36:37.000000000 -0700
+--- a/lib/active_support/values/time_zone.rb	2010-08-30 14:37:36.000000000 -0700
++++ b/lib/active_support/values/time_zone.rb	2010-08-30 14:36:37.000000000 -0700
 @@ -352,8 +352,14 @@
            when String
            begin

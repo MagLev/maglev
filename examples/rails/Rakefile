@@ -50,6 +50,9 @@ namespace :patch do
       "activesupport-3.0.0" => ['activesupport_class_patch.diff',
                                 'activesupport_time_zone_patch.diff',
                                 'activesupport_descendents_tracker_patch.diff']
+      "activesupport-3.0.3" => ['activesupport_class_patch.diff',
+                                'activesupport_time_zone_patch.diff',
+                                'activesupport_descendents_tracker_patch.diff']
     }
     apply_patches(patch_info)
   end
@@ -78,7 +81,7 @@ def apply_patch(patch_dir, patch_file)
     puts "Applying patch #{patch_file} in #{patch_dir}"
     cd(patch_dir) do
       patch_path = File.join(PATCH_DIR, patch_file)
-      sh %{ patch -p2 < #{patch_path} }
+      sh %{ patch -p1 < #{patch_path} }
     end
   end
 end
