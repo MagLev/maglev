@@ -3,3 +3,11 @@ fails:String#scan respects $KCODE when the pattern collapses to nothing
 fails:String#scan stores groups as arrays in the returned arrays
 fails:String#scan taints the match strings if self is tainted, unless the taint happens in the method call
 fails:String#scan with pattern and block taints the match strings if self is tainted, unless the tain happens inside the scan
+fails:String#scan taints the results if the String argument is tainted
+fails:String#scan taints the results when passed a String argument if self is tainted
+fails:String#scan taints the results if the Regexp argument is tainted
+fails:String#scan taints the results when passed a Regexp argument if self is tainted
+fails:String#scan with pattern and block taints the results if the String argument is tainted
+fails:String#scan with pattern and block taints the results when passed a String argument if self is tainted
+fails:String#scan with pattern and block taints the results if the Regexp argument is tainted
+fails:String#scan with pattern and block taints the results when passed a Regexp argument if self is tainted

@@ -1,0 +1,3 @@
+fails:UNIXSocket#recv_io reads an IO object across the socket
+fails:UNIXSocket#recv_io takes an optional class to use
+fails:UNIXSocket#recv_io takes an optional mode to use

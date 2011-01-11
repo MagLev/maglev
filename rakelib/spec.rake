@@ -17,9 +17,15 @@ namespace :spec do
     sh "#{PSPEC} -V -G fails"
   end
 
+  desc "Retag the ci files (works only with hacked mspec-tag.rb)"
+  task :retag do
+    sh "#{PSPEC} tag -G fails"
+  end
+
   def check_spec_file(f)
     raise "No spec defined with: spec=..." unless f
     raise "Can't find file #{f}" unless File.exists? f
   end
+  
 end
 

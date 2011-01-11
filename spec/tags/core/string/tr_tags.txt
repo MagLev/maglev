@@ -1,1 +1,2 @@
 fails:String#tr! raises a TypeError if self is frozen
+fails:String#tr treats a descending range in the replacement as containing just the start character
