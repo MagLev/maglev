@@ -8,6 +8,8 @@
 * Update Rails support to Rails 3.0.3.  The example Gemfile now points to
   Rails 3.0.3, and the active support patches are updated to handle either
   Rails 3.0.3 or Rails 3.0.0.
+* Fix Trac 833, exhibited as undefined `[]' on NilClass when using
+  Rack::Mount w/o -MallIvsDynamic
 
 == Changes for 24990 2011-01-07
 * Fix Trac 827 , problems with automatic to_proc coercion
