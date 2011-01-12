@@ -2,9 +2,9 @@
 
 The files in this directory allow you to run the default Rails app on
 MagLev.  Currently, MagLev is able to serve static and (simple) dynamic
-pages using a patched version of Rails 3.0.0 final.  The <tt>Rakefile</tt>
-provides tasks to setup your MagLev environment with the correct gems,
-including the (patched) Rails Gems.
+pages using a patched version of Rails 3.0.0, or Rails 3.0.3.  The
+<tt>Rakefile</tt> provides tasks to setup your MagLev environment with the
+correct gems, including the (patched) Rails Gems.
 
 == Quick Start
 
@@ -26,8 +26,8 @@ including the (patched) Rails Gems.
    A. Ensure mysql is running
 
    B. Ensure <tt>myapp/config/database.yml</tt> is configured for your
-      system (user, password, socket, etc.).  Rails 3.0.0 now defaults to
-      the <tt>mysql2</tt> driver for MySQL.  MagLev only supports the older
+      system (user, password, socket, etc.).  Rails 3 now defaults to the
+      <tt>mysql2</tt> driver for MySQL.  MagLev only supports the older
       +mysql+ driver, so make sure <tt>database.yml</tt> and +Gemfile+
       specify +mysql+ and not <tt>mysql2</tt> for new projects.
 
@@ -126,11 +126,8 @@ You can install and patch rails using the provided rake task:
 
 Or, you can use Bundler to install them yourself.
 
-1. Install Bundler
-     $ maglev-gem install rake bundler --no-rdoc --no-ri
-     Successfully installed rake-0.8.7
-     Successfully installed bundler-1.0.0
-     2 gems installed
+1. Rake and Bundler are now pre-installed in MagLev, so you do not need to
+   install the gems.
 
 2. Use Bundler, and <tt>myapp/Gemfile.lock</tt>, to install the gems:
      $ cd $MAGLEV_HOME/examples/rails/myapp

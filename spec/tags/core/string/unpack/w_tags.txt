@@ -1,0 +1,3 @@
+fails:String#unpack with directive 'w' calls #to_str to coerce the directives string
+fails:String#unpack with directive 'w' raises an ArgumentError when the format modifier is '_'
+fails:String#unpack with directive 'w' raises an ArgumentError when the format modifier is '!'

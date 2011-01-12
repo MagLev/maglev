@@ -1,1 +1,2 @@
 fails:A class definition allows using self as the superclass if self is a class
+fails:A class definition extending an object (sclass) can use return to cause the enclosing method to return

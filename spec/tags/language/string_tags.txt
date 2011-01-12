@@ -1,0 +1,1 @@
+fails:Ruby character strings call #to_s as a private method
