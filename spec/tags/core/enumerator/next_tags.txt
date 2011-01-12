@@ -1,0 +1,2 @@
+fails:Enumerator#next returns the next element of the enumeration
+fails:Enumerator#next raises a StopIteration exception at the end of the stream

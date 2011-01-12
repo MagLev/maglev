@@ -1,0 +1,6 @@
+fails:String#unpack with format 'B' calls #to_str to coerce the directives string
+fails:String#unpack with format 'B' raises an ArgumentError when the format modifier is '_'
+fails:String#unpack with format 'B' raises an ArgumentError when the format modifier is '!'
+fails:String#unpack with format 'b' calls #to_str to coerce the directives string
+fails:String#unpack with format 'b' raises an ArgumentError when the format modifier is '_'
+fails:String#unpack with format 'b' raises an ArgumentError when the format modifier is '!'

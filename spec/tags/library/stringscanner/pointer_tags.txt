@@ -1,0 +1,2 @@
+fails:StringScanner#pointer= positions from the end if the argument is negative
+fails:StringScanner#pointer= raises a RangeError if position too far backward

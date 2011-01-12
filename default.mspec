@@ -21,6 +21,10 @@ class MSpecScript
                 "^spec/rubyspec/core/string/modulo_spec.rb",
                 "^spec/rubyspec/core/string/multiply_spec.rb",
                 "^spec/rubyspec/core/string/valid_encoding_spec.rb",
+
+                "^spec/rubyspec/core/string/unpack/a_spec.rb",
+                "^spec/rubyspec/core/string/modulo_spec.rb",
+
                 "^spec/rubyspec/core/thread/alive_spec.rb",
                 "^spec/rubyspec/core/thread/exit_spec.rb",
                 "^spec/rubyspec/core/thread/inspect_spec.rb",
