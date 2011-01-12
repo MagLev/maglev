@@ -22,6 +22,11 @@ namespace :spec do
     sh "#{PSPEC} tag -G fails"
   end
 
+  desc "Run failing specs and untag ones that now pass (works only with hacked mspec-tag.rb)"
+  task :untag do
+    sh "#{PSPEC} tag --del fails"
+  end
+
   def check_spec_file(f)
     raise "No spec defined with: spec=..." unless f
     raise "Can't find file #{f}" unless File.exists? f
