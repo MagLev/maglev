@@ -21,6 +21,6 @@ module M
   define_module_function(:kernel_system, &mx )
 end
 
-M::kernel_system("echo foo")  # Raises: NoMethodError: undefined method `call' for aMetaModule
+M::kernel_system("true")  # Raises: NoMethodError: undefined method `call' for aMetaModule
 true
 
