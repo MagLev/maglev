@@ -1,0 +1,3 @@
+This directory contains files to reproduce bugs on the way to making Ruby
+Gems persistable.  There are several files that need to get loaded in
+certain orders.  The bugs can be reproduced with the Rakefile.
