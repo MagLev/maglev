@@ -16,3 +16,4 @@ including:
 - Wayne Seguin for adding MagLev support to RVM - http://rvm.beginrescueend.com/
 - Daniel Starling for generalizing the KD-Tree example to n dimensions and adding
   other improvements/
+- Tim Felgentreff for creating an FFI'd bcrypt-ruby that works with MagLev
