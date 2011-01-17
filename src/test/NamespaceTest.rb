@@ -50,9 +50,15 @@ module Enclosing
     # The list of modules searched, in the order searched
     #
     # TODO: MagLev doesn't yet support this...
-#     expected = [Enclosing::Local, Enclosing, Included, Super, Object, Kernel]
-#     search   = (Module.nesting + self.ancestors + Object.ancestors).uniq
-#     raise "expected #{expected.inspect} actual: #{search.inspect}" unless expected == search
+    ox = Object.ancestors 
+    puts "ox #{ox.inspect}"
+    sx = self.ancestors 
+    puts "sx #{sx.inspect}"
+    nx = Module.nesting
+    puts "nx #{nx.inspect}"
+    expected = [Enclosing::Local, Enclosing, Included, Super, Object, Kernel]
+    search   = (Module.nesting + self.ancestors + Object.ancestors).uniq
+    raise "expected #{expected.inspect} actual: #{search.inspect}" unless expected == search
   end
 end
 

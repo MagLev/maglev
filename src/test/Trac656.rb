@@ -31,7 +31,7 @@ module M
     class << o
       puts C.inspect
       if defined?(Maglev) 
-        unless (nx = C.inspect) == 'singleton::C' ; raise 'error'; end
+        unless (nx = C.inspect) == 'M::B::C' ; raise 'error'; end
       else
         puts C.inspect
       end
@@ -39,7 +39,7 @@ module M
     o.instance_eval(" class D; def m; DDX ; end;end")  
   end
   if defined?(Maglev)
-    unless (wx = $w.inspect) == 'singleton::C' ; raise 'error'; end
+    unless (wx = $w.inspect) == 'M::B::C' ; raise 'error'; end
   else
     puts $w.inspect
   end
