@@ -17,13 +17,16 @@ class Time
 end
 
 class Time
+  sb = self
   class << self
+    sa = self
     def _load(foo)
       987
     end
   end
 end
 
+tx = Time
 ax = Time._load("")
 unless ax == 987 ; raise 'error'; end
 true
