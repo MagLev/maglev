@@ -1,0 +1,10 @@
+task :default => :trac836
+
+desc "Run Trac 836"
+task :trac836 do
+  # Step 1: Commit the test code that has the autoload defs
+  sh "maglev-ruby -Ilib trac836_setup.rb"
+
+  # Step 2: Run client code that triggers the persisted autoload
+  sh "maglev-ruby -d trac836_client.rb"
+end
