@@ -1,27 +1,34 @@
 # This causes a local jump error.
-require 'rubygems'
-require 'erb'
-require 'tilt'
+#
+# Protect against environment that don't have tilt installed
+begin
+  require 'rubygems'
+  require 'erb'
+  require 'tilt'
 
-TDIR = File.join(File.dirname(__FILE__), 'test_data')
-X      = File.join(TDIR, 'x.erb')
-LAYOUT = File.join(TDIR, 'layout.erb')
-class C
-  # This include turns on the class << self in Tilt
-  include Tilt::CompileSite
+  TDIR = File.join(File.dirname(__FILE__), 'test_data')
+  X      = File.join(TDIR, 'x.erb')
+  LAYOUT = File.join(TDIR, 'layout.erb')
+  class C
+    # This include turns on the class << self in Tilt
+    include Tilt::CompileSite
 
-  def render(x, &block)
-    template = Tilt.new(X)
-    layout   = Tilt.new(LAYOUT)
+    def render(x, &block)
+      template = Tilt.new(X)
+      layout   = Tilt.new(LAYOUT)
 
-    # render template
-    output = template.render(self, { }, &block)
+      # render template
+      output = template.render(self, { }, &block)
 
-    # render layout
-    output = layout.render { output }
-    p output
+      # render layout
+      output = layout.render { output }
+      p output
+    end
   end
-end
 
-C.new.render(10) { "block to render" }
-true
+  C.new.render(10) { "block to render" }
+  true
+rescue LoadError => e
+  puts "------- SKIPPED #{$0}  #{e}"
+  false
+end
