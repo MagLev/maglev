@@ -1,1 +1,10 @@
 doc/
+specifications
+!specifications/bundler-1.0.7.gemspec
+!specifications/rake-0.8.7.gemspec
+
+gems/
+!gems/bundler-1.0.7
+!gems/rake-0.8.7
+
+cache/
