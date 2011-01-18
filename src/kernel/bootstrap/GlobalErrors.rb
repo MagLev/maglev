@@ -13,7 +13,7 @@ class Interrupt           < SignalException; end
 module Maglev
 
   class MaglevException < StandardError;  end
-    
+
   class NotPersistableException < MaglevException;  end
 
   class OutsideOfTransactionException < MaglevException; end

@@ -13,4 +13,9 @@
 # E.new.def_method("foo", :render)
 
 
-Object.new.send(:instance_eval, "def foo(); puts :foo; end")
+class E
+  def ma
+   Object.new.send(:instance_eval, "def foo(); puts :foo; end")
+  end
+end
+E.new.ma

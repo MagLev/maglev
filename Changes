@@ -5,12 +5,17 @@
 == Unreleased Changes
 
 * Fix Trac 830 , problem in automatic to_proc coercion
+* Fix Trac 834 , problem in code generation for instVar access
+* Fix Trac 837 , problem in running code under irb and eval
+* Fix Trac 838 , problem in smalltalk layer of FFI  implementation.
 * Update Rails support to Rails 3.0.3.  The example Gemfile now points to
   Rails 3.0.3, and the active support patches are updated to handle either
   Rails 3.0.3 or Rails 3.0.0.
 * Fix Trac 833, exhibited as undefined `[]' on NilClass when using
   Rack::Mount w/o -MallIvsDynamic
-
+* Add -q option to maglev-ruby.  Using both -q and -d runs in debug, but
+  w/o all the banner output at VM startup.
+  
 == Changes for 24990 2011-01-07
 * Fix Trac 827 , problems with automatic to_proc coercion
 * Update underlying GemStone 3.0 system to Beta2

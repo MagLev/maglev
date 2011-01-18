@@ -1,6 +1,7 @@
 module Errno
   # Map an errno (small int) to the exception class for that errno
   # ERRNO_TO_EXCEPTION = [ ]  # initialized in Errno1.rb
+  EXCEPTION_CLS_TO_ERRNO = IdentityHash.new  # actual value
 
   # Given a return value from a "system or library" call, raise the
   # appropriate exception if any.  If +err+ is not a small integer, or if
