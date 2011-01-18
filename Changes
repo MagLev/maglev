@@ -5,6 +5,9 @@
 == Unreleased Changes
 
 * Fix Trac 830 , problem in automatic to_proc coercion
+* Fix Trac 834 , problem in code generation for instVar access
+* Fix Trac 837 , problem in running code under irb and eval
+* Fix Trac 838 , problem in smalltalk layer of FFI  implementation.
 * Update Rails support to Rails 3.0.3.  The example Gemfile now points to
   Rails 3.0.3, and the active support patches are updated to handle either
   Rails 3.0.3 or Rails 3.0.0.
