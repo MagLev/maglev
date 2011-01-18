@@ -3,7 +3,8 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
-
+  
+== Changes for 25051 2011-01-18
 * Fix Trac 830 , problem in automatic to_proc coercion
 * Fix Trac 834 , problem in code generation for instVar access
 * Fix Trac 837 , problem in running code under irb and eval
@@ -15,6 +16,7 @@
   Rack::Mount w/o -MallIvsDynamic
 * Add -q option to maglev-ruby.  Using both -q and -d runs in debug, but
   w/o all the banner output at VM startup.
+* Numerous changes to underlying GemStone 3.0 system
   
 == Changes for 24990 2011-01-07
 * Fix Trac 827 , problems with automatic to_proc coercion
