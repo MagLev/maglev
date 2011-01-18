@@ -8,3 +8,7 @@ gems/
 !gems/rake-0.8.7
 
 cache/
+!cache/bundler-1.0.7.gem
+!cache/rake-0.8.7.gem
+
+bin/
