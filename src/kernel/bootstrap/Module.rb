@@ -378,6 +378,9 @@ class Module
   def undef_method(*names)
     names.each { |name| __undef_method(name) }
   end
+  def undef_method(name)
+    __undef_method(name)
+  end
 
   primitive_nobridge '__class_var_remove', 'rubyClassVarRemove:'
 
