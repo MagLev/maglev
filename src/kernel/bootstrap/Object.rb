@@ -655,19 +655,8 @@ class Object
   # the current transaction.
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 
-  # MaglevUndefined is a sentinal value used to distinguish between nil as a value passed
-  # by the user and the user not passing anything for a defaulted value.  E.g.,:
-  #
-  #   def foo(required_param, optional_param=MaglevUndefined)
-  #     if optional_param._equal?( MaglevUndefined )
-  #       puts "User did not pass a value"
-  #     else
-  #       puts "Users passed #{optional_param} (which may be nil)"
-  #     fi
-  #   end
-  #
-  MaglevUndefined = Object.new
-  MaglevUndefined.freeze
+  # MaglevUndefined in Object1.rb
+
 end
 Object.__freeze_constants
 

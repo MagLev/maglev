@@ -100,25 +100,7 @@ class Module
     end
   end
 
-  def attr_reader(*names)
-    bnd = Binding.__basic_new(self)
-    fake_vcglbl = [nil,nil]
-    names.each do |n|
-      the_name = self.__attr_type_check(n)
-      str = "def #{the_name}; @#{the_name}; end"
-      self.__module_eval_string( str, fake_vcglbl, bnd )
-    end
-  end
-
-  def attr_writer(*names)
-    bnd = Binding.__basic_new(self)
-    fake_vcglbl = [nil,nil]
-    names.each do |n|
-      the_name = self.__attr_type_check(n)
-      str = "def #{the_name}=(v); @#{the_name} = v; end"
-      self.__module_eval_string( str, fake_vcglbl, bnd )
-    end
-  end
+  # attr_reader, attr_writer in Module3.rb
 
   primitive_nobridge 'autoload', 'rubyAutoload:file:'
   primitive_nobridge 'autoload?', 'rubyAutoloadFileFor:'
@@ -458,12 +440,10 @@ class Module
   # Module.nesting is compiled to an env0 send of ( aRubyConstantRef nesting ) .
   # Module.nesting is not usable within bootstrap code.
   #
-  def self.nesting(*args, &block)
-    # You may also get this error if Module.nesting is used in bootstrap code
-    # or if the receiver of nesting is not recognizable at compile time
-    # as a reference to the constant Module .
-    raise ArgumentError , 'only zero arg form of Module.nesting is supported'
-  end
+
+  # Return an Array of the Modules nested at the point of call.
+  # def self.nesting; end
+  class_primitive 'nesting', 'moduleNesting'
 
   # primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
 

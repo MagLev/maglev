@@ -37,6 +37,8 @@ RUBY.class.primitive 'global', 'installConstant:name:'
 RUBY.require 'kernel/bootstrap/Globals.rb'
 RUBY.require 'kernel/bootstrap/GlobalErrors.rb'
 
+RUBY.require 'kernel/bootstrap/Object1.rb'
+
 #
 # bootstrap
 #
@@ -47,8 +49,11 @@ RUBY.require 'kernel/bootstrap/Module.rb'
 RUBY.require 'kernel/bootstrap/Class.rb'
 RUBY.require 'kernel/bootstrap/StClass.rb'
 RUBY.require 'kernel/bootstrap/Object.rb'
+RUBY.require 'kernel/bootstrap/Module2.rb'
+RUBY.require 'kernel/bootstrap/Module3.rb'
 RUBY.require 'kernel/bootstrap/Maglev1.rb'
 RUBY.require 'kernel/bootstrap/System.rb'
+RUBY.require 'kernel/bootstrap/Errno1.rb'
 RUBY.require 'kernel/bootstrap/Exception.rb'
 RUBY.require 'kernel/bootstrap/Fixnum.rb'
 RUBY.require 'kernel/bootstrap/Enumerator.rb'
@@ -72,7 +77,6 @@ RUBY.require 'kernel/bootstrap/String.rb'
 RUBY.require 'kernel/bootstrap/Symbol.rb'
 RUBY.require 'kernel/bootstrap/Regexp.rb'
 RUBY.require 'kernel/bootstrap/MatchData.rb'
-RUBY.require 'kernel/bootstrap/Errno1.rb'
 # Globals2 deleted
 RUBY.require 'kernel/bootstrap/Env.rb'
 RUBY.require 'kernel/bootstrap/Errno.rb'

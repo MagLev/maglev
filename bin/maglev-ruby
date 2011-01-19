@@ -17,18 +17,32 @@ usage()
     cat << EOF
 Usage: $COMMAND [switches] [--] [programfile] [arguments]
 
-    Execute a Ruby file with MagLev
+Execute a Ruby file with MagLev
 
-OPTIONS:
-   --copyright    Print copyright and exit
+Ruby Options:
    -C <dir>       Changes directory to <dir> before executing.
    -d, --debug    Set debug flag. Allows topaz debugging.
-   +d             Set debug flag off.
    -e 'command'   Execute command. Several -e's allowed. Omit [programfile]
-   -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -h, --help     Show this message and exit
    -I <path>      Add <path> to \$LOAD_PATH
    -r library     Require library before running
+   -S             MagLev will search for the ruby script on the PATH environment
+                  variable, unless the script name begins with '/'.
+   -w             Turn on warnings.  Sets $VERBOSE true.
+   -W<d>          Set the warning level to <d>.  <d> is a single digit 0..9.
+                  If set to 0, then no warnings are printed.  Default is 1.
+   -X<dir>        Changes directory to <dir> before executing (same as -C)
+   --             End of MagLev parameters.  The next parameter is the
+                  programfile, then any programfile arguments follow.
+   -v, --verbose  Print version number, then turn on verbose mode
+   --version      Print version number and exit
+
+MagLev Options:
+   --copyright    Print copyright and exit
+   -q             Run MagLev VM in quiet mode.  -q is default, unless -d is
+                  turned on.  use -d -q for a quiet debug session.
+   +d             Set debug flag off.
+   -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -M<opt>        MagLev specific options.  This flag may be passed multiple
                   times.  The currently recognized options are:
                     allIvsDynamic Start the VM so all instance variables are
@@ -48,21 +62,11 @@ OPTIONS:
                     rlwrap        invoke topaz with rlwrap, if available
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
-   -S             MagLev will search for the ruby script on the PATH environment
-                  variable, unless the script name begins with '/'.
-   -w             Turn on warnings.  Sets $VERBOSE true.
-   -W<d>          Set the warning level to <d>.  <d> is a single digit 0..9.
-                  If set to 0, then no warnings are printed.  Default is 1.
-   -X<dir>        Changes directory to <dir> before executing (same as -C)
-   --             End of MagLev parameters.  The next parameter is the
-                  programfile, then any programfile arguments follow.
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
    --stone <name> Run programfile connecting to the named stone
-   -v, --verbose  Print version number, then turn on verbose mode
-   --version      Print version number and exit
 
-Options can be set in the MAGLEV_OPTS environment variable as well as on the
-command line.  Command line options override \$MAGLEV_OPTS
+Any/all options can be set in the MAGLEV_OPTS environment variable as well
+as on the command line.  Command line options override \$MAGLEV_OPTS
 
 EOF
 exit 1
@@ -128,6 +132,7 @@ debugFlag=    # off by default
 rlwrapFlag=   # off by default
 sawDashE=
 searchPathFlag=
+quietFlag=
 
 # To login to an already running stone not started by maglev commands
 # use the STONENAME env variable , not the --stone option, because.
@@ -158,6 +163,9 @@ do
             ;;
         -d|--debug)
             debugFlag=1
+            ;;
+        -q)
+            quietFlag="-q"
             ;;
         +d)
             debugFlag=
@@ -387,9 +395,14 @@ exitifnoerror
 EOFC
 fi
 
-TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -q -I $dbscript "
-# If debugging, do not use -q with topaz
-[[ $debugFlag  ]] && TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize -I $dbscript "
+
+# The only time we turn off the quiet flag is if -d and no -q
+if [[ $debugFlag && ! $quietFlag ]]; then
+    quietFlag=
+else
+    quietFlag="-q"
+fi
+TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize $quietFlag -I $dbscript "
 
 # echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"
 # echo "GEMSTONE_SYS_CONF = $GEMSTONE_SYS_CONF"
