@@ -17,23 +17,23 @@ with that OSS license.
 
 However, if an OSS license permits a licensee to modify any of the
 GemStone Products and a licensee elects to exercise that right, that
-modification will terminate GemStone's warranty, and any maintenance
+modification will terminate VMware's warranty, and any maintenance
 and support obligations, for that GemStone Product.
 
 Although these licenses are included in the appropriate files throughout
 the distribution, we've copied them to this centralized location for
 easier reference.
 
-Ruby source code written by GemStone Systems, Inc. is licensed under the
+Ruby source code written by VMware is licensed under the
 MIT license:
    MagLev-MIT-License.txt
 
 The GemStone Virtual Machine and associated binary files and libraries
-written by GemStone Systems, Inc. are governed by:
+written by VMware are governed by:
    GemStone-License.pdf
 
-Various open source components not written by GemStone Systems, Inc. are
-included in this distribution, and covered by their respective licenses:
+Various open source components not written by VMware which may be included
+in this distribution are covered by their respective licenses:
    bstring-license.txt - Better String Library
    EY-License.txt - MSpec test execution framework and the RubySpec tests
    ffi-License.txt - Ruby Foreign Function Interface
