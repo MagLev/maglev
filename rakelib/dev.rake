@@ -10,7 +10,14 @@ namespace :dev do
   end
 
   desc "Run the passing specs and the vm tests"
-  task :smoke => [ 'dev:vm-tests', 'dev:passing' ]
+  task :smoke => [ 'dev:vm-tests', 'spec:ci' ]
+
+  desc "Run the GemTests set of tests"
+  task :gemtests do
+    cd('src/test/GemTests') do
+      sh %{ rake test }
+    end
+  end
 
   desc "Run the vm smoke tests"
   task :'vm-tests' => :stwrappers do
