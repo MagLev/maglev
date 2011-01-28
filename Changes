@@ -3,6 +3,9 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+* First pass at implementing ruby-debug API. No attempt has been made to
+  make the debugger commands similar to ruby-debug (see topaz
+  documentation).  E.g., rspec -d ... now works.
   
 == Changes for 25051 2011-01-18
 * Fix Trac 830 , problem in automatic to_proc coercion
