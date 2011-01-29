@@ -3,9 +3,14 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+
+== Changes for 25127 2011-01-28
 * First pass at implementing ruby-debug API. No attempt has been made to
   make the debugger commands similar to ruby-debug (see topaz
   documentation).  E.g., rspec -d ... now works.
+* Some reimplementation of Exceptions
+* Many changes to underlying GemStone 3.0 system in prep for GS/S 3.0 Beta 3
+  most of which should not affect MagLev users
   
 == Changes for 25051 2011-01-18
 * Fix Trac 830 , problem in automatic to_proc coercion
