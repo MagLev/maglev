@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 843
+
 == Changes for 25127 2011-01-28
 * First pass at implementing ruby-debug API. No attempt has been made to
   make the debugger commands similar to ruby-debug (see topaz
