@@ -602,6 +602,10 @@ class Object
     self.class.name.to_s
   end
 
+  def __regex_to_s
+    self.to_s
+  end
+
   # Object should NOT have a to_str.  If to_str is implementd by passing
   # to to_s, then by default all objects can convert to a string!  But we
   # want classes to make an effort in order to convert their objects to

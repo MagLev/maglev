@@ -17,6 +17,7 @@ class Regexp
   primitive_nobridge 'kcode', 'kcode'
   primitive_nobridge 'options', 'options'
   primitive_nobridge 'to_s', 'to_s'
+  primitive_nobridge '__regex_to_s', '_regex_to_s'
 
   class_primitive_nobridge 'alloc', '_basicNew'
   class_primitive_nobridge '__opts_from_lang', 'optsFromLang:opts:'

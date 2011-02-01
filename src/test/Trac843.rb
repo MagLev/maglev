@@ -9,11 +9,12 @@
 #   nil
 
 a = %r{a/b}
+as = a.to_s
 b = %r{x#{a}y}
-p b
-p "xa/by" =~ b
-raise "Fail" unless "xa/by" =~ b
-
+c = b.inspect
+d = '/x(?-mix:a\/b)y/' #MRI result
+raise "Fail" unless c == d
+true
 
 
 
