@@ -6,6 +6,7 @@
 
 * Fix Trac 843
 * Fix error in File.readlink
+* Added IdentitySet#clear
 
 == Changes for 25127 2011-01-28
 * First pass at implementing ruby-debug API. No attempt has been made to
