@@ -252,7 +252,7 @@ class Thread
 
   class_primitive_nobridge 'list', 'allProcesses'
 
-  class_primitive_nobridge 'main', 'main'
+  class_primitive_nobridge 'main', 'rubyMain'
 
   class_primitive_nobridge '__basic_new', 'rubyBasicNew'
 

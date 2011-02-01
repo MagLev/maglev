@@ -343,7 +343,15 @@ class Array
 
   def __joinStringsWithRegexpOptions(opts_integer)
     # called from generated code
-    str = self.__joinStrings
+    # inline variant of __joinStrings
+    str = ''
+    n = 0
+    siz = self.__size
+    while n < siz
+      str << self.__at(n).__regex_to_s
+      n += 1
+    end
+    str
     # bypass Regexp.new because opts_integer includes both
     #  the options and the language encoding
     rx = Regexp.alloc
