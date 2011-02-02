@@ -12,6 +12,7 @@ test(String.class == Fixnum.class, true, "String.class == Fixnum.class")
 
 begin
   class ClsOne < Hash
+    self.__fixed_instvars('@bb', '@cc')
     def setBb(a)
       @bb = a
     end
@@ -27,7 +28,7 @@ begin
   test(x , [ '@cc' ] , "cc defined" )
   o.setBb(5)
   x = o.instance_variables
-  test(x , [ '@bb', '@cc' ] , "plus bb defined" )
+  test(x , [ '@bb', '@cc'] , "plus bb defined" )
   class ClsOne
     def setDd(a)
       @dd = a
@@ -202,6 +203,30 @@ def c.a_singleton_method
 end
 test(c.public_methods(false), ["a_singleton_method"], 'public_methods(false) B')
 test(c.methods(false), ["a_singleton_method"], 'methods(false) B')
+
+$bz = 0
+begin
+  class BadA < ClsOne
+     self.__fixed_instvars('@bb', '@zz')  # duplicate iv name
+  end  
+rescue StandardError => e
+  $bz += 5
+end
+test( $bz , 5 , 'duplicate fixed instvar')
+
+begin
+  eval("class ClsOne; __fixed_instvars('@bb', '@cc') ; end") #illegal second opening
+rescue ArgumentError => e
+  $bz += 5
+end
+test( $bz , 10 , 'fixed instvar in second opening')
+
+begin
+  eval( "class ClsOne ; __fixed_instvars() ; end")  # zero args not allowed
+rescue ArgumentError => e
+  $bz += 5
+end
+test( $bz , 15 , 'empty fixed instvar list')
 
 report
 true
