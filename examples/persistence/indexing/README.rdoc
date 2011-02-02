@@ -13,8 +13,9 @@ comments.  This is probably the first file to look at.  To run it:
 
 NOTE: if you get an error message like:
   #<RuntimeError: The object aPerson does not have an instance variable with the given name #'@age'>
-you are probably running with the <tt>-MallIvsDynamic</tt> flag to
-maglev-ruby.  Turn off that flag and try re-running the example.
+you need to define the instance variables as fixed using
+__fixed_instvars('@age') in the class definition.  We expect to update the
+indexing system to allow dynamic inst vars in the near future.
 
 == Persistent Demo
 
