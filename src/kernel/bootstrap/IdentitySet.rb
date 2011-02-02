@@ -88,6 +88,7 @@ class IdentitySet
   primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
   # dup, clone inherited from Object
 
+  primitive_nobridge '__removeAll', 'removeAll:'
 
   def avg(&block)
     self.sum(&block) / length
@@ -100,6 +101,12 @@ class IdentitySet
     self
   end
 
+  # Remove all elements from reciever.  Returns self.
+  def clear
+    __removeAll(self)  # This takes an optimized path in the primitive
+    self
+  end
+  
   # Deletes every element of the set for which block evaluates to
   # true, and returns self.
   def delete_if

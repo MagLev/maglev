@@ -45,8 +45,6 @@ MagLev Options:
    -G             Use /opt/gemstone instead of MAGLEV_HOME for locks and logs
    -M<opt>        MagLev specific options.  This flag may be passed multiple
                   times.  The currently recognized options are:
-                    allIvsDynamic Start the VM so all instance variables are
-                                  dynamic.
                     commit        wrap script in Maglev.persistent block and
                                   commit; implies -Mpersistent.  E.g.,:
                                      maglev-ruby -Mcommit -e 'require "foo"'
@@ -202,7 +200,7 @@ do
                 rlwrap)
                     rlwrapFlag=1
                     ;;
-                traceGlobals|logSexp|traceLoad|commit|persistent|allIvsDynamic|noCaptureStack)
+                traceGlobals|logSexp|traceLoad|commit|persistent|noCaptureStack)
                     maglev_args="${maglev_args} ${sub_opt}"
                     ;;
                 *)

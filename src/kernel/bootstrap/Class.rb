@@ -15,6 +15,25 @@ class Class
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
 
+  # Defines fixed instance variables of a Ruby class.
+  # Arguments must be String or Symbol constants .
+  # they will be processed when the class is parsed,
+  # and the fixed inst vars created when the start
+  # of the class ; ... ; end    is executed .
+  # The call to __fixed_instvars must be in the first
+  # opening of the class, in the class body.
+  # It is not allowed in a module body .  example:
+  #   class C
+  #     __fixed_instvars('@a', :b)
+  #     def a_method
+  #     end
+  #   end
+  def __fixed_instvars(*args)
+    # This will be called at runtime.
+    # Nothing to do, the args were processed at class creation
+    # printing code could be added here for debugging.
+  end
+
   def inherited(a_subclass)
     # .mcz code will not invoke this during bootstrap.
     # do nothing
