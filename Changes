@@ -4,8 +4,16 @@
 
 == Unreleased Changes
 
-* Fix Trac 843
 * add Class#__fixed_instvars to fix 832, 840
+
+== Changes for 25151 2011-02-01
+* Fix Trac 843
+* Fix error in File.readlink
+* Added IdentitySet#clear
+* Fix problem in parsing of Ruby heredocs
+* Allow unlimited size compiler heap nodes
+* More changes to underlying GemStone 3.0 system, this may or may not be 
+  the final GS/S 3.0 Beta 3
 
 == Changes for 25127 2011-01-28
 * First pass at implementing ruby-debug API. No attempt has been made to
