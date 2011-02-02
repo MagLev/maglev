@@ -5,6 +5,7 @@
 == Unreleased Changes
 
 * Fix Trac 843
+* add Class#__fixed_instvars to fix 832, 840
 
 == Changes for 25127 2011-01-28
 * First pass at implementing ruby-debug API. No attempt has been made to
