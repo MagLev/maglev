@@ -3,18 +3,21 @@ require 'test/unit'
 # Define two classes that both have an @id field so we can test that
 # collections can hold instances from multiple, unrelated classes.
 class Id
+  __fixed_instvars('@id')
   def initialize(id)
     @id = id
   end
 end
 
 class Address
+  __fixed_instvars('@zipcode')
   def initialize
     @zipcode = rand(9000)
   end
 end
 
 class Bar
+  __fixed_instvars('@id', '@address')
   def initialize(id)
     @id = id
     @address = Address.new
@@ -199,6 +202,7 @@ end
 #
 class TestRubyTime < Test::Unit::TestCase
   class Foo
+    __fixed_instvars('@time')
     attr_reader :time
     def initialize(time=Time.now)
       @time = time
@@ -214,8 +218,8 @@ class TestRubyTime < Test::Unit::TestCase
     assert(a.time < b.time)
     assert_equal(3, set.size)
 
-    # NOTE: microseconds is a smalltalk instvar, so it does not get the '@'
-    # prefix.
+    # NOTE: microseconds is a smalltalk instvar in Time, 
+    # so it does not get the '@'  prefix.
     x = set.search([:'@time', :'microseconds'], :lt, b.time.__microsecs)
     assert_equal(1, x.size)
     assert(set.include?(a))
