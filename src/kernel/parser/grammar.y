@@ -2150,9 +2150,9 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary  | kCLASS ___ body_stamt kEND");
-		      POP_LINE(vps);
+		      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
-                      NODE **resH = scp.add( RubySClassNode::s(& $3, & $7, $1/*RpNameTokenkCLASS*/, vps));
+                      NODE **resH = scp.add( RubySClassNode::s(& $3, & $7, $1/*RpNameTokenkCLASS*/, lineNum, vps));
 		      local_pop(vps);
 		      vps->class_nest--;
 		      vps->in_def = siToI64( $4 );

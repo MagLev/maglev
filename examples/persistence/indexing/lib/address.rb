@@ -5,6 +5,13 @@ require 'utils'
 
 class Address
 
+  # Currently, only the instvars passed to __fixed_instvars are indexable.
+  # Even though the examples do not index on all inst vars, they are all
+  # listed here so that it is easy to play with the examples.
+  #
+  # See comments about fixed vs dynamic inst vars in ../README.rdoc on
+  self.__fixed_instvars :@street, :@city, :@state, :@zip
+
   # Data for random creation of addresses
   STREETS = ['Main', 'Spruce', 'Robinson Ln', 'Taylor Ave.', '43rd Ave']
   CITIES = ['Portland', 'AnyTown', 'Roseville', 'Santa Cruz', 'Bellingham',

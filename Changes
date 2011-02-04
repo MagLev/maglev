@@ -3,6 +3,10 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+* Update examples, docs Rakefiles to reflect that all inst vars are now
+  dynamic by default (-MallIvsDynamic no longer supported).
+* more error checking in Class#__fixed_instvars .
+* Fix Trac 846, 848
 
 == Changes for 25153 2011-02-01
 * Fix Trac 843

@@ -5,5 +5,5 @@ task :default do
   #
   #   ENV['MYSQL_UNIX_PORT'] = '/opt/local/var/run/mysql5/mysqld.sock'
 
-  sh 'maglev-ruby -rubygems -MallIvsDynamic mysql.rb'
+  sh 'maglev-ruby -rubygems mysql.rb'
 end

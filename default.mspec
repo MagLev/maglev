@@ -13,7 +13,9 @@ class MSpecScript
                 "^spec/rubyspec/language/block_spec.rb"]
 
   core_files = ['spec/rubyspec/core',
+            "^spec/rubyspec/core/array/product_spec.rb",
                 "^spec/rubyspec/core/argf/seek_spec.rb",
+            "^spec/rubyspec/core/kernel/system_spec.rb",
                 "^spec/rubyspec/core/kernel/exec_spec.rb",
                 "^spec/rubyspec/core/process/wait_spec.rb",
                 "^spec/rubyspec/core/process/wait2_spec.rb",
@@ -37,6 +39,7 @@ class MSpecScript
                 "^spec/rubyspec/core/thread/wakeup_spec.rb"]
 
   lib_files = ['spec/rubyspec/library',
+           "^spec/rubyspec/library/date/civil_spec.rb",
                "^spec/rubyspec/library/net/http",
                "^spec/rubyspec/library/generator",
                "^spec/rubyspec/library/prime",
