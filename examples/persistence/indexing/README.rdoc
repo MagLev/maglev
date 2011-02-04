@@ -11,11 +11,6 @@ comments.  This is probably the first file to look at.  To run it:
 
   $ rake demo
 
-NOTE: if you get an error message like:
-  #<RuntimeError: The object aPerson does not have an instance variable with the given name #'@age'>
-you are probably running with the <tt>-MallIvsDynamic</tt> flag to
-maglev-ruby.  Turn off that flag and try re-running the example.
-
 == Persistent Demo
 
 <tt>create_random_people.rb</tt> and <tt>search_random_people.rb</tt>
@@ -39,5 +34,18 @@ To run:
 
 The lib directory contains the base code that defines the Person class, and
 supports creating random instances.
+
+
+== Fixed vs Dynamic inst vars
+
+MagLev now defaults to all instvars dynamic.  The indexing subsystem has
+not yet been updated to work with dynamic inst vars, so we must declare
+them as fixed.  See https://magtrac.gemstone.com/ticket/844
+
+NOTE: if you get an error message like:
+  #<RuntimeError: The object aPerson does not have an instance variable with the given name #'@age'>
+you need to define the instance variables as fixed using
+__fixed_instvars('@age') in the class definition.  We expect to update the
+indexing system to allow dynamic inst vars in the near future.
 
 

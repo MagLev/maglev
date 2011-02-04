@@ -9,10 +9,6 @@ task :init => [:'bundler:gem', :'bundler:install', :'patch:activesupport']
 desc "Run myapp, with maglev."
 task :app do
   cd('myapp') do
-    # MagLev needs the -MallIvsDynamic flag to run Rails.
-    # Setting the MAGLEV_OPTS environment variable ensures the option
-    # is passed from the rails script onto maglev-ruby.
-    ENV['MAGLEV_OPTS'] = "-MallIvsDynamic"
     sh "#{MAGLEV_HOME}/bin/rails server"
   end
 end

@@ -16,12 +16,6 @@ correct gems, including the (patched) Rails Gems.
      $ cd $MAGLEV_HOME/examples/rails
      $ rake init
 
-3. Setup MagLev options.  ActiveSupport and the MySQL driver both require
-   MagLev's <tt>-MallIvsDynamic</tt> option. The easiest way to ensure it
-   gets passed to all subsequent invocations (whether via rake or the
-   +rails+ command), is to set your environment:
-     $ export MAGLEV_OPTS="-MallIvsDynamic"
-
 3. Setup the Database.  MagLev currently supports MySQL 5, so:
    A. Ensure mysql is running
 
@@ -35,8 +29,8 @@ correct gems, including the (patched) Rails Gems.
        $ cd $MAGLEV_HOME/examples/rails/myapp
        $ $MAGLEV_HOME/bin/rake db:create
        $ $MAGLEV_HOME/bin/rake db:migrate
-   
-3. Run the app:
+
+4. Run the app:
      $ cd $MAGLEV_HOME/examples/rails/myapp
      $ $MAGLEV_HOME/bin/rails server
    Then hit http://localhost:3000/
@@ -186,12 +180,6 @@ Or, you can use Bundler to install them yourself.
    details on the workaround.
      $ cp $MAGLEV_HOME/examples/rails/patches/app_config_boot_Trac757.rb myapp/config/boot.rb
 
-5. You must pass the <tt>-MallIvsDynamic</tt> flag to MagLev in order to
-   run rails (the +Rakefile+ does this).  See
-   <tt>docs/release_notes</tt>[link:files/docs/release_notes.html] for a
-   discussion of <tt>-MallIvsDynamic</tt>.
-     $ export MAGLEV_OPTS='-MallIvsDynamic'
-
 === 3. Run +bundle+
 
 Run:
@@ -207,21 +195,16 @@ You should now see your application databases defined in MySQL.
 
 === 5. Start server
 
-MagLev needs the <tt>-MallIvsDynamic</tt> option set in order to run
-Rails.  The most robust way to set this is through the <tt>MAGLEV_OPTS</tt>
-environment variable.  This will ensure the flag gets passed from the
-+rails+ script onto <tt>maglev-ruby</tt>.
-
 You can start the server in a couple of ways.  The normal way to start a
 rails server is:
-  $ export MAGLEV_OPTS="-MallIvsDynamic"
+
   $ cd myapp
   $ $MAGLEV_HOME/bin/rails server
 
 An alternate method is:
 
   $ cd myapp
-  $ maglev-ruby -MallIvsDynamic script/rails server
+  $ maglev-ruby script/rails server
 
 === 6. Load a static page
 

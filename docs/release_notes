@@ -56,10 +56,100 @@ See the {Persistence API}[link:files/docs/persistence-api.html]
               during foo.rb
     ERROR 2023, Error, 'too many arguments' (ArgumentError)
 
-== MagLev Options
+== Dynamic vs Fixed Instance Variables
 
-These are the MagLev specific command line options to the maglev-ruby shell
-script.
+The MagLev VM supports both fixed and dynamic instance variables.  For
+Ruby, the default type of instance variable is dynamic, for Smalltalk, the
+default is fixed.
+
+The VM optimizes access to fixed instance variables by making references to
+them a simple integer offset from a well known location in the object
+structure.  These optimized instance variables are known as "fixed" or
+"static" instance variables.  The other type of instance variable is a
+dynamic instance variable.  The VM must lookup references to dynamic
+instance variables at runtime, by searching for them by name. This takes
+more time than using a pre-computed index.
+
+=== How to declare fixed instance variables
+
+MagLev provides the '__fixed_instvars' directive to declare fixed inst vars
+(it is a "directive", not a method, since it is recognized by the parser
+and handled at parse time, not an expression evaluated at runtime).
+
+  class C
+    self.__fixed_instvars('@foo', :@bar)
+
+    # rest of class....
+  end
+
+There are some restrictions on the use of the __fixed_instvars directive.
++ May only be issued once per class.
++ May only be issued in the first opening of the class.
++ The parameters must be simple strings or symbols (i.e., cannot be
+  expressions that are evaluated, nor can they be string interpolations
+  like "@#{something_or_other}".
++ Must be in the main class body (not in a method definition nor in a
+  singleton construct).
+
+=== Implications for Persistence
+
+==== Why MagLev has all dynamic instance variables by default
+
+Smalltalk classes contain a list of instance variables.  All Smalltalk
+objects allocate space for all instance variables, and instance variables
+are accessed as fixed offsets from the object header.  Whan an instance
+variable is added or removed from a Smalltalk class, or the order of
+instance variables is changed, the Smalltalk system creates a new version
+of that class, recompiles all methods to use the new offsets.  All
+instances of the old class need to be migrated to the new class, at which
+time, the instance variables are then in-sync with the method definitions.
+
+Ruby is not Smalltalk. In Smalltalk, the developer explicitly manages the
+list of fixed inst vars, and there is a clear trigger that indicates all
+methods need re-compiling and that old instances should be migrated to the
+new format. This is not the case in Ruby.  Imagine a customer application
+that has this persisted class, and imagine that instance variables were
+fixed:
+
+    class C
+      def foo
+        @foo = 1
+      end
+
+      def bar
+        @bar = 2
+      end
+      ...
+    end
+
+The class and instances are persisted. Then they release version 2 of the
+app, and for some reason, they simply swap the order of the method defns:
+    class C
+      def bar
+        @bar = 2
+      end
+
+      def foo
+        @foo = 1
+      end
+      ...
+    end
+
+If they persist this, and the methods get re-compiled, or they add new
+methods, then we will have a mix of instances and/or methods that have
+different opinions on the ordering of the inst vars. We could work around
+that issue by sorting the fixed inst vars by name, but that only solves
+some of the scenarios, e.g., it doesn't fix addition of new variables or
+removal of old ones.
+
+==== Use of Fixed Instance Variables
+
+MagLev now supports the __fixed_instvars directive.  This allows the Ruby
+developer to declare, and take responsibility for, fixed instance
+variables.  If objects with fixed instance variables are persisted in the
+repository, and the developer decides to add, remove or re-order the fixed
+instance variables, they must also take responsibility for migrating old
+instances to the new schema.
 
 === <tt>--stone s</tt>
 
@@ -76,24 +166,6 @@ New stones can be created and managed via the +Rakefile+ in
   rake stone:create[server_name]   # Create a new MagLev server and repository
   rake stone:destroy[server_name]  # Destroy an existing MagLev server and repository
   rake stone:list                  # List MagLev servers managed by this Rakefile
-
-=== <tt>-MallIvsDynamic</tt>
-
-This option tells MagLev to make all instance variables dynamic.  Normally,
-MagLev optimizes instance variables mentioned during the first opening of a
-class by making references to them a simple integer offset from a well
-known location in the object structure.  These optimized instance variables
-are known as static instance variables.  All other instance variables for
-the class, whether mentioned in a subsequent opening of the class, or
-dynamically generated, are dynamic instance variables.  MagLev must lookup
-references to dynamic instance variables by name, which takes more time
-than using a pre-computed index.
-
-If the <tt>-MallIvsDynamic</tt> flag is passed to <tt>maglev-ruby</tt>,
-then all instance variables will be dynamic, even those in the first
-opening of a class.  This is necessary if code tries to
-<tt>remove_instance_variable</tt> on a static instance variable (i.e.,
-Rails).
 
 === <tt>-Mcommit</tt>
 

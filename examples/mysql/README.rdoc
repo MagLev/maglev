@@ -11,9 +11,6 @@ and then put the following in your code
   gem 'ruby-mysql', '>= 2.9.2'
   require 'mysql'
 
-You also need to run MagLev with the <tt>-MallIvsDynamic</tt> flag anytime
-you use the ruby-mysql gem.
-
 == Configure the demo code
 
 MySQL must already be running, then edit the configuration section of

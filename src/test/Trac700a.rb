@@ -1,4 +1,4 @@
-Maglev::System.session_temp_put( :MAGLEV_allIvsDynamic, true )
+# Maglev::System.session_temp_put( :MAGLEV_allIvsDynamic, true )
 
 class Application
   puts "start body"
