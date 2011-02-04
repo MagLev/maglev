@@ -5,6 +5,7 @@
 == Unreleased Changes
 * Update examples, docs Rakefiles to reflect that all inst vars are now
   dynamic by default (-MallIvsDynamic no longer supported).
+* more error checking in Class#__fixed_instvars .
 
 == Changes for 25153 2011-02-01
 * Fix Trac 843
