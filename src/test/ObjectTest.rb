@@ -204,6 +204,7 @@ end
 test(c.public_methods(false), ["a_singleton_method"], 'public_methods(false) B')
 test(c.methods(false), ["a_singleton_method"], 'methods(false) B')
 
+# ============== coverage for __fixed_instvars
 $bz = 0
 begin
   class BadA < ClsOne
@@ -227,6 +228,23 @@ rescue ArgumentError => e
   $bz += 5
 end
 test( $bz , 15 , 'empty fixed instvar list')
+
+
+begin
+  # illegal in RubySClassNode
+  eval( "class ClsOne ; class << self ; __fixed_instvars('@dd'); end; end")
+rescue ArgumentError => e
+  $bz += 5
+end
+test( $bz , 20 , '__fixed_instvars illegal in sclass node')
+
+  # illegal second call
+begin
+  eval("class ClsTwo < ClsOne; __fixed_instvars('@w', '@y') ; def ma; end; __fixed_instvars('@m') ; end")
+rescue ArgumentError => e
+  $bz += 5
+end
+test( $bz , 25 , 'illegal second call to __fixed_instvars')
 
 report
 true

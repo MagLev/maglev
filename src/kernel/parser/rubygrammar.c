@@ -11007,9 +11007,9 @@ case 322:
 /* # line 2151 "grammar.y" */ 
 	{
                       yTrace(vps, "primary  | kCLASS ___ body_stamt kEND");
-		      POP_LINE(vps);
+		      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
-                      NODE **resH = scp.add( RubySClassNode::s(& yymarkPtr[-5].obj, & yymarkPtr[-1].obj, yymarkPtr[-7].obj/*RpNameTokenkCLASS*/, vps));
+                      NODE **resH = scp.add( RubySClassNode::s(& yymarkPtr[-5].obj, & yymarkPtr[-1].obj, yymarkPtr[-7].obj/*RpNameTokenkCLASS*/, lineNum, vps));
 		      local_pop(vps);
 		      vps->class_nest--;
 		      vps->in_def = siToI64( yymarkPtr[-4].obj );

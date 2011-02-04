@@ -728,9 +728,11 @@ class RubySClassNode
 {
   enum { my_cls = cls_RubySClassNode };
  public:
-  static inline omObjSType* s(omObjSType **rcvH, omObjSType **bodyH, omObjSType *classTok, rb_parse_state *ps) {
+  static inline omObjSType* s(omObjSType **rcvH, omObjSType **bodyH, omObjSType *classTok, 
+				int startLine, rb_parse_state *ps) {
     omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, classTok);
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, *rcvH, *bodyH, srcOfs, ps);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, *rcvH, *bodyH, srcOfs, 
+				OOP_OF_SMALL_LONG_(startLine), ps);
   }
 };
 class RubySValueNode
