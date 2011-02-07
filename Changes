@@ -4,8 +4,10 @@
 
 == Unreleased Changes
 
+== Changes for 25191 2011-02-07
 * Fix Trac 839
 * Adjust code in libcrypto.rb for new version of embedded libcrypto.so 
+* Minor bugfixes in underlying GemStone 3.0 system
 
 == Changes for 25186 2011-02-04
 * Update examples, docs Rakefiles to reflect that all inst vars are now
