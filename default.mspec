@@ -15,6 +15,8 @@ class MSpecScript
   core_files = ['spec/rubyspec/core',
             "^spec/rubyspec/core/array/product_spec.rb",
                 "^spec/rubyspec/core/argf/seek_spec.rb",
+            "^spec/rubyspec/core/basicobject",
+            "^spec/rubyspec/core/fixnum/right_shift_spec.rb",
             "^spec/rubyspec/core/kernel/system_spec.rb",
                 "^spec/rubyspec/core/kernel/exec_spec.rb",
                 "^spec/rubyspec/core/process/wait_spec.rb",

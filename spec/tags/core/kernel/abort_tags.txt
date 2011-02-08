@@ -1,0 +1,2 @@
+fails:Kernel#abort raises TypeError when given a non-String object
+fails:Kernel.abort raises TypeError when given a non-String object

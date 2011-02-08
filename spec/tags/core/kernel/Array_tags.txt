@@ -1,1 +1,3 @@
 fails:Kernel#Array raises a TypeError if #to_ary / #to_a do not return an array
+fails:Kernel.Array raises a TypeError if #to_ary does not return an Array
+fails:Kernel#Array raises a TypeError if #to_ary does not return an Array

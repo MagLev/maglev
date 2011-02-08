@@ -1,0 +1,2 @@
+fails:Array#flatten with a non-Array object in the Array ignores the return value of #to_ary if it is nil
+fails:Array#flatten with a non-Array object in the Array raises a TypeError if the return value of #to_ary is not an Array
