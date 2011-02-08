@@ -1,0 +1,10 @@
+This directory contains topaz scripts that do useful stuff. They can be 
+invoked using rake -- i.e.
+  rake maglev:input_file[filname]
+
+You can trace the execution of the script and watch for errors using:
+  tail -f $MAGLEV_HOME/log/maglev/topaz.log
+
+For example, loadSeaside.topaz loads a boatload of Seaside goodness into a
+running MagLev image.
+  rake maglev:input_file[src/topaz/loadSeaside.topaz]
