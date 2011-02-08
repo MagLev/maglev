@@ -1,0 +1,30 @@
+run
+MCPlatformSupport autoCommit: true.
+MCPlatformSupport autoMigrate: true.
+%
+run
+Gofer new
+    gemsource: 'MetacelloRepository';
+    package: 'ConfigurationOfMetacello';
+    load.
+MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
+    (Smalltalk at: #ConfigurationOfMetacello) project latestVersion load ]
+
+%
+run
+Gofer new
+    gemsource: 'MetacelloRepository';
+    package: 'ConfigurationOfGLASS';
+    package: 'ConfigurationOfSeaside30';
+    package: 'ConfigurationOfMagritte2';
+    package: 'ConfigurationOfPier2';
+    package: 'ConfigurationOfPierAddOns2';
+    load.
+MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
+    ((Smalltalk at: #ConfigurationOfGLASS) project version: '1.0-beta.8.6') load.
+    (Smalltalk at: #ConfigurationOfSeaside30) project latestVersion load.
+    (Smalltalk at: #ConfigurationOfMagritte2) project latestVersion load.
+    (Smalltalk at: #ConfigurationOfPier2) project latestVersion load.
+    (Smalltalk at: #ConfigurationOfPierAddOns2) project latestVersion load: 'Pier-Setup'.
+  ]
+%

@@ -1,0 +1,7 @@
+This directory contains topaz scripts that do useful stuff. They can be 
+invoked using rake -- i.e.
+  rake maglev:input_file[filname]
+
+For example, loadSeaside.topaz loads a boatload of Seaside goodness into a
+running MagLev image.
+  rake maglev:input_file[src/topaz/loadSeaside.topaz]
