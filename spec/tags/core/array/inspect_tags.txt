@@ -1,0 +1,1 @@
+fails:Array#inspect propagates taint from itself or elements

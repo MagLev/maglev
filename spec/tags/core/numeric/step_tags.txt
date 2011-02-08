@@ -2,3 +2,8 @@ fails:Numeric#step with [stop, step] returns an Enumerator when passed no block 
 fails:Numeric#step with [stop, step] returns an Enumerator when passed no block and self < stop
 fails:Numeric#step with [stop, step] increments self (using #+) until self > stop when step > 0
 fails:Numeric#step with [stop, step] decrements self (using #+) until self < stop when step < 0
+fails:Numeric#step returns an Enumerator when step is 0
+fails:Numeric#step returns an Enumerator when not passed a block and self > stop
+fails:Numeric#step returns an Enumerator when not passed a block and self < stop
+fails:Numeric#step with [stop, step] increments self using #+ until self > stop when step > 0
+fails:Numeric#step with [stop, step] decrements self using #+ until self < stop when step < 0

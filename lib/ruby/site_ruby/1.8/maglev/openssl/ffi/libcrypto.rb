@@ -105,13 +105,17 @@ module OpenSSL
     #   ENGINE *engine; /* functional reference if 'digest' is ENGINE-provided */
     #   unsigned long flags;
     #   void *md_data;
+    #   EVP_PKEY_CTX *pctx;
+    #  int (*update)(EVP_MD_CTX *ctx,const void *data,size_t count);
     #   } /* EVP_MD_CTX */;
     #++
     class EVP_MD_CTX < FFI::Struct
       layout(:digest, :pointer,
              :engine, :pointer,
              :flags,  :ulong,
-             :data,   :pointer)
+             :data,   :pointer,
+             :pctx,   :pointer,
+             :updatefn, :pointer)
       # Return the message digest pointer.  Equivalent to
       # <tt>EVP_MD_CTX_md(ctx)</tt>.
 
