@@ -1,0 +1,7 @@
+run
+WAGemStoneRunSeasideGems default
+    name: 'Swazoo';
+    adaptorClass: WAGsSwazooAdaptor;
+    ports: #(8383).
+WAGemStoneRunSeasideGems restartGems. "execute runSeasideGems30 script"
+%

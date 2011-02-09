@@ -3,10 +3,10 @@
   For more precise details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
-* Added topaz script to load Seaside into MagLev using
-  rake maglev:input_file[loadSeaside.topaz]
 
-== Changes for 25191 2011-02-07
+== Changes for 25201 2011-02-08
+* Added topaz script to load Seaside into MagLev using
+  rake maglev:input_file[src/topaz/loadSeaside.topaz]
 * Fix Trac 839
 * Adjust code in libcrypto.rb for new version of embedded libcrypto.so 
 * Minor bugfixes in underlying GemStone 3.0 system
