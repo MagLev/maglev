@@ -1,0 +1,114 @@
+= Sample Topaz Scripts
+
+WARNING: These scripts are not fully tested and may not function as expected.
+
+== Overview
+
+This directory contains topaz scripts that do useful stuff. They can be 
+invoked using rake -- i.e.
+  rake maglev:input_file[src/topaz/filename]
+
+You can trace the execution of the script and watch for errors using
+  tail -f $MAGLEV_HOME/log/maglev/topaz.log
+
+For example, this will load a boatload of Seaside goodness into a
+running MagLev image.
+  rake maglev:input_file[src/topaz/loadSeaside.topaz]
+
+== Prerequisites
+
+Some Rake scripts modify the $GEMSTONE environment variable. You
+aren't allowed to do that if Rake is running in MagLev. To work
+around this limitation, disable the pre-installed Rake Gem
+  mv $MAGLEV_HOME/bin/rake $MAGLEV_HOME/bin/maglev-rake
+
+Some scripts start processes that require /opt/gemstone/locks, 
+which may not exist on your system. Here's one way to create it
+    if [ ! -e /opt/gemstone ]
+        then
+        sudo mkdir -p /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
+        sudo chown $USER:${GROUPS[0]} /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
+        sudo chmod 770 /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
+    else
+        echo "[Warning] /opt/gemstone directory already exists"
+        echo "to replace it, remove or rename it and rerun this script"
+    fi
+
+== Playing with Seaside
+
+If you want to use a GemTools One-Click Pharo image at
+http://seaside.gemstone.com/squeak/GemTools-MagLev-Pharo-1.0.zip
+instead of running these in Topaz, you'll need to start both MagLev
+and a NetLDI
+    maglev start
+    maglev startnetldi
+    
+TODO: Turn some of these Seaside code snippets into Topaz scripts in
+this directory. Your suggestions and contributions are welcome.
+
+The following is copied from the GemTools workspace you get when
+logged in to MagLev from the Pharo image mentioned above.
+
+For more info about using GLASS and Seaside check:
+http://code.google.com/p/glassdb/wiki/TableOfContents"
+
+The default username/password for Seaside is admin/seaside.
+
+"start FastCGI adaptor ... does not return. 
+Use #startGemServerOn: in standalone server gem"
+    WAFastCGIAdaptor startOn: 9001.
+    WAFastCGIAdaptor stop.
+
+"start Swazoo adaptor ... does not return. 
+Use #startGemServerOn: in standalone server gem"
+    WAGsSwazooAdaptor startOn: 8383.
+    WAGsSwazooAdaptor stop.
+    SwazooServer initSingleton.
+
+"Object log"
+    WAAdmin 
+        register: WAObjectLog 
+        asApplicationAt: WAObjectLog entryPointName
+        user: 'admin' password: 'tool'.
+    ObjectLogEntry objectLog.
+    ObjectLogEntry emptyLog.
+
+"Set/clear breakpoints at usual suspects for errors"
+    WABasicDevelopment setBreakPoints.
+    WABasicDevelopment clearBreakPoints.
+
+"Shortcuts"
+    WAEnvironment reloadApplications.           "reload Seaside applications"
+    WAAdmin defaultServerManager initialize.    "reset list of server adaptors"
+    WABasicDevelopment reapSeasideCache.        "reap expired sessions"
+    WADispatcher default.                       "access root dispatcher"
+                        
+"Specify FastCGI for runSeasideGems30"
+    WAGemStoneRunSeasideGems default
+        name: 'FastCGI';
+        adaptorClass: WAFastCGIAdaptor;
+        ports: #(9001 9002 9003).
+    WAGemStoneRunSeasideGems restartGems.       "execute runSeasideGems30 script"
+
+"Specify Swazoo for runSeasideGems30"
+    WAGemStoneRunSeasideGems default
+        name: 'Swazoo';
+        adaptorClass: WAGsSwazooAdaptor;
+        ports: #(8383).
+    WAGemStoneRunSeasideGems restartGems.       "execute runSeasideGems30 script"
+
+"Use this handler when running production Seaside servers out of topaz vms (default)"
+    WAAdmin applicationExceptionHandlingDefaults 
+        at: #exceptionHandler 
+        put: WAGemStoneProductionErrorHandler.
+  
+"Use this handler when running Seaside server out of a GemTools vm"
+    WAAdmin applicationExceptionHandlingDefaults 
+        at: #exceptionHandler 
+        put: WAGemStoneWalkbackErrorHandler.
+
+"Use this handler when running development Seaside servers out of topaz vms"
+    WAAdmin applicationExceptionHandlingDefaults 
+        at: #exceptionHandler 
+        put: WARemoteDebuggingWalkbackErrorHandler.
+
