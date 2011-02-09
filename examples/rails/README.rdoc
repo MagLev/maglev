@@ -2,9 +2,9 @@
 
 The files in this directory allow you to run the default Rails app on
 MagLev.  Currently, MagLev is able to serve static and (simple) dynamic
-pages using a patched version of Rails 3.0.0, or Rails 3.0.3.  The
-<tt>Rakefile</tt> provides tasks to setup your MagLev environment with the
-correct gems, including the (patched) Rails Gems.
+pages using a patched version of Rails 3.0.x.  The <tt>Rakefile</tt>
+provides tasks to setup your MagLev environment with the correct gems,
+including the (patched) Rails Gems.
 
 == Quick Start
 
@@ -153,6 +153,7 @@ Or, you can use Bundler to install them yourself.
      Installing rails (3.0.0)
      Installing ruby-mysql (2.9.3)
      Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+
 3. Patch activesupport:
      $ cd $MAGLEV_HOME/examples/rails
      $ rake patch:activesupport
