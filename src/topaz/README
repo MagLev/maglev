@@ -2,14 +2,19 @@ This directory contains topaz scripts that do useful stuff. They can be
 invoked using rake -- i.e.
   rake maglev:input_file[filname]
 
-WARNING: These are not fully tested and may not function correctly.
-
 You can trace the execution of the script and watch for errors using:
   tail -f $MAGLEV_HOME/log/maglev/topaz.log
 
 For example, loadSeaside.topaz loads a boatload of Seaside goodness into a
 running MagLev image.
   rake maglev:input_file[src/topaz/loadSeaside.topaz]
+
+WARNING: These scripts are not fully tested and may not function correctly.
+
+NOTE: You can't use rake running in MagLev to start MagLev. You'll 
+need to disable the pre-installed Rake Gem. Here's one way:
+  mv $MAGLEV_HOME/bin/rake $MAGLEV_HOME/bin/maglev-rake
+  mv $MAGLEV_HOME/bin/bundle $MAGLEV_HOME/bin/maglev-bundle
 
 TODO: Implement more Topaz scripts to handle running Seaside, etc.
 
