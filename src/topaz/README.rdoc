@@ -34,23 +34,31 @@ which may not exist on your system. Here's one way to create it
         echo "to replace it, remove or rename it and rerun this script"
     fi
 
-== Playing with Seaside
+== Additional information on GLASS, Seaside, MetaCello, etc.
 
-If you want to use a GemTools One-Click Pharo image at
-http://seaside.gemstone.com/squeak/GemTools-MagLev-Pharo-1.0.zip
-instead of running these in Topaz, you'll need to start both MagLev
+* {Dale's Blog -- (gem)Stone Soup}[http://gemstonesoup.wordpress.com/]
+* {James' Blog -- Programming Gems (on GemStone)}[http://programminggems.wordpress.com/]
+* {GLASS Project on Google Code}[http://code.google.com/p/glassdb/wiki/TableOfContents]
+* {Metacello Project on Google Code}[http://code.google.com/p/metacello/]
+* {GLASS Mailing List}[http://seaside.gemstone.com/mailman/listinfo/beta]
+* {GLASS Mailing List Archive}[http://forum.world.st/GLASS-f1460844.html]
+* {Seaside Project}[http://seaside.st/]
+* {Seaside Book}[http://book.seaside.st/book]
+
+== Playing with Seaside in MagLev
+
+To use the GemTools One-Click Pharo image at
+http://seaside.gemstone.com/squeak/GemTools-MagLev-Pharo-1.0.zip instead
+of running these snippets in Topaz, you'll need to start both MagLev
 and a NetLDI
     maglev start
     maglev startnetldi
     
-TODO: Turn some of these Seaside code snippets into Topaz scripts in
+TODO: Turn some of these Seaside snippets into Topaz scripts in
 this directory. Your suggestions and contributions are welcome.
 
 The following is copied from the GemTools workspace you get when
 logged in to MagLev from the Pharo image mentioned above.
-
-For more info about using GLASS and Seaside check:
-http://code.google.com/p/glassdb/wiki/TableOfContents"
 
 The default username/password for Seaside is admin/seaside.
 

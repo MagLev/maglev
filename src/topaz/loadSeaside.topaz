@@ -20,9 +20,12 @@ Gofer new
     package: 'ConfigurationOfPier2';
     package: 'ConfigurationOfPierAddOns2';
     load.
+
+" NOTE: for now use specific versions of GLASS and Seaside30 with MagLev"
+
 MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
     ((Smalltalk at: #ConfigurationOfGLASS) project version: '1.0-beta.8.6') load.
-    (Smalltalk at: #ConfigurationOfSeaside30) project latestVersion load.
+    ((Smalltalk at: #ConfigurationOfSeaside30) project version: '3.0.3.1') load.
     (Smalltalk at: #ConfigurationOfMagritte2) project latestVersion load.
     (Smalltalk at: #ConfigurationOfPier2) project latestVersion load.
     (Smalltalk at: #ConfigurationOfPierAddOns2) project latestVersion load: 'Pier-Setup'.
