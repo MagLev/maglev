@@ -48,6 +48,9 @@ namespace :patch do
                                 'activesupport_descendents_tracker_patch.diff'],
       "activesupport-3.0.3" => ['activesupport_class_patch.diff',
                                 'activesupport_time_zone_patch.diff',
+                                'activesupport_descendents_tracker_patch.diff'],
+      "activesupport-3.0.4" => ['activesupport_class_patch.diff',
+                                'activesupport_time_zone_patch.diff',
                                 'activesupport_descendents_tracker_patch.diff']
     }
     apply_patches(patch_info)

@@ -4,7 +4,9 @@
 
 == Unreleased Changes
 
-== Changes for 25218 2011-02-09
+* Fix Trac 850
+
+== Changes for 25223 2011-02-09
 * Added topaz script to load Seaside into MagLev using
   rake maglev:input_file[src/topaz/loadSeaside.topaz]
   See src/topaz/README.rdoc
