@@ -22,6 +22,7 @@ Gofer new
     load.
 
 " NOTE: for now use specific versions of GLASS and Seaside30 with MagLev"
+" These may break if others update Metacello projects without testing on MagLev"
 
 MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
     ((Smalltalk at: #ConfigurationOfGLASS) project version: '1.0-beta.8.6') load.
