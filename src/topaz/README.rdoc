@@ -1,6 +1,8 @@
 = Sample Topaz Scripts
 
 WARNING: These scripts are not fully tested and may not function as expected.
+Seaside is loaded using Metacello Configurations on the web. There is no guarantee
+that others will test their Metacello project updates on MagLev.
 
 == Overview
 
@@ -40,6 +42,7 @@ which may not exist on your system. Here's one way to create it
 * {James' Blog -- Programming Gems (on GemStone)}[http://programminggems.wordpress.com/]
 * {GLASS Project on Google Code}[http://code.google.com/p/glassdb/wiki/TableOfContents]
 * {Metacello Project on Google Code}[http://code.google.com/p/metacello/]
+* {Metacello 1.0-beta.28 unearthed}[http://gemstonesoup.wordpress.com/2011/01/17/metacello-1-0-beta-28-unearthed/]
 * {GLASS Mailing List}[http://seaside.gemstone.com/mailman/listinfo/beta]
 * {GLASS Mailing List Archive}[http://forum.world.st/GLASS-f1460844.html]
 * {Seaside Project}[http://seaside.st/]
