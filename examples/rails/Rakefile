@@ -27,14 +27,6 @@ namespace :bundler do
 end
 
 namespace :patch do
-  desc "patch appname/config/boot.rb for trac757"
-  task :app, :appname do |t,args|
-    app = args[:appname]
-    raise "Can't find application: #{app.inspect}" if app.nil? || ! File.exist?(app)
-    patch = File.join(PATCH_DIR, "app_config_boot_Trac757.rb")
-    cp patch, File.join(app, "config", "boot.rb")
-  end
-
   desc "Patch ActiveSupport 3.0.0 gem."
   task :activesupport do
     patch_info = {
