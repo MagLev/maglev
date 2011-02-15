@@ -50,6 +50,18 @@ class Class
     c
   end
 
+  def self.__rb_new(super_cls)
+    if super_cls._not_equal?(Object)
+      if super_cls._equal?(Class)
+        raise TypeError, 'superclass may not be Class'
+      end
+      unless super_cls._is_a?(Class)
+        raise TypeError, 'superclass arg must be a Class'
+      end
+    end
+    __ruby_new(super_cls)
+  end
+
   class_primitive_nobridge_env '__ruby_new_fixedivs&', '_rubyNew', ':instVars:do:'
 
   # Define a new Class using fixed instance variables for the

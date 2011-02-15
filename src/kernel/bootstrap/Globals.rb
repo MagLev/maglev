@@ -9,6 +9,7 @@ RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'Metaclass3')
 RUBY.global('StClass', 'Class')
 RUBY.global('ConditionVariable', 'TransientSemaphore')
+RUBY.global('Data', 'RubyCextData');
 RUBY.global('Dir', 'RubyDirectory')
 RUBY.global('Env', 'RubyEnv')
 RUBY.global('FalseClass', 'FalseClass')

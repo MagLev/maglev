@@ -338,6 +338,35 @@ class Hash
 
   alias [] __atkey
 
+  def __cext_lookup(key)  # [
+    # used by implementation of rb_hash_lookup() in C extension API
+    kh = key.hash
+    kofs = kh % @_st_tableSize  ; kofs += kofs
+    v = self.__at(kofs + 1)
+    if v._not_equal?(RemoteNil)
+      k = self.__at(kofs)
+      if k._not_equal?(RemoteNil)
+        if key.eql?( k )
+          return v
+        end
+      elsif v._isFixnum
+        idx = v  # internal collision chain
+        begin
+          if key.eql?( self.__at(idx) )
+            return self.__at(idx + 1)
+          end
+          idx = self.__at(idx + 2)
+        end while idx._isFixnum
+      else
+        v = v.__bucket_at(key, kh) # a collision bucket
+        if v._not_equal?(RemoteNil)
+          return v
+        end
+      end
+    end
+    nil  # don't use self.default
+  end # ]
+
   def __bucket_at(key, khash)
     # parent is a Hash , khash is the result of key.hash
     # returns value for key, or RemoteNil if key not found

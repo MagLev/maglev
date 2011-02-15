@@ -1663,9 +1663,15 @@ end
 
 class Date
 
+  def to_time() 
+    Time.local(year, mon, mday) 
+  end
+
+  def to_date() 
+    self 
+  end
+
 =begin
-# def to_time() Time.local(year, mon, mday) end
-# def to_date() self end
 # def to_datetime() DateTime.new!(self.class.jd_to_ajd(jd, 0, 0), @of, @sg) end
 =end
 

@@ -601,6 +601,14 @@ class Object
   def to_s
     self.class.name.to_s
   end
+ 
+  def __cext_to_s
+    str = "#<"
+    str << self.class.name
+    str <<  ?:
+    str << self.__id.to_s
+    str << ?> 
+  end
 
   def __regex_to_s
     self.to_s

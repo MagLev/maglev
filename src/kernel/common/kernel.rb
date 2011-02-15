@@ -85,11 +85,19 @@ module Kernel
     if obj._isArray 
       return obj
     end 
+    bad = false
     begin
       res = obj.to_ary
-      return res if res._isArray
+      if res._isArray
+        return res 
+      else
+        bad = res._not_equal?(nil)
+      end
     rescue
       # ignore
+    end
+    if bad
+      raise TypeError, 'Kernel#Array, to_ary did not return an Array'
     end
     Type.coerce_to(obj, Array, :to_a)
   end
@@ -123,6 +131,12 @@ module Kernel
   end
   module_function :warn
 
+  def __cext_warning(warning)
+    # called by  rb_warning
+    if $VERBOSE
+      $stderr.write "#{warning}\n" 
+    end
+  end
 
   # from timeout.rb
   ## 

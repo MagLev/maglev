@@ -248,5 +248,24 @@ class Range
     return [beg, len]
   end
 
+  def __cext_beg_len(len, err)
+    beg = Type.coerce_to(@_st_from, Fixnum, :to_int)
+    the_end = Type.coerce_to(@_st_to, Fixnum, :to_int)
+    if (beg < 0)
+      beg += len
+      return nil if (beg < 0)
+    end
+    if (err == 0 || err == 2) 
+      return nil if (beg > len)
+      if (the_end > len) ; the_end = len ; end
+    end
+    if (the_end < 0) ; the_end += len ; end
+    the_end += 1 unless @_st_excludeEnd
+    len = the_end - beg 
+    if (len < 0) ; len = 0 ; end
+   
+    [ beg, len ]
+  end
+
 end
 Range.__freeze_constants

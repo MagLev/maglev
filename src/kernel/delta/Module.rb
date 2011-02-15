@@ -53,9 +53,29 @@ class Module
   end
 
 
-
   def extend_object(object)
     raise NotImplementedError, 'Module#extend_object'
   end
+
+  def self.__rb_path2class(path)
+    if path[0] == "#"
+      raise ArgumentError, "can't retrieve anonymous class #{path}"
+    end
+
+    ns = Object
+    path.to_s.split('::').each do |n|
+      next if n.empty?
+      if ns.const_defined?(n)
+	ns = ns.const_get(n)
+      else
+	raise ArgumentError, "undefined class/module #{n}"
+      end
+      unless ns._kind_of?(Module)
+	raise TypeError, "#{ns} in #{path} does not refer to class/module"
+      end
+    end
+    ns
+  end
+
 
 end

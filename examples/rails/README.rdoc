@@ -92,25 +92,6 @@ patched ActiveSupport as described below, and you apply the patch to the
 generated app (as described in step 2), then everything up through step 9
 should just work:
 
-1. Install rails: <tt>maglev-gem install rails --pre</tt>
-2. Create new rails app: <tt>$MAGLEV_HOME/bin/rails new blog</tt>
-3. Run +bundle+: <tt>$MAGLEV_HOME/bin/bundle install</tt>
-4. Create the database: <tt>$MAGLEV_HOME/bin/rake db:create</tt>
-5. Start server: <tt>$MAGLEV_HOME/bin/rails server</tt>
-6. Load a static page: http://localhost:3000/
-7. Load a dynamic page: http://localhost:3000/rails/info/properties
-8. Generate new controller: <tt>$MAGLEV_HOME/bin/rails generate controller
-   home index</tt>
-9. Running migrations: <tt>$MAGLEV_HOME/bin/rake db:migrate</tt>
-10. Running the rails console: <tt>$MAGLEV_HOME/bin/rails console</tt>
-    (untested)
-11. Run application unit tests (untested)
-
-Once the basic life-cycle works, we plan on getting the Rails Specs to
-pass.
-
-Detailed explanations of each step follow.
-
 === 1. Install rails
 
 Rails installs from gems or bundler, but needs a couple of patches.
@@ -118,47 +99,12 @@ You can install and patch rails using the provided rake task:
   $ cd $MAGLEV_HOME/examples/rails
   $ rake init
 
-Or, you can use Bundler to install them yourself.
-
-1. Rake and Bundler are now pre-installed in MagLev, so you do not need to
-   install the gems.
-
-2. Use Bundler, and <tt>myapp/Gemfile.lock</tt>, to install the gems:
-     $ cd $MAGLEV_HOME/examples/rails/myapp
-     $ $MAGLEV_HOME/bin/bundle install
-     Fetching source index for http://rubygems.org/
-     Using rake (0.8.7)
-     Installing abstract (1.0.0)
-     Installing activesupport (3.0.0)
-     Installing builder (2.1.2)
-     Installing i18n (0.4.1)
-     Installing activemodel (3.0.0)
-     Installing erubis (2.6.6)
-     Installing rack (1.2.1)
-     Installing rack-mount (0.6.13)
-     Installing rack-test (0.5.4)
-     Installing tzinfo (0.3.23)
-     Installing actionpack (3.0.0)
-     Installing mime-types (1.16)
-     Installing polyglot (0.3.1)
-     Installing treetop (1.4.8)
-     Installing mail (2.2.5)
-     Installing actionmailer (3.0.0)
-     Installing arel (1.0.1)
-     Installing activerecord (3.0.0)
-     Installing activeresource (3.0.0)
-     Using bundler (1.0.0)
-     Installing thor (0.14.0)
-     Installing railties (3.0.0)
-     Installing rails (3.0.0)
-     Installing ruby-mysql (2.9.3)
-     Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-
-3. Patch activesupport:
+You will need to patch activesupport.  The patches directory has patches
+for rails versions 3.0.0, 3.0.3, 3.0.4
      $ cd $MAGLEV_HOME/examples/rails
      $ rake patch:activesupport
 
-=== 2. Create new rails app
+=== 2. Create and configure new rails app
 
 1. Generate the application:
      $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
@@ -175,11 +121,6 @@ Or, you can use Bundler to install them yourself.
         socket: /opt/local/var/run/mysql5/mysqld.sock
    C. Change the +username+, +password+ and +database+ for your
       installation.
-
-4. Edit <tt>myapp/config/boot.rb</tt> to work around {Trac
-   757}[https://magtrac.gemstone.com/ticket/757]. See the track report for
-   details on the workaround.
-     $ cp $MAGLEV_HOME/examples/rails/patches/app_config_boot_Trac757.rb myapp/config/boot.rb
 
 === 3. Run +bundle+
 
@@ -225,14 +166,11 @@ If you remove <tt>public/index.html</tt> and add <tt>root :to =>
 "home#index"</tt> into <tt>config/routes.rb</tt>, you should be able to hit
 http://localhost:3000/ and see <tt>home#index</tt>
 
-You can also create scaffolding:
-  $ $MAGLEV_HOME/bin/rails generate scaffold Post name:string title:string content:text
-
 === 9. Running a migrations
 
-Assuming you've generated the scaffolding in the previous step, you can do:
+You can also create scaffolding and run migrations:
+  $ $MAGLEV_HOME/bin/rails generate scaffold Post name:string title:string content:text
   $ $MAGLEV_HOME/bin/rake db:migrate
-which seems to work.
 
 You should now be able to start the server and hit
 http://localhost:3000/posts and start managing your blog.

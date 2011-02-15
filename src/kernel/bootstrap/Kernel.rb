@@ -25,6 +25,9 @@ module Kernel
   # terminates.
   def abort(string=nil)
     unless string._equal?(nil)
+      unless string._isString
+        raise TypeError , 'arg to Kernel#abort must be a String'
+      end
       $stderr.write("#{string}\n")
     end
     exit(1)
@@ -320,6 +323,11 @@ module Kernel
     vcgl[0].__storeRubyVcGlobal(0x30)
     vcgl[1].__storeRubyVcGlobal(0x31)
     res
+  end
+
+  def __cext_eval(*args, &block) 
+    # called from rb_eval_string_ in C extension implementation
+    eval(*args, &block)
   end
 
   # Initiates the termination of the Ruby script by raising the

@@ -86,6 +86,7 @@ class Struct
     attrs.freeze
     field_names.freeze
 
+    # the field names get fixed instVars with smalltalk style names
     klass = Class.new_fixed_instvars(self, field_names) {
       attr_accessor(*field_names)
 
@@ -99,8 +100,9 @@ class Struct
 
       include Enumerable  # Maglev
     }
-    Struct.const_set(klass_name, klass) if klass_name
-
+    if klass_name
+      Struct.const_set(klass_name, klass) 
+    end
     klass.const_set(:STRUCT_ATTRS, attrs)
     klass.const_set(:STRUCT_ATTRS_fieldNames, field_names)
 

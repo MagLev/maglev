@@ -97,6 +97,10 @@ class Array
             if el._isArray
               el.__flatten_onto(output, level - 1)
               recursed = true
+            elsif el._equal?(nil)
+              #ok
+            else
+              raise TypeError, 'in flatten, to_ary did not return an Array'
             end
           else
             output.__push( el )
