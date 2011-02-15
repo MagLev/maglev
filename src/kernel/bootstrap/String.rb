@@ -161,8 +161,6 @@ class String
     self
   end
 
-  alias << __concat
-
   primitive_env '<=>',  '_rubyCompare' , ':'
 
   def __prim_compare_failed(o)
@@ -543,7 +541,7 @@ class String
     return nil # no modification made
   end
 
-  alias concat __concat
+  alias concat <<
 
   # def count(*args); end
   # arg to rubyCount: is expected to be an Array , so declare as 'count*'
@@ -1440,82 +1438,32 @@ class String
   #     "1,2,,3,4,,".split(',', 4)      #=> ["1", "2", "", "3,4,,"]
   #     "1,2,,3,4,,".split(',', -4)     #=> ["1", "2", "", "3", "4", "", ""]
   def split(pattern=nil, limit=MaglevUndefined)
-    if limit._equal?(MaglevUndefined)
-      return self.split(pattern)
-    end
     return [] if self.__size._equal?(0)
-    limit = Type.coerce_to(limit, Integer, :to_int)
-    return [self.dup] if limit._equal?(1)
-    limited = limit > 0 ? true : false
-    suppress_trailing_empty = limit._equal?(0)
+
+    if limit._equal?(MaglevUndefined)
+      suppress_trailing_empty = true
+      limited = false
+      limit = nil
+    else
+      limit = Type.coerce_to(limit, Integer, :to_int)
+      return [self.dup] if limit._equal?(1)
+      limited = limit > 0 ? true : false
+      suppress_trailing_empty = limit._equal?(0)
+    end
 
     pattern ||= ($; || " ")
 
-    if pattern._isString
-      if pattern.__size <= 1 
-        if pattern == ''
-          return  __split_chars(limit, limited, suppress_trailing_empty)
-        elsif  pattern == ' ' 
-          return  __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
-        end
-      end
-      return __split_string_on(pattern, limit, limited, suppress_trailing_empty)
-    else
-      return __split_regex(pattern, limit, limited, suppress_trailing_empty)
-    end
+    result = if pattern == ''
+               __split_chars(limit, limited, suppress_trailing_empty)
+             elsif  pattern == ' '
+               __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
+             elsif pattern._isString
+               __split_string_on(pattern, limit, limited, suppress_trailing_empty)
+             else
+               __split_regex(pattern, limit, limited, suppress_trailing_empty)
+             end
+    result
   end
-
-  def split(pattern=nil)
-    if pattern._equal?(nil)
-       return self.split
-    end
-    return [] if self.__size._equal?(0)
-
-    suppress_trailing_empty = true
-    limited = false
-    limit = nil
-
-    if pattern._isString
-      if pattern.__size <= 1
-	if pattern == ''
-	  return  __split_chars(limit, limited, suppress_trailing_empty)
-	elsif  pattern == ' '
-	  return  __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
-	end
-      end
-      return __split_string_on(pattern, limit, limited, suppress_trailing_empty)
-    else
-      return __split_regex(pattern, limit, limited, suppress_trailing_empty)
-    end
-  end
-
-  def split
-    return [] if self.__size._equal?(0)
-
-    suppress_trailing_empty = true
-    limited = false
-    limit = nil
-
-    pattern = $; 
-    if pattern 
-      if pattern._isString
-        if pattern.__size <= 1
-          if pattern == ''
-            return  __split_chars(limit, limited, suppress_trailing_empty)
-          elsif  pattern == ' '
-            return  __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty)
-          end
-        end
-        return __split_string_on(pattern, limit, limited, suppress_trailing_empty)
-      else
-        return __split_regex(pattern, limit, limited, suppress_trailing_empty)
-      end
-    else
-      # pattern defaults to  ' ' 
-      return __split_on_contiguous_whitespace(limit, limited, suppress_trailing_empty
-    end
-  end
-
 
   primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
 
@@ -1912,18 +1860,6 @@ class String
       end
       str.to_inum(base, false)
     end
-  end
- 
-  def to_i
-    # base defaults to 10
-    str = self
-    if self.__at(0)._equal?( ?0 ) && self.__at(1)._equal?( ?d )
-      if self.__at(2)._equal?( ?- )
-	return 0 # sign must come before base specifier
-      end
-      str = self.__at(2, self.__size - 2)
-    end
-    Integer.__from_string_radix(str.strip, 10)
   end
 
   # Consider self as an integer and return value given base.

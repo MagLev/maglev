@@ -33,6 +33,7 @@ class ExecBlock
   primitive_nobridge '__source_location', '_fileAndLine'
 
   primitive_nobridge '__set_self', 'setSelf:'
+  primitive_nobridge '__get_self' , 'selfValue'
 
   # call, call:, call::, call::: , call&, call:&, call::&
   #  will be compiled to special bytecodes
@@ -215,6 +216,8 @@ class Proc
     def __set_self(obj)
       @_st_block.__set_self(obj)
     end
+
+    primitive_nobridge '__get_self' , 'selfValue'
 
     def [](*args, &block)
       @_st_block.call(*args, &block)

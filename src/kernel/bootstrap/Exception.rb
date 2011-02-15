@@ -78,8 +78,19 @@ class Exception
 
     IncludeSmalltalkFrames = false
 
-    def initialize(msg)
+    def initialize(*args)
       # bridge methods for this variant
+      self.__st_initialize
+      if args.length >= 1
+        msg = args[0]
+      end
+      if msg._equal?(nil)
+        msg = self.class.name
+      end
+      @_st_messageText = msg
+    end
+
+    def initialize(msg)
       self.__st_initialize  # initialize smalltak instvars
       if msg._equal?(nil)
         msg = self.class.name
@@ -90,17 +101,6 @@ class Exception
     def initialize
       self.__st_initialize  # initialize smalltak instvars
       @_st_messageText = self.class.name
-    end
-
-    def initialize(*args)
-      self.__st_initialize
-      if args.length >= 1
-        msg = args[0]
-      end
-      if msg._equal?(nil)
-        msg = self.class.name
-      end
-      @_st_messageText = msg
     end
 
     primitive_nobridge '__stbacktrace', 'backtraceToLevel:'

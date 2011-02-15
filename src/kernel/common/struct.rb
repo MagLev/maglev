@@ -86,6 +86,7 @@ class Struct
     attrs.freeze
     field_names.freeze
 
+    # the field names get fixed instVars with smalltalk style names
     klass = Class.new_fixed_instvars(self, field_names) {
       attr_accessor(*field_names)
 

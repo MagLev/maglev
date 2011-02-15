@@ -8,26 +8,7 @@ module Maglev
     # Given the path to a class, return the class.  E.g.,
     # path might be ::Foo::Bar
     def self.rb_path2class(path)
-      if path[0] == "#"
-        raise ArgumentError, "can't retrieve anonymous class #{path}"
-      end
-
-      ns = Object
-      path.to_s.split('::').each do |n|
-        next if n.empty?
-        if ns.const_defined?(n)
-          ns = ns.const_get(n)
-        else
-          raise ArgumentError, "undefined class/module #{n}"
-        end
-        case ns
-        when Class, Module
-          # ok
-        else
-          raise TypeError, "#{ns} in #{path} does not refer to class/module"
-        end
-      end
-      ns
+      Module.__rb_path2class(path)
     end
 
     # rb_string_value from string.c
