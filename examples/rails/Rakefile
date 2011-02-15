@@ -4,7 +4,7 @@ PATCH_DIR = File.join(File.dirname(__FILE__), "patches")
 MAGLEV_HOME = ENV['MAGLEV_HOME']
 
 desc "Do one-time install of gems and patch rails gems"
-task :init => [:'bundler:gem', :'bundler:install', :'patch:activesupport']
+task :init => [:'bundler:install', :'patch:activesupport']
 
 desc "Run myapp, with maglev."
 task :app do
@@ -18,11 +18,6 @@ end
 # gems for MagLev installed in $MAGLEV_HOME.  The tasks in this namespace
 # need only be run once.
 namespace :bundler do
-  desc "Ensure the rake and bundler gems are installed into MagLev."
-  task :gem do
-    sh %{ maglev-gem install --no-ri --no-rdoc rake bundler }
-  end
-
   desc "Install rails 3.0.0 gems from myapp/Gemfile.lock into MagLev"
   task :install do
     cd('myapp') do
@@ -32,14 +27,6 @@ namespace :bundler do
 end
 
 namespace :patch do
-  desc "patch appname/config/boot.rb for trac757"
-  task :app, :appname do |t,args|
-    app = args[:appname]
-    raise "Can't find application: #{app.inspect}" if app.nil? || ! File.exist?(app)
-    patch = File.join(PATCH_DIR, "app_config_boot_Trac757.rb")
-    cp patch, File.join(app, "config", "boot.rb")
-  end
-
   desc "Patch ActiveSupport 3.0.0 gem."
   task :activesupport do
     patch_info = {
