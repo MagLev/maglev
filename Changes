@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 * Fix Trac 850
+* Initial implementation of Ruby C extensions API.
+  See  lib/ruby/1.8/Maglev_c_extensions.txt for current limitations.
 
 == Changes for 25223 2011-02-09
 * Added topaz script to load Seaside into MagLev using
