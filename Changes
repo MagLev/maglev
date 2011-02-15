@@ -1,11 +1,15 @@
 = MagLev Change Log
 
-  For more precise details see: http://bit.ly/d3C6S1
+  For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
-* Fix Trac 850
+
+== Changes for 25260 2011-02-15
+* Fix Trac 850, problem creating namespace in persistent mode
+* Updates for rails 3.0.4
 * Initial implementation of Ruby C extensions API.
-  See  lib/ruby/1.8/Maglev_c_extensions.txt for current limitations.
+  See lib/ruby/1.8/Maglev_c_extensions.txt for current limitations.
+* A number of backend GemStone 3.0 changes including some to support Seaside 3.0
 
 == Changes for 25223 2011-02-09
 * Added topaz script to load Seaside into MagLev using
