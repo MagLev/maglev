@@ -79,7 +79,7 @@ class Fixnum
     end
   end
 
-  primitive_nobridge '__bit_at', 'bitAt:'
+  primitive_nobridge '__bit_at', 'bitAt:'  # argument is 1 based
 
   # abs inherited from Integer
 
