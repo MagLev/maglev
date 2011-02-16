@@ -138,7 +138,7 @@ class Integer
     end
   end
 
-  primitive_nobridge '__bit_at', 'bitAt:'
+  primitive_nobridge '__bit_at', 'bitAt:'  # argument is 1 based
 
   def [](arg)
     a = Type.coerce_to(arg, Integer, :to_int)
@@ -146,7 +146,7 @@ class Integer
        0
     else
       if a._isFixnum
-        self.__bit_at(a)
+        self.__bit_at(a + 1)
       else
         self < 0 ? 1 : 0 
       end
