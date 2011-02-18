@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25282 2011-02-17
+== Changes for 25278 2011-02-17
 * Fix Trac 850, problem creating namespace in persistent mode
 * Updates for rails 3.0.4
 * Initial implementation of Ruby C extensions API.
