@@ -569,11 +569,12 @@ RUBY_DLLSPEC VALUE rb_cvar_get(VALUE module_handle, ID name);
 /** Set module's named class variable to given value. Returns the value. */
 RUBY_DLLSPEC VALUE rb_cvar_set_(VALUE modul, ID name, VALUE value);
 
-static inline RUBY_DLLSPEC VALUE rb_cvar_set(VALUE module_handle, ID name, VALUE value, VALUE ignored18)
+static inline RUBY_DLLSPEC VALUE rb_cvar_set(VALUE module_handle, ID name, VALUE value, ...)
 {
+  // added var args per Trac 851
+  // for ruby 1.9, remove the var args
   return rb_cvar_set_(module_handle, name, value);
 }
-// define rb_cvar_set(klass, name, value, ...) __extension__(rb_cvar_set(klass, name, value))
 
 /** Return object's instance variable by name. @ optional. */
 RUBY_DLLSPEC VALUE rb_iv_get(VALUE obj, const char* name);
