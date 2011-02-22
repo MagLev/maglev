@@ -1,3 +1,15 @@
+# Found in Ramaze. To reproduce in Ramaze, run the following program and
+# hit the main URL:
+#
+#   require 'rubygems'
+#   require 'ramaze'
+#   class MainController < Ramaze::Controller
+#         def index
+#           'Hello, World!'
+#         end
+#   end
+#   Ramaze.start
+
 module M
   def cache_store(key, value, options={ })
     puts "M::cache_store(#{key}, #{value}, #{options.inspect})"
