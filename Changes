@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* Fix Trac 857
+* Implement rb_str_buf_new - note comments in ruby.h
+
 == Changes for 25289 2011-02-18
 * Adjust ruby.h per Trac 851  .
 * Fix spec failure in rb_num2dbl with nil arg.
