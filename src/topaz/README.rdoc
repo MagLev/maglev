@@ -17,6 +17,9 @@ For example, this will load a boatload of Seaside goodness into a
 running MagLev image.
   rake maglev:input_file[src/topaz/loadSeaside.topaz]
 
+and this will fire up Seaside on localhost:8383
+  rake maglev:input_file[src/topaz/runSeaside-Swazoo.topaz]
+
 == Prerequisites
 
 Some Rake scripts modify the $GEMSTONE environment variable. You
