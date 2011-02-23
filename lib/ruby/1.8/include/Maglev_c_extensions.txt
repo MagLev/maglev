@@ -15,8 +15,8 @@ Objectives
   GCI function calls.  We use this same object identifier for VALUE's
   in the Ruby C API.
 
-Limitations
------------
+Restrictions
+------------
 
 Maglev does not support C comparisons expecting Qfalse to have C integer 
 value  zero. 
@@ -153,7 +153,7 @@ rb_rescue
   exception being rescued  by the application's C code.   
   $! only reflects  exceptions being rescued by Ruby rescue blocks.
 
-Limitation of Data_Wrap_Struct in current Maglev implementation.
+Limitations of Data_Wrap_Struct in current Maglev implementation.
 
   Calling Data_Wrap_Struct with a non-NULL mark function is not
   supported yet.
@@ -168,19 +168,6 @@ Limitation of Data_Wrap_Struct in current Maglev implementation.
   void init_xml_node() {
     ...
     sym_iv_doc = rb_intern("@doc");
-    ...
-  }
-
-
-  VALUE Nokogiri_wrap_xml_node(VALUE klass, xmlNodePtr node) {
-    ...
-    if (DOC_RUBY_OBJECT_TEST(node->doc)) {  // maglev workaround , no gc mark yet
-      VALUE ref = DOC_RUBY_OBJECT(node->doc);
-      if (ref != 0 && ref != Qnil && sym_iv_doc != Qnil) {
-        rb_node = Data_Wrap_Struct(klass, NULL, debug_node_dealloc, node) ;
-        rb_ivar_set(rb_node, sym_iv_doc, ref);
-      }
-    }
     ...
   }
 
@@ -220,7 +207,91 @@ variant of rb_funcall to call a public method in Exception.
 The Maglev VM does not implement the  MRI  st.h  API .
 A C extension which needs to use the C hash implementation
 of st.h  must build it's own copy of st.c .  (observed in nokogiri)
+
+Other restrictions in the current implementation
+
+  rb_iterate_each_pair  only supports iteration on Array arguments
+
+  128bit long long numeric functions not supported yet
+     rb_big2ll , rb_ll2inum
+
+  rb_big2ulong raises a RangeError when given a negative argument
+
+  in globals_spec.rb
+    sb_gv_get  does not retrieve $~
+
+  In Ruby code invoked from C code , $! does not reflect
+  the exception currently being rescued by C code
+  called by rb_rescue  .
+
+  Regexp matches invoked from  C do not set $1, $2
+  in the Ruby code which called the C code
+
+  rb_str_set_len will change the logical size of the string.
+  If it is used to shrink the string and then grow it
+  all bytes beyond the size produced by the shrink will be
+  zero after the string is grown again.
+
+Bugs not fixed yet (see also rubyspecs discussion below)
+
+  rb_cvar_defined  has some failures
+
+  rb_const_get_from , rb_const_get_at fail to call const_missing
+
+  The protections of methods installed by rb_define_private_method,
+   rb_define_protected_method  is not correct.
+
+  rb_is_type_data(Time.now)  returns false ; it should be true
+
+  VALUE Nokogiri_wrap_xml_node(VALUE klass, xmlNodePtr node) {
+    ...
+    if (DOC_RUBY_OBJECT_TEST(node->doc)) {  // maglev workaround , no gc mark yet
+      VALUE ref = DOC_RUBY_OBJECT(node->doc);
+      if (ref != 0 && ref != Qnil && sym_iv_doc != Qnil) {
+        rb_node = Data_Wrap_Struct(klass, NULL, debug_node_dealloc, node) ;
+        rb_ivar_set(rb_node, sym_iv_doc, ref);
+      }
+    }
+    ...
+  }
      
+Status of rubyspecs (as of 17 Feb 2011)
+
+  For the rubyspecs  in optional/capi/ , 
+  the following specs are skipped with 'not_compliant_on :maglev do'
+  because they are not implemented yet
+
+    rb_ary_new2_assign
+    rb_ary_to_s
+    rb_block_proc
+    rb_call_super
+    rb_define_hooked_variable
+    rb_define_readonly_variable
+    rb_define_variable
+    rb_exec_recursive
+    rb_hash
+    rb_hash_delete_if
+    rb_hash_foreach
+    rb_mem_clear
+    rb_num_zerodiv
+    rb_reg_match
+    rb_set_kcode
+    rb_str_buf_new
+    rb_str2cstr_replace
+    rb_struct_aref
+    rb_struct_aset
+    rb_struct_new
+    rb_str_hash
+    rb_throw
+  
+    RARRAY
+    RARRAY_PTR_assign
+    RBIGNUM_SIGN
+    RFLOAT
+    RSTRING
+    uses of RSTRING_PTR which attempt to change the string
+    uses of STR2CSTR  which attempt to change the string
+
 Following are some code examples of changes required to use
 Maglev C extensions.
 
