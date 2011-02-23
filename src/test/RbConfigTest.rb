@@ -3,7 +3,7 @@ require File.expand_path('simple', File.dirname(__FILE__))
 require 'rbconfig'
 
 M = ENV['MAGLEV_HOME']
-A = `uname -m`
+A = `uname -m`.chomp
 
 test(RbConfig::CONFIG['libdir'],     "#{M}/lib",                'libdir')
 test(RbConfig::CONFIG['rubylibdir'], "#{M}/lib/ruby/1.8",       'rubylibdir')
