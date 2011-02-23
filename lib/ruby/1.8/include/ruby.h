@@ -730,10 +730,19 @@ static inline VALUE rb_str_new_cstr(const char* str) { return rb_str_new2(str); 
 // RUBY_DLLSPEC VALUE rb_tainted_str_new_cstr(const char*); 
 // RUBY_DLLSPEC VALUE rb_tainted_str_new(const char*, long);
 
-RUBY_DLLSPEC VALUE rb_str_buf_new(long len );
+static inline VALUE rb_str_buf_new(long len )
+{
+  // creates a new String of size 0 . The argument is ignored.
+  // Maglev does not support separate logical and physical sizes 
+  // of String objects
+  return rb_str_new("", 0);
+}
+
+// following 3 append bytes to the str object which must be a kind of String
 RUBY_DLLSPEC VALUE rb_str_buf_append(VALUE str, VALUE val);
 RUBY_DLLSPEC VALUE rb_str_buf_cat(VALUE str, const char* bytes, long len);
 RUBY_DLLSPEC VALUE rb_str_buf_cat2(VALUE str, const char* cstring);
+
 RUBY_DLLSPEC VALUE rb_obj_as_string(VALUE obj);
 
 RUBY_DLLSPEC VALUE rb_check_string_type(VALUE obj);

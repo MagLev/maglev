@@ -90,6 +90,13 @@ RSTRING_PTR  has a result type of   const char*    in Maglev.
   
   The result of RSTRING_PTR must not be passed to free()
 
+rb_str_buf_new(x)  is equivalent to   rb_str_new("", 0)
+  The argument to rb_str_buf_new is ignored.
+  The physical size of a String object is not accessible from Ruby,
+  Smalltalk, or Ruby C extensions .  Since the result
+  of RSTRING_PTR is read-only,  one of the rb_str_buf_append
+  or rb_str_buf_cat* functions must be used to append
+  to the result of rb_str_buf_new .
 
 DATA_PTR is not supported by Maglev.
   To change the C data wrapped by an object, use

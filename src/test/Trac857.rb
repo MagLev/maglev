@@ -10,6 +10,8 @@
 #
 $flag = false
 
+$ensure_ary = []
+
 class Object
   def self.const_missing(const_name, nesting = nil)
     error = nil
@@ -21,9 +23,16 @@ class Object
         xx = self.xyzzy   # Generate a NoMethodError
         return xx
       rescue NoMethodError => l
-        raise l
+        begin
+          raise l
+        ensure
+          $ensure_ary << 44
+        end
       rescue NameError => e
         error ||= e
+      ensure
+        puts "EnsureTwo"
+        $ensure_ary << 22
       end
     end
     raise error
@@ -44,7 +53,14 @@ class C
         xx = self.class.const_get(sym)
       rescue NameError => e
         puts "-- devise_for: NameError: #{e}"
-        next
+        begin
+          next
+        ensure
+          $ensure_ary << 33
+        end
+      ensure
+        puts "EnsureOne"
+        $ensure_ary << 11
       end
     end
     # MRI comes here via the "next" in the rescue clause.  MagLev does not
@@ -59,5 +75,6 @@ rescue => e
   puts "FAILED!"
 end
 
+puts "ensure_ary #{$ensure_ary.inspect}"
 puts "Flag is #{$flag}"
 raise "Failed to set $flag" unless $flag
