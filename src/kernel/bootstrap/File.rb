@@ -342,7 +342,7 @@ class File
 
   def self.lchmod(permission, *file_names)
     # not supported , lchmod() not available on Linux or Solaris
-    raise NotImplementedError
+    raise NotImplementedError, "File.lchmod not implemented (unavailable on Linux and Solaris)"
   end
 
   def self.lchown(owner, group, *file_names)
@@ -953,7 +953,7 @@ class File
 
   def lchmod(permission)
     # not supported , lchmod() not available on Linux or Solaris
-    raise NotImplementedError
+    raise NotImplementedError, "File.lchmod not implemented (unavailable on Linux and Solaris)"
   end
 
   def lchown(owner, group)
@@ -1010,7 +1010,7 @@ class File
         mode = 'r'
       end
     else
-      raise TypeError , 'File#reopen, first arg must be a File, String, or Socket'
+      raise TypeError , "File#reopen, first arg must be a File, String, or Socket, but was: #{arg1.inspect}"
     end
     unless mode._isString || mode._isFixnum
       raise TypeError, 'File#reopen, mode is neither Fixnum nor String'

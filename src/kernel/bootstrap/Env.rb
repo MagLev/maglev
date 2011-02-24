@@ -8,11 +8,11 @@ class Env
     class_primitive_nobridge '__unsetenv', '_unsetenv:'
 
     def self.new
-      raise NotImplementedError
+      raise NotImplementedError, "Env.new"
     end
 
     def self.[](*elements)
-      raise NotImplementedError
+      raise NotImplementedError, "Env.[]"
     end
 
     def dup
@@ -72,7 +72,7 @@ class Env
     end
 
     def clear    # not allowed by Maglev
-      raise NotImplementedError
+      raise NotImplementedError, "Env#clear"
     end
 
     def delete(key, &block)
@@ -105,10 +105,10 @@ class Env
     end
 
     def merge(aHash)
-      raise NotImplementedError
+      raise NotImplementedError, "Env#merge"
     end
     def merge!(other)
-      raise NotImplementedError
+      raise NotImplementedError, "Env#merge!"
     end
 
     def to_s
