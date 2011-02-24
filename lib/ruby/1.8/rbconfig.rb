@@ -26,7 +26,6 @@ module Config
   TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/1.8")
   DESTDIR = '' unless defined? DESTDIR
 
-
   CONFIG = {}
   CONFIG['prefix']            = MAGLEV_HOME
   CONFIG['exec_prefix']       = MAGLEV_HOME
@@ -70,6 +69,15 @@ module Config
     CONFIG['DLEXT'] = 'so' # other unix
   end
 
+  CONFIG["LN_S"]            = "ln -s"
+  CONFIG["SET_MAKE"]        = ""
+  CONFIG["INSTALL_PROGRAM"] = "$(INSTALL)"
+  CONFIG["INSTALL_SCRIPT"]  = "$(INSTALL)"
+  CONFIG["INSTALL_DATA"]    = "$(INSTALL) -m 644"
+  CONFIG["RM"]              = "rm -f"
+  CONFIG["CP"]              = "cp"
+  CONFIG["MAKEDIRS"]        = "mkdir -p"
+             
   CONFIG['EXEEXT']            = ''
   CONFIG['LIBEXT']            = 'a'
   CONFIG['OBJEXT']            = 'o'
