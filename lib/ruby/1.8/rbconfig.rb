@@ -77,6 +77,10 @@ module Config
   CONFIG['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?
 
   MAKEFILE_CONFIG = CONFIG # Some C extensions require both hashes to be present
+  MAKEFILE_CONFIG['CFLAGS']         = ''
+  MAKEFILE_CONFIG['CXXFLAGS']       = ''
+  MAKEFILE_CONFIG['CPPFLAGS']       = ''
+  MAKEFILE_CONFIG['configure_args'] = ''
 end
 
 RbConfig = Config

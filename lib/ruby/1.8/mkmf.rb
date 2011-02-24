@@ -31,6 +31,9 @@ Config::MAKEFILE_CONFIG["CFLAGS"] += " $(cflags)"
 Config::MAKEFILE_CONFIG["CPPFLAGS"] += " $(DEFS) $(cppflags)"
 Config::MAKEFILE_CONFIG["CXXFLAGS"] += " $(cflags) $(cxxflags)"
 
+# This is needed later on
+CROSS_COMPILING = false
+
 $topdir     = Config::MAKEFILE_CONFIG['includedir']
 $hdrdir     = $topdir
 $top_srcdir = $topdir
