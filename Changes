@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 862
+
 == Changes for 25314 2011-02-23
 * Fix Trac 857, 860
 * Implement rb_str_buf_new - note comments in ruby.h
