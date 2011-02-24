@@ -22,10 +22,6 @@ module Config
   end
 end
 
-# Some extconf.rb's rely on RUBY_PLATFORM to point to the native platform
-Object.send(:remove_const, :RUBY_PLATFORM)
-RUBY_PLATFORM = Config::MAKEFILE_CONFIG['RUBY_PLATFORM']
-
 # RbConfig::CONFIG and MAKEFILE_CONFIG are each not complete.
 Config::CONFIG.merge!(Config::MAKEFILE_CONFIG)
 Config::MAKEFILE_CONFIG.merge!(Config::CONFIG)
