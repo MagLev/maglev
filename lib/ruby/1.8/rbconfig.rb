@@ -32,7 +32,7 @@ module Config
   CONFIG['exec_prefix']       = MAGLEV_HOME
   CONFIG['bindir']            = File.join(MAGLEV_HOME, 'bin')
   CONFIG['sysconfdir']        = File.join(MAGLEV_HOME, 'etc')
-  CONFIG['includedir']        = File.join(MAGLEV_HOME, 'include')
+  CONFIG['includedir']        = File.join(MAGLEV_HOME, 'lib/ruby/1.8/include')
   CONFIG['libdir']            = File.join(MAGLEV_HOME, 'lib')
 
   CONFIG['rubylibdir']        = File.join(CONFIG['libdir'], 'ruby', VERSION)
