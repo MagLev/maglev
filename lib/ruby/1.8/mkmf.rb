@@ -4,7 +4,7 @@ require 'rbconfig'
 # We're missing this in our rbconfig
 module Config
   def Config::expand(val, config = Config::CONFIG)
-    val.gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
+    (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
       if !(v = $1 || $2)
         '$'
       elsif key = config[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
