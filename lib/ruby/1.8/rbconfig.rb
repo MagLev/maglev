@@ -32,7 +32,7 @@ module Config
   CONFIG['exec_prefix']       = MAGLEV_HOME
   CONFIG['bindir']            = File.join(MAGLEV_HOME, 'bin')
   CONFIG['sysconfdir']        = File.join(MAGLEV_HOME, 'etc')
-  CONFIG['includedir']        = File.join(MAGLEV_HOME, 'include')
+  CONFIG['includedir']        = File.join(MAGLEV_HOME, 'lib/ruby/1.8/include')
   CONFIG['libdir']            = File.join(MAGLEV_HOME, 'lib')
 
   CONFIG['rubylibdir']        = File.join(CONFIG['libdir'], 'ruby', VERSION)
@@ -71,10 +71,34 @@ module Config
   end
 
   CONFIG['EXEEXT']            = ''
+  CONFIG['LIBEXT']            = 'a'
+  CONFIG['OBJEXT']            = 'o'
   CONFIG['ruby_install_name'] = 'maglev-ruby'  # The name of the interpreter executable
   CONFIG['RUBY_INSTALL_NAME'] = CONFIG['ruby_install_name']
   CONFIG['RUBY_SO_NAME']      = CONFIG['ruby_install_name']
   CONFIG['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?
+
+  MAKEFILE_CONFIG = CONFIG # Some C extensions require both hashes to be present
+  MAKEFILE_CONFIG['CC']             = ENV["CC"] || 'cc '
+  MAKEFILE_CONFIG['CPP']            = ENV["CPP"] || 'cc -E '
+  MAKEFILE_CONFIG['CXX']            = ENV["CXX"] || 'c++'
+  MAKEFILE_CONFIG['CFLAGS']         = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
+  MAKEFILE_CONFIG['CPPFLAGS']       = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
+  MAKEFILE_CONFIG['CXXFLAGS']       = MAKEFILE_CONFIG['CFLAGS'] + ' $(cxxflags) '
+  MAKEFILE_CONFIG['OUTFLAG']        = ' -o '
+  MAKEFILE_CONFIG['COMMON_HEADERS'] = 'ruby.h'
+  if CONFIG['host_os'] =~ /darwin/
+    MAKEFILE_CONFIG['LDSHARED']     = MAKEFILE_CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
+    MAKEFILE_CONFIG['LDFLAGS']      = ' -bundle '
+    MAKEFILE_CONFIG['ARCH_FLAG']    = ' -arch x86_64 '
+  else
+    MAKEFILE_CONFIG['LDSHARED']     = MAKEFILE_CONFIG["CC"] + ' -shared '
+    MAKEFILE_CONFIG['LDFLAGS']      = ''
+    MAKEFILE_CONFIG['ARCH_FLAG']    = ' -m64 '
+  end
+  MAKEFILE_CONFIG['LDSHAREDXX']     = MAKEFILE_CONFIG['LDSHARED']
+
+  MAKEFILE_CONFIG['configure_args'] = ''
 end
 
 RbConfig = Config
