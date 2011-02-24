@@ -488,7 +488,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   end
 
   def seek(offset, whence) # raise not implemented error
-    raise NotImplementedError
+    raise NotImplementedError, "Socket#seek"
   end
 
   # send attempts to write specified string to the underlying socket.

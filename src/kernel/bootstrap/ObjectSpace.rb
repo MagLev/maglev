@@ -99,7 +99,7 @@ module ObjectSpace
   end
 
   def each_object(class_or_module=nil, &block)
-    raise NotImplementedError, ' each_object not implemented'
+    raise NotImplementedError, 'ObjectSpace#each_object not implemented'
   end
 
   def garbage_collect()

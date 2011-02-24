@@ -19,7 +19,7 @@ class IO
   end
 
   def dup
-    raise NotImplementedError
+    raise NotImplementedError, "IO.dup"
   end
 
   primitive_nobridge '__fcntl', 'fcntl:with:'
@@ -122,7 +122,7 @@ class IO
     elsif status._equal?(-1)
       return arg[0] # retrieved value for a 'get' operation
     elsif status < -1
-      raise NotImplementedError, 'fcntl operation not implemented'
+      raise NotImplementedError, "IO#fcntl: operation not implemented: #{op.inspect}"
     else
       Errno.handle(status, 'fcntl failed')
     end
@@ -321,7 +321,7 @@ class IO
   end
 
   def self.open(int_fd, mode_string, &block)
-    raise NotImplementedError
+    raise NotImplementedError, "IO.open note implemented"
   end
 
   def pid
@@ -329,7 +329,7 @@ class IO
   end
 
   def self.popen(cmd, mode="r", &block)
-    raise NotImplementedError
+    raise NotImplementedError, "IO.popen not implemented"
   end
 
   def <<(anObj)
