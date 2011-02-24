@@ -75,6 +75,8 @@ module Config
   CONFIG['RUBY_INSTALL_NAME'] = CONFIG['ruby_install_name']
   CONFIG['RUBY_SO_NAME']      = CONFIG['ruby_install_name']
   CONFIG['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?
+
+  MAKEFILE_CONFIG = CONFIG # Some C extensions require both hashes to be present
 end
 
 RbConfig = Config
