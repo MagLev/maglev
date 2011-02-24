@@ -238,8 +238,8 @@ end
 module Logging
   @log = nil
   @logfile = 'mkmf.log'
-  @orgerr = $stderr.dup
-  @orgout = $stdout.dup
+  @orgerr = $stderr
+  @orgout = $stdout
   @postpone = 0
   @quiet = $extmk
 
@@ -1745,14 +1745,14 @@ def init_mkmf(config = CONFIG)
   $enable_shared = config['ENABLE_SHARED'] == 'yes'
   $defs = []
   $extconf_h = nil
-  $CFLAGS = with_config("cflags", arg_config("CFLAGS", config["CFLAGS"])).dup
-  $ARCH_FLAG = with_config("arch_flag", arg_config("ARCH_FLAG", config["ARCH_FLAG"])).dup
-  $CPPFLAGS = with_config("cppflags", arg_config("CPPFLAGS", config["CPPFLAGS"])).dup
-  $LDFLAGS = with_config("ldflags", arg_config("LDFLAGS", config["LDFLAGS"])).dup
+  $CFLAGS = with_config("cflags", arg_config("CFLAGS", config["CFLAGS"]))
+  $ARCH_FLAG = with_config("arch_flag", arg_config("ARCH_FLAG", config["ARCH_FLAG"]))
+  $CPPFLAGS = with_config("cppflags", arg_config("CPPFLAGS", config["CPPFLAGS"]))
+  $LDFLAGS = with_config("ldflags", arg_config("LDFLAGS", config["LDFLAGS"]))
   $INCFLAGS = "-I$(topdir) -I$(hdrdir) -I$(srcdir)"
-  $DLDFLAGS = with_config("dldflags", arg_config("DLDFLAGS", config["DLDFLAGS"])).dup
-  $LIBEXT = config['LIBEXT'].dup
-  $OBJEXT = config["OBJEXT"].dup
+  $DLDFLAGS = with_config("dldflags", arg_config("DLDFLAGS", config["DLDFLAGS"]))
+  $LIBEXT = config['LIBEXT']
+  $OBJEXT = config["OBJEXT"]
   $LIBS = "#{config['LIBS']} #{config['DLDLIBS']}"
   $LIBRUBYARG = ""
   $LIBRUBYARG_STATIC = config['LIBRUBYARG_STATIC']
@@ -1766,7 +1766,7 @@ def init_mkmf(config = CONFIG)
   $objs = nil
   $srcs = nil
   $libs = ""
-  if $enable_shared or Config.expand(config["LIBRUBY"].dup) != Config.expand(config["LIBRUBY_A"].dup)
+  if $enable_shared or Config.expand(config["LIBRUBY"]) != Config.expand(config["LIBRUBY_A"])
     $LIBRUBYARG = config['LIBRUBYARG']
   end
 
