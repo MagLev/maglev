@@ -246,12 +246,13 @@ module Logging
   def self::open
     @log ||= File::open(@logfile, 'w')
     @log.sync = true
-    $stderr.reopen(@log)
-    $stdout.reopen(@log)
+    # MagLev currently does not allow re-opening stdout / stderr
+    # $stderr.reopen(@log)
+    # $stdout.reopen(@log)
     yield
   ensure
-    $stderr.reopen(@orgerr)
-    $stdout.reopen(@orgout)
+    # $stderr.reopen(@orgerr)
+    # $stdout.reopen(@orgout)
   end
 
   def self::message(*s)
