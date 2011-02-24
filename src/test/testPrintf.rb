@@ -56,8 +56,11 @@ test( sprintf('%o', 465) , '721' )
 test( sprintf('%o', 250000000000000000003) , '33065623267056752000003' )
 test( sprintf('%0o', 465) , '721' )
 test( sprintf('%#o', 465) , '0721' )
-test( sprintf('%o', -465) , '..7777777777057' )
-test( sprintf('%#o', -465) , '0..7777777777057' )
+
+if defined? Maglev
+  test( sprintf('%o', -465) , '..7777777777057' )
+  test( sprintf('%#o', -465) , '0..7777777777057' )
+end
 
 test( sprintf("%x", 0x4b6), '4b6')
 test( sprintf("%#x", 0x4b6) , '0x4b6' )
@@ -100,6 +103,14 @@ begin
   test( sprintf("%8.4f", -3.7e45), '-3699999999999999771793234396487274551161389056.0000' )
 rescue Exception => ex
   puts "WARN: #{__FILE__}: bug with float precision on this platform: SKIPPING"
+end
+
+# Regression: test passes as long as no exception is raised
+# MagLev was failing with arg error for zero and one arg variants of printf
+a = []
+10.times do |i|
+  printf(*a)
+  a << i.to_s
 end
 
 true

@@ -4,6 +4,16 @@
 
 == Unreleased Changes
 
+== Changes for 25314 2011-02-23
+* Fix Trac 857, 860
+* Implement rb_str_buf_new - note comments in ruby.h
+* More details in lib/ruby/1.8/include/Maglev_c_extensions.txt
+* Fixes to rbconfig.rb neeeded for mkmf
+* A few bugfixes in underlying GemStone 3.0 system
+* Major change to compilation infrastructure for GS/S 3.0,
+  many undeclared functions are now declared static,
+  switch to GCC v 4.5.2 for lint builds on Sparc and Solaris-x86
+
 == Changes for 25289 2011-02-18
 * Adjust ruby.h per Trac 851  .
 * Fix spec failure in rb_num2dbl with nil arg.

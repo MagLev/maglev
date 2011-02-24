@@ -15,7 +15,7 @@ module Config
   RUBY_VERSION == "1.8.7" or
     raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
   VERSION = '1.8'
-  ARCH = `uname -m`
+  ARCH = `uname -m`.chomp
 
   # Note: MAGLEV_HOME and TOPDIR should end up being the same
   # in a default installation

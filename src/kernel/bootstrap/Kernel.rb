@@ -594,6 +594,18 @@ module Kernel
     end
   end
 
+  def printf(*args)
+    if args.length == 0
+      return nil
+    end
+    if (args[0]._kind_of?(IO))
+      target = args.shift
+    else
+      target = $stdout
+    end
+    target.printf(*args)
+  end
+
   def printf(a, b, c)
     if (a._kind_of?(IO))
       a.printf(b, c)
