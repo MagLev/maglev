@@ -292,13 +292,13 @@ module Maglev
     # +Raises NotImplementedError+.  When implemented, this method will
     # provide the details on the conflicts.
     def transaction_conflicts
-      raise NotImplementedError
+      raise NotImplementedError, "CommitFailedException#transaction_conflicts"
     end
 
     # Raises +NotImplementedError+.  When implemented, this method will
     # disconnect (ignore) all conflicts.
     def disconnect_conflicts
-      raise NotImplementedError
+      raise NotImplementedError, "CommitFailedException#disconnect_conflicts"
     end
   end
 
