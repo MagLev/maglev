@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 829 in the implementation of eval
+
 == Changes for 25315 2011-02-23
 * Fix Trac 857, 860, 862.
 * Implement rb_str_buf_new - note comments in ruby.h
