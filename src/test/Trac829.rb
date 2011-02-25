@@ -1,22 +1,33 @@
 # Based on bug found doing: maglev-gem build foo.gemspec
 # MagLev doesn't assign the gemspec variable correctly.
 class Spec
+  puts "Start def self.load"
   def self.load
-    gemspec = nil
+    puts 'A'
+    gemspec = 88
+    #nil.pause
     ev_str = "Spec.new do ; puts 'in spec#initialize'; end"
 
-    # The assignment to gemspec in the following proc does not take effect.
-    @@gather = proc { |gs| gemspec = gs }
+    # before fix, assignment to gemspec does happen direct to the VC,
+    #   but is overwritten by the write of eval's copy of
+    #   gemspec back to the VC in the generated epilog of the VC,
+    #    see below
+    @@gather = proc { |gs| gemspec = gs ; puts 'B' }
+    puts "Start Eval"
     eval ev_str
-    gemspec      # should not be nil
+    xx = gemspec      # should not be nil
+    puts 'C'
+    # nil.pause
+    xx
   end
 
   def initialize
     yield self if block_given?
-    @@gather.call(self) if @@gather
+    @@gather.call(98) if @@gather
   end
 end
 
 spec = Spec.load
-raise "Fail" if spec.nil?
+raise "Fail" unless spec == 98
+true
 
