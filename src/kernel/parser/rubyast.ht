@@ -94,6 +94,7 @@ typedef enum
   sel_colon3,
   sel_bodyNode_,
   sel_get_match_node,
+  sel_includesTemp_,
   sel_list_append,
   sel_list_prepend,
   sel_literal_concat,

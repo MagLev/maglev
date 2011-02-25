@@ -325,6 +325,7 @@ class rb_parse_state
   NODE **lex_strtermH;
   NODE **magicCommentsH;
   NODE **warningsH;
+  NODE **evalScopeH; // NULL or handle to a RubyEvalScope
 
   enum { yystack_MAXDEPTH = 10000 ,
          yystack_START_DEPTH = 1000 };
