@@ -6,6 +6,10 @@
 
 * Fix Trac 829 in the implementation of eval
 
+== Changes for 25329 2011-02-24
+* Changes to rbconfig.rb and mkmf.rb to support C extensions
+* A handful of bugfixes to underlying GemStone 3.0 system
+
 == Changes for 25315 2011-02-23
 * Fix Trac 857, 860, 862.
 * Implement rb_str_buf_new - note comments in ruby.h
