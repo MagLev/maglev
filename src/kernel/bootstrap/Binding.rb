@@ -24,7 +24,7 @@ class Binding
     @_st_block = nil
     @_st_forModuleEval = false
     @_st_tmpsDict = nil
-    @_st_names = []
+    @_st_names = nil
     @_st_staticLink = nil
     @_st_lexicalScope = nil
     self
@@ -77,27 +77,6 @@ class Binding
   
   def __context
     @_st_staticLink # a VariableContext
-  end
-
-  def __get_temp( symbol )
-    # only used for temps not in the starting VariableContext
-    @_st_tmpsDict[ symbol ]
-  end
-
-  def __put_temp( symbol, value )
-    # returns value
-    # only used for temps not in the starting VariableContext
-    h = @_st_tmpsDict
-    if h._equal?(nil)
-      h = IdentityHash.new
-      @_st_tmpsDict = h
-    end
-    unless h.has_key?( symbol )
-      (nms = @_st_names) << symbol 
-      nms << nil 
-    end
-    h[ symbol ] = value
-    value 
   end
 
 end
