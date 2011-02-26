@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-* Fix Trac 829 in the implementation of eval
+* Fix Trac 829, 866 
 
 == Changes for 25329 2011-02-24
 * Changes to rbconfig.rb and mkmf.rb to support C extensions
