@@ -71,6 +71,7 @@ module Config
 
   CONFIG["LN_S"]            = "ln -s"
   CONFIG["SET_MAKE"]        = ""
+  CONFIG["INSTALL"]         = "install -vp"
   CONFIG["INSTALL_PROGRAM"] = "$(INSTALL)"
   CONFIG["INSTALL_SCRIPT"]  = "$(INSTALL)"
   CONFIG["INSTALL_DATA"]    = "$(INSTALL) -m 644"
