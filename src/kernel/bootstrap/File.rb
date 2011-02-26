@@ -1031,6 +1031,8 @@ class File
     self.lineno=(0)
   end
 
+  class_primitive '__popen', '_popen:mode:'
+
   def path
     @_st_pathName
   end

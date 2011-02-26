@@ -321,7 +321,7 @@ class IO
   end
 
   def self.open(int_fd, mode_string, &block)
-    raise NotImplementedError, "IO.open note implemented"
+    raise NotImplementedError, "IO.open not implemented"
   end
 
   def pid
@@ -329,7 +329,22 @@ class IO
   end
 
   def self.popen(cmd, mode="r", &block)
-    raise NotImplementedError, "IO.popen not implemented"
+    cmd = Type.coerce_to(cmd, String, :to_s)
+    mode = Type.coerce_to(mode, String, :to_s)
+    if cmd[0]._equal?( ?-)
+      raise ArgumentError , '"-" prefix not supported by IO.popen' 
+    end
+    f = File.__popen(cmd, mode);
+    if f._isFixnum
+      Errno.raise_errno(f, "IO.popen failed");
+    end
+    if block_given?
+      res = block.call( f)
+      f.close
+      res
+    else 
+      f
+    end
   end
 
   def <<(anObj)
