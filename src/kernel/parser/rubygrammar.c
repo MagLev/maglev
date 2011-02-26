@@ -5778,6 +5778,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     case sel_callNode_:         str = "callNode:"; break;
     case sel_backref_error: 	str = "backref_error:" ; break;
     case sel_bodyNode_:         str = "bodyNode:"; break;
+    case sel_includesTemp_:   str = "includesTemp:"; break;
     case sel_get_match_node:   str = "get_match_node:rhs:ofs:"; break;
     case sel_list_append: 	str = "list_append:item:"; break;
     case sel_list_prepend: 	str = "list_prepend:item:"; break;
@@ -6012,14 +6013,17 @@ omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr)
 
 omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
 {
-  DOPRIM_ARGS(omPtr, 7);
-  // omObjSType **recH = DOPRIM_STACK_ADDR(7);
-  omObjSType **sourceH = DOPRIM_STACK_ADDR(6);
-  omObjSType **cbytesH = DOPRIM_STACK_ADDR(5); // a CByteArray
-  omObjSType *lineOop =  DOPRIM_STACK(4); 
-  omObjSType **fileNameH = DOPRIM_STACK_ADDR(3);
-  omObjSType *traceOop = DOPRIM_STACK(2);
-  omObjSType *warnOop = DOPRIM_STACK(1);
+
+  DOPRIM_ARGS(omPtr, 8);
+  // omObjSType **recH = DOPRIM_STACK_ADDR(8);
+  omObjSType **sourceH = DOPRIM_STACK_ADDR(7);
+  omObjSType **cbytesH = DOPRIM_STACK_ADDR(6); // a CByteArray
+  omObjSType *lineOop =  DOPRIM_STACK(5);
+  omObjSType **fileNameH =  DOPRIM_STACK_ADDR(4);
+  omObjSType *traceOop =    DOPRIM_STACK(3);
+  omObjSType *warnOop =     DOPRIM_STACK(2);
+  omObjSType **evalScopeH = DOPRIM_STACK_ADDR(1);
+
   if (! OOP_IS_SMALL_INT(lineOop))
     return NULL;
   if (! OOP_IS_SMALL_INT(traceOop))
@@ -6085,7 +6089,15 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->fileNameH = oScope.add(*fileNameH);
   ps->sourceStrH = oScope.add(*sourceH);
   ps->warningsH = oScope.newHandle();
-
+  if (*evalScopeH == ram_OOP_NIL) {
+    ps->evalScopeH = NULL;
+  } else {
+    omObjSType *evScope = *evalScopeH; // expect a RubyEvalScope
+    if (! OOP_IS_RAM_OOP(evScope)) { // class RubyEvalScope in mcz only
+      return NULL;
+    }
+    ps->evalScopeH = oScope.add(evScope); 
+  }
   ps->lex_pbeg = NULL;
   ps->lex_p = NULL;
   ps->lex_pend = NULL;
@@ -8650,16 +8662,23 @@ static int local_id(rb_parse_state *st, NODE* idO)
   UTL_ASSERT(OOP_IS_SMALL_INT(idO));
   QUID qid = (OopType)idO;
   LocalState *vars = st->variables;
-    if (vars->block_vars) {
-      if (var_table_find_chained(vars->block_vars, qid) >= 0) {
-        return 1;
-      }
-    }
-
-    if (var_table_find(vars->variables, qid) >= 0) {
+  if (vars->block_vars) {
+    if (var_table_find_chained(vars->block_vars, qid) >= 0) {
       return 1;
     }
-    return 0;
+  }
+  if (var_table_find(vars->variables, qid) >= 0) {
+    return 1;
+  }
+  omObjSType **evalScopeH = st->evalScopeH;
+  if (evalScopeH != NULL) {
+    omObjSType *symO = quidToSymbolObj(idO, st);
+    omObjSType *isLocal = RubyNode::call(*evalScopeH, sel_includesTemp_, symO, st);
+    if (isLocal == ram_OOP_TRUE) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 static const struct {
@@ -8879,7 +8898,7 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
   }
 }
 
-/* # line 8883 "rubygrammar.c" */ 
+/* # line 8902 "rubygrammar.c" */ 
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -12139,7 +12158,7 @@ case 524:
 /* # line 3200 "grammar.y" */ 
 	{  yTrace(vps, "none:");  yyvalO = ram_OOP_NIL; }
 break;
-/* # line 12143 "rubygrammar.c" */ 
+/* # line 12162 "rubygrammar.c" */ 
     }
     if (yyvalO == NULL) {  /*compute default state result*/ 
       if (yyvalPtr != NULL) {
