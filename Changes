@@ -4,7 +4,10 @@
 
 == Unreleased Changes
 
+== Changes for 25340 2011-02-25
 * Fix Trac 829 in the implementation of eval
+* Started new document on Ruby <-> Smalltalk interoperability
+* A handful of bugfixes to underlying GemStone 3.0 system
 
 == Changes for 25329 2011-02-24
 * Changes to rbconfig.rb and mkmf.rb to support C extensions

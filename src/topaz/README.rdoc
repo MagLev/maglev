@@ -52,5 +52,6 @@ which may not exist on your system. Here's one way to create it
 * Fork the project from https://github.com/MagLev/maglev-topaz-scripts
 * Start a feature or topic branch
 * Commit and push until you are happy with your contribution
+* Add some tests to ensure we don't break things in a future release
 * Make sure to test with the latest MagLev
 * Send a pull request
