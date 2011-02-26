@@ -345,4 +345,10 @@
 *** Find "Smalltalk objects" from Ruby
 *** Call Smalltalk methods from Ruby
 
-
+** Other Considerations
+   + How do you load up a full ruby environment from Smalltalk?  E.g.,
+     suppose you want to use Nokogiri from Seaside...We should probably
+     document a real use case like that.  Need to get Nokogiri loaded, get
+     some API/entry point so Seaside can call into it, and then return the
+     right stuff.  
+   + How do you manage updating the Nokogiri gem in previous example?
