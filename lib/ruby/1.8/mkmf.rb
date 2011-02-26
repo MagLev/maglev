@@ -1,36 +1,6 @@
 # ---------------------- Changed for Maglev ------------------------------------
 require 'rbconfig'
 
-# We're missing this in our rbconfig
-module Config
-  def Config::expand(val, config = Config::CONFIG)
-    (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
-      if !(v = $1 || $2)
-        '$'
-      elsif key = config[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
-        pat, sub = $1, $2
-        config[v] = false
-        Config::expand(key, config)
-        config[v] = key
-        key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
-        key
-      else
-        " "
-      end
-    end
-    val
-  end
-end
-
-# RbConfig::CONFIG and MAKEFILE_CONFIG are each not complete.
-Config::CONFIG.merge!(Config::MAKEFILE_CONFIG)
-Config::MAKEFILE_CONFIG.merge!(Config::CONFIG)
-
-# For environment overrides to work, the MAKEFILE_CONFIG hash needs to have these
-Config::MAKEFILE_CONFIG["CFLAGS"] += " $(cflags)"
-Config::MAKEFILE_CONFIG["CPPFLAGS"] += " $(DEFS) $(cppflags)"
-Config::MAKEFILE_CONFIG["CXXFLAGS"] += " $(cflags) $(cxxflags)"
-
 # This is needed later on
 CROSS_COMPILING = false
 

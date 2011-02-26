@@ -108,6 +108,24 @@ module Config
   MAKEFILE_CONFIG['LDSHAREDXX']     = MAKEFILE_CONFIG['LDSHARED']
 
   MAKEFILE_CONFIG['configure_args'] = ''
+
+  def Config::expand(val, config = Config::CONFIG)
+    (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
+      if !(v = $1 || $2)
+        '$'
+      elsif key = config[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
+        pat, sub = $1, $2
+        config[v] = false
+        Config::expand(key, config)
+        config[v] = key
+        key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
+        key
+      else
+        " "
+      end
+    end
+    val
+  end
 end
 
 RbConfig = Config
