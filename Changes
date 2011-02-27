@@ -3,13 +3,15 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
-* Fix some spec regressions in eval after fix of Trac 829
-* Fix Trac 866, IO.popen .
 
-== Changes for 25340 2011-02-25
+== Changes for 25343 2011-02-26
+* Fix Trac 866, IO.popen
 * Fix Trac 829 in the implementation of eval
+* Fix some spec regressions in eval after fix of Trac 829
+* Include Tim's updates to mkmf and rbconfig
 * Started new document on Ruby <-> Smalltalk interoperability
 * A handful of bugfixes to underlying GemStone 3.0 system
+* Fix lint problems found by latest GCC
 
 == Changes for 25329 2011-02-24
 * Changes to rbconfig.rb and mkmf.rb to support C extensions
