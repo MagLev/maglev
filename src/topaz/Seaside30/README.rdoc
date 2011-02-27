@@ -1,3 +1,19 @@
+== Usage
+
+The following steps will load Seaside 30 nto MagLev and
+start it running on port 8383, i.e. http://localhost:8383
+and monitor execution for any errors
+
+In one terminal window execute
+  touch $MAGLEV_HOME/log/maglev/topaz.log
+  tail -f $MAGLEV_HOME/log/maglev/topaz.log
+
+In a different terminal window execute
+  cd $MAGLEV_HOME   # or anywhere in the MagLev tree
+  maglev start      # unless it's already running
+  rake maglev:input_file[src/topaz/Seaside30/loadSeaside.topaz]
+  rake maglev:input_file[src/topaz/Seaside30/runSeaside-Swazoo.topaz]
+
 == Playing with Seaside in MagLev
 
 To use the GemTools One-Click Pharo image at
