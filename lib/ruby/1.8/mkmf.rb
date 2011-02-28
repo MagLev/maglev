@@ -1,36 +1,6 @@
 # ---------------------- Changed for Maglev ------------------------------------
 require 'rbconfig'
 
-# We're missing this in our rbconfig
-module Config
-  def Config::expand(val, config = Config::CONFIG)
-    (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
-      if !(v = $1 || $2)
-        '$'
-      elsif key = config[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
-        pat, sub = $1, $2
-        config[v] = false
-        Config::expand(key, config)
-        config[v] = key
-        key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
-        key
-      else
-        " "
-      end
-    end
-    val
-  end
-end
-
-# RbConfig::CONFIG and MAKEFILE_CONFIG are each not complete.
-Config::CONFIG.merge!(Config::MAKEFILE_CONFIG)
-Config::MAKEFILE_CONFIG.merge!(Config::CONFIG)
-
-# For environment overrides to work, the MAKEFILE_CONFIG hash needs to have these
-Config::MAKEFILE_CONFIG["CFLAGS"] += " $(cflags)"
-Config::MAKEFILE_CONFIG["CPPFLAGS"] += " $(DEFS) $(cppflags)"
-Config::MAKEFILE_CONFIG["CXXFLAGS"] += " $(cflags) $(cxxflags)"
-
 # This is needed later on
 CROSS_COMPILING = false
 
@@ -246,12 +216,13 @@ module Logging
   def self::open
     @log ||= File::open(@logfile, 'w')
     @log.sync = true
-    $stderr.reopen(@log)
-    $stdout.reopen(@log)
+    # MagLev currently does not allow re-opening stdout / stderr
+    # $stderr.reopen(@log)
+    # $stdout.reopen(@log)
     yield
   ensure
-    $stderr.reopen(@orgerr)
-    $stdout.reopen(@orgout)
+    # $stderr.reopen(@orgerr)
+    # $stdout.reopen(@orgout)
   end
 
   def self::message(*s)
@@ -364,14 +335,12 @@ end
 
 def cc_command(opt="")
   conf = Config::CONFIG.merge('hdrdir' => $hdrdir.quote, 'srcdir' => $srcdir.quote)
-  Config::expand("$(CC) #$INCFLAGS #$CPPFLAGS #$CFLAGS #$ARCH_FLAG #{opt} -c #{CONFTEST_C}",
-		 conf)
+  Config::expand("$(CC) #$INCFLAGS #$CPPFLAGS #$CFLAGS #$ARCH_FLAG #{opt} -c #{CONFTEST_C}", conf)
 end
 
 def cpp_command(outfile, opt="")
   conf = Config::CONFIG.merge('hdrdir' => $hdrdir.quote, 'srcdir' => $srcdir.quote)
-  Config::expand("$(CPP) #$INCFLAGS #$CPPFLAGS #$CFLAGS #{opt} #{CONFTEST_C} #{outfile}",
-		 conf)
+  Config::expand("$(CPP) #$INCFLAGS #$CPPFLAGS #$CFLAGS #{opt} #{CONFTEST_C} #{outfile}", conf)
 end
 
 def libpathflag(libpath=$DEFLIBPATH|$LIBPATH)
@@ -531,18 +500,18 @@ def egrep_cpp(pat, src, opt = "", &b)
     if Regexp === pat
       puts("    ruby -ne 'print if #{pat.inspect}'")
       f.grep(pat) {|l|
-	puts "#{f.lineno}: #{l}"
-	return true
+        puts "#{f.lineno}: #{l}"
+        return true
       }
       false
     else
       puts("    egrep '#{pat}'")
       begin
-	stdin = $stdin.dup
-	$stdin.reopen(f)
-	system("egrep", pat)
+        stdin = $stdin.dup
+        $stdin.reopen(f)
+        system("egrep", pat)
       ensure
-	$stdin.reopen(stdin)
+        $stdin.reopen(stdin)
       end
     end
   end
@@ -722,11 +691,11 @@ def find_library(lib, func, *paths, &b)
     libs = append_library($libs, lib)
     begin
       until r = try_func(func, libs, &b) or paths.empty?
-	$LIBPATH = libpath | [paths.shift]
+        $LIBPATH = libpath | [paths.shift]
       end
       if r
-	$libs = libs
-	libpath = nil
+        $libs = libs
+        libpath = nil
       end
     ensure
       $LIBPATH = libpath if libpath
@@ -1582,7 +1551,7 @@ static: $(STATIC_LIB)#{$extout ? " install-rb" : ""}
       end
       mfile.print "\t$(INSTALL_PROG) #{f} #{dir}\n"
       if defined?($installed_list)
-	mfile.print "\t@echo #{dir}/#{File.basename(f)}>>$(INSTALLED_LIST)\n"
+        mfile.print "\t@echo #{dir}/#{File.basename(f)}>>$(INSTALLED_LIST)\n"
       end
     end
   else
@@ -1596,26 +1565,26 @@ static: $(STATIC_LIB)#{$extout ? " install-rb" : ""}
     files = install_files(mfile, i, nil, srcprefix) or next
     for dir, *files in files
       unless dirs.include?(dir)
-	dirs << dir
-	mfile.print "pre-install-rb#{sfx}: #{dir}\n"
+        dirs << dir
+        mfile.print "pre-install-rb#{sfx}: #{dir}\n"
       end
       files.each do |f|
-	dest = "#{dir}/#{File.basename(f)}"
-	mfile.print("install-rb#{sfx}: #{dest}\n")
-	mfile.print("#{dest}: #{f} #{dir}\n\t$(#{$extout ? 'COPY' : 'INSTALL_DATA'}) ")
-	sep = config_string('BUILD_FILE_SEPARATOR')
-	if sep
-	  f = f.gsub("/", sep)
-	  sep = ":/="+sep
-	  f = f.gsub(/(\$\(\w+)(\))/) {$1+sep+$2}
-	  f = f.gsub(/(\$\{\w+)(\})/) {$1+sep+$2}
-	else
-	  sep = ""
-	end
-	mfile.print("#{f} $(@D#{sep})\n")
-	if defined?($installed_list) and !$extout
-	  mfile.print("\t@echo #{dest}>>$(INSTALLED_LIST)\n")
-	end
+        dest = "#{dir}/#{File.basename(f)}"
+        mfile.print("install-rb#{sfx}: #{dest}\n")
+        mfile.print("#{dest}: #{f} #{dir}\n\t$(#{$extout ? 'COPY' : 'INSTALL_DATA'}) ")
+        sep = config_string('BUILD_FILE_SEPARATOR')
+        if sep
+          f = f.gsub("/", sep)
+          sep = ":/="+sep
+          f = f.gsub(/(\$\(\w+)(\))/) {$1+sep+$2}
+          f = f.gsub(/(\$\{\w+)(\})/) {$1+sep+$2}
+        else
+          sep = ""
+        end
+        mfile.print("#{f} $(@D#{sep})\n")
+        if defined?($installed_list) and !$extout
+          mfile.print("\t@echo #{dest}>>$(INSTALLED_LIST)\n")
+        end
       end
     end
   end
@@ -1678,43 +1647,43 @@ site-install-rb: install-rb
       mfile.printf "###\n"
       cont = implicit = nil
       impconv = proc do
-	COMPILE_RULES.each {|rule| depout << (rule % implicit[0]) << implicit[1]}
-	implicit = nil
+        COMPILE_RULES.each {|rule| depout << (rule % implicit[0]) << implicit[1]}
+        implicit = nil
       end
       ruleconv = proc do |line|
-	if implicit
-	  if /\A\t/ =~ line
-	    implicit[1] << line
-	    next
-	  else
-	    impconv[]
-	  end
-	end
-	if m = /\A\.(\w+)\.(\w+)(?:\s*:)/.match(line)
-	  suffixes << m[1] << m[2]
-	  implicit = [[m[1], m[2]], [m.post_match]]
-	  next
-	elsif RULE_SUBST and /\A(?!\s*\w+\s*=)[$\w][^#]*:/ =~ line
-	  line.gsub!(%r"(\s)(?!\.)([^$(){}+=:\s\/\\,]+)(?=\s|\z)") {$1 + RULE_SUBST % $2}
-	end
-	depout << line
+        if implicit
+          if /\A\t/ =~ line
+            implicit[1] << line
+            next
+          else
+            impconv[]
+          end
+        end
+        if m = /\A\.(\w+)\.(\w+)(?:\s*:)/.match(line)
+          suffixes << m[1] << m[2]
+          implicit = [[m[1], m[2]], [m.post_match]]
+          next
+        elsif RULE_SUBST and /\A(?!\s*\w+\s*=)[$\w][^#]*:/ =~ line
+          line.gsub!(%r"(\s)(?!\.)([^$(){}+=:\s\/\\,]+)(?=\s|\z)") {$1 + RULE_SUBST % $2}
+        end
+        depout << line
       end
       while line = dfile.gets()
-	line.gsub!(/\.o\b/, ".#{$OBJEXT}")
-	line.gsub!(/\$\((?:hdr|top)dir\)\/config.h/, $config_h) if $config_h
-	if /(?:^|[^\\])(?:\\\\)*\\$/ =~ line
-	  (cont ||= []) << line
-	  next
-	elsif cont
-	  line = (cont << line).join
-	  cont = nil
-	end
-	ruleconv.call(line)
+        line.gsub!(/\.o\b/, ".#{$OBJEXT}")
+        line.gsub!(/\$\((?:hdr|top)dir\)\/config.h/, $config_h) if $config_h
+        if /(?:^|[^\\])(?:\\\\)*\\$/ =~ line
+          (cont ||= []) << line
+          next
+        elsif cont
+          line = (cont << line).join
+          cont = nil
+        end
+        ruleconv.call(line)
       end
       if cont
-	ruleconv.call(cont.join)
+        ruleconv.call(cont.join)
       elsif implicit
-	impconv.call
+        impconv.call
       end
     end
     unless suffixes.empty?

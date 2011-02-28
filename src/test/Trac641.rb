@@ -25,9 +25,16 @@
 
 # This test case creates a binding with a local variable named "_hamlout",
 # but the eval does not have access to it.
-scope = Object.new.instance_eval { binding }
-eval('_hamlout = "FOO"', scope)
-ax = eval("_hamlout", scope)     # => prints "FOO" in MRI
-puts ax
-unless ax = 'FOO' ; raise 'error'; end
+class C
+ def ma
+   scope = Object.new.instance_eval { binding }
+   puts "AA -------------------"
+   eval('_hamlout = "FOO" ', scope)
+   puts "BB -------------------"
+   ax = eval("_hamlout", scope)     # => prints "FOO" in MRI
+   puts ax
+   unless ax = 'FOO' ; raise 'error'; end
+ end
+end
+C.new.ma
 true

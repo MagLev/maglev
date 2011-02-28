@@ -40,19 +40,6 @@ class Thread
     self.current[  :__evalArgs ][1]
   end
 
-  def self.__atEvalBinding_put(symbol, value )
-    # called by generated code
-    # returns value . used only for temps created by an eval 
-    cx = self.current[  :__evalArgs ]
-    unless cx._equal?(nil)
-      binding = cx[0]
-      unless binding._equal?(nil)
-        binding.__put_temp( symbol, value )
-      end
-    end
-    value
-  end
-
   def self.__evalHomeMethod	# added for 1.8.7
     # called by generated code
     res = nil

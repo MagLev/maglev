@@ -26,7 +26,6 @@ module Config
   TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/1.8")
   DESTDIR = '' unless defined? DESTDIR
 
-
   CONFIG = {}
   CONFIG['prefix']            = MAGLEV_HOME
   CONFIG['exec_prefix']       = MAGLEV_HOME
@@ -70,6 +69,16 @@ module Config
     CONFIG['DLEXT'] = 'so' # other unix
   end
 
+  CONFIG["LN_S"]            = "ln -s"
+  CONFIG["SET_MAKE"]        = ""
+  CONFIG["INSTALL"]         = "install -vp"
+  CONFIG["INSTALL_PROGRAM"] = "$(INSTALL)"
+  CONFIG["INSTALL_SCRIPT"]  = "$(INSTALL)"
+  CONFIG["INSTALL_DATA"]    = "$(INSTALL) -m 644"
+  CONFIG["RM"]              = "rm -f"
+  CONFIG["CP"]              = "cp"
+  CONFIG["MAKEDIRS"]        = "mkdir -p"
+             
   CONFIG['EXEEXT']            = ''
   CONFIG['LIBEXT']            = 'a'
   CONFIG['OBJEXT']            = 'o'
@@ -99,6 +108,24 @@ module Config
   MAKEFILE_CONFIG['LDSHAREDXX']     = MAKEFILE_CONFIG['LDSHARED']
 
   MAKEFILE_CONFIG['configure_args'] = ''
+
+  def Config::expand(val, config = Config::CONFIG)
+    (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
+      if !(v = $1 || $2)
+        '$'
+      elsif key = config[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
+        pat, sub = $1, $2
+        config[v] = false
+        Config::expand(key, config)
+        config[v] = key
+        key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
+        key
+      else
+        " "
+      end
+    end
+    val
+  end
 end
 
 RbConfig = Config

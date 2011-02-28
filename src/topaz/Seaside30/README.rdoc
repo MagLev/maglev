@@ -1,0 +1,91 @@
+== Usage
+
+The following steps will load Seaside 30 nto MagLev and
+start it running on port 8383, i.e. http://localhost:8383
+and monitor execution for any errors
+
+In one terminal window execute
+  touch $MAGLEV_HOME/log/maglev/topaz.log
+  tail -f $MAGLEV_HOME/log/maglev/topaz.log
+
+In a different terminal window execute
+  cd $MAGLEV_HOME   # or anywhere in the MagLev tree
+  maglev start      # unless it's already running
+  rake maglev:input_file[src/topaz/Seaside30/loadSeaside.topaz]
+  rake maglev:input_file[src/topaz/Seaside30/runSeaside-Swazoo.topaz]
+
+== Playing with Seaside in MagLev
+
+To use the GemTools One-Click Pharo image at
+http://seaside.gemstone.com/squeak/GemTools-MagLev-Pharo-1.0.zip instead
+of running these snippets in Topaz, you'll need to start both MagLev
+and a NetLDI
+    maglev start
+    maglev startnetldi
+    
+TODO: Turn some of these Seaside snippets into Topaz scripts in
+this directory. Your suggestions and contributions are welcome.
+
+The following is copied from the GemTools workspace you get when
+logged in to MagLev from the Pharo image mentioned above.
+
+The default username/password for Seaside is admin/seaside.
+
+"start FastCGI adaptor ... does not return. 
+Use #startGemServerOn: in standalone server gem"
+    WAFastCGIAdaptor startOn: 9001.
+    WAFastCGIAdaptor stop.
+
+"start Swazoo adaptor ... does not return. 
+Use #startGemServerOn: in standalone server gem"
+    WAGsSwazooAdaptor startOn: 8383.
+    WAGsSwazooAdaptor stop.
+    SwazooServer initSingleton.
+
+"Object log"
+    WAAdmin 
+        register: WAObjectLog 
+        asApplicationAt: WAObjectLog entryPointName
+        user: 'admin' password: 'tool'.
+    ObjectLogEntry objectLog.
+    ObjectLogEntry emptyLog.
+
+"Set/clear breakpoints at usual suspects for errors"
+    WABasicDevelopment setBreakPoints.
+    WABasicDevelopment clearBreakPoints.
+
+"Shortcuts"
+    WAEnvironment reloadApplications.           "reload Seaside applications"
+    WAAdmin defaultServerManager initialize.    "reset list of server adaptors"
+    WABasicDevelopment reapSeasideCache.        "reap expired sessions"
+    WADispatcher default.                       "access root dispatcher"
+                        
+"Specify FastCGI for runSeasideGems30"
+    WAGemStoneRunSeasideGems default
+        name: 'FastCGI';
+        adaptorClass: WAFastCGIAdaptor;
+        ports: #(9001 9002 9003).
+    WAGemStoneRunSeasideGems restartGems.       "execute runSeasideGems30 script"
+
+"Specify Swazoo for runSeasideGems30"
+    WAGemStoneRunSeasideGems default
+        name: 'Swazoo';
+        adaptorClass: WAGsSwazooAdaptor;
+        ports: #(8383).
+    WAGemStoneRunSeasideGems restartGems.       "execute runSeasideGems30 script"
+
+"Use this handler when running production Seaside servers out of topaz vms (default)"
+    WAAdmin applicationExceptionHandlingDefaults 
+        at: #exceptionHandler 
+        put: WAGemStoneProductionErrorHandler.
+  
+"Use this handler when running Seaside server out of a GemTools vm"
+    WAAdmin applicationExceptionHandlingDefaults 
+        at: #exceptionHandler 
+        put: WAGemStoneWalkbackErrorHandler.
+
+"Use this handler when running development Seaside servers out of topaz vms"
+    WAAdmin applicationExceptionHandlingDefaults 
+        at: #exceptionHandler 
+        put: WARemoteDebuggingWalkbackErrorHandler.
+

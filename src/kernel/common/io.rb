@@ -1,4 +1,6 @@
 class IO
+  include Enumerable
+
   ##
   # Reads the entire file specified by name as individual
   # lines, and returns those lines in an array. Lines are

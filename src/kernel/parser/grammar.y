@@ -41,6 +41,7 @@
 #include "gcifloat.hf"
 #include "floatprim.hf"
 #include "doprimargs.hf"
+#include "intloopsup.hf"
 #include "om_inline.hf"
 
 #include "rubygrammar.h"
@@ -229,6 +230,22 @@ static void rb_compile_error_override(rb_parse_state* ps, const char* msg)
   yyerror(msg, ps);
 }
 
+static void rb_compile_error_q(rb_parse_state* ps, const char* msg, omObjSType *quidO)
+{
+  om *omPtr = ps->omPtr;
+  OmScopeType scp(omPtr);
+  char buf[256];
+  buf[0] = '\0';
+  if (OOP_IS_SMALL_INT(quidO)) {
+    omObjSType *symO = quidToSymbolObj(quidO, ps);
+    om::FetchCString_(symO, buf, sizeof(buf));
+  } 
+  strlcpy(ps->firstErrorReason, msg, sizeof(ps->firstErrorReason)) ; 
+  strlcat(ps->firstErrorReason, ", ", sizeof(ps->firstErrorReason));
+  strlcat(ps->firstErrorReason, buf, sizeof(ps->firstErrorReason)); 
+  yyerror(ps->firstErrorReason, ps); 
+}
+
 static void rb_compile_error(const char* msg, rb_parse_state* ps)
 {
   rb_compile_error(ps, msg);
@@ -310,6 +327,7 @@ static void local_pop(rb_parse_state*);
 static int64 local_cnt(rb_parse_state *st, NODE *idO);
 
 static int local_id(rb_parse_state* ps, NODE* quid);
+static int eval_local_id(rb_parse_state *st, NODE* idO);
 
 static void tokadd(char c, rb_parse_state *parse_state);
 
@@ -3000,9 +3018,9 @@ f_norm_arg      : tCONSTANT
                       OmScopeType aScope(vps->omPtr);
                       NODE *quidO = asQuid($1, vps);
 		      if (! is_local_id(quidO)) {
-			  rb_compile_error(vps, "formal argument must be local variable");
+			  rb_compile_error_q(vps, "formal argument must be local variable", quidO);
 		      } else if (local_id(vps, quidO)) {
-			  rb_compile_error(vps, "duplicate argument name");
+			  rb_compile_error_q(vps, "duplicate argument name", quidO);
                       }
 		      local_cnt(vps, quidO);
 		      $$ = $1 ;
@@ -3029,9 +3047,9 @@ f_opt           : tIDENTIFIER '=' arg_value
                       OmScopeType aScope(vps->omPtr);
                       NODE *quidO = asQuid($1, vps);
 		      if (! is_local_id(quidO)) {
-			  rb_compile_error("formal argument must be local variable", vps);
+			  rb_compile_error_q(vps, "formal argument must be local variable", quidO);
 		      } else if (local_id(vps, quidO)) {
-			  rb_compile_error("duplicate optional argument name", vps);
+			  rb_compile_error_q(vps, "duplicate optional argument name", quidO);
                       } 
                       NODE **thirdH = aScope.add($3);
 		      $$ = assignable(& $1, $2/*srcOffsetSi*/, thirdH, vps);
@@ -3464,6 +3482,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     case sel_callNode_:         str = "callNode:"; break;
     case sel_backref_error: 	str = "backref_error:" ; break;
     case sel_bodyNode_:         str = "bodyNode:"; break;
+    case sel_includesTemp_:   str = "includesTemp:"; break;
     case sel_get_match_node:   str = "get_match_node:rhs:ofs:"; break;
     case sel_list_append: 	str = "list_append:item:"; break;
     case sel_list_prepend: 	str = "list_prepend:item:"; break;
@@ -3698,14 +3717,17 @@ omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr)
 
 omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
 {
-  DOPRIM_ARGS(omPtr, 7);
-  // omObjSType **recH = DOPRIM_STACK_ADDR(7);
-  omObjSType **sourceH = DOPRIM_STACK_ADDR(6);
-  omObjSType **cbytesH = DOPRIM_STACK_ADDR(5); // a CByteArray
-  omObjSType *lineOop =  DOPRIM_STACK(4); 
-  omObjSType **fileNameH = DOPRIM_STACK_ADDR(3);
-  omObjSType *traceOop = DOPRIM_STACK(2);
-  omObjSType *warnOop = DOPRIM_STACK(1);
+
+  DOPRIM_ARGS(omPtr, 8);
+  // omObjSType **recH = DOPRIM_STACK_ADDR(8);
+  omObjSType **sourceH = DOPRIM_STACK_ADDR(7);
+  omObjSType **cbytesH = DOPRIM_STACK_ADDR(6); // a CByteArray
+  omObjSType *lineOop =  DOPRIM_STACK(5);
+  omObjSType **fileNameH =  DOPRIM_STACK_ADDR(4);
+  omObjSType *traceOop =    DOPRIM_STACK(3);
+  omObjSType *warnOop =     DOPRIM_STACK(2);
+  omObjSType **evalScopeH = DOPRIM_STACK_ADDR(1);
+
   if (! OOP_IS_SMALL_INT(lineOop))
     return NULL;
   if (! OOP_IS_SMALL_INT(traceOop))
@@ -3771,7 +3793,15 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->fileNameH = oScope.add(*fileNameH);
   ps->sourceStrH = oScope.add(*sourceH);
   ps->warningsH = oScope.newHandle();
-
+  if (*evalScopeH == ram_OOP_NIL) {
+    ps->evalScopeH = NULL;
+  } else {
+    omObjSType *evScope = *evalScopeH; // expect a RubyEvalScope
+    if (! OOP_IS_RAM_OOP(evScope)) { // class RubyEvalScope in mcz only
+      return NULL;
+    }
+    ps->evalScopeH = oScope.add(evScope); 
+  }
   ps->lex_pbeg = NULL;
   ps->lex_p = NULL;
   ps->lex_pend = NULL;
@@ -6066,7 +6096,7 @@ static NODE* gettable(rb_parse_state *ps, NODE** idH)
       }
     }
     if (v_is_local_id(id)) {
-        if (local_id(ps, idO)) {
+        if (eval_local_id(ps, idO)) {
           return RubyLocalVarNode::s( quidToSymbolObj(idO, ps), ps);
         }
         /* method call without arguments */
@@ -6088,8 +6118,7 @@ static NODE* gettable(rb_parse_state *ps, NODE** idH)
         return RubyClassVarNode::s( quidToSymbolObj( idO, ps), ps);
     }
   }
-  /* FIXME: indicate which identifier. */
-  rb_compile_error(ps, "identifier is not valid 1\n");
+  rb_compile_error_q(ps, "identifier is not valid 1\n", idO);
   return ram_OOP_NIL;
 }
 
@@ -6236,7 +6265,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffsetArg, NODE **valH, rb_parse_st
     }
     else if (v_is_const_id(id)) {
         if (ps->in_def || ps->in_single) {
-            rb_compile_error("dynamic constant assignment", ps);
+            rb_compile_error_q(ps, "dynamic constant assignment", idO);
         }
         NODE *symO = quidToSymbolObj(idO, ps);
         UTL_ASSERT(OOP_IS_SMALL_INT(srcOffset));
@@ -6251,7 +6280,6 @@ static NODE* assignable(NODE **idH, NODE* srcOffsetArg, NODE **valH, rb_parse_st
         return RubyClassVarDeclNode::s(symO, srcOffset, *valH, ps);
     }
   }
-  /* FIXME: indicate which identifier. */
   rb_compile_error(ps, "identifier is not valid 2\n");
   return ram_OOP_NIL;
 }
@@ -6336,16 +6364,28 @@ static int local_id(rb_parse_state *st, NODE* idO)
   UTL_ASSERT(OOP_IS_SMALL_INT(idO));
   QUID qid = (OopType)idO;
   LocalState *vars = st->variables;
-    if (vars->block_vars) {
-      if (var_table_find_chained(vars->block_vars, qid) >= 0) {
-        return 1;
-      }
-    }
-
-    if (var_table_find(vars->variables, qid) >= 0) {
+  if (vars->block_vars) {
+    if (var_table_find_chained(vars->block_vars, qid) >= 0) {
       return 1;
     }
-    return 0;
+  }
+  return var_table_find(vars->variables, qid) >= 0 ;
+}
+
+static int eval_local_id(rb_parse_state *st, NODE* idO)
+{
+  if (local_id(st, idO))
+    return 1;
+
+  omObjSType **evalScopeH = st->evalScopeH;
+  if (evalScopeH != NULL) {
+    omObjSType *symO = quidToSymbolObj(idO, st);
+    omObjSType *isLocal = RubyNode::call(*evalScopeH, sel_includesTemp_, symO, st);
+    if (isLocal == ram_OOP_TRUE) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 static const struct {
