@@ -108,7 +108,7 @@ module Config
     CONFIG['ARCH_FLAG']  = ' -arch x86_64 '
 
   when /x86_64_solaris/
-    CONFIG['CC']         = ENV["CC"] || "/opt/solstudio12.2/bin/cc"
+    CONFIG['CC']         = ENV["CC"] || "/opt/sunstudio12.1/bin/cc"
     CONFIG['LIBS']       = "-lrt -ldl -lm -lc"
     CONFIG['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
     CONFIG['CFLAGS']     = " -fPIC -g "     # -m64 should be picked up by ARCH_FLAG ?
