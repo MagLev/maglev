@@ -21,7 +21,7 @@
     In fact, many classes are shared by both Ruby and Smalltalk (Object,
     Float, Array, and others).  They are the same, identical class object:
 
-       Smalltalk:  Object asOop    "72193"
+       Smalltalk:  Object asOop    "=>  72193"
        Ruby:       Object.__id__   # => 72193
 
 *** Non-fundamental differences between Ruby and Smalltalk Objects
@@ -215,9 +215,9 @@
     are the same between Smalltalk and Ruby for myModule, fizzClass and
     fizz, we know they are the very same objects created by the Ruby code:
 
-      myModule asOop  "148107009"
-      fizzClass asOop "148106241"
-      fizz asOop      "148100865"
+      myModule asOop                    "=> 148107009"
+      fizzClass asOop                   "=> 148106241"
+      fizz asOop                        "=> 148100865"
 
     and
 
@@ -240,16 +240,16 @@
      message. Ruby defines the "object_id" method on Object, but you can't
      call it directly from Smalltalk:
 
-       Object object_id   "raises a MessageNotUnderstood"
+       Object object_id   "=>  raises a MessageNotUnderstood"
 
      Using perform:env:, you can call it from Smalltalk:
 
-       Object perform: #object_id env: 1 .   "72193"
+       Object perform: #object_id env: 1 .   "=> 72193"
 
      But if you try to invoke it in environment 0, you still get the
      MessageNotUnderstood:
 
-       Object perform: #object_id env: 0 .   "raises a MessageNotUnderstood"
+       Object perform: #object_id env: 0 .   "=>  raises a MessageNotUnderstood"
 
 **** Using the "@ruby1:" syntax
 
@@ -352,6 +352,9 @@
     TODO: implement and then explain __send_env__
 
 ** Bridge Methods
+
+   TODO: Explain the suffix notation.
+
 ** Other Considerations
    + How do you load up a full ruby environment from Smalltalk?  E.g.,
      suppose you want to use Nokogiri from Seaside...We should probably
