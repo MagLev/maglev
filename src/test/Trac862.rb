@@ -17,3 +17,17 @@ def create_makefile(target, srcprefix = nil)
 ensure
   mfile.close if mfile
 end
+
+class C
+  # more coverage to actually execute the for loop with trouble
+  def self.ma
+    files = [ [ 5,6,60] ]
+    for c, *d in files  
+      puts "c #{c}  d #{d.inspect}"
+      unless c == 5 ; raise 'fail';end
+      unless d == [6,60] ; raise 'fail';end
+    end
+  end
+end
+C.ma
+true
