@@ -4,6 +4,12 @@
 
 == Unreleased Changes
 
+== Changes for 25352 2011-03-01
+* Changes to make RDiscount work, make IO Enumerable
+* Update docs/ruby_and_smalltalk
+* Fix compile flags in rbconfig for MacOSX
+* A couple of bugfixes to underlying GemStone 3.0 system
+
 == Changes for 25343 2011-02-26
 * Fix Trac 866, IO.popen
 * Fix Trac 829 in the implementation of eval
