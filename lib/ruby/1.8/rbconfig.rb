@@ -63,12 +63,6 @@ module Config
   cpu_os = Exception.__cpu_os_kind
   CONFIG['host_os']           = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
                                     darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
-  if cpu_os == 7
-    CONFIG['DLEXT'] = 'sl' # HPUX
-  else
-    CONFIG['DLEXT'] = 'so' # other unix
-  end
-
   CONFIG["LN_S"]            = "ln -s"
   CONFIG["SET_MAKE"]        = ""
   CONFIG["INSTALL"]         = "install -vp"
@@ -78,7 +72,7 @@ module Config
   CONFIG["RM"]              = "rm -f"
   CONFIG["CP"]              = "cp"
   CONFIG["MAKEDIRS"]        = "mkdir -p"
-             
+
   CONFIG['EXEEXT']            = ''
   CONFIG['LIBEXT']            = 'a'
   CONFIG['OBJEXT']            = 'o'
@@ -87,27 +81,44 @@ module Config
   CONFIG['RUBY_SO_NAME']      = CONFIG['ruby_install_name']
   CONFIG['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?
 
-  MAKEFILE_CONFIG = CONFIG # Some C extensions require both hashes to be present
-  MAKEFILE_CONFIG['CC']             = ENV["CC"] || 'cc '
-  MAKEFILE_CONFIG['CPP']            = ENV["CPP"] || 'cc -E '
-  MAKEFILE_CONFIG['CXX']            = ENV["CXX"] || 'c++'
-  MAKEFILE_CONFIG['CFLAGS']         = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
-  MAKEFILE_CONFIG['CPPFLAGS']       = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
-  MAKEFILE_CONFIG['CXXFLAGS']       = MAKEFILE_CONFIG['CFLAGS'] + ' $(cxxflags) '
-  MAKEFILE_CONFIG['OUTFLAG']        = ' -o '
-  MAKEFILE_CONFIG['COMMON_HEADERS'] = 'ruby.h'
-  if CONFIG['host_os'] =~ /darwin/
-    MAKEFILE_CONFIG['LDSHARED']     = MAKEFILE_CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
-    MAKEFILE_CONFIG['LDFLAGS']      = ' -bundle '
-    MAKEFILE_CONFIG['ARCH_FLAG']    = ' -arch x86_64 '
-  else
-    MAKEFILE_CONFIG['LDSHARED']     = MAKEFILE_CONFIG["CC"] + ' -shared '
-    MAKEFILE_CONFIG['LDFLAGS']      = ''
-    MAKEFILE_CONFIG['ARCH_FLAG']    = ' -m64 '
-  end
-  MAKEFILE_CONFIG['LDSHAREDXX']     = MAKEFILE_CONFIG['LDSHARED']
+  # First set plausible defaults, then override on specific architectures
+  # in the case statement immediately below
+  CONFIG['ARCH_FLAG']      = ' -m64 '
+  CONFIG['CC']             = ENV["CC"] || 'cc '
+  CONFIG['CFLAGS']         = ' -fPIC -g '
+  CONFIG['COMMON_HEADERS'] = 'ruby.h'
+  CONFIG['CPP']            = ENV["CPP"] || 'cc -E '
+  CONFIG['CPPFLAGS']       = ' $(cppflags) '
+  CONFIG['CXX']            = ENV["CXX"] || 'c++'
+  CONFIG['DLEXT']          = 'so'
+  CONFIG['LDFLAGS']        = ''
+  CONFIG['LDSHARED']       = "#{CONFIG['CC']} -shared"
+  CONFIG['LDSHARED']       = CONFIG["CC"] + ' -shared '
+  CONFIG['OUTFLAG']        = ' -o '
+  CONFIG['configure_args'] = ''
 
-  MAKEFILE_CONFIG['configure_args'] = ''
+  case Config::CONFIG['host_os']
+  when /darwin/
+    CONFIG['CFLAGS']     = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
+    CONFIG['CPPFLAGS']   = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
+    CONFIG['CXXFLAGS']   =  CONFIG['CFLAGS'] + ' $(cxxflags) '
+    CONFIG['LDSHARED']   = CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
+    CONFIG['LDSHAREDXX'] = CONFIG['LDSHARED']
+    CONFIG['LDFLAGS']    = ' -bundle '
+    CONFIG['ARCH_FLAG']  = ' -arch x86_64 '
+
+  when /x86_64_solaris/
+    CONFIG['CC']         = ENV["CC"] || "/opt/solstudio12.2/bin/cc"
+    CONFIG['LIBS']       = "-lrt -ldl -lm -lc"
+    CONFIG['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
+    CONFIG['CFLAGS']     = " -fPIC -g "     # -m64 should be picked up by ARCH_FLAG ?
+
+  when /HP-UX/
+    CONFIG['DLEXT']      = 'sl'
+
+  end
+  MAKEFILE_CONFIG = {}
+  CONFIG.each{|k,v| MAKEFILE_CONFIG[k] = v.dup}
 
   def Config::expand(val, config = Config::CONFIG)
     (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
@@ -126,6 +137,10 @@ module Config
     end
     val
   end
+  CONFIG.each_value do |val|
+    Config::expand(val)
+  end
+  
 end
 
 RbConfig = Config
