@@ -83,7 +83,11 @@ revert the gem.
       end
 
       # TODO use installer options
-      installer = Gem::Installer.new gem, :wrappers => true, :force => true
+      # GEMSTONE: Workaround rubygems bug 28661
+      # See http://www.mail-archive.com/rubygems-developers@rubyforge.org/msg03922.html
+      shebang = !Gem::ConfigFile::PLATFORM_DEFAULTS['install'].to_s['--env-shebang'].nil?
+      installer = Gem::Installer.new gem, :wrappers => true, :force => true, :env_shebang => shebang
+
       installer.install
 
       say "Restored #{spec.full_name}"
