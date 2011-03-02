@@ -1,16 +1,16 @@
 # In other implementation this file gets created by mkconfig.rb when ruby
-# is built. It's usually used to describe various settings and other
-# information used in the build For more informations refer to pickaxe
-# p.183
+# is built.  Since MagLev potentially supports VMs from multiple
+# architectures connecting to the same stone, we have to figure out
+# architecture specific information at runtime.
 #
-# Various files in the MSpec libs require this Module. At this point it's
-# hard coded rather than generated to fulfill the mspec requirement.
-
-# TODO: To get a per-install view of this, without having to generate the
-# data each time the vm starts up, we can do the real work, once, when
-# prims are loaded, then have rbconfig.rb reference that data.  For right
-# now, we'll just calculate each time.
-
+# To prevent a VM from one architecture (e.g., Solaris/Sparc) from
+# persisting configurations values that will mess up a VM from another
+# architecture (e.g., OSX x86), we wrap most of the code in a transient
+# block.  Then, we remove this file from $LOADED_FEATURES, so that it will
+# be re-loaded if needed.  We should really only remove if from the
+# persistent $LOADED_FEATURES, but we don't support that yet.
+#
+Maglev.transient do
 module Config
   RUBY_VERSION == "1.8.7" or
     raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
@@ -147,3 +147,7 @@ module Config
 end
 RbConfig = Config
 CROSS_COMPILING = nil unless defined? CROSS_COMPILING
+
+end  # End Maglev.transient
+
+$LOADED_FEATURES.shift  # take this file off of $LOADED_FEATURES so that reloads will work.
