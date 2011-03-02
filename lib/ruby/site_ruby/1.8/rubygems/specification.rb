@@ -330,10 +330,11 @@ class Gem::Specification
   end
 
   ##
-  # List of depedencies that will automatically be activated at runtime.
+  # List of dependencies that will automatically be activated at runtime.
 
   def runtime_dependencies
-    dependencies.select { |d| d.type == :runtime || d.type == nil }
+    # TODO: fix #type to return :runtime if nil
+    dependencies.select { |d| d.type == :runtime }
   end
 
   ##
@@ -498,17 +499,37 @@ class Gem::Specification
   end
 
   ##
-  # Loads ruby format gemspec from +filename+
+  # Loads Ruby format gemspec from +file+.
 
-  def self.load(filename)
-    gemspec = nil
-    raise "NESTED Specification.load calls not allowed!" if @@gather
-    @@gather = proc { |gs| gemspec = gs }
-    data = File.read filename
-    eval data, nil, filename
-    gemspec
-  ensure
-    @@gather = nil
+  def self.load file
+    return unless file && File.file?(file)
+
+    file = file.dup.untaint
+
+    code = if defined? Encoding
+             File.read file, :encoding => "UTF-8"
+           else
+             File.read file
+           end
+
+    code.untaint
+
+    begin
+      spec = eval code, binding, file
+
+      if Gem::Specification === spec
+        spec.loaded_from = file
+        return spec
+      end
+
+      warn "[#{file}] isn't a Gem::Specification (#{spec.class} instead)."
+    rescue SignalException, SystemExit
+      raise
+    rescue SyntaxError, Exception => e
+      warn "Invalid gemspec in [#{file}]: #{e}"
+    end
+
+    nil
   end
 
   ##
@@ -516,8 +537,8 @@ class Gem::Specification
 
   def self.normalize_yaml_input(input)
     result = input.respond_to?(:read) ? input.read : input
-    result = "--- " + result unless result =~ /^--- /
-    result
+    result = "--- " + result unless result =~ /\A--- /
+    result.gsub(/ !!null \n/, " \n")
   end
 
   ##
@@ -659,6 +680,14 @@ class Gem::Specification
   alias eql? == # :nodoc:
 
   ##
+  # A macro to yield cached gem path
+  #
+  def cache_gem
+    cache_name = File.join(Gem.dir, 'cache', file_name)
+    return File.exist?(cache_name) ? cache_name : nil
+  end
+
+  ##
   # True if this gem has the same attributes as +other+.
 
   def same_attributes?(other)
@@ -671,9 +700,8 @@ class Gem::Specification
   private :same_attributes?
 
   def hash # :nodoc:
-    @@attributes.inject(0) { |hash_code, (name, default_value)|
-      n = self.send(name).hash
-      hash_code + n
+    @@attributes.inject(0) { |hash_code, (name, _)|
+      hash_code ^ self.send(name).hash
     }
   end
 
@@ -701,11 +729,13 @@ class Gem::Specification
   end
 
   def to_yaml(opts = {}) # :nodoc:
-    return super if YAML.const_defined?(:ENGINE) && !YAML::ENGINE.syck?
-
-    yaml = YAML.quick_emit object_id, opts do |out|
-      out.map taguri, to_yaml_style do |map|
-        encode_with map
+    if YAML.const_defined?(:ENGINE) && !YAML::ENGINE.syck? then
+      super.gsub(/ !!null \n/, " \n")
+    else
+      YAML.quick_emit object_id, opts do |out|
+        out.map taguri, to_yaml_style do |map|
+          encode_with map
+        end
       end
     end
   end
@@ -765,27 +795,22 @@ class Gem::Specification
 
     result << nil
     result << "  if s.respond_to? :specification_version then"
-    result << "    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION"
     result << "    s.specification_version = #{specification_version}"
     result << nil
 
     result << "    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then"
 
-    unless dependencies.empty? then
-      dependencies.each do |dep|
-        version_reqs_param = dep.requirements_list.inspect
-        dep.instance_variable_set :@type, :runtime if dep.type.nil? # HACK
-        result << "      s.add_#{dep.type}_dependency(%q<#{dep.name}>, #{version_reqs_param})"
-      end
+    dependencies.each do |dep|
+      req = dep.requirements_list.inspect
+      dep.instance_variable_set :@type, :runtime if dep.type.nil? # HACK
+      result << "      s.add_#{dep.type}_dependency(%q<#{dep.name}>, #{req})"
     end
 
     result << "    else"
 
-    unless dependencies.empty? then
-      dependencies.each do |dep|
-        version_reqs_param = dep.requirements_list.inspect
-        result << "      s.add_dependency(%q<#{dep.name}>, #{version_reqs_param})"
-      end
+    dependencies.each do |dep|
+      version_reqs_param = dep.requirements_list.inspect
+      result << "      s.add_dependency(%q<#{dep.name}>, #{version_reqs_param})"
     end
 
     result << '    end'
@@ -803,6 +828,15 @@ class Gem::Specification
     result.join "\n"
   end
 
+  def to_ruby_for_cache
+    s = dup
+    # remove large blobs that aren't used at runtime:
+    s.files = nil
+    s.extra_rdoc_files = nil
+    s.rdoc_options = nil
+    s.to_ruby
+  end
+
   ##
   # Checks that the specification contains all required fields, and does a
   # very basic sanity check.
@@ -811,6 +845,7 @@ class Gem::Specification
   # checks..
 
   def validate
+    require 'rubygems/user_interaction'
     extend Gem::UserInteraction
     normalize
 
@@ -909,7 +944,7 @@ class Gem::Specification
 
     # Warnings
 
-    %w[author description email homepage rubyforge_project summary].each do |attribute|
+    %w[author description email homepage summary].each do |attribute|
       value = self.send attribute
       alert_warning "no #{attribute} specified" if value.nil? or value.empty?
     end
@@ -1498,5 +1533,33 @@ class Gem::Specification
               @extra_rdoc_files,
               @extensions,
              ].flatten.uniq.compact
+  end
+
+  def conflicts
+    conflicts = {}
+    Gem.loaded_specs.values.each do |spec|
+      bad = self.runtime_dependencies.find_all { |dep|
+        spec.name == dep.name and not spec.satisfies_requirement? dep
+      }
+
+      conflicts[spec] = bad unless bad.empty?
+    end
+    conflicts
+  end
+
+  def traverse trail = [], &b
+    trail = trail + [self]
+    runtime_dependencies.each do |dep|
+      dep_specs = Gem.source_index.search dep, true
+      dep_specs.each do |dep_spec|
+        b[self, dep, dep_spec, trail + [dep_spec]]
+        dep_spec.traverse(trail, &b) unless
+          trail.map(&:name).include? dep_spec.name
+      end
+    end
+  end
+
+  def dependent_specs
+    runtime_dependencies.map { |dep| Gem.source_index.search dep, true }.flatten
   end
 end
