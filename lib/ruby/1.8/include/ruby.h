@@ -1,3 +1,4 @@
+// Generated file, do not edit. master copy in svn
 /**********************************************************************
 
   ruby/ruby.h -
