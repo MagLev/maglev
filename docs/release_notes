@@ -219,9 +219,9 @@ end up in the topaz debugger, or for irb.
 
 == RubyGems
 
-MagLev comes with a copy of RubyGems 1.3.7 pre-installed.  Gems get loaded
+MagLev comes with a copy of RubyGems pre-installed.  Gems get loaded
 into <tt>$MAGLEV_HOME/lib/maglev/gems/1.8/gems</tt>.  Gems that are based
-on a C-extension do not install or run with MagLev.
+on a C-extension may not install or run with MagLev.
 
 == Kernel
 * Note that we don't support instance variables as block arguments,
