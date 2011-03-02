@@ -1,4 +1,3 @@
-// Generated file, do not edit. master copy in svn
 /**********************************************************************
 
   ruby/ruby.h -
@@ -623,7 +622,7 @@ RUBY_DLLSPEC VALUE rb_ary_new4(long n, const VALUE *values);
 RUBY_DLLSPEC VALUE rb_assoc_new(VALUE a, VALUE b);
 RUBY_DLLSPEC long rb_ary_size(VALUE self);
 
-static inline long RARRAY_LEN(VALUE ary) { return rb_ary_size(ary); }
+#define RARRAY_LEN(ary) rb_ary_size(ary)
 
 RUBY_DLLSPEC VALUE rb_ary_push(VALUE array, VALUE val);
 RUBY_DLLSPEC VALUE rb_ary_pop(VALUE array);
@@ -678,7 +677,7 @@ RUBY_DLLSPEC const char* rb_str2cstr(VALUE str, long *len);
    // C memory is auto-freed by GC
 
 /** The pointer to the string str's data. */
-static inline const char* RSTRING_PTR(VALUE str) { return rb_str2cstr(str, NULL); }
+#define RSTRING_PTR(str) rb_str2cstr(str, NULL)
 static inline const char* rb_str_ptr(VALUE str) { return rb_str2cstr(str, NULL); }
 static inline const char* rb_str_ptr_readonly(VALUE str) { return rb_str2cstr(str, NULL); }
 
@@ -777,7 +776,7 @@ RUBY_DLLSPEC VALUE rb_str_intern(VALUE str);
 /** The length of string str. */
 RUBY_DLLSPEC long rb_str_len(VALUE str);
 
-static inline long RSTRING_LEN(VALUE str) { return rb_str_len(str); }
+#define RSTRING_LEN(str) rb_str_len(str)
 
 // /** Deprecated alias for rb_obj_freeze */
 // RUBY_DLLSPEC VALUE rb_str_freeze(VALUE str);
@@ -915,7 +914,7 @@ RUBY_DLLSPEC double rb_float_value(VALUE v);
 
 // RFLOAT not supported
 
-static inline double RFLOAT_VALUE(VALUE v) { return rb_float_value(v); }
+#define RFLOAT_VALUE(v) rb_float_value(v)
 
 /** if v is a Float return v, else return v.to_f  */
 RUBY_DLLSPEC VALUE rb_Float(VALUE v);
