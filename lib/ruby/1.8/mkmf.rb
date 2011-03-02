@@ -1,9 +1,8 @@
-# ---------------------- Changed for Maglev ------------------------------------
+# module to create Makefile for extension modules
+# invoke like: ruby -r mkmf extconf.rb
+
 require 'rbconfig'
-
-# This is needed later on
-CROSS_COMPILING = false
-
+# ---------------------- Changed for Maglev ------------------------------------
 $topdir     = Config::MAKEFILE_CONFIG['includedir']
 $hdrdir     = $topdir
 $top_srcdir = $topdir
@@ -15,11 +14,6 @@ unless File.exists?($hdrdir + "/ruby.h")
 end
 # -----------------------------------------------------------------------------
 
-
-# module to create Makefile for extension modules
-# invoke like: ruby -r mkmf extconf.rb
-
-require 'rbconfig'
 require 'fileutils'
 require 'shellwords'
 
@@ -239,7 +233,7 @@ module Logging
       @log = nil
     end
   end
-  
+
   def self::postpone
     tmplog = "mkmftmp#{@postpone += 1}.log"
     open do
@@ -806,7 +800,7 @@ end
 #
 # For example, if have_struct_member('struct foo', 'bar') returned true, then the
 # HAVE_ST_BAR preprocessor macro would be passed to the compiler.
-# 
+#
 def have_struct_member(type, member, headers = nil, &b)
   checking_for checking_message("#{type}.#{member}", headers) do
     if try_compile(<<"SRC", &b)
@@ -1114,7 +1108,7 @@ end
 # 'extconf.h'.
 #
 # For example:
-# 
+#
 #    # extconf.rb
 #    require 'mkmf'
 #    have_func('realpath')
@@ -1209,7 +1203,7 @@ def pkg_config(pkg)
   if pkgconfig = with_config("#{pkg}-config") and find_executable0(pkgconfig)
     # iff package specific config command is given
     get = proc {|opt| `#{pkgconfig} --#{opt}`.chomp}
-  elsif ($PKGCONFIG ||= 
+  elsif ($PKGCONFIG ||=
          (pkgconfig = with_config("pkg-config", ("pkg-config" unless CROSS_COMPILING))) &&
          find_executable0(pkgconfig) && pkgconfig) and
       system("#{$PKGCONFIG} --exists #{pkg}")

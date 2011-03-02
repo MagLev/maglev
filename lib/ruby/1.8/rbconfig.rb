@@ -63,6 +63,7 @@ module Config
   cpu_os = Exception.__cpu_os_kind
   CONFIG['host_os']           = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
                                     darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
+  CONFIG['target_os']       = CONFIG['host_os']
   CONFIG["LN_S"]            = "ln -s"
   CONFIG["SET_MAKE"]        = ""
   CONFIG["INSTALL"]         = "install -vp"
@@ -101,11 +102,14 @@ module Config
   when /darwin/
     CONFIG['CFLAGS']     = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
     CONFIG['CPPFLAGS']   = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
-    CONFIG['CXXFLAGS']   =  CONFIG['CFLAGS'] + ' $(cxxflags) '
+    CONFIG['CXXFLAGS']   = CONFIG['CFLAGS'] + ' $(cxxflags) '
     CONFIG['LDSHARED']   = CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
     CONFIG['LDSHAREDXX'] = CONFIG['LDSHARED']
-    CONFIG['LDFLAGS']    = ' -bundle '
+    CONFIG['DLDFLAGS']    = " -bundle -L#{File.join(MAGLEV_HOME, 'gemstone', 'lib')}"
     CONFIG['ARCH_FLAG']  = ' -arch x86_64 '
+
+#    CONFIG['LIBS']       = "-lgcilink64"
+    CONFIG['CC']         = ENV["CC"] || 'gcc '
 
   when /x86_64_solaris/
     CONFIG['CC']         = ENV["CC"] || "/opt/sunstudio12.1/bin/cc"
@@ -140,7 +144,6 @@ module Config
   CONFIG.each_value do |val|
     Config::expand(val)
   end
-  
 end
-
 RbConfig = Config
+CROSS_COMPILING = nil unless defined? CROSS_COMPILING
