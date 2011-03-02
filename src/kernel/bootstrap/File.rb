@@ -46,6 +46,7 @@ class File
   def close
     if self.__is_open
       self.__close
+      self.__pclose_status 
     else
       raise IOError, 'already closed'
     end
@@ -1032,6 +1033,7 @@ class File
   end
 
   class_primitive '__popen', '_popen:mode:'
+  primitive '__pclose_status', '_pcloseStatus'
 
   def path
     @_st_pathName
