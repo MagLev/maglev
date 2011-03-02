@@ -7,13 +7,12 @@ NOTE:  See the top level docs/applications directory for more details.
 benchmark
   (moved to $MAGLEV_HOME/benchmark)
   Benchmarks from Antonio Cangiano's Ruby-Benchmark-Suite, and some scripts to run them.
+  see: https://github.com/acangiano/ruby-benchmark-suite
 
-rubygems-1.3.5
-  A slightly patched version of rubygems 1.3.5.  The patches are in
-  * rubygems-1.3.5/lib/rubygems/dependency_installer.rb
-  * rubygems-1.3.5/lib/rubygems/package/tar_input.rb
-  See docs/applications for details
-  Next step:   maglev-ruby -Ilib -Itest test/test_gem
+mspec & rubyspec
+  (moved to $MAGLEV_HOME/spec)
+  Executable specification for the Ruby programming language
+  see: https://github.com/rubyspec
 
 rxtest
   Tim Bray's rx code.  Rx is an automaton based XML tokenizer.  It was
