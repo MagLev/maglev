@@ -1,4 +1,3 @@
-// Generated file, do not edit. master copy in svn
 /**********************************************************************
 
   ruby/ruby.h -
@@ -915,7 +914,7 @@ RUBY_DLLSPEC double rb_float_value(VALUE v);
 
 // RFLOAT not supported
 
-static inline double RFLOAT_VALUE(VALUE v) { return rb_float_value(v); }
+#define RFLOAT_VALUE(v) rb_float_value(v)
 
 /** if v is a Float return v, else return v.to_f  */
 RUBY_DLLSPEC VALUE rb_Float(VALUE v);
