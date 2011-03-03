@@ -5,6 +5,7 @@
 == Unreleased Changes
 * Update to Bundler 1.0.10
 * Update to RubyGems 1.6.0
+* Changes to ruby.h to change a few inline functions to MRI compatible macros.
 
 == Changes for 25352 2011-03-01
 * Changes to make RDiscount work, make IO Enumerable
