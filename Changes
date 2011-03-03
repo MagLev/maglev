@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 861
+
 == Changes for 25359 2011-03-02
 * Update to Bundler 1.0.10
 * Update to RubyGems 1.6.0
