@@ -4,11 +4,14 @@
 
 == Unreleased Changes
 
-== Changes for 25359 2011-03-02
+* Fix Trac 861
+
+== Changes for 25370 2011-03-03
 * Update to Bundler 1.0.10
 * Update to RubyGems 1.6.0
 * Change a few inline functions in ruby.h to MRI compatible macros.
 * Changes to make RDiscount work, make IO Enumerable
+* Fix Trac 861
 * Update docs/ruby_and_smalltalk
 * Fix compile flags in rbconfig for MacOSX
 * A couple of bugfixes to underlying GemStone 3.0 system
