@@ -1,16 +1,16 @@
 # In other implementation this file gets created by mkconfig.rb when ruby
-# is built. It's usually used to describe various settings and other
-# information used in the build For more informations refer to pickaxe
-# p.183
+# is built.  Since MagLev potentially supports VMs from multiple
+# architectures connecting to the same stone, we have to figure out
+# architecture specific information at runtime.
 #
-# Various files in the MSpec libs require this Module. At this point it's
-# hard coded rather than generated to fulfill the mspec requirement.
-
-# TODO: To get a per-install view of this, without having to generate the
-# data each time the vm starts up, we can do the real work, once, when
-# prims are loaded, then have rbconfig.rb reference that data.  For right
-# now, we'll just calculate each time.
-
+# To prevent a VM from one architecture (e.g., Solaris/Sparc) from
+# persisting configurations values that will mess up a VM from another
+# architecture (e.g., OSX x86), we wrap most of the code in a transient
+# block.  Then, we remove this file from $LOADED_FEATURES, so that it will
+# be re-loaded if needed.  We should really only remove if from the
+# persistent $LOADED_FEATURES, but we don't support that yet.
+#
+Maglev.transient do
 module Config
   RUBY_VERSION == "1.8.7" or
     raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
@@ -33,6 +33,7 @@ module Config
   CONFIG['sysconfdir']        = File.join(MAGLEV_HOME, 'etc')
   CONFIG['includedir']        = File.join(MAGLEV_HOME, 'lib/ruby/1.8/include')
   CONFIG['libdir']            = File.join(MAGLEV_HOME, 'lib')
+  CONFIG['gemlibdir']         = File.join(MAGLEV_HOME, 'gemstone', 'lib')
 
   CONFIG['rubylibdir']        = File.join(CONFIG['libdir'], 'ruby', VERSION)
   CONFIG['archdir']           = File.join(CONFIG['rubylibdir'], ARCH)
@@ -63,6 +64,7 @@ module Config
   cpu_os = Exception.__cpu_os_kind
   CONFIG['host_os']           = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
                                     darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
+  CONFIG['target_os']       = CONFIG['host_os']
   CONFIG["LN_S"]            = "ln -s"
   CONFIG["SET_MAKE"]        = ""
   CONFIG["INSTALL"]         = "install -vp"
@@ -91,8 +93,7 @@ module Config
   CONFIG['CPPFLAGS']       = ' $(cppflags) '
   CONFIG['CXX']            = ENV["CXX"] || 'c++'
   CONFIG['DLEXT']          = 'so'
-  CONFIG['LDFLAGS']        = ''
-  CONFIG['LDSHARED']       = "#{CONFIG['CC']} -shared"
+  CONFIG['LDFLAGS']        = "-L#{CONFIG['gemlibdir']}"
   CONFIG['LDSHARED']       = CONFIG["CC"] + ' -shared '
   CONFIG['OUTFLAG']        = ' -o '
   CONFIG['configure_args'] = ''
@@ -101,11 +102,13 @@ module Config
   when /darwin/
     CONFIG['CFLAGS']     = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
     CONFIG['CPPFLAGS']   = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
-    CONFIG['CXXFLAGS']   =  CONFIG['CFLAGS'] + ' $(cxxflags) '
+    CONFIG['CXXFLAGS']   = CONFIG['CFLAGS'] + ' $(cxxflags) '
     CONFIG['LDSHARED']   = CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
     CONFIG['LDSHAREDXX'] = CONFIG['LDSHARED']
-    CONFIG['LDFLAGS']    = ' -bundle '
+    CONFIG['DLDFLAGS']   = " -bundle "
     CONFIG['ARCH_FLAG']  = ' -arch x86_64 '
+    CONFIG['LIBS']       = "-lgcilnk"
+    CONFIG['CC']         = ENV["CC"] || 'gcc '
 
   when /x86_64_solaris/
     CONFIG['CC']         = ENV["CC"] || "/opt/sunstudio12.1/bin/cc"
@@ -140,7 +143,11 @@ module Config
   CONFIG.each_value do |val|
     Config::expand(val)
   end
-  
-end
 
+end
 RbConfig = Config
+CROSS_COMPILING = nil unless defined? CROSS_COMPILING
+
+end  # End Maglev.transient
+
+$LOADED_FEATURES.shift  # take this file off of $LOADED_FEATURES so that reloads will work.
