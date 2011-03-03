@@ -1,4 +1,3 @@
-require 'fileutils'
 require 'rubygems/command'
 require 'rubygems/format'
 require 'rubygems/installer'
@@ -74,11 +73,13 @@ revert the gem.
     say "Restoring gem(s) to pristine condition..."
 
     specs.each do |spec|
-      gem = Dir[File.join(Gem.dir, 'cache', spec.file_name)].first
+      gem = spec.cache_gem
 
       if gem.nil? then
-        alert_error "Cached gem for #{spec.full_name} not found, use `gem install` to restore"
-        next
+        say "Cached gem for #{spec.full_name} not found, attempting to fetch..."
+        dep = Gem::Dependency.new spec.name, spec.version
+        Gem::RemoteFetcher.fetcher.download_to_cache dep
+        gem = spec.cache_gem
       end
 
       # TODO use installer options
@@ -86,6 +87,7 @@ revert the gem.
       # See http://www.mail-archive.com/rubygems-developers@rubyforge.org/msg03922.html
       shebang = !Gem::ConfigFile::PLATFORM_DEFAULTS['install'].to_s['--env-shebang'].nil?
       installer = Gem::Installer.new gem, :wrappers => true, :force => true, :env_shebang => shebang
+
       installer.install
 
       say "Restored #{spec.full_name}"

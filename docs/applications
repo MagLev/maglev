@@ -1,8 +1,8 @@
 == Current state of various applications
 
 This document summarizes the state of various applications under MagLev.
-MagLev does not currently support the Ruby C extension mechanism.  Features
-of applications that depend on a C extension do not work.
+MagLev does not fully support the Ruby C extension mechanism.  Features
+of applications that depend on a C extension may not work.
 
 === Rack
 
@@ -31,10 +31,9 @@ The following items are known not to work:
 
 === RubyGems
 
-RubyGems 1.3.7 is preinstalled as "maglev-gem".
+RubyGems is preinstalled as "maglev-gem".
 
-It's likely that many gems will not work, especially those requiring C extensions.
-However, "maglev-gem install sinatra" will install rack-1.1.0 and sinatra-1.0.
+It's likely that some gems will not work, especially those requiring C extensions.
 
 To clean up after experimenting with gems, there is a rake task:
 

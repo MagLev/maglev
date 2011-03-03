@@ -1,3 +1,4 @@
+// Generated file, do not edit. master copy in svn
 /**********************************************************************
 
   ruby/ruby.h -
@@ -287,7 +288,7 @@ RUBY_DLLSPEC void rb_free(void*);
 //  RTEST defined above
 
 // RARRAY_PTR, RARRAY not supported
-// RFLOAT, RFLOAT_VALUE not supported
+// RFLOAT not supported
 
 // DATA_PTR, RDATA not supported
 
