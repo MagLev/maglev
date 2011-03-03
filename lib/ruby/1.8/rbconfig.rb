@@ -33,6 +33,7 @@ module Config
   CONFIG['sysconfdir']        = File.join(MAGLEV_HOME, 'etc')
   CONFIG['includedir']        = File.join(MAGLEV_HOME, 'lib/ruby/1.8/include')
   CONFIG['libdir']            = File.join(MAGLEV_HOME, 'lib')
+  CONFIG['gemlibdir']         = File.join(MAGLEV_HOME, 'gemstone', 'lib')
 
   CONFIG['rubylibdir']        = File.join(CONFIG['libdir'], 'ruby', VERSION)
   CONFIG['archdir']           = File.join(CONFIG['rubylibdir'], ARCH)
@@ -92,8 +93,7 @@ module Config
   CONFIG['CPPFLAGS']       = ' $(cppflags) '
   CONFIG['CXX']            = ENV["CXX"] || 'c++'
   CONFIG['DLEXT']          = 'so'
-  CONFIG['LDFLAGS']        = ''
-  CONFIG['LDSHARED']       = "#{CONFIG['CC']} -shared"
+  CONFIG['LDFLAGS']        = "-L#{CONFIG['gemlibdir']}"
   CONFIG['LDSHARED']       = CONFIG["CC"] + ' -shared '
   CONFIG['OUTFLAG']        = ' -o '
   CONFIG['configure_args'] = ''
@@ -105,10 +105,9 @@ module Config
     CONFIG['CXXFLAGS']   = CONFIG['CFLAGS'] + ' $(cxxflags) '
     CONFIG['LDSHARED']   = CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
     CONFIG['LDSHAREDXX'] = CONFIG['LDSHARED']
-    CONFIG['DLDFLAGS']    = " -bundle -L#{File.join(MAGLEV_HOME, 'gemstone', 'lib')}"
+    CONFIG['DLDFLAGS']   = " -bundle "
     CONFIG['ARCH_FLAG']  = ' -arch x86_64 '
-
-#    CONFIG['LIBS']       = "-lgcilink64"
+    CONFIG['LIBS']       = "-lgcilnk"
     CONFIG['CC']         = ENV["CC"] || 'gcc '
 
   when /x86_64_solaris/
@@ -144,6 +143,7 @@ module Config
   CONFIG.each_value do |val|
     Config::expand(val)
   end
+
 end
 RbConfig = Config
 CROSS_COMPILING = nil unless defined? CROSS_COMPILING
