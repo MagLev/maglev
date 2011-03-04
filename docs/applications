@@ -1,43 +1,65 @@
 == Current state of various applications
 
-This document summarizes the state of various applications under MagLev.
-MagLev does not fully support the Ruby C extension mechanism.  Features
-of applications that depend on a C extension may not work.
+This document summarizes the state of various applications running under
+MagLev.  In general, many non C-extension based RubyGems work with MagLev.
+C-Extension support was added to MagLev in March 2011, and some C-extension
+based gems seem to work out of the box (e.g., rdiscount), while others do
+not (racc), and others work with modifications (nokogiri).
 
-=== Rack
+MagLev comes with RubyGems and Bundler pre-installed.  This table
+summarizes the state of selected gems.  If there is an asterisk by a name,
+that means the gem is discussed more fully below:
 
-MagLev does not currently support (at least) the following Rack features:
-* openid
-* mongrel
-* memcache
-* thin
-* cookies (depends on openssl)
-* fastcgi
+  | Gem       | Version | Status              |
+  |-----------+---------+---------------------|
+  | bundler   | ~> 1.0  | Works               |
+  | minitest  | ~> 2.0  | Works               |
+  | nokogiri* | ~> 1.5  | Works with patches  |
+  | rack      | ~> 1.2  | Works               |
+  | rails*    | ~> 3.0  | Works with patches  |
+  | rake      | ~> 0.8  | Works               |
+  | sinatra*  | ~> 1.1  | Works, with caveats |
+
+=== Nokogiri
+
+Nokogiri is a C-extension based gem.  The MagLev team maintains a fork of
+Nokogiri at git://github.com/MagLev/nokogiri.git .
+
+There are a couple of places in the Nokogiri code that use a feature not
+currently supported by the MagLev C-extension implementation.  Many of the
+tests pass, but some fail with an error message:
+
+  ArgumentError: rb_data_object_alloc, non-NULL dmark not supported yet
+
+==== Install Nokogiri
+
+Some of the tools needed to build the Nokogiri gem (racc) do not currently
+work under MagLev, so the gem must be built using MRI.  To build the
+Nokogiri gem:
+
+  $ git clone git://github.com/MagLev/nokogiri.git
+  $ cd nokogiri
+
+Make sure you use MRI ruby for the following:
+
+  $ gem install hoe rake-compiler racc rexical minitest
+  $ rake
+
+At this point, you should have a gem packaged in
+pkg/nokogiri-1.5.0.beta.4.gem.  Install that gem using MagLev:
+
+  $ maglev-gem install pkg/nokogiri-1.5.0.beta.4.gem
+  Building native extensions.  This could take a while...
+  Successfully installed nokogiri-1.5.0.beta.4
+  1 gem installed
+
+=== Rails
+
+Rails works, but you need to apply a couple of patches after you've gem
+installed it.  See details in examples/rails/README.rdoc.
 
 === Sinatra
 
-Much of Sinatra runs, but some things don't.
-
-The following items seem to work (at least in the simple case)
-* Routes
-* Source code reloading
-* Views (erb)
-
-The following items are known not to work:
-
-* Cookies and Cookie based sessions
-  WEBrick requires openssl for cookie support. openssl is a C based
-  library, and MagLev does not yet support Ruby C extensions.
-
-=== RubyGems
-
-RubyGems is preinstalled as "maglev-gem".
-
-It's likely that some gems will not work, especially those requiring C extensions.
-
-To clean up after experimenting with gems, there is a rake task:
-
-    $ rake dev:clean-gems
-
-which removes all traces of any gems you've installed.
-
+Sinatra basically works, with one caveat: You may need to add "set :run,
+true" in your sinatra_app.rb file to start it. See
+examples/sinatra/README.rdoc for details.
