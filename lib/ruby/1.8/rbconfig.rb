@@ -3,151 +3,164 @@
 # architectures connecting to the same stone, we have to figure out
 # architecture specific information at runtime.
 #
-# To prevent a VM from one architecture (e.g., Solaris/Sparc) from
-# persisting configurations values that will mess up a VM from another
-# architecture (e.g., OSX x86), we wrap most of the code in a transient
-# block.  Then, we remove this file from $LOADED_FEATURES, so that it will
-# be re-loaded if needed.  We should really only remove if from the
-# persistent $LOADED_FEATURES, but we don't support that yet.
-#
-Maglev.transient do
+# Uses transient_const_set so that the architecture specific information
+# is recomputed the first time each constant is accessed during the lifetime
+# of a VM, even if this file is persistently loaded.
+
 module Config
   RUBY_VERSION == "1.8.7" or
     raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
   VERSION = '1.8'
-  ARCH = `uname -m`.chomp
+  transient_const_set( :ARCH ) { `uname -m`.chomp }
 
   # Note: MAGLEV_HOME and TOPDIR should end up being the same
   # in a default installation
-  MAGLEV_HOME = ENV['MAGLEV_HOME']
+  transient_const_set( :MAGLEV_HOME ) { ENV['MAGLEV_HOME'] }
 
   # TODO: MRI puts rbconfig in the architecture specific subdir of
   # .../lib/ruby/1.8/<archdir>/rbconfig.rb
-  TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/1.8")
-  DESTDIR = '' unless defined? DESTDIR
 
-  CONFIG = {}
-  CONFIG['prefix']            = MAGLEV_HOME
-  CONFIG['exec_prefix']       = MAGLEV_HOME
-  CONFIG['bindir']            = File.join(MAGLEV_HOME, 'bin')
-  CONFIG['sysconfdir']        = File.join(MAGLEV_HOME, 'etc')
-  CONFIG['includedir']        = File.join(MAGLEV_HOME, 'lib/ruby/1.8/include')
-  CONFIG['libdir']            = File.join(MAGLEV_HOME, 'lib')
-  CONFIG['gemlibdir']         = File.join(MAGLEV_HOME, 'gemstone', 'lib')
+  # TOPDIR = File.dirname(__FILE__).chomp!("/lib/ruby/1.8")
+  transient_const_set( :TOP_DIR ) { ENV['MAGLEV_HOME'] }
 
-  CONFIG['rubylibdir']        = File.join(CONFIG['libdir'], 'ruby', VERSION)
-  CONFIG['archdir']           = File.join(CONFIG['rubylibdir'], ARCH)
-  CONFIG['topdir']            = CONFIG['archdir']
+  # DESTDIR = '' unless defined? DESTDIR
+  DESTDIR = '' 
 
-  CONFIG['sitedir']           = File.join(CONFIG['libdir'], 'ruby', 'site_ruby')
-  CONFIG['sitelibdir']        = File.join(CONFIG['sitedir'], VERSION)
-  CONFIG['sitearchdir']       = File.join(CONFIG['sitelibdir'], ARCH)
-
-  CONFIG['DESTDIR']           = DESTDIR
-
-  # CONFIG['sbindir']         = File.join(MAGLEV_HOME, 'sbin')
-  # CONFIG['libexecdir']      = File.join(MAGLEV_HOME, 'libexec')
-  CONFIG['datadir']           = File.join(MAGLEV_HOME, 'share')
-  CONFIG['datarootdir']       = File.join(MAGLEV_HOME, 'share')
-  CONFIG['docdir']            = File.join(CONFIG['datarootdir'], 'doc')
-  CONFIG['infodir']           = File.join(CONFIG['datarootdir'], 'info')
-  CONFIG['htmldir']           = CONFIG['docdir']
-
-  CONFIG['vendordir']         = File.join(CONFIG['libdir'], 'vendor_ruby')
-  CONFIG['vendorlibdir']      = File.join(CONFIG['vendordir'], VERSION)
-  CONFIG['vendorarchdir']     = File.join(CONFIG['vendorlibdir'], ARCH)
-
-  # TODO SHELL
-  # TODO PATH_SEPARATOR
-  CONFIG['arch']              = ARCH
-  CONFIG['ruby_version']      = '1.8'
-  cpu_os = Exception.__cpu_os_kind
-  CONFIG['host_os']           = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
-                                    darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
-  CONFIG['target_os']       = CONFIG['host_os']
-  CONFIG["LN_S"]            = "ln -s"
-  CONFIG["SET_MAKE"]        = ""
-  CONFIG["INSTALL"]         = "install -vp"
-  CONFIG["INSTALL_PROGRAM"] = "$(INSTALL)"
-  CONFIG["INSTALL_SCRIPT"]  = "$(INSTALL)"
-  CONFIG["INSTALL_DATA"]    = "$(INSTALL) -m 644"
-  CONFIG["RM"]              = "rm -f"
-  CONFIG["CP"]              = "cp"
-  CONFIG["MAKEDIRS"]        = "mkdir -p"
-
-  CONFIG['EXEEXT']            = ''
-  CONFIG['LIBEXT']            = 'a'
-  CONFIG['OBJEXT']            = 'o'
-  CONFIG['ruby_install_name'] = 'maglev-ruby'  # The name of the interpreter executable
-  CONFIG['RUBY_INSTALL_NAME'] = CONFIG['ruby_install_name']
-  CONFIG['RUBY_SO_NAME']      = CONFIG['ruby_install_name']
-  CONFIG['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?
-
-  # First set plausible defaults, then override on specific architectures
-  # in the case statement immediately below
-  CONFIG['ARCH_FLAG']      = ' -m64 '
-  CONFIG['CC']             = ENV["CC"] || 'cc '
-  CONFIG['CFLAGS']         = ' -fPIC -g '
-  CONFIG['COMMON_HEADERS'] = 'ruby.h'
-  CONFIG['CPP']            = ENV["CPP"] || 'cc -E '
-  CONFIG['CPPFLAGS']       = ' $(cppflags) '
-  CONFIG['CXX']            = ENV["CXX"] || 'c++'
-  CONFIG['DLEXT']          = 'so'
-  CONFIG['LDFLAGS']        = "-L#{CONFIG['gemlibdir']}"
-  CONFIG['LDSHARED']       = CONFIG["CC"] + ' -shared '
-  CONFIG['OUTFLAG']        = ' -o '
-  CONFIG['configure_args'] = ''
-
-  case Config::CONFIG['host_os']
-  when /darwin/
-    CONFIG['CFLAGS']     = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
-    CONFIG['CPPFLAGS']   = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
-    CONFIG['CXXFLAGS']   = CONFIG['CFLAGS'] + ' $(cxxflags) '
-    CONFIG['LDSHARED']   = CONFIG["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
-    CONFIG['LDSHAREDXX'] = CONFIG['LDSHARED']
-    CONFIG['DLDFLAGS']   = " -bundle "
-    CONFIG['ARCH_FLAG']  = ' -arch x86_64 '
-    CONFIG['LIBS']       = "-lgcilnk"
-    CONFIG['CC']         = ENV["CC"] || 'gcc '
-
-  when /x86_64_solaris/
-    CONFIG['CC']         = ENV["CC"] || "/opt/sunstudio12.1/bin/cc"
-    CONFIG['LIBS']       = "-lrt -ldl -lm -lc"
-    CONFIG['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
-    CONFIG['CFLAGS']     = " -fPIC -g "     # -m64 should be picked up by ARCH_FLAG ?
-
-  when /HP-UX/
-    CONFIG['DLEXT']      = 'sl'
-
-  end
-  MAKEFILE_CONFIG = {}
-  CONFIG.each{|k,v| MAKEFILE_CONFIG[k] = v.dup}
-
-  def Config::expand(val, config = Config::CONFIG)
-    (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
-      if !(v = $1 || $2)
-        '$'
-      elsif key = config[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
-        pat, sub = $1, $2
-        config[v] = false
-        Config::expand(key, config)
-        config[v] = key
-        key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
-        key
-      else
-        " "
+  def Config::__expand(val, cfg_arg)
+      (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
+	if !(v = $1 || $2)
+	  '$'
+	elsif key = cfg_arg[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
+	  pat, sub = $1, $2
+	  cfg_arg[v] = false
+	  Config::__expand(key, cfg_arg)
+	  cfg_arg[v] = key
+	  key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
+	  key
+	else
+	  " "
+	end
       end
-    end
-    val
-  end
-  CONFIG.each_value do |val|
-    Config::expand(val)
+      val
   end
 
+  transient_const_set( :CONFIG ) {
+    env = ENV
+    maglev_home = env['MAGLEV_HOME'] 
+    config = {}
+    config['prefix']            = maglev_home
+    config['exec_prefix']       = maglev_home
+    config['bindir']            = File.join(maglev_home, 'bin')
+    config['sysconfdir']        = File.join(maglev_home, 'etc')
+    config['includedir']        = File.join(maglev_home, 'lib/ruby/1.8/include')
+    config['libdir']            = File.join(maglev_home, 'lib')
+    config['gemlibdir']         = File.join(maglev_home, 'gemstone', 'lib')
+    version = VERSION
+    arch = ARCH
+
+    config['rubylibdir']        = File.join(config['libdir'], 'ruby', version)
+    config['archdir']           = File.join(config['rubylibdir'], arch)
+    config['topdir']            = config['archdir']
+
+    config['sitedir']           = File.join(config['libdir'], 'ruby', 'site_ruby')
+    config['sitelibdir']        = File.join(config['sitedir'], version)
+    config['sitearchdir']       = File.join(config['sitelibdir'], arch)
+
+    config['DESTDIR']           = DESTDIR
+
+    # config['sbindir']         = File.join(maglev_home, 'sbin')
+    # config['libexecdir']      = File.join(maglev_home, 'libexec')
+    config['datadir']           = File.join(maglev_home, 'share')
+    config['datarootdir']       = File.join(maglev_home, 'share')
+    config['docdir']            = File.join(config['datarootdir'], 'doc')
+    config['infodir']           = File.join(config['datarootdir'], 'info')
+    config['htmldir']           = config['docdir']
+
+    config['vendordir']         = File.join(config['libdir'], 'vendor_ruby')
+    config['vendorlibdir']      = File.join(config['vendordir'], version)
+    config['vendorarchdir']     = File.join(config['vendorlibdir'], arch)
+
+    # TODO SHELL
+    # TODO PATH_SEPARATOR
+    config['arch']              = arch
+    config['ruby_version']      = '1.8'
+    cpu_os = Exception.__cpu_os_kind
+    host_os = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
+				      darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
+    config['host_os'] = host_os 
+    config['target_os']       = config['host_os']
+    config["LN_S"]            = "ln -s"
+    config["SET_MAKE"]        = ""
+    config["INSTALL"]         = "install -vp"
+    config["INSTALL_PROGRAM"] = "$(INSTALL)"
+    config["INSTALL_SCRIPT"]  = "$(INSTALL)"
+    config["INSTALL_DATA"]    = "$(INSTALL) -m 644"
+    config["RM"]              = "rm -f"
+    config["CP"]              = "cp"
+    config["MAKEDIRS"]        = "mkdir -p"
+
+    config['EXEEXT']            = ''
+    config['LIBEXT']            = 'a'
+    config['OBJEXT']            = 'o'
+    config['ruby_install_name'] = 'maglev-ruby'  # The name of the interpreter executable
+    config['RUBY_INSTALL_NAME'] = config['ruby_install_name']
+    config['RUBY_SO_NAME']      = config['ruby_install_name']
+    config['BASERUBY']          = 'ruby'  # MRI ruby used to build maglev-ruby?
+
+    # First set plausible defaults, then override on specific architectures
+    # in the case statement immediately below
+    config['ARCH_FLAG']      = ' -m64 '
+    config['CC']             = env["CC"] || 'cc '
+    config['CFLAGS']         = ' -fPIC -g '
+    config['COMMON_HEADERS'] = 'ruby.h'
+    config['CPP']            = env["CPP"] || 'cc -E '
+    config['CPPFLAGS']       = ' $(cppflags) '
+    config['CXX']            = env["CXX"] || 'c++'
+    config['DLEXT']          = 'so'
+    config['LDFLAGS']        = "-L#{config['gemlibdir']}"
+    config['LDSHARED']       = config["CC"] + ' -shared '
+    config['OUTFLAG']        = ' -o '
+    config['configure_args'] = ''
+
+    case host_os
+#   when /linux/        # linux is using defaults above
+
+    when /darwin/
+      config['CFLAGS']     = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
+      config['CPPFLAGS']   = ' -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags) '
+      config['CXXFLAGS']   = config['CFLAGS'] + ' $(cxxflags) '
+      config['LDSHARED']   = config["CC"] + ' -dynamic -bundle -undefined dynamic_lookup '
+      config['LDSHAREDXX'] = config['LDSHARED']
+      config['DLDFLAGS']   = " -bundle "
+      config['ARCH_FLAG']  = ' -arch x86_64 '
+      config['CC']         = env["CC"] || 'gcc '
+
+    when /x86_64_solaris/
+      config['CC']         = env["CC"] || "/opt/sunstudio12.1/bin/cc"
+      config['LIBS']       = "-lrt -ldl -lm -lc"
+      config['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
+      config['CFLAGS']     = " -fPIC -g "     # -m64 should be picked up by ARCH_FLAG ?
+
+#   when /HP-UX/		# not supported on Maglev yet
+#     config['DLEXT']      = 'sl'
+
+    end
+    config.each_value do |val|
+      Config::__expand(val, config)
+    end
+    config
+  }
+
+  transient_const_set( :MAKEFILE_CONFIG ) { 
+    makefile_config = {}
+    CONFIG.each{|k,v| makefile_config[k] = v.dup}
+    makefile_config  
+  }
+
+  def Config::expand(val, cfg_arg = Config::CONFIG)
+    Config::__expand(val, cfg_arg)
+  end
 end
 RbConfig = Config
-CROSS_COMPILING = nil unless defined? CROSS_COMPILING
+CROSS_COMPILING = nil unless defined? CROSS_COMPILING  # transiently defined
 
-end  # End Maglev.transient
-
-$LOADED_FEATURES.shift  # take this file off of $LOADED_FEATURES so that reloads will work.

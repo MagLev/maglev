@@ -121,6 +121,8 @@ module Maglev
   # Calls to +transient+ may be nested inside other calls to +transient+
   # and calls to +persistent+.
   #
+  #  Returns the value of executing teh block.
+  #
   def transient(&block)
     #--
     # Newly defined modules/classes will be marked as transient
@@ -134,12 +136,14 @@ module Maglev
     #++
     rctx = RubyContext
     save_pm = rctx.persistence_mode
+    res = nil
     begin
       rctx.persistence_mode=(false)
-      yield
+      res = yield
     ensure
       rctx.persistence_mode=(save_pm)
     end
+    res
   end
 
   # Executes the block with the current thread in persistent mode, which
@@ -239,6 +243,8 @@ module Maglev
   # Calls to +persistent+ may be nested inside calls to +transient+ and
   # other calls to +persistent+.
   #
+  # Returns the value from executing block.
+  #
   def persistent(persistable_instances=true, &block)
     # Newly defined modules/classes will be marked as persistable,
     #   and their names stored in persistable parent's persistent name space,
@@ -257,14 +263,16 @@ module Maglev
     rctx = RubyContext
     save_pm = rctx.persistence_mode
     save_pinst = rctx.persistable_instances
+    res = nil
     begin
       rctx.persistence_mode=(true)
       rctx.persistable_instances=(persistable_instances)
-      yield
+      res = yield
     ensure
       rctx.persistence_mode=(save_pm)
       rctx.persistable_instances=(save_pinst)
     end
+    res
   end
 
   # Returns true if the current thread is in persistent mode.
