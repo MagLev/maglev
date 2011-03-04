@@ -77,5 +77,34 @@ class Module
     ns
   end
 
+  primitive_nobridge '__transient_const_set', 'rubyTransientConst:put:block:'
+
+  # Define a transient constant for which block will be evaluated
+  # the first time the constant is referenced in the life of a VM .
+  # The value of the constant will be the value returned by the block.
+  # Do not use Maglev.persistent  within the block.
+  def transient_const_set(name, &block)
+    if name._isSymbol
+      sym = name
+      str = name.to_s
+    else
+      str = Type.coerce_to(name, String, :to_str)
+      sym = nil
+    end
+    unless str =~ /^[A-Z](\w)*\z/
+      raise NameError, 'arg to transient_const_set? is not a valid name for a constant'
+    end
+    if sym._equal?(nil)
+      sym = str.to_sym
+    end
+    val = Maglev.transient(&block)
+    self.__transient_const_set(sym, val, block)
+    val
+  end
+
+  def __transient_const_evaluate(&block)
+    # called from Smalltalk only
+    Maglev.transient(&block)
+  end
 
 end
