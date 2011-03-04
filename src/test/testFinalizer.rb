@@ -14,14 +14,16 @@ class C
     a[1] = nil
     a[2] = nil
     s = 'abc'
-    (1.. 3000000).each { |n|  
+    (1.. 4000000).each { |n|  
       s << '00000000000000000000000000000dddddddddddddddddddddddddddddddddddddd' 
       if s.size > 100000
         s = 'abc'
       end
     }
-    unless (ww = $w) == 1100 ; raise 'error'; end
-    unless (xx = $x) == 200 ; raise 'error'; end
+    ww = $w
+    xx = $x
+    unless ww == 1100 ; raise 'error'; end
+    unless xx == 200 ; raise 'error'; end
   end
 end
 C.test
