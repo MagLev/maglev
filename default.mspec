@@ -47,7 +47,6 @@ class MSpecScript
                "^spec/rubyspec/library/prime",
                "^spec/rubyspec/library/socket/basicsocket/send_spec.rb",
                "^spec/rubyspec/library/socket/tcpsocket/open_spec.rb",
-               "^spec/rubyspec/library/socket/socket/bind_spec.rb",
                "^spec/rubyspec/library/scanf",
                "^spec/rubyspec/library/syslog",
                "^spec/rubyspec/library/zlib/inflate/append_spec.rb",
