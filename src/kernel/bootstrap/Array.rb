@@ -325,6 +325,14 @@ class Array
     self
   end
 
+  primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
+
+  def dup
+    res = self.__basic_dup
+    res.initialize_copy(self)
+    res
+  end
+
   # double quoted string literals support
 
   def __joinStrings
@@ -700,6 +708,10 @@ class Array
   end
 
   primitive_nobridge '__copy_from_to', 'copyFrom:to:'
+
+  primitive   '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs' 
+    # uses non-singleton class and copies fixed and dynamic instVars
+    # but not the varying instVars accessed by []
 
   # Return copy of self with all nil elements removed
   def compact

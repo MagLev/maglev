@@ -17,6 +17,18 @@ class Hash
     ary 
   end
 
+  def __to_array
+    # Used by rubcext.c
+    ary = Array.new(@_st_numElements * 2)
+    n = 0
+    self.each_pair { | k, v |
+      ary[n] =  k 
+      ary[n + 1] =  v 
+      n += 2
+    }
+    ary 
+  end
+
   def sort(&block)
     self.to_a.sort(&block)
   end

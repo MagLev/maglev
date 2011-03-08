@@ -8,10 +8,13 @@ class Hash
         #  @defaultOrParent = nil , @defaultIsBlock = false
         # varying instVars initialized to RemoteNil
 
+  primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
+
   def self.allocate
     # for spec compatibility, not used by this implementation
     self.__allocate(7)
   end
+
 
   def self.new(*args)
     # this variant gets bridge methods

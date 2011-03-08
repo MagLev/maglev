@@ -143,13 +143,8 @@ class Object
     self.call(*args)
   end
 
-  primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
+  # primitive   '__basic_dup', '_rubyBasicDup'  # use non-singleton class
   primitive   '__basic_clone', '_basicCopy' # use singleton class
-
-  primitive   '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs' # uses non-singleton class
-    # and does not copy varying instVars.
-    # For an Array, copies fixed and dynamic instVars
-    # but not the varying instVars accesses by []
 
   def clone
     res = self.__basic_clone
@@ -160,8 +155,12 @@ class Object
     res
   end
 
+  primitive_nobridge '__basic_initialize_copy', '_rubyInitializeFrom:'
+
   def dup
-    res = self.__basic_dup
+    # must call allocate for C extensions to work, can't use __basic_dup
+    res = self.class.allocate  # use non-singleton class
+    res.__basic_initialize_copy(self)
     res.initialize_copy(self)
     res
   end

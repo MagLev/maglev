@@ -1,6 +1,8 @@
-class String
-  primitive 'hash' , 'hash'  # So class Hash will operate
+# File String2.rb , after String.rb, so String.dup works
+# define MAGLEV_EXTRACT_BASE_TABLE so it can be resolved
+#  at compile time in String3.rb
 
+class String
    MAGLEV_EXTRACT_BASE_TABLE = {"0b" => 2, "0d" => 10, "0o" => 8, "0x" => 16, "0" => 8 ,
                                 "0B" => 2, "0D" => 10, "0O" => 8, "0X" => 16
                                }
