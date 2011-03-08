@@ -4,6 +4,13 @@
 
 == Unreleased Changes
 
+== Changes for 25393 2011-03-08
+* Implement rb_hash_foreach for C extensions.
+* Fix  Object#dup to call allocate , required for C extensions.
+* Fix Trac 871
+* Updated script to load Seaside
+* A few bugfixes to underlying GemStone 3.0 system
+
 == Changes for 25375 2011-03-04
 * Update to Bundler 1.0.10
 * Update to RubyGems 1.6.0

@@ -648,7 +648,7 @@ RUBY_DLLSPEC VALUE rb_hash_new(void);
 RUBY_DLLSPEC VALUE rb_hash_aref(VALUE hash, VALUE key);
 
 #if !defined(HAVE_RB_HASH_ASET)
-#  define HAVE_RB_HASH_ASET 1
+#define HAVE_RB_HASH_ASET 1
 #endif
 RUBY_DLLSPEC VALUE rb_hash_aset(VALUE hash, VALUE key, VALUE val);
 
@@ -661,10 +661,11 @@ static inline long RHASH_LEN(VALUE h) { return FIX2INT(rb_hash_size(h)); }
 // define RHASH ({ Maglev does not support RHASH })
 // define RHASH_TBL ({ Maglev does not support RHASH_TBL })
 
-// ifndef HAVE_RB_HASH_FOREACH
-//  define HAVE_RB_HASH_FOREACH 1
-// endif
-// RUBY_DLLSPEC void rb_hash_foreach(VALUE hash, int (*func)(ANYARGS), VALUE arg);
+#ifndef HAVE_RB_HASH_FOREACH
+#define HAVE_RB_HASH_FOREACH 1
+#endif
+RUBY_DLLSPEC void rb_hash_foreach(VALUE hash, 
+			int (*func)(VALUE key, VALUE val, VALUE arg), VALUE arg);
 
 RUBY_DLLSPEC VALUE rb_hash_lookup(VALUE hash, VALUE key);
 
