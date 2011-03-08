@@ -6,6 +6,7 @@
 
 * implement rb_hash_foreach for C extensions.
 * Fix  Object#dup to call allocate , required for C extensions.
+* Add an include/st.h which just defines the  enum st_retval .
 
 == Changes for 25375 2011-03-04
 * Update to Bundler 1.0.10
