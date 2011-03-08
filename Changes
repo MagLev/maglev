@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* implement rb_hash_foreach for C extensions.
+* Fix  Object#dup to call allocate , required for C extensions.
+
 == Changes for 25375 2011-03-04
 * Update to Bundler 1.0.10
 * Update to RubyGems 1.6.0
