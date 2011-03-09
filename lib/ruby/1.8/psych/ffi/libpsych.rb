@@ -8,7 +8,7 @@ module Psych
 
   class LibPsych
     extend FFI::Library
-    ffi_lib "#{ENV['GEMSTONE']}/lib/libpsych"
+    ffi_lib '$GEMSTONE/lib/libpsych'  # $GEMSTONE expansion at runtime in VM prims
 
     ##################################################
     # Parser support
