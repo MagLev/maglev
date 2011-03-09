@@ -655,8 +655,9 @@ RUBY_DLLSPEC VALUE rb_hash_aset(VALUE hash, VALUE key, VALUE val);
 RUBY_DLLSPEC VALUE rb_hash_delete(VALUE hash, VALUE key);
 RUBY_DLLSPEC VALUE rb_hash_size(VALUE hash);
 
-static inline long RHASH_SIZE(VALUE h) { return FIX2INT(rb_hash_size(h)); }
-static inline long RHASH_LEN(VALUE h) { return FIX2INT(rb_hash_size(h)); }
+
+#define RHASH_SIZE(h) FIX2INT(rb_hash_size(h))
+#define RHASH_LEN(h) FIX2INT(rb_hash_size(h))
 
 // define RHASH ({ Maglev does not support RHASH })
 // define RHASH_TBL ({ Maglev does not support RHASH_TBL })
