@@ -35,6 +35,19 @@ module FFI
     def self.__clibraries
       self.__libraries[1]
     end
+
+    # Register the zero argument block to be called each time the
+    # shared library represented by the receiver is loaded into a VM  .
+    # The block is also run when initialize_on_load is called, 
+    # if there was no previous block registered with the receiver. 
+    # For an example, see lib/ruby/site_ruby/1.8/maglev/opensslffi/libcrypto.rb .
+    def initialize_on_load(&block) 
+      old = @_st_onLoadBlock
+      @_st_onLoadBlock = block 
+      if old._equal?(nil) && block_given?
+        block.call
+      end 
+    end
   end
 
   class CCallout
@@ -454,6 +467,7 @@ module FFI
     #
     # The final argument, +ret+, is the type of the return value from the C
     # function.
+    # Returns a method or raises an error.
     def attach_function(name, a3, a4, a5=MaglevUndefined)
       name = ::Type.coerce_to(name, String, :to_s)
       if a5._not_equal?(MaglevUndefined)
