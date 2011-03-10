@@ -4,7 +4,7 @@ desc "Run a simple web app to view code and statistics."
 task :webtools do
   # Load the Smalltalk example code into the MagLev repository, and commit it.
   MH = ENV['MAGLEV_HOME']
-  file = "#{MH}/gemstone/examples/www/WebTools.gs"
+  file = "#{MH}/gemstone/examples/www/install.tpz"
   raise "Can't find #{file}" unless File.exists? file
   cd(MH) { sh "rake maglev:input_file[#{file}]" }
   sh "maglev-ruby -d web_tools.rb"
