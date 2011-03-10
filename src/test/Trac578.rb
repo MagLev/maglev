@@ -41,18 +41,16 @@ def correct(word)
     [word]).max {|a,b| $nwords[a] <=> $nwords[b] }
 end
 
-5.times do
-  # $nwords is used to avoid constant reassignment warnings
-  path = ENV[ :MAGLEV_HOME ] + '/src/test/Trac578data.txt'
-  $nwords = train(words(File.new(path).read))
-  expected = "breathing"
-  actual = correct("braething")
+# $nwords is used to avoid constant reassignment warnings
+path = ENV["MAGLEV_HOME"] + '/src/test/Trac578data.txt'
+$nwords = train(words(File.new(path).read))
+expected = "breathing"
+actual = correct("braething")
 #  expected = "spelling"
 #  actual = correct("speling")
-  if actual == expected
-    puts "Spelling successfully corrected."
-  else
-    # raise is used so that the error appears in the reports
-    raise "Failed to correct spelling: expected '#{expected}' but was '#{actual}'"
-  end
+if actual == expected
+  puts "Spelling successfully corrected."
+else
+  # raise is used so that the error appears in the reports
+  raise "Failed to correct spelling: expected '#{expected}' but was '#{actual}'"
 end
