@@ -288,7 +288,7 @@ RUBY_DLLSPEC void rb_free(void*);
 //  RTEST defined above
 
 // RARRAY_PTR, RARRAY not supported
-// RFLOAT, RFLOAT_VALUE not supported
+// RFLOAT not supported
 
 // DATA_PTR, RDATA not supported
 
@@ -623,7 +623,7 @@ RUBY_DLLSPEC VALUE rb_ary_new4(long n, const VALUE *values);
 RUBY_DLLSPEC VALUE rb_assoc_new(VALUE a, VALUE b);
 RUBY_DLLSPEC long rb_ary_size(VALUE self);
 
-static inline long RARRAY_LEN(VALUE ary) { return rb_ary_size(ary); }
+#define RARRAY_LEN(ary) rb_ary_size(ary)
 
 RUBY_DLLSPEC VALUE rb_ary_push(VALUE array, VALUE val);
 RUBY_DLLSPEC VALUE rb_ary_pop(VALUE array);
@@ -648,7 +648,7 @@ RUBY_DLLSPEC VALUE rb_hash_new(void);
 RUBY_DLLSPEC VALUE rb_hash_aref(VALUE hash, VALUE key);
 
 #if !defined(HAVE_RB_HASH_ASET)
-#  define HAVE_RB_HASH_ASET 1
+#define HAVE_RB_HASH_ASET 1
 #endif
 RUBY_DLLSPEC VALUE rb_hash_aset(VALUE hash, VALUE key, VALUE val);
 
@@ -661,10 +661,11 @@ static inline long RHASH_LEN(VALUE h) { return FIX2INT(rb_hash_size(h)); }
 // define RHASH ({ Maglev does not support RHASH })
 // define RHASH_TBL ({ Maglev does not support RHASH_TBL })
 
-// ifndef HAVE_RB_HASH_FOREACH
-//  define HAVE_RB_HASH_FOREACH 1
-// endif
-// RUBY_DLLSPEC void rb_hash_foreach(VALUE hash, int (*func)(ANYARGS), VALUE arg);
+#ifndef HAVE_RB_HASH_FOREACH
+#define HAVE_RB_HASH_FOREACH 1
+#endif
+RUBY_DLLSPEC void rb_hash_foreach(VALUE hash, 
+			int (*func)(VALUE key, VALUE val, VALUE arg), VALUE arg);
 
 RUBY_DLLSPEC VALUE rb_hash_lookup(VALUE hash, VALUE key);
 
@@ -678,7 +679,7 @@ RUBY_DLLSPEC const char* rb_str2cstr(VALUE str, long *len);
    // C memory is auto-freed by GC
 
 /** The pointer to the string str's data. */
-static inline const char* RSTRING_PTR(VALUE str) { return rb_str2cstr(str, NULL); }
+#define RSTRING_PTR(str) rb_str2cstr(str, NULL)
 static inline const char* rb_str_ptr(VALUE str) { return rb_str2cstr(str, NULL); }
 static inline const char* rb_str_ptr_readonly(VALUE str) { return rb_str2cstr(str, NULL); }
 
@@ -777,7 +778,7 @@ RUBY_DLLSPEC VALUE rb_str_intern(VALUE str);
 /** The length of string str. */
 RUBY_DLLSPEC long rb_str_len(VALUE str);
 
-static inline long RSTRING_LEN(VALUE str) { return rb_str_len(str); }
+#define RSTRING_LEN(str) rb_str_len(str)
 
 // /** Deprecated alias for rb_obj_freeze */
 // RUBY_DLLSPEC VALUE rb_str_freeze(VALUE str);
@@ -915,7 +916,7 @@ RUBY_DLLSPEC double rb_float_value(VALUE v);
 
 // RFLOAT not supported
 
-static inline double RFLOAT_VALUE(VALUE v) { return rb_float_value(v); }
+#define RFLOAT_VALUE(v) rb_float_value(v)
 
 /** if v is a Float return v, else return v.to_f  */
 RUBY_DLLSPEC VALUE rb_Float(VALUE v);
