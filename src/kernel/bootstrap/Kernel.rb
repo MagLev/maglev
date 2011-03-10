@@ -595,7 +595,7 @@ module Kernel
   end
 
   def printf(*args)
-    if args.length == 0
+    if args.length._equal?(0)
       return nil
     end
     if (args[0]._kind_of?(IO))
