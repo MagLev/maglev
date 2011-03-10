@@ -494,6 +494,8 @@ class Module
 
   primitive 'to_s' , '_rubyInspect'
 
+  # def transient_const_set(name, &block) in delta/Module.rb
+
   # comparision methods
 
   def <(other)

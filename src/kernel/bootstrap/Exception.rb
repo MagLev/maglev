@@ -23,6 +23,12 @@ class Exception
 
     primitive_nobridge '__basic_dup', '_basicCopy'
 
+    def dup
+      res = self.__basic_dup
+      res.initialize_copy(self)
+      res
+    end
+
     def __message
       m = @_st_gsDetails
       if m._equal?(nil)

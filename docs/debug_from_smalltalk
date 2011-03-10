@@ -14,15 +14,6 @@ This example demonstrates a couple of things:
 This scenario shows how to debug a ruby program (RubyGems) from the Topaz
 prompt.
 
-==== Install RubyGems
-To get <tt>bin/maglev-gem</tt> installed, do the following:
-
-  $ cd $MAGLEV_HOME/src/external/rubygems-1.3.1
-  $ maglev-ruby setup.rb --no-rdoc --no-ri
-
-This installs RubyGems into <tt>$MAGLEV_HOME/lib/...</tt> and puts
-<tt>maglev-gem</tt> into <tt>$MAGLEV_HOME/bin</tt>.
-
 ====  Start Topaz:
 
   $ cd $MAGLEV_HOME
@@ -54,7 +45,7 @@ Before invoking the ruby program, we want to setup some debug help.  Create
       RubyGems throws a couple of exceptions during normal processing,
       mostly to discover that various libraries do not exist, or to force
       the loading of a library.  The following Smalltalk array holds the
-      error messages from these boring exceptionns, so we can filter them
+      error messages from these boring exceptions, so we can filter them
       in the exception handler.
       ------------------------------------------------------------------ "
 
@@ -138,8 +129,8 @@ In this case, the problem is obvious: we haven't implemented
 
 === Using Squeak to Debug
 
-Download and install the GemTools squeak image from the website.
-Fire up GemTools, and login to the GemStone VM.
+Download and install http://seaside.gemstone.com/squeak/GemTools-MagLev-Pharo-1.0.zip
+Fire up GemTools, and login to the MagLev VM.
 From the GemStone transcript window, issue the following commands:
 
   RubyDirectory _chdir: (RubyEnv _getenv:'MAGLEV_HOME') .

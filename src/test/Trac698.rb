@@ -1,4 +1,6 @@
-# MagLev does not make initialize private.
+# Maglev makes initialize private, but sends of initialize within
+# an implementation of   new   override the protection.  Otherwise
+# it would be impossible to implement   new   in Ruby .
 class C
   def self.new(*args, &block)
     instance = allocate

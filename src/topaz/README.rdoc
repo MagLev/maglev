@@ -14,6 +14,7 @@ and this will fire up Seaside on localhost:8383
   rake maglev:input_file[src/topaz/Seaside30/runSeaside-Swazoo.topaz]
 
 You can trace the execution of these scripts and watch for errors using
+  touch $MAGLEV_HOME/log/maglev/topaz.log
   tail -f $MAGLEV_HOME/log/maglev/topaz.log
 
 == Prerequisites

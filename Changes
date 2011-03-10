@@ -4,6 +4,28 @@
 
 == Unreleased Changes
 
+* Add an include/st.h which just defines the  enum st_retval .
+* Implement initialize_on_load for FFI libraries, to fix Trac 800.
+* Fix Trac 874 in Regexp primitives.
+
+== Changes for 25393 2011-03-08
+* Implement rb_hash_foreach for C extensions.
+* Fix  Object#dup to call allocate , required for C extensions.
+* Fix Trac 871
+* Updated script to load Seaside
+* A few bugfixes to underlying GemStone 3.0 system
+
+== Changes for 25375 2011-03-04
+* Update to Bundler 1.0.10
+* Update to RubyGems 1.6.0
+* Change a few inline functions in ruby.h to MRI compatible macros.
+* Changes to make RDiscount work, make IO Enumerable
+* Fix Trac 861 & 869
+* Update docs/ruby_and_smalltalk
+* Fix compile flags in rbconfig for MacOSX
+* A couple of bugfixes to underlying GemStone 3.0 system
+* Quite a few changes to .gs files in the GemStone 3.0 image directory
+
 == Changes for 25343 2011-02-26
 * Fix Trac 866, IO.popen
 * Fix Trac 829 in the implementation of eval

@@ -8,7 +8,7 @@ module OpenSSL
   class LibCrypto
     extend FFI::Library
 
-    ffi_lib "#{ENV['GEMSTONE']}/lib/libcrypto"
+    ffi_lib '$GEMSTONE/lib/libcrypto'  # $GEMSTONE expansion at runtime in VM prims
 
     # Creates and initializes a new <tt>EVP_MD_CTX</tt> struct for
     # <tt>digest_name</tt>, which should be one of the recognized digest
@@ -196,14 +196,6 @@ module OpenSSL
         raise "Method called after cleanup on #{self.class.name}" unless @valid
       end
     end
-
-    #--
-    # void OpenSSL_add_all_digests(void)
-    #++
-    #
-    # Loads all of the digests known to the libopenssl and makes them
-    # available.  Must be called before EVP_get_digestbyname etc.
-    attach_function(:OpenSSL_add_all_digests, [], :void)
 
     #--
     # int EVP_MD_CTX_copy_ex(EVP_MD_CTX *out,const EVP_MD_CTX *in);
@@ -442,12 +434,20 @@ module OpenSSL
     # initialization calls:
     # + OpenSSL_add_all_digests    # Make SHA1 etc. available
     def self.initialize_library
-      unless @initialized
-        @initialized = true
-        self.OpenSSL_add_all_digests
-      end
+      self.OpenSSL_add_all_digests
     end
+
+    #--
+    # void OpenSSL_add_all_digests(void)
+    #++
+    #
+    # Loads all of the digests known to the libopenssl and makes them
+    # available.  Must be called before EVP_get_digestbyname etc.
+    attach_function(:OpenSSL_add_all_digests, [], :void).ffi_library.initialize_on_load {
+      # this block will execute each time the library is loaded even if
+      # this file is persistently loaded only once .
+      LibCrypto.initialize_library
+    }   
   end
 
-  LibCrypto.initialize_library
 end

@@ -25,8 +25,8 @@ Gofer new
 " These may break if others update Metacello projects without testing on MagLev"
 
 MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
-        ((Smalltalk at: #ConfigurationOfGLASS) project version: '1.0-beta.8.6') load.
-        ((Smalltalk at: #ConfigurationOfSeaside30) project version: '3.0.3.1') load.
+        ((Smalltalk at: #ConfigurationOfGLASS) project version: #'stable') load.
+        ((Smalltalk at: #ConfigurationOfSeaside30) project version: #'stable') load.
         (Smalltalk at: #ConfigurationOfMagritte2) project latestVersion load.
         (Smalltalk at: #ConfigurationOfPier2) project latestVersion load.
         (Smalltalk at: #ConfigurationOfPierAddOns2) project latestVersion load: 'Pier-Setup'.

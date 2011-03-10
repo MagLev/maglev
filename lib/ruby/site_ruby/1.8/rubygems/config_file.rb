@@ -47,23 +47,29 @@ class Gem::ConfigFile
 
   system_config_path =
     begin
-      require 'Win32API'
+      require "etc"
+      Etc.sysconfdir
+    rescue LoadError, NoMethodError
+      begin
+        # TODO: remove after we drop 1.8.7 and 1.9.1
+        require 'Win32API'
 
-      CSIDL_COMMON_APPDATA = 0x0023
-      path = 0.chr * 260
-      if RUBY_VERSION > '1.9' then
-        SHGetFolderPath = Win32API.new 'shell32', 'SHGetFolderPath', 'PLPLP',
-                                       'L', :stdcall
-        SHGetFolderPath.call nil, CSIDL_COMMON_APPDATA, nil, 1, path
-      else
-        SHGetFolderPath = Win32API.new 'shell32', 'SHGetFolderPath', 'LLLLP',
-                                       'L'
-        SHGetFolderPath.call 0, CSIDL_COMMON_APPDATA, 0, 1, path
+        CSIDL_COMMON_APPDATA = 0x0023
+        path = 0.chr * 260
+        if RUBY_VERSION > '1.9' then
+          SHGetFolderPath = Win32API.new 'shell32', 'SHGetFolderPath', 'PLPLP',
+          'L', :stdcall
+          SHGetFolderPath.call nil, CSIDL_COMMON_APPDATA, nil, 1, path
+        else
+          SHGetFolderPath = Win32API.new 'shell32', 'SHGetFolderPath', 'LLLLP',
+          'L'
+          SHGetFolderPath.call 0, CSIDL_COMMON_APPDATA, 0, 1, path
+        end
+
+        path.strip
+      rescue LoadError
+        "/etc"
       end
-
-      path.strip
-    rescue LoadError
-      '/etc'
     end
 
   SYSTEM_WIDE_CONFIG_FILE = File.join system_config_path, 'gemrc'
@@ -116,6 +122,11 @@ class Gem::ConfigFile
   # API key for RubyGems.org
 
   attr_reader :rubygems_api_key
+
+  ##
+  # Hash of RubyGems.org and alternate API keys
+
+  attr_reader :api_keys
 
   ##
   # Create the config file object.  +args+ is the list of arguments
@@ -180,7 +191,7 @@ class Gem::ConfigFile
     @update_sources   = @hash[:update_sources]   if @hash.key? :update_sources
     @verbose          = @hash[:verbose]          if @hash.key? :verbose
 
-    load_rubygems_api_key
+    load_api_keys
 
     Gem.sources = @hash[:sources] if @hash.key? :sources
     handle_arguments arg_list
@@ -193,10 +204,12 @@ class Gem::ConfigFile
     File.join(Gem.user_home, '.gem', 'credentials')
   end
 
-  def load_rubygems_api_key
-    api_key_hash = File.exists?(credentials_path) ? load_file(credentials_path) : @hash
-
-    @rubygems_api_key = api_key_hash[:rubygems_api_key] if api_key_hash.key? :rubygems_api_key
+  def load_api_keys
+    @api_keys = File.exists?(credentials_path) ? load_file(credentials_path) : @hash
+    if @api_keys.key? :rubygems_api_key then
+      @rubygems_api_key = @api_keys[:rubygems_api_key]
+      @api_keys[:rubygems] = @api_keys.delete :rubygems_api_key unless @api_keys.key? :rubygems
+    end
   end
 
   def rubygems_api_key=(api_key)
@@ -205,7 +218,7 @@ class Gem::ConfigFile
     dirname = File.dirname(credentials_path)
     Dir.mkdir(dirname) unless File.exists?(dirname)
 
-    require 'yaml'
+    Gem.load_yaml
 
     File.open(credentials_path, 'w') do |f|
       f.write config.to_yaml
@@ -215,9 +228,10 @@ class Gem::ConfigFile
   end
 
   def load_file(filename)
+    Gem.load_yaml
+
     return {} unless filename and File.exists?(filename)
     begin
-      require 'yaml'
       YAML.load(File.read(filename))
     rescue ArgumentError
       warn "Failed to load #{config_file_name}"
@@ -312,7 +326,6 @@ class Gem::ConfigFile
 
   # Writes out this config file, replacing its source.
   def write
-    require 'yaml'
     open config_file_name, 'w' do |io|
       io.write to_yaml
     end

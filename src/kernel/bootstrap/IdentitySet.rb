@@ -86,7 +86,14 @@ class IdentitySet
 
   primitive_nobridge '__basic_dup', '_basicCopy'  # uses singleton class for now
   primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
-  # dup, clone inherited from Object
+
+  def dup
+    res = self.__basic_dup
+    res.initialize_copy(self)
+    res
+  end
+
+  # clone inherited from Object
 
   primitive_nobridge '__removeAll', 'removeAll:'
 

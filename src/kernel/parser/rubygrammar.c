@@ -5857,7 +5857,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
   OmScopeType aScope(omPtr);
   NODE **strH = aScope.add( om::NewString_(omPtr, str));
   NODE* symO = ObjExistingCanonicalSym(omPtr, strH);
-  if (! OOP_IS_RAM_OOP(symO)) {
+  if (symO == NULL) {
     printf( "non-existant symbol %s in initAstSelector\n", str);
     return FALSE;
   }

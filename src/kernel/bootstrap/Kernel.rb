@@ -921,13 +921,11 @@ module Kernel
   end
 
   def system(command, *args)
-    cmd = command
+    cmd = command.dup  # don't destory parameter
     n = 0
     sz = args.length
     while n < sz
-      if (n < sz - 1)
-        cmd << ' '
-      end
+      cmd << ' '
       cmd << args[n].to_s
       n = n + 1
     end
