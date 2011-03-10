@@ -16,22 +16,28 @@
 
 def shellwords(line)
 
+  arr = []
   until line.empty?
-
     loop do
+      # puts "before sub! line: #{line}"
       if line.sub!(/\A([^\s\\'"]+)/, '')
         flag = true
+	ax = $0
         snippet = $1
+        # puts "line: #{line} snippet: #{snippet}"
       else
+        # puts "before lstrip! #{line} d1: #{$1.inspect}"
         line.lstrip!
+        # puts "after lstrip! #{line}"
         break
       end
       puts "snippet: #{snippet}"
-      raise "FAIL" if snippet == "em"
+      arr << snippet
     end
-
   end
-
+  arr
 end
 
-shellwords("emacsclient -n")
+x = shellwords("emacsclient -n")
+raise 'fail' unless x == ["emacsclient","-n"]
+true

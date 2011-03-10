@@ -6,6 +6,7 @@
 
 * Add an include/st.h which just defines the  enum st_retval .
 * Implement initialize_on_load for FFI libraries, to fix Trac 800.
+* Fix Trac 874 in Regexp primitives.
 
 == Changes for 25393 2011-03-08
 * Implement rb_hash_foreach for C extensions.
