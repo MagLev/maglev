@@ -76,6 +76,8 @@ class MatchData
     self[ self.length - 1 ]
   end
 
+  # Returns the String that was the input to the successful match.
+  # The result is a frozen String .
   def string
     @_st_inputString
   end
