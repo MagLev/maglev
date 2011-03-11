@@ -5531,7 +5531,7 @@ static short yycheck(uint64 v) {
 /* yydebug defined in .y file now */
 static int  yynerrs = 0;
 
-/* # line 3221 "grammar.y" */ 
+/* # line 3222 "grammar.y" */ 
 
 
 #undef ISALPHA
@@ -11844,41 +11844,42 @@ break;
 case 456:
 /* # line 2895 "grammar.y" */ 
 	{
-		    yyvalO = RubyNthRefNode::s(yymarkPtr[0].obj/*a SmallInt*/, vps);
+                    NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
+		    yyvalO = RubyNthRefNode::s(yymarkPtr[0].obj/*a SmallInt*/, ofsO, vps);
                   }
 break;
 case 457:
-/* # line 2899 "grammar.y" */ 
+/* # line 2900 "grammar.y" */ 
 	{
 		    yyvalO = RubyBackRefNode::s(yymarkPtr[0].obj/*a Character*/, vps);
                   }
 break;
 case 458:
-/* # line 2905 "grammar.y" */ 
+/* # line 2906 "grammar.y" */ 
 	{
                       yTrace(vps, "superclass: Term");
 		      yyvalO = ram_OOP_NIL;
                     }
 break;
 case 459:
-/* # line 2910 "grammar.y" */ 
+/* # line 2911 "grammar.y" */ 
 	{
 		      vps->lex_state = EXPR_BEG;
                     }
 break;
 case 460:
-/* # line 2914 "grammar.y" */ 
+/* # line 2915 "grammar.y" */ 
 	{
                       yTrace(vps, "superclass: | tLT expr_value Term");
                       yyvalO = yymarkPtr[-1].obj; 
                     }
 break;
 case 461:
-/* # line 2918 "grammar.y" */ 
+/* # line 2919 "grammar.y" */ 
 	{ yyerrflag = 0; yyvalO = ram_OOP_NIL;}
 break;
 case 462:
-/* # line 2922 "grammar.y" */ 
+/* # line 2923 "grammar.y" */ 
 	{
                       yTrace(vps, "f_arglist: tLPAREN2 f_args opt_nl tRPAREN");
                       rParenLexPop(vps);
@@ -11888,14 +11889,14 @@ case 462:
                     }
 break;
 case 463:
-/* # line 2930 "grammar.y" */ 
+/* # line 2931 "grammar.y" */ 
 	{
                       yTrace(vps, "f_arglist: | f_args Term");
 		      yyvalO = yymarkPtr[-1].obj;
                     }
 break;
 case 464:
-/* # line 2937 "grammar.y" */ 
+/* # line 2938 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_f_block_arg");
 		      RubyArgsNode::add_optional_arg(yymarkPtr[-5].obj, yymarkPtr[-3].obj, vps);
@@ -11904,7 +11905,7 @@ case 464:
                     }
 break;
 case 465:
-/* # line 2944 "grammar.y" */ 
+/* # line 2945 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: | f_arg tCOMMA f_optarg  opt_f_block_arg");
                       RubyArgsNode::add_optional_arg(yymarkPtr[-3].obj, yymarkPtr[-1].obj, vps);
@@ -11912,7 +11913,7 @@ case 465:
                     }
 break;
 case 466:
-/* # line 2950 "grammar.y" */ 
+/* # line 2951 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: | f_arg tCOMMA  f_rest_arg opt_f_block_arg");
                       RubyArgsNode::add_star_arg(yymarkPtr[-3].obj, yymarkPtr[-1].obj, vps);
@@ -11920,14 +11921,14 @@ case 466:
                     }
 break;
 case 467:
-/* # line 2956 "grammar.y" */ 
+/* # line 2957 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: | f_arg  opt_f_block_arg");
                       yyvalO = RubyArgsNode::add_block_arg(yymarkPtr[-1].obj, yymarkPtr[0].obj, vps);
                     }
 break;
 case 468:
-/* # line 2961 "grammar.y" */ 
+/* # line 2962 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: | f_optarg tCOMMA f_rest_arg opt_f_block_arg");
                       OmScopeType aScope(vps->omPtr);
@@ -11938,7 +11939,7 @@ case 468:
                     }
 break;
 case 469:
-/* # line 2970 "grammar.y" */ 
+/* # line 2971 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: |  f_optarg  opt_f_block_arg");
                       OmScopeType aScope(vps->omPtr);
@@ -11948,7 +11949,7 @@ case 469:
                     }
 break;
 case 470:
-/* # line 2978 "grammar.y" */ 
+/* # line 2979 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: | f_rest_arg opt_f_block_arg");
                       OmScopeType aScope(vps->omPtr);
@@ -11958,7 +11959,7 @@ case 470:
                     }
 break;
 case 471:
-/* # line 2986 "grammar.y" */ 
+/* # line 2987 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: |  f_blck_arg");
                       OmScopeType aScope(vps->omPtr);
@@ -11967,38 +11968,38 @@ case 471:
                     }
 break;
 case 472:
-/* # line 2993 "grammar.y" */ 
+/* # line 2994 "grammar.y" */ 
 	{
                       yTrace(vps, "f_args: | <nothing>");
 		      yyvalO = RubyArgsNode::new_(vps);
                     }
 break;
 case 473:
-/* # line 3000 "grammar.y" */ 
+/* # line 3001 "grammar.y" */ 
 	{
                         rb_compile_error(vps, "formal argument cannot be a constant");
                     }
 break;
 case 474:
-/* # line 3004 "grammar.y" */ 
+/* # line 3005 "grammar.y" */ 
 	{
                         rb_compile_error(vps, "formal argument cannot be an instance variable");
                     }
 break;
 case 475:
-/* # line 3008 "grammar.y" */ 
+/* # line 3009 "grammar.y" */ 
 	{
                         rb_compile_error(vps, "formal argument cannot be a global variable");
                     }
 break;
 case 476:
-/* # line 3012 "grammar.y" */ 
+/* # line 3013 "grammar.y" */ 
 	{
                         rb_compile_error(vps, "formal argument cannot be a class variable");
                     }
 break;
 case 477:
-/* # line 3016 "grammar.y" */ 
+/* # line 3017 "grammar.y" */ 
 	{
                       yTrace(vps, "f_norm_arg: | tIDENTIFIER");
                       OmScopeType aScope(vps->omPtr);
@@ -12013,7 +12014,7 @@ case 477:
                     }
 break;
 case 478:
-/* # line 3031 "grammar.y" */ 
+/* # line 3032 "grammar.y" */ 
 	{ yTrace(vps, "f_arg: f_norm_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
@@ -12021,14 +12022,14 @@ case 478:
                     }
 break;
 case 479:
-/* # line 3038 "grammar.y" */ 
+/* # line 3039 "grammar.y" */ 
 	{
                       yTrace(vps, "f_arg: | f_arg tCOMMA f_norm_arg");
                       yyvalO = RubyArgsNode::add_arg(& yymarkPtr[-2].obj, yymarkPtr[0].obj/*RpNameToken*/, vps); 
                     }
 break;
 case 480:
-/* # line 3045 "grammar.y" */ 
+/* # line 3046 "grammar.y" */ 
 	{
                       yTrace(vps, "f_opt: tIDENTIFIER tEQL arg_value");
                       OmScopeType aScope(vps->omPtr);
@@ -12043,21 +12044,21 @@ case 480:
                     }
 break;
 case 481:
-/* # line 3060 "grammar.y" */ 
+/* # line 3061 "grammar.y" */ 
 	{
                       yTrace(vps, "f_optarg: f_opt");
                       yyvalO = RubyBlockNode::s( yymarkPtr[0].obj, vps);
                     }
 break;
 case 482:
-/* # line 3065 "grammar.y" */ 
+/* # line 3066 "grammar.y" */ 
 	{
                       yTrace(vps, "f_optarg: | f_optarg tCOMMA f_opt");
                       yyvalO = RubyBlockNode::append_to_block(yymarkPtr[-2].obj, yymarkPtr[0].obj, vps);
                     }
 break;
 case 485:
-/* # line 3076 "grammar.y" */ 
+/* # line 3077 "grammar.y" */ 
 	{
                       yTrace(vps, "f_rest_arg: restarg_mark tIDENTIFIER");
                       NODE *quidO = asQuid(yymarkPtr[0].obj, vps);
@@ -12071,14 +12072,14 @@ case 485:
                     }
 break;
 case 486:
-/* # line 3088 "grammar.y" */ 
+/* # line 3089 "grammar.y" */ 
 	{
                       yTrace(vps, "f_rest_arg: | restarg_mark");
                       yyvalO = RpNameToken::s(a_sym_rest_args, vps);
                     }
 break;
 case 489:
-/* # line 3099 "grammar.y" */ 
+/* # line 3100 "grammar.y" */ 
 	{
                       yTrace(vps, "f_blck_arg: blkarg_mark tIDENTIFIER");
                       NODE *quidO = asQuid(yymarkPtr[0].obj, vps);
@@ -12092,32 +12093,32 @@ case 489:
                     }
 break;
 case 490:
-/* # line 3113 "grammar.y" */ 
+/* # line 3114 "grammar.y" */ 
 	{
                       yTrace(vps, "opt_f_block_arg: tCOMMA f_blck_arg");
                       yyvalO = yymarkPtr[0].obj;
                     }
 break;
 case 491:
-/* # line 3118 "grammar.y" */ 
+/* # line 3119 "grammar.y" */ 
 	{
                       yTrace(vps, "opt_f_block_arg: | <nothing>");
                       yyvalO = ram_OOP_NIL;
                     }
 break;
 case 492:
-/* # line 3125 "grammar.y" */ 
+/* # line 3126 "grammar.y" */ 
 	{
                         yTrace(vps, "singleton : var_ref");
                         yyvalO = yymarkPtr[0].obj;
                     }
 break;
 case 493:
-/* # line 3129 "grammar.y" */ 
+/* # line 3130 "grammar.y" */ 
 	{ vps->lex_state = EXPR_BEG;}
 break;
 case 494:
-/* # line 3130 "grammar.y" */ 
+/* # line 3131 "grammar.y" */ 
 	{
                        yTrace(vps, "singleton: ___ expr opt_nl tRPAREN");
                        rParenLexPop(vps);
@@ -12130,21 +12131,21 @@ case 494:
                     }
 break;
 case 495:
-/* # line 3143 "grammar.y" */ 
+/* # line 3144 "grammar.y" */ 
 	{
                       yTrace(vps, "assoc_list: none");
                       yyvalO = RubyArrayNode::new_(vps);
                     }
 break;
 case 496:
-/* # line 3148 "grammar.y" */ 
+/* # line 3149 "grammar.y" */ 
 	{
                       yTrace(vps, "assoc_list: | assocs trailer");
 		      yyvalO = yymarkPtr[-1].obj;
                     }
 break;
 case 497:
-/* # line 3153 "grammar.y" */ 
+/* # line 3154 "grammar.y" */ 
 	{
                       yTrace(vps, "assoc_list: | args trailer");
                       if ((RubyArrayNode::arrayLength(yymarkPtr[-1].obj, vps) & 1) != 0) {
@@ -12154,32 +12155,32 @@ case 497:
                     }
 break;
 case 499:
-/* # line 3164 "grammar.y" */ 
+/* # line 3165 "grammar.y" */ 
 	{
                       yTrace(vps, "assocs: | assocs tCOMMA assoc");
                       yyvalO = RubyArrayNode::appendAll(yymarkPtr[-2].obj, yymarkPtr[0].obj, vps); /* returns first arg*/
                     }
 break;
 case 500:
-/* # line 3171 "grammar.y" */ 
+/* # line 3172 "grammar.y" */ 
 	{
                       yTrace(vps, "assoc: arg_value tASSOC arg_value");
                       yyvalO = RubyArrayNode::s_a_b( yymarkPtr[-2].obj, yymarkPtr[0].obj, vps);
                     }
 break;
 case 520:
-/* # line 3210 "grammar.y" */ 
+/* # line 3211 "grammar.y" */ 
 	{ yyerrflag = 0 ;}
 break;
 case 523:
-/* # line 3215 "grammar.y" */ 
+/* # line 3216 "grammar.y" */ 
 	{ yyerrflag = 0;}
 break;
 case 524:
-/* # line 3218 "grammar.y" */ 
+/* # line 3219 "grammar.y" */ 
 	{  yTrace(vps, "none:");  yyvalO = ram_OOP_NIL; }
 break;
-/* # line 12183 "rubygrammar.c" */ 
+/* # line 12184 "rubygrammar.c" */ 
     }
     if (yyvalO == NULL) {  /*compute default state result*/ 
       if (yyvalPtr != NULL) {

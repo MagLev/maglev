@@ -587,9 +587,9 @@ class RubyNthRefNode
   enum { my_cls = cls_RubyNthRefNode };
  public:
 
-  static inline omObjSType* s(omObjSType *smallInt, rb_parse_state *ps)
+  static inline omObjSType* s(omObjSType *smallInt, omObjSType *srcOfs, rb_parse_state *ps)
   {
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a, smallInt, ps);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, smallInt, srcOfs, ps);
   }
 };
 class RubyOpAsgnNode
