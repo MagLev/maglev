@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* Fix performance regression caused by fix of Trac 874
+* Make RUBY_PLATFORM a transient constant.
+
 == Changes for 25414 2011-03-10
 * Add an include/st.h which just defines the  enum st_retval .
 * Implement initialize_on_load for FFI libraries, to fix Trac 800.
