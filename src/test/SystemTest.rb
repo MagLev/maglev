@@ -32,4 +32,23 @@ end
   Maglev::System.decrement_session_stat(i, 2)
   test(Maglev::System.get_session_stat(i), i-1, "D: decrement_session_stat(#{i})")
 end
+
+# MagLev was (1) modifying the command string passed to system() and (2)
+# not putting a space between the command and first param if command_parts
+# was size 2
+command_parts = ["echo", "foo"]
+
+success = system(*command_parts)
+
+test(success, true, "echo command worked")
+test(command_parts[0], "echo", "Modified command_parts[0]")
+
+# Now with more args
+command_parts = ["echo", "foo", "bar"]
+
+success = system(*command_parts)
+
+test(success, true, "echo command worked")
+test(command_parts[0], "echo", "Modified command_parts[0]")
+
 report
