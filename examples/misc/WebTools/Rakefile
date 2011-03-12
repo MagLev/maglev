@@ -3,17 +3,17 @@ task :default => :webtools
 MH = ENV['MAGLEV_HOME']
 
 desc "Run a simple web app to view code and statistics."
-task :webtools => :commit do
+task :webtools do
   # Load the Smalltalk example code into the MagLev repository, and commit it.
   file = "#{MH}/gemstone/examples/www/install.tpz"
   raise "Can't find #{file}" unless File.exists? file
   cd(MH) { sh "rake maglev:input_file[#{file}]" }
-  sh "maglev-ruby -d web_tools.rb"
-end
 
-desc "Commit the ruby code needed for the WebTools demo"
-task :commit do
+  # Enable the MagLev WebTools code
   file = "#{MH}/gemstone/examples/www/src/maglev.rb"
   raise "Can't find #{file}" unless File.exists? file
   sh "maglev-ruby -Mcommit #{file}"
+
+  # Start the server
+  sh "maglev-ruby -d web_tools.rb"
 end

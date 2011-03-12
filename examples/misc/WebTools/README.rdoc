@@ -9,3 +9,4 @@ To run:
   $ rake
 
 Then browse to http://localhost:8080/
+Hit Ctl-C in the terminal window to stop.
