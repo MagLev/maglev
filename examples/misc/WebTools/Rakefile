@@ -4,9 +4,6 @@ MH = ENV['MAGLEV_HOME']
 
 desc "Run a simple web app to view code and statistics."
 task :webtools, :meta do |t, args|
-
-  puts "======== ARGS.meta: #{args.meta}"
-  
   # Load the Smalltalk example code into the MagLev repository, and commit it.
   file = "#{MH}/gemstone/examples/www/install.tpz"
   raise "Can't find #{file}" unless File.exists? file
