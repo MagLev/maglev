@@ -61,6 +61,7 @@ fi
 
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
+if [ $PLATFORM = 'Darwin-x86_64' ]; then PLATFORM='Darwin-i386'; fi
 gsvers=`grep ^GEMSTONE version.txt | cut -f2 -d-`
 gss_name="GemStone-${gsvers}.${PLATFORM}"
 gss_file=${gss_name}.tar.gz

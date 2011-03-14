@@ -58,7 +58,7 @@ mag_name="MagLev-${1}.${PLATFORM}"
 
 # Check we're on a suitable 64-bit machine
 case "$PLATFORM" in
-    Darwin-i386)
+    'Darwin-i386'|'Darwin-x86_64')
     OSVERSION="`sw_vers -productVersion`"
     MAJOR="`echo $OSVERSION | cut -f1 -d.`"
     MINOR="`echo $OSVERSION | cut -f2 -d.`"
@@ -114,7 +114,7 @@ case "$PLATFORM" in
     # Figure out the max shared memory currently allowed
     shmall=`cat /proc/sys/kernel/shmall`
     ;;
-    Darwin-i386)
+    'Darwin-i386'|'Darwin-x86_64')
     totalMem="`sysctl hw.memsize | cut -f2 -d' '`"
     # Figure out the max shared memory segment size currently allowed
     shmmax="`sysctl kern.sysv.shmmax | cut -f2 -d' '`"
