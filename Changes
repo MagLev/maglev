@@ -4,14 +4,14 @@
 
 == Unreleased Changes
 
+== Changes for 25439 2011-03-11
+* Got Seaside loading correctly again
 * Fix performance regression caused by fix of Trac 874
 * Make RUBY_PLATFORM a transient constant.
-
-== Changes for 25414 2011-03-10
-* Add an include/st.h which just defines the  enum st_retval .
+* Add an include/st.h which just defines the enum st_retval .
 * Implement initialize_on_load for FFI libraries, to fix Trac 800.
 * Fix Trac 874 in Regexp primitives.
-* Updated WebTools example
+* Updated WebTools example to include browsing Ruby code, and graphing statmon data
 * More bugfixes and improvements to the underlying GemStone 3.0 system
 
 == Changes for 25393 2011-03-08
