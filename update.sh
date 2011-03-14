@@ -118,8 +118,8 @@ echo "[Info] updating MSpec, RubySpec, and RBS submodules"
 git submodule update --init 
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
-# Check for existence of required executable /usr/bin/rake
-if [ -x /usr/bin/rake ]; then
+# Check for existence of required executable rake
+if [ $(which rake) ]; then
     # Backup any existing maglev repository
     if [ -e data/maglev/extent/extent0.ruby.dbf ]; then 
         echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
@@ -136,7 +136,7 @@ if [ -x /usr/bin/rake ]; then
     echo "[Info] Generating the MagLev HTML documentation"
     rake rdoc >/dev/null 2>&1
 else
-    echo "[Warning] /usr/bin/rake not found!"
+    echo "[Warning] rake not found!"
     echo "Skipping creation of default 'maglev' repository and HTML documentation."
 fi
 
