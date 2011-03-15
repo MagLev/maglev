@@ -47,18 +47,24 @@ class Binding
 
   def eval(*args, &block_arg)		# added for 1.8.7
     # should always come here via bridge method
+    # IR generator synthesizes missing args as needed per Kernel.eval
     nargs = args.size
     if nargs < 1
       raise ArgumentError, 'too few args, send of :eval not supported'
     end
-    if nargs > 3
+    if nargs > 4
       raise ArgumentError, 'too many args'
     end
     # lex_path = self.__getRubyVcGlobal(0x32) # not used, use path already in self
     str = args[0]
     bnd = self
     file = args[1]
-    line = args[2]
+    if file._equal?(nil)
+      file = args[2] # synthesized
+      line = args[3] 
+    else
+      line = args[2]
+    end
     if line._equal?(nil)
       line = 0
     end
