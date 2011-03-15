@@ -7,15 +7,14 @@ class Module
   # @param [Boolean] instance_method If true, look for an instance method
   #         named +method_name+, otherwise look in receiver's singleton
   #         class for the method.
-  # @return [String] The method source
+  # @return [GsNMethod] A non-bridge compiled method 
   #
-  def method_source_for(method_name, instance_method=true)
-    src = nil
+  def gs_method_for(method_name, instance_method=true)
+    meth = nil
     begin
       mname = method_name.to_sym
       target = instance_method ? self : self.__singleton_class
-      m = target.instance_method(mname)
-      src = m.__nonbridge_meth.__source_string
+      meth = target.__gs_method(mname)
     rescue => e
       raise NameError, "Error trying to get #{instance_method ? "instance" : "class"} method source for class #{self.name} method #{method_name.inspect}: #{e.to_s}"
     end
