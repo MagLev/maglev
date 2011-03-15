@@ -11,6 +11,7 @@ class Exception
     class_primitive_nobridge  '__errno_tables', 'errnoTables'
     class_primitive_nobridge  '__errno_to_name', 'errnoToName:'
     class_primitive_nobridge  '__cpu_os_kind', 'cpuOsKind'
+    class_primitive_nobridge  '__cpu_os_str', 'cpuOsKindString'
 
     primitive_nobridge '__handler_active' , '_handlerActive'
 
