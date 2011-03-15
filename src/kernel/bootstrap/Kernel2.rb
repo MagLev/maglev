@@ -1,6 +1,7 @@
-module Kernel
   # file Kernel2.rb  , parts of kernel that must be deferred to later
   #  in the bootstrap
+
+module Kernel
 
   def binding(lex_path, &block)
     # lex_path arg is synthesized by the parser.
