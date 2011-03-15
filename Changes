@@ -3,6 +3,10 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+ 
+* Fix Trac 878, add test coverage for 521 .
+* Changes to rbconfig.rb and FFI to make some constants transient.
+* Optimizations to method_source.rb
 
 == Changes for 25439 2011-03-11
 * Got Seaside loading correctly again
