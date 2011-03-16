@@ -4,6 +4,14 @@
 
 == Unreleased Changes
 
+== Changes for 25476 2011-03-16
+* Updated installers to deal with new Intel Core i7 Macs
+* Improved WebTools example
+* Added setupLocks.sh script to tie $MAGLEV/locks to /opt/gemstone/locks
+  and $MAGLEV/log to /opt/gemstone/log
+  for cases where you want to run both GemStone and MagLev at the same time
+* More bugfixes and improvements to the underlying GemStone 3.0 system
+
 == Changes for 25439 2011-03-11
 * Got Seaside loading correctly again
 * Fix performance regression caused by fix of Trac 874
