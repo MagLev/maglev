@@ -7,6 +7,7 @@
 * Fix Trac 878, add test coverage for 521 .
 * Changes to rbconfig.rb and FFI to make some constants transient.
 * Optimizations to method_source.rb
+* Fix some spec failures.
 
 == Changes for 25476 2011-03-16
 * Updated installers to deal with new Intel Core i7 Macs
