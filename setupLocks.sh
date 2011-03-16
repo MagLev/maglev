@@ -13,6 +13,7 @@
 #    MagLev expects locks to be in $MAGLEV_HOME/locks
 #    Ditto for log directory
 #    This script links them together
+#    Your need to rerun this script anytime you change $MAGLEV_HOME
 #    Use at your own risk!
 #
 # Actions:
