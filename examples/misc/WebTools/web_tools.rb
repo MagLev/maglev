@@ -3,6 +3,10 @@
 #  registers that code into the Ruby namespace, and then starts the
 #  application.  Once it is running, it will print a URL to connect to.
 
+if ARGV.size > 0
+  require 'meta_demo'
+end
+
 # Register the Smalltalk WebTools Server class into the Ruby Namespace
 WebTools = __resolve_smalltalk_global(:Server)
 
