@@ -399,15 +399,23 @@ class Time
     dup.gmtime
   end
 
+  def self.__to_int(arg)
+    if arg._isString
+      arg.to_i
+    else
+      Type.coerce_to(arg, Integer, :to_int )
+    end
+  end
+
   def self.__mktime(sec, min, hour, mday, mon, year, usec, isdst=-1, from_gmt=false) 
-    sec  = Integer(sec)
-    min  = Integer(min)
-    hour = Integer(hour)
-    mday = Integer(mday)
-    mon  = Integer(mon)  # conversion to zero based done in C in __c_mktime
+    sec  = __to_int(sec)
+    min  = __to_int(min)
+    hour = __to_int(hour)
+    mday = __to_int(mday)
+    mon  = __to_int(mon)
     # range checks on above args done in C in __c_mktime 
-    year = Integer(year)
-    usec = Integer(usec)
+    year = __to_int(year)
+    usec = __to_int(usec)
     sec += usec.__divide(1000000)
 
     # This logic is taken from MRI, on how to deal with 2 digit dates.
