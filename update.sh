@@ -70,9 +70,9 @@ machine_name="`uname -n`"
 echo "[Info] Starting upgrade to $gss_name on $machine_name"
 
 # Look for either wget or curl to download GemStone
-if [ -e "`which wget`" ]; then
+if [ -e "`which wget 2>/dev/null`" ]; then
     cmd="`which wget`"
-elif [ -e "`which curl`" ]; then
+elif [ -e "`which curl 2>/dev/null`" ]; then
     cmd="`which curl` -O"
 else
     echo "[Error] Neither wget nor curl is available. Install one of them and rerun this script."
@@ -119,7 +119,7 @@ git submodule update --init
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
-if [ $(which rake) ]; then
+if [  -e "`which rake 2>/dev/null`" ]; then
     # Backup any existing maglev repository
     if [ -e data/maglev/extent/extent0.ruby.dbf ]; then 
         echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
