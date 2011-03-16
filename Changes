@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25476 2011-03-16
+== Changes for 25479 2011-03-16
 * Updated installers to deal with new Intel Core i7 Macs
 * Improved WebTools example
 * Added setupLocks.sh script to tie $MAGLEV/locks to /opt/gemstone/locks
