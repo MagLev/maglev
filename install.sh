@@ -54,6 +54,8 @@ fi
 
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
+# Macs with Core i7 use the same software as older Macs
+[ $PLATFORM = "Darwin-x86_64" ] && PLATFORM="Darwin-i386"
 mag_name="MagLev-${1}.${PLATFORM}"
 
 # Check we're on a suitable 64-bit machine
