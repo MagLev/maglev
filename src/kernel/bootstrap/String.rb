@@ -1650,21 +1650,9 @@ class String
     false
   end
 
-  primitive '__strip', '_trimReturningSelf:'
+  primitive 'strip', '_rubyStrip'
 
-  def strip
-    self.__strip(false)
-  end
-
-  def strip!
-    res = self.__strip(true)
-    if res._not_equal?(self)
-      self.replace(res)  # replace detects frozen
-      self
-    else
-      nil
-    end
-  end
+  primitive 'strip!', '_rubyStripInPlace'
 
   # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
   # with either +replacement+ or the value of the block.  See the
