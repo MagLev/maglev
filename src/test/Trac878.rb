@@ -17,4 +17,4 @@ file, line = m.source_location
 puts file
 puts line
 raise "Bad line number for instance method #{line} expecting #{line_num}" unless line_num == line
-
+true

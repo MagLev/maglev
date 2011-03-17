@@ -740,6 +740,12 @@ static inline VALUE rb_str_buf_new(long len )
   return rb_str_new("", 0);
 }
 
+static inline VALUE rb_str_buf_new2(const char* string)
+{
+  // Return a new String containing the given C string
+  return rb_str_new2(string);
+}
+
 // following 3 append bytes to the str object which must be a kind of String
 RUBY_DLLSPEC VALUE rb_str_buf_append(VALUE str, VALUE val);
 RUBY_DLLSPEC VALUE rb_str_buf_cat(VALUE str, const char* bytes, long len);

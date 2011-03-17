@@ -37,7 +37,9 @@ class StringScanner
   #   s.pos = 7            # -> 7
   #   s.rest               # -> "ring"
   def pos=(n)
-    n = Type.coerce_to(n, Fixnum, :to_int)
+    unless n._isFixnum
+      n = Type.coerce_to(n, Fixnum, :to_int)
+    end
     raise RangeError, "xxx" if n > @string.size
     @pos = n
   end
@@ -57,7 +59,9 @@ class StringScanner
   #   s.pre_match                        # -> ""
   def [](n)
     # coercion will be implicit by match[] primitive
-    n = Type.coerce_to(n, Fixnum, :to_int)
+    unless n._isFixnum
+      n = Type.coerce_to(n, Fixnum, :to_int)
+    end
     begin
       match[n]
     rescue IndexError
@@ -212,6 +216,9 @@ class StringScanner
   # Creates a new StringScanner object to scan over the given
   # +string+. +dup+ argument is obsolete and not used now.
   def initialize(string, dup = false)
+    unless string._isString
+      string = Type.coerce_to(string, String, :to_str)
+    end
     @string = string
     self.reset
   end
@@ -464,6 +471,9 @@ class StringScanner
   # Changes the string being scanned to +str+ and resets the
   # scanner. Returns +str+.
   def string=(str)
+    unless str._isString
+      str = Type.coerce_to(str, String, :to_str)
+    end
     reset
     @string = str
   end

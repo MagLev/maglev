@@ -85,8 +85,7 @@ module Config
     config['arch']              = arch
     config['ruby_version']      = '1.8'
     cpu_os = Exception.__cpu_os_kind
-    host_os = %w( not_used sparc_solaris linux-gnu PowerPC_AIX
-				      darwin9.0 x86_64_solaris Itanium_HP-UX)[ cpu_os  - 1]
+    host_os = Object.__platform_str
     config['host_os'] = host_os 
     config['target_os']       = config['host_os']
     config["LN_S"]            = "ln -s"

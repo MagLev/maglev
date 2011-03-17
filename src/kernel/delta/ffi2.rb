@@ -30,17 +30,14 @@ module FFI
   USE_THIS_PROCESS_AS_LIBRARY = Library::CURRENT_PROCESS # deprecated
 
   module Platform
-    OS = "" # you must use Config::CONFIG['host_os']
-      # because OS could change after you commit code
+    # OS, ARCH, LIBC  defined in post_prims/ffi.rb
 
-    ARCH = ""   # arch should be determined dynamically
     LIBPREFIX = "lib"
     LIBSUFFIX = "" # OS  dependent suffix appended at runtime by the
                    # library load primitives if '.' not in lib name,
                    #    or if '.' is last character of lib name.
     LONG_SIZE = 64 # in bits
     ADDRESS_SIZE = 64
-    LIBC = 'libc'  # may need OS dependent logic eventually?
   end
 
   # Tables used to translate arguments for primitives.

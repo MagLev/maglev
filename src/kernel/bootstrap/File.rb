@@ -289,8 +289,18 @@ class File
 
   def self.__tilde_expand(path)
     case path[0,2]
-    when '~':   ENV['HOME']
-    when '~/':  ENV['HOME'] + path[1..-1]
+    when '~'  
+      hm = ENV['HOME']
+      if hm._equal?(nil) ||  hm == '' 
+        raise ArgumentError, "['HOME'] is nil or empty"
+      end
+      hm
+    when '~/'
+      hm = ENV['HOME']
+      if hm._equal?(nil) ||  hm == '' 
+        raise ArgumentError, "['HOME'] is nil or empty"
+      end
+      hm + path[1..-1]
     when /^~([^\/])+(.*)/
       raise NotImplementedError, "~user expansion not implemented"
     else

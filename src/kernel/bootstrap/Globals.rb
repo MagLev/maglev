@@ -145,7 +145,7 @@ RUBY_ENGINE = 'maglev'
 
 # A quick hack to get specs further w/o build having to poke the right string in
 #  this slot. See ticket #76
-RUBY_PLATFORM = 'Unspecified.platform'
+# RUBY_PLATFORM  is installed in RubyContext>>_initTransient:
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
 RUBY_RELEASE_DATE = '2011-03-15'
