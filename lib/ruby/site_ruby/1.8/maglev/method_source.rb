@@ -18,6 +18,5 @@ class Module
     rescue => e
       raise NameError, "Error trying to get #{instance_method ? "instance" : "class"} method source for class #{self.name} method #{method_name.inspect}: #{e.to_s}"
     end
-    src
   end
 end
