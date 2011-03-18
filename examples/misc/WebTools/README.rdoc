@@ -43,8 +43,8 @@ $MAGLEV_HOME is changed.
 === Can't modify $GEMSTONE environment variable while MagLev is running
 
 Some Rake scripts may modify the $GEMSTONE environment variable. You
-can't do this if the rake you are running is $MAGLEV_HOME/bin/rake
-You can try using /usr/bin/rake instead, or
+can't do this if you are running $MAGLEV_HOME/bin/rake. You can try running
+/usr/bin/rake instead, or
 
   mv $MAGLEV_HOME/bin/rake $MAGLEV_HOME/bin/maglev-rake
 
