@@ -27,7 +27,7 @@ maglev stop
 
 sudo mkdir -p /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
 sudo chown $USER:${GROUPS[0]} /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
-sudo chmod 770 /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
+sudo chmod 775 /opt/gemstone /opt/gemstone/log /opt/gemstone/locks
 
 rm -rf locks log
 
