@@ -1,6 +1,11 @@
-task :default => :webtools
+task :default => :run
 
 MH = ENV['MAGLEV_HOME']
+
+desc "Run the WebTools Sinatra App"
+task :run do
+  sh "#{MH}/bin/rackup -Ilib config.ru"
+end
 
 desc "Run a simple web app to view code and statistics."
 task :webtools, :meta do |t, args|

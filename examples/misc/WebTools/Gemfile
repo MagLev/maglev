@@ -3,4 +3,5 @@
 
 source "http://rubygems.org"
 
-gem "activemodel", '~> 3.0'
+gem 'activemodel', '~> 3.0'
+gem 'sinatra',     '~> 1.1'
