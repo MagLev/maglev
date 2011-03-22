@@ -1,0 +1,18 @@
+<style type="text/css">
+#versionPanel { overflow: auto; }
+#versionPanel table { margin-left: auto; margin-right: auto; }
+</style>
+
+<div id='versionPanel' class='hidden'>
+  <table>
+    <caption>GemStone Version Report</caption>
+    <thead>
+      <tr><th>Attribute</th><th>Stone</th><th>WebTools</th></tr>
+    </thead>
+    <tbody id='versionTable'>
+      <% @data.each do |k,v| %>
+      <tr><th><%= k %></th><td><%= v[0] %></td><td><%= v[1] %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

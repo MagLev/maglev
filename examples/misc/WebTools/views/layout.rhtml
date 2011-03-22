@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MagLev WebTools</title>
+    <meta charset="utf-8">
+    <link rel="Shortcut Icon" type="image/ico" href="images/favicon.ico">
+    <link rel="stylesheet" href="stylesheets/reset.css"     type="text/css" media="screen">
+    <link rel="stylesheet" href="stylesheets/webtools.css"  type="text/css" media="screen">
+
+    <script type="text/javascript" src="javascript/jquery.js"></script>
+    <script type="text/javascript" src="javascript/jquery-ui.js"></script>
+    <script type="text/javascript" src="javascript/webtools.js"></script>
+<!--
+
+    <script type="text/javascript" src="js/html5.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+-->
+    <!--[if IE 7]><link rel="stylesheet" href="css/ie/ie7.css" type="text/css" media="screen"><![endif]-->
+    <!--[if lt IE 7]><link rel="stylesheet" href="css/ie/ie6.css" type="text/css" media="screen"><![endif]-->
+  </head>
+  <body>
+    <div id="tabs">
+      <%= yield %>
+    </div>
+    <div id="statusBar">&nbsp</div>
+  </body>
+</html>

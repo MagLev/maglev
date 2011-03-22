@@ -1,0 +1,49 @@
+@import "reset.css";
+@import "base/jquery.ui.all.css";
+@import "jquery.contextMenu.css";
+
+body * { font-size: 10pt; }
+.hidden { display: none; }
+.maximize { position: absolute; top: 0; left: 0; bottom: 0; right: 0; }
+
+.ui-tabs-nav li a { padding: 2px 6px !important; }
+.ui-tabs-panel { position: absolute; top: 0; left: 0; bottom: 0; right: 0; overflow: hidden; }
+.ui-tabs-selected a { font-weight: bold; }
+
+.tabs-empty { border-bottom-width: 0; padding-bottom: 0px; }
+.tabs-empty.tabs-bottom { border-bottom-width: 1px; border-top-width: 0; padding-bottom: 2px; padding-top: 0; }
+.tabs-empty .ui-tabs-panel { display: none; }
+
+.tabs-bottom .ui-tabs-nav { padding: 0 0.2em 0.2em 0.2em; }
+.tabs-bottom .ui-tabs-nav li { top: -1px; margin: 1px 0.2em 0 0;  border: 1px solid lightGrey !important; border-top: 0 !important; }
+.tabs-bottom .ui-tabs-nav li.ui-tabs-selected { top: -2px; margin: 0 2px 0 0; border: 1px solid #AAA !important; }
+
+.ui-tabs-nav li a.closeTab { 
+	display: inline-block; overflow: visible; text-indent: -99999px;
+	width: 14px; height: 20px; padding: 0 2px !important; 
+	background: url('base/images/ui-icons_888888_256x240.png') -80px -126px; 
+	cursor: pointer !important; 
+}
+.ui-tabs-nav li a.closeTab:hover { 
+	background: url('base/images/ui-icons_cd0a0a_256x240.png') -32px -910px; 
+}
+
+.clickable:hover { background: #EEE; cursor: pointer; }
+.selected { background: #CCC; }
+.selected.clickable:hover { background: #CCC; }
+
+.contextMenu { position: fixed; }
+
+caption { font-size: 150%; text-align: center; }
+table, th, td { border: 1px solid black; padding: 2px; }
+thead * { text-align: center; }
+th { font-weight: bold; }
+
+#tabs { position: fixed; top: 0; left: 0; bottom: 2em; right: 0; }
+#tabs .ui-tabs-panel { border-width: 0 1px 1px 1px; top: 30px; left: 3px; bottom: 3px; right: 3px; }
+
+#statusBar { border-bottom: 1px solid #DDD; padding: 3px 4px; position: fixed; bottom: 1.4em; height: 1em; width: 100% }
+
+#homePanel { overflow: auto; }
+#homePanel table { margin-left: auto; margin-right: auto; }
+

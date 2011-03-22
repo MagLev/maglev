@@ -1,0 +1,16 @@
+* Notes on the re-tool of WebTools
+
+** Things to change:
+
+   1. The /tools url returns objects.  The 'file' attribute is really a uri
+      attribute.  The ST WebTools expected something like CodeBrowser.html,
+      and would serve up that file.  In Sinatra, I use a simple URI like
+      '/browser', and let the view return the guts....  Thus the name
+      'file' is a misnonmer.
+
+** How the tabs work
+
+   The tabs use jQuery http://docs.jquery.com/UI/Tabs
+
+   
+
