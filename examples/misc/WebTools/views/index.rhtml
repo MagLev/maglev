@@ -1,20 +1,45 @@
-      <div id="tabvanilla" class="widget">
-        <ul class="tabnav">
-          <li><a href="#versionReport">Version Report</a></li>
-          <li><a href="#currentSessions">Current Sessions</a></li>
-          <li><a href="#rubyCodeBrowser">Code Browser</a></li>
-          <li><a href="#statistics">Statistics</a></li>
-        </ul>
-        <div id="versionReport" class="tabdiv">
-          <p>The Version Report</p>
-        </div>
-        <div id="currentSessions" class="tabdiv">
-          <p>Current Sessions</p>
-        </div>
-        <div id="rubyCodeBrowser" class="tabdiv">
-          <p>Ruby Code Browser</p>
-        </div>
-        <div id="statistics" class="tabdiv">
-          <p>Statistics</p>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MagLev WebTools</title>
+    <meta charset="utf-8">
+    <link rel="Shortcut Icon" type="image/ico" href="images/favicon.ico">
+
+    <link rel="stylesheet" href="stylesheets/reset.css"     type="text/css" media="screen">
+    <link rel="stylesheet" href="stylesheets/webtools.css"  type="text/css" media="screen">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="javascript/webtools.js"></script>
+
+    <script>
+      $(document).ready(function() {
+      $("#tabs").tabs();
+      $("#tabs").tabs('select', '#versionReport');
+      });
+      
+    </script>
+  </head>
+  <body>
+    <div id="tabs">
+      <ul class="tabnav">
+        <li><a href="/version">Version Report</a></li>
+        <li><a href="#currentSessions">Current Sessions</a></li>
+        <li><a href="#rubyCodeBrowser">Code Browser</a></li>
+        <li><a href="#statistics">Statistics</a></li>
+      </ul>
+      <div id="versionReport" class="tabdiv">
+        <p>The Version Report</p>
       </div>
+      <div id="currentSessions" class="tabdiv">
+        <p>Current Sessions</p>
+      </div>
+      <div id="rubyCodeBrowser" class="tabdiv">
+        <p>Ruby Code Browser</p>
+      </div>
+      <div id="statistics" class="tabdiv">
+        <p>Statistics</p>
+      </div>
+    </div>
+  </body>
+</html>

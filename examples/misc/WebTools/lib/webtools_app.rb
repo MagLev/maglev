@@ -17,9 +17,10 @@ class WebToolsApp < Sinatra::Base
     gem_rpt = WebTools::API.gem_version_report
     @data = { }
     (stone_rpt.keys + gem_rpt.keys).each do |k|
-      @data[k] = [stone_rpt[k], gem_rpt[k]]
+      g = stone_rpt[k] == gem_rpt[k] ? '' : gem_rpt[k]
+      @data[k] = [stone_rpt[k], g]
     end
-    erb :version
+    erb :version, :layout => false
   end
 
   get '/sessions' do

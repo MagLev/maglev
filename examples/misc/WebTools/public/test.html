@@ -14,15 +14,17 @@
 
     <script>
       $(document).ready(function() {
-      $("#tabs").tabs();
+        $("#tabs").tabs();
+        $("#tabs").tabs('select', '#versionReport');
       });
+      
     </script>
   </head>
   <body>
     <p>Test.html: static page</p>
     <div id="tabs">
       <ul class="tabnav">
-        <li><a href="#versionReport"><span>Version Report</span></a></li>
+        <li><a href="/versionReport"><span>Version Report</span></a></li>
         <li><a href="#currentSessions"><span>Current Sessions</span></a></li>
         <li><a href="#rubyCodeBrowser"><span>Code Browser</span></a></li>
         <li><a href="#statistics"><span>Statistics</span></a></li>
