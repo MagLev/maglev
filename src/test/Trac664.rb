@@ -24,15 +24,18 @@ unless exp == act
   raise "error: expected #{exp.inspect}  actual: #{act.inspect}"
 end
 
-res = Socket::getaddrinfo("moro", "http")
+res = Socket::getaddrinfo("www.vmware.com", "http")
 puts res.inspect
 unless res.length >= 1; raise 'err;'; end # 1 on Solaris, 2 on Linux
 
 elem = res[0]
-expA = ["AF_INET", 80, "moro.gemstone.com", "10.80.250.115", 2 ]
-expB = ["AF_INET", 80, "moro",              "10.80.250.115", 2 ]
-act = [ elem[0], elem[1], elem[2],         elem[3], elem[4] ]
-unless act == expA || act == expB
-  raise "error: expected #{expA.inspect}  actual: #{act.inspect}"
+unless elem[0] == "AF_INET" && elem[1] == 80
+  raise "error: expected 'AF_INET' and port 80: actual #{elem[0]} #{elem[1]}"
+end
+unless elem[2] =~ /akamaitechnologies.com/
+  raise "error: akamaitechnologies:  actual #{elem[2]}"
+end
+unless elem[3] =~ /\d{2,3}\.\d{1,3}\.\d{1,3}/
+  raise "error: expected inet number:  actual #{elem[3]}"
 end
 true
