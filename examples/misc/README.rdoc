@@ -3,12 +3,9 @@
 This directory contains miscellaneous demos.
 
 
-== Simple Code Browser
+== WebTools
 
 This demo runs a very simple web application that allows you to browse the
 Smalltalk code in the VM, and to examine statistics of various processes
 connected to a repository.
 
-To run:
-
-  $ rake

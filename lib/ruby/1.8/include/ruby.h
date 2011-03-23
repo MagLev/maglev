@@ -526,7 +526,7 @@ RUBY_DLLSPEC VALUE rb_path2class(const char* path);
 RUBY_DLLSPEC void rb_include_module(VALUE self, VALUE module);
 
 /** Return the object's singleton class */
-// RUBY_DLLSPEC VALUE rb_singleton_class(VALUE obj);
+RUBY_DLLSPEC VALUE rb_singleton_class(VALUE obj);
 
 RUBY_DLLSPEC VALUE rb_define_class(const char* name, VALUE parent);
 RUBY_DLLSPEC VALUE rb_define_module(const char* name);
@@ -738,6 +738,12 @@ static inline VALUE rb_str_buf_new(long len )
   // Maglev does not support separate logical and physical sizes 
   // of String objects
   return rb_str_new("", 0);
+}
+
+static inline VALUE rb_str_buf_new2(const char* string)
+{
+  // Return a new String containing the given C string
+  return rb_str_new2(string);
 }
 
 // following 3 append bytes to the str object which must be a kind of String

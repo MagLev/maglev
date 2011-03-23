@@ -2893,7 +2893,8 @@ var_lhs         : variable
 
 backref         : tNTH_REF
                   {
-		    $$ = RubyNthRefNode::s($1/*a SmallInt*/, vps);
+                    NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
+		    $$ = RubyNthRefNode::s($1/*a SmallInt*/, ofsO, vps);
                   }
                 | tBACK_REF 
                   {

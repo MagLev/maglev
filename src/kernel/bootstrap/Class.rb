@@ -15,6 +15,10 @@ class Class
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
 
+  def dup
+    raise NotImplementedError, "Class#dup"
+  end
+
   # Defines fixed instance variables of a Ruby class.
   # Arguments must be String or Symbol constants .
   # they will be processed when the class is parsed,

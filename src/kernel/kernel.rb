@@ -152,6 +152,7 @@ RUBY.require 'kernel/common/filetest.rb'
 # common code with gemstone specific mods.
 RUBY.require 'kernel/delta/hash.rb'
 RUBY.require 'kernel/delta/Module.rb'
+RUBY.require 'kernel/delta/Object3.rb'
 RUBY.require 'kernel/delta/Array.rb'
 RUBY.require 'kernel/delta/Dir.rb'
 RUBY.require 'kernel/delta/Range.rb'

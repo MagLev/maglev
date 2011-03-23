@@ -157,6 +157,8 @@ class Object
 
   primitive_nobridge '__basic_initialize_copy', '_rubyInitializeFrom:'
 
+  # define_singleton_method is 1.9 only
+
   def dup
     # must call allocate for C extensions to work, can't use __basic_dup
     res = self.class.allocate  # use non-singleton class
@@ -523,7 +525,8 @@ class Object
   end
 
   def singleton_methods(inc_modules = true)
-    Module.__filter_method_names(__ruby_singleton_methods(inc_modules, 0))
+    inc_mods = inc_modules ? true : false 
+    Module.__filter_method_names(__ruby_singleton_methods(inc_mods, 0))
   end
 
   primitive_nobridge '__ruby_methods', 'rubyMethods:protection:'

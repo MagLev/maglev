@@ -1495,6 +1495,10 @@ class Array
           return i
         end
         i -= 1
+        sz = self.__size
+        if i >= sz
+          i = sz - 1  # adjust for array shrinkage during iteration
+        end
       end
       nil
     else

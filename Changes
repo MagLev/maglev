@@ -3,10 +3,32 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+ 
+== Changes for 25523 2011-03-22
+* Only contains bugfixes to underlying GemStone 3.0 system
 
-* Add an include/st.h which just defines the  enum st_retval .
+== Changes for 25506 2011-03-18
+* Fix Trac 878, add test coverage for 521 .
+* Changes to rbconfig.rb and FFI to make some constants transient.
+* Optimizations to method_source.rb
+* Fix some spec failures.
+* Add rb_str_buf_new2 to ruby.h for C extensions
+* Updated installers to deal with new Intel Core i7 Macs
+* Improved WebTools example
+* Added setupLocks.sh script to tie $MAGLEV/locks to /opt/gemstone/locks
+  and $MAGLEV/log to /opt/gemstone/log
+  for cases where you want to run both GemStone and MagLev at the same time
+* More bugfixes and improvements to the underlying GemStone 3.0 system
+
+== Changes for 25439 2011-03-11
+* Got Seaside loading correctly again
+* Fix performance regression caused by fix of Trac 874
+* Make RUBY_PLATFORM a transient constant.
+* Add an include/st.h which just defines the enum st_retval .
 * Implement initialize_on_load for FFI libraries, to fix Trac 800.
 * Fix Trac 874 in Regexp primitives.
+* Updated WebTools example to include browsing Ruby code, and graphing statmon data
+* More bugfixes and improvements to the underlying GemStone 3.0 system
 
 == Changes for 25393 2011-03-08
 * Implement rb_hash_foreach for C extensions.

@@ -772,7 +772,7 @@ module Kernel
   end
 
   # Preferred alternative to         class << self ; self ; end  .
-  # Faster and no concurrency artifacts because not
+  # Faster and no concurrency side effects because not
   # reexecuting a class body  (see Trac 745).
   def singleton_class
     self.__singleton_class  # See Object#__singleton_class
