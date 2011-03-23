@@ -496,13 +496,7 @@ module Marshal
     end
 
     def serialize_instance_variables_prefix(obj, ivars_result)
-      # (... exclude_ivars = false)
-      # ivars_result is Array of size 1, an output .
-      #   ivars_result[0] will be second arg to serialize_instance_variables_suffix
       ivars = obj.instance_variables
-
-      # ivars -= exclude_ivars if exclude_ivars
-
       ivars_result[0] = ivars
       if ivars.length > 0 then
         # Don't return TYPE_IVAR.  The return value of this method is
@@ -514,31 +508,20 @@ module Marshal
     end
 
     def serialize_instance_variables_suffix(obj, ivars)
-      # (... , force = false, strip_ivars = false)
       len = ivars.length
-      # if force or len > 0 then
-      if len > 0 then
-        str = serialize_integer( len )
-        n = 0
-        while n < len
-          ivar = ivars[n]
-          sym = ivar.to_sym
-          val = obj.instance_variable_get(sym)
+      str = serialize_integer( len )
+      n = 0
+      while n < len
+	ivar = ivars[n]
+	sym = ivar.to_sym
+	val = obj.instance_variable_get(sym)
 
-          #unless strip_ivars then
-          #  str << serialize(sym)
-          #else
-          #  str << serialize(ivar[1..-1].to_sym)
-          #end
-          str << serialize(sym)
+	str << serialize(sym)
 
-          str << serialize(val)
-          n += 1
-        end
-        str
-      else
-        ''
+	str << serialize(val)
+	n += 1
       end
+      str
     end
 
     def serialize_integer(n)

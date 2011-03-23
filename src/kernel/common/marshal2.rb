@@ -9,7 +9,6 @@ class Object
     out = ms.serialize_extended_object(self)
     out << Marshal__TYPE_OBJECT
     out << ms.serialize(self.class.name.to_sym)
-    #out << ms.serialize_instance_variables_suffix(self, true, strip_ivars)
     out << ms.serialize_instance_variables_suffix(self, self.instance_variables)
     out
   end
@@ -80,7 +79,11 @@ class String
     out << ms.serialize_user_class(self, String)
     out << Marshal__TYPE_STRING
     out << ms.serialize_integer(self.length) << self
-    out << ms.serialize_instance_variables_suffix(self, ivars[0])
+    ivs = ivars[0]
+    if ivs.__size._not_equal?(0)
+      out << ms.serialize_instance_variables_suffix(self, ivs)
+    end
+    out
   end
 end
 
@@ -121,7 +124,11 @@ class Regexp
     out << Marshal__TYPE_REGEXP
     out << ms.serialize_integer(str.length) + str
     out << ms.to_byte(options & 0x7)
-    out << ms.serialize_instance_variables_suffix(self, ivars[0])
+    ivs = ivars[0]
+    if ivs.__size._not_equal?(0)
+      out << ms.serialize_instance_variables_suffix(self, ivs)
+    end
+    out
   end
 end
 
@@ -140,8 +147,10 @@ class Struct
       out << ms.serialize(name)
       out << ms.serialize(value)
     end
-
-    out << ms.serialize_instance_variables_suffix(self, ivars[0])
+    ivs = ivars[0]
+    if ivs.__size._not_equal?(0)
+      out << ms.serialize_instance_variables_suffix(self, ivs)
+    end
     out
   end
 end
@@ -161,7 +170,11 @@ class Array
       out << ms.serialize(self[n])
       n = n + 1
     end   # end Gemstone
-    out << ms.serialize_instance_variables_suffix(self, ivars[0])
+    ivs = ivars[0]
+    if ivs.__size._not_equal?(0)
+      out << ms.serialize_instance_variables_suffix(self, ivs)
+    end
+    out
   end
 end
 
@@ -185,7 +198,10 @@ class Hash
       end
     end
     out << (default_val ? ms.serialize(default_val) : '')
-    out << ms.serialize_instance_variables_suffix(self, ivars[0])
+    ivs = ivars[0]
+    if ivs.__size._not_equal?(0)
+      out << ms.serialize_instance_variables_suffix(self, ivs)
+    end
     out
   end
 end
