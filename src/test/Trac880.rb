@@ -13,5 +13,6 @@ x2 = [x1].pack("m*")
 
 x3 = x2.unpack("m*").first
 x4 = Marshal.load(x3)
-
 p x4
+unless x4.class._equal?(Object) ; raise 'fail';end
+true
