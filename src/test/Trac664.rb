@@ -32,7 +32,7 @@ elem = res[0]
 unless elem[0] == "AF_INET" && elem[1] == 80
   raise "error: expected 'AF_INET' and port 80: actual #{elem[0]} #{elem[1]}"
 end
-unless elem[2] =~ /akamaitechnologies.com/
+unless elem[2] =~ /vmware.com/
   raise "error: akamaitechnologies:  actual #{elem[2]}"
 end
 unless elem[3] =~ /\d{2,3}\.\d{1,3}\.\d{1,3}/
