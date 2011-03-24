@@ -1,0 +1,22 @@
+<div>
+  <table>
+    <caption>GemStone Session Report</caption>
+    <thead>
+      <tr>
+      <% @data[:session_report].shift.each do |name,description| %>
+        <th title="<%= description %>"><%= name %></th>
+      <% end %>
+      </tr>
+    </thead>
+    <tbody id='sessionTable'>
+      <% @data[:session_report].each do |session| %>
+      <tr>
+        <% session.each do |field| %>
+        <td><%= field %></td>
+        <% end %>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <p class="timestamp"> Report generated: <%= @data[:timestamp] %></p>
+</div>

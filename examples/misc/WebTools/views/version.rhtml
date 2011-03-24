@@ -5,9 +5,12 @@
       <tr><th>Attribute</th><th>Stone</th><th>WebTools</th></tr>
     </thead>
     <tbody id='versionTable'>
-      <% @data.keys.sort.each do |k| %>
-      <tr><th><%= k %></th><td><%= @data[k][0] %></td><td><%= @data[k][1] %></td></tr>
+      <% data = @data[:version_report]
+         data.keys.sort.each do |k|
+      %>
+      <tr><th><%= k %></th><td><%= data[k][0] %></td><td><%= data[k][1] %></td></tr>
       <% end %>
     </tbody>
   </table>
+  <p class="timestamp"> Report generated: <%= @data[:timestamp] %></p>
 </div>

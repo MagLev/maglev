@@ -23,10 +23,10 @@ class WebToolsApp < Sinatra::Base
     erb :version, :layout => false
   end
 
-  # Sends back a JSON list of sessions
+  # Render the Sesssions list
   get '/sessions' do
-    content_type :json
-    ['sessions: Not Implemented'].to_json
+    @data = @app.session_report
+    erb :sessions, :layout => false
   end
 
   get '/browsecode' do

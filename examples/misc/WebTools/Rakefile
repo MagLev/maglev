@@ -23,6 +23,11 @@ task :webtools, :meta do |t, args|
   sh "maglev-ruby -d web_tools.rb #{args.meta}"
 end
 
+task :tests do
+  FileList['tests/test_*'].each do |file|
+    sh "maglev-ruby -rubygems -Ilib #{file}"
+  end
+end
 
 file "public/stylesheets" do
   sh "ln -s #{MH}/gemstone/examples/www/css public/stylesheets"
