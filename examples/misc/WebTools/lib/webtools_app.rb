@@ -6,23 +6,24 @@ class WebToolsApp < Sinatra::Base
 
   before do
     @ts = Time.now
+
+    unless session[:app]
+      session[:app] = WebTools::AppModel.new
+    end
+    @app = session[:app]
   end
 
   get '/' do
     erb :index
   end
 
+  # This renders an HTML page, no JavaScript needed.
   get '/version' do
-    stone_rpt = WebTools::API.stone_version_report
-    gem_rpt = WebTools::API.gem_version_report
-    @data = { }
-    (stone_rpt.keys + gem_rpt.keys).each do |k|
-      g = stone_rpt[k] == gem_rpt[k] ? '' : gem_rpt[k]
-      @data[k] = [stone_rpt[k], g]
-    end
+    @data = @app.version_report
     erb :version, :layout => false
   end
 
+  # Sends back a JSON list of sessions
   get '/sessions' do
     content_type :json
     ['sessions: Not Implemented'].to_json
