@@ -3,17 +3,34 @@ module WebTools
 
   # This is a ViewModel for the WebTools Application
   class AppModel
-    # Returns a hash of configuration parameters for the stone and the gem.
-    # Each value is an array with the stone's value at index 0 and the
-    # gem's value (if different than the stone's value) at index 1.
-    #  { 'foo' => ['stone_value', 'gem_value_if_different'],
-    #    'bar' => ['shared_value', ''] }
-    #
+
+    # Returns an array of tool descriptions.  Each description is a hash
+    def tools
+      [{ 'file' => '/version',
+         'name' => 'Version Report',
+         'description' => 'Information about the Stone and Gem processes and their host(s)'},
+       {'file' => 'sessions',
+         'name' => 'Current Sessions',
+         'description' => 'Information about current sessions and other processes'},
+       {'file' => 'browsecode',
+         'name' => 'Code Browser',
+         'description' => 'Browse Classes, Constants, Methods and source'},
+       {'file' => 'statistics',
+         'name' => 'Statistics',
+         'description' => 'Load and view statmonitor files'}]
+    end
 
     VERSION_HEADERS = [['Attribute', 'The attribute.'],
                        ['Stone', 'The value for the stone process.'],
                        ['WebTools', 'The value for the WebTools vm process (if different than the Stone''s value)']]
 
+
+    # Returns a hash of configuration parameters for the stone and the gem.
+    # The has has three keys:
+    #  + :timestamp => when the report was generated
+    #  + :headers   => array of [name, description] pairs for the fields
+    #  + :report    => An array of data.  Each entry is an array of the field data.
+    #
     def version_report
       stone_rpt = stone_version_report
       gem_rpt = gem_version_report
@@ -25,20 +42,6 @@ module WebTools
       { :timestamp => Time.now.asctime,
         :headers   => VERSION_HEADERS,
         :report    => data }
-    end
-
-    def stone_version_report
-      results = { }
-      rpt = Maglev::System.stone_version_report
-      rpt.keys.each { |k| results[k] = rpt.at(k) }
-      results
-    end
-
-    def gem_version_report
-      results = { }
-      rpt = Maglev::System.gem_version_report
-      rpt.keys.each { |k| results[k] = rpt.at(k) }
-      results
     end
 
     # An array of [name, description] entries for the fields in the session report.
@@ -62,6 +65,33 @@ module WebTools
 
 
 
+
+    # Returns a hash of configuration parameters for the stone and the gem.
+    # The has has three keys:
+    #  + :timestamp => when the report was generated
+    #  + :headers   => array of [name, description] pairs for the fields
+    #  + :report    => An array of data.  Each entry is an array of the field data.
+    #
+    def session_report
+      ts = Time.now
+      now = ts.to_i
+      session_info = Maglev::System.current_session_ids.map do |id|
+        sess_desc = Maglev::System.description_of_session id
+        sess_desc[0] = sess_desc[0].instance_variable_get(:@_st_userId) # UserProfile
+        sess_desc[3] = '' if sess_desc[3] == 0                          # Primitive?
+        sess_desc[4] = format_secs(now - sess_desc[4])                  # View Age
+        sess_desc[6] = ['none', 'out', 'in'][sess_desc[6] + 1]          # Transaction
+        sess_desc[13] = format_secs(now - sess_desc[13])                # Quiet
+        sess_desc[14] = format_secs(now - sess_desc[14])                # Age
+        sess_desc
+        # sess_cache_slot = Maglev::System.cache_slot_for_sessionid id
+      end
+      { :timestamp => ts.asctime,
+        :headers   => SESSION_FIELDS,
+        :report    => session_info }
+    end
+
+
     SECS_PER_DAY  = 86400
     SECS_PER_HOUR = 3600
     SECS_PER_MIN  = 60
@@ -80,23 +110,18 @@ module WebTools
       days > 0 ? "#{days} #{days == 1 ? 'day' : 'days'} #{ts}" : ts
     end
 
-    def session_report
-      ts = Time.now
-      now = ts.to_i
-      session_info = Maglev::System.current_session_ids.map do |id|
-        sess_desc = Maglev::System.description_of_session id
-        sess_desc[0] = sess_desc[0].instance_variable_get(:@_st_userId) # UserProfile
-        sess_desc[3] = '' if sess_desc[3] == 0                          # Primitive?
-        sess_desc[4] = format_secs(now - sess_desc[4])                  # View Age
-        sess_desc[6] = ['none', 'out', 'in'][sess_desc[6] + 1]          # Transaction
-        sess_desc[13] = format_secs(now - sess_desc[13])                # Quiet
-        sess_desc[14] = format_secs(now - sess_desc[14])                # Age
-        sess_desc
-        # sess_cache_slot = Maglev::System.cache_slot_for_sessionid id
-      end
-      { :timestamp => ts.asctime,
-        :headers   => SESSION_FIELDS,
-        :report    => session_info }
+    def stone_version_report
+      results = { }
+      rpt = Maglev::System.stone_version_report
+      rpt.keys.each { |k| results[k] = rpt.at(k) }
+      results
+    end
+
+    def gem_version_report
+      results = { }
+      rpt = Maglev::System.gem_version_report
+      rpt.keys.each { |k| results[k] = rpt.at(k) }
+      results
     end
   end
 end
