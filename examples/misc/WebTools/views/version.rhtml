@@ -2,10 +2,12 @@
   <table>
     <caption>GemStone Version Report</caption>
     <thead>
-      <tr><th>Attribute</th><th>Stone</th><th>WebTools</th></tr>
+      <% @data[:headers].each do |name,description| %>
+        <th title="<%= description %>"><%= name %></th>
+      <% end %>
     </thead>
     <tbody id='versionTable'>
-      <% data = @data[:version_report]
+      <% data = @data[:report]
          data.keys.sort.each do |k|
       %>
       <tr><th><%= k %></th><td><%= data[k][0] %></td><td><%= data[k][1] %></td></tr>

@@ -4,6 +4,8 @@ require 'json'
 
 class WebToolsApp < Sinatra::Base
 
+  enable :sessions
+  
   before do
     @ts = Time.now
 

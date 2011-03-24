@@ -1,5 +1,7 @@
 # This module emulates all of the API from the Smalltalk side of things
 module WebTools
+
+  # This is a ViewModel for the WebTools Application
   class AppModel
     # Returns a hash of configuration parameters for the stone and the gem.
     # Each value is an array with the stone's value at index 0 and the
@@ -7,6 +9,11 @@ module WebTools
     #  { 'foo' => ['stone_value', 'gem_value_if_different'],
     #    'bar' => ['shared_value', ''] }
     #
+
+    VERSION_HEADERS = [['Attribute', 'The attribute.'],
+                       ['Stone', 'The value for the stone process.'],
+                       ['WebTools', 'The value for the WebTools vm process (if different than the Stone''s value)']]
+
     def version_report
       stone_rpt = stone_version_report
       gem_rpt = gem_version_report
@@ -15,7 +22,9 @@ module WebTools
         g = stone_rpt[k] == gem_rpt[k] ? '' : gem_rpt[k]
         data[k] = [stone_rpt[k], g]
       end
-      { :timestamp => Time.now.asctime, :version_report => data }
+      { :timestamp => Time.now.asctime,
+        :headers   => VERSION_HEADERS,
+        :report    => data }
     end
 
     def stone_version_report
@@ -85,8 +94,9 @@ module WebTools
         sess_desc
         # sess_cache_slot = Maglev::System.cache_slot_for_sessionid id
       end
-      session_info.unshift SESSION_FIELDS
-      { :timestamp => ts.asctime, :session_report => session_info }
+      { :timestamp => ts.asctime,
+        :headers   => SESSION_FIELDS,
+        :report    => session_info }
     end
   end
 end
