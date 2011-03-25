@@ -144,7 +144,7 @@ class Object
   end
 
   # primitive   '__basic_dup', '_rubyBasicDup'  # use non-singleton class
-  primitive   '__basic_clone', '_basicCopy' # use singleton class
+  primitive   '__basic_clone', 'shallowCopy' # use singleton class
 
   def clone
     res = self.__basic_clone

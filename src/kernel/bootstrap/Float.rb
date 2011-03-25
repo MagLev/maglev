@@ -84,6 +84,7 @@ class Float
   primitive_nobridge '__divide', '_rubyDivide:'
   primitive_nobridge '%', '_rubyModulo:'
   primitive_nobridge 'modulo', '_rubyModulo:'
+  primitive_nobridge '__kind', '_getKind'
 
   def div(arg)
     q = self.__divide(arg)
@@ -95,8 +96,13 @@ class Float
       raise TypeError, 'arg to divmod is not a Numeric'
     end
     a = Type.coerce_to(arg, Float, :to_f)
-    if a == 0.0
-      raise FloatDomainError ,'arg to divmod was zero'
+    unless (sk = self.__kind)._equal?(1)  # Not normal
+      unless sk._equal?(1) || sk._equal?(4)  # neither subnormal nor zero
+        raise FloatDomainError, 'receiver of divmod infinite or nan' 
+      end
+    end
+    if a.__kind >= 4 
+      raise FloatDomainError ,'arg to divmod was zero or NaN'
     end
     [ (self.__divide(a)).floor , self % a  ]
   end

@@ -1146,7 +1146,16 @@ module Enumerable
   #   (1..7).to_a                       #=> [1, 2, 3, 4, 5, 6, 7]
   #   { 'a'=>1, 'b'=>2, 'c'=>3 }.to_a   #=> [["a", 1], ["b", 2], ["c", 3]]
 
+  def to_a(*args)
+    ary = []
+    self.each(*args) { |o| 
+      ary << o 
+    }
+    ary
+  end
+
   def to_a
+    # common variant, to avoid bridge method
     ary = []
     self.each { |o| 
       ary << o 

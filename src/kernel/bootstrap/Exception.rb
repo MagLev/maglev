@@ -22,7 +22,7 @@ class Exception
     primitive_nobridge '__message=', 'messageText:'
     primitive_nobridge '__st_initialize', 'initialize'
 
-    primitive_nobridge '__basic_dup', '_basicCopy'
+    primitive_nobridge '__basic_dup', 'shallowCopy'
 
     def dup
       res = self.__basic_dup
@@ -129,6 +129,9 @@ class Exception
       if stk._not_equal?(oldstk)
         stk = Thread.__st_to_rubybacktrace(stk)
         @_st_gsStack = stk
+      end
+      if stk.__size._equal?(0)
+        return nil
       end
       stk   
     end

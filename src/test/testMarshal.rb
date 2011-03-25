@@ -251,7 +251,7 @@ DATA = {
     "Module Marshal" => [Marshal,
                          "\004\bm\fMarshal"],
     "_dump object extended" => [UserDefined.new.extend(Meths),
-                                "\004\bu:\020UserDefined\022\004\b[\a\"\nstuff@\006"],
+                                "\004\bu:\020UserDefined\022\004\b[\a\"\nstuff@\006\000"],
     "marshal_dump object" => [UserMarshalWithIvar.new,
                               "\004\bU:\030UserMarshalWithIvar[\006\"\fmy data"],
     "Float 0.0" => [0.0,

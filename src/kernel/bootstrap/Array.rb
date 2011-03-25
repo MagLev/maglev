@@ -1382,7 +1382,12 @@ class Array
     count
   end
 
-  primitive 'pack', 'rubyPack:'
+  primitive '__pack', 'rubyPack:'
+
+  def pack(template_str)
+    template_str = Type.coerce_to(template_str, String, :to_str)
+    self.__pack(template_str)
+  end
 
   def self.__pack_coerce(obj, sym)
     # sent from C code in capiprim.c
