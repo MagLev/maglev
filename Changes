@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 881 in Array#first
+
 == Changes for 25549 2011-03-24
 * Fix Trac 880
 * Fix some spec failures
