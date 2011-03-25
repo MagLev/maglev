@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25535 2011-03-23
+== Changes for 25549 2011-03-24
 * Fix Trac 880
 * Fix some spec failures
 * Bugfixes and enhancements to underlying GemStone 3.0 system
