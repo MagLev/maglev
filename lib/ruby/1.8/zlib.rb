@@ -416,25 +416,42 @@ module Zlib
     end
   end
 
-#   class Deflate < ZStream
+  class Deflate < ZStream
+    # Decompress +string+.
+    #
+    def self.deflate(string, level=DEFAULT_COMPRESSION)
+      deflate_stream = Zlib::Deflate.new(level)
+      buf = deflate_stream.deflate(string)
+      deflate_stream.finish
+      deflate_stream.close
+      buf
+    end
 
-#     # Compresses the given +string+. Valid values of level are
-#     # <tt>Zlib::NO_COMPRESSION</tt>, <tt>Zlib::BEST_SPEED</tt>,
-#     # <tt>Zlib::BEST_COMPRESSION</tt>, <tt>Zlib::DEFAULT_COMPRESSION</tt>, and an
-#     # integer from 0 to 9.
-#     #
-#     # This method is almost equivalent to the following code:
-#     #
-#     #   def deflate(string, level)
-#     #     z = Zlib::Deflate.new(level)
-#     #     dst = z.deflate(string, Zlib::FINISH)
-#     #     z.close
-#     #     dst
-#     #   end
-#     #
-#     # TODO: what's default value of +level+?
-#     def deflate(string, flush = Zlib::FINISH)
+    # @param [Fixnum] level One of the compression levels, NO_COMPRESSION,
+    #        BEST_SPEED, BEST_COMPRESSION or DEFAULT_COMPRESSION
+    #
+    #def initialize(level=DEFAULT_COMPRESSION, wbits=nil, memlevel=nil, strategy=nil)
+    def initialize(level=DEFAULT_COMPRESSION)
+      @level = level
+    end
 
-#     end
-#   end
+    def deflate(string, level=nil)
+      compressed_data = StringIO.new('')
+      __open(true, compressed_data, Error, level || @level)
+      write(string, string.length)
+      flush(SYNC_FLUSH)
+      compressed_data.string
+    end
+
+    # This method is equivalent to <tt>deflate('', flush)</tt>.  If flush
+    # is omitted, <tt>Zlib::SYNC_FLUSH</tt> is used as flush.  This method
+    # is just provided to improve the readability of your Ruby program.
+    def flush(flush=SYNC_FLUSH)
+      # deflate('', flush) unless flush == NO_FLUSH
+    end
+
+    def finish(type=FINISH)
+      # ??
+    end
+  end
 end
