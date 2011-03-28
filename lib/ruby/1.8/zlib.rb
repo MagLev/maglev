@@ -8,37 +8,37 @@ module Zlib
   # constants from zlib.h as linked into Gemstone libgcilnk.so
   ZLIB_VERSION = "1.2.5"
 
-  Z_NO_FLUSH    =  0
-  # Z_PARTIAL_FLUSH = 1 # will be removed, use Z_SYNC_FLUSH instead
-  Z_SYNC_FLUSH    = 2
-  Z_FULL_FLUSH    = 3  # inflate() will terminate a block of compressed data
-  Z_FINISH        = 4
-  Z_BLOCK         = 5  # deflate() will return at end of next block boundary,
+  NO_FLUSH    =  0
+  # PARTIAL_FLUSH = 1 # will be removed, use SYNC_FLUSH instead
+  SYNC_FLUSH    = 2
+  FULL_FLUSH    = 3  # inflate() will terminate a block of compressed data
+  FINISH        = 4
+  BLOCK         = 5  # deflate() will return at end of next block boundary,
                         #  or after the gzip header .
-  Z_TREES         = 6
+  TREES         = 6
 
-  Z_OK            = 0
-  Z_STREAM_END    = 1
-  Z_NEED_DICT     = 2
-  Z_ERRNO        = (-1)
-  Z_STREAM_ERROR = (-2)
-  Z_DATA_ERROR   = (-3)
-  Z_MEM_ERROR    = (-4)
-  Z_BUF_ERROR    = (-5)
-  Z_VERSION_ERROR = (-6)
+  OK            = 0
+  STREAM_END    = 1
+  NEED_DICT     = 2
+  ERRNO        = (-1)
+  STREAM_ERROR = (-2)
+  DATA_ERROR   = (-3)
+  MEM_ERROR    = (-4)
+  BUF_ERROR    = (-5)
+  VERSION_ERROR = (-6)
 
-  Z_NO_COMPRESSION     =    0
-  Z_BEST_SPEED         =    1
-  Z_BEST_COMPRESSION   =    9
-  Z_DEFAULT_COMPRESSION = (-1)
+  NO_COMPRESSION     =    0
+  BEST_SPEED         =    1
+  BEST_COMPRESSION   =    9
+  DEFAULT_COMPRESSION = (-1)
 
-  Z_FILTERED           = 1
-  Z_HUFFMAN_ONLY       = 2
-  Z_RLE                = 3
-  Z_FIXED              = 4
-  Z_DEFAULT_STRATEGY   = 0
+  FILTERED           = 1
+  HUFFMAN_ONLY       = 2
+  RLE                = 3
+  FIXED              = 4
+  DEFAULT_STRATEGY   = 0
 
-  Z_DEFLATED   = 8
+  DEFLATED   = 8
 
   # from zconf.h
   MAX_WBITS = 15 # 32K LZ77 window
@@ -78,7 +78,7 @@ module Zlib
         begin
           yield obj
         ensure
-          obj.close 
+          obj.close
         end
       end
     end
@@ -131,8 +131,8 @@ module Zlib
       @comment = arr[1]
       @mtime = arr[2]
     end
-   
-    def rewind 
+
+    def rewind
       @zstream.close
       @io.rewind
       @zstream = ZStream.open_read(@io, Error)
@@ -198,7 +198,7 @@ module Zlib
       end
       sio
     end
-  
+
     def each_line(sep=$/, &block)
       sio = self.__contents_sio
       sio.each_line(sep, &block)
@@ -224,7 +224,7 @@ module Zlib
 
   class GzipWriter < GzipFile  # {
 
-    GzfError = GzipFile::Error 
+    GzfError = GzipFile::Error
 
     ##
     # Creates a GzipWriter object associated with +io+. +level+ and +strategy+
@@ -233,8 +233,8 @@ module Zlib
     # respond to the +write+ method that behaves same as write method in IO
     # class.
 
-    def initialize(io, level = Z_DEFAULT_COMPRESSION,
-                   strategy = Z_DEFAULT_STRATEGY)
+    def initialize(io, level = DEFAULT_COMPRESSION,
+                   strategy = DEFAULT_STRATEGY)
       @level = level
       @strategy = strategy
       @io = io
@@ -258,7 +258,7 @@ module Zlib
         raise GzfError, 'header is already written' # Error resolves to GzipFile::Error
       end
       t = Integer(time)
-      @mtime = t 
+      @mtime = t
     end
 
     def orig_name=(v)
@@ -281,7 +281,7 @@ module Zlib
       __validate_string(@orig_name)
       __validate_string(@comment)
       lev = @level
-      if (lev < Z_DEFAULT_COMPRESSION || lev > Z_BEST_COMPRESSION)
+      if (lev < DEFAULT_COMPRESSION || lev > BEST_COMPRESSION)
         raise ArgumentError, 'compression level out of range'
       end
       @zstream = ZStream.open_write(@io, Error, lev) # Error resolves to GzipFile::Error
@@ -323,29 +323,29 @@ module Zlib
 
     alias << write
 
-    def finish(flags=Z_SYNC_FLUSH)
+    def finish(flags=SYNC_FLUSH)
       strm = @zstream
       if strm._equal?(nil)
         write_header
         strm = @zstream
-      end 
+      end
       bs = @bufsize
       if bs > 0
         strm.write(@buffer, bs)
         @bufsize = 0
       end
-      unless flags == Z_SYNC_FLUSH
+      unless flags == SYNC_FLUSH
         strm.flush(flags)  # writes footer
       end
       @io
     end
 
-    def flush(flags=Z_SYNC_FLUSH)
+    def flush(flags=SYNC_FLUSH)
       self.finish(flags)
     end
 
     def close
-      self.finish(Z_FINISH)
+      self.finish(FINISH)
       @zstream.close
       @zstream = nil
       io = @io
@@ -375,14 +375,14 @@ module Zlib
     end
 
     def inflate(string)
-      __open(false, StringIO.new(string), Error, Z_DEFAULT_COMPRESSION) # Error resolves to Zlib::Error
+      __open(false, StringIO.new(string), Error, DEFAULT_COMPRESSION) # Error resolves to Zlib::Error
       self.flush_next_out
     end
 
     def <<(string)
       io = @ioObj
       if io._equal?(nil)
-        __open(false, StringIO.new(string), Error, Z_DEFAULT_COMPRESSION)
+        __open(false, StringIO.new(string), Error, DEFAULT_COMPRESSION)
       else
         @ioObj << string
       end
@@ -390,7 +390,7 @@ module Zlib
 
     def flush_next_out
       buf = ''
-      while ! at_eof 
+      while ! at_eof
         buf << read(2048)
       end
       buf
@@ -405,36 +405,53 @@ module Zlib
         @isClosed = true
         super()
       end
-    end 
+    end
 
     def closed?
-      @isClosed 
+      @isClosed
     end
-    
+
     def finished?
       at_eof
     end
   end
 
-#   class Deflate < ZStream
+  class Deflate < ZStream
+    # Decompress +string+.
+    #
+    def self.deflate(string, level=DEFAULT_COMPRESSION)
+      deflate_stream = Zlib::Deflate.new(level)
+      buf = deflate_stream.deflate(string)
+      deflate_stream.finish
+      deflate_stream.close
+      buf
+    end
 
-#     # Compresses the given +string+. Valid values of level are
-#     # <tt>Zlib::NO_COMPRESSION</tt>, <tt>Zlib::BEST_SPEED</tt>,
-#     # <tt>Zlib::BEST_COMPRESSION</tt>, <tt>Zlib::DEFAULT_COMPRESSION</tt>, and an
-#     # integer from 0 to 9.
-#     #
-#     # This method is almost equivalent to the following code:
-#     #
-#     #   def deflate(string, level)
-#     #     z = Zlib::Deflate.new(level)
-#     #     dst = z.deflate(string, Zlib::FINISH)
-#     #     z.close
-#     #     dst
-#     #   end
-#     #
-#     # TODO: what's default value of +level+?
-#     def deflate(string, flush = Zlib::FINISH)
+    # @param [Fixnum] level One of the compression levels, NO_COMPRESSION,
+    #        BEST_SPEED, BEST_COMPRESSION or DEFAULT_COMPRESSION
+    #
+    #def initialize(level=DEFAULT_COMPRESSION, wbits=nil, memlevel=nil, strategy=nil)
+    def initialize(level=DEFAULT_COMPRESSION)
+      @level = level
+    end
 
-#     end
-#   end
+    def deflate(string, level=nil)
+      compressed_data = StringIO.new('')
+      __open(true, compressed_data, Error, level || @level)
+      write(string, string.length)
+      flush(SYNC_FLUSH)
+      compressed_data.string
+    end
+
+    # This method is equivalent to <tt>deflate('', flush)</tt>.  If flush
+    # is omitted, <tt>Zlib::SYNC_FLUSH</tt> is used as flush.  This method
+    # is just provided to improve the readability of your Ruby program.
+    def flush(flush=SYNC_FLUSH)
+      # deflate('', flush) unless flush == NO_FLUSH
+    end
+
+    def finish(type=FINISH)
+      # ??
+    end
+  end
 end
