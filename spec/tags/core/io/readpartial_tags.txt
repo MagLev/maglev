@@ -8,3 +8,4 @@ fails:IO#readpartial discards the existing buffer content upon error
 fails:IO#readpartial raises IOError if the stream is closed
 fails:IO#readpartial raises ArgumentError if the negative argument is provided
 fails:IO#readpartial immediately returns an empty string if the length argument is 0
+fails:IO#readpartial reads after ungetc with multibyte characters in the buffer
