@@ -736,6 +736,9 @@ class Hash
     # RUBINIUS: This code is from rubinius core/hash.rb ;  modified.
     # maglev 1.8.7 does not support returning an Enumerator due to complex side effects
     unless block_given?
+      if @_st_numElements._equal?(0)
+        return nil
+      end    
       raise LocalJumpError, "no block given"  # changes for 1.8.7
     else
       # Do this in 2 steps, so we're not altering the structure while we walk it.

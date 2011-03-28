@@ -787,12 +787,17 @@ class File
     unless a_length._equal?(nil)
       length = Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
-      return nil if self.pos > self.stat.size
+      if self.pos > self.stat.size
+        buffer = Type.coerce_to(a_buffer, String, :to_str)
+        buffer.size = 0 
+        return nil 
+      end
     end
     buffer = Type.coerce_to(a_buffer, String, :to_str)
     length = self.stat.size if length._equal?(nil)
     num_read = __read_into(length, buffer, true)
     if num_read._equal?(0)
+      buffer.size = 0
       return a_length._equal?(nil)  ? '' : nil
     end
     raise IOError, 'error' if num_read._equal?(nil)

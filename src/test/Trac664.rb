@@ -32,9 +32,13 @@ elem = res[0]
 unless elem[0] == "AF_INET" && elem[1] == 80
   raise "error: expected 'AF_INET' and port 80: actual #{elem[0]} #{elem[1]}"
 end
-unless elem[2] =~ /vmware.com/
+
+# The actual value for this changes depending on whether you are inside or
+# outside of the firewall, so check for either case.
+unless elem[2] =~ /vmware.com/ || elem[2] =~ /akamaitechnologies/
   raise "error: akamaitechnologies:  actual #{elem[2]}"
 end
+
 unless elem[3] =~ /\d{2,3}\.\d{1,3}\.\d{1,3}/
   raise "error: expected inet number:  actual #{elem[3]}"
 end

@@ -1,1 +1,2 @@
 fails:Module#alias_method is a private method
+fails:Module#alias_method handles aliasing a stub that changes visibility

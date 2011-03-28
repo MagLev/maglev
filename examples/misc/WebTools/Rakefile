@@ -1,6 +1,11 @@
-task :default => :webtools
+task :default => :run
 
 MH = ENV['MAGLEV_HOME']
+
+desc "Run the WebTools Sinatra App"
+task :run => :web_assets do
+  sh "#{MH}/bin/rackup -Ilib config.ru"
+end
 
 desc "Run a simple web app to view code and statistics."
 task :webtools, :meta do |t, args|
@@ -17,3 +22,19 @@ task :webtools, :meta do |t, args|
   # Start the server
   sh "maglev-ruby -d web_tools.rb #{args.meta}"
 end
+
+task :tests do
+  FileList['tests/test_*'].each do |file|
+    sh "maglev-ruby -rubygems -Ilib #{file}"
+  end
+end
+
+file "public/stylesheets" do
+  sh "ln -s #{MH}/gemstone/examples/www/css public/stylesheets"
+end
+
+file "public/javascript" do
+  sh "ln -s #{MH}/gemstone/examples/www/scripts public/javascript"
+end
+
+task :web_assets => ['public/stylesheets', 'public/javascript']

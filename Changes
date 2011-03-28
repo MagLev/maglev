@@ -4,12 +4,15 @@
 
 == Unreleased Changes
 
-== Changes for 25549 2011-03-24
-* Fix Trac 880
+== Changes for 25572 2011-03-28
+* Fix Trac 881 in Array#first
+* Fix Trac 883, 880
 * Fix some spec failures
+* Added Zlib::Deflate
 * Bugfixes and enhancements to underlying GemStone 3.0 system
-  optimize CharacterCollection>>copy to call the shallowCopy primitive and not send postCopy
-  fix asString on LargeInteger overflow errors
+  - optimize CharacterCollection>>copy to call the shallowCopy primitive and not send postCopy
+  - fix asString on LargeInteger overflow errors
+  - fix problem with upgrading from GS/S 2.4
 
 == Changes for 25506 2011-03-18
 * Fix Trac 878, add test coverage for 521 .

@@ -224,3 +224,25 @@ class Float
     Marshal__TYPE_FLOAT + ms.serialize_integer(str.length) + str
   end
 end
+
+class IO
+  def to_marshal(ms)
+    raise TypeError , 'IO#to_marshal not supported'
+  end
+end
+class MatchData
+  def to_marshal(ms)
+    raise TypeError , 'MatchData#to_marshal not supported'
+  end
+end
+class Method
+  def to_marshal(ms)
+    raise TypeError , 'Method#to_marshal not supported'
+  end
+end
+class Proc
+  def to_marshal(ms)
+    raise TypeError , 'IO#to_marshal not supported'
+  end
+end
+

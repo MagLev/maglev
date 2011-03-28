@@ -445,12 +445,12 @@ module Marshal
         idx = @objs_dict[obj]
         if idx._equal?(nil)
           @depth -= 1
-          if obj.respond_to? :_dump then
-            add_output_obj(obj)
-            str = serialize_user_defined obj
-          elsif obj.respond_to? :marshal_dump then
+          if obj.respond_to? :marshal_dump then
             add_output_obj(obj)
             str = serialize_user_marshal obj
+          elsif obj.respond_to? :_dump then
+            add_output_obj(obj)
+            str = serialize_user_defined obj
           else
             add_output_obj(obj)
             str = obj.to_marshal(self)

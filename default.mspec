@@ -13,7 +13,6 @@ class MSpecScript
                 "^spec/rubyspec/language/block_spec.rb"]
 
   core_files = ['spec/rubyspec/core',
-            "^spec/rubyspec/core/array/product_spec.rb",
                 "^spec/rubyspec/core/argf/seek_spec.rb",
             "^spec/rubyspec/core/basicobject",
             "^spec/rubyspec/core/fixnum/right_shift_spec.rb",
