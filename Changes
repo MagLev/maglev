@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25572 2011-03-28
+== Changes for 25580 2011-03-29
 * Fix Trac 881 in Array#first
 * Fix Trac 883, 880
 * Fix some spec failures
@@ -13,6 +13,7 @@
   - optimize CharacterCollection>>copy to call the shallowCopy primitive and not send postCopy
   - fix asString on LargeInteger overflow errors
   - fix problem with upgrading from GS/S 2.4
+  - QuadByteString & QuadByteSymbol improvements
 
 == Changes for 25506 2011-03-18
 * Fix Trac 878, add test coverage for 521 .
