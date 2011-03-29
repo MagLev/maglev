@@ -1,8 +1,21 @@
+
+require 'webtools/code_browser'
+
 # This module emulates all of the API from the Smalltalk side of things
+
+
 module WebTools
 
   # This is a ViewModel for the WebTools Application
   class AppModel
+
+    def initialize
+      @code_browser = WebTools::CodeBrowser.new
+    end
+
+    def code_browser
+      @code_browser.state
+    end
 
     # Returns an array of tool descriptions.  Each description is a hash
     def tools

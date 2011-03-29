@@ -9,10 +9,8 @@ class WebToolsApp < Sinatra::Base
     @ts = Time.now
     unless session[:app]
       session[:app] = WebTools::AppModel.new
-      puts "========= NEW APP"
     end
     @app = session[:app]
-    puts "====== APP: #{@app.inspect}"
   end
 
   get '/' do
@@ -30,19 +28,24 @@ class WebToolsApp < Sinatra::Base
     erb :sessions, :layout => false
   end
 
-  get '/browsecode' do
+  get '/codebrowser' do
     content_type :json
-    ['browsecode: Not Implemented'].to_json
+    add_time_stats(@app.code_browser.to_json).to_json
   end
 
   get '/statistics' do
     content_type :json
-    ['statistics: Not Implemented'].to_json
+    add_time_stats(['statistics: Not Implemented']).to_json
   end
 
   get '/tools' do
     content_type :json
-    sinatra_time = ((Time.now - @ts) * 1_000).to_i
-    { 'tools' => @app.tools, '_time'  => sinatra_time }.to_json
+    add_time_stats(@app.tools).to_json
+  end
+
+  def add_time_stats(data)
+    # sinatra_time = ((Time.now - @ts) * 1_000).to_i
+    { "_time" => ((Time.now - @ts) * 1_000).to_i,
+      "data"  => data }
   end
 end
