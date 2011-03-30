@@ -1,4 +1,4 @@
-require 'maglev/method_source'
+require 'maglev/method_source' if defined? Maglev
 module WebTools
   # Provide information about the Ruby environment
   module Ruby

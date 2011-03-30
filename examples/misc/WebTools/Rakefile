@@ -23,7 +23,7 @@ task :webtools, :meta do |t, args|
   sh "maglev-ruby -d web_tools.rb #{args.meta}"
 end
 
-task :tests do
+task :test do
   FileList['tests/test_*'].each do |file|
     sh "maglev-ruby -rubygems -Ilib #{file}"
   end
