@@ -15,12 +15,12 @@ body * { font-size: 10pt; }
 #tabs { position: fixed; top: 0; left: 0; bottom: 2em; right: 0; }
 #tabs .ui-tabs-panel { border-width: 0 1px 1px 1px; top: 30px; left: 3px; bottom: 3px; right: 3px; }
 
-#rubyCodeBrowser { height: 50% }
+#rubyCodeBrowser { height: 45% }
 
 #rubyModuleList { position: absolute; top: 0; left: 0; width: 25%; bottom: 0; }
 #rubyConstants { position: absolute; top: 0; left: 25%; width: 25%; bottom: 0; }
-#rubyModuleMethods { position: absolute; top: 0; left: 50%; width: 25%; bottom: 0; background: red; }
-#rubyInstanceMethods { position: absolute; top: 0; left: 75%; width: 25%; bottom: 0; background: blue; }
+#rubyModuleMethods { position: absolute; top: 0; left: 50%; width: 25%; bottom: 0; }
+#rubyInstanceMethods { position: absolute; top: 0; left: 75%; width: 25%; bottom: 0; }
 
 
 /* Not sure why I need height 95%, but otherwise the last element is cut off.... */
@@ -29,9 +29,11 @@ body * { font-size: 10pt; }
 #rubyCodeBrowser ul li:hover { background: #CCC; }
 .ui-selected  { background: #AAA; }
 
-
-
 #rubyEditArea { position: absolute; top: 60%; left: 0; right: 0; bottom: 0;   margin: 2px; }
 #rubyEditor { height: 100%; width: 100%;  }
 
 #statusBar { border-bottom: 1px solid #DDD; padding: 3px 4px; position: fixed; bottom: 1.4em; height: 1em; width: 100% }
+
+.CodeMirror-line-numbers { width: 2.2em; color: #aaa; background-color: #eee; text-align: right;
+	padding-right: .3em; font-size: 10pt; font-family: monospace; padding-top: .4em;
+	line-height: normal; }

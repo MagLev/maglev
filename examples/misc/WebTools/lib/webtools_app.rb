@@ -33,7 +33,6 @@ puts "== before: done"
   end
 
   get '/codebrowser/modulelist' do
-puts "== GET /codebrowser/module"
     content_type :json
     wrap_in_metadata(WebTools::CodeBrowser.class_and_module_list).to_json
   end
@@ -49,6 +48,11 @@ puts "== GET /codebrowser/module"
       @stack = e.backtrace
       wrap_in_metadata("Error: #{e}").to_json
     end
+  end
+
+  get '/constant' do
+    content_type :json
+    wrap_in_metadata({:value => "foo" }).to_json;
   end
 
   get '/statistics' do

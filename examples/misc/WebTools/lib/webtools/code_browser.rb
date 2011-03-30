@@ -19,7 +19,7 @@ module WebTools
       mod = Ruby.find_in_namespace(module_name)
       @selected_class = module_name
       @constants = mod.constants.sort
-      @class_methods = Ruby.module_fns_for(mod)
+      @module_methods = Ruby.module_fns_for(mod)
       @instance_methods = mod.instance_methods(false).sort
       state
     end

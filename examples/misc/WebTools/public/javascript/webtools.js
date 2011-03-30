@@ -1,13 +1,12 @@
 maglevInfo = (function() {
-  var requestCount       = 0;
+  var requestCount = 0, rubyEditor = null;
 
   $(document).ready(function() {
     console.log('document ready');
     setupTabs();
     setupSelectables();
-    // Since we only have one tab, we load it's JSON by hand
-    updateCodeBrowser();
-
+    setupEditor();
+    updateCodeBrowser();  // Not sure this is the best way to kick it off...
   });
 
   function setupTabs() {
@@ -21,13 +20,6 @@ maglevInfo = (function() {
         updateCodeBrowser();
       }
     });
-    tabs.bind('tabsload', function(event, ui) {
-      console.log("Tabs Load: " + ui.panel.id);
-    });
-    tabs.bind('tabsshow', function(event, ui) {
-      console.log("Tabs Show : " + ui.panel.id);
-    });
-
   }
 
   function setupSelectables() {
@@ -35,41 +27,64 @@ maglevInfo = (function() {
     console.log('setupSelectables()');
 
     $('#rubyModuleList').selectable({
-      selected: function(event, ui) {
-        console.log(ui.selected.title);
-        setSelectedClass(ui.selected.title);
-      }
+      selected: function(event, ui) { setSelectedClass(ui.selected.title); }
     });
     $('#rubyConstants').selectable({
-      selected: function(event, ui) {
-        console.log(ui.selected.title);
-        setSelectedConstant(ui.selected.title);
-      }
+      selected: function(event, ui) { setSelectedConstant(ui.selected.title); }
     });
     $('#rubyModuleMethods').selectable({
-      selected: function(event, ui) {
-        console.log(ui.selected.title);
-        setSelectedModuleMethod(ui.selected.title);
-      }
+      selected: function(event, ui) { setSelectedModuleMethod(ui.selected.title); }
     });
     $('#rubyInstanceMethods').selectable({
-      selected: function(event, ui) {
-        console.log(ui.selected.title);
-        setSelectedInstanceMethod(ui.selected.title);
-      }
+      selected: function(event, ui) { setSelectedInstanceMethod(ui.selected.title); }
     });
   };
 
+  function setupEditor() {
+    rubyEditor = CodeMirror.fromTextArea('rubyEditor',
+                                         { height: "100%",
+                                           parserfile: "parseSmalltalk.js",
+                                           stylesheet: "CodeMirror/css/Smalltalk.css",
+                                           path: "CodeMirror/js/",
+                                           lineNumbers: true});
+  };
+
+  function selectedModuleName() {
+    $('#rubyModuleList .ui-selected').attr('title');
+  }
+
+  function selectedConstantName() {
+    $('#rubyConstants .ui-selected').attr('title');
+  }
+
+  function selectedModuleMethodName() {
+    $('#rubyModuleMethods .ui-selected').attr('title');
+  }
+
+  function selectedInstanceMethodName() {
+    $('#rubyInstanceMethods .ui-selected').attr('title');
+  }
+
   function setSelectedConstant(constName) {
     console.log('selected constant ' + constName);
+    $('#rubyModuleMethods .ui-selected').removeClass('ui-selected');
+    $('#rubyInstanceMethods .ui-selected').removeClass('ui-selected');
+    getJSON('/constant',
+            { moduleName: selectedModuleName(),
+              constName:  selectedConstantName() },
+            function(data) { renderSource(data['value']) });
   };
 
   function setSelectedModuleMethod(methodName) {
     console.log('selected module method ' + methodName);
+    $('#rubyConstants .ui-selected').removeClass('ui-selected');
+    $('#rubyInstanceMethods .ui-selected').removeClass('ui-selected');
   };
 
   function setSelectedInstanceMethod(methodName) {
     console.log('selected instance method ' + methodName);
+    $('#rubyConstants .ui-selected').removeClass('ui-selected');
+    $('#rubyModuleMethods .ui-selected').removeClass('ui-selected');
   };
 
   // Makes a JSON request, and decorates it with timing information.
@@ -101,7 +116,6 @@ maglevInfo = (function() {
           + elapsed + ' ms on the client.'
       );
     };
-
   };
 
   // Retrieve fresh data for the codebrowser and render it
@@ -124,43 +138,13 @@ maglevInfo = (function() {
       console.log('renderSelection()');
       console.log(data);
 
-      renderConstants();
-//      renderModuleMethods();
-//      renderInstanceMethods();
+      renderList(data['constants'],        $('#rubyConstants'));
+      renderList(data['module_methods'],   $('#rubyModuleMethods'));
+      renderList(data['instance_methods'], $('#rubyInstanceMethods'));
     };
 
-    function renderConstants() {
-      console.log('renderConstants()');
-      constants = data['constants'];
-      if (constants) {
-        var constantList = $('#rubyConstants').empty();
-        $.each(constants, function(n, constant) {
-          var li = $('<li>', { title: constant, class: 'ui-widget-content'});
-          li.html(constant);
-          li.appendTo(constantList);
-        });
-      }
-    }
-
-    function renderModuleMethods() {
-      console.log('renderModuleMethods()');
-      methods = data['moduleMethods'];
-      if (constants) {
-        var list = $('#rubyModuleMethods').empty();
-        $.each(methods, function(n, method) {
-          var li = $('<li>', { title: method, class: 'ui-widget-content'});
-          li.html(method);
-          li.appendTo(list);
-        });
-      }
-    }
-
-    function renderInstanceMethods() {
-      renderList(data['moduleMethods'], $('#rubyInstanceMethods'));
-    };
-    
     function renderList(items, ui) {
-      console.log('renderList()');
+      console.log('renderList('+ui+')');
       if (items) {
         ui.empty();
         $.each(items, function(n, item) {
@@ -186,4 +170,11 @@ maglevInfo = (function() {
       };
     };
   }
+
+  function renderSource(string) {
+    console.log('renderSource: ' + string);
+    if (rubyEditor.editor) {
+      rubyEditor.setCode(string);
+    }
+  };
 })();
