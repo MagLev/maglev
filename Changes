@@ -4,7 +4,9 @@
 
 == Unreleased Changes
 
-== Changes for 25583 2011-03-29
+== Changes for 25593 2011-03-30
+* WebTools now is a "pure ruby" app. Basics are there, but more work is 
+  needed before it's ready.
 * Fix Trac 881 in Array#first
 * Fix Trac 883, 880
 * Fix some spec failures
@@ -14,6 +16,8 @@
   - fix asString on LargeInteger overflow errors
   - fix problem with upgrading from GS/S 2.4
   - QuadByteString & QuadByteSymbol improvements
+  - Refactor #'copyFrom:to:into:startingAt:'
+  - GsObjectInventory improvements
 
 == Changes for 25506 2011-03-18
 * Fix Trac 878, add test coverage for 521 .
