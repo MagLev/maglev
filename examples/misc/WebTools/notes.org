@@ -1,4 +1,11 @@
 * Notes on the re-tool of WebTools
+** TO DO
+   + Put source and line number in own html, not in the editor
+   + Object inspector
+   + Transaction control buttons
+   + Label the columns
+   + Handle Errors
+   + Array.new doesn't show source: fix
 
 ** Things to change:
 

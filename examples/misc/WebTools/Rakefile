@@ -3,24 +3,32 @@ task :default => :run
 MH = ENV['MAGLEV_HOME']
 
 desc "Run the WebTools Sinatra App"
-task :run => :web_assets do
+task :run do
   sh "#{MH}/bin/rackup -Ilib config.ru"
 end
 
-desc "Run a simple web app to view code and statistics."
-task :webtools, :meta do |t, args|
-  # Load the Smalltalk example code into the MagLev repository, and commit it.
-  file = "#{MH}/gemstone/examples/www/install.tpz"
-  raise "Can't find #{file}" unless File.exists? file
-  cd(MH) { sh "rake maglev:input_file[#{file}]" }
+desc "Commit an interesting example class, AValidPerson, to the repository"
+task :meta do
+  sh "maglev-ruby -Mcommit lib/webtools/meta_demo.rb"
+end
 
-  # Enable the MagLev WebTools code
-  file = "#{MH}/gemstone/examples/www/src/maglev.rb"
-  raise "Can't find #{file}" unless File.exists? file
-  sh "maglev-ruby -Mcommit #{file}"
+namespace :smalltalk do
+  desc "Run the Smalltalk WebTools code from ruby."
+  task :run do
+    # Load the Smalltalk example code into the MagLev repository, and
+    # commit it.
+    file = "#{MH}/gemstone/examples/www/install.tpz"
+    raise "Can't find #{file}" unless File.exists? file
+    cd(MH) { sh "rake maglev:input_file[#{file}]" }
 
-  # Start the server
-  sh "maglev-ruby -d web_tools.rb #{args.meta}"
+    # Enable the MagLev WebTools code
+    file = "#{MH}/gemstone/examples/www/src/maglev.rb"
+    raise "Can't find #{file}" unless File.exists? file
+    sh "maglev-ruby -Mcommit #{file}"
+
+    # Start the server
+    sh "maglev-ruby -d lib/webtools/smalltalk_tools.rb"
+  end
 end
 
 task :test do
@@ -28,13 +36,3 @@ task :test do
     sh "maglev-ruby -rubygems -Ilib #{file}"
   end
 end
-
-file "public/stylesheets" do
-  sh "ln -s #{MH}/gemstone/examples/www/css public/stylesheets"
-end
-
-file "public/javascript" do
-  sh "ln -s #{MH}/gemstone/examples/www/scripts public/javascript"
-end
-
-task :web_assets => ['public/stylesheets', 'public/javascript']
