@@ -50,41 +50,53 @@ maglevInfo = (function() {
   };
 
   function selectedModuleName() {
-    $('#rubyModuleList .ui-selected').attr('title');
+    return $('#rubyModuleList .ui-selected').attr('title');
   }
 
   function selectedConstantName() {
-    $('#rubyConstants .ui-selected').attr('title');
+    return $('#rubyConstants .ui-selected').attr('title');
   }
 
   function selectedModuleMethodName() {
-    $('#rubyModuleMethods .ui-selected').attr('title');
+    return $('#rubyModuleMethods .ui-selected').attr('title');
   }
 
   function selectedInstanceMethodName() {
-    $('#rubyInstanceMethods .ui-selected').attr('title');
+    return $('#rubyInstanceMethods .ui-selected').attr('title');
   }
 
   function setSelectedConstant(constName) {
-    console.log('selected constant ' + constName);
     $('#rubyModuleMethods .ui-selected').removeClass('ui-selected');
     $('#rubyInstanceMethods .ui-selected').removeClass('ui-selected');
+
     getJSON('/constant',
-            { moduleName: selectedModuleName(),
-              constName:  selectedConstantName() },
-            function(data) { renderSource(data['value']) });
+            { 'moduleName': selectedModuleName(),
+              'constName':  selectedConstantName() },
+            function(data) { renderSource(data['const_value']); });
   };
 
   function setSelectedModuleMethod(methodName) {
     console.log('selected module method ' + methodName);
     $('#rubyConstants .ui-selected').removeClass('ui-selected');
     $('#rubyInstanceMethods .ui-selected').removeClass('ui-selected');
+
+    getJSON('/method',
+            { moduleName: selectedModuleName(),
+              methName:   selectedModuleMethodName(),
+              isInstanceMethod: false },
+            function(data) { renderSource(data['method_source']); });
   };
 
   function setSelectedInstanceMethod(methodName) {
     console.log('selected instance method ' + methodName);
     $('#rubyConstants .ui-selected').removeClass('ui-selected');
     $('#rubyModuleMethods .ui-selected').removeClass('ui-selected');
+
+    getJSON('/method',
+            { moduleName: selectedModuleName(),
+              methName:   selectedInstanceMethodName(),
+              isInstanceMethod: true },
+            function(data) { renderSource(data['method_source']); });
   };
 
   // Makes a JSON request, and decorates it with timing information.
@@ -94,6 +106,8 @@ maglevInfo = (function() {
     var statusBar = $('#statusBar');
     $(statusBar).text('Sent request #' + (++requestCount) + ' for ' + url);
 
+    console.log('Calling $.getJSON with data: ');
+    console.log(data);
     $.getJSON(url, data, success);
     return;
 
@@ -121,11 +135,11 @@ maglevInfo = (function() {
   // Retrieve fresh data for the codebrowser and render it
   function updateCodeBrowser() {
     console.log('updateCodeBrowser()');
-    getJSON('/codebrowser/modulelist', null, renderCodeBrowser);
+    getJSON('/modulelist', null, renderCodeBrowser);
   };
 
   function setSelectedClass(className) {
-    getJSON('/codebrowser/module/' + className, null, renderCodeBrowser);
+    getJSON('/module/' + className, null, renderCodeBrowser);
   };
 
   function renderCodeBrowser(data) {
@@ -157,7 +171,7 @@ maglevInfo = (function() {
 
     function renderClassModuleList() {
       var modules = data['classNames'],
-      selected = data['selected_class'];
+      selected = data['selected_module'];
       console.log('renderClassModuleList()');
       if (modules) {
         var moduleList = $('#rubyModuleList').empty();

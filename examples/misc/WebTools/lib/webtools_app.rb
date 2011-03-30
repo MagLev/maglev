@@ -2,42 +2,36 @@ require 'sinatra/base'
 require 'webtools'
 require 'json'
 
+# TODO: Decide on my URLs.  Should I be REST-ful:
+#
+#    GET /module/FooModule/constant/XYZ
+#    GET /module/Object/instanceMethod/to_s
+#
+# Or use query params etc:
+#
+#    GET /constant?moduleName=FooModule&constName=XYZ
+#    GET /method?moduleName=Object&methName=to_s&isInstanceMethod=false
+#
 class WebToolsApp < Sinatra::Base
   enable :sessions
 
   before do
-puts "========= request: #{request.request_method} #{request.url}"    
-puts "== before: code_browser: #{session[:code_browser].inspect}"
     @ts = Time.now
     @stack = nil
-puts "== before: set app"
     @app = (session[:app] ||= WebTools::AppModel.new)
-puts "== before: set browser"
     @browser = (session[:code_browser] ||= WebTools::CodeBrowser.new)
-puts "== before: done"
   end
 
   get '/' do
     erb :index
   end
 
-  get '/version' do
-    @data = @app.version_report
-    erb :version, :layout => false
-  end
-
-  # Render the Sesssions list
-  get '/sessions' do
-    @data = @app.session_report
-    erb :sessions, :layout => false
-  end
-
-  get '/codebrowser/modulelist' do
+  get '/modulelist' do
     content_type :json
     wrap_in_metadata(WebTools::CodeBrowser.class_and_module_list).to_json
   end
 
-  get '/codebrowser/module/:name' do
+  get '/module/:name' do
     begin
       mod_name = params[:name]
       puts "== GET /codebrowser/#{mod_name}"
@@ -52,7 +46,22 @@ puts "== before: done"
 
   get '/constant' do
     content_type :json
-    wrap_in_metadata({:value => "foo" }).to_json;
+    wrap_in_metadata(@browser.select_constant(params[:moduleName], params[:constName])).to_json;
+  end
+
+  get '/method' do
+    content_type :json
+    wrap_in_metadata(@browser.select_method(params[:moduleName], params[:methName], params[:isInstanceMethod])).to_json;
+  end
+
+  get '/version' do
+    @data = @app.version_report
+    erb :version, :layout => false
+  end
+
+  get '/sessions' do
+    @data = @app.session_report
+    erb :sessions, :layout => false
   end
 
   get '/statistics' do

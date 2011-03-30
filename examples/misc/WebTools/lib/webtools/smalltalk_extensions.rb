@@ -1,5 +1,4 @@
 # Extra Smalltalk features used by WebTools
-if defined? Maglev
 class Maglev::System
     class_primitive_nobridge 'stone_version_report', 'stoneVersionReport'
     class_primitive_nobridge 'gem_version_report',   'gemVersionReport'
@@ -63,6 +62,4 @@ StringKeyValueDictionary = __resolve_smalltalk_global(:StringKeyValueDictionary)
 class StringKeyValueDictionary
   primitive_nobridge 'keys', 'keys'
   primitive_nobridge 'at', 'at:'
-end
-
 end

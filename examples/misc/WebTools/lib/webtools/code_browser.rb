@@ -17,18 +17,45 @@ module WebTools
       # to store the currently selected class/module.  Until then, this
       # suffices.
       mod = Ruby.find_in_namespace(module_name)
-      @selected_class = module_name
-      @constants = mod.constants.sort
-      @module_methods = Ruby.module_fns_for(mod)
-      @instance_methods = mod.instance_methods(false).sort
+      @const_value        = nil
+      @constants          = mod.constants.sort
+      @instance_methods   = mod.instance_methods(false).sort
+      @is_instance_method = nil
+      @module_methods     = Ruby.module_fns_for(mod)
+      @selected_constant  = nil
+      @selected_method    = nil
+      @selected_module    = module_name
       state
     end
 
+    def select_constant(module_name, const_name)
+      raise 'Module mismatch' unless @selected_module.nil? or @selected_module == module_name
+      @selected_constant = const_name
+      @const_value = Ruby.const_info_for(module_name, const_name)
+      { :selected_constant => @selected_constant,
+        :const_value       => @const_value }
+    end
+
+    def select_method(module_name, method_name, is_instance_method)
+      raise 'Module mismatch' unless @selected_module.nil? or @selected_module == module_name
+      @selected_method = method_name
+      @is_instance_method = is_instance_method
+      { :selected_method => @selected_method,
+        :is_instance_method => @is_instance_method,
+        :method_source => Ruby.source_for(module_name, method_name, is_instance_method) }
+    end
+
     def state
-      { :selected_class   => @selected_class   || nil,
-        :constants        => @constants        || [],
-        :instance_methods => @instance_methods || [],
-        :module_methods   => @module_methods   || [] }
+      {
+        :const_value        => @const_value,
+        :constants          => @constants         || [],
+        :instance_methods   => @instance_methods  || [],
+        :is_instance_method => @is_instance_method,
+        :module_methods     => @module_methods    || [],
+        :selected_constant  => @selected_constant,
+        :selected_method    => @selected_method,
+        :selected_module    => @selected_module,
+      }
     end
   end
 end
