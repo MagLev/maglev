@@ -1,7 +1,9 @@
-require 'test/unit'
+require 'minitest/unit'
 require 'webtools/appmodel'
 
-class TestAppModel < Test::Unit::TestCase
+MiniTest::Unit.autorun
+
+class TestAppModel < MiniTest::Unit::TestCase
   def test_format_seconds
     app = WebTools::AppModel.new
     [[0,      "00:00:00"],

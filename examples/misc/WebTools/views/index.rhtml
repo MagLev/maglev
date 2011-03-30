@@ -11,26 +11,37 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
     <script type="text/javascript" src="javascript/webtools.js"></script>
-
-    <script>
-      $(document).ready(function() {
-        $("#tabs").tabs();
-      });
-      
-    </script>
+    <script type="text/javascript" src="CodeMirror/js/codemirror.js"></script>
   </head>
   <body>
     <div id="tabs">
       <ul class="tabnav">
+<!--
+    Currently, we want to concentrate on the CodeBrowser for MagLev.  We've
+    commented out the following items, but there is a good chance they'll
+    work if you uncomment and want to play with them.  (also uncomment the
+    divs below)
+
         <li><a href="/version">Version Report</a></li>
         <li><a href="/sessions">Current Sessions</a></li>
-        <li><a href="#rubyCodeBrowser">Code Browser</a></li>
-        <li><a href="#statistics">Statistics</a></li>
+-->
+        <li><a href="#rubyCodeBrowser"><span>Code Browser</span></a></li>
       </ul>
+<!--
       <div id="versionReport" class="tabdiv"></div>
       <div id="currentSessions" class="tabdiv"></div>
-      <div id="rubyCodeBrowser" class="tabdiv"></div>
-      <div id="statistics" class="tabdiv"></div>
+-->
+      <div id="rubyCodeBrowser" class="tabdiv">
+<!-- Need to move edit area under the rubyCodeBrowser: insert new wrapper div -->
+        <ul id="rubyModuleList"></ul>
+        <ul id="rubyConstants"></ul>
+        <ul id="rubyModuleMethods"></ul>
+        <ul id="rubyInstanceMethods"></ul>
+      </div>
+      <div id='rubyEditArea'>
+        <textArea id='rubyEditor' spellcheck='false'></textArea>
+      </div>
+      <div><span id="statusBar"></span></div>
     </div>
   </body>
 </html>
