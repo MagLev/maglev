@@ -70,7 +70,10 @@ maglevInfo = (function() {
     getJSON('/constant',
             { 'moduleName': selectedModuleName(),
               'constName':  selectedConstantName() },
-            function(data) { renderSource(data['const_value']); });
+            function(data) {
+              clearEditArea();
+              renderSource(data['const_value']);
+            });
   }
 
   function selectModuleMethod(methodName) {
@@ -79,7 +82,7 @@ maglevInfo = (function() {
             { moduleName: selectedModuleName(),
               methName:   selectedModuleMethodName(),
               isInstanceMethod: false },
-            function(data) { renderSource(data['method_source']); });
+            renderMethod);
   }
 
   function selectInstanceMethod(methodName) {
@@ -88,14 +91,14 @@ maglevInfo = (function() {
             { moduleName: selectedModuleName(),
               methName:   selectedInstanceMethodName(),
               isInstanceMethod: true },
-            function(data) { renderSource(data['method_source']); });
+             renderMethod);
   }
 
   function clearSelections(selections) {
     $.each(selections, function(i, el) {
       $(el + ' .ui-selected').removeClass('ui-selected');
     });
-    renderSource('');
+    clearEditArea();
   }
 
   // Makes a JSON request, and decorates it with timing information.
@@ -149,6 +152,17 @@ maglevInfo = (function() {
         });
       }
     }
+  }
+
+  function clearEditArea() {
+    renderSource('');
+    $('#fileInfo').empty();
+  }
+
+  function renderMethod(data) {
+    clearEditArea();
+    renderSource(data['method_source']);
+    $('#fileInfo').html(data['method_source_file'] + ':' + data['method_line_number']);
   }
 
   function renderSource(string) {
