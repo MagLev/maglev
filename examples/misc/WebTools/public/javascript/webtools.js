@@ -20,7 +20,7 @@ maglevInfo = (function() {
 
   function setupSelectables() {
     $('#rubyModules').selectable({
-      selected: function(event, ui) { setSelectedClass(ui.selected.title); }
+      selected: function(event, ui) { setSelectedModule(ui.selected.title); }
     });
     $('#rubyConstants').selectable({
       selected: function(event, ui) { setSelectedConstant(ui.selected.title); }
@@ -31,7 +31,7 @@ maglevInfo = (function() {
     $('#rubyInstanceMethods').selectable({
       selected: function(event, ui) { setSelectedInstanceMethod(ui.selected.title); }
     });
-  };
+  }
 
   function setupEditor() {
     rubyEditor = CodeMirror.fromTextArea('rubyEditor',
@@ -40,7 +40,7 @@ maglevInfo = (function() {
                                            stylesheet: "CodeMirror/css/Smalltalk.css",
                                            path: "CodeMirror/js/",
                                            lineNumbers: true});
-  };
+  }
 
   function selectedModuleName() {
     return $('#rubyModules .ui-selected').attr('title');
@@ -58,37 +58,43 @@ maglevInfo = (function() {
     return $('#rubyInstanceMethods .ui-selected').attr('title');
   }
 
-  function setSelectedConstant(constName) {
-    $('#rubyModuleMethods .ui-selected').removeClass('ui-selected');
-    $('#rubyInstanceMethods .ui-selected').removeClass('ui-selected');
+  function setSelectedModule(className) {
+    clearSelections(['#rubyModuleMethods', '#rubyModuleMethods', '#rubyInstanceMethods']);
+    getJSON('/module/' + className, null, renderCodeBrowser);
+  }
 
+  function setSelectedConstant(constName) {
+    clearSelections(['#rubyModuleMethods', '#rubyInstanceMethods']);
     getJSON('/constant',
             { 'moduleName': selectedModuleName(),
               'constName':  selectedConstantName() },
             function(data) { renderSource(data['const_value']); });
-  };
+  }
 
   function setSelectedModuleMethod(methodName) {
-    $('#rubyConstants .ui-selected').removeClass('ui-selected');
-    $('#rubyInstanceMethods .ui-selected').removeClass('ui-selected');
-
+    clearSelections(['#rubyConstants', '#rubyInstanceMethods']);
     getJSON('/method',
             { moduleName: selectedModuleName(),
               methName:   selectedModuleMethodName(),
               isInstanceMethod: false },
             function(data) { renderSource(data['method_source']); });
-  };
+  }
 
   function setSelectedInstanceMethod(methodName) {
-    $('#rubyConstants .ui-selected').removeClass('ui-selected');
-    $('#rubyModuleMethods .ui-selected').removeClass('ui-selected');
-
+    clearSelections(['#rubyConstants', '#rubyModuleMethods']);
     getJSON('/method',
             { moduleName: selectedModuleName(),
               methName:   selectedInstanceMethodName(),
               isInstanceMethod: true },
             function(data) { renderSource(data['method_source']); });
-  };
+  }
+
+  function clearSelections(selections) {
+    $.each(selections, function(i, el) {
+      $(el + ' .ui-selected').removeClass('ui-selected');
+    });
+    renderSource('');
+  }
 
   // Makes a JSON request, and decorates it with timing information.
   // It then passes the bundled data object to the callback.
@@ -119,17 +125,13 @@ maglevInfo = (function() {
           serverTime + ' ms on server, ' + networkTime + ' ms on the network, and '
           + elapsed + ' ms on the client.'
       );
-    };
-  };
+    }
+  }
 
   // Retrieve fresh data for the codebrowser and render it
   function updateCodeBrowser() {
     getJSON('/modulelist', null, renderCodeBrowser);
-  };
-
-  function setSelectedClass(className) {
-    getJSON('/module/' + className, null, renderCodeBrowser);
-  };
+  }
 
   function renderCodeBrowser(data) {
     renderList(data['modules'],          $('#rubyModules'));
@@ -145,13 +147,13 @@ maglevInfo = (function() {
           $('<li>', { title: item, 'class': 'ui-widget-content' }).html(item).appendTo(ui);
         });
       }
-    };
+    }
   }
 
   function renderSource(string) {
     if (rubyEditor.editor) {
       rubyEditor.setCode(string);
     }
-  };
+  }
 
 })();
