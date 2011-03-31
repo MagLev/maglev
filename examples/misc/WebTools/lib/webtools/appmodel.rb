@@ -1,23 +1,15 @@
+
+require 'webtools/code_browser'
+
 # This module emulates all of the API from the Smalltalk side of things
 module WebTools
 
-  # This is a ViewModel for the WebTools Application
+  # This is a ViewModel for the WebTools Application.
+  #
+  # All of the methods that return "Objects" should return a Hash.  Keys
+  # beginning with '_' are reserved for metadata applied by the GUI.
   class AppModel
-
-    # Returns an array of tool descriptions.  Each description is a hash
-    def tools
-      [{ 'file' => '/version',
-         'name' => 'Version Report',
-         'description' => 'Information about the Stone and Gem processes and their host(s)'},
-       {'file' => 'sessions',
-         'name' => 'Current Sessions',
-         'description' => 'Information about current sessions and other processes'},
-       {'file' => 'browsecode',
-         'name' => 'Code Browser',
-         'description' => 'Browse Classes, Constants, Methods and source'},
-       {'file' => 'statistics',
-         'name' => 'Statistics',
-         'description' => 'Load and view statmonitor files'}]
+    def initialize
     end
 
     VERSION_HEADERS = [['Attribute', 'The attribute.'],
@@ -62,9 +54,6 @@ module WebTools
        ['Quiet', 'Time since the session''s most recent request to stone.'],
        ['Age', 'Time since the session logged in.'],
        ['CRB', 'Commit Record Backlog: number of commits which have occurred since the session obtained its view.']]
-
-
-
 
     # Returns a hash of configuration parameters for the stone and the gem.
     # The has has three keys:
