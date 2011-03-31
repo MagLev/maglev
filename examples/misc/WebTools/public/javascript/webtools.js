@@ -2,34 +2,36 @@ maglevInfo = (function() {
   var requestCount = 0, rubyEditor = null;
 
   $(document).ready(function() {
-    setupTabs();
     setupSelectables();
     setupEditor();
+    setupToolBar();
     updateCodeBrowser();  // Not sure this is the best way to kick it off...
   });
 
-  function setupTabs() {
-    var tabs = $("#tabs");
-    tabs.tabs();
-    tabs.bind('tabsselect', function(event, ui) {
-      if (ui.panel.id == 'rubyCodeBrowser') {
-        updateCodeBrowser();
-      }
-    });
+  function setupToolBar() {
+    $('#toolBar').append(
+      $('<div>', { id: '#abortTxn' }).button({
+        label: 'Abort Txn'
+      }).click(function () {
+        console.log('AbortTxn');
+        getJSON('/transaction/abort', null, function(data) {
+          updateCodeBrowser();
+        });
+      }));
   }
 
   function setupSelectables() {
     $('#rubyModules').selectable({
-      selected: function(event, ui) { setSelectedModule(ui.selected.title); }
+      selected: function(event, ui) { selectModule(ui.selected.title); }
     });
     $('#rubyConstants').selectable({
-      selected: function(event, ui) { setSelectedConstant(ui.selected.title); }
+      selected: function(event, ui) { selectConstant(ui.selected.title); }
     });
     $('#rubyModuleMethods').selectable({
-      selected: function(event, ui) { setSelectedModuleMethod(ui.selected.title); }
+      selected: function(event, ui) { selectModuleMethod(ui.selected.title); }
     });
     $('#rubyInstanceMethods').selectable({
-      selected: function(event, ui) { setSelectedInstanceMethod(ui.selected.title); }
+      selected: function(event, ui) { selectInstanceMethod(ui.selected.title); }
     });
   }
 
@@ -58,12 +60,12 @@ maglevInfo = (function() {
     return $('#rubyInstanceMethods .ui-selected').attr('title');
   }
 
-  function setSelectedModule(className) {
+  function selectModule(className) {
     clearSelections(['#rubyModuleMethods', '#rubyModuleMethods', '#rubyInstanceMethods']);
     getJSON('/module/' + className, null, renderCodeBrowser);
   }
 
-  function setSelectedConstant(constName) {
+  function selectConstant(constName) {
     clearSelections(['#rubyModuleMethods', '#rubyInstanceMethods']);
     getJSON('/constant',
             { 'moduleName': selectedModuleName(),
@@ -71,7 +73,7 @@ maglevInfo = (function() {
             function(data) { renderSource(data['const_value']); });
   }
 
-  function setSelectedModuleMethod(methodName) {
+  function selectModuleMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyInstanceMethods']);
     getJSON('/method',
             { moduleName: selectedModuleName(),
@@ -80,7 +82,7 @@ maglevInfo = (function() {
             function(data) { renderSource(data['method_source']); });
   }
 
-  function setSelectedInstanceMethod(methodName) {
+  function selectInstanceMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyModuleMethods']);
     getJSON('/method',
             { moduleName: selectedModuleName(),
@@ -128,7 +130,6 @@ maglevInfo = (function() {
     }
   }
 
-  // Retrieve fresh data for the codebrowser and render it
   function updateCodeBrowser() {
     getJSON('/modulelist', null, renderCodeBrowser);
   }
