@@ -3,10 +3,9 @@
 @import "jquery.contextMenu.css";
 
 body * { font-size: 10pt; margin: 0; padding: 0; }
-#tabs { position: absolute; top: 0; bottom: 1em; left: 0; right: 0; }
-#rubyCodeBrowser { position: absolute; top: 2em; bottom: 1em; left: 0; right: 0; }
-#rubyNavigation { height: 50%; overflow: hidden; border: 2px solid #DDD; border-top: none; }
-#rubyEditArea   { height: 50%; padding-top: 0.5em; margin-bottom: 3em; border: 2px solid #DDD; border-top: none;}
+#rubyCodeBrowser { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
+#rubyNavigation { height: 45%; overflow: hidden; border: 2px solid #DDD; border-top: none; }
+#rubyEditArea   { height: 45%;  margin-top: 0.5em; margin-bottom: 3em; border: 2px solid #DDD; border-top: none;}
 #rubyEditor { padding: 1em; margin-bottom: 2em; }
 #rubyNavigation ul { overflow-y: scroll; overflow-x: hidden; height: 100%; border: 1px solid #DDD; border-top: none; }
 #rubyNavigation ul li { border: 0; width: 100%; }
