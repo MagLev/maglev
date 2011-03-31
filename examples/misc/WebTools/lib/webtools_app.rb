@@ -14,6 +14,8 @@ require 'json'
 #
 class WebToolsApp < Sinatra::Base
   enable :sessions
+  set :show_exceptions, true
+  set :raise_errors, false
 
   before do
     @ts = Time.now
@@ -51,7 +53,8 @@ class WebToolsApp < Sinatra::Base
 
   get '/method' do
     content_type :json
-    wrap_in_metadata(@browser.select_method(params[:moduleName], params[:methName], params[:isInstanceMethod])).to_json;
+    is_instance = params[:isInstanceMethod] == 'true' ? true : false
+    wrap_in_metadata(@browser.select_method(params[:moduleName], params[:methName], is_instance)).to_json;
   end
 
   get '/version' do
@@ -81,5 +84,11 @@ class WebToolsApp < Sinatra::Base
     data['_time'] = ((Time.now - @ts) * 1_000).to_i
     data['_stack'] = @stack
     data
+  end
+
+  error do
+    excep = request.env['sinatra.error']
+    content_type :json
+    { '_stack' => excep.backtrace.join("<br>") }
   end
 end

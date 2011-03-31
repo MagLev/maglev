@@ -1,4 +1,4 @@
-require 'maglev/method_source' if defined? Maglev
+require 'maglev/method_source'
 module WebTools
   # Provide information about the Ruby environment
   module Ruby
@@ -96,7 +96,6 @@ module WebTools
     # @param [Boolean] if true, then look for a class method, otherwise look
     #         for an instance method.
     def source_for(class_name, method_name, instance_method=true)
-puts "======= source_for(#{class_name}, #{method_name}, #{instance_method})"
       klass = find_in_namespace(class_name)
       gsnmeth = klass.gs_method_for(method_name, instance_method)
       src = gsnmeth.__source_string

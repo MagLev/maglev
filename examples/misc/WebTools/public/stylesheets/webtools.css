@@ -15,7 +15,7 @@ body * { font-size: 10pt; }
 #tabs { position: fixed; top: 0; left: 0; bottom: 2em; right: 0; }
 #tabs .ui-tabs-panel { border-width: 0 1px 1px 1px; top: 30px; left: 3px; bottom: 3px; right: 3px; }
 
-#rubyCodeBrowser { height: 45% }
+#rubyCodeBrowser { height: 50% }
 
 #rubyModuleList { position: absolute; top: 0; left: 0; width: 25%; bottom: 0; }
 #rubyConstants { position: absolute; top: 0; left: 25%; width: 25%; bottom: 0; }
@@ -24,16 +24,16 @@ body * { font-size: 10pt; }
 
 
 /* Not sure why I need height 95%, but otherwise the last element is cut off.... */
-#rubyCodeBrowser ul { overflow: hidden; overflow-y: scroll; height: 95%; }
+#rubyCodeBrowser ul { overflow: hidden; overflow-y: scroll; height: 100%; }
 #rubyCodeBrowser ul li { border: 0; }
 #rubyCodeBrowser ul li:hover { background: #CCC; }
 .ui-selected  { background: #AAA; }
 
-#rubyEditArea { position: absolute; top: 60%; left: 0; right: 0; bottom: 0;   margin: 2px; }
+#rubyEditArea { position: absolute; top: 55%; left: 0; right: 0; bottom: 0; margin: 2px; }
 #rubyEditor { height: 100%; width: 100%;  }
-
-#statusBar { border-bottom: 1px solid #DDD; padding: 3px 4px; position: fixed; bottom: 1.4em; height: 1em; width: 100% }
-
 .CodeMirror-line-numbers { width: 2.2em; color: #aaa; background-color: #eee; text-align: right;
 	padding-right: .3em; font-size: 10pt; font-family: monospace; padding-top: .4em;
 	line-height: normal; }
+
+#statusBar { border-bottom: 1px solid #DDD; padding: 3px 4px; position: fixed; bottom: 1.4em; height: 1em; width: 100% }
+

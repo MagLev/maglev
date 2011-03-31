@@ -38,11 +38,15 @@ module WebTools
 
     def select_method(module_name, method_name, is_instance_method)
       raise 'Module mismatch' unless @selected_module.nil? or @selected_module == module_name
+      mod = Ruby.find_in_namespace(module_name)
+      src, file, line = mod.method_source(method_name, is_instance_method)
       @selected_method = method_name
       @is_instance_method = is_instance_method
-      { :selected_method => @selected_method,
+      { :selected_method    => @selected_method,
         :is_instance_method => @is_instance_method,
-        :method_source => Ruby.source_for(module_name, method_name, is_instance_method) }
+        :method_source      => src,
+        :method_source_file => file,
+        :method_line_number => line }
     end
 
     def state

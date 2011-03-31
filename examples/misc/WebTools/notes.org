@@ -6,7 +6,7 @@
    + Label the columns
    + Handle Errors
    + Array.new doesn't show source: fix
-
+   + Use an after filter (or rack middleware) to do the timing?
 ** Things to change:
 
    1. The /tools url returns objects.  The 'file' attribute is really a uri
