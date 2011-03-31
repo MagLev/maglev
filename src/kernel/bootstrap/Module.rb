@@ -251,7 +251,7 @@ class Module
   primitive_nobridge '__includes_module', '_rubySubclassOf:'
 
   primitive_nobridge '__instance_method', 'rubyUnboundMethodFor:'
-  primitive_nobridge '__gs_method', 'rubyMethodFor:'
+  primitive_nobridge '__gs_method', 'rubyMethodFor:instanceMethod:'
 
   def instance_method(name)
     unless name._isSymbol

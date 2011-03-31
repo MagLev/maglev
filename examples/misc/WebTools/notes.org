@@ -1,5 +1,12 @@
 * Notes on the re-tool of WebTools
-
+** TO DO
+   + Put source and line number in own html, not in the editor
+   + Object inspector
+   + Transaction control buttons
+   + Label the columns
+   + Handle Errors
+   + Array.new doesn't show source: fix
+   + Use an after filter (or rack middleware) to do the timing?
 ** Things to change:
 
    1. The /tools url returns objects.  The 'file' attribute is really a uri
