@@ -26,7 +26,7 @@ maglevInfo = (function() {
     // May have to re-run this if we reload module list?
     console.log('setupSelectables()');
 
-    $('#rubyModuleList').selectable({
+    $('#rubyModules').selectable({
       selected: function(event, ui) { setSelectedClass(ui.selected.title); }
     });
     $('#rubyConstants').selectable({
@@ -50,7 +50,7 @@ maglevInfo = (function() {
   };
 
   function selectedModuleName() {
-    return $('#rubyModuleList .ui-selected').attr('title');
+    return $('#rubyModules .ui-selected').attr('title');
   }
 
   function selectedConstantName() {
@@ -174,7 +174,7 @@ maglevInfo = (function() {
       selected = data['selected_module'];
       console.log('renderClassModuleList()');
       if (modules) {
-        var moduleList = $('#rubyModuleList').empty();
+        var moduleList = $('#rubyModules').empty();
         $.each(modules, function(n, mod){
           var li = $('<li>', { title: mod,
                                class: 'ui-widget-content'});
