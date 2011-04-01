@@ -10,14 +10,13 @@ maglevInfo = (function() {
 
   function setupToolBar() {
     $('#toolBar').append(
-      $('<div>', { id: 'abortTxn' }).button({
-        label: 'Abort Txn'
-      }).click(function () {
-        debugMsg('AbortTxn');
-        getJSON('/transaction/abort', null, function(data) {
-          updateCodeBrowser();
-        });
-      }));
+      $('<div>').button({label: 'Refresh View'}
+                       ).click(function () {
+                         debugMsg('AbortTxn');
+                         getJSON('/transaction/abort', null, function(data) {
+                           updateCodeBrowser();
+                         });
+                       }));
     $('#toolBar').append($('<div>', { id: 'statusBar'}));
   }
 
