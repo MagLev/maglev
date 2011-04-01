@@ -7,7 +7,7 @@ module WebTools
   class CodeBrowser
     def self.class_and_module_list
       puts "#{self}.class_and_module_list()"
-      { 'classNames' => WebTools::Ruby.class_and_module_names }
+      { 'modules' => WebTools::Ruby.class_and_module_names }
     end
 
     def select_module(module_name)
