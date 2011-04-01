@@ -12,23 +12,13 @@ task :meta do
   sh "maglev-ruby -Mcommit lib/webtools/meta_demo.rb"
 end
 
-namespace :smalltalk do
-  desc "Run the Smalltalk WebTools code from ruby."
-  task :run do
-    # Load the Smalltalk example code into the MagLev repository, and
-    # commit it.
-    file = "#{MH}/gemstone/examples/www/install.tpz"
-    raise "Can't find #{file}" unless File.exists? file
-    cd(MH) { sh "rake maglev:input_file[#{file}]" }
+desc "Run the Smalltalk WebTools code from ruby."
+task :smalltalk do
+  file = "#{MH}/gemstone/examples/www/install.tpz"
+  raise "Can't find #{file}" unless File.exists? file
+  cd(MH) { sh "rake maglev:input_file[#{file}]" }
 
-    # Enable the MagLev WebTools code
-    file = "#{MH}/gemstone/examples/www/src/maglev.rb"
-    raise "Can't find #{file}" unless File.exists? file
-    sh "maglev-ruby -Mcommit #{file}"
-
-    # Start the server
-    sh "maglev-ruby -d lib/webtools/smalltalk_tools.rb"
-  end
+  sh "maglev-ruby -d lib/webtools/smalltalk_tools.rb"
 end
 
 task :test do
