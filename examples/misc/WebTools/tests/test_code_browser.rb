@@ -13,7 +13,6 @@ class TestCodeBrowser < MiniTest::Unit::TestCase
   def test_select_module
     cb = WebTools::CodeBrowser.new
     state = cb.select_module 'Object'
-p state.keys
     assert_equal 'Object', state[:selected_module]
 
     assert_includes state[:constants],         'Kernel'

@@ -36,3 +36,8 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
     padding-right: .3em; font-size: 10pt; font-family: monospace; padding-top: .4em;
     line-height: normal;
 }
+
+table .objTable { border-collapse: collapse; }
+.objTable caption { font-weight: bold; width: 30em; text-align: center; }
+col .labelCol { background: #DDD; }
+col .valCol { width: 20em; text-align: right; }

@@ -203,10 +203,25 @@ maglevInfo = (function() {
 
   // Make the objectInspector visible in the detail area and render the
   // Object.  High level api.
-  function renderObject(objectId) {
+  function renderObject(objectInfo) {
     console.log('renderObject()');
     setDetailViewObject();
-    $('#objInfo').empty().append($('<span>').html(objectId));
+
+    var objInfo = $('#objInfo tbody').empty();
+    objInfo.append('<tr><th>Class</th><td>'     + objectInfo['class'] + '</td></tr>');
+    objInfo.append('<tr><th>Object ID</th><td>' + objectInfo['object_id'] + '</td></tr>');
+    objInfo.append('<tr><th>Inspect</th><td>'   + objectInfo['inspect'] + '</td></tr>');
+    var instVars = $('#objInstVars tbody').empty();
+    var objIvs = objectInfo['instance_variables'];
+    if (objIvs) {
+      $.each(objIvs, function(idx, ivData) {
+        objIvs.append($('<tr><td>' + ivData[0] +
+                        '</td><td objectId="' + ivData[2] + '">'
+                        + ivData[1] + '</td></tr>'));
+      });
+    }
+    
+   // $('#objInfo').empty().append($('<span>').html(objectId));
   }
 
   // Some older browsers were complaining that console wasn't defined.

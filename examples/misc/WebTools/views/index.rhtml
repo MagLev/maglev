@@ -46,8 +46,22 @@
         </div>
         <div id="detailDisplay">
           <div id="objectInspector" class="hidden">
-            <ul id="objInfo"></ul>
-            <ul id="objInstVars"></ul>
+            <table id="objInfo" class="objTable">
+              <caption>Object Info</caption>
+              <colgroup>
+                <col class="labelCol" />
+                <col class="valCol" />
+              </colgroup>
+              <tbody></tbody>
+            </table>
+            <table id="objInstVars" class="objTable">
+              <caption>Instance Variables</caption>
+              <colgroup>
+                <col class="labelCol" />
+                <col class="valCol" />
+              </colgroup>
+              <tbody></tbody>
+            </table>
           </div>
           <div id="rubyEditArea" class="hidden">
             <textArea id="rubyEditor" spellcheck="false"></textArea>

@@ -1,4 +1,5 @@
 require 'webtools/ruby'
+require 'json'
 
 module WebTools
   # The CodeBrowser is a ViewModel for MagLev code browsing.  It keeps the
@@ -32,7 +33,7 @@ module WebTools
     def select_constant(module_name, const_name)
       raise 'Module mismatch' unless @selected_module.nil? or @selected_module == module_name
       @selected_constant = const_name
-      @const_value = Ruby.const_info_for(module_name, const_name)
+      @const_value = ObjectInfo.for_const(module_name, const_name)
       { :selected_constant => @selected_constant,
         :const_value       => @const_value }
     end
@@ -62,6 +63,33 @@ module WebTools
         :selected_method    => @selected_method,
         :selected_module    => @selected_module,
       }
+    end
+  end
+
+  class ObjectInfo
+    def self.for_const(module_path, const_name)
+      parent = Ruby.find_in_namespace module_path
+      const = parent.const_get const_name
+      new(const)
+    end
+
+    def initialize(obj)
+      @obj = obj
+    end
+
+    def to_json(*args)
+      info = { }
+      info[:object_id] = @obj.object_id
+      info[:class]     = @obj.class.name
+      info[:inspect]   = @obj.inspect
+      inst_vars = []
+      @obj.instance_variables.each do |iv|
+        puts "====== Adding inst var #{iv}"
+        val = @obj.instance_variable_get(iv)
+        inst_vars << [iv, val.inspect, val.object_id]
+      end
+      info[:instance_variables] = inst_vars
+      info.to_json
     end
   end
 end
