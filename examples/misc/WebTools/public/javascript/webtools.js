@@ -63,6 +63,7 @@ maglevInfo = (function() {
   function selectModule(className) {
     clearSelections(['#rubyModuleMethods',   '#rubyModuleMethods',
                      '#rubyInstanceMethods', '#rubyAncestors']);
+    clearDetailView();
     getJSON('/module/' + className, null, renderCodeBrowser);
   }
 
@@ -73,7 +74,7 @@ maglevInfo = (function() {
               'constName':  selectedConstantName() },
             function(data) {
               clearEditArea();
-              renderSource(data['const_value']);
+              renderObject(data['const_value']);
             });
   }
 
@@ -156,8 +157,26 @@ maglevInfo = (function() {
     }
   }
 
+  function setDetailViewCode(sym) {
+    console.log('setDetailViewCode()');
+    $('#objectInspector').addClass('hidden');
+    $('#rubyEditArea').removeClass('hidden');
+  }
+
+  function setDetailViewObject(sym) {
+    $('#rubyEditArea').addClass('hidden');
+    $('#objectInspector').removeClass('hidden');
+  }
+
+  function clearDetailView() {
+    $('#rubyEditArea').addClass('hidden');
+    $('#objectInspector').addClass('hidden');
+  }
+
   function clearEditArea() {
-    renderSource('');
+    if (rubyEditor.editor) {
+      rubyEditor.setCode('');
+    }
     $('#fileInfo').empty();
   }
 
@@ -173,10 +192,21 @@ maglevInfo = (function() {
     }
   }
 
+  // Make the rubyEditor visible in the detail area and render the source
+  // code.  High level api.
   function renderSource(string) {
     if (rubyEditor.editor) {
       rubyEditor.setCode(string);
+      setDetailViewCode();
     }
+  }
+
+  // Make the objectInspector visible in the detail area and render the
+  // Object.  High level api.
+  function renderObject(objectId) {
+    console.log('renderObject()');
+    setDetailViewObject();
+    $('#objInfo').empty().append($('<span>').html(objectId));
   }
 
   // Some older browsers were complaining that console wasn't defined.
