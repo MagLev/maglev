@@ -13,7 +13,7 @@ maglevInfo = (function() {
       $('<div>', { id: 'abortTxn' }).button({
         label: 'Abort Txn'
       }).click(function () {
-        console.log('AbortTxn');
+        debugMsg('AbortTxn');
         getJSON('/transaction/abort', null, function(data) {
           updateCodeBrowser();
         });
@@ -112,8 +112,8 @@ maglevInfo = (function() {
     return;
 
     function success(data) {
-      console.log("getJSON success");
-      console.log(data);
+      debugMsg("getJSON success");
+      debugMsg(data);
 
       var serverTime = data['_time'];
       var networkTime = new Date().getTime() - startTime - serverTime;
@@ -121,7 +121,7 @@ maglevInfo = (function() {
       var error = data['_error'];
       if (error) {
         alert(error + ' (see console log for stack)');
-        console.log(data['_stack']);
+        debugMsg(data['_stack']);
       } else {
         (callback)(data);
       };
@@ -164,7 +164,7 @@ maglevInfo = (function() {
     clearEditArea();
     renderSource(data['method_source']);
     var file = data['method_source_file'];
-    
+
     if (file) {
       $('#fileInfo').html(file + ':' + data['method_line_number']);
     } else {
@@ -178,4 +178,12 @@ maglevInfo = (function() {
     }
   }
 
+  // Some older browsers were complaining that console wasn't defined.
+  // (old firefox on solaris), so I'm wrapping console logging in this
+  // function.
+  function debugMsg(obj) {
+    if (console) {
+      console.log(obj);
+    }
+  }
 })();
