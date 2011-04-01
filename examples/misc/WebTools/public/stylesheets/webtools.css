@@ -7,18 +7,17 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
 /* Setup the basic structure of the panels */
 #rubyCodeBrowser { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
   #toolBar { }
-  #mainContent { position: absolute; bottom: 3em; top: 2em; width: 100%; }
+  #mainContent { position: absolute; bottom: 2em; top: 2em; width: 100%; }
     #rubyNavigation { height: 50%; overflow: hidden; border: 2px solid #DDD; border-top: none; }
       #modules { float: left; width: 25%; height: 100%;}
       #constants { float: left; width: 25%; height: 100%;}
       #moduleMethods { float: left; width: 25%; height: 100%;}
       #instanceMethods { float: left; width: 25%; height: 100%;}
-
-    #rubyEditArea { height: 50%;  margin-top: 0.5em; margin-bottom: 3em;
+    #rubyEditArea { position: absolute; bottom: 0; top: 50%; left: 0; right: 0;
                     border: 2px solid #DDD; border-top: none;}
-
-  #statusBar { position: fixed; bottom: 0;  height: 2em; width: 100%;
-               padding-left: 1.4em; font-size: 9pt; }
+  #footer { position: absolute; bottom: 0; width: 100%; background: #DDD; }
+    #fileInfo { height: 2em; padding-top: .5em; padding-left: 2.5em; }
+    #statusBar { float: right; padding: 0.25em; }
 
 /* Stylistic stuff */
 .rubyList ul { overflow-y: scroll; overflow-x: hidden; height: 100%;
@@ -29,9 +28,6 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
 .ui-selected  { background: #AAA; }
 .caption { font-weight: bold; background: #EEE; text-align: center;
            width: 100%; display: block; border: 2px solid #DDD; }
-
-#rubyEditor { padding: 1em; margin-bottom: 2em; }
-#fileInfo { }
 
 .CodeMirror-line-numbers {
     width: 2.2em; color: #aaa; background-color: #eee; text-align: right;

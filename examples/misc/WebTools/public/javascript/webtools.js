@@ -10,7 +10,7 @@ maglevInfo = (function() {
 
   function setupToolBar() {
     $('#toolBar').append(
-      $('<div>', { id: '#abortTxn' }).button({
+      $('<div>', { id: 'abortTxn' }).button({
         label: 'Abort Txn'
       }).click(function () {
         console.log('AbortTxn');
@@ -18,6 +18,7 @@ maglevInfo = (function() {
           updateCodeBrowser();
         });
       }));
+    $('#toolBar').append($('<div>', { id: 'statusBar'}));
   }
 
   function setupSelectables() {
@@ -162,7 +163,13 @@ maglevInfo = (function() {
   function renderMethod(data) {
     clearEditArea();
     renderSource(data['method_source']);
-    $('#fileInfo').html(data['method_source_file'] + ':' + data['method_line_number']);
+    var file = data['method_source_file'];
+    
+    if (file) {
+      $('#fileInfo').html(file + ':' + data['method_line_number']);
+    } else {
+      $('#fileInfo').html('No file information available');
+    }
   }
 
   function renderSource(string) {
