@@ -14,26 +14,38 @@
     <script type="text/javascript" src="CodeMirror/js/codemirror.js"></script>
   </head>
   <body>
-    <div id="tabs">
-      <ul class="tabnav">
-        <li><a href="#rubyCodeBrowser"><span>Code Browser</span></a></li>
-      </ul>
-      <div id="rubyCodeBrowser" class="tabdiv">
+    <div id="rubyCodeBrowser" class="ui-widget-content">
+      <div id="toolBar"></div>
+      <div id="mainContent">
         <div id="rubyNavigation">
-          <ul id="rubyModules">
-          </ul>
-          <ul id="rubyConstants">
-          </ul>
-          <ul id="rubyModuleMethods">
-          </ul>
-          <ul id="rubyInstanceMethods">
-          </ul>
+          <div id="modules" class="rubyList">
+            <span class="caption">Modules &amp; Classes</span>
+            <ul id="rubyModules"></ul>
+          </div>
+
+          <div id="constants" class="rubyList">
+            <span class="caption">Constants</span>
+            <ul id="rubyConstants"></ul>
+          </div>
+
+          <div id="moduleMethods" class="rubyList">
+            <span class="caption">Module / Class Methods</span>
+            <ul id="rubyModuleMethods"></ul>
+          </div>
+
+          <div id="instanceMethods" class="rubyList">
+            <span class="caption">Instance Methods</span>
+            <ul id="rubyInstanceMethods"></ul>
+          </div>
+
         </div>
         <div id="rubyEditArea">
           <textArea id="rubyEditor" spellcheck="false"></textArea>
         </div>
       </div>
-      <div id="statusBar"></div>
+    </div>
+    <div id="footer">
+      <div id="fileInfo"></div>
     </div>
   </body>
 </html>

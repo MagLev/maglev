@@ -77,6 +77,12 @@ class WebToolsApp < Sinatra::Base
     wrap_in_metadata(@app.tools).to_json
   end
 
+  get '/transaction/abort' do
+    Maglev.abort_transaction
+    content_type :json
+    wrap_in_metadata(@browser.state).to_json
+  end
+
   # Returns a Hash that contains the data under the "data" key.
   # Adds other keys (_time, _stack) if appropriate
   def wrap_in_metadata(data)
