@@ -61,7 +61,8 @@ maglevInfo = (function() {
   }
 
   function selectModule(className) {
-    clearSelections(['#rubyModuleMethods', '#rubyModuleMethods', '#rubyInstanceMethods']);
+    clearSelections(['#rubyModuleMethods',   '#rubyModuleMethods',
+                     '#rubyInstanceMethods', '#rubyAncestors']);
     getJSON('/module/' + className, null, renderCodeBrowser);
   }
 
@@ -142,6 +143,7 @@ maglevInfo = (function() {
     renderList(data['constants'],        $('#rubyConstants'));
     renderList(data['module_methods'],   $('#rubyModuleMethods'));
     renderList(data['instance_methods'], $('#rubyInstanceMethods'));
+    renderList(data['ancestors'],        $('#rubyAncestors'));
     return;
 
     function renderList(items, ui) {

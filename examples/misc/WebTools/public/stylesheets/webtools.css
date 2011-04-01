@@ -9,10 +9,11 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
   #toolBar { }
   #mainContent { position: absolute; bottom: 2em; top: 2em; width: 100%; }
     #rubyNavigation { height: 50%; overflow: hidden; border: 2px solid #DDD; border-top: none; }
-      #modules { float: left; width: 25%; height: 100%;}
-      #constants { float: left; width: 25%; height: 100%;}
-      #moduleMethods { float: left; width: 25%; height: 100%;}
-      #instanceMethods { float: left; width: 25%; height: 100%;}
+      #modules { float: left; width: 20%; height: 100%;}
+      #constants { float: left; width: 20%; height: 100%;}
+      #moduleMethods { float: left; width: 20%; height: 100%;}
+      #instanceMethods { float: left; width: 20%; height: 100%;}
+      #ancestors { float: left; width: 20%; height: 100%;}
     #rubyEditArea { position: absolute; bottom: 0; top: 50%; left: 0; right: 0;
                     border: 2px solid #DDD; border-top: none;}
   #footer { position: absolute; bottom: 0; width: 100%; background: #DDD; }
@@ -20,10 +21,10 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
     #statusBar { float: right; padding: 0.25em; }
 
 /* Stylistic stuff */
-.rubyList ul { overflow-y: scroll; overflow-x: hidden; height: 100%;
+.rubyList { overflow-y: scroll; overflow-x: hidden; height: 100%;
                border: 1px solid #DDD; border-top: none; }
-.rubyList ul li { border: 0; width: 100%; }
-.rubyList ul li:hover { background: #CCC; }
+.rubyList li { border: 0; width: 100%; }
+.rubyList li:hover { background: #CCC; }
 
 .ui-selected  { background: #AAA; }
 .caption { font-weight: bold; background: #EEE; text-align: center;
