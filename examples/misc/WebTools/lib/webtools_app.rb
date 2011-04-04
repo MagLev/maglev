@@ -30,31 +30,26 @@ class WebToolsApp < Sinatra::Base
 
   get '/modulelist' do
     content_type :json
-    wrap_in_metadata(WebTools::CodeBrowser.class_and_module_list).to_json
+    prepare_data(WebTools::CodeBrowser.class_and_module_list)
   end
 
   get '/module/:name' do
-    begin
-      mod_name = params[:name]
-      puts "== GET /codebrowser/#{mod_name}"
-      content_type :json
-      d = @browser.select_module(mod_name)
-      wrap_in_metadata(d).to_json
-    rescue => e
-      @stack = e.backtrace
-      wrap_in_metadata("Error: #{e}").to_json
-    end
+    content_type :json
+    prepare_data(@browser.select_module(params[:name]))
   end
 
   get '/constant' do
     content_type :json
-    wrap_in_metadata(@browser.select_constant(params[:moduleName], params[:constName])).to_json;
+    prepare_data(@browser.select_constant(params[:moduleName],
+                                          params[:constName]))
   end
 
   get '/method' do
     content_type :json
     is_instance = params[:isInstanceMethod] == 'true' ? true : false
-    wrap_in_metadata(@browser.select_method(params[:moduleName], params[:methName], is_instance)).to_json;
+    prepare_data(@browser.select_method(params[:moduleName],
+                                        params[:methName],
+                                        is_instance))
   end
 
   get '/version' do
@@ -69,32 +64,32 @@ class WebToolsApp < Sinatra::Base
 
   get '/statistics' do
     content_type :json
-    wrap_in_metadata(['statistics: Not Implemented']).to_json
+    prepare_data(['statistics: Not Implemented'])
   end
 
   get '/tools' do
     content_type :json
-    wrap_in_metadata(@app.tools).to_json
+    prepare_data(@app.tools)
   end
 
   get '/transaction/abort' do
     Maglev.abort_transaction
     content_type :json
-    wrap_in_metadata(@browser.state).to_json
+    prepare_data(@browser.state)
   end
 
-  # Returns a Hash that contains the data under the "data" key.
-  # Adds other keys (_time, _stack) if appropriate
-  def wrap_in_metadata(data)
+  # Returns a JSON string that contains the data under the "data" key.
+  # Adds other keys (_time, _stack) if appropriate.
+  def prepare_data(data)
     raise "Expecting Hash" unless Hash === data
     data['_time'] = ((Time.now - @ts) * 1_000).to_i
     data['_stack'] = @stack
-    data
+    data.to_json
   end
 
   error do
     excep = request.env['sinatra.error']
     content_type :json
-    { '_stack' => excep.backtrace.join("<br>") }
+    { '_stack' => excep.backtrace.join("<br>") }.to_json
   end
 end
