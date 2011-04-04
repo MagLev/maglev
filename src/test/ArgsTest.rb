@@ -265,6 +265,32 @@ def x.to_ary() ; [3,4]; end
 ret.clear
 test(ret.push(*x), [3,4], 'Non Array: responds to to_a, to_ary')
 
+class CA
+  # from language/def_spec.rb
+  def bar(a=b=c=1,d=2)
+    [a,b,c,d]
+  end
+  def foo(x = ($foo_self = self; nil))
+    99
+  end
+
+  def self.test
+    o = self.new
+    x = [ o.bar() , o.bar(10), o.bar(10,20) ]
+    o.foo
+    y = $foo_self
+    unless x == [[1, 1, 1, 2],    [10, nil, nil, 2],  [10, nil, nil, 20]]
+      raise 'fail'
+    end
+    unless y._equal?(o)
+      raise 'fail'
+    end
+    true
+  end
+end
+
+CA.test
+
 report
 
 true

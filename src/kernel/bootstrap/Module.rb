@@ -239,6 +239,10 @@ class Module
     define_method(sym, block)
   end
 
+  def dup
+    raise NotImplementedError, "Module#dup"
+  end
+
   # make associations holding constants of receiver invariant
   #   does not affect inherited constants
   primitive_nobridge '__freeze_constants', '_rubyConstantsFreeze'
