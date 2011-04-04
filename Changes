@@ -6,22 +6,26 @@
 
 * Fix some spec failures
 
-== Changes for 25607 2011-03-31
+== Changes for 25628 2011-04-03
 * WebTools now is a "pure ruby" app. Basics are there, but more work is 
-  needed before it's ready.
+  needed before it's ready. Added Ancestors pane. Added Refresh button.
 * Fix Trac 881 in Array#first
-* Fix Trac 883, 880
+* Fix Trac 880, 883, 885
 * Fix some spec failures
 * Added Zlib::Deflate
 * Added git sha to maglev version number, e.g. 25598-1265-3238b22
   which are the GemStone/S (SVN), Smalltalk (.mcz), and Ruby (git sha)
 * Numerous bugfixes and enhancements to underlying GemStone 3.0 system
+  - fix SEGV seen in GsSocketTestCase>>test_C_getServiceNameByPort_
   - optimize CharacterCollection>>copy to call the shallowCopy primitive and not send postCopy
   - fix asString on LargeInteger overflow errors
   - fix problem with upgrading from GS/S 2.4
   - QuadByteString & QuadByteSymbol improvements
   - Refactor #'copyFrom:to:into:startingAt:'
   - GsObjectInventory improvements
+  - stopstone now blocks by default until all other processes detach the
+    shared cache or the cache goes away
+  - Fixed stat types in VSD
 
 == Changes for 25506 2011-03-18
 * Fix Trac 878, add test coverage for 521 .
