@@ -82,6 +82,8 @@ module ObjectSpace
       raise TypeError, 'define_finalizer expected a Block or Proc'
     end 
     Finalizer.__create(obj, a_proc) 
+    # MRI returns [ 0, a_proc ] but we return self, since whatever side 
+    #  effects subsequent changes to MRI array might have will not be the same
     self
   end
 
@@ -95,6 +97,8 @@ module ObjectSpace
       raise TypeError, 'define_finalizer expected a Block or Proc'
     end
     Finalizer.__create(obj, block) 
+    # MRI returns [ 0, block ] but we return self, since whatever side 
+    #  effects subsequent changes to MRI array might have will not be the same
     self
   end
 
