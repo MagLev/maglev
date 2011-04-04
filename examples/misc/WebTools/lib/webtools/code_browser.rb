@@ -65,11 +65,13 @@ module WebTools
     end
 
     def to_json(*args)
+      puts "===== to_json"
       info = { }
       info[:object_id] = @obj.object_id
       info[:class]     = @obj.class.name
       info[:inspect]   = @obj.inspect
       inst_vars = []
+      puts "====== inst vars for #{@obj}: #{@obj.instance_variables.inspect}"
       @obj.instance_variables.each do |iv|
         puts "====== Adding inst var #{iv}"
         val = @obj.instance_variable_get(iv)
@@ -78,6 +80,7 @@ module WebTools
       info[:instance_variables] = inst_vars
 
       enum_info = info[:enumerated] = []
+      puts "======= @obj.class: #{@obj.class}"
       case @obj
       when Enumerable, Array
         @obj.each_with_index do |o,i|
@@ -90,6 +93,7 @@ module WebTools
         end
 
       when Hash
+        puts "======= Adding hash info to enum"
         @obj.each do |k,v|
           enum_info << [k.to_s, v.inspect]
         end

@@ -215,23 +215,41 @@ maglevInfo = (function() {
   // Object.  High level api.
   function renderObject(objectInfo) {
     console.log('renderObject()');
+    console.log(objectInfo);
     setDetailViewObject();
 
     var objInfo = $('#objInfo tbody').empty();
     objInfo.append('<tr><th>Class</th><td>'     + objectInfo['class'] + '</td></tr>');
     objInfo.append('<tr><th>Object ID</th><td>' + objectInfo['object_id'] + '</td></tr>');
     objInfo.append('<tr><th>Inspect</th><td>'   + objectInfo['inspect'] + '</td></tr>');
-    var instVars = $('#objInstVars tbody').empty();
-    var objIvs = objectInfo['instance_variables'];
-    if (objIvs) {
-      $.each(objIvs, function(idx, ivData) {
-        objIvs.append($('<tr><td>' + ivData[0] +
-                        '</td><td objectId="' + ivData[2] + '">'
-                        + ivData[1] + '</td></tr>'));
-      });
-    }
 
-   // $('#objInfo').empty().append($('<span>').html(objectId));
+    renderTableData('#objInstVars',
+                    objectInfo['instance_variables'],
+                    // Data is an array of [name, value, objid]
+                    function(idx, data) {
+                      return $('<tr><td>'+ data[0] + '</td><td objectId="'
+                               + data[2] + '">' + data[1] + '</td></tr>');
+                    });
+
+    renderTableData('#objEnumValues',
+                    objectInfo['enumerated'],
+                    function(idx, data) {
+                      return $('<tr><td>' + idx + '</td><td>' + data + '</td></tr>');
+                    });
+    return;
+
+    function renderTableData(tableId, vals, formatFn) {
+      console.log('renderTableData: tableId: '+ tableId + ' # vals: ' + vals.length);
+      if (vals && vals.length > 0) {
+        $(tableId).removeClass('hidden');
+        var ui = $(tableId + ' tbody');
+        ui.empty();
+        $.each(vals, function(idx, data) { ui.append(formatFn(idx, data)) });
+        $(tableId).removeClass('hidden');
+      } else {
+        $(tableId).addClass('hidden');
+      }
+    }
   }
 
   // Some older browsers were complaining that console wasn't defined.

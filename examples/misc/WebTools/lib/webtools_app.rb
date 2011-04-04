@@ -42,10 +42,10 @@ class WebToolsApp < Sinatra::Base
                                         flag))
   end
 
-  # get '/objectspace/:object_id' do
-  #   content_type :json
-  #   prepare_data(@browser.)
-  # end
+  get '/objectspace/:object_id' do
+    content_type :json
+    prepare_data(@browser.object_info(params[:object_id]))
+  end
 
   get '/version' do
     @data = @app.version_report
