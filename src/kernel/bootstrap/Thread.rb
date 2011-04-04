@@ -244,6 +244,9 @@ class Thread
   class_primitive_nobridge '__basic_new', 'rubyBasicNew'
 
   def self.new(*args, &block)
+    unless block_given?
+      raise ThreadError, 'no block given'
+    end
     thr = self.__basic_new
     thr.initialize(*args)
     thr.__start(*args, &block)

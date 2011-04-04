@@ -135,7 +135,24 @@ end
 
 class Proc 
    # Proc is identically  the smalltalk class RubyProc  
+    def self.new(*args, &block)
+      if block._isBlock
+        inst = self.allocate
+        b = block.__copy_for_proc(2) # transform break bytecodes if any
+        b.freeze
+        inst.__initialize(&b)
+        inst.initialize(*args)
+        return inst
+      elsif block._is_a?(Proc)
+        raise ArgumentError, 'too many args , block arg is already a Proc'
+      else
+        raise ArgumentError, 'tried to create Proc object without a block' 
+      end
+      
+    end
+
     def self.new(&block)
+      # optimize common variant to avoid bridge methods
       if block._isBlock
         inst = self.allocate
         b = block.__copy_for_proc(2) # transform break bytecodes if any
@@ -151,6 +168,7 @@ class Proc
     end
 
     def self.new(block)
+      # optimize common variant to avoid bridge methods
       if block._isBlock
         inst = self.allocate
         b = block.__copy_for_proc(2) # transform break bytecodes if any
@@ -161,12 +179,6 @@ class Proc
       else
         raise ArgumentError, 'tried to create Proc object without a block'
       end
-    end
-
-
-    def self.new
-      # no bridge methods
-      raise ArgumentError, 'tried to create Proc object without a block'
     end
 
     def self.new_lambda(&block)

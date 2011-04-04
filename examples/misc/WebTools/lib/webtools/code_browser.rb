@@ -20,6 +20,7 @@ module WebTools
       @const_value        = nil
       @constants          = mod.constants.sort
       @instance_methods   = mod.instance_methods(false).sort
+      @ancestors          = mod.ancestors.reverse
       @is_instance_method = nil
       @module_methods     = Ruby.module_fns_for(mod)
       @selected_constant  = nil
@@ -53,6 +54,7 @@ module WebTools
       {
         :const_value        => @const_value,
         :constants          => @constants         || [],
+        :ancestors          => @ancestors || [],
         :instance_methods   => @instance_methods  || [],
         :is_instance_method => @is_instance_method,
         :module_methods     => @module_methods    || [],
