@@ -13,6 +13,7 @@ module WebTools
 
     def select_module(module_name)
       puts "#{self}.select_module(#{module_name.inspect})"
+      return if module_name == @select_module
       # At some point, if we need to cache individual classes/modules, or
       # if the state becomes complex, we could introduce a ModuleInfo class
       # to store the currently selected class/module.  Until then, this
@@ -31,7 +32,7 @@ module WebTools
     end
 
     def select_constant(module_name, const_name)
-      raise 'Module mismatch' unless @selected_module.nil? or @selected_module == module_name
+      select_module(module_name)
       @selected_constant = const_name
       @const_value = ObjectInfo.for_const(module_name, const_name)
       { :selected_constant => @selected_constant,
@@ -39,7 +40,7 @@ module WebTools
     end
 
     def select_method(module_name, method_name, is_instance_method)
-      raise 'Module mismatch' unless @selected_module.nil? or @selected_module == module_name
+      select_module(module_name)
       mod = Ruby.find_in_namespace(module_name)
       src, file, line = mod.method_source(method_name, is_instance_method)
       @selected_method = method_name
@@ -89,6 +90,25 @@ module WebTools
         inst_vars << [iv, val.inspect, val.object_id]
       end
       info[:instance_variables] = inst_vars
+
+      enum_info = info[:enumerated] = []
+      case @obj
+      when Enumerable, Array
+        @obj.each_with_index do |o,i|
+          if i > 20
+            enum_info << ['', '...']
+            break
+          else
+            enum_info << [i, o.inspect]
+          end
+        end
+
+      when Hash
+        @obj.each do |k,v|
+          enum_info << [k.to_s, v.inspect]
+        end
+      end
+
       info.to_json
     end
   end

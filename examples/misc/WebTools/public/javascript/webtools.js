@@ -2,6 +2,7 @@ maglevInfo = (function() {
   var requestCount = 0, rubyEditor = null;
 
   $(document).ready(function() {
+    debugAjaxCalls();
     setupSelectables();
     setupEditor();
     setupToolBar();
@@ -18,6 +19,16 @@ maglevInfo = (function() {
                          });
                        }));
     $('#toolBar').append($('<div>', { id: 'statusBar'}));
+  }
+
+  function debugAjaxCalls() {
+    $('body').bind(
+//      'ajaxStart ajaxStop ajaxSend ajaxSuccess ajaxError ajaxComplete',
+      'ajaxError',
+      function(event) {
+        debugMsg(event.type);
+      });
+
   }
 
   function setupSelectables() {
@@ -80,6 +91,7 @@ maglevInfo = (function() {
 
   function selectModuleMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyInstanceMethods']);
+    console.log('selectModuleMethod: module: ' + selectedModuleName());
     getJSON('/method',
             { moduleName: selectedModuleName(),
               methName:   selectedModuleMethodName(),
@@ -89,6 +101,7 @@ maglevInfo = (function() {
 
   function selectInstanceMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyModuleMethods']);
+    console.log('selectInstanceMethod: module: ' + selectedModuleName());
     getJSON('/method',
             { moduleName: selectedModuleName(),
               methName:   selectedInstanceMethodName(),
@@ -97,6 +110,7 @@ maglevInfo = (function() {
   }
 
   function clearSelections(selections) {
+    console.log('clearSelections: ' + selections);
     $.each(selections, function(i, el) {
       $(el + ' .ui-selected').removeClass('ui-selected');
     });
@@ -140,6 +154,7 @@ maglevInfo = (function() {
   }
 
   function renderCodeBrowser(data) {
+    debugMsg('renderCodeBrowser(): clearing #rubyModules');
     renderList(data['modules'],          $('#rubyModules'));
     renderList(data['constants'],        $('#rubyConstants'));
     renderList(data['module_methods'],   $('#rubyModuleMethods'));
