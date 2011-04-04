@@ -2,16 +2,6 @@ require 'sinatra/base'
 require 'webtools'
 require 'json'
 
-# TODO: Decide on my URLs.  Should I be REST-ful:
-#
-#    GET /module/FooModule/constant/XYZ
-#    GET /module/Object/instanceMethod/to_s
-#
-# Or use query params etc:
-#
-#    GET /constant?moduleName=FooModule&constName=XYZ
-#    GET /method?moduleName=Object&methName=to_s&isInstanceMethod=false
-#
 class WebToolsApp < Sinatra::Base
   enable :sessions
   set :show_exceptions, true
@@ -38,19 +28,24 @@ class WebToolsApp < Sinatra::Base
     prepare_data(@browser.select_module(params[:name]))
   end
 
-  get '/constant' do
+  get '/module/:module_name/constant/:const_name' do
     content_type :json
-    prepare_data(@browser.select_constant(params[:moduleName],
-                                          params[:constName]))
+    prepare_data(@browser.select_constant(params[:module_name],
+                                          params[:const_name]))
   end
 
-  get '/method' do
+  get '/module/:module_name/method' do
     content_type :json
-    is_instance = params[:isInstanceMethod] == 'true' ? true : false
-    prepare_data(@browser.select_method(params[:moduleName],
-                                        params[:methName],
-                                        is_instance))
+    flag = params[:is_instance_method] == 'true' ? true : false
+    prepare_data(@browser.select_method(params[:module_name],
+                                        params[:method_name],
+                                        flag))
   end
+
+  # get '/objectspace/:object_id' do
+  #   content_type :json
+  #   prepare_data(@browser.)
+  # end
 
   get '/version' do
     @data = @app.version_report

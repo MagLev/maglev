@@ -7,71 +7,57 @@ module WebTools
   # For the first pass, we do not cache anything.
   class CodeBrowser
     def self.class_and_module_list
-      puts "#{self}.class_and_module_list()"
       { 'modules' => WebTools::Ruby.class_and_module_names }
     end
 
     def select_module(module_name)
-      puts "#{self}.select_module(#{module_name.inspect})"
-      return if module_name == @select_module
-      # At some point, if we need to cache individual classes/modules, or
-      # if the state becomes complex, we could introduce a ModuleInfo class
-      # to store the currently selected class/module.  Until then, this
-      # suffices.
       mod = Ruby.find_in_namespace(module_name)
-      @const_value        = nil
-      @constants          = mod.constants.sort
-      @instance_methods   = mod.instance_methods(false).sort
-      @ancestors          = mod.ancestors.reverse
-      @is_instance_method = nil
-      @module_methods     = Ruby.module_fns_for(mod)
-      @selected_constant  = nil
-      @selected_method    = nil
-      @selected_module    = module_name
-      state
+      {
+        :ancestors          => mod.ancestors.reverse,
+        :constants          => mod.constants.sort,
+        :instance_methods   => mod.instance_methods(false).sort,
+        :module_methods     => Ruby.module_fns_for(mod),
+        :selected_module    => module_name,
+      }
     end
 
     def select_constant(module_name, const_name)
-      select_module(module_name)
-      @selected_constant = const_name
-      @const_value = ObjectInfo.for_const(module_name, const_name)
-      { :selected_constant => @selected_constant,
-        :const_value       => @const_value }
+      parent = Ruby.find_in_namespace module_name
+      {
+        :const_value       => ObjectInfo.for(parent.const_get(const_name)),
+        :selected_constant => const_name,
+        :selected_module   => module_name,
+      }
     end
 
     def select_method(module_name, method_name, is_instance_method)
-      select_module(module_name)
       mod = Ruby.find_in_namespace(module_name)
       src, file, line = mod.method_source(method_name, is_instance_method)
-      @selected_method = method_name
-      @is_instance_method = is_instance_method
-      { :selected_method    => @selected_method,
-        :is_instance_method => @is_instance_method,
+      {
+        :is_instance_method => is_instance_method,
+        :method_line_number => line,
         :method_source      => src,
         :method_source_file => file,
-        :method_line_number => line }
+        :module_name        => module_name,
+        :selected_method    => method_name,
+      }
     end
 
-    def state
-      {
-        :const_value        => @const_value,
-        :constants          => @constants         || [],
-        :ancestors          => @ancestors || [],
-        :instance_methods   => @instance_methods  || [],
-        :is_instance_method => @is_instance_method,
-        :module_methods     => @module_methods    || [],
-        :selected_constant  => @selected_constant,
-        :selected_method    => @selected_method,
-        :selected_module    => @selected_module,
-      }
+    def object_info(object_id)
+      ObjectInfo.for(object_id)
     end
   end
 
   class ObjectInfo
-    def self.for_const(module_path, const_name)
-      parent = Ruby.find_in_namespace module_path
-      const = parent.const_get const_name
-      new(const)
+    # Return a new ObjectInfo instance for the object with the given object
+    # id.
+    def self.for_id(object_id)
+      new(ObjectSpace._id2ref(oop))
+    end
+
+    # Return a new ObjectInfo instance for the given object.
+    def self.for(object)
+      new(object)
     end
 
     def initialize(obj)

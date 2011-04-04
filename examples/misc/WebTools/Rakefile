@@ -26,3 +26,8 @@ task :test do
     sh "maglev-ruby -rubygems -Ilib #{file}"
   end
 end
+
+desc "Add some objects to Maglev::PERSISTENT_ROOT"
+task :populate do
+  sh "maglev-ruby -Mcommit data.rb"
+end

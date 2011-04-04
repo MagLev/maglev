@@ -80,9 +80,8 @@ maglevInfo = (function() {
 
   function selectConstant(constName) {
     clearSelections(['#rubyModuleMethods', '#rubyInstanceMethods']);
-    getJSON('/constant',
-            { 'moduleName': selectedModuleName(),
-              'constName':  selectedConstantName() },
+    getJSON('/module/' + selectedModuleName() + '/constant/' + selectedConstantName(),
+            null,
             function(data) {
               clearEditArea();
               renderObject(data['const_value']);
@@ -91,22 +90,18 @@ maglevInfo = (function() {
 
   function selectModuleMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyInstanceMethods']);
-    console.log('selectModuleMethod: module: ' + selectedModuleName());
-    getJSON('/method',
-            { moduleName: selectedModuleName(),
-              methName:   selectedModuleMethodName(),
-              isInstanceMethod: false },
+    getJSON('/module/' + selectedModuleName() + '/method',
+            { 'method_name': selectedModuleMethodName(),
+              'is_instance_method': false },
             renderMethod);
   }
 
   function selectInstanceMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyModuleMethods']);
-    console.log('selectInstanceMethod: module: ' + selectedModuleName());
-    getJSON('/method',
-            { moduleName: selectedModuleName(),
-              methName:   selectedInstanceMethodName(),
-              isInstanceMethod: true },
-             renderMethod);
+    getJSON('/module/' + selectedModuleName() + '/method',
+            { 'method_name': selectedInstanceMethodName(),
+              'is_instance_method': true },
+            renderMethod);
   }
 
   function clearSelections(selections) {
@@ -235,7 +230,7 @@ maglevInfo = (function() {
                         + ivData[1] + '</td></tr>'));
       });
     }
-    
+
    // $('#objInfo').empty().append($('<span>').html(objectId));
   }
 
