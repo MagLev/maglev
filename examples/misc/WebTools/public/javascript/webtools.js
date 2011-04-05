@@ -218,10 +218,9 @@ maglevInfo = (function() {
     console.log(objectInfo);
     setDetailViewObject();
 
-    var objInfo = $('#objInfo tbody').empty();
-    objInfo.append('<tr><th>Class</th><td>'     + objectInfo['class'] + '</td></tr>');
-    objInfo.append('<tr><th>Object ID</th><td>' + objectInfo['object_id'] + '</td></tr>');
-//    objInfo.append('<tr><th>Inspect</th><td>'   + objectInfo['inspect'] + '</td></tr>');
+    $('#objInfoClass').text(objectInfo['class']);
+    $('#objInfoId').text(objectInfo['object_id']);
+    $('#objInfoValue').text(objectInfo['inspect']);
 
     renderTableData('#objInstVars',
                     objectInfo['instance_variables'],

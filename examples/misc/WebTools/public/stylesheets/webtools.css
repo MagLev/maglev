@@ -44,10 +44,10 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
     line-height: normal;
 }
 
-.objTable { border-collapse: collapse; border-width: 1px solid; }
-.objTable td:first-child { width: 5em; }
-.objTable td,th { border-style: solid; border-width: 1px; border-color: #DDD; width: 10em; }
-.objTable caption { font-weight: bold; width: 30em; text-align: center; background: #AAA;}
+.objTable { border-collapse: collapse; border-width: 1px solid; width: 100%;}
+.objTable  tr>:first-child { width: 8em; background: #EEE; }
+.objTable td,th { border-style: solid; border-width: 1px; border-color: #DDD; }
+.objTable caption { font-weight: bold; text-align: left; background: #AAA;}
 
 #captions ul li { display: block; float: left;  width: 20%;
                   font-weight: bold; background: #EEE; text-align: center; }
