@@ -28,6 +28,6 @@ task :test do
 end
 
 desc "Add some objects to Maglev::PERSISTENT_ROOT"
-task :populate do
-  sh "maglev-ruby -Mcommit data.rb"
+task :demodata do
+  sh "maglev-ruby -Mcommit demo_data.rb"
 end
