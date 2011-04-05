@@ -9,15 +9,18 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
 #rubyCodeBrowser { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
   #toolBar { }
   #mainContent { position: absolute; bottom: 2em; top: 2em; width: 100%; }
-    #rubyNavigation { position: absolute; top: 0; bottom: 50%; left: 0; right: 0;
-                      overflow: hidden; border: 2px solid #DDD; border-top: none; }
-      #modules { float: left; width: 20%; height: 100%;}
-      #constants { float: left; width: 20%; height: 100%;}
-      #moduleMethods { float: left; width: 20%; height: 100%;}
-      #instanceMethods { float: left; width: 20%; height: 100%; }
-      #ancestors { float: left; width: 20%; height: 100%;}
+    #rubyNavigation { position: absolute; top: 0; bottom: 50%; left: 0; right: 0; }
+      #captions { position: absolute; top: 0; bottom: 2em; left: 0; right: 0; height: 2em; }
+      #lists { position: absolute; top: 2em; left: 0; right: 0; bottom: 0; }
+        #modules { float: left; width: 20%; height: 100%;}
+        #constants { float: left; width: 20%; height: 100%;}
+        #moduleMethods { float: left; width: 20%; height: 100%;}
+        #instanceMethods { float: left; width: 20%; height: 100%; }
+        #ancestors { float: left; width: 20%; height: 100%;}
     #detailDisplay { position: absolute; bottom: 0; top: 50%; left: 0; right: 0;
-                    border: 2px solid #DDD; border-top: none;}
+                    border: 2px solid #DDD; border-top: none; overflow-y: auto; }
+      #objectInspector { }
+      #rubyEditArea { }
   #footer { position: absolute; bottom: 0; width: 100%; background: #DDD; }
     #fileInfo { height: 2em; padding-top: .5em; padding-left: 2.5em; }
     #statusBar { float: right; padding: 0.25em; width 60%; font-size: smaller; }
@@ -28,6 +31,7 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
 .rubyList li { border: 0; width: 100%; }
 .rubyList li:hover { background: #CCC; }
 
+#rubyNavigation  { overflow: hidden; border: 2px solid #DDD; border-top: none; }
 #ancestors li:hover { background: inherit; }
 
 .ui-selected  { background: #AAA; }
@@ -45,9 +49,5 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
 .objTable td,th { border-style: solid; border-width: 1px; border-color: #DDD; width: 10em; }
 .objTable caption { font-weight: bold; width: 30em; text-align: center; background: #AAA;}
 
-#objectInspector { overflow-y: scroll; }
-
-#captions { position: absolute; top: 0; bottom: 2em; left: 0; right: 0; height: 2em; }
 #captions ul li { display: block; float: left;  width: 20%;
                   font-weight: bold; background: #EEE; text-align: center; }
-#lists { position: absolute; top: 2em; left: 0; right: 0; bottom: 0; }
