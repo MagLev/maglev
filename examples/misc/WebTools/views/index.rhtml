@@ -18,31 +18,36 @@
       <div id="toolBar"></div>
       <div id="mainContent">
         <div id="rubyNavigation">
-          <div id="modules">
-            <span class="caption">Modules &amp; Classes</span>
-            <ul id="rubyModules" class="rubyList"></ul>
+          <div id="captions">
+            <ul>
+              <li>Modules &amp; Classes</li>
+              <li>Constants</li>
+              <li>Module / Class Methods</li>
+              <li>Instance methods</li>
+              <li>Ancestors</li>
+            </ul>
           </div>
+          <div id="lists">
+            <div id="modules">
+              <ul id="rubyModules" class="rubyList"></ul>
+            </div>
 
-          <div id="constants">
-            <span class="caption">Constants</span>
-            <ul id="rubyConstants" class="rubyList"></ul>
+            <div id="constants">
+              <ul id="rubyConstants" class="rubyList"></ul>
+            </div>
+
+            <div id="moduleMethods">
+              <ul id="rubyModuleMethods" class="rubyList"></ul>
+            </div>
+
+            <div id="instanceMethods">
+              <ul id="rubyInstanceMethods" class="rubyList"></ul>
+            </div>
+
+            <div id="ancestors">
+              <ul id="rubyAncestors" class="rubyList"></ul>
+            </div>
           </div>
-
-          <div id="moduleMethods">
-            <span class="caption">Module / Class Methods</span>
-            <ul id="rubyModuleMethods" class="rubyList"></ul>
-          </div>
-
-          <div id="instanceMethods">
-            <span class="caption">Instance Methods</span>
-            <ul id="rubyInstanceMethods" class="rubyList"></ul>
-          </div>
-
-          <div id="ancestors">
-            <span class="caption">Ancestors</span>
-            <ul id="rubyAncestors" class="rubyList"></ul>
-          </div>
-
         </div>
         <div id="detailDisplay">
           <div id="objectInspector" class="hidden">

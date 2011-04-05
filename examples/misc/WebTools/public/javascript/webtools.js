@@ -244,7 +244,6 @@ maglevInfo = (function() {
         $(tableId).removeClass('hidden');
         var ui = $(tableId + ' tbody');
         ui.empty();
-        ui.append('<tr><th>Index</th><th>Value</th></tr>');
         $.each(vals, function(idx, data) { ui.append(formatFn(idx, data)) });
         $(tableId).removeClass('hidden');
       } else {

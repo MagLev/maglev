@@ -17,10 +17,9 @@ Maglev.persistent do
       @foo = "foo"
       @bar = "bar"
       @rand = rand(100)
+      @a_hash = { :a => rand(51), :b => rand(72) }
     end
 
-    def inspect
-    end
     protected
     def protected_method
       "This is a protected method"
@@ -31,7 +30,7 @@ Maglev.persistent do
       "This is a private method"
     end
 
-    INSTANCES = [AAADemo.new, AAADemo.new]
+    AN_INSTANCE = AAADemo.new
     AN_ARRAY = []
     30.times { |i| AN_ARRAY << i }
   end
