@@ -12,10 +12,13 @@ module WebTools
 
     def select_module(module_name)
       mod = Ruby.find_in_namespace(module_name)
+      methods = mod.instance_methods(false) +
+        mod.protected_instance_methods(false) +
+        mod.private_instance_methods(false)
       {
         :ancestors          => mod.ancestors.reverse,
         :constants          => mod.constants.sort,
-        :instance_methods   => mod.instance_methods(false).sort,
+        :instance_methods   => methods.sort,
         :module_methods     => Ruby.module_fns_for(mod),
         :selected_module    => module_name,
       }
@@ -80,11 +83,11 @@ module WebTools
       info[:instance_variables] = inst_vars
 
       enum_info = info[:enumerated] = []
-      puts "======= @obj.class: #{@obj.class}"
+      limit = 10
       case @obj
       when Enumerable, Array
         @obj.each_with_index do |o,i|
-          if i > 20
+          if i > limit
             enum_info << ['', '...']
             break
           else
@@ -93,13 +96,17 @@ module WebTools
         end
 
       when Hash
-        puts "======= Adding hash info to enum"
-        @obj.each do |k,v|
-          enum_info << [k.to_s, v.inspect]
+        @obj.each_with_index do |pair, idx|
+          if idx > limit
+            enum_info << ['', '...']
+            break
+          end
+          enum_info << [pair[0].to_s, pair[1].inspect]
+
         end
       end
-
       info.to_json
+
     end
   end
 end

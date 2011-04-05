@@ -3,6 +3,19 @@ require 'webtools/code_browser'
 
 MiniTest::Unit.autorun
 
+class Xyzzy
+  def initialize
+  end
+
+  protected
+  def protected_method
+  end
+
+  private
+  def private_method
+  end
+end
+
 class TestCodeBrowser < MiniTest::Unit::TestCase
   def test_class_and_module_list
     list = WebTools::CodeBrowser.class_and_module_list
@@ -25,5 +38,16 @@ class TestCodeBrowser < MiniTest::Unit::TestCase
     assert_empty    state[:constants]
     assert_empty    state[:module_methods]
     assert_includes state[:instance_methods], 'add_field'
+    # test that
+  end
+
+  def test_all_methods_retrieved
+    cb = WebTools::CodeBrowser.new
+    state = cb.select_module 'Xyzzy'
+    refute_nil state
+    assert_equal 'Xyzzy', state[:selected_module]
+    assert_includes state[:instance_methods], 'initialize'
+    assert_includes state[:instance_methods], 'protected_method'
+    assert_includes state[:instance_methods], 'private_method'
   end
 end

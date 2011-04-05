@@ -70,7 +70,7 @@ class WebToolsApp < Sinatra::Base
   get '/transaction/abort' do
     Maglev.abort_transaction
     content_type :json
-    prepare_data(@browser.state)
+    prepare_data(WebTools::CodeBrowser.class_and_module_list)
   end
 
   # Returns a JSON string that contains the data under the "data" key.

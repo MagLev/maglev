@@ -14,7 +14,7 @@ module WebTools
       assert_kind_of(String, json)
       assert_match(/"object_id":\d+/, json)
       assert_match(/"class":"Object"/, json)
-      assert_match(/"@foo":/, json)
+      assert_match(/"@foo"/, json)
     end
   end
 end
