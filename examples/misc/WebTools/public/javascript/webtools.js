@@ -2,7 +2,6 @@ maglevInfo = (function() {
   var requestCount = 0, rubyEditor = null;
 
   $(document).ready(function() {
-    debugAjaxCalls();
     setupSelectables();
     setupEditor();
     setupToolBar();
@@ -13,22 +12,17 @@ maglevInfo = (function() {
     $('#toolBar').append(
       $('<div>').button({label: 'Refresh View'}
                        ).click(function () {
-                         debugMsg('AbortTxn');
                          getJSON('/transaction/abort', null, function(data) {
+                           clearRubyNav();
                            updateCodeBrowser();
                          });
                        }));
     $('#toolBar').append($('<div>', { id: 'statusBar'}));
   }
 
-  function debugAjaxCalls() {
-    $('body').bind(
-//      'ajaxStart ajaxStop ajaxSend ajaxSuccess ajaxError ajaxComplete',
-      'ajaxError',
-      function(event) {
-        debugMsg(event.type);
-      });
-
+  function clearRubyNav() {
+    $('ul.rubyList').empty();
+    clearDetailView();
   }
 
   function setupSelectables() {
@@ -122,7 +116,7 @@ maglevInfo = (function() {
     return;
 
     function success(data) {
-      debugMsg("getJSON success");
+      debugMsg('getJSON Success');
       debugMsg(data);
 
       var serverTime = data['_time'];
@@ -149,7 +143,6 @@ maglevInfo = (function() {
   }
 
   function renderCodeBrowser(data) {
-    debugMsg('renderCodeBrowser(): clearing #rubyModules');
     renderList(data['modules'],          $('#rubyModules'));
     renderList(data['constants'],        $('#rubyConstants'));
     renderList(data['module_methods'],   $('#rubyModuleMethods'));
@@ -227,15 +220,19 @@ maglevInfo = (function() {
                     // Data is an array of [name, value, objid]
                     function(idx, data) {
                       return $('<tr><td>'+ data[0] + '</td><td objectId="'
-                               + data[2] + '">' + data[1] + '</td></tr>');
+                               + escapeHTML(data[2]) + '">' + data[1] + '</td></tr>');
                     });
 
     renderTableData('#objEnumValues',
                     objectInfo['enumerated'],
                     function(idx, data) {
-                      return $('<tr><td>' + idx + '</td><td>' + data + '</td></tr>');
+                      return $('<tr><td>' + idx + '</td><td>' + escapeHTML(data) + '</td></tr>');
                     });
     return;
+
+    function escapeHTML(text) {
+      return $('<div>').text(text).html();
+    }
 
     function renderTableData(tableId, vals, formatFn) {
       console.log('renderTableData: tableId: '+ tableId + ' # vals: ' + vals.length);
