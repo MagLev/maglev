@@ -18,7 +18,7 @@ module WebTools
       {
         :ancestors          => mod.ancestors.reverse,
         :constants          => mod.constants.sort,
-        :instance_methods   => methods.sort,
+        :instance_methods   => methods.uniq.sort,
         :module_methods     => Ruby.module_fns_for(mod),
         :selected_module    => module_name,
       }
