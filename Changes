@@ -4,6 +4,11 @@
 
 == Unreleased Changes
 
+== Changes for 25646 2011-04-05
+* Improvements to WebTools, demo now has both code and data to examine
+* A few bugfixes to the underlying GemStone 3.0 system
+* Updated GS/S 3.0 to Beta5+
+
 == Changes for 25633 2011-04-04
 * WebTools now is a "pure ruby" app. Basics are there, but more work is 
   needed before it's ready. Added Ancestors pane. Added Refresh button.

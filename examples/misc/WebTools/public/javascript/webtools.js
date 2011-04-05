@@ -12,12 +12,17 @@ maglevInfo = (function() {
     $('#toolBar').append(
       $('<div>').button({label: 'Refresh View'}
                        ).click(function () {
-                         debugMsg('AbortTxn');
                          getJSON('/transaction/abort', null, function(data) {
+                           clearRubyNav();
                            updateCodeBrowser();
                          });
                        }));
     $('#toolBar').append($('<div>', { id: 'statusBar'}));
+  }
+
+  function clearRubyNav() {
+    $('ul.rubyList').empty();
+    clearDetailView();
   }
 
   function setupSelectables() {
@@ -63,39 +68,38 @@ maglevInfo = (function() {
   function selectModule(className) {
     clearSelections(['#rubyModuleMethods',   '#rubyModuleMethods',
                      '#rubyInstanceMethods', '#rubyAncestors']);
+    clearDetailView();
     getJSON('/module/' + className, null, renderCodeBrowser);
   }
 
   function selectConstant(constName) {
     clearSelections(['#rubyModuleMethods', '#rubyInstanceMethods']);
-    getJSON('/constant',
-            { 'moduleName': selectedModuleName(),
-              'constName':  selectedConstantName() },
+    getJSON('/module/' + selectedModuleName() + '/constant/' + selectedConstantName(),
+            null,
             function(data) {
               clearEditArea();
-              renderSource(data['const_value']);
+              renderObject(data['const_value']);
             });
   }
 
   function selectModuleMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyInstanceMethods']);
-    getJSON('/method',
-            { moduleName: selectedModuleName(),
-              methName:   selectedModuleMethodName(),
-              isInstanceMethod: false },
+    getJSON('/module/' + selectedModuleName() + '/method',
+            { 'method_name': selectedModuleMethodName(),
+              'is_instance_method': false },
             renderMethod);
   }
 
   function selectInstanceMethod(methodName) {
     clearSelections(['#rubyConstants', '#rubyModuleMethods']);
-    getJSON('/method',
-            { moduleName: selectedModuleName(),
-              methName:   selectedInstanceMethodName(),
-              isInstanceMethod: true },
-             renderMethod);
+    getJSON('/module/' + selectedModuleName() + '/method',
+            { 'method_name': selectedInstanceMethodName(),
+              'is_instance_method': true },
+            renderMethod);
   }
 
   function clearSelections(selections) {
+    console.log('clearSelections: ' + selections);
     $.each(selections, function(i, el) {
       $(el + ' .ui-selected').removeClass('ui-selected');
     });
@@ -112,7 +116,7 @@ maglevInfo = (function() {
     return;
 
     function success(data) {
-      debugMsg("getJSON success");
+      debugMsg('getJSON Success');
       debugMsg(data);
 
       var serverTime = data['_time'];
@@ -156,8 +160,26 @@ maglevInfo = (function() {
     }
   }
 
+  function setDetailViewCode(sym) {
+    console.log('setDetailViewCode()');
+    $('#objectInspector').addClass('hidden');
+    $('#rubyEditArea').removeClass('hidden');
+  }
+
+  function setDetailViewObject(sym) {
+    $('#rubyEditArea').addClass('hidden');
+    $('#objectInspector').removeClass('hidden');
+  }
+
+  function clearDetailView() {
+    $('#rubyEditArea').addClass('hidden');
+    $('#objectInspector').addClass('hidden');
+  }
+
   function clearEditArea() {
-    renderSource('');
+    if (rubyEditor.editor) {
+      rubyEditor.setCode('');
+    }
     $('#fileInfo').empty();
   }
 
@@ -173,9 +195,56 @@ maglevInfo = (function() {
     }
   }
 
+  // Make the rubyEditor visible in the detail area and render the source
+  // code.  High level api.
   function renderSource(string) {
     if (rubyEditor.editor) {
       rubyEditor.setCode(string);
+      setDetailViewCode();
+    }
+  }
+
+  // Make the objectInspector visible in the detail area and render the
+  // Object.  High level api.
+  function renderObject(objectInfo) {
+    console.log('renderObject()');
+    console.log(objectInfo);
+    setDetailViewObject();
+
+    $('#objInfoClass').text(objectInfo['class']);
+    $('#objInfoId').text(objectInfo['object_id']);
+    $('#objInfoValue').text(objectInfo['inspect']);
+
+    renderTableData('#objInstVars',
+                    objectInfo['instance_variables'],
+                    // Data is an array of [name, value, objid]
+                    function(idx, data) {
+                      return $('<tr><td>'+ data[0] + '</td><td objectId="'
+                               + escapeHTML(data[2]) + '">' + data[1] + '</td></tr>');
+                    });
+
+    renderTableData('#objEnumValues',
+                    objectInfo['enumerated'],
+                    function(idx, data) {
+                      return $('<tr><td>' + idx + '</td><td>' + escapeHTML(data) + '</td></tr>');
+                    });
+    return;
+
+    function escapeHTML(text) {
+      return $('<div>').text(text).html();
+    }
+
+    function renderTableData(tableId, vals, formatFn) {
+      console.log('renderTableData: tableId: '+ tableId + ' # vals: ' + vals.length);
+      if (vals && vals.length > 0) {
+        $(tableId).removeClass('hidden');
+        var ui = $(tableId + ' tbody');
+        ui.empty();
+        $.each(vals, function(idx, data) { ui.append(formatFn(idx, data)) });
+        $(tableId).removeClass('hidden');
+      } else {
+        $(tableId).addClass('hidden');
+      }
     }
   }
 
