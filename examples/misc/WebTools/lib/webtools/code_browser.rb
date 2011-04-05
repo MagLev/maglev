@@ -55,7 +55,7 @@ module WebTools
     # Return a new ObjectInfo instance for the object with the given object
     # id.
     def self.for_id(object_id)
-      new(ObjectSpace._id2ref(oop))
+      new(ObjectSpace._id2ref(object_id))
     end
 
     # Return a new ObjectInfo instance for the given object.
@@ -63,50 +63,48 @@ module WebTools
       new(object)
     end
 
+    attr_reader :info
+    
     def initialize(obj)
-      @obj = obj
-    end
+      @info = { }
+      @info[:object_id]          = obj.object_id
+      @info[:class]              = obj.class.name
+      @info[:inspect]            = obj.inspect
+      @info[:instance_variables] = []
+      @info[:enumerated]         = []
+      @info[:enumerated_size]    = obj.respond_to?(:size) ? obj.size : nil
 
-    def to_json(*args)
-      puts "===== to_json"
-      info = { }
-      info[:object_id] = @obj.object_id
-      info[:class]     = @obj.class.name
-      info[:inspect]   = @obj.inspect
-      inst_vars = []
-      puts "====== inst vars for #{@obj}: #{@obj.instance_variables.inspect}"
-      @obj.instance_variables.each do |iv|
-        puts "====== Adding inst var #{iv}"
-        val = @obj.instance_variable_get(iv)
-        inst_vars << [iv, val.inspect, val.object_id]
+      obj.instance_variables.each do |iv|
+        val = obj.instance_variable_get(iv)
+        @info[:instance_variables] << [iv, val.inspect, val.object_id]
       end
-      info[:instance_variables] = inst_vars
 
-      enum_info = info[:enumerated] = []
       limit = 10
-      case @obj
+      case obj
       when Enumerable, Array
-        @obj.each_with_index do |o,i|
+        obj.each_with_index do |o,i|
           if i > limit
-            enum_info << ['', '...']
+            @info[:enumerated] << '...'
             break
           else
-            enum_info << [i, o.inspect]
+            @info[:enumerated] << o.inspect
           end
         end
 
       when Hash
-        @obj.each_with_index do |pair, idx|
+        obj.each_with_index do |pair, idx|
           if idx > limit
-            enum_info << ['', '...']
+            @info[:enumerated] << ['', '...']
             break
           end
-          enum_info << [pair[0].to_s, pair[1].inspect]
-
+          @info[:enumerated] << [pair[0].to_s, pair[1].inspect]
         end
       end
-      info.to_json
 
+    end
+
+    def to_json(*args)
+      @info.to_json
     end
   end
 end

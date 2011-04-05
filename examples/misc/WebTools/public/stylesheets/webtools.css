@@ -27,6 +27,8 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
 .rubyList li { border: 0; width: 100%; }
 .rubyList li:hover { background: #CCC; }
 
+#ancestors li:hover { background: inherit; }
+
 .ui-selected  { background: #AAA; }
 .caption { font-weight: bold; background: #EEE; text-align: center;
            width: 100%; display: block; border: 2px solid #DDD; }
@@ -37,7 +39,9 @@ body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
     line-height: normal;
 }
 
-table .objTable { border-collapse: collapse; }
-.objTable caption { font-weight: bold; width: 30em; text-align: center; }
-col .labelCol { background: #DDD; }
-col .valCol { width: 20em; text-align: right; }
+.objTable { border-collapse: collapse; border-width: 1px solid; }
+.objTable td:first-child { width: 5em; }
+.objTable td,th { border-style: solid; border-width: 1px; border-color: #DDD; width: 10em; }
+.objTable caption { font-weight: bold; width: 30em; text-align: center; background: #AAA;}
+
+#objectInspector { overflow-y: scroll; }

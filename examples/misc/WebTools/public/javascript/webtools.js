@@ -221,7 +221,7 @@ maglevInfo = (function() {
     var objInfo = $('#objInfo tbody').empty();
     objInfo.append('<tr><th>Class</th><td>'     + objectInfo['class'] + '</td></tr>');
     objInfo.append('<tr><th>Object ID</th><td>' + objectInfo['object_id'] + '</td></tr>');
-    objInfo.append('<tr><th>Inspect</th><td>'   + objectInfo['inspect'] + '</td></tr>');
+//    objInfo.append('<tr><th>Inspect</th><td>'   + objectInfo['inspect'] + '</td></tr>');
 
     renderTableData('#objInstVars',
                     objectInfo['instance_variables'],
@@ -244,6 +244,7 @@ maglevInfo = (function() {
         $(tableId).removeClass('hidden');
         var ui = $(tableId + ' tbody');
         ui.empty();
+        ui.append('<tr><th>Index</th><th>Value</th></tr>');
         $.each(vals, function(idx, data) { ui.append(formatFn(idx, data)) });
         $(tableId).removeClass('hidden');
       } else {
