@@ -27,9 +27,11 @@ class Env
 
     def [](key)
       v = __atkey(key)
+
       if v._equal?(nil)
         v = Env.__getenv(key)
         unless v._equal?(nil)
+          v.freeze
           self.__atkey_put( key, v ) # __atkey_put implemented in Hash
         end
       end
@@ -62,6 +64,11 @@ class Env
         Env.__unsetenv(key)
         self.__delete(key)
       else
+        if val._isString 
+          unless val.frozen?
+            val = val.dup.freeze
+          end
+        end
         Env.__putenv(key, val)
         self.__atkey_put(key, val) # __atkey_put implemented in Hash 
       end
