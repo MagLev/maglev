@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* Fix Trac 887
+* Fix a few spec failures
+
 == Changes for 25646 2011-04-05
 * Improvements to WebTools, demo now has both code and data to examine
 * A few bugfixes to the underlying GemStone 3.0 system
