@@ -6,6 +6,7 @@
 
 * Fix Trac 887
 * Fix a few spec failures
+* Added more explicit instructions for examples/misc/WebTools
 
 == Changes for 25646 2011-04-05
 * Improvements to WebTools, demo now has both code and data to examine
