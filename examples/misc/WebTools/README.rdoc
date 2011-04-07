@@ -93,5 +93,5 @@ The line number displayed for evals is always 2. This will be fixed at a later d
 
 == CodeMirror
 
-This project includes a copy of CodeMirror, copyrighted by Marijn Haverbeke.
+This project includes a subset of CodeMirror, copyrighted by Marijn Haverbeke.
 See public/CodeMirror/LICENSE.
