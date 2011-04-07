@@ -4,9 +4,13 @@
 
 == Unreleased Changes
 
-* Fix Trac 887
+== Changes for 25665 2011-04-07
+* Fix Trac 887, 889
 * Fix a few spec failures
 * Added more explicit instructions for examples/misc/WebTools
+* Bugfixes and enhancements to underlying GemStone 3.0 system
+  - deprecated constraints
+  - AIO pgsvr sockets are monitored by main thread instead of the NetReader thread
 
 == Changes for 25646 2011-04-05
 * Improvements to WebTools, demo now has both code and data to examine
