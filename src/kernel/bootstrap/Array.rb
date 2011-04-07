@@ -1176,7 +1176,18 @@ class Array
     self
   end
 
-  def first(count = 0)
+  def first(*args, &block)
+    sz = args.__size
+    if sz._equal?(0)
+      self.__at(0)
+    elsif sz._equal?(1)
+      self.first(args[0])
+    else
+      raise ArgumentError, 'Array#first, too many args'
+    end
+  end
+
+  def first(count)
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'negative count'
@@ -1382,7 +1393,12 @@ class Array
     count
   end
 
-  primitive 'pack', 'rubyPack:'
+  primitive '__pack', 'rubyPack:'
+
+  def pack(template_str)
+    template_str = Type.coerce_to(template_str, String, :to_str)
+    self.__pack(template_str)
+  end
 
   def self.__pack_coerce(obj, sym)
     # sent from C code in capiprim.c

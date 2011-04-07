@@ -228,6 +228,38 @@ end
 
 raise "Fail B" unless CXYZZY.instance_methods(false).size == 1
 
+# Test method source retrieval
+# Check the method source is found in a number of instances
+class C
+  def x;      "x";      end
+  def self.y; "self.y"; end
+end
+
+test(C.__gs_method('x', true).nil?,  false, "C.x true")
+begin
+  test(C.__gs_method('x', false), nil, "C.x false")
+rescue
+  # ok
+end
+
+test(C.__gs_method('y', false).nil?,  false, "C.y false")
+begin
+  test(C.__gs_method('y', true), nil, "C.y true")
+rescue
+  # ok
+end
+
+# Test with and without a singleton class
+test(Array.__gs_method(:new, false).nil?, false, 'Array.new no singleton')
+class Array
+  class << self
+    def foo
+    end
+  end
+end
+test(Array.__gs_method(:new, false).nil?, false, 'Array.new after singleton')
+test(Array.__gs_method(:foo, false).nil?, false, 'Array.foo no singleton')
+
 ################### Report and clean up #####################
 report
 Maglev.abort_transaction if defined? RUBY_ENGINE

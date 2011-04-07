@@ -1,0 +1,1 @@
+fails:Array#product does not attempt to produce an unreasonable number of products

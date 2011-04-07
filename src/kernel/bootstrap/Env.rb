@@ -27,9 +27,11 @@ class Env
 
     def [](key)
       v = __atkey(key)
+
       if v._equal?(nil)
         v = Env.__getenv(key)
         unless v._equal?(nil)
+          v.freeze
           self.__atkey_put( key, v ) # __atkey_put implemented in Hash
         end
       end
@@ -62,6 +64,11 @@ class Env
         Env.__unsetenv(key)
         self.__delete(key)
       else
+        if val._isString 
+          unless val.frozen?
+            val = val.dup.freeze
+          end
+        end
         Env.__putenv(key, val)
         self.__atkey_put(key, val) # __atkey_put implemented in Hash 
       end
@@ -104,11 +111,37 @@ class Env
       self
     end
 
-    def merge(aHash)
+    def merge(a_hash)
       raise NotImplementedError, "Env#merge"
     end
     def merge!(other)
       raise NotImplementedError, "Env#merge!"
+    end
+
+    def replace(a_hash)
+      unless a_hash._isHash
+        raise TypeError, 'arg to ENV.replace must be a Hash' 
+      end
+      # build list of keys in self not in a_hash
+      dels = []
+      self.each_key { |k|  
+        if a_hash.__at_orRNil(k)._equal?(RemoteNil)
+          dels << k
+        end
+      }
+      # __check_update on all keys to be changed  before any changes
+      dels.each { |k| self.__check_update(k) }
+      adds = [] 
+      a_hash.each_pair { |k, v| 
+        unless self[k] == v
+          self.__check_update(k) 
+          adds << [ k, v]
+        end
+      }
+      # delete keys in self not in a_hash
+      dels.each { |k | self.delete(k) }
+      # now store all pairs in a_hash into self
+      adds.each { | pair | self.store( pair[0], pair[1] ) }
     end
 
     def to_s

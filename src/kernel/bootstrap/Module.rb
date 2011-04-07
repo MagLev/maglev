@@ -239,6 +239,10 @@ class Module
     define_method(sym, block)
   end
 
+  def dup
+    raise NotImplementedError, "Module#dup"
+  end
+
   # make associations holding constants of receiver invariant
   #   does not affect inherited constants
   primitive_nobridge '__freeze_constants', '_rubyConstantsFreeze'
@@ -251,7 +255,7 @@ class Module
   primitive_nobridge '__includes_module', '_rubySubclassOf:'
 
   primitive_nobridge '__instance_method', 'rubyUnboundMethodFor:'
-  primitive_nobridge '__gs_method', 'rubyMethodFor:'
+  primitive_nobridge '__gs_method', 'rubyMethodFor:instanceMethod:'
 
   def instance_method(name)
     unless name._isSymbol

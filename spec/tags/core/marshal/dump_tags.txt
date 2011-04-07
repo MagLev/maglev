@@ -67,3 +67,4 @@ fails:Marshal.dump dumps a Fixnum 2**24
 fails:Marshal.dump dumps a Float 1.0
 fails:Marshal.dump dumps a Module nested
 fails:Marshal.dump dumps a Fixnum 2**16
+fails:Marshal.dump dumps an array containing objects having _dump method

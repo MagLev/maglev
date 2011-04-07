@@ -522,7 +522,8 @@ class RubyInstVarNode
   enum { my_cls = cls_RubyInstVarNode };
  public:
   static inline omObjSType* s(omObjSType *sym, rb_parse_state *ps) {
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a, sym, ps);
+    omObjSType *srcOfs = OOP_OF_SMALL_LONG_(ps->tokenOffset());
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b, sym, srcOfs, ps);
   }
 };
 class RubyLocalAsgnNode

@@ -8,9 +8,17 @@ GEM
     activesupport (3.0.5)
     builder (2.1.2)
     i18n (0.5.0)
+    json_pure (1.5.1)
+    rack (1.2.2)
+    sinatra (1.2.1)
+      rack (~> 1.1)
+      tilt (< 2.0, >= 1.2.2)
+    tilt (1.2.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   activemodel (~> 3.0)
+  json_pure (= 1.5.1)
+  sinatra (~> 1.1)

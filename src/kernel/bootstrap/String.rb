@@ -232,29 +232,24 @@ class String
 
   def casecmp(o)
     # case-insensitive version of String#<=>
-    if o._isString
-      i = 1
-      o_size = o.__size
-      lim = size > o_size ? o_size : size # lim is the min
-      while i <= lim
-        sc = self.__uppercaseAt(i)
-        oc = o.__uppercaseAt(i)
-        result = sc <=> oc
-        return result unless result._equal?(0)
-        i += 1
-      end
-      return size <=> o_size
-    else
+    unless o._isString
       if o._equal?(nil)
         return nil
       end
-      # From Rubinius...there are a lot of strange things in how
-      # string handles <=>...
       return nil if o._isSymbol
-      return nil unless o.respond_to?(:to_str) && o.respond_to?(:casecmp)
-      return nil unless tmp = (o casecmp self)
-      return -tmp
+      o = Type.coerce_to(o, String, :to_str)
     end
+    i = 1
+    o_size = o.__size
+    lim = size > o_size ? o_size : size # lim is the min
+    while i <= lim
+      sc = self.__uppercaseAt(i)
+      oc = o.__uppercaseAt(i)
+      result = sc <=> oc
+      return result unless result._equal?(0)
+      i += 1
+    end  
+    return size <=> o_size
   end
 
   primitive_env '==',   '_rubyEqual' , ':'
@@ -335,9 +330,9 @@ class String
   primitive_nobridge_env '__at' , '_rubyAt', ':length:'
 
   def __prim_at_length_failed(start, length)
-    # called from Smalltalk
+    # called from Smalltalk primitive failure code
     if start._isRegexp
-      arr = self.__match_regexp(start, length) # arr is [m_begin, m_len]
+      arr = self.__match_regexp(start, length, 0x40) # arr is [m_begin, m_len]
       return nil if arr._equal?(nil)
       # no tainted logic
       self.__at( arr[0] , arr[1] )
@@ -630,14 +625,12 @@ class String
     last = 0
     i = sep_size
     if sep_size._equal?(1)
-      i += 1
       while i < my_size
         if self.__at(i-1)._equal?(newline)
           line = self.__at(last, i-last)
-          # line.taint if tainted?
           block.call( line )
           # We don't have a way yet to check if the data was modified...
-          #modified? id, my_size
+          # modified? id, my_size
           last = i
         end
         i += 1
@@ -1331,7 +1324,7 @@ class String
   def slice!(start, a_len)
     sz = self.__size
     if start._isRegexp
-      arr = self.__match_regexp(start, a_len) # arr is [ m_begin, m_len]
+      arr = self.__match_regexp(start, a_len, 0x30) # arr is [ m_begin, m_len]
       return nil if arr._equal?(nil)
       r = slice!(arr.__at(0), arr.__at(1))
       # r.taint if self.tainted? or start.tainted?
@@ -1358,7 +1351,8 @@ class String
   def slice!(arg)
     # Do NOT check for frozen here...fails specs
     if arg._isRegexp
-      md = arg.match(self)
+      md = arg.__search(self, 0, nil)  # inline Regexp#match to update $~
+      md.__storeRubyVcGlobal(0x20) # store into caller's $~
       return nil if md._equal?(nil)
       raise TypeError, "can't modify frozen string" if self.frozen?
       start = md.begin(0)
@@ -1380,8 +1374,9 @@ class String
     end
   end
 
-  def __match_regexp(regexp, length)
+  def __match_regexp(regexp, length, vcgl_idx)
     md = regexp.match(self)
+    md.__storeRubyVcGlobal( vcgl_idx ) # update $~
     return nil if md._equal?(nil)
     idx = Type.coerce_to(length, Integer, :to_int)
     return nil if idx >= md.size or idx < 0
@@ -1776,14 +1771,19 @@ class String
     tot = 0
     n = 0
     lim = self.__size
-    unless power._isFixnum
-      power = power.to_int
-    end
-    mod = (1 << power) - 1
-    while n < lim
-      tot = tot + self.__at(n)
-      tot = tot & mod
-      n = n + 1
+    power = Type.coerce_to(power, Fixnum, :to_int)
+    if power <= 0
+      while n < lim
+        tot = tot + self.__at(n)
+        n = n + 1
+      end
+    else
+      mod = (1 << power) - 1
+      while n < lim
+        tot = tot + self.__at(n)
+        tot = tot & mod
+        n = n + 1
+      end
     end
     tot
   end

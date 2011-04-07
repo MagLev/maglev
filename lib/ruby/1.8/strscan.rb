@@ -63,7 +63,11 @@ class StringScanner
       n = Type.coerce_to(n, Fixnum, :to_int)
     end
     begin
-      match[n]
+      m = self.match
+      unless match._equal?(nil)
+        m = m[n]
+      end
+      m
     rescue IndexError
       nil
     end
@@ -562,12 +566,8 @@ class StringScanner
   private :_scan
 
   def _scan_headonly(pattern, succptr, getstr)
-    if pattern._isString
-      # ok
-    elsif pattern._isRegexp
-      # ok
-    else
-      pattern = Type.coerce_to(pattern, String, :to_str)
+    unless pattern._isRegexp
+      raise TypeError, "expected a Regexp"
     end
     @match = nil
 

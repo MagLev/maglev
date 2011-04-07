@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MagLev WebTools</title>
+    <meta charset="utf-8">
+    <link rel="Shortcut Icon" type="image/ico" href="images/favicon.ico">
+
+    <link rel="stylesheet" href="stylesheets/reset.css"     type="text/css" media="screen">
+    <link rel="stylesheet" href="stylesheets/webtools.css"  type="text/css" media="screen">
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="javascript/webtools.js"></script>
+    <script type="text/javascript" src="CodeMirror/js/codemirror.js"></script>
+  </head>
+  <body>
+    <div id="rubyCodeBrowser" class="ui-widget-content">
+      <div id="toolBar"></div>
+      <div id="mainContent">
+        <div id="rubyNavigation">
+          <div id="captions">
+            <ul>
+              <li>Modules &amp; Classes</li>
+              <li>Constants</li>
+              <li>Module / Class Methods</li>
+              <li>Instance methods</li>
+              <li>Ancestors</li>
+            </ul>
+          </div>
+          <div id="lists">
+            <div id="modules">
+              <ul id="rubyModules" class="rubyList"></ul>
+            </div>
+
+            <div id="constants">
+              <ul id="rubyConstants" class="rubyList"></ul>
+            </div>
+
+            <div id="moduleMethods">
+              <ul id="rubyModuleMethods" class="rubyList"></ul>
+            </div>
+
+            <div id="instanceMethods">
+              <ul id="rubyInstanceMethods" class="rubyList"></ul>
+            </div>
+
+            <div id="ancestors">
+              <ul id="rubyAncestors" class="rubyList"></ul>
+            </div>
+          </div>
+        </div>
+        <div id="detailDisplay">
+          <div id="objectInspector" class="hidden">
+            <table id="objInfo" class="objTable">
+              <caption>Object Info</caption>
+              <tbody>
+                <tr><th>Class</th><td id="objInfoClass"></td></tr>
+                <tr><th>Object ID</th><td id="objInfoId"></td></tr>
+                <tr><th>Value</th><td id="objInfoValue"></td></tr>
+              </tbody>
+            </table>
+            <table id="objInstVars" class="objTable hidden">
+              <caption>Instance Variables</caption>
+              <tbody></tbody>
+            </table>
+            <table id="objEnumValues" class="objTable hidden">
+              <caption>Enumerated Values</caption>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="rubyEditArea" class="hidden">
+            <textArea id="rubyEditor" spellcheck="false"></textArea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer">
+      <div id="fileInfo"></div>
+    </div>
+  </body>
+</html>

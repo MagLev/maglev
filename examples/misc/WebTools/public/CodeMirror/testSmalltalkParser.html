@@ -1,0 +1,116 @@
+<!--
+	This file can be used with jsunit to test the Smalltalk parser.
+-->
+<html>
+	<head>
+		<title>Test Page for Smalltalk Parser</title>
+		<script language="javascript" src="/~jfoster/scripts/jquery.js"></script>
+		<script language="javascript" src="/~jfoster/jsunit/app/jsUnitCore.js"></script>
+		<script language="javascript" src="/~jfoster/CodeMirror/js/stringstream.js"></script>
+		<script language="javascript" src="/~jfoster/CodeMirror/js/tokenize.js"></script>
+		<script language="javascript" src="/~jfoster/CodeMirror/js/highlight.js"></script>
+		<script language="javascript" src="/~jfoster/CodeMirror/js/parseSmalltalk.js"></script>
+	</head>
+	<body>
+		<div style="display: none;" />
+		<script language="javascript">
+			function testCharacter() {
+				highlightText("$a $b", result, SmalltalkParser);
+				return;		
+				function result(spanNodes) {
+					assertEquals("element count", 2, spanNodes.length);
+					assertEquals("span tag", "SPAN", spanNodes[0].tagName);
+					assertEquals("span class", "st-character", $(spanNodes[0]).attr("class"));
+					assertEquals("span html", "$a ", $(spanNodes[0]).html());
+					assertEquals("span tag", "SPAN", spanNodes[1].tagName);
+					assertEquals("span class", "st-character", $(spanNodes[1]).attr("class"));
+					assertEquals("span html", "$b", $(spanNodes[1]).html());
+				}
+			}
+			function testString() {
+				var lineCount = -1;
+				highlightText("'abc''def' 'qwe\nrty'", result, SmalltalkParser);
+				return;
+				function result(spanNodes) {
+					++lineCount;
+					switch (lineCount) {
+						case 0:
+							assertEquals("element count", 2, spanNodes.length);
+							assertEquals("span tag", "SPAN", spanNodes[0].tagName);
+							assertEquals("span class", "st-string", $(spanNodes[0]).attr("class"));
+							assertEquals("span html", "'abc''def' ", $(spanNodes[0]).html());
+							assertEquals("span class", "st-string", $(spanNodes[1]).attr("class"));
+							assertEquals("span html", "'qwe", $(spanNodes[1]).html());
+							break;
+						case 1:
+							assertEquals("element count", 1, spanNodes.length);
+							assertEquals("span class", "st-string", $(spanNodes[0]).attr("class"));
+							assertEquals("span html", "rty'", $(spanNodes[0]).html());
+							break;
+						default:
+							fail("Should be only two lines!");
+					}
+				}
+			}	
+			function testSymbol() {
+				highlightText("#'abc' #a #_a1 #a1:b2: # ", result, SmalltalkParser);
+				return;	
+				function result(spanNodes) {
+					assertEquals("element count", 5, spanNodes.length);
+					assertEquals("span tag", "SPAN", spanNodes[0].tagName);
+					assertEquals("span class", "st-symbol", $(spanNodes[0]).attr("class"));
+					assertEquals("span html", "#'abc' ", $(spanNodes[0]).html());
+					assertEquals("span class", "st-symbol", $(spanNodes[1]).attr("class"));
+					assertEquals("span html", "#a ", $(spanNodes[1]).html());
+					assertEquals("span class", "st-symbol", $(spanNodes[2]).attr("class"));
+					assertEquals("span html", "#_a1 ", $(spanNodes[2]).html());
+					assertEquals("span class", "st-symbol", $(spanNodes[3]).attr("class"));
+					assertEquals("span html", "#a1:b2: ", $(spanNodes[3]).html());
+					assertEquals("span class", "st-error", $(spanNodes[4]).attr("class"));
+					assertEquals("span html", "# ", $(spanNodes[4]).html());
+				}
+			}
+			function testIdentifier() {
+				highlightText("a _a a_1", result, SmalltalkParser);
+				return;
+				function result(spanNodes) {
+					assertEquals("element count", 3, spanNodes.length);
+					assertEquals("span class", "st-identifier", $(spanNodes[0]).attr("class"));
+					assertEquals("span class", "st-identifier", $(spanNodes[1]).attr("class"));
+					assertEquals("span class", "st-identifier", $(spanNodes[2]).attr("class"));
+				}
+			}
+			function testKeyword() {
+				highlightText("foo:", result, SmalltalkParser);
+				return;
+				function result(spanNodes) {
+					assertEquals("element count", 1, spanNodes.length);
+					assertEquals("span class", "st-keyword", $(spanNodes[0]).attr("class"));
+					assertEquals("span html", "foo:", $(spanNodes[0]).html());
+				}
+			}
+			function testSpecialLiterals() {
+				highlightText("true false self super nil ", result, SmalltalkParser);
+				return;
+				function result(spanNodes) {
+					assertEquals("element count", 5, spanNodes.length);
+					assertEquals("span class", "st-boolean", $(spanNodes[0]).attr("class"));
+					assertEquals("span class", "st-boolean", $(spanNodes[1]).attr("class"));
+					assertEquals("span class", "st-self", $(spanNodes[2]).attr("class"));
+					assertEquals("span class", "st-super", $(spanNodes[3]).attr("class"));
+					assertEquals("span class", "st-nil", $(spanNodes[4]).attr("class"));
+				}
+			}
+			function testOperators() {
+				highlightText("^#a ", result, SmalltalkParser);
+				return;
+				function result(spanNodes) {
+					assertEquals("element count", 2, spanNodes.length);
+					assertEquals("span class", "st-return", $(spanNodes[0]).attr("class"));
+					assertEquals("span class", "st-symbol", $(spanNodes[1]).attr("class"));
+				}
+			}
+
+		</script>
+	</body>
+</html>

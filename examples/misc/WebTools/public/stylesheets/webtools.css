@@ -1,0 +1,53 @@
+@import "reset.css";
+@import "base/jquery.ui.all.css";
+@import "jquery.contextMenu.css";
+
+body * { font-size: 10pt; margin: 0; padding: 0; font-family: sans-serif;}
+.hidden { display: none; }
+
+/* Setup the basic structure of the panels */
+#rubyCodeBrowser { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
+  #toolBar { }
+  #mainContent { position: absolute; bottom: 2em; top: 2em; width: 100%; }
+    #rubyNavigation { position: absolute; top: 0; bottom: 50%; left: 0; right: 0; }
+      #captions { position: absolute; top: 0; bottom: 2em; left: 0; right: 0; height: 2em; }
+      #lists { position: absolute; top: 2em; left: 0; right: 0; bottom: 0; }
+        #modules { float: left; width: 20%; height: 100%;}
+        #constants { float: left; width: 20%; height: 100%;}
+        #moduleMethods { float: left; width: 20%; height: 100%;}
+        #instanceMethods { float: left; width: 20%; height: 100%; }
+        #ancestors { float: left; width: 20%; height: 100%;}
+    #detailDisplay { position: absolute; bottom: 0; top: 50%; left: 0; right: 0;
+                    border: 2px solid #DDD; border-top: none; overflow-y: auto; }
+      #objectInspector { }
+      #rubyEditArea { }
+  #footer { position: absolute; bottom: 0; width: 100%; background: #DDD; }
+    #fileInfo { height: 2em; padding-top: .5em; padding-left: 2.5em; }
+    #statusBar { float: right; padding: 0.25em; width 60%; font-size: smaller; }
+
+/* Stylistic stuff */
+.rubyList { overflow-y: scroll; overflow-x: hidden; height: 100%;
+               border: 1px solid #DDD; border-top: none; }
+.rubyList li { border: 0; width: 100%; }
+.rubyList li:hover { background: #CCC; }
+
+#rubyNavigation  { overflow: hidden; border: 2px solid #DDD; border-top: none; }
+#ancestors li:hover { background: inherit; }
+
+.ui-selected  { background: #AAA; }
+.caption { font-weight: bold; background: #EEE; text-align: center;
+           width: 100%; display: block;  }
+
+.CodeMirror-line-numbers {
+    width: 2.2em; color: #aaa; background-color: #eee; text-align: right;
+    padding-right: .3em; font-size: 10pt; font-family: monospace; padding-top: .4em;
+    line-height: normal;
+}
+
+.objTable { border-collapse: collapse; border-width: 1px solid; width: 100%;}
+.objTable  tr>:first-child { width: 8em; background: #EEE; }
+.objTable td,th { border-style: solid; border-width: 1px; border-color: #DDD; }
+.objTable caption { font-weight: bold; text-align: left; background: #AAA;}
+
+#captions ul li { display: block; float: left;  width: 20%;
+                  font-weight: bold; background: #EEE; text-align: center; }

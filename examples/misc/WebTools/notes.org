@@ -1,0 +1,69 @@
+* Notes on the re-tool of WebTools
+** TO DO
+   + Put source and line number in own html, not in the editor
+   + Object inspector
+   + Transaction control buttons
+   + Label the columns
+   + Handle Errors
+   + Array.new doesn't show source: fix
+   + Use an after filter (or rack middleware) to do the timing?
+** Things to change:
+
+   1. The /tools url returns objects.  The 'file' attribute is really a uri
+      attribute.  The ST WebTools expected something like CodeBrowser.html,
+      and would serve up that file.  In Sinatra, I use a simple URI like
+      '/browser', and let the view return the guts....  Thus the name
+      'file' is a misnonmer.
+
+** How the tabs work
+
+   The tabs use jQuery http://docs.jquery.com/UI/Tabs
+
+   The app is loaded by calling http://localhost:4567/.  This loads the
+   index.rhtml file, which is a complete page (we don't use a layout, since
+   we want to load one page, and then just add DOM fragments for each
+   additional tab.
+
+   index.rhtml defines empty tabs for each of the tools.  This is currently
+   hard-coded in the .rhtml file, but the list/order of tools could easily
+   be made dynamic.
+
+   To add a tab to the application: Add an <li> entry to the <ul> in
+   index.rhtml.  If the href is of the form "#fooTab", then you'll need to
+   load JSON for it.  If it is of the form "/fooStuff", then it will be
+   loaded via a GET '/fooStuff', so add an entry into the
+   lib/webtools_app.rb Sinatra app.
+
+   Once the bare html is loaded into the browser, the jQuery ready()
+   function initializes the tabs and the first tab gets selected, which
+   loads its html:
+
+      $(document).ready(function() {
+        $("#tabs").tabs();
+      });
+
+   Since each tab is dynamically loaded, and we only want the markup for
+   that tab, the html for the version report is in version.rhtml and looks
+   like:
+
+     <div>
+       <table>
+         <caption>GemStone Version Report</caption>
+         <thead>
+           <tr><th>Attribute</th><th>Stone</th><th>WebTools</th></tr>
+         </thead>
+         <tbody id='versionTable'>
+           <% @data.each do |k,v| %>
+           <tr><th><%= k %></th><td><%= v[0] %></td><td><%= v[1] %></td></tr>
+           <% end %>
+         </tbody>
+       </table>
+     </div>
+
+   The jQuery-UI takes care of adding all of the various class and id
+   attributes on the tabbed DOM elements so that the jQuery-UI css can
+   style it appropriately.  There is themeing support, but I haven't played
+   with it yet.
+
+   jQuery provides the option to cache data in the tabs, so that the url is
+   retrieved only the first time, but I haven't turned that on yet.

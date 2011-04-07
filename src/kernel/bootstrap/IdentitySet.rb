@@ -84,8 +84,8 @@ class IdentitySet
 
   primitive_nobridge 'to_a' , 'asArray'
 
-  primitive_nobridge '__basic_dup', '_basicCopy'  # uses singleton class for now
-  primitive_nobridge '__basic_clone', '_basicCopy' # use singleton class
+  primitive_nobridge '__basic_dup', 'shallowCopy'  # uses singleton class for now
+  primitive_nobridge '__basic_clone', 'shallowCopy' # use singleton class
 
   def dup
     res = self.__basic_dup

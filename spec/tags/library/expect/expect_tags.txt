@@ -1,0 +1,6 @@
+fails:IO#expect matches data against a Regexp
+fails:IO#expect matches data against a String
+fails:IO#expect returns any captures of the Regexp
+fails:IO#expect returns raises IOError if the IO is closed
+fails:IO#expect returns nil if eof is hit
+fails:IO#expect yields the result if a block is given
