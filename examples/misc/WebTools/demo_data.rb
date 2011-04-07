@@ -1,8 +1,13 @@
-# This file defines a class that has lots of interesting features.
+#=========================================================================
 #
-# 1. The class is named to appear near the top of the class list (easy
-#    access for demos).
-# 2. The class has public, private and protected instance methods
+# Name:     demo_data.rb
+#
+# Purpose:  Define a persistent class with public, private and protected
+#           instance methods, a class method, and some data we can explore
+#           using WebTools. Name it AAADemo so it will appear at the top
+#           of the Class list.
+#
+#=========================================================================
 
 Maglev.persistent do
   class AAADemo
@@ -30,13 +35,13 @@ Maglev.persistent do
       "This is a private method"
     end
 
+    # Add a few constants
     AN_INSTANCE = AAADemo.new
     AN_ARRAY = []
     30.times { |i| AN_ARRAY << i }
   end
 
   # Define a method programmatically
-
   AAADemo.define_method(:metaprogrammed) do
     x = :foo
     "This method metaprogrammed to return #{x}"

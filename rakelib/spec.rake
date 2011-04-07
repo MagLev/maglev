@@ -3,7 +3,8 @@
 namespace :spec do
 
   # NOTE: "-t m" handled in $MAGLEV_HOME/default.mspec
-  PSPEC = "#{ENV['MAGLEV_HOME']}/spec/mspec/bin/mspec"
+  # Running all of the specs in one VM requires bigger tmp obj size
+  PSPEC = %{MAGLEV_OPTS="--tocsz 500000 $MAGLEV_OPTS" #{ENV['MAGLEV_HOME']}/spec/mspec/bin/mspec }
 
   desc "Run one rubyspec file: rake spec:run[spec/rubyspec/.../foo_spec.rb]"
   task :run, :spec do |t, args|

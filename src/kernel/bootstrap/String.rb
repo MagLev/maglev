@@ -625,14 +625,12 @@ class String
     last = 0
     i = sep_size
     if sep_size._equal?(1)
-      i += 1
       while i < my_size
         if self.__at(i-1)._equal?(newline)
           line = self.__at(last, i-last)
-          # line.taint if tainted?
           block.call( line )
           # We don't have a way yet to check if the data was modified...
-          #modified? id, my_size
+          # modified? id, my_size
           last = i
         end
         i += 1

@@ -8,8 +8,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   # All of the socket constants go into two places: (A) as constants in
   # Socket and (B) as constants in Socket::Constants.
-  module Constants
-  end
+  # module Constants ; end ; # defined in IO2.rb
 
   primitive '__active?', 'isActive'
 

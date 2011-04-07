@@ -57,6 +57,14 @@ class File
   include Constants
 end
 
+class Socket
+  module Constants
+    # constants filled in by Socket>>_initTransientSocketConstants , 
+    #   called from RubyContext>>initTransient during VM initialization .
+  end
+  include Constants
+end
+
 class IO
   include File::Constants
 end

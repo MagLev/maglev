@@ -49,7 +49,9 @@ module SecureRandom
   # NotImplementedError is raised.
   def self.random_bytes(n=nil)
     if n
-      n = Type.coerce_to(n, Fixnum, :to_int)
+      unless n._isFixnum
+        n = Type.coerce_to(n, Fixnum, :to_int)
+      end
       if n < 0
         raise ArgumentError , 'SecureRandom.random, n must be >= 0'
       end

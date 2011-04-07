@@ -9,7 +9,7 @@ end
 
 desc "Commit an interesting example class, AValidPerson, to the repository"
 task :meta do
-  sh "maglev-ruby -Mcommit lib/webtools/meta_demo.rb"
+  sh "maglev-ruby -Mcommit meta_demo.rb"
 end
 
 desc "Run the Smalltalk WebTools code from ruby."
