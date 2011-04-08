@@ -38,6 +38,7 @@ in this distribution are covered by their respective licenses:
    CodeMirror-License.txt - CodeMirror code editing library in JavaScript
    EY-License.txt - MSpec test execution framework and the RubySpec tests
    ffi-License.txt - Ruby Foreign Function Interface
+   GemStone-Scripts-License.txt - scripts to setup multiple named GemStones
    GeoNames-License.txt - List of Zipcodes from GeoNames.org
    LibYaml-License.txt - libyaml shared library
    MRI-COPYING.txt and MRI-LEGAL.txt - MRI 1.8.6 and 1.8.7
