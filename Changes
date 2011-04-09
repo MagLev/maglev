@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25671 2011-04-08
+== Changes for 25673 2011-04-08
 * Fix Trac 887, 889
 * Fix a few spec failures
 * Added more explicit instructions for examples/misc/WebTools
