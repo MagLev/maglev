@@ -3,9 +3,7 @@
 # setenv LD_LIBRARY_PATH '/export/iceland1/users/otisa/linuxSrc/solaris_xml2/libxml2-2.7.7/.libs:/lib:/usr/lib'
 #  libxml2 version installed on  energy in /usr/lib/amd64 is  2.6.23 
 
-# Dir.chdir('/export/iceland1/users/otisa/gitPublic/rubyCexts/nokogiri')
 Dir.chdir('/export/iceland1/users/otisa/Svn/st64_30alt/git/cExtensions/nokogiri')
-
 lp = $LOAD_PATH 
 lp.insert(0, 'lib/' )
 load 'lib/nokogiri.rb'

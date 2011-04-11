@@ -13,7 +13,7 @@ To create the generated parser files
               #  to the svn/src directory 
 
 Then to get changes to show up in your Smalltalk VM,
-retrun the  slow or fast compile step of the Smalltalk product.
+rerun the  slow or fast compile step of the Smalltalk product.
 
 ==========================
 algorithmic changes to the Rubinius grammar

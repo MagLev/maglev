@@ -4,6 +4,17 @@
 
 == Unreleased Changes
 
+== Changes for 25681 2011-04-11
+* Fix parts of Maglev Trac 878, 888
+* Fix a few spec failures
+* Bugfixes and enhancements to underlying GemStone 3.0 system
+  - deprecate copyFrom:to:into:startingAt: and replace with
+    replaceFrom:to:with:startingAt:
+  - Added primitives for replaceFrom:to:with:startingAt: in
+    Array, String, DoubleByteString, QuadByteString, OrderedCollection
+  - Added prims for Array>>addAll:, Array>>addAll:excludingFirst:,
+    OrderedCollection>>addall:
+
 == Changes for 25673 2011-04-08
 * Fix Trac 887, 889
 * Fix a few spec failures
