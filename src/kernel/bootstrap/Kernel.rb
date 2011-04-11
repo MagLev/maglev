@@ -302,8 +302,13 @@ module Kernel
     bnd = args[1]
     file = args[2]
     line = args[3]
+    unless file._equal?(nil)
+      file = Type.coerce_to(file, String, :to_str)
+    end
     if line._equal?(nil)
       line = 0
+    else
+      line = Type.coerce_to(line, Fixnum, :to_int)
     end
     if bnd._equal?(nil)
       ctx = self.__binding_ctx(1)
@@ -325,9 +330,37 @@ module Kernel
     res
   end
 
-  def __cext_eval(*args, &block) 
+  def __cext_eval(*args, &block_arg) 
     # called from rb_eval_string_ in C extension implementation
-    eval(*args, &block)
+    nargs = args.size
+    if nargs < 1
+      raise ArgumentError, 'too few args'
+    end
+    if nargs > 4
+      raise ArgumentError, 'too many args'
+    end
+    str = args[0]
+    bnd = args[1]
+    file = args[2]
+    line = args[3]
+    unless file._equal?(nil)
+      file = Type.coerce_to(file, String, :to_str)
+    end
+    if line._equal?(nil)
+      line = 0
+    else
+      line = Type.coerce_to(line, Fixnum, :to_int)
+    end
+    # ctx = self.__binding_ctx(1)
+    bnd = Binding.__basic_new( nil )
+    vcgl = [ self.__getRubyVcGlobal(0x30) ,
+             self.__getRubyVcGlobal(0x31) , nil ]
+    # bblk = bnd.block
+    #unless bblk._equal?(nil)
+    #  vcgl << bblk
+    #end
+    res = __eval_with_position(str, bnd, vcgl, file, line )
+    res
   end
 
   # Initiates the termination of the Ruby script by raising the
