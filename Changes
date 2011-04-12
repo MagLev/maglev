@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Finshed fixing Trac 888, 878
+
 == Changes for 25681 2011-04-11
 * Fix parts of Maglev Trac 878, 888
 * Fix a few spec failures

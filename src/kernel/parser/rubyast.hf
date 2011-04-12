@@ -323,9 +323,11 @@ class RubyClassNode
   enum { my_cls = cls_RubyClassNode };
  public:
   static inline omObjSType* s(omObjSType *path, omObjSType* superNod,
-                        omObjSType* body, omObjSType *srcStr, rb_parse_state *ps)
+                        omObjSType* body, omObjSType *srcStr, omObjSType *srcOfs,
+			rb_parse_state *ps)
   {
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, path, superNod, body, srcStr, ps);
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d_e, path, superNod, body, srcStr,
+				srcOfs, ps);
   }
 };
 class RubyClassVarDeclNode
@@ -437,10 +439,12 @@ class RubyForNode
 {
   enum { my_cls = cls_RubyForNode };
  public:
-  static inline omObjSType* s(omObjSType **iterH, omObjSType** varH, omObjSType** bodyH, 
-			omObjSType *forTok, rb_parse_state *ps) {
+  static omObjSType* s(omObjSType **iterH, omObjSType** varH, omObjSType** bodyH, 
+			omObjSType *forTok, rb_parse_state *ps, int tokSize) {
     omObjSType *srcOfs = RpNameToken::srcOffsetO(ps, forTok);
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, *iterH, *varH, *bodyH, srcOfs, ps);
+
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d_e, *iterH, *varH, 
+	*bodyH, srcOfs, OOP_OF_SMALL_LONG_( ps->tokenOffset() + tokSize ), ps);
   }
 };
 class RubyGlobalAsgnNode
@@ -499,8 +503,9 @@ class RubyIterRpNode
   enum { my_cls = cls_RubyIterRpNode };
  public:
   static inline omObjSType* s(omObjSType *args, omObjSType *body, omObjSType *srcOfs,
-			rb_parse_state *ps) {
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, args, body, srcOfs, ps);
+			rb_parse_state *ps, int tokSize ) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, args, body, srcOfs, 
+		    OOP_OF_SMALL_LONG_( ps->tokenOffset() + tokSize ),	ps);
   }
 
   static inline omObjSType* set_call(omObjSType *inst, omObjSType *v, rb_parse_state *ps) {
@@ -549,8 +554,8 @@ class RubyModuleNode
  public:
 
   static inline omObjSType* s(omObjSType *path, omObjSType* body, omObjSType *srcStr,
-			rb_parse_state *ps) {
-    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c, path, body, srcStr, ps);
+			omObjSType *srcOfs, rb_parse_state *ps) {
+    return RubyNode::call((AstClassEType)my_cls, sel_s_a_b_c_d, path, body, srcStr, srcOfs, ps);
   }
 };
 class RubyNextNode

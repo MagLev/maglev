@@ -820,7 +820,8 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                        if (vps->in_def || vps->in_single) {
                             rb_warning(vps, "END in method; use at_exit");
                        }
-                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, $2/*srcOffsetSi*/, vps);
+                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, $2/*srcOffsetSi*/, 
+						vps, 1/* strlen( '}' ) */ );
                     }
                 | lhs '=' command_call
                     {
@@ -983,7 +984,8 @@ cmd_brace_block : tLBRACE_ARG
 		      yTrace(vps, "cmd_brace_block: ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
 		      popBlockVars(vps);
-		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, $1/*srcOffsetSi*/, vps); 
+		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, $1/*srcOffsetSi*/, 
+						vps, 1/* strlen( '}' ) */ );
                     }
                 ;
 
@@ -2123,7 +2125,8 @@ primary         : literal
                     {
                       yTrace(vps, "primary: kFOR ___ comp_stamt kEND");
                       POP_LINE(vps);
-                      $$ = RubyForNode::s( & $6, & $3, & $9, $1/*for token*/, vps);
+                      $$ = RubyForNode::s( & $6, & $3, & $9, $1/*for token*/, 
+						vps, 3/* strlen( 'end' ) */ );
                     }
                 | kCLASS cpath superclass
                     {
@@ -2143,7 +2146,8 @@ primary         : literal
 		      POP_LINE(vps);
                       // new_class( path, superclass, body)
                       OmScopeType scp(vps->omPtr);
-                      NODE **resH = scp.add( RubyClassNode::s( $2, $3, $5, *vps->sourceStrH, vps));
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);  // of kCLASS
+                      NODE **resH = scp.add( RubyClassNode::s( $2, $3, $5, *vps->sourceStrH, srcOfs,  vps));
                       //  nd_set_line($$, $<num>4);
                       local_pop(vps);
                       vps->class_nest--;
@@ -2194,7 +2198,8 @@ primary         : literal
                       yTrace(vps, "primary: | kMODULE ___ body_stamt kEND");
 		      POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
-                      NODE **resH = scp.add( RubyModuleNode::s( $2, $4, *vps->sourceStrH, vps));
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);  // of kMODULE
+                      NODE **resH = scp.add( RubyModuleNode::s( $2, $4, *vps->sourceStrH, srcOfs, vps));
 		      // nd_set_line($$, $<num>3);
 		      local_pop(vps);
 		      vps->class_nest--;
@@ -2455,7 +2460,8 @@ do_block        : kDO_BLOCK
 		      POP_LINE(vps);
                       popBlockVars(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // of kDO_BLOCK
-                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, vps);
+                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, 
+						vps, 3/* strlen( 'end' ) */ );
                     }
                 ;
 
@@ -2537,7 +2543,8 @@ brace_block     : '{'
                       yTrace(vps, "brace_blck: tLCURLY ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/, vps);
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/, 
+						vps, 1/* strlen( '}' ) */ );
                     }
                 | kDO
                     {
@@ -2556,7 +2563,8 @@ brace_block     : '{'
 		      POP_LINE(vps);
                       popBlockVars(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, vps);
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, 
+						vps, 3/* strlen( 'end' ) */ );
                     }
                 ;
 
@@ -3523,6 +3531,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     case sel_s_a_b: 		str = "s_a:b:"; break;
     case sel_s_a_b_c: 		str = "s_a:b:c:"; break;
     case sel_s_a_b_c_d: 	str = "s_a:b:c:d:"; break;
+    case sel_s_a_b_c_d_e: 	str = "s_a:b:c:d:e:"; break;
     case sel_s_splat_blk:	str = "s_splat:blk:"; break;
     case sel_s_a_blk:		str = "s_a:blk:"; break;
     case sel_s_a_splat_blk:	str = "s_a:splat:blk:"; break;

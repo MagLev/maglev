@@ -134,6 +134,7 @@ typedef enum
   sel_s_a_b,
   sel_s_a_b_c,
   sel_s_a_b_c_d,
+  sel_s_a_b_c_d_e,
   sel_s_splat_blk,
   sel_s_a_blk,
   sel_s_a_splat_blk,
