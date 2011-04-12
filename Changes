@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 891
+
 == Changes for 25691 2011-04-12
 * Finished fixing Trac 888, 878, 890
 * Fix problem in RubyGems with autoloads.

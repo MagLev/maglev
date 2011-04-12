@@ -6388,7 +6388,8 @@ static int eval_local_id(rb_parse_state *st, NODE* idO)
     return 1;
 
   omObjSType **evalScopeH = st->evalScopeH;
-  if (evalScopeH != NULL) {
+  if (evalScopeH != NULL && st->variables->prev == NULL) {
+    // parsing an eval, and we do not have an active local_push()
     omObjSType *symO = quidToSymbolObj(idO, st);
     omObjSType *isLocal = RubyNode::call(*evalScopeH, sel_includesTemp_, symO, st);
     if (isLocal == ram_OOP_TRUE) {

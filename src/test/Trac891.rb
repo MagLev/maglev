@@ -11,7 +11,6 @@ class C
       class_eval <<-METHOD, __FILE__, __LINE__
         def fred
           o = options
-          p o
           o
         end
         METHOD
@@ -24,3 +23,4 @@ c = C.new
 c.options = 25
 result = c.fred
 raise "Fail" unless result == 25
+true
