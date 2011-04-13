@@ -3040,7 +3040,7 @@ f_arg           : f_norm_arg
 		    { yTrace(vps, "f_arg: f_norm_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
-                      $$ = RubyArgsNode::add_arg(argsH, $1/*RpNameToken*/, vps);  // returns first arg*/
+                      $$ = RubyArgsNode::add_arg(argsH, $1/*RpNameToken*/, vps);  // returns first arg
                     } 
                       
                 | f_arg ',' f_norm_arg

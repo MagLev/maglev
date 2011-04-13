@@ -12028,7 +12028,7 @@ case 478:
 	{ yTrace(vps, "f_arg: f_norm_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
-                      yyvalO = RubyArgsNode::add_arg(argsH, yymarkPtr[0].obj/*RpNameToken*/, vps);  /* returns first arg* /*/
+                      yyvalO = RubyArgsNode::add_arg(argsH, yymarkPtr[0].obj/*RpNameToken*/, vps);  /* returns first arg*/
                     }
 break;
 case 479:
