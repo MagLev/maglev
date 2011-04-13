@@ -8693,7 +8693,8 @@ static int eval_local_id(rb_parse_state *st, NODE* idO)
     return 1;
 
   omObjSType **evalScopeH = st->evalScopeH;
-  if (evalScopeH != NULL) {
+  if (evalScopeH != NULL && st->variables->prev == NULL) {
+    // parsing an eval, and we do not have an active local_push()
     omObjSType *symO = quidToSymbolObj(idO, st);
     omObjSType *isLocal = RubyNode::call(*evalScopeH, sel_includesTemp_, symO, st);
     if (isLocal == ram_OOP_TRUE) {
@@ -8920,7 +8921,7 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
   }
 }
 
-/* # line 8924 "rubygrammar.c" */ 
+/* # line 8925 "rubygrammar.c" */ 
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -12027,7 +12028,7 @@ case 478:
 	{ yTrace(vps, "f_arg: f_norm_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
-                      yyvalO = RubyArgsNode::add_arg(argsH, yymarkPtr[0].obj/*RpNameToken*/, vps);  /* returns first arg* /*/
+                      yyvalO = RubyArgsNode::add_arg(argsH, yymarkPtr[0].obj/*RpNameToken*/, vps);  /* returns first arg*/
                     }
 break;
 case 479:
@@ -12189,7 +12190,7 @@ case 524:
 /* # line 3227 "grammar.y" */ 
 	{  yTrace(vps, "none:");  yyvalO = ram_OOP_NIL; }
 break;
-/* # line 12193 "rubygrammar.c" */ 
+/* # line 12194 "rubygrammar.c" */ 
     }
     if (yyvalO == NULL) {  /*compute default state result*/ 
       if (yyvalPtr != NULL) {
