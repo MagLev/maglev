@@ -44,7 +44,9 @@ module Marshal
     def store_unique_object(obj)
       # used on input
       arr = @objs_input_arr
-      arr[arr.length] = obj
+      x = arr.length
+      arr[x] = obj
+      # puts "store_unique_object #{x} #{obj.inspect}\n"  # uncomment for debugging
       obj
     end
 
@@ -83,6 +85,7 @@ module Marshal
         obj = construct_symbol
       elsif type._equal?( TYPE_FLOAT_ch )
         obj = construct_float
+        store_unique_object(obj)
       elsif type._equal?( TYPE_BIGNUM_ch )
         obj = construct_bignum
       elsif type._equal?( TYPE_CLASS_ch) || type._equal?( TYPE_MODULE_ch)
@@ -430,8 +433,20 @@ module Marshal
     def serialize(obj)
       raise ArgumentError, "exceed depth limit" if @depth._equal?(0)
 
-      if obj.__isSpecial
+      if obj._isFixnum
         str = obj.to_marshal(self)
+      elsif obj.__isSpecial
+        if obj.__class._equal?(SmallDouble)
+          idx = @objs_dict[obj]
+          if idx._equal?(nil)
+            add_output_obj(obj) 
+            str = obj.to_marshal(self)
+          else
+            str = TYPE_LINK + serialize_integer(idx)
+          end 
+        else
+          str = obj.to_marshal(self)
+        end 
       elsif obj._isSymbol
         idx = @syms_dict[obj]
         if idx._equal?(nil)
@@ -452,7 +467,7 @@ module Marshal
             add_output_obj(obj)
             str = serialize_user_defined obj
           else
-            add_output_obj(obj)
+            add_output_obj(obj)  # Floats handled here
             str = obj.to_marshal(self)
           end
           @depth += 1
@@ -526,11 +541,14 @@ module Marshal
 
     def serialize_integer(n)
       if n._equal?(0)
-        s = to_byte(n)
+        s = ' '
+        s[0] = to_byte(n)
       elsif n > 0 and n < 123
-        s = to_byte(n + 5)
+        s = ' '
+        s[0] = to_byte(n + 5)
       elsif n < 0 and n > -124
-        s = to_byte(256 + (n - 5))
+        s = ' '
+        s[0] = to_byte(256 + (n - 5))
       else
         s = "\0"
         cnt = 0
@@ -598,7 +616,7 @@ module Marshal
     end
 
     def to_byte(n)
-      [n].pack('C')
+      n & 0xFF
     end
 
   end  # ]

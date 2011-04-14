@@ -40,11 +40,13 @@ class Module
       a_module.append_features(self)
       a_module.included(self)
     end
+    self
   end
   def include(a_module)
     # variant needed for bootstrap
     a_module.append_features(self)
     a_module.included(self)
+    self
   end
 
   # Invoked as a callback when a_module includes receiver.
