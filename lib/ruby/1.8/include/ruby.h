@@ -631,7 +631,7 @@ RUBY_DLLSPEC VALUE rb_ary_entry(VALUE array, long offset);  // use instead of RA
 RUBY_DLLSPEC VALUE rb_ary_clear(VALUE array);
 RUBY_DLLSPEC VALUE rb_ary_dup(VALUE array);
 RUBY_DLLSPEC VALUE rb_ary_join(VALUE array1, VALUE separator);
-RUBY_DLLSPEC VALUE rb_ary_reverse(VALUE array);
+RUBY_DLLSPEC VALUE rb_ary_reverse(VALUE array);   // NOTE  invokes Array#reverse!  
 RUBY_DLLSPEC VALUE rb_ary_unshift(VALUE array, VALUE val);
 RUBY_DLLSPEC VALUE rb_ary_shift(VALUE array);
 RUBY_DLLSPEC void rb_ary_store(VALUE array, long offset, VALUE val);
