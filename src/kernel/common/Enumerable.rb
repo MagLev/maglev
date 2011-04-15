@@ -462,7 +462,7 @@ module Enumerable
   #   IO.constants.include? "SEEK_NO_FURTHER"   #=> false
 
   def include?(obj)
-    each { |o| return true if obj == o }
+    each { |o| return true if o == obj }
     false
   end
 

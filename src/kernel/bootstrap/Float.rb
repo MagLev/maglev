@@ -11,6 +11,8 @@ class SmallDouble
     Float
   end
 
+  primitive_nobridge '__class', 'class'  # returns SmallDouble
+
   primitive_nobridge '__isSpecial', 'isSpecial'
 end
 
