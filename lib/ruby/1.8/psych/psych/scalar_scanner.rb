@@ -44,8 +44,10 @@ module Psych
         md = time.match(/(\d+:\d+:\d+)(\.\d*)?\s*(Z|[-+]\d+(:\d\d)?)?/)
 
         (hh, mm, ss) = md[1].split(':').map { |x| x.to_i }
-        us = (md[2] ? Rational(md[2].sub(/^\./, '0.')) : 0) * 1000000
-
+        us = 0
+        if (mdtwo = md[2])
+          us = (Float(mdtwo.sub(/^\./, '0.')) * 1000000).to_i
+        end
         time = Time.utc(yy, m, dd, hh, mm, ss, us)
 
         return time if 'Z' == md[3]

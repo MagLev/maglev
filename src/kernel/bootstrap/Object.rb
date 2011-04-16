@@ -12,6 +12,7 @@ class Object
   # class is installed by RubyContext>>installPrimitiveBootstrap: , but we
   #  install again here to get bridge methods
   primitive_nobridge 'class', 'class'
+  primitive_nobridge '__class', 'class'
 
   primitive_nobridge '__singleton_class', 'rubySingletonClass'
 
