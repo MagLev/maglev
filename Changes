@@ -4,16 +4,15 @@
 
 == Unreleased Changes
 
-* Fix Trac 872
+== Changes for 25716 2011-04-15
+* Fixed Trac 872, 888, 878, 890, 891
 * Fix some spec failures.
-
-== Changes for 25701 2011-04-13
-* Finished fixing Trac 888, 878, 890, 891
 * Fix problem in RubyGems with autoloads.
 * Bugfixes and enhancements to underlying GemStone 3.0 system
   - remove the NRS from the extent file names in fileSizeReport
   - remove GemIoLimit from the product
   - fix problems caused by login during recovery
+  - fix backup on Solaris restore on Linux corrupting indexes
 
 == Changes for 25681 2011-04-11
 * Fix parts of Maglev Trac 878, 888
