@@ -230,7 +230,6 @@ class BigDecimal
     else
       @sign = 1
     end
-    nd = val.__decimal_digits_length_approx(true)
     arr = __reduce_trailing_zeros(val)
     digs = arr[0]
     exp =  arr[1]  # number of trailing zeros removed
@@ -846,7 +845,7 @@ class BigDecimal
     if prec_arg._not_equal?(0)
       p = prec_arg.__min( p )
     end
-    nd = r_digits.__decimal_digits_length_approx(true)
+    nd = r_digits.__decimal_digits_length_approx(false)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
       r_digits = __reduce_precis_by(r_digits, rd)
@@ -918,7 +917,7 @@ class BigDecimal
     if prec_arg._not_equal?(0)
       p = prec_arg.__min( p )
     end
-    nd = r_digits.__decimal_digits_length_approx(true)
+    nd = r_digits.__decimal_digits_length_approx(false)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
       r_digits = __reduce_precis_by(r_digits, rd)
@@ -1008,7 +1007,7 @@ class BigDecimal
     if prec_arg._not_equal?(0)
       p = prec_arg.__min( p )
     end
-    nd = r_digits.__decimal_digits_length_approx(true)
+    nd = r_digits.__decimal_digits_length_approx(false)
     rd = nd - p 
     if rd > 0  #  rd is number of digits to omit
       r_digits = __reduce_precis_by(r_digits, rd)
@@ -1182,7 +1181,7 @@ class BigDecimal
     if p != UNLIM_PRECISION
       if p < @precs
 	r_digits = @digits
-	nd = r_digits.__decimal_digits_length_approx(true)
+	nd = r_digits.__decimal_digits_length_approx(false)
 	rd = nd - p
 	if rd > 0  #  rd is number of digits to omit
 	  r_digits = __reduce_precis_by(r_digits, rd)
