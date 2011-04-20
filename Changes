@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 836.
+
 == Changes for 25716 2011-04-15
 * Fixed Trac 872, 888, 878, 890, 891
 * Fix some spec failures.
