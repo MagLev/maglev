@@ -6,6 +6,7 @@ end
 class Module
 
   primitive_nobridge '__freeze_constants', '_rubyConstantsFreeze'
+
 end
 
 class Object
@@ -23,8 +24,10 @@ class Object
   #   end
   #
 
-  MaglevUndefined = Object.allocate
-  MaglevUndefined.freeze
+  unless defined?( MaglevUndefined ) # don't change if reloading prims
+    MaglevUndefined = Object.allocate
+    MaglevUndefined.freeze
+  end
 end
 Object.__freeze_constants
 
