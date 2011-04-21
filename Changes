@@ -4,9 +4,14 @@
 
 == Unreleased Changes
 
-* Fix Trac 836.
+== Changes for 25743 2011-04-20
+* Fix Trac 836 - persisted autoloads fail
+* rake stone:destroy[foo] now deletes data/foo directory
+  instead of leaving the empty directory
+* Bugfixes and enhancements to underlying GemStone 3.0 system
+  - fix bugs 41465, 41475, 41477, 41479, 41480
 
-== Changes for 25716 2011-04-15
+== Changes for 25716 2011-04-20
 * Fixed Trac 872, 888, 878, 890, 891
 * Fix some spec failures.
 * Fix problem in RubyGems with autoloads.
