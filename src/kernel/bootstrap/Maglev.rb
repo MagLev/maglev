@@ -41,7 +41,11 @@ module Maglev
   # the contents of this Hash will be refreshed from the repository at each
   # <tt>Maglev.abort_transaction</tt>, <tt>Maglev.commit_transaction</tt>
   # and at VM startup.
-  PERSISTENT_ROOT = Hash.new
+  unless defined?( PERSISTENT_ROOT )
+    # if PERSISTENT_ROOT is defined, we are just reloading bootstrap methods
+    # otherwise it was deleted by RubyContext(C)>>reset .
+    PERSISTENT_ROOT = Hash.new
+  end
 
   # Executes the block with the current thread in transient mode, which
   # affects the following operations:

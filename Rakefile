@@ -117,7 +117,7 @@ namespace :stone do
   desc "Destroy an existing MagLev server and repository"
   task :destroy, :server_name do |t, args|
     raise ArgumentError, "Task #{t.name} requires an existing server name" unless args.server_name
-    s = Stone.existing(args.server_name)
+    s = MagLevStone.existing(args.server_name)
     s.stop
     puts "Destroying server \"#{args.server_name}\""
     s.destroy!

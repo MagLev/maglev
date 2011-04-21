@@ -35,12 +35,12 @@ class RubyContext
   # session temps (copy from persistent to session temps).
   class_primitive 'load_context', 'load'
 
-  # These primitives are defined in kernel.rb for bootstrapping.  The
-  # comment here is for documentation.
+  # These primitives are defined in kernel.rb for bootstrapping.  
+  # Redefine here since they were cleared by the 'class RubyContext in this file'
   #
-  # RUBY.class.primitive 'require', 'requireFileNamed:'
-  # RUBY.class.primitive 'load', 'loadFileNamed:'
-  # RUBY.class.primitive 'global', 'installConstant:name:'
+  RUBY.class.primitive 'require', 'requireFileNamed:'
+  RUBY.class.primitive 'load', 'loadFileNamed:'
+  RUBY.class.primitive 'global', 'installConstant:name:'
 
   # access to persistentMode in transient instance of RubyCompilerState
   class_primitive_nobridge 'persistence_mode', 'persistenceMode'
