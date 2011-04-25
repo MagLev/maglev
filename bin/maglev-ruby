@@ -60,6 +60,7 @@ MagLev Options:
                     rlwrap        invoke topaz with rlwrap, if available
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
+                    maglevVersion Print the simple MagLev version
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
    --stone <name> Run programfile connecting to the named stone
 
@@ -167,6 +168,11 @@ do
                 noRlwrap)
                     echo "WARNING: -MnoRlwrap is deprecated"
                     rlwrapFlag=
+                    ;;
+                maglevVersion)
+                    # Print out just the maglev version, e.g., "0.8"
+                    echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f2 -d ' '`"
+                    exit
                     ;;
                 rlwrap)
                     rlwrapFlag=1
