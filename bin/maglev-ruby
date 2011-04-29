@@ -60,6 +60,7 @@ MagLev Options:
                     rlwrap        invoke topaz with rlwrap, if available
                     traceGlobals  Trace setting/defining global variables
                     traceLoad     Trace loading of ruby files
+                    maglevVersion Print the simple MagLev version
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
    --stone <name> Run programfile connecting to the named stone
 
@@ -90,29 +91,6 @@ add_ruby_arg()
 # them all the same in one pass
 set -- $MAGLEV_OPTS "$@"
 
-# Make sure MAGLEV_HOME is set
-if [ -z "${MAGLEV_HOME}" ]; then
-    echo "$COMMAND: [Error] \$MAGLEV_HOME is not set."
-    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
-    exit 1
-fi
-
-# Make sure GEMSTONE is set
-if [ -z "${GEMSTONE}" ]; then
-    export GEMSTONE=$MAGLEV_HOME/gemstone
-    # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
-fi
-
-# Check for topaz command to validate the $GEMSTONE directory
-if [ ! -x $GEMSTONE/bin/topaz ]; then
-    echo "$COMMAND: [Error] $GEMSTONE does not appear to be a valid GemStone product directory."
-    echo "To fix this, set a valid GEMSTONE in your .bashrc"
-    exit 1
-fi
-
-# Set GEMSTONE_GLOBAL_DIR unless it's already set or STONENAME is set
-# -G will unset it later if needed
-[ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
 
 # All of the command line arguments passed to this shell script will either
 # be processed and totally consumed by this shell script (e.g., -Mrlwrap
@@ -132,18 +110,12 @@ sawDashE=
 searchPathFlag=
 quietFlag=
 
-# To login to an already running stone not started by maglev commands
-# use the STONENAME env variable , not the --stone option, because.
-#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
-# Don't override any existing magic ENV variables
-if [ -z "$STONENAME" ]; then
-    stone=maglev
-    [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-else
-    # $STONENAME was set -- don't change anything
-    stone=$STONENAME
-fi
 
+# Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use
+# parseArgsMH as a substitute for MAGLEV_HOME if necessary during
+# arg parsing
+parseArgsMH=$MAGLEV_HOME
+[[ -z $parseArgsMH ]] && parseArgsMH=${0%%/bin/maglev-ruby}
 
 while [ $# -gt 0 ]
 do
@@ -197,6 +169,11 @@ do
                     echo "WARNING: -MnoRlwrap is deprecated"
                     rlwrapFlag=
                     ;;
+                maglevVersion)
+                    # Print out just the maglev version, e.g., "0.8"
+                    echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f2 -d ' '`"
+                    exit
+                    ;;
                 rlwrap)
                     rlwrapFlag=1
                     ;;
@@ -225,11 +202,11 @@ do
             ;;
         -v|--verbose)
             add_ruby_arg "'-v'"
-            echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
+            echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f1 -d[`[`uname -sm`]"
             if [ $# -eq 1 ]; then exit; fi
             ;;
         --version)
-            echo "`grep ^maglev $MAGLEV_HOME/version.txt | cut -f1 -d[`[`uname -sm`]"
+            echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f1 -d[`[`uname -sm`]"
             exit
             ;;
         -w) # Sets $VERBOSE true; read from stdin if no script
@@ -256,6 +233,45 @@ do
     shift
 done
 
+# Set MAGLEV_HOME and GEMSTONE env variables AFTER parsing parameters.
+# This allows "maglev-ruby --version" to run w/o a stone or $MAGLEV_HOME
+# set.  Useful for finding installed version w/o a stone running.
+
+# Make sure MAGLEV_HOME is set
+if [ -z "${MAGLEV_HOME}" ]; then
+    echo "$COMMAND: [Error] \$MAGLEV_HOME is not set."
+    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
+    exit 1
+fi
+
+# Make sure GEMSTONE is set
+if [ -z "${GEMSTONE}" ]; then
+    export GEMSTONE=$MAGLEV_HOME/gemstone
+    # echo "Setting \$GEMSTONE to \$MAGLEV_HOME/gemstone"
+fi
+
+# Check for topaz command to validate the $GEMSTONE directory
+if [ ! -x $GEMSTONE/bin/topaz ]; then
+    echo "$COMMAND: [Error] $GEMSTONE does not appear to be a valid GemStone product directory."
+    echo "To fix this, set a valid GEMSTONE in your .bashrc"
+    exit 1
+fi
+
+# Set GEMSTONE_GLOBAL_DIR unless it's already set or STONENAME is set
+# -G will unset it later if needed
+[ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+
+# To login to an already running stone not started by maglev commands
+# use the STONENAME env variable , not the --stone option, because.
+#  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
+# Don't override any existing magic ENV variables
+if [ -z "$STONENAME" ]; then
+    stone=maglev
+    [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
+else
+    # $STONENAME was set -- don't change anything
+    stone=$STONENAME
+fi
 
 # Make sure the stone is ready
 $GEMSTONE/bin/waitstone "$stone" -1 >/dev/null
