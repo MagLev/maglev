@@ -89,11 +89,11 @@ $MAGLEV_HOME/gemstone/examples/www. The Smalltalk example code can be
 invoked from ruby (a demonstration of how to invoke Smalltalk from Ruby),
 via:
 
-    $ rake smalltalk:run
+    $ rake smalltalk
 
 Then browse to http://localhost:8080/ and explore
 
-Hit Ctl-C in the terminal window to stop.
+To quit, hit Ctl-C in the terminal window to get to a Topaz prompt, then type "exit".
 
 == Known problems
 
