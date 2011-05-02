@@ -89,7 +89,7 @@ add_ruby_arg()
 
 # Prepend the maglev options onto the passed parameters so we can parse
 # them all the same in one pass
-set -- $MAGLEV_OPTS "$@"
+set -- $MAGLEV_OPTS "$@" $RUBYOPT
 
 
 # All of the command line arguments passed to this shell script will either
