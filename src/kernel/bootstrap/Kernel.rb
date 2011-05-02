@@ -284,7 +284,6 @@ module Kernel
     else
       ENV['PATH'].split(':').each do |comp|
         full_cmd = File.join(comp, cmd)
-        puts "Trying: #{full_cmd}"
         return full_cmd if File.exist?(full_cmd)
       end
     end
