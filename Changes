@@ -5,7 +5,7 @@
 == Unreleased Changes
 
 == Changes for 25779 2011-05-02
-* Fix Trac 895
+* Fix Trac 895, 896, 897
 * Added -MmaglevVersion: Prints out just the MagLev version portion of version.txt
 * Move checks in maglev-ruby for $MAGLEV_HOME etc. after parsing parameters which
   allows "maglev-ruby --version" to run, even if $MAGLEV_HOME not set or stone process
