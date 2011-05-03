@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* New Smalltalk implementation of Random
+
 == Changes for 25779 2011-05-02
 * Fix Trac 895, 896, 897
 * Added -MmaglevVersion: Prints out just the MagLev version portion of version.txt
