@@ -6,6 +6,7 @@
 
 == Changes for 25801 2011-05-04
 * Fix Trac 895, 896, 897
+* Fix the way $RUBYOPT was being handled
 * Added -MmaglevVersion: Prints out just the MagLev version portion of version.txt
 * Move checks in maglev-ruby for $MAGLEV_HOME etc. after parsing parameters which
   allows "maglev-ruby --version" to run, even if $MAGLEV_HOME not set or stone process
