@@ -5,21 +5,24 @@
 == Unreleased Changes
 
 * New Smalltalk implementation of Random
+* Bugfixes and enhancements to underlying GemStone 3.0 system
+  - Update ProgressCount stat during first phase of backup
 
-== Changes for 25779 2011-05-02
+== Changes for 25801 2011-05-04
 * Fix Trac 895, 896, 897
 * Added -MmaglevVersion: Prints out just the MagLev version portion of version.txt
 * Move checks in maglev-ruby for $MAGLEV_HOME etc. after parsing parameters which
   allows "maglev-ruby --version" to run, even if $MAGLEV_HOME not set or stone process
   is not running. Useful for CloudFoundry.
 * Bugfixes and enhancements to underlying GemStone 3.0 system
-  - fix 41474, 41489, 41492, 41494, 41496
+  - fix 41128, 41257, 41262, 41410, 41474, 41481, 41489, 41492, 41494, 41496
   - made 2.x to 3.x updates work correctly with the new Stream code
   - a few low level changes for epoch and wsUnion config initialization,
     subclass creation, classes with no constraints, restores, etc.
   - update Smalltalk WebTools
   - fixes for ANSI Smalltalk
   - new implementation of Random
+  - increase timeout waiting for gc gems to start in fileins from 30 to 60 seconds
 
 == Changes for 25752 2011-04-22
 * Fix Trac 836 - persisted autoloads fail
