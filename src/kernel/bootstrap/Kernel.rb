@@ -279,9 +279,12 @@ module Kernel
   end
 
   def __find_on_path(cmd)
-    if cmd.index("/") == 0 || cmd.index("./") == 0
-      cmd
+    if cmd.index("/") == 0 || cmd.index("./") == 0 || cmd.index("../") == 0
+      return cmd
     else
+      # TODO:
+      #  1. ~ expansion not done
+      #  2. zero length path components not yet interpreted as "."
       ENV['PATH'].split(':').each do |comp|
         full_cmd = File.join(comp, cmd)
         return full_cmd if File.exist?(full_cmd)

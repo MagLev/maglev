@@ -18,14 +18,14 @@ raise "Fail B" if results.size < 5
 
 # Test srand
 srand(12345)
-test(rand(100),  9, "First random after srand")
-test(rand(100), 83, "Second random after srand")
-test(rand(100), 94, "Third random after srand")
+test(rand(100), 41, "First random after srand")
+test(rand(100), 11, "Second random after srand")
+test(rand(100), 84, "Third random after srand")
 
 srand(12345)
-test(rand(100),  9, "First random after srand (2)")
-test(rand(100), 83, "Second random after srand (2)")
-test(rand(100), 94, "Third random after srand (2)")
+test(rand(100), 41, "First random after srand (2)")
+test(rand(100), 11, "Second random after srand (2)")
+test(rand(100), 84, "Third random after srand (2)")
 
 # Trac 548: rand(0) was throwing an exception.
 test(rand(0).kind_of?(Float), true, 'Trac 548: should be a float')
