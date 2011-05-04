@@ -77,29 +77,26 @@ add_ruby_arg()
     ruby_args="${ruby_args}${1}"
 }
 
-# The environment variable STONENAME is for use by internal GemStone developers and QA
-# who start the stone manually instead of using "maglev start" or "rake maglev:start"
-# If STONENAME is set, GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF will not be set
-# -- even if they are undefined.
+# The environment variable STONENAME is for use by internal GemStone
+# developers and QA who start the stone manually instead of using "maglev
+# start" or "rake maglev:start" If STONENAME is set, GEMSTONE_GLOBAL_DIR
+# and GEMSTONE_SYS_CONF will not be set -- even if they are undefined.
 #
-# Existing GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF env variables will never be
-# overridden. If GEMSTONE_GLOBAL_DIR is not defined, it will be set to $MAGLEV_HOME.
-# If the GEMSTONE_SYS_CONF environment variables is not defined, it will be set
-# based on the --stone parameter, otherwise defaulted to etc/system.conf.
-
-# Prepend the maglev options onto the passed parameters so we can parse
-# them all the same in one pass
-set -- $MAGLEV_OPTS "$@" $RUBYOPT
-
+# Existing GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF env variables will
+# never be overridden. If GEMSTONE_GLOBAL_DIR is not defined, it will be
+# set to $MAGLEV_HOME.  If the GEMSTONE_SYS_CONF environment variables is
+# not defined, it will be set based on the --stone parameter, otherwise
+# defaulted to etc/system.conf.
 
 # All of the command line arguments passed to this shell script will either
 # be processed and totally consumed by this shell script (e.g., -Mrlwrap
 # affects how we invoke the MagLev VM), or passed into the VM in one of the
 # following variables:
-RUBYSCRIPT=     # The name of the .rb file to run (or "-", if reading from stdin)
+RUBYSCRIPT=     # The name of the .rb file (or "-", if reading from stdin)
 ruby_args=""    # Standard ruby options passed to VM, e.g., "-Ilib" "-e '...'"
 script_args=""  # Arguments that will be passed to the ruby script in ARGV
-maglev_args=""  # MagLev specific Arguments that MagLev interprets before invoking the script
+maglev_args=""  # MagLev specific Arguments that MagLev interprets before
+                # invoking the script
 
 # The following flags and parameters are used by this shell script
 tocsize=""
@@ -110,128 +107,151 @@ sawDashE=
 searchPathFlag=
 quietFlag=
 
-
-# Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use
-# parseArgsMH as a substitute for MAGLEV_HOME if necessary during
-# arg parsing
+# Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use parseArgsMH
+# as a substitute for MAGLEV_HOME if necessary during arg parsing
 parseArgsMH=$MAGLEV_HOME
 [[ -z $parseArgsMH ]] && parseArgsMH=${0%%/bin/maglev-ruby}
 
-while [ $# -gt 0 ]
-do
-    case "$1" in
-        -C|-X)
-            cd $2 || usage "$2: bad directory for $1"
-            shift
-            ;;
-        -C*|-X*)
-            cd ${1:2} || usage "${1:2}: bad directory"
-            ;;
-        --copyright)
-            echo "maglev - Copyright 2008-2010 GemStone Systems, Inc."
-            exit
-            ;;
-        -d|--debug)
-            debugFlag=1
-            ;;
-        -q)
-            quietFlag="-q"
-            ;;
-        +d)
-            debugFlag=
-            ;;
-        -e)
-            add_ruby_arg "'-e' . '${2//\'/''}'"  # smalltalk escape: ' => ''
-            sawDashE=1
-            shift
-            ;;
-        -e*)
-            add_ruby_arg "'${1//\'/''}'"  # smalltalk escape: ' => ''
-            sawDashE=1
-            ;;
-        -G)
-            unset GEMSTONE_GLOBAL_DIR
-            ;;
-        -h|--help)
-            usage  # usage exits
-            ;;
-        -I|-r)
-            add_ruby_arg "'$1' . '$2'"
-            shift
-            ;;
-        -I*|-r*)
-            add_ruby_arg "'$1'"
-            ;;
-        -M*)
-            sub_opt=${1:2}
-            case $sub_opt in
-                noRlwrap)
-                    echo "WARNING: -MnoRlwrap is deprecated"
-                    rlwrapFlag=
-                    ;;
-                maglevVersion)
-                    # Print out just the maglev version, e.g., "0.8"
-                    echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f2 -d ' '`"
-                    exit
-                    ;;
-                rlwrap)
-                    rlwrapFlag=1
-                    ;;
-                traceGlobals|logSexp|traceLoad|commit|persistent|noCaptureStack)
-                    maglev_args="${maglev_args} ${sub_opt}"
-                    ;;
-                *)
-                    usage "Unknown option: $1"  # usage exits
-                    ;;
-            esac
-            ;;
-        -S) searchPathFlag=1 ;;
-        --tocsz)
-            tocsize="-T $2"
-            shift
-            ;;
-        --stone)
-            stone=$2
-            # Don't override any existing magic ENV variables
-            [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
-            if [ ! -f $GEMSTONE_SYS_CONF ]; then
-                echo "Can't find configuration file $GEMSTONE_SYS_CONF"
-                exit 2
-            fi
-            shift
-            ;;
-        -v|--verbose)
-            add_ruby_arg "'-v'"
-            echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f1 -d[`[`uname -sm`]"
-            if [ $# -eq 1 ]; then exit; fi
-            ;;
-        --version)
-            echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f1 -d[`[`uname -sm`]"
-            exit
-            ;;
-        -w) # Sets $VERBOSE true; read from stdin if no script
-            add_ruby_arg "'-w'"
-            ;;
-        -W*)
-            if [[ ${1:2} =~ ^[0-9]$ ]]; then
+# This function gets called several times
+# 1. Parse $MAGLEV_OPTS
+# 2. Parse command line parameters
+# 3. Parse $RUBYOPT
+#
+# RUBYOPT is supposed to be processed after all command line options have
+# been processed, so we can't do:
+#   set -- $MAGLEV_OPTS $RUBYOPT "$@"
+# because RUBYOPT will be processed before command line options, likewise
+#   set -- $MAGLEV_OPTS "$@" $RUBYOPT
+# won't work since RUBYOPT will essentially be passed to the ruby script as
+# $script_args.  So, we call this function three times
+#
+function parseArgs {
+    while [ $# -gt 0 ]
+    do
+        case "$1" in
+            -C|-X)
+                cd $2 || usage "$2: bad directory for $1"
+                shift
+                ;;
+            -C*|-X*)
+                cd ${1:2} || usage "${1:2}: bad directory"
+                ;;
+            --copyright)
+                echo "maglev - Copyright 2008-2010 GemStone Systems, Inc."
+                exit
+                ;;
+            -d|--debug)
+                debugFlag=1
+                ;;
+            -q)
+                quietFlag="-q"
+                ;;
+            +d)
+                debugFlag=
+                ;;
+            -e)
+                add_ruby_arg "'-e' . '${2//\'/''}'"  # smalltalk escape: ' => ''
+                sawDashE=1
+                shift
+                ;;
+            -e*)
+                add_ruby_arg "'${1//\'/''}'"  # smalltalk escape: ' => ''
+                sawDashE=1
+                ;;
+            -G)
+                unset GEMSTONE_GLOBAL_DIR
+                ;;
+            -h|--help)
+                usage  # usage exits
+                ;;
+            -I|-r)
+                add_ruby_arg "'$1' . '$2'"
+                shift
+                ;;
+            -I*|-r*)
                 add_ruby_arg "'$1'"
-            else
-                echo "Bad parameter for -W: should be single digit"
-                exit 1
-            fi
-            ;;
-        --)
-            break
-            ;;
-        -*)
-            usage "Unrecognized option: $1"  # usage exits
-            ;;
-        *)
-            break
-            ;;
-    esac
-    shift
-done
+                ;;
+            -M*)
+                sub_opt=${1:2}
+                case $sub_opt in
+                    noRlwrap)
+                        echo "WARNING: -MnoRlwrap is deprecated"
+                        rlwrapFlag=
+                        ;;
+                    maglevVersion)
+                    # Print out just the maglev version, e.g., "0.8"
+                        echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f2 -d ' '`"
+                        exit
+                        ;;
+                    rlwrap)
+                        rlwrapFlag=1
+                        ;;
+                    traceGlobals|logSexp|traceLoad|commit|persistent|noCaptureStack)
+                        maglev_args="${maglev_args} ${sub_opt}"
+                        ;;
+                    *)
+                        usage "Unknown option: $1"  # usage exits
+                        ;;
+                esac
+                ;;
+            -S) searchPathFlag=1 ;;
+            --tocsz)
+                tocsize="-T $2"
+                shift
+                ;;
+            --stone)
+                stone=$2
+            # Don't override any existing magic ENV variables
+                [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
+                if [ ! -f $GEMSTONE_SYS_CONF ]; then
+                    echo "Can't find configuration file $GEMSTONE_SYS_CONF"
+                    exit 2
+                fi
+                shift
+                ;;
+            -v|--verbose)
+                add_ruby_arg "'-v'"
+                echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f1 -d[`[`uname -sm`]"
+                if [ $# -eq 1 ]; then exit; fi
+                ;;
+            --version)
+                echo "`grep ^maglev ${parseArgsMH}/version.txt | cut -f1 -d[`[`uname -sm`]"
+                exit
+                ;;
+            -w) # Sets $VERBOSE true; read from stdin if no script
+                add_ruby_arg "'-w'"
+                ;;
+            -W*)
+                if [[ ${1:2} =~ ^[0-9]$ ]]; then
+                    add_ruby_arg "'$1'"
+                else
+                    echo "Bad parameter for -W: should be single digit"
+                    exit 1
+                fi
+                ;;
+            --)
+                break
+                ;;
+            -*)
+                usage "Unrecognized option: $1"  # usage exits
+                ;;
+            *)
+                break
+                ;;
+        esac
+        shift
+    done
+    unprocessedArgs="$@"  # Pass unparsed parameters back to caller
+}
+
+parseArgs $MAGLEV_OPTS
+
+parseArgs "$@"
+set -- $unprocessedArgs  # Must be before next parseArgs call
+
+# TODO: RUBYOPT should be limited to the following options: TIdvwWrK,
+# plus whatever maglev specific options we want to allow.
+parseArgs $RUBYOPT
 
 # Set MAGLEV_HOME and GEMSTONE env variables AFTER parsing parameters.
 # This allows "maglev-ruby --version" to run w/o a stone or $MAGLEV_HOME
