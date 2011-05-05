@@ -78,15 +78,22 @@ add_ruby_arg()
 }
 
 # The environment variable STONENAME is for use by internal GemStone
-# developers and QA who start the stone manually instead of using "maglev
-# start" or "rake maglev:start" If STONENAME is set, GEMSTONE_GLOBAL_DIR
-# and GEMSTONE_SYS_CONF will not be set -- even if they are undefined.
+# developers and QA who start the stone manually instead of using
+# "maglev start" or "rake maglev:start" If STONENAME is set,
+# GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF will not be set -- even if
+# they are undefined.  This enables the default Smalltalk stone
+# discovery.
 #
 # Existing GEMSTONE_GLOBAL_DIR and GEMSTONE_SYS_CONF env variables will
 # never be overridden. If GEMSTONE_GLOBAL_DIR is not defined, it will be
 # set to $MAGLEV_HOME.  If the GEMSTONE_SYS_CONF environment variables is
 # not defined, it will be set based on the --stone parameter, otherwise
 # defaulted to etc/system.conf.
+
+# Set GEMSTONE_GLOBAL_DIR unless it's already set or STONENAME is set
+# -G will unset it later if needed
+[ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+stone=${STONENAME:-maglev}
 
 # All of the command line arguments passed to this shell script will either
 # be processed and totally consumed by this shell script (e.g., -Mrlwrap
@@ -201,7 +208,7 @@ function parseArgs {
                 ;;
             --stone)
                 stone=$2
-            # Don't override any existing magic ENV variables
+                # Don't override any existing magic ENV variables
                 [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/conf.d/${stone}.conf
                 if [ ! -f $GEMSTONE_SYS_CONF ]; then
                     echo "Can't find configuration file $GEMSTONE_SYS_CONF"
@@ -277,21 +284,11 @@ if [ ! -x $GEMSTONE/bin/topaz ]; then
     exit 1
 fi
 
-# Set GEMSTONE_GLOBAL_DIR unless it's already set or STONENAME is set
-# -G will unset it later if needed
-[ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
-
 # To login to an already running stone not started by maglev commands
 # use the STONENAME env variable , not the --stone option, because.
 #  --stone requires existence of a conf file in $MAGLEV_HOME/etc/conf.d
 # Don't override any existing magic ENV variables
-if [ -z "$STONENAME" ]; then
-    stone=maglev
-    [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
-else
-    # $STONENAME was set -- don't change anything
-    stone=$STONENAME
-fi
+[ -z "$STONENAME" ] && [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 
 # Make sure the stone is ready
 $GEMSTONE/bin/waitstone "$stone" -1 >/dev/null
