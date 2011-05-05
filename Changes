@@ -3,6 +3,7 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+* Fix broken --stone option in maglev-ruby
 
 == Changes for 25801 2011-05-04
 * Fix Trac 895, 896, 897
