@@ -99,7 +99,7 @@ maglevInfo = (function() {
   }
 
   function clearSelections(selections) {
-    console.log('clearSelections: ' + selections);
+    debugMsg('clearSelections: ' + selections);
     $.each(selections, function(i, el) {
       $(el + ' .ui-selected').removeClass('ui-selected');
     });
@@ -161,7 +161,6 @@ maglevInfo = (function() {
   }
 
   function setDetailViewCode(sym) {
-    console.log('setDetailViewCode()');
     $('#objectInspector').addClass('hidden');
     $('#rubyEditArea').removeClass('hidden');
   }
@@ -207,8 +206,6 @@ maglevInfo = (function() {
   // Make the objectInspector visible in the detail area and render the
   // Object.  High level api.
   function renderObject(objectInfo) {
-    console.log('renderObject()');
-    console.log(objectInfo);
     setDetailViewObject();
 
     $('#objInfoClass').text(objectInfo['class']);
@@ -235,7 +232,6 @@ maglevInfo = (function() {
     }
 
     function renderTableData(tableId, vals, formatFn) {
-      console.log('renderTableData: tableId: '+ tableId + ' # vals: ' + vals.length);
       if (vals && vals.length > 0) {
         $(tableId).removeClass('hidden');
         var ui = $(tableId + ' tbody');
@@ -252,7 +248,7 @@ maglevInfo = (function() {
   // (old firefox on solaris), so I'm wrapping console logging in this
   // function.
   function debugMsg(obj) {
-    if (console) {
+    if (typeof console != "undefined") {
       console.log(obj);
     }
   }
