@@ -4,6 +4,10 @@
 
 == Unreleased Changes
 
+== Changes for 25850 2011-05-12
+* Bugfixes and enhancements to underlying GemStone 3.0 system
+  - fix 41530, 41527, 41483, 41420, 41529
+
 == Changes for 25838 2011-05-10
 * Fix broken --stone option in maglev-ruby
 * Bugfixes and enhancements to underlying GemStone 3.0 system
