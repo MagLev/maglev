@@ -5757,14 +5757,14 @@ static void resolveAstClass(om *omPtr, NODE **astClassesH, AstClassEType e_cls)
     default:
 #endif
     case NUM_AST_CLASSES:
-      GemSupErr_s(ERR_ArgumentError, "invalid enum value in resolveAstClass");
+      GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "invalid enum value in resolveAstClass");
   }
   OmScopeType aScope(omPtr);
   NODE **symH = aScope.add( ObjNewSym(omPtr, nam));
   NODE **symListH = aScope.add( GemDoSessionSymList(omPtr));
   NODE *assoc = GemSupSearchSymList(omPtr, symListH, symH );
   if (assoc == ram_OOP_NIL) {
-     GemSupErr_ss(ERR_ArgumentError, "resolveAstClass class not found: ", nam);
+     GemErrAnsi(omPtr, ERR_ArgumentError, "resolveAstClass class not found: ", nam);
   }
   NODE **clsH = aScope.add( om::FetchOop(assoc, OC_ASSOCIATION_VALUE)); 
   om::StoreOop(omPtr, astClassesH, e_cls, clsH); 
@@ -5853,7 +5853,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     default:
 #endif
     case NUM_AST_SELECTORS:
-      GemSupErr_s(ERR_ArgumentError, "invalid enum value in initAstSelector");
+      GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "invalid enum value in initAstSelector");
   }
   OmScopeType aScope(omPtr);
   NODE **strH = aScope.add( om::NewString_(omPtr, str));
@@ -5955,7 +5955,7 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
     default:
 #endif
     case NUM_AST_SYMBOLS:
-      GemSupErr_s(ERR_ArgumentError, "invalid enum value in initAstSymbol");
+      GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "invalid enum value in initAstSymbol");
       str = "badSym"; //lint
       break;
   }
@@ -5992,7 +5992,7 @@ static void sessionInit(om *omPtr, rb_parse_state *ps)
     id += 1;
   }
   if (! ok) {
-    GemSupErr_s(ERR_ArgumentError, "non-existant symbol(s) in initAstSelector");
+    GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "non-existant symbol(s) in initAstSelector");
   }
   id = 0;
   while (id < NUM_AST_SYMBOLS) {
@@ -6062,7 +6062,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
 
   int64 lineBias = OOP_TO_I64(lineOop);
   if ((uint64)lineBias > INT_MAX) {
-    GemSupErr_s(ERR_ArgumentError, "Parser lineNumber arg must be in range 0..0x7FFFFFFF");
+    GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "Parser lineNumber arg must be in range 0..0x7FFFFFFF");
   }
   { omObjSType *cbytesO = *cbytesH;
     if (! OOP_IS_RAM_OOP(cbytesO) || !  cbytesO->classPtr()->isCByteArray())
@@ -6084,7 +6084,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     omPtr->rubyParseState = ps;
     omPtr->rubyParseStack = &ps->yystack ;
   } else if (ps->parserActive) {
-    GemSupErr_s(ERR_ArgumentError, "reentrant invocation of parser not supported");
+    GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "reentrant invocation of parser not supported");
   }
   if (lineBias > 0) {  // assume arg is one-based
     ps->lineNumber = lineBias - 1;
@@ -6125,7 +6125,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     int64 info = om::FetchSmallInt_(cbytesO, OC_CByteArray_info);
     int64 srcSize = H_CByteArray::sizeBytes(info);
     if ((uint64)srcSize > INT_MAX) {
-      GemSupErr_s(ERR_ArgumentError, "Parser maximum source string size is 2G bytes");
+      GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "Parser maximum source string size is 2G bytes");
     }
     ps->sourceBytes = (char*)om::FetchCData(cbytesO);
     ps->sourcePtr = ps->sourceBytes;
