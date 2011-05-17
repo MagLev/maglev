@@ -4,9 +4,12 @@
 
 == Unreleased Changes
 
-== Changes for 25850 2011-05-12
+== Changes for 25874 2011-05-17
+* Add local copy of jquery so WebTools demo can be done w/o network access.
+* Build on firt release candidate for underlying GS/S 3.0
 * Bugfixes and enhancements to underlying GemStone 3.0 system
-  - fix 41530, 41527, 41483, 41420, 41529
+  - fix 39267, 39941, 41266, 41385, 41419, 41420, 41483, 41524, 41525, 41526,
+    41527, 41528, 41530, 41522, 41528, 41529, 41534, 41536
 
 == Changes for 25838 2011-05-10
 * Fix broken --stone option in maglev-ruby
