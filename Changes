@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25874 2011-05-17
+== Changes for 25876 2011-05-17
 * Add local copy of jquery so WebTools demo can be done w/o network access.
 * Build on first release candidate for underlying GS/S 3.0
 * Bugfixes and enhancements to underlying GemStone 3.0 system
