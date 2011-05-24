@@ -1352,6 +1352,17 @@ class Array
     s
   end
 
+  def last(*args)               # fix Trac 903
+    nargs = args.__size
+    if nargs._equal?(0)
+      self.last
+    elsif nargs._equal?(1)
+      self.last(args[0])
+    else
+      raise ArgumentError, 'expected 0 or 1 args'
+    end
+  end
+
   def last(count)
     cnt = Type.coerce_to(count, Fixnum, :to_int)
     my_size = self.__size
