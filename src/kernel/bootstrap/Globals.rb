@@ -156,6 +156,8 @@ RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev addi
 
 VERSION = '25876-1277-67439a1'
 
+MAGLEV_VERSION = VERSION  # per Trac 901
+
 TRUE  = true
 FALSE = false
 NIL = nil
