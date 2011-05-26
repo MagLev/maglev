@@ -1,6 +1,6 @@
 # Random is the Smalltalk class TransientRandom
 #
-# We use TransientRandom so that we the persistent instance,
+# We use TransientRandom so that the Ruby persistent instance,
 # RandomInstance, is still usable in the face of abort_transaction.
 class Random
   class_primitive_nobridge 'new'
