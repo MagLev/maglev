@@ -262,6 +262,7 @@ module Kernel
         lim -= 1
       end
       cmd = Type.coerce_to(cmd, String, :to_str)
+      cmd = __find_on_path(cmd)
       arguments = []
       while idx < lim
         arguments << Type.coerce_to(args[idx], String, :to_str)
@@ -275,6 +276,21 @@ module Kernel
     ensure
       Errno.handle(Dir.__chdir(original_wd), "chdir back to #{original_wd}")
     end
+  end
+
+  def __find_on_path(cmd)
+    if cmd.index("/") == 0 || cmd.index("./") == 0 || cmd.index("../") == 0
+      return cmd
+    else
+      # TODO:
+      #  1. ~ expansion not done
+      #  2. zero length path components not yet interpreted as "."
+      ENV['PATH'].split(':').each do |comp|
+        full_cmd = File.join(comp, cmd)
+        return full_cmd if File.exist?(full_cmd)
+      end
+    end
+    return ""  # Couldn't find it on the path
   end
 
   primitive '__execv*', 'execv:envVars:fdDups:args:'

@@ -11,6 +11,7 @@ class Object
   def self.__set_platform
      self.transient_const_set( :RUBY_PLATFORM ) { Exception.__cpu_os_str }
      self.transient_const_set( :PLATFORM ) { Exception.__cpu_os_str }
+     self.transient_const_set(  :RandomInstance ) { RandomNp.new }
   end
 end
 Object.__set_platform

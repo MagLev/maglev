@@ -33,7 +33,8 @@ RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
 RUBY.global('Proc', 'RubyProc')
-RUBY.global('Random', 'TransientRandom')
+RUBY.global('Random', 'RubyRandom')
+RUBY.global('RandomNp', 'RubyRandomNp')
 RUBY.global('Range', 'Range')
 RUBY.global('Regexp', 'Regexp')
 RUBY.global('IdentitySet', 'IdentitySet')
@@ -148,12 +149,14 @@ RUBY_ENGINE = 'maglev'
 # RUBY_PLATFORM  is installed in RubyContext>>_initTransient:
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2011-04-22'
+RUBY_RELEASE_DATE = '2011-05-25'
 RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
 RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '25752-1273-aaa579e'
+VERSION = '25898-1277-82f5523'
+
+MAGLEV_VERSION = VERSION  # per Trac 901
 
 TRUE  = true
 FALSE = false
