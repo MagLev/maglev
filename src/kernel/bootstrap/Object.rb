@@ -176,9 +176,13 @@ class Object
       # catch infinite recursion from typical MRI usage pattern
       raise RuntimeError, 'Enumerator creation is subclass responsibility'
     end
-    enumerator = self.__send__(sym, *args)
+    enumerator = Enumerable::ObjectEnumerator.new(self, sym)
     ts.remove(self)
     enumerator
+  end
+
+  def to_enum(sym = :each, *args)
+    enum_for(sym, *args)
   end
 
   primitive 'freeze', 'immediateInvariant'
@@ -589,12 +593,6 @@ class Object
   def to_a
      # remove this method for MRI 1.9 compatibility
      [ self ]
-  end
-
-  def to_enum(sym = :each , *args)  # added in 1.8.7
-    # the receiver must implement the specified method that
-    #  would return an enumerator
-    self.__send__(sym, *args)
   end
 
   def to_fmt
