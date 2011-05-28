@@ -4,11 +4,11 @@
 
 == Unreleased Changes
 
-== Changes for 25898 2011-05-25
+== Changes for 25913 2011-05-27
 * Fix Trac 900, 901, 902, 903
 * Bugfixes in underlying GemStone 3.0 system
-  - fix 41127, 41385, 41532, 41535, 41544, 41547, 41548, 41549, 41550,
-    41551, 41552, 41553, 41558, 41560, 41561, 41568
+  - fix 41127, 41385, 41452, 41532, 41535, 41544, 41547, 41548, 41549, 41550,
+    41551, 41552, 41553, 41555, 41558, 41560, 41561, 41563, 41568, 41582, 41585
 
 == Changes for 25876 2011-05-17
 * Add local copy of jquery so WebTools demo can be done w/o network access.
