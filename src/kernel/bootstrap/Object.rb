@@ -81,7 +81,6 @@ class Object
   # End private helper methods
 
   primitive_nobridge '==', '='
-  primitive 'halt'
   primitive 'hash'
   primitive 'object_id', 'asOop'
   primitive '__id__' , 'asOop'  # included in public names query results

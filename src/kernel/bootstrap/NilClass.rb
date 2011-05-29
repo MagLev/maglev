@@ -1,4 +1,5 @@
 class NilClass
+  primitive 'halt'
   primitive_nobridge '__isSpecial', 'isSpecial'
 
   def &(an_object)
