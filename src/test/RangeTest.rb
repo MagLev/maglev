@@ -26,4 +26,10 @@ test((1..1).__beg_len(11), [1,1],   "C: __beg_len ")
 test((5..-1).__beg_len(11), [5,6],  "D: __beg_len ")
 test((5...-1).__beg_len(11), [5,5], "E: __beg_len ")
 
+# uses from sinatra unit tests
+unless (nil === (4..6)).equal?(false) ; raise 'fail'; end
+unless (true === (4..6)).equal?(false) ; raise 'fail'; end
+unless ((4..6) === true ).equal?(false) ; raise 'fail'; end
+unless ((4..6) === nil).equal?(false) ; raise 'fail'; end
+
 report
