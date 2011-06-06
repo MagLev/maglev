@@ -211,6 +211,11 @@ class RubyArrayNode
     return RubyNode::call(inst, sel__append, arg, ps);
   }
 
+  static inline omObjSType* append_amperLhs(omObjSType *inst, omObjSType *arg, rb_parse_state *ps)
+  { // returns inst
+    return RubyNode::call(inst, sel__append_amperLhs, arg, ps);
+  }
+
   static inline int64 arrayLength(omObjSType *inst, rb_parse_state *ps)
   {
     omObjSType *lenO = RubyNode::call(inst, sel_arrayLength, ps);
