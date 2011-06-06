@@ -18,9 +18,12 @@ class Range
   end
 
   def ===(n)
-    return false if (n <=> @_st_from)  < 0
-    to_cmp = n <=> @_st_to
-    return false if to_cmp > 0
+    from_cmp = @_st_from <=> n 
+    if from_cmp._equal?(nil) || from_cmp > 0
+      return false
+    end
+    to_cmp =   @_st_to <=> n
+    return false if to_cmp < 0
     if @_st_excludeEnd
       return false if to_cmp == 0
     end
