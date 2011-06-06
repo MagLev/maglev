@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Fix Trac 904, 905, 906, 907, 908, 911
+
 == Changes for 25913 2011-05-27
 * Fix Trac 900, 901, 902, 903
 * Bugfixes in underlying GemStone 3.0 system
