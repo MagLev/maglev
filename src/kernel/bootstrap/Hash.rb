@@ -762,10 +762,12 @@ class Hash
   end
 
   primitive_nobridge '__become', '_becomeMinimalChecks:'
+  primitive_nobridge '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs'
 
   def __rebuild(new_size)
     # puts "start rebuild ( "
-    nhash = self.class.__new(new_size)
+    nhash = self.__basic_dup_named_ivs
+    nhash.__clear(new_size) 
     nhash.default=( @_st_defaultOrParent )
     save_cl = nhash.__set_collision_limit(Fixnum_MAX) # prevent recursive rebuild
 
