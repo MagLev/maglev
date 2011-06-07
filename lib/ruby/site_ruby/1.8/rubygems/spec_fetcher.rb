@@ -70,7 +70,8 @@ class Gem::SpecFetcher
   # Returns the local directory to write +uri+ to.
 
   def cache_dir(uri)
-    escaped_path = uri.path.sub(%r[^/([a-z]):/]i, '/\\1-/') # Correct for windows paths
+    # Correct for windows paths
+    escaped_path = uri.path.sub(/^\/([a-z]):\//i, '/\\1-/')
     File.join @dir, "#{uri.host}%#{uri.port}", File.dirname(escaped_path)
   end
 
@@ -80,8 +81,15 @@ class Gem::SpecFetcher
   # false, all platforms are returned. If +prerelease+ is true,
   # prerelease versions are included.
 
-  def fetch_with_errors(dependency, all = false, matching_platform = true, prerelease = false)
-    specs_and_sources, errors = find_matching_with_errors dependency, all, matching_platform, prerelease
+  def fetch_with_errors(dependency,
+                        all               = false,
+                        matching_platform = true,
+                        prerelease        = false)
+
+    specs_and_sources, errors = find_matching_with_errors(dependency,
+                                                          all,
+                                                          matching_platform,
+                                                          prerelease)
 
     ss = specs_and_sources.map do |spec_tuple, source_uri|
       [fetch_spec(spec_tuple, URI.parse(source_uri)), source_uri]
@@ -131,7 +139,10 @@ class Gem::SpecFetcher
   # matching released versions are returned.  If +matching_platform+
   # is false, gems for all platforms are returned.
 
-  def find_matching_with_errors(dependency, all = false, matching_platform = true, prerelease = false)
+  def find_matching_with_errors(dependency,
+                                all               = false,
+                                matching_platform = true,
+                                prerelease        = false)
     found = {}
 
     rejected_specs = {}
@@ -244,13 +255,12 @@ class Gem::SpecFetcher
     loaded     = false
 
     if File.exist? local_file then
-      spec_dump = @fetcher.fetch_path spec_path, File.mtime(local_file)
+      spec_dump =
+        @fetcher.fetch_path(spec_path, File.mtime(local_file)) rescue nil
 
-      if spec_dump.nil? then
-        spec_dump = Gem.read_binary local_file
-      else
-        loaded = true
-      end
+      loaded = true if spec_dump
+
+      spec_dump ||= Gem.read_binary local_file
     else
       spec_dump = @fetcher.fetch_path spec_path
       loaded = true
