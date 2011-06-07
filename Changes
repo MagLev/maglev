@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 25940 2011-06-07
+== Changes for 25943 2011-06-07
 * Fix Trac 904, 905, 906, 907, 908, 911
 * Update underlying GemStone 3.0 system to GS/S 3.0.1
 
