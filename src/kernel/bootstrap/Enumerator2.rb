@@ -1,5 +1,14 @@
 module Enumerable
 
+  class ObjectEnumerator < Enumerator
+    # Object enumerator used for lazy enumeration  , fix Trac 904
+    def next(&block)
+      # return an element of the minor-enumeration
+      @sub_enum ||= @obj.__send__(@enum_selector, *@extra_args).each
+      @sub_enum.next(&block)
+    end
+  end
+
   class ArrayEnumerator < Enumerator
     # ArrayEnumerator also used for String#each_byte
     def next

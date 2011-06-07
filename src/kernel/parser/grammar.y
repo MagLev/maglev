@@ -2343,7 +2343,7 @@ blck_var       : block_par
                 | block_par ',' tAMPER lhs
                     {
 		      yTrace(vps, "blck_var | block_par , & lhs x");
-                      RubyArrayNode::append($1, $4, vps);
+                      RubyArrayNode::append_amperLhs($1, $4, vps);
                       $$ = RubyParser::new_parasgn( $1, $3/*srcOffsetSi*/, vps);   
                     }
                 | block_par ',' tSTAR lhs ',' tAMPER lhs
@@ -2352,7 +2352,7 @@ blck_var       : block_par
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($4, vps));
                       RubyArrayNode::append($1, *splatH, vps);
-                      RubyArrayNode::append($1, $7, vps);
+                      RubyArrayNode::append_amperLhs($1, $7, vps);
                       $$ = RubyParser::new_parasgn( $1, $3/*srcOffsetSi*/, vps);
                     }
                 | block_par ',' tSTAR ',' tAMPER lhs
@@ -2361,7 +2361,7 @@ blck_var       : block_par
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       RubyArrayNode::append($1, *splatH, vps);
-                      RubyArrayNode::append($1, $6, vps);
+                      RubyArrayNode::append_amperLhs($1, $6, vps);
                       $$ = RubyParser::new_parasgn( $1, $3/*srcOffsetSi*/, vps);
                     }
                 | block_par ',' tSTAR lhs
@@ -2386,7 +2386,7 @@ blck_var       : block_par
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($2, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
-                      RubyArrayNode::append(*arrH, $5, vps);
+                      RubyArrayNode::append_amperLhs(*arrH, $5, vps);
                       $$ = RubyParser::new_parasgn( *arrH, $1/*srcOffsetSi*/, vps);
                     }
                 | tSTAR ',' tAMPER lhs
@@ -2395,7 +2395,7 @@ blck_var       : block_par
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
-                      RubyArrayNode::append(*arrH, $4, vps);
+                      RubyArrayNode::append_amperLhs(*arrH, $4, vps);
                       $$ = RubyParser::new_parasgn( *arrH, $1/*srcOffsetSi*/, vps);
                     }
                 | tSTAR lhs
@@ -2418,7 +2418,8 @@ blck_var       : block_par
                     {
                       yTrace(vps, "blck_var | & lhs x");
                       OmScopeType aScope(vps->omPtr);
-                      NODE **arrH = aScope.add(RubyArrayNode::s($2, vps));
+                      NODE **arrH = aScope.add(RubyArrayNode::new_(vps));
+                      RubyArrayNode::append_amperLhs(*arrH, $2, vps);
                       $$ = RubyParser::new_parasgn( *arrH, $1/*srcOffsetSi*/, vps);
                     }
                 ;
@@ -3476,6 +3477,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     case sel_add_star_arg: 	str = "add_star_arg:"; 	break;
     case sel__append: 		str = "_append:"; 	break;
     case sel__appendAll: 	str = "_appendAll:"; break;
+    case sel__append_amperLhs:  str = "_appendAmperLhs:";  break;
     case sel_append_arg: 	str = "append_arg:"; break;
     case sel_append_arg_blkArg: str = "append_arg:blkArg:"; break;
     case sel_append_arg_splatArg_blkArg: str = "append_arg:splatArg:blkArg:"; break;
@@ -5960,6 +5962,7 @@ static int yylex(rb_parse_state* ps)
                         if (kwIdZero == kDO) return kDO;
                     }
                     if (kwIdZero == kDO) {
+                        // ps->command_start = TRUE;   // rubinius Sep 20, 2010
                         if (COND_P(ps)) return kDO_COND;
                         if (CMDARG_P(ps) && state != EXPR_CMDARG)
                             return kDO_BLOCK;

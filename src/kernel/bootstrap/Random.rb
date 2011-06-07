@@ -1,5 +1,6 @@
 # Random is the Smalltalk class RubyRandom
 #
+
 class Random
   class_primitive_nobridge 'new'
   primitive_nobridge 'next', 'nextInt:'

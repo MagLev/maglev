@@ -111,9 +111,7 @@ class Array
         i = i + 1
       end
     ensure
-      if added
-        ts.remove(self)
-      end
+      ts.remove(self)
     end
     recursed
   end
@@ -145,7 +143,7 @@ class Array
     else
       # if a subclass does not reimplement initialize*,
       #  this path raises ArgumentError, 'too many args' 
-      a = self.new  
+      a = self.__alloc(0, nil)
       a.initialize(*args) 
       a
     end
@@ -709,7 +707,7 @@ class Array
 
   primitive_nobridge '__copy_from_to', 'copyFrom:to:'
 
-  primitive   '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs' 
+  primitive_nobridge '__basic_dup_named_ivs', '_rubyBasicDupNamedIvs' 
     # uses non-singleton class and copies fixed and dynamic instVars
     # but not the varying instVars accessed by []
 

@@ -25,33 +25,7 @@ class Thread
 
   primitive_nobridge 'alive?' , 'alive'
 
-  # eval support
-  def self.__evVc
-    # Thread.current[ :__evalArgs ][0]    is a Binding
-    self.current[  :__evalArgs ][0].__context 
-  end
-  def self.__evArgs
-    self.current[  :__evalArgs ]
-  end
-  def self.__evBnd
-    self.current[  :__evalArgs ][0]
-  end
-  def self.__evBlk
-    self.current[  :__evalArgs ][1]
-  end
-
-  def self.__evalHomeMethod	# added for 1.8.7
-    # called by generated code
-    res = nil
-    cx = self.current[  :__evalArgs ]
-    unless cx._equal?(nil)
-      binding = cx[0]
-      unless binding._equal?(nil)
-        res = binding.__home_method
-      end
-    end
-    res.__name
-  end
+  class_primitive_nobridge '__evVcGput', '_rubyEvalVcPutTilde:underscore:'
 
   class_primitive_nobridge '__stbacktrace', 'backtraceToLevel:'
 

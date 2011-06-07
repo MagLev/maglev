@@ -81,7 +81,6 @@ class Object
   # End private helper methods
 
   primitive_nobridge '==', '='
-  primitive 'halt'
   primitive 'hash'
   primitive 'object_id', 'asOop'
   primitive '__id__' , 'asOop'  # included in public names query results
@@ -169,16 +168,11 @@ class Object
   end
 
   def enum_for(sym = :each , *args)  # added in 1.8.7
-    # the receiver must implement the specified method that
-    #  would return an enumerator
-    ts = Thread.__recursion_guard_set
-    unless ts.__add_if_absent(self)
-      # catch infinite recursion from typical MRI usage pattern
-      raise RuntimeError, 'Enumerator creation is subclass responsibility'
-    end
-    enumerator = self.__send__(sym, *args)
-    ts.remove(self)
-    enumerator
+    Enumerable::ObjectEnumerator.new(self, sym)
+  end
+
+  def to_enum(sym = :each, *args)
+    enum_for(sym, *args)
   end
 
   primitive 'freeze', 'immediateInvariant'
@@ -379,7 +373,19 @@ class Object
 
   def extend(*modules)
     if (modules.length > 0)
-      cl = self.__singleton_class
+      if self.__isSpecial
+        if self._equal?(nil)
+          cl = NilClass
+        elsif self._equal?(true)
+          cl = TrueClass
+        elsif self._equal?(false)
+          cl = FalseClass
+        else
+          raise ArgumentError, "cannot extend a special object"
+        end 
+      else
+        cl = self.__singleton_class
+      end
       modules.each do |a_module|
         cl.__include_module(a_module)
         a_module.extended(self)
@@ -458,12 +464,10 @@ class Object
     ctx = self.__binding_ctx(1)
     bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
-    vcgl = [ self.__getRubyVcGlobal(0x30),
-       self.__getRubyVcGlobal(0x31) ]
-    bblk = bnd.block
-    unless bblk._equal?(nil)
-      vcgl << bblk
-    end
+    vcgl = [ self.__getRubyVcGlobal(0x30), self.__getRubyVcGlobal(0x31) ,
+             nil ,  # slot used later on for theSelf 
+             block_arg
+           ]
     m_args = [ bnd, 
                 args[1], # file
                 args[2] ]  # line

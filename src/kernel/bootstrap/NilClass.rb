@@ -98,11 +98,6 @@ class NilClass
     self
   end
 
-  def __evVcGput(tilde, underscore)
-    # for use by eval implementation only
-    self
-  end
-
   def call(*args)
     # invoked when yield used with no block argument
     raise LocalJumpError , 'no block was passed'

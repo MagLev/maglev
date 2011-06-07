@@ -230,19 +230,73 @@ class File
   #
   #  File.join("usr", "mail", "gumby")   #=> "usr/mail/gumby"
   def self.join(*args)
-    args.map! { |o|
-      unless o._isString || o._isArray 
-        o = o.to_str 
-      end
-      o
-    } rescue raise TypeError
+    args_len = args.__size
+    return ''  if args_len._equal?(0)
+   
+    # The first one is unrolled out of the loop to remove a condition
+    # from the loop. It seems needless, but you'd be surprised how much hinges
+    # on the performance of File.join
+    #
+    first = args.shift
+    ts = nil
+    if first._isString
+      first = first.dup
+    elsif first._isArray
+      ts = Thread.__recursion_guard_set
+      if ts.__add_if_absent(first)
+        begin
+          first = join(*first)
+        ensure
+          ts.remove(first)
+        end
+      else
+        raise ArgumentError, "recursive array in File.join" 
+      end 
+    else
+      # We need to use dup here, since it's possible that
+      # StringValue gives us a direct object we shouldn't mutate
+      first = Type.coerce_to(first, String, :to_str).dup
+    end
 
-    # let join/split deal with all the recursive array complexities
-    # one small hack is to replace URI header with \0 and swap back later
-    result = args.join(SEPARATOR).gsub(/\:\//, "\0").split(/#{SEPARATOR}+/o)   
- 						     # ^ broken here for args of ['','']
-    result << '' if args.empty? || args.last.empty? || args.last[-1] == SEPARATOR[0]
-    result.join(SEPARATOR).gsub(/\0/, ':/')
+    ret = first
+    idx = 0
+    sep = SEPARATOR
+    args_len = args.__size
+    while idx < args_len
+      el = args[idx]
+      value = nil
+
+      if el._isString
+        value = el
+      elsif el._isArray
+        if ts._equal?(nil)
+          ts = Thread.__recursion_guard_set
+        end
+        if ts.__add_if_absent(first)
+          begin
+            value = join(*el)
+          ensure
+            ts.remove(first)
+          end  
+        else
+          raise ArgumentError, "recursive array in File.join"
+        end
+      else
+        value = Type.coerce_to(el, String, :to_str).dup
+      end
+
+      if value.__at(0) == sep.__at(0) && value.__at_equals(1, sep)
+        ret.gsub!(/#{sep}+$/, '')
+      else
+        ofs = ret.__size - sep.__size 
+        unless ret.__at(ofs) == sep.__at(0) && ret.__at_equals(ofs + 1, sep)
+          ret << sep
+        end
+      end
+      ret << value
+      idx += 1
+    end
+    ret
   end
 
 end

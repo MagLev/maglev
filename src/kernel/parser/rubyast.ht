@@ -78,6 +78,7 @@ typedef enum
   sel_add_star_arg,
   sel__append,
   sel__appendAll,
+  sel__append_amperLhs,
   sel_append_arg,
   sel_append_arg_blkArg,
   sel_append_arg_splatArg_blkArg,
