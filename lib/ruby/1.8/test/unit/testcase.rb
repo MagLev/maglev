@@ -82,16 +82,28 @@ module Test
           setup
           __send__(@method_name)
         rescue AssertionFailedError => e
+          if Maglev::System.session_temp( :Maglev_ruby_debugFlag)
+            nil.pause
+          end
           add_failure(e.message, e.backtrace)
         rescue Exception
+          if Maglev::System.session_temp( :Maglev_ruby_debugFlag)
+            nil.pause
+          end
           raise if PASSTHROUGH_EXCEPTIONS.include? $!.class
           add_error($!)
         ensure
           begin
             teardown
           rescue AssertionFailedError => e
+            if Maglev::System.session_temp( :Maglev_ruby_debugFlag)
+              nil.pause
+            end
             add_failure(e.message, e.backtrace)
           rescue Exception
+            if Maglev::System.session_temp( :Maglev_ruby_debugFlag)
+              nil.pause
+            end
             raise if PASSTHROUGH_EXCEPTIONS.include? $!.class
             add_error($!)
           end
