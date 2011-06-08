@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* More fixes to line numbering in backtraces, and how
+*   bootstrap code is shown in backtraces.
+
 == Changes for 25943 2011-06-07
 * Fix Trac 904, 905, 906, 907, 908, 911
 * Update underlying GemStone 3.0 system to GS/S 3.0.1
