@@ -39,7 +39,18 @@ class Thread
     res_start_ofs = 1
     st_stack = __stbacktrace(limit)
     result = self.__st_to_rubybacktrace(st_stack, include_st)
-    result[(res_start_ofs+1)..-1]
+    if include_st
+      result.__shift # skip frame of __backtrace
+    end
+    result
+  end
+
+  def self.__add_to_backtrace(result, a_frame)
+     file = a_frame[0] 
+     line = a_frame[1]
+     meth = a_frame[2]
+     meth = ":in `#{meth}'" unless meth._equal?(nil) 
+     result <<  "#{file}:#{line}#{meth}" 
   end
 
   def self.__st_to_rubybacktrace(st_stack, include_st=nil)
@@ -49,106 +60,84 @@ class Thread
       wlevel = $-W 
       include_st =  wlevel._isFixnum && wlevel > 2 
     end
-    for idx in 0..(st_stack.length - 1) do
-      f_info = __frame_info(st_stack[idx], include_st)
-      if f_info._not_equal?(nil)
-        file = f_info[0]
-        line = f_info[1]
-        meth = f_info[2]
-        # Kernel methods need to refer to the next app level stack info, not
-        # to the src/kernel/* files.  This should almost always be the next
-        # frame, but eval and block frames may require searching further.
-        # This search is a bit sketchy...
-        if file and file.include?( KERNEL_SRC_STR )
-          u_info = __find_next_user_info_for(idx+1, st_stack)
-          if u_info._not_equal?(nil)
-            file = u_info[0]
-            line = u_info[1]
-            # don't replace meth
-           end
+    idx = 0
+    limit = st_stack.length - 1
+    kernel_src = KERNEL_SRC_STR
+    while idx < limit
+      frame = __frame_info(st_stack[idx] )
+      if include_st
+        __add_to_backtrace( result, frame )
+      else
+        type = frame[3]
+        if type._equal?( :ruby) 
+          file = frame[0]
+          if file.include?( kernel_src ) 
+            k_idx = idx
+            s_idx = idx + 1
+            while s_idx < limit - 1
+              frame = __frame_info(st_stack[s_idx] )
+              type = frame[3]
+              if type._equal?(:ruby) 
+                if frame[0].include?( kernel_src )
+                  k_idx = s_idx
+                else
+                  break  # at the next ruby application frame
+                end
+              end
+              s_idx += 1
+            end
+            k_frame = __frame_info(st_stack[k_idx])
+            __add_to_backtrace( result, k_frame )
+            idx = s_idx - 1  # still need to process frame[s_idx - 1]
+          else
+            __add_to_backtrace( result, frame )
+          end
         end
-        meth = ":in `#{meth}'" unless meth._equal?(nil) 
-        result << "#{file}:#{line}#{meth}"  if file 
       end
+      idx += 1
     end
     result
   end
 
-  # If the current stack frame represents kernel source
-  # ($MAGLEV_HOME/src/kernel/*), then this frame should be reported from
-  # the calling frame (if it is a user frame).  This mimics how MRI reports
-  # frames representing C code.
-  def self.__find_next_user_info_for(start, stack)
-    for idx in (start..stack.length-1) do
-      f_info = __frame_info(stack[idx])
-      if f_info._not_equal?(nil)
-        file = f_info[0]
-        if file and ! file.include?(KERNEL_SRC_STR)
-          line = f_info[1]
-          meth = f_info[2]
-          return [file, line, meth] 
-        end
-      end
-    end
-    return nil  # failed
-  end
 
-  # Return an array of [file_name, line_number, method_name] for the stack
-  # frame for ruby stack frames.  If include_st is true, then also return
-  # the same information for smalltalk frames.  Ignores env 2.
-  def self.__frame_info(stack_frame, include_st=false)
-    where = stack_frame[0]
+  # Return an array of [file_name, line_number, method_name, type] 
+  # type is one of :ruby , :bridge , :smalltalk
+  def self.__frame_info(stack_frame)
     line  = stack_frame[1]
     env_id = stack_frame[2]
     home_sel = stack_frame[3] # selector prefix of home
     is_bridge = stack_frame[4]
     file   = stack_frame[5]   # from debug info used by source_location
     baseline = stack_frame[6]
-    
-    # if /.*# (.*?):*\*?&? \(envId 1\)/ =~ where
-    if env_id._equal?(1) && ! is_bridge
-      # Process a ruby stack frame.
-      # Treat _compfileFile methods as top level calls (i.e., no 'in' part)
-      if home_sel
-        meth = home_sel
-        meth = nil if meth._equal?( :__compileFile )
-      end
-      if home_sel # if source
-  #     # get baseline and file name from comment at end of method's source
-  #     lines = source.split("\n").grep(/# method/)
-  #     unless lines.empty?
-  #       if /line (\d+) .* file (.*)/=~ lines[-1]
-  #         baseline = $1.to_i   
-  #         file = $2
-  #         # baseline and line are both 1-based , so -1 here
-  #         lnum = baseline + line - 1 
-  #         return [file[0..-2], lnum , meth]
-  #       end
-  #     end
-        if baseline._isFixnum
-          lnum = baseline + line - 1 # baseline and line are both 1-based, so -1
-        else
-          lnum = line
+    if env_id._equal?(1) 
+      if ! is_bridge && file
+        # Process a ruby stack frame.
+        # Treat _compfileFile methods as top level calls (i.e., no 'in' part)
+        if home_sel
+          meth = home_sel
+          meth = nil if meth._equal?( :__compileFile )
         end
-        return [ file, lnum, meth ]
+        if home_sel # if source
+          if baseline._isFixnum
+            lnum = baseline + line - 1 # baseline and line are both 1-based, so -1
+          else
+            lnum = line
+          end
+          return [ file, lnum, meth, :ruby ]
+        end
       end
-    elsif include_st
-      # Process a smalltalk or bridge method stack frame
-      if env_id._equal?(1) && is_bridge
-        return ["bridge", line, home_sel]
-      elsif env_id._equal?(0)
-        return ["smalltalk", line, home_sel]
-      else
-        # exclude env_id > 1 (typically Ruby parser)
+      if is_bridge
+        return ["bridge", line, home_sel, :bridge ]
       end
-    else
-      # exclude, not env 1
+      return [ "bridge" , line, stack_frame[0], :bridge]  # such as __rubySend1: ...
     end
-    return nil
+    # assume smalltalk
+    #  stack_frame[0] is ' aClassName >> selector (envId 0) ' 
+    return ["smalltalk", line, stack_frame[0].sub('(envId 0)','') , :smalltalk ]
   end
 
   class << self
-    private :__find_next_user_info_for, :__frame_info
+    private  :__frame_info
   end
 
   # ThreadCriticalMutex defined in Thread1.rb

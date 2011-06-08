@@ -115,10 +115,11 @@ module Kernel
       raise ArgumentError
     end
     res = Thread.__backtrace(false, limit)
+    idx = 1  # skip frame of Kernel.caller
     if (skip > 0)
-      res = res[skip, res.length]
+      idx += skip
     end
-    res
+    res[idx, res.length]
   end
 
   # call-seq:
