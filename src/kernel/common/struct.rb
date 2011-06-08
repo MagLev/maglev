@@ -399,8 +399,10 @@ class Struct
         eh = elem.hash
       end
       if eh._not_equal?(0)
-  eh = Type.coerce_to( eh, Fixnum, :to_int)
-  hval = (hval >> 1) ^ eh
+	unless eh._isFixnum
+	  eh = eh & 0xfffffffffffffff # truncate to Fixnum
+	end
+        hval = (hval >> 1) ^ eh
       end
       n += 1
     end
