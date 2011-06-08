@@ -23,21 +23,23 @@ def c
   x = nil
   [1].each do |i|
     x = caller
-    # sa = Thread.__backtrace(true, 100)
+    $bx = Thread.__backtrace(true, 1000) # for debugging
   end
   x
 end
 back_trace = a(1,2,3)
+st_trace = $bx
 
 # END of line number sensitive code
 
-expected =
-  ["src/test/CallerTest.rb:25:in `c'",
-   "src/test/CallerTest.rb:24:in `each'", # (line 24 in this file)
+expected = [ 
+   "src/test/CallerTest.rb:25:in `c'",
+   "src/kernel/bootstrap/Array.rb:DONT_CARE:in `each'", 
    "src/test/CallerTest.rb:24:in `c'",
    "src/test/CallerTest.rb:19:in `b'",
    "src/test/CallerTest.rb:15:in `a'",
-   "src/test/CallerTest.rb:30"]
+   "src/test/CallerTest.rb:30"
+  ]
 
 bt_suffixes = []
 back_trace.each do | str | 
@@ -53,7 +55,9 @@ expected.each_with_index do |frame, i|
   file, line, meth = back_trace[i].split(':')
   file_result = file.match /#{ex_file}/
   test(file_result.nil?, false, "filename")
-  test(line, ex_line, "line")
+  unless ex_line == 'DONT_CARE'
+    test(line, ex_line, "line")
+  end
   test(meth, ex_meth, "meth")
 end
 #test(back_trace, expected, "Backtrace")
