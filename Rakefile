@@ -4,13 +4,11 @@ require 'rake/clean'
 
 # Try to support Rake 0.8.7 and 0.9.x (at least for a while)
 if defined? Rake::VERSION
-puts "============ #{Rake::VERSION}  NEW"
   # Rake 0.9.x
   require 'rubygems'
   gem 'rdoc'
   require 'rdoc/task'
 else
-puts "============ OLD"
   # Rake 0.8.x
   require 'rake/rdoctask'
 end
