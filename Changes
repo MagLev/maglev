@@ -4,6 +4,7 @@
 
 == Unreleased Changes
 
+* Fix Trac 913
 * More fixes to line numbering in backtraces, and how
 *   bootstrap code is shown in backtraces.
 
