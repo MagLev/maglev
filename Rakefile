@@ -1,7 +1,19 @@
 # MagLev Rakefile
 
 require 'rake/clean'
-require 'rake/rdoctask'
+
+# Try to support Rake 0.8.7 and 0.9.x (at least for a while)
+if defined? Rake::VERSION
+puts "============ #{Rake::VERSION}  NEW"
+  # Rake 0.9.x
+  require 'rubygems'
+  gem 'rdoc'
+  require 'rdoc/task'
+else
+puts "============ OLD"
+  # Rake 0.8.x
+  require 'rake/rdoctask'
+end
 
 $LOAD_PATH << File.dirname(__FILE__)  # For 1.9, '.' is no longer in the load path
 
