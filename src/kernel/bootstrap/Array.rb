@@ -1247,7 +1247,9 @@ class Array
         elem = self.__at(n)
         eh = elem.hash
         if eh._not_equal?(0)
-          eh = Type.coerce_to( eh, Fixnum, :to_int)
+          unless eh._isFixnum
+            eh = eh & 0xfffffffffffffff # truncate to Fixnum
+          end
           hval = (hval >> 1) ^ eh
         end
         n += interval

@@ -46,7 +46,7 @@ module Test
         _wrap_assertion do
           if (! yield)
             if Maglev::System.session_temp( :Maglev_ruby_debugFlag)
-              puts "AssertionFailed"
+              puts "AssertionFailed #{message.to_s} "
               nil.pause
             end
             raise AssertionFailedError.new(message.to_s)

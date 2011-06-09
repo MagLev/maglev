@@ -4,6 +4,13 @@
 
 == Unreleased Changes
 
+== Changes for 25953 2011-06-09
+* Fix Trac 913
+* More fixes to line numbering in backtraces, and how
+    bootstrap code is shown in backtraces.
+* Relaxed the 75% of total ram limit for SHMMAX to enable
+  customers with 144 GB of ram to use more of their physical memory.
+
 == Changes for 25943 2011-06-07
 * Fix Trac 904, 905, 906, 907, 908, 911
 * Update underlying GemStone 3.0 system to GS/S 3.0.1

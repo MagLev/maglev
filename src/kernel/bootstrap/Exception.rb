@@ -128,6 +128,7 @@ class Exception
       end
       if stk._not_equal?(oldstk)
         stk = Thread.__st_to_rubybacktrace(stk)
+        stk.__shift # don't report the frame for  raise
         @_st_gsStack = stk
       end
       if stk.__size._equal?(0)
