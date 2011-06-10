@@ -62,6 +62,7 @@ class Fixnum
   primitive_nobridge '^', '_rubyBitXor:'
   primitive_nobridge '__prim_xor', '_rubyBitXor:'
   primitive_nobridge '<<', '_rubyShiftLeft:'
+  primitive_nobridge 'between?', 'between:and:'
   # >> inherited from Integer
 
   def <=>(arg)
