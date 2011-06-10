@@ -9,5 +9,8 @@ class Switch
     @block.call
   end
 end
-x = Switch.new() { puts "Hi there" }
-x.doit  # => Prints "Hi there"
+s = Switch
+x = Switch.new() { $aa = "Hi there 538" }
+x.doit()
+unless (ax = $aa) == 'Hi there 538' ; raise 'fail' ; end 
+true
