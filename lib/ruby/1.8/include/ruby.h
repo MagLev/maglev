@@ -429,11 +429,11 @@ RUBY_DLLSPEC int rb_bignum_len(VALUE v);
 
 #define RBIGNUM_LEN rb_bignum_len
 
-RUBY_DLLSPEC VALUE rb_ll2inum(long n);
-RUBY_DLLSPEC VALUE rb_ull2inum(unsigned long n);
+static inline VALUE rb_ll2inum(long n) { return rb_int2inum(n); }
+static inline VALUE rb_ull2inum(unsigned long n) { return rb_uint2inum(n); }
 
-static inline VALUE rb_int2big(long v) { return rb_ll2inum(v); }
-static inline VALUE rb_uint2big(unsigned long v) { return rb_ull2inum(v);}
+static inline VALUE rb_int2big(long n) { return rb_int2inum(n); }
+static inline VALUE rb_uint2big(unsigned long n) { return rb_uint2inum(n); }
 
 RUBY_DLLSPEC VALUE rb_Integer(VALUE v); 
   // calls to_i  on v
