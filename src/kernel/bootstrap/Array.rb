@@ -10,7 +10,7 @@ class Array
     lim = self.__size
     while n < lim
       el = self.__at(n)
-      if obj === el
+      if el === obj 
         return true
       end
       n = n + 1
