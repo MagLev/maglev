@@ -1,4 +1,2 @@
-fails:Kernel.Float raises an ArgumentError for a String with an embedded \0
 fails:Kernel.Float raises an Argument Error if to_f is called and it returns NaN
-fails:Kernel#Float raises an ArgumentError for a String with an embedded \0
 fails:Kernel#Float raises an Argument Error if to_f is called and it returns NaN
