@@ -1,3 +1,8 @@
+
+Can you run "rails new" w/o the bundle?
+
+
+
 = Notes on MagLev and Rails 3
 
 The files in this directory allow you to run the default Rails app on
@@ -107,20 +112,11 @@ for rails versions 3.0.0, 3.0.3, 3.0.4
 === 2. Create and configure new rails app
 
 1. Generate the application:
-     $ $MAGLEV_HOME/bin/rails new myapp --database=mysql
+     $ $MAGLEV_HOME/bin/rails new myapp --skip-bundle
 
-2. Edit <tt>myapp/Gemfile</tt> to use <tt>ruby-mysql</tt> gem.  Change
-     gem 'mysql2'
-   to
-     gem 'ruby-mysql', :require => 'mysql'
+2. Edit <tt>myapp/Gemfile</tt>:
 
-3. Edit <tt>myapp/config/database.yml</tt>
-   A. Change <tt>mysql2</tt> to +mysql+.
-   B. You may also need to add the +socket+ option to talk to your
-      server, it it isn't listening on <tt>/tmp/mysql.sock</tt>, e.g.:
-        socket: /opt/local/var/run/mysql5/mysqld.sock
-   C. Change the +username+, +password+ and +database+ for your
-      installation.
+   Commment out the "gem 'coffee-script'" line
 
 === 3. Run +bundle+
 
@@ -194,3 +190,20 @@ The following patches are applied:
    to Rails.
 2. There is a patch to workaround https://magtrac.gemstone.com/ticket/757.
 
+
+
+
+================== OLD
+
+Change
+     gem 'mysql2'
+   to
+     gem 'ruby-mysql', :require => 'mysql'
+
+3. Edit <tt>myapp/config/database.yml</tt>
+   A. Change <tt>mysql2</tt> to +mysql+.
+   B. You may also need to add the +socket+ option to talk to your
+      server, it it isn't listening on <tt>/tmp/mysql.sock</tt>, e.g.:
+        socket: /opt/local/var/run/mysql5/mysqld.sock
+   C. Change the +username+, +password+ and +database+ for your
+      installation.
