@@ -18,10 +18,9 @@ class EvalLine
     unless file == gfile
       raise "Wrong file name: #{file} expecting"   
     end
-    unless line_num.to_i == gline
+    unless line_num.to_i == gline + 1
       raise "Wrong line number: #{line_num} expecting: #{gline}"
     end
-    nil.pause 
   end
 
   def baz

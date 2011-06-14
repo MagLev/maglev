@@ -24,6 +24,20 @@ namespace :dev do
     Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
   end
 
+  task :'vm2-tests' do
+    test_dir = File.join(ENV['MAGLEV_HOME'], 'src', 'test')
+    conf_file = 'vmunit2.conf'
+    Dir.chdir(test_dir) do
+      raise "Can't find conf file: #{File.join(test_dir, conf_file)}" unless File.exist? conf_file
+      File.foreach conf_file do |line|
+        line.chomp!
+        next if line =~ /^\s*#/ || line =~ /^\s*$/
+        puts "\n======= Running #{line}"
+        sh "maglev-ruby #{line}"
+      end
+    end
+  end
+
   desc "Run maglev-gem pristine on rails gems"
   task :pristinerails do
     %w(actionmailer actionpack activemodel activerecord

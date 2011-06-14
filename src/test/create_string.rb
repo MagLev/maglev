@@ -3,4 +3,4 @@
 # 
  
 str = ""; 1000.times{str << "x"}
-puts str.length
+raise "Faile" unless str.length == 1000
