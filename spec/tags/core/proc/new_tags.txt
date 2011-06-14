@@ -1,3 +1,2 @@
 fails:Proc.new without a block returns a new Proc instance from the block passed to the containing method
-fails:Proc.new with an associated block calls initialize on the Proc object
 fails:Proc.new with an associated block returns a new Proc instance from the block passed to the containing method

@@ -1,4 +1,3 @@
-fails:Array#pack with format 'M' calls #to_str to coerce the directives string
 fails:Array#pack with format 'M' taints the output string if the format string is tainted
 fails:Array#pack with format 'M' does not append a soft break if the string ends with a newline
 fails:Array#pack with format 'M' encodes 0..31 except tab and newline in hex format
@@ -6,5 +5,4 @@ fails:Array#pack with format 'M' encodes a tab followed by a newline with an enc
 fails:Array#pack with format 'M' emits a soft line break when the output exceeds count characters
 fails:Array#pack with format 'M' converts the object to a String representation if #to_s does not return a String
 fails:Array#pack with format 'M' converts Floats to the minimum unique representation
-fails:Array#pack with format 'm' calls #to_str to coerce the directives string
 fails:Array#pack with format 'm' taints the output string if the format string is tainted

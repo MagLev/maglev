@@ -1,1 +1,2 @@
 fails:File.setgid? should return true when the gid bit is set
+fails:File.setgid? returns true when the gid bit is set

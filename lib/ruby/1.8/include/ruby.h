@@ -37,6 +37,9 @@
 #include <ctype.h>
 
 //  include <st_sizes.h>
+#define SIZEOF_LONG 8
+#define SIZEOF_VOIDP 8
+#define SIZEOF_OFF_T 8
 
 // Some platform specific includes
 #if defined(__WIN32__) || defined(__MINGW32__)
@@ -91,8 +94,6 @@ extern "C" {
 #else
 # define ANYARGS
 #endif
-
-// define LONG_LONG long long
 
 /** In MRI, ID represents an interned string, i.e. a Symbol. */
 typedef uintptr_t ID;
@@ -387,23 +388,33 @@ RUBY_DLLSPEC long FIX2LONG(VALUE x);
 
 RUBY_DLLSPEC unsigned long FIX2ULONG(VALUE x);
 
-static inline long rb_fix2int(VALUE v) { return FIX2LONG(v); }
+static inline int rb_fix2int(VALUE v) { return FIX2INT(v); }
 
-static inline unsigned long rb_fix2uint(VALUE v) { return FIX2ULONG(v); }
+static inline unsigned int rb_fix2uint(VALUE v) { return FIX2UINT(v); }
 
-// RUBY_DLLSPEC long long rb_num2ll(VALUE v);
-// RUBY_DLLSPEC unsigned long long rb_num2ull(VALUE v);
+static inline long rb_num2ll(VALUE v)
+{
+  return rb_num2long(v);
+}
+static inline long rb_num2ull(VALUE v)
+{
+  return rb_num2ulong(v);
+}
 
 RUBY_DLLSPEC double rb_num2dbl(VALUE v);
 RUBY_DLLSPEC long rb_big2long(VALUE v);
 
-static inline long rb_big2int(VALUE x) { return rb_big2long(x); }
+RUBY_DLLSPEC int rb_big2int(VALUE x);  // usually throws RangeError
 
 RUBY_DLLSPEC unsigned long rb_big2ulong(VALUE);
 
-static unsigned long rb_big2uint(VALUE x) { return rb_big2ulong(x); }
+RUBY_DLLSPEC unsigned int rb_big2uint(VALUE x); // usually throws RangeError
 
-// RUBY_DLLSPEC long long rb_big2ll(VALUE x);
+static inline long rb_big2ll(VALUE v)
+{
+  return rb_big2long(v);
+}
+
 RUBY_DLLSPEC double rb_big2dbl(VALUE v);
 RUBY_DLLSPEC VALUE rb_big2str(VALUE v, int radix);
 
@@ -411,10 +422,18 @@ RUBY_DLLSPEC VALUE rb_big2str(VALUE v, int radix);
 RUBY_DLLSPEC VALUE rb_int2inum(long v);
 RUBY_DLLSPEC VALUE rb_uint2inum(unsigned long v);
 
-// RUBY_DLLSPEC VALUE rb_ll2inum(long long);
-// RUBY_DLLSPEC VALUE rb_ull2inum(unsigned long long);
-// RUBY_DLLSPEC VALUE rb_int2big(long long);
-// RUBY_DLLSPEC VALUE rb_uint2big(unsigned long long);
+enum { SIZEOF_BDIGITS = 4 }; // 32bits per digit
+
+RUBY_DLLSPEC int rb_bignum_len(VALUE v); 
+  // returns the number of digits in the internal implementation
+
+#define RBIGNUM_LEN rb_bignum_len
+
+static inline VALUE rb_ll2inum(long n) { return rb_int2inum(n); }
+static inline VALUE rb_ull2inum(unsigned long n) { return rb_uint2inum(n); }
+
+static inline VALUE rb_int2big(long n) { return rb_int2inum(n); }
+static inline VALUE rb_uint2big(unsigned long n) { return rb_uint2inum(n); }
 
 RUBY_DLLSPEC VALUE rb_Integer(VALUE v); 
   // calls to_i  on v
@@ -448,8 +467,15 @@ static unsigned long NUM2ULONG(VALUE x)
     return FIXNUM_P(x) ? FIX2ULONG(x) : rb_num2ulong(x);
 }
 
-// static inline long long NUM2LL(VALUE x);
-// static inline unsigned long long NUM2ULL(VALUE x)
+static inline long NUM2LL(VALUE x)
+{
+  return NUM2LONG(x);
+}
+
+static inline unsigned long NUM2ULL(VALUE x)
+{
+  return NUM2ULONG(x);
+}
 
 /** Convert int to a Ruby Integer. */
 static inline VALUE INT2FIX(int i) { return Mag_GCI_I32_TO_OOP(i); }
@@ -474,9 +500,9 @@ static inline VALUE LONG2NUM(long v) { return rb_int2inum(v); }
 static inline VALUE ULONG2NUM(unsigned long v) { return rb_uint2inum(v); }
 
 
-// VALUE LL2NUM(long long v) ;
+static inline VALUE LL2NUM(long v) { return rb_int2inum(v); }
 
-// VALUE ULL2NUM(unsigned long long v);
+static inline VALUE ULL2NUM(unsigned long v) { return rb_uint2inum(v); }
 
 /** Convert a VALUE into a char */
 static inline char NUM2CHR(VALUE x) { return rb_num2chr(x); }
@@ -728,9 +754,21 @@ RUBY_DLLSPEC VALUE rb_str_new2(const char* str);
 
 static inline VALUE rb_str_new_cstr(const char* str) { return rb_str_new2(str); }
 
-// no taint support in Maglev
-// RUBY_DLLSPEC VALUE rb_tainted_str_new_cstr(const char*); 
-// RUBY_DLLSPEC VALUE rb_tainted_str_new(const char*, long);
+// no actual taint support in Maglev
+static inline RUBY_DLLSPEC VALUE rb_tainted_str_new_cstr(const char* str)
+{
+  return rb_str_new2(str);
+}
+
+static inline RUBY_DLLSPEC VALUE rb_tainted_str_new(const char* str, long len)
+{
+  return rb_str_new(str, len);
+}
+
+static inline RUBY_DLLSPEC VALUE rb_tainted_str_new2(const char* str)
+{
+  return rb_str_new2(str);
+}
 
 static inline VALUE rb_str_buf_new(long len )
 {
@@ -933,7 +971,7 @@ RUBY_DLLSPEC VALUE rb_Float(VALUE v);
 RUBY_DLLSPEC int rb_block_given_p();		
 
 /** Return the Proc for the implicit block */
-// RUBY_DLLSPEC VALUE rb_block_proc();  // not implemented yet
+RUBY_DLLSPEC VALUE rb_block_proc();  
 
 /** Call block with given argument(s) or raise error if no block given. */
 RUBY_DLLSPEC VALUE rb_yield(VALUE argument);

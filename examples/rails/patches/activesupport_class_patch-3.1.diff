@@ -1,0 +1,18 @@
+--- a/lib/active_support/core_ext/class/subclasses.rb
++++ b/lib/active_support/core_ext/class/subclasses.rb
+@@ -12,6 +12,15 @@ class Class #:nodoc:
+       end
+       descendants
+     end
++  rescue NotImplementedError # MagLev
++    def descendents
++      subclasses = []
++      ObjectSpace.loaded_classes do |k|
++        subclasses << k if k < self
++      end
++      subclasses.uniq!
++      subclasses
++    end
+   rescue StandardError # JRuby
+     def descendants
+       descendants = []

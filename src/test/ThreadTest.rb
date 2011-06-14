@@ -35,7 +35,7 @@ class ThrTest
     unless (x = $A) == [3,4,5];		Failed() ; end
 
     tb = Thread.new(3,4,5) { |*a| $A = a} 
-    unless (x = $A) == [[3,4,5]];		Failed() ; end
+    unless (x = $A) == [3,4,5];		Failed() ; end
 
     t = Thread.fork { $A = 78 ; Thread.stop ; $A = 68 }
     unless (x = $A) == 78 ; 			Failed() ; end

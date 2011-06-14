@@ -5,6 +5,8 @@ require 'date'
 require 'tempfile'
 
 class Stone
+  include Rake::DSL if defined? Rake::VERSION # support both Rake 0.8.7 and 0.9.2
+
   attr_accessor :username, :password
   attr_reader :name
   attr_reader :log_directory

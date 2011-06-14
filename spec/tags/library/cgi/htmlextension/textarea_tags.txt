@@ -1,0 +1,1 @@
+fails:CGI::HtmlExtension#textarea when passed name returns an 'textarea'-element with the passed name

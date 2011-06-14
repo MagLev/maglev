@@ -1,4 +1,6 @@
 class GemStoneInstallation
+  include Rake::DSL if defined? Rake::VERSION # support both Rake 0.8.7 and 0.9.2
+
   attr_reader :installation_directory, :config_directory, :installation_extent_directory, :base_log_directory, :backup_directory, :initial_extent_name
 
   @@current = nil

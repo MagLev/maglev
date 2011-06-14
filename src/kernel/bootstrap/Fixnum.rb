@@ -30,6 +30,8 @@ class Fixnum
 
   primitive '===', '_rubyEqual:'  #  === same as == for Fixnum
 
+  primitive 'between?', 'between:and:'
+
   #  /    # note division does not produce Fractions in Ruby
   #         until math.n is required, then may produce Rationals ...
   primitive_nobridge '/', '_rubyDivide:'
