@@ -1,0 +1,1 @@
+fails:String#chomp! with separator does raise an exception when no change would be done and no argument is passed in

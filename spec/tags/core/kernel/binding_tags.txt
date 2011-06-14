@@ -1,0 +1,2 @@
+fails:Kernel#binding uses the receiver of #binding as self in the binding
+fails:Kernel#binding uses the receiver of #binding as self in a Class.new block
