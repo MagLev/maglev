@@ -3,10 +3,14 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+
+== Changes for 25987 2011-06-14
 * Update rakefiles to 0.9.2: use of Rake::DSL and fix rdoc task.
 * Fixes to C extension implementation so sqlite3 C code will run.
+* adjusts topaz printing for STACK and THREAD commands.
 * Fix Trac 538, and test case Trac484b .
-* Fix Trac 915, 916, 917, 918.
+* Fix Trac 914, 915, 916, 917, 918.
+* Bugfixes in underlying GemStone 3.0 system
 
 == Changes for 25955 2011-06-09
 * Updated to RubyGems 1.8.5
