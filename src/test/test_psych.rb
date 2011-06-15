@@ -1,4 +1,4 @@
-Dir.chdir('/export/iceland1/users/otisa/gitPublic/rubyCexts/psych')
+# Dir.chdir('/export/iceland1/users/otisa/gitPublic/rubyCexts/psych')
 lp = $LOAD_PATH 
 lp.insert(0, 'lib/' )
 load 'lib/psych.rb'

@@ -1,0 +1,13 @@
+diff --git a/activesupport/lib/active_support/ordered_options.rb b/activesupport/lib/active_support/ordered_options.rb
+index 8d8e6eb..03ac6ff 100644
+--- a/lib/active_support/ordered_options.rb
++++ b/lib/active_support/ordered_options.rb
+@@ -19,7 +19,7 @@ require 'active_support/ordered_hash'
+ module ActiveSupport #:nodoc:
+   class OrderedOptions < OrderedHash
+     alias_method :_get, :[] # preserve the original #[] method
+-    protected :_get # make it protected
++#    protected :_get # make it protected
+ 
+     def []=(key, value)
+       super(key.to_sym, value)

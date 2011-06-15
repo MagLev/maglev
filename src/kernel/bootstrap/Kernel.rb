@@ -291,7 +291,7 @@ module Kernel
         return full_cmd if File.exist?(full_cmd)
       end
     end
-    return ""  # Couldn't find it on the path
+    raise Errno::ENOENT.new("No such file or directory - #{cmd}")
   end
 
   primitive '__execv*', 'execv:envVars:fdDups:args:'

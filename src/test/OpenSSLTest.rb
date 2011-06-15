@@ -108,7 +108,7 @@ test_sha1 if defined? Maglev
 test_crypto_digest
 test_basic_ruby_use_case
 test_openssl_module
-test_all_hmac_impls
+# test_all_hmac_impls
 test_random
 
 report
