@@ -213,6 +213,53 @@ If you run in debug mode, you can pause and get the Topaz prompt using
 
 Then you can continue with +continue+:
 
+==== Debugging src/kernel code
+
+Sometimes it is helpful to add debugging code in the src/kernel/* code.
+Since this is bootstrap code, you may want to turn off debugging code until
+after the bootstrap phase (since not all objects/methods are available).
+You can use the <tt>$MaglevInBootstrap</tt> global variable to test the
+bootstrap state.
+
+E.g., here we instrument Module#include to print out module inclusion:
+
+     # src/kernel/Module.rb
+     # ...
+     def include(*modules)
+       # this variant gets bridge methods
+       unless $MaglevInBootstrap
+         # puts not available during bootstrap
+         puts "======= (Module) #{self}.include(#{modules.inspect})"
+       end
+       modules.reverse.each do |a_module|
+         a_module.append_features(self)
+         a_module.included(self)
+       end
+       self
+     end
+     def include(a_module)
+       # variant needed for bootstrap
+       unless $MaglevInBootstrap
+         # puts not available during bootstrap
+         puts "======= (Module) #{self}.include(#{a_module})"
+       end
+       a_module.append_features(self)
+       a_module.included(self)
+       self
+     end
+
+We then reload primitives (to enable our debug code; rake
+maglev:reload_prims).  When we run a program:
+    ...
+    ======= (Module) Gem::Version.include(Comparable)
+    ======= (Module) Gem::Requirement.include(Comparable)
+    ======= (Module) FileUtils.include(FileUtils::StreamUtils_)
+    ======= (Module) FileUtils::Entry_.include(FileUtils::StreamUtils_)
+    ======= (Module) FileUtils::Verbose.include(FileUtils)
+    ======= (Module) FileUtils::NoWrite.include(FileUtils)
+    ======= (Module) FileUtils::DryRun.include(FileUtils)
+    ...
+
 == Topaz Overview, Documentation and Help
 
 Most of the scripts and rake tasks are based on Topaz scripts and use the

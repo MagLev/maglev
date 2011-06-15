@@ -3,6 +3,8 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+* Added $MaglevInBootstrap flag that is true during primitive install
+  (bootstrap) and nil otherwise.  Used for debugging src/kernel code.
 
 == Changes for 25987 2011-06-14
 * Update rakefiles to 0.9.2: use of Rake::DSL and fix rdoc task.
@@ -108,7 +110,7 @@
 * Updated GS/S 3.0 to Beta5+
 
 == Changes for 25633 2011-04-04
-* WebTools now is a "pure ruby" app. Basics are there, but more work is 
+* WebTools now is a "pure ruby" app. Basics are there, but more work is
   needed before it's ready. Added Ancestors pane. Added Refresh button.
 * Fixed SEGV in WebTools on Linux
 * Fix Trac 881 in Array#first
@@ -211,7 +213,7 @@
   rake maglev:input_file[src/topaz/loadSeaside.topaz]
   See src/topaz/README.rdoc
 * Fix Trac 839, 849
-* Adjust code in libcrypto.rb for new version of embedded libcrypto.so 
+* Adjust code in libcrypto.rb for new version of embedded libcrypto.so
 * Minor bugfixes in underlying GemStone 3.0 system
 
 == Changes for 25186 2011-02-04
@@ -228,7 +230,7 @@
 * Fix problem in parsing of Ruby heredocs
 * Allow unlimited size compiler heap nodes
 * add Class#__fixed_instvars to fix 832, 840
-* More changes to underlying GemStone 3.0 system, this may or may not be 
+* More changes to underlying GemStone 3.0 system, this may or may not be
   the final GS/S 3.0 Beta 3
 
 == Changes for 25127 2011-01-28
@@ -238,7 +240,7 @@
 * Some reimplementation of Exceptions
 * Many changes to underlying GemStone 3.0 system in prep for GS/S 3.0 Beta 3
   most of which should not affect MagLev users
-  
+
 == Changes for 25051 2011-01-18
 * Fix Trac 830 , problem in automatic to_proc coercion
 * Fix Trac 834 , problem in code generation for instVar access
@@ -252,7 +254,7 @@
 * Add -q option to maglev-ruby.  Using both -q and -d runs in debug, but
   w/o all the banner output at VM startup.
 * Numerous changes to underlying GemStone 3.0 system
-  
+
 == Changes for 24990 2011-01-07
 * Fix Trac 827 , problems with automatic to_proc coercion
 * Update underlying GemStone 3.0 system to Beta2
@@ -262,7 +264,7 @@
 * Pre-install bundler-1.0.7 gem.
 * Fix for Trac 825 - Exception backtrace is bogus
 * Fix that a subclass of string defining #<< messed up pure ruby gsub etc.
-* Changes in GemStone 3.0 stats 
+* Changes in GemStone 3.0 stats
 * Changes in GemStone 3.0 to improve conversion from GemStone 2.4
 * Other Bugfixes in underlying GemStone 3.0 system
 
@@ -335,9 +337,9 @@
 
 * Fix Trac 796, 798, 799, 802, 804
 * Underlying GemStone 3.0 system changes
-*   Fix Gemstone bugs 40086, 40609, 40861, 40866, 40883, 40898, 40909, 40933, 40944, 
+*   Fix Gemstone bugs 40086, 40609, 40861, 40866, 40883, 40898, 40909, 40933, 40944,
     40952, 40961, 40971, 40976, 40898, 40981, 40984, 40994, 40999, 41002, 41005
-*   Fixes to almost OutOfMemory handling in IndexManager 
+*   Fixes to almost OutOfMemory handling in IndexManager
 
 == Changes for 24407 2010-10-01
 
