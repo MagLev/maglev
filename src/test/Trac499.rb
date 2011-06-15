@@ -16,4 +16,4 @@ x3.test
 x4.test
 x5.test
 
-unless $g499 == [ 51, 52, 53, 54, 55 ] ; raise 'error'; end
+unless (ax = $g499) == [ 51, 52, 53, 54, 55 ] ; raise 'error'; end

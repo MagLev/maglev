@@ -5,6 +5,8 @@
 == Unreleased Changes
 * Added $MaglevInBootstrap flag that is true during primitive install
   (bootstrap) and nil otherwise.  Used for debugging src/kernel code.
+* Fix Trac 919. Fix failure of remove_method  with bridge chars.
+* Fix regressions in Trac 463, 484b.  Fix some deviations in language/def_spec.rb
 
 == Changes for 25987 2011-06-14
 * Update rakefiles to 0.9.2: use of Rake::DSL and fix rdoc task.
