@@ -15,6 +15,7 @@ class Object
   primitive_nobridge '__class', 'class'
 
   primitive_nobridge '__singleton_class', 'rubySingletonClass'
+  primitive_nobridge '__class_for_extend', 'rubySingletonClassForExtend'
 
   #  Reimplementation of the following special selectors is disallowed
   #  by the parser and they are optimized by code generator to special bytecodes.
@@ -384,7 +385,7 @@ class Object
           raise ArgumentError, "cannot extend a special object"
         end 
       else
-        cl = self.__singleton_class
+        cl = self.__class_for_extend
       end
       modules.each do |a_module|
         cl.__include_module(a_module)
