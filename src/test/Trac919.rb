@@ -8,4 +8,4 @@ class OrderedOptions < Hash
   alias_method :_get, :[]
   protected :_get
 end
-
+true

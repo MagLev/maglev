@@ -9,7 +9,9 @@ module SQLite3
       proxy = Class.new do
         def initialize
           @fp = FunctionProxy.new # failure to resolve FunctionProxy 
+          sx = self
         end
+        sy = self
       end
       define_aggregator(proxy.new) 
     end
@@ -22,5 +24,7 @@ end
 
 SQLite3::Database.new.create_aggregate_handler
 
-unless $px.class.equal?(SQLite3::Database::FunctionProxy); raise 'fail' ;end
+ax = $px
+bx = SQLite3::Database::FunctionProxy
+unless ax.class.equal?(bx); raise 'fail' ;end
 true

@@ -353,7 +353,12 @@ class Module
     __method_defined(name, 2)
   end
 
-  primitive_nobridge 'remove_method', 'rubyRemoveMethod:'
+  primitive_nobridge '__remove_method', 'rubyRemoveMethod:'
+
+  def remove_method(sym)
+    sym = Type.coerce_to(sym, Symbol, :to_sym)
+    self.__remove_method(sym)
+  end
 
   def __ruby_inherited(a_class)
     # do the actual send  of inherited to self, so Rails can install
