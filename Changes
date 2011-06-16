@@ -3,11 +3,14 @@
   For more details see: http://bit.ly/d3C6S1
 
 == Unreleased Changes
+
+== Changes for 26011 2011-06-15
 * Added $MaglevInBootstrap flag that is true during primitive install
   (bootstrap) and nil otherwise.  Used for debugging src/kernel code.
-* Fix Trac 919, 920. Fix remove_method  , alias, undef 
-* to handle trailing suffix chars.
+* Fix Trac 919, 920. Allow bridge chars in arg to remove_method. Fix
+  remove_method, alias, undef to handle trailing suffix chars.
 * Fix regressions in Trac 463, 484b.  Fix some deviations in language/def_spec.rb
+* Bugfixes in underlying GemStone 3.0 system
 
 == Changes for 25987 2011-06-14
 * Update rakefiles to 0.9.2: use of Rake::DSL and fix rdoc task.
