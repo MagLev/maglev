@@ -283,7 +283,7 @@ class Module
         return false
       end
     end
-    __method_defined(name, -1)
+    __method_defined(name, 0)
   end
 
   def module_eval(*args, &block_arg)
