@@ -1,15 +1,12 @@
-
-Can you run "rails new" w/o the bundle?
-
-
-
 = Notes on MagLev and Rails 3
 
 The files in this directory allow you to run the default Rails app on
-MagLev.  Currently, MagLev is able to serve static and (simple) dynamic
-pages using a patched version of Rails 3.0.x.  The <tt>Rakefile</tt>
-provides tasks to setup your MagLev environment with the correct gems,
-including the (patched) Rails Gems.
+MagLev.  MagLev serves static and dynamic pages on patched versions of
+Rails 3.0.x and 3.1.x.
+
+This document discusses installing Rails 3.1.x.  If you want to use Rails
+3.0.x, you'll have to check out an earlier version of this document on
+GitHub.
 
 == Quick Start
 
@@ -18,26 +15,17 @@ including the (patched) Rails Gems.
      $ rake maglev:start      # or: $MAGLEV_HOME/bin/maglev start
 
 2. Install Rails, patch it and install other gems and set ENVIRONMENT:
-     $ cd $MAGLEV_HOME/examples/rails
-     $ rake init
+     $ $MAGLEV_HOME/bin/gem install rails --pre
 
-3. Setup the Database.  MagLev currently supports MySQL 5, so:
-   A. Ensure mysql is running
-
-   B. Ensure <tt>myapp/config/database.yml</tt> is configured for your
-      system (user, password, socket, etc.).  Rails 3 now defaults to the
-      <tt>mysql2</tt> driver for MySQL.  MagLev only supports the older
-      +mysql+ driver, so make sure <tt>database.yml</tt> and +Gemfile+
-      specify +mysql+ and not <tt>mysql2</tt> for new projects.
-
-   C. Create the db and run migrations
-       $ cd $MAGLEV_HOME/examples/rails/myapp
-       $ $MAGLEV_HOME/bin/rake db:create
-       $ $MAGLEV_HOME/bin/rake db:migrate
+3. Setup the Database.  See bottom of file for MySQL details.
+     $ cd $MAGLEV_HOME/examples/rails/myapp
+     $ $MAGLEV_HOME/bin/rake db:create
+     $ $MAGLEV_HOME/bin/rake db:migrate
 
 4. Run the app:
      $ cd $MAGLEV_HOME/examples/rails/myapp
      $ $MAGLEV_HOME/bin/rails server
+
    Then hit http://localhost:3000/
 
 == Rails on MagLev: Status
@@ -101,37 +89,24 @@ should just work:
 
 Rails installs from gems or bundler, but needs a couple of patches.
 You can install and patch rails using the provided rake task:
-  $ cd $MAGLEV_HOME/examples/rails
-  $ rake init
+
+    $ $MAGLEV_HOME/bin/gem install rails --pre
 
 You will need to patch activesupport.  The patches directory has patches
-for rails versions 3.0.0, 3.0.3, 3.0.4
+for rails versions 3.0.0, 3.0.3, 3.0.4, 3.1.0rc4
      $ cd $MAGLEV_HOME/examples/rails
      $ rake patch:activesupport
 
 === 2. Create and configure new rails app
 
-1. Generate the application:
-     $ $MAGLEV_HOME/bin/rails new myapp --skip-bundle
+Generate the application:
+     $ $MAGLEV_HOME/bin/rails new myapp
 
-2. Edit <tt>myapp/Gemfile</tt>:
+And configure the database:
 
-   Commment out the "gem 'coffee-script'" line
-
-=== 3. Run +bundle+
-
-Run:
-  $ cd myapp
-  $ $MAGLEV_HOME/bin/bundle install
-
-=== 4. Create the database
-
-Run:
   $ $MAGLEV_HOME/bin/rake db:create
 
-You should now see your application databases defined in MySQL.
-
-=== 5. Start server
+=== 3. Start server
 
 You can start the server in a couple of ways.  The normal way to start a
 rails server is:
