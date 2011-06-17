@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* More fixes for Trac 913 . Fix some problems in printf.
+* Fix a problem in rebuild of Hash.
+
 == Changes for 26011 2011-06-15
 * Added $MaglevInBootstrap flag that is true during primitive install
   (bootstrap) and nil otherwise.  Used for debugging src/kernel code.
