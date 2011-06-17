@@ -3,29 +3,6 @@ task :default => :app
 PATCH_DIR = File.join(File.dirname(__FILE__), "patches")
 MAGLEV_HOME = ENV['MAGLEV_HOME']
 
-desc "Do one-time install of gems and patch rails gems"
-task :init => [:'bundler:install', :'patch:activesupport']
-
-desc "Run myapp, with maglev."
-task :app do
-  cd('myapp') do
-    sh "#{MAGLEV_HOME}/bin/rails server"
-  end
-end
-
-# The tasks in this namespace use Bundler to install the appropriate Rails
-# 3.0.0 gems, and the other gems needed to run rails.  They only manage
-# gems for MagLev installed in $MAGLEV_HOME.  The tasks in this namespace
-# need only be run once.
-namespace :bundler do
-  desc "Install rails 3.0.0 gems from myapp/Gemfile.lock into MagLev"
-  task :install do
-    cd('myapp') do
-      sh %{ #{MAGLEV_HOME}/bin/bundle install }
-    end
-  end
-end
-
 namespace :patch do
   desc "Patch ActiveSupport 3.0.0 gem."
   task :activesupport do
