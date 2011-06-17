@@ -4,6 +4,7 @@
 
 == Unreleased Changes
 
+* Merge Fix of Trac 921.
 * More fixes for Trac 913 . Fix some problems in printf.
 * Fix a problem in rebuild of Hash.
 
