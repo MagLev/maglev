@@ -18,5 +18,16 @@ D.new.send("foo:xx" , 99)
 
 bx = $bx
 unless bx == [ nil, 99 ] ; raise 'fail'; end
-puts mx.inspect
+unless mx == [ 'foo:xx' ] ; raise 'fail'; end
+
+class D
+  def method_missing(name, *args)
+    $cx = name
+  end
+end
+
+D.new.send('bar:foo:')
+cx = $cx
+unless cx.equal?( :'bar:foo:') ; raise 'fail'; end
 puts "ok"
+true
