@@ -4,6 +4,8 @@
 
 == Unreleased Changes
 
+* Add Rails 3.1.0rc4 support.
+* Fix Trac 922.
 * Merge Fix of Trac 921.
 * More fixes for Trac 913 . Fix some problems in printf.
 * Fix a problem in rebuild of Hash.
