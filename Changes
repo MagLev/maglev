@@ -4,6 +4,14 @@
 
 == Unreleased Changes
 
+== Changes for 26024 2011-06-21
+* Add Rails 3.1.0rc4 support.
+* Fix Trac 922.
+* Merge Fix of Trac 921.
+* More fixes for Trac 913 . Fix some problems in printf.
+* Fix a problem in rebuild of Hash.
+* Bugfixes/enhancements in underlying GemStone 3.0 system
+
 == Changes for 26011 2011-06-15
 * Added $MaglevInBootstrap flag that is true during primitive install
   (bootstrap) and nil otherwise.  Used for debugging src/kernel code.

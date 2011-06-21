@@ -562,4 +562,24 @@ values.each do |key,value|
 end
 
 test(values, { :b => "B"}, "delete allowed during iteration")
+
+# coverage for extraious nil values showing up after rebuild in the
+#  presence of dynamic instvars
+h = h = Hash.new
+h.instance_variable_set( '@aa', 'AA' )
+h.instance_variable_set( '@ac', 'AC' )
+arr = []
+100.times { |i| arr << i * 1000 ; h[i] = i * 1000 }
+vb = h.values
+
+sa = IdentitySet.with_all(vb)
+sb = IdentitySet.with_all(arr)
+unless sa == sb ; raise 'fail'; end
+vb.each { |elem| 
+  if elem.equal?(nil)
+     raise 'fail'
+  end
+}
+
+
 report
