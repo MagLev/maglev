@@ -16,9 +16,11 @@ class MSpecScript
                 "^spec/rubyspec/core/argf/seek_spec.rb",
             "^spec/rubyspec/core/basicobject",
             "^spec/rubyspec/core/fixnum/right_shift_spec.rb",
+            "^spec/rubyspec/core/enumerable/cycle_spec.rb",
             "^spec/rubyspec/core/kernel/system_spec.rb",
                 "^spec/rubyspec/core/kernel/exec_spec.rb",
                 "^spec/rubyspec/core/process/wait_spec.rb",
+                "^spec/rubyspec/core/process/detach_spec.rb",
                 "^spec/rubyspec/core/process/wait2_spec.rb",
                 "^spec/rubyspec/core/process/waitall_spec.rb",
                 "^spec/rubyspec/core/string/modulo_spec.rb",
@@ -36,6 +38,7 @@ class MSpecScript
                 "^spec/rubyspec/core/thread/run_spec.rb",
                 "^spec/rubyspec/core/thread/status_spec.rb",
                 "^spec/rubyspec/core/thread/stop_spec.rb",
+                "^spec/rubyspec/core/thread/start_spec.rb",
                 "^spec/rubyspec/core/thread/terminate_spec.rb",
                 "^spec/rubyspec/core/thread/wakeup_spec.rb"]
 
