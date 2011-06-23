@@ -1,3 +1,4 @@
 fails:String#unpack with 'U' directive returns an array by decoding self according to the format string
 fails:String#unpack with 'm' directive returns an array by decoding self according to the format string
 fails:String#unpack with 'Q' and 'q' directives pads nil when the string is short
+fails:String#unpack with 'P' directive returns a random object after consume a words worth of byte

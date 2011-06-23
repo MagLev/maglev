@@ -1,0 +1,1 @@
+fails:Thread.fork Thread.start raises a ThreadError if not passed a block

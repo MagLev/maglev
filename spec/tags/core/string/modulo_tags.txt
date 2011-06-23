@@ -1,0 +1,26 @@
+fails:String#% raises an ArgumentError for unused arguments when $DEBUG is true
+fails:String#% replaces trailing absolute argument specifier without type with percent sign
+fails:String#% allows more than one digit of position
+fails:String#% raises an ArgumentError when absolute and relative argument numbers are mixed
+fails:String#% allows positional arguments for width star and precision star arguments
+fails:String#% allows negative width to imply '-' flag
+fails:String#% ignores negative precision
+fails:String#% allows a star to take an argument number to use as the width
+fails:String#% calls to_int on width star and precision star tokens
+fails:String#% tries to convert the argument to Array by calling #to_ary
+fails:String#% always taints the result when the format string is tainted
+fails:String#% supports binary formats using %b for negative numbers
+fails:String#% calls #to_ary on argument for %c formats
+fails:String#% supports octal formats using %o for negative numbers
+fails:String#% taints result for %p when argument.inspect is tainted
+fails:String#% taints result for %s when argument is tainted
+fails:String#% raises an ArgumentError for huge precisions for %s
+fails:String#% supports hex formats using %x for negative numbers
+fails:String#% supports hex formats using %X for negative numbers
+fails:String#% behaves as if calling Kernel#Integer for %b argument, if it does not respond to #to_ary
+fails:String#% behaves as if calling Kernel#Integer for %d argument, if it does not respond to #to_ary
+fails:String#% behaves as if calling Kernel#Integer for %i argument, if it does not respond to #to_ary
+fails:String#% behaves as if calling Kernel#Integer for %o argument, if it does not respond to #to_ary
+fails:String#% behaves as if calling Kernel#Integer for %u argument, if it does not respond to #to_ary
+fails:String#% behaves as if calling Kernel#Integer for %x argument, if it does not respond to #to_ary
+fails:String#% behaves as if calling Kernel#Integer for %X argument, if it does not respond to #to_ary
