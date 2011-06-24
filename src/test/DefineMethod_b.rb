@@ -28,7 +28,7 @@ class C
   def self.ma  # ma is classmethod
     puts "In ma"
     $selfma = self
-    def cma 	# cma is instance meth
+    def cma 	# cma is instance meth   # compileIn: GsProcess currentMethDefTarget
       puts "In cma"
     end
     def self.cmaa   # cmaa is class method
@@ -59,6 +59,11 @@ class C
   end
 end
 
+cx = C
+ox = C.new
+C.ma
+ox.cma
+C.cmaa
 
 C.instance_eval do
   $selfev = self
@@ -74,6 +79,18 @@ C.instance_eval(" $ciy = self ; def cmie ; puts 'In cmie' ; end ")  # cmie is cl
 
 C.class_eval( " $ccy = self; def ccie ; puts 'In ccie' ; end ")  # ccie is instance meth
 
+ox.mb
+ox.cmb
+ox.ccmb  # ccmb is on a singleton
+# C.new.ccmb  # would get MNU
+
+C.sa
+C.sb
+C.cmi
+C.cmii
+C.cmie
+C.new.ccie
+
 cnn = Class.new do 
   $selfcnn = self
   def cdi	# cdi, cdii are instance methods of cnn
@@ -83,6 +100,10 @@ cnn = Class.new do
     end
   end
 end
+
+onn = cnn.new
+onn.cdi
+onn.cdii
 
 class D
   def dcls_new
@@ -98,6 +119,8 @@ class D
   end
 end
 
+D.new.dcls_new
+
 class E
   def maa
     puts "In maa"
@@ -109,34 +132,70 @@ class E
   end
 end
 
-cx = C
-ox = C.new
-C.ma
-ox.cma
-C.cmaa
+E.new.maa
+E.new.mbb
 
-ox.mb
-ox.cmb
-ox.ccmb  # ccmb is on a singleton
-# C.new.ccmb  # would get MNU
+class F
+  def self.defmf
+    eval( "def mf ; $fax = 9 ; end ")  # makes an instance method
+  end
+end
+F.defmf
+F.new.mf
+unless $fax == 9 ; raise 'fail'; end
 
-C.sa
-C.sb
-C.cmi
-C.cmii
-C.cmie
-C.new.ccie
-onn = cnn.new
-onn.cdi
-onn.cdii
+module M
+   def self.extend_cmd
+     eval( "def mma ; $max = 9 ; end ") # expect a module method
+   end 
+end 
+M.extend_cmd
+class CM
+  include M
+ end 
+CM.new.mma ; unless $max == 9 ; raise 'fail'; end
+
+class H
+  def initialize
+    eval("def irb_xx; puts 'In irb_xx'; self ; end ", TOPLEVEL_BINDING)
+  end
+end
+H.new # to run initialize
+isx = irb_xx()
+unless isx.equal?(self) ; raise 'fail'; end
+
+class HB
+  def initialize
+    eval("def hb_xx; puts 'In hb_xx'; self ; end ")
+    hb_xx
+  end
+end
+hb = HB.new
+hb.hb_xx()
+begin
+  Object.new.hb_xx()
+  raise 'should not find hb_xx in Object'
+rescue NoMethodError
+  # ok
+end
+ 
+# Maglev::System.session_temp_put(:Mdbg, true)
+class G
+  class << self
+    def ev_ma
+      eval "def ev_mb ; end"  # expect a classmethod
+    end
+  end
+end 
+G.ev_ma
+G.ev_mb
+
 sma = $selfma
 smb = $selfmb
 sev = $selfev
 snn = $selfcnn
 puts "ciy #{$ciy.inspect}"
 puts "ccy #{$ccy.inspect}"
-D.new.dcls_new
-E.new.maa
-E.new.mbb
+
 
 true

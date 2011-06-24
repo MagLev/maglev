@@ -1,0 +1,1 @@
+fails:Module#const_defined? special cases Object and checks it's included Modules

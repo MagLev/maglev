@@ -1,2 +1,3 @@
 fails:Thread.new raises an exception when not given a block
 fails:Thread.new creates a subclass of thread calls super with a block in initialize
+fails:Thread.new calls and respects #initialize for the block to use

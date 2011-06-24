@@ -6,15 +6,18 @@ class Binding
   def initialize( binding_context , obj, blk )
     info = Binding.__build_names( binding_context )
     @_st_staticLink = info[0]   # staticLink may be nil
-    @_st_names = info[1]
+    @_st_names = info[2]
     @_st_selfObj = obj 
     @_st_block = blk
     @_st_forModuleEval = false
     @_st_tmpsDict = nil
     @_st_homeMeth = binding_context[-1]	# for 1.8.7
+    @_st_methDefTarget = info[1]
   end
 
   def self.__basic_new(a_self)
+    # used to create instances which only capture self, and not the
+    #   the other information for a full binding.
     bnd = self.allocate
     bnd.__init(a_self)
   end
@@ -27,6 +30,7 @@ class Binding
     @_st_names = nil
     @_st_staticLink = nil
     @_st_lexicalScope = nil
+    @_st_methDefTarget = nil
     self
   end
 

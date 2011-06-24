@@ -2,3 +2,4 @@ fails:Process.getpriority takes two arguments
 fails:Process.getpriority gets the scheduling priority for a specified process
 fails:Process.getpriority gets the scheduling priority for a specified process group
 fails:Process.getpriority gets the scheduling priority for a specified user
+fails:Process.getpriority coerces arguments to Integers

@@ -28,6 +28,11 @@ namespace :spec do
     sh "#{PSPEC} tag --del fails"
   end
 
+  desc "Run the named specs and tag the failing ones"
+  task :tag, :file do |t, args|
+    sh "#{PSPEC} tag -G fails #{args.file}"
+  end
+
   def check_spec_file(f)
     raise "No spec defined with: spec=..." unless f
     raise "Can't find file #{f}" unless File.exists? f

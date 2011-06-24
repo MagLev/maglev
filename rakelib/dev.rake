@@ -21,7 +21,9 @@ namespace :dev do
 
   desc "Run the vm smoke tests"
   task :'vm-tests' => :stwrappers do
-    Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
+    # Be sure to return the pass/fail status to the shell by doing an exit.
+    # Otherwise, rake swallows the exit status
+    exit Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
   end
 
   task :'vm2-tests' do
