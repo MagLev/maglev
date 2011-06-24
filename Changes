@@ -4,6 +4,9 @@
 
 == Unreleased Changes
 
+* Fix Trac924 failures in Sinatra tests  
+* Fix failures in language/def_spec.rb 
+
 == Changes for 26024 2011-06-21
 * Add Rails 3.1.0rc4 support.
 * Fix Trac 922.
