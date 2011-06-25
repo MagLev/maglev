@@ -10,34 +10,15 @@ namespace :dev do
   end
 
   desc "Run the passing specs and the vm tests"
-  task :smoke => [ 'dev:vm-tests', 'spec:ci' ]
-
-  desc "Run the GemTests set of tests"
-  task :gemtests do
-    cd('src/test/GemTests') do
-      sh %{ rake test }
-    end
-  end
+  task :smoke => [ 'tests:vmunit', 'spec:ci' ]
 
   desc "Run the vm smoke tests"
   task :'vm-tests' => :stwrappers do
+    puts "==== WARNING: dev:vm-tests is deprecated; New way: rake tests:vmunit"
+    sleep 5
     # Be sure to return the pass/fail status to the shell by doing an exit.
     # Otherwise, rake swallows the exit status
     exit Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
-  end
-
-  task :'vm2-tests' do
-    test_dir = File.join(ENV['MAGLEV_HOME'], 'src', 'test')
-    conf_file = 'vmunit2.conf'
-    Dir.chdir(test_dir) do
-      raise "Can't find conf file: #{File.join(test_dir, conf_file)}" unless File.exist? conf_file
-      File.foreach conf_file do |line|
-        line.chomp!
-        next if line =~ /^\s*#/ || line =~ /^\s*$/
-        puts "\n======= Running #{line}"
-        sh "maglev-ruby #{line}"
-      end
-    end
   end
 
   desc "Run maglev-gem pristine on rails gems"
@@ -48,7 +29,7 @@ namespace :dev do
       echo "Patch maglev binaries shebang line...patch activesupport"
     end
   end
-  
+
   desc "Run the passing specs"
   task :'passing' do
     sh "spec/mspec/bin/mspec run -B passing.mspec"
@@ -128,14 +109,6 @@ namespace :dev do
       fl.exclude('lib/ruby/site_ruby/1.8/rubygems/defaults/*')
     end
     files.each { |fn| rm_r fn rescue nil }
-  end
-
-  desc "Clear out the old rubygems and install a new version"
-  task :'new-gems' => 'dev:clean-gems' do
-    cd('src/external/rubygems-1.3.5') do
-      sh "maglev-ruby ./setup.rb --no-rdoc --no-ri"
-    end
-    cp "/Users/pmclain/GemStone/dev/maglev-gem", "bin"
   end
 
   desc "Run topaz (use rlwrap, if available)"
