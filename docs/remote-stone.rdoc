@@ -1,0 +1,112 @@
+= Notes on setting up a Multi-Machine MagLev environment
+== Overview
+
+Even though most MagLev development is done with a single MagLev vm talking
+to a MagLev repository on the same machine, MagLev is a distributed system
+and allows MagLev VMs from multiple machines to connect to the same
+repository.  This note describes how to configure that scenario.
+
+== Synopsis
+
+=== Setup the Repository machine and start MagLev
+
+1. Ensure netldi is set properly in <tt>/etc/services</tt>
+
+   On both the stone machine and the VM machine, make sure there is a
+   proper entry in <tt>/etc/services</tt> (or the YP services database, if
+   you use that) on *all* machines, and that the entry is correct.  The
+   default entry is:
+
+     gs64ldi         50377/tcp        # Gemstone netldi
+
+2. Setup envrionment on stone machine
+
+   Assuming your $MAGLEV_HOME environment variable is correct:
+
+     $ unset GEMSTONE_NRS_ALL                  # precautionary
+     $ export GEMSTONE=$MAGLEV_HOME/gemstone
+     $ export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+
+   If you are using a non-standard netldi name/port, then:
+
+     $ export gs64ldi=<mynetldi>
+
+2. Start netldi on stone machine
+
+   Start the netldi daemon on the Repoistory machine in guest mode, to
+   allow MagLev VMs on remote machines to connect to this Repository.
+
+     $ $GEMSTONE/bin/startnetldi -g -apmclain -d ${gs64ldi:-gs64ldi}
+
+3. Start the stone
+
+     $ cd $MAGLEV_HOME
+     $ rake maglev:start
+
+=== Setup remote MagLev VM machine and start MagLev VM
+
+1. Setup envrionment on remote VM machine
+
+   Ensure the gs64ldi entry in <tt>/etc/services</tt> is the same as it is
+   on the Repository machine.
+
+     $ export GEMSTONE=$MAGLEV_HOME/gemstone
+
+   If you are using a non-standard netldi name, then:
+
+     $ export gs64ldi=<mynetldi>                # same name as on stone machine
+
+2. Setup login credentials
+
+   Make sure there is a ~/.netrc entry for the user / machine / password of
+   the stone machine.
+
+3. Start netldi on the remote VM machine:
+
+     $ unset GEMSTONE_NRS_ALL                  # precautionary
+     $ export GEMSTONE=$MAGLEV_HOME/gemstone
+     $ $GEMSTONE/bin/startnetldi ${gs65ldi:-gs64ldi}
+
+x. Start topaz
+
+     $ $GEMSTONE/bin/topaz
+     topaz> set user DataCurator pass swordfish
+     topaz> set gemstone !@10.80.20.240!maglev
+     topaz> set gemnetid !@localhost#netldi:ldipmcclain#task!gemnetobject
+     topaz> login
+     [06/27/11 13:25:38.950 PDT]
+       gci login: currSession 2 rpc gem processId 19021 OOB keep-alive interval 0
+     successful login
+     topaz 2>
+
+== Issues / Problems
+
+For further details on connecting remote machines, consult the GS64 System
+Administration Guide, especially the section "How to Set Up a Remote
+Session".
+
+=== Issues with <tt>$GEMSTONE_NRS_ALL</tt>
+
+If you are running on a heterogenous setup (e.g., Linux stone machine and
+OSX VM machine), you may run into problems with some settings for
+$GEMSTONE_NRS_ALL.  E.g., if you have:
+
+  export GEMSTONE_NRS_ALL=#dir:/Users/pmclain/GemStone/logs
+
+you may run into problems, since <tt>/Users</tt> is correct for OSX, but on
+Linux, your home directory may be <tt>/home/pmcalin</tt>.  If the setting
+for GEMSTONE_NRS_ALL is different, MagLev may complain and refuse to
+connect.
+
+* Need a nicer way than ~/.netrc to login
+* Can we synchronize the netldi ports by explict parameters on each side?
+  Or is the only way to rely on /etc/services entries to be synchronized?
+=== Need nice way to invoke a remote vm:
+
+W need a a nice <tt>--remote XXX</tt> option for <tt>maglev-ruby</tt>.
+We should be able to do something like:
+
+  $ maglev-ruby --stone foobar \
+      --host some.host.com     \
+      --netldiport 12345       \
+      my_script.rb
