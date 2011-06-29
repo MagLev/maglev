@@ -1,6 +1,6 @@
-maglev 0.9 (ruby 1.8.7) (2011-06-24 rev 26063-1288-5502a9e) 
-GEMSTONE: 3.0.1 Build: gss64_3_0_x_branch-26063
-MONTICELLO: MagLev-ao.1288.mcz
-MAGLEV: commit 5502a9eea74ba8880b0bd27b2f2c34c36c04b462
-        Merge: fdb8677 e94b192
+maglev 0.9 (ruby 1.8.7) (2011-06-28 rev 26076-1289-f95227b) 
+GEMSTONE: 3.0.1 Build: gss64_3_0_x_branch-26076
+MONTICELLO: MagLev-ao.1289.mcz
+MAGLEV: commit f95227bf55f1a6ad5fd542cd9a0768b07d08890f
         Author: Monty Williams <monty.williams@gemstone.com>
+        Date:   Tue Jun 28 17:24:35 2011 -0700
