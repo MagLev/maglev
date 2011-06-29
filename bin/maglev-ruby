@@ -63,7 +63,9 @@ MagLev Options:
                     maglevVersion Print the simple MagLev version
    --tocsz <size> Set the GEM_TEMPOBJ_CACHE_SIZE that will be used (in KB)
    --stone <name> Run programfile connecting to the named stone
-
+   --stonehost <hostname> Connect to repository on hostname
+   --netldiname <name> The name of the netldi registered in /etc/services
+                       The default is gs64ldi.  Used only if --remotehost is also specified.
 Any/all options can be set in the MAGLEV_OPTS environment variable as well
 as on the command line.  Command line options override \$MAGLEV_OPTS
 
@@ -113,6 +115,8 @@ rlwrapFlag=   # off by default
 sawDashE=
 searchPathFlag=
 quietFlag=
+netldiname="gs64ldi"
+stoneHost=
 
 # Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use parseArgsMH
 # as a substitute for MAGLEV_HOME if necessary during arg parsing
@@ -206,6 +210,14 @@ function parseArgs {
                 tocsize="-T $2"
                 shift
                 ;;
+            --stonehost)
+                stoneHost=$2
+                shift
+                ;;
+            --netldiname)
+                netldiname=$2
+                shift
+                ;;
             --stone)
                 stone=$2
                 # Don't override any existing magic ENV variables
@@ -291,11 +303,13 @@ fi
 [ -z "$STONENAME" ] && [ -z "$GEMSTONE_SYS_CONF" ] && export GEMSTONE_SYS_CONF=$MAGLEV_HOME/etc/system.conf
 
 # Make sure the stone is ready
-$GEMSTONE/bin/waitstone "$stone" -1 >/dev/null
-if [[ $? -ne 0 ]] ; then
-    echo "$COMMAND: [Error] The MagLev server \"$stone\" is not running."
-    echo "To fix this run \"rake $stone:start\" before running $COMMAND."
-    exit 1
+if [[ ! $stoneHost ]]; then
+    $GEMSTONE/bin/waitstone "$stone" -1 >/dev/null
+    if [[ $? -ne 0 ]] ; then
+        echo "$COMMAND: [Error] The MagLev server \"$stone\" is not running."
+        echo "To fix this run \"rake $stone:start\" before running $COMMAND."
+        exit 1
+    fi
 fi
 
 # If no -e params and no script, then read commands from STDIN
@@ -378,7 +392,13 @@ EOFRL
     $rlwrapFlag=
   fi
 fi
-#
+
+# Check for remote repository
+if [[ $stoneHost ]]; then
+    export gs64ldi=${netldiname}
+    stone="!@${stoneHost}!${stone}"
+fi
+
 cat - >> $dbscript <<-EOF
 set gemstone $stone
 login
@@ -435,10 +455,14 @@ else
 fi
 TOPAZ_CMD="$GEMSTONE/bin/topaz -l $tocsize $quietFlag -I $dbscript "
 
+
 # echo "GEMSTONE_GLOBAL_DIR = $GEMSTONE_GLOBAL_DIR"
 # echo "GEMSTONE_SYS_CONF = $GEMSTONE_SYS_CONF"
 # echo "GEMSTONE_EXE_CONF = $GEMSTONE_EXE_CONF"
 # echo "TOPAZ_CMD = $TOPAZ_CMD"
+# echo "rlwrapFlag: $rlwrapFlag"
+# echo "rlwrapExe: $rlwrapExe"
+
 
 if [[ $rlwrapFlag ]]; then
     $rlwrapExe $TOPAZ_CMD
