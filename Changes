@@ -6,6 +6,10 @@
 
 * Fix regression in sintra tests after Fix Trac 924
 
+== Changes for 26076 2011-06-28
+* Fix Trac 925
+* Several bugfixes/enhancements in underlying GemStone 3.0 system
+
 == Changes for 26063 2011-06-24
 * Updated version from 0.8 to 0.9 due to recent improvements
   such as Rails 3.1 support
