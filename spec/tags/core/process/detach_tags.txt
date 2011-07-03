@@ -1,3 +1,5 @@
 fails:Process#detach requires one argument
 fails:Process#detach returns a thread
 fails:Process#detach reaps the child process's status automatically
+fails:Process.detach returns a thread
+fails:Process.detach reaps the child process's status automatically
