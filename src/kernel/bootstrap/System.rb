@@ -1,49 +1,56 @@
-# Class Maglev::System is identically Smalltalk System
-#
-# == Persistent Shared Counters
-#
-# Maglev::System maintins a set of persistent shared counters.
-#
-# Persistent shared counters provide a means for multiple sessions to share
-# common integer values.  There are 128 persistent shared counters,
-# numbered from 1 to 128. The index of the first counter is 1.
-#
-# Each update to a persistent shared counter causes a roundtrip to the
-# stone process.  However reading the value of a counter is handled by the
-# gem (and its page server, if any) and does not cause a roundtrip to the
-# stone.
-#
-# Persistent shared counters are globally visible to all sessions on all
-# shared page caches.
-#
-# Persistent shared counters hold 64 bit values and may be set to any
-# signed 64 bit integer value.  No limit checks are done when incrementing
-# or decrementing a counter.  Attempts to increment/decrement the counter
-# above/below the minimum/maximum value of a signed 64-bit integer will
-# cause the counter to 'roll over'.
-#
-# Persistent shared counters are independent of database transactions.
-# Updates to counters are visible immediately and aborts have no effect on
-# them.
-#
-# The values of all persistent shared counters are written to the primary
-# database extent at checkpoint time.  Updates between checkpoints are
-# written to the transaction log by the stone.  Therefore the state of the
-# persistent shared counters is recoverable after a crash, restore from
-# backup, and restore from transaction logs.
-#
-# Persistent shared counter performance is affected by the stone
-# configuration option STN_COMMITS_ASYNC.  Setting this option to TRUE will
-# result in faster update performance because the stone will respond to
-# update requests after the tranlog write has been queued but before it
-# completes.  Operating in this mode leaves a small chance of losing data
-# should the stone or host machine crash after the tranlog write was queued
-# but before it completes.  If this value is set to FALSE, the stone will
-# only respond to update requests after the tranlog write has completed."
-#
-
 module Maglev
-  # System resolved to Smalltalk class in System1.rb
+  # Class Maglev::System is identically Smalltalk System
+  #
+  # Maglev::System provides access to many transaction and locking
+  # facilities in MagLev.  Among the facilities are:
+  # <ul>
+  #  <li>Transaction management (commit, abort etc.)</li>
+  #  <li>Persistent Shared Counters</li>
+  #  <li>Access system counters (metrics)</li>
+  #  <li>Miscellaneous other support</li>
+  # </ul>
+  #
+  # == Persistent Shared Counters
+  #
+  # Maglev::System maintins a set of persistent shared counters.
+  #
+  # Persistent shared counters provide a means for multiple sessions to
+  # share common integer values.  There are 128 persistent shared counters,
+  # numbered from 1 to 128. The index of the first counter is 1.
+  #
+  # Each update to a persistent shared counter causes a roundtrip to the
+  # stone process.  However reading the value of a counter is handled by
+  # the gem (and its page server, if any) and does not cause a roundtrip to
+  # the stone.
+  #
+  # Persistent shared counters are globally visible to all sessions on all
+  # shared page caches.
+  #
+  # Persistent shared counters hold 64 bit values and may be set to any
+  # signed 64 bit integer value.  No limit checks are done when
+  # incrementing or decrementing a counter.  Attempts to
+  # increment/decrement the counter above/below the minimum/maximum value
+  # of a signed 64-bit integer will cause the counter to 'roll over'.
+  #
+  # Persistent shared counters are independent of database transactions.
+  # Updates to counters are visible immediately and aborts have no effect
+  # on them.
+  #
+  # The values of all persistent shared counters are written to the primary
+  # database extent at checkpoint time.  Updates between checkpoints are
+  # written to the transaction log by the stone.  Therefore the state of
+  # the persistent shared counters is recoverable after a crash, restore
+  # from backup, and restore from transaction logs.
+  #
+  # Persistent shared counter performance is affected by the stone
+  # configuration option STN_COMMITS_ASYNC.  Setting this option to TRUE
+  # will result in faster update performance because the stone will respond
+  # to update requests after the tranlog write has been queued but before
+  # it completes.  Operating in this mode leaves a small chance of losing
+  # data should the stone or host machine crash after the tranlog write was
+  # queued but before it completes.  If this value is set to FALSE, the
+  # stone will only respond to update requests after the tranlog write has
+  # completed."
   class System
 
     # Transaction support
