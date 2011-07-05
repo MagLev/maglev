@@ -5,6 +5,7 @@
 == Unreleased Changes
 
 * Fix regression in sintra tests after Fix Trac 924
+* Added Locking API to Maglev::System.
 
 == Changes for 26076 2011-06-28
 * Fix Trac 925

@@ -99,6 +99,8 @@ RUBY.global('Exception',    'Exception')
     RUBY.global('ZeroDivisionError', 'ZeroDivide')
 
 
+    RUBY.global('LockError', 'LockError')
+
 
 # ----------------------------------------------------------
 #  classes related to implementation of Proc, not extendable by Ruby
