@@ -157,6 +157,7 @@ namespace :netldi do
   end
 end
 
+# Helper function used to define tasks for each named stone
 def task_gemstone(stone, action, desc=nil)
   desc "#{desc.nil? ? action.to_s : desc}"
   task action do
@@ -168,8 +169,7 @@ end
 GemStoneInstallation.current.stones.each do |server_name|
   namespace server_name do
     stone = MagLevStone.new(server_name, GemStoneInstallation.current)
-    [[:start,            "Start the \"#{server_name}\" server"],
-     [:stop,             "Stop the \"#{server_name}\" server"],
+    [[:stop,             "Stop the \"#{server_name}\" server"],
      [:restart,          "Stop then start the \"#{server_name}\" server"],
      [:status,           "Report status of the \"#{server_name}\" server"],
      [:reload,           "Destroy the \"#{server_name}\" repository then load a fresh one"],
@@ -177,6 +177,14 @@ GemStoneInstallation.current.stones.each do |server_name|
      [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
     ].each do |action,desc|
       task_gemstone(stone, action, desc)
+    end
+    desc "Start the \"#{server_name}\" server. 
+The netldiname parameter determines which netldi to use (default: ENV['gs64ldi'] || 'gs64ldi')."
+    task :start, :netldiname do |t, args|
+      netldi = args[:netldiname] || ENV['gs64ldi'] || 'gs64ldi'
+      puts "Starting stone with netldi #{netldi}"
+      ['GEMSTONE', 'GEMSTONE_GLOBAL_DIR'].each { |n| puts "#{n} => #{ENV[n]}" }
+      stone.start netldi
     end
 
     desc "Read a GemStone Topaz .gs file into server.  Does a commit."
