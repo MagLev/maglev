@@ -1,0 +1,1 @@
+fails:Time.to_s formats the time following the pattern 'EEE MMM dd HH:mm:ss Z yyyy'
