@@ -1,1 +1,4 @@
 fails:IO#ioctl raises IOError on closed stream
+fails:IO#ioctl resizes an empty String to match the output size
+fails:IO#ioctl passes data from and to a String correctly
+fails:IO#ioctl raises an Errno error when ioctl fails

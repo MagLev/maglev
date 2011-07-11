@@ -38,4 +38,11 @@ namespace :tests do
       sh "#{MAGLEV_HOME}/bin/bundle install"
     end
   end
+
+  desc "Run the sinatra gem tests under MagLev"
+  task :sinatra do
+    cd(File.join(TESTS_DIR, 'sinatra')) do
+      sh "./test.sh"
+    end
+  end
 end
