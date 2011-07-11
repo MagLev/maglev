@@ -364,7 +364,15 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     0
   end
 
-  class_primitive 'new', 'new:type:proto:'
+  class_primitive '__new', 'new:type:proto:'
+
+  def self.new(domain, type, protocol)
+    sock = self.__new(domain, type, protocol)
+    if sock._isFixnum
+      Errno.raise_errno(sock)
+    end
+    sock
+  end
 
   primitive '__peek_byte', '_peek'
   primitive_nobridge '__become', '_becomeMinimalChecks:'
