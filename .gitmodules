@@ -1,9 +1,9 @@
 [submodule "spec/mspec"]
 	path = spec/mspec
-	url = git://github.com/rubyspec/mspec.git
+	url = https://github.com/rubyspec/mspec.git
 [submodule "spec/rubyspec"]
 	path = spec/rubyspec
-	url = git://github.com/rubyspec/rubyspec.git
+	url = https://github.com/rubyspec/rubyspec.git
 [submodule "benchmark"]
 	path = benchmark
-	url = git://github.com/acangiano/ruby-benchmark-suite.git
+	url = https://github.com/acangiano/ruby-benchmark-suite.git
