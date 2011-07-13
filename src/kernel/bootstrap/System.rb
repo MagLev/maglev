@@ -1,55 +1,165 @@
-# Class Maglev::System is identically Smalltalk System
-#
-# == Persistent Shared Counters
-#
-# Maglev::System maintins a set of persistent shared counters.
-#
-# Persistent shared counters provide a means for multiple sessions to share
-# common integer values.  There are 128 persistent shared counters,
-# numbered from 1 to 128. The index of the first counter is 1.
-#
-# Each update to a persistent shared counter causes a roundtrip to the
-# stone process.  However reading the value of a counter is handled by the
-# gem (and its page server, if any) and does not cause a roundtrip to the
-# stone.
-#
-# Persistent shared counters are globally visible to all sessions on all
-# shared page caches.
-#
-# Persistent shared counters hold 64 bit values and may be set to any
-# signed 64 bit integer value.  No limit checks are done when incrementing
-# or decrementing a counter.  Attempts to increment/decrement the counter
-# above/below the minimum/maximum value of a signed 64-bit integer will
-# cause the counter to 'roll over'.
-#
-# Persistent shared counters are independent of database transactions.
-# Updates to counters are visible immediately and aborts have no effect on
-# them.
-#
-# The values of all persistent shared counters are written to the primary
-# database extent at checkpoint time.  Updates between checkpoints are
-# written to the transaction log by the stone.  Therefore the state of the
-# persistent shared counters is recoverable after a crash, restore from
-# backup, and restore from transaction logs.
-#
-# Persistent shared counter performance is affected by the stone
-# configuration option STN_COMMITS_ASYNC.  Setting this option to TRUE will
-# result in faster update performance because the stone will respond to
-# update requests after the tranlog write has been queued but before it
-# completes.  Operating in this mode leaves a small chance of losing data
-# should the stone or host machine crash after the tranlog write was queued
-# but before it completes.  If this value is set to FALSE, the stone will
-# only respond to update requests after the tranlog write has completed."
-#
-
+# -*- coding: utf-8 -*-
 module Maglev
-  # System resolved to Smalltalk class in System1.rb
+  # Class Maglev::System is identically Smalltalk System
+  #
+  # Maglev::System provides access to many transaction and locking
+  # facilities in MagLev.  Among the facilities are:
+  # <ul>
+  #  <li>Transaction management (commit, abort etc.)</li>
+  #  <li>Persistent Shared Counters</li>
+  #  <li>Object Locks</li>
+  #  <li>Access system counters (metrics)</li>
+  #  <li>Miscellaneous other support</li>
+  # </ul>
+  #
+  # == Persistent Shared Counters
+  #
+  # Maglev::System maintins a set of persistent shared counters.
+  #
+  # Persistent shared counters provide a means for multiple sessions to
+  # share common integer values.  There are 128 persistent shared counters,
+  # numbered from 1 to 128. The index of the first counter is 1.
+  #
+  # Each update to a persistent shared counter causes a roundtrip to the
+  # stone process.  However reading the value of a counter is handled by
+  # the gem (and its page server, if any) and does not cause a roundtrip to
+  # the stone.
+  #
+  # Persistent shared counters are globally visible to all sessions on all
+  # shared page caches.
+  #
+  # Persistent shared counters hold 64 bit values and may be set to any
+  # signed 64 bit integer value.  No limit checks are done when
+  # incrementing or decrementing a counter.  Attempts to
+  # increment/decrement the counter above/below the minimum/maximum value
+  # of a signed 64-bit integer will cause the counter to 'roll over'.
+  #
+  # Persistent shared counters are independent of database transactions.
+  # Updates to counters are visible immediately and aborts have no effect
+  # on them.
+  #
+  # The values of all persistent shared counters are written to the primary
+  # database extent at checkpoint time.  Updates between checkpoints are
+  # written to the transaction log by the stone.  Therefore the state of
+  # the persistent shared counters is recoverable after a crash, restore
+  # from backup, and restore from transaction logs.
+  #
+  # Persistent shared counter performance is affected by the stone
+  # configuration option STN_COMMITS_ASYNC.  Setting this option to TRUE
+  # will result in faster update performance because the stone will respond
+  # to update requests after the tranlog write has been queued but before
+  # it completes.  Operating in this mode leaves a small chance of losing
+  # data should the stone or host machine crash after the tranlog write was
+  # queued but before it completes.  If this value is set to FALSE, the
+  # stone will only respond to update requests after the tranlog write has
+  # completed."
+  #
+  # == Object Locks
+  #
+  # MagLev allows setting and releasing locks on objects.  The system
+  # supports read locks and write locks. A session may hold only one kind
+  # of lock on an object at a time.  Holding locks prevents transactions
+  # whose activities would conflict with your own from committing changes
+  # to the repository.  MagLev permits you to request any kind of lock,
+  # regardless of your transaction mode or whether you are in a
+  # transaction.
+  #
+  # If you request a lock on an object and another session already holds a
+  # conflicting lock on it, then MagLev denies your request; MagLev
+  # does not automatically wait for locks to become available.
+  #
+  # It is possible that you may never succeed in acquiring a lock, no
+  # matter how long you wait. Furthermore, because GemStone does not
+  # automatically wait for locks, it does not attempt deadlock
+  # detection. It is your responsibility to limit the attempts to acquire
+  # locks in some way.
+  #
+  # Locks work across sessions (i.e., locking an object in one VM, locks it
+  # in all VMs connected to the same repository).
+  #
+  # For more information on locks, see the GemStone Programming Guide.
+  #
+  # === Read Locks
+  #
+  # Holding a read lock on an object means that you can use the object’s
+  # value, and then commit without fear that some other transaction has
+  # committed a new value for that object during your transaction. Another
+  # way of saying this is that holding a read lock on an object guarantees
+  # that other sessions cannot
+  # * acquire a write lock on the object, or
+  # * commit if they have written the object.
+  #
+  # === Write Locks
+  #
+  # Holding a write lock on an object guarantees that you can write the
+  # object and commit. That is, it ensures that you won’t find that someone
+  # else has prevented you from committing by writing the object and
+  # committing it before you, while your transaction was in progress.
+  # Another way of looking at this is that holding a write lock on an
+  # object guarantees that other sessions cannot:
+  # * acquire either a read or write lock on the object, or
+  # * commit if they have written the object.
+  #
+  # Write locks differ from read locks in that only one session can hold a
+  # write lock on an object. In fact, if a session holds a write lock on an
+  # object, then no other session can hold any kind of lock on the
+  # object. This prevents another session from receiving the assurance
+  # implied by a read lock: that the value of the object it sees in its
+  # view will not be out of date when it attempts to commit a transaction.
+  #
+  # === Non Lockable Objects
+  #
+  # MagLev does not allow you to lock instances of +Fixnum+, +Float+,
+  # +TrueClass+, +FalseClass+ or nil (i.e., instances of Smalltalk classes
+  # +SmallInteger+, +Boolean+, +SmallDouble+ or nil). Trying to lock these
+  # special objects is meaningless.
+  #
+  # === Example
+  #
+  # In one MagLev VM, run the following code:
+  #
+  #     Maglev::System.write_lock Maglev::PERSISTENT_ROOT
+  #     puts "grabed lock...sleeping..."
+  #     sleep 10
+  #
+  #     Maglev::System.remove_locks_for_session
+  #     puts "released locks...sleeping..."
+  #     sleep 10
+  #
+  # In another MagLev VM, run the following code:
+  #
+  #     while true
+  #       begin
+  #         puts "Attempting to grab lock..."
+  #         Maglev::System.write_lock Maglev::PERSISTENT_ROOT
+  #         puts "Got the lock!"
+  #         sleep 1
+  #         Maglev::System.remove_lock Maglev::PERSISTENT_ROOT
+  #       rescue LockError
+  #         puts "Got a lock error; sleep a while"
+  #         sleep 1
+  #         redo
+  #       end
+  #     end
+  #
+  # === Not Yet Supported
+  #
+  # The underlying GemStone system supports many lock related methods, not
+  # all of them have been exposed to MagLev.  Among these features are:
+  # * Efficient locking of collections
+  # * Upgrading locks
+  # * Release Lock Sets (see "Releasing Locks Upon Aborting or Committing"
+  #   in the GemStone Programming Manual).
+  # * Inquiring about locks and lock owners.
+  # * Application Write Locks
+  #
   class System
 
     # Transaction support
     class_primitive '__commitTransaction', 'commitTransaction'
     class_primitive '__abortTransaction', 'abortTransaction'
     class_primitive '__beginTransaction', 'beginTransaction'
+
 
     # Attempts to update the persistent state of the Repository to include
     # changes made by this transaction.
@@ -104,6 +214,22 @@ module Maglev
     def self.begin_transaction
       __beginTransaction
     end
+
+
+    # Attempt to commit the transaction for the current session.
+    #
+    # This method is the same as 'commit_transaction' except for the
+    # handling of locks.  If the commit succeeds, this method releases all
+    # locks for the session and returns true.  Otherwise, it returns false
+    # and does not release locks.
+    #
+    # This method also clears the commit release locks and commit-or-abort
+    # release locks sets.  See the 'Releasing Locks' method category for
+    # more information.
+    #
+    # Returns true if commit was read-only or succeeded , false if there
+    # was a failure.
+    class_primitive 'commit_and_release_locks', 'commitAndReleaseLocks'
 
     # Raise an exception if specified temporary object is added to the
     # closure list during an attempt to commit. Useful in debugging errors
@@ -380,5 +506,41 @@ module Maglev
       raise "Session stat index must be 0..47" unless (0..47).include? index
       _decrement_session_stat(index, delta)
     end
+
+    # call-seq:
+    #   Maglev::System.read_lock an_object
+    #
+    # This method grants a read lock on <tt>an_object</tt> if no other
+    # session holds a lock on an_object, or another session already holds a
+    # read lock, but grants no lock if another session already holds a
+    # write lock to anObject.  Returns Maglev::System
+    #
+    # Raises a LockError exception if another session holds a conflicting
+    # lock.
+    class_primitive 'read_lock', 'readLock:'
+
+    # This method grants a write lock on <tt>an_object</tt> if no other
+    # session holds a lock on an_object, or another session already holds a
+    # read lock, but grants no lock if another session already holds a
+    # write lock to anObject. Returns Maglev::System
+    #
+    # Raises a LockError exception if another session holds a conflicting
+    # lock.
+    class_primitive 'write_lock', 'writeLock:'
+
+    # Removes the lock held by the current session on anObject. Returns the
+    # receiver.  (see also #commit_and_release_locks).
+    class_primitive 'remove_lock', 'removeLock:'
+
+    # Removes all locks held by this session.  Returns the receiver. This
+    # method succeeds even if the session no longer has read authorization
+    # for one or more of its locked objects.
+    class_primitive 'remove_locks_for_session', 'removeLocksForSession'
+
+    # Removes all locks held by the current session on the objects in
+    # aCollection.  If an object in aCollection is not locked by the
+    # current session, that object is ignored. Returns the receiver.
+    #
+    # class_primitive 'remove_lock_all', 'removeLockAll:'
   end
 end

@@ -50,8 +50,10 @@ class MagLevStone < Stone
     end
   end
 
-  def start
-    super
+  def start(netldiname='gs64ldi')
+    ENV['gs64ldi'] = netldiname
+    puts "=== Starting with netldiname #{netldiname}"
+    super()
     ensure_prims_loaded
   end
 

@@ -4,7 +4,13 @@
 
 == Unreleased Changes
 
+== Changes for 26148 2011-07-13
 * Fix regression in sintra tests after Fix Trac 924
+* Added Locking API to Maglev::System.
+* Numerous bugfixes/enhancements in underlying GemStone 3.0 system
+  - Performance improvement in RedoLog>>addLargeConflictObject:for:
+  - Added support for IPv6
+  - Adds -A option to startnetldi and stone config file option STN_LISTENING_ADDRESSES
 
 == Changes for 26076 2011-06-28
 * Fix Trac 925

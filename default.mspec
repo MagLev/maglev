@@ -22,6 +22,8 @@ class MSpecScript
             "^spec/rubyspec/core/argf/readline_spec.rb",          # Orpheus
             "^spec/rubyspec/core/file/stat/ftype_spec.rb",        # Orpheus
             "^spec/rubyspec/core/argf/gets_spec.rb",              # Orpheus
+            "^spec/rubyspec/core/process/waitall_spec.rb",        # Grace
+            "^spec/rubyspec/core/file/flock_spec.rb", # Grace
                 "^spec/rubyspec/core/kernel/exec_spec.rb",
                 "^spec/rubyspec/core/process/wait_spec.rb",
                 "^spec/rubyspec/core/process/detach_spec.rb",
@@ -30,7 +32,7 @@ class MSpecScript
                 "^spec/rubyspec/core/string/modulo_spec.rb",
                 "^spec/rubyspec/core/string/multiply_spec.rb",
                 "^spec/rubyspec/core/string/valid_encoding_spec.rb",
-
+                "^rubyspec/core/math", # Grace
                 "^spec/rubyspec/core/string/unpack/a_spec.rb",
                 "^spec/rubyspec/core/string/modulo_spec.rb",
 
@@ -51,13 +53,13 @@ class MSpecScript
                "^spec/rubyspec/library/net/http",
                "^spec/rubyspec/library/generator",
                "^spec/rubyspec/library/prime",
-               "^spec/rubyspec/library/socket/basicsocket/send_spec.rb",
-               "^spec/rubyspec/library/socket/tcpsocket/open_spec.rb",
-               "^spec/rubyspec/library/socket/unixserver",  # Orpheus
-               "^spec/rubyspec/library/socket/unixsocket",  # Orpheus
+               "^spec/rubyspec/library/socket",  # Orpheus, Grace
                "^spec/rubyspec/library/scanf",
+               "^spec/rubyspec/library/iconv",   # Grace
                "^spec/rubyspec/library/syslog",
                "^spec/rubyspec/library/zlib/inflate/append_spec.rb",
+               "^spec/rubyspec/library/etc", # Grace
+               "^spec/rubyspec/library/complex", # Grace
                "^spec/rubyspec/library/zlib/inflate/inflate_spec.rb"]
 
   set :files, lang_files + core_files + lib_files

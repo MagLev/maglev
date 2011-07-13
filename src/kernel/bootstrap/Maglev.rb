@@ -373,6 +373,23 @@ module Maglev
     return System.begin_transaction
   end
 
+  # Attempt to commit the transaction for the current session.
+  #
+  # This method is the same as 'commit_transaction' except for the
+  # handling of locks.  If the commit succeeds, this method releases all
+  # locks for the session and returns true.  Otherwise, it returns false
+  # and does not release locks.
+  #
+  # This method also clears the commit release locks and commit-or-abort
+  # release locks sets.  See the 'Releasing Locks' method category for
+  # more information.
+  #
+  # Returns true if commit was read-only or succeeded , false if there
+  # was a failure.
+  def commit_and_release_locks
+    return System.commit_and_release_locks
+  end
+
   # $LOADED_FEATURES has a persistent Array and a transient Array .  In
   # ruby code, $LOADED_FEATURES returns the transient Array , and
   # assignment to $LOADED_FEATURES will change the transient Array.  At VM
@@ -388,7 +405,8 @@ module Maglev
   end
 
   module_function( :commit_transaction, :abort_transaction,
-                   :begin_transaction,  :clear_persistent_LOADED_FEATURES )
+                   :begin_transaction,  :clear_persistent_LOADED_FEATURES,
+                   :commit_and_release_locks )
 
   def __system
     # following ref to Maglev::System can be bound at boot compile
