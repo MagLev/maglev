@@ -20,7 +20,7 @@ or want access to the absolute latest code. It changes more slowly than the
 github version, and it has undergone more testing.
 
 You'll need to know a version number to install.
-The MagLev Alpha version on 2011-07-13 is 26157. Check for later versions on
+The MagLev Alpha version on 2011-07-14 is 26157. Check for later versions on
 Twitter[http://twitter.com/maglev] or the {MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
 
 First, download and unzip the installer from
