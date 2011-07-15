@@ -4,7 +4,7 @@
 
 == Unreleased Changes
 
-== Changes for 26157 2011-07-14
+== Changes for 26167 2011-07-14
 * Fix regression in sintra tests after Fix Trac 924
 * Added Locking API to Maglev::System.
 * Numerous bugfixes/enhancements in underlying GemStone 3.0 system
