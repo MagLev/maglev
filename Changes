@@ -4,8 +4,8 @@
 
 == Unreleased Changes
 
-* Rework of ruby selector suffix implementation to use #N*& 
-* fixed length format.
+* Rework of ruby selector suffix implementation to use #N*& fixed length format.
+* Fix Trac 928
 
 == Changes for 26167 2011-07-14
 * Fix regression in sintra tests after Fix Trac 924
