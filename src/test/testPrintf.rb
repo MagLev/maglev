@@ -142,6 +142,8 @@ test( sprintf("%2$*3$d w %1$*4$d z", 33, 456, 4, 5), ' 456 w    33 z' , __LINE__
 test( sprintf( '  %-*s - %s' , 8 , 'abcd', 'xyz'), '  abcd     - xyz' , __LINE__ )
 test( sprintf( "    %*1$2$s  %3$s\n" , -15, "--accessor", "support discontinued"), "    --accessor       support discontinued\n" , __LINE__ )
 
+test( sprintf( "CA %*d CB %*d CC",  6 , 22 , 8, 33 ) , "CA     22 CB       33 CC" , __LINE__ )
+
 
 # This test is platform dependent.  When the float literal -3.7e45 is
 # parsed, MRI prints it and on Macs it gives the wrong answer, presumably
