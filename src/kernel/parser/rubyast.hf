@@ -985,7 +985,8 @@ class RubyParser
    return RubyNode::call((AstClassEType)my_cls, sel_new_super, *argsH, srcOfs, ps);
  }
  static omObjSType* new_undef(omObjSType *symNode, rb_parse_state *ps) {
-   return RubyNode::call((AstClassEType)my_cls, sel_new_undef, symNode, ps);
+   omObjSType *srcOfs = OOP_OF_SMALL_LONG_(ps->tokenOffset());
+   return RubyNode::call((AstClassEType)my_cls, sel_new_undef, symNode, srcOfs, ps);
  }
  static omObjSType* new_until(omObjSType *blk, omObjSType* expr, omObjSType* srcOfs,
 	rb_parse_state *ps) {

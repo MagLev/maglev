@@ -3357,7 +3357,18 @@ omObjSType* RubyArgsNode::add_arg(omObjSType **instH, omObjSType *arg, rb_parse_
       } 
       return *instH;
     }
-    return RubyNode::call(*instH, sel_add_arg, arg, ps);
+    omObjSType *res = RubyNode::call(*instH, sel_add_arg, arg, ps);
+    if (! OOP_IS_SMALL_INT(res)) {
+      rb_compile_error(ps, "illegal result in RubyArgsNode::add_arg");
+    }
+    int64 nArgs = OOP_TO_I64(res);
+    if (nArgs > GEN_MAX_RubyFixedArgs) {
+      char msg[128];
+      snprintf(msg, sizeof(msg),
+	   "more than %d formal arguments", GEN_MAX_RubyFixedArgs);
+      rb_compile_error(ps, msg);
+    }
+    return *instH;
 }
 
 omObjSType* RubyParser::node_assign(omObjSType **lhsH, omObjSType* srcOfs, omObjSType *rhs,
@@ -3520,7 +3531,7 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
     case sel_new_regexp: 	str = "new_regexp:options:"; break;
     case sel_new_string: 	str = "new_string:"; break;
     case sel_new_super: 	str = "new_super:ofs:"; break;
-    case sel_new_undef: 	str = "new_undef:"; break;
+    case sel_new_undef: 	str = "new_undef:ofs:"; break;
     case sel_new_until: 	str = "new_until:expr:ofs:"; break;
     case sel_new_vcall: 	str = "new_vcall:sel:"; break;
     case sel_new_while: 	str = "new_while:expr:ofs:"; break;

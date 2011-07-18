@@ -1413,8 +1413,9 @@ class Array
 
   def self.__pack_coerce(obj, sym)
     # sent from C code in capiprim.c
+    # sym includes the selector suffix
     begin
-      r = obj.__send__(sym)
+      r = obj.__perform__(sym, 1)
     rescue Exception
       return nil  # capiprim.c will raise TypeError
     end

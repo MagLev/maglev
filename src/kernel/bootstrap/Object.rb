@@ -97,7 +97,7 @@ class Object
     self._not # _not is a special send compiled direct to a bytecode
   end
 
-  # rubySend: methods implemented in .mcz
+  # rubySend: methods implemented in svn/image/ruby/pre_prim_methods.gs
   primitive_nobridge_env 'send',  '__rubySend', ':'
   primitive_nobridge_env 'send',  '__rubySend', ':with:'
   primitive_nobridge_env 'send',  '__rubySend', ':with:with:'
@@ -109,8 +109,8 @@ class Object
   primitive_nobridge_env 'send*', '__rubySend', ':withArgs:'
   primitive_env          'send*&' , '__rubySend', ':withArgs:block:'
 
-  #  'send:*&' , '__send__:*&' special cased in  installBridgeMethodsFor ,
-  #   to have no bridges.
+  # 'send#1*&' , '__send__#1*&' special cased in  bridgeForPrimAllowed: ,
+  #  to have bridges during bootstrap.
   #  any other   def send;...  end   gets no bridges  during bootstrap
   #  to allow reimplementation of  send  for methods updating $~ , $_
 
@@ -133,6 +133,7 @@ class Object
   #   and last arg is envId
   # __perform are used by RubyParser and FFI::StructLayout
   primitive_nobridge '__perform_se', 'with:perform:env:'
+  primitive_nobridge '__perform__', 'perform:env:'
   primitive_nobridge '__perform__se', 'with:with:perform:env:'  # IR generator allows up to 5 colon args before the * arg .
 
   # redefinition of __perform_method disallowed after bootstrap,
