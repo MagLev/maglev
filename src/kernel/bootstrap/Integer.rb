@@ -35,7 +35,7 @@ class Integer
     end
   end
 
-  def _fraised_to(arg)
+  def __fraised_to(arg)
     # handles coercion for _rubyRaisedTo:
     if arg._isInteger 
       raise TypeError , 'coercion error in ** '
@@ -92,22 +92,22 @@ class Integer
   end
 
   # following handle primitive failures of  _rubyBitOr:, etc
-  def _bit_and(arg)
+  def __bit_and(arg)
     a = Type.coerce_to(arg, Integer, :to_int) 
     self & a 
   end
  
-  def _bit_or(arg)
+  def __bit_or(arg)
     a = Type.coerce_to(arg, Integer, :to_int) 
     self | a 
   end
 
-  def _bit_xor(arg)
+  def __bit_xor(arg)
     a = Type.coerce_to(arg, Integer, :to_int) 
     self.__prim_xor( a )
   end
 
-  def _shift_left(arg)
+  def __shift_left(arg)
     a = Type.coerce_to(arg, Integer, :to_int) 
     unless a._isFixnum
       raise RangeError, 'argument must be a Fixnum'
