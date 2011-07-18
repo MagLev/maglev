@@ -330,7 +330,7 @@ class Regexp
     end
   end
 
- def __each_match(str, &block)
+  def __each_match(str, &block)
     # Private, does not store into callers $~
     idx = 0
     str_sz = str.length
@@ -353,7 +353,7 @@ class Regexp
     end
   end
 
- def __each_match_vcgl(str, vcglobals_arg, &block)
+  def __each_match_vcgl(str, vcglobals_arg, &block)
     # Private, stores into $~ specified by vcglobals_arg
     pos = 0
     while(pos < str.length)
