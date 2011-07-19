@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 #
 # Based on the Jenkins script From RKH at
 # http://ci.rkh.im/job/sinatra-maglev/
@@ -31,6 +31,7 @@ if [[ -n $WORKSPACE ]]; then
     maglev start
 fi
 
+# set +x  # May need this?
 maglev-ruby -S bundle install
 bundle exec rake -Ilib ci:setup:testunit test
 
