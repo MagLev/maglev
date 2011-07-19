@@ -7,7 +7,7 @@ PATH=$MAGLEV_HOME/bin:$PATH
 MAGLEV_OPTS=
 
 rm -rf sinatra
-git clone git://github.com/sinatra/sinatra.git
+git clone https://github.com/sinatra/sinatra.git
 
 cd sinatra
 git submodule init
