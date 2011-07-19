@@ -13,13 +13,18 @@ cd sinatra
 git submodule init
 git submodule update --init --recursive
 
+# Our corporate firewall does not let us use git: protocol.  So, we patch
+# Sinatra Gemfile to use http: rather than git:
+echo "Patching sinatra/Gemfile"
+sed -i .bak s/git:/http:/ Gemfile
+
 export rack=master
 
 # Patch the broken version of rack
 badf=$MAGLEV_HOME/lib/maglev/gems/1.8/gems/rack-1.3.0/lib/rack/session/abstract/id.rb
 if [[ -f $badf ]]; then
     echo "Patching $badf"
-    sed s/NotImpelentedError/NotImplementedError/ $badf > $badf
+    sed -i .bak s/NotImpelentedError/NotImplementedError/ $badf
 else
     echo "Could not find rack file to patch: $badf"
 fi
@@ -31,7 +36,6 @@ if [[ -n $WORKSPACE ]]; then
     maglev start
 fi
 
-# set +x  # May need this?
 maglev-ruby -S bundle install
 bundle exec rake -Ilib ci:setup:testunit test
 
