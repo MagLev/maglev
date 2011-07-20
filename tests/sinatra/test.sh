@@ -14,9 +14,10 @@ git submodule init
 git submodule update --init --recursive
 
 # Our corporate firewall does not let us use git: protocol.  So, we patch
-# Sinatra Gemfile to use http: rather than git:
+# Sinatra Gemfile to use http: rather than git:.  Also, we use perl rather
+# than sed because Solaris sed is broken (no -i).
 echo "Patching sinatra/Gemfile"
-sed -i .bak s/git:/http:/ Gemfile
+perl -pi -e s/git:/http:/ Gemfile
 
 export rack=master
 
@@ -24,7 +25,7 @@ export rack=master
 badf=$MAGLEV_HOME/lib/maglev/gems/1.8/gems/rack-1.3.0/lib/rack/session/abstract/id.rb
 if [[ -f $badf ]]; then
     echo "Patching $badf"
-    sed -i .bak s/NotImpelentedError/NotImplementedError/ $badf
+    perl -pi -e s/NotImpelentedError/NotImplementedError/ $badf
 else
     echo "Could not find rack file to patch: $badf"
 fi
