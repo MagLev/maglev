@@ -139,7 +139,7 @@ module Config
       config['LIBS']       = "-lrt -ldl -lm -lc"
       config['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
       config['CFLAGS']     = " -fPIC -g "     # -m64 should be picked up by ARCH_FLAG ?
-      config["INSTALL"]         = "install"   # Solaris doesn't support "-vp"
+      config["INSTALL"]         = "/usr/ucb/install"   # Solaris default install is too wonky"
       config["INSTALL_PROGRAM"] = "$(INSTALL)"
       config["INSTALL_SCRIPT"]  = "$(INSTALL)"
       config["INSTALL_DATA"]    = "$(INSTALL) -m 644"
