@@ -134,7 +134,7 @@ module Config
       config['ARCH_FLAG']  = ' -arch x86_64 '
       config['CC']         = env["CC"] || 'gcc '
 
-    when /x86_64_solaris/
+    when /x86_64_Solaris/i     # accept either "solaris" or "Solaris"
       config['CC']         = env["CC"] || "/opt/sunstudio12.1/bin/cc"
       config['LIBS']       = "-lrt -ldl -lm -lc"
       config['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
