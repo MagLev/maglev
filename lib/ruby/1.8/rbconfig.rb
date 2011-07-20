@@ -24,7 +24,7 @@ module Config
   transient_const_set( :TOP_DIR ) { ENV['MAGLEV_HOME'] }
 
   # DESTDIR = '' unless defined? DESTDIR
-  DESTDIR = '' 
+  DESTDIR = ''
 
   def Config::__expand(val, cfg_arg)
       (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
@@ -46,7 +46,7 @@ module Config
 
   transient_const_set( :CONFIG ) {
     env = ENV
-    maglev_home = env['MAGLEV_HOME'] 
+    maglev_home = env['MAGLEV_HOME']
     config = {}
     config['prefix']            = maglev_home
     config['exec_prefix']       = maglev_home
@@ -86,7 +86,7 @@ module Config
     config['ruby_version']      = '1.8'
     cpu_os = Exception.__cpu_os_kind
     host_os = Object.__platform_str
-    config['host_os'] = host_os 
+    config['host_os'] = host_os
     config['target_os']       = config['host_os']
     config["LN_S"]            = "ln -s"
     config["SET_MAKE"]        = ""
@@ -122,7 +122,7 @@ module Config
     config['configure_args'] = ''
 
     case host_os
-#   when /linux/        # linux is using defaults above
+#   when /linux/        # linux uses defaults above
 
     when /darwin/
       config['CFLAGS']     = ' -fPIC -DTARGET_RT_MAC_CFM=0 -fno-omit-frame-pointer -fno-strict-aliasing -fexceptions $(cflags) '
@@ -139,6 +139,10 @@ module Config
       config['LIBS']       = "-lrt -ldl -lm -lc"
       config['DLDFLAGS']   = " -L."           # -m64 should be picked up by ARCH_FLAG ?
       config['CFLAGS']     = " -fPIC -g "     # -m64 should be picked up by ARCH_FLAG ?
+      config["INSTALL"]         = "install"   # Solaris doesn't support "-vp"
+      config["INSTALL_PROGRAM"] = "$(INSTALL)"
+      config["INSTALL_SCRIPT"]  = "$(INSTALL)"
+      config["INSTALL_DATA"]    = "$(INSTALL) -m 644"
 
 #   when /HP-UX/		# not supported on Maglev yet
 #     config['DLEXT']      = 'sl'
@@ -150,10 +154,10 @@ module Config
     config
   }
 
-  transient_const_set( :MAKEFILE_CONFIG ) { 
+  transient_const_set( :MAKEFILE_CONFIG ) {
     makefile_config = {}
     CONFIG.each{|k,v| makefile_config[k] = v.dup}
-    makefile_config  
+    makefile_config
   }
 
   def Config::expand(val, cfg_arg = Config::CONFIG)
