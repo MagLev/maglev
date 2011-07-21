@@ -2,7 +2,8 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26197 2011-07-19
+== Changes for 26208 2011-07-20
+* Workaround in File#open for Solaris
 * Several bugfixes/enhancements in underlying GemStone 3.0.1 system
   - fixes infinite retry in socket connect, seen in backuptst
   - fixes 41733
@@ -12,7 +13,7 @@
 == Changes for 26197 2011-07-19
 * Rework of ruby selector suffix implementation to use #N*& fixed length format.
 * Fix Trac 928, 929
-* Fix regression in sintra tests after Fix Trac 924
+* Fix regression in Sinatra tests after Fix Trac 924
 * Added Locking API to Maglev::System.
 * Numerous bugfixes/enhancements in underlying GemStone 3.0 system
   - Performance improvement in RedoLog>>addLargeConflictObject:for:
