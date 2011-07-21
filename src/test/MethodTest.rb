@@ -40,6 +40,7 @@ end
 test(C27.new.respond_to?(:match), true, "Method protection A")
 test(C27.new.respond_to?(:foo), false,  "Method protection B")
 test(C27.new.respond_to?(:foo, true), true,  "Method protection C")
+test(nil.respond_to?(:call), false, "Trac 930 fails");
 
 report
 
