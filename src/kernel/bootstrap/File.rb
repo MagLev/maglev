@@ -396,7 +396,12 @@ class File
   end
 
   def self.open(filename, mode=MaglevUndefined, permission=MaglevUndefined, &block)
-    self.__create(filename, mode, permission, &block)
+    begin
+      self.__create(filename, mode, permission, &block)
+    rescue Errno::ENOTDIR
+      # Solaris reports wrong errono in some cases
+      raise Errno::ENOENT.new(filename)
+    end
   end
 
   def self.__create(filename, mode, permission, &block)
