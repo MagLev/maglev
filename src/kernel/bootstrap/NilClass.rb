@@ -99,11 +99,17 @@ class NilClass
   end
 
   def call(*args)
-    # invoked when yield used with no block argument
+    # invoked by SEND_CALL bytecode when yield used with no block argument
     raise LocalJumpError , 'no block was passed'
   end
 
-  private
+  def respond_to?(symbol, include_private=false)
+    # Fix Trac 930
+    if symbol._equal?(:call)
+      return false;
+    end
+    super
+  end
 
   # This prevents infinite recursion if $_ is nil and you call
   # split(...).  Now it will raise an exception
