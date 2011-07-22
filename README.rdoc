@@ -20,7 +20,7 @@ or want access to the absolute latest code. It changes more slowly than the
 github version, and it has undergone more testing.
 
 You'll need to know a version number to install.
-The MagLev Alpha version on 2011-07-21 is 26231. Check for later versions on
+The MagLev Alpha version on 2011-07-22 is 26243. Check for later versions on
 Twitter[http://twitter.com/maglev] or the {MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
 
 First, download and unzip the installer from
@@ -32,8 +32,8 @@ memory settings. It's safe to run multiple times, it won't overwrite
 things it's already done. Subsequently, use <tt>upgradeMaglev.sh</tt>. 
 It skips the checks run by <tt>installMaglev.sh</tt>. You must supply the
 version number as a parameter, <em>e.g.</em>
-  ./installMaglev.sh 26231
-  ./upgradeMaglev.sh 26231
+  ./installMaglev.sh 26243
+  ./upgradeMaglev.sh 26243
 
 The installer is somewhat verbose. That's so you can more easily debug
 installation problems.
@@ -79,7 +79,7 @@ To stop your MagLev server run <tt>rvm use maglev; maglev stop</tt>.
 
 <b>Note:</b> <tt>maglev stop</tt> will only stop the version of MagLev currently in use.
 If you're using more than one, you'll have to <tt>maglev stop</tt> each of them -- e.g.
-<tt>rvm use maglev-26231; maglev stop; rvm use maglev-head; maglev stop</tt>.
+<tt>rvm use maglev-26243; maglev stop; rvm use maglev-head; maglev stop</tt>.
 
 <b>ProTip:</b> To kill all the MagLev servers rather than shut them down gracefully, run
 <tt>ps -ef | grep /sys/stoned</tt> and kill the <tt>stoned</tt> processes that show up.

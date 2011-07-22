@@ -2,7 +2,7 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26231 2011-07-21
+== Changes for 26243 2011-07-22
 * Fix Trac 930 in irb
 * Several bugfixes/enhancements in underlying GemStone 3.1 system
 
