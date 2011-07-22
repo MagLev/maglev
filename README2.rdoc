@@ -5,9 +5,7 @@ Please see LICENSES.txt[link:files/LICENSES_txt.html] in this directory.
 == Getting started
 
 The simplest way to install and run MagLev is to use the
-installer[http://maglev-discussion.googlegroups.com/web/MagLev-installer.zip]
-available from the
-{MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion/].
+installer[http://maglev.gemstone.com/files/MagLev-installer.zip].
 This installer/updater creates a separate (sub)directory for each new version of MagLev.
 
 If you want to participate in MagLev development, or just live on the
