@@ -1,5 +1,7 @@
 # This tests basic JSON serialization using active model
 require 'rubygems'
+require 'bundler/setup'
+
 require 'minitest/unit'
 require 'active_model'
 

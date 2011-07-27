@@ -2,5 +2,6 @@
 source "http://rubygems.org"
 
 gem "minitest"
-
 gem "activemodel", "~>3.0"
+gem "rack"
+gem "rack-test", :require => "rack/test"
