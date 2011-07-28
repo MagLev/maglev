@@ -58,21 +58,26 @@ module Kernel
 
   def rand(n=0)
     limit = n.to_i.abs
+    inst = RandomInstance
     if limit._equal?(0)
-      RandomInstance.next
+      inst.__float
     else
-      RandomInstance.next(limit) - 1
+      inst.__next_int(limit) - 1
     end
   end
   module_function :rand
 
-  def srand(number=MaglevUndefined)
-    old_seed = RandomInstance.seed
-    if number._equal?(MaglevUndefined)
-      RandomInstance.next   
+  def srand(a_seed=MaglevUndefined)
+    inst = RandomInstance
+    old_seed = inst.seed
+    if old_seed._equal?(nil)
+       old_seed = inst.__integer
+    end
+    if a_seed._equal?(MaglevUndefined)
+      inst.seed(nil)
     else
-      number = Type.coerce_to(number, Fixnum, :to_int)
-      RandomInstance.seed(number)
+      a_seed = Type.coerce_to(a_seed, Fixnum, :to_int)
+      inst.seed(a_seed)
     end
     old_seed
   end
