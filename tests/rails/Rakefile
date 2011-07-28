@@ -1,0 +1,51 @@
+
+ML = ENV['MAGLEV_HOME']
+PNAME = 'test_project'
+
+desc "Install rails, create a new project, run the tests in that new project"
+task :default => [:clean,
+                  'rails:install',
+                  'rails:new',
+                  'rails:scaffold',
+                  'rails:test']
+
+task :clean do
+  rm_rf PNAME
+end
+
+namespace :rails do
+  desc "bundle install rails and patch it"
+  task :install do
+    ENV['MAGLEV_OPTS'] = ''
+    sh "#{ML}/bin/maglev-gem uninstall -I activesupport" do |ok,stat|
+      # ignore errors, we want to force an uninstall
+    end
+    sh "#{ML}/bin/bundle install"
+    cd("#{ML}/examples/rails") do
+      sh "rake patch:activesupport"
+    end
+  end
+
+  desc "Create a new rails project: #{PNAME} and bundle install its Gemfile"
+  task :new do
+    sh "#{ML}/bin/bundle exec rails new #{PNAME}"
+    cd(PNAME) do
+      sh "#{ML}/bin/bundle install"
+      sh "#{ML}/bin/rake db:migrate"
+    end
+  end
+
+  desc "Generate scaffold in the new project"
+  task :scaffold do
+    cd(PNAME) do
+      sh "#{ML}/bin/bundle exec rails generate scaffold Foo name:string a_flag:boolean size:integer"
+    end
+  end
+  
+  desc "Run the tests in newly created project"
+  task :test do
+    cd(PNAME) do
+      sh "#{ML}/bin/rake test"
+    end
+  end
+end
