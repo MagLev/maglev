@@ -4,14 +4,15 @@
 
 * Fix Trac 933, 934
 
-== Changes for 26278 2011-07-26
-* Fix Trac 930 in irb
+== Changes for 26290 2011-07-28
+* Fix Trac 930 in irb, 931, 933
 * Several bugfixes/enhancements in underlying GemStone 3.1 system
   - If GEMSTONE_SOCKET_DEBUG env var defined, then do not delete log
     files on process exit
   - create gemstone.hostid during netldid startup
   - Improvements to Smalltalk WebTools
   - more IPv6 work
+  - raise maximum size of topaz command line
 
 == Changes for 26208 2011-07-20
 * Workaround in File#open for Solaris
