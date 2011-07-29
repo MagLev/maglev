@@ -3,17 +3,23 @@
 
 class Random
   class_primitive_nobridge 'new'
-  primitive_nobridge 'next', 'nextInt:'
-  primitive_nobridge 'next'
-  primitive_nobridge '_seed', 'seed:'
+  primitive_nobridge '__float', 'float'
+  primitive_nobridge '__integer', 'integer'
+  primitive_nobridge '__next_int', 'nextInt:'
+  primitive_nobridge '__seed', 'seed:'
 
   def seed
     @_st_seed
   end
   def seed(v)
-    v = Type.coerce_to(v, Fixnum, :to_int)
-    @_st_seed = v
-    self._seed(v)
+    if v._not_equal?(nil)
+      v = Type.coerce_to(v, Fixnum, :to_int)
+      @_st_seed = v
+      self.__seed(v)
+    else
+      @_st_seed = nil
+    end
+    v
   end
      
 end

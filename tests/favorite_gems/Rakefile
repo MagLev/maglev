@@ -1,0 +1,40 @@
+# We are working around Trac934.  We can't depend on MiniTest being able to
+# indicate a failed test by inspecting the exit status of maglev-ruby.  So,
+# we have to grep stdout.  Furthermore, we're going to have a task per test
+# for a while.
+#
+# Rake::TestTask.new do |t|
+#   t.libs << 'test'
+#   # t.libs << 'lib'
+#   t.test_files = FileList['test/test_*.rb']
+# end
+
+TEST_FILES = FileList['test_*.rb']
+ML = ENV['MAGLEV_HOME']
+MBUNDLE = File.join(ML, 'bin', 'bundle')
+
+desc "Run the tests"
+task :default => [:environment, :workaround]
+
+task :environment do
+  raise "Can't find maglev home '#{ML}'" unless File.directory? ML
+  raise "Can't find maglev bundle '#{MBUNDLE}'" unless File.exist? MBUNDLE
+  rm_f 'Gemfile.lock'
+  sh "#{MBUNDLE} install"
+end
+
+task :workaround do
+  test_count = 0
+  failed_count = 0
+  TEST_FILES.each do |f|
+    begin
+      puts "== Running #{f}"
+      test_count += 1
+      sh "maglev-ruby #{f} | grep '0 failures, 0 errors, 0 skips'"
+      failed_count += 1 if $? == 1
+    rescue
+      failed_count += 1
+    end
+  end
+  puts "ran #{test_count} tests, failed: #{failed_count}"
+end

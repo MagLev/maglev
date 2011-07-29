@@ -45,4 +45,9 @@ namespace :tests do
       sh "./test.sh"
     end
   end
+
+  desc "Run tests on the examples directory"
+  task :examples do
+    sh "cd examples/sinatra ; rake test"
+  end
 end
