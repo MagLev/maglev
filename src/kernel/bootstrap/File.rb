@@ -186,10 +186,6 @@ class File
   end
 
   def self.directory?(arg)
-    unless arg._isString
-      arg = Type.coerce_to(arg, IO, :to_io)
-      return arg.stat.directory?
-    end
     stat_obj = self.__stat(arg, false)
     if (stat_obj._isFixnum)
       return false  # an error attempting to stat
