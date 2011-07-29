@@ -41,6 +41,7 @@ namespace :rails do
   task :scaffold do
     cd(PNAME) do
       sh "#{ML}/bin/bundle exec rails generate scaffold Foo name:string a_flag:boolean size:integer"
+      sh "#{ML}/bin/rake db:migrate"
     end
   end
 
