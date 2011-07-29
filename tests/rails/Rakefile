@@ -10,7 +10,9 @@ task :default => [:clean,
                   'rails:test']
 
 task :clean do
-  rm_rf PNAME
+  if File.directory?(PNAME)
+    rm_rf PNAME
+  end
 end
 
 namespace :rails do
@@ -41,11 +43,13 @@ namespace :rails do
       sh "#{ML}/bin/bundle exec rails generate scaffold Foo name:string a_flag:boolean size:integer"
     end
   end
-  
+
   desc "Run the tests in newly created project"
   task :test do
     cd(PNAME) do
-      sh "#{ML}/bin/rake test"
+      # 2011-07-29: We only run the unit tests, since the functional tests
+      # trip over https://magtrac.gemstone.com/ticket/935
+      sh "#{ML}/bin/rake test:units"
     end
   end
 end
