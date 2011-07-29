@@ -771,6 +771,9 @@ class Array
     end
     cnt = 0
     sz = self.__size
+    if sz._equal?(0)
+      return nil  # receiver is empty
+    end
     while cnt < lim
       n = 0
       enum_res = self.each { |elem|
