@@ -151,12 +151,12 @@ RUBY_ENGINE = 'maglev'
 # RUBY_PLATFORM  is installed in RubyContext>>_initTransient:
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2011-07-26'
+RUBY_RELEASE_DATE = '2011-08-02'
 RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
 RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '26278-1292-3ae7107'
+VERSION = '26313-1293-0cf8f20'
 
 MAGLEV_VERSION = VERSION  # per Trac 901
 
