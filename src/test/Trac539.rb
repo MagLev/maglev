@@ -57,6 +57,7 @@ unless xx == [19, 29, 39, 49] ; raise 'ERROR'; end
     ]
     parser = Parser.new
     option_list.each do |handler|
+      # inner block should be a copying block containing copy of   handler
       parser.on { |value| handler.call(value) }
     end
 
@@ -64,3 +65,34 @@ yy =  parser.parse!
 unless yy == [19, 29, 39, 49] ; raise 'ERROR'; end
 true
 
+class C934
+  # code from Trac 934
+  def initialize
+    @blks = [ ]
+  end
+  def save_call(&block) 
+    @blks << block
+  end
+  def test
+    trc = String.new
+    sx = nil
+    # exit_code should be in the VC, not passed via instvar of copying blocks
+    save_call {
+      trc << "aa"
+      exit_code = nil
+      save_call {
+        trc << "bb"
+        sx = exit_code
+      }
+      exit_code = 123
+    }
+    j = 0
+    while j < @blks.size
+      @blks[j].call
+      j += 1
+    end
+    unless trc == 'aabb' ; raise 'fail'; end
+    unless sx == 123 ; raise 'fail'; end
+  end
+end
+C934.new.test

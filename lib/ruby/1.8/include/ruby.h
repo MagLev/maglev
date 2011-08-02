@@ -931,6 +931,9 @@ RUBY_DLLSPEC VALUE rb_convert_type(VALUE object_handle, int type, const char* ty
 
 /** Returns object returned by invoking method on object or nil */
 RUBY_DLLSPEC VALUE rb_check_convert_type(VALUE val, int type, const char* type_name, const char* method);
+
+RUBY_DLLSPEC VALUE rb_check_to_integer(VALUE obj, const char* method);
+
 RUBY_DLLSPEC VALUE rb_check_array_type(VALUE val);
 RUBY_DLLSPEC VALUE rb_check_string_type(VALUE val);
 

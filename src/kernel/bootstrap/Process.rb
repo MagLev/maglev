@@ -46,6 +46,7 @@ module Process
   end
 
   def self.getpgid(arg)
+    arg = Type.coerce_to(arg, Fixnum, :to_int)
     r = Maglev.__system.__process_info(11, arg, nil)
     _procInfoResultCheck(r)
   end

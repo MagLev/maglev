@@ -25,6 +25,10 @@ class Thread
 
   primitive_nobridge 'alive?' , 'alive'
 
+  def self.allocate
+    raise TypeError, 'Thread.allocate not allowed'
+  end
+
   class_primitive_nobridge '__evVcGput', '_rubyEvalVcPutTilde:underscore:'
 
   class_primitive_nobridge '__stbacktrace', 'backtraceToLevel:'
@@ -163,7 +167,9 @@ class Thread
   primitive_nobridge 'exit', 'exit'
 
   def self.fork(&block)
-    self.start(*[], &block)
+    thr = self.__basic_new
+    # does not call initialize
+    thr.__start(*[], &block)
   end
 
   primitive_nobridge 'group' , 'rubyGroup'
@@ -207,12 +213,18 @@ class Thread
   class_primitive_nobridge '__basic_new', 'rubyBasicNew'
 
   def self.new(*args, &block)
-    unless block_given?
-      raise ThreadError, 'no block given'
-    end
     thr = self.__basic_new
-    thr.initialize(*args)
-    thr.__start(*args, &block)
+    thr.initialize(*args, &block)
+    blk = thr.__block
+    thr.__start(*args, &blk)
+  end
+
+  def __block
+    @_st_block
+  end
+
+  def initialize(*args, &block)
+    @_st_block = block
   end
 
   class_primitive_nobridge 'pass', 'pass'
@@ -267,7 +279,11 @@ class Thread
 
   primitive_nobridge '__start*&', 'rubyStart:block:'
 
-  class_primitive 'start*&', 'rubyStart:block:'
+  def self.start(*args, &block) 
+    thr = self.__basic_new
+    # does not call initialize
+    thr.__start(*[], &block)
+  end
 
   primitive_nobridge 'stop?', 'rubyStopped'
 

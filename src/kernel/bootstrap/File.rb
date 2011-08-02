@@ -185,8 +185,8 @@ class File
     return count
   end
 
-  def self.directory?(filename)
-    stat_obj = self.__stat(filename, false)
+  def self.directory?(arg)
+    stat_obj = self.__stat(arg, false)
     if (stat_obj._isFixnum)
       return false  # an error attempting to stat
     end
