@@ -2,10 +2,8 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-* Fix 936
-
-== Changes for 26325 2011-08-02
-* Fix Trac 930 in irb, 931, 932, 933, 934
+== Changes for 26334 2011-08-03
+* Fix Trac 930 in irb, 931, 932, 933, 934, 936
 * Several bugfixes/enhancements in underlying GemStone 3.1 system
   - If GEMSTONE_SOCKET_DEBUG env var defined, then do not delete log
     files on process exit
