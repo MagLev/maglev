@@ -3,4 +3,15 @@
 # This file will set the temporary object cache size up to
 # avoid running out of memory when installing larger gems.
 #
-/usr/bin/env maglev-ruby --tocsz 600000 -S maglev-bundle.rb $@
+# It supports being called from either ruby (e.g. using
+# maglev-ruby -S bundle) or directly through bash
+#
+# Ruby part
+test=true
+if test; then # this will evaluate to false in bash
+  exit system "maglev-ruby --tocsz 600000 -S maglev-bundle.rb #{ARGV}"
+end
+__END__
+# Bash part
+fi
+maglev-ruby --tocsz 600000 -S maglev-bundle.rb $@
