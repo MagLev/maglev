@@ -10,6 +10,13 @@ module ObjectSpace
     SystemRepository = __resolve_smalltalk_global(:SystemRepository)
   end
 
+  class ObjectSpaceArray < Array
+    def each
+      super
+      size
+    end
+  end
+
   class Finalizer  # identically smalltalk RubyFinalizer
 
     # Finalizers are not useable during bootstrap.
@@ -110,11 +117,11 @@ module ObjectSpace
     clss = class_or_module ? [class_or_module] : loaded_classes(false)
     clss = clss.sort_by {|o| o.object_id}
     clss = clss.slice(0, 2034) # VM constant, see Repository>>_listInstancesInMemory:
-    objs = Repository::SystemRepository.__list_instances_in_memory(clss)
+    objs = ObjectSpaceArray[*Repository::SystemRepository.__list_instances_in_memory(clss).flatten(1)]
     if block
-      objs.each {|instances| instances.each(&block) }
+      objs.each(&block)
     else
-      enum = Enumerable::Enumerator.new(objs.flatten(1), :each)
+      enum = Enumerable::Enumerator.new(objs, :each)
     end
   end
 
