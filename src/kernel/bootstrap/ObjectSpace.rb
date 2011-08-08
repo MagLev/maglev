@@ -6,16 +6,9 @@ module ObjectSpace
   class Repository
     class_primitive_nobridge '__loaded_classes', '_loadedClasses:'
     primitive_nobridge '__list_instances_in_memory', '_listInstancesInMemory:'
-
-    SystemRepository = __resolve_smalltalk_global(:SystemRepository)
   end
 
-  class ObjectSpaceArray < Array
-    def each
-      super
-      size
-    end
-  end
+  # class ObjectSpaceArray < Array , in ObjectSpace1.rb
 
   class Finalizer  # identically smalltalk RubyFinalizer
 
@@ -117,7 +110,7 @@ module ObjectSpace
     clss = class_or_module ? [class_or_module] : loaded_classes(false)
     clss = clss.sort_by {|o| o.object_id}
     clss = clss.slice(0, 2034) # VM constant, see Repository>>_listInstancesInMemory:
-    objs = ObjectSpaceArray[*Repository::SystemRepository.__list_instances_in_memory(clss).flatten(1)]
+    objs = ObjectSpaceArray[*SystemRepository.__list_instances_in_memory(clss).flatten(1)]
     if block
       objs.each(&block)
     else
