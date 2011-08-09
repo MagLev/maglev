@@ -20,7 +20,11 @@ class Exception
     primitive_nobridge '__signal', 'signal'
     primitive          '__description', 'description'
     primitive_nobridge '__message=', 'messageText:'
+
     primitive_nobridge '__st_initialize', 'initialize'
+    # We attempt to always call the smalltalk initialize method,
+    # but ruby subclasses may reimplement initialize and fail to call
+    # super initialize .
 
     primitive_nobridge '__basic_dup', 'shallowCopy'
 

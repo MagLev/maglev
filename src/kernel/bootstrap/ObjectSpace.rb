@@ -5,7 +5,10 @@ module ObjectSpace
 
   class Repository
     class_primitive_nobridge '__loaded_classes', '_loadedClasses:'
+    primitive_nobridge '__list_instances_in_memory', '_listInstancesInMemory:'
   end
+
+  # class ObjectSpaceArray < Array , in ObjectSpace1.rb
 
   class Finalizer  # identically smalltalk RubyFinalizer
 
@@ -103,7 +106,16 @@ module ObjectSpace
   end
 
   def each_object(class_or_module=nil, &block)
-    raise NotImplementedError, 'ObjectSpace#each_object not implemented'
+    warn 'ObjectSpace#each_object does not work properly on MagLev. Continuing'
+    clss = class_or_module ? [class_or_module] : loaded_classes(false)
+    clss = clss.sort_by {|o| o.object_id}
+    clss = clss.slice(0, 2034) # VM constant, see Repository>>_listInstancesInMemory:
+    objs = ObjectSpaceArray[*SystemRepository.__list_instances_in_memory(clss).flatten(1)]
+    if block
+      objs.each(&block)
+    else
+      enum = Enumerable::Enumerator.new(objs, :each)
+    end
   end
 
   def garbage_collect()
@@ -120,8 +132,9 @@ module ObjectSpace
     # Returns an Array of Classes 
     #  or an Array of Classes and Module which are loaded in memory.
     # does not include meta classes, meta modules, or virtual classes.
-    with_modules = include_modules ? true : false 
-    Repository.__loaded_classes(with_modules)
+    Repository.__loaded_classes(!!include_modules).select do |c|
+      c.name.include?("::") || Object.const_defined?(c.name)
+    end
   end
 
   module_function :_id2ref, :define_finalizer, :each_object, :garbage_collect, :undefine_finalizer, :loaded_classes

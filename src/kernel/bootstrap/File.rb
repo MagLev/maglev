@@ -186,6 +186,11 @@ class File
   end
 
   def self.directory?(arg)
+    unless arg._isString 
+      if arg.is_a?(IO)
+        return arg.stat.directory?
+      end
+    end
     stat_obj = self.__stat(arg, false)
     if (stat_obj._isFixnum)
       return false  # an error attempting to stat
