@@ -2,6 +2,7 @@ require 'maglev/orderedcollection'
 require 'maglev/dateandtime'
 
 ObjectLogEntry = __resolve_smalltalk_global(:ObjectLogEntry)
+DebuggerLogEntry = __resolve_smalltalk_global(:DebuggerLogEntry)
 
 # ObjectLogEntries are objects that can be inserted into a distributed,
 # persistent queue for later retrieval.  They are typically used as an aid
@@ -142,4 +143,12 @@ class ObjectLogEntry
   def to_s
     inspect
   end
+end
+
+class DebuggerLogEntry < ObjectLogEntry
+  # Creates a new continuation at this point and stores in the object log
+  class_primitive 'create_continuation_labeled', 'createContinuationLabeled:'
+
+  # access to the GsProcess
+  primitive 'continuation', 'continuation'
 end
