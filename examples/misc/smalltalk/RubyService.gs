@@ -16,7 +16,7 @@ RubyService removeAllMethods.
 RubyService class removeAllMethods.
 %
 ! ------------------- Class methods for RubyService
-category: 'as yet unclassified'
+category: 'examples'
 set compile_env: 0
 classmethod: RubyService
 example1
@@ -34,10 +34,10 @@ example1
 	msg html: 'fred@here.com'.
 	^ msg to_s
 %
-category: 'as yet unclassified'
+category: 'examples'
 set compile_env: 0
 classmethod: RubyService
-example3
+example2
 	"Demo using the C-ext rdiscount gem"
 	| ruby rd markdown html |
 	ruby := RubyService new.
@@ -49,24 +49,36 @@ example3
 	html := markdown to_html.
 	^ html
 %
-category: 'as yet unclassified'
+category: 'examples'
 set compile_env: 0
 classmethod: RubyService
-example5
-	| ruby clown face white_bg |
+example3
+	| ruby msg html fromAddress toAddress netSmtp |
 	ruby := RubyService new.
-	ruby loadGem: 'RMagick'.
+	ruby
+		require: 'rubygems';
+		require: 'mailfactory';
+		require: 'rdiscount';
+		require: 'net/smtp'.
+
+	msg := (ruby resolve: 'MailFactory') new.
+	html := ((ruby resolve: 'RDiscount') new: '## MagLev
+This message was rendered from Gemstone/S, using the Ruby C-extension RDiscount via *MagLev*.') to_html.
+	msg
+		to: (toAddress := 'fred@here.com');
+		from: (fromAddress := 'user@localhost');
+		html: html;
+		add_attachment: ((RubyEnv _getenv: 'MAGLEV_HOME'), '/README.rdoc') _: 'text/plain'.
 	
-	clown := (RubyService resolve: 'Magick::ImageList') new: 'clown.jpg'.
-	face := clown crop: 50 _: 15 _: 150 _: 165.
-	white_bg := (RubyService resolve: 'Magick::Image') new: clown columns _: clown rows.
-	clown := white_bg composite: face _: 50 _: 15 _: (RubyService resolve: 'Magick::OverCompositeOp').
-	clown write: 'crop.jpg'.
+	netSmtp := (ruby resolve: 'Net::SMTP').
+	netSmtp start: 'localhost' do: [:smtp | smtp send_message: msg to_s _: fromAddress _: toAddress].
+	^ msg to_s
 %
-category: 'as yet unclassified'
+category: 'examples'
 set compile_env: 0
 classmethod: RubyService
-example8
+example4
+	"Same as example3, but with reflective block sending"
 	| ruby msg html fromAddress toAddress netSmtp |
 	ruby := RubyService new.
 	ruby
@@ -91,19 +103,28 @@ This message was rendered from Gemstone/S, using the Ruby C-extension RDiscount 
 		withBlock: [:smtp | smtp send_message: msg to_s _: fromAddress _: toAddress].
 	^ msg to_s
 %
-category: 'as yet unclassified'
+category: 'examples'
 set compile_env: 0
 classmethod: RubyService
-example9
-	"Demo using blocks"
+example5
+	"Demo using implicit blocks"
 	| ruby envKeys |
 	ruby := RubyService new.
 	
 	envKeys := (ruby resolve: 'ENV') keys.
-	^ envKeys
-		rubyPerform: #map
-		withArguments: #()
-		withBlock: [:element | element to_sym]
+	^ envKeys map: [:element | element to_sym]
+%
+category: 'examples'
+set compile_env: 0
+classmethod: RubyService
+example6
+	"Demo using block syntax.
+	 Compare to
+	 	(1 to: 10) inject: 1 into: [:res :next | res / next]
+	"
+	| ary |
+	ary := ((RubyService new resolve: 'Range') new: 1 _: 10).
+	^ ary inject: 1 do: [:res :next | res / next]
 %
 ! ------------------- Instance methods for RubyService
 category: 'ruby-support'
