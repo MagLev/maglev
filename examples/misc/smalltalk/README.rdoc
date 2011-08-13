@@ -1,0 +1,5 @@
+= Call RubyGems from Smalltalk
+
+This directory contains GemStone/S Smalltalk code that allows RubyGems to
+be called from Smalltalk.
+
