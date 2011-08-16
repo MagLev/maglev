@@ -12,6 +12,7 @@ class OrderedCollection
   primitive 'length', 'size'
   primitive 'size', 'size'
   primitive 'size=', 'size:'
+  primitive 'delete', 'remove:'
 
   def [](index)
     _at(index + 1)
