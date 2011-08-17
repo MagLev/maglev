@@ -215,6 +215,9 @@ module Maglev
       __beginTransaction
     end
 
+    # Returns true if there are modified object in transient mode that have
+    # not been commited to the repository.
+    class_primitive 'needs_commit', 'needsCommit'
 
     # Attempt to commit the transaction for the current session.
     #
