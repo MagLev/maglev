@@ -2,8 +2,8 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26414 2011-08-12
-* Fix Trac 937, 938
+== Changes for 26432 2011-08-17
+* Fix Trac 909, 937, 938
 * Several bugfixes/enhancements in underlying GemStone 3.1 system
   - Drastically speed up restore from compressed backup
   - improvements in WebTools
