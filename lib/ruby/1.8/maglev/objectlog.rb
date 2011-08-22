@@ -4,6 +4,33 @@ require 'maglev/dateandtime'
 ObjectLogEntry = __resolve_smalltalk_global(:ObjectLogEntry)
 DebuggerLogEntry = __resolve_smalltalk_global(:DebuggerLogEntry)
 
+module ObjectLog
+  extend self
+
+  [:trace, :debug, :info, :warn, :error, :fatal].each do |m|
+    define_method(:"#{m}s") do |abort|
+      Maglev.abort_transaction if abort
+      ObjectLogEntry.object_log.to_a.select do |log_entry|
+        log_entry.priority == ObjectLogEntry.send(:"#{m}_level")
+      end
+    end
+  end
+
+  def to_a
+    ObjectLogEntry.object_log
+  end
+
+  def to_ary
+    ObjectLogEntry.object_log.to_a
+  end
+
+  def delete(entry, commit = true)
+    Maglev.abort_transaction if commit
+    ObjectLogEntry.object_log.delete(entry)
+    Maglev.commit_transaction if commit
+  end
+end
+
 # ObjectLogEntries are objects that can be inserted into a distributed,
 # persistent queue for later retrieval.  They are typically used as an aid
 # to debugging.  The size of the object log is limited by disk.
@@ -56,7 +83,6 @@ DebuggerLogEntry = __resolve_smalltalk_global(:DebuggerLogEntry)
 # * warn  3
 # * error 2
 # * fatal 1
-
 class ObjectLogEntry
   # Returns the object log: an OrderedCollection of ObjectLogEntries.  The caller
   # is expected to abort, acquire lock and commit if necessary.
