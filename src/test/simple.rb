@@ -7,6 +7,18 @@ def test(actual, expected, msg)
   register_failure(msg, expected, actual) unless (expected == actual)
 end
 
+def assert_not_nil(obj, msg)
+  puts "==== Testing: #{msg}"
+  if obj.nil?
+    register_failure(msg, 'Not Nil', nil)
+  end
+end
+
+def assert_type(obj, klass, msg="Type mismatch")
+  puts "==== Testing: #{msg}"
+  register_failure(msg, klass.name, obj.class.name) unless obj.kind_of?(klass)
+end
+
 def report
   num = $failed.size
   puts "=== Ran #{$count} tests.  Failed: #{$failed.size}"
