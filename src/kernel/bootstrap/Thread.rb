@@ -282,7 +282,7 @@ class Thread
   def self.start(*args, &block) 
     thr = self.__basic_new
     # does not call initialize
-    thr.__start(*[], &block)
+    thr.__start(*args, &block)
   end
 
   primitive_nobridge 'stop?', 'rubyStopped'
