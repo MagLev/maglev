@@ -12,14 +12,14 @@ namespace :dev do
   desc "Run the passing specs and the vm tests"
   task :smoke => [ 'tests:vmunit', 'spec:ci' ]
 
-  desc "Run the vm smoke tests"
-  task :'vm-tests' => :stwrappers do
-    puts "==== WARNING: dev:vm-tests is deprecated; New way: rake tests:vmunit"
-    sleep 5
-    # Be sure to return the pass/fail status to the shell by doing an exit.
-    # Otherwise, rake swallows the exit status
-    exit Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
-  end
+  # desc "Run the vm smoke tests"
+  # task :'vm-tests' => :stwrappers do
+  #   puts "==== WARNING: dev:vm-tests is deprecated; New way: rake tests:vmunit"
+  #   sleep 5
+  #   # Be sure to return the pass/fail status to the shell by doing an exit.
+  #   # Otherwise, rake swallows the exit status
+  #   exit Stone.new(ENV['STONENAME'] || 'maglev').run_string("run\nRubyContext _runVmUnit\n%")
+  # end
 
   desc "Run maglev-gem pristine on rails gems"
   task :pristinerails do
