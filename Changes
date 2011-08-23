@@ -2,6 +2,10 @@
 
   For more details see: http://bit.ly/d3C6S1
 
+== Unreleased Changes
+* Moved maglev libraries out of lib/ruby/site_ruby/1.8/maglev into lib/ruby/1.8/maglev.
+* Removed outdated doc files; updated others.
+
 == Changes for 26496 2011-08-22
 * Fix Trac 909, 937, 938
 * Added minimalist RCHash
