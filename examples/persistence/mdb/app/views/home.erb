@@ -1,8 +1,0 @@
-<h3>Welcome to a simple blog</h3>
-<ul>
-<% @posts.each do |post| %>
-  <li>
-    <%= post.timestamp.strftime("%Y-%m-%d") %>: <a href="/posts/<%= post.id %>"> <%= post.title %></a>
-  </li>
-<% end %>
-</ul>

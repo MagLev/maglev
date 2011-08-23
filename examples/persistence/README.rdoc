@@ -12,14 +12,6 @@ as a GUI to display the closest zip codes to a given location
 selected on the map (a two-dimensional problem, since we must 
 find the nearest latitude-longitude pairs for a given position).
 
-== MDB
-
-The mdb[link:files/examples/persistence/mdb/README_rdoc.html] directory
-contains experimental code to wrap MagLev as a NoSQL Server (MagLevDB, AKA
-MDB), and make it available to other applications.  The sample app can be
-run from MRI, and will connect to the MagLev VM running the MDB server code
-using HTTP.
-
 == GStore
 
 The gstore[link:files/examples/persistence/gstore/README_rdoc.html]
