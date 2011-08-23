@@ -1,9 +1,0 @@
-desc "Run the demo script"
-task :default do
-  # Some users may need to set MYSQL_UNIX_PORT to point to the socket,
-  # if you get errors about /tmp/mysql.sock
-  #
-  #   ENV['MYSQL_UNIX_PORT'] = '/opt/local/var/run/mysql5/mysqld.sock'
-
-  sh 'maglev-ruby -rubygems mysql.rb'
-end

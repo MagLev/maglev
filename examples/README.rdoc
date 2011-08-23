@@ -3,7 +3,6 @@
 This directory contains examples using MagLev for various things.
 The examples are:
 
-* MySQL[link:files/examples/mysql/README_rdoc.html]
 * {MagLev Persistence}[link:files/examples/persistence/README_rdoc.html]
 * {Using Rack with MagLev}[link:files/examples/rack/README_rdoc.html]
 * {Rails on MagLev}[link:files/examples/rails/README_rdoc.html]
