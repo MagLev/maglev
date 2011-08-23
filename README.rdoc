@@ -1,153 +1,114 @@
-== MagLev Alpha
+= MagLev Alpha
 
-=== Minimum Requirements
+== Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.
 * 64-bit Linux, Mac OS X, or Solaris X86 operating system
 * a version of ruby and rake to use during installation
 * root access so you can increase default shared memory settings (only during initial install)
 
-== Getting started
+== Install MagLev
+There are three ways to install MagLev:
+* Use the installer
+* Install with Ruby Version Manager (RVM)
+* Install from GitHub
 
-Create a MagLev directory. Its name doesn't matter. Put the installer or git clone there.
-It needs to be writable, as files are put there by installations and updates. If you 
-install using RVM (http://rvm.beginrescueend.com), it will use ~/.rvm or the rvm_path
-specified in your .rvmrc.
+=== Use the installer
 
-=== Installing the zipped version
-
-We recommend this version unless you want to participate in MagLev development
-or want access to the absolute latest code. It changes more slowly than the
-github version, and it has undergone more testing.
+We recommend this version unless you want to participate in MagLev
+development or want access to the absolute latest code. This version
+changes more slowly than the github version, and it has undergone more
+testing.
 
 You'll need to know a version number to install.
-The MagLev Alpha version on 2011-08-22 is 26496. Check for later versions on
-Twitter[http://twitter.com/maglev] or the {MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
+The MagLev Alpha version on 2011-07-19 is <b>26436</b>.
+Check for later versions on
+Twitter[http://twitter.com/maglev] or the
+{MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
 
-First, download and unzip the installer from
-http://maglev.gemstone.com/files/MagLev-installer.zip
+1. Select a directory to put MagLev in. Its name doesn't matter.
+1. Download and unzip
+   {MagLev-installer.zip}[http://maglev.gemstone.com/files/MagLev-installer.zip]
+   into the directory you've selected.
+1. If this is the first time you're installing MagLev, run:
+     ./installMaglev.sh 26436
+   If you've already run <tt>installMaglev.sh</tt> on the machine, then you
+   can use the upgrade script:
+     ./upgradeMaglev.sh 26436
 
-The first time you install MagLev use <tt>installMaglev.sh</tt>. It
-checks that your hardware will run MagLev, and sets appropriate shared
-memory settings. It's safe to run multiple times, it won't overwrite
-things it's already done. Subsequently, use <tt>upgradeMaglev.sh</tt>. 
-It skips the checks run by <tt>installMaglev.sh</tt>. You must supply the
-version number as a parameter, <em>e.g.</em>
-  ./installMaglev.sh 26496
-  ./upgradeMaglev.sh 26496
+   <tt>installMaglev.sh</tt> runs one-time machine checks and configuration
+   that ensure your hardware will run MagLev.  These mostly relate to
+   shared memory settings. It's safe to run multiple times and it won't
+   overwrite things it's already done.  <tt>upgradeMaglev.sh</tt> does not
+   perform these checks.  Both scripts accept a version number as a
+   parameter.
 
 The installer is somewhat verbose. That's so you can more easily debug
 installation problems.
 
-Note: This installer/updater creates a separate (sub)directory for
-each new version of MagLev. Reverting to an older version is as simple as
-stopping MagLev, changing $MAGLEV_HOME to point to the prior version, and restarting.
+Note: This installer/updater creates a separate directory for each new
+version of MagLev. Reverting to an older version is as simple as stopping
+MagLev, changing <tt>$MAGLEV_HOME</tt> to point to the prior version, and
+restarting.
 
-=== Installing from the github repository
+=== Install with Ruby Version Manager (RVM)
 
-This version is best for MagLev contributors and for developers who 
-want to live on the bleeding edge or use git functionality. It can be less stable
+{RVM}[http://rvm.beginrescueend.com] is useful if you want to compare
+behavior of various Ruby implementations or versions of MagLev.  Install
+using:
+  rvm install maglev
+
+See the {rvm home page}[http://rvm.beginrescueend.com] for details of using
+RVM.
+
+RVM will automatically start a MagLev server when you <tt>rvm use
+maglev</tt>.  That server is left running if you <tt>rvm use
+any_other_Ruby</tt>.
+
+To stop your MagLev server:
+  rvm use maglev
+  maglev stop
+
+<b>Note:</b> <tt>maglev stop</tt> will only stop the version of MagLev currently in use.
+If you're using more than one, you'll have to <tt>maglev stop</tt> each of them -- e.g.
+  rvm use maglev-26204
+  maglev stop
+  rvm use maglev-head
+  maglev stop
+
+<b>ProTip:</b> To kill all the MagLev servers rather than shut them down gracefully, run
+<tt>ps -ef | grep /sys/stoned</tt> and kill the <tt>stoned</tt> processes that show up.
+It takes a short time before they shut down, as they do a bit of cleanup first.
+
+<b>Note:</b> When running rake from MagLev, you cannot perform tasks which affect
+MagLev itself, like <tt>rake maglev:stop</tt>. You have to use the <tt>bin/maglev</tt>
+shell script instead.
+
+=== Install from GitHub
+
+This version is best for MagLev contributors and for developers who want to
+live on the bleeding edge or use git functionality. It can be less stable
 than the zipped version.
 
-First, clone the MagLev github repository, <em>i.e.</em> 
-  git clone git://github.com/MagLev/maglev.git 
-and cd to the resulting directory.
+1. Clone the MagLev github repository
+     git clone git://github.com/MagLev/maglev.git
+1. Install the VM.  If this is the first time you're installing MagLev,
+   run:
+     ./installMaglev.sh
+   If you've already run <tt>installMaglev.sh</tt> on the machine, then you
+   can use the upgrade script:
+     ./upgradeMaglev.sh
 
 To use MagLev, you need to run <tt>install.sh</tt> at least once.  After
-that, everytime you do a 'git pull' you need to run <tt>update.sh</tt>
-to ensure you have the corresponding GemStone 3.x binaries. Otherwise,
-you might get version skew that prevents MagLev from running correctly.
-I'll tweet about any 'git only' updates, but if you're more than one update
-behind you still might need to run <tt>update.sh</tt>.
-You don't need to know a version number to install. The installer/updater
-figures that out from the version.txt file.
+that, everytime you <tt>git pull</tt>, you need to run <tt>update.sh</tt>
+to ensure you have the corresponding GemStone 3.x binaries. Otherwise, you
+might get version skew that prevents MagLev from running correctly.  I'll
+tweet about any 'git only' updates, but if you're more than one update
+behind you still might need to run <tt>update.sh</tt>.  You don't need to
+know a version number to install. The installer/updater figures that out
+from the version.txt file.
 
 You'll have all the functionality of git, but unless you create a new
 clone for each release, you may be unable to revert to an earlier version.
 Why? The install/upgrade script creates a new copy of the MagLev data
 repository including persistent kernel code. The scripts make one level of
 backup, but we won't be providing migration scripts during Alpha.
-
-=== Installing under RVM
-
-RVM is useful if you want to compare behavior of various Ruby implementations
-or versions of MagLev.  Install using <tt>rvm install maglev</tt>. 
-See http://rvm.beginrescueend.com for details of using RVM. 
-
-RVM will automatically start a MagLev server when you <tt>rvm use maglev</tt>. 
-That server is left running if you <tt>rvm use any_other_Ruby</tt>.
-To stop your MagLev server run <tt>rvm use maglev; maglev stop</tt>.
-
-<b>Note:</b> <tt>maglev stop</tt> will only stop the version of MagLev currently in use.
-If you're using more than one, you'll have to <tt>maglev stop</tt> each of them -- e.g.
-<tt>rvm use maglev-26496; maglev stop; rvm use maglev-head; maglev stop</tt>.
-
-<b>ProTip:</b> To kill all the MagLev servers rather than shut them down gracefully, run
-<tt>ps -ef | grep /sys/stoned</tt> and kill the <tt>stoned</tt> processes that show up.
-It takes a short time before they shut down, as they do a bit of cleanup first.
-
-<b>Note:</b> When running rake from MagLev, you cannot perform tasks which affect 
-MagLev itself, like <tt>rake maglev:stop</tt>. You have to use the <tt>bin/maglev</tt>
-shell script instead.
-
-== Running MagLev
-
-Start the server by either running <tt>rake maglev:start</tt> from within your $MAGLEV_HOME directory tree, or running <tt>maglev start</tt> (which counts on $MAGLEV_HOME being set and $MAGLEV_HOME/bin being in your $PATH. If you have RVM installed, you can run <tt>rvm use maglev</tt>.
-
-Useful commands include <tt>maglev-irb</tt>, <tt>maglev-ruby</tt>, and <tt>maglev-gem</tt>. MagLev code is in <tt>src</tt>, examples are in <tt>examples</tt>, some docs are in <tt>html</tt>. You'll find a few README files, too. 
-
-Stop the server by running <tt>rake maglev:stop</tt> or <tt>maglev stop</tt>.
-
-== Tips and troubleshooting
-
-* rake needs to be in your PATH. It's needed to install and to bootstrap MagLev.
-  You shouldn't install the rake gem into MagLev -- it won't work.
-
-* You need to start MagLev before running "maglev-ruby", "maglev-gem", or "maglev-irb". Either
-  "rake maglev:start" or "maglev start" will do that. While not strictly required it's better to
-  stop MagLev before turning off your machine. i.e. "rake maglev:stop" or "maglev stop".
-
-* If you get this error when running maglev:start:
-    rake aborted!
-    Don't know how to build task 'maglev:start'
-  it indicates rake wasn't found during installation and so important
-  steps were skipped. You can re-run the installer, or try this:
-    rake stone:create[maglev]
-
-* if you get an error starting maglev-irb, try "maglev-irb -f". It's likely
-  something in your .irbrc is breaking maglev-irb.
-
-* RubyGems 1.3.5 is preinstalled. The command to use it is "maglev-gem". For
-  example: "maglev-gem install sinatra" will install both Sinatra and Rack
-  into MagLev. Gems that use C extensions won't work. Many other gems may 
-  install, but not work correctly at this time. :-(
-
-* If you get an error like this when running "maglev-gem":
-    line 8: require: command not found 
-  it indicates your system thinks "maglev-gem" is a shell script.
-  The first line of "maglev-gem" should be:
-    #!/usr/bin/env maglev-ruby
-  If it's not, either reinstall MagLev or correct the first line of
-  bin/maglev-gem
-
-* If you get a "NoMethodError" such as the following:
-        Coercion error: nil.to_str => String failed:
-    (NoMethodError: undefined method `to_str' for )
-  It will help us debug it if you send a stack trace. 
-  Setting "-d" in the environment variable MAGLEV_OPTS should leave you
-  at a topaz prompt when you hit the error. Then execute the following
-  sequence of commands. Be aware you may see a lot of output, which will
-  also wind up in the file "stack.out"
-    output push stack.out
-    where
-    stack
-    output pop
-  Other useful MAGLEV_OPTS switches include "traceload", i.e.:
-    export MAGLEV_OPTS="-d -MtraceLoad"
-  for more info on MAGLEV_OPTS type "maglev-ruby -h"
-
-* MagLev has {ACID transactions}[http://en.wikipedia.org/wiki/ACID].
-  To share persistent objects between two running
-  VM's you need to make use of <tt>Maglev.commit_transaction</tt> and
-  <tt>Maglev.abort_transaction</tt>.
-  Read the persistence-api docs for more info.
-
