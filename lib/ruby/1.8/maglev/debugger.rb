@@ -122,6 +122,12 @@ module Maglev::Debugger
     def []=(key, value)
       @thread[key] = value
     end
+
+    def to_hash
+      { :label => label,
+        :process_id => thread.object_id,
+        :timestamp => timestamp }
+    end
   end
 
   class ObjectLogError < Process
@@ -197,6 +203,16 @@ module Maglev::Debugger
             :source => ary[8],
             :context => context }
         end
+    end
+
+    def to_hash
+      { :method_name => @method_name,
+        :class => @class,
+        :index => @index,
+        :defining_class => @defining_class,
+        :source_location => @source_location,
+        :block_nesting => @block_nesting,
+        :debug_info => @debug_info }
     end
   end
 end
