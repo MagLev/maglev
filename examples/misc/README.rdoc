@@ -2,10 +2,13 @@
 
 This directory contains miscellaneous demos.
 
-
 == WebTools
 
 This demo runs a very simple web application that allows you to browse the
 Smalltalk code in the VM, and to examine statistics of various processes
 connected to a repository.
 
+== Smalltalk
+
+A demonstration of calling RubyGems from Smalltalk. This demo was presented
+at Esug[http://www.esug.org/wiki/pier/Conferences/2011].
