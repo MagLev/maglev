@@ -1,4 +1,4 @@
-= MagLev KD Tree Example
+= MagLev KD-Tree Example
 
 == Overview
 
@@ -12,20 +12,16 @@ with a latitude and longitude.
 
 The demo.rb file is a Sinatra application that allows you to enter a
 latitude and longitude (preferably, within the US, if you're using the US
-Postal Database), and will find the nearest K zip codes to the lat/lon.  
+Postal Database), and will find the nearest K zip codes to the lat/lon.
 
-Prerequisite: You must have the json_pure gem installed:
+Prerequisite: Install RubyGems:
 
-  $ maglev-gem install json_pure
+  $ $MAGLEV_HOME/bin/bundle install
 
 1. Make sure the maglev server has been started:
 
   $ cd $MAGLEV_HOME
   $ rake maglev:start
-
-2. Make sure Sinatra has been installed:
-
-  $ maglev-gem install sinatra
 
 2. Run the app:
 
