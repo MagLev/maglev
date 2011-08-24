@@ -27,6 +27,6 @@ changed since then, and this example shows the new approach.
 
 == Indexing
 
-The indexing[link:examples/persistence/indexing/README_rdoc.html]
+The indexing[link:examples/persistence/indexing/Indexing-README_rdoc.html]
 directory contains an example of how to index an unordered collection.
 

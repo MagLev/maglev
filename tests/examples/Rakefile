@@ -1,0 +1,15 @@
+# Test all testable examples
+
+EXAMPLE_DIR = File.expand_path("../../examples", File.dirname(__FILE__))
+
+namespace :examples do
+  desc "Test examples/persistence/indexing"
+  task :indexing do
+    cd("#{EXAMPLE_DIR}/persistence/indexing") do
+      sh "rake"
+      sh "rake demo"
+      sh "rake commit"
+      sh "rake search"
+    end
+  end
+end
