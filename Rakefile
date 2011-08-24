@@ -40,7 +40,7 @@ CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html',
 CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk', 'version.txt')
 
 Rake::RDocTask.new do |rd|
-  rd.main = "README2.rdoc"
+  rd.main = "README.rdoc"
   rd.rdoc_files.include 'README*', 'docs/*', 'LICENSES.txt'
   rd.rdoc_files.include 'src/kernel/bootstrap/Maglev.rb'
   rd.rdoc_files.include 'examples/**/README*', 'examples/**/readme.txt'
@@ -178,7 +178,7 @@ GemStoneInstallation.current.stones.each do |server_name|
     ].each do |action,desc|
       task_gemstone(stone, action, desc)
     end
-    desc "Start the \"#{server_name}\" server. 
+    desc "Start the \"#{server_name}\" server.
 The netldiname parameter determines which netldi to use (default: ENV['gs64ldi'] || 'gs64ldi')."
     task :start, :netldiname do |t, args|
       netldi = args[:netldiname] || ENV['gs64ldi'] || 'gs64ldi'

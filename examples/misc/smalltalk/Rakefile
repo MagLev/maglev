@@ -1,0 +1,15 @@
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', '..', '..')
+require 'rakelib/gemstone_env'
+require 'rakelib/maglev_stone'
+
+task :default => :install
+
+desc "Install the Smalltalk code into a MagLev image"
+task :install do
+  stone = Stone.new(ENV['STONENAME'] || 'maglev')
+  ['RubyWrapper.gs', 'RubyService.gs'].each do |f|
+    puts "\nLoading #{f}"
+    stone.input_file(f)
+  end
+end
+
