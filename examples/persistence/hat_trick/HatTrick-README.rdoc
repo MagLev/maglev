@@ -1,0 +1,203 @@
+= The Hat Trick
+
+This directory holds a recreation of the "Hat Trick" performed by Avi
+Bryant at RailsConf 2008, which you can see at http://vimeo.com/1147409
+MagLev has progressed since Avi's demo, so some of the details are
+changed. If you want to recreate his interactive demo, read the "Hat Trick
+in IRB" section below.
+
+== Overview
+
+The Hat Trick demonstrates MagLev persistence by running two MagLev VMs
+(two different OS processes) and sharing objects between the VMs.  A single
+Hat object, created in one VM, is filled with Rabbits created in another
+VM.  The state of the hat is coordinated using ACID transactions.
+
+== Running the Hat Trick from files
+
+First, run <tt>create_hat.rb</tt> to create a new hat. It uses
+<tt>Maglev.persistent do ... end</tt> to load the +Hat+ class, the +Rabbit+
+class and an empty instance of a hat into the MagLev repository -- all of
+which will then be available to any MagLev VM.
+
+  $ maglev-ruby create_hat.rb
+  Created empty hat at Maglev::PERSISTENT_ROOT[:hat]:    #<Hat:0x15fbb001 @contents=[]>
+
+Next, run <tt>add_rabbit_to_hat.rb</tt> and <tt>show_hat_contents.rb</tt>
+in any order as many times as you wish. Any rabbits added to the Hat by
+<tt>add_rabbit_to_hat.rb</tt> are persisted and will show up in any VM that
+runs <tt>show_hat_contents.rb</tt>.
+
+
+  $ maglev-ruby add_rabbit_to_hat.rb
+  $ maglev-ruby show_hat_contents.rb
+  The hat contains 1 rabbits
+  #<Hat:0x15fbb001 @contents=[
+   () ()
+  ( '.' )
+  (")_(")
+  ]>
+
+The important thing to notice is that three different VMs were used to (1)
+create the hat (2) add a rabbit to the hat and (3) show the contents of the
+hat.  Each VM saved the hat and its contents to the MagLev repository so
+that the next VM could see it.  You can continue adding rabbits to the hat:
+
+  $ maglev-ruby add_rabbit_to_hat.rb
+  $ maglev-ruby show_hat_contents.rb
+  The hat contains 2 rabbits
+  #<Hat:0x15fbb001 @contents=[
+   () ()
+  ( '.' )
+  (")_(")
+  ,
+   () ()
+  ( '.' )
+  (")_(")
+  ]>
+
+To empty the hat and start over, run
+
+  $ maglev-ruby create_hat.rb
+
+== Running the Hat Trick from IRB
+
+In Avi's original demo, he used two, long-running VMs to show how code,
+hats and rabbits can be loaded and coordinated amongst several MagLev VMs.
+As the demo proceeds, the state of each VM is refreshed to get the latest
+view of the hat and rabbits.
+
+Note: there is a <tt>.irbrc</tt> file in this directory that changes the
+IRB prompt to easily distinguish the Magician's VM from the Assistant's
+VM.
+
+To recreate Avi's demo:
+
+=== 1: Start the Magician, Show Empty Hat
+
+In shell 1 (the magician's shell), start maglev-irb:
+
+  $ cd $MAGLEV_HOME/examples/persistence/hat_trick
+  $ maglev-irb --prompt magician
+
+Now we persistently load the +Hat+ and +Rabbit+ classes, and commit that
+code to the repository.  Once committed, *all* MagLev VMs will have that
+code available to them:
+
+    Magician :001:0> load 'create_hat.rb'
+    Created empty hat at Maglev::PERSISTENT_ROOT[:hat]:    #<Hat:0x8f18b901 @contents=[]>
+    => true
+
+We can take a quick peek at the hat, and see that it is empty:
+
+    Magician :002:0> Maglev::PERSISTENT_ROOT[:hat].contents
+    => []
+
+=== 2: Start the Assistant, Secretly put Rabbit in Hat
+
+In shell 2 (the magician's assistant), start IRB:
+
+  $ cd $MAGLEV_HOME/examples/persistence/hat_trick
+  $ maglev-irb --prompt assistant
+
+At this point, assuming <tt>maglev-irb</tt> was started *after* the
+magician committed the Hat and Rabbit code in step 1, the assistant's VM
+will have the code already loaded (no need to require
+<tt>create_hat.rb</tt>) and should be able to see an empty hat:
+
+  Assistant :001:0> Maglev::PERSISTENT_ROOT[:hat].contents
+  => []
+
+Now, the assistant can put a rabbit into the hat, and commit the change to
+the repository:
+
+  Assistant :002:0> Maglev::PERSISTENT_ROOT[:hat].put(Rabbit.new)
+  => nil
+  Assistant :003:0> Maglev.commit_transaction
+
+=== 3: Magician Pulls Rabbit out of Hat
+
+In shell 1, the Magician can now pull a rabbit out of the hat:
+
+  Magician :003:0> Maglev.abort_transaction
+  => Maglev::System
+  Magician :004:0> Maglev::PERSISTENT_ROOT[:hat].contents
+  => [
+   () ()
+  ( '.' )
+  (")_(")
+  ]
+
+The magician does <tt>Maglev.abort_transaction</tt> to refresh his VM's
+view of the repository (i.e., he wants to see the rabbit).  One of the ACID
+properties (isolation), ensures that the state of a VM is isolated from
+changes to the repository from other VMs (e.g., the assistant's VM adding a
+rabbit).  The abort transaction freshens the view, and the magician can
+pull the rabbit out of the hat.
+
+In Avi's demo, he was using a pseudo version of IRB, which did an
+<tt>abort_transaction</tt> before each prompt, so it looked a bit more
+magical in the video...
+
+If you want to cheat a bit, load <tt>peek.rb</tt>. Its +Proc+ does an abort
+before peeking into the hat, so it will always show the latest state.
+  Magician :005:0> load 'peek.rb'
+  => true
+  Magician :006:0> peek = Maglev::PERSISTENT_ROOT[:peek]
+  => #<Proc>
+  Magician :007:0> peek[:hat].contents
+  => [
+   () ()
+  ( '.' )
+  (")_(")
+  ]
+
+Note: You can peek at the current state of any key in
+<tt>Maglev::PERSISTENT_ROOT</tt>, use <tt>peek[].keys</tt> to get a list.
+
+== Things to notice
+
+Each time you invoke <tt>maglev-ruby</tt>, you are starting a fresh VM, but
+it can see the persistent effects from previous runs of other VMs.  One VM
+creates an empty hat.  Then another VM adds a rabbit to the hat.  And
+finally, yet another VM shows the contents of the results from the first
+two VMs.
+
+If you notice, the <tt>object_id</tt> for the hat is the same throughout
+the demo (until you create a new hat).  That is because a single instance of a
+hat is created, saved in the repository and shared by all VMs.
+
+  $ maglev-ruby create_hat.rb
+  Created empty hat at Maglev::PERSISTENT_ROOT[:hat]:    #<Hat:0x12d13101 @contents=[]>
+
+  $ maglev-ruby show_hat_contents.rb
+  The hat contains 0 rabbits
+  #<Hat:0x12d13101 @contents=[]>
+
+  $ maglev-ruby add_rabbit_to_hat.rb
+
+  $ maglev-ruby show_hat_contents.rb
+  The hat contains 1 rabbits
+  #<Hat:0x12d13101 @contents=[
+   () ()
+  ( '.' )
+  (")_(")
+  ]>
+
+  $ maglev-ruby add_rabbit_to_hat.rb
+  $ maglev-ruby add_rabbit_to_hat.rb
+  $ maglev-ruby show_hat_contents.rb
+  The hat contains 3 rabbits
+  #<Hat:0x12d13101 @contents=[
+   () ()
+  ( '.' )
+  (")_(")
+  ,
+   () ()
+  ( '.' )
+  (")_(")
+  ,
+   () ()
+  ( '.' )
+  (")_(")
+  ]>
