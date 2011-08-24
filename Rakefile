@@ -41,9 +41,9 @@ CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk', 'version.txt')
 
 Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"
-  rd.rdoc_files.include 'README*', 'docs/*', 'LICENSES.txt'
+  rd.rdoc_files.include 'docs/*', 'LICENSES.txt'
   rd.rdoc_files.include 'src/kernel/bootstrap/Maglev.rb'
-  rd.rdoc_files.include 'examples/**/README*', 'examples/**/readme.txt'
+  rd.rdoc_files.include 'examples/**/*README.rdoc', 'examples/**/readme.txt'
   rd.rdoc_files.include 'src/topaz/**/README*', 'src/topaz/LICENSE*'
 end
 
