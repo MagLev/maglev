@@ -6,8 +6,9 @@ d = Dir.new('/tmp')
 
 # The following tests are order dependent (i.e., they depend on the
 # internal state of the Dir object), so don't change the order.
-test(d.read,     '.', 'read A')
-test(d.read,    '..', 'read B')
+#
+test(d.read.class, String, 'read A') # Usually '.', but not on ubuntu
+test(d.read.class, String, 'read B') # Usually '..', but not on ubuntu
 
 # TODO: ruby fails on this one (returns 1 rather than 2): why?!
 #       if I manually do two reads and a pos in irb, it shows 2...

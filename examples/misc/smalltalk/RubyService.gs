@@ -32,7 +32,7 @@ example1
 	"ruby rubyPerform: 'to=' withArguments: #('fred@here.com') on: msg."
 	"ruby rubyPerform: #'html=' withArguments: #('<h1>Hi there</h1>') on: msg."
 	msg html: 'fred@here.com'.
-	^ msg to_s
+	^ RubyWrapper unwrap: (msg to_s)
 %
 category: 'examples'
 set compile_env: 0
@@ -47,7 +47,7 @@ example2
 	markdown := rd new: '## Hello World
                                        This is *awesome*'.
 	html := markdown to_html.
-	^ html
+	^ RubyWrapper unwrap: html
 %
 category: 'examples'
 set compile_env: 0
@@ -72,7 +72,7 @@ This message was rendered from Gemstone/S, using the Ruby C-extension RDiscount 
 	
 	netSmtp := (ruby resolve: 'Net::SMTP').
 	netSmtp start: 'localhost' do: [:smtp | smtp send_message: msg to_s _: fromAddress _: toAddress].
-	^ msg to_s
+	^ RubyWrapper unwrap: (msg to_s)
 %
 category: 'examples'
 set compile_env: 0
@@ -101,7 +101,7 @@ This message was rendered from Gemstone/S, using the Ruby C-extension RDiscount 
 		rubyPerform: #start
 		withArguments: #('localhost' 25 nil nil nil)
 		withBlock: [:smtp | smtp send_message: msg to_s _: fromAddress _: toAddress].
-	^ msg to_s
+	^ RubyWrapper unwrap: (msg to_s)
 %
 category: 'examples'
 set compile_env: 0
@@ -112,7 +112,7 @@ example5
 	ruby := RubyService new.
 	
 	envKeys := (ruby resolve: 'ENV') keys.
-	^ envKeys map: [:element | element to_sym]
+	^ RubyWrapper unwrap: (envKeys map: [:element | element to_sym])
 %
 category: 'examples'
 set compile_env: 0
@@ -124,7 +124,7 @@ example6
 	"
 	| ary |
 	ary := ((RubyService new resolve: 'Range') new: 1 _: 10).
-	^ ary inject: 1 do: [:res :next | res / next]
+	^ RubyWrapper unwrap: (ary inject: 1 do: [:res :next | res / next])
 %
 ! ------------------- Instance methods for RubyService
 category: 'ruby-support'

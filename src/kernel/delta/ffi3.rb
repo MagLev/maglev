@@ -40,7 +40,7 @@ module FFI
     # shared library represented by the receiver is loaded into a VM  .
     # The block is also run when initialize_on_load is called, 
     # if there was no previous block registered with the receiver. 
-    # For an example, see lib/ruby/site_ruby/1.8/maglev/opensslffi/libcrypto.rb .
+    # For an example, see lib/ruby/1.8/maglev/opensslffi/libcrypto.rb .
     def initialize_on_load(&block) 
       old = @_st_onLoadBlock
       @_st_onLoadBlock = block 

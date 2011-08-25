@@ -1,5 +1,28 @@
 = Call RubyGems from Smalltalk
 
 This directory contains GemStone/S Smalltalk code that allows RubyGems to
-be called from Smalltalk.
+be called from Smalltalk.  It was presented at at
+Esug[http://www.esug.org/wiki/pier/Conferences/2011].
 
+Load the Smalltalk code by running rake:
+  $ rake install
+
+  Loading RubyWrapper.gs
+  $GEMSTONE/bin/waitstone maglev -1 1>/dev/null
+
+  Loading RubyService.gs
+  $GEMSTONE/bin/waitstone maglev -1 1>/dev/null
+
+
+Gem install the MailFactory gem:
+
+  $ $MAGLEV_HOME/bin/bundle install
+
+Then you can fire up a topaz session and run the examples:
+
+  $ topaz -l -q  -T50000
+  topaz 1> run
+  RubyService example6
+  %
+  [2 sz:0 cls: 74241 SmallInteger] 0 == 0x0
+  topaz 1>

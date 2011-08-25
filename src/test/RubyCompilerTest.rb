@@ -1,4 +1,4 @@
-# Test lib/ruby/site_ruby/1.8/maglev/ruby_compiler.rb
+# Test lib/ruby/1.8/maglev/ruby_compiler.rb
 #
 #
 require 'maglev/ruby_compiler'

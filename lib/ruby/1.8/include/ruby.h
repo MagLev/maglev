@@ -615,6 +615,9 @@ RUBY_DLLSPEC VALUE rb_ivar_get(VALUE obj, ID ivar_name);
 RUBY_DLLSPEC VALUE rb_ivar_set(VALUE obj, ID ivar_name, VALUE value);
 
 RUBY_DLLSPEC int rb_ivar_defined_(VALUE obj, ID ivar_name);
+static inline VALUE rb_ivar_defined(VALUE obj, ID ivar_name) {
+    return rb_ivar_defined_(obj, ivar_name) ? Qtrue : Qfalse;
+}
 
 /** Nonzero if constant corresponding to Symbol exists in the Module. */
 RUBY_DLLSPEC int rb_const_defined(VALUE mod, ID sym);

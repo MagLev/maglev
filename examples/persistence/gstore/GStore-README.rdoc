@@ -1,0 +1,38 @@
+= GStore Persistence Example
+
+This is a demo of how you might implement the standard ruby PStore library
+using MagLev persistence, rather than the filesystem and marshal.  See the
+comments in gstore.rb for more details.
+
+Note: GStore is just an example of how to use MagLev persistence.  We are
+not recommending you use GStore.
+
+To run this example:
+
+1. Ensure the MagLev Server is running
+
+2. Run +rake+ to time how long it takes MagLev and MRI/YARV to do the same
+   amount of work.
+
+On my MacBook Pro, I get:
+   $ rake
+   maglev-ruby --version
+   maglev 0.9 (ruby 1.8.7) (2011-08-22 rev 26296-1293-) [Darwin i386]
+
+   maglev-ruby main.rb
+   Timing MagLev and GStore (should take about 30 seconds?)
+         user     system      total        real
+   write  1.240000   0.050000   1.290000 (  9.031213)
+   read   0.000000   0.000000   0.000000 (  0.013746)
+   r/w    0.140000   0.040000   0.180000 ( 16.282170)
+
+   rm -f pstore.db
+   ruby --version
+   ruby 1.9.2p180 (2011-02-18 revision 30909) [x86_64-darwin10.4.0]
+
+   Timing MRI and PStore (might take several minutes?)
+   ruby main.rb
+         user     system      total        real
+   write 32.030000   1.640000  33.670000 ( 37.116518)
+   read   6.510000   0.210000   6.720000 (  6.763053)
+   r/w  171.970000   5.860000 177.830000 (181.422336)
