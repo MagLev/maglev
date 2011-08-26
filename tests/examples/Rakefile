@@ -7,6 +7,7 @@ desc "Run all of the examples"
 task :default => [:'examples:gstore',
                   :'examples:hat_trick',
                   :'examples:indexing',
+                  :'examples:kdtree',
                   ]
 
 namespace :examples do
@@ -43,13 +44,12 @@ namespace :examples do
   task :kdtree do
     cd("#{EXAMPLE_DIR}/persistence/kdtree") do
       bundle_install
-      sh "rake test"
-      sh "rake maglev:demo"
-      sh "rake maglev:commit"
-      sh "rake maglev:gprof"
+      %w(test maglev:commit maglev:gprof).each do |target|
+        puts "===== examples:kdtree:  #{target} ====="
+        sh "rake #{target}"
+      end
     end
   end
-
 end
 
 def bundle_install
