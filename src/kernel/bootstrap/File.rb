@@ -328,9 +328,6 @@ class File
     stat_obj.file?
   end
 
-  # MNI: File.fnmatch
-  # MNI: File.fnmatch?
-
   def self.ftype(*names)
     unless names.length._equal?(1)
       raise ArgumentError , 'expected 1 arg'
