@@ -3,13 +3,13 @@
 This directory contains demos and examples using MagLev's built-in object
 persistence.
 
-== KDTree (Using Google Maps API)
+== K-d Tree (Using Google Maps API)
 
-The KDTree[link:examples/persistence/kdtree/KDTree-README_rdoc.html] exmple
-contains a pure ruby implementation of a KD-Tree, a data structure that
-allows fast nearest-neighbor look-ups in a given dimension.  In this
+The {K-d Tree}[link:examples/persistence/kdtree/KDTree-README_rdoc.html]
+example contains a pure ruby implementation of a K-d Tree, a data structure
+that allows fast nearest-neighbor look-ups in a given dimension.  In this
 example, we use the Google Maps API as a GUI to display the closest zip
-codes to a given location selected on the map (a KD-Tree where K=2, since
+codes to a given location selected on the map (a K-d Tree where K=2, since
 we must find the nearest latitude-longitude pairs for a given position).
 
 == GStore
