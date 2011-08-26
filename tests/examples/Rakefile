@@ -1,7 +1,7 @@
 # Test all testable examples
 #
 # The tests pass if nothing blows up, causing rake to exit non-zero.
-
+ML = ENV['MAGLEV_HOME'] || File.expand_path("../..", File.dirname(__FILE__))
 EXAMPLE_DIR = File.expand_path("../../examples", File.dirname(__FILE__))
 desc "Run all of the examples"
 task :default => [:'examples:gstore',
@@ -38,4 +38,20 @@ namespace :examples do
       sh "rake test"
     end
   end
+
+  desc "Test examples/persistence/kdtree"
+  task :kdtree do
+    cd("#{EXAMPLE_DIR}/persistence/kdtree") do
+      bundle_install
+      sh "rake test"
+      sh "rake maglev:demo"
+      sh "rake maglev:commit"
+      sh "rake maglev:gprof"
+    end
+  end
+
+end
+
+def bundle_install
+  sh "#{File.join(ML, "bin", "bundle")} install" if File.exist? "Gemfile"
 end

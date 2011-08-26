@@ -21,15 +21,6 @@ perl -pi -e s/git:/http:/ Gemfile
 
 export rack=master
 
-# Patch the broken version of rack
-badf=$MAGLEV_HOME/lib/maglev/gems/1.8/gems/rack-1.3.0/lib/rack/session/abstract/id.rb
-if [[ -f $badf ]]; then
-    echo "Patching $badf"
-    perl -pi -e s/NotImpelentedError/NotImplementedError/ $badf
-else
-    echo "Could not find rack file to patch: $badf"
-fi
-
 # In the Jenkins environment, $WORKSPACE will be set.
 # We need to start maglev if we're under jenkins.
 if [[ -n $WORKSPACE ]]; then
@@ -37,7 +28,10 @@ if [[ -n $WORKSPACE ]]; then
     maglev start
 fi
 
+# consider adding  --without-coffee-script for Allen
+# maglev-ruby -S bundle install --without-coffee-script
 maglev-ruby -S bundle install
+maglev-ruby -S bundle update
 bundle exec rake -Ilib ci:setup:testunit test
 
 # Work around Maglev ci reporter builder bug

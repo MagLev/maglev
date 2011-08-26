@@ -5,12 +5,12 @@ persistence.
 
 == KDTree (Using Google Maps API)
 
-The kdtree directory contains a pure ruby implementation of a KD-Tree,
-a data structure that allows fast nearest-neighbor look-ups in
-a given dimension.  In this example, we use the Google Maps API
-as a GUI to display the closest zip codes to a given location
-selected on the map (a two-dimensional problem, since we must
-find the nearest latitude-longitude pairs for a given position).
+The KDTree[link:examples/persistence/kdtree/KDTree-README_rdoc.html] exmple
+contains a pure ruby implementation of a KD-Tree, a data structure that
+allows fast nearest-neighbor look-ups in a given dimension.  In this
+example, we use the Google Maps API as a GUI to display the closest zip
+codes to a given location selected on the map (a KD-Tree where K=2, since
+we must find the nearest latitude-longitude pairs for a given position).
 
 == GStore
 
@@ -29,4 +29,3 @@ changed since then, and this example shows the new approach.
 
 The indexing[link:examples/persistence/indexing/Indexing-README_rdoc.html]
 directory contains an example of how to index an unordered collection.
-
