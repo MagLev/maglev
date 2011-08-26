@@ -7,7 +7,9 @@ require 'active_model'
 
 MiniTest::Unit.autorun
 
-class Person
+# Don't name the class "Person", as that sometimes gets committed in other
+# tests (e.g., under examples/*)
+class AMTestPerson
   include ActiveModel::Serializers::JSON
 
   attr_accessor :name
@@ -19,7 +21,7 @@ end
 
 class TestActiveModelJSONSerialization < MiniTest::Unit::TestCase
   def test_basic
-    p = Person.new
+    p = AMTestPerson.new
     p.name = "Bob"
     assert_equal({"person"=>{"name"=>"Bob"}}, p.as_json)
   end
