@@ -119,20 +119,27 @@ rb_obj_is_kind_of , rb_obj_is_instance_of are renamed
   MRI, jruby and rubinius  all define
      VALUE rb_obj_is_kind_of(VALUE, VALUE);
      VALUE rb_obj_is_instance_of(VALUE, VALUE);
-  and both are commented as     /** Returns true-ish  ... */ 
+     VALUE rb_ivar_defined(VALUE, ID);
+  and they are commented as     /** Returns true-ish  ... */ 
 
   However the common usage pattern appears to be like 
     if (! (rb_obj_is_kind_of(rb_node, cNokogiriXmlNode)))  
   which fails to apply RTEST to the result of rb_obj_is_* functions
   before doing the C comparision to zero.
    
-  The Maglev API defines
+  The Maglev API defines always
     int rb_obj_is_kind_of_(VALUE object, VALUE module);
     int rb_obj_is_instance_of_(VALUE obj, VALUE module);
-  and C code doing direct C comparisions
-  should be changed to use the new function names.  If there was
-  previously an RTEST macro it may be deleted.
+    int rb_ivar_defined_(VALUE, ID)
 
+  The  variants returning a VALUE, 
+    rb_obj_is_kind_of , rb_obj_is_instance_of, rb_ivar_defined
+  are only defined if MAGLEV_LINT is not defined .
+  Thus you can  use -DMAGLEV_LINT=1 on a C compile to find
+  the probable bad uses of rb_obj_is_kind_of, etc .
+  Then either change the bad uses to use the underscore variant,
+  or add RTEST macro calls as needed around  the result of the 
+  VALUE variant.
 
 rb_global_variable, rb_gc_register_address, 
 rb_gc_unregister_address    are not supported.
