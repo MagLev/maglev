@@ -1,9 +1,5 @@
-task :default => :hello
 
-desc 'Run sinatra_hello.rb'
-task :hello do
-  sh 'maglev-ruby sinatra_hello.rb'
-end
+task :default => :app
 
 desc 'Run sinatra_app.rb'
 task :app do

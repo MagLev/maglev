@@ -3,32 +3,25 @@
 The files in this directory are some examples of using Sinatra with MagLev.
 You must first install the Sinatra and Rack gems:
 
-  $ maglev-gem install sinatra rack
+  $ $MAGLEV_HOME/bin/bundle install
 
-If you want to run the tests, you'll also need RackTest:
-
-  $ maglev-gem install rack-test
-
-== Simple Examples
+== Simple Example
 
 === Hello
 
 <tt>sinatra_hello.rb</tt> is a Sinatra app that runs several of the example
-features from the {Sinatra Book}[http://www.sinatrarb.com/book.html].  To run
+features from the {Sinatra Book}[http://sinatra-book.gittr.com/].  To run
 it:
 
   $ rake hello
 
 Then hit http://localhost:4567/
 
-=== Sinatra App and Test
+=== Sinatra Test
 
 <tt>sinatra_app.rb</tt> and <tt>sinatra_app_test.rb</tt> are simple hello
 world app and an associated MiniTest for it that shows how
-<tt>rack/test</tt> works with MagLev.  To Run the test case, you'll need
-the <tt>sinatra</tt>, <tt>rack</tt>, <tt>rack-test</tt> and
-<tt>minitest</tt> gems installed into MagLev.
-
+<tt>rack/test</tt> works with MagLev.
 To run the tests:
 
   $ rake test
@@ -36,15 +29,15 @@ To run the tests:
 To run the app:
 
   $ rake app
-  
+
 == Other Examples
 
 The sub-directories contain more involved sample applications:
 
 - <tt>maglev_sessions</tt> contains an example of using MagLev to store
-  HTTP session data. 
+  HTTP session data.
 - <tt>simple_blog</tt> contains a simple blog using MagLev persistence for
-  the posts. 
+  the posts.
 - <tt>object_inspector</tt> implements a web front end to the MagLev
   ObjectLog (used for debugging, and by the simple blog app).
 
