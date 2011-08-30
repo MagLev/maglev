@@ -7,28 +7,20 @@ You must first install the Sinatra and Rack gems:
 
 == Simple Example
 
-=== Hello
-
-<tt>sinatra_hello.rb</tt> is a Sinatra app that runs several of the example
+<tt>sinatra_app.rb</tt> is a Sinatra app that runs several of the example
 features from the {Sinatra Book}[http://sinatra-book.gittr.com/].  To run
 it:
 
-  $ rake hello
+  $ rake
 
 Then hit http://localhost:4567/
 
-=== Sinatra Test
+== Simple Test
 
-<tt>sinatra_app.rb</tt> and <tt>sinatra_app_test.rb</tt> are simple hello
-world app and an associated MiniTest for it that shows how
-<tt>rack/test</tt> works with MagLev.
-To run the tests:
+<tt>sinatra_app_test.rb</tt> is a test that uses MiniTest and rack-test to
+test <tt>sinatra_app.rb</tt>.  To run the tests:
 
   $ rake test
-
-To run the app:
-
-  $ rake app
 
 == Other Examples
 
@@ -43,9 +35,8 @@ The sub-directories contain more involved sample applications:
 
 == Issues with Sinatra under MagLev
 
-=== How it is supposed to work
-
-One of the standard ways to run a Sinatra app is to write it in one file:
+One of the standard ways to run a Sinatra app (though now it is somewhat
+deprecated), is to write it in one file:
 
   # my_sinatra_app.rb
 
@@ -66,13 +57,11 @@ application.  Ruby then continues to read the file, and finally falls off
 the bottom.  At that point, the previously installed <tt>at_exit</tt>
 handler is invoked, which starts the application running.
 
-=== Issue 1: Sinatra can't figure out the right file
-
-Sinatra examines the calling stack to try and figure out the name of the
-file that was invoked (from the <tt>at_exit</tt> handler, so
-<tt>\_\_FILE\_\_</tt> is not available).  Currently, the MagLev format from
-<tt>Kernel#caller</tt> confuses Sinatra and it can't figure out which file
-is the main file, and so the app does not start.
+Unfortunately, this doesn't work well with MagLev.  Sinatra examines the
+calling stack to try and figure out the name of the file that was invoked
+Currently, the MagLev format from <tt>Kernel#caller</tt> confuses Sinatra
+and it can't figure out which file is the main file, and so the app does
+not start.
 
 There are two workarounds for this.  The first is to put <tt>set :run,
 true</tt> in your app (see <tt>sinatra_app.rb</tt> for an example).  The

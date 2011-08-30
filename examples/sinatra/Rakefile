@@ -6,7 +6,7 @@ task :app do
   sh 'maglev-ruby sinatra_app.rb'
 end
 
-desc 'Run the minitest for sinatra_app.rb.'
+desc 'Run the test for sinatra_app.rb.'
 task :test do
   sh 'maglev-ruby -rubygems sinatra_app_test.rb'
 end

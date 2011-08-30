@@ -3,13 +3,11 @@ require 'sinatra'
 
 configure(:development) do
   set :sessions, true
-  set :run,     true unless DO_NOT_RUN  # See note in sinatra_app_test.rb
-  set :server,  'webrick'
-#  set :lock,    false     # but I'm only sending one request at a time....
+  set :run,      true unless defined? DO_NOT_RUN  # See note in sinatra_app_test.rb
+  set :server,   'webrick'
 end
 
 # These examples are from the Sinatra Book http://sinatra-book.gittr.com/
-
 get '/' do
   <<-EOS
   <html>
