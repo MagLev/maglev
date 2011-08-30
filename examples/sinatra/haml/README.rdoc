@@ -1,5 +1,0 @@
-= Sinatra + Haml Demo/Test
-
-This is just to test that Sinatra and Haml work together in MagLev.
-Nothing very interesting here.
-

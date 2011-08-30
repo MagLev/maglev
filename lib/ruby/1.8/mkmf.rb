@@ -1707,6 +1707,7 @@ def init_mkmf(config = CONFIG)
   $arg_config = []
   $enable_shared = config['ENABLE_SHARED'] == 'yes'
   $defs = []
+  $defs.push("MAGLEV_LINT") if ENV["MAGLEV_LINT"]
   $extconf_h = nil
   $CFLAGS = with_config("cflags", arg_config("CFLAGS", config["CFLAGS"]))
   $ARCH_FLAG = with_config("arch_flag", arg_config("ARCH_FLAG", config["ARCH_FLAG"]))

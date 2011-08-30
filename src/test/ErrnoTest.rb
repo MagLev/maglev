@@ -3,7 +3,7 @@ require File.expand_path('simple', File.dirname(__FILE__))
 # This test currently passes, but only because Errno.constants is stubbed
 # to return []...
 errnosWithBadSuperclass = Errno.constants.find_all do |n|
-  unless n == "ERRNO_TO_EXCEPTION" || n == "EXCEPTION_CLS_TO_ERRNO"
+  unless n == "MaglevErr" 
     Errno.const_get(n).superclass != SystemCallError 
   end
 end

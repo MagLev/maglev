@@ -1,7 +1,33 @@
 module Errno
+  module MaglevErr
+    # ERRNO_TO_EXCEPTION = [ ]  # initialized in Errno1.rb
+    EXCEPTION_CLS_TO_ERRNO = IdentityHash.new  # actual value
+
+    def self.__new_for_errno(errno)
+      cls = ERRNO_TO_EXCEPTION[errno]
+      if cls._equal?(nil)
+	return nil
+      end
+      exc = cls.allocate
+      exc.__st_initialize
+      exc.errno=(errno)
+      m = cls.__default_ruby_message
+      if m._not_equal?(nil)
+	exc.__message=(m)
+      end
+      exc
+    end
+
+    def self.__errno_for_class(cls)
+      EXCEPTION_CLS_TO_ERRNO[cls]
+    end
+  end
+
+  def self.__new_for_errno(errno)
+    MaglevErr::__new_for_errno(errno)
+  end
+
   # Map an errno (small int) to the exception class for that errno
-  # ERRNO_TO_EXCEPTION = [ ]  # initialized in Errno1.rb
-  EXCEPTION_CLS_TO_ERRNO = IdentityHash.new  # actual value
 
   # Given a return value from a "system or library" call, raise the
   # appropriate exception if any.  If +err+ is not a small integer, or if
@@ -25,27 +51,8 @@ module Errno
     self.handle(errnum, '')
   end
 
-  def self.__new_for_errno(errno)
-    cls = ERRNO_TO_EXCEPTION[errno]
-    if cls._equal?(nil)
-      return nil
-    end
-    exc = cls.allocate
-    exc.__st_initialize
-    exc.errno=(errno)
-    m = cls.__default_ruby_message
-    if m._not_equal?(nil)
-      exc.__message=(m)
-    end
-    exc
-  end
-
-  def self.__errno_for_class(cls)
-    EXCEPTION_CLS_TO_ERRNO[cls]
-  end
-
   def self.raise_errno(errno, additional='')
-    exc = self.__new_for_errno(errno)
+    exc = MaglevErr.__new_for_errno(errno)
     if exc._equal?(nil)
       exc = SystemCallError.new("System error (errno: #{errno}):" , errno)
     end
@@ -92,12 +99,12 @@ module Errno
   # instances of an errno class subclasses of the first instance.
 
   def self.__create_errno_class(errno, name)
-    sklass = ERRNO_TO_EXCEPTION[errno] || SystemCallError
+    sklass = MaglevErr::ERRNO_TO_EXCEPTION[errno] || SystemCallError
     klass = Class.new(sklass)             # create class
     const_set(name, klass)                # Assign class name
     klass.const_set(:Errno, errno)        # Set class's Errno constant
-    ERRNO_TO_EXCEPTION[errno] = klass
-    EXCEPTION_CLS_TO_ERRNO[klass] = errno
+    MaglevErr::ERRNO_TO_EXCEPTION[errno] = klass
+    MaglevErr::EXCEPTION_CLS_TO_ERRNO[klass] = errno
     klass
   end
 
