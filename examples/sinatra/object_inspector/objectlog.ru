@@ -1,15 +1,13 @@
+require 'sinatra'
 require 'objectlog_app'
 
-# When running out of a classic top level Sinatra app, several options are
-# set.  We have to set them here if we want them in a rackable app.
-set :server, ["webrick"]   # Maglev currently only supports webrick
+set :server, 'webrick'
 set :environment, :development
-set :static, true                # Allow loading /style.css, etc.
+set :static, true
 
-# Setup for :views, :public and :root
-set :app_file, File.expand_path(__FILE__)
-# set :app_file, d
-# set :views,  File.join(d, 'views')
-# set :public, File.join(d, 'public')
+# ObjectLogApp is relocatable, so tell it where it will start
+ObjectLogApp.script_name  = ''
+ObjectLogApp.main_app_url = '/'
+ObjectLogApp.main_object  =  ObjectLogEntry.object_log
 
 ObjectLogApp.run! :host => 'localhost', :port => 4567

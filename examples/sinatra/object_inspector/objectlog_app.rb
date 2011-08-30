@@ -1,11 +1,12 @@
-require 'rubygems'
 require 'sinatra/base'
 require 'maglev/objectlog'
 
 # A simple object log viewer.  This app tries to be re-locatable.  It looks
-# at the @@path class variable for its mount point, and then makes all URLs
-# relative to that.  See config.ru for example of setting @@path.
+# at the @path class variable for its mount point, and then makes all URLs
+# relative to that.  See config.ru for example of setting @path.
 class ObjectLogApp < Sinatra::Base
+
+  set :app_file, __FILE__  # Set the public and static views
 
   def initialize(*args)
     super(*args)
@@ -13,7 +14,7 @@ class ObjectLogApp < Sinatra::Base
     # NOTE: Main App URL is a hack...works with most examples
     @nav_bar = <<-EOS
         <ul class="menu">
-          <li><a href="#{@@main_app_url}">Main App</a></li>
+          <li><a href="#{@main_app_url}">Main App</a></li>
           <li><a href="#{path_for('/')}">Main Object</a></li>
           <li><a href="#{path_for('/objectlog')}">ObjectLog</a></li>
           <li><a href="#{path_for('/clear')}">Clear Log</a></li>
@@ -21,25 +22,16 @@ class ObjectLogApp < Sinatra::Base
     EOS
   end
 
-  @@script_name = ''
-  @@main_app_url = '/'
-  @@main_object  = ObjectLogEntry.object_log
-
-  def self.script_name=(str)
-    @@script_name = str
+  class << self
+    attr_accessor :script_name, :main_app_url, :main_object
   end
 
-  def self.main_app_url=(str)
-    @@main_app_url = str
-  end
-
-  def self.main_object=(eval_str)
-    @@main_object = eval eval_str
-    puts "----- MAIN OBJECT: #{@@main_object}"
-  end
+  # self.script_name = ''
+  # self.main_app_url = '/'
+  # self.main_object  = ObjectLogEntry.object_log
 
   def path_for(string)
-    @@script_name + string
+    ObjectLogApp.script_name + string
   end
 
   get '/info' do
@@ -50,15 +42,14 @@ class ObjectLogApp < Sinatra::Base
   <li>:views     #{options.views.inspect} </li>
   <li>:public    #{options.public.inspect} </li>
   <li>:root      #{options.root.inspect} </li>
-  <li>@@main_object: #{@@main_object.inspect} (#{@@main_object.class})</li>
+  <li>main_object: #{ObjectLogApp.main_object.inspect} (#{ObjectLogApp.main_object.class})</li>
 </ul>
     EOS
-#    erb :info
   end
 
   get '/' do
     Maglev.abort_transaction  # Get a fresh object view
-    @object = @@main_object
+    @object = ObjectLogApp.main_object
     erb :objectdetail
   end
 
