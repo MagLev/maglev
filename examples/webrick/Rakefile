@@ -1,6 +1,0 @@
-task :default => :run
-
-desc "Run the webrick demo"
-task :run do
-  sh "maglev-ruby time_server.rb"
-end

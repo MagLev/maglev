@@ -1,0 +1,15 @@
+
+namespace :test do
+  desc "Run a simple webrick server and test connectivity"
+  task :webrick do
+    pid = `./run_webrick.sh`.chomp.to_i
+    result = 0
+    sleep 2
+    sh 'maglev-ruby test_webrick.rb' do |ok,res|
+      result = res
+    end
+    Process.kill(:TERM, pid)
+    p result
+    exit result.exitstatus
+  end
+end

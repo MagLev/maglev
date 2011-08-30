@@ -7,4 +7,3 @@ The examples are:
 * {Using Rack with MagLev}[link:files/examples/rack/README_rdoc.html]
 * {Rails on MagLev}[link:files/examples/rails/README_rdoc.html]
 * {Sinatra and MagLev}[link:files/examples/sinatra/README_rdoc.html]
-* WEBrick[link:files/examples/webrick/README_rdoc.html]
