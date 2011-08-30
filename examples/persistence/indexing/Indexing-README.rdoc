@@ -1,0 +1,65 @@
+= MagLev indexing example
+
+This directory contains an example of using MagLev's built-in indexing
+support to provide efficient search of unordered collections.  There are
+two demos and some tests.
+
+== Simple Demo
+
+<tt>index_example.rb</tt> is a single file overview of indexing with
+comments.  The commented code in <tt>index_example.rb</tt> is the best
+place to get an introduction to indexing.
+
+The demo creates an indexed collection of people objects, inserts 100,000
+random people into it and performs a number of queries over the collection
+(e.g., "find all the people less than 25 years old", or "find all the
+people who are both old and a hermit").
+
+To run the demo:
+  $ rake demo
+
+== Persistent Demo
+
+<tt>create_random_people.rb</tt> and <tt>search_random_people.rb</tt>
+comprise a second example using MagLev persistence with the indexes.
+
+<tt>create_random_people.rb</tt> creates a collection of random people,
+indexes the collection on the 'age' field, and then commits it to the
+repository.  By default, the script creates 100,000 users.  By passing a
+parameter, you can control how big the collection is.
+
+<tt>search_random_people.rb</tt> runs indexed and non-indexed queries
+against the persisted data.
+
+To run:
+
+  $ rake commit    # Or "rake commit:data_1m" to create 1 million people
+  $ rake search    # runs search_random_people against the committed dataset
+
+== Fixed vs Dynamic Instance Variables
+
+
+By default, all instance variables in MagLev are dynamic. The indexing
+subsystem has not yet been updated to work with dynamic instance
+variables.  In order to index a collection on a particular instance
+variable, it must be a fixed instance variable.  You can declare them like
+this:
+
+  class Address
+    self.__fixed_instvars :@age, :@height
+
+    attr_accessor :age, :height
+
+    ... # rest of class
+  end
+
+If you get an error message like the followin, you need to define the
+instance variables as fixed.
+  #<RuntimeError: The object aPerson does not have an instance variable with the given name #'@age'>
+
+For more information on fixed vs dynamic instance variables, see:
+* {release notes}[link:docs/release_notes_rdoc.html]
+* https://magtrac.gemstone.com/ticket/844
+
+
+

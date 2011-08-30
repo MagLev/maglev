@@ -1,31 +1,26 @@
-= MagLev KD Tree Example
+= MagLev K-d Tree Example
 
 == Overview
 
 This directory contains an implementation of a {K-Dimensional
-Tree}[http://en.wikipedia.org/wiki/Kd-tree] (KD-Tree).  A derivative class,
-Tree2D (k=2), is shown in this example using the Google Maps API as the GUI.
-This is a binary tree that can be used to search for 2D data, i.e., nodes
-with a latitude and longitude.
+Tree}[http://en.wikipedia.org/wiki/Kd-tree] (K-d Tree).  A derivative
+class, Tree2D (k=2), is also included and is used in the example Google
+Maps Sinatra app.
 
 == Demo
 
 The demo.rb file is a Sinatra application that allows you to enter a
-latitude and longitude (preferably, within the US, if you're using the US
-Postal Database), and will find the nearest K zip codes to the lat/lon.  
+latitude and longitude (by cliking on a map) and will find the nearest n
+zip codes to the lat/lon.
 
-Prerequisite: You must have the json_pure gem installed:
+Prerequisite: Install RubyGems:
 
-  $ maglev-gem install json_pure
+  $ $MAGLEV_HOME/bin/bundle install
 
 1. Make sure the maglev server has been started:
 
   $ cd $MAGLEV_HOME
   $ rake maglev:start
-
-2. Make sure Sinatra has been installed:
-
-  $ maglev-gem install sinatra
 
 2. Run the app:
 
@@ -38,7 +33,6 @@ The demo will show up in Sinatra at: http://localhost:3333/
 You can run MagLev with profiling turned on and take a look at the
 performance details (see which methods are called the most, and from where,
 etc.):
-
   $ rake maglev:gprof    # dumps output in ./profile.out
   $ more profile.out
 
@@ -189,5 +183,5 @@ The following numbers are from a run on that:
 
 The data file that has the US postal codes is provided by
 http://GeoNames.org/ under a Creative Commons Attribution 3.0 License.  See
-<tt>etc/readme.txt</tt>[link:files/examples/persistence/kdtree/etc/readme_txt.html]
+{etc/readme.txt}[link:examples/persistence/kdtree/etc/readme_txt.html]
 for details.

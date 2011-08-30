@@ -9,7 +9,9 @@
 #
 #   if "commit" is given, then commits the collection to
 #   Person::RANDOM_PEOPLE
-
+#
+# After the collection has been created, you can search using
+# search_random_people.rb
 
 population_size = ARGV.length > 0 ? ARGV.shift.to_i : 1_000
 commit_p = ARGV[0] == 'commit'

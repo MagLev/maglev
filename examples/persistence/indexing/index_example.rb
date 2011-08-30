@@ -1,4 +1,4 @@
-# This is an example of maglev persistence on unordered collections with
+# This is an example of MagLev persistence on unordered collections with
 # indexing.
 
 require 'benchmark'
@@ -25,6 +25,11 @@ people = IdentitySet.new
 # the set.  People have a name, age, gender and address.
 people.create_equality_index('@age', Fixnum)
 
+
+# The code in the block loads up our indexed collection with 100,000 random
+# People objects, then it searches for various people in the collection.
+# The Benchmark reports the time it took to create/insert the people, and
+# the time it takes to do several searches.
 Benchmark.bm do |x|
   population = 100_000
   youngsters = nil

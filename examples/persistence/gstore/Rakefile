@@ -2,10 +2,17 @@ task :default => [:maglev, :mri]
 
 desc "Run the demo using MagLev and GStore"
 task :maglev do
+  sh "maglev-ruby --version"
+  puts "\nTiming MagLev and GStore (should take about 30 seconds?)\n"
   sh "maglev-ruby main.rb"
+  puts "\n"
 end
 
 desc "Run the demo using mri and PStore"
 task :mri do
+  sh "rm -f pstore.db"
+  sh "ruby --version"
+  puts "\nTiming MRI and PStore (might take several minutes?)"
   sh "ruby main.rb"
+  puts "\n"
 end

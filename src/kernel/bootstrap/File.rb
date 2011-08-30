@@ -246,6 +246,16 @@ class File
     path = Type.coerce_to(path, String, :to_str)
 
     first = path[0]
+    if dir
+      eval_prefix = /\(eval\) from line (\d+) of /
+      if pos = (dir =~ eval_prefix)
+        # Substract the eval prefix. -7 corresponds to \d-capture
+        # group, and the esacping of brackets around the eval, and
+        # $1.size is the length of the line number string
+        dir = dir[(pos + eval_prefix.source.size - 7 + $1.size)..-1]
+      end
+    end
+
     if first == ?~
       path = __tilde_expand(path)
     elsif first != ?/
@@ -327,9 +337,6 @@ class File
     end
     stat_obj.file?
   end
-
-  # MNI: File.fnmatch
-  # MNI: File.fnmatch?
 
   def self.ftype(*names)
     unless names.length._equal?(1)

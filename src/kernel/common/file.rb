@@ -224,6 +224,9 @@ class File
 
     name_match(pattern, path, flags, 0, pattern.size, 0, path.size)
   end
+  class << self
+    alias_method :fnmatch?, :fnmatch
+  end
 
   ##
   # Returns a new string formed by joining the strings using File::SEPARATOR.

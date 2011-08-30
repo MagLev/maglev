@@ -248,7 +248,7 @@ class SystemCallError
   def self.exception(msg)
     exc = self.allocate
     exc.__st_initialize
-    n = Errno.__errno_for_class(self)
+    n = Errno::MaglevErr.__errno_for_class(self)
     if n._equal?(nil)
       n = 0
     end
@@ -260,7 +260,7 @@ class SystemCallError
   def self.exception
     exc = self.allocate
     exc.__st_initialize
-    n = Errno.__errno_for_class(self)
+    n = Errno::MaglevErr.__errno_for_class(self)
     if n._equal?(nil)
       n = 0
     end

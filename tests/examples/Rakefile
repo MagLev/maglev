@@ -1,0 +1,57 @@
+# Test all testable examples
+#
+# The tests pass if nothing blows up, causing rake to exit non-zero.
+ML = ENV['MAGLEV_HOME'] || File.expand_path("../..", File.dirname(__FILE__))
+EXAMPLE_DIR = File.expand_path("../../examples", File.dirname(__FILE__))
+desc "Run all of the examples"
+task :default => [:'examples:gstore',
+                  :'examples:hat_trick',
+                  :'examples:indexing',
+                  :'examples:kdtree',
+                  ]
+
+namespace :examples do
+  desc "Test examples/persistence/gstore"
+  task :gstore do
+    cd("#{EXAMPLE_DIR}/persistence/gstore") do
+      sh "rake maglev"
+    end
+  end
+
+  desc "Test examples/persistence/hat_trick"
+  task :hat_trick do
+    cd("#{EXAMPLE_DIR}/persistence/hat_trick") do
+      # No rakefile, but we can at least load all the files
+      sh "maglev-ruby create_hat.rb"  # needed first: loads hat.rb and rabbit.rb
+      sh "maglev-ruby add_rabbit_to_hat.rb"
+      sh "maglev-ruby show_hat_contents.rb"
+      sh "maglev-ruby peek.rb"
+    end
+  end
+
+  desc "Test examples/persistence/indexing"
+  task :indexing do
+    cd("#{EXAMPLE_DIR}/persistence/indexing") do
+      sh "rake"
+      sh "rake demo"
+      sh "rake commit"
+      sh "rake search"
+      sh "rake test"
+    end
+  end
+
+  desc "Test examples/persistence/kdtree"
+  task :kdtree do
+    cd("#{EXAMPLE_DIR}/persistence/kdtree") do
+      bundle_install
+      %w(test maglev:commit maglev:gprof).each do |target|
+        puts "===== examples:kdtree:  #{target} ====="
+        sh "rake #{target}"
+      end
+    end
+  end
+end
+
+def bundle_install
+  sh "#{File.join(ML, "bin", "bundle")} install" if File.exist? "Gemfile"
+end

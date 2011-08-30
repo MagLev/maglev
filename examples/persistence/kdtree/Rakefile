@@ -33,16 +33,18 @@ end
 namespace :maglev do
   desc 'Run the migrations and the demo web app'
   task :demo => :migrate do
+    sh "echo #{RACKUP} config.ru"
     sh "#{RACKUP} config.ru"
   end
 
   desc 'Commit the tree2d code and a tree of random data'
   task :commit do
-    sh 'maglev-ruby -Ilib bin/commit.rb'
+    sh 'maglev-ruby --tocsz 600000 -Ilib bin/commit.rb'
   end
 
   desc 'Create and commit the persistent data for the demo app.'
   task :migrate, :force do |t,args|
+    sh "echo maglev-ruby -I lib migration.rb #{args.force}"
     sh "maglev-ruby -I lib migration.rb #{args.force}"
   end
 

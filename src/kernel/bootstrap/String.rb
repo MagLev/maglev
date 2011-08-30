@@ -248,7 +248,7 @@ class String
       result = sc <=> oc
       return result unless result._equal?(0)
       i += 1
-    end  
+    end
     return size <=> o_size
   end
 
@@ -818,11 +818,15 @@ class String
     return result
   end
 
-  def __replace_match_with(match, replacement)
+  def __replace_match_with(match, replacement, flag=true)
     out = self.class.__alloc
     out.__append_internal(self._gsub_copyfrom_to(0, match.begin(0) ))
     unless replacement._equal?(nil)
-      out.__append_internal(replacement.__to_sub_replacement(match))
+      if flag
+        out.__append_internal(replacement.__to_sub_replacement(match))
+      else
+        out.__append_internal(replacement)
+      end
     end
     out.__append_internal(self.__copyfrom_to(match.end(0) + 1, self.__size))
     out
@@ -973,7 +977,7 @@ class String
     num
   end
 
-  primitive 'hash' , 'hash'  
+  primitive 'hash' , 'hash'
 
   def include?(item)
     if item._isFixnum
@@ -1646,7 +1650,6 @@ class String
   end
 
   primitive 'strip', '_rubyStrip'
-
   primitive 'strip!', '_rubyStripInPlace'
 
   # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
@@ -1666,13 +1669,12 @@ class String
 
     # If pattern is a string, then do NOT interpret regex special characters.
     # stores into caller's $~
-    r = if (match = regex.__match_vcglobals(self, 0x30))
-          __replace_match_with(match, replacement)
-        else
-          dup
-        end
+    if (match = regex.__match_vcglobals(self, 0x30))
+      __replace_match_with(match, replacement)
+    else
+      dup
+    end
     # r.taint if replacement.tainted? || self.tainted?
-    r
   end
 
   def sub(pattern, &block)
@@ -1708,11 +1710,12 @@ class String
   def sub!(pattern, &block)
     # $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
-
     regex = self.__get_pattern(pattern, true)
     if match = regex.__match_vcglobals(self, 0x30)
       replacement = block.call(match.__at(0))
-      replace(__replace_match_with(match, replacement))
+
+      # Don't run through __to_sub_replacement for block version See trac 946
+      replace(__replace_match_with(match, replacement, false))
       # self.taint if replacement.tainted?
       self
     else

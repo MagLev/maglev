@@ -616,6 +616,16 @@ RUBY_DLLSPEC VALUE rb_ivar_set(VALUE obj, ID ivar_name, VALUE value);
 
 RUBY_DLLSPEC int rb_ivar_defined_(VALUE obj, ID ivar_name);
 
+/*  common usage patterns are to use rb_ivar_defined without RTEST,
+ *  when MAGLEV_LINT is defined, we get compile errors to help find
+ *  the bad uses */
+#if !defined(MAGLEV_LINT)
+static inline VALUE rb_ivar_defined(VALUE obj, ID ivar_name) 
+{
+  return rb_ivar_defined_(obj, ivar_name) ? Qtrue : Qfalse;
+}
+#endif
+
 /** Nonzero if constant corresponding to Symbol exists in the Module. */
 RUBY_DLLSPEC int rb_const_defined(VALUE mod, ID sym);
 
@@ -1005,8 +1015,22 @@ RUBY_DLLSPEC const char* rb_obj_classname_(VALUE object);
 /** Returns 1 if module is object's class or other ancestor, 0 otherwise. */
 RUBY_DLLSPEC int rb_obj_is_kind_of_(VALUE obj, VALUE module);
 
+#if !defined(MAGLEV_LINT)
+static inline VALUE rb_obj_is_kind_of(VALUE obj, VALUE module)
+{
+  return rb_obj_is_kind_of_(obj, module) ? Qtrue : Qfalse;
+}
+#endif
+
 /** Returns 1 if module is object's class , 0 otherwise. */
 RUBY_DLLSPEC int rb_obj_is_instance_of_(VALUE obj, VALUE module);
+
+#if !defined(MAGLEV_LINT)
+static inline VALUE rb_obj_is_instance_of(VALUE obj, VALUE module)
+{
+  return rb_obj_is_instance_of_(obj, module) ? Qtrue : Qfalse ;
+}
+#endif
 
 /** Returns the Class object this object is an instance of. */
 static inline VALUE rb_obj_class(VALUE object) { return rb_class_of(object); }

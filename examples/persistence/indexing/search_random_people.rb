@@ -1,3 +1,7 @@
+# This file should be run only after create_random_people.rb has been run.
+# create_random_people.rb needs to be run only once.  This file may be run
+# multiple times.
+
 require 'benchmark'
 
 Benchmark.bm(37) do |x|
