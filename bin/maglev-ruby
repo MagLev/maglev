@@ -468,8 +468,8 @@ if [[ $rlwrapFlag ]]; then
     $rlwrapExe $TOPAZ_CMD
     exitStatus=$?
 else
-    $TOPAZ_CMD
-    exitStatus=$?
+    exec $TOPAZ_CMD
+    exitStatus=$?  # exec failed?
 fi
 
 exit $exitStatus
