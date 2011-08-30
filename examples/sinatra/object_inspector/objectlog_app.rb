@@ -26,9 +26,10 @@ class ObjectLogApp < Sinatra::Base
     attr_accessor :script_name, :main_app_url, :main_object
   end
 
-  # self.script_name = ''
-  # self.main_app_url = '/'
-  # self.main_object  = ObjectLogEntry.object_log
+  # ObjectLogApp is relocatable, so tell it where it will start
+  self.script_name = ''
+  self.main_app_url = '/'
+  self.main_object  = ObjectLogEntry.object_log
 
   def path_for(string)
     ObjectLogApp.script_name + string
