@@ -1,15 +1,52 @@
+require 'net/http'
+require 'uri'
+
+desc "Run all the tests"
+task :default => ['test:webrick', 'test:racklobster']
+
+task :clean do
+  rm_f 'testlog.out'
+  rm_f 'Gemfile.lock'
+end
 
 namespace :test do
   desc "Run a simple webrick server and test connectivity"
   task :webrick do
-    pid = `./run_webrick.sh`.chomp.to_i
-    result = 0
-    sleep 2
-    sh 'maglev-ruby test_webrick.rb' do |ok,res|
-      result = res
-    end
-    Process.kill(:TERM, pid)
-    p result
-    exit result.exitstatus
+    pid    = spawn_maglev_on 'time_server.rb'
+    result = test_url "http://localhost:2000/"
+    reap_and_raise pid, result
   end
+
+  desc "Run the rack lobster test using rackup"
+  task :racklobster do
+    pid    = spawn_shell_script 'run_lobster.sh'
+    result = test_url "http://localhost:9292/"
+    reap_and_raise pid, result
+  end
+end
+
+def reap_and_raise(pid, result)
+  Process.kill(:TERM, pid)
+  raise "Failed" unless result
+end
+
+def test_url(url)
+  uri = URI.parse(url)
+  response = Net::HTTP.get_response(uri)
+  puts "#{response} for #{url}"
+  return Net::HTTPOK === response
+end
+
+def spawn_shell_script(script, nap_time=2)
+  pid = `./run_script.sh #{script}`.chomp.to_i
+  sleep nap_time
+  pid
+end
+
+# Since maglev has neither fork/exec, nor spawn, we need to write a wrapper
+# shell script to run this in the background and report the PID.
+def spawn_maglev_on(file, nap_time=2)
+  pid = `./spawn_maglev.sh #{file}`.chomp.to_i
+  sleep nap_time
+  pid
 end
