@@ -27,6 +27,34 @@ class HelloWorldTest < MiniTest::Unit::TestCase
     assert last_response.ok?, "response not ok"
     assert last_response.body =~ /Sinatra #{Sinatra::VERSION} says Hello/, "response content wrong: #{last_response.body}"
   end
+
+  def test_it_does_params
+    get '/names/fred'
+    assert last_response.ok?
+    assert last_response.body =~ /The name is: fred/
+  end
+
+  def test_wildcards_in_url
+    get '/say/hello/to/fred'
+    assert last_response.ok?
+    assert last_response.body =~ /Say 'hello' to fred/
+  end
+
+  def test_redirect
+    get '/goto_home'
+    assert last_response.redirect?
+    assert_equal last_response.location, "http://example.org/"
+  end
+
+  def test_session
+    get '/session_count', { }, 'rack.session' => { 'count' => 0 }
+    assert last_response.ok?
+    assert_equal 'count: 1', last_response.body
+
+    get '/session_count', { }, 'rack.session' => { 'count' => 1 }
+    assert last_response.ok?
+    assert_equal 'count: 2', last_response.body
+  end
 end
 
 MiniTest::Unit.new.run(ARGV)
