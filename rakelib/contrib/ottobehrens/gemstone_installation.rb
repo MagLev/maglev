@@ -30,7 +30,7 @@ class GemStoneInstallation
   end
 
   def set_gemstone_installation_environment
-    ENV['GEMSTONE'] = @installation_directory
+    ENV['GEMSTONE'] ||= @installation_directory
   end
 
   def stones
