@@ -85,11 +85,15 @@ module Maglev::Debugger
     end
 
     def ruby_frames
+      frames.select do |frame|
+        frame.gsmethod.__env_id == RubyEnv
+      end
+    end
+
+    def frames
       methods = []
       @thread.__stack_depth.times do |idx|
-        @thread.__method_at(idx + 1).tap do |o|
-          methods << [o, idx + 1] if o.__env_id == RubyEnv
-        end
+        methods << [@thread.__method_at(idx + 1), idx + 1]
       end
       methods.collect do |method, idx|
         Frame.new(:method => method, :index => idx, :thread => thread)
@@ -150,7 +154,7 @@ module Maglev::Debugger
   end
 
   class Frame < Wrapper
-    attr_reader :debug_info
+    attr_reader :debug_info, :gsmethod
 
     def initialize(params)
       @gsmethod = params[:method]
@@ -180,7 +184,9 @@ module Maglev::Debugger
       @defining_class = m.__in_class
       @class = @gsmethod.__in_class
       @method_name = label
-      @source_location = @gsmethod.__source_location.join(":")
+      if @gsmethod.__source_location
+        @source_location = @gsmethod.__source_location.join(":")
+      end
     end
 
     def debug_info!
