@@ -25,6 +25,7 @@ class Module
 
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
+  primitive_nobridge '__is_virtual', 'isVirtual'
 
   # append_features deprecated, but needed by Rails3
   def append_features(other)
