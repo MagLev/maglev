@@ -110,11 +110,19 @@ module ObjectSpace
     clss = class_or_module ? [class_or_module] : loaded_classes(false)
     clss = clss.sort_by {|o| o.object_id}
     clss = clss.slice(0, 2034) # VM constant, see Repository>>_listInstancesInMemory:
-    objs = ObjectSpaceArray[*SystemRepository.__list_instances_in_memory(clss).flatten(1)]
+    objs = SystemRepository.__list_instances_in_memory(clss).flatten(1)
+
+    # Avoid leaking virtual modules into Ruby space
+    if class_or_module.nil?
+      objs.reject! {|o| o.is_a?(Module) && o.__is_virtual }
+    elsif class_or_module <= Module
+      objs.reject! {|o| o.__is_virtual }
+    end
+
     if block
-      objs.each(&block)
+      ObjectSpaceArray[*objs].each(&block)
     else
-      enum = Enumerable::Enumerator.new(objs, :each)
+      enum = Enumerable::Enumerator.new(ObjectSpaceArray[*objs], :each)
     end
   end
 
