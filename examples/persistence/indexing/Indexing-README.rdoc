@@ -1,4 +1,4 @@
-= MagLev indexing example
+= MagLev Indexing Example
 
 This directory contains an example of using MagLev's built-in indexing
 support to provide efficient search of unordered collections.  There are

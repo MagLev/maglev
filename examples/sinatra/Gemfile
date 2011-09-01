@@ -4,6 +4,7 @@
 source "http://rubygems.org"
 
 gem "sinatra"
+gem "rack"
 
 group :test do
   gem "rack-test", :require => "rack/test"

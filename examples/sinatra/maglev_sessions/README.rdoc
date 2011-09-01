@@ -14,10 +14,10 @@ To run:
 Then hit http://localhost:4567/
 
 If you run several web browser sessions, you'll see all of the sessions
-listed, and each one increments its count separately.  If you stop the
-Sinatra app, and then restart it, you should see your session count pick up
-from where you left it (the session data can persist independently of the
-VM).
+listed, and each one increments its count separately.  Since session state
+is stored in the MagLev repository, if you stop the Sinatra app, and then
+restart it, you should see your session count pick up from where you left
+it (as long as the broswer cookies are undisturbed).
 
 
 

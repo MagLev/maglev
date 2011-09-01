@@ -2,8 +2,11 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-* Fix 939, 943, 944 .
+== Changes for 26618 2011-08-31
+* Fix 939, 942, 943, 944, 946
 * Add MAGLEV_LINT logic in ruby.h
+* Several bugfixes/enhancements in underlying GemStone 3.1 system
+  - further improvements in WebTools
 
 == Changes for 26544 2011-08-23
 * Moved maglev libraries out of lib/ruby/site_ruby/1.8/maglev into lib/ruby/1.8/maglev.

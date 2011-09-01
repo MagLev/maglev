@@ -18,7 +18,7 @@ test(d.pos = 0,    0, 'pos= A')
 test(d.tell,       0, 'tell A')
 
 # Ensure enumerable is included properly
-test(d.select { |e| e == "." || e == ".."}, [".", ".."], 'Enumerable: select')
+test(d.select { |e| e == "." || e == ".."}.sort, [".", ".."].sort, 'Enumerable: select')
 
 # The following tests depend on the pre-defined files in test_dir
 # The constants below are the exepcted names of files in them
