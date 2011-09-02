@@ -154,7 +154,7 @@ module Maglev::Debugger
   end
 
   class Frame < Wrapper
-    attr_reader :debug_info, :gsmethod
+    attr_reader :debug_info, :gsmethod, :index, :thread
 
     def initialize(params)
       @gsmethod = params[:method]
@@ -169,7 +169,13 @@ module Maglev::Debugger
     end
 
     def context_eval(str)
-      raise NotImplementedError, "Do-it on frame not implemented"
+      context_object.instance_eval(str)
+    end
+
+    def context_object
+      @context ||= Context.create_for(self,
+                                      debug_info![:self],
+                                      debug_info![:context])
     end
 
     def initialize_frame_info
@@ -220,5 +226,48 @@ module Maglev::Debugger
         :block_nesting => @block_nesting,
         :debug_info => @debug_info }
     end
+
+    # Emulates the context of a frame execution
+    # Defines accessors to the frame locals and sets the instance variables to
+    # point to the original object's values
+    class Context
+      # Tries to create a duplicate of the receiver. If that is not possible,
+      # creates a new instance of self. In any case, a singleton class is added
+      # to define accessors to frame local values
+      def self.create_for(frame, receiver, context_hash)
+        begin
+          rcv = receiver.dup
+        rescue # Make sure that the receiver can be duplicated
+               # (If it can't, 'self' and 'class' won't work)
+          rcv = self.new(receiver)
+        end
+        rcv = self.new(receiver) if receiver === rcv
+
+        receiver.instance_variables do |name|
+          rcv.instance_variable_set(name, receiver.instance_variable_get(name))
+        end
+        context_hash.each do |k,v|
+          next if [:"(__self__)", :"(__class__)"].include? k
+          rcv.singleton_class.define_method(:k) { v }
+          rcv.singleton_class.define_method(:"k=") do |v|
+            frame.thread.__frame_at_temp_named_put(frame.index, k, v)
+          end
+        end
+        rcv
+      end
+
+      def initialize(rcv)
+        @receiver = rcv
+      end
+
+      def respond_to?(method)
+        @receiver.respond_to? method
+      end
+
+      def method_missing(method, *args, &block)
+        @receiver.send(method, *args, &block)
+      end
+    end
+
   end
 end
