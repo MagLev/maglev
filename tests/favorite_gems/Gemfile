@@ -4,6 +4,7 @@
 # Gemfile.lock, so it will test that the latest versions of the gems
 # install.
 
+source 'http://w2-stdev-ub10-01.gemstone.com:9292/'
 source "http://rubygems.org"
 
 gem "sinatra"
