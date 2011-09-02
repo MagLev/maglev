@@ -10,9 +10,8 @@ task :default => [:clean,
                   'rails:test']
 
 task :clean do
-  if File.directory?(PNAME)
-    rm_rf PNAME
-  end
+  rm_rf PNAME if File.directory?(PNAME)
+  rm_f 'Gemfile.lock'
 end
 
 namespace :rails do
