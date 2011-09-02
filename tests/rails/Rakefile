@@ -10,9 +10,8 @@ task :default => [:clean,
                   'rails:test']
 
 task :clean do
-  if File.directory?(PNAME)
-    rm_rf PNAME
-  end
+  rm_rf PNAME if File.directory?(PNAME)
+  rm_f FileList['Gemfile*.lock']
 end
 
 namespace :rails do
@@ -22,6 +21,7 @@ namespace :rails do
     sh "#{ML}/bin/maglev-gem uninstall -I activesupport" do |ok,stat|
       # ignore errors, we want to force an uninstall
     end
+    sh "#{ML}/bin/bundle --gemfile=Gemfile.bcrypt-ruby install" if File.exist? 'Gemfile.bcrypt-ruby'
     sh "#{ML}/bin/bundle install"
     cd("#{ML}/examples/rails") do
       sh "rake patch:activesupport"

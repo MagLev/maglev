@@ -103,5 +103,27 @@ module Process
     return count
   end
 
+  def self.waitpid2(pid, flags=0)
+    #  __waitpid2  updates $? as side effect
+    r = Kernel.__waitpid2(pid, flags)    
+    if r._isFixnum
+      Errno.handle( r )  
+    end
+    r
+  end
+
+  def self.waitpid(pid, flags=0)
+    arr = waitpid2(pid, flags)
+    arr[0]
+  end
+
+  def self.wait2(pid=-1)
+    waitpid2(pid, 0)
+  end
+
+  def self.wait(pid=-1)
+    waitpid(pid, 0)
+  end
+
 end
 Process.__freeze_constants

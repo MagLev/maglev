@@ -9,3 +9,4 @@ Dir.chdir File.dirname(__FILE__) do
   raise "Fail: wrong exitstatus #{$?.exitstatus}" unless $?.exitstatus == 1
   raise "Fail: wrong message #{result.inspect}" unless result =~ /No such file or directory - not_a_command/
 end
+puts "OK"

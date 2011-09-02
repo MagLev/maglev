@@ -1702,6 +1702,9 @@ end
 
 # :stopdoc:
 
+# define MAGLEV_LINT in your enviroment to detect via compile errors,
+#  common usage patterns where RTEST macro is likely missing in C code.
+
 def init_mkmf(config = CONFIG)
   $makefile_created = false
   $arg_config = []

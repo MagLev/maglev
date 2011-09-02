@@ -81,7 +81,6 @@ module Config
     config['vendorarchdir']     = File.join(config['vendorlibdir'], arch)
 
     # TODO SHELL
-    # TODO PATH_SEPARATOR
     config['arch']              = arch
     config['ruby_version']      = '1.8'
     cpu_os = Exception.__cpu_os_kind
@@ -97,6 +96,7 @@ module Config
     config["RM"]              = "rm -f"
     config["CP"]              = "cp"
     config["MAKEDIRS"]        = "mkdir -p"
+    config['PATH_SEPARATOR']  = ':'
 
     config['EXEEXT']            = ''
     config['LIBEXT']            = 'a'
@@ -133,6 +133,7 @@ module Config
       config['DLDFLAGS']   = " -bundle "
       config['ARCH_FLAG']  = ' -arch x86_64 '
       config['CC']         = env["CC"] || 'gcc '
+      config['DLEXT']      = 'bundle'
 
     when /x86_64_Solaris/i     # accept either "solaris" or "Solaris"
       config['CC']         = env["CC"] || "/opt/sunstudio12.1/bin/cc"

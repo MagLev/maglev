@@ -1,0 +1,37 @@
+require 'rake/clean'
+
+CLEAN.include('Makefile', '*.so', '*.bundle', '*.o')
+
+task :default => 'maglev:test'
+
+# build the whole thing under MagLev
+namespace :maglev do
+  task :make => :clean do
+    sh 'maglev-ruby extconf.rb'
+    sh 'make'
+  end
+
+  task :test => 'maglev:make' do
+    test_it
+  end
+end
+
+# build the whole thing under MRI
+namespace :mri do
+  task :make => :clean do
+    sh 'ruby extconf.rb'
+    sh 'make'
+  end
+
+  task :test do
+    test_it('ruby')
+  end
+end
+
+def test_it(ruby='maglev-ruby')
+  puts "=== testing require"
+  ["my_test.bundle", "my_test", "my_test.so"].each do |name|
+    str = "#{ruby} -e 'require \"#{name}\" ; p MyTest.new'"
+    sh str
+  end
+end
