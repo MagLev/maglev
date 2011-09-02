@@ -49,7 +49,12 @@ class String
     len = args.length
     # Do nothing for zero args (return self)
     if len._equal?(1)
-      self.initialize(args[0])
+      if self.class._equal?(String)
+        # do nothing
+      else
+        str = Type.coerce_to(args[0], String, :to_str)
+        self.replace(str)
+      end
     elsif len > 1
       raise ArgumentError, 'too many args'
     end
