@@ -177,6 +177,8 @@ module Kernel
     end
   end
 
+  primitive '__waitpid2' , 'waitpid:flags:'
+
   # call-seq:
   #   exec(command <, args*>)
   #   exec(<env, > command <, args*>, <options>) 
@@ -184,6 +186,58 @@ module Kernel
   # The following keys in options are not implemented
   #    :pgroup, :rlimit_xxx , :umask .
   def exec(*args)
+    arr = __pre_exec(*args)
+    original_wd = arr[4]
+    begin
+      cmd  = arr[0]
+      cmd = __find_on_path( cmd )
+      env_arr = arr[1]
+      dups_arr = arr[2]
+      arguments = arr[3]
+      child_pid = self.__execv(cmd, 0, env_arr, dups_arr, *arguments)
+      if child_pid < 0
+        Errno.handle( - child_pid )
+      end
+      raise 'Unexpected return from Kernel.__execv'
+    ensure
+      Errno.handle(Dir.__chdir(original_wd), "chdir back to #{original_wd}")
+    end
+  end
+
+  def spawn(*args)
+    arr = __pre_exec(*args)
+    original_wd = arr[4]
+    child_pid = nil
+    begin
+      cmd  = "sh"
+      env_arr = arr[1]
+      dups_arr = arr[2]
+      arguments = [ "-c", arr[0] ]
+      arguments.concat( arr[3] )
+      child_pid = self.__execv(cmd, 1, env_arr, dups_arr, *arguments)
+      if child_pid < 0
+        Errno.handle( - child_pid )
+      end
+    ensure
+      Errno.handle(Dir.__chdir(original_wd), "chdir back to #{original_wd}")
+    end
+    child_pid
+  end
+
+  def system(*args)
+    child_pid = self.spawn(*args)
+    done = false
+    count = 0
+    while !done
+      count += 1
+      arr = Process.waitpid2(child_pid, 0)
+      done = arr[0] != 0
+    end
+    $?.success? 
+  end
+
+  def __pre_exec(*args) 
+    # result is [ cmd, env_arr, dups_arr, arguments , original_wd]
     firstarg = args[0]
     env = nil
     env_arr = [ false , true ]  # env_arr[0] is unsetenv_others arg to prim
@@ -263,7 +317,6 @@ module Kernel
         lim -= 1
       end
       cmd = Type.coerce_to(cmd, String, :to_str)
-      cmd = __find_on_path(cmd)
       arguments = []
       while idx < lim
         arguments << Type.coerce_to(args[idx], String, :to_str)
@@ -272,10 +325,7 @@ module Kernel
       if wd_for_exec
         Dir.chdir(wd_for_exec)
       end
-      self.__execv(cmd, env_arr, dups_arr, *arguments)
-      raise 'Unexpected return from Kernel.__execv'
-    ensure
-      Errno.handle(Dir.__chdir(original_wd), "chdir back to #{original_wd}")
+      return [ cmd, env_arr, dups_arr, arguments , original_wd]
     end
   end
 
@@ -294,7 +344,7 @@ module Kernel
     raise Errno::ENOENT.new("No such file or directory - #{cmd}")
   end
 
-  primitive '__execv*', 'execv:envVars:fdDups:args:'
+  primitive '__execv*', 'execv:opcode:envVars:fdDups:args:'
 
   primitive_nobridge '__eval_with_position', '_eval:binding:with:fileName:lineNumber:'
 
@@ -970,19 +1020,7 @@ module Kernel
     arr[2]  # child stdout
   end
 
-  def system(command, *args)
-    cmd = command.dup  # don't destory parameter
-    n = 0
-    sz = args.length
-    while n < sz
-      cmd << ' '
-      cmd << args[n].to_s
-      n = n + 1
-    end
-    arr = __system_exec(cmd)  #   raw_status is arr[0]
-    # Note that arr is available as $?.__prim_result for debugging
-    arr[2]  # child completion boolean
-  end
+  # def system ; end  # see above near   def exec
 
   # See <tt>Signal.trap</tt>.
   def trap(sig, command=nil, &block)

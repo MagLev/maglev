@@ -21,6 +21,7 @@ task :environment do
   raise "Can't find maglev bundle '#{MBUNDLE}'" unless File.exist? MBUNDLE
   rm_f 'Gemfile.lock'
   sh "#{MBUNDLE} install"
+  sh "#{MBUNDLE} update"
 end
 
 task :workaround do
