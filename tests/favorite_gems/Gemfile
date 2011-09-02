@@ -3,8 +3,7 @@
 # This gemfile does not list particular versions, and the test removes any
 # Gemfile.lock, so it will test that the latest versions of the gems
 # install.
-
-source 'http://w2-stdev-ub10-01.gemstone.com:9292/'
+source 'http://w2-stdev-ub10-01.gemstone.com:9292'
 source "http://rubygems.org"
 
 gem "sinatra"
@@ -12,4 +11,4 @@ gem "rack"
 gem "rack-test", :require => "rack/test"
 gem "minitest",  :require => "minitest/unit"
 gem "rdiscount"
-gem "activemodel", "~>3.0"
+gem "activemodel", "~>3.1"
