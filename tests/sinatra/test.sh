@@ -10,6 +10,7 @@ rm -rf sinatra
 git clone https://github.com/sinatra/sinatra.git
 
 cd sinatra
+
 git submodule init
 git submodule update --init --recursive
 
@@ -18,6 +19,8 @@ git submodule update --init --recursive
 # than sed because Solaris sed is broken (no -i).
 echo "Patching sinatra/Gemfile"
 perl -pi -e s/git:/http:/ Gemfile
+echo "source 'http://w2-stdev-ub10-01.gemstone.com:9292'"|cat - Gemfile > Gemfile.new
+mv Gemfile.new Gemfile
 
 export rack=master
 
