@@ -219,9 +219,9 @@ module Maglev::Debugger
           ary[6].each_with_index {|name,idx| context[name] = ary[7][idx] }
           # Then the remaining scope values with temporary names
           ary[7][ary[6].size..-1].each_with_index {|v,i| context[:'t#{i}'] = v}
-          context[:'(__receiver__)'] = ary[1]
-          context[:'(__class__)'] = ary[1].class
-          context[:'(__self__)'] = ary[2]
+          context[:'(receiver)'] = ary[1]
+          context[:'(class)'] = ary[1].class
+          context[:'(self)'] = ary[2]
           { :gsMethod => ary[0],
             :receiver => ary[1],
             :self => ary[2],
@@ -263,7 +263,7 @@ module Maglev::Debugger
           rcv.instance_variable_set(name, receiver.instance_variable_get(name))
         end
         context_hash.each do |k,v|
-          next if [:"(__self__)", :"(__class__)"].include? k
+          next if [:"(self)", :"(class)", :"(receiver)"].include? k
           rcv.singleton_class.define_method(:k) { v }
           rcv.singleton_class.define_method(:"k=") do |v|
             frame.thread.__frame_at_temp_named_put(frame.index, k, v)
