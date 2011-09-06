@@ -82,6 +82,7 @@ class Object
   # End private helper methods
 
   primitive_nobridge '==', '='
+  primitive_nobridge '__eql?', '='
   primitive 'hash'
   primitive 'object_id', 'asOop'
   primitive '__id__' , 'asOop'  # included in public names query results
@@ -370,7 +371,7 @@ class Object
   # Attempts to reimplement _not_equal? will fail with a compile error.
 
   def eql?(other)
-    self == other
+    self.__eql?(other)
   end
 
   def extend(*modules)
