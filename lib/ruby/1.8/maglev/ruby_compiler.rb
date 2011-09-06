@@ -33,4 +33,12 @@ class RubyCompiler
     _compile(ruby_source_string.freeze, file_name)
   end
 
+  def compile_method(ruby_source_string, file_name="<a String>", line=0, klass=Object)
+    prefix = klass.is_a?(Class) ? "class" : "module"
+    ruby_source_string = "#{prefix} #{klass.name}\n" +
+      ("\n" * [(line - 1), 0].max) +
+      ruby_source_string +
+      "\nend"
+    _compile(ruby_source_string.freeze, file_name)
+  end
 end

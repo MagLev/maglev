@@ -1,3 +1,4 @@
+require 'maglev/ruby_compiler'
 # Methods to get access to method source code.
 
 class Module
@@ -14,5 +15,32 @@ class Module
     src = gsnmeth.__source_string
     file,line = gsnmeth.__source_location
     [src,file,line]
+  end
+
+  def set_method_source(method_name, source, instance_method=true)
+    src, file, line = method_source(method_name, instance_method)
+
+    unless File.writable?(file) && File.writable?(File.dirname(file))
+      raise ArgumentError, "cannot write to method source and source directory"
+    end
+    unless src
+      raise ArgumentError, "not an ordinary method"
+    end
+
+    # Compile the new method
+    line = line - 1
+    RubyCompiler.new.compile_method(source, file, line, self)
+
+    # Write a new file with updated contents
+    original_contents = File.readlines(file)
+    copy = File.open("#{file}.tmp", 'w+') do |f|
+      f.write(original_contents[0...line].join)
+      f.write(original_contents[line..-1].join.sub(src, source))
+    end
+
+    # Rename to original file
+    File.rename("#{file}.tmp", file)
+
+    [source, file, line + 1]
   end
 end
