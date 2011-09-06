@@ -251,21 +251,28 @@ module Maglev::Debugger
       # creates a new instance of self. In any case, a singleton class is added
       # to define accessors to frame local values
       def self.create_for(frame, receiver, context_hash)
+        rcv = nil
         begin
           rcv = receiver.dup
-        rescue # Make sure that the receiver can be duplicated
-               # (If it can't, 'self' and 'class' won't work)
+        rescue Exception
+        end
+        if receiver === rcv || rcv.nil?
           rcv = self.new(receiver)
-        end
-        rcv = self.new(receiver) if receiver === rcv
 
-        receiver.instance_variables do |name|
-          rcv.instance_variable_set(name, receiver.instance_variable_get(name))
+          receiver.instance_variables do |name|
+            rcv.instance_variable_set(name, receiver.instance_variable_get(name))
+          end
+
+          receiver_mod = (receiver.is_a?(Module) ? receiver : receiver.class)
+          receiver_mod.constants do |sym|
+            rcv.singleton_class.const_set(sym, receiver_mod.const_get(sym))
+          end
         end
+
         context_hash.each do |k,v|
           next if [:"(self)", :"(class)", :"(receiver)"].include? k
-          rcv.singleton_class.define_method(:k) { v }
-          rcv.singleton_class.define_method(:"k=") do |v|
+          rcv.singleton_class.define_method(:"#{k}") { v }
+          rcv.singleton_class.define_method(:"#{k}=") do |v|
             frame.thread.__frame_at_temp_named_put(frame.index, k, v)
           end
         end
@@ -274,6 +281,10 @@ module Maglev::Debugger
 
       def initialize(rcv)
         @receiver = rcv
+      end
+
+      def myself
+        @receiver
       end
 
       def respond_to?(method)
