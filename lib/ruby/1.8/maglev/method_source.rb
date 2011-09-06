@@ -17,8 +17,19 @@ class Module
     [src,file,line]
   end
 
-  def set_method_source(method_name, source, instance_method=true)
-    src, file, line = method_source(method_name, instance_method)
+  def set_method_source(method_name, source)
+    if self.ancestors.collect(&:to_s).include? "StClass"
+      if source =~ /^\s+def\s+self\./m
+        compile_source = source.sub(/def\s+self./, "def ")
+      end
+    end
+    compile_source ||= source
+
+    begin
+      src, file, line = method_source(method_name, true)
+    rescue Exception
+      src, file, line = method_source(method_name, false)
+    end
 
     unless File.writable?(file) && File.writable?(File.dirname(file))
       raise ArgumentError, "cannot write to method source and source directory"
@@ -29,7 +40,7 @@ class Module
 
     # Compile the new method
     line = line - 1
-    RubyCompiler.new.compile_method(source, file, line, self)
+    self.class_eval(compile_source, file, line)
 
     # Write a new file with updated contents
     original_contents = File.readlines(file)
