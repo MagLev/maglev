@@ -154,7 +154,7 @@ module Maglev::Debugger
   end
 
   class Frame < Wrapper
-    attr_reader :debug_info, :gsmethod, :index, :thread
+    attr_reader :debug_info, :gsmethod, :index, :thread, :method_name
 
     def initialize(params)
       @gsmethod = params[:method]
