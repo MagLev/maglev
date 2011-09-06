@@ -168,6 +168,20 @@ module Maglev::Debugger
       @thread.__trim_stack_to_level(@index)
     end
 
+    # Step. The manner of stepping defaults to :over, but :into or the
+    # number of steps can be passed as arguments
+    def step(symbol = :over)
+      raise RuntimerError, "can only step top frame" unless @index === 1
+      case symbol
+      when :into
+        @thread.__step_over_in_frame(0)
+      when :over
+        @thread.__step_over_in_frame(1)
+      when Fixnum
+        @thread.__step_over_in_frame(arg)
+      end
+    end
+
     def context_eval(str)
       context_object.instance_eval(str)
     end
@@ -211,7 +225,8 @@ module Maglev::Debugger
             :receiver => ary[1],
             :self => ary[2],
             :method => ary[3],
-            :stepOffset => (ary[4] ? ary[5][ary[4]] : nil),
+            :stepOffset => ary[4],
+            :stepPoints => ary[5],
             :source => ary[8],
             :context => context }
         end

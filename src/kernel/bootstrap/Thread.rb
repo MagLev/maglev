@@ -324,4 +324,6 @@ class Thread
   #  10 ipOffset
   #  11 markerOrException
   primitive '__gsi_debugger_detailed_report_at', '_gsiDebuggerDetailedReportAt:'
+  # Stepping
+  primitive '__step_over_in_frame', '_stepOverInFrame:'
 end
