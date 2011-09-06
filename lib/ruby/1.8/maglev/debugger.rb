@@ -172,7 +172,7 @@ module Maglev::Debugger
     # Step. The manner of stepping defaults to :over, but :into or the
     # number of steps can be passed as arguments
     def step(symbol = :over)
-      raise RuntimerError, "can only step top frame" unless @index === 1
+      raise RuntimeError, "can only step top frame" unless @index === 1
       case symbol
       when :into
         @thread.__step_over_in_frame(0)
