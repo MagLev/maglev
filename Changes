@@ -2,13 +2,15 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26719 2011-09-02
+== Changes for 26734 2011-09-06
 * Fix 939, 942, 943, 944, 946
 * Fix 947, 948, 949, 950
 * Add MAGLEV_LINT logic in ruby.h
 * Fix require logic to search for dyn libs with extensions other than .so
 * Fix kdtree example so that it doesn't require as much temp obj cache
 * Several bugfixes/enhancements in underlying GemStone 3.1 system
+  - initial cut at nested transactions (max 16 levels)
+  - gracefully handle "offset from code memory ... exceeds 32bits" on Mac OS X.
   - further improvements in WebTools
 
 == Changes for 26544 2011-08-23
