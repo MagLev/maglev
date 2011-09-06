@@ -1,13 +1,5 @@
 TESTS_DIR = File.join(MAGLEV_HOME, 'tests')
 
-namespace :gems do
-  desc "Remove all installed gems; reset to checked out version of pre-installed gems"
-  task :clean do
-    rm_rf 'lib/maglev'
-    sh "git checkout lib/maglev"
-  end
-end
-
 namespace :tests do
   desc "Run tests in $MAGLEV_HOME/src/test/vmunit.conf (was dev:vm-tests)"
   task :vmunit do
@@ -32,7 +24,11 @@ namespace :tests do
   end
 
   desc "Test that many of our favorite rubygems install"
-  task :fav_gems_install => 'gems:clean' do
+  # NOTE: we used to do a clean of all the gems here, but there were too
+  # many interactions with jenkins.  We now assume the calling environment
+  # manages how clean our gemdir is.
+  task :fav_gems_install do
+    puts "== :fav_gems_install: Assuming gems are already clean..."
     cd(File.join(TESTS_DIR, 'favorite_gems')) do
       rm_f 'Gemfile.lock'
       sh "#{MAGLEV_HOME}/bin/bundle install"
