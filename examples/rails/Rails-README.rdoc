@@ -15,8 +15,8 @@ GitHub.
      $ rake maglev:start      # or: $MAGLEV_HOME/bin/maglev start
 
 2. Install Rails and patch it:
-     $ $MAGLEV_HOME/bin/gem install rails --pre
      $ cd $MAGLEV_HOME/examples/rails
+     $ $MAGLEV_HOME/bin/bundle install
      $ rake patch:activesupport
 
 3. Setup the Database (see bottom of file for MySQL details):
@@ -26,7 +26,7 @@ GitHub.
 
 4. Run the app:
      $ cd $MAGLEV_HOME/examples/rails/myapp
-     $ $MAGLEV_HOME/bin/rails server
+     $ $MAGLEV_HOME/bin/bundle exec rails server
 
    Then hit http://localhost:3000/
 
@@ -44,35 +44,30 @@ Tutorial}[http://guides.rails.info/getting_started.html].
 === 1. Install rails
 
 Install rails:
-     $ $MAGLEV_HOME/bin/gem install rails --version=3.1.0.rc4
+     $ cd $MAGLEV_HOME/examples/rails
+     $ $MAGLEV_HOME/bin/bundle install
 
 You will need to patch activesupport.  The patches directory has patches
-for rails versions 3.0.0, 3.0.3, 3.0.4, 3.1.0rc4
+for rails 3.1.0 and a few prior releases.
      $ cd $MAGLEV_HOME/examples/rails
      $ rake patch:activesupport
 
 === 2. Create and configure new rails app
 
 Generate the application:
-     $ $MAGLEV_HOME/bin/rails new myapp
+    $ MAGLEV_HOME/bin/bundle exec rails new myapp
 
 And configure the database:
     $ cd myapp
     $ $MAGLEV_HOME/bin/bundle exec $MAGLEV_HOME/bin/rake db:create
 
 === 3. Start server
-
-    $ cd myapp
-    $ $MAGLEV_HOME/bin/rails server
-
-Static pages in the app load fine under MagLev: http://localhost:3000/
-Simple dynamic pages work fine under MagLev: http://localhost:3000/rails/info/properties
+    $ $MAGLEV_HOME/bin/bundle exec rails server
 
 === 4. Generate new controllers and scaffolding
 
 Run:
-    $ $MAGLEV_HOME/bin/rails generate controller home index
-and generate the expected files.
+    $ $MAGLEV_HOME/bin/bundle exec rails generate controller home index
 
 If you remove <tt>public/index.html</tt> and add the following into
 <tt>config/routes.rb</tt>, you should be able to hit http://localhost:3000/
@@ -82,22 +77,11 @@ and see <tt>home#index</tt>
 === 5. More Scaffolding and Running migrations
 
 You can also create scaffolding and run migrations:
-    $ $MAGLEV_HOME/bin/rails generate scaffold Post name:string title:string content:text
+    $ $MAGLEV_HOME/bin/bundle exec rails generate scaffold Post name:string title:string content:text
     $ $MAGLEV_HOME/bin/rake db:migrate
 
 You should now be able to start the server and hit
 http://localhost:3000/posts and start managing your blog.
-
-== Patch Details
-
-The following patches are applied:
-1. Patch changes the manner in which all subclasses are found.  MagLev
-   does not support <tt>ObjectSpace#each_object</tt> (since objects may be
-   persisted, there can be hundreds of millions of them...).  This patch allows
-   finding all subclasses currently loaded in a VM.  The ActiveSupport file
-   already has patches for Rubinius and JRuby.  We expect to submit this patch
-   to Rails.
-2. There is a patch to workaround an include problem.
 
 == MySQL details
 
@@ -124,4 +108,3 @@ Then run bundle:
 
     $ cd myapp
     $ $MAGLEV_HOME/bin/bundle install
-
