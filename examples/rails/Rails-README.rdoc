@@ -1,12 +1,3 @@
-
-
-  TODO: Bcrypt-Ruby gem issues:
-  * Could fix the ffi version
-  * Could get the maglev-bcrypt-ruby gem published
-  * Could encourage bcrypt-ruby to publish again
-
-
-
 = Notes on MagLev and Rails 3
 
 The files in this directory allow you to run the default Rails app on
@@ -35,7 +26,7 @@ GitHub.
 
 4. Run the app:
      $ cd $MAGLEV_HOME/examples/rails/myapp
-     $ $MAGLEV_HOME/bin/rails server
+     $ $MAGLEV_HOME/bin/bundle exec rails server
 
    Then hit http://localhost:3000/
 
@@ -71,12 +62,12 @@ And configure the database:
     $ $MAGLEV_HOME/bin/bundle exec $MAGLEV_HOME/bin/rake db:create
 
 === 3. Start server
-    $ $MAGLEV_HOME/bin/bundle rails server
+    $ $MAGLEV_HOME/bin/bundle exec rails server
 
 === 4. Generate new controllers and scaffolding
 
 Run:
-    $ $MAGLEV_HOME/bin/bundle rails generate controller home index
+    $ $MAGLEV_HOME/bin/bundle exec rails generate controller home index
 
 If you remove <tt>public/index.html</tt> and add the following into
 <tt>config/routes.rb</tt>, you should be able to hit http://localhost:3000/
