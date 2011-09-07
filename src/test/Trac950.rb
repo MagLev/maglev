@@ -6,6 +6,7 @@ class SafeBuffer < String
   end
 end
 
-SafeBuffer.new('x')
+sx = SafeBuffer.new('abc')
+unless sx[0,3] == 'abc' ; raise 'fail'; end
 true
 

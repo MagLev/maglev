@@ -371,7 +371,15 @@ class Object
   # Attempts to reimplement _not_equal? will fail with a compile error.
 
   def eql?(other)
-    self.__eql?(other)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
+    unless added # fix #951
+      ts.remove(self)
+      return self.__eql?(other)
+    end
+    return self == other
+  ensure
+    ts.remove(self)
   end
 
   def extend(*modules)
@@ -385,7 +393,7 @@ class Object
           cl = FalseClass
         else
           raise ArgumentError, "cannot extend a special object"
-        end 
+        end
       else
         cl = self.__class_for_extend
       end
@@ -468,10 +476,10 @@ class Object
     bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
     vcgl = [ self.__getRubyVcGlobal(0x30), self.__getRubyVcGlobal(0x31) ,
-             nil ,  # slot used later on for theSelf 
+             nil ,  # slot used later on for theSelf
              block_arg
            ]
-    m_args = [ bnd, 
+    m_args = [ bnd,
                 args[1], # file
                 args[2] ]  # line
     res = __instance_eval_string(string, vcgl, *m_args )
@@ -533,7 +541,7 @@ class Object
   end
 
   def singleton_methods(inc_modules = true)
-    inc_mods = inc_modules ? true : false 
+    inc_mods = inc_modules ? true : false
     Module.__filter_method_names(__ruby_singleton_methods(inc_mods, 0))
   end
 
@@ -590,7 +598,7 @@ class Object
 
   def __to_proc_arg
      # used in BlockPassNode IR
-    self.to_proc 
+    self.to_proc
   end
 
   def to_a
@@ -611,13 +619,13 @@ class Object
   def to_s
     self.class.name.to_s
   end
- 
+
   def __cext_to_s
     str = "#<"
     str << self.class.name
     str <<  ?:
     str << self.__id.to_s
-    str << ?> 
+    str << ?>
   end
 
   def __regex_to_s
