@@ -61,6 +61,20 @@ def test_crypto_digest
   test(md.nil?, false, "OpenSSL::Digest::SHA1.new")
 end
 
+def test_file
+  digest_class = OpenSSL::Digest.const_get('MD5')
+  path = File.join(File.dirname(__FILE__), 'test_data', 'openssl_test.txt')
+
+  # Test instance side method
+  digest = digest_class.new.update('XYZ')
+  digest.file(path)
+  test(digest.hexdigest, "05c3a23c39f8212d5d8b0beca20cc09f", 'a_digest.file(...)')
+
+  # Test class side method
+  digest = digest_class.file(path)
+  test(digest.hexdigest, "4d54ce1fbbf79e3f47f97732afdbe043", 'digest_class.file(...)')
+end
+
 def test_sha1
   bogus = OpenSSL::LibCrypto.EVP_get_digestbyname('BOGUS')
   test(bogus.null?, true, "EVP_get_digestbyname BOGUS")
@@ -110,5 +124,6 @@ test_basic_ruby_use_case
 test_openssl_module
 # test_all_hmac_impls
 test_random
+test_file
 
 report

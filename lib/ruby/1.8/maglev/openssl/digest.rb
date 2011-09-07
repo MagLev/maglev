@@ -120,6 +120,17 @@ module OpenSSL
       @ctx.md
     end
 
+    # update the digest with the given file name.  Return self.
+    def file(name)
+      File.open(name, "rb") {|f|
+        buf = ""
+        while f.read(16384, buf)
+          update buf
+        end
+      }
+      self
+    end
+
     # call-seq:
     #   digest.finish -> digest_string
     #
