@@ -154,6 +154,8 @@ class ObjectLogEntry
   # Return receiver's pid attribute
   primitive_nobridge 'pid', 'pid'
 
+  primitive_nobridge 'has_cc?', 'hasContinuation'
+
   primitive_nobridge '_timestamp', 'stamp'  # the timestamp is held as stamp
   # Return receiver's timestamp attribute
   def timestamp
@@ -162,6 +164,7 @@ class ObjectLogEntry
 
   # Return true if the reciever has been tagged
   primitive_nobridge 'tagged?', 'hasTag'
+  primitive_nobridge 'tag', 'tag'
 
   # Return receiver's label attribute
   primitive_nobridge 'label', 'label'
