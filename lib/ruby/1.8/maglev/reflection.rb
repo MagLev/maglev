@@ -1,4 +1,5 @@
 require 'maglev/objectlog'
+require 'set'
 
 class Thread
   # Saves the Thread to the ObjectLog.
@@ -373,32 +374,37 @@ class UnboundMethod
     options = {:args => 0, :splat => false,
       :block => false, :keep => false}.merge(options)
     unless options[:keep]
-      string = string.to_s + args.to_s +
+      string = string.to_s + options[:args].to_s +
         (options[:splat] ? '*' : '_') +
         (options[:block] ? '&' : '_')
     end
-    !!@_st_gsmeth.__source_offset_first_send_of(string.to_s).nil?
+    !@_st_gsmeth.__source_offset_first_send_of(string.to_sym).nil?
+  end
+
+  def ==(other)
+    false unless other === self.class
+    in_class == other.in_class && name == other.name
   end
 end
 
 class String
   def implementors
-    ary = IdentitySet.new
+    ary = Set.new
     Object.each_module do |m|
       ary.add(m.instance_method(self)) if m.instance_methods(false).include? self
       ary.add(m.method(self)) if m.methods(false).include? self
     end
-    ary.to_a
+    ary
   end
 
   def senders
-    ary = IdentitySet.new
+    ary = Set.new
     Object.each_module do |m|
       meths = m.instance_methods(false).collect {|n| m.instance_method(n) }
       meths += m.methods(false).collect {|n| m.method(n) }
-      meths.each {|meth| ary.add(meth) if meth.sends_message? self, :keep => true }
+      meths.each {|meth| ary.add(meth) if meth.sends_message?(self, :keep => true) }
     end
-    ary.to_a
+    ary
   end
 end
 
