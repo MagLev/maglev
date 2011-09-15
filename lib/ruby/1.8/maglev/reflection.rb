@@ -68,7 +68,8 @@ class Thread
   # Simple check whether the thread looks like as if it is in a persistable (i.e.
   # non-runnable) state
   def in_persistable_state?
-    self.thread_data.collect(&:class).include? RubyPersistableCompilerState
+    return true if thread_data.nil?
+    thread_data.collect(&:class).include? RubyPersistableCompilerState
   end
 
   # Saves the Thread to the ObjectLog.
