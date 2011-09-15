@@ -274,7 +274,6 @@ class Module
 
   def compile_method(source, selector = nil)
     meth_dict = instance_methods(false) + methods(false)
-    p selector
     if selector || (md = /^\s*def\s+(?:self\.)?([^;\( \n]+)/.match(source))
       selector = selector || md[1]
       begin
