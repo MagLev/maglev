@@ -37,17 +37,18 @@ Maglev.persistent do
     # => raises Exception, if any
     def debug(reraise = false, &block)
       raise ArgumentError, "must supply a block to debug" unless block
-
-      client = Thread.start(Thread.current, block) do |parent_thread, blk|
+      pkey = Thread.current.object_id
+      Maglev::System.session_temp_put(:"#{pkey}", Thread.current)
+      client = Thread.start(block, !!reraise, pkey) do |blk, reraise_dup, parent|
         begin
           Thread.current[:result] = blk.call
         rescue Exception => e
-          if reraise
+          if reraise_dup
             save_exception(e)
             raise e
           else
             Thread.current[:exception] = e
-            parent_thread.wakeup
+            Maglev::System.session_temp(:"#{parent}").wakeup
             Thread.stop
           end
         end
