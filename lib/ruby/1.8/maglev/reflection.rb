@@ -176,8 +176,12 @@ class Thread
       Hash[names.zip(values)]
     end
 
+    def variable_context
+      @thread.__frame_contents_at(@index)[3]
+    end
+
     def inspect
-      "#<Frame #{@index}: #{@method.inspect} >> #{thread.inspect}>"
+      "#<Frame #{@index}: #{@method.in_class}##{@method.name} >> #{thread.inspect}>"
     end
 
     private
