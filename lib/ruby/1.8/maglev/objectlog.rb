@@ -176,8 +176,21 @@ end
 
 class DebuggerLogEntry < ObjectLogEntry
   # Creates a new continuation at this point and stores in the object log
-  class_primitive 'create_continuation_labeled', 'createContinuationLabeled:'
-
-  # access to the GsProcess
+  # Uses the Ruby variant, that converts the created continuation into a
+  # persistable version
+  class_primitive 'create_continuation_labeled', 'rubyCreateContinuationLabeled:'
   primitive 'continuation', 'continuation'
+
+  # Readies the continuation for resume. nils the instance variable, removing
+  # the thread from the stone
+  def resume_continuation
+    t = self.continuation
+    t.convert_to_runnable_state
+    self.__continuation = nil
+    t
+  end
+
+  private
+  primitive '__continuation=', 'continuation:'
 end
+

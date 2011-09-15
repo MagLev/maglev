@@ -2,6 +2,75 @@ require 'maglev/objectlog'
 require 'set'
 
 class Thread
+  # => GsNMethod
+  primitive '__method_at', 'methodAt:'
+  # => Fixnum
+  primitive '__stack_depth', 'stackDepth'
+  # Remove all frames above [Fixnum]
+  primitive '__trim_stack_to_level', '_trimStackToLevel:'
+  # Change temporary at level to value
+  primitive '__frame_at_temp_named_put', '_frameAt:tempNamed:put:'
+  # => Array
+  #    with:
+  #  1  gsMethod
+  #  2  self
+  #  4  selector
+  #  5  quickStepPoint (offset into sourceOffsets)
+  #  6  sourceOffsets (the points where each step would be at)
+  #  7  argAndTempNames
+  #  8  argAndTempValues (maybe smaller or larger than argAndTempNames)
+  #  9  sourceString
+  #  10 ipOffset
+  #  11 markerOrException
+  primitive '__gsi_debugger_detailed_report_at', '_gsiDebuggerDetailedReportAt:'
+  # Stepping
+  primitive '__step_over_in_frame', '_stepOverInFrame:'
+  # Persistence conversions
+  primitive 'convert_to_persistable_state', "convertToPersistableState"
+  primitive 'convert_to_runnable_state', 'convertToRunnableState'
+  primitive '__ar_stack', 'arStack'
+  primitive '__client_data', '_clientData'
+  #  Private.  Returns an Array describing the specified level in the receiver.
+  #  aLevel == 1 is top of stack.  If aLevel is less than 1 or greater than
+  #  stackDepth, returns nil.
+  #  The result Array contains:
+  #  offset item
+  #  -----  -----
+  #    0    gsMethod
+  #    1    ipOffset
+  #    2    frameOffset (zero-based)
+  #    3    varContext
+  #    4    saveProtectedMode
+  #    5    markerOrException
+  #    6    nil (not used)
+  #    7    self (possibly nil in a ComplexBlock)
+  #    8    argAndTempNames (an Array of Symbols or Strings)
+  #    9    receiver
+  #   10    arguments and temps, if any
+  primitive '__frame_contents_at', '_frameContentsAt:'
+  primitive '__run' , 'rubyRun'
+  primitive '__wakeup', 'rubyResume'
+
+  def run
+    if in_persistable_state?
+      raise RuntimeError, "You have to call #resume_continuation on the ObjectLogEntry for this Thread, before trying to re-run it"
+    end
+    __run
+  end
+
+  def wakeup
+    if in_persistable_state?
+      raise RuntimeError, "You have to call #resume_continuation on the ObjectLogEntry for this Thread, before trying to re-run it"
+    end
+    __wakeup
+  end
+
+  # Simple check whether the thread looks like as if it is in a persistable (i.e.
+  # non-runnable) state
+  def in_persistable_state?
+    self.thread_data.collect(&:class).include? RubyPersistableCompilerState
+  end
+
   # Saves the Thread to the ObjectLog.
   #
   # @param [String] message the message under which to save the entry,
@@ -22,10 +91,6 @@ class Thread
     DebuggerLogEntry.create_continuation_labeled(message)
     Maglev.commit_transaction if force_commit || !Maglev.needs_commit
     self
-  end
-
-  # Ready a thread recovered from the ObjectLog for resumption
-  def load
   end
 
   # Remove Thread from ObjectLog
@@ -132,8 +197,45 @@ class Thread
   end
 
   # The list of saved threads in the ObjectLog
-  def self.saved_list
+  def self.saved_errors
+    ObjectLog.errors
   end
+
+  def raw_stack
+    self.__ar_stack || begin # Force data into cache, if neccessary
+                         self.stack
+                         self.__ar_stack
+                       end
+  end
+
+  def thread_data
+    self.__client_data
+  end
+
+  def compiler_state
+    self.__client_data.first
+  end
+
+  VariableContext = __resolve_smalltalk_global(:VariableContext)
+  VariableContext.primitive '[]', 'at:'
+  VariableContext.primitive '[]=', 'at:put:'
+  VariableContext.primitive 'size', 'size'
+
+  RubyPersistableCompilerState =
+    __resolve_smalltalk_global(:RubyPersistableCompilerState)
+  RubyCompilerState =
+    __resolve_smalltalk_global(:RubyCompilerState)
+  class RubyCompilerState < RubyPersistableCompilerState; end
+  RubyCompilerState.primitive 'to_persistent_state', 'asPersistentState'
+  RubyPersistableCompilerState.primitive 'to_transient_state', 'asTransientState'
+
+  RubyPersistableCompilerStack =
+    __resolve_smalltalk_global(:RubyPersistableCompilerStack)
+  RubyCompilerStack =
+    __resolve_smalltalk_global(:RubyCompilerStack)
+  class RubyCompilerStack < RubyPersistableCompilerStack; end
+  RubyCompilerStack.primitive 'to_persistent_state', 'asPersistentState'
+  RubyPersistableCompilerStack.primitive 'to_transient_state', 'asTransientState'
 end
 
 RubyNameSpace = __resolve_smalltalk_global(:RubyNameSpace)
@@ -430,5 +532,23 @@ class Maglev::System
       array << [statlist.first, Hash[descr.zip(statlist[1..-1])]]
     end
     sorted ? ary : Hash[ary]
+  end
+end
+
+class Object
+  primitive 'find_all_references', 'findAllReferences'
+  primitive 'find_all_references_in_memory', 'findReferencesInMemory'
+end
+
+class ObjectSpace::Repository
+  primitive '__find_objs_connected_to', 'findObjsConnectedTo:'
+  primitive '__findReferencePathToObjectsfindAllRefsprintToLog', 'findReferencePathToObjects:findAllRefs:printToLog:'
+
+  def find_objs_connected_to(array_or_obj)
+    __find_objs_connected_to([*array_or_obj])
+  end
+
+  def find_reference_path_to(array_or_obj, find_all = true, log = true)
+    __findReferencePathToObjectsfindAllRefsprintToLog([*array_or_obj], find_all, log)
   end
 end

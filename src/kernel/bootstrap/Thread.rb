@@ -301,29 +301,4 @@ class Thread
   primitive_nobridge 'value' , 'joinValue'
 
   primitive_nobridge 'wakeup', 'rubyResume'
-
-  # Debugging support
-  # => GsNMethod
-  primitive '__method_at', 'methodAt:'
-  # => Fixnum
-  primitive '__stack_depth', 'stackDepth'
-  # Remove all frames above [Fixnum]
-  primitive '__trim_stack_to_level', '_trimStackToLevel:'
-  # Change temporary at level to value
-  primitive '__frame_at_temp_named_put', '_frameAt:tempNamed:put:'
-  # => Array
-  #    with:
-  #  1  gsMethod
-  #  2  self
-  #  4  selector
-  #  5  quickStepPoint (offset into sourceOffsets)
-  #  6  sourceOffsets (the points where each step would be at)
-  #  7  argAndTempNames
-  #  8  argAndTempValues (maybe smaller or larger than argAndTempNames)
-  #  9  sourceString
-  #  10 ipOffset
-  #  11 markerOrException
-  primitive '__gsi_debugger_detailed_report_at', '_gsiDebuggerDetailedReportAt:'
-  # Stepping
-  primitive '__step_over_in_frame', '_stepOverInFrame:'
 end
