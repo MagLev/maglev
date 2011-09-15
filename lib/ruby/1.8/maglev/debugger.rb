@@ -19,8 +19,8 @@ Maglev.persistent do
       res = ObjectLog.to_a.last
       begin
         Maglev.commit_transaction
-      rescue Exception
-        warn "A transaction error occured trying to save a continuation to the stone"
+      rescue Exception => e
+        warn "Error trying to save a continuation to the stone: #{e.message}"
       end
       res
     end
