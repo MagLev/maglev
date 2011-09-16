@@ -69,7 +69,7 @@ class Thread
   # non-runnable) state
   def in_persistable_state?
     return true if thread_data.nil?
-    thread_data.collect(&:class).include? RubyPersistableCompilerState
+    thread_data.collect(&:class).collect(&:name).include? :RubyPersistableCompilerState
   end
 
   # Saves the Thread to the ObjectLog.
@@ -225,22 +225,6 @@ class Thread
   VariableContext.primitive '[]', 'at:'
   VariableContext.primitive '[]=', 'at:put:'
   VariableContext.primitive 'size', 'size'
-
-  RubyPersistableCompilerState =
-    __resolve_smalltalk_global(:RubyPersistableCompilerState)
-  RubyCompilerState =
-    __resolve_smalltalk_global(:RubyCompilerState)
-  class RubyCompilerState < RubyPersistableCompilerState; end
-  RubyCompilerState.primitive 'to_persistent_state', 'asPersistentState'
-  RubyPersistableCompilerState.primitive 'to_transient_state', 'asTransientState'
-
-  RubyPersistableCompilerStack =
-    __resolve_smalltalk_global(:RubyPersistableCompilerStack)
-  RubyCompilerStack =
-    __resolve_smalltalk_global(:RubyCompilerStack)
-  class RubyCompilerStack < RubyPersistableCompilerStack; end
-  RubyCompilerStack.primitive 'to_persistent_state', 'asPersistentState'
-  RubyPersistableCompilerStack.primitive 'to_transient_state', 'asTransientState'
 end
 
 RubyNameSpace = __resolve_smalltalk_global(:RubyNameSpace)
