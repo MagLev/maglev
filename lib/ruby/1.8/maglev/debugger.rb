@@ -46,7 +46,6 @@ Maglev.persistent do
                      rescue Exception => e
                        log_entry = save_exception(e)
                        debugger_e = DebuggerException.new(e, log_entry)
-                       nil.pause
                        raise debugger_e
                      end
                    end)
