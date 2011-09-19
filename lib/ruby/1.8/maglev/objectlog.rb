@@ -186,11 +186,25 @@ Maglev.persistent do
     def resume_continuation
       t = self.continuation
       t.convert_to_runnable_state
-      self.__continuation = nil
-      t
+      self.continuation = nil
+      t.run_callcc
+    end
+
+    def debug_continuation
+      t = self.continuation
+      t.convert_to_runnable_state
+      self.continuation = nil
+      t.run_callcc(:debug)
+    end
+
+    def stop_continuation
+      t = self.continuation
+      t.convert_to_runnable_state
+      self.continuation = nil
+      t.run_callcc(:stop)
     end
 
     private
-    primitive '__continuation=', 'continuation:'
+    primitive 'continuation=', 'continuation:'
   end
 end

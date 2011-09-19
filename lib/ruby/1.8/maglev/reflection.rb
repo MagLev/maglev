@@ -50,17 +50,23 @@ class Thread
   primitive '__frame_contents_at', '_frameContentsAt:'
   primitive '__run' , 'rubyRun'
   primitive '__wakeup', 'rubyResume'
+  primitive '__value', 'value:'
+
+  # Resuming a continuation is only possible through this method
+  def run_callcc(ret_val = nil)
+    __value(ret_val)
+  end
 
   def run
     if in_persistable_state?
-      raise RuntimeError, "You have to call #resume_continuation on the ObjectLogEntry for this Thread, before trying to re-run it"
+      raise RuntimeError, "You have to call #resume_continuation on the ObjectLogEntry for this Thread"
     end
     __run
   end
 
   def wakeup
     if in_persistable_state?
-      raise RuntimeError, "You have to call #resume_continuation on the ObjectLogEntry for this Thread, before trying to re-run it"
+      raise RuntimeError, "You have to call #resume_continuation on the ObjectLogEntry for this Thread"
     end
     __wakeup
   end
