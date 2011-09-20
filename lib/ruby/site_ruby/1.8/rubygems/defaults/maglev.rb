@@ -24,13 +24,26 @@ end
 
 Gem::MAGLEV_POSTFIX = "-maglev-"
 
+# Override the name accessors of both Gem::Dependency and Gem::Specification.
+# This allows us to publish Gems with the MAGLEV_POSTFIX, but have them report
+# their names as the names of the gems they are replacing. This means that
+# both Bundler and Rubygems should see XYZ-maglev- gems as just XYZ gems.
+#
+# This patch also modifies the sort-logic for Gems, so that -maglev- gems are
+# preferred.
+
 class Gem::Dependency
   # MagLev specific gems should match in addition to the standard gems
   def name
     return @name if @name.nil?
     return @__patched_name if @__patched_name && @name == @__patched_name
 
-    @__patched_name = @name.dup
+    if @name.end_with?(Gem::MAGLEV_POSTFIX)
+      @__patched_name = @name[0...-Gem::MAGLEV_POSTFIX.size]
+    else
+      @__patched_name = @name.dup
+    end
+
     def @__patched_name.===(other)
       if other.to_s.end_with?(Gem::MAGLEV_POSTFIX)
         super(other.to_s[0...-Gem::MAGLEV_POSTFIX.size])
@@ -47,7 +60,12 @@ class Gem::Specification
     return @name if @name.nil?
     return @__patched_name if @__patched_name && @name == @__patched_name
 
-    @__patched_name = @name.dup
+    if @name.end_with?(Gem::MAGLEV_POSTFIX)
+      @__patched_name = @name[0...-Gem::MAGLEV_POSTFIX.size]
+    else
+      @__patched_name = @name.dup
+    end
+
     def @__patched_name.===(other)
       if other.to_s.end_with?(Gem::MAGLEV_POSTFIX)
         super(other.to_s[0...-Gem::MAGLEV_POSTFIX.size])
