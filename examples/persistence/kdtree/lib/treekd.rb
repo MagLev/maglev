@@ -394,7 +394,7 @@ module Collections
       when 3
         dx = @x - other.x
         dy = @y - other.y
-        dy = @z - other.z
+        dz = @z - other.z
         (dx * dx) + (dy * dy) + (dz * dz)
       else
         sum = 0
