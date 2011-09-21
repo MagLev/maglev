@@ -176,6 +176,11 @@ class Thread
       detailed_report[4]
     end
 
+    def source_offset
+      self.method.step_offsets[self.step_offset - 1] -
+        self.method.step_offsets[0]
+    end
+
     def args_and_temps
       names = detailed_report[6]
       values = detailed_report[7]
