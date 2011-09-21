@@ -61,7 +61,7 @@ class OrderedHash < HashProxy
 
     # The second time through this pause, the call from frame 6 to frame 5
     # is the problem
-    nil.pause if defined? Maglev
+    # nil.pause if defined? Maglev
 
     @keys << key if !has_key?(key)
     super

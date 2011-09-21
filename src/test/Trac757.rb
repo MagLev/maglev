@@ -2,8 +2,8 @@
 $:.unshift(File.dirname(__FILE__))
 
 begin
-  require 'Trac757a'  # defines and raises Foo::FooException
-rescue Foo::FooException => e
+  require File.expand_path('../Trac757a', __FILE__)  # defines and raises Foo::FooException
+rescue Exception => e
   if Foo::FooException === e
     puts "OK"
   else
