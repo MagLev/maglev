@@ -116,7 +116,7 @@ class Thread
     end
   end
 
-  def step(symbol)
+  def step(symbol = :over)
     case symbol
     when :into
       self.__step_over_in_frame(0)
