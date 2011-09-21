@@ -5,9 +5,10 @@ class ClsA
       puts b
       aa = a
       bb = b
+      [a,b]
       # nil.pause
   end
 end
 o = ClsA.new
-o.foo(3,4)
-o.foo()
+raise Exception unless o.foo(3) == [3,nil]
+raise Exception unless o.foo() == [9,9]
