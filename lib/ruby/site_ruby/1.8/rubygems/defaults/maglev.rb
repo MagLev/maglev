@@ -14,6 +14,7 @@
 # http://www.mail-archive.com/rubygems-developers@rubyforge.org/msg02161.html
 
 require 'rubygems/config_file'
+require 'rubygems/installer'
 require 'fileutils'
 
 module Gem
@@ -25,94 +26,157 @@ end
 
 # The postfix we are look for to install patched gems released by the MagLev team
 Gem::MAGLEV_POSTFIX = "-maglev-"
+maglev_platform = "maglev"
+def maglev_platform.os; "maglev"; end
+def maglev_platform.cpu; "maglev"; end
+def maglev_platform.version; "maglev"; end
+Gem.platforms = Gem.platforms + [maglev_platform]
 
-# A hook so that after installing a MagLev specific gem, the name of
-# which differs from the actual gem's name, we create a symlink, so
-# Rubygems' require works
-Gem.post_install do |installer|
-  if installer.spec.maglev_specific_gem?
-    spec = installer.spec
-    real_gem_dir = installer.gem_dir.reverse.
-      sub(spec.maglev_real_name.reverse, spec.name.reverse).reverse
-    if File.exist? real_gem_dir
-      case File.ftype(real_gem_dir)
-      when "directory"
-        FileUtils.rm_rf real_gem_dir
-      when "link"
-        File.delete(real_gem_dir)
-      else
-        return false
+class Gem::SpecFetcher
+  alias_method :original_list, :list
+  alias_method :original_fetch_spec, :fetch_spec
+
+  # Bundler only uses this to fetch a list of spec names and then uses
+  # it's own search logic. So we have to modify the list of gems this
+  # returns
+  def list(*args, &block)
+    list = original_list(*args, &block)
+    list.values.map do |gems|
+      gems.map! do |g|
+        if g.first.end_with?(Gem::MAGLEV_POSTFIX)
+          [g[0][0...-Gem::MAGLEV_POSTFIX.size], g[1], "maglev"]
+        else
+          g
+        end
       end
     end
-    File.symlink(installer.gem_dir, real_gem_dir)
+
+    list
+  end
+
+  # Fetch spec gets its input from the result of #list above, to
+  # download the right spec, we have to change the name back to what
+  # it was
+  def fetch_spec(spec, uri)
+    spec = [spec[0] + Gem::MAGLEV_POSTFIX, spec[1], ""] if spec[2] == "maglev"
+    original_fetch_spec(spec, uri)
   end
 end
 
-# Override the name accessors of both Gem::Dependency and Gem::Specification.
-# This allows us to publish Gems with the MAGLEV_POSTFIX, but have them report
-# their names as the names of the gems they are replacing. This means that
-# both Bundler and Rubygems should see XYZ-maglev- gems as just XYZ gems.
-#
-# This patch also modifies the sort-logic for Gems, so that -maglev- gems are
-# preferred.
+class Gem::Format
+  class << self
+    alias_method :original_from_file_by_path, :from_file_by_path
 
-class Gem::Dependency
-  # MagLev specific gems should match in addition to the standard gems
-  def name
-    return @name if @name.nil?
-    return @__patched_name if @__patched_name && @name == @__patched_name
-
-    if @name.end_with?(Gem::MAGLEV_POSTFIX)
-      @__patched_name = @name[0...-Gem::MAGLEV_POSTFIX.size]
-    else
-      @__patched_name = @name.dup
-    end
-
-    def @__patched_name.===(other)
-      if other.to_s.end_with?(Gem::MAGLEV_POSTFIX)
-        super(other.to_s[0...-Gem::MAGLEV_POSTFIX.size])
-      else
-        super(other)
+    # Bundler uses RemoteSpecifications, that we cannot patch easily.
+    # So if we are asked to load a file that we cannot find, just try
+    # the maglev specific name, too
+    def from_file_by_path(path, security_policy = nil)
+      begin
+        original_from_file_by_path(path, security_policy)
+      rescue Gem::Exception => e
+        begin
+          path = path.sub(/(\/.*)-([^-]+)\.gem/,
+                          '\1' + Gem::MAGLEV_POSTFIX + '-\2.gem')
+          p "trying #{path} instead"
+          original_from_file_by_path(path, security_policy)
+        rescue Gem::Exception
+          raise e
+        end
       end
     end
-    @__patched_name
+  end
+end
+
+class Gem::Platform
+  class << self
+    alias_method :original_new, :new
+
+    # Rubygems doesn't allow simply adding platforms as we go, so we
+    # need to patch here to have 'maglev' go through
+    def new(arch)
+      return arch if arch == "maglev"
+      original_new(arch)
+    end
   end
 end
 
 class Gem::Specification
+  class << self
+    alias_method :original__load, :_load
+
+    # This is called by Marshal.load when creating the Spec from the
+    # Rubygems data. We make sure the name is set to the package we're
+    # faking.
+    def _load(str)
+      spec = original__load(str)
+      spec.check_name
+      spec
+    end
+  end
+
+  alias_method :original_full_name, :full_name
+  alias_method :original_gem_dir, :gem_dir
+
+  # Helper
   def maglev_specific_gem?
-    @name != @__patched_name
+    self.platform == "maglev"
   end
 
-  def maglev_real_name
-    @name.dup
-  end
-
-  def name
-    return @name if @name.nil?
-    return @__patched_name if @__patched_name && @name == @__patched_name
-
+  # Helper. Checks whether the name looks like a maglev override gem
+  # and possibly changes the values of @platform, @original_platform
+  # and @name
+  def check_name
     if @name.end_with?(Gem::MAGLEV_POSTFIX)
-      @__patched_name = @name[0...-Gem::MAGLEV_POSTFIX.size]
-    else
-      @__patched_name = @name.dup
+      cache_file # memoize cache file
+      instance_variable_set("@original_platform", "maglev")
+      instance_variable_set("@platform", "maglev")
+      instance_variable_set("@name", @name[0...-Gem::MAGLEV_POSTFIX.size])
     end
-
-    def @__patched_name.===(other)
-      if other.to_s.end_with?(Gem::MAGLEV_POSTFIX)
-        super(other.to_s[0...-Gem::MAGLEV_POSTFIX.size])
-      else
-        super(other)
-      end
-    end
-    @__patched_name
   end
 
+  # Make sure we check_name before calling. This is neccessary because
+  # Gem::Installer will read the spec metadata from the .gem file, and
+  # there is no hook into that.
+  def gem_dir
+    check_name
+    original_gem_dir
+  end
+
+  # Copy this for the original Rubygems behavior. It is used in
+  # Bundler to determine the installation path of the gem.
+  def full_gem_path
+    check_name
+    return @full_gem_path if defined?(@full_gem_path) && @full_gem_path
+    @full_gem_path = File.expand_path File.join(gems_dir, original_full_name)
+    return @full_gem_path if File.directory? @full_gem_path
+    @full_gem_path = File.expand_path File.join(gems_dir, original_name)
+  end
+
+  # The full_name methods needs to return the actual name of the gem
+  # as Rubygems knows it, because all the URIs are built from that
+  def full_name
+    if maglev_specific_gem?
+      "#{@name}#{Gem::MAGLEV_POSTFIX}-#{@version}"
+    else
+      original_full_name
+    end
+  end
+
+  # Prioritize MagLev specific gems
   def sort_obj
-    # Prioritize MagLev specific gems
-    [@name.end_with?(Gem::MAGLEV_POSTFIX) ? 1 : 0,
+    [maglev_specific_gem? ? 1 : 0,
      @name,
      @version,
      @new_platform == Gem::Platform::RUBY ? -1 : 1]
+  end
+end
+
+class Gem::Installer
+  alias_method :original_gem_dir, :gem_dir
+
+  # Always bust the memo, this fixes an issue in Bundler
+  def gem_dir
+    @gem_dir = nil
+    original_gem_dir
   end
 end
