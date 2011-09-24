@@ -135,6 +135,17 @@ class Thread
   end
 
   class Frame
+    class FrameHash < Hash
+      attr_writer :frame
+
+      def []=(key, value)
+        super
+        if @frame
+          @frame.thread.__frame_at_temp_named_put(@frame.index, key.to_s, value)
+        end
+      end
+    end
+
     attr_reader :method, :index, :thread
 
     def initialize(gsmethod, st_idx, thread)
@@ -180,7 +191,9 @@ class Thread
       names = detailed_report[6]
       values = detailed_report[7]
       (values.size - names.size).times {|i| names << ".t#{i+1}"}
-      Hash[names.zip(values)]
+      fh = FrameHash[names.zip(values)]
+      fh.frame = self
+      fh
     end
 
     def variable_context
