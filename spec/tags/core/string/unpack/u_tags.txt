@@ -3,3 +3,4 @@ fails:String#unpack with format 'U' raises an ArgumentError when the format modi
 fails:String#unpack with format 'U' raises an ArgumentError when the format modifier is '!'
 fails:String#unpack with format 'u' calls #to_str to coerce the directives string
 fails:String#unpack with format 'u' decodes all ascii characters
+fails:String#unpack with format 'u' ignores whitespace in the format string

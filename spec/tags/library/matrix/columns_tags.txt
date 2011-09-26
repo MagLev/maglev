@@ -1,1 +1,2 @@
 fails:Matrix.columns handles empty matrices
+fails:Matrix.columns for a subclass of Matrix returns an instance of that subclass

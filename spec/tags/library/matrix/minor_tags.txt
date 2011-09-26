@@ -2,3 +2,4 @@ fails:Matrix#minor with start_row, nrows, start_col, ncols returns nil for out-o
 fails:Matrix#minor with start_row, nrows, start_col, ncols returns nil for negative nrows or ncols
 fails:Matrix#minor with col_range, row_range returns nil if col_range or row_range is out of range
 fails:Matrix#minor with col_range, row_range start counting backwards for col_range or row_range below zero
+fails:Matrix#minor for a subclass of Matrix returns an instance of that subclass
