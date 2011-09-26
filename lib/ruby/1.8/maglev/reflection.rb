@@ -337,12 +337,15 @@ class Module
   primitive '__compile_method_category_environment_id', 'compileMethod:category:environmentId:'
 end
 
+BreakpointNotification = __resolve_smalltalk_global(:BreakpointNotification)
+
 class GsNMethod
   primitive '__is_method_for_block', 'isMethodForBlock'
   primitive '__source_string_for_block', '_sourceStringForBlock'
   primitive '__source_offsets', '_sourceOffsets'
   primitive '__source_offsets_of_sends', '_sourceOffsetsOfSends'
   primitive '__source_offset_first_send_of', '_sourceOffsetOfFirstSendOf:'
+  primitive '__set_break_at_step_point', 'setBreakAtStepPoint:'
 end
 
 class GsNMethodWrapper < UnboundMethod
@@ -362,6 +365,14 @@ class UnboundMethod
 
   def send_offsets
     @_st_gsmeth.__source_offsets_of_sends
+  end
+
+  def break(step_point = 1)
+    if @_st_gsmeth.__is_method_for_block
+      @_st_gsmeth.__set_break_at_step_point(step_point)
+    else
+      self.__nonbridge_meth.__set_break_at_step_point(step_point)
+    end
   end
 
   def in_class
