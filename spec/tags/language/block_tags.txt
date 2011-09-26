@@ -1,1 +1,18 @@
-fails:A block with mismatched arguments raises ArgumentError if argument is passed, but the block takes none
+fails:A block overwrites a captured local when used as an argument
+fails:A block taking |a| arguments assigns all the values yielded to the argument as an Array
+fails:A block taking |a, b| arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |a, b| arguments raises an TypeError if #to_ary does not return an Array
+fails:A block taking |a, *b| arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |a, *b| arguments does not call #to_ary if the single yielded object is an Array
+fails:A block taking |a, *b| arguments raises an TypeError if #to_ary does not return an Array
+fails:A block taking |*| arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |*| arguments raises an TypeError if #to_ary does not return an Array
+fails:A block taking |*a| arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |*a| arguments raises an TypeError if #to_ary does not return an Array
+fails:A block taking |a, | arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |a, | arguments raises an TypeError if #to_ary does not return an Array
+fails:A block taking |(a, b)| arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |(a, b)| arguments raises an TypeError if #to_ary does not return an Array
+fails:A block taking |(a, b), c| arguments calls #to_ary to convert a single yielded object to an Array
+fails:A block taking |(a, b), c| arguments does not call #to_ary if the single yielded object is an Array
+fails:A block taking |(a, b), c| arguments raises an TypeError if #to_ary does not return an Array

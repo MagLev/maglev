@@ -1,9 +1,0 @@
-fails:self in an eigenclass body (class << obj) is TrueClass for true
-fails:self in an eigenclass body (class << obj) is FalseClass for false
-fails:self in an eigenclass body (class << obj) is NilClass for nil
-fails:Instance methods of an eigenclass does not include class methods of the metaclass of Class, for a class
-fails:Instance methods of an eigenclass includes instance methods of the metaclass of Class, for a metaclass
-fails:Instance methods of an eigenclass does not include class methods of the metaclass of Class, for a metaclass
-fails:Class methods of an eigenclass includes class methods of Class, for a class
-fails:Class methods of an eigenclass includes instance methods of the metaclass of Class, for a class
-fails:Class methods of an eigenclass includes instance methods of Class, for a class
