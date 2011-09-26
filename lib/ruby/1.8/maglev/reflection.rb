@@ -125,7 +125,7 @@ class Thread
     when :through
       raise NotImplementedError, "not implemented yet"
     when Fixnum
-      self.__step_over_in_frame(arg)
+      self.__step_over_in_frame(symbol)
     end
   end
 
