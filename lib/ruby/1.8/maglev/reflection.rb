@@ -345,28 +345,11 @@ class GsNMethod
   primitive '__source_offset_first_send_of', '_sourceOffsetOfFirstSendOf:'
 end
 
-class GsNMethodWrapper
-  def initialize(gsmethod); @gsmethod = gsmethod; end
-  def step_offsets; @gsmethod.__source_offsets; end
-  def send_offsets; @gsmethod.__source_offsets_of_sends; end
-  def in_class; @gsmethod.__in_class; end
-  def file; (@gsmethod.__source_location || [])[0]; end
-  def line; (@gsmethod.__source_location || [])[1]; end
-  def name; @gsmethod.__name; end
-
-  def source
-    if @gsmethod.__is_method_for_block
-      @gsmethod.__source_string_for_block
-    else
-      @gsmethod.__source_string
-    end
-  end
-
-  def source!(str, ignored)
-    in_class.__compile_method_category_environment_id(str, '*maglev-webtools-unclassified', 1)
-    self
-  end
-
+class GsNMethodWrapper < UnboundMethod
+  def initialize(gsmethod); @_st_gsmeth = gsmethod; end
+  def inspect; "#<GsNMethodWrapper: #{self.name}>"; end
+  # Overrides
+  def name; @_st_gsmeth.__name; end
   def file_out(ignored); raise StandardError, "not an ordinary method def"; end
   def file=(ignored); raise TypeError, "cannot modify a Smalltalk method"; end
   def line=(ignored); raise TypeError, "cannot modify a Smalltalk method"; end
