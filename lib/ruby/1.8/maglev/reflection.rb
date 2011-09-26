@@ -193,7 +193,7 @@ class Thread
     end
 
     def inspect
-      "#<Frame #{@index}: #{@method.in_class}##{@method.name} >> #{thread.inspect}>"
+      "#<Frame #{@index}: #{@method.in_class}##{@method.name} >> #{@thread.inspect}>"
     end
 
     private
