@@ -1,0 +1,1 @@
+fails:Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path

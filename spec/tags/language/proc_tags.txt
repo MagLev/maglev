@@ -1,0 +1,10 @@
+fails:A Proc overwrites a captured local when used as an argument
+fails:A Proc taking || arguments raises an ArgumentError if a value is passed
+fails:A Proc taking |a, *b| arguments does not destructure a single Array value yielded
+fails:A Proc taking |a, *b| arguments assigns all passed values after the first to the rest argument
+fails:A Proc taking |a, *b| arguments does not call #to_ary to convert a single passed object to an Array
+fails:A Proc taking |a, | arguments raises an ArgumentError when passed more than one value
+fails:A Proc taking |a, | arguments assigns the argument the value passed
+fails:A Proc taking |a, | arguments does not destructure when passed a single Array
+fails:A Proc taking |a, | arguments does not call #to_ary to convert a single passed object to an Array
+fails:A Proc taking |(a, b)| arguments raises an ArgumentError when passed a single Array

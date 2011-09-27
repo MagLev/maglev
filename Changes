@@ -2,7 +2,7 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26876 2011-09-23
+== Changes for 26900 2011-09-26
 * Fix 939, 942, 943, 944, 946, 947, 948, 949, 950, 951, 952
   812, 816, 847, 868, 910, 943
 * Fixed missing method in openssl for Rails 3.1.0 (sprockets).
@@ -13,7 +13,7 @@
 * Numerous bugfixes/enhancements in underlying GemStone 3.1 system
   - Fix 41773, 41761, 41814, 41606, 41762, 41756, 41709, 41817, 41819,
     41575, 41745, 41710, 41804, 41809, 41634, 41829, 41220, 41559, 40696,
-    41702, 39548, 41694, 41688, 41836, 41802, 39788, 41595
+    41702, 39548, 41694, 41688, 41836, 41802, 39788, 41595, 41592
   - initial cut at nested transactions (max 16 levels)
   - gracefully handle "offset from code memory ... exceeds 32bits" on Mac OS X.
   - further improvements in WebTools
