@@ -1,0 +1,87 @@
+!=========================================================================
+! Copyright (C) VMware, Inc. 1986-2011.  All Rights Reserved.
+!
+! $Id: shrinkdbf.topaz 25988 2011-06-14 17:55:54Z stever $
+!
+! Name - shrinkdbf.topaz 
+!
+! Description -  Script to shrink a Repository using fullBackup/fullRestore
+!     The Repository must fit in a single backup file in $dbfDir .
+!
+!     You must be logged in as SystemUser prior to running this script.
+!
+!=========================================================================
+
+expectvalue nil
+expectvalue GsFile
+run
+(GsFile existsOnServer: '$dbfDir/backup.dat') ifTrue:
+  [GsFile removeServerFile: '$dbfDir/backup.dat']
+%
+
+expectvalue System
+run
+System stopUserSessions.
+System sleep: 5.
+System waitForVoteStateIdle.
+%
+
+expectvalue true
+run
+SystemRepository fullBackupTo: '$dbfDir/backup.dat'
+%
+
+! logout to release Gem's temporary pages
+logout
+login
+
+! Use the special restore method for minimal size repository file.
+!  restore will always terminate with loss of session
+expectvalue true
+run
+SystemRepository _destroyOtAndRestoreFrom: '$dbfDir/backup.dat' 
+%
+
+! get a new session after restore
+login
+
+
+! Repository assumed in partial logging mode, so restore from logs not needed
+
+! if the audit fails, exit, so we still have the backup.dat for diagnosis
+
+iferr 1 exit 
+
+expectvalue true
+run
+System waitForAllGcGemsToStartForUpToSeconds: 60.
+%
+
+iferr 1 where
+
+expectvalue true
+run
+SystemRepository auditWithLimit:50000
+%
+
+! leave backup.dat on file system for diagnosis if needed
+
+! logout to release Gem's temporary pages
+logout
+
+login
+
+expectvalue %String
+run
+SystemRepository fileSizeReport
+%
+
+expectvalue SystemRepository
+run
+SystemRepository shrinkExtents
+%
+
+expectvalue %String
+run
+SystemRepository fileSizeReport
+%

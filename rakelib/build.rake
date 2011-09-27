@@ -5,14 +5,15 @@ namespace :build do
   # Note: we only do the fast versions of the build for MagLev (no slow vm
   # available), so the task names do not include "fast" and "slow".
 
-  BASE_DIR  = File.expand_path("..", File.dirname(__FILE__))
-  GS_DIR    = File.join(BASE_DIR, 'src', 'smalltalk', 'ruby')
-  BUILD_DIR = File.join(BASE_DIR, 'build')
-  KEYFILE   = File.join(BASE_DIR, 'etc', 'maglev.demo.key')
-  ST_IMAGE  = File.join(GEMSTONE, 'bin', 'extent0.dbf')
+  BASE_DIR       = File.expand_path("..", File.dirname(__FILE__))
+  IMAGE_DIR      = File.join(BASE_DIR, 'src', 'smalltalk')
+  IMAGE_RUBY_DIR = File.join(IMAGE_DIR, 'ruby')
+  BUILD_DIR      = File.join(BASE_DIR, 'build')
+  KEYFILE        = File.join(BASE_DIR, 'etc', 'maglev.demo.key')
+  ST_IMAGE       = File.join(GEMSTONE, 'bin', 'extent0.dbf')
 
   task :check do
-    [BASE_DIR, BUILD_DIR, KEYFILE, GS_DIR, ST_IMAGE].each do |f|
+    [BASE_DIR, IMAGE_DIR, IMAGE_RUBY_DIR, BUILD_DIR, KEYFILE, ST_IMAGE].each do |f|
       raise "Can't find #{f}" unless File.exist? f
     end
     raise "GEMSTONE not set" unless defined?(GEMSTONE)
@@ -23,10 +24,6 @@ namespace :build do
   task :image => :check do
     puts "=== task :image"
     fileinruby
-    # equivalent to fastrubyimage
-    # start stone
-    # create filein.ruby.conf
-    #
   end
 
   # equivalent to fileinruby.pl, but only supports fast
@@ -70,10 +67,13 @@ namespace :build do
     # upgradeDir is also needed by the filein topaz scripts.  When a
     # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
     # a filein it will be set to the imageDir.
-    ENV["upgradeDir"]             = GS_DIR
+    ENV["upgradeDir"]             = IMAGE_RUBY_DIR
+    ENV["imageDir"]               = IMAGE_DIR
+    ENV["dbfDir"]                 = filein_dir
     ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
     ENV['STONENAME']              = options[:stone_name]
     ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
+    ENV["GEMSTONE_EXE_CONF"]      = options[:gem_conf]
 
     cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
     cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
@@ -83,8 +83,15 @@ namespace :build do
       cp ST_IMAGE, 'extent0.ruby.dbf'
       chmod 0770,'extent0.ruby.dbf'
       begin
-        startstone(options) && waitstone( options)
-        #topaz_cmd = "#{options[:gem_bin]}/topaz -l -i -e #{gem_conf} -z #{gem_conf}"
+        startstone(options) &&
+          waitstone( options) &&
+          run_topaz(<<-EOS, options)
+output push #{options[:filein_dir]}/fileinruby.out only
+set gemstone #{options[:stone_name]}
+input #{IMAGE_DIR}/fileinruby.topaz
+output pop
+exit
+          EOS
       ensure
         stopstone  options
       end
@@ -109,6 +116,14 @@ namespace :build do
     cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish"
     puts "Stopping stone: #{cmd}"
     system cmd
+  end
+
+  def run_topaz(topaz_commands, opts)
+    topaz_cmd = "#{opts[:gem_bin]}/topaz -l -i -e #{opts[:gem_conf]} -z #{opts[:gem_conf]}"
+    puts "\n==== About to execute topaz"
+    cmd_file = File.join(Dir.pwd, 'tpz_commands')
+    File.open(cmd_file, 'w') { |f| f.write(topaz_commands) }
+    system "#{topaz_cmd} < #{cmd_file}"
   end
 
   # Given the name of a ERB template, copy it to the destination dir,
