@@ -864,8 +864,13 @@ RUBY_DLLSPEC VALUE rb_data_object_alloc(VALUE klass, void* data,
 // an instance of any Ruby class may be created 
 //  and have C data attached to it by Data_Wrap
 
-#define Data_Wrap_Struct(klass,mark,free,sval)\
+#ifdef MAGLEV_LINT
+#define Data_Wrap_Struct(klass,mark,free,sval)				\
     rb_data_object_alloc(klass,sval,(RUBY_DATA_FUNC)mark,(RUBY_DATA_FUNC)free)
+#else
+#define Data_Wrap_Struct(klass,mark,free,sval)				\
+    rb_data_object_alloc(klass,sval,(RUBY_DATA_FUNC)NULL,(RUBY_DATA_FUNC)free)
+#endif
 
 #define Data_Make_Struct(klass,type,mark,free,sval) (\
     sval = ALLOC(type),\
