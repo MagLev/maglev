@@ -1,1 +1,2 @@
 fails:Time#strftime returns the date alone with %x
+fails:Time#strftime returns the time alone with %X

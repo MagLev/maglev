@@ -1,0 +1,1 @@
+fails:Float#round raises FloatDomainError for exceptional values

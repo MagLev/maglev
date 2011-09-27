@@ -468,8 +468,10 @@ if [[ $rlwrapFlag ]]; then
     $rlwrapExe $TOPAZ_CMD
     exitStatus=$?
 else
-    exec $TOPAZ_CMD
-    exitStatus=$?  # exec failed?
+    # It would be nice to do: exec $TOPAZ_CMD
+    # but then we can't delete $dbscript.  topaz needs to be modified...
+    $TOPAZ_CMD
+    exitStatus=$?
 fi
 
 exit $exitStatus
