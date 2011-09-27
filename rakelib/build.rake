@@ -9,11 +9,14 @@ namespace :build do
   GS_DIR    = File.join(BASE_DIR, 'src', 'smalltalk', 'ruby')
   BUILD_DIR = File.join(BASE_DIR, 'build')
   KEYFILE   = File.join(BASE_DIR, 'etc', 'maglev.demo.key')
+  ST_IMAGE  = File.join(GEMSTONE, 'bin', 'extent0.dbf')
 
   task :check do
-    [BASE_DIR, BUILD_DIR, KEYFILE, GS_DIR].each do |f|
+    [BASE_DIR, BUILD_DIR, KEYFILE, GS_DIR, ST_IMAGE].each do |f|
       raise "Can't find #{f}" unless File.exist? f
     end
+    raise "GEMSTONE not set" unless defined?(GEMSTONE)
+    raise "GEMSTONE '#{GEMSTONE}' is not a directory" unless File.directory? GEMSTONE
   end
 
   desc "Create a fresh ruby image"
@@ -24,13 +27,6 @@ namespace :build do
     # start stone
     # create filein.ruby.conf
     #
-  end
-
-  task :clean do # equivalent to fastrubyclean
-  end
-
-  task :private do # equivalent to fastrubyprivate
-
   end
 
   # equivalent to fileinruby.pl, but only supports fast
@@ -56,60 +52,68 @@ namespace :build do
     # filein_tmp_dir is the working directory that we put the starting
     # image in, the conf files and log files.  The only useful thing at the
     # end is the extent0.ruby.dbf file, which is our build product.
-    filein_tmp_dir = File.join(MAGLEV_HOME, "fileintmp#{$$}")
-    rm_rf filein_tmp_dir
-    mkdir filein_tmp_dir
 
-    # TODO: remove aliasing after first pass
-    $out_dir = filein_tmp_dir
-    $dbf_dir = filein_tmp_dir # or perhaps filein_tmp_dir/rubyfilein
+    filein_dir = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
+    options = {
+      :filein_dir => filein_dir,
+      :stone_name => "fileinruby#{$$}stone",
+      :stone_conf => File.join(filein_dir, 'filein.ruby.conf'),
+      :stone_log  => File.join(filein_dir, 'stone.log'),
+      :gem_conf   => File.join(filein_dir, 'fileingem.ruby.conf'),
+      :gem_bin    => File.join(GEMSTONE, 'bin'),
+    }
+    options.each_pair { |k,v| puts "fileinruby:[info] #{k} = #{v}" }
 
-    image_dir = GS_DIR # TODO: elimianate
-    raise "Can't find #{image_dir}" unless File.directory? image_dir
-
-    out_dir = 'NOT IMPLEMENTED'
-    keyfile = 'path/to/keyfile'  # todo
-
-    puts "fileinruby:[info] GEMSTONE       = #{ENV['GEMSTONE']}"
-    puts "fileinruby:[info] image_dir      = #{image_dir}"
-    puts "fileinruby:[info] filein_tmp_dir = #{filein_tmp_dir}"
-
-    ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
+    rm_rf options[:filein_dir]
+    mkdir options[:filein_dir]
 
     # upgradeDir is also needed by the filein topaz scripts.  When a
     # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
     # a filein it will be set to the imageDir.
-    ENV["upgradeDir"] = image_dir
+    ENV["upgradeDir"]             = GS_DIR
+    ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
+    ENV['STONENAME']              = options[:stone_name]
+    ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
 
-    ENV['STONENAME'] = "fileinruby#{$$}stone"
+    cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
+    cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
 
-    stn_conf = ENV['GEMSTONE_SYS_CONF'] = "#{filein_tmp_dir}/filein.ruby.conf"
-    cp_template "#{BUILD_DIR}/filein.ruby.conf.erb", stn_conf
+    Dir.chdir(options[:filein_dir]) do
+      puts "Now in directory: #{Dir.pwd}"
+      cp ST_IMAGE, 'extent0.ruby.dbf'
+      chmod 0770,'extent0.ruby.dbf'
+      begin
+        startstone(options) && waitstone( options)
+        #topaz_cmd = "#{options[:gem_bin]}/topaz -l -i -e #{gem_conf} -z #{gem_conf}"
+      ensure
+        stopstone  options
+      end
+    end
 
+    # TODO: clean filein_tmp_dir
+  end
 
-#    gem_conf = "#{filein_tmp_dir}/fileingem.ruby.conf"
+  def startstone(opts)
+    cmd = "#{opts[:gem_bin]}/startstone #{opts[:stone_name]} -l #{opts[:stone_log]} -e #{opts[:stone_conf]} -z #{opts[:stone_conf]}"
+    puts "Starting stone: #{cmd}"
+    system cmd
+  end
 
+  def waitstone(opts)
+    cmd = "#{opts[:gem_bin]}/waitstone #{opts[:stone_name]}"
+    puts "Waiting for stone: #{cmd}"
+    system cmd
+  end
 
-
-
-
-    # # cp_template("fileingem.ruby.conf", filein_tmp_dir)
-    # $gem_conf =
-    # raise "Can't find #{$gem_conf}" unless File.exist? $gem_conf
-
-
-    # raise "Can't find #{$stn_conf}" unless File.exist? $stn_conf
-    # TODO may need to cp templ stn_conf and chmod 770
-
-    # require 'erb'
-    # File.open(system_config_filename, "w") do | file |
-    #   file.write(ERB.new(config_file_template).result(binding))
-    # end
+  def stopstone(opts)
+    cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish"
+    puts "Stopping stone: #{cmd}"
+    system cmd
   end
 
   # Given the name of a ERB template, copy it to the destination dir,
   # running it through erb.
-  def cp_template(erb_file, dest_file)
+  def cp_template(erb_file, dest_file, options)
     raise "Can't find erb_file #{erb_file}" unless File.exist? erb_file
 
     File.open(dest_file, "w") do | dest |
