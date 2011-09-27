@@ -1,0 +1,140 @@
+!=========================================================================
+! Copyright (C) VMware, Inc. 2008.  All Rights Reserved.
+!
+! $Id: rubyLoops.txt 25988 2011-06-14 17:55:54Z stever $
+!
+!=========================================================================
+
+Notes after Review by Avi,  Feb 13:
+
+ Defer implementation of all of this except for
+ lambda support .
+
+
+Proposed New IR graph nodes to support Ruby loops
+
+   GsComLoopEntryNode
+     loopId: a SmallInteger , 0 ... max
+
+     execution passes through this node (which has no effect on the 
+     logical stack) before starting a  while/until/for   loop
+
+     Each GsComLoopEntryNode within a method gets a unique loopId .
+
+   GsComLoopExitNode
+      loopId: a SmallInteger , 0 ... max
+      
+      execution passes through this node (which has no effect on the
+      logical stack) after exiting a  while/until/for   loop . 
+
+   GsComLabelNode
+      targetKind, 0 = normal,  1 = break, 2 = next, 3 = redo, 4 = retry
+      loopId, a SmallInteger , -1 for targetKind == normal, 
+         otherwise must match the loopId of the GsComLoopEntryNode for the
+         loop in which the  break/next/redo/retry occurs.
+
+   GsComGotoNode
+      target: a GsComLabelNode (any targetKind allowed)
+      generates a simple unconditional branch bytecode for branch
+      within the current method or block.
+
+   GsLoopBreakNode
+      targetKind , 1 = break, 2 = next, 3 = redo, 4 = retry
+      target: a GsComLabelNode having matching targetKind and loopId
+      loopId: a SmallInteger, for consistency checks
+
+      if loop being exited/restarted is within the same method,
+        transformer or generator can convert to a GsComGotoNode
+      else if "break" is within a Ruby block ,
+        generator must generate "return to caller of caller" bytecode
+      else 
+        generator must produce a Bc_Break bytecode that encodes the targetKind.
+        At runtime, Bc_Break will search up the stack for first frame which has executed
+        a GsComLoopEntryNode and not yet executed the corresponding GsComLoopExitNode;
+        Execution will transfer to the GsComLabelNode with targetKind matching 
+        targetKind of the Bc_Break, and loopId matching the found GsComLoopEntryNode  .
+        If no such frame is found , an error is generated.
+
+Handling return from within Ruby lambda block 
+ 
+    Creation of the lambda will be implemented as smalltalk primitive 678 .
+    which  copies the block (shallow copy) creating a new instance of
+    ExecBlock (the concrete class for instances of BlockClosure in Gs64 v3.0)
+    In the new intstance,  the new bit isLambda  will be set in the
+    SmallInteger in the iFields1 instVar .
+    The new instance will reference the same GsNMethod (containing the bytecodes)
+    and the same VariableContext if any .
+  
+    When compiling for Ruby and the IR graph contains a GsComReturnNode,
+    and the return type is "return-from-home" , then the generator will
+    produce a Bc_RETURN_TOS_FROM_RUBY_BLOCK  bytecode
+    instead of the Bc_RETURN_TOS_FROM_BLOCK used for Smalltalk.
+
+    The implementation of Bc_RETURN_TOS_FROM_RUBY_BLOCK will be .
+    If receiver.isLambda==1 , 
+      execute a normal return to caller's frame 
+    else
+      search stack for home context and do a return-from-home 
+
+    With this design we don't need to recompile or otherwise
+    process bytecodes of a block when turning it into a lambda .
+
+
+new bytecodes
+   Bc_RETURN_TOS_2levels_u1 
+        // return value is *SP , return to caller of caller 
+        //  newSP := (char*)FP + u1  // u1 is byteOffset
+
+   Bc_CHKInt_LOOP_MARKs_u1_ALLOCTEMPS_u2_saveRcvrCls_u3,
+      puts OOP_LOOP_MARK_NIL on stack without creating a VC ,
+      and allocates space for breakTargetsLists for u1 loops ,
+      then allocates u2 stack temps.
+
+      non-normal can never translate to first bytecode in a method;
+        rather containing method must begin with a ALLOCTEMPS or CREATE_VC
+        or CREATE_RTH_VC bytecode.
+
+   Bc_LoopEntry_s1_u2 , 
+         s1 identifies 2 stack slots at  FP+s1, FP+s1-8 holding breakTargetsList .
+         u2 is offset from portable IP to first of 2 smallInt literals,
+            which hold the portable IP offsets from start of method for
+            the 4 break targets for this loop
+       Initializes the 2 stack slots starting at FP+s1 to the hold the
+       portable or native IP offsets relative to start of this method
+       as specified by the literals .
+       The stack slots in question will have been initialized to OOP_NIL
+       at method entry , these slots plus an OOP_NIL end marker slot
+       will have been allocated in front of (at higher address) first
+       method temp on the stack .
+         
+
+   Bc_LoopExit_s1 , 
+      s1 identifies 2 stack slots at  FP+s1, FP+s1-8  holding breakTargetsList
+      clears those stack slots to OOP_NIL
+
+   Bc_Break_u1,  u1 identifies breakKind 
+      generated for a GsLoopBreakNode if the loop being exited/restarted
+      must be in an up-level stack frame .
+      searches up the stack for first frame containing 
+        (framePtr[FP_rthMethStkNil_OFS] & (OopType)OOP_RTH_MARK_NIL) == OOP_RTH_MARK_NIL
+      i.e. search for first frame with either OOP_RTH_MARK_NIL or OOP_LOOP_MARK_NIL
+      
+   Bc_LoopEntry_u1, Bc_LoopExit_u1 are always paired within the same method.
+
+   generator will allocate space in stack frame (relative to FP) for a
+   breakTargetsList for each Bc_LoopEntry_u1/Bc_LoopExit_u1 pair within
+   the method.
+
+
+   A frame for a method with Bc_LoopEntry_u1 will have
+
+       FP-9: OOP_NIL to mark end of loop target words
+       FP-8,FP-7:  loop1 targets ...
+       FP-6: loop0: codeOffset for retry target (SI,  1 30bit field)
+       FP-5: loop0: codeOffset for break target, codeOffset for redo target (SI, 2 30bit fields)
+       FP-4: ramOop of a VC, or nil
+       FP-3: OOP_STACK_MARK_NIL  (TBD or do we need a different kind of nil ????)
+      
+existing bytecodes
+   Bc_JUMP_BACK_n, Bc_JUMP_u1_topc2   generated for a GsComGotoNode ,
+     depending on whether jump is fowards or  backwards .
