@@ -2,7 +2,7 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26938 2011-09-28
+== Changes for 26946 2011-09-29
 * Fix 939, 942, 943, 944, 946, 947, 948, 949, 950, 951, 952
   812, 816, 847, 868, 910, 943
 * Fixed missing method in openssl for Rails 3.1.0 (sprockets).
