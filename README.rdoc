@@ -20,7 +20,7 @@ changes more slowly than the github version, and it has undergone more
 testing.
 
 You'll need to know a version number to install.
-The MagLev Alpha version on 2011-09-20 is <b>26852</b>.
+The MagLev Alpha version on 2011-09-28 is <b>26920</b>.
 Check for later versions on
 Twitter[http://twitter.com/maglev] or the
 {MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
@@ -30,10 +30,10 @@ Twitter[http://twitter.com/maglev] or the
    {MagLev-installer.zip}[http://maglev.gemstone.com/files/MagLev-installer.zip]
    into the directory you've selected.
 1. If this is the first time you're installing MagLev, run:
-     ./installMaglev.sh 26852
+     ./installMaglev.sh 26920
    If you've already run <tt>installMaglev.sh</tt> on the machine, then you
    can use the upgrade script:
-     ./upgradeMaglev.sh 26852
+     ./upgradeMaglev.sh 26920
 
    <tt>installMaglev.sh</tt> runs one-time machine checks and configuration
    that ensure your hardware will run MagLev.  These mostly relate to
