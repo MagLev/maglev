@@ -28,6 +28,10 @@
 #         `rm -rf ${target}/.hg ${target}/.hgignore`;
 #         `rm -rf ${target}/data/* ${target}/log/*`;
 #         `zip -r9yq ${target}.zip ${target}`;
+#
+# for packaging a release image:
+#   + remove .git*
+#   + keyfile
 
 namespace :build do
   require 'erb'
@@ -76,7 +80,8 @@ namespace :build do
       :stone_log   => File.join(filein_dir, 'stone.log'),
       :gem_conf    => File.join(filein_dir, 'fileingem.ruby.conf'),
       :gem_bin     => File.join(GEMSTONE, 'bin'),
-      :mcz_version => 'TimFelgentreff.1307',  # TODO: Parameterize
+      :mcz_version => 'TimFelgentreff.1307',
+      :mcz_dir     => IMAGE_RUBY_DIR,
     }
     options.each_pair { |k,v| log("build:image", "options[#{k.inspect}] = #{v}") }
 
@@ -157,13 +162,11 @@ exit
 
   # Assume stone is running and we PWD is correct
   def loadmcz(options) # todo: parameterize
-    #    log "Begin: loadmcz"
     safe_run("loadmcz") do
       tpz_cmds = "load_mcz.topaz"
       cp_template("#{BUILD_DIR}/load_mcz.topaz.erb", tpz_cmds, options)
       run_topaz_file(tpz_cmds, options)
     end
-    # log "End: loadmcz"
   end
 
   # Run a block wrapped in logging and error checking
@@ -180,35 +183,22 @@ exit
   end
 
   def startstone(opts)
-    #log "Begin: startstone"
     logfile = "#{Dir.pwd}/startstone.log"
     cmd = "#{opts[:gem_bin]}/startstone #{opts[:stone_name]} -l #{opts[:stone_log]} -e #{opts[:stone_conf]} -z #{opts[:stone_conf]} > #{logfile} 2>&1"
 
     safe_run("startstone", logfile) { system cmd }
-    #puts "Starting stone: #{cmd}"
-    #v = system cmd
-    #log "End: loadmcz"
-    #v
   end
 
   def waitstone(opts)
     logfile = "#{Dir.pwd}/waitstone.log"
-    # log "Begin: waitstone"
     cmd = "#{opts[:gem_bin]}/waitstone #{opts[:stone_name]} > #{logfile} 2>&1"
     safe_run("waitstone", logfile) { system cmd }
-    # v = system cmd
-    # log "End: waitstone"
-    # v
   end
 
   def stopstone(opts)
-    #log "Begin: stopstone"
     logfile = "#{Dir.pwd}/waitstone.log"
     cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish > #{logfile} 2>&1"
     safe_run("stopstone", logfile) { system cmd }
-    #v = system cmd
-    #log "End: stopstone"
-    #v
   end
 
   def run_topaz(topaz_commands, opts)
@@ -221,8 +211,6 @@ exit
   def run_topaz_file(file, opts)
     topaz_cmd = "#{opts[:gem_bin]}/topaz -l -i -e #{opts[:gem_conf]} -z #{opts[:gem_conf]}"
     system "#{topaz_cmd} < #{file}"
-#    log "run_topaz_file returns: #{v} ($?: #{$?.exitstatus})"
-#    v
   end
 
   # Given the name of a ERB template, copy it to the destination dir,
@@ -237,10 +225,6 @@ exit
       end
     end
   end
-
-  # for packaging a release image:
-  #   + remove .git*
-  #   + keyfile
 
   def allprims()
     log("allprims",  "Begin")
@@ -259,10 +243,6 @@ exit
     Dir.chdir(options[:filein_dir]) do
       cp ST_IMAGE, 'extent0.ruby.dbf'
       chmod 0770,'extent0.ruby.dbf'
-
-      # filein_tmp_dir is the working directory that we put the starting
-      # image in, the conf files and log files.  The only useful thing at the
-      # end is the extent0.ruby.dbf file, which is our build product.
       cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
       cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
     end
