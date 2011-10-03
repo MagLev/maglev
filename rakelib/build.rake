@@ -1,10 +1,6 @@
 # Create a MagLev image from base Smalltalk image
 #
 # TODO:
-#  1. Get a clean run of fileinruby
-#  2. Get output from fileinruby going to a known and reported location
-#  3. Report the success/failure of fileinruby
-#
 #  4. Get clean run of loadmcz
 #  5. Get output from loadmcz going to a known and reported location
 #  6. Report the success/failure of loadmcz
@@ -13,6 +9,26 @@
 #  8. Get output from allprims going to a known and reported location
 #  9. Report the success/failure of allprims
 #
+
+# 3. Create version.txt
+# 4. Set build date in Globals.rb
+
+# 5. create extent0.ruby.dbf
+# 6. Load mcz into extent0.ruby.dbf
+#    a. start stone
+#    b. load_mcz()
+#    c. allprims()
+#    d. stop stone
+#    e. put the image file somewhere in the package and chmod it
+#         `rm topazerrors.log`;
+#         `chmod 777 ${target}/gemstone/bin ${target}/gemstone/bin/extent0.ruby.dbf`;
+#         `mv ${target}/data/pkg${os}/extent/extent0.ruby.dbf ${target}/gemstone/bin`;
+#         `chmod 444 ${target}/gemstone/bin/extent0.ruby.dbf`;
+#         `chmod 555 ${target}/gemstone/bin`;
+#         `rm -rf ${target}/.hg ${target}/.hgignore`;
+#         `rm -rf ${target}/data/* ${target}/log/*`;
+#         `zip -r9yq ${target}.zip ${target}`;
+
 namespace :build do
   require 'erb'
   require 'logger'
@@ -62,7 +78,7 @@ namespace :build do
       :gem_bin     => File.join(GEMSTONE, 'bin'),
       :mcz_version => 'TimFelgentreff.1307',  # TODO: Parameterize
     }
-    options.each_pair { |k,v| log("build:image", "fileinruby:[info] #{k} = #{v}") }
+    options.each_pair { |k,v| log("build:image", "options[#{k.inspect}] = #{v}") }
 
     # upgradeDir is also needed by the filein topaz scripts.  When a
     # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
@@ -222,27 +238,6 @@ exit
     end
   end
 
-  # 1. setup and verify $GEMSTONE
-  # 2. Ensure we can find a base smalltalk image
-  # 3. Create version.txt
-  # 4. Set build date in Globals.rb
-
-  # 5. create extent0.ruby.dbf
-  # 6. Load mcz into extent0.ruby.dbf
-  #    a. start stone
-  #    b. load_mcz()
-  #    c. allprims()
-  #    d. stop stone
-  #    e. put the image file somewhere in the package and chmod it
-  #         `rm topazerrors.log`;
-  #         `chmod 777 ${target}/gemstone/bin ${target}/gemstone/bin/extent0.ruby.dbf`;
-  #         `mv ${target}/data/pkg${os}/extent/extent0.ruby.dbf ${target}/gemstone/bin`;
-  #         `chmod 444 ${target}/gemstone/bin/extent0.ruby.dbf`;
-  #         `chmod 555 ${target}/gemstone/bin`;
-  #         `rm -rf ${target}/.hg ${target}/.hgignore`;
-  #         `rm -rf ${target}/data/* ${target}/log/*`;
-  #         `zip -r9yq ${target}.zip ${target}`;
-
   # for packaging a release image:
   #   + remove .git*
   #   + keyfile
@@ -276,6 +271,6 @@ exit
 
   def log(step, msg, level=Logger::INFO)
     puts "==== #{msg}" if VERBOSE
-    $logger.log(level, msg)
+    $logger.log(level, msg, step)
   end
 end
