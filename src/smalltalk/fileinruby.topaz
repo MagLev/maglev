@@ -3,9 +3,9 @@
 !
 ! $Id: fileinruby.topaz 25988 2011-06-14 17:55:54Z stever $
 !
-! Name - fileinruby.topaz 
+! Name - fileinruby.topaz
 !
-! Description -  Script to filein image changes to support Ruby 
+! Description -  Script to filein image changes to support Ruby
 !
 !========================================================================
 
@@ -16,7 +16,7 @@ display oops
 display resultcheck
 errorcount
 
-!  baseruby.gs does login/logout/commits 
+!  baseruby.gs does login/logout/commits
 iferr 1 exit 2
 input $upgradeDir/baseruby.gs
 errorcount
@@ -35,13 +35,16 @@ errorcount
 
 ! shut down Stone
 !   retry login in case a previous login failed
-iferror
-expecterror @231169 2147
-login
-time
-expecterror @231169 4057
-expecterror @231169 4009
-run
-System shutDown
-%
-
+! The following system shutdown is handled by the Rake task.
+! I've left these commands to document old way
+!
+! iferror
+! expecterror @231169 2147
+! login
+! time
+! expecterror @231169 4057
+! expecterror @231169 4009
+! run
+! System shutDown
+! %
+exit 0

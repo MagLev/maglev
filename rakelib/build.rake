@@ -77,19 +77,31 @@ namespace :build do
 
     create_filein_stone_files options
 
+    # Pass one includes a shrink stone, so we only run it
+    # and logout to ensure image written ok
+    success = false
     Dir.chdir(options[:filein_dir]) do
-      log("build:image",  "Now in directory: #{Dir.pwd}")
+      begin
+        startstone(options) &&
+          waitstone(options) &&
+          (success = fileinruby(options))
+      ensure
+        stopstone(options)
+      end
+    end
+
+    # Pass two loads mcz and runs allprims
+    Dir.chdir(options[:filein_dir]) do
       begin
         startstone(options) &&
           waitstone( options) &&
-          fileinruby(options) &&
           loadmcz(options) &&
-          allprims(options) &&
-          log("build:image", "DONE")
+          allprims(options)
       ensure
-        stopstone  options
+        stopstone(options)
       end
-    end
+    end if success
+
     # TODO: clean filein_tmp_dir
     # TODO: Report Success/Failure
   end
