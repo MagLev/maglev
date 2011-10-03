@@ -1,5 +1,22 @@
 # Create a MagLev image from base Smalltalk image
+#
+# TODO:
+#  1. Get a clean run of fileinruby
+#  2. Get output from fileinruby going to a known and reported location
+#  3. Report the success/failure of fileinruby
+#
+#  4. Get clean run of loadmcz
+#  5. Get output from loadmcz going to a known and reported location
+#  6. Report the success/failure of loadmcz
+#
+#  7. Get clean run of allprims
+#  8. Get output from allprims going to a known and reported location
+#  9. Report the success/failure of allprims
+#
 namespace :build do
+  require 'erb'
+  require 'logger'
+
   # Assume MAGLEV_HOME is already set.
 
   # Note: we only do the fast versions of the build for MagLev (no slow vm
@@ -12,6 +29,8 @@ namespace :build do
   KEYFILE        = File.join(BASE_DIR, 'etc', 'maglev.demo.key')
   ST_IMAGE       = File.join(GEMSTONE, 'bin', 'extent0.dbf')
 
+  VERBOSE        = true
+
   task :check do
     [BASE_DIR, IMAGE_DIR, IMAGE_RUBY_DIR, BUILD_DIR, KEYFILE, ST_IMAGE].each do |f|
       raise "Can't find #{f}" unless File.exist? f
@@ -22,15 +41,69 @@ namespace :build do
 
   desc "Create a fresh ruby image"
   task :image => :check do
-    puts "=== task :image"
-    fileinruby
+    filein_dir     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
+
+    rm_rf filein_dir
+    mkdir filein_dir
+
+    build_log_name = File.join(filein_dir, 'build_image.log')
+    $logger        = Logger.new(build_log_name)
+    $logger.level  = Logger::DEBUG
+
+    puts "Logging to: #{build_log_name}"
+    log("build:image", "Begin task")
+
+    options = {
+      :filein_dir  => filein_dir,
+      :stone_name  => "fileinruby#{$$}stone",
+      :stone_conf  => File.join(filein_dir, 'filein.ruby.conf'),
+      :stone_log   => File.join(filein_dir, 'stone.log'),
+      :gem_conf    => File.join(filein_dir, 'fileingem.ruby.conf'),
+      :gem_bin     => File.join(GEMSTONE, 'bin'),
+      :mcz_version => 'TimFelgentreff.1307',  # TODO: Parameterize
+    }
+    options.each_pair { |k,v| log("build:image", "fileinruby:[info] #{k} = #{v}") }
+
+    # upgradeDir is also needed by the filein topaz scripts.  When a
+    # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
+    # a filein it will be set to the imageDir.
+    ENV["upgradeDir"]             = IMAGE_RUBY_DIR
+    ENV["imageDir"]               = IMAGE_DIR
+    ENV["dbfDir"]                 = options[:filein_dir]
+    ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
+    ENV['STONENAME']              = options[:stone_name]
+    ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
+    ENV["GEMSTONE_EXE_CONF"]      = options[:gem_conf]
+
+    create_filein_stone_files options
+
+    Dir.chdir(options[:filein_dir]) do
+      log("build:image",  "Now in directory: #{Dir.pwd}")
+      begin
+        startstone(options) &&
+          waitstone( options) &&
+          fileinruby(options) &&
+          loadmcz(options) &&
+          allprims(options) &&
+          log("build:image", "DONE")
+      ensure
+        stopstone  options
+      end
+    end
+    # TODO: clean filein_tmp_dir
+    # TODO: Report Success/Failure
   end
 
   # equivalent to fileinruby.pl, but only supports fast
   #
   # fileinruby creates a MagLev ruby image from a virgin Smalltalk image.
-  # This involves "running" the files in image/ruby on top of a smalltalk
-  # image file (extent0.dbf), and saving the file as extent0.ruby.dbf.
+  # This involves:
+  #
+  #   1. Start a virgin smalltalk image
+  #   2. Load the MagLev files from src/smalltalk/ruby
+  #   3. Load the code from the MagLev-*.mcz file
+  #   4. Save the image file as extent0.ruby.dbf.
+  #
   # This step needs to be run anytime you change the files in image/ruby.
   #
   # All work is done in filein_tmp_dir.  Config files and the initial image
@@ -41,89 +114,87 @@ namespace :build do
   # We will use $GEMSTONE/bin/extent0.dbf as the base smalltalk image upon
   # which we build the ruby image.
   #
-  #
-  def fileinruby
-    require 'erb'
-    puts "=== fileinruby"
-
-    # filein_tmp_dir is the working directory that we put the starting
-    # image in, the conf files and log files.  The only useful thing at the
-    # end is the extent0.ruby.dbf file, which is our build product.
-
-    filein_dir = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
-    options = {
-      :filein_dir => filein_dir,
-      :stone_name => "fileinruby#{$$}stone",
-      :stone_conf => File.join(filein_dir, 'filein.ruby.conf'),
-      :stone_log  => File.join(filein_dir, 'stone.log'),
-      :gem_conf   => File.join(filein_dir, 'fileingem.ruby.conf'),
-      :gem_bin    => File.join(GEMSTONE, 'bin'),
-    }
-    options.each_pair { |k,v| puts "fileinruby:[info] #{k} = #{v}" }
-
-    rm_rf options[:filein_dir]
-    mkdir options[:filein_dir]
-
-    # upgradeDir is also needed by the filein topaz scripts.  When a
-    # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
-    # a filein it will be set to the imageDir.
-    ENV["upgradeDir"]             = IMAGE_RUBY_DIR
-    ENV["imageDir"]               = IMAGE_DIR
-    ENV["dbfDir"]                 = filein_dir
-    ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
-    ENV['STONENAME']              = options[:stone_name]
-    ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
-    ENV["GEMSTONE_EXE_CONF"]      = options[:gem_conf]
-
-    cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
-    cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
-
-    Dir.chdir(options[:filein_dir]) do
-      puts "Now in directory: #{Dir.pwd}"
-      cp ST_IMAGE, 'extent0.ruby.dbf'
-      chmod 0770,'extent0.ruby.dbf'
-      begin
-        startstone(options) &&
-          waitstone( options) &&
-          run_topaz(<<-EOS, options)
-output push #{options[:filein_dir]}/fileinruby.out only
+  def fileinruby(options)
+    outfile = "#{options[:filein_dir]}/fileinruby.out"
+    safe_run("fileinruby", outfile) do
+      run_topaz(<<-EOS, options)
+output push #{outfile} only
 set gemstone #{options[:stone_name]}
 input #{IMAGE_DIR}/fileinruby.topaz
 output pop
 exit
-          EOS
-      ensure
-        stopstone  options
-      end
+      EOS
     end
+  end
 
-    # TODO: clean filein_tmp_dir
+  # Assume stone is running and we PWD is correct
+  def loadmcz(options) # todo: parameterize
+    #    log "Begin: loadmcz"
+    safe_run("loadmcz") do
+      tpz_cmds = "load_mcz.topaz"
+      cp_template("#{BUILD_DIR}/load_mcz.topaz.erb", tpz_cmds, options)
+      run_topaz_file(tpz_cmds, options)
+    end
+    # log "End: loadmcz"
+  end
+
+  # Run a block wrapped in logging and error checking
+  def safe_run(step_name, logfile="<no logfile>")
+    log(step_name, "Begin: LOG: #{logfile}")
+    res = yield
+    if res
+      log(step_name, "Success: $?: #{$?.exitstatus} LOG: #{logfile}")
+    else
+      log(step_name, "FAILURE: $?: #{$?.exitstatus} LOG: #{logfile}", Logger::ERROR)
+    end
+    log(step_name, "End: #{step_name}")
+    res
   end
 
   def startstone(opts)
-    cmd = "#{opts[:gem_bin]}/startstone #{opts[:stone_name]} -l #{opts[:stone_log]} -e #{opts[:stone_conf]} -z #{opts[:stone_conf]}"
-    puts "Starting stone: #{cmd}"
-    system cmd
+    #log "Begin: startstone"
+    logfile = "#{Dir.pwd}/startstone.log"
+    cmd = "#{opts[:gem_bin]}/startstone #{opts[:stone_name]} -l #{opts[:stone_log]} -e #{opts[:stone_conf]} -z #{opts[:stone_conf]} > #{logfile} 2>&1"
+
+    safe_run("startstone", logfile) { system cmd }
+    #puts "Starting stone: #{cmd}"
+    #v = system cmd
+    #log "End: loadmcz"
+    #v
   end
 
   def waitstone(opts)
-    cmd = "#{opts[:gem_bin]}/waitstone #{opts[:stone_name]}"
-    puts "Waiting for stone: #{cmd}"
-    system cmd
+    logfile = "#{Dir.pwd}/waitstone.log"
+    # log "Begin: waitstone"
+    cmd = "#{opts[:gem_bin]}/waitstone #{opts[:stone_name]} > #{logfile} 2>&1"
+    safe_run("waitstone", logfile) { system cmd }
+    # v = system cmd
+    # log "End: waitstone"
+    # v
   end
 
   def stopstone(opts)
-    cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish"
-    puts "Stopping stone: #{cmd}"
-    system cmd
+    #log "Begin: stopstone"
+    logfile = "#{Dir.pwd}/waitstone.log"
+    cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish > #{logfile} 2>&1"
+    safe_run("stopstone", logfile) { system cmd }
+    #v = system cmd
+    #log "End: stopstone"
+    #v
   end
 
   def run_topaz(topaz_commands, opts)
-    topaz_cmd = "#{opts[:gem_bin]}/topaz -l -i -e #{opts[:gem_conf]} -z #{opts[:gem_conf]}"
-    puts "\n==== About to execute topaz"
+    log("run_topaz", "Begin")
     cmd_file = File.join(Dir.pwd, 'tpz_commands')
     File.open(cmd_file, 'w') { |f| f.write(topaz_commands) }
-    system "#{topaz_cmd} < #{cmd_file}"
+    run_topaz_file(cmd_file, opts)
+  end
+
+  def run_topaz_file(file, opts)
+    topaz_cmd = "#{opts[:gem_bin]}/topaz -l -i -e #{opts[:gem_conf]} -z #{opts[:gem_conf]}"
+    system "#{topaz_cmd} < #{file}"
+#    log "run_topaz_file returns: #{v} ($?: #{$?.exitstatus})"
+#    v
   end
 
   # Given the name of a ERB template, copy it to the destination dir,
@@ -164,58 +235,35 @@ exit
   #   + remove .git*
   #   + keyfile
 
-
-  def load_mcz() # todo: parameterize
-    # a. startstone
-    # b. run this:
-    #        `$gemstone/bin/topaz -l
-    build_log = "./build.log"
-    stone_name = "buildstone"
-    maglev_version = 'todo'           # todo: get the mcz version...
-
-    topaz_cmds =<<-EOS
-      set gemstone #{stone_name} user DataCurator pass swordfish
-      login
-      output append #{build_log}
-      display resultcheck
-      run
-      | httpRepo fileRepo useRepo aBase |
-      httpRepo := MCHttpRepository location:'http://seaside.gemstone.com/ss/megaVL'
-          user: 'mb' password:'xxxxx'.
-      fileRepo := MCDirectoryRepository new directory:
-        (FileDirectory on: '#{MAGLEV_HOME}/image/ruby').
-      useRepo := fileRepo .
-
-      {
-          'MagLev-#{maglev_version}.mcz'
-
-      } do:[ :aName | | ver |
-          ver := useRepo loadVersionFromFileNamed: aName .
-          ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
-          GsFile gciLogServer: ver printString .
-          ver load .
-          ver workingCopy repositoryGroup addRepository: httpRepo ;
-                              addRepository: fileRepo .
-          GsFile gciLogServer: 'load done'
-      ].
-      ^ true
-      %
-      commit
-      errorCount
-      logout
-      output pop
-      exit
-    EOS
-  end
-
-
   def allprims()
+    log("allprims",  "Begin")
     #        `$gemstone/bin/topaz -l <<EOF
     #        output append $build_log
     #        set gemstone pkg${os} user DataCurator pass swordfish
     #        input $gemstone/upgrade/ruby/allprims.topaz
     #        exit
     #        EOF`;
+    log("allprims", "NOT IMPLEMENTED", Logger::ERROR)
+    log("allprims",  "End")
   end
 
+  def create_filein_stone_files(options)
+    log("create_filein_stone_files",  "Begin")
+    Dir.chdir(options[:filein_dir]) do
+      cp ST_IMAGE, 'extent0.ruby.dbf'
+      chmod 0770,'extent0.ruby.dbf'
+
+      # filein_tmp_dir is the working directory that we put the starting
+      # image in, the conf files and log files.  The only useful thing at the
+      # end is the extent0.ruby.dbf file, which is our build product.
+      cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
+      cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
+    end
+    log("create_filein_stone_files",  "End")
+  end
+
+  def log(step, msg, level=Logger::INFO)
+    puts "==== #{msg}" if VERBOSE
+    $logger.log(level, msg)
+  end
 end

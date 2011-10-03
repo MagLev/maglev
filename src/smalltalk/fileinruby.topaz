@@ -14,9 +14,12 @@
 level 0
 display oops
 display resultcheck
+errorcount
 
 !  baseruby.gs does login/logout/commits 
+iferr 1 exit 2
 input $upgradeDir/baseruby.gs
+errorcount
 
 ! now cluster and audit, and shrink
 set user SystemUser pass swordfish
