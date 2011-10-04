@@ -1,0 +1,41 @@
+
+run
+| undef |
+undef := SymbolDictionary new.
+undef name: #UndefinedSymbols.
+UserGlobals at: #UndefinedSymbols put: undef.
+UserGlobals at: #UndefinedSymbolList put: (SymbolList with: undef).
+true
+%
+
+
+run
+| packageNames |
+packageNames := { 
+	'Core.v3-dkh.61.mcz'.
+	'Base-Bootstrap.v3-dkh.27.mcz'.
+	'Bootstrap.v3-dkh.213.mcz'.
+	'GemStone-ANSI-Streams-DaleHenrichs.5.mcz'.
+	'GemStone-Indexing-Extensions-dkh.3.mcz'.
+	'Sport3.010.v3-DaleHenrichs.26.mcz'.
+	'Squeak.v3-dkh.261.mcz'.
+	'Regex-Core-DaleHenrichs.3.mcz'.
+	'Regex-Tests-Core-DaleHenrichs.5.mcz'.
+	'PackageInfo-Base.g-DaleHenrichs.34.mcz'.
+	'Monticello.v3-dkh.434.mcz'.
+	'GemStone-Deployment-DaleHenrichs.20.mcz'.
+	'Change-Notification.v3-DaleHenrichs.14.mcz'.
+	'Metacello-Base-DaleHenrichs.19.mcz'.
+	'Metacello-Core-dkh.464.mcz'.
+	'Gofer-Core-StephaneDucasse.133.mcz'.
+	'Metacello-MC-dkh.520.mcz'.
+	'Metacello-Platform.gemstone-DaleHenrichs.20.mcz'.
+	'Metacello-ToolBox-dkh.105.mcz'.
+	}.
+packageNames do: [:packageName |
+	GsPackageLibrary loadMCZFile: packageName fromRepositoryPath: BootstrapRepositoryDirectory ].
+true
+%
+
+commit
+
