@@ -97,11 +97,11 @@ namespace :build do
           waitstone(options)  &&
           fileinruby(options) &&
           stopstone(options)  &&
-          # loadmcz and allprims on shrunk image => restart stone
+
+          # loadmcz on shrunk image => restart stone
           startstone(options) &&
           waitstone(options)  &&
-          loadmcz(options)    &&
-          allprims(options)
+          loadmcz(options)
       ensure
         stopstone(options)
       end
@@ -191,7 +191,7 @@ exit
 
   def run_topaz_file(file, opts)
     topaz_cmd = "#{opts[:gem_bin]}/topaz -l -i -e #{opts[:gem_conf]} -z #{opts[:gem_conf]}"
-    system "#{topaz_cmd} < #{file}"
+    system "#{topaz_cmd} < #{file} > #{file}.out 2>&1"
   end
 
   # Given the name of a ERB template, copy it to the destination dir,
@@ -207,18 +207,6 @@ exit
     end
   end
 
-  def allprims(options)
-    log("allprims",  "Begin")
-    #        `$gemstone/bin/topaz -l <<EOF
-    #        output append $build_log
-    #        set gemstone pkg${os} user DataCurator pass swordfish
-    #        input $gemstone/upgrade/ruby/allprims.topaz
-    #        exit
-    #        EOF`;
-    log("allprims", "NOT IMPLEMENTED", Logger::ERROR)
-    log("allprims",  "End")
-  end
-
   def create_filein_stone_files(options)
     log("create_filein_stone_files",  "Begin")
     Dir.chdir(FILEIN_DIR) do
@@ -228,17 +216,18 @@ exit
       cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
       cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
 
+      # TODO: Remove this when smalltalk bug resovled.
       # Workaround for bug in Smalltalk build.  patchMaster30.gs should be shipped
       # with the VM, but currently isn't.  Until bug is fixed, we'll copy the file
       # into place here:
-      log("create_filein_stone_files", "copy patchMaster30.gs to $upgradeDir", Logger::WARN)
+      log("create_filein_stone_files", "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
       cp File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs'), File.join(GEMSTONE, 'upgrade')
     end
     log("create_filein_stone_files",  "End")
   end
 
   def log(step, msg, level=Logger::INFO)
-    puts "==== #{msg}" if VERBOSE
+    puts "==== #{step}: #{msg}" if VERBOSE
     $logger.log(level, msg, step)
     true
   end
