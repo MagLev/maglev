@@ -95,6 +95,7 @@ namespace :build do
       :gem_bin     => File.join(GEMSTONE, 'bin'),
       :mcz_version => 'TimFelgentreff.1307', # TODO: Parameterize this: read out of file/ENV?
       :mcz_dir     => IMAGE_RUBY_DIR,
+      :mcz_log     => File.join(FILEIN_DIR, 'load_mcz.log'),
     }
     options.each_pair { |k,v| log("build:image", "options[#{k.inspect}] = #{v}") }
 

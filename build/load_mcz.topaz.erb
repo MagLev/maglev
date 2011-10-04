@@ -1,6 +1,6 @@
-set gemstone <%= options[:stone_name] %> user DataCurator pass swordfish
+set gemstone $STONENAME user DataCurator pass swordfish
 login
-output append <%= options[:build_log] %>
+output append <%= options[:mcz_log] %>
 display resultcheck
 run
 | fileRepo aBase aName ver |
