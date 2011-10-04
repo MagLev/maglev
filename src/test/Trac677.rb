@@ -4242,7 +4242,7 @@ end
 unless Foo::UNICODE_DATA.size == 4233 ; raise 'error'; end
 msg = nil
 begin
-  require 'src/test/Trac677b.rb'
+  require File.expand_path("../Trac677b.rb", __FILE__)
 rescue => ex
   msg = ex.message
 end
