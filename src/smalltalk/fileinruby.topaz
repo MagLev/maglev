@@ -18,7 +18,7 @@ errorcount
 
 !  baseruby.gs does login/logout/commits
 iferr 1 exit 2
-input $upgradeDir/baseruby.gs
+input $imageDir/baseruby.gs
 errorcount
 
 ! now cluster and audit, and shrink
@@ -26,7 +26,7 @@ set user SystemUser pass swordfish
 login
 ! input $upgradeDir/clusterimage.gs  ! skip for now, do not checkin
 
-input $upgradeDir/auditrubyimage.gs
+input $imageDir/auditrubyimage.gs
 errorcount
 
 iferr 1 where

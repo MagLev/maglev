@@ -25,69 +25,69 @@ Stream installLegacyStreamImplementation.
 true
 %
 
-input $upgradeDir/ruby/GsCompilerClasses.gs
+input $imageRubyDir/GsCompilerClasses.gs
 
-input $upgradeDir/ruby/Behavior_ruby.gs
+input $imageRubyDir/Behavior_ruby.gs
 
 ! class definitions
-input $upgradeDir/ruby/Classes_ruby.gs
+input $imageRubyDir/Classes_ruby.gs
 
-input $upgradeDir/ruby/Class_ruby.gs
-input $upgradeDir/ruby/Metaclass3_ruby.gs
-input $upgradeDir/ruby/Capi_ruby.gs
-input $upgradeDir/ruby/ObsoleteMetaclass_ruby.gs
-input $upgradeDir/ruby/UnorderedCollection_ruby.gs
+input $imageRubyDir/Class_ruby.gs
+input $imageRubyDir/Metaclass3_ruby.gs
+input $imageRubyDir/Capi_ruby.gs
+input $imageRubyDir/ObsoleteMetaclass_ruby.gs
+input $imageRubyDir/UnorderedCollection_ruby.gs
 
 ! methods for GsCompilerIRNode classes
-input $upgradeDir/ruby/GsCompilerIRNode.gs
-input $upgradeDir/ruby/GsNMethod_ruby.gs
+input $imageRubyDir/GsCompilerIRNode.gs
+input $imageRubyDir/GsNMethod_ruby.gs
 
 ! Smalltalk env 0 and env1 methods for other base classes
-input $upgradeDir/ruby/Association_ruby.gs
-input $upgradeDir/ruby/Array_ruby.gs
-input $upgradeDir/ruby/CharacterCollection_ruby.gs
-input $upgradeDir/ruby/ExecBlock_ruby.gs
-input $upgradeDir/ruby/Exception_ruby.gs
-input $upgradeDir/ruby/IO_ruby.gs
-input $upgradeDir/ruby/GsFile_ruby.gs
-input $upgradeDir/ruby/GsProcess_ruby.gs
-input $upgradeDir/ruby/GsSocket_ruby.gs
-input $upgradeDir/ruby/Numeric.gs
-input $upgradeDir/ruby/MatchData.gs
-input $upgradeDir/ruby/NilTF.gs
-input $upgradeDir/ruby/Object_ruby.gs
-input $upgradeDir/ruby/ProcessorScheduler_ruby.gs
-input $upgradeDir/ruby/Repository_ruby.gs
-input $upgradeDir/ruby/Symbol_ruby.gs
-input $upgradeDir/ruby/SymbolAssociation_ruby.gs
-input $upgradeDir/ruby/String_ruby.gs
-input $upgradeDir/ruby/System_ruby.gs
-input $upgradeDir/ruby/Range_ruby.gs
-input $upgradeDir/ruby/Regexp.gs
-input $upgradeDir/ruby/RubyConstantRef.gs
-input $upgradeDir/ruby/RubyDirectory.gs
-input $upgradeDir/ruby/RubyEnv.gs
-input $upgradeDir/ruby/RubyProc.gs
-input $upgradeDir/ruby/RubyThreadGroup.gs
-input $upgradeDir/ruby/RubySocket.gs 
-input $upgradeDir/ruby/IPSocket.gs
-input $upgradeDir/ruby/TCPSocket.gs
-input $upgradeDir/ruby/TCPServer.gs
-input $upgradeDir/ruby/UDPSocket.gs
-input $upgradeDir/ruby/UNIXSocket.gs
-input $upgradeDir/ruby/UNIXServer.gs
-input $upgradeDir/ruby/TransientShortArray_ruby.gs
-input $upgradeDir/ruby/RubyHash.gs
-input $upgradeDir/ruby/RubyIdentityHash.gs
+input $imageRubyDir/Association_ruby.gs
+input $imageRubyDir/Array_ruby.gs
+input $imageRubyDir/CharacterCollection_ruby.gs
+input $imageRubyDir/ExecBlock_ruby.gs
+input $imageRubyDir/Exception_ruby.gs
+input $imageRubyDir/IO_ruby.gs
+input $imageRubyDir/GsFile_ruby.gs
+input $imageRubyDir/GsProcess_ruby.gs
+input $imageRubyDir/GsSocket_ruby.gs
+input $imageRubyDir/Numeric.gs
+input $imageRubyDir/MatchData.gs
+input $imageRubyDir/NilTF.gs
+input $imageRubyDir/Object_ruby.gs
+input $imageRubyDir/ProcessorScheduler_ruby.gs
+input $imageRubyDir/Repository_ruby.gs
+input $imageRubyDir/Symbol_ruby.gs
+input $imageRubyDir/SymbolAssociation_ruby.gs
+input $imageRubyDir/String_ruby.gs
+input $imageRubyDir/System_ruby.gs
+input $imageRubyDir/Range_ruby.gs
+input $imageRubyDir/Regexp.gs
+input $imageRubyDir/RubyConstantRef.gs
+input $imageRubyDir/RubyDirectory.gs
+input $imageRubyDir/RubyEnv.gs
+input $imageRubyDir/RubyProc.gs
+input $imageRubyDir/RubyThreadGroup.gs
+input $imageRubyDir/RubySocket.gs 
+input $imageRubyDir/IPSocket.gs
+input $imageRubyDir/TCPSocket.gs
+input $imageRubyDir/TCPServer.gs
+input $imageRubyDir/UDPSocket.gs
+input $imageRubyDir/UNIXSocket.gs
+input $imageRubyDir/UNIXServer.gs
+input $imageRubyDir/TransientShortArray_ruby.gs
+input $imageRubyDir/RubyHash.gs
+input $imageRubyDir/RubyIdentityHash.gs
 ! DateTime_ruby.gs no longer used
-input $upgradeDir/ruby/VariableContext_ruby.gs
-input $upgradeDir/ruby/Module_ruby.gs
-input $upgradeDir/ruby/Kernel.gs
-input $upgradeDir/ruby/RubySignal.gs
-input $upgradeDir/ruby/RubyTime.gs
-input $upgradeDir/ruby/ProfMonitorTree_ruby.gs
-input $upgradeDir/ruby/ProfMonitorEntry_ruby.gs
-input $upgradeDir/ruby/GsObjectSecurityPolicies.gs
+input $imageRubyDir/VariableContext_ruby.gs
+input $imageRubyDir/Module_ruby.gs
+input $imageRubyDir/Kernel.gs
+input $imageRubyDir/RubySignal.gs
+input $imageRubyDir/RubyTime.gs
+input $imageRubyDir/ProfMonitorTree_ruby.gs
+input $imageRubyDir/ProfMonitorEntry_ruby.gs
+input $imageRubyDir/GsObjectSecurityPolicies.gs
 
 expectvalue true
 run
@@ -108,7 +108,7 @@ logout
 set user DataCurator pass swordfish
 login
 
-input $upgradeDir/ruby/GsCompilerClasses.gs
+input $imageRubyDir/GsCompilerClasses.gs
 
 ! Arrange to load Metacello/Monticello/OmniBrowser/Release support
 run
@@ -130,7 +130,7 @@ logout
 
 set user SystemUser pass swordfish
 login
-input $upgradeDir/ruby/pre_prim_methods.gs
+input $imageRubyDir/pre_prim_methods.gs
 run
 { Object . 
    Behavior . 

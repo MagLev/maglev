@@ -33,33 +33,26 @@
 #   + remove .git*
 #   + keyfile
 
+
 namespace :build do
   require 'erb'
   require 'logger'
 
-  # Assume MAGLEV_HOME is already set.
-
-  # Note: we only do the fast versions of the build for MagLev (no slow vm
-  # available), so the task names do not include "fast" and "slow".
-
-  BASE_DIR       = File.expand_path("..", File.dirname(__FILE__))
-  IMAGE_DIR      = File.join(BASE_DIR, 'src', 'smalltalk')
-  IMAGE_RUBY_DIR = File.join(IMAGE_DIR, 'ruby')
-  BUILD_DIR      = File.join(BASE_DIR, 'build')
-  KEYFILE        = File.join(BASE_DIR, 'etc', 'maglev.demo.key')
-  ST_IMAGE       = File.join(GEMSTONE, 'bin', 'extent0.dbf')
-  VERBOSE        = true
+  IMAGE_RUBY_DIR = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
+  BUILD_DIR      = File.join(MAGLEV_HOME, 'build')
   FILEIN_DIR     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
 
-  task :check_files do
-    [BASE_DIR, IMAGE_DIR, IMAGE_RUBY_DIR, BUILD_DIR, KEYFILE, ST_IMAGE].each do |f|
-      raise "Can't find #{f}" unless File.exist? f
+  KEYFILE        = File.join(MAGLEV_HOME, 'etc', 'maglev.demo.key')
+  VERBOSE        = true
+
+  task :check_dev_env do
+    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, FILEIN_DIR].each do |var|
+      raise "#{var} is not a directory" unless File.directory? var
     end
-    raise "GEMSTONE not set" unless defined?(GEMSTONE)
-    raise "GEMSTONE '#{GEMSTONE}' is not a directory" unless File.directory? GEMSTONE
   end
 
   task :temp_dir do
+    puts "Creating new FILEIN_DIR #{FILEIN_DIR}"
     rm_rf FILEIN_DIR
     mkdir FILEIN_DIR
   end
@@ -68,9 +61,14 @@ namespace :build do
     # upgradeDir is also needed by the filein topaz scripts.  When a
     # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
     # a filein it will be set to the imageDir.
-    ENV["upgradeDir"]             = IMAGE_DIR
-    ENV["imageDir"]               = IMAGE_DIR
-    ENV["dbfDir"]                 = options[:filein_dir]
+    #
+    # The non-traditional camel case env variable names come from the
+    # Smalltalk build.  We do not change them because we want to remain as
+    # compatible as possible with the original SVN source.
+    ENV["upgradeDir"]             = File.join(GEMSTONE, 'upgrade')
+    ENV["imageDir"]               = File.join(MAGLEV_HOME, 'src', 'smalltalk')
+    ENV["dbfDir"]                 = FILEIN_DIR
+    ENV["imageRubyDir"]           = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
     ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
     ENV['STONENAME']              = options[:stone_name]
     ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
@@ -78,7 +76,7 @@ namespace :build do
   end
 
   desc "Create a fresh ruby image"
-  task :image => [:check_files, :temp_dir] do
+  task :image => [:check_dev_env, :temp_dir] do
     build_log_name = File.join(FILEIN_DIR, 'build_image.log')
     $logger        = Logger.new(build_log_name)
     $logger.level  = Logger::DEBUG
@@ -87,7 +85,6 @@ namespace :build do
     log("build:image", "Begin task")
 
     options = {
-      :filein_dir  => FILEIN_DIR,
       :stone_name  => "fileinruby#{$$}stone",
       :stone_conf  => File.join(FILEIN_DIR, 'filein.ruby.conf'),
       :stone_log   => File.join(FILEIN_DIR, 'stone.log'),
@@ -104,7 +101,7 @@ namespace :build do
 
     # Pass one includes a shrink stone, so we only run it
     # and logout to ensure image written ok
-    Dir.chdir options[:filein_dir] do
+    Dir.chdir FILEIN_DIR do
       begin
         # Pass one runs the filein of ruby base code,
         # then shrinks the image.  We stop at that
@@ -128,30 +125,6 @@ namespace :build do
     # TODO: Report Success/Failure
   end
 
-  task :pbm => [:check_files, :temp_dir] do
-    build_log_name = File.join(FILEIN_DIR, 'build_image.log')
-    $logger        = Logger.new(build_log_name)
-    $logger.level  = Logger::DEBUG
-
-    puts "Logging to: #{build_log_name}"
-    log("build:image", "Begin task")
-
-    options = {
-      :filein_dir  => FILEIN_DIR,
-      :stone_name  => "fileinruby#{$$}stone",
-      :stone_conf  => File.join(FILEIN_DIR, 'filein.ruby.conf'),
-      :stone_log   => File.join(FILEIN_DIR, 'stone.log'),
-      :gem_conf    => File.join(FILEIN_DIR, 'fileingem.ruby.conf'),
-      :gem_bin     => File.join(GEMSTONE, 'bin'),
-      :mcz_version => 'TimFelgentreff.1307', # TODO: Parameterize this: read out of file/ENV?
-      :mcz_dir     => IMAGE_RUBY_DIR,
-    }
-    options.each_pair { |k,v| log("build:image", "options[#{k.inspect}] = #{v}") }
-
-    setup_env options
-    create_filein_stone_files options
-  end
-
   # equivalent to fileinruby.pl, but only supports fast
   #
   # fileinruby creates a MagLev ruby image from a virgin Smalltalk image.
@@ -173,12 +146,12 @@ namespace :build do
   # which we build the ruby image.
   #
   def fileinruby(options)
-    outfile = "#{options[:filein_dir]}/fileinruby.out"
+    outfile = "#{FILEIN_DIR}/fileinruby.out"
     safe_run("fileinruby", outfile) do
       run_topaz(<<-EOS, options)
 output push #{outfile} only
 set gemstone #{options[:stone_name]}
-input #{IMAGE_DIR}/fileinruby.topaz
+input $imageDir/fileinruby.topaz
 output pop
 exit
       EOS
@@ -265,11 +238,18 @@ exit
 
   def create_filein_stone_files(options)
     log("create_filein_stone_files",  "Begin")
-    Dir.chdir(options[:filein_dir]) do
-      cp ST_IMAGE, 'extent0.ruby.dbf'
+    Dir.chdir(FILEIN_DIR) do
+
+      cp File.join(GEMSTONE, 'bin', 'extent0.dbf'), 'extent0.ruby.dbf'
       chmod 0770,'extent0.ruby.dbf'
       cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", options[:stone_conf], options)
       cp "#{BUILD_DIR}/fileingem.ruby.conf", options[:gem_conf]
+
+      # Workaround for bug in Smalltalk build.  patchMaster30.gs should be shipped
+      # with the VM, but currently isn't.  Until bug is fixed, we'll copy the file
+      # into place here:
+      log("create_filein_stone_files", "copy patchMaster30.gs to $upgradeDir", Logger::WARN)
+      cp File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs'), File.join(GEMSTONE, 'upgrade')
     end
     log("create_filein_stone_files",  "End")
   end

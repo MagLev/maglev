@@ -6,7 +6,7 @@ run
 | repo aName ver |
 repo := MCDirectoryRepository new directory:
   (FileDirectory on:  
-     (System gemEnvironmentVariable: 'upgradeDir') , '/ruby' )  .
+     (System gemEnvironmentVariable: 'imageDir') , '/ruby' )  .
 aName := 'btb-Java-avi.191.mcz' .
 ver := repo loadVersionFromFileNamed: aName .
 ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].

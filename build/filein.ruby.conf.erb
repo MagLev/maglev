@@ -18,8 +18,8 @@ STN_HALT_ON_FATAL_ERR = FALSE;
 
 # The following added when moving to pure ruby build
 # In svn, these params were added by fileinruby.pl
-DBF_EXTENT_NAMES = <%= options[:filein_dir] %>/extent0.ruby.dbf;
-DBF_SCRATCH_DIR = <%= options[:filein_dir] %>/;
-STN_TRAN_LOG_DIRECTORIES = <%= options[:filein_dir] %>/, <%= options[:filein_dir] %>/;
+DBF_EXTENT_NAMES = <%= FILEIN_DIR %>/extent0.ruby.dbf;
+DBF_SCRATCH_DIR = <%= FILEIN_DIR %>/;
+STN_TRAN_LOG_DIRECTORIES = <%= FILEIN_DIR %>/, <%= FILEIN_DIR %>/;
 SHR_PAGE_CACHE_SIZE_KB = 200000;
 KEYFILE = <%= KEYFILE %>;

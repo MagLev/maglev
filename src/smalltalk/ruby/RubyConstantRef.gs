@@ -46,7 +46,7 @@ self _primitiveFailed: #setGlobalAssoc_noMarkDirty: args: { anAssoc }
 %
 
 !  resolveInContext: in separate file
-input $upgradeDir/ruby/RubyConstantRef_resolv.gs
+input $imageRubyDir/RubyConstantRef_resolv.gs
 
 method:
 resolveGlobalVarAssoc
