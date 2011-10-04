@@ -200,7 +200,11 @@ typedef enum MagRubyType {
     T_NIL,
     T_OBJECT,
     T_CLASS,
-    T_ICLASSnotUsed,  // T_ICLASS not in Maglev
+#ifdef MAGLEV_LINT
+    T_ICLASSnotused,
+#else
+    T_ICLASS,
+#endif
     T_MODULE,
     T_FLOAT,
     T_STRING,
@@ -219,10 +223,12 @@ typedef enum MagRubyType {
     T_SYMBOL,
 
     T_BLKTAG,  // not used in maglev
-    T_UNDEF    // no object exists for specified objectId 
-    // T_VARMAP, // internal use: dynamic variables , not in Maglev
-    // T_SCOPE,  // internal use: variable scope , not in Maglev
-    // T_NODE    // internal use: syntax tree node
+    T_UNDEF,    // no object exists for specified objectId 
+#ifndef MAGLEV_LINT
+    T_VARMAP, // internal use: dynamic variables , not in Maglev
+    T_SCOPE,  // internal use: variable scope , not in Maglev
+    T_NODE    // internal use: syntax tree node
+#endif
 
 } MagRubyType;
 
@@ -895,7 +901,7 @@ RUBY_DLLSPEC void  rb_rdata_store(VALUE obj, void *p);
 /** Mark variable global */
 // RUBY_DLLSPEC void rb_global_variable(VALUE* handle_address);
 
-// RUBY_DLLSPEC void rb_gc_register_address(VALUE* address); 
+/* RUBY_DLLSPEC void rb_gc_register_address(VALUE* address);  */
 
 /** Unmark variable as global */
 // RUBY_DLLSPEC void rb_gc_unregister_address(VALUE* address); 
@@ -905,6 +911,24 @@ RUBY_DLLSPEC VALUE rb_gv_get(const char* name);
 
 /** Set named global to given value, returning the value. $ optional. */
 RUBY_DLLSPEC VALUE rb_gv_set(const char* name, VALUE value);
+
+
+#ifndef MAGLEV_LINT
+static void rb_gc_register_address(VALUE* address) {
+    char to_s[17] = {'\0'};
+    sprintf(to_s, "%p", address);
+    rb_gv_set((const char*)to_s, *address);
+}
+
+static void rb_gc_unregister_address(VALUE* address) {
+    char to_s[17] = {'\0'};
+    sprintf(to_s, "%p", address);
+    rb_gv_set((const char*)to_s, Qnil);
+}
+
+#define rb_gc_mark(v)
+#define rb_gc_mark_maybe(v)
+#endif
 
 static inline VALUE rb_errinfo()
 {
@@ -1175,7 +1199,9 @@ RUBY_DLLSPEC extern VALUE rb_eStandardError;
 RUBY_DLLSPEC extern VALUE rb_eSystemExit;
 RUBY_DLLSPEC extern VALUE rb_eInterrupt;
 RUBY_DLLSPEC extern VALUE rb_eSignal;
-// RUBY_DLLSPEC extern VALUE rb_eFatal;  
+#ifndef MAGLEV_LINT
+RUBY_DLLSPEC extern VALUE rb_eFatal;  
+#endif
 RUBY_DLLSPEC extern VALUE rb_eArgError;
 RUBY_DLLSPEC extern VALUE rb_eEOFError;
 RUBY_DLLSPEC extern VALUE rb_eIndexError;
