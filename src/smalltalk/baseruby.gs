@@ -7,10 +7,10 @@
 !    top level filein input script for slowrubyimage step of the build
 !========================================================================
 set user SystemUser pass swordfish
-! iferr 1 exit
+iferr 1 exit
 login
 
-iferr 1 where  
+! iferr 1 where  
 iferr 2 stack
 
 output push baseruby.out 
