@@ -1,24 +1,10 @@
 # Create a MagLev image from base Smalltalk image
 #
-# TODO:
-#  4. Get clean run of loadmcz
-#  5. Get output from loadmcz going to a known and reported location
-#  6. Report the success/failure of loadmcz
-#
-#  7. Get clean run of allprims
-#  8. Get output from allprims going to a known and reported location
-#  9. Report the success/failure of allprims
+# TODO: Get rid of topaz output during rake runs
 #
 
 # 3. Create version.txt
 # 4. Set build date in Globals.rb
-
-# 5. create extent0.ruby.dbf
-# 6. Load mcz into extent0.ruby.dbf
-#    a. start stone
-#    b. load_mcz()
-#    c. allprims()
-#    d. stop stone
 #    e. put the image file somewhere in the package and chmod it
 #         `rm topazerrors.log`;
 #         `chmod 777 ${target}/gemstone/bin ${target}/gemstone/bin/extent0.ruby.dbf`;
@@ -46,7 +32,7 @@ namespace :build do
   VERBOSE        = true
 
   task :check_dev_env do
-    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, FILEIN_DIR].each do |var|
+    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR].each do |var|
       raise "#{var} is not a directory" unless File.directory? var
     end
   end
@@ -117,12 +103,9 @@ namespace :build do
           loadmcz(options)    &&
           allprims(options)
       ensure
-        stopstone options
+        stopstone(options)
       end
     end
-
-    # TODO: clean filein_tmp_dir
-    # TODO: Report Success/Failure
   end
 
   # equivalent to fileinruby.pl, but only supports fast
@@ -194,7 +177,7 @@ exit
   end
 
   def stopstone(opts)
-    logfile = "#{Dir.pwd}/waitstone.log"
+    logfile = "#{Dir.pwd}/stopstone.log"
     cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish > #{logfile} 2>&1"
     safe_run("stopstone", logfile) { system cmd }
   end
@@ -224,7 +207,7 @@ exit
     end
   end
 
-  def allprims()
+  def allprims(options)
     log("allprims",  "Begin")
     #        `$gemstone/bin/topaz -l <<EOF
     #        output append $build_log
