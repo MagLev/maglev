@@ -48,10 +48,10 @@ namespace :build do
   BUILD_DIR      = File.join(BASE_DIR, 'build')
   KEYFILE        = File.join(BASE_DIR, 'etc', 'maglev.demo.key')
   ST_IMAGE       = File.join(GEMSTONE, 'bin', 'extent0.dbf')
-
   VERBOSE        = true
+  FILEIN_DIR     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
 
-  task :check do
+  task :check_files do
     [BASE_DIR, IMAGE_DIR, IMAGE_RUBY_DIR, BUILD_DIR, KEYFILE, ST_IMAGE].each do |f|
       raise "Can't find #{f}" unless File.exist? f
     end
@@ -59,14 +59,27 @@ namespace :build do
     raise "GEMSTONE '#{GEMSTONE}' is not a directory" unless File.directory? GEMSTONE
   end
 
+  task :temp_dir do
+    rm_rf FILEIN_DIR
+    mkdir FILEIN_DIR
+  end
+
+  def setup_env(options)
+    # upgradeDir is also needed by the filein topaz scripts.  When a
+    # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
+    # a filein it will be set to the imageDir.
+    ENV["upgradeDir"]             = IMAGE_DIR
+    ENV["imageDir"]               = IMAGE_DIR
+    ENV["dbfDir"]                 = options[:filein_dir]
+    ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
+    ENV['STONENAME']              = options[:stone_name]
+    ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
+    ENV["GEMSTONE_EXE_CONF"]      = options[:gem_conf]
+  end
+
   desc "Create a fresh ruby image"
-  task :image => :check do
-    filein_dir     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
-
-    rm_rf filein_dir
-    mkdir filein_dir
-
-    build_log_name = File.join(filein_dir, 'build_image.log')
+  task :image => [:check_files, :temp_dir] do
+    build_log_name = File.join(FILEIN_DIR, 'build_image.log')
     $logger        = Logger.new(build_log_name)
     $logger.level  = Logger::DEBUG
 
@@ -74,57 +87,68 @@ namespace :build do
     log("build:image", "Begin task")
 
     options = {
-      :filein_dir  => filein_dir,
+      :filein_dir  => FILEIN_DIR,
       :stone_name  => "fileinruby#{$$}stone",
-      :stone_conf  => File.join(filein_dir, 'filein.ruby.conf'),
-      :stone_log   => File.join(filein_dir, 'stone.log'),
-      :gem_conf    => File.join(filein_dir, 'fileingem.ruby.conf'),
+      :stone_conf  => File.join(FILEIN_DIR, 'filein.ruby.conf'),
+      :stone_log   => File.join(FILEIN_DIR, 'stone.log'),
+      :gem_conf    => File.join(FILEIN_DIR, 'fileingem.ruby.conf'),
       :gem_bin     => File.join(GEMSTONE, 'bin'),
-      :mcz_version => 'TimFelgentreff.1307',
+      :mcz_version => 'TimFelgentreff.1307', # TODO: Parameterize this: read out of file/ENV?
       :mcz_dir     => IMAGE_RUBY_DIR,
     }
     options.each_pair { |k,v| log("build:image", "options[#{k.inspect}] = #{v}") }
 
-    # upgradeDir is also needed by the filein topaz scripts.  When a
-    # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
-    # a filein it will be set to the imageDir.
-    ENV["upgradeDir"]             = IMAGE_RUBY_DIR
-    ENV["imageDir"]               = IMAGE_DIR
-    ENV["dbfDir"]                 = options[:filein_dir]
-    ENV["GS_DEBUG_COMPILE_TRACE"] = "1"
-    ENV['STONENAME']              = options[:stone_name]
-    ENV['GEMSTONE_SYS_CONF']      = options[:stone_conf]
-    ENV["GEMSTONE_EXE_CONF"]      = options[:gem_conf]
-
+    setup_env options
     create_filein_stone_files options
 
     # Pass one includes a shrink stone, so we only run it
     # and logout to ensure image written ok
-    success = false
-    Dir.chdir(options[:filein_dir]) do
+    Dir.chdir options[:filein_dir] do
       begin
-        startstone(options) &&
-          waitstone(options) &&
-          (success = fileinruby(options))
+        # Pass one runs the filein of ruby base code,
+        # then shrinks the image.  We stop at that
+        # point to ensure write of shrunk image
+        log("build:image", "Begin initial fileinruby")
+        startstone(options)   &&
+          waitstone(options)  &&
+          fileinruby(options) &&
+          stopstone(options)  &&
+          # loadmcz and allprims on shrunk image => restart stone
+          startstone(options) &&
+          waitstone(options)  &&
+          loadmcz(options)    &&
+          allprims(options)
       ensure
-        stopstone(options)
+        stopstone options
       end
     end
 
-    # Pass two loads mcz and runs allprims
-    Dir.chdir(options[:filein_dir]) do
-      begin
-        startstone(options) &&
-          waitstone( options) &&
-          loadmcz(options) &&
-          allprims(options)
-      ensure
-        stopstone(options)
-      end
-    end if success
-
     # TODO: clean filein_tmp_dir
     # TODO: Report Success/Failure
+  end
+
+  task :pbm => [:check_files, :temp_dir] do
+    build_log_name = File.join(FILEIN_DIR, 'build_image.log')
+    $logger        = Logger.new(build_log_name)
+    $logger.level  = Logger::DEBUG
+
+    puts "Logging to: #{build_log_name}"
+    log("build:image", "Begin task")
+
+    options = {
+      :filein_dir  => FILEIN_DIR,
+      :stone_name  => "fileinruby#{$$}stone",
+      :stone_conf  => File.join(FILEIN_DIR, 'filein.ruby.conf'),
+      :stone_log   => File.join(FILEIN_DIR, 'stone.log'),
+      :gem_conf    => File.join(FILEIN_DIR, 'fileingem.ruby.conf'),
+      :gem_bin     => File.join(GEMSTONE, 'bin'),
+      :mcz_version => 'TimFelgentreff.1307', # TODO: Parameterize this: read out of file/ENV?
+      :mcz_dir     => IMAGE_RUBY_DIR,
+    }
+    options.each_pair { |k,v| log("build:image", "options[#{k.inspect}] = #{v}") }
+
+    setup_env options
+    create_filein_stone_files options
   end
 
   # equivalent to fileinruby.pl, but only supports fast
@@ -252,5 +276,6 @@ exit
   def log(step, msg, level=Logger::INFO)
     puts "==== #{msg}" if VERBOSE
     $logger.log(level, msg, step)
+    true
   end
 end
