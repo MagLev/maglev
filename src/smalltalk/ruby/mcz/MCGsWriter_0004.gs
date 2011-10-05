@@ -1,20 +1,4 @@
 
-doit
-MCStWriter subclass: 'MCGsWriter'
-	instVarNames: #( fileStreams dependencyIndex currentClass)
-	classVars: #()
-	classInstVars: #()
-	poolDictionaries: #()
-	inDictionary: ''
-	category: 'MagLev-Tools'
-	options: #()
-
-%
-
-set class MCGsWriter
-removeallmethods
-removeallclassmethods
-
 set class MCGsWriter class
 category: 'as yet unclassified'
 method:
@@ -49,6 +33,19 @@ class: aName
 set class MCGsWriter
 category: 'as yet unclassified'
 method:
+classDefinitionsStream
+	| streamColl idxStreamPair |
+	streamColl := (fileStreams at: 'class_definitions' ifAbsentPut: [
+		{ { 0 . String new writeStream } } ]).
+	idxStreamPair := streamColl last.
+	^ idxStreamPair last "the actual WriteStream"
+
+%
+
+
+set class MCGsWriter
+category: 'as yet unclassified'
+method:
 fileOutIn: path
 	| dir |
 	dir := (FileDirectory on: path)
@@ -58,11 +55,24 @@ fileOutIn: path
 	fileStreams keysAndValuesDo: [:className :array |
 		"for info on :array, see #class:"
 		array do: [:idxStreamPair || index stream |
-			index := array first printPaddedWith: $0 to: 4.
-			stream := array last.
+			index := idxStreamPair first printPaddedWith: $0 to: 4.
+			stream := idxStreamPair last.
 			(dir forceNewFileNamed: (className asString copyReplaceAll: ' ' with: '_' ), '_', index, '.gs')
 				nextPutAll: stream contents;
 				close]].
+
+%
+
+
+set class MCGsWriter
+category: 'as yet unclassified'
+method:
+safeFileOut
+	| maglevHome path |
+	(maglevHome := (RubyEnv _getenv: 'MAGLEV_HOME')) ifNil: [ ^ self ].
+	path := maglevHome, '/src/smalltalk/ruby/mcz'.
+	(FileDirectory on: path) exists ifFalse: [ ^ self ].
+	self fileOutIn: path.
 
 %
 
@@ -92,7 +102,7 @@ category: 'as yet unclassified'
 method:
 writeClassDefinition: definition
 	
-	(self class: definition className)
+	self classDefinitionsStream
 		cr;
 		nextPutAll: 'doit'; cr;
 		nextPutAll: definition actualClass definition; cr;
