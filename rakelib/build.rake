@@ -27,12 +27,12 @@ namespace :build do
   IMAGE_RUBY_DIR = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
   BUILD_DIR      = File.join(MAGLEV_HOME, 'build')
   FILEIN_DIR     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
-
+  MCZ_DIR        = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby', 'mcz')
   KEYFILE        = File.join(MAGLEV_HOME, 'etc', 'maglev.demo.key')
   VERBOSE        = true
 
   task :check_dev_env do
-    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR].each do |var|
+    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, MCZ_DIR].each do |var|
       raise "#{var} is not a directory" unless File.directory? var
     end
   end
@@ -101,10 +101,30 @@ namespace :build do
           # loadmcz on shrunk image => restart stone
           startstone(options) &&
           waitstone(options)  &&
-          loadmcz(options)
+          load_mcz_dir(options)
       ensure
         stopstone(options)
       end
+    end
+  end
+
+  def load_mcz_dir(options)
+    # No looping in topaz, so generate a script here
+    files = Dir["#{MCZ_DIR}/*.gs"]
+    inputs = files.map{ |fn| "input #{fn}\n" }
+
+    outfile = "#{FILEIN_DIR}/loadmczdir.out"
+    log_run("load_mcz_dir", outfile) do
+      run_topaz("load_mcz_dir", <<-EOS, options)
+        output push #{outfile} only
+        iferr 1 exit 3
+        set gemstone #{options[:stone_name]} user SystemUser pass swordfish
+        login
+        #{inputs}
+        expectvalue true
+        commit
+        logout
+      EOS
     end
   end
 
@@ -130,20 +150,20 @@ namespace :build do
   #
   def fileinruby(options)
     outfile = "#{FILEIN_DIR}/fileinruby.out"
-    safe_run("fileinruby", outfile) do
-      run_topaz(<<-EOS, options)
-output push #{outfile} only
-set gemstone #{options[:stone_name]}
-input $imageDir/fileinruby.topaz
-output pop
-exit
+    log_run("fileinruby", outfile) do
+      run_topaz("fileinruby", <<-EOS, options)
+        output push #{outfile} only
+        set gemstone #{options[:stone_name]}
+        input $imageDir/fileinruby.topaz
+        output pop
+        exit
       EOS
     end
   end
 
   # Assume stone is running and we PWD is correct
   def loadmcz(options) # todo: parameterize
-    safe_run("loadmcz") do
+    log_run("loadmcz") do
       tpz_cmds = "load_mcz.topaz"
       cp_template("#{BUILD_DIR}/load_mcz.topaz.erb", tpz_cmds, options)
       run_topaz_file(tpz_cmds, options)
@@ -151,7 +171,7 @@ exit
   end
 
   # Run a block wrapped in logging and error checking
-  def safe_run(step_name, logfile="<no logfile>")
+  def log_run(step_name, logfile="<no logfile>")
     log(step_name, "Begin: LOG: #{logfile}")
     res = yield
     if res
@@ -167,23 +187,23 @@ exit
     logfile = "#{Dir.pwd}/startstone.log"
     cmd = "#{opts[:gem_bin]}/startstone #{opts[:stone_name]} -l #{opts[:stone_log]} -e #{opts[:stone_conf]} -z #{opts[:stone_conf]} > #{logfile} 2>&1"
 
-    safe_run("startstone", logfile) { system cmd }
+    log_run("startstone", logfile) { system cmd }
   end
 
   def waitstone(opts)
     logfile = "#{Dir.pwd}/waitstone.log"
     cmd = "#{opts[:gem_bin]}/waitstone #{opts[:stone_name]} > #{logfile} 2>&1"
-    safe_run("waitstone", logfile) { system cmd }
+    log_run("waitstone", logfile) { system cmd }
   end
 
   def stopstone(opts)
     logfile = "#{Dir.pwd}/stopstone.log"
     cmd = "#{opts[:gem_bin]}/stopstone #{opts[:stone_name]} DataCurator swordfish > #{logfile} 2>&1"
-    safe_run("stopstone", logfile) { system cmd }
+    log_run("stopstone", logfile) { system cmd }
   end
 
-  def run_topaz(topaz_commands, opts)
-    log("run_topaz", "Begin")
+  def run_topaz(step_name, topaz_commands, opts)
+    log("run_topaz: #{step_name}", "Begin")
     cmd_file = File.join(Dir.pwd, 'tpz_commands')
     File.open(cmd_file, 'w') { |f| f.write(topaz_commands) }
     run_topaz_file(cmd_file, opts)
