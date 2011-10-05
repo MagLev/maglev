@@ -1,14 +1,14 @@
 doc/
-specifications
-!specifications/bundler-1.0.14.gemspec
+#specifications
+!specifications/bundler-1.0.21.gemspec
 !specifications/rake-0.9.2.gemspec
 
-gems/
-!gems/bundler-1.0.14
+#gems/
+!gems/bundler-1.0.21
 !gems/rake-0.9.2
 
-cache/
-!cache/bundler-1.0.14.gem
+#cache/
+!cache/bundler-1.0.21.gem
 !cache/rake-0.9.2.gem
 
 bin/
