@@ -1,7 +1,7 @@
 
 doit
 MCStWriter subclass: 'MCGsWriter'
-	instVarNames: #( fileStreams dependencyIndex)
+	instVarNames: #( fileStreams dependencyIndex currentClass)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()
@@ -30,9 +30,18 @@ category: 'as yet unclassified'
 method:
 class: aName
 	"associates the class name with a {index . stream} pair"
-	^ (fileStreams at: aName ifAbsentPut: [
+	"if the requested class isn't the last one, but we already have a file stream for it,
+	 that means that we are processing a definition that depends on something to be loaded
+	 in between, so we create a new file for that"
+	| streamColl currentIdxStreamPair |
+	streamColl := (fileStreams at: aName ifAbsentPut: [OrderedCollection new]).
+
+	currentClass = aName ifFalse: ["we have never seen this class (streamColl = {}) or we haven't worked on it last"
 		dependencyIndex := dependencyIndex + 1.
-		{dependencyIndex . String new writeStream}]) last
+		streamColl add: {dependencyIndex . String new writeStream}.
+		currentClass := aName].
+	currentIdxStreamPair := streamColl last.
+	^ currentIdxStreamPair last "the actual WriteStream"
 
 %
 
@@ -46,13 +55,14 @@ fileOutIn: path
 			assureExistence;
 			deleteLocalFiles;
 			yourself.
-	fileStreams keysAndValuesDo: [:className :array || file index stream |
+	fileStreams keysAndValuesDo: [:className :array |
 		"for info on :array, see #class:"
-		index := array first printPaddedWith: $0 to: 3.
-		stream := array last.
-		(dir forceNewFileNamed: index, '_', (className asString copyReplaceAll: ' ' with: '_' ), '.gs')
-			nextPutAll: stream contents;
-			close].
+		array do: [:idxStreamPair || index stream |
+			index := array first printPaddedWith: $0 to: 4.
+			stream := array last.
+			(dir forceNewFileNamed: (className asString copyReplaceAll: ' ' with: '_' ), '_', index, '.gs')
+				nextPutAll: stream contents;
+				close]].
 
 %
 

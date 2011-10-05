@@ -1,20 +1,4 @@
 
-doit
-SymbolAssociation subclass: 'RubySymbolAssociation'
-	instVarNames: #( isDefined)
-	classVars: #()
-	classInstVars: #()
-	poolDictionaries: #()
-	inDictionary: ''
-	category: 'MagLev-Runtime'
-	options: #()
-
-%
-
-set class RubySymbolAssociation
-removeallmethods
-removeallclassmethods
-
 set class RubySymbolAssociation class
 category: 'as yet unclassified'
 method:
