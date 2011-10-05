@@ -110,7 +110,7 @@ namespace :build do
 
   def load_mcz_dir(options)
     # No looping in topaz, so generate a script here
-    files = Dir["#{MCZ_DIR}/*.gs"]
+    files = Dir["#{MCZ_DIR}/*.gs"].sort_by {|a| a.split('_').last }
     inputs = files.map{ |fn| "input #{fn}\n" }
 
     outfile = "#{FILEIN_DIR}/loadmczdir.out"
@@ -118,12 +118,13 @@ namespace :build do
       run_topaz("load_mcz_dir", <<-EOS, options)
         output push #{outfile} only
         iferr 1 exit 3
-        set gemstone #{options[:stone_name]} user SystemUser pass swordfish
+        set gemstone #{options[:stone_name]} user DataCurator pass swordfish
         login
         #{inputs}
         expectvalue true
         commit
         logout
+        exit 0
       EOS
     end
   end
