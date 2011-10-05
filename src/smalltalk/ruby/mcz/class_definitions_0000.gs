@@ -1146,7 +1146,7 @@ RubyAbstractCallNode subclass: 'RubyMethodDefNode'
 	                  scope hasBlockArgRef irMethNode traceBool
 	                  sendsBinding argsDescrInt methSelector lineBias
 	                  fileName source startLine endOffset
-	                  outerDef defTarget)
+	                  outerDef defTarget innerDefs)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()

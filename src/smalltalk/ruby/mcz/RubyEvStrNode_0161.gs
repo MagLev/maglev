@@ -2,10 +2,10 @@
 set class RubyEvStrNode class
 category: '*maglev-ast'
 method:
-s_a: body
- | res |
-  (res := self _basicNew ) body: body .
-  ^ res
+s_a: aBody
+ | result |
+  (result := self _basicNew ) body: aBody .
+  ^ result
 
 %
 

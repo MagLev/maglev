@@ -4,10 +4,10 @@ category: 'as yet unclassified'
 method:
 newForRp
 
-  | node rcvr |
+  | node receiver |
   node := self _basicNew .
-  rcvr := (RubyGlobalLastException _basicNew ) name: #'$!' .
-  node rcvr: rcvr .
+  receiver := (RubyGlobalLastException _basicNew ) name: #'$!' .
+  node rcvr: receiver .
   ^ node
 
 %

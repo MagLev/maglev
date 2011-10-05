@@ -2,9 +2,9 @@
 set class RubyBlockGivenNode class
 category: '*maglev-runtime'
 method:
-irNode: theSelf evalRcvr: evalRcvr
+irNode: theSelf evalRcvr: evalReceiver
   | node rcv  |
-  evalRcvr ifNotNil:[  
+  evalReceiver ifNotNil:[  
      (rcv := GsComSendNode new)
        rcvr: (GsComLiteralNode newObject: GsProcess);
        stSelector: #_rubyEvalBlockArg .

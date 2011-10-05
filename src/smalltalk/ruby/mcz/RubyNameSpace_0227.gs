@@ -52,15 +52,15 @@ RubyNameSpace initialize.
 set class RubyNameSpace class
 category: '*maglev-runtime'
 method:
-initTopScope: envId
+initTopScope: environmentId
     "returns the transient top level name space"
   | tns pns |
   pns := RubyNameSpace new .
-  pns initializeForModule: Object  env: envId .
+  pns initializeForModule: Object  env: environmentId .
 
   tns := RubyTransientNameSpace new .
-  tns initializeForModule: Object persistentCopy: pns env: envId .
-  Object _setTopNameSpace: tns persistent: pns env: envId .
+  tns initializeForModule: Object persistentCopy: pns env: environmentId .
+  Object _setTopNameSpace: tns persistent: pns env: environmentId .
   
   TraceGlobals >=2 ifTrue:[ GsFile gciLogServer: 'initialized root scope: ' , self describe ].
   ^ tns 

@@ -114,7 +114,7 @@ set class RubyBridge class
 category: '*maglev-runtime'
 method:
 installBridgesFor: rubySel in: aClass argsDescr: argsDescrInt 
-    optArgs: optArgsDescr protection: protInt primKind: primKnd env: envId
+    optArgs: optArgsDescr protection: protInt primKind: primKind env: envId
  "primKnd argument is one of  0:normal 1:primitive 2:primitive_nobridge 
                        4:boot 5:primitive during boot , 6: primitive_nobridge during boot .
   Returns selectorPrefix Symbol of rubySel .
@@ -124,7 +124,7 @@ installBridgesFor: rubySel in: aClass argsDescr: argsDescrInt
  destSuffix := (rubySel copyFrom:( prefix size + 1) to: rubySel size ) asSymbol .
  ^ self installBridgesForPrefix: prefix suffix: destSuffix selector: rubySel
     in: aClass argsDescr: argsDescrInt
-    optArgs: optArgsDescr protection: protInt primKind: primKnd env: envId
+    optArgs: optArgsDescr protection: protInt primKind: primKind env: envId
 
 %
 
@@ -134,7 +134,7 @@ category: '*maglev-runtime'
 method:
 installBridgesForPrefix: prefix suffix: destSuffix selector: rubySelArg
     in: aClass argsDescr: argsDescrInt
-    optArgs: optArgsDescr protection: protInt primKind: primKnd env: envId
+    optArgs: optArgsDescr protection: protInt primKind: primKind env: envId
  "primKnd argument is one of  0:normal 1:primitive 2:primitive_nobridge
                        4:boot 5:primitive during boot , 6: primitive_nobridge during boot .
   Returns prefix" 
@@ -154,7 +154,7 @@ installBridgesForPrefix: prefix suffix: destSuffix selector: rubySelArg
     frSuffix := suffixes at: n .
     frSuffix ~~ destSuffix ifTrue:[ | frSel cm genErrCm  |
       frSel :=  prefix _asSymbolWithRubySuffix: ( masks at: n ) .
-      cm :=  primKnd >=4 ifTrue:[ "during bootstrap,  don't overwrite existing variants"
+      cm :=  primKind >=4 ifTrue:[ "during bootstrap,  don't overwrite existing variants"
         aClass compiledMethodAt: frSel rubyEnv: envId .
       ].
       cm ifNil:[
@@ -162,7 +162,7 @@ installBridgesForPrefix: prefix suffix: destSuffix selector: rubySelArg
         useGenerics ifNotNil:[ cm := genErrCm ].
         cm ifNil:[ | br |
           (br := (templates at: n) shallowCopy ) 
-             setTo: rubySel suffix: destSuffix argsDesc: argsDescrInt primKind: primKnd .
+             setTo: rubySel suffix: destSuffix argsDesc: argsDescrInt primKind: primKind .
           br from: frSel .
           aComp ifNil:[ aComp := RubyCompiler new ].
           cm := br cmForOptArgs: optArgsDescr protection: protInt class: aClass 
