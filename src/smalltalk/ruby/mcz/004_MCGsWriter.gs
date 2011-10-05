@@ -1,7 +1,7 @@
 
 doit
 MCStWriter subclass: 'MCGsWriter'
-	instVarNames: #( fileStreams)
+	instVarNames: #( fileStreams dependencyIndex)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()
@@ -29,8 +29,10 @@ set class MCGsWriter
 category: 'as yet unclassified'
 method:
 class: aName
-
-	^ fileStreams at: aName ifAbsentPut: [String new writeStream]
+	"associates the class name with a {index . stream} pair"
+	^ (fileStreams at: aName ifAbsentPut: [
+		dependencyIndex := dependencyIndex + 1.
+		{dependencyIndex . String new writeStream}]) last
 
 %
 
@@ -42,9 +44,13 @@ fileOutIn: path
 	| dir |
 	dir := (FileDirectory on: path)
 			assureExistence;
+			deleteLocalFiles;
 			yourself.
-	fileStreams keysAndValuesDo: [:className :stream || file |
-		(dir forceNewFileNamed: (className asString copyReplaceAll: ' ' with: '_' ), '.gs')
+	fileStreams keysAndValuesDo: [:className :array || file index stream |
+		"for info on :array, see #class:"
+		index := array first printPaddedWith: $0 to: 3.
+		stream := array last.
+		(dir forceNewFileNamed: index, '_', (className asString copyReplaceAll: ' ' with: '_' ), '.gs')
 			nextPutAll: stream contents;
 			close].
 
@@ -93,10 +99,9 @@ category: 'as yet unclassified'
 method:
 writeDefinitions: aCollection
 	fileStreams := Dictionary new.
-
+	dependencyIndex := 0.
 	(MCDependencySorter sortItems: aCollection)
-		do: [:ea | ea accept: self]
-		displayingProgress: 'Writing definitions...'.
+		do: [:ea | ea accept: self].
 
 %
 
