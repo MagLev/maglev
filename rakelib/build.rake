@@ -1,7 +1,5 @@
 # Create a MagLev image from base Smalltalk image
 #
-# TODO: Get rid of topaz output during rake runs
-#
 
 # 3. Create version.txt
 # 4. Set build date in Globals.rb
@@ -23,23 +21,33 @@ namespace :build do
   require 'erb'
   require 'logger'
 
-  BUILD_DIR      = File.join(MAGLEV_HOME, 'build')
   FILEIN_DIR     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
+
+  BUILD_DIR      = File.join(MAGLEV_HOME, 'build')
+  BUILD_LOG      = File.join(MAGLEV_HOME, 'build_image.log')
   GEM_BIN        = File.join(GEMSTONE, 'bin')
   GEM_CONF       = File.join(FILEIN_DIR, 'fileingem.ruby.conf')
   IMAGE_RUBY_DIR = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
   KEYFILE        = File.join(MAGLEV_HOME, 'etc', 'maglev.demo.key')
   MCZ_DIR        = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby', 'mcz')
+  NEW_EXTENT     = File.join(FILEIN_DIR, 'extent0.ruby.dbf')
   RUBY_EXTENT    = File.join(MAGLEV_HOME, 'bin', 'extent0.ruby.dbf')
   STONE_CONF     = File.join(FILEIN_DIR, 'filein.ruby.conf')
   STONE_LOG      = File.join(FILEIN_DIR, 'stone.log')
   STONE_NAME     = "fileinruby#{$$}stone"
   VERBOSE        = true
+  $success       = false
 
-  # desc "Create a new extent0.ruby.dbf from virgin Smalltalk extent0.dbf"
-  # task :ruby_extent => [:check_dev_env, :save_ruby_extent, :image] do
-  #   cp
-  # end
+  desc "Create a new MagLev image and install in #{RUBY_EXTENT}"
+  task :maglev => [:save_ruby_extent, :logger] do
+    Rake::Task['build:image'].invoke
+    if $success && File.exist?(NEW_EXTENT)
+      log "maglev", "Copying new extent to #{RUBY_EXTENT}"
+      cp NEW_EXTENT, RUBY_EXTENT
+    else
+      log "maglev", "Build failed see #{BUILD_LOG}"
+    end
+  end
 
   task :check_dev_env do
     [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, MCZ_DIR].each do |var|
@@ -47,22 +55,41 @@ namespace :build do
     end
   end
 
-  task :save_ruby_extent do
+  task :save_ruby_extent => :logger do
     if File.exist? RUBY_EXTENT
-      puts "Saving copy of #{RUBY_EXTENT}"
+      log "save_ruby_extent", "Saving copy of #{RUBY_EXTENT}"
       mv RUBY_EXTENT, "#{RUBY_EXTENT}.save"
     else
-      puts "No #{RUBY_EXTENT} to save"
+      log "save_ruby_extent", "No #{RUBY_EXTENT} to save"
     end
   end
 
-  task :temp_dir do
-    puts "Creating new FILEIN_DIR #{FILEIN_DIR}"
-    rm_rf FILEIN_DIR
-    mkdir FILEIN_DIR
+  task :logger do
+    $logger        = Logger.new(BUILD_LOG)
+    $logger.level  = Logger::DEBUG
+    log "logger", "Logging to: #{BUILD_LOG}"
   end
 
-  def setup_env
+  task :temp_dir do
+    rm_rf FILEIN_DIR
+    mkdir FILEIN_DIR
+    Dir.chdir(FILEIN_DIR) do
+      cp File.join(GEMSTONE, 'bin', 'extent0.dbf'), NEW_EXTENT
+      chmod 0770, NEW_EXTENT
+      cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", STONE_CONF)
+      cp "#{BUILD_DIR}/fileingem.ruby.conf", GEM_CONF
+
+      # TODO: Remove this when smalltalk bug resovled.
+      # Workaround for bug in Smalltalk build.  patchMaster30.gs should be shipped
+      # with the VM, but currently isn't.  Until bug is fixed, we'll copy the file
+      # into place here:
+      log("temp_dir", "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
+      cp File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs'),
+         File.join(GEMSTONE, 'upgrade')
+    end
+  end
+
+  task :setup_env do
     # upgradeDir is also needed by the filein topaz scripts.  When a
     # customers does a 'upgrade' it will be set to $GEMSTONE/upgrade.  For
     # a filein it will be set to the imageDir.
@@ -81,19 +108,9 @@ namespace :build do
   end
 
   desc "Create a fresh ruby image"
-  task :image => [:check_dev_env, :temp_dir] do
-    build_log_name = File.join(FILEIN_DIR, 'build_image.log')
-    $logger        = Logger.new(build_log_name)
-    $logger.level  = Logger::DEBUG
-
-    puts "Logging to: #{build_log_name}"
+  task :image => [:check_dev_env, :temp_dir, :setup_env] do
     log("build:image", "Begin task")
 
-    setup_env
-    create_filein_stone_files
-
-    # Pass one includes a shrink stone, so we only run it
-    # and logout to ensure image written ok
     Dir.chdir FILEIN_DIR do
       begin
         # Pass one runs the filein of ruby base code, then shrinks the
@@ -101,7 +118,7 @@ namespace :build do
         log("build:image", "Begin initial fileinruby")
         startstone && fileinruby && stopstone &&
           # loadmcz on shrunk image => restart stone
-          startstone && load_mcz_dir && puts("===== SUCCESS =====")
+          startstone && load_mcz_dir && $success = true
       ensure
         stopstone
       end
@@ -162,14 +179,6 @@ namespace :build do
     end
   end
 
-  def loadmcz
-    log_run("loadmcz") do
-      tpz_cmds = "load_mcz.topaz"
-      cp_template("#{BUILD_DIR}/load_mcz.topaz.erb", tpz_cmds)
-      run_topaz_file(tpz_cmds)
-    end
-  end
-
   # Run a block wrapped in logging and error checking
   def log_run(step_name, logfile="<no logfile>")
     puts
@@ -223,28 +232,9 @@ namespace :build do
     end
   end
 
-  def create_filein_stone_files
-    log("create_filein_stone_files",  "Begin")
-    Dir.chdir(FILEIN_DIR) do
-
-      cp File.join(GEMSTONE, 'bin', 'extent0.dbf'), 'extent0.ruby.dbf'
-      chmod 0770,'extent0.ruby.dbf'
-      cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", STONE_CONF)
-      cp "#{BUILD_DIR}/fileingem.ruby.conf", GEM_CONF
-
-      # TODO: Remove this when smalltalk bug resovled.
-      # Workaround for bug in Smalltalk build.  patchMaster30.gs should be shipped
-      # with the VM, but currently isn't.  Until bug is fixed, we'll copy the file
-      # into place here:
-      log("create_filein_stone_files", "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
-      cp File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs'), File.join(GEMSTONE, 'upgrade')
-    end
-    log("create_filein_stone_files",  "End")
-  end
-
   def log(step, msg, level=Logger::INFO)
     puts "==== #{step}: #{msg}" if VERBOSE
-    $logger.log(level, msg, step)
+    $logger.log(level, msg, step) if $logger
     true
   end
 end
