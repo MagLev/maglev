@@ -1,0 +1,47 @@
+! file reloadprims.topaz
+iferror exit
+
+set user DataCurator pass swordfish
+login
+expectvalue true
+run
+UserGlobals at:#RubyPrimsLoaded 
+%
+expectvalue true
+run
+Object deleteMethods: 1 "delete env 1 methods" . 
+Object virtualClass deleteMethods: 1 "delete env 1 methods" . 
+true
+%
+commit
+
+logout
+set user SystemUser pass swordfish
+login
+input $GEMSTONE/upgrade/ruby/pre_prim_methods.gs
+run
+{ Object . 
+   Behavior . 
+   UndefinedObject . 
+   Boolean 
+ } do:[:aCls |
+   aCls changeToSecurityPolicyForRubyExtension: DataCuratorSegment .
+].
+true
+%
+commit
+logout
+set user DataCurator pass swordfish
+login
+run
+ RubyBridge initialize . "reset generic bridge methods"
+ RubyContext commitTransaction  .
+%
+run
+RubyContext reload: #( ) env: 1 
+%
+run
+UserGlobals at:#RubyPrimsLoaded put: true .
+RubyContext commitTransaction
+%
+! caller responsible for topaz exit 

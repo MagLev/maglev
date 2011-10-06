@@ -12,6 +12,9 @@ GemStoneInstallation.current =
                             "#{ML}/log",                         # base log directory
                             "#{ML}/backups",                     # backup directory
                             'extent0.ruby.dbf')                  # initial extent name
+def (GemStoneInstallation.current).initial_extent
+  File.join(ML, "bin", @initial_extent_name)
+end
 
 class MagLevStone < Stone
   def config_file_template
