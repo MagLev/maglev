@@ -1,7 +1,7 @@
 
-set class RubyEvStrNode class
+set class RubyEvStrNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: aBody
  | result |
   (result := self _basicNew ) body: aBody .

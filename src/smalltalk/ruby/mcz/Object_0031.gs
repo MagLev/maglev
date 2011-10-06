@@ -1,7 +1,7 @@
 
-set class Object class
+set class Object
 category: '*maglev-runtime'
-method:
+classmethod:
 addException: anException
   | res |
   self == Object ifFalse:[ ArgumentTypeError signal:'expected anException or Object'].
@@ -13,9 +13,9 @@ addException: anException
 %
 
 
-set class Object class
+set class Object
 category: '*maglev-cextensions'
-method:
+classmethod:
 cextGlobalVarAt: stringArg  put: aValue
   | assoc aString |
   aString := stringArg .
@@ -30,9 +30,9 @@ cextGlobalVarAt: stringArg  put: aValue
 %
 
 
-set class Object class
+set class Object
 category: '*maglev-cextensions'
-method:
+classmethod:
 cextGlobalVarGet: stringArg
   | sym assoc aString |
   aString := stringArg .
@@ -47,9 +47,9 @@ cextGlobalVarGet: stringArg
 %
 
 
-set class Object class
+set class Object
 category: '*maglev-cextensions'
-method:
+classmethod:
 cextGlobalVariables: envId 
   | ns arr |
   ns := Object transientNameSpace: envId .

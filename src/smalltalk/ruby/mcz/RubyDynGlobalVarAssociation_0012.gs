@@ -1,7 +1,7 @@
 
-set class RubyDynGlobalVarAssociation class
+set class RubyDynGlobalVarAssociation
 category: 'as yet unclassified'
-method:
+classmethod:
 newWithKey: aSymbol with: aBlock
   | assoc |
   assoc := self newWithKey: aSymbol .

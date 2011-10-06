@@ -1,7 +1,7 @@
 
-set class RubyZSuperNode class
+set class RubyZSuperNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: srcOfs
   | res |
   (res := self _basicNew) position: srcOfs .

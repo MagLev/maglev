@@ -1,7 +1,7 @@
 
-set class RubyForNode class
+set class RubyForNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_a: iter b: var c: body d: srcOfs e: endOfs
   | res |
   (res := self _basicNew )

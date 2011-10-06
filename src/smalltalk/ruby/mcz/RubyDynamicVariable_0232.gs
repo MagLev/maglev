@@ -1,7 +1,7 @@
 
-set class RubyDynamicVariable class
+set class RubyDynamicVariable
 category: '*maglev-runtime'
-method:
+classmethod:
 use: anObject during: aBlock
     ^ aBlock
         onException: self
@@ -10,9 +10,9 @@ use: anObject during: aBlock
 %
 
 
-set class RubyDynamicVariable class
+set class RubyDynamicVariable
 category: 'as yet unclassified'
-method:
+classmethod:
 value
 	"self isInvariant ifFalse:[ self immediateInvariant ]."  " should not be needed"
 	^ self signal

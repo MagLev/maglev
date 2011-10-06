@@ -1,7 +1,7 @@
 
-set class RubyGlobalLastExceptionAsgn class
+set class RubyGlobalLastExceptionAsgn
 category: 'as yet unclassified'
-method:
+classmethod:
 newForRp
   ^ self _basicNew
 

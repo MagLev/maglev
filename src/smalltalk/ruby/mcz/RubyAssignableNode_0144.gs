@@ -1,7 +1,7 @@
 
-set class RubyAssignableNode class
+set class RubyAssignableNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: sym b: srcOfs c: val
  "used for RubyLocalAsgnNode, RubyInstAsgnNode, RubyClassVarDeclNode"
  | res |

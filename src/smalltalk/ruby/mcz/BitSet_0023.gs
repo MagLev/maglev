@@ -1,7 +1,7 @@
 
-set class BitSet class
+set class BitSet
 category: '*maglev-runtime'
-method:
+classmethod:
 forTemplates: templates env: envId
 
 "Return the intersection of the BitSets for templates.  templates is an
@@ -24,9 +24,9 @@ result bitInvert.
 %
 
 
-set class BitSet class
+set class BitSet
 category: '*maglev-runtime'
-method:
+classmethod:
 forTemplateString: template
 
 "Treat the template String as a pattern specifying a set of ASCII
@@ -65,9 +65,9 @@ negating ifTrue:[ result bitInvert ].
 %
 
 
-set class BitSet class
+set class BitSet
 category: '*maglev-runtime'
-method:
+classmethod:
 _coerceToString: anObj env: envId
   ^ [ anObj @ruby1:to_str ] onException: Exception do:[:ex |
       ArgumentTypeError signal: 'coercion with to_str failed'

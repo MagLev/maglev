@@ -1,7 +1,7 @@
 
-set class RubyAliasNode class
+set class RubyAliasNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: objA b: objB  c: srcOffsetSi
   | res |
   (res := self _basicNew ) 

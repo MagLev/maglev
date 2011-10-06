@@ -1,7 +1,7 @@
 
-set class RubyAndNode class
+set class RubyAndNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: left b: right
   | res |
   (res := self _basicNew) 

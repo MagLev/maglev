@@ -1,7 +1,7 @@
 
-set class RubyColon2Node class
+set class RubyColon2Node
 category: '(as yet unclassified)'
-method:
+classmethod:
 comment
   ^ 'Used to access a global or constant such as
        a = MA::Y
@@ -16,9 +16,9 @@ comment
 %
 
 
-set class RubyColon2Node class
+set class RubyColon2Node
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
 
   ^ self _basicNew  "position left as nil"
@@ -26,9 +26,9 @@ newForIr
 %
 
 
-set class RubyColon2Node class
+set class RubyColon2Node
 category: '*maglev-ast'
-method:
+classmethod:
 sym: sym srcOffset: ofs
   | res |
   (res := self _basicNew) 
@@ -38,9 +38,9 @@ sym: sym srcOffset: ofs
 %
 
 
-set class RubyColon2Node class
+set class RubyColon2Node
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: left b: nam_tok
   | res |
   (res := self _basicNew ) 

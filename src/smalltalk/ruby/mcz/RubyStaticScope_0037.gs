@@ -1,7 +1,7 @@
 
-set class RubyStaticScope class
+set class RubyStaticScope
 category: '*maglev-runtime'
-method:
+classmethod:
 initialize
   TraceLocals := 0  "0 is no trace , 1 is tracing"
 
@@ -13,9 +13,9 @@ RubyStaticScope initialize.
 %
 
 
-set class RubyStaticScope class
+set class RubyStaticScope
 category: '*maglev-runtime'
-method:
+classmethod:
 traceLocals: anInt  
    "anInt   0 is no trace , 1 is tracing"
 

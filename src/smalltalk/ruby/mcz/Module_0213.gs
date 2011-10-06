@@ -1,7 +1,7 @@
 
-set class Module class
+set class Module
 category: '*maglev-runtime'
-method:
+classmethod:
 cextDefineClass: aString parent: parentArg superclass: superCls env: envId
   "implementation for rb_define_class_under() .   
    does not support fixed instvars yet"
@@ -13,9 +13,9 @@ cextDefineClass: aString parent: parentArg superclass: superCls env: envId
 %
 
 
-set class Module class
+set class Module
 category: '*maglev-runtime'
-method:
+classmethod:
 cextDefineModule: aString parent: parentArg env: envId
 ^ RubyCompiler new defineModuleNamed: aString asSymbol
      rubyMethod: nil inScope: parentArg  env: 1 
@@ -23,9 +23,9 @@ cextDefineModule: aString parent: parentArg env: envId
 %
 
 
-set class Module class
+set class Module
 category: '*maglev-runtime'
-method:
+classmethod:
 excludeInternalMethodNames: set
    "set is an IdentitySet of Symbols. 
     Returns an Array with contents of set filtered
@@ -49,18 +49,18 @@ excludeInternalMethodNames: set
 %
 
 
-set class Module class
+set class Module
 category: '*maglev-runtime'
-method:
+classmethod:
 isModifiable_oops_notModule
   ^ false
 
 %
 
 
-set class Module class
+set class Module
 category: '*maglev-runtime'
-method:
+classmethod:
 moduleNesting
   "Result is the contents of rtModuleStack, excluding Object"
   | stk sz |

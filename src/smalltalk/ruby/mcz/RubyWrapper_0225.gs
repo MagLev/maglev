@@ -1,7 +1,7 @@
 
-set class RubyWrapper class
+set class RubyWrapper
 category: 'Instance Creation'
-method:
+classmethod:
 on: anObject
 
 	^ (anObject respondsTo: #'__wrappedRubyObject')
@@ -11,9 +11,9 @@ on: anObject
 %
 
 
-set class RubyWrapper class
+set class RubyWrapper
 category: 'Instance Conversion'
-method:
+classmethod:
 unwrap: anObject
 	"Unwraps the object, if it is currently wrapped with RubyWrapper"
 	^ (anObject respondsTo: #'__wrappedRubyObject')

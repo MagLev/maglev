@@ -1,7 +1,7 @@
 
-set class RubyInstVarNode class
+set class RubyInstVarNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: sym b: srcOfs
 
   | res |

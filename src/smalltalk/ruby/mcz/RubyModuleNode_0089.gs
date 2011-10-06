@@ -1,7 +1,7 @@
 
-set class RubyModuleNode class
+set class RubyModuleNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_a: aCpath b: aBody c: fileSourceString d: srcOfs
   | res |
   (res := self _basicNew )
@@ -13,9 +13,9 @@ s_a: aCpath b: aBody c: fileSourceString d: srcOfs
 %
 
 
-set class RubyModuleNode class
+set class RubyModuleNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_forRp: aCpath body: aBody source: fileSourceString 
   | res |
   (res := self _basicNew )

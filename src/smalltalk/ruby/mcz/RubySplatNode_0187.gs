@@ -1,7 +1,7 @@
 
-set class RubySplatNode class
+set class RubySplatNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val 
  | res |
   (res := self _basicNew)

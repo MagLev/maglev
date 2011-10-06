@@ -1,7 +1,7 @@
 
-set class RubyIterRpNode class
+set class RubyIterRpNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: args b: body c: srcOfs
   | res |
   (res := self _basicNew) 
@@ -12,9 +12,9 @@ s_a: args b: body c: srcOfs
 %
 
 
-set class RubyIterRpNode class
+set class RubyIterRpNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_a: args b: body c: srcOfs d: endOfs
   | res |
   (res := self _basicNew) 

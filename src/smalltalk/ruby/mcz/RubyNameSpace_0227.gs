@@ -1,7 +1,7 @@
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
 ^ '
   instVars
@@ -24,18 +24,18 @@ comment
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 delim
   ^ '::'  "PathDelim hardcoded"
 
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 initialize
   self _addClassVar: #TraceCount value: 0 ;
       _addClassVar: #TraceGlobals value: 0  ;
@@ -49,9 +49,9 @@ RubyNameSpace initialize.
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 initTopScope: environmentId
     "returns the transient top level name space"
   | tns pns |
@@ -68,9 +68,9 @@ initTopScope: environmentId
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: 'as yet unclassified'
-method:
+classmethod:
 pathToString: aPath
   | res delim pSize |
   (pSize := aPath size) == 0 ifTrue:[ ^ '' ].
@@ -84,9 +84,9 @@ pathToString: aPath
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 traceFile: prefix name: aName
   
   TraceGlobals >=1 ifTrue:[ 
@@ -96,18 +96,18 @@ traceFile: prefix name: aName
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 traceGlobals
    ^ TraceGlobals
 
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 traceGlobals: anInt 
   "0 means no trace, 1 means trace deferred globals, 2 trace all"
   TraceGlobals := anInt  .  
@@ -116,9 +116,9 @@ traceGlobals: anInt
 %
 
 
-set class RubyNameSpace class
+set class RubyNameSpace
 category: '*maglev-runtime'
-method:
+classmethod:
 trapLookup: aBool
   TrapLookup := aBool 
 

@@ -1,7 +1,7 @@
 
-set class RubyMatchZeroNode class
+set class RubyMatchZeroNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: aRegexNode
   | node  str |
   ( str := RubyVcGlobalNode _basicNew) name: #'$_' .

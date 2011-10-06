@@ -1,7 +1,7 @@
 
-set class RubyAbstractWhileNode class
+set class RubyAbstractWhileNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_forRp: condArg block: blkArg bool: cfBool
   | cls  node |
   cls := cfBool ifTrue:[  RubyWhileNode ] ifFalse:[ RubyUntilNode ].

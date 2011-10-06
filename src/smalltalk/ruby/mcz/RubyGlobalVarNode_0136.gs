@@ -1,7 +1,7 @@
 
-set class RubyGlobalVarNode class
+set class RubyGlobalVarNode
 category: 'as yet unclassified'
-method:
+classmethod:
 initialize: envId
   "executed during bootstrap"
   envId == 1 ifTrue:[ self _initialize ].
@@ -10,18 +10,18 @@ initialize: envId
 %
 
 
-set class RubyGlobalVarNode class
+set class RubyGlobalVarNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForRp
   ^ self _basicNew
 
 %
 
 
-set class RubyGlobalVarNode class
+set class RubyGlobalVarNode
 category: '*maglev-runtime'
-method:
+classmethod:
 rubyAlias: newKey from: oldKey
   | dict arr |
   dict := SessionTemps current at:#RubyGlobalNodesDict .
@@ -36,9 +36,9 @@ rubyAlias: newKey from: oldKey
 %
 
 
-set class RubyGlobalVarNode class
+set class RubyGlobalVarNode
 category: '*maglev-runtime'
-method:
+classmethod:
 sessionInitialize
   "executed at each initialization of transient state"
  
@@ -48,9 +48,9 @@ sessionInitialize
 %
 
 
-set class RubyGlobalVarNode class
+set class RubyGlobalVarNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: aSymbol
   | arr cls sym node |
   arr := (SessionTemps current at:#RubyGlobalNodesDict) at: aSymbol otherwise: nil .
@@ -63,9 +63,9 @@ s_a: aSymbol
 %
 
 
-set class RubyGlobalVarNode class
+set class RubyGlobalVarNode
 category: '*maglev-runtime'
-method:
+classmethod:
 _initialize
   "executed during env 1 bootstrap"
   | dict | 

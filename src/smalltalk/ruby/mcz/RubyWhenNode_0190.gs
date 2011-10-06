@@ -1,7 +1,7 @@
 
-set class RubyWhenNode class
+set class RubyWhenNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: expr b: body c: nxt d: srcOfs
  | res |
   (res := self _basicNew)

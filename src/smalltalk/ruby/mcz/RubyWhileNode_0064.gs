@@ -1,7 +1,7 @@
 
-set class RubyWhileNode class
+set class RubyWhileNode
 category: '*maglev-runtime'
-method:
+classmethod:
 selectorFor: conditionFirstBool
       "maybe ruby_selector_suffix dependent"
  

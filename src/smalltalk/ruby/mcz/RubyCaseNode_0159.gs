@@ -1,7 +1,7 @@
 
-set class RubyCaseNode class
+set class RubyCaseNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: exprArg b: body  c: ofs
   "body is a WhenNode  "
   | node  |

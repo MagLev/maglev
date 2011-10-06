@@ -1,7 +1,7 @@
 
-set class RubyDynamicDefinedQNode class
+set class RubyDynamicDefinedQNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
   ^ self _basicNew
 

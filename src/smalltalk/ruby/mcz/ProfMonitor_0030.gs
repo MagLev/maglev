@@ -1,7 +1,7 @@
 
-set class ProfMonitor class
+set class ProfMonitor
 category: '*maglev-runtime'
-method:
+classmethod:
 newIntervalNs: nsPerSample
 	"initialize an instance with sampling suspended"
 	| inst result |

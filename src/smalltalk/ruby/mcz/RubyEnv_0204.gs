@@ -1,7 +1,7 @@
 
-set class RubyEnv class
+set class RubyEnv
 category: '*maglev-runtime'
-method:
+classmethod:
 _current
   "Return the current instance of RubyEnv , the value of ruby ENV ,
    for use within smalltalk code.  not used from generated code."
@@ -11,9 +11,9 @@ _current
 %
 
 
-set class RubyEnv class
+set class RubyEnv
 category: '*maglev-runtime'
-method:
+classmethod:
 _currentAssociation: aKey with: aBlock
    | tempsDict assoc   |
 assoc := (tempsDict := SessionTemps current) associationAt: aKey otherwise: nil .
@@ -28,9 +28,9 @@ assoc ifNil:[  | val |
 %
 
 
-set class RubyEnv class
+set class RubyEnv
 category: '*maglev-runtime'
-method:
+classmethod:
 _currentEnvAssoc
   ^ self _currentAssociation: #RubyENVCurrent with:
     [ | list dict siz |
@@ -45,9 +45,9 @@ _currentEnvAssoc
 %
 
 
-set class RubyEnv class
+set class RubyEnv
 category: '*maglev-runtime'
-method:
+classmethod:
 _currentPlatformAssoc
   ^ self _currentAssociation:  #RubyPLATFORMCurrent 
                  with: [ AbstractException cpuOsKindString ]

@@ -1,7 +1,7 @@
 
-set class AbstractException class
+set class AbstractException
 category: '*maglev-runtime'
-method:
+classmethod:
 addException: anException
   | res |
   (res := ExceptionSet new)

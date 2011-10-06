@@ -1,7 +1,7 @@
 
-set class RubyAbstractNumberNode class
+set class RubyAbstractNumberNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val
   | res |
   val _isInteger ifTrue:[  "handles both SmallInteger and LargeInteger"
@@ -19,9 +19,9 @@ s_a: val
 %
 
 
-set class RubyAbstractNumberNode class
+set class RubyAbstractNumberNode
 category: '*maglev-runtime'
-method:
+classmethod:
 valueToNumber: aString
 
   aString isDigitsForInteger ifTrue:[

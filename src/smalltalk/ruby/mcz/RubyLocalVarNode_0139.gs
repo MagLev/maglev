@@ -1,7 +1,7 @@
 
-set class RubyLocalVarNode class
+set class RubyLocalVarNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
   ^ self _basicNew
 

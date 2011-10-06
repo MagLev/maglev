@@ -1,7 +1,7 @@
 
-set class RubySymbolAssociation class
+set class RubySymbolAssociation
 category: 'as yet unclassified'
-method:
+classmethod:
 newWithKey: aKey
 
     "         aKey == #'$<' ifTrue:[  self pause ]."

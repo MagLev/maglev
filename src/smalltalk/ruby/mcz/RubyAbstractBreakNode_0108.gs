@@ -1,7 +1,7 @@
 
-set class RubyAbstractBreakNode class
+set class RubyAbstractBreakNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val b: srcOfs
   "used for RubyBreakNode, RubyNextNode"
   | res |

@@ -1,7 +1,7 @@
 
-set class RubyHashNode class
+set class RubyHashNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: list
   | res aryNodeCls lst_cls |
   res := self _basicNew .

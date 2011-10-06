@@ -1,7 +1,7 @@
 
-set class RubyStrNode class
+set class RubyStrNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
 
   ^ self _basicNew "position left nil"
@@ -9,9 +9,9 @@ newForIr
 %
 
 
-set class RubyStrNode class
+set class RubyStrNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val 
  | res |
   (res := self _basicNew)

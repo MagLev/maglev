@@ -1,7 +1,7 @@
 
-set class RubyBeginNode class
+set class RubyBeginNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val
   | res |
   (res := self _basicNew) bodyNode: val .

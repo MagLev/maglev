@@ -1,16 +1,16 @@
 
-set class RubyFixnumNode class
+set class RubyFixnumNode
 category: '*maglev-ast'
-method:
+classmethod:
 newForInt: anInt
   ^ self _basicNew _value: anInt 
 
 %
 
 
-set class RubyFixnumNode class
+set class RubyFixnumNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
 
   ^ self _basicNew "position left nil"

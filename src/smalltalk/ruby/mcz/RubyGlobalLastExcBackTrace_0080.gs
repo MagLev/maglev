@@ -1,7 +1,7 @@
 
-set class RubyGlobalLastExcBackTrace class
+set class RubyGlobalLastExcBackTrace
 category: 'as yet unclassified'
-method:
+classmethod:
 newForRp
 
   | node receiver |

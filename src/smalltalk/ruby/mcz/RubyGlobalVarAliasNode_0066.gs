@@ -1,7 +1,7 @@
 
-set class RubyGlobalVarAliasNode class
+set class RubyGlobalVarAliasNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: symA b: symB
   | res |
   (res := self _basicNew)

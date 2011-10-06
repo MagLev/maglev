@@ -1,7 +1,7 @@
 
-set class TransientSemaphore class
+set class TransientSemaphore
 category: '*maglev-runtime'
-method:
+classmethod:
 rubyBasicNew
 
 ^ self rubyBasicNew_stBaseClass: TransientSemaphore

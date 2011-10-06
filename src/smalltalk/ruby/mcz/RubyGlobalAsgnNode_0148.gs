@@ -1,25 +1,25 @@
 
-set class RubyGlobalAsgnNode class
+set class RubyGlobalAsgnNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
   ^ self _basicNew
 
 %
 
 
-set class RubyGlobalAsgnNode class
+set class RubyGlobalAsgnNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForRp
   ^ self _basicNew
 
 %
 
 
-set class RubyGlobalAsgnNode class
+set class RubyGlobalAsgnNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: aSymbol b: srcOfs c: val
   | arr cls node sym |
   arr := (SessionTemps current at:#RubyGlobalNodesDict) at: aSymbol otherwise: nil .

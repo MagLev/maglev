@@ -1,7 +1,7 @@
 
-set class RubyConstNode class
+set class RubyConstNode
 category: '(as yet unclassified)'
-method:
+classmethod:
 comment
   "No instances of RubyConstNode are produced anymore .
     :const  in sexpr stream  now produces a RubyColon2Node "

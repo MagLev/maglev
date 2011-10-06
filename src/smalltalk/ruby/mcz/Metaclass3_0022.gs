@@ -1,7 +1,7 @@
 
-set class Metaclass3 class
+set class Metaclass3
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyNew1: aSuperCls do: aBlock
   "a ruby primitive"
   | newCls | 
@@ -28,9 +28,9 @@ _rubyNew1: aSuperCls do: aBlock
 %
 
 
-set class Metaclass3 class
+set class Metaclass3
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyNew1: aSuperCls instVars: ivNames do: aBlock
   "a ruby primitive"
   | newCls | 

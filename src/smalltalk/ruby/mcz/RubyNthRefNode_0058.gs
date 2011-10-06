@@ -1,7 +1,7 @@
 
-set class RubyNthRefNode class
+set class RubyNthRefNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_a: arg b: srcOfs
   | node rcvr | 
   arg _isSmallInteger ifFalse:[ self error:'nthRef arg must be a Fixnum'].

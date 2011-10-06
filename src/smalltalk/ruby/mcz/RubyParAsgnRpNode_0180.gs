@@ -1,7 +1,7 @@
 
-set class RubyParAsgnRpNode class
+set class RubyParAsgnRpNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: lhs ofs: srcOfs comma: trailingCommaBool
   | res |
   (res := self _basicNew) firstNode: lhs; position: srcOfs ;

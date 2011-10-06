@@ -1,7 +1,7 @@
 
-set class RubyBackRefNode class
+set class RubyBackRefNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: ch
     | node sel rcvr |
     ch == $&  ifTrue:[

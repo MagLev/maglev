@@ -1,7 +1,7 @@
 
-set class RubyBlockGivenNode class
+set class RubyBlockGivenNode
 category: '*maglev-runtime'
-method:
+classmethod:
 irNode: theSelf evalRcvr: evalReceiver
   | node rcv  |
   evalReceiver ifNotNil:[  

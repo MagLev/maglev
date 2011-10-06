@@ -1,7 +1,7 @@
 
-set class ArgumentError class
+set class ArgumentError
 category: '*maglev-runtime'
-method:
+classmethod:
 signalTooFewArgs
 
   ^ self signal: 'too few arguments'
@@ -9,9 +9,9 @@ signalTooFewArgs
 %
 
 
-set class ArgumentError class
+set class ArgumentError
 category: '*maglev-runtime'
-method:
+classmethod:
 signalTooManyArgs
 
   ^ self signal: 'too many arguments'

@@ -1,7 +1,7 @@
 
-set class RubyClassNode class
+set class RubyClassNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_a: aCpath b: aSuperNode c: aBody d: fileSourceString e: srcOfs
   | res |
   (res := self _basicNew )

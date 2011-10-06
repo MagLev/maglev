@@ -1,7 +1,7 @@
 
-set class RubyColon3Node class
+set class RubyColon3Node
 category: 'Documentation'
-method:
+classmethod:
 comment
  "MRI sexp stream uses   [:colon3, :Z ] for direct access to global  Z
   variable at outer most scope, such as    a=::Z   "
@@ -9,9 +9,9 @@ comment
 %
 
 
-set class RubyColon3Node class
+set class RubyColon3Node
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: nam_tok
   | res |
   (res := self _basicNew ) 

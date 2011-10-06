@@ -1,7 +1,7 @@
 
-set class RubyNotNode class
+set class RubyNotNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: cond
    | res |
   (res := self _basicNew )

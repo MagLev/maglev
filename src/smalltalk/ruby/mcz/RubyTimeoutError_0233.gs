@@ -1,16 +1,16 @@
 
-set class RubyTimeoutError class
+set class RubyTimeoutError
 category: 'as yet unclassified'
-method:
+classmethod:
 comment
    "this class is deprecated"
 
 %
 
 
-set class RubyTimeoutError class
+set class RubyTimeoutError
 category: 'as yet unclassified'
-method:
+classmethod:
 timeout: aNumber do: aBlock
 	|sem process val|
 	sem := Semaphore new.

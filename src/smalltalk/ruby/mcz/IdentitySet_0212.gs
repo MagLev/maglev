@@ -1,7 +1,7 @@
 
-set class IdentitySet class
+set class IdentitySet
 category: '*maglev-runtime'
-method:
+classmethod:
 rubyBasicNew
 
 ^ self rubyBasicNew_stBaseClass: IdentitySet

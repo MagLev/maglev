@@ -1,7 +1,7 @@
 
-set class Behavior class
+set class Behavior
 category: '*maglev-runtime'
-method:
+classmethod:
 traceRubyMethodDicts: aBoolean
 
   "Set value of the class variable which controls tracing of changes to

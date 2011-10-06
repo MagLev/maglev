@@ -1,7 +1,7 @@
 
-set class RubyService class
+set class RubyService
 category: 'examples'
-method:
+classmethod:
 example1
 	"Demo creating a mail using the mailfactory gem"
 	| ruby mf msg |
@@ -20,9 +20,9 @@ example1
 %
 
 
-set class RubyService class
+set class RubyService
 category: 'examples'
-method:
+classmethod:
 example2
 	"Demo using the C-ext rdiscount gem"
 	| ruby rd markdown html |
@@ -38,9 +38,9 @@ example2
 %
 
 
-set class RubyService class
+set class RubyService
 category: 'examples'
-method:
+classmethod:
 example3
 	| ruby msg html fromAddress toAddress netSmtp |
 	ruby := RubyService new.
@@ -66,9 +66,9 @@ This message was rendered from Gemstone/S, using the Ruby C-extension RDiscount 
 %
 
 
-set class RubyService class
+set class RubyService
 category: 'examples'
-method:
+classmethod:
 example4
 	"Same as example3, but with reflective block sending"
 	| ruby msg html fromAddress toAddress netSmtp |
@@ -98,9 +98,9 @@ This message was rendered from Gemstone/S, using the Ruby C-extension RDiscount 
 %
 
 
-set class RubyService class
+set class RubyService
 category: 'examples'
-method:
+classmethod:
 example5
 	"Demo using implicit blocks"
 	| ruby envKeys |
@@ -112,9 +112,9 @@ example5
 %
 
 
-set class RubyService class
+set class RubyService
 category: 'examples'
-method:
+classmethod:
 example6
 	"Demo using block syntax.
 	 Compare to

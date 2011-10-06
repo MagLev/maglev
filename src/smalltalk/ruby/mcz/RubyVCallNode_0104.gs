@@ -1,7 +1,7 @@
 
-set class RubyVCallNode class
+set class RubyVCallNode
 category: 'parsetree'
-method:
+classmethod:
 initialize
   | dict |
   (dict := IdentityKeyValueDictionary new)
@@ -25,9 +25,9 @@ RubyVCallNode initialize.
 %
 
 
-set class RubyVCallNode class
+set class RubyVCallNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: rcvr b: callSym
   | node  nodeCls  |
   nodeCls := SpecialRubySelectors at: callSym otherwise: self .

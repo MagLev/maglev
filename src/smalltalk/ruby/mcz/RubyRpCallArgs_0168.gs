@@ -1,7 +1,7 @@
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: v
   | res |
   (res := self _basicNew) list: { } ; append_arg: v .
@@ -10,9 +10,9 @@ s_a: v
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: a all: ary b: b blk: blk
   | res |
   (res := self _basicNew) list: { } ;
@@ -23,9 +23,9 @@ s_a: a all: ary b: b blk: blk
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: a all: ary b: b splat: splat blk: blk
   | res |
   (res := self _basicNew) list: { } ;
@@ -37,9 +37,9 @@ s_a: a all: ary b: b splat: splat blk: blk
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: a b: b blk: blk
   | res |
   (res := self _basicNew) list: { } ;
@@ -49,9 +49,9 @@ s_a: a b: b blk: blk
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: a b: b splat: splat blk: blk 
   | res |
   (res := self _basicNew) list: { } ;
@@ -63,9 +63,9 @@ s_a: a b: b splat: splat blk: blk
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: a blk: blk
   | res |
   (res := self _basicNew) list: { } ;
@@ -75,9 +75,9 @@ s_a: a blk: blk
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: a splat: splat blk: blk
   | res |
   (res := self _basicNew) list: { } ;
@@ -89,9 +89,9 @@ s_a: a splat: splat blk: blk
 %
 
 
-set class RubyRpCallArgs class
+set class RubyRpCallArgs
 category: '*maglev-ast'
-method:
+classmethod:
 s_splat: splat blk: blk 
   | res |
   (res := self _basicNew) list: { } ;

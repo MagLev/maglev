@@ -1,7 +1,7 @@
 
-set class RubyFCallNode class
+set class RubyFCallNode
 category: '*maglev-runtime'
-method:
+classmethod:
 initialize
   | dict |
   (dict := IdentityKeyValueDictionary new)
@@ -22,9 +22,9 @@ RubyFCallNode initialize.
 %
 
 
-set class RubyFCallNode class
+set class RubyFCallNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: rcvr b: callSym c: args
   | node   nodeCls    | 
   nodeCls :=  SpecialRubySelectors at: callSym otherwise: self .

@@ -1,7 +1,7 @@
 
-set class RubyRescueNode class
+set class RubyRescueNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: body b: rescuebody c: elsebody d: srcOfs
   | res |
   rescuebody class == RubyRescueBodyNode ifFalse:[

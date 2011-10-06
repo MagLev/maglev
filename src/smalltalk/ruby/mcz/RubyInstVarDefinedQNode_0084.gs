@@ -1,7 +1,7 @@
 
-set class RubyInstVarDefinedQNode class
+set class RubyInstVarDefinedQNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
   ^ self _basicNew
 

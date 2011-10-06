@@ -1,7 +1,7 @@
 
-set class RubyCallNode class
+set class RubyCallNode
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
   ^ '
 RubyVCallNode  is a call with  zero arguments  .
@@ -19,9 +19,9 @@ The following eval variants exist
 %
 
 
-set class RubyCallNode class
+set class RubyCallNode
 category: 'as yet unclassified'
-method:
+classmethod:
 initialize
  | dict |
   dict := IdentityKeyValueDictionary new .
@@ -38,9 +38,9 @@ RubyCallNode initialize.
 %
 
 
-set class RubyCallNode class
+set class RubyCallNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: rcvr b: callSym c: args
   | node nodeCls | 
   nodeCls :=  SpecialRubySelectors at: callSym otherwise: self .

@@ -1,7 +1,7 @@
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 addExitHandler: aBlock
   
   (SessionTemps current at:#RubyExitHandlers) add: aBlock
@@ -9,9 +9,9 @@ addExitHandler: aBlock
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 altParser: aParser
   "The alternative parser is a second MRI parse server which is 
     only  used to print the sexp stream from a v3 ParseTree gem
@@ -24,9 +24,9 @@ altParser: aParser
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 basicLog: aString
 	| f |
 	self error:'should not be here'. 
@@ -37,36 +37,36 @@ basicLog: aString
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 beSilent
 	Verbose := nil
 
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 beVerbose
 	Verbose := true
 
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 blockEvalSelector
 	^ #__compileEval
 
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: '*maglev-runtime'
-method:
+classmethod:
 handleRubyThrow: anException sysExitBlock: sysExitBlk main: mainThrBool 
   | namErr sigNum throwExBlk |
   throwExBlk := [ :ex|  | resigEx | 
@@ -113,9 +113,9 @@ handleRubyThrow: anException sysExitBlock: sysExitBlk main: mainThrBool
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: '*maglev-ast'
-method:
+classmethod:
 initializeParser 
   RestrictedClasses ifNil:[ |set |
     (set := IdentitySet new)
@@ -130,36 +130,36 @@ initializeParser
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 isVerbose
 	^ Verbose ifNil: [false]
 
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 log: aString
 	Verbose ifNotNil: [self basicLog: aString]
 
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 parser 
   ^ Parser
 
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 parser: aParser
   
 	Parser := aParser . 
@@ -168,9 +168,9 @@ parser: aParser
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: 'as yet unclassified'
-method:
+classmethod:
 parseTreePort
 	|env|
 	env := System gemEnvironmentVariable: 'PARSETREE_PORT'.
@@ -179,9 +179,9 @@ parseTreePort
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: '*maglev-runtime'
-method:
+classmethod:
 reimplementationAllowed: aSymbol for: aClass cst: aRubyCompilerState
       "ruby_selector_suffix dependent"
   | firstCh  |
@@ -216,9 +216,9 @@ reimplementationAllowed: aSymbol for: aClass cst: aRubyCompilerState
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: '*maglev-runtime'
-method:
+classmethod:
 runAtExitBlocks: envId
   | tmps arr |
   arr := (tmps := SessionTemps current) at:#RubyExitHandlers otherwise: nil .
@@ -270,9 +270,9 @@ runAtExitBlocks: envId
 %
 
 
-set class RubyCompiler class
+set class RubyCompiler
 category: '*maglev-runtime'
-method:
+classmethod:
 withRubyHandlers: envId main: mainThrBool do: aBlock 
   | sysExitBlk |
   sysExitBlk := [ :ex|  | status nx mainThr currThr runAtExits runAtExitBlk |    

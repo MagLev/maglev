@@ -1,7 +1,7 @@
 
-set class RubyAutoloadAssociation class
+set class RubyAutoloadAssociation
 category: 'as yet unclassified'
-method:
+classmethod:
 newWithKey: aKey file: aFileName
 	^ (super newWithKey: aKey) initializeWithFile: aFileName .
 

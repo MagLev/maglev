@@ -1,7 +1,7 @@
 
-set class RpNameToken class
+set class RpNameToken
 category: '*maglev-ast'
-method:
+classmethod:
 new: sym position: ofs
   ^ self _basicNew sym: sym position: ofs 
 

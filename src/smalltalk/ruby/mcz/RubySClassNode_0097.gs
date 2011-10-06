@@ -1,7 +1,7 @@
 
-set class RubySClassNode class
+set class RubySClassNode
 category: '*maglev-runtime'
-method:
+classmethod:
 s_a: rcv b: body c: srcOfs d: lineNum
   | res |
   (res := self _basicNew)

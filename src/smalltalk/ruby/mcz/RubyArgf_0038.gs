@@ -1,7 +1,7 @@
 
-set class RubyArgf class
+set class RubyArgf
 category: '*maglev-runtime'
-method:
+classmethod:
 with: anArgv
   ^ self _basicNew _init: anArgv
 

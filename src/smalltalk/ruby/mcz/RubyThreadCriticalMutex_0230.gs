@@ -1,7 +1,7 @@
 
-set class RubyThreadCriticalMutex class
+set class RubyThreadCriticalMutex
 category: 'as yet unclassified'
-method:
+classmethod:
 instance
   | obj tmps |
   obj := (tmps := SessionTemps current) at:#RUBY_ThreadCriticalMutex otherwise: nil.

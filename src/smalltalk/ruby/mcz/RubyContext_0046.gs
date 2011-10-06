@@ -1,25 +1,25 @@
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 bootWarnings
   ^ SessionTemps current at:#RUBY_BootWarnings otherwise: false
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 bootWarnings: aBool
   SessionTemps current at:#RUBY_BootWarnings put: (aBool ifTrue:[ true] ifFalse:[false])
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 commitTransaction
   System commitTransaction ifFalse:[ | cnfDict arr ex |
 	 cnfDict := System transactionConflicts .
@@ -34,9 +34,9 @@ commitTransaction
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 copyPath: anArray replacing: original with: replacement
 	"Return a copy of anArray, that shares nothing (both the array and the elements are copied).
 	 Convert any leading occurrence of original with replacement.  This is intended for converting
@@ -58,9 +58,9 @@ copyPath: anArray replacing: original with: replacement
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 createSmalltalkFFIWrappers
     | year directory classes envId |
     envId := 1 .
@@ -145,9 +145,9 @@ createSmalltalkFFIWrappers
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 default
   | val  |
   val := SessionTemps current at: #DefaultRubyContext otherwise: nil .
@@ -159,18 +159,18 @@ default
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 defaultOrNil
   ^ SessionTemps current at: #DefaultRubyContext otherwise: nil .
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 ensurePrimsLoaded
 	"Check if there is already a ruby context with prims loaded installed,
 	 and if not, install one and commit the transaction."
@@ -179,9 +179,9 @@ ensurePrimsLoaded
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 installTopBinding: aBinding
   "called from generated code,  returns the argument" 
   (Object transientNameSpaceForStore: 1"__callerEnvId") 
@@ -191,18 +191,18 @@ installTopBinding: aBinding
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 load 
   ^ self load: #() 
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 load: optionsArray
   | ctx |
   ctx := self load: optionsArray env: 1 .
@@ -211,9 +211,9 @@ load: optionsArray
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 load: optionsArray  env: envId
   "Returns the current default context after initializing or loading it."
   | ctx sessTmps |
@@ -256,9 +256,9 @@ load: optionsArray  env: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 loadFileNamed: aString env: envId
   "used in smalltalk scripts run from topaz"
    ^ self default loadFileNamed: aString env: envId
@@ -266,9 +266,9 @@ loadFileNamed: aString env: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 nextConfFileLine: aFile
   "Return next line not beginning with #, or nil if eof,
    contents of line after # are excluded.  "
@@ -289,9 +289,9 @@ nextConfFileLine: aFile
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 persistableInstances
   "true means  newly created classes have non-peristable_instances_bit == 0"
   ^ RubyCompilerState current persistableInstances
@@ -299,9 +299,9 @@ persistableInstances
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 persistableInstances: aBoolean
   "true means  newly created classes have non-peristable_instances_bit == 0"
   RubyCompilerState current persistableInstances: aBoolean .
@@ -310,9 +310,9 @@ persistableInstances: aBoolean
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 persistenceMode
   "true means  inside of a Maglev.persistent  block"
   ^ RubyCompilerState current persistenceMode
@@ -320,9 +320,9 @@ persistenceMode
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 persistenceMode: aBoolean
   "a Ruby primitive. 
    true means  inside of a Maglev.persistent  block.  
@@ -338,9 +338,9 @@ persistenceMode: aBoolean
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 reload: optionsArray  env: envId
   | ctx sessTmps |
   "resets to empty the persistent env 1 method dicts of 
@@ -366,9 +366,9 @@ reload: optionsArray  env: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 reset
   "resets environment 1"
   | found |
@@ -383,9 +383,9 @@ reset
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 reset: envId
   "To be used only to force subsequent reload of ruby bootstrap code.
    Returns true if a previous committed context was cleared"
@@ -400,9 +400,9 @@ reset: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 runFileNamed: aString env: envId
   "used in smalltalk scripts run from topaz"
    ^ self default runFileNamed: aString env: envId
@@ -410,9 +410,9 @@ runFileNamed: aString env: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 transientLoadPathCopy: envId
 	"Copy the transient load path to the persistent load path, ensuring that the array
 	 and all elements are copies (nothing shared).  Convert any leading prefix equal to
@@ -425,9 +425,9 @@ transientLoadPathCopy: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _clearPersistentLoadedFeatures
   "a ruby primitive"
    self default _clearPersistentLoadedFeatures: 1"__callerEnvId"    
@@ -435,27 +435,27 @@ _clearPersistentLoadedFeatures
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _loadMspec
   ^ self _loadMspec: #() env: 0
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _loadMspec: options
   ^ self _loadMspec: options env: 0
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _loadMspec: options env: envId
   | ctx |
     ctx := RubyContext load: options . "traceLoad logSexp"
@@ -469,9 +469,9 @@ _loadMspec: options env: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runBenchmarks: logPath  repeat: repeatCount timeout: timeOut 
    "logPath is path to directory where stdout and report file for each benchmark will be written,
      timeOut is in seconds "
@@ -518,9 +518,9 @@ saveDir := RubyDirectory _getwd .
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runPassingSpecs
   ^ self _runPassingSpecs: 'passingspecs.conf' verbose: false debugErrors: true 
         options: #() env: 1 
@@ -528,9 +528,9 @@ _runPassingSpecs
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runPassingSpecs: confFileName verbose: verboseBool debugErrors: debugBool options: optsArr env: envId
   "for use from a topaz -l process, to run all passing specs,    stopping to debug any error.
    Returns the number of specs run "
@@ -580,9 +580,9 @@ saveDir := RubyDirectory _getwd .
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runPassingSpecs: confFileName verbose: verboseBool options: optsArr env: envId
   ^ self _runPassingSpecs: confFileName verbose: verboseBool debugErrors: true 
             options: optsArr env: envId
@@ -590,9 +590,9 @@ _runPassingSpecs: confFileName verbose: verboseBool options: optsArr env: envId
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runVmUnit 
 "Run the vmunit tests from a topaz -l , assumming RubyContext load already done.
  uses currently configured MRI parser host and port ."
@@ -602,18 +602,18 @@ _runVmUnit
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runVmUnit: parserHost options: optsArray
   ^ self _runVmUnit: parserHost options: optsArray  env: 1
 
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _runVmUnit: parserHost options: optsArray  env: envId
 "Run the vmunit tests from a topaz -l , assumming RubyContext load already done.
 skips the tests listed in  skips array   below ."
@@ -669,9 +669,9 @@ GsFile gciLogServer:'--- pwd= ', RubyDirectory _getwd .
 %
 
 
-set class RubyContext class
+set class RubyContext
 category: '*maglev-runtime'
-method:
+classmethod:
 _saved
   ^ Saved
 

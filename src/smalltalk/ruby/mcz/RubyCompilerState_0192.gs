@@ -1,7 +1,7 @@
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '(as yet unclassified)'
-method:
+classmethod:
 clearTransientState
   GsProcess _current _rubyThreadDataAt: 1 put: nil ;
                      _rubyThreadDataAt: 2 put: nil .
@@ -9,9 +9,9 @@ clearTransientState
 %
 
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
 ^ '
   fileStack replaces RubyCurrentFile .
@@ -36,18 +36,18 @@ comment
 %
 
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '(as yet unclassified)'
-method:
+classmethod:
 current
   ^ GsProcess _current _rubyThreadDataAt: 1
 
 %
 
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '*maglev-runtime'
-method:
+classmethod:
 initialize: environmentId
  "Note, we currently don't support fully general mixed-env ruby execution ; to do so 
   would require a stack of envId's "
@@ -61,9 +61,9 @@ initialize: environmentId
 %
 
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '*maglev-runtime'
-method:
+classmethod:
 initializeForNewThread: environmentId
  "Note, we currently don't support fully general mixed-env ruby execution ; to do so 
   would require a stack of envId's "
@@ -87,9 +87,9 @@ initializeForNewThread: environmentId
 %
 
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '*maglev-runtime'
-method:
+classmethod:
 methodDefTargetStack
   "method not sent, for documentation only"
   ^ GsProcess _current _rubyThreadDataAt: 3 .
@@ -97,9 +97,9 @@ methodDefTargetStack
 %
 
 
-set class RubyCompilerState class
+set class RubyCompilerState
 category: '(as yet unclassified)'
-method:
+classmethod:
 use: aState
   "for use by maglev irb implementation only"
   aState class == RubyCompilerState ifFalse:[ self error:'invalid argument'].

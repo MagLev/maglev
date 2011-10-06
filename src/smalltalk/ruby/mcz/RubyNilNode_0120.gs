@@ -1,7 +1,7 @@
 
-set class RubyNilNode class
+set class RubyNilNode
 category: 'parsetree'
-method:
+classmethod:
 newForIr
    ^ self _basicNew  "during IR phase, for literals leave position nil"
 

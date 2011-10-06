@@ -1,7 +1,7 @@
 
-set class RubyFinalizer class
+set class RubyFinalizer
 category: 'as yet unclassified'
-method:
+classmethod:
 new: anObject proc: aProc
 
 "a ruby primitive"

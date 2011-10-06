@@ -1,7 +1,7 @@
 
-set class RubyImplicitBlockVarNode class
+set class RubyImplicitBlockVarNode
 category: 'Documentation'
-method:
+classmethod:
 comment
 
 	^ 'This class should only be used from #optionallyBuildImplicitBlockTemp. See the

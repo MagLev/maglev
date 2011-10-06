@@ -1,7 +1,7 @@
 
-set class RubyConstantRef class
+set class RubyConstantRef
 category: '*maglev-runtime'
-method:
+classmethod:
 _abstractCall: rcvrBlock definedQ: selectorSym
     "returns  'method'  if receiver responds to aSymbol, nil otherwise
      flags say don't cache result in code_gen, ruby lookup, env 1"

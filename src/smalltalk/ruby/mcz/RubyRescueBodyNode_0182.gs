@@ -1,7 +1,7 @@
 
-set class RubyRescueBodyNode class
+set class RubyRescueBodyNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: ex_list b: body c: next_rescue d: srcOfs 
  | res |
   (res := self _basicNew)

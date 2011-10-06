@@ -1,7 +1,7 @@
 
-set class MatchData class
+set class MatchData
 category: '*maglev-runtime'
-method:
+classmethod:
 _validateInstance: anObject
 
    anObject ifNotNil:[

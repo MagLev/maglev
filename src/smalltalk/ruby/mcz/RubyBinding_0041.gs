@@ -1,7 +1,7 @@
 
-set class RubyBinding class
+set class RubyBinding
 category: '*maglev-runtime'
-method:
+classmethod:
 _bindingInfo: aBindingContext
   "A ruby primitive.
    argument is { aVariableContext . aMethodDefTarget, aGsNMethod .  ... }  from  Object>>_bindingContext:  .

@@ -1,7 +1,7 @@
 
-set class RubySelfNode class
+set class RubySelfNode
 category: 'as yet unclassified'
-method:
+classmethod:
 new
   ^ self _basicNew   "creation during walkScopes, leave position nil"
 

@@ -1,7 +1,7 @@
 
-set class RubyClassVarDeclNode class
+set class RubyClassVarDeclNode
 category: 'Documentation'
-method:
+classmethod:
 comment
   "8/1/2008 inherits nextNodeForParser: from RubyNode .
     may not be used or debugged yet."

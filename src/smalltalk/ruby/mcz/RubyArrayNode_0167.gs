@@ -1,7 +1,7 @@
 
-set class RubyArrayNode class
+set class RubyArrayNode
 category: '*maglev-ast'
-method:
+classmethod:
 _new
 | res |
 res := self _basicNew .
@@ -11,9 +11,9 @@ res list: #() .  "note #() is canonicalized across image"
 %
 
 
-set class RubyArrayNode class
+set class RubyArrayNode
 category: '*maglev-ast'
-method:
+classmethod:
 _new: arg
 | res |
 res := self _basicNew .
@@ -23,9 +23,9 @@ res list: { arg } .
 %
 
 
-set class RubyArrayNode class
+set class RubyArrayNode
 category: '*maglev-ast'
-method:
+classmethod:
 _new: argOne with: argTwo
 | res |
 res := self _basicNew .

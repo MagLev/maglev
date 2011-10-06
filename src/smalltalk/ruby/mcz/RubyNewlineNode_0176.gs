@@ -1,7 +1,7 @@
 
-set class RubyNewlineNode class
+set class RubyNewlineNode
 category: 'parsetree'
-method:
+classmethod:
 nodeOnTokenStream: aStream
               "8 Aug 2008   no senders found"
 	aStream next; next.

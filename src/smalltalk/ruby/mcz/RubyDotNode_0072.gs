@@ -1,7 +1,7 @@
 
-set class RubyDotNode class
+set class RubyDotNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: numDots b: left c: right d: srcOfs
   | res |
   (res := self _basicNew )

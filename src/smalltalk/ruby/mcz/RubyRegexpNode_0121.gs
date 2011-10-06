@@ -1,7 +1,7 @@
 
-set class RubyRegexpNode class
+set class RubyRegexpNode
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
 
 "Creation of a RubyRegexpNode starts from String>>rubyLiteralClass ."
@@ -9,9 +9,9 @@ comment
 %
 
 
-set class RubyRegexpNode class
+set class RubyRegexpNode
 category: 'parsetree'
-method:
+classmethod:
 optionsFromString: aString
        "result must agree with options arg to om::RegexCompile in regexprim.c"
   | optsInt |

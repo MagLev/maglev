@@ -1,7 +1,7 @@
 
-set class RubyFile class
+set class RubyFile
 category: 'as yet unclassified'
-method:
+classmethod:
 absolutePathFor: aString
 	"If the first character of aString is not '/', then prepend the current working 
 	directory and return the path. Does NOT compress embedded occurrences of '.' and '..'."
@@ -13,9 +13,9 @@ absolutePathFor: aString
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: 'as yet unclassified'
-method:
+classmethod:
 baseNameAndSuffixFor: aName
   "If aName ends with .<something>, return a pair of the name without
    the suffix and the suffix.  E.g.  baseNameAndSuffixFor: 'abd.def'  returns
@@ -34,9 +34,9 @@ baseNameAndSuffixFor: aName
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: 'as yet unclassified'
-method:
+classmethod:
 cannonicalPathFor: aString
 	"Given a relative or absolute path, return an absolute path with '.' and '..' properly
 	 handled and removed.  Removes trailing '/'. uses the current process working 
@@ -48,9 +48,9 @@ cannonicalPathFor: aString
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: 'as yet unclassified'
-method:
+classmethod:
 comment
 	"RubyFile holds a couple of paths and knows how to compile itslef. A RubyFile
 	has several names which are listed below:
@@ -68,9 +68,9 @@ comment
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 compressPath: aPath
   "Compress '.' and '..' in aPath.  Assumes aPath is absolute (starts with '/').
   Removes trailing '/'."
@@ -125,9 +125,9 @@ compressPath: aPath
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 filename: aString env: envId
 "Create and return a file named aString.  Will try to find the file using the current ruby path $:.
 If the file is not found, returns nil.  Does not try to add .rb or any other suffix (see RubyContext>>requireFileNamed)."
@@ -139,9 +139,9 @@ file path == nil ifTrue:[    ^ nil ] . "file not found"
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 findOnLoadPath: aName env: envId
    (self loadPath: envId) do: [:pathPrefix || p loadPath sfx |
       loadPath := (pathPrefix terminatedWith: $/ ) , aName .
@@ -153,9 +153,9 @@ findOnLoadPath: aName env: envId
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 findOnLoadPath: aName isRequire: isRequire  env: envId
   "Returns an Array { aRubyFile_orNil . featureName } "
   | names bns suffix searchForLibrary baseName defName|
@@ -195,9 +195,9 @@ findOnLoadPath: aName isRequire: isRequire  env: envId
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 findRubyFileFor: aName isRequire: isRequire env: envId 
   "Try to find a file for aName.  If aName is a qualified name (starts with '.' '..' './' or '~/'),
   then do the appropriate expansions.  If it is not a qualified name, then search for the
@@ -214,9 +214,9 @@ findRubyFileFor: aName isRequire: isRequire env: envId
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: 'as yet unclassified'
-method:
+classmethod:
 isFile: aString
 	"Return true iff aString is a path that maps to a file (not a directory) on the server."
 	|r r1|
@@ -230,9 +230,9 @@ isFile: aString
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 loadPath: envId
   "The result may be an empty array"
   ^ ((Object transientNameSpace: envId) resolveConstant: #'$:') globalVarValue .
@@ -240,18 +240,18 @@ loadPath: envId
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 loadPath: envId put: anArray 
   (Object transientNameSpaceForStore: envId) rubyGlobalVar: #'$:' put: anArray .
 
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: 'as yet unclassified'
-method:
+classmethod:
 pathForTrace: aPath
   | hm |
   hm := RubyEnv _getenv:'MAGLEV_HOME' .
@@ -261,9 +261,9 @@ pathForTrace: aPath
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 withGivenPath: given fullPath: full 
     "Create a Ruby file with the given path information.  
     Returns nil if the full path does not exist."
@@ -273,9 +273,9 @@ withGivenPath: given fullPath: full
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 withGivenPath: given fullPath: full loadName: ln
     "Create a Ruby file with the given path information.  An error is
     raised if the full path does not exist."
@@ -285,9 +285,9 @@ withGivenPath: given fullPath: full loadName: ln
 %
 
 
-set class RubyFile class
+set class RubyFile
 category: '*maglev-runtime'
-method:
+classmethod:
 _findQualifiedFile: nameArg isRequire: isRequire
     "Compute the full path for aName, expanding '.' '..' or '~' as appropriate.
     Return an Array { aRubyFile_or_nil . feature_name } "

@@ -1,7 +1,7 @@
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 execMethBridgeTo: aMethod
       "ruby_selector_suffix dependent"
   | br toSuff toSel ch optArgsDescr argsDescrInt toNargs |
@@ -36,9 +36,9 @@ execMethBridgeTo: aMethod
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: 'as yet unclassified'
-method:
+classmethod:
 genericErrCmSet
 	"Return the identity set of generic error bridge compiled methods."
 	^ GenericErrCmSet.
@@ -46,9 +46,9 @@ genericErrCmSet
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 initialize
 
   BridgeOptions := { } .
@@ -63,9 +63,9 @@ RubyBridge initialize.
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 initializeGenericBridges: envId
   "creates and returns the bridge options for specified environment"
   |  bridges suffixes sz generics comp frSym aBr  |
@@ -110,9 +110,9 @@ initializeGenericBridges: envId
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 installBridgesFor: rubySel in: aClass argsDescr: argsDescrInt 
     optArgs: optArgsDescr protection: protInt primKind: primKind env: envId
  "primKnd argument is one of  0:normal 1:primitive 2:primitive_nobridge 
@@ -129,9 +129,9 @@ installBridgesFor: rubySel in: aClass argsDescr: argsDescrInt
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 installBridgesForPrefix: prefix suffix: destSuffix selector: rubySelArg
     in: aClass argsDescr: argsDescrInt
     optArgs: optArgsDescr protection: protInt primKind: primKind env: envId
@@ -180,9 +180,9 @@ installBridgesForPrefix: prefix suffix: destSuffix selector: rubySelArg
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 irMethod_defineMethStarArgs: selPrefix block: aBlock inClass: aClass  env: envId
    "aBlock must have been produced by _copyForRuby:1   "
       "ruby_selector_suffix dependent"
@@ -218,9 +218,9 @@ irMethod_defineMethStarArgs: selPrefix block: aBlock inClass: aClass  env: envId
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 suffixOptionMasks 
     "result is an array of masks for use as arg to _asSymbolWithRubySuffix: 
       to match the above array of suffixes returned by  RubyBridge(C)>>suffixOptions"
@@ -233,9 +233,9 @@ suffixOptionMasks
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 suffixOptions
       "ruby_selector_suffix dependent"
     ^  #( #'#0__' #'#1__' #'#2__' #'#3__'        
@@ -245,9 +245,9 @@ suffixOptions
 %
 
 
-set class RubyBridge class
+set class RubyBridge
 category: '*maglev-runtime'
-method:
+classmethod:
 _templates: envId
   ^ BridgeOptions _rubyAt: envId - 1
 

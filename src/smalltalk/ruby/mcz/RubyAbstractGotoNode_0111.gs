@@ -1,7 +1,7 @@
 
-set class RubyAbstractGotoNode class
+set class RubyAbstractGotoNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: srcOfs
   "used for RubyRedoNode, RubyRetryNode"
   | res |

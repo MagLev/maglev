@@ -1,7 +1,7 @@
 
-set class RubyArgs class
+set class RubyArgs
 category: 'as yet unclassified'
-method:
+classmethod:
 forScript: aScriptName withRubyArgs: aRubyArgs withScriptArgs: aScriptArgs
 	"rubyArgs is an array of arguments to the VM.
 	 scriptArgs is an array of arguments to the script"

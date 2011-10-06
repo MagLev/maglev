@@ -1,7 +1,7 @@
 
-set class RubyOpAsgnOrNode class
+set class RubyOpAsgnOrNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: first b: second
 ^ self _basicNew firstNode: first secondNode: second 
 

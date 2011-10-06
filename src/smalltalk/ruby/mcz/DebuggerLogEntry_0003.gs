@@ -1,7 +1,7 @@
 
-set class DebuggerLogEntry class
+set class DebuggerLogEntry
 category: '*maglev-continuation creation'
-method:
+classmethod:
 rubyCreateContinuationLabeled: aString
 "snap off a continuation at this point and stash it in the queue"
     |action cc logEntry |

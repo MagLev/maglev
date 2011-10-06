@@ -1,7 +1,7 @@
 
-set class RubySocket class
+set class RubySocket
 category: '*maglev-runtime'
-method:
+classmethod:
 _initTransientSocketConstants: envId
 
   "executed during VM startup

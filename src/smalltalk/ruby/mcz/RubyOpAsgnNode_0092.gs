@@ -1,7 +1,7 @@
 
-set class RubyOpAsgnNode class
+set class RubyOpAsgnNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: rcv b: asgnSelTok c: opSelTok d: val
   | res asgn_sel |
   asgn_sel := asgnSelTok symval .

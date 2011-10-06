@@ -1,7 +1,7 @@
 
-set class RubyConstDeclNode class
+set class RubyConstDeclNode
 category: '*maglev-ast'
-method:
+classmethod:
 colon2: left name: name_tok
   | c2n res |
   c2n := RubyColon2Node s_a: left b: name_tok .
@@ -13,9 +13,9 @@ colon2: left name: name_tok
 %
 
 
-set class RubyConstDeclNode class
+set class RubyConstDeclNode
 category: '*maglev-ast'
-method:
+classmethod:
 colon3: name_tok
   | c3n res |
   c3n := RubyColon3Node s_a: name_tok .
@@ -27,9 +27,9 @@ colon3: name_tok
 %
 
 
-set class RubyConstDeclNode class
+set class RubyConstDeclNode
 category: '*maglev-ast'
-method:
+classmethod:
 sym: sym ofs: srcOfs val: val
   | c2n res |
   (c2n := RubyColon2Node _basicNew) 

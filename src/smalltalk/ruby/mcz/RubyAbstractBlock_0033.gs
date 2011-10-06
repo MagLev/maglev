@@ -1,7 +1,7 @@
 
-set class RubyAbstractBlock class
+set class RubyAbstractBlock
 category: 'as yet unclassified'
-method:
+classmethod:
 comment
 ^ 'a RubyAbstractBlock is an object pushed on the loopStack only.
   It does not represent any AST or IR node . '

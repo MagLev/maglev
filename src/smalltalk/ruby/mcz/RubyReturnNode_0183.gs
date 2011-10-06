@@ -1,7 +1,7 @@
 
-set class RubyReturnNode class
+set class RubyReturnNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val b: srcOfs
   | res |
   (res := self _basicNew)

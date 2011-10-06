@@ -1,7 +1,7 @@
 
-set class RubySValueNode class
+set class RubySValueNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: body
  | res |
   (res := self _basicNew)

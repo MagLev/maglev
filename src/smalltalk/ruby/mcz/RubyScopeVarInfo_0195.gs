@@ -1,7 +1,7 @@
 
-set class RubyScopeVarInfo class
+set class RubyScopeVarInfo
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
 ^ ' kinds are 
     #incomingBlock -  incoming block argument (&block) to a method definition
@@ -14,9 +14,9 @@ comment
 %
 
 
-set class RubyScopeVarInfo class
+set class RubyScopeVarInfo
 category: '*maglev-runtime'
-method:
+classmethod:
 new: nameSym kind:  kindSym ofs: anOffset
   ^ self _basicNew key: nameSym kind: kindSym  ofs: anOffset
 

@@ -1,7 +1,7 @@
 
-set class RubyVcGlobalAsgNode class
+set class RubyVcGlobalAsgNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForRp
   ^ self _basicNew
 

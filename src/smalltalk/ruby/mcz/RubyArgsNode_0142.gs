@@ -1,7 +1,7 @@
 
-set class RubyArgsNode class
+set class RubyArgsNode
 category: 'parsetree'
-method:
+classmethod:
 restArgForTokens: tokens rest: rest opt: opt
 	^ rest 
 		ifNil: [-1] 

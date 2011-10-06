@@ -1,7 +1,7 @@
 
-set class RubyNode class
+set class RubyNode
 category: '(as yet unclassified)'
-method:
+classmethod:
 new
   self error:'should use newFor: '
 

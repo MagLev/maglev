@@ -1,7 +1,7 @@
 
-set class RubyBlockArgNode class
+set class RubyBlockArgNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: sym
   | res |
   (res := self _basicNew) name: sym .

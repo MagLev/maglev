@@ -1,7 +1,7 @@
 
-set class RubyProcessStatus class
+set class RubyProcessStatus
 category: '*maglev-runtime'
-method:
+classmethod:
 with: rawResultArray
   ^ self _basicNew init: rawResultArray
 

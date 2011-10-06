@@ -1,25 +1,25 @@
 
-set class TransientMutex class
+set class TransientMutex
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
   ^ 'TransientMutex instances are DbTransient'
 
 %
 
 
-set class TransientMutex class
+set class TransientMutex
 category: '*maglev-runtime'
-method:
+classmethod:
 forRubyMutualExclusion
   ^ self rubyBasicNew
 
 %
 
 
-set class TransientMutex class
+set class TransientMutex
 category: '*maglev-runtime'
-method:
+classmethod:
 rubyBasicNew
 
 ^ self rubyBasicNew_stBaseClass: TransientMutex

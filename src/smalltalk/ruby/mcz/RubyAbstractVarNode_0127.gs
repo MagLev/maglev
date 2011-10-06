@@ -1,7 +1,7 @@
 
-set class RubyAbstractVarNode class
+set class RubyAbstractVarNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: sym
   "used for RubyInstVarNode, RubyLocalVarNode, RubyClassVarNode"
   | res |

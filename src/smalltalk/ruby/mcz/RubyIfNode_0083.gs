@@ -1,7 +1,7 @@
 
-set class RubyIfNode class
+set class RubyIfNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: cond b: tBlock c: fBlock
  | res |
  (res := self _basicNew)

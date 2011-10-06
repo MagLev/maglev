@@ -1,7 +1,7 @@
 
-set class RubyDStrNode class
+set class RubyDStrNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: anArray 
   | res |
   anArray _isArray ifFalse:[

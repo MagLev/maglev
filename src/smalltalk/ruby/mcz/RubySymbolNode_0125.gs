@@ -1,16 +1,16 @@
 
-set class RubySymbolNode class
+set class RubySymbolNode
 category: 'as yet unclassified'
-method:
+classmethod:
 newForIr
   ^ self _basicNew "during IR phase, leave position nil"
 
 %
 
 
-set class RubySymbolNode class
+set class RubySymbolNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: val
   ^ self _basicNew
      name: (val _isSymbol ifTrue:[ val ] ifFalse:[ val symval ])

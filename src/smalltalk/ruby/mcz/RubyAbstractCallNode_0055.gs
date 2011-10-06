@@ -1,16 +1,16 @@
 
-set class RubyAbstractCallNode class
+set class RubyAbstractCallNode
 category: 'as yet unclassified'
-method:
+classmethod:
 evalSelectors 
   ^ #( #eval  #module_eval #class_eval #instance_eval )
 
 %
 
 
-set class RubyAbstractCallNode class
+set class RubyAbstractCallNode
 category: '*maglev-runtime'
-method:
+classmethod:
 initialize
   | dict |
   dict := IdentityKeyValueDictionary new .
@@ -45,18 +45,18 @@ RubyAbstractCallNode initialize.
 %
 
 
-set class RubyAbstractCallNode class
+set class RubyAbstractCallNode
 category: '*maglev-runtime'
-method:
+classmethod:
 lastArgNoToProcSelectors
   ^ LastArgNoToProcSelectors
 
 %
 
 
-set class RubyAbstractCallNode class
+set class RubyAbstractCallNode
 category: '*maglev-runtime'
-method:
+classmethod:
 rcvrNoToProcSelectors
   ^ RcvrNoToProcSelectors
 

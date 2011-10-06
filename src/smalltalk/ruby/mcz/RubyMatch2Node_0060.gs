@@ -1,7 +1,7 @@
 
-set class RubyMatch2Node class
+set class RubyMatch2Node
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: regex b: rcvr
   | res |
   (res := self _basicNew)

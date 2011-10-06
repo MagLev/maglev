@@ -1,7 +1,7 @@
 
-set class RubyArgsCatNode class
+set class RubyArgsCatNode
 category: '*maglev-runtime'
-method:
+classmethod:
 comment
   ^ 'RubyArgsCatNode is only used in AST produced by MRI parse server
      when loading bootstrap code.  

@@ -1,7 +1,7 @@
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 anonymousSelectors
 
   ^ #(__compileFile __compileEval)
@@ -9,9 +9,9 @@ anonymousSelectors
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 backtraceToLevel: aLevel
 | backtrace aFrame meth level |        
 backtrace := Array new .
@@ -40,18 +40,18 @@ level := 1 .
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 currentMethDefTarget
   ^ self   _current _rubyThreadDataAt: 7 
 
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 initRubyMainThread: inPrims env: envId
   "returns the previous main program self , or nil if this is the
    first invocation in a ruby session."
@@ -75,9 +75,9 @@ prevSelf ifNil:[
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 methodDefnMetaTarget
   "called from generated code"  
   ^ ( self _current _rubyThreadDataAt: 3 ) topValue theMetaClass
@@ -85,9 +85,9 @@ methodDefnMetaTarget
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 methodDefnTarget
   "called from generated code and Object>>_bindingContext: "  
   ^ ( self _current _rubyThreadDataAt: 3 ) topOrNil 
@@ -95,9 +95,9 @@ methodDefnTarget
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 rubyExitOnException: aBoolean
  "Returns previous value of the abort_on_exception state.
   If arg not nil, installs arg as new value."
@@ -112,9 +112,9 @@ rubyExitOnException: aBoolean
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyEvalBinding
 
   ^ (self _current _rubyThreadDataAt: 6"evalArgsStk") topValue at: 1"aBinding"
@@ -122,9 +122,9 @@ _rubyEvalBinding
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyEvalBlockArg
 
   ^ (self _current _rubyThreadDataAt: 6"evalArgsStk") topOrNil 
@@ -133,9 +133,9 @@ _rubyEvalBlockArg
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyEvalHomeMethod
   "returns the name of the home method, per __method__"
 ^ self _rubyEvalBinding homeMethod _rubyName
@@ -143,9 +143,9 @@ _rubyEvalHomeMethod
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyEvalVc
 
   ^ ((self _current _rubyThreadDataAt: 6"evalArgsStk") topValue at: 1"aBinding") context
@@ -153,9 +153,9 @@ _rubyEvalVc
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 _rubyEvalVcPutTilde: tArg underscore: uArg
 
   tArg _storeRubyVcGlobal: 16r70 .
@@ -164,9 +164,9 @@ _rubyEvalVcPutTilde: tArg underscore: uArg
 %
 
 
-set class GsProcess class
+set class GsProcess
 category: '*maglev-runtime'
-method:
+classmethod:
 _topazExceptionName: anException
   
  ^ [ | ecls |

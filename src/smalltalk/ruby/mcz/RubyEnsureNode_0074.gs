@@ -1,7 +1,7 @@
 
-set class RubyEnsureNode class
+set class RubyEnsureNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: argBlock b: srcOfs
   | res |
   (res := self _basicNew )

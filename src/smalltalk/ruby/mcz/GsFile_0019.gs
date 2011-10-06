@@ -1,7 +1,7 @@
 
-set class GsFile class
+set class GsFile
 category: '*maglev-runtime'
-method:
+classmethod:
 redirectRubyStdout: aGsFile env: envId
   "returns previous value of Ruby $stdout "
   | prev tns nam |

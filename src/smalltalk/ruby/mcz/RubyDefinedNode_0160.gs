@@ -1,7 +1,7 @@
 
-set class RubyDefinedNode class
+set class RubyDefinedNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: expr
   | res |
   (res := self _basicNew ) expressionNode: expr .

@@ -1,7 +1,7 @@
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 appendTo: arrayNode evstr2dstr: val
   | v |
   (v := val) class == RubyEvStrNode ifTrue:[
@@ -13,18 +13,18 @@ appendTo: arrayNode evstr2dstr: val
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 backref_error: aNode
   self signalError: 'Cannot set variable  ' , aNode backRefErrorString
 
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 block_append: head tail: tail
   ".y file checks for head/tail nil"
   | hd |
@@ -38,9 +38,9 @@ block_append: head tail: tail
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 check_selector: selTok
    " returns selector symbol , guards against malformed elsif"
   | sel |
@@ -59,9 +59,9 @@ check_selector: selTok
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 get_match_node: lhs rhs: rhs ofs: srcOfs
   | res |
   lhs ifNotNil:[ | l_cls |
@@ -96,9 +96,9 @@ get_match_node: lhs rhs: rhs ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-runtime'
-method:
+classmethod:
 initializeClassRefs
     RubyFCallNode initialize .
     RubyVCallNode initialize .
@@ -107,9 +107,9 @@ initializeClassRefs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-runtime'
-method:
+classmethod:
 initializeParser
     RubyNameSpace initialize .
     RubyStaticScope initialize .
@@ -118,9 +118,9 @@ initializeParser
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 list_append: list item: item
   | arrayCls lst |
   arrayCls := RubyRpCallArgs .
@@ -136,9 +136,9 @@ list_append: list item: item
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 list_prepend: list item: item
   | arrayCls |
   arrayCls := RubyRpCallArgs .
@@ -151,9 +151,9 @@ list_prepend: list item: item
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 literal_concat: headArg tail: tailArg
   ".y file checks for head/tail nil"
   | htype ttype head tail |
@@ -205,9 +205,9 @@ literal_concat: headArg tail: tailArg
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 logop: cls left: left_arg right: right
   | left |
   left := left_arg kbegin_value "remove_begin" .
@@ -230,27 +230,27 @@ logop: cls left: left_arg right: right
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 masgn_append_arg: lhs right: rhs
    ^ lhs masgn_append_arg: rhs kbegin_value 
 
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 masgn_append_mrhs: lhs right: rhs
    ^ lhs append_mrhs: rhs kbegin_value
 
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_aref: rcv args: refArgs ofs: srcOfs
   | args res |
   args := refArgs ifNil:[ RubyRpCallArgs _new ].
@@ -260,9 +260,9 @@ new_aref: rcv args: refArgs ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_call: recv sel: selTok arg: args 
   | arg_cls cArgs result |
   args ifNil:[  " zero args"
@@ -291,9 +291,9 @@ new_call: recv sel: selTok arg: args
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_call_1: recv sel: selTok arg: argone
   "argone should never be a RubyBlockPassNode"
   | cArgs result |
@@ -309,9 +309,9 @@ new_call_1: recv sel: selTok arg: argone
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_call_braceBlock: rcv sel: selTok args: args blkArg: blkArg
   | res |
   res := self new_call: rcv sel: selTok arg: args  .
@@ -327,9 +327,9 @@ new_call_braceBlock: rcv sel: selTok args: args blkArg: blkArg
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_defn: nameTok args: args body: bodyArg ofs: srcOfs 
      startLine: lineNum endOfs: endOfs
   | body result |
@@ -349,9 +349,9 @@ new_defn: nameTok args: args body: bodyArg ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_defs: rcvr name: nameTok args: args body: bodyArg ofs: srcOfs 
     startLine: lineNum endOfs: endOfs 
   | body result |
@@ -371,9 +371,9 @@ new_defs: rcvr name: nameTok args: args body: bodyArg ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_dsym:  val
   | v_cls |
   v_cls := val class .
@@ -391,9 +391,9 @@ new_dsym:  val
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_evstr: val
   | knd |
   val ifNil:[
@@ -408,9 +408,9 @@ new_evstr: val
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_fcall: selTok arg: arg
   "receiver is implicit self"
   | result arg_cls sym |
@@ -440,9 +440,9 @@ new_fcall: selTok arg: arg
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_fcall_braceBlock: selTok args: args blkArg: blkArg
   | res |
   res := self new_call: RubySelfNode _basicNew sel: selTok arg: args .
@@ -458,9 +458,9 @@ new_fcall_braceBlock: selTok args: args blkArg: blkArg
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_if: condArg t: trueBlock f: falseBlock ofs: srcOfs
   | c res |
   c := condArg as_cond .
@@ -474,9 +474,9 @@ new_if: condArg t: trueBlock f: falseBlock ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_op_asgn: lhs sel: asgnSel arg: argNode
    | nLhs lhsAcc asgn_op arg res aCall |
    lhsAcc := lhs as_accessor .
@@ -504,9 +504,9 @@ new_op_asgn: lhs sel: asgnSel arg: argNode
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_parasgn: lhs ofs: srcOfs comma: trailingCommaBool
    lhs ifNil:[ 
      self signalError: 'lhs is nil in new_parasgn'
@@ -516,9 +516,9 @@ new_parasgn: lhs ofs: srcOfs comma: trailingCommaBool
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_regexp: arg options: optionsSi
   | have_once arg_cls node options |
   have_once := false .
@@ -553,9 +553,9 @@ new_regexp: arg options: optionsSi
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_string: val
   val class == RubyEvStrNode ifTrue:[
     ^ RubyDStrNode s_a: { val body  }
@@ -565,9 +565,9 @@ new_string: val
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_super: args ofs: srcOfs
   | aryCls argsCls |
   aryCls := RubyRpCallArgs .
@@ -586,18 +586,18 @@ new_super: args ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_undef: symNode ofs: srcOfs
   ^ RubyUndefNode _basicNew name: symNode symNodeValue ; position: srcOfs
 
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_until: block expr: exprArg ofs: srcOfs
   | expr |
   exprArg class == RubyNotNode ifTrue:[
@@ -611,9 +611,9 @@ new_until: block expr: exprArg ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_vcall: rcv sel: selTok
   | result |
   ( result := RubyVCallNode s_a: rcv b: (self check_selector: selTok))
@@ -623,9 +623,9 @@ new_vcall: rcv sel: selTok
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_while: blockArg expr: exprArg ofs: srcOfs
   | preBool expr res block |
   preBool := true . 
@@ -644,9 +644,9 @@ new_while: blockArg expr: exprArg ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_xstring: str
   | knd |
   str ifNil:[
@@ -664,9 +664,9 @@ new_xstring: str
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 new_yield: args ofs: srcOfs
   | cArgs |
   args ifNil:[ 
@@ -685,9 +685,9 @@ new_yield: args ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 node_assign: lhs ofs: srcOfs rhs: rhsArg
   | rhs nLhs |
   lhs ifNil:[ ^ nil ].
@@ -699,9 +699,9 @@ node_assign: lhs ofs: srcOfs rhs: rhsArg
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 opt_rescue: exClasses var: exVar body: bodyArg rescue: rescueBody ofs: srcOfs
   | body |
   body := bodyArg .
@@ -719,9 +719,9 @@ opt_rescue: exClasses var: exVar body: bodyArg rescue: rescueBody ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 ret_args: aCallArgs
   | lst res |
   aCallArgs iter ifNotNil:[ 
@@ -734,9 +734,9 @@ ret_args: aCallArgs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-compiling'
-method:
+classmethod:
 rpParseFile: fullPath  loadName: aName yTrace: yTrace warnings: warn
   | sourceString f |
   sourceString := (f := GsFile openReadOnServer: fullPath) contents.
@@ -748,9 +748,9 @@ rpParseFile: fullPath  loadName: aName yTrace: yTrace warnings: warn
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-runtime'
-method:
+classmethod:
 rpParseString: sourceString path: fullPath  loadName: aName yTrace: yTrace warnings: warn
   | root ast |
   ast := self parse: sourceString cBytes: ( CByteArray withAll: sourceString)
@@ -771,9 +771,9 @@ rpParseString: sourceString path: fullPath  loadName: aName yTrace: yTrace warni
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-runtime'
-method:
+classmethod:
 rpParseString: sourceString scope: aScopN lineBias: bias evalScope: aRubyEvalScope fileName: fName
   | ast root trace tmps warn |
   sourceString immediateInvariant .
@@ -800,9 +800,9 @@ rpParseString: sourceString scope: aScopN lineBias: bias evalScope: aRubyEvalSco
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 signalError: aString
 
   (self _rbCompileError: aString isWarning: false) ifTrue:[
@@ -815,18 +815,18 @@ signalError: aString
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 signalWarning: aString
   self _rbCompileError: aString isWarning: true
 
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 string_to_symbol: str
   str _isOneByteString ifFalse:[
     self signalError: 'internal_error, expected value to be a String'.
@@ -842,9 +842,9 @@ string_to_symbol: str
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 uplus_production: arg ofs: srcOfs
   | res |
   (arg isKindOf: RubyAbstractLiteralNode) ifTrue:[
@@ -857,9 +857,9 @@ uplus_production: arg ofs: srcOfs
 %
 
 
-set class RubyParserM class
+set class RubyParserM
 category: '*maglev-ast'
-method:
+classmethod:
 value_expr: aNode
   ^ aNode kbegin_value
 

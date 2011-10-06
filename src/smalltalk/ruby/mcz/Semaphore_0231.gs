@@ -1,7 +1,7 @@
 
-set class Semaphore class
+set class Semaphore
 category: '*maglev-runtime'
-method:
+classmethod:
 forRubyMutualExclusion
   ^ self rubyBasicNew _initializeMutex
 

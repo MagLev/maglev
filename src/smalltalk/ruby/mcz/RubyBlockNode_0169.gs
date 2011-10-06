@@ -1,16 +1,16 @@
 
-set class RubyBlockNode class
+set class RubyBlockNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_a: aNode
   ^ self _basicNew list: { aNode } .
 
 %
 
 
-set class RubyBlockNode class
+set class RubyBlockNode
 category: '*maglev-ast'
-method:
+classmethod:
 s_list: anArray
   ^ self _basicNew list: anArray
 
