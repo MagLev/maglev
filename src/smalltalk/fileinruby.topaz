@@ -29,8 +29,8 @@ login
 input $imageDir/auditrubyimage.gs
 errorcount
 
-iferr 1 where
-input $imageDir/shrinkdbf.topaz
+! iferr 1 where
+input $upgradeDir/shrinkdbf.topaz
 errorcount
 
 ! shut down Stone
