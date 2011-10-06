@@ -1,12 +1,12 @@
 set gemstone $STONENAME user DataCurator pass swordfish
 login
-output append <%= options[:mcz_log] %>
+output append <%= MCZ_LOG %>
 display resultcheck
 run
 | fileRepo aBase aName ver |
-aName := 'MagLev-<%= options[:mcz_version] %>.mcz'.
+aName := 'MagLev-<%= MCZ_VERSION %>.mcz'.
 fileRepo := MCDirectoryRepository new directory:
-  (FileDirectory on: '<%= options[:mcz_dir] %>').
+  (FileDirectory on: '<%= MCZ_DIR %>').
 
 ver := fileRepo loadVersionFromFileNamed: aName .
 ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
