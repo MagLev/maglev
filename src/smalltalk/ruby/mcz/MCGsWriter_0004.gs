@@ -165,12 +165,13 @@ set class MCGsWriter
 category: 'as yet unclassified'
 method:
 writeMethodPreamble: definition
-
+	| isMeta |
+	isMeta := definition fullClassName ~= definition className.
 	(self class: definition className)
 		cr;
-		nextPutAll: 'set class ', definition fullClassName; cr;
+		nextPutAll: 'set class ', definition className; cr;
 		nextPutAll: 'category: '; nextPutAll: definition category asString printString; cr;
-		nextPutAll: 'method:'; cr.
+		nextPutAll: (isMeta ifFalse: ['method:'] ifTrue: ['classmethod:']); cr.
 
 %
 
@@ -182,7 +183,7 @@ writeMethodSource: definition
 	| file |
 	file := (self class: definition className).
 	definition source linesDo: [:line | file nextPutAll: line; cr].
-	file cr; nextPutAll: '%'; cr; cr.
+	file nextPutAll: '%'; cr; cr.
 
 %
 
