@@ -11,10 +11,14 @@ begin
   end
   require 'bundler/cli'
   Bundler::CLI.start
-rescue Bundler::BundlerError => e
-  Bundler.ui.error e.message
-  Bundler.ui.debug e.backtrace.join("\n")
-  exit e.status_code
+rescue Exception => e
+  if Bundler::BundlerError === e
+    Bundler.ui.error e.message
+    Bundler.ui.debug e.backtrace.join("\n")
+    exit e.status_code
+  else
+    raise
+  end
 rescue Interrupt => e
   Bundler.ui.error "\nQuitting..."
   Bundler.ui.debug e.backtrace.join("\n")
