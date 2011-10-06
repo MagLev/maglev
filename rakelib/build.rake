@@ -44,6 +44,7 @@ namespace :build do
     if $success && File.exist?(NEW_EXTENT)
       log "maglev", "Copying new extent to #{RUBY_EXTENT}"
       cp NEW_EXTENT, RUBY_EXTENT
+      chmod 0444, RUBY_EXTENT
     else
       log "maglev", "Build failed see #{BUILD_LOG}"
     end
@@ -65,6 +66,7 @@ namespace :build do
   end
 
   task :logger do
+    rm_f BUILD_LOG
     $logger        = Logger.new(BUILD_LOG)
     $logger.level  = Logger::DEBUG
     log "logger", "Logging to: #{BUILD_LOG}"
@@ -107,7 +109,6 @@ namespace :build do
     ENV["GEMSTONE_EXE_CONF"]      = GEM_CONF
   end
 
-  desc "Create a fresh ruby image"
   task :image => [:check_dev_env, :temp_dir, :setup_env] do
     log("build:image", "Begin task")
 
