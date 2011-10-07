@@ -1,0 +1,79 @@
+= How to Build MagLev
+
+These are notes on how to build the MagLev image from scratch.
+
+== Quick Start
+
+The build assumes the following file-system layout:
+
+  $MAGLEV_HOME            # checkout from github
+  $MAGLEV_HOME/gemstone   # the VM (from install.sh / upgrade.sh)
+
+The only environment variable you should set is MAGLEV_HOME (GEMSTONE
+etc. will be calculated from $MAGLEV_HOME)
+
+=== Step 1: Checkout github
+
+Checkout this github repository:
+
+  $ git clone git://github.com/MagLev/maglev.git
+  $ export MAGLEV_HOME=$PWD/maglev
+
+=== Step 2: Install VM
+
+  $ cd $MAGLEV_HOME
+  $ ./install.sh xxxxx
+
+=== Step 3: Build MagLev image
+
+  $ rake build:image
+
+== How it all fits together
+
+MagLev is layered on top of the GemStone/S Smalltalk Virtual Machine.  To
+build MagLev, we start with s pure Smalltalk system, and then add layers of
+Ruby features on top of it.  To do this, we use the Smalltalk tools and
+methods to introduce the core ruby extensions needed, and then run the pure
+Ruby definitions after that.
+
+=== VM versus image
+
+The Smalltalk VM is just a C++ program that runs and manages an object
+memory.  The VM has an Object Manager that knows how to create and delete
+objects in memory.
+
+The objects live in a large chunk of memory known as "object memory".  When
+the VM starts up, it allocates space for object memory, and then starts
+loading objects from the stone and putting them into the object memory and
+activating them.  The base persistent objects (Object, Class, Array, Hash,
+etc.) all live in the Stone, and the Object Manager brings them into life
+at VM startup.  To add the base ruby objects and classes, we start a stone
+to serve the base smalltalk image (extent0.dbf), and then run a VM that
+reads files from src/smalltalk/ruby into the system, and then commits
+(saves) those new objects to the image.  We rename the image to
+extent0.ruby.dbf, and use this new image as the base for all Ruby stones.
+
+TODO: Describe mcz directory
+
+The scripts that load the ruby objects into the image are a combination of
+rakefiles (rakelib/build.rake) and topaz scripts.  Topaz is a C program
+that runs a GemStone VM, and provides a command line interface to that VM;
+see
+http://community.gemstone.com/download/attachments/6816350/GS64-Topaz-3.0.pdf?version=1
+.
+
+== Misc
+
+The following notes are just reminders for VMware MagLev engineers on how
+we moved source out of the internal SVN branch and over to github.
+
+The SVN branch is
+ https://svn.gemstone.com/repos/smalltalk/server/64bit/branches/gss64_maglev_branch
+
+From that branch, we did:
+1. mv gss64_maglev_branch/image/smalltalk/ruby $MAGLEV_HOME/src/smalltalk
+2. removed the .mcz
+3. Added $MAGLEV_HOME/src/smalltalk/mcz with the contents of the mcz
+4. Added some MagLev specific methods to Monticello to manage writing the
+   .mcz contents to files in src/smalltalk/ruby/mcz
+
