@@ -1,4 +1,4 @@
-# This works around issue #39
+# This works around issue #36
 #
 # We evaluate rescue clauses too early. In Rails,
 # specifically activesupport/lib/active_support/values/time_zone.rb,
