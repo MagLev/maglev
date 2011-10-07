@@ -50,7 +50,7 @@ module Gem
         puts "[INFO] The MagLev team publishes customized versions of some gems."
         puts "       These fix issues with the original versions or include optimizations"
         puts "       specific to MagLev. To allow MagLev to pick the originals anyway,"
-        puts "       unset the MAGLEV_GEMS_ALLOW_ALL environment variable."
+        puts "       set the MAGLEV_GEMS_ALLOW_ALL environment variable to true"
         @@maglev_gems_allow_all = false
       else
         puts "[INFO] Allowing MagLev to pick original gems over MagLev specific versions ..."
