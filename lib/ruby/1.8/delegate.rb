@@ -255,6 +255,7 @@ SimpleDelegater = SimpleDelegator
 #     end
 #   end
 #
+module Kernel
 def DelegateClass(superclass)
   klass = Class.new
   methods = superclass.public_instance_methods(true)
@@ -308,6 +309,7 @@ def DelegateClass(superclass)
     end
   end
   return klass
+end
 end
 
 # :enddoc:
