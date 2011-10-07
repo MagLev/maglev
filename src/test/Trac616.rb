@@ -28,3 +28,28 @@ true
 # raise "Expected \"[\"foo\"]\" but got #{json.inspect}" unless json == "[\"foo\"]"
 
 
+#################### Trac Info
+# ID:         616
+# Summary:    JSON can't deal with symbols in maglev ;   TrueClass,FalseClass  problems
+# Changetime: 2009-09-30 16:14:53+00:00
+###
+
+#  {{{
+#  require 'rubygems'
+#  require 'iconv'
+#  require 'json'
+#  
+#  json = [:foo].to_json
+#  raise "Expected \"[\"foo\"]\" but got #{json.inspect}" unless json == "[\"foo\"]"
+#  
+#  }}}
+#  
+#  The error:
+#  
+#  
+#  {{{
+#  error , Illegal creation of a Symbol,
+#            during /Users/pmclain/GemStone/dev/pbm.rb
+#  
+#  }}}
+#  

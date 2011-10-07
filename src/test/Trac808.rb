@@ -32,3 +32,34 @@ rescue LoadError => e
   puts "------- SKIPPED #{$0}  #{e}"
   false
 end
+#################### Trac Info
+# ID:         808
+# Summary:    Installing tilt gem causes errors
+# Changetime: 2010-11-01 19:36:33+00:00
+###
+
+#  If I install the tilt gem, sinatra 1.0 examples fail with a  "LocalJumpError - no block was passed"
+#  
+#  Note: "WARN  TCPServer Error: SocketError_unknown getHostAddressByName failed" is expected on my Mac.
+#  It doesn't cause problems running the examples.
+#  Tilt seems to be the cause of the localjump error -- if i "maglev-gem uninstall tilt", the error goes away.
+#  
+#  {{{
+#  maglev-gem install sinatra tilt
+#  cd $MAGLEV_HOME/examples/sinatra/simple_blog/
+#  rake blog
+#  (in /Users/monty/MagLev/MagLev-24518.Darwin-i386/examples/sinatra/simple_blog)
+#   maglev-ruby -Ilib lib/commit_code.rb  
+#  == blog.rb is already committed....skipping
+#   $MAGLEV_HOME/bin/rackup config.ru 
+#  ----- MAIN OBJECT: 
+#  [2010-10-21 08:22:34] INFO  WEBrick 1.3.1
+#  [2010-10-21 08:22:34] INFO  ruby 1.8.7 (2010-10-20) [x86_64-darwin]
+#  [2010-10-21 08:22:34] WARN  TCPServer Error: SocketError_unknown getHostAddressByName failed
+#  [2010-10-21 08:22:34] WARN  TCPServer Error: SocketError_unknown getHostAddressByName failed
+#  [2010-10-21 08:22:34] INFO  WEBrick::HTTPServer#start: pid=20755 port=4444
+#  127.0.0.1 - - [21/Oct/2010 08:22:39] "GET / HTTP/1.1" 302 - 0.0119
+#  LocalJumpError - no block was passed:
+#  
+#  }}}
+#  

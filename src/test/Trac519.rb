@@ -157,3 +157,20 @@ end
 raise "Fail with send A" unless  d3.send(:many_args) == 44
 raise "Fail with send A" unless  d3.send(:many_args, 55, 66) == 44
 
+#################### Trac Info
+# ID:         519
+# Summary:    Date.new unimplemented
+# Changetime: 2009-08-08 17:22:09+00:00
+###
+
+#  Playing around with dates as they are reportedly very slow in MRI, I discovered:
+#  
+#  {{{
+#  require 'date'
+#  puts "#{Date.new(2009,12,25) - Date.today} days until Christmas, 2009"
+#  NoMethodError: Undefined method `new' for Date  
+#  	from /congo1/users/monty/MagLev/MagLev-21605.Linux/bin/maglev-irb:24: in 'Object >> _compileFile'
+#  }}}
+#  
+#  I'll create and checkin a test file for this ticket
+#  

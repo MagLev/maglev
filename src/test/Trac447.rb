@@ -29,3 +29,16 @@ test(unzipped, original, 'Test 1')
 
 report
 
+#################### Trac Info
+# ID:         447
+# Summary:    gzip rbs test gets "No method was found for the selector #'stringOfSize:at:'"
+# Changetime: 2009-04-20 21:08:03+00:00
+###
+
+#  Test files attached
+#  
+#  {{{
+#  $ maglev-ruby -d gzip.rb 
+#  ERROR 2010, No method was found for the selector #'stringOfSize:at:' when sent to '^_.^H^X
+#  }}}
+#  

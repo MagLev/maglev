@@ -33,3 +33,29 @@ while true
       prev_thread = thread
    end
 end
+#################### Trac Info
+# ID:         533
+# Summary:    maglev-ruby infinite loop in thread test
+# Changetime: 2009-06-08 16:49:17+00:00
+###
+
+#  Maglev loops on this simple thread test from http://tinyurl.com/qyl3rq. I'll create a test file and check it in.
+#  
+#  Maglev outputs this:
+#  {{{
+#  $ maglev-ruby thread_ring.rb 400
+#  [...]
+#  [...]
+#  [...]
+#  [...]
+#  [...]
+#  [...]
+#  [...]
+#  }}}
+#  
+#  Should output this:
+#  {{{
+#  $ ruby thread_ring.rb 400
+#  401
+#  }}}
+#  

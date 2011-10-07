@@ -20,3 +20,14 @@ else
 end
 true
 
+#################### Trac Info
+# ID:         803
+# Summary:    Examples are broken when running Rake in MagLev
+# Changetime: 2010-10-22 17:55:30+00:00
+###
+
+#  rake -T works, rake test usually works, but many other rake tasks in the examples either hang or get #<SystemExit: SystemExit Error,  9>
+#  when run with rake installed in MagLev.
+#  
+#  You can see this by running rake in examples/sinatra/simple_blog,
+#  examples/rack, examples/persistence/kdtree and likely others.

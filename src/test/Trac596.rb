@@ -40,3 +40,28 @@ private_methods_on_object_from_kernel.each do |m|
 end
 
 raise "FAILED: should not be public: #{failures.join("\n")}" unless failures.empty?
+#################### Trac Info
+# ID:         596
+# Summary:    Kernel module functions should be private instance methods on Object, not public
+# Changetime: 2011-09-15 20:29:17+00:00
+###
+
+#  This bug found in MiniTest
+#  
+#  The methods documented in the Pick-Axe under Kernel (i.e., everything defined in Kernel.rb) are supposed to be module methods: You can call them in functional form (w/o a receiver) and they become private methods for classes that mix-in the module (i.e., they should be *private* instance methods on Object).  There are some methods documented under Kernel that are *also* documented under Object as instance methods, and these should be public on Object.
+#  
+#  It appears that all of the methods in Kernel.rb are showing up as public instance methods on Object.  This messes up reflective processing.
+#  
+#  The MiniTest framework has the following code:
+#  
+#  {{{
+#   methods = public_instance_methods(true).grep(/^test/).map { |m|
+#            m.to_s
+#          }.sort
+#  }}}
+#  
+#  This is intended to pick up all methods that begin with "test" so that the framework can run through them and invoke them all as test cases.   Kernel#test (which should be a module method), is found as a public instance method on Object, and becomes one of methods found by the code above.
+#  
+#  To reproduce: run the associated TracXXX file.
+#  
+#  

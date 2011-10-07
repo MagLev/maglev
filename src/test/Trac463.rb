@@ -259,3 +259,73 @@ end
 
 puts "OK"
 true
+#################### Trac Info
+# ID:         463
+# Summary:    "next" and "rescue" do not play well together (core dump)
+# Changetime: 2009-09-21 20:57:39+00:00
+###
+
+#  If you try to skip to the next iteration of a loop with {{{next}}} from inside a {{{begin}}}/{{{rescue}}}/{{{end}}} construct, things do not go well.  For example:
+#  
+#  {{{
+#  $q = ['boo']
+#  
+#  while not $q.empty?
+#      begin
+#          next if $q.shift
+#        rescue ZeroDivisionError => err
+#          p "This never happens"
+#        end
+#     end
+#  }}}
+#  
+#  {{{
+#  (markus@glass) ~/maglev/MagLev-21530.Linux/irb2> maglev-ruby next_bug.rb
+#  ERROR 2079, GemStone Smalltalk execution could not return from the current Activation. 'hit reenter marker in Bc_RUBY_NEXT' Home 
+#  context of block to return from may no longer be active.GemStone Smalltalk execution could not return from the current Activation.
+#  'hit reenter marker in Bc_RUBY_NEXT' Home context of block to return from may no longer be active.
+#  }}}
+#  
+#  If the example is simplified further (to an infinite loop as opposed to one that exits after the first iteration) the failure is even more dramatic:
+#  
+#  {{{
+#  while true
+#      begin
+#          next
+#        rescue ZeroDivisionError => err
+#          p "This never happens"
+#        end
+#     end
+#  }}}
+#  
+#  
+#  {{{
+#  Gemstone Signal Handler: Signal 11,  SIGSEGV Received
+#  HostFaultHandler: signal = 11
+#      info->si_signo = 11 = 0xb
+#      info->si_code =  128 = 0x80
+#      info->si_errno = 0 = 0x0
+#      info->si_addr = (nil)
+#    Registers saved from frame receiving the signal:
+#     rip 0x7f1bcdd2430f rsp 0x7fffd744edf0 rbp 0x7f1bce064f50
+#     rax 0x7f1bb06ca348 rbx 0x20 rcx 0x3c1a0000011c82 rdx 0x7f1bc22b2ff8
+#     r8 0x7f1bafedcc28 r9 0x14 r10 0x7f1bc2288a78 r11 0x246
+#     r12 0x7f1bce064f50 r13 0x1 r14 0x7f1bc22b30b8 r15 0x7f1bafedcc58
+#     rdi 0x7f1bce064f50 rsi 0x7f1bce065ad8 efl 0x10206 csgsfs_pad 0xe033
+#     err 0x0 trapno 0xd oldmask 0x0 cr2 0x0
+#  
+#  Begin attempt to print C-level stack at: Sun Apr 19 00:45:36 UTC 2009
+#  
+#  
+#  End of C-level stack:
+#  
+#  
+#  
+#   _____________________________________________________________________________
+#  | Possible Internal Error: HostCoreDump invoked at 04/19/09 00:45:36.729 UTC
+#   in process 13636
+#  
+#   __________________________________
+#  HostCoredump: Waiting 60 seconds for C Debugger to attach, process 13636
+#  }}}
+#  
