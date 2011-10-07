@@ -26,7 +26,12 @@ end
 
 ###########################################################################################
 # From here on in, it's all patching around in Rubygems to get both the maglev-gem command
-# and bundler to consider -maglev- patched gems before anything else
+# and bundler to consider -maglev- patched gems before anything else.
+#
+# Note: Right now we consider all gems ending in "-maglev-" to be preferrable over their
+#   original versions - this means any user can publish gems that any MagLev install will
+#   prefer. This is a security risk. If it _does_ become a problem, we will have to add
+#   logic to check whether the gem was signed by the MagLev team.
 ###########################################################################################
 
 # Remove our -maglev- gemspecs if they exist, otherwise Rubygems will
