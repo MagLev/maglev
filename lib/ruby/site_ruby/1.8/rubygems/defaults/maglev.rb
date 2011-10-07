@@ -24,7 +24,20 @@ module Gem
   ConfigFile::PLATFORM_DEFAULTS['update']  = '--env-shebang'
 end
 
-# The postfix we are look for to install patched gems released by the MagLev team
+###########################################################################################
+# From here on in, it's all patching around in Rubygems to get both the maglev-gem command
+# and bundler to consider -maglev- patched gems before anything else
+###########################################################################################
+
+# Remove our -maglev- gemspecs if they exist, otherwise Rubygems will
+# keep thinking the Gem is still installed.
+Gem.post_uninstall do |uninstaller|
+  s = uninstaller.spec
+  f = s.spec_file.sub(s.name, "#{s.name}#{Gem::MAGLEV_POSTFIX}")
+  File.unlink f if File.exist? f
+end
+
+# The postfix we look for to install patched gems released by the MagLev team
 Gem::MAGLEV_POSTFIX = "-maglev-"
 maglev_platform = "maglev"
 def maglev_platform.=~(other)
@@ -84,7 +97,7 @@ class Gem::Format
         begin
           maglev_path = path.sub(/(\/.*)-([^-]+)\.gem/,
                                  '\1' + Gem::MAGLEV_POSTFIX + '-\2.gem')
-          puts "[NOTE] Was asked to install #{path}, but using #{maglev_path} instead"
+          puts "[NOTE] Was asked to install #{File.basename(path)}, but using #{File.basename(maglev_path)} instead"
           original_from_file_by_path(maglev_path, security_policy)
         rescue Gem::Exception
           raise e
