@@ -38,7 +38,10 @@ Gem.post_uninstall do |uninstaller|
 end
 
 unless ENV["MAGLEV_GEMS_ALLOW_ALL"]
-  puts "[INFO] The MagLev team publishes customized versions of some gems. These fix issues with the original versions or include optimizations specific to MagLev. To allow MagLev to pick the originals anyway, specify the MAGLEV_GEMS_ALLOW_ALL environment variable."
+  puts "[INFO] The MagLev team publishes customized versions of some gems."
+  puts "       These fix issues with the original versions or include optimizations"
+  puts "       specific to MagLev. To allow MagLev to pick the originals anyway,"
+  puts "       specify the MAGLEV_GEMS_ALLOW_ALL environment variable."
   Gem::MAGLEV_GEMS_ALLOW_ALL = false
 else
   puts "[INFO] Allowing MagLev to pick original gems over MagLev specific versions ..."
@@ -113,7 +116,7 @@ class Gem::Format
         begin
           maglev_path = path.sub(/(\/.*)-([^-]+)\.gem/,
                                  '\1' + Gem::MAGLEV_POSTFIX + '-\2.gem')
-          puts "[NOTE] Was asked to install #{File.basename(path)}, but using #{File.basename(maglev_path)} instead"
+          puts "[NOTE] Found MagLev optimized version for #{File.basename(path)}."
           original_from_file_by_path(maglev_path, security_policy)
         rescue Gem::Exception
           raise e
