@@ -85,14 +85,21 @@ class Gem::SpecFetcher
       gems.map! do |g|
         if g.first.end_with?(Gem::MAGLEV_POSTFIX)
           custom_gems << (n = g[0][0...-Gem::MAGLEV_POSTFIX.size])
+          custom_gems << g[1]
           [n, g[1], "maglev"]
         else
           g
         end
       end
 
-      unless Gem.maglev_gems_allow_all?
-        gems.reject! do |g|
+      if Gem.maglev_gems_allow_all?
+        gems.reject! do |g| # If we allow original versions, we still reject same-version gems
+          custom_gems.include?(g.first) && # Check whether a gem of the same name ...
+            custom_gems.include?(g[1]) &&  # ... or version is in the custom_gems
+            g.last != "maglev"
+        end
+      else
+        gems.reject! do |g| # If we don't allow original versions at all, reject them
           custom_gems.include?(g.first) && g.last != "maglev"
         end
       end
