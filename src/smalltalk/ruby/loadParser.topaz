@@ -1,0 +1,21 @@
+!
+! $Id$
+!
+run
+  "load the btb_Java  .mcz "
+| repo aName ver |
+repo := MCDirectoryRepository new directory:
+  (FileDirectory on:  
+     (System gemEnvironmentVariable: 'imageDir') , '/ruby' )  .
+aName := 'btb-Java-avi.191.mcz' .
+ver := repo loadVersionFromFileNamed: aName .
+ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
+GsFile gciLogServer: ver printString .
+ver load .
+ver workingCopy repositoryGroup addRepository: repo .
+GsFile gciLogServer: 'load done' .
+^ true
+%
+commit
+
+!  eventually load the maglev AST .mcz here 

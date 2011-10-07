@@ -2,6 +2,12 @@
 
   For more details see: http://bit.ly/d3C6S1
 
+== Changes for 27001 2011-10-07
+* Moved .mcz from internal to github
+* Moved Smalltalk source code from internal to github
+* Added a build.rake file to create extent0.ruby.dbf from the virgin extent0.dbf
+  in $GEMSTONE/bin
+
 == Changes for 26994 2011-10-06
 * Update to rubygems 1.8.11
 * Update to bundler 1.0.21

@@ -1,0 +1,50 @@
+!=========================================================================
+! Copyright (C) VMware, Inc. 1986-2011.  All Rights Reserved.
+!
+! $Id: fileinruby.topaz 25988 2011-06-14 17:55:54Z stever $
+!
+! Name - fileinruby.topaz
+!
+! Description -  Script to filein image changes to support Ruby
+!
+!========================================================================
+
+! caller does "output push" of a log file, to make debugging easier
+
+level 0
+display oops
+display resultcheck
+errorcount
+
+!  baseruby.gs does login/logout/commits
+iferr 1 exit 2
+input $imageDir/baseruby.gs
+errorcount
+
+! now cluster and audit, and shrink
+set user SystemUser pass swordfish
+login
+! input $upgradeDir/clusterimage.gs  ! skip for now, do not checkin
+
+input $imageDir/auditrubyimage.gs
+errorcount
+
+! iferr 1 where
+input $upgradeDir/shrinkdbf.topaz
+errorcount
+
+! shut down Stone
+!   retry login in case a previous login failed
+! The following system shutdown is handled by the Rake task.
+! I've left these commands to document old way
+!
+! iferror
+! expecterror @231169 2147
+! login
+! time
+! expecterror @231169 4057
+! expecterror @231169 4009
+! run
+! System shutDown
+! %
+exit 0

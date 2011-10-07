@@ -1,0 +1,23 @@
+set gemstone $STONENAME user DataCurator pass swordfish
+login
+output append <%= MCZ_LOG %>
+display resultcheck
+run
+| fileRepo aBase aName ver |
+aName := 'MagLev-<%= MCZ_VERSION %>.mcz'.
+fileRepo := MCDirectoryRepository new directory:
+  (FileDirectory on: '<%= MCZ_DIR %>').
+
+ver := fileRepo loadVersionFromFileNamed: aName .
+ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
+GsFile gciLogServer: ver printString .
+ver load .
+ver workingCopy repositoryGroup addRepository: fileRepo .
+GsFile gciLogServer: 'load done'.
+^ true
+%
+commit
+errorCount
+logout
+output pop
+exit
