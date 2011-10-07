@@ -37,15 +37,23 @@ Gem.post_uninstall do |uninstaller|
   File.unlink f if File.exist? f
 end
 
-unless ENV["MAGLEV_GEMS_ALLOW_ALL"]
-  puts "[INFO] The MagLev team publishes customized versions of some gems."
-  puts "       These fix issues with the original versions or include optimizations"
-  puts "       specific to MagLev. To allow MagLev to pick the originals anyway,"
-  puts "       specify the MAGLEV_GEMS_ALLOW_ALL environment variable."
-  Gem::MAGLEV_GEMS_ALLOW_ALL = false
-else
-  puts "[INFO] Allowing MagLev to pick original gems over MagLev specific versions ..."
-  Gem::MAGLEV_GEMS_ALLOW_ALL = true
+# Allow MagLev to consider original gem versions
+module Gem
+  def self.maglev_gems_allow_all?
+    unless defined? @@maglev_gems_allow_all
+      unless ENV["MAGLEV_GEMS_ALLOW_ALL"]
+        puts "[INFO] The MagLev team publishes customized versions of some gems."
+        puts "       These fix issues with the original versions or include optimizations"
+        puts "       specific to MagLev. To allow MagLev to pick the originals anyway,"
+        puts "       specify the MAGLEV_GEMS_ALLOW_ALL environment variable."
+        @@maglev_gems_allow_all = false
+      else
+        puts "[INFO] Allowing MagLev to pick original gems over MagLev specific versions ..."
+        @@maglev_gems_allow_all = true
+      end
+    end
+    @@maglev_gems_allow_all
+  end
 end
 
 # The postfix we look for to install patched gems released by the MagLev team
@@ -83,7 +91,7 @@ class Gem::SpecFetcher
         end
       end
 
-      unless Gem::MAGLEV_GEMS_ALLOW_ALL
+      unless Gem.maglev_gems_allow_all?
         gems.reject! do |g|
           custom_gems.include?(g.first) && g.last != "maglev"
         end
