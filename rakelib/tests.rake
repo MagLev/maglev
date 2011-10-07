@@ -27,12 +27,41 @@ namespace :tests do
   # NOTE: we used to do a clean of all the gems here, but there were too
   # many interactions with jenkins.  We now assume the calling environment
   # manages how clean our gemdir is.
-  task :fav_gems_install do
+  task :fav_gems_install => [:shadow_gems_install] do
     puts "== :fav_gems_install: Assuming gems are already clean..."
     cd(File.join(TESTS_DIR, 'favorite_gems')) do
       rm_f 'Gemfile.lock'
       sh "#{MAGLEV_HOME}/bin/bundle install"
     end
+  end
+
+  # This tests our custom gem-finding logic. See rubygems/lib/default/maglev.rb
+  # This test will break if at any point in the future a bcrypt-ruby-maglev- version 3.0.0
+  # is added to rubygems, or either bcrypt-ruby-maglev- or bcrypt-ruby 3.0.1 are yanked.
+  task :shadow_gems_install do
+    sh "#{MAGLEV_HOME}/bin/maglev-gem install bcrypt-ruby -v'=3.0.1' --no-ri --no-rdoc"
+    # Last call fail with a compiler error if our rubygems logic doesn't work
+    sh "#{MAGLEV_HOME}/bin/maglev-gem uninstall bcrypt-ruby"
+    # Should have uninstalled the gem properly, this is tested with the next line
+    unless %x[#{MAGLEV_HOME}/bin/maglev-gem list bcrypt-ruby].strip.empty?
+     raise "Failed to uninstall bcrypt-ruby-maglev- when requesting uninstall of bcrypt-ruby"
+    end
+
+    # Now we request a version which we have no -maglev- gem for, but we should
+    # shadow the original gem completely if MAGLEV_GEMS_ALLOW_ALL is set to false
+    msg = %x[MAGLEV_GEMS_ALLOW_ALL=false #{MAGLEV_HOME}/bin/maglev-gem install bcrypt-ruby -v '=3.0.0' --no-ri --no-rdoc]
+    unless msg.include? "Could not find a valid gem 'bcrypt-ruby' (= 3.0.0)"
+      raise "Failed to shadow original gem with MAGLEV_GEMS_ALLOW_ALL set to false"
+    end
+
+    # Now we request a version which we have a -maglev- gem for, and even
+    # with MAGLEV_GEMS_ALLOW_ALL set to true, this should shadow the original same version
+    msg = %x[MAGLEV_GEMS_ALLOW_ALL=true #{MAGLEV_HOME}/bin/maglev-gem install bcrypt-ruby -v '=3.0.1' --no-ri --no-rdoc]
+    unless msg.include? "Successfully installed bcrypt-ruby-3.0.1"
+      raise "Failed to shadow an original gem version with MAGLEV_GEMS_ALLOW_ALL set to true"
+    end
+
+    sh "#{MAGLEV_HOME}/bin/maglev-gem uninstall bcrypt-ruby"
   end
 
   desc "Run the sinatra gem tests under MagLev"
