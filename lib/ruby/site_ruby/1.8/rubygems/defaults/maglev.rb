@@ -27,6 +27,13 @@ end
 # The postfix we are look for to install patched gems released by the MagLev team
 Gem::MAGLEV_POSTFIX = "-maglev-"
 maglev_platform = "maglev"
+def maglev_platform.=~(other)
+  if other._isRegexp
+    "maglev" =~ other
+  else
+    "maglev" =~ /#{other}/
+  end
+end
 def maglev_platform.os; "maglev"; end
 def maglev_platform.cpu; "maglev"; end
 def maglev_platform.version; "maglev"; end
@@ -75,10 +82,10 @@ class Gem::Format
         original_from_file_by_path(path, security_policy)
       rescue Gem::Exception => e
         begin
-          path = path.sub(/(\/.*)-([^-]+)\.gem/,
-                          '\1' + Gem::MAGLEV_POSTFIX + '-\2.gem')
-          p "trying #{path} instead"
-          original_from_file_by_path(path, security_policy)
+          maglev_path = path.sub(/(\/.*)-([^-]+)\.gem/,
+                                 '\1' + Gem::MAGLEV_POSTFIX + '-\2.gem')
+          puts "[NOTE] Was asked to install #{path}, but using #{maglev_path} instead"
+          original_from_file_by_path(maglev_path, security_policy)
         rescue Gem::Exception
           raise e
         end
@@ -138,6 +145,7 @@ class Gem::Specification
   # Gem::Installer will read the spec metadata from the .gem file, and
   # there is no hook into that.
   def gem_dir
+    @gem_dir = nil
     check_name
     original_gem_dir
   end
