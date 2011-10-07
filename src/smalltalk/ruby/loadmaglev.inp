@@ -1,0 +1,31 @@
+display pauseonerror
+login
+time
+input $s30ir/patchBase.gs
+commit
+
+run
+| ver rg aName fileRepo dirPath | 
+"httpRepo := MCHttpRepository location:'http://seaside.gemstone.com/ss/megaVL'
+                                user: 'ao' password:'xxxx'. "
+dirPath := '/export/iceland1/users/otisa/Svn/st64_30/svn/image/ruby'.
+fileRepo := MCServerDirectoryRepository new directory:
+  			(ServerFileDirectory on: dirPath ).
+
+aName := GsPackageLibrary lastFileNameOf: 'MagLev' inPath: dirPath .
+
+ver :=  fileRepo loadVersionFromFileNamed: aName .
+ver class == MCVersion ifFalse:[ aName error:'not found in repos' ].
+GsFile gciLogServer: ver printString .
+ver load .
+ver workingCopy repositoryGroup addRepository: fileRepo .
+GsFile gciLogServer: 'load done' .
+System commitTransaction ifFalse:[ nil error:'commit fail'].
+true
+%
+
+! input $s30ir/patch123N.gs
+! input $s30ir/patchEnsure.gs
+commit
+errorcount
+

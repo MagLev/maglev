@@ -2,7 +2,22 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26963` 2011-10-04
+== Changes for 27001 2011-10-07
+* Moved .mcz from internal to github
+* Moved Smalltalk source code from internal to github
+* Added a build.rake file to create extent0.ruby.dbf from the virgin extent0.dbf
+  in $GEMSTONE/bin
+
+== Changes for 26994 2011-10-06
+* Update to rubygems 1.8.11
+* Update to bundler 1.0.21
+* add (wrapped in MAGLEV_LINT) things we didn't define that prevented
+  therubyracer from compiling
+* link c ext documentation into docs dir
+* A few bugfixes/enhancements in underlying GemStone 3.1 system
+  - Fix 41698, 41741, 41842
+
+== Changes for 26963 2011-10-04
 * Fix 939, 942, 943, 944, 946, 947, 948, 949, 950, 951, 952
   812, 816, 847, 868, 910, 943
 * Fixed missing method in openssl for Rails 3.1.0 (sprockets).
