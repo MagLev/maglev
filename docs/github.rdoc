@@ -1,0 +1,68 @@
+= GitHub Process
+
+Here's how the MagLev team uses GitHub.  Even though we are a
+released-based project, we still took inspiration from the
+{GitHub team's process}[http://scottchacon.com/2011/08/31/github-flow.html].
+
+== Questions / Issues
+
+1. Should we have a naming scheme for branches, e.g., timfel/silly-feature,
+   pbm/good-feature ?
+2. Seems that fixes for specific release follow the same process, except
+   the topic branch is off of the release branch.  Correct?
+
+== Overview
+
+* The master branch holds mainline development.  It should always be in a
+  runnable state.  Only merge into master from topic branches (although you
+  can use your good judgment and check in small stuff directly to master).
+* Do most work on topic branches; then do a pull request to merge into
+  master.  Using pull requests allows others on the team a chance to look
+  at the changes, or simply be informed of the change.
+* Other core members should review and comment on the pull request.  Once
+  there is general agreement, the originator of the pull request can
+  finalize and close the request (merge into master).
+* When you start a new feature, create a topic branch and push to GitHub
+  (enables backup, collaboration and visibility of what's going on).
+* Releases are on a release branch (1.0, 1.1, 2.0 etc.); cherry-pick from
+  master to release.
+* If your commit fixes an issue on the GitHub issue tracker, then include
+  "fixes #nnn" in the commit message.  This will allow GitHub to correlate
+  the commit with the issue.
+
+== Basic GitHub Work-flow for Core Team
+
+1. git checkout -b my-cool-feature   # create a branch locally
+2. <write code and tests>
+3. git add <files>
+4. git commit
+5. git push -u origin my-cool-feature # create on origin; track locally
+
+Now you continue to work on your cool feature branch, and push to GitHub.
+The branch will be visible in the GitHub branches page
+https://github.com/MagLev/maglev/branches
+so people will know you are working on the feature.
+
+When you think the feature is ready, issue a pull request from GitHub:
+
+1. go to https://github.com/MagLev/maglev
+2. select your branch from the "switch branches" list
+3. Click on the "Pull Request" button and fill out the paperwork.
+
+This is the signal that your code is ready for review.  The core team can
+then comment, approve and originator can close the request.
+
+After the feature is merged into master, you can delete the topic branch:
+
+1. git branch -d my-cool-feature      # delete local branch
+2: git push origin :my-cool-feature   # delete off github
+
+== GitHub work-flow for non Core Team
+
+Standard stuff...
+
+1. Fork MagLev
+2. Create a topic branch
+3. Work
+4. When ready, create pull request
+5. Core team will review and act appropriately.
