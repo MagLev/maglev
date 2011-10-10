@@ -1,5 +1,5 @@
 # Ensure a proper GEMSTONE/Maglev environment
-MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("..", "..", File.dirname(__FILE__))
+MAGLEV_HOME = ENV['MAGLEV_HOME'] ||= File.expand_path("../..", __FILE__)
 STONENAME   = ENV['STONENAME']   ||= "maglev"
 GEMSTONE    = ENV['GEMSTONE']    || "#{MAGLEV_HOME}/gemstone"
 
