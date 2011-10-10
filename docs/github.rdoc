@@ -32,9 +32,6 @@ released-based project, we still took inspiration from the
 
 == Basic GitHub Work-flow for Core Team
 
-
-== Basic GitHub Work-flow for Core Team
-
 1. git checkout -b my-cool-feature   # create a branch locally
 2. <write code and tests>
 3. git add <files>
@@ -54,6 +51,11 @@ When you think the feature is ready, issue a pull request from GitHub:
 
 This is the signal that your code is ready for review.  The core team can
 then comment, approve and originator can close the request.
+
+After the feature is merged into master, you can delete the topic branch:
+
+1. git branch -d my-cool-feature      # delete local branch
+2: git push origin :my-cool-feature   # delete off github
 
 == GitHub work-flow for non Core Team
 
