@@ -20,9 +20,9 @@ rubySendersOf: aSelector in: classList
     prefix _asSymbolWithRubySuffix: m].
   senders := IdentitySet new.
   searcher := [:methDict :set :syms |
-    methDict valuesDo: [:meth |
-      (meth isKindOf: GsNMethod) ifTrue: [
-        (meth _selectorPool * syms) ifNotEmpty: [set _addIfAbsent: meth]]]].
+    methDict valuesDo: [:m |
+      ((m isKindOf: GsNMethod) and: [m isRubyBridgeMethod not]) ifTrue: [
+        (m _selectorPool * syms) ifNotEmpty: [set _addIfAbsent: m]]]].
 
   classList do: [:cls |
     { cls transientMethodDictForEnv: 1 .
