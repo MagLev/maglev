@@ -2,10 +2,51 @@
 set class ClassOrganizer
 category: '*maglev-runtime'
 method:
-rubyImplementorsOfReport: aSelector
+rubySendersOf: aSelector
       "ruby_selector_suffix dependent"
-  | sym allCls implems  clsNames result pad | 
-  allCls := self _allRubyClasses .
+  ^ self rubySendersOf: aSelector in: self _allRubyClasses .
+
+%
+
+
+set class ClassOrganizer
+category: '*maglev-runtime'
+method:
+rubySendersOf: aSelector in: classList
+      "ruby_selector_suffix dependent"
+  | senders searcher |
+  senders := IdentitySet new.
+  searcher := [:methDict :set :sym |
+    methDict valuesDo: [:meth || srcOffs |
+      srcOffs := meth _sourceOffsetOfFirstSendOf: sym.
+      srcOffs ifNotNil: [set _addIfAbsent: meth]]].
+
+  classList do: [:cls |
+    { cls transientMethodDictForEnv: 1 .
+      cls persistentMethodDictForEnv: 1 } do: [:ea |
+        ea ifNotNilDo: [:methDict |
+	  searcher value: methDict value: senders value: aSelector]]].
+  ^ senders asArray
+
+%
+
+
+set class ClassOrganizer
+category: '*maglev-runtime'
+method:
+rubyImplementorsOf: aSelector
+      "ruby_selector_suffix dependent"
+  ^ self rubyImplementorsOf: aSelector in: self _allRubyClasses .
+
+%
+
+
+set class ClassOrganizer
+category: '*maglev-runtime'
+method:
+rubyImplementorsOf: aSelector in: allCls
+      "ruby_selector_suffix dependent"
+  | sym implems | 
   sym := aSelector asSymbol prefixIfRubySelector .
   implems := { } .
   allCls do:[:aCls | | found |
@@ -15,6 +56,18 @@ rubyImplementorsOfReport: aSelector
         ]
      ]
   ].
+  ^ implems
+
+%
+
+
+set class ClassOrganizer
+category: '*maglev-runtime'
+method:
+rubyImplementorsOfReport: aSelector
+      "ruby_selector_suffix dependent"
+  | implems clsNames result pad | 
+  implems := self rubyImplementorsOf: aSelector .
   clsNames := { }.
   pad := '                                            ' .
   implems do:[:cls | | aCls str clsOop | 
