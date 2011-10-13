@@ -14,19 +14,21 @@ category: '*maglev-runtime'
 method:
 rubySendersOf: aSelector in: classList
       "ruby_selector_suffix dependent"
-  | senders searcher |
+  | senders searcher prefix bridges |
+  prefix := aSelector asSymbol prefixIfRubySelector.
+  bridges := RubyBridge suffixOptionMasks asIdentitySet collect: [:m |
+    prefix _asSymbolWithRubySuffix: m].
   senders := IdentitySet new.
-  searcher := [:methDict :set :sym |
-    methDict valuesDo: [:meth || srcOffs |
+  searcher := [:methDict :set :syms |
+    methDict valuesDo: [:meth |
       (meth isKindOf: GsNMethod) ifTrue: [
-        srcOffs := meth _sourceOffsetOfFirstSendOf: sym.
-        srcOffs ifNotNil: [set _addIfAbsent: meth]]]].
+        (meth _selectorPool * syms) ifNotEmpty: [set _addIfAbsent: meth]]]].
 
   classList do: [:cls |
     { cls transientMethodDictForEnv: 1 .
       cls persistentMethodDictForEnv: 1 } do: [:ea |
         ea ifNotNilDo: [:methDict |
-	  searcher value: methDict value: senders value: aSelector]]].
+	  searcher value: methDict value: senders value: bridges]]].
   ^ senders asArray
 
 %
