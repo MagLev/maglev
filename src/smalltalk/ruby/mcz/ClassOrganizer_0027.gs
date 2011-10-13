@@ -18,8 +18,9 @@ rubySendersOf: aSelector in: classList
   senders := IdentitySet new.
   searcher := [:methDict :set :sym |
     methDict valuesDo: [:meth || srcOffs |
-      srcOffs := meth _sourceOffsetOfFirstSendOf: sym.
-      srcOffs ifNotNil: [set _addIfAbsent: meth]]].
+      (meth isKindOf: GsNMethod) ifTrue: [
+        srcOffs := meth _sourceOffsetOfFirstSendOf: sym.
+        srcOffs ifNotNil: [set _addIfAbsent: meth]]]].
 
   classList do: [:cls |
     { cls transientMethodDictForEnv: 1 .
