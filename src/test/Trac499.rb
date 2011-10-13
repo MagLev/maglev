@@ -17,3 +17,22 @@ x4.test
 x5.test
 
 unless (ax = $g499) == [ 51, 52, 53, 54, 55 ] ; raise 'error'; end
+#################### Trac Info
+# ID:         499
+# Summary:    Instance eval not handling method defs correctly
+# Changetime: 2009-04-29 16:44:41+00:00
+###
+
+#  MBP:feature_tests lattam$ maglev-ruby instance_eval.rb
+#  test 5
+#  test 5
+#  test 5
+#  test 5
+#  test 5
+#  MBP:feature_tests lattam$ ruby instance_eval.rb
+#  test 1
+#  test 2
+#  test 3
+#  test 4
+#  
+#  

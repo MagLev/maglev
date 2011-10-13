@@ -36,3 +36,33 @@ true
 #     end
 #   end
 # end
+#################### Trac Info
+# ID:         525
+# Summary:    Compile problem in cgi.rb
+# Changetime: 2009-05-29 23:46:35+00:00
+###
+
+#  Distilled from lib/ruby/1.8/cgi.rb:
+#  
+#  Compiling this:
+#  {{{
+#  def foo
+#    if block_given?
+#      super() { yield }
+#    end
+#  end
+#  }}}
+#  
+#  Gives:
+#  
+#  {{{
+#  $ maglev-ruby src/test/TracXXX.rb
+#  -- RubyFile>>load  : loading /Users/pmclain/projects/maglev/git/src/test/TracXXX.rb
+#  error , No method was found for the selector #'irNewBlockNode' when sent to nil with arguments contained in anArray( ).,
+#            during /Users/pmclain/projects/maglev/git/src/test/TracXXX.rb
+#  ERROR 2010, No method was found for the selector #'irNewBlockNode' when sent to nil with arguments contained in anArray( ).
+#  topaz 1> 
+#  
+#  }}}
+#  
+#  

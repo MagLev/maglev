@@ -20,3 +20,10 @@ test(M.instance_methods.include?('m1'), true, 'm1')
 test(M.instance_methods.include?('m2'), true, 'm2')
 
 report
+#################### Trac Info
+# ID:         441
+# Summary:    Module#include has incorrect arguments
+# Changetime: 2009-04-20 20:46:14+00:00
+###
+
+#  The method Module#include should take a splat argument and iterate over the list of arguments, rather than just a single argumeent.

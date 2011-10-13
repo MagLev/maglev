@@ -213,9 +213,9 @@ class Gem::Specification
   ##
   # True when this gemspec has been activated. This attribute is not persisted.
 
-  attr_accessor :loaded
+  attr_accessor :loaded # :nodoc:
 
-  alias :loaded? :loaded
+  alias :loaded? :loaded # :nodoc:
 
   ##
   # True when this gemspec has been activated. This attribute is not persisted.
@@ -329,7 +329,7 @@ class Gem::Specification
 
   def self.all
     warn "NOTE: Specification.all called from #{caller.first}" unless
-      Deprecate.skip
+      Gem::Deprecate.skip
     _all
   end
 
@@ -683,6 +683,7 @@ class Gem::Specification
     spec.instance_variable_set :@platform,                  array[16].to_s
     spec.instance_variable_set :@license,                   array[17]
     spec.instance_variable_set :@loaded,                    false
+    spec.instance_variable_set :@activated,                 false
 
     spec
   end
@@ -742,7 +743,8 @@ class Gem::Specification
     add_self_to_load_path
 
     Gem.loaded_specs[self.name] = self
-    self.activated = true
+    @activated = true
+    @loaded = true
 
     return true
   end
@@ -1318,6 +1320,7 @@ class Gem::Specification
 
   def initialize name = nil, version = nil
     @loaded = false
+    @activated = false
     @loaded_from = nil
     @original_platform = nil
 
@@ -1456,7 +1459,7 @@ class Gem::Specification
     # TODO: do we need these?? Kill it
     glob = File.join(self.lib_dirs_glob, glob)
 
-    Dir[glob].map { |f| f.untaint } # FIX our tests are brokey, run w/ SAFE=1
+    Dir[glob].map { |f| f.untaint } # FIX our tests are broken, run w/ SAFE=1
   end
 
   ##
@@ -1687,11 +1690,11 @@ class Gem::Specification
 
   def ruby_code(obj)
     case obj
-    when String            then '%q{' + obj + '}'
+    when String            then obj.dump
     when Array             then '[' + obj.map { |x| ruby_code x }.join(", ") + ']'
-    when Gem::Version      then obj.to_s.inspect
-    when Date              then '%q{' + obj.strftime('%Y-%m-%d') + '}'
-    when Time              then '%q{' + obj.strftime('%Y-%m-%d') + '}'
+    when Gem::Version      then obj.to_s.dump
+    when Date              then obj.strftime('%Y-%m-%d').dump
+    when Time              then obj.strftime('%Y-%m-%d').dump
     when Numeric           then obj.inspect
     when true, false, nil  then obj.inspect
     when Gem::Platform     then "Gem::Platform.new(#{obj.to_a.inspect})"
@@ -2101,7 +2104,7 @@ class Gem::Specification
     self.platform = Gem::Platform.new @platform
   end
 
-  extend Deprecate
+  extend Gem::Deprecate
 
   deprecate :test_suite_file,     :test_file,  2011, 10
   deprecate :test_suite_file=,    :test_file=, 2011, 10
@@ -2120,3 +2123,6 @@ class Gem::Specification
   # deprecate :file_name,           :cache_file, 2011, 10
   # deprecate :full_gem_path,     :cache_file, 2011, 10
 end
+
+Gem.clear_paths
+

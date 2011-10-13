@@ -56,3 +56,23 @@ unless cx == 55 ; raise 'fail'; end
 
 
 true
+#################### Trac Info
+# ID:         907
+# Summary:    Problem assigning *args and &block properly
+# Changetime: 2011-06-06 23:23:59+00:00
+###
+
+#  In Sinatra::Delegator, there is some code generating methods for delegation (base.rb:101). Here, the define_method block takes |*args,&block| as arguments. In the test cases, often, no block is passed, and what happens is that only the first string is passed to as *args, and ''block'' is set to an Array with the remaining args.
+#  
+#  The following test code demonstrates this:
+#  {{{
+#  class Test
+#    define_method(:"test1") do |*args, &block|
+#      puts "*args: #{args.inspect}, &block: #{block.inspect}"
+#    end
+#  end
+#  
+#  Test.new.test1 1, "bar", "buzz"
+#  => *args: 1, &block: ["bar", "buzz"]
+#  }}}
+#  

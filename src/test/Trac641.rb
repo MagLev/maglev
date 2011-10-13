@@ -38,3 +38,33 @@ class C
 end
 C.new.ma
 true
+#################### Trac Info
+# ID:         641
+# Summary:    eval does not have access to local variables
+# Changetime: 2010-01-06 01:01:22+00:00
+###
+
+#  The following code prints "FOO" in MRI, but raises an exception in MagLev:
+#  
+#  
+#  {{{
+#  # This test case creates a binding with a local variable named "_hamlout",
+#  # but the eval does not have access to it.
+#  scope = Object.new.instance_eval { binding }
+#  eval('_hamlout = "FOO"', scope)
+#  puts eval("_hamlout", scope)     # => prints "FOO" in MRI
+#  }}}
+#  
+#  The error:
+#  
+#  
+#  {{{
+#  $ maglev-ruby src/test/TracXXX.rb
+#  error , NoMethodError: undefined method `_hamlout' for Object,
+#            during /Users/pmclain/GemStone/checkouts/git/src/test/TracXXX.rb
+#  ERROR 2010, NoMethodError: undefined method `_hamlout' for Object (NoMethodError)
+#  
+#  
+#  }}}
+#  
+#  

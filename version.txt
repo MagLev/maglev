@@ -1,6 +1,6 @@
-maglev 0.9 (ruby 1.8.7) (2011-09-26 rev 26900-1307-f13ab95) 
-GEMSTONE: 3.1.0 Build: 64bit-26900
-MONTICELLO: MagLev-TimFelgentreff.1307.mcz
-MAGLEV: commit f13ab9548fb82bec5e7f4f7f39deb1c4628619cd
-        Author: Monty Williams <monty.williams@gemstone.com>
-        Date:   Mon Sep 26 19:37:27 2011 -0700
+maglev 0.9 (ruby 1.8.7) (2011-10-06 rev 26994-1311-f565a95) 
+GEMSTONE: 3.1.0 Build: 64bit-26994
+MONTICELLO: MagLev-TimFelgentreff.1311.mcz
+MAGLEV: commit f565a95cb7757f835adbcd5324c5eccf7fbabc0b
+        Author: Peter McLain <pmclain@vmware.com>
+        Date:   Wed Oct 5 13:50:49 2011 -0700

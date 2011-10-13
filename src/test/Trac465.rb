@@ -72,3 +72,26 @@ yy = g { break 33 }
 unless yy == 33 ; raise 'error'; end
 puts "OK"
 true
+#################### Trac Info
+# ID:         465
+# Summary:    Breaking out of a user defined generator
+# Changetime: 2009-09-25 19:04:18+00:00
+###
+
+#  Breaking out of a user-written generator fails with the error
+#  
+#  {{{
+#  ERROR 2023, break, Error, true
+#  }}}
+#  
+#  Minimal failure case:
+#  
+#  {{{
+#  def g
+#      yield
+#      end
+#  
+#  g { break }
+#  }}}
+#  
+#  

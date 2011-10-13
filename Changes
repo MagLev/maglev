@@ -2,7 +2,22 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 26900 2011-09-26
+== Changes for 27001 2011-10-07
+* Moved .mcz from internal to github
+* Moved Smalltalk source code from internal to github
+* Added a build.rake file to create extent0.ruby.dbf from the virgin extent0.dbf
+  in $GEMSTONE/bin
+
+== Changes for 26994 2011-10-06
+* Update to rubygems 1.8.11
+* Update to bundler 1.0.21
+* add (wrapped in MAGLEV_LINT) things we didn't define that prevented
+  therubyracer from compiling
+* link c ext documentation into docs dir
+* A few bugfixes/enhancements in underlying GemStone 3.1 system
+  - Fix 41698, 41741, 41842
+
+== Changes for 26963 2011-10-04
 * Fix 939, 942, 943, 944, 946, 947, 948, 949, 950, 951, 952
   812, 816, 847, 868, 910, 943
 * Fixed missing method in openssl for Rails 3.1.0 (sprockets).
@@ -10,10 +25,12 @@
 * Fix require logic to search for dyn libs with extensions other than .so
 * Fix kdtree example so that it doesn't require as much temp obj cache
 * Update rails example for Rails 3.1.0 final
+* Stop leaving maglev-ruby files in /tmp
+* More work on supporting Ruby in WebTools.
 * Numerous bugfixes/enhancements in underlying GemStone 3.1 system
-  - Fix 41773, 41761, 41814, 41606, 41762, 41756, 41709, 41817, 41819,
-    41575, 41745, 41710, 41804, 41809, 41634, 41829, 41220, 41559, 40696,
-    41702, 39548, 41694, 41688, 41836, 41802, 39788, 41595, 41592
+  - Fix 41773, 41761, 41814, 41606, 41762, 41756, 41709, 41817, 41819, 41792,
+    41575, 41745, 41710, 41804, 41809, 41634, 41829, 41220, 41559, 40696, 41823,
+    41702, 39548, 41694, 41688, 41836, 41802, 39788, 41595, 41592, 41840, 41841
   - initial cut at nested transactions (max 16 levels)
   - gracefully handle "offset from code memory ... exceeds 32bits" on Mac OS X.
   - further improvements in WebTools

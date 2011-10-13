@@ -48,3 +48,59 @@ o.testa
 o.testb
 o.testc
 true
+#################### Trac Info
+# ID:         86
+# Summary:    ||= and &&=  if LHS is an array reference, could be optimized
+# Changetime: 2009-02-18 22:11:58+00:00
+###
+
+#  MRI accepts:
+#  
+#  {{{
+#  cairo:maglev-git pmclain$ irb
+#  >> r = []
+#  => []
+#  >> r[0] ||= 1
+#  => 1
+#  >> r[1] &&= 2
+#  => nil
+#  >> r[0] &&= 2
+#  => 2
+#  }}}
+#  
+#  MagLev does not accept either:
+#  
+#  {{{
+#  topaz 1> maglev
+#  >> r = []
+#  => []
+#  *> r[0] &&= 5
+#  -----------------------------------------------------
+#  GemStone: Error         Nonfatal
+#  No method was found for the selector #'&&:' when sent to nil with
+#  arguments contained in anArray( 5).
+#  Error Category: [GemStone] Number: 2010 Arg Count: 3
+#  Arg 1: nil
+#  Arg 2: &&:
+#  Arg 3: anArray
+#  topaz 1> 
+#  
+#  
+#  
+#  topaz 1> maglev
+#  >> r = []
+#  => []
+#  *> r[0] ||= 4
+#  -----------------------------------------------------
+#  GemStone: Error         Nonfatal
+#  No method was found for the selector #'||:' when sent to nil with
+#  arguments contained in anArray( 4).
+#  Error Category: [GemStone] Number: 2010 Arg Count: 3
+#  Arg 1: nil
+#  Arg 2: ||:
+#  Arg 3: anArray
+#  topaz 1> 
+#  
+#  }}}
+#  
+#  

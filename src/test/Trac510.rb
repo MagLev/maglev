@@ -26,3 +26,21 @@ puts "File size of non-existing file is: #{File.new('/testing')}"
 #mri    = `ruby        -e 'p File.size(\"/testing\")' 2>&1`
 #maglev = `maglev-ruby -e 'p File.size(\"/testing\")' 2>&1`
 #raise "Ruby Maglev Mismatch" unless mri == maglev
+#################### Trac Info
+# ID:         510
+# Summary:    Asking for the size of  non-existent file behaves differntly
+# Changetime: 2009-11-03 21:28:53+00:00
+###
+
+#  Rails uses this to work with log files.  The file non_existent_file_test.rb has the following line:
+#  
+#  puts "File size of non-existing file is: #{File.new('/testing').size}"
+#  
+#  MBP:feature_tests lattam$ ruby non_existent_file_test.rb
+#  non_existent_file_test.rb:1:in `initialize': No such file or directory - /testing (Errno::ENOENT)
+#  	from non_existent_file_test.rb:1:in `new'
+#  	from non_existent_file_test.rb:1
+#  MBP:feature_tests lattam$ maglev-ruby non_existent_file_test.rb
+#  ERROR 2023, Error, 'Error,  nil '
+#  
+#  
