@@ -15,6 +15,7 @@ end
 
 $LOAD_PATH << File.dirname(__FILE__)  # For 1.9, '.' is no longer in the load path
 
+require 'rakelib/gemstone_env.rb'
 require 'rakelib/maglev_stone.rb'
 require 'rakelib/contrib/ottobehrens/stone.rb'
 
