@@ -1,47 +1,80 @@
 # Create a MagLev image from base Smalltalk image
 #
-
-# 3. Create version.txt
-# 4. Set build date in Globals.rb
-#    e. put the image file somewhere in the package and chmod it
-#         `rm topazerrors.log`;
-#         `chmod 777 ${target}/gemstone/bin ${target}/gemstone/bin/extent0.ruby.dbf`;
-#         `mv ${target}/data/pkg${os}/extent/extent0.ruby.dbf ${target}/gemstone/bin`;
-#         `chmod 444 ${target}/gemstone/bin/extent0.ruby.dbf`;
-#         `chmod 555 ${target}/gemstone/bin`;
-#         `rm -rf ${target}/.hg ${target}/.hgignore`;
-#         `rm -rf ${target}/data/* ${target}/log/*`;
-#         `zip -r9yq ${target}.zip ${target}`;
+# Most uses of this file will simply be for the build:image task.
+# That creates a fresh MagLev image from the files under:
 #
-# for packaging a release image:
-#   + remove .git*
-#   + keyfile
+#    $MAGLEV_HOME/src/smalltalk
+#
+# The other documented tasks are intended for use when editing the files
+# under $MAGLEV_HOME/src/smalltalk.
+#
+# The steps required to create a new MagLev image are:
+#
+# 1. Create a temporary directory to work in (FILEIN_DIR)
+# 2. Copy a virgin Smalltalk stone to bootstrap (NEW_EXTENT)
+# 3. Start a stone, and then:
+#      A: load the files in src/smalltalk/ruby
+#      B: load the files in src/smalltalk/ruby/mcz
+# 4. Do a little bit of maintenance on the new image (audit, shrink it).
+# 5. Stop the stone
+# 6. Copy the newly created extent0.ruby.dbf to its standard location:
+#    $MAGLEV_HOME/bin/extent0.ruby.dbf (the previous extent, if there is
+#    one, is saved)
+#
+# The steps above are run on an initial install of MagLev.  The only other
+# time you may want to run these steps is if you change any of the files
+# under src/smalltalk.
+#
+# The steps above do NOT affect any currently running or installed stone
+# images.  You'll need to either create a new stone:
+#
+#    rake stone:create[mynewstone]
+#
+# or you'll need to stop your current stone and copy a new image (will
+# destroy any data in the old stone).
+#
+# ===================================================
+# TODO
+# ===================================================
+#
+# 1. We need a way to upgrade a current stone without destroying user data.
+#
+# 2. Possibly add allprims loading into this file too (currently, it is done
+#    the first time the stone is started with "rake <stonename>:start").
 
 namespace :build do
   require 'erb'
   require 'logger'
 
-  FILEIN_DIR     = File.join(MAGLEV_HOME, "fileintmp") # TODO: add $$ to name
+  FILEIN_DIR       = File.join(MAGLEV_HOME, "fileintmp")
+  NEW_EXTENT       = File.join(FILEIN_DIR, 'extent0.ruby.dbf')
 
-  BUILD_DIR      = File.join(MAGLEV_HOME, 'build')
-  BUILD_LOG      = File.join(MAGLEV_HOME, 'build_image.log')
-  GEM_BIN        = File.join(GEMSTONE, 'bin')
-  GEM_CONF       = File.join(FILEIN_DIR, 'fileingem.ruby.conf')
-  IMAGE_RUBY_DIR = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
-  KEYFILE        = File.join(MAGLEV_HOME, 'etc', 'maglev.demo.key')
-  MCZ_DIR        = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby', 'mcz')
-  NEW_EXTENT     = File.join(FILEIN_DIR, 'extent0.ruby.dbf')
-  RUBY_EXTENT    = File.join(MAGLEV_HOME, 'bin', 'extent0.ruby.dbf')
-  STONE_CONF     = File.join(FILEIN_DIR, 'filein.ruby.conf')
-  STONE_LOG      = File.join(FILEIN_DIR, 'stone.log')
-  STONE_NAME     = "fileinruby#{$$}stone"
-  VERBOSE        = true
-  $success       = false
+  BUILD_DIR        = File.join(MAGLEV_HOME, 'build')
+  BUILD_LOG        = File.join(MAGLEV_HOME, 'build_image.log')
+  GEM_BIN          = File.join(GEMSTONE, 'bin')
+  GEM_CONF         = File.join(FILEIN_DIR, 'fileingem.ruby.conf')
+  IMAGE_RUBY_DIR   = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
+  KEYFILE          = File.join(MAGLEV_HOME, 'etc', 'maglev.demo.key')
+  MCZ_DIR          = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby', 'mcz')
+  RUBY_EXTENT      = File.join(MAGLEV_HOME, 'bin', 'extent0.ruby.dbf')
+  RUBY_EXTENT_SAVE = File.join(MAGLEV_HOME, 'bin', 'extent0.ruby.dbf.save')
+  STONE_CONF       = File.join(FILEIN_DIR, 'filein.ruby.conf')
+  STONE_LOG        = File.join(FILEIN_DIR, 'stone.log')
+  STONE_NAME       = "fileinrubystone"
+  SMALLTALK_EXTENT = File.join(GEMSTONE, 'bin', 'extent0.dbf')
+  VERBOSE          = true
 
-  desc "Create a new MagLev image and install in #{RUBY_EXTENT}"
-  task :maglev => [:save_ruby_extent, :logger] do
-    Rake::Task['build:image'].invoke
-    if $success && File.exist?(NEW_EXTENT)
+  directory FILEIN_DIR
+
+  desc "Create a new MagLev image and install in #{RUBY_EXTENT}.  Has no effect on currently installed stones.  You will also need to create a new stone after this (rake stone:create[<stonename>])."
+  task :maglev => [:logger] do
+    if Rake::Task['build:filein'].invoke && Rake::Task['build:mczdir'].invoke
+      log "maglev", "Build Succeeded"
+      if File.exist? RUBY_EXTENT
+        log "maglev", "Saving previous extent as #{RUBY_EXTENT_SAVE}"
+        mv RUBY_EXTENT, RUBY_EXTENT_SAVE
+      end
+
       log "maglev", "Copying new extent to #{RUBY_EXTENT}"
       cp NEW_EXTENT, RUBY_EXTENT
       chmod 0444, RUBY_EXTENT
@@ -50,19 +83,20 @@ namespace :build do
     end
   end
 
-  task :check_dev_env do
-    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, MCZ_DIR].each do |var|
-      raise "#{var} is not a directory" unless File.directory? var
-    end
+  desc "Remove #{FILEIN_DIR} directory"
+  task :clean do
+    files = FileList['*.log', '*.out', 'gem_*_code.log']
+    files << 'tpz_commands'
+    files << FILEIN_DIR
+    rm_rf files
   end
 
-  task :save_ruby_extent => :logger do
-    if File.exist? RUBY_EXTENT
-      log "save_ruby_extent", "Saving copy of #{RUBY_EXTENT}"
-      mv RUBY_EXTENT, "#{RUBY_EXTENT}.save"
-    else
-      log "save_ruby_extent", "No #{RUBY_EXTENT} to save"
-    end
+  desc "call clean, then remove bin/extent0*"
+  task :clobber => :clean do
+    puts "RM: #{RUBY_EXTENT}"
+    puts "RM: #{RUBY_EXTENT_SAVE}"
+    rm_f RUBY_EXTENT
+    rm_f RUBY_EXTENT_SAVE
   end
 
   task :logger do
@@ -72,22 +106,34 @@ namespace :build do
     log "logger", "Logging to: #{BUILD_LOG}"
   end
 
-  task :temp_dir do
-    rm_rf FILEIN_DIR
-    mkdir FILEIN_DIR
+  task :check_dev_env do
+    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, MCZ_DIR].each do |var|
+      raise "#{var} is not a directory" unless File.directory? var
+    end
+  end
+
+  # The PATCHMASTER* code is a workaround for bug in Smalltalk build.
+  # patchMaster30.gs should be shipped with the VM, but currently isn't.
+  # Until bug is fixed, we'll copy the file into place here.
+  #
+  # TODO: When the bug is fixed, remove this code and remove
+  #       src/smalltalk/patchMaster30.gs from the git repo.
+  PATCHMASTER     = File.join(GEMSTONE, 'upgrade', 'patchMaster30.gs')
+  PATCHMASTER_SRC = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs')
+  file PATCHMASTER => :logger do
+    # TODO: Remove this when smalltalk bug resovled.
+    log(PATCHMASTER, "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
+    cp PATCHMASTER_SRC, PATCHMASTER
+  end
+
+  file NEW_EXTENT => FILEIN_DIR do
+    # These should be done as part of creating FILEIN_DIR, but
+    # directory tasks can't have blocks...
     Dir.chdir(FILEIN_DIR) do
-      cp File.join(GEMSTONE, 'bin', 'extent0.dbf'), NEW_EXTENT
+      cp SMALLTALK_EXTENT, NEW_EXTENT
       chmod 0770, NEW_EXTENT
       cp_template("#{BUILD_DIR}/filein.ruby.conf.erb", STONE_CONF)
       cp "#{BUILD_DIR}/fileingem.ruby.conf", GEM_CONF
-
-      # TODO: Remove this when smalltalk bug resovled.
-      # Workaround for bug in Smalltalk build.  patchMaster30.gs should be shipped
-      # with the VM, but currently isn't.  Until bug is fixed, we'll copy the file
-      # into place here:
-      log("temp_dir", "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
-      cp File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs'),
-         File.join(GEMSTONE, 'upgrade')
     end
   end
 
@@ -109,23 +155,29 @@ namespace :build do
     ENV["GEMSTONE_EXE_CONF"]      = GEM_CONF
   end
 
-  task :image => [:check_dev_env, :temp_dir, :setup_env] do
-    log("build:image", "Begin task")
-
+  desc "Load the files in #{MCZ_DIR} into the image (starts and stops stone)"
+  task :filein => [:setup_env, NEW_EXTENT, :logger] do
     Dir.chdir FILEIN_DIR do
       begin
-        # Pass one runs the filein of ruby base code, then shrinks the
-        # image.  We stop at that point to ensure write of shrunk image
-        log("build:image", "Begin initial fileinruby")
-        startstone && fileinruby && stopstone &&
-          # loadmcz on shrunk image => restart stone
-          startstone && load_mcz_dir && $success = true
+        startstone && fileinruby
       ensure
         stopstone
       end
     end
   end
 
+  desc "Load the files in #{MCZ_DIR} into the image (starts and stops stone)"
+  task :mczdir => [:setup_env, NEW_EXTENT, :logger] do
+    Dir.chdir FILEIN_DIR do
+      begin
+        startstone && load_mcz_dir
+      ensure
+        stopstone
+      end
+    end
+  end
+
+  # Equivalent to the old loading of the MagLev-*.mcz
   def load_mcz_dir
     # No looping in topaz, so generate a script here
     files = Dir["#{MCZ_DIR}/*.gs"].sort_by {|a| a.split('_').last }
@@ -147,26 +199,7 @@ namespace :build do
     end
   end
 
-  # equivalent to fileinruby.pl, but only supports fast
-  #
-  # fileinruby creates a MagLev ruby image from a virgin Smalltalk image.
-  # This involves:
-  #
-  #   1. Start a virgin smalltalk image
-  #   2. Load the MagLev files from src/smalltalk/ruby
-  #   3. Load the code from the MagLev-*.mcz file
-  #   4. Save the image file as extent0.ruby.dbf.
-  #
-  # This step needs to be run anytime you change the files in image/ruby.
-  #
-  # All work is done in filein_tmp_dir.  Config files and the initial image
-  # are copied there.
-  #
-  # $GEMSTONE should be the VM base directory.
-  #
-  # We will use $GEMSTONE/bin/extent0.dbf as the base smalltalk image upon
-  # which we build the ruby image.
-  #
+  # equivalent to fileinruby.pl, but only supports fast builds
   def fileinruby
     outfile = "#{FILEIN_DIR}/fileinruby.out"
     log_run("fileinruby", outfile) do
@@ -238,4 +271,21 @@ namespace :build do
     $logger.log(level, msg, step) if $logger
     true
   end
+
 end
+
+# 3. Create version.txt
+# 4. Set build date in Globals.rb
+#    e. put the image file somewhere in the package and chmod it
+#         `rm topazerrors.log`;
+#         `chmod 777 ${target}/gemstone/bin ${target}/gemstone/bin/extent0.ruby.dbf`;
+#         `mv ${target}/data/pkg${os}/extent/extent0.ruby.dbf ${target}/gemstone/bin`;
+#         `chmod 444 ${target}/gemstone/bin/extent0.ruby.dbf`;
+#         `chmod 555 ${target}/gemstone/bin`;
+#         `rm -rf ${target}/.hg ${target}/.hgignore`;
+#         `rm -rf ${target}/data/* ${target}/log/*`;
+#         `zip -r9yq ${target}.zip ${target}`;
+#
+# for packaging a release image:
+#   + remove .git*
+#   + keyfile
