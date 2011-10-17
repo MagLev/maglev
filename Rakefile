@@ -182,7 +182,7 @@ The netldiname parameter determines which netldi to use (default: ENV['gs64ldi']
       if file.end_with? ".gs"
         stone.input_file file, true
       elsif file.end_with? ".rb"
-        system "maglev-ruby -Mcommit #{file}"
+        system "maglev-ruby -Mcommit --stone #{server_name} #{file}"
       else
         raise "Can only load .gs and .rb files"
       end
