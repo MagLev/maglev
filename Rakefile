@@ -173,12 +173,19 @@ The netldiname parameter determines which netldi to use (default: ENV['gs64ldi']
       stone.start netldi
     end
 
-    desc "Read a GemStone Topaz .gs file into server.  Does a commit."
+    desc "Read a GemStone Topaz .gs file or .rb file into server.  Does a commit."
     task :input_file, :file do |t, args|
-      file = args[:file]
+      file = File.expand_path args[:file]
       raise "Need a file to read." unless file
       raise "Can't open input file: #{file.inspect}" unless File.exists?(file)
-      stone.input_file file, true
+
+      if file.end_with? ".gs"
+        stone.input_file file, true
+      elsif file.end_with? ".rb"
+        system "maglev-ruby -Mcommit #{file}"
+      else
+        raise "Can only load .gs and .rb files"
+      end
     end
   end
 end

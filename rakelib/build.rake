@@ -177,38 +177,6 @@ namespace :build do
     end
   end
 
-  desc "(Re-)load a .gs or .rb file from the src/ directory into the stone"
-  task :reload, :filename, :stonename do |task, args|
-    args.with_defaults :stonename => "maglev"
-    stonename = args.stonename
-    file = File.expand_path args.filename
-    unless File.exist? file
-      raise "#{file} not found"
-    end
-    unless file.start_with? File.expand_path("src/")
-      raise "Only reload files from src/"
-    end
-
-    if file.end_with? ".gs"
-      outfile = "loadmczdir.out"
-      run_topaz("reload_file", <<-EOS)
-          output push #{outfile} only
-          iferr 1 exit 3
-          set gemstone #{stonename} user DataCurator pass swordfish
-          login
-          input #{file}
-          expectvalue true
-          commit
-          logout
-          exit 0
-      EOS
-    elsif file.end_with? ".rb"
-      system "maglev-ruby -Mcommit #{file}"
-    else
-      raise "Can only load .gs and .rb files"
-    end
-  end
-
   # Equivalent to the old loading of the MagLev-*.mcz
   def load_mcz_dir
     # No looping in topaz, so generate a script here
