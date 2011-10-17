@@ -467,3 +467,20 @@ _startRuby: envId
 
 %
 
+set class GsProcess
+category: '*maglev-runtime'
+method:
+_checkIfDebuggable
+  "Check to make sure the receiver is debuggable. Currently this
+   means that it is in the debug, suspended or ready states.
+   If it is not debuggable then raise an error."
+
+  | status |
+  (#('ready' 'debug' 'active' 'suspended') includes: status) ifFalse: [
+    ImproperOperation new
+      _number: 2376;
+      reason: #rtErrGsProcessNotDebuggable;
+      object: self;
+      signal].
+
+%
