@@ -5,9 +5,11 @@ require 'date'
 require 'tempfile'
 
 class Stone
-  FORK_ENV = {}
-  def FORK_ENV.pairs
-    each_pair.collect {|k,v| "#{k}=#{v}" }.join(" ")
+  unless defined? FORK_ENV
+    FORK_ENV = {}
+    def FORK_ENV.pairs
+      each_pair.collect {|k,v| "#{k}=#{v}" }.join(" ")
+    end
   end
 
   include Rake::DSL if defined? Rake::VERSION # support both Rake 0.8.7 and 0.9.2
