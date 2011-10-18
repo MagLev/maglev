@@ -1,6 +1,3 @@
-maglev 0.9 (ruby 1.8.7) (2011-10-17 rev 27072-1311-cc70d7f) 
+maglev 0.9 (ruby 1.8.7) (2011-10-17 rev 27072-cc70d7f) 
 GEMSTONE: 3.1.0 Build: 64bit-27072
-MONTICELLO: MagLev-TimFelgentreff.1311.mcz
 MAGLEV: commit cc70d7f7213fbfa550ed1180ffa1e652df323644
-        Author: Peter McLain <pmclain@vmware.com>
-        Date:   Fri Oct 14 11:23:48 2011 -0700
