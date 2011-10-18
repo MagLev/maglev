@@ -154,7 +154,6 @@ end
 
 GemStoneInstallation.current.stones.each do |server_name|
   namespace server_name do
-    stone = MagLevStone.new(server_name, GemStoneInstallation.current)
     [[:stop,             "Stop the \"#{server_name}\" server"],
      [:restart,          "Stop then start the \"#{server_name}\" server"],
      [:status,           "Report status of the \"#{server_name}\" server"],
@@ -162,11 +161,14 @@ GemStoneInstallation.current.stones.each do |server_name|
      [:take_snapshot,    "Stop the \"#{server_name}\" server then make a backup copy of its repository"],
      [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
     ].each do |action,desc|
+      stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       task_gemstone(stone, action, desc)
     end
+
     desc "Start the \"#{server_name}\" server.
 The netldiname parameter determines which netldi to use (default: ENV['gs64ldi'] || 'gs64ldi')."
     task :start, :netldiname do |t, args|
+      stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       netldi = args[:netldiname] || ENV['gs64ldi'] || 'gs64ldi'
       puts "Starting stone with netldi #{netldi}"
       ['GEMSTONE', 'GEMSTONE_GLOBAL_DIR'].each { |n| puts "#{n} => #{ENV[n]}" }
@@ -175,6 +177,7 @@ The netldiname parameter determines which netldi to use (default: ENV['gs64ldi']
 
     desc "Read a GemStone Topaz .gs file or .rb file into server.  Does a commit."
     task :input_file, :file do |t, args|
+      stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       file = File.expand_path args[:file]
       raise "Need a file to read." unless file
       raise "Can't open input file: #{file.inspect}" unless File.exists?(file)
