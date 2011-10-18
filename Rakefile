@@ -182,12 +182,10 @@ The netldiname parameter determines which netldi to use (default: ENV['gs64ldi']
       raise "Need a file to read." unless file
       raise "Can't open input file: #{file.inspect}" unless File.exists?(file)
 
-      if file.end_with? ".gs"
-        stone.input_file file, true
-      elsif file.end_with? ".rb"
+      if file.end_with? ".rb"
         system "maglev-ruby -Mcommit --stone #{server_name} #{file}"
       else
-        raise "Can only load .gs and .rb files"
+        stone.input_file file, true
       end
     end
   end
