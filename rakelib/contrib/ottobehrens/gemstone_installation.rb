@@ -42,7 +42,7 @@ class GemStoneInstallation
   # Execute command in this installation's environment
   def gs_sh(command, &block)
     set_gemstone_installation_environment
-    sh "$GEMSTONE/bin/#{command}", &block
+    sh "env #{Stone::FORK_ENV.pairs} $GEMSTONE/bin/#{command}", &block
   end
 
   def gslist
