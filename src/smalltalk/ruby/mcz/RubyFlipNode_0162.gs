@@ -3,8 +3,8 @@ set class RubyFlipNode
 category: 'as yet unclassified'
 method:
 first: aNode second: nodeTwo isDot3: aBool
-  firstNode := aNode .
-  secondNode := nodeTwo .
+  firstNode := RubyBlockNode s_a: aNode .
+  secondNode := RubyBlockNode s_a: nodeTwo .
   isDot3 := aBool
 
 %
