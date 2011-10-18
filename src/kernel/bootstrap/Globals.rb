@@ -110,6 +110,11 @@ RUBY.global("VariableContext", "VariableContext")
 RUBY.global("GsNMethod", "GsNMethod")
 
 # ----------------------------------------------------------
+#  Continuation class for Ruby's limited callcc support
+
+RUBY.global("Continuation", "RubyContinuation")
+
+# ----------------------------------------------------------
 
 # ARGV, ARGF initialized in .mcz, in RubyContext>>__initTransient:
 
