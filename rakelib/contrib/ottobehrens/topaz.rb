@@ -33,7 +33,7 @@ class Topaz
   def initialize(stone, topaz_command="topaz -l -T 200000")
     @stone = stone
     @output = []
-    @topaz_command = "$GEMSTONE/bin/#{topaz_command} 2>&1"
+    @topaz_command = "env #{Stone::FORK_ENV.pairs} $GEMSTONE/bin/#{topaz_command} 2>&1"
   end
 
   def commands(topaz_commands_array)

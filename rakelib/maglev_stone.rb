@@ -96,9 +96,9 @@ class MagLevStone < Stone
 
   def initialize_gemstone_environment
     super
-    ENV['GEMSTONE_NAME'] = name
+    FORK_ENV['GEMSTONE_NAME'] = name
     # Tell gslist and others where the root of the install is.
-    ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
+    FORK_ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
   end
 
   # Loads the primitives if they haven't been loaded, then commits the
