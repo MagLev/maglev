@@ -7,7 +7,7 @@ class TestFor
     v = 9
     if v == 0..(w=66) ; y = 3 ; else ; y = 4 ; end
     unless y == 4; raise 'err' ; end
-    unless w == 66; raise "err w=#{w.inspect}" ; end # note MRI gets w==nil
+    unless w.nil?; raise "err w=#{w.inspect}" ; end # note MRI gets w==nil
     v = 0
     if v == 0..(w=77) ; y = 3 ; else ; y = 4 ; end
     unless y == 3; raise 'err' ; end

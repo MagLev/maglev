@@ -66,8 +66,13 @@ namespace :build do
 
   directory FILEIN_DIR
 
-  desc "Create a new MagLev image and install in #{RUBY_EXTENT}.  Has no effect on currently installed stones.  You will also need to create a new stone after this (rake stone:create[<stonename>])."
+  desc "Create a new MagLev image and install in #{RUBY_EXTENT}. Create new maglev stone if it doesn't exist"
   task :maglev => [:logger] do
+    Rake::Task['build:image'].invoke && Rake::Task['stone:create'].invoke('maglev')
+  end
+
+  desc "Create a new maglev image and install in #{RUBY_EXTENT}"
+  task :image => [:logger] do
     if Rake::Task['build:filein'].invoke && Rake::Task['build:mczdir'].invoke
       log "maglev", "Build Succeeded"
       if File.exist? RUBY_EXTENT
@@ -81,6 +86,7 @@ namespace :build do
     else
       log "maglev", "Build failed see #{BUILD_LOG}"
     end
+    
   end
 
   desc "Remove #{FILEIN_DIR} directory"
