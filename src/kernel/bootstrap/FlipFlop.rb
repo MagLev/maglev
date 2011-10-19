@@ -17,16 +17,16 @@ class Range
       # runtime for 2 dots form
       s = @_st_theState
       unless s
-        if expr1val
+        if expr1val[]
           s = true
           new_state = s
-          if expr2val
+          if expr2val[]
             new_state = false
           end
           @_st_theState = new_state
         end
       else
-        if expr2val
+        if expr2val[]
           new_state = false
           @_st_theState = new_state
         end
@@ -38,12 +38,12 @@ class Range
       # runtime for 3 dots form
       s = @_st_theState
       unless s
-        if expr1val
+        if expr1val[]
           s = true
           @_st_theState = s
         end
       else
-        if expr2val
+        if expr2val[]
           @_st_theState = false 
         end
       end

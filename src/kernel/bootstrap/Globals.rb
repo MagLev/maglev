@@ -110,6 +110,11 @@ RUBY.global("VariableContext", "VariableContext")
 RUBY.global("GsNMethod", "GsNMethod")
 
 # ----------------------------------------------------------
+#  Continuation class for Ruby's limited callcc support
+
+RUBY.global("Continuation", "RubyContinuation")
+
+# ----------------------------------------------------------
 
 # ARGV, ARGF initialized in .mcz, in RubyContext>>__initTransient:
 
@@ -151,12 +156,12 @@ RUBY_ENGINE = 'maglev'
 # RUBY_PLATFORM  is installed in RubyContext>>_initTransient:
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2011-10-06'
+RUBY_RELEASE_DATE = '2011-10-17'
 RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
 RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '26994-1311-f565a95'
+VERSION = '27072-1311-cc70d7f'
 
 MAGLEV_VERSION = VERSION  # per Trac 901
 

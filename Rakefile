@@ -15,24 +15,9 @@ end
 
 $LOAD_PATH << File.dirname(__FILE__)  # For 1.9, '.' is no longer in the load path
 
+require 'rakelib/gemstone_env.rb'
 require 'rakelib/maglev_stone.rb'
-require 'rakelib/contrib/ottobehrens/stone.rb'
 
-MAGLEV_HOME    = ENV['MAGLEV_HOME'] ||= File.expand_path("..", File.dirname(__FILE__))
-STONENAME      = ENV['STONENAME']   ||= "maglev"
-GEMSTONE       = ENV['GEMSTONE']    || "#{MAGLEV_HOME}/gemstone"
-
-# Maglev doesn't allow changes to $GEMSTONE* variables during execution
-# (i.e., you can't change the stone your connected to, once you've
-# connected).  Assume that if $GEMSTONE is set correctly, then all the
-# others are too.
-if ENV['GEMSTONE'].nil? or ENV['GEMSTONE'].empty?
-  ENV['GEMSTONE_GLOBAL_DIR'] = MAGLEV_HOME
-  ENV['GEMSTONE_SYS_CONF']   = "#{MAGLEV_HOME}/etc/system.conf"
-  ENV['GEMSTONE_DATADIR']    = "#{MAGLEV_HOME}/data/#{STONENAME}"
-  ENV['GEMSTONE_LOG']        = "#{MAGLEV_HOME}/log/#{STONENAME}/#{STONENAME}.log"
-  ENV['GEMSTONE']            = GEMSTONE
-end
 verbose false  # turn off rake's chatter about all the sh commands
 
 CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html',
@@ -168,7 +153,6 @@ end
 
 GemStoneInstallation.current.stones.each do |server_name|
   namespace server_name do
-    stone = MagLevStone.new(server_name, GemStoneInstallation.current)
     [[:stop,             "Stop the \"#{server_name}\" server"],
      [:restart,          "Stop then start the \"#{server_name}\" server"],
      [:status,           "Report status of the \"#{server_name}\" server"],
@@ -176,23 +160,34 @@ GemStoneInstallation.current.stones.each do |server_name|
      [:take_snapshot,    "Stop the \"#{server_name}\" server then make a backup copy of its repository"],
      [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
     ].each do |action,desc|
+      stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       task_gemstone(stone, action, desc)
     end
+
     desc "Start the \"#{server_name}\" server.
 The netldiname parameter determines which netldi to use (default: ENV['gs64ldi'] || 'gs64ldi')."
     task :start, :netldiname do |t, args|
+      stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       netldi = args[:netldiname] || ENV['gs64ldi'] || 'gs64ldi'
       puts "Starting stone with netldi #{netldi}"
       ['GEMSTONE', 'GEMSTONE_GLOBAL_DIR'].each { |n| puts "#{n} => #{ENV[n]}" }
       stone.start netldi
     end
 
-    desc "Read a GemStone Topaz .gs file into server.  Does a commit."
+    desc "Read a GemStone Topaz .gs file or .rb file into server.  Does a commit."
     task :input_file, :file do |t, args|
-      file = args[:file]
+      stone = MagLevStone.new(server_name, GemStoneInstallation.current)
+      file = File.expand_path args[:file]
       raise "Need a file to read." unless file
       raise "Can't open input file: #{file.inspect}" unless File.exists?(file)
-      stone.input_file file, true
+
+      if file.end_with? ".gs"
+        stone.input_file file, true
+      elsif file.end_with? ".rb"
+        system "maglev-ruby -Mcommit --stone #{server_name} #{file}"
+      else
+        raise "Can only load .gs and .rb files"
+      end
     end
   end
 end
