@@ -118,20 +118,6 @@ namespace :build do
     end
   end
 
-  # The PATCHMASTER* code is a workaround for bug in Smalltalk build.
-  # patchMaster30.gs should be shipped with the VM, but currently isn't.
-  # Until bug is fixed, we'll copy the file into place here.
-  #
-  # TODO: When the bug is fixed, remove this code and remove
-  #       src/smalltalk/patchMaster30.gs from the git repo.
-  PATCHMASTER     = File.join(GEMSTONE, 'upgrade', 'patchMaster30.gs')
-  PATCHMASTER_SRC = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs')
-  file PATCHMASTER => :logger do
-    # TODO: Remove this when smalltalk bug resovled.
-    log(PATCHMASTER, "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
-    cp PATCHMASTER_SRC, PATCHMASTER
-  end
-
   file NEW_EXTENT => FILEIN_DIR do
     # These should be done as part of creating FILEIN_DIR, but
     # directory tasks can't have blocks...
