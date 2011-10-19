@@ -3,11 +3,14 @@ OR USING THIS SOFTWARE. BY DOWNLOADING OR USING THIS SOFTWARE YOU ARE
 AGREEING TO BE BOUND BY THE TERMS OF THESE LICENSES. IF YOU DO NOT AGREE
 TO THE TERMS OF THESE LICENSES, DO NOT DOWNLOAD OR USE THE SOFTWARE.
 
-In addition to proprietary code owned by VMware, GemStone/S software
-products (the "GemStone Products") include computer code licensed
-under various open source licenses ("open source software" or "OSS").
-The text of each of those licenses is available in the files in this
-directory listed below.
+This MagLev distribution includes computer code licensed under various
+open source licenses ("open source software" or "OSS").  The text of
+each of those licenses is available in the files in this directory
+listed below.
+
+MagLev is used in conjunction with VMware's GemStone/S software products
+(the "GemStone Products"). The licenses for the GemStone Products and
+any associated open source software are packaged with GemStone/S. 
 
 Nothing in VMware's End User License Agreement or any other document
 to which VMware is a party or by which it is bound overrides the terms
@@ -28,14 +31,9 @@ Ruby source code written by VMware is licensed under the
 MIT license:
    MagLev-MIT-License.txt
 
-The GemStone Virtual Machine and associated binary files and libraries
-written by VMware are governed by:
-   GemStone-License.pdf
-
 Various open source components not written by VMware which may be included
 in this distribution are covered by their respective licenses:
    bstring-license.txt - Better String Library
-   CodeMirror-License.txt - CodeMirror code editing library in JavaScript
    EY-License.txt - MSpec test execution framework and the RubySpec tests
    ffi-License.txt - Ruby Foreign Function Interface
    GemStone-Scripts-License.txt - scripts to setup multiple named GemStones
@@ -47,9 +45,6 @@ in this distribution are covered by their respective licenses:
    racc146-COPYING and racc146-README.txt - RACC parser runtime state machine
    Rubinius-License.txt - Rubinius (Ruby Sources only)
    RubyGems-License.txt - RubyGems packaging system
-   ruby_parser202-README.txt - Ruby parser written in Ruby
-   Seaside-MIT-License.txt - Seaside web application framework
-   Squeak-License.txt - Squeak Smalltalk
 
 In all cases where open source components are dual licensed, and one of
 the choices is the GPL, we have chosen to use that software under the
