@@ -31,7 +31,7 @@ module Gem
     class << self
       alias_method :original_new, :new
 
-      def new(gem, options)
+      def new(gem, options = { })
         shebang = !Gem::ConfigFile::PLATFORM_DEFAULTS['install'].to_s['--env-shebang'].nil?
         options[:env_shebang] = shebang
         original_new(gem, options)
