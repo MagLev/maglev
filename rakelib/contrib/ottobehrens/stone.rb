@@ -5,6 +5,11 @@ require 'date'
 require 'tempfile'
 
 class Stone
+  FORK_ENV = {}
+  def FORK_ENV.pairs
+    each_pair.collect {|k,v| "#{k}=#{v}" }.join(" ")
+  end
+
   include Rake::DSL if defined? Rake::VERSION # support both Rake 0.8.7 and 0.9.2
 
   attr_accessor :username, :password
@@ -42,14 +47,8 @@ class Stone
 
   def initialize_gemstone_environment
     @gemstone_installation.set_gemstone_installation_environment
-    # TODO
-    # rake stwrappers chokes here, since we assign to GEMSTONE_LOGDIR
-    # but we don't have a good way of testing if full GS env is setup
-    # since the Rake scripts set $GEMSTONE long before we get here.
-    # Perhaps MagLev should set an env variable if it is running
-    # (and unset it on fork/exec)
-    ENV['GEMSTONE_LOGDIR'] ||= log_directory
-    ENV['GEMSTONE_DATADIR'] ||= data_directory
+    FORK_ENV['GEMSTONE_LOGDIR'] ||= log_directory
+    FORK_ENV['GEMSTONE_DATADIR'] ||= data_directory
   end
 
   # Bare bones stone with nothing loaded, specialise for your situation

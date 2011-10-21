@@ -66,8 +66,13 @@ namespace :build do
 
   directory FILEIN_DIR
 
-  desc "Create a new MagLev image and install in #{RUBY_EXTENT}.  Has no effect on currently installed stones.  You will also need to create a new stone after this (rake stone:create[<stonename>])."
+  desc "Create a new MagLev image and install in #{RUBY_EXTENT}. Create new maglev stone if it doesn't exist"
   task :maglev => [:logger] do
+    Rake::Task['build:image'].invoke && Rake::Task['stone:create'].invoke('maglev')
+  end
+
+  desc "Create a new maglev image and install in #{RUBY_EXTENT}"
+  task :image => [:logger] do
     if Rake::Task['build:filein'].invoke && Rake::Task['build:mczdir'].invoke
       log "maglev", "Build Succeeded"
       if File.exist? RUBY_EXTENT
@@ -81,6 +86,7 @@ namespace :build do
     else
       log "maglev", "Build failed see #{BUILD_LOG}"
     end
+    
   end
 
   desc "Remove #{FILEIN_DIR} directory"
@@ -110,20 +116,6 @@ namespace :build do
     [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, MCZ_DIR].each do |var|
       raise "#{var} is not a directory" unless File.directory? var
     end
-  end
-
-  # The PATCHMASTER* code is a workaround for bug in Smalltalk build.
-  # patchMaster30.gs should be shipped with the VM, but currently isn't.
-  # Until bug is fixed, we'll copy the file into place here.
-  #
-  # TODO: When the bug is fixed, remove this code and remove
-  #       src/smalltalk/patchMaster30.gs from the git repo.
-  PATCHMASTER     = File.join(GEMSTONE, 'upgrade', 'patchMaster30.gs')
-  PATCHMASTER_SRC = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'patchMaster30.gs')
-  file PATCHMASTER => :logger do
-    # TODO: Remove this when smalltalk bug resovled.
-    log(PATCHMASTER, "WORKAROUND: copy patchMaster30.gs to $upgradeDir", Logger::WARN)
-    cp PATCHMASTER_SRC, PATCHMASTER
   end
 
   file NEW_EXTENT => FILEIN_DIR do
