@@ -1196,4 +1196,12 @@ module Kernel
     __trace_var(name, &blk)
   end
 
+  # Generates a Continuation object, which it passes to the associated
+  # block. Performing a cont.call will cause the callcc to return (as
+  # will falling through the end of the block). The value returned by
+  # the callcc is the value of the block, or the value passed to
+  # cont.call. See class Continuation for more details.
+  def callcc
+    Proc.new.__call_cc
+  end
 end

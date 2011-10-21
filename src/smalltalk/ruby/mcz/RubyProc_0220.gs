@@ -41,3 +41,13 @@ _copyForRuby: opcode
 
 %
 
+set class RubyProc
+category: '*maglev-runtime'
+method:
+callCC
+
+	^ block numArgs == 1
+		ifTrue: [ [:cc | block value: (RubyContinuation with: cc)] callCC ]
+		ifFalse: [ block value ]
+
+%
