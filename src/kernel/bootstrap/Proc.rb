@@ -403,4 +403,6 @@ class Proc
       @_st_block.call
     end
 
+    # Continuation support
+    primitive_nobridge '__call_cc', 'callCC'
 end
