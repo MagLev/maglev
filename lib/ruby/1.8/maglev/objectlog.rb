@@ -187,21 +187,21 @@ Maglev.persistent do
       t = self.continuation
       t.convert_to_runnable_state
       self.continuation = nil
-      t.run_callcc
+      t.resume_from_continuation
     end
 
     def debug_continuation
       t = self.continuation
       t.convert_to_runnable_state
       self.continuation = nil
-      t.run_callcc(:debug)
+      t.resume_from_continuation(:debug)
     end
 
     def stop_continuation
       t = self.continuation
       t.convert_to_runnable_state
       self.continuation = nil
-      t.run_callcc(:stop)
+      t.resume_from_continuation(:stop)
     end
 
     private
