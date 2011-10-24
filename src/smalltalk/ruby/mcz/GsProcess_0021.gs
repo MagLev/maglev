@@ -468,12 +468,16 @@ _startRuby: envId
 %
 
 set class GsProcess
-category: '*maglev-runtime'
+category: '*maglev-override'
 method:
 _checkIfDebuggable
   "Check to make sure the receiver is debuggable. Currently this
    means that it is in the debug, suspended or ready states.
-   If it is not debuggable then raise an error."
+   If it is not debuggable then raise an error.
+
+   Overridden for maglev, because we want to be able to step in suspended
+   Ruby threads"
+
 
   | status |
   (#('ready' 'debug' 'active' 'suspended') includes: status) ifFalse: [
