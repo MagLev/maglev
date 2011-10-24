@@ -45,9 +45,9 @@ desc "Run all the RBS benchmarks"
 task :bench => 'bench:run'
 
 namespace :bench do
-  desc "Plot the RBS benchmark results (not implemented)"
-  task :results => :setup do
-  end
+  #desc "Plot the RBS benchmark results (not implemented)"
+  #task :results => :setup do
+  #end
 
   desc "Generate a CSV file of RBS results"
   task :to_csv => :setup do
