@@ -65,7 +65,8 @@ Maglev.persistent do
           "that was created during the execution of #debug"
       end
 
-      debug_thread(Thread.start { log_entry.resume_continuation })
+      t = Thread.start { log_entry.stop_continuation }
+      t.value
     end
 
     private
