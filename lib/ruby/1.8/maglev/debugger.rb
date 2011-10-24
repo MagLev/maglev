@@ -83,7 +83,6 @@ Maglev.persistent do
         # (joiner.respond_to?(:call) ? joiner.call : joiner).value
       rescue DebuggerException => e
         continuation = e.log_entry.continuation
-        self.pop_exception_handling_frames(continuation)
         raise e.cause
       end
     end
