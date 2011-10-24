@@ -480,6 +480,7 @@ _checkIfDebuggable
 
 
   | status |
+  status := self _statusString.
   (#('ready' 'debug' 'active' 'suspended') includes: status) ifFalse: [
     ImproperOperation new
       _number: 2376;
