@@ -10,9 +10,6 @@ class GsNMethod
   primitive_nobridge '__name', '_rubyName'
   primitive_nobridge '__source_location', '_fileAndLine'
   primitive_nobridge '__source_string', 'sourceString'
-  primitive_nobridge '__env_id', 'environmentId'
-  primitive_nobridge '__home_method', 'homeMethod'
-  primitive_nobridge '__in_class', 'inClass'
 
   primitive_nobridge 'ffi_library', '_libraryForCallout'
 end
