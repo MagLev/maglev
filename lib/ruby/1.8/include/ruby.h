@@ -1,4 +1,3 @@
-// Generated file, do not edit. master copy in svn
 /**********************************************************************
 
   ruby/ruby.h -
@@ -200,11 +199,7 @@ typedef enum MagRubyType {
     T_NIL,
     T_OBJECT,
     T_CLASS,
-#ifdef MAGLEV_LINT
-    T_ICLASSnotused,
-#else
-    T_ICLASS,
-#endif
+    T__CLASS, 
     T_MODULE,
     T_FLOAT,
     T_STRING,
@@ -228,6 +223,12 @@ typedef enum MagRubyType {
     T_VARMAP, // internal use: dynamic variables , not in Maglev
     T_SCOPE,  // internal use: variable scope , not in Maglev
     T_NODE    // internal use: syntax tree node
+#endif
+
+#ifdef MAGLEV_LINT
+#define T_ICLASSnotUsed T__CLASS
+#else
+#define T_ICLASS T__CLASS
 #endif
 
 } MagRubyType;
@@ -901,7 +902,7 @@ RUBY_DLLSPEC void  rb_rdata_store(VALUE obj, void *p);
 /** Mark variable global */
 // RUBY_DLLSPEC void rb_global_variable(VALUE* handle_address);
 
-/* RUBY_DLLSPEC void rb_gc_register_address(VALUE* address);  */
+// RUBY_DLLSPEC void rb_gc_register_address(VALUE* address);
 
 /** Unmark variable as global */
 // RUBY_DLLSPEC void rb_gc_unregister_address(VALUE* address); 
