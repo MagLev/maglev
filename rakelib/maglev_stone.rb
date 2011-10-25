@@ -112,7 +112,7 @@ class MagLevStone < Stone
   def reload_prims
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
-    input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
+    input_file("#{ML}/src/smalltalk/ruby/allprims.topaz", false)
   end
 
   def prims_loaded?(name='maglev')
