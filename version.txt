@@ -1,3 +1,2 @@
-maglev 1.0RC1 (ruby 1.8.7) (2011-10-24 rev 27174-f79ded7) 
-GEMSTONE: 3.1.0 Build: 64bit-27174
-MAGLEV: commit f79ded7305f7acd2735143998a50821083ddd1a4
+maglev 1.0RC1 (ruby 1.8.7) (2011-10-25 rev 27174)
+GEMSTONE: 3.1.0 Build: gss64_maglev_branch-27174
