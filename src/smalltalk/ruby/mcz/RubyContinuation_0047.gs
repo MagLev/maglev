@@ -1,5 +1,5 @@
 
-set class RubyContinuation class
+set class RubyContinuation
 category: 'as yet unclassified'
 classmethod:
 with: aGsProcess

@@ -491,6 +491,22 @@ removeallmethods
 removeallclassmethods
 
 doit
+Object subclass: 'RubyContinuation'
+	instVarNames: #( process)
+	classVars: #()
+	classInstVars: #()
+	poolDictionaries: #()
+	inDictionary: 'Globals'
+	category: 'MagLev-Runtime'
+	options: #()
+
+%
+
+set class RubyContinuation
+removeallmethods
+removeallclassmethods
+
+doit
 Object subclass: 'RubyDRegexpOnceLiteral'
 	instVarNames: #( regex)
 	classVars: #()
@@ -3228,21 +3244,5 @@ Error subclass: 'RubyTimeoutError'
 %
 
 set class RubyTimeoutError
-removeallmethods
-removeallclassmethods
-
-doit
-Object subclass: 'RubyContinuation'
-	instVarNames: #( process)
-	classVars: #()
-	classInstVars: #()
-	poolDictionaries: #()
-	inDictionary: 'Globals'
-	category: 'MagLev-Runtime'
-	options: #()
-
-%
-
-set class RubyContinuation
 removeallmethods
 removeallclassmethods
