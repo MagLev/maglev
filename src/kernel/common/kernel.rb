@@ -126,16 +126,14 @@ module Kernel
 #  private :FloatValue   # TODO: uncomment
 
   def warn(warning)
-    $stderr.write "#{warning}\n" unless $VERBOSE._equal?(false)
+    $stderr.write "#{warning}\n" if $VERBOSE._equal?(true)
     nil
   end
   module_function :warn
 
   def __cext_warning(warning)
     # called by  rb_warning
-    if $VERBOSE
-      $stderr.write "#{warning}\n" 
-    end
+    warn(warning)
   end
 
   # from timeout.rb
