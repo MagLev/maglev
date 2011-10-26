@@ -133,10 +133,24 @@ if [  -e "`which rake 2>/dev/null`" ]; then
         echo "[Info] Removing existing 'maglev' configuration file."
         rake stone:destroy[maglev] >/dev/null
     fi
-    echo "[Info] Creating new default 'maglev' repository"
-    rake stone:create[maglev] >/dev/null
-    echo "[Info] Generating the MagLev HTML documentation"
-    rake rdoc >/dev/null 2>&1
+
+    if [ ! -e bin/extent0.ruby.dbf ]; then
+        extent0='gemstone/bin/extent0.dbf'
+        echo "[Info] Building new extent0.ruby.dbf from $extent0"
+        if [ -e $extent0 ]; then
+
+            if rake build:maglev ; then
+                echo "[Info] Creating new default 'maglev' repository"
+                rake stone:create[maglev] >/dev/null
+                echo "[Info] Generating the MagLev HTML documentation"
+                rake rdoc >/dev/null 2>&1
+            else
+                echo "[Warning] Could not build new ruby extent"
+            fi
+        else
+            echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+        fi
+    fi
 else
     echo "[Warning] rake not found!"
     echo "Skipping creation of default 'maglev' repository and HTML documentation."

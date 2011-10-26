@@ -4,6 +4,3 @@
 [submodule "spec/rubyspec"]
 	path = spec/rubyspec
 	url = https://github.com/rubyspec/rubyspec.git
-[submodule "benchmark"]
-	path = benchmark
-	url = https://github.com/acangiano/ruby-benchmark-suite.git

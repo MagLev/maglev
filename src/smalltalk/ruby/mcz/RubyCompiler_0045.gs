@@ -1175,8 +1175,10 @@ reimplementationAllowed: aSymbol node: aNode cst: aRubyCompilerState
      aRubyCompilerState installingPrims ifTrue:[
        Error signal: msg .
      ].
-     GsFile gciLogServer: 'WARNING ' , msg .
-     "(aSymbol at:1 equals:'__send') ifTrue:[ self pause ]."
+     (SessionTemps current at: #MAGLEV_parseWarn otherwise: false) ifTrue: [
+       GsFile gciLogServer: 'WARNING ' , msg .
+       "(aSymbol at:1 equals:'__send') ifTrue:[ self pause ]."
+     ].
      ^ false
   ].
   ^ true

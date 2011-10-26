@@ -96,9 +96,9 @@ class MagLevStone < Stone
 
   def initialize_gemstone_environment
     super
-    ENV['GEMSTONE_NAME'] = name
+    FORK_ENV['GEMSTONE_NAME'] = name
     # Tell gslist and others where the root of the install is.
-    ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
+    FORK_ENV['GEMSTONE_GLOBAL_DIR'] = ENV['MAGLEV_HOME']
   end
 
   # Loads the primitives if they haven't been loaded, then commits the
@@ -112,7 +112,7 @@ class MagLevStone < Stone
   def reload_prims
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
-    input_file("#{GEMSTONE}/upgrade/ruby/allprims.topaz", false)
+    input_file("#{ML}/src/smalltalk/ruby/allprims.topaz", false)
   end
 
   def prims_loaded?(name='maglev')

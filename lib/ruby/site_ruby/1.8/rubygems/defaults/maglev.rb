@@ -24,6 +24,23 @@ module Gem
   ConfigFile::PLATFORM_DEFAULTS['update']  = '--env-shebang'
 end
 
+# GEMSTONE: Workaround rubygems bug 28661
+# See http://www.mail-archive.com/rubygems-developers@rubyforge.org/msg03922.html
+module Gem
+  class Installer
+    class << self
+      alias_method :original_new, :new
+
+      def new(gem, options = { })
+        shebang = !Gem::ConfigFile::PLATFORM_DEFAULTS['install'].to_s['--env-shebang'].nil?
+        options[:env_shebang] = shebang
+        original_new(gem, options)
+      end
+    end
+  end
+end
+
+
 ###########################################################################################
 # From here on in, it's all patching around in Rubygems to get both the maglev-gem command
 # and bundler to consider -maglev- patched gems before anything else.

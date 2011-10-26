@@ -2,11 +2,32 @@
 
   For more details see: http://bit.ly/d3C6S1
 
-== Changes for 27001 2011-10-07
+== Changes for 27184 2011-10-25
+* Better separation of MagLev and GemStone
+* Updated version to MagLev 1.0 RC1 in preparation for next week's release.
+* Added support for Ruby's continuations
+* Reloading prims now loads files from MAGLEV_HOME, not GEMSTONE/upgradeDir
+* Remove workaround for bcrypt-ruby 3.0.0
+* Update rails patch for 3.1.1
+* Remove old RBS benchmarks, they're available online
+* Move the env-shebang patch for gem pristine to the defaults file
+* Remove workaround for missing patchMaster30.gs
+* The build:maglev target will now create the maglev stone if it doesn't exist.
+* Do the proper delayed evaluation of flip flop params.
+* Remove MCZ version, as the mcz no longer exists.
+* A number of fixes and improvements to underlying GemStone 3.1 system
+
+== Changes for 27072 2011-10-15
 * Moved .mcz from internal to github
 * Moved Smalltalk source code from internal to github
 * Added a build.rake file to create extent0.ruby.dbf from the virgin extent0.dbf
   in $GEMSTONE/bin
+* A few bugfixes/enhancements in underlying GemStone 3.1 system
+  - Increase concurrency for OT scans
+  - Instance Migration should not require code mod privilege
+  - Fix assert in om::IntLpSupProcessSwitch on AIX
+  - Cleanup of recovery error messages
+  - skip badPageKind if file not truncated in validateLogRead
 
 == Changes for 26994 2011-10-06
 * Update to rubygems 1.8.11

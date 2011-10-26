@@ -1201,7 +1201,7 @@ module Kernel
   # will falling through the end of the block). The value returned by
   # the callcc is the value of the block, or the value passed to
   # cont.call. See class Continuation for more details.
-  def callcc(&block)
-    block.__call_cc
+  def callcc
+    Proc.new.__call_cc
   end
 end
