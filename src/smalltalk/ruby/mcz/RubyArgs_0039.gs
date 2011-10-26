@@ -225,7 +225,7 @@ _parseRubyArgs: envId
                 processedArg := true ] .
             
         (curArg beginsWith: '-v') ifTrue: [ 
-            globals at: #'$VERBOSE' put: true .   parseWarn := true .
+            globals at: #'$VERBOSE' put: true .
             args removeFirst .
             processedArg := true ] .
         "note, --version processed in maglev-ruby shell script and VM not invoked"
