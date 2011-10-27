@@ -182,7 +182,7 @@ namespace :build do
         iferr 1 exit 3
         set gemstone #{STONE_NAME} user DataCurator pass swordfish
         login
-        #{inputs}
+        #{inputs.join}
         expectvalue true
         commit
         logout
