@@ -24,8 +24,12 @@ rescue LoadError => e
   puts e
   puts "Generating RDoc will not work without the rdoc gem"
 
-  task :rdoc { puts "Install the rdoc gem and re-run this" }
-  task :rerdoc { puts "Install the rdoc gem and re-run this" }
+  task :rdoc do
+    puts "Install the rdoc gem and re-run this"
+  end
+  task :rerdoc do
+    puts "Install the rdoc gem and re-run this"
+  end
 end
 
 $LOAD_PATH << File.dirname(__FILE__)  # For 1.9, '.' is no longer in the load path
