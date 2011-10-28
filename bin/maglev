@@ -178,7 +178,7 @@ initialize() {
   fi
   # grab a virgin repository if no repository exists
   if [ ! -e $GEMSTONE_DATADIR/extent/extent0.ruby.dbf ]; then
-    cp -p $GEMSTONE/bin/extent0.ruby.dbf $GEMSTONE_DATADIR/extent/
+    cp -p $MAGLEV_HOME/bin/extent0.ruby.dbf $GEMSTONE_DATADIR/extent/
     chmod 660 $GEMSTONE_DATADIR/extent/extent0.ruby.dbf
   fi
 }
