@@ -251,7 +251,8 @@ rubyFullName: envId
   | ns nam |
   self isMeta ifTrue:[  ^ '' copy ].
   (ns := self nameSpace: envId) ifNotNil:[ ^ ns fullName ].
-  (nam := name) ifNil:[ ^ '' copy ].  "Ruby meta classes have no name"
+  ((nam := name) isNil or: [nam size == 0]) ifTrue: [
+    ^ '#<Class:0x', self asOop hex, '>' ].
   ^ String withAll: nam
 
 %
