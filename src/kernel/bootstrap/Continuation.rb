@@ -17,6 +17,10 @@ class Continuation
   end
 
   def __run(args)
+    if Thread.current == Thread.main
+      raise ThreadError, "cannot resume in main thread, yet"
+    end
+
     if args.empty?
       __cc_call(nil)
     elsif args.size == 1
