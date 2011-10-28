@@ -172,8 +172,7 @@ namespace :build do
   # Equivalent to the old loading of the MagLev-*.mcz
   def load_mcz_dir
     # No looping in topaz, so generate a script here
-    files = Dir["#{MCZ_DIR}/*.gs"].sort_by {|a| a.split('_').last }
-    inputs = files.map{ |fn| "input #{fn}\n" }
+    input = "#{MCZ_DIR}/filein.gs"
 
     outfile = "#{FILEIN_DIR}/loadmczdir.out"
     log_run("load_mcz_dir", outfile) do
@@ -182,7 +181,7 @@ namespace :build do
         iferr 1 exit 3
         set gemstone #{STONE_NAME} user DataCurator pass swordfish
         login
-        #{inputs.join}
+        input #{input}
         expectvalue true
         commit
         logout

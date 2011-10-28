@@ -54,7 +54,15 @@
     |  |
     |  + rubyspec/   # Git submodule containing a recent version of RubySpec files
     |
-    + src/           # MagLev Ruby source and libs
+    + src/
+       |
+       + kernel/     # MagLev Ruby source and libs
+       |
+       + smalltalk/  # MagLev smalltalk source
+       |
+       + test/       # MagLev tests
+       |
+       + topaz/      # Possibly useful topaz scripts
 
 === Source File Layout
 

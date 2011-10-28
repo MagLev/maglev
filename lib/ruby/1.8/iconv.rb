@@ -143,7 +143,7 @@ class Iconv
     l2 = FFI::MemoryPointer.new(:pointer)
 
     ic = FFI::MemoryPointer.new(:long)
-    if str then
+    if str && !str.empty?
 
       if not str.instance_of? String then
         if str.respond_to? :to_str then
@@ -178,7 +178,7 @@ class Iconv
 
       ic.write_long length
 
-    else # if str is nil, reset the shift state
+    else # if str is nil or empty, reset the shift state
       ic.write_long 0
       l1.write_long 0
     end

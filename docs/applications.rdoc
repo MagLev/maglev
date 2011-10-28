@@ -16,9 +16,9 @@ that means the gem is discussed more fully below:
   | minitest  | ~> 2.0  | Works               |
   | nokogiri* | ~> 1.5  | Works with patches  |
   | rack      | ~> 1.2  | Works               |
-  | rails*    | ~> 3.0  | Works with patches  |
+  | rails*    | ~> 3.1  | Works with patch    |
   | rake      | ~> 0.8  | Works               |
-  | sinatra*  | ~> 1.1  | Works, with caveats |
+  | sinatra*  | ~> 1.1  | Works with caveat   |
 
 === Nokogiri
 
@@ -32,6 +32,13 @@ tests pass, but some fail with an error message:
   ArgumentError: rb_data_object_alloc, non-NULL dmark not supported yet
 
 ==== Install Nokogiri
+
+The rubygems that is bundled in MagLev has been configured to download
+a MagLev specific version of the gem. This will work with the gem
+commands and bundler. If you install the gem differently, use
+"nokogiri-maglev-" from Rubygems.org, or install from source.
+
+===== Source install Nokogiri
 
 Some of the tools needed to build the Nokogiri gem (racc) do not currently
 work under MagLev, so the gem must be built using MRI.  To build the
@@ -55,8 +62,8 @@ pkg/nokogiri-1.5.0.beta.4.gem.  Install that gem using MagLev:
 
 === Rails
 
-Rails works, but you need to apply a couple of patches after you've gem
-installed it.  See details in examples/rails/README.rdoc.
+Rails works, but we currently apply a workaround to the MagLev image
+during bootstrap, see src/kernel/workarounds/tzinfo.rb
 
 === Sinatra
 

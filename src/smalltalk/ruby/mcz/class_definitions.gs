@@ -1,7 +1,7 @@
 
 doit
 MCStWriter subclass: 'MCGsWriter'
-	instVarNames: #( fileStreams dependencyIndex currentClass)
+	instVarNames: #( fileStreams)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()

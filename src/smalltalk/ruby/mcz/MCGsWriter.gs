@@ -17,16 +17,11 @@ class: aName
 	"if the requested class isn't the last one, but we already have a file stream for it,
 	 that means that we are processing a definition that depends on something to be loaded
 	 in between, so we create a new file for that"
-	| streamColl currentIdxStreamPair |
-	streamColl := (fileStreams at: aName ifAbsentPut: [OrderedCollection new]).
-
-	currentClass = aName ifFalse: ["we have never seen this class (streamColl = {}) or we haven't worked on it last"
-		dependencyIndex := dependencyIndex + 1.
-		streamColl add: {dependencyIndex . String new writeStream}.
-		currentClass := aName].
-	currentIdxStreamPair := streamColl last.
-	^ currentIdxStreamPair last "the actual WriteStream"
-
+	fileStreams last key = aName ifFalse: ["we haven't worked on this last"
+		| count |
+		count := fileStreams count: [:each | each key = aName].
+		fileStreams add: aName -> {count . String new writeStream}].
+	^ fileStreams last "requested class assoc" value "{count . stream}" last "stream"
 %
 
 
@@ -34,12 +29,8 @@ set class MCGsWriter
 category: 'as yet unclassified'
 method:
 classDefinitionsStream
-	| streamColl idxStreamPair |
-	streamColl := (fileStreams at: 'class_definitions' ifAbsentPut: [
-		{ { 0 . String new writeStream } } ]).
-	idxStreamPair := streamColl last.
-	^ idxStreamPair last "the actual WriteStream"
 
+	^ fileStreams first "class definitions is first file" value "{ 0 . stream }" last "stream"
 %
 
 
@@ -47,20 +38,23 @@ set class MCGsWriter
 category: 'as yet unclassified'
 method:
 fileOutIn: path
-	| dir |
+	| dir loadOrderFile |
 	dir := (FileDirectory on: path)
 			assureExistence;
 			deleteLocalFiles;
 			yourself.
-	fileStreams keysAndValuesDo: [:className :array |
-		"for info on :array, see #class:"
-		array do: [:idxStreamPair || index stream |
-			index := idxStreamPair first printPaddedWith: $0 to: 4.
-			stream := idxStreamPair last.
-			(dir forceNewFileNamed: (className asString copyReplaceAll: ' ' with: '_' ), '_', index, '.gs')
-				nextPutAll: stream contents;
-				close]].
+	loadOrderFile := dir forceNewFileNamed: 'filein.gs'.
 
+	fileStreams do: [:assoc || className count stream filename |
+		"for info on :assoc, see #class:"
+		className := assoc key.
+		count := assoc value first = 0 ifTrue: [''] ifFalse: [assoc value first asString].
+		stream := assoc value last.
+		filename := className, count, '.gs'.
+
+		loadOrderFile nextPutAll: 'input $MAGLEV_HOME/src/smalltalk/ruby/mcz/'; nextPutAll: filename; lf.
+		(dir forceNewFileNamed: filename) nextPutAll: stream contents; close].
+	loadOrderFile close.
 %
 
 
@@ -118,8 +112,7 @@ set class MCGsWriter
 category: 'as yet unclassified'
 method:
 writeDefinitions: aCollection
-	fileStreams := Dictionary new.
-	dependencyIndex := 0.
+	fileStreams := OrderedCollection with: 'class_definitions' -> {0. String new writeStream}.
 	(MCDependencySorter sortItems: aCollection)
 		do: [:ea | ea accept: self].
 
