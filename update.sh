@@ -136,12 +136,10 @@ if [  -e "`which rake 2>/dev/null`" ]; then
 
     if [ ! -e bin/extent0.ruby.dbf ]; then
         extent0='gemstone/bin/extent0.dbf'
-        echo "[Info] Building new extent0.ruby.dbf from $extent0"
+        echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
         if [ -e $extent0 ]; then
 
             if rake build:maglev ; then
-                echo "[Info] Creating new default 'maglev' repository"
-                rake stone:create[maglev] >/dev/null
                 echo "[Info] Generating the MagLev HTML documentation"
                 rake rdoc >/dev/null 2>&1
             else
@@ -149,6 +147,11 @@ if [  -e "`which rake 2>/dev/null`" ]; then
             fi
         else
             echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+        fi
+    else
+        if [ ! -e etc/conf.d/maglev.conf ]; then
+            echo "[Info] Creating new default 'maglev' repository"
+            rake stone:create[maglev] >/dev/null
         fi
     fi
 else
