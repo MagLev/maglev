@@ -10,8 +10,9 @@ addException: anotherException
   ] ifFalse:[
     anotherException == Object ifTrue:[
       self at: self size + 1 put: Exception 
-    ] ifFalse:[
-      ArgumentTypeError signal: 'expected Object or anException'
+    ] ifFalse:[| msg |
+      msg := 'WARNING, expected to be Object or Exception subclass: ', (anotherException rubyFullName: 1).
+      Kernel @ruby1:warn: msg.
     ].
   ].
   ^ self
