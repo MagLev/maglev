@@ -44,9 +44,16 @@ if [ -z "$MAGLEV_HOME" ]; then
     # echo "using $PWD as MAGLEV_HOME"
     export MAGLEV_HOME=$PWD
   else
-    echo "$COMMAND: [Error] $PWD is not a valid MAGLEV_HOME directory"
-    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
-    exit 1
+    echo "$COMMAND: [Warning] \$MAGLEV_HOME is not set."
+    tree=$(cd `dirname "$0"/` ; cd .. ; pwd)
+    if [ -d "${tree}/gemstone" ]; then
+      export MAGLEV_HOME="${tree}"
+      echo "Assuming ${MAGLEV_HOME}"
+    else
+      echo "$COMMAND: [Error] Neither $PWD nor $tree are a valid MAGLEV_HOME directory"
+      echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
+      exit 1
+    fi
   fi
 fi
 # Set environment variables unless they already exist
