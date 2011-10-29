@@ -36,7 +36,7 @@ if [ ! -d ".git" ]; then
 fi
 
 if [ -x bin/maglev-ruby ]; then
-    # echo "using $PWD as MAGLEV_HOME"
+    # echo "[Info] using $PWD as MAGLEV_HOME"
     export MAGLEV_HOME=$PWD
 else
     echo "[Error] $PWD is not a valid MagLev directory"
@@ -69,7 +69,7 @@ gss_file=${gss_name}.tar.gz
 
 # We're good to go. Let user know.
 machine_name="`uname -n`"
-echo "[Info] Starting upgrade to $gss_name on $machine_name"
+echo "[Info] Installing $gss_name on $machine_name"
 
 # Look for either wget or curl to download GemStone
 if [ -e "`which wget 2>/dev/null`" ]; then
@@ -116,8 +116,8 @@ mkdir -p locks
 rm -f etc/maglev.demo.key
 ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
-echo "[Info] updating MSpec, RubySpec, and RBS submodules"
-git submodule update --init 
+echo "[Info] updating MSpec and RubySpec submodules"
+git submodule update --quiet --init 
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
@@ -137,6 +137,7 @@ if [  -e "`which rake 2>/dev/null`" ]; then
     if [ ! -e bin/extent0.ruby.dbf ]; then
         extent0='gemstone/bin/extent0.dbf'
         echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+        echo "This could take a while..."
         if [ -e $extent0 ]; then
 
             if rake build:maglev ; then
