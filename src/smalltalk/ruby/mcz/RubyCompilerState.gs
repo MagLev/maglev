@@ -98,6 +98,19 @@ methodDefTargetStack
 
 
 set class RubyCompilerState
+category: 'as yet unclassified'
+classmethod:
+newFrom: aState withStacksMap: stacks
+	
+	^ self
+		newFrom: aState
+		withStacksMap: stacks
+		fromStackType: RubyPersistableCompilerStack
+		toStackType: RubyCompilerStack
+%
+
+
+set class RubyCompilerState
 category: '(as yet unclassified)'
 classmethod:
 use: aState

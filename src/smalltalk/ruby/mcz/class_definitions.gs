@@ -492,7 +492,7 @@ removeallclassmethods
 
 doit
 Object subclass: 'RubyContinuation'
-	instVarNames: #( process)
+	instVarNames: #( process clientData)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()

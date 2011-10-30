@@ -25,6 +25,7 @@ input $MAGLEV_HOME/src/smalltalk/ruby/mcz/BitSet.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/Array.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyCompilerStack.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyCompilerStackDbg.gs
+input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyPersistableCompilerStack.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/ClassOrganizer.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/GsComMethNode.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/TransientSemaphore.gs
@@ -192,6 +193,7 @@ input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyToAryNode.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyWhenNode.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyZArrayNode.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyCompilerState.gs
+input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyPersistableCompilerState.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyProcessStatus.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyScopeIncomingBlockVar.gs
 input $MAGLEV_HOME/src/smalltalk/ruby/mcz/RubyScopeVarInfo.gs
