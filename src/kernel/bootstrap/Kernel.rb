@@ -1202,10 +1202,6 @@ module Kernel
   # the callcc is the value of the block, or the value passed to
   # cont.call. See class Continuation for more details.
   def callcc
-    if Thread.current == Thread.main
-      raise ThreadError, "cannot resume in main thread, yet"
-    end
-
     Proc.new.__call_cc
   end
 end
