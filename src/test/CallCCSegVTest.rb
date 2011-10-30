@@ -1,8 +1,4 @@
-begin
-  begin; require 'continuation'; rescue LoadError; end
-  cc = callcc {|cc| cc }
-  cc.call if cc
-  CONTINUATIONS_SUPPORTED = true
-rescue Exception
-  CONTINUATIONS_SUPPORTED = false
-end
+# Taken from yard. This should not raise an exception.
+cc = callcc {|cc| cc }
+cc.call if cc
+CONTINUATIONS_SUPPORTED = true
