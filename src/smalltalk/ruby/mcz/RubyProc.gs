@@ -3,11 +3,16 @@ set class RubyProc
 category: '*maglev-runtime'
 method:
 callCC
-
-	^ block numArgs == 1
-		ifTrue: [ [:cc | block value: (RubyContinuation with: cc)] callCC ]
-		ifFalse: [ block value ]
-
+	| clientData rubyReturn callCCReturn args |
+	args := Array new: block numArgs.
+	clientData := GsProcess _current _clientData. "callCC resume fails to restore the clientData, keep it"
+	callCCReturn := [:cc |
+		args size > 0 ifTrue: [args at: 1 put: (RubyContinuation with: cc)].
+		block valueWithArguments: args] callCC.
+	(clientData notNil and: [GsProcess _current _clientData isNil])
+		ifTrue: ["resuming, restore client data"
+			GsProcess _current _clientData: clientData].
+	^ callCCReturn
 %
 
 
