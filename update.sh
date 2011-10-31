@@ -117,7 +117,7 @@ rm -f etc/maglev.demo.key
 ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
 echo "[Info] updating MSpec and RubySpec submodules"
-git submodule update --quiet --init 
+git submodule --quiet update --init 
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
