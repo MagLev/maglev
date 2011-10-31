@@ -157,8 +157,8 @@ RUBY_ENGINE = 'maglev'
 RUBY_VERSION = '1.8.7'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
 RUBY_RELEASE_DATE = '2011-10-27'
-RUBY_PATCHLEVEL = 249  # TODO: finalize for 1.8.7
-RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 249)'
+RUBY_PATCHLEVEL = 352
+RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 352)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
 VERSION = '27184'
