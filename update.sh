@@ -6,7 +6,7 @@
 # Name - update.sh
 #
 # Purpose - Automatically update to a new version of GemStone
-#           in an existing git repository cloned from MagLev on github.  
+#           in an existing git repository cloned from MagLev on github.
 #           Be both verbose and idempotent, so we can easily diagnose
 #           any problems.
 #
@@ -30,7 +30,7 @@
 
 if [ ! -d ".git" ]; then
     echo "[Error] $PWD is not a git repository"
-    echo "install.sh and update.sh are only used with MagLev git repositories" 
+    echo "install.sh and update.sh are only used with MagLev git repositories"
     echo "for more information see http://github.com/MagLev/maglev"
     exit 1
 fi
@@ -117,13 +117,13 @@ rm -f etc/maglev.demo.key
 ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
 echo "[Info] updating MSpec and RubySpec submodules"
-git submodule --quiet update --init 
+git submodule --quiet update --init
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
 if [  -e "`which rake 2>/dev/null`" ]; then
     # Backup any existing maglev repository
-    if [ -e data/maglev/extent/extent0.ruby.dbf ]; then 
+    if [ -e data/maglev/extent/extent0.ruby.dbf ]; then
         echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
         rake maglev:take_snapshot >/dev/null
         mv backups/maglev_extent.tgz backups/previous_maglev_extent.tgz
@@ -139,7 +139,7 @@ if [  -e "`which rake 2>/dev/null`" ]; then
         echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
         echo "This could take a while..."
         if [ -e $extent0 ]; then
-
+            # NOTE: build:maglev will also create the maglev stone
             if rake build:maglev ; then
                 echo "[Info] Generating the MagLev HTML documentation"
                 rake rdoc >/dev/null 2>&1
@@ -155,11 +155,14 @@ if [  -e "`which rake 2>/dev/null`" ]; then
             rake stone:create[maglev] >/dev/null
         fi
     fi
+    echo "[Info] Starting MagLev stone (loading kernel classes)"
+    rake maglev:start
 else
     echo "[Warning] rake not found!"
     echo "Skipping creation of default 'maglev' repository and HTML documentation."
 fi
 
+echo
 echo "[Info] Finished upgrade to $gss_name on $machine_name"
 echo ""
 echo "[Info] MagLev version information:"
