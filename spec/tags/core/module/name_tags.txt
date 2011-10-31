@@ -1,0 +1,1 @@
+fails:Module#name returns an empty String by default

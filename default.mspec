@@ -9,16 +9,28 @@ class MSpecScript
 
   lang_files = ['spec/rubyspec/language',
                 "^spec/rubyspec/language/for_spec.rb",
-                "^spec/rubyspec/language/super_spec.rb"]
+                "^spec/rubyspec/language/block_spec.rb",
+                "^spec/rubyspec/language/super_spec.rb",
+                "^spec/rubyspec/language/predefined_spec.rb",
+                "^spec/rubyspec/language/break_spec.rb",
+                "^spec/rubyspec/language/predefined/data_spec.rb"]
 
   core_files = ['spec/rubyspec/core',
+                "^spec/rubyspec/core/argf/gets_spec.rb",
                 "^spec/rubyspec/core/argf/seek_spec.rb",
+                "^spec/rubyspec/core/argf/readline_spec.rb",
                 "^spec/rubyspec/core/basicobject/basicobject_spec.rb",
                 "^spec/rubyspec/core/basicobject/not_equal_spec.rb",
                 "^spec/rubyspec/core/basicobject/not_spec.rb",
+                "^spec/rubyspec/core/fixnum/right_shift_spec.rb",
                 "^spec/rubyspec/core/kernel/exec_spec.rb",
                 "^spec/rubyspec/core/kernel/system_spec.rb",
-                "^spec/rubyspec/core/numeric/step_spec.rb",           # 26876
+                "^spec/rubyspec/core/marshal/dump_spec.rb",          # OpenSSL::X509::Name
+                "^spec/rubyspec/core/marshal/load_spec.rb",          # OpenSSL::X509::Name
+                "^spec/rubyspec/core/numeric/step_spec.rb",          # 26876
+                "^spec/rubyspec/core/process/waitall_spec.rb",
+                "^spec/rubyspec/core/process/wait_spec.rb",
+                "^spec/rubyspec/core/process/wait2_spec.rb",
                 "^spec/rubyspec/core/string/modulo_spec.rb",
                 "^spec/rubyspec/core/string/unpack/a_spec.rb",
                 "^spec/rubyspec/core/thread/alive_spec.rb",
