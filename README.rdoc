@@ -7,32 +7,23 @@
 * root access so you can increase default shared memory settings (only during initial install)
 
 == Install MagLev
-There are three ways to install MagLev:
+There are several ways to install MagLev:
 * Use the installer
 * Install with Ruby Version Manager (RVM)
 * Install from GitHub
 
-=== Use the installer
-
-We recommend this version unless you want to participate in MagLev
-development or want access to the absolute latest code. This version
-changes more slowly than the github version, and it has undergone more
-testing.
+=== Install a specific version of MagLev from a .tar.gz archive
 
 1. Download and unzip
    {MagLev-installer.zip}[http://maglev.gemstone.com/files/MagLev-installer.zip]
-1. If this is the first time you're installing MagLev, run:
-     ./installMaglev.sh [DIRECTORY]
-   If you've already run <tt>installMaglev.sh</tt> on the machine, then you
-   can use the upgrade script:
-     ./upgradeMaglev.sh [DIRECTORY]
-   If DIRECTORY is not specified, "maglev" will be used.
+1. Run
+     ./installMaglev.sh [VERSION]
+   Where VERSION is the specific MagLev revsion you wish to install, e.g. 1.0.0
 
    <tt>installMaglev.sh</tt> runs one-time machine checks and configuration
    that ensure your hardware will run MagLev.  These mostly relate to
    shared memory settings. It's safe to run multiple times and it won't
-   overwrite things it's already done.  <tt>upgradeMaglev.sh</tt> does not
-   perform these checks. 
+   overwrite things it's already done.
 
 The installer is somewhat verbose. That's so you can more easily debug
 installation problems.
@@ -78,7 +69,7 @@ shell script instead.
 
 This version is best for MagLev contributors and for developers who want to
 live on the bleeding edge or use git functionality. It can be less stable
-than the zipped version.
+than the .tar.gz version.
 
 1. Clone the MagLev github repository
      git clone git://github.com/MagLev/maglev.git
