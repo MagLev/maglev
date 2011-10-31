@@ -123,10 +123,17 @@ EOF
   result=$?
   if [ "$result" -ne 0 ] ; then
     echo "Loading kernel. It may take a few seconds..."
-    $TOPAZ_CMD << EOF > /dev/null
+    logfile="$MAGLEV_HOME/log/maglev/allprims.log"
+    $TOPAZ_CMD << EOF > $logfile
       set gemstone $STONENAME
-      input $GEMSTONE/upgrade/ruby/allprims.topaz
+      iferr 1 exit 3
+      input $MAGLEV_HOME/src/smalltalk/ruby/allprims.topaz
+      exit 0
 EOF
+    result=$?
+    if [ "$result" -ne 0 ] ; then
+        echo "FAILED LOADING PRIMS: $result See $logfile"
+    fi
   fi
 }
 
