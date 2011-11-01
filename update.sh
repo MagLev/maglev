@@ -28,13 +28,6 @@
 #    Remind user to setup environment variables
 #=========================================================================
 
-if [ ! -d ".git" ]; then
-    echo "[Error] $PWD is not a git repository"
-    echo "install.sh and update.sh are only used with MagLev git repositories"
-    echo "for more information see http://github.com/MagLev/maglev"
-    exit 1
-fi
-
 if [ -x bin/maglev-ruby ]; then
     # echo "[Info] using $PWD as MAGLEV_HOME"
     export MAGLEV_HOME=$PWD
