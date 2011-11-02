@@ -4,6 +4,8 @@
 #
 # Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
 
+export LANG=C  # see https://github.com/MagLev/maglev/issues/93
+
 COMMAND="`basename $0`"
 
 usage()
