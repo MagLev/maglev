@@ -15,7 +15,7 @@ There are several ways to install MagLev:
 === Install a specific version of MagLev from a .tar.gz archive
 
 1. Download and unzip
-   {MagLev-installer.zip}[http://maglev.gemstone.com/files/MagLev-installer.zip]
+   {MagLev-installer.zip}[http://glass-downloads.gemstone.com/maglev/MagLev-installer.zip]
 1. Run
      ./installMaglev.sh [VERSION]
    Where VERSION is the specific MagLev revsion you wish to install, e.g. 1.0.0
