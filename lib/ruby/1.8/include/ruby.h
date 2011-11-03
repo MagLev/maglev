@@ -895,40 +895,32 @@ RUBY_DLLSPEC void  rb_rdata_store(VALUE obj, void *p);
 
 #define Data_Get_Struct(obj, type, sval)  sval = (type*)rb_rdata_fetch(obj)
 
-// RUBY_DLLSPEC void rb_gc_mark_locations(VALUE* a, VALUE* b); 
-// RUBY_DLLSPEC void rb_gc_mark(VALUE obj);
-// RUBY_DLLSPEC void rb_gc_mark_maybe(VALUE obj);
-
-/** Mark variable global */
-// RUBY_DLLSPEC void rb_global_variable(VALUE* handle_address);
-
-// RUBY_DLLSPEC void rb_gc_register_address(VALUE* address);
-
-/** Unmark variable as global */
-// RUBY_DLLSPEC void rb_gc_unregister_address(VALUE* address); 
-
 /** Return the global variable. $ optional */
 RUBY_DLLSPEC VALUE rb_gv_get(const char* name);
 
 /** Set named global to given value, returning the value. $ optional. */
 RUBY_DLLSPEC VALUE rb_gv_set(const char* name, VALUE value);
 
-
 #ifndef MAGLEV_LINT
+/** Mark variable global */
+#define rb_global_variable rb_gc_register_address
 static void rb_gc_register_address(VALUE* address) {
     char to_s[17] = {'\0'};
     sprintf(to_s, "%p", address);
     rb_gv_set((const char*)to_s, *address);
 }
 
+/** Unmark variable as global */
 static void rb_gc_unregister_address(VALUE* address) {
     char to_s[17] = {'\0'};
     sprintf(to_s, "%p", address);
     rb_gv_set((const char*)to_s, Qnil);
 }
 
+/** No-op, gc access cannot be provided */
 #define rb_gc_mark(v)
 #define rb_gc_mark_maybe(v)
+// RUBY_DLLSPEC void rb_gc_mark_locations(VALUE* a, VALUE* b);
 #endif
 
 static inline VALUE rb_errinfo()

@@ -6,7 +6,7 @@
 # Name - update.sh
 #
 # Purpose - Automatically update to a new version of GemStone
-#           in an existing git repository cloned from MagLev on github.  
+#           in an existing git repository cloned from MagLev on github.
 #           Be both verbose and idempotent, so we can easily diagnose
 #           any problems.
 #
@@ -28,15 +28,8 @@
 #    Remind user to setup environment variables
 #=========================================================================
 
-if [ ! -d ".git" ]; then
-    echo "[Error] $PWD is not a git repository"
-    echo "install.sh and update.sh are only used with MagLev git repositories" 
-    echo "for more information see http://github.com/MagLev/maglev"
-    exit 1
-fi
-
 if [ -x bin/maglev-ruby ]; then
-    # echo "using $PWD as MAGLEV_HOME"
+    # echo "[Info] using $PWD as MAGLEV_HOME"
     export MAGLEV_HOME=$PWD
 else
     echo "[Error] $PWD is not a valid MagLev directory"
@@ -69,13 +62,13 @@ gss_file=${gss_name}.tar.gz
 
 # We're good to go. Let user know.
 machine_name="`uname -n`"
-echo "[Info] Starting upgrade to $gss_name on $machine_name"
+echo "[Info] Installing $gss_name on $machine_name"
 
 # Look for either wget or curl to download GemStone
 if [ -e "`which wget 2>/dev/null`" ]; then
-    cmd="`which wget`"
+    cmd="`which wget` --quiet"
 elif [ -e "`which curl 2>/dev/null`" ]; then
-    cmd="`which curl` -O"
+    cmd="`which curl` -s -O"
 else
     echo "[Error] Neither wget nor curl is available. Install one of them and rerun this script."
     exit 1
@@ -116,14 +109,14 @@ mkdir -p locks
 rm -f etc/maglev.demo.key
 ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
-echo "[Info] updating MSpec, RubySpec, and RBS submodules"
-git submodule update --init 
+echo "[Info] updating MSpec and RubySpec submodules"
+git submodule --quiet update --init
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
 if [  -e "`which rake 2>/dev/null`" ]; then
     # Backup any existing maglev repository
-    if [ -e data/maglev/extent/extent0.ruby.dbf ]; then 
+    if [ -e data/maglev/extent/extent0.ruby.dbf ]; then
         echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
         rake maglev:take_snapshot >/dev/null
         mv backups/maglev_extent.tgz backups/previous_maglev_extent.tgz
@@ -136,12 +129,11 @@ if [  -e "`which rake 2>/dev/null`" ]; then
 
     if [ ! -e bin/extent0.ruby.dbf ]; then
         extent0='gemstone/bin/extent0.dbf'
-        echo "[Info] Building new extent0.ruby.dbf from $extent0"
+        echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+        echo "This could take a while..."
         if [ -e $extent0 ]; then
-
+            # NOTE: build:maglev will also create the maglev stone
             if rake build:maglev ; then
-                echo "[Info] Creating new default 'maglev' repository"
-                rake stone:create[maglev] >/dev/null
                 echo "[Info] Generating the MagLev HTML documentation"
                 rake rdoc >/dev/null 2>&1
             else
@@ -150,12 +142,20 @@ if [  -e "`which rake 2>/dev/null`" ]; then
         else
             echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
         fi
+    else
+        if [ ! -e etc/conf.d/maglev.conf ]; then
+            echo "[Info] Creating new default 'maglev' repository"
+            rake stone:create[maglev] >/dev/null
+        fi
     fi
+    echo "[Info] Starting MagLev stone (loading kernel classes)"
+    rake maglev:start
 else
     echo "[Warning] rake not found!"
     echo "Skipping creation of default 'maglev' repository and HTML documentation."
 fi
 
+echo
 echo "[Info] Finished upgrade to $gss_name on $machine_name"
 echo ""
 echo "[Info] MagLev version information:"

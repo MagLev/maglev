@@ -4,6 +4,8 @@
 #
 # Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
 
+export LANG=C  # see https://github.com/MagLev/maglev/issues/93
+
 COMMAND="`basename $0`"
 
 usage()
@@ -278,9 +280,20 @@ parseArgs $RUBYOPT
 
 # Make sure MAGLEV_HOME is set
 if [ -z "${MAGLEV_HOME}" ]; then
-    echo "$COMMAND: [Error] \$MAGLEV_HOME is not set."
-    echo "To fix this, set a valid MAGLEV_HOME in your .bashrc"
-    exit 1
+  tree=$(cd `dirname "$0"/` ; cd .. ; pwd)
+
+  if [ -d "${tree}/gemstone" ]; then
+    export MAGLEV_HOME="${tree}"
+    [ -z "$STONENAME" ] && [ -z "$GEMSTONE_GLOBAL_DIR" ] && export GEMSTONE_GLOBAL_DIR=$MAGLEV_HOME
+    if [ -n "$debugFlag" ]; then
+      echo "$COMMAND: [Warning] \$MAGLEV_HOME is not set."
+      echo "Assuming ${MAGLEV_HOME}"
+    fi
+  else
+      echo "$COMMAND: [Error] \$MAGLEV_HOME is not set."
+      echo "To fix this, set a valid MAGLEV_HOME, e.g. in your .bashrc"
+      exit 1
+  fi
 fi
 
 # Make sure GEMSTONE is set
