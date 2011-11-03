@@ -26,7 +26,7 @@ Checkout this github repository:
 
 === Step 3: Build MagLev image
 
-  $ rake build:image
+  $ rake build:maglev
 
 == How it all fits together
 

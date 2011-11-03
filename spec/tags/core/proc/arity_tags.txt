@@ -4,3 +4,12 @@ fails:Proc#arity return the number of arguments, using Kernel#proc
 fails:Proc#arity if optional arguments, return the negative number of mandatory arguments using Proc.new 
 fails:Proc#arity if optional arguments, return the negative number of mandatory arguments using Kernel#lambda
 fails:Proc#arity if optional arguments, return the negative number of mandatory arguments using Kernel#proc
+fails:Proc#arity returns 0 for a block taking || arguments
+fails:Proc#arity returns 1 for a block taking |a, | arguments
+fails:Proc#arity returns -2 for a block taking |a, *| arguments
+fails:Proc#arity returns -1 for a block taking |*| arguments
+fails:Proc#arity returns -2 for a block taking |(a, *)| arguments
+fails:Proc#arity returns 2 for a block taking |a, (b, c)| arguments
+fails:Proc#arity returns 2 for a block taking |a, (b, *c)| arguments
+fails:Proc#arity returns 2 for a block taking |(a, b), c| arguments
+fails:Proc#arity returns 2 for a block taking |(a, *b), c| arguments

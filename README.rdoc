@@ -1,4 +1,4 @@
-= MagLev Alpha
+= MagLev
 
 == Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.
@@ -7,47 +7,29 @@
 * root access so you can increase default shared memory settings (only during initial install)
 
 == Install MagLev
-There are three ways to install MagLev:
+There are several ways to install MagLev:
 * Use the installer
 * Install with Ruby Version Manager (RVM)
 * Install from GitHub
 
-=== Use the installer
+=== Install a specific version of MagLev from a .tar.gz archive
 
-We recommend this version unless you want to participate in MagLev
-development or want access to the absolute latest code. This version
-changes more slowly than the github version, and it has undergone more
-testing.
-
-You'll need to know a version number to install.
-The MagLev Alpha version on 2011-10-15 is <b>27072</b>.
-Check for later versions on
-Twitter[http://twitter.com/maglev] or the
-{MagLev Discussion Google Group}[http://groups.google.com/group/maglev-discussion].
-
-1. Select a directory to put MagLev in. Its name doesn't matter.
 1. Download and unzip
-   {MagLev-installer.zip}[http://maglev.gemstone.com/files/MagLev-installer.zip]
-   into the directory you've selected.
-1. If this is the first time you're installing MagLev, run:
-     ./installMaglev.sh 27072
-   If you've already run <tt>installMaglev.sh</tt> on the machine, then you
-   can use the upgrade script:
-     ./upgradeMaglev.sh 27072
+   {MagLev-installer.zip}[http://glass-downloads.gemstone.com/maglev/MagLev-installer.zip]
+1. Run
+     ./installMaglev.sh [VERSION]
+   Where VERSION is the specific MagLev revsion you wish to install, e.g. 1.0.0
 
    <tt>installMaglev.sh</tt> runs one-time machine checks and configuration
    that ensure your hardware will run MagLev.  These mostly relate to
    shared memory settings. It's safe to run multiple times and it won't
-   overwrite things it's already done.  <tt>upgradeMaglev.sh</tt> does not
-   perform these checks.  Both scripts accept a version number as a
-   parameter.
+   overwrite things it's already done.
 
 The installer is somewhat verbose. That's so you can more easily debug
 installation problems.
 
-Note: This installer/updater creates a separate directory for each new
-version of MagLev. Reverting to an older version is as simple as stopping
-MagLev, changing <tt>$MAGLEV_HOME</tt> to point to the prior version, and
+Note: Reverting to an older version is as simple as stopping MagLev,
+changing <tt>$MAGLEV_HOME</tt> to point to the prior version, and
 restarting.
 
 === Install with Ruby Version Manager (RVM)
@@ -87,7 +69,7 @@ shell script instead.
 
 This version is best for MagLev contributors and for developers who want to
 live on the bleeding edge or use git functionality. It can be less stable
-than the zipped version.
+than the .tar.gz version.
 
 1. Clone the MagLev github repository
      git clone git://github.com/MagLev/maglev.git

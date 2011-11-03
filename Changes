@@ -1,6 +1,25 @@
 = MagLev Change Log
 
-  For more details see: http://bit.ly/d3C6S1
+== Changes for MagLev-1.0.0 2011-10-31
+* Fixes to callcc
+* We've moved all the MagLev code to GitHub (https://github.com/MagLev/maglev)
+  To see what changed after 1.0.0, check that site or run "git log" from your
+  $MAGLEV_HOME directory.
+
+== Changes for 27184 2011-10-25
+* Better separation of MagLev and GemStone
+* Updated version to MagLev 1.0 RC1 in preparation for next week's release.
+* Added support for Ruby's continuations
+* Reloading prims now loads files from MAGLEV_HOME, not GEMSTONE/upgradeDir
+* Remove workaround for bcrypt-ruby 3.0.0
+* Update rails patch for 3.1.1
+* Remove old RBS benchmarks, they're available online
+* Move the env-shebang patch for gem pristine to the defaults file
+* Remove workaround for missing patchMaster30.gs
+* The build:maglev target will now create the maglev stone if it doesn't exist.
+* Do the proper delayed evaluation of flip flop params.
+* Remove MCZ version, as the mcz no longer exists.
+* A number of fixes and improvements to underlying GemStone 3.1 system
 
 == Changes for 27072 2011-10-15
 * Moved .mcz from internal to github

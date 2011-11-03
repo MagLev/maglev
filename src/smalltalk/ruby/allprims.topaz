@@ -12,7 +12,7 @@ run
 logout
 set user SystemUser pass swordfish
 login
-input $GEMSTONE/upgrade/ruby/pre_prim_methods.gs
+input $MAGLEV_HOME/src/smalltalk/ruby/pre_prim_methods.gs
 run
 { Object . 
    Behavior . 
