@@ -26,6 +26,7 @@ Maglev.persistent do
       Maglev.abort_transaction
       res = DebuggerLogEntry.create_continuation_labeled(exception.message)
       res.continuation[Marker] = true
+      res.label_object(exception.message, exception)
       begin
         Maglev.commit_transaction
       rescue Exception => e
@@ -77,14 +78,8 @@ Maglev.persistent do
     # DebuggerException, as the #debug method catches any other
     # Exception and wraps it in a DebuggerException
     def debug_thread(client)
-      begin
-        # The next line raises if the Thread raised
-        client.value
-        # (joiner.respond_to?(:call) ? joiner.call : joiner).value
-      rescue DebuggerException => e
-        continuation = e.log_entry.continuation
-        raise e.cause
-      end
+      # The next line raises if the Thread raised
+      client.value
     end
 
     ##

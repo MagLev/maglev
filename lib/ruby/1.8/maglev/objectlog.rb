@@ -180,6 +180,9 @@ Maglev.persistent do
     # persistable version
     class_primitive 'create_continuation_labeled', 'rubyCreateContinuationLabeled:'
     primitive 'continuation', 'continuation'
+    primitive 'thread', 'continuation'
+    primitive 'exception', 'object'
+    primitive 'label_object', 'label:object:'
 
     # Readies the continuation for resume. nils the instance variable, removing
     # the thread from the stone
