@@ -10,3 +10,6 @@ fails:IO.select raises TypeError if the specified timeout value is not Numeric
 fails:IO.select raises TypeError if the first three arguments are not Arrays
 fails:IO.select does not raise errors if the first three arguments are nil
 fails:IO.select does not accept negative timeouts
+fails:IO.select raises a TypeError if the specified timeout value is not Numeric
+fails:IO.select sleeps the specified timeout if all streams are nil
+fails:IO.select raises an ArgumentError when passed a negative timeout

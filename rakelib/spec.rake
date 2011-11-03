@@ -4,7 +4,7 @@ namespace :spec do
 
   # NOTE: "-t m" handled in $MAGLEV_HOME/default.mspec
   # Running all of the specs in one VM requires bigger tmp obj size
-  PSPEC = %{MAGLEV_OPTS="--tocsz 500000 $MAGLEV_OPTS" #{ENV['MAGLEV_HOME']}/spec/mspec/bin/mspec }
+  PSPEC = %{MAGLEV_OPTS="--tocsz 1000000 $MAGLEV_OPTS" #{ENV['MAGLEV_HOME']}/spec/mspec/bin/mspec }
 
   desc "Run one rubyspec file: rake spec:run[spec/rubyspec/.../foo_spec.rb]"
   task :run, :spec do |t, args|
@@ -16,6 +16,15 @@ namespace :spec do
   task :ci do
     rm_f "rubyspec_temp/*"
     sh "#{PSPEC} -V -G fails"
+  end
+
+  desc "Run ci specs, generating a rubyspec_report.xml with JUnit output."
+  task :ci_report do
+    rm_f "rubyspec_temp/*"
+    sh "#{PSPEC} -f j -V -G fails 2>&1 | tee rubyspec_report.out"
+    sh 'csplit rubyspec_report.out "%<?xml%" "/</testsuites/+1"'
+    sh "mv xx00 rubyspec_report.xml"
+    sh "rm xx01 rubyspec_report.out"
   end
 
   desc "Retag the ci files (works only with hacked mspec-tag.rb)"

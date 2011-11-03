@@ -4,7 +4,7 @@ module Kernel
   def Float(obj)
     return obj  if obj._isFloat
     if obj._isString
-      if obj.__indexOfByte( 0 , 1 )._not_equal?(0)  
+      if obj.__indexOfByte( 0 , 1 )._not_equal?(0)
         raise ArgumentError, 'null character in arg to Float()'
       end
       str = obj.lstrip  # remove leading white space
@@ -12,27 +12,27 @@ module Kernel
       sign = 1.0
       first_ch = str[0]
       if first_ch._equal?( ?+ )
-	str.__remove_from_to(1,1)
+        str.__remove_from_to(1,1)
       elsif first_ch._equal?( ?- )
-	sign = -1.0
-	str.__remove_from_to(1,1)
-      end  
+        sign = -1.0
+        str.__remove_from_to(1,1)
+      end
       # see kernel/parser/lexer.rb for regexp's from which this code derived
       ok = (ra = str =~ /^[\d]+(.[\d]+)?(e[+-]?[\d]+)?/i ) ||
-             (rb = str =~ /^([\d]+|[\d]+[\d_]*[\d]+)(.([\d]+|[\d]+[\d_]*[\d]+))?(e[+-]?([\d]+|[\d]+[\d_]*[\d]+))?/i )
+        (rb = str =~ /^([\d]+|[\d]+[\d_]*[\d]+)(.([\d]+|[\d]+[\d_]*[\d]+))?(e[+-]?([\d]+|[\d]+[\d_]*[\d]+))?/i )
       unless ok
-        raise ArgumentError, "invalid value for Float(): #{obj.inspect}" 
+        raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
       end
       idxu = str.__indexOfByte( ?_ , 1 ) # arg/result is one-based
       unless idxu._equal?(0)
         if idxu._equal?(str.size ) ||
-           (rc = str =~ /([\d]+_e)|(e_)/i )
+            (rc = str =~ /([\d]+_e)|(e_)/i )
           raise ArgumentError, "invalid value for Float(): #{obj.inspect}"#
         end
         str = str.dup.delete('_')
       end
       f = str.__to_f
-      if f.nan? 
+      if f.nan?
         raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
       end
       return f * sign
@@ -47,15 +47,15 @@ module Kernel
       return obj
     end
     if obj._isString
-      if obj.__indexOfByte( 0 , 1 )._not_equal?(0)  
+      if obj.__indexOfByte( 0 , 1 )._not_equal?(0)
         raise ArgumentError, 'null character in arg to Integer()'
       end
       str = obj.lstrip  # remove leading white space
       str.rstrip! # remove trailing white space, in place
       if str.size._equal?(0)
-	raise ArgumentError, "invalid value for Integer: (empty string)"
+        raise ArgumentError, "invalid value for Integer: (empty string)"
       end
-      if str[0]._equal?( ?_ ) || str[-1]._equal?( ?_ ) 
+      if str[0]._equal?( ?_ ) || str[-1]._equal?( ?_ )
         raise ArgumentError, "invalid value for Integer: #{obj.inspect}"
       end
       return str.to_inum(0, true)
@@ -73,7 +73,7 @@ module Kernel
         val = obj.to_i
       rescue Exception
       end
-    end  
+    end
     unless val._isInteger
       raise TypeError, 'Coercion error: to_int or to_i did not return an Integer'
     end
@@ -82,14 +82,14 @@ module Kernel
   module_function :Integer
 
   def Array(obj)
-    if obj._isArray 
+    if obj._isArray
       return obj
-    end 
+    end
     bad = false
     begin
       res = obj.to_ary
       if res._isArray
-        return res 
+        return res
       else
         bad = res._not_equal?(nil)
       end
@@ -123,7 +123,7 @@ module Kernel
       raise TypeError, 'no implicit conversion to float'
     end
   end
-#  private :FloatValue   # TODO: uncomment
+  #  private :FloatValue   # TODO: uncomment
 
   def warn(warning)
     $stderr.write "#{warning}\n" if $VERBOSE._equal?(true)
@@ -137,7 +137,7 @@ module Kernel
   end
 
   # from timeout.rb
-  ## 
+  ##
   # Identical to:
   #
   #   Timeout::timeout(n, e, &block).

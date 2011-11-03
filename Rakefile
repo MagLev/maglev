@@ -2,15 +2,34 @@
 
 require 'rake/clean'
 
-# Try to support Rake 0.8.7 and 0.9.x (at least for a while)
-if defined? Rake::VERSION
-  # Rake 0.9.x
-  require 'rubygems'
-  gem 'rdoc'
-  require 'rdoc/task'
-else
-  # Rake 0.8.x
-  require 'rake/rdoctask'
+begin
+  # Try to support Rake 0.8.7 and 0.9.x (at least for a while)
+  if defined? Rake::VERSION
+    # Rake 0.9.x
+    require 'rubygems'
+    gem 'rdoc'
+    require 'rdoc/task'
+  else
+    # Rake 0.8.x
+    require 'rake/rdoctask'
+  end
+
+  Rake::RDocTask.new do |rd|
+    rd.main = "README.rdoc"
+    rd.rdoc_files.include 'docs/*', 'LICENSES.txt'
+    rd.rdoc_files.include 'src/kernel/bootstrap/Maglev.rb'
+    rd.rdoc_files.include 'examples/**/*README.rdoc', 'examples/**/readme.txt'
+  end
+rescue LoadError => e
+  puts e
+  puts "Generating RDoc will not work without the rdoc gem"
+
+  task :rdoc do
+    puts "Install the rdoc gem and re-run this"
+  end
+  task :rerdoc do
+    puts "Install the rdoc gem and re-run this"
+  end
 end
 
 $LOAD_PATH << File.dirname(__FILE__)  # For 1.9, '.' is no longer in the load path
@@ -23,13 +42,6 @@ verbose false  # turn off rake's chatter about all the sh commands
 CLEAN.include('*.out', 'log/vmunit*.out', 'log/all*.out', 'html',
               'vmunit.log', 'topazerrors.log', 'gem_*_code.log')
 CLOBBER.include('lib/ruby/site_ruby/1.8/smalltalk', 'version.txt')
-
-Rake::RDocTask.new do |rd|
-  rd.main = "README.rdoc"
-  rd.rdoc_files.include 'docs/*', 'LICENSES.txt'
-  rd.rdoc_files.include 'src/kernel/bootstrap/Maglev.rb'
-  rd.rdoc_files.include 'examples/**/*README.rdoc', 'examples/**/readme.txt'
-end
 
 task :default => :status
 

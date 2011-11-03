@@ -17,8 +17,13 @@ end
 
 out, err = capture_io do
   puts "Hi"
-  warn "bye"
+  # warn no longer prints warnings unless level is high,
+  # so explicitly call on $stderr
+  $stderr.puts "bye\n"
 end
+
+puts "out: #{out}"
+puts "err: #{err}"
 
 raise "Failed on stdout: #{out.inspect}" unless out == "Hi\n"
 raise "Failed on stderr: #{err.inspect}" unless err == "bye\n"

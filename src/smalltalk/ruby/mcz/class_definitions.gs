@@ -1,7 +1,7 @@
 
 doit
 MCStWriter subclass: 'MCGsWriter'
-	instVarNames: #( fileStreams dependencyIndex currentClass)
+	instVarNames: #( fileStreams)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()
@@ -492,7 +492,7 @@ removeallclassmethods
 
 doit
 Object subclass: 'RubyContinuation'
-	instVarNames: #( process)
+	instVarNames: #( process clientData)
 	classVars: #()
 	classInstVars: #()
 	poolDictionaries: #()

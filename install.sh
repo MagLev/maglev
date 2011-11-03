@@ -27,13 +27,6 @@
 #    Invoke update.sh to finish the job
 #=========================================================================
 
-if [ ! -d ".git" ]; then
-    echo "[Error] $PWD is not a git repository"
-    echo "install.sh and update.sh are only used with MagLev git repositories" 
-    echo "for more information see http://github.com/MagLev/maglev"
-    exit 1
-fi
-
 if [ -x bin/maglev-ruby ]; then
     # echo "using $PWD as MAGLEV_HOME"
     export MAGLEV_HOME=$PWD
@@ -56,7 +49,6 @@ fi
 PLATFORM="`uname -sm | tr ' ' '-'`"
 # Macs with Core i7 use the same software as older Macs
 [ $PLATFORM = "Darwin-x86_64" ] && PLATFORM="Darwin-i386"
-mag_name="MagLev-${1}.${PLATFORM}"
 
 # Check we're on a suitable 64-bit machine
 case "$PLATFORM" in
@@ -94,7 +86,7 @@ fi
 
 # We're good to go. Let user know.
 machine_name="`uname -n`"
-echo "[Info] Starting installation of $mag_name on $machine_name"
+echo "[Info] Configuring $machine_name to run MagLev"
 
 # Do a trivial sudo to test we can and get the password prompt out of the way
 sudo date
