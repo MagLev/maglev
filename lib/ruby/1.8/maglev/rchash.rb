@@ -48,6 +48,7 @@ class RCHash
   primitive '[]=', 'at:put:'
   primitive '__at_otherwise',  'at:otherwise:'
   primitive 'size', 'size'
+  alias length size
   primitive '__delete&', 'removeKey:ifAbsent:'
   primitive 'rebuild_table', 'rebuildTable:'
   primitive 'empty?', 'isEmpty'
