@@ -38,6 +38,26 @@ resolveSmalltalkGlobal: aName
 set class Kernel
 category: '*maglev-runtime'
 method:
+exposeSmalltalkGlobal: aName as: aRubyName
+  | assoc cld |
+  assoc := System myUserProfile resolveSymbol: (aName asSymbol) .
+  assoc ifNil:[ self error:'Smalltalk global ' , aName , ' not found' ].
+  assoc _value initNameSpacesForExtend: 1. "caller env"
+  (assoc _value nameSpace: 1) _name: aRubyName.
+  cld := GsProcess _current _clientData.
+  ^ ((cld
+      ifNotNil: [(cld at: 5) last theNonMetaClass "_rubyThreadDataAt:5 -> rtModuleStack"]
+      ifNil: [Object])
+    transientNameSpaceForStore: 1)
+      at: aRubyName asSymbol
+      runtimePut: assoc _value
+
+%
+
+
+set class Kernel
+category: '*maglev-runtime'
+method:
 rubyGlobalVariables
   "a ruby primitive"
   | ns arr |
