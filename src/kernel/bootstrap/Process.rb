@@ -125,5 +125,13 @@ module Process
     waitpid(pid, 0)
   end
 
+  def self.__child_pids
+    ps = "ps -d -o pid,ppid,command"
+    grep = "grep -v #{ps}"
+    me = Process.pid
+    list = %x[#{ps} | grep #{me} | grep -v "#{ps}" | grep -v "grep #{me}"]
+    pids = list.lines.to_a.collect {|str| str.strip.split.first }
+    pids.collect {|pid| pid.to_i }.reject {|pid| pid == me }
+  end
 end
 Process.__freeze_constants

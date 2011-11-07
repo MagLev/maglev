@@ -325,7 +325,11 @@ class IO
   end
 
   def pid
-    nil  # need to change after self.popen and self.pipe implemented
+    @_st_lineNumber # Overloaded ivar, but only pid OR line will ever be set
+  end
+
+  def __set_pid(int)
+    @_st_lineNumber = int
   end
 
   def self.popen(cmd, mode="r", &block)
@@ -334,7 +338,13 @@ class IO
     if cmd[0]._equal?( ?-)
       raise ArgumentError , '"-" prefix not supported by IO.popen' 
     end
+    Thread.critical = true # FIXME: This really ought to be fixed in the VM
+    old_pids = Process.__child_pids
     f = File.__popen(cmd, mode);
+    unless f._isFixnum
+      f.__set_pid Process.__child_pids.first {|pid| !old_pids.include?(pid) }
+    end
+    Thread.critical = false
     if f._isFixnum
       Errno.raise_errno(f, "IO.popen failed");
     end
