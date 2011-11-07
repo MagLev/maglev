@@ -61,13 +61,17 @@ end
 
 # Allow MagLev to consider original gem versions
 module Gem
+  def self.maglev_override_info
+    puts "[INFO] The MagLev team publishes customized versions of some gems."
+    puts "       These fix issues with the original versions or include optimizations"
+    puts "       specific to MagLev. To allow MagLev to pick the originals anyway,"
+    puts "       set the MAGLEV_GEMS_ALLOW_ALL environment variable to true"
+  end
+
   def self.maglev_gems_allow_all?
     unless defined? @@maglev_gems_allow_all
       if ENV["MAGLEV_GEMS_ALLOW_ALL"].nil? || ENV["MAGLEV_GEMS_ALLOW_ALL"] =~ /^0|false$/
-        puts "[INFO] The MagLev team publishes customized versions of some gems."
-        puts "       These fix issues with the original versions or include optimizations"
-        puts "       specific to MagLev. To allow MagLev to pick the originals anyway,"
-        puts "       set the MAGLEV_GEMS_ALLOW_ALL environment variable to true"
+        maglev_override_info
         @@maglev_gems_allow_all = false
       else
         puts "[INFO] Allowing MagLev to pick original gems over MagLev specific versions ..."
