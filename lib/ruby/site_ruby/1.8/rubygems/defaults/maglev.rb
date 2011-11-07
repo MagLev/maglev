@@ -261,3 +261,19 @@ class Gem::Installer
     original_gem_dir
   end
 end
+
+# Bundler 1.1 onwards uses the Rubygems API to retrieve only specific,
+# marshalled gemspecs. We can just proactively append the postfix and
+# if we _have_ a specific gem, it'll show up in the loaded gem list
+# with its original name, due to the unmarshalling modifications
+# above. Bundler then sorts through that list to select one gem. The
+# -maglev- gems have higher priority (again due to changes above)
+module Bundler
+  def self.autoload(name, file)
+    if name == :Fetcher && Bundler::VERSION.to_f >= 1.1
+      super(:Fetcher, File.expand_path("../bundler/fetcher", __FILE__))
+    else
+      super
+    end
+  end
+end
