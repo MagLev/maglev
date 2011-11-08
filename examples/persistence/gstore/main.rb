@@ -9,7 +9,7 @@ if defined? Maglev
     # and gstore.  But, we only need to do it once, so we test for that
     # case here.
     require 'pstore' unless defined? PStore
-    require 'gstore' unless defined? GStore
+    require 'maglev/gstore' unless defined? GStore
   end
   Maglev.commit_transaction
   file = 'gstore.db'
