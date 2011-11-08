@@ -373,6 +373,14 @@ module Maglev
     return System.begin_transaction
   end
 
+  # Enter a new nested transaction.
+  # If session is outside of a transaction, equivalent to beginTransaction.
+  # Signals a ImproperOperation exception if the begin would exceed
+  # 16 levels of nested transactions.
+  def self.begin_nested_transaction
+    return System.begin_nested_transaction
+  end
+
   # Attempt to commit the transaction for the current session.
   #
   # This method is the same as 'commit_transaction' except for the
@@ -388,6 +396,13 @@ module Maglev
   # was a failure.
   def commit_and_release_locks
     return System.commit_and_release_locks
+  end
+
+  # Returns 0 if not in a transaction, or a SmallInteger > 0
+  # indicating the transaction level. > 1 means a nested
+  # transaction.
+  def self.transaction_level
+    return System.transaction_level
   end
 
   # $LOADED_FEATURES has a persistent Array and a transient Array .  In

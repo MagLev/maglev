@@ -159,7 +159,8 @@ module Maglev
     class_primitive '__commitTransaction', 'commitTransaction'
     class_primitive '__abortTransaction', 'abortTransaction'
     class_primitive '__beginTransaction', 'beginTransaction'
-
+    class_primitive '__beginNestedTransaction', 'beginNestedTransaction'
+    class_primitive '__transactionLevel', 'transactionLevel'
 
     # Attempts to update the persistent state of the Repository to include
     # changes made by this transaction.
@@ -215,6 +216,20 @@ module Maglev
       __beginTransaction
     end
 
+    # Enter a new nested transaction.
+    # If session is outside of a transaction, equivalent to beginTransaction.
+    # Signals a ImproperOperation exception if the begin would exceed
+    # 16 levels of nested transactions.
+    def self.begin_nested_transaction
+      __beginNestedTransaction
+    end
+
+    # Returns 0 if not in a transaction, or a SmallInteger > 0
+    # indicating the transaction level. > 1 means a nested
+    # transaction.
+    def self.transaction_level
+      __transactionLevel
+    end
 
     # Attempt to commit the transaction for the current session.
     #
