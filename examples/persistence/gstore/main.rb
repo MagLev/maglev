@@ -2,8 +2,6 @@
 # GStore performance.
 #
 # TODO:
-#   * Remove the gstore.db from GStore before each run.
-#   * Do reads and writes
 #   * Different workloads (many readers, a few writers, etc.)
 if defined? Maglev
   Maglev.persistent do
