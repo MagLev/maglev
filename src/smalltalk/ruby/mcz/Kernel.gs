@@ -39,7 +39,7 @@ set class Kernel
 category: '*maglev-runtime'
 method:
 exposeSmalltalkGlobal: aName as: aRubyName
-  | assoc cld ns |
+  | assoc cld ns tns sym |
   assoc := System myUserProfile resolveSymbol: (aName asSymbol) .
   assoc ifNil:[ self error:'Smalltalk global ' , aName , ' not found' ].
 
@@ -48,13 +48,13 @@ exposeSmalltalkGlobal: aName as: aRubyName
     ifNotNil: [(cld at: 5) last theNonMetaClass "_rubyThreadDataAt:5 -> rtModuleStack"]
     ifNil: [Object].
 
-  (assoc _value nameSpace: 1) ifNil: ["new exposure, init namespace with proper name"
-    | nsPrefix |
-    nsPrefix := ns = Object ifTrue: [''] ifFalse: [(ns rubyFullName: 1), '::'].
-    assoc _value initNameSpacesForExtend: 1. "caller env"
-    (assoc _value nameSpace: 1) _name: (nsPrefix, aRubyName)].
+  ns rubyConstAt: (sym := aRubyName asSymbol) env: 1 put: assoc _value.
 
-  ^ ns rubyConstAt: aRubyName asSymbol env: 1 put: assoc _value.
+  (tns := assoc _value transientNameSpaceForStore: 1) parent ifNil: [
+    assoc _value changeNameTo: sym.
+    tns _name: sym;parent: (ns transientNameSpaceForStore: 1)].
+
+  ^ assoc _value
 
 %
 
