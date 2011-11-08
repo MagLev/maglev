@@ -102,6 +102,11 @@ signalSocketError: errText
     errSym ifNil:[
       ^ SocketError signal: 'SocketError_unknown ' , errText
     ].
+    errSym = #NotConnected "Fix github #97"
+      ifTrue: [| errno |
+        errno := (Exception errnoTables at: AbstractException cpuOsKind)
+                   indexOf: 'ECONNREFUSED'.
+        ^ (SystemCallError @ruby1:new: errText value: errno) signal].
     ^ SocketError signal: 'SocketError_' , errSym , ' ' , errText
   ].
   ^ exCls signal: exCls name , ' ' , errText
@@ -120,6 +125,11 @@ signalSocketError: errText
     errSym ifNil:[
       ^ SocketError signal: 'SocketError_unknown ' , errText
     ].
+    errSym = #NotConnected "Fix github #97"
+      ifTrue: [| errno |
+        errno := (Exception errnoTables at: AbstractException cpuOsKind)
+                   indexOf: 'ECONNREFUSED'.
+        ^ (SystemCallError @ruby1:new: errText value: errno) signal ].
     ^ SocketError signal: 'SocketError_' , errSym , ' ' , errText
   ].
   ^ exCls signal: exCls name , ' ' , errText
