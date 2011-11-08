@@ -15,6 +15,13 @@ if defined? Maglev
   file = 'gstore.db'
   GStore.rm(file)
   db = GStore.new(file)
+
+  # Do full commits after nested commits. If we don't actually persist
+  # (i.e, write to disk) it isn't really comparable to MRI
+  def db.transaction(*args, &block)
+    super
+    Maglev.commit_transaction
+  end
 else
   require 'pstore'
   file = 'pstore.db'
