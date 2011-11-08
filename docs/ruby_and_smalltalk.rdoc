@@ -1,364 +1,353 @@
--*- org -*-
-* Notes on Running Smalltalk and Ruby in the Same VM
+= Notes on Running Smalltalk and Ruby in the Same VM
 
-  This is a work in progress.  Current status: Not even a complete outline,
-  let alone first draft status.
+This is a work in progress.  Current status: Not even a complete outline,
+let alone first draft status.
 
-** Overview
+== Overview
 
-   The 3.x version of the GemStone VM supports two languages: Smalltalk and
-   Ruby.  This document explains how to access Ruby objects from Smalltalk,
-   and how to access Smalltalk objects from Ruby.
+The 3.x version of the GemStone VM supports two languages: Smalltalk and
+Ruby.  This document explains how to access Ruby objects from Smalltalk,
+and how to access Smalltalk objects from Ruby.
 
-*** VM does not distinguish between Ruby and Smalltalk objects
+=== VM does not distinguish between Ruby and Smalltalk objects
 
-    There is no fundamental difference between "Ruby objects" and
-    "Smalltalk objects".  From the VM perspective, they are the same.
-    There are operational differences, and each flavor of object makes use
-    of different features provided by the VM, but fundamentally, they are
-    the same and will interoperate.
+There is no fundamental difference between "Ruby objects" and "Smalltalk
+objects".  From the VM perspective, they are the same.  There are
+operational differences, and each flavor of object makes use of different
+features provided by the VM, but fundamentally, they are the same and will
+interoperate.
 
-    In fact, many classes are shared by both Ruby and Smalltalk (Object,
-    Float, Array, and others).  They are the same, identical class object:
+In fact, many classes are shared by both Ruby and Smalltalk (Object, Float,
+Array, and others).  They are the same, identical class object:
 
-       Smalltalk:  Object asOop    "=>  72193"
-       Ruby:       Object.__id__   # => 72193
+   Smalltalk:  Object asOop    "=>  72193"
+   Ruby:       Object.__id__   # => 72193
 
-*** Non-fundamental differences between Ruby and Smalltalk Objects
+=== Non-fundamental differences between Ruby and Smalltalk Objects
 
-    Even though there is no fundamental difference between "Ruby objects"
-    and "Smalltalk objects", there are some characteristics that each
-    flavor shows.
+Even though there is no fundamental difference between "Ruby objects" and
+"Smalltalk objects", there are some characteristics that each flavor shows.
 
-    1. Ruby objects use dynamic instance variables; Smalltalk objects use
-       fixed instance variables.
+1. Ruby objects use dynamic instance variables; Smalltalk objects use fixed
+   instance variables.
 
-    2. Ruby looks up methods in the environmnet 1 method dictionaries;
-       Smalltalk looks up methods in the environmnet 0 method
-       dictionaries.
+2. Ruby looks up methods in the environmnet 1 method dictionaries;
+   Smalltalk looks up methods in the environmnet 0 method dictionaries.
 
-    3. Ruby classes and modules use some flags in the object header that
-       are unique to ruby (to mark singleton classes, mixed in modules,
-       etc.)
+3. Ruby classes and modules use some flags in the object header that are
+   unique to ruby (to mark singleton classes, mixed in modules, etc.)
 
-*** How the VM keeps Ruby and Smalltalk separate
+=== How the VM keeps Ruby and Smalltalk separate
 
-    A couple of guiding principles (not hard and fast rules):
+A couple of guiding principles (not hard and fast rules):
 
-    1. In general, Smalltalk does not know about Ruby, and it takes an
-       explicit effort to touch the Ruby side of things from Smalltalk
-       (finding objects, invoking methods).
+1. In general, Smalltalk does not know about Ruby, and it takes an explicit
+   effort to touch the Ruby side of things from Smalltalk (finding objects,
+   invoking methods).
 
-    2. In general, Ruby is built on top of Smalltalk, but does not explicitly
-       know about it, and it takes effort to find Smalltalk objects and
-       invoke methods on them.
+2. In general, Ruby is built on top of Smalltalk, but does not explicitly
+   know about it, and it takes effort to find Smalltalk objects and invoke
+   methods on them.
 
-    There are ways to write a mixed Ruby/Smalltalk application, but you will
-    be on the vanguard, and you may have to hack your way through a bit of
-    underbrush for a while until we discover and address the issues. Today,
-    it should be possible to write a mixed Ruby/Smalltalk app, and we hope
-    that it will eventually by pleasant to do so.  Please give us feedback!
+There are ways to write a mixed Ruby/Smalltalk application, but you will be
+on the vanguard, and you may have to hack your way through a bit of
+underbrush for a while until we discover and address the issues. Today, it
+should be possible to write a mixed Ruby/Smalltalk app, and we hope that it
+will eventually by pleasant to do so.  Please give us feedback!
 
-*** Some objects/classes shared between Ruby and Smalltalk
+=== Some objects/classes shared between Ruby and Smalltalk
 
-    Smalltalk code can find and operate on Ruby objects, and vice-versa.
-    It's just that you have to be explicit about what you're doing.  We
-    don't want programmers having to worry about the other language, unless
-    they specifically want to take advantage of it, so there are no
-    accidental calls between the two languages.
+Smalltalk code can find and operate on Ruby objects, and vice-versa.  It's
+just that you have to be explicit about what you're doing.  We don't want
+programmers having to worry about the other language, unless they
+specifically want to take advantage of it, so there are no accidental calls
+between the two languages.
 
-    Each language has its own way of easily finding well known classes in
-    that language (standard symbol dictionaries for Smalltalk, the Ruby
-    namespace hierarchy for Ruby).  Those mechanisms do not prevent
-    discovery from the other language.
+Each language has its own way of easily finding well known classes in that
+language (standard symbol dictionaries for Smalltalk, the Ruby namespace
+hierarchy for Ruby).  Those mechanisms do not prevent discovery from the
+other language.
 
-    Some of the Ruby classes show up in the standard Smalltalk symbol
-    dictionaries (try browsing for "Ruby" in a Smalltalk class browser).
-    Some of the classes are not easily accessible from Smalltalk (e.g.,
-    library defined classes, user defined classes), because they are only
-    registered in the Ruby namespace.  But you can still access these from
-    Smalltalk.  E.g., here is how you'd access the ruby constant
-    Maglev::PERSISTENT_ROOT:
+Some of the Ruby classes show up in the standard Smalltalk symbol
+dictionaries (try browsing for "Ruby" in a Smalltalk class browser).  Some
+of the classes are not easily accessible from Smalltalk (e.g., library
+defined classes, user defined classes), because they are only registered in
+the Ruby namespace.  But you can still access these from Smalltalk.  E.g.,
+here is how you'd access the ruby constant Maglev::PERSISTENT_ROOT:
 
-      |maglev proot|
-      maglev := (Object rubyConstAt: #Maglev env: 1) value .
-      proot := (maglev rubyConstAt: #PERSISTENT_ROOT env: 1) value .
-      proot class .               "=>  RubyHash"
-      proot class asOop .         "=>  138497"
+  |maglev proot|
+  maglev := (Object rubyConstAt: #Maglev env: 1) value .
+  proot := (maglev rubyConstAt: #PERSISTENT_ROOT env: 1) value .
+  proot class .               "=>  RubyHash"
+  proot class asOop .         "=>  138497"
 
-    We first get a reference to the Maglev module by accessing the value of
-    the #Maglev constant in the top level namespace (Object).
-    PERSISTENT_ROOT is a constant defined in the Maglev module, so we again
-    ask for that constant.  proot now references a Ruby Hash instance.
+We first get a reference to the Maglev module by accessing the value of
+the #Maglev constant in the top level namespace (Object).  PERSISTENT_ROOT
+is a constant defined in the Maglev module, so we again ask for that
+constant.  proot now references a Ruby Hash instance.
 
-    Here we access the same identical object from Ruby:
+Here we access the same identical object from Ruby:
 
-      $ maglev-ruby -e 'p Maglev::PERSISTENT_ROOT.class'
-      Hash
+  $ maglev-ruby -e 'p Maglev::PERSISTENT_ROOT.class'
+  Hash
 
-      $ maglev-ruby -e 'p Maglev::PERSISTENT_ROOT.class.object_id'
-      138497
+  $ maglev-ruby -e 'p Maglev::PERSISTENT_ROOT.class.object_id'
+  138497
 
-    The only difference is the *name* the class is known as.  In Ruby, it
-    is named "Hash" and in Smalltalk, it is named "RubyHash".  RubyHash
-    derives from AbstractDictionary.
+The only difference is the *name* the class is known as.  In Ruby, it is
+named "Hash" and in Smalltalk, it is named "RubyHash".  RubyHash derives
+from AbstractDictionary.
 
-    So, objects are just objects, and can be accessed from either language.
+So, objects are just objects, and can be accessed from either language.
 
-*** Persistence
+=== Persistence
 
-    Persistence works the same for both languages.  If an object is
-    reachable from another persistent object, then that object will be
-    persisted at the next commit.  Since there aren't really "smalltalk
-    objects" and "ruby objects", the only criterion for persistence is
-    reachability (nothing changed here); it doesn't matter whether Ruby
-    code or Smalltalk code created/referenced the objects, the VM neither
-    knows nor cares.
+Persistence works the same for both languages.  If an object is reachable
+from another persistent object, then that object will be persisted at the
+next commit.  Since there aren't really "smalltalk objects" and "ruby
+objects", the only criterion for persistence is reachability (nothing
+changed here); it doesn't matter whether Ruby code or Smalltalk code
+created/referenced the objects, the VM neither knows nor cares.
 
-    For instance, from Smalltalk, you can put a Smalltalk defined object,
-    e.g. a MetacelloVersionNumber object, into the persistent RubyNameSpace
-    for Object, commit, and it would be visible to Ruby code.  The Ruby
-    code will have difficulty effectively using that object, since there
-    will be no methods visible to the Ruby code (but see the discussion of
-    Environments and method sends).
+For instance, from Smalltalk, you can put a Smalltalk defined object,
+e.g. a MetacelloVersionNumber object, into the persistent RubyNameSpace
+for Object, commit, and it would be visible to Ruby code.  The Ruby code
+will have difficulty effectively using that object, since there will be no
+methods visible to the Ruby code (but see the discussion of Environments
+and method sends).
 
-    To persiste Ruby objects, there are some extra steps you might have to
-    take. By default, Ruby classes are not persistent.  The rules of
-    persistence require that an object's class (and super class, mixed in
-    modules, etc.) be persistent as well.  So, if you want to persist a
-    Ruby object (from either Smalltalk or Ruby) you'll need to ensure that
-    the Ruby class for the object is persistent, and that all of its
-    ancestor classes are too (superclasses and mixed in modules).  But this
-    is a "managing the persistence of the Ruby class hierarchy" issue, and
-    not a fundamental VM-level issue.  You also might want to read
-    $MAGLEV_HOME/examples/persistence/migrations/migrations.org for some
-    initial thoughts on Ruby migrations.
+To persiste Ruby objects, there are some extra steps you might have to
+take. By default, Ruby classes are not persistent.  The rules of
+persistence require that an object's class (and super class, mixed in
+modules, etc.) be persistent as well.  So, if you want to persist a Ruby
+object (from either Smalltalk or Ruby) you'll need to ensure that the Ruby
+class for the object is persistent, and that all of its ancestor classes
+are too (superclasses and mixed in modules).  But this is a "managing the
+persistence of the Ruby class hierarchy" issue, and not a fundamental
+VM-level issue.  You also might want to read
+$MAGLEV_HOME/examples/persistence/migrations/migrations.org for some
+initial thoughts on Ruby migrations.
 
-*** Methods and Environments:
+=== Methods and Environments:
 
-    The 3.0 GemStone VM implements environments.  An environment is a
-    namespace for message sends.  Smalltalk is in environment 0, and Ruby
-    is in environment 1.  Each environment has its own method
-    dictionaries.  So, the Object class has a set of methods for Smalltalk
-    (stored in the environment 0 method dictionaries), and the Object
-    class has another set of methods for Ruby (stored in the environment 1
-    method dictionaries).
+The 3.0 GemStone VM implements environments.  An environment is a namespace
+for message sends.  Smalltalk is in environment 0, and Ruby is in
+environment 1.  Each environment has its own method dictionaries.  So, the
+Object class has a set of methods for Smalltalk (stored in the environment
+0 method dictionaries), and the Object class has another set of methods for
+Ruby (stored in the environment 1 method dictionaries).
 
-    A message send, by default, stays within its own environment.
-    Smalltalk issues message sends in environment 0, and Ruby issues
-    message sends in environment 1.  In the normal case, Smalltalk code
-    only calls other Smalltalk code, and Ruby code only calls other Ruby
-    code.  You can't accidentally send a Ruby message from a Smalltalk
-    method.  GemStone provides mechanisms to call one language from the
-    other.  These are discussed below.
+A message send, by default, stays within its own environment.  Smalltalk
+issues message sends in environment 0, and Ruby issues message sends in
+environment 1.  In the normal case, Smalltalk code only calls other
+Smalltalk code, and Ruby code only calls other Ruby code.  You can't
+accidentally send a Ruby message from a Smalltalk method.  GemStone
+provides mechanisms to call one language from the other.  These are
+discussed below.
 
-    Since Ruby depends on Smalltalk, there are a lot of new methods in
-    environment 0 (the Smalltalk side of things) that support ruby.  They
-    tend to be in either the *maglev-runtime* or RubySupport categories,
-    but you can look at them from the Smalltalk class/method browser.
+Since Ruby depends on Smalltalk, there are a lot of new methods in
+environment 0 (the Smalltalk side of things) that support ruby.  They tend
+to be in either the *maglev-runtime* or RubySupport categories, but you can
+look at them from the Smalltalk class/method browser.
 
-** Accessing Ruby from Smalltalk
-*** Find "Ruby objects" from Smalltalk
+== Accessing Ruby from Smalltalk
 
-    Ruby stores references to most classes in the Ruby namespace.  Each
-    Ruby Class and Module manages a set of constant references.  Most Ruby
-    classes are regisetred in this hierarchical namespace.  The Object
-    class represents the top level of the namespace.  In Ruby, a bare
-    reference to a class name will search Object's namespace for a match.
-    E.g., in the following Ruby code:
+=== Find "Ruby objects" from Smalltalk
 
-      my_array = Array.new()
+Ruby stores references to most classes in the Ruby namespace.  Each Ruby
+Class and Module manages a set of constant references.  Most Ruby classes
+are regisetred in this hierarchical namespace.  The Object class represents
+the top level of the namespace.  In Ruby, a bare reference to a class name
+will search Object's namespace for a match.
+E.g., in the following Ruby code:
 
-    Ruby will search for a symbol named "Array" in Object's namespace.  It
-    will succeed, and the object associated with the name "Array" is the
-    Array class.
+  my_array = Array.new()
 
-    Ruby supports a hierarchichal namespace.  E.g., we can create a
-    persistent Ruby Module and Class:
+Ruby will search for a symbol named "Array" in Object's namespace.  It will
+succeed, and the object associated with the name "Array" is the Array
+class.
 
-      Maglev.persistent do
+Ruby supports a hierarchichal namespace.  E.g., we can create a persistent
+Ruby Module and Class:
 
-        module MyModule
-          class Fizz
-            FIZZ = "a fizzy sound"
-          end
-        end
+  Maglev.persistent do
 
+    module MyModule
+      class Fizz
+        FIZZ = "a fizzy sound"
       end
-      Maglev.commit_transaction
+    end
 
-    Save the code to a file named my_module.rb, then run it:
+  end
+  Maglev.commit_transaction
 
-      $ maglev-ruby my_module.rb
+Save the code to a file named my_module.rb, then run it:
 
-    This code introduces three new symobls into the Ruby hierarchical
-    namespace:
+  $ maglev-ruby my_module.rb
 
-    1. The constant MyModule will be added to the Object's namespace (top
-       level namespace).  The value will be a Ruby Module object, which
-       implements the MyModule code above.
+This code introduces three new symobls into the Ruby hierarchical
+namespace:
 
-    2. The constant Fizz will be added to MyModule's namespace, and its
-       value will be an instnace of Class.
+1. The constant MyModule will be added to the Object's namespace (top level
+   namespace).  The value will be a Ruby Module object, which implements
+   the MyModule code above.
 
-    3. The FIZZ constant will be added to the MyModule::Fizz class, and
-       its value will be a String instance.
+2. The constant Fizz will be added to MyModule's namespace, and its value
+   will be an instnace of Class.
 
-    To traverse this hierarchy from Smalltalk you can do:
+3. The FIZZ constant will be added to the MyModule::Fizz class, and its
+   value will be a String instance.
 
-      |myModule fizzClass fizz|
-      myModule := (Object rubyConstAt: #MyModule env: 1) value .
-      fizzClass := (myModule rubyConstAt: #Fizz env: 1) value .
-      fizz := (fizzClass rubyConstAt: #FIZZ env: 1) value .
+To traverse this hierarchy from Smalltalk you can do:
 
-    And if you inspect fizz, you find 'a fizzy sound'.  And since the OOPs
-    are the same between Smalltalk and Ruby for myModule, fizzClass and
-    fizz, we know they are the very same objects created by the Ruby code:
+  |myModule fizzClass fizz|
+  myModule := (Object rubyConstAt: #MyModule env: 1) value .
+  fizzClass := (myModule rubyConstAt: #Fizz env: 1) value .
+  fizz := (fizzClass rubyConstAt: #FIZZ env: 1) value .
 
-      myModule asOop                    "=> 148107009"
-      fizzClass asOop                   "=> 148106241"
-      fizz asOop                        "=> 148100865"
+And if you inspect fizz, you find 'a fizzy sound'.  And since the OOPs are
+the same between Smalltalk and Ruby for myModule, fizzClass and fizz, we
+know they are the very same objects created by the Ruby code:
 
-    and
+  myModule asOop                    "=> 148107009"
+  fizzClass asOop                   "=> 148106241"
+  fizz asOop                        "=> 148100865"
 
-      MyModule.object_id                # => 148107009
-      MyModule::Fizz.object_id          # => 148106241
-      MyModule::Fizz::FIZZ.object_id    # => 148100865
+and
 
-*** Call Ruby methods from Smalltalk
+  MyModule.object_id                # => 148107009
+  MyModule::Fizz.object_id          # => 148106241
+  MyModule::Fizz::FIZZ.object_id    # => 148100865
 
-    GemStone Smalltalk provides a couple of mechanisms to issue message
-    sends in the Ruby environment 1 method dictionaries.
+=== Call Ruby methods from Smalltalk
 
-**** Using an environment aware message
+GemStone Smalltalk provides a couple of mechanisms to issue message sends
+in the Ruby environment 1 method dictionaries.
 
-     Some methods have a variant that take an "env" parameter.  You can
-     pass 1 as the environment parameter, and the VM will call the
-     appropriate environment 1 method.
+==== Using an environment aware message
 
-     An example of this is the perform:env variant of the perform:
-     message. Ruby defines the "object_id" method on Object, but you can't
-     call it directly from Smalltalk:
+Some methods have a variant that take an "env" parameter.  You can pass 1
+as the environment parameter, and the VM will call the appropriate
+environment 1 method.
 
-       Object object_id   "=>  raises a MessageNotUnderstood"
+An example of this is the perform:env variant of the perform: message. Ruby
+defines the "object_id" method on Object, but you can't call it directly
+from Smalltalk:
 
-     Using perform:env:, you can call it from Smalltalk:
+  Object object_id   "=>  raises a MessageNotUnderstood"
 
-       Object perform: #object_id env: 1 .   "=> 72193"
+Using perform:env:, you can call it from Smalltalk:
 
-     But if you try to invoke it in environment 0, you still get the
-     MessageNotUnderstood:
+  Object perform: #object_id env: 1 .   "=> 72193"
 
-       Object perform: #object_id env: 0 .   "=>  raises a MessageNotUnderstood"
+But if you try to invoke it in environment 0, you still get the
+MessageNotUnderstood:
 
-**** Using the "@ruby1:" syntax
+  Object perform: #object_id env: 0 .   "=>  raises a MessageNotUnderstood"
 
-     GemStone Smalltalk provides syntactic sugar to directly invoke a
-     method in the ruby environment.  E.g., to find the size of a string
-     using the Ruby :size method:
+==== Using the "@ruby1:" syntax
 
-       'My string' @ruby1:size   "=> 9"
+GemStone Smalltalk provides syntactic sugar to directly invoke a method in
+the ruby environment.  E.g., to find the size of a string using the
+Ruby :size method:
 
-     A Ruby message send with a single parameter:
+  'My string' @ruby1:size   "=> 9"
 
-       'My string' @ruby1:end_with?: 'ing'  "=> true"
+A Ruby message send with a single parameter:
 
-     To send a message that takes multiple parameters, use '_:' as the
-     name of each parameter after the first.  E.g., to do the Ruby
-     equivalent of 'My string'.ljust(20, "X") is:
+  'My string' @ruby1:end_with?: 'ing'  "=> true"
 
-       'My string' @ruby1:ljust: 20 _: 'X'   "=> 'My stringXXXXXXXXXXX'"
+To send a message that takes multiple parameters, use '_:' as the name of
+each parameter after the first.  E.g., to do the Ruby equivalent of 'My
+string'.ljust(20, "X") is:
 
-     In the next example, we are careful not to use a Smalltalk string
-     literal, since they are invaraint and Ruby's :insert method modifies
-     the receiver:
+  'My string' @ruby1:ljust: 20 _: 'X'   "=> 'My stringXXXXXXXXXXX'"
 
-       |s|
-       s := String withAll: 'My string' .
-       s @ruby1:insert: 2 _: ' long'         "=>  'My long string'"
+In the next example, we are careful not to use a Smalltalk string literal,
+since they are invaraint and Ruby's :insert method modifies the receiver:
 
-     Or the Ruby equivalent of Array.new.insert(0, :A, :B):
+  |s|
+  s := String withAll: 'My string' .
+  s @ruby1:insert: 2 _: ' long'         "=>  'My long string'"
 
-       |a|
-       a := Array new .
-       a @ruby1:insert: 0 _: #A _: #B    "=> anArray( #'A', #'B')"
+Or the Ruby equivalent of Array.new.insert(0, :A, :B):
 
-**** Gotchas
+  |a|
+  a := Array new .
+  a @ruby1:insert: 0 _: #A _: #B    "=> anArray( #'A', #'B')"
 
-     Even though Ruby and Smalltalk may share some classes, e.g., String,
-     that doesn't mean that a String object initialized from Smalltalk, is
-     a proper Ruby String.  Ruby may have additional instance variables
-     that need to be setup.  So you should be careful of calling Ruby
-     methods on objects created from Smalltalk, since the initialization
-     might not have been complete.
+==== Gotchas
 
-     TODO: Are there any real examples of this?
+Even though Ruby and Smalltalk may share some classes, e.g., String, that
+doesn't mean that a String object initialized from Smalltalk, is a proper
+Ruby String.  Ruby may have additional instance variables that need to be
+setup.  So you should be careful of calling Ruby methods on objects created
+from Smalltalk, since the initialization might not have been complete.
 
-** Accessing Smalltalk from Ruby
-*** Find "Smalltalk objects" from Ruby
+== Accessing Smalltalk from Ruby
+=== Find "Smalltalk objects" from Ruby
 
-    Kernel#__resolve_smalltalk_global provides a way for Ruby code to find
-    objects stored in the Smalltalk symbol dictionaries.  We already know
-    that the Ruby Hash class is named "RubyHash" in Smalltalk.  We can get
-    a reference to this class from Ruby, and prove that it is the same as
-    the object named "Hash" in the ruby namespace like this:
+Kernel#__resolve_smalltalk_global provides a way for Ruby code to find
+objects stored in the Smalltalk symbol dictionaries.  We already know that
+the Ruby Hash class is named "RubyHash" in Smalltalk.  We can get a
+reference to this class from Ruby, and prove that it is the same as the
+object named "Hash" in the ruby namespace like this:
 
-      st_ruby_hash = __resolve_smalltalk_global(:RubyHash)
-      p st_ruby_hash                # => "Hash"
-      p st_ruby_hash.equal? Hash    # => true
+  st_ruby_hash = __resolve_smalltalk_global(:RubyHash)
+  p st_ruby_hash                # => "Hash"
+  p st_ruby_hash.equal? Hash    # => true
 
-*** Call Smalltalk methods from Ruby
+=== Call Smalltalk methods from Ruby
 
-    You can also invoke Smalltalk methods from Ruby, but it is a bit more
-    complicated.  Try the following:
+You can also invoke Smalltalk methods from Ruby, but it is a bit more
+complicated.  Try the following:
 
-      $ cd $MAGLEV_HOME
-      $ rake stwrappers
+  $ cd $MAGLEV_HOME
+  $ rake stwrappers
 
-    And then look at the files in
-    $MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk.  E.g., here is some of the
-    code from one of those files, with some comments I added for this email:
+And then look at the files in
+$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk.  E.g., here is some of the
+code from one of those files, with some comments I added for this email:
 
-      # Get a reference to the RcCounter class.
-      RcCounter = __resolve_smalltalk_global(:RcCounter)
+  # Get a reference to the RcCounter class.
+  RcCounter = __resolve_smalltalk_global(:RcCounter)
 
-      # Open up (monkey patch) the class
-      class RcCounter
+  # Open up (monkey patch) the class
+  class RcCounter
 
-        # the class_primitive_nobridge and primitive_nobridge methods takes
-        # two parameters, the ruby name and the smalltalk name.  They then
-        # make the smalltalk method available to ruby via the ruby name.
-        # The class_primitive_nobridge works on the class side, and the
-        # primitive_nobridge works for instance methods.
-        #
-        # E.g., this makes it possible to send the :comment message to the
-        # environment 0 method dictionaries from Ruby like this:
-        #
-        #    RcCounter._st_comment()  # => "blah blah blah"
-        #
-        class_primitive_nobridge '_st_comment', 'comment'
+    # the class_primitive_nobridge and primitive_nobridge methods takes
+    # two parameters, the ruby name and the smalltalk name.  They then
+    # make the smalltalk method available to ruby via the ruby name.
+    # The class_primitive_nobridge works on the class side, and the
+    # primitive_nobridge works for instance methods.
+    #
+    # E.g., this makes it possible to send the :comment message to the
+    # environment 0 method dictionaries from Ruby like this:
+    #
+    #    RcCounter._st_comment()  # => "blah blah blah"
+    #
+    class_primitive_nobridge '_st_comment', 'comment'
 
 
-        # This allows ruby to do:
-        #   an_rc_counter_obj._st_decrement()
-        primitive_nobridge '_st_decrement', 'decrement'
+    # This allows ruby to do:
+    #   an_rc_counter_obj._st_decrement()
+    primitive_nobridge '_st_decrement', 'decrement'
 
-        # Called like:  an_rc_counter_obj._st_decrementBy_(10)
-        primitive_nobridge '_st_decrementBy_', 'decrementBy:'
+    # Called like:  an_rc_counter_obj._st_decrementBy_(10)
+    primitive_nobridge '_st_decrementBy_', 'decrementBy:'
 
-      end
+  end
 
-    TODO: explain primitive and class_primitive
-    TODO: implement and then explain __send_env__
+TODO: explain primitive and class_primitive
+TODO: implement and then explain __send_env__
 
-** Bridge Methods
+== Bridge Methods
 
    TODO: Explain the suffix notation.
 
-** Other Considerations
-   + How do you load up a full ruby environment from Smalltalk?  E.g.,
-     suppose you want to use Nokogiri from Seaside...We should probably
-     document a real use case like that.  Need to get Nokogiri loaded, get
-     some API/entry point so Seaside can call into it, and then return the
-     right stuff.
-   + How do you manage updating the Nokogiri gem in previous example?
+== Other Considerations
+* How do you load up a full ruby environment from Smalltalk?  E.g., suppose
+  you want to use Nokogiri from Seaside...We should probably document a
+  real use case like that.  Need to get Nokogiri loaded, get some API/entry
+  point so Seaside can call into it, and then return the right stuff.
+* How do you manage updating the Nokogiri gem in previous example?
