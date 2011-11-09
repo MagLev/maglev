@@ -1,0 +1,126 @@
+= Maglev Bootstrap code.
+
+The Maglev Bootstrap code consists of those ruby files loaded by
++src/kernel/kernel.rb+.  This Ruby code is compiled with the semantics
+defined in the rest of this file.
+
+== Multiple +def+ of a method is allowed
+
+The first +def+ is used to generate bridge methods, and sends resolving to
+a bridge method will come to this implementation by default.
+
+A subsequent +def+ of the same method with an alternate argument signature
+will replace a bridge method with the given implementation, and will have
+no bridge methods generated for itself.
+
+== Special semantics for send of +super+
+
+From +Object.rb+ near line 64: During bootstrap, a send of +super+ with no
+args specified passes an implicit block argument (the declared block
+parameter or +nil+), otherwise only the exact args to +super+ are passed.
+
+Outside of bootstrap, +super+ alway passes an explicit or implicit block
+argument.  See +RubySuperNode+ in +.mcz+ and Trac 454, 634.
+
+== Special semantics of +ensure+ while in bootstrap:
+
+From +Object.rb+ near line 72: During bootstrap, a Ruby +ensure+ translates
+to the Smalltalk <tt>ExecBlock>>ensure:</tt> semantics, and the ensure
+block will be executed after any rescue blocks run.
+
+Outside of bootstrap, +ensure+ translates to
+<tt>ExecBlock>>rubyEnsure:</tt> and the ensure block executes before rescue
+blocks higher in the stack are run.
+
+Use of +rubyEnsure:+ fixes Trac 720. Use of +ensure:+ in bootstrap code
+makes the +ensure+ faster .
+
+== Special bridge rules for +send+
+
+From +Object.rb+ near line 101: <tt>send#1*&</tt> and <tt>__send__#1*&</tt>
+are special cased in +bridgeForPrimAllowed:+, to have bridges during bootstrap.
+Any other implementations of +send+ or <tt>__send__</tt> get no bridge methods
+during bootstrap, to allow reimplementation of +send+ for methods updating
+<tt>$~</tt> or <tt>$_</tt>.
+
+== Redefinitions of some 'private' methods are disallowed after bootstrap
+
+See +Object.rb+:
+* redefinition of <tt>__send__</tt>  disallowed by parser after bootstrap
+  finished.
+* redefinition of <tt>__perform__</tt> disallowed by parser after bootstrap
+  finished.
+* redefinition of <tt>__perform_method</tt> disallowed after bootstrap
+* Attempts to reimplement  +block_given?+ disallowd after bootstrap
+
+== Extending these classes is not allowed after bootstrap
+* +VariableContext+
+* +ExecBlock+
+* +GsNMethod+
+
+== Constant resolution.
+
+During bootstrap, the parser attempts to resolve constants at compile time,
+to generate more efficient code to access constants whose value never
+changes, such as +String+, +Array+.  See the sends of +__freeze_constants+
+in a number of files which assists in the resolution of constants at
+compile time.
+
+See also
+* <tt>RubyClassNameNode >> walkWithScope:</tt>
+* <tt>RubyColon2Node >> walkWithScope:isDefinedQ:</tt>
+* <tt>RubyColon3Node >> walkWithScope:isDefinedQ:</tt>
+* <tt>RubyConstDeclNode >> walkWithScope:</tt>
+* <tt>Module >> rubyConstAt:env:put:</tt>
+
+== Use of +defined?+  is not allowed in bootstrap code.
+
+A variable on left hand side of <tt>::</tt> is not allowed in bootstrap
+code (see <tt>RubyColon2Node>>walkWithScope:isDefinedQ:</tt>).
+
+== <tt>Type.coerce_to</tt> optimizations
+
+See <tt>RubyCallNode >> irForTypeCoerce3Args:</tt> in +mcz/RubyCallNode.gs+
+
+If compiling bootstrap code we always optimize a call such as
+    Type.coerce_to(o , Integer, :to_int)
+to
+    o _isInteger ifTrue:[ o ]
+                 ifFalse:[ Type.__coerce_to_Integer_to_int(o) ]
+If not compiling bootstrap code, we attempt the optimization.
+
+== Class definitions
+
+Automatic sends of +#inherited+, +#method_added+, are not done during
+bootstrap.
+
+During bootstrap only, classes are left as 'smalltalk modifiable' in the
+first opening so that instVars with fixed offsets can be accumulated during
+the opening.
+
+The first opening of a class or module which is found in the name space
+(i.e.  was defined from Smalltalk) will delete any persistent environment 1
+methods for the class.
+
+See
+<tt>RubyCompiler>>defineClassNamed:rubyMethod:inScope:superclass:env:fixedIvs:</tt>
+and <tt>RubyCompiler>>defineModuleNamed:rubyMethod:inScope:env:</tt>
+
+instVar references that would create a dynamic instVar are not allowd.
+
+Enviroment 1 superclass of +Symbol+ is changed to be +Object+ near end of
+bootstrap, see <tt>RubyContext >> _fixSymbolSuperclass:</tt>.
+
+== Miscellaneous
+
++LOADED_FEATURES+ accumulates files loaded during bootstrap and is reset to
+empty at end of bootstrap. See
+<tt>RubyContext>>_requirePrimitives_traceGlobals:traceLocals:env:reload:</tt>.
+
+Some of the automatic coercion to +Proc+ is not executed within bootstrap
+code. See comments in <tt>RubyLocalVarNode >> irBlockPassNode</tt>, and
+<tt>RubyBlockPassNode >> irNode</tt>.
+
+Creation of a +Binding+ is not allowed during bootstrap, see
+<tt>RubyVCallBindingNode>>irArgNodes</tt>.
+
