@@ -1466,4 +1466,7 @@ class BigDecimal
     self.__truncate(n, 0)
   end
 
+  def _dump(limit = nil)  # used by marshal
+    Marshal.dump(self)
+  end
 end
