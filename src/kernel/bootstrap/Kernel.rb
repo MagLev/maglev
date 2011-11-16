@@ -212,8 +212,10 @@ module Kernel
       cmd  = "sh"
       env_arr = arr[1]
       dups_arr = arr[2]
-      arguments = [ "-c", arr[0] ]
-      arguments.concat( arr[3] )
+      arguments = ["-c"]
+      command = [arr[0]]
+      command.concat(arr[3])
+      arguments << command.join(" ")
       child_pid = self.__execv(cmd, 1, env_arr, dups_arr, *arguments)
       if child_pid < 0
         Errno.handle( - child_pid )
