@@ -1466,7 +1466,16 @@ class BigDecimal
     self.__truncate(n, 0)
   end
 
+  def self._load(data) # used by marshal
+    raise TypeError, 'marshaled bignum format differ' unless data.start_with? "18:"
+    begin
+      self.new(data["18:".size..-1])
+    rescue Exception
+      raise TypeError, 'marshaled bignum format differ'
+    end
+  end
+
   def _dump(limit = nil)  # used by marshal
-    Marshal.dump(self)
+    "18:#{self.to_s}" # 18: is for compat with Ruby marshal
   end
 end
