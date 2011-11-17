@@ -1,9 +1,15 @@
 module Kernel
 
+  # This is for bootstrap code only
   primitive_nobridge '__resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
   # _smalltalk_global_put for use by bootstrap code only
   primitive_nobridge '__smalltalk_global_put', 'smalltalkUserGlobalsAt:put:'
+
+  # Use this method to expose a Smalltalk class to Ruby land under a
+  # specific name. It will install the class within the current
+  # namespace under the specified name
+  primitive 'expose_smalltalk_global_as', 'exposeSmalltalkGlobal:as:'
 
   # Loads and executes the Ruby program in the file +name+.  If the
   # filename does not resolve to an absolute path, the file is searched for
