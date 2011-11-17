@@ -395,7 +395,7 @@ module FFI
         lib_names << a_name
         n += 1
       end
-      CLibrary.__set_libraries( lib_names, libs )
+      CLibrary.__set_libraries( lib_names, libs ).last
     end
 
     def ffi_libraries
