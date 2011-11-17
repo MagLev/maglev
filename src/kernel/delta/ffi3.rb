@@ -38,15 +38,15 @@ module FFI
 
     # Register the zero argument block to be called each time the
     # shared library represented by the receiver is loaded into a VM  .
-    # The block is also run when initialize_on_load is called, 
-    # if there was no previous block registered with the receiver. 
+    # The block is also run when initialize_on_load is called,
+    # if there was no previous block registered with the receiver.
     # For an example, see lib/ruby/1.8/maglev/opensslffi/libcrypto.rb .
-    def initialize_on_load(&block) 
+    def initialize_on_load(&block)
       old = @_st_onLoadBlock
-      @_st_onLoadBlock = block 
+      @_st_onLoadBlock = block
       if old._equal?(nil) && block_given?
         block.call
-      end 
+      end
     end
   end
 
