@@ -51,9 +51,6 @@ class MSpecScript
                "^spec/rubyspec/library/complex/modulo_spec.rb",
                "^spec/rubyspec/library/complex/multiply_spec.rb",
                "^spec/rubyspec/library/complex/plus_spec.rb",
-               "^spec/rubyspec/library/iconv/iconv_spec.rb",            # 2011-12-01
-               "^spec/rubyspec/library/net/http/http/request_spec.rb",  # 2011-12-01
-               "^spec/rubyspec/library/net/http/http/send_request_spec.rb",  # 2011-12-01
                "^spec/rubyspec/library/prime",
                "^spec/rubyspec/library/scanf",
                "^spec/rubyspec/library/socket",                         # Orpheus, Grace
