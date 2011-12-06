@@ -53,6 +53,7 @@ class MSpecScript
                 "^spec/rubyspec/core/process/wait2_spec.rb",
                 "^spec/rubyspec/core/process/wait_spec.rb",
                 "^spec/rubyspec/core/process/waitall_spec.rb",
+                "^spec/rubyspec/core/range/step_spec.rb",               # 2011-12-07
                 "^spec/rubyspec/core/string/modulo_spec.rb",
                 "^spec/rubyspec/core/string/unpack/a_spec.rb",
                 "^spec/rubyspec/core/string/unpack/p_spec.rb",          # 2011-12-01
