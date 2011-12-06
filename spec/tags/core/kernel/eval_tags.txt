@@ -10,3 +10,4 @@ fails:Kernel#eval updates a local at script scope
 fails:Kernel#eval stores all locals of nested eval bindings in the first non-eval binding
 fails:Kernel#eval allows a Proc invocation to terminate the eval binding chain on local creation
 fails:Kernel#eval can access normal locals in nested closures
+fails:Kernel#eval finds locals in a nested eval
