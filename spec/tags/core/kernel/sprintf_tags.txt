@@ -1,6 +1,3 @@
-fails:Kernel#sprintf passes some tests for positive %x
-fails:Kernel#sprintf passes some tests for negative %x
-fails:Kernel#sprintf passes some tests for positive %u
 fails:Kernel#sprintf passes kstephens's tests
 fails:Kernel#sprintf with negative values with format %x precedes the number with '..'
 fails:Kernel#sprintf with negative values with format %u precedes the number with '-'
