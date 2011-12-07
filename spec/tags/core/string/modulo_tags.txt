@@ -1,7 +1,6 @@
 fails:String#% raises an ArgumentError for unused arguments when $DEBUG is true
 fails:String#% replaces trailing absolute argument specifier without type with percent sign
 fails:String#% allows more than one digit of position
-fails:String#% raises an ArgumentError when absolute and relative argument numbers are mixed
 fails:String#% allows positional arguments for width star and precision star arguments
 fails:String#% allows negative width to imply '-' flag
 fails:String#% ignores negative precision

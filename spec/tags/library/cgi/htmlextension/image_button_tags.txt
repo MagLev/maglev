@@ -1,1 +1,0 @@
-fails:CGI::HtmlExtension#image_button when passed src, name, alt ignores a passed block
