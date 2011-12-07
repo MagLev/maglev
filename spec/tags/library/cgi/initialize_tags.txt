@@ -1,2 +1,1 @@
-fails:CGI#initialize when passed no arguments sets #cookies based on ENV['HTTP_COOKIE']
 fails:CGI#initialize when CGI_PARAMS is set prints out a warning
