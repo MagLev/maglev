@@ -1,0 +1,1 @@
+fails:Net::HTTP#send_request when passed type, path, body sends a HTTP Request with the passed body

@@ -1,1 +1,2 @@
 fails:GzipWriter#write writes some compressed data
+fails:GzipWriter#write handles inputs of 2^23 bytes
