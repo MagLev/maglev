@@ -29,18 +29,18 @@ class RCQueue
 
   primitive 'each&', 'do:'
 
-  primitive 'enq', 'add:'
-  alias push enq
-  alias << enq
+  primitive 'add', 'add:'
+  alias push add
+  alias << add
+  alias enq add
 
   primitive '__remove_all', 'removeAll'
   alias clear __remove_all
 
-  primitive 'deq', 'remove'
-  alias pop deq
-  alias shift deq
-
-
+  primitive 'remove', 'remove'
+  alias pop remove
+  alias shift remove
+  alias deq remove
 
 end
 
