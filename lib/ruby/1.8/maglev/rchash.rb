@@ -48,14 +48,25 @@ class RCHash
   primitive '[]=', 'at:put:'
   primitive '__at_otherwise',  'at:otherwise:'
   primitive 'size', 'size'
+  alias length size
+  alias count size
   primitive '__delete&', 'removeKey:ifAbsent:'
   primitive 'rebuild_table', 'rebuildTable:'
   primitive 'empty?', 'isEmpty'
   primitive '__keys', 'keys'
+  primitive '__values&', 'valuesDo:'
   primitive 'each&', 'keysAndValuesDo:'
 
   def keys
     __keys.to_a
+  end
+
+  def values
+    ary = []
+    __values do |v|
+      ary << v
+    end
+    ary
   end
 
   def [](key)
