@@ -52,9 +52,7 @@ module Kernel
   module_function :lambda
 
   def proc(&block)
-    # in 1.8.6, this used to be Proc.new_lambda
-    # 1.8.7 broke compatibility in this
-    Proc.new(&block)
+    Proc.new_lambda(&block)  # use new_lambda here for 1.8.6 compatibility
   end
   module_function :proc
 
