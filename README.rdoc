@@ -71,6 +71,9 @@ This version is best for MagLev contributors and for developers who want to
 live on the bleeding edge or use git functionality. It can be less stable
 than the .tar.gz version.
 
+Create a new directory on a local (not NFS) file system to hold the
+MagLev source tree and other files. Change to that directory, then:
+
 1. Clone the MagLev github repository
      git clone git://github.com/MagLev/maglev.git
 1. Install the VM.  If this is the first time you're installing MagLev,
