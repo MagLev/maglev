@@ -79,6 +79,11 @@ class Class
     c
   end
 
+  # Returns a nice string for Kernel#method_missing
+  def __name_for_mnu
+    "#{name}:Class"
+  end
+
   # Allocate space for a new object of self's class.  The returned object
   # is an instance of self.
   primitive 'allocate', 'rubyBasicNew'    # init fixed instVars to remoteNil
