@@ -157,8 +157,8 @@ module Kernel
       return 2 if arg._equal?(:err)
     elsif arg._is_a?(File)
       return 0 if arg._equal?(STDIN)
-      return 0 if arg._equal?(STDOUT)
-      return 0 if arg._equal?(STDERR)
+      return 1 if arg._equal?(STDOUT)
+      return 2 if arg._equal?(STDERR)
     end
     return nil
   end
