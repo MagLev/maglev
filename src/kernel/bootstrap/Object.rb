@@ -609,7 +609,16 @@ class Object
   def to_enum(sym = :each , *args)  # added in 1.8.7
     # the receiver must implement the specified method that
     #  would return an enumerator
-    self.__send__(sym, *args)
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
+    unless added # fix infinite recursion if s.b. implements #each and
+                 # calls #to_enum in there
+      ts.remove(self)
+      return self.enum_for(sym, *args)
+    end
+    return self.__send__(sym, *args)
+  ensure
+    ts.remove(self)
   end
 
   def to_fmt
