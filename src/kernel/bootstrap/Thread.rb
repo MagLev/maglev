@@ -8,6 +8,14 @@ class Thread
 
   class_primitive_nobridge '__abort_on_exception', 'rubyExitOnException:'
 
+  def abort_on_exception
+    !!self[:RubyExitOnException]
+  end
+
+  def abort_on_exception=(bool)
+    self[:RubyExitOnException]=bool
+  end
+
   def self.abort_on_exception
     self.__abort_on_exception(nil)
   end
