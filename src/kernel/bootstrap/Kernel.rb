@@ -115,7 +115,7 @@ module Kernel
   # optional +skip+ parameter determines the number of initial stack
   # entries to omit from the result.  The optional +limit+ parameter
   # determines the maximum number of frames to return.
-  def caller(skip=0, limit=1000)
+  def caller(skip=1, limit=1000)
     # returns an Array of Strings, each element describes a stack frame
     unless skip._isFixnum
       raise ArgumentError
