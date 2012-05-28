@@ -10,6 +10,7 @@
 There are several ways to install MagLev:
 * Use the installer
 * Install with Ruby Version Manager (RVM)
+* Install with ruby-build/rbenv
 * Install from GitHub
 
 === Install a specific version of MagLev from a .tar.gz archive
@@ -64,6 +65,31 @@ It takes a short time before they shut down, as they do a bit of cleanup first.
 <b>Note:</b> When running rake from MagLev, you cannot perform tasks which affect
 MagLev itself, like <tt>rake maglev:stop</tt>. You have to use the <tt>bin/maglev</tt>
 shell script instead.
+
+=== Install with ruby-build/rbenv
+
+{ruby-build}[https://github.com/sstephenson/ruby-build] is a plugin for {rbenv}[https://github.com/sstephenson/rbenv] 
+that compiles and installs different Ruby implementations on Unix-like systems. 
+rbenv lets you switch among different implementations of Ruby easily.
+
+You can install MagLev with rbenv:
+
+  rbenv install maglev-1.0.0
+
+or you can use ruby-build to install MagLev standalone:
+
+  ruby-build maglev-1.0.0 ~/local/maglev
+
+<b>Note:</b> Change <tt>~/local/maglev</tt> to wherever you want MagLev installed.
+
+ruby-build basically runs <tt>install.sh</tt> with some friendly output.
+
+You will have to start and stop the MagLev server using
+
+  maglev start
+  maglev stop
+
+The <b>ProTip</b> above for RVM still applies.
 
 === Install from GitHub
 
