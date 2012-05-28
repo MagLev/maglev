@@ -18,3 +18,5 @@ including:
   other improvements/
 - Tim Felgentreff for creating an FFI'd bcrypt-ruby that works with MagLev, getting
   mkmf.rb working and other help with MagLev C extensions.
+- Jesse Cooke for adding MagLev support to ruby-build - https://github.com/sstephenson/ruby-build
+  and exposing RCQueue, along with starting the use of MSpec for functionality like the Reduced Conflict classes.
