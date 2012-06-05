@@ -1,4 +1,4 @@
-! Do not set the stone name in this file, maglev-ruby will overrride it.
+! Do not set the stone name in this file, maglev-ruby will override it.
 ! Use the STONENAME environment variable instead.
 set username 'DataCurator'
 set password swordfish
