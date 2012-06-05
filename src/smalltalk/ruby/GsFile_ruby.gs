@@ -146,6 +146,7 @@ _section2OpenConstants
    at: #RUBY_NONBLOCK  put: RUBY_NONBLOCK  ;
    at: #RUBY_RDONLY  put: RUBY_RDONLY ;
    at: #RUBY_RDWR  put: RUBY_RDWR ;
+   at: #RUBY_SYNC  put: RUBY_SYNC ;
    at: #RUBY_TRUNC  put: RUBY_TRUNC ;
    at: #RUBY_WRONLY put: RUBY_WRONLY .
  ^ h
