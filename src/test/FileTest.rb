@@ -121,4 +121,6 @@ log = open(fname, 'wb', 0644)
 log.close
 File.delete(fname) if File.exist?(fname)
 
+test(!!File::SYNC, true, "File::SYNC should not be nil")
+
 report
