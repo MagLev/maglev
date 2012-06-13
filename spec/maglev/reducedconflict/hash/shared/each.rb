@@ -21,7 +21,7 @@ describe :rchash_each, :shared => true do
     check["b"] = "2"
     check["c"] = "3"
     check["d"] = "5"
-    r.keys.should == check.keys
+    r.keys.sort.should == check.keys.sort
     r.values.should == check.values
   end
 
