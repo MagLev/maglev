@@ -125,7 +125,7 @@ module Maglev
   # Calls to +transient+ may be nested inside other calls to +transient+
   # and calls to +persistent+.
   #
-  #  Returns the value of executing teh block.
+  # Returns the value of executing the block.
   #
   def transient(&block)
     #--
