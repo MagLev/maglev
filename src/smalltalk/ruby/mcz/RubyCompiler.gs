@@ -295,7 +295,7 @@ withRubyHandlers: envId main: mainThrBool do: aBlock
         mainThr signalException: nx .
         Processor yield.
       ].
-      runAtExits ifTrue:[ runAtExitBlk value ]
+      runAtExits ifTrue:[ runAtExitBlk value ].
       AbstractException signal: 'Kernel.exit invoked from non-main thread, and main thread not alive' .
     ] ifFalse:[
       runAtExits ifTrue:[ runAtExitBlk value ]
