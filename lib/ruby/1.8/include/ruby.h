@@ -850,7 +850,7 @@ RUBY_DLLSPEC VALUE rb_str2inum(VALUE str, int base);
 
 RUBY_DLLSPEC VALUE rb_cstr2inum(const char* str, int base) ;
 
-#define rb_cstr_to_dbl(x, badcheck) rb_num2dbl(rb_cstr2inum(x, 10))
+#define rb_cstr_to_dbl(x, badcheck) atof(x)
 
 //  define rb_cstr_to_inum(VALUE str, int base, badcheck) rb_cstr2inum(str, base)
 
