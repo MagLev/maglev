@@ -125,5 +125,8 @@ module Process
     waitpid(pid, 0)
   end
 
+  def self.fork
+    raise NotImplementedError, "fork not available on MagLev"
+  end
 end
 Process.__freeze_constants
