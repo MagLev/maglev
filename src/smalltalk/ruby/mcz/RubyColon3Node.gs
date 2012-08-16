@@ -46,6 +46,20 @@ baseName
 
 
 set class RubyColon3Node
+category: '*maglev-runtime'
+method:
+buildConstRef
+
+	globAssoc ifNotNil: [
+		globAssoc class == RubyConstantRef ifFalse: [
+			^ super buildConstRef "an association bound at compile time, in bootstrap"
+		]
+	].
+	^ globAssoc
+%
+
+
+set class RubyColon3Node
 category: '(as yet unclassified)'
 method:
 definedQkind
