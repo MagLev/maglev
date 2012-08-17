@@ -723,7 +723,7 @@ RUBY_DLLSPEC const char* rb_str2cstr(VALUE str, long *len);
    // C memory is auto-freed by GC
 
 /** The pointer to the string str's data. */
-#define RSTRING_PTR(str) rb_str2cstr(str, NULL)
+#define RSTRING_PTR(str) (char*)rb_str2cstr(str, NULL)
 static inline const char* rb_str_ptr(VALUE str) { return rb_str2cstr(str, NULL); }
 static inline const char* rb_str_ptr_readonly(VALUE str) { return rb_str2cstr(str, NULL); }
 
@@ -841,6 +841,8 @@ RUBY_DLLSPEC VALUE rb_str_intern(VALUE str);
 RUBY_DLLSPEC long rb_str_len(VALUE str);
 
 #define RSTRING_LEN(str) rb_str_len(str)
+#define RSTRING_LENINT(str) rb_long2int(rb_str_len(str))
+#define rb_long2int(x) ((int)x)
 
 // /** Deprecated alias for rb_obj_freeze */
 // RUBY_DLLSPEC VALUE rb_str_freeze(VALUE str);
