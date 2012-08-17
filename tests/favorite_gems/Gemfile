@@ -3,7 +3,13 @@
 # This gemfile does not list particular versions, and the test removes any
 # Gemfile.lock, so it will test that the latest versions of the gems
 # install.
-source 'http://w2-stdev-ub10-01.gemstone.com:9292'
+require 'resolv'
+begin
+  mirror = 'http://w2-stdev-ub10-01.gemstone.com:9292'
+  Resolv.getaddress mirror
+  source mirror
+rescue Exception
+end
 source "http://rubygems.org"
 
 gem "sinatra"
