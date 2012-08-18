@@ -32,9 +32,8 @@ st_trace = $bx
 
 # END of line number sensitive code
 
-expected = [ 
-   "src/test/CallerTest.rb:25:in `c'",
-   "src/kernel/bootstrap/Array.rb:DONT_CARE:in `each'", 
+expected = [
+   "src/kernel/bootstrap/Array.rb:DONT_CARE:in `each'",
    "src/test/CallerTest.rb:24:in `c'",
    "src/test/CallerTest.rb:19:in `b'",
    "src/test/CallerTest.rb:15:in `a'",
@@ -42,7 +41,7 @@ expected = [
   ]
 
 bt_suffixes = []
-back_trace.each do | str | 
+back_trace.each do | str |
   bt_suffixes << str[-25, 25]
 end
 
