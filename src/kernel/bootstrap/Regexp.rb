@@ -232,7 +232,8 @@ class Regexp
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
-    raise ArgumentError, 'expected 1 arg with no block'
+    raise(ArgumentError, 'expected 1 arg with no block') if block
+    return self.match(args[0])
   end
 
   def match(str)
@@ -257,7 +258,8 @@ class Regexp
     # only one-arg call supported. any other invocation
     # will have a bridge method interposed which would
     #   require different args to __storeRubyVcGlobal
-    raise ArgumentError, 'expected 1 arg with no block'
+    raise(ArgumentError, 'expected 1 arg with no block') if block
+    return self =~ args[0]
   end
 
   def =~(str)
