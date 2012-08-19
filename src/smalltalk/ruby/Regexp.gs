@@ -60,7 +60,7 @@ new: aString options: anInteger lang: langString
   for specified pattern string and options.  
   langString must specifiy ASCII ."
 
-  | res status opts |
+  | res status opts unescapedString |
 
   aString _isRegexp ifTrue:[ ^ aString copy ].
   
@@ -73,9 +73,13 @@ new: aString options: anInteger lang: langString
     ].
     opts := self optsFromLang: langString opts: opts .
   ].
-   
+
+  "FIXME: This is a workaround for a bug in the parser. It's compile time, 
+   so shouldn't be too bad, but remove this once GitHub issue #142 is fixed
+   properly"
+  unescapedString := aString copyReplaceAll: '\/' with: '/'.
   res := self rubyNewCFinalizer_stBaseClass: Regexp .
-  status := res _compile: aString options: opts .
+  status := res _compile: unescapedString options: opts .
   status ~~ res ifTrue:[ RegexpError signal: status ].
   ^ res
 %
