@@ -321,7 +321,7 @@ class IO
   end
 
   def self.open(int_fd, mode_string, &block)
-    raise NotImplementedError, "IO.open not implemented"
+    raise StandardError, "IO.open not implemented"
   end
 
   def pid
