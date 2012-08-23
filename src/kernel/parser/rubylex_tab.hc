@@ -1,3 +1,4 @@
+/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
 /* C code produced by gperf version 2.7.2 */
 /* Command-line: gperf -p -j1 -i 1 -g -o -t -N rb_reserved_word -k'1,3,$' ./keywords  */
 class kwtable {

@@ -1,3 +1,4 @@
+/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
 // generated file rubygrammar.h 
 
 typedef enum { 
