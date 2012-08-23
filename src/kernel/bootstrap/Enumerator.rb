@@ -6,6 +6,26 @@ module Enumerable
     # The current implementation does not use fibers or continuations
     include Enumerable
 
+    # Provide generic method, so aliasing works correctly
+    def initialize(object = nil, enum_sel = :each, *extra)
+      # per specs, requires 1.8.8 or above
+      unless object
+        if block_given?
+          raise(ArgumentError, 'Enumerator from block not supported in 1.8.7')
+        else
+          raise(ArgumentError, 'wrong number of arguments (0 for 1)')
+        end
+      end
+
+      @ofs = 0
+      @obj = object
+      unless enum_sel._isSymbol
+        raise TypeError, 'second arg must be a Symbol'
+      end
+      @enum_selector = enum_sel
+      @extra_args = extra
+    end
+
     def initialize(object, enum_sel, arg1, arg2)
       @ofs = 0
       @obj = object
@@ -38,11 +58,6 @@ module Enumerable
 
     def initialize(object)
       self.initialize(object, :each)
-    end
-
-    def initialize(&block)
-      # per specs, requires 1.8.8 or above
-      raise ArgumentError, 'Enumerator from block not supported in 1.8.7'
     end
 
     def each(&block)
