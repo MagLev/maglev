@@ -13,7 +13,7 @@ _rubyNew1: aSuperCls do: aBlock
       poolDictionaries: #() .
   newCls immediateInvariant . 
   aBlock ifNotNil:[ | defStk cld |
-    cld := GsProcess _current _clientData .
+    cld := GsProcess _current clientData .
     (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: newCls .
     cld at: 7 put: newCls " _rubyThreadDataAt: 7 put: " .
     [ | blk |

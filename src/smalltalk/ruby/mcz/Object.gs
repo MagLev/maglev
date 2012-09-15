@@ -135,7 +135,7 @@ instanceEvalString: aString with: vcGlobalsArr args: argsArr
   envId := 1"__callerEnvId" . 
   selfCls := self virtualClass   .
   defnTarget := self _singletonClass: envId .
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: defnTarget .
   cld at: 7 put: defnTarget " _rubyThreadDataAt: 7 put: " .
 
@@ -272,7 +272,7 @@ rubyEval1: lexPath block: aBlock
   "A ruby primitive, for instance_eval.  lexPath is ignored .
    Evaluate aBlock with the block's self set to this object"
   | stk defnTarget cld |
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   stk := cld at: 3 . " _rubyThreadDataAt: 3 , meth def target stack"
   stk push: (defnTarget := self _singletonClass: 1 ).
   cld at: 7 put: defnTarget . "_rubyThreadDataAt: 7 put: "

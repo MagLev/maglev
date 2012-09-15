@@ -216,11 +216,11 @@ category: '*maglev-Debugging Support'
 method:
 convertState: stateClass andStack: stackClass to: newStateClass and: newStackClass
 	| stackSet |
-	self _clientData ifNil: [^ self].
+	self clientData ifNil: [^ self].
 	stackSet := IdentityDictionary new.
 	
 	"migrate any compiler state"
-	(self _clientData select: [:ea | ea class == stateClass]) asArray do: [:state || newState |
+	(self clientData select: [:ea | ea class == stateClass]) asArray do: [:state || newState |
 		newState := newStateClass new.
 		stateClass instVarNames withIndexDo: [:name :idx || var |
 			var := state instVarAt: name.
@@ -229,12 +229,12 @@ convertState: stateClass andStack: stackClass to: newStateClass and: newStackCla
 																							addAll: var;
 																							yourself])]
 				ifFalse: [newState instVarNamed: name put: var]].
-		self _clientData at: (self _clientData indexOf: state) put: newState].
+		self clientData at: (self clientData indexOf: state) put: newState].
 	
 	"migrate any compiler stacks"
-	(self _clientData select: [:ea | ea class == stackClass]) asArray do: [:stack |
-		self _clientData
-			at: (self _clientData indexOf: stack)
+	(self clientData select: [:ea | ea class == stackClass]) asArray do: [:stack |
+		self clientData
+			at: (self clientData indexOf: stack)
 			put: (stackSet at: stack ifAbsentPut: [(newStackClass new: stack size)
 													addAll: stack;
 													yourself])].

@@ -1156,7 +1156,7 @@ _moduleEval1: lexPathNotUsed block: aBlock
     Evaluate aBlock with the block's self and arg set to this module"
   | defStk envId cld |
   envId := 1"__callerEnvId" .
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: self .
   cld at: 7 put: self " _rubyThreadDataAt: 7 put: " .
   ^ [ | val |
@@ -1179,7 +1179,7 @@ _moduleEvalString: aString with: vcGlobalsArr args: argsArr
     "A ruby primitive."
    | defStk envId  lexSelfStk aBinding cst rtModuStk cld |
   envId := 1"__callerEnvId" .
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: self .
   cld at: 7 put: self " _rubyThreadDataAt: 7 put: " .
 

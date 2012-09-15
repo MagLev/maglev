@@ -416,13 +416,13 @@ compileFileNamed: fullPath loadName: aName env: envId
          self class withRubyHandlers: envId main: true do: [
            | topSelf |
            topSelf := SessionTemps current at: #RubyMainSelf .
-           cld := GsProcess _current _clientData .
+           cld := GsProcess _current clientData .
            (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: (defCls := topSelf class) .
            cld at: 7 put: defCls " _rubyThreadDataAt: 7 put: " .
            res := topSelf performMethod: cm  .
         ]
       ] ifNotNil:[  "recursed to load another file"
-        cld := GsProcess _current _clientData .
+        cld := GsProcess _current clientData .
         (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: (defCls := prevSelf class) .
         cld at: 7 put: defCls " _rubyThreadDataAt: 7 put: " .
         res := prevSelf  performMethod:  cm  .
@@ -913,7 +913,7 @@ extend: anObject rubyMethod: aNode blk: blkArg rtModulePath: rtModules
   | envId cld defStk rtModuStk prevModules cls | 
   envId := 1"__callerEnvId" . 
   cls := anObject _singletonClass: envId .
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: cls .
   cld at: 7 put: cls " _rubyThreadDataAt: 7 put: " .
   rtModuStk := cld at: 5  "_rubyThreadDataAt: 5, rtModuleStack" .
@@ -937,7 +937,7 @@ category: '*maglev-runtime'
 method:
 extendClass: aClass rubyMethod: aNode env: envId
  | cld defStk rtModuStk |
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: aClass .
   cld at: 7 put: aClass " _rubyThreadDataAt: 7 put: " .
   rtModuStk := cld at: 5  "_rubyThreadDataAt: 5, rtModuleStack" .
@@ -960,7 +960,7 @@ category: '*maglev-runtime'
 method:
 extendModule: aModule rubyMethod: aNode env: envId
   | cld defStk rtModuStk |
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: aModule .
   cld at: 7 put: aModule " _rubyThreadDataAt: 7 put: " .
   rtModuStk := cld at: 5  "_rubyThreadDataAt: 5, rtModuleStack" .

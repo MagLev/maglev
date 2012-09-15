@@ -43,7 +43,7 @@ exposeSmalltalkGlobal: aName as: aRubyName
   assoc := System myUserProfile resolveSymbol: (aName asSymbol) .
   assoc ifNil:[ self error:'Smalltalk global ' , aName , ' not found' ].
 
-  cld := GsProcess _current _clientData.
+  cld := GsProcess _current clientData.
   ns := cld
     ifNotNil: [(cld at: 5) last theNonMetaClass "_rubyThreadDataAt:5 -> rtModuleStack"]
     ifNil: [Object].
@@ -181,7 +181,7 @@ _eval: aString binding: aBinding with: vcGlobalsSelf fileName: aFileName lineNum
      Evaluate aString.  vcGlobals is an Array of size 3"
   | defStk lexSelfStk envId cld aClass |
   envId := 1"__callerEnvId" .
-  cld := GsProcess _current _clientData .
+  cld := GsProcess _current clientData .
   aClass := aBinding methodDefTarget .
 
   (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: aClass .
