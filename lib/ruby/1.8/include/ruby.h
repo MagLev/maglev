@@ -811,18 +811,6 @@ RUBY_DLLSPEC VALUE rb_obj_as_string(VALUE obj);
 
 RUBY_DLLSPEC VALUE rb_check_string_type(VALUE obj);
 
-// duplicate cstr
-static inline char* ruby_strdup(const char *str)
-{
-    char *tmp;
-    size_t len = strlen(str) + 1;
-
-    tmp = xmalloc(len);
-    memcpy(tmp, str, len);
-
-    return tmp;
-}
-
 RUBY_DLLSPEC VALUE rb_str_dup(VALUE str);
 RUBY_DLLSPEC VALUE rb_str_dup_frozen(VALUE str);
 
