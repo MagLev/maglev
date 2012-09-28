@@ -193,13 +193,13 @@ replaced with:
          compiler class withRubyHandlers: envId main: true do: [
            | topSelf |
            topSelf := SessionTemps current at: #RubyMainSelf .
-           cld := GsProcess _current _clientData .
+           cld := GsProcess _current clientData .
            (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: (defCls := topSelf class) .
            cld at: 7 put: defCls " _rubyThreadDataAt: 7 put: " .
            res := topSelf performMethod: cm  .
         ]
       ] ifNotNil:[  "recursed to load another file"
-        cld := GsProcess _current _clientData .
+        cld := GsProcess _current clientData .
         (defStk := cld at: 3 " _rubyThreadDataAt: 3" ) push: (defCls := prevSelf class) .
         cld at: 7 put: defCls " _rubyThreadDataAt: 7 put: " .
         res := prevSelf  performMethod:  cm  .
