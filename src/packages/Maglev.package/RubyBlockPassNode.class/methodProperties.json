@@ -1,0 +1,12 @@
+{
+	"class" : {
+		"s_a:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"bodyNode" : "DataCurator 10/02/2012 14:30",
+		"bodyNode:" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"isBlockPassNode" : "DataCurator 10/02/2012 14:30",
+		"postWalkForYield" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

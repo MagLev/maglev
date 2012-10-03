@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"SpecialGlobalNodesDict" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"name",
+		"globalAssoc" ],
+	"name" : "RubyGlobalVarNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractVarNode",
+	"type" : "normal" }

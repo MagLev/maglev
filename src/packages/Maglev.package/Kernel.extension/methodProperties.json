@@ -1,0 +1,19 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_eval:binding:with:fileName:lineNumber:" : "DataCurator 10/02/2012 14:30",
+		"_forkvExec:" : "DataCurator 10/02/2012 14:30",
+		"_rubyLoop1:" : "DataCurator 10/02/2012 14:30",
+		"_rubyLoop2:" : "DataCurator 10/02/2012 14:30",
+		"_system:" : "",
+		"atExit:" : "DataCurator 10/02/2012 14:30",
+		"exposeSmalltalkGlobal:as:" : "DataCurator 10/02/2012 14:30",
+		"includeRubyModule:" : "DataCurator 10/02/2012 14:30",
+		"resolveSmalltalkGlobal:" : "DataCurator 10/02/2012 14:30",
+		"rubyGlobalVariables" : "DataCurator 10/02/2012 14:30",
+		"rubyKernelAutoload:file:" : "DataCurator 10/02/2012 14:30",
+		"rubyKernelAutoloadFileFor:" : "DataCurator 10/02/2012 14:30",
+		"smalltalkUserGlobalsAt:put:" : "",
+		"traceGlobalVarAssign:block:" : "DataCurator 10/02/2012 14:30",
+		"waitpid:flags:" : "DataCurator 10/02/2012 14:30" } }

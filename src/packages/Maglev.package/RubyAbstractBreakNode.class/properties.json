@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"valueNode",
+		"walked" ],
+	"name" : "RubyAbstractBreakNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractGotoNode",
+	"type" : "normal" }

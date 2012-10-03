@@ -1,0 +1,29 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"BridgeOptions",
+		"GenericErrCms",
+		"GenericErrCmSet" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"from",
+		"fromSuffix",
+		"fromNargs",
+		"fromRestArg",
+		"fromBlockArg",
+		"to",
+		"toSuffix",
+		"neededArgs",
+		"needsRestArg",
+		"needsBlockArg",
+		"leaves",
+		"missingArgsError",
+		"firstOptArg",
+		"primKnd" ],
+	"name" : "RubyBridge",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

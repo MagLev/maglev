@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"fileStreams" ],
+	"name" : "MCGsWriter",
+	"pools" : [
+		 ],
+	"super" : "MCStWriter",
+	"type" : "normal" }

@@ -1,0 +1,18 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"SpecialRubySelectors" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"argsNode",
+		"callName",
+		"iterNode",
+		"rcvrNode",
+		"implicitDollarTilde" ],
+	"name" : "RubyFCallNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractCallNode",
+	"type" : "normal" }

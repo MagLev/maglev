@@ -1,0 +1,19 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"leftNode",
+		"leftIsDynamic",
+		"isProcClass",
+		"isTypeClass",
+		"dynamicTypeError",
+		"inInnerDef" ],
+	"name" : "RubyColon2Node",
+	"pools" : [
+		 ],
+	"super" : "RubyColon3Node",
+	"type" : "normal" }

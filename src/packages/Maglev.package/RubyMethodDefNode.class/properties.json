@@ -1,0 +1,31 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"argsNode",
+		"bodyNode",
+		"nameNode",
+		"scope",
+		"hasBlockArgRef",
+		"irMethNode",
+		"traceBool",
+		"sendsBinding",
+		"argsDescrInt",
+		"methSelector",
+		"lineBias",
+		"fileName",
+		"source",
+		"startLine",
+		"endOffset",
+		"outerDef",
+		"defTarget",
+		"innerDefs" ],
+	"name" : "RubyMethodDefNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractCallNode",
+	"type" : "normal" }

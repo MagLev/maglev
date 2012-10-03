@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"outerIsDefsNode" ],
+	"name" : "RubyDefnNode",
+	"pools" : [
+		 ],
+	"super" : "RubyMethodDefNode",
+	"type" : "normal" }

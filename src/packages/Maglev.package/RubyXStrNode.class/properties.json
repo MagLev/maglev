@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyXStrNode",
+	"pools" : [
+		 ],
+	"super" : "RubyStrNode",
+	"type" : "normal" }

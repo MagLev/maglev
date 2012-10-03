@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"lexPathVar" ],
+	"name" : "RubyCallEvalNode",
+	"pools" : [
+		 ],
+	"super" : "RubyCallNode",
+	"type" : "normal" }

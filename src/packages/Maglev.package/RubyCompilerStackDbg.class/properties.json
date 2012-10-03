@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyCompilerStackDbg",
+	"pools" : [
+		 ],
+	"super" : "RubyCompilerStack",
+	"type" : "normal" }

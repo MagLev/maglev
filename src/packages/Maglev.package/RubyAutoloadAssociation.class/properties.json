@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"isLoaded",
+		"fileName" ],
+	"name" : "RubyAutoloadAssociation",
+	"pools" : [
+		 ],
+	"super" : "RubySymbolAssociation",
+	"type" : "normal" }

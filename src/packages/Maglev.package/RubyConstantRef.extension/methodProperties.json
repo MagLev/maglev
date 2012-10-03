@@ -1,0 +1,19 @@
+{
+	"class" : {
+		"_abstractCall:definedQ:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_constantMissing:in:env:" : "DataCurator 10/02/2012 14:30",
+		"_valueNoAction" : "DataCurator 10/02/2012 14:30",
+		"c3name:" : "DataCurator 10/02/2012 14:30",
+		"dyn_definedQinContext:" : "DataCurator 10/02/2012 14:30",
+		"dyn_resolveInContext:" : "DataCurator 10/02/2012 14:30",
+		"globalVarName:" : "DataCurator 10/02/2012 14:30",
+		"initialize" : "DataCurator 10/02/2012 14:30",
+		"irDefinedQNode" : "DataCurator 10/02/2012 14:30",
+		"lexPathSize" : "DataCurator 10/02/2012 14:30",
+		"name:c2lexPath:evalSelfCls:" : "DataCurator 10/02/2012 14:30",
+		"notFoundValue" : "DataCurator 10/02/2012 14:30",
+		"pathToString" : "DataCurator 10/02/2012 14:30",
+		"resolveGlobalVarAsgn:" : "DataCurator 10/02/2012 14:30",
+		"resolveGlobalVarValue" : "DataCurator 10/02/2012 14:30",
+		"setDynamicTypeError" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,13 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"advance:" : "DataCurator 10/02/2012 14:30",
+		"atEquals:" : "DataCurator 10/02/2012 14:30",
+		"locationInfo" : "DataCurator 10/02/2012 14:30",
+		"peek" : "DataCurator 10/02/2012 14:30",
+		"peekToNonSeparator:" : "DataCurator 10/02/2012 14:30",
+		"peekToNonWhite:" : "DataCurator 10/02/2012 14:30",
+		"sexpAdvanceNoCheck" : "DataCurator 10/02/2012 14:30",
+		"sexpNextOrNil" : "DataCurator 10/02/2012 14:30",
+		"sexpPeekOrSeparator" : "DataCurator 10/02/2012 14:30" } }

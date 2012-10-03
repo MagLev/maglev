@@ -1,0 +1,4 @@
+*maglev-ast
+symNodeValue
+  ^ name
+

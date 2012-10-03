@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"PathDelim" ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyAbstractGlobal",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

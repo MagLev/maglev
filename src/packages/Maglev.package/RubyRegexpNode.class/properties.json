@@ -1,0 +1,16 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"options",
+		"value",
+		"regexpLit" ],
+	"name" : "RubyRegexpNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractLiteralNode",
+	"type" : "normal" }

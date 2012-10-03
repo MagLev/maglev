@@ -1,0 +1,4 @@
+converting
+irIterResult
+	^ nextNode irIterResult
+

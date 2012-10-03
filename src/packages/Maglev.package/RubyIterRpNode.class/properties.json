@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"callNode" ],
+	"name" : "RubyIterRpNode",
+	"pools" : [
+		 ],
+	"super" : "RubyIterNode",
+	"type" : "normal" }

@@ -53,9 +53,10 @@ namespace :build do
   BUILD_LOG        = File.join(MAGLEV_HOME, 'build_image.log')
   GEM_BIN          = File.join(GEMSTONE, 'bin')
   GEM_CONF         = File.join(FILEIN_DIR, 'fileingem.ruby.conf')
-  IMAGE_RUBY_DIR   = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby')
+  SMALLTALK_DIR    = File.join(MAGLEV_HOME, 'src', 'smalltalk')
+  PACKAGES_DIR     = File.join(MAGLEV_HOME, 'src', 'packages')
+  IMAGE_RUBY_DIR   = File.join(SMALLTALK_DIR, 'ruby')
   KEYFILE          = File.join(MAGLEV_HOME, 'etc', 'maglev.demo.key')
-  MCZ_DIR          = File.join(MAGLEV_HOME, 'src', 'smalltalk', 'ruby', 'mcz')
   RUBY_EXTENT      = File.join(MAGLEV_HOME, 'bin', 'extent0.ruby.dbf')
   RUBY_EXTENT_SAVE = File.join(MAGLEV_HOME, 'bin', 'extent0.ruby.dbf.save')
   STONE_CONF       = File.join(FILEIN_DIR, 'filein.ruby.conf')
@@ -73,7 +74,7 @@ namespace :build do
 
   desc "Create a new maglev image and install in #{RUBY_EXTENT}"
   task :image => [:logger] do
-    if Rake::Task['build:filein'].invoke && Rake::Task['build:mczdir'].invoke
+    if Rake::Task['build:filein'].invoke && Rake::Task['build:packages'].invoke
       log "maglev", "Build Succeeded"
       if File.exist? RUBY_EXTENT
         log "maglev", "Saving previous extent as #{RUBY_EXTENT_SAVE}"
@@ -113,7 +114,7 @@ namespace :build do
   end
 
   task :check_dev_env do
-    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, MCZ_DIR].each do |var|
+    [MAGLEV_HOME, GEMSTONE, IMAGE_RUBY_DIR, BUILD_DIR, PACKAGES_DIR].each do |var|
       raise "#{var} is not a directory" unless File.directory? var
     end
   end
@@ -147,7 +148,7 @@ namespace :build do
     ENV["GEMSTONE_EXE_CONF"]      = GEM_CONF
   end
 
-  desc "Load the files in #{MCZ_DIR} into the image (starts and stops stone)"
+  desc "Load the files in #{SMALLTALK_DIR} into the image (starts and stops stone)"
   task :filein => [:setup_env, NEW_EXTENT, :logger] do
     Dir.chdir FILEIN_DIR do
       begin
@@ -158,25 +159,25 @@ namespace :build do
     end
   end
 
-  desc "Load the files in #{MCZ_DIR} into the image (starts and stops stone)"
-  task :mczdir => [:setup_env, NEW_EXTENT, :logger] do
+  desc "Load the files in #{PACKAGES_DIR} into the image (starts and stops stone)"
+  task :packages => [:setup_env, NEW_EXTENT, :logger] do
     Dir.chdir FILEIN_DIR do
       begin
-        startstone && load_mcz_dir
+        startstone && load_file_tree_dir
       ensure
         stopstone
       end
     end
   end
 
-  # Equivalent to the old loading of the MagLev-*.mcz
-  def load_mcz_dir
+  # Equivalent to the old loading of the MagLev-*.mcz / MCZ_DIR
+  def load_file_tree_dir
     # No looping in topaz, so generate a script here
-    input = "#{MCZ_DIR}/filein.gs"
+    input = "#{SMALLTALK_DIR}/loadfiletree.gs"
 
-    outfile = "#{FILEIN_DIR}/loadmczdir.out"
-    log_run("load_mcz_dir", outfile) do
-      run_topaz("load_mcz_dir", <<-EOS)
+    outfile = "#{FILEIN_DIR}/loadfiletree.out"
+    log_run("load_file_tree", outfile) do
+      run_topaz("load_file_tree", <<-EOS)
         output push #{outfile} only
         iferr 1 exit 3
         set gemstone #{STONE_NAME} user DataCurator pass swordfish
@@ -189,7 +190,7 @@ namespace :build do
       EOS
     end
   end
-
+  
   # equivalent to fileinruby.pl, but only supports fast builds
   def fileinruby
     outfile = "#{FILEIN_DIR}/fileinruby.out"

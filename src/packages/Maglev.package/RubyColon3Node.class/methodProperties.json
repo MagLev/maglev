@@ -1,0 +1,26 @@
+{
+	"class" : {
+		"comment" : "DataCurator 10/02/2012 14:30",
+		"s_a:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"asClassNameNode" : "DataCurator 10/02/2012 14:30",
+		"baseName" : "DataCurator 10/02/2012 14:30",
+		"buildConstRef" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"determineDynamic" : "DataCurator 10/02/2012 14:30",
+		"irClassNameLiteralNode" : "DataCurator 10/02/2012 14:30",
+		"irDefinedQNode" : "DataCurator 10/02/2012 14:30",
+		"irForDynamicCDecl:" : "DataCurator 10/02/2012 14:30",
+		"irForModuleNesting" : "DataCurator 10/02/2012 14:30",
+		"irLeaf" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "",
+		"isModuleClass" : "DataCurator 10/02/2012 14:30",
+		"leftIsDynamic" : "DataCurator 10/02/2012 14:30",
+		"name" : "DataCurator 10/02/2012 14:30",
+		"name:" : "DataCurator 10/02/2012 14:30",
+		"pathArray" : "DataCurator 10/02/2012 14:30",
+		"walkForDefinedQ:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:isDefinedQ:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScopeForCdecl:" : "DataCurator 10/02/2012 14:30" } }

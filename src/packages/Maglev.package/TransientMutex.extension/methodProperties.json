@@ -1,0 +1,8 @@
+{
+	"class" : {
+		"comment" : "DataCurator 10/02/2012 14:30",
+		"forRubyMutualExclusion" : "DataCurator 10/02/2012 14:30",
+		"rubyBasicNew" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"isLocked" : "DataCurator 10/02/2012 14:30",
+		"tryLock" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,21 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"TraceLocals" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"isArgumentScope",
+		"requiredArgs",
+		"restArg",
+		"enclosingScope",
+		"variableNames",
+		"extraArgs",
+		"inBootstrap",
+		"nameSpace" ],
+	"name" : "RubyStaticScope",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractScope",
+	"type" : "normal" }

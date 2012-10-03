@@ -1,0 +1,19 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"endLine",
+		"endOffset",
+		"startLine",
+		"startOffset",
+		"comments",
+		"file" ],
+	"name" : "RubyIDESourcePosition",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

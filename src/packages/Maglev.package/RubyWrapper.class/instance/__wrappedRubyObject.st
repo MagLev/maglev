@@ -1,0 +1,5 @@
+accessing
+__wrappedRubyObject
+
+	^ wrappedObject
+

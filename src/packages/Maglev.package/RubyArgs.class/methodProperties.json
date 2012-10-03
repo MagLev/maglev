@@ -1,0 +1,20 @@
+{
+	"class" : {
+		"forScript:withRubyArgs:withScriptArgs:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_extractArgFrom:into:" : "DataCurator 10/02/2012 14:30",
+		"_parseRubyArgs:" : "DataCurator 10/02/2012 14:30",
+		"_setGlobalsFrom:env:" : "DataCurator 10/02/2012 14:30",
+		"initialize" : "DataCurator 10/02/2012 14:30",
+		"libs" : "DataCurator 10/02/2012 14:30",
+		"processArgsInto:env:" : "DataCurator 10/02/2012 14:30",
+		"requires" : "DataCurator 10/02/2012 14:30",
+		"rubyArgs" : "DataCurator 10/02/2012 14:30",
+		"rubyArgs:" : "DataCurator 10/02/2012 14:30",
+		"scriptArgs" : "DataCurator 10/02/2012 14:30",
+		"scriptArgs:" : "DataCurator 10/02/2012 14:30",
+		"scriptName" : "DataCurator 10/02/2012 14:30",
+		"scriptName:" : "DataCurator 10/02/2012 14:30",
+		"scriptlets" : "DataCurator 10/02/2012 14:30",
+		"setContext:env:" : "DataCurator 10/02/2012 14:30",
+		"setGlobals:" : "DataCurator 10/02/2012 14:30" } }
