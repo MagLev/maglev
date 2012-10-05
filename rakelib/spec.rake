@@ -18,6 +18,15 @@ namespace :spec do
     sh "#{PSPEC} -V -G fails"
   end
 
+  desc "Run ci specs, generating a rubyspec_report.xml with JUnit output."
+  task :ci_report do
+    rm_f "rubyspec_temp/*"
+    sh "#{PSPEC} -f j -V -G fails 2>&1 | tee rubyspec_report.out"
+    sh 'csplit rubyspec_report.out "%<?xml%" "/</testsuites/+1"'
+    sh "mv xx00 rubyspec_report.xml"
+    sh "rm xx01 rubyspec_report.out"
+  end
+
   desc "Retag the ci files (works only with hacked mspec-tag.rb)"
   task :retag do
     sh "#{PSPEC} tag -G fails"

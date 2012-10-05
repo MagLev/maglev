@@ -370,8 +370,9 @@ static VALUE rb_exc_new2(VALUE klass, const char* s)
 
 RUBY_DLLSPEC VALUE rb_exc_new3(VALUE klass, VALUE str);
 
-// RUBY_DLLSPEC void rb_secure(int k);
-
+static void rb_secure(int k) { }
+static void rb_check_safe_obj(VALUE obj) { }
+static void rb_check_safe_str(VALUE str) { }
 static int rb_safe_level(void) { return 0; }
 
 RUBY_DLLSPEC int rb_num2int(VALUE v);
@@ -723,7 +724,7 @@ RUBY_DLLSPEC const char* rb_str2cstr(VALUE str, long *len);
    // C memory is auto-freed by GC
 
 /** The pointer to the string str's data. */
-#define RSTRING_PTR(str) rb_str2cstr(str, NULL)
+#define RSTRING_PTR(str) (char*)rb_str2cstr(str, NULL)
 static inline const char* rb_str_ptr(VALUE str) { return rb_str2cstr(str, NULL); }
 static inline const char* rb_str_ptr_readonly(VALUE str) { return rb_str2cstr(str, NULL); }
 
@@ -841,6 +842,8 @@ RUBY_DLLSPEC VALUE rb_str_intern(VALUE str);
 RUBY_DLLSPEC long rb_str_len(VALUE str);
 
 #define RSTRING_LEN(str) rb_str_len(str)
+#define RSTRING_LENINT(str) rb_long2int(rb_str_len(str))
+#define rb_long2int(x) ((int)x)
 
 // /** Deprecated alias for rb_obj_freeze */
 // RUBY_DLLSPEC VALUE rb_str_freeze(VALUE str);
@@ -849,6 +852,8 @@ RUBY_DLLSPEC long rb_str_len(VALUE str);
 RUBY_DLLSPEC VALUE rb_str2inum(VALUE str, int base);
 
 RUBY_DLLSPEC VALUE rb_cstr2inum(const char* str, int base) ;
+
+#define rb_cstr_to_dbl(x, badcheck) atof(x)
 
 //  define rb_cstr_to_inum(VALUE str, int base, badcheck) rb_cstr2inum(str, base)
 

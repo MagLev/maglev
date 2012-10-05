@@ -44,7 +44,7 @@ test(File.extname('test. '),        '. ',   'GemStone extname C')  # ?!!h
 
 # First create a file with known properties
 fname = '/tmp/FileStatTest-234'
-time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
+time = Time.local(1999, 10, 20, 12, 34)
 %x{ touch -t 199910201234 #{fname} }  # create at Wed Oct 20 12:34:00 1999
 
 # Test File class methods
@@ -120,5 +120,7 @@ fname = __FILE__ + 'x'
 log = open(fname, 'wb', 0644)
 log.close
 File.delete(fname) if File.exist?(fname)
+
+test(!!File::SYNC, true, "File::SYNC should not be nil")
 
 report

@@ -141,7 +141,7 @@ module ObjectSpace
     #  or an Array of Classes and Module which are loaded in memory.
     # does not include meta classes, meta modules, or virtual classes.
     Repository.__loaded_classes(!!include_modules).select do |c|
-      c.name.include?("::") || Object.const_defined?(c.name)
+      c.name.include?("::") || (Object.const_defined?(c.name) rescue false)
     end
   end
 

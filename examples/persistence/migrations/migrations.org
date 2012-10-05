@@ -206,7 +206,7 @@
         <tt>myapp/lib</tt>.
      2. The format of the code is different (The ActiveRecord Migration
         DSL).
-     3. The process of "activtaing" a migration is an explicit step you
+     3. The process of "activating" a migration is an explicit step you
         take (rake db:migrate).
      4. There is a separate process, and tool support (rake tasks) for
         managing the migrations.
@@ -214,7 +214,7 @@
      All of these differences from "normal coding" provide ample warning to
      the developer that they are dealing with persistent data and that they
      should adjust their thinking accordingly.  On the other hand, one of
-     MagLev's appeals is that everything is a ruby object.  If we go down
+     MagLev's appeals is that everything is a Ruby object.  If we go down
      the path of making migrations "different", we lose some of that
      appeal.
 
@@ -346,7 +346,7 @@
    the offset of the instance variables (compiled methods have integer
    offsets to instance variables; they don't search by name).
    But old-style objects still refer to old-style classes (version history
-   etc.).   In ruby, there will be (typically) only one class.
+   etc.).   In Ruby, there will be (typically) only one class.
    You wouldn't want to trigger a global migration everytime somone monkey
    patched Object...
 
@@ -512,11 +512,11 @@
 
    Smalltalk and Ruby face a different set of persistence issues.  While
    this paper is informed by the GemStone Smalltalk features and recipes
-   for data migration, we approach the issue from a ruby perspective, as
+   for data migration, we approach the issue from a Ruby perspective, as
    the needs of the Ruby programmer are different than the needs of the
    Smalltalk programmer due to differences in the languages.
 
-*** Smalltalk requires instance migration; ruby does not
+*** Smalltalk requires instance migration; Ruby does not
 
     In Smalltalk, certain changes to a class *require* instance migration
     (any change to instance variables, class variables or inheritance
@@ -545,7 +545,7 @@
 
     The Smalltalk programming environment can detect when it is necessary to
     create a new version of a class, and asks the programmer to confirm.
-    The Ruby environment does not have a clear dmarcation of when it is
+    The Ruby environment does not have a clear demarcation of when it is
     necessary to create a new version of a class, so we rely on the
     developer / admin to tell the system when to create a new version (and
     of what).
@@ -599,7 +599,7 @@
      V1 of ClassX, and you change its class to V2, then how do you update
      the reference held by the object?
 
-     This is only a problem if you actually version classes.  In ruby, if
+     This is only a problem if you actually version classes.  In Ruby, if
      you re-open classes, then you don't have problems???
 
    + Migrations paradigm

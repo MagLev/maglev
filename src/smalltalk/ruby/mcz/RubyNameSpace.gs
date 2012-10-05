@@ -332,7 +332,7 @@ fullName
     ^ String withAll: (nm ifNil:['']) 
   ].
   nm := par fullName . 
-  nm addAll: '::' ; addAll: name .
+  nm addAll: '::' ; addAll: (name ifNil: ['#<aModule>']) .
   ^ nm
 
 %

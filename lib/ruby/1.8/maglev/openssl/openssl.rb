@@ -67,3 +67,4 @@ end
 require 'maglev/openssl/digest'
 require 'maglev/openssl/hmac'
 require 'maglev/openssl/random'
+require 'maglev/openssl/ssl'

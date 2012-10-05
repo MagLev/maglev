@@ -1,7 +1,7 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
 fname = "/tmp/FileStatTest-#{rand(100_000).to_s}"
-time = Time.at 940448040              # Wed Oct 20 12:34:00 -0700 1999
+time = Time.local(1999, 10, 20, 12, 34, 00)              # Wed Oct 20 12:34:00 -0700 1999
 
 # deleted line chgrp $(id -g) #{fname} # get 'Illegal variable name.' from shell
 %x{

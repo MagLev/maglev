@@ -1,1 +1,0 @@
-fails:StringScanner#[] returns nil if there is no current match

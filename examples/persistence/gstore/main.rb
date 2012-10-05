@@ -2,8 +2,6 @@
 # GStore performance.
 #
 # TODO:
-#   * Remove the gstore.db from GStore before each run.
-#   * Do reads and writes
 #   * Different workloads (many readers, a few writers, etc.)
 if defined? Maglev
   Maglev.persistent do
@@ -11,12 +9,19 @@ if defined? Maglev
     # and gstore.  But, we only need to do it once, so we test for that
     # case here.
     require 'pstore' unless defined? PStore
-    require 'gstore' unless defined? GStore
+    require 'maglev/gstore' unless defined? GStore
   end
   Maglev.commit_transaction
   file = 'gstore.db'
   GStore.rm(file)
   db = GStore.new(file)
+
+  # Do full commits after nested commits. If we don't actually persist
+  # (i.e, write to disk) it isn't really comparable to MRI
+  def db.transaction(*args, &block)
+    super
+    Maglev.commit_transaction
+  end
 else
   require 'pstore'
   file = 'pstore.db'

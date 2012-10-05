@@ -317,7 +317,7 @@ class Integer
     unless base._isFixnum 
       raise TypeError, 'arg must be a Fixnum'
     end
-    __to_s_base_show(base, false)
+    __to_s_base_show(base, false).downcase
   end
 
   primitive 'truncate' , 'truncated'

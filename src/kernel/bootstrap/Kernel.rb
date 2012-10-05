@@ -1,9 +1,15 @@
 module Kernel
 
+  # This is for bootstrap code only
   primitive_nobridge '__resolve_smalltalk_global', 'resolveSmalltalkGlobal:'
 
   # _smalltalk_global_put for use by bootstrap code only
   primitive_nobridge '__smalltalk_global_put', 'smalltalkUserGlobalsAt:put:'
+
+  # Use this method to expose a Smalltalk class to Ruby land under a
+  # specific name. It will install the class within the current
+  # namespace under the specified name
+  primitive 'expose_smalltalk_global_as', 'exposeSmalltalkGlobal:as:'
 
   # Loads and executes the Ruby program in the file +name+.  If the
   # filename does not resolve to an absolute path, the file is searched for
@@ -109,7 +115,7 @@ module Kernel
   # optional +skip+ parameter determines the number of initial stack
   # entries to omit from the result.  The optional +limit+ parameter
   # determines the maximum number of frames to return.
-  def caller(skip=0, limit=1000)
+  def caller(skip=1, limit=1000)
     # returns an Array of Strings, each element describes a stack frame
     unless skip._isFixnum
       raise ArgumentError
@@ -146,21 +152,21 @@ module Kernel
     if arg._isFixnum
       return arg  if arg >= 0 && arg <= 2
     elsif arg._isSymbol
-      return 0 if arg._equal?(:in) 
+      return 0 if arg._equal?(:in)
       return 1 if arg._equal?(:out)
       return 2 if arg._equal?(:err)
     elsif arg._is_a?(File)
       return 0 if arg._equal?(STDIN)
-      return 0 if arg._equal?(STDOUT)
-      return 0 if arg._equal?(STDERR)
-    end 
+      return 1 if arg._equal?(STDOUT)
+      return 2 if arg._equal?(STDERR)
+    end
     return nil
   end
 
   def __exec_prepare_fd_strm(fd_desc, v, dups_arr)
     if (strm = __fd_for_exec(v))
       dups_arr << fd_desc
-      dups_arr << strm 
+      dups_arr << strm
       return true
     elsif v._isString || v._isArray
       if v._isString
@@ -181,7 +187,7 @@ module Kernel
 
   # call-seq:
   #   exec(command <, args*>)
-  #   exec(<env, > command <, args*>, <options>) 
+  #   exec(<env, > command <, args*>, <options>)
   # Replaces the current process by running the given external command.
   # The following keys in options are not implemented
   #    :pgroup, :rlimit_xxx , :umask .
@@ -212,8 +218,10 @@ module Kernel
       cmd  = "sh"
       env_arr = arr[1]
       dups_arr = arr[2]
-      arguments = [ "-c", arr[0] ]
-      arguments.concat( arr[3] )
+      arguments = ["-c"]
+      command = [arr[0]]
+      command.concat(arr[3])
+      arguments << command.join(" ")
       child_pid = self.__execv(cmd, 1, env_arr, dups_arr, *arguments)
       if child_pid < 0
         Errno.handle( - child_pid )
@@ -233,10 +241,10 @@ module Kernel
       arr = Process.waitpid2(child_pid, 0)
       done = arr[0] != 0
     end
-    $?.success? 
+    $?.success?
   end
 
-  def __pre_exec(*args) 
+  def __pre_exec(*args)
     # result is [ cmd, env_arr, dups_arr, arguments , original_wd]
     firstarg = args[0]
     env = nil
@@ -251,10 +259,10 @@ module Kernel
           unless v._equal?(nil)
             vstr = Type.coerce_to(v, String, :to_str)
           end
-          env_arr << k 
+          env_arr << k
           env_arr << vstr
         else
-          raise ArgumentError, "non String key #{k} in env arg to exec"  
+          raise ArgumentError, "non String key #{k} in env arg to exec"
         end
       }
       cmd = args[1]
@@ -292,7 +300,7 @@ module Kernel
             else
               raise ArgumentError, "option #{k} not recognized for exec"
             end
-          elsif k._is_a?(IO) 
+          elsif k._is_a?(IO)
             unless v._equal?(:close)
               raise ArgumentError, "anIO=>#{v} not a valid option for exec"
             end
@@ -397,7 +405,7 @@ module Kernel
     res
   end
 
-  def __cext_eval(*args, &block_arg) 
+  def __cext_eval(*args, &block_arg)
     # called from rb_eval_string_ in C extension implementation
     nargs = args.size
     if nargs < 1

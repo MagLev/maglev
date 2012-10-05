@@ -14,7 +14,7 @@ for MagLev Alpha Developers.  For more detail see:
 * The persistence API[link:classes/Maglev.html]
 * The GemStone/S 64 Bit Programming Guide: provides a full discussion of
   the GemStone persistence model (including transactions, locking, etc.),
-  http://seaside.gemstone.com/docs/GS64-ProgGuide-2.2.pdf.
+  http://maglev.github.com/docs/further_reading.html
 
 ==== Synopsis
 

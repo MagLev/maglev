@@ -17,19 +17,20 @@ set class RubyFile
 category: 'as yet unclassified'
 classmethod:
 baseNameAndSuffixFor: aName
-  "If aName ends with .<something>, return a pair of the name without
-   the suffix and the suffix.  E.g.  baseNameAndSuffixFor: 'abd.def'  returns
-   { 'abc' . '.def' } If there is no suffix, then { aName . nil } is returned."
+  "If aName ends with a valid ruby load file suffix (.rb, .so, .bundle, .dylib),
+   return a pair of the name without the suffix and the suffix.
+   E.g.  baseNameAndSuffixFor: 'abd.rb'  returns
+   { 'abc' . '.rb' } If there is no valid suffix, then { aName . nil } is returned."
 
-  | dotIdx sz|
-  sz := aName size .
-  dotIdx :=sz .
-  [ dotIdx > 0 ] whileTrue: [
-    (aName at: dotIdx) == $.
-      ifTrue: [ ^ { aName copyFrom: 1 to: (dotIdx -1) . aName copyFrom: dotIdx to: sz } ].
-    dotIdx := dotIdx - 1.
-    ].
-  ^ { aName . nil }
+  | dotIdx baseName suffix sz |
+  sz := aName size.
+  dotIdx := aName indexOfLastByte: 46 "." startingAt: sz.
+  dotIdx = 0 ifTrue: [^ {aName. nil}].
+  baseName := aName copyFrom: 1 to: dotIdx - 1.
+  suffix := aName copyFrom: dotIdx to: sz.
+  (#('.rb' '.so' '.bundle' '.dylib') includes: suffix)
+    ifTrue: [^ {baseName. suffix}]
+    ifFalse: [^ {aName. nil}].
 
 %
 

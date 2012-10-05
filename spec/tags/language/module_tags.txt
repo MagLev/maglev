@@ -1,1 +1,2 @@
 fails:module reopens a module included into Object
+fails:An anonymous module forces named nested modules to be anonymous

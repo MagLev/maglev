@@ -295,7 +295,7 @@ withRubyHandlers: envId main: mainThrBool do: aBlock
         mainThr signalException: nx .
         Processor yield.
       ].
-      runAtExits ifTrue:[ runAtExitBlk value ]
+      runAtExits ifTrue:[ runAtExitBlk value ].
       AbstractException signal: 'Kernel.exit invoked from non-main thread, and main thread not alive' .
     ] ifFalse:[
       runAtExits ifTrue:[ runAtExitBlk value ]
@@ -320,7 +320,7 @@ withRubyHandlers: envId main: mainThrBool do: aBlock
         not recognized by signalRubyBreak bytecode."
        ex resignalAs: (CannotReturn new messageText:'break not within block nor while/for loop')
      ].
-     (stmps at:#RubyExitOnException otherwise: false) ifTrue:[ 
+     ((stmps at:#RubyExitOnException otherwise: false) or: [(GsProcess _current threadDataAt: #RubyExitOnException) == true]) ifTrue:[ 
        (stmps  at:#Maglev_ruby_debugFlag otherwise: false) ifTrue:[
           GsFile gciLogServer:'an Exception would cause exit when abort_on_exception is true'.
           self pause .  "stop for debugging the application"

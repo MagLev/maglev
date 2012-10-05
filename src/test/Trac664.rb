@@ -35,8 +35,10 @@ end
 
 # The actual value for this changes depending on whether you are inside or
 # outside of the firewall, so check for either case.
-unless elem[2] =~ /vmware.com/ || elem[2] =~ /akamaitechnologies/
-  raise "error: akamaitechnologies:  actual #{elem[2]}"
+unless elem[2] =~ /vmware.com/ ||
+    elem[2] =~ /akamaitechnologies/ ||
+    elem[2] =~ /#{(resolved = `resolveip -s www.vmware.com`.chomp)}/
+  raise "error: vmware.com, akamaitechnologies, or #{resolved}:  actual #{elem[2]}"
 end
 
 unless elem[3] =~ /\d{2,3}\.\d{1,3}\.\d{1,3}/

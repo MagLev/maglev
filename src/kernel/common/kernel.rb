@@ -148,4 +148,7 @@ module Kernel
     Timeout::timeout(n, e, &block)
   end
 
+  def fork(&block)
+    Process.fork(&block)
+  end
 end
