@@ -13,7 +13,9 @@
 /html/
 /gemstone/
 /locks/
+/locks
 /log/
+/log
 gemstone.old/
 /src/experimental/
 debugspec.inp
