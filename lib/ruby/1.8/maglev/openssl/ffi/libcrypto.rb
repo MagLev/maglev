@@ -8,7 +8,7 @@ module OpenSSL
   class LibCrypto
     extend FFI::Library
 
-    ffi_lib '$GEMSTONE/lib/libcrypto'  # $GEMSTONE expansion at runtime in VM prims
+    ffi_lib '$GEMSTONE/lib/libssl'  # $GEMSTONE expansion at runtime in VM prims
 
     # Creates and initializes a new <tt>EVP_MD_CTX</tt> struct for
     # <tt>digest_name</tt>, which should be one of the recognized digest
