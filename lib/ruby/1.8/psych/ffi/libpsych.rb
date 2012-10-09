@@ -8,7 +8,7 @@ module Psych
 
   class LibPsych
     extend FFI::Library
-    ffi_lib '$GEMSTONE/lib/libpsych'  # $GEMSTONE expansion at runtime in VM prims
+    ffi_lib Maglev::System.gs_lib_name(:YAML)
 
     ##################################################
     # Parser support
