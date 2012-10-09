@@ -1,0 +1,4 @@
+accessing
+irLocalAsgnValue
+	^ node irLocalAsgnValue
+

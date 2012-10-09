@@ -1,0 +1,23 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"bodyNode",
+		"conditionNode",
+		"labelBreak",
+		"labelNext",
+		"labelRedo",
+		"hasBreakOrNext",
+		"hasBeginOrRescue",
+		"blksInline",
+		"condIsFirst",
+		"baseSel" ],
+	"name" : "RubyAbstractWhileNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractCallNode",
+	"type" : "normal" }

@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyVcGlobalLastMatchAsgn",
+	"pools" : [
+		 ],
+	"super" : "RubyVcGlobalAsgNode",
+	"type" : "normal" }

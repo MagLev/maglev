@@ -1,0 +1,17 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"exceptionNodes",
+		"bodyNode",
+		"nextRescueBody",
+		"defaultNode" ],
+	"name" : "RubyRescueBodyNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

@@ -1,0 +1,5 @@
+accessing
+nextNode
+
+	 ^ nextNode
+

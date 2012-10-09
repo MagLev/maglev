@@ -1,0 +1,17 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"firstNode",
+		"secondNode",
+		"firstTmp",
+		"isDot3" ],
+	"name" : "RubyFlipNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

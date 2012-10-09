@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"theBinding",
+		"varLocs" ],
+	"name" : "RubyEvalScope",
+	"pools" : [
+		 ],
+	"super" : "RubyStaticScope",
+	"type" : "normal" }

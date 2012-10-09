@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyLoadError",
+	"pools" : [
+		 ],
+	"super" : "RubyScriptError",
+	"type" : "normal" }

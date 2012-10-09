@@ -1,0 +1,20 @@
+{
+	"class" : {
+		"s_a:" : "DataCurator 10/02/2012 14:30",
+		"s_list:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"append_to_block:" : "DataCurator 10/02/2012 14:30",
+		"irBeginBodyNode" : "DataCurator 10/02/2012 14:30",
+		"irBlockPassNode" : "DataCurator 10/02/2012 14:30",
+		"irEvaluateBlock" : "DataCurator 10/02/2012 14:30",
+		"irEvaluatedBlockNode" : "DataCurator 10/02/2012 14:30",
+		"irEvaluatedRcvrNode" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"irNodeListInto:" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"prepend_to_block:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"walkOptionalArgs:" : "DataCurator 10/02/2012 14:30",
+		"walkOptionalArgsLhs:" : "DataCurator 10/02/2012 14:30",
+		"walkOptionalArgsRhs:" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,10 @@
+{
+	"class" : {
+		"newForIr" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"irReceiverNode" : "DataCurator 10/02/2012 14:30",
+		"isSmalltalkSend" : "DataCurator 10/02/2012 14:30",
+		"literalObj:" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

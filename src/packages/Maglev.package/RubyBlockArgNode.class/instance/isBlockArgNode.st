@@ -1,0 +1,4 @@
+parsetree
+isBlockArgNode
+	^ true
+

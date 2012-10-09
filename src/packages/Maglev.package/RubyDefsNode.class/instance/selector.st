@@ -1,0 +1,4 @@
+converting
+selector
+	^ #compileSingletonFor:rubyMethod:
+

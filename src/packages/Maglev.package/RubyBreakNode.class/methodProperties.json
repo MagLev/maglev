@@ -1,0 +1,10 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"irGotoNodeFrom:to:" : "DataCurator 10/02/2012 14:30",
+		"irGotoTarget:" : "DataCurator 10/02/2012 14:30",
+		"nameForPrint" : "DataCurator 10/02/2012 14:30",
+		"nonInlineIrNode" : "DataCurator 10/02/2012 14:30" } }

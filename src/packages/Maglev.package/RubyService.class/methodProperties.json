@@ -1,0 +1,17 @@
+{
+	"class" : {
+		"example1" : "DataCurator 10/02/2012 14:30",
+		"example2" : "DataCurator 10/02/2012 14:30",
+		"example3" : "DataCurator 10/02/2012 14:30",
+		"example4" : "DataCurator 10/02/2012 14:30",
+		"example5" : "DataCurator 10/02/2012 14:30",
+		"example6" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"astFor:" : "DataCurator 10/02/2012 14:30",
+		"compileFile:" : "DataCurator 10/02/2012 14:30",
+		"initialize" : "DataCurator 10/02/2012 14:30",
+		"loadGem:" : "DataCurator 10/02/2012 14:30",
+		"require:" : "DataCurator 10/02/2012 14:30",
+		"resolve:" : "DataCurator 10/02/2012 14:30",
+		"runRuby:" : "DataCurator 10/02/2012 14:30",
+		"runRubySource:" : "DataCurator 10/02/2012 14:30" } }

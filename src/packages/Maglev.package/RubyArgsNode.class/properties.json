@@ -1,0 +1,20 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"restArg",
+		"arguments",
+		"blockArgNode",
+		"optArgs",
+		"restArgNode",
+		"argsDescrInt",
+		"selectorSuffix" ],
+	"name" : "RubyArgsNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

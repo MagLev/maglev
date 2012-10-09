@@ -1,0 +1,16 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"BootWarnings",
+		"Saved" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"modifiedStClasses",
+		"rubyPrimMethods" ],
+	"name" : "RubyContext",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

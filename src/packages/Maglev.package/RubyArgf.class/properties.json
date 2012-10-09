@@ -1,0 +1,22 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"argv",
+		"stream",
+		"lineno",
+		"advance",
+		"fileName",
+		"closed" ],
+	"name" : "RubyArgf",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : [
+		"normal",
+		[
+			"instancesNonPersistent" ] ] }

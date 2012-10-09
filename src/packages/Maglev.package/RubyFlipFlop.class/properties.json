@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"theState" ],
+	"name" : "RubyFlipFlop",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

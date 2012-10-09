@@ -1,0 +1,16 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"block",
+		"theClass",
+		"env" ],
+	"name" : "RubyTransientConstantAssociation",
+	"pools" : [
+		 ],
+	"super" : "RubySymbolAssociation",
+	"type" : "normal" }

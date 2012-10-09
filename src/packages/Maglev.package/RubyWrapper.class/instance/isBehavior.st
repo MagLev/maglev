@@ -1,0 +1,5 @@
+testing
+isBehavior
+
+	^ wrappedObject isBehavior
+

@@ -1,0 +1,19 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"kind",
+		"iva",
+		"ivb",
+		"ivc",
+		"ivd",
+		"nesting" ],
+	"name" : "RubyLexStrTerm",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

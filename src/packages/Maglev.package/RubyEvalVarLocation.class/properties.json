@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"vcOfs",
+		"tmpName" ],
+	"name" : "RubyEvalVarLocation",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

@@ -1,0 +1,17 @@
+{
+	"class" : {
+		"comment" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"class:" : "DataCurator 10/02/2012 14:30",
+		"classDefinitionsStream" : "DataCurator 10/02/2012 14:30",
+		"fileOutIn:" : "DataCurator 10/02/2012 14:30",
+		"safeFileOut" : "DataCurator 10/02/2012 14:30",
+		"writeCategory:" : "DataCurator 10/02/2012 14:30",
+		"writeClassComment:" : "DataCurator 10/02/2012 14:30",
+		"writeClassDefinition:" : "DataCurator 10/02/2012 14:30",
+		"writeDefinitions:" : "DataCurator 10/02/2012 14:30",
+		"writeMetaclassDefinition:" : "DataCurator 10/02/2012 14:30",
+		"writeMethodInitializer:" : "DataCurator 10/02/2012 14:30",
+		"writeMethodPostscript" : "DataCurator 10/02/2012 14:30",
+		"writeMethodPreamble:" : "DataCurator 10/02/2012 14:30",
+		"writeMethodSource:" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,17 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"buildStatementsOn:" : "DataCurator 10/02/2012 14:30",
+		"detectMismatchWith:" : "DataCurator 10/02/2012 14:30",
+		"fCallArgNodes" : "DataCurator 10/02/2012 14:30",
+		"irBlockNode:" : "DataCurator 10/02/2012 14:30",
+		"irBlockNodeInline:" : "DataCurator 10/02/2012 14:30",
+		"irCaseNodeListWithLeaf:into:" : "DataCurator 10/02/2012 14:30",
+		"irCaseNodeWithNode:" : "DataCurator 10/02/2012 14:30",
+		"irNodeListInto:" : "DataCurator 10/02/2012 14:30",
+		"isSplatNode" : "DataCurator 10/02/2012 14:30",
+		"not" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

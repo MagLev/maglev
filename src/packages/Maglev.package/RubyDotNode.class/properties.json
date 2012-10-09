@@ -1,0 +1,20 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"exclusive",
+		"beginNode",
+		"endNode",
+		"beginTmp",
+		"endTmp",
+		"fixNumCount",
+		"isInline" ],
+	"name" : "RubyDotNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractCallNode",
+	"type" : "normal" }

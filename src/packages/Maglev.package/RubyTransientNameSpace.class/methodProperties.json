@@ -1,0 +1,25 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_name:" : "DataCurator 10/02/2012 14:30",
+		"_rubyConstants" : "DataCurator 10/02/2012 14:30",
+		"_rubyConstantsFreeze" : "DataCurator 10/02/2012 14:30",
+		"addPersistentAssociation:" : "DataCurator 10/02/2012 14:30",
+		"addTransientAssociation:" : "DataCurator 10/02/2012 14:30",
+		"at:classVarPut:" : "DataCurator 10/02/2012 14:30",
+		"at:runtimePut:" : "",
+		"at:transientRuntimePut:" : "",
+		"bootAddConstAssociation:env:" : "DataCurator 10/02/2012 14:30",
+		"childScopeAt:isDefine:env:" : "DataCurator 10/02/2012 14:30",
+		"copyAssociationsToPns" : "DataCurator 10/02/2012 14:30",
+		"freezeModule" : "DataCurator 10/02/2012 14:30",
+		"initializeForModule:persistentCopy:env:" : "DataCurator 10/02/2012 14:30",
+		"parent" : "DataCurator 10/02/2012 14:30",
+		"parent:" : "DataCurator 10/02/2012 14:30",
+		"persistentCopy" : "DataCurator 10/02/2012 14:30",
+		"persistentCopy:" : "DataCurator 10/02/2012 14:30",
+		"removeConst:" : "DataCurator 10/02/2012 14:30",
+		"removeKey:" : "DataCurator 10/02/2012 14:30",
+		"resolveConstant:" : "DataCurator 10/02/2012 14:30",
+		"transientCopy" : "DataCurator 10/02/2012 14:30" } }

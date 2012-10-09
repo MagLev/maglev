@@ -1,0 +1,17 @@
+{
+	"class" : {
+		"_initialize" : "DataCurator 10/02/2012 14:30",
+		"initialize:" : "DataCurator 10/02/2012 14:30",
+		"newForRp" : "DataCurator 10/02/2012 14:30",
+		"rubyAlias:from:" : "DataCurator 10/02/2012 14:30",
+		"s_a:" : "DataCurator 10/02/2012 14:30",
+		"sessionInitialize" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"determineDynamic" : "DataCurator 10/02/2012 14:30",
+		"irDefinedQNode" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"name" : "DataCurator 10/02/2012 14:30",
+		"name:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30" } }
