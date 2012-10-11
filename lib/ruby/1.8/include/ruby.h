@@ -370,8 +370,9 @@ static VALUE rb_exc_new2(VALUE klass, const char* s)
 
 RUBY_DLLSPEC VALUE rb_exc_new3(VALUE klass, VALUE str);
 
-// RUBY_DLLSPEC void rb_secure(int k);
-
+static void rb_secure(int k) { }
+static void rb_check_safe_obj(VALUE obj) { }
+static void rb_check_safe_str(VALUE str) { }
 static int rb_safe_level(void) { return 0; }
 
 RUBY_DLLSPEC int rb_num2int(VALUE v);

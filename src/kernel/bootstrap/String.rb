@@ -731,6 +731,40 @@ class String
     self.__copyfrom_to( from + 1 , to )
   end
 
+  # Generic version of gsub, for aliasing
+  # ELSE BRANCH COPIED FROM SPECIALIZED VERSION
+  def gsub(regex, str=nil, &block)
+    if str
+      _gsub_internal(regex, str)[0]
+    else
+      # if block_given?,
+      #  $~ and related variables will be valid in block if
+      #   blocks's home method and caller's home method are the same
+      unless block_given?
+        # updating of $~ not implemented yet on  this path
+        return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
+      end
+      start = 0
+      out = self.class.__alloc
+      last_match = nil
+      self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+        last_match = match
+        out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
+        saveTilde = block.__fetchRubyVcGlobal(0)
+        begin
+          block.__setRubyVcGlobal(0, match)
+          out.__append_internal(block.call(match.__at(0)).to_s)
+        ensure
+          block.__setRubyVcGlobal(0, saveTilde)
+        end
+        start = match.end(0)
+      end
+      out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
+      last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
+      out
+    end
+  end
+
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
   # replaced with either <i>replacement</i> or the value of the block. The
   # <i>pattern</i> will typically be a <code>Regexp</code>; if it is a
@@ -837,7 +871,8 @@ class String
     out
   end
 
-
+  # specialized version for invocation with block
+  # COPY TO ELSE BRANCH OF GENERIC VERSION ABOVE IF CHANGED
   def gsub(regex, &block)
     # if block_given?,
     #  $~ and related variables will be valid in block if
