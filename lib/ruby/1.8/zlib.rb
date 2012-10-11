@@ -122,7 +122,8 @@ module Zlib
 
   class GzipReader < GzipFile # {
 
-    def initialize(io)
+    def initialize(io, *args)
+      # TODO: update it to ruby 1.9
       @io = io
       @zstream = ZStream.open_read(io, Error) # Error resolves to GzipFile::Error
       super()

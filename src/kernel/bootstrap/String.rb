@@ -2037,4 +2037,14 @@ class String
     (min <= self) && (self <= max)
   end
 
+  def encode(*args)
+    # TODO
+    self.dup
+  end
+
+  def encode!(*args)
+    # TODO
+    self
+  end
+
 end
