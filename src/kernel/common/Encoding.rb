@@ -77,3 +77,4 @@ class Encoding
 end
 
 Encoding::UTF_8 = Encoding.new
+Encoding::ASCII_8BIT = Encoding.new

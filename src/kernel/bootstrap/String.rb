@@ -2082,4 +2082,18 @@ class String
     self
   end
 
+  def encoding
+    Encoding::UTF_8
+  end
+
+  def force_encoding(encoding)
+    #TODO
+    self
+  end
+
+  def valid_encoding?
+    #TODO
+    true
+  end
+
 end
