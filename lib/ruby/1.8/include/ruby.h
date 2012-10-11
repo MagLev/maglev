@@ -374,6 +374,8 @@ RUBY_DLLSPEC VALUE rb_exc_new3(VALUE klass, VALUE str);
 
 static int rb_safe_level(void) { return 0; }
 
+static void rb_check_safe_obj(VALUE v) { return; }
+
 RUBY_DLLSPEC int rb_num2int(VALUE v);
 RUBY_DLLSPEC unsigned int rb_num2uint(VALUE v);
 
