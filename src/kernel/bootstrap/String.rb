@@ -731,6 +731,15 @@ class String
     self.__copyfrom_to( from + 1 , to )
   end
 
+  # Generic version of gsub, for aliasing
+  def gsub(regex, str=nil, &block)
+    if str
+      _gsub_internal(regex, str)[0]
+    else
+      _gsub_internal_with_block(regex, &block)
+    end
+  end
+
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
   # replaced with either <i>replacement</i> or the value of the block. The
   # <i>pattern</i> will typically be a <code>Regexp</code>; if it is a
@@ -839,6 +848,10 @@ class String
 
 
   def gsub(regex, &block)
+    _gsub_internal_with_block(regex, &block)
+  end
+
+  def _gsub_internal_with_block(regex, &block)
     # if block_given?,
     #  $~ and related variables will be valid in block if
     #   blocks's home method and caller's home method are the same
