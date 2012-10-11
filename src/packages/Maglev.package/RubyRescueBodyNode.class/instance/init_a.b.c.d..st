@@ -2,7 +2,7 @@
 init_a: ex_list b: body c: next_rescue d: srcOfs 
   | reraise innerRescue innerRescueBody |
 
-  ex_list == nil
+  ex_list ~= nil
 	ifTrue: [
 		innerRescueBody := (RubyRescueBodyNode _basicNew)
 							bodyNode: body;
