@@ -114,3 +114,14 @@ rescue A.new
 end
 
 raise "rescue does not respect overridden #===" unless $flag
+
+require 'rubygems'
+begin
+  begin
+    raise Gem::LoadError.new "sth"
+  rescue StandardError
+    p "falsy rescued"
+  end
+rescue Gem::LoadError
+  p "rescued"
+end
