@@ -115,13 +115,53 @@ end
 
 raise "rescue does not respect overridden #===" unless $flag
 
+# Strange inner outer stuff
 require 'rubygems'
+require 'timeout'
 begin
   begin
-    raise Gem::LoadError.new "sth"
-  rescue StandardError
-    p "falsy rescued"
+    begin
+      begin
+        raise Gem::LoadError.new "sth"
+      rescue puts("inner thing"), StandardError, Timeout::Error
+        raise "falsely rescued"
+      end
+    rescue puts("inner thing 2"), StandardError
+      raise "falsy rescued"
+    end
+  rescue puts("right thing"), Timeout::Error, Gem::LoadError, NoMethodError
+    # nil.pause
+    p "rescued"
   end
-rescue Gem::LoadError
-  p "rescued"
+rescue puts("outer thing"), ScriptError
+  raise "script error??"
 end
+
+# Inline return
+def foo
+  raise StandardError rescue return
+end
+
+# Lookup problems
+class Guah
+  class Exception < ::StandardError; end
+  class MyException < ::Exception; end
+
+  def foo
+    begin
+      raise MyException
+    rescue MyException
+      # This will be replaced with the following:
+      # rescue ::Exception        <--- this used to be just Exception,
+      #                                which would be the wrong thing in this scope
+      #   if MyException === $!
+      #     ...
+      #   else
+      #     $!.__reraise
+      #   end
+      # end
+      puts "stderror"
+    end
+  end
+end
+Guah.new.foo
