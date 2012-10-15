@@ -32,9 +32,11 @@ namespace :spec do
     sh "#{PSPEC} tag -G fails"
   end
 
-  desc "Run failing specs and untag ones that now pass (works only with hacked mspec-tag.rb)"
+  desc "Run failing specs and untag ones that now pass"
   task :untag do
-    sh "#{PSPEC} tag --del fails"
+    # sh "#{PSPEC} tag --del fails"
+    untag_script = File.expand_path("../untag.sh", __FILE__)
+    sh untag_script
   end
 
   desc "Run the named specs and tag the failing ones"
@@ -46,6 +48,6 @@ namespace :spec do
     raise "No spec defined with: spec=..." unless f
     raise "Can't find file #{f}" unless File.exists? f
   end
-  
+
 end
 
