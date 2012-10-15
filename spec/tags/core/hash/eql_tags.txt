@@ -1,3 +1,2 @@
 fails:Hash#eql? computes equality for complex recursive hashes
 fails:Hash#eql? compares the values in self to values in other hash
-fails:Hash#eql? computes equality for recursive hashes & arrays

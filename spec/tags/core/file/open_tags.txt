@@ -15,4 +15,3 @@ fails:File.open raises a SystemCallError if passed an invalid Integer type
 fails:File.open raises an ArgumentError if passed an invalid string for mode
 fails:File.open raises an IOError when read in a block opened with File::RDONLY|File::APPEND mode
 fails:File.open raises an IOError if the file exists when open with File::RDONLY|File::APPEND
-fails:File.open opens a file with mode num and block
