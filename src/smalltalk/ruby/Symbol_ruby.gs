@@ -14,7 +14,7 @@ _rubyAllSymbols
   
 | allSyms |
 allSyms := ((AllUsers userWithId:'SymbolUser') resolveSymbol: #AllSymbols) value.
-^ Array withAll: allSyms keys .
+^ Array withAll: (allSyms keys select: [:a | a class == Symbol]).
 %
 
 method: Symbol
