@@ -9,15 +9,19 @@ rubyAutoload: sym file: fileToLoad
   ].
   assoc := self resolveConstant: sym .
   assoc ifNotNil:[
-    assoc isDefined ifNotNil:[ ^ nil ].
-    assoc class == RubyAutoloadAssociation ifFalse:[
+    (assoc class == RubyAutoloadAssociation and: [assoc isLoaded ~= true]) ifTrue: [
       "remove key->NameSpace assoc created during walkWithScope for a Module"
       self removeKey: sym .
       assoc := nil .
-    ].
+    ] ifFalse: [
+        assoc isDefined ifNotNil:[^ nil] .
+        assoc class == RubyAutoloadAssociation ifFalse:[
+          "remove key->NameSpace assoc created during walkWithScope for a Module"
+          self removeKey: sym .
+          assoc := nil .
+    ]].
   ].
   assoc ifNil:[ self addPersistentAssociation: 
              (RubyAutoloadAssociation newWithKey: sym file: fileToLoad) .
   ].
   ^ nil .
-
