@@ -7,5 +7,3 @@ walkWithScope: aScope
     exn walkWithScope: aScope .
   ].
   bodyNode walkWithScope: aScope .
-  nextRescueBody walkWithScope: aScope .
-

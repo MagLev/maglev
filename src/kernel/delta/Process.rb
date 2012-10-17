@@ -89,6 +89,7 @@ module Process
       # instances of Process::Status not available while a child is running
       true
     end
+    alias stopped? exited?
 
     def exitstatus
       # equivalent to posix WEXITSTATUS macro
