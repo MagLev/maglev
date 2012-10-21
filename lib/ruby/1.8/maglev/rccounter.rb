@@ -22,4 +22,5 @@ class RCCounter
   primitive 'increment_by', 'incrementBy:'
   primitive 'decrement', 'decrement'
   primitive 'decrement_by', 'decrementBy:'
+  primitive 'decrement_if_negative&', 'decrementIfNegative:'
 end
