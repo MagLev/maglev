@@ -18,4 +18,5 @@ class RCCounter
   class_primitive 'new', 'new'
 
   primitive 'value', 'value'
+  primitive 'increment', 'increment'
 end
