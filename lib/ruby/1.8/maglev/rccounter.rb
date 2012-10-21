@@ -21,6 +21,17 @@ class RCCounter
   primitive 'increment', 'increment'
   primitive 'increment_by', 'incrementBy:'
   primitive 'decrement', 'decrement'
-  primitive 'decrement_by', 'decrementBy:'
+  primitive '__decrement_by', 'decrementBy:'
   primitive 'decrement_if_negative&', 'decrementIfNegative:'
+  primitive '__decrement_by_if_less_than&', 'decrementBy:ifLessThan:thenExecute:'
+
+  def decrement_by(amount, guard=nil)
+    if guard && block_given?
+      __decrement_by_if_less_than(amount, guard) do
+        yield
+      end
+    else
+      __decrement_by(amount)
+    end
+  end
 end
