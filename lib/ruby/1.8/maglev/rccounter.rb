@@ -16,4 +16,6 @@ RCCounter = __resolve_smalltalk_global(:RcCounter)
 
 class RCCounter
   class_primitive 'new', 'new'
+
+  primitive 'value', 'value'
 end
