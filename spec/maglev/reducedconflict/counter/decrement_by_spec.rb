@@ -22,6 +22,13 @@ describe "RCCounter#decrement_by" do
           'block executed'
         end.should == 'block executed'
       end
+
+      it "doesn't decrement the value" do
+        @counter.decrement_by(10, -1) do
+          'block executed'
+        end
+        @counter.value.should == 0
+      end
     end
 
     describe "when guard is missed" do
