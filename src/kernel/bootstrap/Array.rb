@@ -1735,7 +1735,7 @@ class Array
   end
 
   def to_s
-    self.join
+    '[' + self.collect { |v| v.inspect }.join(', ') + ']'
   end
 
   # Transpose rows and columns (assumes self is an array of arrays, all of
