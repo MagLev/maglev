@@ -132,6 +132,7 @@ end
 
 # These are dev specific tasks we want on a per stone basis
 GemStoneInstallation.current.stones.each do |stone_name|
+  next if defined?(Maglev) and Maglev::System.stone_name == stone_name
   namespace stone_name do
     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
 
