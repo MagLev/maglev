@@ -27,7 +27,13 @@ class Stone
   end
 
   def Stone.create(name, gemstone_installation=GemStoneInstallation.current)
-    fail "Cannot create stone #{name}: the conf file already exists in #{gemstone_installation.config_directory}" if gemstone_installation.stones.include? name
+    if gemstone_installation.stones.include? name
+      if existing(name).running?
+        fail "Cannot recreate stone #{name}: the conf file already exists and stone is running"
+      else
+        existing(name).destroy!
+      end
+    end
     instance = new(name, gemstone_installation)
     instance.initialize_new_stone
     instance
@@ -57,6 +63,9 @@ class Stone
   def initialize_new_stone
     create_skeleton
     copy_clean_extent
+  rescue Exception
+    destroy!
+    raise
   end
 
   def create_skeleton
