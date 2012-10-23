@@ -1,0 +1,20 @@
+{
+	"category" : "MagLev-AST-Abstract",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"LastArgNoToProcSelectors",
+		"RcvrNoToProcSelectors",
+		"SpecialSelectorKinds" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"irArgNodes",
+		"fixedArgCount",
+		"lastArgIsBlk",
+		"argsList",
+		"bypassProt" ],
+	"name" : "RubyAbstractCallNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

@@ -1,0 +1,4 @@
+*maglev-ast
+fCallArgNodes
+  ^ #()
+

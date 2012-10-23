@@ -1,0 +1,16 @@
+{
+	"class" : {
+		"colon2:name:" : "DataCurator 10/02/2012 14:30",
+		"colon3:" : "DataCurator 10/02/2012 14:30",
+		"sym:ofs:val:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"as_accessor" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"constNode" : "DataCurator 10/02/2012 14:30",
+		"constNode:" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"irAssignmentNode:" : "DataCurator 10/02/2012 14:30",
+		"irLeaf" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

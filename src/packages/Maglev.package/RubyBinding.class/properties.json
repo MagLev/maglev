@@ -1,0 +1,22 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"block",
+		"staticLink",
+		"selfObj",
+		"names",
+		"forModuleEval",
+		"tmpsDict",
+		"lexicalScope",
+		"homeMeth",
+		"methDefTarget" ],
+	"name" : "RubyBinding",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

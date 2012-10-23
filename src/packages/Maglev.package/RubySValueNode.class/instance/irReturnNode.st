@@ -1,0 +1,4 @@
+accessing
+irReturnNode
+	^ node irReturnNode
+

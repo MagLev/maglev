@@ -25,9 +25,11 @@ module OpenSSL
     end
 
     class SSLContext
+      attr_accessor :verify_mode
     end
 
     class SSLSocket
+      attr_accessor :sync_close
     end
 
     class Session

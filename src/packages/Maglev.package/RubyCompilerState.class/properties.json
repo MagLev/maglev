@@ -1,0 +1,17 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyCompilerState",
+	"pools" : [
+		 ],
+	"super" : "RubyPersistableCompilerState",
+	"type" : [
+		"normal",
+		[
+			"instancesNonPersistent" ] ] }

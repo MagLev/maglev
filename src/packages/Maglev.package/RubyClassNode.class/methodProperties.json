@@ -1,0 +1,14 @@
+{
+	"class" : {
+		"s_a:b:c:d:e:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"fixedInstVars:" : "DataCurator 10/02/2012 14:30",
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30",
+		"superNode" : "DataCurator 10/02/2012 14:30",
+		"superNode:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

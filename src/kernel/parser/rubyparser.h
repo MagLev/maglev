@@ -1,3 +1,4 @@
+/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
 #if !defined(RUBYPARSER_H)
 #define RUBYPARSER_H 1
 

@@ -25,6 +25,16 @@ Stream installLegacyStreamImplementation.
 true
 %
 
+set class PositionableStream
+category: '*squeak'
+method:
+originalContents
+
+ ^ itsCollection
+
+%
+
+
 input $imageRubyDir/GsCompilerClasses.gs
 
 input $imageRubyDir/Behavior_ruby.gs

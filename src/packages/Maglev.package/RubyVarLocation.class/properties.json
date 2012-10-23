@@ -1,0 +1,16 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"depth",
+		"info",
+		"scope" ],
+	"name" : "RubyVarLocation",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

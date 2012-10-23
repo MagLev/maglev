@@ -1,0 +1,13 @@
+{
+	"class" : {
+		"s_a:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"appendToHeadString:" : "DataCurator 10/02/2012 14:30",
+		"appendToList:" : "DataCurator 10/02/2012 14:30",
+		"asDSymbolNode" : "DataCurator 10/02/2012 14:30",
+		"dstrList" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"size" : "DataCurator 10/02/2012 14:30",
+		"str_dstr_evstr_kind" : "DataCurator 10/02/2012 14:30" } }

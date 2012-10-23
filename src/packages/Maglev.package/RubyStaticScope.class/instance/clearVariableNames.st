@@ -1,0 +1,5 @@
+*maglev-runtime
+clearVariableNames
+   variableNames := { } .
+   
+

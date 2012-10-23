@@ -557,5 +557,43 @@ module Maglev
     # current session, that object is ignored. Returns the receiver.
     #
     # class_primitive 'remove_lock_all', 'removeLockAll:'
+
+    class_primitive '__gem_version', 'gemVersionAt:'
+    def self.__gs_version
+      self.__gem_version('gsVersion')
+    end
+
+    def self.__gs_width
+      case self.__gem_version('cpuArchitecture')
+      when 'x86-64' then '64'
+      when 'i386'   then '32'
+      else '??'
+      end
+    end
+
+    def self.__gs_dynlibext
+      case self.__gem_version('osName')
+      when 'Darwin' then '.dylib'
+      else '.so'
+      end
+    end
+
+    # Get the name of a known dynamic library shipped with GemStone.
+    # Currently this includes
+    #   * the linked GCI library
+    #   * the RPC GCI library
+    #   * the SSL library (OpenSSL including libcrypto)
+    #   * the YAML library (libpsych)
+    #
+    def self.gs_lib_name(library_symbol)
+      library_name = case library_symbol
+                     when :LINKGCI then 'libgcilnk'
+                     when :RPCGCI  then 'libgcirpc'
+                     when :SSL     then 'libssl'
+                     when :YAML    then 'libpsych'
+                     else raise "Library name must be known"
+      end
+      "$GEMSTONE/lib/#{library_name}-#{self.__gs_version}-#{self.__gs_width}#{self.__gs_dynlibext}"
+    end
   end
 end

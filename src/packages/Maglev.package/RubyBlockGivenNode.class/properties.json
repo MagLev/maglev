@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"evalRcvr" ],
+	"name" : "RubyBlockGivenNode",
+	"pools" : [
+		 ],
+	"super" : "RubyFCallNode",
+	"type" : "normal" }

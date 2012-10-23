@@ -62,9 +62,9 @@ classmethod:
 _recursionGuardSet
  "use _newRubyThreadData for lazy init, to handle   topaz inspect ..."
 
- ^ (( self _current _clientData ifNil:[ self _current _newRubyThreadData ])
+ ^ (( self _current clientData ifNil:[ self _current _newRubyThreadData ])
       at: GC_RubyGsProcessClientData_recursionGuardSet) ifNil:[
-    self _current _clientData at: 4 put: IdentitySet new 
+    self _current clientData at: 4 put: IdentitySet new 
  ]
 %
 

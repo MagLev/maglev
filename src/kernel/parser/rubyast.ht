@@ -1,3 +1,4 @@
+/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
 #if !defined(RUBYAST_HT)
 #define RUBYAST_HT 1
 

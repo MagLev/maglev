@@ -1,0 +1,16 @@
+{
+	"category" : "Maglev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"toProcInfo",
+		"readCount",
+		"isBlockInt" ],
+	"name" : "RubyScopeIncomingBlockVar",
+	"pools" : [
+		 ],
+	"super" : "RubyScopeVarInfo",
+	"type" : "normal" }

@@ -131,4 +131,5 @@ module Kernel
     :trap 
   )
 
+  private :autoload, :autoload?
 end

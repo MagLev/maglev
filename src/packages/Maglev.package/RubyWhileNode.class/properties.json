@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyWhileNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractWhileNode",
+	"type" : "normal" }

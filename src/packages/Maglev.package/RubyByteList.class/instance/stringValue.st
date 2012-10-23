@@ -1,0 +1,5 @@
+accessing
+stringValue
+
+	 ^ stringValue
+

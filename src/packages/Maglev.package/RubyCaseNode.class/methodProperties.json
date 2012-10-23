@@ -1,0 +1,12 @@
+{
+	"class" : {
+		"s_a:b:c:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"caseBody" : "DataCurator 10/02/2012 14:30",
+		"caseBody:" : "DataCurator 10/02/2012 14:30",
+		"caseNode" : "DataCurator 10/02/2012 14:30",
+		"caseNode:" : "DataCurator 10/02/2012 14:30",
+		"caseNode:caseBody:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

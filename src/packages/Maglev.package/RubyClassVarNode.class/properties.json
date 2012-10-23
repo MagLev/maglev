@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"name",
+		"inMethod" ],
+	"name" : "RubyClassVarNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractVarNode",
+	"type" : "normal" }
