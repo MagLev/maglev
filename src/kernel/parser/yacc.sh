@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#!/bin/bash
 
 ./byacc/yacc -d -g -o rubygrammar.c -P -t -v grammar.y
 if [ $? -ne 0 ]; then
