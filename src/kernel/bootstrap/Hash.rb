@@ -962,6 +962,11 @@ class Hash
   end
 
   def index(value)
+    warn "warning: Hash#index is deprecated; use Hash#key"
+    self.key(value)
+  end
+
+  def key(value)
     self.each_pair { |k,v|
       return k if v == value  # per specs, v is receiver
     }
