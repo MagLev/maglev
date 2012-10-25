@@ -169,7 +169,8 @@ GemStoneInstallation.current.stones.each do |server_name|
      [:status,           "Report status of the \"#{server_name}\" server"],
      [:reload,           "Destroy the \"#{server_name}\" repository then load a fresh one"],
      [:take_snapshot,    "Stop the \"#{server_name}\" server then make a backup copy of its repository"],
-     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
+     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"],
+     [:webtools, "Run the GemStone/S Webtools"],
     ].each do |action,desc|
       stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       task_gemstone(stone, action, desc)
