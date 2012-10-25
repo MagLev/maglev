@@ -28,7 +28,7 @@ repository.  This note describes how to configure that scenario.
    should be available in the services database on all machines that will
    participate in the cluster.
 
-2. Setup envrionment on stone machine
+2. Setup environment on stone machine
 
    Assuming your $MAGLEV_HOME environment variable is correct:
 
@@ -42,7 +42,7 @@ repository.  This note describes how to configure that scenario.
 
 3. Start netldi on stone machine
 
-   Start the netldi daemon on the Repoistory machine in guest mode, to
+   Start the netldi daemon on the Repository machine in guest mode, to
    allow MagLev VMs on remote machines to connect to this Repository.
 
      $ $GEMSTONE/bin/startnetldi -g -apmclain -d ${gs64ldi:-gs64ldi}
@@ -78,7 +78,7 @@ repository.  This note describes how to configure that scenario.
 
      $ unset GEMSTONE_NRS_ALL                  # precautionary
      $ export GEMSTONE=$MAGLEV_HOME/gemstone
-     $ $GEMSTONE/bin/startnetldi ${gs65ldi:-gs64ldi}
+     $ $GEMSTONE/bin/startnetldi ${gs64ldi:-gs64ldi}
 
 4. Start topaz
 
@@ -118,7 +118,7 @@ connect.
 
 === Need nice way to invoke a remote vm:
 
-W need a a nice <tt>--remote XXX</tt> option for <tt>maglev-ruby</tt>.
+We need a a nice <tt>--remote XXX</tt> option for <tt>maglev-ruby</tt>.
 We should be able to do something like:
 
   $ maglev-ruby --stone foobar \
