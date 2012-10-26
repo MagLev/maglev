@@ -45,7 +45,14 @@ repository.  This note describes how to configure that scenario.
    Start the netldi daemon on the Repoistory machine in guest mode, to
    allow MagLev VMs on remote machines to connect to this Repository.
 
-     $ $GEMSTONE/bin/startnetldi -g -apmclain -d ${gs64ldi:-gs64ldi}
+     $ $GEMSTONE/bin/startnetldi -g -a$USER -d ${gs64ldi:-gs64ldi}
+
+   The meaning of the options is:
+     -g        Guest mode: Allow clients of any user to login to GemStone
+     -a $USER  Run netldi as user $USER
+     -d        Print debug info
+     ${gs64ldi:-gs64ldi}  The name of the netldi (must match entry in
+                /etc/services)
 
 4. Start the stone
 
@@ -78,12 +85,22 @@ repository.  This note describes how to configure that scenario.
 
      $ unset GEMSTONE_NRS_ALL                  # precautionary
      $ export GEMSTONE=$MAGLEV_HOME/gemstone
-     $ $GEMSTONE/bin/startnetldi ${gs65ldi:-gs64ldi}
+     $ $GEMSTONE/bin/startnetldi -a$USER ${gs65ldi:-gs64ldi}
+
+   The <tt>-a$USER</tt> is important.  The local topaz will call over to
+   the Stone machine's netldi process.  The netldi process on the stone
+   machine then contacts the netldi on the gem machine (this machine), and
+   asks the local netldi to start a shared page cache.  The netldi on this
+   machine will then create the shared page cache running as the user
+   passed in via <tt>-a$USER</tt>.  If no user was passed to startnetldi,
+   then the local netldi will attempt to create the shared page cache
+   running as the same username as whatever user is running on the Stone
+   machine (which may not exist on this machine).
 
 4. Start topaz
 
    Start a topaz session to connect to the stone.
-   
+
      $ $GEMSTONE/bin/topaz -l
      topaz> set user DataCurator pass swordfish
      topaz> set gemstone !@mystone.machine.org!maglev
