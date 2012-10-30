@@ -19,7 +19,7 @@ repository.  This note describes how to configure that scenario.
    if you use that) on *all* machines, and that the entry is the same on
    *all* machines.  The default entry is:
 
-     gs64ldi         50377/tcp        # GemStone netldi
+     gs64ldi         50378/tcp        # GemStone netldi
 
    but you can name your netldi something else, e.g.,
 
@@ -188,7 +188,7 @@ page cache running, you can use rake from <tt>$MAGLEV_HOME</tt>:
   $ rake
   Status   Version    Owner    Pid   Port   Started     Type       Name
   ------- --------- --------- ----- ----- ------------ ------      ----
-    OK    3.1.0.1   pbm       17461 50377 Oct 29 15:12 Netldi      gs64ldi
+    OK    3.1.0.1   pbm       17461 50378 Oct 29 15:12 Netldi      gs64ldi
     OK    3.1.0.1   pbm       17679 49215 Oct 29 15:46 cache       maglev~ce60a142787a48e6
 
 The second line in the output is the cache (notice there is no maglev stone
@@ -201,7 +201,7 @@ And then confirm it is gone:
   $ rake
   Status   Version    Owner    Pid   Port   Started     Type       Name
   ------- --------- --------- ----- ----- ------------ ------      ----
-    OK    3.1.0.1   pbm       17461 50377 Oct 29 15:12 Netldi      gs64ldi
+    OK    3.1.0.1   pbm       17461 50378 Oct 29 15:12 Netldi      gs64ldi
 
 Now you can re-configure and try again.  In normal mode, it is a *good*
 thing the shared page cache sticks around.  It avoids the cost of setting
