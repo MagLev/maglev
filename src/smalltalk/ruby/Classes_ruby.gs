@@ -346,3 +346,15 @@ self _primitiveFailed: #parse:cBytes:line:file:yTrace:warnings:evalScope:
      args: { sourceString . sourceCByteArray . lineNum . 
              fileName . yTraceLevel . warnBool . aRubyEvalScope }
 %
+
+
+run
+Object subclass: 'RubyString'
+  instVarNames: #( stringObj encoding)
+  classVars: #()
+  classInstVars: #()
+  poolDictionaries: #()
+  inDictionary: 'Globals'
+  category: 'User Classes'
+  options: #().
+%
