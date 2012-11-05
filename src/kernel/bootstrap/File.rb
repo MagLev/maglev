@@ -1136,6 +1136,10 @@ class File
 
   alias :syswrite :write
 
+
+  def set_encoding(encoding)
+    #TODO
+  end
 end
 File.__freeze_constants
 

@@ -5,6 +5,7 @@ class String
   end
 
   primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
+  #primitive_nobridge '__asUnicode', '_asUnicodeString'
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
@@ -2024,11 +2025,13 @@ class String
     str.__tr_s!(from, to) || str
   end
 
+  p "hier"
   primitive 'unpack', 'rubyUnpack:'
 
   primitive 'upcase', 'asUppercase'   # no taint propagation
 
   primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
+
 
   # MNI: upto
 
@@ -2070,6 +2073,30 @@ class String
 
   def between?(min, max)
     (min <= self) && (self <= max)
+  end
+
+  def encode(*args)
+    # TODO
+    self.dup
+  end
+
+  def encode!(*args)
+    # TODO
+    self
+  end
+
+  def encoding
+    Encoding::UTF_8
+  end
+
+  def force_encoding(encoding)
+    #TODO
+    self
+  end
+
+  def valid_encoding?
+    #TODO
+    true
   end
 
 end

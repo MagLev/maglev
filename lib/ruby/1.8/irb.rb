@@ -49,6 +49,9 @@ module IRB
 
   # initialize IRB and start TOP_LEVEL irb
   def IRB.start(ap_path = nil)
+    def STDIN.tty?
+      true
+    end
     $0 = File::basename(ap_path, ".rb") if ap_path
 
     IRB.setup(ap_path)

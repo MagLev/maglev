@@ -958,7 +958,7 @@ _initializeSpecialSelectors
         at: Number put: #(  _isNumber  Number ) ;
         at: ExecBlock put: #(  _isExecBlock  ExecBlock ) ;
         at: Array put: #(  _isArray  Array ) ;
-        at: String put: #(  _isRubyString  String ) ;
+        at: RubyString put: #(  _isRubyString  String ) ;
         at: RubyHash put: #(  _isRubyHash  Hash ) ;
         at: Regexp put: #(  _isRegexp  Regexp ) ;
         at: Range put: #(  _isRange  Range )  .
