@@ -295,11 +295,15 @@ class Module
     nargs = args.size
     if nargs < 1
       if block_arg._not_equal?(nil)
-        return __module_eval(nil, block_arg)
+        module_eval_value = __module_eval(nil, block_arg)
+        __set_protection_methods(protection_level)
+        return module_eval_value
       end
+        __set_protection_methods(protection_level)
       raise ArgumentError, 'too few args'
     end
     if nargs > 3
+        __set_protection_methods(protection_level)
       raise ArgumentError, 'too many args'
     end
     # no ArgumentError for both string and explicit block args yet ;
@@ -323,9 +327,8 @@ class Module
     res = __module_eval_string(string, vcgl, *m_args )
     vcgl[0].__storeRubyVcGlobal(0x30)
     vcgl[1].__storeRubyVcGlobal(0x31)
-    res
-  ensure
     __set_protection_methods(protection_level)
+    res
   end
 
   primitive_nobridge_env '__module_eval', '_moduleEval', ':block:'
