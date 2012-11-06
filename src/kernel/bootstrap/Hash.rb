@@ -1131,7 +1131,7 @@ class Hash
   end
 
   def to_s
-    to_a.join
+    self.inspect
   end
 
   alias update merge!
