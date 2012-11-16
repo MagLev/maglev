@@ -1,29 +1,10 @@
+!=========================================================================
+! Copyright (C) VMware, Inc. 2008-2012.  All Rights Reserved.
 !
-! From ! GEMSTONE: 3.1.0.1, Wed Nov  7 12:51:14 2012 matthias private build; IMAGE: GemStone/S64 v3.1.0.1 kernel classes filein completed at 10/10/2012 00:53:34
-
-! 
-
-! On November 9, 2012, 4:41:41 PM
+! RubyHash.gs: Smalltalk implementation of the Ruby hash table.
 !
-! doit
-! Object indexableSubclass: #RubyHash
-!	instVarNames: #(  head tail
-! 	                  bitmask hasNestedHashes occupiedSlots
-! 	                  autoRehash size default isIdentityHash
-! 	                  defaultProc)
-! 	classVars: #()
-! 	classInstVars: #()
-! 	poolDictionaries: #()
-! 	inDictionary: Globals
-! 	options: #( disallowGciStore).
-! true
-! %
-
-! ------------------- Class comment for RubyHash
-! doit
-! RubyHash comment: 
-! ''
-! %
+!=========================================================================
+!
 
 ! Remove existing behavior from RubyHash
 doit
@@ -104,18 +85,14 @@ at: aKey put: aValue
 category: 'Accessing'
 method: RubyHash
 autoRehash
-
-   "Return the value of the instance variable 'autoRehash'."
 	autoRehash ifNil: [self autoRehash: true].
-   ^autoRehash
+   ^ autoRehash
 %
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 autoRehash: newValue
-
-   "Modify the value of the instance variable 'autoRehash'."
-   autoRehash := newValue
+   autoRehash := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
@@ -127,7 +104,7 @@ category: 'Updating'
 set compile_env: 0
 method: RubyHash
 bitmask: aBitmask
-	bitmask := aBitmask
+	bitmask := aBitmask.
 %
 category: 'Accessing'
 set compile_env: 0
@@ -217,17 +194,13 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 defaultProc
-
-   "Return the value of the instance variable 'defaultProc'."
-   ^defaultProc
+   ^ defaultProc
 %
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 defaultProc: newValue
-
-   "Modify the value of the instance variable 'defaultProc'."
-   defaultProc := newValue
+   defaultProc := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
@@ -249,7 +222,7 @@ doKeyValue: aBlock
 		aBlock value: association key value: association value.
 		association := association next].
 %
-category: 'unknown'
+category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 equals: aKey with: anotherKey
@@ -291,19 +264,15 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 head
-
-   "Return the value of the instance variable 'head'."
-   ^head
+   ^ head
 %
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 head: newValue
-
-   "Modify the value of the instance variable 'head'."
-   head := newValue
+   head := newValue.
 %
-category: 'unknown'
+category: 'Instance creation'
 set compile_env: 0
 method: RubyHash
 initHash
@@ -317,7 +286,8 @@ initHash
 	self hasNestedHashes: false.
 	self isIdentityHash: false.
 	self _basicSize: self hashTableSize.
-	(1 to: self hashTableSize) do: [:index | ((self _at: index) == _remoteNil) ifTrue: [self _at: index put: nil]].
+	(1 to: self hashTableSize) do: [:index | 
+    ((self _at: index) == _remoteNil) ifTrue: [self _at: index put: nil]].
 	self bitmask: 32767.
 	self occupiedSlots: 0.
 	self size: 0.
@@ -326,16 +296,12 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 isIdentityHash
-
-   "Return the value of the instance variable 'isIdentityHash'."
-   ^isIdentityHash
+   ^ isIdentityHash
 %
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 isIdentityHash: newValue
-
-  	"Modify the value of the instance variable 'isIdentityHash'."
   	isIdentityHash := newValue.
 	self hasNestedHashes ifTrue: [
 		(1 to: self hashTableSize) do: [:index | (self _at: index) isIdentityHash: true]].
@@ -379,15 +345,13 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 occupiedSlots
-
-   "Return the value of the instance variable 'occupiedSlots'."
-   ^occupiedSlots
+   ^ occupiedSlots
 %
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 occupiedSlots: aNumber
-	occupiedSlots := aNumber
+	occupiedSlots := aNumber.
 %
 category: 'Updating'
 set compile_env: 0
@@ -436,25 +400,19 @@ category: 'Updating'
 set compile_env: 0
 method: RubyHash
 size: newValue
-
-   "Modify the value of the instance variable 'size'."
-   size := newValue
+   size := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 tail
-
-   "Return the value of the instance variable 'tail'."
-   ^tail
+   ^ tail
 %
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 tail: newValue
-
-   "Modify the value of the instance variable 'tail'."
-   tail := newValue
+   tail := newValue.
 %
 category: 'Updating'
 set compile_env: 0
@@ -483,6 +441,6 @@ _rubyEachPair: aBlock
 		self @ruby1:__do_pair: aBlock _: key _: value].
 %
 doit
-RubyHash category: 'Globals'.
+RubyHash category: 'Ruby support'.
 true
 %

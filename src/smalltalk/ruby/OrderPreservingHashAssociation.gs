@@ -1,10 +1,13 @@
+!=========================================================================
+! Copyright (C) VMware, Inc. 2008-2012.  All Rights Reserved.
 !
-! From ! GEMSTONE: 3.1.0.1, Wed Nov  7 12:51:14 2012 matthias private build; IMAGE: GemStone/S64 v3.1.0.1 kernel classes filein completed at 10/10/2012 00:53:34
-
-! 
-
-! On November 9, 2012, 4:41:56 PM
+! OrderPreservingHashAssociation.gs: Smalltalk implementation of the 
+! Ruby hash table. An association saves a pointer to the next and 
+! to the previous entry in the hash table.
 !
+!=========================================================================
+!
+
 run
 Object subclass: #OrderPreservingHashAssociation
 	instVarNames: #( key value previous
@@ -16,14 +19,6 @@ Object subclass: #OrderPreservingHashAssociation
 	options: #().
 true
 %
-
-! ------------------- Class comment for OrderPreservingHashAssociation
-run
-OrderPreservingHashAssociation comment: 
-''.
-true
-%
-
 ! Remove existing behavior from OrderPreservingHashAssociation
 run
 OrderPreservingHashAssociation removeAllMethods.
@@ -48,83 +43,63 @@ category: 'Accessing'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 index
-
-   "Return the value of the instance variable 'index'."
-   ^index
+   ^ index
 %
 category: 'Updating'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 index: newValue
-
-   "Modify the value of the instance variable 'index'."
-   index := newValue
+   index := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 key
-
-   "Return the value of the instance variable 'key'."
-   ^key
+   ^ key
 %
 category: 'Updating'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 key: newValue
-
-   "Modify the value of the instance variable 'key'."
-   key := newValue
+   key := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 next
-
-   "Return the value of the instance variable 'next'."
-   ^next
+   ^ next
 %
 category: 'Updating'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 next: newValue
-
-   "Modify the value of the instance variable 'next'."
-   next := newValue
+   next := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 previous
-
-   "Return the value of the instance variable 'previous'."
-   ^previous
+   ^ previous
 %
 category: 'Updating'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 previous: newValue
-
-   "Modify the value of the instance variable 'previous'."
-   previous := newValue
+   previous := newValue.
 %
 category: 'Accessing'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 value
-
-   "Return the value of the instance variable 'value'."
-   ^value
+   ^ value
 %
 category: 'Updating'
 set compile_env: 0
 method: OrderPreservingHashAssociation
 value: newValue
-
-   "Modify the value of the instance variable 'value'."
-   value := newValue
+   value := newValue.
 %
 run
-OrderPreservingHashAssociation category: 'Globals'.
+OrderPreservingHashAssociation category: 'Ruby support'.
 true
 %
