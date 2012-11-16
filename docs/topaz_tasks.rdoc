@@ -1,0 +1,308 @@
+= Topaz
+Topaz is several things:
+1. debugger, like gdb or ruby-debug
+2. command line driven code browser
+3. Image editor
+
+== Stack Commands
+
+=== WHERE Show both ruby and smalltalk stack frames
+
+WHERE will show the stack.  Can take parameters to show above or below the
+current stack frame.
+
+A plain "where" (abbreviated "wh"), will show the full stack with both ruby
+and smalltalk frames:
+
+  topaz 1> wh
+  ==> 1 AbstractException >> _outer:with:        (envId 0) @8 line 19
+  2 AbstractException >> outer               (envId 0) @2 line 19
+  3 [] in  RubyCompiler >> compileFileNamed:loadName:env: (envId 0) @4 line 58
+  4 AbstractException >> _executeOuterHandler: (envId 0) @3 line 7
+  5 AbstractException >> _outer:with:        (envId 0) @4 line 14
+  6 AbstractException >> outer               (envId 0) @2 line 19
+  7 [] in  RubyCompiler class >> withRubyHandlers:main:do: (envId 0) @24 line 56
+  8 AbstractException >> _executeHandler:    (envId 0) @3 line 8
+  9 AbstractException >> _signalWith:        (envId 0) @1 line 1
+  10 AbstractException >> signal:             (envId 0) @3 line 7
+  11 AbstractException class >> signal:       (envId 0) @3 line 4
+  12 RubyContext >> requireFileNamed:env:     (envId 0) @14 line 14
+  13 RubyContext >> requireFileNamed:         (envId 0) @2 line 3
+  14 Kernel # require#1__                     (envId 1) @6 line 2
+  15 Object # __compileFile                   (envId 1) @4 line 1
+  16 [] in  RubyCompiler >> compileFileNamed:loadName:env: (envId 0) @14 line 21
+  17 [] in  RubyCompiler class >> withRubyHandlers:main:do: (envId 0) @2 line 34
+  18 ExecBlock >> onException:do:             (envId 0) @2 line 66
+  ...
+
+=== WHRUBY <same options as WHERE> : Show only ruby (non bridge env 1) stack frames
+
+From the same place as the previous example, here is what "whruby" shows
+(abbreviated "whr"):
+
+  topaz 1> whr
+  ==> 14 Kernel # require#1__                     (envId 1) @6 line 2
+  15 Object # __compileFile                   (envId 1) @4 line 1
+
+It shows only the environment 1 stack frames from the previous example
+
+=== WHRB <same options as WHERE> : Show ruby and bridge methods
+
+Show ruby bridge and non-bridge stack frames:
+
+  topaz 1> whrb
+  ==> 19 Kernel # __reraise:                      (envId 1) @2 line 3
+  20 block in  Application # standard_exception_handling& (envId 1) @3 line 6
+  22 block in  Application # standard_exception_handling& (envId 1) @2 line 4
+  26 Kernel # raise:                          (envId 1) @16 line 11
+  27 Kernel # exit:                           (envId 1) @14 line 8
+  28 block in  Application # standard_exception_handling& (envId 1) @4 line 13
+  30 block in  Application # standard_exception_handling& (envId 1) @2 line 10
+  34 Kernel # raise:                          (envId 1) @15 line 9
+  35 block in  Task # invoke_with_call_chain:: (envId 1) @4 line 14
+  37 block in  Task # invoke_with_call_chain:: (envId 1) @2 line 12
+  45 Kernel # raise:                          (envId 1) @15 line 9
+  46 block in  Task # invoke_with_call_chain:: (envId 1) @4 line 14
+  48 block in  Task # invoke_with_call_chain:: (envId 1) @2 line 12
+  74 Deprecate # deprecate:                   (envId 1b) @2 line 1
+  75 Getter class # __compileClass            (envId 1) @8 line 561
+  81 ClassCache class # __compileClass        (envId 1) @20 line 553
+  87 Module # __compileClass                  (envId 1) @115 line 525
+  95 Module # __compileClass                  (envId 1) @3 line 16
+  103 Object # __compileFile                   (envId 1) @16 line 15
+
+=== UPR [<anInteger>] :  move up stack ruby non-bridge
+=== UPRB [<anInteger>] : move up stack ruby bridge and non-bridge
+=== DOWNR [<anInteger>]  : Move down stack to next (nth) non-bridge ruby frame
+
+Move up/down to the next ruby stack frame
+
+  | downr   | Go down stack to next non-bridge frame in env 1   |
+  |---------+---------------------------------------------------|
+  | downr N | Go down N frames, counting only non-bridge frames |
+  |         | in environment 1                                  |
+
+=== DOWNRB [<anInteger>]  : Move down stack to next (nth) ruby frame
+Like downr, but counts both bridge and non-bridge methods.
+
+== Class / Source Browsing
+
+You can use topaz as a command line class/source browser.  First step, is
+to set the class you want to work from.  You can use a smalltalk class
+name:
+
+  topaz 1> set class Object
+
+Or you can use the object id of the class (e.g., useful for singleton
+classes, which are unamed):
+
+  topaz 1> set class @143855617
+
+Once you have set the class, the following items will work.
+
+=== RUBYHIERARCHY  : Show the ruby class hierarchy from current class/module
+
+Example:
+
+  topaz 1> set class Array
+  topaz 1> rubyhier
+  virtualKernel
+    Object
+      Collection
+        SequenceableCollection
+          virtualEnumerable
+            Array
+
+If you want more detail, you can turn on class oops:
+
+  topaz 1> display classoop
+  topaz 1> set class Array
+  topaz 1> rubyhier
+  virtualKernel                   26193409  format=16r6820 primaryCopy 20861953 pns=nil tns=nil
+    Object                        72193  format=16r2000 pns=26722561 tns=244611329
+      Collection                  68865  format=16r4 pns=nil tns=nil
+        SequenceableCollection    73729  format=16r4 pns=nil tns=nil
+          virtualEnumerable       101305345  format=16r6820 primaryCopy 26184961 pns=nil tns=nil
+            Array                 66817  format=16r4 pns=103278337 tns=nil
+
+Now you can look at a particular class and its methods:
+
+=== RUBYIMPLEMENTORS <aSelector> : Search for implementation of a method by  method name
+
+Searches environment 1 transient and persistent method dictionaries and
+prints a list of classes which contain implementations of the ruby selector
+prefix of aSelector .  aSelector may be a string or symbol.
+
+Example: Look for implementors of "eval" and then look at the source code:
+
+  topaz 1> rubyimpl eval
+  aMetaModule                             20863233
+  Binding                                 10615553
+  Kernel                                  20861953
+
+  topaz 1> set class @20863233
+
+  topaz 1> rubylist meth eval
+    def eval(*args, &block_arg)
+      #   should always come here via a bridge method , thus 0x3N for vcgl ...
+      nargs = args.size
+      if nargs < 1
+        raise ArgumentError, 'too few args'
+      end
+      if nargs > 4
+        raise ArgumentError, 'too many args'
+      end
+      lex_path = self.__getRubyVcGlobal(0x32) # __lexPath, synthesized by AST to IR code in .mcz
+      str = args[0]
+      bnd = args[1]
+      file = args[2]
+      line = args[3]
+      unless file._equal?(nil)
+        file = Type.coerce_to(file, String, :to_str)
+      end
+      if line._equal?(nil)
+        line = 0
+      else
+        line = Type.coerce_to(line, Fixnum, :to_int)
+      end
+      if bnd._equal?(nil)
+        ctx = self.__binding_ctx(1)
+        bnd = Binding.new(ctx, self, block_arg)
+        bnd.__set_lex_scope(lex_path)
+      else
+        unless bnd._is_a?(Binding) ; raise TypeError,'not a Binding' ; end
+        # lex_path arg ignored, passed binding has precedence
+      end
+      vcgl = [ self.__getRubyVcGlobal(0x30) ,
+               self.__getRubyVcGlobal(0x31) , nil ]
+      bblk = bnd.block
+      unless bblk._equal?(nil)
+        vcgl << bblk
+      end
+      res = __eval_with_position(str, bnd, vcgl, file, line )
+      vcgl[0].__storeRubyVcGlobal(0x30)
+      vcgl[1].__storeRubyVcGlobal(0x31)
+      res
+    end
+
+  COPIED by module_function
+  # method starts at line 366 of /Users/pmclain/GemStone/checkouts/maglev-hpi/src/kernel/bootstrap/Kernel.rb
+
+=== RUBYLIST : Look at list of ruby methods
+
+This command is used in conjunction with the SET and EDIT commands to
+browse through dictionaries, classes, and methods in the database.
+
+RUBYLIST with no arguments will list the source code for the currently
+selected stack frame, as selected by a previous UP, DOWN, or FRAME command.
+
+You look at the instance side using "selpre" (for selector prefixes, i.e.,
+without the bridge methods) or "cselpre" (for class side). Example:
+
+  topaz 1> set class RubyHash
+  topaz 1> rubylist selpre
+    ==
+    clear
+    clone
+    default
+    default=
+    default_proc
+    delete
+    delete_if
+    dup
+    each
+    each_key
+    each_pair
+    ...
+
+  topaz 1> rubylist cselpre
+    allocate
+    new
+    []
+    __allocate
+    __from_array
+    __from_array_of_pairs
+    __from_elements
+    __new
+
+=== RUBYLOOKUP: look at ruby source code or bytecodes for a method
+
+RUBYLOOKUP meth <selectorSpec>  [envIdInteger]
+RUBYLOOKUP method <selectorSpec>  [envIdInteger]
+RUBYLOOKUP cmeth <selectorSpec>  [envIdInteger]
+RUBYLOOKUP classmethod <selectorSpec>  [envIdInteger]
+
+Like LOOKUP but uses environmentId 1 by default to lookup methods.  looks
+in transient method dicts, then peristent method dicts for each class up
+the hierarchy.  If a bridge method is found, and the bridge method has a
+nonBridgeSelector in it's debug information, then the nonBridge method is
+also displayed.  See <selectorSpec> in Object_Specification_Formats
+
+Example:
+
+First set the class, and then you can look at either instance side methods
+with "rubylook meth <selector>" or class methods using "cmeth". To see the
+bytecode, use the "disa" command after looking at the method.  Example:
+
+  topaz 1> set class Object
+  topaz 1> rubylook meth to_s
+  method: Object
+    to_s#0*&
+      <bridge method, objId 103348481>
+  method: Object
+    def to_s
+      self.class.name.to_s
+    end
+  # method starts at line 628 of /Users/pmclain/GemStone/checkouts/maglev-hpi/src/kernel/bootstrap/Object.rb
+
+  topaz 1> disa
+  Object >> to_s#0__ (envId 1)
+   method:103367681 sourceString:104736257 numArgs:0, public, No literals
+  Step/Source IP    Opcode         Description  (IP in bytes from &obj.hdr)
+   ---/------ ---   -------------- -----------
+    1/     2    56    CHKInt_ALLOCTEMPS_u1 u1=0 
+                60    push_STK_s1 s1=16 bytes(2 words)
+    2/    25    64    SEND_self sel=Symbol(oop 27279617) #'class#0__' env:1,S, 0 args, sendCache.u2=32 
+    3/    30    72    SEND sel=Symbol(oop 16018177) #'name#0__' env:1, 0 args, sendCache.u2=56 
+    4/    35    80    SEND sel=Symbol(oop 27151361) #'to_s#0__' env:1, 0 args, sendCache.u2=80 
+    5/    35    88    return_tos_u1 u1=16 bytes(2 words)
+
+
+Look at class side method:
+
+  topaz 1> set class Object
+  topaz 1> rubylook cmeth new
+  classmethod: Metaclass3
+    def new(*args, &block)
+      # this variant gets bridge methods
+      inst = self.allocate
+      inst.initialize(*args, &block)
+      inst
+    end
+  # method starts at line 93 of /Users/pmclain/GemStone/checkouts/maglev-hpi/src/kernel/bootstrap/Class.rb
+  topaz 1> 
+
+=== INSPECT <object>  : Call (ruby) inspect() on an object
+
+First parameter must be an object specification.
+If  (Globals at:#RubySystemExit otherwise: nil)  is not nil equivalent to
+  SENDENV 1 <object> inspect
+else equivalent to
+  SEND <object> describe
+
+Example:
+
+      topaz 1> fr_cls
+      75 Getter class # __compileClass            (envId 1) @8 line 561   [methId 143691777]
+          receiver [143855617 sz:19 cls: 143855873 Getter class] Getter
+
+      topaz 1> inspect @143855617
+         ActiveSupport::Dependencies::ClassCache::Getter
+
+== Debugging
+
+If topaz is at the prompt from a `nil.pause`, the stack is still in native
+mode (not interpreted mode).  If you set a breakpoint in the code (e.g.,
+"list steps"..."break @77"), then a `continue` will not stop at the break
+point (since stack is in native mode).  To switch the stack to interpreted
+mode, do a step, then you can do a continue...

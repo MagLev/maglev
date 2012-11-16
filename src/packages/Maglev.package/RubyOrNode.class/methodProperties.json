@@ -1,0 +1,21 @@
+{
+	"class" : {
+		"s_a:b:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"as_cond" : "DataCurator 10/02/2012 14:30",
+		"firstNode" : "DataCurator 10/02/2012 14:30",
+		"firstNode:" : "DataCurator 10/02/2012 14:30",
+		"firstNode:secondNode:" : "DataCurator 10/02/2012 14:30",
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"isSmalltalkSend" : "DataCurator 10/02/2012 14:30",
+		"paren" : "DataCurator 10/02/2012 14:30",
+		"postWalkForYield" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"receiverNode" : "DataCurator 10/02/2012 14:30",
+		"secondNode" : "DataCurator 10/02/2012 14:30",
+		"secondNode:" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30",
+		"setParen" : "DataCurator 10/02/2012 14:30",
+		"shouldOptimize" : "DataCurator 10/02/2012 14:30" } }

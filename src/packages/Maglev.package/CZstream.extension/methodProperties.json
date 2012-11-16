@@ -1,0 +1,19 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_compressAndWriteFrom:count:" : "DataCurator 10/02/2012 14:30",
+		"_compressAndWriteFrom:count:env:" : "DataCurator 10/02/2012 14:30",
+		"_flush:env:" : "DataCurator 10/02/2012 14:30",
+		"_readAndDecompress" : "DataCurator 10/02/2012 14:30",
+		"_readAndDecompress:" : "DataCurator 10/02/2012 14:30",
+		"atEnd" : "DataCurator 10/02/2012 14:30",
+		"close" : "DataCurator 10/02/2012 14:30",
+		"flush" : "DataCurator 10/02/2012 14:30",
+		"flush:" : "DataCurator 10/02/2012 14:30",
+		"header" : "DataCurator 10/02/2012 14:30",
+		"read:" : "DataCurator 10/02/2012 14:30",
+		"readAll" : "DataCurator 10/02/2012 14:30",
+		"rubyWrite:count:" : "DataCurator 10/02/2012 14:30",
+		"write:" : "DataCurator 10/02/2012 14:30",
+		"write:count:env:" : "DataCurator 10/02/2012 14:30" } }

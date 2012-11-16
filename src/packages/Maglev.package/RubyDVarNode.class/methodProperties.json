@@ -1,0 +1,13 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"determineDynamic" : "DataCurator 10/02/2012 14:30",
+		"irLeaf" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"location" : "DataCurator 10/02/2012 14:30",
+		"location:" : "DataCurator 10/02/2012 14:30",
+		"name" : "DataCurator 10/02/2012 14:30",
+		"name:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

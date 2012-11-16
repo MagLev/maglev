@@ -1,0 +1,12 @@
+{
+	"class" : {
+		"newForIr" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"determineDynamic" : "DataCurator 10/02/2012 14:30",
+		"irLeaf" : "DataCurator 10/02/2012 14:30",
+		"irYieldStarNode" : "DataCurator 10/02/2012 14:30",
+		"isNilNode" : "DataCurator 10/02/2012 14:30",
+		"pathArray" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30" } }

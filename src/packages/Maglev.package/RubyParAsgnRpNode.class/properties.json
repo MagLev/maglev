@@ -1,0 +1,17 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"firstNode",
+		"thirdNode",
+		"toAry",
+		"trailingComma" ],
+	"name" : "RubyParAsgnRpNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

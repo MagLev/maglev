@@ -1,0 +1,13 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"implicitBlockNotNil" : "DataCurator 10/02/2012 14:30",
+		"implicitBlockVar" : "DataCurator 10/02/2012 14:30",
+		"irBlockNode" : "DataCurator 10/02/2012 14:30",
+		"irNewBlockNode" : "DataCurator 10/02/2012 14:30",
+		"lexLevel" : "DataCurator 10/02/2012 14:30",
+		"locationForBlockArg:" : "DataCurator 10/02/2012 14:30",
+		"methodScope" : "DataCurator 10/02/2012 14:30",
+		"newArgLeafNamed:number:" : "DataCurator 10/02/2012 14:30",
+		"newTempLeafNamed:" : "DataCurator 10/02/2012 14:30" } }

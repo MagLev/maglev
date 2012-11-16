@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"readOnly" ],
+	"name" : "RubyGlobalVarAssociation",
+	"pools" : [
+		 ],
+	"super" : "RubySymbolAssociation",
+	"type" : "normal" }

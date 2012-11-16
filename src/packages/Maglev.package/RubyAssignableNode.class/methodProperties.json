@@ -1,0 +1,11 @@
+{
+	"class" : {
+		"s_a:b:c:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"irAssignmentNode:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"node_assign_set_rhs:" : "DataCurator 10/02/2012 14:30",
+		"valueNode" : "DataCurator 10/02/2012 14:30",
+		"valueNode:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

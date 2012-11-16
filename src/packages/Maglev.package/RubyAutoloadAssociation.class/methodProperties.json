@@ -1,0 +1,16 @@
+{
+	"class" : {
+		"newWithKey:file:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_assocFor:inClass:env:error:" : "DataCurator 10/02/2012 14:30",
+		"_classFor:inModule:env:" : "DataCurator 10/02/2012 14:30",
+		"_freezeConstant" : "DataCurator 10/02/2012 14:30",
+		"_isLoaded:" : "DataCurator 10/02/2012 14:30",
+		"_valueFor:inClass:env:" : "DataCurator 10/02/2012 14:30",
+		"_valueNoAction" : "DataCurator 10/02/2012 14:30",
+		"definedQ" : "DataCurator 10/02/2012 14:30",
+		"fileName" : "DataCurator 10/02/2012 14:30",
+		"initializeWithFile:" : "DataCurator 10/02/2012 14:30",
+		"isDefined" : "DataCurator 10/02/2012 14:30",
+		"isDefinedForResolve:inClass:env:" : "DataCurator 10/02/2012 14:30",
+		"isLoaded" : "DataCurator 10/02/2012 14:30" } }

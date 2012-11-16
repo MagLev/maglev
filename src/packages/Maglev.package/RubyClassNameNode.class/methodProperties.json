@@ -1,0 +1,13 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"compileTimeClass" : "DataCurator 10/02/2012 14:30",
+		"determineDynamic" : "DataCurator 10/02/2012 14:30",
+		"irForClassName" : "DataCurator 10/02/2012 14:30",
+		"irForClassParent" : "DataCurator 10/02/2012 14:30",
+		"isColon3" : "DataCurator 10/02/2012 14:30",
+		"isColon3:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30",
+		"warnDynamicConst:" : "DataCurator 10/02/2012 14:30" } }

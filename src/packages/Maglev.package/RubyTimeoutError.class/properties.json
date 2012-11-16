@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"RubyMethProtection" ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyTimeoutError",
+	"pools" : [
+		 ],
+	"super" : "Error",
+	"type" : "normal" }

@@ -4,6 +4,7 @@ class Array
   #   would suppress generation of bridge methods for private
   #   methods that should not need bridge methods
 
+  # used in RubyRescueBodyNode>>initSplatRescueWith:and:at:
   def __anySatisfyCaseLeaf( obj )
     # used in implementation of  while *list   within a   case
     n = 0

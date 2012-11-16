@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"line",
+		"filename" ],
+	"name" : "RubySimpleSourcePosition",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

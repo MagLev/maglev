@@ -54,7 +54,7 @@ To stop your MagLev server:
 
 <b>Note:</b> <tt>maglev stop</tt> will only stop the version of MagLev currently in use.
 If you're using more than one, you'll have to <tt>maglev stop</tt> each of them -- e.g.
-  rvm use maglev-26436
+  rvm use maglev-1.0.0
   maglev stop
   rvm use maglev-head
   maglev stop

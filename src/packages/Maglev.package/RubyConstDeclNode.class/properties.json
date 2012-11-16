@@ -1,0 +1,16 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"constNode",
+		"globalAssoc",
+		"isDynamic" ],
+	"name" : "RubyConstDeclNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAssignableNode",
+	"type" : "normal" }

@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"walked" ],
+	"name" : "RubyArgsPushNode",
+	"pools" : [
+		 ],
+	"super" : "RubyListNode",
+	"type" : "normal" }

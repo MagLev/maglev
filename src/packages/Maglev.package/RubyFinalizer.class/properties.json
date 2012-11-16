@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"obj",
+		"procs" ],
+	"name" : "RubyFinalizer",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

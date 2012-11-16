@@ -325,7 +325,7 @@ eolValue _isSmallInteger ifTrue:[
 startOfs := bufferOffset .
 searchOfs := startOfs .
 [ true ] whileTrue:[ | moreData ofs ofsPlusEol |
-  ofs := buf _findSmallString: eolStr startingAt: searchOfs ignoreCase: false.
+  ofs := buf _findString: eolStr startingAt: searchOfs ignoreCase: false.
   ofs ~~ 0 ifTrue:[ | res ofs_plus_eol |
     (ofsPlusEol := ofs + eolSize) < buf size ifTrue:[
       res := buf copyFrom:startOfs to: (ofsPlusEol - 1) . "including terminator"

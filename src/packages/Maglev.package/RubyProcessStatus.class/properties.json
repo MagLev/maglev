@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"stat",
+		"primStatus" ],
+	"name" : "RubyProcessStatus",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

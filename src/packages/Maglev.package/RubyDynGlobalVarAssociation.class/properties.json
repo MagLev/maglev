@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"theBlock" ],
+	"name" : "RubyDynGlobalVarAssociation",
+	"pools" : [
+		 ],
+	"super" : "RubyGlobalVarAssociation",
+	"type" : "normal" }

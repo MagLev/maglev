@@ -1,0 +1,4 @@
+converting
+irNode
+	^ nextNode irNode
+

@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"incBlockArgLeaf",
+		"hasImplicitBlockTemp" ],
+	"name" : "RubyLocalStaticScope",
+	"pools" : [
+		 ],
+	"super" : "RubyStaticScope",
+	"type" : "normal" }

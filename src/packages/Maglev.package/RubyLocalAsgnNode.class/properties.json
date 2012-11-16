@@ -1,0 +1,18 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"location",
+		"name",
+		"isBlockArg",
+		"createsVar",
+		"hasAmpersand" ],
+	"name" : "RubyLocalAsgnNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAssignableNode",
+	"type" : "normal" }

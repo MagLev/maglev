@@ -1,0 +1,23 @@
+{
+	"class" : {
+		"s_a:b:c:d:" : "DataCurator 10/02/2012 14:30",
+		"s_forRp:body:source:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"bodyNode" : "DataCurator 10/02/2012 14:30",
+		"bodyNode:source:" : "DataCurator 10/02/2012 14:30",
+		"comIrMethNode" : "DataCurator 10/02/2012 14:30",
+		"cpath" : "DataCurator 10/02/2012 14:30",
+		"cpath:" : "DataCurator 10/02/2012 14:30",
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"irMethodNode:forClass:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"irReceiverNode" : "DataCurator 10/02/2012 14:30",
+		"isSmalltalkSend" : "DataCurator 10/02/2012 14:30",
+		"lineBias" : "DataCurator 10/02/2012 14:30",
+		"lineBias:" : "DataCurator 10/02/2012 14:30",
+		"literalNode" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"scope" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,4 @@
+*maglev-runtime
+varInfo
+  ^ self
+
