@@ -1,0 +1,23 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_buildBlockArgumentsOn:" : "DataCurator 10/02/2012 14:30",
+		"_irNode" : "",
+		"buildBlockArgumentsOn:" : "DataCurator 10/02/2012 14:30",
+		"buildIrLeafsInto:" : "",
+		"emitFirstNRhs:" : "DataCurator 10/02/2012 14:30",
+		"emitFirstNRhs:leftSize:" : "DataCurator 10/02/2012 14:30",
+		"evalTemps" : "DataCurator 10/02/2012 14:30",
+		"evalTempsSize" : "DataCurator 10/02/2012 14:30",
+		"hasInnerParAssign" : "DataCurator 10/02/2012 14:30",
+		"irAssignmentNode:" : "DataCurator 10/02/2012 14:30",
+		"irAssignmentNonStar:size:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"isParAssignNode" : "DataCurator 10/02/2012 14:30",
+		"isSingleIterArg" : "DataCurator 10/02/2012 14:30",
+		"left:" : "DataCurator 10/02/2012 14:30",
+		"rightNode:" : "DataCurator 10/02/2012 14:30",
+		"rightNodeRp:toAry:" : "DataCurator 10/02/2012 14:30",
+		"setIsBlockArg" : "",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

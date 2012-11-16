@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyMatchZeroNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractMatchNode",
+	"type" : "normal" }

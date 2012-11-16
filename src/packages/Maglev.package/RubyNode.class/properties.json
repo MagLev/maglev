@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST-Abstract",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"position" ],
+	"name" : "RubyNode",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

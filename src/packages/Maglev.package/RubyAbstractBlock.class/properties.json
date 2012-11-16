@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST-Abstract",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"labelRedo" ],
+	"name" : "RubyAbstractBlock",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

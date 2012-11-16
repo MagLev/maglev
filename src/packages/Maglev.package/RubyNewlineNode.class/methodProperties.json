@@ -1,0 +1,18 @@
+{
+	"class" : {
+		"nodeOnTokenStream:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"asMethodDefNode" : "DataCurator 10/02/2012 14:30",
+		"asString" : "DataCurator 10/02/2012 14:30",
+		"irForNode" : "DataCurator 10/02/2012 14:30",
+		"irForNodeWillBeInline" : "DataCurator 10/02/2012 14:30",
+		"irIterResult" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"irNodeListInto:" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"nextNode" : "DataCurator 10/02/2012 14:30",
+		"nextNode:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"setForLoopNotInline" : "DataCurator 10/02/2012 14:30",
+		"walkIterWithScope:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyDynamicVariable",
+	"pools" : [
+		 ],
+	"super" : "Notification",
+	"type" : "normal" }

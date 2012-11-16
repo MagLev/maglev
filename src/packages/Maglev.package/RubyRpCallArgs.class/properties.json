@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"iterNode" ],
+	"name" : "RubyRpCallArgs",
+	"pools" : [
+		 ],
+	"super" : "RubyArrayNode",
+	"type" : "normal" }

@@ -1,0 +1,31 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"envId",
+		"fileStack",
+		"scopeStack",
+		"lexLevel",
+		"lexLevelStack",
+		"compilerStack",
+		"methStack",
+		"lineBiasStack",
+		"loopStack",
+		"lastExceptionStack",
+		"outerDefLexPath",
+		"installingPrims",
+		"persistenceMode",
+		"persistableInstances",
+		"parserStack",
+		"evalLexicalSelfStack",
+		"rtModuleStack",
+		"reloadingPrims" ],
+	"name" : "RubyPersistableCompilerState",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

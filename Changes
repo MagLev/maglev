@@ -1,5 +1,12 @@
 = MagLev Change Log
 
+== Changes for MagLev-1.1alpha2 2012-10-04
+* Merged final GS/S 3.1.0.1
+* Merged Tim's popen fixes
+
+== Changes for MagLev-1.1alpha1 2012-08-22
+* Updated Ruby parser files per Allen's fixes in SVN
+
 == Changes for MagLev-1.0.0 2011-10-31
 * Fixes to callcc
 * We've moved all the MagLev code to GitHub (https://github.com/MagLev/maglev)

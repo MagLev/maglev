@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"firstNode",
+		"secondNode" ],
+	"name" : "RubyOpAsgnAndNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractCallNode",
+	"type" : "normal" }

@@ -1,0 +1,11 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"testAskingForClassShouldReturnWrappeeClass" : "DataCurator 10/02/2012 14:30",
+		"testNonWrappedObjectsShouldUnwrap" : "",
+		"testObjectsShouldNotWrapMultiply" : "DataCurator 10/02/2012 14:30",
+		"testObjectsShouldUnwrap" : "DataCurator 10/02/2012 14:30",
+		"testWrappedObjectsShouldRespondToRubyMethods" : "DataCurator 10/02/2012 14:30",
+		"testWrappedObjectsShouldRespondToRubyMethodsBeforeSmalltalkMethods" : "DataCurator 10/02/2012 14:30",
+		"testWrappedObjectsShouldRespondToSmalltalkMethods" : "DataCurator 10/02/2012 14:30" } }

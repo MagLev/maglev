@@ -1,0 +1,16 @@
+{
+	"class" : {
+		"s_a:b:c:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"irReceiverNode" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"isSmalltalkSend" : "DataCurator 10/02/2012 14:30",
+		"newName" : "DataCurator 10/02/2012 14:30",
+		"newName:" : "DataCurator 10/02/2012 14:30",
+		"newName:oldName:" : "DataCurator 10/02/2012 14:30",
+		"oldName" : "DataCurator 10/02/2012 14:30",
+		"oldName:" : "DataCurator 10/02/2012 14:30",
+		"receiverNode" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30" } }

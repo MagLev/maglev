@@ -1,10 +1,7 @@
 fails:IO.popen reads from a read-only pipe
 fails:IO.popen reads and writes to a read/write pipe
 fails:IO.popen writes to a write-only pipe
-fails:IO.popen returns the value of the block when passed a block
-fails:IO.popen closes the IO when used with a block
 fails:IO.popen allows the IO to be closed inside the block
-fails:IO.popen returns the IO if no block given
 fails:IO.popen starts returns a forked process if the command is -
 fails:IO.popen yields an instance of a subclass when called on a subclass
 fails:IO.popen returns an instance of a subclass when called on a subclass

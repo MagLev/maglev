@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyFCallBindingNode",
+	"pools" : [
+		 ],
+	"super" : "RubyFCallNode",
+	"type" : "normal" }

@@ -1,0 +1,16 @@
+{
+	"category" : "MagLev-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"ctx",
+		"envId",
+		"tns" ],
+	"name" : "RubyService",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

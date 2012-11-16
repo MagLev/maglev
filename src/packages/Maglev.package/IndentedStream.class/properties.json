@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-Tools",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"level",
+		"locals" ],
+	"name" : "IndentedStream",
+	"pools" : [
+		 ],
+	"super" : "WriteStream",
+	"type" : "normal" }

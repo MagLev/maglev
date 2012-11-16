@@ -1,3 +1,4 @@
+/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
 #if !defined(RUBYAST_HF)
 #define RUBYAST_HF 1
 
@@ -836,12 +837,12 @@ class RubyLexStrTerm
 
   static omObjSType* newStrTerm(short func, int term, int paren, rb_parse_state *ps);
 
-  static int64 kind(omObjSType *inst) { return om::FetchSmallInt_(inst, kind_ofs); }
+  static int64 kind(omObjSType *inst) { return om::FetchSmallInt__(inst, kind_ofs); }
 
-  static int64 nest(omObjSType *inst) { return om::FetchSmallInt_(inst, nest_ofs); }
-  static int64 func(omObjSType *inst) { return om::FetchSmallInt_(inst, a_ofs); }
-  static int64 term(omObjSType *inst) { return om::FetchSmallInt_(inst, b_ofs); }
-  static int64 paren(omObjSType *inst) { return om::FetchSmallInt_(inst, c_ofs); }
+  static int64 nest(omObjSType *inst) { return om::FetchSmallInt__(inst, nest_ofs); }
+  static int64 func(omObjSType *inst) { return om::FetchSmallInt__(inst, a_ofs); }
+  static int64 term(omObjSType *inst) { return om::FetchSmallInt__(inst, b_ofs); }
+  static int64 paren(omObjSType *inst) { return om::FetchSmallInt__(inst, c_ofs); }
   static int64 incrementNest(omObjSType **objH, int delta, rb_parse_state *ps);
 
   static omObjSType *ndLit(omObjSType *inst) { 
@@ -854,12 +855,12 @@ class RubyLexStrTerm
     UTL_ASSERT(strO->classId() == OOP_CLASS_STRING);
     return strO;
   }
-  static int64 ndNth(omObjSType *inst) { return om::FetchSmallInt_(inst, b_ofs); }
+  static int64 ndNth(omObjSType *inst) { return om::FetchSmallInt__(inst, b_ofs); }
   static int lineNum(omObjSType *inst) { 
-    return om::FetchSmallInt_(inst, d_ofs) >> 32; 
+    return om::FetchSmallInt__(inst, d_ofs) >> 32; 
   }
   static int lineStartOffset(omObjSType *inst) { 
-    return om::FetchSmallInt_(inst, d_ofs) & 0x7FFFFFFF;
+    return om::FetchSmallInt__(inst, d_ofs) & 0x7FFFFFFF;
   }
 
   static void set_func(omObjSType **objH, int v, rb_parse_state *ps) {

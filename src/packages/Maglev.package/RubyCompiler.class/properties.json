@@ -1,0 +1,24 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"AltParser",
+		"Parser",
+		"RestrictedClasses",
+		"SmallIntSpecialSelectors",
+		"Verbose" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"currentClass",
+		"leaves",
+		"sourceString",
+		"currClassOrModule",
+		"installingPrims",
+		"useRubyParser",
+		"needsSuperEach" ],
+	"name" : "RubyCompiler",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

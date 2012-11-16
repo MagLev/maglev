@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"process",
+		"clientData" ],
+	"name" : "RubyContinuation",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

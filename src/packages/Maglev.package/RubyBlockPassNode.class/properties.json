@@ -1,0 +1,15 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"bodyNode",
+		"inBoot" ],
+	"name" : "RubyBlockPassNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

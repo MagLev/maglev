@@ -1,0 +1,28 @@
+{
+	"class" : {
+		"_rubyNew1:do:" : "DataCurator 10/02/2012 14:30",
+		"_rubyNew1:instVars:do:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_checkIncludeRubyModule:" : "DataCurator 10/02/2012 14:30",
+		"_classForRubyClassVar" : "DataCurator 10/02/2012 14:30",
+		"_includeRubyModule:" : "DataCurator 10/02/2012 14:30",
+		"_rubyInspect" : "DataCurator 10/02/2012 14:30",
+		"_rubyInspect:" : "DataCurator 10/02/2012 14:30",
+		"addModuleMethodIfEnabled:env:" : "DataCurator 10/02/2012 14:30",
+		"allModuleMethodsEnabled:" : "DataCurator 10/02/2012 14:30",
+		"classForConstantLookup:forModuleEval:" : "DataCurator 10/02/2012 14:30",
+		"clsMethodDefnTarget" : "DataCurator 10/02/2012 14:30",
+		"is_aModule" : "DataCurator 10/02/2012 14:30",
+		"methodDefined:rubyEnv:" : "DataCurator 10/02/2012 14:30",
+		"moduleIncludeSelf:" : "DataCurator 10/02/2012 14:30",
+		"newRubySubclass:instancesPersistent:" : "",
+		"newRubySubclass:instancesPersistent:fixedIvs:" : "",
+		"rubyAncestors" : "DataCurator 10/02/2012 14:30",
+		"rubyConstAssociationAtOrNil:env:" : "DataCurator 10/02/2012 14:30",
+		"rubyFullName:" : "DataCurator 10/02/2012 14:30",
+		"rubyFullNameSymbol:" : "DataCurator 10/02/2012 14:30",
+		"rubyIncludedModules" : "DataCurator 10/02/2012 14:30",
+		"rubyMethods:protection:" : "DataCurator 10/02/2012 14:30",
+		"rubyMethods:protection:env:" : "DataCurator 10/02/2012 14:30",
+		"rubyNameForModuleInit" : "DataCurator 10/02/2012 14:30",
+		"setProtection:classmethods:" : "DataCurator 10/02/2012 14:30" } }

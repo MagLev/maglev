@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"irblock" ],
+	"name" : "RubyBlockStaticScope",
+	"pools" : [
+		 ],
+	"super" : "RubyStaticScope",
+	"type" : "normal" }

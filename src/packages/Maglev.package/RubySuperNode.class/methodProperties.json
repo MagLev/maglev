@@ -1,0 +1,23 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"argIsSplatAt:" : "DataCurator 10/02/2012 14:30",
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"argsNode" : "DataCurator 10/02/2012 14:30",
+		"argsNode:" : "DataCurator 10/02/2012 14:30",
+		"asCallNodeForIter" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"hasBlockArg" : "DataCurator 10/02/2012 14:30",
+		"hasRestArg" : "DataCurator 10/02/2012 14:30",
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"irReceiverNode" : "DataCurator 10/02/2012 14:30",
+		"irReceiverNodeEach:" : "DataCurator 10/02/2012 14:30",
+		"isSendSuper" : "DataCurator 10/02/2012 14:30",
+		"iterNode:" : "DataCurator 10/02/2012 14:30",
+		"iterNode_forRp:" : "DataCurator 10/02/2012 14:30",
+		"receiverNode" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30",
+		"shouldOptimize" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

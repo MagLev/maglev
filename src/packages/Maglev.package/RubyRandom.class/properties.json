@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"seed" ],
+	"name" : "RubyRandom",
+	"pools" : [
+		 ],
+	"super" : "Lag25000CmwcRandom",
+	"type" : "normal" }

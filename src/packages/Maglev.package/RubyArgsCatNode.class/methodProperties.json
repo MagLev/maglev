@@ -1,0 +1,15 @@
+{
+	"class" : {
+		"comment" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"fCallArgNodes" : "DataCurator 10/02/2012 14:30",
+		"firstNode:" : "DataCurator 10/02/2012 14:30",
+		"getClearIter" : "DataCurator 10/02/2012 14:30",
+		"hasRestArg" : "DataCurator 10/02/2012 14:30",
+		"isArgsCatNode" : "DataCurator 10/02/2012 14:30",
+		"isSmalltalkSend" : "DataCurator 10/02/2012 14:30",
+		"numArgs" : "DataCurator 10/02/2012 14:30",
+		"receiverNode" : "DataCurator 10/02/2012 14:30",
+		"secondNode:" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,22 @@
+{
+	"class" : {
+		"_new" : "DataCurator 10/02/2012 14:30",
+		"_new:" : "DataCurator 10/02/2012 14:30",
+		"_new:with:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_append:" : "DataCurator 10/02/2012 14:30",
+		"_appendAll:" : "DataCurator 10/02/2012 14:30",
+		"_appendAmperLhs:" : "DataCurator 10/02/2012 14:30",
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"_prepend:" : "DataCurator 10/02/2012 14:30",
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"arrayLength" : "DataCurator 10/02/2012 14:30",
+		"asRpMasgnRhs" : "DataCurator 10/02/2012 14:30",
+		"buildIrLeafsInto:" : "DataCurator 10/02/2012 14:30",
+		"getClearIter" : "DataCurator 10/02/2012 14:30",
+		"hasRestArg" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"printArgsOn:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30",
+		"yieldArgsList" : "DataCurator 10/02/2012 14:30" } }

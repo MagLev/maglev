@@ -1,0 +1,26 @@
+{
+	"class" : {
+		"s_a:b:c:d:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"argsNode" : "DataCurator 10/02/2012 14:30",
+		"argsNode:" : "DataCurator 10/02/2012 14:30",
+		"buildArgumentsOn:" : "DataCurator 10/02/2012 14:30",
+		"buildBlockArgumentsOn:" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"fullSelector" : "DataCurator 10/02/2012 14:30",
+		"init:sel:args:srcOffset:" : "",
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"irAssignmentNode:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"isSingleIterArg" : "DataCurator 10/02/2012 14:30",
+		"name" : "DataCurator 10/02/2012 14:30",
+		"name:" : "DataCurator 10/02/2012 14:30",
+		"node_assign_set_rhs:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"receiverNode" : "DataCurator 10/02/2012 14:30",
+		"receiverNode:" : "DataCurator 10/02/2012 14:30",
+		"selector" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }
