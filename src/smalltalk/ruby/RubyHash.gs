@@ -37,6 +37,18 @@ classmethod: RubyHash
 hashTableSize
 	^ 2017
 %
+category: 'Updating'
+set compile_env: 0
+method: RubyHash
+hashTableSize: anInteger
+	hashTableSize := anInteger.
+%
+category: 'Accessing'
+set compile_env: 0
+method: RubyHash
+hashTableSize
+	^ hashTableSize
+%
 category: 'Instance creation'
 set compile_env: 0
 classmethod: RubyHash
@@ -62,17 +74,20 @@ asArray
 		association := association next].
 	^ array
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 at: aKey
 	self hasNestedHashes
-		ifTrue: [^ (self _at: (self hashSlotIndexFor: aKey)) 
+		ifTrue: [(self _at: (self hashSlotIndexFor: aKey)) 
 			ifNotNil: [:hash | ^ hash at: aKey]]
-		ifFalse: [^ self chainingAt: aKey].
-	^ nil
+		ifFalse: [
+			self bitmask = 0 
+				ifTrue: [^ self setAt: aKey].
+			^ self chainingAt: aKey].
+	self @ruby1:__key_error: aKey.
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 at: aKey put: aValue
@@ -80,7 +95,8 @@ at: aKey put: aValue
 		index := self hashSlotIndexFor: aKey.
 		(self _at: index) ifNil: [self _at: index put: self newNextHash].
 		^ (self _at: index) at: aKey put: aValue]
-	ifFalse: [^ self chainingAt: aKey put: aValue].
+	ifFalse: [self bitmask = 0 ifTrue: [^ self setAt: aKey put: aValue].
+		^ self chainingAt: aKey put: aValue].
 %
 category: 'Accessing'
 method: RubyHash
@@ -100,13 +116,47 @@ method: RubyHash
 bitmask
 	^ bitmask
 %
+category: 'Hash set'
+set compile_env: 0
+method: RubyHash
+maxBitmask
+	^ 67566
+%
+category: 'Hash set'
+set compile_env: 0
+method: RubyHash
+setAt: aKey
+	^ (self _at: 1) detect: [:assoc |
+		self equals: aKey with: assoc key] value.
+%
+category: 'Hash set'
+set compile_env: 0
+method: RubyHash
+setAt: aKey put: aValue
+	|assoc|
+	assoc := (self _at: 1) 
+		detect: [:ass |	self equals: aKey with: ass key]
+		ifNone: [|ass| ass := self newAssociation: aValue at: aKey atIndex: 0. 
+			(self _at: 1) add: ass].
+	^ aValue
+%
+category: 'Hash set'
+set compile_env: 0
+method: RubyHash
+setRemoveKey: aKey
+	(self _at: 1) 
+		detect: [:ass |	self equals: aKey with: ass key]
+		ifNone: [self @ruby1:__key_error: aKey. ^ nil].
+	^ (self _at: 1) removeAllSuchThat: [:assoc |
+		self equals: aKey with: assoc key].
+%
 category: 'Updating'
 set compile_env: 0
 method: RubyHash
 bitmask: aBitmask
 	bitmask := aBitmask.
 %
-category: 'Accessing'
+category: 'Hash chaining'
 set compile_env: 0
 method: RubyHash
 chainingAt: aKey
@@ -117,6 +167,17 @@ chainingAt: aKey
 		ifNotNil: [^ (self _at: index) value].
 %
 category: 'Updating'
+set compile_env: 0
+method: RubyHash
+toSetHash
+	|set|
+	set := Set new.
+	(1 to: self hashTableSize) do: [:index |
+		set add: (self _at: index)].
+	self _at: 1 put: set.
+	self bitmask: 0.
+%
+category: 'Hash chaining'
 set compile_env: 0
 method: RubyHash
 chainingAt: aKey put: aValue
@@ -130,7 +191,7 @@ chainingAt: aKey put: aValue
 		ifNotNil: [(self _at: index) value: aValue].
 	^ aValue
 %
-category: 'Accessing'
+category: 'Hash chaining'
 set compile_env: 0
 method: RubyHash
 chainingFind: aKey
@@ -141,7 +202,7 @@ chainingFind: aKey
 			whileFalse: [index := index + 1 \\ self hashTableSize + 1].
 	^ index
 %
-category: 'Updating'
+category: 'Hash chaining'
 set compile_env: 0
 method: RubyHash
 chainingPutAssociation: anAssociation
@@ -154,7 +215,7 @@ chainingPutAssociation: anAssociation
 	self occupiedSlots: self occupiedSlots + 1.
 	self checkRehash.
 %
-category: 'Updating'
+category: 'Hash chaining'
 set compile_env: 0
 method: RubyHash
 chainingRemove: aKey
@@ -170,19 +231,22 @@ chainingRemove: aKey
 			self size: self size - 1.
 			^ association value].
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 checkRehash
 	|preAutoRehash|
 	preAutoRehash := self autoRehash.
 	((self hasNestedHashes not and: self autoRehash)
-		and: [self fillFactor > self maximumFillFactor 
-		and: [self autoRehash: false. self rehash. self fillFactor > self maximumFillFactor]])
-			ifTrue: [self toNestedHash].
+		and: [self fillFactor > self maximumFillFactor]) ifTrue: [
+			self bitmask = self maxBitmask
+				ifTrue: [self toSetHash] 
+				ifFalse: [self autoRehash: false. 
+					self rehash. 
+					self fillFactor > self maximumFillFactor ifTrue: [self toNestedHash]]].
 	self autoRehash: preAutoRehash.
 %
-category: 'unknown'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 clear
@@ -202,7 +266,7 @@ method: RubyHash
 defaultProc: newValue
    defaultProc := newValue.
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 do: aBlock
@@ -212,7 +276,7 @@ do: aBlock
 		aBlock value: association value.
 		association := association next].
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 doKeyValue: aBlock
@@ -222,7 +286,7 @@ doKeyValue: aBlock
 		aBlock value: association key value: association value.
 		association := association next].
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 equals: aKey with: anotherKey
@@ -230,13 +294,13 @@ equals: aKey with: anotherKey
 		ifTrue: [^ aKey == anotherKey]
 		ifFalse: [^ aKey = anotherKey].
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 fillFactor
 	^ self occupiedSlots / self hashTableSize
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 hashSlotIndexFor: aKey
@@ -246,7 +310,7 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 hashTableSize
-	^ 2017
+	^ self class hashTableSize
 %
 category: 'Accessing'
 set compile_env: 0
@@ -286,8 +350,6 @@ initHash
 	self hasNestedHashes: false.
 	self isIdentityHash: false.
 	self _basicSize: self hashTableSize.
-	(1 to: self hashTableSize) do: [:index | 
-    ((self _at: index) == _remoteNil) ifTrue: [self _at: index put: nil]].
 	self bitmask: 32767.
 	self occupiedSlots: 0.
 	self size: 0.
@@ -306,13 +368,13 @@ isIdentityHash: newValue
 	self hasNestedHashes ifTrue: [
 		(1 to: self hashTableSize) do: [:index | (self _at: index) isIdentityHash: true]].
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 maximumFillFactor
 	^ 0.7
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 newAssociation: aValue at: aKey atIndex: anIndex
@@ -323,7 +385,7 @@ newAssociation: aValue at: aKey atIndex: anIndex
 	self tail previous: value.
 	^ value
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 newNextHash
@@ -335,7 +397,7 @@ newNextHash
 	hash tail: self tail.
 	^ hash
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 nextBitmask
@@ -353,7 +415,7 @@ method: RubyHash
 occupiedSlots: aNumber
 	occupiedSlots := aNumber.
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 rehash
@@ -368,7 +430,7 @@ rehash
 			self _at: index put: nil].
 		elements do: [:assoc | self chainingPutAssociation: assoc]].
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 rehashPutAssociation: anAssociation
@@ -377,16 +439,17 @@ rehashPutAssociation: anAssociation
 	(self _at: index) ifNil: [self _at: index put: self newNextHash].
 	(self _at: index) chainingPutAssociation: anAssociation.
 %
-category: 'Updating'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 removeKey: aKey
 	self hasNestedHashes
-		ifTrue: [(self _at: (self hashSlotIndexFor: aKey)) removeKey: aKey]
-		ifFalse: [self chainingRemove: aKey].
+		ifTrue: [^ (self _at: (self hashSlotIndexFor: aKey)) removeKey: aKey]
+		ifFalse: [self bitmask = 0 ifTrue: [^ self setRemoveKey: aKey].
+			^ self chainingRemove: aKey].
 		
 %
-category: 'Accessing'
+category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 size
@@ -420,7 +483,7 @@ method: RubyHash
 toIdentityHash
 	self isIdentityHash: true.
 %
-category: 'Updating'
+category: 'Hash nesting'
 set compile_env: 0
 method: RubyHash
 toNestedHash
@@ -433,7 +496,7 @@ toNestedHash
 	elements do: [:assoc |
 		self hasNestedHashes ifTrue: [self rehashPutAssociation: assoc]].
 %
-category: 'Accessing'
+category: 'Ruby support'
 set compile_env: 0
 method: RubyHash
 _rubyEachPair: aBlock
