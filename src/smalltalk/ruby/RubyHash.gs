@@ -28,7 +28,6 @@ classmethod: RubyHash
 _basicNew: aSize
 	|hash|
 	hash := self _primBasicNew: aSize.
-	hash initHash.
 	^ hash
 %
 category: 'Accessing'
@@ -37,24 +36,12 @@ classmethod: RubyHash
 hashTableSize
 	^ 2017
 %
-category: 'Updating'
-set compile_env: 0
-method: RubyHash
-hashTableSize: anInteger
-	hashTableSize := anInteger.
-%
-category: 'Accessing'
-set compile_env: 0
-method: RubyHash
-hashTableSize
-	^ hashTableSize
-%
 category: 'Instance creation'
 set compile_env: 0
 classmethod: RubyHash
 new
 	|hash|
-	hash := self _basicNew: self hashTableSize.
+	hash := self _primBasicNew: self hashTableSize.
 	hash initialize.
 	^ hash
 %
@@ -341,18 +328,22 @@ set compile_env: 0
 method: RubyHash
 initHash
 	| firstAssoc lastAssoc |
+	self hasNestedHashes: false.
+	self initDeque.
+	self bitmask: 32767.
+	self occupiedSlots: 0.
+	self size: 0.
+%
+category: 'Instance creation'
+set compile_env: 0
+method: RubyHash
+initDeque
 	self head: OrderPreservingHashAssociation new.
 	self tail: OrderPreservingHashAssociation new.
 	self tail next: self tail.
 	self head previous: self head.
 	self tail previous: self head.
 	self head next: self tail.
-	self hasNestedHashes: false.
-	self isIdentityHash: false.
-	self _basicSize: self hashTableSize.
-	self bitmask: 32767.
-	self occupiedSlots: 0.
-	self size: 0.
 %
 category: 'Accessing'
 set compile_env: 0
