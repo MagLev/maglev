@@ -43,7 +43,7 @@ class Hash
   end
 
   def to_s
-    
+    self.inspect
   end
 
   def dup
@@ -178,7 +178,15 @@ class Hash
     end
     nil
   end
-  
+ 
+  def __delete(key)
+    begin
+      return self.delete(key)
+    rescue KeyError
+      return nil
+    end
+  end
+   
   def __delete_ifpresent(key)
     # Return true if key was found
     begin
