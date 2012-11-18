@@ -1,19 +1,22 @@
 class Hash
+  include Enumerable
+
   primitive_nobridge '__atkey_put', 'at:put:'
   primitive_nobridge '__at', 'at:'
   primitive_nobridge '__remove_key', 'removeKey:'
   primitive_nobridge '__to_a', 'asArray'
-  primitive 'each_pair&', '_rubyEachPair:'
+  primitive '__each_pair&', '_rubyEachPair:'
   primitive 'size', 'size'
   primitive 'clear', 'clear'
   primitive 'compare_by_identity?', 'isIdentityHash'
   primitive 'compare_by_identity', 'toIdentityHash'
+  primitive '__head', 'head'
+  primitive '__tail', 'tail'
   class_primitive_nobridge '_new', 'new'
   
   alias to_a __to_a
   alias __to_array __to_a
   alias length size
-  alias each each_pair
   
   def self.__new(size = 0)
     # Ignore the size argument
@@ -42,7 +45,33 @@ class Hash
   def to_s
     
   end
-   
+
+  def each_pair(&block)
+    if block_given?
+      return self.__each_pair(&block)
+    else
+      return HashEnumerator.new(self, :each_pair)
+    end
+  end
+
+  alias each each_pair
+
+  def each_key(&block)
+    if block_given?
+      return self.__each_pair { |k, v| yield(k) }
+    else
+      return HashKeyEnumerator.new(self, :each_key)
+    end
+  end
+
+  def each_value(&block)
+    if block_given?
+      return self.__each_pair { |k, v| yield(v) }
+    else
+      return HashEnumerator.new(self, :each_value)
+    end
+  end
+
   def self.new(default = (default_missing = true; nil), &block)
     if !default_missing and block_given?
       raise ArgumentError, "wrong number of arguments"
@@ -334,7 +363,7 @@ class Hash
     elsif block_given?
       yield(key)
     else
-      # TODO: Raise KeyError
+      self.__key_error(key)
     end
   end
 
@@ -362,3 +391,5 @@ end
 class KeyError < IndexError
 
 end
+
+
