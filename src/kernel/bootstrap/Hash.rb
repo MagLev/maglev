@@ -46,6 +46,19 @@ class Hash
     
   end
 
+  def dup
+    hash = self.class.new
+    hash.compare_by_identity if self.compare_by_identity?
+    hash.default = self.default.dup if self.default
+    hash.default_proc = self.default_proc.dup if self.default_proc
+    
+    self.each_pair { |k, v|
+      hash[k] = v
+    }
+
+    hash
+  end
+
   def each_pair(&block)
     if block_given?
       return self.__each_pair(&block)
