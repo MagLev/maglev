@@ -297,7 +297,7 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 hashTableSize
-	^ self class hashTableSize
+	^ self _basicSize
 %
 category: 'Accessing'
 set compile_env: 0
@@ -315,6 +315,7 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 head
+   head ifNil: [self initDeque].
    ^ head
 %
 category: 'Updating'
@@ -460,6 +461,7 @@ category: 'Accessing'
 set compile_env: 0
 method: RubyHash
 tail
+   tail ifNil: [self initDeque].
    ^ tail
 %
 category: 'Updating'
