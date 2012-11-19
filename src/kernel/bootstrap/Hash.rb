@@ -13,7 +13,8 @@ class Hash
   primitive '__head', 'head'
   primitive '__tail', 'tail'
   class_primitive_nobridge '_new', 'new'
-  
+  primitive '__rubyPrepareMarshal', 'rubyPrepareMarshal'
+
   alias to_a __to_a
   alias __to_array __to_a
   alias length size
@@ -23,8 +24,12 @@ class Hash
     _new
   end
 
-  def default
-    @_st_default
+  def default(key=nil)
+    if self.default_proc == nil
+      return @_st_default
+    else
+      return self.default_proc.call(self, key)
+    end
   end
 
   def default=(value)
@@ -37,7 +42,7 @@ class Hash
   end
 
   def default_proc=(value)
-    raise (TypeError, "wrong default_proc type #{value.class} (expected Proc)") if value.class != Proc and value.class != ExecBlock
+    raise (TypeError, "wrong default_proc type #{value.class} (expected Proc)") if !value.kind_of?(Proc) and !value.kind_of?(ExecBlock)
     @_st_defaultProc = value
     @_st_default = nil
   end
@@ -49,8 +54,8 @@ class Hash
   def dup
     hash = self.class.new
     hash.compare_by_identity if self.compare_by_identity?
-    hash.default = self.default.dup if self.default
-    hash.default_proc = self.default_proc.dup if self.default_proc
+    hash.default = self.default if self.default
+    hash.default_proc = self.default_proc if self.default_proc
     
     self.each_pair { |k, v|
       hash[k] = v
@@ -85,22 +90,89 @@ class Hash
     end
   end
 
-  def self.new(default = (default_missing = true; nil), &block)
-    if !default_missing and block_given?
-      raise ArgumentError, "wrong number of arguments"
-    elsif !default_missing
-      hash = self.__new
-      hash.default = default
-      return hash
-    elsif block_given?
-      hash = self.__new
-      hash.default_proc = block
-      return hash
+  def self.new(*args)
+    # This variant gets bridge methods
+    na = args.length
+
+    if na <= 1
+      if na == 0
+        h = self.new
+      else
+        h = self.new(args[0])
+      end
     else
-      return self.__new
+      h = self.__new
+      h.initialize(*args) # ArgumentError
+    end
+    h
+  end
+
+  def self.new
+    hash = self.__new
+    hash.initialize
+    hash
+  end
+
+  def self.new(default)
+    hash = self.__new
+    hash.initialize(default)
+    hash
+  end
+  
+  def self.new(&block)
+    hash = self.__new
+    if block_given?
+      hash.initialize(&block)
+    else
+      hash.initialize
+    end
+    hash
+  end
+
+  def self.new(default, &block)
+    # Raises ArgumentError
+    hash = self.__new
+    hash.initialize(default, &block)
+    hash
+  end
+
+  def initialize(*args, &block)
+    # This variant gets bridge methods
+    na = args.__size
+    if na._equal?(1)
+      raise ArgumentError, 'wrong number of arguments' if block_given?
+      self.default=(args.__at(0))
+    elsif na._equal?(0)
+      if block_given?
+        self.default=(block)
+      else
+        # allocation includes self.default=(nil)
+      end
+    else
+      raise ArgumentError , 'wrong number of arguments'
     end
   end
- 
+
+  def initialize(default, &block)
+    raise ArgumentError('wrong number of arguments') if block_given?
+    self.default = default
+    self
+  end
+
+  def initialize(default)
+    self.default = default
+    self
+  end
+
+  def initialize(&block)
+    self.default_proc = block if block_given?
+    self
+  end
+
+  def initialize
+    self
+  end
+     
   def self.try_convert(obj)
     begin
       Type.coerce_to(obj, Hash, :to_hash)
@@ -121,6 +193,13 @@ class Hash
     if args.size == 1 and args[0].class == Array
       args[0].each { |assoc| hash[assoc[0]] = assoc[1] }
       return hash
+    elsif args.size == 1 and args[0]._isHash
+      if args[0].class.eql?(self.class)
+        return args[0].dup
+      else
+        args[0].each { |k, v| hash[k] = v }
+        return hash
+      end
     elsif args.size == 1
       converted = self.try_convert(args[0])
       return converted.dup if args[0].class == self.class
@@ -157,7 +236,7 @@ class Hash
   end
 
   def store(key, value)
-    if key.class == String
+    if !self.compare_by_identity? and key.class == String
       return self.__atkey_put(key.dup.freeze, value)
     else
       return self.__atkey_put(key, value)
@@ -181,7 +260,7 @@ class Hash
  
   def __delete(key)
     begin
-      return self.delete(key)
+      return self.__remove_key(key)
     rescue KeyError
       return nil
     end
@@ -235,6 +314,12 @@ class Hash
     }
     nil
   end
+  
+  def index(value)
+    # TODO: warning: Hash#index is deprecated; use Hash#key
+    warn("warning: Hash#index is deprecated; use Hash#key")
+    key(value)
+  end
    
   def values_at(*args)
     args.collect { |k| self[k] }
@@ -251,7 +336,7 @@ class Hash
   
   def has_key?(key)
     self.each_pair { |k, v|
-      return true if key.eql?(k)
+      return true if (key.eql?(k) and !self.compare_by_identity?) or (key.equal?(k) and self.compare_by_identity?)
     }
     false
   end
@@ -272,6 +357,7 @@ class Hash
         self[k] = v
       end
     }
+    self
   end
   
   alias update merge!
@@ -390,12 +476,22 @@ class Hash
 
   def eql?(other)
     return true if other.equal?(self)
-    return false unless other.class == self.class
+    return false unless other._isHash
     return false unless other.size == self.size
     
     self.each_pair { |k, v| return false unless other.key?(k) and other[k] == v }
     other.each_pair { |k, v| return false unless self.key?(k) and self[k] == v }
     true
+  end
+
+  alias == eql?
+
+  def hash
+    97633 ^ self.size
+  end
+
+  def prepare_marshal
+    self.__rubyPrepareMarshal
   end
 
   private

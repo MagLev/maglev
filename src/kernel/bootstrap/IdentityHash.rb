@@ -1,6 +1,10 @@
 
 class IdentityHash
 
+  def compare_by_identity?
+    true
+  end
+
   def self.from_hash(obj)
     hash = Hash.new
     hash.compare_by_identity

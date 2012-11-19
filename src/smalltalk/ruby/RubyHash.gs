@@ -36,6 +36,12 @@ classmethod: RubyHash
 hashTableSize
 	^ 2017
 %
+category: 'Accessing'
+set compile_env: 0
+classmethod: RubyHash
+hash
+  ^ self @ruby1:hash
+%
 category: 'Instance creation'
 set compile_env: 0
 classmethod: RubyHash
@@ -60,6 +66,23 @@ asArray
 		array at: index put: tuple.
 		association := association next].
 	^ array
+%
+category: 'Ruby support'
+set compile_env: 0
+method: RubyHash
+rubyPrepareMarshal
+  self _basicSize: self class hashTableSize.
+  self initHash.
+  self autoRehash: true.
+  default := nil.
+  self defaultProc: nil.
+  self isIdentityHash: false.
+%
+category: 'Ruby support'
+set compile_env: 0
+method: RubyHash
+rubyPrivateSize
+  ^ 10
 %
 category: 'Basic hash'
 set compile_env: 0
@@ -123,7 +146,8 @@ setAt: aKey put: aValue
 	|assoc|
 	assoc := (self _at: 1) 
 		detect: [:ass |	self equals: aKey with: ass key]
-		ifNone: [|ass| ass := self newAssociation: aValue at: aKey atIndex: 0. 
+		ifNone: [|ass| ass := self newAssociation: aValue at: aKey atIndex: 0.
+      self size: self size + 1. 
 			(self _at: 1) add: ass].
 	^ aValue
 %
@@ -131,11 +155,15 @@ category: 'Hash set'
 set compile_env: 0
 method: RubyHash
 setRemoveKey: aKey
+	|association|
 	(self _at: 1) 
 		detect: [:ass |	self equals: aKey with: ass key]
 		ifNone: [self @ruby1:__key_error: aKey. ^ nil].
-	^ (self _at: 1) removeAllSuchThat: [:assoc |
+	association := (self _at: 1) removeAllSuchThat: [:assoc |
 		self equals: aKey with: assoc key].
+	association previous next: association next.
+	association next previous: association previous.
+	^ association value
 %
 category: 'Updating'
 set compile_env: 0
@@ -426,10 +454,12 @@ category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 rehashPutAssociation: anAssociation
-	|index|
+	|index innerHash|
 	index := self hashSlotIndexFor: anAssociation key.
 	(self _at: index) ifNil: [self _at: index put: self newNextHash].
-	(self _at: index) chainingPutAssociation: anAssociation.
+	innerHash := self _at: index.
+	innerHash chainingPutAssociation: anAssociation.
+	innerHash size: innerHash size + 1.
 %
 category: 'Basic hash'
 set compile_env: 0
@@ -446,7 +476,7 @@ set compile_env: 0
 method: RubyHash
 size
 	self hasNestedHashes 
-		ifTrue: [|s| (1 to: self hashTableSize) do: [:index |
+		ifTrue: [|s| s := 0. (1 to: self hashTableSize) do: [:index |
 			(self _at: index) ifNotNil: [:hashTable | s := s + hashTable size]].
 			^ s]
 		ifFalse: [^ size].
@@ -484,7 +514,8 @@ toNestedHash
 	elements := Set new.
 	(1 to: self hashTableSize) do: [:index |
 		elements add: (self _at: index).
-		self _at: index put: nil].
+		self _at: index put: nil.
+		self size: self size - 1].
 	self hasNestedHashes: true.
 	elements do: [:assoc |
 		self hasNestedHashes ifTrue: [self rehashPutAssociation: assoc]].
