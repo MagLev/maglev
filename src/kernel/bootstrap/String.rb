@@ -2072,4 +2072,28 @@ class String
     (min <= self) && (self <= max)
   end
 
+  def encode(*args)
+    # TODO
+    self.dup
+  end
+
+  def encode!(*args)
+    # TODO
+    self
+  end
+
+  def encoding
+    Encoding::UTF_8
+  end
+
+  def force_encoding(encoding)
+    #TODO
+    self
+  end
+
+  def valid_encoding?
+    #TODO
+    true
+  end
+
 end

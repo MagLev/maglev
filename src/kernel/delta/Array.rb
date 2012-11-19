@@ -262,6 +262,7 @@ class Array
       else
         memo = memo.__send__(binary_op_sym, o)
       end
+      n = n +1
     end
     memo._equal?(un_defined) ? nil : memo
   end
