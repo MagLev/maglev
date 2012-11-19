@@ -21,7 +21,6 @@ class String
   primitive '__append', '_rubyAddAll:'
   primitive_nobridge '__uppercaseAt', 'rubyUpperCaseAt:' # arg is one-based
 
-  primitive 'bytesize', 'size'  # added for 1.8.7
 
   primitive_env '==',   '_rubyEqual' , ':'
   #  primitive assumes   nil.respond_to?(:to_str) == false
@@ -79,7 +78,6 @@ class String
 
   primitive "_paddedToWithString", "padded:to:withString:"
   
-  primitive 'length', 'rubySize'
 
   primitive 'lstrip', '_rubyLstrip'
 
@@ -99,11 +97,13 @@ class String
 
   # def scan #  implemented in common/string.rb
 
-  primitive 'size', 'rubySize'
-  primitive '__size', 'rubySize'
+  primitive 'bytesize', 'size'  # added for 1.8.7
+  primitive 'length', '_rubySize'
+  primitive 'size', '_rubySize'
+  primitive '__size', '_rubySize'
 
-  primitive 'size=', 'rubySize:'  # Note size=() not in MRI
-  primitive '__size=', 'rubySize:'
+  primitive 'size=', '_rubySize:'  # Note size=() not in MRI
+  primitive '__size=', '_rubySize:'
 
 
   primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
@@ -1529,7 +1529,7 @@ class String
              end
     result
   end
-  
+
   def __split_string_on(delim, limit, limited, suppress_trailing_empty)
     results = []
     delim_length = delim.__size
