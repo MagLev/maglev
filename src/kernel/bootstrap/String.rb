@@ -5,13 +5,134 @@ class String
   end
 
   primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
-  #primitive_nobridge '__asUnicode', '_asUnicodeString'
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
   class_primitive_nobridge '__new', 'new:'
+
+  primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
+
+  primitive  '+', 'rubyConcatenate:'
+
+  primitive_env '<=>',  '_rubyCompare' , ':'
+  #   note smalltalk addAll:  returns arg, not receiver
+  primitive '__append', '_rubyAddAll:'
+  primitive_nobridge '__uppercaseAt', 'rubyUpperCaseAt:' # arg is one-based
+
+  primitive 'bytesize', 'size'  # added for 1.8.7
+
+  primitive_env '==',   '_rubyEqual' , ':'
+  #  primitive assumes   nil.respond_to?(:to_str) == false
+  #  primitive assumes   a_symbol.respond_to?(:to_str) == false
+
+  primitive_env '===',   '_rubyEqual' , ':'   # === same as == for String
+
+  primitive_nobridge_env '[]' , '_rubyAt', ':'
+  primitive_nobridge_env '__at' , '_rubyAt', ':'
+
+
+  primitive_nobridge_env '[]' ,         '_rubyAt', ':length:'
+  primitive_nobridge_env '__at' , '_rubyAt', ':length:'
+
+
+  primitive_nobridge_env '[]=',     '_rubyAt', ':put:'
+  primitive_nobridge_env '__at_put', '_rubyAt', ':put:'
+  # Smalltalk code handles  Regexp and String  first args
+
+
+  primitive_nobridge_env '[]=', '_rubyAt', ':length:put:'
+  primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
+  # smalltalk code handles Regexp and Fixnum first args
+
+  primitive '__capitalize', 'rubyCapitalize'
+
+  # def count(*args); end
+  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
+  primitive 'count*', 'rubyCount:'
+
+  # MNI: crypt
+
+  primitive 'delete*',  'rubyDelete:'
+  primitive 'delete!*', 'rubyDeleteInPlace:'
+
+  # asLowercase is a smalltalk to:do: loop in CharacterCollection
+  primitive '__downcase', 'asLowercase'
+  primitive '__downcase!', 'rubyDowncaseInPlace'
+
+  primitive '__dumpInto' , 'rubyDumpInto:'
+
+  primitive 'empty?', 'isEmpty'
+
+  primitive 'eql?', '='
+
+  primitive 'hash' , 'hash'
+
+  primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'  # one-based offset/result
+
+  primitive_nobridge '__insertall_at', 'insertAll:at:'
+
+  primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
+
+  primitive 'inspect', '_rubyInspect'
+
+  primitive "_paddedToWithString", "padded:to:withString:"
+  
+  primitive 'length', 'rubySize'
+
+  primitive 'lstrip', '_rubyLstrip'
+
+  primitive 'lstrip!', '_rubyLstripInPlace' # in .mcz
+
+  primitive 'replace', '_rubyReplace:'
+
+  primitive          'reverse', 'reverse'
+
+  primitive_nobridge '__reverse_from', '_reverseFrom:'
+
+  primitive_nobridge '__lastSubstring', 'findLastSubString:startingAt:'
+  primitive_nobridge '__indexOfLastByte', 'indexOfLastByte:startingAt:'
+
+  primitive 'rstrip', '_rubyRstrip'
+  primitive 'rstrip!', '_rubyRstripInPlace'  # in .mcz
+
+  # def scan #  implemented in common/string.rb
+
+  primitive 'size', 'rubySize'
+  primitive '__size', 'rubySize'
+
+  primitive 'size=', 'rubySize:'  # Note size=() not in MRI
+  primitive '__size=', 'rubySize:'
+
+
+  primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
+
+
+  primitive 'squeeze*', 'rubySqueeze:'
+  primitive_nobridge 'squeeze', 'rubySqueeze'
+
+  primitive 'squeeze!*', 'rubySqueezeSelf:'
+  primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
+
+  primitive 'strip', '_rubyStrip'
+  primitive 'strip!', '_rubyStripInPlace'
+
+
+  primitive 'succ!', 'rubySucc' # prim detects frozen if would change
+
+  primitive 'swapcase!', 'rubySwapcaseInPlace' # prim detects frozen if would change
+
+  primitive '__to_f', 'asFloat'
+
+  primitive '__tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
+  primitive '__tr_s!', 'rubyTrSqueezeFrom:to:'  # prim detects frozen if would change
+  
+  primitive 'unpack', 'rubyUnpack:'
+
+  primitive 'upcase', 'asUppercase'   # no taint propagation
+
+  primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
 
   def self.new(*args)
     # this version gets bridge methods
@@ -95,8 +216,6 @@ class String
     self
   end
 
-  primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
-
   def dup
     res = self.__basic_dup
     res.initialize_copy(self)
@@ -151,10 +270,6 @@ class String
     str
   end
 
-  primitive  '+', 'rubyConcatenate:'
-
-  #   note smalltalk addAll:  returns arg, not receiver
-  primitive '__append', '_rubyAddAll:'
 
   def <<(arg)
     __append_internal(arg)
@@ -175,7 +290,6 @@ class String
     self
   end
 
-  primitive_env '<=>',  '_rubyCompare' , ':'
 
   def __prim_compare_failed(o)
     # invoked from Smalltalk code in _rubyCompare<env>:
@@ -184,9 +298,6 @@ class String
     return -tmp
   end
 
-  primitive_nobridge '__uppercaseAt', 'rubyUpperCaseAt:' # arg is one-based
-
-  primitive 'bytesize', 'size'  # added for 1.8.7
 
   def bytes(&block)   # added for 1.8.7
     unless block_given?
@@ -258,12 +369,6 @@ class String
     return size <=> o_size
   end
 
-  primitive_env '==',   '_rubyEqual' , ':'
-  #  primitive assumes   nil.respond_to?(:to_str) == false
-  #  primitive assumes   a_symbol.respond_to?(:to_str) == false
-
-  primitive_env '===',   '_rubyEqual' , ':'   # === same as == for String
-
   def __prim_equal_failed(other)
     # invoked from Smalltalk code in _rubyEqual<env>:
     if other.respond_to? :to_str
@@ -312,9 +417,6 @@ class String
     raise ArgumentError, 'wrong number of arguments'
   end
 
-  primitive_nobridge_env '[]' , '_rubyAt', ':'
-  primitive_nobridge_env '__at' , '_rubyAt', ':'
-
   def __prim_at_failed(index)
     # invoked from prim failure code in _rubyAt<env>:
     if index._isRange
@@ -331,9 +433,6 @@ class String
       self.__at(index)
     end
   end
-
-  primitive_nobridge_env '[]' ,         '_rubyAt', ':length:'
-  primitive_nobridge_env '__at' , '_rubyAt', ':length:'
 
   def __prim_at_length_failed(start, length)
     # called from Smalltalk primitive failure code
@@ -371,10 +470,6 @@ class String
     end
   end
 
-  primitive_nobridge_env '[]=',     '_rubyAt', ':put:'
-  primitive_nobridge_env '__at_put', '_rubyAt', ':put:'
-  # Smalltalk code handles  Regexp and String  first args
-
   def __prim_at_put_failed(index, value)
     # called from Smalltalk
     if value._isFixnum || value._isString
@@ -403,10 +498,6 @@ class String
     value
   end
 
-  primitive_nobridge_env '[]=', '_rubyAt', ':length:put:'
-  primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
-  # smalltalk code handles Regexp and Fixnum first args
-
   def __prim_at_length_put_failed(index, count, value)
     index = Type.coerce_to(index, Fixnum, :to_int)
     str_value = Type.coerce_to(value, String, :to_str)
@@ -416,8 +507,6 @@ class String
   end
 
   # MNI: String#~
-
-  primitive '__capitalize', 'rubyCapitalize'
 
   def capitalize
     x = __capitalize
@@ -552,19 +641,6 @@ class String
 
   alias concat <<
 
-  # def count(*args); end
-  # arg to rubyCount: is expected to be an Array , so declare as 'count*'
-  primitive 'count*', 'rubyCount:'
-
-  # MNI: crypt
-
-  primitive 'delete*',  'rubyDelete:'
-  primitive 'delete!*', 'rubyDeleteInPlace:'
-
-  # asLowercase is a smalltalk to:do: loop in CharacterCollection
-  primitive '__downcase', 'asLowercase'
-  primitive '__downcase!', 'rubyDowncaseInPlace'
-
   def downcase
     s = __downcase
     # s.taint if self.tainted?
@@ -575,8 +651,6 @@ class String
     raise TypeError, "can't modify frozen string" if frozen?
     __downcase!
   end
-
-  primitive '__dumpInto' , 'rubyDumpInto:'
 
   def dump
     res = self.class.__alloc
@@ -701,8 +775,6 @@ class String
 
   alias each_char chars   # changed to an alias  for 1.8.7
 
-  primitive 'empty?', 'isEmpty'
-
   def end_with?(*args)  # added for 1.8.7
     n = 0
     lim = args.__size
@@ -721,8 +793,6 @@ class String
     end
     false
   end
-
-  primitive 'eql?', '='
 
   def _gsub_copyfrom_to(from, match_start)
     to = match_start # match_start is zero based
@@ -1018,16 +1088,12 @@ class String
     num
   end
 
-  primitive 'hash' , 'hash'
-
   def include?(item)
     if item._isFixnum
       item = item % 256
     end
     self.index(item)._not_equal?(nil)
   end
-
-  primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'  # one-based offset/result
 
   def index(item, offset=MaglevUndefined, &block)
     # came here via a bridge from args*
@@ -1082,8 +1148,6 @@ class String
     end
   end
 
-  primitive_nobridge '__insertall_at', 'insertAll:at:'
-
   def insert(index, string)
     # account for smalltalk index
     index = Type.coerce_to(index, Integer, :to_int)
@@ -1096,10 +1160,6 @@ class String
     self
   end
 
-  primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
-
-  primitive 'inspect', '_rubyInspect'
-
   def intern
     if self.__size._equal?(0)
       raise ArgumentError , 'cannot intern zero sized String'
@@ -1110,8 +1170,6 @@ class String
     self.__as_symbol
   end
   #  to_sym is aliased to intern, see below
-
-  primitive "_paddedToWithString", "padded:to:withString:"
 
   def justify(width, direction, padstr=" ")
     # This started off as Rubinius, but was heavily modified since most
@@ -1132,18 +1190,12 @@ class String
     self
   end
 
-  primitive 'length', 'size'
-
   alias lines each  # added for 1.8.7  , String#each goes away in 1.9
 
   def ljust(width, padstr = " ") # from Rubinius
     justified = dup
     justified.justify(width, :left, padstr)
   end
-
-  primitive 'lstrip', '_rubyLstrip'
-
-  primitive 'lstrip!', '_rubyLstripInPlace' # in .mcz
 
   def match(pattern)
     if pattern._isRegexp
@@ -1214,18 +1266,10 @@ class String
     return [left, right]
   end
 
-  primitive 'replace', '_rubyReplace:'
-
-  primitive          'reverse', 'reverse'
-
-  primitive_nobridge '__reverse_from', '_reverseFrom:'
 
   def reverse!
     self.__reverse_from(self) # returns self
   end
-
-  primitive_nobridge '__lastSubstring', 'findLastSubString:startingAt:'
-  primitive_nobridge '__indexOfLastByte', 'indexOfLastByte:startingAt:'
 
   # Return the index of the last occurrence of the given substring,
   # character or pattern in self.  Returns nil if not found.  If the second
@@ -1326,16 +1370,6 @@ class String
     end
   end
 
-  primitive 'rstrip', '_rubyRstrip'
-  primitive 'rstrip!', '_rubyRstripInPlace'  # in .mcz
-
-  # def scan #  implemented in common/string.rb
-
-  primitive 'size', 'size'
-  primitive '__size', 'size'
-
-  primitive 'size=', 'size:'  # Note size=() not in MRI
-  primitive '__size=', 'size:'
 
   alias slice []
 
@@ -1495,9 +1529,7 @@ class String
              end
     result
   end
-
-  primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
-
+  
   def __split_string_on(delim, limit, limited, suppress_trailing_empty)
     results = []
     delim_length = delim.__size
@@ -1654,12 +1686,6 @@ class String
     ret
   end
 
-  primitive 'squeeze*', 'rubySqueeze:'
-  primitive_nobridge 'squeeze', 'rubySqueeze'
-
-  primitive 'squeeze!*', 'rubySqueezeSelf:'
-  primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
-
   def start_with?(*args)  # added for 1.8.7
     n = 0
     lim = args.__size
@@ -1689,9 +1715,6 @@ class String
     end
     false
   end
-
-  primitive 'strip', '_rubyStrip'
-  primitive 'strip!', '_rubyStripInPlace'
 
   # Returns a copy of +str+ with the first occurrence of +pattern+ replaced
   # with either +replacement+ or the value of the block.  See the
@@ -1781,8 +1804,6 @@ class String
     pattern
   end
 
-  primitive 'succ!', 'rubySucc' # prim detects frozen if would change
-
   # Returns the successor to <i>self</i>. The successor is calculated by
   # incrementing characters starting from the rightmost alphanumeric (or
   # the rightmost character if there are no alphanumerics) in the
@@ -1832,16 +1853,12 @@ class String
     tot
   end
 
-  primitive 'swapcase!', 'rubySwapcaseInPlace' # prim detects frozen if would change
-
   def swapcase
     s = self.dup
     s.swapcase!
     # s.taint if self.tainted?
     s
   end
-
-  primitive '__to_f', 'asFloat'
 
   def to_f
     s = self.__delete_underscore_strip
@@ -1949,9 +1966,12 @@ class String
     end
   end
 
+  def to_s2
+    to_s
+  end
+
   alias to_sym intern
 
-  primitive '__tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
   #     str.tr!(from_str, to_str)   => str or nil
   #
   #  Translates <i>str</i> in place, using the same rules as
@@ -1998,7 +2018,6 @@ class String
     s
   end
 
-  primitive '__tr_s!', 'rubyTrSqueezeFrom:to:'  # prim detects frozen if would change
   #     str.tr_s!(from_str, to_str)   => str or nil
   #
   #  Performs <code>String#tr_s</code> processing on <i>str</i> in place,
@@ -2024,15 +2043,6 @@ class String
     # str.taint if self.tainted?
     str.__tr_s!(from, to) || str
   end
-
-  p "hier"
-  primitive 'unpack', 'rubyUnpack:'
-
-  primitive 'upcase', 'asUppercase'   # no taint propagation
-
-  primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
-
-
   # MNI: upto
 
   # dup, clone  inherited from Object
@@ -2076,7 +2086,6 @@ class String
   end
 
   def encode(*args)
-    # TODO
     self.dup
   end
 
@@ -2086,7 +2095,7 @@ class String
   end
 
   def encoding
-    Encoding::UTF_8
+    Encoding::ASCII_8BIT
   end
 
   def force_encoding(encoding)

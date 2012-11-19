@@ -203,6 +203,7 @@ class Module
       raise NameError, 'arg to const_set? is not a valid name for a constant'
     end
     if sym._equal?(nil)
+      newStr = str.to_s2
       sym = str.to_sym
     end
     self.__const_set(sym, value)

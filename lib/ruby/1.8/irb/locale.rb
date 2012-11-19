@@ -1,9 +1,9 @@
 #
 #   irb/locale.rb - internationalization module
-#   	$Release Version: 0.9.5$
-#   	$Revision: 11708 $
-#   	$Date: 2007-02-12 16:01:19 -0700 (Mon, 12 Feb 2007) $
-#   	by Keiju ISHITSUKA(keiju@ruby-lang.org)
+#     $Release Version: 0.9.5$
+#     $Revision: 11708 $
+#     $Date: 2007-02-12 16:01:19 -0700 (Mon, 12 Feb 2007) $
+#     by Keiju ISHITSUKA(keiju@ruby-lang.org)
 #
 # --
 #
@@ -32,18 +32,18 @@ module IRB
       when "ja_JP.sjis", "ja_JP.SJIS"
         Kconv::SJIS
       when /ja_JP.utf-?8/i
-	Kconv::UTF8
+  Kconv::UTF8
       end
     end
     private :lc2kconv
 
     def String(mes)
       mes = super(mes)
-#     case @lang		# Patch until kconv.rb works (see Trac 694)
+#     case @lang    # Patch until kconv.rb works (see Trac 694)
 #     when /^ja/
 #       mes = Kconv::kconv(mes, lc2kconv(@lang))
 #     else
-#	mes
+# mes
 #     end
       mes
     end
@@ -81,22 +81,22 @@ module IRB
 
       case file
       when /\.rb$/
-	begin
-	  load(file, priv)
-	  $".push file
-	  return true
-	rescue LoadError
-	end
+  begin
+    load(file, priv)
+    $".push file
+    return true
+  rescue LoadError
+  end
       when /\.(so|o|sl)$/
-	return super
+  return super
       end
 
       begin
-	load(f = file + ".rb")
-	$".push f  #"
-	return true
+  load(f = file + ".rb")
+  $".push f  #"
+  return true
       rescue LoadError
-	return ruby_require(file)
+  return ruby_require(file)
       end
     end
 
@@ -108,20 +108,21 @@ module IRB
       base = File.basename(file)
 
       if /^ja(_JP)?$/ =~ @lang
- 	back, @lang = @lang, "C"
+  back, @lang = @lang, "C"
       end
       begin
-	if dir[0] == ?/ #/
-	  lc_path = search_file(dir, base)
-	  return real_load(lc_path, priv) if lc_path
-	end
-	
-	for path in $:
-	  lc_path = search_file(path + "/" + dir, base)
-	  return real_load(lc_path, priv) if lc_path
-	end
+        if dir[0] == ?/ #/
+          lc_path = search_file(dir, base)
+          return real_load(lc_path, priv) if lc_path
+        end
+        
+        for path in $:
+          
+          lc_path = search_file(path + "/" + dir, base)
+          return real_load(lc_path, priv) if lc_path
+        end
       ensure
-	@lang = back if back
+        @lang = back if back
       end
       raise LoadError, "No such file to load -- #{file}"
     end 
@@ -129,9 +130,9 @@ module IRB
     def real_load(path, priv)
       src = self.String(File.read(path))
       if priv
-	eval("self", TOPLEVEL_BINDING).extend(Module.new {eval(src, nil, path)})
+  eval("self", TOPLEVEL_BINDING).extend(Module.new {eval(src, nil, path)})
       else
-	eval(src, TOPLEVEL_BINDING, path)
+  eval(src, TOPLEVEL_BINDING, path)
       end
     end
     private :real_load
@@ -141,24 +142,24 @@ module IRB
       dir = "" if dir == "."
       base = File.basename(file)
       if dir[0] == ?/ #/
-	  return lc_path = search_file(dir, base)
+    return lc_path = search_file(dir, base)
       else
-	for path in $:
-	  if lc_path = search_file(path + "/" + dir, base)
-	    return lc_path
-	  end
-	end
+  for path in $:
+    if lc_path = search_file(path + "/" + dir, base)
+      return lc_path
+    end
+  end
       end
       nil
     end
 
     def search_file(path, file)
       if File.exist?(p1 = path + lc_path(file, "C"))
-	if File.exist?(p2 = path + lc_path(file))
-	  return p2
-	else
-	end
-	return p1
+        if File.exist?(p2 = path + lc_path(file))
+          return p2
+        else
+        end
+        return p1
       else
       end
       nil
@@ -168,11 +169,11 @@ module IRB
     def lc_path(file = "", lc = @lang)
       case lc
       when "C"
-	LOCALE_DIR + file
+  LOCALE_DIR + file
       when /^ja/
-	LOCALE_DIR + "ja/" + file
+  LOCALE_DIR + "ja/" + file
       else
-	LOCALE_DIR + @lang + "/" + file
+  LOCALE_DIR + @lang + "/" + file
       end
     end
     private :lc_path
