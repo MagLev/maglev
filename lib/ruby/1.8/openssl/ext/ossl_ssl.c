@@ -1250,6 +1250,7 @@ ossl_ssl_read_internal(int argc, VALUE *argv, VALUE self, int nonblock)
     int ilen, nread = 0;
     VALUE len, str, io;
     int fd;
+    char* buf;
 
     rb_scan_args(argc, argv, "11", &len, &str);
     ilen = NUM2INT(len);
@@ -1264,11 +1265,16 @@ ossl_ssl_read_internal(int argc, VALUE *argv, VALUE self, int nonblock)
     Data_Get_Struct(self, SSL, ssl);
     io = ossl_ssl_get_io(self);
     fd = rb_io_fd(io);
+
     if (ssl) {
 	if(!nonblock && SSL_pending(ssl) <= 0)
 	    rb_thread_wait_fd(fd);
 	for (;;){
-	    nread = SSL_read(ssl, RSTRING_PTR(str), RSTRING_LENINT(str));
+	    buf = (char*)xmalloc(sizeof(char) * RSTRING_LENINT(str));
+	    nread = SSL_read(ssl, buf, RSTRING_LENINT(str));
+	    if (nread > 0)
+		rb_str_update(str, 0, nread, rb_str_new(buf, nread));
+	    xfree(buf);
 	    switch(ssl_get_error(ssl, nread)){
 	    case SSL_ERROR_NONE:
 		goto end;
