@@ -466,7 +466,7 @@ class Module
   # def self.nesting; end
   class_primitive 'nesting', 'moduleNesting'
 
-  primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
+  primitive_nobridge '_method_protection', 'rubyMethodProtection'
 
   PROTECTION_PUBLIC = 0
   PROTECTION_PROTECTED = 1
