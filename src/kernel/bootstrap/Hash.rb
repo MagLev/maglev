@@ -285,24 +285,20 @@ class Hash
   end
   
   def inspect
-    return "{}" if self.size == 0
-    str = "{"
-    self.each_pair { |k, v|
-      # TODO: This only detects loops of length 0. Maybe use a visitor?
-      if k.equal?(self)
-        str << '{...}'
-      else
-        str << k.inspect
-      end
-      str << "=>"
-      if v.equal?(self)
-        str << '{...}'
-      else
-        str << v.inspect
-      end
-      str << ", "
-    }
-    str[0..(str.length - 3)] + "}"
+    s = "{"
+    ts = Thread.__recursion_guard_set
+    added = ts.__add_if_absent(self)
+    unless added
+      s << '...}'
+      return s
+    end
+    begin
+      s << self.collect {|k, v| k.inspect + '=>' + v.inspect}.join(', ')
+      s << "}"
+    ensure
+      ts.remove(self)
+    end
+    s
   end
 
   def values
