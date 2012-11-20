@@ -503,6 +503,14 @@ class Hash
   def __key_error(key)
     raise KeyError.new("Key not found: \"#{key}\"")
   end
+
+  def __equals(key, anotherKey)
+    if self.compare_by_identity?
+      return key.equal?(anotherKey)
+    else
+      return key.eql?(anotherKey)
+    end
+  end
 end
 
 class KeyError < IndexError

@@ -305,9 +305,9 @@ category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 equals: aKey with: anotherKey
-	self isIdentityHash 
-		ifTrue: [^ aKey == anotherKey]
-		ifFalse: [^ aKey = anotherKey].
+  self isIdentityHash
+  ifTrue: [^ aKey @ruby1:equal?: anotherKey]
+  ifFalse: [^ aKey @ruby1:eql?: anotherKey].
 %
 category: 'Basic hash'
 set compile_env: 0
@@ -319,7 +319,7 @@ category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 hashSlotIndexFor: aKey
-	^ (aKey hash bitAnd: self bitmask) \\ self hashTableSize + 1
+  ^ ((aKey @ruby1:hash) bitAnd: self bitmask) \\ self hashTableSize + 1
 %
 category: 'Accessing'
 set compile_env: 0
