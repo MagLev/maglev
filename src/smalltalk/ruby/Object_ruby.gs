@@ -42,6 +42,10 @@ _isRubyString
 ^ self _isRubyString
 %
 
+method:
+isInterval
+  ^ false
+%
 
 category: 'Ruby compare'
 method:

@@ -1127,7 +1127,7 @@ class File
 
   def write(arg)
     arg = Type.coerce_to(arg, String, :to_s)
-    count = self.__write(arg.__size, arg)
+    count = self.__write(arg.bytesize, arg)
     if count._equal?(nil)
       raise IOError , self.__last_err_string  # TODO: Errno::xxx
     end

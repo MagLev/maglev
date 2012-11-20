@@ -103,7 +103,7 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
   aMatchData ~~ nil ifTrue:[  ^ aMatchData _rubyAt:0 ].
   ^ nil .
 ].
-(anOffset isKindOf: Interval) ifTrue:[
+(anOffset isInterval) ifTrue:[
   ^ self _rubyAt1Interval: anOffset 
 ].
 ^ self @ruby1:__prim_at_failed: anOffset
@@ -118,9 +118,9 @@ method:
 _rubyAt1Interval: anInterval
   | size result |
   size := self _rubySize.
-  anInterval begin > anInterval end ifTrue: [ ^ nil. ].
   anInterval begin > size ifTrue: [ ^ nil. ].
-  result := self class new.
+  anInterval end < anInterval begin ifTrue: [^ String new].
+  result := String new.
   anInterval rubyDo: [ :index | 
     (self _rubyAt1: index)
       ifNil: [ ^ result ]
@@ -163,8 +163,7 @@ _rubyAt1: anOffset length: aCount
   Negative offsets go backwards from end,  -1 means last element.
   For env 1.
 "
-<primitive: 687>
-^ self @ruby1:__prim_at_length_failed: anOffset _: aCount
+^ self _rubyAt1: (anOffset to: (anOffset + aCount - 1))
 %
 
 method:

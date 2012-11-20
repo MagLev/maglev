@@ -102,10 +102,10 @@ class String
   primitive 'length', '_rubySize'
   primitive 'size', '_rubySize'
   primitive 'size=', '_rubySize:'  # Note size=() not in MRI
+  primitive '__size', '_rubySize'
+  primitive '__size=', '_rubySize:'
 
   ## used internal to know how many bytes the string instance has
-  primitive '__size', 'size'
-  primitive '__size=', 'size:'
   primitive 'bytesize', 'size'  # added for 1.8.7
 
 
@@ -1542,8 +1542,9 @@ class String
     lim = self.__size
 
     first_char = delim.__at(0)
+
     while current < lim
-      if self.__at(current)._equal?(first_char) and self.__at_equals(current + 1, delim)
+      if self.__at(current).eql?(first_char) and self.__at(current, delim_length).eql?(delim)
         results << self.__at(start, (current - start))
         count += 1
         start = current + delim_length
