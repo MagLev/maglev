@@ -355,6 +355,8 @@ self size > 1000000 ifTrue:[
   str add: $" .
   self _rubyQuoteOn: str .
   str add: $" .
+  1 halt.
+  
   ^ str
 ]
 %
@@ -393,8 +395,8 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
       av := c asciiValue .
       xlated := RubyEscapeTranslationTable at: (av + 1) .
       (xlated == 0) ifTrue: [
-	(av between: 32 and: 126) ifTrue: [
-	  aString add: c
+	(av between: 32 and: 300) ifTrue: [
+	  aString add: c.
 	] ifFalse: [
 	  vArr at: 1 put: av .
 	  aString addAll: (Module sprintf:'\%03o' with: vArr)
@@ -404,6 +406,7 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
       ] .
     ] .
   ] .
+  1halt.
 %
 
 method: String
