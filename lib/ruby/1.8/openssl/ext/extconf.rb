@@ -16,37 +16,12 @@
 
 require "mkmf"
 
-# MagLev specifics
-unless ENV["GEMSTONE_SSL_INCLUDE"]
-  include_folder = File.expand_path("../../../../../../../HPI-GSS/ssl/openssl/include", __FILE__)
-  if File.directory? include_folder
-    GEMSTONE_SSL_INCLUDE = include_folder
-  else
-    include_folder = File.expand_path("../../../../../../../svn/ssl/openssl/include", __FILE__)
-    if File.directory? include_folder
-      GEMSTONE_SSL_INCLUDE = include_folder
-    else
-      puts "=== Please set GEMSTONE_SSL_INCLUDE to point to the ssl source in GemStone/S ==="
-      exit 1
-    end
-  end
-else
-  GEMSTONE_SSL_INCLUDE = ENV["GEMSTONE_SSL_INCLUDE"]
-end
-$INCFLAGS = "-I#{GEMSTONE_SSL_INCLUDE} #{$INCFLAGS}"
-# FIXME: Manual definitions to fix compilation
-$defs.push "-DHAVE_HMAC_CTX_COPY"
-$defs.push "-DHAVE_EVP_CIPHER_CTX_COPY"
-$defs.push "-DHAVE_BN_RAND_RANGE"
-$defs.push "-DHAVE_BN_PSEUDO_RAND_RANGE"
-$defs.push "-DHAVE_ENGINE_GET_CIPHER"
-$defs.push "-DHAVE_ENGINE_GET_DIGEST"
-$defs.push "-DHAVE_X509V3_EXT_NCONF_NID"
-$defs.push "-DHAVE_X509V3_SET_NCONF"
-$defs.push "-DHAVE_PKCS5_PBKDF2_HMAC_SHA1"
-$defs.push "-DHAVE_PKCS5_PBKDF2_HMAC"
-$defs.push "-DHAVE_OBJ_NAME_DO_ALL_SORTED"
-$defs.push "-DHAVE_EVP_CIPHER_CTX_SET_PADDING"
+# Manual definitions to so library works with MagLev provided libcrypto
+%w[HAVE_HMAC_CTX_COPY HAVE_EVP_CIPHER_CTX_COPY HAVE_BN_RAND_RANGE HAVE_BN_PSEUDO_RAND_RANGE
+   HAVE_ENGINE_GET_CIPHER HAVE_ENGINE_GET_DIGEST HAVE_X509V3_EXT_NCONF_NID
+   HAVE_X509V3_EXT_NCONF HAVE_PKCS5_PBKDF2_HMAC_SHA1 HAVE_PKCS5_PBKDF2_HMAC
+   HAVE_OBJ_NAME_DO_ALL_SORTED HAVE_EVP_CIPHER_CTX_SET_PADDING
+   HAVE_SSL_SET_TLSEXT_HOST_NAME].each { |d| $defs.push "-D#{d}" }
 #
 
 dir_config("openssl")
