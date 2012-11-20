@@ -170,7 +170,7 @@ module OpenSSL::Buffering
         return ""
       end
     end
-    if @rbuffer.empty?
+    if (@rbuffer ||= "").empty?
       return sysread_nonblock(maxlen, buf)
     end
     ret = consume_rbuff(maxlen)
