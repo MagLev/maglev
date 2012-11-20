@@ -325,7 +325,7 @@ class IO
   end
 
   def pid
-    nil  # need to change after self.popen and self.pipe implemented
+    self.instance_variable_get '@_st_childPid'
   end
 
   def self.popen(cmd, mode="r", &block)
@@ -341,6 +341,8 @@ class IO
     if block_given?
       res = block.call( f)
       f.close
+      # This works only together with HPI-GSS matthias/popen-sigchld
+      Process.wait(f.pid)
       res
     else 
       f

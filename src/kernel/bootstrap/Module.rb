@@ -289,15 +289,22 @@ class Module
   end
 
   def module_eval(*args, &block_arg)
+    # save current protection level to restore afterwards; set public
+    protection_level = _method_protection
+    public
     # should always come here via a bridge method , thus 0x3N for vcgl ...
     nargs = args.size
     if nargs < 1
       if block_arg._not_equal?(nil)
-        return __module_eval(nil, block_arg)
+        module_eval_value = __module_eval(nil, block_arg)
+        __set_protection_methods(protection_level)
+        return module_eval_value
       end
+        __set_protection_methods(protection_level)
       raise ArgumentError, 'too few args'
     end
     if nargs > 3
+        __set_protection_methods(protection_level)
       raise ArgumentError, 'too many args'
     end
     # no ArgumentError for both string and explicit block args yet ;
@@ -321,6 +328,7 @@ class Module
     res = __module_eval_string(string, vcgl, *m_args )
     vcgl[0].__storeRubyVcGlobal(0x30)
     vcgl[1].__storeRubyVcGlobal(0x31)
+    __set_protection_methods(protection_level)
     res
   end
 
@@ -459,27 +467,35 @@ class Module
   # def self.nesting; end
   class_primitive 'nesting', 'moduleNesting'
 
-  # primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
+  primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
+
+  PROTECTION_PUBLIC = 0
+  PROTECTION_PROTECTED = 1
+  PROTECTION_PRIVATE = 2
+
+  def protection
+    _method_protection
+  end
 
   primitive_nobridge '__set_protection_methods*', 'setProtection:methods:'
 
   def private(*names)
     # if names empty, set default visibility for subsequent methods to private
     #  and shutoff _module_methods_all
-    __set_protection_methods(2, *names)
+    __set_protection_methods(PROTECTION_PRIVATE, *names)
   end
 
   def public(*names)
     #  if names empty, set default visibility for subsequent methods to public
     #  and shutoff _module_methods_all
-    __set_protection_methods(0, *names)
+    __set_protection_methods(PROTECTION_PUBLIC, *names)
   end
 
 
   def protected(*names)
     # if names empty, set default visibility for subsequent methods to protected
     #  and shutoff _module_methods_all
-    __set_protection_methods(1, *names)
+    __set_protection_methods(PROTECTION_PROTECTED, *names)
   end
 
   primitive_nobridge '__set_protection_classmethods*', 'setProtection:classmethods:'
