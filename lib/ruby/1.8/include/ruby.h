@@ -299,7 +299,10 @@ RUBY_DLLSPEC void rb_free(void*);
 // RFLOAT not supported
 
 // DATA_PTR, RDATA not supported
-
+#define SetRDataData(obj, ptr) \
+    rb_ivar_set(obj, rb_intern("RDataData"), Data_Wrap_Struct(rb_cObject, NULL, NULL, ptr))
+#define GetRDataData(obj) \
+    rb_rdata_fetch(rb_ivar_get(obj, rb_intern("RDataData")))
 
 /* End of interface macros */
 
@@ -342,6 +345,8 @@ RUBY_DLLSPEC VALUE rb_require(const char* name);
 
 RUBY_DLLSPEC void rb_raise(VALUE exc, const char *fmt, ...) ;
 RUBY_DLLSPEC void rb_raise_(VALUE exc, const char *message);
+
+#define rb_eof_error() rb_raise(rb_eEOFError, "end of file reached")
 
 RUBY_DLLSPEC VALUE rb_rescue(VALUE(*)(ANYARGS), VALUE,VALUE(*)(ANYARGS), VALUE);
 RUBY_DLLSPEC VALUE rb_rescue2(VALUE(*)(ANYARGS),VALUE,VALUE(*)(ANYARGS),VALUE,...);
@@ -569,6 +574,8 @@ RUBY_DLLSPEC VALUE rb_define_module_under(VALUE parent, const char* name);
 
 /** Ruby's attr_* for given name. Nonzeros to toggle read/write. */
 RUBY_DLLSPEC void rb_define_attr(VALUE module, const char* attr_name, int readable, int writable);
+#define rb_attr(mod, attr_name, read, write, unused) \
+    rb_define_attr(mod, rb_id2name(attr_name), read, write);
 
 typedef VALUE (*anyArgsFct_t)(ANYARGS);
 
@@ -826,6 +833,7 @@ RUBY_DLLSPEC VALUE rb_str_length(VALUE str);
 RUBY_DLLSPEC VALUE rb_str_substr(VALUE str, long start, long len);
 RUBY_DLLSPEC VALUE rb_str_freeze(VALUE str);
 RUBY_DLLSPEC VALUE rb_str_resize(VALUE str, long len);
+#define HAVE_RB_STR_SET_LEN
 static inline void rb_str_set_len(VALUE str, long len) { rb_str_resize(str, len); }
 RUBY_DLLSPEC VALUE rb_str_cat(VALUE str, const char* bytes, long len);
 RUBY_DLLSPEC VALUE rb_str_cat2(VALUE str, const char* cstring);
@@ -1081,14 +1089,29 @@ RUBY_DLLSPEC VALUE rb_equal(VALUE obj, VALUE other);
 
 RUBY_DLLSPEC VALUE rb_attr_get(VALUE obj, ID id);
 
-RUBY_DLLSPEC VALUE rb_io_write(VALUE io, VALUE str);  // defer
-// RUBY_DLLSPEC int rb_io_fd(VALUE io);
+#ifndef MAGLEV_LINT
+
+RUBY_DLLSPEC VALUE rb_io_write(VALUE io, VALUE str);
+#define HAVE_RB_IO_FD 1
+#define rb_io_fd(io) NUM2INT(rb_funcall((io), rb_intern("fileno"), 0))
 // RUBY_DLLSPEC void rb_io_check_readable(rb_io_t* io);
 // RUBY_DLLSPEC void rb_io_check_writable(rb_io_t* io);
 // RUBY_DLLSPEC void rb_io_check_closed(rb_io_t* io);
 // RUBY_DLLSPEC void rb_io_set_nonblock(rb_io_t* io);
 // RUBY_DLLSPEC int rb_io_wait_readable(int f);
 // RUBY_DLLSPEC int rb_io_wait_writable(int f);
+
+// Provide our own versions which work on the objects
+RUBY_DLLSPEC void rb_io_check_readable_(VALUE io);
+RUBY_DLLSPEC void rb_io_check_writable_(VALUE io);
+RUBY_DLLSPEC void rb_io_check_closed_(VALUE io);
+RUBY_DLLSPEC int rb_io_wait_readable_(VALUE io);
+RUBY_DLLSPEC int rb_io_wait_writable_(VALUE io);
+
+// RUBY_DLLSPEC void rb_io_wait_fd(int fd)
+#define rb_thread_wait_fd_(ioobj) rb_io_wait_readable_(ioobj)
+
+#endif
 
 RUBY_DLLSPEC VALUE rb_range_new(VALUE from, VALUE to, int exclude_end);
 
