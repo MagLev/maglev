@@ -6,8 +6,8 @@ class Hash
   primitive_nobridge '__remove_key', 'removeKey:'
   primitive_nobridge '__to_a', 'asArray'
   primitive '__each_pair&', '_rubyEachPair:'
-  primitive 'size', 'size'
-  primitive 'clear', 'clear'
+  primitive '__size', 'size'
+  primitive '__clear', 'clear'
   primitive 'compare_by_identity?', 'isIdentityHash'
   primitive 'compare_by_identity', 'toIdentityHash'
   primitive '__head', 'head'
@@ -17,18 +17,18 @@ class Hash
 
   alias to_a __to_a
   alias __to_array __to_a
-  alias length size
+  alias length __size
   
   def self.__new(size = 0)
     # Ignore the size argument
-    _new
+    self._new
   end
 
   def default(key=nil)
-    if self.default_proc == nil
+    if @_st_defaultProc == nil
       return @_st_default
     else
-      return self.default_proc.call(self, key)
+      return @_st_defaultProc.call(self, key)
     end
   end
 
@@ -50,7 +50,7 @@ class Hash
   def to_s
     self.inspect
   end
-
+  
   def dup
     hash = self.class.new
     hash.compare_by_identity if self.compare_by_identity?
@@ -62,6 +62,14 @@ class Hash
     }
 
     hash
+  end
+
+  def clear
+    self.__clear
+  end
+  
+  def size
+    self.__size
   end
 
   def each_pair(&block)
@@ -184,7 +192,7 @@ class Hash
   def self.__from_array(array)
     raise ArgumentError, "odd number of arguments for Hash" if array.size % 2 == 1
     hash = self.new
-    (array.size / 2).times { |idx| hash[array[2*idx]] = array[2*idx+1] }
+    (array.size / 2).times { |idx| hash.__atkey_put(array[2*idx], array[2*idx+1]) }
     hash
   end
    
@@ -222,10 +230,10 @@ class Hash
     begin
       return self.__at(key)
     rescue KeyError 
-      if self.default_proc == nil
-        return self.default
+      if @_st_defaultProc == nil
+        return @_st_default
       else
-        return self.default_proc.call(self, key)
+        return @_st_defaultProc.call(self, key)
       end
     end
   end
@@ -280,9 +288,18 @@ class Hash
     return "{}" if self.size == 0
     str = "{"
     self.each_pair { |k, v|
-      str << k.inspect
+      # TODO: This only detects loops of length 0. Maybe use a visitor?
+      if k.equal?(self)
+        str << '{...}'
+      else
+        str << k.inspect
+      end
       str << "=>"
-      str << v.inspect
+      if v.equal?(self)
+        str << '{...}'
+      else
+        str << v.inspect
+      end
       str << ", "
     }
     str[0..(str.length - 3)] + "}"
@@ -291,7 +308,7 @@ class Hash
   def values
     arr = Array.new(self.size)
     idx = 0
-    self.each_pair { |k, v|
+    self.__each_pair { |k, v|
       arr.__at_put(idx, v)
       idx += 1
     }
@@ -325,45 +342,48 @@ class Hash
     args.collect { |k| self[k] }
   end
 
-  def has_value?(value)
+  def __has_value?(value)
     self.each_pair { |k, v|
       return true if value.eql?(v)
     }
    false
   end
 
-  alias value? has_value?
+  alias has_value? __has_value?
+  alias value? __has_value?
   
-  def has_key?(key)
+  def __has_key?(key)
     self.each_pair { |k, v|
       return true if (key.eql?(k) and !self.compare_by_identity?) or (key.equal?(k) and self.compare_by_identity?)
     }
     false
   end
-
-  alias key? has_key?
-  alias include? has_key?
-  alias member? has_key?
+  
+  alias has_key? __has_key?
+  alias key? __has_key?
+  alias include? __has_key?
+  alias member? __has_key?
    
   def to_hash
     self
   end
   
-  def merge!(other, &block)
+  def __merge!(other, &block)
     other.each_pair { |k, v|
-      if self.key?(k) and block_given?
-        self[k] = block.call(k, self[k], v)
+      if self.__has_key?(k) and block_given?
+        self.__atkey_put(k, block.call(k, self[k], v))
       else
-        self[k] = v
+        self.__atkey_put(k, v)
       end
     }
     self
   end
   
-  alias update merge!
+  alias merge! __merge!
+  alias update __merge!
   
   def merge(other, &block)
-    self.dup.merge!(other, &block)
+    self.dup.__merge!(other, &block)
   end
   
   def first
@@ -388,8 +408,8 @@ class Hash
   end
   
   def replace(hash)
-    self.clear
-    self.merge!(hash)
+    self.__clear
+    self.__merge!(hash)
   end
   
   def empty?
@@ -427,7 +447,7 @@ class Hash
   
   def rehash
     assocs = self.to_a
-    self.clear
+    self.__clear
     assocs.each { |a| self[a[0]] = a[1] }
     self
   end
@@ -463,7 +483,7 @@ class Hash
   end
 
   def fetch(key, default = (default_missing = true; nil), &block)
-    if self.key?(key)
+    if self.__has_key?(key)
       return self[key]
     elsif !default_missing
       return default
@@ -479,8 +499,8 @@ class Hash
     return false unless other._isHash
     return false unless other.size == self.size
     
-    self.each_pair { |k, v| return false unless other.key?(k) and other[k] == v }
-    other.each_pair { |k, v| return false unless self.key?(k) and self[k] == v }
+    self.each_pair { |k, v| return false unless other.__has_key?(k) and other[k] == v }
+    other.each_pair { |k, v| return false unless self.__has_key?(k) and self[k] == v }
     true
   end
 
@@ -501,7 +521,7 @@ class Hash
   end
 
   def __key_error(key)
-    raise KeyError.new("Key not found: \"#{key}\"")
+    raise KeyError.new("Key not found: \"#{key.inspect}\"")
   end
 
   def __equals(key, anotherKey)
