@@ -110,6 +110,11 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
 %
 
 method:
+forRuby
+  ^ (Utf8 fromString: self) asUnicodeString
+%
+
+method:
 _rubyAt1Interval: anInterval
   | size result |
   size := self _rubySize.

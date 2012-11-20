@@ -94,3 +94,11 @@ rubyPrivateSize
   ^ 4 "Hide smalltalk instance variables from ruby (marshal)"
 %
       
+category: 'Ruby support'
+method:
+rubyDo: aBlock
+  | lastValue | 
+  self excludeEnd ifFalse: [ ^ self do: aBlock].
+  from to: to - 1 by: by do: aBlock.
+  ^ self
+%
