@@ -131,9 +131,9 @@ VALUE ossl_x509name_sk2ary(STACK_OF(X509_NAME) *names);
 VALUE ossl_buf2str(char *buf, int len);
 #define ossl_str_adjust(str, p)				\
     do {						\
-	int len = RSTRING_LENINT(str);			\
-	rb_str_set_len((str), 0);			\
-	rb_str_cat2((str), (p));			\
+	int len = strlen(p);				\
+	rb_str_set_len((str), len);			\
+	rb_str_update((str), 0, len, rb_str_new2(p));	\
     } while(0)
 
 /*
