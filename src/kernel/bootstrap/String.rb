@@ -97,13 +97,16 @@ class String
 
   # def scan #  implemented in common/string.rb
 
-  primitive 'bytesize', 'size'  # added for 1.8.7
+
+  ## for external use. returns the number of UTF-8 characters
   primitive 'length', '_rubySize'
   primitive 'size', '_rubySize'
-  primitive '__size', '_rubySize'
-
   primitive 'size=', '_rubySize:'  # Note size=() not in MRI
-  primitive '__size=', '_rubySize:'
+
+  ## used internal to know how many bytes the string instance has
+  primitive '__size', 'size'
+  primitive '__size=', 'size:'
+  primitive 'bytesize', 'size'  # added for 1.8.7
 
 
   primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion

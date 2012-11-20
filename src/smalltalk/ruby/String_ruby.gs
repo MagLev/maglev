@@ -355,7 +355,6 @@ self size > 1000000 ifTrue:[
   str add: $" .
   self _rubyQuoteOn: str .
   str add: $" .
-  1 halt.
   
   ^ str
 ]
@@ -406,7 +405,6 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
       ] .
     ] .
   ] .
-  1halt.
 %
 
 method: String
