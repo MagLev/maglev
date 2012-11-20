@@ -1077,8 +1077,8 @@ ossl_ssl_setup(VALUE self)
 #endif
         io = ossl_ssl_get_io(self);
         fd = rb_io_fd(io);
-        rb_io_check_readable_(io);
-        rb_io_check_writable_(io);
+        /* rb_io_check_readable_(io); */
+        /* rb_io_check_writable_(io); */
         SSL_set_fd(ssl, TO_SOCKET(fd));
 	SSL_set_ex_data(ssl, ossl_ssl_ex_ptr_idx, (void*)self);
 	cb = ossl_sslctx_get_verify_cb(v_ctx);
@@ -1101,21 +1101,25 @@ ossl_ssl_setup(VALUE self)
 static void
 write_would_block(int nonblock)
 {
-    if (nonblock) {
-        VALUE exc = ossl_exc_new(eSSLError, "write would block");
-        rb_extend_object(exc, rb_path2class("IO::WaitWritable"));
-        rb_exc_raise(exc);
-    }
+    /* 
+     * if (nonblock) {
+     *     VALUE exc = ossl_exc_new(eSSLError, "write would block");
+     *     rb_extend_object(exc, rb_path2class("IO::WaitWritable"));
+     *     rb_exc_raise(exc);
+     * }
+     */
 }
 
 static void
 read_would_block(int nonblock)
 {
-    if (nonblock) {
-        VALUE exc = ossl_exc_new(eSSLError, "read would block");
-        rb_extend_object(exc, rb_path2class("IO::WaitReadable"));
-        rb_exc_raise(exc);
-    }
+    /* 
+     * if (nonblock) {
+     *     VALUE exc = ossl_exc_new(eSSLError, "read would block");
+     *     rb_extend_object(exc, rb_path2class("IO::WaitReadable"));
+     *     rb_exc_raise(exc);
+     * }
+     */
 }
 
 static VALUE
