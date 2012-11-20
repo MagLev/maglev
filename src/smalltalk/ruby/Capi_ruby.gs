@@ -6,7 +6,7 @@
 !  methods for CFunction and related classes to support Ruby
 !=========================================================================
 
-category:  'Ruby support'
+category: 'Ruby support'
 !-----------------------------------
 set class CFunction
 classmethod:

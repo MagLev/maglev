@@ -85,7 +85,13 @@ _rubyAt1: anOffset
      returns nil if anOffset is out of range,
      else returns character code at specified position.
   "
-<primitive: 686>
+anOffset isInteger ifTrue: [ | offset |
+  anOffset < 0 
+    ifTrue:[ offset := anOffset + self _rubySize. ]
+    ifFalse: [ offset := anOffset].
+  (offset < 0 or:[offset >= self _rubySize]) ifTrue:[^ nil].
+  ^ String withBytes: (self forRuby at: offset +1) asString encodeAsUTF8 asByteArray asString
+].
 anOffset _isOneByteString  ifTrue:[ "a String"  | ofs |
   ofs := self _findString: anOffset startingAt: 1 ignoreCase: false .
   ofs ~~ 0 ifTrue:[ ^ anOffset ].
@@ -97,7 +103,35 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
   aMatchData ~~ nil ifTrue:[  ^ aMatchData _rubyAt:0 ].
   ^ nil .
 ].
+(anOffset isKindOf: Interval) ifTrue:[
+  ^ self _rubyAt1Interval: anOffset 
+].
 ^ self @ruby1:__prim_at_failed: anOffset
+%
+
+method:
+_rubyAt1Interval: anInterval
+  | size result |
+  size := self _rubySize.
+  anInterval begin > anInterval end ifTrue: [ ^ nil. ].
+  anInterval begin > size ifTrue: [ ^ nil. ].
+  result := self class new.
+  anInterval rubyDo: [ :index | 
+    (self _rubyAt1: index)
+      ifNil: [ ^ result ]
+      ifNotNilDo: [ :newCharacter | 
+        result := result,  newCharacter ].
+  ].
+  ^ result.
+%
+
+method:
+_rubySize
+  ^ self forRuby size
+%
+method:
+_rubySize: anInteger
+  ^ self size: anInteger
 %
 
 method:
