@@ -383,7 +383,7 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
     c := self at: n .
     c == $# ifTrue:[ | nextByte |
       nextByte := self _rubyAt1: n  .  "atOrNil: n + 1"
-      (nextByte == 36 or:[ nextByte == 64 or:[ nextByte == 123]]) ifFalse:[
+      (nextByte = '$' or:[ nextByte = '@' or:[ nextByte = '{']]) ifFalse:[
          "next char not one of  $  @  {  ,  do not escape " 
         aString add: c .
         chDone  := true .
@@ -422,7 +422,7 @@ rubySelectorPrefix
   | sz |
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
-  (self _rubyAt1: -4) == 35"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
+  (self _rubyAt1: -4) = '#'"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
 
   self _primitiveFailed: #rubySelectorPrefix args: #() .
 %
@@ -443,7 +443,7 @@ rubySelectorPrefixSymbol
   | sz |
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
-  (self _rubyAt1: -4) == 35"$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
+  (self _rubyAt1: -4) = '#' "$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
   self _primitiveFailed: #rubySelectorPrefixSymbol args: #() .
 %
 
