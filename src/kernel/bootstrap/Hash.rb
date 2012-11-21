@@ -152,7 +152,7 @@ class Hash
       self.default=(args.__at(0))
     elsif na._equal?(0)
       if block_given?
-        self.default=(block)
+        self.default_proc = block
       else
         # allocation includes self.default=(nil)
       end
