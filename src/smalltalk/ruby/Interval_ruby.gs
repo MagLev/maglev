@@ -11,8 +11,13 @@ set class Interval
 category: 'Ruby support'
 
 method:
-rubyDo: aBlockClosure
-  ^ self do: aBlockClosure
+rubyDo: aBlock withLength: aLength
+  | start stop |
+  start := self begin.
+  stop := self end.
+  start < 0 ifTrue: [ start := start + aLength].
+  stop < 0 ifTrue: [ stop := stop + aLength].
+  start to: stop by: by do: aBlock.
 %
 
 method:

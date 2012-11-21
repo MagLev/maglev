@@ -119,14 +119,14 @@ _rubyAt1Interval: anInterval
   | size result |
   size := self _rubySize.
   anInterval begin > size ifTrue: [ ^ nil. ].
-  anInterval end < anInterval begin ifTrue: [^ String new].
+  "anInterval end < anInterval begin ifTrue: [^ String new]."
   result := String new.
   anInterval rubyDo: [ :index | 
     (self _rubyAt1: index)
       ifNil: [ ^ result ]
       ifNotNilDo: [ :newCharacter | 
         result := result,  newCharacter ].
-  ].
+  ] withLength: size.
   ^ result.
 %
 
@@ -163,7 +163,13 @@ _rubyAt1: anOffset length: aCount
   Negative offsets go backwards from end,  -1 means last element.
   For env 1.
 "
-^ self _rubyAt1: (anOffset to: (anOffset + aCount - 1))
+  | positiveOffset |
+  aCount < 0 ifTrue: [ ^ nil ].
+  positiveOffset := anOffset < 0 
+      ifTrue: [ anOffset + self _rubySize ]
+      ifFalse: [ anOffset].
+  positiveOffset < 0 ifTrue: [ ^ nil ].
+  ^ self _rubyAt1: (Range from: positiveOffset limit: positiveOffset + aCount)
 %
 
 method:

@@ -96,9 +96,18 @@ rubyPrivateSize
       
 category: 'Ruby support'
 method:
-rubyDo: aBlock
-  | lastValue | 
-  self excludeEnd ifFalse: [ ^ self do: aBlock].
-  from to: to - 1 by: by do: aBlock.
-  ^ self
+rubyDo: aBlock withLength: aLength
+  | firstValue valueBefore | 
+  self excludeEnd ifFalse: [ ^ super rubyDo: aBlock withLength: aLength].
+  "if we exclude the end instead of 
+    1 2 3 4 5 6
+  we get
+    f 1 2 3 4 5
+  f is the firstValue"
+  valueBefore := Object new.
+  firstValue := valueBefore.
+  super rubyDo: [ :aValue |
+    firstValue ~~ valueBefore ifTrue: [
+      aBlock value: valueBefore].
+    valueBefore := aValue.] withLength: aLength.
 %
