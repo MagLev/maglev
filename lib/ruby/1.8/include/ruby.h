@@ -346,10 +346,6 @@ RUBY_DLLSPEC VALUE rb_require(const char* name);
 RUBY_DLLSPEC void rb_raise(VALUE exc, const char *fmt, ...) ;
 RUBY_DLLSPEC void rb_raise_(VALUE exc, const char *message);
 
-static VALUE rb_f_notimplement(int argc, VALUE *argv, VALUE obj) { rb_notimplement(); }
-#define rb_eof_error() rb_raise(rb_eEOFError, "end of file reached")
-#define rb_notimplement() rb_raise(rb_eNotImpError, "in ")
-
 RUBY_DLLSPEC VALUE rb_rescue(VALUE(*)(ANYARGS), VALUE,VALUE(*)(ANYARGS), VALUE);
 RUBY_DLLSPEC VALUE rb_rescue2(VALUE(*)(ANYARGS),VALUE,VALUE(*)(ANYARGS),VALUE,...);
 //  In ruby code invoked from third arg to rb_rescue, rb_rescue2
@@ -1248,6 +1244,10 @@ RUBY_DLLSPEC extern VALUE rb_eScriptError;
 RUBY_DLLSPEC extern VALUE rb_eNameError;
 RUBY_DLLSPEC extern VALUE rb_eSyntaxError;
 RUBY_DLLSPEC extern VALUE rb_eLoadError;
+
+#define rb_notimplement() rb_raise(rb_eNotImpError, "in ")
+#define rb_eof_error() rb_raise(rb_eEOFError, "end of file reached")
+static VALUE rb_f_notimplement(int argc, VALUE *argv, VALUE obj) { rb_notimplement(); }
 
 #define ruby_verbose (rb_gv_get("$VERBOSE"))
 #define ruby_debug (rb_gv_get("$DEBUG"))
