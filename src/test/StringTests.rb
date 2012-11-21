@@ -84,23 +84,29 @@ test( s, "фруктовый!", "slice appends to end unicode" )
 
 #### errors if out of bounds
 
-s = "зад"
-err = nil.
-begin
-  s[5..155] = "12"
-rescue RangeError => err
-  test( err.message["out of range"], "out of range", "slicing off from outside raises and RangeError" )
+def testForRangeError( arg1, arg2 = nil)
+  err = nil
+  s = "зад"
+  begin
+    if arg2
+      s[arg1, arg2] = "12" 
+    else 
+      s[arg1] = "12" 
+    end
+  rescue RangeError => err
+    test( err.message["out of range"], "out of range", "slicing off from outside raises and RangeError" )
+  rescue IndexError => err
+    test( err.message["out of string"], "out of string", "slicing off with length from outside raises and IndexError" )
+  end
+  test( err.eql?(nil), false, "the error has risen!" )
 end
-test( err.eql?(nil), false, "the error has risen!" )
 
+s = "зад"
+testForRangeError(5..20)
 s = "Том" # 6 bytes but 3 characters
-err = nil.
-begin
-  s[-5..-2] = "12"
-rescue RangeError => err
-  test( err.message["out of range"], "out of range", "slicing off from outside raises and RangeError" )
-end
-test( err.eql?(nil), false, "the error has risen!" )
+testForRangeError(-5..4)
+testForRangeError(-5, 4)
+testForRangeError(5, 4)
 
 ########################################################################
 report
