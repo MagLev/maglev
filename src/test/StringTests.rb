@@ -2,7 +2,7 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
 ########################################################################
-####
+#### get content of string
 
 #### squeeze
 
@@ -33,6 +33,7 @@ test( "123"[3..0], "", 'begin inside (2)' )
 test( "123"[4..0], nil, 'begin outside' )
 
 #### http://www.ruby-doc.org/core-1.9.3/String.html#method-i-5B-5D
+
 a = "hello there"
 test( a[1]                   , "e", 'mri slice test 1' )
 test( a[2, 3]                , "llo", 'mri slice test 2' )
@@ -48,6 +49,58 @@ test( a[12..-1]              , nil, 'mri slice test 8' )
 #test( a[%r[aeiou](.)\11//, 2]   , nil, 'mri slice test 12' ) ## from website but not even working in MRI :(
 test( a["lo"]                , "lo", 'mri slice test 13' )
 test( a["bye"]               , nil, 'mri slice test 14' )
+
+
+########################################################################
+#### change content of string
+
+#### change one character
+s = "0123456789"
+test( s[3] = "3", "3", "no change of content returns string passed to it" )
+test( s[2] = "3", "3", "slice of content returns string passed to it" )
+test( s, "0133456789", "string has changed")
+
+s = "0123456789"
+test( s[2..100] = "987", "987", "slice with range returns string assigned to it" )
+test( s, "01987", "slice to cut and append end" )
+
+#### change many characters
+
+s = "0123456789"
+s[10..12] = "12"
+test( s, "012345678912", "slice appends to end")
+
+#### make string smaller
+
+s = ":ангел"
+s[2..3] = "р"
+test(s, ":арел", "replace in middle of unicode"  )
+
+#### make string bigger
+
+s = "фрукт"
+s[5..5] = "овый!"
+test( s, "фруктовый!", "slice appends to end unicode" )
+
+#### errors if out of bounds
+
+s = "зад"
+err = nil.
+begin
+  s[5..155] = "12"
+rescue RangeError => err
+  test( err.message["out of range"], "out of range", "slicing off from outside raises and RangeError" )
+end
+test( err.eql?(nil), false, "the error has risen!" )
+
+s = "Том" # 6 bytes but 3 characters
+err = nil.
+begin
+  s[-5..-2] = "12"
+rescue RangeError => err
+  test( err.message["out of range"], "out of range", "slicing off from outside raises and RangeError" )
+end
+test( err.eql?(nil), false, "the error has risen!" )
 
 ########################################################################
 report
