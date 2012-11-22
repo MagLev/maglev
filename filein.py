@@ -27,6 +27,7 @@ def setUpToDate():
     f = open(__file__, 'w')
     f.write(myContent)
     f.close()
+update = False
 
 # find out the last time we run this script
 lastChanged = ChangeTime(__file__)
@@ -40,7 +41,7 @@ if not '.git' in os.listdir(maglevHome):
 relativePathForChangedGsFiles = 'src/smalltalk'
 gsFileDirectory = os.path.join(maglevHome, relativePathForChangedGsFiles)
 
-print 'See what has changed in %s' % gsFileDirectory
+print('Changes  in %s' % gsFileDirectory)
 changedGsFiles = []
 for dirPath, dirNames, fileNames in os.walk(gsFileDirectory):
     for fileName in fileNames:
@@ -66,7 +67,7 @@ login
 input {filePath}
 '''.format(filePath = filePath)
 
-    topazString2 = '''run
+    topazString += '''run
 System commitTransaction
 %
 exit
@@ -111,7 +112,38 @@ exit
 
         ## next error please!
         errorStart += 1
-    if errorStart == 0:
-        setUpToDate()
-        print 'Filein without known errors done!'
-        
+    if errorStart != 0:
+        exit(1)
+    update = True
+    print('Filein without known errors done!')
+
+## reload primitives
+rbFileDirectory = os.path.join(maglevHome, 'src/kernel/bootstrap')
+print('Changes  in %s' % rbFileDirectory)
+rbFilesHaveChanged = False
+for dirPath, dirNames, fileNames in os.walk(rbFileDirectory):
+    for fileName in fileNames:
+        if fileName.endswith('.rb'):
+            # can be filed in
+            filePath = os.path.join(dirPath, fileName)
+            if lastChanged < ChangeTime(filePath) + 10:
+                print('\t%s' % fileName)
+                rbFilesHaveChanged = True
+if rbFilesHaveChanged:
+    print('Reload primitives.')
+    pipe = subprocess.Popen(['rake maglev:reload_prims'],
+                            stdout = subprocess.PIPE, \
+                            shell = True)
+    stdout, _stderr = pipe.communicate()
+    if pipe.wait() != 0:
+        print('-' * 50)
+        print('rake maglev:reload_prims exited with status %i' % \
+              pipe.wait())
+        print stdout
+        exit(pipe.wait())
+    update = True
+else:
+    print('Nothing!')
+      
+if update:
+    setUpToDate()
