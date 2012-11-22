@@ -152,7 +152,7 @@ RUBY.require 'kernel/common/Encoding.rb'
 
 # Include the delta code.  The delta code overwrites the rubinius
 # common code with gemstone specific mods.
-RUBY.require 'kernel/delta/hash.rb'
+# RUBY.require 'kernel/delta/hash.rb'
 RUBY.require 'kernel/delta/Module.rb'
 RUBY.require 'kernel/delta/Object3.rb'
 RUBY.require 'kernel/delta/Array.rb'

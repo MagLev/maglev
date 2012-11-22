@@ -97,8 +97,6 @@ class Fixnum
 
   # to_s inherited from Integer
 
-  primitive 'to_sym', '_rubyToSym'
-
   def zero?  
     self._equal?(0)
   end

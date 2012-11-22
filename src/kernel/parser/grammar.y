@@ -399,7 +399,7 @@ static NODE* NEW_STR( bstring *str, rb_parse_state *ps)
 
 int64 RubyLexStrTerm::incrementNest(NODE **objH, int delta, rb_parse_state *ps)
 {
-  int64 v = om::FetchSmallInt_(*objH, nest_ofs);
+  int64 v = om::FetchSmallInt_(objH, nest_ofs);
   v += delta;
   om::StoreSmallInt_(ps->omPtr, objH, nest_ofs, v);
   return v;
@@ -565,7 +565,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
         k__LINE__
         k__FILE__
 
-%token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG
+%token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG tLABEL
 %token <node> tINTEGER tFLOAT tSTRING_CONTENT
 %token <node> tNTH_REF tBACK_REF
 %token <num>  tREGEXP_END
@@ -3182,6 +3182,11 @@ assoc           : arg_value tASSOC arg_value
                       yTrace(vps, "assoc: arg_value tASSOC arg_value");
                       $$ = RubyArrayNode::s_a_b( $1, $3, vps);
                     }
+                  | tLABEL arg_value
+                    {
+                      yTrace(vps, "assoc: arg_value tLABEL arg_value");
+                      $$ = RubyArrayNode::s_a_b(RubySymbolNode::s($1, vps), $2, vps);
+                    }
                 ;
 
 operation       : tIDENTIFIER
@@ -3830,7 +3835,8 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->lex_pend = NULL;
   { NODE *cbytesO = *cbytesH;
     UTL_ASSERT(OOP_IS_RAM_OOP(cbytesO) && cbytesO->classPtr()->isCByteArray());
-    int64 info = om::FetchSmallInt_(cbytesO, OC_CByteArray_info);
+    int64 info = om::FetchSmallInt_(cbytesH, OC_CByteArray_info);
+    cbytesO = *cbytesH;
     int64 srcSize = H_CByteArray::sizeBytes(info);
     if ((uint64)srcSize > INT_MAX) {
       GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "Parser maximum source string size is 2G bytes");
@@ -5951,6 +5957,16 @@ static int yylex(rb_parse_state* ps)
                 } else {
                     result = tIDENTIFIER;
                     needsNameToken = TRUE;
+                }
+            }
+            if ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state)) {
+                int p_c = *(ps->lex_p); // actual peek
+                if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
+                    lex_state = EXPR_BEG;
+                    nextc(ps);
+                    NODE* symqO = rb_parser_sym( tok(ps) , ps); 
+                    *ps->lexvalH = RpNameToken::s( ps, symqO );
+                    return tLABEL;
                 }
             }
 
