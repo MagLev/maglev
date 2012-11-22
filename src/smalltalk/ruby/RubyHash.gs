@@ -38,7 +38,7 @@ hashTableSize
 %
 category: 'Accessing'
 set compile_env: 0
-classmethod: RubyHash
+method: RubyHash
 hash
   ^ self @ruby1:hash
 %
