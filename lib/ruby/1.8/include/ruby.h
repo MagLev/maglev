@@ -1247,7 +1247,11 @@ RUBY_DLLSPEC extern VALUE rb_eLoadError;
 
 #define rb_notimplement() rb_raise(rb_eNotImpError, "in ")
 #define rb_eof_error() rb_raise(rb_eEOFError, "end of file reached")
-static VALUE rb_f_notimplement(int argc, VALUE *argv, VALUE obj) { rb_notimplement(); }
+static VALUE rb_f_notimplement(int argc, VALUE *argv, VALUE obj) {
+    rb_notimplement();
+    // not reached
+    return (VALUE)NULL;
+}
 
 #define ruby_verbose (rb_gv_get("$VERBOSE"))
 #define ruby_debug (rb_gv_get("$DEBUG"))
