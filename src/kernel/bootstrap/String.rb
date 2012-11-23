@@ -68,8 +68,6 @@ class String
 
   primitive 'hash' , 'hash'
 
-  primitive_nobridge '__indexOfByte', 'indexOfByte:startingAt:'  # one-based offset/result
-
   primitive_nobridge '__insertall_at', 'insertAll:at:'
 
   primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
@@ -91,6 +89,8 @@ class String
 
   primitive_nobridge '__lastSubstring', 'findLastSubString:startingAt:'
   primitive_nobridge '__indexOfLastByte', 'indexOfLastByte:startingAt:'
+  primitive_nobridge '__indexOfByte_int', 'indexOfByte:startingAt:'  # one-based offset/result
+  primitive 'ord', '_rubyOrd'
 
   primitive 'rstrip', '_rubyRstrip'
   primitive 'rstrip!', '_rubyRstripInPlace'  # in .mcz
@@ -273,6 +273,16 @@ class String
     str
   end
 
+  def __indexOfByte(aCharacter, startingAtIndex)
+    unless aCharacter._isInteger
+      aCharacter = aCharacter.ord
+    end
+    __indexOfByte_int(aCharacter, startingAtIndex)
+  end
+
+  def ord
+    __ord
+  end
 
   def <<(arg)
     __append_internal(arg)

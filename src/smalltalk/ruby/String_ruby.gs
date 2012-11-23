@@ -483,6 +483,11 @@ _rubyCompare1: aString
 %
 
 method:
+_rubyOrd
+  ^ (self forRuby at: 1) asInteger
+%
+
+method:
 _at: anIndex equals: aString
 
  "A Ruby primitive.
