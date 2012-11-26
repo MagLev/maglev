@@ -280,10 +280,6 @@ class String
     __indexOfByte_int(aCharacter, startingAtIndex)
   end
 
-  def ord
-    __ord
-  end
-
   def <<(arg)
     __append_internal(arg)
   end
