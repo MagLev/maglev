@@ -45,6 +45,8 @@ class String
   primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
   # smalltalk code handles Regexp and Fixnum first args
 
+  primitive_nobridge '__at_byte', '_rubyAtByte:'
+
   primitive '__capitalize', 'rubyCapitalize'
 
   # def count(*args); end
@@ -316,9 +318,9 @@ class String
     broke = false
     ea_res = arr.each { |ignore|
       n = 0
-      lim = self.__size
+      lim = self.bytesize
       while n < lim
-        ch = self.__at(n)
+        ch = self.__at_byte(n + 1)
         broke = true
         block.call( ch )
         broke = false
