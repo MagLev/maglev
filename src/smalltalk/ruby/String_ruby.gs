@@ -54,6 +54,12 @@ String _installRubyVariables .
 ^ true
 %
 
+classmethod:
+fromForRuby: anObjectForRuby
+  "see the instance side >>forRuby. creates a String object from aString forRuby"
+  ^ anObjectForRuby encodeAsUTF8 asByteArray asString
+%
+
 method:
 _rubyAddAll: anArg
 
@@ -90,7 +96,7 @@ anOffset isInteger ifTrue: [ | offset |
     ifTrue:[ offset := anOffset + self _rubySize. ]
     ifFalse: [ offset := anOffset].
   (offset < 0 or:[offset >= self _rubySize]) ifTrue:[^ nil].
-  ^ String withBytes: (self forRuby at: offset +1) asString encodeAsUTF8 asByteArray asString
+  ^ String fromForRuby: (self forRuby at: offset +1) asString 
 ].
 anOffset _isOneByteString  ifTrue:[ "a String"  | ofs |
   ofs := self _findString: anOffset startingAt: 1 ignoreCase: false .
@@ -111,7 +117,19 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
 
 method:
 forRuby
+  "use class-side fromForRuby: to create a String out of the returned object"
   ^ (Utf8 fromString: self) asUnicodeString
+%
+
+method:
+forRubyAdaptedTo: aString
+  "the result can contain all characters aString forRuby contains."
+  | selfForRuby otherForRuby |
+  selfForRuby := self forRuby.
+  otherForRuby := aString forRuby.
+  selfForRuby charSize < otherForRuby charSize 
+    ifTrue:[^ otherForRuby class newFrom: selfForRuby].
+  ^ selfForRuby
 %
 
 method:
@@ -137,6 +155,47 @@ _rubySize
 method:
 _rubySize: anInteger
   ^ self size: anInteger
+%
+
+
+method:
+_rubyReplaceFrom: start to: end with: aReplacement
+  | selfForRuby aReplacementForRuby sizeOfTheResultForRuby aResultForRuby indexInResult |
+
+  " check for valid arguments "
+  start <= end ifFalse: [ OffsetError signal:'should be: start <= end!' ].
+  start >= 0 ifFalse: [ OffsetError signal:'should be: start >= 0!' ].
+  end <= self _rubySize ifFalse: [ OffsetError signal:'should be: end < self _rubySize!' ].
+
+  " convert ourselves for ruby "
+  selfForRuby := self forRubyAdaptedTo: aReplacement.
+  aReplacementForRuby := aReplacement forRuby.
+  sizeOfTheResultForRuby := selfForRuby size + aReplacementForRuby size - end + start . 
+  aResultForRuby := selfForRuby class new: sizeOfTheResultForRuby.
+
+  " start putting the result together 
+
+  selfForRuby          [--------------|------------|------------------]
+                       0              start        end                size
+  aReplacementForRuby                 [------------------]
+
+  aResultForRuby       [--------------|------------------|------------------]
+                       0              start                                 sizeOfTheResultForRuby
+  "
+  indexInResult := 1 .
+  1 to: start do: [ :indexInSelfForRuby | 
+    aResultForRuby at: indexInResult put: (selfForRuby at: indexInSelfForRuby).
+    indexInResult := indexInResult + 1 ].
+  1 to: aReplacementForRuby size do: [ :indexInReplacementForRuby |
+    aResultForRuby at: indexInResult put: (aReplacementForRuby at: indexInReplacementForRuby).
+    indexInResult := indexInResult + 1 ].
+  end + 1 to: selfForRuby size do: [ :indexInSelfForRuby | 
+    aResultForRuby at: indexInResult put: (selfForRuby at: indexInSelfForRuby).
+    indexInResult := indexInResult + 1 ].
+
+  " claim the value from the result "
+  self _rubyReplace: (String fromForRuby: aResultForRuby).
+  ^ self
 %
 
 method:
@@ -191,35 +250,52 @@ _rubyAt1: anOffset put: aValue
    Returns aValue
   "
   "<primitive: 690>"
-  anOffset isInteger ifTrue:[ | ofs charToReplace |
-    charToReplace := self _rubyAt1: anOffset.
-    anOffset < 0 
-      ifTrue:[ofs := anOffset + self _rubySize]
-      ifFalse:[ofs := anOffset ].
-    ofs < 0 ifTrue:["TODO: error handling"].
-    ^ self _rubyAt1: ofs length: charToReplace size put: aValue.
+  anOffset _isOneByteString ifTrue:[ ^ self _rubyAt1String: anOffset put: aValue ].
+  anOffset isInteger ifTrue:[ ^ self _rubyAt1Integer: anOffset put: aValue ].
+  anOffset _isRegexp ifTrue:[ ^ self _rubyAt1Regexp: anOffset put: aValue ].
+  anOffset isInterval ifTrue:[ ^ self _rubyAt1Interval: anOffset put: aValue ].
 
-  ].
-
-  anOffset _isOneByteString ifTrue:[  "anOffset is a String"  | argString ofs argSize |
-    argString := anOffset .
-    ofs := self _findString: argString startingAt: 1 ignoreCase: false .
-    ofs == 0 ifTrue:[
-       ^ OffsetError signal:'argument string not found'.
-    ].
-    ^ self _rubyAt1: ofs - 1 length: argString size put: aValue
-    
-  ].
-  anOffset _isRegexp ifTrue:[ "anOffset is a Regexp" |aMatchData mOfs mStart mLimit|
-    aMatchData := anOffset match: self  .
-    aMatchData == nil ifTrue:[
-        ^ OffsetError signal:'argument regex not found'.
-    ].
-    mStart := aMatchData at: 1 . "mStart is zero based "
-    mLimit := aMatchData at: 2 .
-    ^ self _rubyAt1: mStart length: mLimit - mStart  put: aValue
-  ].
   ^ self @ruby1:__prim_at_put_failed: anOffset _: aValue
+
+%
+
+method:
+_rubyAt1Integer: anInteger put: aValue
+  | offset charToReplace |
+  
+  charToReplace := self _rubyAt1: anInteger.
+  anInteger < 0 
+    ifTrue:[offset := anInteger + self _rubySize]
+    ifFalse:[offset := anInteger ].
+  offset < 0 ifTrue:["TODO: error handling"].
+
+  ^ self _rubyReplaceFrom: offset to: offset with: aValue.
+
+%
+
+method:
+_rubyAt1Interval: anInterval put: aValue
+
+%
+method:
+_rubyAt1String: aString put: aValue
+  | offset |
+
+  offset := self _findString: aString startingAt: 1 ignoreCase: false .
+  offset == 0 ifTrue:[
+     ^ OffsetError signal:'argument string not found'.
+  ].
+  ^ self _rubyAt1: offset - 1 length: aString size put: aValue
+%
+
+method:
+_rubyAt1Regexp: aRegexp put: aValue
+  |aMatchData mStart mLimit|
+  aMatchData := aRegexp match: self  .
+  aMatchData == nil ifTrue:[ ^ OffsetError signal:'argument regex not found'. ].
+  mStart := aMatchData at: 1 . "mStart is zero based "
+  mLimit := aMatchData at: 2 .
+  ^ self _rubyAt1: mStart length: mLimit - mStart  put: aValue
 %
 
 method:

@@ -28,6 +28,7 @@ def setUpToDate():
     f.write(myContent)
     f.close()
 update = False
+reloadPrimitivesAtTheEnd = False
 
 # find out the last time we run this script
 lastChanged = ChangeTime(__file__)
@@ -116,11 +117,12 @@ exit
         exit(1)
     update = True
     print('Filein without known errors done!')
+    reloadPrimitivesAtTheEnd = True
 
 ## reload primitives
 rbFileDirectory = os.path.join(maglevHome, 'src/kernel/bootstrap')
 print('Changes  in %s' % rbFileDirectory)
-rbFilesHaveChanged = False
+
 for dirPath, dirNames, fileNames in os.walk(rbFileDirectory):
     for fileName in fileNames:
         if fileName.endswith('.rb'):
@@ -128,8 +130,9 @@ for dirPath, dirNames, fileNames in os.walk(rbFileDirectory):
             filePath = os.path.join(dirPath, fileName)
             if lastChanged < ChangeTime(filePath) + 10:
                 print('\t%s' % fileName)
-                rbFilesHaveChanged = True
-if rbFilesHaveChanged:
+                reloadPrimitivesAtTheEnd = True
+
+if reloadPrimitivesAtTheEnd:
     print('Reload primitives.')
     pipe = subprocess.Popen(['rake maglev:reload_prims'],
                             stdout = subprocess.PIPE, \
