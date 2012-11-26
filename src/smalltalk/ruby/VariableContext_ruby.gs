@@ -11,6 +11,8 @@ set class VariableContext
 
 run
   "allow inherit from Object to support IRB implementation"
-VariableContext removeSelector:#at:put: .
+  " following line fail may raise an Lookup Error "
+[ VariableContext removeSelector:#at:put: ]
+  on: LookupError do: [ :exception | ].
 true
 %
