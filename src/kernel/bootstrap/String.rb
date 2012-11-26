@@ -45,7 +45,8 @@ class String
   primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
   # smalltalk code handles Regexp and Fixnum first args
 
-  primitive_nobridge '__at_byte', '_rubyAtByte:'
+  primitive_nobridge '__at_byte', '_rubyByteAt:'
+  primitive_nobridge '__at_bytes', '_rubyByteAt:length:'
 
   primitive '__capitalize', 'rubyCapitalize'
 

@@ -140,6 +140,20 @@ _rubySize: anInteger
 %
 
 method:
+_rubyByteAt: anOffset length: aCount
+
+ "A ruby primitive.
+  Returns an instance of receiver's class
+   containing specified substring of the receiver,
+   or returns nil if anOffset is out of range.
+  Negative offsets go backwards from end,  -1 means last element.
+  Used by Smalltalk code in MatchData .
+"
+<primitive: 687>
+^ self _primitiveFailed: #_rubyAt:length: args: { anOffset . aCount }
+%
+
+method:
 _rubyAt: anOffset length: aCount
 
  "A ruby primitive.
@@ -154,7 +168,7 @@ _rubyAt: anOffset length: aCount
 %
 
 method:
-_rubyAtByte: anOffset
+_rubyByteAt: anOffset
   ^ (self at: anOffset) asInteger
 %
 
