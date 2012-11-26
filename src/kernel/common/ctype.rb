@@ -7,25 +7,27 @@
 # spec/shotgun/ctype_spec.rb
 
 module CType
+  # TODO: Add Unicode character support
+
   def isctrl
-    self == ?\n or self == ?\r or self == ?\t or self == ?\f or
-    self == ?\v or self == ?\a or self == ?\e or self == ?\b
+    self.size == 1 and (self == ?\n or self == ?\r or self == ?\t or self == ?\f or
+    self == ?\v or self == ?\a or self == ?\e or self == ?\b)
   end
 
   def isspace
-    self == ?\s or self == ?\n or self == ?\t or self == ?\r or self == ?\f or self == ?\v
+    self.size == 1 and (self == ?\s or self == ?\n or self == ?\t or self == ?\r or self == ?\f or self == ?\v)
   end
 
   def isupper
-    self >= ?A and self <= ?Z
+    self.size == 1 and (self >= ?A and self <= ?Z)
   end
 
   def islower
-    self >= ?a and self <= ?z
+    self.size == 1 and (self >= ?a and self <= ?z)
   end
 
   def isdigit
-    self >= ?0 and self <= ?9
+    self.size == 1 and (self >= ?0 and self <= ?9)
   end
 
   def isalnum
@@ -33,7 +35,7 @@ module CType
   end
 
   def toupper!
-    self - ?\s
+    (self.ord - ?\s.ord).chr
   end
 
   def toupper
@@ -41,7 +43,7 @@ module CType
   end
 
   def tolower!
-    self + ?\s
+    (self.ord + ?\s.ord).chr
   end
 
   def tolower

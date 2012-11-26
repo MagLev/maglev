@@ -159,6 +159,11 @@ namespace :build do
     end
   end
 
+  desc "Same as build:filein, but only files modified since the last filein_changes run."
+  task :filein_changes => [:logger] do
+    puts %x(python filein.py)
+  end
+
   desc "Load the files in #{PACKAGES_DIR} into the image (starts and stops stone)"
   task :packages => [:setup_env, NEW_EXTENT, :logger] do
     Dir.chdir FILEIN_DIR do

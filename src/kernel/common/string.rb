@@ -1,5 +1,6 @@
 class String
 
+  include CType
   # primitive '__splice', 'copyReplaceFrom:to:with:' # no longer used
 
   def upto(stop, exclusive=false, &block) # changes for 1.8.7

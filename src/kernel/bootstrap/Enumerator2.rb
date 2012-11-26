@@ -32,7 +32,7 @@ module Enumerable
         raise StopIteration
       end
       @ofs = ofs + 1
-      str.__at(ofs)
+      str.__at_byte(@ofs)
     end
   end
 

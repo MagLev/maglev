@@ -391,7 +391,7 @@ class Regexp
       ch = str[i]
       m_idx = META_CHARS.__indexOfByte(ch, 1)
       if (m_idx > 0)
-        if (ch <= 0x20)   # handle \n \r \f \t and " "
+        if (ch.ord <= 0x20)   # handle \n \r \f \t and " "
           escaped_ch = "\\."
           escaped_ch[1] = META_REPL_CHARS[m_idx - 1]
         else

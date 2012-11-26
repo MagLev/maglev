@@ -45,7 +45,8 @@ class String
   primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
   # smalltalk code handles Regexp and Fixnum first args
 
-  primitive_nobridge '__at_byte', '_rubyAtByte:'
+  primitive_nobridge '__at_byte', '_rubyByteAt:'
+  primitive_nobridge '__at_bytes', '_rubyByteAt:length:'
 
   primitive '__capitalize', 'rubyCapitalize'
 
@@ -1588,7 +1589,7 @@ class String
     lim = self.__size
     while(index < lim)
       char = self.__at(index)
-      return index unless char <= 32 and __is_whitespace(char)  # \t \n etc. are less than space which is 32
+      return index unless char <= 32.chr and __is_whitespace(char)  # \t \n etc. are less than space which is 32
       index += 1
     end
     return index
@@ -1604,7 +1605,7 @@ class String
 
     while current < eos
       char = self.__at(current)
-      if char <= 32 and __is_whitespace(char)
+      if char <= 32.chr and __is_whitespace(char)
         results << self.__at(start, (current - start))
         count += 1
         start = __skip_contiguous_whitespace(current)
