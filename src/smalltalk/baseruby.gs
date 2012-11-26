@@ -53,6 +53,7 @@ input $imageRubyDir/GsCompilerIRNode.gs
 input $imageRubyDir/GsNMethod_ruby.gs
 
 ! Smalltalk env 0 and env1 methods for other base classes
+input $imageRubyDir/Integer_ruby.gs
 input $imageRubyDir/Association_ruby.gs
 input $imageRubyDir/Array_ruby.gs
 input $imageRubyDir/CharacterCollection_ruby.gs
@@ -100,6 +101,7 @@ input $imageRubyDir/RubyTime.gs
 input $imageRubyDir/ProfMonitorTree_ruby.gs
 input $imageRubyDir/ProfMonitorEntry_ruby.gs
 input $imageRubyDir/GsObjectSecurityPolicies.gs
+
 
 expectvalue true
 run
