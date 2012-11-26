@@ -93,21 +93,16 @@ method:
 rubyPrivateSize
   ^ 4 "Hide smalltalk instance variables from ruby (marshal)"
 %
-      
+
+
 category: 'Ruby support'
 method:
-rubyDo: aBlock withLength: aLength
-  | firstValue valueBefore | 
-  self excludeEnd ifFalse: [ ^ super rubyDo: aBlock withLength: aLength].
-  "if we exclude the end instead of 
-    1 2 3 4 5 6
-  we get
-    f 1 2 3 4 5
-  f is the firstValue"
-  valueBefore := Object new.
-  firstValue := valueBefore.
-  super rubyDo: [ :aValue |
-    firstValue ~~ valueBefore ifTrue: [
-      aBlock value: valueBefore].
-    valueBefore := aValue.] withLength: aLength.
+rubyEndForSize: aSize
+  | rubyEnd |
+  rubyEnd := self end < 0
+    ifTrue: [ self end + aSize ]
+    ifFalse: [ self end ].
+  self excludeEnd ifTrue: [ ^ rubyEnd - 1 ].
+  ^ rubyEnd
 %
+

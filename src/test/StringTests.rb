@@ -74,7 +74,7 @@ test( s, "012345678912", "slice appends to end")
 
 s = ":ангел"
 s[2..3] = "р"
-test(s, ":арел", "replace in middle of unicode"  )
+test(s, ":арел", "replace in middle of unicode" )
 
 #### make string bigger
 

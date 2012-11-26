@@ -163,14 +163,14 @@ _rubyReplaceFrom: start to: end with: aReplacement
   | selfForRuby aReplacementForRuby sizeOfTheResultForRuby aResultForRuby indexInResult |
 
   " check for valid arguments "
-  start <= end ifFalse: [ OffsetError signal:'should be: start <= end!' ].
-  start >= 0 ifFalse: [ OffsetError signal:'should be: start >= 0!' ].
-  end <= self _rubySize ifFalse: [ OffsetError signal:'should be: end < self _rubySize!' ].
+  start <= end ifFalse: [ OffsetError signal:'should be: start <= end: ', start asString, ' <= ', end asString ].
+  start >= 0 ifFalse: [ OffsetError signal:'should be: start >= 0: ', start asString, ' >= 0' ].
+  end <= self _rubySize ifFalse: [ OffsetError signal:'should be: end <= self _rubySize: ', end asString, ' <= ', self _rubySize asString ].
 
   " convert ourselves for ruby "
   selfForRuby := self forRubyAdaptedTo: aReplacement.
   aReplacementForRuby := aReplacement forRuby.
-  sizeOfTheResultForRuby := selfForRuby size + aReplacementForRuby size - end + start . 
+  sizeOfTheResultForRuby := selfForRuby size + aReplacementForRuby size - end + start.
   aResultForRuby := selfForRuby class new: sizeOfTheResultForRuby.
 
   " start putting the result together 
@@ -276,20 +276,16 @@ _rubyAt1: anOffset put: aValue
 method:
 _rubyAt1Integer: anInteger put: aValue
   | offset charToReplace |
-  
-  charToReplace := self _rubyAt1: anInteger.
-  anInteger < 0 
-    ifTrue:[offset := anInteger + self _rubySize]
-    ifFalse:[offset := anInteger ].
-  offset < 0 ifTrue:["TODO: error handling"].
-
-  ^ self _rubyReplaceFrom: offset to: offset with: aValue.
+  offset := anInteger < 0 
+    ifTrue:[ anInteger + self _rubySize ]
+    ifFalse:[ anInteger ].
+  ^ self _rubyReplaceFrom: offset to: offset + 1 with: aValue.
 
 %
 
 method:
-_rubyAt1Interval: anInterval put: aValue
-
+_rubyAt1Interval: anInterval put: aReplacement
+  ^ anInterval rubyReplaceIn: self with: aReplacement
 %
 method:
 _rubyAt1String: aString put: aValue
