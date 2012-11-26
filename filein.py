@@ -33,7 +33,7 @@ update = False
 lastChanged = ChangeTime(__file__)
 gitDirectory = os.path.dirname(__file__)
 
-maglevHome = os.environ.get('maglev_home', gitDirectory)
+maglevHome = os.environ.get('MAGLEV_HOME', gitDirectory)
 if not '.git' in os.listdir(maglevHome):
     print('''I expected maglev home to be the git root.''')
     exit(2)
