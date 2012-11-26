@@ -19,6 +19,10 @@ I expected my filename to be in the arguments passed to me..
 would you do me this favor?''')
             exit(1)
 
+if subprocess.call('hash topaz', shell = True) != 0:
+    print('topaz must be callable from the commandline.')
+    exit(10)
+
 ChangeTime = os.path.getctime
 def setUpToDate():
     f = open(__file__)
@@ -80,7 +84,7 @@ exit
                              stdin = subprocess.PIPE, \
                              shell = True)
     output, error = pipe.communicate(topazString)
-    errors = ['unknown command:', '*******']
+    errors = ['unknown command:', '*******', '\nerror', '\nError']
     errorStart = 0
     while 1:
         lastError = len(output)
@@ -100,7 +104,7 @@ exit
             start = output.rfind('\n', 0, start)
         stop = errorStart
         for i in range(3): # lines
-            stop = output.rfind('\n', stop + 1)
+            stop = output.find('\n', stop + 1)
         ## find the name of the bad file
         fileNameIndex = output.rfind('InPuT_FiLe: ', 0, errorStart)
         fileNameEndIndex = output.find('\n', fileNameIndex, errorStart)
