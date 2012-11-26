@@ -185,7 +185,17 @@ _rubyAt1: anOffset put: aValue
 
    Returns aValue
   "
-  <primitive: 690>
+  "<primitive: 690>"
+  anOffset isInteger ifTrue:[ | ofs charToReplace |
+    charToReplace := self _rubyAt1: anOffset.
+    anOffset < 0 
+      ifTrue:[ofs := anOffset + self _rubySize]
+      ifFalse:[ofs := anOffset ].
+    ofs < 0 ifTrue:["TODO: error handling"].
+    ^ self _rubyAt1: ofs length: charToReplace size put: aValue.
+
+  ].
+
   anOffset _isOneByteString ifTrue:[  "anOffset is a String"  | argString ofs argSize |
     argString := anOffset .
     ofs := self _findString: argString startingAt: 1 ignoreCase: false .
@@ -193,6 +203,7 @@ _rubyAt1: anOffset put: aValue
        ^ OffsetError signal:'argument string not found'.
     ].
     ^ self _rubyAt1: ofs - 1 length: argString size put: aValue
+    
   ].
   anOffset _isRegexp ifTrue:[ "anOffset is a Regexp" |aMatchData mOfs mStart mLimit|
     aMatchData := anOffset match: self  .
