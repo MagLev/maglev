@@ -154,6 +154,11 @@ _rubyAt: anOffset length: aCount
 %
 
 method:
+_rubyAtByte: anOffset
+  ^ (self at: anOffset) asInteger
+%
+
+method:
 _rubyAt1: anOffset length: aCount
 
  "A ruby primitive.
