@@ -165,13 +165,13 @@ class Integer
     self
   end
 
+  primitive '__chr', '_rubyChr'
+
   def chr
-      if self > 255 || self < 0
-	  raise RangeError, "#{self} out of char range"
-      end
-      string = ' '
-      string[0] = self
-      string
+    if self > 255 || self < 0
+	    raise RangeError, "#{self} out of char range"
+    end
+    __chr
   end
 
   def divmod(arg)
