@@ -85,7 +85,13 @@ _rubyAt1: anOffset
      returns nil if anOffset is out of range,
      else returns character code at specified position.
   "
-<primitive: 686>
+anOffset isInteger ifTrue: [ | offset |
+  anOffset < 0 
+    ifTrue:[ offset := anOffset + self _rubySize. ]
+    ifFalse: [ offset := anOffset].
+  (offset < 0 or:[offset >= self _rubySize]) ifTrue:[^ nil].
+  ^ String withBytes: (self forRuby at: offset +1) asString encodeAsUTF8 asByteArray asString
+].
 anOffset _isOneByteString  ifTrue:[ "a String"  | ofs |
   ofs := self _findString: anOffset startingAt: 1 ignoreCase: false .
   ofs ~~ 0 ifTrue:[ ^ anOffset ].
@@ -97,7 +103,40 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
   aMatchData ~~ nil ifTrue:[  ^ aMatchData _rubyAt:0 ].
   ^ nil .
 ].
+(anOffset isInterval) ifTrue:[
+  ^ self _rubyAt1Interval: anOffset 
+].
 ^ self @ruby1:__prim_at_failed: anOffset
+%
+
+method:
+forRuby
+  ^ (Utf8 fromString: self) asUnicodeString
+%
+
+method:
+_rubyAt1Interval: anInterval
+  | size result |
+  size := self _rubySize.
+  anInterval begin > size ifTrue: [ ^ nil. ].
+  "anInterval end < anInterval begin ifTrue: [^ String new]."
+  result := String new.
+  anInterval rubyDo: [ :index | 
+    (self _rubyAt1: index)
+      ifNil: [ ^ result ]
+      ifNotNilDo: [ :newCharacter | 
+        result := result,  newCharacter ].
+  ] withLength: size.
+  ^ result.
+%
+
+method:
+_rubySize
+  ^ self forRuby size
+%
+method:
+_rubySize: anInteger
+  ^ self size: anInteger
 %
 
 method:
@@ -124,8 +163,13 @@ _rubyAt1: anOffset length: aCount
   Negative offsets go backwards from end,  -1 means last element.
   For env 1.
 "
-<primitive: 687>
-^ self @ruby1:__prim_at_length_failed: anOffset _: aCount
+  | positiveOffset |
+  aCount < 0 ifTrue: [ ^ nil ].
+  positiveOffset := anOffset < 0 
+      ifTrue: [ anOffset + self _rubySize ]
+      ifFalse: [ anOffset].
+  positiveOffset < 0 ifTrue: [ ^ nil ].
+  ^ self _rubyAt1: (Range from: positiveOffset limit: positiveOffset + aCount)
 %
 
 method:
@@ -316,6 +360,7 @@ self size > 1000000 ifTrue:[
   str add: $" .
   self _rubyQuoteOn: str .
   str add: $" .
+  
   ^ str
 ]
 %
@@ -344,7 +389,7 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
     c := self at: n .
     c == $# ifTrue:[ | nextByte |
       nextByte := self _rubyAt1: n  .  "atOrNil: n + 1"
-      (nextByte == 36 or:[ nextByte == 64 or:[ nextByte == 123]]) ifFalse:[
+      (nextByte = '$' or:[ nextByte = '@' or:[ nextByte = '{']]) ifFalse:[
          "next char not one of  $  @  {  ,  do not escape " 
         aString add: c .
         chDone  := true .
@@ -354,8 +399,8 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
       av := c asciiValue .
       xlated := RubyEscapeTranslationTable at: (av + 1) .
       (xlated == 0) ifTrue: [
-	(av between: 32 and: 126) ifTrue: [
-	  aString add: c
+	(av between: 32 and: 300) ifTrue: [
+	  aString add: c.
 	] ifFalse: [
 	  vArr at: 1 put: av .
 	  aString addAll: (Module sprintf:'\%03o' with: vArr)
@@ -383,7 +428,7 @@ rubySelectorPrefix
   | sz |
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
-  (self _rubyAt1: -4) == 35"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
+  (self _rubyAt1: -4) = '#'"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
 
   self _primitiveFailed: #rubySelectorPrefix args: #() .
 %
@@ -404,7 +449,7 @@ rubySelectorPrefixSymbol
   | sz |
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
-  (self _rubyAt1: -4) == 35"$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
+  (self _rubyAt1: -4) = '#' "$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
   self _primitiveFailed: #rubySelectorPrefixSymbol args: #() .
 %
 
@@ -435,6 +480,11 @@ _rubyCompare1: aString
   "A Ruby primitive"
   <primitive: 844>
   ^ self @ruby1:__prim_compare_failed: aString
+%
+
+method:
+_rubyOrd
+  ^ (self forRuby at: 1) asInteger
 %
 
 method:

@@ -9,7 +9,7 @@ set class System
 
 !  additional methods  for System to support Ruby 
 
-category: 'Ruby Support'
+category: 'Ruby support'
 classmethod:
 enableContinuations
 

@@ -9,7 +9,7 @@ set class Repository
 
 !  additional methods  for Repository to support Ruby 
 
-category: 'Ruby Support'
+category: 'Ruby support'
 classmethod: 
 _loadedClasses: includeModules
   

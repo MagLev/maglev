@@ -12,10 +12,10 @@ irMethodNode: envId forClass: aClass
       scope extraArgs: argsNode extraArgs .
       self useScope: scope during:[ | lastNormalArgIdx |
          lastNormalArgIdx := argsNode buildMethodArgumentsOn: node implicitBlk: hasBlockArgRef .
-         (prefix _rubyAt1: -1) ==  61"$= asciiValue"  ifTrue:[ | secLast |
+         (prefix _rubyAt1: -1) = '=' "$= asciiValue"  ifTrue:[ | secLast |
            secLast := prefix _rubyAt1: -2 .
            secLast ifNotNil:[ 
-             secLast := Character withValue: secLast .
+             secLast := Character fromString: secLast .
              (secLast == $]  or:[ secLast isAlphaNumeric]) ifTrue:[
                "Example:  def foo=(a,b); end   # default return value is b , per Trac 785"
                node rubyDefaultReturnArg: lastNormalArgIdx .

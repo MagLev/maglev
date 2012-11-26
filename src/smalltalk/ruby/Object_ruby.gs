@@ -42,6 +42,10 @@ _isRubyString
 ^ self _isRubyString
 %
 
+method:
+isInterval
+  ^ false
+%
 
 category: 'Ruby compare'
 method:
@@ -71,7 +75,7 @@ envId == 1  ifTrue: [ |  prefix |
   prefix := aSymbol rubySelectorPrefixSymbol .   "Fix Trac 913"
   "prefix == #'a_prefix' ifTrue:[ nil pause ].  uncomment for debugging Ruby DNU"
   prefix ~~ #method_missing ifTrue:[
-    (aSymbol _rubyAt1: -1) == 16r26 "== $& " ifTrue:[ | args blk |
+    (aSymbol _rubyAt1: -1) = '&' "== $& " ifTrue:[ | args blk |
       args := anArray _rubyAt: 0 length: anArray size - 1 .
       blk := anArray _rubyAt: -1 .
       ^ self @ruby1:method_missing: prefix __STAR: args __BLOCK: blk 

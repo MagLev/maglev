@@ -7,8 +7,8 @@ selectors4moreArgs: baseSel  env: envId
   | aDict selSet  blk |
   selSet := IdentitySet new .
   blk := [:aKey | | nFixed | 
-     (aKey _rubyAt1: -4) == 35 "$#" ifTrue:[  "it is a ruby selector"
-       nFixed := (aKey _rubyAt1: -3) - 48"$0" .
+     (aKey _rubyAt1: -4) = '#' "$#" ifTrue:[  "it is a ruby selector"
+       nFixed := ((aKey _rubyAt1: -3) at: 1) asciiValue - 48"$0" .
        (nFixed > 3 and:[ aKey at: 1 equals: baseSel ]) ifTrue:[  selSet add: aKey ].
      ].
   ].
