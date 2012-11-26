@@ -57,62 +57,62 @@ module Marshal
     def construct(ivar_index = nil, call_proc = true) # [
       type = consume_byte
 
-      if type._equal?(TYPE_NIL_ch)
+      if type.eql?(TYPE_NIL_ch)
         obj = nil
-      elsif type._equal?( TYPE_TRUE_ch )
+      elsif type.eql?( TYPE_TRUE_ch )
         obj = true
-      elsif type._equal?( TYPE_FALSE_ch )
+      elsif type.eql?( TYPE_FALSE_ch )
         obj = false
-      elsif type._equal?( TYPE_FIXNUM_ch )
+      elsif type.eql?( TYPE_FIXNUM_ch )
         obj = construct_integer
-      elsif type._equal?( TYPE_LINK_ch )
+      elsif type.eql?( TYPE_LINK_ch )
         num = construct_integer
         obj = @objs_input_arr[num]
         raise ArgumentError, "dump format error (unlinked)" if obj._equal?(nil)
         return obj
-      elsif type._equal?( TYPE_SYMLINK_ch )
+      elsif type.eql?( TYPE_SYMLINK_ch )
         num = construct_integer
         obj = @syms_input_arr[num]
         raise ArgumentError, "dump format error (symbol unlinked)" if obj._equal?(nil)
         return obj
-      elsif type._equal?( TYPE_STRING_ch)
+      elsif type.eql?( TYPE_STRING_ch)
         obj = construct_string
         call obj if call_proc
-      elsif type._equal?( TYPE_ARRAY_ch )
+      elsif type.eql?( TYPE_ARRAY_ch )
         obj = construct_array
         call obj if call_proc
-      elsif type._equal?( TYPE_SYMBOL_ch )
+      elsif type.eql?( TYPE_SYMBOL_ch )
         obj = construct_symbol
-      elsif type._equal?( TYPE_FLOAT_ch )
+      elsif type.eql?( TYPE_FLOAT_ch )
         obj = construct_float
         store_unique_object(obj)
-      elsif type._equal?( TYPE_BIGNUM_ch )
+      elsif type.eql?( TYPE_BIGNUM_ch )
         obj = construct_bignum
-      elsif type._equal?( TYPE_CLASS_ch) || type._equal?( TYPE_MODULE_ch)
+      elsif type.eql?( TYPE_CLASS_ch) || type.eql?( TYPE_MODULE_ch)
         name = construct_symbol
         #obj = Object.const_get(name)
         obj = get_scoped_constant(name)
         store_unique_object(obj)
         call obj if call_proc
-      elsif type._equal?( TYPE_REGEXP_ch )
+      elsif type.eql?( TYPE_REGEXP_ch )
         obj = construct_regexp
         call obj if call_proc
-      elsif type._equal?( TYPE_HASH_ch) || type._equal?( TYPE_HASH_DEF_ch)
+      elsif type.eql?( TYPE_HASH_ch) || type.eql?( TYPE_HASH_DEF_ch)
         obj = construct_hash(type)
         call obj if call_proc
-      elsif type._equal?( TYPE_STRUCT_ch )
+      elsif type.eql?( TYPE_STRUCT_ch )
         obj = construct_struct
         call obj if call_proc
-      elsif type._equal?( TYPE_OBJECT_ch )
+      elsif type.eql?( TYPE_OBJECT_ch )
         obj = construct_object
         call obj if call_proc
-      elsif type._equal?( TYPE_USERDEF_ch )
+      elsif type.eql?( TYPE_USERDEF_ch )
         obj = construct_user_defined ivar_index
         call obj if call_proc
-      elsif type._equal?( TYPE_USRMARSHAL_ch )
+      elsif type.eql?( TYPE_USRMARSHAL_ch )
         obj = construct_user_marshal
         call obj if call_proc
-      elsif type._equal?( TYPE_EXTENDED_ch )
+      elsif type.eql?( TYPE_EXTENDED_ch )
         @modules ||= []
         name = get_symbol
         # @modules << Object.const_get(name)
@@ -121,13 +121,13 @@ module Marshal
         extend_object( obj)
         call obj if call_proc
 
-      elsif type._equal?( TYPE_UCLASS_ch )
+      elsif type.eql?( TYPE_UCLASS_ch )
         name = get_symbol
         @user_class = name
         obj = construct( nil, false)
         call obj if call_proc
 
-      elsif type._equal?( TYPE_IVAR_ch )
+      elsif type.eql?( TYPE_IVAR_ch )
         ivar_index = @has_ivar.length
         @has_ivar.push(true)
         obj = construct(ivar_index, false)
@@ -170,7 +170,7 @@ module Marshal
     def construct_float
       s = get_byte_sequence
       last_ch = s[-1]
-      if last_ch._equal?( ?n ) || last_ch._equal?( ?f )
+      if last_ch.eql?( ?n ) || last_ch.eql?( ?f )
         if s == "nan"
           obj = 0.0.__divide(0.0)
         elsif s == "inf"
@@ -204,7 +204,7 @@ module Marshal
         obj.__atkey_put(key,val)
       end
 
-      obj.default = construct if type._equal?( TYPE_HASH_DEF_ch)
+      obj.default = construct if type.eql?( TYPE_HASH_DEF_ch)
 
       obj
     end
@@ -343,7 +343,7 @@ module Marshal
 
     def consume(byte_count)
       idx = @consumed
-      data = @stream[idx, byte_count]
+      data = @stream.__at_bytes(idx, byte_count)
       idx += byte_count
       @consumed = idx
       data
@@ -351,7 +351,7 @@ module Marshal
 
     def consume_byte
       idx = @consumed
-      ch = @stream[idx]
+      ch = @stream.__at_byte(idx + 1)
       idx += 1
       @consumed = idx
       ch
@@ -414,11 +414,11 @@ module Marshal
 
     def get_symbol
       type = consume_byte
-      if type._equal?(TYPE_SYMBOL_ch)
+      if type.eql?(TYPE_SYMBOL_ch)
         @call = false
         obj = construct_symbol
         @call = true
-      elsif type._equal?(TYPE_SYMLINK_ch)
+      elsif type.eql?(TYPE_SYMLINK_ch)
         num = construct_integer
         obj = @syms_input_arr[num]
       else

@@ -78,7 +78,7 @@ class String
     out << ms.serialize_extended_object(self)
     out << ms.serialize_user_class(self, String)
     out << Marshal__TYPE_STRING
-    out << ms.serialize_integer(self.length) << self
+    out << ms.serialize_integer(self.bytesize) << self
     ivs = ivars[0]
     if ivs.__size._not_equal?(0)
       out << ms.serialize_instance_variables_suffix(self, ivs)

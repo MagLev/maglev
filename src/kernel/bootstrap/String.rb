@@ -1589,7 +1589,7 @@ class String
     lim = self.__size
     while(index < lim)
       char = self.__at(index)
-      return index unless char <= 32 and __is_whitespace(char)  # \t \n etc. are less than space which is 32
+      return index unless char <= 32.chr and __is_whitespace(char)  # \t \n etc. are less than space which is 32
       index += 1
     end
     return index
@@ -1605,7 +1605,7 @@ class String
 
     while current < eos
       char = self.__at(current)
-      if char <= 32 and __is_whitespace(char)
+      if char <= 32.chr and __is_whitespace(char)
         results << self.__at(start, (current - start))
         count += 1
         start = __skip_contiguous_whitespace(current)
