@@ -576,7 +576,7 @@ class String
       diminish_by = 0
       if last_ch.eql?( ?\n )
         diminish_by += 1 if self.__at(-2).eql?( ?\r ) && my_size > 1
-      elsif last_ch._not_equal?( ?\r )
+      elsif not last_ch.eql?(?\r)
         return nil
       end
       diminish_by += 1
