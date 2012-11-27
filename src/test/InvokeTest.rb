@@ -22,6 +22,9 @@ test_cases =  [
   Struct::TC.new(here + '/lib', "./", "./echo__FILE__.rb\n"),
   Struct::TC.new(here, 'lib/', "lib/echo__FILE__.rb\n"),
   Struct::TC.new(here, "#{here}/lib/", "#{here}/lib/echo__FILE__.rb\n"),
+  # For the next line to pass do this in the command line: 
+  # sudo chmod o+w /
+  # because it needs read and write in / 
   Struct::TC.new('/',  "#{here[1..-1]}/lib/", "#{here[1..-1]}/lib/echo__FILE__.rb\n"),
 ]
 
