@@ -28,7 +28,7 @@ module Enumerable
       # return an element,  @obj[ofs]
       str = @obj
       ofs = @ofs
-      if ofs >= str.__size
+      if ofs >= str.bytesize
         raise StopIteration
       end
       @ofs = ofs + 1
