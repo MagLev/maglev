@@ -926,9 +926,9 @@ class String
       elsif cap.eql?( ?' )
         result << match.post_match
       elsif cap.eql?( ?+ )
-        result << match.captures.compact.__at(-1).to_s
+        result << match.captures.compact.__at(-1)
       elsif cap >= ?0 && cap <= ?9
-        result << match.__at(cap - ?0 ).to_s
+        result << match.__at(cap.ord - ?0.ord)
       elsif cap.eql?( ?\\ ) # escaped backslash
         result << '\\'
       else     # unknown escape
