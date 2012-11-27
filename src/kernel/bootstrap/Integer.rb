@@ -167,11 +167,16 @@ class Integer
 
   primitive '__chr', '_rubyChr'
 
-  def chr
-    if self > 255 || self < 0
-	    raise RangeError, "#{self} out of char range"
+  def chr(encoding = 'ASCII-8BIT')
+    if encoding == 'ASCII-8BIT':
+      if self > 255 || self < 0
+	      raise RangeError, "#{self} out of char range"
+      end
+      return __chr
     end
-    __chr
+    if encoding == 'UTF-8'
+      return __chr
+    end
   end
 
   def divmod(arg)
