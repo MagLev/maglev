@@ -41,4 +41,4 @@ src/kernel/parser/byacc/makefile
 src/kernel/parser/byacc/yacc
 src/test/capi/Makefile
 etc/maglev.hpi.key
-test
+/test

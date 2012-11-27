@@ -73,7 +73,7 @@ test( s, "012345678912", "slice appends to end")
 #### make string smaller
 
 s = ":ангел"
-s[2..3] = "р"
+s[2...4] = "р"
 test(s, ":арел", "replace in middle of unicode" )
 
 #### make string bigger

@@ -160,12 +160,19 @@ _rubySize: anInteger
 
 method:
 _rubyReplaceFrom: start to: end with: aReplacement
+  " replace from start to end including end "
+  ^ self _rubyReplaceFrom: start limit: end + 1 with: aReplacement
+%
+
+method:
+_rubyReplaceFrom: start limit: end with: aReplacement
+  " replace from start to end excluding end "
   | selfForRuby aReplacementForRuby sizeOfTheResultForRuby aResultForRuby indexInResult |
 
   " check for valid arguments "
-  start <= end ifFalse: [ OffsetError signal:'should be: start <= end: ', start asString, ' <= ', end asString ].
-  start >= 0 ifFalse: [ OffsetError signal:'should be: start >= 0: ', start asString, ' >= 0' ].
-  end <= self _rubySize ifFalse: [ OffsetError signal:'should be: end <= self _rubySize: ', end asString, ' <= ', self _rubySize asString ].
+  start <= end ifFalse: [ OffsetError signal:'out of string: start <= end: ', start asString, ' <= ', end asString ].
+  start >= 0 ifFalse: [ OffsetError signal:'out of string: start >= 0: ', start asString, ' >= 0' ].
+  end <= self _rubySize ifFalse: [ OffsetError signal:'out of string: end <= self _rubySize: ', end asString, ' <= ', self _rubySize asString ].
 
   " convert ourselves for ruby "
   selfForRuby := self forRubyAdaptedTo: aReplacement.
@@ -241,13 +248,48 @@ _rubyAt1: anOffset length: aCount
   Negative offsets go backwards from end,  -1 means last element.
   For env 1.
 "
+  | aRange |
+  aRange := self 
+      _rubyRangeAt: anOffset 
+      length: aCount 
+      onNegativeOffsetDo: [ ^ nil ]
+      onNegativeCountDo: [ ^ nil ].
+
+  ^ self _rubyAt1: aRange
+%
+
+method:
+_rubyAt1: anOffset length: aCount put: aString
+
+  "If anOffset is an SmallInteger,  anOffset is zero based , and
+   replace elements anOffset .. aCount-1 of receiver with contents of aString .
+
+   If anOffset is a Regexp , replace the portion of the receiver
+   specified by  (anOffset.match(self))[aCount] with aString ,
+   where aCount is zero based.
+
+   returns aString."
+  | aRange |
+  anOffset _isRegexp ifTrue: [ self error: 'This marvelous feature is not yet implemented. TODO!' ].
+
+  aRange := self 
+      _rubyRangeAt: anOffset 
+      length: aCount 
+      onNegativeOffsetDo: [OffsetError signal: 'index ', anOffset asString, ' out of string']
+      onNegativeCountDo: [ OffsetError signal: 'negative length ', aCount asString].
+
+  ^ self _rubyAt1: aRange put: aString
+%
+
+method:
+_rubyRangeAt: anOffset length: aCount onNegativeOffsetDo: anOffsetBlock onNegativeCountDo: aCountBlock
   | positiveOffset |
-  aCount < 0 ifTrue: [ ^ nil ].
+  aCount < 0 ifTrue: aCountBlock.
   positiveOffset := anOffset < 0 
       ifTrue: [ anOffset + self _rubySize ]
       ifFalse: [ anOffset].
-  positiveOffset < 0 ifTrue: [ ^ nil ].
-  ^ self _rubyAt1: (Range from: positiveOffset limit: positiveOffset + aCount)
+  positiveOffset < 0 ifTrue: anOffsetBlock.
+  ^ (Range from: positiveOffset limit: positiveOffset + aCount).
 %
 
 method:
@@ -279,7 +321,7 @@ _rubyAt1Integer: anInteger put: aValue
   offset := anInteger < 0 
     ifTrue:[ anInteger + self _rubySize ]
     ifFalse:[ anInteger ].
-  ^ self _rubyReplaceFrom: offset to: offset + 1 with: aValue.
+  ^ self _rubyReplaceFrom: offset to: offset with: aValue.
 
 %
 
@@ -308,88 +350,6 @@ _rubyAt1Regexp: aRegexp put: aValue
   ^ self _rubyAt1: mStart length: mLimit - mStart  put: aValue
 %
 
-method:
-_rubyAt1: offsetArg length: aCount put: aString
-
-  "If offsetArg is an SmallInteger,  anOffset is zero based , and
-   replace elements anOffset .. aCount-1 of receiver with contents of aString .
-
-   If offsetArg is a Regexp , replace the portion of the receiver
-   specified by  (offsetArg.match(self))[aCount] with aString ,
-   where aCount is zero based.
-
-   returns aString."
-
-  | anOffset valSize start end rcvrSize newSize matchSize cnt |
-  aCount _isSmallInteger ifFalse:[
-    ^ self @ruby1:__prim_at_length_put_failed: offsetArg _: aCount _: aString
-  ].
-  aString _isOneByteString ifFalse:[
-    ^ self @ruby1:__prim_at_length_put_failed: offsetArg _: aCount _: aString
-  ].
-  anOffset := offsetArg .
-  offsetArg _isSmallInteger ifTrue:[
-    rcvrSize := self size .
-    start := anOffset .  "zero based, first elem to replace"
-    start < 0 ifTrue:[ 
-      start := start + rcvrSize .
-      start < 0 ifTrue:[ ^ OffsetError signal: 'String#[index,count]=str, index too small' ].
-    ].
-    start > rcvrSize ifTrue:[ ^ OffsetError signal: 'String#[index,count]=str, index too large'].
-    aCount < 0 ifTrue:[ OffsetError signal: 'String#[index,count]= , count < 0' ].
-    end := start + aCount - 1 . "end is zero based, last elem to replace"
-    end >= rcvrSize ifTrue:[ end := rcvrSize - 1 ].
-    matchSize := end - start + 1 .
-  ] ifFalse:[ "expect a Regexp "  | aMatchData mOfs |
-    anOffset _isRegexp ifFalse:[
-      ^ self @ruby1:__prim_at_length_put_failed: offsetArg _: aCount _: aString
-    ].
-    aMatchData := anOffset"aRegexp" match: self  . "anOffset is a Regexp"
-    aMatchData == nil ifTrue:[
-       ^ OffsetError signal:'argument regex not found'.
-    ].
-    aCount < 0 ifTrue:[  
-      cnt := (aMatchData size // 2) "nMatches" + aCount .
-      cnt <= 0 ifTrue:[ ^ OffsetError signal:'String#[regexp,count] , count out of range'].
-      mOfs := (cnt * 2) + 1 .
-    ] ifFalse:[
-      mOfs := (aCount * 2) + 1 . "mOfs is one based"
-      mOfs > aMatchData size ifTrue:[ 
-         ^ OffsetError signal:'String#[regexp,count] , count out of range'
-      ]
-    ].
-    start := (aMatchData at: mOfs)  . "(zero based matchStart)  "
-    end := aMatchData at: mOfs + 1 .     "zero based matchLimit == zero-based end"
-    matchSize := end - start .
-    rcvrSize := self size .
-  ].
-  start := start + 1 . "convert to one based"
-  end := end + 1 .
-  valSize := aString size .
-  newSize := rcvrSize + valSize - matchSize .
-  newSize < 0 ifTrue: [
-    self size: 0 .
-    ^ aString .
-  ] .
-  valSize < matchSize ifTrue:[ "shrinking receiver"
-    end < rcvrSize ifTrue: [  
-      self replaceFrom:  (cnt := start + valSize)"destIdx" 
-           to: cnt + rcvrSize - (end + 1) with: self startingAt: end + 1
-    ] .
-    self size: newSize .
-  ] ifFalse:[ "growing receiver" 
-      self size: newSize .
-      cnt "numToSave" := rcvrSize - end .
-      cnt > 0 ifTrue:[
-        self replaceFrom: (cnt := newSize - cnt + 1) 
-             to: cnt + rcvrSize - (end + 1) with: self startingAt: end + 1 .
-      ].
-  ].
-  valSize ~~ 0 ifTrue: [
-    self replaceFrom: start to: start + valSize - 1 with: aString startingAt: 1 
-  ] .
-  ^ aString
-%
 
 
 method:

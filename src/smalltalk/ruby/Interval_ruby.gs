@@ -41,10 +41,11 @@ rubyEndForSize: aSize
 method:
 rubyReplaceIn: aString with: aReplacement
   | aStringsSize end |
-  aStringsSize := aString size.
+  aStringsSize := aString _rubySize.
   end := (self rubyEndForSize: aStringsSize).
-  end > aStringsSize ifTrue: [ end := aStringsSize ].
+  end >= aStringsSize ifTrue: [ end := aStringsSize - 1].
   ^ aString _rubyReplaceFrom: (self rubyBeginForSize: aStringsSize) 
             to: end
             with: aReplacement
 %
+
