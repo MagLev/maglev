@@ -255,14 +255,30 @@ _rubyAt1: anOffset length: aCount
   Negative offsets go backwards from end,  -1 means last element.
   For env 1.
 "
+  anOffset _isRegexp ifTrue: [^ self _rubyAt1Regexp: anOffset length: aCount ].
+  anOffset isInteger ifTrue: [^ self _rubyAt1Integer: anOffset length: aCount ].
+
+%
+
+method:
+_rubyAt1Integer: anInteger length: aCount
   | aRange |
   aRange := self 
-      _rubyRangeAt: anOffset 
+      _rubyRangeAt: anInteger 
       length: aCount 
       onNegativeOffsetDo: [ ^ nil ]
       onNegativeCountDo: [ ^ nil ].
 
   ^ self _rubyAt1: aRange
+%
+
+method:
+_rubyAt1Regexp: anRegexp length: aCount
+  |aMatchData |
+  aMatchData := anRegexp match: self .
+  aMatchData _storeRubyVcGlobal: 16r20 . "store into caller's $~ "
+  aMatchData ~~ nil ifTrue:[  ^ aMatchData _rubyAt: aCount].
+  ^ nil .
 %
 
 method:
