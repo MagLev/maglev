@@ -90,7 +90,7 @@ class String
 
   primitive_nobridge '__reverse_from', '_reverseFrom:'
 
-  primitive_nobridge '__lastSubstring', 'findLastSubString:startingAt:'
+  primitive_nobridge '__lastSubstring', '_rubyFindLastSubString:startingAt:'
   primitive_nobridge '__indexOfLastByte', 'indexOfLastByte:startingAt:'
   primitive_nobridge '__indexOfByte_int', 'indexOfByte:startingAt:'  # one-based offset/result
   primitive 'ord', '_rubyOrd'
@@ -293,7 +293,7 @@ class String
     if arg._isFixnum
       # raise TypeError, "<<: #{arg} out of range" if arg < 0 or arg > 255 # in prim
       # range checked in  __append primitive
-      other = arg
+      other = arg.chr('UTF-8')
     else
       other = Type.coerce_to(arg, String, :to_str)
     end
@@ -574,8 +574,8 @@ class String
     if sep == "\n"
       last_ch = self.__at(-1)
       diminish_by = 0
-      if last_ch._equal?( ?\n )
-        diminish_by += 1 if self.__at(-2)._equal?( ?\r ) && my_size > 1
+      if last_ch.eql?( ?\n )
+        diminish_by += 1 if self.__at(-2).eql?( ?\r ) && my_size > 1
       elsif last_ch._not_equal?( ?\r )
         return nil
       end
@@ -585,8 +585,8 @@ class String
       separator_sz = sep.__size
       if separator_sz._equal?(0)
         sz = my_size
-        while sz > 0 && self.__at(sz-1)._equal?( ?\n )
-          if sz > 1 && self.__at(sz-2)._equal?( ?\r )
+        while sz > 0 && self.__at(sz-1).eql?( ?\n )
+          if sz > 1 && self.__at(sz-2).eql?( ?\r )
             sz -= 2
           else
             sz -= 1
@@ -637,8 +637,8 @@ class String
   def chop!
     my_size = self.__size
     if my_size._not_equal?( 0 )
-      if self.__at(-1)._equal?( ?\n )
-        if my_size > 1 && self.__at(-2)._equal?( ?\r )
+      if self.__at(-1).eql?( ?\n )
+        if my_size > 1 && self.__at(-2).eql?( ?\r )
           self.__size=(my_size - 2)
         else
           self.__size=(my_size - 1)
@@ -729,12 +729,12 @@ class String
       end
     elsif sep_size._equal?(0)
       while i < my_size
-        if self.__at(i)._equal?( ?\n )
+        if self.__at(i).eql?( ?\n )
           if self.__at(i+=1)._not_equal?( ?\n )
             i += 1
             next
           end
-          i += 1 while i < my_size && self.__at(i)._equal?( ?\n )
+          i += 1 while i < my_size && self.__at(i).eql?( ?\n )
         end
         if i > 0 && self.__at(i-1)._equal?( newline )
           line = self.__at(last, i-last)
@@ -919,17 +919,17 @@ class String
       index = current + 1
 
       cap = self.__at(index)
-      if cap._equal?( ?& )
+      if cap.eql?( ?& )
         result << match.__at(0)
-      elsif cap._equal?( ?` )
+      elsif cap.eql?( ?` )
         result << match.pre_match
-      elsif cap._equal?( ?' )
+      elsif cap.eql?( ?' )
         result << match.post_match
-      elsif cap._equal?( ?+ )
+      elsif cap.eql?( ?+ )
         result << match.captures.compact.__at(-1).to_s
       elsif cap >= ?0 && cap <= ?9
         result << match.__at(cap - ?0 ).to_s
-      elsif cap._equal?( ?\\ ) # escaped backslash
+      elsif cap.eql?( ?\\ ) # escaped backslash
         result << '\\'
       else     # unknown escape
         result << '\\'
@@ -1044,7 +1044,7 @@ class String
     ch = self.__at(idx)
     while idx < lim
       nxt = self.__at(idx + 1)
-      if ch._equal?( ?_ ) && nxt._equal?( ?_ )
+      if ch.eql?( ?_ ) && nxt.eql?( ?_ )
         str = self.dup
         str[idx] = ?Z
         return str
@@ -1063,7 +1063,7 @@ class String
     ch = str.__at(idx)
     while idx < lim
       nxt = str.__at(idx + 1)
-      if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
+      if ch.eql?( ?_ ) && nxt._not_equal?( ?_ )
         dest_idx = idx
         break
       end
@@ -1072,7 +1072,7 @@ class String
     end
     while idx < lim
       nxt = str.__at(idx + 1)
-      if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
+      if ch.eql?( ?_ ) && nxt._not_equal?( ?_ )
         # do not include ch in result
       else
         str[dest_idx] = ch
@@ -1094,7 +1094,7 @@ class String
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
     sign_str = $1
     num = Integer.__from_string_radix( $3 , 16)
-    if sign_str[0]._equal?( ?- )
+    if sign_str[0].eql?( ?- )
       num = num * -1
     end
     num
@@ -1234,11 +1234,11 @@ class String
     sign_str = arr.__at(1)
     body = arr.__at(2)
     first_ch = body.__at(0)
-    if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
+    if first_ch.eql?( ?+ ) || first_ch.eql?( ?- )
       return 0  # redundant sign character is not an octal digit
     end
     num = Integer.__from_string_radix(body, base)
-    if sign_str[0]._equal?( ?- )
+    if sign_str[0].eql?( ?- )
       num = num * -1
     end
     num
@@ -1309,7 +1309,7 @@ class String
 
   def __rindex(item, original_offset, vcgl_idx)
     my_size = self.__size
-    if my_size._equal?(0)
+    if my_size._equal?(0) and item.__size._not_equal?(0)
       return nil
     end
     if original_offset._equal?(MaglevUndefined)
@@ -1574,11 +1574,11 @@ class String
   end
 
   def __is_whitespace(char)
-    char._equal?(?\ ) ||
-      char._equal?(?\t) ||
-      char._equal?(?\n) ||
-      char._equal?(?\r) ||
-      char._equal?(?\v)
+    char.eql?(?\ ) ||
+      char.eql?(?\t) ||
+      char.eql?(?\n) ||
+      char.eql?(?\r) ||
+      char.eql?(?\v)
   end
 
   # Skip contiguous whitespace starting at index and return the index of
@@ -1884,8 +1884,8 @@ class String
     base = Type.coerce_to(base, Integer, :to_int)
     if base._equal?(10)
       str = self
-      if self.__at(0)._equal?( ?0 ) && self.__at(1)._equal?( ?d )
-        if self.__at(2)._equal?( ?- )
+      if self.__at(0).eql?( ?0 ) && self.__at(1).eql?( ?d )
+        if self.__at(2).eql?( ?- )
           return 0 # sign must come before base specifier
         end
         str = self.__at(2, self.__size - 2)
@@ -1905,7 +1905,7 @@ class String
       if exp_prefix._not_equal?(nil)
         prefix = self.__at(0,2)
         if prefix == exp_prefix
-          if self.__at(2)._equal?( ?- )
+          if self.__at(2).eql?( ?- )
             return 0 # sign must come before base specifier
           end
           str = self.__at(2, self.__size - 2)
@@ -1932,7 +1932,7 @@ class String
     else
       s = str
       first_ch = s.__at(0)
-      if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
+      if first_ch.eql?( ?+ ) || first_ch.eql?( ?- )
         s = s.__at(1, s.__size - 1)
       end
     end
@@ -1955,7 +1955,7 @@ class String
       end
     end
     num = Integer.__from_string_radix(str, base)
-    if sign_str._not_equal?(nil) && sign_str[0]._equal?( ?- )
+    if sign_str._not_equal?(nil) && sign_str[0].eql?( ?- )
       num = num * -1
     end
     num
@@ -1977,10 +1977,6 @@ class String
     else
       String.new(self)
     end
-  end
-
-  def to_s2
-    to_s
   end
 
   alias to_sym intern

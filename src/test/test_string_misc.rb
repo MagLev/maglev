@@ -1,3 +1,4 @@
+# encoding: utf-8
 # Misellaneous tests for string (e.g., regressions and random corner cases)
 
 require File.expand_path('simple', File.dirname(__FILE__))
@@ -6,15 +7,15 @@ require File.expand_path('simple', File.dirname(__FILE__))
 
 #
 
-test 'fooo'.rindex('oo'),    2,   "GemStone rindex A"
-test 'foooo'.rindex('oo'),   3,   "GemStone rindex B" # throws ST error...
-test 'abcabc'.rindex('abc'), 3,   "GemStone rindex C"
-test 'abcabc'.rindex('xyz'), nil, "GemStone rindex D"
-test ''.rindex('abc'),       nil, "GemStone rindex E"
-test ''.rindex(''),          nil,   "GemStone rindex F"
-test 'abc'.rindex(''),       3,   "GemStone rindex G"
-test 'ruby.rbx'.rindex('x'), 7,   "GemStone rindex H"  # Regression
-test 'rubx.rbx'.rindex('x'), 7,   "GemStone rindex I"  # Regression
+test 'äooo'.rindex('oo'),    2,   "GemStone rindex A"
+test 'äoooo'.rindex('oo'),   3,   "GemStone rindex B" # throws ST error...
+test 'äbcabc'.rindex('abc'), 3,   "GemStone rindex C"
+test 'äbcabc'.rindex('xyz'), nil, "GemStone rindex D"
+test ''.rindex('äbc'),       nil, "GemStone rindex E"
+test ''.rindex(''),          0,   "GemStone rindex F"
+test 'äbc'.rindex(''),       3,   "GemStone rindex G"
+test 'äuby.rbx'.rindex('x'), 7,   "GemStone rindex H"  # Regression
+test 'äubx.rbx'.rindex('x'), 7,   "GemStone rindex I"  # Regression
 
 s = "-rw-r--r--  1 650  0  0 Oct 20  1999 /tmp/FileStatTest-234\n"
 test s.split, ["-rw-r--r--", "1", "650", "0", "0", "Oct", "20", "1999", "/tmp/FileStatTest-234"], "GemStone split A"
@@ -101,7 +102,8 @@ test('zzz'.succ, 'aaaa', '"zzz".succ')
 r = ''
 255.times { |i| r << i }
 ins = r.inspect
-expected = "\"\\000\\001\\002\\003\\004\\005\\006\\a\\b\\t\\n\\v\\f\\r\\016\\017\\020\\021\\022\\023\\024\\025\\026\\027\\030\\031\\032\\e\\034\\035\\036\\037 !\\\"\\\#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\177\\200\\201\\202\\203\\204\\205\\206\\207\\210\\211\\212\\213\\214\\215\\216\\217\\220\\221\\222\\223\\224\\225\\226\\227\\230\\231\\232\\233\\234\\235\\236\\237\\240\\241\\242\\243\\244\\245\\246\\247\\250\\251\\252\\253\\254\\255\\256\\257\\260\\261\\262\\263\\264\\265\\266\\267\\270\\271\\272\\273\\274\\275\\276\\277\\300\\301\\302\\303\\304\\305\\306\\307\\310\\311\\312\\313\\314\\315\\316\\317\\320\\321\\322\\323\\324\\325\\326\\327\\330\\331\\332\\333\\334\\335\\336\\337\\340\\341\\342\\343\\344\\345\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\\360\\361\\362\\363\\364\\365\\366\\367\\370\\371\\372\\373\\374\\375\\376\""
+## expected = "\"\\000\\001\\002\\003\\004\\005\\006\\a\\b\\t\\n\\v\\f\\r\\016\\017\\020\\021\\022\\023\\024\\025\\026\\027\\030\\031\\032\\e\\034\\035\\036\\037 !\\\"\\\#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\177\\200\\201\\202\\203\\204\\205\\206\\207\\210\\211\\212\\213\\214\\215\\216\\217\\220\\221\\222\\223\\224\\225\\226\\227\\230\\231\\232\\233\\234\\235\\236\\237\\240\\241\\242\\243\\244\\245\\246\\247\\250\\251\\252\\253\\254\\255\\256\\257\\260\\261\\262\\263\\264\\265\\266\\267\\270\\271\\272\\273\\274\\275\\276\\277\\300\\301\\302\\303\\304\\305\\306\\307\\310\\311\\312\\313\\314\\315\\316\\317\\320\\321\\322\\323\\324\\325\\326\\327\\330\\331\\332\\333\\334\\335\\336\\337\\340\\341\\342\\343\\344\\345\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\\360\\361\\362\\363\\364\\365\\366\\367\\370\\371\\372\\373\\374\\375\\376\""
+expected = "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\a\\b\\t\\n\\v\\f\\r\\u000E\\u000F\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001A\\e\\u001C\\u001D\\u001E\\u001F !\\\"\\\#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\u007F\\u0080\\u0081\\u0082\\u0083\\u0084\\u0086\\u0087\\u0088\\u0089\\u008A\\u008B\\u008C\\u008D\\u008E\\u008F\\u0090\\u0091\\u0092\\u0093\\u0094\\u0095\\u0096\\u0097\\u0098\\u0099\\u009A\\u009B\\u009C\\u009D\\u009E\\u009F ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ\""
 test(ins, expected, 'All byte values inspected')
 
 def test_chomp
@@ -176,7 +178,7 @@ str.gsub(UNSAFE) do |us|
 end
 
 actual = "hello".gsub(/./) { |s| s[0].to_s + '|' }
-test(actual, "104|101|108|108|111|", "gsub with block")
+test(actual, "h|e|l|l|o|", "gsub with block")
 
 begin
   r = "xxx" =~ "yyy"
@@ -187,30 +189,35 @@ rescue Exception => x
   failed_test("Expected TypeError", TypeError, x)
 end
 
-class C
-  def to_str
-    '/xxx/'
-  end
-  def to_s
-    '/yyy/'
-  end
-end
 
-test('xxx'   =~ C.new, false, "'xxx'   =~ C.new")
-test('yyy'   =~ C.new, false, "'yyy'   =~ C.new")
 
-test('/xxx/' =~ C.new, false, "'/xxx/' =~ C.new")
-test('/yyy/' =~ C.new, false, "'/yyy/' =~ C.new")
+### Don't know, what the intention of the test was... it fails in Ruby 1.9.3, Ruby 1.8.7 and Maglev and makes no sense
+  # class C
+  #   def to_str
+  #     '/xxx/'
+  #   end
+  #   def to_s
+  #     '/yyy/'
+  #   end
+  # end
 
-test(C.new =~ 'xxx',   false, "C.new =~ 'xxx'")
-test(C.new =~ 'yyy',   false, "C.new =~ 'yyy'")
+  # test('xxx'   =~ C.new, false, "'xxx'   =~ C.new")
+  # test('yyy'   =~ C.new, false, "'yyy'   =~ C.new")
 
-test(C.new =~ '/xxx/', false, "C.new =~ '/xxx/'")
-test(C.new =~ '/yyy/', false, "C.new =~ '/yyy/'")
+  # test('/xxx/' =~ C.new, false, "'/xxx/' =~ C.new")
+  # test('/yyy/' =~ C.new, false, "'/yyy/' =~ C.new")
+
+  # test(C.new =~ 'xxx',   false, "C.new =~ 'xxx'")
+  # test(C.new =~ 'yyy',   false, "C.new =~ 'yyy'")
+
+  # test(C.new =~ '/xxx/', false, "C.new =~ '/xxx/'")
+  # test(C.new =~ '/yyy/', false, "C.new =~ '/yyy/'")
+#######################################################################
+
 
 # Slice! tests from pickaxe
 string = "this is a string"
-test(string.slice!(2), 105, 'slice! 1')
+test(string.slice!(2), 'i', 'slice! 1')
 test(string, "ths is a string", 'slice! 1a')
 
 test(string.slice!(3..6), " is ", 'slice! 2')
@@ -284,7 +291,7 @@ test(string, "0123456", 'slice! 17a')
 # ticket 400
 str = "this is a string"
 r = str.slice!(2)
-unless r == 105 ; raise 'error' ; end
+unless r == 'i' ; raise 'error' ; end
 unless str == 'ths is a string' ; raise 'error' ; end
 r = str.slice!(3..6)
 unless r == " is " ; raise 'error' ; end
@@ -307,7 +314,7 @@ test(string, 'test', 'Trac458a')
 test('hello'.gsub(/[aeiou]/, '*'),    'h*ll*',     'gsub pickaxe 1')
 test('hello'.gsub(/([aeiou])/, '<\1>'), 'h<e>ll<o>', 'gsub pickaxe 2')
 r = 'hello'.gsub(/./) {|s| s[0].to_s + ' ' }
-test(r,    '104 101 108 108 111 ', 'gsub pickaxe 3')
+test(r,    'h e l l o ', 'gsub pickaxe 3')
 
 # Gsub with all backslash substitutions
 test('Foo Bar'.gsub(/(.)o(.)(.)(.*)/, '\4 \3 \2 \1'), 'Bar   o F', 'gsub backslash numeric')

@@ -61,6 +61,13 @@ fromForRuby: anObjectForRuby
 %
 
 method:
+_rubyFindLastSubString: subString startingAt: startIndex
+  "adapt myself to subString and call the findLastSubString:startingAt: method"
+  ^ (self forRubyAdaptedTo: subString) findLastSubString: subString forRuby startingAt: startIndex
+
+%
+
+method:
 _rubyAddAll: anArg
 
   "A Ruby primitive.
@@ -447,10 +454,10 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
  | charCls vArr |
   charCls := Character .
   vArr := { nil }.
-  1 to: self size do: [:n | | c xlated av chDone |
-    c := self at: n .
-    c == $# ifTrue:[ | nextByte |
-      nextByte := self _rubyAt1: n  .  "atOrNil: n + 1"
+  0 to: self _rubySize - 1 do: [:n | | c xlated av chDone |
+    c := self _rubyAt1: n .
+    c = '#' ifTrue:[ | nextByte |
+      nextByte := self _rubyAt1: n + 1  .  "atOrNil: n + 1"
       (nextByte = '$' or:[ nextByte = '@' or:[ nextByte = '{']]) ifFalse:[
          "next char not one of  $  @  {  ,  do not escape " 
         aString add: c .
@@ -458,14 +465,14 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
       ] .
     ] .
     chDone ifNil:[
-      av := c asciiValue .
+      av := c _rubyOrd .
       xlated := RubyEscapeTranslationTable at: (av + 1) .
       (xlated == 0) ifTrue: [
-	(av between: 32 and: 300) ifTrue: [
+	(((av between: 32 and: 126) or: (av between: 160 and: 255)) or: (av = 133)) ifTrue: [
 	  aString add: c.
 	] ifFalse: [
 	  vArr at: 1 put: av .
-	  aString addAll: (Module sprintf:'\%03o' with: vArr)
+	  aString addAll: (Module sprintf:'\u%04X' with: vArr)
 	] .
       ] ifFalse: [
 	aString add: $\ ; add: ( charCls withValue: xlated) .

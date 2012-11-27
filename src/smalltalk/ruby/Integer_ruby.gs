@@ -12,7 +12,10 @@ category: 'Ruby support'
 
 method:
 _rubyChr
-  ^ self asCharacter asString
+  | stringForRuby |
+  stringForRuby := '' forRuby.
+  stringForRuby add: self asCharacter.
+  ^ String fromForRuby: stringForRuby
 %
 
 
