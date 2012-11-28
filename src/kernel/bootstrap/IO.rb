@@ -495,7 +495,7 @@ class IO
       end
       unless line._equal?(nil)
         write(line)
-        write(eol) unless line[-1]._equal?(10)
+        write(eol) unless line[-1].ord._equal?(10)
       end
       n = n + 1
     end
