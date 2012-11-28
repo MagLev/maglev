@@ -334,6 +334,8 @@ class String
     self
   end
 
+  alias each_byte bytes
+
   def chars(&block) # added for 1.8.7
     # Maglev not yet KCODE aware
     unless block_given?
@@ -770,20 +772,6 @@ class String
   end
 
   alias each_line each
-
-  def each_byte(&block)
-    unless block_given?
-      return ArrayEnumerator.new(self, :each_byte) # for 1.8.7
-    end
-    n = 0
-    # Do not cache size before looping.  Specs require
-    # us to go to new end when string grows or shrinks in the yield.
-    while n < self.__size
-      block.call( self.__at(n) )
-      n = n + 1
-    end
-    self
-  end
 
   alias each_char chars   # changed to an alias  for 1.8.7
 
