@@ -124,7 +124,7 @@ exit
     reloadPrimitivesAtTheEnd = True
 
 ## reload primitives
-rbFileDirectory = os.path.join(maglevHome, 'src/kernel/bootstrap')
+rbFileDirectory = os.path.join(maglevHome, 'src/kernel')
 print('Changes  in %s' % rbFileDirectory)
 
 for dirPath, dirNames, fileNames in os.walk(rbFileDirectory):
