@@ -4,141 +4,141 @@ class String
     Regexp.new(self)
   end
 
-  primitive_nobridge '__copyfrom_to', 'copyFrom:to:'
-  primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
-  primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
-  primitive_nobridge '__remove_from_to', 'removeFrom:to:'
-  class_primitive_nobridge '__withAll', 'withAll:'
-  class_primitive_nobridge '__alloc', '_basicNew'
-  class_primitive_nobridge '__new', 'new:'
+  primitive_nobridge '__copyfrom_to', '_rubyPrim_CopyFrom:to:'
+  primitive_nobridge '__findStringStartingAt', '_rubyPrim_FindString:startingAt:'
+  primitive_nobridge '__md5sum', '_rubyPrim_Md5sumDigest'     # used by lib file  digest/md5.rb
+  primitive_nobridge '__remove_from_to', '_rubyPrim_RemoveFrom:to:'
+  class_primitive_nobridge '__withAll', '_rubyPrim_WithAll:'
+  class_primitive_nobridge '__alloc', '_rubyPrim_BasicNew'
+  class_primitive_nobridge '__new', '_rubyPrim_New:'
 
-  primitive   '__basic_dup', '_rubyBasicDup'      # use non-singleton class
+  primitive   '__basic_dup', '_rubyPrim_BasicDup'      # use non-singleton class
 
-  primitive  '+', 'rubyConcatenate:'
+  primitive  '+', '_rubyPrim_Concatenate:'
 
-  primitive_env '<=>',  '_rubyCompare' , ':'
+  primitive_env '<=>',  '_rubyPrim_Compare' , ':'
   #   note smalltalk addAll:  returns arg, not receiver
-  primitive '__append', '_rubyAddAll:'
-  primitive_nobridge '__uppercaseAt', 'rubyUpperCaseAt:' # arg is one-based
+  primitive '__append', '_rubyPrim_AddAll:'
+  primitive_nobridge '__uppercaseAt', '_rubyPrim_UpperCaseAt:' # arg is one-based
 
 
-  primitive_env '==',   '_rubyEqual' , ':'
+  primitive_env '==',   '_rubyPrim_Equal' , ':'
   #  primitive assumes   nil.respond_to?(:to_str) == false
   #  primitive assumes   a_symbol.respond_to?(:to_str) == false
 
-  primitive_env '===',   '_rubyEqual' , ':'   # === same as == for String
+  primitive_env '===',   '_rubyPrim_Equal' , ':'   # === same as == for String
 
-  primitive_nobridge_env '[]' , '_rubyAt', ':'
-  primitive_nobridge_env '__at' , '_rubyAt', ':'
-
-
-  primitive_nobridge_env '[]' ,         '_rubyAt', ':length:'
-  primitive_nobridge_env '__at' , '_rubyAt', ':length:'
+  primitive_nobridge_env '[]' , '_rubyPrim_At', ':'
+  primitive_nobridge_env '__at' , '_rubyPrim_At', ':'
 
 
-  primitive_nobridge_env '[]=',     '_rubyAt', ':put:'
-  primitive_nobridge_env '__at_put', '_rubyAt', ':put:'
+  primitive_nobridge_env '[]' ,         '_rubyPrim_At', ':length:'
+  primitive_nobridge_env '__at' , '_rubyPrim_At', ':length:'
+
+
+  primitive_nobridge_env '[]=',     '_rubyPrim_At', ':put:'
+  primitive_nobridge_env '__at_put', '_rubyPrim_At', ':put:'
   # Smalltalk code handles  Regexp and String  first args
 
 
-  primitive_nobridge_env '[]=', '_rubyAt', ':length:put:'
-  primitive_nobridge_env '__at_length_put', '_rubyAt', ':length:put:'
+  primitive_nobridge_env '[]=', '_rubyPrim_At', ':length:put:'
+  primitive_nobridge_env '__at_length_put', '_rubyPrim_At', ':length:put:'
   # smalltalk code handles Regexp and Fixnum first args
 
-  primitive_nobridge '__at_byte', '_rubyByteAt:'
-  primitive_nobridge '__at_bytes', '_rubyByteAt:length:'
+  primitive_nobridge '__at_byte', '_rubyPrim_ByteAt:'
+  primitive_nobridge '__at_bytes', '_rubyPrim_ByteAt:length:'
 
-  primitive '__capitalize', 'rubyCapitalize'
+  primitive '__capitalize', '_rubyPrim_Capitalize'
 
   # def count(*args); end
   # arg to rubyCount: is expected to be an Array , so declare as 'count*'
-  primitive 'count*', 'rubyCount:'
+  primitive 'count*', '_rubyPrim_Count:'
 
   # MNI: crypt
 
-  primitive 'delete*',  'rubyDelete:'
-  primitive 'delete!*', 'rubyDeleteInPlace:'
+  primitive 'delete*',  '_rubyPrim_Delete:'
+  primitive 'delete!*', '_rubyPrim_DeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
-  primitive '__downcase', 'asLowercase'
-  primitive '__downcase!', 'rubyDowncaseInPlace'
+  primitive '__downcase', '_rubyPrim_AsLowercase'
+  primitive '__downcase!', '_rubyPrim_DowncaseInPlace'
 
-  primitive '__dumpInto' , 'rubyDumpInto:'
+  primitive '__dumpInto' , '_rubyPrim_DumpInto:'
 
-  primitive 'empty?', 'isEmpty'
+  primitive 'empty?', '_rubyPrim_IsEmpty'
 
-  primitive 'eql?', '='
+  primitive 'eql?', '_rubyPrim_Eql'
 
-  primitive 'hash' , 'hash'
+  primitive 'hash' , '_rubyPrim_Hash'
 
-  primitive_nobridge '__insertall_at', 'insertAll:at:'
+  primitive_nobridge '__insertall_at', '_rubyPrim_InsertAll:at:'
 
-  primitive '__as_symbol', 'asSymbol'  # allows zero size Symbols
+  primitive '__as_symbol', '_rubyPrim_AsSymbol'  # allows zero size Symbols
 
-  primitive 'inspect', '_rubyInspect'
+  primitive 'inspect', '_rubyPrim_Inspect'
 
-  primitive "_paddedToWithString", "padded:to:withString:"
+  primitive '_paddedToWithString', '_rubyPrim_Padded:to:withString:'
   
 
-  primitive 'lstrip', '_rubyLstrip'
+  primitive 'lstrip', '_rubyPrim_Lstrip'
 
-  primitive 'lstrip!', '_rubyLstripInPlace' # in .mcz
+  primitive 'lstrip!', '_rubyPrim_LstripInPlace' # in .mcz
 
-  primitive 'replace', '_rubyReplace:'
+  primitive 'replace', '_rubyPrim_Replace:'
 
-  primitive          'reverse', 'reverse'
+  primitive          'reverse', '_rubyPrim_Reverse'
 
-  primitive_nobridge '__reverse_from', '_reverseFrom:'
+  primitive_nobridge '__reverse_from', '_rubyPrim_ReverseFrom:'
 
-  primitive_nobridge '__lastSubstring', '_rubyFindLastSubString:startingAt:'
-  primitive_nobridge '__indexOfLastByte', 'indexOfLastByte:startingAt:'
-  primitive_nobridge '__indexOfByte_int', 'indexOfByte:startingAt:'  # one-based offset/result
-  primitive 'ord', '_rubyOrd'
+  primitive_nobridge '__lastSubstring', '_rubyPrim_FindLastSubString:startingAt:'
+  primitive_nobridge '__indexOfLastByte', '_rubyPrim_IndexOfLastByte:startingAt:'
+  primitive_nobridge '__indexOfByte_int', '_rubyPrim_IndexOfByte:startingAt:'  # one-based offset/result
+  primitive 'ord', '_rubyPrim_Ord'
 
-  primitive 'rstrip', '_rubyRstrip'
-  primitive 'rstrip!', '_rubyRstripInPlace'  # in .mcz
+  primitive 'rstrip', '_rubyPrim_Rstrip'
+  primitive 'rstrip!', '_rubyPrim_RstripInPlace'  # in .mcz
 
   # def scan #  implemented in common/string.rb
 
 
   ## for external use. returns the number of UTF-8 characters
-  primitive 'length', '_rubySize'
-  primitive 'size', '_rubySize'
-  primitive 'size=', '_rubySize:'  # Note size=() not in MRI
-  primitive '__size', '_rubySize'
-  primitive '__size=', '_rubySize:'
+  primitive 'length', '_rubyPrim_Size'
+  primitive 'size', '_rubyPrim_Size'
+  primitive 'size=', '_rubyPrim_Size:'  # Note size=() not in MRI
+  primitive '__size', '_rubyPrim_Size'
+  primitive '__size=', '_rubyPrim_Size:'
 
   ## used internal to know how many bytes the string instance has
-  primitive 'bytesize', 'size'  # added for 1.8.7
+  primitive 'bytesize', '_rubyPrim_ByteSize'  # added for 1.8.7
 
 
-  primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
+  primitive '__at_equals', '_rubyPrim_At:equals:'  # first arg is one-based offset, no coercion
 
 
-  primitive 'squeeze*', 'rubySqueeze:'
-  primitive_nobridge 'squeeze', 'rubySqueeze'
+  primitive 'squeeze*', '_rubyPrim_Squeeze:'
+  primitive_nobridge 'squeeze', '_rubyPrim_Squeeze'
 
-  primitive 'squeeze!*', 'rubySqueezeSelf:'
-  primitive_nobridge 'squeeze!', 'rubySqueezeSelf'
+  primitive 'squeeze!*', '_rubyPrim_SqueezeSelf:'
+  primitive_nobridge 'squeeze!', '_rubyPrim_SqueezeSelf'
 
-  primitive 'strip', '_rubyStrip'
-  primitive 'strip!', '_rubyStripInPlace'
+  primitive 'strip', '_rubyPrim_Strip'
+  primitive 'strip!', '_rubyPrim_StripInPlace'
 
 
-  primitive 'succ!', 'rubySucc' # prim detects frozen if would change
+  primitive 'succ!', '_rubyPrim_Succ' # prim detects frozen if would change
 
-  primitive 'swapcase!', 'rubySwapcaseInPlace' # prim detects frozen if would change
+  primitive 'swapcase!', '_rubyPrim_SwapcaseInPlace' # prim detects frozen if would change
 
-  primitive '__to_f', 'asFloat'
+  primitive '__to_f', '_rubyPrim_AsFloat'
 
-  primitive '__tr!', 'rubyTrFrom:to:' # prim detects frozen if would change
-  primitive '__tr_s!', 'rubyTrSqueezeFrom:to:'  # prim detects frozen if would change
+  primitive '__tr!', '_rubyPrim_TrFrom:to:' # prim detects frozen if would change
+  primitive '__tr_s!', '_rubyPrim_TrSqueezeFrom:to:'  # prim detects frozen if would change
   
-  primitive 'unpack', 'rubyUnpack:'
+  primitive 'unpack', '_rubyPrim_Unpack:'
 
-  primitive 'upcase', 'asUppercase'   # no taint propagation
+  primitive 'upcase', '_rubyPrim_AsUppercase'   # no taint propagation
 
-  primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
+  primitive 'upcase!', '_rubyPrim_UpcaseInPlace'  # prim detects frozen if would change
 
   def self.new(*args)
     # this version gets bridge methods
