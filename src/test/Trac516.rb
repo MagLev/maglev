@@ -1,6 +1,6 @@
 
 a = String.ancestors
-unless a == [ String, Enumerable, Comparable, Object, Kernel ] 
+unless a == [ String, Enumerable, Comparable, CType, Object, Kernel ] 
   raise 'error'
 end
 

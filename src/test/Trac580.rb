@@ -6,7 +6,7 @@ xx_map = {
    }
 unless xx_map.size == 3 ; raise 'error'; end
 k = ' '
-k[0] = 28
+k[0] = 28.chr
 unless xx_map[k] == 33 ; raise 'error' ; end
 
 # Coverage for Trac565

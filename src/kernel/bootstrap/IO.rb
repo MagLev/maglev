@@ -544,9 +544,6 @@ class IO
       open_args = args.shift  
     end
 
-
-
-
     if offset._equal?(nil)
       offset = 0
     end
