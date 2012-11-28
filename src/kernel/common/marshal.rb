@@ -502,10 +502,10 @@ module Marshal
         flt = mod_arr[0]
         n = mod_arr[1]
         n = n.to_i
-        str << to_byte(n >> 24)
-        str << to_byte(n >> 16)
-        str << to_byte(n >> 8)
-        str << to_byte(n & 0x7fffffff)
+        str << to_byte(n >> 24).chr
+        str << to_byte(n >> 16).chr
+        str << to_byte(n >> 8).chr
+        str << to_byte(n & 0x7fffffff).chr
       end
       str.chop! while str[-1]._equal?(0)
       str
@@ -543,23 +543,23 @@ module Marshal
     def serialize_integer(n)
       if n._equal?(0)
         s = ' '
-        s[0] = to_byte(n)
+        s[0] = to_byte(n).chr
       elsif n > 0 and n < 123
         s = ' '
-        s[0] = to_byte(n + 5)
+        s[0] = to_byte(n + 5).chr
       elsif n < 0 and n > -124
         s = ' '
-        s[0] = to_byte(256 + (n - 5))
+        s[0] = to_byte(256 + (n - 5)).chr
       else
         s = "\0"
         cnt = 0
         for k in (1..4) do
-          s << to_byte(n)
+          s << to_byte(n).chr
           n >>= 8
           cnt += 1
           break if n._equal?(0) or n._equal?(-1)
         end
-        s[0] = to_byte(n < 0 ? 256 - cnt : cnt)
+        s[0] = to_byte(n < 0 ? 256 - cnt : cnt).chr
       end
       s
     end
