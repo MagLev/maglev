@@ -925,10 +925,10 @@ rubyEql: other
 
 category: 'Ruby support-primitive compatibility'
 
+! TODO: remove all references to these methods
 
 method:
 _rubyAt1: anOffset
-  " TODO: remove references to this method "
   ^ self _rubyPrim_At1: anOffset
 %
 
@@ -939,6 +939,11 @@ _at: anOffset equals: aString
 
 method:
 _at: anOffset length: aLength
+  ^ self _rubyPrim_At: anOffset length: aLength
+%
+
+method:
+_rubyAt1: anOffset length: aLength
   ^ self _rubyPrim_At: anOffset length: aLength
 %
 

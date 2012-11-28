@@ -60,35 +60,35 @@ rubyReplaceFrom: start to: end with: aReplacement
 
 method:
 rubyConcatenate: aString
-  self error: 'rubyConcatenate: aString is to be implemented here or in subclasses.'.
+  self error: 'rubyConcatenate: aString needs to be implemented in CharacterCollection or in subclasses.'.
   self _primitiveFailed: #rubyConcatenate: args: { aString }
 %
 
 method:
 rubyCompare: aString
-  self error: 'rubyCompare: aString is to be implemented here or in subclasses.'.
+  self error: 'rubyCompare: aString needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyAddAll: anArg
-  self error: 'rubyAddAll: anArg is to be implemented here or in subclasses.'.
+  self error: 'rubyAddAll: anArg needs to be implemented in CharacterCollection or in subclasses.'.
   self _primitiveFailed:#_rubyAddAll: args: { anArg }
 %
 
 method:
 rubyUpperCaseAt: anOffset
-  self error: 'rubyUpperCaseAt: anOffset is to be implemented here or in subclasses.'.
+  self error: 'rubyUpperCaseAt: anOffset needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyEqual: aString
-  self error: 'rubyEqual: aString is to be implemented here or in subclasses.'.
+  self error: 'rubyEqual: aString needs to be implemented in CharacterCollection or in subclasses.'.
   ^ self @ruby1:__prim_equal_failed: aString
 %
  
 method:
 rubyAt: anOffset
-  self error: 'rubyAt: anOffset is to be implemented here or in subclasses.'.
+  self error: 'rubyAt: anOffset needs to be implemented in CharacterCollection or in subclasses.'.
   ^ self @ruby1:__prim_at_failed: anOffset
 %
 
@@ -154,212 +154,212 @@ rubyAt: anOffset length: aCount put: aString
 
 method:
 rubyCapitalize
-  self error: 'rubyCapitalize is to be implemented here or in subclasses.'.
+  self error: 'rubyCapitalize needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyCount: anArray
-  self error: 'rubyCount: anArray is to be implemented here or in subclasses.'.
+  self error: 'rubyCount: anArray needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyDelete: a
-  self error: 'rubyDelete: a is to be implemented here or in subclasses.'.
+  self error: 'rubyDelete: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyDeleteInPlace: a
-  self error: 'rubyDeleteInPlace: a is to be implemented here or in subclasses.'.
+  self error: 'rubyDeleteInPlace: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyAsLowercase: a
-  self error: 'rubyAsLowercase: a is to be implemented here or in subclasses.'.
+  self error: 'rubyAsLowercase: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyDowncaseInPlace: a
-  self error: 'rubyDowncaseInPlace: a is to be implemented here or in subclasses.'.
+  self error: 'rubyDowncaseInPlace: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyDumpInto: a
-  self error: 'rubyDumpInto: a is to be implemented here or in subclasses.'.
+  self error: 'rubyDumpInto: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyIsEmpty
-  self error: 'rubyIsEmpty is to be implemented here or in subclasses.'.
+  self error: 'rubyIsEmpty needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyEql: other
-  self error: 'rubyEql: other is to be implemented here or in subclasses.'.
+  self error: 'rubyEql: other needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyHash
-  self error: 'rubyHash is to be implemented here or in subclasses.'.
+  self error: 'rubyHash needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyInsertAll: a at: b
-  self error: 'rubyInsertAll: a at: b is to be implemented here or in subclasses.'.
+  self error: 'rubyInsertAll: a at: b needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyAsSymbol
-  self error: 'rubyAsSymbol is to be implemented here or in subclasses.'.
+  self error: 'rubyAsSymbol needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyInspect
-  self error: 'rubyInspect is to be implemented here or in subclasses.'.
+  self error: 'rubyInspect needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyPadded: start to: end withString: aString
-  self error: 'rubyPadded: start to: end withString: aString is to be implemented here or in subclasses.'.
+  self error: 'rubyPadded: start to: end withString: aString needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyLstrip
-  self error: 'rubyLstrip is to be implemented here or in subclasses.'.
+  self error: 'rubyLstrip needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyLstripInPlace
-  self error: 'rubyLstripInPlace is to be implemented here or in subclasses.'.
+  self error: 'rubyLstripInPlace needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyReverse
-  self error: 'rubyReverse is to be implemented here or in subclasses.'.
+  self error: 'rubyReverse needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyReverseFrom: anOffset
-  self error: 'rubyReverseFrom: anOffset is to be implemented here or in subclasses.'.
+  self error: 'rubyReverseFrom: anOffset needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyFindLastSubString: subString startingAt: startIndex
-  self error: 'rubyFindLastSubString: subString startingAt: startIndex is to be implemented here or in subclasses.'.
+  self error: 'rubyFindLastSubString: subString startingAt: startIndex needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyIndexOfLastCharacter: aCharacter startingAt: anOffset
-  self error: 'rubyIndexOfLastCharacter: aCharacter startingAt: anOffset is to be implemented here or in subclasses.'.
+  self error: 'rubyIndexOfLastCharacter: aCharacter startingAt: anOffset needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyIndexOfCharacter: aCharacter startingAt: anOffset
-  self error: 'rubyIndexOfCharacter: aCharacter startingAt: anOffset is to be implemented here or in subclasses.'.
+  self error: 'rubyIndexOfCharacter: aCharacter startingAt: anOffset needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyOrd
-  self error: 'rubyOrd is to be implemented here or in subclasses.'.
+  self error: 'rubyOrd needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyRstrip
-  self error: 'rubyRstrip is to be implemented here or in subclasses.'.
+  self error: 'rubyRstrip needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyRstripInPlace
-  self error: 'rubyRstripInPlace is to be implemented here or in subclasses.'.
+  self error: 'rubyRstripInPlace needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySize
-  self error: 'rubySize is to be implemented here or in subclasses.'.
+  self error: 'rubySize needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySize: anInteger
-  self error: 'rubySize: anInteger is to be implemented here or in subclasses.'.
+  self error: 'rubySize: anInteger needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyAt: anIndex equals: aString
-  self error: 'rubyAt: anIndex equals: aString is to be implemented here or in subclasses.'.
+  self error: 'rubyAt: anIndex equals: aString needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySqueeze: a
-  self error: 'rubySqueeze: a is to be implemented here or in subclasses.'.
+  self error: 'rubySqueeze: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySqueeze
-  self error: 'rubySqueeze is to be implemented here or in subclasses.'.
+  self error: 'rubySqueeze needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySqueezeSelf: a
-  self error: 'rubySqueezeSelf: a is to be implemented here or in subclasses.'.
+  self error: 'rubySqueezeSelf: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySqueezeSelf
-  self error: 'rubySqueezeSelf is to be implemented here or in subclasses.'.
+  self error: 'rubySqueezeSelf needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyStrip
-  self error: 'rubyStrip is to be implemented here or in subclasses.'.
+  self error: 'rubyStrip needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyStripInPlace
-  self error: 'rubyStripInPlace is to be implemented here or in subclasses.'.
+  self error: 'rubyStripInPlace needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySucc
-  self error: 'rubySucc is to be implemented here or in subclasses.'.
+  self error: 'rubySucc needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubySwapcaseInPlace
-  self error: 'rubySwapcaseInPlace is to be implemented here or in subclasses.'.
+  self error: 'rubySwapcaseInPlace needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyAsFloat
-  self error: 'rubyAsFloat is to be implemented here or in subclasses.'.
+  self error: 'rubyAsFloat needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyTrFrom: a to: b
-  self error: 'rubyTrFrom: a to: b is to be implemented here or in subclasses.'.
+  self error: 'rubyTrFrom: a to: b needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyTrSqueezeFrom: a to: b
-  self error: 'rubyTrSqueezeFrom: a to: b is to be implemented here or in subclasses.'.
+  self error: 'rubyTrSqueezeFrom: a to: b needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyUnpack: aString
-  self error: 'rubyUnpack: aString is to be implemented here or in subclasses.'.
+  self error: 'rubyUnpack: aString needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyAsUppercase
-  self error: 'rubyAsUppercase is to be implemented here or in subclasses.'.
+  self error: 'rubyAsUppercase needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyUpcaseInPlace
-  self error: 'rubyUpcaseInPlace is to be implemented here or in subclasses.'.
+  self error: 'rubyUpcaseInPlace needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:
 rubyReplaceFrom: start to: end with: aReplacement
-  self error: 'rubyReplaceFrom: start to: end with: aReplacement is to be implemented here or in subclasses.'.
+  self error: 'rubyReplaceFrom: start to: end with: aReplacement needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 
