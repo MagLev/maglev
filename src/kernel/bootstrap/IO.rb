@@ -515,8 +515,8 @@ class IO
   # Returns the empty string for empty files, unless length is passed, then returns nil
 
   # since 1.9.3:
-  # read(name, [length [, offset]] ) → string click to toggle source
-  # read(name, [length [, offset]], open_args) → string
+  # read(name, [length [, offset]] ) -> string click to toggle source
+  # read(name, [length [, offset]], open_args) -> string
 
   def self.read(*args)
     raise Errno::EINVAL, "to few arguments" if args.length < 1
@@ -541,13 +541,16 @@ class IO
     when 3
       length = Type.coerce_to(args.shift, Fixnum, :to_int)
       offset = Type.coerce_to(args.shift, Fixnum, :to_int)
-      open_args = args.shift
+      open_args = args.shift  
     end
 
 
-    offset = if offset._equal?(nil)
-               0
-             end
+
+
+    if offset._equal?(nil)
+      offset = 0
+    end
+
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
     read_all_bytes = length._equal?(MaglevUndefined) || length._equal?(nil)
