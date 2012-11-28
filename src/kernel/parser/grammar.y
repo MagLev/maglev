@@ -5963,7 +5963,7 @@ static int yylex(rb_parse_state* ps)
                     needsNameToken = TRUE;
                 }
             }
-            if ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state)) {
+            if ((lex_state == EXPR_BEG) || IS_ARG(lex_state)) {
                 int p_c = *(ps->lex_p); // actual peek
                 if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
                     lex_state = EXPR_BEG;
