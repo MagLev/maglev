@@ -33,6 +33,16 @@ def setUpToDate():
     f.close()
 update = False
 reloadPrimitivesAtTheEnd = False
+showOutput = len(sys.argv) >= 2 and 'o' in sys.argv[1]
+showHelp = len(sys.argv) >= 2 and 'h' in sys.argv[1]
+if showHelp:
+    print '''
+h
+    for help
+o
+    to show the output of topaz
+'''
+    
 
 # find out the last time we run this script
 lastChanged = ChangeTime(__file__)
@@ -84,7 +94,16 @@ exit
                              stdin = subprocess.PIPE, \
                              shell = True)
     output, error = pipe.communicate(topazString)
-    errors = ['unknown command:', '*******', '\nerror', '\nError']
+    if showOutput:
+        print('#' * 60)
+        print(' topaz output     '.center(60, '#'))
+        print('#' * 60)
+        print(output)
+        print('#' * 60)
+        print(' topaz output end '.center(60, '#'))
+        print('#' * 60)
+    errors = ['unknown command:', '*****', '\nerror', '\nError', \
+              'GemStone Smalltalk Compiler Errors:', 'WARNING:']
     errorStart = 0
     while 1:
         lastError = len(output)
@@ -103,7 +122,7 @@ exit
         for i in range(3): # lines
             start = output.rfind('\n', 0, start)
         stop = errorStart
-        for i in range(3): # lines
+        for i in range(5): # lines
             stop = output.find('\n', stop + 1)
         ## find the name of the bad file
         fileNameIndex = output.rfind('InPuT_FiLe: ', 0, errorStart)
