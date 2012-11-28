@@ -208,7 +208,7 @@ removeallclassmethods
 
 run
   "Set ruby compatibility level"
-  GsCompilerIRNode _addClassVar: #COM_RUBY_COMPAT_LEVEL value: 18.
+  GsCompilerIRNode _addClassVar: #COM_RUBY_COMPAT_LEVEL value: 19.
 true
 %  
 
@@ -1639,7 +1639,7 @@ appendArg: aGsComVarLeaf
   | argKnd needSynth |
   needSynth := false .
   (argKnd := aGsComVarLeaf varKind) == COMPAR_BLOCK_ARG_VAR ifTrue:[
-    (aGsComVarLeaf lexLevel < lexLevel and:[ COM_RUBY_COMPAT_LEVEL == 18]) ifTrue:[
+    (aGsComVarLeaf lexLevel < lexLevel and:[ COM_RUBY_COMPAT_LEVEL >= 18]) ifTrue:[
       "Fix Ticket 113, block arg escaping to outer block arg,
        Synthesize a blockArg node, and add an assignment to the
        outer arg"
@@ -1653,7 +1653,7 @@ appendArg: aGsComVarLeaf
       or:[ argKnd == COMPAR_BLOCK_TEMP_VAR
         or:[ argKnd == COMPAR_METHOD_ARG_VAR] ]) 
     and:[ aGsComVarLeaf lexLevel < lexLevel 
-        and:[ COM_RUBY_COMPAT_LEVEL == 18 ]]) ifTrue:[
+        and:[ COM_RUBY_COMPAT_LEVEL >= 18 ]]) ifTrue:[
     "Fix for Ticket 21, ruby block args escaping to outer level.
      Synthesize a blockArg node, and add an assignment to the 
      outer temp"

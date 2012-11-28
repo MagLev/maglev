@@ -161,15 +161,16 @@ def task_gemstone(stone, action, desc=nil)
   end
 end
 
-
 GemStoneInstallation.current.stones.each do |server_name|
+  next if defined?(Maglev) and Maglev::System.stone_name == server_name
   namespace server_name do
     [[:stop,             "Stop the \"#{server_name}\" server"],
      [:restart,          "Stop then start the \"#{server_name}\" server"],
      [:status,           "Report status of the \"#{server_name}\" server"],
      [:reload,           "Destroy the \"#{server_name}\" repository then load a fresh one"],
      [:take_snapshot,    "Stop the \"#{server_name}\" server then make a backup copy of its repository"],
-     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
+     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"],
+     [:webtools, "Run the GemStone/S Webtools"],
     ].each do |action,desc|
       stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       task_gemstone(stone, action, desc)
@@ -198,5 +199,11 @@ The netldiname parameter determines which netldi to use (default: ENV['gs64ldi']
         stone.input_file file, true
       end
     end
+  end
+end
+
+if defined? Maglev
+  at_exit do
+    puts "[INFO] Some stone maintenance tasks have been omitted, because they cannot be run through MagLev rake. Use another Ruby for stone maintenance."
   end
 end
