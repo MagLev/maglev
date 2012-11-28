@@ -3,7 +3,7 @@ class String
   def to_rx
     Regexp.new(self)
   end
-
+ 
   primitive_nobridge '__copyfrom_to', '_rubyPrim_CopyFrom:to:'
   primitive_nobridge '__findStringStartingAt', '_rubyPrim_FindString:startingAt:'
   primitive_nobridge '__md5sum', '_rubyPrim_Md5sumDigest'     # used by lib file  digest/md5.rb
@@ -67,7 +67,7 @@ class String
 
   primitive 'empty?', '_rubyPrim_IsEmpty'
 
-  primitive 'eql?', '_rubyPrim_Eql'
+  primitive 'eql?', '_rubyPrim_Eql:'
 
   primitive 'hash' , '_rubyPrim_Hash'
 
@@ -91,15 +91,15 @@ class String
   primitive_nobridge '__reverse_from', '_rubyPrim_ReverseFrom:'
 
   primitive_nobridge '__lastSubstring', '_rubyPrim_FindLastSubString:startingAt:'
-  primitive_nobridge '__indexOfLastByte', '_rubyPrim_IndexOfLastByte:startingAt:'
-  primitive_nobridge '__indexOfByte_int', '_rubyPrim_IndexOfByte:startingAt:'  # one-based offset/result
+  primitive_nobridge '__indexOfLastCharacter', '_rubyPrim_IndexOfLastCharacter:startingAt:'
+  primitive_nobridge '__indexOfCharacter_int', '_rubyPrim_IndexOfCharacter:startingAt:'  # one-based offset/result
   primitive 'ord', '_rubyPrim_Ord'
 
   primitive 'rstrip', '_rubyPrim_Rstrip'
   primitive 'rstrip!', '_rubyPrim_RstripInPlace'  # in .mcz
 
   # def scan #  implemented in common/string.rb
-
+ 
 
   ## for external use. returns the number of UTF-8 characters
   primitive 'length', '_rubyPrim_Size'
@@ -280,7 +280,7 @@ class String
     unless aCharacter._isInteger
       aCharacter = aCharacter.ord
     end
-    __indexOfByte_int(aCharacter, startingAtIndex)
+    __indexOfCharacter_int(aCharacter, startingAtIndex)
   end
 
   def <<(arg)
@@ -1326,7 +1326,7 @@ class String
     elsif item._isInteger
       return nil if item > 255 || item < 0
       zoffset = my_size - 1 if zoffset >= my_size
-      st_idx = self.__indexOfLastByte(item % 256 , zoffset + 1)
+      st_idx = self.__indexOfLastCharacter(item % 256 , zoffset + 1)
       return st_idx._equal?(0) ? nil : st_idx - 1
     elsif item._isRegexp
       zoffset = my_size  if zoffset > my_size  # allow searching for end of string

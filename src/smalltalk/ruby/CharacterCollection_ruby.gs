@@ -9,7 +9,7 @@
 set class CharacterCollection
 
 !  additional methods  for String to support Ruby
-
+ 
 category: 'Ruby support'
 
 classmethod:
@@ -60,34 +60,35 @@ rubyReplaceFrom: start to: end with: aReplacement
 
 method:
 rubyConcatenate: aString
+  self error: 'rubyConcatenate: aString is to be implemented here or in subclasses.'.
   self _primitiveFailed: #rubyConcatenate: args: { aString }
 %
 
 method:
 rubyCompare: aString
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyCompare: aString is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyAddAll: anArg
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAddAll: anArg is to be implemented here or in subclasses.'.
   self _primitiveFailed:#_rubyAddAll: args: { anArg }
 %
 
 method:
 rubyUpperCaseAt: anOffset
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyUpperCaseAt: anOffset is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyEqual: aString
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyEqual: aString is to be implemented here or in subclasses.'.
   ^ self @ruby1:__prim_equal_failed: aString
 %
-
+ 
 method:
 rubyAt: anOffset
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAt: anOffset is to be implemented here or in subclasses.'.
   ^ self @ruby1:__prim_at_failed: anOffset
 %
 
@@ -153,202 +154,212 @@ rubyAt: anOffset length: aCount put: aString
 
 method:
 rubyCapitalize
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyCapitalize is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyCount: anArray
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyCount: anArray is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyDelete: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyDelete: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyDeleteInPlace: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyDeleteInPlace: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyAsLowercase: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAsLowercase: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyDowncaseInPlace: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyDowncaseInPlace: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyDumpInto: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyDumpInto: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyIsEmpty
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyIsEmpty is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyEql: other
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyEql: other is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyHash
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyHash is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyInsertAll: a at: b
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyInsertAll: a at: b is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyAsSymbol
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAsSymbol is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyInspect
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyInspect is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyPadded: start to: end withString: aString
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyPadded: start to: end withString: aString is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyLstrip
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyLstrip is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyLstripInPlace
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyLstripInPlace is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyReverse
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyReverse is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyReverseFrom: anOffset
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyReverseFrom: anOffset is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyFindLastSubString: subString startingAt: startIndex
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyFindLastSubString: subString startingAt: startIndex is to be implemented here or in subclasses.'.
+%
+
+method:
+rubyIndexOfLastCharacter: aCharacter startingAt: anOffset
+  self error: 'rubyIndexOfLastCharacter: aCharacter startingAt: anOffset is to be implemented here or in subclasses.'.
+%
+
+method:
+rubyIndexOfCharacter: aCharacter startingAt: anOffset
+  self error: 'rubyIndexOfCharacter: aCharacter startingAt: anOffset is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyOrd
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyOrd is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyRstrip
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyRstrip is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyRstripInPlace
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyRstripInPlace is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySize
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySize is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySize: anInteger
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySize: anInteger is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyAt: anIndex equals: aString
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAt: anIndex equals: aString is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySqueeze: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySqueeze: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySqueeze
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySqueeze is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySqueezeSelf: a
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySqueezeSelf: a is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySqueezeSelf
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySqueezeSelf is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyStrip
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyStrip is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyStripInPlace
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyStripInPlace is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySucc
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySucc is to be implemented here or in subclasses.'.
 %
 
 method:
 rubySwapcaseInPlace
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubySwapcaseInPlace is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyAsFloat
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAsFloat is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyTrFrom: a to: b
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyTrFrom: a to: b is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyTrSqueezeFrom: a to: b
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyTrSqueezeFrom: a to: b is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyUnpack: aString
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyUnpack: aString is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyAsUppercase
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyAsUppercase is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyUpcaseInPlace
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyUpcaseInPlace is to be implemented here or in subclasses.'.
 %
 
 method:
 rubyReplaceFrom: start to: end with: aReplacement
-  self error: 'To be implemented here or in subclasses.'
+  self error: 'rubyReplaceFrom: start to: end with: aReplacement is to be implemented here or in subclasses.'.
 %
 
 

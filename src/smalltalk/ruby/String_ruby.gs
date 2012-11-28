@@ -6,7 +6,7 @@
 !=========================================================================
 
 set class String
-
+ 
 !
 !  additional methods  for String to support Ruby
 !
@@ -103,18 +103,16 @@ fromRubyDataDo: aBlock
 
 category: 'Ruby support-primitives'
 
-!            class_primitive_nobridge '__withAll', '_rubyPrim_WithAll:'
 classmethod:
 _rubyPrim_WithAll: aSequenceableCollection
   ^ self withAll: aSequenceableCollection
 %
 
-!            class_primitive_nobridge '__alloc', '_rubyPrim_BasicNew'
 classmethod:
 _rubyPrim_BasicNew
   ^ self _basicNew
+%
 
-!            class_primitive_nobridge '__new', '_rubyPrim_New:'
 classmethod: 
 _rubyPrim_New: anObject
   ^ self new: anObject
@@ -151,11 +149,6 @@ _rubyPrim_Md5sumDigest
 method:
 _rubyPrim_RemoveFrom: start to: end
   ^ self fromRubyDataDoAndChange: [ :o | o rubyRemoveFrom: start to: end].
-%
-
-method:
-_rubyPrim_BasicDup
-  ^ self fromRubyDataDo: [ :o | o rubyBasicDup].
 %
 
 method:
@@ -199,12 +192,12 @@ method:
 _rubyPrim_At1: anOffset put: aValue
   ^ self fromRubyDataDoAndChange: [:o | o rubyAt: anOffset put: aValue].
 %
-
+ 
 method:
 _rubyPrim_At1: anOffset length: aCount put: aString
-  ^ self fromRubyDataDoAndChange: [:o | o rubyAt: anOffset length: aCount put: aValue].
+  ^ self fromRubyDataDoAndChange: [:o | o rubyAt: anOffset length: aCount put: aString].
 %
-
+ 
 method:
 _rubyPrim_Capitalize
   ^ self fromRubyDataDoAndChange: [:o | o rubyCapitalize].
@@ -226,13 +219,13 @@ _rubyPrim_DeleteInPlace: a
 %
 
 method:
-_rubyPrim_AsLowercase: a
-  ^ self fromRubyDataDoAndChange: [:o | o rubyAsLowercase: a].
+_rubyPrim_AsLowercase
+  ^ self fromRubyDataDoAndChange: [:o | o rubyAsLowercase].
 %
 
 method:
-_rubyPrim_DowncaseInPlace: a
-  ^ self fromRubyDataDoAndChange: [:o | o rubyDowncaseInPlace: a].
+_rubyPrim_DowncaseInPlace
+  ^ self fromRubyDataDoAndChange: [:o | o rubyDowncaseInPlace].
 %
 
 method:
@@ -282,23 +275,35 @@ _rubyPrim_Lstrip
 %
 
 method:
-_rubyPrim_LstripInPlace: a
+_rubyPrim_LstripInPlace
   ^ self fromRubyDataDoAndChange: [:o | o rubyLstripInPlace].
 %
 
 method:
-_rubyPrim_reverse
+_rubyPrim_Reverse
   ^ self fromRubyDataDo: [:o | o rubyReverse].
 %
 
 method:
-_rubyPrim_reverseFrom: anOffset
+_rubyPrim_ReverseFrom: anOffset
   ^ self fromRubyDataDoAndChange: [:o | o rubyReverseFrom: anOffset].
 %
 
 method:
 _rubyPrim_FindLastSubString: subString startingAt: startIndex
   ^ self fromRubyDataDo: [:o | o rubyFindLastSubString: subString startingAt: startIndex].
+%
+
+method:
+_rubyPrim_IndexOfLastCharacter: aCharacter startingAt: anOffset
+  ^ self fromRubyDataDo: [:o | o rubyIndexOfLastCharacter: aCharacter startingAt: anOffset].
+  "^ self _primitiveFailed: #_rubyPrim_indexOfLastByte:startingAt: args: { a . b }"
+%
+
+method:
+_rubyPrim_IndexOfCharacter: aCharacter startingAt: anOffset
+  ^ self fromRubyDataDo: [:o | o rubyIndexOfCharacter: aCharacter startingAt: anOffset].
+  "^ self _primitiveFailed: #_rubyPrim_indexOfByte:startingAt: args: { a . b }"
 %
 
 method:
@@ -404,13 +409,25 @@ _rubyPrim_AsUppercase
 %
 
 method:
-_rubyPrim_UpcaseInPlace: a
+_rubyPrim_UpcaseInPlace
   ^ self fromRubyDataDoAndChange: [:o | o rubyUpcaseInPlace].
 %
 
 method:
 _rubyPrim_ReplaceFrom: start to: end with: aReplacement
   ^ self fromRubyDataDoAndChange: [:o | o rubyReplaceFrom: start to: end with: aReplacement].
+%
+
+method:
+_rubyPrim_At: anOffset length: aCount
+ "A ruby primitive.
+  Returns an instance of receiver's class
+   containing specified substring of the receiver,
+   or returns nil if anOffset is out of range.
+  Negative offsets go backwards from end,  -1 means last element.
+  Used by Smalltalk code in MatchData .
+  "
+  ^ self fromRubyDataDo: [:o | o rubyAt: anOffset length: aCount].
 %
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -457,18 +474,13 @@ _rubyPrim_Replace: aString
 
 
 method:
-_rubyPrim_IndexOfLastByte: a startingAt: b
-  ^ self _primitiveFailed: #_rubyPrim_indexOfLastByte:startingAt: { a . b }
-%
-
-method:
-_rubyPrim_IndexOfByte: a startingAt: b
-  ^ self _primitiveFailed: #_rubyPrim_indexOfByte:startingAt: { a . b }
-%
-
-method:
 _rubyPrim_ByteSize
   ^ self size
+%
+
+method:
+_rubyPrim_BasicDup
+  ^ self _rubyBasicDup
 %
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -484,6 +496,19 @@ _rubyPrim_ByteSize
 category: 'Ruby support'
 
 method:
+rubyAt: anOffset length: aCount
+ "A ruby primitive.
+  Returns an instance of receiver's class
+   containing specified substring of the receiver,
+   or returns nil if anOffset is out of range.
+  Negative offsets go backwards from end,  -1 means last element.
+  Used by Smalltalk code in MatchData .
+  "
+  <primitive: 687>
+  ^ self _primitiveFailed: #_rubyAt:length: args: { anOffset . aCount }
+%
+
+method:
 rubyPrim_ReplaceFrom: start limit: end with: aReplacement
   " replace from start to end excluding end "
   | selfForRuby aReplacementForRuby sizeOfTheResultForRuby aResultForRuby indexInResult |
@@ -491,7 +516,7 @@ rubyPrim_ReplaceFrom: start limit: end with: aReplacement
   " check for valid arguments "
   start <= end ifFalse: [ OffsetError signal:'out of string: start <= end: ', start asString, ' <= ', end asString ].
   start >= 0 ifFalse: [ OffsetError signal:'out of string: start >= 0: ', start asString, ' >= 0' ].
-  end <= self _rubySize ifFalse: [ OffsetError signal:'out of string: end <= self _rubySize: ', end asString, ' <= ', self _rubySize asString ].
+  end <= self rubySize ifFalse: [ OffsetError signal:'out of string: end <= self rubySize: ', end asString, ' <= ', self rubySize asString ].
 
   " convert ourselves for ruby "
   selfForRuby := self forRubyAdaptedTo: aReplacement.
@@ -528,7 +553,7 @@ rubyPrim_ReplaceFrom: start limit: end with: aReplacement
 method:
 _rubyAt1Interval: anInterval
   | size result |
-  size := self _rubySize.
+  size := self rubySize.
   anInterval begin > size ifTrue: [ ^ nil. ].
   "anInterval end < anInterval begin ifTrue: [^ String new]."
   result := String new.
@@ -567,7 +592,7 @@ _rubyRangeAt: anOffset length: aCount onNegativeOffsetDo: anOffsetBlock onNegati
   | positiveOffset |
   aCount < 0 ifTrue: aCountBlock.
   positiveOffset := anOffset < 0 
-      ifTrue: [ anOffset + self _rubySize ]
+      ifTrue: [ anOffset + self rubySize ]
       ifFalse: [ anOffset].
   positiveOffset < 0 ifTrue: anOffsetBlock.
   ^ (Range from: positiveOffset limit: positiveOffset + aCount).
@@ -575,9 +600,9 @@ _rubyRangeAt: anOffset length: aCount onNegativeOffsetDo: anOffsetBlock onNegati
 
 method:
 _rubyAt1Integer: anInteger put: aValue
-  | offset charToReplace |
+  | offset |
   offset := anInteger < 0 
-    ifTrue:[ anInteger + self _rubySize ]
+    ifTrue:[ anInteger + self rubySize ]
     ifFalse:[ anInteger ].
   ^ self _rubyReplaceFrom: offset to: offset with: aValue.
 
@@ -629,7 +654,7 @@ _rubyQuoteOn: aString
   | charCls vArr |
   charCls := Character .
   vArr := { nil }.
-  0 to: self _rubySize - 1 do: [:n | | c xlated av chDone |
+  0 to: self rubySize - 1 do: [:n | | c xlated av chDone |
     c := self _rubyAt1: n .
     c = '#' ifTrue:[ | nextByte |
       nextByte := self _rubyAt1: n + 1  .  "atOrNil: n + 1"
@@ -719,9 +744,9 @@ rubyAt: anOffset
   "
   anOffset isInteger ifTrue: [ | offset |
     anOffset < 0 
-      ifTrue:[ offset := anOffset + self _rubySize. ]
+      ifTrue:[ offset := anOffset + self rubySize. ]
       ifFalse: [ offset := anOffset].
-    (offset < 0 or:[offset >= self _rubySize]) ifTrue:[^ nil].
+    (offset < 0 or:[offset >= self rubySize]) ifTrue:[^ nil].
     ^ String fromForRuby: (self forRuby at: offset +1) asString 
   ].
   anOffset _isOneByteString  ifTrue:[ "a String"  | ofs |
@@ -807,6 +832,17 @@ rubyFindLastSubString: subString startingAt: startIndex
   ^ (self forRubyAdaptedTo: subString) findLastSubString: subString forRuby startingAt: startIndex
 %
 
+
+method:
+rubyIndexOfLastCharacter: aCharacter startingAt: anOffset
+  ^ self indexOfLastByte: aCharacter startingAt: anOffset
+%
+
+method:
+rubyIndexOfCharacter: aCharacter startingAt: anOffset
+  ^ self indexOfByte: aCharacter startingAt: anOffset
+%
+
 method:
 rubyOrd
   ^ (self forRuby at: 1) asInteger
@@ -828,12 +864,13 @@ rubyAt: anIndex equals: aString
       
   <primitive: 778>
   | sz |
+
   anIndex _isSmallInteger ifFalse:[ anIndex _validateClass: SmallInteger].
   anIndex == ((sz := self size) + 1) ifTrue:[ ^ false ].
   ((anIndex <= 0) or: [(anIndex > sz)]) ifTrue: [ 
     ^ self _errorIndexOutOfRange: anIndex 
   ].
-  self _primitiveFailed: #_at:equals: args: { anIndex . aString }
+  self _primitiveFailed: #rubyAt:equals: args: { anIndex . aString }
 %
 
 method:
@@ -849,7 +886,7 @@ rubyUnpack: aString
   <primitive: 722>
   aString _isOneByteString ifFalse:[
     aString _error: #rtErrBadArgKind args:{ String }
-  ].
+  ]. 
   self _primitiveFailed: #rubyUnpack: args: { aString }
 %
 
@@ -858,33 +895,65 @@ rubyAsUppercase
   ^ self asUppercase
 %
 
+method:
+rubySize
+  ^ self forRuby size
+%
+
+method:
+rubyAsSymbol
+  ^ self asSymbol
+%
+
+method:
+rubyHash
+  ^ self hash
+%
+
+method:
+rubyEql: other
+  ^ self = other
+%
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! -------------------------------- ruby support methods end --------------------------------
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! -------------------------------- unused methods --------------------------------
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! -------------------------------- primitive compatibility --------------------------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-category: 'Ruby support-unused methods'
+category: 'Ruby support-primitive compatibility'
+
 
 method:
-_rubyPrim_At: anOffset length: aCount
-
- "A ruby primitive.
-  Returns an instance of receiver's class
-   containing specified substring of the receiver,
-   or returns nil if anOffset is out of range.
-  Negative offsets go backwards from end,  -1 means last element.
-  Used by Smalltalk code in MatchData .
-  "
-  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
-  "<primitive: 687>"
-  ^ self _primitiveFailed: #_rubyAt:length: args: { anOffset . aCount }
+_rubyAt1: anOffset
+  " TODO: remove references to this method "
+  ^ self _rubyPrim_At1: anOffset
 %
 
 method:
-_rubyPrim_SelectorPrefix
+_at: anOffset equals: aString
+  ^ self _rubyPrim_At: anOffset equals: aString
+%
+
+method:
+_at: anOffset length: aLength
+  ^ self _rubyPrim_At: anOffset length: aLength
+%
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! -------------------------------- primitive compatibility end --------------------------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! -------------------------------- bootstrap methods --------------------------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+category: 'Ruby support-bootstrap methods'
+
+method:
+_rubySelectorPrefix
   "return the selector prefix of the receiver.
 
   ruby selector format is  prefix#N*&
@@ -895,9 +964,9 @@ _rubyPrim_SelectorPrefix
     & is either $&  or $_
   "
   		"ruby_selector_suffix dependent"
-  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
   <primitive: 794>   "primitive fails if receiver is a large object"
   | sz |
+  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
   (self _rubyAt1: -4) = '#'"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
@@ -906,10 +975,8 @@ _rubyPrim_SelectorPrefix
 %
 
 
-
-
 method:
-_rubyPrim_SelectorPrefixSymbol
+rubySelectorPrefixSymbol
   " Return the selector prefix of the receiver as a Symbol
 
   ruby selector format is  prefix#N*&
@@ -920,17 +987,18 @@ _rubyPrim_SelectorPrefixSymbol
     & is either $&  or $_
   "
   		"ruby_selector_suffix dependent"
-  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
   <primitive: 812>
   | sz |
+  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
   (self _rubyAt1: -4) = '#' "$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
   self _primitiveFailed: #_rubyPrim_SelectorPrefixSymbol args: #() .
 %
 
+
 method: 
-_rubyPrim_asSymbolWithRubySuffix: argInt
+_asSymbolWithRubySuffix: argInt
   "Return a Symbol consisting of self concatenated with specified
     ruby suffix .
 
@@ -940,18 +1008,19 @@ _rubyPrim_asSymbolWithRubySuffix: argInt
        16r1 - append a $&
   "
   	"send sites are ruby_selector_suffix dependent"
-  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
+  
   <primitive: 809>   "primitive fails if receiver is large object or DoubleByteSymbol"
   | sz |
+  'seems to be an unused method see /src/smalltalk/ruby/String_ruby.gs' halt.
   (sz := self size) > 1020 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   (argInt // 4) > 74 ifTrue:[ Error signal:'max of 74 fixed args exceeded' ].
 
   self _primitiveFailed: #__rubyPrim_asSymbolWithRubySuffix: args: { argInt } .
 %
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! -------------------------------- unused methods end --------------------------------
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! -------------------------------- bootstrap methods end --------------------------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 
