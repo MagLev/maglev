@@ -514,47 +514,6 @@ rubyAt: anOffset length: aCount
   ^ self _primitiveFailed: #_rubyAt:length: args: { anOffset . aCount }
 %
 
-method:
-rubyPrim_ReplaceFrom: start limit: end with: aReplacement
-  " replace from start to end excluding end "
-  | selfForRuby aReplacementForRuby sizeOfTheResultForRuby aResultForRuby indexInResult |
-
-  " check for valid arguments "
-  start <= end ifFalse: [ OffsetError signal:'out of string: start <= end: ', start asString, ' <= ', end asString ].
-  start >= 0 ifFalse: [ OffsetError signal:'out of string: start >= 0: ', start asString, ' >= 0' ].
-  end <= self rubySize ifFalse: [ OffsetError signal:'out of string: end <= self rubySize: ', end asString, ' <= ', self rubySize asString ].
-
-  " convert ourselves for ruby "
-  selfForRuby := self forRubyAdaptedTo: aReplacement.
-  aReplacementForRuby := aReplacement forRuby.
-  sizeOfTheResultForRuby := selfForRuby size + aReplacementForRuby size - end + start.
-  aResultForRuby := selfForRuby class new: sizeOfTheResultForRuby.
-
-  " start putting the result together 
-
-  selfForRuby          [--------------|------------|------------------]
-                       0              start        end                size
-  aReplacementForRuby                 [------------------]
-
-  aResultForRuby       [--------------|------------------|------------------]
-                       0              start                                 sizeOfTheResultForRuby
-  "
-  indexInResult := 1 .
-  1 to: start do: [ :indexInSelfForRuby | 
-    aResultForRuby at: indexInResult put: (selfForRuby at: indexInSelfForRuby).
-    indexInResult := indexInResult + 1 ].
-  1 to: aReplacementForRuby size do: [ :indexInReplacementForRuby |
-    aResultForRuby at: indexInResult put: (aReplacementForRuby at: indexInReplacementForRuby).
-    indexInResult := indexInResult + 1 ].
-  end + 1 to: selfForRuby size do: [ :indexInSelfForRuby | 
-    aResultForRuby at: indexInResult put: (selfForRuby at: indexInSelfForRuby).
-    indexInResult := indexInResult + 1 ].
-
-  " claim the value from the result "
-  self _rubyReplace: (String fromForRuby: aResultForRuby).
-  ^ self
-%
-
 
 method:
 _rubyAt1Interval: anInterval
@@ -610,7 +569,7 @@ _rubyAt1Integer: anInteger put: aValue
   offset := anInteger < 0 
     ifTrue:[ anInteger + self rubySize ]
     ifFalse:[ anInteger ].
-  ^ self _rubyReplaceFrom: offset to: offset with: aValue.
+  ^ self rubyReplaceFrom: offset to: offset with: aValue.
 
 %
 
@@ -671,7 +630,7 @@ _rubyQuoteOn: aString
       ] .
     ] .
     chDone ifNil:[
-      av := c _rubyOrd .
+      av := c _rubyPrim_Ord .
       xlated := RubyEscapeTranslationTable at: (av + 1) .
       (xlated == 0) ifTrue: [
 	(((av between: 32 and: 126) or: (av between: 160 and: 255)) or: (av = 133)) ifTrue: [
@@ -820,7 +779,7 @@ rubyReplace: aString
       arg := [:a | a @ruby1:to_str ] value: aString
           onSynchronous: Exception do: [:ex| nil ].
       arg _isOneByteString ifFalse:[
-         ArgumentTypeError signal: 'in _rubyReplace:, to_str did not return a String'
+         ArgumentTypeError signal: 'in rubyReplace:, to_str did not return a String'
       ].
     ].
     self size: (argSize := arg size) .
@@ -828,6 +787,46 @@ rubyReplace: aString
       self replaceFrom: 1 to: argSize with: arg startingAt: 1 .
     ].
   ].
+  ^ self
+%
+
+method:
+rubyReplaceFrom: start to: end with: aReplacement
+  " replace from start to end excluding end "
+  | selfForRuby aReplacementForRuby sizeOfTheResultForRuby aResultForRuby indexInResult |
+  " check for valid arguments "
+  start <= end ifFalse: [ OffsetError signal:'out of string: start <= end: ', start asString, ' <= ', end asString ].
+  start >= 0 ifFalse: [ OffsetError signal:'out of string: start >= 0: ', start asString, ' >= 0' ].
+  end <= self rubySize ifFalse: [ OffsetError signal:'out of string: end <= self rubySize: ', end asString, ' <= ', self rubySize asString ].
+
+  " convert ourselves for ruby "
+  selfForRuby := self forRubyAdaptedTo: aReplacement.
+  aReplacementForRuby := aReplacement forRuby.
+  sizeOfTheResultForRuby := selfForRuby size + aReplacementForRuby size - end + start.
+  aResultForRuby := selfForRuby class new: sizeOfTheResultForRuby.
+
+  " start putting the result together 
+
+  selfForRuby          [--------------|------------|------------------]
+                       0              start        end                size
+  aReplacementForRuby                 [------------------]
+
+  aResultForRuby       [--------------|------------------|------------------]
+                       0              start                                 sizeOfTheResultForRuby
+  "
+  indexInResult := 1 .
+  1 to: start do: [ :indexInSelfForRuby | 
+    aResultForRuby at: indexInResult put: (selfForRuby at: indexInSelfForRuby).
+    indexInResult := indexInResult + 1 ].
+  1 to: aReplacementForRuby size do: [ :indexInReplacementForRuby |
+    aResultForRuby at: indexInResult put: (aReplacementForRuby at: indexInReplacementForRuby).
+    indexInResult := indexInResult + 1 ].
+  end + 1 to: selfForRuby size do: [ :indexInSelfForRuby | 
+    aResultForRuby at: indexInResult put: (selfForRuby at: indexInSelfForRuby).
+    indexInResult := indexInResult + 1 ].
+
+  " claim the value from the result "
+  self rubyReplace: (String fromForRuby: aResultForRuby).
   ^ self
 %
 
@@ -925,6 +924,21 @@ method:
 rubyEql: other
   ^ self = other
 %
+
+method:
+rubyIsEmpty
+  ^ self forRuby isEmpty
+%
+method:
+rubyFindString: aString startingAt: anOffset
+  ^ self forRuby _findString: aString startingAt: anOffset ignoreCase: false
+% 
+
+method:
+rubyCopyFrom: start to: end
+  ^ self forRuby copyFrom: start to: end
+%
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! -------------------------------- ruby support methods end --------------------------------
