@@ -162,6 +162,12 @@ _rubyPrim_Compare1: aString
   ^ self fromRubyDataDo: [ :o | o rubyCompare: aString].
 %
 
+! used in HPI-GSS/src/rubycext.c in line 326
+method:
+_rubyCompare1: aString
+  ^ self _rubyCompare1: aString.
+%
+
 method:
 _rubyPrim_AddAll: anArg
   ^ self fromRubyDataDoAndChange: [:o | o rubyAddAll: anArg].
@@ -898,6 +904,11 @@ rubyAsUppercase
 method:
 rubySize
   ^ self forRuby size
+%
+
+method:
+rubySize: anInteger
+  ^ self forRuby size: anInteger
 %
 
 method:
