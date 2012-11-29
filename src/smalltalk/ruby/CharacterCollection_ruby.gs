@@ -173,8 +173,8 @@ rubyDeleteInPlace: a
 %
 
 method:
-rubyAsLowercase: a
-  self error: 'rubyAsLowercase: a needs to be implemented in CharacterCollection or in subclasses.'.
+rubyAsDowncase: a
+  self error: 'rubyAsDowncase: a needs to be implemented in CharacterCollection or in subclasses.'.
 %
 
 method:

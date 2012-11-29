@@ -225,8 +225,8 @@ _rubyPrim_DeleteInPlace: a
 %
 
 method:
-_rubyPrim_AsLowercase
-  ^ self fromRubyDataDoAndChange: [:o | o rubyAsLowercase].
+_rubyPrim_AsDowncase
+  ^ self fromRubyDataDo: [:o | o rubyAsDowncase].
 %
 
 method:
@@ -376,7 +376,7 @@ _rubyPrim_Strip
 
 method:
 _rubyPrim_StripInPlace
-  ^ self fromRubyDataDo: [:o | o rubyStripInPlace].
+  ^ self fromRubyDataDoAndChange: [:o | o rubyStripInPlace].
 %
 
 method:
@@ -500,6 +500,41 @@ _rubyPrim_BasicDup
 !!!!  helper methods used by ruby primitives
 
 category: 'Ruby support'
+
+method:
+rubyPadded: direction to: length withString: padString
+  ^ self padded: direction to: length withString: padString
+%
+
+method:
+rubyLstrip
+  ^ self _rubyLstrip
+%
+
+method:
+rubyLstripInPlace
+  ^ self _rubyLstripInPlace
+%
+
+method:
+rubyRstrip
+  ^ self _rubyRstrip
+%
+
+method:
+rubyStrip
+  ^ self _rubyStrip
+%
+
+method:
+rubyStripInPlace
+  ^ self _rubyStripInPlace
+%
+
+method:
+rubyAsDowncase
+  ^ self asLowercase
+%
 
 method:
 rubyAt: anOffset length: aCount
@@ -907,7 +942,7 @@ rubySize
 
 method:
 rubySize: anInteger
-  ^ self forRuby size: anInteger
+  ^ self rubyReplace: (String fromForRuby: (self forRuby size: anInteger))
 %
 
 method:
@@ -983,7 +1018,7 @@ _rubyAt1: anOffset length: aLength
 category: 'Ruby support-bootstrap methods'
 
 method:
-_rubySelectorPrefix
+rubySelectorPrefix
   "return the selector prefix of the receiver.
 
   ruby selector format is  prefix#N*&

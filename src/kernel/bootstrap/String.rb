@@ -60,7 +60,7 @@ class String
   primitive 'delete!*', '_rubyPrim_DeleteInPlace:'
 
   # asLowercase is a smalltalk to:do: loop in CharacterCollection
-  primitive '__downcase', '_rubyPrim_AsLowercase'
+  primitive '__downcase', '_rubyPrim_AsDowncase'
   primitive '__downcase!', '_rubyPrim_DowncaseInPlace'
 
   primitive '__dumpInto' , '_rubyPrim_DumpInto:'
