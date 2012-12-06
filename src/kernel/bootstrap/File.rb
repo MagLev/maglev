@@ -256,9 +256,9 @@ class File
       end
     end
 
-    if first == ?~
+    if first == ?~.ord
       path = __tilde_expand(path)
-    elsif first != ?/
+    elsif first != ?/.ord
       if dir
         dir = File.expand_path dir
       else

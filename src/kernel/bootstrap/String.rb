@@ -8,6 +8,7 @@ class String
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
+  primitive_nobridge '__code_point_at', 'codePointAt:'
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
   class_primitive_nobridge '__new', 'new:'
@@ -42,6 +43,10 @@ class String
     s = __alloc
     s.initialize
     s
+  end
+
+  def ord
+    self.__code_point_at(1)
   end
 
   def initialize(*args, &block)
