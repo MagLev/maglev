@@ -16,79 +16,79 @@ module Marshal
   VERSION_STRING = "\x04\x08".freeze
 
   TYPE_ARRAY = '['.freeze
-  TYPE_ARRAY_ch = 91 #?[
+  TYPE_ARRAY_ch = ?[
 
   TYPE_BIGNUM = 'l'.freeze
-  TYPE_BIGNUM_ch = 108 #?l
+  TYPE_BIGNUM_ch = ?l
 
   TYPE_CLASS = 'c'.freeze
-  TYPE_CLASS_ch = 99 #?c
+  TYPE_CLASS_ch = ?c
 
   TYPE_DATA = 'd'.freeze  # no specs
-  TYPE_DATA_ch = 100 #?d  # no specs
+  TYPE_DATA_ch = ?d  # no specs
 
   TYPE_EXTENDED = 'e'.freeze
-  TYPE_EXTENDED_ch = 101 #?e
+  TYPE_EXTENDED_ch = ?e
 
   TYPE_FALSE = 'F'.freeze
-  TYPE_FALSE_ch = 70 #?F
+  TYPE_FALSE_ch = ?F
 
   TYPE_FIXNUM = 'i'.freeze
-  TYPE_FIXNUM_ch = 105 #?i
+  TYPE_FIXNUM_ch = ?i
 
   TYPE_FLOAT = 'f'.freeze
-  TYPE_FLOAT_ch = 102 #?f
+  TYPE_FLOAT_ch = ?f
 
   TYPE_HASH = '{'.freeze
   TYPE_HASH_DEF = '}'.freeze
 
-  TYPE_HASH_DEF_ch = 125 #?}
-  TYPE_HASH_ch = 123 #?{
+  TYPE_HASH_DEF_ch = ?}
+  TYPE_HASH_ch = ?{
 
   TYPE_IVAR = 'I'.freeze
-  TYPE_IVAR_ch = 73 #?I
+  TYPE_IVAR_ch = ?I
 
   TYPE_LINK = '@'.freeze
-  TYPE_LINK_ch = 64 #?@
+  TYPE_LINK_ch = ?@
 
   TYPE_MODULE = 'm'.freeze
-  TYPE_MODULE_ch = 109 #?m
+  TYPE_MODULE_ch = ?m
 
   TYPE_MODULE_OLD = 'M'.freeze  # no specs
-  TYPE_MODULE_OLD_ch = 77 #?M   # no specs
+  TYPE_MODULE_OLD_ch = ?M   # no specs
 
   TYPE_NIL = '0'.freeze
-  TYPE_NIL_ch = 79 #?0
+  TYPE_NIL_ch = ?0
 
   TYPE_OBJECT = 'o'.freeze
-  TYPE_OBJECT_ch = 111 #?o
+  TYPE_OBJECT_ch = ?o
 
   TYPE_REGEXP = '/'.freeze
-  TYPE_REGEXP_ch = 47 #?/
+  TYPE_REGEXP_ch = ?/
 
   TYPE_STRING = '"'.freeze
-  TYPE_STRING_ch = 34 #?"
+  TYPE_STRING_ch = ?"
 
   TYPE_STRUCT = 'S'.freeze
-  TYPE_STRUCT_ch = 83 #?S
+  TYPE_STRUCT_ch = ?S
 
   TYPE_SYMBOL = ':'.freeze
-  TYPE_SYMBOL_ch = 58 #?:
+  TYPE_SYMBOL_ch = ?:
 
   TYPE_SYMLINK = ';'.freeze
-  TYPE_SYMLINK_ch = 59 #?;
+  TYPE_SYMLINK_ch = ?;
 
   TYPE_TRUE = 'T'.freeze
-  TYPE_TRUE_ch = 84 #?T
+  TYPE_TRUE_ch = ?T
 
   TYPE_UCLASS = 'C'.freeze
-  TYPE_UCLASS_ch = 67 #?C
+  TYPE_UCLASS_ch = ?C
 
   TYPE_USERDEF = 'u'.freeze
-  TYPE_USERDEF_ch = 117 #?u
+  TYPE_USERDEF_ch = ?u
 
   TYPE_USRMARSHAL = 'U'.freeze
-  TYPE_USRMARSHAL_ch = 85 #?U
+  TYPE_USRMARSHAL_ch = ?U
 end
 Marshal.__freeze_constants
 
