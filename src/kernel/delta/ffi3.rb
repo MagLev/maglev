@@ -626,6 +626,7 @@ module FFI
       if name._not_equal?(nil)
         typedef(e, name)
       end
+      e
     end
 
     def enum_type(name)
