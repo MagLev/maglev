@@ -591,6 +591,7 @@ module Maglev
                      when :RPCGCI  then 'libgcirpc'
                      when :SSL     then 'libssl'
                      when :YAML    then 'libpsych'
+                     when :ICUUC   then 'libicuuc'
                      else raise "Library name must be known"
       end
       "$GEMSTONE/lib/#{library_name}-#{self.__gs_version}-#{self.__gs_width}#{self.__gs_dynlibext}"
