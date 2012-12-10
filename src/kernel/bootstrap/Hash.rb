@@ -285,20 +285,26 @@ class Hash
   end
   
   def inspect
-    s = "{"
+    return "{}" if self.size == 0
+    str = "{"
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
     unless added
-      s << '...}'
-      return s
+      str << '...}'
+      return str
     end
     begin
-      s << self.collect {|k, v| k.inspect + '=>' + v.inspect}.join(', ')
-      s << "}"
+      self.each_pair { |k, v|
+          s = str
+          s << k.inspect
+          s << "=>"
+          s << v.inspect
+          s << ", "
+      }
+      str[0..(str.length - 3)] + "}"
     ensure
       ts.remove(self)
     end
-    s
   end
 
   def values
