@@ -228,7 +228,7 @@ class Hash
 
   def [](key)
     begin
-      return self.__at(key)
+      return self.fetch(key)
     rescue KeyError 
       if @_st_defaultProc == nil
         return @_st_default
@@ -345,7 +345,7 @@ class Hash
   end
 
   def __has_value?(value)
-    self.each_pair { |k, v|
+    self.__each_pair { |k, v|
       return true if value.eql?(v)
     }
    false
@@ -355,7 +355,7 @@ class Hash
   alias value? __has_value?
   
   def __has_key?(key)
-    self.each_pair { |k, v|
+    self.__each_pair { |k, v|
       return true if (key.eql?(k) and !self.compare_by_identity?) or (key.equal?(k) and self.compare_by_identity?)
     }
     false
@@ -486,7 +486,7 @@ class Hash
 
   def fetch(key, default = (default_missing = true; nil), &block)
     if self.__has_key?(key)
-      return self[key]
+      return self.__at(key)
     elsif !default_missing
       return default
     elsif block_given?
