@@ -48,7 +48,7 @@ classmethod: RubyHash
 new
 	|hash|
 	hash := self _primBasicNew: self hashTableSize.
-	hash initialize.
+	hash initHash.
 	^ hash
 %
 ! ------------------- Instance methods for RubyHash
