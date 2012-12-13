@@ -19,5 +19,5 @@
 
 bash ./validate.sh &&
 bash ./setup.sh &&
-bash ./update.sh ||
+bash ./update.sh "$@" ||
 exit $?
