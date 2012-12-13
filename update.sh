@@ -37,6 +37,7 @@ export BACKUPS_HOME=$PWD/backups
 export DISABLE_INSTALL_DOC=0
 export SKIP_RC_REMINDER=0
 export SKIP_STONE_START=0
+export RUN_STWRAPPERS=0
 
 # Parse parameters
 while (( $# ))
@@ -70,6 +71,10 @@ do
       SKIP_STONE_START=1
       shift
       ;;
+    (--run-stwrappers)
+      RUN_STWRAPPERS=1
+      shift
+      ;;
   esac
 done
 
@@ -98,7 +103,7 @@ done
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
 # Macs with Core i7 use the same software as older Macs
-[[ $PLATFORM = "Darwin-x86_64" ]] && PLATFORM="Darwin-i386"
+[[ $PLATFORM == "Darwin-x86_64" ]] && PLATFORM="Darwin-i386"
 
 gsvers=`grep ^GEMSTONE version.txt | cut -f2 -d-`
 gss_name="GemStone-${gsvers}.${PLATFORM}"
@@ -163,10 +168,9 @@ ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 echo "[Info] updating MSpec and RubySpec submodules"
 git submodule --quiet update --init
 
-# Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
 if
-  [[  -x "${MAGLEV_SOURCE}/rake" ]]
+  which rake >/dev/null 2>&1
 then
   # Backup any existing maglev repository
   if
@@ -177,52 +181,8 @@ then
       ln -s "$BACKUPS_HOME/" backups
     }
     echo "[Info] Backing up existing 'maglev' repository to $BACKUPS_HOME/previous_maglev_extent.tgz"
-    "${MAGLEV_SOURCE}/rake" maglev:take_snapshot >/dev/null
+    rake maglev:take_snapshot >/dev/null
     mv backups/maglev_extent.tgz backups/previous_maglev_extent.tgz
-  fi
-  # create a clean slate
-  if
-    [[ -e etc/conf.d/maglev.conf ]]
-  then
-    echo "[Info] Removing existing 'maglev' configuration file."
-    "${MAGLEV_SOURCE}/rake" stone:destroy[maglev] >/dev/null
-  fi
-  if
-    [[ -e bin/extent0.ruby.dbf ]]
-  then
-    [[ -e etc/conf.d/maglev.conf ]] || {
-      echo "[Info] Creating new default 'maglev' repository"
-      "${MAGLEV_SOURCE}/rake" stone:create[maglev] >/dev/null
-    }
-  else
-    extent0='gemstone/bin/extent0.dbf'
-    if
-      [[ -e $extent0 ]]
-    then
-      echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-      echo "This could take a while..."
-      # NOTE: build:maglev will also create the maglev stone
-      if
-        "${MAGLEV_SOURCE}/rake" build:maglev
-      then
-        if
-          [[ $DISABLE_INSTALL_DOC == 0 ]]
-        then
-          echo "[Info] Generating the MagLev HTML documentation"
-          "${MAGLEV_SOURCE}/rake" rdoc >/dev/null 2>&1
-        fi
-      else
-        echo "[Warning] Could not build new ruby extent"
-      fi
-    else
-      echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
-    fi
-  fi
-  if
-    [[ $SKIP_STONE_START == 0 ]]
-  then
-    echo "[Info] Starting MagLev stone (loading kernel classes)"
-    "${MAGLEV_SOURCE}/rake" maglev:start
   fi
 else
   echo "[Warning] rake not found!"
@@ -235,7 +195,66 @@ fi
   then rm -rf "$MAGLEV_HOME"
   fi
   cp -f "$MAGLEV_SOURCE" "$MAGLEV_HOME"
+  # Make sure we are in MagLev target directory
+  builtin cd "${MAGLEV_SOURCE}"
 }
+
+# Create a default repository called "maglev" and generate the MagLev HTML documentation
+if
+  which rake >/dev/null 2>&1
+then
+  # create a clean slate
+  if
+    [[ -e etc/conf.d/maglev.conf ]]
+  then
+    echo "[Info] Removing existing 'maglev' configuration file."
+    rake stone:destroy[maglev] >/dev/null
+  fi
+  if
+    [[ -e bin/extent0.ruby.dbf ]]
+  then
+    [[ -e etc/conf.d/maglev.conf ]] || {
+      echo "[Info] Creating new default 'maglev' repository"
+      rake stone:create[maglev] >/dev/null
+    }
+  else
+    extent0='gemstone/bin/extent0.dbf'
+    if
+      [[ -e $extent0 ]]
+    then
+      echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+      echo "This could take a while..."
+      # NOTE: build:maglev will also create the maglev stone
+      if
+        rake build:maglev
+      then
+        if
+          [[ $DISABLE_INSTALL_DOC == 0 ]]
+        then
+          echo "[Info] Generating the MagLev HTML documentation"
+          rake rdoc >/dev/null 2>&1
+        fi
+      else
+        echo "[Warning] Could not build new ruby extent"
+      fi
+    else
+      echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+    fi
+  fi
+  if
+    [[ $RUN_STWRAPPERS == 1 ]]
+  then
+    echo "[Info] Generating smalltalk FFI"
+    rake stwrappers
+  fi
+fi
+
+if
+  [[ $SKIP_STONE_START == 0 ]]
+then
+  echo "[Info] Starting MagLev stone (loading kernel classes)"
+  "$MAGLEV_HOME/bin/maglev" start
+fi
 
 echo
 echo "[Info] Finished upgrade to $gss_name on $machine_name"
@@ -256,8 +275,12 @@ then
 fi
 
 # Reminder to generate Smalltalk FFI
-echo ""
-echo "[Info] If you want to call GemStone Smalltalk methods from Ruby, run"
-echo "  rake stwrappers"
-echo "after this upgrade has finished. This will generate .rb files you can use"
-echo "in \$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/"
+if
+  [[ $RUN_STWRAPPERS == 0 ]]
+then
+  echo ""
+  echo "[Info] If you want to call GemStone Smalltalk methods from Ruby, run"
+  echo "  rake stwrappers"
+  echo "after this upgrade has finished. This will generate .rb files you can use"
+  echo "in \$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/"
+fi
