@@ -68,11 +68,8 @@ case "$PLATFORM" in
     Linux-x86_64)
     # Linux looks OK
     ;;
-    SunOS-i86pc)
-    # Solaris X86  looks OK
-    ;;
     *)
-    echo "[Error] This script only works on a 64-bit Linux, Mac OS X, or Solaris-x86 machine"
+    echo "[Error] This script only works on a 64-bit Linux or Mac OS X machine"
     echo "The result from \"uname -sm\" is \"`uname -sm`\""
     exit 1
     ;;
@@ -115,14 +112,6 @@ case "$PLATFORM" in
     # Figure out the max shared memory currently allowed
     shmall="`sysctl kern.sysv.shmall | cut -f2 -d' '`"
     ;;
-    SunOS-i86pc)
-    # TODO: figure memory needs for Solaris-x86
-    # Investigate project.max-shm-memory
-    totalMemMB="`/usr/sbin/prtconf | grep Memory | cut -f3 -d' '`"
-    totalMem=$(($totalMemMB * 1048576))
-    shmmax=$(($totalMem / 4))
-    shmall=$(($shmmax / 4096))
-    ;;
     *)
     echo "[Error] Can't determine operating system. Check script."
     exit 1
@@ -157,7 +146,6 @@ if [ $shmmaxNew -gt $shmmax ]; then
     echo "[Info] Increasing max shared memory segment size to $shmmaxNewMB MB"
     [ $PLATFORM = "Darwin-i386" ] && sudo sysctl -w kern.sysv.shmmax=$shmmaxNew
     [ $PLATFORM = "Linux-x86_64" ] && sudo bash -c "echo $shmmaxNew > /proc/sys/kernel/shmmax"
-    [ $PLATFORM = "SunOS-i86pc" ] && echo "[Warning] shmmax must be set manually on Solaris-x86"
 else
     echo "[Info] No need to increase max shared memory segment size"
 fi
@@ -167,7 +155,6 @@ if [ $shmallNew -gt $shmall ]; then
     echo "[Info] Increasing max shared memory allowed to $shmallNewMB MB"
     [ $PLATFORM = "Darwin-i386" ] && sudo sysctl -w kern.sysv.shmall=$shmallNew
     [ $PLATFORM = "Linux-x86_64" ] && sudo bash -c "echo $shmallNew > /proc/sys/kernel/shmall"
-    [ $PLATFORM = "SunOS-i86pc" ] && echo "[Warning]shmall must be set manually on Solaris-x86"
 else
     echo "[Info] No need to increase max shared memory allowed"
 fi
@@ -188,22 +175,15 @@ if [[ ! -f /etc/sysctl.conf || `grep -sc "kern.*.shm" /etc/sysctl.conf` -eq 0 ]]
         sysctl kern.sysv.shmmax kern.sysv.shmall kern.sysv.shmmin kern.sysv.shmmni \
         kern.sysv.shmseg  | tr ":" "=" | tr -d " " >> /tmp/sysctl.conf.$$
         ;;
-        SunOS-i86pc)
-        # Do nothing in Solaris-x86 since /etc/sysctl.conf is ignored on Solaris 10.
-        # Must configure shared memory settings manually.
-        ;;
         *)
         echo "[Error] Can't determine operating system. Check script."
         exit 1
         ;;
     esac
-    # Do nothing on Solaris-x86 since /etc/sysctl.conf is ignored on Solaris 10.
-    if [[ "$PLATFORM" != "SunOS-i86pc" ]]; then
-        echo "[Info] Adding the following section to /etc/sysctl.conf"
-        cat /tmp/sysctl.conf.$$
-        sudo bash -c "cat /tmp/sysctl.conf.$$ >> /etc/sysctl.conf"
-        /bin/rm -f /tmp/sysctl.conf.$$
-    fi
+    echo "[Info] Adding the following section to /etc/sysctl.conf"
+    cat /tmp/sysctl.conf.$$
+    sudo bash -c "cat /tmp/sysctl.conf.$$ >> /etc/sysctl.conf"
+    /bin/rm -f /tmp/sysctl.conf.$$
 else
     echo "[Info] The following shared memory settings already exist in /etc/sysctl.conf"
     echo "To change them, remove the following lines from /etc/sysctl.conf and rerun this script"

@@ -3,7 +3,7 @@
 
 == Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.
-* 64-bit Linux, Mac OS X, or Solaris X86 operating system
+* 64-bit Linux or Mac OS X operating system
 * a version of ruby and rake to use during installation
 * root access so you can increase default shared memory settings (only during initial install)
 
