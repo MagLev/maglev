@@ -19,11 +19,11 @@
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
 # Macs with Core i7 use the same software as older Macs
-[ $PLATFORM = "Darwin-x86_64" ] && PLATFORM="Darwin-i386"
+[[ $PLATFORM == "Darwin-x86_64" ]] && PLATFORM="Darwin-i386"
 
 # Check we're on a suitable 64-bit machine
 case "$PLATFORM" in
-    Darwin-i386)
+  Darwin-i386)
     OSVERSION="`sw_vers -productVersion`"
     MAJOR="`echo $OSVERSION | cut -f1 -d.`"
     MINOR="`echo $OSVERSION | cut -f2 -d.`"
@@ -36,13 +36,13 @@ case "$PLATFORM" in
         exit 1
     fi
     ;;
-    Linux-x86_64)
+  Linux-x86_64)
     # Linux looks OK
     ;;
-    SunOS-i86pc)
+  SunOS-i86pc)
     # Solaris X86  looks OK
     ;;
-    *)
+  *)
     echo "[Error] This script only works on a 64-bit Linux, Mac OS X, or Solaris-x86 machine"
     echo "The result from \"uname -sm\" is \"`uname -sm`\""
     exit 1
