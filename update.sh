@@ -75,7 +75,7 @@ else
 fi
 
 # IMPORTANT: Move to the parent directory of the MagLev git repository
-cd $MAGLEV_HOME/..
+builtin cd $MAGLEV_HOME/..
 
 # Download appropriate version of GemStone
 if [ ! -e $gss_file ]; then
@@ -101,7 +101,7 @@ rm -f $MAGLEV_HOME/gemstone
 ln -sf ${PWD}/$gss_name $MAGLEV_HOME/gemstone
 
 # Finally get back to the MagLev directory
-cd $MAGLEV_HOME
+builtin cd $MAGLEV_HOME
 
 # Make sure we have a locks directory
 mkdir -p locks
@@ -113,47 +113,43 @@ echo "[Info] updating MSpec and RubySpec submodules"
 git submodule --quiet update --init
 
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
-# Check for existence of required executable rake
-if [  -e "`which rake 2>/dev/null`" ]; then
-    # Backup any existing maglev repository
-    if [ -e data/maglev/extent/extent0.ruby.dbf ]; then
-        echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
-        rake maglev:take_snapshot >/dev/null
-        mv backups/maglev_extent.tgz backups/previous_maglev_extent.tgz
-    fi
-    # create a clean slate
-    if [ -e etc/conf.d/maglev.conf ]; then
-        echo "[Info] Removing existing 'maglev' configuration file."
-        rake stone:destroy[maglev] >/dev/null
-    fi
+## # Backup any existing maglev repository
+## if [ -e data/maglev/extent/extent0.ruby.dbf ]; then
+##     echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
+##     rake maglev:take_snapshot >/dev/null
+##     mv backups/maglev_extent.tgz backups/previous_maglev_extent.tgz
+## fi
+## # create a clean slate
+## if [ -e etc/conf.d/maglev.conf ]; then
+##     echo "[Info] Removing existing 'maglev' configuration file."
+##     rake stone:destroy[maglev] >/dev/null
+## fi
+## 
+## if [ ! -e bin/extent0.ruby.dbf ]; then
+##     extent0='gemstone/bin/extent0.dbf'
+##     echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+##     echo "This could take a while..."
+##     if [ -e $extent0 ]; then
+##         # NOTE: build:maglev will also create the maglev stone
+##         if rake build:maglev ; then
+##             echo "[Info] Generating the MagLev HTML documentation"
+##             rake rdoc >/dev/null 2>&1
+##         else
+##             echo "[Warning] Could not build new ruby extent"
+##         fi
+##     else
+##         echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+##     fi
+## else
+##     if [ ! -e etc/conf.d/maglev.conf ]; then
+##         echo "[Info] Creating new default 'maglev' repository"
+##         rake stone:create[maglev] >/dev/null
+##     fi
+## fi
 
-    if [ ! -e bin/extent0.ruby.dbf ]; then
-        extent0='gemstone/bin/extent0.dbf'
-        echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-        echo "This could take a while..."
-        if [ -e $extent0 ]; then
-            # NOTE: build:maglev will also create the maglev stone
-            if rake build:maglev ; then
-                echo "[Info] Generating the MagLev HTML documentation"
-                rake rdoc >/dev/null 2>&1
-            else
-                echo "[Warning] Could not build new ruby extent"
-            fi
-        else
-            echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
-        fi
-    else
-        if [ ! -e etc/conf.d/maglev.conf ]; then
-            echo "[Info] Creating new default 'maglev' repository"
-            rake stone:create[maglev] >/dev/null
-        fi
-    fi
-    echo "[Info] Starting MagLev stone (loading kernel classes)"
-    rake maglev:start
-else
-    echo "[Warning] rake not found!"
-    echo "Skipping creation of default 'maglev' repository and HTML documentation."
-fi
+# Starting takes longer the first time since kernel classes haven't been loaded
+echo "[Info] Starting MagLev stone (loading kernel classes)"
+bin/maglev start
 
 echo
 echo "[Info] Finished upgrade to $gss_name on $machine_name"
