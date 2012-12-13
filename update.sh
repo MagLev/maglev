@@ -125,11 +125,13 @@ git submodule --quiet update --init
 ##     rake stone:destroy[maglev] >/dev/null
 ## fi
 ## 
-## if [ ! -e bin/extent0.ruby.dbf ]; then
-##     extent0='gemstone/bin/extent0.dbf'
-##     echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-##     echo "This could take a while..."
-##     if [ -e $extent0 ]; then
+if [ ! -e bin/extent0.ruby.dbf ]; then
+    extent0='gemstone/bin/extent0.dbf'
+    echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+    echo "This could take a while..."
+    if [ -e $extent0 ]; then
+        cp $extent0 data/maglev/extent/extent0.ruby.dbf
+        chmod 660 data/maglev/extent/extent0.ruby.dbf
 ##         # NOTE: build:maglev will also create the maglev stone
 ##         if rake build:maglev ; then
 ##             echo "[Info] Generating the MagLev HTML documentation"
@@ -137,15 +139,15 @@ git submodule --quiet update --init
 ##         else
 ##             echo "[Warning] Could not build new ruby extent"
 ##         fi
-##     else
-##         echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
-##     fi
+    else
+        echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+    fi
 ## else
 ##     if [ ! -e etc/conf.d/maglev.conf ]; then
 ##         echo "[Info] Creating new default 'maglev' repository"
 ##         rake stone:create[maglev] >/dev/null
 ##     fi
-## fi
+fi
 
 # Starting takes longer the first time since kernel classes haven't been loaded
 echo "[Info] Starting MagLev stone (loading kernel classes)"
