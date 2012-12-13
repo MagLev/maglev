@@ -27,13 +27,7 @@
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
 # Macs with Core i7 use the same software as older Macs
-[ $PLATFORM = "Darwin-x86_64" ] && PLATFORM="Darwin-i386"
-
-# We should run this as a normal user, not root.
-if [ `id | cut -f2 -d= | cut -f1 -d\(` -eq 0 ]; then
-    echo "[Error] This script should be run as a normal user, not root."
-    exit 1
-fi
+[[ $PLATFORM == "Darwin-x86_64" ]] && PLATFORM="Darwin-i386"
 
 # We're good to go. Let user know.
 machine_name="`uname -n`"
