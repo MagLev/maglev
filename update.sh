@@ -125,6 +125,7 @@ git submodule --quiet update --init
 ##     rake stone:destroy[maglev] >/dev/null
 ## fi
 ## 
+mkdir -p data/maglev/extent data/maglev/tranlog
 dbf_source=gemstone/bin/extent0.dbf
 dbf_target=data/maglev/extent/extent0.ruby.dbf
 if [ ! -e $dbf_target ]; then
