@@ -123,17 +123,39 @@ EOF
   result=$?
   if [ "$result" -ne 0 ] ; then
     echo "Loading kernel. It may take a few seconds..."
-    logfile="$MAGLEV_HOME/log/maglev/allprims.log"
+    logfile="$MAGLEV_HOME/log/maglev/loadprims.log"
+    export imageDir=$MAGLEV_HOME/src/smalltalk
+    export imageRubyDir=$MAGLEV_HOME/src/smalltalk/ruby
+    export packagesDir=$MAGLEV_HOME/src/packages
+    export upgradeDir=$MAGLEV_HOME/gemstone/upgrade
+    export dbfDir=$MAGLEV_HOME/backups
     $TOPAZ_CMD << EOF > $logfile
       set gemstone $STONENAME
       iferr 1 exit 3
-      input $MAGLEV_HOME/src/smalltalk/ruby/allprims.topaz
-      exit 0
+      input $MAGLEV_HOME/src/smalltalk/fileinruby.topaz
 EOF
     result=$?
     if [ "$result" -ne 0 ] ; then
         echo "FAILED LOADING PRIMS: $result See $logfile"
     fi
+    $TOPAZ_CMD << EOF > $logfile
+      set gemstone $STONENAME
+      iferr 1 exit 3
+        login
+        run
+        |repos|
+        repos := MCFileTreeRepository new directory: (FileDirectory on: '$packagesDir').
+
+        Gofer new
+            package: 'Maglev';
+            repository: repos;
+            load
+%
+        expectvalue true
+        commit
+        logout
+        exit 0
+EOF
   fi
 }
 
