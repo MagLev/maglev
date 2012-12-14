@@ -199,53 +199,70 @@ fi
   builtin cd "${MAGLEV_SOURCE}"
 }
 
+# setup topaz environment
+STONENAME="${STONENAME:-maglev}"
+GEMSTONE="${MAGLEV_HOME}/gemstone"
+GEMSTONE_GLOBAL_DIR="$MAGLEV_HOME"
+GEMSTONE_SYS_CONF="${MAGLEV_HOME}/etc/system.conf"
+GEMSTONE_DATADIR="${MAGLEV_HOME}/data/${STONENAME}"
+GEMSTONE_LOG="${MAGLEV_HOME}/log/${STONENAME}/${STONENAME}.log"
+
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
+#TODO: stop stone if running
+
+# create a clean slate
 if
-  which rake >/dev/null 2>&1
+  [[ -e etc/conf.d/maglev.conf ]]
 then
-  # create a clean slate
+  echo "[Info] Removing existing '${STONENAME}' configuration file."
+  rm -rf "${GEMSTONE_DATADIR}"
+  rm -rf "${MAGLEV_HOME}/etc/conf.d/${STONENAME}.conf"
+  rm -rf "${MAGLEV_HOME}/log/${STONENAME}"
+fi
+if
+  [[ -e "${MAGLEV_HOME}/bin/extent0.ruby.dbf" ]]
+then
+  [[ -e etc/conf.d/maglev.conf ]] || maglev_stone_create
+else
+  extent0='gemstone/bin/extent0.dbf'
   if
-    [[ -e etc/conf.d/maglev.conf ]]
+    [[ -e $extent0 ]]
   then
-    echo "[Info] Removing existing 'maglev' configuration file."
-    rake stone:destroy[maglev] >/dev/null
-  fi
-  if
-    [[ -e bin/extent0.ruby.dbf ]]
-  then
-    [[ -e etc/conf.d/maglev.conf ]] || {
-      echo "[Info] Creating new default 'maglev' repository"
-      rake stone:create[maglev] >/dev/null
-    }
-  else
-    extent0='gemstone/bin/extent0.dbf'
+    echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+    echo "This could take a while..."
+    # NOTE: build:maglev will also create the maglev stone
     if
-      [[ -e $extent0 ]]
+      build_maglev
     then
-      echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-      echo "This could take a while..."
-      # NOTE: build:maglev will also create the maglev stone
       if
-        rake build:maglev
+        [[ $DISABLE_INSTALL_DOC == 0 ]] &&
+        [[ -x "${MAGLEV_HOME}/bin/rake" ]]
       then
-        if
-          [[ $DISABLE_INSTALL_DOC == 0 ]]
-        then
-          echo "[Info] Generating the MagLev HTML documentation"
-          rake rdoc >/dev/null 2>&1
-        fi
-      else
-        echo "[Warning] Could not build new ruby extent"
+        echo "[Info] Generating the MagLev HTML documentation"
+        env GEM_HOME="" GEM_PATH="${MAGLEV_HOME}/lib/maglev/gems/1.8/gems" \
+          "${MAGLEV_HOME}/bin/rake" rdoc >/dev/null 2>&1
       fi
     else
-      echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+      echo "[Warning] Could not build new ruby extent"
     fi
+  else
+    echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
   fi
+fi
+
+if
+  [[ $RUN_STWRAPPERS == 1 ]]
+then
+  #rake stwrappers
+  wrapper_dir="${MAGLEV_HOME}/lib/ruby/site_ruby/1.8/smalltalk"
   if
-    [[ $RUN_STWRAPPERS == 1 ]]
+    [[ -e "${wrapper_dir}" ]]
   then
-    echo "[Info] Generating smalltalk FFI"
-    rake stwrappers
+    echo "[Info] Smalltalk FFI already exist."
+  else
+    echo "[Info] Generating smalltalk FFI."
+    #TODO: what was the % supposed to do?
+    run_on_stone "omit resultcheck" "run" "RubyContext createSmalltalkFFIWrappers" "%"
   fi
 fi
 
