@@ -311,6 +311,8 @@ class SystemCallError
     @_st_errno
   end
 end
+class TransactionError
+end
 class ThreadError
 end
 class TypeError
