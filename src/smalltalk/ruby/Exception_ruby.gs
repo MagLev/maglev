@@ -280,3 +280,8 @@ _initSignalConstants: envId
  tmps at:#RUBY_RubySignal putNoStub: cls . "protect in-memory copy from GC"
  ^ self
 %
+
+method: TransactionError
+gsArguments
+  ^ gsArgs
+%
