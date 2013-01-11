@@ -146,7 +146,7 @@ else
     exit 1
   fi
   echo "[Info] Downloading $gss_file using ${cmd}"
-  ensure $cmd http://glass-downloads.gemstone.com/maglev/$gss_file
+  ensure $cmd http://glass-downloads.gemstone.com/maglev/$gss_name
 fi
 
 # Uncompress the downloaded GemStone archive in the current directory
