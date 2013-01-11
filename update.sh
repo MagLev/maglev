@@ -109,6 +109,8 @@ function ensure()
   }
 }
 
+source ./build_functions.sh
+
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
 # Macs with Core i7 use the same software as older Macs
