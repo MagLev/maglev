@@ -100,6 +100,15 @@ done
   exit 1
 }
 
+function ensure()
+{
+  "$@" || {
+    typeset _ret=$?
+    echo "[Error] execution failed for '$*' with error ${_ret}."
+    exit ${_ret}
+  }
+}
+
 # Detect operating system
 PLATFORM="`uname -sm | tr ' ' '-'`"
 # Macs with Core i7 use the same software as older Macs
@@ -137,7 +146,7 @@ else
     exit 1
   fi
   echo "[Info] Downloading $gss_file using ${cmd}"
-  $cmd http://glass-downloads.gemstone.com/maglev/$gss_file
+  ensure $cmd http://glass-downloads.gemstone.com/maglev/$gss_file
 fi
 
 # Uncompress the downloaded GemStone archive in the current directory
@@ -148,7 +157,7 @@ then
   echo "to replace it, remove or rename it and rerun this script"
 else
   echo "[Info] Uncompressing $gss_file in $PWD"
-  tar xzf "$gss_file"
+  ensure tar xzf "$gss_file"
 fi
 
 # Create a link to the GemStone directory
@@ -166,7 +175,7 @@ rm -f etc/maglev.demo.key
 ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
 echo "[Info] updating MSpec and RubySpec submodules"
-git submodule --quiet update --init
+ensure git submodule --quiet update --init
 
 # Check for existence of required executable rake
 if
