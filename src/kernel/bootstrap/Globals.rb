@@ -97,6 +97,7 @@ RUBY.global('Exception',    'Exception')
 
     RUBY.global('NameError',    'NameError')
       RUBY.global('NoMethodError',  'MessageNotUnderstood')
+    RUBY.global('TransactionError', 'TransactionError')
     RUBY.global('ZeroDivisionError', 'ZeroDivide')
 
 
