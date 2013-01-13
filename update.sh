@@ -38,6 +38,11 @@ export DISABLE_INSTALL_DOC=0
 export SKIP_RC_REMINDER=0
 export SKIP_STONE_START=0
 export RUN_STWRAPPERS=0
+export STONENAME
+if [[ -z "$STONENAME" && -s .stonename && -f .stonename ]]
+then STONENAME="$(cat .stonename)"
+else STONENAME="${STONENAME:-maglev}"
+fi
 
 # Parse parameters
 while (( $# ))
@@ -75,8 +80,14 @@ do
       RUN_STWRAPPERS=1
       shift
       ;;
+    (--stonename)
+      STONENAME="$2"
+      shift 2
+      ;;
   esac
 done
+
+echo "$STONENAME" > .stonename
 
 # check if it's proper maglev source
 [[ -x "${MAGLEV_SOURCE}/bin/maglev-ruby" ]] || {
@@ -211,7 +222,6 @@ fi
 }
 
 # setup topaz environment
-STONENAME="${STONENAME:-maglev}"
 GEMSTONE="${MAGLEV_HOME}/gemstone"
 GEMSTONE_GLOBAL_DIR="$MAGLEV_HOME"
 GEMSTONE_SYS_CONF="${MAGLEV_HOME}/etc/system.conf"
