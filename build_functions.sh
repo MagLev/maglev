@@ -142,6 +142,13 @@ function build_maglev_fileinruby()
   run_topaz "${_commands[@]}"
 }
 
+function build_maglev_filein()
+(
+# ( = subprocess for new env variables scope
+  build_maglev_filein_env_setup
+  build_maglev_in_stone build_maglev_fileinruby
+)
+
 function build_maglev_load_file_tree_dir()
 {
   typeset -a _commands
@@ -167,13 +174,6 @@ function build_maglev_load_file_tree_dir()
   )
   run_topaz "${_commands[@]}"
 }
-
-function build_maglev_filein()
-(
-# ( = subprocess for new env variables scope
-  build_maglev_filein_env_setup
-  build_maglev_in_stone build_maglev_fileinruby
-)
 
 function build_maglev_packages()
 (
