@@ -10,7 +10,7 @@ function run_topaz()
 {
   typeset IFS
   IFS=$'\n'
-  printf "$*\n" | gs_sh topaz || return $?
+  printf "$*\n" | gs_sh topaz -I "${MAGLEV_HOME}/etc/.topazini" || return $?
 }
 
 function run_on_stone()
@@ -48,11 +48,11 @@ function cp_template()
     exit 1
   }
   sed \
-    -e "s#<%= extent_filename %>#$GEMSTONE_DATADIR/extent/extent0.dbf#" \
-    -e "s#<%= scratch_directory %>#$GEMSTONE_DATADIR/scratch.#" \
-    -e "s#<%= tranlog_directories.join(\",\") %>#$GEMSTONE_DATADIR/tranlog,$GEMSTONE_DATADIR/tranlog#" \
-    -e "s#<%= FILEIN_DIR %>#$FILEIN_DIR#" \
-    -e "s#<%= KEYFILE %>#$MAGLEV_HOME/etc/maglev.demo.key#" \
+    -e "s#<%= extent_filename %>#$GEMSTONE_DATADIR/extent/extent0.dbf#g" \
+    -e "s#<%= scratch_directory %>#$GEMSTONE_DATADIR/scratch.#g" \
+    -e "s#<%= tranlog_directories.join(\",\") %>#$GEMSTONE_DATADIR/tranlog,$GEMSTONE_DATADIR/tranlog#g" \
+    -e "s#<%= FILEIN_DIR %>#$FILEIN_DIR#g" \
+    -e "s#<%= KEYFILE %>#$MAGLEV_HOME/etc/maglev.demo.key#g" \
     < "$erb_file" > "$dest_file"
 }
 
@@ -65,7 +65,7 @@ function build_maglev_stone_create()
   mkdir -p "${GEMSTONE_DATADIR}/extent"
   mkdir -p "${MAGLEV_HOME}/log/${STONENAME}"
   mkdir -p "${GEMSTONE_DATADIR}/tranlog"
-  cp "${MAGLEV_HOME}/bin/extent0.ruby.dbf" "${GEMSTONE_DATADIR}/extent0.ruby.dbf"
+  cp -f "${MAGLEV_HOME}/bin/extent0.ruby.dbf" "${GEMSTONE_DATADIR}/extent0.ruby.dbf"
   chmod 0660 "${GEMSTONE_DATADIR}/extent0.ruby.dbf"
 }
 
@@ -96,16 +96,16 @@ function build_maglev_new_extent()
 (
 # ( = subprocess for new env variables scope
   build_maglev_filein_env_setup
-  cp "$GEMSTONE/bin/extent0.dbf" "$FILEIN_DIR/extent0.ruby.dbf"
+  cp -f "$GEMSTONE/bin/extent0.dbf" "$FILEIN_DIR/extent0.ruby.dbf"
   chmod 0770 "$FILEIN_DIR/extent0.ruby.dbf"
   cp_template "${BUILD_DIR}/filein.ruby.conf.erb" "$GEMSTONE_SYS_CONF"
-  cp "${BUILD_DIR}/fileingem.ruby.conf" "$GEMSTONE_EXE_CONF"
+  cp -f "${BUILD_DIR}/fileingem.ruby.conf" "$GEMSTONE_EXE_CONF"
 )
 
 function build_maglev_in_stone()
 {
   {
-    gs_sh startstone ${STONENAME} -l "$FILEIN_DIR/stone.log" -e "$FILEIN_DIR/filein.ruby.conf" -z "$FILEIN_DIR/filein.ruby.conf"
+    gs_sh startstone ${STONENAME} -l "$FILEIN_DIR/stone.log" -e "$FILEIN_DIR/filein.ruby.conf" -z "$FILEIN_DIR/filein.ruby.conf" &&
     gs_sh waitstone ${STONENAME}
   } > "$FILEIN_DIR/startstone.log" 2>&1 ||
   {
@@ -113,9 +113,12 @@ function build_maglev_in_stone()
     echo "[ERROR] failed starting gemstone, check '$FILEIN_DIR/startstone.log' for details."
     return ${_return}
   }
-  "$@" > "$FILEIN_DIR/runstone.log" 2>&1 ||
+  {
+    "$@"
+  } > "$FILEIN_DIR/runstone_$1.log" 2>&1 ||
   {
     typeset _return=$?
+    echo "return_status=${_return}" >> "$FILEIN_DIR/runstone_$1.log"
     echo "[ERROR] failed running '$*', check '$FILEIN_DIR/runstone_$1.log' for details."
     return ${_return}
   }
@@ -192,7 +195,7 @@ function build_maglev_install_extent()
   fi
 
   echo "[Info] Copying new extent to ${MAGLEV_HOME}/bin/extent0.ruby.dbf"
-  cp "${MAGLEV_HOME}/fileintmp/extent0.ruby.dbf" "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
+  cp -f "${MAGLEV_HOME}/fileintmp/extent0.ruby.dbf" "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
   chmod 0444 "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
 }
 
@@ -201,6 +204,7 @@ function build_maglev()
   typeset _type _return
   for _type in new_extent filein packages install_extent stone_create
   do
+    echo "[INFO] maglev build ${_type//_/ }"
     build_maglev_${_type} || {
       _return=$?
       echo "[Error] Build failed for build_maglev_${_type} with return code ${_return}."

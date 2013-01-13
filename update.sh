@@ -55,10 +55,12 @@ do
     (--gemstones)
       GEMSTONES_HOME="$2"
       shift 2
+      mkdir -p "$GEMSTONES_HOME"
       ;;
     (--archives)
       ARCHIVES_HOME="$2"
       shift 2
+      mkdir -p "$ARCHIVES_HOME"
       ;;
     (--backups)
       BACKUPS_HOME="$2"
@@ -83,6 +85,15 @@ do
     (--stonename)
       STONENAME="$2"
       shift 2
+      ;;
+    (--help)
+      printf "%b" "Usage:\n./update.sh [--prefix <prefix>] [--gemstone <gemstone>] [--archives <archives] [--backups <backups>] [--disable-install-doc] [--skip-rc-reminder] [--skip-stone-start] [--run-stwrappers] [--stonename <stonename>]\n"
+      exit 0
+      ;;
+    (*)
+      echo "[ERROR] Unknown flag '$1'."
+      printf "%b" "Usage:\n./update.sh [--prefix <prefix>] [--gemstone <gemstone>] [--archives <archives] [--backups <backups>] [--disable-install-doc] [--skip-rc-reminder] [--skip-stone-start] [--run-stwrappers] [--stonename <stonename>]\n"
+      exit 1
       ;;
   esac
 done
@@ -216,12 +227,13 @@ fi
   if [[ -d "$MAGLEV_HOME" ]]
   then rm -rf "$MAGLEV_HOME"
   fi
-  cp -f "$MAGLEV_SOURCE" "$MAGLEV_HOME"
+  cp -rf "$MAGLEV_SOURCE" "$MAGLEV_HOME"
   # Make sure we are in MagLev target directory
   builtin cd "${MAGLEV_SOURCE}"
 }
 
 # setup topaz environment
+export GEMSTONE GEMSTONE_GLOBAL_DIR GEMSTONE_SYS_CONF GEMSTONE_DATADIR GEMSTONE_LOG
 GEMSTONE="${MAGLEV_HOME}/gemstone"
 GEMSTONE_GLOBAL_DIR="$MAGLEV_HOME"
 GEMSTONE_SYS_CONF="${MAGLEV_HOME}/etc/system.conf"
@@ -249,9 +261,6 @@ else
   if
     [[ -e $extent0 ]]
   then
-    echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-    echo "This could take a while..."
-    # NOTE: build:maglev will also create the maglev stone
     if
       build_maglev
     then
