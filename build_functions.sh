@@ -56,7 +56,7 @@ function cp_template()
     < "$erb_file" > "$dest_file"
 }
 
-function maglev_stone_create()
+function build_maglev_stone_create()
 {
   echo "[Info] Creating new default '${STONENAME}' repository"
   mkdir -p "${MAGLEV_HOME}/etc/conf.d/"
@@ -176,27 +176,29 @@ function build_maglev_packages()
   build_maglev_stop_stone
 )
 
+function build_maglev_install_extent()
+{
+  echo "[Info] Build Succeeded"
+  if [[ -f "${MAGLEV_HOME}/bin/extent0.ruby.dbf" ]]
+  then
+    echo "[Info] Saving previous extent as ${MAGLEV_HOME}/bin/extent0.ruby.dbf.save"
+    mv "${MAGLEV_HOME}/bin/extent0.ruby.dbf" "${MAGLEV_HOME}/bin/extent0.ruby.dbf.save"
+  fi
+
+  echo "[Info] Copying new extent to ${MAGLEV_HOME}/bin/extent0.ruby.dbf"
+  cp "${MAGLEV_HOME}/fileintmp/extent0.ruby.dbf" "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
+  chmod 0444 "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
+}
+
 function build_maglev()
 {
-  if
-    build_maglev_new_extent &&
-    build_maglev_filein &&
-    build_maglev_packages
-  then
-    echo "[Info] Build Succeeded"
-    if [[ -f "${MAGLEV_HOME}/bin/extent0.ruby.dbf" ]]
-    then
-      echo "[Info] Saving previous extent as ${MAGLEV_HOME}/bin/extent0.ruby.dbf.save"
-      mv "${MAGLEV_HOME}/bin/extent0.ruby.dbf" "${MAGLEV_HOME}/bin/extent0.ruby.dbf.save"
-    fi
-
-    echo "[Info] Copying new extent to ${MAGLEV_HOME}/bin/extent0.ruby.dbf"
-    cp "${MAGLEV_HOME}/fileintmp/extent0.ruby.dbf" "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
-    chmod 0444 "${MAGLEV_HOME}/bin/extent0.ruby.dbf"
-  else
-    echo "[Error] Build failed see ${BUILD_LOG}"
-    return 1
-  fi &&
-  maglev_stone_create ||
-  return $?
+  typeset _type _return
+  for _type in new_extent filein packages install_extent stone_create
+  do
+    build_maglev_${_type} || {
+      _return=$?
+      echo "[Error] Build failed for build_maglev_${_type} with return code ${_return}."
+      return ${_return}
+    }
+  done
 }

@@ -233,7 +233,7 @@ fi
 if
   [[ -e "${MAGLEV_HOME}/bin/extent0.ruby.dbf" ]]
 then
-  [[ -e etc/conf.d/maglev.conf ]] || maglev_stone_create
+  [[ -e etc/conf.d/maglev.conf ]] || build_maglev_stone_create
 else
   extent0='gemstone/bin/extent0.dbf'
   if
