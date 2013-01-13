@@ -88,33 +88,43 @@ function build_maglev_filein_env_setup()
   export STONENAME="fileinrubystone"
   export GEMSTONE_SYS_CONF="$FILEIN_DIR/filein.ruby.conf"
   export GEMSTONE_EXE_CONF="$FILEIN_DIR/fileingem.ruby.conf"
+  \mkdir -p "${FILEIN_DIR}"
+  \cd "${FILEIN_DIR}"
 }
 
 function build_maglev_new_extent()
 (
 # ( = subprocess for new env variables scope
   build_maglev_filein_env_setup
-  mkdir -p "${FILEIN_DIR}"
-  cd "${FILEIN_DIR}"
   cp "$GEMSTONE/bin/extent0.dbf" "$FILEIN_DIR/extent0.ruby.dbf"
   chmod 0770 "$FILEIN_DIR/extent0.ruby.dbf"
   cp_template "${BUILD_DIR}/filein.ruby.conf.erb" "$GEMSTONE_SYS_CONF"
   cp "${BUILD_DIR}/fileingem.ruby.conf" "$GEMSTONE_EXE_CONF"
 )
 
-function build_maglev_start_stone()
+function build_maglev_in_stone()
 {
   {
     gs_sh startstone ${STONENAME} -l "$FILEIN_DIR/stone.log" -e "$FILEIN_DIR/filein.ruby.conf" -z "$FILEIN_DIR/filein.ruby.conf"
     gs_sh waitstone ${STONENAME}
-  } > "$FILEIN_DIR/startstone.log" 2>&1
-}
-
-function build_maglev_stop_stone()
-{
+  } > "$FILEIN_DIR/startstone.log" 2>&1 ||
   {
-    gs_sh stopstone ${STONENAME} DataCurator swordfish
-  } > "$FILEIN_DIR/stopstone.log" 2>&1
+    typeset _return=$?
+    echo "[ERROR] failed starting gemstone, check '$FILEIN_DIR/startstone.log' for details."
+    return ${_return}
+  }
+  "$@" > "$FILEIN_DIR/runstone.log" 2>&1 ||
+  {
+    typeset _return=$?
+    echo "[ERROR] failed running '$*', check '$FILEIN_DIR/runstone_$1.log' for details."
+    return ${_return}
+  }
+  gs_sh stopstone ${STONENAME} DataCurator swordfish > "$FILEIN_DIR/stopstone.log" 2>&1 ||
+  {
+    typeset _return=$?
+    echo "[ERROR] failed stoping gemstone, check '$FILEIN_DIR/stopstone.log' for details."
+    return ${_return}
+  }
 }
 
 function build_maglev_fileinruby()
@@ -162,18 +172,14 @@ function build_maglev_filein()
 (
 # ( = subprocess for new env variables scope
   build_maglev_filein_env_setup
-  cd "${FILEIN_DIR}"
-  build_maglev_start_stone && build_maglev_fileinruby
-  build_maglev_stop_stone
+  build_maglev_in_stone build_maglev_fileinruby
 )
 
 function build_maglev_packages()
 (
 # ( = subprocess for new env variables scope
   build_maglev_filein_env_setup
-  cd "${FILEIN_DIR}"
-  build_maglev_start_stone && build_maglev_load_file_tree_dir
-  build_maglev_stop_stone
+  build_maglev_in_stone build_maglev_load_file_tree_dir
 )
 
 function build_maglev_install_extent()
