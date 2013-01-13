@@ -110,7 +110,8 @@ function build_maglev_in_stone()
   } > "$FILEIN_DIR/startstone.log" 2>&1 ||
   {
     typeset _return=$?
-    echo "[ERROR] failed starting gemstone, check '$FILEIN_DIR/startstone.log' for details."
+    echo "[ERROR] failed starting gemstone, last 10 lines of '$FILEIN_DIR/startstone.log':"
+    tail -n 10 "$FILEIN_DIR/startstone.log"
     return ${_return}
   }
   {
@@ -118,14 +119,16 @@ function build_maglev_in_stone()
   } > "$FILEIN_DIR/runstone_$1.log" 2>&1 ||
   {
     typeset _return=$?
+    echo "[ERROR] failed running '$*', last 10 lines of '$FILEIN_DIR/runstone_$1.log':"
+    tail -n 10 "$FILEIN_DIR/runstone_$1.log"
     echo "return_status=${_return}" >> "$FILEIN_DIR/runstone_$1.log"
-    echo "[ERROR] failed running '$*', check '$FILEIN_DIR/runstone_$1.log' for details."
     return ${_return}
   }
   gs_sh stopstone ${STONENAME} DataCurator swordfish > "$FILEIN_DIR/stopstone.log" 2>&1 ||
   {
     typeset _return=$?
-    echo "[ERROR] failed stoping gemstone, check '$FILEIN_DIR/stopstone.log' for details."
+    echo "[ERROR] failed stopping gemstone, last 10 lines of '$FILEIN_DIR/stopstone.log':"
+    tail -n 10 "$FILEIN_DIR/stopstone.log"
     return ${_return}
   }
 }
