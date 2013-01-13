@@ -5,3 +5,4 @@ fails:IO.popen allows the IO to be closed inside the block
 fails:IO.popen starts returns a forked process if the command is -
 fails:IO.popen yields an instance of a subclass when called on a subclass
 fails:IO.popen returns an instance of a subclass when called on a subclass
+fails:IO.popen waits for the child to finish
