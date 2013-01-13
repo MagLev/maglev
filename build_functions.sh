@@ -53,7 +53,7 @@ function cp_template()
     -e "s#<%= tranlog_directories.join(\",\") %>#$GEMSTONE_DATADIR/tranlog,$GEMSTONE_DATADIR/tranlog#" \
     -e "s#<%= FILEIN_DIR %>#$FILEIN_DIR#" \
     -e "s#<%= KEYFILE %>#$MAGLEV_HOME/etc/maglev.demo.key#" \
-    < erb_file > dest_file
+    < "$erb_file" > "$dest_file"
 }
 
 function maglev_stone_create()
@@ -65,7 +65,7 @@ function maglev_stone_create()
   mkdir -p "${GEMSTONE_DATADIR}/extent"
   mkdir -p "${MAGLEV_HOME}/log/${STONENAME}"
   mkdir -p "${GEMSTONE_DATADIR}/tranlog"
-  cp "${MAGLEV_HOME}/bin/extent0.ruby.dbf") "${GEMSTONE_DATADIR}/extent0.ruby.dbf"
+  cp "${MAGLEV_HOME}/bin/extent0.ruby.dbf" "${GEMSTONE_DATADIR}/extent0.ruby.dbf"
   chmod 0660 "${GEMSTONE_DATADIR}/extent0.ruby.dbf"
 }
 
