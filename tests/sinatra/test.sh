@@ -7,20 +7,23 @@ PATH=$MAGLEV_HOME/bin:$PATH
 MAGLEV_OPTS=
 
 rm -rf sinatra
-git clone https://github.com/sinatra/sinatra.git
+git clone --depth 1 https://github.com/sinatra/sinatra.git
 
 cd sinatra
 
 git submodule init
 git submodule update --init --recursive
 
-# Our corporate firewall does not let us use git: protocol.  So, we patch
-# Sinatra Gemfile to use http: rather than git:.  Also, we use perl rather
-# than sed because Solaris sed is broken (no -i).
-echo "Patching sinatra/Gemfile"
-perl -pi -e s/git:/http:/ Gemfile
-echo "source 'http://w2-stdev-ub10-01.gemstone.com:9292'"|cat - Gemfile > Gemfile.new
-mv Gemfile.new Gemfile
+if [ -z "$TRAVIS" ]; then
+    # Our corporate firewall does not let us use git: protocol.  So,
+    # we patch Sinatra Gemfile to use http: rather than git:.  Also,
+    # we use perl rather than sed because Solaris sed is broken (no
+    # -i).
+    echo "Patching sinatra/Gemfile"
+    perl -pi -e s/git:/http:/ Gemfile
+    echo "source 'http://w2-stdev-ub10-01.gemstone.com:9292'"|cat - Gemfile > Gemfile.new
+    mv Gemfile.new Gemfile
+fi
 
 export rack=master
 
@@ -30,6 +33,9 @@ if [[ -n $WORKSPACE ]]; then
     mkdir -p "${WORKSPACE}/reports"
     maglev start
 fi
+
+# Install gems that are required but need patches
+maglev-gem install eventmachine json nokogiri multi_json yajl-ruby mongrel bcrypt-ruby
 
 # consider adding  --without-coffee-script for Allen
 # maglev-ruby -S bundle install --without-coffee-script
