@@ -342,7 +342,7 @@ class File
     unless names.length._equal?(1)
       raise ArgumentError , 'expected 1 arg'
     end
-    File.stat(names[0]).ftype
+    File.stat(Type.coerce_to(names[0], String, :to_str)).ftype
   end
 
   def self.grpowned?(filename)
