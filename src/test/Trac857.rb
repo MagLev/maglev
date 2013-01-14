@@ -77,4 +77,5 @@ end
 
 puts "ensure_ary #{$ensure_ary.inspect}"
 puts "Flag is #{$flag}"
+raise "Failed to run all ensure blocks" unless $ensure_ary == [44, 22, 33, 11]
 raise "Failed to set $flag" unless $flag

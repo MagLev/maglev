@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"persistCopy" ],
+	"name" : "RubyTransientNameSpace",
+	"pools" : [
+		 ],
+	"super" : "RubyNameSpace",
+	"type" : "normal" }

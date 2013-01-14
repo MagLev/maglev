@@ -1,0 +1,17 @@
+{
+	"category" : "Maglev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"key",
+		"kind",
+		"leaf",
+		"offsetInScop" ],
+	"name" : "RubyScopeVarInfo",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

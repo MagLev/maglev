@@ -1,0 +1,12 @@
+{
+	"class" : {
+		"s_a:b:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"irGotoValueNode" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "",
+		"is_void_result" : "DataCurator 10/02/2012 14:30",
+		"valueNode" : "DataCurator 10/02/2012 14:30",
+		"valueNode:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

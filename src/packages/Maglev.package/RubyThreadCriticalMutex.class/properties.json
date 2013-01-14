@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"owner" ],
+	"name" : "RubyThreadCriticalMutex",
+	"pools" : [
+		 ],
+	"super" : "Semaphore",
+	"type" : "normal" }

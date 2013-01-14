@@ -399,7 +399,7 @@ static NODE* NEW_STR( bstring *str, rb_parse_state *ps)
 
 int64 RubyLexStrTerm::incrementNest(NODE **objH, int delta, rb_parse_state *ps)
 {
-  int64 v = om::FetchSmallInt_(*objH, nest_ofs);
+  int64 v = om::FetchSmallInt_(objH, nest_ofs);
   v += delta;
   om::StoreSmallInt_(ps->omPtr, objH, nest_ofs, v);
   return v;
@@ -1192,7 +1192,7 @@ lhs             : variable
                 | primary_value ary_ref
                     {
                       yTrace(vps, "lhs: | primary_value tLBRACK_STR aref__args tRBRACK");
-                      rParenLexPop(vps);
+                      /* rParenLexPop(vps); */ /* Fix GitHub issue #148, ary_ref pops already */
                       omObjSType *srcOfs = om::FetchOop($2, 1); // no gc
                       omObjSType *aref_args = om::FetchOop($2, 0);
                       $$ = RubyAttrAssignNode::s($1, ram_OOP_NIL/*"[]="*/, aref_args, srcOfs, vps);
@@ -3830,7 +3830,8 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->lex_pend = NULL;
   { NODE *cbytesO = *cbytesH;
     UTL_ASSERT(OOP_IS_RAM_OOP(cbytesO) && cbytesO->classPtr()->isCByteArray());
-    int64 info = om::FetchSmallInt_(cbytesO, OC_CByteArray_info);
+    int64 info = om::FetchSmallInt_(cbytesH, OC_CByteArray_info);
+    cbytesO = *cbytesH;
     int64 srcSize = H_CByteArray::sizeBytes(info);
     if ((uint64)srcSize > INT_MAX) {
       GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "Parser maximum source string size is 2G bytes");

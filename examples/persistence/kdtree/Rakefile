@@ -10,7 +10,7 @@ if MAGLEV
   end
   # rackup can be in different places, need to find the correct one
   RACKUP = maglev_using_rvm ? \
-    "#{ENV['BUNDLE_PATH']}/bin/rackup" : "#{ENV['MAGLEV_HOME']}/bin/rackup"
+    "#{ENV['BUNDLE_PATH']}/bin/rackup" : "#{ENV['MAGLEV_HOME']}/bin/bundle exec rackup"
 else
   puts "RUBY is MRI"
   RUBY = 'ruby'

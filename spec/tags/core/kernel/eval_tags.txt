@@ -1,4 +1,3 @@
-fails:Kernel#eval updates a local in a scope above a surrounding block scope
 fails:Kernel#eval accepts a Proc object as a binding
 fails:Kernel#eval does not make Proc locals visible to evaluated code
 fails:Kernel#eval allows a binding to be captured inside an eval

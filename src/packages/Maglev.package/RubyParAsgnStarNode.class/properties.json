@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"starSize" ],
+	"name" : "RubyParAsgnStarNode",
+	"pools" : [
+		 ],
+	"super" : "RubyParAsgnNode",
+	"type" : "normal" }

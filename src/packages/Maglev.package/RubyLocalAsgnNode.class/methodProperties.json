@@ -1,0 +1,27 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"as_accessor" : "DataCurator 10/02/2012 14:30",
+		"astDefaultVal" : "DataCurator 10/02/2012 14:30",
+		"buildBlockArgumentsOn:" : "DataCurator 10/02/2012 14:30",
+		"buildIrLeafsInto:" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"irAssignmentNode:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"irNodeNonDefault:block:" : "DataCurator 10/02/2012 14:30",
+		"irNodeWithDefault:" : "DataCurator 10/02/2012 14:30",
+		"irOptArgNode" : "DataCurator 10/02/2012 14:30",
+		"isSameAs:" : "DataCurator 10/02/2012 14:30",
+		"isSingleIterArg" : "DataCurator 10/02/2012 14:30",
+		"location" : "DataCurator 10/02/2012 14:30",
+		"name" : "DataCurator 10/02/2012 14:30",
+		"name:" : "DataCurator 10/02/2012 14:30",
+		"printSourceOn:" : "DataCurator 10/02/2012 14:30",
+		"setHasAmpersand" : "DataCurator 10/02/2012 14:30",
+		"setIsBlockArg" : "DataCurator 10/02/2012 14:30",
+		"tempName" : "DataCurator 10/02/2012 14:30",
+		"walkOptionalArg:" : "DataCurator 10/02/2012 14:30",
+		"walkOptionalArgRhs:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

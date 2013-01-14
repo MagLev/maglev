@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"matchNumNode" ],
+	"name" : "RubyNthRefNode",
+	"pools" : [
+		 ],
+	"super" : "RubyAbstractMatchDataRef",
+	"type" : "normal" }

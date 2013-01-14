@@ -1,0 +1,19 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"scriptName",
+		"rubyArgs",
+		"scriptArgs",
+		"libs",
+		"requires",
+		"scriptlets" ],
+	"name" : "RubyArgs",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

@@ -1,0 +1,19 @@
+{
+	"class" : {
+		"on:" : "DataCurator 10/02/2012 14:30",
+		"unwrap:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"__rubyPerformWrapperBlockFor:" : "DataCurator 10/02/2012 14:30",
+		"__wrappedRubyObject" : "DataCurator 10/02/2012 14:30",
+		"__wrappedRubyObject:" : "DataCurator 10/02/2012 14:30",
+		"class" : "DataCurator 10/02/2012 14:30",
+		"doesNotUnderstand:" : "",
+		"ifNil:ifNotNilDo:" : "DataCurator 10/02/2012 14:30",
+		"ifNotNilDo:" : "DataCurator 10/02/2012 14:30",
+		"ifNotNilDo:ifNil:" : "DataCurator 10/02/2012 14:30",
+		"isBehavior" : "DataCurator 10/02/2012 14:30",
+		"isNil" : "DataCurator 10/02/2012 14:30",
+		"respondsTo:" : "DataCurator 10/02/2012 14:30",
+		"rubyPerform:" : "DataCurator 10/02/2012 14:30",
+		"rubyPerform:withArguments:" : "DataCurator 10/02/2012 14:30",
+		"rubyPerform:withArguments:withBlock:" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,20 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		"bodyNode",
+		"staticScope",
+		"sendsBinding",
+		"lineNumberBias",
+		"isMainProgram",
+		"fileName",
+		"source" ],
+	"name" : "RubyRootNode",
+	"pools" : [
+		 ],
+	"super" : "RubyNode",
+	"type" : "normal" }

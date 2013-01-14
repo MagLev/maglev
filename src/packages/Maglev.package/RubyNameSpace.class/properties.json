@@ -1,0 +1,23 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"AllowDeferred",
+		"AutoDefine",
+		"TraceCount",
+		"TraceGlobals",
+		"TrapLookup" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"name",
+		"myClass",
+		"parent",
+		"methodProtection",
+		"moduleFrozen",
+		"envId" ],
+	"name" : "RubyNameSpace",
+	"pools" : [
+		 ],
+	"super" : "IdentityDictionary",
+	"type" : "normal" }

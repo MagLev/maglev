@@ -1,0 +1,16 @@
+{
+	"class" : {
+		"s_a:b:c:d:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"childrenForMatch" : "DataCurator 10/02/2012 14:30",
+		"definedQkind" : "DataCurator 10/02/2012 14:30",
+		"init_a:b:c:d:" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "DataCurator 10/02/2012 14:30",
+		"operatorCallName:" : "DataCurator 10/02/2012 14:30",
+		"receiverNode" : "DataCurator 10/02/2012 14:30",
+		"receiverNode:" : "DataCurator 10/02/2012 14:30",
+		"valueNode" : "DataCurator 10/02/2012 14:30",
+		"valueNode:" : "DataCurator 10/02/2012 14:30",
+		"variableAsgnCallName:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

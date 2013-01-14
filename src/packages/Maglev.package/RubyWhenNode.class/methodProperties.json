@@ -1,0 +1,19 @@
+{
+	"class" : {
+		"s_a:b:c:d:" : "DataCurator 10/02/2012 14:30" },
+	"instance" : {
+		"_inspect" : "DataCurator 10/02/2012 14:30",
+		"bodyNode" : "DataCurator 10/02/2012 14:30",
+		"bodyNode:" : "DataCurator 10/02/2012 14:30",
+		"expressionNodes" : "DataCurator 10/02/2012 14:30",
+		"expressionNodes:" : "DataCurator 10/02/2012 14:30",
+		"init_a:b:c:d:" : "DataCurator 10/02/2012 14:30",
+		"irCaseExpressionWithLeaf:" : "DataCurator 10/02/2012 14:30",
+		"irCaseNodeListWithLeaf:" : "DataCurator 10/02/2012 14:30",
+		"irCaseNodeListWithLeaf:into:" : "DataCurator 10/02/2012 14:30",
+		"irCaseNodeWithLeaf:" : "DataCurator 10/02/2012 14:30",
+		"irNextCaseExprWithLeaf:rcvr:list:idx:" : "DataCurator 10/02/2012 14:30",
+		"irWhenExpressionWithLeaf:" : "DataCurator 10/02/2012 14:30",
+		"nextCase" : "DataCurator 10/02/2012 14:30",
+		"nextCase:" : "DataCurator 10/02/2012 14:30",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

@@ -1,0 +1,10 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"argNodes" : "DataCurator 10/02/2012 14:30",
+		"asCallNodeForIter" : "DataCurator 10/02/2012 14:30",
+		"hasBlockArg" : "DataCurator 10/02/2012 14:30",
+		"irArgNodes" : "DataCurator 10/02/2012 14:30",
+		"irNode" : "",
+		"walkWithScope:" : "DataCurator 10/02/2012 14:30" } }

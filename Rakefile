@@ -57,6 +57,21 @@ task :status do
   end
 end
 
+if ENV["TRAVIS"]
+  tests = {"rubyspec" => "spec:ci",
+           "vmunit" => "tests:vmunit",
+           "vmunit2" => "tests:vmunit2",
+           "fav_gems" => "tests:fav_gems_install",
+           "sinatra" => "tests:sinatra",
+           "examples" => "tests:examples"}
+
+  task :travis do
+    Rake::Task["stwrappers"].invoke
+    ENV["PATH"] = "#{File.dirname(__FILE__)}/bin:#{ENV['PATH']}"
+    Rake::Task[tests[ENV["CI_TESTS"]]].invoke
+  end
+end
+
 # This initializes the environment, and then ensures that there is a
 # gemstone diretory there.  Needed to pull this out, since some of the
 # initialization tasks need to be performed before there is a gemstone dir
@@ -161,15 +176,16 @@ def task_gemstone(stone, action, desc=nil)
   end
 end
 
-
 GemStoneInstallation.current.stones.each do |server_name|
+  next if defined?(Maglev) and Maglev::System.stone_name == server_name
   namespace server_name do
     [[:stop,             "Stop the \"#{server_name}\" server"],
      [:restart,          "Stop then start the \"#{server_name}\" server"],
      [:status,           "Report status of the \"#{server_name}\" server"],
      [:reload,           "Destroy the \"#{server_name}\" repository then load a fresh one"],
      [:take_snapshot,    "Stop the \"#{server_name}\" server then make a backup copy of its repository"],
-     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"]
+     [:restore_snapshot, "Restore the \"#{server_name}\" repository from its previous snapshot"],
+     [:webtools, "Run the GemStone/S Webtools"],
     ].each do |action,desc|
       stone = MagLevStone.new(server_name, GemStoneInstallation.current)
       task_gemstone(stone, action, desc)
@@ -198,5 +214,11 @@ The netldiname parameter determines which netldi to use (default: ENV['gs64ldi']
         stone.input_file file, true
       end
     end
+  end
+end
+
+if defined? Maglev
+  at_exit do
+    puts "[INFO] Some stone maintenance tasks have been omitted, because they cannot be run through MagLev rake. Use another Ruby for stone maintenance."
   end
 end

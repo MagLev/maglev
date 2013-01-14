@@ -54,7 +54,7 @@ To stop your MagLev server:
 
 <b>Note:</b> <tt>maglev stop</tt> will only stop the version of MagLev currently in use.
 If you're using more than one, you'll have to <tt>maglev stop</tt> each of them -- e.g.
-  rvm use maglev-26436
+  rvm use maglev-1.0.0
   maglev stop
   rvm use maglev-head
   maglev stop
@@ -107,8 +107,8 @@ MagLev source tree and other files. Change to that directory, then:
    run:
      ./install.sh
    If you've already run <tt>installMaglev.sh</tt> on the machine, then you
-   can use the upgrade script:
-     ./upgrade.sh
+   can use the update script:
+     ./update.sh
 
 To use MagLev, you need to run <tt>install.sh</tt> at least once.  After
 that, every time you <tt>git pull</tt>, you need to run <tt>update.sh</tt>
@@ -121,6 +121,6 @@ The installer/updater figures that out from the version.txt file.
 
 You'll have all the functionality of git, but unless you create a new
 clone for each release, you may be unable to revert to an earlier version.
-Why? The install/upgrade script creates a new copy of the MagLev data
+Why? The install/update script creates a new copy of the MagLev data
 repository including persistent kernel code. The scripts make one level of
 backup, but we are not providing migration scripts.

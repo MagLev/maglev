@@ -1,0 +1,4 @@
+parsetree
+isSameAs: other
+	^ true
+

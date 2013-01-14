@@ -1,0 +1,20 @@
+{
+	"category" : "MagLev-Runtime",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		"TraceLoad" ],
+	"commentStamp" : "",
+	"instvars" : [
+		"givenPath",
+		"path",
+		"source",
+		"loadName",
+		"fullPath",
+		"traceLoad",
+		"cLibrary" ],
+	"name" : "RubyFile",
+	"pools" : [
+		 ],
+	"super" : "Object",
+	"type" : "normal" }

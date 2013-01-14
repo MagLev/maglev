@@ -1,0 +1,15 @@
+{
+	"class" : {
+		 },
+	"instance" : {
+		"addImplicitBlockTemp" : "DataCurator 10/02/2012 14:30",
+		"addIncomingBlock:" : "DataCurator 10/02/2012 14:30",
+		"blockArgLeaf:" : "DataCurator 10/02/2012 14:30",
+		"implicitBlockNotNil" : "DataCurator 10/02/2012 14:30",
+		"implicitBlockTempName" : "DataCurator 10/02/2012 14:30",
+		"implicitBlockVar" : "DataCurator 10/02/2012 14:30",
+		"lexLevel" : "DataCurator 10/02/2012 14:30",
+		"methodScope" : "DataCurator 10/02/2012 14:30",
+		"newArgLeafNamed:number:" : "DataCurator 10/02/2012 14:30",
+		"newTempLeafNamed:" : "DataCurator 10/02/2012 14:30",
+		"setGlobalScopeFor:parent:env:" : "DataCurator 10/02/2012 14:30" } }

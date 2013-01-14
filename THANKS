@@ -5,7 +5,7 @@ including:
 - Avi Bryant, for a lot of inspiration and hard work from day one.
 - Markus Roberts, for lots of feedback, bugfixes, and porting irb and zaml
   to MagLev.
-- Michael Latta, for getting the MySQL driver and some of Rails working 
+- Michael Latta, for getting the MySQL driver and some of Rails working
   under MagLev, and his valuable feedback and bugfixes while suffering
   through earliest Alphas
 - Danie Roux and Otto Behrens, for providing rake scripts to manage multiple
@@ -19,4 +19,4 @@ including:
 - Tim Felgentreff for creating an FFI'd bcrypt-ruby that works with MagLev, getting
   mkmf.rb working and other help with MagLev C extensions.
 - Jesse Cooke for adding MagLev support to ruby-build - https://github.com/sstephenson/ruby-build
-  and exposing RCQueue, along with starting the use of MSpec for functionality like the Reduced Conflict classes.
+  and exposing some of the Reduced Conflict classes, along with starting the use of MSpec for functionality like the Reduced Conflict classes.

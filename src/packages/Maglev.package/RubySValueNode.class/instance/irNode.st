@@ -1,0 +1,4 @@
+accessing
+irNode
+	^ node irNode
+
