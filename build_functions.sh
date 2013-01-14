@@ -104,6 +104,7 @@ function build_maglev_new_extent()
 
 function build_maglev_in_stone()
 {
+  typeset __return ${_return}
   {
     gs_sh startstone ${STONENAME} -l "$FILEIN_DIR/stone.log" -e "$FILEIN_DIR/filein.ruby.conf" -z "$FILEIN_DIR/filein.ruby.conf" &&
     gs_sh waitstone ${STONENAME}
@@ -118,19 +119,19 @@ function build_maglev_in_stone()
     "$@"
   } > "$FILEIN_DIR/runstone_$1.log" 2>&1 ||
   {
-    typeset _return=$?
+    __return=$?
     echo "[ERROR] failed running '$*', last 10 lines of '$FILEIN_DIR/runstone_$1.log':"
     tail -n 10 "$FILEIN_DIR/runstone_$1.log"
     echo "return_status=${_return}" >> "$FILEIN_DIR/runstone_$1.log"
-    return ${_return}
   }
   gs_sh stopstone ${STONENAME} DataCurator swordfish > "$FILEIN_DIR/stopstone.log" 2>&1 ||
   {
     typeset _return=$?
+    [[ -n "__return" ]] || __return=${_return}
     echo "[ERROR] failed stopping gemstone, last 10 lines of '$FILEIN_DIR/stopstone.log':"
     tail -n 10 "$FILEIN_DIR/stopstone.log"
-    return ${_return}
   }
+  return ${__return:-0}
 }
 
 function build_maglev_fileinruby()
