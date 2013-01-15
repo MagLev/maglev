@@ -15,7 +15,9 @@ namespace :spec do
   desc "Run ci specs: there should be NO failures and NO errors."
   task :ci do
     rm_f "rubyspec_temp/*"
-    sh "#{PSPEC} -V -G fails"
+    system "#{PSPEC} -V -G fails | tee rubyspec.out"
+    system "killall -9 cat"
+    sh "grep '0 failures, 0 errors' rubyspec.out"
   end
 
   desc "Run ci specs, generating a rubyspec_report.xml with JUnit output."
@@ -50,4 +52,3 @@ namespace :spec do
   end
 
 end
-

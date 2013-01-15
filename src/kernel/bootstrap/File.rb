@@ -100,6 +100,7 @@ class File
   end
 
   def self.__stat(name, is_lstat)
+    raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
       name = Type.coerce_to(name, String, :to_str)
     end
@@ -342,7 +343,7 @@ class File
     unless names.length._equal?(1)
       raise ArgumentError , 'expected 1 arg'
     end
-    File.stat(names[0]).ftype
+    File.stat(Type.coerce_to(names[0], String, :to_str)).ftype
   end
 
   def self.grpowned?(filename)
