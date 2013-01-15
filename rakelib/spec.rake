@@ -16,6 +16,7 @@ namespace :spec do
   task :ci do
     rm_f "rubyspec_temp/*"
     system "#{PSPEC} -V -G fails | tee rubyspec.out"
+    system "killall -9 cat"
     sh "grep '0 failures, 0 errors' rubyspec.out"
   end
 
