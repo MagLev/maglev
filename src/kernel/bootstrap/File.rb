@@ -100,6 +100,7 @@ class File
   end
 
   def self.__stat(name, is_lstat)
+    raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
       name = Type.coerce_to(name, String, :to_str)
     end
