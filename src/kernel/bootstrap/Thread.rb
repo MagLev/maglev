@@ -188,10 +188,6 @@ class Thread
 
   primitive_nobridge '__join_group', '_joinGroup:'
 
-  # def join(limit); end #
-  #  if limit is zero, join will return immediately
-  primitive_nobridge 'join', '_join:'
-
   def join
     #   wait forever for the receiver to finish
     self.value
