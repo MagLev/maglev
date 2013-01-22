@@ -32,6 +32,7 @@ RUBY.global('Mutex', 'RubyTransientMutex')
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
+RUBY.global('OrderPreservingHashAssociation', 'OrderPreservingHashAssociation')
 RUBY.global('Proc', 'RubyProc')
 RUBY.global('Random', 'RubyRandom')
 RUBY.global('RandomNp', 'RubyRandomNp')
@@ -96,6 +97,7 @@ RUBY.global('Exception',    'Exception')
 
     RUBY.global('NameError',    'NameError')
       RUBY.global('NoMethodError',  'MessageNotUnderstood')
+    RUBY.global('TransactionError', 'TransactionError')
     RUBY.global('ZeroDivisionError', 'ZeroDivide')
 
 

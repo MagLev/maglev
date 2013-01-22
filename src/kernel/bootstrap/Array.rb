@@ -503,11 +503,12 @@ class Array
     end
   end
 
-  # ====== Comparable:
-  # RxINC: This is a cut-n-paste to get things working for mspec.
-  # Need to either overwrite or allow a mixin.
+  # Return true if both are the same object, or if both are arrays, and
+  # have the same number of elements and all corresponding elements are
+  # __eql?.
+  #
 
-  def ==(other)
+  def __eql?(other)
     return true if self._equal?(other)
     return false unless other._isArray
     lim = self.__size
@@ -523,16 +524,10 @@ class Array
         v = self.__at(i)
         ov = other[i]
         if v._equal?(ov)
-    # ok
+          # ok
         elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Array#=='
-          end
-        elsif v == ov
+          # ok, but not sure... you know :)
+        elsif v.__eql?(ov)
           # ok
         else
           return false
@@ -547,46 +542,13 @@ class Array
     true
   end
 
-  # Return true if both are the same object, or if both are arrays, and
-  # have the same number of elements and all corresponding elements are
-  # eql?.
-  #
+
+  def ==(other)
+    __eql?(other)
+  end
+
   def eql?(other)
-    return true if self._equal?(other)
-    return false unless other._isArray
-    lim = self.__size
-    return false unless lim._equal?(other.__size)
-    ts = Thread.__recursion_guard_set
-    added = ts.__add_if_absent(self)
-    begin
-      i = 0
-      limi = lim
-      while i < limi
-        v = self.__at(i)
-        ov = other[i]
-        if v._equal?(ov)
-          # ok
-        elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Array#=='
-          end
-        elsif v.eql?(ov)
-          # ok
-        else
-          return false
-        end
-        i += 1
-      end
-    ensure
-      if added
-        ts.remove(self)
-      end
-    end
-    true
+    __eql?(other)
   end
 
   def >(other)
@@ -1735,7 +1697,7 @@ class Array
   end
 
   def to_s
-    self.join
+    '[' + self.collect { |v| v.inspect }.join(', ') + ']'
   end
 
   # Transpose rows and columns (assumes self is an array of arrays, all of

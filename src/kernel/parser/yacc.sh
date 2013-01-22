@@ -1,3 +1,4 @@
+#! /usr/bin/bash
 #!/bin/bash
 
 PARSERDIR=$(cd $(dirname $0) ; pwd)

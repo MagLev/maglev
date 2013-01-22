@@ -1,5 +1,7 @@
 class Module
 
+  primitive '__rename', '_rubyRename:'
+
   # See also delta/Module.rb
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
@@ -498,7 +500,7 @@ class Module
   # def self.nesting; end
   class_primitive 'nesting', 'moduleNesting'
 
-  primitive_nobridge '_method_protection', 'rubyMethodProtection'
+  primitive_nobridge '_method_protection', 'rubyMethodProtection' # not used from Ruby
 
   PROTECTION_PUBLIC = 0
   PROTECTION_PROTECTED = 1

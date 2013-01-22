@@ -649,7 +649,7 @@ class ArrayTest
   def toString
     arr1 = ['d', 'f', 'a', 'c', 'e', 'b']
     arr2 = arr1.to_s
-    if arr2 != 'dfaceb'
+    if arr2 != "[\"d\", \"f\", \"a\", \"c\", \"e\", \"b\"]"
       raise 'ERROR'
     end
   end

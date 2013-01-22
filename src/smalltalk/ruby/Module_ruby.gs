@@ -546,6 +546,16 @@ _persistable
 ^  (format bitAnd: 16r800000) == 0  "GC_RubyModuleNP bit"
 %
 
+method:
+_rubyRename: aName
+  |ns oldName|
+  oldName := (self nameSpace: 1) name.
+  ns := (self nameSpace: 1) parent.
+  ns at: aName asSymbol runtimePut: self.
+  (self nameSpace: 1) _name: aName asSymbol.
+  ns removeKey: oldName.
+%
+
 method
 isVirtual
    ^ (format bitAnd: 16r14000) ~~ 0
