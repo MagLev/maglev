@@ -1,5 +1,7 @@
 class Module
 
+  primitive '__rename', '_rubyRename:'
+
   # See also delta/Module.rb
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
