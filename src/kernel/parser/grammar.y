@@ -1192,7 +1192,7 @@ lhs             : variable
                 | primary_value ary_ref
                     {
                       yTrace(vps, "lhs: | primary_value tLBRACK_STR aref__args tRBRACK");
-                      rParenLexPop(vps);
+                      /* rParenLexPop(vps); */ /* Fix GitHub issue #148, ary_ref pops already */
                       omObjSType *srcOfs = om::FetchOop($2, 1); // no gc
                       omObjSType *aref_args = om::FetchOop($2, 0);
                       $$ = RubyAttrAssignNode::s($1, ram_OOP_NIL/*"[]="*/, aref_args, srcOfs, vps);

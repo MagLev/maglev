@@ -8947,6 +8947,7 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
   }
 }
 
+
 /* # line 8951 "rubygrammar.c" */ 
 
 #if YYDEBUG
@@ -9770,7 +9771,7 @@ case 85:
 /* # line 1193 "grammar.y" */ 
 	{
                       yTrace(vps, "lhs: | primary_value tLBRACK_STR aref__args tRBRACK");
-                      rParenLexPop(vps);
+                      /* rParenLexPop(vps); */ /* Fix GitHub issue #148, ary_ref pops already */
                       omObjSType *srcOfs = om::FetchOop(yymarkPtr[0].obj, 1); /* no gc*/
                       omObjSType *aref_args = om::FetchOop(yymarkPtr[0].obj, 0);
                       yyvalO = RubyAttrAssignNode::s(yymarkPtr[-1].obj, ram_OOP_NIL/*"[]="*/, aref_args, srcOfs, vps);

@@ -57,8 +57,8 @@ And here is the second version of the class (<tt>point_v200.rb</tt>):
   end
 
 Instances of the two classes are incompatible with each other: version 1
-instances have <tt>@x</tt> and </tt>@y</tt> instance variables and
-accessors, while version 2 instances have <tt>@r</tt> and </tt>@theta</tt>
+instances have <tt>@x</tt> and <tt>@y</tt> instance variables and
+accessors, while version 2 instances have <tt>@r</tt> and <tt>@theta</tt>
 instance variables and accessors.
 
 == Scenario 1: Stop the world and migrate

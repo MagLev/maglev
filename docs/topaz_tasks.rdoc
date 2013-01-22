@@ -6,7 +6,7 @@ Topaz is several things:
 
 == Stack Commands
 
-=== WHERE Show both ruby and smalltalk stak frames
+=== WHERE Show both ruby and smalltalk stack frames
 
 WHERE will show the stack.  Can take parameters to show above or below the
 current stack frame.
