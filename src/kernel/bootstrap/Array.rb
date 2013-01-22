@@ -524,19 +524,9 @@ class Array
         v = self.__at(i)
         ov = other[i]
         if v._equal?(ov)
-    # ok
+          # ok
         elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            #raise ArgumentError, 'recursion too complex for Array#=='
-            # causes error for this example:
-            # ar1 = [1]
-            # ar2 = [ar1, 2]
-            # ar1 == ar2 or ar1.eql?(ar2) or 
-          end
+          # ok, but not sure... you know :)
         elsif v.__eql?(ov)
           # ok
         else
