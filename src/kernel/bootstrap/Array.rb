@@ -530,7 +530,11 @@ class Array
           elsif v._equal?(other) && ov._equal?(self)
             # ok
           else
-            raise ArgumentError, 'recursion too complex for Array#=='
+            #raise ArgumentError, 'recursion too complex for Array#=='
+            # causes error for this example:
+            # ar1 = [1]
+            # ar2 = [ar1, 2]
+            # ar1 == ar2
           end
         elsif v == ov
           # ok
@@ -552,6 +556,8 @@ class Array
   # eql?.
   #
   def eql?(other)
+    savedSelf = self.inspect
+    savedOther = other.inspect
     return true if self._equal?(other)
     return false unless other._isArray
     lim = self.__size
@@ -572,7 +578,11 @@ class Array
           elsif v._equal?(other) && ov._equal?(self)
             # ok
           else
-            raise ArgumentError, 'recursion too complex for Array#=='
+            #raise ArgumentError, 'recursion too complex for Array#=='
+            # causes error for this example:
+            # ar1 = [1]
+            # ar2 = [ar1, 2]
+            # ar1.eql?(ar2)
           end
         elsif v.eql?(ov)
           # ok
