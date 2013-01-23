@@ -485,9 +485,13 @@ class Hash
   end
 
   def fetch(key, default = (default_missing = true; nil), &block)
-    if self.__has_key?(key)
-      return self.__at(key)
-    elsif !default_missing
+    begin
+      return self.__at(key)  
+    rescue KeyError => e
+      # ok, try defaults
+    end 
+       
+    if !default_missing
       return default
     elsif block_given?
       yield(key)
