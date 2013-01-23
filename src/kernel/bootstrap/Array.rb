@@ -510,10 +510,10 @@ class Array
 
   # Return true if both are the same object, or if both are arrays, and
   # have the same number of elements and all corresponding elements are
-  # __eql?.
+  # eql?.
   #
 
-  def __eql?(other)
+  def eql?(other)
     return true if self._equal?(other)
     return false unless other._isArray
     lim = self.__size
@@ -531,8 +531,10 @@ class Array
         if v._equal?(ov)
           # ok
         elsif ts.include?(v) || ts.include?(ov)
-          # ok, but not sure... you know :)
-        elsif v.__eql?(ov)
+          # v and ov are the same objects, so behave like MRI 1.8.7 and return false
+          # in MRI 1.9.3 it should return true, though the array are not the same objects, but they have the same content
+          return false          
+        elsif v.eql?(ov)
           # ok
         else
           return false
@@ -547,14 +549,7 @@ class Array
     true
   end
 
-
-  def ==(other)
-    __eql?(other)
-  end
-
-  def eql?(other)
-    __eql?(other)
-  end
+  alias :== :eql?
 
   def >(other)
     (self <=> other) > 0

@@ -53,6 +53,19 @@ def trace(linenum)
   # puts 'line ' + linenum.to_s
 end
 
+# overriding == or eql?
+class MyArray1 < Array
+  def ==(other)
+    false
+  end
+end
+
+class MyArray2 < Array
+  def eql?(other)
+    false
+  end
+end
+
 class ArrayTest
   # Expected value: [100, 200, 300]
   def new1
@@ -150,6 +163,7 @@ class ArrayTest
     end
   end
 
+  ## eql? and ==
   # Expected value: true
   def equal1
     arr1 = [1, 2, 3, 4]
@@ -169,6 +183,65 @@ class ArrayTest
       raise 'ERROR'
     end
   end
+
+
+  def equal_overriding1
+    # overriding ==
+    arr_orig = [1,2,3,4]
+    other = [1,2,3,3]
+
+    arr1 = MyArray1.new(arr_orig)
+
+    if arr1 == arr_orig
+      raise "1. Overriding of == does not work"
+    elsif arr1 == other
+      raise "2. Overriding of == does not work"
+    elsif !arr1.eql?(arr_orig)
+      raise "3. Overriding of == does not work"
+    elsif arr1.eql?(other)
+      raise "4. Overriding of == does not work"
+    else
+      # ok
+    end
+  end
+
+  def equal_overriding2
+    # overriding eql?
+    arr_orig = [1,2,3,4]
+    other = [1,2,3,3]
+
+    arr1 = MyArray2.new(arr_orig)
+
+    if !(arr1 == arr_orig)
+      raise "1. Overriding of == does not work"
+    elsif arr1 == other
+      raise "2. Overriding of == does not work"
+    elsif arr1.eql?(arr_orig)
+      raise "3. Overriding of == does not work"
+    elsif arr1.eql?(other)
+      raise "4. Overriding of == does not work"
+    else
+      # ok
+    end
+  end
+
+  # equal of recursive Arrays
+  def equal_recursive
+    a = [1,2,3,4]
+    b = [1,2,3,4]
+    a[0] = a
+    b[0] = b
+    if a.eql?(b)
+      raise "recursive arrays #{a} and #{b} should not be equal"
+    end
+    a = [1,2,3]
+    b = [a,2,3]
+    if a.eql?(b)
+      raise "recursive arrays #{a} and #{b} should not be equal"
+    end
+
+  end
+
 
   # Expected value: 2
   def index1
@@ -645,13 +718,14 @@ class ArrayTest
     end
   end
 
-  # Expected value: 'dfaceb'
+  # Expected value: 'dfaceb' or "[\"d\", \"f\", \"a\", \"c\", \"e\", \"b\"]"
   def toString
     arr1 = ['d', 'f', 'a', 'c', 'e', 'b']
     arr2 = arr1.to_s
-    if arr2 != "[\"d\", \"f\", \"a\", \"c\", \"e\", \"b\"]"
+    if not ["[\"d\", \"f\", \"a\", \"c\", \"e\", \"b\"]", "dfaceb"].include? arr2
       raise 'ERROR'
     end
+
   end
 
   # Expected value [[1, 5], [2, 6]]
@@ -743,6 +817,15 @@ trace(__LINE__)
 
 # expectvalue false
 ArrayTest.new.equal2()
+trace(__LINE__)
+
+ArrayTest.new.equal_overriding1
+trace(__LINE__)
+
+ArrayTest.new.equal_overriding2
+trace(__LINE__)
+
+ArrayTest.new.equal_recursive
 trace(__LINE__)
 
 # expectvalue 2
