@@ -25,6 +25,23 @@ _primBasicNew: aSize
 category: 'Instance creation'
 set compile_env: 0
 classmethod: RubyHash
+newWithNextSizeFor: size
+	|hash nextSize|
+	size == 7 ifTrue: [nextSize := 13].
+	size == 13 ifTrue: [nextSize := 23].
+	size == 23 ifTrue: [nextSize := 47].
+	size == 47 ifTrue: [nextSize := 83].
+	size == 83 ifTrue: [nextSize := 163].
+	size == 163 ifTrue: [nextSize := 317].
+	size == 317 ifTrue: [nextSize := 631].
+	size == 631 ifTrue: [nextSize := 631].
+	hash := self _primBasicNew: nextSize.
+	hash initHash.
+	^ hash
+%
+category: 'Instance creation'
+set compile_env: 0
+classmethod: RubyHash
 _basicNew: aSize
 	|hash|
 	hash := self _primBasicNew: aSize.
@@ -34,7 +51,7 @@ category: 'Accessing'
 set compile_env: 0
 classmethod: RubyHash
 hashTableSize
-	^ 2017
+	^ 7
 %
 category: 'Accessing'
 set compile_env: 0
@@ -130,7 +147,7 @@ category: 'Hash set'
 set compile_env: 0
 method: RubyHash
 maxBitmask
-	^ 67566
+	^ 47096
 %
 category: 'Hash set'
 set compile_env: 0
@@ -412,7 +429,7 @@ set compile_env: 0
 method: RubyHash
 newNextHash
 	|hash|
-	hash := self class new.
+	hash := self class newWithNextSizeFor: self hashTableSize.
 	hash isIdentityHash: self isIdentityHash.
 	hash bitmask: self nextBitmask.
 	hash head: self head.

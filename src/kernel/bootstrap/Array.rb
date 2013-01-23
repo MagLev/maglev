@@ -434,26 +434,11 @@ class Array
 
   def -(arg)
     arg = Type.coerce_to(arg, Array, :to_ary)
-    argSize = arg.__size
-    mySize = self.__size
-    default = []
-    h = Hash.new(default)
     res = []
-    i = 0
-    while i < argSize
-      el = arg[i]
-      h[el] = el
-      i = i + 1
-    end
-    i = 0
-    while i < mySize
-      el = self.__at(i)
-      if h[el]._equal?(default)
-        res.__push( el )
-      end
-      i = i + 1
-    end
-    res
+    self.each { |x|
+      res.__push(x) unless arg.include?(x)
+    }
+    return res
   end
 
   # note, <<  can't use smalltalk add: , it returns arg, not receiver

@@ -536,11 +536,7 @@ class Hash
   end
 
   def __key_error(key)
-    if key._isHash
-      raise KeyError.new("Key not found {...}")
-    else
-      raise KeyError.new("Key not found \"#{key.inspect}\"")
-    end
+    raise KeyError.new("Key not found")
   end
 
   def __equals(key, anotherKey)
