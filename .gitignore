@@ -40,4 +40,6 @@ src/kernel/parser/byacc/config.status
 src/kernel/parser/byacc/makefile
 src/kernel/parser/byacc/yacc
 src/test/capi/Makefile
+etc/
+/etc/
 etc/maglev.hpi.key
