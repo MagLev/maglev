@@ -246,3 +246,19 @@ _selectorPrefixesReport: envId
   ].
   ^ SortedCollection withAll: set
 %
+
+method:
+_setInstancesDbTransientBit: aBool
+self _validatePrivilege ifTrue:[
+  aBool ifTrue:[
+    (self isPointers and:[ self isIndexable not]) ifFalse:[
+      ^ ImproperOperation new details:'Only non-indexable pointer objects may be DbTransient';
+           object: self ; signal 
+    ].
+    format := format bitOr: 16r1000 .
+  ] ifFalse:[
+    format := format bitAnd: (16r1000 bitInvert) 
+  ].
+  self _refreshClassCache: false .
+].
+%

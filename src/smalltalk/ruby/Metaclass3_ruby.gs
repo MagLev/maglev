@@ -36,3 +36,9 @@ _setInstancesPersistent: aBool
 
 ! includeRubyModule: moved to .mcz
 !  classForConstantLookup moved to .mcz
+
+method
+_setInstancesDbTransient: aBool
+  self _setInstancesDbTransientBit: aBool .
+  ^ aBool
+%
