@@ -286,6 +286,7 @@ class Hash
   
   def inspect
     return "{}" if self.size == 0
+
     str = "{"
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
@@ -294,14 +295,16 @@ class Hash
       return str
     end
     begin
+      counter = 0
       self.each_pair { |k, v|
-          s = str
-          s << k.inspect
-          s << "=>"
-          s << v.inspect
-          s << ", "
+          counter = counter + 1
+          str << k.inspect
+          str << "=>"
+          str << v.inspect
+          str << ", "
       }
-      str[0..(str.length - 3)] + "}"
+      str = str[0..-3]
+      str << "}"
     ensure
       ts.remove(self)
     end
@@ -355,10 +358,16 @@ class Hash
   alias value? __has_value?
   
   def __has_key?(key)
-    self.__each_pair { |k, v|
-      return true if (key.eql?(k) and !self.compare_by_identity?) or (key.equal?(k) and self.compare_by_identity?)
-    }
-    false
+    begin
+      self.__at(key)
+      true
+    rescue KeyError => e
+      false
+    end
+    # self.__each_pair { |k, v|
+    #   return true if (key.eql?(k) and !self.compare_by_identity?) or (key.equal?(k) and self.compare_by_identity?)
+    # }
+    # false
   end
   
   alias has_key? __has_key?
@@ -527,7 +536,11 @@ class Hash
   end
 
   def __key_error(key)
-    raise KeyError.new("Key not found: \"#{key.inspect}\"")
+    if key._isHash
+      raise KeyError.new("Key not found {...}")
+    else
+      raise KeyError.new("Key not found \"#{key.inspect}\"")
+    end
   end
 
   def __equals(key, anotherKey)

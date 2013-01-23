@@ -319,7 +319,9 @@ category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
 hashSlotIndexFor: aKey
-  ^ ((aKey @ruby1:hash) bitAnd: self bitmask) \\ self hashTableSize + 1
+	isIdentityHash 
+		ifTrue: [ ^ ((aKey @ruby1:object_id) bitAnd: self bitmask) \\ self hashTableSize + 1]
+		ifFalse: [ ^ ((aKey @ruby1:hash) bitAnd: self bitmask) \\ self hashTableSize + 1].
 %
 category: 'Accessing'
 set compile_env: 0
