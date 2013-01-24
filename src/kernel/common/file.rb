@@ -228,11 +228,8 @@ class File
     alias_method :fnmatch?, :fnmatch
   end
 
-  ##
-  # Returns a new string formed by joining the strings using File::SEPARATOR.
-  #
-  #  File.join("usr", "mail", "gumby")   #=> "usr/mail/gumby"
-  def self.join(*args)
+
+  def self.__join(args)
     args_len = args.__size
     return ''  if args_len._equal?(0)
    
@@ -248,7 +245,7 @@ class File
       ts = Thread.__recursion_guard_set
       if ts.__add_if_absent(first)
         begin
-          first = join(*first)
+          first = __join(first)
         ensure
           ts.remove(first)
         end
@@ -277,7 +274,7 @@ class File
         end
         if ts.__add_if_absent(first)
           begin
-            value = join(*el)
+            value = __join(el)
           ensure
             ts.remove(first)
           end  
@@ -300,6 +297,15 @@ class File
       idx += 1
     end
     ret
+  end
+  ##
+  # Returns a new string formed by joining the strings using File::SEPARATOR.
+  #
+  #  File.join("usr", "mail", "gumby")   #=> "usr/mail/gumby"
+  def self.join(*args)
+    # Adding another indirection to always work on the same array object
+    # (Splat operator always passes a copy.)
+    __join(args)
   end
 
 end
