@@ -485,10 +485,11 @@ set compile_env: 0
 method: RubyHash
 removeKey: aKey
 	self hasNestedHashes
-		ifTrue: [^ (self _at: (self hashSlotIndexFor: aKey)) removeKey: aKey]
+		ifTrue: [|slot| slot := self _at: (self hashSlotIndexFor: aKey).
+			slot ifNil: [self @ruby1:__key_error: aKey]
+				ifNotNil: [^ slot removeKey: aKey]]
 		ifFalse: [self bitmask = 0 ifTrue: [^ self setRemoveKey: aKey].
-			^ self chainingRemove: aKey].
-		
+			^ self chainingRemove: aKey].		
 %
 category: 'Basic hash'
 set compile_env: 0
