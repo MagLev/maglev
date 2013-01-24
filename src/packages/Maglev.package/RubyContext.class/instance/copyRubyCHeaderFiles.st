@@ -1,7 +1,7 @@
 *maglev-runtime
 copyRubyCHeaderFiles
  | dest src srcF destF |
- dest := '$MAGLEV_HOME/lib/ruby/1.8/include/ruby.h' .
+ dest := '$MAGLEV_HOME/lib/ruby/1.9/include/ruby.h' .
  src :=  '$MAGLEV_HOME/../svn/src/ruby.h' .
  (srcF := GsFile openReadOnServer: src ) ifNotNil:[
    "we have a private build with svn checkout"
