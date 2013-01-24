@@ -1489,7 +1489,7 @@ def create_makefile(target, srcprefix = nil)
   dllib = target ? "$(TARGET).#{CONFIG['DLEXT']}" : ""
   staticlib = target ? "$(TARGET).#$LIBEXT" : ""
   mfile = open("Makefile", "wb")
-  mfile.print configuration(srcprefix)
+  mfile.print configuration(srcprefix).join
   mfile.print "
 libpath = #{($DEFLIBPATH|$LIBPATH).join(" ")}
 LIBPATH = #{libpath}
