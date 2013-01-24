@@ -148,6 +148,8 @@ RUBY.require 'kernel/common/marshal2.rb'
 RUBY.require 'kernel/common/regexp.rb'
 RUBY.require 'kernel/common/io.rb'
 RUBY.require 'kernel/common/filetest.rb'
+RUBY.require 'kernel/common/Encoding.rb'
+RUBY.require 'kernel/common/fiber.rb'
 
 # Include the delta code.  The delta code overwrites the rubinius
 # common code with gemstone specific mods.
@@ -172,4 +174,3 @@ RUBY.require 'kernel/delta/ffi_enum.rb'
 RUBY.require 'kernel/delta/pointer.rb'
 RUBY.require 'kernel/delta/buffer.rb'
 RUBY.require 'kernel/bootstrap/Argf.rb'
-

@@ -513,17 +513,45 @@ class IO
   #  IO.read("testfile", 20, 10)   #=> "ne one\nThis is line "
   #
   # Returns the empty string for empty files, unless length is passed, then returns nil
-  def self.read(name, length=MaglevUndefined, an_offset=0)
-    offset = if an_offset._equal?(nil)
+
+  # since 1.9.3:
+  # read(name, [length [, offset]] ) → string click to toggle source
+  # read(name, [length [, offset]], open_args) → string
+
+  def self.read(*args)
+    raise Errno::EINVAL, "to few arguments" if args.length < 1
+    name = args.shift
+
+    case args.length
+    when 1
+      ex = args.shift      
+      if ex.class._equal?(Fixnum)
+        length = Type.coerce_to(ex, Fixnum, :to_int)
+      else
+        open_args = ex
+      end
+    when 2
+      length = args.shift
+      ex2 = args.shift
+      if ex2.class._equal?(Fixnum)
+        offset = Type.coerce_to(ex2, Fixnum, :to_int)
+      else
+        open_args = ex2
+      end
+    when 3
+      length = Type.coerce_to(args.shift, Fixnum, :to_int)
+      offset = Type.coerce_to(args.shift, Fixnum, :to_int)
+      open_args = args.shift
+    end
+
+
+    offset = if offset._equal?(nil)
                0
-             else
-               Type.coerce_to(an_offset, Fixnum, :to_int)
              end
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
     read_all_bytes = length._equal?(MaglevUndefined) || length._equal?(nil)
     unless read_all_bytes
-      length = Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
     end
 

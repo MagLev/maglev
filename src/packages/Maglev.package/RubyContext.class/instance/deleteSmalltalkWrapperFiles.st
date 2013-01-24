@@ -1,7 +1,7 @@
 *maglev-runtime
 deleteSmalltalkWrapperFiles
   | dir names  |
-  dir := '$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk' .
+  dir := '$MAGLEV_HOME/lib/ruby/site_ruby/1.9/smalltalk' .
   (GsFile isServerDirectory: dir) == true ifTrue:[
     names := GsFile contentsOfDirectory: dir onClient: false .
     names do:[:fn | 

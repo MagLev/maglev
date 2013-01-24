@@ -147,4 +147,22 @@ class MagLevStone < Stone
     yield
     start if was_running
   end
+
+  def webtools
+    www_dir = "#{GemStoneInstallation.current.installation_directory}/examples/www"
+    unless File.exist?("#{www_dir}/installAndRun.tpz")
+      unless File.exist?(gss = "#{ML}/../svn") || File.exist?(gss = "#{ML}/../HPI-GSS")
+        raise "cannot run webtools, please copy the code to #{www_dir}"
+      end
+      FileUtils.chmod("+w", www_dir)
+      Dir["#{gss}/examples/www/*"].each do |file|
+        FileUtils.cp_r(file, www_dir)
+      end
+    end
+    cmds = ["set u DataCurator p swordfish gemstone #{name}",
+            "login",
+            "input $GEMSTONE/examples/www/installAndRun.tpz"]
+    puts "WebTools running on localhost:8080"
+    Topaz.new(self).commands(cmds)
+  end
 end

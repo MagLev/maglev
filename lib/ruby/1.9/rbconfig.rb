@@ -8,9 +8,9 @@
 # of a VM, even if this file is persistently loaded.
 
 module Config
-  RUBY_VERSION == "1.8.7" or
-    raise "ruby lib version (1.8.7) doesn't match executable version (#{RUBY_VERSION})"
-  VERSION = '1.8'
+  RUBY_VERSION == "1.9.3" or
+    raise "ruby lib version (1.9.3) doesn't match executable version (#{RUBY_VERSION})"
+  VERSION = '1.9'
   transient_const_set( :ARCH ) { `uname -m`.chomp }
 
   # Note: MAGLEV_HOME and TOPDIR should end up being the same
@@ -28,18 +28,18 @@ module Config
 
   def Config::__expand(val, cfg_arg)
       (val || "").gsub!(/\$\$|\$\(([^()]+)\)|\$\{([^{}]+)\}/) do |var|
-	if !(v = $1 || $2)
-	  '$'
-	elsif key = cfg_arg[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
-	  pat, sub = $1, $2
-	  cfg_arg[v] = false
-	  Config::__expand(key, cfg_arg)
-	  cfg_arg[v] = key
-	  key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
-	  key
-	else
-	  " "
-	end
+  if !(v = $1 || $2)
+    '$'
+  elsif key = cfg_arg[v = v[/\A[^:]+(?=(?::(.*?)=(.*))?\z)/]]
+    pat, sub = $1, $2
+    cfg_arg[v] = false
+    Config::__expand(key, cfg_arg)
+    cfg_arg[v] = key
+    key = key.gsub(/#{Regexp.quote(pat)}(?=\s|\z)/n) {sub} if pat
+    key
+  else
+    " "
+  end
       end
       val
   end
@@ -52,7 +52,7 @@ module Config
     config['exec_prefix']       = maglev_home
     config['bindir']            = File.join(maglev_home, 'bin')
     config['sysconfdir']        = File.join(maglev_home, 'etc')
-    config['includedir']        = File.join(maglev_home, 'lib/ruby/1.8/include')
+    config['includedir']        = File.join(maglev_home, 'lib/ruby/1.9/include')
     config['libdir']            = File.join(maglev_home, 'lib')
     config['gemlibdir']         = File.join(maglev_home, 'gemstone', 'lib')
     version = VERSION
@@ -82,7 +82,7 @@ module Config
 
     # TODO SHELL
     config['arch']              = arch
-    config['ruby_version']      = '1.8'
+    config['ruby_version']      = '1.9'
     cpu_os = Exception.__cpu_os_kind
     host_os = Object.__platform_str
     config['host_os'] = host_os
@@ -145,7 +145,7 @@ module Config
       config["INSTALL_SCRIPT"]  = "$(INSTALL)"
       config["INSTALL_DATA"]    = "$(INSTALL) -m 644"
 
-#   when /HP-UX/		# not supported on Maglev yet
+#   when /HP-UX/    # not supported on Maglev yet
 #     config['DLEXT']      = 'sl'
 
     end

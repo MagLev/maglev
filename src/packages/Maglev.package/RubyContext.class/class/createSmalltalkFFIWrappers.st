@@ -4,7 +4,7 @@ createSmalltalkFFIWrappers
     envId := 1 .
     RubyContext load .
     year := DateAndTime now year printString.
-    directory := '$MAGLEV_HOME/lib/ruby/site_ruby/1.8/smalltalk/'.
+    directory := '$MAGLEV_HOME/lib/ruby/site_ruby/1.9/smalltalk/'.
     (GsFile isServerDirectory: directory) == true ifFalse:[ | dirOk |
         dirOk := GsFile createServerDirectory: directory .
         dirOk ifNil:[ Error signal:'failed to create directory' ].
