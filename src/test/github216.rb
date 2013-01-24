@@ -9,4 +9,4 @@ end
 array = [1, 2]
 
 meth(*array)
-raise Exception("Should still contain two values.") if array.size != 2
+raise "Array should still contain two values." if array.size != 2
