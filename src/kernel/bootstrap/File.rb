@@ -1137,6 +1137,18 @@ class File
 
   alias :syswrite :write
 
+  def dup
+    raise IOError, "closed stream" if self.closed?
+
+    if @_st_fileDescriptor >= 0 && @_st_fileDescriptor <= 2
+      self
+    else
+      file = self.class.new(@_st_pathName, @_st_mode)
+      file.seek(self.tell)
+      file
+    end
+  end
+
 end
 File.__freeze_constants
 
