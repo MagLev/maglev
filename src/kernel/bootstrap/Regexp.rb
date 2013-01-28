@@ -264,6 +264,7 @@ class Regexp
 
   def =~(str)
     # no bridge method for this variant
+    str = str.to_str if str.respond_to?(:to_str) unless String === str
     m = __search(str, 0, nil)
     m.__storeRubyVcGlobal(0x20) # store into caller's $~
     if (m)

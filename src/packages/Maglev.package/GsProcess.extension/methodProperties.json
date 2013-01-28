@@ -14,6 +14,7 @@
 		"methodDefnTarget" : "DataCurator 10/02/2012 14:30",
 		"rubyExitOnException:" : "DataCurator 10/02/2012 14:30" },
 	"instance" : {
+                "_checkIfDebuggable" : "DataCurator 10/02/2012 14:30",
 		"_currentMethDefMetaTarget" : "DataCurator 10/02/2012 14:30",
 		"_currentMethDefTarget" : "DataCurator 10/02/2012 14:30",
 		"_defTargets" : "DataCurator 10/02/2012 14:30",

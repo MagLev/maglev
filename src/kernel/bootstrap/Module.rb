@@ -418,6 +418,38 @@ class Module
 
   primitive_nobridge '__set_persistable', '_setPersistable'
 
+  # Redefine a class and migrate it's instances. Will abort or commit
+  # the current transaction.
+  #
+  # Currently accepts the following optional hash parameters
+  #   :commit => Boolean   # Whether to commit the current transaction or not
+  #                        # Defaults to false in transient, true in persistent mode
+  #   :new_name => String  # The intended new class name and namespace
+  #                        # Defaults to the current name and namespace
+  def maglev_redefine(params = {})
+    unless (params[:commit] ||= Maglev.persistent?)
+      raise Exception, "maglev_redefine requires a transaction abort, however, an abort would result in lost data" if Maglev::System.needs_commit
+      Maglev.abort_transaction
+    end
+
+    new_name = (params[:new_name] || name).to_s.split("::")[-1]
+    old_ns = name.split("::")[0...-1].inject(Object) {|c,n| c.const_get(n)}
+    new_ns = new_name.split("::")[0...-1].inject(Object) {|c,n| cls.const_get(n)}
+
+    Maglev.persistent { old_ns.remove_const(name.split("::")[-1]) }
+    yield
+    Maglev.commit_transaction if params[:commit]
+
+    if new_ns.const_defined?(new_name)
+      self.__migrate_instances_to(new_ns.const_get(new_name))
+    else
+      raise ArgumentError, "The block passed to #maglev_redefine failed to create a class named #{new_name} under #{new_ns}"
+    end
+    Maglev.commit_transaction if params[:commit]
+    new_ns.const_get(new_name)
+  end
+  primitive '__migrate_instances_to', 'migrateInstancesTo:'
+
   # Invoked as a callback when a method is added to the receiver
   def method_added(a_symbol)
     nil

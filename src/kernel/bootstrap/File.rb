@@ -100,6 +100,7 @@ class File
   end
 
   def self.__stat(name, is_lstat)
+    raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
       name = Type.coerce_to(name, String, :to_str)
     end
@@ -342,7 +343,7 @@ class File
     unless names.length._equal?(1)
       raise ArgumentError , 'expected 1 arg'
     end
-    File.stat(names[0]).ftype
+    File.stat(Type.coerce_to(names[0], String, :to_str)).ftype
   end
 
   def self.grpowned?(filename)
@@ -1135,6 +1136,18 @@ class File
   end
 
   alias :syswrite :write
+
+  def dup
+    raise IOError, "closed stream" if self.closed?
+
+    if @_st_fileDescriptor >= 0 && @_st_fileDescriptor <= 2
+      self
+    else
+      file = self.class.new(@_st_pathName, @_st_mode)
+      file.seek(self.tell)
+      file
+    end
+  end
 
 end
 File.__freeze_constants

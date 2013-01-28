@@ -7,7 +7,7 @@ before_script:
   - "./install.sh"
 script: "rake travis"
 env:
-  # - CI_TESTS=rubyspec
+  - CI_TESTS=rubyspec
   - CI_TESTS=vmunit
   - CI_TESTS=vmunit2
   # These next ones have to be cleaned up, they don't currently pass
