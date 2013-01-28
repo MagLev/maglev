@@ -427,6 +427,7 @@ class File
                    Type.coerce_to(filename, String, :to_s)
                else
                    Type.coerce_to(filename, String, :to_str)
+               end
     nargs = 1
     if mode._equal?(MaglevUndefined)
       mode = 'r'
