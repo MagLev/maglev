@@ -39,24 +39,19 @@ class Module
     # this variant gets bridge methods
     modules.reverse.each do |a_module|
       a_module.append_features(self)
-      a_module.included(self)
+      if a_module.respond_to? :included
+        a_module.included(self)
+      end
     end
     self
   end
   def include(a_module)
     # variant needed for bootstrap
     a_module.append_features(self)
-    a_module.included(self)
+    if a_module.respond_to? :included
+      a_module.included(self)
+    end
     self
-  end
-
-  # Invoked as a callback when a_module includes receiver.
-  def included(a_module)
-  end
-
-  # Callback invoked whenever the receiver is used to extend an object.
-  # The object is passed as a paramter.
-  def extended(a_module)
   end
 
   # --------- remainder of methods approximately alphabetical
