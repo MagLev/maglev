@@ -422,7 +422,9 @@ class File
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
-    filename = Type.coerce_to(filename, String, :to_str)
+    # Pathname responds only to to_s
+    filename = Type.__coerce_to_String_to_s(filename)
+    
     nargs = 1
     if mode._equal?(MaglevUndefined)
       mode = 'r'
