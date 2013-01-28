@@ -1018,7 +1018,7 @@ class File
   end
 
   primitive_nobridge '__fopen', '_fopen:mode:'
-
+  primitive_nobridge '__isStdStream', '_isStdStream'
   primitive_nobridge '__become', '_becomeMinimalChecks:'
 
   def reopen(arg1, mode=MaglevUndefined)
@@ -1029,6 +1029,11 @@ class File
         mode = 'r'
       end
     elsif arg1._kind_of?(File)
+      if arg1.__isStdStream
+        f = self
+        f.__become(arg1)
+        return f
+      end
       path = arg1.path
       ofs = arg1.pos
       if mode._equal?(MaglevUndefined)
