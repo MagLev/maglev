@@ -261,7 +261,7 @@ class Object
         a = [ self ]
       end
     end
-    a
+    Array.new(a)
   end
 
   def __splat_return_value
