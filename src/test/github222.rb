@@ -36,8 +36,14 @@ class Github222Test < Test::Unit::TestCase
   end
 
   def test_dollar_bang_not_assignable
-    assert_raise NameError do
-      $! = Exception.new
+    if RUBY_VERSION == "1.9.3"
+      assert_raise NameError do
+        $! = Exception.new
+      end
+    elsif RUBY_VERSION == "1.8.7"
+      exc = Exception.new
+      $! = exc
+      assert_equal $!, exc
     end
   end
 
