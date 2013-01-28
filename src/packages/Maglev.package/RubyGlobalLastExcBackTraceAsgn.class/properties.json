@@ -1,0 +1,14 @@
+{
+	"category" : "MagLev-AST",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "",
+	"instvars" : [
+		 ],
+	"name" : "RubyGlobalLastExcBackTraceAsgn",
+	"pools" : [
+		 ],
+	"super" : "RubyAssignableNode",
+	"type" : "normal" }
