@@ -540,14 +540,6 @@ class Module
     __set_protection_classmethods(0, *symbols)
   end
 
-  def private_methods(include_super=true)
-    Module.__filter_method_names(self.class.__ruby_methods(include_super, 2))
-  end
-
-  def protected_methods(include_super=true)
-    Module.__filter_method_names(self.class.__ruby_methods(include_super, 1))
-  end
-
   primitive_nobridge '__remove_const', 'rubyRemoveConst:'
 
   primitive_nobridge '__remove_iv', 'rubyRemoveIv:'
