@@ -51,6 +51,15 @@ class Module
     self
   end
 
+  # Invoked as a callback when a_module includes receiver.
+  def included(a_module)
+  end
+
+  # Callback invoked whenever the receiver is used to extend an object.
+  # The object is passed as a paramter.
+  def extended(a_module)
+  end
+
   # --------- remainder of methods approximately alphabetical
 
   primitive '__alias_method', 'rubyAlias:from:'
@@ -529,6 +538,14 @@ class Module
 
   def public_class_method(*symbols)
     __set_protection_classmethods(0, *symbols)
+  end
+
+  def private_methods(include_super=true)
+    Module.__filter_method_names(self.class.__ruby_methods(include_super, 2))
+  end
+
+  def protected_methods(include_super=true)
+    Module.__filter_method_names(self.class.__ruby_methods(include_super, 1))
   end
 
   primitive_nobridge '__remove_const', 'rubyRemoveConst:'
