@@ -543,9 +543,7 @@ class IO
     end
 
 
-    offset = if offset._equal?(nil)
-               0
-             end
+    offset = 0 if offset._equal?(nil)
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
     read_all_bytes = length._equal?(MaglevUndefined) || length._equal?(nil)
