@@ -31,4 +31,15 @@ class Module
     end
     self
   end
+
+  # Invoked as a callback when a_module includes receiver.
+  def included(*args)
+  end
+  private :included
+
+  # Callback invoked whenever the receiver is used to extend an object.
+  # The object is passed as a paramter.
+  def extended(*args)
+  end
+  private :extended
 end
