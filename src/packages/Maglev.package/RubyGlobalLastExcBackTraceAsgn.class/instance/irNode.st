@@ -10,7 +10,9 @@ irNode
         rubySelector: #'set_backtrace#1__';
         appendArgument: valueNode irNode]
     ifNil: [
-		"TODO: Raise Ruby ArgumentError"
-		self error: 'ArgumentError: $! not set'].
+      "TODO: Raise Ruby ArgumentError directly"
+       node := GsComSendNode new
+         rcvr: (GsComVariableNode globalNamed: #ArgumentError inDict: Globals);
+         rubySelector: #'_set_backtrace_failed#0__'].
    self ir: node .  
    ^ node 
