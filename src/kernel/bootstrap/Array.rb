@@ -1828,5 +1828,14 @@ class Array
     end
     res
   end
+  
+  def self.try_convert(obj)
+    begin
+      array = Type.__coerce_to_Array_to_ary(obj)
+    rescue TypeError
+      return nil
+    end
+    return array
+  end
 
 end
