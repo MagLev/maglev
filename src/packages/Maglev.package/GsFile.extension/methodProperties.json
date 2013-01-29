@@ -2,4 +2,5 @@
 	"class" : {
 		"redirectRubyStdout:env:" : "DataCurator 10/02/2012 14:30" },
 	"instance" : {
-		"_pcloseStatus" : "DataCurator 10/02/2012 14:30" } }
+		"_pcloseStatus" : "DataCurator 10/02/2012 14:30",
+		"_isStdStream" : "TimFelgentreff 01/28/2013 14:21" } }
