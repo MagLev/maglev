@@ -68,6 +68,8 @@ class File
   primitive_nobridge '__last_err_string', 'lastErrorString'
   primitive_nobridge '__last_err_code', 'lastErrorCode'
   primitive_nobridge '__readable', '_isReadable'
+  primitive_nobridge '__writable', '_isWritable'
+
   primitive_nobridge '__seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '__fstat','fstat:isLstat:'
@@ -858,6 +860,7 @@ class File
     end
     num_read = self.__read_into(length, buffer, false)
     raise IOError, 'error' if num_read._equal?(nil)
+    raise EOFError, 'end of file reached' if num_read == 0
     if need_trunc
       buffer.size = num_read # truncate buffer
     end
