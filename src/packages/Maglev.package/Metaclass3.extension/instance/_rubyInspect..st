@@ -6,8 +6,12 @@ _rubyInspect: envId
      res add: (destClass rubyFullName: envId  ) ;
          add:  $>  .
      ^ res
-   ] ifFalse:[
-     ^ self rubyFullName: envId 
-   ]
+  ] ifFalse:[ | name |
+    name := self rubyFullName: envId .
 
+    (name isNil or: [name size == 0]) ifTrue: [
+      self isMeta ifTrue: [ ^ (destClass rubyFullName: envId), ':Class' ].
+      ^ '#<Class:0x', self asOop hex, '>' ].
 
+    ^ name
+  ]

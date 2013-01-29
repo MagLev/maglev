@@ -565,7 +565,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
         k__LINE__
         k__FILE__
 
-%token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG
+%token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG tLABEL
 %token <node> tINTEGER tFLOAT tSTRING_CONTENT
 %token <node> tNTH_REF tBACK_REF
 %token <num>  tREGEXP_END
@@ -1621,7 +1621,6 @@ aref_args       : none
                 | command opt_nl
                     {
                       yTrace(vps, "aref__args: | command opt_nl");
-                      rb_warning(vps, "parenthesize argument(s) for future version");
                       $$ = RubyRpCallArgs::s($1, vps);
                     }
                 | args trailer
@@ -1670,14 +1669,12 @@ paren_args      : '(' none ')'
                     {
                       yTrace(vps, "paren_args: | tLPAREN2 block_call opt_nl tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning(vps, "parenthesize argument for future version");
                       $$ = RubyRpCallArgs::s( $2, vps);
                     }
                 | '(' args ',' block_call opt_nl ')'
                     {
                       yTrace(vps, "paren_args: | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN");
                       rParenLexPop(vps);
-                      rb_warning(vps, "parenthesize argument for future version");
                       $$ = RubyArrayNode::append( $2, $4, vps);
                     }
                 ;
@@ -1689,7 +1686,6 @@ opt_paren_args  : none
 call_args       : command
                     {
                       yTrace(vps, "call_args: command");
-                      rb_warning(vps, "parenthesize argument(s) for future version");
 		      $$ = RubyRpCallArgs::s( $1, vps);
                     }
                 | args opt_block_arg
@@ -3181,6 +3177,11 @@ assoc           : arg_value tASSOC arg_value
                     {
                       yTrace(vps, "assoc: arg_value tASSOC arg_value");
                       $$ = RubyArrayNode::s_a_b( $1, $3, vps);
+                    }
+                  | tLABEL arg_value
+                    {
+                      yTrace(vps, "assoc: arg_value tLABEL arg_value");
+                      $$ = RubyArrayNode::s_a_b(RubySymbolNode::s($1, vps), $2, vps);
                     }
                 ;
 
@@ -5952,6 +5953,16 @@ static int yylex(rb_parse_state* ps)
                 } else {
                     result = tIDENTIFIER;
                     needsNameToken = TRUE;
+                }
+            }
+            if ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state)) {
+                int p_c = *(ps->lex_p); // actual peek
+                if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
+                    lex_state = EXPR_BEG;
+                    nextc(ps);
+                    NODE* symqO = rb_parser_sym( tok(ps) , ps); 
+                    *ps->lexvalH = RpNameToken::s( ps, symqO );
+                    return tLABEL;
                 }
             }
 

@@ -1,10 +1,10 @@
 n = 0
 begin
-  n = n + 1 
+  n = n + 1
   raise
-  n = n + 10 
+  n = n + 10
   rescue
-    n = n + 100    
+    n = n + 100
   else
     n = n + 1000
    ensure
@@ -16,10 +16,10 @@ end
 
 n = 0
 begin
-  n = n + 1 
-  n = n + 10 
+  n = n + 1
+  n = n + 10
   rescue
-    n = n + 100    
+    n = n + 100
   else
     n = n + 1000
   ensure
@@ -31,11 +31,11 @@ end
 
 n = 0
 begin
-  n = n + 5 
+  n = n + 5
   raise ScriptError
-  n = n + 10 
+  n = n + 10
   rescue ScriptError
-    n = n + 100    
+    n = n + 100
   else
     n = n + 1000
   ensure
@@ -47,19 +47,19 @@ end
 
 n = 0
 begin
-  n = n + 6 
+  n = n + 6
   raise SyntaxError
   n = n + 10
   rescue ScriptError, SyntaxError
     n = n + 100
-end  
+end
 unless n == 106
   raise 'ERR'
 end
 
 n = 0
 begin
-  n = n + 8 
+  n = n + 8
   elist = [ ScriptError, SyntaxError ]
   begin
     raise SyntaxError
@@ -68,13 +68,13 @@ begin
       n = n + 100
     else
       n = n + 1000
-    ensure  
-      n = n + 10000 
+    ensure
+      n = n + 10000
   end
   unless n == 10108
     raise 'ERR'
   end
-end  
+end
 
 true
 
@@ -95,18 +95,18 @@ end
 begin
   a = 99
   y = 98
-  y = $! 
+  y = $!
   unless y.equal?(nil)
     raise 'ERR'
   end
   begin
     a.frob
-    rescue NoMethodError => ex 
+    rescue NoMethodError => ex
       unless ex.class.equal?(NoMethodError)
         raise 'ERR'
       end
       a = 97
-  end    
+  end
   unless a == 97
      raise 'ERR'
   end
@@ -134,24 +134,35 @@ begin
     x = 5 / 0
   rescue
     b = $!
-    $! = ArgumentError.new
-    c = $! 
-  end 
+    if RUBY_VERSION == "1.8.7"
+      $! = ArgumentError.new
+      c = $!
+    end
+  end
   d = $!
-  $! = TypeError.new
-  e = $!
+  if RUBY_VERSION == "1.8.7"
+    $! = TypeError.new
+    e = $!
+  end
   puts [b,c,d,e].inspect
   unless b.class.equal?( ZeroDivisionError) ; raise 'err' ; end
-  unless c.class.equal?( ArgumentError) ; raise 'err' ; end
+
+  if RUBY_VERSION == "1.8.7"
+    unless c.class.equal?( ArgumentError) ; raise 'err' ; end
+  end
+
   unless d.equal?( nil) ; raise 'err' ; end
-  unless e.class.equal?( TypeError) ; raise 'err' ; end
+
+  if RUBY_VERSION == "1.8.7"
+    unless e.class.equal?( TypeError) ; raise 'err' ; end
+  end
 end
 true
 
 begin
   begin
     raise
-  rescue  
+  rescue
     e = $!
     unless e.class.equal?(RuntimeError)  ; raise 'err' ; end
   end
