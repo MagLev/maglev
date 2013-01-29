@@ -1,7 +1,7 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
 h = {'one' => {'two' => {'three' => 0}}}
-b = Marshal.dump(h, 6);
+b = Marshal.dump(h, 7);
 
 hb = Marshal.load(b)
 unless h == hb ; raise 'error' ; end

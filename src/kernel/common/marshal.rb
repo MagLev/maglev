@@ -189,6 +189,7 @@ module Marshal
     def construct_hash(type)
       obj = @user_class ? get_user_class.allocate : {}
       store_unique_object obj
+      obj.prepare_marshal
 
       for k in (1..construct_integer) do
         key = construct
