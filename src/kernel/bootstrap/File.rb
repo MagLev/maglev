@@ -46,7 +46,7 @@ class File
   def close
     if self.__is_open
       self.__close
-      self.__pclose_status 
+      self.__pclose_status
     else
       raise IOError, 'already closed'
     end
@@ -187,7 +187,7 @@ class File
   end
 
   def self.directory?(arg)
-    unless arg._isString 
+    unless arg._isString
       if arg.is_a?(IO)
         return arg.stat.directory?
       end
@@ -305,15 +305,15 @@ class File
 
   def self.__tilde_expand(path)
     case path[0,2]
-    when '~'  
+    when '~'
       hm = ENV['HOME']
-      if hm._equal?(nil) ||  hm == '' 
+      if hm._equal?(nil) ||  hm == ''
         raise ArgumentError, "['HOME'] is nil or empty"
       end
       hm
     when '~/'
       hm = ENV['HOME']
-      if hm._equal?(nil) ||  hm == '' 
+      if hm._equal?(nil) ||  hm == ''
         raise ArgumentError, "['HOME'] is nil or empty"
       end
       hm + path[1..-1]
@@ -422,7 +422,9 @@ class File
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
-    filename = Type.coerce_to(filename, String, :to_str)
+    # Pathname responds only to to_s
+    filename = Type.__coerce_to_String_to_s(filename)
+
     nargs = 1
     if mode._equal?(MaglevUndefined)
       mode = 'r'
@@ -807,8 +809,8 @@ class File
       raise ArgumentError, "length must not be negative" if length < 0
       if self.pos > self.stat.size
         buffer = Type.coerce_to(a_buffer, String, :to_str)
-        buffer.size = 0 
-        return nil 
+        buffer.size = 0
+        return nil
       end
     end
     buffer = Type.coerce_to(a_buffer, String, :to_str)
@@ -1018,17 +1020,22 @@ class File
   end
 
   primitive_nobridge '__fopen', '_fopen:mode:'
-
+  primitive_nobridge '__isStdStream', '_isStdStream'
   primitive_nobridge '__become', '_becomeMinimalChecks:'
 
   def reopen(arg1, mode=MaglevUndefined)
-    ofs = -1 
+    ofs = -1
     if arg1._isString
       path = arg1
       if mode._equal?(MaglevUndefined)
         mode = 'r'
       end
     elsif arg1._kind_of?(File)
+      if arg1.__isStdStream
+        f = self
+        f.__become(arg1)
+        return f
+      end
       path = arg1.path
       ofs = arg1.pos
       if mode._equal?(MaglevUndefined)
@@ -1137,9 +1144,20 @@ class File
 
   alias :syswrite :write
 
-
   def set_encoding(encoding)
     #TODO
+  end
+
+  def dup
+    raise IOError, "closed stream" if self.closed?
+
+    if @_st_fileDescriptor >= 0 && @_st_fileDescriptor <= 2
+      self
+    else
+      file = self.class.new(@_st_pathName, @_st_mode)
+      file.seek(self.tell)
+      file
+    end
   end
 end
 File.__freeze_constants
