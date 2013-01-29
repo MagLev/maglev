@@ -26,7 +26,7 @@ class Thread
   #
   def self.abort_on_exception=(bool)
     # Returns the argument .
-    v = bool ? true : false  
+    v = bool ? true : false
     self.__abort_on_exception(v)
     bool
   end
@@ -58,19 +58,19 @@ class Thread
   end
 
   def self.__add_to_backtrace(result, a_frame)
-     file = a_frame[0] 
+     file = a_frame[0]
      line = a_frame[1]
      meth = a_frame[2]
-     meth = ":in `#{meth}'" unless meth._equal?(nil) 
-     result <<  "#{file}:#{line}#{meth}" 
+     meth = ":in `#{meth}'" unless meth._equal?(nil)
+     result <<  "#{file}:#{line}#{meth}"
   end
 
   def self.__st_to_rubybacktrace(st_stack, include_st=nil)
     result = []
     maglev_home = ENV['MAGLEV_HOME']
     if include_st._equal?(nil)
-      wlevel = $-W 
-      include_st =  wlevel._isFixnum && wlevel > 2 
+      wlevel = $-W
+      include_st =  wlevel._isFixnum && wlevel > 2
     end
     idx = 0
     limit = st_stack.length - 1
@@ -81,15 +81,15 @@ class Thread
         __add_to_backtrace( result, frame )
       else
         type = frame[3]
-        if type._equal?( :ruby) 
+        if type._equal?( :ruby)
           file = frame[0]
-          if file.include?( kernel_src ) 
+          if file.include?( kernel_src )
             k_idx = idx
             s_idx = idx + 1
             while s_idx < limit - 1
               frame = __frame_info(st_stack[s_idx] )
               type = frame[3]
-              if type._equal?(:ruby) 
+              if type._equal?(:ruby)
                 if frame[0].include?( kernel_src )
                   k_idx = s_idx
                 else
@@ -112,7 +112,7 @@ class Thread
   end
 
 
-  # Return an array of [file_name, line_number, method_name, type] 
+  # Return an array of [file_name, line_number, method_name, type]
   # type is one of :ruby , :bridge , :smalltalk
   def self.__frame_info(stack_frame)
     line  = stack_frame[1]
@@ -121,7 +121,7 @@ class Thread
     is_bridge = stack_frame[4]
     file   = stack_frame[5]   # from debug info used by source_location
     baseline = stack_frame[6]
-    if env_id._equal?(1) 
+    if env_id._equal?(1)
       if ! is_bridge && file
         # Process a ruby stack frame.
         # Treat _compfileFile methods as top level calls (i.e., no 'in' part)
@@ -144,7 +144,7 @@ class Thread
       return [ "bridge" , line, stack_frame[0], :bridge]  # such as __rubySend1: ...
     end
     # assume smalltalk
-    #  stack_frame[0] is ' aClassName >> selector (envId 0) ' 
+    #  stack_frame[0] is ' aClassName >> selector (envId 0) '
     return ["smalltalk", line, stack_frame[0].sub('(envId 0)','') , :smalltalk ]
   end
 
@@ -166,7 +166,7 @@ class Thread
     else
       mutex_cls.unlock_by(me)
       false
-    end  
+    end
   end
 
   class_primitive_nobridge 'current', '_current'
@@ -188,15 +188,13 @@ class Thread
 
   primitive_nobridge '__join_group', '_joinGroup:'
 
-  # def join(limit); end #
-  #  if limit is zero, join will return immediately
-  primitive_nobridge 'join', '_join:'
-
   def join
-    #   wait forever for the receiver to finish
+    # wait forever for the receiver to finish
     self.value
     self
   end
+  #  if limit is zero, join will return immediately
+  primitive_nobridge 'join', '_join:'
 
   primitive_nobridge 'keys', 'keys'
 
@@ -287,7 +285,7 @@ class Thread
 
   primitive_nobridge '__start*&', 'rubyStart:block:'
 
-  def self.start(*args, &block) 
+  def self.start(*args, &block)
     thr = self.__basic_new
     # does not call initialize
     thr.__start(*args, &block)
@@ -311,5 +309,3 @@ class Thread
   primitive_nobridge 'wakeup', 'rubyResume'
 
 end
-
-

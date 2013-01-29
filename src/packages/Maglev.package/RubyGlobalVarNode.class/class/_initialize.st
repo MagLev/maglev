@@ -4,7 +4,7 @@ _initialize
   | dict | 
   dict := SymbolKeyValueDictionary new .
  { { #'$!' . RubyGlobalLastException . RubyGlobalLastExceptionAsgn } . 
-    { #'$@' . RubyGlobalLastExcBackTrace . RubyGlobalNotAssignable } . 
+    { #'$@' . RubyGlobalLastExcBackTrace . RubyGlobalLastExcBackTraceAsgn } . 
     { #'$~' . RubyVcGlobalNode . RubyVcGlobalLastMatchAsgn } . 
     { #'$_' . RubyVcGlobalNode . RubyVcGlobalAsgNode } . 
     { #'$?' . RubyGlobalProcessState . RubyGlobalNotAssignable } . 
