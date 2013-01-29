@@ -311,6 +311,7 @@ class SystemCallError
     @_st_errno
   end
 end
+
 class TransactionError
   primitive '__gsArguments', 'gsArguments'
   def object
@@ -319,6 +320,7 @@ class TransactionError
     return args[0]
   end
 end
+
 class ThreadError
 end
 class TypeError
