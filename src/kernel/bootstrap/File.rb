@@ -102,7 +102,7 @@ class File
   def self.__stat(name, is_lstat)
     raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
-      name = Type.coerce_to(name, String, :to_str)
+      name = Type.__coerce_to_path(name)
     end
     __stat_isLstat(name, is_lstat)
   end
@@ -1159,6 +1159,12 @@ class File
       file
     end
   end
+
+  def self.path(obj)
+    return obj.to_path if obj.respond_to?(:to_path)
+    Type.coerce_to(obj, String, :to_str)
+  end
+
 end
 File.__freeze_constants
 
