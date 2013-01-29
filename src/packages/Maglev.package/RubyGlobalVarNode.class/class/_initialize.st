@@ -3,8 +3,8 @@ _initialize
   "executed during env 1 bootstrap"
   | dict | 
   dict := SymbolKeyValueDictionary new .
- { { #'$!' . RubyGlobalLastException . RubyGlobalLastExceptionAsgn } . 
-    { #'$@' . RubyGlobalLastExcBackTrace . RubyGlobalNotAssignable } . 
+ { { #'$!' . RubyGlobalLastException . RubyGlobalNotAssignable } . 
+    { #'$@' . RubyGlobalLastExcBackTrace . RubyGlobalLastExcBackTraceAsgn } . 
     { #'$~' . RubyVcGlobalNode . RubyVcGlobalLastMatchAsgn } . 
     { #'$_' . RubyVcGlobalNode . RubyVcGlobalAsgNode } . 
     { #'$?' . RubyGlobalProcessState . RubyGlobalNotAssignable } . 
