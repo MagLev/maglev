@@ -246,7 +246,7 @@ class File
   #  File.expand_path("~oracle/bin")           #=> "/home/oracle/bin"
   #  File.expand_path("../../bin", "/tmp/x")   #=> "/bin"
   def self.expand_path(path, dir=nil)
-    path = Type.coerce_to(path, String, :to_str)
+    path = Type.__coerce_to_path(path)
 
     first = path[0]
     if dir
