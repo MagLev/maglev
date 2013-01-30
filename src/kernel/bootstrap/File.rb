@@ -68,6 +68,8 @@ class File
   primitive_nobridge '__last_err_string', 'lastErrorString'
   primitive_nobridge '__last_err_code', 'lastErrorCode'
   primitive_nobridge '__readable', '_isReadable'
+  primitive_nobridge '__writable', '_isWritable'
+
   primitive_nobridge '__seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '__fstat','fstat:isLstat:'
@@ -102,7 +104,7 @@ class File
   def self.__stat(name, is_lstat)
     raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
-      name = Type.coerce_to(name, String, :to_str)
+      name = Type.__coerce_to_path(name)
     end
     __stat_isLstat(name, is_lstat)
   end
@@ -858,6 +860,7 @@ class File
     end
     num_read = self.__read_into(length, buffer, false)
     raise IOError, 'error' if num_read._equal?(nil)
+    raise EOFError, 'end of file reached' if num_read == 0
     if need_trunc
       buffer.size = num_read # truncate buffer
     end
@@ -1159,6 +1162,12 @@ class File
       file
     end
   end
+
+  def self.path(obj)
+    return obj.to_path if obj.respond_to?(:to_path)
+    Type.coerce_to(obj, String, :to_str)
+  end
+
 end
 File.__freeze_constants
 
