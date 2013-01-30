@@ -150,7 +150,11 @@ class Module
 
   # constants access methods
 
-  primitive_nobridge 'constants', 'rubyConstants'  # includes superclasses' constants
+  primitive_nobridge '_constants', 'rubyConstants:'  # includes superclasses' constants
+
+  def constants(inherit = true)
+    _constants(inherit)
+  end
 
   def self.constants
     Object.constants
