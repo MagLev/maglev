@@ -39,14 +39,15 @@ class Module
     # this variant gets bridge methods
     modules.reverse.each do |a_module|
       a_module.append_features(self)
-      a_module.included(self)
+      if a_module.respond_to? :included
+        a_module.included(self)
+      end
     end
     self
   end
   def include(a_module)
-    # variant needed for bootstrap
+    # variant needed for bootstrap, eventual version in Module3.rb
     a_module.append_features(self)
-    a_module.included(self)
     self
   end
 
