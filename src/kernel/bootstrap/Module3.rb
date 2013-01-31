@@ -22,4 +22,15 @@ class Module
       self.__module_eval_string( str, fake_vcglbl, *args )
     end
   end
+
+  def include(a_module)
+    # redefinition of bootstrap version from Module.rb
+    a_module.append_features(self)
+    if a_module.respond_to? :included
+      a_module.included(self)
+    end
+    self
+  end
+
+  __set_protection_methods(PROTECTION_PRIVATE, :included, :extended)
 end

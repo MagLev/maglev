@@ -399,7 +399,9 @@ class Object
       end
       modules.each do |a_module|
         cl.__include_module(a_module)
-        a_module.extended(self)
+        if a_module.respond_to? :extended
+          a_module.extended(self)
+        end
       end
     end
     self
