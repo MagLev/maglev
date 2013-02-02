@@ -389,7 +389,7 @@ module FFI
         if a_name == CURRENT_PROCESS || a_name._equal?(nil)
           libs << nil
         else
-          a_name = ::Type.coerce_to(names[n], String, :to_str)
+          a_name = Maglev::Type.coerce_to(names[n], String, :to_str)
           libs << CLibrary.named(a_name)
         end
         lib_names << a_name
@@ -469,9 +469,9 @@ module FFI
     # function.
     # Returns a method or raises an error.
     def attach_function(name, a3, a4, a5=MaglevUndefined)
-      name = ::Type.coerce_to(name, String, :to_s)
+      name = Maglev::Type.coerce_to(name, String, :to_s)
       if a5._not_equal?(MaglevUndefined)
-        cname = ::Type.coerce_to(a3, String, :to_s)
+        cname = Maglev::Type.coerce_to(a3, String, :to_s)
         args = a4
         ret = a5
       else

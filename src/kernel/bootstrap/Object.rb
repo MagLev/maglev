@@ -266,9 +266,9 @@ class Object
 
   def __splat_return_value
     # runtime support for  return *v  , invoked from generated code
-    v = Type.coerce_to_or_nil(self, Array, :to_ary)
+    v = Maglev::Type.coerce_to_or_nil(self, Array, :to_ary)
     if v._equal?(nil)
-      v = Type.coerce_to_or_nil(self, Array, :to_a)
+      v = Maglev::Type.coerce_to_or_nil(self, Array, :to_a)
       if v._equal?(nil)
         v = self
       end
@@ -334,14 +334,14 @@ class Object
 
   def instance_variable_get(a_name)
     unless a_name._isStringOrSymbol
-      a_name = Type.coerce_to(a_name, String, :to_str)
+      a_name = Maglev::Type.coerce_to(a_name, String, :to_str)
     end
     __instvar_get(a_name.to_sym)
   end
 
   def instance_variable_set(a_name, a_val)
     unless a_name._isStringOrSymbol
-      a_name = Type.coerce_to(a_name, String, :to_str)
+      a_name = Maglev::Type.coerce_to(a_name, String, :to_str)
     end
     __instvar_put(a_name.to_sym, a_val)
     a_val
@@ -471,7 +471,7 @@ class Object
     #  be put in the binding...
     lex_path = self.__getRubyVcGlobal(0x32) # the __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
-    string = Type.coerce_to(str, String, :to_str)
+    string = Maglev::Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
     bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
@@ -532,7 +532,7 @@ class Object
 
   def remove_instance_variable(name)
     unless name._isStringOrSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
     end
     if name.__at(0)._not_equal?( ?@ )
       raise NameError, "intance variable names must begin with '@'"

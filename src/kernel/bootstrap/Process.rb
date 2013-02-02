@@ -46,7 +46,7 @@ module Process
   end
 
   def self.getpgid(arg)
-    arg = Type.coerce_to(arg, Fixnum, :to_int)
+    arg = Maglev::Type.coerce_to(arg, Fixnum, :to_int)
     r = Maglev.__system.__process_info(11, arg, nil)
     _procInfoResultCheck(r)
   end
@@ -91,7 +91,7 @@ module Process
       raise ArgumentError, 'Process.kill, expected at least 2 args'
     end
     unless signal._isFixnum
-      signal = Type.coerce_to(signal, String, :to_s )
+      signal = Maglev::Type.coerce_to(signal, String, :to_s )
       signal = Signal.__name_to_number(signal)
     end
     count = 0

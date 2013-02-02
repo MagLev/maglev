@@ -88,7 +88,7 @@ class IO
     if sep._equal?(nil)
       block.call( self.__contents )
     else
-      sep = Type.coerce_to(sep, String, :to_str)
+      sep = Maglev::Type.coerce_to(sep, String, :to_str)
       if sep.__size._equal?(0)
         while not eof?
           para = self.__next_paragraph
@@ -114,7 +114,7 @@ class IO
     #   F_GETFD, F_GETFL, F_SETFL, FD_CLOEXEC
     # Socket contains implementation specific to File::NONBLOCK
 
-    op = Type.coerce_to(op, Fixnum, :to_int)
+    op = Maglev::Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
     status = __fcntl(op, arg )
     if status._equal?(0)
@@ -185,7 +185,7 @@ class IO
       res = __contents
       self.__increment_lineno
     else
-      sep = Type.coerce_to(a_sep, String, :to_str)
+      sep = Maglev::Type.coerce_to(a_sep, String, :to_str)
       sep_len = sep.length
       if sep_len._equal?(0)
         res = self.eof?  ?  nil : self.__next_paragraph
@@ -303,7 +303,7 @@ class IO
     if closed?
       raise IOError, 'IO#lineno= on a closed IO'
     end
-    num = Type.coerce_to(integer, Fixnum, :to_int)
+    num = Maglev::Type.coerce_to(integer, Fixnum, :to_int)
     @_st_lineNumber = num
     num
   end
@@ -329,8 +329,8 @@ class IO
   end
 
   def self.popen(cmd, mode="r", &block)
-    cmd = Type.coerce_to(cmd, String, :to_s)
-    mode = Type.coerce_to(mode, String, :to_s)
+    cmd = Maglev::Type.coerce_to(cmd, String, :to_s)
+    mode = Maglev::Type.coerce_to(mode, String, :to_s)
     if cmd[0]._equal?( ?-)
       raise ArgumentError , '"-" prefix not supported by IO.popen' 
     end
@@ -410,7 +410,7 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int)
+      c = Maglev::Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
@@ -428,7 +428,7 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int)
+      c = Maglev::Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
@@ -524,7 +524,7 @@ class IO
     when 1
       ex = args.shift      
       if ex.class._equal?(Fixnum)
-        length = Type.coerce_to(ex, Fixnum, :to_int)
+        length = Maglev::Type.coerce_to(ex, Fixnum, :to_int)
       else
         open_args = ex
       end
@@ -532,13 +532,13 @@ class IO
       length = args.shift
       ex2 = args.shift
       if ex2.class._equal?(Fixnum)
-        offset = Type.coerce_to(ex2, Fixnum, :to_int)
+        offset = Maglev::Type.coerce_to(ex2, Fixnum, :to_int)
       else
         open_args = ex2
       end
     when 3
-      length = Type.coerce_to(args.shift, Fixnum, :to_int)
-      offset = Type.coerce_to(args.shift, Fixnum, :to_int)
+      length = Maglev::Type.coerce_to(args.shift, Fixnum, :to_int)
+      offset = Maglev::Type.coerce_to(args.shift, Fixnum, :to_int)
       open_args = args.shift
     end
 
@@ -638,7 +638,7 @@ class IO
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
       end
     elsif timeout._not_equal?(nil)
-      timeout = Type.coerce_to(timeout, Float, :to_f)
+      timeout = Maglev::Type.coerce_to(timeout, Float, :to_f)
       ms = (timeout * 1000.0 ).to_int
       unless ms._isFixnum && ms >= 0
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"

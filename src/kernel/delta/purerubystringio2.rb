@@ -93,7 +93,7 @@ class PureRubyStringIO
     if other_io._isString
       self._initialize(other_io, IO::RDWR, true )
     else
-      other_io = Type.coerce_to(other_io, PureRubyStringIO, :to_strio )
+      other_io = Maglev::Type.coerce_to(other_io, PureRubyStringIO, :to_strio )
       self._initialize(other_io.string, other_io._mode, true)
     end
   end
