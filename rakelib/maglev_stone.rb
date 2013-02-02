@@ -109,6 +109,19 @@ class MagLevStone < Stone
     end
   end
 
+  def reload_file_tree
+    start unless running?
+    puts "Loading src/packages for #{@name}.  This may take a minute..."
+    script = File.read("#{ML}/src/smalltalk/loadfiletree.gs")
+    filename = "#{ML}/src/smalltalk/load#{@name}filetree.gs"
+    File.open(filename, "w") do |f|
+      f << script.gsub("MAGLEV_HOME", ML)
+    end
+    input_file(filename , false)
+    File.rm filename
+    reload_prims
+  end
+
   def reload_prims
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
