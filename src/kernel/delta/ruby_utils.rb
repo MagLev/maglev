@@ -17,7 +17,7 @@ module Maglev
     # the value.  Converts nil to empty string.
     def self.rb_string_value(s)
       return '' if s._equal?(nil)
-      Type.coerce_to(s, String, :to_str) || ''
+      Maglev::Type.coerce_to(s, String, :to_str) || ''
     end
   end
 end

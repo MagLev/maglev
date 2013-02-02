@@ -72,7 +72,7 @@ class Float
     if obj._isFloat
       obj
     elsif obj._isInteger
-      Type.coerce_to(obj, Float, :to_f)
+      Maglev::Type.coerce_to(obj, Float, :to_f)
     else
       raise TypeError, "arg to induce_from neither Float nor Integer"
       nil
@@ -97,7 +97,7 @@ class Float
     unless arg._isNumeric
       raise TypeError, 'arg to divmod is not a Numeric'
     end
-    a = Type.coerce_to(arg, Float, :to_f)
+    a = Maglev::Type.coerce_to(arg, Float, :to_f)
     unless (sk = self.__kind)._equal?(1)  # Not normal
       unless sk._equal?(1) || sk._equal?(4)  # neither subnormal nor zero
         raise FloatDomainError, 'receiver of divmod infinite or nan' 
@@ -155,7 +155,7 @@ class Float
       end
     elsif arg._isInteger
       if self.finite? 
-        a = Type.coerce_to(arg, Float, :to_f)
+        a = Maglev::Type.coerce_to(arg, Float, :to_f)
         self <=> a
       elsif self.infinite?
         if self > 0.0
@@ -167,7 +167,7 @@ class Float
         nil
       end
     elsif arg._isNumeric
-      a = Type.coerce_to(arg, Float, :to_f)
+      a = Maglev::Type.coerce_to(arg, Float, :to_f)
       self <=> a
     else
       nil
@@ -222,12 +222,12 @@ class Float
   primitive_nobridge 'floor', 'floor'
 
   def step(nend, inc=1.0 , &block)
-    inc = Type.coerce_to(inc, Float, :to_f)
+    inc = Maglev::Type.coerce_to(inc, Float, :to_f)
     n = self
     if inc == 0.0
       raise ArgumentError, "increment is zero"
     end
-    nend = Type.coerce_to(nend, Float, :to_f)
+    nend = Maglev::Type.coerce_to(nend, Float, :to_f)
     unless block_given?
       return NumericEnumerator.new(self, self, nend, inc) # for 1.8.7
     end
