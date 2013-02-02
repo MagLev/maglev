@@ -1553,7 +1553,7 @@ class Array
 
   def shift(count=MaglevUndefined)  # added in 1.8.7
     if count._equal?(MaglevUndefined) 
-      return self.shift()
+      return self.__shift
     end
     cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
@@ -1574,16 +1574,10 @@ class Array
   end
 
   def shift
-    sz = self.__size
-    elem = nil
-    unless sz._equal?(0)
-      elem = self.__at(0)
-      self.__remove_from_to_(1, 1)  # one-based args
-    end
-    elem
+    self.__shift
   end
 
-  def __shift  # used by Argf implementation
+  def __shift
     sz = self.__size
     elem = nil
     unless sz._equal?(0)
