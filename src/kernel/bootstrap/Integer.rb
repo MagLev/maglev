@@ -65,7 +65,7 @@ class Integer
   primitive_nobridge '<<', '_rubyShiftLeft:'
 
   def ^(arg)
-    arg = Type.coerce_to(arg, Integer, :to_int)
+    arg = Maglev::Type.coerce_to(arg, Integer, :to_int)
     if self < 0 && arg < 0
       if self == arg
         0
@@ -79,7 +79,7 @@ class Integer
 
   def >>(arg)
     unless arg._isFixnum
-      arg = Type.coerce_to(arg, Integer, :to_int)
+      arg = Maglev::Type.coerce_to(arg, Integer, :to_int)
       unless arg._isFixnum 
 	if (self >= 0)
 	  return 0
@@ -93,22 +93,22 @@ class Integer
 
   # following handle primitive failures of  _rubyBitOr:, etc
   def __bit_and(arg)
-    a = Type.coerce_to(arg, Integer, :to_int) 
+    a = Maglev::Type.coerce_to(arg, Integer, :to_int) 
     self & a 
   end
  
   def __bit_or(arg)
-    a = Type.coerce_to(arg, Integer, :to_int) 
+    a = Maglev::Type.coerce_to(arg, Integer, :to_int) 
     self | a 
   end
 
   def __bit_xor(arg)
-    a = Type.coerce_to(arg, Integer, :to_int) 
+    a = Maglev::Type.coerce_to(arg, Integer, :to_int) 
     self.__prim_xor( a )
   end
 
   def __shift_left(arg)
-    a = Type.coerce_to(arg, Integer, :to_int) 
+    a = Maglev::Type.coerce_to(arg, Integer, :to_int) 
     unless a._isFixnum
       raise RangeError, 'argument must be a Fixnum'
     end
@@ -131,7 +131,7 @@ class Integer
         1  
       end
     elsif arg._isFloat
-      sf = Type.coerce_to(self, Float, :to_f)
+      sf = Maglev::Type.coerce_to(self, Float, :to_f)
       sf <=> arg
     else
       super
@@ -141,7 +141,7 @@ class Integer
   primitive_nobridge '__bit_at', 'bitAt:'  # argument is 1 based
 
   def [](arg)
-    a = Type.coerce_to(arg, Integer, :to_int)
+    a = Maglev::Type.coerce_to(arg, Integer, :to_int)
     if (a < 0)
        0
     else
