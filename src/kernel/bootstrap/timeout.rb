@@ -47,7 +47,7 @@ module Timeout
     if sec._isFixnum
       millisecs = sec * 1000
     else
-      sec = Type.coerce_to(sec, Float, :to_f)
+      sec = Maglev::Type.coerce_to(sec, Float, :to_f)
       millisecs = (sec * 1000.0).to_int
     end
     unless millisecs._isFixnum

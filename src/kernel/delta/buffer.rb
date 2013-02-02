@@ -34,7 +34,7 @@ module FFI
         modu =  FFI
         elemsize = modu.type_size(modu.find_type(type))
       end
-      count = Type.coerce_to(count, Fixnum, :to_int)
+      count = Maglev::Type.coerce_to(count, Fixnum, :to_int)
       if (count < 1)
         raise ArgumentError , 'count must be a Fixnum >= 1'
       end

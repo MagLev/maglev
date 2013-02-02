@@ -83,7 +83,7 @@ class Hash
     if first._isHash
       return self.__atkey(first)
     end
-    return Type.coerce_to(first, Hash, :to_hash)
+    return Maglev::Type.coerce_to(first, Hash, :to_hash)
   end
   raise ArgumentError , 'odd number of args'
       end
@@ -105,7 +105,7 @@ class Hash
     while n < numelem
       pair = nil
       begin
-        pair = Type.coerce_to( elements.__at(n), Array, :to_ary )
+        pair = Maglev::Type.coerce_to( elements.__at(n), Array, :to_ary )
       rescue
         # ignore coercion errors
       end
@@ -149,7 +149,7 @@ class Hash
         res
       end
     else
-      Type.coerce_to(arg, Hash, :to_hash)
+      Maglev::Type.coerce_to(arg, Hash, :to_hash)
     end
   end
 
@@ -1004,7 +1004,7 @@ class Hash
   end
 
   def merge(other, &block)
-    other = Type.coerce_to(other, Hash, :to_hash)
+    other = Maglev::Type.coerce_to(other, Hash, :to_hash)
     other_siz = other.size
     my_siz = @_st_numElements
     res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
@@ -1019,7 +1019,7 @@ class Hash
   end
 
   def merge!(other, &block)
-    other = Type.coerce_to(other, Hash, :to_hash)
+    other = Maglev::Type.coerce_to(other, Hash, :to_hash)
     other_siz = other.size
     my_siz = @_st_numElements
     if other._not_equal?(self)
@@ -1082,7 +1082,7 @@ class Hash
                         #  complex side effects of   Enumerator#next
 
   def replace(hash)
-    hash = Type.coerce_to(hash, Hash, :to_hash)
+    hash = Maglev::Type.coerce_to(hash, Hash, :to_hash)
     self.__clear( hash.size )
     hash.__merge_into(self)
     self

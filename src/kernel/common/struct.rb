@@ -48,7 +48,7 @@ class Struct
       # We don't want to throw an exception just to distinguish
       # between a string and a symbol...
       # begin
-      #   klass_name = Type.coerce_to(klass_name, String, :to_str)
+      #   klass_name = Maglev::Type.coerce_to(klass_name, String, :to_str)
       # rescue TypeError
       #   attrs.unshift klass_name
       #   klass_name = nil

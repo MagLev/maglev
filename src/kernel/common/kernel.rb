@@ -37,7 +37,7 @@ module Kernel
       end
       return f * sign
     end
-    Type.coerce_to(obj, Float, :to_f)
+    Maglev::Type.coerce_to(obj, Float, :to_f)
   end
 
   module_function :Float
@@ -99,12 +99,12 @@ module Kernel
     if bad
       raise TypeError, 'Kernel#Array, to_ary did not return an Array'
     end
-    Type.coerce_to(obj, Array, :to_a)
+    Maglev::Type.coerce_to(obj, Array, :to_a)
   end
   module_function :Array
 
   def String(obj)
-    Type.coerce_to(obj, String, :to_s)
+    Maglev::Type.coerce_to(obj, String, :to_s)
   end
 
   module_function :String
