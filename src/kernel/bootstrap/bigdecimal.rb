@@ -719,7 +719,7 @@ class BigDecimal
   end
 
   def sub(other, precs)
-    precs = Type.coerce_to( precs, Fixnum, :to_int)  # a required argument
+    precs = Maglev::Type.coerce_to( precs, Fixnum, :to_int)  # a required argument
     raise TypeError , 'precision must be >= 0'    if precs < 0
     unless other._kind_of?(BigDecimal)
       other = self.coerce(other)[0]
@@ -767,7 +767,7 @@ class BigDecimal
 
 
   def add(other, prec_arg)  # [
-    prec_arg = Type.coerce_to( prec_arg, Fixnum, :to_int) # a required arg
+    prec_arg = Maglev::Type.coerce_to( prec_arg, Fixnum, :to_int) # a required arg
     raise TypeError , 'precision must be >= 0'    if prec_arg < 0
     unless other._kind_of?(BigDecimal)
       other = self.coerce(other)[0]
@@ -861,7 +861,7 @@ class BigDecimal
     if prec_arg._equal?(nil)
       prec_arg = DEFAULT_prec
     else
-      prec_arg = Type.coerce_to( prec_arg, Fixnum, :to_int)
+      prec_arg = Maglev::Type.coerce_to( prec_arg, Fixnum, :to_int)
       raise TypeError , 'precision must be >= 0'   if prec_arg < 0
     end
     unless other._kind_of?(BigDecimal)
@@ -932,7 +932,7 @@ class BigDecimal
     if prec_arg._equal?(nil)
       prec_arg = DEFAULT_prec
     else
-      prec_arg = Type.coerce_to( prec_arg, Fixnum, :to_int)
+      prec_arg = Maglev::Type.coerce_to( prec_arg, Fixnum, :to_int)
       raise TypeError , 'precision must be >= 0'   if prec_arg < 0
     end
     unless other._kind_of?(BigDecimal)
@@ -1048,7 +1048,7 @@ class BigDecimal
 
   def sqrt(prec_arg)   # [
     # precision arg is required, not optional
-    prec_arg = Type.coerce_to( prec_arg, Fixnum, :to_int)
+    prec_arg = Maglev::Type.coerce_to( prec_arg, Fixnum, :to_int)
     raise TypeError , 'precision must be >= 0'   if prec_arg < 0
 
     my_sign = @sign
@@ -1130,7 +1130,7 @@ class BigDecimal
 
   # Raises self to an integer power.
   def __power(other) # [
-    other = Type.coerce_to( other, Fixnum, :to_int)
+    other = Maglev::Type.coerce_to( other, Fixnum, :to_int)
     kind = @special
     if kind._not_equal?(0) # not finite
       return self.class.__nan
@@ -1398,7 +1398,7 @@ class BigDecimal
     # if n > 0,  returns copy of receiver
     #    with precision reduced to n digits to right of the decimal point
     # if n < 0, zeros (0-n) digits to left of decimal point
-    n = Type.coerce_to( n, Fixnum, :to_int)
+    n = Maglev::Type.coerce_to( n, Fixnum, :to_int)
     self.__truncate(n, 1)
   end
 
@@ -1418,7 +1418,7 @@ class BigDecimal
     # if n > 0,  returns copy of receiver
     #    with precision reduced to n digits to right of the decimal point
     # if n < 0, zeros (0-n) digits to left of decimal point
-    n = Type.coerce_to( n, Fixnum, :to_int)
+    n = Maglev::Type.coerce_to( n, Fixnum, :to_int)
     self.__truncate(n, -1)
   end
 
@@ -1462,7 +1462,7 @@ class BigDecimal
     # if n > 0,  returns copy of receiver
     #    with precision reduced to n digits to right of the decimal point
     # if n < 0, zeros (0-n) digits to left of decimal point
-    n = Type.coerce_to( n, Fixnum, :to_int)
+    n = Maglev::Type.coerce_to( n, Fixnum, :to_int)
     self.__truncate(n, 0)
   end
 

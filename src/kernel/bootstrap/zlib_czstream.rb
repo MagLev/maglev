@@ -3,7 +3,7 @@
 module Zlib
 
   def self.adler32(string="", initial=1)
-    string = Type.coerce_to(string, String, :to_s)
+    string = Maglev::Type.coerce_to(string, String, :to_s)
     unless initial._isFixnum
       # prim checks range of initial
       raise( initial._isNumeric ? RangeError : TypeError, 
@@ -13,7 +13,7 @@ module Zlib
   end
 
   def self.crc32(string="", initial=0)
-    string = Type.coerce_to(string, String, :to_s)
+    string = Maglev::Type.coerce_to(string, String, :to_s)
     unless initial._isFixnum
       # prim checks range of initial
       raise( initial._isNumeric ? RangeError : TypeError,

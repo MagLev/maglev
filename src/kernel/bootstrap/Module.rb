@@ -39,14 +39,15 @@ class Module
     # this variant gets bridge methods
     modules.reverse.each do |a_module|
       a_module.append_features(self)
-      a_module.included(self)
+      if a_module.respond_to? :included
+        a_module.included(self)
+      end
     end
     self
   end
   def include(a_module)
-    # variant needed for bootstrap
+    # variant needed for bootstrap, eventual version in Module3.rb
     a_module.append_features(self)
-    a_module.included(self)
     self
   end
 
@@ -65,10 +66,10 @@ class Module
 
   def alias_method(new_name, old_name)
     unless new_name._isSymbol
-      new_name = Type.coerce_to(new_name, String, :to_str)
+      new_name = Maglev::Type.coerce_to(new_name, String, :to_str)
     end
     unless old_name._isSymbol
-      old_name = Type.coerce_to(old_name, String, :to_str)
+      old_name = Maglev::Type.coerce_to(old_name, String, :to_str)
     end
     self.__alias_method(new_name, old_name)
   end
@@ -99,7 +100,7 @@ class Module
     elsif (name._isString || name._isSymbol)
       name
     else
-      Type.coerce_to(name, String, :to_str)
+      Maglev::Type.coerce_to(name, String, :to_str)
     end
   end
 
@@ -119,7 +120,7 @@ class Module
       if name._isNumeric
         raise NameError, 'illegal class variable name'
       end
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
     end
     __class_var_defined(name)
   end
@@ -131,7 +132,7 @@ class Module
       if name._isNumeric
         raise NameError, 'illegal class variable name'
       end
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
     end
     __class_var_get(name)
   end
@@ -143,7 +144,7 @@ class Module
       if name._isNumeric
         raise NameError, 'illegal class variable name'
       end
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
     end
     __class_var_set(name, value)
   end
@@ -167,7 +168,7 @@ class Module
     if name._isSymbol
       sym = name
     else
-      str = Type.coerce_to(name, String, :to_str)
+      str = Maglev::Type.coerce_to(name, String, :to_str)
       sym = str.to_sym
     end
     res = self.__const_defined(sym)
@@ -188,7 +189,7 @@ class Module
 
   def const_get(name)
     unless name._isString or name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
     end
     __const_get(name)
   end
@@ -200,7 +201,7 @@ class Module
       sym = name
       str = name.to_s
     else
-      str = Type.coerce_to(name, String, :to_str)
+      str = Maglev::Type.coerce_to(name, String, :to_str)
       sym = nil
     end
     unless str =~ /^[A-Z](\w)*\z/
@@ -223,7 +224,7 @@ class Module
   primitive_nobridge '__define_method_block&' , 'defineMethod:block:'
 
   def define_method(sym, meth)
-    sym = Type.coerce_to(sym, Symbol, :to_sym)
+    sym = Maglev::Type.coerce_to(sym, Symbol, :to_sym)
     m = meth
     if meth._is_a?(Proc)
       m = meth.__block
@@ -266,7 +267,7 @@ class Module
 
   def instance_method(name)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     self.__instance_method(name)
@@ -282,7 +283,7 @@ class Module
 
   def method_defined?(name)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = Symbol.__existing_symbol(name)
       if name.equal?(nil)
         return false
@@ -315,7 +316,7 @@ class Module
     #  be put in the binding...
     lex_path = self.__getRubyVcGlobal(0x32) # __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
-    string = Type.coerce_to(str, String, :to_str)
+    string = Maglev::Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
     bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
@@ -344,7 +345,7 @@ class Module
 
   def public_method_defined?(name)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     __method_defined(name, 0)
@@ -352,7 +353,7 @@ class Module
 
   def protected_method_defined?(name)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     __method_defined(name, 1)
@@ -360,7 +361,7 @@ class Module
 
   def private_method_defined?(name)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     __method_defined(name, 2)
@@ -369,7 +370,7 @@ class Module
   primitive_nobridge '__remove_method', 'rubyRemoveMethod:'
 
   def remove_method(sym)
-    sym = Type.coerce_to(sym, Symbol, :to_sym)
+    sym = Maglev::Type.coerce_to(sym, Symbol, :to_sym)
     self.__remove_method(sym)
   end
 
@@ -396,7 +397,7 @@ class Module
       if name._isNumeric
         raise NameError, 'illegal class variable name'
       end
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     __class_var_remove(name)
@@ -477,7 +478,7 @@ class Module
     if names.length > 0
       names.each { |name|
         unless name._isSymbol
-          name = Type.coerce_to(name, String, :to_str)
+          name = Maglev::Type.coerce_to(name, String, :to_str)
           name = name.to_sym
         end
         __module_funct(name)
@@ -551,7 +552,7 @@ class Module
 
   def remove_const(name)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     __remove_const(name)

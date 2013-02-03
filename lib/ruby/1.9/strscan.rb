@@ -38,7 +38,7 @@ class StringScanner
   #   s.rest               # -> "ring"
   def pos=(n)
     unless n._isFixnum
-      n = Type.coerce_to(n, Fixnum, :to_int)
+      n = Maglev::Type.coerce_to(n, Fixnum, :to_int)
     end
     raise RangeError, "xxx" if n > @string.size
     @pos = n
@@ -60,7 +60,7 @@ class StringScanner
   def [](n)
     # coercion will be implicit by match[] primitive
     unless n._isFixnum
-      n = Type.coerce_to(n, Fixnum, :to_int)
+      n = Maglev::Type.coerce_to(n, Fixnum, :to_int)
     end
     begin
       m = self.match
@@ -221,7 +221,7 @@ class StringScanner
   # +string+. +dup+ argument is obsolete and not used now.
   def initialize(string, dup = false)
     unless string._isString
-      string = Type.coerce_to(string, String, :to_str)
+      string = Maglev::Type.coerce_to(string, String, :to_str)
     end
     @string = string
     self.reset
@@ -476,7 +476,7 @@ class StringScanner
   # scanner. Returns +str+.
   def string=(str)
     unless str._isString
-      str = Type.coerce_to(str, String, :to_str)
+      str = Maglev::Type.coerce_to(str, String, :to_str)
     end
     reset
     @string = str
@@ -534,7 +534,7 @@ class StringScanner
     elsif pattern._isRegexp
       # ok
     else
-      pattern = Type.coerce_to(pattern, String, :to_str)
+      pattern = Maglev::Type.coerce_to(pattern, String, :to_str)
     end
     @match = nil
 

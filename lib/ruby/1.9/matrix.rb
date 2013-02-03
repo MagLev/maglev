@@ -280,7 +280,7 @@ class Matrix
     if arow._kind_of?( Vector )
       return arow.__elements
     end
-    Type.coerce_to( arow, Array, :to_ary )
+    Maglev::Type.coerce_to( arow, Array, :to_ary )
   end
   
   def initialize(rows, copy) # maglev , renamed from init_rows

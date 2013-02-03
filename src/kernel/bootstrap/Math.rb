@@ -3,7 +3,7 @@ module Math
   E  = 2.71828182845905
 
   def acos(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.acos
     if r.nan?
       raise Errno::EDOM
@@ -14,7 +14,7 @@ module Math
   end
 
   def acosh(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.acosh
     if r.nan?
       raise Errno::EDOM
@@ -25,7 +25,7 @@ module Math
   end
 
   def asin(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.asin
     if r.nan?
       raise Errno::EDOM
@@ -36,18 +36,18 @@ module Math
   end
 
   def asinh(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.asinh
   end
 
   def atan(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.atan
   end
 
   def atan2(x, y)
-    fx = Type.coerce_to(x, Float, :to_f )
-    fy= Type.coerce_to(y, Float, :to_f )
+    fx = Maglev::Type.coerce_to(x, Float, :to_f )
+    fy= Maglev::Type.coerce_to(y, Float, :to_f )
     r = fx.__atan2(fy)
     if r.nan?
       raise Errno::EDOM
@@ -58,7 +58,7 @@ module Math
   end
 
   def atanh(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.atanh
     if r.nan? || r.infinite?
       raise Errno::EDOM
@@ -69,49 +69,49 @@ module Math
   end
 
   def cos(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.cos
   end
 
   def cosh(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.cosh
   end
 
   def erf(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.erf
   end
 
   def erfc(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.erfc
   end
 
   def exp(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.exp
   end
 
   def frexp(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.frexp
   end
 
   def hypot(x, y)
-    fx = Type.coerce_to(x, Float, :to_f )
-    fy= Type.coerce_to(y, Float, :to_f )
+    fx = Maglev::Type.coerce_to(x, Float, :to_f )
+    fy= Maglev::Type.coerce_to(y, Float, :to_f )
     fx.__hypot(fy)
   end
 
   def ldexp(x, y)
-   fx = Type.coerce_to(x, Float, :to_f )
-   iy = Type.coerce_to(y, Fixnum, :to_int)
+   fx = Maglev::Type.coerce_to(x, Float, :to_f )
+   iy = Maglev::Type.coerce_to(y, Fixnum, :to_int)
    fx.__ldexp(iy)
   end
 
   def log(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.log
     if r.nan?
       if f == 0.0
@@ -126,7 +126,7 @@ module Math
   end
 
   def log2(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.log2
     if r.nan?
       if f == 0.0
@@ -141,7 +141,7 @@ module Math
   end
 
   def log10(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     r = f.log10
     if r.nan?
       if f == 0.0
@@ -157,37 +157,37 @@ module Math
 
   def modf(x)
     # result is an Array,   [ fractional_part, integral_part ]
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.modf
   end
 
   def sin(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.sin
   end
 
   def sinh(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.sinh
   end
 
   def sqrt(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.sqrt
   end
 
   def tan(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.tan
   end
 
   def tanh(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.tanh
   end
 
   def sqrt(x)
-    f = Type.coerce_to(x, Float, :to_f )
+    f = Maglev::Type.coerce_to(x, Float, :to_f )
     f.sqrt
   end
 

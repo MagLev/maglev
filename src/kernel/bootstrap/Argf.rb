@@ -88,7 +88,7 @@ module Maglev
       if sep._equal?(nil)
         block.call( self.__contents )
       else
-        sep = Type.coerce_to(sep, String, :to_str)
+        sep = Maglev::Type.coerce_to(sep, String, :to_str)
         if sep.__size._equal?(0)
           while true
             para = self.__next_paragraph
@@ -260,7 +260,7 @@ module Maglev
         res = self.__contents
         self.__increment_lineno
       else
-        sep = Type.coerce_to(a_sep, String, :to_str)
+        sep = Maglev::Type.coerce_to(a_sep, String, :to_str)
         sep_len = sep.length
         if sep_len._equal?(0)
           res = self.eof?  ?  nil : self.__next_paragraph
@@ -357,7 +357,7 @@ module Maglev
     # @todo Should this be public? --rue
     #
     def lineno=(num)
-      num = Type.coerce_to(num, Fixnum, :to_int)
+      num = Maglev::Type.coerce_to(num, Fixnum, :to_int)
       @_st_lineno = num
       $. = num
       num

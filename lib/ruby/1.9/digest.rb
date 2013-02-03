@@ -45,7 +45,7 @@ module Digest
   # Generates a hex-encoded version of a given _string_.
   def hexencode(value)
     unless value._isString
-      value = Type.coerce_to(value, String, :to_str)
+      value = Maglev::Type.coerce_to(value, String, :to_str)
     end
     out = ''
     value.each_byte { |b| out << sprintf("%02x", b) }
@@ -108,7 +108,7 @@ module Digest
     def digest_length
       d = digest()
       unless d._isString
-        d = Type.coerce_to(d, String, :to_s)
+        d = Maglev::Type.coerce_to(d, String, :to_s)
       end
       d.length
     end
@@ -141,10 +141,10 @@ module Digest
         str2 = other
       end
       unless str1._isString
-        str1 = Type.coerce_to(str1, String, :to_str)
+        str1 = Maglev::Type.coerce_to(str1, String, :to_str)
       end
       unless str2._isString
-        str2 = Type.coerce_to(str2, String, :to_str)
+        str2 = Maglev::Type.coerce_to(str2, String, :to_str)
       end
       str1.eql?(str2)
     end

@@ -16,6 +16,7 @@ walkWithScope: aScope isDefinedQ: isQ
           globAssoc :=  leftAssoc _valueNoAction 
                bootConstantLookup: name env: cst envId .
         ].
+        isTypeClass := (name == #Type and: [ln name == #Maglev]).
      ].
   ] ifFalse:[   "left node is nil"
     inBoot ifTrue:[ | assoc ns rtModuStk | 
@@ -26,7 +27,6 @@ walkWithScope: aScope isDefinedQ: isQ
         self warnDynamicConst: name 
       ] ifNotNil: [  | val key |
         isProcClass :=  (val := assoc _valueNoAction) == RubyProc .
-        isTypeClass :=  (key := assoc key)  == #Type .
         (inBoot and:[ val isNameSpace ]) ifTrue:[  
           self warnDynamicConst: key .
         ].
