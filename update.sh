@@ -117,7 +117,7 @@ git submodule --quiet update --init
 if [  -e "`which rake 2>/dev/null`" ]; then
     if [ "$(dirname `which rake`)" == "${MAGLEV_HOME}/bin" ]; then
         echo "[Error] Cannot use the rake in \$MAGLEV_HOME/bin to update. Please put another Ruby's rake in your PATH."
-	exit 1
+        exit 1
     fi
 
     # Backup any existing maglev repository
@@ -130,8 +130,8 @@ if [  -e "`which rake 2>/dev/null`" ]; then
         if [ $? -eq 0 ]; then
             echo "[Info] Upgraded exisiting 'maglev' repository in-place."
             echo "       Upgrade any other stones using 'rake STONENAME:take_snapshot STONENAME:reload_everything'."
-	    echo "           This will create a backup in \$MAGLEV_HOME/backups (your data is cleared during the upgrade)."
-            echo "       If the 'maglev' does not work as expected after this, destroy the stone an re-run this script"
+            echo "           This will create a backup in \$MAGLEV_HOME/backups (your data is cleared during the upgrade)."
+            echo "       In rare cases the in-place upgrade may not work correctly. If you encounter problems after this, destroy the stone an re-run this script."
             exit 0
         fi
     fi
@@ -153,7 +153,7 @@ if [  -e "`which rake 2>/dev/null`" ]; then
             rake rdoc >/dev/null 2>&1
         else
             echo "[Error] Could not build new ruby extent. This means there was an error loading the Smalltalk code."
-	    exit 1
+            exit 1
         fi
     else
         echo "[Error] Can't find ${extent0}: Skip building ruby extent. This means your GemStone download is broken."
