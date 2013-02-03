@@ -90,7 +90,7 @@ module FFI
         modu =  FFI
         elemsize = modu.type_size(modu.find_type(type))
       end
-      count = Type.coerce_to(count, Fixnum, :to_int)
+      count = Maglev::Type.coerce_to(count, Fixnum, :to_int)
       if (count < 0)
         raise ArgumentError , 'count must be a Fixnum >= 0'
       end
@@ -187,7 +187,7 @@ module FFI
     #   my_ptr = Pointer.from_string("hello")
     #
     def self.from_string(string)
-      string = Type.coerce_to(string, String, :to_str)
+      string = Maglev::Type.coerce_to(string, String, :to_str)
       inst = self.__with_all(string)
       inst.__initialize(1)
       inst

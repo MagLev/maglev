@@ -115,43 +115,59 @@ git submodule --quiet update --init
 # Create a default repository called "maglev" and generate the MagLev HTML documentation
 # Check for existence of required executable rake
 if [  -e "`which rake 2>/dev/null`" ]; then
+    if [ "$(dirname `which rake`)" == "${MAGLEV_HOME}/bin" ]; then
+        echo "[Error] Cannot use the rake in \$MAGLEV_HOME/bin to update. Please put another Ruby's rake in your PATH."
+        exit 1
+    fi
+
     # Backup any existing maglev repository
     if [ -e data/maglev/extent/extent0.ruby.dbf ]; then
         echo "[Info] Backing up existing 'maglev' repository to backups/previous_maglev_extent.tgz"
         rake maglev:take_snapshot >/dev/null
         mv backups/maglev_extent.tgz backups/previous_maglev_extent.tgz
+        # Try update in place, might not work reliably
+        rake maglev:reload_everything >/dev/null
+        if [ $? -eq 0 ]; then
+            echo "[Info] Upgraded exisiting 'maglev' repository in-place."
+            echo "       Upgrade any other stones using 'rake STONENAME:take_snapshot STONENAME:reload_everything'."
+            echo "           This will create a backup in \$MAGLEV_HOME/backups (your data is cleared during the upgrade)."
+            echo "       In rare cases the in-place upgrade may not work correctly. If you encounter problems after this, destroy the stone an re-run this script."
+            exit 0
+        fi
     fi
     # create a clean slate
+
     if [ -e etc/conf.d/maglev.conf ]; then
-        echo "[Info] Removing existing 'maglev' configuration file."
+        echo "[Info] In-place upgrade not possible. Removing existing 'maglev' configuration file."
         rake stone:destroy[maglev] >/dev/null
     fi
 
-    if [ ! -e bin/extent0.ruby.dbf ]; then
-        extent0='gemstone/bin/extent0.dbf'
-        echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-        echo "This could take a while..."
-        if [ -e $extent0 ]; then
-            # NOTE: build:maglev will also create the maglev stone
-            if rake build:maglev ; then
-                echo "[Info] Generating the MagLev HTML documentation"
-                rake rdoc >/dev/null 2>&1
-            else
-                echo "[Warning] Could not build new ruby extent"
-            fi
+    rake build:clobber
+    extent0='gemstone/bin/extent0.dbf'
+    echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+    echo "This could take a while..."
+    if [ -e $extent0 ]; then
+        # NOTE: build:maglev will also create the maglev stone
+        if rake build:maglev ; then
+            echo "[Info] Generating the MagLev HTML documentation"
+            rake rdoc >/dev/null 2>&1
         else
-            echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
+            echo "[Error] Could not build new ruby extent. This means there was an error loading the Smalltalk code."
+            exit 1
         fi
     else
-        if [ ! -e etc/conf.d/maglev.conf ]; then
-            echo "[Info] Creating new default 'maglev' repository"
-            rake stone:create[maglev] >/dev/null
-        fi
+        echo "[Error] Can't find ${extent0}: Skip building ruby extent. This means your GemStone download is broken."
+        exit 1
     fi
     echo "[Info] Starting MagLev stone (loading kernel classes)"
-    rake maglev:start
+    if rake maglev:start ; then
+        echo "[Info] Successfully loaded kernel classes"
+    else
+        echo "[Error] Failed loading kernel classes!"
+        exit 1
+    fi
 else
-    echo "[Warning] rake not found!"
+    echo "[Error] rake not found!"
     echo "Skipping creation of default 'maglev' repository and HTML documentation."
 fi
 

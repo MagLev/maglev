@@ -76,7 +76,7 @@ module Kernel
     if a_seed._equal?(MaglevUndefined)
       inst.seed(nil)
     else
-      a_seed = Type.coerce_to(a_seed, Fixnum, :to_int)
+      a_seed = Maglev::Type.coerce_to(a_seed, Fixnum, :to_int)
       inst.seed(a_seed)
     end
     old_seed

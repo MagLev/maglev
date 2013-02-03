@@ -5,12 +5,12 @@ class Dir
   def self.[](*patterns)
     if patterns.__size._equal?( 1)
       pat = patterns[0]
-      pat = Type.coerce_to(pat, String, :to_str)
+      pat = Maglev::Type.coerce_to(pat, String, :to_str)
       patterns = pat.split("\0")
     end
     files = []
     patterns.each do |pat|
-      pat = Type.coerce_to(pat, String, :to_str)
+      pat = Maglev::Type.coerce_to(pat, String, :to_str)
       Dir::Glob.glob(pat, 0, files)
     end
     files
@@ -20,13 +20,13 @@ class Dir
     if pat._isArray
       patterns = pat
     else
-      pat = Type.coerce_to(pat, String, :to_str)
+      pat = Maglev::Type.coerce_to(pat, String, :to_str)
       return [] if pat.__size._equal?(0)
       patterns = pat.split("\0")
     end
     matches = []
     patterns.each { |apat|
-      apat = Type.coerce_to(apat, String, :to_str)
+      apat = Maglev::Type.coerce_to(apat, String, :to_str)
       Dir::Glob.glob( apat, flags, matches)
     }
     if block_given?

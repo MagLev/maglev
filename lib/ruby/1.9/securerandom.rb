@@ -50,7 +50,7 @@ module SecureRandom
   def self.random_bytes(n=nil)
     if n
       unless n._isFixnum
-        n = Type.coerce_to(n, Fixnum, :to_int)
+        n = Maglev::Type.coerce_to(n, Fixnum, :to_int)
       end
       if n < 0
         raise ArgumentError , 'SecureRandom.random, n must be >= 0'
