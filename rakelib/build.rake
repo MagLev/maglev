@@ -87,8 +87,8 @@ unless defined? MAGLEV_VERSION
         chmod 0444, RUBY_EXTENT
       else
         log "maglev", "Build failed see #{BUILD_LOG}"
+        abort
       end
-
     end
 
     desc "Remove #{FILEIN_DIR} directory"
@@ -153,7 +153,7 @@ unless defined? MAGLEV_VERSION
     task :filein => [:setup_env, NEW_EXTENT, :logger] do
       Dir.chdir FILEIN_DIR do
         begin
-          startstone && fileinruby
+          abort unless (startstone and fileinruby)
         ensure
           stopstone
         end
@@ -164,7 +164,7 @@ unless defined? MAGLEV_VERSION
     task :packages => [:setup_env, NEW_EXTENT, :logger] do
       Dir.chdir FILEIN_DIR do
         begin
-          startstone && load_file_tree_dir
+          abort unless (startstone and load_file_tree_dir)
         ensure
           stopstone
         end
@@ -231,9 +231,12 @@ unless defined? MAGLEV_VERSION
     def startstone
       logfile = "#{Dir.pwd}/startstone.log"
       cmd = "#{GEM_BIN}/startstone #{STONE_NAME} -l #{STONE_LOG} -e #{STONE_CONF} -z #{STONE_CONF} > #{logfile} 2>&1"
-      log_run("startstone", logfile) { system cmd }
-      cmd = "#{GEM_BIN}/waitstone #{STONE_NAME} >> #{logfile} 2>&1"
-      log_run("waitstone", logfile) { system cmd }
+      if log_run("startstone", logfile) { system cmd }
+        cmd = "#{GEM_BIN}/waitstone #{STONE_NAME} >> #{logfile} 2>&1"
+        log_run("waitstone", logfile) { system cmd }
+      else
+        false
+      end
     end
 
     def stopstone
