@@ -12,8 +12,8 @@ irMethodNode: envId forClass: aClass
       scope extraArgs: argsNode extraArgs .
       self useScope: scope during:[ | lastNormalArgIdx |
          lastNormalArgIdx := argsNode buildMethodArgumentsOn: node implicitBlk: hasBlockArgRef .
-         (prefix _rubyAt1: -1) ==  61"$= asciiValue"  ifTrue:[ | secLast |
-           secLast := prefix _rubyAt1: -2 .
+         (prefix _rubyOrdAt: -1) ==  61"$= asciiValue"  ifTrue:[ | secLast |
+           secLast := prefix _rubyOrdAt: -2 .
            secLast ifNotNil:[ 
              secLast := Character withValue: secLast .
              (secLast == $]  or:[ secLast isAlphaNumeric]) ifTrue:[
