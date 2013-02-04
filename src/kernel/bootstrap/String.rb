@@ -1497,6 +1497,7 @@ class String
 
   primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
 
+
   def __split_string_on(delim, limit, limited, suppress_trailing_empty)
     results = []
     delim_length = delim.__size
@@ -1506,8 +1507,9 @@ class String
     lim = self.__size
 
     first_char = delim.__at(0)
+
     while current < lim
-      if self.__at(current)._equal?(first_char) and self.__at_equals(current + 1, delim)
+      if self.__at(current).eql?(first_char) and self.__at(current, delim_length).eql?(delim)
         results << self.__at(start, (current - start))
         count += 1
         start = current + delim_length
