@@ -223,7 +223,7 @@ module Marshal
         data = consume(size)
 
         for exp in (0...size) do
-          result += (data[exp] * (1 << (exp*8)) )
+          result += (data[exp].ord * (1 << (exp*8)) )
         end
         result - signed
       elsif n > 127
