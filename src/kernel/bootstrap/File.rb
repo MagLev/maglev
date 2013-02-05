@@ -551,7 +551,7 @@ class File
       fn = filename.path
     else
       begin
-  fn = filename.to_str
+  fn = Type.__coerce_to_path(filename)
       rescue
   begin
     fn = filename.to_io.path
