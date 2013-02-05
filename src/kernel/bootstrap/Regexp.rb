@@ -389,7 +389,7 @@ class Regexp
     i = 0
     ch_str = ' '
     while i < lim
-      ch = str[i]
+      ch = str[i].ord
       m_idx = META_CHARS.__indexOfByte(ch, 1)
       if (m_idx > 0)
         if (ch <= 0x20)   # handle \n \r \f \t and " "
