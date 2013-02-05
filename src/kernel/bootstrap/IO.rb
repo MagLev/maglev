@@ -10,6 +10,8 @@ class IO
     self
   end
 
+
+
   def bytes()  # added for 1.8.7
     return IoByteEnumerator.new(self, :each_byte)
   end
@@ -31,16 +33,16 @@ class IO
     while not eof?
       buf = self.read(4096)
       if buf._equal?(nil)
-	return self
+  return self
       end
       len = buf.size
       if len._equal?(0)
-	return self
+  return self
       end
       n = 0
       while n < len
-	block.call( buf[n] )
-	n += 1
+  block.call( buf[n] )
+  n += 1
       end
     end
     self
@@ -53,18 +55,18 @@ class IO
     while not eof?
       buf = self.read(4096)
       if buf._equal?(nil)
-	return self
+  return self
       end
       len = buf.size
       if len._equal?(0)
-	return self
+  return self
       end
       n = 0
       while n < len
-	str = ' ' 
-	str[0] = buf[n]
-	block.call( str )
-	n += 1
+  str = ' ' 
+  str[0] = buf[n]
+  block.call( str )
+  n += 1
       end
     end
     self
@@ -493,7 +495,7 @@ class IO
       end
       unless line._equal?(nil)
         write(line)
-        write(eol) unless line[-1]._equal?(10)
+        write(eol) unless line[-1].eql?(?\n)
       end
       n = n + 1
     end
@@ -563,6 +565,10 @@ class IO
                end
     end
     data
+  end
+
+  def self.write(*args)
+    raise NotImplementedError, 'Class:write'
   end
 
   # def read() ; end  # subclass responsibility
@@ -670,5 +676,99 @@ class IO
   end
 
   # def ungetc ; end # subclass responsibility
+
+  class StreamCopier
+    def initialize(from, to, length, offset)
+      @length = length
+      @offset = offset
+
+      @from_io, @from = to_io(from, "rb")
+      @to_io, @to = to_io(to, "wb")
+
+      @method = read_method @from
+    end
+
+    def to_io(obj, mode)
+      if obj.kind_of? IO
+        flag = true
+        io = obj
+      else
+        flag = false
+
+        if obj._isString
+          io = File.open obj, mode
+        elsif obj.respond_to? :to_path
+          path = Type.coerce_to obj, String, :to_path
+          io = File.open path, mode
+        else
+          io = obj
+        end
+      end
+
+      return flag, io
+    end
+
+    def read_method(obj)
+      if obj.respond_to? :readpartial
+        :readpartial
+      else
+        :read
+      end
+    end
+
+    def run
+      @from.ensure_open_and_readable
+      @to.ensure_open_and_writable
+
+      saved_pos = @from.pos if @from_io
+
+      @from.seek @offset, IO::SEEK_CUR if @offset
+
+      size = @length ? @length : 16384
+      bytes = 0
+
+      begin
+        while data = @from.send(@method, size, "")
+          @to.write data
+          bytes += data.size
+
+          break if @length && bytes >= @length
+        end
+      rescue EOFError
+        # done reading
+      end
+
+      @to.flush
+      return bytes
+    ensure
+      if @from_io
+        @from.pos = saved_pos if @offset
+      else
+        @from.close
+      end
+
+      @to.close unless @to_io
+    end
+  end
+
+  def self.copy_stream(from, to, max_length=nil, offset=nil)
+    StreamCopier.new(from, to, max_length, offset).run
+  end
+  
+  def ensure_open_and_readable
+    raise IOError, "not opened for reading" unless !self.closed? and self.__readable
+  end
+
+  def ensure_open_and_writable
+    raise IOError, "not opened for writing" unless !self.closed? and self.__writable
+  end
+
+  def self.binread(*args)
+    self.read(*args)
+  end
+
+  def self.binwrite(*args)
+    self.write(*args)
+  end
 
 end
