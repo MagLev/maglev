@@ -23,7 +23,7 @@ module Kernel
       unless ok
         raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
       end
-      idxu = str.__indexOfByte( ?_ , 1 ) # arg/result is one-based
+      idxu = str.__indexOfByte( ?_.ord , 1 ) # arg/result is one-based
       unless idxu._equal?(0)
         if idxu._equal?(str.size ) ||
             (rc = str =~ /([\d]+_e)|(e_)/i )

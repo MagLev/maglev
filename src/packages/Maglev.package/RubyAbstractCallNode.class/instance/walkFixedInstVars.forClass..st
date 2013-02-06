@@ -13,7 +13,7 @@ walkFixedInstVars: list forClass: aBody
    ecls := elem class .
    (ecls == RubySymbolNode or:[ ecls == RubyStrNode]) ifTrue:[ | val |
      val := elem _value .
-     ((val _rubyAt1: 0 ) == 64"$@" and:[(val _rubyAt1: 1) ~~ 64 ]) ifFalse:[
+     ((val _rubyOrdAt: 0 ) == 64"$@" and:[(val _rubyOrdAt: 1) ~~ 64 ]) ifFalse:[
        self signal: ArgumentError
           with: 'illegal instVar name, element ' , j asString ,' of list'
      ]
