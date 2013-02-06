@@ -88,7 +88,7 @@ class Module
       sym = name
       str = name.to_s
     else
-      str = Type.coerce_to(name, String, :to_str)
+      str = Maglev::Type.coerce_to(name, String, :to_str)
       sym = nil
     end
     unless str =~ /^[A-Z](\w)*\z/

@@ -168,7 +168,7 @@ class Time
       if ma._isInteger
         month = ma
       else
-        ma = Type.coerce_to_or_nil(ma, String, :to_str)
+        ma = Maglev::Type.coerce_to_or_nil(ma, String, :to_str)
 	if ma._isString
 	  mint = ma.to_i
 	  if mint._equal?(0)
@@ -229,7 +229,7 @@ class Time
       raise TypeError , 'Time#+  , arg may not be a Time'
     else
       # addition with rounding to nearest microsecond
-      other = Type.coerce_to(other, Float, :to_f)
+      other = Maglev::Type.coerce_to(other, Float, :to_f)
       if other > 0.0
         microsecs += ((other + 0.0000005) * 1_000_000.0).to_i
       elsif other <= 0.0
@@ -251,7 +251,7 @@ class Time
       delta = microsecs - other.__microsecs
       return (delta.to_f).__divide(1_000_000.0)
     else
-      other = Type.coerce_to(other, Float, :to_f)
+      other = Maglev::Type.coerce_to(other, Float, :to_f)
       microsecs -= (other * 1_000_000.0).to_i
     end
     t = self.class.allocate
@@ -403,7 +403,7 @@ class Time
     if arg._isString
       arg.to_i
     else
-      Type.coerce_to(arg, Integer, :to_int )
+      Maglev::Type.coerce_to(arg, Integer, :to_int )
     end
   end
 
@@ -451,10 +451,10 @@ class Time
     if sec._isInteger 
       usec = usec ? usec.to_i : 0
     elsif usec
-      sec  = Type.coerce_to(sec, Integer, :to_i)
+      sec  = Maglev::Type.coerce_to(sec, Integer, :to_i)
       usec = usec.to_i 
     else
-      sec  = Type.coerce_to(sec, Float, :to_f)
+      sec  = Maglev::Type.coerce_to(sec, Float, :to_f)
       usec = ((sec % 1) * 1_000_000).to_i
       sec  = sec.to_i
     end
@@ -527,7 +527,7 @@ class Time
     elsif a_time._isInteger
       usecs = a_time * 1_000_000
     else
-      a_time = Type.coerce_to(a_time, Float, :to_f)
+      a_time = Maglev::Type.coerce_to(a_time, Float, :to_f)
       usecs = (a_time * 1000000.0).to_int
     end
     res.__init( usecs , false)
