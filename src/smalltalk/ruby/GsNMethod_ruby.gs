@@ -226,8 +226,8 @@ rubyArity
   optArgBits == 0 ifTrue:[  "no optional args"
     delta := 0 .  "do not count block or star args"
     (sel := self selector) ifNotNil:[
-      (sel _rubyAt1: -1) == 38"$&" ifTrue:[ delta := 1 ].
-      (sel _rubyAt1: -2) == 42"$*" ifTrue:[ delta := delta + 1 . haveSplat := true ]. 
+      (sel _rubyOrdAt: -1) == 38 "$&" ifTrue:[ delta := 1 ].
+      (sel _rubyOrdAt: -2) == 42 "$*" ifTrue:[ delta := delta + 1 . haveSplat := true ]. 
     ].
     n :=  self numArgs - delta  .
     haveSplat == true ifTrue:[ n := 0 - (n + 1) ].

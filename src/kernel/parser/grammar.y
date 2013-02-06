@@ -566,7 +566,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
         k__FILE__
 
 %token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG tLABEL
-%token <node> tINTEGER tFLOAT tSTRING_CONTENT
+%token <node> tINTEGER tFLOAT tSTRING_CONTENT tCHAR
 %token <node> tNTH_REF tBACK_REF
 %token <num>  tREGEXP_END
 %type <node> singleton strings string string1 xstring regexp
@@ -2653,7 +2653,8 @@ strings         : string
                     }
                 ;
 
-string          : string1
+string          : tCHAR
+                | string1
                 | string string1
                     {
                       yTrace(vps, "string: | string string1");
@@ -5128,11 +5129,14 @@ static int yylex(rb_parse_state* ps)
         else if (c == '\\') {
             c = read_escape(ps);
         }
+        startToken(ps);
         c &= 0xff;
+        tokadd((char)c,ps);
+        tokfix(ps);
         SET_lexState( EXPR_END);
-        *ps->lexvalH = int64ToSi( (intptr_t)c);
-        return tINTEGER;
-
+        *ps->lexvalH = RubyStrNode::s( NEW_STR(tok(ps), toklen(ps), ps) , ps);
+        SET_lexState( EXPR_END);
+        return tCHAR;
       case '&':
         if ((c = nextc(ps)) == '&') {
             SET_lexState( EXPR_BEG);
