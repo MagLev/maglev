@@ -10,7 +10,12 @@ puts "---"
 # Correct: Does return the singleton class
 oc2 = class << Object; self; end
 p oc2
-unless (xx = oc2.name) == '' ; raise 'error'; end
+if RUBY_VERSION == "1.8.7"
+  emptyClassName = ""
+elsif RUBY_VERSION == "1.9.3"
+  emptyClassName = nil
+end
+unless (xx = oc2.name) == emptyClassName ; raise 'error'; end 
 unless (xx = oc2.inspect) == '#<Class:Object>' ; raise 'error'; end
 unless oc2.is_a?(Object) ; raise 'error'; end
 unless oc2.is_a?(Class) ; raise 'error'; end
