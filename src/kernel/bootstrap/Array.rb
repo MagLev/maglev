@@ -503,11 +503,17 @@ class Array
     end
   end
 
+ 
   # ====== Comparable:
   # RxINC: This is a cut-n-paste to get things working for mspec.
   # Need to either overwrite or allow a mixin.
 
-  def ==(other)
+  # Return true if both are the same object, or if both are arrays, and
+  # have the same number of elements and all corresponding elements are
+  # eql?.
+  #
+
+  def eql?(other)
     return true if self._equal?(other)
     return false unless other._isArray
     lim = self.__size
@@ -523,57 +529,11 @@ class Array
         v = self.__at(i)
         ov = other[i]
         if v._equal?(ov)
-    # ok
-        elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Array#=='
-          end
-        elsif v == ov
-          # ok
-        else
-          return false
-        end
-        i += 1
-      end
-    ensure
-      if added
-        ts.remove(self)
-      end
-    end
-    true
-  end
-
-  # Return true if both are the same object, or if both are arrays, and
-  # have the same number of elements and all corresponding elements are
-  # eql?.
-  #
-  def eql?(other)
-    return true if self._equal?(other)
-    return false unless other._isArray
-    lim = self.__size
-    return false unless lim._equal?(other.__size)
-    ts = Thread.__recursion_guard_set
-    added = ts.__add_if_absent(self)
-    begin
-      i = 0
-      limi = lim
-      while i < limi
-        v = self.__at(i)
-        ov = other[i]
-        if v._equal?(ov)
           # ok
         elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Array#=='
-          end
+          # v and ov are the same objects, so behave like MRI 1.8.7 and return false
+          # in MRI 1.9.3 it should return true, though the array are not the same objects, but they have the same content
+          return true          
         elsif v.eql?(ov)
           # ok
         else
@@ -588,6 +548,8 @@ class Array
     end
     true
   end
+
+  alias :== :eql?
 
   def >(other)
     (self <=> other) > 0
