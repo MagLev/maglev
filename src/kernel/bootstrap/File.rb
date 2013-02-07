@@ -550,12 +550,12 @@ class File
       fn = filename.path
     else
       begin
-  fn = Type.__coerce_to_path(filename)
+        fn = Maglev::Type.__coerce_to_path(filename)
       rescue
-  begin
-    fn = filename.to_io.path
-  rescue
-  end
+        begin
+          fn = filename.to_io.path
+        rescue
+        end
       end
     end
     if fn._equal?(nil)
@@ -1164,7 +1164,7 @@ class File
 
   def self.path(obj)
     return obj.to_path if obj.respond_to?(:to_path)
-    Type.coerce_to(obj, String, :to_str)
+    Maglev::Type.coerce_to(obj, String, :to_str)
   end
 
 end
