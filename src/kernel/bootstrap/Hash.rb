@@ -429,39 +429,11 @@ class Hash
     self.size == 0
   end
 
-  def merge(other, &block)
-    other = Maglev::Type.coerce_to(other, Hash, :to_hash)
-    other_siz = other.size
-    my_siz = @_st_numElements
-    res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-    if res_siz > (ts = @_st_tableSize)  && ts < 1009
-      h = self.class.__new(res_siz)
-      h.default=( @_st_defaultOrParent )
-      self.__merge_into(h)
-    else
-      h = self.dup
-    end
-    h.__merge!(other, &block)
-  end
-
   def delete_if(&block)
     self.each_pair { |k, v|
       self.delete(k) if yield(k, v)
     }
     self
-  end
-
-  def merge!(other, &block)
-    other = Maglev::Type.coerce_to(other, Hash, :to_hash)
-    other_siz = other.size
-    my_siz = @_st_numElements
-    if other._not_equal?(self)
-      res_siz = ((my_siz + other_siz).to_f * 1.4 ).to_i
-      if res_siz > (ts = @_st_tableSize)  && ts < 1009
-        self.__rebuild(res_siz)
-      end
-    end
-    self.__merge!(other, &block)
   end
   
   def keep_if(&block)
