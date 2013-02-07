@@ -21,7 +21,7 @@ class Dir
 
   # RUBINIUS inspired, but our API is enough different..
   def self.chdir(path = ENV['HOME'])
-    path = Maglev::Type.coerce_to(path, String, :to_str)
+    path = Maglev::Type.__coerce_to_path(path)
     if block_given?
       original_path = self.getwd
       Errno.handle(__chdir(path), "chdir #{path}")
