@@ -11,12 +11,12 @@ puts "---"
 oc2 = class << Object; self; end
 puts "should be #<Class:Object>: #{oc2}"
 if RUBY_VERSION == "1.8.7"
-  emptyClassName = ""
+  className = ""
 elsif RUBY_VERSION == "1.9.3"
-  emptyClassName = Object.name
+  className = Object.name
 end
 
-unless (xx = oc2.name) == emptyClassName ; raise "name was: #{xx.inspect} but expected: #{emptyClassName.inspect}"; end 
+unless (xx = oc2.name) == className ; raise "name was: #{xx.inspect} but expected: #{className.inspect}"; end 
 unless (xx = oc2.inspect) == '#<Class:Object>' ; raise "inspect was: #{xx.inspect}"; end
 unless oc2.is_a?(Object) ; raise 'error'; end
 unless oc2.is_a?(Class) ; raise 'error'; end
