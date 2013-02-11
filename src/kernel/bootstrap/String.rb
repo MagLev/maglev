@@ -27,7 +27,7 @@ class String
         s = __withAll(str)
       else
         s = __alloc
-        str = Maglev::Type.coerce_to(str, String, :to_str)
+        str = Type.coerce_to(str, String, :to_str)
         s.replace(str)
       end
     else
@@ -52,7 +52,7 @@ class String
       if self.class._equal?(String)
         # do nothing
       else
-        str = Maglev::Type.coerce_to(args[0], String, :to_str)
+        str = Type.coerce_to(args[0], String, :to_str)
         self.replace(str)
       end
     elsif len > 1
@@ -66,7 +66,7 @@ class String
     if self.class._equal?(String)
       # do nothing
     else
-      str = Maglev::Type.coerce_to(str, String, :to_str)
+      str = Type.coerce_to(str, String, :to_str)
       self.replace(str)
     end
     self
@@ -77,7 +77,7 @@ class String
     if self.class._equal?(String)
       # do nothing
     else
-      str = Maglev::Type.coerce_to(str, String, :to_str)
+      str = Type.coerce_to(str, String, :to_str)
       self.replace(str)
     end
     self
@@ -117,7 +117,7 @@ class String
   end
 
   def *(n)
-    n = Maglev::Type.coerce_to(n, Integer, :to_int)
+    n = Type.coerce_to(n, Integer, :to_int)
     unless n._isFixnum
       if n._isInteger
         raise RangeError , 'arg exceeds max Fixnum'
@@ -167,7 +167,7 @@ class String
       # range checked in  __append primitive
       other = arg
     else
-      other = Maglev::Type.coerce_to(arg, String, :to_str)
+      other = Type.coerce_to(arg, String, :to_str)
     end
     self.__append(other)
     # self.taint if other.tainted?
@@ -242,7 +242,7 @@ class String
         return nil
       end
       return nil if o._isSymbol
-      o = Maglev::Type.coerce_to(o, String, :to_str)
+      o = Type.coerce_to(o, String, :to_str)
     end
     i = 1
     o_size = o.__size
@@ -326,7 +326,7 @@ class String
     elsif index._isInteger
       raise ArgumentError, 'String#[index] primitive failed'
     else
-      index = Maglev::Type.__coerce_to_Fixnum_to_int(index)
+      index = Type.__coerce_to_Fixnum_to_int(index)
       self.__at(index)
     end
   end
@@ -346,11 +346,11 @@ class String
         if length._isFixnum
           raise ArgumentError, 'String#[start,length] primitive failed'
         else
-          length = Maglev::Type.__coerce_to_Fixnum_to_int(length)
+          length = Type.__coerce_to_Fixnum_to_int(length)
         end
       else
-        start = Maglev::Type.__coerce_to_Fixnum_to_int(start)
-        length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
+        start = Type.__coerce_to_Fixnum_to_int(start)
+        length = Type.coerce_to(length, Fixnum, :to_int)
       end
       # no tainted logic
       return nil if length < 0
@@ -379,7 +379,7 @@ class String
     if value._isFixnum || value._isString
       # ok
     else
-      value = Maglev::Type.__coerce_to_String_to_str( value )
+      value = Type.__coerce_to_String_to_str( value )
       val_coerced = true
     end
     if index._isFixnum
@@ -395,7 +395,7 @@ class String
         self.__at_length_put( arr[0] , arr[1], value)
       end
     else
-      index = Maglev::Type.coerce_to(index, Fixnum, :to_int)
+      index = Type.coerce_to(index, Fixnum, :to_int)
       self.__at_put(index, value)
     end
     # taint if value.tainted?
@@ -407,9 +407,9 @@ class String
   # smalltalk code handles Regexp and Fixnum first args
 
   def __prim_at_length_put_failed(index, count, value)
-    index = Maglev::Type.coerce_to(index, Fixnum, :to_int)
-    str_value = Maglev::Type.coerce_to(value, String, :to_str)
-    count = Maglev::Type.coerce_to(count, Fixnum, :to_int)
+    index = Type.coerce_to(index, Fixnum, :to_int)
+    str_value = Type.coerce_to(value, String, :to_str)
+    count = Type.coerce_to(count, Fixnum, :to_int)
     self.__at_length_put(idx, count, str_value)
     # no taint logic
   end
@@ -468,7 +468,7 @@ class String
     return nil  if sep._equal?(nil)
     my_size = self.__size
     return nil  if my_size._equal?(0)
-    sep = Maglev::Type.coerce_to(sep, String, :to_str)
+    sep = Type.coerce_to(sep, String, :to_str)
     if sep == "\n"
       last_ch = self.__at(-1)
       diminish_by = 0
@@ -619,7 +619,7 @@ class String
       block.call(self)
       return self
     end
-    sep = Maglev::Type.coerce_to(a_sep, String, :to_str)
+    sep = Type.coerce_to(a_sep, String, :to_str)
 
     # algorithm replicated in   StringEachEnumerator
     # id = self.__id__
@@ -709,7 +709,7 @@ class String
     while n < lim
       str = args[n]
       begin
-        str = Maglev::Type.coerce_to(str, String, :to_str)
+        str = Type.coerce_to(str, String, :to_str)
         if self.__at_equals(my_siz - str.__size + 1 , str)
           return true
         end
@@ -798,7 +798,7 @@ class String
   #++
   def _gsub_internal(regex, str)
     modified = false
-    str = Maglev::Type.coerce_to(str, String, :to_str)
+    str = Type.coerce_to(str, String, :to_str)
     out = self.class.__alloc
     start = 0
     pat = self.__get_pattern(regex, true)
@@ -1033,7 +1033,7 @@ class String
     if offset._equal?(MaglevUndefined)
       self.__index(item, 0, 0x50)
     else
-      offset = Maglev::Type.coerce_to(offset, Integer, :to_int)
+      offset = Type.coerce_to(offset, Integer, :to_int)
       self.__index(item, offset, 0x50)
     end
   end
@@ -1049,7 +1049,7 @@ class String
   end
 
   def index(item, offset)
-    offset = Maglev::Type.coerce_to(offset, Integer, :to_int)
+    offset = Type.coerce_to(offset, Integer, :to_int)
     self.__index(item, offset, 0x40)
   end
 
@@ -1076,7 +1076,7 @@ class String
     else
       # try to coerce to a number or string and try again,
       #   will raise TypeError if item is a Symbol .
-      coerced = Maglev::Type.__coerce_to_string_or_integer(item)
+      coerced = Type.__coerce_to_string_or_integer(item)
       return self.index(coerced, zoffset)
     end
   end
@@ -1085,8 +1085,8 @@ class String
 
   def insert(index, string)
     # account for smalltalk index
-    index = Maglev::Type.coerce_to(index, Integer, :to_int)
-    string = Maglev::Type.coerce_to(string, String, :to_str)
+    index = Type.coerce_to(index, Integer, :to_int)
+    string = Type.coerce_to(string, String, :to_str)
     idx = index < 0 ? index + size + 2 : index + 1
     if idx <= 0 || idx > size + 1
       raise IndexError, "index #{index} out of string"
@@ -1115,10 +1115,10 @@ class String
   def justify(width, direction, padstr=" ")
     # This started off as Rubinius, but was heavily modified since most
     # work is done in smalltalk.
-    padstr = Maglev::Type.coerce_to(padstr, String, :to_str)
+    padstr = Type.coerce_to(padstr, String, :to_str)
     raise ArgumentError, "zero width padding" if padstr.__size._equal?(0)
 
-    width = Maglev::Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
+    width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
     sz = size
     if width > sz
       padsize = width - sz
@@ -1200,7 +1200,7 @@ class String
       end
       return [ self.dup , '', '' ]
     else
-      pstr = Maglev::Type.coerce_to(pattern, String, :to_str)
+      pstr = Type.coerce_to(pattern, String, :to_str)
       return self.partition(pstr)
     end
   end
@@ -1259,7 +1259,7 @@ class String
       was_undef = true
       zoffset = my_size._equal?(0) ? 0 : my_size
     else
-      zoffset = Maglev::Type.coerce_to(original_offset, Integer, :to_int)
+      zoffset = Type.coerce_to(original_offset, Integer, :to_int)
       zoffset += my_size if zoffset < 0
     end
     return nil if zoffset < 0
@@ -1288,7 +1288,7 @@ class String
       zidx = item.__rindex_string(self, zoffset, vcgl_idx)
       return zidx
     else
-      coerced = Maglev::Type.coerce_to(item, String, :to_str)
+      coerced = Type.coerce_to(item, String, :to_str)
       return self.rindex(coerced, original_offset)
     end
   end
@@ -1320,7 +1320,7 @@ class String
       end
       return [ '', '', self.dup ]
     else
-      pstr = Maglev::Type.coerce_to(pattern, String, :to_str)
+      pstr = Type.coerce_to(pattern, String, :to_str)
       return self.rpartition(pstr)
     end
   end
@@ -1374,8 +1374,8 @@ class String
       # r.taint if self.tainted? or start.tainted?
       return r
     end
-    start = Maglev::Type.coerce_to(start, Integer, :to_int)
-    len = Maglev::Type.coerce_to(a_len, Integer, :to_int)
+    start = Type.coerce_to(start, Integer, :to_int)
+    len = Type.coerce_to(a_len, Integer, :to_int)
     return nil if len < 0
     return self.class.__alloc if len._equal?(0)
     start += sz if start < 0
@@ -1411,7 +1411,7 @@ class String
       return nil if start._equal?(0)
       slice!(start - 1, arg.__size) # adjust coming from smalltalk
     else
-      arg = Maglev::Type.coerce_to(arg, Integer, :to_int)
+      arg = Type.coerce_to(arg, Integer, :to_int)
       s = slice!(arg, 1)
       return nil if s._equal?(nil)
       s.__at(0)
@@ -1422,7 +1422,7 @@ class String
     md = regexp.match(self)
     md.__storeRubyVcGlobal( vcgl_idx ) # update $~
     return nil if md._equal?(nil)
-    idx = Maglev::Type.coerce_to(length, Integer, :to_int)
+    idx = Type.coerce_to(length, Integer, :to_int)
     return nil if idx >= md.size or idx < 0
     m_begin = md.begin(idx)
     m_len = md.end(idx) - m_begin
@@ -1475,7 +1475,7 @@ class String
       limited = false
       limit = nil
     else
-      limit = Maglev::Type.coerce_to(limit, Integer, :to_int)
+      limit = Type.coerce_to(limit, Integer, :to_int)
       return [self.dup] if limit._equal?(1)
       limited = limit > 0 ? true : false
       suppress_trailing_empty = limit._equal?(0)
@@ -1600,7 +1600,7 @@ class String
 
   def __split_regex(pattern, limit, limited, suppress_trailing_empty)
     unless pattern._isRegexp
-      pattern = Maglev::Type.coerce_to(pattern, String, :to_str)
+      pattern = Type.coerce_to(pattern, String, :to_str)
       pattern = Regexp.new(Regexp.quote(pattern))
     end
 
@@ -1665,7 +1665,7 @@ class String
     while n < lim
       str = args[n]
       begin
-        str = Maglev::Type.coerce_to(str, String, :to_str)
+        str = Type.coerce_to(str, String, :to_str)
         if self.__at_equals(1 , str)
           return true
         end
@@ -1679,7 +1679,7 @@ class String
 
   def start_with?(string)
     begin
-      str = Maglev::Type.coerce_to(string, String, :to_str)
+      str = Type.coerce_to(string, String, :to_str)
       if self.__at_equals(1 , str)
         return true
       end
@@ -1704,7 +1704,7 @@ class String
   # we don't know number of frames up stack to find caller's $~
 
   def sub(pattern, replacement)
-    replacement = Maglev::Type.coerce_to(replacement, String, :to_str)
+    replacement = Type.coerce_to(replacement, String, :to_str)
     regex = self.__get_pattern(pattern, true)
 
     # If pattern is a string, then do NOT interpret regex special characters.
@@ -1814,7 +1814,7 @@ class String
     tot = 0
     n = 0
     lim = self.__size
-    power = Maglev::Type.coerce_to(power, Fixnum, :to_int)
+    power = Type.coerce_to(power, Fixnum, :to_int)
     if power <= 0
       while n < lim
         tot = tot + self.__at(n)
@@ -1850,7 +1850,7 @@ class String
   end
 
   def to_i(base=10)
-    base = Maglev::Type.coerce_to(base, Integer, :to_int)
+    base = Type.coerce_to(base, Integer, :to_int)
     if base._equal?(10)
       str = self
       if self.__at(0)._equal?( ?0 ) && self.__at(1)._equal?( ?d )
@@ -1957,8 +1957,8 @@ class String
   #  <code>String#tr</code>. Returns <i>str</i>, or <code>nil</code> if no
   #  changes were made.
   def tr!(from_str, to_str)
-    from = Maglev::Type.coerce_to(from_str, String, :to_str)
-    to   = Maglev::Type.coerce_to(to_str,   String, :to_str)
+    from = Type.coerce_to(from_str, String, :to_str)
+    to   = Type.coerce_to(to_str,   String, :to_str)
 
     # Make the case for single character replacement more efficient.
     # Avoids creating a translation table.
@@ -2017,8 +2017,8 @@ class String
   #     "hello".tr_s('el', '*')    #=> "h*o"
   #     "hello".tr_s('el', 'hx')   #=> "hhxo"
   def tr_s(from_str, to_str)
-    from = Maglev::Type.coerce_to(from_str, String, :to_str)
-    to   = Maglev::Type.coerce_to(to_str,   String, :to_str)
+    from = Type.coerce_to(from_str, String, :to_str)
+    to   = Type.coerce_to(to_str,   String, :to_str)
     str = self.dup
     # str.taint if self.tainted?
     str.__tr_s!(from, to) || str

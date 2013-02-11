@@ -195,7 +195,7 @@ module Enumerable
 
   class ArrayCycleEnumerator < Enumerator
     def initialize(array, repeat_count)
-      cnt = Maglev::Type.coerce_to(repeat_count, Fixnum , :to_int)
+      cnt = Type.coerce_to(repeat_count, Fixnum , :to_int)
       super(array, :cycle)
       @cycle_count = cnt
       @num_cycles = cnt

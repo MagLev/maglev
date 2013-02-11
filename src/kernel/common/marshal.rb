@@ -634,7 +634,7 @@ module Marshal
     if limit._equal?(nil)
       depth = -1
     else
-      depth = Maglev::Type.coerce_to(limit, Fixnum, :to_int )
+      depth = Type.coerce_to(limit, Fixnum, :to_int )
     end
     ms = State.new(nil, depth, nil)
 

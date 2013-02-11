@@ -218,9 +218,9 @@ class File
   #  File.fnmatch(pattern, 'a/.b/c/foo', File::FNM_PATHNAME)    #=> false
   #  File.fnmatch(pattern, 'a/.b/c/foo', File::FNM_PATHNAME | File::FNM_DOTMATCH) #=> true
   def self.fnmatch(pattern, path, flags=0)
-    pattern = Maglev::Type.coerce_to(pattern, String, :to_str).dup
-    path    = Maglev::Type.coerce_to(path, String, :to_str).dup
-    flags   = Maglev::Type.coerce_to(flags, Fixnum, :to_int) unless Fixnum === flags
+    pattern = Type.coerce_to(pattern, String, :to_str).dup
+    path    = Type.coerce_to(path, String, :to_str).dup
+    flags   = Type.coerce_to(flags, Fixnum, :to_int) unless Fixnum === flags
 
     name_match(pattern, path, flags, 0, pattern.size, 0, path.size)
   end
@@ -255,7 +255,7 @@ class File
     else
       # We need to use dup here, since it's possible that
       # StringValue gives us a direct object we shouldn't mutate
-      first = Maglev::Type.__coerce_to_path(first).dup
+      first = Type.__coerce_to_path(first).dup
     end
 
     ret = first
@@ -282,7 +282,7 @@ class File
           raise ArgumentError, "recursive array in File.join"
         end
       else
-        value = Maglev::Type.coerce_to(el, String, :to_str).dup
+        value = Type.coerce_to(el, String, :to_str).dup
       end
 
       if value.__at(0) == sep.__at(0) && value.__at_equals(1, sep)

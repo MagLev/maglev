@@ -553,7 +553,7 @@ class Regexp
         end
         src << an_arg.to_s
       else
-        an_arg = Maglev::Type.coerce_to(an_arg, String, :to_str)
+        an_arg = Type.coerce_to(an_arg, String, :to_str)
         src << Regexp.escape(an_arg)
       end 
       n += 1

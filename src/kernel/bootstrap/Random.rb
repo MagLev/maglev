@@ -13,7 +13,7 @@ class Random
   end
   def seed(v)
     if v._not_equal?(nil)
-      v = Maglev::Type.coerce_to(v, Fixnum, :to_int)
+      v = Type.coerce_to(v, Fixnum, :to_int)
       @_st_seed = v
       self.__seed(v)
     else
