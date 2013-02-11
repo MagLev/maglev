@@ -13,7 +13,7 @@ as = a.to_s
 b = %r{x#{a}y}
 c = b.inspect
 d = '/x(?-mix:a\/b)y/' #MRI result
-raise "Fail" unless c == d
+raise "Fail #{c} should equal #{d}" unless c == d
 true
 
 

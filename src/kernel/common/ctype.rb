@@ -8,24 +8,24 @@
 
 module CType
   def isctrl
-    self == ?\n or self == ?\r or self == ?\t or self == ?\f or
-    self == ?\v or self == ?\a or self == ?\e or self == ?\b
+    self.chr == ?\n or self.chr == ?\r or self.chr == ?\t or self.chr == ?\f or
+    self.chr == ?\v or self.chr == ?\a or self.chr == ?\e or self.chr == ?\b
   end
 
   def isspace
-    self == ?\s or self == ?\n or self == ?\t or self == ?\r or self == ?\f or self == ?\v
+    self.chr == ?\s or self.chr == ?\n or self.chr == ?\t or self.chr == ?\r or self.chr == ?\f or self.chr == ?\v
   end
 
   def isupper
-    self >= ?A and self <= ?Z
+    self.chr >= ?A and self.chr <= ?Z
   end
 
   def islower
-    self >= ?a and self <= ?z
+    self.chr >= ?a and self.chr <= ?z
   end
 
   def isdigit
-    self >= ?0 and self <= ?9
+    self.chr >= ?0 and self.chr <= ?9
   end
 
   def isalnum
@@ -33,7 +33,7 @@ module CType
   end
 
   def toupper!
-    self - ?\s
+    self - 32
   end
 
   def toupper
@@ -41,7 +41,7 @@ module CType
   end
 
   def tolower!
-    self + ?\s
+    self + 32
   end
 
   def tolower

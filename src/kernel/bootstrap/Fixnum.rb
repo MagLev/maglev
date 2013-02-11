@@ -5,7 +5,7 @@ class Fixnum
   MIN = -1152921504606846976
 
   def self.induced_from(obj)
-    i = Type.coerce_to(obj, Integer, :to_int)
+    i = Maglev::Type.coerce_to(obj, Integer, :to_int)
     unless i._isFixnum
       raise RangeError, 'Object is out of range for a Fixnum' 
     end

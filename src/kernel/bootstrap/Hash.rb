@@ -183,7 +183,7 @@ class Hash
      
   def self.try_convert(obj)
     begin
-      Type.coerce_to(obj, Hash, :to_hash)
+      Maglev::Type.coerce_to(obj, Hash, :to_hash)
     rescue 
       nil
     end

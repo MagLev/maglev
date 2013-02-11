@@ -91,6 +91,7 @@ run
  SocketErrorEPIPE . 
  AlmostOutOfStack . 
  SystemCallError . 
+ TransactionError . 
  ThreadError . 
  ArgumentTypeError . 
  UNIXServer .
