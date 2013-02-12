@@ -11,6 +11,8 @@ class IO
     self
   end
 
+
+
   def bytes()  # added for 1.8.7
     return IoByteEnumerator.new(self, :each_byte)
   end
@@ -32,16 +34,16 @@ class IO
     while not eof?
       buf = self.read(4096)
       if buf._equal?(nil)
-	return self
+  return self
       end
       len = buf.size
       if len._equal?(0)
-	return self
+  return self
       end
       n = 0
       while n < len
-	block.call( buf[n] )
-	n += 1
+  block.call( buf[n] )
+  n += 1
       end
     end
     self
@@ -54,18 +56,18 @@ class IO
     while not eof?
       buf = self.read(4096)
       if buf._equal?(nil)
-	return self
+  return self
       end
       len = buf.size
       if len._equal?(0)
-	return self
+  return self
       end
       n = 0
       while n < len
-	str = ' ' 
-	str[0] = buf[n]
-	block.call( str )
-	n += 1
+  str = ' ' 
+  str[0] = buf[n]
+  block.call( str )
+  n += 1
       end
     end
     self
@@ -566,6 +568,10 @@ class IO
     data
   end
 
+  def self.write(*args)
+    raise NotImplementedError, 'Class:write'
+  end
+
   # def read() ; end  # subclass responsibility
 
   def readchar 
@@ -756,6 +762,14 @@ class IO
 
   def ensure_open_and_writable
     raise IOError, "not opened for writing" unless !self.closed? and self.__writable
+  end
+
+  def self.binread(*args)
+    self.read(*args)
+  end
+
+  def self.binwrite(*args)
+    self.write(*args)
   end
 
 end
