@@ -1787,7 +1787,7 @@ class Array
   
   def self.try_convert(obj)
     begin
-      array = Type.__coerce_to_Array_to_ary(obj)
+      array = Maglev::Type.__coerce_to_Array_to_ary(obj)
     rescue TypeError
       return nil
     end
