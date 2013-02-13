@@ -78,6 +78,7 @@ class Hash
     else
       return HashEnumerator.new(self, :each_pair)
     end
+    return Maglev::Type.coerce_to(first, Hash, :to_hash)
   end
 
   alias each each_pair
@@ -419,6 +420,7 @@ class Hash
   end
   
   def replace(hash)
+    hash = Maglev::Type.coerce_to(hash, Hash, :to_hash)
     self.__clear
     self.__merge!(hash)
   end

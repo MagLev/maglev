@@ -68,6 +68,8 @@ class File
   primitive_nobridge '__last_err_string', 'lastErrorString'
   primitive_nobridge '__last_err_code', 'lastErrorCode'
   primitive_nobridge '__readable', '_isReadable'
+  primitive_nobridge '__writable', '_isWritable'
+
   primitive_nobridge '__seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '__fstat','fstat:isLstat:'
@@ -102,7 +104,7 @@ class File
   def self.__stat(name, is_lstat)
     raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
-      name = Maglev::Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.__coerce_to_path(name)
     end
     __stat_isLstat(name, is_lstat)
   end
@@ -244,7 +246,7 @@ class File
   #  File.expand_path("~oracle/bin")           #=> "/home/oracle/bin"
   #  File.expand_path("../../bin", "/tmp/x")   #=> "/bin"
   def self.expand_path(path, dir=nil)
-    path = Maglev::Type.coerce_to(path, String, :to_str)
+    path = Maglev::Type.__coerce_to_path(path)
 
     first = path[0]
     if dir
@@ -424,7 +426,6 @@ class File
     end
     # Pathname responds only to to_s
     filename = Maglev::Type.__coerce_to_String_to_s(filename)
-
     nargs = 1
     if mode._equal?(MaglevUndefined)
       mode = 'r'
@@ -549,12 +550,12 @@ class File
       fn = filename.path
     else
       begin
-  fn = filename.to_str
+        fn = Maglev::Type.__coerce_to_path(filename)
       rescue
-  begin
-    fn = filename.to_io.path
-  rescue
-  end
+        begin
+          fn = filename.to_io.path
+        rescue
+        end
       end
     end
     if fn._equal?(nil)
@@ -858,6 +859,7 @@ class File
     end
     num_read = self.__read_into(length, buffer, false)
     raise IOError, 'error' if num_read._equal?(nil)
+    raise EOFError, 'end of file reached' if num_read == 0
     if need_trunc
       buffer.size = num_read # truncate buffer
     end
@@ -1159,6 +1161,12 @@ class File
       file
     end
   end
+
+  def self.path(obj)
+    return obj.to_path if obj.respond_to?(:to_path)
+    Maglev::Type.coerce_to(obj, String, :to_str)
+  end
+
 end
 File.__freeze_constants
 
