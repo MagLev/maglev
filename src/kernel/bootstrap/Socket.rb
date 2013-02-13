@@ -1000,4 +1000,7 @@ class UNIXServer # < UNIXSocket in Smalltalk bootstrap
     self.accept
   end
 
+  primitive_nobridge '__readable', '_isReadable'
+  primitive_nobridge '__writable', '_isWritable'
+
 end
