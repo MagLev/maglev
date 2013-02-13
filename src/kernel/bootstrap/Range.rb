@@ -159,7 +159,7 @@ class Range
     lim = @_st_to
     if @_st_from._isNumeric
       unless n._isNumeric
-        n = Type.coerce_to(n, Integer, :to_int)
+        n = Maglev::Type.coerce_to(n, Integer, :to_int)
       end
       if (n <= 0)
         raise ArgumentError, 'increment for step must be > 0'
@@ -230,11 +230,11 @@ class Range
   # Given a target length, +len+, Calculate whether this range covers the given length.
   # If it does, return the beginning and length of the "string" of length +len+.
   # Returns nil if the range does not cover.  
-  # This does the appropriate Type.coerce_to that the specs expect.
+  # This does the appropriate Maglev::Type.coerce_to that the specs expect.
   # +err+ is ignored for now.
   def __beg_len(len)
-    beg = Type.coerce_to(@_st_from, Fixnum, :to_int)
-    the_end = Type.coerce_to(@_st_to, Fixnum, :to_int)
+    beg = Maglev::Type.coerce_to(@_st_from, Fixnum, :to_int)
+    the_end = Maglev::Type.coerce_to(@_st_to, Fixnum, :to_int)
 
     if (beg < 0)
       beg += len
@@ -252,8 +252,8 @@ class Range
   end
 
   def __cext_beg_len(len, err)
-    beg = Type.coerce_to(@_st_from, Fixnum, :to_int)
-    the_end = Type.coerce_to(@_st_to, Fixnum, :to_int)
+    beg = Maglev::Type.coerce_to(@_st_from, Fixnum, :to_int)
+    the_end = Maglev::Type.coerce_to(@_st_to, Fixnum, :to_int)
     if (beg < 0)
       beg += len
       return nil if (beg < 0)

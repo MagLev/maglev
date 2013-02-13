@@ -21,7 +21,7 @@ class Dir
 
   # RUBINIUS inspired, but our API is enough different..
   def self.chdir(path = ENV['HOME'])
-    path = Type.coerce_to(path, String, :to_str)
+    path = Maglev::Type.__coerce_to_path(path)
     if block_given?
       original_path = self.getwd
       Errno.handle(__chdir(path), "chdir #{path}")
@@ -43,7 +43,7 @@ class Dir
   end
 
   def self.delete(dirname)
-    dirname = Type.coerce_to(dirname, String, :to_str)
+    dirname = Maglev::Type.coerce_to(dirname, String, :to_str)
     Errno.handle(__rmdir(dirname), "delete #{dirname}")
   end
 
@@ -71,7 +71,7 @@ class Dir
   def self.mkdir(dirname, permissions=0777)
     # MRI does not allow conversion of nil to 0 for this method...
     raise TypeError, "no implicit conversion from nil to integer" if permissions._equal?(nil)
-    permissions = Type.coerce_to(permissions, Integer, :to_i)
+    permissions = Maglev::Type.coerce_to(permissions, Integer, :to_i)
     Errno.handle(__mkdir(dirname, permissions), "mkdir #{dirname}  #{permissions}")
   end
 
@@ -95,7 +95,7 @@ class Dir
   end
 
   def self.open(dirname, &block)
-    dirname = Type.coerce_to(dirname, String, :to_str) # 1.9 would use to_path
+    dirname = Maglev::Type.coerce_to(dirname, String, :to_str) # 1.9 would use to_path
     if block_given?
       begin
         d = Dir.new(dirname)
@@ -114,12 +114,12 @@ class Dir
   end
 
   def self.rmdir(dirname)
-    dirname = Type.coerce_to(dirname, String, :to_str)
+    dirname = Maglev::Type.coerce_to(dirname, String, :to_str)
     Errno.handle(__rmdir(dirname), "rmdir #{dirname}")
   end
 
   def self.unlink(dirname)
-    dirname = Type.coerce_to(dirname, String, :to_str)
+    dirname = Maglev::Type.coerce_to(dirname, String, :to_str)
     Errno.handle(__rmdir(dirname), "unlink #{dirname}")
   end
 
@@ -172,7 +172,7 @@ class Dir
 
   def pos=(pos)
     check_closed
-    p = Type.coerce_to(pos, Fixnum, :to_i)
+    p = Maglev::Type.coerce_to(pos, Fixnum, :to_i)
 
     @_st_index = p if @_st_range === p
     @_st_index
@@ -196,7 +196,7 @@ class Dir
 
   def seek(pos)
     check_closed
-    p = Type.coerce_to(pos, Fixnum, :to_i)
+    p = Maglev::Type.coerce_to(pos, Fixnum, :to_i)
 
     @_st_index = p if (0...@_st_entries.size) === p
     self 

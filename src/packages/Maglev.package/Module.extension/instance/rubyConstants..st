@@ -1,5 +1,5 @@
 *maglev-runtime
-rubyConstants
+rubyConstants: withIncluded
     "a ruby primitive.
      Return an Array of Strings, the names of constants defined in this module
        and any included modules."
@@ -7,10 +7,10 @@ rubyConstants
     moduleNames := self _rubyConstants: (envId := 1"__callerEnvId") .
     cls := self .
     topCls := Object .
-    [ cls ~~ topCls ] whileTrue:[ 
-      cls := cls rubySuperclass: envId .
-      cls ~~ topCls ifTrue:[ moduleNames addAll: (cls _rubyConstants: envId)].   
-    ].
+	withIncluded ifTrue: [
+	    [ cls ~~ topCls ] whileTrue:[ 
+    	  cls := cls rubySuperclass: envId .
+      	cls ~~ topCls ifTrue:[ moduleNames addAll: (cls _rubyConstants: envId)]]].
     (arr := { }) _addAllFromNsc: moduleNames .
     1 to: arr size do:[:m |
       arr at: m put: (arr at: m) asString . "convert Symbols to Strings"

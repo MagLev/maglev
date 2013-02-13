@@ -15,7 +15,7 @@ walkWithScope: aScope
   ].
   [ | prefix |
     prefix := nameNode .
-    ((prefix _rubyAt1: -1) == 108"$l asciiValue"  and:[
+    ((prefix _rubyOrdAt: -1) == 108"$l asciiValue"  and:[
           RubyAbstractCallNode evalSelectors includesIdentical: prefix ]) ifTrue:[
       "required to avoid tooManyArgs errors since we synthesize file and line args
        to any call to an eval "

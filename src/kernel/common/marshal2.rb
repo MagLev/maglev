@@ -52,14 +52,14 @@ end
 class Class
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous class #{self}" if self.name == ''
-    Marshal__TYPE_CLASS + ms.serialize_integer(name.length) + name
+    Marshal__TYPE_CLASS + ms.serialize_integer(name.to_s.length) + name
   end
 end
 
 class Module
   def to_marshal(ms)
     raise TypeError, "can't dump anonymous module #{self}" if self.name == ''
-    Marshal__TYPE_MODULE + ms.serialize_integer(name.length) + name
+    Marshal__TYPE_MODULE + ms.serialize_integer(name.to_s.length) + name
   end
 end
 
