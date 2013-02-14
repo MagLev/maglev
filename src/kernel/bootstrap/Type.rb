@@ -291,11 +291,10 @@ module Maglev
         if obj.respond_to?(:to_path)
           obj = obj.to_path
         end
-        
         self.coerce_to(obj, String, :to_str)
       end
     end
-  end
 
   # END Modified RUBINIUS
+  end
 end

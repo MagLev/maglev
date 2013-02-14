@@ -425,7 +425,6 @@ class File
     end
     # Pathname responds only to to_s
     filename = Maglev::Type.__coerce_to_String_to_s(filename)
-
     nargs = 1
     if mode._equal?(MaglevUndefined)
       mode = 'r'
@@ -550,12 +549,12 @@ class File
       fn = filename.path
     else
       begin
-  fn = Maglev::Type.__coerce_to_path(filename)
+        fn = Maglev::Type.__coerce_to_path(filename)
       rescue
-  begin
-    fn = filename.to_io.path
-  rescue
-  end
+        begin
+          fn = filename.to_io.path
+        rescue
+        end
       end
     end
     if fn._equal?(nil)

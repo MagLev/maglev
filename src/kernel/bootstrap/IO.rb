@@ -699,7 +699,7 @@ class IO
         if obj._isString
           io = File.open obj, mode
         elsif obj.respond_to? :to_path
-          path = Type.coerce_to obj, String, :to_path
+          path = Maglev::Type.coerce_to obj, String, :to_path
           io = File.open path, mode
         else
           io = obj
