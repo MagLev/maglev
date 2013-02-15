@@ -1,0 +1,3 @@
+fails:Matrix#conj returns a matrix with all entries 'conjugated'
+fails:Matrix#conj returns empty matrices on the same size if empty
+fails:Matrix#conj for a subclass of Matrix returns an instance of that subclass

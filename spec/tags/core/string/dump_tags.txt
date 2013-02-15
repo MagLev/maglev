@@ -1,1 +1,3 @@
 fails:String#dump taints result when self is tainted
+fails:String#dump returns a string with nonprinting charaters replaced by \x notation
+fails:String#dump includes .force_encoding(name) if the encoding isn't ASCII compatiable

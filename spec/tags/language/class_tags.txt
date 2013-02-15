@@ -2,3 +2,4 @@ fails:A class definition allows using self as the superclass if self is a class
 fails:A class definition extending an object (sclass) can use return to cause the enclosing method to return
 fails:An anonymous class takes on the name of the first constant it is assigned to
 fails:An anonymous class forces named nested classes to be anonymous
+fails:An outer class definition contains the inner classes

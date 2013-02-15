@@ -1,0 +1,2 @@
+fails:Hash.try_convert does not rescue exceptions raised by #to_hash
+fails:Hash.try_convert raises a TypeError if #to_hash does not return a Hash

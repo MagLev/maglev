@@ -1,0 +1,2 @@
+fails:BigDecimal#eql? NaN is never equal to any number
+fails:BigDecimal#eql? returns false for infinity values with different signs

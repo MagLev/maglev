@@ -1,0 +1,2 @@
+fails:Matrix::LUPDecomposition#u returns the second element of to_a
+fails:Matrix::LUPDecomposition#u returns an upper triangular matrix

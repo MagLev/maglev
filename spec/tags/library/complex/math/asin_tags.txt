@@ -1,0 +1,1 @@
+fails:Math#asin is a private instance method

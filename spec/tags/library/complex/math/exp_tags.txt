@@ -1,0 +1,1 @@
+fails:Math#exp is a private instance method

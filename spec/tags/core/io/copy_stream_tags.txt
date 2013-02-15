@@ -1,0 +1,6 @@
+fails:IO.copy_stream from an IO to a file name calls #to_path to convert on object to a file name
+fails:IO.copy_stream from an IO to a file name raises a TypeError if #to_path does not return a String
+fails:IO.copy_stream from a file name calls #to_path to convert on object to a file name
+fails:IO.copy_stream from a file name raises a TypeError if #to_path does not return a String
+fails:IO.copy_stream from a file name to a file name calls #to_path to convert on object to a file name
+fails:IO.copy_stream from a file name to a file name raises a TypeError if #to_path does not return a String
