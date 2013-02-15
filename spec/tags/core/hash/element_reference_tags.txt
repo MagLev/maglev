@@ -1,0 +1,2 @@
+fails:Hash#[] calls subclass implementations of default
+fails:Hash#[] compares keys with the same #hash value via #eql?

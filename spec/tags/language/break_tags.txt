@@ -5,3 +5,6 @@ fails:The break statement in a captured block from a scope that has returned rai
 fails:The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block
 fails:The break statement in a lambda when the invocation of the scope creating the lambda is still active raises a LocalJumpError when yielding to a lambda passed as a block argument
 fails:The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument
+fails:Break inside a while loop with a splat treats nil as an empty array
+fails:Break inside a while loop with a splat preserves an array as is
+fails:Break inside a while loop with a splat wraps a non-Array in an Array

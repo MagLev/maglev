@@ -1,0 +1,1 @@
+fails:Math#rsqrt is a private instance method

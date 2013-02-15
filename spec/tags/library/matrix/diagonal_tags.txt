@@ -1,0 +1,5 @@
+fails:Matrix.diagonal? returns true for a diagonal Matrix
+fails:Matrix.diagonal? returns true for a zero square Matrix
+fails:Matrix.diagonal? returns false for a non diagonal square Matrix
+fails:Matrix.diagonal? returns true for an empty 0x0 matrix
+fails:Matrix.diagonal? raises an error for rectangular matrices

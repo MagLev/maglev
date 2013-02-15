@@ -1,1 +1,2 @@
 fails:Thread#join accepts a floating point timeout length
+fails:Thread#join raises any uncaught exception encountered in ensure block

@@ -1,0 +1,1 @@
+fails:Math#asinh is a private instance method

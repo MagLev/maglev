@@ -1,0 +1,3 @@
+fails:Kernel#singleton_class returns NilClass for nil
+fails:Kernel#singleton_class returns TrueClass for true
+fails:Kernel#singleton_class returns FalseClass for false
