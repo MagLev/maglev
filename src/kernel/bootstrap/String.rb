@@ -735,40 +735,6 @@ class String
     self.__copyfrom_to( from + 1 , to )
   end
 
-  # Generic version of gsub, for aliasing
-  # ELSE BRANCH COPIED FROM SPECIALIZED VERSION
-  def gsub(regex, str=nil, &block)
-    if str
-      _gsub_internal(regex, str)[0]
-    else
-      # if block_given?,
-      #  $~ and related variables will be valid in block if
-      #   blocks's home method and caller's home method are the same
-      unless block_given?
-        # updating of $~ not implemented yet on  this path
-        return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
-      end
-      start = 0
-      out = self.class.__alloc
-      last_match = nil
-      self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-        last_match = match
-        out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-        saveTilde = block.__fetchRubyVcGlobal(0)
-        begin
-          block.__setRubyVcGlobal(0, match)
-          out.__append_internal(block.call(match.__at(0)).to_s)
-        ensure
-          block.__setRubyVcGlobal(0, saveTilde)
-        end
-        start = match.end(0)
-      end
-      out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
-      last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
-      out
-    end
-  end
-
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
   # replaced with either <i>replacement</i> or the value of the block. The
   # <i>pattern</i> will typically be a <code>Regexp</code>; if it is a
@@ -790,8 +756,24 @@ class String
   #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
-  def gsub(regex, str=MaglevUndefined)
-    _gsub_internal(regex, str)[0]
+  #
+  # Generic version of gsub, for aliasing
+  # BOTH BRANCHES COPIED FROM SPECIALIZED VERSIONS BELOW
+  def gsub(regex, replacement=MaglevUndefined, &block)
+    if !replacement._equal?(MaglevUndefined)
+      __gsub_perform_substitution(regex, replacement)[0]
+    elsif block
+      __gsub_perform_block_substititution(regex, &block)
+    else
+      StringGsubEnumerator.new(self, :gsub, regex)
+    end
+  end
+
+  # specialized version for invocation with block
+  # COPY TO ELSE BRANCH OF GENERIC VERSION ABOVE IF CHANGED
+  def gsub(regex, &block)
+    return StringGsubEnumerator.new(self, :gsub, regex) unless block
+    __gsub_perform_block_substitution(regex, &block)
   end
 
   #-- Returns an array of [newvalue, modified], where modified is true if a
@@ -800,26 +782,17 @@ class String
   # incorrect results for something like "replace the last 's' with an 's'"
   # (which breaks Rails routing...)
   #++
-  def _gsub_internal(regex, replacement=MaglevUndefined)
+  def gsub(regex, replacement)
+    __gsub_perform_substitution(regex, replacement)[0]
+  end
+
+  def __gsub_perform_substitution(regex, replacement)
     # 1. phase convert arguments to correct types
-    if replacement._equal?(MaglevUndefined)
-      unless block_given?
-        raise 'gsub called with only one argument and no block - I do not know what to do!'
-        #return to_enum(:gsub, pattern, replacement) #copied from rubinius
-      end
-      use_yield = true
-    else
-      if replacement.kind_of?(String)
-        replacement = Maglev::Type.coerce_to(replacement, String, :to_str)
-      else
-        hash = Maglev::Type.__coerce_to_Hash_to_hash(replacement)
-        # replacement = StringValue(replacement) unless hash #TODO
-      end
-      use_yield = false
-    end
-    # 2. phase: prepare substitution loop
+    hash = Maglev::Type.__coerce_to_Hash_to_hash_or_nil(replacement)
+    replacement = Maglev::Type.coerce_to(replacement, String, :to_str) if hash._equal?(nil)
+
     modified = false
-                                                             #str = Maglev::Type.coerce_to(str, String, :to_str)
+    # 2. phase: prepare substitution loop
     out = self.class.__alloc
     out.force_encoding(self.encoding) # TODO: if force encoding is implemented this should be tested
     start = 0
@@ -831,14 +804,9 @@ class String
       last_match = match
       # append string between matches
       out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-      if use_yield || hash
-        if use_yield
-          # replace with yield
-          val = yield match.to_s
-        else
-          # replace with hash
-          val = hash[match.to_s]
-        end
+      if hash
+        # replace with hash
+        val = hash[match.to_s]
         val = val.to_s unless val.kind_of?(String)
       else
         # replace with string 
@@ -852,6 +820,30 @@ class String
     out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
     last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
     return [out, modified]
+  end
+  
+  def __gsub_perform_block_substitution(regex, &block)
+    # if block_given?,
+    #  $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
+    start = 0
+    out = self.class.__alloc
+    last_match = nil
+    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+      last_match = match
+      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
+      saveTilde = block.__fetchRubyVcGlobal(0)
+      begin
+        block.__setRubyVcGlobal(0, match)
+        out.__append_internal(block.call(match.__at(0)).to_s)
+      ensure
+        block.__setRubyVcGlobal(0, saveTilde)
+      end
+      start = match.end(0)
+    end
+    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
+    last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
+    out
   end
 
   # From Rubinius
@@ -910,63 +902,18 @@ class String
     out
   end
 
-  # specialized version for invocation with block
-  # COPY TO ELSE BRANCH OF GENERIC VERSION ABOVE IF CHANGED
-  def gsub(regex, &block)
-    # if block_given?,
-    #  $~ and related variables will be valid in block if
-    #   blocks's home method and caller's home method are the same
-    unless block_given?
-      # updating of $~ not implemented yet on  this path
-      return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
-    end
-    start = 0
-    out = self.class.__alloc
-    last_match = nil
-    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      last_match = match
-      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-      saveTilde = block.__fetchRubyVcGlobal(0)
-      begin
-        block.__setRubyVcGlobal(0, match)
-        out.__append_internal(block.call(match.__at(0)).to_s)
-      ensure
-        block.__setRubyVcGlobal(0, saveTilde)
-      end
-      start = match.end(0)
-    end
-    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
-    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
-    out
-  end
-
   def gsub!(regex, str)
-    result = _gsub_internal(regex, str)
-    unless result[1]
+    result, modified = __gsub_perform_substitution(regex, str)
+    unless modified
       nil
     else
-      replace(result[0])  # replace detects frozen
+      replace(result)  # replace detects frozen
     end
   end
 
   def gsub!(regex, &block)
-    # From Rubinius
-    # $~ and related variables will be valid in block if
-    #   blocks's home method and caller's home method are the same
-    start = 0
-    out = self.class.__alloc
-    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0) ))
-      saveTilde = block.__fetchRubyVcGlobal(0)
-      begin
-        block.__setRubyVcGlobal(0, match)
-        out.__append_internal(block.call(match.__at(0)).to_s)
-      ensure
-        block.__setRubyVcGlobal(0, saveTilde)
-      end
-      start = match.end(0)
-    end
-    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
+    return StringGsubEnumerator.new(self, :gsub!, regex) unless block
+    out = __gsub_perform_block_substitution(regex, &block)
     if self == out
       nil
     else
