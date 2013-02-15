@@ -790,7 +790,7 @@ class String
   #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
-  def gsub(regex, str)
+  def gsub(regex, str=MaglevUndefined)
     _gsub_internal(regex, str)[0]
   end
 
@@ -800,23 +800,58 @@ class String
   # incorrect results for something like "replace the last 's' with an 's'"
   # (which breaks Rails routing...)
   #++
-  def _gsub_internal(regex, str)
+  def _gsub_internal(regex, replacement=MaglevUndefined)
+    # 1. phase convert arguments to correct types
+    if replacement._equal?(MaglevUndefined)
+      unless block_given?
+        raise 'gsub called with only one argument and no block - I do not know what to do!'
+        #return to_enum(:gsub, pattern, replacement) #copied from rubinius
+      end
+      use_yield = true
+    else
+      if replacement.kind_of?(String)
+        replacement = Maglev::Type.coerce_to(replacement, String, :to_str)
+      else
+        hash = Maglev::Type.__coerce_to_Hash_to_hash(replacement)
+        # replacement = StringValue(replacement) unless hash #TODO
+      end
+      use_yield = false
+    end
+    # 2. phase: prepare substitution loop
     modified = false
-    str = Maglev::Type.coerce_to(str, String, :to_str)
+                                                             #str = Maglev::Type.coerce_to(str, String, :to_str)
     out = self.class.__alloc
+    out.force_encoding(self.encoding) # TODO: if force encoding is implemented this should be tested
     start = 0
     pat = self.__get_pattern(regex, true)
     last_match = nil
+    # 3. phase: substitute
     pat.__each_match(self) do |match|
       modified = true
       last_match = match
+      # append string between matches
       out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-      out.__append_internal(str.__to_sub_replacement(match))
+      if use_yield || hash
+        if use_yield
+          # replace with yield
+          val = yield match.to_s
+        else
+          # replace with hash
+          val = hash[match.to_s]
+        end
+        val = val.to_s unless val.kind_of?(String)
+      else
+        # replace with string 
+        val = replacement.__to_sub_replacement(match)
+      end
+      val.force_encoding(self.encoding) # TODO: if force encoding is implemented this should be tested
+      out.__append_internal(val)
       start = match.end(0)
     end
+    # append from last match to end of string
     out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
     last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
-    [out, modified]
+    return [out, modified]
   end
 
   # From Rubinius
