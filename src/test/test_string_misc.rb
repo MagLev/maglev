@@ -389,5 +389,13 @@ test(BadString.new("123").gsub!(/\d/, " "), "   ", "BadString gsub!")
 test(b.partition("ll"), ["He", "ll", "o There"], "BadString partition")
 test(b.split, ["Hello", "There"], "BadString split")
 
+# gsub tests for rails:
+#   gsub with block and hash
+test("Herzlich Willkommen".gsub(/[aeiou]/, {"a" => 1, "e" => 2, "i" => 3, "o" => "x", "u" => "z"}),
+     "H2rzl3ch W3llkxmm2n", "gsub with hash")
+
+test("Herzlich Willkommen".gsub(/[aeiou]/){ |s| s.upcase},
+     "HErzlIch WIllkOmmEn", "gsub with block")
+
 report
 
