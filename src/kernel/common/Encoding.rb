@@ -78,3 +78,4 @@ end
 
 Encoding::UTF_8 = Encoding.new
 Encoding::ASCII_8BIT = Encoding.new
+Encoding::BINARY = Encoding::ASCII_8BIT
