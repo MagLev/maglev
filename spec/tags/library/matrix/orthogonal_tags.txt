@@ -1,0 +1,3 @@
+fails:Matrix.orthogonal? returns false for non orthogonal matrices
+fails:Matrix.orthogonal? returns true for orthogonal matrices
+fails:Matrix.orthogonal? raises an error for rectangular matrices

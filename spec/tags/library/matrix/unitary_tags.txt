@@ -1,0 +1,3 @@
+fails:Matrix.unitary? returns false for non unitary matrices
+fails:Matrix.unitary? returns true for unitary matrices
+fails:Matrix.unitary? raises an error for rectangular matrices

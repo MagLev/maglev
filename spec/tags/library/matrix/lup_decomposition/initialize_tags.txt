@@ -1,0 +1,1 @@
+fails:Matrix::LUPDecomposition#initialize raises an error if argument is not a matrix

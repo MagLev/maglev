@@ -10,3 +10,7 @@ fails:Kernel#eval stores all locals of nested eval bindings in the first non-eva
 fails:Kernel#eval allows a Proc invocation to terminate the eval binding chain on local creation
 fails:Kernel#eval can access normal locals in nested closures
 fails:Kernel#eval finds locals in a nested eval
+fails:returns from the scope calling #eval when evaluating 'return'
+fails:Kernel#eval is a private method
+fails:Kernel#eval does not share locals across eval scopes
+fails:Kernel#eval unwinds through a Proc-style closure and returns from a lambda-style closure in the closure chain

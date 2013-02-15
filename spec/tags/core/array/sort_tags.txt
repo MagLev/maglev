@@ -1,3 +1,4 @@
 fails:Array#sort raises an error if objects can't be compared
 fails:Array#sort! temporarily freezes self and recovers after sorted
 fails:Array#sort raises an error when a given block returns nil
+fails:Array#sort! raises a RuntimeError on a frozen array

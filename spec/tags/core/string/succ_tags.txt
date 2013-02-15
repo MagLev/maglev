@@ -1,1 +1,2 @@
 fails:String#succ! raises a TypeError if self is frozen
+fails:String#succ! raises a RuntimeError if self is frozen

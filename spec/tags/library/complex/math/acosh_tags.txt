@@ -1,0 +1,1 @@
+fails:Math#acosh is a private instance method

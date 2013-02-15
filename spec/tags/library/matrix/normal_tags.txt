@@ -1,0 +1,2 @@
+fails:Matrix.normal? returns true for normal matrices
+fails:Matrix.normal? raises an error for rectangular matrices
