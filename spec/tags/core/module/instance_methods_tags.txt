@@ -1,0 +1,3 @@
+fails:Module#instance_methods returns the public and protected methods of self if include_super is false
+fails:Module#instance_methods returns the public and protected methods of self and it's ancestors
+fails:Module#instance_methods makes a private Object instance method public in Kernel

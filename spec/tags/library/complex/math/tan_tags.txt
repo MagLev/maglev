@@ -1,0 +1,1 @@
+fails:Math#tan is a private instance method

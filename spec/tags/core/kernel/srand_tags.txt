@@ -1,1 +1,2 @@
 fails:Kernel.srand accepts a Bignum as a seed
+fails:Kernel.srand is a private method

@@ -1,0 +1,3 @@
+fails:Matrix.upper_triangular? returns true for an upper triangular Matrix
+fails:Matrix.upper_triangular? returns false for a non upper triangular square Matrix
+fails:Matrix.upper_triangular? returns true for an empty matrix
