@@ -1,0 +1,3 @@
+fails:Matrix#imag returns a matrix with the imaginary part of the elements of the receiver
+fails:Matrix#imag returns empty matrices on the same size if empty
+fails:Matrix#imag for a subclass of Matrix returns an instance of that subclass

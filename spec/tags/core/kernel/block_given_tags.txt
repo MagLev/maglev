@@ -1,1 +1,3 @@
 fails:Kernel.block_given? returns true if and only if a block is supplied
+fails:Kernel#block_given? is a private method
+fails:self.send(:block_given?) returns true if and only if a block is supplied

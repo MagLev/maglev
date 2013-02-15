@@ -1,1 +1,5 @@
 fails:Array#compact! raises a TypeError on a frozen array
+fails:Array#compact does not keep tainted status even if all elements are removed
+fails:Array#compact does not keep untrusted status even if all elements are removed
+fails:Array#compact! keeps untrusted status even if all elements are removed
+fails:Array#compact! raises a RuntimeError on a frozen array

@@ -1,0 +1,4 @@
+fails:Matrix#permutation? returns true for a permutation Matrix
+fails:Matrix#permutation? returns false for a non permutation square Matrix
+fails:Matrix#permutation? returns true for an empty 0x0 matrix
+fails:Matrix#permutation? raises an error for rectangular matrices

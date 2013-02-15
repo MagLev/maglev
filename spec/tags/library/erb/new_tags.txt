@@ -1,1 +1,5 @@
 fails:ERB.new accepts a safe level as second argument
+fails:ERB.new regards lines starting with '%' as '<% ... %>' when trim_mode is '%'
+fails:ERB.new regards lines starting with '%' as '<% ... %>' and remove "\n" when trim_mode is '%>'
+fails:ERB.new regard lines starting with '%' as '<% ... %>' and remove "\n" when trim_mode is '%<>'
+fails:ERB.new regard lines starting with '%' as '<% ... %>' and spaces around '<%- -%>' when trim_mode is '%-'

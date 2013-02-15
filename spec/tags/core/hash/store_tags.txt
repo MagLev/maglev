@@ -1,0 +1,2 @@
+fails:Hash#store doesn't duplicate and freeze already frozen string keys
+fails:Hash#store raises a RuntimeError if called on a frozen instance

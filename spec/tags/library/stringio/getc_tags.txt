@@ -1,0 +1,2 @@
+fails:StringIO#getc returns nil when called at the end of self
+fails:StringIO#getc does not increase self's position when called at the end of file

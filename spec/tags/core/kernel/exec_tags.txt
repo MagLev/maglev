@@ -1,1 +1,5 @@
 fails:Kernel#exec is a private method
+fails:raises a SystemCallError if cmd cannot execute
+
+fails:Kernel#exec runs the specified command, replacing current process
+fails:Kernel#exec passes environment vars to the child environment

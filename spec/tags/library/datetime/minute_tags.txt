@@ -1,0 +1,5 @@
+fails:DateTime.minute returns 0 if no argument is passed
+fails:DateTime.minute returns the minute passed as argument
+fails:DateTime.minute adds 60 to negative minutes
+fails:DateTime.minute raises an error for Rational
+fails:DateTime.minute raises an error for Float

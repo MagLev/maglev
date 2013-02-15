@@ -1,1 +1,2 @@
 fails:Hash#default calls default proc with nil arg if passed a default proc but no arg
+fails:Hash#default= raises a RuntimeError if called on a frozen instance

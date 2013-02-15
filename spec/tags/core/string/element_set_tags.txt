@@ -1,2 +1,4 @@
 fails:String#[]= with String taints self if other_str is tainted
 fails:String#[]= with index, count taints self if other_str is tainted
+fails:String#[]= with String allows assignment to the zero'th element of an empty String
+fails:String#[]= with String raises a RuntimeError when self is frozen
