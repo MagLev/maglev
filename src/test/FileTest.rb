@@ -123,4 +123,9 @@ File.delete(fname) if File.exist?(fname)
 
 test(!!File::SYNC, true, "File::SYNC should not be nil")
 
+#Test identical? for two files. This should not throw weird errors if one file does not exist
+test(File.identical?(__FILE__, __FILE__), true, "a file should be equal to itself")
+test(File.identical?(__FILE__, File.expand_path('FileStatTest.rb', File.dirname(__FILE__))), false, "files should not be identical")
+test(File.identical?(__FILE__, File.expand_path('iAmANonExistentFile', File.dirname(__FILE__))), false, "files that do not exist are not equal to existing files")
+
 report

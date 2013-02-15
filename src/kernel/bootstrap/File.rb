@@ -358,6 +358,7 @@ class File
   def self.identical?(file_1, file_2)
     stat_1 = self.__stat(Maglev::Type.coerce_to(file_1, String, :to_str), false)
     stat_2 = self.__stat(Maglev::Type.coerce_to(file_2, String, :to_str), false)
+    return false if stat_1._isFixnum || stat_2._isFixnum
     return false unless stat_1.ino == stat_2.ino
     return false unless stat_1.ftype == stat_2.ftype
 #     return false unless POSIX.access(orig, R_OK)
