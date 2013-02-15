@@ -1,0 +1,10 @@
+fails:Matrix#each_with_index returns an Enumerator when called without a block
+fails:Matrix#each_with_index returns self
+fails:Matrix#each_with_index yields the elements starting with the those of the first row
+fails:Matrix#each_with_index with an argument raises an ArgumentError for unrecognized argument
+fails:Matrix#each_with_index with an argument yields the rights elements when passed :diagonal
+fails:Matrix#each_with_index with an argument yields the rights elements when passed :off_diagonal
+fails:Matrix#each_with_index with an argument yields the rights elements when passed :lower
+fails:Matrix#each_with_index with an argument yields the rights elements when passed :strict_lower
+fails:Matrix#each_with_index with an argument yields the rights elements when passed :strict_upper
+fails:Matrix#each_with_index with an argument yields the rights elements when passed :upper

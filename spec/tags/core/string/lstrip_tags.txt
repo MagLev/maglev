@@ -1,1 +1,3 @@
 fails:String#lstrip taints the result when self is tainted
+fails:String#lstrip! raises a RuntimeError on a frozen instance that is modified
+fails:String#lstrip! raises a RuntimeError on a frozen instance that would not be modified

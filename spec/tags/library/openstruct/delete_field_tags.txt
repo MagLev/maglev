@@ -1,0 +1,1 @@
+fails:OpenStruct#delete_field does remove the accessor methods

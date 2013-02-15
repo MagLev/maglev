@@ -1,0 +1,2 @@
+fails:Dir.open calls #to_path on non-String arguments
+fails:Dir.open accepts an options Hash

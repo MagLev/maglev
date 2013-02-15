@@ -1,0 +1,2 @@
+fails:Array.try_convert does not rescue exceptions
+fails:Array.try_convert checks the result of the conversion

@@ -1,1 +1,2 @@
 fails:Kernel#extend calls extend_object on argument
+fails:Kernel#extend raises a RuntimeError if self is frozen

@@ -3,3 +3,4 @@ fails:Kernel.exit raises a SystemExit with the specified boolean status
 fails:Kernel.exit tries to convert the passed argument to an Integer using #to_int
 fails:Kernel.exit converts the passed Float argument to an Integer
 fails:Kernel.exit raises TypeError if can't convert the argument to an Integer
+fails:Kernel#exit is a private method

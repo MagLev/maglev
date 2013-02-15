@@ -1,1 +1,2 @@
 fails:StringIO#each_byte returns an Enumerator when passed no block
+fails:StringIO#each_byte yields each character code in turn

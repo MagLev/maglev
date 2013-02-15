@@ -1,3 +1,4 @@
 fails:Matrix#/ raises a TypeError if other is of wrong type
 fails:Matrix#/ returns the result of dividing self by another Matrix
 fails:Matrix#/ for a subclass of Matrix returns an instance of that subclass
+fails:Matrix#/ returns the result of dividing self by a Float

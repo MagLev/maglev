@@ -1,0 +1,2 @@
+fails:Kernel.rand is a private method
+fails:Kernel.rand calls to_int on its argument

@@ -297,7 +297,7 @@ module SM
 
       # skip leading invisible text
       i = 0
-      i += 1 while i < str_len and @str[i].zero?
+      i += 1 while i < str_len and @str[i].ord.zero?
       start_pos = i
 
       # then scan the string, chunking it on attribute changes
@@ -323,7 +323,7 @@ module SM
         # move on, skipping any invisible characters
         begin
           i += 1
-        end while i < str_len and @str[i].zero?
+        end while i < str_len and @str[i].ord.zero?
       end
       
       # tidy up trailing text

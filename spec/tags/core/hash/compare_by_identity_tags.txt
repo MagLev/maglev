@@ -1,0 +1,3 @@
+fails:Hash#compare_by_identity uses the semantics of BasicObject#equal? to determine key identity
+fails:Hash#compare_by_identity uses #equal? semantics, but doesn't actually call #equal? to determine identity
+fails:Hash#compare_by_identity raises a RuntimeError on frozen hashes

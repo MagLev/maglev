@@ -1,0 +1,2 @@
+fails:Enumerator::Generator#each Supports enumeration with a block
+fails:Enumerator::Generator#each Raises a LocalJumpError if no block given
