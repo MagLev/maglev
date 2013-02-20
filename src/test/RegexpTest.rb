@@ -101,6 +101,8 @@ test(/\u00E4/ui =~ "ä", 0, "UTF8 escape (3)")
 test(/\u{E4}/ =~ "ä", 0, "UTF8 escape (4)")
 test(/[\u{80}-\u{D7FF}]/ =~ "ä", 0, "UTF8 escape (5)")
 test(/\u00E4/ =~ "b", nil, "UTF8 escape (6)")
+test(/[\x00-\xff]/n =~ "a", 0, "ASCII escape (1)")
+test(/[\x00-\xff]/ni =~ "a", 0, "ASCII escape (2)")
 
 report
 
