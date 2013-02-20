@@ -1,1 +1,2 @@
 fails:Array#to_s uses default internal encoding regardless of strings' encodings or content
+fails:Array#to_s is equivalent to Array#inspect in a recursive array

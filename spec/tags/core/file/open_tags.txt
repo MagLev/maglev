@@ -17,3 +17,4 @@ fails:File.open raises an IOError when read in a block opened with File::RDONLY|
 fails:File.open raises an IOError if the file exists when open with File::RDONLY|File::APPEND
 fails:File.open raises a TypeError if passed a filename that is not a String or Integer type
 fails:File.open defaults external_encoding to ASCII-8BIT for binary modes
+fails:File.open opens a file with mode num and block
