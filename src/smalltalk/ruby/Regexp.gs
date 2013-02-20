@@ -116,6 +116,11 @@ category: 'Private'
 
 method:
 _compile: aString options: anInteger
+  ^ self __compile:  (self prepareStringPattern: aString) options: anInteger 
+%
+
+method:
+__compile: aString options: anInteger
   "Initialize the receiver, for specified pattern string
    and options.  Returns receiver if successful or an error String
    if onig_new() returned non-zero status. 
@@ -135,7 +140,42 @@ _compile: aString options: anInteger
 %
 
 method:
+unescapeUnicode: aString
+  |charSeq result|
+  result := aString copyWithRegex: '\\u{[^}]*}' matchesTranslatedUsing: [:useq | |charSeq|
+    charSeq := useq copyFrom: 4 to: useq size - 1.
+    ((charSeq subStrings: ' ') collect: [:char | self unicodeCharAsString: char]) reduce: [:x :y | x, y]].
+  ^ result copyWithRegex: '\\u[0-9|A-F][0-9|A-F][0-9|A-F][0-9|A-F]' matchesTranslatedUsing: [:useq | |charSeq|
+    charSeq := useq copyFrom: 3 to: 6.
+    self unicodeCharAsString: charSeq]
+%
+
+method:
+unicodeCharAsString: aCharCodeString
+  |unicode|
+  unicode := Unicode7 new.
+  unicode codePointAt: 1 put: (Integer fromHexString: aCharCodeString).
+  "^ (Utf8 fromString: unicode) asString"
+  ^ unicode
+%
+
+method:
 _search: aString from: aStart to: aLimit 
+  ^ self __search: aString from: aStart to: aLimit
+%
+
+method:
+prepareStringPattern: aString
+  ^ (self unescapeUnicode: aString asUnicodeString) encodeAsUTF8 asString
+%
+
+method:
+prepareSearchString: aString
+  ^ aString asUnicodeString encodeAsUTF8 asString
+%
+
+method:
+__search: aString from: aStart to: aLimit 
   "Returns an instance of MatchData or nil. calls onig_search .
    aStart must be a SmallInteger >= 0. 
    if aLimit == nil , limit is aString size
