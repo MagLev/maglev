@@ -23,8 +23,6 @@ fails:String#% behaves as if calling Kernel#Integer for %o argument, if it does 
 fails:String#% behaves as if calling Kernel#Integer for %u argument, if it does not respond to #to_ary
 fails:String#% behaves as if calling Kernel#Integer for %x argument, if it does not respond to #to_ary
 fails:String#% behaves as if calling Kernel#Integer for %X argument, if it does not respond to #to_ary
-fails:String#% supports negative integers using %d, giving priority to `-`
-fails:String#% supports negative integers using %i, giving priority to `-`
 fails:String#% pads with spaces for %E with Inf, -Inf, and NaN
 fails:String#% supports negative bignums with %u or %d
 fails:String#% formats zero without prefix using %#x
