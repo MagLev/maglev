@@ -116,7 +116,7 @@ category: 'Private'
 
 method:
 _compile: aString options: anInteger
-  ^ self __compile:  (self prepareStringPattern: aString) options: ((anInteger bitAnd: 16r0000FFFFFFFF) bitOr: 16r000400000000) 
+  ^ self __compile:  (self prepareStringPattern: aString) options: anInteger 
 %
 
 method:
@@ -161,7 +161,7 @@ unicodeCharAsString: aCharCodeString
 
 method:
 _search: aString from: aStart to: aLimit 
-  ^ self __search: (self prepareSearchString: aString) from: aStart to: aLimit
+  ^ self __search: aString from: aStart to: aLimit
 %
 
 method:
