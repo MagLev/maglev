@@ -108,7 +108,6 @@ class String
 
   # Class Methods
 
-
   # Instance Methods
   def %(arg)
     unless arg._isArray
