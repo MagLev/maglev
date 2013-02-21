@@ -10,7 +10,6 @@ class MSpecScript
   lang_files = ['spec/rubyspec/language',
                 "^spec/rubyspec/language/array_spec.rb",
                 "^spec/rubyspec/language/case_spec.rb",
-                "^spec/rubyspec/language/constants_spec.rb",
                 "^spec/rubyspec/language/literal_lambda_spec.rb",
                 "^spec/rubyspec/language/for_spec.rb",
                 "^spec/rubyspec/language/block_spec.rb",
