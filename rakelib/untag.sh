@@ -38,6 +38,10 @@ function control_c() {
 }
 trap control_c SIGINT
 
+function untag_spec() {
+    $TIMEOUT 15 spec/mspec/bin/mspec tag -t m --del fails -g fails -e "$1" "$2"
+}
+
 ### Actually run
 echo "Untagging tagged specs"
 sleep 1
@@ -46,7 +50,14 @@ for i in `find spec/tags/ -name "*_tags.txt"`; do
     SPECNAME="${FILE%_tags.txt}"_spec.rb
     SPECPATH="`echo "$SPECNAME" | sed 's#spec/tags/rubyspec/tags/#spec/rubyspec/#'`"
     SPECPATH="`echo "$SPECNAME" | sed 's#spec/tags/#spec/rubyspec/#'`"
-    $TIMEOUT 60 maglev-ruby spec/mspec/bin/mspec tag -t m --del fails s "$SPECPATH"
+
+    while read LINE
+    do
+	SPEC="${LINE##fails:*#}"
+	echo "$SPEC"
+	sleep 0.5
+	untag_spec "$SPEC" "$SPECPATH" &
+    done < "$FILE"
 done
 
 export FAILING_FILES="$(pwd)/failing_files.txt"
