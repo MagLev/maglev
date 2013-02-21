@@ -74,7 +74,6 @@ class MSpecScript
                "^spec/rubyspec/library/scanf",
                "^spec/rubyspec/library/socket",                         # Orpheus, Grace
                "^spec/rubyspec/library/syslog",
-               "^spec/rubyspec/library/weakref",
                "^spec/rubyspec/library/zlib/inflate/append_spec.rb",
                "^spec/rubyspec/library/zlib/inflate/inflate_spec.rb"]
 
