@@ -1,3 +1,4 @@
 fails:Matrix::LUPDecomposition#to_a returns an array of three matrices
 fails:Matrix::LUPDecomposition#to_a returns [l, u, p] such that l*u == a*p
 fails:Matrix::LUPDecomposition#to_a has other properties implied by the specs of #l, #u and #p
+fails:Matrix::LUPDecomposition#to_a returns the right values for rectangular matrices

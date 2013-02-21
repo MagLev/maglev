@@ -18,3 +18,6 @@ fails:File.open raises an IOError if the file exists when open with File::RDONLY
 fails:File.open raises a TypeError if passed a filename that is not a String or Integer type
 fails:File.open defaults external_encoding to ASCII-8BIT for binary modes
 fails:File.open opens a file with mode num and block
+fails:File.open opens a file with mode and permission as nil
+fails:File.open uses the second argument as an options Hash
+fails:File.open calls #to_hash to convert the second argument to a Hash

@@ -1,0 +1,5 @@
+fails:Custom type definitions attach_function with custom typedef
+fails:Custom type definitions variadic invoker with custom typedef
+fails:Custom type definitions Callback with custom typedef parameter
+fails:Custom type definitions attach_function after a typedef should not reject normal types
+fails:Custom type definitions detects the correct type for size_t

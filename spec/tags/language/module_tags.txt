@@ -1,3 +1,6 @@
 fails:module reopens a module included into Object
 fails:An anonymous module forces named nested modules to be anonymous
 fails:An anonymous module returns nil for its name
+fails:The module keyword creates a new module with a variable qualified constant name
+fails:The module keyword reopens a module included in Object
+fails:The module keyword raises a TypeError if the constant is nil

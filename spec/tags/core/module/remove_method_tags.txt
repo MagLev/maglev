@@ -1,0 +1,1 @@
+fails:Module#remove_method raises RuntimeError when frozen

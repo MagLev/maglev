@@ -1,0 +1,2 @@
+fails:Vector#inner_product raises an error for mismatched vectors
+fails:Vector#inner_product uses the conjugate of its argument

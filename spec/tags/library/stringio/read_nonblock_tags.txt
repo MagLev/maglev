@@ -1,0 +1,21 @@
+fails:StringIO#read_nonblock when passed length, buffer returns the passed buffer String
+fails:StringIO#read_nonblock when passed length, buffer returns the remaining data when limit is nil
+fails:StringIO#read_nonblock when passed length, buffer truncates buffer when limit is nil and no data reamins
+fails:StringIO#read_nonblock when passed length, buffer reads length bytes and writes them to the buffer String
+fails:StringIO#read_nonblock when passed length, buffer calls #to_str to convert the object to a String
+fails:StringIO#read_nonblock when passed length, buffer raises a TypeError if the object does not respond to #to_str
+fails:StringIO#read_nonblock when passed length, buffer raises a RuntimeError when passed a frozen String as buffer
+fails:StringIO#read_nonblock when passed length reads length bytes from the current position and returns them
+fails:StringIO#read_nonblock when passed length reads at most the whole content
+fails:StringIO#read_nonblock when passed length updates the position
+fails:StringIO#read_nonblock when passed length calls #to_int to convert the length
+fails:StringIO#read_nonblock when passed length raises a TypeError when the length does not respond to #to_int
+fails:StringIO#read_nonblock when passed length raises a TypeError when length is negative
+fails:StringIO#read_nonblock when passed no arguments reads the whole content starting from the current position
+fails:StringIO#read_nonblock when passed no arguments updates the current position
+fails:StringIO#read_nonblock when passed no arguments returns an empty String when no data remains
+fails:StringIO#read_nonblock when self is not readable raises an IOError
+fails:StringIO#read_nonblock when passed nil returns the remaining content from the current position
+fails:StringIO#read_nonblock when passed nil updates the current position
+fails:StringIO#read_nonblock when passed nil returns an empty String when no data remains
+fails:StringIO#read_nonblock when passed length returns an empty String when passed 0 and no data remains

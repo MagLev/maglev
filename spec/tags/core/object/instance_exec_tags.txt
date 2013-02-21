@@ -3,3 +3,4 @@ fails:Object#instance_exec raises a TypeError when defining methods on an immedi
 fails:Object#instance_exec raises a TypeError when defining methods on numerics
 fails:Object#instance_exec invokes Method objects wihtout rebinding self
 fails:Object#instance_exec sets class variables in the receiver
+fails:Object#instance_exec invokes Method objects without rebinding self

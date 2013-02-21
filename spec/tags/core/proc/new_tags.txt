@@ -1,2 +1,5 @@
 fails:Proc.new without a block returns a new Proc instance from the block passed to the containing method
 fails:Proc.new with an associated block returns a new Proc instance from the block passed to the containing method
+fails:Proc.new with a block argument returns the passed proc created from a method
+fails:Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a method
+fails:Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a symbol

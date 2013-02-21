@@ -1,1 +1,2 @@
 fails:Enumerable#cycle passed a number n as an argument yields only when necessary
+fails:Enumerable#cycle passed no argument or nil yields only when necessary
