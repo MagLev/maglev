@@ -1,6 +1,6 @@
 *maglev-runtime
 _setPersistable
-  "a ruby primitive"  
+  "a ruby primitive"
   | envId tns  parTns parPns savePm cst  wasPersistable |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
@@ -12,7 +12,13 @@ _setPersistable
        pns := RubyNameSpace new initializeForModule: self env: envId .
        pns parent: parPns .
        tns persistentCopy: pns .
-       self persistentNameSpace: envId put: pns . 
+       self persistentNameSpace: envId put: pns .
+       tmd := self transientMethodDictForStoreEnv: 1.
+       pmd := self persistentMethodDictForStoreEnv: 1.
+       tmd keysAndValuesDo: [:key :value |
+        pmd at: key put: value.
+       ].
+       tmd removeAllKeys: tmd keys.
     ].
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
