@@ -38,7 +38,6 @@ class MSpecScript
                 "^spec/rubyspec/core/marshal/restore_spec.rb",          # OpenSSL::X509
                 "^spec/rubyspec/core/method/parameters_spec.rb",
                 "^spec/rubyspec/core/module/name_spec.rb",
-                "^spec/rubyspec/core/module/constants_spec.rb",
                 "^spec/rubyspec/core/module/define_method_spec.rb",
                 "^spec/rubyspec/core/numeric/to_c_spec.rb",
                 "^spec/rubyspec/core/proc/arity_spec.rb",
@@ -46,8 +45,6 @@ class MSpecScript
                 "^spec/rubyspec/core/process/wait2_spec.rb",
                 "^spec/rubyspec/core/process/wait_spec.rb",
                 "^spec/rubyspec/core/process/waitall_spec.rb",
-                "^spec/rubyspec/core/regexp/source_spec.rb",
-                "^spec/rubyspec/core/string/match_spec.rb",
                 "^spec/rubyspec/core/string/modulo_spec.rb",
                 "^spec/rubyspec/core/string/unpack/a_spec.rb",
                 "^spec/rubyspec/core/symbol/encoding_spec.rb",
