@@ -21,3 +21,4 @@ fails:File.open opens a file with mode num and block
 fails:File.open opens a file with mode and permission as nil
 fails:File.open uses the second argument as an options Hash
 fails:File.open calls #to_hash to convert the second argument to a Hash
+fails:File.open on a FIFO opens it as a normal file

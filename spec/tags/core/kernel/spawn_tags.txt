@@ -119,3 +119,7 @@ fails:Kernel.spawn with a command array calls #to_str to convert the first eleme
 fails:Kernel.spawn with a command array calls #to_str to convert the second element to a String
 fails:Kernel.spawn with a command array raises an ArgumentError if the Array does not have exactly two elements
 fails:Kernel.spawn with a command array raises an ArgumentError if the Strings in the Array include a null byte
+fails:Kernel#spawn unsets environment variables whose value is nil
+fails:Kernel#spawn with a single argument subjects the specified command to shell expansion
+fails:Kernel.spawn unsets environment variables whose value is nil
+fails:Kernel.spawn with a single argument subjects the specified command to shell expansion
