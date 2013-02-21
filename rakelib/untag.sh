@@ -49,18 +49,27 @@ for i in `find spec/tags/ -name "*_tags.txt"`; do
     $TIMEOUT 60 maglev-ruby spec/mspec/bin/mspec tag -t m --del fails s "$SPECPATH"
 done
 
-FAILING_FILES=""
-echo "Tagging failing specs"
-sleep 1
-for i in `find spec/rubyspec/core spec/rubyspec/command_line spec/rubyspec/language -name "*_spec.rb"`; do
-    FILE="$i"
-    $TIMEOUT 60 maglev-ruby spec/mspec/bin/mspec tag -t m --add fails s "$SPECPATH" | tee output.txt
-    grep "1 file, 0 examples, 0 expectations, 0 failures, 1 error" output.txt
+export FAILING_FILES="$(pwd)/failing_files.txt"
+
+function tag_file() {
+    FILE="$1"
+    echo $FILE
+    outfile="$$"
+    $TIMEOUT 15 spec/mspec/bin/mspec tag -t m --add fails -G fails "$FILE" | tee "$outfile".txt
+    grep "1 file, 0 examples, 0 expectations, 0 failures, 1 error" "$outfile".txt
     if [ $? -eq 0 ]; then
         # Specfile had an error during load
-        FAILING_FILES="${FAILING_FILES} ${FILE}"
+        echo "$FILE " > "$FAILING_FILES"
     fi
-    rm -f output.txt
+    rm -f "$outfile".txt
+}
+
+echo "Tagging failing specs, also see $FAILING_FILES afterwards"
+sleep 1
+# for i in `find spec/rubyspec/core spec/rubyspec/command_line spec/rubyspec/language spec/rubyspec/library -name "*_spec.rb"`; do
+for i in `find spec/rubyspec/ -name "*_spec.rb"`; do
+    sleep 0.5
+    tag_file "$i" &
 done
 
 if [ -n "$FAILING_FILES" ]; then
