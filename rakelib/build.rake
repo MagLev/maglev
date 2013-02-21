@@ -107,11 +107,6 @@ unless defined? MAGLEV_VERSION
       rm_f RUBY_EXTENT_SAVE
     end
 
-    desc "filein changes only"
-    task :filein_changes do
-      puts `rakelib/filein.py`
-    end
-
     task :logger do
       rm_f BUILD_LOG
       $logger        = Logger.new(BUILD_LOG)
