@@ -79,6 +79,9 @@ class MSpecScript
 
   set :files, lang_files + core_files + lib_files
 
+  MSpec.enable_feature :fiber_library
+  MSpec.enable_feature :continuation_library
+
   # The set of substitutions to transform a spec filename into a tag
   # filename.  The transformations are applied, in the given sequence, to a
   # filename, yielding a tag file name.

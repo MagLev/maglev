@@ -1210,6 +1210,7 @@ module Kernel
   # the callcc is the value of the block, or the value passed to
   # cont.call. See class Continuation for more details.
   def callcc
+    raise LocalJumpError, "no block given" unless block_given?
     Proc.new.__call_cc
   end
 end
