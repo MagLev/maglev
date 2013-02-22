@@ -95,6 +95,7 @@ ossl_rand_write_file(VALUE self, VALUE filename)
 static VALUE
 ossl_rand_bytes(VALUE self, VALUE len)
 {
+    VALUE str;
     unsigned char* buf;
     int n = NUM2INT(len);
 
@@ -103,7 +104,9 @@ ossl_rand_bytes(VALUE self, VALUE len)
 	ossl_raise(eRandomError, NULL);
     }
 
-    return rb_str_new(buf, n);
+    str = rb_str_new(buf, n);
+    xfree(buf);
+    return str;
 }
 
 /*
@@ -114,6 +117,7 @@ ossl_rand_bytes(VALUE self, VALUE len)
 static VALUE
 ossl_rand_pseudo_bytes(VALUE self, VALUE len)
 {
+    VALUE str;
     unsigned char* buf;
     int n = NUM2INT(len);
 
@@ -122,7 +126,9 @@ ossl_rand_pseudo_bytes(VALUE self, VALUE len)
 	ossl_raise(eRandomError, NULL);
     }
 
-    return rb_str_new(buf, n);
+    str = rb_str_new(buf, n);
+    xfree(buf);
+    return str;
 }
 
 /*
