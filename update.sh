@@ -66,7 +66,7 @@ echo "[Info] Installing $gss_name on $machine_name"
 
 # Look for either wget or curl to download GemStone
 if [ -e "`which wget 2>/dev/null`" ]; then
-    cmd="`which wget` --quiet"
+    cmd="`which wget`"
 elif [ -e "`which curl 2>/dev/null`" ]; then
     cmd="`which curl` -s -O"
 else
