@@ -1,1 +1,2 @@
 fails:Math.acos raises an ArgumentError if the string argument cannot be coerced with Float()
+fails:Math.acos returns NaN given NaN

@@ -1,2 +1,3 @@
 fails:Hash#[] calls subclass implementations of default
 fails:Hash#[] compares keys with the same #hash value via #eql?
+fails:Hash#[] finds a value via an identical key even when its #eql? isn't reflexive

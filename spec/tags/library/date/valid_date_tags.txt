@@ -1,3 +1,6 @@
 fails:Date.valid_date? returns true if it is a valid civil date
 fails:Date.valid_date? returns false if it is not a valid civil date
 fails:Date.valid_date? handles negative months and days
+fails:Date#valid_date? returns true if it is a valid civil date
+fails:Date#valid_date? returns false if it is not a valid civil date
+fails:Date#valid_date? handles negative months and days

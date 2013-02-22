@@ -1,2 +1,4 @@
 fails:Kernel#remove_instance_variable is a private method
 fails:Kernel#remove_instance_variable removes an ivar of a given name and return it's value
+fails:Kernel#remove_instance_variable when passed a Symbol returns the instance variable's value
+fails:Kernel#remove_instance_variable when passed a Symbol removes the instance variable

@@ -1,0 +1,3 @@
+fails:Reading/Writing binary strings Buffer#write_bytes
+fails:Reading/Writing binary strings Buffer#write_bytes with index and length
+fails:Reading/Writing binary strings Buffer#write_bytes with only index

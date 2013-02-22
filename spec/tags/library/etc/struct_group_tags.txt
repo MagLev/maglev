@@ -1,0 +1,1 @@
+fails:Struct::Group returns an array of users belonging to the group

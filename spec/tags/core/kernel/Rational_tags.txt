@@ -8,3 +8,6 @@ fails:Kernel.Rational when passed a String does not use the same method as Float
 fails:Kernel.Rational when passed a Numeric calls #to_r to convert the first argument to a Rational
 fails:Kernel.Rational when passed a Complex returns a Rational from the real part if the imaginary part is 0
 fails:Kernel.Rational when passed a Complex raises a RangeError if the imaginary part is not 0
+fails:Kernel.Rational passed Integer returns a new Rational number with 1 as the denominator
+fails:Kernel.Rational passed two integers returns a new Rational number
+fails:Kernel.Rational passed two integers reduces the Rational

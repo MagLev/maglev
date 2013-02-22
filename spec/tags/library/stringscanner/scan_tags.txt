@@ -1,0 +1,1 @@
+fails:StringScanner#scan returns the matched string for a multi byte string

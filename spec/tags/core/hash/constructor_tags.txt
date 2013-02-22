@@ -1,2 +1,7 @@
-fails:Hash.[] creates a Hash; values can be provided as a list of value-pairs in an array
 fails:Hash.[] calls to_hash
+fails:Hash.[] coerces a single argument which responds to #to_ary
+fails:Hash.[] ignores elements that are not arrays
+fails:Hash.[] ignores elements that are arrays of more than 2 elements
+fails:Hash.[] creates a Hash; values can be provided as a list of value-invalid-pairs in an array
+fails:Hash.[] does not call #initialize on the subclass instance
+fails:Hash.[] passed a single argument which responds to #to_hash coerces it and returns a copy

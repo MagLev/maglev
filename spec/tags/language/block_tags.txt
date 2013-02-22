@@ -18,3 +18,5 @@ fails:A block taking |(a, b), c| arguments does not call #to_ary if the single y
 fails:A block taking |(a, b), c| arguments raises an TypeError if #to_ary does not return an Array
 fails:A block taking |a, b| arguments destructures a splatted Array
 fails:A block taking |a, *b| arguments destructures a splatted Array
+fails:A block arguments with _ extracts arguments with _
+fails:A block arguments with _ assigns the first variable named
