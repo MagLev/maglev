@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class IO
 
   # FNM*, LOCK*, APPEND ... , SEEK*  , initialized in IO2.rb
@@ -88,7 +89,7 @@ class IO
     if sep._equal?(nil)
       block.call( self.__contents )
     else
-      sep = Type.coerce_to(sep, String, :to_str)
+      sep = Maglev::Type.coerce_to(sep, String, :to_str)
       if sep.__size._equal?(0)
         while not eof?
           para = self.__next_paragraph
@@ -114,7 +115,7 @@ class IO
     #   F_GETFD, F_GETFL, F_SETFL, FD_CLOEXEC
     # Socket contains implementation specific to File::NONBLOCK
 
-    op = Type.coerce_to(op, Fixnum, :to_int)
+    op = Maglev::Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
     status = __fcntl(op, arg )
     if status._equal?(0)
@@ -185,7 +186,7 @@ class IO
       res = __contents
       self.__increment_lineno
     else
-      sep = Type.coerce_to(a_sep, String, :to_str)
+      sep = Maglev::Type.coerce_to(a_sep, String, :to_str)
       sep_len = sep.length
       if sep_len._equal?(0)
         res = self.eof?  ?  nil : self.__next_paragraph
@@ -303,7 +304,7 @@ class IO
     if closed?
       raise IOError, 'IO#lineno= on a closed IO'
     end
-    num = Type.coerce_to(integer, Fixnum, :to_int)
+    num = Maglev::Type.coerce_to(integer, Fixnum, :to_int)
     @_st_lineNumber = num
     num
   end
@@ -329,8 +330,8 @@ class IO
   end
 
   def self.popen(cmd, mode="r", &block)
-    cmd = Type.coerce_to(cmd, String, :to_s)
-    mode = Type.coerce_to(mode, String, :to_s)
+    cmd = Maglev::Type.coerce_to(cmd, String, :to_s)
+    mode = Maglev::Type.coerce_to(mode, String, :to_s)
     if cmd[0]._equal?( ?-)
       raise ArgumentError , '"-" prefix not supported by IO.popen' 
     end
@@ -410,7 +411,7 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int)
+      c = Maglev::Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
@@ -428,7 +429,7 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int)
+      c = Maglev::Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
@@ -493,7 +494,7 @@ class IO
       end
       unless line._equal?(nil)
         write(line)
-        write(eol) unless line[-1]._equal?(10)
+        write(eol) unless line[-1].eql?(?\n)
       end
       n = n + 1
     end
@@ -511,17 +512,43 @@ class IO
   #  IO.read("testfile", 20, 10)   #=> "ne one\nThis is line "
   #
   # Returns the empty string for empty files, unless length is passed, then returns nil
-  def self.read(name, length=MaglevUndefined, an_offset=0)
-    offset = if an_offset._equal?(nil)
-               0
-             else
-               Type.coerce_to(an_offset, Fixnum, :to_int)
-             end
+
+  # since 1.9.3:
+  # read(name, [length [, offset]] ) → string click to toggle source
+  # read(name, [length [, offset]], open_args) → string
+
+  def self.read(*args)
+    raise Errno::EINVAL, "to few arguments" if args.length < 1
+    name = args.shift
+
+    case args.length
+    when 1
+      ex = args.shift      
+      if ex.class._equal?(Fixnum)
+        length = Maglev::Type.coerce_to(ex, Fixnum, :to_int)
+      else
+        open_args = ex
+      end
+    when 2
+      length = args.shift
+      ex2 = args.shift
+      if ex2.class._equal?(Fixnum)
+        offset = Maglev::Type.coerce_to(ex2, Fixnum, :to_int)
+      else
+        open_args = ex2
+      end
+    when 3
+      length = Maglev::Type.coerce_to(args.shift, Fixnum, :to_int)
+      offset = Maglev::Type.coerce_to(args.shift, Fixnum, :to_int)
+      open_args = args.shift
+    end
+
+
+    offset = 0 if offset._equal?(nil)
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
     read_all_bytes = length._equal?(MaglevUndefined) || length._equal?(nil)
     unless read_all_bytes
-      length = Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
     end
 
@@ -612,7 +639,7 @@ class IO
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
       end
     elsif timeout._not_equal?(nil)
-      timeout = Type.coerce_to(timeout, Float, :to_f)
+      timeout = Maglev::Type.coerce_to(timeout, Float, :to_f)
       ms = (timeout * 1000.0 ).to_int
       unless ms._isFixnum && ms >= 0
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
@@ -644,5 +671,91 @@ class IO
   end
 
   # def ungetc ; end # subclass responsibility
+
+  class StreamCopier
+    def initialize(from, to, length, offset)
+      @length = length
+      @offset = offset
+
+      @from_io, @from = to_io(from, "rb")
+      @to_io, @to = to_io(to, "wb")
+
+      @method = read_method @from
+    end
+
+    def to_io(obj, mode)
+      if obj.kind_of? IO
+        flag = true
+        io = obj
+      else
+        flag = false
+
+        if obj._isString
+          io = File.open obj, mode
+        elsif obj.respond_to? :to_path
+          path = Maglev::Type.coerce_to obj, String, :to_path
+          io = File.open path, mode
+        else
+          io = obj
+        end
+      end
+
+      return flag, io
+    end
+
+    def read_method(obj)
+      if obj.respond_to? :readpartial
+        :readpartial
+      else
+        :read
+      end
+    end
+
+    def run
+      @from.ensure_open_and_readable
+      @to.ensure_open_and_writable
+
+      saved_pos = @from.pos if @from_io
+
+      @from.seek @offset, IO::SEEK_CUR if @offset
+
+      size = @length ? @length : 16384
+      bytes = 0
+
+      begin
+        while data = @from.send(@method, size, "")
+          @to.write data
+          bytes += data.size
+
+          break if @length && bytes >= @length
+        end
+      rescue EOFError
+        # done reading
+      end
+
+      @to.flush
+      return bytes
+    ensure
+      if @from_io
+        @from.pos = saved_pos if @offset
+      else
+        @from.close
+      end
+
+      @to.close unless @to_io
+    end
+  end
+
+  def self.copy_stream(from, to, max_length=nil, offset=nil)
+    StreamCopier.new(from, to, max_length, offset).run
+  end
+  
+  def ensure_open_and_readable
+    raise IOError, "not opened for reading" unless !self.closed? and self.__readable
+  end
+
+  def ensure_open_and_writable
+    raise IOError, "not opened for writing" unless !self.closed? and self.__writable
+  end
 
 end

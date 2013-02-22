@@ -1,3 +1,5 @@
 fails:String#delete taints result when self is tainted
 fails:String#delete! raises a TypeError when self is frozen
 fails:String#delete respects backslash for escaping a -
+fails:String#delete raises if the given ranges are invalid
+fails:String#delete! raises a RuntimeError when self is frozen

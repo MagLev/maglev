@@ -1,4 +1,4 @@
-dirname = "#{ENV['MAGLEV_HOME']}/lib/ruby/site_ruby/1.8/smalltalk"
+dirname = "#{ENV['MAGLEV_HOME']}/lib/ruby/site_ruby/1.9/smalltalk"
 unless File.directory?(dirname)
   Dir.chdir "#{ENV['MAGLEV_HOME']}" do
     puts "generating stwrappers"

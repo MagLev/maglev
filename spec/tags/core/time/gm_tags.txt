@@ -1,1 +1,10 @@
 fails:Time.gm should accept various year ranges
+fails:Time.gm creates a time based on given values, interpreted as UTC (GMT)
+fails:Time.gm creates a time based on given C-style gmtime arguments, interpreted as UTC (GMT)
+fails:Time.gm coerces the month with #to_int
+fails:Time.gm handles fractional seconds as a Float
+fails:Time.gm handles fractional seconds as a Rational
+fails:Time.gm handles fractional microseconds as a Float
+fails:Time.gm handles fractional microseconds as a Rational
+fails:Time.gm ignores fractional seconds if a passed whole number of microseconds
+fails:Time.gm ignores fractional seconds if a passed fractional number of microseconds

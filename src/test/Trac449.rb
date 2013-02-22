@@ -1,6 +1,6 @@
 # Incorrect: returns nil, not the singleton class
 oc = class << Object; end
-p oc
+puts "should be nil: #{oc.inspect}"
 unless oc.equal?(nil) ; raise 'error'; end
 unless oc.is_a?(Object) ; raise 'error'; end
 if oc.is_a?(Class) ; raise 'error'; end
@@ -9,9 +9,15 @@ if oc.is_a?(Module) ; raise 'error'; end
 puts "---"
 # Correct: Does return the singleton class
 oc2 = class << Object; self; end
-p oc2
-unless (xx = oc2.name) == '' ; raise 'error'; end
-unless (xx = oc2.inspect) == '#<Class:Object>' ; raise 'error'; end
+puts "should be #<Class:Object>: #{oc2}"
+if RUBY_VERSION == "1.8.7"
+  className = ""
+elsif RUBY_VERSION == "1.9.3"
+  className = Object.name
+end
+
+unless (xx = oc2.name) == className ; raise "name was: #{xx.inspect} but expected: #{className.inspect}"; end 
+unless (xx = oc2.inspect) == '#<Class:Object>' ; raise "inspect was: #{xx.inspect}"; end
 unless oc2.is_a?(Object) ; raise 'error'; end
 unless oc2.is_a?(Class) ; raise 'error'; end
 unless oc2.is_a?(Module) ; raise 'error'; end

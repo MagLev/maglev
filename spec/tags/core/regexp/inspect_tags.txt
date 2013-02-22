@@ -1,1 +1,3 @@
 fails:Regexp#inspect does not over escape
+fails:Regexp#inspect returns options in the order 'mixn'
+fails:Regexp#inspect does not include a character set code

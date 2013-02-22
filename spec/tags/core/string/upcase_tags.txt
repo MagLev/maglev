@@ -1,3 +1,4 @@
 fails:String#upcase is locale insensitive (only replaces a-z)
 fails:String#upcase taints result when self is tainted
 fails:String#upcase! raises a TypeError when self is frozen
+fails:String#upcase! raises a RuntimeError when self is frozen

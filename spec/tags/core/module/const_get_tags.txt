@@ -1,3 +1,7 @@
 fails:Module#const_get calls #const_missing on the receiver if unable to locate the constant
 fails:Module#const_get with statically assigned constants returns a toplevel constant when the receiver is a Module
 fails:Module#const_get with dynamically assigned constants returns a toplevel constant when the receiver is a Module
+fails:Module#const_get raises a NameError if the constant is defined in the receiver's supperclass and the inherit flag is false
+fails:Module#const_get searches into the receiver superclasses if the inherit flag is true
+fails:Module#const_get raises a NameError when the receiver is a Module, the constant is defined at toplevel and the inherit flag is false
+fails:Module#const_get raises a NameError when the receiver is a Class, the constant is defined at toplevel and the inherit flag is false

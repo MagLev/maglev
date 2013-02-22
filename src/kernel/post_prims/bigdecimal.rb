@@ -40,7 +40,7 @@ class BigDecimal
     # sets the specified mode modification will be transient or persistent
     # per the current state of  Maglev.persistent?
     if sym._equal?( :ROUND_MODE )
-      v = Type.coerce_to(v, Fixnum, :to_int)
+      v = Maglev::Type.coerce_to(v, Fixnum, :to_int)
       if v < ROUND_DOWN or v > ROUND_UP
         raise ArgumentError, 'rounding mode must be one of -1,0,1'
       end
@@ -68,7 +68,7 @@ class BigDecimal
   def self.limit(val=nil)
     old_limit = DEFAULT_prec
     if val._not_equal?(nil)
-      val = Type.coerce_to( val, Fixnum, :to_int)
+      val = Maglev::Type.coerce_to( val, Fixnum, :to_int)
       raise TypeError , 'BigDecimal.limit, precision arg must be >= 0'   if val < 0
       self.const_set(:DEFAULT_prec, val )
     end

@@ -34,3 +34,20 @@ fails:Processing RUBYOPT raises a RuntimeError for '-0'
 fails:Processing RUBYOPT raises a RuntimeError for '--copyright'
 fails:Processing RUBYOPT raises a RuntimeError for '--version'
 fails:Processing RUBYOPT raises a RuntimeError for '--yydebug'
+fails:Execution variable $: does not include the current directory
+fails:Processing RUBYOPT prints the version number for '-v'
+fails:Predefined global $+ captures the last non nil capture
+fails:Predefined global $/ changes $-0
+fails:Predefined global $/ does not call #to_str to convert the object to a String
+fails:Predefined global $/ raises a TypeError if assigned a Fixnum
+fails:Predefined global $/ raises a TypeError if assigned a boolean
+fails:Predefined global $-0 changes $/
+fails:Predefined global $-0 does not call #to_str to convert the object to a String
+fails:Predefined global $-0 raises a TypeError if assigned a Fixnum
+fails:Predefined global $-0 raises a TypeError if assigned a boolean
+fails:Predefined global $, raises TypeError if assigned a non-String
+fails:Predefined global $_ is Thread-local
+fails:Global variable $-d is an alias of $DEBUG
+fails:Global variable $-v is an alias of $VERBOSE
+fails:Global variable $-w is an alias of $VERBOSE
+fails:Global variable $0 raises a TypeError when not given an object that can be coerced to a String

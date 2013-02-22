@@ -1,17 +1,8 @@
 *maglev-runtime
 rubyImplementorsOfReport: aSelector
       "ruby_selector_suffix dependent"
-  | sym allCls implems  clsNames result pad | 
-  allCls := self _allRubyClasses .
-  sym := aSelector asSymbol prefixIfRubySelector .
-  implems := { } .
-  allCls do:[:aCls | | found |
-     (aCls selectorsForEnvironment: 1) do:[ :aSel |
-       (found == nil and:[ aSel prefixIfRubySelector == sym]) ifTrue:[ 
-          implems add: aCls . found := true
-        ]
-     ]
-  ].
+  | implems clsNames result pad |
+  implems := self rubyImplementorsOf: aSelector .
   clsNames := { }.
   pad := '                                            ' .
   implems do:[:cls | | aCls str clsOop | 

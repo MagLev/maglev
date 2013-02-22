@@ -1,1 +1,2 @@
 fails:The yield call taking multiple arguments with a splat passes nil as the argument value if the splatted argument is nil
+fails:The yield call taking a single splatted argument passes no values when give nil as an argument

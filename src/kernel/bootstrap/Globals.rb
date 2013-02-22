@@ -32,6 +32,7 @@ RUBY.global('Mutex', 'RubyTransientMutex')
 RUBY.global('NilClass', 'UndefinedObject')
 RUBY.global('Numeric', 'Number')
 RUBY.global('Object', 'Object')
+RUBY.global('OrderPreservingHashAssociation', 'OrderPreservingHashAssociation')
 RUBY.global('Proc', 'RubyProc')
 RUBY.global('Random', 'RubyRandom')
 RUBY.global('RandomNp', 'RubyRandomNp')
@@ -96,6 +97,7 @@ RUBY.global('Exception',    'Exception')
 
     RUBY.global('NameError',    'NameError')
       RUBY.global('NoMethodError',  'MessageNotUnderstood')
+    RUBY.global('TransactionError', 'TransactionError')
     RUBY.global('ZeroDivisionError', 'ZeroDivide')
 
 
@@ -154,14 +156,14 @@ RUBY_ENGINE = 'maglev'
 # A quick hack to get specs further w/o build having to poke the right string in
 #  this slot. See ticket #76
 # RUBY_PLATFORM  is installed in RubyContext>>_initTransient:
-RUBY_VERSION = '1.8.7'
+RUBY_VERSION = '1.9.3'
 # Note - the packager modifies the date on any line starting with RUBY_RELEASE_DATE
-RUBY_RELEASE_DATE = '2012-11-16'
-RUBY_PATCHLEVEL = 352
-RUBY_DESCRIPTION = 'ruby 1.8.7 (maglev patchlevel 352)'
+RUBY_RELEASE_DATE = '2012-12-06'
+RUBY_PATCHLEVEL = 327
+RUBY_DESCRIPTION = 'ruby 1.9.3 (maglev patchlevel 327)'
 RUBY_COPYRIGHT = 'ruby - Copyright (C) 1993-2010 Yukihiro Matsumoto; maglev additions Copyright(C) 2009-2010 GemStone Systems Inc.'
 
-VERSION = '1.1beta'
+VERSION = '2.0dev'
 
 MAGLEV_VERSION = VERSION  # per Trac 901
 

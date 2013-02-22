@@ -1,0 +1,4 @@
+fails:BigDecimal#power powers of self
+fails:BigDecimal#power 0 to powers < 0 is Infinity
+fails:BigDecimal#power returns NaN if self is NaN
+fails:BigDecimal#power returns 0.0 if self is infinite and argument is negative

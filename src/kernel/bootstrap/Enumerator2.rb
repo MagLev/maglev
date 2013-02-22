@@ -195,7 +195,7 @@ module Enumerable
 
   class ArrayCycleEnumerator < Enumerator
     def initialize(array, repeat_count)
-      cnt = Type.coerce_to(repeat_count, Fixnum , :to_int)
+      cnt = Maglev::Type.coerce_to(repeat_count, Fixnum , :to_int)
       super(array, :cycle)
       @cycle_count = cnt
       @num_cycles = cnt
@@ -331,45 +331,33 @@ module Enumerable
   class HashEnumerator < Enumerator
     def initialize(obj, enum_sel)
       super(obj, enum_sel)
-      @values = nil
-    end
-
-    def __compute_values
-      varr = []
-      @obj.each { |k,v| varr << [k,v] }
-      @ofs = 0
-      @values = varr
-      return varr
+      @deque_pointer = obj.__head
     end
 
     def next 
-      varr = @values
-      if varr._equal?(nil)
-        varr = self.__compute_values 
-      end
-      ofs = @ofs
-      if ofs >= varr.__size
+      @deque_pointer = @deque_pointer.instance_variable_get :@next
+      
+      if @deque_pointer.equal?(@obj.__tail)
         raise StopIteration
       end
-      res = varr[ofs]
-      @ofs = ofs + 1
+       
+      return [@deque_pointer.instance_variable_get(:@key), @deque_pointer.instance_variable_get(:@value)]
     end
 
     def rewind
-      @ofs = 0
-      @values = nil # force recompute
+      @deque_pointer = @obj.__head
       self
     end
   end
 
   class HashKeyEnumerator < HashEnumerator
     # used to enumerate either keys or values
-    def __compute_values
-      varr = []
-      @obj.__send__(@enum_selector) { |k| varr << k }
-      @ofs = 0
-      @values = varr
-      return varr
+    def next
+      if @enum_selector.eql?(:each_value)
+        return super[1]
+      elsif @enum_selector.eql?(:each_key)
+        return super[0]
+      end
     end
   end
 

@@ -1,0 +1,3 @@
+fails:Etc.getgrgid returns a Etc::Group struct instance for the given user
+fails:Etc.getgrgid returns the Etc::Group for a given gid if it exists
+fails:Etc.getgrgid uses Process.gid as the default value for the argument

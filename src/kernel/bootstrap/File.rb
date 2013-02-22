@@ -46,7 +46,7 @@ class File
   def close
     if self.__is_open
       self.__close
-      self.__pclose_status 
+      self.__pclose_status
     else
       raise IOError, 'already closed'
     end
@@ -68,6 +68,8 @@ class File
   primitive_nobridge '__last_err_string', 'lastErrorString'
   primitive_nobridge '__last_err_code', 'lastErrorCode'
   primitive_nobridge '__readable', '_isReadable'
+  primitive_nobridge '__writable', '_isWritable'
+
   primitive_nobridge '__seek', '_seekTo:opcode:'
 
   class_primitive_nobridge '__fstat','fstat:isLstat:'
@@ -100,16 +102,17 @@ class File
   end
 
   def self.__stat(name, is_lstat)
+    raise TypeError, "can't convert nil into String" if name.nil?
     unless name._equal?(nil)
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.__coerce_to_path(name)
     end
     __stat_isLstat(name, is_lstat)
   end
 
   # TODO: consider using FFI to call libc basename
   def self.basename(filename, suffix='')
-    fn = Type.coerce_to(filename, String, :to_str).squeeze('/')
-    sf = Type.coerce_to(suffix, String, :to_str)
+    fn = Maglev::Type.coerce_to(filename, String, :to_str).squeeze('/')
+    sf = Maglev::Type.coerce_to(suffix, String, :to_str)
 
     return '/' if fn.eql?('/')
 
@@ -144,10 +147,10 @@ class File
   end
 
   def self.chmod(permission, *file_names)
-    perm = Type.coerce_to(permission, Fixnum, :to_int)
+    perm = Maglev::Type.coerce_to(permission, Fixnum, :to_int)
     count = 0
     file_names.each { |a_name|
-      nam = Type.coerce_to(a_name, String, :to_str)
+      nam = Maglev::Type.coerce_to(a_name, String, :to_str)
       status = File.__modify_file( 1, nam, perm, nil)
       if (status._equal?(0))
         count = count + 1
@@ -174,7 +177,7 @@ class File
   def self.delete(*file_names)
     count = 0
     file_names.each { |a_name|
-      nam = Type.coerce_to(a_name, String, :to_str)
+      nam = Maglev::Type.coerce_to(a_name, String, :to_str)
       status = File.__modify_file( 0, nam, nil, nil )
       if (status._equal?(0))
         count = count + 1
@@ -186,7 +189,7 @@ class File
   end
 
   def self.directory?(arg)
-    unless arg._isString 
+    unless arg._isString
       if arg.is_a?(IO)
         return arg.stat.directory?
       end
@@ -199,7 +202,7 @@ class File
   end
 
   def self.dirname(string)
-    nam = Type.coerce_to(string, String, :to_str)
+    nam = Maglev::Type.coerce_to(string, String, :to_str)
     File.__modify_file( 14, nam, nil, nil)  # section 3 dirname()
   end
 
@@ -243,7 +246,7 @@ class File
   #  File.expand_path("~oracle/bin")           #=> "/home/oracle/bin"
   #  File.expand_path("../../bin", "/tmp/x")   #=> "/bin"
   def self.expand_path(path, dir=nil)
-    path = Type.coerce_to(path, String, :to_str)
+    path = Maglev::Type.__coerce_to_path(path)
 
     first = path[0]
     if dir
@@ -304,15 +307,15 @@ class File
 
   def self.__tilde_expand(path)
     case path[0,2]
-    when '~'  
+    when '~'
       hm = ENV['HOME']
-      if hm._equal?(nil) ||  hm == '' 
+      if hm._equal?(nil) ||  hm == ''
         raise ArgumentError, "['HOME'] is nil or empty"
       end
       hm
     when '~/'
       hm = ENV['HOME']
-      if hm._equal?(nil) ||  hm == '' 
+      if hm._equal?(nil) ||  hm == ''
         raise ArgumentError, "['HOME'] is nil or empty"
       end
       hm + path[1..-1]
@@ -342,7 +345,7 @@ class File
     unless names.length._equal?(1)
       raise ArgumentError , 'expected 1 arg'
     end
-    File.stat(names[0]).ftype
+    File.stat(Maglev::Type.coerce_to(names[0], String, :to_str)).ftype
   end
 
   def self.grpowned?(filename)
@@ -354,8 +357,9 @@ class File
   end
 
   def self.identical?(file_1, file_2)
-    stat_1 = self.__stat(Type.coerce_to(file_1, String, :to_str), false)
-    stat_2 = self.__stat(Type.coerce_to(file_2, String, :to_str), false)
+    stat_1 = self.__stat(Maglev::Type.coerce_to(file_1, String, :to_str), false)
+    stat_2 = self.__stat(Maglev::Type.coerce_to(file_2, String, :to_str), false)
+    return false if stat_1._isFixnum || stat_2._isFixnum
     return false unless stat_1.ino == stat_2.ino
     return false unless stat_1.ftype == stat_2.ftype
 #     return false unless POSIX.access(orig, R_OK)
@@ -380,8 +384,8 @@ class File
   end
 
   def self.link(oldname, newname)
-    old_nam = Type.coerce_to(oldname, String, :to_str)
-    new_nam = Type.coerce_to(newname, String, :to_str)
+    old_nam = Maglev::Type.coerce_to(oldname, String, :to_str)
+    new_nam = Maglev::Type.coerce_to(newname, String, :to_str)
     status = File.__modify_file(8, old_nam, new_nam)
     unless status._equal?(0)
       Errno.raise_errno(status, 'File.link failed')
@@ -421,7 +425,8 @@ class File
     if filename._isInteger
       raise TypeError , 'File.new(fd_integer)  not supported yet'
     end
-    filename = Type.coerce_to(filename, String, :to_str)
+    # Pathname responds only to to_s
+    filename = Maglev::Type.__coerce_to_String_to_s(filename)
     nargs = 1
     if mode._equal?(MaglevUndefined)
       mode = 'r'
@@ -514,8 +519,8 @@ class File
   end
 
   def self.rename(oldname, newname)
-    oldname = Type.coerce_to(oldname, String, :to_str)
-    newname = Type.coerce_to(newname, String, :to_str)
+    oldname = Maglev::Type.coerce_to(oldname, String, :to_str)
+    newname = Maglev::Type.coerce_to(newname, String, :to_str)
     status = File.__modify_file(7, oldname, newname)
     unless status._equal?(0)
       Errno.raise_errno(status, 'File.rename failed')
@@ -546,12 +551,12 @@ class File
       fn = filename.path
     else
       begin
-  fn = filename.to_str
+        fn = Maglev::Type.__coerce_to_path(filename)
       rescue
-  begin
-    fn = filename.to_io.path
-  rescue
-  end
+        begin
+          fn = filename.to_io.path
+        rescue
+        end
       end
     end
     if fn._equal?(nil)
@@ -583,7 +588,7 @@ class File
   end
 
   def self.split(arg)
-    arg = Type.coerce_to(arg, String, :to_str)
+    arg = Maglev::Type.coerce_to(arg, String, :to_str)
     if arg.size._equal?(0)
       return [ '.' , '' ]
     end
@@ -623,8 +628,8 @@ class File
   end
 
   def self.symlink(oldname, newname)
-    oldname = Type.coerce_to(oldname, String, :to_str)
-    newname = Type.coerce_to(newname, String, :to_str)
+    oldname = Maglev::Type.coerce_to(oldname, String, :to_str)
+    newname = Maglev::Type.coerce_to(newname, String, :to_str)
     status = File.__modify_file(6, oldname, newname)
     unless status._equal?(0)
       Errno.raise_errno(status, 'File.symlink failed')
@@ -641,8 +646,8 @@ class File
   end
 
   def self.truncate(filename, newsize)
-    filename = Type.coerce_to(filename, String, :to_str)
-    newsize = Type.coerce_to(newsize, Fixnum, :to_int)
+    filename = Maglev::Type.coerce_to(filename, String, :to_str)
+    newsize = Maglev::Type.coerce_to(newsize, Fixnum, :to_int)
     status = File.__modify_file(2, filename, newsize)
     unless status._equal?(0)
       Errno.raise_errno(status, 'File.truncate failed')
@@ -658,7 +663,7 @@ class File
   def self.umask(newmask)
     # set file creation mask to newmask and return previous value
     # newmask must be >= 0 and <= 0777
-    newmask = Type.coerce_to(newmask, Fixnum, :to_int)
+    newmask = Maglev::Type.coerce_to(newmask, Fixnum, :to_int)
     if (newmask >= 0)
       res = __umask(newmask)
     else
@@ -730,7 +735,7 @@ class File
   end
 
   def chmod(arg)
-    permission = Type.coerce_to(arg, Fixnum, :to_int)
+    permission = Maglev::Type.coerce_to(arg, Fixnum, :to_int)
     status = File.__modify_file( 10, @_st_fileDescriptor, permission, nil)
     unless status._equal?(0)
       Errno.raise_errno(status, 'File#chmod failed')
@@ -802,15 +807,15 @@ class File
   def __read(a_length, a_buffer)
     raise IOError, 'read: closed stream' unless self.__is_open
     unless a_length._equal?(nil)
-      length = Type.coerce_to(a_length, Fixnum, :to_int)
+      length = Maglev::Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
       if self.pos > self.stat.size
-        buffer = Type.coerce_to(a_buffer, String, :to_str)
-        buffer.size = 0 
-        return nil 
+        buffer = Maglev::Type.coerce_to(a_buffer, String, :to_str)
+        buffer.size = 0
+        return nil
       end
     end
-    buffer = Type.coerce_to(a_buffer, String, :to_str)
+    buffer = Maglev::Type.coerce_to(a_buffer, String, :to_str)
     length = self.stat.size if length._equal?(nil)
     num_read = __read_into(length, buffer, true)
     if num_read._equal?(0)
@@ -827,7 +832,7 @@ class File
     if a_length._equal?(nil)
       self.__contents # read_all_bytes
     else
-      length = Type.coerce_to(a_length, Fixnum, :to_int)
+      length = Maglev::Type.coerce_to(a_length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
       if length._equal?(0)
         return ''
@@ -846,15 +851,16 @@ class File
   def readpartial(length, buffer=MaglevUndefined)
     raise IOError, 'read: closed stream' unless __is_open
     need_trunc = false
-    length = Type.coerce_to(length, Fixnum, :to_int)
+    length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
     if buffer._equal?(MaglevUndefined)
       buffer = ""
     else
-      buffer = Type.coerce_to(buffer, String, :to_str)
+      buffer = Maglev::Type.coerce_to(buffer, String, :to_str)
       need_trunc = true
     end
     num_read = self.__read_into(length, buffer, false)
     raise IOError, 'error' if num_read._equal?(nil)
+    raise EOFError, 'end of file reached' if num_read == 0
     if need_trunc
       buffer.size = num_read # truncate buffer
     end
@@ -1017,17 +1023,22 @@ class File
   end
 
   primitive_nobridge '__fopen', '_fopen:mode:'
-
+  primitive_nobridge '__isStdStream', '_isStdStream'
   primitive_nobridge '__become', '_becomeMinimalChecks:'
 
   def reopen(arg1, mode=MaglevUndefined)
-    ofs = -1 
+    ofs = -1
     if arg1._isString
       path = arg1
       if mode._equal?(MaglevUndefined)
         mode = 'r'
       end
     elsif arg1._kind_of?(File)
+      if arg1.__isStdStream
+        f = self
+        f.__become(arg1)
+        return f
+      end
       path = arg1.path
       ofs = arg1.pos
       if mode._equal?(MaglevUndefined)
@@ -1085,7 +1096,7 @@ class File
   # each_line inherited from IO
 
   def seek(offset, whence = SEEK_SET)
-    offset = Type.coerce_to(offset, Fixnum, :to_int)
+    offset = Maglev::Type.coerce_to(offset, Fixnum, :to_int)
     pos = __seek(offset, whence)
     if pos._equal?(nil)
       Errno.raise_errno(self.__last_err_code, 'seek failed')
@@ -1108,14 +1119,14 @@ class File
     if closed?
       raise IOError, 'IO#pos on closed IO'
     end
-    ofs = Type.coerce_to(offset, Fixnum, :to_int)
+    ofs = Maglev::Type.coerce_to(offset, Fixnum, :to_int)
     seek(ofs, SEEK_SET)
   end
 
   alias tell pos
 
   def truncate(a_length)
-    a_length = Type.coerce_to(a_length, Fixnum, :to_int)
+    a_length = Maglev::Type.coerce_to(a_length, Fixnum, :to_int)
     status = File.__modify_file( 15, @_st_fileDescriptor, a_length, nil)
     unless status._equal?(0)
       Errno.raise_errno(status, 'File#truncate failed')
@@ -1126,7 +1137,7 @@ class File
   primitive 'ungetc', 'ungetByte:'
 
   def write(arg)
-    arg = Type.coerce_to(arg, String, :to_s)
+    arg = Maglev::Type.coerce_to(arg, String, :to_s)
     count = self.__write(arg.__size, arg)
     if count._equal?(nil)
       raise IOError , self.__last_err_string  # TODO: Errno::xxx
@@ -1135,6 +1146,27 @@ class File
   end
 
   alias :syswrite :write
+
+  def set_encoding(encoding)
+    #TODO
+  end
+
+  def dup
+    raise IOError, "closed stream" if self.closed?
+
+    if @_st_fileDescriptor >= 0 && @_st_fileDescriptor <= 2
+      self
+    else
+      file = self.class.new(@_st_pathName, @_st_mode)
+      file.seek(self.tell)
+      file
+    end
+  end
+
+  def self.path(obj)
+    return obj.to_path if obj.respond_to?(:to_path)
+    Maglev::Type.coerce_to(obj, String, :to_str)
+  end
 
 end
 File.__freeze_constants

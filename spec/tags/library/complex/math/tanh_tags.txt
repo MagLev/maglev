@@ -1,0 +1,1 @@
+fails:Math#tanh is a private instance method

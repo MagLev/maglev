@@ -264,6 +264,7 @@ class Regexp
 
   def =~(str)
     # no bridge method for this variant
+    str = str.to_str if str.respond_to?(:to_str) unless String === str
     m = __search(str, 0, nil)
     m.__storeRubyVcGlobal(0x20) # store into caller's $~
     if (m)
@@ -388,7 +389,7 @@ class Regexp
     i = 0
     ch_str = ' '
     while i < lim
-      ch = str[i]
+      ch = str[i].ord
       m_idx = META_CHARS.__indexOfByte(ch, 1)
       if (m_idx > 0)
         if (ch <= 0x20)   # handle \n \r \f \t and " "
@@ -552,7 +553,7 @@ class Regexp
         end
         src << an_arg.to_s
       else
-        an_arg = Type.coerce_to(an_arg, String, :to_str)
+        an_arg = Maglev::Type.coerce_to(an_arg, String, :to_str)
         src << Regexp.escape(an_arg)
       end 
       n += 1

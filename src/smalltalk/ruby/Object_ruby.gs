@@ -70,14 +70,21 @@ dnuKind ~~ 0 ifTrue:[ self _dnuError: dnuKind args: anArray reason: dnuKind ].
 envId == 1  ifTrue: [ |  prefix |
   prefix := aSymbol rubySelectorPrefixSymbol .   "Fix Trac 913"
   "prefix == #'a_prefix' ifTrue:[ nil pause ].  uncomment for debugging Ruby DNU"
-  prefix ~~ #method_missing ifTrue:[
-    (aSymbol _rubyAt1: -1) == 16r26 "== $& " ifTrue:[ | args blk |
+  prefix ~~ #method_missing ifTrue:[ | args blk |
+    (aSymbol _rubyOrdAt: -1) == 16r26 "== $& " ifTrue:[
       args := anArray _rubyAt: 0 length: anArray size - 1 .
       blk := anArray _rubyAt: -1 .
-      ^ self @ruby1:method_missing: prefix __STAR: args __BLOCK: blk 
     ].
-    ^ self @ruby1:method_missing: prefix __STAR: anArray 
-  ]. 
+   args == nil ifTrue: [ args := anArray ].
+   (aSymbol _rubyOrdAt: -2) == 16r2A " == $* " ifTrue: [
+      "splat last arg if from a splat send. GitHub #221"
+      args := args allButLast, args last
+    ].
+   blk == nil ifTrue: [
+    ^ self @ruby1:method_missing: prefix __STAR: args 
+  ] ifFalse: [
+    ^ self @ruby1:method_missing: prefix __STAR: args __BLOCK: blk 
+  ]].
   ^ self doesNotUnderstand: aSymbol args: anArray envId: envId
 ] ifFalse: [
   "smalltalk env 0"

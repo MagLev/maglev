@@ -1,0 +1,2 @@
+fails:StringIO#read when passed length, buffer raises an error when passed a frozen String as buffer
+fails:StringIO#read when passed length, buffer raises a RuntimeError when passed a frozen String as buffer

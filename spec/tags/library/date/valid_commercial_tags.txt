@@ -1,0 +1,3 @@
+fails:Date#valid_commercial? returns true if it is a valid commercial date
+fails:Date#valid_commercial? returns false it is not a valid commercial date
+fails:Date#valid_commercial? handles negative week and day numbers

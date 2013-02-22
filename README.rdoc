@@ -1,5 +1,5 @@
 = MagLev
-<b>Build Status:</b> {<img height="18" src="http://ci.rkh.im/view/Maglev/job/MagLev-Rubyspecs/lastBuild/buildStatus"/>}[http://ci.rkh.im/view/Maglev/job/MagLev-Rubyspecs/lastBuild/] {<img height="18" src="http://ci.gemstone.com/job/MagLev_RubySpec-master/lastBuild/buildStatus"/>}[http://ci.gemstone.com/job/MagLev_RubySpec-master/lastBuild/]
+<b>Build Status:</b> {<img src="https://travis-ci.org/MagLev/maglev.png?branch=master-1.9" alt="Build Status" />}[https://travis-ci.org/MagLev/maglev]
 
 == Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.
@@ -107,8 +107,8 @@ MagLev source tree and other files. Change to that directory, then:
    run:
      ./install.sh
    If you've already run <tt>installMaglev.sh</tt> on the machine, then you
-   can use the upgrade script:
-     ./upgrade.sh
+   can use the update script:
+     ./update.sh
 
 To use MagLev, you need to run <tt>install.sh</tt> at least once.  After
 that, every time you <tt>git pull</tt>, you need to run <tt>update.sh</tt>
@@ -121,6 +121,6 @@ The installer/updater figures that out from the version.txt file.
 
 You'll have all the functionality of git, but unless you create a new
 clone for each release, you may be unable to revert to an earlier version.
-Why? The install/upgrade script creates a new copy of the MagLev data
+Why? The install/update script creates a new copy of the MagLev data
 repository including persistent kernel code. The scripts make one level of
 backup, but we are not providing migration scripts.

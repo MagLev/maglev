@@ -125,7 +125,7 @@ class Exception
       unless limit > 0
         raise ArgumentError, 'limit must be > 0'
       end
-      oldstk = @_st_gsStack 
+      oldstk = @_st_gsStack
       stk = self.__stbacktrace(limit)
       if stk.size._equal?(0)
         stk = [ 'No Stack Available, to generate stack use - ']
@@ -135,10 +135,10 @@ class Exception
         stk.__shift # don't report the frame for  raise
         @_st_gsStack = stk
       end
-      if stk.__size._equal?(0)
+      if stk.__size._equal?(0) && !self.__handler_active
         return nil
       end
-      stk   
+      stk
     end
 
     def exception(msg = MaglevUndefined)
@@ -160,6 +160,7 @@ class Exception
     end
 
     def set_backtrace(array)
+      raise TypeError, "backtrace must be Array of String"  unless array.class == Array and array.all? {|e| e.class == String}
       @_st_gsStack = array
     end
 
@@ -220,6 +221,10 @@ end
 class StandardError
 end
 class ArgumentError
+  # TODO: raise in RubyGlobalLastExcBackTraceAsgn>>irNode
+  def self._set_backtrace_failed
+    raise ArgumentError, "$! not set"
+  end
 end
 class IOError
 end
@@ -311,6 +316,16 @@ class SystemCallError
     @_st_errno
   end
 end
+
+class TransactionError
+  primitive '__gsArguments', 'gsArguments'
+  def object
+    args = __gsArguments
+    return nil if args.nil?
+    return args[0]
+  end
+end
+
 class ThreadError
 end
 class TypeError

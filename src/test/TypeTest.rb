@@ -16,20 +16,20 @@ end
 
 m = Mock.new
 
-test(Type.coerce_to(m, Hash,    :to_hash).class, Hash,   "Hash")
+test(Maglev::Type.coerce_to(m, Hash,    :to_hash).class, Hash,   "Hash")
 
-test(Type.coerce_to(m, Array,   :to_ary).class,  Array,  "Array#to_ary")
-test(Type.coerce_to(m, Array,   :to_a).class,    Array,  "Array#to_a")
+test(Maglev::Type.coerce_to(m, Array,   :to_ary).class,  Array,  "Array#to_ary")
+test(Maglev::Type.coerce_to(m, Array,   :to_a).class,    Array,  "Array#to_a")
 
-test(Type.coerce_to(m, String,  :to_str).class,  String, "String#to_str")
-test(Type.coerce_to(m, String,  :to_s).class,    String, "String#to_s")
+test(Maglev::Type.coerce_to(m, String,  :to_str).class,  String, "String#to_str")
+test(Maglev::Type.coerce_to(m, String,  :to_s).class,    String, "String#to_s")
 
-test(Type.coerce_to(m, Fixnum,  :to_int).class,  Fixnum, "Fixnum#to_int")
+test(Maglev::Type.coerce_to(m, Fixnum,  :to_int).class,  Fixnum, "Fixnum#to_int")
 
-test(Type.coerce_to(m, Integer, :to_i).class,    Fixnum, "Integer#to_i")
-test(Type.coerce_to(m, Integer, :to_int).class,  Fixnum, "Integer#to_int")
+test(Maglev::Type.coerce_to(m, Integer, :to_i).class,    Fixnum, "Integer#to_i")
+test(Maglev::Type.coerce_to(m, Integer, :to_int).class,  Fixnum, "Integer#to_int")
 
-test(Type.coerce_to(m, Symbol,  :to_sym).class,  Symbol, "Symbol#to_sym")
+test(Maglev::Type.coerce_to(m, Symbol,  :to_sym).class,  Symbol, "Symbol#to_sym")
 
 report
 true

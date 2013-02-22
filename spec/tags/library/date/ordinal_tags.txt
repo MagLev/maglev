@@ -1,0 +1,2 @@
+fails:Date.ordinal should be able to construct a Date object from an ordinal date
+fails:Date.ordinal constructs a Date object from an ordinal date

@@ -57,6 +57,28 @@ task :status do
   end
 end
 
+if ENV["TRAVIS"]
+  tests = {"rubyspec" => "spec:ci",
+           "vmunit" => "travis:vmunit",
+           "vmunit2" => "tests:vmunit2",
+           "fav_gems" => "tests:fav_gems_install",
+           "sinatra" => "tests:sinatra",
+           "examples" => "tests:examples"}
+
+  task :travis do
+    Rake::Task["stwrappers"].invoke
+    ENV["PATH"] = "#{ENV['PATH']}:#{File.dirname(__FILE__)}/bin"
+    Rake::Task[tests[ENV["CI_TESTS"]]].invoke
+  end
+
+  desc "Run vmunit tests on clean stone and again after update.sh ran"
+  task :"travis:vmunit" do
+    system "rake tests:vmunit"
+    system "./update.sh"
+    system "rake tests:vmunit"
+  end
+end
+
 # This initializes the environment, and then ensures that there is a
 # gemstone diretory there.  Needed to pull this out, since some of the
 # initialization tasks need to be performed before there is a gemstone dir

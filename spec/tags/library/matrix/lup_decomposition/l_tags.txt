@@ -1,0 +1,2 @@
+fails:Matrix::LUPDecomposition#l returns the first element of to_a
+fails:Matrix::LUPDecomposition#l returns a lower triangular matrix

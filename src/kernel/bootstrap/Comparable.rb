@@ -5,11 +5,11 @@ module Comparable
       if status._isNumeric
         status == 0
       else
-        nil
+        false
       end
-     rescue StandardError
-       nil
-     end
+    rescue StandardError
+      false
+    end
   end
   
   def >(other)

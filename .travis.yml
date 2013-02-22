@@ -1,0 +1,19 @@
+# Java, because those are the 64bit boxes. We'll change it once Ruby
+# boxes are 64bit, too
+language: java
+before_install:
+  - "sudo apt-get install -qq rake"
+before_script:
+  - "./install.sh"
+script: "rake travis"
+env:
+  - CI_TESTS=rubyspec
+  - CI_TESTS=vmunit
+  - CI_TESTS=vmunit2
+  # These next ones have to be cleaned up, they don't currently pass
+  # - CI_TESTS=fav_gems
+  # - CI_TESTS=sinatra
+  # - CI_TESTS=examples
+notifications:
+    email: false
+    irc: "irc.freenode.org#maglev-ruby"
