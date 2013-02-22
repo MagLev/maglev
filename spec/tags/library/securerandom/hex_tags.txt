@@ -1,0 +1,1 @@
+fails:SecureRandom.hex generates different hex strings with subsequent invocations

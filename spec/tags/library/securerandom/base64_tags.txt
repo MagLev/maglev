@@ -1,0 +1,1 @@
+fails:SecureRandom.base64 generates different base64 strings with subsequent invocations
