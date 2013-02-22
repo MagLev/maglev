@@ -33,9 +33,6 @@ class MSpecScript
                 "^spec/rubyspec/core/kernel/exec_spec.rb",
                 "^spec/rubyspec/core/kernel/system_spec.rb",
                 "^spec/rubyspec/core/kernel/define_singleton_method_spec.rb",
-                "^spec/rubyspec/core/marshal/dump_spec.rb",             # OpenSSL::X509::Name
-                "^spec/rubyspec/core/marshal/load_spec.rb",             # OpenSSL::X509::Name
-                "^spec/rubyspec/core/marshal/restore_spec.rb",          # OpenSSL::X509
                 "^spec/rubyspec/core/method/parameters_spec.rb",
                 "^spec/rubyspec/core/module/name_spec.rb",
                 "^spec/rubyspec/core/module/define_method_spec.rb",
