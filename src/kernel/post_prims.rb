@@ -9,6 +9,5 @@ require 'kernel/post_prims/Object.rb'
 require 'kernel/post_prims/StructTms.rb'
 require 'kernel/post_prims/bigdecimal.rb'
 require 'kernel/post_prims/ffi.rb'
-require 'kernel/post_prims/openssl.rb'
 
 require 'kernel/workarounds/load_all.rb'
