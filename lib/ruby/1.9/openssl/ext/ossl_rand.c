@@ -114,15 +114,15 @@ ossl_rand_bytes(VALUE self, VALUE len)
 static VALUE
 ossl_rand_pseudo_bytes(VALUE self, VALUE len)
 {
-    VALUE str;
+    unsigned char* buf;
     int n = NUM2INT(len);
 
-    str = rb_str_new(0, n);
-    if (!RAND_pseudo_bytes((unsigned char *)RSTRING_PTR(str), n)) {
+    buf = (unsigned char*)xmalloc(sizeof(unsigned char) * n);
+    if (!RAND_pseudo_bytes(buf, n)) {
 	ossl_raise(eRandomError, NULL);
     }
 
-    return str;
+    return rb_str_new(buf, n);
 }
 
 /*
