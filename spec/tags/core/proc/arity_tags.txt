@@ -13,3 +13,7 @@ fails:Proc#arity returns 2 for a block taking |a, (b, c)| arguments
 fails:Proc#arity returns 2 for a block taking |a, (b, *c)| arguments
 fails:Proc#arity returns 2 for a block taking |(a, b), c| arguments
 fails:Proc#arity returns 2 for a block taking |(a, *b), c| arguments
+fails:Proc#arity returns 0 for a block taking no arguments
+fails:Proc#arity returns 1 for a block taking |(a, b)| arguments
+fails:Proc#arity returns 1 for a block taking |(a, *)| arguments
+fails:Proc#arity returns 1 for a block taking |(a, *b)| arguments

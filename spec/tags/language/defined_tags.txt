@@ -90,3 +90,7 @@ fails:The defined? keyword for an expression with logical connectives returns 'm
 fails:The defined? keyword for an expression with logical connectives calls a method in a 'not' expression and returns 'method'
 fails:The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset global variable
 fails:The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset instance variable
+fails:The defined? keyword for super for a method taking no arguments returns 'super' from a block when a superclass method exists
+fails:The defined? keyword for super for a method taking no arguments returns 'super' from a block in a #define_method when a superclass method exists
+fails:The defined? keyword for super for a method taking arguments returns 'super' from a block when a superclass method exists
+fails:The defined? keyword for super for a method taking arguments returns 'super' from a block in a #define_method when a superclass method exists

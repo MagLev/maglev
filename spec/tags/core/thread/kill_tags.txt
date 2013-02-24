@@ -1,0 +1,3 @@
+fails:Thread#kill can be rescued by outer rescue clause when inner ensure clause raises exception
+fails:Thread#kill is deferred if ensure clause does Thread.stop
+fails:Thread.kill causes the given thread to exit

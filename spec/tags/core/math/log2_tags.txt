@@ -1,2 +1,3 @@
 fails:Math.log2 raises an Errno::EDOM if the argument is less than 0
 fails:Math.log2 raises an TypeError if passed a numerical argument as a string
+fails:Math.log2 returns NaN given NaN

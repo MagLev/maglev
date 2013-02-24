@@ -1,1 +1,7 @@
 fails:Module#name returns an empty String by default
+fails:Module#name is nil for an anonymous module
+fails:Module#name is nil when assigned to a constant in an anonymous module
+fails:Module#name is nil for a nested module created with the module keyword
+fails:Module#name is set with a conditional assignment to a nested constant
+fails:Module#name is set with a conditional assignment to a constant
+fails:Module#name preserves the encoding in which the class was defined

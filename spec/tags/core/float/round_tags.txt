@@ -5,3 +5,5 @@ fails:Float#round returns self for exceptional values when passed a non-negative
 fails:Float#round works for corner cases
 fails:Float#round returns rounded values for big argument
 fails:Float#round returns rounded values for big values
+fails:Float#round returns zero when passed a negative argument with magitude greater the magitude of the whole number portion of the Float
+fails:Float#round raises RangeError for NAN when passed a non-positive precision

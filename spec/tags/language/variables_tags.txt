@@ -9,3 +9,8 @@ fails:Assignment using expansion succeeds without conversion
 fails:Basic multiple assignment with a splatted single RHS value does not call #to_ary on an object
 fails:Assigning multiple values wraps a single value in an Array if it's not already one
 fails:Multiple assignments with splats * on the LHS returns the Array on the RHS without enclosing it in an Array
+fails:Operator assignment 'obj[idx] op= expr' handles empty index (idx) arguments
+fails:Operator assignment 'obj[idx] op= expr' handles empty splat index (idx) arguments
+fails:Operator assignment 'obj[idx] op= expr' handles single splat index (idx) arguments
+fails:Operator assignment 'obj[idx] op= expr' handles multiple splat index (idx) arguments
+fails:Operator assignment 'obj[idx] op= expr' handles splat index (idx) arguments with normal arguments

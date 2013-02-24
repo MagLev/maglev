@@ -1,0 +1,7 @@
+fails:FFI::Platform::LIBSUFFIX returns 'so'
+fails:FFI::Platform::IS_WINDOWS returns false
+fails:FFI::Platform::ARCH returns the architecture type
+fails:FFI::Platform::OS returns 'linux' as a string
+fails:FFI::Platform::OS FFI::Platform.windows? returns false
+fails:FFI::Platform::OS FFI::Platform.mac? returns false
+fails:FFI::Platform::OS FFI::Platform.unix? returns true

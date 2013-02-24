@@ -2,3 +2,4 @@ fails:Matrix.hermitian? returns true for a hermitian Matrix
 fails:Matrix.hermitian? returns true for a 0x0 empty matrix
 fails:Matrix.hermitian? returns false for an assymetric Matrix
 fails:Matrix.hermitian? raises an error for rectangular matrices
+fails:Matrix.hermitian? returns false for a matrix with complex values on the diagonal

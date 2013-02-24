@@ -2,12 +2,8 @@ require File.expand_path('simple', File.dirname(__FILE__))
 
 require 'openssl'
 
-$md_algorithms = if defined? Maglev
-                   OpenSSL::Digest::SUPPORTED_DIGESTS
-                 else
-                   %w(MD2 MD4 MD5 MDC2 RIPEMD160 SHA SHA1
+$md_algorithms = %w(MD4 MD5 RIPEMD160 SHA SHA1
                       SHA224 SHA256 SHA384 SHA512 DSS1)
-                 end
 
 def test_basic_ruby_use_case
   digest = OpenSSL::Digest.const_get('SHA1').new
@@ -51,6 +47,9 @@ def test_crypto_digest
     begin
       md = OpenSSL::Digest.new(name)
       test(md.nil?, false, "OpenSSL::Digest.new(#{name.inspect})")
+      if name == "DSS1"
+        name = "DSA" # this inconsistency is also on Rubinius
+      end
       test(md.name, name, "#{name} .name")
     rescue RuntimeError => e
       p e
@@ -75,28 +74,21 @@ def test_file
   test(digest.hexdigest, "4d54ce1fbbf79e3f47f97732afdbe043", 'digest_class.file(...)')
 end
 
-def test_sha1
-  bogus = OpenSSL::LibCrypto.EVP_get_digestbyname('BOGUS')
-  test(bogus.null?, true, "EVP_get_digestbyname BOGUS")
-
-  sha1 = OpenSSL::LibCrypto.EVP_get_digestbyname('SHA1')
-  test(sha1.null?, false, "EVP_get_digestbyname SHA1")
-end
-
 def test_openssl_module
-  if defined? Maglev
-    test(OpenSSL::OPENSSL_VERSION, 'OpenSSL 0.9.8j 07 Jan 2009', 'OPENSSL_VERSION')
-    test(OpenSSL::OPENSSL_VERSION_NUMBER, "0x009080af".hex, 'OPENSSL_VERSION_NUMBER')
-  end
-  test(OpenSSL::VERSION, '1.0.0', 'VERSION')
+  test(OpenSSL::VERSION, '1.1.0', 'VERSION')
   test(OpenSSL.debug, false, 'Default value of debug')
 end
 
-# TODO: This one is broken....
 def test_use_md_specific_classes
-  digest = OpenSSL::Digest.const_get('SHA1').new
-  digest.update('ff')
-  p digest.hexdigest
+  digest = OpenSSL::Digest.const_get('SHA1').new("f")
+  digest.update('f')
+  test(digest.hexdigest, "ed70c57d7564e994e7d5f6fd6967cea8b347efbc", "Specific Digest hexdigest");
+end
+
+def test_use_md_unspecific_class
+  digest = OpenSSL::Digest.new("sha1", "ff")
+  digest.update('f')
+  test(digest.hexdigest, "f6949a8c7d5b90b4a698660bbfb9431503fbb995", "Generic Digest hexdigest")
 end
 
 def test_random
@@ -118,11 +110,12 @@ def test_random
   test(random_enough, true, 'OpenSSL::Random.status?')
 end
 
-test_sha1 if defined? Maglev
 test_crypto_digest
 test_basic_ruby_use_case
+test_use_md_unspecific_class
+test_use_md_specific_classes
 test_openssl_module
-# test_all_hmac_impls
+test_all_hmac_impls
 test_random
 test_file
 
