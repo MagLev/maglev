@@ -43,12 +43,6 @@ class MSpecScript
 
   lib_files = ['spec/rubyspec/library',
                "^spec/rubyspec/library/erb/new_spec.rb",
-               "^spec/rubyspec/library/complex/divide_spec.rb",
-               "^spec/rubyspec/library/complex/exponent_spec.rb",
-               "^spec/rubyspec/library/complex/minus_spec.rb",
-               "^spec/rubyspec/library/complex/modulo_spec.rb",
-               "^spec/rubyspec/library/complex/multiply_spec.rb",
-               "^spec/rubyspec/library/complex/plus_spec.rb",
                "^spec/rubyspec/library/uri/parser",
                "^spec/rubyspec/library/prime",
                "^spec/rubyspec/library/scanf",
