@@ -1,0 +1,17 @@
+fails:Library attach_function :getpid from [ 'c', 'libc.so.6'] 
+fails:Library attach_function :getpid from [ 'libc.so.6', 'c' ] 
+fails:Library attach_function :getpid from [ 'libfubar.so.0xdeadbeef', nil, 'c' ] 
+fails:Library :char variable
+fails:Library :uchar variable
+fails:Library :short variable
+fails:Library :ushort variable
+fails:Library :int variable
+fails:Library :uint variable
+fails:Library :long_long variable
+fails:Library :ulong_long variable
+fails:Library :long variable
+fails:Library :ulong variable
+fails:Library Pointer variable
+fails:Library structure
+fails:Library #ffi_convention defaults to :default
+fails:Library #ffi_convention should be settable

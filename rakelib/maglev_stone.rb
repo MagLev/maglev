@@ -154,6 +154,7 @@ class MagLevStone < Stone
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
     input_file("#{ML}/src/smalltalk/ruby/allprims.topaz", false)
+    system("#{ML}/bin/maglev-ruby --stone #{@name} #{ML}/src/kernel/extensions.rb")
   end
 
   def prims_loaded?(name='maglev')

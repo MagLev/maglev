@@ -1,1 +1,3 @@
 fails:Math.atan2 raises an ArgumentError if the argument cannot be coerced with Float()
+fails:Math.atan2 returns Pi when passed 0.0, -0.0
+fails:Math.atan2 returns -Pi when passed -0.0, -0.0

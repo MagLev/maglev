@@ -1,3 +1,5 @@
 fails:String#chomp! with separator does raise an exception when no change would be done and no argument is passed in
 fails:String#chomp! with separator raises a RuntimeError on a frozen instance when it is modified
 fails:String#chomp! with separator raises a RuntimeError on a frozen instance when it would not be modified
+fails:String#chomp! raises a RuntimeError on a frozen instance when it is modified
+fails:String#chomp! raises a RuntimeError on a frozen instance when it would not be modified

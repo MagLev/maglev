@@ -1,0 +1,5 @@
+fails:describes a running thread
+fails:Thread#inspect describes a completed thread
+fails:Thread#inspect describes a killed thread
+fails:Thread#inspect describes a thread with an uncaught exception
+fails:Thread#inspect describes a dying sleeping thread

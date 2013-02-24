@@ -649,4 +649,8 @@ class Module
     obj._kind_of?( self)
   end
 
+  def private_constant(*args)
+    warn "NotImplemented: Module#private_constant"
+  end
+
 end

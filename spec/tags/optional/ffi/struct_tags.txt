@@ -1,0 +1,7 @@
+fails:Struct allocation MemoryPointer.new(Struct, 2)
+fails:Struct allocation Buffer.new(Struct, 2)
+fails:Struct allocation null? should be true when initialized with NULL pointer
+fails:Struct allocation supports :bool as a struct member
+fails:variable-length arrays zero length array should be accepted as last field
+fails:variable-length arrays can access elements of array
+fails:variable-length arrays non-variable length array is bounds checked

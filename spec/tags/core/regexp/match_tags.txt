@@ -1,1 +1,6 @@
 fails:Regexp#match coerces Exceptions into strings
+fails:Regexp#=~ returns the index too, when argument is a Symbol
+fails:Regexp#match matches the input at a given position
+fails:Regexp#match when passed a block yields the MatchData
+fails:Regexp#match when passed a block returns the block result
+fails:Regexp#match when passed a block does not yield if there is no match
