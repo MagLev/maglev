@@ -46,10 +46,15 @@ class MSpecScript
                "^spec/rubyspec/library/uri/parser",
                "^spec/rubyspec/library/prime",
                "^spec/rubyspec/library/scanf",
-               "^spec/rubyspec/library/socket",                         # Orpheus, Grace
                "^spec/rubyspec/library/syslog",
                "^spec/rubyspec/library/zlib/inflate/append_spec.rb",
                "^spec/rubyspec/library/zlib/inflate/inflate_spec.rb"]
+
+
+  # On Orpheus and Grace, these used to fail. Possible add them
+  # conditionally based on ENV var
+  #
+  # "^spec/rubyspec/library/socket"
 
   set :files, lang_files + core_files + lib_files
 
