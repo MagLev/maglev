@@ -1,1 +1,3 @@
 fails:String#replace replaces the taint status of self with that of other
+fails:String#replace raises a RuntimeError on a frozen instance that is modified
+fails:String#replace raises a RuntimeError on a frozen instance that would not be modified

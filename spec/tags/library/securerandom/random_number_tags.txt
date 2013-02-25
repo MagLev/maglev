@@ -1,1 +1,2 @@
 fails:SecureRandom.random_number raises ArgumentError if the argument is non-numeric
+fails:SecureRandom.random_number generates a random positive number smaller then the positive integer argument

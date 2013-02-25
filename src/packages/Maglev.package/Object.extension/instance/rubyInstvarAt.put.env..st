@@ -5,10 +5,10 @@ rubyInstvarAt: aString put: aValue env: envId
   aString _isOneByteString ifFalse:[
     NameError signal:'instance variable name is not a String'
   ].
-  (aString _rubyAt1: 0) == 64"$@" ifFalse:[
+  (aString _rubyOrdAt: 0) == 64"$@" ifFalse:[
     NameError signal: aString , ' is not allowed as instance variable name', self class rubyName
   ].
-  ((aString _rubyAt1: 1) == 95"$_" and:[ aString at: 2 equals:'_st_' ]) ifTrue:[
+  ((aString _rubyOrdAt: 1) == 95"$_" and:[ aString at: 2 equals:'_st_' ]) ifTrue:[
     stSym := (aString copyFrom: 6 to: aString size) asSymbol .
     sym := stSym
   ] ifFalse:[

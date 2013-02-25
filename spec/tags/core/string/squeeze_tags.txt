@@ -1,1 +1,4 @@
 fails:String#squeeze taints the result when self is tainted
+fails:String#squeeze raises an ArgumentError when the parameter is out of sequence
+fails:String#squeeze! raises an ArgumentError when the parameter is out of sequence
+fails:String#squeeze! raises a RuntimeError when self is frozen

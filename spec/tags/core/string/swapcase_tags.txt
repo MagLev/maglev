@@ -1,1 +1,2 @@
 fails:String#swapcase! raises a TypeError when self is frozen
+fails:String#swapcase! raises a RuntimeError when self is frozen

@@ -1,2 +1,9 @@
 fails:Kernel.Float raises an Argument Error if to_f is called and it returns NaN
 fails:Kernel#Float raises an Argument Error if to_f is called and it returns NaN
+fails:Kernel.Float returns a positive Float if the string is prefixed with +
+fails:Kernel.Float returns a negative Float if the string is prefixed with +
+fails:Kernel.Float returns the identical NaN if to_f is called and it returns NaN
+fails:Kernel#Float returns a positive Float if the string is prefixed with +
+fails:Kernel#Float returns a negative Float if the string is prefixed with +
+fails:Kernel#Float returns the identical NaN if to_f is called and it returns NaN
+fails:Kernel#Float is a private method

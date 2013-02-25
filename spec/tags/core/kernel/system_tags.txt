@@ -1,2 +1,6 @@
 fails:Kernel#system does not write to stderr when it can't find a command
 fails:Kernel#system does not expand shell variables when given multiples arguments
+fails:Kernel#system returns nil when command execution fails
+fails:Kernel#system executes with `sh` if the command contains shell characters
+fails:Kernel#system ignores SHELL env var and always uses `sh`
+fails:Kernel#system is a private method

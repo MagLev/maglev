@@ -86,7 +86,7 @@ class Numeric
   end
 
   def ceil
-    f = Type.coerce_to(self, Float, :to_f)
+    f = Maglev::Type.coerce_to(self, Float, :to_f)
     f.ceil
   end
 
@@ -112,7 +112,7 @@ class Numeric
     unless arg._isNumeric
       raise TypeError, 'arg to divmod is not a Numeric'
     end
-    a = Type.coerce_to(arg, Float, :to_f)
+    a = Maglev::Type.coerce_to(arg, Float, :to_f)
     if a == 0.0
       raise FloatDomainError ,'arg to divmod was zero'
     end
@@ -208,7 +208,7 @@ class Numeric
 
   def step(nend, inc=1, &block) 
     if nend._isFloat or inc._isFloat
-      s = Type.coerce_to(self, Float, :to_f)
+      s = Maglev::Type.coerce_to(self, Float, :to_f)
       return s.step(nend, inc, &block)
     end
     n = self

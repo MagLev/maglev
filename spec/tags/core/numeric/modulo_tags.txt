@@ -1,1 +1,3 @@
 fails:Numeric#modulo returns the result of calling self#% with other
+fails:Numeric#modulo returns self - other * self.div(other)
+fails:Numeric#% returns self - other * self.div(other)

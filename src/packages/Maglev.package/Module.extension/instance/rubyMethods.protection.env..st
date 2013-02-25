@@ -10,7 +10,7 @@ rubyMethods: includeSuper protection: protInt env: envId
     [ true ] whileTrue:[  
        (curClass := curClass rubySuperclass: envId) ifNil:[ ^ set ]. 
        curClass == Object ifTrue:[ ^ set  "Fix Trac 719" ].
-       curClass isRubyModuleInclude ifTrue:[
+       (curClass isRubyModuleInclude or: [curClass == Module]) ifTrue:[
           curClass nonBridgeRubySelectorsInto: set hiddenInto: hidden 
 			protection: protInt env: envId 
        ].

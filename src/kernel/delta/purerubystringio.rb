@@ -46,7 +46,7 @@ class PureRubyStringIO  < IO
     if @mode[0]._equal?( ?a ) 
       # in append mode, ignore position and append to the buffer
       if @sio_closed_write ; __require_writable ; end
-      str = Type.coerce_to(obj, String, :to_s)
+      str = Maglev::Type.coerce_to(obj, String, :to_s)
       s_string = @sio_string
       s_string << str
       @sio_pos = s_string.size
@@ -135,7 +135,7 @@ class PureRubyStringIO  < IO
   end
 
   def _initialize(string="", mode=MaglevUndefined, is_reopen=false)
-    s_buf = Type.coerce_to(string, String, :to_str )
+    s_buf = Maglev::Type.coerce_to(string, String, :to_str )
     isfrozen = s_buf.frozen?
     @_st_lineNumber = 0  # IV inherited from IO
     append = false
@@ -162,7 +162,7 @@ class PureRubyStringIO  < IO
       basemode = isfrozen ? "r" : "r+"
       @mode = basemode
     else
-      mode = Type.coerce_to(mode, String, :to_str )
+      mode = Maglev::Type.coerce_to(mode, String, :to_str )
       basemode = mode.dup
       isbinary = basemode.delete!("b")
       if is_reopen 
@@ -245,7 +245,7 @@ class PureRubyStringIO  < IO
     if closed?
       raise IOError, 'IO#pos on closed IO'
     end
-    p = Type.coerce_to(integer, Fixnum, :to_int)
+    p = Maglev::Type.coerce_to(integer, Fixnum, :to_int)
     raise( Errno::EINVAL, "argument must be >= 0") if p < 0
     @sio_pos = p
   end
@@ -259,7 +259,7 @@ class PureRubyStringIO  < IO
 
   def read(length=nil, buffer=nil)
     if @sio_closed_read ; __require_readable ; end
-    buf = buffer._equal?(nil) ? "" : Type.coerce_to(buffer, String, :to_str)
+    buf = buffer._equal?(nil) ? "" : Maglev::Type.coerce_to(buffer, String, :to_str)
 
     s_pos = @sio_pos
     s_string = @sio_string
@@ -267,7 +267,7 @@ class PureRubyStringIO  < IO
     if length._equal?(nil)
       len = bytes_left
     else
-      len = Type.coerce_to(length, Fixnum, :to_int)
+      len = Maglev::Type.coerce_to(length, Fixnum, :to_int)
       return "" if len._equal?(0)  # only in case length = 0 is passed in
     end
     if bytes_left < len
@@ -340,7 +340,7 @@ class PureRubyStringIO  < IO
     elsif sep_string._equal?(nil)
       return [read]
     else
-      sep_string = Type.coerce_to(sep_string, String, :to_str)
+      sep_string = Maglev::Type.coerce_to(sep_string, String, :to_str)
     end
     raise(EOFError, "End of file reached") if eof?
     sep_string = "\n\n" if sep_string.length._equal?(0)
@@ -366,7 +366,7 @@ class PureRubyStringIO  < IO
     if closed?
       raise(IOError, "not opened in seek")
     end
-    offset = Type.coerce_to(offset, Fixnum, :to_int)
+    offset = Maglev::Type.coerce_to(offset, Fixnum, :to_int)
     if whence == SEEK_CUR then
       offset += @sio_pos
     elsif whence == SEEK_END then
@@ -391,7 +391,7 @@ class PureRubyStringIO  < IO
   end
 
   def string=(newstring)
-    newstring = Type.coerce_to(newstring, String, :to_str)
+    newstring = Maglev::Type.coerce_to(newstring, String, :to_str)
     @sio_string = newstring
     self.rewind
     newstring
@@ -413,7 +413,7 @@ class PureRubyStringIO  < IO
 
   def syswrite(string)
     if @sio_closed_write ; __require_writable ; end
-    str = Type.coerce_to(string, String, :to_s)
+    str = Maglev::Type.coerce_to(string, String, :to_s)
     s_string = @sio_string
     my_len = s_string.length
     s_pos = @sio_pos
@@ -447,7 +447,7 @@ class PureRubyStringIO  < IO
   # will be simple to update as well.
   def truncate(integer)
     if @sio_closed_write ; __require_writable ; end
-    new_size = Type.coerce_to(integer, Fixnum, :to_int)
+    new_size = Maglev::Type.coerce_to(integer, Fixnum, :to_int)
     raise(Errno::EINVAL, "Invalid argument - negative length") if new_size < 0
     s_string = @sio_string
     old_size = s_string.length
@@ -461,7 +461,7 @@ class PureRubyStringIO  < IO
 
   def ungetc(integer)
     if @sio_closed_read ; __require_readable ; end
-    integer = Type.coerce_to(integer, Fixnum, :to_int)
+    integer = Maglev::Type.coerce_to(integer, Fixnum, :to_int)
     s_pos = @sio_pos
     if s_pos > 0 then
       @sio_pos = s_pos - 1
@@ -489,7 +489,7 @@ class PureRubyStringIO  < IO
   def __gets(a_sep_string, vc_frame_arg)
     sep_is_nil = a_sep_string._equal?(nil)
     unless sep_is_nil
-      sep_string = Type.coerce_to(a_sep_string, String, :to_str)
+      sep_string = Maglev::Type.coerce_to(a_sep_string, String, :to_str)
     end
     if !sep_is_nil && (sep_len = sep_string.size) == 0
       sep_string = "\n\n"

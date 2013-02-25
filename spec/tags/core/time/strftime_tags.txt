@@ -1,2 +1,4 @@
 fails:Time#strftime returns the date alone with %x
 fails:Time#strftime returns the time alone with %X
+fails:Time#strftime returns the fractional seconds digits, default is 9 digits (nanosecond) with %N
+fails:Time#strftime supports GNU modificators

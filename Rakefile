@@ -59,7 +59,7 @@ end
 
 if ENV["TRAVIS"]
   tests = {"rubyspec" => "spec:ci",
-           "vmunit" => "tests:vmunit",
+           "vmunit" => "travis:vmunit",
            "vmunit2" => "tests:vmunit2",
            "fav_gems" => "tests:fav_gems_install",
            "sinatra" => "tests:sinatra",
@@ -67,8 +67,15 @@ if ENV["TRAVIS"]
 
   task :travis do
     Rake::Task["stwrappers"].invoke
-    ENV["PATH"] = "#{File.dirname(__FILE__)}/bin:#{ENV['PATH']}"
+    ENV["PATH"] = "#{ENV['PATH']}:#{File.dirname(__FILE__)}/bin"
     Rake::Task[tests[ENV["CI_TESTS"]]].invoke
+  end
+
+  desc "Run vmunit tests on clean stone and again after update.sh ran"
+  task :"travis:vmunit" do
+    system "rake tests:vmunit"
+    system "./update.sh"
+    system "rake tests:vmunit"
   end
 end
 

@@ -71,12 +71,12 @@ envId == 1  ifTrue: [ |  prefix |
   prefix := aSymbol rubySelectorPrefixSymbol .   "Fix Trac 913"
   "prefix == #'a_prefix' ifTrue:[ nil pause ].  uncomment for debugging Ruby DNU"
   prefix ~~ #method_missing ifTrue:[ | args blk |
-    (aSymbol _rubyAt1: -1) == 16r26 "== $& " ifTrue:[
+    (aSymbol _rubyOrdAt: -1) == 16r26 "== $& " ifTrue:[
       args := anArray _rubyAt: 0 length: anArray size - 1 .
       blk := anArray _rubyAt: -1 .
     ].
    args == nil ifTrue: [ args := anArray ].
-   (aSymbol _rubyAt1: -2) == 16r2A " == $* " ifTrue: [
+   (aSymbol _rubyOrdAt: -2) == 16r2A " == $* " ifTrue: [
       "splat last arg if from a splat send. GitHub #221"
       args := args allButLast, args last
     ].
