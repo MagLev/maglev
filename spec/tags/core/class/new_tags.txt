@@ -1,1 +1,1 @@
-fails:Class.new creates a class without a name
+fails:Class.new with a block given runs the inherited hook after yielding the block

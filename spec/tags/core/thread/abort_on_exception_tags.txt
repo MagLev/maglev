@@ -1,0 +1,1 @@
+fails:causes the main thread to raise that exception

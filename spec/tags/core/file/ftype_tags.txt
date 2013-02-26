@@ -1,2 +1,1 @@
-fails:File.ftype returns 'blockSpecial' when the file is a block
 fails:File.ftype returns 'link' when the file is a link

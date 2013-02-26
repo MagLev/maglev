@@ -10,3 +10,6 @@ fails:Module#autoload return 'constant' on refering the constant with defined?()
 fails:Module#autoload calls #to_path on non-string filenames
 fails:Module#autoload raises a TypeError if not passed a String or object respodning to #to_path for the filename
 fails:Module#autoload calls #to_path on non-String filename arguments
+fails:Module#autoload does not load the file when refering to the constant in defined?
+fails:Module#autoload looks up the constant in the scope where it is referred
+fails:Module#autoload (concurrently) blocks a second thread while a first is doing the autoload

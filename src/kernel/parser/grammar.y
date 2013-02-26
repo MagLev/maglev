@@ -43,6 +43,7 @@
 #include "doprimargs.hf"
 #include "intloopsup.hf"
 #include "om_inline.hf"
+#include "unicode/ustring.h"
 
 #include "rubygrammar.h"
 
@@ -330,6 +331,7 @@ static int local_id(rb_parse_state* ps, NODE* quid);
 static int eval_local_id(rb_parse_state *st, NODE* idO);
 
 static void tokadd(char c, rb_parse_state *parse_state);
+static int tokadd_utf8(rb_parse_state *parse_state, int string_literal, int symbol_literal, int regexp_literal);
 
 static NODE* gettable(rb_parse_state *parse_state, NODE **idH);
 
@@ -4026,6 +4028,20 @@ static void startToken(rb_parse_state *ps)  // was named newtok()
     UTL_ASSERT( ps->tokenbuf != NULL);
 }
 
+
+static char * tokspace(int n, rb_parse_state *ps)
+{
+  ps->tokidx += n;
+
+  if(ps->tokidx >= ps->toksiz) {
+    do {
+      ps->toksiz *= 2;
+    } while(ps->toksiz < ps->tokidx);
+    ps->tokenbuf = (char*)realloc(ps->tokenbuf, sizeof(char) * ps->toksiz);
+  }
+  return &(ps->tokenbuf[ps->tokidx - n]);
+}
+
 static void tokadd(char c, rb_parse_state *ps)
 {
   UTL_ASSERT(ps->tokidx < ps->toksiz && ps->tokidx >= 0);
@@ -4043,6 +4059,86 @@ static void tokadd(char c, rb_parse_state *ps)
   ps->tokidx = idx; 
 }
 
+#define tokcopy(n, ps) memcpy(tokspace(n, ps), ps->lex_p - (n), (n))
+
+static int tokadd_utf8(rb_parse_state *ps, int string_literal, int symbol_literal, int regexp_literal)
+{
+  /*
+   * If string_literal is true, then we allow multiple codepoints
+   * in \u{}, and add the codepoints to the current token.
+   * Otherwise we're parsing a character literal and return a single
+   * codepoint without adding it
+   */
+
+  int codepoint;
+  int numlen;
+
+  if(regexp_literal) {
+    tokadd('\\', ps); tokadd('u', ps);
+  }
+
+  if(peek('{', ps)) {  /* handle \u{...} form */
+    do {
+      if(regexp_literal) tokadd(*ps->lex_p, ps);
+      nextc(ps);
+      codepoint = scan_hex(ps->lex_p, 6, &numlen);
+
+      if(numlen == 0)  {
+        rb_compile_error("invalid Unicode escape", ps);
+        return 0;
+      }
+      if(codepoint > 0x10ffff) {
+        rb_compile_error("invalid Unicode codepoint (too large)", ps);
+        return 0;
+      }
+
+      ps->lex_p += numlen;
+      if(regexp_literal) {
+        tokcopy(numlen, ps);
+      } else if(codepoint >= 0x80) {
+        char* dst = (char*)calloc(sizeof(char), 8);
+        u_austrncpy(dst, (const UChar*)&codepoint, 5);
+        for (unsigned int i = 0; i < strlen(dst); i++) {
+          tokadd(*(dst + i), ps);
+        }
+        free(dst);
+      } else if(string_literal) {
+        tokadd(codepoint, ps);
+      }
+    } while(string_literal && (peek(' ', ps) || peek('\t', ps)));
+
+    if(!peek('}', ps)) {
+      rb_compile_error("unterminated Unicode escape", ps);
+      return 0;
+    }
+
+    if(regexp_literal) tokadd('}', ps);
+    nextc(ps);
+  } else {			/* handle \uxxxx form */
+    codepoint = scan_hex(ps->lex_p, 4, &numlen);
+    if(numlen < 4) {
+      rb_compile_error("invalid Unicode escape", ps);
+      return 0;
+    }
+    ps->lex_p += 4;
+    if(regexp_literal) {
+      tokcopy(4, ps);
+    } else if(codepoint >= 0x80) {
+      if (string_literal) {
+        char* dst = (char*)calloc(sizeof(char), 8);
+        u_austrncpy(dst, (const UChar*)&codepoint, 5);
+        for (unsigned int i = 0; i < strlen(dst); i++) {
+          tokadd(*(dst + i), ps);
+        }
+        free(dst);
+      }
+    } else if(string_literal) {
+      tokadd(codepoint, ps);
+    }
+  }
+
+  return codepoint;
+}
 static int read_escape(rb_parse_state *ps)
 {
     int c;
@@ -4350,6 +4446,15 @@ static int tokadd_string(int func, int term, int paren, NODE **strTermH,
               case '\\':
                 if (func & STR_FUNC_ESCAPE) tokadd((char)c, ps);
                 break;
+
+              case 'u':
+                  if((func & STR_FUNC_EXPAND) == 0) {
+                    tokadd('\\', ps);
+                    break;
+                  }
+                  tokadd_utf8(ps, 1, func & STR_FUNC_SYMBOL, 
+                                     func & STR_FUNC_REGEXP);
+                  continue;
 
               default:
                 if (func & STR_FUNC_REGEXP) {

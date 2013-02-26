@@ -1,0 +1,1 @@
+fails:Thread#run can interrupt Kernel#sleep

@@ -1,1 +1,2 @@
 fails:OpenStruct#initialize_copy is private
+fails:OpenStruct#initialize_copy generates the same methods

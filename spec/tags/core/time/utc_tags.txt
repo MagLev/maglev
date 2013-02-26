@@ -1,3 +1,10 @@
 fails:Time.utc should accept various year ranges
 fails:Time.utc creates a time based on given values, interpreted as UTC (GMT)
 fails:Time.utc creates a time based on given C-style gmtime arguments, interpreted as UTC (GMT)
+fails:Time.utc coerces the month with #to_int
+fails:Time.utc handles fractional seconds as a Float
+fails:Time.utc handles fractional seconds as a Rational
+fails:Time.utc handles fractional microseconds as a Float
+fails:Time.utc handles fractional microseconds as a Rational
+fails:Time.utc ignores fractional seconds if a passed whole number of microseconds
+fails:Time.utc ignores fractional seconds if a passed fractional number of microseconds

@@ -2,3 +2,4 @@ fails:Module#alias_method is a private method
 fails:Module#alias_method handles aliasing a stub that changes visibility
 fails:Module#alias_method retains method visibility
 fails:Module#alias_method accesses a method defined on Object from Kernel
+fails:Module#alias_method raises RuntimeError if frozen

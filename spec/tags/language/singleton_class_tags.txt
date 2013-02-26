@@ -1,9 +1,7 @@
 fails:A singleton class is TrueClass for true
 fails:A singleton class is FalseClass for false
 fails:A singleton class is NilClass for nil
-fails:Instance methods of a singleton class for a class do not include class methods of the singleton class of Class
 fails:Instance methods of a singleton class for a singleton class includes instance methods of the singleton class of Class
-fails:Instance methods of a singleton class for a singleton class does not include class methods of the singleton class of Class
 fails:Class methods of a singleton class for a class include instance methods of Class
 fails:Class methods of a singleton class for a class include class methods of Class
 fails:Class methods of a singleton class for a class include instance methods of the singleton class of Class

@@ -10,3 +10,8 @@ fails:Array#* with a string returns a string formed by concatenating each elemen
 fails:Array#* with a string raises an ArgumentError when the Array is recursive
 fails:Array#* with a string does not consider untrustworthiness of either the array or the separator when the array is empty
 fails:Array#* with a string returns a string which would be infected with untrustworthiness of the array, its elements or the separator when the array is not empty
+fails:Array#* with a string returns a string formed by concatenating each element.to_str separated by separator
+fails:Array#* with a string with a tainted separator taints the result if the array has two or more elements
+fails:Array#* with a string with an untrusted separator does not untrust the result if the array is empty
+fails:Array#* with a string with an untrusted separator does not untrust the result if the array has only one element
+fails:Array#* with a string with an untrusted separator untrusts the result if the array has two or more elements

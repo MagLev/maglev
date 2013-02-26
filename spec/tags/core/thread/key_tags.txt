@@ -1,1 +1,2 @@
 fails:Thread#key? raises exceptions on the wrong type of keys
+fails:Thread#key? is not shared across fibers

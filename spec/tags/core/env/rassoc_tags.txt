@@ -1,0 +1,1 @@
+fails:ENV.rassoc returns the value element coerced with #to_str

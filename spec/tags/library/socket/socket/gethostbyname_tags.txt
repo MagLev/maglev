@@ -1,2 +1,4 @@
 fails:Socket#gethostbyname returns broadcast address info for '<broadcast>'
 fails:Socket#gethostbyname returns broadcast address info for '<any>'
+fails:Socket#gethostbyname returns address list in pack format (IPv4)
+fails:Socket#gethostbyname returns address list in pack format (IPv6)

@@ -1,0 +1,2 @@
+fails:Continuation#call closes over lexical environments
+fails:Continuation#call executes an outer ensure block

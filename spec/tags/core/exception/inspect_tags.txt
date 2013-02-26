@@ -1,0 +1,1 @@
+fails:Exception#inspect returns the class name when #to_s returns an empty string

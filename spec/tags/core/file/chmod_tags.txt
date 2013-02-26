@@ -1,1 +1,2 @@
 fails:File.chmod accepts an object that has a #to_path method
+fails:File.chmod raises an error for a non existent path

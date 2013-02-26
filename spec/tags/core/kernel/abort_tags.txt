@@ -1,1 +1,5 @@
 fails:Kernel#abort is a private method
+fails:Kernel#abort sets the exception message to the given message
+fails:Kernel#abort coerces the argument with #to_str
+fails:Kernel.abort sets the exception message to the given message
+fails:Kernel.abort coerces the argument with #to_str
