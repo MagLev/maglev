@@ -440,7 +440,7 @@ ossl_dsa_sign(VALUE self, VALUE data)
 		  &buf_len, pkey->pkey.dsa)) { /* type is ignored (0) */
 	ossl_raise(eDSAError, NULL);
     }
-    rb_str_size(str, buf_len);
+    rb_str_resize(str, buf_len);
 
     return str;
 }
