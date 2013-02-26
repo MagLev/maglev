@@ -192,13 +192,12 @@ ossl_x509_to_der(VALUE self)
     GetX509(self, x509);
     if ((len = i2d_X509(x509, NULL)) <= 0)
 	ossl_raise(eX509CertError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if (i2d_X509(x509, &p) <= 0)
 	ossl_raise(eX509CertError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new(p, strlen(p));
 }
 
 /*

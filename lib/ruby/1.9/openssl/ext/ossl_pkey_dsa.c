@@ -304,13 +304,11 @@ ossl_dsa_to_der(VALUE self)
 	i2d_func = i2d_DSA_PUBKEY;
     if((len = i2d_func(pkey->pkey.dsa, NULL)) <= 0)
 	ossl_raise(eDSAError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_func(pkey->pkey.dsa, &p) < 0)
 	ossl_raise(eDSAError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 /*
@@ -442,7 +440,7 @@ ossl_dsa_sign(VALUE self, VALUE data)
 		  &buf_len, pkey->pkey.dsa)) { /* type is ignored (0) */
 	ossl_raise(eDSAError, NULL);
     }
-    rb_str_set_len(str, buf_len);
+    rb_str_size(str, buf_len);
 
     return str;
 }

@@ -236,22 +236,22 @@ ossl_pkey_sign(VALUE self, VALUE digest, VALUE data)
     EVP_PKEY *pkey;
     EVP_MD_CTX ctx;
     unsigned int buf_len;
-    VALUE str;
-
+    unsigned char* str = (unsigned char*)xmalloc(sizeof(char) * EVP_PKEY_size(pkey)+16);
+    
     if (rb_funcall(self, id_private_q, 0, NULL) != Qtrue) {
-	ossl_raise(rb_eArgError, "Private key is needed.");
+	   ossl_raise(rb_eArgError, "Private key is needed.");
     }
     GetPKey(self, pkey);
     EVP_SignInit(&ctx, GetDigestPtr(digest));
-    StringValue(data);
-    EVP_SignUpdate(&ctx, RSTRING_PTR(data), RSTRING_LEN(data));
-    str = rb_str_new(0, EVP_PKEY_size(pkey)+16);
-    if (!EVP_SignFinal(&ctx, (unsigned char *)RSTRING_PTR(str), &buf_len, pkey))
-	ossl_raise(ePKeyError, NULL);
-    assert((long)buf_len <= RSTRING_LEN(str));
-    rb_str_set_len(str, buf_len);
 
-    return str;
+    EVP_SignUpdate(&ctx, RSTRING_PTR(data), RSTRING_LEN(data));
+    
+    if (!EVP_SignFinal(&ctx, str, &buf_len, pkey)) {
+	   ossl_raise(ePKeyError, NULL);
+    }
+    assert((long)buf_len <= strlen(str));
+    
+    return rb_str_new(str, buf_len);
 }
 
 /*

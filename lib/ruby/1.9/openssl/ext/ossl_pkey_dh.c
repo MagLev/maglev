@@ -277,13 +277,12 @@ ossl_dh_to_der(VALUE self)
     GetPKeyDH(self, pkey);
     if((len = i2d_DHparams(pkey->pkey.dh, NULL)) <= 0)
 	ossl_raise(eDHError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_DHparams(pkey->pkey.dh, &p) < 0)
 	ossl_raise(eDHError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 /*
@@ -462,7 +461,7 @@ ossl_dh_compute_key(VALUE self, VALUE pub)
     if ((len = DH_compute_key((unsigned char *)RSTRING_PTR(str), pub_key, dh)) < 0) {
 	ossl_raise(eDHError, NULL);
     }
-    rb_str_set_len(str, len);
+    rb_str_resize(str, len);
 
     return str;
 }

@@ -172,13 +172,11 @@ ossl_x509req_to_der(VALUE self)
     GetX509Req(self, req);
     if ((len = i2d_X509_REQ(req, NULL)) <= 0)
 	ossl_raise(eX509ReqError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if (i2d_X509_REQ(req, &p) <= 0)
 	ossl_raise(eX509ReqError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 static VALUE

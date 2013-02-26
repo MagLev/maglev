@@ -423,13 +423,11 @@ ossl_x509ext_to_der(VALUE obj)
     GetX509Ext(obj, ext);
     if((len = i2d_X509_EXTENSION(ext, NULL)) <= 0)
 	ossl_raise(eX509ExtError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_X509_EXTENSION(ext, &p) < 0)
 	ossl_raise(eX509ExtError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 /*

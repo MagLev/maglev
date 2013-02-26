@@ -801,13 +801,12 @@ ossl_pkcs7_to_der(VALUE self)
     GetPKCS7(self, pkcs7);
     if((len = i2d_PKCS7(pkcs7, NULL)) <= 0)
 	ossl_raise(ePKCS7Error, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_PKCS7(pkcs7, &p) <= 0)
 	ossl_raise(ePKCS7Error, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 static VALUE

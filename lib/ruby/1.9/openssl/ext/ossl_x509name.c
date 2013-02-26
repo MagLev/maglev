@@ -360,13 +360,12 @@ ossl_x509name_to_der(VALUE self)
     GetX509Name(self, name);
     if((len = i2d_X509_NAME(name, NULL)) <= 0)
 	ossl_raise(eX509NameError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_X509_NAME(name, &p) <= 0)
 	ossl_raise(eX509NameError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new(p, strlen(p));
 }
 
 /*

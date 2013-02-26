@@ -294,13 +294,11 @@ ossl_rsa_to_der(VALUE self)
 	i2d_func = (int (*)(const RSA*, unsigned char**))i2d_RSA_PUBKEY;
     if((len = i2d_func(pkey->pkey.rsa, NULL)) <= 0)
 	ossl_raise(eRSAError, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_func(pkey->pkey.rsa, &p) < 0)
 	ossl_raise(eRSAError, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 #define ossl_rsa_buf_size(pkey) (RSA_size((pkey)->pkey.rsa)+16)
@@ -329,7 +327,7 @@ ossl_rsa_public_encrypt(int argc, VALUE *argv, VALUE self)
 				 (unsigned char *)RSTRING_PTR(str), pkey->pkey.rsa,
 				 pad);
     if (buf_len < 0) ossl_raise(eRSAError, NULL);
-    rb_str_set_len(str, buf_len);
+    rb_str_resize(str, buf_len);
 
     return str;
 }
@@ -358,7 +356,7 @@ ossl_rsa_public_decrypt(int argc, VALUE *argv, VALUE self)
 				 (unsigned char *)RSTRING_PTR(str), pkey->pkey.rsa,
 				 pad);
     if (buf_len < 0) ossl_raise(eRSAError, NULL);
-    rb_str_set_len(str, buf_len);
+    rb_str_resize(str, buf_len);
 
     return str;
 }
@@ -390,7 +388,7 @@ ossl_rsa_private_encrypt(int argc, VALUE *argv, VALUE self)
 				  (unsigned char *)RSTRING_PTR(str), pkey->pkey.rsa,
 				  pad);
     if (buf_len < 0) ossl_raise(eRSAError, NULL);
-    rb_str_set_len(str, buf_len);
+    rb_str_resize(str, buf_len);
 
     return str;
 }
@@ -422,7 +420,7 @@ ossl_rsa_private_decrypt(int argc, VALUE *argv, VALUE self)
 				  (unsigned char *)RSTRING_PTR(str), pkey->pkey.rsa,
 				  pad);
     if (buf_len < 0) ossl_raise(eRSAError, NULL);
-    rb_str_set_len(str, buf_len);
+    rb_str_resize(str, buf_len);
 
     return str;
 }

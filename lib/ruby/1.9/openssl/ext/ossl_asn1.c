@@ -759,14 +759,13 @@ ossl_asn1data_to_der(VALUE self)
     }
     if((length = ossl_asn1_object_size(is_cons, RSTRING_LENINT(value), tag)) <= 0)
 	ossl_raise(eASN1Error, NULL);
-    der = rb_str_new(0, length);
-    p = (unsigned char *)RSTRING_PTR(der);
+    
+    p = (unsigned char *)xmalloc(length * sizeof(char));
     ossl_asn1_put_object(&p, is_cons, RSTRING_LENINT(value), tag, tag_class);
     memcpy(p, RSTRING_PTR(value), RSTRING_LEN(value));
     p += RSTRING_LEN(value);
-    ossl_str_adjust(der, p);
-
-    return der;
+    
+    return rb_str_new(p, strlen(p));
 }
 
 static VALUE
@@ -1287,8 +1286,8 @@ ossl_asn1cons_to_der(VALUE self)
 
     seq_len = ossl_asn1_object_size(constructed, RSTRING_LENINT(value), tag);
     length = ossl_asn1_object_size(constructed, seq_len, tn);
-    str = rb_str_new(0, length);
-    p = (unsigned char *)RSTRING_PTR(str);
+
+    p = (unsigned char *)xmalloc(sizeof(char) * length);
     if(tc == V_ASN1_UNIVERSAL)
 	ossl_asn1_put_object(&p, constructed, RSTRING_LENINT(value), tn, tc);
     else{
@@ -1311,9 +1310,8 @@ ossl_asn1cons_to_der(VALUE self)
     if (explicit && inf_length == Qtrue) {
 	ASN1_put_eoc(&p);
     }
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new(p, strlen(p));
 }
 
 /*
