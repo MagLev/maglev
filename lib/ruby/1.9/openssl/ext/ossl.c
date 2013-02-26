@@ -138,7 +138,7 @@ ossl_buf2str(char *buf, int len)
 
     str = rb_protect((VALUE(*)_((VALUE)))ossl_str_new, len, &status);
     if(!NIL_P(str)) {
-	rb_str_set_len(str, len);
+	rb_str_resize(str, len);
 	rb_str_update(str, 0, len, rb_str_new2(buf));
     }
     OPENSSL_free(buf);

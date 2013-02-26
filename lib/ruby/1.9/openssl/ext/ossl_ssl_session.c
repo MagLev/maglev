@@ -221,11 +221,10 @@ static VALUE ossl_ssl_session_to_der(VALUE self)
 		ossl_raise(eSSLSession, "i2d_SSL_SESSION");
 	}
 
-	str = rb_str_new(0, len);
-	p = (unsigned char *)RSTRING_PTR(str);
+	p = (unsigned char *)xmalloc(sizeof(char) * len);
 	i2d_SSL_SESSION(ctx, &p);
-	ossl_str_adjust(str, p);
-	return str;
+
+	return rb_str_new2(p);
 }
 
 /*

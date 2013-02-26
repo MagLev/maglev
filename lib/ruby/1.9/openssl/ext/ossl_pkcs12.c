@@ -182,13 +182,11 @@ ossl_pkcs12_to_der(VALUE self)
     GetPKCS12(self, p12);
     if((len = i2d_PKCS12(p12, NULL)) <= 0)
 	ossl_raise(ePKCS12Error, NULL);
-    str = rb_str_new(0, len);
-    p = (unsigned char *)RSTRING_PTR(str);
+    p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_PKCS12(p12, &p) <= 0)
 	ossl_raise(ePKCS12Error, NULL);
-    ossl_str_adjust(str, p);
 
-    return str;
+    return rb_str_new2(p);
 }
 
 void

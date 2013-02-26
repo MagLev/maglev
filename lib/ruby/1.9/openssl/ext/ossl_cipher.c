@@ -373,7 +373,7 @@ ossl_cipher_update(int argc, VALUE *argv, VALUE self)
     if (!EVP_CipherUpdate(ctx, (unsigned char *)RSTRING_PTR(str), &out_len, in, in_len))
 	ossl_raise(eCipherError, NULL);
     assert(out_len < RSTRING_LEN(str));
-    rb_str_set_len(str, out_len);
+    rb_str_resize(str, out_len);
 
     return str;
 }
@@ -399,7 +399,7 @@ ossl_cipher_final(VALUE self)
     if (!EVP_CipherFinal_ex(ctx, (unsigned char *)RSTRING_PTR(str), &out_len))
 	ossl_raise(eCipherError, NULL);
     assert(out_len <= RSTRING_LEN(str));
-    rb_str_set_len(str, out_len);
+    rb_str_resize(str, out_len);
 
     return str;
 }
