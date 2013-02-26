@@ -601,6 +601,17 @@ module URI
       /(?=#{Regexp.union(*schemes)}:)#{PATTERN::X_ABS_URI}/xn
     end
   end
+  
+  class Parser
+  #Dummy Class that does not provide any useful functionality.
+  #This is a patch for the fact that encoding is not yet implemented.
+    def escape(str)
+      str
+    end
+    def unescape(str)
+      str
+    end
+  end
 
 end
 
