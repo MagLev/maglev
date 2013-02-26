@@ -1,2 +1,8 @@
 fails:StringIO#sysread when passed no arguments returns an empty String if at EOF
 fails:StringIO#sysread when passed nil returns an empty String if at EOF
+fails:StringIO#sysread when passed length, buffer raises an error when passed a frozen String as buffer
+fails:StringIO#sysread when passed length, buffer truncates buffer when limit is nil and no data reamins
+fails:StringIO#sysread when passed length, buffer raises a RuntimeError when passed a frozen String as buffer
+fails:StringIO#sysread when passed no arguments returns an empty String when no data remains
+fails:StringIO#sysread when passed nil returns an empty String when no data remains
+fails:StringIO#sysread when passed length returns an empty String when passed 0 and no data remains

@@ -1,0 +1,1 @@
+fails:Hash#has_value? uses == semantics for comparing values

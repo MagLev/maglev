@@ -1,0 +1,4 @@
+fails:Matrix.symmetric? returns true for a symmetric Matrix
+fails:Matrix.symmetric? returns true for a 0x0 empty matrix
+fails:Matrix.symmetric? returns false for an assymetric Matrix
+fails:Matrix.symmetric? raises an error for rectangular matrices

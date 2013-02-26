@@ -10,3 +10,5 @@ fails:IO#puts writes a newline after objects that do not end in newlines
 fails:IO#puts does not write a newline after objects that end in newlines
 fails:IO#puts ignores the $/ separator global
 fails:IO#puts raises IOError on closed stream
+fails:IO#puts writes empty string with a newline when given nil as an arg
+fails:IO#puts writes empty string with a newline when when given nil as multiple args

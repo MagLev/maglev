@@ -102,43 +102,49 @@ r = ''
 255.times { |i| r << i }
 ins = r.inspect
 expected = "\"\\000\\001\\002\\003\\004\\005\\006\\a\\b\\t\\n\\v\\f\\r\\016\\017\\020\\021\\022\\023\\024\\025\\026\\027\\030\\031\\032\\e\\034\\035\\036\\037 !\\\"\\\#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\177\\200\\201\\202\\203\\204\\205\\206\\207\\210\\211\\212\\213\\214\\215\\216\\217\\220\\221\\222\\223\\224\\225\\226\\227\\230\\231\\232\\233\\234\\235\\236\\237\\240\\241\\242\\243\\244\\245\\246\\247\\250\\251\\252\\253\\254\\255\\256\\257\\260\\261\\262\\263\\264\\265\\266\\267\\270\\271\\272\\273\\274\\275\\276\\277\\300\\301\\302\\303\\304\\305\\306\\307\\310\\311\\312\\313\\314\\315\\316\\317\\320\\321\\322\\323\\324\\325\\326\\327\\330\\331\\332\\333\\334\\335\\336\\337\\340\\341\\342\\343\\344\\345\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\\360\\361\\362\\363\\364\\365\\366\\367\\370\\371\\372\\373\\374\\375\\376\""
-test(ins, expected, 'All byte values inspected')
+
+# expected.size.times{ |i|
+#   test(ins[0..i], expected[0..i], "should be \n#{ins[0..i]} \nwas \n#{expected[0..i]}")    
+# }
+
+test(ins, expected, "should be \n#{ins} \nwas \n#{expected}")    
+
 
 def test_chomp
   s = 'abcd'
   r = s.chomp
-  unless r == s ; raise 'Err'; end
-  if r.equal?(s) ; raise 'Err'; end
+  unless r == s ; raise 'Err1'; end
+  if r.equal?(s) ; raise 'Err2'; end
   r = s.chomp!
-  unless r.equal?(nil) ; raise 'Err'; end
+  unless r.equal?(nil) ; raise 'Err3'; end
 
   s = "abcd\n"
   r = s.chomp
-  if r.equal?(s) ; raise 'Err'; end
-  unless r == 'abcd' ; raise 'Err'; end
+  if r.equal?(s) ; raise 'Err4'; end
+  unless r == 'abcd' ; raise 'Err5'; end
   r = s.chomp!
-  unless r.equal?(s) ; raise 'Err'; end
-  unless r == 'abcd' ; raise 'Err'; end
+  unless r.equal?(s) ; raise 'Err6'; end
+  unless r == 'abcd' ; raise 'Err7'; end
   s = "abcd\r\n"
   r = s.chomp
-  if r.equal?(s) ; raise 'Err'; end
-  unless r == 'abcd' ; raise 'Err'; end
+  if r.equal?(s) ; raise 'Err8'; end
+  unless r == 'abcd' ; raise 'Err9'; end
   r = s.chomp!
-  unless r.equal?(s) ; raise 'Err'; end
-  unless r == 'abcd' ; raise 'Err'; end
+  unless r.equal?(s) ; raise 'Err10'; end
+  unless r == 'abcd' ; raise 'Err11'; end
 
   s = 'abcd'
   r = s.chop
-  unless r == 'abc' ; raise 'Err'; end
-  if r.equal?(s) ; raise 'Err'; end
+  unless r == 'abc' ; raise 'Err12'; end
+  if r.equal?(s) ; raise 'Err13'; end
   r = s.chop!
-  unless r == 'abc' ; raise 'Err'; end
-  unless r.equal?(s) ; raise 'Err'; end
+  unless r == 'abc' ; raise 'Err14'; end
+  unless r.equal?(s) ; raise 'Err15'; end
   s = ''
   r = s.chop!
-  unless r.equal?(nil) ; raise 'Err'; end
+  unless r.equal?(nil) ; raise 'Err16'; end
   r = s.chop
-  unless r.length == 0 ; raise 'Err'; end
+  unless r.length == 0 ; raise 'Err17'; end
   return true
 end
 
@@ -176,7 +182,7 @@ str.gsub(UNSAFE) do |us|
 end
 
 actual = "hello".gsub(/./) { |s| s[0].to_s + '|' }
-test(actual, "104|101|108|108|111|", "gsub with block")
+test(actual, "h|e|l|l|o|", "gsub with block")
 
 begin
   r = "xxx" =~ "yyy"
@@ -210,7 +216,7 @@ test(C.new =~ '/yyy/', false, "C.new =~ '/yyy/'")
 
 # Slice! tests from pickaxe
 string = "this is a string"
-test(string.slice!(2), 105, 'slice! 1')
+test(string.slice!(2), 'i', 'slice! 1')
 test(string, "ths is a string", 'slice! 1a')
 
 test(string.slice!(3..6), " is ", 'slice! 2')
@@ -284,7 +290,7 @@ test(string, "0123456", 'slice! 17a')
 # ticket 400
 str = "this is a string"
 r = str.slice!(2)
-unless r == 105 ; raise 'error' ; end
+unless r == 'i' ; raise 'error' ; end
 unless str == 'ths is a string' ; raise 'error' ; end
 r = str.slice!(3..6)
 unless r == " is " ; raise 'error' ; end
@@ -307,7 +313,7 @@ test(string, 'test', 'Trac458a')
 test('hello'.gsub(/[aeiou]/, '*'),    'h*ll*',     'gsub pickaxe 1')
 test('hello'.gsub(/([aeiou])/, '<\1>'), 'h<e>ll<o>', 'gsub pickaxe 2')
 r = 'hello'.gsub(/./) {|s| s[0].to_s + ' ' }
-test(r,    '104 101 108 108 111 ', 'gsub pickaxe 3')
+test(r,    'h e l l o ', 'gsub pickaxe 3')
 
 # Gsub with all backslash substitutions
 test('Foo Bar'.gsub(/(.)o(.)(.)(.*)/, '\4 \3 \2 \1'), 'Bar   o F', 'gsub backslash numeric')
@@ -382,6 +388,14 @@ test(b * 3, "Hello ThereHello ThereHello There", "BadString *")
 test(BadString.new("123").gsub!(/\d/, " "), "   ", "BadString gsub!")
 test(b.partition("ll"), ["He", "ll", "o There"], "BadString partition")
 test(b.split, ["Hello", "There"], "BadString split")
+
+# gsub tests for rails:
+#   gsub with block and hash
+test("Herzlich Willkommen".gsub(/[aeiou]/, {"a" => 1, "e" => 2, "i" => 3, "o" => "x", "u" => "z"}),
+     "H2rzl3ch W3llkxmm2n", "gsub with hash")
+
+test("Herzlich Willkommen".gsub(/[aeiou]/){ |s| s.upcase},
+     "HErzlIch WIllkOmmEn", "gsub with block")
 
 report
 

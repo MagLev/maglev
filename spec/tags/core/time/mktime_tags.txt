@@ -1,5 +1,9 @@
-fails:Time.mktime creates a time based on given C-style gmtime arguments, interpreted in the local time zone
-fails:Time.mktime creates a time based on given values, interpreted in the local time zone
-fails:Time.mktime respects rare old timezones
 fails:Time.mktime sets the time zone correctly for a short time zone identifier
 fails:Time.mktime should accept various year ranges
+fails:Time.mktime coerces the month with #to_int
+fails:Time.mktime handles fractional seconds as a Float
+fails:Time.mktime handles fractional seconds as a Rational
+fails:Time.mktime handles fractional microseconds as a Float
+fails:Time.mktime handles fractional microseconds as a Rational
+fails:Time.mktime ignores fractional seconds if a passed whole number of microseconds
+fails:Time.mktime ignores fractional seconds if a passed fractional number of microseconds

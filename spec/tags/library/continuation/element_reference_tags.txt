@@ -1,0 +1,1 @@
+fails:Continuation#call closes over lexical environments

@@ -1,0 +1,2 @@
+fails:Matrix::LUPDecomposition#p returns the third element of to_a
+fails:Matrix::LUPDecomposition#p returns a permutation matrix

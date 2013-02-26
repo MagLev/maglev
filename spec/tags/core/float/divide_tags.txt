@@ -1,1 +1,2 @@
 fails:Float#/ properly coerces objects
+fails:Float#/ properly handles BigDecimal argument

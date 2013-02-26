@@ -1,0 +1,2 @@
+fails:Matrix#== returns false for different empty matrices
+fails:Matrix#== returns true if some elements are == but not eql?

@@ -1,1 +1,2 @@
 fails:Matrix#det raises an error for rectangular matrices
+fails:Matrix#det returns the determinant of a square Matrix

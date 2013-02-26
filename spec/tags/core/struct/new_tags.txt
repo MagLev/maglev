@@ -1,1 +1,4 @@
 fails:Struct.new raises a TypeError if object is not a Symbol
+fails:Struct.new processes passed block with instance_eval
+fails:Struct.new creates reader methods
+fails:Struct.new creates writer methods

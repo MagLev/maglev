@@ -1,0 +1,2 @@
+fails:File.chown raises an error for a non existent path
+fails:File.chown accepts an object that has a #to_path method

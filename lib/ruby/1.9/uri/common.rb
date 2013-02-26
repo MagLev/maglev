@@ -519,7 +519,7 @@ module URI
   def self.join(*str)
     u = str[0]
     unless u._is_a?(URI) 
-      u = Type.coerce_to(u, String, :to_str)
+      u = Maglev::Type.coerce_to(u, String, :to_str)
       u = self.parse(u)
     end
     str[1 .. -1].each do |x|
@@ -624,7 +624,7 @@ module Kernel
     if uri_str._is_a?(ucls)
       return uri_str
     end
-    uri_str = Type.coerce_to(uri_str, String, :to_str)
+    uri_str = Maglev::Type.coerce_to(uri_str, String, :to_str)
     ucls.parse(uri_str)
   end
   module_function :URI

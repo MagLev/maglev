@@ -1,0 +1,2 @@
+fails:URI::FTP#path= does not require a leading /
+fails:URI::FTP#path= does not strip the leading /

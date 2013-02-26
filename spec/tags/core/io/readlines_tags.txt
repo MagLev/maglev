@@ -14,3 +14,21 @@ fails:IO#readlines when passed a separator does not change $_
 fails:IO#readlines when passed a separator tries to convert the passed separator to a String using #to_str
 fails:IO#readlines when passed a string that starts with a | gets data from the standard out of the subprocess
 fails:IO#readlines when passed a string that starts with a | gets data from a fork when passed -
+fails:IO.readlines when passed name calls #to_path to convert the name
+fails:IO.readlines when passed name, object when the object is a Fixnum defaults to $/ as the separator
+fails:IO.readlines when passed name, object when the object is a Fixnum uses the object as a limit if it is a Fixnum
+fails:IO.readlines when passed name, object, object when the first object is a Fixnum uses the second object as an options Hash
+fails:IO.readlines when passed name, object, object when the first object is a Fixnum calls #to_hash to convert the second object to a Hash
+fails:IO.readlines when passed name, object, object when the first object is a String uses the second object as a limit if it is a Fixnum
+fails:IO.readlines when passed name, object, object when the first object is a String calls #to_int to convert the second object
+fails:IO.readlines when passed name, object, object when the first object is a String uses the second object as an options Hash
+fails:IO.readlines when passed name, object, object when the first object is a String calls #to_hash to convert the second object to a Hash
+fails:IO.readlines when passed name, object, object when the first object is not a String or Fixnum calls #to_str to convert the object to a String
+fails:IO.readlines when passed name, object, object when the first object is not a String or Fixnum uses the second object as a limit if it is a Fixnum
+fails:IO.readlines when passed name, object, object when the first object is not a String or Fixnum calls #to_int to convert the second object
+fails:IO.readlines when passed name, object, object when the first object is not a String or Fixnum uses the second object as an options Hash
+fails:IO.readlines when passed name, object, object when the first object is not a String or Fixnum calls #to_hash to convert the second object to a Hash
+fails:IO.readlines when passed name, separator, limit, options calls #to_path to convert the name object
+fails:IO.readlines when passed name, separator, limit, options calls #to_str to convert the separator object
+fails:IO.readlines when passed name, separator, limit, options calls #to_int to convert the limit argument
+fails:IO.readlines when passed name, separator, limit, options calls #to_hash to convert the options object

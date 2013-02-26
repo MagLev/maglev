@@ -1,1 +1,7 @@
 fails:String#replace replaces the taint status of self with that of other
+fails:String#replace raises a RuntimeError on a frozen instance that is modified
+fails:String#replace raises a RuntimeError on a frozen instance that would not be modified
+fails:String#replace taints self if other is tainted
+fails:String#replace untrusts self if other is untrusted
+fails:String#replace does not trust self if other is trusted
+fails:String#replace raises a RuntimeError on a frozen instance when self-replacing

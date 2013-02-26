@@ -1,0 +1,2 @@
+fails:Kernel#taint raises RuntimeError on an untainted, frozen object
+fails:Kernel#taint does not raise an error on a tainted, frozen object

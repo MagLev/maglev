@@ -50,7 +50,7 @@ module SecureRandom
   def self.random_bytes(n=nil)
     if n
       unless n._isFixnum
-        n = Type.coerce_to(n, Fixnum, :to_int)
+        n = Maglev::Type.coerce_to(n, Fixnum, :to_int)
       end
       if n < 0
         raise ArgumentError , 'SecureRandom.random, n must be >= 0'
@@ -124,17 +124,20 @@ module SecureRandom
   # SecureRandom.random_number returns an float:
   # 0.0 <= SecureRandom.random_number() < 1.0.
   def self.random_number(n=0)
+    unless n._isFixnum
+      raise ArgumentError, "comparison of Fixnum with #{n.class} failed"
+    end
     if 0 < n
       hex = n.to_s(16)
       hex = '0' + hex if (hex.length & 1) == 1
       bin = [hex].pack("H*")
-      mask = bin[0]
+      mask = bin[0].ord
       mask |= mask >> 1
       mask |= mask >> 2
       mask |= mask >> 4
       begin
         rnd = SecureRandom.random_bytes(bin.length)
-        rnd[0] = (rnd[0] & mask).chr
+        rnd[0] = (rnd[0].ord & mask).chr
       end until rnd < bin
       rnd.unpack("H*")[0].hex
     else

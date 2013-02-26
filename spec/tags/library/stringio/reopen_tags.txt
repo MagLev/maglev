@@ -1,3 +1,4 @@
 fails:StringIO#reopen when passed [Object, Object] reopens self with the passed Object in the passed mode
 fails:StringIO#reopen when passed [Object] taints self when the passed Object was tainted
 fails:StringIO#reopen taints self if the provided StringIO argument is tainted
+fails:StringIO#reopen when passed [Object, Integer] raises a RuntimeError when trying to reopen self with a frozen String in truncate-mode

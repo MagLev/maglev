@@ -72,13 +72,13 @@ module Process
 
     # Returns the logical AND of the bits in stat with +fixnum+.
     def &(fixnum)
-      arg = Type.coerce_to(fixnum, Fixnum, :to_int)
+      arg = Maglev::Type.coerce_to(fixnum, Fixnum, :to_int)
       @_st_stat & arg
     end
 
     # Shift the bits in receiver right +fixnum+ places.
     def >>(fixnum)
-      arg = Type.coerce_to(fixnum, Fixnum, :to_int)
+      arg = Maglev::Type.coerce_to(fixnum, Fixnum, :to_int)
       @_st_stat >> arg
     end
 

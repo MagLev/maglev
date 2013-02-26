@@ -1,1 +1,2 @@
 fails:Struct#each returns an Enumerator if not passed a block
+fails:Struct#each returns self if passed a block

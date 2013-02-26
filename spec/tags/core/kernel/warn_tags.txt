@@ -1,1 +1,1 @@
-fails:Kernel.warn calls #write on $stderr if $VERBOSE is false
+fails:Kernel.warn is a private method
