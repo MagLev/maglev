@@ -79,7 +79,6 @@ static VALUE
 ossl_spki_to_der(VALUE self)
 {
     NETSCAPE_SPKI *spki;
-    VALUE str;
     long len;
     unsigned char *p;
 
@@ -91,7 +90,9 @@ ossl_spki_to_der(VALUE self)
     if (i2d_NETSCAPE_SPKI(spki, &p) <= 0)
         ossl_raise(eX509CertError, NULL);
 
-    return rb_str_new(p, strlen(p));
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 static VALUE

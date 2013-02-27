@@ -205,12 +205,13 @@ ossl_digest_finish(int argc, VALUE *argv, VALUE self)
     EVP_DigestFinal_ex(ctx, result, NULL);
 
     if (NIL_P(str)) {
-	return rb_str_new(result, len);
+	str = rb_str_new2((char*)result);
     } else {
 	rb_str_resize(str, len);
-	rb_str_update(str, 0, len, rb_str_new2(result));
-	return str;
+	rb_str_update(str, 0, len, rb_str_new2((char*)result));
     }
+    xfree(result);
+    return str;
 }
 
 /*

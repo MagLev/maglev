@@ -89,7 +89,8 @@ ossl_##name##_ary2sk(VALUE ary)					\
     int status = 0;						\
     								\
     sk = ossl_protect_##name##_ary2sk(ary, &status);		\
-    if (status) rb_jump_tag(status);				\
+    /* if (status) rb_jump_tag(status); */			\
+    if (status) rb_notimplement();				\
 								\
     return sk;							\
 }
@@ -142,7 +143,10 @@ ossl_buf2str(char *buf, int len)
 	rb_str_update(str, 0, len, rb_str_new2(buf));
     }
     OPENSSL_free(buf);
-    if(status) rb_jump_tag(status);
+    if(status) {
+	/* rb_jump_tag(status); */
+	rb_notimplement();
+    }
 
     return str;
 }
@@ -156,7 +160,7 @@ ossl_pem_passwd_cb0(VALUE flag)
     VALUE pass;
 
     pass = rb_yield(flag);
-    SafeStringValue(pass);
+    StringValue(pass);
 
     return pass;
 }

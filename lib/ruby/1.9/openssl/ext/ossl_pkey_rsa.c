@@ -298,7 +298,9 @@ ossl_rsa_to_der(VALUE self)
     if(i2d_func(pkey->pkey.rsa, &p) < 0)
 	ossl_raise(eRSAError, NULL);
 
-    return rb_str_new2(p);
+    str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 #define ossl_rsa_buf_size(pkey) (RSA_size((pkey)->pkey.rsa)+16)

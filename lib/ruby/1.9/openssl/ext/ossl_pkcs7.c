@@ -217,7 +217,8 @@ ossl_pkcs7_s_sign(int argc, VALUE *argv, VALUE klass)
 	x509s = ossl_protect_x509_ary2sk(certs, &status);
 	if(status){
 	    BIO_free(in);
-	    rb_jump_tag(status);
+	    /* rb_jump_tag(status); */
+	    rb_notimplement();
 	}
     }
     if(!(pkcs7 = PKCS7_sign(x509, pkey, x509s, in, flg))){
@@ -270,7 +271,8 @@ ossl_pkcs7_s_encrypt(int argc, VALUE *argv, VALUE klass)
     x509s = ossl_protect_x509_ary2sk(certs, &status);
     if(status){
 	BIO_free(in);
-	rb_jump_tag(status);
+	/* rb_jump_tag(status); */
+	rb_notimplement();
     }
     if(!(p7 = PKCS7_encrypt(x509s, in, (EVP_CIPHER*)ciph, flg))){
 	BIO_free(in);
@@ -706,7 +708,8 @@ ossl_pkcs7_verify(int argc, VALUE *argv, VALUE self)
 	x509s = ossl_protect_x509_ary2sk(certs, &status);
 	if(status){
 	    BIO_free(in);
-	    rb_jump_tag(status);
+	    /* rb_jump_tag(status); */
+	    rb_notimplement();
 	}
     }
     x509st = GetX509StorePtr(store);
@@ -794,7 +797,6 @@ static VALUE
 ossl_pkcs7_to_der(VALUE self)
 {
     PKCS7 *pkcs7;
-    VALUE str;
     long len;
     unsigned char *p;
 
@@ -806,7 +808,9 @@ ossl_pkcs7_to_der(VALUE self)
     if(i2d_PKCS7(pkcs7, &p) <= 0)
 	ossl_raise(ePKCS7Error, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 static VALUE

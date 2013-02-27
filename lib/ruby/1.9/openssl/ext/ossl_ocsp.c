@@ -259,7 +259,6 @@ static VALUE
 ossl_ocspreq_to_der(VALUE self)
 {
     OCSP_REQUEST *req;
-    VALUE str;
     unsigned char *p;
     long len;
 
@@ -270,7 +269,9 @@ ossl_ocspreq_to_der(VALUE self)
     if(i2d_OCSP_REQUEST(req, &p) <= 0)
 	ossl_raise(eOCSPError, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*
@@ -371,7 +372,6 @@ static VALUE
 ossl_ocspres_to_der(VALUE self)
 {
     OCSP_RESPONSE *res;
-    VALUE str;
     long len;
     unsigned char *p;
 
@@ -384,7 +384,9 @@ ossl_ocspres_to_der(VALUE self)
        ossl_raise(eOCSPError, NULL);
     }
     
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*
@@ -508,7 +510,10 @@ ossl_ocspbres_add_status(VALUE self, VALUE cid, VALUE status,
     ASN1_TIME_free(nxt);
     ASN1_TIME_free(rev);
     if(error) ossl_raise(eOCSPError, NULL);
-    if(rstatus) rb_jump_tag(rstatus);
+    if(rstatus) {
+	/* rb_jump_tag(rstatus); */
+	rb_notimplement();
+    }
 
     return self;
 }

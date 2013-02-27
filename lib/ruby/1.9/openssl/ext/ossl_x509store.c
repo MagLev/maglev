@@ -212,7 +212,7 @@ ossl_x509store_add_file(VALUE self, VALUE file)
     char *path = NULL;
 
     if(file != Qnil){
-        SafeStringValue(file);
+        StringValue(file);
 	path = RSTRING_PTR(file);
     }
     GetX509Store(self, store);
@@ -233,7 +233,7 @@ ossl_x509store_add_path(VALUE self, VALUE dir)
     char *path = NULL;
 
     if(dir != Qnil){
-        SafeStringValue(dir);
+        StringValue(dir);
 	path = RSTRING_PTR(dir);
     }
     GetX509Store(self, store);

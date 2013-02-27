@@ -1139,8 +1139,10 @@ ossl_start_ssl(VALUE self, int (*func)(), const char *funcname, int nonblock)
 	ret = func(ssl);
 
         cb_state = rb_ivar_get(self, ID_callback_state);
-        if (!NIL_P(cb_state))
-            rb_jump_tag(NUM2INT(cb_state));
+        if (!NIL_P(cb_state)) {
+            /* rb_jump_tag(NUM2INT(cb_state)); */
+	    rb_notimplement();
+	}
 
 	if (ret > 0)
 	    break;
@@ -1257,7 +1259,7 @@ ossl_ssl_read_internal(int argc, VALUE *argv, VALUE self, int nonblock)
     if(NIL_P(str)) str = rb_str_new(0, ilen);
     else{
         StringValue(str);
-        rb_str_modify(str);
+        /* rb_str_modify(str); */
         rb_str_resize(str, ilen);
     }
     if(ilen == 0) return str;
@@ -1268,7 +1270,7 @@ ossl_ssl_read_internal(int argc, VALUE *argv, VALUE self, int nonblock)
 
     if (ssl) {
 	if(!nonblock && SSL_pending(ssl) <= 0)
-	    rb_thread_wait_fd(fd);
+	    rb_thread_wait_fd_(fd);
 	for (;;){
 	    buf = (char*)xmalloc(sizeof(char) * RSTRING_LENINT(str));
 	    nread = SSL_read(ssl, buf, RSTRING_LENINT(str));

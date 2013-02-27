@@ -370,11 +370,12 @@ ossl_cipher_update(int argc, VALUE *argv, VALUE self)
     }
 
     if (NIL_P(str)) {
-        str = rb_str_new(cstr, out_len);
+        str = rb_str_new((char*)cstr, out_len);
     } else {
         rb_str_resize(str, out_len);
-	rb_str_update(str, 0, out_len, rb_str_new(cstr, out_len));
+	rb_str_update(str, 0, out_len, rb_str_new((char*)cstr, out_len));
     }
+    xfree(cstr);
 
     return str;
 }
@@ -400,7 +401,9 @@ ossl_cipher_final(VALUE self)
     if (!EVP_CipherFinal_ex(ctx, str, &out_len))
 	ossl_raise(eCipherError, NULL);
 
-    return rb_str_new(str, out_len);
+    VALUE retval = rb_str_new((char*)str, out_len);
+    xfree(str);
+    return retval;
 }
 
 /*

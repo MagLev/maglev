@@ -418,7 +418,6 @@ ossl_x509ext_to_der(VALUE obj)
     X509_EXTENSION *ext;
     unsigned char *p;
     long len;
-    VALUE str;
 
     GetX509Ext(obj, ext);
     if((len = i2d_X509_EXTENSION(ext, NULL)) <= 0)
@@ -427,7 +426,9 @@ ossl_x509ext_to_der(VALUE obj)
     if(i2d_X509_EXTENSION(ext, &p) < 0)
 	ossl_raise(eX509ExtError, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*

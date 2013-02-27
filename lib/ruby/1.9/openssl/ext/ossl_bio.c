@@ -79,7 +79,10 @@ ossl_membio2str(BIO *bio)
 
     ret = ossl_protect_membio2str(bio, &status);
     BIO_free(bio);
-    if(status) rb_jump_tag(status);
+    if(status) {
+	/* rb_jump_tag(status); */
+	rb_notimplement();
+    }
 
     return ret;
 }

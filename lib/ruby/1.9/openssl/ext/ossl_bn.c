@@ -227,7 +227,7 @@ ossl_bn_to_i(VALUE self)
     if (!(txt = BN_bn2dec(bn))) {
 	ossl_raise(eBNError, NULL);
     }
-    num = rb_cstr_to_inum(txt, 10, Qtrue);
+    num = rb_cstr2inum(txt, 10);
     OPENSSL_free(txt);
 
     return num;

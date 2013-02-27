@@ -166,7 +166,10 @@ ossl_pkcs12_initialize(int argc, VALUE *argv, VALUE self)
     ossl_pkcs12_set_key(self, pkey);
     ossl_pkcs12_set_cert(self, cert);
     ossl_pkcs12_set_ca_certs(self, ca);
-    if(st) rb_jump_tag(st);
+    if(st) {
+	/* rb_jump_tag(st); */
+	rb_notimplement();
+    }
 
     return self;
 }
@@ -186,7 +189,9 @@ ossl_pkcs12_to_der(VALUE self)
     if(i2d_PKCS12(p12, &p) <= 0)
 	ossl_raise(ePKCS12Error, NULL);
 
-    return rb_str_new2(p);
+    str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 void

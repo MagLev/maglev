@@ -295,7 +295,6 @@ ossl_dsa_to_der(VALUE self)
     int (*i2d_func)_((DSA*, unsigned char**));
     unsigned char *p;
     long len;
-    VALUE str;
 
     GetPKeyDSA(self, pkey);
     if(DSA_HAS_PRIVATE(pkey->pkey.dsa))
@@ -308,7 +307,9 @@ ossl_dsa_to_der(VALUE self)
     if(i2d_func(pkey->pkey.dsa, &p) < 0)
 	ossl_raise(eDSAError, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*

@@ -64,7 +64,7 @@ ossl_rand_add(VALUE self, VALUE str, VALUE entropy)
 static VALUE
 ossl_rand_load_file(VALUE self, VALUE filename)
 {
-    SafeStringValue(filename);
+    StringValue(filename);
 
     if(!RAND_load_file(RSTRING_PTR(filename), -1)) {
 	ossl_raise(eRandomError, NULL);
@@ -80,7 +80,7 @@ ossl_rand_load_file(VALUE self, VALUE filename)
 static VALUE
 ossl_rand_write_file(VALUE self, VALUE filename)
 {
-    SafeStringValue(filename);
+    StringValue(filename);
     if (RAND_write_file(RSTRING_PTR(filename)) == -1) {
 	ossl_raise(eRandomError, NULL);
     }
@@ -104,7 +104,7 @@ ossl_rand_bytes(VALUE self, VALUE len)
 	ossl_raise(eRandomError, NULL);
     }
 
-    str = rb_str_new(buf, n);
+    str = rb_str_new((char*)buf, n);
     xfree(buf);
     return str;
 }
@@ -126,7 +126,7 @@ ossl_rand_pseudo_bytes(VALUE self, VALUE len)
 	ossl_raise(eRandomError, NULL);
     }
 
-    str = rb_str_new(buf, n);
+    str = rb_str_new((char*)buf, n);
     xfree(buf);
     return str;
 }
@@ -139,7 +139,7 @@ ossl_rand_pseudo_bytes(VALUE self, VALUE len)
 static VALUE
 ossl_rand_egd(VALUE self, VALUE filename)
 {
-    SafeStringValue(filename);
+    StringValue(filename);
 
     if(!RAND_egd(RSTRING_PTR(filename))) {
 	ossl_raise(eRandomError, NULL);
@@ -157,7 +157,7 @@ ossl_rand_egd_bytes(VALUE self, VALUE filename, VALUE len)
 {
     int n = NUM2INT(len);
 
-    SafeStringValue(filename);
+    StringValue(filename);
 
     if (!RAND_egd_bytes(RSTRING_PTR(filename), n)) {
 	ossl_raise(eRandomError, NULL);

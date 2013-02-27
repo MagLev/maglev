@@ -119,7 +119,7 @@ static VALUE ossl_ssl_session_get_time(VALUE self)
 	if (t == 0)
 		return Qnil;
 
-	return rb_funcall(rb_cTime, rb_intern("at"), 1, TIMET2NUM(t));
+	return rb_funcall(rb_cTime, rb_intern("at"), 1, rb_int2inum(t));
 }
 
 /*
@@ -138,7 +138,7 @@ static VALUE ossl_ssl_session_get_timeout(VALUE self)
 
 	t = SSL_SESSION_get_timeout(ctx);
 
-	return TIMET2NUM(t);
+	return rb_int2inum(t);
 }
 
 /*
@@ -213,7 +213,6 @@ static VALUE ossl_ssl_session_to_der(VALUE self)
 	SSL_SESSION *ctx;
 	unsigned char *p;
 	int len;
-	VALUE str;
 
 	GetSSLSession(self, ctx);
 	len = i2d_SSL_SESSION(ctx, NULL);
@@ -224,7 +223,9 @@ static VALUE ossl_ssl_session_to_der(VALUE self)
 	p = (unsigned char *)xmalloc(sizeof(char) * len);
 	i2d_SSL_SESSION(ctx, &p);
 
-	return rb_str_new2(p);
+	VALUE str = rb_str_new2((char*)p);
+	xfree(p);
+	return str;
 }
 
 /*

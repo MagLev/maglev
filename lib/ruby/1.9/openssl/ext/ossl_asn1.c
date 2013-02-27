@@ -350,7 +350,10 @@ decode_int(unsigned char* der, int length)
     ret = rb_protect((VALUE(*)_((VALUE)))asn1integer_to_num,
 		     (VALUE)ai, &status);
     ASN1_INTEGER_free(ai);
-    if(status) rb_jump_tag(status);
+    if(status) {
+	/* rb_jump_tag(status); */
+	rb_notimplement();
+    }
 
     return ret;
 }
@@ -390,7 +393,10 @@ decode_enum(unsigned char* der, int length)
     ret = rb_protect((VALUE(*)_((VALUE)))asn1integer_to_num,
 		     (VALUE)ai, &status);
     ASN1_ENUMERATED_free(ai);
-    if(status) rb_jump_tag(status);
+    if(status) {
+	/* rb_jump_tag(status); */
+	rb_notimplement();
+    }
 
     return ret;
 }
@@ -452,7 +458,10 @@ decode_time(unsigned char* der, int length)
     ret = rb_protect((VALUE(*)_((VALUE)))asn1time_to_time,
 		     (VALUE)time, &status);
     ASN1_TIME_free(time);
-    if(status) rb_jump_tag(status);
+    if(status) {
+	/* rb_jump_tag(status); */
+	rb_notimplement();
+    }
 
     return ret;
 }
@@ -600,7 +609,7 @@ ossl_asn1_default_tag(VALUE obj)
 	if (tag != Qnil) {
        	    return NUM2INT(tag);
       	}
-    	tmp_class = rb_class_superclass(tmp_class);
+    	tmp_class = rb_funcall(tmp_class, rb_intern("superclass"), 0);
     }
     ossl_raise(eASN1Error, "universal tag for %s not found",
 	       rb_class2name(CLASS_OF(obj)));
@@ -739,7 +748,7 @@ join_der(VALUE enumerable)
 static VALUE
 ossl_asn1data_to_der(VALUE self)
 {
-    VALUE value, der, inf_length;
+    VALUE value, inf_length;
     int tag, tag_class, is_cons = 0;
     long length;
     unsigned char *p;
@@ -765,7 +774,9 @@ ossl_asn1data_to_der(VALUE self)
     memcpy(p, RSTRING_PTR(value), RSTRING_LEN(value));
     p += RSTRING_LEN(value);
     
-    return rb_str_new(p, strlen(p));
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 static VALUE
@@ -1239,7 +1250,7 @@ ossl_asn1cons_to_der(VALUE self)
     int found_prim = 0, seq_len;
     long length;
     unsigned char *p;
-    VALUE value, str, inf_length;
+    VALUE value, inf_length;
 
     tn = NUM2INT(ossl_asn1_get_tag(self));
     tc = ossl_asn1_tag_class(self);
@@ -1311,7 +1322,14 @@ ossl_asn1cons_to_der(VALUE self)
 	ASN1_put_eoc(&p);
     }
 
-    return rb_str_new(p, strlen(p));
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
+}
+
+static VALUE _ossl_simple_yield(VALUE i, VALUE cbdata)
+{
+    return rb_yield(i);
 }
 
 /*
@@ -1330,7 +1348,13 @@ ossl_asn1cons_to_der(VALUE self)
 static VALUE
 ossl_asn1cons_each(VALUE self)
 {
-    rb_ary_each(ossl_asn1_get_value(self));
+    // Not supported on MagLev
+    // rb_ary_each(ossl_asn1_get_value(self));
+    if (rb_block_given_p()) {
+	rb_iterate(rb_each, ossl_asn1_get_value(self), _ossl_simple_yield, (VALUE)NULL);
+    } else {
+	rb_funcall(ossl_asn1_get_value(self), rb_intern("each"), 0);
+    }
     return self;
 }
 

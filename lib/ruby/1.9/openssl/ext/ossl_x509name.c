@@ -353,7 +353,6 @@ static VALUE
 ossl_x509name_to_der(VALUE self)
 {
     X509_NAME *name;
-    VALUE str;
     long len;
     unsigned char *p;
 
@@ -365,7 +364,9 @@ ossl_x509name_to_der(VALUE self)
     if(i2d_X509_NAME(name, &p) <= 0)
 	ossl_raise(eX509NameError, NULL);
 
-    return rb_str_new(p, strlen(p));
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*

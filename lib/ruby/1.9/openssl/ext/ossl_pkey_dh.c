@@ -272,7 +272,6 @@ ossl_dh_to_der(VALUE self)
     EVP_PKEY *pkey;
     unsigned char *p;
     long len;
-    VALUE str;
 
     GetPKeyDH(self, pkey);
     if((len = i2d_DHparams(pkey->pkey.dh, NULL)) <= 0)
@@ -282,7 +281,9 @@ ossl_dh_to_der(VALUE self)
     if(i2d_DHparams(pkey->pkey.dh, &p) < 0)
 	ossl_raise(eDHError, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*

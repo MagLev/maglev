@@ -62,7 +62,7 @@ ossl_x509_new_from_file(VALUE filename)
     FILE *fp;
     VALUE obj;
 
-    SafeStringValue(filename);
+    StringValue(filename);
     if (!(fp = fopen(RSTRING_PTR(filename), "r"))) {
 	ossl_raise(eX509CertError, "%s", strerror(errno));
     }
@@ -185,7 +185,6 @@ static VALUE
 ossl_x509_to_der(VALUE self)
 {
     X509 *x509;
-    VALUE str;
     long len;
     unsigned char *p;
 
@@ -197,7 +196,9 @@ ossl_x509_to_der(VALUE self)
     if (i2d_X509(x509, &p) <= 0)
 	ossl_raise(eX509CertError, NULL);
 
-    return rb_str_new(p, strlen(p));
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*

@@ -165,7 +165,6 @@ static VALUE
 ossl_x509req_to_der(VALUE self)
 {
     X509_REQ *req;
-    VALUE str;
     long len;
     unsigned char *p;
 
@@ -176,7 +175,9 @@ ossl_x509req_to_der(VALUE self)
     if (i2d_X509_REQ(req, &p) <= 0)
 	ossl_raise(eX509ReqError, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 static VALUE

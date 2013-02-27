@@ -224,7 +224,8 @@ ossl_x509attr_get_value(VALUE self)
     			i2d_ASN1_TYPE, V_ASN1_SET, V_ASN1_UNIVERSAL, 0);
     	
     }
-    asn1 = rb_funcall(mASN1, rb_intern("decode"), 1, rb_str_new2(p));
+    asn1 = rb_funcall(mASN1, rb_intern("decode"), 1, rb_str_new2((char*)p));
+    xfree(p);
 
     return asn1;
 }
@@ -237,7 +238,6 @@ static VALUE
 ossl_x509attr_to_der(VALUE self)
 {
     X509_ATTRIBUTE *attr;
-    VALUE str;
     int len;
     unsigned char *p;
 
@@ -249,7 +249,9 @@ ossl_x509attr_to_der(VALUE self)
     if(i2d_X509_ATTRIBUTE(attr, &p) <= 0)
 	ossl_raise(eX509AttrError, NULL);
 
-    return rb_str_new2(p);
+    VALUE str = rb_str_new2((char*)p);
+    xfree(p);
+    return str;
 }
 
 /*

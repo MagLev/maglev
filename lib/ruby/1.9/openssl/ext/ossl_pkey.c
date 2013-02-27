@@ -71,7 +71,7 @@ ossl_pkey_new_from_file(VALUE filename)
     FILE *fp;
     EVP_PKEY *pkey;
 
-    SafeStringValue(filename);
+    StringValue(filename);
     if (!(fp = fopen(RSTRING_PTR(filename), "r"))) {
 	ossl_raise(ePKeyError, "%s", strerror(errno));
     }
@@ -236,7 +236,7 @@ ossl_pkey_sign(VALUE self, VALUE digest, VALUE data)
     EVP_PKEY *pkey;
     EVP_MD_CTX ctx;
     unsigned int buf_len;
-    unsigned char* str = (unsigned char*)xmalloc(sizeof(char) * EVP_PKEY_size(pkey)+16);
+    unsigned char* str;
     
     if (rb_funcall(self, id_private_q, 0, NULL) != Qtrue) {
 	   ossl_raise(rb_eArgError, "Private key is needed.");
@@ -246,12 +246,14 @@ ossl_pkey_sign(VALUE self, VALUE digest, VALUE data)
 
     EVP_SignUpdate(&ctx, RSTRING_PTR(data), RSTRING_LEN(data));
     
+    str = (unsigned char*)xmalloc(sizeof(char) * EVP_PKEY_size(pkey)+16);
     if (!EVP_SignFinal(&ctx, str, &buf_len, pkey)) {
 	   ossl_raise(ePKeyError, NULL);
     }
-    assert((long)buf_len <= strlen(str));
     
-    return rb_str_new(str, buf_len);
+    VALUE retval = rb_str_new((char*)str, buf_len);
+    xfree(str);
+    return retval;
 }
 
 /*
