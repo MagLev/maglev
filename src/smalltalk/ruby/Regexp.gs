@@ -145,7 +145,7 @@ unescapeUnicode: aString
   result := aString copyWithRegex: '\\u{[^}]*}' matchesTranslatedUsing: [:useq | |charSeq|
     charSeq := useq copyFrom: 4 to: useq size - 1.
     ((charSeq subStrings: ' ') collect: [:char | self unicodeCharAsString: char]) reduce: [:x :y | x, y]].
-  ^ result copyWithRegex: '\\u[0-9|A-F][0-9|A-F][0-9|A-F][0-9|A-F]' matchesTranslatedUsing: [:useq | |charSeq|
+  ^ result copyWithRegex: '\\u[0-9|a-fA-F][0-9|a-fA-F][0-9|a-fA-F][0-9|a-fA-F]' matchesTranslatedUsing: [:useq | |charSeq|
     charSeq := useq copyFrom: 3 to: 6.
     self unicodeCharAsString: charSeq]
 %
@@ -154,7 +154,7 @@ method:
 unicodeCharAsString: aCharCodeString
   |unicode|
   unicode := Unicode7 new.
-  unicode codePointAt: 1 put: (Integer fromHexString: aCharCodeString).
+  unicode codePointAt: 1 put: (Integer fromHexString: aCharCodeString asUppercase).
   "^ (Utf8 fromString: unicode) asString"
   ^ unicode
 %
