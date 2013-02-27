@@ -242,7 +242,7 @@ module WEBrick
           @raw_header << line
         end
       end
-      @header = HTTPUtils::parse_header(@raw_header.join)
+      @header = HTTPUtils::parse_header(@raw_header)
     end
 
     def parse_uri(str, scheme="http")

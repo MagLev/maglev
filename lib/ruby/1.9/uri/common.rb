@@ -601,6 +601,50 @@ module URI
       /(?=#{Regexp.union(*schemes)}:)#{PATTERN::X_ABS_URI}/xn
     end
   end
+
+  # This method doesn’t convert *, -, ., 0-9, A-Z, _, a-z, 
+  # but does convert SP (ASCII space) to + 
+  # and converts others to %XX
+  def self.encode_www_form_component(str)
+    result = ""
+    str.each_char do |chr|
+      if chr.ord == 32  # Space
+        result << "+"
+      elsif chr[/[\da-zA-Z\*._\-]/].nil?
+        result << "%" << chr.ord.to_s(16).upcase
+      else
+        result << chr
+      end  
+    end
+    result
+  end
+  
+  def self.encode_www_form(enum)
+    ""
+  end
+
+  def self.decode_www_form_component(str, encoding = Encoding::UTF_8)
+    idx = 0
+    result = ""
+    while idx < str.size
+      chr = str[idx]
+      if chr.eql?("+")
+        result << " "
+      elsif chr.eql?("%")
+        result << str[idx+1..idx+2].to_i(16).chr
+        idx += 2
+      else
+        result << chr
+      end
+      idx+=1
+    end
+    result
+  end
+  
+  def self.decode_www_form(str, encoding = Encoding::UTF_8)
+    ""
+  end
+
   
   class Parser
   #Dummy Class that does not provide any useful functionality.
