@@ -132,7 +132,7 @@ VALUE ossl_buf2str(char *buf, int len);
 #define ossl_str_adjust(str, p)				\
     do {						\
 	int len = strlen(p);				\
-	rb_str_set_len((str), len);			\
+	rb_str_resize((str), len);			\
 	rb_str_update((str), 0, len, rb_str_new2(p));	\
     } while(0)
 
