@@ -353,6 +353,7 @@ ossl_cipher_update(int argc, VALUE *argv, VALUE self)
     unsigned char *in;
     int in_len, out_len;
     VALUE data, str;
+    unsigned char* cstr;
 
     rb_scan_args(argc, argv, "11", &data, &str);
 
@@ -361,19 +362,19 @@ ossl_cipher_update(int argc, VALUE *argv, VALUE self)
     if ((in_len = RSTRING_LENINT(data)) == 0)
         ossl_raise(rb_eArgError, "data must not be empty");
     GetCipher(self, ctx);
-    out_len = in_len+EVP_CIPHER_CTX_block_size(ctx);
+    out_len = in_len + EVP_CIPHER_CTX_block_size(ctx);
 
-    if (NIL_P(str)) {
-        str = rb_str_new(0, out_len);
-    } else {
-        StringValue(str);
-        rb_str_resize(str, out_len);
+    cstr = (unsigned char*)xmalloc(sizeof(char) * out_len);
+    if (!EVP_CipherUpdate(ctx, cstr, &out_len, in, in_len)) {
+	ossl_raise(eCipherError, NULL);
     }
 
-    if (!EVP_CipherUpdate(ctx, (unsigned char *)RSTRING_PTR(str), &out_len, in, in_len))
-	ossl_raise(eCipherError, NULL);
-    assert(out_len < RSTRING_LEN(str));
-    rb_str_resize(str, out_len);
+    if (NIL_P(str)) {
+        str = rb_str_new(cstr, out_len);
+    } else {
+        rb_str_resize(str, out_len);
+	rb_str_update(str, 0, out_len, rb_str_new(cstr, out_len));
+    }
 
     return str;
 }
@@ -392,16 +393,14 @@ ossl_cipher_final(VALUE self)
 {
     EVP_CIPHER_CTX *ctx;
     int out_len;
-    VALUE str;
+    unsigned char *str;
 
     GetCipher(self, ctx);
-    str = rb_str_new(0, EVP_CIPHER_CTX_block_size(ctx));
-    if (!EVP_CipherFinal_ex(ctx, (unsigned char *)RSTRING_PTR(str), &out_len))
+    str = (unsigned char*)xmalloc(sizeof(char) * EVP_CIPHER_CTX_block_size(ctx));
+    if (!EVP_CipherFinal_ex(ctx, str, &out_len))
 	ossl_raise(eCipherError, NULL);
-    assert(out_len <= RSTRING_LEN(str));
-    rb_str_resize(str, out_len);
 
-    return str;
+    return rb_str_new(str, out_len);
 }
 
 /*

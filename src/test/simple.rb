@@ -7,6 +7,12 @@ def test(actual, expected, msg)
   register_failure(msg, expected, actual) unless (expected == actual)
 end
 
+def test_not(actual, unexpected, msg)
+  puts "==== Testing: #{msg}"
+  $count += 1
+  register_failure(msg, unexpected, actual) if (unexpected == actual)
+end
+
 def assert_not_nil(obj, msg)
   puts "==== Testing: #{msg}"
   if obj.nil?

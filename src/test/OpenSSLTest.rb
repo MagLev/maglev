@@ -110,6 +110,32 @@ def test_random
   test(random_enough, true, 'OpenSSL::Random.status?')
 end
 
+def test_cipher
+  # encryption
+  encipher = OpenSSL::Cipher.new('aes-256-cbc')
+  encipher.encrypt
+  key = encipher.random_key
+  iv = encipher.random_iv
+
+  cipher_text = ''
+  cipher_text += encipher.update("hello world")
+  cipher_text += encipher.final
+
+  test_not(cipher_text, "hello world", 'OpenSSL::Cipher encipher')
+
+  # decryption
+  decipher = OpenSSL::Cipher.new('aes-256-cbc')
+  decipher.decrypt
+  decipher.key = key
+  decipher.iv = iv
+
+  plain_text = ''
+  plain_text += decipher.update(cipher_text)
+  plain_text += decipher.final
+
+  test(plain_text, "hello world", 'OpenSSL::Cipher decipher')
+end
+
 test_crypto_digest
 test_basic_ruby_use_case
 test_use_md_unspecific_class
@@ -118,5 +144,6 @@ test_openssl_module
 test_all_hmac_impls
 test_random
 test_file
+test_cipher
 
 report
