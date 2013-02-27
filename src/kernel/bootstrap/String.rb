@@ -631,7 +631,7 @@ class String
     i = sep_size
     if sep_size._equal?(1)
       while i < my_size
-        if self.__at(i-1)._equal?(newline)
+        if self.__at(i-1).eql?(newline)
           line = self.__at(last, i-last)
           block.call( line )
           # We don't have a way yet to check if the data was modified...
@@ -662,7 +662,7 @@ class String
     else
       i += 1
       while i < my_size
-        if self.__at(i-1)._equal?(newline) &&
+        if self.__at(i-1).eql?(newline) &&
             (sep_size < 2 || self.__at_equals( i - sep_size + 1, sep))
           line = self.__at(last, i-last)
           # line.taint if tainted?
