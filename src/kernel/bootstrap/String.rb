@@ -649,7 +649,7 @@ class String
           end
           i += 1 while i < my_size && self.__at(i).eql?( ?\n )
         end
-        if i > 0 && self.__at(i-1)._equal?( newline )
+        if i > 0 && self.__at(i-1).eql?( newline )
           line = self.__at(last, i-last)
           # line.taint if tainted?
           block.call( line )
