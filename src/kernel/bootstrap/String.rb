@@ -763,7 +763,7 @@ class String
     if !replacement._equal?(MaglevUndefined)
       __gsub_perform_substitution(regex, replacement)[0]
     elsif block
-      __gsub_perform_block_substititution(regex, &block)
+      __gsub_perform_block_substitution(regex, &block)
     else
       StringGsubEnumerator.new(self, :gsub, regex)
     end
