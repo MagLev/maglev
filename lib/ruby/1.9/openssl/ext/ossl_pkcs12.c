@@ -180,17 +180,17 @@ ossl_pkcs12_to_der(VALUE self)
     PKCS12 *p12;
     VALUE str;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetPKCS12(self, p12);
     if((len = i2d_PKCS12(p12, NULL)) <= 0)
 	ossl_raise(ePKCS12Error, NULL);
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_PKCS12(p12, &p) <= 0)
 	ossl_raise(ePKCS12Error, NULL);
 
-    str = rb_str_new2((char*)p);
-    xfree(p);
+    str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

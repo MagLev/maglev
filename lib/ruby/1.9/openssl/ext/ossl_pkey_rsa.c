@@ -283,7 +283,7 @@ ossl_rsa_to_der(VALUE self)
 {
     EVP_PKEY *pkey;
     int (*i2d_func)_((const RSA*, unsigned char**));
-    unsigned char *p;
+    unsigned char *p, *data;
     long len;
     VALUE str;
 
@@ -294,12 +294,12 @@ ossl_rsa_to_der(VALUE self)
 	i2d_func = (int (*)(const RSA*, unsigned char**))i2d_RSA_PUBKEY;
     if((len = i2d_func(pkey->pkey.rsa, NULL)) <= 0)
 	ossl_raise(eRSAError, NULL);
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_func(pkey->pkey.rsa, &p) < 0)
 	ossl_raise(eRSAError, NULL);
 
-    str = rb_str_new2((char*)p);
-    xfree(p);
+    str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

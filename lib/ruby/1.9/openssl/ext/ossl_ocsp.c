@@ -259,18 +259,18 @@ static VALUE
 ossl_ocspreq_to_der(VALUE self)
 {
     OCSP_REQUEST *req;
-    unsigned char *p;
+    unsigned char *p, *data;
     long len;
 
     GetOCSPReq(self, req);
     if((len = i2d_OCSP_REQUEST(req, NULL)) <= 0)
 	ossl_raise(eOCSPError, NULL);
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_OCSP_REQUEST(req, &p) <= 0)
 	ossl_raise(eOCSPError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 
@@ -373,19 +373,19 @@ ossl_ocspres_to_der(VALUE self)
 {
     OCSP_RESPONSE *res;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetOCSPRes(self, res);
     if((len = i2d_OCSP_RESPONSE(res, NULL)) <= 0){
         ossl_raise(eOCSPError, NULL);
     }
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_OCSP_RESPONSE(res, &p) <= 0){
        ossl_raise(eOCSPError, NULL);
     }
     
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

@@ -293,7 +293,7 @@ ossl_dsa_to_der(VALUE self)
 {
     EVP_PKEY *pkey;
     int (*i2d_func)_((DSA*, unsigned char**));
-    unsigned char *p;
+    unsigned char *p, *data;
     long len;
 
     GetPKeyDSA(self, pkey);
@@ -303,12 +303,12 @@ ossl_dsa_to_der(VALUE self)
 	i2d_func = i2d_DSA_PUBKEY;
     if((len = i2d_func(pkey->pkey.dsa, NULL)) <= 0)
 	ossl_raise(eDSAError, NULL);
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_func(pkey->pkey.dsa, &p) < 0)
 	ossl_raise(eDSAError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

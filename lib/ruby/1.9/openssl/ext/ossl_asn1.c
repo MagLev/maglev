@@ -751,7 +751,7 @@ ossl_asn1data_to_der(VALUE self)
     VALUE value, inf_length;
     int tag, tag_class, is_cons = 0;
     long length;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     value = ossl_asn1_get_value(self);
     if(rb_obj_is_kind_of(value, rb_cArray)){
@@ -769,13 +769,13 @@ ossl_asn1data_to_der(VALUE self)
     if((length = ossl_asn1_object_size(is_cons, RSTRING_LENINT(value), tag)) <= 0)
 	ossl_raise(eASN1Error, NULL);
     
-    p = (unsigned char *)xmalloc(length * sizeof(char));
+    data = p = (unsigned char *)xmalloc(length * sizeof(char));
     ossl_asn1_put_object(&p, is_cons, RSTRING_LENINT(value), tag, tag_class);
     memcpy(p, RSTRING_PTR(value), RSTRING_LEN(value));
     p += RSTRING_LEN(value);
     
     VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    xfree(data);
     return str;
 }
 
@@ -1249,7 +1249,7 @@ ossl_asn1cons_to_der(VALUE self)
     int tag, tn, tc, explicit, constructed = 1;
     int found_prim = 0, seq_len;
     long length;
-    unsigned char *p;
+    unsigned char *p, *data;
     VALUE value, inf_length;
 
     tn = NUM2INT(ossl_asn1_get_tag(self));
@@ -1298,7 +1298,7 @@ ossl_asn1cons_to_der(VALUE self)
     seq_len = ossl_asn1_object_size(constructed, RSTRING_LENINT(value), tag);
     length = ossl_asn1_object_size(constructed, seq_len, tn);
 
-    p = (unsigned char *)xmalloc(sizeof(char) * length);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * length);
     if(tc == V_ASN1_UNIVERSAL)
 	ossl_asn1_put_object(&p, constructed, RSTRING_LENINT(value), tn, tc);
     else{
@@ -1323,7 +1323,7 @@ ossl_asn1cons_to_der(VALUE self)
     }
 
     VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    xfree(data);
     return str;
 }
 

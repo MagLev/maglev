@@ -416,18 +416,18 @@ static VALUE
 ossl_x509ext_to_der(VALUE obj)
 {
     X509_EXTENSION *ext;
-    unsigned char *p;
+    unsigned char *p, *data;
     long len;
 
     GetX509Ext(obj, ext);
     if((len = i2d_X509_EXTENSION(ext, NULL)) <= 0)
 	ossl_raise(eX509ExtError, NULL);
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_X509_EXTENSION(ext, &p) < 0)
 	ossl_raise(eX509ExtError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

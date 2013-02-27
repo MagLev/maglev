@@ -186,18 +186,18 @@ ossl_x509_to_der(VALUE self)
 {
     X509 *x509;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetX509(self, x509);
     if ((len = i2d_X509(x509, NULL)) <= 0)
 	ossl_raise(eX509CertError, NULL);
     
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if (i2d_X509(x509, &p) <= 0)
 	ossl_raise(eX509CertError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

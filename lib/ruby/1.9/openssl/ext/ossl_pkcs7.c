@@ -798,18 +798,18 @@ ossl_pkcs7_to_der(VALUE self)
 {
     PKCS7 *pkcs7;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetPKCS7(self, pkcs7);
     if((len = i2d_PKCS7(pkcs7, NULL)) <= 0)
 	ossl_raise(ePKCS7Error, NULL);
     
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_PKCS7(pkcs7, &p) <= 0)
 	ossl_raise(ePKCS7Error, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

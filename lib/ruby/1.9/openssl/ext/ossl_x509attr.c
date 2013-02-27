@@ -206,26 +206,26 @@ ossl_x509attr_get_value(VALUE self)
     X509_ATTRIBUTE *attr;
     VALUE asn1;
     long length;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetX509Attr(self, attr);
     if(attr->value.ptr == NULL) return Qnil;
     if(OSSL_X509ATTR_IS_SINGLE(attr)){
     	length = i2d_ASN1_TYPE(attr->value.single, NULL);
-    	p = (unsigned char *)xmalloc(sizeof(char) * length);
+    	data = p = (unsigned char *)xmalloc(sizeof(char) * length);
         i2d_ASN1_TYPE(attr->value.single, &p);
     }
     else{
     	length = i2d_ASN1_SET_OF_ASN1_TYPE(attr->value.set,
     			(unsigned char **) NULL, i2d_ASN1_TYPE,
     			V_ASN1_SET, V_ASN1_UNIVERSAL, 0);
-    	p = (unsigned char *)xmalloc(sizeof(char) * length);
+    	data = p = (unsigned char *)xmalloc(sizeof(char) * length);
     	i2d_ASN1_SET_OF_ASN1_TYPE(attr->value.set, &p,
     			i2d_ASN1_TYPE, V_ASN1_SET, V_ASN1_UNIVERSAL, 0);
     	
     }
-    asn1 = rb_funcall(mASN1, rb_intern("decode"), 1, rb_str_new2((char*)p));
-    xfree(p);
+    asn1 = rb_funcall(mASN1, rb_intern("decode"), 1, rb_str_new((char*)data, length));
+    xfree(data);
 
     return asn1;
 }
@@ -239,18 +239,18 @@ ossl_x509attr_to_der(VALUE self)
 {
     X509_ATTRIBUTE *attr;
     int len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetX509Attr(self, attr);
     if((len = i2d_X509_ATTRIBUTE(attr, NULL)) <= 0){
        ossl_raise(eX509AttrError, NULL);
     }
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_X509_ATTRIBUTE(attr, &p) <= 0)
 	ossl_raise(eX509AttrError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

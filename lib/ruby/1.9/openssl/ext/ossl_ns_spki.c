@@ -80,18 +80,18 @@ ossl_spki_to_der(VALUE self)
 {
     NETSCAPE_SPKI *spki;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetSPKI(self, spki);
     if ((len = i2d_NETSCAPE_SPKI(spki, NULL)) <= 0)
         ossl_raise(eX509CertError, NULL);
 
-    p = (unsigned char *)xmalloc(sizeof(char*) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char*) * len);
     if (i2d_NETSCAPE_SPKI(spki, &p) <= 0)
         ossl_raise(eX509CertError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

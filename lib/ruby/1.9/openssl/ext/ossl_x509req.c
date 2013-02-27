@@ -166,17 +166,17 @@ ossl_x509req_to_der(VALUE self)
 {
     X509_REQ *req;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetX509Req(self, req);
     if ((len = i2d_X509_REQ(req, NULL)) <= 0)
 	ossl_raise(eX509ReqError, NULL);
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if (i2d_X509_REQ(req, &p) <= 0)
 	ossl_raise(eX509ReqError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

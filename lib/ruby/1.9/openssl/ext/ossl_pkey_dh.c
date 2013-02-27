@@ -270,19 +270,19 @@ static VALUE
 ossl_dh_to_der(VALUE self)
 {
     EVP_PKEY *pkey;
-    unsigned char *p;
+    unsigned char *p, *data;
     long len;
 
     GetPKeyDH(self, pkey);
     if((len = i2d_DHparams(pkey->pkey.dh, NULL)) <= 0)
 	ossl_raise(eDHError, NULL);
 
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_DHparams(pkey->pkey.dh, &p) < 0)
 	ossl_raise(eDHError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

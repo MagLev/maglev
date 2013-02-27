@@ -354,18 +354,18 @@ ossl_x509name_to_der(VALUE self)
 {
     X509_NAME *name;
     long len;
-    unsigned char *p;
+    unsigned char *p, *data;
 
     GetX509Name(self, name);
     if((len = i2d_X509_NAME(name, NULL)) <= 0)
 	ossl_raise(eX509NameError, NULL);
 
-    p = (unsigned char *)xmalloc(sizeof(char) * len);
+    data = p = (unsigned char *)xmalloc(sizeof(char) * len);
     if(i2d_X509_NAME(name, &p) <= 0)
 	ossl_raise(eX509NameError, NULL);
 
-    VALUE str = rb_str_new2((char*)p);
-    xfree(p);
+    VALUE str = rb_str_new((char*)data, len);
+    xfree(data);
     return str;
 }
 

@@ -211,7 +211,7 @@ static VALUE ossl_ssl_session_get_id(VALUE self)
 static VALUE ossl_ssl_session_to_der(VALUE self)
 {
 	SSL_SESSION *ctx;
-	unsigned char *p;
+	unsigned char *p, *data;
 	int len;
 
 	GetSSLSession(self, ctx);
@@ -220,11 +220,11 @@ static VALUE ossl_ssl_session_to_der(VALUE self)
 		ossl_raise(eSSLSession, "i2d_SSL_SESSION");
 	}
 
-	p = (unsigned char *)xmalloc(sizeof(char) * len);
+	data = p = (unsigned char *)xmalloc(sizeof(char) * len);
 	i2d_SSL_SESSION(ctx, &p);
 
-	VALUE str = rb_str_new2((char*)p);
-	xfree(p);
+	VALUE str = rb_str_new((char*)data, len);
+	xfree(data);
 	return str;
 }
 
