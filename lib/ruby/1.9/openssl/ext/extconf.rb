@@ -42,8 +42,12 @@ if with_config("debug") or enable_config("debug")
 end
 
 message "=== Checking for system dependent stuff... ===\n"
-have_library("nsl", "t_open")
-have_library("socket", "socket")
+unless RbConfig::CONFIG["host_os"] =~ /^darwin/i
+  # Seems not to be required on Darwin, and even breaks the build
+  # sometimes
+  have_library("nsl", "t_open")
+  have_library("socket", "socket")
+end
 have_header("assert.h")
 
 message "=== Checking for required stuff... ===\n"
