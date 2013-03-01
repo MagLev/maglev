@@ -165,11 +165,4 @@ class Class
   # Returns +true+ if instances of receiver are allowed to be
   # persisted. Returns +false+ otherwise.
   primitive_nobridge 'maglev_instances_persistable?', '_instancesPersistent'
-
-  def aaaa
-    puts 123123123
-  end
-  
-  primitive 'set_instances_db_transient', '_setInstancesDbTransient'
-
 end
