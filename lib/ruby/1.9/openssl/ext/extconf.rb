@@ -16,12 +16,33 @@
 
 require "mkmf"
 
-# Manual definitions to so library works with MagLev provided libcrypto
+# Manual definitions to so library works with MagLev provided libssl
 %w[HAVE_HMAC_CTX_COPY HAVE_EVP_CIPHER_CTX_COPY HAVE_BN_RAND_RANGE HAVE_BN_PSEUDO_RAND_RANGE
    HAVE_ENGINE_GET_CIPHER HAVE_ENGINE_GET_DIGEST HAVE_X509V3_EXT_NCONF_NID
    HAVE_X509V3_EXT_NCONF HAVE_PKCS5_PBKDF2_HMAC_SHA1 HAVE_PKCS5_PBKDF2_HMAC
    HAVE_OBJ_NAME_DO_ALL_SORTED HAVE_EVP_CIPHER_CTX_SET_PADDING
-   HAVE_SSL_SET_TLSEXT_HOST_NAME].each { |d| $defs.push "-D#{d}" }
+   HAVE_SSL_SET_TLSEXT_HOST_NAME
+   HAVE_EVP_MD_CTX_CREATE
+   HAVE_EVP_MD_CTX_CLEANUP
+   HAVE_EVP_MD_CTX_DESTROY
+   HAVE_EVP_MD_CTX_INIT
+   HAVE_HMAC_CTX_INIT
+   HAVE_HMAC_CTX_CLEANUP
+   HAVE_EVP_CIPHER_CTX_COPY
+   HAVE_X509_CRL_SET_VERSION
+   HAVE_X509_CRL_SET_ISSUER_NAME
+   HAVE_X509_CRL_SORT
+   HAVE_X509_CRL_ADD0_REVOKED
+   HAVE_BN_MOD_SQR
+   HAVE_BN_MOD_ADD
+   HAVE_BN_MOD_ADD
+   HAVE_BN_MOD_SUB
+   HAVE_BN_RAND_RANGE
+   HAVE_BN_RAND_RANGE
+   HAVE_BN_PSEUDO_RAND_RANGE
+   HAVE_CONF_GET1_DEFAULT_CONFIG_FILE
+   HAVE_PEM_DEF_CALLBACK
+   HAVE_ASN1_PUT_EOC].each { |d| $defs.push "-D#{d}" }
 #
 
 dir_config("openssl")
@@ -42,8 +63,11 @@ if with_config("debug") or enable_config("debug")
 end
 
 message "=== Checking for system dependent stuff... ===\n"
-have_library("nsl", "t_open")
-have_library("socket", "socket")
+
+unless RbConfig::CONFIG["host_os"] =~ /^darwin/i
+  have_library("nsl", "t_open")
+  have_library("socket", "socket")
+end
 have_header("assert.h")
 
 message "=== Checking for required stuff... ===\n"
