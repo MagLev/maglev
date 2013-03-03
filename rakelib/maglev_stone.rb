@@ -154,7 +154,12 @@ class MagLevStone < Stone
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
     input_file("#{ML}/src/smalltalk/ruby/allprims.topaz", false)
+    after_prims
+  end
 
+  def after_prims
+    start unless running?
+    raise "reload_prims first" unless prims_loaded?(@name)
     stonename = ENV["STONENAME"]
     begin
       ENV["STONENAME"] = ""

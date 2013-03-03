@@ -136,7 +136,8 @@ GemStoneInstallation.current.stones.each do |stone_name|
   namespace stone_name do
     stone = MagLevStone.new(stone_name, GemStoneInstallation.current)
 
-    [[:reload_prims, "Reset the ruby context in \"#{stone_name}\" then reload primitives"],
+    [[:after_prims, "Compile shipped C extensions with \"#{stone_name}\""],
+     [:reload_prims, "Reset the ruby context in \"#{stone_name}\" then reload primitives"],
      [:reload_file_tree, "Reload FileTree code in src/packages into \"#{stone_name}\""],
      [:reload_everything, "Reload Smalltalk code in src/smalltalk into \"#{stone_name}\""]
     ].each do |action, desc|
