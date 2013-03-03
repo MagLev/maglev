@@ -367,43 +367,42 @@ function in_place_upgrade {
 	fi
 	return 1
     else
-	return 1
+	if [ $PREBUILT_STONE == 1 ]; then
+	    if [ ! -e "etc/conf.d/maglev.conf" ]; then
+		echo "[Error] No prebuilt maglev stone available"
+		return 1
+	    else
+		echo "[Info] Using prebuilt stone, only compiling stdlib C extensions"
+		bin/maglev start
+		bin/maglev-ruby src/kernel/extensions.rb
+	    fi
+	fi
     fi
 }
 
 function create_stone {
-    if [ $PREBUILT_STONE == 0 ]; then
-	set_rake
+    set_rake
     # create a clean slate
-	if [ -e etc/conf.d/maglev.conf ]; then
-            echo "[Info] In-place upgrade not possible. Removing existing 'maglev' configuration file."
-            $RAKE stone:destroy[maglev] >/dev/null
-	fi
+    if [ -e etc/conf.d/maglev.conf ]; then
+        echo "[Info] In-place upgrade not possible. Removing existing 'maglev' configuration file."
+        $RAKE stone:destroy[maglev] >/dev/null
+    fi
 
-	$RAKE build:clobber
-	extent0='gemstone/bin/extent0.dbf'
-	echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
-	echo "This could take a while..."
-	if [ -e $extent0 ]; then
+    $RAKE build:clobber
+    extent0='gemstone/bin/extent0.dbf'
+    echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
+    echo "This could take a while..."
+    if [ -e $extent0 ]; then
         # NOTE: build:maglev will also create the maglev stone
-            if $RAKE build:maglev ; then
-		return 0
-            else
-		echo "[Error] Could not build new ruby extent. This means there was an error loading the Smalltalk code."
-		return 1
-            fi
-	else
-            echo "[Error] Can't find ${extent0}: Skip building ruby extent. This means your GemStone download is broken."
-            return 1
-	fi
-    else
-	if [ ! -e "etc/conf.d/maglev.conf" ]; then
-	    echo "[Error] No prebuilt maglev stone available"
+        if $RAKE build:maglev ; then
+	    return 0
+        else
+	    echo "[Error] Could not build new ruby extent. This means there was an error loading the Smalltalk code."
 	    return 1
-	else
-	    bin/maglev start
-	    bin/maglev-ruby src/kernel/extensions.rb
-	fi
+        fi
+    else
+        echo "[Error] Can't find ${extent0}: Skip building ruby extent. This means your GemStone download is broken."
+        return 1
     fi
 }
 
