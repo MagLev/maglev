@@ -24,7 +24,17 @@
 #    Verify machine is capable of running MagLev 64-bit
 #    Add shared memory setup to /etc/sysctl.conf
 #    Add GemStone netldi service port to /etc/services
-#    Invoke update.sh to finish the job
+#    Download the GemStone archive into the parent directory
+#    Uncompress the GemStone archive in the parent directory
+#    Update the gemstone link to point to the new GemStone
+#    Backup any existing 'maglev' repository
+#    Attempt an inplace upgrade of an existing repo or using it as a prebuilt stone
+#    If the previous fails, wipe any existing maglev repository
+#    Create a new default repository called 'maglev'
+#    Generate the MagLev HTML documentation
+#    Generate Smalltalk wrappers
+#    Print build version information
+#    Remind user to setup environment variables
 #=========================================================================
 
 # Parse parameters
@@ -63,7 +73,6 @@ do
 	    ;;
     esac
 done
-
 
 function set_maglev_home {
     if [ -x bin/maglev-ruby ]; then
