@@ -1,3 +1,3 @@
-maglev 2.0.0dev (ruby 1.9.3) (2013-02-13 rev 2.0.0dev-30086)
-GEMSTONE: gss64_maglev_branch-30086
-Wed Feb 13 12:27:57 PST 2013
+maglev 2.0.0dev (ruby 1.9.3) (2013-03-06 rev 2.0.0dev-30246)
+GEMSTONE: gss64_maglev_branch-30246
+Wed Mar 6 13:53:57 PST 2013
