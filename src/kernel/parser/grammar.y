@@ -44,6 +44,8 @@
 #include "intloopsup.hf"
 #include "om_inline.hf"
 #include "unicode/ustring.h"
+#include "unicode/umachine.h"
+#include "unicode/utf.h"
 
 #include "rubygrammar.h"
 
@@ -4097,7 +4099,8 @@ static int tokadd_utf8(rb_parse_state *ps, int string_literal, int symbol_litera
         tokcopy(numlen, ps);
       } else if(codepoint >= 0x80) {
         char* dst = (char*)calloc(sizeof(char), 8);
-        u_austrncpy(dst, (const UChar*)&codepoint, 5);
+        int offset_counter = 0;
+        U8_APPEND_UNSAFE(dst, offset_counter, codepoint);
         for (unsigned int i = 0; i < strlen(dst); i++) {
           tokadd(*(dst + i), ps);
         }
@@ -4126,7 +4129,8 @@ static int tokadd_utf8(rb_parse_state *ps, int string_literal, int symbol_litera
     } else if(codepoint >= 0x80) {
       if (string_literal) {
         char* dst = (char*)calloc(sizeof(char), 8);
-        u_austrncpy(dst, (const UChar*)&codepoint, 5);
+        int offset_counter = 0;
+        U8_APPEND_UNSAFE(dst, offset_counter, codepoint);
         for (unsigned int i = 0; i < strlen(dst); i++) {
           tokadd(*(dst + i), ps);
         }
