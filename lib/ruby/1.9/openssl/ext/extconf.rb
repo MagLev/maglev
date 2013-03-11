@@ -122,6 +122,12 @@ end
 message "=== Checking for system dependent stuff... ===\n"
 
 unless RbConfig::CONFIG["host_os"] =~ /^darwin/i
+  # Manual definitions to so library works with MagLev provided libssl
+  %w[HAVE_HMAC_CTX_COPY HAVE_EVP_CIPHER_CTX_COPY
+     HAVE_BN_RAND_RANGE HAVE_BN_PSEUDO_RAND_RANGE].each { |d|
+    $defs.push "-D#{d}"
+  }
+
   # Seems not to be required on Darwin, and even breaks the build
   # sometimes
   have_library("nsl", "t_open")
