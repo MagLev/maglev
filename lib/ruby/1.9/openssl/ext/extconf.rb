@@ -123,8 +123,12 @@ message "=== Checking for system dependent stuff... ===\n"
 
 unless RbConfig::CONFIG["host_os"] =~ /^darwin/i
   # Manual definitions to so library works with MagLev provided libssl
-  %w[HAVE_HMAC_CTX_COPY HAVE_EVP_CIPHER_CTX_COPY
-     HAVE_BN_RAND_RANGE HAVE_BN_PSEUDO_RAND_RANGE].each { |d|
+  %w[HAVE_HMAC_CTX_COPY HAVE_EVP_CIPHER_CTX_COPY HAVE_BN_RAND_RANGE
+     HAVE_BN_PSEUDO_RAND_RANGE HAVE_ENGINE_GET_CIPHER HAVE_ENGINE_GET_DIGEST
+     HAVE_X509V3_EXT_NCONF_NID HAVE_X509V3_EXT_NCONF
+     HAVE_PKCS5_PBKDF2_HMAC_SHA1 HAVE_PKCS5_PBKDF2_HMAC
+     HAVE_OBJ_NAME_DO_ALL_SORTED HAVE_EVP_CIPHER_CTX_SET_PADDING
+     HAVE_SSL_SET_TLSEXT_HOST_NAME ].each { |d|
     $defs.push "-D#{d}"
   }
 
