@@ -314,7 +314,7 @@ Maglev.persistent do
     end
 
     def check_014
-      test(M014.method_defined?(:m014), false, "Maglev.persistable does not persist methods")
+      test(M014.method_defined?(:m014), false, "Maglev.persistable does not cause methods to be persisted")
     end
 
     def test_015
@@ -324,7 +324,8 @@ Maglev.persistent do
     end
 
     def check_015
-      test(M015.method_defined?(:m015), true, "Maglev.persistable(true) does persist methods")
+      test(M015.method_defined?(:m015_1), true, "Maglev.persistable(true) causes methods to be persisted")
+      test(M015.method_defined?(:m015_2), true, "Maglev.persistable(true) causes methods to be persisted, even afterwards.")
     end
 
 
