@@ -50,9 +50,11 @@ module GetOpenSSLHeaders
       file = "openssl-#{version}.tar.gz"
       openssl_url = "ftp://ftp.openssl.org/source/#{file}"
       message " Downloading #{openssl_url}\n"
+      message " Trying wget.\n"
       system "wget --quiet '#{openssl_url}'"
       unless $?.success?
-        system "curl -s -O '#{openssl_url}"
+        message " Trying curl.\n"
+        system "curl -s -O '#{openssl_url}'"
         unless $?.success?
           raise "Must have curl or wget"
         end
