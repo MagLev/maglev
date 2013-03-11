@@ -10,4 +10,5 @@ class M015
     puts "m015_2"
   end
 end
+M015.maglev_persistable(true)
 Maglev.commit_transaction
