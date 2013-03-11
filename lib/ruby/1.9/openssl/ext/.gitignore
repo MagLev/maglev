@@ -3,3 +3,4 @@ mkmf.log
 Makefile
 *.so
 *.o
+openssl-*

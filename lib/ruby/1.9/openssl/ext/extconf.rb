@@ -16,39 +16,94 @@
 
 require "mkmf"
 
-# Manual definitions to so library works with MagLev provided libssl
-%w[HAVE_HMAC_CTX_COPY HAVE_EVP_CIPHER_CTX_COPY HAVE_BN_RAND_RANGE HAVE_BN_PSEUDO_RAND_RANGE
-   HAVE_ENGINE_GET_CIPHER HAVE_ENGINE_GET_DIGEST HAVE_X509V3_EXT_NCONF_NID
-   HAVE_X509V3_EXT_NCONF HAVE_PKCS5_PBKDF2_HMAC_SHA1 HAVE_PKCS5_PBKDF2_HMAC
-   HAVE_OBJ_NAME_DO_ALL_SORTED HAVE_EVP_CIPHER_CTX_SET_PADDING
-   HAVE_SSL_SET_TLSEXT_HOST_NAME
-   HAVE_EVP_MD_CTX_CREATE
-   HAVE_EVP_MD_CTX_CLEANUP
-   HAVE_EVP_MD_CTX_DESTROY
-   HAVE_EVP_MD_CTX_INIT
-   HAVE_HMAC_CTX_INIT
-   HAVE_HMAC_CTX_CLEANUP
-   HAVE_EVP_CIPHER_CTX_COPY
-   HAVE_X509_CRL_SET_VERSION
-   HAVE_X509_CRL_SET_ISSUER_NAME
-   HAVE_X509_CRL_SORT
-   HAVE_X509_CRL_ADD0_REVOKED
-   HAVE_BN_MOD_SQR
-   HAVE_BN_MOD_ADD
-   HAVE_BN_MOD_ADD
-   HAVE_BN_MOD_SUB
-   HAVE_BN_RAND_RANGE
-   HAVE_BN_RAND_RANGE
-   HAVE_BN_PSEUDO_RAND_RANGE
-   HAVE_CONF_GET1_DEFAULT_CONFIG_FILE
-   HAVE_PEM_DEF_CALLBACK
-   HAVE_ASN1_PUT_EOC].each { |d| $defs.push "-D#{d}" }
-#
+module GetOpenSSLHeaders
+  class LibSsl
+    extend FFI::Library
+    ffi_lib Maglev::System.gs_lib_name(:SSL)
+    attach_function( :SSLeay_version, [:int], :string )
+  end
 
-dir_config("openssl")
-dir_config("kerberos")
+  # from openssl/crypto.h
+  # #define SSLEAY_VERSION          0
+
+  # SSLEAY_VERSION
+  # The text variant of the version number and the release date. For example,
+  # "OpenSSL 0.9.5a 1 Apr 2000".
+
+  SSLEAY_VERSION = 0
+  SSLEAY_VERSION_REGEX = /^(\w+) ((\d+)\.(\d+)\.(\d+)(.?)) (.+)$/
+
+  extend self
+
+  def parse_version_string(version_string)
+    # name, version_id, major, minor, patch, status, timestamp
+    version_id = version_string.match(SSLEAY_VERSION_REGEX)[2]
+    version_id
+  end
+
+  def version
+    parse_version_string(LibSsl.SSLeay_version(SSLEAY_VERSION))
+  end
+
+  def get_headers(version)
+    unless File.directory?("openssl-#{version}")
+      file = "openssl-#{version}.tar.gz"
+      openssl_url = "ftp://ftp.openssl.org/source/#{file}"
+      message " Downloading #{openssl_url}\n"
+      system "wget --quiet '#{openssl_url}'"
+      unless $?.success?
+        system "curl -s -O '#{openssl_url}"
+        unless $?.success?
+          raise "Must have curl or wget"
+        end
+      end
+      system "tar xzf #{file}"
+    end
+  end
+
+  def go!
+    version_id = version
+    get_headers(version_id)
+    @@include_dir = "#{File.dirname(__FILE__)}/openssl-#{version_id}"
+  end
+  def include_dir
+    @@include_dir
+  end
+end
+
+module EnsureMaglevSSLLib
+  extend self
+  def go!
+    # these are defaults.
+    @@library = Maglev::System.gs_lib_name(:SSL)
+    if @@library =~ /\$GEMSTONE\/lib\//
+      @@library.gsub!('$GEMSTONE/lib/', '')
+    end
+    if @@library =~ /^lib/
+      @@library.gsub!(/^lib/, '')
+    end
+    if @@library =~ /\.dylib$/
+      @@library.gsub!(/\.dylib$/, '')
+    end
+
+    have_library( @@library, "SSLeay")
+
+  end
+
+  def library
+    @@library
+  end
+end
 
 message "=== OpenSSL for Ruby configurator ===\n"
+
+message "=== Retrieving OpenSSL headers for MagLev version ===\n"
+GetOpenSSLHeaders::go!
+
+dir_config("openssl", GetOpenSSLHeaders::include_dir)
+dir_config("kerberos")
+
+EnsureMaglevSSLLib::go!
 
 ##
 # Adds -Wall -DOSSL_DEBUG for compilation and some more targets when GCC is used
@@ -96,7 +151,9 @@ unless have_header("openssl/conf_api.h")
   exit 1
 end
 
-%w"rb_str_set_len rb_block_call".each {|func| have_func(func, "ruby.h")}
+# have_func("rb_str_set_len", "ruby.h")
+have_func("rb_block_call", "ruby.h")
+
 
 message "=== Checking for OpenSSL features... ===\n"
 have_func("ERR_peek_last_error")
@@ -168,6 +225,10 @@ have_struct_member("EVP_CIPHER_CTX", "engine", "openssl/evp.h")
 have_struct_member("X509_ATTRIBUTE", "single", "openssl/x509.h")
 
 message "=== Checking done. ===\n"
+
+# don't acutally link against GemStone's libssl, but rather
+# resolve-on-load
+$libs.gsub!("-l#{EnsureMaglevSSLLib::library}","")
 
 create_header
 create_makefile("openssl")

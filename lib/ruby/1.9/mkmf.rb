@@ -213,7 +213,14 @@ module Logging
     # MagLev currently does not allow re-opening stdout / stderr
     # $stderr.reopen(@log)
     # $stdout.reopen(@log)
-    yield
+    res = yield
+    case res
+    when String
+      @log << res
+      $?.success?
+    else
+      res
+    end
   ensure
     # $stderr.reopen(@orgerr)
     # $stdout.reopen(@orgout)
@@ -264,20 +271,17 @@ def xsystem command
     nil while command.gsub!(varpat) {vars[$1||$2]}
   end
   Logging::open do
-    puts command.quote
-    system(command)
+    `#{command}`
   end
 end
 
 def xpopen command, *mode, &block
   Logging::open do
-    case mode[0]
-    when nil, /^r/
-      puts "#{command} |"
-    else
-      puts "| #{command}"
+    IO.popen(command, *mode) do | io |
+      res = block.call(io)
+      io.read
+      return res
     end
-    IO.popen(command, *mode, &block)
   end
 end
 
@@ -490,22 +494,18 @@ end
 
 def egrep_cpp(pat, src, opt = "", &b)
   src = create_tmpsrc(src, &b)
-  xpopen(cpp_command('', opt)) do |f|
+  xpopen(cpp_command('', opt)) do |io|
     if Regexp === pat
-      puts("    ruby -ne 'print if #{pat.inspect}'")
-      f.grep(pat) {|l|
-        puts "#{f.lineno}: #{l}"
-        return true
-      }
-      false
+      res = io.read
+      !!(res =~ pat)
     else
       puts("    egrep '#{pat}'")
       begin
-        stdin = $stdin.dup
-        $stdin.reopen(f)
+        # stdin = $stdin.dup
+        # $stdin.reopen(f)
         system("egrep", pat)
       ensure
-        $stdin.reopen(stdin)
+        # $stdin.reopen(stdin)
       end
     end
   end
@@ -708,6 +708,9 @@ end
 #
 def have_func(func, headers = nil, &b)
   checking_for checking_message("#{func}()", headers) do
+    if headers
+      headers = cpp_include(headers)
+    end
     if egrep_cpp(/.*#{func}.*/, <<"SRC")
 #{COMMON_HEADERS}
 #{headers}
@@ -1802,11 +1805,13 @@ $ruby = arg_config("--ruby", File.join(Config::CONFIG["bindir"], CONFIG["ruby_in
 split = Shellwords.method(:shellwords).to_proc
 
 EXPORT_PREFIX = config_string('EXPORT_PREFIX') {|s| s.strip}
-
-hdr = []
+hdr = ['#include "ruby.h"' "\n"]
 config_string('COMMON_MACROS') do |s|
   Shellwords.shellwords(s).each do |w|
-    hdr << "#define " + w.split(/=/, 2).join(" ")
+    w, v = w.split(/=/, 2)
+    hdr << "#ifndef #{w}"
+    hdr << "#define #{[w, v].compact.join(" ")}"
+    hdr << "#endif /* #{w} */"
   end
 end
 config_string('COMMON_HEADERS') do |s|
