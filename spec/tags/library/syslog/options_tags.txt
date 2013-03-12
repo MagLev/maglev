@@ -1,0 +1,3 @@
+fails:Syslog.options returns the logging options
+fails:Syslog.options defaults to LOG_PID | LOG_CONS
+fails:Syslog.options resets after each open call

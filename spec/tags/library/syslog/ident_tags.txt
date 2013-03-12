@@ -1,0 +1,2 @@
+fails:Syslog.ident returns the logging identity
+fails:Syslog.ident defaults to $0

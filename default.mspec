@@ -43,9 +43,7 @@ class MSpecScript
 
   lib_files = ['spec/rubyspec/library',
                "^spec/rubyspec/library/erb/new_spec.rb",
-               "^spec/rubyspec/library/prime",
-               "^spec/rubyspec/library/scanf",
-               "^spec/rubyspec/library/syslog",
+               "^spec/rubyspec/library/syslog/mask_spec.rb",
                "^spec/rubyspec/library/zlib/inflate/append_spec.rb",
                "^spec/rubyspec/library/zlib/inflate/inflate_spec.rb"]
 

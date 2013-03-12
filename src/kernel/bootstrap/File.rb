@@ -769,6 +769,7 @@ class File
     end
     status
   end
+  alias eof eof?
 
   def getc
     raise IOError, 'getc: closed stream' unless __is_open
