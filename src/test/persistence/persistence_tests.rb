@@ -307,6 +307,28 @@ Maglev.persistent do
       # Nothing to check
     end
 
+    def test_014
+      Maglev.transient do
+        require 't014.rb'
+      end
+    end
+
+    def check_014
+      test(M014.method_defined?(:m014), false, "Maglev.persistable does not cause methods to be persisted")
+    end
+
+    def test_015
+      Maglev.transient do
+        require 't015.rb'
+      end
+    end
+
+    def check_015
+      test(M015.method_defined?(:m015_1), true, "Maglev.persistable(true) causes methods to be persisted")
+      test(M015.method_defined?(:m015_2), true, "Maglev.persistable(true) causes methods to be persisted, even afterwards.")
+    end
+
+
     ########################################
     # Test Framework Methods
     ########################################
