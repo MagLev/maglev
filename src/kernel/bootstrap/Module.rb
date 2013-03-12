@@ -417,11 +417,12 @@ class Module
   # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
-  def maglev_persistable
-    self.__set_persistable
+  def maglev_persistable(methodsPersistable = false)
+    methodsPersistable = (methodsPersistable == true)
+    self.__set_persistable(methodsPersistable)
   end
 
-  primitive_nobridge '__set_persistable', '_setPersistable'
+  primitive_nobridge '__set_persistable', '_setPersistable:'
 
   # Redefine a class and migrate it's instances. Will abort or commit
   # the current transaction.
