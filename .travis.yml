@@ -1,8 +1,4 @@
-# Java, because those are the 64bit boxes. We'll change it once Ruby
-# boxes are 64bit, too
-language: java
-before_install:
-  - "sudo apt-get install -qq rake"
+language: ruby
 before_script:
   - "./install.sh"
 script: "rake travis"
