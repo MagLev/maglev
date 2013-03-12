@@ -1,0 +1,4 @@
+fails:C-API exception constant rb_eMathDomainError references the Math::DomainError class
+fails:C-API exception constant rb_eEncCompatError references the Encoding::CompatibilityError
+fails:C-API exception constant rb_mWaitReadable references the IO::WaitReadable module
+fails:C-API exception constant rb_mWaitWritable references the IO::WaitWritable module

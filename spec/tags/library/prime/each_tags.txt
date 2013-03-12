@@ -1,0 +1,2 @@
+fails:Prime.each accepts a pseudo-prime generator as the second argument
+fails:Prime#each with Prime.instance accepts a pseudo-prime generator as the second argument

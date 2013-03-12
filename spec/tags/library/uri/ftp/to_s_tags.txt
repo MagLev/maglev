@@ -1,1 +1,0 @@
-fails:URI::FTP#to_s escapes the leading /

@@ -1,0 +1,6 @@
+fails:Syslog.mask returns the log priority mask
+fails:Syslog.mask defaults to 255
+fails:Syslog.mask persists if the log is reopened
+fails:Syslog.mask= sets the log priority mask
+fails:Syslog.mask= persists if the log is reopened
+fails:Syslog.mask= only accepts numbers
