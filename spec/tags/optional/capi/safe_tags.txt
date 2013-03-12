@@ -1,0 +1,1 @@
+fails:CApiSafeSpecs throws an error when rb_secure is called with argument >= SAFE

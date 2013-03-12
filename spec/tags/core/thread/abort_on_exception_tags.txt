@@ -1,1 +1,3 @@
 fails:causes the main thread to raise that exception
+fails:Thread#abort_on_exception=
+fails:Thread.abort_on_exception=

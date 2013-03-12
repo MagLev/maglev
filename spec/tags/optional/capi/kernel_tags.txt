@@ -1,0 +1,23 @@
+fails:C-API Kernel function rb_block_call calls the block with a single argument
+fails:C-API Kernel function rb_block_call calls the block with multiple arguments in argc / argv
+fails:C-API Kernel function rb_block_call calls the method with no function callback and no block
+fails:C-API Kernel function rb_block_call calls the method with no function callback and a block
+fails:C-API Kernel function rb_throw sets the return value of the catch block to the specified value
+fails:C-API Kernel function rb_throw terminates the function at the point it was called
+fails:C-API Kernel function rb_throw raises an ArgumentError if there is no catch block for the symbol
+fails:C-API Kernel function rb_throw_obj sets the return value of the catch block to the specified value
+fails:C-API Kernel function rb_throw_obj terminates the function at the point it was called
+fails:C-API Kernel function rb_throw_obj raises an ArgumentError if there is no catch block for the symbol
+fails:C-API Kernel function rb_sys_fail can take a NULL message
+fails:C-API Kernel function rb_syserr_fail raises an exception from the given error
+fails:C-API Kernel function rb_syserr_fail can take a NULL message
+fails:C-API Kernel function rb_rescue raises an exception if passed function raises an exception other than StandardError
+fails:C-API Kernel function rb_rescue2 only rescues if one of the passed exceptions is raised
+fails:C-API Kernel function rb_catch
+fails:C-API Kernel function rb_ensure raises the same exception raised inside passed function
+fails:C-API Kernel function rb_f_sprintf returns a string according to format and arguments
+fails:C-API Kernel function rb_make_backtrace
+fails:C-API Kernel function rb_obj_method
+fails:C-API Kernel function rb_rescue makes $! available only during 'raise function' execution
+fails:C-API Kernel function rb_exec_recursive
+fails:C-API Kernel function rb_set_end_proc

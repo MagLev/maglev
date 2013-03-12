@@ -43,20 +43,54 @@ class MSpecScript
 
   lib_files = ['spec/rubyspec/library',
                "^spec/rubyspec/library/erb/new_spec.rb",
-               "^spec/rubyspec/library/uri/parser",
-               "^spec/rubyspec/library/prime",
-               "^spec/rubyspec/library/scanf",
-               "^spec/rubyspec/library/syslog",
+               "^spec/rubyspec/library/syslog/mask_spec.rb",
                "^spec/rubyspec/library/zlib/inflate/append_spec.rb",
                "^spec/rubyspec/library/zlib/inflate/inflate_spec.rb"]
 
+  cmdline_files = ['spec/rubyspec/command_line',
+                   '^spec/rubyspec/dash_a_spec.rb']
+
+  ffi_files = ["spec/rubyspec/optional/ffi",
+               "^spec/rubyspec/optional/ffi/async_callback_spec.rb",
+               "^spec/rubyspec/optional/ffi/bool_spec.rb",
+               "^spec/rubyspec/optional/ffi/callback_spec.rb",
+               "^spec/rubyspec/optional/ffi/custom_type_spec.rb",
+               "^spec/rubyspec/optional/ffi/enum_spec.rb",
+               "^spec/rubyspec/optional/ffi/errno_spec.rb",
+               "^spec/rubyspec/optional/ffi/ffi_spec.rb",
+               "^spec/rubyspec/optional/ffi/function_spec.rb",
+               "^spec/rubyspec/optional/ffi/managed_struct_spec.rb",
+               "^spec/rubyspec/optional/ffi/number_spec.rb",
+               "^spec/rubyspec/optional/ffi/pointer_spec.rb",
+               "^spec/rubyspec/optional/ffi/rbx/",
+               "^spec/rubyspec/optional/ffi/string_spec.rb",
+               "^spec/rubyspec/optional/ffi/strptr_spec.rb",
+               "^spec/rubyspec/optional/ffi/struct_initialize_spec.rb",
+               "^spec/rubyspec/optional/ffi/struct_spec.rb",
+               "^spec/rubyspec/optional/ffi/union_spec.rb",
+               "^spec/rubyspec/optional/ffi/variadic_spec.rb"]
+
+  capi_files = ["spec/rubyspec/optional/capi",
+                "^spec/rubyspec/optional/capi/class_spec.rb",
+                "^spec/rubyspec/optional/capi/data_spec.rb",
+                "^spec/rubyspec/optional/capi/encoding_spec.rb",
+                "^spec/rubyspec/optional/capi/io_spec.rb",
+                "^spec/rubyspec/optional/capi/regexp_spec.rb",
+                "^spec/rubyspec/optional/capi/struct_spec.rb",
+                "^spec/rubyspec/optional/capi/thread_spec.rb"]
 
   # On Orpheus and Grace, these used to fail. Possible add them
   # conditionally based on ENV var
   #
   # "^spec/rubyspec/library/socket"
 
-  set :files, lang_files + core_files + lib_files
+  if ENV["CAPI_SPECS"] == "1"
+      set :files, capi_files
+  elsif ENV["FFI_SPECS"] == "1"
+      set :files, ffi_files
+  else
+      set :files, lang_files + core_files + lib_files + cmdline_files + ffi_files
+  end
 
   MSpec.enable_feature :fiber_library
   MSpec.enable_feature :continuation_library

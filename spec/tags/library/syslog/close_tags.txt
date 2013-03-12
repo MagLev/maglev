@@ -1,0 +1,5 @@
+fails:Syslog.close closes the log
+fails:Syslog.close it does not work inside blocks
+fails:Syslog.close sets the identity to nil
+fails:Syslog.close sets the options to nil
+fails:Syslog.close sets the facility to nil

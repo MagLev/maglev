@@ -10,9 +10,9 @@ class Encoding
 
   class CompatibilityError < EncodingError
   end
-  
+
   def initialize
-    
+
   end
 
   def self.list
@@ -40,19 +40,19 @@ class Encoding
   end
 
   def self.locale_charmap
-    
+
   end
 
   def self.name_list
-    
+
   end
 
   def ascii_compatible?
-    
+
   end
 
   def dummy?
-    
+
   end
 
   def inspect
@@ -62,20 +62,20 @@ class Encoding
   end
 
   def names
-    
+
   end
 
 
   def replicate(name)
-    
+
   end
 
   def to_s
-    
+
   end
 
 end
 
 Encoding::UTF_8 = Encoding.new
 Encoding::ASCII_8BIT = Encoding.new
-Encoding::BINARY = Encoding::ASCII_8BIT
+Encoding::BINARY = Encoding::US_ASCII = Encoding::ASCII_8BIT

@@ -252,6 +252,7 @@ module FFI
 
     def self.__install_native_type(a_type)
       FFI.const_set( a_type.name , a_type )
+      FFI::Type.const_set(a_type.name, a_type)
     end
     def self.__initialize_native_types
       # install various module level constants which are names for primitive types
@@ -261,6 +262,8 @@ module FFI
       __install_native_type( Type.new( :TYPE_UINT16, 2 , :uint16))
       __install_native_type( Type.new( :TYPE_INT32, 4 , :int32))
       __install_native_type( Type.new( :TYPE_UINT32, 4 , :uint32))
+      __install_native_type( Type.new( :LONG, 4 , :int32))
+      __install_native_type( Type.new( :ULONG, 4 , :uint32))
       __install_native_type( Type.new( :TYPE_INT64, 8 , :int64))
       __install_native_type( Type.new( :TYPE_UINT64, 8 , :uint64))
       __install_native_type( Type.new( :TYPE_FLOAT32, 4 , :float))

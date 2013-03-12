@@ -1,0 +1,7 @@
+fails:CApiBignumSpecs rb_big2ulong wraps around if passed a negative bignum
+fails:CApiBignumSpecs RBIGNUM_SIGN returns C true if the Bignum has a positive sign
+fails:CApiBignumSpecs RBIGNUM_SIGN retuns C false if the Bignum has a negative sign
+fails:CApiBignumSpecs RBIGNUM_POSITIVE_P returns C true if the Bignum has a positive sign
+fails:CApiBignumSpecs RBIGNUM_POSITIVE_P retuns C false if the Bignum has a negative sign
+fails:CApiBignumSpecs RBIGNUM_NEGATIVE_P returns C false if the Bignum has a positive sign
+fails:CApiBignumSpecs RBIGNUM_NEGATIVE_P retuns C true if the Bignum has a negative sign

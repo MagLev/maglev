@@ -1,2 +1,3 @@
 fails:Hash#delete raises a TypeError if called on a frozen instance
 fails:Hash#delete raises a RuntimeError if called on a frozen instance
+fails:Hash#delete accepts keys with private #hash method
