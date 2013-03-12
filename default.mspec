@@ -43,7 +43,6 @@ class MSpecScript
 
   lib_files = ['spec/rubyspec/library',
                "^spec/rubyspec/library/erb/new_spec.rb",
-               "^spec/rubyspec/library/uri/parser",
                "^spec/rubyspec/library/prime",
                "^spec/rubyspec/library/scanf",
                "^spec/rubyspec/library/syslog",
