@@ -1,0 +1,3 @@
+fails:CApiRationalSpecs rb_Rational creates a new Rational with numerator and denominator
+fails:CApiRationalSpecs rb_Rational2 creates a new Rational with numerator and denominator
+fails:CApiRationalSpecs rb_Rational1 creates a new Rational with numerator and denominator of 1

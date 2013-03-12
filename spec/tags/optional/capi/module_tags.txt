@@ -1,0 +1,14 @@
+fails:CApiModule rb_define_module_under defines a module for an existing Autoload with an extension
+fails:CApiModule rb_const_get calls #const_missing if the constant is not defined in the class or ancestors
+fails:CApiModule rb_const_get_from calls #const_missing if the constant is not defined in the class or ancestors
+fails:CApiModule rb_const_get_at calls #const_missing if the constant is not defined in the module
+fails:CApiModule rb_alias defines an alias for an existing method
+fails:CApiModule rb_define_global_function defines a method on Object
+fails:CApiModule rb_define_method defines a method on a class
+fails:CApiModule rb_define_method defines a method on a module
+fails:CApiModule rb_define_module_function defines a private instance method
+fails:CApiModule rb_define_private_method defines a private method on a class
+fails:CApiModule rb_define_private_method defines a private method on a module
+fails:CApiModule rb_define_protected_method defines a protected method on a class
+fails:CApiModule rb_define_protected_method defines a protected method on a module
+fails:CApiModule rb_define_singleton_method defines a method on the singleton class

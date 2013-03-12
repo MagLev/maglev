@@ -89,7 +89,7 @@ class MSpecScript
   elsif ENV["FFI_SPECS"] == "1"
       set :files, ffi_files
   else
-      set :files, lang_files + core_files + lib_files + cmdline_files
+      set :files, lang_files + core_files + lib_files + cmdline_files + ffi_files
   end
 
   MSpec.enable_feature :fiber_library
