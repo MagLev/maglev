@@ -84,13 +84,7 @@ class MSpecScript
   #
   # "^spec/rubyspec/library/socket"
 
-  if ENV["CAPI_SPECS"] == "1"
-      set :files, capi_files
-  elsif ENV["FFI_SPECS"] == "1"
-      set :files, ffi_files
-  else
-      set :files, lang_files + core_files + lib_files + cmdline_files + ffi_files
-  end
+  set :files, lang_files + core_files + lib_files + cmdline_files + ffi_files + capi_files
 
   MSpec.enable_feature :fiber_library
   MSpec.enable_feature :continuation_library
