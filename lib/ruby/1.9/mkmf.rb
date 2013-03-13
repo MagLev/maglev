@@ -1687,7 +1687,12 @@ site-install-rb: install-rb
       mfile.print ".SUFFIXES: .", suffixes.uniq.join(" ."), "\n\n"
     end
     mfile.print "$(OBJS): $(RUBY_EXTCONF_H)\n\n" if $extconf_h
-    mfile.print depout
+    case depout
+    when Array
+      mfile.print depout.join
+    else
+      mfile.print depout
+    end
   else
     headers = []
     if RULE_SUBST
