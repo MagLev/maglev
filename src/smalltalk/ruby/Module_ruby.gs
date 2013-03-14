@@ -649,4 +649,8 @@ self _validatePrivilege ifTrue:[
   self _refreshClassCache: false .
 ].
 %
+method:
+_nilReferences
+  ^ (format bitAnd: GC_DB_NIL_REFERENCES_MASK) ~~ 0
+%
 

@@ -4,7 +4,14 @@ class Module
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
   
-  primitive 'maglev_nil_references', '_nilReferences:'
+  primitive_nobridge '__maglev_nil_references', '_nilReferences:'
+
+  def maglev_nil_references(switch=true)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if switch and self.maglev_persistable?
+    __maglev_nil_references(switch)
+  end
+
+  primitive 'maglev_nil_references?', '_nilReferences'
 
   def __isBehavior
     true
@@ -420,6 +427,7 @@ class Module
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
   def maglev_persistable(methodsPersistable = false)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if self.maglev_nil_references?
     methodsPersistable = (methodsPersistable == true)
     self.__set_persistable(methodsPersistable)
   end
