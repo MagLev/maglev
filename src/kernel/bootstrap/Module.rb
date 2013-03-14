@@ -3,6 +3,8 @@ class Module
   # See also delta/Module.rb
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
+  
+  primitive 'maglev_nil_references', '_nilReferences:'
 
   def __isBehavior
     true

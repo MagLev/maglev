@@ -637,4 +637,16 @@ name
   ].
   ^ name
 %
+method:
+_nilReferences: aBool
+
+self _validatePrivilege ifTrue:[
+  aBool ifTrue:[
+    format := format bitOr: GC_DB_NIL_REFERENCES_MASK.
+  ] ifFalse:[
+    format := format bitAnd: (GC_DB_NIL_REFERENCES_MASK bitInvert) 
+  ].
+  self _refreshClassCache: false .
+].
+%
 
