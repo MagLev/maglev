@@ -328,6 +328,16 @@ Maglev.persistent do
       test(M015.method_defined?(:m015_2), true, "Maglev.persistable(true) causes methods to be persisted, even afterwards.")
     end
 
+    def test_016
+      Maglev.transient do
+        require 't016.rb'
+      end
+    end
+
+    def check_016
+      test(T016.included_modules.include?(M016), true, "Maglev.persistable(true) persists included modules.")
+    end
+
 
     ########################################
     # Test Framework Methods
