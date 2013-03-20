@@ -31,7 +31,7 @@ _setPersistable: methodsPersistable
     ].
     "copying included modules in persistent dict"
     superklass := self rubySuperclass: envId .
-    (superklass == nil) ifFalse: [
+    (superklass == nil or: [superklass == Object]) ifFalse: [
       self persistentRubySuperclass: envId put: superklass .
       superklass _setPersistable: methodsPersistable .
     ].
