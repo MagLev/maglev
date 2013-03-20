@@ -8,6 +8,7 @@ class String
   primitive_nobridge '__findStringStartingAt', 'findString:startingAt:'
   primitive_nobridge '__md5sum', 'md5sumDigest'     # used by lib file  digest/md5.rb
   primitive_nobridge '__remove_from_to', 'removeFrom:to:'
+  primitive '__evaluate_smalltalk_in_instance', 'evaluateInContext:'
   class_primitive_nobridge '__withAll', 'withAll:'
   class_primitive_nobridge '__alloc', '_basicNew'
   class_primitive_nobridge '__new', 'new:'

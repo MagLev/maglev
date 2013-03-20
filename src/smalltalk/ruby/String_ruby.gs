@@ -486,6 +486,11 @@ _asSymbolWithRubySuffix: argInt
   self _primitiveFailed: #_asSymbolWithRubySuffix: args: { argInt } .
 %
 
+method: 
+evaluateInContext: anObject
+  ^ self evaluateInContext: anObject symbolList: GsSession currentSession symbolList
+%
+
 !----------------------------------
 set class MultiByteString
 method: 
