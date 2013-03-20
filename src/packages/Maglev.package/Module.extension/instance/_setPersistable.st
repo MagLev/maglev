@@ -1,7 +1,7 @@
 *maglev-runtime
 _setPersistable: methodsPersistable
   "a ruby primitive"
-  | envId tns parTns parPns savePm cst wasPersistable superklass |
+  | envId tns parTns parPns savePm cst wasPersistable klass superklass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   wasPersistable ifFalse: [
@@ -23,16 +23,16 @@ _setPersistable: methodsPersistable
     ]
   ].
  methodsPersistable ifTrue: [
-    tmd := self transientMethodDictForStoreEnv: envId .
-    pmd := self persistentMethodDictForStoreEnv: envId .
-    "copying methods in persistent method dict"
-    tmd keysAndValuesDo: [:key :value |
-      pmd at: key put: value .
-    ].
+    self _persistMethods .
     "copying included modules in persistent dict"
     superklass := self rubySuperclass: envId .
     (superklass == nil or: [superklass == Object]) ifFalse: [
       self persistentRubySuperclass: envId put: superklass .
       superklass _setPersistable: methodsPersistable .
     ].
+    "make this class' class persistent for class methods"
+    klass := self class .
+    (klass == nil) ifFalse: [
+      klass _persistMethods .
+    ]
   ].
