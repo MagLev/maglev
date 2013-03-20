@@ -5,5 +5,6 @@ class T016
   include M016
 end
 
-M016.maglev_persistable(true)
 T016.maglev_persistable(true)
+M016.maglev_persistable(true)
+Maglev.commit_transaction

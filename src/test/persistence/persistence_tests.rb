@@ -332,6 +332,7 @@ Maglev.persistent do
       Maglev.transient do
         require 't016.rb'
       end
+      test(T016.included_modules.include?(M016), true, "Included module is accessible via klass.included_modules.")
     end
 
     def check_016

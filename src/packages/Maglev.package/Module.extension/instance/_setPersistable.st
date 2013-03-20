@@ -1,10 +1,10 @@
 *maglev-runtime
 _setPersistable: methodsPersistable
   "a ruby primitive"
-  | envId tns  parTns parPns savePm cst  wasPersistable |
+  | envId tns parTns parPns savePm cst wasPersistable superklass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
-  wasPersistable ifFalse:[
+  wasPersistable ifFalse: [
     tns := self transientNameSpaceForStore: envId .
     ( parTns := tns parent) == tns ifTrue:[  ^ self  "do nothing  when self==Object" ].
     (parPns := parTns persistentCopy) ifNil:[ ArgumentError signal:'parent is not yet persistable' ].
@@ -23,10 +23,16 @@ _setPersistable: methodsPersistable
     ]
   ].
  methodsPersistable ifTrue: [
-    tmd := self transientMethodDictForStoreEnv: 1.
-    pmd := self persistentMethodDictForStoreEnv: 1.
+    tmd := self transientMethodDictForStoreEnv: envId .
+    pmd := self persistentMethodDictForStoreEnv: envId .
+    "copying methods in persistent method dict"
     tmd keysAndValuesDo: [:key :value |
-     pmd at: key put: value.
+      pmd at: key put: value .
+    ].
+    "copying included modules in persistent dict"
+    superklass := self rubySuperclass: envId .
+    (superklass == nil) ifFalse: [
+      self persistentRubySuperclass: envId put: superklass .
+      superklass _setPersistable: methodsPersistable .
     ].
   ].
-
