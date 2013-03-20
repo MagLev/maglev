@@ -314,7 +314,7 @@ Maglev.persistent do
     end
 
     def check_014
-      test(M014.method_defined?(:m014), false, "Maglev.persistable does not cause methods to be persisted")
+      test(M014.method_defined?(:m014), false, "maglev_persistable does not cause methods to be persisted")
     end
 
     def test_015
@@ -324,8 +324,8 @@ Maglev.persistent do
     end
 
     def check_015
-      test(M015.method_defined?(:m015_1), true, "Maglev.persistable(true) causes methods to be persisted")
-      test(M015.method_defined?(:m015_2), true, "Maglev.persistable(true) causes methods to be persisted, even afterwards.")
+      test(M015.method_defined?(:m015_1), true, "maglev_persistable(true) causes methods to be persisted")
+      test(M015.method_defined?(:m015_2), true, "maglev_persistable(true) causes methods to be persisted, even afterwards.")
     end
 
     def test_016
@@ -336,7 +336,17 @@ Maglev.persistent do
     end
 
     def check_016
-      test(T016.included_modules.include?(M016), true, "Maglev.persistable(true) persists included modules.")
+      test(T016.included_modules.include?(M016), true, "maglev_persistable(true) persists included modules.")
+    end
+
+    def test_017
+      Maglev.transient do
+        require 't017.rb'
+      end
+    end
+
+    def check_017
+      test(T017.respond_to?(:t017_c), true, "maglev_persistable(true) persists class methods")
     end
 
 
