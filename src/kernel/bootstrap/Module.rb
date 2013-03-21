@@ -247,8 +247,52 @@ class Module
     define_method(sym, block)
   end
 
+  def __internal_clone
+    duplicate = self.class.new(self.superclass)
+
+    self.instance_variables.each do |ivar|
+      duplicate.instance_variable_set(ivar, self.instance_variable_get(ivar))
+    end
+    self.class_variables.each do |ivar|
+      duplicate.class_variable_set(ivar, self.class_variable_get(ivar))
+    end
+
+    # Ancestors added with Module#include
+    (self.included_modules - self.superclass.included_modules).each do |mod|
+      duplicate.send :include, mod
+    end
+    # Ancestors added with Module#extend
+    (self.singleton_class.included_modules -
+     self.superclass.singleton_class.included_modules).each do |mod|
+      duplicate.send :extend, mod
+    end
+
+    # copy methods
+    self.methods(false).each do |name|
+      duplicate.singleton_class.define_method(name, self.method(name))
+    end
+    self.instance_methods(false).each do |name|
+      duplicate.define_method(name, self.instance_method(name))
+    end
+
+    duplicate
+  end
+
   def dup
-    raise NotImplementedError, "Module#dup"
+    duplicate = __internal_clone
+    duplicate.taint if self.tainted?
+    duplicate.untrust if self.untrusted?
+    duplicate.initialize_dup(self)
+    duplicate
+  end
+
+  def clone
+    duplicate = __internal_clone
+    duplicate.freeze if self.frozen? # only in clone, not in dup
+    duplicate.taint if self.tainted?
+    duplicate.untrust if self.untrusted?
+    duplicate.initialize_clone(self)
+    duplicate
   end
 
   # make associations holding constants of receiver invariant
