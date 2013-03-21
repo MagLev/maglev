@@ -5,7 +5,7 @@ _setPersistable: methodsPersistable
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   wasPersistable ifFalse: [
-    tns := self transientNameSpaceForStore: envId .
+    tns := self  : envId .
     ( parTns := tns parent) == tns ifTrue:[  ^ self  "do nothing  when self==Object" ].
     (parPns := parTns persistentCopy) ifNil:[ 
       ArgumentError signal:'parent is not yet persistable' 
@@ -37,9 +37,14 @@ _setPersistable: methodsPersistable
     (klass == nil) ifFalse: [
       klass _persistMethods .
     ].
-    
+
     klass := self rubySingletonClassForExtend .
     (klass == nil) ifFalse: [
-      klass _persistMethods .
+      superklass := (klass rubySuperclass: envId) .
+      (superklass _setRubyModulePersistentBit: true) ifFalse: [
+        klass persistentRubySuperclass: envId put: superklass .
+        klass persistentNameSpace: envId put: (klass nameSpace: envId) .
+      ]
     ]
+    
   ].
