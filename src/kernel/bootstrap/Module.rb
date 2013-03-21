@@ -281,7 +281,7 @@ class Module
   def dup
     duplicate = __internal_clone
     duplicate.taint if self.tainted?
-    duplicate.untrust if self.untrusted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
     duplicate.initialize_dup(self)
     duplicate
   end
@@ -290,7 +290,7 @@ class Module
     duplicate = __internal_clone
     duplicate.freeze if self.frozen? # only in clone, not in dup
     duplicate.taint if self.tainted?
-    duplicate.untrust if self.untrusted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
     duplicate.initialize_clone(self)
     duplicate
   end

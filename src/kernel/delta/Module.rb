@@ -28,7 +28,7 @@ class Module
   primitive '__ruby_instance_methods', 'rubyInstanceMethods:protection:'
 
   def methods(regular = true)
-    set = self.__ruby_singleton_methods(false, -1)  # include protected meths
+    set = self.__ruby_methods(false, -1)  # include protected meths
     if regular
       set =  set + self.__ruby_methods(true, -1) # include protected meths
     end
