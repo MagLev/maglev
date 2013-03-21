@@ -9,8 +9,8 @@ defineMethod: aSymbol method: aMethod env: envId
   ].
   cm := aMethod nonBridgeGsMethod: envId .
   mCls := cm inClass .
-  self allInstVarNames =  mCls allInstVarNames ifFalse:[
-     ArgumentError signal: 'define_method , arg''s class has different fixed instvars than self'
+  self allInstVarNames size >= mCls allInstVarNames size ifFalse:[
+     ArgumentError signal: 'define_method , arg''s class has more fixed instvars than self'
   ].
   newCm := cm _copyForClass: self aliasFrom: nil to: nil comment:'
 METHOD COPIED by define_method' .  

@@ -497,7 +497,7 @@ class Time
 
   class_primitive 'new'
   class_primitive 'now'
-  # class_primitive_nobridge 'allocate' , '_basicNew'
+  class_primitive_nobridge 'allocate' , '_basicNew'
   class_primitive_nobridge '__c_mktime' , 'mktime:fromGmt:'
 
   # __strftime takes a format String as the arg
