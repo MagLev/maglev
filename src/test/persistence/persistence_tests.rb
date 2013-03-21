@@ -349,6 +349,17 @@ Maglev.persistent do
       test(T017.respond_to?(:t017_c), true, "maglev_persistable(true) persists class methods")
     end
 
+    def test_018
+      Maglev.transient do
+        require 't018.rb'
+      end
+      test(T018.respond_to?(:t018_c), true, "maglev_persistable(true) persists class methods extended from a module")
+    end
+
+    def check_018
+      test(T018.respond_to?(:t018_c), true, "maglev_persistable(true) persists class methods extended from a module")
+    end
+
 
     ########################################
     # Test Framework Methods
@@ -394,8 +405,8 @@ Maglev.persistent do
     end
 
     def register_failure(msg, expected, actual)
-      @failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
-      x = @failed
+      @failed << "ERROR: #{msg}. Expected: #{expected.inspect} actual: #{actual.inspect}"
+      puts @failed
       unless ENV['SIMPLE_NO_PAUSE']  # don't pause if the env says not to...
         nil.pause if defined? RUBY_ENGINE # Keep MRI from trying to pause
       end
