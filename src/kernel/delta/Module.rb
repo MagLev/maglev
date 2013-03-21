@@ -1,9 +1,5 @@
 class Module
 
-  def clone
-    raise NotImplementedError , "Module#clone"
-  end
-
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)
     raise NameError, "uninitialized constant #{symbol}"

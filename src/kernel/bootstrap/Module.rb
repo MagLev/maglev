@@ -247,8 +247,11 @@ class Module
     define_method(sym, block)
   end
 
+  primitive_nobridge '__copy_methods', '_shallowCopyMethodsFrom:environments:'
+
   def __internal_clone
-    duplicate = self.class.new(self.superclass)
+    fixed_ivars = self.__all_fixed_instvar_names - self.superclass.__all_fixed_instvar_names
+    duplicate = self.class.new_fixed_instvars(self.superclass, fixed_ivars)
 
     self.instance_variables.each do |ivar|
       duplicate.instance_variable_set(ivar, self.instance_variable_get(ivar))
@@ -268,13 +271,7 @@ class Module
     end
 
     # copy methods
-    self.methods(false).each do |name|
-      duplicate.singleton_class.define_method(name, self.method(name))
-    end
-    self.instance_methods(false).each do |name|
-      duplicate.define_method(name, self.instance_method(name))
-    end
-
+    duplicate.__copy_methods(self, [0, 1])
     duplicate
   end
 
