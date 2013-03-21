@@ -66,12 +66,12 @@ class Module
     path.to_s.split('::').each do |n|
       next if n.empty?
       if ns.const_defined?(n)
-	ns = ns.const_get(n)
+        ns = ns.const_get(n)
       else
-	raise ArgumentError, "undefined class/module #{n}"
+        raise ArgumentError, "undefined class/module #{n}"
       end
       unless ns._kind_of?(Module)
-	raise TypeError, "#{ns} in #{path} does not refer to class/module"
+        raise TypeError, "#{ns} in #{path} does not refer to class/module"
       end
     end
     ns
