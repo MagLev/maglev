@@ -353,11 +353,12 @@ Maglev.persistent do
       Maglev.transient do
         require 't018.rb'
       end
-      test(T018.respond_to?(:t018_c), true, "maglev_persistable(true) persists class methods extended from a module")
+      test(T018.respond_to?(:t018_1), true, "maglev_persistable(true) persists class methods extended from a module")
     end
 
     def check_018
-      test(T018.respond_to?(:t018_c), true, "maglev_persistable(true) persists class methods extended from a module")
+      test(T018.respond_to?(:t018_2), true, "maglev_persistable(true) persists class methods extended from a module")
+      test(T018.respond_to?(:t018_1), true, "maglev_persistable(true) persists class methods extended from a module")
     end
 
 

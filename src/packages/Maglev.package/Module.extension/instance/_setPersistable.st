@@ -5,10 +5,10 @@ _setPersistable: methodsPersistable
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   wasPersistable ifFalse: [
-    tns := self  : envId .
+    tns := self transientNameSpaceForStore: envId .
     ( parTns := tns parent) == tns ifTrue:[  ^ self  "do nothing  when self==Object" ].
-    (parPns := parTns persistentCopy) ifNil:[ 
-      ArgumentError signal:'parent is not yet persistable' 
+    (parPns := parTns persistentCopy) ifNil:[
+      ArgumentError signal:'parent is not yet persistable'
     ].
     tns persistentCopy ifNil:[ | pns |
        pns := RubyNameSpace new initializeForModule: self env: envId .
@@ -46,5 +46,5 @@ _setPersistable: methodsPersistable
         klass persistentNameSpace: envId put: (klass nameSpace: envId) .
       ]
     ]
-    
+
   ].
