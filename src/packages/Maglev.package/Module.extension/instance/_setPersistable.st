@@ -1,7 +1,7 @@
 *maglev-runtime
 _setPersistable: methodsPersistable
   "a ruby primitive"
-  | envId tns parTns parPns savePm cst wasPersistable klass superklass |
+  | envId tns parTns parPns savePm cst wasPersistable klass superklass moduleKlass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   wasPersistable ifFalse: [
@@ -43,7 +43,19 @@ _setPersistable: methodsPersistable
       superklass := (klass rubySuperclass: envId) .
       (superklass _setRubyModulePersistentBit: true) ifFalse: [
         klass persistentRubySuperclass: envId put: superklass .
-        klass persistentNameSpace: envId put: (klass nameSpace: envId) .
+        (klass persistentNameSpace: envId) ifNil: [
+          klass persistentNameSpace: envId put: (klass nameSpace: envId) .
+        ]
+      ].
+      (self class ~~ Module) ifTrue: [
+        [superklass ~~ Object class] whileTrue: [
+          klass := superklass.
+          superklass := (klass rubySuperclass: envId) .
+          Transcript show: klass name; cr; show: superklass name; cr.
+          (superklass _setRubyModulePersistentBit: true) ifFalse: [
+            klass persistentRubySuperclass: envId put: superklass .
+          ].
+        ].
       ]
     ]
 
