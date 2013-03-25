@@ -51,11 +51,14 @@ _setPersistable: methodsPersistable
         [superklass ~~ Object class] whileTrue: [
           klass := superklass.
           superklass := (klass rubySuperclass: envId) .
-          Transcript show: klass name; cr; show: superklass name; cr.
+          "Transcript show: klass name; cr; show: superklass name; cr."
           (superklass _setRubyModulePersistentBit: true) ifFalse: [
             klass persistentRubySuperclass: envId put: superklass .
           ].
         ].
+      ] ifFalse: [
+        "persist methods defined in module's singleton class"
+        self rubySingletonClass _persistMethods .
       ]
     ]
 
