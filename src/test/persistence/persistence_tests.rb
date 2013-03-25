@@ -362,6 +362,20 @@ Maglev.persistent do
     end
 
 
+    def test_019
+      Maglev.transient do
+        require 't019.rb'
+      end
+      test(M019_1.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module, created in the singleton class")
+      test(M019_2.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module")
+    end
+
+    def check_019
+      test(M019_1.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module, created in the singleton class")
+      test(M019_2.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module")
+    end
+
+
     ########################################
     # Test Framework Methods
     ########################################
