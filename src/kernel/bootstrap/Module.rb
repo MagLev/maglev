@@ -247,8 +247,49 @@ class Module
     define_method(sym, block)
   end
 
+  primitive_nobridge '__copy_methods', '_shallowCopyMethodsFrom:environments:'
+
+  def __internal_clone
+    fixed_ivars = self.__all_fixed_instvar_names - self.superclass.__all_fixed_instvar_names
+    duplicate = self.class.new_fixed_instvars(self.superclass, fixed_ivars)
+
+    self.instance_variables.each do |ivar|
+      duplicate.instance_variable_set(ivar, self.instance_variable_get(ivar))
+    end
+    self.class_variables.each do |ivar|
+      duplicate.class_variable_set(ivar, self.class_variable_get(ivar))
+    end
+
+    # Ancestors added with Module#include
+    (self.included_modules - self.superclass.included_modules).each do |mod|
+      duplicate.send :include, mod
+    end
+    # Ancestors added with Module#extend
+    (self.singleton_class.included_modules -
+     self.superclass.singleton_class.included_modules).each do |mod|
+      duplicate.send :extend, mod
+    end
+
+    # copy methods
+    duplicate.__copy_methods(self, [0, 1])
+    duplicate
+  end
+
   def dup
-    raise NotImplementedError, "Module#dup"
+    duplicate = __internal_clone
+    duplicate.taint if self.tainted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
+    duplicate.initialize_dup(self)
+    duplicate
+  end
+
+  def clone
+    duplicate = __internal_clone
+    duplicate.freeze if self.frozen? # only in clone, not in dup
+    duplicate.taint if self.tainted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
+    duplicate.initialize_clone(self)
+    duplicate
   end
 
   # make associations holding constants of receiver invariant
