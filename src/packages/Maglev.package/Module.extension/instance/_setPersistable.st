@@ -13,10 +13,13 @@ _setPersistable: methodsPersistable
       ]
     ].
     tns persistentCopy ifNil:[ | pns |
-       pns := RubyNameSpace new initializeForModule: self env: envId .
-       pns parent: parPns .
-       tns persistentCopy: pns .
-       self persistentNameSpace: envId put: pns .
+      pns := RubyNameSpace new initializeForModule: self env: envId .
+      pns parent: parPns .
+      tns persistentCopy: pns .
+      self persistentNameSpace: envId put: pns .
+      tns keysAndValuesDo: [:key :value |
+        pns at: key runtimePut: value .
+      ].
     ].
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
