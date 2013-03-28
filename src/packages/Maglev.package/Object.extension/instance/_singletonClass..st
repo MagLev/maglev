@@ -6,9 +6,12 @@ _singletonClass: envId
        cls := self _rubyModuleIncludeSelfEnv: envId 
     ].
   ] ifFalse:[  
-    self isBehavior ifTrue:[ 
-       cls := self virtualClass . "extending metaclass"
+    (self isBehavior and: [self isMeta not and: [self isRubySingletonClass not]]) ifTrue:[ 
+       "It's neither a meta class nor a Ruby singleton class, so it must be a class.
+       Smalltalk meta classes (=first level Ruby singleton class) are automatically
+       created by GemStone."
+       cls := self virtualClass.
     ] ifFalse:[ cls := self _singletonClassFor: envId ].
   ].
-  ^ cls 
+  ^ cls
 
