@@ -6,6 +6,10 @@ addRubySingletonClass: envId
  The new class is persistable.  "
 
   |vCls prevCls singletonClass|
+  self == Behavior class ifTrue: [
+        ArgumentTypeError signal: 'add singleton class disallowed for Behavior class'.
+        ^ self].
+
   prevCls := self virtualClass.
   singletonClass := Metaclass3 _subclass: #Singleton instVarNames: {} format: 0 constraints: {} classVars: SymbolDictionary new poolDictionaries: {}.
 

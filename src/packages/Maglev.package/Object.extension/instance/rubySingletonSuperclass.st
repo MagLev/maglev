@@ -7,6 +7,12 @@ rubySingletonSuperclass
   self isClass ifTrue: [
     self == Object
       ifTrue: [^ Metaclass3]
-      ifFalse: [^ self _superclass rubySingletonClass]]
+      ifFalse: [
+        self == Module class 
+            ifTrue: [
+                "We don't want to create 2nd/higher order singleton
+                classes of Behavior."
+                ^ Object class]
+            ifFalse: [^ self _superclass rubySingletonClass]]]
     ifFalse: [^ self class].
 
