@@ -6,7 +6,7 @@ class Class
 
   primitive_nobridge 'ancestors' , 'rubyAncestors'
 
-  primitive_nobridge 'superclass', '_superclass'
+  primitive_nobridge 'superclass', '_rubySuperclass'
 
   primitive_nobridge '__ruby_methods', 'rubyMethods:protection:'
 

@@ -28,9 +28,4 @@ addRubySingletonClass: envId
     ArgumentTypeError signal: 'add singleton class disallowed, ', vCls.
   ].
 
-  "env 1 method dicts left as nil"
-  "name spaces left as nil."
-  vCls persistentRubySuperclass: 1 put: prevCls .
-  vCls transientRubySuperclass: 1 put: prevCls .
-  "new singleton class has empty method dicts, so no need to clear lookup caches yet"
   ^ self
