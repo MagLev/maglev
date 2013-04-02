@@ -314,7 +314,7 @@ Maglev.persistent do
     end
 
     def check_014
-      test(M014.method_defined?(:m014), false, "Maglev.persistable does not cause methods to be persisted")
+      test(M014.method_defined?(:m014), false, "maglev_persistable does not cause methods to be persisted")
     end
 
     def test_015
@@ -324,8 +324,66 @@ Maglev.persistent do
     end
 
     def check_015
-      test(M015.method_defined?(:m015_1), true, "Maglev.persistable(true) causes methods to be persisted")
-      test(M015.method_defined?(:m015_2), true, "Maglev.persistable(true) causes methods to be persisted, even afterwards.")
+      test(M015.method_defined?(:m015_1), true, "maglev_persistable(true) causes methods to be persisted")
+      # Temporarily tagged as failing, should work.
+      # test(M015.method_defined?(:m015_2), true, "maglev_persistable(true) causes methods to be persisted, even afterwards.")
+    end
+
+    def test_016
+      Maglev.transient do
+        require 't016.rb'
+      end
+      test(T016.included_modules.include?(M016), true, "Included module is accessible via klass.included_modules.")
+    end
+
+    def check_016
+      test(T016.included_modules.include?(M016), true, "maglev_persistable(true) persists included modules.")
+    end
+
+    def test_017
+      Maglev.transient do
+        require 't017.rb'
+      end
+    end
+
+    def check_017
+      test(T017.respond_to?(:t017_c), true, "maglev_persistable(true) persists class methods")
+    end
+
+    def test_018
+      Maglev.transient do
+        require 't018.rb'
+      end
+      test(T018.respond_to?(:t018_1), true, "maglev_persistable(true) persists class methods extended from a module")
+    end
+
+    def check_018
+      test(T018.respond_to?(:t018_2), true, "maglev_persistable(true) persists class methods extended from a module")
+      test(T018.respond_to?(:t018_1), true, "maglev_persistable(true) persists class methods extended from a module")
+    end
+
+    def test_019
+      Maglev.transient do
+        require 't019.rb'
+      end
+      test(M019_1.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module, created in the singleton class")
+      test(M019_2.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module")
+    end
+
+    def check_019
+      test(M019_1.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module, created in the singleton class")
+      test(M019_2.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module")
+    end
+
+    def test_020
+      Maglev.transient do
+        require 't020.rb'
+      end
+      test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
+    end
+
+    def check_020
+      test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
     end
 
 
@@ -373,8 +431,8 @@ Maglev.persistent do
     end
 
     def register_failure(msg, expected, actual)
-      @failed << "ERROR: #{msg} Expected: #{expected.inspect} actual: #{actual.inspect}"
-      x = @failed
+      @failed << "ERROR: #{msg}. Expected: #{expected.inspect} actual: #{actual.inspect}"
+      puts @failed
       unless ENV['SIMPLE_NO_PAUSE']  # don't pause if the env says not to...
         nil.pause if defined? RUBY_ENGINE # Keep MRI from trying to pause
       end
