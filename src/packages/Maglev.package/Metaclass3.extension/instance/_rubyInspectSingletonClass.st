@@ -2,6 +2,8 @@
 _rubyInspectSingletonClass
   |str|
   str := '#<Class:' copy.
-  str addAll: destClass _rubyInspect.
+  destClass == nil
+    ifTrue: [str addAll: self primaryCopy _rubyInspect]
+    ifFalse: [str addAll: destClass _rubyInspect].
   str addAll: '>'.
   ^ str
