@@ -17,8 +17,10 @@ _setPersistable: methodsPersistable
       pns parent: parPns .
       tns persistentCopy: pns .
       self persistentNameSpace: envId put: pns .
-      tns keysAndValuesDo: [:key :value |
-        pns at: key runtimePut: value .
+	  methodsPersistable ifTrue: [
+	    tns keysAndValuesDo: [:key :value |
+		  pns at: key runtimePut: value .
+        ].
       ].
     ].
     cst := RubyCompilerState current .
