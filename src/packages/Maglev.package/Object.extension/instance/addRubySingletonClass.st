@@ -1,5 +1,5 @@
 *maglev-runtime
-addRubySingletonClass: envId
+addRubySingletonClass
 
 "Insert a new singleton class in the receiver's class hierarchy.
  Returns receiver, or signals an error.
@@ -23,9 +23,9 @@ addRubySingletonClass: envId
 
   "Why did we need envId here?"
   vCls := self _addRubySingletonClass: singletonClass forSuperClass: self rubySingletonSuperclass.
-  vCls destClass: self.
-  vCls _isOneByteString ifTrue: [
-    ArgumentTypeError signal: 'add singleton class disallowed, ', vCls.
-  ].
+  
+  vCls _isOneByteString
+    ifTrue: [ArgumentTypeError signal: 'add singleton class disallowed, ', vCls]
+    ifFalse: [vCls destClass: self].
 
   ^ self

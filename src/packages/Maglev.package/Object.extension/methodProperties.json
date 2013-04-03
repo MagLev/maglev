@@ -18,7 +18,7 @@
 		"_singletonClass:" : "DataCurator 10/02/2012 14:30",
 		"_singletonClassFor:" : "DataCurator 10/02/2012 14:30",
 		"addRubyClassVar:value:mref:" : "DataCurator 10/02/2012 14:30",
-		"addRubySingletonClass:" : "DataCurator 10/02/2012 14:30",
+		"addRubySingletonClass" : "DataCurator 10/02/2012 14:30",
 		"classForConstantLookup:forModuleEval:" : "DataCurator 10/02/2012 14:30",
 		"clsMethodDefnTarget" : "DataCurator 10/02/2012 14:30",
 		"instanceEvalString:with:args:" : "DataCurator 10/02/2012 14:30",
