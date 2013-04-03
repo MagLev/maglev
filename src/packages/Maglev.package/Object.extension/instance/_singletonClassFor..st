@@ -3,7 +3,8 @@ _singletonClassFor: envId
   |isSecondMetaOrSingleton isSecondSingletonGenerated isSecondSingletonAllowed|
   (self _singletonClassAllowedFor: self) ifFalse: [ 
     "singleton class generation not allowed"
-    Kernel @ruby1:warn: 'warning: adding higher level singleton class not allowed for ', self name.
+    [Kernel @ruby1:warn: 'warning: adding higher level singleton class not allowed for ', self name]
+      onException: AbstractException do: [:e| "ignore, no warnings allowed in bootstrap"].
     ^ self virtualClass].
   self isBehavior
     ifFalse: ["an object" 

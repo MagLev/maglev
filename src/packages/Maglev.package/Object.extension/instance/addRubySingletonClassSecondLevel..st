@@ -16,7 +16,8 @@ addRubySingletonClassSecondLevel: isSecondLevel
 
   self isCommitted ifTrue: [
     "The new class pointer for this class will not be committed!"
-    Kernel @ruby1:warn: 'warning: adding singleton class to committed object'].
+    [Kernel @ruby1:warn: 'warning: adding singleton class to committed object']
+      onException: AbstractException do: [:e| "ignore, no warnings allowed in bootstrap"]].
 
   singletonClassName := (self name, ' class') asSymbol.
 

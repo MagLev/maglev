@@ -1,4 +1,5 @@
 *maglev-runtime
+_singletonClass: envId  
   | cls |
   self class == Module 
     ifTrue: ["a  class<<self   within a  module "
