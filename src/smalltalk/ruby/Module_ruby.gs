@@ -569,7 +569,6 @@ changeToSecurityPolicyForRubyExtension: anObjectSecurityPolicy
  receiver was originally in  SystemObjectSecurityPolicy .
 "
  | aCls cvs |
- self objectSecurityPolicy == anObjectSecurityPolicy ifTrue: [^ nil].
  (cvs := classVars) ifNotNil:[ 
     cvs _objectSecurityPolicy: anObjectSecurityPolicy 
   ].
