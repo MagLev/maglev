@@ -9,6 +9,7 @@ addPersistentAssociation: assoc
     ArgumentTypeError signal:'key already in transient name space'
   ].
   self addAssociation: assoc .
+  autoloadCache := assoc .
   ((pns := persistCopy) ~~ nil and:[RubyCompilerState current persistenceMode]) ifTrue:[
     (pns  _at: aSymbol otherwise: nil ) ifNotNil:[
       ArgumentTypeError signal:'key already in persistent name space'
