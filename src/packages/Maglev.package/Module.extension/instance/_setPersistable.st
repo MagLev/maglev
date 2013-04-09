@@ -4,8 +4,8 @@ _setPersistable: methodsPersistable
   | envId tns klass2 parTns parPns savePm cst wasPersistable klass superklass moduleKlass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
+  tns := self transientNameSpaceForStore: envId .
   wasPersistable ifFalse: [
-    tns := self transientNameSpaceForStore: envId .
     ( parTns := tns parent) == tns ifTrue:[  ^ self  "do nothing  when self==Object" ].
     (parTns ~~ nil and: [(parPns := parTns persistentCopy) == nil]) ifTrue: [
       (parTns myClass _persistable) ifFalse:[
@@ -17,9 +17,12 @@ _setPersistable: methodsPersistable
       pns parent: parPns .
       tns persistentCopy: pns .
       self persistentNameSpace: envId put: pns .
-	  methodsPersistable ifTrue: [
-	    tns keysAndValuesDo: [:key :value |
-		  pns at: key runtimePut: value .
+      methodsPersistable ifTrue: [
+        tns autoloadCache ifNotNil: [
+          pns addAssociation: (tns autoloadCache copy).
+        ].
+        tns keysAndValuesDo: [:key :value |
+          "pns at: key runtimePut: value ."
         ].
       ].
     ].
@@ -70,5 +73,10 @@ _setPersistable: methodsPersistable
         ]
       ]
 
+    ].
+  ] ifTrue: [
+    pns := tns persistentCopy.
+    tns autoloadCache ifNotNil: [
+      pns addAssociation: (tns autoloadCache copy).
     ].
   ].
