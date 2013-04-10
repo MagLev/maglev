@@ -19,7 +19,9 @@ _setPersistable: methodsPersistable
       self persistentNameSpace: envId put: pns .
       methodsPersistable ifTrue: [
         tns autoloadCache ifNotNil: [
-          pns addAssociation: (tns autoloadCache copy).
+          tns autoloadCache do: [ :assoc |
+            pns addAssociation: (assoc copy).
+          ].
         ].
         tns keysAndValuesDo: [:key :value |
           "pns at: key runtimePut: value ."
@@ -77,6 +79,8 @@ _setPersistable: methodsPersistable
   ] ifTrue: [
     pns := tns persistentCopy.
     tns autoloadCache ifNotNil: [
-      pns addAssociation: (tns autoloadCache copy).
+      tns autoloadCache do: [ :assoc |
+        pns addAssociation: (assoc copy).
+      ].
     ].
   ].
