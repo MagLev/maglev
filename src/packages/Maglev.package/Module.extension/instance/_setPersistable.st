@@ -1,7 +1,7 @@
 *maglev-runtime
 _setPersistable: methodsPersistable
   "a ruby primitive"
-  | envId tns klass2 parTns parPns savePm cst wasPersistable klass superklass moduleKlass |
+  | envId tns pns klass2 parTns parPns savePm cst wasPersistable klass superklass moduleKlass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   tns := self transientNameSpaceForStore: envId .
@@ -12,20 +12,22 @@ _setPersistable: methodsPersistable
         ArgumentError signal:'parent ', parTns myClass rubyFullName asString ,' is not yet persistable'
       ]
     ].
-    tns persistentCopy ifNil:[ | pns |
+    tns persistentCopy ifNil:[
       pns := RubyNameSpace new initializeForModule: self env: envId .
       pns parent: parPns .
       tns persistentCopy: pns .
       self persistentNameSpace: envId put: pns .
-      methodsPersistable ifTrue: [
-        tns autoloadCache ifNotNil: [
-          tns autoloadCache do: [ :assoc |
-            pns addAssociation: (assoc copy).
-          ].
-        ].
-        tns keysAndValuesDo: [:key :value |
-          "pns at: key runtimePut: value ."
-        ].
+      tns keysAndValuesDo: [:key :value |
+        "pns at: key runtimePut: value ."
+      ].
+    ].
+    tns autoloadCache ifNotNil: [
+      pns := tns persistentCopy .
+      tns autoloadCache do: [ :assoc | |copy|
+        copy := assoc copy.
+        copy _value: nil.
+        copy _isLoaded: false.
+        pns addAssociation: copy.
       ].
     ].
     cst := RubyCompilerState current .
@@ -79,8 +81,12 @@ _setPersistable: methodsPersistable
   ] ifTrue: [
     pns := tns persistentCopy.
     tns autoloadCache ifNotNil: [
-      tns autoloadCache do: [ :assoc |
-        pns addAssociation: (assoc copy).
+      pns := tns persistentCopy .
+      tns autoloadCache do: [ :assoc | |copy|
+        copy := assoc copy.
+        copy _value: nil.
+        copy _isLoaded: false.
+        pns addAssociation: copy.
       ].
     ].
   ].
