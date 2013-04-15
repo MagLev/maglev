@@ -1454,6 +1454,10 @@ module Net   #:nodoc:
     end
     private :basic_encode
 
+    def connection_close?
+      tokens(@header['connection']).include?('close') or
+      tokens(@header['proxy-connection']).include?('close')
+    end
   end
 
 

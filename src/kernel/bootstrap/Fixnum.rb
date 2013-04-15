@@ -97,7 +97,8 @@ class Fixnum
 
   # to_s inherited from Integer
 
-  primitive 'to_sym', '_rubyToSym'
+  # ruby 1.9 has no to_sym method for Fixnums
+  # primitive 'to_sym', '_rubyToSym'
 
   def zero?  
     self._equal?(0)
