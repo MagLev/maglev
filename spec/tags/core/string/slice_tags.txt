@@ -28,3 +28,8 @@ fails:String#slice! with Regexp raises a RuntimeError on a frozen instance that 
 fails:String#slice! with Regexp raises a RuntimeError on a frozen instance that would not be modified
 fails:String#slice! with Regexp, index raises a RuntimeError if self is frozen
 fails:String#slice! with String raises a RuntimeError if self is frozen
+fails:String#slice! with index returns the character given by the character index
+fails:String#slice! with index, length returns the substring given by the character offsets
+fails:String#slice! Range returns the substring given by the character offsets of the range
+fails:String#slice! with Regexp returns the matching portion of self with a multi byte character
+fails:String#slice! with Regexp, index returns the encoding aware capture for the given index

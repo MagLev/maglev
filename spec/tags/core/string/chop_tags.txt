@@ -2,3 +2,5 @@ fails:String#chop taints result when self is tainted
 fails:String#chop! raises a RuntimeError on a frozen instance that is modified
 fails:String#chop! raises a RuntimeError on a frozen instance that would not be modified
 fails:String#chop untrusts result when self is untrusted
+fails:String#chop removes a multi-byte character
+fails:String#chop! removes a multi-byte character

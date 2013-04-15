@@ -98,3 +98,5 @@ fails:Marshal.load for a Module raises ArgumentError if given the name of a non-
 fails:Marshal.load for a Module loads an old module
 fails:Marshal.load for a wrapped C pointer loads
 fails:Marshal.load for a wrapped C pointer raises TypeError when the local class is missing _data_load
+fails:Marshal.load for a String loads a US-ASCII String
+fails:Marshal.load for a String loads a String in another encoding
