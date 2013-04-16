@@ -1,7 +1,7 @@
 *maglev-runtime
 _setPersistable: methodsPersistable
   "a ruby primitive"
-  | envId tns pns klass2 parTns parPns savePm cst wasPersistable klass superklass moduleKlass |
+  | envId tns pns parTns parPns savePm cst wasPersistable klass superklass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   tns := self transientNameSpaceForStore: envId .
@@ -21,15 +21,7 @@ _setPersistable: methodsPersistable
         "pns at: key runtimePut: value ."
       ].
     ].
-    tns autoloadCache ifNotNil: [
-      pns := tns persistentCopy .
-      tns autoloadCache do: [ :assoc | |copy|
-        copy := assoc copy.
-        copy _value: nil.
-        copy _isLoaded: false.
-        pns addAssociation: copy.
-      ].
-    ].
+    
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
     [ cst persistenceMode: true .
@@ -38,55 +30,16 @@ _setPersistable: methodsPersistable
       ]
     ] ensure:[
       cst persistenceMode: savePm
-  ].
-   methodsPersistable ifTrue: [
+    ].
+    methodsPersistable ifTrue: [
       self _persistMethods .
-      "copying included modules in persistent dict"
-      superklass := self rubySuperclass: envId .
-      (superklass == nil or: [superklass == Object]) ifFalse: [
-        self persistentRubySuperclass: envId put: superklass .
-        superklass _setPersistable: methodsPersistable .
-      ].
-      "make this class' class persistent for class methods"
-      klass := self class .
-      (klass == nil) ifFalse: [
-        klass _persistMethods .
-      ].
 
-      klass := self rubySingletonClassForExtend .
-      (klass == nil) ifFalse: [
-        superklass := (klass rubySuperclass: envId) .
-        (superklass _setRubyModulePersistentBit: true) ifFalse: [
-          klass persistentRubySuperclass: envId put: superklass .
-          (klass persistentNameSpace: envId) ifNil: [
-            klass persistentNameSpace: envId put: (klass nameSpace: envId) .
-          ]
-        ].
-        (self class ~~ Module) ifTrue: [
-          [superklass ~~ Object class] whileTrue: [
-            klass := superklass.
-            superklass := (klass rubySuperclass: envId) .
-            "Transcript show: klass name; cr; show: superklass name; cr."
-            (superklass _setRubyModulePersistentBit: true) ifFalse: [
-              klass persistentRubySuperclass: envId put: superklass .
-            ].
-          ].
-        ] ifFalse: [
-          "persist methods defined in module's singleton class"
-          self rubySingletonClass _persistMethods .
-        ]
-      ]
+      self _persistIncludedModules: methodsPersistable . 
 
-    ].
-  ] ifTrue: [
-    pns := tns persistentCopy.
-    tns autoloadCache ifNotNil: [
-      pns := tns persistentCopy .
-      tns autoloadCache do: [ :assoc | |copy|
-        copy := assoc copy.
-        copy _value: nil.
-        copy _isLoaded: false.
-        pns addAssociation: copy.
-      ].
+      self _persistClassMethod .
+
+      self _persistSingletonClass .
     ].
   ].
+
+  self _persistAutoloadCache.   
