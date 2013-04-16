@@ -34,14 +34,9 @@ _setPersistable: methodsPersistable
     methodsPersistable ifTrue: [
       self _persistMethods .
 
-      "copying included modules in persistent dict"
-      superklass := self rubySuperclass: envId .
-      (superklass == nil or: [superklass == Object]) ifFalse: [
-        self persistentRubySuperclass: envId put: superklass .
-        superklass _setPersistable: methodsPersistable .
-      ].
+      self _persistIncludedModules: methodsPersistable . 
 
-      self _persistClassMethod.
+      self _persistClassMethod .
 
       klass := self rubySingletonClassForExtend .
       (klass == nil) ifFalse: [
