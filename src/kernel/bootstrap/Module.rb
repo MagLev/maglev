@@ -464,6 +464,7 @@ class Module
   end
 
   primitive_nobridge '__set_persistable', '_setPersistable:'
+  primitive_nobridge 'module_parent', 'rubyModuleParent'
 
   # Redefine a class and migrate it's instances. Will abort or commit
   # the current transaction.
