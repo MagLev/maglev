@@ -22,8 +22,6 @@ _setPersistable: methodsPersistable
       ].
     ].
     
-    "self _persistAutoloadCache."
-
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
     [ cst persistenceMode: true .
@@ -35,17 +33,15 @@ _setPersistable: methodsPersistable
     ].
     methodsPersistable ifTrue: [
       self _persistMethods .
+
       "copying included modules in persistent dict"
       superklass := self rubySuperclass: envId .
       (superklass == nil or: [superklass == Object]) ifFalse: [
         self persistentRubySuperclass: envId put: superklass .
         superklass _setPersistable: methodsPersistable .
       ].
-      "make this class' class persistent for class methods"
-      klass := self class .
-      (klass == nil) ifFalse: [
-        klass _persistMethods .
-      ].
+
+      self _persistClassMethod.
 
       klass := self rubySingletonClassForExtend .
       (klass == nil) ifFalse: [
