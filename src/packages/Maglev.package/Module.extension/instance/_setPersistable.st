@@ -22,7 +22,7 @@ _setPersistable: methodsPersistable
       ].
     ].
     
-    self _persistAutoloadCache.
+    "self _persistAutoloadCache."
 
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
@@ -70,6 +70,6 @@ _setPersistable: methodsPersistable
         ]
       ]
     ].
-  ] ifTrue: [
-    self _persistAutoloadCache.   
   ].
+
+  self _persistAutoloadCache.   
