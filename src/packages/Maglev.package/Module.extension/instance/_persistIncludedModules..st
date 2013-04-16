@@ -8,3 +8,4 @@ _persistIncludedModules: methodsPersistable
     self persistentRubySuperclass: envId put: superklass .
     superklass _setPersistable: methodsPersistable .
   ].
+  

@@ -38,28 +38,7 @@ _setPersistable: methodsPersistable
 
       self _persistClassMethod .
 
-      klass := self rubySingletonClassForExtend .
-      (klass == nil) ifFalse: [
-        superklass := (klass rubySuperclass: envId) .
-        (superklass _setRubyModulePersistentBit: true) ifFalse: [
-          klass persistentRubySuperclass: envId put: superklass .
-          (klass persistentNameSpace: envId) ifNil: [
-            klass persistentNameSpace: envId put: (klass nameSpace: envId) .
-          ]
-        ].
-        (self class ~~ Module) ifTrue: [
-          [superklass ~~ Object class] whileTrue: [
-            klass := superklass.
-            superklass := (klass rubySuperclass: envId) .
-            (superklass _setRubyModulePersistentBit: true) ifFalse: [
-              klass persistentRubySuperclass: envId put: superklass .
-            ].
-          ].
-        ] ifFalse: [
-          "persist methods defined in module's singleton class"
-          self rubySingletonClass _persistMethods .
-        ]
-      ]
+      self _persistSingletonClass .
     ].
   ].
 
