@@ -1,0 +1,3 @@
+fails:Matrix::EigenvalueDecomposition#initialize raises an error if argument is not a matrix
+fails:Matrix::EigenvalueDecomposition#initialize raises an error if matrix is not square
+fails:Matrix::EigenvalueDecomposition#initialize never hangs

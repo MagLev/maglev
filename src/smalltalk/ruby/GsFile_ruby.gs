@@ -247,3 +247,12 @@ ungetByte: aByteValue
   ^ nil "per Ruby specs"
 % 
 
+method:
+_isWritable
+  
+  "Returns true if receiver is open for write/append, otherwise returns false."
+  | m |
+  (m := mode) ifNil:[ ^ false].
+  ^ (m includesValue: $w) or:[ m includesValue: $a ] 
+%
+

@@ -1,3 +1,24 @@
 fails:Array#join returns a string formed by concatenating each element.to_s separated by separator without trailing separator
 fails:Array#join returns a string which would be infected with taint of the array, its elements or the separator when the array is not empty
 fails:Array#join raises a TypeError if the separator cannot be coerced to a String by calling #to_str
+fails:Array#join returns a string formed by concatenating each element.to_str separated by separator without trailing separator
+fails:Array#join raises an ArgumentError when the Array is recursive
+fails:Array#join does not consider untrustworthiness of either the array or the separator when the array is empty
+fails:Array#join returns a string which would be infected with untrustworthiness of the array, its elements or the separator when the array is not empty
+fails:Array#join uses the first encoding when other strings are compatible
+fails:Array#join fails for arrays with incompatibly-encoded strings
+fails:Array#join returns a string formed by concatenating each element.to_str separated by separator
+fails:Array#join returns a US-ASCII string for an empty Array
+fails:Array#join separates elements with default separator when the passed separator is nil
+fails:Array#join attempts coercion via #to_str first
+fails:Array#join attempts coercion via #to_ary second
+fails:Array#join taints the result if the Array is tainted and non-empty
+fails:Array#join taints the result if the result of coercing an element is tainted
+fails:Array#join untrusts the result if the Array is untrusted and non-empty
+fails:Array#join does not untrust the result if the Array is untrusted but empty
+fails:Array#join untrusts the result if the result of coercing an element is untrusted
+fails:Array#join raises a TypeError if passed false as the separator
+fails:Array#join with a tainted separator taints the result if the array has two or more elements
+fails:Array#join with an untrusted separator does not untrust the result if the array is empty
+fails:Array#join with an untrusted separator does not untrust the result if the array has only one element
+fails:Array#join with an untrusted separator untrusts the result if the array has two or more elements

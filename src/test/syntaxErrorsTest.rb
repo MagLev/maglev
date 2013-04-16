@@ -2,7 +2,7 @@
 
 # Maglev.__system.session_temp_put( :DebugParse , false)
 count = 0
-arr = [ 
+arr = [
  'syntaxErrDynamicConstant.rb',
  'syntaxErrFormalArgConstant.rb',
  'syntaxErrConstantReassign.rb',

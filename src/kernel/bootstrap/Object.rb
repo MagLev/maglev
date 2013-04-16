@@ -442,6 +442,14 @@ class Object
     self
   end
 
+  def initialize_dup(other)
+    initialize_copy(other)
+  end
+
+  def initialize_clone(other)
+    initialize_copy(other)
+  end
+
   def instance_of?(cls)
     # Modified from RUBINIUS
     if self.class._equal?(cls)
@@ -536,7 +544,7 @@ class Object
     unless name._isStringOrSymbol
       name = Maglev::Type.coerce_to(name, String, :to_str)
     end
-    if name.__at(0)._not_equal?( ?@ )
+    if name.__at(0).not_eql?( ?@ )
       raise NameError, "intance variable names must begin with '@'"
     end
     self.__remove_iv(name)

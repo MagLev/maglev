@@ -61,6 +61,7 @@ if ENV["TRAVIS"]
   tests = {"rubyspec" => "spec:ci",
            "vmunit" => "travis:vmunit",
            "vmunit2" => "tests:vmunit2",
+           "p_tests" => "dev:p-tests",
            "fav_gems" => "tests:fav_gems_install",
            "sinatra" => "tests:sinatra",
            "examples" => "tests:examples"}

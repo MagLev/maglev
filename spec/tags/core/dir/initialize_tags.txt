@@ -1,1 +1,2 @@
 fails:Dir#initialize calls #to_str on non-String arguments
+fails:Dir#initialize calls #to_path on non-String arguments

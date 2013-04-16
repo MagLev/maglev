@@ -1,0 +1,1 @@
+fails:C-API Range function rb_range_new raises an ArgumentError when the given start and end can't be compared by using #<=>

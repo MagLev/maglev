@@ -1,0 +1,1 @@
+fails:UnboundMethod#source_location works for define_singleton_method methods

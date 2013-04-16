@@ -1,0 +1,3 @@
+fails:Kernel has private instance method Array()
+fails:Kernel.Array returns an Array containing the argument if #to_a returns nil
+fails:Kernel#Array returns an Array containing the argument if #to_a returns nil

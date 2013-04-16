@@ -6,7 +6,7 @@ cd $PARSERDIR
 if ! test -x ./byacc/yacc; then
   cd byacc
   ./configure
-  if test -n $(which gmake) ; then
+  if [ -n "$(which gmake)" ]; then
     gmake
   else
     make

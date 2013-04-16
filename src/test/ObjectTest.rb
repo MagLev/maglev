@@ -11,7 +11,7 @@ test(String.class.equal?(Class), true, "String.class.equal? Class")
 test(String.class == Fixnum.class, true, "String.class == Fixnum.class")
 
 begin
-  class ClsOne < Hash
+  class ClsOne < Array 
     self.__fixed_instvars('@bb', '@cc')
     def setBb(a)
       @bb = a

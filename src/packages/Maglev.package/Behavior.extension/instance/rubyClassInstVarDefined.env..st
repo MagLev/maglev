@@ -4,7 +4,8 @@ rubyClassInstVarDefined: aSymbol env: envId
    ns := self nameSpace: envId .
    ns ifNotNil:[ assoc := ns resolveConstant: aSymbol ] .
    assoc ifNil:[ ^ nil ].
-   assoc _valueNoAction  ifNotNil:[ ^ #'instance-variable' ] .
+   "Fix Github 209: ClassInstVars are defined, even if their value is nil."
+   assoc ifNotNil:[ ^ #'instance-variable' ].
    ^ nil 
   
 

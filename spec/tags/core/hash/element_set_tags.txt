@@ -1,0 +1,3 @@
+fails:Hash#[]= doesn't duplicate and freeze already frozen string keys
+fails:Hash#[]= raises a RuntimeError if called on a frozen instance
+fails:Hash#[]= accepts keys with private #hash method

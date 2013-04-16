@@ -1,1 +1,2 @@
 fails:File.utime uses the current times if two nil values are passed
+fails:File.utime accepts an object that has a #to_path method

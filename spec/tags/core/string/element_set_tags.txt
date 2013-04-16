@@ -1,2 +1,16 @@
 fails:String#[]= with String taints self if other_str is tainted
 fails:String#[]= with index, count taints self if other_str is tainted
+fails:String#[]= with String allows assignment to the zero'th element of an empty String
+fails:String#[]= with String raises a RuntimeError when self is frozen
+fails:String#[]= with Fixnum index taints self if other_str is tainted
+fails:String#[]= with Fixnum index allows assignment to the zero'th element of an empty String
+fails:String#[]= with Fixnum index raises a RuntimeError when self is frozen
+fails:String#[]= with a Regexp index calls #to_str to convert the replacement
+fails:String#[]= with a Regexp index with 3 arguments calls #to_int to convert the second object
+fails:String#[]= with a Regexp index with 3 arguments raises a TypeError if #to_int does not return a Fixnum
+fails:String#[]= with a Regexp index with 3 arguments checks the match index before calling #to_str to convert the replacement
+fails:String#[]= with a Range index raises a RangeError if negative Range begin is out of range
+fails:String#[]= with a Range index raises a RangeError if positive Range begin is greater than String size
+fails:String#[]= with Fixnum index, count taints self if other_str is tainted
+fails:String#[]= with Fixnum index, count calls #to_int to convert the index and count objects
+fails:String#[]= with Fixnum index, count calls #to_str to convert the replacement object

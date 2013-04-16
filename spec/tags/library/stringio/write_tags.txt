@@ -1,1 +1,2 @@
 fails:StringIO#write when passed [String] taints self's String when the passed argument is tainted
+fails:StringIO#write when passed [Object] raises an IOError if the data String is frozen after creating the StringIO instance

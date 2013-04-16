@@ -35,6 +35,7 @@ input $imageRubyDir/Symbol_ruby.gs
 input $imageRubyDir/SymbolAssociation_ruby.gs
 input $imageRubyDir/String_ruby.gs
 input $imageRubyDir/System_ruby.gs
+input $imageRubyDir/OrderPreservingHashAssociation.gs
 input $imageRubyDir/Range_ruby.gs
 input $imageRubyDir/Regexp.gs
 input $imageRubyDir/RubyConstantRef.gs

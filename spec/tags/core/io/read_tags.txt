@@ -4,3 +4,16 @@ fails:IO.read from a pipe reads only the specified number of bytes requested
 fails:IO.read from a pipe raises Errno::ESPIPE if passed an offset
 fails:IO#read raises IOError on closed stream
 fails:IO#read with encodings ignores unicode encoding
+fails:IO.read calls #to_path on non-String arguments
+fails:IO.read raises an IOError if the options Hash specifies write mode
+fails:IO.read raises an IOError if the options Hash specifies append only mode
+fails:IO.read raises a TypeError when not passed a String type
+fails:IO#read with 1.9 encodings strips the BOM when given 'rb:utf-7-bom' as the mode
+fails:IO#read with $KCODE set to UTF-8 ignores unicode encoding
+fails:IO#read in binary mode does not transcode file contents when Encoding.default_internal is set
+fails:IO#read in binary mode does transcode file contents when an internal encoding is specified
+fails:IO.read with BOM reads a file with a utf-8 bom
+fails:IO.read with BOM reads a file with a utf-16le bom
+fails:IO.read with BOM reads a file with a utf-16be bom
+fails:IO.read with BOM reads a file with a utf-32le bom
+fails:IO.read with BOM reads a file with a utf-32be bom

@@ -1,0 +1,1 @@
+fails:String#index raises a TypeError if passed a Fixnum

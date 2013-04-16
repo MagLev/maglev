@@ -255,7 +255,7 @@ class File
     else
       # We need to use dup here, since it's possible that
       # StringValue gives us a direct object we shouldn't mutate
-      first = Maglev::Type.coerce_to(first, String, :to_str).dup
+      first = Maglev::Type.__coerce_to_path(first).dup
     end
 
     ret = first

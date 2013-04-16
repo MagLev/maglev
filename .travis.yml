@@ -10,6 +10,7 @@ env:
   - CI_TESTS=rubyspec
   - CI_TESTS=vmunit
   - CI_TESTS=vmunit2
+  - CI_TESTS=p_tests
   # These next ones have to be cleaned up, they don't currently pass
   # - CI_TESTS=fav_gems
   # - CI_TESTS=sinatra

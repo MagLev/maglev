@@ -1,0 +1,2 @@
+fails:Proc#source_location sets the first value to the path of the file in which the proc was defined
+fails:Proc#source_location sets the last value to a Fixnum representing the line on which the proc was defined

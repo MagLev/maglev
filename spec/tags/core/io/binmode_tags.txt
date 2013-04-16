@@ -1,3 +1,6 @@
 fails:IO#binmode raises an IOError on closed stream
-fails:IO#binmode propagates to dup'ed IO objects when writing
-fails:IO#binmode read has binmode propagated from IO object dup'ed
+fails:IO#binmode? is true after a call to IO#binmode
+fails:IO#binmode? propagates to dup'ed IO objects
+fails:IO#binmode returns self
+fails:IO#binmode sets external encoding to binary
+fails:IO#binmode sets internal encoding to nil

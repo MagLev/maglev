@@ -151,7 +151,11 @@ class Module
 
   # constants access methods
 
-  primitive_nobridge 'constants', 'rubyConstants'  # includes superclasses' constants
+  primitive_nobridge '_constants', 'rubyConstants:'  # includes superclasses' constants
+
+  def constants(inherit = true)
+    _constants(inherit)
+  end
 
   def self.constants
     Object.constants
@@ -243,8 +247,49 @@ class Module
     define_method(sym, block)
   end
 
+  primitive_nobridge '__copy_methods', '_shallowCopyMethodsFrom:environments:'
+
+  def __internal_clone
+    fixed_ivars = self.__all_fixed_instvar_names - self.superclass.__all_fixed_instvar_names
+    duplicate = self.class.new_fixed_instvars(self.superclass, fixed_ivars)
+
+    self.instance_variables.each do |ivar|
+      duplicate.instance_variable_set(ivar, self.instance_variable_get(ivar))
+    end
+    self.class_variables.each do |ivar|
+      duplicate.class_variable_set(ivar, self.class_variable_get(ivar))
+    end
+
+    # Ancestors added with Module#include
+    (self.included_modules - self.superclass.included_modules).each do |mod|
+      duplicate.send :include, mod
+    end
+    # Ancestors added with Module#extend
+    (self.singleton_class.included_modules -
+     self.superclass.singleton_class.included_modules).each do |mod|
+      duplicate.send :extend, mod
+    end
+
+    # copy methods
+    duplicate.__copy_methods(self, [0, 1])
+    duplicate
+  end
+
   def dup
-    raise NotImplementedError, "Module#dup"
+    duplicate = __internal_clone
+    duplicate.taint if self.tainted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
+    duplicate.initialize_dup(self)
+    duplicate
+  end
+
+  def clone
+    duplicate = __internal_clone
+    duplicate.freeze if self.frozen? # only in clone, not in dup
+    duplicate.taint if self.tainted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
+    duplicate.initialize_clone(self)
+    duplicate
   end
 
   # make associations holding constants of receiver invariant
@@ -413,11 +458,12 @@ class Module
   # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
-  def maglev_persistable
-    self.__set_persistable
+  def maglev_persistable(methodsPersistable = false)
+    methodsPersistable = (methodsPersistable == true)
+    self.__set_persistable(methodsPersistable)
   end
 
-  primitive_nobridge '__set_persistable', '_setPersistable'
+  primitive_nobridge '__set_persistable', '_setPersistable:'
 
   # Redefine a class and migrate it's instances. Will abort or commit
   # the current transaction.
@@ -643,6 +689,10 @@ class Module
   def ===(obj)
     # return true if obj is an instance of self or of one of self's descendants
     obj._kind_of?( self)
+  end
+
+  def private_constant(*args)
+    warn "NotImplemented: Module#private_constant"
   end
 
 end

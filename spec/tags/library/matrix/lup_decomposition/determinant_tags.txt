@@ -1,0 +1,2 @@
+fails:Matrix::LUPDecomposition#determinant returns the determinant when the matrix is square
+fails:Matrix::LUPDecomposition#determinant raises an error for rectangular matrices

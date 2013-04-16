@@ -469,8 +469,7 @@ module Kernel
   primitive 'format*', 'sprintf:with:'
 
   def gets(sep=$/)
-    # TODO: Need to use-up ARGV first...
-    STDIN.gets(sep)
+    $stdin.gets(sep)
   end
 
   primitive 'global_variables', 'rubyGlobalVariables'
@@ -1210,6 +1209,7 @@ module Kernel
   # the callcc is the value of the block, or the value passed to
   # cont.call. See class Continuation for more details.
   def callcc
+    raise LocalJumpError, "no block given" unless block_given?
     Proc.new.__call_cc
   end
 end
