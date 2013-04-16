@@ -1,7 +1,7 @@
 *maglev-runtime
 _setPersistable: methodsPersistable
   "a ruby primitive"
-  | envId tns pns klass2 parTns parPns savePm cst wasPersistable klass superklass moduleKlass |
+  | envId tns pns parTns parPns savePm cst wasPersistable klass superklass |
   envId := 1"__callerEnvId" .
   wasPersistable := self _setRubyModulePersistentBit: true .
   tns := self transientNameSpaceForStore: envId .
@@ -21,15 +21,9 @@ _setPersistable: methodsPersistable
         "pns at: key runtimePut: value ."
       ].
     ].
-    tns autoloadCache ifNotNil: [
-      pns := tns persistentCopy .
-      tns autoloadCache do: [ :assoc | |copy|
-        copy := assoc copy.
-        copy _value: nil.
-        copy _isLoaded: false.
-        pns addAssociation: copy.
-      ].
-    ].
+    
+    self _persistAutoloadCache.
+
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
     [ cst persistenceMode: true .
@@ -38,8 +32,8 @@ _setPersistable: methodsPersistable
       ]
     ] ensure:[
       cst persistenceMode: savePm
-  ].
-   methodsPersistable ifTrue: [
+    ].
+    methodsPersistable ifTrue: [
       self _persistMethods .
       "copying included modules in persistent dict"
       superklass := self rubySuperclass: envId .
@@ -66,7 +60,6 @@ _setPersistable: methodsPersistable
           [superklass ~~ Object class] whileTrue: [
             klass := superklass.
             superklass := (klass rubySuperclass: envId) .
-            "Transcript show: klass name; cr; show: superklass name; cr."
             (superklass _setRubyModulePersistentBit: true) ifFalse: [
               klass persistentRubySuperclass: envId put: superklass .
             ].
@@ -76,17 +69,7 @@ _setPersistable: methodsPersistable
           self rubySingletonClass _persistMethods .
         ]
       ]
-
     ].
   ] ifTrue: [
-    pns := tns persistentCopy.
-    tns autoloadCache ifNotNil: [
-      pns := tns persistentCopy .
-      tns autoloadCache do: [ :assoc | |copy|
-        copy := assoc copy.
-        copy _value: nil.
-        copy _isLoaded: false.
-        pns addAssociation: copy.
-      ].
-    ].
+    self _persistAutoloadCache.   
   ].
