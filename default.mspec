@@ -25,6 +25,7 @@ class MSpecScript
   core_files = ['spec/rubyspec/core',
                 "^spec/rubyspec/core/argf/seek_spec.rb",
                 "^spec/rubyspec/core/basicobject/",
+                "^spec/rubyspec/core/encoding/converter/",
                 "^spec/rubyspec/core/fixnum/right_shift_spec.rb",
                 "^spec/rubyspec/core/kernel/define_singleton_method_spec.rb",
                 "^spec/rubyspec/core/method/parameters_spec.rb",
@@ -94,6 +95,7 @@ class MSpecScript
 
   MSpec.enable_feature :fiber_library
   MSpec.enable_feature :continuation_library
+  MSpec.enable_feature :encoding
 
   # The set of substitutions to transform a spec filename into a tag
   # filename.  The transformations are applied, in the given sequence, to a
