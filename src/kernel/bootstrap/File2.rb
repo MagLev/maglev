@@ -3,9 +3,10 @@
 class File
   def self.__validate_stdin_value(file)
     # used in generated code value for     $stdin = file
-    cls = file.class
-    if cls == File 
-      return file
+    unless file._equal?(nil)
+      if file.respond_to?(:rewind)
+        return file
+      end
     end
     raise TypeError, 'expected a File'
   end
