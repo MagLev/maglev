@@ -15,3 +15,9 @@ _loadedClasses: includeModules
   
   ^ SystemRepository _loadedClasses: includeModules
 %
+
+category: 'Listing References'
+method:
+listReferencesForObject: anObject
+  ^ (self listReferencesInMemory: (Array with: anObject)) at: 1
+%
