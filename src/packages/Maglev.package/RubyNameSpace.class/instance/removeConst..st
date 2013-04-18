@@ -7,7 +7,7 @@ removeConst: aSymbol
   ] ifFalse:[
     assoc := self associationAt: aSymbol otherwise: nil .
     assoc ifNotNil:[
-      ArgumentTypeError signal:'cannot remove constant from persistent module in transient mode'.
+      "ArgumentTypeError signal:'cannot remove constant from persistent module in transient mode'."
     ]
   ].
   assoc ifNil:[
