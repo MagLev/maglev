@@ -18,10 +18,9 @@ _setPersistable: methodsPersistable
       tns persistentCopy: pns .
       self persistentNameSpace: envId put: pns .
       tns keysAndValuesDo: [:key :value |
-        "pns at: key runtimePut: value ."
+        pns at: key runtimePut: value .
       ].
     ].
-    
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
     [ cst persistenceMode: true .
@@ -34,7 +33,7 @@ _setPersistable: methodsPersistable
     methodsPersistable ifTrue: [
       self _persistMethods .
 
-      self _persistIncludedModules: methodsPersistable . 
+      self _persistIncludedModules: methodsPersistable .
 
       self _persistClassMethod .
 
@@ -42,4 +41,4 @@ _setPersistable: methodsPersistable
     ].
   ].
 
-  self _persistAutoloadCache.   
+  self _persistAutoloadCache.
