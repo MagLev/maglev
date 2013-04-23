@@ -7,8 +7,8 @@ removeKey: aSymbol
     self _removeKey: aSymbol ifAbsent:[] .
   ] ifFalse:[
     (self includesKey: aSymbol) ifTrue:[
-         NameError signal:'cannot remove ' , aSymbol , 
-        ' , persistenceMode==false and variable is persistent' 
+         "NameError signal:'cannot remove ' , aSymbol , 
+        ' , persistenceMode==false and variable is persistent' "
     ].
   ].
  
