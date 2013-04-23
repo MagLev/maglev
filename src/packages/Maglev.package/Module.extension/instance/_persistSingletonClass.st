@@ -1,28 +1,27 @@
 *maglev-runtime
 _persistSingletonClass
-  | singletonClass envId superklass |
-  
+  | singletonClass envId klass superklass |
   envId := 1 .
 
+  "when self is a module, there are no other singleton superclasses obviously
+   only need to persist methods then"
+  (self class == Module) ifTrue: [
+    self rubySingletonClass _persistMethods .
+    ^ nil
+  ].
+  "nothing to do, if no singleton class"
   singletonClass := self rubySingletonClassForExtend .
-  (singletonClass == nil) ifFalse: [
-    superklass := (singletonClass rubySuperclass: envId) .
+  (singletonClass == nil) ifTrue: [^ nil ].
+
+  klass := singletonClass .
+  superklass := (klass rubySuperclass: envId) .
+  [
     (superklass _setRubyModulePersistentBit: true) ifFalse: [
-      singletonClass persistentRubySuperclass: envId put: superklass .
-      (singletonClass persistentNameSpace: envId) ifNil: [
-        singletonClass persistentNameSpace: envId put: (singletonClass nameSpace: envId) .
-      ]
-    ].
-    (self class ~~ Module) ifTrue: [
-      [superklass ~~ Object class] whileTrue: [
-        singletonClass := superklass .
-        superklass := (singletonClass rubySuperclass: envId) .
-        (superklass _setRubyModulePersistentBit: true) ifFalse: [
-          singletonClass persistentRubySuperclass: envId put: superklass .
-        ].
+      (klass persistentNameSpace: envId) ifNil: [
+        klass persistentRubySuperclass: envId put: superklass .
       ].
-    ] ifFalse: [
-      "persist methods defined in module's singleton class"
-      self rubySingletonClass _persistMethods .
-    ]
-  ]
+    ].
+    klass := superklass .
+    superklass := (klass rubySuperclass: envId) .
+    klass ~~ Object class
+  ] whileTrue.
