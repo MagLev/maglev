@@ -8,7 +8,8 @@ removeConst: aSymbol env: envId
       NameError signal: 'uninitialized constant object ', aSymbol.
     ].
     RubyCompilerState current persistenceMode ifFalse:[
-      ArgumentTypeError signal:'cannot remove constant from persistent module in transient mode'
+      "ArgumentTypeError signal:'cannot remove constant from persistent 
+module in transient mode'"
     ].
   ].
   self _incrementCachedConstantsSerialNum .
