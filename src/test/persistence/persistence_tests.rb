@@ -398,19 +398,27 @@ Maglev.persistent do
 
     def test_022
       require "t022"
-      
+
       @M022_object_id = M022.object_id
       @C022_object_id = M022::C022.object_id
-      
+
       M022.maglev_persistable
       M022::C022.maglev_persistable
       Maglev.commit_transaction
+      
+      
     end
 
     def check_022
-      test(M022.constants.include?("C022"), true,     "persisted autoloads autoloads will be triggered")
-      test(@M022_object_id, M022.object_id,           "after autoload the module's id is the same")
-      test(@C022_object_id, M022::C022.object_id,     "after autoload the class' id is the same")
+      require "t022"
+
+      M022.maglev_persistable
+      M022::C022.maglev_persistable
+      Maglev.commit_transaction
+
+      test(M022.constants.include?("C022"),   true,             "persisted autoloads autoloads will be triggered")
+      test(M022.object_id,                    @M022_object_id,  "after autoload the module's id is the same")
+      test(M022::C022.object_id,              @C022_object_id,  "after autoload the class' id is the same")
     end
 
 
