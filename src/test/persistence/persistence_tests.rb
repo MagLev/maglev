@@ -411,7 +411,6 @@ Maglev.persistent do
       test(M022.constants.include?("C022"), true,     "persisted autoloads autoloads will be triggered")
       test(@M022_object_id, M022.object_id,           "after autoload the module's id is the same")
       test(@C022_object_id, M022::C022.object_id,     "after autoload the class' id is the same")
-      test(M022::C022.new.respond_to?(:some_method), true, "the method was been autoloaded")
     end
 
 
