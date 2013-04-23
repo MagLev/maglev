@@ -2,6 +2,6 @@
 _persistClassMethod
   | klass |
   klass := self class .
-  (klass == nil) ifFalse: [
+  (klass ~~ nil and: [klass ~~ Module]) ifTrue: [
     klass _persistMethods
   ]
