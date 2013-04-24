@@ -12,7 +12,6 @@ _persistIncludedModules: methodsPersistable
           pcopy := superklass primaryCopy .
           pcopy ifNotNil: [ pcopy _setPersistable: methodsPersistable ] .
           superklass _setPersistable: methodsPersistable.
-          "Transcript show: 'Klass; Superklass'; show: klass rubyFullName; show: superklass rubyFullName."
           klass persistentRubySuperclass: envId put: superklass .
       ].
       klass := superklass .
@@ -20,8 +19,5 @@ _persistIncludedModules: methodsPersistable
     ] ifFalse: [
       superklass := superklass rubySuperclass: envId .
     ].
-      ((Object rubySuperclass: 1) rubyFullName includesSubString: 'Persistence') ifTrue: [
-        1 halt.
-      ].
     superklass ~~ Object and: [ superklass ~~ nil]
   ] whileTrue.
