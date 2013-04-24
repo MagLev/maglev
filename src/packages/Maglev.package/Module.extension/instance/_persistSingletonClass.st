@@ -16,12 +16,14 @@ _persistSingletonClass
   klass := singletonClass .
   superklass := (klass rubySuperclass: envId) .
   [
-    (superklass _setRubyModulePersistentBit: true) ifFalse: [
-      (klass persistentNameSpace: envId) ifNil: [
-        klass persistentRubySuperclass: envId put: superklass .
+    (superklass rubyFullName includesSubString: 'MaglevRecord') ifTrue: [
+      (superklass _setRubyModulePersistentBit: true) ifFalse: [
+          klass persistentRubySuperclass: envId put: superklass .
       ].
+      klass := superklass .
+      superklass := (klass rubySuperclass: envId) .
+    ] ifFalse: [
+      superklass := superklass rubySuperclass: envId .
     ].
-    klass := superklass .
-    superklass := (klass rubySuperclass: envId) .
-    klass ~~ Object class
+    klass ~~ Object class and: [ superklass ~~ nil]
   ] whileTrue.
