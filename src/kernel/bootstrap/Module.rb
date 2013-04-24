@@ -25,6 +25,8 @@ class Module
 
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
+  primitive_nobridge '__save_for_reinclude', '_rubySaveForReinclude:'
+  primitive_nobridge '__reinclude_store', '_rubyReincludeStore'
   primitive_nobridge '__is_virtual', 'isVirtual'
 
   # append_features deprecated, but needed by Rails3
@@ -33,6 +35,17 @@ class Module
       other.__include_module(self)
     end
     self
+  end
+
+  def redo_include(*modules)
+    modules.each do |mod|
+      __save_for_reinclude(mod.to_s)
+    end
+    include(*modules)
+  end
+
+  def reinclude_store
+    __reinclude_store
   end
 
   def include(*modules)
