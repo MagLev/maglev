@@ -163,8 +163,7 @@ class Module
 
   primitive_nobridge '__const_defined', 'rubyConstDefined:'
 
-  def const_defined?(name)
-    # does not look in superclasses (but 1.9 does)
+  def const_defined?(name, search_parents=true)
     if name._isSymbol
       sym = name
     else
@@ -173,6 +172,13 @@ class Module
     end
     res = self.__const_defined(sym)
     if res._equal?(false)
+      if search_parents
+        return true if constants.include?(name.to_s)
+        return true if ancestors.include?(Object) &&
+          Object.constants.include?(name.to_s)
+        return true if instance_of?(Module) &&
+          self.class.constants.include?(name.to_s)
+      end
       if str._equal?(nil)
         str = name.to_s   # arg is a Symbol
       end

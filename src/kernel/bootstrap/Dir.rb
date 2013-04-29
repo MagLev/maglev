@@ -47,7 +47,8 @@ class Dir
     Errno.handle(__rmdir(dirname), "delete #{dirname}")
   end
 
-  def self.entries(dirname)
+  def self.entries(dirname, opts = {})
+    dirname = dirname.to_path unless dirname.is_a? String
     Dir.new(dirname).entries
   end
 
