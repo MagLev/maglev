@@ -375,16 +375,28 @@ Maglev.persistent do
       test(M019_2.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module")
     end
 
-    def test_020
-      Maglev.transient do
-        require 't020.rb'
-      end
-      test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
-    end
+    # def test_020
+    #   Maglev.transient do
+    #     require 't020.rb'
+    #   end
+    #   test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
+    # end
 
-    def check_020
-      test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
-    end
+    # def check_020
+    #   test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
+    # end
+
+
+    # def test_021
+    #   require 't021.rb'
+    #   test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered first time.")
+    # end
+
+    # def check_021
+    #   require 't021.rb'
+    #   test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered second time as well.")
+    # end
+
 
 
     ########################################
