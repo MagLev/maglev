@@ -8,7 +8,8 @@ _persistIncludedModules: methodsPersistable
   superklass := (klass rubySuperclass: envId) .
   [
     ((superklass rubyFullName includesSubString: 'MaglevRecord') or: [ superklass class ~~ Module ] ) ifTrue: [
-      (superklass _setRubyModulePersistentBit: true) ifFalse: [ | pcopy |
+      superklass _setRubyModulePersistentBit: true.
+      (superklass objectSecurityPolicy == nil) ifTrue: [ | pcopy |
           pcopy := superklass primaryCopy .
           pcopy ifNotNil: [ pcopy _setPersistable: methodsPersistable ] .
           superklass _setPersistable: methodsPersistable.

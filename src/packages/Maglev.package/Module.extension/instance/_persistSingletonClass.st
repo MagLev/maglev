@@ -1,5 +1,5 @@
 *maglev-runtime
-_persistSingletonClass
+_persistSingletonClass: methodsPersistable
   | singletonClass envId klass superklass |
   envId := 1 .
 
@@ -16,8 +16,11 @@ _persistSingletonClass
   klass := singletonClass .
   superklass := (klass rubySuperclass: envId) .
   [
-    (superklass rubyFullName includesSubString: 'MaglevRecord') ifTrue: [
-      (superklass _setRubyModulePersistentBit: true) ifFalse: [
+    ((superklass rubyFullName includesSubString: 'Maglev') or: [superklass class ~~ Module]) ifTrue: [
+      (superklass objectSecurityPolicy == nil) ifTrue: [ | pcopy |
+          pcopy := superklass primaryCopy .
+          pcopy ifNotNil: [ pcopy _setPersistable: methodsPersistable ] .
+          superklass _setPersistable: methodsPersistable.
           klass persistentRubySuperclass: envId put: superklass .
       ].
       klass := superklass .

@@ -37,7 +37,7 @@ _setPersistable: methodsPersistable
 
       self _persistClassMethod .
 
-      self _persistSingletonClass .
+      self _persistSingletonClass: methodsPersistable .
     ].
   ].
 
