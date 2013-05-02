@@ -387,15 +387,15 @@ Maglev.persistent do
     # end
 
 
-    def test_021
-      require 't021.rb'
-      test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered first time.")
-    end
+    # def test_021
+    #   require 't021.rb'
+    #   test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered first time.")
+    # end
 
-    def check_021
-      require 't021.rb'
-      test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered second time as well.")
-    end
+    # def check_021
+    #   require 't021.rb'
+    #   test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered second time as well.")
+    # end
 
 
 
