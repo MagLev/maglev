@@ -28,6 +28,14 @@ class Module
   primitive_nobridge '__save_for_reinclude', '_rubySaveForReinclude:'
   primitive_nobridge '__reinclude_store', '_rubyReincludeStore'
   primitive_nobridge '__is_virtual', 'isVirtual'
+  primitive_nobridge '__maglev_nil_references', '_nilReferences:'
+
+  def maglev_nil_references(switch=true)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if switch and self.maglev_persistable?
+    __maglev_nil_references(switch)
+  end
+
+  primitive 'maglev_nil_references?', '_nilReferences'
 
   # append_features deprecated, but needed by Rails3
   def append_features(other)
