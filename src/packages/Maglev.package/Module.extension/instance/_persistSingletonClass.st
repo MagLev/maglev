@@ -3,12 +3,6 @@ _persistSingletonClass: methodsPersistable
   | singletonClass envId klass superklass |
   envId := 1 .
 
-  "when self is a module, there are no other singleton superclasses obviously
-   only need to persist methods then"
-  (self class == Module) ifTrue: [
-    self rubySingletonClass _persistMethods .
-    ^ nil
-  ].
   "nothing to do, if no singleton class"
   singletonClass := self rubySingletonClassForExtend .
   (singletonClass == nil) ifTrue: [^ nil ].
