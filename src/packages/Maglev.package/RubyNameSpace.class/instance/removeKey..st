@@ -2,7 +2,7 @@
 removeKey: aSymbol
   |  pm |
   moduleFrozen ifTrue:[ ArgumentTypeError signal:'attempt to modify a frozen module/class'].
-  pm := true "RubyCompilerState current persistenceMode" .
+  pm := RubyCompilerState current persistenceMode .
   pm ifTrue:[
     self _removeKey: aSymbol ifAbsent:[] .
   ] ifFalse:[
