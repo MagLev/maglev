@@ -485,12 +485,13 @@ class Module
   # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
-  def maglev_persistable(methodsPersistable = false)
+  def maglev_persistable(methodsPersistable = false, &block)
     methodsPersistable = (methodsPersistable == true)
-    self.__set_persistable(methodsPersistable)
+    block = Proc.new { |mod| true } unless block_given?
+    self.__set_persistable(methodsPersistable, block)
   end
 
-  primitive_nobridge '__set_persistable', '_setPersistable:'
+  primitive_nobridge '__set_persistable', '_setPersistable:with:'
   primitive_nobridge 'module_parent', 'rubyModuleParent'
 
   # Redefine a class and migrate it's instances. Will abort or commit
