@@ -2,7 +2,7 @@
 # date.rb - date and time library
 #   Maglev file  date2.rb
 #
-# Author: Tadayoshi Funaba 1998-2008
+# Author: Tadayoshi Funaba 1998-2011
 #
 # Documentation: William Webber <william@williamwebber.com>
 #
@@ -1660,17 +1660,9 @@ end
 
 class Date
 
-  def to_time() 
-    Time.local(year, mon, mday) 
-  end
-
-  def to_date() 
-    self 
-  end
-
-=begin
-# def to_datetime() DateTime.new!(self.class.jd_to_ajd(jd, 0, 0), @of, @sg) end
-=end
+  def to_time() Time.local(year, mon, mday) end
+  def to_date() self end
+  def to_datetime() DateTime.new!(jd_to_ajd(jd, 0, 0), @of, @sg) end
 
   # Create a new Date object representing today.
   #
@@ -1699,19 +1691,17 @@ end
 
 class DateTime < Date
 
-=begin
-# def to_time
-#   d = new_offset(0)
-#   d.instance_eval do
-#     Time.utc(year, mon, mday, hour, min, sec,
-#       (sec_fraction * 86400000000).to_i)
-#   end.
-# getlocal
-# end
+  def to_time
+    d = new_offset(0)
+    d.instance_eval do
+      Time.utc(year, mon, mday, hour, min, sec +
+	       sec_fraction)
+    end.
+	getlocal
+  end
 
-# def to_date() Date.new!(self.class.jd_to_ajd(jd, 0, 0), 0, @sg) end
-# def to_datetime() self end
-=end
+  def to_date() Date.new!(jd_to_ajd(jd, 0, 0), 0, @sg) end
+  def to_datetime() self end
 
   private_class_method :today
   public_class_method  :now

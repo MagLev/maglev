@@ -142,3 +142,7 @@ fails:Marshal.dump with a Hash dumps an extended Hash
 fails:Marshal.dump with a Struct dumps an extended Struct
 fails:Marshal.dump with an Object dumps an extended Object
 fails:Marshal.dump with an Object dumps an Object that has had an instance variable added and removed as though it was never set
+fails:Marshal.dump with a String dumps a US-ASCII String
+fails:Marshal.dump with a String dumps a UTF-8 String
+fails:Marshal.dump with a String dumps a String in another encoding
+fails:Marshal.dump with a String dumps multiple strings using symlinks for the :E (encoding) symbol

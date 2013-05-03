@@ -10,3 +10,4 @@ fails:Kernel#sprintf with format string that contains %{} sections substitutes v
 fails:Kernel#sprintf with format string that contains %{} sections raises KeyError when no matching key is in second argument
 fails:Kernel#sprintf with format string that contains %<> sections formats values for named references
 fails:Kernel#sprintf with format string that contains %<> sections raises KeyError when no matching key is in second argument
+fails:Kernel#sprintf returns a String in the same encoding as the format String
