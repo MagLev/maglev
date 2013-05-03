@@ -56,6 +56,21 @@ class Module
     __reinclude_store
   end
 
+  def reinclude
+    self.reinclude_store.each do |mod|
+      # get constant value from mod (string)
+      names = mod.split('::')
+      names.shift if names.empty? || names.first.empty?
+
+      constant = Object
+      names.each do |name|
+        constant = constant.const_defined?(name) ? constant.const_get(name) : constant.const_missing(name)
+      end
+      # include constant
+      self.include constant
+    end
+  end
+
   def include(*modules)
     # this variant gets bridge methods
     modules.reverse.each do |a_module|
