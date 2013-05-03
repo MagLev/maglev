@@ -375,17 +375,16 @@ Maglev.persistent do
       test(M019_2.respond_to?(:t019), true, "maglev_persistable(true) persists class methods of a module")
     end
 
-    # def test_020
-    #   Maglev.transient do
-    #     require 't020.rb'
-    #   end
-    #   test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
-    # end
+    def test_020
+      Maglev.transient do
+        require 't020.rb'
+      end
+      test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
+    end
 
-    # def check_020
-    #   test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
-    # end
-
+    def check_020
+      test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
+    end
 
     def test_021
       require 't021.rb'
@@ -397,7 +396,47 @@ Maglev.persistent do
       test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered second time as well.")
     end
 
+    def test_022
+      require "t022"
 
+      @M022_object_id = M022.object_id
+      @C022_object_id = M022::C022.object_id
+
+      M022.maglev_persistable
+      M022::C022.maglev_persistable
+      Maglev.commit_transaction
+    end
+
+    def check_022
+      require "t022"
+
+      M022.maglev_persistable
+      M022::C022.maglev_persistable
+      Maglev.commit_transaction
+
+      test(M022.constants.include?("C022"),   true,             "persisted autoloads autoloads will be triggered")
+      test(M022.object_id,                    @M022_object_id,  "after autoload the module's id is the same")
+      test(M022::C022.object_id,              @C022_object_id,  "after autoload the class' id is the same")
+    end
+
+    def test_023
+      require "t023"
+      test(T023.reinclude_store.include?("M023_1"), true, "reinclude_store should be filled.")
+      test(T023.reextend_store.include?("M023_2"), true, "reextend_store should be filled.")
+      test(T023.included_modules.include?(M023_1), true, "should include module.")
+      test(T023.singleton_class.included_modules.include?(M023_2), true, "should extend module.")
+    end
+
+    def check_023
+      require "m023"
+      test(T023.reinclude_store.include?("M023_1"), true, "reinclude_store should be filled.")
+      test(T023.reextend_store.include?("M023_2"), true, "reextend_store should be filled.")
+      test(T023.included_modules.include?(M023_1), false, "should not include module.")
+      test(T023.singleton_class.included_modules.include?(M023_2), false, "should not extend module.")
+      T023.redo_include_and_extend
+      test(T023.included_modules.include?(M023_1), true, "should include module.")
+      test(T023.singleton_class.included_modules.include?(M023_2), true, "should extend module.")
+    end
 
     ########################################
     # Test Framework Methods

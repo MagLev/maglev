@@ -2,6 +2,10 @@
 _persistClassMethod
   | klass |
   klass := self class .
-  (klass == nil) ifFalse: [
-    klass _persistMethods
+  klass == Module ifTrue: [
+    self virtualClass _persistMethods.
+  ] ifFalse: [
+    (klass ~~ nil) ifTrue: [
+      klass _persistMethods
+    ]
   ]
