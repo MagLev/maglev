@@ -386,18 +386,38 @@ Maglev.persistent do
     #   test(M020.constants.include?("C"), true, "maglev_persistable(true) persists constants")
     # end
 
+    # def test_021
+    #   require 't021.rb'
+    #   test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered first time.")
+    # end
 
-    def test_021
-      require 't021.rb'
-      test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered first time.")
+    # def check_021
+    #   require 't021.rb'
+    #   test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered second time as well.")
+    # end
+
+    def test_022
+      require "t022"
+
+      @M022_object_id = M022.object_id
+      @C022_object_id = M022::C022.object_id
+
+      M022.maglev_persistable
+      M022::C022.maglev_persistable
+      Maglev.commit_transaction
     end
 
-    def check_021
-      require 't021.rb'
-      test(M::M021.instance_methods.include?("a"), true, "Autoload is triggered second time as well.")
+    def check_022
+      require "t022"
+
+      M022.maglev_persistable
+      M022::C022.maglev_persistable
+      Maglev.commit_transaction
+
+      test(M022.constants.include?("C022"),   true,             "persisted autoloads autoloads will be triggered")
+      test(M022.object_id,                    @M022_object_id,  "after autoload the module's id is the same")
+      test(M022::C022.object_id,              @C022_object_id,  "after autoload the class' id is the same")
     end
-
-
 
     ########################################
     # Test Framework Methods
