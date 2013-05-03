@@ -18,7 +18,7 @@ _setPersistable: methodsPersistable with: aBlock
       tns persistentCopy: pns .
       self persistentNameSpace: envId put: pns .
       tns keysAndValuesDo: [:key :value |
-        "pns at: key runtimePut: value ."
+        pns at: key runtimePut: value .
       ].
     ].
     
