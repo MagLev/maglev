@@ -436,6 +436,12 @@ ZeroDivide .     1  "mapped to Ruby by Ruby bootstrap"
 category: 'Ruby support'
 
 method:
+newRubySubclass: aString  instancesPersistent: ipersistBool fixedIvs: ivList
+  "this is sometimes called when a class X < ModuleX inherits from a module"
+  ArgumentTypeError signal: 'wrong argument type ', self class name
+%
+
+method:
 transientMethodDictForEnv: envId put: aValue
   "aValue should be a GsMethodDictionary, or nil ,
    caller responsible for _refreshClassCache.
