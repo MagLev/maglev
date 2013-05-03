@@ -10,7 +10,7 @@ removeConst: aSymbol
      ] ifFalse:[
        passoc := pns associationAt: aSymbol otherwise: nil .
        passoc ifNotNil:[
-         "ArgumentTypeError signal:'cannot remove constant from persistent module in transient mode'."
+         ArgumentTypeError signal:'cannot remove constant from persistent module in transient mode'.
        ]
      ]
   ].

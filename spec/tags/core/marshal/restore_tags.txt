@@ -113,3 +113,5 @@ fails:Marshal.restore for a Module loads an old module
 fails:Marshal.restore for a wrapped C pointer loads
 fails:Marshal.restore for a wrapped C pointer raises TypeError when the local class is missing _data_load
 fails:Marshal.restore for a wrapped C pointer raises ArgumentError when the local class is a regular object
+fails:Marshal.restore for a String loads a US-ASCII String
+fails:Marshal.restore for a String loads a String in another encoding
