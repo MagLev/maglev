@@ -34,7 +34,19 @@ class Module
 
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
+  primitive_nobridge '__save_for_reinclude', '_rubySaveForReinclude:'
+  primitive_nobridge '__reinclude_store', '_rubyReincludeStore'
+  primitive_nobridge '__save_for_reextend', '_rubySaveForReextend:'
+  primitive_nobridge '__reextend_store', '_rubyReextendStore'
   primitive_nobridge '__is_virtual', 'isVirtual'
+  primitive_nobridge '__maglev_nil_references', '_nilReferences:'
+
+  def maglev_nil_references(switch=true)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if switch and self.maglev_persistable?
+    __maglev_nil_references(switch)
+  end
+
+  primitive 'maglev_nil_references?', '_nilReferences'
 
   # append_features deprecated, but needed by Rails3
   def append_features(other)
@@ -42,6 +54,42 @@ class Module
       other.__include_module(self)
     end
     self
+  end
+
+  def redo_include(*modules)
+    modules.each do |mod|
+      __save_for_reinclude(mod.to_s)
+    end
+    include(*modules)
+  end
+  def redo_extend(*modules)
+    modules.each do |mod|
+      __save_for_reextend(mod.to_s)
+    end
+    extend(*modules)
+  end
+
+  def reinclude_store
+    __reinclude_store
+  end
+  def reextend_store
+    __reextend_store
+  end
+
+  def reinclude
+    self.reinclude_store.each do |mod|
+      self.include __resolve_constant(mod)
+    end unless self.reinclude_store.nil?
+  end
+  def reextend
+    self.reextend_store.each do |mod|
+      self.extend __resolve_constant(mod)
+    end unless self.reextend_store.nil?
+  end
+
+  def redo_include_and_extend
+    reinclude
+    reextend
   end
 
   def include(*modules)
@@ -67,6 +115,18 @@ class Module
   # Callback invoked whenever the receiver is used to extend an object.
   # The object is passed as a paramter.
   def extended(a_module)
+  end
+
+  def __resolve_constant(mod)
+    # get constant value from mod (string)
+    names = mod.split('::')
+    names.shift if names.empty? || names.first.empty?
+
+    constant = Object
+    names.each do |name|
+      constant = constant.const_defined?(name) ? constant.const_get(name) : constant.const_missing(name)
+    end
+    constant
   end
 
   # --------- remainder of methods approximately alphabetical
@@ -473,13 +533,14 @@ class Module
   # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
-  def maglev_persistable(methodsPersistable = false)
+  def maglev_persistable(methodsPersistable = false, &block)
     raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if self.maglev_nil_references?
     methodsPersistable = (methodsPersistable == true)
-    self.__set_persistable(methodsPersistable)
+    block = Proc.new { |mod| true } unless block_given?
+    self.__set_persistable(methodsPersistable, block)
   end
 
-  primitive_nobridge '__set_persistable', '_setPersistable:'
+  primitive_nobridge '__set_persistable', '_setPersistable:with:'
   primitive_nobridge 'module_parent', 'rubyModuleParent'
 
   # Redefine a class and migrate it's instances. Will abort or commit

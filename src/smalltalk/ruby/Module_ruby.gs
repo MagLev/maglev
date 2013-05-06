@@ -654,3 +654,19 @@ _nilReferences
   ^ (format bitAnd: GC_DB_NIL_REFERENCES_MASK) ~~ 0
 %
 
+method:
+_nilReferences: aBool
+
+self _validatePrivilege ifTrue:[
+  aBool ifTrue:[
+    format := format bitOr: GC_DB_NIL_REFERENCES_MASK.
+  ] ifFalse:[
+    format := format bitAnd: (GC_DB_NIL_REFERENCES_MASK bitInvert)
+  ].
+  self _refreshClassCache: false .
+].
+%
+method:
+_nilReferences
+  ^ (format bitAnd: GC_DB_NIL_REFERENCES_MASK) ~~ 0
+%

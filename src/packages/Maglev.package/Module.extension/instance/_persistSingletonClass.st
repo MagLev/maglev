@@ -1,28 +1,26 @@
 *maglev-runtime
-_persistSingletonClass
-  | singletonClass envId superklass |
-  
+_persistSingletonClass: methodsPersistable with: aBlock
+  | singletonClass envId klass superklass val |
   envId := 1 .
 
+  "nothing to do, if no singleton class"
   singletonClass := self rubySingletonClassForExtend .
-  (singletonClass == nil) ifFalse: [
-    superklass := (singletonClass rubySuperclass: envId) .
-    (superklass _setRubyModulePersistentBit: true) ifFalse: [
-      singletonClass persistentRubySuperclass: envId put: superklass .
-      (singletonClass persistentNameSpace: envId) ifNil: [
-        singletonClass persistentNameSpace: envId put: (singletonClass nameSpace: envId) .
-      ]
-    ].
-    (self class ~~ Module) ifTrue: [
-      [superklass ~~ Object class] whileTrue: [
-        singletonClass := superklass .
-        superklass := (singletonClass rubySuperclass: envId) .
-        (superklass _setRubyModulePersistentBit: true) ifFalse: [
-          singletonClass persistentRubySuperclass: envId put: superklass .
-        ].
+  (singletonClass == nil) ifTrue: [^ nil ].
+
+  klass := singletonClass .
+  superklass := (klass rubySuperclass: envId) .
+  [
+    ((aBlock value: superklass primaryCopy) or: [superklass class ~~ Module]) ifTrue: [
+      (superklass objectSecurityPolicy == nil) ifTrue: [ | pcopy |
+        pcopy := superklass primaryCopy .
+        pcopy ifNotNil: [ pcopy _setPersistable: methodsPersistable with: aBlock ] .
+        superklass _setPersistable: methodsPersistable with: aBlock.
+        klass persistentRubySuperclass: envId put: superklass .
       ].
+      klass := superklass .
+      superklass := (klass rubySuperclass: envId) .
     ] ifFalse: [
-      "persist methods defined in module's singleton class"
-      self rubySingletonClass _persistMethods .
-    ]
-  ]
+      superklass := superklass rubySuperclass: envId .
+    ].
+    klass ~~ Object class and: [ superklass ~~ nil]
+  ] whileTrue.
