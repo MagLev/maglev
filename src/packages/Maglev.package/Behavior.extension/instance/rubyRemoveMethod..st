@@ -5,9 +5,6 @@ rubyRemoveMethod: aSymbol
   envId := 1"__callerEnvId" .
   sel := aSymbol _asSymbolWithRubySuffix: 16r3 " #0*& " .
   cm := self compiledMethodAt: sel rubyEnv: envId .
-  aSymbol asString = 'const_missing' ifTrue: [
-  ^ nil.
-  ].
   cm ifNotNil:[
     cm _isSmallInteger ifTrue:[
        cm <= METH_lu_skipPersistentMd ifTrue:[

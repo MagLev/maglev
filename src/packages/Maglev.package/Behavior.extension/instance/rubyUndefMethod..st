@@ -12,7 +12,7 @@ rubyUndefMethod: aName
      ]
   ] ifNotNil:[
      cm == METH_lu_undef_ed ifTrue:[ 
-       "NameError signal:'undef_method, ', aName , ' has already been undef-ed'"
+       NameError signal:'undef_method, ', aName , ' has already been undef-ed'
      ].
     (self rubySelectorsWithPrefix: baseSel env: envId) do: [ :eaSelector |
         self removeRubySelector: eaSelector env: envId .
