@@ -78,12 +78,12 @@ class Module
 
   def reinclude
     self.reinclude_store.each do |mod|
-      self.include resolve_constant(mod)
+      self.include __resolve_constant(mod)
     end unless self.reinclude_store.nil?
   end
   def reextend
     self.reextend_store.each do |mod|
-      self.extend resolve_constant(mod)
+      self.extend __resolve_constant(mod)
     end unless self.reextend_store.nil?
   end
 
@@ -117,7 +117,7 @@ class Module
   def extended(a_module)
   end
 
-  def resolve_constant(mod)
+  def __resolve_constant(mod)
     # get constant value from mod (string)
     names = mod.split('::')
     names.shift if names.empty? || names.first.empty?
