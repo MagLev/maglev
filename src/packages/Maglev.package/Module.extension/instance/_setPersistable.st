@@ -1,5 +1,5 @@
 *maglev-runtime
-_setPersistable: methodsPersistable
+_setPersistable: methodsPersistable with: aBlock
   "a ruby primitive"
   | envId tns pns parTns parPns savePm cst wasPersistable klass superklass |
   envId := 1"__callerEnvId" .
@@ -18,7 +18,7 @@ _setPersistable: methodsPersistable
       tns persistentCopy: pns .
       self persistentNameSpace: envId put: pns .
       tns keysAndValuesDo: [:key :value |
-        "pns at: key runtimePut: value ."
+        pns at: key runtimePut: value .
       ].
     ].
     
@@ -34,12 +34,12 @@ _setPersistable: methodsPersistable
     methodsPersistable ifTrue: [
       self _persistMethods .
 
-      self _persistIncludedModules: methodsPersistable . 
+      self _persistIncludedModules: methodsPersistable with: aBlock .
 
       self _persistClassMethod .
 
-      self _persistSingletonClass .
+      self _persistSingletonClass: methodsPersistable with: aBlock .
     ].
   ].
 
-  self _persistAutoloadCache.   
+  self _persistAutoloadCache.
