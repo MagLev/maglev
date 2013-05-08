@@ -70,21 +70,21 @@ class Module
   end
 
   def reinclude_store
-    __reinclude_store
+    __reinclude_store or []
   end
   def reextend_store
-    __reextend_store
+    __reextend_store or []
   end
 
   def reinclude
     self.reinclude_store.each do |mod|
       self.include __resolve_constant(mod)
-    end unless self.reinclude_store.nil?
+    end
   end
   def reextend
     self.reextend_store.each do |mod|
       self.extend __resolve_constant(mod)
-    end unless self.reextend_store.nil?
+    end
   end
 
   # Returns what has been included and extended
