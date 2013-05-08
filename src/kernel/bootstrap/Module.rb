@@ -87,9 +87,9 @@ class Module
     end unless self.reextend_store.nil?
   end
 
+  # Returns what has been included and extended
   def redo_include_and_extend
-    reinclude
-    reextend
+    reinclude + reextend
   end
 
   def include(*modules)
