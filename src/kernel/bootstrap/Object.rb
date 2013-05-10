@@ -689,6 +689,10 @@ class Object
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 
   # MaglevUndefined in Object1.rb
+  
+  def __evaluate_smalltalk(code)
+    code.__evaluate_smalltalk_in_context(self)
+  end
 
 end
 Object.__freeze_constants

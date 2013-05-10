@@ -73,6 +73,11 @@ anArg _isSmallInteger ifTrue:[
 self _primitiveFailed:#_rubyAddAll: args: { anArg }
 %
 
+method:
+evaluateInContext: anObject
+  ^ self evaluateInContext: anObject symbolList: nil
+%
+
 ! edits to _rubyAt1:  must be replicated to _rubyAt2: for env 2"
 method:
 _rubyAt1: anOffset
