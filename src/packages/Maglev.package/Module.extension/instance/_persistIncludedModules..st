@@ -8,7 +8,6 @@ _persistIncludedModules: methodsPersistable with: aBlock
   superklass := (klass rubySuperclass: envId) .
   [
     (((aBlock value: superklass primaryCopy) or: [aBlock value: superklass]) or: [ superklass class ~~ Module ] ) ifTrue: [
-      superklass _setRubyModulePersistentBit: true.
       (superklass objectSecurityPolicy == nil) ifTrue: [ | pcopy |
           pcopy := superklass primaryCopy .
           pcopy ifNotNil: [ pcopy _setPersistable: methodsPersistable with: aBlock ] .

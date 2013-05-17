@@ -70,26 +70,26 @@ class Module
   end
 
   def reinclude_store
-    __reinclude_store
+    __reinclude_store or []
   end
   def reextend_store
-    __reextend_store
+    __reextend_store or []
   end
 
   def reinclude
     self.reinclude_store.each do |mod|
-      self.include resolve_constant(mod)
-    end unless self.reinclude_store.nil?
+      self.include __resolve_constant(mod)
+    end
   end
   def reextend
     self.reextend_store.each do |mod|
-      self.extend resolve_constant(mod)
-    end unless self.reextend_store.nil?
+      self.extend __resolve_constant(mod)
+    end
   end
 
+  # Returns what has been included and extended
   def redo_include_and_extend
-    reinclude
-    reextend
+    reinclude + reextend
   end
 
   def include(*modules)
@@ -117,7 +117,7 @@ class Module
   def extended(a_module)
   end
 
-  def resolve_constant(mod)
+  def __resolve_constant(mod)
     # get constant value from mod (string)
     names = mod.split('::')
     names.shift if names.empty? || names.first.empty?
