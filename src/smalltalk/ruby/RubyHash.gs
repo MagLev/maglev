@@ -311,7 +311,7 @@ do: aBlock
 category: 'Basic hash'
 set compile_env: 0
 method: RubyHash
-doKeyValue: aBlock
+keysAndValuesDo: aBlock
 	|association|
 	association := self head next.
 	[association ~~ self tail] whileTrue: [
@@ -544,7 +544,7 @@ category: 'Ruby support'
 set compile_env: 0
 method: RubyHash
 _rubyEachPair: aBlock
-	self doKeyValue: [:key :value |
+	self keysAndValuesDo: [:key :value |
 		self @ruby1:__do_pair: aBlock _: key _: value].
 %
 doit
