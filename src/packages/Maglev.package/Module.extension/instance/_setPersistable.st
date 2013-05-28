@@ -21,7 +21,7 @@ _setPersistable: methodsPersistable with: aBlock
         pns at: key runtimePut: value .
       ].
     ].
-    
+
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
     [ cst persistenceMode: true .
