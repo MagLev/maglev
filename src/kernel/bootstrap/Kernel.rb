@@ -469,8 +469,7 @@ module Kernel
   primitive 'format*', 'sprintf:with:'
 
   def gets(sep=$/)
-    # TODO: Need to use-up ARGV first...
-    STDIN.gets(sep)
+    $stdin.gets(sep)
   end
 
   primitive 'global_variables', 'rubyGlobalVariables'

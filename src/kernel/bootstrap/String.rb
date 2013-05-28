@@ -2024,6 +2024,10 @@ class String
     self.__ordAt(0)
   end
 
+  def chr()
+    self[0]
+  end
+
   def tolower()
     self.ord.tolower
   end

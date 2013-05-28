@@ -62,6 +62,7 @@ class Class
     __ruby_new(super_cls)
   end
 
+  primitive_nobridge '__all_fixed_instvar_names', 'allInstVarNames'
   class_primitive_nobridge_env '__ruby_new_fixedivs&', '_rubyNew', ':instVars:do:'
 
   # Define a new Class using fixed instance variables for the

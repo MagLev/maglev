@@ -1,8 +1,6 @@
-# Java, because those are the 64bit boxes. We'll change it once Ruby
-# boxes are 64bit, too
-language: java
+language: ruby
 before_install:
-  - "sudo apt-get install -qq rake"
+  - "sudo apt-get install -qq libssl-dev"
 before_script:
   - "./install.sh"
 script: "rake travis"
@@ -10,6 +8,7 @@ env:
   - CI_TESTS=rubyspec
   - CI_TESTS=vmunit
   - CI_TESTS=vmunit2
+  - CI_TESTS=p_tests
   # These next ones have to be cleaned up, they don't currently pass
   # - CI_TESTS=fav_gems
   # - CI_TESTS=sinatra

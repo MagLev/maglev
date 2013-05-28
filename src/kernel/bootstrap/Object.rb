@@ -442,6 +442,14 @@ class Object
     self
   end
 
+  def initialize_dup(other)
+    initialize_copy(other)
+  end
+
+  def initialize_clone(other)
+    initialize_copy(other)
+  end
+
   def instance_of?(cls)
     # Modified from RUBINIUS
     if self.class._equal?(cls)

@@ -3,6 +3,15 @@ class Module
   # See also delta/Module.rb
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
+  
+  primitive_nobridge '__maglev_nil_references', '_nilReferences:'
+
+  def maglev_nil_references(switch=true)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if switch and self.maglev_persistable?
+    __maglev_nil_references(switch)
+  end
+
+  primitive 'maglev_nil_references?', '_nilReferences'
 
   def __isBehavior
     true
@@ -25,7 +34,19 @@ class Module
 
   primitive_nobridge '__check_include', '_checkIncludeRubyModule:'
   primitive_nobridge '__include_module', '_includeRubyModule:'
+  primitive_nobridge '__save_for_reinclude', '_rubySaveForReinclude:'
+  primitive_nobridge '__reinclude_store', '_rubyReincludeStore'
+  primitive_nobridge '__save_for_reextend', '_rubySaveForReextend:'
+  primitive_nobridge '__reextend_store', '_rubyReextendStore'
   primitive_nobridge '__is_virtual', 'isVirtual'
+  primitive_nobridge '__maglev_nil_references', '_nilReferences:'
+
+  def maglev_nil_references(switch=true)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if switch and self.maglev_persistable?
+    __maglev_nil_references(switch)
+  end
+
+  primitive 'maglev_nil_references?', '_nilReferences'
 
   # append_features deprecated, but needed by Rails3
   def append_features(other)
@@ -33,6 +54,42 @@ class Module
       other.__include_module(self)
     end
     self
+  end
+
+  def redo_include(*modules)
+    modules.each do |mod|
+      __save_for_reinclude(mod.to_s)
+    end
+    include(*modules)
+  end
+  def redo_extend(*modules)
+    modules.each do |mod|
+      __save_for_reextend(mod.to_s)
+    end
+    extend(*modules)
+  end
+
+  def reinclude_store
+    __reinclude_store or []
+  end
+  def reextend_store
+    __reextend_store or []
+  end
+
+  def reinclude
+    self.reinclude_store.each do |mod|
+      self.include __resolve_constant(mod)
+    end
+  end
+  def reextend
+    self.reextend_store.each do |mod|
+      self.extend __resolve_constant(mod)
+    end
+  end
+
+  # Returns what has been included and extended
+  def redo_include_and_extend
+    reinclude + reextend
   end
 
   def include(*modules)
@@ -58,6 +115,18 @@ class Module
   # Callback invoked whenever the receiver is used to extend an object.
   # The object is passed as a paramter.
   def extended(a_module)
+  end
+
+  def __resolve_constant(mod)
+    # get constant value from mod (string)
+    names = mod.split('::')
+    names.shift if names.empty? || names.first.empty?
+
+    constant = Object
+    names.each do |name|
+      constant = constant.const_defined?(name) ? constant.const_get(name) : constant.const_missing(name)
+    end
+    constant
   end
 
   # --------- remainder of methods approximately alphabetical
@@ -163,8 +232,7 @@ class Module
 
   primitive_nobridge '__const_defined', 'rubyConstDefined:'
 
-  def const_defined?(name)
-    # does not look in superclasses (but 1.9 does)
+  def const_defined?(name, search_parents=true)
     if name._isSymbol
       sym = name
     else
@@ -173,6 +241,13 @@ class Module
     end
     res = self.__const_defined(sym)
     if res._equal?(false)
+      if search_parents
+        return true if constants.include?(name.to_s)
+        return true if ancestors.include?(Object) &&
+          Object.constants.include?(name.to_s)
+        return true if instance_of?(Module) &&
+          self.class.constants.include?(name.to_s)
+      end
       if str._equal?(nil)
         str = name.to_s   # arg is a Symbol
       end
@@ -247,8 +322,49 @@ class Module
     define_method(sym, block)
   end
 
+  primitive_nobridge '__copy_methods', '_shallowCopyMethodsFrom:environments:'
+
+  def __internal_clone
+    fixed_ivars = self.__all_fixed_instvar_names - self.superclass.__all_fixed_instvar_names
+    duplicate = self.class.new_fixed_instvars(self.superclass, fixed_ivars)
+
+    self.instance_variables.each do |ivar|
+      duplicate.instance_variable_set(ivar, self.instance_variable_get(ivar))
+    end
+    self.class_variables.each do |ivar|
+      duplicate.class_variable_set(ivar, self.class_variable_get(ivar))
+    end
+
+    # Ancestors added with Module#include
+    (self.included_modules - self.superclass.included_modules).each do |mod|
+      duplicate.send :include, mod
+    end
+    # Ancestors added with Module#extend
+    (self.singleton_class.included_modules -
+     self.superclass.singleton_class.included_modules).each do |mod|
+      duplicate.send :extend, mod
+    end
+
+    # copy methods
+    duplicate.__copy_methods(self, [0, 1])
+    duplicate
+  end
+
   def dup
-    raise NotImplementedError, "Module#dup"
+    duplicate = __internal_clone
+    duplicate.taint if self.tainted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
+    duplicate.initialize_dup(self)
+    duplicate
+  end
+
+  def clone
+    duplicate = __internal_clone
+    duplicate.freeze if self.frozen? # only in clone, not in dup
+    duplicate.taint if self.tainted?
+    # duplicate.untrust if self.untrusted? # Not supported on MagLev
+    duplicate.initialize_clone(self)
+    duplicate
   end
 
   # make associations holding constants of receiver invariant
@@ -417,12 +533,15 @@ class Module
   # instances flag (which is set to true by default). See
   # <tt>Class#maglev_persistable_instances</tt> for controlling whether
   # instances of the class are persistable.
-  def maglev_persistable(methodsPersistable = false)
+  def maglev_persistable(methodsPersistable = false, &block)
+    raise ArgumentError, "A module/class cannot be persistable and marked as nil_references at the same time." if self.maglev_nil_references?
     methodsPersistable = (methodsPersistable == true)
-    self.__set_persistable(methodsPersistable)
+    block = Proc.new { |mod| true } unless block_given?
+    self.__set_persistable(methodsPersistable, block)
   end
 
-  primitive_nobridge '__set_persistable', '_setPersistable:'
+  primitive_nobridge '__set_persistable', '_setPersistable:with:'
+  primitive_nobridge 'module_parent', 'rubyModuleParent'
 
   # Redefine a class and migrate it's instances. Will abort or commit
   # the current transaction.

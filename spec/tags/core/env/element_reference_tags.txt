@@ -1,1 +1,2 @@
 fails:ENV.[] uses the locale encoding
+fails:ENV.[] transcodes from the locale encoding to Encoding.default_internal if set

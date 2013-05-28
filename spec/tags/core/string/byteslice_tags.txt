@@ -18,3 +18,4 @@ fails:String#byteslice with Range always taints resulting strings when self is t
 fails:String#byteslice with Range returns subclass instances
 fails:String#byteslice with Range calls to_int on range arguments
 fails:String#byteslice with Range works with Range subclasses
+fails:String#byteslice on on non ASCII strings returns byteslice of unicode strings
