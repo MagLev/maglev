@@ -21,7 +21,7 @@ _setPersistable: methodsPersistable with: aBlock
         pns at: key runtimePut: value .
       ].
     ].
-    
+
     cst := RubyCompilerState current .
     savePm := cst persistenceMode .
     [ cst persistenceMode: true .
@@ -31,15 +31,15 @@ _setPersistable: methodsPersistable with: aBlock
     ] ensure:[
       cst persistenceMode: savePm
     ].
-    methodsPersistable ifTrue: [
-      self _persistMethods .
+  ].
+  methodsPersistable ifTrue: [
+    self _persistMethods .
 
-      self _persistIncludedModules: methodsPersistable with: aBlock .
+    self _persistIncludedModules: methodsPersistable with: aBlock .
 
-      self _persistClassMethod .
+    self _persistClassMethod .
 
-      self _persistSingletonClass: methodsPersistable with: aBlock .
-    ].
+    self _persistSingletonClass: methodsPersistable with: aBlock .
   ].
 
   self _persistAutoloadCache.
