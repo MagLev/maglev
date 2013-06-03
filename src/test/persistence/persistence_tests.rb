@@ -438,6 +438,15 @@ Maglev.persistent do
       test(T023.singleton_class.included_modules.include?(M023_2), true, "should extend module.")
     end
 
+    def test_024
+      require "t024"
+      test(T024.instance_methods.include?("t024_2"), true, "should respond_to? monkey-patched method")
+    end
+
+    def check_024
+      test(T024.instance_methods.include?("t024_2"), true, "should persist monkey-patched methods")
+    end
+
     ########################################
     # Test Framework Methods
     ########################################
