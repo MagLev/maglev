@@ -58,4 +58,8 @@ class Symbol
     Proc.new { |*args| args.shift.__send__(self, *args) }
   end
 
+  def =~(obj)
+    to_s =~ obj
+  end
+
 end
