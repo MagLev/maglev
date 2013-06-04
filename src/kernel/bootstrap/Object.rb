@@ -148,10 +148,10 @@ class Object
 
   def public_send(sym, *args)
     # TODO: public_methods should return an array of symbols
-    if (public_methods.include? sym.to_s)
-      send(sym, *args)
-    else
+    if protected_methods.include?(sym.to_s) || private_methods.include?(sym.to_s)
       raise NoMethodError(sym)
+    else
+      send(sym, *args)
     end
   end
 
