@@ -148,7 +148,7 @@ class Object
 
   def public_send(sym, *args)
     # TODO: public_methods should return an array of symbols
-    if (public_methods include? sym.to_s)
+    if (public_methods.include? sym.to_s)
       send(sym, *args)
     else
       raise NoMethodError(sym)
