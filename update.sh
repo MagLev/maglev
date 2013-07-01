@@ -80,7 +80,7 @@ cd $MAGLEV_HOME/..
 # Download appropriate version of GemStone
 if [ ! -e $gss_file ]; then
     echo "[Info] Downloading $gss_file using ${cmd}"
-    $cmd http://glass-downloads.gemstone.com/maglev/$gss_file
+    $cmd http://seaside.gemtalksystems.com/maglev/$gss_file
 else
     echo "[Info] $gss_file already exists"
     echo "to replace it, remove or rename it and rerun this script"
@@ -107,6 +107,9 @@ cd $MAGLEV_HOME
 mkdir -p locks
 # and the correct updated keyfile
 rm -f etc/maglev.demo.key
+
+echo "[Info] Copying key"
+
 ln -sf maglev.demo.key-$PLATFORM etc/maglev.demo.key
 # Make sure we have specs and benchmarks.
 echo "[Info] updating MSpec and RubySpec submodules"
@@ -141,7 +144,7 @@ if [  -e "`which rake 2>/dev/null`" ]; then
         echo "[Info] In-place upgrade not possible. Removing existing 'maglev' configuration file."
         rake stone:destroy[maglev] >/dev/null
     fi
-
+echo 'foo'
     rake build:clobber
     extent0='gemstone/bin/extent0.dbf'
     echo "[Info] Building new extent0.ruby.dbf from $extent0 and creating default maglev stone"
