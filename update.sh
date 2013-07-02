@@ -80,7 +80,7 @@ cd $MAGLEV_HOME/..
 # Download appropriate version of GemStone
 if [ ! -e $gss_file ]; then
     echo "[Info] Downloading $gss_file using ${cmd}"
-    $cmd http://glass-downloads.gemstone.com/maglev/$gss_file
+    $cmd http://seaside.gemtalksystems.com/maglev/$gss_file
 else
     echo "[Info] $gss_file already exists"
     echo "to replace it, remove or rename it and rerun this script"
