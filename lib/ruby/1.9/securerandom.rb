@@ -114,6 +114,40 @@ module SecureRandom
     [random_bytes(n)].pack("m*").delete("\n")
   end
 
+  # SecureRandom.urlsafe_base64 generates a random URL-safe base64 string.
+  #
+  # The argument _n_ specifies the length of the random length.
+  # The length of the result string is about 4/3 of _n_.
+  #
+  # If _n_ is not specified, 16 is assumed.
+  # It may be larger in future.
+  #
+  # The boolean argument _padding_ specifies the padding.
+  # If it is false or nil, padding is not generated.
+  # Otherwise padding is generated.
+  # By default, padding is not generated because "=" may be used as a URL delimiter.
+  #
+  # The result may contain A-Z, a-z, 0-9, "-" and "_".
+  # "=" is also used if _padding_ is true.
+  #
+  #   p SecureRandom.urlsafe_base64 #=> "b4GOKm4pOYU_-BOXcrUGDg"
+  #   p SecureRandom.urlsafe_base64 #=> "UZLdOkzop70Ddx-IJR0ABg"
+  #
+  #   p SecureRandom.urlsafe_base64(nil, true) #=> "i0XQ-7gglIsHGV2_BNPrdQ=="
+  #   p SecureRandom.urlsafe_base64(nil, true) #=> "-M8rLhr7JEpJlqFGUMmOxg=="
+  #
+  # If secure random number generator is not available,
+  # NotImplementedError is raised.
+  #
+  # See RFC 3548 for the definition of URL-safe base64.
+  def self.urlsafe_base64(n=nil, padding=false)
+    s = [random_bytes(n)].pack("m*")
+    s.delete!("\n")
+    s.tr!("+/", "-_")
+    s.delete!("=") unless padding
+    s
+  end
+
   # SecureRandom.random_number generates a random number.
   #
   # If an positive integer is given as n,
@@ -145,5 +179,23 @@ module SecureRandom
       i64 = SecureRandom.random_bytes(8).unpack("Q")[0]
       Math.ldexp(i64 >> (64-Float::MANT_DIG), -Float::MANT_DIG)
     end
+  end
+
+  # SecureRandom.uuid generates a v4 random UUID (Universally Unique IDentifier).
+  #
+  #   p SecureRandom.uuid #=> "2d931510-d99f-494a-8c67-87feb05e1594"
+  #   p SecureRandom.uuid #=> "bad85eb9-0713-4da7-8d36-07a8e4b00eab"
+  #   p SecureRandom.uuid #=> "62936e70-1815-439b-bf89-8492855a7e6b"
+  #
+  # The version 4 UUID is purely random (except the version).
+  # It doesn't contain meaningful information such as MAC address, time, etc.
+  #
+  # See RFC 4122 for details of UUID.
+  #
+  def self.uuid
+    ary = self.random_bytes(16).unpack("NnnnnN")
+    ary[2] = (ary[2] & 0x0fff) | 0x4000
+    ary[3] = (ary[3] & 0x3fff) | 0x8000
+    "%08x-%04x-%04x-%04x-%04x%08x" % ary
   end
 end
