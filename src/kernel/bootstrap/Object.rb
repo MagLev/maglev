@@ -146,6 +146,15 @@ class Object
     self.call(*args)
   end
 
+  def public_send(sym, *args)
+    # TODO: public_methods should return an array of symbols
+    if protected_methods.include?(sym.to_s) || private_methods.include?(sym.to_s)
+      raise NoMethodError(sym)
+    else
+      send(sym, *args)
+    end
+  end
+
   # primitive   '__basic_dup', '_rubyBasicDup'  # use non-singleton class
   primitive   '__basic_clone', 'shallowCopy' # use singleton class
 

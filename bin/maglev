@@ -134,6 +134,8 @@ EOF
     if [ "$result" -ne 0 ] ; then
         echo "FAILED LOADING PRIMS: $result See $logfile"
     fi
+
+    $MAGLEV_HOME/bin/maglev-ruby $MAGLEV_HOME/src/kernel/extensions.rb
   fi
 }
 
