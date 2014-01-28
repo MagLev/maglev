@@ -331,9 +331,17 @@ class IO
     nil  # need to change after self.popen and self.pipe implemented
   end
 
-  def self.popen(cmd, mode="r", &block)
+  def self.popen(cmd, options={}, &block)
     cmd = Maglev::Type.coerce_to(cmd, String, :to_s)
-    mode = Maglev::Type.coerce_to(mode, String, :to_s)
+    mode = "r"
+
+    if options._isHash
+      #TODO: evaluate options
+      mode = options["mode"] ? options["mode"] : "r" 
+    else
+      mode = Maglev::Type.coerce_to(mode, String, :to_s)
+    end
+
     if cmd[0]._equal?( ?-)
       raise ArgumentError , '"-" prefix not supported by IO.popen' 
     end

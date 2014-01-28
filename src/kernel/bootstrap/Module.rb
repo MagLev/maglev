@@ -772,5 +772,6 @@ class Module
   def private_constant(*args)
     warn "NotImplemented: Module#private_constant"
   end
-
+  
+  primitive '__st_category_names', 'categoryNames'
 end
