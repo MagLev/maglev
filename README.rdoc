@@ -1,5 +1,5 @@
 = MagLev
-<b>Build Status:</b> {<img src="https://travis-ci.org/MagLev/maglev.png?branch=master-1.9" alt="Build Status" />}[https://travis-ci.org/MagLev/maglev]
+<b>Build Status:</b> {<img src="https://travis-ci.org/MagLev/maglev.png" alt="Build Status" />}[https://travis-ci.org/MagLev/maglev]
 
 == Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.
