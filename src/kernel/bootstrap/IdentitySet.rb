@@ -155,7 +155,7 @@ class IdentitySet
     end
     begin
       s << ( collect {|ea| ea.inspect }.join(", ") )
-      s << "}"
+      s << "}>"
     ensure
       ts.remove(self)
     end
