@@ -50,7 +50,15 @@ module Maglev
   def root
     PERSISTENT_ROOT
   end
-  module_function :root
+
+  def [](key)
+    root[key]
+  end
+
+  def []=(key, value)
+    root[key] = value
+  end
+  module_function :root, :[], :[]=
 
   # Executes the block with the current thread in transient mode, which
   # affects the following operations:
