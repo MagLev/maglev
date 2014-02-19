@@ -9,7 +9,7 @@ describe 'Maglev' do
   end
 
   describe '#[]' do
-    it 'updates Maglev::PERSISTENT_ROOT' do
+    it 'references Maglev::PERSISTENT_ROOT' do
       message = 'hello world'
       Maglev::PERSISTENT_ROOT[:message] = message
       Maglev[:message].should == message
@@ -18,8 +18,9 @@ describe 'Maglev' do
 
   describe '#[]=' do
     it 'updates Maglev::PERSISTENT_ROOT' do
-      Maglev[:message] = 'hello world'
-      Maglev[:message].should == Maglev::PERSISTENT_ROOT[:message]
+      message = 'hello world'
+      Maglev[:message] = message
+      Maglev::PERSISTENT_ROOT[:message].should == message
     end
   end
 
