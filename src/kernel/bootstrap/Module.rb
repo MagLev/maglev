@@ -3,7 +3,7 @@ class Module
   # See also delta/Module.rb
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
-  
+
   primitive_nobridge '__maglev_nil_references', '_nilReferences:'
 
   def maglev_nil_references(switch=true)
@@ -777,6 +777,6 @@ class Module
   def private_constant(*args)
     warn "NotImplemented: Module#private_constant"
   end
-  
+
   primitive '__st_category_names', 'categoryNames'
 end
