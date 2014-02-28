@@ -15,4 +15,4 @@ unless mfa == 2 ; raise 'error'; end
 
 acd = Module.method(:const_defined?).arity
 
-unless acd == 1 ; raise 'error'; end;
+unless acd == -1 ; raise "error #{acd}"; end;

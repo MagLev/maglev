@@ -232,6 +232,11 @@ class Module
 
   primitive_nobridge '__const_defined', 'rubyConstDefined:'
 
+  # generic method with same arity as in MRI
+  def const_defined?(*args)
+    raise ArgumentError, "too many arguments (#{args.size} for 1..2)"
+  end
+
   def const_defined?(name, search_parents=true)
     if name._isSymbol
       sym = name
