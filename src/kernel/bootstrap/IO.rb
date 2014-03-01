@@ -582,6 +582,10 @@ class IO
 
   # def read() ; end  # subclass responsibility
 
+  def read_nonblock(*args)
+    recv_nonblock(*args)
+  end
+
   def readchar 
     ch = self.getc
     if ch._equal?(nil)
