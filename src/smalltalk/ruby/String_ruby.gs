@@ -73,6 +73,11 @@ anArg _isSmallInteger ifTrue:[
 self _primitiveFailed:#_rubyAddAll: args: { anArg }
 %
 
+method:
+evaluateInContext: anObject
+  ^ self evaluateInContext: anObject symbolList: GsSession currentSession symbolList
+%
+
 ! edits to _rubyAt1:  must be replicated to _rubyAt2: for env 2"
 method:
 _rubyAt1: anOffset
@@ -484,6 +489,11 @@ _asSymbolWithRubySuffix: argInt
   (argInt // 4) > 74 ifTrue:[ Error signal:'max of 74 fixed args exceeded' ].
 
   self _primitiveFailed: #_asSymbolWithRubySuffix: args: { argInt } .
+%
+
+method: 
+evaluateInContext: anObject
+  ^ self evaluateInContext: anObject symbolList: GsSession currentSession symbolList
 %
 
 !----------------------------------

@@ -2,7 +2,7 @@
 run
   "following classes moved to DataCuratorObjectSecurityPolicy because they have
    Ruby mappings loaded by the Ruby bootstrap."
-{ AbstractDictionary .
+{AbstractDictionary .
  AbstractException .
  Array . 
  Behavior . 

@@ -6,6 +6,8 @@ module ObjectSpace
   class Repository
     class_primitive_nobridge '__loaded_classes', '_loadedClasses:'
     primitive_nobridge '__list_instances_in_memory', '_listInstancesInMemory:'
+    primitive_nobridge '__list_instances', 'listInstances:limit:toDirectory:withMaxThreads:maxCpuUsage:memoryOnly:'
+
   end
 
   # class ObjectSpaceArray < Array , in ObjectSpace1.rb

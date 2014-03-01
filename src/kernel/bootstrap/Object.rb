@@ -706,7 +706,6 @@ class Object
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 
   # MaglevUndefined in Object1.rb
-
 end
 Object.__freeze_constants
 
