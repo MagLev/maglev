@@ -69,8 +69,7 @@ if ENV["TRAVIS"]
   task :travis do
     Rake::Task["stwrappers"].invoke
     ENV["PATH"] = "#{ENV['PATH']}:#{File.dirname(__FILE__)}/bin"
-    # this should return the proper exit status
-    exit Rake::Task[tests[ENV["CI_TESTS"]]].invoke
+    Rake::Task[tests[ENV["CI_TESTS"]]].invoke
   end
 
   desc "Run vmunit tests on clean stone and again after update.sh ran"
