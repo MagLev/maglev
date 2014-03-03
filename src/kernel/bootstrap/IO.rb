@@ -663,7 +663,7 @@ class IO
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
       end
     end
-    Kernel.__select(reads, writes, errs, *[ ms ])
+    Kernel.__select(reads, writes, errs, *[ ms ]).map{|arr| Array(arr)}
   end
 
   primitive 'stat',  'stat'
