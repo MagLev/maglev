@@ -248,6 +248,11 @@ _rubyNilQ
 !  _rubyKind_Block_String_Range_Regexp_Array deleted
 !  _rubyTo: , _rubyTo_:    implemented in .mcz
 
+method:
+newRubySubclass: aString  instancesPersistent: ipersistBool fixedIvs: ivList
+  "this is sometimes called when a class X < ModuleX inherits from a module"
+  ArgumentTypeError signal: 'wrong argument type ', self class rubyFullName, '. expected a class.'
+%
 
 category: 'Ruby private'
 method:
