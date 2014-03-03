@@ -74,9 +74,11 @@ if ENV["TRAVIS"]
 
   desc "Run vmunit tests on clean stone and again after update.sh ran"
   task :"travis:vmunit" do
-    system "rake tests:vmunit"
-    system "./update.sh"
-    system "rake tests:vmunit"
+    unless system("rake tests:vmunit") &&
+        system("./update.sh") &&
+        system("rake tests:vmunit")
+      exit 1
+    end
   end
 end
 

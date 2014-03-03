@@ -3,7 +3,7 @@ class Module
   # See also delta/Module.rb
 
   primitive_nobridge '__instvar_get', 'rubyInstvarAt:'
-  
+
   primitive_nobridge '__maglev_nil_references', '_nilReferences:'
 
   def maglev_nil_references(switch=true)
@@ -232,7 +232,38 @@ class Module
 
   primitive_nobridge '__const_defined', 'rubyConstDefined:'
 
-  def const_defined?(name, search_parents=true)
+  # generic method with same arity as in MRI
+  def const_defined?(*args)
+    raise ArgumentError, "too many arguments (#{args.size} for 1..2)"
+  end
+
+  def const_defined?(name)
+    if name._isSymbol
+      sym = name
+    else
+      str = Maglev::Type.coerce_to(name, String, :to_str)
+      sym = str.to_sym
+    end
+    res = self.__const_defined(sym)
+    if res._equal?(false)
+      return true if constants.include?(name.to_s)
+      return true if ancestors.include?(Object) &&
+        Object.constants.include?(name.to_s)
+      return true if instance_of?(Module) &&
+        self.class.constants.include?(name.to_s)
+      if str._equal?(nil)
+        str = name.to_s   # arg is a Symbol
+      end
+      if str =~ /^[A-Z](\w)*\z/
+        return false
+      else
+        raise NameError, 'arg to const_defined? is not a valid name for a constant'
+      end
+    end
+    res
+  end
+
+  def const_defined?(name, search_parents)
     if name._isSymbol
       sym = name
     else
@@ -772,6 +803,6 @@ class Module
   def private_constant(*args)
     warn "NotImplemented: Module#private_constant"
   end
-  
+
   primitive '__st_category_names', 'categoryNames'
 end

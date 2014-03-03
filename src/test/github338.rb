@@ -1,6 +1,6 @@
 require 'socket'
 
-server = TCPServer.new 2000 # Server bind to port 2000
+server = TCPServer.new "127.0.0.1", 2000 # Server bind to port 2000
 output = []
 
 def read_socket_message(socket, chunk_size = 2)

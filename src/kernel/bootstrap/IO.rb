@@ -49,7 +49,7 @@ class IO
     self
   end
 
-  def each_char(&block)  
+  def each_char(&block)
     unless block_given?
       return IoCharEnumerator.new(self, :each_char) # for 1.8.7
     end
@@ -64,7 +64,7 @@ class IO
       end
       n = 0
       while n < len
-  str = ' ' 
+  str = ' '
   str[0] = buf[n]
   block.call( str )
   n += 1
@@ -76,7 +76,7 @@ class IO
   def __next_line(sep)
     # used by Enumerators
     if sep._equal?(nil)
-      self.__contents 
+      self.__contents
     elsif sep.__size._equal?(0)
       self.__next_paragraph
     else
@@ -106,7 +106,7 @@ class IO
     self
   end
 
-  alias each each_line 
+  alias each each_line
 
   def lines(sep=$/)  # added for 1.8.7
     return IoEnumerator.new(self, :each_line, sep)
@@ -151,7 +151,7 @@ class IO
     unless block_given?
       return f.each_line(sep)  # return an Enumerator, for 1.8.7
     end
-    f.each_line(sep) { | str | 
+    f.each_line(sep) { | str |
       block.call(str)
     }
     nil
@@ -164,21 +164,21 @@ class IO
 
   def getbyte  # added for 1.8.7
     self.getc
-  end 
+  end
 
   def gets(*args)    # [  begin gets implementation
     raise ArgumentError, 'expected 0 or 1 arg, with no block'
   end
-  
+
   def gets(sep_string)
-    # variant after first gets no bridges   
+    # variant after first gets no bridges
     res = self.__gets(sep_string, 0x31)
-    res 
+    res
   end
-  
+
   def gets
-    # variant after first gets no bridges  
-    res = self.__gets( $/, 0x31 ) 
+    # variant after first gets no bridges
+    res = self.__gets( $/, 0x31 )
     res
   end
 
@@ -201,7 +201,7 @@ class IO
   end
 
   def __next_paragraph()
-    # caller has checked for not eof? 
+    # caller has checked for not eof?
     para = ''
     while true  # add non-empty lines to result
       str = self.__next_line_to( 10 )
@@ -217,9 +217,9 @@ class IO
         return para
       end
       ch = self.__peek_byte
-      if ch._equal?(10) 
+      if ch._equal?(10)
         para << self.read(1)  # add first empty line
-        while true   # skip subsequent empty lines 
+        while true   # skip subsequent empty lines
           break if eof?
           ch = self.__peek_byte
           if ch._not_equal?(10)
@@ -276,7 +276,7 @@ class IO
 
   # ]   end of gets implementation
 
-  # NOTE: IO#read() is deprecated...perhaps we don't bother? 
+  # NOTE: IO#read() is deprecated...perhaps we don't bother?
   #   read is implemented in subclasses
 
   def initialize(*args, &block)
@@ -302,7 +302,7 @@ class IO
   end
 
   def lineno=(integer)
-    # per specs, does not alter $. 
+    # per specs, does not alter $.
     if closed?
       raise IOError, 'IO#lineno= on a closed IO'
     end
@@ -318,7 +318,7 @@ class IO
       num = 0
     end
     num += 1
-    @_st_lineNumber = num 
+    @_st_lineNumber = num
     $. = num
     num
   end
@@ -337,13 +337,13 @@ class IO
 
     if options._isHash
       #TODO: evaluate options
-      mode = options["mode"] ? options["mode"] : "r" 
+      mode = options["mode"] ? options["mode"] : "r"
     else
       mode = Maglev::Type.coerce_to(mode, String, :to_s)
     end
 
     if cmd[0]._equal?( ?-)
-      raise ArgumentError , '"-" prefix not supported by IO.popen' 
+      raise ArgumentError , '"-" prefix not supported by IO.popen'
     end
     f = File.__popen(cmd, mode);
     if f._isFixnum
@@ -353,7 +353,7 @@ class IO
       res = block.call( f)
       f.close
       res
-    else 
+    else
       f
     end
   end
@@ -533,7 +533,7 @@ class IO
 
     case args.length
     when 1
-      ex = args.shift      
+      ex = args.shift
       if ex.class._equal?(Fixnum)
         length = Maglev::Type.coerce_to(ex, Fixnum, :to_int)
       else
@@ -586,7 +586,7 @@ class IO
     recv_nonblock(*args)
   end
 
-  def readchar 
+  def readchar
     ch = self.getc
     if ch._equal?(nil)
       raise EOFError, 'EOF during readchar'
@@ -663,19 +663,19 @@ class IO
         raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
       end
     end
-    Kernel.__select(reads, writes, errs, *[ ms ])
+    Kernel.__select(reads, writes, errs, *[ ms ]).map{|arr| Array(arr)}
   end
 
   primitive 'stat',  'stat'
- 
+
   primitive 'sync', 'sync'
 
   # sync= has no effect, in Maglev  File and Socket never buffer output
-  primitive 'sync=', 'setSync:'  
+  primitive 'sync=', 'setSync:'
 
   def self.sysopen(filename, mode=MaglevUndefined, permission=MaglevUndefined)
     f = File.open(filename, mode, permission)
-    f.__fileno 
+    f.__fileno
   end
 
   # def sysread(length, buffer); end # subclass responsibility
@@ -767,7 +767,7 @@ class IO
   def self.copy_stream(from, to, max_length=nil, offset=nil)
     StreamCopier.new(from, to, max_length, offset).run
   end
-  
+
   def ensure_open_and_readable
     raise IOError, "not opened for reading" unless !self.closed? and self.__readable
   end

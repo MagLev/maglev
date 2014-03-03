@@ -24,6 +24,14 @@ _basicNew
 %
 
 classmethod:
+_newSocketForFd: anInteger
+  ^ self _basicNew
+         _twoArgPrim: 14 with: anInteger with: nil; "_setFd:"
+         rubyBlocking: true;
+         yourself
+%
+
+classmethod:
 _socketOsConstants: kind
 
 "Returns an Array of String, SmallInteger pairs 
