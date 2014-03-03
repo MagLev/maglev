@@ -23,3 +23,7 @@ end
 
 expected = "ping pong\nping pong\nping pong\nping pong\nping "
 raise "IO select did not work" unless result == expected
+
+unless rp.class == IO
+  raise "Pipes should pose as instantiating class, so matching in case statements works"
+end

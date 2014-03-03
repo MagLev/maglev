@@ -17,8 +17,8 @@ class IO
     pipefds = FFI::MemoryPointer.new :int, 2
     raise "Error creating pipes" if __cfunctions.pipe(pipefds) != 0
     # r,w = File.__fopen(pipefds[0], 'r'), File.__fopen(pipefds[1], 'w')
-    r = Pipe.__send__(:new, pipefds[0], 'r', self.class)
-    w = Pipe.__send__(:new, pipefds[1], 'w', self.class)
+    r = Pipe.__send__(:new, pipefds[0], 'r', self)
+    w = Pipe.__send__(:new, pipefds[1], 'w', self)
     if block_given?
       begin
         return yield(r,w)
