@@ -877,7 +877,7 @@ module Kernel
     end
 
     arrays = __select(reads, writes, errs, *[ ms ])
-    return arrays if arrays.nil?
+    return arrays if arrays._equal?(nil)
     arrays.map{|arr| Array(arr)}
   end
 
