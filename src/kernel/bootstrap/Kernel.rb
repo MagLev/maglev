@@ -863,14 +863,16 @@ module Kernel
   primitive_nobridge '__select*', 'selectRead:write:error:timeout:'
 
   def select(reads, writes=nil, errs=nil, timeout=nil)
-    ms = if timeout._isFixnum
+    ms = if timeout._equal?(nil)
+      nil
+    elsif timeout._isFixnum
       timeout * 1000
-    elsif timeout._not_equal?(nil)
+    else
       timeout = Maglev::Type.coerce_to(timeout, Float, :to_f)
       (timeout * 1000.0 ).to_int
     end
 
-    unless ms._isFixnum && ms >= 0
+    if ms._isFixnum && ms < 0
       raise ArgumentError, 'Kernel.select, timeout not representable as Fixnum milliseconds >=0'
     end
 
