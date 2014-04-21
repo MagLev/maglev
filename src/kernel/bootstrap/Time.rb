@@ -332,6 +332,7 @@ class Time
   def usec
     @_st_microseconds % 1_000_000 
   end
+  alias_method :nsec, :usec
 
   def to_i
     @_st_microseconds.__divide(1_000_000)
