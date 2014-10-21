@@ -1,3 +1,5 @@
+// File is duplicated in svn/src/ruby.h in the VM build
+
 /**********************************************************************
 
   ruby/ruby.h -
