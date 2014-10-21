@@ -90,9 +90,8 @@ _rubyAt1: anOffset
      returns nil if anOffset is out of range,
      else returns character code at specified position.
   "
-anOffset isInteger ifTrue:[
-  ^ self _rubyAt1: anOffset length: 1.
-].
+<primitive: 961>  "primitive handles anOffset _isInteger"
+
 anOffset _isOneByteString  ifTrue:[ "a String"  | ofs |
   ofs := self _findString: anOffset startingAt: 1 ignoreCase: false .
   ofs ~~ 0 ifTrue:[ ^ anOffset ].
@@ -107,7 +106,8 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
 ^ self @ruby1:__prim_at_failed: anOffset
 %
 
-! old version of _rubyAt1:. Returns an integer value of the character
+! ruby 1.8.7 version of _rubyAt1:. Returns an integer value of the character
+!  still used in some places.
 method:
 _rubyOrdAt: anInteger
 <primitive: 686>
@@ -431,9 +431,9 @@ rubyConcatenate: aString
     [ 
       str := aString @ruby1:to_str 
     ] onSynchronous: AbstractException do:[ :ex| "swallow ex" ] .
-      str _isRubyString ifFalse:[
+		str _isRubyString ifFalse:[
         ArgumentTypeError signal:'String#+ , cannot convert arg to String with to_str'. 
-      ].
+		].
     ^ self rubyConcatenate: str 
   ].
   self _primitiveFailed: #rubyConcatenate: args: { aString }
