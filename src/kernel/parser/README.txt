@@ -57,7 +57,7 @@ To create the generated parser files
   -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
   -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
   -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
-  -g -O2 -DFLG_FAST=1 \
+  -g -O3 -DFLG_FAST=1 \
   -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
   -fno-strict-aliasing -fno-exceptions \
   -I. -I$GEMSTONE/include -x c++ \
@@ -68,7 +68,7 @@ To create the generated parser files
   -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
   -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
   -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
-  -g -O2 -DFLG_FAST=1 \
+  -g -O3 -DFLG_FAST=1 \
   -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
   -fno-strict-aliasing -fno-exceptions \
   -I. -I$GEMSTONE/include -x c++ \
