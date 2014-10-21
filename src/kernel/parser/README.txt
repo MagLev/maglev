@@ -49,9 +49,6 @@ To create the generated parser files
 
   # Linux compile commands with C optimizer turned on
 
-  -g -O3 -DFLG_FAST=1 \
-
-
   /usr/bin/g++ -fmessage-length=0 -fcheck-new \
   -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
   -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
