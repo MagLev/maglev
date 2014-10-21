@@ -141,7 +141,7 @@ __compile: aString options: anInteger
 
 method:
 unescapeUnicode: aString
-  |charSeq result|
+  | result|
   result := aString copyWithRegex: '\\u{[^}]*}' matchesTranslatedUsing: [:useq | |charSeq|
     charSeq := useq copyFrom: 4 to: useq size - 1.
     ((charSeq subStrings: ' ') collect: [:char | self unicodeCharAsString: char]) reduce: [:x :y | x, y]].
