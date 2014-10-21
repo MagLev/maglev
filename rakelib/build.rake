@@ -174,28 +174,14 @@ unless defined? MAGLEV_VERSION
     # Equivalent to the old loading of the MagLev-*.mcz / MCZ_DIR
     def load_file_tree_dir
       # No looping in topaz, so generate a script here
-      input = "#{SMALLTALK_DIR}/loadfiletree.gs"
-
       outfile = "#{FILEIN_DIR}/loadfiletree.out"
       log_run("load_file_tree", outfile) do
         run_topaz("load_file_tree", <<-EOS)
         output push #{outfile} only
-        iferr 1 exit 3
-        set gemstone #{STONE_NAME} user DataCurator pass swordfish
-        login
-        run
-        |repos|
-        repos := MCFileTreeRepository new directory: (FileDirectory on: '#{ENV["MAGLEV_HOME"]}/src/packages').
-
-        Gofer new
-            package: 'Maglev';
-            repository: repos;
-            load
-%
-        expectvalue true
-        commit
-        logout
-        exit 0
+        set gemstone #{STONE_NAME} 
+        input $imageDir/loadfiletree.topaz
+        output pop
+        exit
       EOS
       end
     end
