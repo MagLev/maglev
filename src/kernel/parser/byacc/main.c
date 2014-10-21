@@ -457,6 +457,8 @@ open_files(void)
     if (output_file == 0)
 	open_error(output_file_name);
 
+    fprintf(output_file, "// generated file %s \n\n", output_file_name);
+
     if (rflag)
     {
 	code_file = fopen(code_file_name, "w");
