@@ -2,8 +2,6 @@
 #if !defined(RUBYAST_HF)
 #define RUBYAST_HF 1
 
-#include "lrgint.hf"
-
 class rb_parse_state;
 
 class RubyNode
