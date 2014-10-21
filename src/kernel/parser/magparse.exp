@@ -1,0 +1,5 @@
+MAGPARSE {
+    global:
+  MagParse903;
+  MagCompileError902;
+};
