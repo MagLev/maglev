@@ -25,24 +25,16 @@
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
-// include <stdbool.h>
+#include <limits.h>
 
 // include <assert.h>
 //   use Maglev VM assertion support
 #define assert UTL_ASSERT
 
-#include "om.hf"
+#include "rubyom.hf"
 #include "rubyparser.h"
 #include "rubyast.hf"
-#include "gemsup.hf"
-#include "gemdo.hf"
-#include "object.hf"
-#include "comheap.hf"
 #include "gcifloat.hf"
-#include "floatprim.hf"
-#include "doprimargs.hf"
-#include "intloopsup.hf"
-#include "om_inline.hf"
 #include "unicode/ustring.h"
 #include "unicode/umachine.h"
 #include "unicode/utf.h"
@@ -83,7 +75,7 @@ static NODE* quidToSymbolObj(NODE* q, rb_parse_state *ps)
     OopType symOid = BIT_TO_OOP(oopNum);
     om *omPtr = ps->omPtr;
     NODE *symO = om::LocatePomObj(omPtr, symOid);
-    UTL_ASSERT( symO->classPtr()->isSymbolCls());
+    UTL_ASSERT( om::isSymbol(symO)) ;
     return symO;
   } 
   return RpNameToken::symval(q, ps);
@@ -162,12 +154,12 @@ static YyStackElement* yygrowstack(rb_parse_state *ps, YyStackElement* markPtr)
     newSize = rb_parse_state::yystack_MAXDEPTH;
 
   int64 numBytes = sizeof(YyStackElement) * newSize ;
-  YyStackElement *base = (YyStackElement*)UtlMalloc(numBytes, "yygrowstack");
+  YyStackElement *base = (YyStackElement*)malloc(numBytes);
   int64 depth = -1;
   if (stk->stacksize > 0) {
     depth = stk->mark - stk->base;
     memcpy(base, stk->base, sizeof(YyStackElement)*stk->stacksize);
-    UtlFree(stk->base);
+    free(stk->base);
   };
   stk->base = base;
   stk->mark = base + depth;
@@ -403,7 +395,7 @@ static NODE* NEW_STR( bstring *str, rb_parse_state *ps)
 
 int64 RubyLexStrTerm::incrementNest(NODE **objH, int delta, rb_parse_state *ps)
 {
-  int64 v = om::FetchSmallInt_(objH, nest_ofs);
+  int64 v = om::FetchSmallInt__(*objH, nest_ofs);
   v += delta;
   om::StoreSmallInt_(ps->omPtr, objH, nest_ofs, v);
   return v;
@@ -3571,12 +3563,12 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
   }
   OmScopeType aScope(omPtr);
   NODE **strH = aScope.add( om::NewString_(omPtr, str));
-  NODE* symO = ObjExistingCanonicalSym(omPtr, strH);
+  NODE* symO = ObjExistingCanonicalSym__(omPtr, strH);
   if (symO == NULL) {
     printf( "non-existant symbol %s in initAstSelector\n", str);
     return FALSE;
   }
-  OopType selObjId = om::objIdOfObj( symO);
+  OopType selObjId = om::objIdOfObj__(omPtr, symO);
   selectorIds[e_sel] = OOP_makeSelectorId(0, selObjId);
   return TRUE;
 }
@@ -3681,12 +3673,12 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
 
 static void sessionInit(om *omPtr, rb_parse_state *ps)
 {
-  omPtr->rubyParseState = ps;
+  omPtr->set_rubyParseState( ps);
   ps->omPtr = omPtr;
 
   ps->yystack.initialize();
   yygrowstack(ps, NULL);
-  omPtr->rubyParseStack = &ps->yystack ;
+  omPtr->set_rubyParseStack(&ps->yystack) ;
 
   ps->astClassesH = omPtr->NewGlobalHandle();
   *ps->astClassesH = om::NewArray(omPtr, NUM_AST_CLASSES);
@@ -3723,12 +3715,12 @@ omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr)
   omObjSType **strH = DOPRIM_STACK_ADDR(2);
   omObjSType *isWarningOop = DOPRIM_STACK(1);
 
-  rb_parse_state *ps = (rb_parse_state*) omPtr->rubyParseState;
+  rb_parse_state *ps = omPtr->rubyParseState();
   if (ps == NULL || ! ps->parserActive) 
     return ram_OOP_FALSE; // caller should signal an Exception
   
   omObjSType *strO = *strH;
-  if (! OOP_IS_RAM_OOP(strO) || strO->classPtr()->strCharSize() != 1)
+  if ( om::strCharSize(strO) != 1)
     return NULL;
 
   int64 strSize = om::FetchSize_(strO);
@@ -3779,24 +3771,24 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "Parser lineNumber arg must be in range 0..0x7FFFFFFF");
   }
   { omObjSType *cbytesO = *cbytesH;
-    if (! OOP_IS_RAM_OOP(cbytesO) || !  cbytesO->classPtr()->isCByteArray())
+    if (! om::isCByteArray(cbytesO) )
       return NULL;
   }
   { omObjSType *srcO = *sourceH;
-    if (! OOP_IS_RAM_OOP(srcO) || srcO->classPtr()->strCharSize() != 1) 
+    if (om::strCharSize(srcO) != 1) 
       return NULL;
   } 
   { omObjSType *fileO = *fileNameH;
-    if (! OOP_IS_RAM_OOP(fileO) || fileO->classPtr()->strCharSize() != 1) 
+    if (om::strCharSize(fileO) != 1) 
       return NULL;
   } 
-  rb_parse_state *ps = (rb_parse_state*) omPtr->rubyParseState;
+  rb_parse_state *ps = omPtr->rubyParseState();
   if (ps == NULL) {
     // this path executed on first parse during session only
-    ps = (rb_parse_state*)UtlMalloc( sizeof(*ps), "MagParseInitialize");
+    ps = (rb_parse_state*)malloc( sizeof(*ps) );
     sessionInit(omPtr, ps);
-    omPtr->rubyParseState = ps;
-    omPtr->rubyParseStack = &ps->yystack ;
+    omPtr->set_rubyParseState( ps);
+    omPtr->set_rubyParseStack(&ps->yystack) ;
   } else if (ps->parserActive) {
     GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "reentrant invocation of parser not supported");
   }
@@ -3810,7 +3802,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   /* Setup an initial empty scope. */
   OmScopeType oScope(ps->omPtr);
 
-  ps->cst = &omPtr->workspace()->compilerState;
+  ps->cst = omPtr->compilerState();
   ComHeapInit(ps->cst);
 
   // initialize handles
@@ -3835,8 +3827,8 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   ps->lex_p = NULL;
   ps->lex_pend = NULL;
   { NODE *cbytesO = *cbytesH;
-    UTL_ASSERT(OOP_IS_RAM_OOP(cbytesO) && cbytesO->classPtr()->isCByteArray());
-    int64 info = om::FetchSmallInt_(cbytesH, OC_CByteArray_info);
+    UTL_ASSERT(om::isCByteArray(cbytesO));
+    int64 info = om::FetchSmallInt__(*cbytesH, OC_CByteArray_info);
     cbytesO = *cbytesH;
     int64 srcSize = H_CByteArray::sizeBytes(info);
     if ((uint64)srcSize > INT_MAX) {
@@ -4728,9 +4720,9 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
                     --pend;
                 }
             }
-            om::AppendToString(omPtr, strValH, p, pend - p);
+            om::AppendToString_(omPtr, strValH, p, pend - p);
             if (pend < ps->lex_pend) {
-              om::AppendToString(omPtr, strValH, "\n", 1);
+              om::AppendToString_(omPtr, strValH, "\n", 1);
             }
             ps->lex_p = ps->lex_pend;
             if (nextc(ps) == -1) {
@@ -6330,7 +6322,7 @@ void VarTable::removeLast()
 
 void VarTable::grow(rb_parse_state *ps)
 {
-  QUID *nList = (QUID*)ComHeapMalloc(&ps->omPtr->workspace()->compilerState, sizeof(QUID) * allocatedSize * 2);
+  QUID *nList = (QUID*)ComHeapMalloc(ps->omPtr->compilerState(), sizeof(QUID) * allocatedSize * 2);
   memcpy(nList, list, sizeof(QUID) * this->size);
   allocatedSize = allocatedSize * 2;
   list = nList;
@@ -6654,7 +6646,7 @@ haveOperator: ;
       symO = ObjCanonicalSymFromCStr(ps->omPtr, (ByteType*)name, lastIdx + 1,
 					       OOP_NIL);
     };
-    OopType symId = om::objIdOfObj(symO);
+    OopType symId = om::objIdOfObj__(ps->omPtr, symO);
     return RpNameToken::buildQuid(symId, tval, id);
 }
 

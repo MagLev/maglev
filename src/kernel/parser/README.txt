@@ -9,11 +9,84 @@ To create the generated parser files
   
   build the executable  byacc/yacc per byacc/README_maglev.txt
 
-  ./yacc.sh   # runs byacc/yacc and copies generated files
-              #  to the svn/src directory 
+  ./yacc.sh   # runs byacc/yacc to produce generated file rubygrammar.c
 
-Then to get changes to show up in your Smalltalk VM,
-rerun the  slow or fast compile step of the Smalltalk product.
+  Then use <TBD> rake or make task <TBD> to do the following steps
+
+    compile rubygrammar.c
+    compile rubyast.c
+    link libmagparse.so
+    install libmagparse.so in $GEMSTONE/lib
+  
+    After all of this is worked out on Linux,
+    we will publish a  maglev 3.1.0.2.1 server for Mac and
+    additional Rake file changes will be needed for Mac .
+    
+
+  # Linux compile commands with full C debugging
+
+  /usr/bin/g++ -fmessage-length=0 -fcheck-new \
+  -Wformat -Wtrigraphs -Wcomment \
+  -Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value \
+  -Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces \
+  -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type \
+   -g -DFLG_DEBUG=1 \
+   -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubygrammar.c -o rubygrammar.o  
+
+  /usr/bin/g++ -fmessage-length=0 -fcheck-new \
+  -Wformat -Wtrigraphs -Wcomment \
+  -Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value \
+  -Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces \
+  -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type \
+   -g -DFLG_DEBUG=1 \
+   -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubyast.c -o rubyast.o  
+
+  # Linux compile commands with C optimizer turned on
+
+  -g -O3 -DFLG_FAST=1 \
+
+
+  /usr/bin/g++ -fmessage-length=0 -fcheck-new \
+  -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
+  -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
+  -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
+  -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
+  -g -O2 -DFLG_FAST=1 \
+  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubygrammar.c -o rubygrammar.o 
+ 
+  /usr/bin/g++ -fmessage-length=0 -fcheck-new \
+  -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
+  -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
+  -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
+  -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
+  -g -O2 -DFLG_FAST=1 \
+  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubyast.c -o rubyast.o
+
+  # Linux link libmagparse.so 
+    rm -f libmagparse.so
+    /usr/bin/g++ -shared -Wl,-Bdynamic,-hlibmagparse.so  -Wl,--version-script=magparse.exp \
+        rubyast.o rubygrammar.o  \
+        -m64 -lpthread -lcrypt -ldl -lc -lm -lrt -o libmagparse.so \
+        -Wl,--warn-unresolved-symbols
+    chmod 555 libmagparse.so
+    
+  # install the libmagparse.so in the $GEMSTONE/lib directory
+    chmod +w $GEMSTONE/lib
+    rm -f $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
+    cp libmagparse.so $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
+        
 
 ==========================
 algorithmic changes to the Rubinius grammar
