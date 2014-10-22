@@ -80,6 +80,11 @@ To create the generated parser files
     chmod 555 libmagparse.so
     
   # install the libmagparse.so in the $GEMSTONE/lib directory
+  # As downloaded from seaside.gemtalksystems.com , 
+  # the lib directory contains a libmagparse-3.1.0.2.1-64.so
+  # which is a copy of libmagparsedummy.so from the server build.
+  # libmagparsedummy.so is sufficient to run pure smalltalk code.
+  # This  cp  will install the actual libmagparse.so .
     chmod +w $GEMSTONE/lib
     rm -f $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
     cp libmagparse.so $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
