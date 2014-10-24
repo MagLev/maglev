@@ -38,7 +38,7 @@ _requirePrimitives_traceGlobals: gInt traceLocals: locInt env: envId reload: rel
    opns ifNil:[ opns := Object persistentNameSpace: envId ].
    ( opns associationAt: #'$"' ) globalVarValue: pfeatures .
    #( #TRUE #FALSE #NIL) do:[:sym | (opns associationAt: sym) immediateInvariant ].
-   self _fixSymbolSuperclass: envId .
+   self _fixSuperclasses: envId .  "Object<-Symbol, ProtoObject<-Object"
    hm := System gemEnvironmentVariable: 'MAGLEV_HOME' .
    reloadBool ifFalse:[
      opns rubyGlobalVar: #'$:' put:  (RubyContext copyPath: (self defaultLoadPath) replacing: hm with: '$MAGLEV_HOME').
