@@ -863,19 +863,22 @@ module Kernel
   primitive_nobridge '__select*', 'selectRead:write:error:timeout:'
 
   def select(reads, writes=nil, errs=nil, timeout=nil)
-    if timeout._isFixnum
-      ms = timeout * 1000
-      unless ms._isFixnum && ms >= 0
-        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
-      end
-    elsif timeout._not_equal?(nil)
+    ms = if timeout._equal?(nil)
+      nil
+    elsif timeout._isFixnum
+      timeout * 1000
+    else
       timeout = Maglev::Type.coerce_to(timeout, Float, :to_f)
-      ms = (timeout * 1000.0 ).to_int
-      unless ms._isFixnum && ms >= 0
-        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
-      end
+      (timeout * 1000.0 ).to_int
     end
-    Kernel.__select(reads, writes, errs, *[ ms ]).map{|arr| Array(arr)}
+
+    if ms._isFixnum && ms < 0
+      raise ArgumentError, 'Kernel.select, timeout not representable as Fixnum milliseconds >=0'
+    end
+
+    arrays = __select(reads, writes, errs, *[ ms ])
+    return arrays if arrays._equal?(nil)
+    arrays.map{|arr| Array(arr)}
   end
 
   # Preferred alternative to         class << self ; self ; end  .
