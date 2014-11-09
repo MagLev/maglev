@@ -115,6 +115,7 @@ module Kernel
     :readline ,
     :readlines ,
     :require ,
+    :require_relative ,
     :scan ,
     :select ,
     :sleep ,
