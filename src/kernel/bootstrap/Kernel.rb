@@ -838,6 +838,13 @@ module Kernel
     RUBY.require(Maglev::Type.coerce_to(name, String, :to_str))
   end
 
+  def require_relative(path)
+    caller_entry = Thread.__backtrace(false, 100)[1]
+    caller_dir = File.dirname(caller_entry[/^[^:]+/])
+    expanded_path = File.expand_path(path, caller_dir)
+    RUBY.require(expanded_path)
+  end
+
   def scan(pattern)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
     if str._equal?(nil)
