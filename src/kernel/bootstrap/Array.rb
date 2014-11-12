@@ -1513,6 +1513,13 @@ class Array
 
   primitive_nobridge '__remove_from_to_', 'removeFrom:to:'
 
+  # Let's get the basic use case working - just pulling a single random element
+  # Check out https://github.com/rubinius/rubinius/blob/master/kernel/common/array.rb#L1286 for
+  # the Rubinius implementation
+  def sample(count=MaglevUndefined, options=MaglevUndefined)
+    return at Kernel.rand(size)
+  end
+
   def shift(count=MaglevUndefined)  # added in 1.8.7
     if count._equal?(MaglevUndefined) 
       return self.__shift
