@@ -1,2 +1,4 @@
-iferror exit
+iferr 1 where
+iferr 2 stack
+iferr 3 exit 2
 inp $MAGLEV_HOME/src/smalltalk/ruby/allprims.gs
