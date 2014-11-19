@@ -6,6 +6,8 @@ grammar.y copied from Rubinius source code on August 6 , 2010 and then edited.
 
 ### Create generated parser files
 
+Make sure you have `libicu-dev` installed.
+
 build the executable `byacc/yacc` per `byacc/README_maglev.txt`
 
 ```shell
@@ -28,52 +30,52 @@ additional Rake file changes will be needed for Mac .
 
 ```shell
 /usr/bin/g++ -fmessage-length=0 -fcheck-new \
--Wformat -Wtrigraphs -Wcomment \
--Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value \
--Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces \
--Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type \
-  -g -DFLG_DEBUG=1 \
-  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
--fno-strict-aliasing -fno-exceptions \
--I. -I$GEMSTONE/include -x c++ \
--c rubygrammar.c -o rubygrammar.o
+  -Wformat -Wtrigraphs -Wcomment \
+  -Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value \
+  -Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces \
+  -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type \
+    -g -DFLG_DEBUG=1 \
+    -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubygrammar.c -o rubygrammar.o
 
 /usr/bin/g++ -fmessage-length=0 -fcheck-new \
--Wformat -Wtrigraphs -Wcomment \
--Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value \
--Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces \
--Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type \
-  -g -DFLG_DEBUG=1 \
-  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
--fno-strict-aliasing -fno-exceptions \
--I. -I$GEMSTONE/include -x c++ \
--c rubyast.c -o rubyast.o
+  -Wformat -Wtrigraphs -Wcomment \
+  -Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value \
+  -Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces \
+  -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type \
+    -g -DFLG_DEBUG=1 \
+    -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubyast.c -o rubyast.o
 ```
 
 ### Linux compile commands with C optimizer turned on
 
 ```shell
 /usr/bin/g++ -fmessage-length=0 -fcheck-new \
--Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
--Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
--Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
--Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
--g -O3 -DFLG_FAST=1 \
--m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
--fno-strict-aliasing -fno-exceptions \
--I. -I$GEMSTONE/include -x c++ \
--c rubygrammar.c -o rubygrammar.o
+  -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
+  -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
+  -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
+  -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
+  -g -O3 -DFLG_FAST=1 \
+  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubygrammar.c -o rubygrammar.o
 
 /usr/bin/g++ -fmessage-length=0 -fcheck-new \
--Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
--Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
--Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
--Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
--g -O3 -DFLG_FAST=1 \
--m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
--fno-strict-aliasing -fno-exceptions \
--I. -I$GEMSTONE/include -x c++ \
--c rubyast.c -o rubyast.o
+  -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
+  -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
+  -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
+  -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
+  -g -O3 -DFLG_FAST=1 \
+  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
+  -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -x c++ \
+  -c rubyast.c -o rubyast.o
 ```
 
 ### Linux link libmagparse.so
@@ -81,9 +83,9 @@ additional Rake file changes will be needed for Mac .
 ```shell
 rm -f libmagparse.so
 /usr/bin/g++ -shared -Wl,-Bdynamic,-hlibmagparse.so  -Wl,--version-script=magparse.exp \
-    rubyast.o rubygrammar.o  \
-    -m64 -lpthread -lcrypt -ldl -lc -lm -lrt -o libmagparse.so \
-    -Wl,--warn-unresolved-symbols
+  rubyast.o rubygrammar.o  \
+  -m64 -lpthread -lcrypt -ldl -lc -lm -lrt -o libmagparse.so \
+  -Wl,--warn-unresolved-symbols
 chmod 555 libmagparse.so
 ```
 
