@@ -12,6 +12,8 @@ logout
 set user SystemUser pass swordfish
 login
 run
+"ProtoObject is loaded into DataCurator's UserGlobals by the
+  loadfiletree step,  add a reference from SystemUsers' UserGlobals"
 UserGlobals at:#ProtoObject put:
 ((AllUsers userWithId:'DataCurator') symbolList resolveSymbol:#ProtoObject)
   value
